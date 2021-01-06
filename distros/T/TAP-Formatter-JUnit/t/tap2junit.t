@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More;
 use Test::XML;
 use File::Slurp qw(slurp);
 use File::Spec;
@@ -21,7 +21,7 @@ my $null = File::Spec->devnull();
 foreach my $test (@tests) {
     (my $junit = $test) =~ s{/tap/}{/tap/junit/};
 
-    my $rc = system(qq{ $^X -Iblib/lib blib/script/tap2junit $test 2>$null });
+    my $rc = system(qq{ $^X -Ilib script/tap2junit $test 2>$null });
 
     my $outfile  = "$test.xml";
     my $received = slurp($outfile);

@@ -17,7 +17,6 @@
 #                   simple_request
 #                   uri
 #                   useragent
-#                   request
 #
 #   Libraries:      LWP::UserAgent
 #                   HTTP::Request
@@ -42,7 +41,6 @@ use subs qw(new simple_request send_request uri useragent request
 use Scalar::Util 'blessed';
 use File::Temp;
 use IO::Handle;
-use Module::Load;
 
 use LWP::UserAgent;
 use HTTP::Request;
@@ -55,11 +53,10 @@ BEGIN
 {
     # Check for compression support
     $COMPRESSION_AVAILABLE =
-        (eval { load Compress::Zlib; 1; }) ? 'deflate' : q{};
+        (eval { require Compress::Zlib; 1; }) ? 'deflate' : q{};
 }
 
-$VERSION = '1.42';
-$VERSION = eval $VERSION; ## no critic (ProhibitStringyEval)
+$VERSION = '1.44';
 
 ###############################################################################
 #
@@ -103,7 +100,7 @@ sub new
     $REQ = HTTP::Request->new(POST => $location);
     $self->{__request} = $REQ;
     $REQ->header(Content_Type => 'text/xml');
-    $REQ->protocol('HTTP/1.0');
+    $REQ->protocol('HTTP/1.1');
 
     # Note compression support
     $self->{__compress} = $COMPRESSION_AVAILABLE;
@@ -124,7 +121,7 @@ sub new
 
     # Parameters to control the point at which messages are shunted to temp
     # files due to size, and where to home the temp files. Start with a size
-    # threshhold of 1Meg and no specific dir (which will fall-through to the
+    # threshold of 1Meg and no specific dir (which will fall-through to the
     # tmpdir() method of File::Spec).
     $self->{__message_file_thresh} = $attrs{message_file_thresh} || 1_048_576;
     $self->{__message_temp_dir}    = $attrs{message_temp_dir}    || q{};
@@ -148,6 +145,11 @@ sub new
         $self->{__error_cb} = $attrs{error_handler};
         delete $attrs{error_handler};
     }
+
+    # A modification of the pull req from Enrico Sorcinelli. If this attr is
+    # non-null then a stringified copy of a request will be saved on the Client
+    # object during the duration of a request.
+    $self->{__request_as_string} = delete $attrs{request_as_string};
 
     # Get the RPC::XML::Parser instance from the ParserFactory
     $self->{__parser} =
@@ -227,6 +229,8 @@ sub send_request ## no critic (ProhibitExcessComplexity)
     my ($me, $message, $response, $reqclone, $content, $can_compress, $value,
         $do_compress, $req_fh, $tmpdir, $com_engine);
 
+    $self->{__request_as_string} && delete $self->{_xmlrpc_request_as_string};
+
     $me = ref($self) . '::send_request';
 
     if (! $req)
@@ -241,6 +245,12 @@ sub send_request ## no critic (ProhibitExcessComplexity)
             return "$me: Error creating RPC::XML::request object: " .
                 $RPC::XML::ERROR;
         }
+    }
+
+    # Add XML-RPC string request as object property if __request_as_string
+    # is set.
+    if ($self->{__request_as_string}) {
+        utf8::encode($self->{_xmlrpc_request_as_string} = $req->as_string);
     }
 
     # Start by setting up the request-clone for using in this instance
@@ -259,7 +269,7 @@ sub send_request ## no critic (ProhibitExcessComplexity)
     }
 
     # Next step, determine our content's disposition. If it is above the
-    # threshhold for a requested file cut-off, send it to a temp file and use
+    # threshold for a requested file cut-off, send it to a temp file and use
     # a closure on the request object to manage content.
     if ($self->message_file_thresh and
         $self->message_file_thresh <= $req->length)
@@ -528,7 +538,7 @@ BEGIN
     }
 }
 
-# Fetch/set the compression threshhold
+# Fetch/set the compression threshold
 sub compress_thresh
 {
     my $self = shift;
@@ -723,7 +733,7 @@ would be larger than this when stringified is instead written to an anonynous
 temporary file, and spooled from there instead. This is useful for cases in
 which the request includes B<RPC::XML::base64> objects that are themselves
 spooled from file-handles. This test is independent of compression, so even
-if compression of a request would drop it below this threshhold, it will be
+if compression of a request would drop it below this threshold, it will be
 spooled anyway. The file itself is created via File::Temp with UNLINK=>1,
 so once it is freed the disk space is immediately freed.
 
@@ -732,6 +742,14 @@ so once it is freed the disk space is immediately freed.
 If a message is to be spooled to a temporary file, this key can define a
 specific directory in which to open those files. If this is not given, then
 the C<tmpdir> method from the B<File::Spec> package is used, instead.
+
+=item request_as_string
+
+For aiding in debugging, you can pass this key with a non-false value to enable
+a step in each request cycle that saves a stringified version of the request
+XML as a private key on the client object. The request will be saved to the
+key C<_xmlrpc_request_as_string>, and will endure until the next request is
+made by the client object.
 
 =back
 
@@ -839,11 +857,11 @@ are not compressed by default.
 
 If a client is communicating with a server that is known to support compressed
 messages, this method can be used to tell the client object to compress any
-outgoing messages that are longer than the threshhold setting in bytes.
+outgoing messages that are longer than the threshold setting in bytes.
 
 =item compress_thresh([MIN_LIMIT])
 
-With no arguments, returns the current compression threshhold; messages
+With no arguments, returns the current compression threshold; messages
 smaller than this number of bytes will not be compressed, regardless of the
 above method setting. If a number is passed, this is set to the new
 lower-limit. The default value is 4096 (4k).

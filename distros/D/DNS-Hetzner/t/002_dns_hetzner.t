@@ -14,7 +14,10 @@ my $dns = DNS::Hetzner->new(
 isa_ok $dns, 'DNS::Hetzner';
 is $dns->token, $ENV{HETZNER_DNS_TOKEN} // '123536';
 
-#my $zones = $dns->zones->list;
-#my $records = $dns->records->list;
+my $zones = $dns->zones;
+isa_ok $zones, 'DNS::Hetzner::API::Zones';
+
+my $records = $dns->records;
+isa_ok $records, 'DNS::Hetzner::API::Records';
 
 done_testing();

@@ -10,6 +10,7 @@ use Storable qw(dclone);
 use File::Path qw(mkpath);
 use IO::File;
 use TAP::Formatter::JUnit::Result;
+use namespace::clean;
 
 has 'testcases' => (
     is      => 'rw',
@@ -368,6 +369,8 @@ sub _squeaky_clean {
 
 1;
 
+=for stopwords instantiation testcases
+
 =head1 NAME
 
 TAP::Formatter::JUnit::Session - Harness output delegate for JUnit output
@@ -381,12 +384,12 @@ C<TAP::Harness>.
 
 =over
 
-=item B<_initialize($arg_for)>
+=item _initialize($arg_for)
 
 Over-ridden private initializer, so we can accept a new "passing_todo_ok"
 argument at instantiation time.
 
-=item B<result($result)>
+=item result($result)
 
 Called by the harness for each line of TAP it receives.
 
@@ -395,24 +398,24 @@ the "next" test (at which point we flush the queue. This allows us to
 capture any error output or diagnostic info that comes after a test
 failure.
 
-=item B<close_test()>
+=item close_test()
 
 Called to close the test session.
 
 Flushes the queue if we've got anything left in it, dumps the JUnit to disk
 (if necessary), and adds the XML for this test suite to our formatter.
 
-=item B<dump_junit_xml($testsuite)>
+=item dump_junit_xml($testsuite)
 
 Dumps the JUnit for the given XML C<$testsuite>, to the directory specified
 by C<PERL_TEST_HARNESS_DUMP_TAP>.
 
-=item B<add_testcase($case)>
+=item add_testcase($case)
 
 Adds an XML test C<$case> to the list of testcases we've run in this
 session.
 
-=item B<xml()>
+=item xml()
 
 Returns a new C<XML::Generator> to generate XML output. This is simply a
 shortcut to C<$self-E<gt>formatter-E<gt>xml()>.

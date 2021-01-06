@@ -10,6 +10,7 @@ my (%args, $help);
 
 GetOptions(
     "help|h"        => \$help,
+    "limit|l=i"     => \$args{limit},
     "multi|m=i"     => \$args{multi_word},
     "results|r=i"   => \$args{max_results},
     "score|S=i"     => \$args{min_score},
@@ -45,6 +46,7 @@ Options:
 -b | --sort_by      Sort by: score_desc (default), score_asc, alpha_desc, alpha_asc
 -s | --syllables    Minimum number of syllables in the rhyming words (1-100)
 -S | --score        We only return words with a score equal to or higher than this (1-1000000)
+-l | --limit        Limit the amount of sorted words returned under each syllable section (default 1000) (1-1000)
 -r | --results      Maximum number of results to fetch (default 1000) (1-1000)
 -m | --multi        Include "words" that are multi-word phrases (flag)
 
@@ -117,6 +119,16 @@ I<Valid values>:
     0-1000000
 
 I<Default>: 0
+
+=head2 -l|--limit
+
+Limits the number of rhyming words displayed under each syllable section.
+
+I<Valid values>:
+
+    1-1000
+
+I<Default>: 1000
 
 =head2 -r|--results
 

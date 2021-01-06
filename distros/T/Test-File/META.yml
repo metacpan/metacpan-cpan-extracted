@@ -5,17 +5,17 @@ author:
 build_requires:
   Test::Builder: '1.001006'
   Test::Builder::Tester: '1.04'
-  Test::More: '0.95'
+  Test::More: '1'
   Test::utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 keywords:
   - testing
   - file
-license: perl
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -39,5 +39,5 @@ resources:
   bugtracker: https://github.com/briandfoy/test-file/issues
   homepage: https://github.com/briandfoy/test-file
   repository: https://github.com/briandfoy/test-file.git
-version: '1.443'
+version: '1.444'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

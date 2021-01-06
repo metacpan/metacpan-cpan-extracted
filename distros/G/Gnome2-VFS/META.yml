@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl interface to the 2.x series of the GNOME VFS library'
+abstract: '(DEPRECATED) Perl interface to the 2.x series of the GNOME VFS'
 author:
   - unknown
 build_requires:
@@ -21,4 +21,5 @@ requires:
   ExtUtils::Depends: 0.20
   ExtUtils::PkgConfig: 1.03
   Glib: 1.120
-version: 1.083
+version: 1.084
+x_deprecated: 1

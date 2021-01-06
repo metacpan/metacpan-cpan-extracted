@@ -13,588 +13,43 @@ use Types::Standard qw(:all);
 
 use Mojo::Base -strict, -signatures;
 
-extends 'DNS::Hetzner';
+extends 'DNS::Hetzner::APIBase';
 
-with 'DNS::Hetzner::Utils';
 with 'MooX::Singleton';
 
-use JSON::Validator;
+use DNS::Hetzner::Schema;
 use Carp;
+
+our $VERSION = '0.02';
 
 has endpoint  => ( is => 'ro', isa => Str, default => sub { 'records' } );
 
-sub create ($self, $params = {}) {
-    my $spec   =     {
-        'components' => {
-            'BaseRecord' => {
-                'properties' => {
-                    'name' => {
-                        'description' => 'Name of record',
-                        'type'        => 'string',
-                    },
-                    'ttl' => {
-                        'description' => 'TTL of record',
-                        'format'      => 'uint64',
-                        'type'        => 'integer',
-                    },
-                    'type' =>
-                      { '$ref' => '#/components/schemas/RecordTypeCreatable', },
-                    'value' => {
-                        'description' =>
-                          'Value of record (e.g. 127.0.0.1, 1.1.1.1)',
-                        'type' => 'string',
-                    },
-                    'zone_id' => {
-                        'description' =>
-                          'ID of zone this record is associated with',
-                        'type' => 'string',
-                    },
-                },
-            },
-            'ExistingRecord' => {
-                'allOf' => [ { '$ref' => '#/components/schemas/BaseRecord', }, ],
-                'properties' => {
-                    'created' => {
-                        'description' => 'Time record was created',
-                        'format'      => 'date-time',
-                        'readOnly' =>
-                          bless( do { \( my $o = 1 ) }, 'JSON::PP::Boolean' ),
-                        'type' => 'string',
-                    },
-                    'id' => {
-                        'description' => 'ID of record',
-                        'readOnly' =>
-                          bless( do { \( my $o = 1 ) }, 'JSON::PP::Boolean' ),
-                        'type' => 'string',
-                    },
-                    'modified' => {
-                        'description' => 'Time record was last updated',
-                        'format'      => 'date-time',
-                        'readOnly' =>
-                          bless( do { \( my $o = 1 ) }, 'JSON::PP::Boolean' ),
-                        'type' => 'string',
-                    },
-                },
-                'type' => 'object',
-            },
-            'Record' => {
-                'allOf' =>
-                  [ { '$ref' => '#/components/schemas/ExistingRecord', }, ],
-                'required' => [ 'name', 'type', 'value', 'zone_id', ],
-                'type'     => 'object',
-            },
-            'RecordResponse' => {
-                'allOf' =>
-                  [ { '$ref' => '#/components/schemas/ExistingRecord', }, ],
-                'properties' =>
-                  { 'type' => { '$ref' => '#/components/schemas/RecordType', }, },
-                'type' => 'object',
-            },
-            'RecordType' => {
-                'description' => 'Type of the record',
-                'enum'        => [
-                    'A',    'AAAA', 'PTR', 'NS',    'MX',  'CNAME',
-                    'RP',   'TXT',  'SOA', 'HINFO', 'SRV', 'DANE',
-                    'TLSA', 'DS',   'CAA',
-                ],
-                'type' => 'string',
-            },
-            'RecordTypeCreatable' => {
-                'description' => 'Type of the record',
-                'enum'        => [
-                    'A',   'AAAA', 'NS',    'MX',  'CNAME', 'RP',
-                    'TXT', 'SOA',  'HINFO', 'SRV', 'DANE',  'TLSA',
-                    'DS',  'CAA',
-                ],
-                'type' => 'string',
-            },
-        },
-        'properties' =>
-          { '' => { 'schema' => { '$ref' => '#/components/schemas/Record', }, }, },
-        'required' => [],
-        'type'     => 'object',
-    };
-
-    my $validator = JSON::Validator->new->schema($spec);
-
-    my @errors = $validator->validate(
-        $params,
-    );
-
-    if ( @errors ) {
-        croak 'invalid parameters';
-    }
-
-    my %request_params = map{
-        exists $params->{$_} ?
-            ($_ => $params->{$_}) :
-            ();
-    } keys %{$spec->{properties}};
-
-    $self->request(
-        '',
-        { type => 'post' },
-        \%request_params,
-    );
+sub bulk_create ($self, %params) {
+    return $self->_do( 'BulkCreateRecords', \%params, '/bulk', { type => 'post' } );
 }
 
-sub list ($self, $params = {}) {
-    my $spec   =     {
-        'properties' => {},
-        'required'   => [],
-        'type'       => 'object',
-    };
-
-    my $validator = JSON::Validator->new->schema($spec);
-
-    my @errors = $validator->validate(
-        $params,
-    );
-
-    if ( @errors ) {
-        croak 'invalid parameters';
-    }
-
-    my %request_params = map{
-        exists $params->{$_} ?
-            ($_ => $params->{$_}) :
-            ();
-    } keys %{$spec->{properties}};
-
-    $self->request(
-        '',
-        { type => 'get' },
-        \%request_params,
-    );
+sub bulk_update ($self, %params) {
+    return $self->_do( 'BulkUpdateRecords', \%params, '/bulk', { type => 'put' } );
 }
 
-sub update_bulk ($self, $params = {}) {
-    my $spec   =     {
-        'components' => {
-            'BaseRecord' => {
-                'properties' => {
-                    'name' => {
-                        'description' => 'Name of record',
-                        'type'        => 'string',
-                    },
-                    'ttl' => {
-                        'description' => 'TTL of record',
-                        'format'      => 'uint64',
-                        'type'        => 'integer',
-                    },
-                    'type' =>
-                      { '$ref' => '#/components/schemas/RecordTypeCreatable', },
-                    'value' => {
-                        'description' =>
-                          'Value of record (e.g. 127.0.0.1, 1.1.1.1)',
-                        'type' => 'string',
-                    },
-                    'zone_id' => {
-                        'description' =>
-                          'ID of zone this record is associated with',
-                        'type' => 'string',
-                    },
-                },
-            },
-            'ExistingRecord' => {
-                'allOf' => [ { '$ref' => '#/components/schemas/BaseRecord', }, ],
-                'properties' => {
-                    'created' => {
-                        'description' => 'Time record was created',
-                        'format'      => 'date-time',
-                        'readOnly' =>
-                          bless( do { \( my $o = 1 ) }, 'JSON::PP::Boolean' ),
-                        'type' => 'string',
-                    },
-                    'id' => {
-                        'description' => 'ID of record',
-                        'readOnly' =>
-                          bless( do { \( my $o = 1 ) }, 'JSON::PP::Boolean' ),
-                        'type' => 'string',
-                    },
-                    'modified' => {
-                        'description' => 'Time record was last updated',
-                        'format'      => 'date-time',
-                        'readOnly' =>
-                          bless( do { \( my $o = 1 ) }, 'JSON::PP::Boolean' ),
-                        'type' => 'string',
-                    },
-                },
-                'type' => 'object',
-            },
-            'Record' => {
-                'allOf' =>
-                  [ { '$ref' => '#/components/schemas/ExistingRecord', }, ],
-                'required' => [ 'name', 'type', 'value', 'zone_id', ],
-                'type'     => 'object',
-            },
-            'RecordResponse' => {
-                'allOf' =>
-                  [ { '$ref' => '#/components/schemas/ExistingRecord', }, ],
-                'properties' =>
-                  { 'type' => { '$ref' => '#/components/schemas/RecordType', }, },
-                'type' => 'object',
-            },
-            'RecordType' => {
-                'description' => 'Type of the record',
-                'enum'        => [
-                    'A',    'AAAA', 'PTR', 'NS',    'MX',  'CNAME',
-                    'RP',   'TXT',  'SOA', 'HINFO', 'SRV', 'DANE',
-                    'TLSA', 'DS',   'CAA',
-                ],
-                'type' => 'string',
-            },
-            'RecordTypeCreatable' => {
-                'description' => 'Type of the record',
-                'enum'        => [
-                    'A',   'AAAA', 'NS',    'MX',  'CNAME', 'RP',
-                    'TXT', 'SOA',  'HINFO', 'SRV', 'DANE',  'TLSA',
-                    'DS',  'CAA',
-                ],
-                'type' => 'string',
-            },
-        },
-        'properties' => {
-            '' => {
-                'schema' => {
-                    'properties' => {
-                        'records' => {
-                            'items' => { '$ref' => '#/components/schemas/Record', },
-                            'type'  => 'array',
-                        },
-                    },
-                    'type' => 'object',
-                },
-            },
-        },
-        'required' => [],
-        'type'     => 'object',
-    };
-
-    my $validator = JSON::Validator->new->schema($spec);
-
-    my @errors = $validator->validate(
-        $params,
-    );
-
-    if ( @errors ) {
-        croak 'invalid parameters';
-    }
-
-    my %request_params = map{
-        exists $params->{$_} ?
-            ($_ => $params->{$_}) :
-            ();
-    } keys %{$spec->{properties}};
-
-    $self->request(
-        '/bulk',
-        { type => 'put' },
-        \%request_params,
-    );
+sub delete ($self, %params) {
+    return $self->_do( 'DeleteRecord', \%params, '/:RecordID', { type => 'delete' } );
 }
 
-sub create_bulk ($self, $params = {}) {
-    my $spec   =     {
-        'components' => {
-            'BaseRecord' => {
-                'properties' => {
-                    'name' => {
-                        'description' => 'Name of record',
-                        'type'        => 'string',
-                    },
-                    'ttl' => {
-                        'description' => 'TTL of record',
-                        'format'      => 'uint64',
-                        'type'        => 'integer',
-                    },
-                    'type' =>
-                      { '$ref' => '#/components/schemas/RecordTypeCreatable', },
-                    'value' => {
-                        'description' =>
-                          'Value of record (e.g. 127.0.0.1, 1.1.1.1)',
-                        'type' => 'string',
-                    },
-                    'zone_id' => {
-                        'description' =>
-                          'ID of zone this record is associated with',
-                        'type' => 'string',
-                    },
-                },
-            },
-            'ExistingRecord' => {
-                'allOf' => [ { '$ref' => '#/components/schemas/BaseRecord', }, ],
-                'properties' => {
-                    'created' => {
-                        'description' => 'Time record was created',
-                        'format'      => 'date-time',
-                        'readOnly' =>
-                          bless( do { \( my $o = 1 ) }, 'JSON::PP::Boolean' ),
-                        'type' => 'string',
-                    },
-                    'id' => {
-                        'description' => 'ID of record',
-                        'readOnly' =>
-                          bless( do { \( my $o = 1 ) }, 'JSON::PP::Boolean' ),
-                        'type' => 'string',
-                    },
-                    'modified' => {
-                        'description' => 'Time record was last updated',
-                        'format'      => 'date-time',
-                        'readOnly' =>
-                          bless( do { \( my $o = 1 ) }, 'JSON::PP::Boolean' ),
-                        'type' => 'string',
-                    },
-                },
-                'type' => 'object',
-            },
-            'Record' => {
-                'allOf' =>
-                  [ { '$ref' => '#/components/schemas/ExistingRecord', }, ],
-                'required' => [ 'name', 'type', 'value', 'zone_id', ],
-                'type'     => 'object',
-            },
-            'RecordResponse' => {
-                'allOf' =>
-                  [ { '$ref' => '#/components/schemas/ExistingRecord', }, ],
-                'properties' =>
-                  { 'type' => { '$ref' => '#/components/schemas/RecordType', }, },
-                'type' => 'object',
-            },
-            'RecordType' => {
-                'description' => 'Type of the record',
-                'enum'        => [
-                    'A',    'AAAA', 'PTR', 'NS',    'MX',  'CNAME',
-                    'RP',   'TXT',  'SOA', 'HINFO', 'SRV', 'DANE',
-                    'TLSA', 'DS',   'CAA',
-                ],
-                'type' => 'string',
-            },
-            'RecordTypeCreatable' => {
-                'description' => 'Type of the record',
-                'enum'        => [
-                    'A',   'AAAA', 'NS',    'MX',  'CNAME', 'RP',
-                    'TXT', 'SOA',  'HINFO', 'SRV', 'DANE',  'TLSA',
-                    'DS',  'CAA',
-                ],
-                'type' => 'string',
-            },
-        },
-        'properties' => {
-            '' => {
-                'schema' => {
-                    'properties' => {
-                        'records' => {
-                            'items' => { '$ref' => '#/components/schemas/Record', },
-                            'type'  => 'array',
-                        },
-                    },
-                    'type' => 'object',
-                },
-            },
-        },
-        'required' => [],
-        'type'     => 'object',
-    };
-
-    my $validator = JSON::Validator->new->schema($spec);
-
-    my @errors = $validator->validate(
-        $params,
-    );
-
-    if ( @errors ) {
-        croak 'invalid parameters';
-    }
-
-    my %request_params = map{
-        exists $params->{$_} ?
-            ($_ => $params->{$_}) :
-            ();
-    } keys %{$spec->{properties}};
-
-    $self->request(
-        '/bulk',
-        { type => 'post' },
-        \%request_params,
-    );
+sub get ($self, %params) {
+    return $self->_do( 'GetRecord', \%params, '/:RecordID', { type => 'get' } );
 }
 
-sub delete ($self, $params = {}) {
-    my $spec   =     {
-        'properties' => { 'RecordID' => { 'type' => 'string', }, },
-        'required'   => [ 'RecordID', ],
-        'type'       => 'object',
-    };
-
-    my $validator = JSON::Validator->new->schema($spec);
-
-    my @errors = $validator->validate(
-        $params,
-    );
-
-    if ( @errors ) {
-        croak 'invalid parameters';
-    }
-
-    my %request_params = map{
-        exists $params->{$_} ?
-            ($_ => $params->{$_}) :
-            ();
-    } keys %{$spec->{properties}};
-
-    $self->request(
-        '/:RecordID',
-        { type => 'delete' },
-        \%request_params,
-    );
+sub update ($self, %params) {
+    return $self->_do( 'UpdateRecord', \%params, '/:RecordID', { type => 'put' } );
 }
 
-sub update ($self, $params = {}) {
-    my $spec   =     {
-        'components' => {
-            'BaseRecord' => {
-                'properties' => {
-                    'name' => {
-                        'description' => 'Name of record',
-                        'type'        => 'string',
-                    },
-                    'ttl' => {
-                        'description' => 'TTL of record',
-                        'format'      => 'uint64',
-                        'type'        => 'integer',
-                    },
-                    'type' =>
-                      { '$ref' => '#/components/schemas/RecordTypeCreatable', },
-                    'value' => {
-                        'description' =>
-                          'Value of record (e.g. 127.0.0.1, 1.1.1.1)',
-                        'type' => 'string',
-                    },
-                    'zone_id' => {
-                        'description' =>
-                          'ID of zone this record is associated with',
-                        'type' => 'string',
-                    },
-                },
-            },
-            'ExistingRecord' => {
-                'allOf' => [ { '$ref' => '#/components/schemas/BaseRecord', }, ],
-                'properties' => {
-                    'created' => {
-                        'description' => 'Time record was created',
-                        'format'      => 'date-time',
-                        'readOnly' =>
-                          bless( do { \( my $o = 1 ) }, 'JSON::PP::Boolean' ),
-                        'type' => 'string',
-                    },
-                    'id' => {
-                        'description' => 'ID of record',
-                        'readOnly' =>
-                          bless( do { \( my $o = 1 ) }, 'JSON::PP::Boolean' ),
-                        'type' => 'string',
-                    },
-                    'modified' => {
-                        'description' => 'Time record was last updated',
-                        'format'      => 'date-time',
-                        'readOnly' =>
-                          bless( do { \( my $o = 1 ) }, 'JSON::PP::Boolean' ),
-                        'type' => 'string',
-                    },
-                },
-                'type' => 'object',
-            },
-            'Record' => {
-                'allOf' =>
-                  [ { '$ref' => '#/components/schemas/ExistingRecord', }, ],
-                'required' => [ 'name', 'type', 'value', 'zone_id', ],
-                'type'     => 'object',
-            },
-            'RecordResponse' => {
-                'allOf' =>
-                  [ { '$ref' => '#/components/schemas/ExistingRecord', }, ],
-                'properties' =>
-                  { 'type' => { '$ref' => '#/components/schemas/RecordType', }, },
-                'type' => 'object',
-            },
-            'RecordType' => {
-                'description' => 'Type of the record',
-                'enum'        => [
-                    'A',    'AAAA', 'PTR', 'NS',    'MX',  'CNAME',
-                    'RP',   'TXT',  'SOA', 'HINFO', 'SRV', 'DANE',
-                    'TLSA', 'DS',   'CAA',
-                ],
-                'type' => 'string',
-            },
-            'RecordTypeCreatable' => {
-                'description' => 'Type of the record',
-                'enum'        => [
-                    'A',   'AAAA', 'NS',    'MX',  'CNAME', 'RP',
-                    'TXT', 'SOA',  'HINFO', 'SRV', 'DANE',  'TLSA',
-                    'DS',  'CAA',
-                ],
-                'type' => 'string',
-            },
-        },
-        'properties' => {
-            '' => { 'schema' => { '$ref' => '#/components/schemas/Record', }, },
-            'RecordID' => { 'type' => 'string', },
-        },
-        'required' => [ 'RecordID', ],
-        'type'     => 'object',
-    };
-
-    my $validator = JSON::Validator->new->schema($spec);
-
-    my @errors = $validator->validate(
-        $params,
-    );
-
-    if ( @errors ) {
-        croak 'invalid parameters';
-    }
-
-    my %request_params = map{
-        exists $params->{$_} ?
-            ($_ => $params->{$_}) :
-            ();
-    } keys %{$spec->{properties}};
-
-    $self->request(
-        '/:RecordID',
-        { type => 'put' },
-        \%request_params,
-    );
+sub list ($self, %params) {
+    return $self->_do( 'GetRecords', \%params, '', { type => 'get' } );
 }
 
-sub get ($self, $params = {}) {
-    my $spec   =     {
-        'properties' => { 'RecordID' => { 'type' => 'string', }, },
-        'required'   => [ 'RecordID', ],
-        'type'       => 'object',
-    };
-
-    my $validator = JSON::Validator->new->schema($spec);
-
-    my @errors = $validator->validate(
-        $params,
-    );
-
-    if ( @errors ) {
-        croak 'invalid parameters';
-    }
-
-    my %request_params = map{
-        exists $params->{$_} ?
-            ($_ => $params->{$_}) :
-            ();
-    } keys %{$spec->{properties}};
-
-    $self->request(
-        '/:RecordID',
-        { type => 'get' },
-        \%request_params,
-    );
+sub create ($self, %params) {
+    return $self->_do( 'CreateRecord', \%params, '', { type => 'post' } );
 }
 
 
@@ -612,7 +67,7 @@ DNS::Hetzner::API::Records - Records
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -636,47 +91,47 @@ version 0.01
 
 =head1 METHODS
 
-=head2 create
-
-Creates a new record.
-
-    $dns->Records->create(HASH(0x55fcc738df20));
-
-=head2 list
-
-Returns all records associated with user.
-
-    $dns->Records->list(HASH(0x55fcc72cd018));
-
-=head2 update_bulk
-
-Update several records at once.
-
-    $dns->Records->update_bulk(HASH(0x55fcc72cd210));
-
-=head2 create_bulk
+=head2 bulk_create
 
 Create several records at once.
 
-    $dns->Records->create_bulk(HASH(0x55fcc737cfd0));
+    $dns->Records->bulk_create();
+
+=head2 bulk_update
+
+Update several records at once.
+
+    $dns->Records->bulk_update();
 
 =head2 delete
 
 Deletes a record.
 
-    $dns->Records->delete(HASH(0x55fcc7376f80));
-
-=head2 update
-
-Updates a record.
-
-    $dns->Records->update(HASH(0x55fcc72cca00));
+    $dns->Records->delete();
 
 =head2 get
 
 Returns information about a single record.
 
-    $dns->Records->get(HASH(0x55fcc72dbe90));
+    $dns->Records->get();
+
+=head2 update
+
+Updates a record.
+
+    $dns->Records->update();
+
+=head2 list
+
+Returns all records associated with user.
+
+    $dns->Records->list();
+
+=head2 create
+
+Creates a new record.
+
+    $dns->Records->create();
 
 =head1 AUTHOR
 

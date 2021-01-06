@@ -1,3 +1,14 @@
+Overview of changes in Gnome2::Wnck 0.18
+========================================
+
+* Added more POD docs via patch supplied by the Debian Perl Porters (RT#93271)
+
+Overview of changes in Gnome2::Wnck 0.17
+========================================
+
+* Deprecation release; project is now in 'deprecated' status.  See the README
+  file for more information about the project's deprecation
+
 Overview of changes in Gnome2::Wnck 0.16
 ========================================
 

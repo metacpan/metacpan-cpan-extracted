@@ -8,7 +8,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 maps
 NEWS
-perl-Gnome2-Rsvg.doap
+perl-gnome2-rsvg.doap
 perl-Gnome2-Rsvg.spec.in
 README
 Rsvg.pm
@@ -17,4 +17,5 @@ rsvg2perl.h
 t/Rsvg.t
 t/window.svg
 xs/Rsvg.xs
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,178 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use TAP::Parser;
+use TAP::Parser::Aggregator;
+use TAP::Formatter::JUnit;
+use Getopt::Long;
+use Pod::Usage;
+use IO::File;
+use File::Slurp qw(slurp);
+
+###############################################################################
+# Read in our command line options.
+my ($help, $man);
+my $name;
+my $verbose;
+my $suffix = '.xml';
+GetOptions(
+    'suffix=s'          => \$suffix,
+    'verbose'           => \$verbose,
+    'name|junit_name=s' => \$name,
+    'help|?'            => \$help,
+    'man'               => \$man,
+) || pod2usage(1);
+pod2usage(1) if ($help);
+pod2usage( -exitstatus=>0, -verbose=>2 ) if ($man);
+
+###############################################################################
+# Get the names of all of the TAP files we're supposed to convert.
+my @tap_files = @ARGV;
+pod2usage(1) unless (@tap_files);
+
+###############################################################################
+# Convert all of the TAP files to JUnit.
+foreach my $file (@tap_files) {
+    verbose( "converting TAP to JUnit: $file" );
+
+    # Slurp in the TAP.
+    my $tap = ($file eq '-')
+        ? do { local $/; <STDIN>; }
+        : slurp($file);
+
+    # Open up a FH for where we're going to dump the JUnit
+    my $fout;
+    if ($file eq '-') {
+        open $fout, '>&STDOUT'
+            || die "can't dup STDOUT; $!\n";
+    }
+    else {
+        my $junit_file = "${file}${suffix}";
+        $fout = IO::File->new( $junit_file, '>' )
+             || die "can't open '$junit_file' for writing; $!";
+    }
+
+    # Name the test; if one wasn't provided, name it after the file itself.
+    my $test_name = $name || $file;
+
+    # Convert the TAP to JUnit
+    eval {
+        # Create the TAP formatter, aggregator, and parser that we're going to
+        # use to convert the TAP to JUnit.
+        my $formatter  = TAP::Formatter::JUnit->new( { stdout => $fout } );
+        my $aggregator = TAP::Parser::Aggregator->new();
+        my $parser     = TAP::Parser->new( { tap => $tap } );
+
+        # Parse all of the TAP in this file.
+        $aggregator->start();
+
+        my $session = $formatter->open_test($test_name, $parser);
+        while (my $result = $parser->next()) {
+            $session->result($result);
+        }
+        $session->close_test();
+        $aggregator->add($file, $parser);
+
+        $aggregator->stop();
+
+        # Summarize the results (in JUnit)
+        $formatter->summary;
+    };
+    if ($@) {
+        warn $@;
+    }
+
+    $fout->close();
+}
+
+###############################################################################
+# All done; exit peacefully.
+exit;
+
+sub verbose {
+    print "$_[0]\n" if ($verbose);
+}
+
+
+=head1 NAME
+
+tap2junit - Converts TAP output to JUnit
+
+=head1 SYNOPSIS
+
+  tap2junit [options] <filename> <filename> ...
+
+  Options:
+    --suffix <suffix>   Suffix for JUnit output files (default ".xml")
+    --verbose           Display verbose status during conversion
+    --name <name>       Provide explicit name for the JUnit test
+    --help/-?           Display brief help message
+    --man               Display full documentation
+
+=head1 DESCRIPTION
+
+C<tap2junit> converts TAP output to JUnit.
+
+Give it a list of files containing TAP results and it will create a series of
+F<????.junit.xml> output files containing the JUnit representations of that TAP
+contained in the files.
+
+If you specify F<-> as the filename, C<tap2junit> will read from STDIN and write
+to STDOUT.  You may also want to use the C<--name> option to name the test
+explicitly (as the default name of "-" isn't going to make much sense).
+
+=head1 OPTIONS
+
+=over
+
+=item B<--suffix E<lt>suffixE<gt>>
+
+Specifies the suffix which is appended to all of the input files, in order to
+generate the filename for the JUnit XML file that is being output.
+
+If you want to live dangerously and over-write your original TAP files, you can
+set this to "" and your original TAP files will be over-written.
+
+Defaults to F<.xml>
+
+=item B<--verbose>
+
+Display verbose status information during the conversion (telling you which TAP
+file its working on).
+
+=item B<--name E<lt>nameE<gt>>
+
+Specifies an explicit name for the JUnit test.  If no name is provided, a
+default name will be constructed based on the full path of the TAP file being
+processed.
+
+This option has also been aliased as C<--junit_name> to provide compatibility
+with a patch from Joe McMahon.
+
+=item B<--help/-?>
+
+Display brief help message.
+
+=item B<--man>
+
+Displays the full documentation.
+
+=back
+
+=head1 AUTHOR
+
+Graham TerMarsch <cpan@howlingfrog.com>
+
+=head1 COPYRIGHT
+
+Copyright 2008-2010, Graham TerMarsch.  All Rights Reserved.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<TAP::Formatter::JUnit>.
+
+=cut

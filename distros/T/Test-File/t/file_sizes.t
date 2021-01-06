@@ -12,10 +12,14 @@ require "./t/setup_common";
 
 test_out( 'ok 1 - zero_file is empty' );
 file_empty_ok( 'zero_file' );
+test_out( 'ok 2 - zero_file really is empty' );
+file_empty_ok( 'zero_file', 'zero_file really is empty' );
 test_test();
 
 test_out( 'ok 1 - min_file is not empty' );
 file_not_empty_ok( 'min_file' );
+test_out( 'ok 2 - min_file really is not empty' );
+file_not_empty_ok( 'min_file', 'min_file really is not empty' );
 test_test();
 
 subtest works => sub {
@@ -31,15 +35,22 @@ subtest works => sub {
 
 	test_out( "ok 1 - $file has right size" );
 	file_size_ok( $file, $actual_size );
+	test_out( "ok 2 - $file really has right size" );
+	file_size_ok( $file, $actual_size, "$file really has right size" );
 	test_test();
 
 	test_out( "ok 1 - $file is under $over_size bytes" );
 	file_max_size_ok( $file, $over_size );
+	test_out( "ok 2 - $file really is under $over_size bytes" );
+	file_max_size_ok( $file, $over_size, "$file really is under $over_size bytes" );
 	test_test();
 
 	test_out( "ok 1 - $file is over $under_size bytes" );
 	file_min_size_ok( $file, $under_size );
+	test_out( "ok 2 - $file really is over $under_size bytes" );
+	file_min_size_ok( $file, $under_size, "$file really is over $under_size bytes" );
 	test_test();
+	done_testing();
 	};
 
 subtest wrong_size => sub {
@@ -97,6 +108,7 @@ subtest wrong_size => sub {
 		);
 	file_not_empty_ok( 'zero_file' );
 	test_test();
+	done_testing();
 	};
 
 subtest doesnt_work_with_missing_file => sub {
@@ -147,6 +159,7 @@ subtest doesnt_work_with_missing_file => sub {
 		);
 	file_not_empty_ok( $not_there );
 	test_test();
+	done_testing();
 	};
 
 done_testing();

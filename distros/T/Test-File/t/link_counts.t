@@ -26,15 +26,22 @@ my $not_there     = 'not_there';
 my $dangle_sym    = 'dangle_sym';
 
 subtest should_work => sub {
-	test_out( "ok 1 - $test_name\n    ok 2 - $test_name\n    ok 3 - $test_name" );
+	test_out( "ok 1 - $test_name" );
+        test_out( "ok 2 - readable has a link count of [100]" );
+        test_out( "ok 3 - $test_name" );
+        test_out( "ok 4 - readable has a link count of [0]" );
+        test_out( "ok 5 - $test_name" );
 	link_count_lt_ok( $readable, 100, $test_name );
+	link_count_lt_ok( $readable, 100 );
 	link_count_gt_ok( $readable,   0, $test_name );
+	link_count_gt_ok( $readable,   0 );
 	link_count_is_ok( $readable,   1, $test_name );
 	test_test();
 
 	test_out( "ok 1 - $readable has a link count of [1]" );
 	link_count_is_ok( $readable, 1 );
 	test_test();
+	done_testing();
 	};
 
 
@@ -75,6 +82,7 @@ subtest bad_count => sub {
 		);
 	link_count_gt_ok( $readable, 100, $test_name );
 	test_test();
+	done_testing();
 	};
 
 done_testing();

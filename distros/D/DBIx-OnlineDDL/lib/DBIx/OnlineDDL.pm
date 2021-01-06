@@ -3,7 +3,7 @@ package DBIx::OnlineDDL;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Run DDL on online databases safely
 use version;
-our $VERSION = 'v0.920.1'; # VERSION
+our $VERSION = 'v0.930.0'; # VERSION
 
 use v5.10;
 use Moo;
@@ -1032,6 +1032,9 @@ sub create_new_table {
     my $orig_table_name_quote = $dbh->quote_identifier($orig_table_name);
     my $new_table_name_quote  = $dbh->quote_identifier($new_table_name);
 
+    # ANSI quotes could also appear in the statement
+    my $orig_table_name_ansi_quote = '"'.$orig_table_name.'"';
+
     $progress->message("Creating new table $new_table_name");
 
     my $table_sql = $helper->create_table_sql($orig_table_name);
@@ -1040,7 +1043,9 @@ sub create_new_table {
     $table_sql = $helper->rename_fks_in_table_sql($orig_table_name, $table_sql) if $helper->dbms_uses_global_fk_namespace;
 
     # Change the old->new table name
-    my $orig_table_name_quote_re = '('.quotemeta($orig_table_name_quote).'|'.quotemeta($orig_table_name).')';
+    my $orig_table_name_quote_re = '('.join('|',
+        quotemeta($orig_table_name_quote), quotemeta($orig_table_name_ansi_quote), quotemeta($orig_table_name)
+    ).')';
     $table_sql =~ s/(?<=^CREATE TABLE )$orig_table_name_quote_re/$new_table_name_quote/;
 
     # NOTE: This SQL will still have the old table name in self-referenced FKs.  This is
@@ -1560,7 +1565,9 @@ sub _fk_info_to_hash {
             # Sadly, foreign_key_info doesn't always fill in all of the details for the FK, so the
             # CREATE TABLE SQL is actually the better record.  Fortunately, this is all ANSI SQL.
             my $create_table_sql = $create_table_sql{$fk_table_name} //= $self->_helper->create_table_sql($fk_table_name);
-            my $fk_name_quote_re = '(?:'.quotemeta( $dbh->quote_identifier($fk_name) ).'|'.quotemeta($fk_name).')';
+            my $fk_name_quote_re = '(?:'.join('|',
+                quotemeta( $dbh->quote_identifier($fk_name) ), quotemeta('"'.$fk_name.'"'), quotemeta($fk_name)
+            ).')';
 
             if ($create_table_sql =~ m<
                 CONSTRAINT \s $fk_name_quote_re \s (      # start capture of full SQL
@@ -1673,7 +1680,7 @@ DBIx::OnlineDDL - Run DDL on online databases safely
 
 =head1 VERSION
 
-version v0.920.1
+version v0.930.0
 
 =head1 SYNOPSIS
 
@@ -2142,7 +2149,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+This software is Copyright (c) 2018 - 2021 by Grant Street Group.
 
 This is free software, licensed under:
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl interface to the 2.x series of the GNOME VFS library",
+   "abstract" : "(DEPRECATED) Perl interface to the 2.x series of the GNOME VFS",
    "author" : [
       "unknown"
    ],
@@ -39,5 +39,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.083"
+   "version" : "1.084",
+   "x_deprecated" : 1
 }

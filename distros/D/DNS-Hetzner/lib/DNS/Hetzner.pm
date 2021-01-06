@@ -1,23 +1,21 @@
 package DNS::Hetzner;
 
-use v5.20;
+use v5.24;
 
 # ABSTRACT: Perl library to work with the API for the Hetzner DNS
 
+use Carp;
 use Moo;
 use Mojo::UserAgent;
-
-use Carp;
 use Types::Mojo qw(:all);
 
-use Mojo::Base -strict, -signatures;
+use DNS::Hetzner::Schema;
 
 with 'DNS::Hetzner::API';
 
-use feature 'postderef';
-no warnings 'experimental::postderef';
+use Mojo::Base -strict, -signatures;
 
-our $VERSION = 0.01;
+our $VERSION = '0.02';
 
 has token    => ( is => 'ro', isa => Str, required => 1 );
 has host     => ( is => 'ro', isa => MojoURL["https?"], default => sub { 'https://dns.hetzner.com' }, coerce => 1 );
@@ -34,59 +32,6 @@ has client   => (
 
 __PACKAGE__->load_namespace;
 
-sub request ( $self, $partial_uri, $opts, $params = {} ) {
-
-    my $method = delete $opts->{type} // 'get';
-    my $sub    = $self->client->can(lc $method);
-
-    if ( !$sub ) {
-        croak sprintf 'Invalid request method %s', $method;
-    }
-
-    $partial_uri =~ s{:(?<mandatory>\w+)\b}{ delete $params->{$+{mandatory}} }xmsge;
-
-    my %request_opts;
-    if ( $params->%* ) {
-        %request_opts = ( json => $params );
-    }
-
-    $opts->{query} //= {};
-    my $query = '';
-    if ( $opts->{query}->%* ) {
-        my $query_params = delete $opts->{query};
-
-        $query = join '&', map{ 
-            $_ . '=' . uri_escape($query_params->{$_}) 
-        }sort keys $query_params->%*;
-    }
-
-    $partial_uri .= '?' . $query if $query;
-
-    my $uri = join '/', 
-        $self->host, 
-        $self->base_uri,
-        $self->endpoint,
-        $partial_uri;
-
-    $uri =~ s{/\z}{};
-
-    my $tx = $self->client->$method(
-        $uri,
-        {
-            'Auth-API-Token' => $self->token,
-        },
-        %request_opts,
-    );
-
-    my $response = $tx->res;
-
-    say STDERR $tx->req->to_string if $ENV{DNS_HETZNER_DEBUG};
-    say STDERR $tx->res->to_string if $ENV{DNS_HETZNER_DEBUG};
-
-    return if $response->is_error;
-    return $response->json;
-}
-
 1;
 
 __END__
@@ -101,18 +46,22 @@ DNS::Hetzner - Perl library to work with the API for the Hetzner DNS
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
     use DNS::Hetzner;
+    use Data::Printer;
 
-    my $cloud = DNS::Hetzner->new(
+    my $dns = DNS::Hetzner->new(
         token => 'ABCDEFG1234567',    # your api token
     );
 
-    my $server_client = $cloud->server;
-    my $server_list   = $server_client->list;
+    my $records = $dns->records;
+    my $zones   = $dns->zones;
+
+    my $all_records = $records->list;
+    p $all_records;
 
 =head1 INFO
 
@@ -143,7 +92,9 @@ B<I<(required)>> Your API token.
 
 =head1 METHODS
 
-=head2 request
+=head2 records
+
+=head2 zones
 
 =head1 AUTHOR
 

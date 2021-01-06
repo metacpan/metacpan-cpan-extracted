@@ -23,6 +23,7 @@ subtest file_does_not_exist => sub {
 		);
 	file_not_empty_ok( $file );
 	test_test( $name );
+	done_testing();
 	};
 
 subtest file_exists_non_zero => sub {
@@ -33,6 +34,7 @@ subtest file_exists_non_zero => sub {
 	test_out( "ok 1 - $name");
 	file_not_empty_ok( $file );
 	test_test( $name );
+	done_testing();
 	};
 
 subtest file_exists_zero_size => sub {
@@ -53,6 +55,7 @@ subtest file_exists_zero_size => sub {
 	test_test( $name );
 
 	unlink $file;
+	done_testing();
 	};
 
 done_testing();

@@ -29,13 +29,14 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Module::Runtime" : "0",
+            "JSON::Validator" : "4.10",
             "Mojolicious" : "8",
             "Moo" : "1.003001",
             "MooX::Singleton" : "0",
             "Types::Mojo" : "0.04",
+            "Types::Standard" : "0",
             "URI::Escape" : "0",
-            "perl" : "5.020"
+            "perl" : "5.024"
          }
       },
       "test" : {
@@ -51,23 +52,27 @@
    "provides" : {
       "DNS::Hetzner" : {
          "file" : "lib/DNS/Hetzner.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "DNS::Hetzner::API" : {
          "file" : "lib/DNS/Hetzner/API.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "DNS::Hetzner::API::Records" : {
          "file" : "lib/DNS/Hetzner/API/Records.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "DNS::Hetzner::API::Zones" : {
          "file" : "lib/DNS/Hetzner/API/Zones.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
-      "DNS::Hetzner::Utils" : {
-         "file" : "lib/DNS/Hetzner/Utils.pm",
-         "version" : "0.01"
+      "DNS::Hetzner::APIBase" : {
+         "file" : "lib/DNS/Hetzner/APIBase.pm",
+         "version" : "0.02"
+      },
+      "DNS::Hetzner::Schema" : {
+         "file" : "lib/DNS/Hetzner/Schema.pm",
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -82,7 +87,7 @@
          "web" : "http://github.com/reneeb/DNS-Hetzner"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

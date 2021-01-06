@@ -6,15 +6,15 @@ use Test::More 0.95;
 my $dir = tempdir( CLEANUP => 1 ) or BAILOUT( "Could not setup temp directory" );
 
 unless( -d $dir ) {
-	mkdir 'test_files', 0700 
+	mkdir 'test_files', 0700
 		or BAILOUT( "Could not make directory! $!" );
 	}
-	
+
 chdir $dir or BAILOUT( "Could not change directory! $!" );
 
 my @files = qw(
 max_file       non_zero_file  not_readable   readable       zero_file
-executable     min_file       not_executable not_writeable  writeable
+executable     min_file       not_executable not_writable   writable
 mtime_file
 );
 
@@ -29,14 +29,14 @@ is( $count, scalar @files ) or BAILOUT( "Could not make files readable" );
 }
 
 {
-my $count = chmod 0400, 'readable', 'not_writeable', 'not_executable';
+my $count = chmod 0400, 'readable', 'not_writable', 'not_executable';
 is( $count, 3 ) or BAILOUT( "Could not make files readable" );
 }
 
 {
-my $count = chmod 0200, 'writeable', 'not_readable',
+my $count = chmod 0200, 'writable', 'not_readable',
 		'zero_file', 'max_file', 'non_zero_file';
-is( $count, 5 ) or BAILOUT( "Could not make files writeable" );
+is( $count, 5 ) or BAILOUT( "Could not make files writable" );
 }
 
 {

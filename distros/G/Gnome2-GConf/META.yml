@@ -1,7 +1,7 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Gnome2-GConf
-version:      1.046
+version:      1.047
 version_from: GConf.pm
 installdirs:  site
 requires:
@@ -13,3 +13,4 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   ExtUtils::PkgConfig: '1.03'
   Glib: '1.120'
+x_deprecated: 1

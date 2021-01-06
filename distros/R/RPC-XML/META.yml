@@ -3,11 +3,12 @@ abstract: 'Data, client and server classes for XML-RPC'
 author:
   - 'Randy J. Ray'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.56'
+  Test::More: '1.302183'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.56'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,22 +19,20 @@ no_index:
     - t
     - inc
 recommends:
-  Compress::Raw::Zlib: '2.063'
-  DateTime: '0.70'
-  DateTime::Format::ISO8601: '0.07'
-  XML::LibXML: '1.85'
+  DateTime: '1.54'
+  DateTime::Format::ISO8601: '0.15'
+  XML::LibXML: '2.0206'
 requires:
-  File::Spec: '0.8'
-  LWP: '5.834'
-  Module::Load: '0.24'
-  Scalar::Util: '1.33'
-  Test::More: '0.94'
-  XML::Parser: '2.31'
-  constant: '1.03'
+  HTTP::Daemon: '6.12'
+  HTTP::Message: '6.26'
+  LWP: '6.51'
+  Module::Load: '0.36'
+  Scalar::Util: '1.55'
+  XML::Parser: '2.46'
   perl: '5.008008'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=RPC-XML
-  homepage: http://search.cpan.org/dist/RPC-XML
+  bugtracker: https://github.com/rjray/rpc-xml/issues
+  homepage: http://github.com/rjray/rpc-xml
   repository: http://github.com/rjray/rpc-xml
-version: '0.80'
+version: '0.81'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

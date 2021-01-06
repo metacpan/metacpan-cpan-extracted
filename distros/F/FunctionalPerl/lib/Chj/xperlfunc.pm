@@ -890,7 +890,7 @@ sub fstype_for_device {
         splice @_, 1, 0, 2;
         goto &checkaccess_for_submask_by_uid_gids;
     }
-    *writable_by_uid_gids = *writeable_by_uid_gids;
+    *writable_by_uid_gids = \&writeable_by_uid_gids;
 
     sub executable_by_uid_gids {
         splice @_, 1, 0, 1;

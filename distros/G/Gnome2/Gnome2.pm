@@ -14,7 +14,7 @@ require DynaLoader;
 
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '1.047';
+our $VERSION = '1.048';
 
 sub import {
   my $self = shift();
@@ -30,7 +30,7 @@ __END__
 
 =head1 NAME
 
-Gnome2 - Perl interface to the 2.x series of the GNOME libraries
+Gnome2 - (DEPRECATED) Perl interface to the 2.x series of the GNOME libraries
 
 =head1 SYNOPSIS
 
@@ -42,11 +42,53 @@ Gnome2 - Perl interface to the 2.x series of the GNOME libraries
 
 =head1 ABSTRACT
 
-Perl bindings to the 2.x series of the GNOME libraries.  This module allows you
-to interface with the libgnome and libgnomeui libraries to create GNOME
-applications.
+B<(DEPRECATED)> Perl bindings to the 2.x series of the GNOME libraries.  This
+module allows you to interface with the libgnome and libgnomeui libraries to
+create GNOME applications.
 
 =head1 DESCRIPTION
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gnome2
+
+=item *
+
+Upstream URL: https://gitlab.gnome.org/Archive/libgnome
+
+=item *
+
+Last upstream version: 2.32.1
+
+=item *
+
+Last upstream release date: 2011-01-31
+
+=item *
+
+Migration path for this module: No upstream replacement
+
+=back
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
 
 Since this module tries to stick very closely to the C API, the documentation
 found at

@@ -78,7 +78,7 @@
          "web" : "https://github.com/analizo/analizo"
       }
    },
-   "version" : "1.25.0",
+   "version" : "1.25.1",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "GPL-3.0-only"

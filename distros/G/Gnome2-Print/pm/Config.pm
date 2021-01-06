@@ -1,4 +1,4 @@
-package Gnom2::Print::Config::Constants;
+package Gnome2::Print::Config::Constants;
 
 use strict;
 require Exporter;
@@ -69,7 +69,7 @@ use constant GNOME_PRINT_KEY_PREFERED_UNIT => "Settings.Document.PreferedUnit"
 
 =head1 NAME
 
-Gnome2::Print::Config::Constants - constants for use with Gnom2::Print::Config
+Gnome2::Print::Config::Constants
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,56 @@ Gnome2::Print::Config::Constants - constants for use with Gnom2::Print::Config
 
   use Gnome2::Print::Config::Constants; # load extra constants
 
+=head1 ABSTRACT
+
+B<DEPRECATED> Constants for use with Gnome2::Print::Config
+
 =head1 DESCRIPTION
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gnome2-print
+
+=item *
+
+Upstream URL: https://gitlab.gnome.org/Archive/libgnomeprint
+
+=item *
+
+Last upstream version: 2.18.8
+
+=item *
+
+Last upstream release date: 2010-09-28
+
+=item *
+
+Migration path for this module: Gtk3::Print*
+
+=item *
+
+Migration module URL: https://metacpan.org/pod/Gtk3
+
+=back
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
 
 Similarily to Pango, in order to effectively use Gnome2::Print::Config you need
 a few constants that are not supplied by the type system or by other means.
@@ -153,8 +202,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the 
-Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
-Boston, MA  02111-1307  USA.
+License along with this library; if not, see
+<https://www.gnu.org/licenses/>.
 
 =cut

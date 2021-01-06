@@ -114,8 +114,9 @@ Accepts an iheartradio.com station / podcast ID or URL and creates and returns a
 new station (or podcast) object, or I<undef> if the URL is not a valid IHeart 
 station or podcast, or no streams are found.  The URL can be the full URL, 
 ie. https://www.iheart.com/live/B<station-id>, https://B<station-id>.iheart.com, 
-https://www.iheart.com/podcast/B<podcast-id>/episode/B<episode-id>, or just 
-I<station-id>, or I<podcast-id>/I<episode-id>.  NOTE:  For podcasts, you must 
+https://www.iheart.com/podcast/B<podcast-id>/episode/B<episode-id>, 
+https://www.iheart.com/podcast/B<podcast-id>, or just 
+B<station-id>, or I<podcast-id/episode-id>.  NOTE:  For podcasts, you must 
 include the I<episode-id> if not specifying a full URL, otherwise, the 
 I<podcast-id> will be interpreted as a I<station-id> (and you likely won't get any 
 streams)!
@@ -197,12 +198,14 @@ Returns a two-element array consisting of the extension (ie. "png",
 =item $station->B<getImageURL>()
 
 Returns the URL for the station's "cover art" (usually larger) 
-banner image.
+banner image.  NOTE:  For IHeart podcasts, this will be the same as the 
+icon url.
 
 =item $station->B<getImageData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual station's banner image (binary data).
+NOTE:  For IHeart podcasts, this will be the same as the icon url.
 
 =item $station->B<getType>()
 
@@ -427,9 +430,13 @@ sub new
 	(my $url2fetch = $url);
 	if ($url =~ /^https?\:/) {
 		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
+		if ($url2fetch =~ m#\/episode\/#) {
+			my $id = $1  if ($url2fetch =~ m#([^\/]+)\/episode\/#);
+			$self->{'id'} = $id . '/' . $self->{'id'}  if ($id);
+		}
 	} else {
+		$self->{'id'} = $url2fetch;
 		my ($id, $podcastid) = split(m#\/#, $url2fetch);
-		$self->{'id'} = $id;
 		$url2fetch = $podcastid ? "https://www.iheart.com/podcast/$id" : "https://${id}.iheart.com/";
 		$url2fetch .= '/episode/' . $podcastid  if ($podcastid);
 	}
@@ -468,6 +475,8 @@ sub new
 	}
 
 	print STDERR "-1: FINAL FETCH URL=$url2fetch=\n"  if ($DEBUG);
+	my $tryit = 0;
+TRYIT:
 	$response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
@@ -492,12 +501,23 @@ sub new
 			push @{$self->{'streams'}}, $1;
 			$self->{'cnt'}++;
 		}
+		unless ($tryit || $self->{'cnt'} > 0) {
+			print "--no streams found, ID=".$self->{'id'}."= url=$url2fetch= PODCAST PG, MAYBE?\n"  if ($DEBUG);
+			if ($html =~ m#\"\,\"url\"\:\"\/podcast\/$self->{'id'}\/?\"\,\"episodeIds\"\:\[(\d+)#s) {
+				my $episodeID = $1;
+				$url2fetch =~ s#\/$##;
+				$url2fetch .= "/episode/$episodeID";
+				$self->{'id'} .= "/$episodeID";
+				print STDERR "----TRY AGAIN w/($url2fetch) ID=".$self->{'id'}."=\n"  if ($DEBUG);
+				++$tryit;
+				goto TRYIT;
+			}
+		}
 		return undef  unless ($self->{'cnt'} > 0);
 		my $id = $url;
 		$id =~ s#\/$##;
 		$id = $1  if ($id =~ m#([^\/]+)\/episode\/#);
 		my $seedID = ($id =~ /(\d+)$/) ? $1 : '';  #NUMERIC PART
-		$self->{'id'} .= '/' . $id  if ($id);
 		$self->{'title'} = $1  if ($html =~ s# rel\=\"alternate\"\s+title\=\"([^\"]+)\"##s);
 		$self->{'title'} ||= ($html =~ s#\<title[^\>]+\>([^\<]+)\<\/title\>##s) ? $1 : '';
 		$self->{'description'} = $1  if ($html =~ s#\"description\"\:\"([^\"]+)##s);
@@ -548,7 +568,6 @@ sub new
 	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
 	$self->{'description'} = uri_unescape($self->{'description'});
 	$self->{'imageurl'} = ($html =~ m#\"image_src\"\s+href=\"([^\"]+)\"#s) ? $1 : '';
-#		$self->{'iconurl'} = $self->{'imageurl'} ? $self->{'imageurl'} . '?ops=fit(100%2C100)' : '';
 	$self->{'iconurl'} = ($html =~ m#\,\"logo\"\:\"([^\"]+)\"\,\"freq\"\:#s) ? $1 : '';
 	$self->{'imageurl'} ||= $self->{'iconurl'};
 	$self->{'genre'} = $1  if ($html =~ m#\"Genre\"\s+name\=\"twitter\:label1\"\/\>\<meta\s+data\-react\-helmet\=\"[^\"]*\"\s+content\=\"([^\"]+)\"#s);

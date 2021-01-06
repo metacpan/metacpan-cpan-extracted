@@ -12,6 +12,8 @@ link_counts.t
 line_counters.t
 file_sizes.t
 file_contains.t
+file_contains_encoded.t
+file_contains_utf8.t
 file_mtime.t
 owner.t
 rt/30346.t

@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker;
 use Cwd;
 use File::Spec;
 
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gnome2-Wnck/Makefile.PL,v 1.17 2008/03/16 12:58:16 kaffeetisch Exp $
+# $Id$
 
 my %build_reqs = (
   'perl-ExtUtils-Depends'   => '0.20',
@@ -87,7 +87,37 @@ WriteMakefile(
   $wnck->get_makefile_vars,
 
   EXTRA_META    => $configure_requires,
+  META_MERGE => {
+    x_deprecated => 1,
+  },
 );
+
+print <<__EON__;
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+* Perl URL: https://gitlab.gnome.org/GNOME/perl-gnome2-wnck
+* Upstream URL: https://gitlab.gnome.org/GNOME/libwnck
+* Last upstream version: 2.30.7
+* Last upstream release date: 2011-08-31
+* Migration path for this module: G:O:I
+* Migration module URL: https://metacpan.org/pod/Glib::Object::Introspection
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+__EON__
 
 sub MY::postamble {
   return Glib::MakeHelper->postamble_clean ()

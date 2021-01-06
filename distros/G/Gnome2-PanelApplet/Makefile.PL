@@ -32,6 +32,8 @@ unless (eval "use ExtUtils::Depends '$perl_reqs{'ExtUtils::Depends'}';"
            . "1") {
   warn "$@\n";
   WriteMakefile(
+    # don't clobber the existing META.yml
+    NO_META      => 1,
     PREREQ_FATAL => 1,
     PREREQ_PM    => \%perl_reqs,
   );
@@ -41,13 +43,13 @@ unless (eval "use ExtUtils::Depends '$perl_reqs{'ExtUtils::Depends'}';"
 # If the package can't be found, warn and exit with status 0 to indicate to
 # CPAN testers that their system is not supported.
 my %pkgcfg;
-unless (eval { %pkgcfg = ExtUtils::PkgConfig->find (
-                 "libpanelapplet-2.0 >= $build_reqs{'libpanelapplet-2.0'}");
-	       1; })
-{
-	warn $@;
-	exit 0;
-}
+#unless (eval { %pkgcfg = ExtUtils::PkgConfig->find (
+#                 "libpanelapplet-2.0 >= $build_reqs{'libpanelapplet-2.0'}");
+#	       1; })
+#{
+#	warn $@;
+#	exit 0;
+#}
 
 mkdir 'build', 0777;
 
@@ -60,10 +62,10 @@ our %pod_files = (
 Gtk2::CodeGen->parse_maps('libpanelapplet-perl');
 Gtk2::CodeGen->write_boot(ignore => qr/^Gnome2::PanelApplet$/);
 
-ExtUtils::PkgConfig->write_version_macros (
-  "build/libpanelapplet-perl-version.h",
-  "libpanelapplet-2.0" => "PANEL_APPLET",
-);
+#ExtUtils::PkgConfig->write_version_macros (
+#  "build/libpanelapplet-perl-version.h",
+#  "libpanelapplet-2.0" => "PANEL_APPLET",
+#);
 
 my $dep = ExtUtils::Depends->new('Gnome2::PanelApplet', qw/Gnome2 Gnome2::GConf/);
 $dep->set_inc($pkgcfg{cflags});
@@ -82,13 +84,37 @@ WriteMakefile(
   XSPROTOARG    => '-noprototypes',
   MAN3PODS      => \%pod_files,
   PREREQ_PM     => \%perl_reqs,
-
-  META_MERGE    => {
-    configure_requires => \%perl_reqs,
-  },
-
+  # don't clobber the existing META.yml
+  NO_META      => 1,
   $dep->get_makefile_vars,
 );
+
+print <<__EON__;
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+* Perl URL: https://gitlab.gnome.org/GNOME/perl-gnome2-panelapplet
+* Upstream URLs: https://developer.gnome.org/panel-applet/ and https://gitlab.gnome.org/GNOME/gnome-applets
+* Last compatible upstream version: 2.32.1.1
+* Last compatible upstream release date: 2010-11-22
+* Migration path for this module: Gtk3::StatusIcon
+* Migration module URL: https://metacpan.org/pod/Gtk3
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+__EON__
 
 sub MY::postamble {
 	return Glib::MakeHelper->postamble_clean ()

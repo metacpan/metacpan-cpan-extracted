@@ -40,6 +40,7 @@ subtest fake_non_multi_user_missing_file => sub {
 		);
 	Test::File::_dm_skeleton( $not_there );
 	test_test();
+	done_testing();
 	};
 
 subtest fake_non_multi_user_empty => sub {
@@ -53,6 +54,7 @@ subtest fake_non_multi_user_empty => sub {
 		);
 	Test::File::_dm_skeleton();
 	test_test();
+	done_testing();
 	};
 
 done_testing();

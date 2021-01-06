@@ -1,0 +1,13 @@
+Changelog for Mojolicious-Plugin-Component
+
+0.02 2021-01-06T15:25:31
+ - Add release updates
+ - Implement component inheritance (#5)
+ - Update Mojolicious_Component.t
+
+0.01 2021-01-06T05:20:07
+ - Built release version 0.01
+ - Add release updates
+ - Update Mojolicious::Component DATA section
+ - Initial implementation (#2)
+ - Initial commit

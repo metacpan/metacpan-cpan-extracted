@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 4;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More tests => 4;
 use TAP::Harness;
 use IO::Scalar;
 use File::Slurp qw(write_file);

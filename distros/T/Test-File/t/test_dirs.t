@@ -12,11 +12,13 @@ open FH, '>', catfile( qw(sub_dir subdir_file) ); close FH;
 
 
 test_out( 'ok 1 - sub_dir is a directory' );
+test_out( 'ok 2 - sub_dir really is a directory' );
 dir_exists_ok( 'sub_dir' );
+dir_exists_ok( 'sub_dir', 'sub_dir really is a directory' );
 test_test();
 
 test_out( 'not ok 1 - bmoogle is a directory' );
-test_diag( 'File [bmoogle] does not exist!' );
+test_diag( 'Directory [bmoogle] does not exist!' );
 test_fail(+1);
 dir_exists_ok( 'bmoogle' );
 test_test();
@@ -28,7 +30,9 @@ dir_exists_ok( 'readable' );
 test_test();
 
 test_out( 'ok 1 - directory sub_dir contains file subdir_file' );
+test_out( 'ok 2 - directory sub_dir really contains file subdir_file' );
 dir_contains_ok( 'sub_dir', 'subdir_file' );
+dir_contains_ok( 'sub_dir', 'subdir_file', 'directory sub_dir really contains file subdir_file' );
 test_test();
 
 test_out( 'not ok 1 - directory bmoogle contains file subdir_file' );

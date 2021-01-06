@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.920.1
+    version v0.930.0
 
 SYNOPSIS
 
@@ -75,10 +75,10 @@ DESCRIPTION
     TABLE) safely on large tables. It has a similar scope as
     DBIx::BatchChunker, but is designed for DDL, rather than DML. It also
     has a similar function to other utilities like pt-online-schema-change
-    <https://www.percona.com/doc/percona-toolkit/LATEST/pt-online-schema-change.html>
-    or gh-ost <https://github.com/github/gh-ost>, but actually works
-    properly with foreign keys, and is written as a Perl module to hook
-    directly into a DBI handle.
+    <https://www.percona.com/doc/percona-toolkit/LATEST/pt-online-schema-ch
+    ange.html> or gh-ost <https://github.com/github/gh-ost>, but actually
+    works properly with foreign keys, and is written as a Perl module to
+    hook directly into a DBI handle.
 
     Like most online schema change tools, this works by creating a new
     shell table that looks just like the old table, running the DDL changes
@@ -454,12 +454,14 @@ STEP METHODS
 SEE ALSO
 
       * Percona's pt-online-schema-change
-      <https://www.percona.com/doc/percona-toolkit/LATEST/pt-online-schema-change.html>
+      <https://www.percona.com/doc/percona-toolkit/LATEST/pt-online-schema-
+      change.html>
 
       * GitHub's gh-ost <https://github.com/github/gh-ost>
 
       * Facebook's OSC
-      <https://www.facebook.com/notes/mysql-at-facebook/online-schema-change-for-mysql/430801045932/>
+      <https://www.facebook.com/notes/mysql-at-facebook/online-schema-chang
+      e-for-mysql/430801045932/>
 
       * MySQL's Online DDL
       <https://dev.mysql.com/doc/refman/5.6/en/innodb-online-ddl.html>
@@ -492,7 +494,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+    This software is Copyright (c) 2018 - 2021 by Grant Street Group.
 
     This is free software, licensed under:
 

@@ -13,7 +13,7 @@ require DynaLoader;
 
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub import {
   my $self = shift();
@@ -47,7 +47,7 @@ __END__
 
 =head1 NAME
 
-Gnome2::PanelApplet - Perl interface to GNOME's applet library
+Gnome2::PanelApplet - (DEPRECATED) Perl interface to GNOME's applet library
 
 =head1 SYNOPSIS
 
@@ -84,9 +84,57 @@ Gnome2::PanelApplet - Perl interface to GNOME's applet library
 
 =head1 ABSTRACT
 
-Use Perl to write GNOME applets that sit on the panel.
+
+B<DEPRECATED> Use Perl to write GNOME applets that sit on the panel.
 
 =head1 DOCUMENTATION
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gnome2-panelapplet
+
+=item *
+
+* Upstream URLs: https://developer.gnome.org/panel-applet/ and https://gitlab.gnome.org/GNOME/gnome-applets
+
+=item *
+
+* Last compatible upstream version: 2.32.1.1
+
+=item *
+
+* Last compatible upstream release date: 2010-11-22
+
+=item *
+
+* Migration path for this module: Gtk3::StatusIcon
+
+=item *
+
+* Migration module URL: https://metacpan.org/pod/Gtk3
+
+=item *
+
+=back
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
 
 I<Gnome2::PanelApplet::Factory-E<gt>main> is documented in
 L<Gnome2::PanelApplet::Factory>.  The methods you can call on the applet
@@ -119,7 +167,6 @@ PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
 details.
 
 You should have received a copy of the GNU Lesser General Public License along
-with this library; if not, write to the Free Software Foundation, Inc., 51
-Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+with this library; if not, see <https://www.gnu.org/licenses/>.
 
 =cut

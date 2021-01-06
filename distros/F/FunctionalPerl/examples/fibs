@@ -89,6 +89,11 @@ sub counting_add {
 
 TEST {
     $addcount = 0;
+
+    # local *add = \&counting_add;
+
+    # to avoid redefinition warnings, use the glob (alternatively
+    # disable the warning):
     local *add = *counting_add;
     [fibs->ref(80), $addcount]
 }
@@ -107,7 +112,7 @@ TEST {
 # sequence, etc. We want to calculate the same sequence only once,
 # which `fibs` achieves.
 
-TEST { Keep($fibs)->take(10)->map(*stringify)->array }
+TEST { Keep($fibs)->take(10)->map(\&stringify)->array }
 [1, 1, 2, 3, 5, 8, 13, 21, 34, 55];
 
 TEST { fib 30 }

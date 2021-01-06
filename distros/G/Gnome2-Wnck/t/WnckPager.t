@@ -3,7 +3,7 @@ use strict;
 use Test::More;
 use Gnome2::Wnck;
 
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gnome2-Wnck/t/WnckPager.t,v 1.10 2007/08/02 20:15:43 kaffeetisch Exp $
+# $Id$
 
 unless ($ENV{WNCK_TEST_PAGER}) {
   plan skip_all => "Not testing pager unless WNCK_TEST_PAGER is set";

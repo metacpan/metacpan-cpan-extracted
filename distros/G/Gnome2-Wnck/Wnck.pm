@@ -1,6 +1,6 @@
 package Gnome2::Wnck;
 
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gnome2-Wnck/Wnck.pm,v 1.23 2008/03/16 12:59:48 kaffeetisch Exp $
+# $Id$
 
 use 5.008;
 use strict;
@@ -12,7 +12,7 @@ require DynaLoader;
 
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 sub import {
   my $self = shift();
@@ -28,7 +28,8 @@ __END__
 
 =head1 NAME
 
-Gnome2::Wnck - Perl interface to the Window Navigator Construction Kit
+Gnome2::Wnck - (DEPRECATED) Perl interface to the Window Navigator
+Construction Kit
 
 =head1 SYNOPSIS
 
@@ -43,8 +44,55 @@ Gnome2::Wnck - Perl interface to the Window Navigator Construction Kit
 
 =head1 ABSTRACT
 
-This module allows a Perl developer to use the Window Navigator Construction
-Kit library (libwnck for short) to write tasklists and pagers.
+B<DEPRECATED> This module allows a Perl developer to use the Window Navigator
+Construction Kit library (libwnck for short) to write tasklists and pagers.
+
+=head1 DESCRIPTION
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gnome2-wnck
+
+=item *
+
+Upstream URL: https://gitlab.gnome.org/GNOME/libwnck
+
+=item *
+
+Last upstream version: 2.30.7
+
+=item *
+
+Last upstream release date: 2011-08-31
+
+=item *
+
+Migration path for this module: G:O:I
+
+=item *
+
+Migration module URL: https://metacpan.org/pod/Glib::Object::Introspection
+
+=back
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
 
 =head1 SEE ALSO
 

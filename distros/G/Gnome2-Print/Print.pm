@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/GnomePrint2/Print.pm,v 1.21 2006/11/15 09:39:46 ebassi Exp $
+# $Id$
 #
 
 package Gnome2::Print;
@@ -31,7 +31,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 sub dl_load_flags { 0x01 }
 
@@ -44,7 +44,7 @@ XSLoader::load('Gnome2::Print', $VERSION);
 __END__
 =head1 NAME
 
-Gnome2::Print - Perl wrappers for the Gnome Print utilities.
+Gnome2::Print - (DEPRECATED) Perl wrappers for the Gnome Print utilities.
 
 =head1 SYNOPSIS
 
@@ -68,10 +68,55 @@ Gnome2::Print - Perl wrappers for the Gnome Print utilities.
 
 =head1 ABSTRACT
 
-Perl bindings to the 2.2 series of the Gnome Print libraries, for use
-with gtk2-perl.
+B<DEPRECATED> Perl bindings to the 2.2 series of the Gnome Print libraries,
+for use with gtk2-perl.
 
 =head1 DESCRIPTION
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gnome2-print
+
+=item *
+
+Upstream URL: https://gitlab.gnome.org/Archive/libgnomeprint
+
+=item *
+
+Last upstream version: 2.18.8
+
+=item *
+
+Last upstream release date: 2010-09-28
+
+=item *
+
+Migration path for this module: Gtk3::Print*
+
+=item *
+
+Migration module URL: https://metacpan.org/pod/Gtk3
+
+=back
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
 
 This module allows you to use the GNOME Print libraries within your
 applications written using the gtk2-perl wrapper.  The GNOME Print libraries
@@ -83,14 +128,6 @@ To discuss gtk2-perl, ask questions and flame/praise the authors,
 join gtk-perl-list@gnome.org at lists.gnome.org.
 
 Find out more about GNOME at http://www.gnome.org.
-
-=head1 DEPRECATION WARNING
-
-With the release of GTK+ 2.10 both libgnomeprint and libgnomeprintui have
-been marked as deprecated and should not be used in newly released code.
-
-In order to use the new Print support in GTK+ you have to use the Gtk2
-module version E<gt>= 1.140 compiled against GTK+ E<gt>= 2.10.0.
 
 =head1 SEE ALSO
 

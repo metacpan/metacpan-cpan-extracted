@@ -1,3 +1,17 @@
+2007-10-19 20:16 pcg
+
+	* pm/Config.pm:
+	* pm/Font.pm: fix obvious (hopefully) Gnom2 => Gnome2 typo. This
+	features prominently on CPAN :-)
+
+2007-09-19  Emmanuele Bassi  <ebassi@gnome.org>
+
+	* README:
+	* Makefile.PL: Add deprecation warning; this module, like
+	the underlying libraries, has been deprecated by the new
+	high level printing API in GTK+ 2.10, wrapped by
+	Gtk2 1.140. You should use that API.
+
 2006-11-15  Emmanuele Bassi  <ebassi@gnome.org>
 
 	* README:

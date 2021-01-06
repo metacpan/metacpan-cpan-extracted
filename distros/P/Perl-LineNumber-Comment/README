@@ -2,12 +2,20 @@ NAME
     Perl::LineNumber::Comment - Add line number to Perl source as comment
 
 VERSION
-    This document describes version 0.001 of Perl::LineNumber::Comment (from
-    Perl distribution Perl-LineNumber-Comment), released on 2020-11-27.
+    This document describes version 0.002 of Perl::LineNumber::Comment (from
+    Perl distribution Perl-LineNumber-Comment), released on 2020-11-28.
 
 SYNOPSIS
+    In your code:
+
+     use File::Slurper qw(read_text);
      use Perl::LineNumber::Comment qw(add_line_number_comments_to_perl_source);
-     print add_line_number_comments_to_perl_source(<<'EOF');
+
+     my $source = read_text('sample.pl');
+     print add_line_number_comments_to_perl_source(source => $source);
+
+    Content of sample.pl:
+
      #!/usr/bin/env perl
 
      use 5.010001;
@@ -19,11 +27,11 @@ SYNOPSIS
      print "A multiline
      string";
 
-     print <<EOF2;
+     print <<EOF;
      A heredoc (not shown in node->content).
 
      Line three.
-     EOF2
+     EOF
 
      exit 0;
 
@@ -31,9 +39,8 @@ SYNOPSIS
      one
      two
      three
-     EOF
 
-    will print:
+    Output of code:
 
      #!/usr/bin/env perl
 

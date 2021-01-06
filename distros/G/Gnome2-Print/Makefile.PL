@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/GnomePrint2/Makefile.PL,v 1.29 2006/11/15 09:38:18 ebassi Exp $
+# $Id$
 #
 
 use 5.008;
@@ -32,6 +32,8 @@ unless (eval "use ExtUtils::Depends;"
    warn "$@\n";
    WriteMakefile(
          PREREQ_FATAL => 1,
+         # don't clobber the existing META.yml
+         NO_META      => 1,
          PREREQ_PM    => {
             'Glib'                => $build_reqs{'perl-Glib'},
             'Gtk2'                => $build_reqs{'perl-Gtk2'},
@@ -89,8 +91,37 @@ WriteMakefile(
     ABSTRACT_FROM => 'Print.pm', # retrieve abstract from module
     XSPROTOARG    => '-noprototypes',
     MAN3PODS	  => \%pod_files,
+    # don't clobber the existing META.yml
+    NO_META      => 1,
     $gnomeprint2->get_makefile_vars,
 );
+
+print <<__EON__;
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+* Perl URL: https://gitlab.gnome.org/GNOME/perl-gnome2-print
+* Upstream URL: https://gitlab.gnome.org/Archive/libgnomeprint
+* Last upstream version: 2.18.8
+* Last upstream release date: 2010-09-28
+* Migration path for this module: Gtk3::Print*
+* Migration module URL: https://metacpan.org/pod/Gtk3
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+__EON__
 
 sub MY::postamble
 {

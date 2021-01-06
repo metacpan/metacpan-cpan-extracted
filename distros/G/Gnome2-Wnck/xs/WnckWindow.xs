@@ -12,15 +12,19 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
- * $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gnome2-Wnck/xs/WnckWindow.xs,v 1.19 2007/08/02 20:15:43 kaffeetisch Exp $
+ * $Id$
  */
 
 #include "wnck2perl.h"
 
 MODULE = Gnome2::Wnck::Window	PACKAGE = Gnome2::Wnck::Window	PREFIX = wnck_window_
+
+=for object Gnome2::Wnck::Window - an object representing a window
+
+=cut
 
 ##  WnckWindow* wnck_window_get (gulong xwindow)
 WnckWindow*

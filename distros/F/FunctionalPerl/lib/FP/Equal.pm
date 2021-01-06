@@ -17,7 +17,7 @@ FP::Equal - generic equality comparison
     use FP::List;
     use FP::Div qw(inc);
 
-    ok equal [1, list(2, 3)], [1, list(1, 2)->map(*inc)];
+    ok equal [1, list(2, 3)], [1, list(1, 2)->map(\&inc)];
     is equal( [1, list(2, 3)], [1, list(1, 2)] ),
        ''; # false but defined since same type
     is equal( [1, list(2, 3)], [1, list([], 3)] ),

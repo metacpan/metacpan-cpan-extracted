@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.020;
+use 5.024;
 
 use ExtUtils::MakeMaker;
 
@@ -17,15 +17,16 @@ my %WriteMakefileArgs = (
     "bin/get_hetzner_info.pl"
   ],
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.020",
+  "MIN_PERL_VERSION" => "5.024",
   "NAME" => "DNS::Hetzner",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Module::Runtime" => 0,
+    "JSON::Validator" => "4.10",
     "Mojolicious" => 8,
     "Moo" => "1.003001",
     "MooX::Singleton" => 0,
     "Types::Mojo" => "0.04",
+    "Types::Standard" => 0,
     "URI::Escape" => 0
   },
   "TEST_REQUIRES" => {
@@ -35,9 +36,9 @@ my %WriteMakefileArgs = (
     "Pod::Coverage::TrustPod" => 0,
     "Test::LongString" => "0.16"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/*.t t/api/*.t t/schema/*.t"
   }
 );
 
@@ -47,13 +48,14 @@ my %FallbackPrereqs = (
   "File::Copy" => 0,
   "File::Path" => 0,
   "FindBin" => 0,
-  "Module::Runtime" => 0,
+  "JSON::Validator" => "4.10",
   "Mojolicious" => 8,
   "Moo" => "1.003001",
   "MooX::Singleton" => 0,
   "Pod::Coverage::TrustPod" => 0,
   "Test::LongString" => "0.16",
   "Types::Mojo" => "0.04",
+  "Types::Standard" => 0,
   "URI::Escape" => 0
 );
 

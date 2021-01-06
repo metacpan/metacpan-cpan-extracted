@@ -35,6 +35,7 @@ subtest dont_work_with_symlinks => sub {
 		&{$sub}();
 		test_test();
 		}
+	done_testing();
 	};
 
 
@@ -62,9 +63,10 @@ subtest should_work => sub {
 		symlink( $not_there, $dangle_sym );
 		file_exists_ok( $readable_sym );
 		file_exists_ok( $dangle_sym );
+		file_is_symlink_ok( $dangle_sym );
 
-		unlink $not_there;
-		ok( ! -e $not_there );
+		unlink $not_there or fail( $! );
+		ok( ! -e $not_there, "$not_there has been removed" );
 		file_is_symlink_ok( $dangle_sym );
 		}
 	else {
@@ -91,6 +93,7 @@ subtest should_work => sub {
 	symlink_target_exists_ok( $readable_sym, $readable );
 	symlink_target_is( $readable_sym, $readable, $test_name );
 	test_test();
+	done_testing();
 	};
 
 subtest should_work => sub {
@@ -141,6 +144,7 @@ subtest should_work => sub {
 		);
 	symlink_target_exists_ok( $readable );
 	test_test();
+	done_testing();
 	};
 
 subtest bad_target_does_not_exist => sub {
@@ -162,6 +166,7 @@ subtest bad_target_does_not_exist => sub {
 		);
 	symlink_target_is( $readable_sym, $not_there );
 	test_test();
+	done_testing();
 	};
 
 subtest bad_target_does_exists => sub {
@@ -169,23 +174,32 @@ subtest bad_target_does_exists => sub {
 	test_diag(
 		"Symlink [readable_sym] points to\n" .
 		"    #          got: readable\n" .
-		"    #     expected: writeable\n" .
+		"    #     expected: writable\n" .
 		"    #   Failed test 'readable_sym is a symlink'\n" .
 		"    #   at $0 line " . line_num(+7) . "."
 		);
-	symlink_target_exists_ok( $readable_sym, "writeable" );
+	symlink_target_exists_ok( $readable_sym, "writable" );
 	test_test();
+	done_testing();
 	};
 
 subtest dangling_exists => sub {
 	test_out( "not ok 1 - $test_name" );
+	test_out( "not ok 2 - readable_sym is a symlink" );
 	test_diag(
 		"Symlink [$readable_sym] points to existing file [$readable] but shouldn't!\n" .
 		"    #   Failed test '$test_name'\n" .
-		"    #   at $0 line " . line_num(+5) . "."
+		"    #   at $0 line " . line_num(+10) . "."
+		);
+	test_diag(
+		"Symlink [$readable_sym] points to existing file [$readable] but shouldn't!\n" .
+		"    #   Failed test 'readable_sym is a symlink'\n" .
+		"    #   at $0 line " . line_num(+6) . "."
 		);
 	symlink_target_dangles_ok( $readable_sym, $test_name );
+	symlink_target_dangles_ok( $readable_sym );
 	test_test();
+	done_testing();
 	};
 
 

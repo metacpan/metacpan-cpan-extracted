@@ -4,33 +4,30 @@ use Moo::Role;
 
 use Mojo::Base -strict, -signatures;
 use Mojo::File;
+use Mojo::Loader qw(find_modules load_class);
 use Mojo::Util qw(decamelize);
 
-use Module::Runtime qw(require_module);
+our $VERSION = '0.02';
 
 sub load_namespace ($package) {
-    my $files = Mojo::File->new(
-        __FILE__
-    )->dirname->child('API')->list->each( sub {
-        my $base = $_->basename;
-        return if '.pm' ne substr $base, -3;
+    my @modules = find_modules $package . '::API', { recursive => 1 };
 
-        $base =~ s{\.pm\z}{};
-        my $module = $package . '::API::' . $base;
+    for my $module ( @modules ) {
+        load_class( $module );
 
-        require_module $module;
-
+        my $base = (split /::/, $module)[-1];
+    
         no strict 'refs';
-        *{ $package . '::' . decamelize( $base ) } = sub ($cloud) {
-            my $object = $module->instance(
-                token    => $cloud->token,
-                base_uri => $cloud->base_uri,
-                client   => $cloud->client,
+        *{ $package . '::' . decamelize( $base ) } = sub ($dns) {
+            state $object //= $module->instance(
+                token    => $dns->token,
+                base_uri => $dns->base_uri,
+                client   => $dns->client,
             );
 
             return $object;
         };
-    });
+    }
 }
 
 1;
@@ -47,7 +44,7 @@ DNS::Hetzner::API
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 METHODS
 

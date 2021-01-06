@@ -1,22 +1,26 @@
 Revision history for Word-Rhymes
 
+1.03    2021-01-05
+    - Added new limit() parameter, limits the number of rhyming words to
+      return/display under each syllable section (closes #1)
+
 1.02    2020-12-19
-        - Changed B<> tags to I<> tags in binary POD
-        - Added Appveyor CI
-        - Modified typo in file test (/lib -> lib/) as the test succeeded in
-          Linux (because /lib is valid), but failed on Windows
+    - Changed B<> tags to I<> tags in binary POD
+    - Added Appveyor CI
+    - Modified typo in file test (/lib -> lib/) as the test succeeded in
+      Linux (because /lib is valid), but failed on Windows
 
 1.01    2020-12-19
-        - POD cleanup; Removed bolding of certain words in sub descriptions
-        - Added example output sections in POD
+    - POD cleanup; Removed bolding of certain words in sub descriptions
+    - Added example output sections in POD
 
 1.00    2020-12-18
-        - Fix CI and coverage badge links
-        - Broke up the processing parts of fetch() and put them into a new
-          _process() method
-        - Added POD for private methods
-        - Removed erroneous EXPORT section from POD
+    - Fix CI and coverage badge links
+    - Broke up the processing parts of fetch() and put them into a new
+      _process() method
+    - Added POD for private methods
+    - Removed erroneous EXPORT section from POD
 
 0.01    2020-12-18
-        First version, released on an unsuspecting world.
+    First version, released on an unsuspecting world.
 

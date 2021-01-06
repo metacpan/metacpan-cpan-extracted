@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl interface to the 2.x series of the GNOME libraries",
+   "abstract" : "(DEPRECATED) Perl interface to the 2.x series of the GNOME libraries",
    "author" : [
       "Gnome2 Perl Team <gtk-perl-list at gnome dot org>"
    ],
@@ -51,10 +51,11 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://git.gnome.org/perl-Gnome2",
-         "web" : "http://git.gnome.org/browse/perl-Gnome2"
+         "url" : "https://gitlab.gnome.org/GNOME/perl-gnome2.git",
+         "web" : "https://gitlab.gnome.org/GNOME/perl-gnome2"
       },
       "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
    },
-   "version" : "1.047"
+   "version" : "1.048",
+   "x_deprecated" : 1
 }

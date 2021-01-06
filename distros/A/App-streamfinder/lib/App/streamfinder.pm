@@ -1,13 +1,14 @@
 package App::streamfinder;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-03'; # DATE
+our $DATE = '2021-01-06'; # DATE
 our $DIST = 'App-streamfinder'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::Object;
 
@@ -79,9 +80,16 @@ sub app {
     }
 
     my $res = $envres->as_struct;
+    #log_trace "%s", $res;
     $res->[2] //= [];
-    if (!$args{detail} && @{ $args{urls} } == 1 && @{ $res->[2] } == 1) {
-        $res->[2] = $res->[2][0]{stream_url};
+    if (@{ $args{urls} } == 1 && @{ $res->[2] } == 1) {
+        if ($args{detail}) {
+            # return a hash
+            $res->[2] = $res->[2][0];
+        } else {
+            # return a single url string
+            $res->[2] = $res->[2][0]{stream_url};
+        }
     }
     $res;
 }
@@ -101,7 +109,7 @@ App::streamfinder - CLI for StreamFinder, a module to fetch actual raw streamabl
 
 =head1 VERSION
 
-This document describes version 0.002 of App::streamfinder (from Perl distribution App-streamfinder), released on 2020-01-03.
+This document describes version 0.003 of App::streamfinder (from Perl distribution App-streamfinder), released on 2021-01-06.
 
 =head1 FUNCTIONS
 
@@ -163,7 +171,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-streamfinder>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-streamfinder>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-streamfinder/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More;
 use Test::XML;
 use File::Slurp qw(slurp);
 use TAP::Harness;

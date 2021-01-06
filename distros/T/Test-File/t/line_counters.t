@@ -14,6 +14,7 @@ subtest subs_defined => sub {
 		no strict 'refs';
 		ok( defined &{$sub}, "$sub is defined" );
 		}
+	done_testing();
 	};
 
 my $file    = 'min_file';
@@ -47,6 +48,7 @@ subtest should_work => sub {
 	test_out( "ok 1 - $file line count is not $linesp lines" );
 	file_line_count_isnt( $file, $linesp );
 	test_test();
+	done_testing();
 	};
 
 subtest missing_file => sub {
@@ -97,6 +99,7 @@ subtest missing_file => sub {
 		);
 	file_line_count_isnt( $missing, $lines );
 	test_test();
+	done_testing();
 	};
 
 subtest missing_line_count => sub {
@@ -129,6 +132,7 @@ subtest missing_line_count => sub {
 		);
 	file_line_count_isnt( $file );
 	test_test();
+	done_testing();
 	};
 
 subtest wrong_number => sub {
@@ -166,6 +170,7 @@ subtest wrong_number => sub {
 		);
 	file_line_count_between( $file, $linesp, $linespp );
 	test_test();
+	done_testing();
 	};
 
 done_testing();

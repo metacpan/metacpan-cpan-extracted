@@ -1,0 +1,51 @@
+{
+   "abstract" : "(DEPRECATED) Perl interface to the Virtual Terminal Emulation",
+   "author" : [
+      "Gtk-Perl Team <gtk-perl-list at gnome dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gnome2-Vte",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.20",
+            "ExtUtils::PkgConfig" : "1.03",
+            "Glib" : "1.01",
+            "Gtk2" : "1.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Gnome2-Vte [at] rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Gnome2-Vte"
+      },
+      "homepage" : "http://gtk2-perl.sourceforge.net",
+      "license" : [
+         "http://www.gnu.org/licenses/lgpl-2.1.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.gnome.org/GNOME/perl-gnome2-vte.git",
+         "web" : "https://gitlab.gnome.org/GNOME/perl-gnome2-vte"
+      },
+      "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
+   },
+   "version" : "0.12",
+   "x_deprecated" : 1
+}

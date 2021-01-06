@@ -1,10 +1,15 @@
 Changelog for DBIx-OnlineDDL
 
-v0.920.1 2020-05-14T19:11:02
+v0.930.0 2021-01-05T22:09:03
+
+v0.920.1 2020-05-08T19:14:18
  - Clean up cpanfile (Andrew Hewus Fresh)
  - Clean up POD for new PodWeaver settings (Andrew Hewus Fresh)
  - Move xt tests where they belong (Andrew Hewus Fresh)
  - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
+
+v0.920.0 2019-08-08T15:14:41
+ - No changes found
 
 0.92 2019-08-08T15:14:41
  - Fix year in CHANGES (Brendan Byrd)
@@ -14,9 +19,6 @@ v0.920.1 2020-05-14T19:11:02
  - SM-1858 Fix typos in pod. (Tom Christiansen)
  - SM-1858: Use MooX::StrictConstructor to prevent attribute misspellings
    (Brendan Byrd)
-
-v0.920.0 2019-08-08T15:14:41
- - No changes found
 
 0.91 2019-01-29T20:08:03
  - POD version fixes to 0.91 (Brendan Byrd)
@@ -67,3 +69,7 @@ v0.920.0 2019-08-08T15:14:41
  - Skeleton framework (Brendan Byrd)
  - Add examples/basic.pl (Brendan Byrd)
  - Initial version of DBIx::OnlineDDL (Brendan Byrd)
+
+v0.93.0 2020-11-13T23:02:38
+ - Update README (Brendan Byrd)
+ - Fix quoting issues with MySQL ansi_quotes mode (Brendan Byrd)

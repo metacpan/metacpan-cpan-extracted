@@ -99,7 +99,9 @@ player called "fauxdacious" (his custom hacked version of the open-source
 "audacious" audio player).  "fauxdacious" can incorporate this module to 
 decode and play Google.com podcasts.
 
-One or more stream URLs can be returned for each podcast.  
+For Google podcasts, currently a single stream will be returned for the 
+podcast episode.  If no episode-ID is specified, then a stream will be 
+returned for the first (latest) episode on the podcast page.
 
 =head1 SUBROUTINES/METHODS
 
@@ -108,19 +110,23 @@ One or more stream URLs can be returned for each podcast.
 =item B<new>(I<url> [, I<-debug> [ => 0|1|2 ] ... ])
 
 Accepts a podcasts.google.com podcast URL and creates and returns a 
-a new podcast object, or I<undef> if the URL is not a valid podcast, or no streams 
-are found.  The URL can be the full URL, 
-ie. https://podcasts.google.com/feed/I<podcast-id>/episode/I<episode-id>, or just 
-I<podcast-id>/I<episode-id>.
+a new podcast object, or I<undef> if the URL is not a valid podcast, or no 
+streams are found.  The URL can be the full URL, 
+ie. https://podcasts.google.com/feed/B<podcast-id>/episode/B<episode-id>, 
+https://podcasts.google.com/feed/B<podcast-id>, B<podcast-id>/B<episode-id>, 
+or just B<podcast-id>.  (If no I<episode-id> is specified, the first (latest) 
+episode on the podcaster's page will be fetched).
 
 =item $podcast->B<get>()
 
-Returns an array of strings representing all stream URLs found.
+Returns an array of strings representing all stream URLs found.  For Google 
+podcasts, only a single stream URL is returned.
 
 =item $podcast->B<getURL>([I<options>])
 
 Similar to B<get>() except it only returns a single stream representing 
-the first valid stream found.  There currently are no valid I<options>.
+the stream found (if a valid stream is found).  There currently are 
+no valid I<options>.
 
 =item $podcast->B<count>()
 
@@ -128,15 +134,14 @@ Returns the number of streams found for the podcast.
 
 =item $podcast->B<getID>()
 
-Returns the podcast's Google ID (default).  For podcasts, the Google ID 
-is a single value.  For individual podcast episodes it's two values 
-separated by a slash ("/").
+Returns the podcast's Google ID consisting of two values (the podcast ID, and 
+the episode ID combined into a single string separated by a slash ("/").  
+NOTE:  Google IDs are generally long strings of random letters and numbers.
 
 =item $podcast->B<getTitle>(['desc'])
 
 Returns the podcast's title, or (long description).  Podcasts 
-on Google can have separate descriptions, but for podcasts, 
-it is always the podcast's title.
+on Google usually have separate long-descriptions.
 
 =item $podcast->B<getIconURL>()
 
@@ -352,14 +357,14 @@ sub new
 	my $urlroot = '';
 	(my $url2fetch = $url) =~ s/\?.*$//;
 	if ($url2fetch =~ m#^https?\:\/\/podcasts\.google\.[a-z]+\/feed\/([a-zA-Z0-9]+)\/episode\/([a-zA-Z0-9]+)#) {
-#EXAMPLE1:my $url = 'https://podcasts.google.com/feed/aHR0cHM6Ly9qb2Vyb2dhbmV4cC5saWJzeW4uY29tL3Jzcw/episode/NDVkNTA4ZTYtZDNiMS00NjQ2LTk1OWEtZjA2NDYyMzQ2NTdm';
 		$self->{'id'} = $1 . '/'. $2;
+	} elsif ($url2fetch =~ m#^https?\:\/\/podcasts\.google\.[a-z]+\/feed\/([a-zA-Z0-9]+)#) {
+		$self->{'id'} = $1;
 	} elsif ($url2fetch !~ m#^https?\:\/\/#) {
 		$self->{'id'} = $url2fetch;
 		my ($podcastid, $episodeid) = split(m#\/#, $self->{'id'});
-		return undef  unless ($episodeid);
-
-		$url2fetch = "https://podcasts.google.com/feed/${podcastid}/episode/${episodeid}";
+		$url2fetch = $episodeid ? "https://podcasts.google.com/feed/${podcastid}/episode/${episodeid}"
+				: "https://podcasts.google.com/feed/${podcastid}";
 	}
 	my $html = '';
 	print STDERR "-0(Google): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
@@ -368,7 +373,76 @@ sub new
 	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
-	my $response = $ua->get($url2fetch);
+	$self->{'cnt'} = 0;
+	$self->{'title'} = '';
+	$self->{'artist'} = '';
+	$self->{'created'} = '';
+	$self->{'year'} = '';
+	$self->{'description'} = '';
+	$self->{'iconurl'} = '';
+	$self->{'streams'} = [];
+	my $response;
+
+	if ($self->{'id'} !~ m#\/#) {  #NO SPECIFIC EPISODE GIVEN, TRY TO FIND 1ST (LATEST) ONE:
+		$response = $ua->get($url2fetch);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+		}
+
+		#SEE IF WE CAN GET THE EPISODE METADATA FROM THE PODCASTER'S SITE:
+		print STDERR "-1a: html=$html=\n"  if ($DEBUG > 1);
+		$self->{'artist'} = $1  if ($html =~ m#hash\:\s*\'\d\'\,\s*data\:[^\"]*\"([^\"]+)#);
+		my $episodeid = ($html =~ s#\"\,\"$self->{'id'}\"\,\"([^\"]+)\"\]#1ST-EPISODE#s) ? $1 : '';
+		print STDERR "-1a: no episode specified, found first ep=$episodeid=\n"  if ($DEBUG);
+		return undef  unless ($episodeid);  #MUST HAVE AN EPISODE BY NOW!
+
+		$html =~ s#^.*?1ST-EPISODE##s;
+		my $goodstuff = $1  if ($html =~ m#([^\]]+)#s);
+		$goodstuff =~ s#^\s*\,(?:true|false)\,\"[^\"]+\"\,(?:true|false)\,\"##s;
+		$self->{'title'} = $1  if ($goodstuff =~ s#^([^\"]+)\"\,\"?##s);
+		$self->{'description'} = $1  if ($goodstuff =~ s#^([^\"]+)\"\,##s);
+		if ($goodstuff =~ s#\"(http[^\"]+)##s) {
+			my $streamURL = $1;
+			$streamURL =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+			$streamURL =~ s/\?.*$//;
+			push @{$self->{'streams'}}, $1;
+			$self->{'cnt'}++;
+		}
+		if ($goodstuff =~ s#\"(http[^\"]+)##s) {
+			my $iconURL = $1;
+			$iconURL =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+			$self->{'iconurl'} = $iconURL;
+		}
+		if ($self->{'cnt'} < 1 && $html =~ s#\bjsdata\=\"(?:[a-zA-Z0-9]*\;)?(https?\:\/\/[^\"\?\;]+)##s) {
+			push @{$self->{'streams'}}, $1;
+			$self->{'cnt'}++;
+		}
+		$self->{'total'} = $self->{'cnt'};
+
+		if ($self->{'cnt'} >= 1 && $self->{'title'} && $self->{'iconurl'}) {
+			#FOUND NEEDED 1ST EPISODE METADATA FROM PODCASTER'S PAGE, SO STOP - NO NEED TO FETCH EPISODE PAGE!:
+			$self->{'albumartist'} = $url2fetch;
+			$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
+			$self->{'title'} = uri_unescape($self->{'title'});
+			$self->{'title'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+			$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+			$self->{'description'} = uri_unescape($self->{'description'});
+			$self->{'description'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+			print STDERR "-1a: We found 1st episode data within the podcaster's page, bless & return!\n"  if ($DEBUG);
+			bless $self, $class;   #BLESS IT!
+
+			return $self;
+		}
+		#FOUND 1ST EPISODE, BUT NOT THE METADATA, SO FETCH THE EPISODE PAGE:
+		print STDERR "-1a: We found 1st episode, but incomplete metadata, so fetch episode's page...\n"  if ($DEBUG);
+		$url2fetch = 'https://podcasts.google.com/feed/' . $self->{'id'} . "/episode/$episodeid";
+		$self->{'id'} .= "/$episodeid";
+		$html = '';
+	}
+
+	$response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
 	} else {
@@ -378,14 +452,6 @@ sub new
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 	return undef  unless ($html && $self->{'id'});  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
 
-	$self->{'cnt'} = 0;
-	$self->{'title'} = '';
-	$self->{'artist'} = '';
-	$self->{'created'} = '';
-	$self->{'year'} = '';
-	$self->{'description'} = '';
-	$self->{'iconurl'} = '';
-	$self->{'streams'} = [];
 	if ($html =~ s#\bjsdata\=\"(?:[a-zA-Z0-9]*\;)?(https?\:\/\/[^\"\?\;]+)##s) {
 		push @{$self->{'streams'}}, $1;
 		$self->{'cnt'}++;

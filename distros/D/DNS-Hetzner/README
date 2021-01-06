@@ -4,18 +4,22 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.02
 
 SYNOPSIS
 
         use DNS::Hetzner;
+        use Data::Printer;
     
-        my $cloud = DNS::Hetzner->new(
+        my $dns = DNS::Hetzner->new(
             token => 'ABCDEFG1234567',    # your api token
         );
     
-        my $server_client = $cloud->server;
-        my $server_list   = $server_client->list;
+        my $records = $dns->records;
+        my $zones   = $dns->zones;
+    
+        my $all_records = $records->list;
+        p $all_records;
 
 INFO
 
@@ -43,7 +47,9 @@ ATTRIBUTES
 
 METHODS
 
- request
+ records
+
+ zones
 
 AUTHOR
 

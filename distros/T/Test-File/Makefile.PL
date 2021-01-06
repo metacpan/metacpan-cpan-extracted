@@ -49,8 +49,8 @@ my %WriteMakefile = (
 	'NAME'          => $module,
 	'VERSION_FROM'  => $main_file,
 	'ABSTRACT_FROM' => $main_file,
-	'LICENSE'		=> 'perl',
-	'AUTHOR'		=> 'brian d foy <bdfoy@cpan.org>',
+	'LICENSE'       => 'artistic_2',
+	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
 
 	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
@@ -61,7 +61,7 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::More'            => '0.95',
+		'Test::More'            => '1',
 		'Test::Builder::Tester' => '1.04',
 		'Test::Builder'         => '1.001006',
 		'Test::utf8'            => '0',
@@ -93,6 +93,7 @@ my %WriteMakefile = (
 		},
 
 	clean  => { FILES    => qq|$dist-*| },
+	test   => { TESTS    => 't/*.t t/*/*.t' },
 	);
 
 

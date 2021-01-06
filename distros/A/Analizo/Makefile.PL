@@ -65,7 +65,7 @@ my %WriteMakefileArgs = (
     "Test::MockModule" => 0,
     "Test::MockObject" => 0
   },
-  "VERSION" => "1.25.0",
+  "VERSION" => "1.25.1",
   "test" => {
     "TESTS" => "t/*.t t/Analizo/*.t t/Analizo/Batch/*.t t/Analizo/Batch/Job/*.t t/Analizo/Batch/Output/*.t t/Analizo/Batch/Runner/*.t t/Analizo/Command/*.t t/Analizo/Extractor/*.t t/Analizo/GlobalMetric/*.t t/Analizo/Metric/*.t t/Analizo/Metric/AfferentConnections/*.t"
   }

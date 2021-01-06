@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 2;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More tests => 2;
 use File::Slurp qw(slurp);
 use File::Spec;
 
@@ -38,5 +38,5 @@ tap2junit_name: {
 sub _tap2junit {
     my @args = @_;
     my $null = File::Spec->devnull();
-    system(qq{ $^X -Iblib/lib blib/script/tap2junit @args 2>$null });
+    system(qq{ $^X -Ilib script/tap2junit @args 2>$null });
 }

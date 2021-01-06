@@ -106,10 +106,13 @@ One or more stream URLs can be returned for each podcast.
 =item B<new>(I<url> [, I<-debug> [ => 0|1|2 ] ... ])
 
 Accepts a www.castbox.com podcast URL and creates and returns a 
-a new podcast object, or I<undef> if the URL is not a valid podcast, or no streams 
-are found.  The URL MUST be the full URL, ie. 
-https://castbox.fm/episode/<title>-id<channel-id>-id<podcast-id>, 
-as I know of no way to look up a podcast on Castbox with just a podcast ID.
+a new podcast object, or I<undef> if the URL is not a valid podcast, or no 
+streams are found.  The URL MUST be the full URL, ie. 
+https://castbox.fm/episode/I<title>-idB<channel-id>-idB<episode-id>, or 
+https://castbox.fm/channel/idB<channel-id> 
+as I know of no way to look up a podcast on Castbox with just an episode ID.
+If no I<episode-id> is specified, the first (latest) episode for the channel 
+is returned.
 
 =item $podcast->B<get>()
 
@@ -349,6 +352,7 @@ sub new
 	if ($url2fetch =~ m#^(https?\:\/\/castbox\.\w+)#) {
 		$urlroot = $1;
 		$self->{'id'} = ($url =~ m#\-id(\d+)\-id(\d+)#) ? "${1}/$2" : '';
+		$self->{'id'} ||= $1  if ($url =~ m#id(\d+)#);   #NO EPISODE SPECIFIED
 	} else {  #MUST PROVIDE URL, NO KNOWN WAY TO LOOK UP WITH JUST ID#?!
 		print STDERR "w:Url ($url) is NOT a valid Castbox podcast url!\n"  if ($DEBUG);
 		return undef;
@@ -360,7 +364,29 @@ sub new
 	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
-	my $response = $ua->get($url2fetch);
+	my $response;
+	if ($self->{'id'} !~ m#\/#) {  #NO SPECIFIC EPISODE GIVEN, TRY TO FIND 1ST (LATEST) ONE:
+		$response = $ua->get($url2fetch);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+		}
+
+		print STDERR "-1a: html=$html=\n"  if ($DEBUG > 1);
+		if ($html =~ m#\<div\s+class\=\"ep\-item\-cover\"\>\s*\<a\s+href\=\"([^\"]+)#s) {
+			$url2fetch = $1;
+			$url2fetch = "https://castbox.fm$url2fetch"  if ($url2fetch !~ /^http/);
+			$self->{'id'} = ($url2fetch =~ m#\-id(\d+)\-id(\d+)#) ? "${1}/$2" : '';
+			$html = '';
+		}
+		return undef  unless ($self->{'id'} =~ m#\/#);  #MUST HAVE AN EPISODE BY NOW!
+
+		print STDERR "-1a: no episode specified, found first ep=".$self->{'id'}."=\n"  if ($DEBUG);
+		print STDERR "-1(Castbox): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+	}
+
+	$response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
 	} else {

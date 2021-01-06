@@ -208,3 +208,11 @@ Revision history for StreamFinder
 1.40    2021/01/04
         - Add StreamFinder::Google for Google (podcasts.google.com) podcasts. 
         (closes CPAN feature# 133993).
+1.41    2021/01/06
+        - StreamFinder::Google, StreamFinder::Castbox, StreamFinder::Spreaker, 
+        and StreamFinder::IHeartRadio:  Add ability to accept a podcast / 
+        channel page without a specific episode and return the first (latest) 
+        episode for that page.  NOTE:  StreamFinder::Apple already does this 
+        but returns all episode streams in a list with the first episode the 
+        first stream, but the metadata returned is for the Apple podcast page, 
+        and left this way for backward compatability.

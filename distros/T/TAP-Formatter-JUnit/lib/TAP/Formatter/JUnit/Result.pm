@@ -1,6 +1,7 @@
 package TAP::Formatter::JUnit::Result;
 
 use Moose;
+use namespace::clean;
 
 has 'time' => (
     is       => 'ro',

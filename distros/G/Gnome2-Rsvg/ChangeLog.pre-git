@@ -1,7 +1,8 @@
 === ChangeLog discontinued ===
 
 	With the move to git, we stop maintaining a separate ChangeLog and
-	rely on proper commit messages instead.
+	rely on proper commit messages instead.  Web view of changes:
+	<http://git.gnome.org/browse/perl-Gnome2-Rsvg/>.
 
 2006-12-30	kaffeetisch
 

@@ -3,7 +3,7 @@ package DBIx::OnlineDDL::Helper::SQLite;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for SQLite-specific code
 use version;
-our $VERSION = 'v0.920.1'; # VERSION
+our $VERSION = 'v0.930.0'; # VERSION
 
 use v5.10;
 use Moo;
@@ -171,7 +171,7 @@ DBIx::OnlineDDL::Helper::SQLite - Private OnlineDDL helper for SQLite-specific c
 
 =head1 VERSION
 
-version v0.920.1
+version v0.930.0
 
 =head1 DESCRIPTION
 
@@ -188,7 +188,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+This software is Copyright (c) 2018 - 2021 by Grant Street Group.
 
 This is free software, licensed under:
 

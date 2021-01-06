@@ -3,7 +3,7 @@ use strict;
 use Test::More;
 use Gnome2::Wnck;
 
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gnome2-Wnck/t/WnckSelector.t,v 1.2 2007/08/02 20:15:43 kaffeetisch Exp $
+# $Id$
 
 unless (Gnome2::Wnck -> CHECK_VERSION(2, 10, 0)) {
   plan skip_all => "WnckSelector is new in 2.10";

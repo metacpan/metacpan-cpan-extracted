@@ -8,8 +8,9 @@ extends qw(
 
 use XML::Generator;
 use TAP::Formatter::JUnit::Session;
+use namespace::clean;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 has 'testsuites' => (
     is      => 'rw',
@@ -54,11 +55,11 @@ sub open_test {
 }
 
 ###############################################################################
-# Subroutine:   summary($aggregate)
+# Subroutine:   summary()
 ###############################################################################
 # Prints the summary report (in JUnit) after all tests are run.
 sub summary {
-    my ($self, $aggregate) = @_;
+    my $self = shift;
     return if $self->silent();
 
     my @suites = @{$self->testsuites};
@@ -66,6 +67,8 @@ sub summary {
 }
 
 1;
+
+=for stopwords xml testsuites TODO parseable JUnitXSchema.xsd
 
 =head1 NAME
 
@@ -75,11 +78,19 @@ TAP::Formatter::JUnit - Harness output delegate for JUnit output
 
 On the command line, with F<prove>:
 
-  prove --formatter TAP::Formatter::JUnit ...
+=for test_synopsis BEGIN { die "SKIP: This isn't Perl, but shell" }
+
+  $ prove --formatter TAP::Formatter::JUnit ...
 
 Or, in your own scripts:
 
   use TAP::Harness;
+
+  # What TAP output did we save from a previous run, with
+  # PERL_TEST_HARNESS_DUMP_TAP=tap/
+  my @tests = glob("tap/*.t");
+
+  # Convert the TAP to JUnit
   my $harness = TAP::Harness->new( {
       formatter_class => 'TAP::Formatter::JUnit',
       merge => 1,
@@ -95,15 +106,15 @@ C<TAP::Formatter::JUnit> provides JUnit output formatting for C<TAP::Harness>.
 By default (e.g. when run with F<prove>), the I<entire> test suite is gathered
 together into a single JUnit XML document, which is then displayed on C<STDOUT>.
 You can, however, have individual JUnit XML files dumped for each individual
-test, by setting c<PERL_TEST_HARNESS_DUMP_TAP> to a directory that you would
+test, by setting C<PERL_TEST_HARNESS_DUMP_TAP> to a directory that you would
 like the JUnit XML dumped to.  Note, that this will B<also> cause
 C<TAP::Harness> to dump the original TAP output into that directory as well (but
-IMHO that's ok as you've now got the data in two parsable formats).
+IMHO that's ok as you've now got the data in two parseable formats).
 
 Timing information is included in the JUnit XML, I<if> you specified C<--timer>
 when you ran F<prove>.
 
-In standard use, "passing TODOs" are treated as failure conditions (and are
+In standard use, a "passing TODO" is treated as failure conditions (and is
 reported as such in the generated JUnit).  If you wish to treat these as a
 "pass" and not a "fail" condition, setting C<ALLOW_PASSING_TODOS> in your
 environment will turn these into pass conditions.
@@ -130,18 +141,18 @@ An C<XML::Generator> instance, to be used to generate XML output.
 
 =over
 
-=item B<open_test($test, $parser)>
+=item open_test($test, $parser)
 
 Over-ridden C<open_test()> method.
 
 Creates a C<TAP::Formatter::JUnit::Session> session, instead of a console
 formatter session.
 
-=item B<summary($aggregate)>
+=item summary()
 
 Prints the summary report (in JUnit) after all tests are run.
 
-=item B<add_testsuite($suite)>
+=item add_testsuite($suite)
 
 Adds the given XML test C<$suite> to the list of test suites that we've
 executed and need to summarize.
@@ -152,8 +163,8 @@ executed and need to summarize.
 
 Graham TerMarsch <cpan@howlingfrog.com>
 
-Many thanks to Andy Armstrong et al. for the B<fabulous> set of tests in
-C<Test::Harness>; they became the basis for the unit tests here.
+Many thanks to Andy Armstrong and all those involved for the B<fabulous> set of
+tests in C<Test::Harness>; they became the basis for the unit tests here.
 
 Other thanks go out to those that have provided feedback, comments, or patches:
 
@@ -174,10 +185,18 @@ terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<TAP::Formatter::Console>,
-L<TAP::Formatter::JUnit::Session>,
-L<http://hudson.dev.java.net/>,
-L<http://jra1mw.cvs.cern.ch:8180/cgi-bin/jra1mw.cgi/org.glite.testing.unit/config/JUnitXSchema.xsd?view=markup&content-type=text%2Fvnd.viewcvs-markup&revision=HEAD>,
-L<http://confluence.atlassian.com/display/BAMBOO/JUnit+parsing+in+Bamboo>.
+=over
+
+=item L<TAP::Formatter::Console>
+
+=item L<TAP::Formatter::JUnit::Session>
+
+=item L<Hudson home page|http://hudson.dev.java.net/>
+
+=item L<JUnitXSchema.xsd|http://jra1mw.cvs.cern.ch:8180/cgi-bin/jra1mw.cgi/org.glite.testing.unit/config/JUnitXSchema.xsd?view=markup&content-type=text%2Fvnd.viewcvs-markup&revision=HEAD>
+
+=item L<JUnit parsing in Bamboo|http://confluence.atlassian.com/display/BAMBOO/JUnit+parsing+in+Bamboo>.
+
+=back
 
 =cut

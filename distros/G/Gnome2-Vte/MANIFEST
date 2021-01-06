@@ -8,10 +8,11 @@ README
 Vte.pm
 copyright.pod
 maps
-perl-Gnome2-Vte.doap
+perl-gnome2-vte.doap
 perl-Gnome2-Vte.spec.in
 t/VteTerminal.t
 vte2perl.h
 xs/Vte.xs
 xs/VteTerminal.xs
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

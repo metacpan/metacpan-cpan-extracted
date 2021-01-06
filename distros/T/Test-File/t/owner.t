@@ -14,16 +14,16 @@ eval
 	die "Could not find a file" unless defined $filename;
 
 	$owner_uid = ( stat $filename )[4];
-	die "failed to find $filename's owner\n" unless defined $owner_uid;
+	die "failed to find ${filename}'s owner\n" unless defined $owner_uid;
 
 	$file_gid = ( stat $filename )[5];
-	die "failed to find $filename's owner\n" unless defined $file_gid;
+	die "failed to find ${filename}'s owner\n" unless defined $file_gid;
 
 	$owner_name = ( getpwuid $owner_uid )[0];
-	die "failed to find $filename's owner as name\n" unless defined $owner_name;
+	die "failed to find ${filename}'s owner as name\n" unless defined $owner_name;
 
 	$file_group_name = ( getgrgid $file_gid )[0];
-	die "failed to find $filename's group as name\n" unless defined $file_group_name;
+	die "failed to find ${filename}'s group as name\n" unless defined $file_group_name;
 	};
 plan skip_all => "I can't find a file to test with: $@" if $@;
 
@@ -148,9 +148,11 @@ test_test( $name );
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # test group stuff
 group_is(   $filename, $file_group_name, 'group_is with text groupname'    );
+group_is(   $filename, $file_group_name );
 group_is(   $filename, $file_gid,  'group_is with numeric GID'             );
 group_isnt( $filename, $other_group_name, 'group_isnt with text groupname' );
 group_isnt( $filename, $other_gid,  'group_isnt with numeric GID'          );
+group_isnt( $filename, $other_gid );
 
 
 $name = 'Intentional group_is failure';

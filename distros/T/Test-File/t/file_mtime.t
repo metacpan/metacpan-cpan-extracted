@@ -24,8 +24,15 @@ ok ( $mtime == $set_mtime, 'utime successfully set mtime for testing' ) or diag 
 
 # file_mtime_age_ok
 test_out( 'ok 1 - file_mtime_age_ok success' );
+test_out( 'ok 2 - mtime_file mtime within 660 seconds of current time' );
 file_mtime_age_ok( $mtime_file, 60*11, 'file_mtime_age_ok success' );
+file_mtime_age_ok( $mtime_file, 60*11 );
 test_test( 'file_mtime_age_ok success works' );
+
+test_out( 'not ok 1 - mtime_file mtime within 0 seconds of current time' );
+file_mtime_age_ok( $mtime_file );
+test_test( name => 'file_mtime_age_ok success works', skip_err => 1 );
+
 
 test_out( 'not ok 1 - file_mtime_age_ok failure' );
 test_err( qr/\s*#\s*Filename \[$mtime_file\] [^\n]+\n/ );
@@ -35,7 +42,9 @@ test_test( 'file_mime_age_ok failure works' );
 
 # file_mtime_lt_ok
 test_out( 'ok 1 - file_mtime_lt_ok success' );
+test_out( 'ok 2 - mtime_file mtime less than unix timestamp ' . time() );
 file_mtime_lt_ok( $mtime_file, time(), 'file_mtime_lt_ok success' );
+file_mtime_lt_ok( $mtime_file, time() );
 test_test( 'file_mtime_lt_ok success works' );
 
 test_out( 'not ok 1 - file_mtime_lt_ok failure' );
@@ -46,7 +55,9 @@ test_test( 'file_mtime_lt_ok failure works' );
 
 # file_mtime_gt_ok
 test_out( 'ok 1 - file_mtime_gt_ok success' );
+test_out( 'ok 2 - mtime_file mtime is greater than unix timestamp ' . ($curtime-60*11) );
 file_mtime_gt_ok( $mtime_file, $curtime-60*11, 'file_mtime_gt_ok success' );
+file_mtime_gt_ok( $mtime_file, $curtime-60*11 );
 test_test( 'file_mtime_gt_ok success works' );
 
 test_out( 'not ok 1 - file_mtime_gt_ok failure' );

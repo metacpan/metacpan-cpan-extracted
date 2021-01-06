@@ -1,9 +1,9 @@
 package Perl::LineNumber::Comment;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-27'; # DATE
+our $DATE = '2020-11-28'; # DATE
 our $DIST = 'Perl-LineNumber-Comment'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use warnings;
@@ -155,12 +155,20 @@ Perl::LineNumber::Comment - Add line number to Perl source as comment
 
 =head1 VERSION
 
-This document describes version 0.001 of Perl::LineNumber::Comment (from Perl distribution Perl-LineNumber-Comment), released on 2020-11-27.
+This document describes version 0.002 of Perl::LineNumber::Comment (from Perl distribution Perl-LineNumber-Comment), released on 2020-11-28.
 
 =head1 SYNOPSIS
 
+In your code:
+
+ use File::Slurper qw(read_text);
  use Perl::LineNumber::Comment qw(add_line_number_comments_to_perl_source);
- print add_line_number_comments_to_perl_source(<<'EOF');
+
+ my $source = read_text('sample.pl');
+ print add_line_number_comments_to_perl_source(source => $source);
+
+Content of F<sample.pl>:
+
  #!/usr/bin/env perl
 
  use 5.010001;
@@ -172,11 +180,11 @@ This document describes version 0.001 of Perl::LineNumber::Comment (from Perl di
  print "A multiline
  string";
 
- print <<EOF2;
+ print <<EOF;
  A heredoc (not shown in node->content).
 
  Line three.
- EOF2
+ EOF
 
  exit 0;
 
@@ -184,9 +192,8 @@ This document describes version 0.001 of Perl::LineNumber::Comment (from Perl di
  one
  two
  three
- EOF
 
-will print:
+Output of code:
 
  #!/usr/bin/env perl
 

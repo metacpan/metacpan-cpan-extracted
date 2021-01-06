@@ -12,11 +12,10 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 maps
 NEWS
-perl-Gnome2-PanelApplet.doap
+perl-gnome2-panelapplet.doap
 README
 t/00.PanelApplet.t
 t/GNOME_PerlAppletTest.server
 t/test-applet
 xs/PanelApplet.xs
 xs/PanelAppletGConf.xs
-META.yml                                 Module meta-data (added by MakeMaker)

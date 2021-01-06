@@ -3,7 +3,7 @@ package DBIx::OnlineDDL::Helper::MySQL;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for MySQL-specific code
 use version;
-our $VERSION = 'v0.920.1'; # VERSION
+our $VERSION = 'v0.930.0'; # VERSION
 
 use v5.10;
 use Moo;
@@ -127,10 +127,13 @@ sub rename_fks_in_table_sql {
     my $dbh = $self->dbh;
 
     # Since MySQL uses a global namespace for foreign keys, these will have to be renamed
-    my $iqre = $dbh->get_info( $GetInfoType{SQL_IDENTIFIER_QUOTE_CHAR} ) || '`';
-    $iqre = quotemeta $iqre;
+    my $iq_chars = $dbh->get_info( $GetInfoType{SQL_IDENTIFIER_QUOTE_CHAR} ) || '`';
+    $iq_chars .= '"';  # include ANSI quotes
 
-    my @fk_names = ($table_sql =~ /CONSTRAINT ${iqre}([^$iqre\s]+)${iqre} FOREIGN KEY/ig);
+    my $iqre     = '['.quotemeta($iq_chars).']';
+    my $noniq_re = '[^'.quotemeta($iq_chars).'\s]';
+
+    my @fk_names = ($table_sql =~ /CONSTRAINT ${iqre}(${noniq_re}+)${iqre} FOREIGN KEY/ig);
 
     foreach my $fk_name (@fk_names) {
         my $new_fk_name = $self->find_new_identifier(
@@ -228,7 +231,7 @@ DBIx::OnlineDDL::Helper::MySQL - Private OnlineDDL helper for MySQL-specific cod
 
 =head1 VERSION
 
-version v0.920.1
+version v0.930.0
 
 =head1 DESCRIPTION
 
@@ -245,7 +248,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+This software is Copyright (c) 2018 - 2021 by Grant Street Group.
 
 This is free software, licensed under:
 

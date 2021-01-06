@@ -94,18 +94,33 @@ WriteMakefile(
     $gconf->get_makefile_vars,
 );
 
-#print "
-#WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
-#
-#This is an unstable development release of Gnome2::GConf.  The API is
-#not frozen and things are subject to change at any time.  Report any
-#bugs to gtk-perl-list AT gnome DOT org as soon as possible.
-#Please use the stable 1.020 version for important work.
-#
-#WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
-#
-#";
-			
+print <<__EON__;
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+* Perl URL: https://gitlab.gnome.org/GNOME/perl-gnome2-gconf
+* Upstream URL: https://gitlab.gnome.org/Archive/gconf
+* Last upstream version: 3.2.6
+* Last upstream release date: 2013-01-21
+* Migration path for this module: Glib::IO::Settings
+* Migration module URL: https://metacpan.org/pod/Glib::IO
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+__EON__
+
 
 sub MY::postamble
 {

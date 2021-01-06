@@ -71,7 +71,12 @@ sub onlineddl_test ($$&) {
     subtest("$source_name: $test_name", sub {
         # Initialize the schema
         my $cd_schema;
-        try_ok { $cd_schema = CDTest->init_schema } 'Tables created';
+        try_ok {
+            $cd_schema = CDTest->init_schema(
+               # If this is MySQL, this will test the ANSI_QUOTES flag
+               $CDTEST_DSN && $CDTEST_DSN =~ /^dbi:mysql:/ ? (on_connect_call => 'set_strict_mode') : ()
+            );
+        } 'Tables created';
         die 'Schema initialization failed!' if $@;
 
         my $rsrc = $cd_schema->source($source_name);
@@ -210,6 +215,8 @@ sub onlineddl_test ($$&) {
             $dc_count++;
             unless ($method =~ /(?:BUILD|post_connection_stmts|_build_helper|current_catalog_schema)$/ || $dc_count % 3) {
                 if ($dbms_name eq 'MySQL') {
+                    # XXX: For reasons unknown, this breaks the ANSI quote testing, so this KILL
+                    # needs to be disabled to properly test that.
                     eval { $dbh->do('KILL CONNECTION CONNECTION_ID()') };
                 }
                 else {

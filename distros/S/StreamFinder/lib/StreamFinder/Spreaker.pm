@@ -368,7 +368,10 @@ sub new
 	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
-	my $response = $ua->get($url2fetch);
+	my $response;
+	my $tried = 0;
+TRYIT:
+	$response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
 	} else {
@@ -393,6 +396,19 @@ sub new
 		(my $s = $1) =~ s#\\##g;;
 		push @{$self->{'streams'}}, $s;
 		$self->{'cnt'}++;
+	}
+	unless ($tried || $self->{'cnt'} > 0) {   #NO STREAMS, PERHAPS WE HAVE A PODCAST PAGE INSTEAD OF AN EPISODE PAGE?:
+		if ($html =~ s#^.+?\<div\s+class\=\"epl\_ep\_title\"\>##s) {
+			if ($html =~ m#href\=\"([^\"]+)#) {
+				$url2fetch = $1;
+				if ($url2fetch =~ /^http/) {
+					print STDERR "-1a: No streams found, try again fetching ($url2fetch)!...\n"  if ($DEBUG);
+					$self->{'id'} = $1  if ($url2fetch =~ m#([^\/]+)$#);
+					++$tried;
+					goto TRYIT;
+				}
+			}
+		}
 	}
 	return undef  unless ($self->{'cnt'} > 0);
 
@@ -436,7 +452,7 @@ sub new
 	$self->{'imageurl'} =~ s#\\##g;
 	$self->{'imageurl'} ||= $self->{'iconurl'};  #MAKE SURE WE HAVE BOTH, OTHERWISE IMAGE:=ICON.
 	$self->{'total'} = $self->{'cnt'};
-	print STDERR "-(all)count=".$self->{'total'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= YEAR=".$self->{'year'}."=\n"  if ($DEBUG);
+	print STDERR "-(all)count=".$self->{'total'}."= ID=".$self->{'id'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= YEAR=".$self->{'year'}."=\n"  if ($DEBUG);
 	print STDERR "-SUCCESS: 1st stream=".${$self->{'streams'}}[0]."=\n"  if ($DEBUG);
 
 	bless $self, $class;   #BLESS IT!

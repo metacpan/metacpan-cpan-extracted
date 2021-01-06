@@ -1,3 +1,9 @@
+0.003   2021-01-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] When requesting a single URL with --detail, return a hash
+	  instead of a single record of hash.
+
+
 0.002   2021-01-03  Released-By: PERLANCAR; Urgency: medium
 
 	- [doc] Add examples.
