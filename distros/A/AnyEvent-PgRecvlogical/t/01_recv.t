@@ -8,6 +8,7 @@ use AnyEvent;
 use File::Basename;
 use File::Spec;
 use Promises backend => ['AnyEvent'], qw(deferred);
+use Try::Tiny;
 
 use AnyEvent::PgRecvlogical;
 
@@ -103,5 +104,44 @@ ae_sleep(2);
 
 ok $end_cv->recv, 'got all messages';
 $recv->stop;
+
+$end_cv = AE::cv;
+
+$recv = new_ok(
+    'AnyEvent::PgRecvlogical' => [
+        dbname          => 'no_exist',
+        host            => '127.0.0.1',
+        port            => $pg->port,
+        username        => 'postgres',
+        slot            => 'test',
+        options         => { 'skip-empty-xacts' => 1, 'include-xids' => 0 },
+        do_create_slot  => 1,
+        slot_exists_ok  => 1,
+        heartbeat       => 1,
+        reconnect_delay => 1,
+        on_message      => sub {
+            return;
+        },
+        on_error => sub {
+            $end_cv->croak(@_);
+        },
+    ],
+    'pg_recvlogical'
+);
+
+my $error = '';
+try {
+    $recv->start;
+
+    ae_sleep(1);
+    $end_cv->send;
+    ae_sleep(1);
+
+    $end_cv->recv;
+} catch {
+    $error = $_;
+};
+
+ok !!$error, 'start died on connect error';
 
 done_testing;

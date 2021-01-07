@@ -1,5 +1,8 @@
 Revision history for Dir-Flock
 
+0.09	2021-01-06
+	Use $CHECK_DELAY to sync dirs on responsive systems
+
 0.08	2020-12-28
 	Simplified implementation that does not rely on Time::HiRes::stat
 	Removed Dir::Flock::Mock package

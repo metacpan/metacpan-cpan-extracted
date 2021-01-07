@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.096 qw(:Status);
+use IO::Compress::Base::Common 2.100 qw(:Status);
 
-use Compress::Raw::Lzma 2.096 ;
+use Compress::Raw::Lzma 2.100 ;
 
 our ($VERSION, @ISA);
-$VERSION = '2.096';
+$VERSION = '2.100';
 
 #@ISA = qw( Compress::Raw::UnLzma );
 
@@ -36,7 +36,7 @@ sub mkUncompObject
     my ($inflate, $status) = Compress::Raw::Lzma::RawDecoder->new(AppendOutput => 1,
                                               Properties => $properties,
                                             #   Filter => $filter,
-                                              ConsumeInput => 1, 
+                                              ConsumeInput => 1,
                                               LimitOutput => 1);
 
     return (undef, "Could not create RawDecoder object: $status", $status)
@@ -50,8 +50,8 @@ sub mkUncompObject
                   'ConsumesInput' => 1,
                   'CRC32'         => 0,
                   'Properties'    => $properties,
-                 }  ;     
-    
+                 }  ;
+
 }
 
 sub uncompr
@@ -72,10 +72,10 @@ sub uncompr
         return STATUS_ERROR;
     }
 
-    $self->{CRC32} = Compress::Raw::Zlib::crc32(substr($$to, $len), $self->{CRC32}) 
+    $self->{CRC32} = Compress::Raw::Zlib::crc32(substr($$to, $len), $self->{CRC32})
         if length($$to) > $len ;
 
-    return STATUS_ENDSTREAM if $status == LZMA_STREAM_END  || 
+    return STATUS_ENDSTREAM if $status == LZMA_STREAM_END  ||
                                 ($eof && length $$from == 0);
 
 
@@ -91,17 +91,17 @@ sub reset
     my ($inf, $status) = Compress::Raw::Lzma::RawDecoder->new(AppendOutput => 1,
                                               Properties => $self->{Properties},
                                             #   Filter => $filter,
-                                              ConsumeInput => 1, 
+                                              ConsumeInput => 1,
                                               LimitOutput => 1);
 
     # my ($inf, $status) = Compress::Raw::Lzma::RawDecoder->new(AppendOutput => 1,
-    #                                           ConsumeInput => 1, 
+    #                                           ConsumeInput => 1,
     #                                           LimitOutput => 1);
     $self->{ErrorNo} = ($status == LZMA_OK) ? 0 : $status ;
 
     if ($status != LZMA_OK)
     {
-        $self->{Error} = "Cannot create UnLzma object: $status"; 
+        $self->{Error} = "Cannot create UnLzma object: $status";
         return STATUS_ERROR;
     }
 
@@ -144,8 +144,8 @@ sub adler32
 sub sync
 {
     my $self = shift ;
-    #( $self->{Inf}->inflateSync(@_) == LZMA_OK) 
-    #        ? STATUS_OK 
+    #( $self->{Inf}->inflateSync(@_) == LZMA_OK)
+    #        ? STATUS_OK
     #        : STATUS_ERROR ;
 }
 
@@ -153,4 +153,3 @@ sub sync
 1;
 
 __END__
-

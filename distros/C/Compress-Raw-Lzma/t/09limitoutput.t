@@ -13,8 +13,8 @@ use bytes;
 use Test::More ;
 use CompTestUtils;
 
-BEGIN 
-{ 
+BEGIN
+{
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
@@ -22,7 +22,7 @@ BEGIN
 
     plan tests => 54 + $extra ;
 
-    use_ok('Compress::Raw::Lzma', 2) ; 
+    use_ok('Compress::Raw::Lzma', 2) ;
 }
 
 
@@ -30,7 +30,7 @@ BEGIN
 my $hello = "I am a HAL 9000 computer" x 2001;
 my $tmp = $hello ;
 
-my ($err, $x, $X, $status); 
+my ($err, $x, $X, $status);
 
 ok( ($x, $err) = new Compress::Raw::Lzma::AloneEncoder (-AppendOutput => 1));
 ok $x ;
@@ -41,8 +41,8 @@ $status = $x->code($tmp, $out) ;
 cmp_ok $status, '==', LZMA_OK, "  status is LZMA_OK" ;
 
 cmp_ok $x->flush($out), '==', LZMA_STREAM_END, "  flush returned LZMA_STREAM_END" ;
-     
-     
+
+
 sub getOut { my $x = ''; return \$x }
 
 for my $bufsize (1, 2, 3, 13, 4096, 1024*10)
@@ -57,7 +57,7 @@ for my $bufsize (1, 2, 3, 13, 4096, 1024*10)
                                                     ));
     ok $k ;
     cmp_ok $err, '==', LZMA_OK, "  status is LZMA_OK" ;
- 
+
     #ok ! defined $k->msg(), "  no msg" ;
     #is $k->total_in(), 0, "  total_in == 0" ;
     #is $k->total_out(), 0, "  total_out == 0" ;
@@ -73,7 +73,7 @@ for my $bufsize (1, 2, 3, 13, 4096, 1024*10)
         last if $status != LZMA_OK;
         $deltaOK = 0 if length($GOT) - $prev > $bufsize;
     }
-     
+
     ok $deltaOK, "  Output Delta never > $bufsize";
     cmp_ok $looped, '>=', 1, "  looped $looped";
     is length($tmp), 0, "  length of input buffer is zero";
@@ -92,7 +92,7 @@ sub getit
 {
     my $obj = shift ;
     my $input = shift;
-    
+
     my $data ;
     #1 while $obj->code($input, $data) != LZMA_STREAM_END ;
     1 while $obj->code($input, $data) == LZMA_OK ;
@@ -101,9 +101,9 @@ sub getit
 
 {
     title "regression test";
-    
-    my ($err, $x, $X, $status); 
-    
+
+    my ($err, $x, $X, $status);
+
     ok( ($x, $err) = new Compress::Raw::Lzma::AloneEncoder (-AppendOutput => 1));
     ok $x ;
     cmp_ok $err, '==', LZMA_OK, "  status is LZMA_OK" ;
@@ -112,11 +112,11 @@ sub getit
     my $line2 = "second line\n" ;
     my $text = $line1 . $line2 ;
     my $tmp = $text;
-   
+
     my $out ;
     $status = $x->code($tmp, $out) ;
     cmp_ok $status, '==', LZMA_OK, "  status is LZMA_OK" ;
-    
+
     cmp_ok $x->flush($out), '==', LZMA_STREAM_END, "  flush returned LZMA_STREAM_END" ;
 
     my $k;
@@ -124,10 +124,9 @@ sub getit
                                                       LimitOutput => 1
                                                     ));
 
-                                                        
+
     my $c = getit($k, $out);
     is $$c, $text;
-    
-                                              
-}
 
+
+}

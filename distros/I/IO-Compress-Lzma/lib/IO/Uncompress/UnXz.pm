@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.096 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.100 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.096 ;
-use IO::Uncompress::Adapter::UnXz 2.096 ;
+use IO::Uncompress::Base 2.100 ;
+use IO::Uncompress::Adapter::UnXz 2.100 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnXzError);
 
-$VERSION = '2.096';
+$VERSION = '2.100';
 $UnXzError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );
@@ -39,7 +39,7 @@ sub unxz
 our %PARAMS = (
         'memlimit' => [IO::Compress::Base::Common::Parse_unsigned, 128 * 1024 * 1024],
         'flags'    => [IO::Compress::Base::Common::Parse_boolean,  0],
-    );    
+    );
 
 sub getExtraParams
 {
@@ -74,7 +74,7 @@ sub mkUncomp
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
-    
+
     *$self->{Uncomp} = $obj;
 
     return 1;
@@ -93,15 +93,15 @@ sub ckMagic
     $self->smartReadExact(\$magic, XZ_ID_SIZE);
 
     *$self->{HeaderPending} = $magic ;
-    
-    return $self->HeaderError("Header size is " . 
-                                        XZ_ID_SIZE . " bytes") 
+
+    return $self->HeaderError("Header size is " .
+                                        XZ_ID_SIZE . " bytes")
         if length $magic != XZ_ID_SIZE;
 
     return $self->HeaderError("Bad Magic.")
         if ! isXzMagic($magic) ;
-                      
-        
+
+
     *$self->{Type} = 'xz';
     return $magic;
 }
@@ -122,7 +122,7 @@ sub readHeader
         'TrailerLength'     => 0,
         'Header'            => '$magic'
         };
-    
+
 }
 
 sub chkTrailer
@@ -154,7 +154,7 @@ IO::Uncompress::UnXz - Read xz files/buffers
     my $status = unxz $input => $output [,OPTS]
         or die "unxz failed: $UnXzError\n";
 
-    my $z = new IO::Uncompress::UnXz $input [OPTS]
+    my $z = IO::Uncompress::UnXz->new( $input [OPTS] )
         or die "unxz failed: $UnXzError\n";
 
     $status = $z->read($buffer)
@@ -445,7 +445,7 @@ uncompressed data to a buffer, C<$buffer>.
     use IO::Uncompress::UnXz qw(unxz $UnXzError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt.xz"
+    my $input = IO::File->new( "<file1.txt.xz" )
         or die "Cannot open 'file1.txt.xz': $!\n" ;
     my $buffer ;
     unxz $input => \$buffer
@@ -480,7 +480,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for IO::Uncompress::UnXz is shown below
 
-    my $z = new IO::Uncompress::UnXz $input [OPTS]
+    my $z = IO::Uncompress::UnXz->new( $input [OPTS] )
         or die "IO::Uncompress::UnXz failed: $UnXzError\n";
 
 Returns an C<IO::Uncompress::UnXz> object on success and undef on failure.
@@ -908,8 +908,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2021 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

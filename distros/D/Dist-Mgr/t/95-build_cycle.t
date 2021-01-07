@@ -38,7 +38,7 @@ remove_init();
     # init()
 
     $h->hook('stderr');
-    init(%module_args);
+    init(%module_args, verbose => 1);
     $h->unhook('stderr');
 
     my @stderr = $h->stderr;
@@ -72,6 +72,13 @@ remove_init();
     file_count(13);
     is -e 'MANIFEST.SKIP', 1, "MANIFEST.SKIP created ok";
     check_file('MANIFEST.SKIP', qr/BB-Pass/, "it's our custom MANIFEST.SKIP ok");
+
+    # manifest_t()
+
+    manifest_t();
+    file_count(13);
+    is -e 't/manifest.t', 1, "t/manifest.t created ok";
+    check_file('t/manifest.t', qr/manicheck/, "it's our custom manifest.t ok");
 
     # ci_github()
 
@@ -125,11 +132,15 @@ remove_init();
         "$new_ver is greater than $orig_ver ok"
     );
 
+    # make_manifest()
+
+    make_manifest();
+
     # Compare all files against the saved template
 
     like
         getcwd(),
-        qr|dist-mgr/t/data/work/init|,
+        qr|dist-mgr(-\d+\.\d+)?/t/data/work/init|i,
         "in the init dir ok";
 
     my $template_dir = "$cwd/t/data/module_template/";
@@ -137,14 +148,12 @@ remove_init();
     my @template_files = File::Find::Rule->file()
         ->name('*')
         ->in($template_dir);
-
     my $file_count = 0;
 
     for my $tf (@template_files) {
         (my $nf = $tf) =~ s/$template_dir//;
         # nf == new file
         # tf == template file
-
         if (-f $nf) {
             open my $tfh, '<', $tf or die $!;
             open my $nfh, '<', $nf or die $!;
@@ -162,6 +171,10 @@ remove_init();
                         like $nf[$_], qr/\$VERSION = '9.66'/, "Changes line 2 contains date ok";
                         next;
                     }
+                    if ($tf[$_] =~ /\b2020\b/) {
+                        is $nf[$_] =~ /Copyright.* \d{4}/, 1, "$nf Copyright line ok";
+                        next;
+                    }
                 }
                 is $nf[$_], $tf[$_], "$nf file matches the template $tf ok";
             }
@@ -169,7 +182,7 @@ remove_init();
         }
     }
 
-    is scalar @template_files, $file_count, "file count matches number of files in template";
+    is scalar $file_count, @template_files, "file count matches number of files in template";
 
     # Cleanup
 
@@ -181,7 +194,7 @@ remove_init() if getcwd() !~ /init$/;
 done_testing;
 
 sub before {
-    like $cwd, qr/dist-mgr/, "in proper directory ok";
+    like $cwd, qr/dist-mgr/i, "in proper directory ok";
 
     chdir $work or die $!;
     like getcwd(), qr/$work$/, "in $work directory ok";
@@ -197,7 +210,7 @@ sub before {
 }
 sub after {
     chdir $cwd or die $!;
-    like getcwd(), qr/dist-mgr/, "back in root directory ok";
+    like getcwd(), qr/dist-mgr(-\d+\.\d+)?/i, "back in root directory ok";
 }
 sub file_count {
     my ($expected_count) = @_;

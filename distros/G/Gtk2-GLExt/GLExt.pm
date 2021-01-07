@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gtk2-GLExt/GLExt.pm,v 1.3 2004/10/29 00:18:43 rwmcfa1 Exp $
+# $Id$
 #
 
 package Gtk2::GLExt;
@@ -14,7 +14,7 @@ require DynaLoader;
 
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 sub dl_load_flags { 0x01 }
 

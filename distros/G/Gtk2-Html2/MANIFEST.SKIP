@@ -1,0 +1,14 @@
+~$
+\.bak$
+blib
+\.bs$
+build
+\.c$
+CVS
+\.cvsignore$
+Makefile$
+Makefile\.old$
+\.o$
+\.spec$
+\.sw.$
+\.tar\.gz$

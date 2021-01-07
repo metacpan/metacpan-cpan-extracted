@@ -14,8 +14,8 @@ use bytes;
 use Test::More ;
 use CompTestUtils;
 
-BEGIN 
-{ 
+BEGIN
+{
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
@@ -218,7 +218,3 @@ EOM
 
 
 1;
-
-
-
-

@@ -88,6 +88,50 @@ my $mf_work = 't/data/work/Makefile.PL';
     }
 }
 
+# add_repository 2nd attempt (fail)
+{
+    is
+        add_repository('stevieb9', 'add-repo', $mf_work),
+        -1,
+        "add_repository() returns -1 if repo info already added ok";
+
+    open my $fh_orig, '<', $mf_orig or die $!;
+    open my $fh_work, '<', $mf_work or die $!;
+
+    my @orig = <$fh_orig>;
+    my @work = <$fh_work>;
+
+    close $fh_orig;
+    close $fh_work;
+
+    is scalar @orig, 24, "orig makefile line count ok";
+    is scalar @work, 34, "repo makefile line count ok";
+
+    my @repo_lines = section_repo();
+    my $repo_line_count = scalar @repo_lines;
+    my $count = 0;
+    my $orig_count = 0;
+
+    for (@work) {
+        s/\s+//g;
+        if ($_ =~ /META_MERGE/) {
+            $repo_lines[$count] =~ s/\s+//g;
+            is $repo_lines[$count] eq $_, 1, "repo '$_' line matches ok";
+            $count++;
+            next;
+        }
+        if ($count && $count < $repo_line_count) {
+            $repo_lines[$count] =~ s/\s+//g;
+            is $repo_lines[$count] eq $_, 1, "repo '$_' line matches ok";
+            $count++;
+            next;
+        }
+        $orig[$orig_count] =~ s/\s+//g;
+        is $orig[$orig_count] eq $_, 1, "Makefile.PL line '$_' matches ok";
+        $orig_count++;
+    }
+}
+
 # Remove and re-copy the Makefile.PL for bugtracker testing
 unlink_makefile();
 copy_makefile();
@@ -98,6 +142,50 @@ copy_makefile();
         add_bugtracker('stevieb9', 'add-repo', $mf_work),
         0,
         "add_bugtracker() returns 0 ok";
+
+    open my $fh_orig, '<', $mf_orig or die $!;
+    open my $fh_work, '<', $mf_work or die $!;
+
+    my @orig = <$fh_orig>;
+    my @work = <$fh_work>;
+
+    close $fh_orig;
+    close $fh_work;
+
+    is scalar @orig, 24, "orig makefile line count ok";
+    is scalar @work, 32, "bugttrack makefile line count ok";
+
+    my @bugtrack_lines = section_bugtrack();
+    my $bugtrack_line_count = scalar @bugtrack_lines;
+    my $orig_count = 0;
+    my $count = 0;
+
+    for (@work) {
+        s/\s+//g;
+
+        if ($_ =~ /META_MERGE/) {
+            $bugtrack_lines[$count] =~ s/\s+//g;
+            is $bugtrack_lines[$count] eq $_, 1, "bugtrack '$_' line matches ok";
+            $count++;
+            next;
+        }
+        if ($count && $count < $bugtrack_line_count) {
+            $bugtrack_lines[$count] =~ s/\s+//g;
+            is $bugtrack_lines[$count] eq $_, 1, "bugtrack '$_' line matches ok";
+            $count++;
+            next;
+        }
+        $orig[$orig_count] =~ s/\s+//g;
+        is $orig[$orig_count] eq $_, 1, "Makefile.PL line '$_' matches ok";
+        $orig_count++;
+    }
+}
+# add_bugtracker
+{
+    is
+        add_bugtracker('stevieb9', 'add-repo', $mf_work),
+        -1,
+        "add_bugtracker() returns -1 if trying to add duplicate entries ok";
 
     open my $fh_orig, '<', $mf_orig or die $!;
     open my $fh_work, '<', $mf_work or die $!;

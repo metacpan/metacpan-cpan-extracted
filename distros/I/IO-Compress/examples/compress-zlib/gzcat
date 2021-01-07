@@ -15,13 +15,13 @@ my $filename ;
 foreach my $filename (@ARGV) {
     my $buffer ;
 
-    my $gz = gzopen($filename, "rb") 
+    my $gz = gzopen($filename, "rb")
          or die "Cannot open $filename: $gzerrno\n" ;
 
     print $buffer while $gz->gzread($buffer) > 0 ;
 
-    die "Error reading from $filename: $gzerrno" . ($gzerrno+0) . "\n" 
+    die "Error reading from $filename: $gzerrno" . ($gzerrno+0) . "\n"
         if $gzerrno != Z_STREAM_END ;
-    
+
     $gz->gzclose() ;
 }

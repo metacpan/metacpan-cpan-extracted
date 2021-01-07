@@ -28,7 +28,7 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
 
     writeWithLzma($outfile, $content)
         or return 0;
-    
+
     my $got ;
     readWithLzma($outfile, $got)
         or return 0;
@@ -72,14 +72,14 @@ sub writeWithLzma
     unlink $file ;
     my $comp = "$LZMA -c $options $infile >$file" ;
 
-    return 1 
+    return 1
         if system($comp) == 0  ;
 
     diag "'$comp' failed: $?";
     return 0 ;
 }
 
-BEGIN 
+BEGIN
 {
 
     # Check external lzma is available
@@ -87,7 +87,7 @@ BEGIN
     my $nameUNLZ = $^O =~ /mswin/i ? 'unlzma.exe' : 'unlzma';
     my $split = $^O =~ /mswin/i ? ";" : ":";
 
-    for my $dir (reverse split $split, $ENV{PATH})    
+    for my $dir (reverse split $split, $ENV{PATH})
     {
         $LZMA = File::Spec->catfile($dir,$nameLZ)
             if -x File::Spec->catfile($dir,$nameLZ);
@@ -96,9 +96,9 @@ BEGIN
             if -x File::Spec->catfile($dir,$nameUNLZ);
     }
 
-    # Handle spaces in path to lzma 
-    $LZMA = "\"$LZMA\"" if defined $LZMA && $LZMA =~ /\s/;    
-    $UNLZMA = "\"$UNLZMA\"" if defined $UNLZMA && $UNLZMA =~ /\s/;    
+    # Handle spaces in path to lzma
+    $LZMA = "\"$LZMA\"" if defined $LZMA && $LZMA =~ /\s/;
+    $UNLZMA = "\"$UNLZMA\"" if defined $UNLZMA && $UNLZMA =~ /\s/;
 
     plan(skip_all => "Cannot find $nameLZ")
         if ! $LZMA ;
@@ -108,7 +108,7 @@ BEGIN
 
     plan(skip_all => "$nameLZ doesn't work as expected")
         if ! ExternalLzmaWorks();
-    
+
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
@@ -160,5 +160,3 @@ BEGIN
     ok readWithLzma($file1, $got), "readWithLzma returns 0";
     is $got, $content, "got content";
 }
-
-

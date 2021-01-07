@@ -5,14 +5,14 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.096 ;
+use IO::Compress::Base 2.100 ;
 
-use IO::Compress::Base::Common  2.096 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzip 2.096 ;
+use IO::Compress::Base::Common  2.100 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzip 2.100 ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzipError);
 
-$VERSION = '2.096';
+$VERSION = '2.100';
 $LzipError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
@@ -38,7 +38,7 @@ sub lzip
 }
 
 
-sub mkHeader 
+sub mkHeader
 {
     my $self = shift ;
     my $opts = shift ;
@@ -56,17 +56,17 @@ sub mkHeader
     $self->saveErrorString(undef, "Unacceptable dictionary size for lzip: $dict_size")
         if $dict_size < (1 << 12) || $dict_size > (1 << 27) ;
 
-    for ($log2dic = 27; $log2dic >= 12; $log2dic--) 
+    for ($log2dic = 27; $log2dic >= 12; $log2dic--)
     {
         last
             if $dict_size & (1 << $log2dic) ;
     }
 
-    if ($dict_size > (1 << $log2dic)) 
+    if ($dict_size > (1 << $log2dic))
     {
         ++ $log2dic ;
         $wedges =  ((1 << $log2dic) - $dict_size) / (1 << ($log2dic - 4));
-    } 
+    }
     else
     {
         $wedges = 0;
@@ -106,7 +106,7 @@ sub mkComp
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
-    
+
     return $obj;
 }
 
@@ -117,8 +117,8 @@ sub mkTrailer
     *$self->{CompSize}->add( 6 + 20);   # Compressed size + header + trailer
 
     return pack("V", *$self->{Compress}->crc32() ) .
-         *$self->{UnCompSize}->getPacked_V64() . # Uncompressed size                       
-                       
+         *$self->{UnCompSize}->getPacked_V64() . # Uncompressed size
+
          *$self->{CompSize}->getPacked_V64() ;   # Compressed size
 }
 
@@ -144,7 +144,7 @@ sub getFileInfo
     my $self = shift ;
     my $params = shift;
     my $file = shift ;
-    
+
 }
 
 1;
@@ -162,7 +162,7 @@ IO::Compress::Lzip - Write lzip files/buffers
     my $status = lzip $input => $output [,OPTS]
         or die "lzip failed: $LzipError\n";
 
-    my $z = new IO::Compress::Lzip $output [,OPTS]
+    my $z = IO::Compress::Lzip->new( $output [,OPTS] )
         or die "lzip failed: $LzipError\n";
 
     $z->print($string);
@@ -437,7 +437,7 @@ compressed data to a buffer, C<$buffer>.
     use IO::Compress::Lzip qw(lzip $LzipError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt"
+    my $input = IO::File->new( "<file1.txt" )
         or die "Cannot open 'file1.txt': $!\n" ;
     my $buffer ;
     lzip $input => \$buffer
@@ -474,7 +474,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for C<IO::Compress::Lzip> is shown below
 
-    my $z = new IO::Compress::Lzip $output [,OPTS]
+    my $z = IO::Compress::Lzip->new( $output [,OPTS] )
         or die "IO::Compress::Lzip failed: $LzipError\n";
 
 It returns an C<IO::Compress::Lzip> object on success and undef on failure.
@@ -804,8 +804,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2021 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

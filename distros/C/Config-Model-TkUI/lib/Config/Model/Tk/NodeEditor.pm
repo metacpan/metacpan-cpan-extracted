@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::NodeEditor 1.372;
+package Config::Model::Tk::NodeEditor 1.373;
 
 use strict;
 use warnings;

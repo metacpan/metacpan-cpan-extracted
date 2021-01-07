@@ -1,5 +1,5 @@
 /*
- * $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Glade/gladexmlperl.h,v 1.2 2003/05/18 22:58:17 rwmcfa1 Exp $
+ * $Id$
  */
 
 #ifndef _GLADEXMLPERL_H_

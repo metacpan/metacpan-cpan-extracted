@@ -14,16 +14,15 @@ my $s;
 @ARGV = '-' unless @ARGV ;
 
 foreach $file (@ARGV) {
-    
+
     my $gz = new IO::Uncompress::UnLzma $file
          or die "Cannot open $file: $UnLzmaError\n" ;
 
     print $buffer
         while ($s = $gz->read($buffer)) > 0 ;
 
-    die "Error reading from $file: $UnLzmaError\n" 
+    die "Error reading from $file: $UnLzmaError\n"
         if $s < 0 ;
-    
+
     $gz->close() ;
 }
-

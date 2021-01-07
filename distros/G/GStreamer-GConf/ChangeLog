@@ -1,3 +1,9 @@
+2006/01/29	kaffeetisch
+
+	* GConf.pm: Add a note to the docs that this module is obsolete as
+	of GStreamer (the C library) 0.10.  I should probably nominate
+	GStreamer::GConf for the Short-Lived Module of the Year award.
+
 2005/08/13	kaffeetisch
 
 	* MANIFEST, NEWS: Release 0.01.

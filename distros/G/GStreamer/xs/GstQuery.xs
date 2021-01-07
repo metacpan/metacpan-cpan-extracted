@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -108,6 +107,10 @@ get_package (GstQuery *query)
 
 MODULE = GStreamer::Query	PACKAGE = GStreamer::QueryType	PREFIX = gst_query_type_
 
+=for object GStreamer::QueryType Dynamically register new query types. Provide functions to create queries, and to set and parse values in them.
+
+=cut
+
 BOOT:
 	gst2perl_register_mini_object_package_lookup_func (
 		GST_TYPE_QUERY,
@@ -154,6 +157,10 @@ gst_query_type_get_details (type)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Query	PACKAGE = GStreamer::Query	PREFIX = gst_query_
+
+=for object GStreamer::Query Dynamically register new query types. Provide functions to create queries, and to set and parse values in them.
+
+=cut
 
 BOOT:
 	gperl_set_isa ("GStreamer::Query::Position", "GStreamer::Query");
@@ -217,6 +224,10 @@ GstStructure * gst_query_get_structure (GstQuery *query);
 
 MODULE = GStreamer::Query	PACKAGE = GStreamer::Query::Position
 
+=for object GStreamer::Query::Position Dynamically register new query types. Provide functions to create queries, and to set and parse values in them.
+
+=cut
+
 # GstQuery* gst_query_new_position (GstFormat format);
 GstQuery_noinc *
 new (class, GstFormat format)
@@ -244,6 +255,10 @@ position (GstQuery *query, GstFormat format=0, gint64 cur=0)
 
 MODULE = GStreamer::Query	PACKAGE = GStreamer::Query::Duration
 
+=for object GStreamer::Query::Duration Dynamically register new query types. Provide functions to create queries, and to set and parse values in them.
+
+=cut
+
 # GstQuery* gst_query_new_duration (GstFormat format);
 GstQuery_noinc *
 new (class, GstFormat format)
@@ -270,6 +285,10 @@ duration (GstQuery *query, GstFormat format=0, gint64 duration=0)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Query	PACKAGE = GStreamer::Query::Convert
+
+=for object GStreamer::Query::Convert Dynamically register new query types. Provide functions to create queries, and to set and parse values in them.
+
+=cut
 
 # GstQuery* gst_query_new_convert (GstFormat src_format, gint64 value, GstFormat dest_format);
 GstQuery_noinc *
@@ -302,6 +321,10 @@ convert (GstQuery *query, GstFormat src_format=0, gint64 src_value=0, GstFormat 
 
 MODULE = GStreamer::Query	PACKAGE = GStreamer::Query::Segment
 
+=for object GStreamer::Query::Segment Dynamically register new query types. Provide functions to create queries, and to set and parse values in them.
+
+=cut
+
 # GstQuery* gst_query_new_segment (GstFormat format);
 GstQuery_noinc *
 new (class, GstFormat format)
@@ -332,6 +355,10 @@ segment (GstQuery *query, gdouble rate=0.0, GstFormat format=0, gint64 start_val
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Query	PACKAGE = GStreamer::Query::Application
+
+=for object GStreamer::Query::Application Dynamically register new query types. Provide functions to create queries, and to set and parse values in them.
+
+=cut
 
 # GstQuery * gst_query_new_application (GstQueryType type, GstStructure *structure);
 GstQuery_noinc *

@@ -67,16 +67,21 @@ typedef struct di_stream {
 
 } di_stream;
 
+typedef struct di_filter {
+    lzma_filter filter;
+    SV* dict;
+} di_filter;
+
 typedef di_stream * deflateStream ;
 typedef di_stream * Compress__Raw__Lzma ;
 typedef di_stream * Compress__Raw__Lzma__Encoder ;
 typedef di_stream * Compress__Raw__Lzma__Decoder ;
 
-typedef lzma_filter * Lzma__Filter ;
-typedef lzma_filter * Lzma__Filter__Lzma;
-typedef lzma_filter * Lzma__Filter__BCJ ;
-typedef lzma_filter * Lzma__Filter__Delta ;
-typedef lzma_filter * Lzma__Filter__SubBlock ;
+typedef di_filter * Lzma__Filter ;
+typedef di_filter * Lzma__Filter__Lzma;
+typedef di_filter * Lzma__Filter__BCJ ;
+typedef di_filter * Lzma__Filter__Delta ;
+typedef di_filter * Lzma__Filter__SubBlock ;
 
 typedef di_stream * inflateStream ;
 typedef lzma_options_lzma * Compress__Raw__Lzma__Options;
@@ -363,13 +368,13 @@ setupFilters(di_stream* s, AV* filters, const char* properties)
         {
             SV * fptr = (SV*) * av_fetch(f, i, FALSE) ;
             IV tmp = SvIV((SV*)SvRV(fptr));
-            lzma_filter* filter = INT2PTR(lzma_filter*, tmp);
+            di_filter* filter = INT2PTR(di_filter*, tmp);
 
             /* Keep a reference to the filter so it doesn't get destroyed */
             s->sv_filters[i] = newSVsv(fptr) ;
 
-            s->filters[i].id = filter->id;
-            s->filters[i].options = filter->options;
+            s->filters[i].id = filter->filter.id;
+            s->filters[i].options = filter->filter.options;
         }
     }
 
@@ -1345,7 +1350,7 @@ int
 id(filter)
     Lzma::Filter    filter
   CODE:
-    RETVAL = filter->id;
+    RETVAL = filter->filter.id;
   OUTPUT:
 	RETVAL
 
@@ -1353,15 +1358,17 @@ void
 DESTROY(s)
     Lzma::Filter s
   CODE:
-    if (s->options)
-        Safefree(s->options) ;
+    if (s->filter.options)
+        Safefree(s->filter.options) ;
+    if (s->dict)
+        SvREFCNT_dec(s->dict);
     Safefree(s) ;
 
 
 MODULE = Lzma::Filter::Lzma PACKAGE = Lzma::Filter::Lzma
 
 Lzma::Filter::Lzma
-_mk(want_lzma2, dict_size, lc, lp, pb, mode, nice_len, mf, depth)
+_mk(want_lzma2, dict_size, lc, lp, pb, mode, nice_len, mf, depth, preset_dict)
     bool want_lzma2
     uint32_t dict_size
     uint32_t lc
@@ -1371,13 +1378,26 @@ _mk(want_lzma2, dict_size, lc, lp, pb, mode, nice_len, mf, depth)
     uint32_t nice_len
     lzma_match_finder mf
     uint32_t depth
+    SV* preset_dict
     CODE:
         lzma_options_lzma* p;
-        ZMALLOC(RETVAL, lzma_filter) ;
-        RETVAL->id = want_lzma2 ? LZMA_FILTER_LZMA2 : LZMA_FILTER_LZMA1 ;
-        ZMALLOC(RETVAL->options, lzma_options_lzma) ;
-        p = (lzma_options_lzma*)RETVAL->options;
+        ZMALLOC(RETVAL, di_filter) ;
+        RETVAL->filter.id = want_lzma2 ? LZMA_FILTER_LZMA2 : LZMA_FILTER_LZMA1 ;
+        ZMALLOC(RETVAL->filter.options, lzma_options_lzma) ;
+        p = (lzma_options_lzma*)RETVAL->filter.options;
         setDefaultOptions(p);
+
+        RETVAL->dict = newSVsv( deRef(preset_dict, (char*)"preset dict") );
+
+        size_t preset_len = 0;
+        p->preset_dict = (void *)SvPVbyte_force(RETVAL->dict,preset_len);
+        p->preset_dict_size = preset_len;
+        if ( p->preset_dict_size == 0 ) {
+          SvREFCNT_dec(RETVAL->dict);
+          p->preset_dict = NULL;
+          RETVAL->dict = NULL;
+        }
+
         p->dict_size = dict_size ;
         p->lc = lc ;
         p->lp = lp ;
@@ -1395,10 +1415,10 @@ _mkPreset(want_lzma2, preset)
     uint32_t preset
     CODE:
         lzma_options_lzma* p;
-        ZMALLOC(RETVAL, lzma_filter) ;
-        RETVAL->id = want_lzma2 ? LZMA_FILTER_LZMA2 : LZMA_FILTER_LZMA1 ;
-        ZMALLOC(RETVAL->options, lzma_options_lzma) ;
-        p = (lzma_options_lzma*)RETVAL->options;
+        ZMALLOC(RETVAL, di_filter) ;
+        RETVAL->filter.id = want_lzma2 ? LZMA_FILTER_LZMA2 : LZMA_FILTER_LZMA1 ;
+        ZMALLOC(RETVAL->filter.options, lzma_options_lzma) ;
+        p = (lzma_options_lzma*)RETVAL->filter.options;
         lzma_lzma_preset(p, preset);
     OUTPUT:
         RETVAL
@@ -1410,10 +1430,10 @@ _mk(id, offset=0)
     int id
     int offset
     CODE:
-        ZMALLOC(RETVAL, lzma_filter) ;
-        ZMALLOC(RETVAL->options, lzma_options_bcj) ;
-        RETVAL->id = id;
-        ((lzma_options_bcj*)(RETVAL->options))->start_offset = offset;
+        ZMALLOC(RETVAL, di_filter) ;
+        ZMALLOC(RETVAL->filter.options, lzma_options_bcj) ;
+        RETVAL->filter.id = id;
+        ((lzma_options_bcj*)(RETVAL->filter.options))->start_offset = offset;
     OUTPUT:
         RETVAL
 
@@ -1424,11 +1444,11 @@ _mk(type=LZMA_DELTA_TYPE_BYTE, dist=LZMA_DELTA_DIST_MIN)
     lzma_delta_type type
     uint32_t dist
     CODE:
-        ZMALLOC(RETVAL, lzma_filter) ;
-        ZMALLOC(RETVAL->options, lzma_options_delta) ;
-        RETVAL->id = LZMA_FILTER_DELTA;
-        ((lzma_options_delta*)(RETVAL->options))->type = type;
-        ((lzma_options_delta*)(RETVAL->options))->dist = dist;
+        ZMALLOC(RETVAL, di_filter) ;
+        ZMALLOC(RETVAL->filter.options, lzma_options_delta) ;
+        RETVAL->filter.id = LZMA_FILTER_DELTA;
+        ((lzma_options_delta*)(RETVAL->filter.options))->type = type;
+        ((lzma_options_delta*)(RETVAL->filter.options))->dist = dist;
     OUTPUT:
         RETVAL
 

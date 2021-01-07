@@ -12,7 +12,7 @@ use Carp;
 
 use overload q|""| => 'raw', fallback => 1;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 sub new {
 

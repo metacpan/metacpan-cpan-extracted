@@ -1,6 +1,11 @@
 Changelog for Mojolicious-Plugin-Component
 
-0.02 2021-01-06T15:25:31
+0.03 2021-01-07T01:38:22
+ - Add release updates
+ - Add support for variable-injection (#8)
+
+0.02 2021-01-06T15:25:32
+ - Built release version 0.02
  - Add release updates
  - Implement component inheritance (#5)
  - Update Mojolicious_Component.t

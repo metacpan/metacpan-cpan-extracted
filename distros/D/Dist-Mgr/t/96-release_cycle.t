@@ -47,6 +47,10 @@ my %cpan_args = (
     changes_date('Changes');
     check_file('Changes', qr/\d{4}-\d{2}-\d{2}/, "changes_date() ok");
 
+    # make_manifest
+
+    make_manifest();
+
     # make_test
 
     make_test();
@@ -73,6 +77,11 @@ my %cpan_args = (
 
     # cpan_upload
 
+    if (! defined $ENV{CPAN_USERNAME}) {
+        $ENV{CPAN_USERNAME} = 'STEVEB';
+        $ENV{CPAN_PASSWORD} = 'STEVEB';
+    }
+
     my $dist_file = (glob('*Acme-STEVEB*'))[-1];
 
     my $output = capture_merged {
@@ -96,7 +105,7 @@ my %cpan_args = (
 
     # next cycle prep commit and push
 
-    git_commit($post_release_ver);
+    git_commit("Release $post_release_ver candidate");
     git_push();
 
     # Compare all files against the saved template (post next cycle prep)
@@ -290,7 +299,7 @@ sub post_prep_next_cycle_file_count {
                             next;
                         }
                     }
-                    is $nf[$_], $tf[$_], "$nf file matches the template $tf ok";
+                    is $nf[$_], $tf[$_], "$nf file line $_ matches the template $tf ok";
                 }
                 $tpl_count++;
             }

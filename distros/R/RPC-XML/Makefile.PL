@@ -16,7 +16,7 @@ use ExtUtils::MakeMaker;
 use File::Spec;
 use File::Find;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 my ($vol, $dir, undef) = File::Spec->splitpath(File::Spec->rel2abs($0));
 $dir                   = File::Spec->catpath($vol, $dir, q{});
@@ -94,10 +94,12 @@ WriteMakefile(
     EXE_FILES => \@scripts,
     PM        => \%PM_FILES,
     PREREQ_PM => {
+        'Carp'          => 0,
         'Scalar::Util'  => 1.55,
         'HTTP::Daemon'  => 6.12,
         'HTTP::Message' => 6.26,
         'LWP'           => 6.51,
+        'Socket'        => 0,
         'XML::Parser'   => 2.46,
         'Module::Load'  => 0.36,
     },
@@ -106,6 +108,7 @@ WriteMakefile(
     },
     TEST_REQUIRES => {
         'ExtUtils::MakeMaker' => 7.56,
+        'IO::Socket::IP'      => 0,
         'Test::More'          => 1.302183,
     },
     dist      => { COMPRESS => 'gzip -9f' },

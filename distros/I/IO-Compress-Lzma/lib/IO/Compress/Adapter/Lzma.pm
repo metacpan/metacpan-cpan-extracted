@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.096 qw(:Status);
+use IO::Compress::Base::Common  2.100 qw(:Status);
 
-use Compress::Raw::Lzma  2.096 qw(LZMA_OK LZMA_STREAM_END) ;
+use Compress::Raw::Lzma  2.100 qw(LZMA_OK LZMA_STREAM_END) ;
 
 our ($VERSION);
-$VERSION = '2.096';
+$VERSION = '2.100';
 
 sub mkCompObject
 {
@@ -25,7 +25,7 @@ sub mkCompObject
     return bless {'Def'        => $def,
                   'Error'      => '',
                   'ErrorNo'    => 0,
-                 }  ;     
+                 }  ;
 }
 
 sub mkRawZipCompObject
@@ -40,7 +40,7 @@ sub mkRawZipCompObject
             if $extreme;
         $filter = Lzma::Filter::Lzma1::Preset($preset) ;
     }
-    else  
+    else
       { $filter = Lzma::Filter::Lzma1 }
 
     my ($def, $status) =
@@ -56,7 +56,7 @@ sub mkRawZipCompObject
     return bless {'Def'        => $def,
                   'Error'      => '',
                   'ErrorNo'    => 0,
-                 }  ;     
+                 }  ;
 }
 
 sub compr
@@ -70,13 +70,13 @@ sub compr
 
     if ($status != LZMA_OK)
     {
-        $self->{Error} = "Deflate Error: $status"; 
+        $self->{Error} = "Deflate Error: $status";
         return STATUS_ERROR;
     }
 
     #${ $_[1] } .= $out if defined $out;
 
-    return STATUS_OK;    
+    return STATUS_OK;
 }
 
 sub flush
@@ -90,13 +90,13 @@ sub flush
 
     if ($status != LZMA_STREAM_END)
     {
-        $self->{Error} = "Deflate Error: $status"; 
+        $self->{Error} = "Deflate Error: $status";
         return STATUS_ERROR;
     }
 
     #${ $_[0] } .= $out if defined $out ;
-    return STATUS_OK;    
-    
+    return STATUS_OK;
+
 }
 
 sub close
@@ -110,13 +110,13 @@ sub close
 
     if ($status != LZMA_STREAM_END)
     {
-        $self->{Error} = "Deflate Error: $status"; 
+        $self->{Error} = "Deflate Error: $status";
         return STATUS_ERROR;
     }
 
     #${ $_[0] } .= $out if defined $out ;
-    return STATUS_OK;    
-    
+    return STATUS_OK;
+
 }
 
 
@@ -126,19 +126,19 @@ sub reset
 
     my $outer = $self->{Outer};
 
-    my ($def, $status) = 
+    my ($def, $status) =
         Compress::Raw::Lzma::AloneEncoder->new(AppendOutput => 1);
     $self->{ErrorNo} = ($status == LZMA_OK) ? 0 : $status ;
 
     if ($status != LZMA_OK)
     {
-        $self->{Error} = "Cannot create Deflate object: $status"; 
+        $self->{Error} = "Cannot create Deflate object: $status";
         return STATUS_ERROR;
     }
 
     $self->{Def} = $def;
 
-    return STATUS_OK;    
+    return STATUS_OK;
 }
 
 sub compressedBytes
@@ -182,4 +182,3 @@ sub uncompressedBytes
 1;
 
 __END__
-

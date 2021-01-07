@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -131,6 +130,10 @@ get_package (GstMessage *message)
 /* ------------------------------------------------------------------------- */
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message	PREFIX = gst_message_
+
+=for object GStreamer::Message Lightweight objects to signal the application of pipeline events
+
+=cut
 
 BOOT:
 	gperl_set_isa ("GStreamer::Message::EOS", "GStreamer::Message");
@@ -274,6 +277,10 @@ src (GstMessage *message)
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::Custom
 
+=for object GStreamer::Message::Custom Lightweight objects to signal the application of pipeline events
+
+=cut
+
 # GstMessage * gst_message_new_custom (GstMessageType type, GstObject * src, GstStructure * structure);
 GstMessage_noinc *
 new (class, GstMessageType type, GstObject * src, GstStructure * structure)
@@ -287,6 +294,10 @@ new (class, GstMessageType type, GstObject * src, GstStructure * structure)
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::EOS
 
+=for object GStreamer::Message::EOS Lightweight objects to signal the application of pipeline events
+
+=cut
+
 # GstMessage * gst_message_new_eos (GstObject * src);
 GstMessage_noinc *
 new (class, GstObject * src)
@@ -298,6 +309,10 @@ new (class, GstObject * src)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::Error
+
+=for object GStreamer::Message::Error Lightweight objects to signal the application of pipeline events
+
+=cut
 
 # GstMessage * gst_message_new_error (GstObject * src, GError * error, gchar * debug);
 GstMessage_noinc *
@@ -342,6 +357,10 @@ error (GstMessage *message)
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::Warning
 
+=for object GStreamer::Message::Warning Lightweight objects to signal the application of pipeline events
+
+=cut
+
 # GstMessage * gst_message_new_warning (GstObject * src, GError * error, gchar * debug);
 GstMessage_noinc *
 new (class, GstObject * src, SV * error, gchar * debug)
@@ -385,6 +404,10 @@ error (GstMessage *message)
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::Tag
 
+=for object GStreamer::Message::Tag Lightweight objects to signal the application of pipeline events
+
+=cut
+
 # GstMessage * gst_message_new_tag (GstObject * src, GstTagList * tag_list);
 GstMessage_noinc *
 new (class, GstObject * src, GstTagList * tag_list)
@@ -406,6 +429,10 @@ tag_list (GstMessage *message)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::StateChanged
+
+=for object GStreamer::Message::StateChanged Lightweight objects to signal the application of pipeline events
+
+=cut
 
 # GstMessage * gst_message_new_state_changed (GstObject * src, GstState oldstate, GstState newstate, GstState pending);
 GstMessage_noinc *
@@ -439,6 +466,10 @@ old_state (GstMessage *message)
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::StateDirty
 
+=for object GStreamer::Message::StateDirty Lightweight objects to signal the application of pipeline events
+
+=cut
+
 # GstMessage * gst_message_new_state_dirty (GstObject * src);
 GstMessage_noinc *
 new (class, GstObject * src)
@@ -450,6 +481,10 @@ new (class, GstObject * src)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::ClockProvide
+
+=for object GStreamer::Message::ClockProvide Lightweight objects to signal the application of pipeline events
+
+=cut
 
 # GstMessage * gst_message_new_clock_provide (GstObject * src, GstClock *clock, gboolean ready);
 GstMessage_noinc *
@@ -489,6 +524,10 @@ clock (GstMessage *message)
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::ClockLost
 
+=for object GStreamer::Message::ClockLost Lightweight objects to signal the application of pipeline events
+
+=cut
+
 # GstMessage * gst_message_new_clock_lost (GstObject * src, GstClock *clock);
 GstMessage_noinc *
 new (class, GstObject * src, GstClock * clock)
@@ -509,6 +548,10 @@ clock (GstMessage *message)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::NewClock
+
+=for object GStreamer::Message::NewClock Lightweight objects to signal the application of pipeline events
+
+=cut
 
 # GstMessage * gst_message_new_new_clock (GstObject * src, GstClock *clock);
 GstMessage_noinc *
@@ -531,6 +574,10 @@ clock (GstMessage *message)
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::Application
 
+=for object GStreamer::Message::Application Lightweight objects to signal the application of pipeline events
+
+=cut
+
 # GstMessage * gst_message_new_application (GstObject * src, GstStructure * structure);
 GstMessage_noinc *
 new (class, GstObject * src, GstStructure * structure)
@@ -544,6 +591,10 @@ new (class, GstObject * src, GstStructure * structure)
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::Element
 
+=for object GStreamer::Message::Element Lightweight objects to signal the application of pipeline events
+
+=cut
+
 # GstMessage * gst_message_new_element (GstObject * src, GstStructure * structure);
 GstMessage_noinc *
 new (class, GstObject * src, GstStructure * structure)
@@ -556,6 +607,10 @@ new (class, GstObject * src, GstStructure * structure)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::SegmentStart
+
+=for object GStreamer::Message::SegmentStart Lightweight objects to signal the application of pipeline events
+
+=cut
 
 # GstMessage * gst_message_new_segment_start (GstObject * src, GstFormat format, gint64 position);
 GstMessage_noinc *
@@ -595,6 +650,10 @@ format (GstMessage *message)
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::SegmentDone
 
+=for object GStreamer::Message::SegmentDone Lightweight objects to signal the application of pipeline events
+
+=cut
+
 # GstMessage * gst_message_new_segment_done (GstObject * src, GstFormat format, gint64 position);
 GstMessage_noinc *
 new (class, GstObject * src, GstFormat format, gint64 position)
@@ -632,6 +691,10 @@ format (GstMessage *message)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::Duration
+
+=for object GStreamer::Message::Duration Lightweight objects to signal the application of pipeline events
+
+=cut
 
 # GstMessage * gst_message_new_duration (GstObject * src, GstFormat format, gint64 duration);
 GstMessage_noinc *
@@ -671,6 +734,10 @@ format (GstMessage *message)
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::Latency
 
+=for object GStreamer::Message::Latency Lightweight objects to signal the application of pipeline events
+
+=cut
+
 #if GST_CHECK_VERSION (0, 10, 12)
 
 # GstMessage * gst_message_new_latency (GstObject * src);
@@ -686,6 +753,10 @@ new (class, GstObject * src)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::AsyncStart
+
+=for object GStreamer::Message::AsyncStart Lightweight objects to signal the application of pipeline events
+
+=cut
 
 #if GST_CHECK_VERSION (0, 10, 13)
 
@@ -711,6 +782,10 @@ new_base_time (GstMessage *message)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Message	PACKAGE = GStreamer::Message::AsyncDone
+
+=for object GStreamer::Message::AsyncDone Lightweight objects to signal the application of pipeline events
+
+=cut
 
 #if GST_CHECK_VERSION (0, 10, 13)
 

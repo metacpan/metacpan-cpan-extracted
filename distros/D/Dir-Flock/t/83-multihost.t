@@ -42,14 +42,13 @@ unlink $fa,$fb;
 my $mdfile = $ENV{MULTI_DIR_FILE} = "t/83-$$.dir";
 
 if (fork() == 0) {
-    close STDOUT; open STDOUT, ">", $fa;
+    $ENV{MULTI_DIR_OUTPUT} = $fa;
     exit system($^X, "-Iblib/lib", "-Ilib", "t/80a-multi.tt") >> 8;
 }
 if (fork() == 0) {
-    close STDOUT; open STDOUT, ">", $fb;
     exit system(
         "ssh $REMOTE_HOST 'cd $base ;
-         MULTI_DIR_FILE=$mdfile $^X -Iblib/lib -Ilib t/80b-multi.tt'") >> 8;
+         MULTI_DIR_FILE=$mdfile MULTI_DIR_OUTPUT=$fb $^X -Iblib/lib -Ilib t/80b-multi.tt'") >> 8;
 }
 wait;
 wait;

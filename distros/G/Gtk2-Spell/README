@@ -1,7 +1,32 @@
 # $Id$
 
-Gtk2::Spell version 1.04
+Gtk2::Spell version 1.05
 ========================
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+* Perl URL: https://gitlab.gnome.org/GNOME/perl-gtk2-spell
+* Upstream URL: http://gtkspell.sourceforge.net/
+* Last upstream version: 2.0.16
+* Last upstream release date: 2009-10-22
+* Migration path for this module: G:O:I
+* Migration module URL: https://metacpan.org/pod/Glib::Object::Introspection
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
 
 Perl bindings to the 2.x series of the GtkSpell graphical user interface
 library.  This module allows you to write perl applications that utilize the
@@ -69,7 +94,5 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the 
-Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
-Boston, MA  02111-1307  USA.
-
+License along with this library; if not, see
+<https://www.gnu.org/licenses/>.

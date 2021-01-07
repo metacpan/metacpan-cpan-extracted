@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gtk2-GLExt/Makefile.PL,v 1.7 2004/10/29 00:18:43 rwmcfa1 Exp $
+# $Id$
 #
 
 use 5.008;
@@ -9,7 +9,7 @@ use File::Spec;
 use ExtUtils::MakeMaker;
 
 # minimum required version of dependancies we need to build
-our %build_reqs = (
+my %build_reqs = (
 	'perl-ExtUtils-Depends'   => '0.2',
 	'perl-ExtUtils-PkgConfig' => '1.03',
 	'perl-Glib'               => '1.060',
@@ -39,16 +39,16 @@ unless (eval "use ExtUtils::Depends '$build_reqs{'perl-ExtUtils-Depends'}';"
    exit 1; # not reached
 }
 
-%pkgcfg = ExtUtils::PkgConfig->find ('gtkglext-1.0 >= '
-				     .$build_reqs{GtkGLExt});
+my %pkgcfg = ExtUtils::PkgConfig->find ('gtkglext-1.0 >= '
+				       .$build_reqs{GtkGLExt});
+
+mkdir 'build', 0777;
 
 our @xs_files = <xs/*.xs>;
 our %pod_files = (
 	'GLExt.pm'          => '$(INST_MAN3DIR)/Gtk2::GLExt.$(MAN3EXT)',
 	Glib::MakeHelper->do_pod_files (@xs_files),
 );
-
-mkdir 'build', 0777;
 
 #
 # autogeneration
@@ -76,9 +76,38 @@ WriteMakefile(
     NAME            => 'Gtk2::GLExt',
     VERSION_FROM    => 'GLExt.pm', # finds $VERSION
     XSPROTOARG      => '-noprototypes',
+    META_MERGE      => { x_deprecated => 1, },
     MAN3PODS        => \%pod_files,
     $gtkglext->get_makefile_vars,
 );
+
+print <<__EON__;
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+* Perl URL: https://gitlab.gnome.org/GNOME/perl-gtk2-glext
+* Upstream URL: https://gitlab.gnome.org/Archive/gtkglext
+* Last upstream version: N/A
+* Last upstream release date: N/A
+* Migration path for this module: Gtk3::GLArea
+* Migration module URL: https://metacpan.org/pod/Glib::Object::Introspection
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+__EON__
+
 
 sub MY::postamble
 {

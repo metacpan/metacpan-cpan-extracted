@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Glade/Makefile.PL,v 1.21 2008/09/07 20:05:50 kaffeetisch Exp $
+# $Id$
 #
 
 use strict;
@@ -18,10 +18,10 @@ our %build_reqs = (
 );
 
 our %pre_reqs = (
-	Glib::                => $build_reqs{'perl-Glib'},
-	Gtk2::                => $build_reqs{'perl-Gtk2'},
-	ExtUtils::Depends::   => $build_reqs{'perl-ExtUtils-Depends'},
-	ExtUtils::PkgConfig:: => $build_reqs{'perl-ExtUtils-PkgConfig'},
+	'Glib'                  => $build_reqs{'perl-Glib'},
+	'Gtk2'                  => $build_reqs{'perl-Gtk2'},
+	'ExtUtils::Depends'     => $build_reqs{'perl-ExtUtils-Depends'},
+	'ExtUtils::PkgConfig'   => $build_reqs{'perl-ExtUtils-PkgConfig'},
 );
 
 # Writing a fake Makefile ensures that CPAN will pick up the correct
@@ -30,7 +30,7 @@ unless (eval "use ExtUtils::Depends '$build_reqs{'perl-ExtUtils-Depends'}';"
            . "use ExtUtils::PkgConfig '$build_reqs{'perl-ExtUtils-PkgConfig'}';"
            . "use Glib::MakeHelper;"
            # just seeing if Glib is available isn't enough, make sure
-           # it's recent enough, too 
+           # it's recent enough, too
            . "use Glib '$build_reqs{'perl-Glib'}';"
            . "use Gtk2 '$build_reqs{'perl-Gtk2'}';"
            . "1") {
@@ -71,9 +71,40 @@ WriteMakefile(
     ABSTRACT_FROM => 'GladeXML.pm',
     PREREQ_PM     => \%pre_reqs,
     XSPROTOARG    => '-noprototypes',
+    META_MERGE    => {
+       configure_requires => \%pre_reqs,
+       x_deprecated => 1,
+    },
     $gladexml->get_makefile_vars,
 );
 
+
+print <<__EON__;
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+* Perl URL: https://gitlab.gnome.org/GNOME/perl-gtk2-gladexml
+* Upstream URL: https://gitlab.gnome.org/Archive/libglade
+* Last upstream version: 2.6.4
+* Last upstream release date: 2009-03-17
+* Migration path for this module: Gtk3::Builder
+* Migration module URL: https://metacpan.org/pod/Gtk3
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+__EON__
 
 sub MY::postamble
 {

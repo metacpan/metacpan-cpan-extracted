@@ -1,6 +1,33 @@
 CHANGES
 -------
 
+  2.100 7 January 2021
+
+      * bin/zipdetails version 2.02
+        7556eba2e174e77d8cdd914b27be1b63e0830d29 update to version 2.02
+        237e9e52f26b7de92398513aa79e8153e65184e6 more fixes for defalte bitmask
+        b03cddfa5c73984eb802fed1c7ad19f43b6522cc fix bitmask for deflate compression level
+
+      * trim whitespace
+        6f5af76d71de1f9d3d1af79dca2f945c318d4e82
+        878f24f8a2de69ccb6d99e6f62ac9eaa89818476
+
+      * some POD updates for zstd
+        1466d8ade3618a6779bd86e1feba81bbe1c6b7c6
+
+      * Fix warnings once in multiple locations
+        https://github.com/pmqs/IO-Compress/pull/27
+        fdf9958972ab34609c3dce33cb5014ca3a197e82
+
+      * Avoid duplicate use statements
+        https://github.com/pmqs/IO-Compress/pull/26
+        11b34f5738187c4bf73aafd243e317c0748553ce
+
+      * Avoid using indirect calls
+        https://github.com/pmqs/IO-Compress/pull/19
+        29a7c586f7adf9d029715d55de31382fd27e8ed3
+        d7a4f6e5af9f9b400f8f84cf38b4d74f4702b4e0
+
   2.096 31 July 2020
 
       * Add Zip support for Zstd

@@ -2,18 +2,10 @@ NAME
     Perl::LineNumber::Comment - Add line number to Perl source as comment
 
 VERSION
-    This document describes version 0.002 of Perl::LineNumber::Comment (from
+    This document describes version 0.003 of Perl::LineNumber::Comment (from
     Perl distribution Perl-LineNumber-Comment), released on 2020-11-28.
 
 SYNOPSIS
-    In your code:
-
-     use File::Slurper qw(read_text);
-     use Perl::LineNumber::Comment qw(add_line_number_comments_to_perl_source);
-
-     my $source = read_text('sample.pl');
-     print add_line_number_comments_to_perl_source(source => $source);
-
     Content of sample.pl:
 
      #!/usr/bin/env perl
@@ -40,23 +32,65 @@ SYNOPSIS
      two
      three
 
-    Output of code:
+    In your code:
+
+     use File::Slurper qw(read_text);
+     use Perl::LineNumber::Comment qw(add_line_number_comments_to_perl_source);
+
+     my $source = read_text('sample.pl');
+     print add_line_number_comments_to_perl_source(source => $source);
+
+    Output:
 
      #!/usr/bin/env perl
 
      use 5.010001;
      use strict;
-     use warnings; # line 5
+     use warnings;                                                                   # line 5
 
      print "Hello, world 1!";
      print "Hello, world 2!";                   # a comment
      print "A multiline
-     string"; # line 10
+     string";                                                                        # line 10
 
      print <<EOF;
+     A heredoc (not shown in node->content).
+
+     Line three.
+     EOF
 
      exit 0;
 
+     __END__
+     one
+     two
+     three
+
+    With this code:
+
+     print add_line_number_comments_to_perl_source(source => $source, every=>1);
+
+    Output:
+
+     #!/usr/bin/env perl
+                                                                                     # line 2
+     use 5.010001;                                                                   # line 3
+     use strict;                                                                     # line 4
+     use warnings;                                                                   # line 5
+                                                                                     # line 6
+     print "Hello, world 1!";                                                        # line 7
+     print "Hello, world 2!";                   # a comment
+     print "A multiline
+     string";                                                                        # line 10
+                                                                                     # line 11
+     print <<EOF;                                                                    # line 12
+     A heredoc (not shown in node->content).
+
+     Line three.
+     EOF
+                                                                                     # line 17
+     exit 0;                                                                         # line 18
+                                                                                     # line 19
      __END__
      one
      two
@@ -68,13 +102,11 @@ FUNCTIONS
 
      add_line_number_comments_to_perl_source(%args) -> any
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
     *   column => *posint* (default: 80)
-
-        Currently not implemented
 
     *   every => *posint* (default: 5)
 

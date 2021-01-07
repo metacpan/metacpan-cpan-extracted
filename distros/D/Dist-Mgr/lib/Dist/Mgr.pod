@@ -1,12 +1,23 @@
 =head1 NAME
 
-Dist::Mgr - Distribution development cycle toolkit
+Dist::Mgr - Automation for Perl distribution creation, integration, pre-release,
+release and post-release tasks.
 
 =for html
 <a href="https://github.com/stevieb9/dist-mgr/actions"><img src="https://github.com/stevieb9/dist-mgr/workflows/CI/badge.svg"/></a>
 <a href='https://coveralls.io/github/stevieb9/dist-mgr?branch=master'><img src='https://coveralls.io/repos/stevieb9/dist-mgr/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
 
 =head1 DESCRIPTION
+
+For end-users, please review the
+[documentation](https://metacpan.org/pod/distribution/Dist-Mgr/bin/distmgr) for
+the [distmgr](https://metacpan.org/pod/distribution/Dist-Mgr/bin/distmgr)
+program that we've installed for you as part of this distribution.
+
+Performs a full suite of automated creation, addition, pre-release, release and
+post release tasks for Perl distributions. It integrates with VCS, automates the
+configuration of Continuous Integration, manages version numbers and Changes
+files, amongst a slew of other tasks.
 
 This distribution is essentially a bunch of tools that revolve around a base
 distribution created with C<module-starter>.
@@ -19,9 +30,7 @@ build system, which utilizes C<Makefile.PL> files.
 
     use Dist::Mgr qw(:all)
 
-    my $results = version_bump('2.02');
-
-    my $file_versions = version_info();
+    ...
 
 =head1 EXPORT_OK
 
@@ -98,7 +107,7 @@ I<Parameters>:
 
     $module
 
-I<Mandatory, String>: The name of the module (eg. C<Acme-STEVEB>).
+I<Mandatory, String>: The name of the module (eg. C<Acme::STEVEB>).
 
     $file
 
@@ -260,17 +269,41 @@ I<Use>: Any time.
 
 I<Parameters>:
 
-    $version
+    $msg
 
-I<Mandatory, String>: The version of the distribution. This will be used in the
-commit message.
+I<Mandatory, String>: The commit message.
 
     $verbose
 
 I<Optional, Bool>: Set to true to display the Git command output. Defaults to
 false.
 
-I<Returns>: Exit code from the C<system> call.
+I<Returns>: Exit code.
+
+=head2 git_clone
+
+Commits all changes to the repository.
+
+B<Note>: Calls C<Dist::Mgr::Git::_git_clone()> internally.
+
+I<Use>: Any time.
+
+I<Parameters>:
+
+    $author
+
+I<Mandatory, String>: Your Github username.
+
+    $repository
+
+I<Mandatory, String>: The name of the pre-created Github repository.
+
+    $verbose
+
+I<Optional, Bool>: Set to true to display the Git command output. Defaults to
+false.
+
+I<Returns>: Exit code.
 
 =head2 git_push
 
@@ -287,7 +320,7 @@ I<Parameters>:
 I<Optional, Bool>: Set to true to display the Git command output. Defaults to
 false.
 
-I<Returns>: Exit code from the C<system> call.
+I<Returns>: Exit code.
 
 =head2 git_pull
 
@@ -304,7 +337,7 @@ I<Parameters>:
 I<Optional, Bool>: Set to true to display the Git command output. Defaults to
 false.
 
-I<Returns>: Exit code from the C<system> call.
+I<Returns>: Exit code.
 
 =head2 git_release
 
@@ -334,7 +367,27 @@ running again.
 
 I<Default>: C<1>, Enabled.
 
-I<Returns>: C<0> on test success (CTRL-C), C<1> on test failure (ENTER).
+I<Returns>: C<1> on test success (CTRL-C), C<0> on test failure (ENTER).
+
+=head2 git_repo
+
+Attempts to retrieve the repository name from the C<.git> directory.
+
+B<Note>: Calls C<Dist::Mgr::Git::_git_repo()> internally.
+
+I<Use>: Any time.
+
+I<Returns>: The string repository name on success, the exit code on failure.
+
+=head2 git_status
+
+Checks whether we need to commit or push.
+
+B<Note>: Calls C<Dist::Mgr::Git::_git_status()> internally.
+
+I<Use>: Any time.
+
+<Returns>: C<0> if the repository differs and C<1> if nothing needs to be done.
 
 =head2 git_tag
 
@@ -350,7 +403,7 @@ B<Note>: Calls C<Dist::Mgr::Git::_git_tag()> internally.
 
 I<Use>: Any time.
 
-I<Returns>: Exit code from the C<system> call.
+I<Returns>: Exit code.
 
 =head2 init
 
@@ -361,7 +414,7 @@ I<Use>: To create a brand new distribution skeleton.
 
 I<Parameters>:
 
-    module  => "Acme-STEVEB"
+    module  => "Acme::STEVEB"
 
 I<Mandatory, String>: The name of the main module of the distribution.
 
@@ -378,12 +431,24 @@ I<Mandatory, String>: The email address of the author.
 I<Optional, String>: The license to apply to the new distribution. Defaults to
 C<artistic2>. See L<Module::Starter> for valid entries.
 
+    verbose => 1
+
+I<Optional, Bool>: If set, we'll display the progress of module creation.
+
 =head2 make_dist
 
 Perform a C<make dist> that creates a CPAN-ready distribution tarball file in
 the current working directory.
 
 I<Use>: After all other release functions have been called.
+
+I<Parameters>:
+
+    $verbose
+
+I<Optional, Bool>: Set to true to display the output from the command.
+
+I<Default>: False
 
 I<Returns>: C<0> on success. Anything other than C<0> is a failure.
 
@@ -393,6 +458,14 @@ Perform a C<make distclean> on the project directory.
 
 I<Use>: After all other post-release functions have been called.
 
+I<Parameters>:
+
+    $verbose
+
+I<Optional, Bool>: Set to true to display the output from the command.
+
+I<Default>: False
+
 I<Returns>: C<0> on success. Anything other than C<0> is a failure.
 
 =head2 make_test
@@ -401,11 +474,27 @@ Perform a C<%^X Makefile.PL> and C<make test>.
 
 I<Use>: After L</changes_date> and before all other release cycle functions.
 
+I<Parameters>:
+
+    $verbose
+
+I<Optional, Bool>: Set to true to display the output from the command.
+
+I<Default>: False
+
 B<Note>: Do not call this function from within the test suite, or else it'll
 spin off into an infinite loop.
 
 B<Note>: Always check the return value of this function before proceeding with
 the rest of the release cycle. Zero C<0> is success, everything else is fail.
+
+I<Returns>: C<0> on success. Anything other than C<0> is a failure.
+
+=head2 make_manifest
+
+Perform a C<make manifest>.
+
+I<Use>: Before running the release procedures.
 
 I<Returns>: C<0> on success. Anything other than C<0> is a failure.
 
@@ -421,6 +510,23 @@ I<Parameters>:
 
 I<Optional, String>: The directory where we'll create the file. If not
 specified, we'll create it in the current directory, C<.>.
+
+I<Returns>: An array of the file's contents.
+
+=head2 manifest_t
+
+Generates a C<t/manifest.t> test file. This overrides the default created with
+L<Module::Starter>, as some custom C<MANIFEST.SKIP> entries fail with the older
+version of the file.
+
+I<Use>: Any time.
+
+I<Parameters>:
+
+    $directory
+
+I<Optional, String>: The directory where we'll create the file. If not
+specified, we'll create it in the C<t/> directory within the current directory, C<.>.
 
 I<Returns>: An array of the file's contents.
 
@@ -491,6 +597,20 @@ I<Returns>: An HoH:
         },
     };
 
+=head2 version_incr
+
+Increments a version number by C<0.01>, and returns the result.
+
+I<Use>: Any time
+
+I<Parameters>:
+
+    $version
+
+I<Mandatory, String>: A valid version number (eg: C<1.03>).
+
+I<Returns>: The supplied version number incremented by C<0.01>.
+
 =head2 version_info
 
 Fetches the file version information of Perl module files. Can operate on a
@@ -523,7 +643,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Steve Bertrand.
+Copyright 2020-2021 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

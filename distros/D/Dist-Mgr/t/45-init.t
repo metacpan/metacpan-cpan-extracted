@@ -126,7 +126,7 @@ remove_init();
 
     $h->flush;
     $h->hook('stderr');
-    init(%module_args);
+    init(%module_args, verbose => 1);
     $h->unhook('stderr');
 
     my @e = $h->stderr;
@@ -163,6 +163,10 @@ remove_init();
             is "#$new_tpl[$_]", "$orig_tpl[$_]", "module template line $_ matches ok";
             next;
         }
+        if ($orig_tpl[$_] =~ /Copyright.*2020/) {
+            like $new_tpl[$_], qr/Copyright.*\d{4}/, "module template line $_ Copyright matches ok";
+            next;
+        }
         is $new_tpl[$_], $orig_tpl[$_], "module template line $_ matches ok";
     }
 
@@ -178,7 +182,7 @@ remove_init();
 done_testing;
 
 sub before {
-    like $cwd, qr/dist-mgr/, "in proper directory ok";
+    like $cwd, qr/dist-mgr/i, "in proper directory ok";
 
     chdir $work or die $!;
     like getcwd(), qr/$work$/, "in $work directory ok";
@@ -194,7 +198,7 @@ sub before {
 }
 sub after {
     chdir $cwd or die $!;
-    like getcwd(), qr/dist-mgr/, "back in root directory ok";
+    like getcwd(), qr/dist-mgr/i, "back in root directory ok";
     remove_init();
 
     is -e "$work/init", undef, "'init' dir removed ok";

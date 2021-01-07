@@ -1,5 +1,11 @@
 Revision history for Perl extension Form::Tiny.
 
+1.12  Wed Jan 6 20:00:00 2021
+	- form_field now accepts coderefs
+	- add default value configuration for form fields
+	- field coercions now eval errors and add them as form errors
+	- build_fields sub is now optional
+
 1.11  Tue Jan 5 14:00:00 2021
 	- fix broken release
 

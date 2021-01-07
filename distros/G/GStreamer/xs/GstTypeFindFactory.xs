@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -22,6 +21,10 @@
 #include "gst2perl.h"
 
 MODULE = GStreamer::TypeFindFactory	PACKAGE = GStreamer::TypeFindFactory	PREFIX = gst_type_find_factory_
+
+=for object GStreamer::TypeFindFactory Information about registered typefind functions
+
+=cut
 
 # GList * gst_type_find_factory_get_list (void);
 void

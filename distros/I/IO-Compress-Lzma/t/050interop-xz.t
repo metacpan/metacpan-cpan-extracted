@@ -27,7 +27,7 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
 
     writeWithXz($outfile, $content)
         or return 0;
-    
+
     my $got ;
     readWithXz($outfile, $got)
         or return 0;
@@ -76,35 +76,35 @@ sub writeWithXz
     unlink $file ;
     my $comp = "$XZ -c $options $infile >$file" ;
 
-    return 1 
+    return 1
         if system($comp) == 0  ;
 
     diag "'$comp' failed: $?";
     return 0 ;
 }
 
-BEGIN 
+BEGIN
 {
 
     # Check external xz is available
     my $name = $^O =~ /mswin/i ? 'xz.exe' : 'xz';
     my $split = $^O =~ /mswin/i ? ";" : ":";
 
-    for my $dir (reverse split $split, $ENV{PATH})    
+    for my $dir (reverse split $split, $ENV{PATH})
     {
         $XZ = File::Spec->catfile($dir,$name)
             if -x File::Spec->catfile($dir,$name);
     }
 
-    # Handle spaces in path to xz 
-    $XZ = "\"$XZ\"" if defined $XZ && $XZ =~ /\s/;    
+    # Handle spaces in path to xz
+    $XZ = "\"$XZ\"" if defined $XZ && $XZ =~ /\s/;
 
     plan(skip_all => "Cannot find $name")
         if ! $XZ ;
 
     plan(skip_all => "$name doesn't work as expected")
         if ! ExternalXzWorks();
-    
+
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
@@ -156,5 +156,3 @@ BEGIN
     ok readWithXz($file1, $got), "readWithXz returns 0";
     is $got, $content, "got content";
 }
-
-

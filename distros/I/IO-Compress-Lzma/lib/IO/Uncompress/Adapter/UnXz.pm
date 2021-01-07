@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.096 qw(:Status);
+use IO::Compress::Base::Common 2.100 qw(:Status);
 
-use Compress::Raw::Lzma 2.096 ;
+use Compress::Raw::Lzma 2.100 ;
 
 our ($VERSION, @ISA);
-$VERSION = '2.096';
+$VERSION = '2.100';
 
 #@ISA = qw( Compress::Raw::UnLzma );
 
@@ -21,7 +21,7 @@ sub mkUncompObject
 
     my ($inflate, $status) =
         Compress::Raw::Lzma::StreamDecoder->new(AppendOutput => 1,
-                                                ConsumeInput => 1, 
+                                                ConsumeInput => 1,
                                                 LimitOutput => 1,
                                                 MemLimit => $memlimit,
                                                 Flags => $flags,
@@ -35,8 +35,8 @@ sub mkUncompObject
                   'UnCompSize'    => 0,
                   'Error'         => '',
                   'ConsumesInput' => 1,
-                 }  ;     
-    
+                 }  ;
+
 }
 
 sub uncompr
@@ -57,7 +57,7 @@ sub uncompr
         return STATUS_ERROR;
     }
 
-    
+
     return STATUS_OK        if $status == LZMA_OK ;
     return STATUS_ENDSTREAM if $status == LZMA_STREAM_END ;
     return STATUS_ERROR ;
@@ -70,13 +70,13 @@ sub reset
 
     my ($inf, $status) =
     Compress::Raw::Lzma::StreamDecoder->new(AppendOutput => 1,
-                                            ConsumeInput => 1, 
+                                            ConsumeInput => 1,
                                             LimitOutput => 1);
     $self->{ErrorNo} = ($status == LZMA_OK) ? 0 : $status ;
 
     if ($status != LZMA_OK)
     {
-        $self->{Error} = "Cannot create UnXz object: $status"; 
+        $self->{Error} = "Cannot create UnXz object: $status";
         return STATUS_ERROR;
     }
 
@@ -118,8 +118,8 @@ sub adler32
 sub sync
 {
     my $self = shift ;
-    #( $self->{Inf}->inflateSync(@_) == LZMA_OK) 
-    #        ? STATUS_OK 
+    #( $self->{Inf}->inflateSync(@_) == LZMA_OK)
+    #        ? STATUS_OK
     #        : STATUS_ERROR ;
 }
 
@@ -127,4 +127,3 @@ sub sync
 1;
 
 __END__
-

@@ -1,0 +1,6 @@
+EGG_TYPE_RECENT_ITEM		EggRecentItem		GBoxed		Gtk2::Recent::Item
+EGG_TYPE_RECENT_MODEL		EggRecentModel		GObject		Gtk2::Recent::Model
+EGG_TYPE_RECENT_VIEW		EggRecentView		GInterface	Gtk2::Recent::View
+EGG_TYPE_RECENT_MODEL_SORT	EggRecentModelSort	GEnum		Gtk2::Recent::ModelSort
+EGG_TYPE_RECENT_VIEW_GTK	EggRecentViewGtk	GObject		Gtk2::Recent::View::Gtk
+EGG_TYPE_RECENT_VIEW_UIMANAGER	EggRecentViewUIManager	GObject		Gtk2::Recent::View::UIManager

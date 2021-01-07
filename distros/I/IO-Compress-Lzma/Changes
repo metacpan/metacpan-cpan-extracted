@@ -1,9 +1,20 @@
 CHANGES
 -------
 
+  2.100 7 January 2021
+
+      * trim whitespace
+        8980603bdb827e60bad8f039c94cc55add63a031
+
+      * Avoid indirect calls
+        871231f020e064978af9e2a0fc3954511467534b
+
+      * fix typo
+        7f580a0df76ff1dbbac76b72dab45aa012cfde47
+
   2.096 31 July 2020
 
-      * Add test for Zip with XZ compresion
+      * Add test for Zip with XZ compression
         5a96ca1ffdd1c7ab57f121c78135371e9272d6e0
         6da69fb83c6f42c77995c96382929cd172896cbf
 

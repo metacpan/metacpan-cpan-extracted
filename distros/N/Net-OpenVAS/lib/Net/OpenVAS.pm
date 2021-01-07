@@ -6,7 +6,7 @@ use v5.10;
 
 use base 'Net::OpenVAS::OMP';
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 1;
 __END__

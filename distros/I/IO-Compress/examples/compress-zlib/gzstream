@@ -12,7 +12,7 @@ my $gz = gzopen('-', "wb")
 	  or die "Cannot open stdout: $gzerrno\n" ;
 
 while (<>) {
-    $gz->gzwrite($_) 
+    $gz->gzwrite($_)
 	or die "error writing: $gzerrno\n" ;
 }
 

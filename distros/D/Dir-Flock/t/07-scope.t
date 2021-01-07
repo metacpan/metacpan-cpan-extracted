@@ -54,6 +54,9 @@ for my $n (10..20) {
     my $patt = qr/( $n){$n}/;
     ok( $data =~ $patt, "found instances of $n" ) or $found_fail++;
 }
+
+# if the previous tests fail, consider increasing $Dir::Flock::CHECK_DELAY
+
 if ($found_fail) {
     diag "data was '$data'";
 }

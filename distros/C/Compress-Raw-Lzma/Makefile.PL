@@ -16,19 +16,19 @@ my $LIBS = '-llzma';
 
 ParseCONFIG() ;
 
-UpDowngrade(getPerlFiles('MANIFEST')) 
+UpDowngrade(getPerlFiles('MANIFEST'))
     unless $ENV{PERL_CORE};
 
-WriteMakefile( 
+WriteMakefile(
     NAME         => 'Compress::Raw::Lzma',
     VERSION_FROM => 'lib/Compress/Raw/Lzma.pm',
     INC          => "-I$LIBLZMA_INCLUDE" ,
     LIBS          => ["-L${LIBLZMA_LIB} $LIBS"],
-    
+
     DEFINE       => "$WALL " ,
     XS           => { 'Lzma.xs' => 'Lzma.c'},
     'depend'     => { 'Makefile'   => 'config.in' },
-    'dist'       => { COMPRESS     => 'gzip', 
+    'dist'       => { COMPRESS     => 'gzip',
                       TARFLAGS     => '-chvf',
                       SUFFIX       => 'gz',
                       DIST_DEFAULT => 'MyTrebleCheck tardist',
@@ -47,9 +47,9 @@ WriteMakefile(
         : ()
     ),
 
-     ( eval { ExtUtils::MakeMaker->VERSION(6.46) }  
+     ( eval { ExtUtils::MakeMaker->VERSION(6.46) }
         ? ( META_MERGE  => {
-    
+
                 "meta-spec" => { version => 2 },
 
                 no_index => {
@@ -57,7 +57,7 @@ WriteMakefile(
                 },
 
                 resources   => {
-                
+
                     bugtracker  => {
                         web     => 'https://github.com/pmqs/Compress-Raw-Lzma/issues'
                     },
@@ -68,15 +68,15 @@ WriteMakefile(
                         type    => 'git',
                         url     => 'git://github.com/pmqs/Compress-Raw-Lzma.git',
                         web     => 'https://github.com/pmqs/Compress-Raw-Lzma',
-                    },        
+                    },
                 },
-              } 
-            ) 
+              }
+            )
         : ()
-    ),   
+    ),
 
     ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
-        ('LICENSE'  => 'perl')         : ()),    
+        ('LICENSE'  => 'perl')         : ()),
 
 ) ;
 
@@ -88,13 +88,13 @@ while (<DATA>)
     s/\s*$//;
     next if /^[^A-Z]/i || /^$/;
     my ($name, $type) = split /\s+/, $_;
-    
+
     if (defined $type && $type =~ /enum/i)
-	  { push @names, { name => $name, macro => ["#if 1\n", "#endif\n"] } }   
+	  { push @names, { name => $name, macro => ["#if 1\n", "#endif\n"] } }
     elsif (defined $type && $type =~ /string/i)
-	  { push @names, { name => $name, type => "PV", macro => ["#ifdef $name \n", "#endif\n"] } }   
+	  { push @names, { name => $name, type => "PV", macro => ["#ifdef $name \n", "#endif\n"] } }
     elsif (defined $type && $type =~ /int/i)
-	  { push @names, { name => $name, type => "IV", macro => ["#if 1\n", "#endif\n"] } }  	  
+	  { push @names, { name => $name, type => "IV", macro => ["#if 1\n", "#endif\n"] } }
     else
       { push @names, { name => $name                  } }
 
@@ -102,9 +102,9 @@ while (<DATA>)
 
 if (eval {require ExtUtils::Constant; 1}) {
     # Check the constants above all appear in @EXPORT in Lzma.pm
-    my %names = map { $_ => 1    } 
-                map { $_->{name} } 
-                @names ; 
+    my %names = map { $_ => 1    }
+                map { $_->{name} }
+                @names ;
     open F, "<lib/Compress/Raw/Lzma.pm" or die "Cannot open Lzma.pm: $!\n";
     while (<F>)
     {
@@ -125,15 +125,15 @@ if (eval {require ExtUtils::Constant; 1}) {
         die "The following names are missing from \@EXPORT in Lzma.pm\n" .
             "\t$missing\n" ;
     }
-    
+
     ExtUtils::Constant::WriteConstants(
                                      NAME     => 'Lzma',
                                      NAMES    => \@names,
                                      C_FILE   => 'constants.h',
                                      XS_FILE  => 'constants.xs',
-                                                                       
+
                                     );
-} 
+}
 else {
     foreach my $name (qw( constants.h constants.xs ))
     {
@@ -178,14 +178,14 @@ sub ParseCONFIG
 
     # check parsed values
     my @missing = () ;
-    die "The following keys are missing from $CONFIG  [@missing]\n" 
+    die "The following keys are missing from $CONFIG  [@missing]\n"
         if @missing = keys %Parsed ;
 
-    $LIBLZMA_INCLUDE = defined $ENV{'LIBLZMA_INCLUDE'} 
-                            ? $ENV{'LIBLZMA_INCLUDE'} 
+    $LIBLZMA_INCLUDE = defined $ENV{'LIBLZMA_INCLUDE'}
+                            ? $ENV{'LIBLZMA_INCLUDE'}
                             : $Info{'INCLUDE'} ;
-    $LIBLZMA_LIB = defined $ENV{'LIBLZMA_LIB'} 
-                            ? $ENV{'LIBLZMA_LIB'} 
+    $LIBLZMA_LIB = defined $ENV{'LIBLZMA_LIB'}
+                            ? $ENV{'LIBLZMA_LIB'}
                             : $Info{'LIB'} ;
 
     if ($^O eq 'VMS') {
@@ -227,7 +227,7 @@ LZMA_SYNC_FLUSH         enum
 LZMA_FULL_FLUSH         enum
 LZMA_FINISH             enum
 
-# bcj.h 
+# bcj.h
 #########
 LZMA_FILTER_X86
 LZMA_FILTER_POWERPC
@@ -239,8 +239,8 @@ LZMA_FILTER_SPARC
 
 # block.h
 #########
-LZMA_BLOCK_HEADER_SIZE_MIN 
-LZMA_BLOCK_HEADER_SIZE_MAX 
+LZMA_BLOCK_HEADER_SIZE_MIN
+LZMA_BLOCK_HEADER_SIZE_MAX
 
 # check.h
 
@@ -251,7 +251,7 @@ LZMA_CHECK_CRC64                enum
 LZMA_CHECK_SHA256               enum
 
 LZMA_CHECK_ID_MAX
-LZMA_CHECK_SIZE_MAX 
+LZMA_CHECK_SIZE_MAX
 
 # container.h
 #############
@@ -279,7 +279,7 @@ LZMA_FILTERS_MAX
 
 # index.h
 ##########
-# Below supported from 5.0.0 onwards 
+# Below supported from 5.0.0 onwards
 #LZMA_INDEX_ITER_ANY enum
 #LZMA_INDEX_ITER_STREAM enum
 #LZMA_INDEX_ITER_BLOCK enum

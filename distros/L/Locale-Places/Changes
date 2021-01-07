@@ -1,5 +1,10 @@
 Revision history for Locale::Places
 
+0.03	Wed  6 Jan 20:02:37 EST 2021
+	If LWP::Simple::WithCache isn't installed, fall back to LWP::Simple
+	If $to eq $from don't look anything up
+	Guess suitable default if one of $to and $from isn't given
+
 0.02	Sat Dec 19 21:21:38 EST 2020
 	Allow source language to be set
 	Faster lookup

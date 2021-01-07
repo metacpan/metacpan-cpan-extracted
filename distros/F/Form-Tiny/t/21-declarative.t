@@ -8,20 +8,29 @@ use Test::More;
 	use Form::Tiny -strict, -filtered;
 	use Types::Standard qw(Str Int);
 
+	has 'number_required' => (
+		is => 'ro',
+		default => sub { 1 },
+	);
+
 	form_field 'name' => (
 		type => Str,
 		required => 1,
 	);
 
-	form_field 'number' => (
-		type => Int,
-		required => 1,
-	);
+	form_field 'number' => sub {
+		my ($self) = @_;
+
+		return {
+			type => Int,
+			required => $self->number_required,
+		};
+	};
 
 	form_cleaner sub {
 		my ($self, $data) = @_;
 
-		$data->{name} .= $data->{number};
+		$data->{name} .= ($data->{number} // '-');
 	};
 
 	form_filter Int, sub {
@@ -52,18 +61,17 @@ is scalar @{$form->field_defs}, 2, 'field defs ok';
 is scalar @{$form->filters}, 2, 'field filters ok';
 isa_ok $form->cleaner, 'CODE';
 
-$form->set_input(
-	{
-		'name' => ' test',
-		'number' => -3,
-	}
+my @data = (
+	[1, {name => ' test', number => -3}, {name => 'test3', number => 3}],
+	[0, {name => ' test', number => 'test-'}],
 );
 
-ok $form->valid, 'validation ok';
-
-if ($form->valid) {
-	is $form->fields->{name}, 'test3', 'form name ok';
-	is $form->fields->{number}, 3, 'form number ok';
+for my $aref (@data) {
+	$form->set_input($aref->[1]);
+	is !!$form->valid, !!$aref->[0], 'validation ok';
+	if ($aref->[0]) {
+		is_deeply $form->fields, $aref->[2], "default value ok";
+	}
 }
 
 done_testing();

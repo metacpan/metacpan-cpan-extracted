@@ -3,11 +3,16 @@ package Perl::LineNumber::Comment;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-11-28'; # DATE
 our $DIST = 'Perl-LineNumber-Comment'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use warnings;
 use strict;
+
+use Exporter qw(import);
+our @EXPORT_OK = qw(
+                       add_line_number_comments_to_perl_source
+);
 
 our %SPEC;
 
@@ -38,7 +43,7 @@ sub _line_has_END {
 }
 
 sub _process_children {
-    my ($level, $args, $node) = @_;
+    my ($level, $args, $lines, $node) = @_;
     return unless $node->can("children");
 
     my $every     = $args->{every};
@@ -69,7 +74,13 @@ sub _process_children {
             last if _line_has_END($line, \@children);
 
             # don't insert width excess $COLUMN setting
-            my $col_after_child = $col + length($content); # XXX use visual width
+
+            #   we want to vertically align line number comment; but PPI reports
+            #   column that are not reset after \n, so that's useless.
+            #my $col_after_child = $col + length($content); # XXX use visual width
+
+            #   so we just use the lines from original source for now
+            my $col_after_child = length($lines->[$line-1]); # XXX use visual width
             next if $col_after_child >= $linum_col;
 
             # don't insert after a comment
@@ -77,24 +88,26 @@ sub _process_children {
 
             #say "  <-- insert ($col_after_child)";
 
-            # we want to vertically align line number comment; but PPI reports
-            # column that are not reset after \n, so that's useless.
-
             #my $el_ws = bless {
             #    _location => [$line, $col_after_child, $col_after_child, $location->[3], undef],
             #    content => (" " x ($linum_col - $col_after_child)),
             #}, 'PPI::Token::Whitespace';
-            my $el_comment = bless {
-                _location => [$line, $linum_col, $linum_col, $location->[3], undef],
-                content => sprintf($fmt, $line) . "\n",
-            }, 'PPI::Token::Comment';
+            #my $el_comment = bless {
+            #    _location => [$line, $linum_col, $linum_col, $location->[3], undef],
+            #    content => sprintf($fmt, $line) . "\n",
+            #}, 'PPI::Token::Comment';
 
             #splice @{ $node->{children} }, $i, 1, $el_ws, $el_comment;
             #$i += 1;
-            splice @{ $node->{children} }, $i, 1, $el_comment;
+            #splice @{ $node->{children} }, $i, 1, $el_comment;
+
+            $lines->[$line-1] =~ s/\R\z//;
+            $lines->[$line-1] .=
+                (" " x ($linum_col - $col_after_child)) .
+                sprintf($fmt, $line) . "\n";
         }
 
-        _process_children($level+1, $args, $child);
+        _process_children($level+1, $args, $lines, $child);
         $i++;
     }
 }
@@ -114,7 +127,6 @@ $SPEC{add_line_number_comments_to_perl_source} = {
         },
         column => {
             schema => 'posint*',
-            description => 'Currently not implemented',
             default => 80,
         },
         every => {
@@ -133,11 +145,16 @@ sub add_line_number_comments_to_perl_source {
     require PPI::Document;
     my $doc = PPI::Document->new(\$args{source});
 
+    # provide an easier columns
+    my $lines = [split /^/m, $args{source}];
+
     # $doc->find stops after some nodes?
-    _process_children(0, \%args, $doc);
+    _process_children(0, \%args, $lines, $doc);
 
     #require PPI::Dumper; PPI::Dumper->new($doc)->print;
-    "$doc";
+    #return "$doc";
+
+    join "", @$lines;
 }
 
 1;
@@ -155,17 +172,9 @@ Perl::LineNumber::Comment - Add line number to Perl source as comment
 
 =head1 VERSION
 
-This document describes version 0.002 of Perl::LineNumber::Comment (from Perl distribution Perl-LineNumber-Comment), released on 2020-11-28.
+This document describes version 0.003 of Perl::LineNumber::Comment (from Perl distribution Perl-LineNumber-Comment), released on 2020-11-28.
 
 =head1 SYNOPSIS
-
-In your code:
-
- use File::Slurper qw(read_text);
- use Perl::LineNumber::Comment qw(add_line_number_comments_to_perl_source);
-
- my $source = read_text('sample.pl');
- print add_line_number_comments_to_perl_source(source => $source);
 
 Content of F<sample.pl>:
 
@@ -193,23 +202,65 @@ Content of F<sample.pl>:
  two
  three
 
-Output of code:
+In your code:
+
+ use File::Slurper qw(read_text);
+ use Perl::LineNumber::Comment qw(add_line_number_comments_to_perl_source);
+
+ my $source = read_text('sample.pl');
+ print add_line_number_comments_to_perl_source(source => $source);
+
+Output:
 
  #!/usr/bin/env perl
 
  use 5.010001;
  use strict;
- use warnings; # line 5
+ use warnings;                                                                   # line 5
 
  print "Hello, world 1!";
  print "Hello, world 2!";                   # a comment
  print "A multiline
- string"; # line 10
+ string";                                                                        # line 10
 
  print <<EOF;
+ A heredoc (not shown in node->content).
+
+ Line three.
+ EOF
 
  exit 0;
 
+ __END__
+ one
+ two
+ three
+
+With this code:
+
+ print add_line_number_comments_to_perl_source(source => $source, every=>1);
+
+Output:
+
+ #!/usr/bin/env perl
+                                                                                 # line 2
+ use 5.010001;                                                                   # line 3
+ use strict;                                                                     # line 4
+ use warnings;                                                                   # line 5
+                                                                                 # line 6
+ print "Hello, world 1!";                                                        # line 7
+ print "Hello, world 2!";                   # a comment
+ print "A multiline
+ string";                                                                        # line 10
+                                                                                 # line 11
+ print <<EOF;                                                                    # line 12
+ A heredoc (not shown in node->content).
+
+ Line three.
+ EOF
+                                                                                 # line 17
+ exit 0;                                                                         # line 18
+                                                                                 # line 19
  __END__
  one
  two
@@ -226,15 +277,13 @@ Usage:
 
  add_line_number_comments_to_perl_source(%args) -> any
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
 =over 4
 
 =item * B<column> => I<posint> (default: 80)
-
-Currently not implemented
 
 =item * B<every> => I<posint> (default: 5)
 

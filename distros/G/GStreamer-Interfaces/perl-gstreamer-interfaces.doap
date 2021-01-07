@@ -4,8 +4,8 @@
          xmlns:gnome="http://api.gnome.org/doap-extensions#"
          xmlns="http://usefulinc.com/ns/doap#">
 
-  <name xml:lang="en">GStreamer</name>
-  <shortdesc xml:lang="en">Perl interface to version 0.X of the GStreamer library</shortdesc>
+  <name xml:lang="en">GStreamer::Interfaces (DEPRECATED)</name>
+  <shortdesc xml:lang="en">Perl interface to the GStreamer Interfaces library</shortdesc>
   <homepage rdf:resource="http://gtk2-perl.sourceforge.net/" />
   <mailing-list rdf:resource="http://mail.gnome.org/mailman/listinfo/gtk-perl-list" />
 

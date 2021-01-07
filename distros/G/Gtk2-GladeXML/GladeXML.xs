@@ -1,5 +1,5 @@
 /*
- * $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Glade/GladeXML.xs,v 1.14 2006/05/07 14:20:42 kaffeetisch Exp $
+ * $Id$
  *
  */
 

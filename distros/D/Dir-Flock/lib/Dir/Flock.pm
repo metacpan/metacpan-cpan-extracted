@@ -8,7 +8,7 @@ use Fcntl ':flock';
 use Data::Dumper;    # when debugging is on
 use base 'Exporter';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 my %TMPFILE;
 my %LOCK;
 our @EXPORT_OK = qw(getDir lock lock_ex lock_sh unlock lockobj lockobj_ex
@@ -19,19 +19,22 @@ our $errstr;
 # configuration that may be updated by user
 our $LOCKFILE_STUB = "dir-flock-";
 our $PAUSE_LENGTH = 0.001;          # seconds
+our $CHECK_DELAY = 0.001;           # seconds
 our $HEARTBEAT_CHECK = 30;          # seconds
 our $_DEBUG = $ENV{DEBUG} || $ENV{DIR_FLOCK_DEBUG} || 0;
 
 sub getDir {
-    my $rootdir = shift;
+    my ($rootdir,$persist,$template) = @_;
     if (-f $rootdir && ! -d $rootdir) {
         require Cwd;
         require File::Basename;
         $rootdir = File::Basename::dirname(Cwd::abs_path($rootdir));
     }
+    $template //= "dflock-XXXX";
+    no warnings 'redefine';
+    local *File::Temp::_replace_xx = sub { $_[0] };
     my $tmpdir = File::Temp::tempdir(
-        TEMPLATE => "dflock-XXXXXX",
-        DIR => $rootdir, CLEANUP => 1 );
+        TEMPLATE => $template, DIR => $rootdir, CLEANUP => !$persist );
     $tmpdir;
 }
 
@@ -44,7 +47,7 @@ sub lock_ex {
     $errstr = "";
     return if !_validate_dir($dir);
     my $P = $_DEBUG && _pid();
-    my ($filename,$now) = _create_tempfile( $dir, "excl" );
+    my ($filename,$now) = _create_lockfile( $dir, "excl" );
     my $last_check = $now;
     my $expire = $now + ($timeout || 0);
     $TMPFILE{ $filename } = _pid();
@@ -63,7 +66,7 @@ sub lock_ex {
             _ping_oldest_file($dir);
             $last_check = Time::HiRes::time;
         }
-	($filename,$now) = _create_tempfile( $dir, "excl" );
+	($filename,$now) = _create_lockfile( $dir, "excl" );
 	$TMPFILE{ $filename } = _pid();
     }
     $P && print STDERR "$P lock successful to $filename\n";
@@ -76,7 +79,7 @@ sub lock_sh {
     $errstr = "";
     return if !_validate_dir($dir);
     my $P = $_DEBUG && _pid();
-    my ($filename,$now) = _create_tempfile( $dir, "shared" );
+    my ($filename,$now) = _create_lockfile( $dir, "shared" );
     my $last_check = $now;
     my $expire = $now + ($timeout || 0);
     $TMPFILE{ $filename } = _pid();
@@ -95,34 +98,12 @@ sub lock_sh {
             _ping_oldest_file($dir);
             $last_check = Time::HiRes::time;
         }
-	($filename,$now) = _create_tempfile( $dir, "shared" );
+	($filename,$now) = _create_lockfile( $dir, "shared" );
 	$TMPFILE{ $filename } = _pid();
     }
     $P && print STDERR "$P lock successful to $filename\n";
     $LOCK{$dir}{_pid()} = $filename;
     1;
-}
-
-### flock semantics
-
-sub flock {
-    my ($dir, $op) = @_;
-    my $timeout = undef;
-    if ($op & LOCK_NB) {
-        $timeout = 0;
-    }
-    if ($op & LOCK_EX) {
-        return lock_ex($dir,$timeout);
-    }
-    if ($op & LOCK_SH) {
-        return lock_sh($dir,$timeout);
-    }
-    if ($op & LOCK_UN) {
-        return unlock($dir);
-    }
-    $errstr = "invalid flock operation '$op'";
-    carp "Dir::Flock::flock: invalid operation";
-    return;
 }
 
 sub unlock {
@@ -159,8 +140,33 @@ sub unlock {
     $errstr = "unlink called failed on file '$filename'";
     carp "Dir::Flock::unlock: failed to unlink lock file ",
 	"'$filename'";
-    return;   # this could be bad
+    return;
 }
+
+
+
+### flock semantics
+
+sub flock {
+    my ($dir, $op) = @_;
+    if ($op & LOCK_UN) {
+        return unlock($dir);
+    }
+    my $timeout = undef;
+    if ($op & LOCK_NB) {
+        $timeout = 0;
+    }
+    if ($op & LOCK_EX) {
+        return lock_ex($dir,$timeout);
+    }
+    if ($op & LOCK_SH) {
+        return lock_sh($dir,$timeout);
+    }
+    $errstr = "invalid flock operation '$op'";
+    carp "Dir::Flock::flock: invalid operation";
+    return;
+}
+
 
 ### scope semantics
 
@@ -247,13 +253,14 @@ sub _pid {
     join("_", $host, $$, $INC{"threads.pm"} ? threads->tid : ());
 }
 
-sub _create_tempfile {
+sub _create_lockfile {
     my ($dir,$type) = @_;
     $type ||= "excl";
     my $now = Time::HiRes::time;
     my $file = sprintf "$dir/%s_%s_%s_%s", $LOCKFILE_STUB,
 	$now, $type, _pid();
     open my $fh, ">>", $file;
+    close $fh;
     return ($file,$now);
 }
 
@@ -261,6 +268,12 @@ sub _oldest_file {
     my ($dir, $excl) = @_;
     my $dh;
     _refresh_dir($dir);  # is this necessary? is this sufficient?
+    if ($CHECK_DELAY) {
+	# if lock dir is local and very responsive, then two competing
+	# processes may thing they each obtained the lock. A small pause
+	# between lockfile creation and file check should mitigate this.
+	Time::HiRes::sleep $CHECK_DELAY;
+    }
     my @f1 = sort glob("$dir/$LOCKFILE_STUB*");
     if ($excl) {
         @f1 = grep /_excl_/, @f1;
@@ -357,7 +370,7 @@ Dir::Flock - advisory locking of a dedicated directory
 
 =head1 VERSION
 
-0.08
+0.09
 
 
 
@@ -390,13 +403,16 @@ Dir::Flock - advisory locking of a dedicated directory
 
 =head1 DESCRIPTION
 
-C<Dir::Flock> implements advisory locking of a directory.
-The use case is to execute synchronized code (code that should
-only be executed by one process or thread at a time) or provide
-exclusive access to a file or other resource. C<Dir::Flock> has
-more overhead than some of the other synchronization techniques
-available to Perl programmers, but it might be the only technique
-that works on NFS (Networked File System).
+C<Dir::Flock> implements advisory locking on a directory, similar
+to how the builtin L<flock|perlfunc/"flock"> performs advisory
+locking on a file. In addition to helping facilitate synchronized
+access to a directory, C<Dir::Flock> functions can be adapted to
+provide synchronized access to any resource across multiple
+processes and even across multiple hosts (where the same directory
+has been mounted). It overcomes some of the limitations of
+C<flock> such as heritability of locks over forks and threads,
+or being able to lock files on a networked file system (like NFS).
+
 
 =head2 Algorithm
 
@@ -412,14 +428,15 @@ driver reads a directory. If advisory locking is accomplished through
 reading the contents of a directory, it will not be affected by NFS's
 caching behavior.
 
-To acquire a lock in a directory, this module writes a small file
-into the directory. Then it checks if this new file is the "oldest"
+To acquire a lock in a directory, this module writes an empty file
+into the directory. The name of the file encodes the host and process
+id that is requesting the lock, and a timestamp of when the request
+was made. Then it checks if this new file is the "oldest"
 file in the directory. If it is the oldest file, then the process
 has acquired the lock. If there is already an older file in the
-directory, than that file specifies what process has a lock on the
-directory, and we have to wait and try again later. To unlock the
-directory, the module simply deletes the file in the directory
-that represents its lock.
+directory, then the process specified by that file possesses the lock,
+and we must try again later. To unlock the directory, the module 
+simply deletes the file in the directory that represents its lock.
 
 =head2 Semantics
 
@@ -489,11 +506,12 @@ the directory is locked, the C<lock> or C<lock_sh> call on the
 same directory from
 other processes or threads will block until the directory is unlocked
 (see L<"unlock">). Returns true if the lock was successfully acquired.
+Note that the first argument is a path name, not a directory I<handle>.
 
 If an optional C<$timeout> argument is provided, the function will
 try for at least C<$timeout> seconds to acquire the lock, and return
 a false value if it is not successful in that time. Use a timeout of
-zero to make a "non-blocking" exclusive lock request.
+zero to make a "non-blocking" request for an exclusive lock.
 
 
 =head2 lock_sh
@@ -507,7 +525,7 @@ C<lock>/C<lock_ex> on the directory will block until all
 shared locks are removed.
 
 If an optional C<$timeout> argument is provided, the function will
-try for at least C<$timeout> seconds to acquire the lock, and
+try for at least C<$timeout> seconds to acquire the shared lock, and
 return a false value if it is not successful in that time.
 Use a timeout of zero to make a "non-blocking" shared lock request.
 
@@ -523,12 +541,15 @@ not possess the lock on the directory.
 
 =head2 getDir
 
-=head2 $tmp_directory = Dir::Flock::getDir( $root )
+=head2 $tmp_directory = Dir::Flock::getDir( $root [, $persist] )
 
 Creates a temporary and empty directory in a subdirectory of C<$root>
 that is suitable for use as a synchronization directory. The directory
 will automatically be cleaned up when the process that called this
-function exits.
+function exits, unless the optional C<$persist> argument is set to
+a true value. The C<$persist> argument can be used to create a
+directory that can be used for synchronization by other processes
+or on other hosts after the lifetime of the current program.
 
 If the input to C<getDir> is a filename rather than a directory name,
 a new subdirectory will be created in the directory where the file
@@ -606,20 +627,20 @@ C<$timeout> argument will cause the function to give up and
 return a false value if the lock cannot be acquired after
 C<$timeout> seconds. Callers should be careful to distinguish
 cases where the specified code reference returns nothing and
-where the C<sync> function times out and returns nothing.
+where the C<sync> function fails to acquire the lock and returns nothing.
 One way to distinguish these cases is to check the value of
 C<$Dir::Flock::errstr>, which will generally be set if there
 was an issue with the locking mechanics.
 
-The lock is released in the event that the given C<$code>
+The lock is released in the event that the given C<BLOCK>
 produces a fatal error.
 
 
 =head2 sync_sh
 
-=head2 $result = Dir::Flock::sync_sh BLOCK $dir [, $timeout]
+=head2 $result = Dir::Flock::sync_sh CODE $dir [, $timeout]
 
-=head2 @result = Dir::Flock::sync_sh BLOCK $dir [, $timeout]
+=head2 @result = Dir::Flock::sync_sh CODE $dir [, $timeout]
 
 Analogue of L<"sync_ex"> but executes the code block while
 there is an advisory shared lock on the given directory.
@@ -628,7 +649,7 @@ there is an advisory shared lock on the given directory.
 =head1 DEPENDENCIES
 
 C<Dir::Flock> requires L<Time::HiRes> where the C<Time::HiRes::time>
-function has subsection resolution.
+function has subsecond resolution.
 
 
 =head1 EXPORTS
@@ -665,22 +686,27 @@ utilization.
 # =head1 ENVIRONMENT    =>   DIR_FLOCK_DEBUG
 
 # =cut
-    
+
 
 
 =head1 LIMITATIONS
 
-See L<"System requirements"> above.
+C<Dir::Flock> requires that the function values of L<Time::HiRes>
+have subsecond resolution
 
-The L<Dir::Flock::Mock> module can be loaded when necessary
-to provide a consistent synchronization API on systems that
-require C<Dir::Flock> to work properly and on systems that
-don't support C<Dir::Flock>.
 
-=cut
+If C<Dir::Flock> is going to be used to synchronize a networked
+directory across multiple hosts, it is imporant that the clocks
+be synchronized between those hosts. Otherwise, a host with a
+"fast" clock will be able to steal locks from a host with a 
+"slow" clock.
 
-# =head1 SEE ALSO  L<Mail::Box::Locker::NFS>, L<File::NFSLock>.
-#        L<File::SharedNFSLock>, L<IPC::ConcurrencyLimit::Lock::NFS>
+
+=head1 SEE ALSO  
+
+Many other modules have taken a shot at advisory locking over
+NFS, including L<Mail::Box::Locker::NFS>, L<File::NFSLock>.
+L<File::SharedNFSLock>, and L<IPC::ConcurrencyLimit::Lock::NFS>.
 
 
 =head1 SUPPORT
@@ -718,7 +744,7 @@ Marty O'Brien, E<lt>mob@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2019-2020, Marty O'Brien
+Copyright (c) 2019-2021, Marty O'Brien
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
@@ -727,7 +753,6 @@ at your option, any later version of Perl 5 you may have available.
 See http://dev.perl.org/licenses/ for more information.
 
 =cut
-
 
 
 =begin TODO
@@ -740,12 +765,16 @@ Heartbeat
     same and other hosts) know that the locking process is still
     alive. Can you do that without releasing the lock?
 
-    Include heartbeat data in the file names?
+    Include heartbeat data in the file names? "touch" lock files
+    at the heartbeat so that the mtime's are updated?
 
 Threads
 
     In  _ping_oldest_file , how to detect whether a thread is
-    still alive? How to detect whether a thread on a remote
-    machine is still alive?
+    still alive? How to detect whether a process or thread on
+    a remote machine is still alive?
+
+    If a SyncObject2 is inherited in a fork or a thread,
+    will DESTROY release its lock?
 
 =end TODO

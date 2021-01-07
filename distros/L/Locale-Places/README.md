@@ -1,12 +1,10 @@
-[![Actions Status](https://github.com/nigelhorne/Locale-Places/workflows/.github/workflows/all.yml/badge.svg)](https://github.com/nigelhorne/Locale-Places/actions)
-
 # NAME
 
 Locale::Places - Translate places using http://download.geonames.org/
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # METHODS
 
@@ -23,10 +21,11 @@ but that can't be guaranteed.
 ## translate
 
 Translate a city into a different language.
-Takes two mandatory arguments 'place'
-and 'from'.
-Takes an optional argument 'to'.
-If $to isn't given,
+Takes one mandatory argument: 'place'.
+It also takes two other arguments:
+'from' and 'to',
+at least one of which must be given.
+If neither $to nor $from is given,
 the code makes a best guess based on the environment.
 
     use Locale::Places;
@@ -78,7 +77,7 @@ You can also look for information at:
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2020 Nigel Horne.
+Copyright 2020-2021 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

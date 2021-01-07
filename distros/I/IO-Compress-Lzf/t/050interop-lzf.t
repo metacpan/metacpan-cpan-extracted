@@ -32,7 +32,7 @@ sub ExternalLzfWorks
 
     writeWithLzf($outfile, $content)
         or return 0;
-    
+
     my $got ;
     readWithLzf($outfile, $got)
         or return 0;
@@ -58,7 +58,7 @@ sub readWithLzf
     if ( system("$comp <$file >$outfile") == 0 )
     {
         $_[0] = readFile($outfile);
-        return 1 
+        return 1
     }
 
     diag "'$comp' failed: $?";
@@ -83,7 +83,7 @@ sub writeWithLzf
     unlink $file ;
     my $comp = "$LZF -c $options <$infile >$file" ;
 
-    return 1 
+    return 1
         if system($comp) == 0 ;
 
     diag "'$comp' failed: $?";
@@ -104,8 +104,8 @@ BEGIN {
     plan(skip_all => "Cannot find lzf")
         if ! $LZF ;
 
-    # Handle spaces in path to lzf 
-    $LZF = "\"$LZF\"" if defined $LZF && $LZF =~ /\s/;    
+    # Handle spaces in path to lzf
+    $LZF = "\"$LZF\"" if defined $LZF && $LZF =~ /\s/;
 
     plan(skip_all => "$name doesn't work as expected")
         if ! ExternalLzfWorks();
@@ -143,4 +143,3 @@ for my $content ($shortContent, $longContent)
     is readWithLzf($file1, $got), 1, "readWithLzf returns 0";
     is $got, $content, "got content";
 }
-

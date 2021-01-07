@@ -19,14 +19,14 @@ our @EXPORT_OK = qw(
     copy_changes
     copy_makefile
     copy_module_files
-    copy_manifest_skip
+    copy_manifest
     copy_git_ignore
 
     unlink_changes
     unlink_ci_files
     unlink_makefile
     unlink_module_files
-    unlink_manifest_skip
+    unlink_manifest
     unlink_git_ignore
 
     mkdir_init
@@ -64,6 +64,9 @@ sub copy_changes {
     $y+= 1900;
     $m+= 1;
 
+    $d = "0$d" if length $d == 1;
+    $m = "0$m" if length $m == 1;
+
     my $changes_release = "$work_dir/Changes-release";
 
     my $tie = tie my @changes, 'Tie::File', $changes_release;
@@ -85,8 +88,9 @@ sub copy_module_files {
         copy $_, $work_dir or die $!;
     }
 }
-sub copy_manifest_skip {
+sub copy_manifest {
     copy "$orig_dir/MANIFEST.SKIP", $work_dir or die $!;
+    copy "$orig_dir/manifest.t", $work_dir or die $!;
 }
 sub copy_git_ignore {
     copy "$orig_dir/.gitignore", $work_dir or die $!;
@@ -128,11 +132,16 @@ sub unlink_module_files {
         is -e $_, undef, "unlinked $_ file ok";
     }
 }
-sub unlink_manifest_skip {
+sub unlink_manifest {
     if (-e "$work_dir/MANIFEST.SKIP") {
         unlink "$work_dir/MANIFEST.SKIP" or die $!;
     }
     is -e "$work_dir/MANIFEST.SKIP", undef, "temp MANIFEST.SKIP deleted ok";
+
+    if (-e "$work_dir/manifest.t") {
+        unlink "$work_dir/manifest.t" or die $!;
+    }
+    is -e "$work_dir/manifest.t", undef, "temp manifest.t deleted ok";
 }
 sub unlink_git_ignore {
     if (-e "$work_dir/.gitignore") {

@@ -1,0 +1,34 @@
+AUTHORS
+ChangeLog
+copyright.pod
+doctypes
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+maps
+README
+examples/populate-recent.pl
+recent-files/egg-recent.h
+recent-files/egg-recent-item.h
+recent-files/egg-recent-item.c
+recent-files/egg-recent-model.h
+recent-files/egg-recent-model.c
+recent-files/egg-recent-util.h
+recent-files/egg-recent-util.c
+recent-files/egg-recent-view.h
+recent-files/egg-recent-view.c
+recent-files/egg-recent-view-gtk.h
+recent-files/egg-recent-view-gtk.c
+recent-files/egg-recent-view-uimanager.c
+recent-files/egg-recent-view-uimanager.h
+Recent.pm
+recentfiles-perl.h
+t/RecentItem.t
+t/RecentModel.t
+TODO
+xs/Recent.xs
+xs/RecentItem.xs
+xs/RecentModel.xs
+xs/RecentView.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

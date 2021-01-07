@@ -19,7 +19,7 @@ BEGIN
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
 
-    my $VERSION = '2.096';
+    my $VERSION = '2.100';
     my @NAMES = qw(
 			Compress::Raw::Lzma
 			IO::Compress::Base
@@ -27,7 +27,7 @@ BEGIN
 			);
 
     my @OPT = qw(
-			
+
 			);
 
     plan tests => @NAMES + @OPT + $extra ;
@@ -43,16 +43,16 @@ BEGIN
         eval " require $name " ;
         if ($@)
         {
-            ok 1, "$name not available" 
+            ok 1, "$name not available"
         }
-        else  
+        else
         {
             my $ver = eval("\$${name}::VERSION");
-            is $ver, $VERSION, "$name version should be $VERSION" 
+            is $ver, $VERSION, "$name version should be $VERSION"
                 or diag "$name version is $ver, need $VERSION" ;
-        }         
+        }
     }
-    
+
 }
 
 {
@@ -80,7 +80,7 @@ BEGIN
                     ? $ver
                     : "Not Installed" ;
         push @results, [$module, $v] ;
-        $have{$module} ++ 
+        $have{$module} ++
             if $ver ;
     }
 

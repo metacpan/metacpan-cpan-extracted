@@ -1,0 +1,9 @@
+
+these are brand-new, very quickly made bindings, so there are still 
+some bugs.  the ones i know about are:
+
+- none of the Dom stuff is bound.
+- there are large omissions everywhere.
+- it's very easy to crash.
+- the test suite is, well, almost nonexistent
+- need doc and examples

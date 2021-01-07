@@ -20,7 +20,8 @@
 pm_to_blib$
 .git/
 .debug$
-.gitignore$
+^\.gitignore$
+^\.github/
 ^\w+.pl$
 .ignore.txt$
 .travis.yml$
@@ -29,6 +30,7 @@ examples/
 build/
 ^\w+.list$
 .bblog$
+bblog/
 .base$
 BB-Pass/
 BB-Fail/

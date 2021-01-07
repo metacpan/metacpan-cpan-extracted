@@ -1,0 +1,689 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+# Test run
+
+# distmgr create --destroy -m Test::Module -a "Steve Bertrand" -e steveb@cpan.org -r test-module -u stevieb9
+# cd test-module/
+# ...add lines to Changes, commit & push
+# distmgr release -d
+# distmgr cycle
+
+use Capture::Tiny qw(:all);
+use Cwd qw(getcwd);
+use Data::Dumper;
+use Dist::Mgr qw(:private);
+use File::Copy qw(move);
+use File::Path qw(rmtree);
+use Getopt::Long qw(:config no_ignore_case);
+
+my $cmd = _init();    # shifts @ARGV
+
+my %args;
+my $git = _validate_git();
+
+GetOptions(
+    "h|help"      => \$args{help},
+    "m|module=s@" => \$args{module},
+    "a|author=s"  => \$args{author},
+    "e|email=s"   => \$args{email},
+    "r|repo=s"    => \$args{repo},
+    "u|user=s"    => \$args{user},
+    "i|cpanid=s"  => \$args{cpan_id},
+    "p|cpanpw=s"  => \$args{cpan_pw},
+    "d|dryrun"    => \$args{cpan_dryrun},
+    "v|version=s" => \$args{version},
+    "V|verbose"   => \$args{verbose},
+
+    "g|gitignore"  => \$args{install_gitignore},
+    "c|ci"         => \$args{install_ci},
+    "B|badges"     => \$args{add_badges},
+    "b|bugtracker" => \$args{add_bugtracker},
+    "R|repository" => \$args{add_repository},
+    "A|all"        => \$args{install_all},
+
+    # destroy will erase the repository before running
+    # Used for testing purposes only
+    "destroy"      => \$args{destroy},
+);
+
+# Make sure we don't upload stuff to the CPAN when in testing
+
+if ($args{destroy}) {
+    $args{dryrun} = 1;
+}
+
+$args{cpan_id} //= $ENV{CPAN_USERNAME};
+$args{cpan_pw} //= $ENV{CPAN_PASSWORD};
+
+commands()->{$cmd}(%args);
+
+# Commands
+
+sub create {
+    my (%args) = @_;
+
+    if ($args{help}) {
+        help('create');
+    }
+
+    for (qw(module author email)) {
+        if (! $args{$_}) {
+            warn "create: requires --module --author --email\n";
+            exit;
+        }
+    }
+    for (qw(repo user)) {
+        if (! exists $args{$_} || ! defined $args{$_}) {
+            warn "Git functionality disabled... need both '--repo' and '--user'\n\n";
+            $git = 0;
+            last;
+        }
+    }
+
+    my $module = $args{module}->[0];
+    my $dir;
+
+    # Clone the repository, or create the directory if no VCS
+    if ($git) {
+        git_clone($args{user}, $args{repo}, $args{verbose});
+        $dir = $args{repo};
+    }
+    else {
+        $dir = $module;
+        $dir =~ s/::/-/g;
+        mkdir $dir or die "ERROR: Can't create the '$dir' directory: $!";
+    }
+
+    # Change into module directory
+    chdir $dir or die "ERROR: Can't change into the '$dir' directory: $!";
+
+    # If in testing mode ('destroy'), clean some things up
+    _destroy();
+
+    # Create the distribution
+    $args{modules} = $args{module};
+    init(%args);
+
+    # Move the files to the module dir
+    move_distribution_files($module);
+
+    # Remove our unwanted files
+    remove_unwanted_files();
+
+    # Changes
+    changes($module);
+
+    # MANIFEST.SKIP
+    manifest_skip();
+
+    # manifest.t
+    manifest_t();
+
+    # Git actions
+    if ($git) {
+        # .gitignore
+        git_ignore();
+
+        # CI config
+        ci_github();
+
+        # CI/Coverage badges
+        ci_badges($args{user}, $args{repo});
+
+        # Add bugtracker to Makefile.PL
+        add_bugtracker($args{user}, $args{repo});
+
+        # Add repository to Makefile.PL
+        add_repository($args{user}, $args{repo});
+
+        # git add
+        git_add($args{verbose});
+
+        # git commit
+        git_commit("Initial import of $module", $args{verbose});
+
+        # git push
+        git_push($args{verbose});
+    }
+
+    print "\nNew distribution created successfully.\n";
+}
+sub cycle {
+    my (%args) = @_;
+
+    if ($args{help}) {
+        help('cycle');
+    }
+
+    my $module = _get_module();
+
+    _check_repo();
+
+    # Version (updated)
+    my $module_file = $module;
+    $module_file =~ s/::/\//g;
+    $module_file = 'lib/' . $module_file . '.pm';
+
+    my $ver;
+    if (! eval { $ver = version_info($module_file)->{$module_file}; 1 }) {
+        die "ERROR: The $module_file file for $module can't be found.\n";
+    }
+
+    my $ver_incr = version_incr($ver);
+
+    version_bump($ver_incr, $module_file);
+
+    changes_bump($ver_incr);
+
+    if ($git) {
+        git_commit("Prep for $ver_incr");
+        git_push();
+    }
+
+    print "\nSuccessfully cycled to the next development version\n";
+}
+sub dist {
+    my (%args) = @_;
+
+    if ($args{help}) {
+        help('dist');
+    }
+
+    for (qw(module author email)) {
+        if (! $args{$_}) {
+            warn "dist: requires --module --author --email\n";
+            exit;
+            #help();
+        }
+    }
+
+    my $module = $args{module}->[0];
+    my $dir = $module;
+    $dir =~ s/::/-/g;
+    mkdir $dir or die "ERROR: Can't create the '$dir' directory: $!";
+
+    # Change into module directory
+    chdir $dir or die "ERROR: Can't change into the '$dir' directory: $!";
+
+    # Create the distribution
+    $args{modules} = $args{module};
+    init(%args);
+
+    # Move the files to the module dir
+    move_distribution_files($module);
+
+    # Remove our unwanted files
+    remove_unwanted_files();
+
+    # Changes
+    changes($module);
+
+    # MANIFEST.SKIP
+    manifest_skip();
+
+    # manifest.t
+    manifest_t();
+}
+sub install {
+    my (%args) = @_;
+
+    if ($args{help}) {
+        help('install');
+    }
+
+    if (!$args{user} || !$args{repo}) {
+        if ($args{install_ci}) {
+            die "ERROR: --badges requires --user and --repo\n";
+        }
+        if ($args{add_badges}) {
+            die "ERROR: --badges requires --user and --repo\n";
+        }
+        if ($args{add_bugtracker}) {
+            die "ERROR: --bugtracker requires --user and --repo\n";
+        }
+        if ($args{add_repository}) {
+            die "ERROR: --repository requires --user and --repo\n";
+        }
+        if ($args{install_all}) {
+            die "ERROR: badges, bugtracker and repository require --user and --repo\n";
+        }
+    }
+
+    if ($args{install_gitignore} || $args{install_all}) {
+        print "\nInstalling .gitignore file...\n";
+        git_ignore() if $args{install_gitignore} || $args{install_all};
+        exit;
+    }
+    if ($args{install_ci} || $args{install_all}) {
+        print "\nInstalling Git Actions CI configuration file\n";
+
+        ci_github();
+        make_manifest();
+
+        if ($git) {
+            git_add($args{verbose});
+        }
+        exit;
+    }
+    if ($args{add_badges} || $args{install_all}) {
+        print "\nInstalling CI badges to POD...\n";
+        ci_badges($args{user}, $args{repo}) if $args{add_badges} || $args{install_all};
+        exit;
+    }
+    if ($args{add_bugtracker} || $args{install_all}) {
+        print "\nInstalling bugtracker information to Makefile.PL...\n";
+        add_bugtracker($args{user}, $args{repo}) if $args{add_bugtracker} || $args{install_all};
+        exit;
+    }
+    if ($args{add_repository} || $args{install_all}) {
+        print "\nInstalling repository information to Makefile.PL...\n";
+        add_repository($args{user}, $args{repo}) if $args{add_repository} || $args{install_all};
+        exit;
+    }
+
+    help('install');
+}
+sub release {
+    my (%args) = @_;
+
+    if ($args{help}) {
+        help('release');
+    }
+
+    # Set RELEASE_TESTING... we are creating a release after all
+    $ENV{RELEASE_TESTING} = 1;
+
+    my $module = _get_module();
+
+    _check_repo();
+
+    # Changes (Add release date)
+    changes_date();
+
+    # Git release (commit, push, CI)
+    my $module_file = $module;
+    $module_file =~ s/::/\//g;
+    $module_file = 'lib/' . $module_file . '.pm';
+
+    # Version (current)
+    my $ver;
+    if (! eval { $ver = version_info($module_file)->{$module_file}; 1 }) {
+        die "ERROR: The $module_file file for $module can't be found\n";
+    }
+
+    # make manifest
+    make_manifest($args{verbose});
+
+    # make test
+    if (! eval { make_test($args{verbose}); 1 }) {
+        die "\nERROR: Local 'make test' failed. Intervention required. Halting the release procedure\n";
+    }
+
+    # CI testing
+    if ($git) {
+        if (! git_release($ver)) {
+            die "\nERROR: User cancelled the release process due to failing CI testing\n";
+        }
+    }
+
+    # Bundle distribution
+
+    make_dist($args{verbose});
+
+    # CPAN upload
+
+    if ($args{cpan_id} && $args{cpan_pw}) {
+        (my $dist = $module) =~ s/::/-/g;
+        my $dist_file = (glob("${dist}-*.tar.gz"))[-1];
+
+        my $cpan_msg = capture_merged {
+            cpan_upload($dist_file, dry_run => $args{cpan_dryrun});
+        };
+
+        if ($cpan_msg =~ /Message:\s+(.*)/) {
+            die "ERROR: CPAN failed with error '$1'. Couldn't upload.\n";
+        }
+    }
+    else {
+        print "\nCPAN ID nor password are set, not uploading\n";
+    }
+
+    # Clean the working directory
+
+    make_distclean($args{verbose});
+
+    # Git tag && push
+
+    git_tag($ver, $args{verbose});
+    git_push($args{verbose});
+
+    $ENV{RELEASE_TESTING} = 0;
+
+    print "\nRelease process completed successfully\n";
+}
+
+# Functional
+
+sub commands {
+    return {
+        create  => \&create,
+        cycle   => \&cycle,
+        dist    => \&dist,
+        install => \&install,
+        release => \&release,
+    };
+}
+
+# Private
+
+sub _init {
+    help() if ! @ARGV;
+    my $command = shift @ARGV;
+    help() if ! defined commands()->{$command};
+    return $command;
+}
+sub _check_repo {
+    if ($git) {
+        if (git_repo() =~ /^\d+$/) {
+            warn "Disabling Git as it doesn't appear as though you're in a " .
+                "repository directory\n";
+            $git = 0;
+        }
+    }
+}
+sub _get_module {
+    if ($args{modules}) {
+        return $args{modules}->[0];
+    }
+    else {
+        open my $fh, '<', 'Makefile.PL'
+            or die "Can't open Makefile.PL to find distribution name. Send in --module\n";
+
+        while (<$fh>) {
+            if (/^\s+NAME.*'(.*)'/) {
+                return $1;
+            }
+        }
+        die "Can't automatically find module name. Send in --module\n";
+    }
+}
+sub _check_repo_info {
+    my (%args) = @_;
+}
+sub _destroy {
+    return if ! $args{destroy};
+
+    my $cwd = getcwd();
+
+    if ($cwd !~ /test-module$/) {
+        die "We're not in the test repository. No way we're destroying stuff!\n";
+    }
+
+    my $dir = 'test-module-temporary';
+
+    chdir '..' or die "Can't escalate to the parent directory\n";
+    mkdir $dir or die "Can't create a temporary repo dir\n";
+    move 'test-module/.git', "$dir/.git" or die "Can't move the .git directory to the temp dir\n";
+    rmtree 'test-module' or die "Can't delete the original repo dir\n";
+    move $dir, 'test-module' or die "Can't rename the temp dir $dir to 'test-module'\n";
+    chdir $cwd or die "Can't enter the repo dir\n";
+
+    git_commit("Dist::Mgr 'distmgr' test run", $args{verbose});
+    git_push($args{verbose});
+
+    print "\nDone testing cleanup...\n";
+}
+
+sub help {
+    my ($command) = @_;
+
+    my $help = {
+        create  => [
+            qq{},
+            qq{Usage: distmgr create [OPTIONS]},
+            qq{},
+            qq{create - Creates a full blown distribution with everything included},
+            qq{},
+            qq{Options:},
+            qq{},
+            qq{    -m | --module   Mandatory: The module name (eg. Test::Module)},
+            qq{    -a | --author   Mandatory: The name of the author (eg. Steve Bertrand)},
+            qq{    -e | --email    Mandatory: The email address of the author},
+            qq{    -u | --user     Optional:  The Github username (eg. stevieb9)},
+            qq{    -r | --repo     Optional:  The Github repository name (eg. test-module)},
+            qq{    -V | --verbose  Optional:  (Flag) Display verbose output for each process},
+            qq{    -h | --help     Optional:  (Flag) Display this help message},
+            qq{},
+            qq{Notes: We will skip adding repository information, skip adding CI badge info,},
+            qq{and skip adding repository and bugtracker information to Makefile.PL file},
+            qq{if --user or --repo are not present in the parameter list.},
+            qq{},
+        ],
+        dist    => [
+            qq{},
+            qq{Usage: distmgr dist [OPTIONS]},
+            qq{},
+            qq{dist - Creates a bare-bones distribution with just the basics},
+            qq{},
+            qq{Options:},
+            qq{},
+            qq{    -m | --module   Mandatory: The module name (eg. Test::Module)},
+            qq{    -a | --author   Mandatory: The name of the author (eg. Steve Bertrand)},
+            qq{    -e | --email    Mandatory: The email address of the author},
+            qq{    -V | --verbose  Optional:  (Flag) Display verbose output for each process},
+            qq{    -h | --help     Optional:  (Flag) Display this help message},
+            qq{},
+        ],
+        release => [
+            qq{},
+            qq{Usage: distmgr release [OPTIONS]},
+            qq{},
+            qq{release - Test then release a distribution to the CPAN},
+            qq{},
+            qq{Options:},
+            qq{},
+            qq{    -i | --cpanid   Optional:  Your PAUSE userid},
+            qq{    -p | --cpanpw   Optional:  Your PAUSE userid's password},
+            qq{    -d | --dryrun   Optional:  (Flag) Don't actually upload to the CPAN},
+            qq{    -V | --verbose  Optional:  (Flag) Display verbose output for each process},
+            qq{    -h | --help     Optional:  (Flag) Display this help message},
+            qq{},
+            qq{Notes: No Git operations will be performed without --repo and --user. If},
+            qq{the --cpanid or --cpanpw aren't available or the CPAN_USERNAME or},
+            qq{CPAN_PASSWORD environment variables aren't set, we won't upload to the CPAN.},
+        ],
+        cycle   => [
+            qq{},
+            qq{Usage: distmgr cycle [OPTIONS]},
+            qq{},
+            qq{cycle - Prepare a distribution for next development cycle after release},
+            qq{},
+            qq{Options:},
+            qq{    -V | --verbose  Optional:  (Flag) Display verbose output for each process},
+            qq{    -h | --help     Optional:  (Flag) Display this help message},
+            qq{},
+        ],
+        install => [
+            qq{},
+            qq{Usage: distmgr install [OPTIONS]},
+            qq{},
+            qq{install - Installs/adds various files or file sections (all flags)},
+            qq{},
+            qq{    -g | --gitignore    Install .gitignore file},
+            qq{    -c | --ci           Install Github Actions CI configuration file},
+            qq{    -B | --badges       Insert CI/Coverage badges links into the module's POD},
+            qq{    -b | --bugtracker   Insert bugtracker information into Makefile.PL},
+            qq{    -R | --repository   Insert repository information into Makefile.PL},
+            qq{    -A | --all          Insert/Install all above options},
+            qq{    -h | --help         Optional:  (Flag) Display this help message},
+            qq{},
+            qq{Notes: For badges, bugtracker and repository, the --user and --repo arguments},
+            qq{must be supplied.},
+            qq{},
+        ]
+    };
+
+    if (! defined $command || ! exists commands()->{$command}) {
+        my @data = <DATA>;
+        print $_ for @data;
+    }
+    else {
+        print "$_\n" for @{ $help->{$command} };
+    }
+
+    exit;
+}
+
+__DATA__
+
+Usage: distmgr <command> [OPTIONS]
+
+Commands:
+
+create - Creates a full blown distribution with everything included
+
+    -m | --module   Mandatory: The module name (eg. Test::Module)
+    -a | --author   Mandatory: The name of the author (eg. Steve Bertrand)
+    -e | --email    Mandatory: The email address of the author
+    -u | --user     Optional:  The Github username (eg. stevieb9)
+    -r | --repo     Optional:  The Github repository name (eg. test-module)
+    -V | --verbose  Optional:  Display verbose output for each process
+
+Note: For Git integration, create an empty Github repository, send in its short
+name with --repo and your Github username with --user.
+
+cycle - Bumps version numbers and prepares for the next development cycle
+
+    -V | --verbose  Optional:  Display verbose output for each process
+
+dist - Creates a bare-bones distribution with just the basics
+
+    -m | --module   Mandatory: The module name (eg. Test::Module)
+    -a | --author   Mandatory: The name of the author (eg. Steve Bertrand)
+    -e | --email    Mandatory: The email address of the author
+    -V | --verbose  Optional:  (Flag) Display verbose output for each process
+
+install - Installs/adds various files or file sections (all flags)
+
+    -g | --gitignore    Install .gitignore file
+    -c | --ci           Install Github Actions CI configuration file
+    -B | --badges       Insert CI/Coverage badges links into the module's POD
+    -b | --bugtracker   Insert bugtracker information into Makefile.PL
+    -R | --repository   Insert repository information into Makefile.PL
+    -A | --all          Insert/Install all above options
+
+release - Tests, runs CI and releases to the CPAN your distribution.
+
+    -i | --cpanid   Optional:  Your PAUSE userid
+    -p | --cpanpw   Optional:  Your PAUSE userid's password
+    -d | --dryrun   Optional:  (Flag) Don't actually upload to the CPAN
+
+Notes: No Git operations will be performed without C<--repo> and C<--user>. If
+the --cpanid or --cpanpw aren't available or the CPAN_USERNAME or
+CPAN_PASSWORD environment variables aren't set, we won't upload to the CPAN.
+
+__END__
+
+=head1 NAME
+
+distmgr - Create, integrate, release a Perl distribution to the CPAN, and
+prepare for the next development cycle.
+
+=for html
+<a href="https://github.com/stevieb9/dist-mgr/actions"><img src="https://github.com/stevieb9/dist-mgr/workflows/CI/badge.svg"/></a>
+<a href='https://coveralls.io/github/stevieb9/dist-mgr?branch=master'><img src='https://coveralls.io/repos/stevieb9/dist-mgr/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+
+=head1 DESCRIPTION
+
+Performs a full suite of automated creation, addition, pre-release, release and
+post release tasks for Perl distributions. It integrates with VCS, automates the
+configuration of Continuous Integration, manages version numbers and Changes
+files, amongst a slew of other tasks.
+
+This B<distmgr> application uses the L<Dist::Mgr> library as its backend.
+
+=head1 USAGE
+
+    distmgr <command> [OPTIONS]
+
+=head1 COMMANDS
+
+=head2 create
+
+Creates a full blown, brand new distribution with everything included.
+
+I<Options>:
+
+    -m | --module   Mandatory: The module name (eg. Test::Module)
+    -a | --author   Mandatory: The name of the author (eg. Steve Bertrand)
+    -e | --email    Mandatory: The email address of the author
+    -u | --user     Optional:  The Github username (eg. stevieb9)
+    -r | --repo     Optional:  The Github repository name (eg. test-module)
+    -V | --verbose  Optional:  Display verbose output for each process
+
+I<Note>: For Git integration, create an empty repository on Github, then supply
+the short name of the repository with C<--repo> and your Github username with
+C<--user> and we'll clone the new repo and use it as the top-level distribution
+directory.
+
+I<Note>: We will skip adding repository information, skip adding CI badge info,
+and skip adding repository and bugtracker information to C<Makefile.PL> file
+if --user or --repo are not present in the parameter list (see L</install>).
+
+=head2 dist
+
+Creates a bare-bones distribution with just the basics. There will be no git
+integration, no CI integration etc. Pretty well nearly a stock L<Module::Starter>
+distribution with a few small tweaks.
+
+I<Options>:
+
+    -m | --module   Mandatory: The module name (eg. Test::Module)
+    -a | --author   Mandatory: The name of the author (eg. Steve Bertrand)
+    -e | --email    Mandatory: The email address of the author
+    -V | --verbose  Optional:  (Flag) Display verbose output for each process
+
+=head2 install
+
+Installs/adds various files or file sections into an existing distribution that
+you author.
+
+I<Options>:
+
+All of the below options are flags, and don't take any arguments.
+
+    -g | --gitignore    Install .gitignore file
+    -c | --ci           Install Github Actions CI configuration file
+    -B | --badges       Insert CI/Coverage badges links into the module's POD
+    -b | --bugtracker   Insert bugtracker information into Makefile.PL
+    -R | --repository   Insert repository information into Makefile.PL
+    -A | --all          Insert/Install all above options
+
+I<Note>: For badges, bugtracker and repository, the C<--user> (Github username)
+and C<--repo> (Github repository) arguments must be supplied.
+
+=head2 release
+
+Prepares for, tests, runs Continuous Integration testing, commits, tags, pushes
+and releases to the CPAN your distribution.
+
+I<Options>:
+
+    -i | --cpanid   Optional:  Your PAUSE userid
+    -p | --cpanpw   Optional:  Your PAUSE userid's password
+    -d | --dryrun   Optional:  (Flag) Don't actually upload to the CPAN
+
+I<Note>: No Git operations will be performed without C<--repo> and C<--user>. If
+the C<--cpanid> or C<--cpanpw> aren't available or the C<CPAN_USERNAME> or
+C<CPAN_PASSWORD> environment variables aren't set, we won't upload to the CPAN.
+
+=head2  cycle
+
+After release, this command will bump version numbers in all of your modules,
+and prepare the Changes file for your next development cycle.
+
+I<Options>:
+
+    -V | --verbose  Optional:  Display verbose output for each process

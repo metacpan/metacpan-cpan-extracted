@@ -1,0 +1,49 @@
+{
+   "abstract" : "(DEPRECATED) Create user interfaces directly from Glade XML",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gtk2-GladeXML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.300",
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::PkgConfig" : "1.000",
+            "Glib" : "1.020",
+            "Gtk2" : "1.000"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.300",
+            "ExtUtils::PkgConfig" : "1.000",
+            "Glib" : "1.020",
+            "Gtk2" : "1.000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.008",
+   "x_deprecated" : 1
+}

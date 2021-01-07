@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -22,6 +21,10 @@
 #include "gst2perl.h"
 
 MODULE = GStreamer::Caps	PACKAGE = GStreamer::Caps::Empty
+
+=for object GStreamer::Caps::Empty Structure describing sets of media formats
+
+=cut
 
 # GstCaps * gst_caps_new_empty (void);
 GstCaps_own *
@@ -33,6 +36,10 @@ new (class)
 
 MODULE = GStreamer::Caps	PACKAGE = GStreamer::Caps::Any
 
+=for object GStreamer::Caps::Any Structure describing sets of media formats
+
+=cut
+
 # GstCaps * gst_caps_new_any (void);
 GstCaps_own *
 new (class)
@@ -42,6 +49,10 @@ new (class)
 	RETVAL
 
 MODULE = GStreamer::Caps	PACKAGE = GStreamer::Caps::Simple
+
+=for object GStreamer::Caps::Simple Structure describing sets of media formats
+
+=cut
 
 # GstCaps * gst_caps_new_simple (const char *media_type, const char *fieldname, ...);
 GstCaps_own *
@@ -79,6 +90,10 @@ new (class, media_type, field, type, value, ...)
 
 MODULE = GStreamer::Caps	PACKAGE = GStreamer::Caps::Full
 
+=for object GStreamer::Caps::Full Structure describing sets of media formats
+
+=cut
+
 # GstCaps * gst_caps_new_full (GstStructure  *struct1, ...);
 # GstCaps * gst_caps_new_full_valist (GstStructure  *structure, va_list var_args);
 GstCaps_own *
@@ -99,6 +114,10 @@ new (class, structure, ...)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Caps	PACKAGE = GStreamer::Caps	PREFIX = gst_caps_
+
+=for object GStreamer::Caps Structure describing sets of media formats
+
+=cut
 
 =for position SYNOPSIS
 

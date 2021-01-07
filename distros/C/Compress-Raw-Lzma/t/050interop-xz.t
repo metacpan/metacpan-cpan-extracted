@@ -30,7 +30,7 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
         or return 0;
 
     writeFile($outfile, $compressed);
-    
+
     my $got;
     readWithXz($outfile, $got)
         or return 0;
@@ -51,10 +51,10 @@ sub rdFile
     my @strings ;
 
     {
-        open (F, "<$f") 
+        open (F, "<$f")
             or croak "Cannot open $f: $!\n" ;
         binmode F;
-        @strings = <F> ;	
+        @strings = <F> ;
         close F ;
     }
 
@@ -104,28 +104,28 @@ sub writeWithXz
     return 0 ;
 }
 
-BEGIN 
+BEGIN
 {
 
     # Check external xz is available
     my $name = $^O =~ /mswin/i ? 'xz.exe' : 'xz';
     my $split = $^O =~ /mswin/i ? ";" : ":";
 
-    for my $dir (reverse split $split, $ENV{PATH})    
+    for my $dir (reverse split $split, $ENV{PATH})
     {
         $XZ = "$dir/$name"
             if -x "$dir/$name" ;
     }
 
-    # Handle spaces in path to xz 
-    $XZ = "\"$XZ\"" if defined $XZ && $XZ =~ /\s/;    
+    # Handle spaces in path to xz
+    $XZ = "\"$XZ\"" if defined $XZ && $XZ =~ /\s/;
 
     plan(skip_all => "Cannot find $name")
         if ! $XZ ;
 
     plan(skip_all => "$name doesn't work as expected")
         if ! ExternalXzWorks();
-    
+
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
@@ -146,8 +146,8 @@ sub compressWith
     my $contents = '' ;
     foreach (1 .. 5000)
       { $contents .= chr int rand 255 }
-    
-    
+
+
     my ($x, $err) = $class->new(AppendOutput => 1, %opts) ;
 
     SKIP:
@@ -157,17 +157,17 @@ sub compressWith
         isa_ok $x, $class;
         isa_ok $x, "Compress::Raw::Lzma::Encoder";
 
-        cmp_ok $err, '==', LZMA_OK,"  status is LZMA_OK" 
+        cmp_ok $err, '==', LZMA_OK,"  status is LZMA_OK"
             or diag "Error is $err";
-         
+
         my (%X, $Y, %Z, $X, $Z);
         cmp_ok $x->code($contents, $X), '==', LZMA_OK, "  compressed ok" ;
-        
+
         cmp_ok $x->flush($X), '==', LZMA_STREAM_END, "  flushed ok" ;
-         
+
         my $lex = new LexFile my $file;
         writeFile($file, $X);
-        
+
         undef $x ;
 
         # displayMemoryUsage("Before");
@@ -188,19 +188,19 @@ sub uncompressWith
     my $contents = '' ;
     foreach (1 .. 5000)
       { $contents .= chr int rand 255 }
-    
-    
-    my $compressed;  
+
+
+    my $compressed;
     writeWithXz($contents, $compressed, $xz_opts);
 
     my ($x, $err) = $class->new(AppendOutput => 1, %opts) ;
     isa_ok $x, $class;
     isa_ok $x, "Compress::Raw::Lzma::Decoder";
     cmp_ok $err, '==', LZMA_OK,"  status is LZMA_OK" ;
-     
+
     my $got = '';
     cmp_ok $x->code($compressed, $got), '==', LZMA_STREAM_END, "  compressed ok" ;
-    
+
     #is $got, $contents, "got content";
     ok $got eq $contents, "  got content";
 }
@@ -250,7 +250,7 @@ sub uncompressWith
     compressAloneWithParam "Lc", [ 0 .. 4 ];
     #compressAloneWithParam "Lp", [ 0 .. 4 ];
     compressAloneWithParam "Mode", [ LZMA_MODE_NORMAL, LZMA_MODE_FAST ];
-    compressAloneWithParam "Mf", [ LZMA_MF_HC3, LZMA_MF_HC4, LZMA_MF_BT2, 
+    compressAloneWithParam "Mf", [ LZMA_MF_HC3, LZMA_MF_HC4, LZMA_MF_BT2,
                               LZMA_MF_BT3, LZMA_MF_BT4];
     #compressAloneWithParam "Nice", [ 2 .. 273 ];
     #compressAloneWithParam "Depth", [ 2 .. 273 ];
@@ -268,7 +268,7 @@ sub uncompressWith
             {
                 title "Test EasyEncoder interop with xz, Check $check, Extreme $extreme, Preset $preset" ;
                 compressWith('Compress::Raw::Lzma::EasyEncoder', '-F xz',
-                                Check => $check, 
+                                Check => $check,
                                 Extreme => $extreme,
                                 Preset => $preset);
             }
@@ -281,23 +281,23 @@ my @Filters = (
                 ["Lzma2",               [ Lzma::Filter::Lzma2
                                         ]
                 ],
-                ["x86 + Lzma2",         [ Lzma::Filter::X86, 
+                ["x86 + Lzma2",         [ Lzma::Filter::X86,
                                           Lzma::Filter::Lzma2
                                         ]
                 ],
-                ["x86 + Delta + Lzma2", [ Lzma::Filter::X86, 
+                ["x86 + Delta + Lzma2", [ Lzma::Filter::X86,
                                           Lzma::Filter::Delta,
                                           Lzma::Filter::Lzma2
                                         ]
                 ],
-                ["x86 + Delta + x86 + Lzma2", [ Lzma::Filter::X86, 
+                ["x86 + Delta + x86 + Lzma2", [ Lzma::Filter::X86,
                                           Lzma::Filter::Delta,
                                           Lzma::Filter::X86,
                                           Lzma::Filter::Lzma2
                                         ]
                 ],
               );
-    
+
 {
     # StreamEncoder
 
@@ -308,8 +308,8 @@ my @Filters = (
             my ($name, $filter) = @$f;
             title "Test StreamEncoder interop with xz, Filter '$name' Check $check" ;
             compressWith('Compress::Raw::Lzma::StreamEncoder', '-F xz',
-                                Check => $check, 
-                                Filter => $filter, 
+                                Check => $check,
+                                Filter => $filter,
                             );
         }
     }
@@ -343,7 +343,7 @@ my @Filters = (
     compressStreamWithParam "Lc", [ 0 .. 4 ];
     #compressStreamWithParam "Lp", [ 0 .. 4 ];
     compressStreamWithParam "Mode", [ LZMA_MODE_NORMAL, LZMA_MODE_FAST ];
-    compressStreamWithParam "Mf", [ LZMA_MF_HC3, LZMA_MF_HC4, LZMA_MF_BT2, 
+    compressStreamWithParam "Mf", [ LZMA_MF_HC3, LZMA_MF_HC4, LZMA_MF_BT2,
                               LZMA_MF_BT3, LZMA_MF_BT4];
     #compressStreamWithParam "Nice", [ 2 .. 273 ];
     #compressStreamWithParam "Depth", [ 2 .. 273 ];
@@ -365,7 +365,7 @@ my @Filters = (
         {
             my $xz_value = shift @$xz_values;
             title "test $name with $value";
-            compressWith('Compress::Raw::Lzma::RawEncoder', 
+            compressWith('Compress::Raw::Lzma::RawEncoder',
                 "-F raw $xz_opts=$xz_value",
                 Filter => Lzma::Filter::Lzma2($name, $value)
                 )  ;
@@ -376,7 +376,7 @@ my @Filters = (
     #compressRawWithParam "Lp", [ 0 .. 4 ], "--lzma2=lp";
     compressRawWithParam "Mode", [ LZMA_MODE_NORMAL, LZMA_MODE_FAST ],
                           "--lzma2=mode", ["normal", "fast"];
-    compressRawWithParam "Mf", [ LZMA_MF_HC3, LZMA_MF_HC4, LZMA_MF_BT2, 
+    compressRawWithParam "Mf", [ LZMA_MF_HC3, LZMA_MF_HC4, LZMA_MF_BT2,
                               LZMA_MF_BT3, LZMA_MF_BT4], "--lzma2=mf",
                               [qw(hc3 hc4 bt2 bt3 bt4)];
     #compressRawWithParam "Nice", [ 2 .. 273 ], "--lzma2=nice";

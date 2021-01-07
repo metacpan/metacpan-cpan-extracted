@@ -4,21 +4,21 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.096 qw(:Status);
+use IO::Compress::Base::Common  2.100 qw(:Status);
 use Compress::LZO ;
 
 our ($VERSION, @ISA);
-$VERSION = '2.096';
+$VERSION = '2.100';
 
 
 sub mkUncompObject
 {
     return bless {
                   'CompBytes'    => 0,
-                  'UnCompBytes'  => 0,        
+                  'UnCompBytes'  => 0,
                   'Error'        => '',
                   'ConsumesInput' => 0,
-                 } ;     
+                 } ;
 }
 
 sub uncompr
@@ -29,7 +29,7 @@ sub uncompr
     my $eof  = shift ;
     my $outSize  = shift ;
 
-    return STATUS_OK 
+    return STATUS_OK
         unless length $$from;
 
     $self->{CompBytes} += length $$from;
@@ -98,12 +98,11 @@ sub adler32
 sub sync
 {
     my $self = shift ;
-    #( $self->{Inf}->inflateSync(@_) == BZ_OK) 
-    #        ? STATUS_OK 
+    #( $self->{Inf}->inflateSync(@_) == BZ_OK)
+    #        ? STATUS_OK
     #        : STATUS_ERROR ;
 }
 
 1;
 
 __END__
-

@@ -11,6 +11,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Dist/Mgr.pod',
     LICENSE          => 'perl_5',
     PL_FILES         => {},
+    EXE_FILES        => [qw(bin/distmgr)],
     MIN_PERL_VERSION => '5.006',
     META_MERGE => {
         'meta-spec' => { version => 2 },

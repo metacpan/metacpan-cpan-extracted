@@ -1,0 +1,257 @@
+#!/usr/bin/perl -w
+
+package MupZilla;
+
+use strict;
+use Glib qw(TRUE FALSE);
+use Gtk2;
+use Gtk2::Html2;
+use Gnome2::VFS;
+use Encode;
+
+my $gnomevfsinitialized = FALSE;
+
+use Glib::Object::Subclass
+    Gtk2::Window::,
+    signals => {
+    },
+    properties => [
+    ],
+    ;
+
+sub INIT_INSTANCE {
+	my $self = shift;
+
+	my $vbox = new Gtk2::VBox FALSE, 0;
+	my $toolbar = new Gtk2::HBox FALSE, 6;
+	my $back = new Gtk2::Button '_Back';
+	my $cancel = new Gtk2::Button '_Cancel';
+	my $label = new Gtk2::Label;
+	my $address = new Gtk2::Entry;
+	my $scroller = new Gtk2::ScrolledWindow;
+	my $view = new Gtk2::Html2::View;
+	my $status = new Gtk2::Statusbar;
+
+	my $document = new Gtk2::Html2::Document;
+	$document->signal_connect (request_url => \&request_url, $self);
+	$document->signal_connect (link_clicked => \&link_clicked, $self);
+	$view->set_document ($document);
+
+	$label->set_markup_with_mnemonic ('_Address:');
+	$label->set_mnemonic_widget ($address);
+	$address->signal_connect (activate => sub {
+		my ($entry, $mupzilla) = @_;
+		my $uri = $entry->get_text;
+		if ($uri !~ m{^(https?|file)://}) {
+			$uri = "http://".$uri;
+			$entry->set_text ($uri);
+		}
+		$mupzilla->load_uri ($uri) if $uri;
+	}, $self);
+	$scroller->set_policy (qw(automatic automatic));
+
+	$cancel->signal_connect (clicked => sub {
+		my $str = $document->current_stream;
+		$str->cancel if $str;
+	});
+	$cancel->set_sensitive (FALSE);
+
+	$view->signal_connect (on_url => sub {
+		my ($v, $url) = @_;
+		if ($url) {
+			$status->pop (1) if $status->{current};
+			$status->push (1, $self->mangle_uri ($url));
+			$status->{current} = $url;
+		} else {
+			$status->pop (1);
+			delete $status->{current};
+		}
+	});
+	$status->push (1, '');
+
+#	$toolbar->pack_start ($back, FALSE, FALSE, 0);
+	$toolbar->pack_start ($cancel, FALSE, FALSE, 0);
+	$toolbar->pack_start ($label, FALSE, FALSE, 0);
+	$toolbar->pack_start ($address, TRUE, TRUE, 0);
+	$vbox->pack_start ($toolbar, FALSE, FALSE, 0);
+	$scroller->add ($view);
+	$vbox->pack_start ($scroller, TRUE, TRUE, 0);
+	$vbox->pack_start ($status, FALSE, FALSE, 0);
+	$self->add ($vbox);
+
+	$vbox->show_all;
+
+	$self->{address} = $address;
+	$self->{doc} = $document;
+	$self->{view} = $view;
+	$self->{cancel} = $cancel;
+}
+
+sub vfs_fetch {
+	my %params = (chunk_size => 1024, @_);
+
+	warn "vfs_fetch $params{uri}\n";
+
+	# FIXME this needs to be done with idles or io watches or 
+	# Gnome2::VFS::Async or something
+
+	my ($result, $handle) = Gnome2::VFS->open ($params{uri}, 'read');
+	return $result unless $result eq 'ok';
+
+	my (undef, $info) = $handle->get_file_info("default");
+
+	$params{prepared}->($handle, $info);
+
+	do {
+		my ($tmp, $nread);
+		($result, $nread, $tmp) = $handle->read ($params{chunk_size});
+		$params{read_chunk}->($handle, $tmp);
+	} while ($result eq 'ok');
+
+	warn "calling finish";
+	$params{finish}->($handle);
+
+	$result = $handle->close;
+
+#	{
+#	my ($result, $handle) = Gnome2::VFS::Async->create
+#					($params{uri},	# text uri
+#					 'read',	# open mode
+#					 TRUE,		# exclusive
+#					 'user-read',	# perm
+#					 0,		# priority
+#					 sub {
+#						 warn "func @_\n",
+#					 },
+#					 []);
+#	}
+}
+
+use Data::Dumper;
+
+sub mangle_uri {
+	my ($self, $uri) = @_;
+	# mangle it to be a full url.  FIXME this is terrible.
+	return $uri if $uri =~ m{://};
+	if ($self->{base_uri}) {
+		$uri = $self->{base_uri}->get_scheme . "://"
+		     . ($self->{base_uri}->get_host_name || '')
+		     . ($uri =~ m{^/}
+		        ? ''
+		        : $self->{base_uri}->extract_dirname . '/'
+		        )
+		     . $uri;
+	} else {
+		$uri = $self->{uri}."/".$uri;
+	}
+	return $uri;
+}
+
+sub clear {
+	my $self = shift;
+	$self->{view}->set_document (undef);
+	$self->{doc}->clear;
+	$self->{view}->set_document ($self->{doc});
+}
+
+sub request_url {
+	my ($document, $url, $stream, $mupzilla) = @_;
+
+	# defer to idle for more responsive incremental page loading.
+	Glib::Idle->add (sub {
+		my $result = vfs_fetch (
+			uri => $mupzilla->mangle_uri ($url),
+			prepared => sub {
+				my ($handle, $info) = @_;
+				$stream->set_mime_type ($info->get_mime_type);
+				$stream->set_cancel_func (sub {
+					warn "request_url cancelled\n";
+					$handle->close;
+				});
+			},
+			read_chunk => sub {
+				$stream->write ($_[1])
+					if length $_[1] > 0;
+				Gtk2->main_iteration
+					while Gtk2->events_pending;
+			},
+			finish => sub { warn "finish"; $stream->close; },
+		);
+		# silently ignore errors.
+		warn "# silently ignore errors. -- $result\n"
+			unless $result eq 'ok';
+		return FALSE;
+	});
+}
+
+sub link_clicked {
+	my ($document, $url, $mupzilla) = @_;
+	warn "link_clicked $url\n";
+	$mupzilla->load_uri ($mupzilla->mangle_uri ($url));
+}
+
+sub load_uri {
+	my ($self, $uri) = @_;
+	warn "load_uri $uri\n";
+
+	if (not $gnomevfsinitialized) {
+		Gnome2::VFS->init;
+		$gnomevfsinitialized = TRUE;
+	}
+
+	my $result = vfs_fetch (
+		uri => $uri,
+		prepared => sub {
+			my ($handle, $info) = @_;
+			$self->clear;
+			$self->{doc}->open_stream ("text/html");
+			$self->{doc}->current_stream->set_cancel_func (sub {
+				# XXX should close the VFS object here, too,
+				# but we don't have a ref to it.
+				warn "should cancel the vfs fetch";
+				$handle->close;
+			});
+			$self->{uri} = $uri;
+			$self->{base_uri} = 
+				Gnome2::VFS::URI->new ($uri);
+		},
+		read_chunk => sub {
+			Encode::_utf8_on ($_[1]);
+			$self->{doc}->write_stream ($_[1])
+				if length $_[1];
+			Gtk2->main_iteration
+				while Gtk2->events_pending;
+		},
+		finish => sub {
+			warn "finish";
+			$self->{doc}->close_stream;
+			$self->{cancel}->set_sensitive (FALSE);
+		},
+	);
+	if ($result ne 'ok') {
+		my $msg = Gtk2::MessageDialog->new
+					($self, [], 'error', 'ok',
+					 "Cannot open $uri: $result");
+		$msg->run;
+		$msg->destroy;
+		return;
+	} else {
+		$self->{address}->set_text ($uri);
+		$self->{cancel}->set_sensitive (TRUE);
+	}
+}
+
+package main;
+
+use strict;
+use Gtk2 -init;
+
+my $mupzilla = new MupZilla;
+$mupzilla->set_default_size (600, 400);
+$mupzilla->show;
+$mupzilla->signal_connect (delete_event => sub {Gtk2->main_quit;});
+
+$mupzilla->load_uri ($ARGV[0])
+	if @ARGV;
+
+Gtk2->main;

@@ -8,11 +8,13 @@ use Types::Common::String qw(NonEmptySimpleStr);
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
 
+use Form::Tiny::Utils;
 use Form::Tiny::Error;
+use Form::Tiny::PathValue;
 
 use namespace::clean;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 our $nesting_separator = q{.};
 our $array_marker = q{*};
@@ -48,6 +50,13 @@ has "adjust" => (
 	writer => "set_adjustment",
 );
 
+has "default" => (
+	is => "ro",
+	isa => CodeRef,
+	predicate => 1,
+	writer => "set_default",
+);
+
 has "message" => (
 	is => "ro",
 	isa => Str,
@@ -68,9 +77,15 @@ sub BUILD
 
 		# checks for coercion == 1
 		my $t = $self->type;
-		croak "the type doesn't provide coercion"
+		croak "type doesn't provide coercion"
 			if !$self->has_type
 			|| !($t->can("coerce") && $t->can("has_coercion") && $t->has_coercion);
+	}
+
+	if ($self->has_default) {
+
+		croak "default value for an array field is unsupported"
+			if scalar grep { $_ eq $array_marker } $self->get_name_path;
 	}
 
 	if ($self->is_subform && !$self->is_adjusted) {
@@ -103,18 +118,32 @@ sub hard_required
 
 sub get_coerced
 {
-	my ($self, $value) = @_;
+	my ($self, $form, $value) = @_;
 
 	my $coerce = $self->coerce;
-	if (ref $coerce eq "CODE") {
-		return $coerce->($value);
+	my $coerced = $value;
+
+	my $error = try sub {
+		if (ref $coerce eq "CODE") {
+			$coerced = $coerce->($value);
+		}
+		elsif ($coerce) {
+			$coerced = $self->type->coerce($value);
+		}
+	};
+
+	if ($error) {
+		$form->add_error(
+			Form::Tiny::Error::DoesNotValidate->new(
+				{
+					field => $self->name,
+					error => $self->has_message ? $self->message : $error,
+				}
+			)
+		);
 	}
-	elsif ($coerce) {
-		return $self->type->coerce($value);
-	}
-	else {
-		return $value;
-	}
+
+	return $coerced;
 }
 
 sub get_adjusted
@@ -125,6 +154,25 @@ sub get_adjusted
 		return $self->adjust->($value);
 	}
 	return $value;
+}
+
+sub get_default
+{
+	my ($self, $form) = @_;
+
+	if ($self->has_default) {
+		my $default = $self->default->($form);
+		if (!$self->has_type || $self->type->check($default)) {
+			return Form::Tiny::PathValue->new(
+				path => [$self->get_name_path],
+				value => $default,
+			);
+		}
+
+		croak 'invalid default value was set';
+	}
+
+	croak 'no default value set but was requested';
 }
 
 sub validate
@@ -252,6 +300,16 @@ B<predicate:> I<is_adjusted>
 
 B<writer:> I<set_adjustment>
 
+=head2 default
+
+A coderef returning the default value for the field. Will be used when the field is not present in the input at all. Making the field hard-required will make the default value be used in place of undefined / empty value as well.
+
+This coderef will be passed form instance as the only argument and is expected to return a scalar value.
+
+B<predicate>: I<has_default>
+
+B<writer>: I<set_default>
+
 =head2 message
 
 If type class error messages are not helpful enough, you can specify your own message string which will be inserted into form errors if the validation for the field fails.
@@ -287,6 +345,10 @@ Coerces and returns a scalar value, according to the definition.
 =head2 get_adjusted
 
 Adjusts and returns a scalar value, according to the definition.
+
+=head2 get_default
+
+Returns a L<Form::Tiny::PathValue> object with the default value for this field definition.
 
 =head2 validate
 

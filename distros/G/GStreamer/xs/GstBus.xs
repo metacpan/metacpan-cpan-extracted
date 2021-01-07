@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -67,6 +66,10 @@ bus_watch (GstBus *bus, GstMessage *message, gpointer data)
 }
 
 MODULE = GStreamer::Bus	PACKAGE = GStreamer::Bus	PREFIX = gst_bus_
+
+=for object GStreamer::Bus Asynchronous message bus subsystem
+
+=cut
 
 # GstBus * gst_bus_new (void);
 GstBus * gst_bus_new (class)

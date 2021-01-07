@@ -1,0 +1,140 @@
+2004/10/24 11:55 (-0400) rwmcfa1
+
+	* MANIFEST.SKIP: updates
+
+	* perl-Gtk2-Html2.spec.in: new scheme that addresses x86_64 problems
+	found by Carl Nygard
+
+2004-09-02 22:52 (-0400) muppetman
+
+	* examples/mupzilla, AUTHORS: apply patch from Pozsar Balazs to
+	fix some minor issues, and allow file:// urls.
+
+2004-05-06 22:47 (-0400) muppetman
+
+	* Html2.pm, README, NEWS: alpha release 0.04
+
+	* Html2, README: commentary
+
+	* Makefile.PL: minor cleanups
+
+2004-04-24 21:35 (-0400) muppetman
+
+	A .cvsignore
+	M xs/.cvsignore
+	  update the ignores
+
+2004-04-24 21:00 (-0400) muppetman
+
+	imported everything to sourceforge cvs from tarballs.  the changelog
+	entries from here to the end are from my old cvs repository.
+
+2004-04-18 22:41  scott
+
+	* xs/HtmlStream.xs: remove unused function warnings, with
+	  commentary
+
+2004-04-18 22:26  scott
+
+	* Makefile.PL: reduce requirement to gtkhtml2 2.0.0
+
+2004-04-18 22:17  scott
+
+	* xs/HtmlView.xs: commentary
+
+2004-04-18 22:17  scott
+
+	* examples/mupzilla: update the statusbar when hovering a link.
+	  fix bugs in uri mangling.  clean up stderr.  still has
+	  performance problems, needs to use vfs async, i think.  will
+	  crash if you try to cancel an image load, cancellation needs
+	  work.
+
+2004-04-06 14:47  scott
+
+	* Html2.pm, NEWS, README: alpha release 0.03
+
+2004-04-06 14:46  scott
+
+	* xs/GtkHtml2.xs: credit myself
+
+2004-04-04 12:43  scott
+
+	* examples/mupzilla: add a cancel button and test drive the
+	  freshly-bound stream-cancellation stuff.
+
+2004-04-04 12:43  scott
+
+	* xs/HtmlStream.xs: implement stream cancellation hooks
+
+2004-04-04 12:43  scott
+
+	* xs/HtmlDocument.xs: accessor for current_stream
+
+2004-04-04 12:43  scott
+
+	* perl-Gtk2-Html2.spec.in: use the proper rpm name for gtkhtml2
+
+2004-04-01 11:22  scott
+
+	* README: forgot to update this
+
+2004-04-01 11:20  scott
+
+	* Html2.pm, NEWS: release 0.02.
+
+2004-04-01 11:20  scott
+
+	* Makefile.PL, perl-Gtk2-Html2.spec.in: various things to make
+	  building rpms work.  require stable Glib.
+
+2004-03-10 01:18  scott
+
+	* Html2.pm: add pod
+
+2004-03-10 01:18  scott
+
+	* MANIFEST: oops, forgot to update the manifest when i replaced
+	  examples
+
+2004-03-10 01:09  scott
+
+	* TODO, genmaps.pl, perl-Gtk2-Html2.spec.in: wipe out references to
+	  canvas... nasty copy'n'paste coding.	:-/
+
+2004-03-10 00:57  scott
+
+	* NEWS, README: doc fixes
+
+2004-03-10 00:51  scott
+
+	* maps, xs/HtmlDocument.xs, xs/HtmlStream.xs: fix things found
+	  while writing mupzilla.
+
+2004-03-10 00:51  scott
+
+	* examples/mupzilla: totally new example, functional (if slow and
+	  crappy) web browser
+
+2004-03-10 00:51  scott
+
+	* examples/browser-window.pl: ugly example, don't want to port that
+
+2004-03-09 22:02  scott
+
+	* AUTHORS, Html2.pm, LICENSE, MANIFEST, MANIFEST.SKIP, META.yml,
+	  Makefile.PL, NEWS, README, TODO, genmaps.pl, gtkhtml2perl.h,
+	  maps, perl-Gtk2-Html2.spec.in, examples/browser-window.pl,
+	  examples/simple.pl, t/01.t, xs/.cvsignore, xs/GtkHtml2.xs,
+	  xs/GtkHtmlContext.xs, xs/HtmlDocument.xs, xs/HtmlStream.xs,
+	  xs/HtmlView.xs: Initial revision
+
+2004-03-09 22:02  scott
+
+	* AUTHORS, Html2.pm, LICENSE, MANIFEST, MANIFEST.SKIP, META.yml,
+	  Makefile.PL, NEWS, README, TODO, genmaps.pl, gtkhtml2perl.h,
+	  maps, perl-Gtk2-Html2.spec.in, examples/browser-window.pl,
+	  examples/simple.pl, t/01.t, xs/.cvsignore, xs/GtkHtml2.xs,
+	  xs/GtkHtmlContext.xs, xs/HtmlDocument.xs, xs/HtmlStream.xs,
+	  xs/HtmlView.xs: initial import
+

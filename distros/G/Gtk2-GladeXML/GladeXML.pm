@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Glade/GladeXML.pm,v 1.32 2008/09/07 20:10:48 kaffeetisch Exp $
+# $Id$
 #
 # Based strongly on gtk-perl's GladeXML
 #
@@ -16,7 +16,7 @@ require DynaLoader;
 
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '1.007';
+our $VERSION = '1.008';
 
 sub import {
 	my $class = shift;
@@ -119,7 +119,8 @@ __END__
 
 =head1 NAME
 
-Gtk2::GladeXML - Create user interfaces directly from Glade XML files.
+Gtk2::GladeXML - (DEPRECATED) Create user interfaces directly from Glade XML
+files.
 
 =head1 SYNOPSIS
 
@@ -128,7 +129,7 @@ Gtk2::GladeXML - Create user interfaces directly from Glade XML files.
   use Gtk2::GladeXML;
   $gladexml = Gtk2::GladeXML->new('example.glade');
   $gladexml->signal_autoconnect_from_package('main');
-  $quitbtn = $gladexml->get_widget('Quit'); 
+  $quitbtn = $gladexml->get_widget('Quit');
   Gtk2->main;
 
   # for glade files using gnome widgets, you must initialize Gnome2
@@ -142,11 +143,56 @@ Gtk2::GladeXML - Create user interfaces directly from Glade XML files.
 
 =head1 ABSTRACT
 
-Gtk2::GladeXML allows Perl programmers to use libglade, a C library which
-generates graphical user interfaces directly from the XML output of the
-Glade user interface designer.
+B<DEPRECATED> Gtk2::GladeXML allows Perl programmers to use libglade, a C
+library which generates graphical user interfaces directly from the XML output
+of the Glade user interface designer.
 
 =head1 DESCRIPTION
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gtk2-gladexml
+
+=item *
+
+Upstream URL: https://gitlab.gnome.org/Archive/libglade
+
+=item *
+
+Last upstream version: 2.6.4
+
+=item *
+
+Last upstream release date: 2009-03-17
+
+=item *
+
+Migration path for this module: Gtk3::Builder
+
+=item *
+
+Migration module URL: https://metacpan.org/pod/Gtk3
+
+=back
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
 
 Glade is a free user interface builder for GTK+ and GNOME.  After designing
 a user interface with glade-2 the layout and configuration are saved in an
@@ -157,7 +203,7 @@ This extension module binds libglade to Perl so you can create and manipulate
 user interfaces in Perl code in conjunction with Gtk2 and even Gnome2.  Better
 yet you can load a file's contents into a PERL scalar do a few magical regular
 expressions to customize things and the load up the app. It doesn't get any
-easier. 
+easier.
 
 =head1 FUNCTIONS
 
@@ -319,8 +365,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the 
-Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
-Boston, MA  02111-1307  USA.
+License along with this library; if not, see
+<https://www.gnu.org/licenses/>.
 
 =cut

@@ -1,10 +1,10 @@
 {
-   "abstract" : "Perl interface to version 0.10.x of the GStreamer library",
+   "abstract" : "(DEPRECATED) Perl interface to version 0.10.x of the GStreamer",
    "author" : [
       "gtk2-perl Team <gtk-perl-list at gnome dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "lgpl_2_1"
    ],
@@ -21,20 +21,7 @@
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
-         "requires" : {
-            "ExtUtils::Depends" : "0.205",
-            "ExtUtils::MakeMaker" : "0",
-            "ExtUtils::PkgConfig" : "1.07",
-            "Glib" : "1.180"
-         }
-      },
-      "runtime" : {
          "requires" : {
             "ExtUtils::Depends" : "0.205",
             "ExtUtils::PkgConfig" : "1.07",
@@ -54,10 +41,11 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://git.gnome.org/perl-GStreamer",
-         "web" : "http://git.gnome.org/browse/perl-GStreamer"
+         "url" : "https://gitlab.gnome.org/GNOME/perl-gstreamer.git",
+         "web" : "https://gitlab.gnome.org/GNOME/perl-gstreamer"
       },
       "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
    },
-   "version" : "0.20"
+   "version" : "0.21",
+   "x_deprecated" : 1
 }

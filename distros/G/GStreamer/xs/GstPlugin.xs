@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -61,6 +60,10 @@ gst2perl_plugin_filter (GstPlugin *plugin,
 /* ------------------------------------------------------------------------- */
 
 MODULE = GStreamer::Plugin	PACKAGE = GStreamer::Plugin	PREFIX = gst_plugin_
+
+=for object GStreamer::Plugin Container for features loaded from a shared object module
+
+=cut
 
 const gchar* gst_plugin_get_name (GstPlugin *plugin);
 

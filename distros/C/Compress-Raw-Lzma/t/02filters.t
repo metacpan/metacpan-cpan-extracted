@@ -15,7 +15,7 @@ use CompTestUtils;
 
 my $XZ ;
 
-BEGIN 
+BEGIN
 {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
@@ -31,7 +31,7 @@ BEGIN
 {
     title "BCJ";
 
-    my @filters = map { "Lzma::Filter::$_" } 
+    my @filters = map { "Lzma::Filter::$_" }
                   qw(X86 PowerPC IA64 ARM ARMThumb Sparc);
 
     for my $filter (@filters)
@@ -40,7 +40,7 @@ BEGIN
         my $x = &{ $filter } ;
         isa_ok $x, $filter;
         isa_ok $x, 'Lzma::Filter::BCJ';
-        isa_ok $x, 'Lzma::Filter';    
+        isa_ok $x, 'Lzma::Filter';
     }
 
     isa_ok Lzma::Filter::X86, "Lzma::Filter::X86";
@@ -52,14 +52,14 @@ BEGIN
     {
         my $x = Lzma::Filter::Delta;
         isa_ok $x, 'Lzma::Filter::Delta';
-        isa_ok $x, 'Lzma::Filter';    
+        isa_ok $x, 'Lzma::Filter';
     }
 
     {
         my $x = Lzma::Filter::Delta Type => LZMA_DELTA_TYPE_BYTE,
                                     Distance => LZMA_DELTA_DIST_MAX  ;
         isa_ok $x, 'Lzma::Filter::Delta';
-        isa_ok $x, 'Lzma::Filter';    
+        isa_ok $x, 'Lzma::Filter';
     }
 
     # TODO -- add error cases
@@ -69,7 +69,7 @@ BEGIN
 {
     title "Lzma";
 
-    my @filters = map { "Lzma::Filter::$_" } 
+    my @filters = map { "Lzma::Filter::$_" }
                   qw(Lzma1 Lzma2);
 
     for my $filter (@filters)
@@ -79,11 +79,11 @@ BEGIN
         my $x = $filter->();
         isa_ok $x, $filter;
         isa_ok $x, 'Lzma::Filter::Lzma';
-        isa_ok $x, 'Lzma::Filter';    
+        isa_ok $x, 'Lzma::Filter';
     }
 
     {
-        my $x = Lzma::Filter::Lzma2 
+        my $x = Lzma::Filter::Lzma2
                 DictSize   => 1024 * 1024 * 100,
                 Lc         => 0,
                 Lp         => 3,
@@ -94,7 +94,7 @@ BEGIN
                 Depth      => 77;
 
         isa_ok $x, 'Lzma::Filter::Lzma2';
-        isa_ok $x, 'Lzma::Filter';    
+        isa_ok $x, 'Lzma::Filter';
     }
 
     use constant oneK => 1024;
@@ -119,7 +119,7 @@ BEGIN
                 my $x = $filter->($name => $value, @$other);
                 isa_ok $x, $filter;
                 isa_ok $x, 'Lzma::Filter::Lzma';
-                isa_ok $x, 'Lzma::Filter';    
+                isa_ok $x, 'Lzma::Filter';
             }
 
             for my $value (@$bad_range)
@@ -135,39 +135,38 @@ BEGIN
         }
     }
 
-    testParam "DictSize", 
-              [ 4 * oneK,  1536 * oneMeg ], 
+    testParam "DictSize",
+              [ 4 * oneK,  1536 * oneMeg ],
               [ (4 * oneK) - 1, (1536 * oneMeg) + 1 ],
               "Dictsize %d not in range 4KiB - 1536Mib" ;
 
-    testParam "Lc", 
+    testParam "Lc",
               [ 0 .. 4 ],
               [ 5 .. 10 ],
               "Lc %d not in range 0-4" ;
 
-    testParam "Lp", 
+    testParam "Lp",
               [ 0 .. 4 ],
               [ 5 .. 10 ],
               "Lp %d not in range 0-4",
                [Lc => 0] ;
 
-    testParam "Mode", 
+    testParam "Mode",
               [ LZMA_MODE_NORMAL, LZMA_MODE_FAST ],
               [ 5 .. 10 ],
               "Mode %d not LZMA_MODE_FAST or LZMA_MODE_NORMAL" ;
 
-    testParam "Mf", 
-              [ LZMA_MF_HC3, LZMA_MF_HC4, LZMA_MF_BT2, 
+    testParam "Mf",
+              [ LZMA_MF_HC3, LZMA_MF_HC4, LZMA_MF_BT2,
                 LZMA_MF_BT3, LZMA_MF_BT4],
               [ 100, 300 ],
               "Mf %d not valid" ;
 
 
-    testParam "Nice", 
+    testParam "Nice",
               [ 2 .. 273 ],
               [ 0, 1, 274 ],
               "Nice %d not in range 2-273" ;
 
 
 }
-

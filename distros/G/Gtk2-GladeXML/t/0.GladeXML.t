@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Glade/t/0.GladeXML.t,v 1.6 2004/09/15 03:31:05 muppetman Exp $
+# $Id$
 #
 
 #########################

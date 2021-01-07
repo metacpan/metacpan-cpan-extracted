@@ -14,8 +14,8 @@ use bytes;
 use Test::More ;
 use CompTestUtils;
 
-BEGIN 
-{ 
+BEGIN
+{
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
@@ -48,7 +48,7 @@ sub myXzReadFile
     $data = $init if defined $init ;
     1 while $fil->read($data) > 0;
     my $status = $fil->error() . "" ;
-    #ok ! $fil->error(), "  no error" 
+    #ok ! $fil->error(), "  no error"
     #    or diag "$$UnError " ;
 
     $fil->close ;
@@ -175,14 +175,14 @@ EOM
                 my $xz ;
                 SKIP:
                 {
-                    $xz = new IO::Compress::Xz($name, 
+                    $xz = new IO::Compress::Xz($name,
                                                Check => $check,
                                                Extreme => $extreme,
                                                Preset => $preset
                                               ) ;
                     skip "Not enough memory - Check $check, Extreme $extreme, Preset $preset", 5
                         if  memError($IO::Compress::Xz::XzError);
-                    
+
                     ok $xz, "  xz object ok";
                     isa_ok $xz, "IO::Compress::Xz";
                     my $status = $xz->write($hello);
@@ -224,7 +224,3 @@ EOM
 
 
 1;
-
-
-
-

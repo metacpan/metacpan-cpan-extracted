@@ -4,7 +4,7 @@ use v5.10;
 use warnings;
 use Moo::Role;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 requires qw(validate check);
 

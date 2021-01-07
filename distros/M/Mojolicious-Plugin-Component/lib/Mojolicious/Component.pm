@@ -48,8 +48,14 @@ method render(Any %args) {
     }
   }
   return $self->template->render(($template || ''), {
-    %args, component => $self,
+    $self->variables(%args), component => $self,
   });
+}
+
+method variables(Any %args) {
+  (
+    %args,
+  )
 }
 
 1;
@@ -79,6 +85,19 @@ Module-based Template Base Class
   has height => 126;
   has width => 145;
   has src => '/random.gif';
+
+  1;
+
+  # __DATA__
+  #
+  # @@ component
+  #
+  # <img
+  #   alt="<%= $component->alt %>"
+  #   height="<%= $component->height %>"
+  #   src="<%= $component->src %>"
+  #   width="<%= $component->width %>"
+  # />
 
   package main;
 
@@ -158,6 +177,43 @@ object available via L</template>.
   my $rendered = $component->render(
     readonly => 1,
   );
+
+=back
+
+=cut
+
+=head2 variables
+
+  variables(Any %args) : (Any)
+
+The variables method is called automatically during template rendering and its
+return value, assumed to be key-value pairs, are passed to the template
+rendering method as template variables. Any key-value pairs passed to the
+L</render> method will be passed to this method making this method, if
+overridden, the ideal place to set component template variable defaults and/or
+override existing variables.
+
+=over 4
+
+=item variables example #1
+
+  # given: synopsis
+
+  my $variables = {
+    $component->variables
+  };
+
+=back
+
+=over 4
+
+=item variables example #2
+
+  # given: synopsis
+
+  my $variables = {
+    $component->variables(true => 1, false => 0)
+  };
 
 =back
 

@@ -4,6 +4,7 @@
 #  one using OpenGL.pm (this one)
 #  one using SDL::OpenGL
 #  one using PDL::Graphics::OpenGL
+#  one using OpenGL::Simple
 # It's main purpose is to show how different OpenGL-implementations in perl
 # differ.
 

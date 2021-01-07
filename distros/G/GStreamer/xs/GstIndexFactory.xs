@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -22,6 +21,10 @@
 #include "gst2perl.h"
 
 MODULE = GStreamer::IndexFactory	PACKAGE = GStreamer::IndexFactory	PREFIX = gst_index_factory_
+
+=for object GStreamer::IndexFactory Create GstIndexes from a factory
+
+=cut
 
 # GstIndexFactory * gst_index_factory_new (const gchar *name, const gchar *longdesc, GType type);
 GstIndexFactory *

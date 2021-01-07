@@ -1,6 +1,6 @@
 
 use lib 't';
- 
+
 use strict;
 use warnings;
 use bytes;
@@ -63,11 +63,11 @@ sub run
                                            @anyUnLz,
                                            Append => 1  ;
 
-                ok $unc, "  Created $AnyClass object" 
+                ok $unc, "  Created $AnyClass object"
                     or print "# $$AnyError\n";
                 my $uncomp ;
                 1 while  $unc->read($uncomp) > 0 ;
-                #ok $unc->read($uncomp) > 0 
+                #ok $unc->read($uncomp) > 0
                 #    or print "# $$AnyError\n";
                 my $y;
                 is $unc->read($y, 1), 0, "  at eof" ;
@@ -83,11 +83,11 @@ sub run
                                            @anyUnLz,
                                            Append => 1  ;
 
-                ok $unc, "  Created $AnyClass object" 
+                ok $unc, "  Created $AnyClass object"
                     or print "# $$AnyError\n";
                 my $uncomp ;
                 1 while  $unc->read($uncomp, 100) > 0 ;
-                #ok $unc->read($uncomp) > 0 
+                #ok $unc->read($uncomp) > 0
                 #    or print "# $$AnyError\n";
                 my $y;
                 is $unc->read($y, 1), 0, "  at eof" ;

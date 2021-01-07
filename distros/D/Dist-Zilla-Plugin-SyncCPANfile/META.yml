@@ -1,0 +1,38 @@
+---
+abstract: 'Sync a cpanfile with the prereqs listed in dist.ini'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires:
+  Exporter: '0'
+  Module::CPANfile: '0'
+  Pod::Coverage::TrustPod: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-SyncCPANfile
+provides:
+  Dist::Zilla::Plugin::SyncCPANfile:
+    file: lib/Dist/Zilla/Plugin/SyncCPANfile.pm
+    version: '0.01'
+requires:
+  Dist::Zilla: '6'
+  Moose: '2'
+  Path::Tiny: '0'
+  namespace::clean: '0.27'
+  perl: '5.010001'
+resources:
+  bugtracker: http://github.com/perlservices/Dist-Zilla-Plugin-SyncCPANfile/issues
+  homepage: http://github.com/perlservices/Dist-Zilla-Plugin-SyncCPANfile
+  repository: git://github.com/perlservices/Dist-Zilla-Plugin-SyncCPANfile.git
+version: '0.01'
+x_contributors:
+  - 'reneeb <info@perl-services.de>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_spdx_expression: Artistic-2.0

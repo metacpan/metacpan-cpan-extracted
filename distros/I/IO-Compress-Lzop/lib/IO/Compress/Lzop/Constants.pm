@@ -8,7 +8,7 @@ require Exporter;
 
 our ($VERSION, @ISA, @EXPORT);
 
-$VERSION = '2.096';
+$VERSION = '2.100';
 
 @ISA = qw(Exporter);
 
@@ -78,7 +78,7 @@ $VERSION = '2.096';
 
     FLAG_CRC_COMP
     FLAG_CRC_UNCOMP
-    
+
 
 );
 
@@ -94,7 +94,7 @@ use constant M_NRV2B         => 0x2b;
 use constant M_NRV2D         => 0x2d;
 use constant M_ZLIB          =>  128;
 
-# header flags 
+# header flags
 use constant F_ADLER32_D     => 0x00000001;
 use constant F_ADLER32_C     => 0x00000002;
 use constant F_STDIN         => 0x00000004;
@@ -111,7 +111,7 @@ use constant F_H_CRC32       => 0x00001000;
 use constant F_H_PATH        => 0x00002000;
 use constant F_MASK          => 0x00003FFF;
 
-use constant F_OS_FAT        => 0x00000000;     # DOS, OS2, Win95 
+use constant F_OS_FAT        => 0x00000000;     # DOS, OS2, Win95
 use constant F_OS_AMIGA      => 0x01000000;
 use constant F_OS_VMS        => 0x02000000;
 use constant F_OS_UNIX       => 0x03000000;
@@ -125,14 +125,14 @@ use constant F_OS_TOPS20     => 0x0a000000;
 use constant F_OS_NTFS       => 0x0b000000;     # Win NT/2000/XP
 use constant F_OS_QDOS       => 0x0c000000;
 use constant F_OS_ACORN      => 0x0d000000;
-use constant F_OS_VFAT       => 0x0e000000;     # Win32 
+use constant F_OS_VFAT       => 0x0e000000;     # Win32
 use constant F_OS_MFS        => 0x0f000000;
 use constant F_OS_BEOS       => 0x10000000;
 use constant F_OS_TANDEM     => 0x11000000;
 use constant F_OS_SHIFT      => 24;
 use constant F_OS_MASK       => 0xff000000;
 
-# character set for file name encoding [mostly unused] 
+# character set for file name encoding [mostly unused]
 use constant F_CS_NATIVE     => 0x00000000;
 use constant F_CS_LATIN1     => 0x00100000;
 use constant F_CS_DOS        => 0x00200000;
@@ -152,4 +152,3 @@ use constant FLAG_CRC_UNCOMP  => F_ADLER32_D | F_CRC32_D ;
 
 
 1;
-

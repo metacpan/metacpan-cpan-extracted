@@ -5,16 +5,16 @@ use warnings;
 require Exporter ;
 use bytes;
 
-use IO::Compress::Base 2.096 ;
+use IO::Compress::Base 2.100 ;
 
-use IO::Compress::Base::Common  2.096 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Zstd 2.096 ;
+use IO::Compress::Base::Common  2.100 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Zstd 2.100 ;
 use Compress::Stream::Zstd qw(ZSTD_MAX_CLEVEL);
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $ZstdError);
 
-$VERSION = '2.099';
+$VERSION = '2.100';
 $ZstdError = '';
 
 @ISA    = qw( IO::Compress::Base Exporter );
@@ -120,7 +120,7 @@ IO::Compress::Zstd - Write zstd files/buffers
     my $status = zstd $input => $output [,OPTS]
         or die "zstd failed: $ZstdError\n";
 
-    my $z = new IO::Compress::Zstd $output [,OPTS]
+    my $z = IO::Compress::Zstd->new( $output [,OPTS] )
         or die "zstd failed: $ZstdError\n";
 
     $z->print($string);
@@ -395,7 +395,7 @@ compressed data to a buffer, C<$buffer>.
     use IO::Compress::Zstd qw(zstd $ZstdError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt"
+    my $input = IO::File->new( "<file1.txt" )
         or die "Cannot open 'file1.txt': $!\n" ;
     my $buffer ;
     zstd $input => \$buffer
@@ -432,7 +432,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for C<IO::Compress::Zstd> is shown below
 
-    my $z = new IO::Compress::Zstd $output [,OPTS]
+    my $z = IO::Compress::Zstd->new( $output [,OPTS] )
         or die "IO::Compress::Zstd failed: $ZstdError\n";
 
 It returns an C<IO::Compress::Zstd> object on success and undef on failure.
@@ -764,7 +764,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2020 Paul Marquess. All rights reserved.
+Copyright (c) 2019-2021 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

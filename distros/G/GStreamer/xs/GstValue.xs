@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -483,6 +482,10 @@ gst2perl_date_initialize (void)
 /* ------------------------------------------------------------------------- */
 
 MODULE = GStreamer::Value	PACKAGE = GStreamer::Value	PREFIX = gst_value_
+
+=for object GStreamer::Value GValue implementations specific to GStreamer
+
+=cut
 
 BOOT:
 	gst2perl_fourcc_initialize ();

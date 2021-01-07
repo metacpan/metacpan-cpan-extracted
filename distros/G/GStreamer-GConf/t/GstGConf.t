@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More tests => 8;
 
-# $Id: GstGConf.t,v 1.1 2005/08/13 17:22:58 kaffeetisch Exp $
+# $Id$
 
 use GStreamer -init;
 use GStreamer::GConf;

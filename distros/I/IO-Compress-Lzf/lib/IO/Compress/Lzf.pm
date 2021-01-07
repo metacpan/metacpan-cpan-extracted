@@ -5,15 +5,15 @@ use warnings;
 require Exporter ;
 use bytes;
 
-use IO::Compress::Base 2.096 ;
+use IO::Compress::Base 2.100 ;
 
-use IO::Compress::Base::Common  2.096 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzf  2.096 ;
+use IO::Compress::Base::Common  2.100 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzf  2.100 ;
 #use Compress::Lzf ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzfError);
 
-$VERSION = '2.096';
+$VERSION = '2.100';
 $LzfError = '';
 
 @ISA    = qw( IO::Compress::Base Exporter );
@@ -36,7 +36,7 @@ sub lzf
     return $obj->_def(@_);
 }
 
-sub mkHeader 
+sub mkHeader
 {
     my $self = shift ;
     my $param = shift ;
@@ -49,7 +49,7 @@ sub ckParams
 {
     my $self = shift ;
     my $got = shift;
-    
+
     return 1 ;
 }
 
@@ -66,8 +66,8 @@ sub mkComp
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
 
-    return $obj;    
-                                          
+    return $obj;
+
 }
 
 
@@ -123,7 +123,7 @@ IO::Compress::Lzf - Write lzf files/buffers
     my $status = lzf $input => $output [,OPTS]
         or die "lzf failed: $LzfError\n";
 
-    my $z = new IO::Compress::Lzf $output [,OPTS]
+    my $z = IO::Compress::Lzf->new( $output [,OPTS] )
         or die "lzf failed: $LzfError\n";
 
     $z->print($string);
@@ -403,7 +403,7 @@ compressed data to a buffer, C<$buffer>.
     use IO::Compress::Lzf qw(lzf $LzfError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt"
+    my $input = IO::File->new( "<file1.txt" )
         or die "Cannot open 'file1.txt': $!\n" ;
     my $buffer ;
     lzf $input => \$buffer
@@ -440,7 +440,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for C<IO::Compress::Lzf> is shown below
 
-    my $z = new IO::Compress::Lzf $output [,OPTS]
+    my $z = IO::Compress::Lzf->new( $output [,OPTS] )
         or die "IO::Compress::Lzf failed: $LzfError\n";
 
 It returns an C<IO::Compress::Lzf> object on success and undef on failure.
@@ -764,8 +764,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2021 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

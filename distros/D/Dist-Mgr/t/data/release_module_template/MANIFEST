@@ -1,4 +1,3 @@
-.github/workflows/github_ci_default.yml
 Changes
 lib/Acme/STEVEB.pm
 Makefile.PL

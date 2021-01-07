@@ -17,7 +17,7 @@ BEGIN {
     #    if 1;
 
     plan(skip_all => "needs Perl 5.6 or better - you have Perl $]" )
-        if $] < 5.006 ;    
+        if $] < 5.006 ;
 }
 use bytes;
 use warnings;
@@ -36,7 +36,7 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
 
     writeWithP7Zip($outfile, $content, "-mm=Lzma")
         or return 0;
-    
+
     my $got ;
     readWithP7Zip($outfile, $got)
         or return 0;
@@ -62,7 +62,7 @@ sub readWithP7Zip
     if ( system("$comp e -tZip -so $file >$outfile 2>$stderr") == 0 )
     {
         $_[0] = readFile($outfile);
-        return 1 
+        return 1
     }
 
     my $bad =  readFile($stderr);
@@ -82,7 +82,7 @@ sub writeWithP7Zip
     unlink $file ;
     my $comp = "$P7ZIP a -tZip $options $file $infile >/dev/null" ;
 
-    return 1 
+    return 1
         if system($comp) == 0 ;
 
     diag "'$comp' failed: $?";
@@ -96,7 +96,7 @@ sub testWithP7Zip
     my $lex = new LexFile my $outfile;
 
     my $status = ( system("$P7ZIP t -tZip $file >$outfile 2>/dev/null") == 0 ) ;
-    
+
     $_[0] = readFile($outfile);
 
     return $status ;
@@ -129,7 +129,7 @@ BEGIN {
     plan(skip_all => "$p7zip don't work as expected")
         if ! ExternalP7ZipWorks();
 
-    
+
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
@@ -192,8 +192,8 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
                       SKIP:
                       {
                         title "zip with Method $method, Streamed $streamed, Preset $preset, Extreme $extreme";
-                        my $status = zip(\$content => $file1, 
-                                                    Name => "fred", 
+                        my $status = zip(\$content => $file1,
+                                                    Name => "fred",
                                                     Preset => $preset,
                                                     Extreme => $extreme,
                                                     Stream => $streamed,
@@ -223,5 +223,3 @@ Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut tempus odio id
         }
     }
 }
-
-

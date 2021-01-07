@@ -15,7 +15,7 @@ my $output = '' ;
 
 while (<>)
 {
-    $x->deflate($_, $output) == Z_OK 
+    $x->deflate($_, $output) == Z_OK
         or die "deflate failed\n" ;
 
     print $output ;

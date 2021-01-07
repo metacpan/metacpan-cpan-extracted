@@ -6,8 +6,8 @@ use bytes;
 use Test::More ;
 use CompTestUtils;
 
-BEGIN 
-{ 
+BEGIN
+{
     plan skip_all => "Encode is not available"
         if $] < 5.006 ;
 
@@ -15,7 +15,7 @@ BEGIN
 
     plan skip_all => "Encode is not available"
         if $@ ;
-    
+
     # use Test::NoWarnings, if available
     my $extra = 0 ;
 
@@ -34,7 +34,7 @@ sub run
     my $UnError         = getErrorRef($UncompressClass);
 
 
-    my $string = "\x{df}\x{100}\x80"; 
+    my $string = "\x{df}\x{100}\x80";
     my $encString = Encode::encode_utf8($string);
     my $buffer = $encString;
 
@@ -43,7 +43,7 @@ sub run
 #        my $input ;
 #        my $lex = new LexFile my $name ;
 #
-#        
+#
 #        if ($from eq 'buffer')
 #          { $input = \$buffer }
 #        elsif ($from eq 'filename')
@@ -84,7 +84,7 @@ sub run
             my $input;
             if ($to eq 'buffer')
               { $input = \$buffer }
-            else 
+            else
             {
                 $input = $name2 ;
             }
@@ -92,9 +92,9 @@ sub run
             my $ucs = new $UncompressClass($input, Append => 1);
             my $got;
             1 while $ucs->read($got) > 0 ;
-            
+
             is  $got, $encString, "  Expected output";
-            
+
             my $decode = Encode::decode_utf8($got);
 
 
@@ -111,22 +111,22 @@ sub run
         my $cs = new $CompressClass(\$out);
         my $a = "a\xFF\x{100}";
         eval { $cs->syswrite($a) };
-        like($@, qr/Wide character in ${CompressClass}::write/, 
+        like($@, qr/Wide character in ${CompressClass}::write/,
                  "  wide characters in ${CompressClass}::write");
 
     }
-    
+
     {
         title "Unknown encoding";
         my $output;
         eval { my $cs = new $CompressClass(\$output, Encode => 'fred'); } ;
-        like($@, qr/${CompressClass}: Encoding 'fred' is not available/, 
+        like($@, qr/${CompressClass}: Encoding 'fred' is not available/,
                  "  Encoding 'fred' is not available");
     }
-    
+
     {
         title "Encode option";
-        
+
         for my $to ( qw(filehandle filename buffer))
         {
             title "Encode: To $to, Encode option";
@@ -136,8 +136,8 @@ sub run
             my $buffer;
 
             if ($to eq 'buffer')
-            { 
-                $output = \$buffer 
+            {
+                $output = \$buffer
             }
             elsif ($to eq 'filename')
             {
@@ -155,8 +155,8 @@ sub run
 
             my $input;
             if ($to eq 'buffer')
-            { 
-                $input = \$buffer 
+            {
+                $input = \$buffer
             }
             elsif ($to eq 'filename')
             {
@@ -166,33 +166,32 @@ sub run
             {
                 $input = new IO::File "<$name2" ;
             }
-            
+
             {
                 my $ucs = new $UncompressClass($input, AutoClose =>1, Append => 1);
                 my $got;
                 1 while $ucs->read($got) > 0 ;
                 ok length($got) > 0;
                 is  $got, $encString, "  Expected output";
-                
+
                 my $decode = Encode::decode_utf8($got);
-    
+
                 is  $decode, $string, "  Expected output";
             }
-            
-     
+
+
 #            {
 #                my $ucs = new $UncompressClass($input, Append => 1, Decode => 'utf8');
 #                my $got;
 #                1 while $ucs->read($got) > 0 ;
-#                ok length($got) > 0;    
+#                ok length($got) > 0;
 #                is  $got, $string, "  Expected output";
-#            }            
-        }        
+#            }
+        }
     }
 
 }
 
 
- 
-1;
 
+1;

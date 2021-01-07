@@ -1,5 +1,29 @@
 Revision history for Dist-Mgr
 
+1.01    2021-01-06
+    - This release fully performed with this Dist::Mgr software!! (Crosses
+      fingers)
+    - Added bin/distmgr script
+    - ci_badges() was forcing $fs_entry param, but it should be optional; fixed
+    - git_commit() now accepts $msg instead of $version as first param
+    - All Git commands now print the exit code in the error message
+    - Add build, dist and install commands to binary
+    - Replace t/manifest.t with updated code to work properly with custom entries
+    - Rework all tests that match dates... the changeover from 2020 to 2021
+      exposed comparison issues
+    - Prevent the addition of multiple repository and bugtracker sections from
+      being added to Makefile.PL (fixes #23; fixes #24)
+    - Prevent the addition of multiple CI badge links (fixes #22)
+    - Each command in distmgr binary have separate help sections (closes #30)
+    - all make* functions have verbose option to print all output (closes #35)
+    - In git_release(), we now call git_status() to see whether we should
+      perform other git actions
+    - Update MANIFEST.SKIP after installing Github Actions CI config file
+      (fixes #34)
+    - distmgr now does a 'git add' and make_manifest() after installing Github
+      Actions CI file (fixes #33)
+    - Performed full release and cycle of Word::Rhymes 1.03!
+
 1.00    2020-12-30
     - Fix issue where ABSTRACT was being pulled from one of the test
       modules. We now pull it from the proper POD file (fixes #4)
@@ -32,7 +56,7 @@ Revision history for Dist-Mgr
     - Renamed bump_version() to version_bump()
     - Renamed get_version_info() to version_info()
     - Added changes(), installs our custom Changes file
-    - Added changes_date(), replaces the UNREL placeholder with today's date
+    - Added changes_date(), replaces the    2020-12-31
       in preparation for release
     - Added changes_bump(), prepares the Changes file for a new development
       cycle

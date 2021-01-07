@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -77,6 +76,10 @@ get_package (GstEvent *event)
 /* ------------------------------------------------------------------------- */
 
 MODULE = GStreamer::Event	PACKAGE = GStreamer::Event	PREFIX = gst_event_
+
+=for object GStreamer::Event Structure describing events that are passed up and down a pipeline
+
+=cut
 
 BOOT:
 	gperl_set_isa ("GStreamer::Event::FlushStart", "GStreamer::Event");
@@ -181,6 +184,10 @@ type (GstEvent *event)
 
 MODULE = GStreamer::Event	PACKAGE = GStreamer::Event::Custom
 
+=for object GStreamer::Event::Custom Structure describing events that are passed up and down a pipeline
+
+=cut
+
 # GstEvent * gst_event_new_custom (GstEventType type, GstStructure *structure);
 GstEvent_noinc *
 new (class, GstEventType type, GstStructure *structure)
@@ -194,6 +201,10 @@ new (class, GstEventType type, GstStructure *structure)
 
 MODULE = GStreamer::Event	PACKAGE = GStreamer::Event::FlushStart
 
+=for object GStreamer::Event::FlushStart Structure describing events that are passed up and down a pipeline
+
+=cut
+
 # GstEvent * gst_event_new_flush_start (void);
 GstEvent_noinc *
 new (class)
@@ -205,6 +216,10 @@ new (class)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Event	PACKAGE = GStreamer::Event::FlushStop
+
+=for object GStreamer::Event::FlushStop Structure describing events that are passed up and down a pipeline
+
+=cut
 
 # GstEvent * gst_event_new_flush_stop (void);
 GstEvent_noinc *
@@ -218,6 +233,10 @@ new (class)
 
 MODULE = GStreamer::Event	PACKAGE = GStreamer::Event::EOS
 
+=for object GStreamer::Event::EOS Structure describing events that are passed up and down a pipeline
+
+=cut
+
 # GstEvent * gst_event_new_eos (void);
 GstEvent_noinc *
 new (class)
@@ -229,6 +248,10 @@ new (class)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Event	PACKAGE = GStreamer::Event::NewSegment
+
+=for object GStreamer::Event::NewSegment Structure describing events that are passed up and down a pipeline
+
+=cut
 
 # GstEvent * gst_event_new_new_segment (gboolean update, gdouble rate, GstFormat format, gint64 start_value, gint64 stop_value, gint64 stream_time);
 GstEvent_noinc *
@@ -291,6 +314,10 @@ update (GstEvent *event)
 
 MODULE = GStreamer::Event	PACKAGE = GStreamer::Event::Tag
 
+=for object GStreamer::Event::Tag Structure describing events that are passed up and down a pipeline
+
+=cut
+
 # GstEvent * gst_event_new_tag (GstTagList *taglist);
 GstEvent_noinc *
 new (class, GstTagList *taglist)
@@ -311,6 +338,10 @@ tag (GstEvent *event)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Event	PACKAGE = GStreamer::Event::BufferSize
+
+=for object GStreamer::Event::BufferSize Structure describing events that are passed up and down a pipeline
+
+=cut
 
 # GstEvent * gst_event_new_buffer_size (GstFormat format, gint64 minsize, gint64 maxsize, gboolean async);
 GstEvent_noinc *
@@ -361,6 +392,10 @@ format (GstEvent *event)
 
 MODULE = GStreamer::Event	PACKAGE = GStreamer::Event::QOS
 
+=for object GStreamer::Event::QOS Structure describing events that are passed up and down a pipeline
+
+=cut
+
 # GstEvent * gst_event_new_qos (gdouble proportion, GstClockTimeDiff diff, GstClockTime timestamp);
 GstEvent_noinc *
 new (class, gdouble proportion, GstClockTimeDiff diff, GstClockTime timestamp)
@@ -403,6 +438,10 @@ proportion (GstEvent *event)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Event	PACKAGE = GStreamer::Event::Seek
+
+=for object GStreamer::Event::Seek Structure describing events that are passed up and down a pipeline
+
+=cut
 
 # GstEvent * gst_event_new_seek (gdouble rate, GstFormat format, GstSeekFlags flags, GstSeekType cur_type, gint64 cur, GstSeekType stop_type, gint64 stop);
 GstEvent_noinc *
@@ -467,6 +506,10 @@ rate (GstEvent *event)
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Event	PACKAGE = GStreamer::Event::Navigation
+
+=for object GStreamer::Event::Navigation Structure describing events that are passed up and down a pipeline
+
+=cut
 
 # GstEvent * gst_event_new_navigation (GstStructure *structure);
 GstEvent_noinc *

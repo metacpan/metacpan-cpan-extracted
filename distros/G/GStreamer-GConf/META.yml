@@ -1,13 +1,25 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         GStreamer-GConf
-version:      0.01
-version_from: GConf.pm
-installdirs:  site
+---
+abstract: '(DEPRECATED) Perl interface to the GStreamer GConf library'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: GStreamer-GConf
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    ExtUtils::Depends:             0.205
-    ExtUtils::PkgConfig:           1.07
-    GStreamer:                     0.02
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  ExtUtils::Depends: 0.205
+  ExtUtils::PkgConfig: 1.07
+  GStreamer: 0.02
+version: 0.02
+x_deprecated: 1

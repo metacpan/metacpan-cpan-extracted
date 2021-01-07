@@ -14,8 +14,8 @@ use Helper qw(:all);
 use Hook::Output::Tiny;
 
 my $cwd = getcwd();
-like $cwd, qr/dist-mgr$/, "in root dir ok";
-die "not in the root dir" if $cwd !~ /dist-mgr$/;
+like $cwd, qr/dist-mgr(-\d+\.\d+)?$/i, "in root dir ok";
+die "not in the root dir" if $cwd !~ /dist-mgr(-\d+\.\d+)?$/i;
 
 my $module_starter_changes_sha = '97624d56464d7254ef5577e4a0c8a098d6c6d9e6';
 

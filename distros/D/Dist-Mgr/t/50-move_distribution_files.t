@@ -12,7 +12,7 @@ use lib 't/lib';
 use Helper qw(:all);
 
 my $cwd = getcwd();
-my $in_cwd = getcwd() =~ qr/dist-mgr$/;
+my $in_cwd = getcwd() =~ qr/dist-mgr(-\d+\.\d+)?$/i;
 
 my $init_dir = 't/data/work/init';
 
@@ -58,7 +58,7 @@ remove_init();
     mkdir $init_dir or die $! if ! -e $init_dir;
     chdir $init_dir or die $!;
 
-    my $in_init_dir = getcwd() =~ qr|dist-mgr/$init_dir$|;
+    my $in_init_dir = getcwd() =~ qr|dist-mgr(-\d+\.\d+)?/$init_dir$|i;
     is $in_init_dir, 1, "in the init directory ok";
 
     if (! $in_init_dir) {

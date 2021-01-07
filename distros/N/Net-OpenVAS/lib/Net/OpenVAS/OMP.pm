@@ -13,7 +13,7 @@ use Net::OpenVAS::Error;
 use Net::OpenVAS::OMP::Response;
 use Net::OpenVAS::OMP::Request;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 sub import {
 
@@ -229,6 +229,7 @@ sub error {
 }
 
 1;
+
 =head1 NAME
 
 Net::OpenVAS - Perl extension for OpenVAS Scanner

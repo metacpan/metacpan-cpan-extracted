@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -39,6 +38,10 @@ gst2perl_task_func (gpointer data)
 /* ------------------------------------------------------------------------- */
 
 MODULE = GStreamer::Pad	PACKAGE = GStreamer::Pad	PREFIX = gst_pad_
+
+=for object GStreamer::Pad Object contained by elements that allows links to other elements
+
+=cut
 
 BOOT:
 	gperl_object_set_no_warn_unreg_subclass (GST_TYPE_PAD, TRUE);

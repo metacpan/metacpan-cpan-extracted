@@ -26,14 +26,14 @@ BEGIN {
     $extra = 1
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
-    plan tests => 8 + $extra ;
+    plan tests => 12 + $extra ;
 
 }
 
 
 SKIP:
 {
-    title "Check long content isn't truncated";
+    title "Check long content isn't truncated for uncompression";
 
     # https://github.com/pmqs/IO-Compress-Zstd/issues/1
 
@@ -49,11 +49,14 @@ SKIP:
     my $filename = 't/files/setup.zst';
 
     # Don't distribute file on CPAN
-    skip "test file not available", 7
+    skip "test file not available", 11
         unless -e $filename ;
 
     eval { require Digest::MD5 }
-        or skip "Digest::MD5 not available", 7;
+        or skip "Digest::MD5 not available", 11;
+
+    my $tmpDir ;
+    my $lex = LexDir->new( $tmpDir );
 
     my $original_compressed = readFile($filename);
 
@@ -74,7 +77,12 @@ SKIP:
     is $length, 17204641, "Length matches";
     is $md5->hexdigest, '3f5b564eea6aa4bb39ebecad0b98d70b', 'MD5 checksums match';
 
-    use IO::Compress::Zstd qw(zstd);
+    my $text = "$tmpDir/text";
+    writeFile($text, $uncompressed);
+
+
+    # use IO::Compress::Zstd to an in-memory buffer
+    use IO::Compress::Zstd qw(zstd $ZstdError);
     use IO::Uncompress::UnZstd qw(unzstd $UnZstdError);
 
     my $compressed;
@@ -97,7 +105,46 @@ SKIP:
     ok length($here);
 
     ok unzstd \$here => \$new_uncompressed, transparent => 0
-        or diag "unzstf failed";
+        or diag "unstd failed";
 
     ok $new_uncompressed eq $uncompressed;
+
+    # output to a file
+    my $outFileZstd = "$tmpDir/file1";
+
+    $OUT = new IO::Compress::Zstd $outFileZstd ;
+    for (split /\n/, $new_uncompressed)
+    {
+        print $OUT "$_\n";
+    }
+    close $OUT ;
+
+    ok unzstd $outFileZstd => \$new_uncompressed, transparent => 0
+        or diag "unstd failed";
+
+    ok $new_uncompressed eq $uncompressed;
+
+    {
+        # Read from <>
+
+        local @ARGV = $text ;
+        my $outB ;
+
+        my $FH = new IO::Compress::Zstd \$outB
+            or die "$ZstdError";
+
+        # select $FH;
+
+        while (<>)
+        {
+            print $FH $_;
+        }
+        close $FH ;
+
+        $new_uncompressed = '';
+        ok unzstd \$outB => \$new_uncompressed, transparent => 0
+            or diag "unstd failed";
+
+        ok $new_uncompressed eq $uncompressed;
+    }
 }

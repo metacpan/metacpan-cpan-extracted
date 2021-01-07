@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::NoteEditor 1.372;
+package Config::Model::Tk::NoteEditor 1.373;
 
 use strict;
 use warnings;
@@ -17,7 +17,6 @@ use Log::Log4perl;
 use base qw/Tk::Frame/;
 use vars qw/$icon_path/;
 use subs qw/menu_struct/;
-use Tk::Dialog;
 use Tk::Photo;
 use Tk::Balloon;
 use Tk;    # Needed to import Ev function

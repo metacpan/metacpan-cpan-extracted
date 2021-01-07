@@ -3,7 +3,7 @@
 use strict ;
 require 5.006 ;
 
-$::VERSION = '2.096' ;
+$::VERSION = '2.100' ;
 
 use lib '.';
 use private::MakeUtil;
@@ -12,10 +12,10 @@ use ExtUtils::MakeMaker 5.16 ;
 UpDowngrade(getPerlFiles('MANIFEST'))
     unless $ENV{PERL_CORE};
 
-WriteMakefile( 
+WriteMakefile(
     NAME         => 'IO::Compress::Lzma',
     VERSION_FROM => 'lib/IO/Compress/Lzma.pm',
-    'dist'       => { COMPRESS     => 'gzip', 
+    'dist'       => { COMPRESS     => 'gzip',
                       TARFLAGS     => '-chvf',
                       SUFFIX       => 'gz',
                       DIST_DEFAULT => 'MyTrebleCheck tardist',
@@ -27,12 +27,12 @@ WriteMakefile(
 	    : (PREREQ_PM   => { 'Compress::Raw::Lzma' => $::VERSION,
 		                    'IO::Compress::Base'   => $::VERSION,
 		                    'IO::Uncompress::Base' => $::VERSION,
-		                    $] >= 5.005 && $] < 5.006   
-                                ? ('File::BSDGlob' => 0) 
+		                    $] >= 5.005 && $] < 5.006
+                                ? ('File::BSDGlob' => 0)
                                 : () }
 	      )
     ),
-       
+
     (
     $] >= 5.005
         ? (ABSTRACT_FROM => 'lib/IO/Compress/Lzma.pm',
@@ -40,9 +40,9 @@ WriteMakefile(
         : ()
     ),
 
-     ( eval { ExtUtils::MakeMaker->VERSION(6.46) }  
+     ( eval { ExtUtils::MakeMaker->VERSION(6.46) }
         ? ( META_MERGE  => {
-    
+
                 "meta-spec" => { version => 2 },
 
                 no_index => {
@@ -50,7 +50,7 @@ WriteMakefile(
                 },
 
                 resources   => {
-                
+
                     bugtracker  => {
                         web     => 'https://github.com/pmqs/IO-Compress-Lzma/issues'
                     },
@@ -61,17 +61,16 @@ WriteMakefile(
                         type    => 'git',
                         url     => 'git://github.com/pmqs/IO-Compress-Lzma.git',
                         web     => 'https://github.com/pmqs/IO-Compress-Lzma',
-                    },        
+                    },
                 },
-              } 
-            ) 
+              }
+            )
         : ()
     ),
 
     ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
-        ('LICENSE'  => 'perl')         : ()),    
+        ('LICENSE'  => 'perl')         : ()),
 
 ) ;
 
 # end of file Makefile.PL
-

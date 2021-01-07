@@ -4,50 +4,6 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
-my @needfull;
-
-# Install Pre-requisites
-BEGIN {
-	my @modules = (
-		'File::HomeDir', 'LWP::Simple::WithCache'
-	);
-
-	foreach my $module(@modules) {
-		eval "use $module";
-		if($@) {
-			push @needfull, $module;
-		}
-	}
-
-	if(scalar(@needfull)) {
-		my $list = join(' ', @needfull);
-		if($ENV{'AUTOMATED_TESTING'}) {
-			die "You need $list to test this package";
-		}
-		print "Installing $list\n";
-		system("cpan -i $list");
-	}
-}
-
-foreach my $module(@needfull) {
-	my $version;
-	if($module =~ /(.+)\s(.+)$/) {
-		$module = $1;
-		$version = $2;
-	}
-	if($module =~ /.+\/(.+)/) {
-		$module = $1;
-	}
-	eval "require $module";
-	if($@) {
-		die $@;
-	}
-	$module->import();
-	# if($version && ($module::VERSION < $version)) {
-		# die "$module: need $version got ", $module::VERSION;
-	# }
-}
-
 my @dirs = (
 	'lib/Locale/Places/databases',
 );
@@ -70,6 +26,9 @@ if(eval { require HTTP::Cache::Transparent; }) {
 	if(my $e = $ENV{'CACHEDIR'}) {
 		$cachedir = File::Spec->catfile($e, 'http-cache-transparent');
 	} else {
+		require File::HomeDir;
+		File::HomeDir->import();
+
 		# $cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
 		$cachedir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
 	}
@@ -89,6 +48,17 @@ if(eval { require HTTP::Cache::Transparent; }) {
 	print "Consider installing HTTP::Cache::Transparent to reduce downloads\n";
 }
 
+my $use_withcache;
+if(eval { require LWP::Simple::WithCache; }) {
+	LWP::Simple::WithCache->import();
+	$use_withcache = 1;
+} else {
+	require LWP::Simple;
+	LWP::Simple->import();
+
+	print "Consider installing LWP::Simple::WithCache to reduce downloads\n";
+}
+
 foreach my $url(keys %urls) {
 	my $file = $urls{$url};
 	if(-r $file) {
@@ -97,8 +67,14 @@ foreach my $url(keys %urls) {
 	}
 
 	print "Downloading $url to $file\n";
-	if(LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::mirror($url, $file))) {
-		die "$url: LWP error $rc";
+	if($use_withcache) {
+		if(LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::mirror($url, $file))) {
+			die "$url: LWP error $rc";
+		}
+	} else {
+		if(LWP::Simple::is_error(my $rc = LWP::Simple::mirror($url, $file))) {
+			die "$url: LWP error $rc";
+		}
 	}
 	die $file if(!-r $file);
 }

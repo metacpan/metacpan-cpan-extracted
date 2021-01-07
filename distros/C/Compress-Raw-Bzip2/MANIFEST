@@ -15,7 +15,7 @@ t/99pod.t
 t/Test/Builder.pm
 t/Test/More.pm
 t/Test/Simple.pm
-t/meta-json.t 
+t/meta-json.t
 t/meta-yaml.t
 t/compress/CompTestUtils.pm
 lib/Compress/Raw/Bzip2.pm

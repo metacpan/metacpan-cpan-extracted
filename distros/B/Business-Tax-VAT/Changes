@@ -1,5 +1,22 @@
 Revision history
 
+1.12 2021-01-06 feature release, update recommended
+
+- Adjusted VAT rate for Greece (GR/EL) to 24% from 23%
+  This rate changed on June 1st. 2016
+
+- Adjusted VAT rate for Romania (RO) to 19% from 24%
+  This rate changed on January 1st. 2017
+
+- Added missing EU countries to POD: Bulgaria, Croatia and Romania
+
+- Corrected tax rates in POD for multiple countries
+
+- Pointed to GitHub over rt.cpan.org in POD
+
+- Corrected some spelling errors and rephrased a few sentences in the POD
+
+
 1.11 2021-01-04 feature release: "Brexit", update recommended
 
 - Removed UK from list of EU countries

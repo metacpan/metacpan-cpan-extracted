@@ -33,7 +33,7 @@ BEGIN {
     my $a ;
     my $b ;
     eval qq[\$a = new $UncompressClass("anc", MultiStream => 1) ;] ;
-    like $@, mkEvalErr("^$UncompressClass: MultiStream not supported by Lzf"), 
+    like $@, mkEvalErr("^$UncompressClass: MultiStream not supported by Lzf"),
       "$UncompressClass with Multstream caught";
     ok ! $a, "lzf failed";
 

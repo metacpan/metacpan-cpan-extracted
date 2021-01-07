@@ -13,6 +13,7 @@ lib/Form/Tiny/Inline.pm
 lib/Form/Tiny/Manual.pod
 lib/Form/Tiny/PathValue.pm
 lib/Form/Tiny/Strict.pm
+lib/Form/Tiny/Utils.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
@@ -37,6 +38,7 @@ t/18-triple-nest.t
 t/19-hooks.t
 t/20-data.t
 t/21-declarative.t
+t/22-default.t
 t/99-examples.t
 t/lib/TestForm.pm
 t/lib/TestInnerForm.pm

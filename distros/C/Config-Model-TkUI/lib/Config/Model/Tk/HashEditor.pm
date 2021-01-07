@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::HashEditor 1.372;
+package Config::Model::Tk::HashEditor 1.373;
 
 use strict;
 use warnings;
@@ -22,6 +22,7 @@ use Tk::Photo;
 use Tk::Balloon;
 use List::MoreUtils qw/apply/;
 use Config::Model::Tk::NoteEditor;
+use Config::Model::Tk::CmeDialog;
 
 Construct Tk::Widget 'ConfigModelHashEditor';
 
@@ -313,7 +314,7 @@ sub add_entry {
     eval { $hash->fetch_with_id(restore_keys($add)) };
 
     if ($@) {
-        $cw->Dialog(
+        $cw->CmeDialog(
             -title => 'Hash index error',
             -text  => $@->as_string,
         )->Show;

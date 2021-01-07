@@ -4,24 +4,24 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.096 qw(:Status);
+use IO::Compress::Base::Common  2.100 qw(:Status);
 use Compress::LZF ;
 
 our ($VERSION, @ISA);
-$VERSION = '2.096';
+$VERSION = '2.100';
 
 
 sub mkUncompObject
 {
     return bless {
                   'CompBytes'    => 0,
-                  'UnCompBytes'  => 0,        
+                  'UnCompBytes'  => 0,
                   'Error'        => '',
                   'ErrorNo'      => 0,
                   'Identity'     => 0,
                   'USize'        => 0,
                   'ConsumesInput' => 0,
-                 } ;     
+                 } ;
 }
 
 sub setIdentity
@@ -46,25 +46,25 @@ sub mk_c_lzf_header_length
     {
         push @dst, $usize;
     }
-    elsif ($usize <= 0x7ff) 
+    elsif ($usize <= 0x7ff)
     {
         push @dst, (( $usize >>  6)         | 0xc0);
         push @dst, (( $usize        & 0x3f) | 0x80);
     }
-    elsif ($usize <= 0xffff) 
+    elsif ($usize <= 0xffff)
     {
         push @dst, (( $usize >> 12)         | 0xe0);
         push @dst, ((($usize >>  6) & 0x3f) | 0x80);
         push @dst, (( $usize        & 0x3f) | 0x80);
     }
-    elsif ($usize <= 0x1fffff) 
+    elsif ($usize <= 0x1fffff)
     {
         push @dst, (( $usize >> 18)         | 0xf0);
         push @dst, ((($usize >> 12) & 0x3f) | 0x80);
         push @dst, ((($usize >>  6) & 0x3f) | 0x80);
         push @dst, (( $usize        & 0x3f) | 0x80);
     }
-    elsif ($usize <= 0x3ffffff) 
+    elsif ($usize <= 0x3ffffff)
     {
         push @dst, (( $usize >> 24)         | 0xf8);
         push @dst, ((($usize >> 18) & 0x3f) | 0x80);
@@ -72,7 +72,7 @@ sub mk_c_lzf_header_length
         push @dst, ((($usize >>  6) & 0x3f) | 0x80);
         push @dst, (( $usize        & 0x3f) | 0x80);
     }
-    elsif ($usize <= 0x7fffffff) 
+    elsif ($usize <= 0x7fffffff)
     {
         push @dst, (( $usize >> 30)         | 0xfc);
         push @dst, ((($usize >> 24) & 0x3f) | 0x80);
@@ -86,7 +86,7 @@ sub mk_c_lzf_header_length
         die("compress can only compress up to 0x7fffffffL bytes");
     }
 
-    
+
     return pack ("C*", @dst);
 }
 
@@ -98,7 +98,7 @@ sub uncompr
     my $eof  = shift ;
     my $outSize  = shift ;
 
-    return STATUS_OK 
+    return STATUS_OK
         unless length $$from;
 
     $self->{CompBytes} += length $$from;
@@ -177,12 +177,11 @@ sub adler32
 sub sync
 {
     my $self = shift ;
-    #( $self->{Inf}->inflateSync(@_) == BZ_OK) 
-    #        ? STATUS_OK 
+    #( $self->{Inf}->inflateSync(@_) == BZ_OK)
+    #        ? STATUS_OK
     #        : STATUS_ERROR ;
 }
 
 1;
 
 __END__
-

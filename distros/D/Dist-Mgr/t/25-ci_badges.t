@@ -26,18 +26,27 @@ copy_module_files();
 
     is eval{ci_badges('stevieb9'); 1}, undef, "croak if only author param ok";
     like $@, qr/\Qci_badges() needs\E/, "...and error is sane";
-
-    is eval{ci_badges('stevieb9', 'test-repo'); 1}, undef, "croak if only author & repo param ok";
-    like $@, qr/\Qci_badges() needs\E/, "...and error is sane";
 }
 
 # files & content (live run)
 {
-
     for my $file (@valid) {
         my $ret = ci_badges($u, $r, $file);
 
         is $ret, 0, "proper return from ci_badges()";
+        verify_file($file);
+    }
+}
+
+# files & content (live run, duplicate) (fail)
+{
+    for my $file (@valid) {
+        my $ret = ci_badges($u, $r, $file);
+
+        if ($file !~ /Three\.pm/) {
+            is $ret, -1, "proper return from ci_badges() if trying to add dup";
+        }
+
         verify_file($file);
     }
 }

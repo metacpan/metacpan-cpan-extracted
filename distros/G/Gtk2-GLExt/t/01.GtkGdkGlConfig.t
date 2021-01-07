@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gtk2-GLExt/t/01.GtkGdkGlConfig.t,v 1.1 2003/11/16 19:56:40 rwmcfa1 Exp $
+# $Id$
 #
 
 #########################

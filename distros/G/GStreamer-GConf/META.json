@@ -1,0 +1,44 @@
+{
+   "abstract" : "(DEPRECATED) Perl interface to the GStreamer GConf library",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GStreamer-GConf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.205",
+            "ExtUtils::PkgConfig" : "1.07",
+            "GStreamer" : "0.02"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02",
+   "x_deprecated" : 1
+}

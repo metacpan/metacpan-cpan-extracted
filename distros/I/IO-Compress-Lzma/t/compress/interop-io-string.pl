@@ -36,7 +36,7 @@ sub run
         #use IO::Scalar;
         #use IO::Wrap;
         #use IO::All;
-        
+
         my $content = "hello world" ;
         my $string = $content;
         my $StrFH = new IO::String $string;
@@ -76,16 +76,16 @@ sub run
 #        my $lex1 = new LexFile my $filename, my $filename1, my $filename2 ;
 #        writeFile($filename1, "hello moto\n");
 #
-#        my $x =  $CompressClass->new($filename); 
+#        my $x =  $CompressClass->new($filename);
 #        cp $StrFH, $x;
 #
-#        #my $y =  $UncompressClass->new($filename1); 
+#        #my $y =  $UncompressClass->new($filename1);
 #        #cp $y => $filename2;
 #
 #        #is readFile($filename2), "hello moto\n", "expected content";
 #    }
 }
- 
+
 1;
 
 __END__
@@ -147,5 +147,3 @@ sub writeWithBzip2
     is readWithBzip2($file1, $got), 0, "readWithBzip2 returns 0";
     is $got, $content, "got content";
 }
-
-

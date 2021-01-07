@@ -11,6 +11,7 @@ examples/model.pl
 lib/Config/Model/Tk/AnyViewer.pm
 lib/Config/Model/Tk/CheckListEditor.pm
 lib/Config/Model/Tk/CheckListViewer.pm
+lib/Config/Model/Tk/CmeDialog.pm
 lib/Config/Model/Tk/HashEditor.pm
 lib/Config/Model/Tk/HashViewer.pm
 lib/Config/Model/Tk/LeafEditor.pm

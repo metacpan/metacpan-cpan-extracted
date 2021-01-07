@@ -1,0 +1,25 @@
+AUTHORS
+ChangeLog
+examples/mupzilla
+examples/simple.pl
+genmaps.pl
+gtkhtml2perl.h
+Html2.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+maps
+META.yml
+NEWS
+perl-Gtk2-Html2.spec.in
+README
+t/01.t
+TODO
+xs/.cvsignore
+xs/GtkHtml2.xs
+xs/GtkHtmlContext.xs
+xs/HtmlDocument.xs
+xs/HtmlStream.xs
+xs/HtmlView.xs
+META.json                                Module JSON meta-data (added by MakeMaker)

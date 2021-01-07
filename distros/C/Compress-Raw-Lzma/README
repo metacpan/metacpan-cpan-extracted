@@ -1,11 +1,11 @@
 
-                            Compress-Raw-Lzma
+                             Compress-Raw-Lzma
 
-                            Version 2.096
+                               Version 2.100
 
-                             31 July 2020
+                              7 January 2021
 
-       Copyright (c) 2009-2020 Paul Marquess. All rights reserved.
+        Copyright (c) 2009-2021 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
            and/or modify it under the same terms as Perl itself.
 
@@ -193,7 +193,7 @@ To help me help you, I need all of the following information:
         If you haven't installed Compress-Raw-Lzma then search Compress::Raw::Lzma.pm
         for a line like this:
 
-          $VERSION = "2.096" ;
+          $VERSION = "2.100" ;
 
      c. The version of lzma you have used.
         If you have successfully installed Compress-Raw-Lzma, this one-liner

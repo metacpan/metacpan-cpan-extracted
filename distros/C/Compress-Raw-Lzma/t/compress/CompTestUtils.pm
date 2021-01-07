@@ -9,13 +9,13 @@ use bytes;
 #use lib qw(t t/compress);
 
 use Carp ;
-#use Test::More ; 
+#use Test::More ;
 
 
 
 sub title
 {
-    #diag "" ; 
+    #diag "" ;
     ok 1, $_[0] ;
     #diag "" ;
 }
@@ -30,7 +30,7 @@ sub like_eval
 
     our ($index);
     $index = '00000';
-    
+
     sub new
     {
         my $self = shift ;
@@ -81,15 +81,15 @@ sub readFile
     {
         my $pos = tell($f);
         seek($f, 0,0);
-        @strings = <$f> ;	
+        @strings = <$f> ;
         seek($f, 0, $pos);
     }
     else
     {
-        open (F, "<$f") 
+        open (F, "<$f")
             or croak "Cannot open $f: $!\n" ;
         binmode F;
-        @strings = <F> ;	
+        @strings = <F> ;
         close F ;
     }
 
@@ -106,7 +106,7 @@ sub writeFile
 {
     my($filename, @strings) = @_ ;
     1 while unlink $filename ;
-    open (F, ">$filename") 
+    open (F, ">$filename")
         or croak "Cannot open $filename: $!\n" ;
     binmode F;
     foreach (@strings) {
@@ -122,10 +122,10 @@ sub GZreadFile
 
     my ($uncomp) = "" ;
     my $line = "" ;
-    my $fil = gzopen($filename, "rb") 
+    my $fil = gzopen($filename, "rb")
         or croak "Cannopt open '$filename': $Compress::Zlib::gzerrno" ;
 
-    $uncomp .= $line 
+    $uncomp .= $line
         while $fil->gzread($line) > 0;
 
     $fil->gzclose ;
@@ -179,7 +179,7 @@ sub readHeaderInfo
 some text
 EOM
 
-    ok my $x = new IO::Compress::Gzip $name, %opts 
+    ok my $x = new IO::Compress::Gzip $name, %opts
         or diag "GzipError is $IO::Compress::Gzip::GzipError" ;
     ok $x->write($string) ;
     ok $x->close ;
@@ -323,11 +323,11 @@ my %TopFuncMap = (  'IO::Compress::Gzip'          => 'IO::Compress::Gzip::gzip',
                     'IO::Uncompress::DummyUncomp' => 'IO::Uncompress::DummyUncomp::dummyuncomp',
                  );
 
-   %TopFuncMap = map { ($_              => $TopFuncMap{$_}, 
-                        $TopFuncMap{$_} => $TopFuncMap{$_}) } 
+   %TopFuncMap = map { ($_              => $TopFuncMap{$_},
+                        $TopFuncMap{$_} => $TopFuncMap{$_}) }
                  keys %TopFuncMap ;
 
- #%TopFuncMap = map { ($_              => \&{ $TopFuncMap{$_} ) } 
+ #%TopFuncMap = map { ($_              => \&{ $TopFuncMap{$_} ) }
                  #keys %TopFuncMap ;
 
 
@@ -471,9 +471,9 @@ sub anyUncompress
     }
 
     my $out = '';
-    my $o = new IO::Uncompress::AnyUncompress \$data, 
-                    Append => 1, 
-                    Transparent => 0, 
+    my $o = new IO::Uncompress::AnyUncompress \$data,
+                    Append => 1,
+                    Transparent => 0,
                     RawInflate => 1,
                     @opts
         or croak "Cannot open buffer/file: $AnyUncompressError" ;
@@ -531,10 +531,10 @@ sub getHeaders
     }
 
     my $out = '';
-    my $o = new IO::Uncompress::AnyUncompress \$data, 
-                MultiStream => 1, 
-                Append => 1, 
-                Transparent => 0, 
+    my $o = new IO::Uncompress::AnyUncompress \$data,
+                MultiStream => 1,
+                Append => 1,
+                Transparent => 0,
                 RawInflate => 1,
                 @opts
         or croak "Cannot open buffer/file: $AnyUncompressError" ;

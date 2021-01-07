@@ -1,28 +1,30 @@
---- #YAML:1.0
-name:               GStreamer-Interfaces
-version:            0.06
-abstract:           Perl interface to the GStreamer Interfaces library
-author:  []
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::Depends:    0.205
-    ExtUtils::MakeMaker:  0
-    ExtUtils::PkgConfig:  1.07
-    Glib:                 1.180
-    GStreamer:            0.06
+---
+abstract: '(DEPRECATED) Perl interface to the GStreamer'
+author:
+  - unknown
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    ExtUtils::Depends:    0.205
-    ExtUtils::PkgConfig:  1.07
-    Glib:                 1.180
-    GStreamer:            0.06
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::Depends: 0.205
+  ExtUtils::MakeMaker: 0
+  ExtUtils::PkgConfig: 1.07
+  GStreamer: 0.06
+  Glib: 1.180
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: GStreamer-Interfaces
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::Depends: 0.205
+  ExtUtils::PkgConfig: 1.07
+  GStreamer: 0.06
+  Glib: 1.180
+version: 0.07
+x_deprecated: 1

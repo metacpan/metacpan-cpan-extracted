@@ -7,13 +7,14 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::LeafEditor 1.372;
+package Config::Model::Tk::LeafEditor 1.373;
 
 use strict;
 use warnings;
 use Carp;
 use Log::Log4perl;
 use Config::Model::Tk::NoteEditor;
+use Config::Model::Tk::CmeDialog;
 use Path::Tiny;
 use Tk::Balloon;
 
@@ -192,6 +193,10 @@ sub add_buttons {
     return $bframe;
 }
 
+# Try is invoked for enum and boolean, where the possible value are
+# set in the widget. Hence the user cannot enter a wrong
+# value. However there may be side effects (like warp) that trigger
+# and error, hence this check.
 sub try {
     my $cw = shift;
     my $v  = shift;
@@ -215,15 +220,13 @@ sub try {
     $v = '' unless defined $v;
 
     $logger->debug("try: value $v");
-    require Tk::Dialog;
 
     my @errors = $cw->{leaf}->check( value => $v, quiet => 1 );
 
     if (@errors) {
-        $cw->Dialog(
-            -title => 'Value error',
-            -text  => join( "\n", @errors ),
-            -font => scalar $cw->cget('-font'),
+        $cw->CmeDialog(
+            -title => 'Check value error',
+            -text => \@errors,
         )->Show;
         $cw->reset_value;
         return;
@@ -240,9 +243,9 @@ sub delete {
     eval { $cw->{leaf}->store(undef); };
 
     if ($@) {
-        $cw->Dialog(
+        $cw->CmeDialog(
             -title => 'Delete error',
-            -text  => ref($@) ? $@->as_string : $@,
+            -text  => "$@",
         )->Show;
     }
     else {
@@ -281,18 +284,16 @@ sub store {
     eval { $leaf->store($v); };
 
     if ($@) {
-        $cw->Dialog (
-            -title => 'Value error',
-            -text  => $@->as_string,
-            -font => scalar $cw->cget('-font'),
+        $cw->CmeDialog(
+            -title => 'Failed to store value',
+            -text => "$@",
         )->Show;
         $cw->reset_value;
     }
     elsif ($leaf->has_error) {
-        $cw->Dialog (
+        $cw->CmeDialog (
             -title => 'Value error',
             -text  => "Cannot store the value:\n* ".join("\n* ",$leaf->all_errors),
-            -font => scalar $cw->cget('-font'),
         )->Show;
         $cw->reset_value;
     }
@@ -363,10 +364,9 @@ sub exec_external_editor {
     $cw->{ed_pid} = open( $h, '|-', $ed );
 
     if ( not defined $cw->{ed_pid} ) {
-        $cw->Dialog(
+        $cw->CmeDialog(
             -title => 'External editor error',
             -text  => "'$ed' : $!",
-            -font => scalar $cw->cget('-font'),
         )->Show;
         return;
     }

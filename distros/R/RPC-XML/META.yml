@@ -4,6 +4,7 @@ author:
   - 'Randy J. Ray'
 build_requires:
   ExtUtils::MakeMaker: '7.56'
+  IO::Socket::IP: '0'
   Test::More: '1.302183'
 configure_requires:
   ExtUtils::MakeMaker: '7.56'
@@ -23,16 +24,18 @@ recommends:
   DateTime::Format::ISO8601: '0.15'
   XML::LibXML: '2.0206'
 requires:
+  Carp: '0'
   HTTP::Daemon: '6.12'
   HTTP::Message: '6.26'
   LWP: '6.51'
   Module::Load: '0.36'
   Scalar::Util: '1.55'
+  Socket: '0'
   XML::Parser: '2.46'
   perl: '5.008008'
 resources:
   bugtracker: https://github.com/rjray/rpc-xml/issues
   homepage: http://github.com/rjray/rpc-xml
   repository: http://github.com/rjray/rpc-xml
-version: '0.81'
+version: '0.82'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -150,6 +149,10 @@ gst2perl_mini_object_initialize (void)
 /* ------------------------------------------------------------------------- */
 
 MODULE = GStreamer::MiniObject	PACKAGE = GStreamer::MiniObject	PREFIX = gst_mini_object_
+
+=for object GStreamer::MiniObject Lightweight base class for the GStreamer object hierarchy
+
+=cut
 
 BOOT:
 	gst2perl_mini_object_initialize ();

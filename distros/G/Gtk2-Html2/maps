@@ -1,0 +1,22 @@
+GTK_HTML_CONTEXT_TYPE	GtkHtmlContext	GObject	Gtk2::Html2::Context
+
+#DOM_TYPE_ABSTRACT_VIEW	DomAbstractView	GObject	DomAbstractView
+#DOM_TYPE_DOCUMENT	DomDocument	GObject	DomDocument
+#DOM_TYPE_DOCUMENT_TYPE	DomDocumentType	GObject	DomDocumentType
+#DOM_TYPE_DOCUMENT_VIEW	(null)	(null)	(null)
+#DOM_TYPE_EVENT	DomEvent	GObject	DomEvent
+#DOM_TYPE_EVENT_LISTENER	DomEventListener	GObject	DomEventListener
+#DOM_TYPE_EVENT_TARGET	DomEventTarget	GObject	DomEventTarget
+#DOM_TYPE_NAMED_NODE_MAP	DomNamedNodeMap	GObject	DomNamedNodeMap
+#DOM_TYPE_NODE	DomNode	GObject	DomNode
+#DOM_TYPE_NODE_LIST	DomNodeList	GObject	DomNodeList
+
+#HTML_TYPE_BOX_BLOCK	HtmlBoxBlock	GObject	HtmlBoxBlock
+#HTML_TYPE_BOX_EMBEDDED	HtmlBoxEmbedded	GObject	HtmlBoxEmbedded
+#HTML_TYPE_BOX_FORM	HtmlBoxForm	GObject	HtmlBoxForm
+#HTML_TYPE_BOX	HtmlBox	GObject	HtmlBox
+HTML_TYPE_DOCUMENT	HtmlDocument	GObject	Gtk2::Html2::Document
+#HTML_TYPE_EMBEDDED	HtmlEmbedded	GtkObject	HtmlEmbedded
+#HTML_TYPE_IMAGE_FACTORY	HtmlImageFactory	GObject	HtmlImageFactory
+HTML_TYPE_STREAM	HtmlStream	GObject	Gtk2::Html2::Stream
+HTML_TYPE_VIEW	HtmlView	GtkObject	Gtk2::Html2::View

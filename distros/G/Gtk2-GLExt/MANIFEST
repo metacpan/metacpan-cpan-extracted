@@ -10,6 +10,7 @@ examples/button.pl
 examples/example.pl.opengl
 examples/example.pl.pdl
 examples/example.pl.sdl
+examples/example.pl.simple
 gtkglextperl.h
 maps
 perl-Gtk2-GLExt.spec.in
@@ -28,4 +29,5 @@ xs/GdkGLWindow.xs
 xs/GtkGL.xs
 xs/GtkGLInit.xs
 xs/GtkGLWidget.xs
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

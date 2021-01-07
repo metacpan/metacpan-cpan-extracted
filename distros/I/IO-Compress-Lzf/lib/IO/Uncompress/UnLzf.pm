@@ -4,16 +4,16 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.096 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common  2.100 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base  2.096 ;
-use IO::Uncompress::Adapter::Lzf  2.096 ;
+use IO::Uncompress::Base  2.100 ;
+use IO::Uncompress::Adapter::Lzf  2.100 ;
 
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnLzfError);
 
-$VERSION = '2.096';
+$VERSION = '2.100';
 $UnLzfError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );
@@ -60,7 +60,7 @@ sub postCheckParams
     return  $self->saveErrorString(undef, "MultiStream not supported by Lzf", STATUS_ERROR)
         if $got->getValue('multistream') ;
 
-    $got->setValue('multistream' => 0); 
+    $got->setValue('multistream' => 0);
     return 1;
 }
 
@@ -81,7 +81,7 @@ sub mkUncomp
         if ! defined $obj;
 
     *$self->{Uncomp} = $obj;
-    
+
     return 1;
 }
 
@@ -94,15 +94,15 @@ sub ckMagic
     $self->smartReadExact(\$magic, 3);
 
     *$self->{HeaderPending} = $magic ;
-    
-    return $self->HeaderError("Header size is " . 
-                                        3 . " bytes") 
+
+    return $self->HeaderError("Header size is " .
+                                        3 . " bytes")
         if length $magic != 3;
 
     return $self->HeaderError("Bad Magic.")
         if ! isLzfMagic($magic) ;
-                      
-        
+
+
     *$self->{Type} = 'lzf';
     return $magic;
 }
@@ -122,8 +122,8 @@ sub readHeader
         'TrailerLength'     => 0,
         'Header'            => '$magic'
         };
-    
-    
+
+
 
 }
 
@@ -140,7 +140,7 @@ sub readBlock
 
     return STATUS_ENDSTREAM
         if $self->smartEof() ;
-    
+
     my $buffer;
 
     if ( ! $self->smartReadExact(\$buffer, 3 )){
@@ -149,7 +149,7 @@ sub readBlock
     }
 
     #$self->smartReadExact(\$buffer, 3 )
-    #   or return $self->saveErrorString(STATUS_ERROR,"Minimum header size is " . 
+    #   or return $self->saveErrorString(STATUS_ERROR,"Minimum header size is " .
     #                                 3 . " bytes") ;
 
     my $sig     =              substr($buffer, 0, 2);
@@ -182,7 +182,7 @@ sub readBlock
     #}
     else {
         return $self->saveErrorString(STATUS_ERROR, "unexpected block type - $type", STATUS_ERROR);
-        
+
     }
 
     *$self->{LzfData}{compSize} = $cSize;
@@ -203,7 +203,7 @@ sub postBlockChk
 
     return $self->saveErrorString(STATUS_ERROR, "uncompressed size wrong", STATUS_ERROR)
         if length($$buffer) - $offset != *$self->{LzfData}{uncSize} ;
-    
+
     return STATUS_OK;
 }
 
@@ -212,7 +212,7 @@ sub isLzfMagic
     my $buffer = shift ;
     my $sig     =              substr($buffer, 0, 2);
     my $type    = unpack 'C',  substr($buffer, 2, 1);
-    return $sig eq SIGNATURE  && ($type == 0 || $type == 1); 
+    return $sig eq SIGNATURE  && ($type == 0 || $type == 1);
 }
 
 1 ;
@@ -231,7 +231,7 @@ IO::Uncompress::UnLzf - Read lzf files/buffers
     my $status = unlzf $input => $output [,OPTS]
         or die "unlzf failed: $UnLzfError\n";
 
-    my $z = new IO::Uncompress::UnLzf $input [OPTS]
+    my $z = IO::Uncompress::UnLzf->new( $input [OPTS] )
         or die "unlzf failed: $UnLzfError\n";
 
     $status = $z->read($buffer)
@@ -524,7 +524,7 @@ uncompressed data to a buffer, C<$buffer>.
     use IO::Uncompress::UnLzf qw(unlzf $UnLzfError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt.lzf"
+    my $input = IO::File->new( "<file1.txt.lzf" )
         or die "Cannot open 'file1.txt.lzf': $!\n" ;
     my $buffer ;
     unlzf $input => \$buffer
@@ -559,7 +559,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for IO::Uncompress::UnLzf is shown below
 
-    my $z = new IO::Uncompress::UnLzf $input [OPTS]
+    my $z = IO::Uncompress::UnLzf->new( $input [OPTS] )
         or die "IO::Uncompress::UnLzf failed: $UnLzfError\n";
 
 Returns an C<IO::Uncompress::UnLzf> object on success and undef on failure.
@@ -973,8 +973,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2021 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

@@ -56,11 +56,11 @@
    "provides" : {
       "Business::Tax::VAT" : {
          "file" : "lib/Business/Tax/VAT.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       },
       "Business::Tax::VAT::Price" : {
          "file" : "lib/Business/Tax/VAT.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/jonasbn/Business-Tax-VAT"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "GPL-2.0-only"

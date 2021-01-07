@@ -3,6 +3,8 @@ package Dist::Mgr::FileData;
 use warnings;
 use strict;
 
+our $VERSION = '1.01';
+
 use Exporter qw(import);
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -20,6 +22,7 @@ our @EXPORT_OK = qw(
     _makefile_section_repo
 
     _manifest_skip_file
+    _manifest_t_file
 
     _unwanted_filesystem_entries
 );
@@ -263,6 +266,7 @@ sub _manifest_skip_file {
         q{pm_to_blib$},
         q{.git/},
         q{.debug$},
+        q{^\.github/},
         q{.gitignore$},
         q{^\w+.pl$},
         q{.ignore.txt$},
@@ -279,12 +283,31 @@ sub _manifest_skip_file {
         q{scrap\.pl},
     );
 }
+sub _manifest_t_file {
+    return (
+        q|use warnings;|,
+        q|use strict;|,
+        q||,
+        q|use Test::More;|,
+        q|use ExtUtils::Manifest;|,
+        q||,
+        q|if (! $ENV{RELEASE_TESTING}) {|,
+        q|    plan skip_all => "Author tests not required for installation";|,
+        q|}|,
+        q||,
+        q|is_deeply [ ExtUtils::Manifest::manicheck() ], [], 'missing';|,
+        q|is_deeply [ ExtUtils::Manifest::filecheck() ], [], 'extra';|,
+        q||,
+        q|done_testing;|,
+    );
+}
 
 sub _unwanted_filesystem_entries {
     return qw(
         xt/
         ignore.txt
         README
+        MANIFEST
     );
 }
 
@@ -366,6 +389,11 @@ C<Makefile.PL> file.
 
 Returns an array of the file lines that make up a default C<MANIFEST.SKIP> file.
 
+=head2 _manifest_t_file()
+
+Returns an array of the file lines that make up our custom C<t/makefile.t> test
+file.
+
 =head2 _unwanted_filesystem_entries()
 
 Returns an array of files and directories we remove from the base, stock
@@ -389,7 +417,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Steve Bertrand.
+Copyright 2020-2021 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -397,16 +425,3 @@ copy of the full license at:
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
 
-=head1 AUTHOR
-
-Steve Bertrand, C<< <steveb at cpan.org> >>
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2020 Steve Bertrand.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>

@@ -15,11 +15,11 @@ use Test::More ;
 use CompTestUtils;
 use Compress::Zlib;
 
-BEGIN 
-{ 
+BEGIN
+{
     plan(skip_all => "Examples needs Perl 5.005 or better - you have Perl $]" )
         if $] < 5.005 ;
-    
+
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
@@ -35,14 +35,14 @@ $Inc = '"-MExtUtils::testlib"'
 
 my $Perl = ($ENV{'FULLPERL'} or $^X or 'perl') ;
 $Perl = qq["$Perl"] if $^O eq 'MSWin32' ;
- 
+
 $Perl = "$Perl $Inc -w" ;
-my $examples = $ENV{PERL_CORE} ? "../ext/IO-Compress/examples/compress-zlib" 
+my $examples = $ENV{PERL_CORE} ? "../ext/IO-Compress/examples/compress-zlib"
                                : "./examples/compress-zlib";
 
 my $hello1 = <<EOM ;
 hello
-this is 
+this is
 a test
 message
 x ttttt
@@ -160,4 +160,3 @@ END
 {
     for ($file1, $file2, $stderr) { 1 while unlink $_ } ;
 }
-

@@ -13,11 +13,9 @@ use Form::Tiny::Error;
 use Form::Tiny::FieldData;
 use Moo::Role;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 with "Form::Tiny::Form";
-
-requires qw(build_fields);
 
 has "field_defs" => (
 	is => "ro",
@@ -26,8 +24,10 @@ has "field_defs" => (
 		->plus_coercions(HashRef, q{ Form::Tiny::FieldDefinition->new($_) })
 	],
 	coerce => 1,
+	lazy => 1,
 	default => sub {
-		my @data = shift->build_fields;
+		my ($self) = @_;
+		my @data = $self->can('build_fields') ? $self->build_fields : ();
 		return shift @data
 			if @data == 1 && ref $data[0] eq ref [];
 		return \@data;
@@ -77,6 +77,12 @@ has "cleaner" => (
 	},
 );
 
+sub BUILD
+{
+	my ($self) = @_;
+	$self->field_defs;    # build fields
+}
+
 sub import
 {
 	my ($package, $caller) = (shift, scalar caller);
@@ -88,16 +94,26 @@ sub import
 
 	my %subs = (
 		form_field => sub {
-			my ($name, %params) = @_;
-			$params{name} = $name;
-			my $previous = $caller->can('build_fields') // sub { () };
+			my ($name, @params) = @_;
+			my $is_coderef = @params == 1 && ref $params[0] eq 'CODE';
 
+			my $previous = $caller->can('build_fields') // sub { () };
 			no strict 'refs';
 			no warnings 'redefine';
+
 			*{"${caller}::build_fields"} = sub {
+				my %real_params = (
+					(
+						$is_coderef
+						? %{$params[0]->(@_)}
+						: @params
+					),
+					name => $name,
+				);
+
 				return (
 					$previous->(@_),
-					\%params,
+					\%real_params
 				);
 			};
 		},
@@ -152,8 +168,6 @@ sub import
 	{
 		no strict 'refs';
 
-		*{"${caller}::build_fields"} = $caller->can('build_fields') // sub { () };
-
 		Moo::Role->apply_roles_to_package(
 			$caller, @wanted_roles
 		);
@@ -186,7 +200,7 @@ sub _mangle_field
 	if (!$def->hard_required || ref $current || length($current // "")) {
 
 		# coerce, validate, adjust
-		$current = $def->get_coerced($current);
+		$current = $def->get_coerced($self, $current);
 		if ($def->validate($self, $current)) {
 			$current = $def->get_adjusted($current);
 		}
@@ -299,7 +313,10 @@ sub _validate
 			}
 
 			# for when it didn't pass the existence test
-			if ($validator->required) {
+			if ($validator->has_default) {
+				$self->_assign_field($dirty, $validator, $validator->get_default($self));
+			}
+			elsif ($validator->required) {
 				$self->add_error(Form::Tiny::Error::DoesNotExist->new(field => $curr_f));
 			}
 		}
@@ -394,12 +411,43 @@ Starting with version 1.10 you can enable syntactic sugar instead of bare-bones 
 		...
 	);
 
+	form_field 'complex_field' => sub {
+		my ($form) = @_;
+
+		return {
+			...
+		};
+	};
+
 	# new syntax for defining a form cleaner
 	form_cleaner sub {
 		...
 	};
 
-Consult L<Form::Tiny::Manual> for more information and examples.
+Consult L<Form::Tiny::Manual> for more examples.
+
+=head2 IMPORTED FUNCTIONS
+
+=head3 form_field
+
+	form_field $name => %arguments;
+	form_field $name => $coderef;
+
+Imported when any flag is present. $coderef gets passed the form instance and should return a hashref. Neither %arguments nor $coderef return data should include the name in the hash, it will be copied from the first argument.
+
+Note that this field definition method is not capable of returning a subclass of L<Form::Tiny::FieldDefinition>. If you need a subclass, you will need to use I<build_fields>.
+
+=head3 form_cleaner
+
+	form_cleaner $sub;
+
+Imported when any flag is present. It is a pretty straightforward shortcut for I<build_cleaner>. There shouldn't be more than one cleaner in a form.
+
+=head3 form_filter
+
+	form_filter $type, $sub;
+
+Imported when the -filtered flag is present. $type should be a Type::Tiny (or compatible) type check. For each input field that passes that check, $sub will be ran. See L<Form::Tiny::Filtered> for details on filters.
 
 =head1 ADDED INTERFACE
 
@@ -471,7 +519,9 @@ A form instance can be customized by overriding any of the following methods:
 
 =head2 build_fields
 
-A class is required to have this method. It should return an array or array reference of field definitions: either L<Form::Tiny::FieldDefinition> instances or hashrefs which can be used to construct these instances.
+This method should return an array or array reference of field definitions: either L<Form::Tiny::FieldDefinition> instances or hashrefs which can be used to construct these instances.
+
+It is passed a single argument, which is the class instance. It can be used to add errors in coderefs or to use class fields in form building.
 
 =head2 build_cleaner
 

@@ -13,5 +13,5 @@ open my $fh, '<', $f or die $!;
 
 while (<$fh>) {
     chomp;
-    print qq{qq{$_},\n};
+    print qq{q|$_|,\n};
 }

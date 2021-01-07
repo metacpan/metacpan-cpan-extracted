@@ -1,10 +1,19 @@
 CHANGES
 -------
 
+  2.100 7 January 2021
+
+      * trim whitespace
+        d990a855d744d4e2a8beab859ec747219798d619
+
+      * Avoid indirect calls
+        82287426ab8ad42682fc63549a68cc41eb39b3d6
+
 2.099 18 October 2020
 
-  * Fix skip number
-    bbf234d6d65d764e752db4c9afa92f8ae9f61c0f
+    * Fix skip number
+      https://github.com/pmqs/IO-Compress-Zstd/issues/3
+      bbf234d6d65d764e752db4c9afa92f8ae9f61c0f
 
 2.098 17 October 2020
 

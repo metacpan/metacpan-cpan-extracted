@@ -4,16 +4,16 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.096 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common  2.100 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base  2.096 ;
-use IO::Uncompress::Adapter::UnZstd  2.096 ;
+use IO::Uncompress::Base  2.100 ;
+use IO::Uncompress::Adapter::UnZstd  2.100 ;
 
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnZstdError);
 
-$VERSION = '2.099';
+$VERSION = '2.100';
 $UnZstdError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );
@@ -150,7 +150,7 @@ IO::Uncompress::UnZstd - Read zstd files/buffers
     my $status = unzstd $input => $output [,OPTS]
         or die "unzstd failed: $UnZstdError\n";
 
-    my $z = new IO::Uncompress::UnZstd $input [OPTS]
+    my $z = IO::Uncompress::UnZstd->new( $input [OPTS] )
         or die "unzstd failed: $UnZstdError\n";
 
     $status = $z->read($buffer)
@@ -423,7 +423,7 @@ uncompressed data to a buffer, C<$buffer>.
     use IO::Uncompress::UnZstd qw(unzstd $UnZstdError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt.zst"
+    my $input = IO::File->new( "<file1.txt.zst" )
         or die "Cannot open 'file1.txt.zst': $!\n" ;
     my $buffer ;
     unzstd $input => \$buffer
@@ -458,7 +458,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for IO::Uncompress::UnZstd is shown below
 
-    my $z = new IO::Uncompress::UnZstd $input [OPTS]
+    my $z = IO::Uncompress::UnZstd->new( $input [OPTS] )
         or die "IO::Uncompress::UnZstd failed: $UnZstdError\n";
 
 Returns an C<IO::Uncompress::UnZstd> object on success and undef on failure.
@@ -878,7 +878,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2021 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

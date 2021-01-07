@@ -15,11 +15,11 @@ use Test::More ;
 use CompTestUtils;
 use IO::Compress::Bzip2 'bzip2' ;
 
-BEGIN 
-{ 
+BEGIN
+{
     plan(skip_all => "Examples needs Perl 5.005 or better - you have Perl $]" )
         if $] < 5.005 ;
-    
+
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
@@ -35,7 +35,7 @@ $Inc = '"-MExtUtils::testlib"'
 
 my $Perl = ($ENV{'FULLPERL'} or $^X or 'perl') ;
 $Perl = qq["$Perl"] if $^O eq 'MSWin32' ;
- 
+
 $Perl = "$Perl $Inc -w" ;
 #$Perl .= " -Mblib " ;
 my $examples = $ENV{PERL_CORE} ? "../ext/IO-Compress/examples/io/bzip2"
@@ -43,7 +43,7 @@ my $examples = $ENV{PERL_CORE} ? "../ext/IO-Compress/examples/io/bzip2"
 
 my $hello1 = <<EOM ;
 hello
-this is 
+this is
 a test
 message
 x ttttt

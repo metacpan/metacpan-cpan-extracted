@@ -1,5 +1,4 @@
-.github/workflows/github_ci_default.yml
-appveyor.yml
+bin/distmgr
 Changes
 dev/quote_file_contents.pl
 lib/Dist/Mgr.pm
@@ -9,7 +8,7 @@ lib/Dist/Mgr/Git.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-pod2htmd.tmp
+README.md
 t/00-load.t
 t/05-version_bump.t
 t/10-version_info.t
@@ -17,6 +16,7 @@ t/15-add_repo_add_bugtrack.t
 t/20-ci_config_files.t
 t/25-ci_badges.t
 t/30-manifest_skip.t
+t/32-manifest_test.t
 t/35-git_ignore.t
 t/40-remove_unwanted_files.t
 t/45-init.t
@@ -28,9 +28,11 @@ t/70-make_test.t
 t/75-git.t
 t/80-git_release.t
 t/85-cpan_upload.t
+t/90-version_incr.t
 t/95-build_cycle.t
 t/96-release_cycle.t
 t/data/module_template/.github/workflows/github_ci_default.yml
+t/data/module_template/.gitignore
 t/data/module_template/Changes
 t/data/module_template/lib/Acme/STEVEB.pm
 t/data/module_template/Makefile.PL
@@ -40,18 +42,21 @@ t/data/module_template/t/00-load.t
 t/data/module_template/t/manifest.t
 t/data/module_template/t/pod-coverage.t
 t/data/module_template/t/pod.t
+t/data/orig/.gitignore
 t/data/orig/Bad.pm
 t/data/orig/Changes
 t/data/orig/Changes-release
 t/data/orig/github_ci_default.yml
 t/data/orig/Makefile.PL
 t/data/orig/MANIFEST.SKIP
+t/data/orig/manifest.t
 t/data/orig/Module.tpl
 t/data/orig/No.pm
 t/data/orig/One.pm
 t/data/orig/Three.pm
 t/data/orig/Two.pm
 t/data/release_module_template/.github/workflows/github_ci_default.yml
+t/data/release_module_template/.gitignore
 t/data/release_module_template/Changes
 t/data/release_module_template/lib/Acme/STEVEB.pm
 t/data/release_module_template/Makefile.PL
@@ -61,6 +66,7 @@ t/data/release_module_template/t/00-load.t
 t/data/release_module_template/t/manifest.t
 t/data/release_module_template/t/pod-coverage.t
 t/data/release_module_template/t/pod.t
+t/data/work/placeholder.txt
 t/lib/Helper.pm
 t/manifest.t
 t/pod-coverage.t

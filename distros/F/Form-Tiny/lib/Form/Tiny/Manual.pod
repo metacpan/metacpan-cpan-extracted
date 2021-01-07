@@ -142,11 +142,21 @@ Each of field definition will be coerced into an object of the L<Form::Tiny::Fie
 		required => 'soft',
 	);
 
+	form_field 'complex_field' => sub {
+		my ($self) = @_;
+
+		return {
+			required => 1,
+			adjust => sub { $self->some_method(shift) },
+		};
+	};
+
 	# explicit builder version
 
 	sub build_fields {
 		return (
 			# first field
+			# note the name is required in this form
 			{ name => "some_name" },
 
 			# second field
@@ -155,6 +165,8 @@ Each of field definition will be coerced into an object of the L<Form::Tiny::Fie
 	}
 
 The only required element of this hashref is key I<name>, which contains the string with name of the field in the form input. In I<form_field>, the name should not be given explicitly, as it will be overwritten by the first argument to that function. Other possible elements are:
+
+Note that it is possible to mix I<form_field> together with I<build_fields>, but should be very rarely necessary.
 
 =over
 
@@ -187,6 +199,12 @@ I<0> - The field can be non-existent in the input, empty or undefined. This is t
 I<"soft"> - The field has to exist in the input, but can be empty or undefined
 
 I<1> or I<"hard"> - The field has to exist in the input, must be defined and non-empty (a value I<0> is allowed, but an empty string is disallowed)
+
+=item default
+
+A coderef, which should return a scalar value that will be used in place of a non-existent input value. If the field is marked as hard-required as well, the default value will also replace undefined or empty values.
+
+The default value needs to be in line with the type check for the field, if it is specified. It also does not support nested arrays, like I<array.*>. An exception will be thrown if these conditions are not met.
 
 =item message
 

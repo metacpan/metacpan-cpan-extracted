@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -53,6 +52,10 @@ gst2perl_plugin_feature_filter (GstPluginFeature *feature,
 /* ------------------------------------------------------------------------- */
 
 MODULE = GStreamer::PluginFeature	PACKAGE = GStreamer::PluginFeature	PREFIX = gst_plugin_feature_
+
+=for object GStreamer::PluginFeature Base class for contents of a GstPlugin
+
+=cut
 
 BOOT:
 	gperl_object_set_no_warn_unreg_subclass (GST_TYPE_PLUGIN_FEATURE, TRUE);

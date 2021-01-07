@@ -2,7 +2,7 @@ package Bundle::Compress::Zlib;
 
 use strict;
 
-$Bundle::Compress::Zlib::VERSION = '2.096';
+$Bundle::Compress::Zlib::VERSION = '2.100';
 
 1;
 __END__
@@ -19,11 +19,11 @@ Bundle::Compress::Zlib - Install Compress::Zlib and dependencies
 
 Scalar::Util
 
-Compress::Raw::Zlib 2.096
+Compress::Raw::Zlib 2.100
 
-Compress::Raw::Bzip2 2.096
+Compress::Raw::Bzip2 2.100
 
-Compress::Zlib 2.096
+Compress::Zlib 2.100
 
 =head1 AUTHOR
 
@@ -33,7 +33,7 @@ Version > 0.3  Paul Marquess <pmqs@cpan.org>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2007 by Kevin W. Henwood
-Copyright (C) 2008-2020 by Paul Marquess
+Copyright (C) 2008-2021 by Paul Marquess
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

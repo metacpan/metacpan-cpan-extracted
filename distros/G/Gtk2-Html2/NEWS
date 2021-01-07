@@ -1,0 +1,27 @@
+Overview of Changes in Gtk2::Html2 0.05
+=======================================
+
+* Deprecation release; project is now in 'deprecated' status.  See the README
+  file for more information about the project's deprecation
+
+Overview of Changes in Gtk2::Html2 0.04
+=======================================
+
+* Reduce gtkhtml2 requirement to 2.0.0.
+
+Overview of Changes in Gtk2::Html2 0.03
+=======================================
+
+* Add bindings for stream cancellation hooks.
+* Fix the dependency name in the RPM specfile.
+
+Overview of Changes in Gtk2::Html2 0.02
+==========================================
+
+* Require stable Glib 1.040.
+* Make rpm building work.
+
+Overview of Changes in Gtk2::Html2 0.01
+==========================================
+
+* Brand new module; tested with libgtkhtml-2.0 2.4.0 and 2.5.5.

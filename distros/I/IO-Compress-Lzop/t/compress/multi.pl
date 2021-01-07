@@ -47,7 +47,7 @@ EOM
 even more stuff
 EOM
 
-    my $b0length = length $buffers[0];  
+    my $b0length = length $buffers[0];
     my $bufcount = @buffers;
 
     {
@@ -55,7 +55,7 @@ EOM
         my $gz ;
         my $hsize ;
         my %headers = () ;
-        
+
 
         foreach my $fb ( qw( file filehandle buffer ) )
         {
@@ -71,7 +71,7 @@ EOM
                                   Strict     => 1,
                                   Comment    => "this is a comment",
                                   ExtraField => ["so" => "me extra"],
-                                  HeaderCRC  => 1); 
+                                  HeaderCRC  => 1);
 
                 }
 
@@ -108,7 +108,7 @@ EOM
                     {
                         $cc = new IO::File "<$name" ;
                     }
-                    my @opts = $unc ne $UncompressClass 
+                    my @opts = $unc ne $UncompressClass
                                     ? (RawInflate => 1)
                                     : ();
                     my $gz = new $unc($cc,
@@ -144,7 +144,7 @@ EOM
                     {
                         $cc = new IO::File "<$name" ;
                     }
-                    my @opts = $unc ne $UncompressClass 
+                    my @opts = $unc ne $UncompressClass
                                     ? (RawInflate => 1)
                                     : ();
                     my $gz = new $unc($cc,
@@ -185,7 +185,7 @@ EOM
                     {
                         $cc = new IO::File "<$name" ;
                     }
-                    my @opts = $unc ne $UncompressClass 
+                    my @opts = $unc ne $UncompressClass
                                     ? (RawInflate => 1)
                                     : ();
                     my $gz = new $unc($cc,
@@ -210,7 +210,7 @@ EOM
                             $un .= $_;
                         }
                         is $., $lines, "    \$. is $lines";
-                        
+
                         ok ! $gz->error(), "      ! error()"
                             or diag "Error is " . $gz->error() ;
                         ok $gz->eof(), "      eof()";

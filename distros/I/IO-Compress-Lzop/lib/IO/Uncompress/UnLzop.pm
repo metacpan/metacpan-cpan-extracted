@@ -4,18 +4,18 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.096 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common  2.100 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base  2.096 ;
-use IO::Uncompress::Adapter::LZO  2.096 ;
+use IO::Uncompress::Base  2.100 ;
+use IO::Uncompress::Adapter::LZO  2.100 ;
 use Compress::LZO qw(crc32 adler32);
-use IO::Compress::Lzop::Constants  2.096 ;
+use IO::Compress::Lzop::Constants  2.100 ;
 
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnLzopError);
 
-$VERSION = '2.096';
+$VERSION = '2.100';
 $UnLzopError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );
@@ -69,7 +69,7 @@ sub mkUncomp
         if ! defined $obj;
 
     *$self->{Uncomp} = $obj;
-    
+
     return 1;
 }
 
@@ -82,15 +82,15 @@ sub ckMagic
     $self->smartReadExact(\$magic, 9);
 
     *$self->{HeaderPending} = $magic ;
-    
-    return $self->HeaderError("Header size is " . 
-                                        9 . " bytes") 
+
+    return $self->HeaderError("Header size is " .
+                                        9 . " bytes")
         if length $magic != 9;
 
     return $self->HeaderError("Bad Magic.")
         if ! isLzopMagic($magic) ;
-                      
-        
+
+
     *$self->{Type} = 'lzop';
     return $magic;
 }
@@ -104,7 +104,7 @@ sub readHeader
     my $buffer;
 
     $self->smartReadExact(\$buffer, 25 )
-        or return $self->HeaderError("Minimum header size is " . 
+        or return $self->HeaderError("Minimum header size is " .
                                      38 . " bytes") ;
     $keep .= $buffer;
     my $version = unpack 'n', substr($buffer, 0, 2);
@@ -137,10 +137,10 @@ sub readHeader
         my $crc ;
         if ($flags & F_H_CRC32)
           { $crc = crc32($keep) }
-        else  
+        else
           { $crc = adler32($keep) }
 
-        return $self->HeaderError("CRC Error") 
+        return $self->HeaderError("CRC Error")
             if $crcGot != $crc;
     }
 
@@ -168,7 +168,7 @@ sub readHeader
         'TrailerLength' => 0,
         'Header'        => $keep,
         };
-    
+
 }
 
 sub chkTrailer
@@ -185,14 +185,14 @@ sub readBlock
     my $tmp;
 
     # uncompressed size
-    $self->smartReadExact(\$tmp, 4) 
+    $self->smartReadExact(\$tmp, 4)
         or return $self->saveErrorString(STATUS_ERROR, "Error Reading Data");
-    
+
     my $uncSize = unpack("N", $tmp);
     $_[0] = $uncSize;
 
     if ($uncSize == 0) {
-        return STATUS_ENDSTREAM;    
+        return STATUS_ENDSTREAM;
     }
 
     return $self->saveErrorString(STATUS_ERROR, "Split file not supported")
@@ -202,9 +202,9 @@ sub readBlock
         if $uncSize > MAX_BLOCK_SIZE ;
 
     # compressed size
-    $self->smartReadExact(\$tmp, 4) 
+    $self->smartReadExact(\$tmp, 4)
         or return $self->saveErrorString(STATUS_ERROR, "Error Reading Data");
-    
+
     my $compSize = unpack("N", $tmp);
 
     return $self->saveErrorString(STATUS_ERROR, "File corrupt compressed size > uncompressed size")
@@ -217,18 +217,18 @@ sub readBlock
     my $compCRC ;
     if (*$self->{LzopData}{Flags} & FLAG_CRC_UNCOMP) {
         # CRC
-        $self->smartReadExact(\$tmp, 4) 
+        $self->smartReadExact(\$tmp, 4)
             or return $self->saveErrorString(STATUS_ERROR, "Error Reading Data");
-        
+
         $uncCRC = unpack("N", $tmp);
     }
 
     if (*$self->{LzopData}{Flags} & FLAG_CRC_COMP) {
         # CRC
         if ($compSize != $uncSize) {
-            $self->smartReadExact(\$tmp, 4) 
+            $self->smartReadExact(\$tmp, 4)
                 or return $self->saveErrorString(STATUS_ERROR, "Error Reading Data");
-    
+
             $compCRC = unpack("N", $tmp);
         }
         else {
@@ -243,7 +243,7 @@ sub readBlock
 
 
     # data
-    $self->smartReadExact($buff, $compSize) 
+    $self->smartReadExact($buff, $compSize)
         or return $self->saveErrorString(STATUS_ERROR, "Error Reading Data");
 
     if (*$self->{Strict} && *$self->{LzopData}{Flags} & FLAG_CRC_COMP) {
@@ -254,7 +254,7 @@ sub readBlock
             if $compCRC != $crc;
     }
 
-    return STATUS_OK;    
+    return STATUS_OK;
 }
 
 
@@ -276,12 +276,12 @@ sub postBlockChk
             $buf = \$x;
         }
 
-        $crc = crc32($$buffer)   
+        $crc = crc32($$buffer)
             if *$self->{LzopData}{Flags} & F_CRC32_D ;
 
-        $crc = adler32($$buffer) 
+        $crc = adler32($$buffer)
             if *$self->{LzopData}{Flags} & F_ADLER32_D ;
-        
+
         return $self->saveErrorString(STATUS_ERROR, "CRC error")
             if *$self->{LzopData}{uncCRC} != $crc;
     }
@@ -295,7 +295,7 @@ sub postBlockChk
 sub isLzopMagic
 {
     my $buffer = shift ;
-    return $buffer eq SIGNATURE ; 
+    return $buffer eq SIGNATURE ;
 }
 
 1 ;
@@ -314,7 +314,7 @@ IO::Uncompress::UnLzop - Read lzop files/buffers
     my $status = unlzop $input => $output [,OPTS]
         or die "unlzop failed: $UnLzopError\n";
 
-    my $z = new IO::Uncompress::UnLzop $input [OPTS]
+    my $z = IO::Uncompress::UnLzop->new( $input [OPTS] )
         or die "unlzop failed: $UnLzopError\n";
 
     $status = $z->read($buffer)
@@ -605,7 +605,7 @@ uncompressed data to a buffer, C<$buffer>.
     use IO::Uncompress::UnLzop qw(unlzop $UnLzopError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt.lzo"
+    my $input = IO::File->new( "<file1.txt.lzo" )
         or die "Cannot open 'file1.txt.lzo': $!\n" ;
     my $buffer ;
     unlzop $input => \$buffer
@@ -640,7 +640,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for IO::Uncompress::UnLzop is shown below
 
-    my $z = new IO::Uncompress::UnLzop $input [OPTS]
+    my $z = IO::Uncompress::UnLzop->new( $input [OPTS] )
         or die "IO::Uncompress::UnLzop failed: $UnLzopError\n";
 
 Returns an C<IO::Uncompress::UnLzop> object on success and undef on failure.
@@ -1059,8 +1059,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2021 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

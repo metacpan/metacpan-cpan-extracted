@@ -1,5 +1,5 @@
 /*
- * $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gtk2-GLExt/xs/GtkGL.xs,v 1.2 2004/03/07 02:45:15 muppetman Exp $
+ * $Id$
  */
 
 #include "gtkglextperl.h"
@@ -12,7 +12,7 @@ BOOT:
 #include "boot.xsh"
 }
 
-=for object Gtk2::GLExt - An OpenGL extension to Gtk2-Perl
+=for object Gtk2::GLExt - (DEPRECATED) An OpenGL extension to Gtk2-Perl
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,57 @@ BOOT:
   # do OpenGL stuff...
   $gldrawable->gl_end;
 
+=head1 ABSTRACT
+
+B<DEPRECATED> The Gtk2::GLExt module allows a Perl developer to use GtkGLExt,
+an OpenGL extension to GTK+ by Naofumi Yasufuku, with Gtk2-Perl.
+
 =head1 DESCRIPTION
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gtk2-glext
+
+=item *
+
+Upstream URL: https://gitlab.gnome.org/Archive/gtkglext
+
+=item *
+
+Last upstream version: N/A
+
+=item *
+
+Last upstream release date: N/A
+
+=item *
+
+Migration path for this module: Gtk3::GLArea
+
+=item *
+
+Migration module URL: https://metacpan.org/pod/Glib::Object::Introspection
+
+=back
+
+B<NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE>
 
 The Gtk2::GLExt module allows a Perl developer to use GtkGLExt, an OpenGL
 extension to GTK+ by Naofumi Yasufuku, with Gtk2-Perl.
@@ -83,8 +133,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the 
-Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
-Boston, MA  02111-1307  USA.
+License along with this library; if not, see
+<https://www.gnu.org/licenses/>.
 
 =cut

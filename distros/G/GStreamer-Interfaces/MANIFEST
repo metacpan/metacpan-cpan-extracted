@@ -8,11 +8,12 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 maps
 NEWS
-perl-GStreamer-Interfaces.doap
+perl-gstreamer-interfaces.doap
 README
 t/GstPropertyProbe.t
 t/GstXOverlay.t
 xs/GstInterfaces.xs
 xs/GstPropertyProbe.xs
 xs/GstXOverlay.xs
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

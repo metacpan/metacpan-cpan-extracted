@@ -28,7 +28,7 @@ our @EXPORT_OK = qw(
 
 # --------------------------------------------------------------------------- #
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 sub import {
   my ($self) = @_;
@@ -168,7 +168,8 @@ __END__
 
 =head1 NAME
 
-GStreamer - Perl interface to version 0.10.x of the GStreamer library
+GStreamer - (DEPRECATED) Perl interface to version 0.10.x of the GStreamer
+library
 
 =head1 SYNOPSIS
 
@@ -207,6 +208,55 @@ GStreamer - Perl interface to version 0.10.x of the GStreamer library
 
 =head1 ABSTRACT
 
+B<DEPRECATED> GStreamer wraps version 0.10.x of the GStreamer C libraries in a
+nice and Perlish way, freeing the programmer from any memory management and
+object casting hassles.
+
+=head1 DESCRIPTION
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gstreamer
+
+=item *
+
+Upstream URL: https://gitlab.freedesktop.org/gstreamer/gstreamer
+
+=item *
+
+Last upstream version: 0.10.35
+
+=item *
+
+Last upstream release date: 2011-06-15
+
+=item *
+
+Migration path for this module: G:O:I
+
+=item *
+
+Migration module URL: https://metacpan.org/pod/Glib::Object::Introspection
+
+=back
+
 B<NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE>
 
 This module only works with the 0.10.x series of the GStreamer C libraries.
@@ -224,9 +274,6 @@ B<NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE>
 
 GStreamer makes everybody dance like crazy.  It provides the means to play,
 stream, and convert nearly any type of media -- be it audio or video.
-GStreamer wraps version 0.10.x of the GStreamer C libraries in a nice and
-Perlish way, freeing the programmer from any memory management and object
-casting hassles.
 
 =head1 INITIALIZATION
 

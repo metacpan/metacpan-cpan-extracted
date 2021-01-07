@@ -24,16 +24,19 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
     _git_add
     _git_commit
+    _git_clone
     _git_push
     _git_pull
     _git_release
+    _git_repo
+    _git_status
     _git_tag
 );
 our %EXPORT_TAGS = (
     all     => [@EXPORT_OK],
 );
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 my $spinner_count;
 
@@ -43,7 +46,7 @@ sub _exec {
     croak("_exec() requires cmd parameter sent in") if ! defined $cmd;
 
     if ($verbose) {
-        `$cmd`;
+        print `$cmd`;
     }
     else {
         capture_merged {
@@ -55,8 +58,8 @@ sub _git_add {
     my ($verbose) = @_;
 
     if (_validate_git()) {
-        _exec('git add', $verbose);
-        croak("Git add failed... needs intervention...") if $? != 0;
+        _exec('git add .', $verbose);
+        croak("Git add failed with exit code: $?") if $? != 0;
     }
     else {
         warn "'git' not installed, can't add\n";
@@ -65,19 +68,19 @@ sub _git_add {
     return $?;
 }
 sub _git_commit {
-    my ($version, $verbose) = @_;
+    my ($msg, $verbose) = @_;
 
-    croak("git_commit() requires a version sent in") if ! defined $version;
+    croak("git_commit() requires a commit message sent in") if ! defined $msg;
 
     if ( _validate_git()) {
-        _exec("git commit -am 'Release $version candidate'", $verbose);
+        _exec("git commit -am '$msg'", $verbose);
 
         if ($? != 0) {
             if ($? == 256) {
-                print "\nNothing to commit, proceeding...\n";
+                print "\nNothing to commit, proceeding...\n" if $verbose;
             }
             else {
-                croak("Git commit failed... needs intervention...") if $? != 0;
+                croak("Git commit failed with exit code: $?") if $? != 0;
             }
         }
     }
@@ -87,12 +90,37 @@ sub _git_commit {
 
     return $?;
 }
+sub _git_clone {
+    my ($user, $repo, $verbose) = @_;
+
+    if (! defined $user || ! defined $repo) {
+        croak("git_clone() requires a user and repository sent in");
+    }
+
+    if ( _validate_git()) {
+        _exec("git clone 'https://$user\@github.com/$user/$repo'", $verbose);
+
+        if ($? != 0) {
+            if ($? == 32768) {
+                croak(
+                    "Git clone failed with exit code: $? DIRECTORY $repo ALREADY EXISTS\n"
+                );
+            }
+            croak("Git clone failed with exit code: $?\n") if $? != 0;
+        }
+    }
+    else {
+        warn "'git' not installed, can't clone\n";
+    }
+
+    return $?;
+}
 sub _git_pull {
     my ($version) = @_;
 
     if (_validate_git()) {
         `git pull`;
-        croak("Git pull failed... needs intervention...") if $? != 0;
+        croak("Git pull failed with exit code: $?") if $? != 0;
     }
     else {
         warn "'git' not installed, can't commit\n";
@@ -106,7 +134,7 @@ sub _git_push {
     if (_validate_git()) {
         _exec('git push', $verbose);
         _exec('git push --tags', $verbose);
-        croak("Git push failed... needs intervention...") if $? != 0;
+        croak("Git push failed with exit code: $?") if $? != 0;
     }
     else {
         warn "'git' not installed, can't push\n";
@@ -122,9 +150,11 @@ sub _git_release {
     $wait_for_ci //= 1;
     my $verbose = 0;
 
-    _git_pull(0);
-    _git_commit($version, $verbose);
-    _git_push($verbose);
+    if (! _git_status()) {
+        _git_pull(0);
+        _git_commit($version, $verbose);
+        _git_push($verbose);
+    }
 
     if ($wait_for_ci) {
         `clear`;
@@ -147,13 +177,54 @@ sub _git_release {
 
         if ($interrupt) {
             print "\nTests pass, continuing with release\n";
-            return 0;
+            return 1;
         }
         else {
             print "\nTests failed, halting progress\n";
-            return -1;
+            return 0;
         }
     }
+}
+sub _git_repo {
+    my $repo;
+
+    if (_validate_git()) {
+        capture_merged {
+            $repo = `git rev-parse --show-toplevel`;
+        };
+    }
+
+    if ($? == 0) {
+        $repo =~ s|.*/(.*)|$1|;
+        return $repo;
+    }
+    else {
+        return $?;
+    }
+}
+sub _git_status {
+    my $status_output;
+
+    if (_validate_git()) {
+        $status_output = `git status`;
+    }
+    else {
+        warn "'git' not installed, can't get status\n";
+    }
+
+    my @git_output = (
+        'On branch',
+        'Your branch is up-to-date with',
+        'nothing to commit, working directory clean'
+    );
+
+    my @status = split /\n/, $status_output;
+
+    for (0..$#status) {
+        return 0 if $status[$_] !~ /$git_output[$_]/;
+    }
+
+    return 1;
 }
 sub _git_tag {
     my ($version, $verbose) = @_;
@@ -200,7 +271,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Steve Bertrand.
+Copyright 2021 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

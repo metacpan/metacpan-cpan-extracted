@@ -7,11 +7,12 @@ use Types::Standard qw(ArrayRef);
 
 use namespace::clean;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 has "path" => (
 	is => "ro",
 	isa => ArrayRef,
+	required => 1,
 );
 
 has "value" => (

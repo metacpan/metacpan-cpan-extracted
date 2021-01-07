@@ -1,5 +1,5 @@
 package AnyEvent::PgRecvlogical;
-$AnyEvent::PgRecvlogical::VERSION = '1.01';
+$AnyEvent::PgRecvlogical::VERSION = '1.02';
 # ABSTRACT: perl port of pg_recvlogical
 
 =pod
@@ -343,12 +343,16 @@ sub _dsn {
 
 sub _build_dbh {
     my $self = shift;
-    return DBI->connect(
+    my $dbh = DBI->connect(
         $self->_dsn,
         $self->username,
         $self->password,
         { PrintError => 0 },
     );
+
+    croak $DBI::errstr unless $dbh;
+
+    return $dbh;
 }
 
 sub _build__fh_watch {
@@ -358,7 +362,13 @@ sub _build__fh_watch {
 
 sub _build__timer {
     my $self = shift;
-    return AE::timer $self->heartbeat, $self->heartbeat, $self->curry::weak::_heartbeat;
+    if ($AnyEvent::MODEL and $AnyEvent::MODEL eq 'AnyEvent::Impl::EV') {
+        my $w = EV::periodic(0, $self->heartbeat, 0, $self->curry::weak::_heartbeat);
+        $w->priority(&EV::MAXPRI);
+        return $w;
+    } else {
+        return AE::timer $self->heartbeat, $self->heartbeat, $self->curry::weak::_heartbeat;
+    }
 }
 
 =head1 METHODS
@@ -424,7 +434,14 @@ Returns: L<Promises::Promise>
 sub identify_system {
     my $self = shift;
     $self->dbh->do('IDENTIFY_SYSTEM', { pg_async => PG_ASYNC });
-    return _async_await($self->dbh);
+    return _async_await($self->dbh)->catch(
+        sub {
+            my @error = @_;
+            unshift @error, $DBI::errstr if $DBI::errstr;
+
+            croak @error;
+        }
+    );
 }
 
 =item create_slot

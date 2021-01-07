@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -99,6 +98,10 @@ SV * sv_from_pointer (gpointer pointer, GType gtype, gboolean own)
 /* ------------------------------------------------------------------------- */
 
 MODULE = GStreamer::Iterator	PACKAGE = GStreamer::Iterator	PREFIX = gst_iterator_
+
+=for object GStreamer::Iterator Object to retrieve multiple elements in a threadsafe way.
+
+=cut
 
 =for position SYNOPSIS
 
@@ -186,6 +189,10 @@ gst_iterator_next (iter)
 # gpointer gst_iterator_find_custom (GstIterator *it, GCompareFunc func, gpointer user_data);
 
 MODULE = GStreamer::Iterator	PACKAGE = GStreamer::Iterator::Tie
+
+=for object GStreamer::Iterator::Tie Object to retrieve multiple elements in a threadsafe way.
+
+=cut
 
 IV
 FETCHSIZE (GstIterator *iter)

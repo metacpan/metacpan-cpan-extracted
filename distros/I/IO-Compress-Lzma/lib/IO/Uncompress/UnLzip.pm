@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.096 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.100 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.096 ;
-use IO::Uncompress::Adapter::UnLzip 2.096 ;
+use IO::Uncompress::Base 2.100 ;
+use IO::Uncompress::Adapter::UnLzip 2.100 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnLzipError);
 
-$VERSION = '2.096';
+$VERSION = '2.100';
 $UnLzipError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );
@@ -74,7 +74,7 @@ sub mkUncomp
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
-    
+
     *$self->{Uncomp} = $obj;
 
     return 1;
@@ -90,9 +90,9 @@ sub ckMagic
 
     *$self->{HeaderPending} = $magic ;
 
-    return $self->HeaderError("Minimum header size is " . 
-                              4 . " bytes") 
-        if length $magic != 4 ;                                    
+    return $self->HeaderError("Minimum header size is " .
+                              4 . " bytes")
+        if length $magic != 4 ;
 
     return $self->HeaderError("Bad Magic")
         if $magic ne 'LZIP' ;
@@ -111,7 +111,7 @@ sub readHeader
     my ($buffer) = '' ;
 
     $self->smartReadExact(\$buffer, 2)
-        or return $self->HeaderError("Minimum header size is " . 
+        or return $self->HeaderError("Minimum header size is " .
                                      2 . " bytes") ;
 
     my $keep = $magic . $buffer ;
@@ -143,8 +143,8 @@ sub readHeader
         'TrailerLength'     => $VN ? 20 : 12,
         'Header'            => $keep,
         'Version'           => $VN,
-        'DictSize'          => $dicsize, 
-        };    
+        'DictSize'          => $dicsize,
+        };
 }
 
 sub chkTrailer
@@ -153,7 +153,7 @@ sub chkTrailer
     my $trailer = shift;
 
     my $not_version_0 = *$self->{Info}{Version} != 0;
-    # Check CRC & ISIZE 
+    # Check CRC & ISIZE
     my $CRC32 = unpack("V", $trailer) ;
     my $uSize = U64::newUnpack_V64 substr($trailer,  4, 8);
     my $mSize;
@@ -164,23 +164,23 @@ sub chkTrailer
 
     }
 
-    *$self->{Info}{CRC32} = $CRC32;    
-    *$self->{Info}{UncompressedLength} = $uSize->get64bit(); 
-    
+    *$self->{Info}{CRC32} = $CRC32;
+    *$self->{Info}{UncompressedLength} = $uSize->get64bit();
+
     if (*$self->{Strict}) {
         return $self->TrailerError("CRC mismatch")
             if $CRC32 != *$self->{Uncomp}->crc32() ;
 
-        return $self->TrailerError("USIZE mismatch.")        
-            if ! $uSize->equal(*$self->{UnCompSize});   
+        return $self->TrailerError("USIZE mismatch.")
+            if ! $uSize->equal(*$self->{UnCompSize});
 
         if ($not_version_0)
         {
             $mSize->subtract(6 + 20); # header & trailer
 
             return $self->TrailerError("CSIZE mismatch.")
-                if ! $mSize->equal(*$self->{CompSize}); 
-        }                    
+                if ! $mSize->equal(*$self->{CompSize});
+        }
     }
 
     return STATUS_OK;
@@ -203,7 +203,7 @@ IO::Uncompress::UnLzip - Read lzip files/buffers
     my $status = unlzip $input => $output [,OPTS]
         or die "unlzip failed: $UnLzipError\n";
 
-    my $z = new IO::Uncompress::UnLzip $input [OPTS]
+    my $z = IO::Uncompress::UnLzip->new( $input [OPTS] )
         or die "unlzip failed: $UnLzipError\n";
 
     $status = $z->read($buffer)
@@ -494,7 +494,7 @@ uncompressed data to a buffer, C<$buffer>.
     use IO::Uncompress::UnLzip qw(unlzip $UnLzipError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt.xz"
+    my $input = IO::File->new( "<file1.txt.xz" )
         or die "Cannot open 'file1.txt.xz': $!\n" ;
     my $buffer ;
     unlzip $input => \$buffer
@@ -529,7 +529,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for IO::Uncompress::UnLzip is shown below
 
-    my $z = new IO::Uncompress::UnLzip $input [OPTS]
+    my $z = IO::Uncompress::UnLzip->new( $input [OPTS] )
         or die "IO::Uncompress::UnLzip failed: $UnLzipError\n";
 
 Returns an C<IO::Uncompress::UnLzip> object on success and undef on failure.
@@ -949,8 +949,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2021 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

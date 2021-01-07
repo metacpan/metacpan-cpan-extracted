@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.096 ;
+use IO::Compress::Base 2.100 ;
 
-use IO::Compress::Base::Common  2.096 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.096 ;
+use IO::Compress::Base::Common  2.100 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.100 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.096';
+$VERSION = '2.100';
 $LzmaError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
@@ -40,7 +40,7 @@ sub lzma
 }
 
 
-sub mkHeader 
+sub mkHeader
 {
     my $self = shift ;
     return '';
@@ -77,7 +77,7 @@ sub mkComp
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
-    
+
     return $obj;
 }
 
@@ -109,7 +109,7 @@ sub getFileInfo
     my $self = shift ;
     my $params = shift;
     my $file = shift ;
-    
+
 }
 
 1;
@@ -127,7 +127,7 @@ IO::Compress::Lzma - Write lzma files/buffers
     my $status = lzma $input => $output [,OPTS]
         or die "lzma failed: $LzmaError\n";
 
-    my $z = new IO::Compress::Lzma $output [,OPTS]
+    my $z = IO::Compress::Lzma->new( $output [,OPTS] )
         or die "lzma failed: $LzmaError\n";
 
     $z->print($string);
@@ -402,7 +402,7 @@ compressed data to a buffer, C<$buffer>.
     use IO::Compress::Lzma qw(lzma $LzmaError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt"
+    my $input = IO::File->new( "<file1.txt" )
         or die "Cannot open 'file1.txt': $!\n" ;
     my $buffer ;
     lzma $input => \$buffer
@@ -439,7 +439,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for C<IO::Compress::Lzma> is shown below
 
-    my $z = new IO::Compress::Lzma $output [,OPTS]
+    my $z = IO::Compress::Lzma->new( $output [,OPTS] )
         or die "IO::Compress::Lzma failed: $LzmaError\n";
 
 It returns an C<IO::Compress::Lzma> object on success and undef on failure.
@@ -771,8 +771,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2021 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

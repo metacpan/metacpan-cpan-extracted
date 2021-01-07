@@ -34,19 +34,25 @@ our @EXPORT_OK = qw(
     cpan_upload
     git_add
     git_commit
+    git_clone
     git_pull
     git_push
     git_ignore
     git_release
+    git_repo
+    git_status
     git_tag
     init
     make_dist
     make_distclean
+    make_manifest
     make_test
     manifest_skip
+    manifest_t
     move_distribution_files
     remove_unwanted_files
     version_bump
+    version_incr
     version_info
 );
 our @EXPORT_PRIVATE = qw(
@@ -57,7 +63,7 @@ our %EXPORT_TAGS = (
     private => _export_private(),
 );
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use constant {
     GITHUB_CI_FILE      => 'github_ci_default.yml',
@@ -67,6 +73,7 @@ use constant {
     FSTYPE_IS_DIR       => 1,
     FSTYPE_IS_FILE      => 2,
     DEFAULT_DIR         => 'lib/',
+    MAKE                => $^O =~ /win32/i ? 'gmake' : 'make',
 };
 
 # Public
@@ -100,13 +107,19 @@ sub changes {
 
     $file //= 'Changes';
 
-    # Overwrite the Changes file if the SHA1 checksum matches the original file
-    # created with module-starter
+    # Overwrite the Changes file if there aren't any dates in it
 
     my @contents;
 
-    if (! -e $file || _sha1sum($file) eq CHANGES_ORIG_SHA) {
-        @contents = _changes_file($module);
+    my $changes_date_count = 0;
+
+    if (-e $file) {
+        my ($contents, $tie) = _changes_tie($file);
+        $changes_date_count = grep /\d{4}-\d{2}-\d{2}/, $contents;
+        untie $tie;
+    }
+    if (! -e $file || ! $changes_date_count) {
+        my @contents = _changes_file($module);
         _changes_write_file($file, \@contents);
     }
 
@@ -142,6 +155,9 @@ sub changes_date {
     $y += 1900;
     $m += 1;
 
+    $m = "0$m" if length $m == 1;
+    $d = "0$d" if length $d == 1;
+
     for (0..$#$contents) {
         if ($contents->[$_] =~ /^(.*)\s+UNREL/) {
             $contents->[$_] = "$1    $y-$m-$d";
@@ -152,23 +168,50 @@ sub changes_date {
     untie $tie;
 }
 sub ci_badges {
-    if (scalar @_ != 3) {
-        croak("ci_badges() needs \$author, \$repo and \$fs_entry sent in");
+    if (scalar @_ < 2) {
+        croak("ci_badges() needs \$author and \$repo sent in");
     }
 
     my ($author, $repo, $fs_entry) = @_;
 
+    $fs_entry //= DEFAULT_DIR;
+
+    my $exit = 0;
+
     for (_module_find_files($fs_entry)) {
-        _module_insert_ci_badges($author, $repo, $_);
+        $exit = -1 if _module_insert_ci_badges($author, $repo, $_) == -1;
     }
 
-    return 0;
+    return $exit;
 }
 sub ci_github {
     my ($os) = @_;
 
     if (defined $os && ref $os ne 'ARRAY') {
-        croak("\$os parameter to github_ci() must be an array ref");
+        croak("\$os parameter to ci_github() must be an array ref");
+    }
+
+    # Add the CI file to MANIFEST.SKIP
+
+    if (-e 'MANIFEST.SKIP') {
+        open my $fh, '<', 'MANIFEST.SKIP'
+            or croak("Can't open MANIFEST.SKIP for reading");
+
+        my @makefile_skip_contents = <$fh>;
+
+        if (grep !m|\.github$|, @makefile_skip_contents) {
+            close $fh;
+            open my $wfh, '>>', 'MANIFEST.SKIP'
+                or croak("Can't open MANIFEST.SKIP for writing");
+
+            print $wfh '^\.github/';
+        }
+    }
+    else {
+        open my $wfh, '>>', 'MANIFEST.SKIP'
+            or croak("Can't open MANIFEST.SKIP for writing");
+
+        print $wfh '^\.github/';
     }
 
     my @contents = _ci_github_file($os);
@@ -191,13 +234,15 @@ sub cpan_upload {
     $args{password} = $ENV{CPAN_PASSWORD} ||= 0 if ! exists $args{password};
 
     if (! $args{user} || ! $args{password}) {
-        croak("cpan_upload() requires the CPAN_USERNAME and CPAN_PASSWORD env vars set");
+        croak("\ncpan_upload() requires the CPAN_USERNAME and CPAN_PASSWORD env vars set");
     }
 
     CPAN::Uploader->upload_file(
         $dist_file_name,
         \%args
     );
+
+    print "\nSuccessfully uploaded $dist_file_name to the CPAN\n";
 }
 sub git_add {
     _git_add();
@@ -216,6 +261,9 @@ sub git_ignore {
 sub git_commit {
     _git_commit(@_);
 }
+sub git_clone {
+    _git_clone(@_);
+}
 sub git_push {
     _git_push(@_);
 }
@@ -225,6 +273,12 @@ sub git_pull {
 sub git_release {
     _git_release(@_);
 }
+sub git_repo {
+    _git_repo();
+}
+sub git_status {
+    _git_status(@_);
+}
 sub git_tag {
     _git_tag(@_);
 }
@@ -233,7 +287,7 @@ sub init {
 
     my $cwd = getcwd();
 
-    if ($cwd =~ /dist-mgr$/) {
+    if ($cwd =~ /dist-mgr(-\d+\.\d+)?$/i) {
         croak "Can't run init() while in the '$cwd' directory";
     }
 
@@ -250,7 +304,15 @@ sub init {
         croak("init()'s 'modules' parameter must be an array reference");
     }
 
-    Module::Starter->create_distro(%args);
+    if ($args{verbose}) {
+        delete $args{verbose};
+        Module::Starter->create_distro(%args);
+    }
+    else {
+        capture_merged {
+            Module::Starter->create_distro(%args);
+        };
+    }
 
     my ($module) = (@{ $args{modules} })[0];
     my $module_file = $module;
@@ -277,6 +339,17 @@ sub manifest_skip {
     my @content = _manifest_skip_file();
 
     _manifest_skip_write_file($dir, \@content);
+
+    return @content;
+}
+sub manifest_t {
+    my ($dir) = @_;
+
+    $dir //= './t';
+
+    my @content = _manifest_t_file();
+
+    _manifest_t_write_file($dir, \@content);
 
     return @content;
 }
@@ -315,38 +388,75 @@ sub remove_unwanted_files {
     for (_unwanted_filesystem_entries()) {
         rmtree $_;
     }
-
+    make_manifest();
     return 0;
 }
 sub make_dist {
-    capture_merged {
-        `make dist`;
-    };
+    my ($verbose) = @_;
+
+    my $cmd = "${\MAKE} dist";
+    $verbose ? `$cmd` : capture_merged {`$cmd`};
 
     if ($? != 0) {
-        croak("Exit code $? returned... 'make dist' failed");
+        croak("Exit code $? returned... '${\MAKE} dist' failed");
     }
 
     return $?;
 }
 sub make_distclean {
-    capture_merged {
-        `make distclean`;
-    };
+    my ($verbose) = @_;
+
+    my $cmd = "${\MAKE} distclean";
+    $verbose ? print `$cmd` : capture_merged {`$cmd`};
 
     if ($? != 0) {
-        croak("Exit code $? returned... 'make dist' failed");
+        croak("Exit code $? returned... '${\MAKE} distclean' failed\n");
+    }
+
+    return $?;
+}
+sub make_manifest {
+    my ($verbose) = @_;
+
+    if ($verbose) {
+        if (-f 'MANIFEST') {
+            unlink 'MANIFEST' or die "make_manifest() Couldn't remove MANIFEST\n";
+        }
+        print `$^X Makefile.PL`;
+        print `${\MAKE} manifest`;
+        make_distclean($verbose);
+    }
+    else {
+        capture_merged {
+            if (-f 'MANIFEST') {
+                unlink 'MANIFEST' or die "make_manifest() Couldn't remove MANIFEST\n";
+            }
+            `$^X Makefile.PL`;
+            `${\MAKE} manifest`;
+            make_distclean($verbose);
+        };
+    }
+
+    if ($? != 0) {
+        croak("Exit code $? returned... '${\MAKE} manifest' failed\n");
     }
 
     return $?;
 }
 sub make_test {
+    my ($verbose) = @_;
+
+    if ($verbose) {
+        print `$^X Makefile.PL`;
+        print `${\MAKE} test`;
+    }
     capture_merged {
-        `$^X Makefile.PL && make test`;
+        `$^X Makefile.PL`;
+        `${\MAKE} test`;
     };
 
     if ($? != 0) {
-        croak("Exit code $? returned... 'make test' failed");
+        croak("Exit code $? returned... '${\MAKE} test' failed\n");
     }
 
     return $?;
@@ -420,6 +530,16 @@ sub version_bump {
         }
     }
     return \%files;
+}
+sub version_incr {
+    my ($version) = @_;
+
+    croak("version_incr() needs a version number sent in") if ! defined $version;
+
+    my $incremented_version;
+
+    _validate_version($version);
+    return sprintf("%.2f", $version + '0.01');
 }
 sub version_info {
     my ($fs_entry) = @_;
@@ -558,6 +678,8 @@ sub _makefile_insert_bugtracker {
 
     my ($mf, $tie) = _makefile_tie($makefile);
 
+    return -1 if grep /bugtracker/, @$mf;
+
     if (grep ! /META_MERGE/, @$mf) {
         _makefile_insert_meta_merge($mf);
     }
@@ -583,6 +705,8 @@ sub _makefile_insert_repository {
 
     my ($mf, $tie) = _makefile_tie($makefile);
 
+    return -1 if grep /repository/, @$mf;
+
     if (grep ! /META_MERGE/, @$mf) {
         _makefile_insert_meta_merge($mf);
     }
@@ -598,7 +722,7 @@ sub _makefile_insert_repository {
     return 0;
 }
 
-# MANIFEST.SKIP related
+# MANIFEST related
 
 sub _manifest_skip_write_file {
     # Writes out the MANIFEST.SKIP file
@@ -606,6 +730,20 @@ sub _manifest_skip_write_file {
     my ($dir, $content) = @_;
 
     open my $fh, '>', "$dir/MANIFEST.SKIP" or croak $!;
+
+    for (@$content) {
+        print $fh "$_\n"
+    }
+
+    return 0;
+}
+sub _manifest_t_write_file {
+    # Writes out the t/manifest.t test file
+
+    my ($dir, $content) = @_;
+
+    open my $fh, '>', "$dir/manifest.t"
+        or croak("Can't open t/manifest.t for writing: $!\n");
 
     for (@$content) {
         print $fh "$_\n"
@@ -706,6 +844,8 @@ sub _module_insert_ci_badges {
 
     my ($mf, $tie) = _module_tie($module_file);
 
+    return -1 if grep /badge\.svg/, @$mf;
+
     for (0..$#$mf) {
         if ($mf->[$_] =~ /^=head1 NAME/) {
             splice @$mf, $_+3, 0, _module_section_ci_badges($author, $repo);
@@ -758,17 +898,6 @@ sub _module_write_template {
 
 # Validation related
 
-sub _sha1sum {
-    my ($file) = @_;
-
-    croak("shasum needs file param") if ! defined $file;
-
-    my $sha1 = Digest::SHA->new;
-
-    $sha1->addfile($file, 'U');
-
-    return $sha1->hexdigest;
-}
 sub _validate_git {
     my $sep = $^O =~ /win32/i ? ';' : ':';
     return grep {-x "$_/git" } split /$sep/, $ENV{PATH};
@@ -828,7 +957,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Steve Bertrand.
+Copyright 2020-2021 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

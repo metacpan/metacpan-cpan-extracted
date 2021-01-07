@@ -5,15 +5,15 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.096 ;
-use IO::Compress::Base::Common  2.096 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Xz 2.096 ;
-use Compress::Raw::Lzma  2.096 ;
+use IO::Compress::Base 2.100 ;
+use IO::Compress::Base::Common  2.100 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Xz 2.100 ;
+use Compress::Raw::Lzma  2.100 ;
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $XzError);
 
-$VERSION = '2.096';
+$VERSION = '2.100';
 $XzError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
@@ -42,7 +42,7 @@ sub xz
 }
 
 
-sub mkHeader 
+sub mkHeader
 {
     my $self = shift ;
     return '';
@@ -67,7 +67,7 @@ sub ckParams
     my $got = shift;
 
     # TODO - validate the parameters
-    
+
     return 1 ;
 }
 
@@ -77,7 +77,7 @@ sub mkComp
     my $self = shift ;
     my $got = shift ;
 
-    my ($obj, $errstr, $errno) 
+    my ($obj, $errstr, $errno)
         = IO::Compress::Adapter::Xz::mkCompObject($got->getValue('preset'),
                                                   $got->getValue('extreme'),
                                                   $got->getValue('check')
@@ -85,7 +85,7 @@ sub mkComp
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
-    
+
     return $obj;
 }
 
@@ -117,7 +117,7 @@ sub getFileInfo
     my $self = shift ;
     my $params = shift;
     my $file = shift ;
-    
+
 }
 
 1;
@@ -135,7 +135,7 @@ IO::Compress::Xz - Write xz files/buffers
     my $status = xz $input => $output [,OPTS]
         or die "xz failed: $XzError\n";
 
-    my $z = new IO::Compress::Xz $output [,OPTS]
+    my $z = IO::Compress::Xz->new( $output [,OPTS] )
         or die "xz failed: $XzError\n";
 
     $z->print($string);
@@ -410,7 +410,7 @@ compressed data to a buffer, C<$buffer>.
     use IO::Compress::Xz qw(xz $XzError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt"
+    my $input = IO::File->new( "<file1.txt" )
         or die "Cannot open 'file1.txt': $!\n" ;
     my $buffer ;
     xz $input => \$buffer
@@ -447,7 +447,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for C<IO::Compress::Xz> is shown below
 
-    my $z = new IO::Compress::Xz $output [,OPTS]
+    my $z = IO::Compress::Xz->new( $output [,OPTS] )
         or die "IO::Compress::Xz failed: $XzError\n";
 
 It returns an C<IO::Compress::Xz> object on success and undef on failure.
@@ -799,8 +799,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2021 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

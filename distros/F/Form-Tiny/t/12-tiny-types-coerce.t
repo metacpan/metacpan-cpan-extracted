@@ -2,6 +2,9 @@ use v5.10;
 use warnings;
 use Test::More;
 use Form::Tiny;
+use Form::Tiny::Inline;
+use Test::Exception;
+use Types::Standard qw(CodeRef);
 
 {
 
@@ -25,7 +28,13 @@ use Form::Tiny;
 				name => "integer",
 				type => Int->plus_coercions(Num, q{ int($_) }),
 				coerce => 1,
-			}
+			},
+
+			{
+				name => "err",
+				type => Int->plus_coercions(Str, q{ 1/0 }),
+				coerce => 1,
+			},
 		)
 	}
 
@@ -35,9 +44,11 @@ use Form::Tiny;
 my @data = (
 	[1, {string => "UPPERCASE", integer => 8.5}],
 	[1, {string => "Expr: 2 + 3", integer => -0xf3}],
+	[1, {err => 5}],
 	[0, {integer => "not an integer"}],
 	[0, {integer => "1not an integer"}],
 	[0, {string => undef}],
+	[0, {err => 'aoeu'}],
 );
 
 for my $aref (@data) {
@@ -60,6 +71,21 @@ for my $aref (@data) {
 			isa_ok($error, "Form::Tiny::Error::DoesNotValidate");
 		}
 	}
+}
+
+for my $type (undef, CodeRef) {
+	dies_ok {
+		Form::Tiny::Inline->new(
+			field_defs => [
+				{
+					name => 'test',
+					(defined $type ? (type => $type) : ()),
+					coerce => 1,
+				}
+			],
+		);
+	}
+	"invalid coerce configuration dies";
 }
 
 done_testing();

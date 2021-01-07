@@ -13,7 +13,7 @@ my $orig = 't/data/orig/MANIFEST.SKIP';
 
 my $dir = 't/data/work';
 
-unlink_manifest_skip();
+unlink_manifest();
 
 my @c = manifest_skip($dir);
 
@@ -35,7 +35,7 @@ for (0..$#w) {
     is $w[$_], $o[$_], "new manifest.skip line $_ matches original file";
 }
 
-unlink_manifest_skip();
+unlink_manifest();
 
 done_testing;
 

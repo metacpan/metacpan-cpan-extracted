@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.096 qw(:Status);
+use IO::Compress::Base::Common  2.100 qw(:Status);
 use Compress::LZO qw(crc32 adler32);
 
 our ($VERSION);
-$VERSION = '2.096';
+$VERSION = '2.100';
 
 sub mkCompObject
 {
@@ -26,7 +26,7 @@ sub mkCompObject
                   'ErrorNo'    => 0,
                   'CompBytes'  => 0,
                   'UnCompBytes'=> 0,
-                 } ;     
+                 } ;
 }
 
 sub compr
@@ -36,7 +36,7 @@ sub compr
     $self->{Buffer} .= ${ $_[0] } ;
     return $self->writeBlock(\$_[1], 0)
         if length $self->{Buffer} >= $self->{BlockSize} ;
-    
+
 
     return STATUS_OK;
 }
@@ -132,7 +132,7 @@ sub writeOneBlock
 
 sub reset
 {
-    return STATUS_OK;    
+    return STATUS_OK;
 }
 
 sub compressedBytes
@@ -177,4 +177,3 @@ sub uncompressedBytes
 1;
 
 __END__
-

@@ -33,7 +33,7 @@ sub ExternalZstdWorks
 
     writeWithZstd($outfile, $content)
         or return 0;
-    
+
     my $got ;
     readWithZstd($outfile, $got)
         or return 0;
@@ -57,7 +57,7 @@ sub readWithZstd
     if ( system("$UnZstd <$file >$outfile") == 0 )
     {
         $_[0] = readFile($outfile);
-        return 1 
+        return 1
     }
 
     diag "'$UnZstd' failed: \$?=$? \$!=$!";
@@ -82,7 +82,7 @@ sub writeWithZstd
     unlink $file ;
     my $comp = "$Zstd -c $options <$infile >$file" ;
 
-    return 1 
+    return 1
         if system($comp) == 0 ;
 
     diag "'$comp' failed: \$?=$? \$!=$!";
@@ -100,7 +100,7 @@ BEGIN {
         $Zstd = File::Spec->catfile($dir, $zstd)
             if -x File::Spec->catfile($dir, $zstd) ;
         $UnZstd = File::Spec->catfile($dir, $unzstd)
-            if -x File::Spec->catfile($dir, $unzstd) ;            
+            if -x File::Spec->catfile($dir, $unzstd) ;
     }
 
     plan(skip_all => "Cannot find zstd")
@@ -109,9 +109,9 @@ BEGIN {
     plan(skip_all => "Cannot find unzstd")
         if ! $UnZstd ;
 
-    # Handle spaces in path to zstd 
-    $Zstd = "\"$Zstd\"" if defined $Zstd && $Zstd =~ /\s/;    
-    $UnZstd = "\"$UnZstd\"" if defined $UnZstd && $UnZstd =~ /\s/;    
+    # Handle spaces in path to zstd
+    $Zstd = "\"$Zstd\"" if defined $Zstd && $Zstd =~ /\s/;
+    $UnZstd = "\"$UnZstd\"" if defined $UnZstd && $UnZstd =~ /\s/;
 
     plan(skip_all => "$zstd doesn't work as expected")
         if ! ExternalZstdWorks();
@@ -149,4 +149,3 @@ for my $content ($shortContent, $longContent)
     is readWithZstd($file1, $got), 1, "readWithZstd returns 0";
     is $got, $content, "got content";
 }
-

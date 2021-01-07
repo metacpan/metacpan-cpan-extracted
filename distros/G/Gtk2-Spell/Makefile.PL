@@ -16,6 +16,12 @@ our %build_reqs = (
 	'GtkSpell'                => '2.0.0',
 );
 
+our %pre_reqs = (
+   'Glib'                => $build_reqs{'perl-Glib'},
+   'Gtk2'                => $build_reqs{'perl-Gtk2'},
+   'ExtUtils::Depends'   => $build_reqs{'perl-ExtUtils-Depends'},
+   'ExtUtils::PkgConfig' => $build_reqs{'perl-ExtUtils-PkgConfig'},
+);
 # Writing a fake Makefile ensures that CPAN will pick up the correct
 # dependencies and install them.
 unless (eval "use ExtUtils::Depends;"
@@ -30,12 +36,7 @@ unless (eval "use ExtUtils::Depends;"
    warn "$@\n";
    WriteMakefile(
          PREREQ_FATAL => 1,
-         PREREQ_PM    => {
-            'Glib'                => $build_reqs{'perl-Glib'},
-            'Gtk2'                => $build_reqs{'perl-Gtk2'},
-            'ExtUtils::Depends'   => $build_reqs{'perl-ExtUtils-Depends'},
-            'ExtUtils::PkgConfig' => $build_reqs{'perl-ExtUtils-PkgConfig'},
-         },
+         PREREQ_PM    => \%pre_reqs,
    );
    exit 1; # not reached
 }
@@ -64,13 +65,45 @@ $gtk2spell->save_config ('build/IFiles.pm');
 WriteMakefile(
     NAME          => 'Gtk2::Spell',
     VERSION_FROM  => 'lib/Gtk2/Spell.pm',
-    PREREQ_PM     => {},
+    PREREQ_PM     => \%pre_reqs,
     ABSTRACT_FROM => 'lib/Gtk2/Spell.pm',
+    META_MERGE    => {
+        configure_requires => \%pre_reqs,
+        x_deprecated       => 1,
+    },
     XSPROTOARG    => '-noprototypes',
     $gtk2spell->get_makefile_vars,
 );
 
 use Cwd;
+
+
+print <<__EON__;
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+* Perl URL: https://gitlab.gnome.org/GNOME/perl-gtk2-spell
+* Upstream URL: http://gtkspell.sourceforge.net/
+* Last upstream version: 2.0.16
+* Last upstream release date: 2009-10-22
+* Migration path for this module: G:O:I
+* Migration module URL: https://metacpan.org/pod/Glib::Object::Introspection
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+__EON__
 
 sub MY::postamble
 {
@@ -102,5 +135,4 @@ PARTICULAR PURPOSE.  See the GNU Library General Public License for more
 details.
 
 You should have received a copy of the GNU Library General Public License along
-with this library; if not, write to the Free Software Foundation, Inc., 59
-Temple Place - Suite 330, Boston, MA  02111-1307  USA.
+with this library; if not, see <https://www.gnu.org/licenses/>.

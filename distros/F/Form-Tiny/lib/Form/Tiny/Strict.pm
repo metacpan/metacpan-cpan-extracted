@@ -4,6 +4,7 @@ use v5.10;
 use warnings;
 use Types::Standard qw(Bool);
 
+use Form::Tiny::Utils;
 use Form::Tiny::Error;
 use Form::Tiny::FieldDefinition;
 
@@ -19,7 +20,7 @@ sub join_path
 
 use Moo::Role;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use constant META_SKIP => "skip";
 use constant META_ARRAY => "array";
@@ -95,9 +96,11 @@ sub _check_strict
 		}
 	}
 
-	local $@;
-	eval { $self->_check_recursive($input, \%meta) };
-	if ($@) {
+	my $error = try sub {
+		$self->_check_recursive($input, \%meta);
+	};
+
+	if ($error) {
 		$self->add_error(Form::Tiny::Error::IsntStrict->new);
 	}
 }

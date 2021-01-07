@@ -1,10 +1,10 @@
 {
-   "abstract" : "Bindings for GtkSpell with Gtk2",
+   "abstract" : "(DEPRECATED) Bindings for GtkSpell with Gtk2",
    "author" : [
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.113640",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "unknown"
    ],
@@ -22,18 +22,28 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::Depends" : "0.1",
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::PkgConfig" : "0.1",
+            "Glib" : "1.24",
+            "Gtk2" : "1.00"
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::Depends" : "0.1",
+            "ExtUtils::PkgConfig" : "0.1",
+            "Glib" : "1.24",
+            "Gtk2" : "1.00"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "1.04"
+   "version" : "1.05",
+   "x_deprecated" : 1
 }

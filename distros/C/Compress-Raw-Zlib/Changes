@@ -1,5 +1,9 @@
 CHANGES
 -------
+  2.100 7 January 2021
+
+      * trim whitespace
+        5de62cd3987c736c14d1aa804936808fbc1fe9cb
 
   2.096 31 July 2020
 

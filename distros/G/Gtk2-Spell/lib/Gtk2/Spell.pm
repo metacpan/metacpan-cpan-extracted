@@ -14,7 +14,7 @@ require DynaLoader;
 
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 sub dl_load_flags { 0x01 }
 
@@ -27,7 +27,7 @@ __END__
 
 =head1 NAME
 
-Gtk2::Spell - Bindings for GtkSpell with Gtk2
+Gtk2::Spell - (DEPRECATED) Bindings for GtkSpell with Gtk2
 
 =head1 SYNOPSIS
 
@@ -44,11 +44,57 @@ Gtk2::Spell - Bindings for GtkSpell with Gtk2
 
 =head1 ABSTRACT
 
-  Perl bindings to GtkSpell, used in concert with Gtk2::TextView.
+B<DEPRECATED> Perl bindings to GtkSpell, used in concert with Gtk2::TextView.
 
 =head1 DESCRIPTION
 
-Perl bindings to GtkSpell, used in concert with Gtk2::TextView. Provides 
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gtk2-spell
+
+=item *
+
+Upstream URL: http://gtkspell.sourceforge.net/
+
+=item *
+
+Last upstream version: 2.0.16
+
+=item *
+
+Last upstream release date: 2009-10-22
+
+=item *
+
+Migration path for this module: G:O:I
+
+=item *
+
+Migration module URL: https://metacpan.org/pod/Glib::Object::Introspection
+
+=back
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+
+Perl bindings to GtkSpell, used in concert with Gtk2::TextView. Provides
 mis-spelled word highlighting in red and offers a right click pop-up menu with
 suggested corrections.
 
@@ -60,11 +106,11 @@ suggested corrections.
 
 =item $spell = Gtk2::Spell->new_attach(GTK2_TEXT_VIEW)
 
-Creates and returns a new Gtk2::Spell object attached to GTK2_TEXT_VIEW. 
+Creates and returns a new Gtk2::Spell object attached to GTK2_TEXT_VIEW.
 
 =item $spell->set_language(LANG_STR)
 
-Sets the language which the underlying spell-checker will use. According to the 
+Sets the language which the underlying spell-checker will use. According to the
 GtkSpell API reference this 'appears to be a locale specifier.'
 
 =item $spell->recheck_all
@@ -107,7 +153,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the 
-Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
-Boston, MA  02111-1307  USA.
+License along with this library; if not, see
+<https://www.gnu.org/licenses/>.
 

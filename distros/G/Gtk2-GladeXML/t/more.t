@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Glade/t/more.t,v 1.1 2004/09/15 03:30:57 muppetman Exp $
+# $Id$
 #
 # we don't require Gtk2 any newer than 1.000, so don't assume we have
 # Gtk2::TestHelper available.

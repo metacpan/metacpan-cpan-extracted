@@ -9,7 +9,7 @@
 #
 # copyright at the end of the file in the pod section
 
-package Config::Model::TkUI 1.372;
+package Config::Model::TkUI 1.373;
 
 use 5.10.1;
 use strict;
@@ -33,7 +33,6 @@ use Tk::DoubleClick;
 use Tk::Balloon;
 use Tk::Photo;
 use Tk::PNG;    # required for Tk::Photo to be able to load pngs
-use Tk::DialogBox;
 use Tk::Adjuster;
 use Tk::FontDialog;
 
@@ -58,6 +57,7 @@ use Config::Model::Tk::NodeViewer;
 use Config::Model::Tk::NodeEditor;
 
 use Config::Model::Tk::Wizard;
+use Config::Model::Tk::CmeDialog;
 
 Construct Tk::Widget 'ConfigModelUI';
 
@@ -79,7 +79,7 @@ sub Tk::Error {
     my $msg = ( ref($error) && $error->can('as_string') ) ? $error->as_string : $error;
     warn $msg;
     $msg .= "Tk stack: \n@locations\n";
-    $cw->Dialog(
+    $cw->CmeDialog(
         -title => 'Config::Model error',
         -text  => $msg,
     )->Show;
@@ -429,23 +429,23 @@ sub add_help_menu {
         $cw->Dialog(
             -title => 'About',
             -text  => "Config::Model::TkUI \n"
-                . "(c) 2008-2012 Dominique Dumont \n"
+                . "(c) 2008-2021 Dominique Dumont \n"
                 . "Licensed under LGPLv2\n"
         )->Show;
     };
 
     my $info_sub = sub {
-        my $db = $cw->DialogBox( -title => 'TODO' );
-        my $text = $db->add( 'Scrolled', 'ROText' )->pack;
-        $text->insert( 'end', $info_text );
-        $db->Show;
+        $cw->CmeDialog(
+            -title => 'TODO',
+            -text =>  $info_text
+        )->Show;
     };
 
     my $help_sub = sub {
-        my $db = $cw->DialogBox( -title => 'help' );
-        my $text = $db->add( 'Scrolled', 'ROText' )->pack;
-        $text->insert( 'end', $help_text );
-        $db->Show;
+        $cw->CmeDialog(
+            -title => 'help',
+            -text => $help_text
+        )->Show;
     };
 
     my $class   = $cw->{instance}->config_root->config_class_name;
@@ -558,13 +558,13 @@ sub save {
         }
 
         if ($@) {
-            my $answer = $cw->Dialog(
+            my $err = $@ ;
+            my $answer = $cw->CmeDialog(
                 -title => 'Save error',
-                -text  => "Cannot save: " . (ref($@) ? $@->as_string : $@),
+                -text  => "Cannot save: $err",
                 -buttons        => [ qw/quit cancel/ ],
                 -default_button => 'cancel',
             )->Show;
-            my $err = $@ ;
             $cb->($err) if $answer eq 'quit'; # indicate failure
         }
         else {

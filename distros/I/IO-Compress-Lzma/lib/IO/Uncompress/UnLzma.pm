@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.096 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.100 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.096 ;
-use IO::Uncompress::Adapter::UnLzma 2.096 ;
+use IO::Uncompress::Base 2.100 ;
+use IO::Uncompress::Adapter::UnLzma 2.100 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnLzmaError);
 
-$VERSION = '2.096';
+$VERSION = '2.100';
 $UnLzmaError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );
@@ -68,7 +68,7 @@ sub mkUncomp
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
-    
+
     *$self->{Uncomp} = $obj;
 
     *$self->{Info} = $self->ckMagic()
@@ -106,14 +106,14 @@ sub isLzma
 
     my $buffer = '';
 
-    $self->smartRead(\$buffer, *$self->{BlockSize}) >= 0  
+    $self->smartRead(\$buffer, *$self->{BlockSize}) >= 0
         or return $self->saveErrorString(undef, "No data to read");
 
     my $temp_buf = $magic . $buffer ;
-    *$self->{HeaderPending} = $temp_buf ;    
+    *$self->{HeaderPending} = $temp_buf ;
     $buffer = '';
     my $status = *$self->{Uncomp}->uncompr(\$temp_buf, \$buffer, $self->smartEof()) ;
-    
+
     return $self->saveErrorString(undef, *$self->{Uncomp}{Error}, STATUS_ERROR)
         if $status == STATUS_ERROR;
 
@@ -121,12 +121,12 @@ sub isLzma
 
     return $self->saveErrorString(undef, "unexpected end of file", STATUS_ERROR)
         if $self->smartEof() && $status != STATUS_ENDSTREAM;
-            
+
     #my $buf_len = *$self->{Uncomp}->uncompressedBytes();
     my $buf_len = length $buffer;
 
     if ($status == STATUS_ENDSTREAM) {
-        if (*$self->{MultiStream} 
+        if (*$self->{MultiStream}
                     && (length $temp_buf || ! $self->smartEof())){
             *$self->{NewStream} = 1 ;
             *$self->{EndStream} = 0 ;
@@ -135,9 +135,9 @@ sub isLzma
             *$self->{EndStream} = 1 ;
         }
     }
-    *$self->{HeaderPending} = $buffer ;    
-    *$self->{InflatedBytesRead} = $buf_len ;    
-    *$self->{TotalInflatedBytesRead} += $buf_len ;    
+    *$self->{HeaderPending} = $buffer ;
+    *$self->{InflatedBytesRead} = $buf_len ;
+    *$self->{TotalInflatedBytesRead} += $buf_len ;
     *$self->{Type} = 'lzma';
 
     $self->saveStatus(STATUS_OK);
@@ -148,7 +148,7 @@ sub isLzma
         'TrailerLength' => 0,
         'Header'        => ''
         };
-    
+
 
     return '';
 }
@@ -170,7 +170,7 @@ sub readHeader
         'TrailerLength'     => 0,
         'Header'            => ''
         };
-    
+
 }
 
 sub chkTrailer
@@ -195,7 +195,7 @@ IO::Uncompress::UnLzma - Read lzma files/buffers
     my $status = unlzma $input => $output [,OPTS]
         or die "unlzma failed: $UnLzmaError\n";
 
-    my $z = new IO::Uncompress::UnLzma $input [OPTS]
+    my $z = IO::Uncompress::UnLzma->new( $input [OPTS] )
         or die "unlzma failed: $UnLzmaError\n";
 
     $status = $z->read($buffer)
@@ -486,7 +486,7 @@ uncompressed data to a buffer, C<$buffer>.
     use IO::Uncompress::UnLzma qw(unlzma $UnLzmaError) ;
     use IO::File ;
 
-    my $input = new IO::File "<file1.txt.lzma"
+    my $input = IO::File->new( "<file1.txt.lzma" )
         or die "Cannot open 'file1.txt.lzma': $!\n" ;
     my $buffer ;
     unlzma $input => \$buffer
@@ -521,7 +521,7 @@ and if you want to compress each file one at a time, this will do the trick
 
 The format of the constructor for IO::Uncompress::UnLzma is shown below
 
-    my $z = new IO::Uncompress::UnLzma $input [OPTS]
+    my $z = IO::Uncompress::UnLzma->new( $input [OPTS] )
         or die "IO::Uncompress::UnLzma failed: $UnLzmaError\n";
 
 Returns an C<IO::Uncompress::UnLzma> object on success and undef on failure.
@@ -941,8 +941,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2021 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

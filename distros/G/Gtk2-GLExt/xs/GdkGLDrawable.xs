@@ -1,5 +1,5 @@
 /*
- * $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gtk2-GLExt/xs/GdkGLDrawable.xs,v 1.1 2003/11/16 19:56:40 rwmcfa1 Exp $
+ * $Id$
  */
 
 #include "gtkglextperl.h"

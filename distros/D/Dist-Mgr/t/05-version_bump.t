@@ -16,6 +16,7 @@ my @valid = ("$d/One.pm", "$d/Two.pm", "$d/Three.pm");
 
 my $h = Hook::Output::Tiny->new;
 
+remove_init();
 copy_module_files();
 
 # bad params

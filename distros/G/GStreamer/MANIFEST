@@ -31,7 +31,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 maps
 NEWS
-perl-GStreamer.doap
+perl-gstreamer.doap
 README
 t/Gst.t
 t/GstBin.t

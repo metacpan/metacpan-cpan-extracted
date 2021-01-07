@@ -1,0 +1,108 @@
+Gtk2::Html2 version 0.05
+========================
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+* Perl URL: https://gitlab.gnome.org/GNOME/perl-gtk2-html2
+* Upstream URL: https://gitlab.gnome.org/Archive/gtkhtml2
+* Last upstream version: 2.11.1
+* Last upstream release date: 2007-08-13
+* Migration path for this module: maybe Gtk3::WebKit
+* Migration module URL: https://metacpan.org/pod/Gtk3::WebKit
+
+NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+
+
+The Gtk2::Html2 extension allows a perl developer to use the gtkhtml2 html
+display widget with Gtk2-Perl.
+
+gtkhtml2 is tuned for html display; for html editing, you want gtkhtml3.
+There appears to be very little documentation about gtkhtml2 on the web.
+Take what you can get, and add to this module's documentation and examples
+if you can.
+
+To discuss gtk2-perl, ask questions and flame/praise the authors,
+join gtk-perl-list@gnome.org at lists.gnome.org.
+
+Also have a look at the gtk2-perl website and sourceforge project page,
+http://gtk2-perl.sourceforge.net
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+To avoid installing to a system directory, since this is a beta release,
+you can change the installation prefix at Makefile.PL time with
+
+   perl Makefile.PL PREFIX=/some/other/place
+
+This will install the module to the subdirectory lib/perl5 under the given
+prefix.  If this is not already in perl's include path, you'll need to tell
+perl how to get to this library directory so you can use it; there are three
+ways:
+
+  in your environment (the easiest):
+    # assuming a bourne-style shell
+    PERL5LIB=/some/other/place/lib/perl5/site_perl
+    export PERL5LIB
+
+  on the perl command line:
+    perl -I /some/other/place/lib/perl5/site_perl yourscript
+
+  in the code of your perl script:
+    use lib '/some/other/place/lib/perl5/site_perl';
+  
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  perl >= 5.8.0
+  Glib >= 1.040 (perl module and requisite C libraries)
+  Gtk2 >= 1.00 (perl module and requisite C libraries)
+  libgtkhtml-2.0 >= 2.0.0 (C library)
+
+In order to build it from source, you'll also need
+
+  ExtUtils::Depends >= 0.2
+  ExtUtils::PkgConfig >= 1.00
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 by muppet <scott at asofyet dot org>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, see
+<https://www.gnu.org/licenses/>.
+

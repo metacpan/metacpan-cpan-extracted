@@ -1,0 +1,31 @@
+2006-07-20  Emmanuele Bassi  <ebassi@gmail.com>
+
+	D recent-files/egg-recent-view-bonobo.c
+	D recent-files/egg-recent-view-bonobo.h
+	A recent-files/egg-recent-view-uimanager.c
+	A recent-files/egg-recent-view-uimanager.h
+
+	* Makefile.PL: Require Glib and Gtk2 >= 1.120, for Glib::CodeGen;
+	warn about this module being deprecated by Gtk2 >= 1.130 and
+	gtk+-2.0 >= 2.10.0.
+
+	* recent-files/*: Re-sync with libegg/recent-files HEAD.
+
+	* maps:
+	* doctypes: Update.
+
+2005-06-01 11:52 (+0200) ebassi
+	
+	* Makefile.PL: bumped required Glib and Gtk2 versions to the current
+	stable cycle (1.080).
+	
+	* README, Recent.pm: bump to release 0.051
+
+	* xs/RecentItem.xs: wrapped
+		
+		egg_recent_item_get_timestamp
+		egg_recent_item_set_timestamp
+
+2005-04-16 10:12 (+0200) ebassi
+
+	* *: initial import

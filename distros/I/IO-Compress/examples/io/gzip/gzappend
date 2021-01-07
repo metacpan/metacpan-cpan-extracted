@@ -19,6 +19,3 @@ $gz->write( [@ARGV] )
      or die "Cannot open $output: $GzipError\n" ;
 
 $gz->close;
-
-    
-

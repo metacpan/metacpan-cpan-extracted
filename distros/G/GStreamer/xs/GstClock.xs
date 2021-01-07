@@ -12,9 +12,8 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * $Id$
  */
@@ -127,6 +126,10 @@ gst2perl_clock_callback (GstClock *clock,
 
 MODULE = GStreamer::Clock	PACKAGE = GStreamer::Clock	PREFIX = gst_clock_
 
+=for object GStreamer::Clock Abstract class for global clocks
+
+=cut
+
 BOOT:
 	gperl_object_set_no_warn_unreg_subclass (GST_TYPE_CLOCK, TRUE);
 
@@ -171,6 +174,10 @@ GstClockID gst_clock_new_periodic_id (GstClock *clock, GstClockTime start_time, 
 # --------------------------------------------------------------------------- #
 
 MODULE = GStreamer::Clock	PACKAGE = GStreamer::ClockID	PREFIX = gst_clock_id_
+
+=for object GStreamer::ClockID Abstract class for global clocks
+
+=cut
 
 void
 DESTROY (id)

@@ -73,12 +73,12 @@ sub run
 
         my $in ;
         eval { $a = $Func->($in, \$x) ;} ;
-        like $@, mkErr("^$TopType: input filename is undef or null string"), 
+        like $@, mkErr("^$TopType: input filename is undef or null string"),
             '  Input filename undef' ;
 
-        $in = '';    
+        $in = '';
         eval { $a = $Func->($in, \$x) ;} ;
-        like $@, mkErr("^$TopType: input filename is undef or null string"), 
+        like $@, mkErr("^$TopType: input filename is undef or null string"),
             '  Input filename empty' ;
 
         {
@@ -109,7 +109,7 @@ sub run
         eval { $a = $Func->(\$in, \$in) ;} ;
         like $@, mkErr("^$TopType: input and output buffer are identical"),
             '  Input and Output buffer are the same';
-            
+
         SKIP:
         {
             # Threaded 5.6.x seems to have a problem comparing filehandles.
@@ -123,7 +123,7 @@ sub run
             eval { $a = $Func->(\*OUT, \*OUT) ;} ;
             like $@, mkErr("^$TopType: input and output handle are identical"),
                 '  Input and Output handle are the same';
-                
+
             close OUT;
             is -s $out_file, 0, "  File zero length" ;
         }
@@ -137,12 +137,12 @@ sub run
             eval { $a = $Func->(\$x, $object) ;} ;
             like $@, mkErr("^$TopType: illegal output parameter"),
                 '  Bad Output Param';
-                
+
             # Buffer not a scalar reference
             eval { $a = $Func->(\$x, \%x) ;} ;
             like $@, mkErr("^$TopType: illegal output parameter"),
                 '  Bad Output Param';
-                
+
 
             eval { $a = $Func->(\%x, \$x) ;} ;
             like $@, mkErr("^$TopType: illegal input parameter"),
@@ -159,13 +159,13 @@ sub run
         $a = $Func->($filename, \$x) ;
         is $a, undef, "  $TopType returned undef";
         like $$Error, "/^input file '$filename' does not exist\$/", "  input File '$filename' does not exist";
-            
+
         $filename = '/tmp/abd/abc.def';
         ok ! -e $filename, "  output File '$filename' does not exist";
         $a = $Func->(\$x, $filename) ;
         is $a, undef, "  $TopType returned undef";
         like $$Error, ("/^(cannot open file '$filename'|input file '$filename' does not exist):/"), "  output File '$filename' does not exist";
-            
+
         eval { $a = $Func->(\$x, '<abc>') } ;
         like $$Error, "/Need input fileglob for outout fileglob/",
                 '  Output fileglob with no input fileglob';
@@ -199,7 +199,7 @@ sub run
 
                 skip '\\ returns mutable value in 5.19.3', 1
                     if $] >= 5.019003;
-                
+
                 eval { $a = $Func->(\$in, \$out, TrailingData => \"abc") ;} ;
                 like $@, mkErr("^$TopType: Parameter 'TrailingData' not writable"),
                     '  TrailingData output not writable';
@@ -433,7 +433,7 @@ sub run
                     is $got, $buffer, "  Uncompressed matches original";
 
                 }
-                
+
                 {
                     title "$TopType - From Handle to Filename content '$disp_content' Append $append" ;
 
@@ -444,7 +444,7 @@ sub run
                     ok ! -e $out_file, "  Output file does not exist";
                     writeFile($out_file, $already);
 
-                    ok &$Func($in, $out_file, Append => $append), '  Compressed ok' 
+                    ok &$Func($in, $out_file, Append => $append), '  Compressed ok'
                         or diag "error is $$Error" ;
 
                     ok -e $out_file, "  Created output file";
@@ -503,7 +503,7 @@ sub run
 
                     my $out = $already;
 
-                    ok &$Func('-', \$out, Append => $append), '  Compressed ok' 
+                    ok &$Func('-', \$out, Append => $append), '  Compressed ok'
                         or diag $$Error ;
 
                        open(STDIN, "<&SAVEIN");
@@ -574,7 +574,7 @@ sub run
                 $of->open("<$file1") ;
 
                 my $output  ;
-                ok &$Func(\@input, \$output, MultiStream => $ms, AutoClose => 0), '  Compressed ok' 
+                ok &$Func(\@input, \$output, MultiStream => $ms, AutoClose => 0), '  Compressed ok'
                     or diag $$Error;
 
                 my $got = anyUncompress([ \$output, MultiStream => $ms ]);
@@ -678,7 +678,7 @@ sub run
         ok &$Func($file1 => $file2), '  Compressed ok' ;
         ok &$FuncInverse($file2 => $file3), '  Uncompressed ok' ;
         is readFile($file3), $original, "  round tripped ok";
- 
+
     }
 
     foreach my $bit ($UncompressClass,
@@ -692,7 +692,7 @@ sub run
         my $C_Func = getTopFuncRef($CompressClass);
 
 
-        
+
         my $data = "mary had a little lamb" ;
         my $keep = $data ;
         my $extra = "after the main event";
@@ -735,7 +735,7 @@ sub run
             }
 
             is $trailing . $rest, $extra, "  Got trailing data";
-            
+
         }
     }
 
@@ -754,7 +754,7 @@ sub run
 #        my $lex = new LexFile(@inFiles, @outFiles);
 #
 #        writeFile($_, "data $_") foreach @inFiles ;
-#        
+#
 #        {
 #            title "$TopType - Hash Ref: to filename" ;
 #
@@ -791,8 +791,8 @@ sub run
 #            my @buffer ;
 #            my %hash = ( $inFiles[0] => undef,
 #                         $inFiles[1] => undef,
-#                         $inFiles[2] => undef, 
-#                     );  
+#                         $inFiles[2] => undef,
+#                     );
 #
 #            ok &$Func( \%hash ), '  Compressed ok' ;
 #
@@ -848,7 +848,7 @@ sub run
 #        my $lex = new LexFile(@inFiles, @outFiles);
 #
 #        writeFile($_, "data $_") foreach @inFiles ;
-#        
+#
 #
 #
 #    #    if (0)
@@ -951,7 +951,7 @@ sub run
             {
                 title "$TopType - From FileGlob to FileGlob files [@$files]" ;
 
-                ok &$Func("<$tmpDir1/a*.tmp>" => "<$tmpDir2/a#1.tmp>"), '  Compressed ok' 
+                ok &$Func("<$tmpDir1/a*.tmp>" => "<$tmpDir2/a#1.tmp>"), '  Compressed ok'
                     or diag $$Error ;
 
                 my @copy = @expected;
@@ -967,7 +967,7 @@ sub run
                 title "$TopType - From FileGlob to Array files [@$files]" ;
 
                 my @buffer = ('first') ;
-                ok &$Func("<$tmpDir1/a*.tmp>" => \@buffer), '  Compressed ok' 
+                ok &$Func("<$tmpDir1/a*.tmp>" => \@buffer), '  Compressed ok'
                     or diag $$Error ;
 
                 is shift @buffer, 'first';
@@ -987,8 +987,8 @@ sub run
                     title "$TopType - From FileGlob to Buffer files [@$files], MS $ms" ;
 
                     my $buffer ;
-                    ok &$Func("<$tmpDir1/a*.tmp>" => \$buffer, 
-                               MultiStream => $ms), '  Compressed ok' 
+                    ok &$Func("<$tmpDir1/a*.tmp>" => \$buffer,
+                               MultiStream => $ms), '  Compressed ok'
                         or diag $$Error ;
 
                     #hexDump(\$buffer);
@@ -1004,9 +1004,9 @@ sub run
                     title "$TopType - From FileGlob to Filename files [@$files], MS $ms" ;
 
                     my $lex = new LexFile(my $filename) ;
-                    
+
                     ok &$Func("<$tmpDir1/a*.tmp>" => $filename,
-                              MultiStream => $ms), '  Compressed ok' 
+                              MultiStream => $ms), '  Compressed ok'
                         or diag $$Error ;
 
                     #hexDump(\$buffer);
@@ -1023,9 +1023,9 @@ sub run
 
                     my $lex = new LexFile(my $filename) ;
                     my $fh = new IO::File ">$filename";
-                    
-                    ok &$Func("<$tmpDir1/a*.tmp>" => $fh, 
-                              MultiStream => $ms, AutoClose => 1), '  Compressed ok' 
+
+                    ok &$Func("<$tmpDir1/a*.tmp>" => $fh,
+                              MultiStream => $ms, AutoClose => 1), '  Compressed ok'
                         or diag $$Error ;
 
                     #hexDump(\$buffer);
@@ -1050,7 +1050,7 @@ sub run
         my $TopType = getTopFuncName($bit);
 
         my $buffer = $OriginalContent1;
-        my $buffer2 = $OriginalContent2; 
+        my $buffer2 = $OriginalContent2;
         my $keep_orig = $buffer;
 
         my $comp = compressBuffer($UncompressClass, $buffer) ;
@@ -1273,7 +1273,7 @@ sub run
                 my $output ;
                 $output = $incumbent if $append ;
 
-                ok &$Func('-', \$output, Append => $append, @opts), '  Uncompressed ok' 
+                ok &$Func('-', \$output, Append => $append, @opts), '  Uncompressed ok'
                     or diag $$Error ;
 
                    open(STDIN, "<&SAVEIN");
@@ -1329,7 +1329,7 @@ sub run
 
             my $output ;
 
-            ok &$Func($stdin, \$output, Transparent => 0, InputLength => length $comp, @opts), '  Uncompressed ok' 
+            ok &$Func($stdin, \$output, Transparent => 0, InputLength => length $comp, @opts), '  Uncompressed ok'
                 or diag $$Error ;
 
             my $buff ;
@@ -1422,8 +1422,8 @@ sub run
             ok &$Func(\@input, \@output, AutoClose => 0, @opts), '  UnCompressed ok' ;
 
             is_deeply \@input, \@keep, "  Input array not changed" ;
-            is_deeply [map { defined $$_ ? $$_ : "" } @output], 
-                      ['first', @expected], 
+            is_deeply [map { defined $$_ ? $$_ : "" } @output],
+                      ['first', @expected],
                       "  Got Expected uncompressed data";
 
         }
@@ -1460,7 +1460,7 @@ sub run
         {
             title "$TopType - From FileGlob to FileGlob" ;
 
-            ok &$Func("<$tmpDir1/a*.tmp>" => "<$tmpDir2/a#1.tmp>", @opts), '  UnCompressed ok' 
+            ok &$Func("<$tmpDir1/a*.tmp>" => "<$tmpDir2/a#1.tmp>", @opts), '  UnCompressed ok'
                 or diag $$Error ;
 
             my @copy = @expected;
@@ -1476,7 +1476,7 @@ sub run
             title "$TopType - From FileGlob to Arrayref" ;
 
             my @output = (\'first');
-            ok &$Func("<$tmpDir1/a*.tmp>" => \@output, @opts), '  UnCompressed ok' 
+            ok &$Func("<$tmpDir1/a*.tmp>" => \@output, @opts), '  UnCompressed ok'
                 or diag $$Error ;
 
             my @copy = ('first', @expected);
@@ -1492,7 +1492,7 @@ sub run
             title "$TopType - From FileGlob to Buffer" ;
 
             my $output ;
-            ok &$Func("<$tmpDir1/a*.tmp>" => \$output, @opts), '  UnCompressed ok' 
+            ok &$Func("<$tmpDir1/a*.tmp>" => \$output, @opts), '  UnCompressed ok'
                 or diag $$Error ;
 
             is $output, join('', @expected), "  got expected uncompressed data";
@@ -1503,7 +1503,7 @@ sub run
 
             my $lex = new LexFile my $output ;
             ok ! -e $output, "  $output does not exist" ;
-            ok &$Func("<$tmpDir1/a*.tmp>" => $output, @opts), '  UnCompressed ok' 
+            ok &$Func("<$tmpDir1/a*.tmp>" => $output, @opts), '  UnCompressed ok'
                 or diag $$Error ;
 
             ok -e $output, "  $output does exist" ;
@@ -1515,7 +1515,7 @@ sub run
 
             my $lex = new LexFile my $output ;
             my $fh = new IO::File ">$output" ;
-            ok &$Func("<$tmpDir1/a*.tmp>" => $fh, AutoClose => 1, @opts), '  UnCompressed ok' 
+            ok &$Func("<$tmpDir1/a*.tmp>" => $fh, AutoClose => 1, @opts), '  UnCompressed ok'
                 or diag $$Error ;
 
             ok -e $output, "  $output does exist" ;
@@ -1604,8 +1604,8 @@ sub run
         }
 
         @data = (
-                   '[""]', 
-                   '[undef]', 
+                   '[""]',
+                   '[undef]',
                 ) ;
 
 
@@ -1616,7 +1616,7 @@ sub run
             eval "\$copy = $send";
             my $Answer ;
             eval { &$Func($copy, \$Answer) } ;
-            like $@, mkErr("^$TopFuncName: input filename is undef or null string"), 
+            like $@, mkErr("^$TopFuncName: input filename is undef or null string"),
                 "  got error message";
 
         }
@@ -1624,7 +1624,7 @@ sub run
 
 
     {
-        # check setting $\ 
+        # check setting $\
 
         my $CompFunc = getTopFuncRef($CompressClass);
         my $UncompFunc = getTopFuncRef($UncompressClass);
@@ -1664,7 +1664,7 @@ sub run
         is $output, $input, "round trip ok" ;
     }
 
-  
+
 }
 
 # TODO add more error cases

@@ -1,6 +1,15 @@
 CHANGES
 -------
 
+
+  2.100 7 January 2021
+
+      * trim whitespace
+        ef838f69e0ad8d083ce9e87f3786f724c0883bd3q
+
+      * Avoid indirect calls
+        4e89b37c4804b38fb505ae612ca6d183633a9b3c
+
   2.096 31 July 2020
 
       * No changes

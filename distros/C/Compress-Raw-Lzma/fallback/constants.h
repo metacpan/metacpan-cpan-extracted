@@ -655,7 +655,7 @@ constant_19 (pTHX_ const char *name, IV *iv_return, const char **pv_return) {
   case 'N':
     if (memEQ(name, "LZMA_VERSION_STRING", 19)) {
     /*                                ^        */
-#ifdef LZMA_VERSION_STRING 
+#ifdef LZMA_VERSION_STRING
       *pv_return = LZMA_VERSION_STRING;
       return PERL_constant_ISPV;
 #else
@@ -964,7 +964,7 @@ __END__
     break;
   case 29:
     if (memEQ(name, "LZMA_VERSION_STABILITY_STRING", 29)) {
-#ifdef LZMA_VERSION_STABILITY_STRING 
+#ifdef LZMA_VERSION_STABILITY_STRING
       *pv_return = LZMA_VERSION_STABILITY_STRING;
       return PERL_constant_ISPV;
 #else
@@ -975,4 +975,3 @@ __END__
   }
   return PERL_constant_NOTFOUND;
 }
-

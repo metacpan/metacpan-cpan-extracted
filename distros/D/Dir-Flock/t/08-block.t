@@ -52,6 +52,9 @@ for my $n (12..18) {
     my $patt = qr/( $n){$n}/;
     ok( $data =~ $patt, "found instances of token $n" );
 }
+
+# if the previous tests fail, consider increasing $Dir::Flock::CHECK_DELAY
+
 unlink $f;
 
 done_testing;
