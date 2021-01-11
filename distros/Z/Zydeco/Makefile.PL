@@ -43,12 +43,12 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.612 },
-                        "Zydeco" => { file => "lib/Zydeco.pm", version => 0.612 },
+                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.613 },
+                        "Zydeco" => { file => "lib/Zydeco.pm", version => 0.613 },
                       },
   "release_status" => "stable",
   "resources"      => {
-                        bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Zydeco" },
+                        bugtracker   => { web => "https://github.com/tobyink/p5-zydeco/issues" },
                         homepage     => "http://zydeco.toby.ink/",
                         license      => ["http://dev.perl.org/licenses/"],
                         repository   => {
@@ -58,7 +58,8 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Zydeco/project",
                       },
-  "version"        => 0.612,
+  "version"        => 0.613,
+  "x_contributors" => ["S\xE9bastien Feug\xE8re (SMONFF) <smonff\@cpan.org>"],
 };
 
 my %dynamic_config;

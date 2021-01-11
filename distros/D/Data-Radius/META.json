@@ -37,6 +37,8 @@
             "Const::Fast" : "0",
             "Digest::HMAC_MD5" : "0",
             "Digest::MD5" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
             "Socket" : "2.021",
             "perl" : "5.010000"
          }
@@ -44,11 +46,14 @@
       "test" : {
          "requires" : {
             "Data::HexDump" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::Deep" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.5",
+   "version" : "v1.2.6",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

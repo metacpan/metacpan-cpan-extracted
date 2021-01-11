@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.012000';
+our $VERSION   = '1.012001';
 
 $VERSION =~ tr/_//d;
 
@@ -13,11 +13,10 @@ $VERSION =~ tr/_//d;
 
 eval 'require re';
 
-unless (exists &re::is_regexp)
-{
+unless ( exists &re::is_regexp ) {
 	require B;
 	*re::is_regexp = sub {
-		eval { B::svref_2object($_[0])->MAGIC->TYPE eq 'r' };
+		eval { B::svref_2object( $_[0] )->MAGIC->TYPE eq 'r' };
 	};
 }
 
@@ -53,7 +52,7 @@ C<is_regexp> function, as this was only added in Perl 5.9.5.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+L<https://github.com/tobyink/p5-type-tiny/issues>.
 
 =head1 AUTHOR
 
@@ -61,7 +60,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -71,4 +70,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

@@ -1,5 +1,13 @@
 Revision history for Finance::Google::Portfolio
 
+1.05      2021-01-10 14:12:06-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+        - Update Travis YAML
+
 1.04      2018-02-05 10:56:44-08:00 America/Los_Angeles
         - Allowing for up to 24 HTTP redirects from Google because holy cow Google
         - Adding Perl versions to test; annual general update for 2018

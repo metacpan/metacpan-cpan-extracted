@@ -12,7 +12,7 @@ use overload '""' => \&stringify;
 ###############################################################################
 # Version number.
 ###############################################################################
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 ###############################################################################
 # Derive ourselves from our base class.
@@ -119,9 +119,11 @@ sub stringify {
 
 1;
 
+=for stopwords ISO8601
+
 =head1 NAME
 
-Template::Plugin::TimeDate - TT plugin to parse/format dates using TimeDate
+Template::Plugin::TimeDate - Template::Toolkit plugin to parse/format dates using TimeDate
 
 =head1 SYNOPSIS
 
@@ -149,16 +151,16 @@ Template::Plugin::TimeDate - TT plugin to parse/format dates using TimeDate
 
 =head1 DESCRIPTION
 
-C<Template::Plugin::TimeDate> is a TT plug-in that makes of the C<Date::Parse>
-and C<Date::Format> modules from the C<TimeDate> distribution, to help deal
-with parsing/formatting dates.
+C<Template::Plugin::TimeDate> is a C<Template::Toolkit> plug-in that makes of
+the C<Date::Parse> and C<Date::Format> modules from the C<TimeDate>
+distribution, to help deal with parsing/formatting dates.
 
-Why another date/time TT plug-in?  C<Template::Plugin::Date> doesn't handle
-output in different timezones, and C<Template::Plugin::DateTime> didn't give me
-a means of easily parsing dates before turning them into C<DateTime> objects.
-I'd been using the C<Date::Parse> module elsewhere to parse dates, and so this
-plug-in was built to help capture the parse/format cycle that I wanted to use in
-my templates.
+Why another date/time plug-in?  C<Template::Plugin::Date> doesn't handle output
+in different timezones, and C<Template::Plugin::DateTime> didn't give me a means
+of easily parsing dates before turning them into C<DateTime> objects.  I'd been
+using the C<Date::Parse> module elsewhere to parse dates, and so this plug-in
+was built to help capture the parse/format cycle that I wanted to use in my
+templates.
 
 The plug-in should be loaded via the USE directive:
 
@@ -176,48 +178,48 @@ alternate name can be specified such as:
 =item new(string)
 
 Creates a new TimeDate plug-in object, returning it to the caller. An
-optional date/time string may be passed in, which is parsed automatically. 
+optional date/time string may be passed in, which is parsed automatically.
 
 =item now
 
 Sets the current time to "now", and returns it as "the number of seconds
-since the epoch". 
+since the epoch".
 
 =item epoch
 
 Returns the currently set time as "the number of seconds since the epoch".
 If a date/time hasn't explicitly been parsed, we default to the current
-time. 
+time.
 
 =item parse(string, zone)
 
 Parses the given date/time C<string> and sets that as the current time
 value for further operations. An optional time C<zone> is used if there is
-no time zone information present in the provided date string. 
+no time zone information present in the provided date string.
 
 =item str2time(string, zone)
 
-An alternate name for the C<parse> method above. 
+An alternate name for the C<parse> method above.
 
 =item format(format, zone)
 
 Formats the current time value using the given strftime C<format>,
 optionally converting it into the given time C<zone>. If a date/time hasn't
-explicitly been parsed, we default to the current time. 
+explicitly been parsed, we default to the current time.
 
 You may also refer to this method as C<time2str>; its original name from
-the C<Date::Format> module. 
+the C<Date::Format> module.
 
 =item time2str(format, zone)
 
-An alternate name for the C<format> method above. 
+An alternate name for the C<format> method above.
 
 =item stringify
 
-Stringifies the object, in ISO8601 format (%Y-%m-%d %H:%M:%S). 
+Stringifies the object, in ISO8601 format (%Y-%m-%d %H:%M:%S).
 
 This method is overloaded, so that simply turning the TimeDate object into
-a string will output it in ISO8601 format. 
+a string will output it in ISO8601 format.
 
 =back
 

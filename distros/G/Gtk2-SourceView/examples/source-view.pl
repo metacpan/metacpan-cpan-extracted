@@ -13,9 +13,8 @@
 # Library General Public License for more details.
 #
 # You should have received a copy of the GNU Library General Public
-# License along with this library; if not, write to the 
-# Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
-# Boston, MA  02111-1307  USA.
+# License along with this library; if not, see
+# <https://www.gnu.org/licenses/>.
 
 # This is an example of the power of GtkSourceView.  I've taken the code inside
 # the test-widget test app that comes with libgtksourceview, and translated it

@@ -1,5 +1,9 @@
 Revision history for LWP-Authen-OAuth2
 
+0.18      2021-01-10 22:49:23+01:00
+    - dist housekeeping, Dist::Zilla::PluginBundle::Author::DOMM
+
+
 0.17	2020-11-22T17:42:02
     - fix bug in token-refresh, RT132661 (Ruud)
     - fix doc error reported by niceperl in RT133154 (niceperl)

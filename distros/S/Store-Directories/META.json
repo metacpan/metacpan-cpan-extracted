@@ -1,0 +1,56 @@
+{
+   "abstract" : "Manage a key/value store of directories with controls for",
+   "author" : [
+      "Cameron Tauxe <camerontauxe@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Store-Directories",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "1.66",
+            "Data::UUID" : "1.226",
+            "IPC::System::Simple" : "1.30",
+            "SQL::SplitStatement" : "1.00020",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IPC::System::Simple" : "1.30",
+            "Test::Cmd" : "1.09",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Store::Directories" : {
+         "file" : "lib/Store/Directories.pm",
+         "version" : "0.1"
+      },
+      "Store::Directories::Lock" : {
+         "file" : "lib/Store/Directories/Lock.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/camtauxe/store-directories.git"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

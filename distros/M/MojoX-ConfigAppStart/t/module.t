@@ -1,11 +1,6 @@
-use strict;
-use warnings;
+use Test2::V0;
+use MojoX::ConfigAppStart;
 
-use Test::Most;
-
-use constant MODULE => 'MojoX::ConfigAppStart';
-
-BEGIN { use_ok(MODULE); }
-require_ok(MODULE);
+ok( 1, '(We still live!)' );
 
 done_testing;

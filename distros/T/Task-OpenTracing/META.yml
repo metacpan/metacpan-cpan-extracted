@@ -1,0 +1,55 @@
+---
+abstract: 'install all the OpenTracing modules'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  Module::CPANfile: '1.1004'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-OpenTracing
+no_index:
+  directory:
+    - t
+    - inc
+optional_features:
+  datadog:
+    description: 'DataDog implementation'
+    requires:
+      CGI::Application::Plugin::OpenTracing::DataDog: v0.1.0
+      OpenTracing::Implementation::DataDog: v0.42.1
+  development:
+    description: 'Development of new integrations or implementations'
+    requires:
+      OpenTracing::Implementation::Test: v0.102.1
+      OpenTracing::Interface: v0.205.0
+      OpenTracing::Role: v0.84.0
+      OpenTracing::Types: v0.205.0
+      Test::OpenTracing::Integration: v0.102.1
+  instrumentation:
+    description: 'Making instrumenting code easier'
+    requires:
+      OpenTracing::AutoScope: v0.106.6
+      OpenTracing::WrapScope: v0.106.6
+  integrations:
+    description: 'Extra integrations'
+    requires:
+      CGI::Application::Plugin::OpenTracing: v0.103.3
+      DBIx::OpenTracing: v0.1.0
+      Log::Log4perl::OpenTracing: v0.1.2
+requires:
+  OpenTracing::GlobalTracer: '0.04'
+  OpenTracing::Implementation: v0.31.0
+  OpenTracing::Implementation::NoOp: v0.72.1
+  OpenTracing::Manual: '0.05'
+  perl: '5.014'
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,10 +1,12 @@
 package Measure::Everything::Adapter::Test;
+
+# ABSTRACT: Test Adapter: for testing...
+our $VERSION = '1.003'; # VERSION
+
 use strict;
 use warnings;
 
 use base qw(Measure::Everything::Adapter::Base);
-
-# ABSTRACT: Test Adapter: for testing...
 
 sub init {
     my $self = shift;
@@ -45,7 +47,7 @@ Measure::Everything::Adapter::Test - Test Adapter: for testing...
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -71,11 +73,11 @@ Flushes all stats collected so far, starts from a clean slate.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Thomas Klausner.
+This software is copyright (c) 2015 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

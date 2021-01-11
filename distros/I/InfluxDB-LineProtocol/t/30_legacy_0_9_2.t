@@ -7,7 +7,8 @@ use Test::Most;
 use InfluxDB::LineProtocol qw(v0.9.2 data2line line2data);
 
 my @faketime = ( 1437072205, 500681 );
-my $nano = join( '', @faketime ) * 1000;
+my $nano = join( '', @faketime ) . "000";
+
 {
     no warnings 'redefine';
 

@@ -1,8 +1,8 @@
-Astro-Coord-ECI-VSOP87A is Copyright (C) 2018-2020 by Thomas R. Wyant, III
+Astro-Coord-ECI-VSOP87D is Copyright (C) 2018-2021 by Thomas R. Wyant, III
 
 DESCRIPTION
 
-<<< Replace boiler plate >>>
+Implement the VSOP87D planetary position model.
 
 INSTALLATION
 
@@ -11,8 +11,8 @@ cpanp, or cpanm. ActivePerl users can try their ppm.
 
 Failing that, you can use one of the two usual incantations:
 
-    gunzip Astro-Coord-ECI-VSOP87A-9.999.tar.gz
-    tar -xf Astro-Coord-ECI-VSOP87A-9.999.tar
+    gunzip Astro-Coord-ECI-VSOP87D-9.999.tar.gz
+    tar -xf Astro-Coord-ECI-VSOP87D-9.999.tar
     perl Makefile.PL
     make
     make test
@@ -20,8 +20,8 @@ Failing that, you can use one of the two usual incantations:
 
 or
 
-    gunzip Astro-Coord-ECI-VSOP87A-9.999.tar.gz
-    tar -xf Astro-Coord-ECI-VSOP87A-9.999.tar
+    gunzip Astro-Coord-ECI-VSOP87D-9.999.tar.gz
+    tar -xf Astro-Coord-ECI-VSOP87D-9.999.tar
     perl Build.PL
     ./Build
     ./Build test

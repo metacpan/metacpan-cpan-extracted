@@ -32,9 +32,9 @@ if ( time - ( stat $cache )[9] > 24 * 60 * 60 ) {
 diag "Reading packages from $cache";
 
 my %seen;
-my @latest = sort grep !$seen{$_}++,
-    grep ! /^Git::Repository::Plugin::Blame::/, # these are included in the parent
+my @latest = sort
     map $_->{package},
+    grep !$seen{ $_->{uri} }++,
     $index->search_packages( { package => qr{^Git::Repository::Plugin::} } );
 
 # get both lists

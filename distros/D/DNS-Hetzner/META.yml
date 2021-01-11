@@ -3,15 +3,12 @@ abstract: 'Perl library to work with the API for the Hetzner DNS'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
 build_requires:
-  File::Copy: '0'
-  File::Path: '0'
-  FindBin: '0'
   Pod::Coverage::TrustPod: '0'
   Test::LongString: '0.16'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,22 +17,22 @@ name: DNS-Hetzner
 provides:
   DNS::Hetzner:
     file: lib/DNS/Hetzner.pm
-    version: '0.02'
-  DNS::Hetzner::API:
-    file: lib/DNS/Hetzner/API.pm
-    version: '0.02'
+    version: '0.05'
+  DNS::Hetzner::API::PrimaryServers:
+    file: lib/DNS/Hetzner/API/PrimaryServers.pm
+    version: '0.05'
   DNS::Hetzner::API::Records:
     file: lib/DNS/Hetzner/API/Records.pm
-    version: '0.02'
+    version: '0.05'
   DNS::Hetzner::API::Zones:
     file: lib/DNS/Hetzner/API/Zones.pm
-    version: '0.02'
+    version: '0.05'
   DNS::Hetzner::APIBase:
     file: lib/DNS/Hetzner/APIBase.pm
-    version: '0.02'
+    version: '0.05'
   DNS::Hetzner::Schema:
     file: lib/DNS/Hetzner/Schema.pm
-    version: '0.02'
+    version: '0.05'
 requires:
   Carp: '0'
   JSON::Validator: '4.10'
@@ -43,14 +40,15 @@ requires:
   Moo: '1.003001'
   MooX::Singleton: '0'
   Types::Mojo: '0.04'
-  Types::Standard: '0'
-  URI::Escape: '0'
+  Types::Standard: '1.012'
   perl: '5.024'
 resources:
-  bugtracker: http://github.com/reneeb/DNS-Hetzner/issues
-  homepage: http://github.com/reneeb/DNS-Hetzner
-  repository: git://github.com/reneeb/DNS-Hetzner.git
-version: '0.02'
+  bugtracker: http://github.com/perlservices/DNS-Hetzner/issues
+  homepage: http://github.com/perlservices/DNS-Hetzner
+  repository: git://github.com/perlservices/DNS-Hetzner.git
+version: '0.05'
 x_contributors:
   - 'reneeb <info@perl-services.de>'
+x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_spdx_expression: Artistic-2.0

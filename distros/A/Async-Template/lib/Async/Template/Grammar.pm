@@ -39,7 +39,7 @@ package Async::Template::Grammar;
 use strict;
 use warnings;
 
-our $VERSION  = 0.12;
+our $VERSION  = 0.14;
 
 my (@RESERVED, %CMPOP, $LEXTABLE, $RULES, $STATES);
 my ($factory, $rawstart);

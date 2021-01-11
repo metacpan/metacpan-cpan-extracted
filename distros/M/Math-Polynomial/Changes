@@ -1,5 +1,8 @@
 Revision history for Perl extension Math::Polynomial.
 
+1.019   2021-01-07
+        - Added deflate and unnest.
+
 1.018   2019-12-30
         - Added inflate.
 

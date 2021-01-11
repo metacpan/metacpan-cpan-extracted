@@ -1,4 +1,12 @@
 Revision history for MojoX::ConfigAppStart
 
+1.02      2021-01-10 14:17:08-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+        - Update Travis YAML
+
 1.01      2018-06-25 13:57:52-07:00 America/Los_Angeles
         - First version, released on an unsuspecting world.

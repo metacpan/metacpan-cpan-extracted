@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 1.11
+version 1.12
 
 # SYNOPSIS
 
@@ -49,10 +49,14 @@ this directly for your own distributions, but you may find it useful as a
 source of ideas for building your own bundle.
 
 This bundle uses [Dist::Zilla::Role::PluginBundle::PluginRemover](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3APluginBundle%3A%3APluginRemover) and
-[Dist::Zilla::Role::PluginBundle::Config::Slicer](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3APluginBundle%3A%3AConfig%3A%3ASlicer) so I can remove or
-configure any plugin as needed.
+[Dist::Zilla::Role::PluginBundle::Config::Slicer](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3APluginBundle%3A%3AConfig%3A%3ASlicer) so I can remove or configure
+any plugin as needed.
 
 This is more or less equivalent to the following `dist.ini`:
+
+    ; updates the dist.ini to include an authordep on this bundle at its
+    ; current $VERSION.
+    [DROLSKY::BundleAuthordep]
 
     ; Picks one of these - defaults to DROLSKY::MakeMaker
     [DROLSKY::MakeMaker]
@@ -250,6 +254,8 @@ This is more or less equivalent to the following `dist.ini`:
     [DROLSKY::PerlLinterConfigFiles]
     ; Generates/updates precious.toml
     [DROLSKY::Precious]
+    ; Generates some dev tool helper scripts when using precious.
+    [DROLSKY::DevTools]
 
     ; The allow_dirty list is basically all of the generated or munged files
     ; in the distro, including:
@@ -317,7 +323,7 @@ Mark Fowler <mark@twoshortplanks.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

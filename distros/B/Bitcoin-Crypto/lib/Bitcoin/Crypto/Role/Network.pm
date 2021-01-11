@@ -1,6 +1,9 @@
 package Bitcoin::Crypto::Role::Network;
 
-use v5.10; use warnings;
+our $VERSION = "0.996";
+
+use v5.10;
+use warnings;
 use Types::Standard qw(InstanceOf);
 use Scalar::Util qw(blessed);
 
@@ -9,7 +12,7 @@ use Bitcoin::Crypto::Exception;
 use Moo::Role;
 
 has "network" => (
-	is => "rw",
+	is => "ro",
 	isa => InstanceOf ["Bitcoin::Crypto::Network"],
 	default => sub {
 		return Bitcoin::Crypto::Network->get;

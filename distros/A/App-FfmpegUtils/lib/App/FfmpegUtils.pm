@@ -3,7 +3,7 @@ package App::FfmpegUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-12-12'; # DATE
 our $DIST = 'App-FfmpegUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,11 +55,11 @@ $SPEC{reencode_video_with_libx264} = {
     summary => 'Re-encode video (using ffmpeg and libx264)',
     description => <<'_',
 
-This utility runs ffmpeg to re-encode your video files using the libx264 codec.
-It is a wrapper to simplify invocation of ffmpeg. It selects the appropriate
-ffmpeg options for you, allows you to specify multiple files, and picks
-appropriate output filenames. It also sports a `--dry-run` option to let you see
-ffmpeg options to be used without actually running ffmpeg.
+This utility runs *ffmpeg* to re-encode your video files using the libx264
+codec. It is a wrapper to simplify invocation of ffmpeg. It selects the
+appropriate ffmpeg options for you, allows you to specify multiple files, and
+picks appropriate output filenames. It also sports a `--dry-run` option to let
+you see ffmpeg options to be used without actually running ffmpeg.
 
 This utility is usually used to reduce the file size (and optionally video
 width/height) of videos so they are smaller, while minimizing quality loss.
@@ -259,6 +259,20 @@ sub reencode_video_with_libx264 {
 $SPEC{split_video_by_duration} = {
     v => 1.1,
     summary => 'Split video by duration into parts',
+    description => <<'_',
+
+This utility uses *ffmpeg* (particularly the `-t` and `-ss`) option to split a
+longer video into shorter videos. For example, if you have `long.mp4` with
+duration of 1h12m and you run it through this utility with `--every 15min` then
+you will have 5 new video files: `long.1of5.mp4` (15min), `long.2of5.mp4`
+(15min), `long.3of5.mp4` (15min), `long.4of5.mp4` (15min), and `long.5of5.mp4`
+(12min).
+
+Currently this utility uses `-c copy` ffmpeg option, so there might be a few of
+seconds of glitches around the cut points. An option to use other codec will be
+provided in the future.
+
+_
     args => {
         %arg0_file,
         # XXX start => {},
@@ -271,6 +285,13 @@ $SPEC{split_video_by_duration} = {
         # XXX output_filename_pattern
     },
     examples => [
+        {
+            summary => 'Split video per 15 minutes',
+            src_plang => 'bash',
+            src => '[[prog]] --every 15min foo.mp4',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
     ],
     features => {
         dry_run => 1,
@@ -278,6 +299,9 @@ $SPEC{split_video_by_duration} = {
     deps => {
         prog => "ffmpeg", # XXX allow FFMPEG_PATH
     },
+    links => [
+        {url=>'prog:split-srt-by-duration'},
+    ],
 };
 sub split_video_by_duration {
     require POSIX;
@@ -301,7 +325,7 @@ sub split_video_by_duration {
 
     require IPC::System::Options;
     for my $i (1..$num_parts) {
-        my $part_label = sprintf "$fmt of %d", $i, $num_parts;
+        my $part_label = sprintf "${fmt}of%d", $i, $num_parts;
         my $ofile = $file;
         if ($ofile =~ /\.\w+\z/) { $ofile =~ s/(\.\w+)\z/.$part_label$1/ } else { $ofile .= ".$part_label" }
         my $time_start = ($i-1)*$part_dur;
@@ -327,7 +351,7 @@ App::FfmpegUtils - Utilities related to ffmpeg
 
 =head1 VERSION
 
-This document describes version 0.007 of App::FfmpegUtils (from Perl distribution App-FfmpegUtils), released on 2020-12-12.
+This document describes version 0.008 of App::FfmpegUtils (from Perl distribution App-FfmpegUtils), released on 2020-12-12.
 
 =head1 FUNCTIONS
 
@@ -340,11 +364,11 @@ Usage:
 
 Re-encode video (using ffmpeg and libx264).
 
-This utility runs ffmpeg to re-encode your video files using the libx264 codec.
-It is a wrapper to simplify invocation of ffmpeg. It selects the appropriate
-ffmpeg options for you, allows you to specify multiple files, and picks
-appropriate output filenames. It also sports a C<--dry-run> option to let you see
-ffmpeg options to be used without actually running ffmpeg.
+This utility runs I<ffmpeg> to re-encode your video files using the libx264
+codec. It is a wrapper to simplify invocation of ffmpeg. It selects the
+appropriate ffmpeg options for you, allows you to specify multiple files, and
+picks appropriate output filenames. It also sports a C<--dry-run> option to let
+you see ffmpeg options to be used without actually running ffmpeg.
 
 This utility is usually used to reduce the file size (and optionally video
 width/height) of videos so they are smaller, while minimizing quality loss.
@@ -445,6 +469,17 @@ Usage:
 
 Split video by duration into parts.
 
+This utility uses I<ffmpeg> (particularly the C<-t> and C<-ss>) option to split a
+longer video into shorter videos. For example, if you have C<long.mp4> with
+duration of 1h12m and you run it through this utility with C<--every 15min> then
+you will have 5 new video files: C<long.1of5.mp4> (15min), C<long.2of5.mp4>
+(15min), C<long.3of5.mp4> (15min), C<long.4of5.mp4> (15min), and C<long.5of5.mp4>
+(12min).
+
+Currently this utility uses C<-c copy> ffmpeg option, so there might be a few of
+seconds of glitches around the cut points. An option to use other codec will be
+provided in the future.
+
 This function is not exported.
 
 This function supports dry-run operation.
@@ -492,7 +527,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-FfmpegUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FfmpegUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-FfmpegUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

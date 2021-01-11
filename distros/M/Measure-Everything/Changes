@@ -1,5 +1,9 @@
 Changes for Measure::Everything
 
+1.003     2021-01-08 22:06:27+01:00
+    - dist housekeeping, Dist::Zilla::PluginBundle::Author::DOMM
+
+
 1.002   2018-02-27T13:17:32
     - added Measure::Everything::Adapter::Test
 

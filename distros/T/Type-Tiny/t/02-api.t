@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -99,12 +99,23 @@ require Type::Tiny;
 
 my $type = "Type::Tiny"->new(name => "TestType");
 
+if ( $HAVE_MOOSE ) {
+	no warnings 'once';
+	*Moose::Meta::TypeConstraint::bleh_this_does_not_exist = sub { 42 };
+	push @MOOSE_WANTS, 'bleh_this_does_not_exist';
+}
+
 for (@MOOSE_WANTS)
 {
 	SKIP: {
 		skip "Moose::Meta::TypeConstraint PRIVATE API: '$_'", 1 if /^_/ && !$HAVE_MOOSE;
 		ok($type->can($_), "Moose::Meta::TypeConstraint API: $type->can('$_')");
 	}
+}
+
+if ( $HAVE_MOOSE ) {
+	is( $type->can('bleh_this_does_not_exist')->( $type ), 42 );
+	is( $type->bleh_this_does_not_exist(), 42 );
 }
 
 for (@MOUSE_WANTS)

@@ -1,6 +1,9 @@
 package Bitcoin::Crypto::Key::ExtPrivate;
 
-use v5.10; use warnings;
+our $VERSION = "0.996";
+
+use v5.10;
+use warnings;
 use Moo;
 use Crypt::Mac::HMAC qw(hmac);
 use Encode qw(encode decode);
@@ -13,10 +16,8 @@ use Bitcoin::Crypto::Key::ExtPublic;
 use Bitcoin::Crypto::Config;
 use Bitcoin::Crypto::Helpers qw(new_bigint pad_hex ensure_length verify_bytestring);
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto;
 
 use namespace::clean;
-our $VERSION = Bitcoin::Crypto->VERSION;
 
 with "Bitcoin::Crypto::Role::ExtendedKey";
 
@@ -169,7 +170,7 @@ sub _derive_key_partial
 __END__
 =head1 NAME
 
-Bitcoin::Crypto::Key::ExtPrivate - class for Bitcoin extended private keys
+Bitcoin::Crypto::Key::ExtPrivate - Bitcoin extended private keys
 
 =head1 SYNOPSIS
 

@@ -4,8 +4,27 @@ Type-Tiny
 Created:      2013-03-23
 Home page:    <https://typetiny.toby.ink/>
 Home page:    <https://metacpan.org/release/Type-Tiny>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>
+Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+1.012001	2021-01-10
+
+ [ Test Suite ]
+ - Extra test cases to improve coverage. (100% on Coveralls; 90% on
+   Codecov.)
+ - Hide warnings in Kavorka integration tests.
+
+ [ Packaging ]
+ - Move issue tracker from RT to Github Issues.
+ - Stop hiding Type::Parser::Token, Type::Parser::TokenStream, and
+   Type::Parser::AstBuilder from the CPAN indexer.
+
+ [ Other ]
+ - Much code tidying using perltidy and manually.
+ - When generic validation objects (blessed objects with a `check` method)
+   are converted to native Type::Tiny type constraints, no longer require
+   them to provide a `get_message` method. This allows Type::Tiny to adopt
+   Data::Constraint type constraints.
 
 1.012000	2020-10-28
 

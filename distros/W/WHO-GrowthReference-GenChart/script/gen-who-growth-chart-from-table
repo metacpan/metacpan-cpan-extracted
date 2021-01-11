@@ -1,0 +1,251 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /WHO/GrowthReference/GenChart/gen_who_growth_chart_from_table
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-10'; # DATE
+our $DIST = 'WHO-GrowthReference-GenChart'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/WHO/GrowthReference/GenChart/gen_who_growth_chart_from_table",
+    program_name => "gen-who-growth-chart-from-table",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Create WHO growth chart ()
+# PODNAME: gen-who-growth-chart-from-table
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+gen-who-growth-chart-from-table - Create WHO growth chart ()
+
+=head1 VERSION
+
+This document describes version 0.001 of gen-who-growth-chart-from-table (from Perl distribution WHO-GrowthReference-GenChart), released on 2021-01-10.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % gen-who-growth-chart-from-table [--debug] [--format=name] [--json]
+     [--log-level=level] [--(no)naked-res] [--name=s]
+     [--page-result[=program]] [--quiet] [--trace] [--verbose]
+     [--view-result[=program]] [--which=s] <gender> <dob> <table>
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--dob>=I<s>*
+
+=item B<--gender>=I<s>*
+
+Valid values:
+
+ ["M","F"]
+
+=item B<--name>=I<s>
+
+=item B<--table>=I<s>*
+
+Table of growth, must be in CSV/TSV format, containing at least age/date and weight/height columns.
+
+TSV/CSV must have header line.
+
+Date must be string in YYYY-MM-DD format. Age must be float in years. Weight
+must be float in kg. Height must be float in cm.
+
+Example:
+
+    date,height,weight
+    2020-11-01,113.5,17.8
+    2020-11-15,113.5,17.9
+    2020-12-01,114,17.9
+    2020-12-15,114,17.9
+    2021-01-01,115,18.1
+    2021-01-15,115.5,18.3
+    2021-02-01,116,18.4
+
+
+=item B<--which>=I<s>*
+
+Specify which chart to generate.
+
+Valid values:
+
+ ["height","weight","bmi"]
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C gen-who-growth-chart-from-table gen-who-growth-chart-from-table
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete gen-who-growth-chart-from-table 'p/*/`gen-who-growth-chart-from-table`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/WHO-GrowthReference-GenChart>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-WHO-GrowthReference-GenChart>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WHO-GrowthReference-GenChart/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

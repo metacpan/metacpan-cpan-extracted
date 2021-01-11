@@ -2,7 +2,7 @@ package Gtk2::SourceView2;
 
 =head1 NAME
 
-Gtk2::SourceView2 - Enhanced source code editor widget 
+Gtk2::SourceView2 - (DEPRECATED) Enhanced source code editor widget
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,56 @@ Gtk2::SourceView2 - Enhanced source code editor widget
 	
 	Gtk2->main();
 
+=head1 ABSTRACT
+
+B<DEPRECATED> Gtk2::SourceView2 is the Perl binding for the C library
+gtksourceview-2.0.
+
 =head1 DESCRIPTION
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gtk2-sourceview2
+
+=item *
+
+Upstream URL: https://gitlab.gnome.org/GNOME/gtksourceview
+
+=item *
+
+Last compatible upstream version: 2.10.5
+
+=item *
+
+Last upstream release date: 2010-09-28
+
+=item *
+
+Migration path for this module: G:O:I
+
+=item *
+
+Migration module URL: https://metacpan.org/pod/Glib::Object::Introspection
+
+=back
+
 
 Gtk2::SourceView2 is the Perl binding for the C library gtksourceview-2.0. This
 is the same widget that's used by gedit, MonoDevelop, Anjuta and several other
@@ -57,9 +106,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 General Public License for more details; or the Artistic License.
 
 You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the
-Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307 USA.
+License along with this library; if not, see
+<https://www.gnu.org/licenses/>.
 
 =cut
 
@@ -69,7 +117,7 @@ use base 'DynaLoader';
 
 use Gtk2;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 

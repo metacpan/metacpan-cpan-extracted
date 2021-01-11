@@ -13,6 +13,8 @@ use Net::DNS::RR;
 use File::Temp;
 use Socket;
 
+# diag "Using Net::DNS::Nameserver $Net::DNS::Nameserver::VERSION";
+
 use_ok('DNS::Unbound');
 
 my $ns = eval {
@@ -20,8 +22,12 @@ my $ns = eval {
 
     Net::DNS::Nameserver->new(
         Verbose => 1,
+        LocalPort => 53,
         ReplyHandler => sub {
             my ( $qname, $qclass, $qtype, $peerhost, $query, $conn ) = @_;
+
+            diag explain [ request => @_ ];
+
             my ( $rcode, @ans, @auth, @add );
 
             if ( $qtype eq "A" && $qname eq "myhost.local" ) {
@@ -70,7 +76,7 @@ SKIP: {
         "@{$result->data()}",
         pack( 'C*', 127, 0, 0, 1 ),
         'query returns as expected',
-    );
+    ) or diag Dumper( $result );
 
     kill 'TERM', $pid;
 }

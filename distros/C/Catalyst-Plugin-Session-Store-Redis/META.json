@@ -1,10 +1,10 @@
 {
    "abstract" : "Redis Session store for Catalyst",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>"
+      "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,6 +13,13 @@
       "version" : 2
    },
    "name" : "Catalyst-Plugin-Session-Store-Redis",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -28,21 +35,51 @@
          "requires" : {
             "Catalyst::Plugin::Session::Store" : "0",
             "Class::Data::Inheritable" : "0",
+            "MIME::Base64" : "0",
             "MRO::Compat" : "0",
             "Redis" : "0",
-            "Try::Tiny" : "0"
+            "Storable" : "0",
+            "Try::Tiny" : "0",
+            "base" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Plugin::Session::Test::Store" : "0",
+            "Catalyst::Test" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::Plugin::Session::Store::Redis" : {
+         "file" : "lib/Catalyst/Plugin/Session/Store/Redis.pm",
+         "version" : "0.900"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/Catalyst-Plugin-Session-Store-Redis/issues"
+      },
+      "homepage" : "https://github.com/domm/Catalyst-Plugin-Session-Store-Redis",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/domm/Catalyst-Plugin-Session-Store-Redis.git",
+         "url" : "https://github.com/domm/Catalyst-Plugin-Session-Store-Redis.git",
          "web" : "https://github.com/domm/Catalyst-Plugin-Session-Store-Redis"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.900",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

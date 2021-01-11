@@ -1,3 +1,14 @@
+0.008   2020-12-12  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        [cli split-video-by-duration]
+
+	- [doc] Add description and example.
+
+	- [doc] Mention script split-srt-by-duration.
+
+
 0.007   2020-12-12  Released-By: PERLANCAR; Urgency: medium
 
 	- Add script: split-video-by-duration.

@@ -1,6 +1,7 @@
 package StateTesters;
 
-use v5.28; use warnings;
+use v5.28;
+use warnings;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 

@@ -18,8 +18,9 @@ my $s = $driver->session;
 # compatibility with related modules like REST::Neo4p works as it should.
 # (So far, we provide very little.)
 
-use Test::More 0.96 tests => 1;
+use Test::More 0.96 tests => 1 + 1;
 use Test::Exception;
+use Test::Warnings;
 use REST::Neo4p;
 use Neo4j::Cypher::Abstract;
 

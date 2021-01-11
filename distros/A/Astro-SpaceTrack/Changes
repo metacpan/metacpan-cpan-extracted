@@ -1,3 +1,10 @@
+0.143		2021-01-09	T. R. Wyant
+    Add Travis CI testing.
+
+    Switch bug reporting to GitHub. R.I.P. rt.cpan.org
+
+    Add 'Swarm' to Celestrak catalog names.
+
 0.142		2020-09-24	T. R. Wyant
     Add Telesat to Celestrak Supplemental catalog
 

@@ -1,11 +1,12 @@
 #!/usr/bin/perl
 
+# PODNAME: scs.pl
+# ABSTRACT: run DBIx::SchemaChecksum, but really you should use dbchecksum
+our $VERSION = '1.103'; # VERSION
+
 use strict;
 use warnings;
 use DBIx::SchemaChecksum::App;
-
-# PODNAME: scs.pl
-# ABSTRACT: run DBIx::SchemaChecksum, but really you should use dbchecksum
 
 DBIx::SchemaChecksum::App->new_with_command->run();
 
@@ -21,7 +22,7 @@ scs.pl - run DBIx::SchemaChecksum, but really you should use dbchecksum
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 USAGE
 
@@ -37,7 +38,7 @@ See C<perldoc DBIx::SchemaChecksum> for even more info.
 
 =item *
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =item *
 
@@ -51,7 +52,7 @@ Klaus Ita <koki@worstofall.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Thomas Klausner, Maroš Kollár, Klaus Ita.
+This software is copyright (c) 2012 - 2021 by Thomas Klausner, Maroš Kollár, Klaus Ita.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -46,6 +46,7 @@ sub new {
 
 	# class/static variables
 	$p{timeout} //= 0;
+	$p{http_request_timeout} //= 3000;
 	$p{debug} //= 0;
 	$p{custom_headers} //= {};
 

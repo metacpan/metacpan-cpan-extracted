@@ -1,4 +1,8 @@
 Revision history for Perl module Neo4j::Bolt
+0.40 2020-12-26
+    - Leaving Inline behind
+    - Use Neo4j::Client 0.40 based on Alien
+    - Enable Bolt v3 and v4 capabilities - transactions, named databases
 0.20 2020-06-05
     - Eschew local libneo4j-client; use Neo4j::Client
     - Add Inline baggage for build only

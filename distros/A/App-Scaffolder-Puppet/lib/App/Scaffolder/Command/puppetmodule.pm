@@ -1,5 +1,5 @@
 package App::Scaffolder::Command::puppetmodule;
-$App::Scaffolder::Command::puppetmodule::VERSION = '0.003001';
+$App::Scaffolder::Command::puppetmodule::VERSION = '0.004000';
 use parent qw(App::Scaffolder::Puppet::Command);
 
 # ABSTRACT: Scaffold a Puppet module
@@ -22,7 +22,7 @@ App::Scaffolder::Command::puppetmodule - Scaffold a Puppet module
 
 =head1 VERSION
 
-version 0.003001
+version 0.004000
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ Manfred Stock <mstock@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Manfred Stock.
+This software is copyright (c) 2021 by Manfred Stock.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

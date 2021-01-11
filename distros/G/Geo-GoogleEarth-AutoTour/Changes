@@ -1,5 +1,12 @@
 Revision history for Geo::GoogleEarth::AutoTour
 
+1.07      2021-01-10 14:43:30-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.06      2019-06-18 15:25:34-07:00 America/Los_Angeles
         - Reduce rounding precision to allow for ld/non-ld passing
         - Adding Perl versions to test; annual general update for 2019

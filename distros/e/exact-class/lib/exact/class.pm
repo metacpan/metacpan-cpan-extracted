@@ -7,7 +7,7 @@ use Role::Tiny ();
 use Scalar::Util ();
 use Class::Method::Modifiers ();
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 my ( $store, $roles );
 
@@ -240,10 +240,10 @@ exact::class - Simple class interface extension for exact
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact-class.svg)](https://travis-ci.org/gryphonshafer/exact-class)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact-class/badge.png)](https://coveralls.io/r/gryphonshafer/exact-class)
+=for markdown [![test](https://github.com/gryphonshafer/exact-class/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-class/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/exact-class/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-class)
 
 =head1 SYNOPSIS
 
@@ -287,7 +287,7 @@ version 1.09
 =head1 DESCRIPTION
 
 L<exact::class> is intended to be a simple class interface extension for
-L<exact>. See the L<exact> documentation for additional informatioh about
+L<exact>. See the L<exact> documentation for additional information about
 extensions. The intended use of L<exact::class> is via the extension interface
 of L<exact>.
 
@@ -493,11 +493,11 @@ L<MetaCPAN|https://metacpan.org/pod/exact::class>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/exact-class>
+L<GitHub Actions|https://github.com/gryphonshafer/exact-class/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/exact-class>
+L<Codecov|https://codecov.io/gh/gryphonshafer/exact-class>
 
 =item *
 
@@ -515,9 +515,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2019-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

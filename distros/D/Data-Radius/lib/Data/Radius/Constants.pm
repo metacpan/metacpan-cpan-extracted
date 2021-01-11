@@ -2,7 +2,7 @@ package Data::Radius::Constants;
 use strict;
 use warnings;
 
-my %RFC_TYPES;
+our %RFC_TYPES;
 
 BEGIN {
     %RFC_TYPES = (
@@ -30,7 +30,14 @@ use constant \%RFC_TYPES;
 
 use Exporter qw(import);
 
-our @EXPORT_OK = (keys (%RFC_TYPES), '%RADIUS_PACKET_TYPES', 'accepting_packet_type');
+our @EXPORT_OK = (
+    keys (%RFC_TYPES),
+    qw(
+        %RFC_TYPES
+        %RADIUS_PACKET_TYPES
+        accepting_packet_type
+    )
+);
 our %EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
 
 use Const::Fast;

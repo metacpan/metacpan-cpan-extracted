@@ -1,6 +1,9 @@
 package Bitcoin::Crypto::Key::Public;
 
-use v5.10; use warnings;
+our $VERSION = "0.996";
+
+use v5.10;
+use warnings;
 use Moo;
 
 use Bitcoin::Crypto::Script;
@@ -8,10 +11,8 @@ use Bitcoin::Crypto::Base58 qw(encode_base58check);
 use Bitcoin::Crypto::Bech32 qw(encode_segwit);
 use Bitcoin::Crypto::Config;
 use Bitcoin::Crypto::Helpers qw(hash160);
-use Bitcoin::Crypto;
 
 use namespace::clean;
-our $VERSION = Bitcoin::Crypto->VERSION;
 
 with "Bitcoin::Crypto::Role::BasicKey";
 
@@ -65,7 +66,7 @@ sub get_segwit_address
 __END__
 =head1 NAME
 
-Bitcoin::Crypto::Key::Public - class for Bitcoin public keys
+Bitcoin::Crypto::Key::Public - Bitcoin public keys
 
 =head1 SYNOPSIS
 
@@ -183,6 +184,8 @@ This module throws an instance of L<Bitcoin::Crypto::Exception> if it encounters
 =over 2
 
 =item * KeyCreate - key couldn't be created correctly
+
+=item * Verify - couldn't verify the message correctly
 
 =item * NetworkConfig - incomplete or corrupted network configuration
 

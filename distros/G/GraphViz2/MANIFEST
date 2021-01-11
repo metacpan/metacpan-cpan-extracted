@@ -89,6 +89,7 @@ t/snapshots/methods_t/mve_nodes_0_0
 t/snapshots/methods_t/mve_nodes_0_1
 t/snapshots/methods_t/mve_nodes_1_0
 t/snapshots/methods_t/mve_nodes_1_1
+t/snapshots/methods_t/undir_dot_input
 t/snapshots/record_old_t/dot_file
 xt/author/pod.t
 xt/manifest.t

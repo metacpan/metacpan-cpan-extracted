@@ -28,6 +28,23 @@ DESCRIPTION
         <https://github.com/apache/avro/tree/master/lang/perl>. Please,
         refer its documentation for installation.
 
+INSTALL
+    Installation of "Kafka::Consumer::Avro" is a canonical:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+  TEST NOTES
+    Tests expect that in the target host is available Schema Registry
+    listening on "http://localhost:8081", otherwise most of the test are
+    skipped.
+
+    You can alternatively set a different URL by exporting
+    "CONFLUENT_SCHEMA_REGISTY_URL" environment variable.
+
+USAGE
   Constructor
    new( [%config] )
     Construct a new "Confluent::SchemaRegistry". Takes an optional hash that

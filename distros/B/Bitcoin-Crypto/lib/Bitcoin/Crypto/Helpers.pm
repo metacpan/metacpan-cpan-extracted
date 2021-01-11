@@ -1,6 +1,9 @@
 package Bitcoin::Crypto::Helpers;
 
-use v5.10; use warnings;
+our $VERSION = "0.996";
+
+use v5.10;
+use warnings;
 use Exporter qw(import);
 use Crypt::Digest::RIPEMD160 qw(ripemd160);
 use Crypt::Digest::SHA256 qw(sha256);
@@ -49,6 +52,10 @@ sub ensure_length
 sub verify_bytestring
 {
 	my ($string) = @_;
+
+	Bitcoin::Crypto::Exception->raise(
+		"invalid input value, expected string"
+	) if !defined $string || ref $string;
 
 	my @characters = split //, $string;
 

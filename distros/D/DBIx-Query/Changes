@@ -1,5 +1,12 @@
 Revision history for DBIx::Query
 
+1.11      2021-01-10 14:29:36-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.10      2020-05-26 09:59:56-07:00 America/Los_Angeles
         - Fix bug in all() to always return arrayref despite context
 

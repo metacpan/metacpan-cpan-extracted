@@ -9,7 +9,8 @@ use Test::NoTabs;
 my @files = (
     'lib/Dist/Zilla/PluginBundle/Author/GTERMARS.pm',
     't/00-report-prereqs.dd',
-    't/00-report-prereqs.t'
+    't/00-report-prereqs.t',
+    't/01-compile.t'
 );
 
 notabs_ok($_) foreach @files;

@@ -1,9 +1,9 @@
 This archive contains the distribution XML-Sig,
-version 0.33:
+version 0.38:
 
   A toolkit to help sign and verify XML Digital Signatures.
 
-This software is copyright (c) 2020 by Byrne Reese, Chris Andrews and Others, see the git log.
+This software is copyright (c) 2021 by Byrne Reese, Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

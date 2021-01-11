@@ -1,0 +1,109 @@
+NAME
+    WHO::GrowthReference::GenChart - Create WHO growth chart ()
+
+VERSION
+    This document describes version 0.001 of WHO::GrowthReference::GenChart
+    (from Perl distribution WHO-GrowthReference-GenChart), released on
+    2021-01-10.
+
+SYNOPSIS
+    In `data.csv`:
+
+        date,height,weight
+        2020-11-01,113.5,17.8
+        2020-11-15,113.5,17.9
+        2020-12-01,114,17.9
+        2020-12-15,114,17.9
+        2021-01-01,115,18.1
+        2021-01-15,115.5,18.3
+        2021-02-01,116,18.4
+
+    From the command-line:
+
+     % gen-who-growth-chart-from-table M 2014-04-15 data.csv --which height
+
+DESCRIPTION
+KEYWORDS
+    growth standards, growth reference
+
+FUNCTIONS
+  gen_who_growth_chart_from_table
+    Usage:
+
+     gen_who_growth_chart_from_table(%args) -> [status, msg, payload, meta]
+
+    Create WHO growth chart ().
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dob* => *date*
+
+    *   gender* => *str*
+
+    *   name => *str*
+
+    *   table* => *str*
+
+        Table of growth, must be in CSV/TSV format, containing at least
+        age/date and weight/height columns.
+
+        TSV/CSV must have header line.
+
+        Date must be string in YYYY-MM-DD format. Age must be float in
+        years. Weight must be float in kg. Height must be float in cm.
+
+        Example:
+
+         date,height,weight
+         2020-11-01,113.5,17.8
+         2020-11-15,113.5,17.9
+         2020-12-01,114,17.9
+         2020-12-15,114,17.9
+         2021-01-01,115,18.1
+         2021-01-15,115.5,18.3
+         2021-02-01,116,18.4
+
+    *   which* => *str*
+
+        Specify which chart to generate.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WHO-GrowthReference-GenChart>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WHO-GrowthReference-GenChart>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-WHO-GrowthReference-GenChart/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    WHO::GrowthReference::Table
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

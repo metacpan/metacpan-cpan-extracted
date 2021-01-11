@@ -1,5 +1,13 @@
 Revision history for Perl extension BSD::Socket::Splice.
 
+0.09 2021-01-09
+    - Signature file was malformed, regenerate distribution.
+
+0.08 2021-01-09
+    - Add explicit Perl 5 license file.
+    - Allow idle time above 31 bit, time_t is 64 bit on OpenBSD.
+      Fixes tests on i386.
+
 0.07 2020-12-30
     - Fix test on arm64.
 

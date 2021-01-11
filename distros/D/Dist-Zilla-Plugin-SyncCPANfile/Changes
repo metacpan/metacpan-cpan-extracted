@@ -1,4 +1,7 @@
 Revision history for Dist-Zilla-Plugin-SyncCPANfile
 
+0.02  2021-01-09 20:40:00
+        - fix prereq list
+
 0.01  2021-01-07 15:17:00
         - Initial release

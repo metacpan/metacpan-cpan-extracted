@@ -1,5 +1,10 @@
 Changes for InfluxDB::LineProtocol
 
+1.014     2021-01-08 21:43:06+01:00
+    - work around scientific notation problems reported in
+      some tester results?
+
+
 1.013     2021-01-03 16:55:02+01:00
     - dist housekeeping: github issues,
       Dist::Zilla::PluginBundle::Author::DOMM

@@ -5,7 +5,7 @@ use 5.014;
 use exact;
 use Role::Tiny ();
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 sub import {
     my ( $self, $caller ) = @_;
@@ -57,7 +57,7 @@ exact::role - Simple role interface extension for exact
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -210,11 +210,11 @@ L<MetaCPAN|https://metacpan.org/pod/exact::class>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/exact-class>
+L<GitHub Actions|https://github.com/gryphonshafer/exact-class/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/exact-class>
+L<Codecov|https://codecov.io/gh/gryphonshafer/exact-class>
 
 =item *
 
@@ -232,9 +232,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2019-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

@@ -137,7 +137,7 @@ use warnings;
 
 use base qw{ Astro::Coord::ECI::TLE };
 
-our $VERSION = '0.128';
+our $VERSION = '0.129';
 
 use Astro::Coord::ECI::Utils 0.091 qw{:all};
 use Carp;
@@ -1947,7 +1947,7 @@ effort.
 =head1 BUGS
 
 Bugs can be reported to the author by mail, or through
-L<http://rt.cpan.org/>.
+L<https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium/issues/>.
 
 =head1 AUTHOR
 
@@ -1955,7 +1955,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2020 by Thomas R. Wyant, III
+Copyright (C) 2005-2021 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

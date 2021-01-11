@@ -1,10 +1,11 @@
 package Measure::Everything::Adapter::InfluxDB::Direct;
+
+# ABSTRACT: Send stats directly to InfluxDB via http
+our $VERSION = '1.001'; # VERSION
+
 use strict;
 use warnings;
 
-our $VERSION = '1.000';
-
-# ABSTRACT: Send stats directly to InfluxDB via http
 
 use base qw(Measure::Everything::Adapter::Base);
 use InfluxDB::LineProtocol qw(data2line);
@@ -68,7 +69,7 @@ Measure::Everything::Adapter::InfluxDB::Direct - Send stats directly to InfluxDB
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -122,11 +123,11 @@ C<username> and C<password> are sent in the C<Authorization> header as C<Basic> 
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Thomas Klausner.
+This software is copyright (c) 2016 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

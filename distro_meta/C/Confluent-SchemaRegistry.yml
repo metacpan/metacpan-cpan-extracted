@@ -1,4 +1,4 @@
 ---
 distro: Confluent-SchemaRegistry
-version: 0.04
-author_path: A/AL/ALVAROL/Confluent-SchemaRegistry-0.04.tar.gz
+version: v1.0.0
+author_path: A/AL/ALVAROL/Confluent-SchemaRegistry-v1.0.0.tar.gz

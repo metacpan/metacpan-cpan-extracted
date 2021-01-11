@@ -2,170 +2,188 @@
 
 use strict;
 use warnings;
-use Test::More;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More;
 use Log::Dispatch;
 use Log::Dispatch::Twilio;
-
-###############################################################################
-### Ensure that we have all of the ENV vars we need for testing.
-unless ($ENV{TWILIO_ACCOUNT_SID}) {
-    plan skip_all => "TWILIO_ACCOUNT_SID must be set in your environment for testing.";
-}
-unless ($ENV{TWILIO_ACCOUNT_TOKEN}) {
-    plan skip_all => "TWILIO_ACCOUNT_TOKEN must be set in your environment for testing.";
-}
-unless ($ENV{TWILIO_FROM}) {
-    plan skip_all => "TWILIO_FROM must be set in your environment for testing.";
-}
-unless ($ENV{TWILIO_TO}) {
-    plan skip_all => "TWILIO_TO must be set in your environment for testing.";
-}
-plan tests => 12;
+use Sub::Override;
 
 ###############################################################################
 ### TEST PARAMETERS
 my %params = (
-    account_sid => $ENV{TWILIO_ACCOUNT_SID},
-    auth_token  => $ENV{TWILIO_ACCOUNT_TOKEN},
-    from        => $ENV{TWILIO_FROM},
-    to          => $ENV{TWILIO_TO},
+  account_sid => 'XXX-ACCOUNT-SID-XXX',
+  auth_token  => 'XXX-AUTH-TOKEN-XXX',
+  from        => '1-604-555-1212',
+  to          => '1-250-555-1212',
 );
 
-###############################################################################
-# Required parameters for instantiation.
-required_parameters: {
-    foreach my $p (sort keys %params) {
-        my %data = %params;
-        delete $data{$p};
-
-        my $output = eval {
-            Log::Dispatch::Twilio->new(
-                name      => 'twilio',
-                min_level => 'debug',
-                %data,
-            );
-        };
-        like $@, qr/requires '$p' parameter/, "$p is required parameter";
-    }
-}
 
 ###############################################################################
-# Instantiation.
-instantiation: {
-    my $output = Log::Dispatch::Twilio->new(
+subtest 'Required parameters' => sub {
+  foreach my $p (sort keys %params) {
+    my %data = %params;
+    delete $data{$p};
+
+    my $output = eval {
+      Log::Dispatch::Twilio->new(
+        name      => 'twilio',
+        min_level => 'debug',
+        %data,
+      );
+    };
+    like $@, qr/requires '$p' parameter/, "$p is required parameter";
+  }
+};
+
+###############################################################################
+subtest 'Instantiation' => sub {
+  my $output = Log::Dispatch::Twilio->new(
+    name      => 'twilio',
+    min_level => 'debug',
+    %params,
+  );
+  isa_ok $output, 'Log::Dispatch::Twilio';
+};
+
+###############################################################################
+subtest 'Instantiation via Log::Dispatch' => sub {
+  my $logger = Log::Dispatch->new(
+    outputs => [
+      [
+        'Twilio',
         name      => 'twilio',
         min_level => 'debug',
         %params,
-    );
-    isa_ok $output, 'Log::Dispatch::Twilio';
-}
+      ],
+    ],
+  );
+  isa_ok $logger, 'Log::Dispatch';
+
+  my $output = $logger->output('twilio');
+  isa_ok $output, 'Log::Dispatch::Twilio';
+};
 
 ###############################################################################
-# Instantiation via Log::Dispatch;
-instantiation_via_log_dispatch: {
-    my $logger = Log::Dispatch->new(
-        outputs => [
-            ['Twilio',
-                name      => 'twilio',
-                min_level => 'debug',
-                %params,
-            ],
-        ],
-    );
-    isa_ok $logger, 'Log::Dispatch';
+subtest 'Logging test' => sub {
+  my $logger = Log::Dispatch->new(
+    outputs => [
+      [ 'Twilio',
+        name      => 'twilio',
+        min_level => 'debug',
+        %params,
+      ],
+    ],
+  );
 
-    my $output = $logger->output('twilio');
-    isa_ok $output, 'Log::Dispatch::Twilio';
-}
-
-###############################################################################
-# Logging test
-logging_test: {
-    my $logger = Log::Dispatch->new(
-        outputs => [
-            ['Twilio',
-                name      => 'twilio',
-                min_level => 'debug',
-                %params,
-            ],
-        ],
-    );
-
+  subtest 'Successful log' => sub {
+    # ... capture calls to "warn"
     my @messages;
     local $SIG{__WARN__} = sub { push @messages, @_ };
-    $logger->info("test message, logged via Twilio");
+    # ... mock the POST response, and capture the message
+    my $body;
+    my $guard = Sub::Override->new('WWW::Twilio::API::POST' => sub {
+      my ($self, $endpoint, %args) = @_;
+      $body = $args{Body};
+      return +{
+        message => 'Created',
+        code    => 201,
+        content => 'XXX-NO-REAL-CONTENT-XXX',
+      };
+    } );
+    # ... log our message, verify the results
+    $logger->info('test');
 
-    ok !@messages, 'Message logged via Twilio';
-}
+    ok $body, 'Logging call sent to Twilio';
+    is $body, 'test', '... logging our message';
+    ok !@messages, '... and no warnings recorded';
+  };
 
-###############################################################################
-# Long messages are truncated by default
-truncate_by_default: {
-    my $logger = Log::Dispatch::Twilio->new(
-        name      => 'twilio',
-        min_level => 'debug',
-        %params,
-    );
+  subtest 'Failed to send' => sub {
+    # ... capture calls to "warn"
+    my @messages;
+    local $SIG{__WARN__} = sub { push @messages, @_ };
+    # ... mock the POST response, and capture the message
+    my $body;
+    my $guard = Sub::Override->new('WWW::Twilio::API::POST' => sub {
+      my ($self, $endpoint, %args) = @_;
+      $body = $args{Body};
+      return +{
+        message => 'Nope, no worky',
+        code    => 400,
+        content => 'XXX-NO-REAL-CONTENT-XXX',
+      };
+    } );
+    # ... log our message, verify the results
+    $logger->info('test');
 
-    my $message
-        = "This is a really long test message, so that I can verify that we "
-        . "properly truncate it at 160 chars.  Only one message should be "
-        . "sent to Twilio when I send this lengthy statement; it'd be "
-        . "truncated automatically.";
-
-    my @expanded = $logger->_expand_message($message);
-    is @expanded, 1, 'Long message auto-truncated by default';
-}
-
-###############################################################################
-# Long messages can be exploded out to multiple messages.
-multiple_messages: {
-    my $logger = Log::Dispatch::Twilio->new(
-        name         => 'twilio',
-        min_level    => 'debug',
-        max_messages => 2,
-        %params,
-    );
-
-    my $message
-        = "This message is also really long.  This one helps test that we can "
-        . "properly slice up the log message across multiple SMS messages, "
-        . "even when its too big to fit.  Further, if we have more text than "
-        . "we can fit into the configured number of SMS messages, the rest "
-        . "just gets truncated and is gone.  No muss, no fuss, no extra "
-        . "messages getting generated for no reason.";
-
-    my @expanded = $logger->_expand_message($message);
-    is @expanded, 2, 'Long message truncated to max number of messages';
-}
+    ok $body, 'Logging call sent to Twilio';
+    ok @messages, '... and warnings recorded';
+    like $messages[0], qr/Failed to send/, '... ... failed to send';
+    like $messages[0], qr/XXX-NO-REAL-CONTENT-XXX/, '... ... including returned content';
+  };
+};
 
 ###############################################################################
-# Short messages don't generate multiples, even when configured
-short_messages_stay_short: {
-    my $logger = Log::Dispatch::Twilio->new(
-        name         => 'twilio',
-        min_level    => 'debug',
-        max_messages => 9,
-        %params,
-    );
+subtest 'Long messages are truncated by defaut' => sub {
+  my $logger = Log::Dispatch::Twilio->new(
+    name      => 'twilio',
+    min_level => 'debug',
+    %params,
+  );
 
+  local $Log::Dispatch::Twilio::MAX_TWILIO_LENGTH = 10;
+  my $message  = '1234567890abcdefghijklmnop';
+  my @expanded = $logger->_expand_message($message);
+  is @expanded, 1, 'Long message auto-truncated by default';
+  is $expanded[0], '1234567890', '... and truncated at correct point';
+};
+
+###############################################################################
+subtest 'Long messages can be split' => sub {
+  my $logger = Log::Dispatch::Twilio->new(
+    name         => 'twilio',
+    min_level    => 'debug',
+    max_messages => 3,
+    %params,
+  );
+
+  subtest 'short messages' => sub {
     my $message  = "w00t!";
     my @expanded = $logger->_expand_message($message);
     is @expanded, 1, 'Short message expanded to one message';
-}
+  };
+
+  subtest 'reaching max messages' => sub {
+    local $Log::Dispatch::Twilio::MAX_TWILIO_LENGTH = 10;
+    my $message  = '1234567890abcdefghijklmnop';
+    my @expanded = $logger->_expand_message($message);
+    is @expanded, 3, 'Long message truncated to max number of messages';
+    is $expanded[0], '1/3: 12345', '... first message truncated to length';
+    is $expanded[1], '2/3: 67890', '... second message truncated to length';
+    is $expanded[2], '3/3: abcde', '... third message truncated to length';
+  };
+
+  subtest 'not quite hitting max messages' => sub {
+    local $Log::Dispatch::Twilio::MAX_TWILIO_LENGTH = 15;
+    my $message  = '1234567890abcdefg';
+    my @expanded = $logger->_expand_message($message);
+    is @expanded, 2, 'Long message truncated to max number of messages';
+    is $expanded[0], '1/2: 1234567890', '... first message truncated to length';
+    is $expanded[1], '2/2: abcdefg',    '... second message complete';
+  };
+};
 
 ###############################################################################
-# Messages have leading/trailing whitespace trimmed from them automatically.
-whitespace_trimmed: {
-    my $logger = Log::Dispatch::Twilio->new(
-        name         => 'twilio',
-        min_level    => 'debug',
-        max_messages => 9,
-        %params,
-    );
+subtest 'Leading/trailing whitespace gets trimmed' => sub {
+  my $logger = Log::Dispatch::Twilio->new(
+    name      => 'twilio',
+    min_level => 'debug',
+    %params,
+  );
 
-    my $message  = "   no whitespace here    ";
-    my @expanded = $logger->_expand_message($message);
-    is $expanded[0], 'no whitespace here',
-        'Leading/trailing whitespace stripped';
-}
+  my $message  = "   no whitespace here    ";
+  my @expanded = $logger->_expand_message($message);
+  is $expanded[0], 'no whitespace here', 'Leading/trailing whitespace stripped';
+};
+
+###############################################################################
+done_testing();

@@ -31,10 +31,10 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Starter::Git:
     file: lib/Dist/Zilla/MintingProfile/Starter/Git.pm
-    version: v5.0.0
+    version: v5.0.1
   Dist::Zilla::PluginBundle::Starter::Git:
     file: lib/Dist/Zilla/PluginBundle/Starter/Git.pm
-    version: v5.0.0
+    version: v5.0.1
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::Plugin::Git::Check: '0'
@@ -52,7 +52,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Starter-Git/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::PluginBundle::Starter::Git
   repository: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Starter-Git.git
-version: v5.0.0
+version: v5.0.1
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
 x_generated_by_perl: v5.32.0

@@ -75,7 +75,7 @@ my %WriteMakefileArgs = (
     "Test::File::ShareDir::Module" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "v5.0.1",
+  "VERSION" => "v5.0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }

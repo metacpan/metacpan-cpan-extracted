@@ -1,12 +1,16 @@
 package ZMQx::Class;
+
+# ABSTRACT: DEPRECATED - OO Interface to ZMQ
+our $VERSION = '0.008'; # VERSION
+
+warn __PACKAGE__ .' is DEPRECATED, please do not use this module anymore';
+
 use strict;
 use warnings;
 use 5.010;
 use ZMQx::Class::Socket;
 use Carp qw(croak carp);
 
-our $VERSION = "0.006";
-# ABSTRACT: OO Interface to ZMQ
 my $__CONTEXT = {};
 
 use ZMQ::FFI;
@@ -108,13 +112,15 @@ __END__
 
 =head1 NAME
 
-ZMQx::Class - OO Interface to ZMQ
+ZMQx::Class - DEPRECATED - OO Interface to ZMQ
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
+
+DEPRECATED - This was only a prototype and never used in production. I doubt it still works with current zmq.
 
   # a ZeroMQ publisher
   # see example/publisher.pl
@@ -145,6 +151,8 @@ version 0.006
   AnyEvent->condvar->recv;
 
 =head1 DESCRIPTION
+
+DEPRECATED - This was only a prototype and never used in production. I doubt it still works with current zmq. But here are the old docs:
 
 C<ZMQx::Class> provides an object oriented & Perlish interface to L<ZeroMQ|http://www.zeromq.org/> 3.2. It builds on L<ZMQ::FFI|https://metacpan.org/module/ZMQ::FFI>.
 
@@ -215,7 +223,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Validad AG.
+This software is copyright (c) 2013 - 2015 by Validad AG.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

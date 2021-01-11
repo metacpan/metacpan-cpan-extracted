@@ -26,20 +26,25 @@ my ($q, $r, $w);
 
 subtest 'wrong/ambiguous field names for get()' => sub {
 	plan tests => 1 + 4 + 5 + 7;
-	lives_ok { $r = 0; $r = $s->run('RETURN 1, 0, -2 AS nAn, 2 AS NaN, 2 AS nan')->single; } 'query lives';
+	lives_ok { $r = 0; $r = $s->run('RETURN 1, 0, 2 AS NaN')->single; } 'query lives';
 	# index/key collisions
 	is $r->get( 0 ), 1, 'get( 0 )';
 	is $r->get("0"), 0, 'get("0")';
 	is $r->get( 1 ), 0, 'get( 1 )';
 	is $r->get("1"), 1, 'get("1")';
 	# other possibly ambiguous cases
-	dies_ok { $r->get("2"); } 'get("1") dies';
-	is $r->get(0+"NaN"), 2, 'get(NaN)';
-	is $r->get("nAn"), -2, 'field treated as case sensitive';
+	dies_ok { $r->get("2"); } 'get("2") dies';
 	lives_ok { $w = warning { $r->get; }; } 'get without field lives';
 	(like $w, qr/\bambiguous\b.*\bget\b.*\bfield/i, 'get without field ambiguous') or diag 'got warning(s): ', explain($w);
+	dies_ok { $r->get("nAn"); } 'field treated as case sensitive';
+	# The string representation of numeric NaN differs by OS and by
+	# Perl version. See <https://en.wikipedia.org/wiki/NaN#Display>.
+	# Actually observed values include 'NaN', 'nan', '1.#QNAN'.
+	# That any NaN or Inf is treated as a string is all we care about.
+	use Neo4j::Driver::Record;
+	ok ! Neo4j::Driver::Record::_looks_like_int(0+"NaN"), 'NaN is string';
 	# unambiguous cases
-	lives_and { is $r->get( 2.0 ), -2 } 'get(2.0)';
+	lives_and { is $r->get( 2.0 ), 2 } 'get(2.0)';
 	$q = 'RETURN 1 AS a';
 	lives_and { is $s->run($q)->single->get(), 1 } 'unambiguous get without field';
 	dies_ok { $s->run($q)->single->get({}); } 'non-scalar field';

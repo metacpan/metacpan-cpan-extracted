@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.0705';
+our $VERSION = '0.0800';
 
 use strict;
 use warnings;
@@ -11,6 +11,15 @@ use warnings;
 use MIDI ();
 use MIDI::Simple ();
 use Music::Tempo qw(bpm_to_ms);
+use Exporter 'import';
+
+our @EXPORT = qw(
+    midi_dump
+    midi_format
+    set_chan_patch
+    set_time_sig
+    setup_score
+);
 
 use constant TICKS => 96;
 
@@ -57,7 +66,7 @@ sub set_chan_patch {
 }
 
 
-sub dump {
+sub midi_dump {
     my ($key) = @_;
 
     if ( lc $key eq 'volume' ) {
@@ -205,22 +214,22 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.0705
+version 0.0800
 
 =head1 SYNOPSIS
 
-  use MIDI::Util;
+  use MIDI::Util qw(midi_dump midi_format set_chan_patch set_time_sig setup_score);
 
-  my $dump = MIDI::Util::dump('volume'); # length, etc.
+  my $dump = midi_dump('volume'); # length, etc.
   print Dumper $dump;
 
-  my $score = MIDI::Util::setup_score( bpm => 120, etc => '...', );
+  my $score = setup_score( bpm => 120, etc => '...', );
 
-  MIDI::Util::set_time_sig( $score, '5/4' );
+  set_time_sig( $score, '5/4' );
 
-  MIDI::Util::set_chan_patch( $score, 0, 1 );
+  set_chan_patch( $score, 0, 1 );
 
-  my @notes = MIDI::Util::midi_format('C','C#','Db','D'); # C, Cs, Df, D
+  my @notes = midi_format('C','C#','Db','D'); # C, Cs, Df, D
 
   $score->n('wn', @notes);         # MIDI::Simple functionality
   $score->write_score('some.mid'); # MIDI::Simple functionality
@@ -275,9 +284,9 @@ Positional parameters and defaults:
   channel: 0
   patch:   undef
 
-=head2 dump
+=head2 midi_dump
 
-  $dump = MIDI::Util::dump($list_name);
+  $dump = MIDI::Util::midi_dump($list_name);
 
 Return sorted array references of the following L<MIDI>,
 L<MIDI::Simple>, and L<MIDI::Event> internal lists:

@@ -1,0 +1,55 @@
+{
+   "abstract" : "create a 'radio' stream by mixing ('cross fading') multiple audio sources (files or anything that can be converted to PCM audio) and sending it to a streaming server (like Icecast)",
+   "author" : [
+      "Sander Plas"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Audio-StreamGenerator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Log4perl" : "0",
+            "perl" : "5.008004",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Oele/audio-streamgenerator/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Oele/audio-streamgenerator.git",
+         "web" : "https://github.com/Oele/audio-streamgenerator"
+      }
+   },
+   "version" : 0.05,
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

@@ -27,7 +27,10 @@ Module-based Template Base Class
 
 =includes
 
+method: preprocess
+method: postprocess
 method: render
+method: template
 method: variables
 
 =cut
@@ -68,7 +71,7 @@ method: variables
 
 controller: ro, opt, InstanceOf["Mojolicious::Controller"]
 space: ro, opt, InstanceOf["Data::Object::Space"]
-template: ro, opt, InstanceOf["Mojo::Template"]
+processor: ro, opt, InstanceOf["Mojo::Template"]
 
 =cut
 
@@ -79,11 +82,83 @@ component-based template (partials) classes.
 
 =cut
 
+=method preprocess
+
+The preprocess method expects a template string. This method is called
+automatically before L</postprocess>, after locating the template in the class
+hierarchy, acting as a I<before> (template loading) hook.
+
+=signature preprocess
+
+preprocess(Str $input) : Str
+
+=example-1 preprocess
+
+  # given: synopsis
+
+  my $processed = $component->preprocess('');
+
+=example-2 preprocess
+
+  package App::Component::Left::ImageLink;
+
+  use Mojo::Base 'App::Component::Image';
+
+  sub preprocess {
+    my ($self, $input) = @_;
+    return '<a href="/">' . $input . '</a>';
+  }
+
+  package main;
+
+  my $component = App::Component::Left::ImageLink->new;
+
+  my $processed = $component->preprocess($component->template);
+
+=cut
+
+=method postprocess
+
+The postprocess method expects a template string. This method is called
+automatically after and passed the results of the L</preprocess> method, and
+its results are passed to the L</render> method, acting as an I<after>
+(template loading) hook.
+
+=signature postprocess
+
+postprocess(Str $input) : Str
+
+=example-1 postprocess
+
+  # given: synopsis
+
+  my $processed = $component->postprocess('');
+
+=example-2 postprocess
+
+  package App::Component::Right::ImageLink;
+
+  use Mojo::Base 'App::Component::Image';
+
+  sub postprocess {
+    my ($self, $input) = @_;
+    return '<a href="/">' . $input . '</a>';
+  }
+
+  package main;
+
+  my $component = App::Component::Right::ImageLink->new;
+
+  my $processed = $component->postprocess($component->template);
+
+=cut
+=cut
+
 =method render
 
 The render method loads the component template string data from the C<DATA>
 section of the component class and renders it using the L<Mojo::Template>
-object available via L</template>.
+object available via L</processor>.
 
 =signature render
 
@@ -102,6 +177,38 @@ render(Any %args) : Str
   my $rendered = $component->render(
     readonly => 1,
   );
+
+=cut
+
+=method template
+
+The template method is used to load template strings from the C<DATA> section
+of the class or object specified. The instance invocant will be used if no
+specific class or object is presented. If an object is provided but no C<DATA>
+section exists, the object's class hierarchy will be searched returning the
+first superclass with a matching data section.
+
+=signature template
+
+template(Str | Object $object = $self, Str $section = 'component') : (Any)
+
+=example-1 template
+
+  # given: synopsis
+
+  my $template = $component->template;
+
+=example-2 template
+
+  # given: synopsis
+
+  my $template = $component->template('App::Component::Image');
+
+=example-3 template
+
+  # given: synopsis
+
+  my $template = $component->template(App::Component::Image->new);
 
 =cut
 
@@ -148,6 +255,34 @@ $subs->synopsis(fun($tryable) {
   $result
 });
 
+$subs->example(-1, 'preprocess', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
+
+  $result
+});
+
+$subs->example(-2, 'preprocess', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok !ref $result;
+  like $result, qr/<a href="\/"><\/a>/;
+
+  $result
+});
+
+$subs->example(-1, 'postprocess', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
+
+  $result
+});
+
+$subs->example(-2, 'postprocess', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok !ref $result;
+  like $result, qr/<a href="\/"><\/a>/;
+
+  $result
+});
+
 $subs->example(-1, 'render', 'method', fun($tryable) {
   ok !(my $result = $tryable->result);
 
@@ -155,6 +290,24 @@ $subs->example(-1, 'render', 'method', fun($tryable) {
 });
 
 $subs->example(-2, 'render', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
+
+  $result
+});
+
+$subs->example(-1, 'template', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
+
+  $result
+});
+
+$subs->example(-2, 'template', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
+
+  $result
+});
+
+$subs->example(-3, 'template', 'method', fun($tryable) {
   ok !(my $result = $tryable->result);
 
   $result

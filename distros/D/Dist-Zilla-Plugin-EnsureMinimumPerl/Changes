@@ -1,0 +1,4 @@
+Revision history for Perl extension Dist::Zilla::Plugin::EnsureMinimumPerl
+
+0.01      2021-01-10 12:07:50-08:00 America/Vancouver
+    - Initial release

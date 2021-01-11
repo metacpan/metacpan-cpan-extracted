@@ -12,7 +12,7 @@ Astro::SIMBAD::Client - Fetch astronomical data from SIMBAD 4.
 
 As of release 0.027_01 the SOAP interface is deprecated. The University
 of Strasbourg has announced at
-L<http://cds.u-strasbg.fr/resources/doku.php?id=soap> that this
+L<https://cds.u-strasbg.fr/resources.gml?id=soap> that this
 interface will not be maintained after April 1 2014, and that 
 B<this interface will be stopped on December 31 2018>.
 
@@ -116,7 +116,7 @@ BEGIN {
 	|| sub { return $_[0] };
 }
 
-our $VERSION = '0.042';
+our $VERSION = '0.043';
 
 our @CARP_NOT = qw{Astro::SIMBAD::Client::WSQueryInterfaceService};
 
@@ -332,7 +332,7 @@ VOTables back (rather than a parse error) if that is what the input
 contains.
 
 This is B<not> a full-grown VOTable parser capable of handling
-the full spec (see L<http://www.ivoa.net/documents/latest/VOT.html>).
+the full spec (see L<https://www.ivoa.net/documents/latest/VOT.html>).
 It is oriented toward returning E<lt>TABLEDATAE<gt> contents, and the
 metadata that can reasonably be associated with those contents.
 
@@ -1689,13 +1689,19 @@ server.
 This environment variable is set to the URL of the C<http:> proxy
 server.
 
+=head1 SUPPORT
+
+Support is by the author. Please file bug reports at
+L<https://github.com/trwyant/perl-Astro-SIMBAD-Client/issues>, or in
+electronic mail to the author.
+
 =head1 AUTHOR
 
 Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2020 by Thomas R. Wyant, III
+Copyright (C) 2005-2021 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

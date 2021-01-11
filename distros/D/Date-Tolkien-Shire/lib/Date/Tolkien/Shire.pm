@@ -21,7 +21,7 @@ use Date::Tolkien::Shire::Data qw{
 use Time::Local;
 
 our $ERROR;
-our $VERSION = '1.902';
+our $VERSION = '1.903';
 
 sub new {
     my ( $class, $date, %arg ) = @_;
@@ -766,6 +766,10 @@ epoch time doesn't support (currently values before 1902 or after 2037).  The
 module should automatically expand in available dates directly with epoch time
 support on your system.
 
+Please file bug reports at
+L<https://github.com/trwyant/perl-Date-Tolkien-Shire/issues>, or in
+electronic mail to F<wyant@cpan.org>.
+
 =head1 AUTHOR
 
 Tom Braun <tbraun@pobox.com>
@@ -776,7 +780,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 Copyright (c) 2001-2003, 2006 Tom Braun. All rights reserved.
 
-Copyright (C) 2017-2019 Thomas R. Wyant, III
+Copyright (C) 2017-2021 Thomas R. Wyant, III
 
 The calendar implemented on this module was created by J.R.R. Tolkien,
 and the copyright is still held by his estate.  The license and

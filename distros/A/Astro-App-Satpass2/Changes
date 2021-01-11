@@ -1,3 +1,11 @@
+0.046		2021-01-08	T. R. Wyant
+    Add Travis CI testing.
+
+    Use GitHub as bug tracker. R.I.P. rt.cpan.org.
+
+    Add attribute 'refraction', which specifies whether atmospheric
+    refraction is taken into account.
+
 0.045		2020-08-02	T. R. Wyant
     Remove prototypes from the testing subroutines defined in t/*.t and
     inc/My/Module/Test/*.pm

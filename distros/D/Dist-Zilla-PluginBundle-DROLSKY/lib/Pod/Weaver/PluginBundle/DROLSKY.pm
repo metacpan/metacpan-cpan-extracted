@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean -also => ['_exp'];
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Dist::Zilla::Plugin::PodWeaver;
 use List::Util qw( first );
@@ -322,7 +322,7 @@ Pod::Weaver::PluginBundle::DROLSKY - A plugin bundle for pod woven by DROLSKY
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =head1 SYNOPSIS
 
@@ -463,8 +463,8 @@ and still use the plugin bundle:
 
 =head1 ADDING STOPWORDS FOR SPELLING TESTS
 
-As noted in L<Dist::Zilla::PluginBundle::DROLSKY>, stopwords for
-spelling tests can be added by adding a directive to pod:
+As noted in L<Dist::Zilla::PluginBundle::DROLSKY>, stopwords for spelling tests
+can be added by adding a directive to pod:
 
     =for stopwords foo bar baz
 
@@ -514,7 +514,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

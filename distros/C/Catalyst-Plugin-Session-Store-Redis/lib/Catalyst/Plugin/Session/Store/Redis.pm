@@ -1,8 +1,10 @@
 package Catalyst::Plugin::Session::Store::Redis;
-use warnings;
-use strict;
 
 # ABSTRACT: Redis Session store for Catalyst
+our $VERSION = '0.900'; # VERSION
+
+use warnings;
+use strict;
 
 use base qw/
     Class::Data::Inheritable
@@ -13,8 +15,6 @@ use MIME::Base64 qw(encode_base64 decode_base64);
 use Redis;
 use Storable qw/nfreeze thaw/;
 use Try::Tiny;
-
-our $VERSION = '0.09';
 
 __PACKAGE__->mk_classdata(qw/_session_redis_storage/);
 
@@ -118,7 +118,7 @@ Catalyst::Plugin::Session::Store::Redis - Redis Session store for Catalyst
 
 =head1 VERSION
 
-version 0.09
+version 0.900
 
 =head1 SYNOPSIS
 
@@ -208,11 +208,11 @@ Thomas Klausner C<< domm@cpan.org >>
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Thomas Klausner.
+This software is copyright (c) 2016 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

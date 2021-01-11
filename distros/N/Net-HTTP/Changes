@@ -1,5 +1,8 @@
 Release history for Net-HTTP
 
+6.20      2021-01-08 16:22:23Z
+    - Replace last use of "vars" with "our" (GH#67) (James Raspass)
+
 6.19      2019-05-16 19:16:59Z
     - partially skip live-https.t if there's no keep-alive connection (GH#58) (Slaven Rezić)
     - set "x_static_install" : 1 in META files

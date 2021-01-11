@@ -13,13 +13,17 @@ SYNOPSIS
       $things{foo}{baz} = ['a'..'z'];
       say deep_get(\%things, qw(foo baz 5)); # f
     
-      deep_get(\%things, qw(foo baz 26)) = 'AA';
-      say $things{foo}{baz}[-1]; # AA
+      deep_set(\%things, qw(foo foo), undef);
+      say deep_exists(\%things, qw(foo foo)); # 1
+    
+      deep_val(\%things, qw(bar bar)) = 'lvalue';
+      say deep_val(\%things, qw(bar bar)); # lvalue
 
 DESCRIPTION
 
-    Provides the functions "deep_get" and "deep_set" that traverse nested
-    data structures to retrieve or set the value located by a list of keys.
+    Provides the functions "deep_exists", "deep_get", "deep_set", and
+    "deep_val" that traverse nested data structures to retrieve or set the
+    value located by a list of keys.
 
     When traversing, keys are applied according to the type of referenced
     data structure. A hash will be traversed by hash key, an array by array
@@ -76,7 +80,7 @@ FUNCTIONS
 
  deep_get
 
-      my $value  = deep_get($structure, @keys);
+      my $value = deep_get($structure, @keys);
 
     Retrieves the value from the referenced structure located by the given
     keys. No intermediate structures will be altered or vivified; a missing
@@ -96,6 +100,20 @@ FUNCTIONS
     If no keys are passed, the structure must be an assignable lvalue and
     will be assigned the value directly.
 
+ deep_val
+
+      my $value = deep_val($structure, @keys);
+      deep_val($structure, @keys) = $new_value;
+
+    Lvalue accessor that is equivalent to "deep_get" when a value is
+    retrieved from it, or "deep_set" when a value is assigned to it
+    (passing the assigned value as the final argument).
+
+    The passed keys are used to traverse the structure at the time of
+    retrieval or assignment, not when the function is called. This subtle
+    difference may matter if the lvalue is preserved for later access, such
+    as via reference.
+
 BUGS
 
     Report any issues on the public bugtracker.
@@ -103,6 +121,10 @@ BUGS
 AUTHOR
 
     Dan Book <dbook@cpan.org>
+
+CONTRIBUTORS
+
+    Matt S Trout (mst)
 
 COPYRIGHT AND LICENSE
 
@@ -114,5 +136,17 @@ COPYRIGHT AND LICENSE
 
 SEE ALSO
 
-    Hash::DeepAccess, Data::DPath, Data::Deep
+    Many prior modules for accessing specific items within a deep
+    structure, which the author determined were either insufficient or
+    overcomplex.
+
+      * Hash::DeepAccess
+
+      * Data::Deep
+
+      * Data::Diver
+
+      * Data::DPath
+
+      * JSON::Pointer
 

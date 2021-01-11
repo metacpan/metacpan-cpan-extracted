@@ -1,11 +1,8 @@
-use Test::Most;
+use Test2::V0;
+use exact -me, -noautoclean;
 
-BEGIN {
-    use_ok( 'exact', 'me', 'noautoclean' );
-}
+ok( lives { me() }, 'me()' ) or note $@;
+ok( lives { me('../path/to/something') }, 'me("../path/to/something")' ) or note $@;
+ok( lives { me('path/to/something') }, 'me("path/to/something")' ) or note $@;
 
-lives_ok( sub { me() }, 'me()' );
-lives_ok( sub { me('../path/to/something') }, 'me("../path/to/something")' );
-lives_ok( sub { me('path/to/something') }, 'me("path/to/something")' );
-
-done_testing();
+done_testing;

@@ -38,7 +38,7 @@ sub apply_defaults {
    my ($self) = @_;
    die "pdf attribute (your PDF::API object) required" unless $self->pdf;
    my %defaults = (
-      # font is a PDF::API2::Resource::Font::CoreFont
+      # font is a PDF::API2::Resource::Font::CoreFont (or PDF::Builder)
       font      => $self->pdf->corefont( 'Helvetica', -encoding => 'latin1' ),
       fillcolor => 'black',
       size      => 10 / pt,

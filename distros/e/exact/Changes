@@ -1,5 +1,12 @@
 Revision history for exact
 
+1.14      2021-01-10 15:43:05-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.13      2020-07-17 20:16:34-07:00 America/Los_Angeles
         - Fix for "use open" not being exported
 

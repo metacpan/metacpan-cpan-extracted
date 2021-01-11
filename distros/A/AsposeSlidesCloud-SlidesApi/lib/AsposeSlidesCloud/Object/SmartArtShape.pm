@@ -39,10 +39,9 @@ use DateTime;
 
 use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
+use AsposeSlidesCloud::Object::GeometryShape;
 use AsposeSlidesCloud::Object::LineFormat;
 use AsposeSlidesCloud::Object::ResourceUri;
-use AsposeSlidesCloud::Object::ResourceUriElement;
-use AsposeSlidesCloud::Object::ShapeBase;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -100,7 +99,6 @@ sub new {
 		$self->$attribute( $args{ $args_key } );
 	}
 	$self->{ type } = 'SmartArtShape';
-	$self->{ shape_type } = 'Custom';
 	
 	return $self;
 }  
@@ -249,7 +247,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'shapes' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Shapes',
     	description => 'Gets or sets the link to shapes.',
     	format => '',
@@ -304,7 +302,7 @@ __PACKAGE__->swagger_types( {
     'x' => 'double',
     'y' => 'double',
     'z_order_position' => 'int',
-    'shapes' => 'ResourceUriElement',
+    'shapes' => 'ResourceUri',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'line_format' => 'LineFormat',

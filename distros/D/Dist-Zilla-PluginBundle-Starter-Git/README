@@ -25,9 +25,14 @@ DESCRIPTION
     The "[@Starter::Git]" plugin bundle for Dist::Zilla is a subclass of the
     [@Starter] plugin bundle designed to support a Git-based workflow.
 
-    See the Dist::Zilla::Starter guide and the base [@Starter]
-    documentation, as this documentation only details the specifics of this
-    subclass.
+    In addition to the standard "[@Starter]" behavior, this bundle restricts
+    the gathered files to those committed to the git repository, allowing
+    .gitignore to also ignore files when assembling the distribution; and
+    commits, tags, and pushes after a successful release.
+
+    See the Dist::Zilla::Starter guide and the base [@Starter] documentation
+    for more information, as this documentation only details the specifics
+    of this subclass.
 
     For one-line initialization of a new "[@Starter::Git]"-based
     distribution, try Dist::Zilla::MintingProfile::Starter::Git.

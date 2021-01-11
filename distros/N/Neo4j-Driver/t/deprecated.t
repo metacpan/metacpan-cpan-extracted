@@ -25,7 +25,7 @@ my $transaction = $driver->session->begin_transaction;
 $transaction->{return_stats} = 0;  # optimise sim
 
 
-my ($d, $w, $r);
+my ($d, $w, @w, $r);
 
 
 # query from types.t
@@ -91,9 +91,9 @@ subtest 'die_on_error = 0' => sub {
 	my $d = Neo4j::Test->driver;
 	$d->{die_on_error} = 0;
 	my $t;
-	$w = '';
-	lives_ok { $w = warning { $t = $d->session->begin_transaction; }; } 'Tx open';
-	(like $w, qr/\bdeprecate/, 'die_on_error deprecated') or diag 'got warning(s): ', explain($w);
+	@w = ();
+	lives_ok { @w = warnings { $t = $d->session->begin_transaction; }; } 'Tx open';
+	(like $w[0], qr/\bdeprecate/, 'die_on_error deprecated') or diag 'got warning(s): ', explain(\@w);
 	# successful statement
 	lives_and { is $t->run('RETURN 42, "live on error"')->single->get(0), 42 } 'no error';
 	# failing statement

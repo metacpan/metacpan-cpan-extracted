@@ -12,14 +12,16 @@
  * Library General Public License for more details.
  *
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the 
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
- * Boston, MA  02111-1307  USA.
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  */
 
 #include "gtksourceviewperl.h"
 
 MODULE = Gtk2::SourceView::StyleScheme	PACKAGE = Gtk2::SourceView::StyleScheme	PREFIX = gtk_source_style_scheme_
+
+BOOT:
+	gperl_object_set_no_warn_unreg_subclass (GTK_TYPE_SOURCE_STYLE_SCHEME, TRUE);
 
 GtkSourceTagStyle_own_ornull *gtk_source_style_scheme_get_tag_style (GtkSourceStyleScheme *scheme, const gchar *style_name);
 

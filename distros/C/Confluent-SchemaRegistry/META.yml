@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,14 +22,16 @@ no_index:
     - t
     - inc
 requires:
-  Aspect: '1.04'
-  Avro::Schema: '0'
-  JSON::XS: '3.02'
-  REST::Client: '273'
-  Try::Tiny: '0.22'
+  Aspect: v1.40.0
+  Avro::Schema: v1.10.1
+  HTTP::Status: v6.270.0
+  JSON::XS: v4.30.0
+  REST::Client: v273.0.0
+  Try::Tiny: v0.300.0
   perl: '5.010'
 resources:
   bugtracker: https://github.com/alivraghi/Confluent-SchemaRegistry/issues
   homepage: https://github.com/alivraghi/Confluent-SchemaRegistry
   repository: https://github.com/alivraghi/Confluent-SchemaRegistry.git
-version: '0.04'
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

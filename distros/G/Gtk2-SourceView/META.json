@@ -1,0 +1,46 @@
+{
+   "abstract" : "(DEPRECATED) Perl wrappers for the GtkSourceView widget",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gtk2-SourceView",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.2",
+            "ExtUtils::PkgConfig" : "1.0",
+            "Glib" : "1.103",
+            "Gnome2::Print" : "0.60",
+            "Gtk2" : "1.100"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.013",
+   "x_deprecated" : 1
+}

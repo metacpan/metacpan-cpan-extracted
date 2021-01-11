@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2019 by Martin Becker, Blaubeuren.
+# Copyright (c) 2007-2021 by Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -12,7 +12,7 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 229 };
+BEGIN { plan tests => 243 };
 use Math::Polynomial 1.000;
 ok(1);  # module loaded
 
@@ -417,6 +417,30 @@ ok(has_coeff($qq, -0.5));               # c(x**0)
 $qq = $zp->inflate(0);
 ok(has_coeff($qq));                     # 0(x**0)
 
+$pp = $p->new(-0.25, 0, 0, 0, 0, 0, 1.25);
+$qq = $pp->deflate(3);
+ok(has_coeff($qq - $p));                # p(x**3)
+$pp = $p->new(-0.5);
+$qq = $pp->deflate(3);
+ok(has_coeff($qq - $c));                # c(x**3)
+$pp = $zp->new;
+$qq = $pp->deflate(3);
+ok(has_coeff($qq - $zp));               # 0(x**3)
+$qq = $p->deflate(1);
+ok(has_coeff($qq - $p));                # p(x**1)
+$qq = $c->deflate(1);
+ok(has_coeff($qq - $c));                # c(x**1)
+$qq = $zp->deflate(1);
+ok(has_coeff($qq));                     # 0(x**1)
+$pp = $p->new(1);
+$qq = $pp->deflate(0);
+ok(!defined $qq);                       # p(x**0)
+$qq = $zp->deflate(0);
+ok(!defined $qq);                       # 0(x**0)
+$pp = $p->new(1, 0, 1, 1, 1);
+$qq = $pp->deflate(2);
+ok(!defined $qq);                       # impossible
+
 $pp = $p->new(11, 22, 33, 44, 55);
 my $ok = 1;
 foreach my $w (0..6) {
@@ -436,6 +460,20 @@ $qq = $p->nest($zp);
 ok(has_coeff($qq, -0.25));              # q(0)
 $qq = $zp->nest($p);
 ok(has_coeff($qq));                     # 0(p)
+
+$pp = $p->new(-11/64, 0, -5/32, 0, 5/64);
+$qq = $pp->unnest($q);
+ok(has_coeff($qq - $p));                # p(q)
+$pp = $p->new(-15/64, 0, -5/32, 0, 25/64);
+$qq = $pp->unnest($p);
+ok(has_coeff($qq - $q));                # q(p)
+$qq = $p->unnest($c);
+ok(!defined $qq);                       # unnesting constant
+$qq = $p->unnest($zp);
+ok(!defined $qq);                       # unnesting zero
+$pp = $p->new($qq, -11/64, 0, -5/32, 1, 5/64);
+$qq = $pp->unnest($q);
+ok(!defined $qq);                       # nonconstant remainder
 
 $pp = $p->new(1, 2, 3)->mirror;
 ok(has_coeff($pp, 1, -2, 3));           # mirror, degree 2

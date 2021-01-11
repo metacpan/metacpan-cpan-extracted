@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -30,12 +30,12 @@ BEGIN {
 	or $ENV{EXTENDED_TESTING}
 	or $ENV{AUTHOR_TESTING}
 	or $ENV{RELEASE_TESTING}
-	or plan skip_all => 'EXTENDED_TESTING'
+	or plan skip_all => 'EXTENDED_TESTING';
+	eval {
+		local $SIG{__WARN__} = sub {};
+		require Kavorka; 'Kavorka'->import; 1;
+	} or plan skip_all => 'requires Kavorka';
 };
-
-use Test::Requires "Kavorka";
-
-
 
 note "simple type constraint";
 

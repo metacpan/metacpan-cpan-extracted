@@ -23,31 +23,31 @@ no_index:
 provides:
   Astro::Coord::ECI::VSOP87D:
     file: lib/Astro/Coord/ECI/VSOP87D.pm
-    version: '0.003'
+    version: '0.004'
   Astro::Coord::ECI::VSOP87D::Jupiter:
     file: lib/Astro/Coord/ECI/VSOP87D/Jupiter.pm
-    version: '0.003'
+    version: '0.004'
   Astro::Coord::ECI::VSOP87D::Mars:
     file: lib/Astro/Coord/ECI/VSOP87D/Mars.pm
-    version: '0.003'
+    version: '0.004'
   Astro::Coord::ECI::VSOP87D::Mercury:
     file: lib/Astro/Coord/ECI/VSOP87D/Mercury.pm
-    version: '0.003'
+    version: '0.004'
   Astro::Coord::ECI::VSOP87D::Neptune:
     file: lib/Astro/Coord/ECI/VSOP87D/Neptune.pm
-    version: '0.003'
+    version: '0.004'
   Astro::Coord::ECI::VSOP87D::Saturn:
     file: lib/Astro/Coord/ECI/VSOP87D/Saturn.pm
-    version: '0.003'
+    version: '0.004'
   Astro::Coord::ECI::VSOP87D::Sun:
     file: lib/Astro/Coord/ECI/VSOP87D/Sun.pm
-    version: '0.003'
+    version: '0.004'
   Astro::Coord::ECI::VSOP87D::Uranus:
     file: lib/Astro/Coord/ECI/VSOP87D/Uranus.pm
-    version: '0.003'
+    version: '0.004'
   Astro::Coord::ECI::VSOP87D::Venus:
     file: lib/Astro/Coord/ECI/VSOP87D/Venus.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Astro::Coord::ECI: '0.102'
   Astro::Coord::ECI::Mixin: '0.102'
@@ -64,8 +64,8 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-VSOP87A
+  bugtracker: https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87A.git
-version: '0.003'
+  repository: git://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D.git
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,9 @@
 package Bitcoin::Crypto::Role::Key;
 
-use v5.10; use warnings;
+our $VERSION = "0.996";
+
+use v5.10;
+use warnings;
 use Types::Standard qw(InstanceOf);
 use Crypt::PK::ECC;
 use Scalar::Util qw(blessed);
@@ -15,7 +18,8 @@ with "Bitcoin::Crypto::Role::Network";
 
 has "key_instance" => (
 	is => "ro",
-	isa => InstanceOf ["Crypt::PK::ECC"]
+	isa => InstanceOf ["Crypt::PK::ECC"],
+	required => 1,
 );
 
 sub _is_private { undef }
@@ -51,17 +55,21 @@ sub _create_key
 		if blessed($entropy) && $entropy->isa("Crypt::PK::ECC");
 
 	my $is_private = get_key_type $entropy;
-	unless (defined $is_private) {
-		Bitcoin::Crypto::Exception::KeyCreate->raise(
-			"invalid entropy data passed to key creation method"
-		);
-	}
+
+	Bitcoin::Crypto::Exception::KeyCreate->raise(
+		"invalid entropy data passed to key creation method"
+	) unless defined $is_private;
 
 	$entropy = ensure_length $entropy, $config{key_max_length}
 		if $is_private;
 
 	my $key = Crypt::PK::ECC->new();
-	$key->import_key_raw($entropy, $config{curve_name});
+
+	Bitcoin::Crypto::Exception::KeyCreate->trap_into(
+		sub {
+			$key->import_key_raw($entropy, $config{curve_name});
+		}
+	);
 
 	return $key;
 }

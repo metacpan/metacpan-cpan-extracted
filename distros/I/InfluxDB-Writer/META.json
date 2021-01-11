@@ -1,18 +1,25 @@
 {
    "abstract" : "Various tools to send lines to InfluxDB",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>"
+      "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "InfluxDB-Writer",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -44,19 +51,61 @@
             "Sys::Hostname" : "0",
             "Time::Moment" : "0",
             "feature" : "0",
-            "lib::projectroot" : "0",
-            "strict" : "0",
-            "warnings" : "0"
+            "lib::projectroot" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "InfluxDB::Writer" : {
+         "file" : "lib/InfluxDB/Writer.pm",
+         "version" : "1.003"
+      },
+      "InfluxDB::Writer::AuthHeaderRole" : {
+         "file" : "lib/InfluxDB/Writer/AuthHeaderRole.pm",
+         "version" : "1.003"
+      },
+      "InfluxDB::Writer::CompactFiles" : {
+         "file" : "lib/InfluxDB/Writer/CompactFiles.pm",
+         "version" : "1.003"
+      },
+      "InfluxDB::Writer::FileTailer" : {
+         "file" : "lib/InfluxDB/Writer/FileTailer.pm",
+         "version" : "1.003"
+      },
+      "InfluxDB::Writer::RememberingFileTailer" : {
+         "file" : "lib/InfluxDB/Writer/RememberingFileTailer.pm",
+         "version" : "1.003"
+      },
+      "InfluxDB::Writer::SendLines" : {
+         "file" : "lib/InfluxDB/Writer/SendLines.pm",
+         "version" : "1.003"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/InfluxDB-Writer/issues"
+      },
+      "homepage" : "https://github.com/domm/InfluxDB-Writer",
       "repository" : {
          "type" : "git",
-         "url" : "git://code.validad.net/validad/influxdb-writer"
+         "url" : "https://github.com/domm/InfluxDB-Writer.git",
+         "web" : "https://github.com/domm/InfluxDB-Writer"
       }
    },
-   "version" : "1.002"
+   "version" : "1.003",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

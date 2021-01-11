@@ -1,5 +1,14 @@
 Revision history for Time::DoAfter
 
+1.07      2021-01-10 14:37:29-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+        - Update Travis YAML
+        - Adding Perl versions to test; annual general update for 2018
+
 1.06      2016-09-20 12:05:47-07:00 America/Los_Angeles
         - Fix bug in history()
 

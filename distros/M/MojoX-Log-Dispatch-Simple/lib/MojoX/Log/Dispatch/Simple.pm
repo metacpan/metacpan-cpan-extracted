@@ -8,7 +8,7 @@ use warnings;
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::Util 'encode';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.08'; # VERSION
 
 has history          => sub { [] };
 has level            => 'debug';
@@ -130,10 +130,10 @@ MojoX::Log::Dispatch::Simple - Simple Log::Dispatch replacement of Mojo::Log
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/MojoX-Log-Dispatch-Simple.svg)](https://travis-ci.org/gryphonshafer/MojoX-Log-Dispatch-Simple)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/MojoX-Log-Dispatch-Simple/badge.png)](https://coveralls.io/r/gryphonshafer/MojoX-Log-Dispatch-Simple)
+=for markdown [![test](https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/workflows/test/badge.svg)](https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/MojoX-Log-Dispatch-Simple/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/MojoX-Log-Dispatch-Simple)
 
 =head1 SYNOPSIS
 
@@ -397,23 +397,15 @@ L<GitHub|https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/MojoX-Log-Dispatch-Simple>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/MojoX::Log::Dispatch::Simple>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/MojoX-Log-Dispatch-Simple>
+L<GitHub Actions|https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/MojoX-Log-Dispatch-Simple>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/MojoX-Log-Dispatch-Simple>
+L<Codecov|https://codecov.io/gh/gryphonshafer/MojoX-Log-Dispatch-Simple>
 
 =item *
 
@@ -445,10 +437,11 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is Copyright (c) 2015-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut
 

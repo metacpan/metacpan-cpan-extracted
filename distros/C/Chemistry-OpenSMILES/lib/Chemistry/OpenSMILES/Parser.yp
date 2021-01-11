@@ -5,6 +5,7 @@
 use warnings;
 use 5.0100;
 
+use Chemistry::OpenSMILES qw(is_aromatic);
 use Graph::Undirected;
 use List::Util qw(sum);
 
@@ -29,8 +30,6 @@ my %bond_order = (
     '#' => 3,
     '$' => 4,
 );
-
-sub _is_organic($);
 
 %}
 
@@ -61,7 +60,7 @@ chain: atom
 
             $_[2]->{graph}->add_edge( $_[1]->{last}, $_[2] );
 
-            if( _is_organic $_[1]->{last} && _is_organic $_[1]->{last} ) {
+            if( is_aromatic $_[1]->{last} && is_aromatic $_[1]->{last} ) {
                 $_[2]->{graph}->set_edge_attribute( $_[1]->{last},
                                                     $_[2],
                                                     'bond',
@@ -111,7 +110,7 @@ chain: atom
             $_[1]->{last}{graph}->add_edge( $_[1]->{last}, $_[3]->{first} );
 
 
-            if( _is_organic $_[1]->{last} && _is_organic $_[3]->{first} ) {
+            if( is_aromatic $_[1]->{last} && is_aromatic $_[3]->{first} ) {
                 $_[1]->{last}{graph}->set_edge_attribute( $_[1]->{last},
                                                           $_[3]->{first},
                                                           'bond',
@@ -217,6 +216,12 @@ sub _Lexer
         my $atom = { %+, number => $self->{USER}{ATOMNO} };
         $self->{USER}{ATOMNO} ++;
         $self->{USER}{CHARNO} += length $&;
+
+        if( $atom->{charge} ) {
+            $atom->{charge} =~ s/^([-+])$/${1}1/;
+            $atom->{charge} =~ s/^([-+])\1$/${1}2/;
+            $atom->{charge} = int $atom->{charge};
+        }
 
         if( $atom->{hcount} ) {
             $atom->{hcount} =~ s/^H//;
@@ -328,8 +333,8 @@ sub _add_ring_bond
         ( $bond ) = grep { defined }
                          ( $bond, $self->{USER}{RINGBONDS}{$ring_bond}{bond} );
         if( !$bond &&
-            _is_organic $self->{USER}{RINGBONDS}{$ring_bond}{atom} &&
-            _is_organic $atom ) {
+            is_aromatic $self->{USER}{RINGBONDS}{$ring_bond}{atom} &&
+            is_aromatic $atom ) {
             $bond = ':';
         }
         if( $bond && $bond ne '-' ) {
@@ -346,12 +351,6 @@ sub _add_ring_bond
         $self->{USER}{RINGBONDS}{$ring_bond} =
             { atom => $atom, $bond ? ( bond => $bond ) : () };
     }
-}
-
-sub _is_organic($)
-{
-    my( $atom ) = @_;
-    return $atom->{symbol} ne ucfirst $atom->{symbol};
 }
 
 sub _merge_graphs
@@ -378,19 +377,6 @@ sub _merge_graphs
     }
 
     $self->{USER}{GRAPHS}[$index2] = undef;
-}
-
-sub _sprint_atom
-{
-    my( $atom ) = @_;
-    return '[' . (exists $atom->{isotope}   ? $atom->{isotope}   : '') .
-                 $atom->{symbol} .
-                 (exists $atom->{chirality} ? $atom->{chirality} : '') .
-                 ($atom->{hcount} ? 'H' . $atom->{hcount} : '') .
-                 (exists $atom->{charge}    ? $atom->{charge}    : '') .
-                 (exists $atom->{class} && $atom->{class}
-                    ? ':' . $atom->{class} : '') .
-           ']';
 }
 
 1;

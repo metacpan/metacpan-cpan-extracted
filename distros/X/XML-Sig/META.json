@@ -62,16 +62,21 @@
    "provides" : {
       "XML::Sig" : {
          "file" : "lib/XML/Sig.pm",
-         "version" : "0.33"
+         "version" : "0.38"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/perl-net-saml2/perl-XML-Sig/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perl-net-saml2/perl-XML-Sig.git",
+         "web" : "https://github.com/perl-net-saml2/perl-XML-Sig"
       }
    },
-   "version" : "0.33",
+   "version" : "0.38",
    "x_contributors" : [
       "Byrne Reese <byrne@cpan.org>",
       "Chris Andrews <chris@nodnol.org>",

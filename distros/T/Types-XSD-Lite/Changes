@@ -6,6 +6,17 @@ Home page:    <https://metacpan.org/release/Types-XSD-Lite>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Types-XSD-Lite>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.006	2021-01-08
+
+ [ Bug Fixes ]
+ - Fix regexes when applied to multiline strings.
+   Fixes RT#134000.
+   Bartosz Jarzyna++
+   <https://rt.cpan.org/Ticket/Display.html?id=134000>
+
+ [ Packaging ]
+ - Add explicit dependency on Perl 5.8.3.
+
 0.005	2014-04-12
 
  [ Documentation ]

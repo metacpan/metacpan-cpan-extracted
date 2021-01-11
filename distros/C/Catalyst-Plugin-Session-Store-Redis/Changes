@@ -1,5 +1,9 @@
 Revision history for Catalyst-Plugin-Session-Store-Redis
 
+0.900     2021-01-08 23:07:36+01:00
+    - dist housekeeping, Dist::Zilla::PluginBundle::Author::DOMM
+
+
 0.09    2018-04-16T23:18:14
     - Added missing prereqs as reported by CPANTS. (Mohammad S Anwar)
       (also reported by cpantesters, I should really use Dist::Zilla

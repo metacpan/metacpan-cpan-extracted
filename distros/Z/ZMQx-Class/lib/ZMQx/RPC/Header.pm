@@ -1,4 +1,8 @@
 package ZMQx::RPC::Header;
+
+# ABSTRACT: DEPRECATED - A unfinished prototype, do not use
+our $VERSION = '0.008'; # VERSION
+
 use strict;
 use warnings;
 use Moose;
@@ -46,11 +50,11 @@ __END__
 
 =head1 NAME
 
-ZMQx::RPC::Header
+ZMQx::RPC::Header - DEPRECATED - A unfinished prototype, do not use
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 AUTHOR
 
@@ -58,7 +62,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Validad AG.
+This software is copyright (c) 2013 - 2015 by Validad AG.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

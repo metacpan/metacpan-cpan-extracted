@@ -38,7 +38,6 @@ use Date::Parse;
 use DateTime;
 
 use AsposeSlidesCloud::Object::ResourceUri;
-use AsposeSlidesCloud::Object::ResourceUriElement;
 use AsposeSlidesCloud::Object::Slide;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -202,56 +201,56 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'layout_slide' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'LayoutSlide',
     	description => 'Gets or sets the  link to the layout slide.',
     	format => '',
     	read_only => '',
     		},
     'shapes' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Shapes',
     	description => 'Gets or sets the  link to list of top-level shapes.',
     	format => '',
     	read_only => '',
     		},
     'theme' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Theme',
     	description => 'Gets or sets the link to theme.',
     	format => '',
     	read_only => '',
     		},
     'placeholders' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Placeholders',
     	description => 'Gets or sets the  link to placeholders.',
     	format => '',
     	read_only => '',
     		},
     'images' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Images',
     	description => 'Gets or sets the link to images.',
     	format => '',
     	read_only => '',
     		},
     'comments' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Comments',
     	description => 'Gets or sets the link to comments.',
     	format => '',
     	read_only => '',
     		},
     'background' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Background',
     	description => 'Get or sets the link to slide&#39;s background',
     	format => '',
     	read_only => '',
     		},
     'notes_slide' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'NotesSlide',
     	description => 'Get or sets the link to notes slide.',
     	format => '',
@@ -272,14 +271,14 @@ __PACKAGE__->swagger_types( {
     'width' => 'double',
     'height' => 'double',
     'show_master_shapes' => 'boolean',
-    'layout_slide' => 'ResourceUriElement',
-    'shapes' => 'ResourceUriElement',
-    'theme' => 'ResourceUriElement',
-    'placeholders' => 'ResourceUriElement',
-    'images' => 'ResourceUriElement',
-    'comments' => 'ResourceUriElement',
-    'background' => 'ResourceUriElement',
-    'notes_slide' => 'ResourceUriElement',
+    'layout_slide' => 'ResourceUri',
+    'shapes' => 'ResourceUri',
+    'theme' => 'ResourceUri',
+    'placeholders' => 'ResourceUri',
+    'images' => 'ResourceUri',
+    'comments' => 'ResourceUri',
+    'background' => 'ResourceUri',
+    'notes_slide' => 'ResourceUri',
     'matches' => 'int'
 } );
 

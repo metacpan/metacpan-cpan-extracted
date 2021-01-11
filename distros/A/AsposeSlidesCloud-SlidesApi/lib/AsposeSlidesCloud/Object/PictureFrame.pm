@@ -43,7 +43,6 @@ use AsposeSlidesCloud::Object::GeometryShape;
 use AsposeSlidesCloud::Object::LineFormat;
 use AsposeSlidesCloud::Object::PictureFill;
 use AsposeSlidesCloud::Object::ResourceUri;
-use AsposeSlidesCloud::Object::ResourceUriElement;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -101,7 +100,6 @@ sub new {
 		$self->$attribute( $args{ $args_key } );
 	}
 	$self->{ type } = 'PictureFrame';
-	$self->{ shape_type } = 'PictureFrame';
 	
 	return $self;
 }  
@@ -250,7 +248,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'shapes' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Shapes',
     	description => 'Gets or sets the link to shapes.',
     	format => '',
@@ -291,13 +289,6 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'geometry_shape_type' => {
-    	datatype => 'string',
-    	base_name => 'GeometryShapeType',
-    	description => 'Geometry shape type.',
-    	format => '',
-    	read_only => '',
-    		},
     'picture_fill_format' => {
     	datatype => 'PictureFill',
     	base_name => 'PictureFillFormat',
@@ -319,13 +310,12 @@ __PACKAGE__->swagger_types( {
     'x' => 'double',
     'y' => 'double',
     'z_order_position' => 'int',
-    'shapes' => 'ResourceUriElement',
+    'shapes' => 'ResourceUri',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'line_format' => 'LineFormat',
     'type' => 'string',
     'shape_type' => 'string',
-    'geometry_shape_type' => 'string',
     'picture_fill_format' => 'PictureFill'
 } );
 
@@ -347,7 +337,6 @@ __PACKAGE__->attribute_map( {
     'line_format' => 'LineFormat',
     'type' => 'Type',
     'shape_type' => 'ShapeType',
-    'geometry_shape_type' => 'GeometryShapeType',
     'picture_fill_format' => 'PictureFillFormat'
 } );
 

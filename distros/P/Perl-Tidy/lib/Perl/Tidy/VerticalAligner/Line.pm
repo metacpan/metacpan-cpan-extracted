@@ -8,7 +8,7 @@
 package Perl::Tidy::VerticalAligner::Line;
 use strict;
 use warnings;
-our $VERSION = '20201207';
+our $VERSION = '20210111';
 
 BEGIN {
     my $i = 0;
@@ -21,17 +21,18 @@ BEGIN {
         _indentation_               => $i++,
         _leading_space_count_       => $i++,
         _outdent_long_lines_        => $i++,
+        _list_seqno_                => $i++,
         _list_type_                 => $i++,
         _is_hanging_side_comment_   => $i++,
         _ralignments_               => $i++,
         _maximum_line_length_       => $i++,
         _rvertical_tightness_flags_ => $i++,
         _is_terminal_ternary_       => $i++,
-        _is_terminal_else_          => $i++,
         _j_terminal_match_          => $i++,
-        _is_forced_break_           => $i++,
         _end_group_                 => $i++,
         _Kend_                      => $i++,
+        _ci_level_                  => $i++,
+        _imax_pair_                 => $i++,
     };
 }
 
@@ -74,15 +75,16 @@ EOM
         $self->[_leading_space_count_]       = $ri->{leading_space_count};
         $self->[_outdent_long_lines_]        = $ri->{outdent_long_lines};
         $self->[_list_type_]                 = $ri->{list_type};
+        $self->[_list_seqno_]                = $ri->{list_seqno};
         $self->[_is_hanging_side_comment_]   = $ri->{is_hanging_side_comment};
         $self->[_maximum_line_length_]       = $ri->{maximum_line_length};
         $self->[_rvertical_tightness_flags_] = $ri->{rvertical_tightness_flags};
         $self->[_is_terminal_ternary_]       = $ri->{is_terminal_ternary};
-        $self->[_is_terminal_else_]          = $ri->{is_terminal_else};
         $self->[_j_terminal_match_]          = $ri->{j_terminal_match};
-        $self->[_is_forced_break_]           = $ri->{is_forced_break};
         $self->[_end_group_]                 = $ri->{end_group};
         $self->[_Kend_]                      = $ri->{Kend};
+        $self->[_ci_level_]                  = $ri->{ci_level};
+        $self->[_imax_pair_]                 = $ri->{imax_pair};
 
         $self->[_ralignments_] = [];
 
@@ -97,6 +99,16 @@ EOM
     sub get_rpatterns      { return $_[0]->[_rpatterns_] }
     sub get_indentation    { return $_[0]->[_indentation_] }
     sub get_Kend           { return $_[0]->[_Kend_] }
+    sub get_ci_level       { return $_[0]->[_ci_level_] }
+    sub get_list_seqno     { return $_[0]->[_list_seqno_] }
+
+    sub get_imax_pair { return $_[0]->[_imax_pair_] }
+
+    sub set_imax_pair {
+        my ( $self, $val ) = @_;
+        $self->[_imax_pair_] = $val;
+        return;
+    }
 
     sub get_j_terminal_match {
         return $_[0]->[_j_terminal_match_];
@@ -108,16 +120,8 @@ EOM
         return;
     }
 
-    sub get_is_terminal_else {
-        return $_[0]->[_is_terminal_else_];
-    }
-
     sub get_is_terminal_ternary {
         return $_[0]->[_is_terminal_ternary_];
-    }
-
-    sub get_is_forced_break {
-        return $_[0]->[_is_forced_break_];
     }
 
     sub get_leading_space_count {
@@ -243,4 +247,3 @@ EOM
 }
 
 1;
-

@@ -4,7 +4,7 @@ use warnings;
 use 5.020;
 use utf8;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Getopt::Long;
 use List::Util qw(min);
@@ -71,7 +71,7 @@ my $wr = Travel::Status::DE::DBWagenreihung->new(
 );
 
 printf(
-	"%s: %s → %s  (%s)\n%s Gleis %s\n\n",
+	"%s: %s → %s\n",
 	join( ' / ', map { $wr->train_type . ' ' . $_ } $wr->train_numbers ),
 	join( ' / ', $wr->origins ),
 	join(
@@ -80,10 +80,9 @@ printf(
 			sprintf( '%s (%s)', $_->{name}, join( q{}, @{ $_->{sections} } ) )
 		} $wr->destinations
 	),
-	$wr->train_subtype // 'IC?',
-	$wr->station_name,
-	$wr->platform
 );
+
+printf( "%s Gleis %s\n\n", $wr->station_name, $wr->platform );
 
 for my $section ( $wr->sections ) {
 	my $section_length = $section->length_percent;
@@ -139,6 +138,15 @@ for my $wagon ( $wr->wagons ) {
 print $wr->direction == 100 ? '>' : '<';
 print "\n\n";
 
+for my $desc ( $wr->train_descriptions ) {
+	if ( $desc->{text} ) {
+		printf( "%s (%s)\n",
+			$desc->{text}, join( q{}, @{ $desc->{sections} } ) );
+	}
+}
+
+say "";
+
 for my $wagon ( $wr->wagons ) {
 	printf(
 		"%3s: %3s %10s  %s\n",
@@ -160,7 +168,7 @@ B<db-wagenreihung> I<station> I<train-number>
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 This is beta software: API and output format may change without notice.
 

@@ -7,32 +7,23 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Path::Tiny qw( path );
 use Path::Tiny::Rule;
 
 use Moose;
 
-with 'Dist::Zilla::Role::BeforeBuild';
+with qw(
+    Dist::Zilla::Plugin::DROLSKY::Role::MaybeFileWriter
+    Dist::Zilla::Role::BeforeBuild
+);
 
 sub before_build {
     my $self = shift;
 
     $self->_maybe_write_file( 'perltidyrc',   $self->_perltidyrc );
     $self->_maybe_write_file( 'perlcriticrc', $self->_perlcriticrc );
-
-    return;
-}
-
-sub _maybe_write_file {
-    my $self    = shift;
-    my $file    = shift;
-    my $content = shift;
-
-    return if -e $file;
-
-    path($file)->spew_utf8($content);
 
     return;
 }
@@ -157,7 +148,7 @@ Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles - Creates default perltidyrc
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =for Pod::Coverage .*
 
@@ -177,7 +168,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

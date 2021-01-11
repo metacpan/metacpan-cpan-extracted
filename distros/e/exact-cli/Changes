@@ -1,5 +1,12 @@
 Revision history for exact::cli
 
+1.04      2021-01-10 15:50:11-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.03      2019-08-26 15:12:32-07:00 America/Los_Angeles
         - Removed support for Perl versions prior to 5.14
 

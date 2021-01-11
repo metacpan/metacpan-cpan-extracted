@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Store/Directories.pm
+lib/Store/Directories/Lock.pm
+lib/Store/Directories/store-directories-schema.sql
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/main.t
+META.yml
+META.json

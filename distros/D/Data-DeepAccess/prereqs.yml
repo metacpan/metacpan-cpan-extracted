@@ -1,0 +1,10 @@
+runtime:
+  requires:
+    perl: '5.008008'
+    Carp: 0
+    Exporter: 0
+    Scalar::Util: 0
+    Sentinel: 0
+test:
+  requires:
+    Test2::V0: 0

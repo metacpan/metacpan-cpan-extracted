@@ -1,15 +1,27 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Gtk2-SourceView
-version:      1.000
-version_from: SourceView.pm
-installdirs:  site
+---
+abstract: '(DEPRECATED) Perl wrappers for the GtkSourceView widget'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gtk2-SourceView
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    ExtUtils::Depends:             0.2
-    ExtUtils::PkgConfig:           1.0
-    Glib:                          1.100
-    Gnome2::Print:                 0.60
-    Gtk2:                          1.100
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  ExtUtils::Depends: 0.2
+  ExtUtils::PkgConfig: 1.0
+  Glib: 1.103
+  Gnome2::Print: 0.60
+  Gtk2: 1.100
+version: 1.013
+x_deprecated: 1

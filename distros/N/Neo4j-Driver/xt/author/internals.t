@@ -21,9 +21,9 @@ my $s = $driver->session;
 # suite, which is by default run on installation on every platform.
 # That's why these internals are in xt/author.
 
-use Test::More 0.96 tests => 6;
+use Test::More 0.96 tests => 6 + 1;
 use Test::Exception;
-use Test::Warnings qw(warnings :no_end_test);
+use Test::Warnings qw(warnings);
 
 
 my ($q, $r);
@@ -51,7 +51,7 @@ subtest 'experimental: die_on_error = 0 for REST 404' => sub {
 	plan skip_all => "(test requires live REST)" if $Neo4j::Test::sim || $Neo4j::Test::bolt;
 	plan tests => 1;
 	my $t = $driver->session->begin_transaction;
-	$t->{transport}->{die_on_error} = 0;
+	$t->{net}->{die_on_error} = 0;
 	$t->{transaction_endpoint} = '/qwertyasdfghzxcvbn';
 	lives_and { warnings { is $t->run('RETURN 42')->size, 0 } } 'HTTP 404';
 };

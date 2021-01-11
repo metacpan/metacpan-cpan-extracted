@@ -5,7 +5,7 @@ The distribution is contained in a Git repository, so simply clone the
 repository
 
 ```
-$ git clone git://github.com/reneeb/DNS-Hetzner.git
+$ git clone git://github.com/perlservices/DNS-Hetzner.git
 ```
 
 and change into the newly-created directory.

@@ -2,22 +2,41 @@ NAME
     Kafka::Consumer::Avro - Avro message consumer for Apache Kafka.
 
 SYNOPSIS
-        use Kafka::Connection;
-        use Kafka::Consumer::Avro;
-
-        my $connection = Kafka::Connection->new( host => 'localhost' );
-
-        my $consumer = Kafka::Consumer::Avro->new( Connection => $connection );
-
-        # Do some interactions with Avro & SchemaRegistry before sending messages
-
-        # Fetch messages
-        my $response = $consumer->fetch(...);
-
-        # Closes the consumer and cleans up
-        undef $consumer;
-        $connection->close;
-        undef $connection;
+      use Kafka qw/DEFAULT_MAX_BYTES/;
+      use Kafka::Connection;
+      use Kafka::Consumer::Avro;
+      use Confluent::SchemaRegistry;
+  
+      my $connection = Kafka::Connection->new( host => 'localhost' );
+  
+      my $consumer = Kafka::Consumer::Avro->new( Connection => $connection , SchemaRegistry => Confluent::SchemaRegistry->new() );
+  
+      # Consuming messages
+      my $messages = $consumer->fetch(
+            'mytopic',            # topic
+            0,                    # partition
+            0,                    # offset
+            $DEFAULT_MAX_BYTES    # Maximum size of MESSAGE(s) to receive
+      );
+  
+      if ($messages) {
+            foreach my $message (@$messages) {
+                    if ( $message->valid ) {
+                            say 'payload    : ', $message->payload;
+                            say 'key        : ', $message->key;
+                            say 'offset     : ', $message->offset;
+                            say 'next_offset: ', $message->next_offset;
+                    }
+                    else {
+                            say 'error      : ', $message->error;
+                    }
+            }
+      }
+  
+      # Closes the consumer and cleans up
+      undef $consumer;
+      $connection->close;
+      undef $connection;
 
 DESCRIPTION
     "Kafka::Consumer::Avro" main feature is to provide object-oriented API
@@ -26,6 +45,24 @@ DESCRIPTION
 
     "Kafka::Consumer::Avro" inerhits from and extends Kafka::Consumer.
 
+INSTALL
+    Installation of "Kafka::Consumer::Avro" is a canonical:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+  TEST NOTES
+    Tests are focused on verifying Avro-formatted messages and theirs
+    interactions with Confluent Schema Registry and are intended to extend
+    "Kafka::Consumer" test suite.
+
+    They expect that in the target machine are available Kafka and Schema
+    Registry listening on "localhost" and default ports, otherwise most of
+    the test are skipped.
+
+USAGE
   CONSTRUCTOR
    "new"
     Creates new consumer client object.

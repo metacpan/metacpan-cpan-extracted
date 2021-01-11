@@ -1,8 +1,9 @@
 package DBIx::SchemaChecksum::Driver::SQLite;
-use utf8;
 
 # ABSTRACT: SQLite driver for DBIx::SchemaChecksum
+our $VERSION = '1.103'; # VERSION
 
+use utf8;
 use namespace::autoclean;
 use Moose::Role;
 
@@ -32,7 +33,7 @@ DBIx::SchemaChecksum::Driver::SQLite - SQLite driver for DBIx::SchemaChecksum
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 DESCRIPTION
 
@@ -44,7 +45,7 @@ Ignore some internal sqlite tables
 
 =item *
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =item *
 
@@ -58,7 +59,7 @@ Klaus Ita <koki@worstofall.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Thomas Klausner, Maroš Kollár, Klaus Ita.
+This software is copyright (c) 2012 - 2021 by Thomas Klausner, Maroš Kollár, Klaus Ita.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

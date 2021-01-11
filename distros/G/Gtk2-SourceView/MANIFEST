@@ -6,7 +6,6 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 maps
-META.yml			Module meta-data (added by MakeMaker)
 NEWS
 README
 SourceView.pm
@@ -31,3 +30,5 @@ xs/GtkSourceTag.xs
 xs/GtkSourceTagStyle.xs
 xs/GtkSourceTagTable.xs
 xs/GtkSourceView.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

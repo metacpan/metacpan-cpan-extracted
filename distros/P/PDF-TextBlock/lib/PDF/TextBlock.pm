@@ -19,14 +19,15 @@ my $debug = 0;
 =head1 NAME
 
 PDF::TextBlock - Easier creation of text blocks when using PDF::API2
+or PDF::Builder
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
-  use PDF::API2;
+  use PDF::API2;   # PDF::Builder also works
   use PDF::TextBlock;
 
   my $pdf = PDF::API2->new( -file => "40-demo.pdf" );
@@ -82,7 +83,7 @@ and/or added/changed individually at any time before you call apply().
 
 =item pdf
 
-A L<PDF::API2> object. You must provide this. 
+A L<PDF::API2> or L<PDF::Builder> object. You must provide this. 
 
 =item text
 
@@ -133,12 +134,12 @@ Aligns each line to the right.
 
 =item page
 
-A L<PDF::API2::Page> object. If you don't set this manually then we create 
-a new page for you when you call apply(). 
+A L<PDF::API2::Page> or L<PDF::Builder::Page> object. If you don't set this 
+manually then we create a new page for you when you call apply(). 
 
 If you want multiple PDF::TextBlock objects to all render onto the same 
-page, you could create a PDF::API2 page yourself, and pass it in to each
-PDF::TextBlock object:
+page, you could create a PDF::API2 or PDF::Builder page yourself, and pass 
+it in to each PDF::TextBlock object:
 
   my $pdf = PDF::API2->new( -file => "mytest.pdf" );
   my $page = $pdf->page();
@@ -191,11 +192,11 @@ L<http://rick.measham.id.au/pdf-api2/>
 
 =item lead
 
-Default is 15/pt.
+Leading distance (baseline to baseline spacing). Default is 15/pt.
 
 =item parspace
 
-Default is 0/pt.
+Extra gap between paragraphs. Default is 0/pt.
 
 =item hang
 
@@ -209,7 +210,8 @@ Default is 0/pt.
 
 =head2 apply
 
-This is where we do all the L<PDF::API2> heavy lifting for you.
+This is where we do all the L<PDF::API2> or L<PDF::Builder> heavy lifting 
+for you.
 
 Returns $endw, $ypos, $overflow. 
 
@@ -236,8 +238,9 @@ sub apply {
    my ($self, %args) = @_;
 
    my $pdf  = $self->pdf;
-   unless (ref $pdf eq "PDF::API2") {
-      croak "pdf attribute (a PDF::API2 object) required";
+   unless (ref $pdf eq "PDF::API2" ||
+           ref $pdf eq "PDF::Builder") {
+      croak "pdf attribute (a PDF::API2 or PDF::Builder object) required";
    }
 
    $self->_apply_defaults();
@@ -245,8 +248,8 @@ sub apply {
    my $text = $self->text;
    my $page = $self->page;
 
-   # Build %content_texts. A hash of all PDF::API2::Content::Text objects,
-   # one for each tag (<b> or <i> or whatever) in $text.
+   # Build %content_texts. A hash of all PDF::API2::Content::Text objects
+   # (or PDF::Builder), one for each tag (<b> or <i> or whatever) in $text.
    my %content_texts;
    foreach my $tag (($text =~ /<(\w*)[^\/].*?>/g), "default") {       
       next if ($content_texts{$tag});
@@ -571,7 +574,7 @@ This module started from, and has grown on top of, Rick Measham's (aka Woosta)
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009-2020 Jay Hannah, all rights reserved.
+Copyright 2009-2021 Jay Hannah, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

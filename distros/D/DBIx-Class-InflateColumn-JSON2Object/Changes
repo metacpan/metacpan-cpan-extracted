@@ -1,5 +1,9 @@
 Revision history for DBIx-Class-InflateColumn-JSON2Object
 
+0.906     2021-01-08 22:56:45+01:00
+    - dist housekeeping, Dist::Zilla::PluginBundle::Author::DOMM
+
+
 0.905   2018-06-13T11:04:05
    - make sure Int/Nums are always returned as int/num in json (Thomas Klausner)
    - documented fixed_class (Thomas Klausner)

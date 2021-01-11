@@ -10,7 +10,7 @@ use Getopt::Long 2.25;
 use Pod::Usage;
 use Term::ANSIColor qw{ colored };
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 my %opt = (
     color	=> -t STDOUT,
@@ -35,9 +35,23 @@ if ( defined( my $home = get_home() ) ) {
 }
 
 GetOptions( \%opt,
-    qw{ color! color_today|color-today=s j! y! },
+    qw{ accented! color! color_today|color-today=s events! j! y! },
     help => sub { pod2usage( { -verbose => 2 } ) },
 ) and @ARGV <= ( $opt{y} ? 1 : 2 ) or pod2usage( { -verbose => 0 } );
+
+my $on_date;
+if ( $opt{events} ) {
+    if ( $opt{accented} ) {
+	$] lt '5.008'
+	    and die "-accented requires at least Perl 5.8\n";
+	$on_date = __PACKAGE__->can( '__on_date_accented' );
+	eval q<binmode STDOUT, ':encoding(utf-8)'>;
+    } else {
+	$on_date = __PACKAGE__->can( '__on_date' );
+    }
+} else {
+    $on_date = sub { return };
+}
 
 if ( my $code = Term::ANSIColor->can( 'colorvalid' ) ) {
     $code->( $opt{color_today} )
@@ -87,7 +101,7 @@ if ( $opt{y} ) {
 	    or print "\n";
     }
 } else {
-    foreach ( month( $year, $month ) ) {
+    foreach ( month( $year, $month, \%opt ) ) {
 	s/ \s* \z /\n/smx;
 	print;
     }
@@ -160,17 +174,37 @@ sub month {
 	push @rslt, join ' ', map { sprintf $column_format, $_ } @week;
     }
 
+    $opt{events}
+	and push @rslt, map { on_year_day( $year, $_ ) } $start .. $finish;
+
     # Midyear's day and Overlithe are honorary members of month 6.
     if ( 6 == $month ) {
 	push @rslt, '',
 	    highlight( __holiday_name( HOLIDAY_MIDYEARS_DAY ),
 		DAY_OF_YEAR_MIDYEARS_DAY );
-	__is_leap_year( $year )
-	    and push @rslt, '', highlight( __holiday_name(
-		HOLIDAY_OVERLITHE ), DAY_OF_YEAR_OVERLITHE );
+	$opt{events}
+	    and push @rslt, on_year_day( $year, HOLIDAY_MIDYEARS_DAY );
+	if ( __is_leap_year( $year ) ) {
+	    push @rslt, '', highlight( __holiday_name(
+		    HOLIDAY_OVERLITHE ), DAY_OF_YEAR_OVERLITHE );
+	    $opt{events}
+		and push @rslt, on_year_day( $year, HOLIDAY_OVERLITHE );
+	}
     }
 
     return @rslt;
+}
+
+sub on_year_day {
+    my ( $year, $yd ) = @_;
+    my ( $month, $day ) = __day_of_year_to_date( $year, $yd );
+    defined( my $evt = $on_date->( $month, $day ) )
+	or return;
+    $evt =~ s/ \s+ \z //smx;
+    $evt = highlight(
+	sprintf( '%s: %s', $day_text->( $year, $yd ), $evt ), $yd );
+    $evt =~ s/ (?<= \n ) /    /smxg;
+    return ( '', $evt );
 }
 
 # Make the calendar for one quarter. The arguments are Shire Year and
@@ -208,6 +242,18 @@ scal - Displays a Shire calendar
 
 =head1 OPTIONS
 
+=head2 -accented
+
+If this Boolean option is asserted, event output will be accented, and
+encoded in UTF-8. If not, event output will be unaccented, and in the
+local character set. This option is ignored unless L<-events|/-events>
+is asserted.
+
+The assertion of this option will cause an exception under Perls before
+5.8.
+
+The default is C<-noaccented>.
+
 =head2 -color
 
 If this Boolean option is asserted, the current day is emphasized.
@@ -221,6 +267,13 @@ The default is true if STDOUT is a terminal, and false if not.
 This option specifies how to emphasize the current day. The value must
 be acceptable to L<Term::ANSIColor|Term::ANSIColor>. The default is
 C<'underline'>.
+
+=head2 -events
+
+If asserted, this Boolean option causes events in the displayed month to
+be displayed also. It is ignored if -y is in effect.
+
+The default is C<-noevents>.
 
 =head2 -help
 
@@ -289,7 +342,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2019 by Thomas R. Wyant, III
+Copyright (C) 2017-2021 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

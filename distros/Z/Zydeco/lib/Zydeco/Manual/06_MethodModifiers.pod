@@ -38,7 +38,7 @@ them, and allow classes to modify the methods they consume from roles.
 
 A C<before> modifier executes before the original method is called.
 Its return value is ignored. If it throws an exception, this will
-prevent the original method from being caused.
+prevent the original method from being called.
 
 An C<after> modifier executes after the original method is called.
 Its return value is also ignored.

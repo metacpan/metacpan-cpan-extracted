@@ -29,7 +29,9 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::GitHub' => '0',
                                       'Git::Wrapper' => '0',
                                       'HTTP::Tiny' => '0',
-                                      'namespace::clean' => '0'
+                                      'Moose' => '0',
+                                      'namespace::clean' => '0',
+                                      'perl' => '5.014'
                                     }
                     },
        'test' => {

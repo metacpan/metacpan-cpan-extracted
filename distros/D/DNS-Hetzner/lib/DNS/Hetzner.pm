@@ -1,21 +1,23 @@
 package DNS::Hetzner;
-
+$DNS::Hetzner::VERSION = '0.05';
 use v5.24;
 
 # ABSTRACT: Perl library to work with the API for the Hetzner DNS
 
+use Mojo::Base -strict, -signatures;
+
 use Carp;
 use Moo;
+use Mojo::File;
+use Mojo::Loader qw(find_modules load_class);
 use Mojo::UserAgent;
+use Mojo::Util qw(decamelize);
 use Types::Mojo qw(:all);
+use Types::Standard qw(Str);
 
 use DNS::Hetzner::Schema;
 
-with 'DNS::Hetzner::API';
-
-use Mojo::Base -strict, -signatures;
-
-our $VERSION = '0.02';
+no warnings 'experimental::signatures';
 
 has token    => ( is => 'ro', isa => Str, required => 1 );
 has host     => ( is => 'ro', isa => MojoURL["https?"], default => sub { 'https://dns.hetzner.com' }, coerce => 1 );
@@ -30,7 +32,28 @@ has client   => (
     }
 );
 
-__PACKAGE__->load_namespace;
+sub _load_namespace ($package) {
+    my @modules = find_modules $package . '::API', { recursive => 1 };
+
+    for my $module ( @modules ) {
+        load_class( $module );
+
+        my $base = (split /::/, $module)[-1];
+
+        no strict 'refs';
+        *{ $package . '::' . decamelize( $base ) } = sub ($dns) {
+            state $object //= $module->instance(
+                token    => $dns->token,
+                base_uri => $dns->base_uri,
+                client   => $dns->client,
+            );
+
+            return $object;
+        };
+    }
+}
+
+__PACKAGE__->_load_namespace;
 
 1;
 
@@ -46,7 +69,7 @@ DNS::Hetzner - Perl library to work with the API for the Hetzner DNS
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -95,6 +118,8 @@ B<I<(required)>> Your API token.
 =head2 records
 
 =head2 zones
+
+=head2 primary_servers
 
 =head1 AUTHOR
 

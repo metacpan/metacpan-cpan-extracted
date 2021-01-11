@@ -1,38 +1,27 @@
-use strict;
-use warnings;
-
-use Test::More;
+use Test2::V0;
 use Clone 'clone';
+use DBIx::Query;
 
-use constant MODULE => 'DBIx::Query';
+my $dq = DBIx::Query->connect('dbi:SQLite:dbname=:memory:');
 
-exit main(@ARGV);
+$dq->do('CREATE TABLE movie ( open TEXT, final TEXT, west TEXT, east TEXT )');
+my $insert = $dq->prepare('INSERT INTO movie ( open, final, west, east ) VALUES ( ?, ?, ?, ? )');
 
-sub main {
-    require_ok(MODULE);
-
-    my $dq = MODULE->connect('dbi:SQLite:dbname=:memory:');
-
-    $dq->do('CREATE TABLE movie ( open TEXT, final TEXT, west TEXT, east TEXT )');
-    my $insert = $dq->prepare('INSERT INTO movie ( open, final, west, east ) VALUES ( ?, ?, ?, ? )');
-
-    while ( <DATA> ) {
-        chomp;
-        $insert->execute( split(/\|/) );
-    }
-
-    test_query($dq);
-    test_crud($dq);
-    test_where($dq);
-    test_db_helper_methods($dq);
-    test_run($dq);
-    test_row_set_methods($dq);
-    test_row_methods($dq);
-    test_cell_methods($dq);
-
-    done_testing();
-    return 0;
+while ( <DATA> ) {
+    chomp;
+    $insert->execute( split(/\|/) );
 }
+
+test_query($dq);
+test_crud($dq);
+test_where($dq);
+test_db_helper_methods($dq);
+test_run($dq);
+test_row_set_methods($dq);
+test_row_methods($dq);
+test_cell_methods($dq);
+
+done_testing;
 
 sub test_query {
     my ($dq) = @_;
@@ -82,7 +71,7 @@ sub test_crud {
     );
 
     my $rv = $dq->update( 'movie', { 'west' => 'Another Earth' }, { 'open' => 'Jun 14, 2013' } );
-    isa_ok( $rv, MODULE . '::db' );
+    isa_ok( $rv, 'DBIx::Query::db' );
     is(
         $dq->get( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run->value,
         'Another Earth',
@@ -90,7 +79,7 @@ sub test_crud {
     );
 
     $rv = $dq->rm( 'movie', { 'open' => 'Jun 14, 2013' } );
-    isa_ok( $rv, MODULE . '::db' );
+    isa_ok( $rv, 'DBIx::Query::db' );
     is(
         $dq->get( 'movie', ['west'], { 'open' => 'Jun 14, 2013' } )->run->value,
         undef,
@@ -101,7 +90,7 @@ sub test_crud {
 sub test_where {
     my ($dq) = @_;
 
-    is_deeply(
+    is(
         scalar( $dq->get('movie')->where( 'final' => 'Aug 7, 2011' )->run->all({}) ),
         [{
             'open'  => 'Aug 5, 2011',
@@ -112,7 +101,7 @@ sub test_where {
         '$db->get($table)->where($where)',
     );
 
-    is_deeply(
+    is(
         $dq
             ->get('movie', undef, { 'final' => 'Aug 7, 2011' } )
             ->where( 'final' => 'Jul 17, 2011' )->run->all({}),
@@ -125,7 +114,7 @@ sub test_where {
         '$db->get( $table, undef, $where )->where($where_change)',
     );
 
-    is_deeply(
+    is(
         $dq
             ->get('movie', undef, { 'final' => 'Aug 7, 2011' } )
             ->where( '"open"' => 'Aug 5, 2011' )->run->all({}),
@@ -138,7 +127,7 @@ sub test_where {
         '$db->get( $table, undef, $where )->where($where_append)',
     );
 
-    is_deeply(
+    is(
         $dq
             ->get('movie', undef, { 'final' => 'Aug 7, 2011' } )
             ->where( '"open"' => 'Jul 15, 2011' )->run->all({}),
@@ -155,17 +144,17 @@ sub test_db_helper_methods {
         'Raising Arizona',
         '$dq->fetch_value()',
     );
-    is_deeply(
+    is(
         $dq->fetchall_arrayref( 'movie', ['west'], { 'open' => 'Jul 1, 2011' } ),
         [ ['Raising Arizona'] ],
         '$dq->fetchall_arrayref()',
     );
-    is_deeply(
+    is(
         $dq->fetchall_hashref( 'movie', ['west'], { 'open' => 'Jul 1, 2011' } ),
         [ { 'west' => 'Raising Arizona' } ],
         '$dq->fetchall_hashref()',
     );
-    is_deeply(
+    is(
         $dq->fetch_column_arrayref( 'movie', ['west'] ),
         [
             'Hunt for Red October',
@@ -182,7 +171,7 @@ sub test_db_helper_methods {
         ],
         '$dq->fetch_column_arrayref()',
     );
-    is_deeply(
+    is(
         $dq->fetchrow_hashref( 'SELECT west FROM movie WHERE open = ?', 'Jul 1, 2011' ),
         { 'west' => 'Raising Arizona' },
         '$dq->fetchrow_hashref()',
@@ -192,7 +181,7 @@ sub test_db_helper_methods {
 sub test_run {
     my ($dq) = @_;
 
-    is_deeply(
+    is(
         $dq->sql(
             'SELECT west, east FROM movie WHERE open = ?',
             undef,
@@ -208,7 +197,7 @@ sub test_run {
         '$dq->sql( $sql, undef, undef, [$variable] )->run()->all({})',
     );
 
-    is_deeply(
+    is(
         $dq->sql('SELECT west, east FROM movie WHERE open = ?')->run('Jul 1, 2011')->all({}),
         [
             {
@@ -218,7 +207,7 @@ sub test_run {
         ],
         '$dq->sql($sql)->run($variable)->all({})',
     );
-    is_deeply(
+    is(
         $dq->get( 'movie', [ 'west', 'east' ], { 'open' => 'Jul 1, 2011' } )->run->all({}),
         [
             {
@@ -235,7 +224,7 @@ sub test_row_set_methods {
 
     my $row_set = $dq->sql('SELECT * FROM movie')->run;
 
-    is_deeply(
+    is(
         $row_set->next->data,
         {
             'open' => 'Jun 17, 2011',
@@ -246,7 +235,7 @@ sub test_row_set_methods {
         '$dq->sql(...)->run()->next()->data()',
     );
 
-    is_deeply(
+    is(
         $row_set->next(2)->data,
         {
             'open' => 'Jul 8, 2011',
@@ -257,7 +246,7 @@ sub test_row_set_methods {
         '$dq->sql(...)->run()->next(2)->data()',
     );
 
-    is_deeply(
+    is(
         $row_set->next(6)->data,
         {
             'open'  => 'Aug 26, 2011',
@@ -274,7 +263,7 @@ sub test_row_set_methods {
         'next at end of data returns undef',
     );
 
-    is_deeply(
+    is(
         $dq->sql('SELECT west, east FROM movie WHERE east LIKE ?')->run('%he%')->all,
         [
             [ 'Raising Arizona', 'There Be Dragons' ],
@@ -283,7 +272,7 @@ sub test_row_set_methods {
         '$dq->sql(...)->run(...)->all()',
     );
 
-    is_deeply(
+    is(
         $dq->sql('SELECT west, east FROM movie WHERE east LIKE ?')->run('%he%')->all({}),
         [
             {
@@ -302,7 +291,7 @@ sub test_row_set_methods {
     $dq
         ->sql('SELECT west, east FROM movie WHERE east LIKE ?')->run('%he%')
         ->each( sub { push( @rows, $_[0]->data ) } );
-    is_deeply(
+    is(
         \@rows,
         [
             {
@@ -323,13 +312,13 @@ sub test_row_set_methods {
         '$dq->sql(...)->run(...)->value() in scalar context',
     );
 
-    is_deeply(
+    is(
         [ $dq->sql('SELECT west, east FROM movie WHERE east = ?')->run('Jane Eyre')->value ],
         [ 'Hunt for Red October', 'Jane Eyre' ],
         '$dq->sql(...)->run(...)->value() in list context',
     );
 
-    is_deeply(
+    is(
         [ $dq->sql('SELECT * FROM movie')->run->first ],
         [ [
             'Jun 17, 2011',
@@ -340,7 +329,7 @@ sub test_row_set_methods {
         'first()',
     );
 
-    is_deeply(
+    is(
         [ $dq->sql('SELECT * FROM movie')->run->first({}) ],
         [ {
             east  => 'Jane Eyre',
@@ -365,13 +354,13 @@ sub test_row_set_methods {
         'Gladiator',
     ];
 
-    is_deeply(
+    is(
         [ $dq->sql('SELECT west FROM movie')->run->column ],
         $titles,
         'column() array context',
     );
 
-    is_deeply(
+    is(
         scalar( $dq->sql('SELECT west FROM movie')->run->column ),
         $titles,
         'column() scalar context',
@@ -413,13 +402,13 @@ sub test_row_methods {
     $dq
         ->sql('SELECT east, west FROM movie WHERE east = ?')
         ->run('There Be Dragons')->next->each( sub { push @titles, $_[0]->value } );
-    is_deeply(
+    is(
         \@titles,
         [ 'There Be Dragons', 'Raising Arizona' ],
         '$dq->sql(...)->run(...)->next()->each( sub { ... } )',
     );
 
-    is_deeply(
+    is(
         $dq->sql('SELECT east, west FROM movie')->run->next->data,
         {
             'west' => 'Hunt for Red October',
@@ -428,7 +417,7 @@ sub test_row_methods {
         '$dq->sql(...)->run()->next()->data()',
     );
 
-    is_deeply(
+    is(
         $dq->sql('SELECT east, west FROM movie')->run->next->row,
         [
             'Jane Eyre',

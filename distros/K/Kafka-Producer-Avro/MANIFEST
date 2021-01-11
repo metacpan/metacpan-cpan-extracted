@@ -1,10 +1,11 @@
-Changes                             History of this package
-Makefile.PL                         Makefile generator
-MANIFEST                            This file
-META.json                           Module meta-data (added by MakeMaker)
-META.yml                            Module meta-data (added by MakeMaker)
-README                              Get you started with this package
-README.md                           Get you started with this package
+Changes				History of this package
+LICENSE
+Makefile.PL			Makefile generator
+MANIFEST			This file
+MANIFEST.SKIP
+META.json			Module meta-data (added by MakeMaker)
+META.yml			Module meta-data (added by MakeMaker)
+README				Get you started with this package
 INSTALL
 lib/Kafka/Producer/Avro.pm
 t/01_quick_start.t

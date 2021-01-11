@@ -1,5 +1,14 @@
 Revision history for ZMQx::Class
 
+0.008     2021-01-10 19:08:51+01:00
+
+0.008	2021-01-10T19:07:32
+    - DEPRECATED!
+
+
+0.007 Wed Oct 29 20:37:30 PDT 2014
+    - String type message decode / encode utf8
+
 0.006   2014-10-02T03:57:49+0200
     - added task distribution example (David Schmidt)
     - Only close open sockets in close(), updated dependency reference from ZMQ::LibZMQ3 to ZMQ::FFI (Michael Kröll)

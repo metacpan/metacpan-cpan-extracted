@@ -1,12 +1,13 @@
 package Filter::CommaEquals;
 # ABSTRACT: Adds support for ,= to any package or script
 
+use 5.008;
 use strict;
 use warnings;
 
 use Filter::Simple;
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.02'; # VERSION
 
 FILTER_ONLY
     code => sub {
@@ -27,10 +28,10 @@ Filter::CommaEquals - Adds support for ,= to any package or script
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Filter-CommaEquals.svg)](https://travis-ci.org/gryphonshafer/Filter-CommaEquals)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Filter-CommaEquals/badge.png)](https://coveralls.io/r/gryphonshafer/Filter-CommaEquals)
+=for markdown [![test](https://github.com/gryphonshafer/Filter-CommaEquals/workflows/test/badge.svg)](https://github.com/gryphonshafer/Filter-CommaEquals/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Filter-CommaEquals/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Filter-CommaEquals)
 
 =for test_synopsis BEGIN { die "SKIP: skip Test::Synopsis because content is post-filter\n"; }
 
@@ -87,23 +88,23 @@ L<GitHub|https://github.com/gryphonshafer/Filter-CommaEquals>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Filter-CommaEquals>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Filter::CommaEquals>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/Filter-CommaEquals>
+L<GitHub Actions|https://github.com/gryphonshafer/Filter-CommaEquals/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Filter-CommaEquals>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Filter-CommaEquals>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Filter-CommaEquals>
+L<CPANTS|http://cpants.cpanauthors.org/dist/Filter-CommaEquals>
+
+=item *
+
+L<CPAN Testers|http://www.cpantesters.org/distro/F/Filter-CommaEquals.html>
 
 =back
 
@@ -113,9 +114,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gryphon Shafer.
+This software is Copyright (c) 2014-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

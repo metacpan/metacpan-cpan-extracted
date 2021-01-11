@@ -10,6 +10,7 @@ t/chi.t
 t/hash.t
 t/lcm.t
 t/links.t
+t/minimum.t
 t/no404s.t
 t/noopentickets.t
 t/noplan.t

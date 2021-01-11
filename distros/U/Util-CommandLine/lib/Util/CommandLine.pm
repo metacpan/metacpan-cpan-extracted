@@ -10,7 +10,7 @@ use Pod::Usage 'pod2usage';
 use Proc::PID::File;
 use Term::ReadKey 'ReadMode';
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 use constant EXPORT_OK => [ qw( options pod2usage singleton readmode ) ];
 
@@ -114,10 +114,10 @@ Util::CommandLine - Command-line interface helper utility
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Util-CommandLine.svg)](https://travis-ci.org/gryphonshafer/Util-CommandLine)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Util-CommandLine/badge.png)](https://coveralls.io/r/gryphonshafer/Util-CommandLine)
+=for markdown [![test](https://github.com/gryphonshafer/Util-CommandLine/workflows/test/badge.svg)](https://github.com/gryphonshafer/Util-CommandLine/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Util-CommandLine/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Util-CommandLine)
 
 =head1 SYNOPSIS
 
@@ -207,11 +207,11 @@ L<MetaCPAN|https://metacpan.org/pod/Util::CommandLine>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Util-CommandLine>
+L<GitHub Actions|https://github.com/gryphonshafer/Util-CommandLine/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Util-CommandLine>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Util-CommandLine>
 
 =item *
 
@@ -229,9 +229,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2015-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

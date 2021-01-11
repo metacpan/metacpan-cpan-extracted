@@ -1,0 +1,46 @@
+{
+   "abstract" : "(DEPRECATED) Enhanced source code editor widget",
+   "author" : [
+      "Emmanuel Rodriguez <potyl@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Gtk2-SourceView2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0",
+            "ExtUtils::PkgConfig" : "0",
+            "Glib::MakeHelper" : "0",
+            "Gtk2::CodeGen" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Gtk2" : "1.160"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.12",
+   "x_deprecated" : 1,
+   "x_repository" : "http://github.com/potyl/gtk2-sourceview2"
+}

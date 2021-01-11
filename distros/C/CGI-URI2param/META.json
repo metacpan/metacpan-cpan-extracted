@@ -1,0 +1,77 @@
+{
+   "abstract" : "DEPRECATED - convert parts of an URL to param values",
+   "author" : [
+      "Thomas Klausner <domm@plix.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CGI-URI2param",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache::Request" : "0.33",
+            "Carp" : "0",
+            "Exporter" : "0",
+            "vars" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Simple" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Apache::URI2param" : {
+         "file" : "lib/Apache/URI2param.pm",
+         "version" : "1.03"
+      },
+      "CGI::URI2param" : {
+         "file" : "lib/CGI/URI2param.pm",
+         "version" : "1.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/CGI-URI2param/issues"
+      },
+      "homepage" : "https://github.com/domm/CGI-URI2param",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/domm/CGI-URI2param.git",
+         "web" : "https://github.com/domm/CGI-URI2param"
+      }
+   },
+   "version" : "1.03",
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

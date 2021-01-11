@@ -38,7 +38,7 @@ use Date::Parse;
 use DateTime;
 
 use AsposeSlidesCloud::Object::FillFormat;
-use AsposeSlidesCloud::Object::ResourceUriElement;
+use AsposeSlidesCloud::Object::ResourceUri;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -209,7 +209,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'image' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Image',
     	description => 'Internal image link.',
     	format => '',
@@ -245,7 +245,7 @@ __PACKAGE__->swagger_types( {
     'crop_right' => 'double',
     'crop_top' => 'double',
     'dpi' => 'int',
-    'image' => 'ResourceUriElement',
+    'image' => 'ResourceUri',
     'base64_data' => 'string',
     'svg_data' => 'string',
     'picture_fill_mode' => 'string'

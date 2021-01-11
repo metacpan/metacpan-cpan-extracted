@@ -1,18 +1,47 @@
-Template::Plugin::Trac adds Text::Trac support to TT
+NAME
 
-Copyright (C) 2007, Graham TerMarsch.  All Rights Reserved.
+    Template::Plugin::Trac - Template::Toolkit filter for Text::Trac
 
-This is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+SYNOPSIS
 
-To install:
-    perl Build.PL
-    ./Build
-    ./Build test
-    ./Build install
+      [% USE Trac %]
+      ...
+      [% FILTER trac %]
+        = Heading One =
+        == Heading Two ==
+      [% END %]
+      ...
+      [% text | trac %]
 
-or
-    perl Makefile.PL
-    make
-    make test
-    make install
+DESCRIPTION
+
+    Template::Plugin::Trac is a plugin for Template::Toolkit, which formats
+    your text using Trac's WikiFormatting style.
+
+METHODS
+
+    init()
+
+      Initializes the template plugin.
+
+    filter($txt, $args, $config)
+
+      Filters the given text, by running it through Text::Trac.
+
+AUTHOR
+
+    Graham TerMarsch <cpan@howlingfrog.com>
+
+COPYRIGHT
+
+    Copyright (C) 2006-2007, Graham TerMarsch. All rights Reserved.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+
+SEE ALSO
+
+    Text::Trac
+
+    Template::Plugin::Filter
+

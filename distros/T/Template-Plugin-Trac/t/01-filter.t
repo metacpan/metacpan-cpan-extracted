@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Template;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Template;
 use Text::Trac;
 use Test::More tests => 5;
 

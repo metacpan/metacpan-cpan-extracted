@@ -1,5 +1,5 @@
 package App::Scaffolder::Puppet;
-$App::Scaffolder::Puppet::VERSION = '0.003001';
+$App::Scaffolder::Puppet::VERSION = '0.004000';
 # ABSTRACT: App::Scaffolder extension to scaffold Puppet modules
 
 use strict;
@@ -20,7 +20,7 @@ App::Scaffolder::Puppet - App::Scaffolder extension to scaffold Puppet modules
 
 =head1 VERSION
 
-version 0.003001
+version 0.004000
 
 =head1 DESCRIPTION
 
@@ -57,7 +57,7 @@ Manfred Stock <mstock@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Manfred Stock.
+This software is copyright (c) 2021 by Manfred Stock.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -82,7 +82,7 @@ sub then {
     # Thus, the backend bridge module aliases the backend then() to
     # _then(), and we call into that.
 
-    my $new = $_[0]->_then(@_[1, 2]);
+    my $new = $_[0]->_dns_unbound_then(@_[1, 2]);
 
     $new->_set_dns( $_[0]->_get_dns() );
 
@@ -97,7 +97,7 @@ sub catch {
 
 sub finally {
 
-    my $new = $_[0]->_finally($_[1]);
+    my $new = $_[0]->_dns_unbound_finally($_[1]);
 
     $new->_set_dns( $_[0]->_get_dns() );
 

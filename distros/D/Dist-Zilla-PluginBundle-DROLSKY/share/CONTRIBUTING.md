@@ -120,15 +120,14 @@ brings up.'
 
 This distribution uses [precious](https://github.com/houseabsolute/precious)
 to enforce a uniform coding style. This is tested as part of the author
-testing suite. You can install and run precious by running the following
-command:
-
-    $> curl https://raw.githubusercontent.com/houseabsolute/precious/master/dev/bin/install-precious.packed.pl \
-           | perl
-    $> precious lint -a
+testing suite. You can install this and any other necessary non-Perl tools by
+running `./dev-bin/install-xt-tools.sh`.
 
 Please run this before committing your changes and address any issues it
-brings up.'
+brings up.
+
+You can also set up a git pre-commit hook that checks all changed files for
+linting issues by running `./git/setup.pl`.'
 } }}
 
 ## Contributor Names

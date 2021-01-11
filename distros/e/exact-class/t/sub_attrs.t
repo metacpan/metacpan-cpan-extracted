@@ -1,4 +1,4 @@
-use Test::Most;
+use Test2::V0;
 
 my $counter = 0;
 
@@ -15,4 +15,4 @@ my $thing = Thing->new;
 is( $thing->data, $thing->data, 'sub-generated attr value generated on first access' );
 isnt( Thing->new->data, Thing->new->data, 'sub-generated attr value not same across objs' );
 
-done_testing();
+done_testing;

@@ -7,7 +7,9 @@ my $driver;
 use Neo4j::Test;
 BEGIN {
 	unless ($driver = Neo4j::Test->driver) {
-		print qq{1..0 # SKIP no connection to Neo4j server\n};
+		my $error = $Neo4j::Test::error;
+		$error =~ s/\n/\\n/g;
+		print qq{1..0 # SKIP $error\n};
 		exit;
 	}
 }
@@ -100,7 +102,7 @@ subtest 'uri variants' => sub {
 
 
 subtest 'non-http uris' => sub {
-	plan tests => 9;
+	plan tests => 12;
 	# https scheme
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('https://test6:9993'); } 'https full uri lives';
 	lives_and { is $d->{uri}, 'https://test6:9993'; } 'https full uri';
@@ -109,12 +111,12 @@ subtest 'non-http uris' => sub {
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('https:'); } 'https scheme only lives';
 	lives_and { is $d->{uri}, 'https://localhost:7473'; } 'https scheme only';
 	# bolt scheme
-	eval { $d = 0; $d = Neo4j::Driver->new('bolt://test:9997'); };
-	ok $@ =~ m/Neo4j::Bolt/ || ! $@ && $d->{uri} eq 'bolt://test:9997', 'bolt full uri';
-	eval { $d = 0; $d = Neo4j::Driver->new('bolt://test9'); };
-	ok $@ =~ m/Neo4j::Bolt/ || ! $@ && $d->{uri} eq 'bolt://test9:7687', 'bolt default port';
-	eval { $d = 0; $d = Neo4j::Driver->new('bolt:'); };
-	ok $@ =~ m/Neo4j::Bolt/ || ! $@ && $d->{uri} eq 'bolt://localhost:7687', 'bolt scheme only';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('bolt://test:9997'); } 'bolt full uri lives';
+	is $d->{uri}, 'bolt://test:9997', 'bolt full uri';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('bolt://test9'); } 'bolt default port lives';
+	is $d->{uri}, 'bolt://test9:7687', 'bolt default port';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('bolt:'); } 'bolt scheme only lives';
+	is $d->{uri}, 'bolt://localhost:7687', 'bolt scheme only';
 };
 
 
@@ -197,9 +199,9 @@ subtest 'cypher filter' => sub {
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver 1';
 	lives_ok { $d->config(cypher_filter => 'params'); } 'set filter';
 	lives_ok { $t = Neo4j::Test->transaction_unconnected($d); } 'new tx 1';
-	@q = ('RETURN {ab}, {c}, {cd}', ab => 17, c => 19, cd => 23);
+	@q = ('RETURN {`ab.`}, {c}, {cd}', 'ab.' => 17, c => 19, cd => 23);
 	lives_ok { $r = 0; $r = $t->_prepare(@q); } 'prepare simple';
-	is $r->{statement}, 'RETURN $ab, $c, $cd', 'filtered simple';
+	is $r->{statement}, 'RETURN $`ab.`, $c, $cd', 'filtered simple';
 	@q = ('CREATE (a) RETURN {}, {a:a}, {a}, [a]', a => 17);
 	lives_ok { $r = 0; $r = $t->_prepare(@q); } 'prepare composite';
 	is $r->{statement}, 'CREATE (a) RETURN {}, {a:a}, $a, [a]', 'filtered composite';

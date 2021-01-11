@@ -1,12 +1,11 @@
 package lib::projectroot;
-use strict;
+
+# ABSTRACT: easier loading of a project's local libs
+our $VERSION = '1.008'; # VERSION
 
 use strict;
 use warnings;
 use 5.010;
-
-# ABSTRACT: easier loading of a project's local libs
-our $VERSION = "1.007";
 
 use FindBin qw();
 use Carp qw(carp);
@@ -127,7 +126,7 @@ lib::projectroot - easier loading of a project's local libs
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =head1 SYNOPSIS
 
@@ -270,11 +269,11 @@ feedback.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Thomas Klausner.
+This software is copyright (c) 2014 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

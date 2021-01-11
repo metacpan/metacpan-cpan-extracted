@@ -18,6 +18,7 @@ scripts/makedeb-docker
 scripts/makedeb-docker-helper
 share/csv2json
 share/enhance
+share/find-missing
 share/json2csv
 share/json2json
 share/stations.csv

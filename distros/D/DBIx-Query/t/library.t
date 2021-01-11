@@ -1,34 +1,23 @@
-use strict;
-use warnings;
-
-use Test::More;
+use Test2::V0;
 use Clone 'clone';
+use DBIx::Query;
 
-use constant MODULE => 'DBIx::Query';
+my $data = load_sponge_data();
+my $dq   = test_connection();
 
-exit main(@ARGV);
+test_sql( $dq, $data );
+test_get( $dq, $data );
+test_sql_uncached( $dq, $data );
+test_get_uncached( $dq, $data );
+test_add( $dq, $data );
+test_rm( $dq, $data );
+test_update( $dq, $data );
+test_get_run( $dq, $data );
+test_db_helper_methods( $dq, $data );
+test_statement_handle_methods( $dq, $data );
+test_up_methods( $dq, $data );
 
-sub main {
-    require_ok(MODULE);
-
-    my $data = load_sponge_data();
-
-    my $dq = test_connection($data);
-    test_sql( $dq, $data );
-    test_get( $dq, $data );
-    test_sql_uncached( $dq, $data );
-    test_get_uncached( $dq, $data );
-    test_add( $dq, $data );
-    test_rm( $dq, $data );
-    test_update( $dq, $data );
-    test_get_run( $dq, $data );
-    test_db_helper_methods( $dq, $data );
-    test_statement_handle_methods( $dq, $data );
-    test_up_methods( $dq, $data );
-
-    done_testing();
-    return 0;
-}
+done_testing;
 
 sub load_sponge_data {
     my $sponge_data;
@@ -48,12 +37,12 @@ sub load_sponge_data {
 }
 
 sub test_connection {
-    my $dq = MODULE->connect_uncached( 'dbi:Sponge:', '', '' );
-    ok( $dq, MODULE . '->connect_uncached()' );
-    isa_ok( $dq, MODULE . '::db' );
+    my $dq = DBIx::Query->connect_uncached( 'dbi:Sponge:', '', '' );
+    ok( $dq, 'DBIx::Query->connect_uncached()' );
+    isa_ok( $dq, 'DBIx::Query::db' );
 
     is( $dq->connection('dsn'), 'dbi:Sponge:', q{connection('dsn') should return dsn} );
-    is_deeply(
+    is(
         scalar $dq->connection,
         {
             'dsn'  => 'dbi:Sponge:',
@@ -67,7 +56,7 @@ sub test_connection {
         },
         'scalar connection() should return full hashref',
     );
-    is_deeply(
+    is(
         [ $dq->connection ],
         [ 'dbi:Sponge:', '', '', {
             dbi_connect_method => 'connect',
@@ -77,11 +66,11 @@ sub test_connection {
         'connection() in list context should return full list',
     );
 
-    $dq = MODULE->connect( 'dbi:Sponge:', '', '', { 'RaiseError' => 1 } );
-    ok( $dq, MODULE . '->connect()' );
-    isa_ok( $dq, MODULE . '::db' );
+    $dq = DBIx::Query->connect( 'dbi:Sponge:', '', '', { 'RaiseError' => 1 } );
+    ok( $dq, 'DBIx::Query->connect()' );
+    isa_ok( $dq, 'DBIx::Query::db' );
 
-    is_deeply(
+    is(
         scalar $dq->connection,
         {
             'dsn'  => 'dbi:Sponge:',
@@ -95,7 +84,7 @@ sub test_connection {
         },
         'scalar connection() should return full hashref',
     );
-    is_deeply(
+    is(
         [ $dq->connection ],
         [ 'dbi:Sponge:', '', '', {
             dbi_connect_method => 'connect_cached',
@@ -105,12 +94,12 @@ sub test_connection {
         'connection() in list context should return full list',
     );
 
-    is_deeply(
+    is(
         scalar $dq->connection( qw( dsn user ) ),
         [ 'dbi:Sponge:', '' ],
         'connection( qw( dsn user ) ) in scalar context should return arrayref',
     );
-    is_deeply(
+    is(
         [ $dq->connection( qw( dsn user ) ) ],
         [ 'dbi:Sponge:', '' ],
         'connection( qw( dsn user ) ) in list context should return array',
@@ -123,7 +112,7 @@ sub test_sql {
     my ( $dq, $sponge_data ) = @_;
     my $sth = $dq->sql( 'SELECT * FROM data', clone($sponge_data) );
 
-    is( ref($sth), MODULE . '::st', 'ref( $dq->sql() )' );
+    is( ref($sth), 'DBIx::Query::st', 'ref( $dq->sql() )' );
     is( $sth->structure->{'table_names'}->[0], 'data', '$dq->sql()->structure()' );
 }
 
@@ -145,7 +134,7 @@ sub test_sql_uncached {
     my ( $dq, $sponge_data ) = @_;
     my $query = $dq->sql_uncached( 'SELECT * FROM data', clone($sponge_data) );
     ok( $query, 'sql_cached() should return a query object' );
-    isa_ok( $query, MODULE . '::st' );
+    isa_ok( $query, 'DBIx::Query::st' );
 }
 
 sub test_get_uncached {
@@ -181,7 +170,7 @@ sub test_rm {
         'west' => 'Hunt for Red October',
     }, clone($sponge_data) );
 
-    isa_ok( $rv, MODULE . '::db' );
+    isa_ok( $rv, 'DBIx::Query::db' );
 }
 
 sub test_update {
@@ -194,7 +183,7 @@ sub test_update {
         clone($sponge_data),
     );
 
-    isa_ok( $rv, MODULE . '::db' );
+    isa_ok( $rv, 'DBIx::Query::db' );
 }
 
 sub test_get_run {
@@ -208,8 +197,8 @@ sub test_get_run {
         clone($sponge_data),
     );
 
-    isa_ok( $sth, MODULE . '::st' );
-    is_deeply(
+    isa_ok( $sth, 'DBIx::Query::st' );
+    is(
         $sth->fetchrow_hashref,
         {
             'open'  => 'Jun 17, 2011',
@@ -248,7 +237,7 @@ sub test_statement_handle_methods {
         undef,
         clone($sponge_data),
     )->run;
-    isa_ok( $rs, MODULE . '::_Dq::RowSet' );
+    isa_ok( $rs, 'DBIx::Query::_Dq::RowSet' );
 
     is(
         $dq->get(
@@ -262,7 +251,7 @@ sub test_statement_handle_methods {
         '$dq->get(...)->sql() returns SQL',
     );
 
-    is_deeply(
+    is(
         $dq->get(
             'movies',
             [ qw( west east ) ],
@@ -336,7 +325,7 @@ sub test_statement_handle_methods {
             undef,
             clone($sponge_data),
         )->up,
-        MODULE . '::db',
+        'DBIx::Query::db',
     );
 }
 
@@ -351,7 +340,7 @@ sub test_up_methods {
             undef,
             clone($sponge_data),
         )->run->up,
-        MODULE . '::st',
+        'DBIx::Query::st',
     );
 
     isa_ok(
@@ -362,7 +351,7 @@ sub test_up_methods {
             undef,
             clone($sponge_data),
         )->run->next->up,
-        MODULE . '::_Dq::RowSet',
+        'DBIx::Query::_Dq::RowSet',
     );
 
     isa_ok(
@@ -373,7 +362,7 @@ sub test_up_methods {
             undef,
             clone($sponge_data),
         )->run->next->cell('west')->up,
-        MODULE . '::_Dq::Row',
+        'DBIx::Query::_Dq::Row',
     );
 }
 

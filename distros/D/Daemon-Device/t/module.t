@@ -1,12 +1,5 @@
-use strict;
-use warnings;
-
-use Test::Most;
-
-use constant MODULE => 'Daemon::Device';
-
-BEGIN { use_ok(MODULE); }
-require_ok(MODULE);
+use Test2::V0;
+use Daemon::Device;
 
 my $my_process = $$;
 my $my_log     = 'daemon_device_test_' . $my_process . '.log';
@@ -48,8 +41,8 @@ my @module_params = (
 );
 
 my $obj;
-ok( $obj = MODULE->new(@module_params), MODULE . '->new()' );
-is( ref $obj, MODULE, 'ref $object' );
+ok( $obj = Daemon::Device->new(@module_params), 'Daemon::Device->new()' );
+is( ref $obj, 'Daemon::Device', 'ref $object' );
 
 $obj->{_daemon}->do_start;
 
@@ -106,7 +99,7 @@ for ( 1 .. 10 ) {
 }
 ok( $good, 'Shutdown properly took place in under 10 seconds' );
 
-cmp_deeply(
+is(
     { map { s/\d+/D/; $_ => 1 } @{ &get_log_file } },
     {
         'CHILD D start'            => 1,

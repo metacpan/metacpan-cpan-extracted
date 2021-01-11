@@ -1,3 +1,8 @@
+v1.0.0 Thu Jan 07 15:05:00 CEST 2020
+    - Introduced version format
+    - Fixed dependecies version numbers
+    - Managed different URL for Schema Registry in test
+
 0.04 Fri Oct 05 09:35:00 CEST 2018
     - Fixed installation problem
 

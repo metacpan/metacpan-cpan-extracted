@@ -5,7 +5,7 @@ use 5.014;
 use exact;
 use strict;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 sub import {
     my ( $self, $caller, $params ) = @_;
@@ -42,10 +42,10 @@ exact::conf - Cascading merged application configuration extension for exact
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact-conf.svg)](https://travis-ci.org/gryphonshafer/exact-conf)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact-conf/badge.png)](https://coveralls.io/r/gryphonshafer/exact-conf)
+=for markdown [![test](https://github.com/gryphonshafer/exact-conf/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-conf/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/exact-conf/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-conf)
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ version 1.03
 L<exact::conf> is a cascading merged application configuration extension for
 L<exact>. It effectively is an integration of L<Config::App> with L<exact>.
 Consult the L<Config::App> documentation for additional information.
-See the L<exact> documentation for additional informatioh about
+See the L<exact> documentation for additional information about
 extensions. The intended use of L<exact::conf> is via the extension interface
 of L<exact>.
 
@@ -99,23 +99,15 @@ L<GitHub|https://github.com/gryphonshafer/exact-conf>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/exact-conf>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/exact::conf>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/exact-conf>
+L<GitHub Actions|https://github.com/gryphonshafer/exact-conf/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/exact-conf>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/exact-conf>
+L<Codecov|https://codecov.io/gh/gryphonshafer/exact-conf>
 
 =item *
 
@@ -133,9 +125,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gryphon Shafer.
+This software is Copyright (c) 2019-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

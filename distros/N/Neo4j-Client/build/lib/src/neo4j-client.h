@@ -1865,6 +1865,10 @@ __neo4j_must_check
 neo4j_result_stream_t *neo4j_run_in_tx(neo4j_transaction_t *tx,
                                        const char *statement, neo4j_value_t params);
 
+__neo4j_must_check
+neo4j_result_stream_t *neo4j_send_to_tx(neo4j_transaction_t *tx,
+                                       const char *statement, neo4j_value_t params);
+
 /**
  * Check if a transaction is open.
  *
@@ -1876,20 +1880,21 @@ neo4j_result_stream_t *neo4j_run_in_tx(neo4j_transaction_t *tx,
  */
 
 __neo4j_must_check
-int neo4j_tx_is_open(neo4j_transaction_t *tx);
+bool neo4j_tx_is_open(neo4j_transaction_t *tx);
 
 /**
  * Check if a transaction has expired.
  *
  * This flag is set when the server fails a transaction operation
- * due to the transaction having exceeded its timeout. Easier to
- * check than examining neo4j_tx_failure_code().
+ * due to the transaction having exceeded its timeout, or if the 
+ * connection has been reset out from under it.
  *
  * @param [tx] The transaction.
- * @return 1 if transaction has expired; 0 if not.
+ * @return true if transaction has expired or connection has reset; 
+ *  false otherwise
  */
 __neo4j_must_check
-int neo4j_tx_expired(neo4j_transaction_t *tx);
+bool neo4j_tx_defunct(neo4j_transaction_t *tx);
 
 /**
  * Check if a transaction has failed.

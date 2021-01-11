@@ -1,13 +1,9 @@
-use strict;
-use warnings;
-
-use Test::Most;
+use Test2::V0;
+use Geo::GoogleEarth::AutoTour;
 use IO::File;
 
-BEGIN { use_ok('Geo::GoogleEarth::AutoTour'); }
-
-throws_ok(
-    sub {
+ok (
+    dies {
         Geo::GoogleEarth::AutoTour::tour();
     },
     qr/Input not defined/,
@@ -19,24 +15,24 @@ my $tour  = IO::File->new( 't/0_tour.kmz', '<' ) or die $!;
 
 my ( $kml_input, $kml_tour, $output );
 
-lives_ok(
-    sub {
+ok(
+    lives {
         $kml_input = Geo::GoogleEarth::AutoTour::kmz_to_xml($input);
         $kml_tour  = Geo::GoogleEarth::AutoTour::tour($kml_input);
     },
     'tour() stand-alone execution',
-);
+) or note $@;
 
-throws_ok(
-    sub {
+ok(
+    dies {
         Geo::GoogleEarth::AutoTour::build_tour({});
     },
     qr/Points not defined properly/,
     'Points not defined properly throws',
 );
 
-lives_ok(
-    sub {
+ok(
+    lives {
         Geo::GoogleEarth::AutoTour::build_tour({ points => [
             {
                 'time' => time,
@@ -44,6 +40,6 @@ lives_ok(
         ] });
     },
     'build_tour() stand-alone lives',
-);
+) or note $@;
 
 done_testing;

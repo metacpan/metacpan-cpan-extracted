@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.02'; # VERSION
 
 BEGIN {
     $ENV{CONFIGAPPENV} = $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development';
@@ -48,10 +48,10 @@ MojoX::ConfigAppStart - Start a Mojolicious application with Config::App
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/MojoX-ConfigAppStart.svg)](https://travis-ci.org/gryphonshafer/MojoX-ConfigAppStart)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/MojoX-ConfigAppStart/badge.png)](https://coveralls.io/r/gryphonshafer/MojoX-ConfigAppStart)
+=for markdown [![test](https://github.com/gryphonshafer/MojoX-ConfigAppStart/workflows/test/badge.svg)](https://github.com/gryphonshafer/MojoX-ConfigAppStart/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/MojoX-ConfigAppStart/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/MojoX-ConfigAppStart)
 
 =head1 SYNOPSIS
 
@@ -119,23 +119,15 @@ L<GitHub|https://github.com/gryphonshafer/MojoX-ConfigAppStart>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/MojoX-ConfigAppStart>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/MojoX::ConfigAppStart>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/MojoX-ConfigAppStart>
+L<GitHub Actions|https://github.com/gryphonshafer/MojoX-ConfigAppStart/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/MojoX-ConfigAppStart>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/MojoX-ConfigAppStart>
+L<Codecov|https://codecov.io/gh/gryphonshafer/MojoX-ConfigAppStart>
 
 =item *
 
@@ -153,9 +145,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is Copyright (c) 2018-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

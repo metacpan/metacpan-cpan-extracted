@@ -1,6 +1,11 @@
 use strict;
 use warnings;
-use Test::More tests => 25;
+
+use FindBin qw($Bin);
+use File::Temp qw();
+
+use Test::Deep qw(cmp_deeply);
+use Test::More tests => 33;
 
 BEGIN { use_ok('Data::Radius::Dictionary') };
 
@@ -41,3 +46,42 @@ $tag_attr = $dict->attribute('Tunnel-Password');
 ok($tag_attr, 'found Tunnel-Password');
 ok($tag_attr->{has_tag}, 'Tunnel-Password has tag');
 is($tag_attr->{encrypt}, 2, 'Tunnel-Password is encrypted');
+
+# testing multiple dicts loaded simultaneously in single instance
+
+my $multi_dict = Data::Radius::Dictionary->from_multiple_files(
+    sprintf('%s/../%s', $Bin, 'radius/rfc4372'),
+    sprintf('%s/../%s', $Bin, 'radius/mera'),
+);
+ok($multi_dict, 'Multiple RADIUS dictionaries loaded into single instance');
+
+# attribute from rfc4372 dict
+my $ch_user_ident = $multi_dict->attribute('Chargeable-User-Identity');
+ok($ch_user_ident, 'found attribute Chargeable-User-Identity');
+is($ch_user_ident->{id}, 89, 'Chargeable-User-Identity has id 89');
+is($ch_user_ident->{type}, 'string', 'Chargeable-User-Identity has type string');
+
+# attribute from mera dict
+my $xpkg_xrout_user = $multi_dict->attribute('xpgk-xrouting-username');
+ok($xpkg_xrout_user, 'found attribute xpgk-xrouting-username');
+is($xpkg_xrout_user->{id}, 251, 'xpgk-xrouting-username has id 1');
+is($xpkg_xrout_user->{type}, 'string', 'xpgk-xrouting-username has type string');
+
+my $tmp_file = File::Temp->new( UNLINK => 0, SUFFIX => '.dict' );
+$tmp_file->autoflush(1);
+$tmp_file->unlink_on_destroy(1);
+
+foreach my $d ('radius/rfc4372', 'radius/mera') {
+    $tmp_file->say( sprintf('$INCLUDE %s/../%s', $Bin, $d) );
+}
+
+my $multi_dict_from_single_tmp_file = Data::Radius::Dictionary->load_file(
+    $tmp_file->filename
+);
+
+cmp_deeply(
+    $multi_dict,
+    $multi_dict_from_single_tmp_file,
+      'RADIUS dict loaded from multiple files simultaneously is equal to'
+    . ' single-file dict with same dicts $INCLUDEd',
+);

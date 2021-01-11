@@ -32,7 +32,7 @@ if ( $mmv >= 6.4501 ) {
 	},
 	resources	=> {
 	    bugtracker	=> {
-                web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Calendar-Julian',
+                web	=> 'https://github.com/trwyant/perl-DateTime-Calendar-Julian/issues',
                 mailto  => 'wyant@cpan.org',
             },
 	    license	=> 'http://dev.perl.org/licenses/',

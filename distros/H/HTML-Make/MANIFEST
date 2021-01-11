@@ -16,7 +16,11 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README
+t/add-class.t
+t/children.t
 t/examples.t
+t/href.t
 t/HTML-Make.t
+t/push-element.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

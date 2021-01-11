@@ -49,7 +49,7 @@ use constant DEVEL_MODE => 0;
 { #<<< A non-indenting brace to contain all lexical variables
 
 use Carp;
-our $VERSION = '20201207';
+our $VERSION = '20210111';
 
 # The Tokenizer will be loaded with the Formatter
 ##use Perl::Tidy::Tokenizer;    # for is_keyword()
@@ -190,7 +190,7 @@ my (
     %is_closing_token,
     %is_equal_or_fat_comma,
     %is_block_with_ci,
-    %is_comma_or_fat_comma,
+    %is_counted_type,
     %is_opening_sequence_token,
     %is_closing_sequence_token,
     %is_container_label_type,
@@ -350,6 +350,7 @@ BEGIN {
         _ris_bli_container_       => $i++,
         _rparent_of_seqno_        => $i++,
         _rchildren_of_seqno_      => $i++,
+        _ris_list_by_seqno_       => $i++,
         _rbreak_container_        => $i++,
         _rshort_nested_           => $i++,
         _length_function_         => $i++,
@@ -408,6 +409,11 @@ BEGIN {
         _rbreak_after_Klast_            => $i++,
         _converged_                     => $i++,
 
+        _rstarting_multiline_qw_seqno_by_K_ => $i++,
+        _rending_multiline_qw_seqno_by_K_   => $i++,
+        _rKrange_multiline_qw_by_seqno_     => $i++,
+        _rcontains_multiline_qw_by_seqno_   => $i++,
+        _rmultiline_qw_has_extra_level_     => $i++,
     };
 
     # Array index names for _this_batch_ (in above list)
@@ -571,9 +577,9 @@ BEGIN {
     @q = qw( = => );
     @is_equal_or_fat_comma{@q} = (1) x scalar(@q);
 
-    @q = qw( => );
+    @q = qw( => ; );
     push @q, ',';
-    @is_comma_or_fat_comma{@q} = (1) x scalar(@q);
+    @is_counted_type{@q} = (1) x scalar(@q);
 
     # These block types can take ci.  This is used by the -xci option.
     # Note that the 'sub' in this list is an anonymous sub.  To be more correct
@@ -684,6 +690,7 @@ sub new {
     $self->[_ris_bli_container_]     = {};
     $self->[_rparent_of_seqno_]      = {};
     $self->[_rchildren_of_seqno_]    = {};
+    $self->[_ris_list_by_seqno_]     = {};
     $self->[_rbreak_container_]      = {};    # prevent one-line blocks
     $self->[_rshort_nested_]         = {};    # blocks not forced open
     $self->[_length_function_]       = $length_function;
@@ -739,6 +746,12 @@ sub new {
     $self->[_rbreak_after_Klast_]            = {};
     $self->[_converged_]                     = 0;
 
+    $self->[_rstarting_multiline_qw_seqno_by_K_] = {};
+    $self->[_rending_multiline_qw_seqno_by_K_]   = {};
+    $self->[_rKrange_multiline_qw_by_seqno_]     = {};
+    $self->[_rcontains_multiline_qw_by_seqno_]   = {};
+    $self->[_rmultiline_qw_has_extra_level_]     = {};
+
     # This flag will be updated later by a call to get_save_logfile()
     $self->[_save_logfile_] = defined($logger_object);
 
@@ -755,40 +768,6 @@ sub new {
 ######################################
 # CODE SECTION 2: Some Basic Utilities
 ######################################
-
-sub check_keys {
-    my ( $rtest, $rvalid, $msg, $exact_match ) = @_;
-
-    # Check the keys of a hash:
-    # $rtest   = ref to hash to test
-    # $rvalid  = ref to hash with valid keys
-
-    # $msg = a message to write in case of error
-    # $exact_match defines the type of check:
-    #     = false: test hash must not have unknown key
-    #     = true:  test hash must have exactly same keys as known hash
-    my @unknown_keys =
-      grep { !exists $rvalid->{$_} } keys %{$rtest};
-    my @missing_keys =
-      grep { !exists $rtest->{$_} } keys %{$rvalid};
-    my $error = @unknown_keys;
-    if ($exact_match) { $error ||= @missing_keys }
-    if ($error) {
-        local $" = ')(';
-        my @expected_keys = sort keys %{$rvalid};
-        @unknown_keys = sort @unknown_keys;
-        Die(<<EOM);
-------------------------------------------------------------------------
-Program error detected checking hash keys
-Message is: '$msg'
-Expected keys: (@expected_keys)
-Unknown key(s): (@unknown_keys)
-Missing key(s): (@missing_keys)
-------------------------------------------------------------------------
-EOM
-    }
-    return;
-}
 
 {    ## begin closure for logger routines
     my $logger_object;
@@ -4651,6 +4630,8 @@ EOM
     # remains fixed for the rest of this iteration.
     $self->respace_tokens();
 
+    $self->find_multiline_qw();
+
     $self->keep_old_line_breaks();
 
     # Implement any welding needed for the -wn or -cb options
@@ -4850,13 +4831,24 @@ sub respace_tokens {
             $nonblank_token_count++;
 
             # count selected types
-            if ( $is_comma_or_fat_comma{$type} ) {
+            if ( $is_counted_type{$type} ) {
                 my $seqno = $seqno_stack{ $depth_next - 1 };
                 if ( defined($seqno) ) {
                     $rtype_count_by_seqno->{$seqno}->{$type}++;
                 }
             }
         }
+
+        # For reference, here is how to get the parent sequence number.
+        # This is not used because it is slower than finding it on the fly
+        # in sub parent_seqno_by_K:
+
+        # my $seqno_parent =
+        #     $type_sequence && $is_opening_token{$token}
+        #   ? $seqno_stack{ $depth_next - 2 }
+        #   : $seqno_stack{ $depth_next - 1 };
+        # my $KK = @{$rLL_new};
+        # $rseqno_of_parent_by_K->{$KK} = $seqno_parent;
 
         # and finally, add this item to the new array
         push @{$rLL_new}, $item;
@@ -5299,6 +5291,30 @@ sub respace_tokens {
                     }
                 }
                 elsif ( $is_closing_token{$token} ) {
+
+                    # Insert a tentative missing semicolon if the next token is
+                    # a closing block brace
+                    if (
+                           $type eq '}'
+                        && $token eq '}'
+
+                        # not preceded by a ';'
+                        && $last_nonblank_type ne ';'
+
+                        # and this is not a VERSION stmt (is all one line, we
+                        # are not inserting semicolons on one-line blocks)
+                        && $CODE_type ne 'VER'
+
+                        # and we are allowed to add semicolons
+                        && $rOpts->{'add-semicolons'}
+                      )
+                    {
+                        $add_phantom_semicolon->($KK);
+                    }
+
+                    # Update the stack...  Note that we do this after adding
+                    # any phantom semicolons so that they will be counted in
+                    # the correct container.
                     $depth_next--;
 
                     # keep track of broken lists for later formatting
@@ -5318,26 +5334,6 @@ sub respace_tokens {
                                 $rhas_broken_container->{$seqno_outer} = 1;
                             }
                         }
-                    }
-
-                    # Insert a tentative missing semicolon if the next token is
-                    # a closing block brace
-                    if (
-                           $type eq '}'
-                        && $token eq '}'
-
-                        # not preceded by a ';'
-                        && $last_nonblank_type ne ';'
-
-                   # and this is not a VERSION stmt (is all one line, we are not
-                   # inserting semicolons on one-line blocks)
-                        && $CODE_type ne 'VER'
-
-                        # and we are allowed to add semicolons
-                        && $rOpts->{'add-semicolons'}
-                      )
-                    {
-                        $add_phantom_semicolon->($KK);
                     }
                 }
             }
@@ -5633,6 +5629,25 @@ sub respace_tokens {
         $self->[_K_first_seq_item_] = $KNEXT;
     }
 
+    # find and remember lists by sequence number
+    # TODO: eventually this should hold a name for the list
+    my $ris_list_by_seqno = {};
+    foreach my $seqno ( keys %{$K_opening_container} ) {
+        my $K_opening  = $K_opening_container->{$seqno};
+        my $block_type = $rLL_new->[$K_opening]->[_BLOCK_TYPE_];
+        next if ($block_type);
+        my $rtype_count = $rtype_count_by_seqno->{$seqno};
+        next unless ($rtype_count);
+        my $fat_comma_count = $rtype_count->{'=>'};
+        my $comma_count     = $rtype_count->{','};
+        my $semicolon_count = $rtype_count->{';'};
+
+        # This definition of a list is sufficient for our needs
+        if ( ( $fat_comma_count || $comma_count ) && !$semicolon_count ) {
+            $ris_list_by_seqno->{$seqno} = $seqno;
+        }
+    }
+
     # Reset memory to be the new array
     $self->[_rLL_] = $rLL_new;
     my $Klimit;
@@ -5648,6 +5663,7 @@ sub respace_tokens {
     $self->[_rhas_broken_container_] = $rhas_broken_container;
     $self->[_rparent_of_seqno_]      = $rparent_of_seqno;
     $self->[_rchildren_of_seqno_]    = $rchildren_of_seqno;
+    $self->[_ris_list_by_seqno_]     = $ris_list_by_seqno;
 
     # DEBUG OPTION: make sure the new array looks okay.
     # This is no longer needed but should be retained for future development.
@@ -5862,32 +5878,80 @@ sub get_old_line_count {
     return $rLL->[$Kend]->[_LINE_INDEX_] - $rLL->[$Kbeg]->[_LINE_INDEX_] + 1;
 }
 
-sub is_list {
+sub parent_seqno_by_K {
+
+    # Return the sequence number of the parent container of token K, if any.
+
+    my ( $self, $KK ) = @_;
+    return unless defined($KK);
+
+    # Note: This routine is relatively slow. I tried replacing it with a hash
+    # which is easily created in sub respace_tokens. But the total time with a
+    # hash was greater because this routine is called once per line whereas a
+    # hash must be created token-by-token.
+
+    my $rLL   = $self->[_rLL_];
+    my $KNEXT = $KK;
+
+    # For example, consider the following with seqno=5 of the '[' and ']'
+    # being called with index K of the first token of each line:
+
+    #                                              # result
+    #    push @tests,                              # -
+    #      [                                       # -
+    #        sub { 99 },   'do {&{%s} for 1,2}',   # 5
+    #        '(&{})(&{})', undef,                  # 5
+    #        [ 2, 2, 0 ],  0                       # 5
+    #      ];                                      # -
+
+    my $parent_seqno;
+    while ( defined($KNEXT) ) {
+        my $Kt = $KNEXT;
+        $KNEXT = $rLL->[$KNEXT]->[_KNEXT_SEQ_ITEM_];
+        my $rtoken_vars   = $rLL->[$Kt];
+        my $type          = $rtoken_vars->[_TYPE_];
+        my $type_sequence = $rtoken_vars->[_TYPE_SEQUENCE_];
+
+        # if next container token is closing, it is the parent seqno
+        if ( $is_closing_type{$type} ) {
+            if ( $Kt > $KK ) {
+                $parent_seqno = $type_sequence;
+            }
+            else {
+                $parent_seqno = $self->[_rparent_of_seqno_]->{$type_sequence};
+            }
+            last;
+        }
+
+        # if next container token is opening, we want its parent container
+        elsif ( $is_opening_type{$type} ) {
+            $parent_seqno = $self->[_rparent_of_seqno_]->{$type_sequence};
+            last;
+        }
+
+        # not a container - must be ternary - keep going
+    }
+
+    return $parent_seqno;
+}
+
+sub is_list_by_K {
+
+    # Return true if token K is in a list
+    my ( $self, $KK ) = @_;
+
+    my $parent_seqno = $self->parent_seqno_by_K($KK);
+    return unless defined($parent_seqno);
+    return $self->[_ris_list_by_seqno_]->{$parent_seqno};
+}
+
+sub is_list_by_seqno {
 
     # Return true if the immediate contents of a container appears to be a
     # list.
-
     my ( $self, $seqno ) = @_;
     return unless defined($seqno);
-
-    my $K_opening_container = $self->[_K_opening_container_];
-    my $K_opening           = $K_opening_container->{$seqno};
-    return unless ( defined($K_opening) );
-
-    my $rLL        = $self->[_rLL_];
-    my $block_type = $rLL->[$K_opening]->[_BLOCK_TYPE_];
-    return if ($block_type);
-
-    my $token = $rLL->[$K_opening]->[_TOKEN_];
-    return if ( $token eq ':' );
-
-    # We will require at least 2 commas or 1 fat comma in the
-    # immediate lower level.
-    my $rtype_count_by_seqno = $self->[_rtype_count_by_seqno_];
-    my $fat_comma_count      = $rtype_count_by_seqno->{$seqno}->{'=>'};
-    my $comma_count          = $rtype_count_by_seqno->{$seqno}->{','};
-    my $is_list = ( $fat_comma_count || $comma_count && $comma_count > 1 );
-    return $is_list;
+    return $self->[_ris_list_by_seqno_]->{$seqno};
 }
 
 sub resync_lines_and_tokens {
@@ -6027,13 +6091,13 @@ sub keep_old_line_breaks {
     foreach my $item ( @{$rKrange_code_without_comments} ) {
         my ( $Kfirst, $Klast ) = @{$item};
 
-        my $typeb = $rLL->[$Kfirst]->[_TYPE_];
-        if ( $keep_break_before_type{$typeb} ) {
+        my $type_first = $rLL->[$Kfirst]->[_TYPE_];
+        if ( $keep_break_before_type{$type_first} ) {
             $rbreak_before_Kfirst->{$Kfirst} = 1;
         }
 
-        my $typee = $rLL->[$Klast]->[_TYPE_];
-        if ( $keep_break_after_type{$typee} ) {
+        my $type_last = $rLL->[$Klast]->[_TYPE_];
+        if ( $keep_break_after_type{$type_last} ) {
             $rbreak_after_Klast->{$Klast} = 1;
         }
     }
@@ -6062,7 +6126,7 @@ sub weld_containers {
     # Note that weld_nested_containers() changes the _LEVEL_ values, so
     # weld_cuddled_blocks must use the _TRUE_LEVEL_ values instead.
 
-    # Here is a good test case to  Be sure that both cuddling and welding
+    # Here is a good test case to be sure that both cuddling and welding
     # are working and not interfering with each other: <<snippets/ce_wn1.in>>
 
     #   perltidy -wn -ce
@@ -6104,6 +6168,8 @@ sub cumulative_length_before_K {
 }
 
 sub cumulative_length_after_K {
+
+    # NOTE: This routine not currently called; could be deleted
     my ( $self, $KK ) = @_;
     my $rLL = $self->[_rLL_];
     return $rLL->[$KK]->[_CUMULATIVE_LENGTH_];
@@ -6982,10 +7048,25 @@ sub weld_nested_quotes {
             $rweld_len_left_closing->{$outer_seqno}  = 1;
             $rweld_len_right_opening->{$outer_seqno} = 2;
 
-            # QW PATCH 1 (Testing)
-            # undo CI for welded quotes
-            foreach my $K ( $Kn .. $Kt_end ) {
-                $rLL->[$K]->[_CI_LEVEL_] = 0;
+            # Undo one indentation level if an extra level was added to this
+            # multiline quote
+            my $qw_seqno = $self->[_rstarting_multiline_qw_seqno_by_K_]->{$Kn};
+            if (   $qw_seqno
+                && $self->[_rmultiline_qw_has_extra_level_]->{$qw_seqno} )
+            {
+                foreach my $K ( $Kn + 1 .. $Kt_end - 1 ) {
+                    $rLL->[$K]->[_LEVEL_] -= 1;
+                }
+                $rLL->[$Kn]->[_CI_LEVEL_]     = 0;
+                $rLL->[$Kt_end]->[_CI_LEVEL_] = 0;
+            }
+
+            # undo CI for other welded quotes
+            else {
+
+                foreach my $K ( $Kn .. $Kt_end ) {
+                    $rLL->[$K]->[_CI_LEVEL_] = 0;
+                }
             }
 
             # Change the level of a closing qw token to be that of the outer
@@ -7454,7 +7535,7 @@ sub adjust_container_indentation {
         next unless ( $is_equal_or_fat_comma{$prev_type} );
 
         # This is only for list containers
-        next unless $self->is_list($seqno);
+        next unless $self->is_list_by_seqno($seqno);
 
         # and only for broken lists
         next unless $ris_broken_container->{$seqno};
@@ -7632,6 +7713,163 @@ sub bli_adjustment {
             }
         }
     }
+    return;
+}
+
+sub find_multiline_qw {
+
+    my $self = shift;
+
+    # Multiline qw quotes are not sequenced items like containers { [ (
+    # but behave in some respects in a similar way. So this routine finds them
+    # and creates a separate sequence number system for later use.
+
+    # This is straightforward because they always begin at the end of one line
+    # and and at the beginning of a later line. This is true no matter how we
+    # finally make our line breaks, so we can find them before deciding on new
+    # line breaks.
+
+    my $rstarting_multiline_qw_seqno_by_K = {};
+    my $rending_multiline_qw_seqno_by_K   = {};
+    my $rKrange_multiline_qw_by_seqno     = {};
+    my $rcontains_multiline_qw_by_seqno   = {};
+    my $rmultiline_qw_has_extra_level     = {};
+
+    my $rlines = $self->[_rlines_];
+    my $rLL    = $self->[_rLL_];
+    my $qw_seqno;
+    my $num_qw_seqno = 0;
+    my $K_start_multiline_qw;
+
+    foreach my $line_of_tokens ( @{$rlines} ) {
+
+        my $line_type = $line_of_tokens->{_line_type};
+        next unless ( $line_type eq 'CODE' );
+        my $rK_range = $line_of_tokens->{_rK_range};
+        my ( $Kfirst, $Klast ) = @{$rK_range};
+        next unless ( defined($Kfirst) && defined($Klast) );   # skip blank line
+        if ( defined($K_start_multiline_qw) ) {
+            my $type = $rLL->[$Kfirst]->[_TYPE_];
+
+            # shouldn't happen
+            if ( $type ne 'q' ) {
+                DEVEL_MODE && print STDERR <<EOM;
+STRANGE: started multiline qw at K=$K_start_multiline_qw but didn't see q qw at K=$Kfirst\n";
+EOM
+                $K_start_multiline_qw = undef;
+                next;
+            }
+            my $Kprev  = $self->K_previous_nonblank($Kfirst);
+            my $Knext  = $self->K_next_nonblank($Kfirst);
+            my $type_m = defined($Kprev) ? $rLL->[$Kprev]->[_TYPE_] : 'b';
+            my $type_p = defined($Knext) ? $rLL->[$Knext]->[_TYPE_] : 'b';
+            if ( $type_m eq 'q' && $type_p ne 'q' ) {
+                $rending_multiline_qw_seqno_by_K->{$Kfirst} = $qw_seqno;
+                $rKrange_multiline_qw_by_seqno->{$qw_seqno} =
+                  [ $K_start_multiline_qw, $Kfirst ];
+                $K_start_multiline_qw = undef;
+                $qw_seqno             = undef;
+            }
+        }
+        if ( !defined($K_start_multiline_qw)
+            && $rLL->[$Klast]->[_TYPE_] eq 'q' )
+        {
+            my $Kprev  = $self->K_previous_nonblank($Klast);
+            my $Knext  = $self->K_next_nonblank($Klast);
+            my $type_m = defined($Kprev) ? $rLL->[$Kprev]->[_TYPE_] : 'b';
+            my $type_p = defined($Knext) ? $rLL->[$Knext]->[_TYPE_] : 'b';
+            if ( $type_m ne 'q' && $type_p eq 'q' ) {
+                $num_qw_seqno++;
+                $qw_seqno             = 'q' . $num_qw_seqno;
+                $K_start_multiline_qw = $Klast;
+                $rstarting_multiline_qw_seqno_by_K->{$Klast} = $qw_seqno;
+            }
+        }
+    }
+
+    # Give multiline qw lists extra indentation instead of CI.  This option
+    # works well but is currently only activated when the -xci flag is set.
+    # The reason is to avoid unexpected changes in formatting.
+    if ( $rOpts->{'extended-continuation-indentation'} ) {
+        while ( my ( $qw_seqno, $rKrange ) =
+            each %{$rKrange_multiline_qw_by_seqno} )
+        {
+            my ( $Kbeg, $Kend ) = @{$rKrange};
+
+            # require isolated closing token
+            my $token_end = $rLL->[$Kend]->[_TOKEN_];
+            next
+              unless ( length($token_end) == 1
+                && ( $is_closing_token{$token_end} || $token_end eq '>' ) );
+
+            # require isolated opening token
+            my $token_beg = $rLL->[$Kbeg]->[_TOKEN_];
+
+            # allow space(s) after the qw
+            if ( length($token_beg) > 3 && substr( $token_beg, 2, 1 ) eq ' ' ) {
+                $token_beg =~ s/\s+//;
+            }
+
+            next unless ( length($token_beg) == 3 );
+
+            foreach my $KK ( $Kbeg + 1 .. $Kend - 1 ) {
+                $rLL->[$KK]->[_LEVEL_]++;
+                $rLL->[$KK]->[_CI_LEVEL_] = 0;
+            }
+
+            # set flag for -wn option, which will remove the level
+            $rmultiline_qw_has_extra_level->{$qw_seqno} = 1;
+        }
+    }
+
+    # For the -lp option we need to mark all parent containers of
+    # multiline quotes
+    if ($rOpts_line_up_parentheses) {
+
+        while ( my ( $qw_seqno, $rKrange ) =
+            each %{$rKrange_multiline_qw_by_seqno} )
+        {
+            my ( $Kbeg, $Kend ) = @{$rKrange};
+            my $parent_seqno = $self->parent_seqno_by_K($Kend);
+            next unless ($parent_seqno);
+
+            # If the parent container exactly surrounds this qw, then -lp
+            # formatting seems to work so we will not mark it.
+            my $is_tightly_contained;
+            my $Kn      = $self->K_next_nonblank($Kend);
+            my $seqno_n = defined($Kn) ? $rLL->[$Kn]->[_TYPE_SEQUENCE_] : undef;
+            if ( defined($seqno_n) && $seqno_n eq $parent_seqno ) {
+
+                my $Kp = $self->K_previous_nonblank($Kbeg);
+                my $seqno_p =
+                  defined($Kp) ? $rLL->[$Kp]->[_TYPE_SEQUENCE_] : undef;
+                if ( defined($seqno_p) && $seqno_p eq $parent_seqno ) {
+                    $is_tightly_contained = 1;
+                }
+            }
+            $rcontains_multiline_qw_by_seqno->{$parent_seqno} = 1
+              unless ($is_tightly_contained);
+
+            # continue up the tree marking parent containers
+            while (1) {
+                $parent_seqno = $self->[_rparent_of_seqno_]->{$parent_seqno};
+                last
+                  unless ( defined($parent_seqno)
+                    && $parent_seqno ne SEQ_ROOT );
+                $rcontains_multiline_qw_by_seqno->{$parent_seqno} = 1;
+            }
+        }
+    }
+
+    $self->[_rstarting_multiline_qw_seqno_by_K_] =
+      $rstarting_multiline_qw_seqno_by_K;
+    $self->[_rending_multiline_qw_seqno_by_K_] =
+      $rending_multiline_qw_seqno_by_K;
+    $self->[_rKrange_multiline_qw_by_seqno_] = $rKrange_multiline_qw_by_seqno;
+    $self->[_rcontains_multiline_qw_by_seqno_] =
+      $rcontains_multiline_qw_by_seqno;
+    $self->[_rmultiline_qw_has_extra_level_] = $rmultiline_qw_has_extra_level;
+
     return;
 }
 
@@ -10627,11 +10865,6 @@ EOM
           @unmatched_closing_indexes_in_this_batch;
     }
 
-    sub comma_arrow_count {
-        my $seqno = shift;
-        return $comma_arrow_count{$seqno};
-    }
-
     sub match_opening_and_closing_tokens {
 
         # Match up indexes of opening and closing braces, etc, in this batch.
@@ -10696,10 +10929,36 @@ EOM
 
         my ( $self, $ri_first, $ri_last, $rindentation_list ) = @_;
 
+        # QW INDENTATION PATCH 1:
+        # Also save indentation for multiline qw quotes
+        my @i_qw;
+        my $seqno_qw_opening;
+        if ( $types_to_go[$max_index_to_go] eq 'q' ) {
+            my $KK = $K_to_go[$max_index_to_go];
+            $seqno_qw_opening =
+              $self->[_rstarting_multiline_qw_seqno_by_K_]->{$KK};
+            if ($seqno_qw_opening) {
+                push @i_qw, $max_index_to_go;
+            }
+        }
+
         # we need to save indentations of any unmatched opening tokens
         # in this batch because we may need them in a subsequent batch.
-        foreach (@unmatched_opening_indexes_in_this_batch) {
+        foreach ( @unmatched_opening_indexes_in_this_batch, @i_qw ) {
+
             my $seqno = $type_sequence_to_go[$_];
+
+            if ( !$seqno ) {
+                if ( $seqno_qw_opening && $_ == $max_index_to_go ) {
+                    $seqno = $seqno_qw_opening;
+                }
+                else {
+
+                    # shouldn't happen
+                    $seqno = 'UNKNOWN';
+                }
+            }
+
             $saved_opening_indentation{$seqno} = [
                 lookup_opening_indentation(
                     $_, $ri_first, $ri_last, $rindentation_list
@@ -11063,7 +11322,7 @@ sub insert_additional_breaks {
             && $i_break_right <= $i_l )
         {
             splice( @{$ri_first}, $line_number, 1, ( $i_f, $i_break_right ) );
-            splice( @{$ri_last}, $line_number, 1, ( $i_break_left, $i_l ) );
+            splice( @{$ri_last},  $line_number, 1, ( $i_break_left, $i_l ) );
         }
     }
     return;
@@ -12546,7 +12805,7 @@ sub insert_breaks_before_list_opening_containers {
         next unless ( $is_equal_or_fat_comma{$prev_type} );
 
         # This must be a list (this will exclude all code blocks)
-        next unless $self->is_list($seqno);
+        next unless $self->is_list_by_seqno($seqno);
 
         # Never break a weld
         next if ( $self->weld_len_left( $seqno, $token_end ) );
@@ -12568,7 +12827,7 @@ sub insert_breaks_before_list_opening_containers {
             $ok_to_break = $rhas_broken_container->{$seqno};
             if ( !$ok_to_break ) {
                 my $parent = $rparent_of_seqno->{$seqno};
-                $ok_to_break = $self->is_list($parent);
+                $ok_to_break = $self->is_list_by_seqno($parent);
             }
         }
 
@@ -15224,7 +15483,7 @@ sub find_token_starting_list {
 
                 if ( $number_of_fields_best != 1 ) {
                     my $spaces_wanted_2 =
-                      1 + $pair_width - $columns;             # for 2 fields
+                      1 + $pair_width - $columns;    # for 2 fields
                     if ( $available_spaces > $spaces_wanted_2 ) {
                         $spaces_wanted = $spaces_wanted_2;
                     }
@@ -16303,6 +16562,12 @@ sub get_available_spaces_to_go {
             my $align_paren     = 0;
             my $excess          = 0;
 
+            my $last_nonblank_seqno;
+            if ( defined($K_last_nonblank) ) {
+                $last_nonblank_seqno =
+                  $rLL->[$K_last_nonblank]->[_TYPE_SEQUENCE_];
+            }
+
             # initialization on empty stack..
             if ( $max_gnu_stack_index == 0 ) {
                 $space_count = $level * $rOpts_indent_columns;
@@ -16316,6 +16581,14 @@ sub get_available_spaces_to_go {
             # if last nonblank token was not structural indentation,
             # just use standard increment
             elsif ( $last_nonblank_type ne '{' ) {
+                $space_count += $standard_increment;
+            }
+
+            # if this container holds a qw, add the standard increment
+            elsif ($last_nonblank_seqno
+                && $self->[_rcontains_multiline_qw_by_seqno_]
+                ->{$last_nonblank_seqno} )
+            {
                 $space_count += $standard_increment;
             }
 
@@ -16747,7 +17020,6 @@ sub send_lines_to_vertical_aligner {
     }
 
     # loop to prepare each line for shipment
-    my $in_comma_list;
     my ( $Kbeg, $type_beg, $token_beg );
     my ( $Kend, $type_end );
     for my $n ( 0 .. $n_last_line ) {
@@ -16931,13 +17203,16 @@ sub send_lines_to_vertical_aligner {
             $rfield_lengths->[-1] += 2;
         }
 
+        # Set flag which tells if this line is contained in a multi-line list
+        my $list_seqno = $self->is_list_by_K($Kbeg);
+
         # send this new line down the pipe
         my $rvalign_hash = {};
-        $rvalign_hash->{level}           = $lev;
-        $rvalign_hash->{level_end}       = $level_end;
-        $rvalign_hash->{level_adj}       = $level_adj;
-        $rvalign_hash->{indentation}     = $indentation;
-        $rvalign_hash->{is_forced_break} = $forced_breakpoint || $in_comma_list;
+        $rvalign_hash->{level}                     = $lev;
+        $rvalign_hash->{level_end}                 = $level_end;
+        $rvalign_hash->{level_adj}                 = $level_adj;
+        $rvalign_hash->{indentation}               = $indentation;
+        $rvalign_hash->{list_seqno}                = $list_seqno;
         $rvalign_hash->{outdent_long_lines}        = $outdent_long_lines;
         $rvalign_hash->{is_terminal_ternary}       = $is_terminal_ternary;
         $rvalign_hash->{is_terminal_statement}     = $is_semicolon_terminated;
@@ -16952,11 +17227,10 @@ sub send_lines_to_vertical_aligner {
         $rvalign_hash->{break_alignment_before}    = $break_alignment_before;
         $rvalign_hash->{break_alignment_after}     = $break_alignment_after;
         $rvalign_hash->{Kend}                      = $Kend_code;
+        $rvalign_hash->{ci_level}                  = $ci_levels_to_go[$ibeg];
 
         my $vao = $self->[_vertical_aligner_object_];
         $vao->valign_input($rvalign_hash);
-
-        $in_comma_list = $type_end eq ',' && $forced_breakpoint;
 
         $do_not_pad = 0;
 
@@ -18043,68 +18317,6 @@ sub pad_token {
     return;
 }
 
-sub mate_index_to_go {
-    my ( $self, $i ) = @_;
-
-    # NOTE: This works but is too inefficient, but is retained for info.
-
-    # Return the matching index of a container or ternary pair
-    # This is equivalent to the array @mate_index_to_go
-    my $K      = $K_to_go[$i];
-    my $K_mate = $self->K_mate_index($K);
-    my $i_mate = -1;
-    if ( defined($K_mate) ) {
-        $i_mate = $i + ( $K_mate - $K );
-        if ( $i_mate < 0 || $i_mate > $max_index_to_go ) {
-            $i_mate = -1;
-        }
-    }
-    my $i_mate_alt = $mate_index_to_go[$i];
-
-    # FIXME: Old Debug code which can be removed eventually
-    if ( 0 && $i_mate_alt != $i_mate ) {
-        my $tok       = $tokens_to_go[$i];
-        my $type      = $types_to_go[$i];
-        my $tok_mate  = '*';
-        my $type_mate = '*';
-        if ( $i_mate >= 0 && $i_mate <= $max_index_to_go ) {
-            $tok_mate  = $tokens_to_go[$i_mate];
-            $type_mate = $types_to_go[$i_mate];
-        }
-        my $seq  = $type_sequence_to_go[$i];
-        my $file = get_input_stream_name();
-
-        Warn(
-"mate_index: file '$file': i=$i, imate=$i_mate, should be $i_mate_alt, K=$K, K_mate=$K_mate\ntype=$type, tok=$tok, seq=$seq, max=$max_index_to_go, tok_mate=$tok_mate, type_mate=$type_mate"
-        );
-    }
-    return $i_mate;
-}
-
-sub K_mate_index {
-
-   # Given the index K of an opening or closing container,  or ?/: ternary pair,
-   # return the index K of the other member of the pair.
-    my ( $self, $K ) = @_;
-    return unless defined($K);
-    my $rLL   = $self->[_rLL_];
-    my $seqno = $rLL->[$K]->[_TYPE_SEQUENCE_];
-    return unless ($seqno);
-
-    my $K_opening = $self->[_K_opening_container_]->{$seqno};
-    if ( defined($K_opening) ) {
-        if ( $K != $K_opening ) { return $K_opening }
-        return $self->[_K_closing_container_]->{$seqno};
-    }
-
-    $K_opening = $self->[_K_opening_ternary_]->{$seqno};
-    if ( defined($K_opening) ) {
-        if ( $K != $K_opening ) { return $K_opening }
-        return $self->[_K_closing_ternary_]->{$seqno};
-    }
-    return;
-}
-
 {    ## begin closure make_alignment_patterns
 
     my %block_type_map;
@@ -18623,11 +18835,22 @@ sub make_paren_name {
         # options that the user has set regarding special indenting and
         # outdenting.
 
-        # This routine is mainly concerned with outdenting closing tokens but
-        # has become a 'catchall' for a variety of special problems involving
-        # ci.  Note that there is some overlap with the functions of sub
-        # undo_ci, which was processed earlier, so care has to be taken to keep
-        # them coordinated.
+        # This routine has to resolve a number of complex interacting issues,
+        # including:
+        # 1. The various -cti=n type flags, which contain the desired change in
+        #    indentation for lines ending in commas and semicolons, should be
+        #    followed,
+        # 2. qw quotes require special processing and do not fit perfectly
+        #    with normal containers,
+        # 3. formatting with -wn can complicate things, especially with qw
+        #    quotes,
+        # 4. formatting with the -lp option is complicated, and does not
+        #    work well with qw quotes and with -wn formatting.
+        # 5. a number of special situations, such as 'cuddled' formatting.
+        # 6. This routine is mainly concerned with outdenting closing tokens
+        #    but note that there is some overlap with the functions of sub
+        #    undo_ci, which was processed earlier, so care has to be taken to
+        #    keep them coordinated.
 
         my (
             $self,       $ibeg,
@@ -18648,8 +18871,24 @@ sub make_paren_name {
         my $terminal_block_type = $block_type_to_go[$i_terminal];
         my $is_outdented_line   = 0;
 
+        my $type_beg      = $types_to_go[$ibeg];
+        my $token_beg     = $tokens_to_go[$ibeg];
+        my $K_beg         = $K_to_go[$ibeg];
+        my $ibeg_weld_fix = $ibeg;
+        my $seqno_beg     = $type_sequence_to_go[$ibeg];
+        my $is_bli_beg    = $seqno_beg ? $ris_bli_container->{$seqno_beg} : 0;
+
+        # QW INDENTATION PATCH 3:
+        my $seqno_qw_closing;
+        if ( $type_beg eq 'q' && $ibeg == 0 ) {
+            my $KK = $K_to_go[$ibeg];
+            $seqno_qw_closing =
+              $self->[_rending_multiline_qw_seqno_by_K_]->{$KK};
+        }
+
         my $is_semicolon_terminated = $terminal_type eq ';'
-          && $nesting_depth_to_go[$iend] < $nesting_depth_to_go[$ibeg];
+          && ( $nesting_depth_to_go[$iend] < $nesting_depth_to_go[$ibeg]
+            || $seqno_qw_closing );
 
         # NOTE: A future improvement would be to make it semicolon terminated
         # even if it does not have a semicolon but is followed by a closing
@@ -18697,13 +18936,6 @@ sub make_paren_name {
             $is_leading,          $opening_exists
         );
 
-        my $type_beg      = $types_to_go[$ibeg];
-        my $token_beg     = $tokens_to_go[$ibeg];
-        my $K_beg         = $K_to_go[$ibeg];
-        my $ibeg_weld_fix = $ibeg;
-        my $seqno_beg     = $type_sequence_to_go[$ibeg];
-        my $is_bli_beg    = $seqno_beg ? $ris_bli_container->{$seqno_beg} : 0;
-
         # Update the $is_bli flag as we go. It is initially 1.
         # We note seeing a leading opening brace by setting it to 2.
         # If we get to the closing brace without seeing the opening then we
@@ -18719,18 +18951,11 @@ sub make_paren_name {
             else { $is_bli_beg = 0 }
         }
 
-        # QW PATCH 2 (Testing)
-        # At an isolated closing token of a qw quote which is welded to
-        # a following closing token, we will locally change its type to
-        # be the same as its token. This will allow formatting to be the
-        # same as for an ordinary closing token.
-
-        # For -lp formatting se use $ibeg_weld_fix to get around the problem
+        # QW PATCH for the combination -lp -wn
+        # For -lp formatting use $ibeg_weld_fix to get around the problem
         # that with -lp type formatting the opening and closing tokens to not
         # have sequence numbers.
-        if ( $type_beg eq 'q'
-            && ( $is_closing_token{$token_beg} || $token_beg eq '>' ) )
-        {
+        if ($seqno_qw_closing) {
             my $K_next_nonblank = $self->K_next_code($K_beg);
             if ( defined($K_next_nonblank) ) {
                 my $type_sequence = $rLL->[$K_next_nonblank]->[_TYPE_SEQUENCE_];
@@ -18741,13 +18966,12 @@ sub make_paren_name {
                     if ( $itest <= $max_index_to_go ) {
                         $ibeg_weld_fix = $itest;
                     }
-                    $type_beg = ')';    ##$token_beg;
                 }
             }
         }
 
         # if we are at a closing token of some type..
-        if ( $is_closing_type{$type_beg} ) {
+        if ( $is_closing_type{$type_beg} || $seqno_qw_closing ) {
 
             # get the indentation of the line containing the corresponding
             # opening token
@@ -18756,7 +18980,7 @@ sub make_paren_name {
                 $is_leading,          $opening_exists
               )
               = $self->get_opening_indentation( $ibeg_weld_fix, $ri_first,
-                $ri_last, $rindentation_list );
+                $ri_last, $rindentation_list, $seqno_qw_closing );
 
             # First set the default behavior:
             if (
@@ -18906,6 +19130,39 @@ sub make_paren_name {
                 # need to remove some spaces to get a valid hash key.
                 my $tok = $tokens_to_go[$ibeg];
                 my $cti = $closing_token_indentation{$tok};
+
+                # Fix the value of 'cti' for an isloated non-welded closing qw
+                # delimiter.
+                if ( $seqno_qw_closing && $ibeg_weld_fix == $ibeg ) {
+
+                    # A quote delimiter which is not a container will not have
+                    # a cti value defined.  In this case use the style of a
+                    # paren. For example
+                    #   my @fars = (
+                    #      qw<
+                    #        far
+                    #        farfar
+                    #        farfars-far
+                    #      >,
+                    #   );
+                    if ( !defined($cti) && length($tok) == 1 ) {
+
+                        # something other than ')', '}', ']' ; use flag for ')'
+                        $cti = $closing_token_indentation{')'};
+
+                        # But for now, do not outdent non-container qw
+                        # delimiters because it would would change existing
+                        # formatting.
+                        if ( $tok ne '>' ) { $cti = 3 }
+                    }
+
+                    # A non-welded closing qw cannot currently use -cti=1
+                    # because that option requires a sequence number to find
+                    # the opening indentation, and qw quote delimiters are not
+                    # sequenced items.
+                    if ( defined($cti) && $cti == 1 ) { $cti = 0 }
+                }
+
                 if ( !defined($cti) ) {
 
                     # $cti may not be defined for several reasons.
@@ -19151,6 +19408,36 @@ sub make_paren_name {
             $last_indentation_written    = $indentation;
             $last_unadjusted_indentation = $leading_spaces_to_go[$ibeg];
             $last_leading_token          = $tokens_to_go[$ibeg];
+
+            # Patch to make a line which is the end of a qw quote work with the
+            # -lp option.  Make $token_beg look like a closing token as some
+            # type even if it is not.  This veriable will become
+            # $last_leading_token at the end of this loop.  Then, if the -lp
+            # style is selected, and the next line is also a
+            # closing token, it will not get more indentation than this line.
+            # We need to do this because qw quotes (at present) only get
+            # continuation indentation, not one level of indentation, so we
+            # need to turn off the -lp indentation.
+
+            # ... a picture is worth a thousand words:
+
+            # perltidy -wn -gnu (Without this patch):
+            #   ok(defined(
+            #       $seqio = $gb->get_Stream_by_batch([qw(J00522 AF303112
+            #       2981014)])
+            #             ));
+
+            # perltidy -wn -gnu (With this patch):
+            #  ok(defined(
+            #      $seqio = $gb->get_Stream_by_batch([qw(J00522 AF303112
+            #      2981014)])
+            #  ));
+            ## if ($seqno_qw_closing) { $last_leading_token = ')' }
+            if ( $seqno_qw_closing
+                && ( length($token_beg) > 1 || $token_beg eq '>' ) )
+            {
+                $last_leading_token = ')';
+            }
         }
 
         # be sure lines with leading closing tokens are not outdented more
@@ -19255,19 +19542,22 @@ sub get_opening_indentation {
     #              in this batch
     # $rindentation_list - reference to a list containing the indentation
     #            used for each line.
+    # $qw_seqno - optional sequence number to use if normal seqno not defined
+    #           (TODO: would be more general to just look this up from index i)
     #
     # return:
     #   -the indentation of the line which contained the opening token
     #    which matches the token at index $i_opening
     #   -and its offset (number of columns) from the start of the line
     #
-    my ( $self, $i_closing, $ri_first, $ri_last, $rindentation_list ) = @_;
+    my ( $self, $i_closing, $ri_first, $ri_last, $rindentation_list, $qw_seqno )
+      = @_;
 
     # first, see if the opening token is in the current batch
     my $i_opening = $mate_index_to_go[$i_closing];
     my ( $indent, $offset, $is_leading, $exists );
     $exists = 1;
-    if ( $i_opening >= 0 ) {
+    if ( defined($i_opening) && $i_opening >= 0 ) {
 
         # it is..look up the indentation
         ( $indent, $offset, $is_leading ) =
@@ -19277,8 +19567,10 @@ sub get_opening_indentation {
 
     # if not, it should have been stored in the hash by a previous batch
     else {
+        my $seqno = $type_sequence_to_go[$i_closing];
+        $seqno = $qw_seqno unless ($seqno);
         ( $indent, $offset, $is_leading, $exists ) =
-          get_saved_opening_indentation( $type_sequence_to_go[$i_closing] );
+          get_saved_opening_indentation($seqno);
     }
     return ( $indent, $offset, $is_leading, $exists );
 }

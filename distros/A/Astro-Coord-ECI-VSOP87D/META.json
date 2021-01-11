@@ -52,56 +52,56 @@
    "provides" : {
       "Astro::Coord::ECI::VSOP87D" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Astro::Coord::ECI::VSOP87D::Jupiter" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Jupiter.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Astro::Coord::ECI::VSOP87D::Mars" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Mars.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Astro::Coord::ECI::VSOP87D::Mercury" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Mercury.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Astro::Coord::ECI::VSOP87D::Neptune" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Neptune.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Astro::Coord::ECI::VSOP87D::Saturn" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Saturn.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Astro::Coord::ECI::VSOP87D::Sun" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Sun.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Astro::Coord::ECI::VSOP87D::Uranus" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Uranus.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Astro::Coord::ECI::VSOP87D::Venus" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Venus.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-VSOP87A"
+         "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87A.git",
-         "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87A"
+         "url" : "git://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D.git",
+         "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

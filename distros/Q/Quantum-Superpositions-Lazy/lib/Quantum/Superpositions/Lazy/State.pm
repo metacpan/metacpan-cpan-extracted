@@ -1,8 +1,9 @@
 package Quantum::Superpositions::Lazy::State;
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
-use v5.28; use warnings;
+use v5.28;
+use warnings;
 use Moo;
 
 use feature qw(signatures);
@@ -28,14 +29,14 @@ has "value" => (
 	required => 1,
 );
 
-sub reset($self)
+sub reset ($self)
 {
 	if (is_collapsible $self->value) {
 		$self->value->reset;
 	}
 }
 
-sub clone($self)
+sub clone ($self)
 {
 	return $self->new(
 		$self->%{qw(value weight)}

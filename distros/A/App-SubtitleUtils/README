@@ -2,8 +2,8 @@ NAME
     App::SubtitleUtils - Utilities related to video subtitles
 
 VERSION
-    This document describes version 0.001 of App::SubtitleUtils (from Perl
-    distribution App-SubtitleUtils), released on 2020-08-20.
+    This document describes version 0.002 of App::SubtitleUtils (from Perl
+    distribution App-SubtitleUtils), released on 2020-12-11.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -30,7 +30,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-SubtitleUtils>
+    <https://github.com/perlancar/perl-App-SubtitleUtils/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

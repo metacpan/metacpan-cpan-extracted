@@ -14,6 +14,32 @@ sub new {
     return bless({ %h }, $class);
 }
 
+sub _combine_existing_dicts {
+    my ($class, @dict_paths) = @_;
+
+    my @existing_paths;
+    foreach my $dict_path ( @dict_paths ) {
+        if ( -r $dict_path ) {
+            push @existing_paths => $dict_path;
+        }
+    }
+
+    return @existing_paths ? [ map { '$INCLUDE ' . $_ } @existing_paths ] : undef;
+}
+
+sub from_multiple_files {
+    my ($class, @files) = @_;
+
+    my $arref_of_includes = $class->_combine_existing_dicts(@files);
+    if ( !$arref_of_includes || !@{$arref_of_includes} ) {
+        warn 'No usable RADIUS dictionaries was provided';
+        return undef;
+    }
+
+    return Data::Radius::DictionaryParser->new()
+                ->parse_str_array($arref_of_includes);
+}
+
 sub load_file {
     my ($class, $file) = @_;
     return Data::Radius::DictionaryParser->new()->parse_file($file);

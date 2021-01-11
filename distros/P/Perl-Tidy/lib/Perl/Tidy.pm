@@ -1,5 +1,5 @@
 #
-###########################################################-
+###########################################################
 #
 #    perltidy - a perl script indenter and formatter
 #
@@ -110,7 +110,7 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20201207';
+    $VERSION = '20210111';
 }
 
 sub DESTROY {
@@ -383,6 +383,15 @@ sub find_input_line_ending {
 
 my $Warn_count;
 my $fh_stderr;
+
+# Bump Warn_count only: it is essential to bump the count on all warnings, even
+# if no message goes out, so that the correct exit status is set.
+sub Warn_count_bump { $Warn_count++; return }
+
+# Output Warn message only
+sub Warn_msg { my $msg = shift; $fh_stderr->print($msg); return }
+
+# Output Warn message and bump Warn count
 sub Warn { my $msg = shift; $fh_stderr->print($msg); $Warn_count++; return }
 
 sub perltidy {
@@ -834,6 +843,14 @@ EOM
           map  { $_->[0] }
           sort { $a->[1] <=> $b->[1] }
           map  { [ $_, -e $_ ? -s $_ : 0 ] } @ARGV;
+    }
+
+    # Remove duplicate filenames.  Otherwise, for example if the user entered
+    #     perltidy -b myfile.pl myfile.pl
+    # the backup version of the original would be lost.
+    if ( $number_of_files > 1 ) {
+        my %seen = ();
+        @ARGV = grep { !$seen{$_}++ } @ARGV;
     }
 
     while ( my $input_file = shift @ARGV ) {
@@ -1572,7 +1589,7 @@ EOM
                     $logger_object->interrupt_logfile();
                     $logger_object->warning( $diff_msg . "\n" );
                     $logger_object->resume_logfile();
-                    $Warn_count ||= 1;   # insure correct exit if -q flag is set
+                    ## $Warn_count ||= 1;   # logger warning does this now
                 }
             }
             if ( $rOpts->{'assert-untidy'} ) {
@@ -1581,7 +1598,7 @@ EOM
                     $logger_object->warning(
 "assertion failure: '--assert-untidy' is set but output equals input\n"
                     );
-                    $Warn_count ||= 1;   # insure correct exit if -q flag is set
+                    ## $Warn_count ||= 1;   # logger warning does this now
                 }
             }
 
@@ -2410,19 +2427,19 @@ sub generate_options {
     ########################################
     $category = 13;    # Debugging
     ########################################
-##  $add_option->( 'DIAGNOSTICS',                     'I',    '!' );
-    $add_option->( 'DEBUG',                           'D',     '!' );
-    $add_option->( 'dump-cuddled-block-list',         'dcbl',  '!' );
-    $add_option->( 'dump-defaults',                   'ddf',   '!' );
-    $add_option->( 'dump-long-names',                 'dln',   '!' );
-    $add_option->( 'dump-options',                    'dop',   '!' );
-    $add_option->( 'dump-profile',                    'dpro',  '!' );
-    $add_option->( 'dump-short-names',                'dsn',   '!' );
-    $add_option->( 'dump-token-types',                'dtt',   '!' );
-    $add_option->( 'dump-want-left-space',            'dwls',  '!' );
-    $add_option->( 'dump-want-right-space',           'dwrs',  '!' );
-    $add_option->( 'fuzzy-line-length',               'fll',   '!' );
-    $add_option->( 'help',                            'h',     '' );
+    $add_option->( 'DIAGNOSTICS',             'I',    '!' ) if (DEVEL_MODE);
+    $add_option->( 'DEBUG',                   'D',    '!' );
+    $add_option->( 'dump-cuddled-block-list', 'dcbl', '!' );
+    $add_option->( 'dump-defaults',           'ddf',  '!' );
+    $add_option->( 'dump-long-names',         'dln',  '!' );
+    $add_option->( 'dump-options',            'dop',  '!' );
+    $add_option->( 'dump-profile',            'dpro', '!' );
+    $add_option->( 'dump-short-names',        'dsn',  '!' );
+    $add_option->( 'dump-token-types',        'dtt',  '!' );
+    $add_option->( 'dump-want-left-space',    'dwls', '!' );
+    $add_option->( 'dump-want-right-space',   'dwrs', '!' );
+    $add_option->( 'fuzzy-line-length',       'fll',  '!' );
+    $add_option->( 'help',                    'h',    '' );
     $add_option->( 'short-concatenation-item-length', 'scl',   '=i' );
     $add_option->( 'show-options',                    'opt',   '!' );
     $add_option->( 'timestamp',                       'ts',    '!' );
@@ -2784,7 +2801,7 @@ sub generate_options {
               blank-lines-before-subs=0
               blank-lines-before-packages=0
               notabs
-              )
+            )
         ],
 
         # 'extrude' originally deleted pod and comments, but to keep it
@@ -2816,7 +2833,7 @@ sub generate_options {
               nofuzzy-line-length
               notabs
               norecombine
-              )
+            )
         ],
 
         # this style tries to follow the GNU Coding Standards (which do
@@ -2825,7 +2842,7 @@ sub generate_options {
         'gnu-style' => [
             qw(
               lp bl noll pt=2 bt=2 sbt=2 cpi=1 csbi=1 cbi=1
-              )
+            )
         ],
 
         # Style suggested in Damian Conway's Perl Best Practices
@@ -3595,7 +3612,7 @@ sub Win_OS_Type {
             90 => "Me"
         },
         2 => {
-            0  => "2000",          # or NT 4, see below
+            0  => "2000",      # or NT 4, see below
             1  => "XP/.Net",
             2  => "Win2003",
             51 => "NT3.51"
@@ -4269,6 +4286,8 @@ Line Break Control
  -wba=s  want break after tokens in string; i.e. wba=': .'
  -wbb=s  want break before tokens in string
  -wn     weld nested: combines opening and closing tokens when both are adjacent
+ -wnxl=s weld nested exclusion list: provides some control over the types of
+         containers which can be welded
 
 Following Old Breakpoints
  -kis    keep interior semicolons.  Allows multiple statements per line.

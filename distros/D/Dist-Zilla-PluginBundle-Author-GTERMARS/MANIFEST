@@ -9,8 +9,8 @@ README
 lib/Dist/Zilla/PluginBundle/Author/GTERMARS.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/01-compile.t
 xt/author/clean-namespaces.t
-xt/author/compile.t
 xt/author/distmeta.t
 xt/author/eof.t
 xt/author/eol.t

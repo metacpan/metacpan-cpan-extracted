@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ no_index:
 provides:
   Date::Tolkien::Shire:
     file: lib/Date/Tolkien/Shire.pm
-    version: '1.902'
+    version: '1.903'
 requires:
   Date::Tolkien::Shire::Data: '0.001'
   Time::Local: '0'
@@ -32,8 +32,8 @@ requires:
   vars: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire
+  bugtracker: https://github.com/trwyant/perl-Date-Tolkien-Shire/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Date-Tolkien-Shire.git
-version: '1.902'
+version: '1.903'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,8 @@
 package LWP::Authen::OAuth2::ServiceProvider::Strava;
 
+# ABSTRACT: Access Strava using OAuth2
+our $VERSION = '0.18'; # VERSION
+
 use strict;
 use warnings;
 
@@ -32,6 +35,30 @@ sub request_default_params {
     );
 }
 
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+LWP::Authen::OAuth2::ServiceProvider::Strava - Access Strava using OAuth2
+
+=head1 VERSION
+
+version 0.18
+
+=head1 SYNOPSIS
+
+See L<http://strava.github.io/api/> for Strava's own documentation. Strava's
+documentation is very detailed, so that is the best place to find detailed
+and up to date info about.
+
 =head1 NAME
 
 LWP::Authen::OAuth2::ServiceProvider::Strava - Access Strava API v3  OAuth2 APIs
@@ -39,17 +66,6 @@ LWP::Authen::OAuth2::ServiceProvider::Strava - Access Strava API v3  OAuth2 APIs
 =head1 VERSION
 
 Version 0.02
-
-=cut
-
-package LWP::Authen::OAuth2::ServiceProvider::Strava;
-our $VERSION = '0.02';
-
-=head1 SYNOPSIS
-
-See L<http://strava.github.io/api/> for Strava's own documentation. Strava's
-documentation is very detailed, so that is the best place to find detailed
-and up to date info about.
 
 =head1 REGISTERING
 
@@ -67,47 +83,25 @@ all the relevant doco).
 
 Leon Wright, C<< <techman@cpan.org> >>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-lwp-authen-oauth2 at rt.cpan.org>, or through
-the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=LWP-Authen-OAuth2>.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc LWP::Authen::OAuth2::ServiceProvider
-
-You can also look for information at:
+=head1 AUTHORS
 
 =over 4
 
-=item Github (submit patches here)
+=item *
 
-L<https://github.com/domm/perl-oauth2>
+Ben Tilly, <btilly at gmail.com>
 
-=item RT: CPAN's request tracker (report bugs here)
+=item *
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=LWP-Authen-OAuth2>
-
-=item AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/LWP-Authen-OAuth2>
-
-=item CPAN Ratings
-
-L<http://cpanratings.perl.org/d/LWP-Authen-OAuth2>
+Thomas Klausner <domm@plix.at>
 
 =back
 
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Leon Wright.
+This software is copyright (c) 2013 - 2021 by Ben Tilly, Rent.com, Thomas Klausner.
 
-This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

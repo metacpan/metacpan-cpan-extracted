@@ -56,6 +56,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Carp::Always" => 0,
     "File::Spec" => 0,
     "File::stat" => 0,
     "FindBin" => 0,
@@ -69,7 +70,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.38",
+  "VERSION" => "1.39",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,6 +80,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Archive::Zip" => 0,
   "Carp" => 0,
+  "Carp::Always" => 0,
   "Clone" => 0,
   "Cwd" => 0,
   "Data::Dumper" => 0,

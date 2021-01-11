@@ -4,7 +4,7 @@
       "Thomas R. Wyant, III F<wyant at cpan dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -43,18 +43,18 @@
    "provides" : {
       "Date::Tolkien::Shire::Data" : {
          "file" : "lib/Date/Tolkien/Shire/Data.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire-Data"
+         "web" : "https://github.com/trwyant/perl-Date-Tolkien-Shire-Data/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.006",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.007",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

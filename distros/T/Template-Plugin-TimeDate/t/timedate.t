@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Template;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Template;
 use Test::More tests => 12;
 BEGIN { use_ok('Template::Plugin::TimeDate') };
 

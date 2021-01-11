@@ -3,8 +3,7 @@ Upstream-Name: Types-XSD
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Types-XSD
 
-Files: Makefile.PL
- t/50ID.t
+Files: t/50ID.t
  t/50NCName.t
  t/50NMTOKEN.t
  t/50Name.t
@@ -45,20 +44,17 @@ Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: README
- lib/Types/XSD.pm
- t/01basic.t
- t/02datetimes.t
- t/03duration.t
-Copyright: This software is copyright (c) 2013-2014 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
-Copyright: Copyright 2014 Toby Inkster.
+Copyright: Copyright 2021 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+ t/02datetimes.t
+ t/03duration.t
+Copyright: This software is copyright (c) 2013-2014 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -67,21 +63,33 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: CONTRIBUTING
- INSTALL
+Files: INSTALL
  LICENSE
 Copyright: Unknown
 License: Unknown
 
+Files: README
+ lib/Types/XSD.pm
+Copyright: This software is copyright (c) 2013-2014, 2021 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2021 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2021 by the copyright holder(s).
  
  This is free software, licensed under:
  

@@ -11,6 +11,11 @@
 
 package CGI::URI2param;
 
+# ABSTRACT: DEPRECATED - convert parts of an URL to param values
+our $VERSION = '1.03'; # VERSION
+
+warn __PACKAGE__ .' is DEPRECATED, please do not use this module anymore';
+
 use strict;
 use Carp;
 use Exporter;
@@ -58,17 +63,31 @@ sub uri2param {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-CGI::URI2param - convert parts of an URL to param values
+CGI::URI2param - DEPRECATED - convert parts of an URL to param values
+
+=head1 VERSION
+
+version 1.03
 
 =head1 SYNOPSIS
+
+DEPRECATED! Please do not use this module any more!
 
   use CGI::URI2param qw(uri2param);
 
   uri2param($req,\%regexes);
 
 =head1 DESCRIPTION
+
+DEPRECATED! Please do not use this module any more!
+
+Here are the old docs:
 
 CGI::URI2param takes a request object (as supplied by CGI.pm or
 Apache::Request) and a hashref of keywords mapped to
@@ -140,21 +159,9 @@ consider using it instead, because it is much more powerfull and
 possibly faster. See mod_rewrite in the Apache Docs
 (http://www.apache.org)
 
-=head1 INSTALLATION
-
- perl Build.PL
- ./Build
- ./Build test
- sudo ./Build install
-
 =head1 BUGS
 
 None so far.
-
-Please report any bugs or feature requests to
-C<bug-cgi-uri2param@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
-be notified of progress on your bug as I make changes.
 
 =head1 TODO
 
@@ -172,17 +179,13 @@ L<Apache::URI2param>
 
 =head1 AUTHOR
 
-Thomas Klausner, domm@cpan.org, http://domm.plix.at
+Thomas Klausner <domm@plix.at>
 
-Thanks Darren Chamberlain <dlc@users.sourceforge.net> for the idea
-to write a mod_perl handler for CGI::URI2param
+=head1 COPYRIGHT AND LICENSE
 
-=head1 COPYRIGHT & LICENSE
+This software is copyright (c) 2001 - 2006 by Thomas Klausner.
 
-Copyright 2001, 2002, 2006 Thomas Klausner, All Rights Reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

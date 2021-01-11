@@ -4,7 +4,7 @@ use Moose;
 extends 'Dist::Zilla::PluginBundle::Starter';
 use namespace::clean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 has '+revision' => (
   default => sub { $_[0]->payload->{revision} // 3 },
@@ -76,9 +76,14 @@ The C<[@Starter::Git]> plugin bundle for L<Dist::Zilla> is a subclass of the
 L<[@Starter]|Dist::Zilla::PluginBundle::Starter> plugin bundle designed to
 support a Git-based workflow.
 
+In addition to the standard C<[@Starter]> behavior, this bundle restricts the
+gathered files to those committed to the git repository, allowing F<.gitignore>
+to also ignore files when assembling the distribution; and commits, tags, and
+pushes after a successful release.
+
 See the L<Dist::Zilla::Starter> guide and the base
-L<[@Starter]|Dist::Zilla::PluginBundle::Starter> documentation, as this
-documentation only details the specifics of this subclass.
+L<[@Starter]|Dist::Zilla::PluginBundle::Starter> documentation for more
+information, as this documentation only details the specifics of this subclass.
 
 For one-line initialization of a new C<[@Starter::Git]>-based distribution, try
 L<Dist::Zilla::MintingProfile::Starter::Git>.

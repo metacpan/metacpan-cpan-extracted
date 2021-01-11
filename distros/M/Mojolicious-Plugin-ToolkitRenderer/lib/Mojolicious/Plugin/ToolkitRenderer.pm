@@ -9,7 +9,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Exception;
 use Template ();
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 sub register {
     my ( $self, $app, $settings ) = @_;
@@ -82,10 +82,10 @@ Mojolicious::Plugin::ToolkitRenderer - Template Toolkit Renderer Mojolicious Plu
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Mojo-Plugin-Toolkit.svg)](https://travis-ci.org/gryphonshafer/Mojo-Plugin-Toolkit)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Mojo-Plugin-Toolkit/badge.png)](https://coveralls.io/r/gryphonshafer/Mojo-Plugin-Toolkit)
+=for markdown [![test](https://github.com/gryphonshafer/Mojo-Plugin-Toolkit/workflows/test/badge.svg)](https://github.com/gryphonshafer/Mojo-Plugin-Toolkit/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-Toolkit/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Mojo-Plugin-Toolkit)
 
 =for test_synopsis my($self);
 
@@ -227,11 +227,11 @@ L<MetaCPAN|https://metacpan.org/pod/Mojolicious::Plugin::ToolkitRenderer>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Mojo-Plugin-Toolkit>
+L<GitHub Actions|https://github.com/gryphonshafer/Mojo-Plugin-Toolkit/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Mojo-Plugin-Toolkit>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Mojo-Plugin-Toolkit>
 
 =item *
 
@@ -249,9 +249,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2013-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

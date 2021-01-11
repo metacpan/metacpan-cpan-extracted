@@ -1,1 +1,1 @@
-{"results":[],"errors":[{"code":"Neo.ClientError.Statement.SyntaxError","message":"Invalid input 'i': expected <init> (line 1, column 1 (offset: 0))\n\"iced manifolds.\"\n ^"}]}
+{"results":[],"errors":[{"code":"Neo.ClientError.Statement.SyntaxError","message":"Invalid input 'iced': expected \n  \"RETURN\"\n  \"CREATE\"\n  \"DELETE\"\n  \"SET\"\n  \"REMOVE\"\n  \"DETACH\"\n  \"MATCH\"\n  \"WITH\"\n  \"UNWIND\"\n  \"USE\"\n  \"CALL\"\n  \"LOAD\"\n  \"FROM\"\n  \"FOREACH\"\n  \"MERGE\"\n  \"OPTIONAL\"\n  \"USING\" (line 1, column 1 (offset: 0))\n\"iced manifolds.\"\n ^"}]}

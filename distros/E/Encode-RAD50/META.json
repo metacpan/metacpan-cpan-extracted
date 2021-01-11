@@ -4,7 +4,7 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -42,14 +42,14 @@
    "provides" : {
       "Encode::RAD50" : {
          "file" : "lib/Encode/RAD50.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Encode-RAD50"
+         "web" : "https://github.com/trwyant/perl-Encode-RAD50/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -60,6 +60,6 @@
          "web" : "https://github.com/trwyant/perl-Encode-RAD50"
       }
    },
-   "version" : "0.014",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.015",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

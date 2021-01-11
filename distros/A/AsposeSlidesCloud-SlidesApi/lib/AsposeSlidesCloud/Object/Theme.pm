@@ -39,7 +39,6 @@ use DateTime;
 
 use AsposeSlidesCloud::Object::ResourceBase;
 use AsposeSlidesCloud::Object::ResourceUri;
-use AsposeSlidesCloud::Object::ResourceUriElement;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -188,21 +187,21 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'color_scheme' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'ColorScheme',
     	description => 'Color scheme.',
     	format => '',
     	read_only => '',
     		},
     'font_scheme' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'FontScheme',
     	description => 'Font scheme.',
     	format => '',
     	read_only => '',
     		},
     'format_scheme' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'FormatScheme',
     	description => 'Format scheme.',
     	format => '',
@@ -214,9 +213,9 @@ __PACKAGE__->swagger_types( {
     'self_uri' => 'ResourceUri',
     'alternate_links' => 'ARRAY[ResourceUri]',
     'name' => 'string',
-    'color_scheme' => 'ResourceUriElement',
-    'font_scheme' => 'ResourceUriElement',
-    'format_scheme' => 'ResourceUriElement'
+    'color_scheme' => 'ResourceUri',
+    'font_scheme' => 'ResourceUri',
+    'format_scheme' => 'ResourceUri'
 } );
 
 __PACKAGE__->attribute_map( {

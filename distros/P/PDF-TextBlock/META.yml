@@ -1,5 +1,5 @@
 ---
-abstract: 'Easier creation of text blocks when using PDF::API2'
+abstract: 'Easier creation of text blocks when using PDF::API2 or PDF::Builder'
 author:
   - 'Jay Hannah <jay@jays.net>'
 build_requires:
@@ -20,9 +20,8 @@ no_index:
 requires:
   Class::Accessor::Fast: '0'
   File::Temp: '0'
-  PDF::API2: '0'
   Test::More: '0'
 resources:
-  repository: https://github.com/jhannah/pdf-textblock
-version: '0.11'
+  repository: https://github.com/jhannah/pdf-textblock.git
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

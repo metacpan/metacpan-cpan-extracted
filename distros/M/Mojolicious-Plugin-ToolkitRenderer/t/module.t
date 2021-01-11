@@ -1,8 +1,5 @@
-use strict;
-use warnings;
-
-use Test::Most;
-use Test::Mojo;
+use Test2::V0;
+use Test2::MojoX;
 use Mojolicious::Lite;
 
 plugin ToolkitRenderer => {
@@ -27,9 +24,8 @@ get '/simple' => sub {
     );
 };
 
-my $t = Test::Mojo->new;
-
-$t
+Test2::MojoX
+    ->new
     ->get_ok('/simple')
     ->status_is(200)
     ->content_is('The answer to life, the UNIVERSE, and EVERYTHING is 42.')

@@ -1,27 +1,11 @@
-blib/arch/.exists
-blib/arch/auto/Kafka/Consumer/Avro/.exists
-blib/bin/.exists
-blib/lib/auto/Kafka/Consumer/Avro/.exists
-blib/lib/Kafka/Consumer/.exists
-blib/lib/Kafka/Consumer/Avro.pm
-blib/man1/.exists
-blib/man3/.exists
-blib/man3/Kafka::Consumer::Avro.3pm
-blib/script/.exists
 Changes				History of this package
-INSTALL
-lib/Kafka/Consumer/Avro.pm
 LICENSE
-Makefile
 Makefile.PL			Makefile generator
 MANIFEST			This file
-MANIFEST.bak
 MANIFEST.SKIP
 META.json			Module meta-data (added by MakeMaker)
 META.yml			Module meta-data (added by MakeMaker)
-MYMETA.json
-MYMETA.yml
-pm_to_blib
 README				Get you started with this package
-README.md			Get you started with this package
+INSTALL
+lib/Kafka/Consumer/Avro.pm
 t/01_quick_start.t

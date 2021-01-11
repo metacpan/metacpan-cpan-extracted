@@ -1,8 +1,7 @@
 package DBIx::Class::InflateColumn::JSON2Object;
 
 # ABSTRACT: convert JSON columns to Perl objects
-
-our $VERSION = '0.905';
+our $VERSION = '0.906'; # VERSION
 
 use strict;
 use warnings;
@@ -184,7 +183,7 @@ DBIx::Class::InflateColumn::JSON2Object - convert JSON columns to Perl objects
 
 =head1 VERSION
 
-version 0.905
+version 0.906
 
 =head1 SYNOPSIS
 
@@ -350,11 +349,11 @@ Parts of this code were orginally developed for L<validad.com|https://www.valida
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Thomas Klausner.
+This software is copyright (c) 2017 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

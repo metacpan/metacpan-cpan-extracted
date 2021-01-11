@@ -29,7 +29,7 @@ isa_ok( $Baz, 'Bar::Baz' );
 isa_ok( $Baz->was, 'Foo' );
 
 
-	
+
 
 
 

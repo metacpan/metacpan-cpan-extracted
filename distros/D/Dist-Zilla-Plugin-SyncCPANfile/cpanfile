@@ -8,6 +8,7 @@ requires "namespace::clean" => "0.27";
 requires "perl" => "5.010001";
 
 on 'test' => sub {
+    requires "Clone" => "0";
     requires "Exporter" => "0";
     requires "Module::CPANfile" => "0";
     requires "Pod::Coverage::TrustPod" => "0";

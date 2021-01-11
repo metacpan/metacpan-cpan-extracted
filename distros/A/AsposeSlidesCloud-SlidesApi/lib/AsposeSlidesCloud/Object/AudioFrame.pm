@@ -42,7 +42,6 @@ use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::GeometryShape;
 use AsposeSlidesCloud::Object::LineFormat;
 use AsposeSlidesCloud::Object::ResourceUri;
-use AsposeSlidesCloud::Object::ResourceUriElement;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -100,7 +99,6 @@ sub new {
 		$self->$attribute( $args{ $args_key } );
 	}
 	$self->{ type } = 'AudioFrame';
-	$self->{ shape_type } = 'AudioFrame';
 	
 	return $self;
 }  
@@ -249,7 +247,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'shapes' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Shapes',
     	description => 'Gets or sets the link to shapes.',
     	format => '',
@@ -287,13 +285,6 @@ __PACKAGE__->method_documentation({
     	datatype => 'string',
     	base_name => 'ShapeType',
     	description => 'Combined shape type.',
-    	format => '',
-    	read_only => '',
-    		},
-    'geometry_shape_type' => {
-    	datatype => 'string',
-    	base_name => 'GeometryShapeType',
-    	description => 'Geometry shape type.',
     	format => '',
     	read_only => '',
     		},
@@ -381,13 +372,12 @@ __PACKAGE__->swagger_types( {
     'x' => 'double',
     'y' => 'double',
     'z_order_position' => 'int',
-    'shapes' => 'ResourceUriElement',
+    'shapes' => 'ResourceUri',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'line_format' => 'LineFormat',
     'type' => 'string',
     'shape_type' => 'string',
-    'geometry_shape_type' => 'string',
     'audio_cd_end_track' => 'int',
     'audio_cd_end_track_time' => 'int',
     'audio_cd_start_track' => 'int',
@@ -418,7 +408,6 @@ __PACKAGE__->attribute_map( {
     'line_format' => 'LineFormat',
     'type' => 'Type',
     'shape_type' => 'ShapeType',
-    'geometry_shape_type' => 'GeometryShapeType',
     'audio_cd_end_track' => 'AudioCdEndTrack',
     'audio_cd_end_track_time' => 'AudioCdEndTrackTime',
     'audio_cd_start_track' => 'AudioCdStartTrack',

@@ -1,4 +1,5 @@
-use v5.28; use warnings;
+use v5.28;
+use warnings;
 use Test::More;
 use Quantum::Superpositions::Lazy;
 
@@ -15,43 +16,53 @@ is "$a1", 6, "stringification ok";
 is - $a1, -6, "negation ok";
 
 is $a1 . $a2, 63, "concatenation ok";
-$a3 = $a1; $a3 .= $a2;
+$a3 = $a1;
+$a3 .= $a2;
 is $a3, 63, "concatenation ok";
 
 is $a1 x 3, 666, "string repetition ok";
-$a3 = $a1; $a3 x= 3;
+$a3 = $a1;
+$a3 x= 3;
 is $a3, 666, "string repetition ok";
 
 is $a1 + $a2, 9, "addition ok";
-$a3 = $a1; $a3 += $a2;
+$a3 = $a1;
+$a3 += $a2;
 is $a3, 9, "addition ok";
 
 is $a1 - $a2, 3, "subtraction ok";
-$a3 = $a1; $a3 -= $a2;
+$a3 = $a1;
+$a3 -= $a2;
 is $a3, 3, "subtraction ok";
 
 is $a1 * $a2, 18, "multiplication ok";
-$a3 = $a1; $a3 *= $a2;
+$a3 = $a1;
+$a3 *= $a2;
 is $a3, 18, "multiplication ok";
 
 is $a1 / $a2, 2, "division ok";
-$a3 = $a1; $a3 /= $a2;
+$a3 = $a1;
+$a3 /= $a2;
 is $a3, 2, "division ok";
 
 is $a1 % $a2, 0, "modulo ok";
-$a3 = $a1; $a3 %= $a2;
+$a3 = $a1;
+$a3 %= $a2;
 is $a3, 0, "modulo ok";
 
 is $a1 **$a2, 216, "power ok";
-$a3 = $a1; $a3**= $a2;
+$a3 = $a1;
+$a3**= $a2;
 is $a3, 216, "power ok";
 
 is $a1 << $a2, 48, "shift left ok";
-$a3 = $a1; $a3 <<= $a2;
+$a3 = $a1;
+$a3 <<= $a2;
 is $a3, 48, "shift left ok";
 
 is $a1 >> 1, 3, "shift right ok";
-$a3 = $a1; $a3 >>= 1;
+$a3 = $a1;
+$a3 >>= 1;
 is $a3, 3, "shift right ok";
 
 is atan2($a1, $a2), atan2(6, 3), "atan2 ok";

@@ -7,7 +7,7 @@ use utf8;
 
 BEGIN {
 	$Types::XSD::Lite::AUTHORITY = 'cpan:TOBYINK';
-	$Types::XSD::Lite::VERSION   = '0.005';
+	$Types::XSD::Lite::VERSION   = '0.006';
 }
 
 use B qw(perlstring);
@@ -354,22 +354,22 @@ declare NormalizedString, as Types::Standard::StrMatch[qr{^[^\t\r\n]*$}sm];
 facet qw( length minLength maxLength pattern enumeration whiteSpace ),
 declare Token, as intersection([
 	NormalizedString,
-	Types::Standard::StrMatch([qr{^\s}sm])->complementary_type,
-	Types::Standard::StrMatch([qr{\s$}sm])->complementary_type,
+	Types::Standard::StrMatch([qr{\A\s}sm])->complementary_type,
+	Types::Standard::StrMatch([qr{\s\z}sm])->complementary_type,
 	Types::Standard::StrMatch([qr{\s{2}}sm])->complementary_type,
 ]);
 
 facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare Language, as Types::Standard::StrMatch[qr{^[a-zA-Z]{1,8}(?:-[a-zA-Z0-9]{1,8})*$}sm];
+declare Language, as Types::Standard::StrMatch[qr{\A[a-zA-Z]{1,8}(?:-[a-zA-Z0-9]{1,8})*\z}sm];
 
 facet qw( pattern whiteSpace ),
-declare Boolean, as Types::Standard::StrMatch[qr{^(?:true|false|0|1)$}ism];
+declare Boolean, as Types::Standard::StrMatch[qr{\A(?:true|false|0|1)\z}ism];
 
 facet qw( lengthB64 minLengthB64 maxLengthB64 pattern enumeration whiteSpace ),
-declare Base64Binary, as Types::Standard::StrMatch[qr{^[a-zA-Z0-9+\x{2f}=\s]+$}ism];
+declare Base64Binary, as Types::Standard::StrMatch[qr{\A[a-zA-Z0-9+\x{2f}=\s]+\z}ism];
 
 facet qw( lengthHex minLengthHex maxLengthHex pattern enumeration whiteSpace ),
-declare HexBinary, as Types::Standard::StrMatch[qr{^[a-fA-F0-9]+$}ism];
+declare HexBinary, as Types::Standard::StrMatch[qr{\A[a-fA-F0-9]+\z}ism];
 
 facet qw( pattern enumeration whiteSpace maxInclusiveFloat maxExclusiveFloat minInclusiveFloat minExclusiveFloat ),
 declare Float, as Types::Standard::Num;
@@ -381,7 +381,7 @@ facet qw( length minLength maxLength pattern enumeration whiteSpace ),
 declare AnyURI, as Types::Standard::Str;
 
 facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusiveFloat maxExclusiveFloat minInclusiveFloat minExclusiveFloat ),
-declare Decimal, as Types::Standard::StrMatch[qr{^(?:(?:[+-]?[0-9]+(?:\.[0-9]+)?)|(?:[+-]?\.[0-9]+))$}ism];
+declare Decimal, as Types::Standard::StrMatch[qr{\A(?:(?:[+-]?[0-9]+(?:\.[0-9]+)?)|(?:[+-]?\.[0-9]+))\z}ism];
 
 facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
 declare Integer, as Types::Standard::Int;

@@ -41,14 +41,14 @@ sub meta_merge {
 	dynamic_config	=> 1,
 	resources	=> {
 	    bugtracker	=> {
-		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-VSOP87A',
+		web	=> 'https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues',
 		mailto  => 'wyant@cpan.org',
 	    },
 	    license	=> 'http://dev.perl.org/licenses/',
 	    repository	=> {
 		type	=> 'git',
-		url	=> 'git://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87A.git',
-		web	=> 'https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87A',
+		url	=> 'git://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D.git',
+		web	=> 'https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D',
 	    },
 	},
 	@extra,
@@ -99,7 +99,7 @@ __END__
 
 =head1 NAME
 
-My::Module::Meta - Information needed to build Astro::Coord::ECI::VSOP87A
+My::Module::Meta - Information needed to build Astro::Coord::ECI::VSOP87D
 
 =head1 SYNOPSIS
 
@@ -112,8 +112,8 @@ My::Module::Meta - Information needed to build Astro::Coord::ECI::VSOP87A
 
 =head1 DETAILS
 
-This module centralizes information needed to build C<Astro::Coord::ECI::VSOP87A>. It
-is private to the C<Astro::Coord::ECI::VSOP87A> package, and may be changed or
+This module centralizes information needed to build C<Astro::Coord::ECI::VSOP87D>. It
+is private to the C<Astro::Coord::ECI::VSOP87D> package, and may be changed or
 retracted without notice.
 
 =head1 METHODS
@@ -132,7 +132,7 @@ This method instantiates the class.
  print Dump( $meta->build_requires() );
 
 This method computes and returns a reference to a hash describing the
-modules required to build the C<Astro::Coord::ECI::VSOP87A> package, suitable for
+modules required to build the C<Astro::Coord::ECI::VSOP87D> package, suitable for
 use in a F<Build.PL> C<build_requires> key, or a F<Makefile.PL>
 C<< {META_MERGE}->{build_requires} >> or C<BUILD_REQUIRES> key.
 
@@ -163,7 +163,7 @@ reference). If it can not load the required module, it returns nothing.
  print Dump( $meta->requires() );
 
 This method computes and returns a reference to a hash describing
-the modules required to run the C<Astro::Coord::ECI::VSOP87A>
+the modules required to run the C<Astro::Coord::ECI::VSOP87D>
 package, suitable for use in a F<Build.PL> C<requires> key, or a
 F<Makefile.PL> C<PREREQ_PM> key. Any additional arguments will be
 appended to the generated hash. In addition, unless
@@ -193,7 +193,8 @@ information makes it into F<META.yml>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -201,7 +202,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018-2020 by Thomas R. Wyant, III
+Copyright (C) 2018-2021 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

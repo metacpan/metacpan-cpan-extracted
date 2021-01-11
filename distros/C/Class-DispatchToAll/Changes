@@ -2,6 +2,14 @@
 # Changes for Class::DispatchToAll
 #-----------------------------------------------------------------
 
+0.13      2021-01-10 18:45:48+01:00
+    - Add deprecation note to abstract...
+
+
+0.12      2021-01-10 18:06:48+01:00
+    - DEPRECATED!
+
+
 0.11    2006-09-30
     - no changes / additions to functionality, this is a purly housekeeping
       release!

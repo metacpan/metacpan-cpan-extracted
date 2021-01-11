@@ -1,12 +1,11 @@
-#!/usr/bin/perl
 package Acme::ReturnValue;
+
+# ABSTRACT: report interesting return values
+our $VERSION = '1.004'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '1.003';
-
-# ABSTRACT: report interesting return values
 
 use PPI;
 use File::Find;
@@ -20,6 +19,8 @@ use Data::Dumper;
 use JSON;
 use Encode;
 use Moose;
+use List::Util qw(any);
+
 with qw(MooseX::Getopt);
 use MooseX::Types::Path::Class;
 
@@ -112,7 +113,7 @@ sub waste_some_cycles {
 
     my @bad = map { 'PPI::Statement::'.$_} qw(Sub Variable Compound Package Scheduled Include Sub);
 
-    if (ref($match) ~~ @bad) {
+    if (any { ref($match) eq $_ } @bad) {
         $data->{'bad'}=$rv;
         push(@{$self->bad},$data);
     }
@@ -246,7 +247,7 @@ Acme::ReturnValue - report interesting return values
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 
@@ -350,11 +351,11 @@ Probably many, because I'm not sure I master PPI yet.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2019 by Thomas Klausner.
+This software is copyright (c) 2013 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

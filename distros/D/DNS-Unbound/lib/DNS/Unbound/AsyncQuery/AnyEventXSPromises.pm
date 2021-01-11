@@ -17,7 +17,7 @@ use constant _DEFERRED_CR => \&AnyEvent::XSPromises::deferred;
 
 my ($new, $class);
 
-sub _then {
+sub _dns_unbound_then {
 
     # This hackery is here because AE::XSP doesn’t accept subclassing.
 

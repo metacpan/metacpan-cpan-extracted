@@ -1,5 +1,5 @@
 {
-   "abstract" : "Easier creation of text blocks when using PDF::API2",
+   "abstract" : "Easier creation of text blocks when using PDF::API2 or PDF::Builder",
    "author" : [
       "Jay Hannah <jay@jays.net>"
    ],
@@ -34,7 +34,6 @@
          "requires" : {
             "Class::Accessor::Fast" : "0",
             "File::Temp" : "0",
-            "PDF::API2" : "0",
             "Test::More" : "0"
          }
       }
@@ -42,9 +41,10 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "https://github.com/jhannah/pdf-textblock"
+         "type" : "git",
+         "web" : "https://github.com/jhannah/pdf-textblock.git"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

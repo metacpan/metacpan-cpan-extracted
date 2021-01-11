@@ -5,12 +5,12 @@ use strict;
 use warnings;
 
 BEGIN {
-	if ($] < 5.008) { require Devel::TypeTiny::Perl56Compat };
+	if ( $] < 5.008 ) { require Devel::TypeTiny::Perl56Compat }
 }
 
 BEGIN {
 	$Types::Common::Numeric::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::Numeric::VERSION   = '1.012000';
+	$Types::Common::Numeric::VERSION   = '1.012001';
 }
 
 $Types::Common::Numeric::VERSION =~ tr/_//d;
@@ -47,11 +47,11 @@ $meta->add_type(
 	message    => sub { "Must be a number greater than or equal to zero" },
 );
 
-my ($pos_int, $posz_int);
-if (Type::Tiny::_USE_XS) {
-	$pos_int  = Type::Tiny::XS::get_coderef_for('PositiveInt')
-		if Type::Tiny::XS->VERSION >= 0.013; # fixed bug with "00"
-	$posz_int = Type::Tiny::XS::get_coderef_for('PositiveOrZeroInt');
+my ( $pos_int, $posz_int );
+if ( Type::Tiny::_USE_XS ) {
+	$pos_int = Type::Tiny::XS::get_coderef_for( 'PositiveInt' )
+		if Type::Tiny::XS->VERSION >= 0.013;    # fixed bug with "00"
+	$posz_int = Type::Tiny::XS::get_coderef_for( 'PositiveOrZeroInt' );
 }
 
 $meta->add_type(
@@ -59,13 +59,13 @@ $meta->add_type(
 	parent     => Int,
 	constraint => sub { $_ > 0 },
 	inlined    => sub {
-		if ($pos_int) {
-			my $xsub = Type::Tiny::XS::get_subname_for($_[0]->name);
+		if ( $pos_int ) {
+			my $xsub = Type::Tiny::XS::get_subname_for( $_[0]->name );
 			return "$xsub($_[1])" if $xsub && !$Type::Tiny::AvoidCallbacks;
 		}
 		undef, qq($_ > 0);
 	},
-	message    => sub { "Must be a positive integer" },
+	message => sub { "Must be a positive integer" },
 	$pos_int ? ( compiled_type_constraint => $pos_int ) : (),
 );
 
@@ -74,13 +74,13 @@ $meta->add_type(
 	parent     => Int,
 	constraint => sub { $_ >= 0 },
 	inlined    => sub {
-		if ($posz_int) {
-			my $xsub = Type::Tiny::XS::get_subname_for($_[0]->name);
+		if ( $posz_int ) {
+			my $xsub = Type::Tiny::XS::get_subname_for( $_[0]->name );
 			return "$xsub($_[1])" if $xsub && !$Type::Tiny::AvoidCallbacks;
 		}
 		undef, qq($_ >= 0);
 	},
-	message    => sub { "Must be an integer greater than or equal to zero" },
+	message => sub { "Must be an integer greater than or equal to zero" },
 	$posz_int ? ( compiled_type_constraint => $posz_int ) : (),
 );
 
@@ -124,48 +124,62 @@ $meta->add_type(
 	message    => sub { "Must be a single digit" },
 );
 
-for my $base (qw/Num Int/) {
+for my $base ( qw/Num Int/ ) {
 	$meta->add_type(
-		name       => "${base}Range",
-		parent     => Types::Standard->get_type($base),
+		name                 => "${base}Range",
+		parent               => Types::Standard->get_type( $base ),
 		constraint_generator => sub {
-			return $meta->get_type("${base}Range") unless @_;
+			return $meta->get_type( "${base}Range" ) unless @_;
 			
-			my $base_obj = Types::Standard->get_type($base);
+			my $base_obj = Types::Standard->get_type( $base );
 			
-			my ($min, $max, $min_excl, $max_excl) = @_;
-			!defined($min) or $base_obj->check($min) or _croak("${base}Range min must be a %s; got %s", lc($base), $min);
-			!defined($max) or $base_obj->check($max) or _croak("${base}Range max must be a %s; got %s", lc($base), $max);
-			!defined($min_excl) or Bool->check($min_excl) or _croak("${base}Range minexcl must be a boolean; got $min_excl");
-			!defined($max_excl) or Bool->check($max_excl) or _croak("${base}Range maxexcl must be a boolean; got $max_excl");
-			
+			my ( $min, $max, $min_excl, $max_excl ) = @_;
+			!defined( $min )
+				or $base_obj->check( $min )
+				or _croak(
+				"${base}Range min must be a %s; got %s", lc( $base ),
+				$min
+				);
+			!defined( $max )
+				or $base_obj->check( $max )
+				or _croak(
+				"${base}Range max must be a %s; got %s", lc( $base ),
+				$max
+				);
+			!defined( $min_excl )
+				or Bool->check( $min_excl )
+				or _croak( "${base}Range minexcl must be a boolean; got $min_excl" );
+			!defined( $max_excl )
+				or Bool->check( $max_excl )
+				or _croak( "${base}Range maxexcl must be a boolean; got $max_excl" );
+				
 			# this is complicated so defer to the inline generator
 			eval sprintf(
 				'sub { %s }',
 				join ' and ',
-					grep defined,
-					$meta->get_type("${base}Range")->inline_generator->(@_)->(undef, '$_[0]'),
+				grep defined,
+				$meta->get_type( "${base}Range" )->inline_generator->( @_ )->( undef, '$_[0]' ),
 			);
 		},
 		inline_generator => sub {
-			my ($min, $max, $min_excl, $max_excl) = @_;
+			my ( $min, $max, $min_excl, $max_excl ) = @_;
 			
 			my $gt = $min_excl ? '>' : '>=';
 			my $lt = $max_excl ? '<' : '<=';
 			
 			return sub {
-				my $v = $_[1];
-				my @code = (undef); # parent constraint
+				my $v    = $_[1];
+				my @code = ( undef );    # parent constraint
 				push @code, "$v $gt $min";
 				push @code, "$v $lt $max" if defined $max;
 				return @code;
 			};
 		},
 		deep_explanation => sub {
-			my ($type, $value, $varname) = @_;
-			my ($min, $max, $min_excl, $max_excl) = @{ $type->parameters || [] };
+			my ( $type, $value, $varname ) = @_;
+			my ( $min, $max, $min_excl, $max_excl ) = @{ $type->parameters || [] };
 			my @whines;
-			if (defined $max) {
+			if ( defined $max ) {
 				push @whines, sprintf(
 					'"%s" expects %s to be %s %d and %s %d',
 					$type,
@@ -175,7 +189,7 @@ for my $base (qw/Num Int/) {
 					$max_excl ? 'less than' : 'at most',
 					$max,
 				);
-			}
+			} #/ if ( defined $max )
 			else {
 				push @whines, sprintf(
 					'"%s" expects %s to be %s %d',
@@ -188,12 +202,12 @@ for my $base (qw/Num Int/) {
 			push @whines, sprintf(
 				"length(%s) is %d",
 				$varname,
-				length($value),
+				length( $value ),
 			);
 			return \@whines;
 		},
 	);
-}
+} #/ for my $base ( qw/Num Int/)
 
 __PACKAGE__->meta->make_immutable;
 
@@ -312,7 +326,7 @@ will be used instead of the usual C<< <= >> or C<< >= >> operators.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+L<https://github.com/tobyink/p5-type-tiny/issues>.
 
 =head1 SEE ALSO
 
@@ -328,7 +342,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -338,4 +352,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

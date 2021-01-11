@@ -51,27 +51,32 @@
             "Template::Toolkit" : "0",
             "perl" : "5.010001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent" : "0"
+         }
       }
    },
    "provides" : {
       "Async::Template" : {
          "file" : "lib/Async/Template.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "Async::Template::Context" : {
          "file" : "lib/Async/Template/Context.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "Async::Template::Directive" : {
          "file" : "lib/Async/Template/Directive.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "Async::Template::Document" : {
          "file" : "lib/Async/Template/Document.pm"
       },
       "Async::Template::Grammar" : {
          "file" : "lib/Async/Template/Grammar.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "Async::Template::Parser" : {
          "file" : "lib/Async/Template/Parser.pm"
@@ -91,7 +96,7 @@
          "web" : "https://github.com/oklas/async-template"
       }
    },
-   "version" : "0.12",
+   "version" : "0.14",
    "x_authority" : "cpan:OKLAS",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1

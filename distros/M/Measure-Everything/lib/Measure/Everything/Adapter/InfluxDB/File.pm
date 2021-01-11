@@ -1,10 +1,10 @@
 package Measure::Everything::Adapter::InfluxDB::File;
-use strict;
-use warnings;
-
-our $VERSION = '1.000';
 
 # ABSTRACT: Write stats formatted as InfluxDB lines into a file
+our $VERSION = '1.003'; # VERSION
+
+use strict;
+use warnings;
 
 use Config;
 use Fcntl qw/:flock/;
@@ -45,7 +45,7 @@ Measure::Everything::Adapter::InfluxDB::File - Write stats formatted as InfluxDB
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -67,11 +67,11 @@ that help doing that in the near future.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Thomas Klausner.
+This software is copyright (c) 2015 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

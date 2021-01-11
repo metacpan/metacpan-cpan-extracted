@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Exporter" : "0",
             "MIDI" : "0",
             "MIDI::Simple" : "0",
             "Music::Tempo" : "0",
@@ -63,7 +64,7 @@
          "web" : "https://github.com/ology/MIDI-Util"
       }
    },
-   "version" : "0.0705",
+   "version" : "0.0800",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

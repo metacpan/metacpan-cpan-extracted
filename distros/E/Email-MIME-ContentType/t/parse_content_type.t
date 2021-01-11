@@ -146,6 +146,14 @@ my %ct_tests = (
                 'charset' => 'us-ascii',
             },
     },
+
+    q(text/plain; oom*999999999*=us-ascii'en'BIG%20PARAM) => {
+            'type' => 'text',
+            'subtype' => 'plain',
+            'attributes' => {
+                'oom' => 'BIG PARAM',
+            },
+    },
 );
 
 my %non_strict_ct_tests = (

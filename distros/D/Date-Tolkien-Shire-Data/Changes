@@ -1,3 +1,16 @@
+0.007		2021-01-11	T. R. Wyant
+    Add Travis CI testing.
+
+    Use GitHub as bug tracker. R.I.P. rt.cpan.org.
+
+    Tweak on-date text for the month of Afteryule.
+
+    Add -events and -accented to eg/scal. This causes the __on_date()
+    data for the month to be appended to the output. Or
+    __on_date_accented() if -accented is asserted.
+    
+    Eliminate redirections in POD URL links
+
 0.006		2019-07-21	T. R. Wyant
     Fix broken POD links and add test to ensure they stay fixed.
 

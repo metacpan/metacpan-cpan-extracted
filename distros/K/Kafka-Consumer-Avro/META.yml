@@ -4,12 +4,13 @@ author:
   - 'Alvaro Livraghi'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Kafka::Producer::Avro: v1.0.0
   Math::BigInt: '1.89'
   Test::Exception: '0.43'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,14 +23,16 @@ no_index:
     - t
     - inc
 requires:
-  Avro::BinaryEncoder: '0'
-  Avro::Schema: '0'
-  Confluent::SchemaRegistry: '0.03'
-  JSON::XS: '3.02'
-  Kafka::Consumer: '1.07'
+  Avro::BinaryDecoder: v1.10.1
+  Avro::Schema: v1.10.1
+  Confluent::SchemaRegistry: v1.0.0
+  IO::String: v1.80.0
+  JSON::XS: v4.30.0
+  Kafka::Consumer: v1.8.0
   perl: '5.010'
 resources:
   bugtracker: https://github.com/alivraghi/Kafka-Consumer-Avro/issues
   homepage: https://github.com/alivraghi/Kafka-Consumer-Avro
   repository: https://github.com/alivraghi/Kafka-Consumer-Avro.git
-version: '0.01'
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

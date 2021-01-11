@@ -1,14 +1,15 @@
 package Bitcoin::Crypto::Bech32;
 
-use v5.10; use warnings;
-use Exporter qw(import);
+our $VERSION = "0.996";
 
-use Bitcoin::Crypto;
+use v5.10;
+use warnings;
+use Exporter qw(import);
+use Types::Standard qw(Str);
+
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Helpers qw(verify_bytestring);
 use Bitcoin::Crypto::Segwit qw(validate_program);
-
-our $VERSION = Bitcoin::Crypto->VERSION;
 
 our @EXPORT_OK = qw(
 	encode_bech32
@@ -85,6 +86,11 @@ sub verify_checksum
 sub split_bech32
 {
 	my ($bech32enc) = @_;
+
+	Bitcoin::Crypto::Exception::Bech32InputFormat->raise(
+		"bech32 input is not a string"
+	) unless Str->check($bech32enc);
+
 	$bech32enc = lc $bech32enc
 		if uc $bech32enc eq $bech32enc;
 
@@ -254,7 +260,7 @@ For Bech32-encoded SegWit addresses, use I<encode_segwit> and I<decode_segwit>.
 For custom uses of Bech32 (not in context of Bitcoin SegWit addresses), use
 I<encode_bech32> and I<decode_bech32>.
 
-B<If in doubt, use *_segwit functions, not *_bech32 functions!>
+B<If in doubt, use segwit functions, not bech32 functions!>
 
 =head1 FUNCTIONS
 

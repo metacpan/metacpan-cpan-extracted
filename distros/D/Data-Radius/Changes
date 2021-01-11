@@ -1,3 +1,10 @@
+1.2.6 2020-12-18
+
+ - Data::Radius::Dictionary can now load multiple dictionaries
+   simultaneously in single class instance
+
+ - %RFC_TYPES constant made public
+
 1.2.5 2020-10-19
 
  - Fixed MIN_PERL_VERSION in Makefile.PL, required by ExtUtils::MakeMaker@7.48

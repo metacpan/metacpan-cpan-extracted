@@ -1,14 +1,14 @@
 package Bitcoin::Crypto::Base58;
 
-use v5.10; use warnings;
+our $VERSION = "0.996";
+
+use v5.10;
+use warnings;
 use Exporter qw(import);
 use Crypt::Misc qw(encode_b58b decode_b58b);
 
-use Bitcoin::Crypto;
 use Bitcoin::Crypto::Helpers qw(new_bigint hash256 verify_bytestring);
 use Bitcoin::Crypto::Exception;
-
-our $VERSION = Bitcoin::Crypto->VERSION;
 
 our @EXPORT_OK = qw(
 	encode_base58

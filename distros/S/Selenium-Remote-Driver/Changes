@@ -1,5 +1,15 @@
 Revision history for Selenium-Remote-Driver
 
+1.39  01-08-2021 TEODESIAN
+        [NEW FEATURES]
+        - Add execute_script and execute_async_script convenience methods to WebElements.
+        - Add die flag to Selenium::Waiter
+        - fix double_click
+        [BUG FIXES]
+        - Fix a couple more documentation issues with driver specific problems
+        [REMOVALS]
+        - Removed ide-plugin.js, as it's not been supported or working in years
+
 1.38  10-19-2020 TEODESIAN
         [BUG FIXES]
         -correct incorrect prior changelog date

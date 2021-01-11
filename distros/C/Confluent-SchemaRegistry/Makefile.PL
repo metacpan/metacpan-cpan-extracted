@@ -22,11 +22,12 @@ my %config = (
     VERSION_FROM        => $path_to_package,  # finds $VERSION
     MIN_PERL_VERSION    => '5.010',
     PREREQ_PM           => {            # more to the list $Module::CoreList::version{5.010}
-		'JSON::XS'		=> '3.02',
-		'REST::Client'	=> '273',
-		'Try::Tiny'		=> '0.22',
-		'Avro::Schema'	=> 0,
-		'Aspect'		=> '1.04'
+		'JSON::XS'     => 'v4.30.0',
+		'REST::Client' => 'v273.0.0',
+        'HTTP::Status' => 'v6.270.0',
+		'Try::Tiny'    => 'v0.300.0',
+		'Avro::Schema' => 'v1.10.1',
+		'Aspect'       => 'v1.40.0'
     },
     TEST_REQUIRES       => {            # more to the list $Module::CoreList::version{5.010}
 		'Math::BigInt'				=> '1.89',

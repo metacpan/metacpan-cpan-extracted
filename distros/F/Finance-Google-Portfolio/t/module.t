@@ -1,15 +1,8 @@
-use strict;
-use warnings;
-
-use Test::Most;
-
-use constant MODULE => 'Finance::Google::Portfolio';
-
-BEGIN { use_ok(MODULE); }
-require_ok(MODULE);
+use Test2::V0;
+use Finance::Google::Portfolio;
 
 my $obj;
-ok( $obj = MODULE->new(), MODULE . '->new()' );
-is( ref $obj, MODULE, 'ref $object' );
+ok( $obj = Finance::Google::Portfolio->new(), 'new' );
+is( ref $obj, 'Finance::Google::Portfolio', 'ref $object' );
 
 done_testing;

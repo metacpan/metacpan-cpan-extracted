@@ -10,7 +10,7 @@ LCM: {
 	if($@) {
 		plan(skip_all => 'Locale::Country::Multilingual required for this test');
 	} else {
-		plan(tests => 13);
+		plan(tests => 18);
 
 		use_ok('Test::NoWarnings');
 		use_ok('Class::Simple::Readonly::Cached');
@@ -27,6 +27,13 @@ LCM: {
 		is($lcm->code2country('US'), 'United States', 'Second call to United States');
 		is($lcm->code2country('US', 'fr_FR'), 'États-Unis', 'Fourth call to États-Unis');
 
+		$lcm->set_lang('fr');
+		is($lcm->country2code('Angleterre'), undef, 'Angleterre returns undef');
+		is($lcm->country2code('Angleterre'), undef, 'Second call to Angleterre returns undef');
+		is($lcm->country2code('England'), undef, 'England returns undef');
+		is($lcm->country2code('Angleterre'), undef, 'Third call to Angleterre returns undef');
+		is($lcm->country2code('England'), undef, 'Third call to England returns undef');
+
 		if($ENV{'TEST_VERBOSE'}) {
 			foreach my $key($cache->get_keys()) {
 				diag($key);
@@ -39,13 +46,13 @@ LCM: {
 		while(my($k, $v) = each %{$hits}) {
 			$count += $v;
 		}
-		is($count, 4, 'cache contains 4 hits');
+		is($count, 7, 'cache contains 7 hits');
 
 		my $misses = $lcm->state()->{'misses'};
 		$count = 0;
 		while(my($k, $v) = each %{$misses}) {
 			$count += $v;
 		}
-		is($count, 2, 'cache contains 2 misses');
+		is($count, 5, 'cache contains 5 misses');
 	}
 }

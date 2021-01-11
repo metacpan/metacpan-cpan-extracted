@@ -4,7 +4,7 @@
       "Manfred Stock <mstock@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,6 +34,9 @@
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "version" : "0.9901"
@@ -57,15 +60,17 @@
             "App::Scaffolder" : "0.002000",
             "Carp" : "0",
             "Directory::Scratch" : "0",
-            "File::Find" : "0",
-            "File::Temp" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::Class" : "0",
             "Test::Exception" : "0",
             "Test::File" : "0",
             "Test::File::ShareDir" : "0",
             "Test::MockObject" : "0",
             "Test::More" : "0.88",
-            "lib" : "0"
+            "lib" : "0",
+            "perl" : "5.006"
          }
       }
    },
@@ -77,6 +82,8 @@
          "web" : "https://github.com/mstock/App-Scaffolder-Puppet"
       }
    },
-   "version" : "0.003001"
+   "version" : "0.004000",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

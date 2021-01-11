@@ -1,12 +1,14 @@
 package LWP::Authen::OAuth2::ServiceProvider::Dwolla;
 
+# ABSTRACT: Access Dwolla API v2
+our $VERSION = '0.18'; # VERSION
+
 use strict;
 use warnings;
 
 use base qw/LWP::Authen::OAuth2::ServiceProvider/;
 
 use JSON qw/decode_json/;
-
 
 sub authorization_endpoint {
     my $self = shift;
@@ -40,9 +42,22 @@ sub default_api_headers {
     return { 'Content-Type' => 'application/vnd.dwolla.v1.hal+json', 'Accept' => 'application/vnd.dwolla.v1.hal+json' };
 }
 
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 LWP::Authen::OAuth2::ServiceProvider::Dwolla - Access Dwolla API v2
+
+=head1 VERSION
+
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -106,36 +121,25 @@ L<https://developers.dwolla.com/>
 
 Adi Fairbank, C<< <https://github.com/adifairbank> >>
 
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc LWP::Authen::OAuth2::ServiceProvider
-
-You can also look for information at:
+=head1 AUTHORS
 
 =over 4
 
-=item Github (submit patches here)
+=item *
 
-CPAN maintainer's branch: L<https://github.com/domm/perl-oauth2>
+Ben Tilly, <btilly at gmail.com>
 
-Branch where I work on Dwolla support: L<https://github.com/adifairbank/perl-oauth2>
+=item *
 
-=item RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=LWP-Authen-OAuth2>
-
-=item AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/LWP-Authen-OAuth2>
-
-=item CPAN Ratings
-
-L<http://cpanratings.perl.org/d/LWP-Authen-OAuth2>
+Thomas Klausner <domm@plix.at>
 
 =back
 
-=cut
+=head1 COPYRIGHT AND LICENSE
 
-1;
+This software is copyright (c) 2013 - 2021 by Ben Tilly, Rent.com, Thomas Klausner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

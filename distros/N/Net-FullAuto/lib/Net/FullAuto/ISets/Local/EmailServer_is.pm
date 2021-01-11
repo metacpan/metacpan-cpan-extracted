@@ -3,7 +3,7 @@ package Net::FullAuto::ISets::Local::EmailServer_is;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Powerful Network Process Automation Software
-#    Copyright © 2000-2020  Brian M. Kelly
+#    Copyright © 2000-2021  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -1444,6 +1444,7 @@ END
          next;
       }
    }
+   # https://www.debiantutorials.com/installing-postfix-with-mysql-backend-and-sasl-for-smtp-authentication/
    $handle->cmd('echo');
    $handle->print($sudo.'mysql -u root');
    $prompt=$handle->prompt();
@@ -1456,28 +1457,36 @@ END
       print $out if $output!~/^MariaDB.*?>\s*$/;
       last if $output=~/$prompt|Bye/;
       if (!$cmd_sent && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd='DROP DATABASE roundcube;';
+         my $cmd='DROP DATABASE roundcubemail;';
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
       } elsif ($cmd_sent==1 && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd='CREATE roundcube DEFAULT CHARACTER SET '.
-                 'utf8 COLLATE utf8_general_ci;';
+         my $cmd='DROP DATABASE mail;';
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
       } elsif ($cmd_sent==2 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd='CREATE DATABASE roundcubemail CHARACTER SET '.
+                 'utf8 COLLATE utf8_general_ci;'.
+         print "$cmd\n";
+         $handle->print($cmd);
+         $handle->print(';');
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==3 && $output=~/MariaDB.*?>\s*$/) {
          my $cmd='DROP USER roundcubeuser@localhost;';
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
-      } elsif ($cmd_sent==3 && $output=~/MariaDB.*?>\s*$/) {
+      } elsif ($cmd_sent==4 && $output=~/MariaDB.*?>\s*$/) {
          my $cmd='CREATE USER roundcubeuser@localhost IDENTIFIED BY '.
                  "'".$service_and_cert_password."';";
          print "$cmd\n";
@@ -1485,7 +1494,7 @@ END
          $cmd_sent++;
          sleep 1;
          next;
-      } elsif ($cmd_sent==4 && $output=~/MariaDB.*?>\s*$/) {
+      } elsif ($cmd_sent==5 && $output=~/MariaDB.*?>\s*$/) {
          my $cmd='GRANT ALL PRIVILEGES ON roundcube.*'.
                  ' TO roundcubeuser@localhost;';
          print "$cmd\n";
@@ -1493,19 +1502,97 @@ END
          $cmd_sent++;
          sleep 1;
          next;
-      } elsif ($cmd_sent==5 && $output=~/MariaDB.*?>\s*$/) {
+      } elsif ($cmd_sent==6 && $output=~/MariaDB.*?>\s*$/) {
          my $cmd="FLUSH PRIVILEGES;";
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
-      } elsif ($cmd_sent>=6 && $output=~/MariaDB.*?>\s*$/) {
+      } elsif ($cmd_sent==7 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd="CREATE DATABASE mail;";
+         print "$cmd\n";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==8 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd='DROP USER mailuser@localhost;';
+         print "$cmd\n";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==9 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd='CREATE USER mailuser@localhost IDENTIFIED BY '.
+                 "'".$service_and_cert_password."';";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==10 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd='GRANT SELECT ON mail.* TO mailuser@localhost IDENTIFIED BY '.
+                 "'".$service_and_cert_password."';";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==11 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd="FLUSH PRIVILEGES;";
+         print "$cmd\n";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==12 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd="use mail;";
+         print "$cmd\n";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==13 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd="CREATE TABLE domains ( domain varchar(255) NOT NULL, ".
+                 "PRIMARY KEY (domain)) ENGINE=MyISAM;";
+         print "$cmd\n";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==14 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd="CREATE TABLE forwardings ( source varchar(255) NOT NULL, ".
+                 "destination varchar(255) NOT NULL, PRIMARY KEY (source)) ".
+                 "ENGINE=MyISAM;";
+         print "$cmd\n";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==15 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd="CREATE TABLE users ( email varchar(255) NOT NULL, ".
+                 "password varchar(255) NOT NULL, quota int(10) DEFAULT ".
+                 "'104857600', PRIMARY KEY (email)) ENGINE=MyISAM;";
+         print "$cmd\n";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent==16 && $output=~/MariaDB.*?>\s*$/) {
+         my $cmd="CREATE TABLE transport ( domain varchar(255) NOT NULL, ".
+                 "transport varchar(255) NOT NULL, UNIQUE KEY domain ".
+                 "(domain)) ENGINE=MyISAM;";
+         print "$cmd\n";
+         $handle->print($cmd);
+         $cmd_sent++;
+         sleep 1;
+         next;
+      } elsif ($cmd_sent>=17 && $output=~/MariaDB.*?>\s*$/) {
          print "quit\n";
          $handle->print('quit');
          sleep 1;
          next;
-      } sleep 1;
+      }
+      sleep 1;
       $handle->print();
    }
    # https://shaunfreeman.name/compiling-php-7-on-centos/
@@ -1831,7 +1918,10 @@ END
    $gtarfile=~s/.tar.gz$//;
    ($stdout,$stderr)=$handle->cwd($gtarfile);
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "make -f Makefile.init makefiles",'__display__');
+      'make -f Makefile.init makefiles '.
+      'CCARGS=-DHAS_MYSQL -I/usr/include/mysql '.
+      'AUXLIBS_MYSQL=-L/usr/lib64/mysql -lmysqlclient -lz -lm',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "make",'__display__');
    $handle->print($sudo.'make install');
@@ -1877,12 +1967,132 @@ END
       }
       next;
    }
+   my $aliases=<<END;
+#
+# mysql config file for local(8) aliases(5) lookups
+#
+
+# The user name and password to log into the mysql server.
+user = mailuser 
+password = $service_and_cert_password
+
+# The database name on the servers.
+dbname = mail
+
+# For Postfix 2.2 and later The SQL query template.
+# See mysql_table(5) for details.
+query = SELECT forw_addr FROM mxaliases WHERE alias='%s' AND status='paid'
+
+# For Postfix releases prior to 2.2. See mysql_table(5) for details.
+select_field = forw_addr
+table = mxaliases
+where_field = alias
+# Don't forget the leading "AND"!
+additional_conditions = AND status = 'paid'
+
+# This is necessary to make UTF8 queries work for Postfix 2.11 .. 3.1,
+# and is the default setting as of Postfix 3.2.
+option_group = client
+END
+#alias_maps = mysql:/etc/postfix/mysql-aliases.cf
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$aliases\" > ".
+      "mysql_aliases.cf");
+   my $virtual=<<END;
+user = mailuser
+password = $service_and_cert_password
+dbname = mail
+table = domains
+select_field = 'virtual'
+where_field = domain
+hosts = 127.0.0.1
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$virtual\" > ".
+      "mysql-virtual_domains.cf");
+   my $forward=<<END;
+user = mailuser
+password = $service_and_cert_password
+dbname = mail
+table = forwardings
+select_field = destination
+where_field = source
+hosts = 127.0.0.1
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$forward\" > ".
+      "mysql-virtual_forwardings.cf");
+   my $mailboxes=<<END;
+user = mailuser
+password = $service_and_cert_password
+dbname = mail
+table = users
+select_field = CONCAT(SUBSTRING_INDEX(email,'@',-1),'/',SUBSTRING_INDEX(email,'@',1),'/')
+where_field = email
+hosts = 127.0.0.1
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$mailboxes\" > ".
+      "mysql-virtual_mailboxes.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "systemctl start postfix",'__display__');
+      'mv -v mysql-virtual_mailboxes.cf /etc/postfix',
+      '__display__');
+   my $email2=<<END;
+user = mailuser
+password = $service_and_cert_password
+dbname = mail
+table = users
+select_field = email
+where_field = email
+hosts = 127.0.0.1
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$email2\" > ".
+      "mysql-virtual_email2email.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "systemctl enable postfix",'__display__');
+      'mv -v mysql-virtual_email2email.cf /etc/postfix',
+      '__display__');
+   my $transport=<<END;
+user = mailuser
+password = $service_and_cert_password
+dbname = mail
+table = transport
+select_field = transport
+where_field = domain
+hosts = 127.0.0.1
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$transport\" > ".
+      "mysql-virtual_transports.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "systemctl status postfix",'__display__');
+      'mv -v mysql-virtual_transports.cf /etc/postfix',
+      '__display__');
+   my $limit=<<END;
+user = mailuser
+password = $service_and_cert_password
+dbname = mail
+table = users
+select_field = quota
+where_field = email
+hosts = 127.0.0.1
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$limit\" > ".
+      "mysql-virtual_mailbox_limit_maps.cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v mysql-virtual_mailbox_limit_maps.cf /etc/postfix',
+      '__display__');
+   my $destination=<<END;
+user = mailuser
+password = $service_and_cert_password
+dbname = mail
+table = transport
+select_field = domain
+where_field = domain
+hosts = 127.0.0.1
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$destination\" > ".
+      "mysql-mydestination.cf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -v mysql-mydestination.cf /etc/postfix',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "postfix start",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "postfix status",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "postconf -e \"inet_interfaces = all\"",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1961,7 +2171,7 @@ END
                                         888                888
                                         888                888
                                         888                888
-    888d888 .d88b. 888  88888888b.  .d88888 .d8888b888  88888888b.  .d88b.
+     88d888 .d88b. 888  88888888b.  .d88888 .d8888b888  88888888b.  .d88b.
     888P"  d88""88b888  888888 "88bd88" 888d88P"   888  888888 "88bd8P  Y8b
     888    888  888888  888888  888888  888888     888  888888  88888888888
     888    Y88..88PY88b 888888  888Y88b 888Y88b.   Y88b 888888 d88PY8b.
@@ -2182,7 +2392,7 @@ END
           |_| \_|\___|\__|     |_|   \__,_|_|_/_/   \_\__,_|\__\___/ (C)
 
 
-   Copyright (C) 2000-2020  Brian M. Kelly  Brian.Kelly@FullAuto.com
+   Copyright (C) 2000-2021  Brian M. Kelly  Brian.Kelly@FullAuto.com
 
 END
    eval {

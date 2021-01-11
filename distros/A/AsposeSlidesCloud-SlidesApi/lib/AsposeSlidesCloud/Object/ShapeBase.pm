@@ -42,7 +42,6 @@ use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::LineFormat;
 use AsposeSlidesCloud::Object::ResourceBase;
 use AsposeSlidesCloud::Object::ResourceUri;
-use AsposeSlidesCloud::Object::ResourceUriElement;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -247,7 +246,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'shapes' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Shapes',
     	description => 'Gets or sets the link to shapes.',
     	format => '',
@@ -281,13 +280,6 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'shape_type' => {
-    	datatype => 'string',
-    	base_name => 'ShapeType',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -302,12 +294,11 @@ __PACKAGE__->swagger_types( {
     'x' => 'double',
     'y' => 'double',
     'z_order_position' => 'int',
-    'shapes' => 'ResourceUriElement',
+    'shapes' => 'ResourceUri',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'line_format' => 'LineFormat',
-    'type' => 'string',
-    'shape_type' => 'string'
+    'type' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -326,8 +317,7 @@ __PACKAGE__->attribute_map( {
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'line_format' => 'LineFormat',
-    'type' => 'Type',
-    'shape_type' => 'ShapeType'
+    'type' => 'Type'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

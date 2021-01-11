@@ -4,8 +4,20 @@ use strict;
 use warnings;
 use 5.0100;
 
-# ABSTRACT: OpenSMILES format reader
-our $VERSION = '0.3.2'; # VERSION
+# ABSTRACT: OpenSMILES format reader and writer
+our $VERSION = '0.4.0'; # VERSION
+
+require Exporter;
+our @ISA = qw( Exporter );
+our @EXPORT_OK = qw(
+    is_aromatic
+);
+
+sub is_aromatic($)
+{
+    my( $atom ) = @_;
+    return $atom->{symbol} ne ucfirst $atom->{symbol};
+}
 
 1;
 
@@ -15,7 +27,7 @@ __END__
 
 =head1 NAME
 
-Chemistry::OpenSMILES - OpenSMILES format reader
+Chemistry::OpenSMILES - OpenSMILES format reader and writer
 
 =head1 SYNOPSIS
 
@@ -31,6 +43,10 @@ Chemistry::OpenSMILES - OpenSMILES format reader
         print scalar $moiety->edges;
     }
 
+    use Chemistry::OpenSMILES::Writer;
+
+    print Chemistry::OpenSMILES::Writer::write( \@moieties );
+
 =head1 DESCRIPTION
 
 Chemistry::OpenSMILES provides support for SMILES chemical identifiers
@@ -40,6 +56,9 @@ conforming to OpenSMILES v1.0 specification
 Chemistry::OpenSMILES::Parser reads in SMILES strings and returns them
 parsed to arrays of L<Graph::Undirected|Graph::Undirected> objects. Each
 atom is represented by a hash.
+
+Chemistry::OpenSMILES::Writer performs the inverse operation. Generated
+SMILES strings are by no means optimal.
 
 =head2 Molecular graph
 
@@ -57,7 +76,7 @@ references:
         "isotope"   => 13,
         "chirality" => "@@",
         "hcount"    => 3,
-        "charge"    => "+",
+        "charge"    => 1,
         "class"     => 0,
         "number"    => 0,
     }

@@ -1,34 +1,31 @@
 use Test::More;
-use Module::Build;
-use Try::Tiny;
 use blib;
 use Cwd;
 use URI::bolt;
 use Neo4j::Bolt;
+use File::Spec;
 use strict;
 
-my $build;
-try {
-  $build = Module::Build->current();
-} catch {
-  my $d = getcwd;
-  chdir '..';
-  $build = Module::Build->current();
-  chdir $d;
-};
 
-unless (defined $build) {
-  plan skip_all => "No build context. Run tests with ./Build test.";
+my $neo_info;
+my $nif = File::Spec->catfile('t','neo_info');
+if (-e $nif ) {
+    local $/;
+    open my $fh, "<", $nif or die $!;
+    my $val = <$fh>;
+    $val =~ s/^.*?(=.*)$/\$neo_info $1/s;
+    eval $val;
 }
 
-unless (defined $build->notes('db_url')) {
-  plan skip_all => "Local db tests not requested.";
+
+unless (defined $neo_info) {
+  plan skip_all => "DB tests not requested";
 }
 
-my $url = URI->new($build->notes('db_url'));
+my $url = URI->new("bolt://".$neo_info->{host});
 
-if ($build->notes('db_user')) {
-  $url->userinfo($build->notes('db_user').':'.$build->notes('db_pass'));
+if ($neo_info->{user}) {
+  $url->userinfo($neo_info->{user}.':'.$neo_info->{pass});
 }
 
 ok my $cxn = Neo4j::Bolt->connect($url->as_string), "attempt connection";
@@ -38,9 +35,10 @@ unless ($cxn->connected) {
 
 SKIP: {
   skip "Couldn't connect to server", 1 unless $cxn->connected;
+  like $cxn->protocol_version, qr/^[0-9]+\.[0-9]+$/, "protocol version returned";
   ok my $stream = $cxn->run_query_(
     "MATCH (a) RETURN labels(a) as lbl, count(a) as ct",
-    {},0
+    {},0,$Neo4j::Bolt::DEFAULT_DB
    ), 'label count query';
   ok $stream->success, "Succeeded";
   ok !$stream->failure, "Not failure";
@@ -60,26 +58,30 @@ SKIP: {
   ok $stream = $cxn->run_query("MATCH p = (a)-->(b) RETURN p LIMIT 1"), 'path query';
   
   my ($pth) = $stream->fetch_next;
-  is ref $pth, 'Neo4j::Bolt::Path', 'got path as Neo4j::Bolt::Path';
-  is scalar @$pth, 3, 'path array length';
-  is ref $pth->[0], 'Neo4j::Bolt::Node', 'got start node as Neo4j::Bolt::Node';
-  is ref $pth->[2], 'Neo4j::Bolt::Node', 'got end node as Neo4j::Bolt::Node';
-  is ref $pth->[1], 'Neo4j::Bolt::Relationship', 'relationship is a Neo4j::Bolt::Relationship';
-  is $pth->[1]->{start}, $pth->[0]->{id}, 'relationship start correct';
-  is $pth->[1]->{end}, $pth->[2]->{id}, 'relationship end correct';
-  
+  if (defined $pth) {
+    is ref $pth, 'Neo4j::Bolt::Path', 'got path as Neo4j::Bolt::Path';
+    is scalar @$pth, 3, 'path array length';
+    is ref $pth->[0], 'Neo4j::Bolt::Node', 'got start node as Neo4j::Bolt::Node';
+    is ref $pth->[2], 'Neo4j::Bolt::Node', 'got end node as Neo4j::Bolt::Node';
+    is ref $pth->[1], 'Neo4j::Bolt::Relationship', 'relationship is a Neo4j::Bolt::Relationship';
+    is $pth->[1]->{start}, $pth->[0]->{id}, 'relationship start correct';
+    is $pth->[1]->{end}, $pth->[2]->{id}, 'relationship end correct';
+  }
   ok $stream = $cxn->run_query("MATCH p = (a)<--(b) RETURN p LIMIT 1"), 'path query 2';
   
   ($pth) = $stream->fetch_next;
-  is ref $pth, 'Neo4j::Bolt::Path', 'got path 2 as Neo4j::Bolt::Path';
-  is scalar @$pth, 3, 'path array length';
-  is ref $pth->[0], 'Neo4j::Bolt::Node', 'got start node 2 as Neo4j::Bolt::Node';
-  is ref $pth->[2], 'Neo4j::Bolt::Node', 'got end node 2 as Neo4j::Bolt::Node';
-  is ref $pth->[1], 'Neo4j::Bolt::Relationship', 'relationship 2 is a Neo4j::Bolt::Relationship';
-  is $pth->[1]->{end}, $pth->[0]->{id}, 'relationship 2 end correct';
-  is $pth->[1]->{start}, $pth->[2]->{id}, 'relationship 2 start correct';
-  
-  ok $stream = $cxn->run_query("CALL db.labels()"), 'call db.labels()';
+  if (defined $pth) {  
+    is ref $pth, 'Neo4j::Bolt::Path', 'got path 2 as Neo4j::Bolt::Path';
+    is scalar @$pth, 3, 'path array length';
+    is ref $pth->[0], 'Neo4j::Bolt::Node', 'got start node 2 as Neo4j::Bolt::Node';
+    is ref $pth->[2], 'Neo4j::Bolt::Node', 'got end node 2 as Neo4j::Bolt::Node';
+    is ref $pth->[1], 'Neo4j::Bolt::Relationship', 'relationship 2 is a Neo4j::Bolt::Relationship';
+    is $pth->[1]->{end}, $pth->[0]->{id}, 'relationship 2 end correct';
+    is $pth->[1]->{start}, $pth->[2]->{id}, 'relationship 2 start correct';
+  }
+  ok $stream = $cxn->run_query("CALL db.schlabels()"), 'call db.labels()';
+  my $fd = $stream->get_failure_details;
+  ok $fd, "got fd";
   my @lbl;
   while ( my @row = $stream->fetch_next ) {
     push @lbl, $row[0];
@@ -94,7 +96,7 @@ SKIP: {
   }
 
   SKIP : {
-    skip "Add/delete tests not requested", 1 unless $build->notes('ok_add_delete');
+    skip "Add/delete tests not requested", 1 unless $neo_info->{tests};
     ok $stream = $cxn->do_query('CREATE (a:Boog:Frelb {prop1: "goob"})'), 'create a node and a property';
     ok $stream->success, 'q succeeds';
 #    $stream->fetch_next_;

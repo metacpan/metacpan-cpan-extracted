@@ -4,7 +4,7 @@ InfluxDB::LineProtocol - Write and read InfluxDB LineProtocol
 
 # VERSION
 
-version 1.013
+version 1.014
 
 # SYNOPSIS
 

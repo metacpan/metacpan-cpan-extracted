@@ -14,17 +14,17 @@
 <http://purl.org/NET/cpan-uri/dist/Types-XSD/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap-deps:runtime-requirement [
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008003"^^doap-deps:CpanId ], [
 		doap-deps:on "DateTime::Incomplete 0"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "DateTimeX::Auto 0.004"^^doap-deps:CpanId;
 	], [
-		doap-deps:on "Type::Library 0.004"^^doap-deps:CpanId;
+		doap-deps:on "Type::Library 1.000000"^^doap-deps:CpanId;
 	], [ doap-deps:on "XML::RegExp 0"^^doap-deps:CpanId ], [
-		doap-deps:on "Types::XSD::Lite 0.004"^^doap-deps:CpanId;
+		doap-deps:on "Types::XSD::Lite 0.006"^^doap-deps:CpanId;
 	];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [
-		doap-deps:on "Test::TypeTiny 0.004"^^doap-deps:CpanId;
+		doap-deps:on "Test::TypeTiny 1.000000"^^doap-deps:CpanId;
 	];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Types-XSD>;
 	doap:created         "2013-04-15"^^xsd:date;
@@ -35,7 +35,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Types-XSD";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-005>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-007>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-types-xsd>;
@@ -182,12 +182,61 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-XSD-0.005.tar.gz>;
 	doap:revision        "0.005"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Types-XSD-0.006"^^xsd:string;
+	dc:issued            "2021-01-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix regexps being applied to multiline strings.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Require newest Types::XSD::Lite.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Explicit dependency on Perl 5.8.3.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Silence warnings.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-XSD-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Types-XSD-0.007"^^xsd:string;
+	dc:issued            "2021-01-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Don't `use Types::XSD::Lite` in examples.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/121089>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/djerius>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-XSD-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/djerius>
+	a                    foaf:Person;
+	foaf:nick            "DJERIUS";
+	foaf:page            <https://metacpan.org/author/DJERIUS>.
+
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:tobyink@cpan.org>;
 	foaf:name            "Toby Inkster";
 	foaf:nick            "TOBYINK";
 	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/121089>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "121089"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=121089>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/89005>
 	a                    doap-bugs:Issue;

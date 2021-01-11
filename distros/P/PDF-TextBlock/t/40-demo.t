@@ -1,3 +1,16 @@
+BEGIN {
+  my $rc;
+  $rc = eval {
+    require PDF::API2;
+    1;
+  };
+  if (!defined $rc) { $rc = 0; }
+  unless($rc) {
+    print qq{1..0 # SKIP these tests; PDF::API2 is not installed\n};
+    exit;
+  }
+}
+
 use Test::More tests => 6;
 
 # Bold some words and hyperlink a few other things

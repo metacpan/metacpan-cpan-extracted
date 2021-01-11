@@ -59,99 +59,99 @@
    "provides" : {
       "REST::Neo4p" : {
          "file" : "lib/REST/Neo4p.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Agent" : {
          "file" : "lib/REST/Neo4p/Agent.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Agent::HTTP::Thin" : {
          "file" : "lib/REST/Neo4p/Agent/HTTP/Thin.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Agent::LWP::UserAgent" : {
          "file" : "lib/REST/Neo4p/Agent/LWP/UserAgent.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Agent::Mojo::UserAgent" : {
          "file" : "lib/REST/Neo4p/Agent/Mojo/UserAgent.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Agent::Neo4j::Driver" : {
          "file" : "lib/REST/Neo4p/Agent/Neo4j/Driver.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Batch" : {
          "file" : "lib/REST/Neo4p/Batch.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Constrain" : {
          "file" : "lib/REST/Neo4p/Constrain.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Constraint" : {
          "file" : "lib/REST/Neo4p/Constraint.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Constraint::NodeProperty" : {
          "file" : "lib/REST/Neo4p/Constraint/Property.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Constraint::Property" : {
          "file" : "lib/REST/Neo4p/Constraint/Property.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Constraint::Relationship" : {
          "file" : "lib/REST/Neo4p/Constraint/Relationship.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Constraint::RelationshipProperty" : {
          "file" : "lib/REST/Neo4p/Constraint/Property.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Constraint::RelationshipType" : {
          "file" : "lib/REST/Neo4p/Constraint/RelationshipType.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Entity" : {
          "file" : "lib/REST/Neo4p/Entity.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Exceptions" : {
          "file" : "lib/REST/Neo4p/Exceptions.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Index" : {
          "file" : "lib/REST/Neo4p/Index.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Node" : {
          "file" : "lib/REST/Neo4p/Node.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::ParseStream" : {
          "file" : "lib/REST/Neo4p/ParseStream.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Path" : {
          "file" : "lib/REST/Neo4p/Path.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Query" : {
          "file" : "lib/REST/Neo4p/Query.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Relationship" : {
          "file" : "lib/REST/Neo4p/Relationship.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Schema" : {
          "file" : "lib/REST/Neo4p/Schema.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       },
       "REST::Neo4p::Simple" : {
          "file" : "lib/REST/Neo4p/Entity.pm",
-         "version" : "0.4000"
+         "version" : "0.4001"
       }
    },
    "release_status" : "stable",
@@ -166,7 +166,7 @@
          "url" : "http://github.com/majensen/rest-neo4p.git"
       }
    },
-   "version" : "0.4000",
+   "version" : "0.4001",
    "x_contributors" : [
       "Mark A. Jensen <majensen@cpan.org>",
       "Arne Johannessen <ajnn@cpan.org>",

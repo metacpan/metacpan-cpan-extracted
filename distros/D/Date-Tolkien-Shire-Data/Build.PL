@@ -29,7 +29,7 @@ $mbv >= 0.28 and $args{meta_merge} = {
 	directory => [qw{inc t xt}],
     },
     resources => {
-	bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire-Data',
+	bugtracker => 'https://github.com/trwyant/perl-Date-Tolkien-Shire-Data/issues',
     },
 };
 

@@ -60,13 +60,13 @@ setsplice(PerlIO *so, ...)
 			sp.sp_idle.tv_sec = SvIV(ST(3));
 		} else if (SvNOK(ST(3))) {
 			idle = SvNV(ST(3));
-			sp.sp_idle.tv_sec = (long)floor(idle);
+			sp.sp_idle.tv_sec = (time_t)floor(idle);
 			idle -= (double)sp.sp_idle.tv_sec;
 			if (fabs(idle) >= 1.) {
 				errno = EINVAL;
 				XSRETURN_UNDEF;
 			}
-			sp.sp_idle.tv_usec = (long)floor(1000000 * idle);
+			sp.sp_idle.tv_usec = (time_t)floor(1000000 * idle);
 		} else if (SvOK(ST(3))) {
 			croak("Non numeric idle value for setsplice");
 		}

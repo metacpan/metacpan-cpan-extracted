@@ -1,4 +1,5 @@
-use Test::More tests => 1;
-use Test::Exception;
+use Test2::V0;
 
-throws_ok( sub { say $^V }, qr/Can't locate object method "say"/, 'say' );
+like( dies { say $^V }, qr/Can't locate object method "say"/, 'say' );
+
+done_testing;

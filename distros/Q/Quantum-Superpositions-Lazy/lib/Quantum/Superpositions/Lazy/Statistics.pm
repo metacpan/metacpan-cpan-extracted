@@ -1,8 +1,9 @@
 package Quantum::Superpositions::Lazy::Statistics;
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
-use v5.28; use warnings;
+use v5.28;
+use warnings;
 use Moo;
 
 use feature qw(signatures);
@@ -38,7 +39,8 @@ sub weight_to_probability ($item, $weight_sum)
 
 sub weighted_mean ($list_ref, $weight_sum = undef)
 {
-	$weight_sum = sum map { $_->weight } $list_ref->@*
+	$weight_sum = sum map { $_->weight }
+	$list_ref->@*
 		unless defined $weight_sum;
 
 	my @values = map { $_->value * $_->weight / $weight_sum } $list_ref->@*;
@@ -82,7 +84,7 @@ sub weighted_median ($sorted_list_ref, $average = 0)
 
 # CAUTION: float == comparison inside. Will only work for elements
 # that were obtained in a similar fasion
-sub find_border_elements($sorted)
+sub find_border_elements ($sorted)
 {
 	my @found;
 	for my $state (@$sorted) {
@@ -101,6 +103,8 @@ my %options = (
 
 use namespace::clean;
 
+our $implementation = __PACKAGE__;
+
 has "parent" => (
 	is => "ro",
 	isa => ConsumerOf ["Quantum::Superpositions::Lazy::Role::Collapsible"],
@@ -115,7 +119,7 @@ has "sorted_by_probability" => (
 		[
 			map {
 				weight_to_probability($_, $self->parent->weight_sum)
-				}
+			}
 				nkeysort {
 				$_->weight
 			}
@@ -209,22 +213,22 @@ has "variance" => (
 	},
 );
 
-sub sorted_by_value($self)
+sub sorted_by_value ($self)
 {
 	return $self->sorted_by_value_str;
 }
 
-sub median($self)
+sub median ($self)
 {
 	return $self->median_str;
 }
 
-sub expected_value($self)
+sub expected_value ($self)
 {
 	return $self->mean;
 }
 
-sub standard_deviation($self)
+sub standard_deviation ($self)
 {
 	return sqrt $self->variance;
 }
@@ -287,7 +291,9 @@ elements. The return value is a new superposition which contains the border
 elements. Multiple border elements will be grouped in this superposition.
 
 =head2 median
+
 =head2 median_str
+
 =head2 median_num
 
 Returns the weighted median of the superposition states (a floating point
@@ -320,3 +326,38 @@ Returns the variance of the data set (a floating point value).
 Returns the standard deviation of the data set - a square root of variance (a
 floating point value).
 
+=head1 EXTENDING
+
+The class can be extended by replacing the value of C<$Quantum::Superpositions::Lazy::Statistics::implementation> with another package name. C<< $superposition->stats >> call will instantiate and return anything that is present in that variable. The package should already be loaded, the module will not try to load it. It has to inherit from I<Quantum::Superpositions::Lazy::Statistics>.
+
+An example class that replaces the implementation on use:
+
+	package MyStatistics;
+
+	use parent 'Quantum::Superpositions::Lazy::Statistics';
+
+	$Quantum::Superpositions::Lazy::Statistics::implementation = __PACKAGE__;
+
+	sub my_statistical_measure {
+		my ($self) = @_;
+
+		return ...;
+	}
+
+	1;
+
+Also note that a I<local> keyword can be used to replace the implementation only for a given lexical scope:
+
+	my $superpos = superpos(1, 2, 3);
+	{
+		local $Quantum::Superpositions::Lazy::Statistics::implementation = 'Some::Class';
+		$superpos->stats; # stats are lazily built and cached
+	}
+
+	$superpos->stats->some_method; # will also be another class implementation because of caching
+
+=head1 CAVEATS
+
+I<parent> is a weak ref. Because of this, this (and many others) will explode:
+
+	superpos(1)->stats->most_probable;

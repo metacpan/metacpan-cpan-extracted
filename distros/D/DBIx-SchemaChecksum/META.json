@@ -1,20 +1,27 @@
 {
    "abstract" : "Manage your datebase schema via checksums",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>",
-      "Maroš Kollár <maros@cpan.org>",
+      "Thomas Klausner <domm@plix.at>",
+      "Maro\u0161 Koll\u00e1r <maros@cpan.org>",
       "Klaus Ita <koki@worstofall.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBIx-SchemaChecksum",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -33,7 +40,6 @@
             "Data::Dumper" : "0",
             "Digest::SHA1" : "0",
             "File::Find::Rule" : "0",
-            "File::HomeDir" : "0",
             "IO::Prompt::Tiny" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
@@ -43,10 +49,7 @@
             "Path::Class" : "0",
             "Try::Tiny" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.010",
-            "strict" : "0",
-            "utf8" : "0",
-            "warnings" : "0"
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -55,7 +58,8 @@
             "File::Copy" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
-            "Module::Pluggable" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
             "Test::Trap" : "0",
@@ -63,13 +67,55 @@
          }
       }
    },
-   "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "type" : "git",
-         "url" : "git://git.ips.validad.net/opensource/DBIx-SchemaChecksum"
+   "provides" : {
+      "DBIx::SchemaChecksum" : {
+         "file" : "lib/DBIx/SchemaChecksum.pm",
+         "version" : "1.103"
+      },
+      "DBIx::SchemaChecksum::App" : {
+         "file" : "lib/DBIx/SchemaChecksum/App.pm",
+         "version" : "1.103"
+      },
+      "DBIx::SchemaChecksum::App::ApplyChanges" : {
+         "file" : "lib/DBIx/SchemaChecksum/App/ApplyChanges.pm",
+         "version" : "1.103"
+      },
+      "DBIx::SchemaChecksum::App::Checksum" : {
+         "file" : "lib/DBIx/SchemaChecksum/App/Checksum.pm",
+         "version" : "1.103"
+      },
+      "DBIx::SchemaChecksum::App::NewChangesFile" : {
+         "file" : "lib/DBIx/SchemaChecksum/App/NewChangesFile.pm",
+         "version" : "1.103"
+      },
+      "DBIx::SchemaChecksum::App::ShowUpdatePath" : {
+         "file" : "lib/DBIx/SchemaChecksum/App/ShowUpdatePath.pm",
+         "version" : "1.103"
+      },
+      "DBIx::SchemaChecksum::Driver::Pg" : {
+         "file" : "lib/DBIx/SchemaChecksum/Driver/Pg.pm",
+         "version" : "1.103"
+      },
+      "DBIx::SchemaChecksum::Driver::SQLite" : {
+         "file" : "lib/DBIx/SchemaChecksum/Driver/SQLite.pm",
+         "version" : "1.103"
       }
    },
-   "version" : "1.102"
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/DBIx-SchemaChecksum/issues"
+      },
+      "homepage" : "https://github.com/domm/DBIx-SchemaChecksum",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/domm/DBIx-SchemaChecksum.git",
+         "web" : "https://github.com/domm/DBIx-SchemaChecksum"
+      }
+   },
+   "version" : "1.103",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

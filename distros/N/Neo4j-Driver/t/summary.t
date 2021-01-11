@@ -16,8 +16,9 @@ my $s = $driver->session;  # only for autocommit transactions
 
 # These tests are for the result summary and statistics.
 
-use Test::More 0.96 tests => 5 + 1;
+use Test::More 0.96 tests => 5 + 2;
 use Test::Exception;
+use Test::Warnings;
 my $transaction = $driver->session->begin_transaction;
 
 
@@ -48,6 +49,7 @@ END
 	TODO: { local $TODO = 'plan/notifications not yet implemented for Bolt' if $Neo4j::Test::bolt;
 	lives_and { ok $plan = $r->plan; } 'get plan';
 	lives_and { ok @notifications = $r->notifications; } 'get notifications';
+	# NB: the server is a bit unreliable in providing notifications; if there are problems with this test, restarting the server usually helps
 	}
 };
 

@@ -4,13 +4,13 @@
       "Alvaro Livraghi"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Kafka-Consumer-Avro",
    "no_index" : {
@@ -34,16 +34,18 @@
       },
       "runtime" : {
          "requires" : {
-            "Avro::BinaryEncoder" : "0",
-            "Avro::Schema" : "0",
-            "Confluent::SchemaRegistry" : "0.03",
-            "JSON::XS" : "3.02",
-            "Kafka::Consumer" : "1.07",
+            "Avro::BinaryDecoder" : "v1.10.1",
+            "Avro::Schema" : "v1.10.1",
+            "Confluent::SchemaRegistry" : "v1.0.0",
+            "IO::String" : "v1.80.0",
+            "JSON::XS" : "v4.30.0",
+            "Kafka::Consumer" : "v1.8.0",
             "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
+            "Kafka::Producer::Avro" : "v1.0.0",
             "Math::BigInt" : "1.89",
             "Test::Exception" : "0.43"
          }
@@ -60,5 +62,6 @@
          "web" : "https://github.com/alivraghi/Kafka-Consumer-Avro.git"
       }
    },
-   "version" : "0.01"
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

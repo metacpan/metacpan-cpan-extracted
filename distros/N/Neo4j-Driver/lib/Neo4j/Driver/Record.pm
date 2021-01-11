@@ -5,21 +5,12 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.18';
+$Neo4j::Driver::Record::VERSION = '0.20';
 
 use Carp qw(croak);
 use JSON::MaybeXS 1.003003 qw(is_bool);
 
 use Neo4j::Driver::ResultSummary;
-
-
-sub new {
-	my ($class, $record, $columns, $deep_bless, $cypher_types) = @_;
-	
-	$record->{column_keys} = $columns;
-	$deep_bless->( $cypher_types, $record->{row}, $record->{meta}, $record->{rest} );
-	return bless $record, $class;
-}
 
 
 # Based on _looks_like_number() in JSON:PP 4.05, originally by HAARG.
@@ -119,7 +110,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -139,7 +130,7 @@ version 0.18
 =head1 DESCRIPTION
 
 Container for Cypher result values. Records are returned from Cypher
-statement execution, contained within a StatementResult. A record is
+statement execution, contained within a Result. A record is
 a form of ordered map and, as such, contained values can be accessed
 by either positional index or textual key.
 
@@ -238,7 +229,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2020 by Arne Johannessen.
+This software is Copyright (c) 2016-2021 by Arne Johannessen.
 
 This is free software, licensed under:
 

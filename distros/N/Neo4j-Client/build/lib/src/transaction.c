@@ -24,6 +24,7 @@
 #include "values.h"
 #include "atomic.h"
 #include <assert.h>
+#include <string.h>
 #include <stddef.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -86,8 +87,11 @@ int begin_callback(void *cdata, neo4j_message_type_t type, const neo4j_value_t *
   assert(argc == 0 || argv != NULL);
   neo4j_transaction_t *tx = (neo4j_transaction_t *) cdata;
 
+#ifndef NEOCLIENT_BUILD  
   if (type == NEO4J_FAILURE_MESSAGE)
-
+#else
+  if ( MESSAGE_TYPE_IS(type,FAILURE) )
+#endif
     {
       // get FAILURE argv and set tx failure info here
       tx->failed = 1;
@@ -99,7 +103,12 @@ int begin_callback(void *cdata, neo4j_message_type_t type, const neo4j_value_t *
 
       return -1;
     }
+
+#ifndef NEOCLIENT_BUILD  
   if (type == NEO4J_IGNORED_MESSAGE)
+#else
+  if ( MESSAGE_TYPE_IS(type,IGNORED) )
+#endif
     {
       neo4j_log_trace(tx->logger, "tx begin ignored");
       return 0;
@@ -108,7 +117,11 @@ int begin_callback(void *cdata, neo4j_message_type_t type, const neo4j_value_t *
   snprintf(description, sizeof(description), "%s in %p (response to BEGIN)",
            neo4j_message_type_str(type), (void *)tx->connection);
 
+#ifndef NEOCLIENT_BUILD  
   if (type != NEO4J_SUCCESS_MESSAGE)
+#else
+  if ( !MESSAGE_TYPE_IS(type,SUCCESS) )
+#endif
     {
       neo4j_log_error(tx->logger, "Unexpected %s", description);
       tx->failed = 1;
@@ -146,7 +159,11 @@ int commit_callback(void *cdata, neo4j_message_type_t type, const neo4j_value_t 
   assert(argc == 0 || argv != NULL);
   neo4j_transaction_t *tx = (neo4j_transaction_t *) cdata;
 
+#ifndef NEOCLIENT_BUILD  
   if (type == NEO4J_FAILURE_MESSAGE)
+#else
+  if ( MESSAGE_TYPE_IS(type,FAILURE) )
+#endif
     {
       // get FAILURE argv and set tx failure info here
       tx->failed = 1;
@@ -158,7 +175,11 @@ int commit_callback(void *cdata, neo4j_message_type_t type, const neo4j_value_t 
       neo4j_log_error_errno(tx->logger, "tx commit failed");
       return -1;
     }
+#ifndef NEOCLIENT_BUILD  
   if (type == NEO4J_IGNORED_MESSAGE)
+#else
+  if ( MESSAGE_TYPE_IS(type,IGNORED) )
+#endif
     {
       neo4j_log_trace(tx->logger, "tx commit ignored");
       return 0;
@@ -167,7 +188,11 @@ int commit_callback(void *cdata, neo4j_message_type_t type, const neo4j_value_t 
   snprintf(description, sizeof(description), "%s in %p (response to COMMIT)",
            neo4j_message_type_str(type), (void *)tx->connection);
 
+#ifndef NEOCLIENT_BUILD  
   if (type != NEO4J_SUCCESS_MESSAGE)
+#else
+  if ( !MESSAGE_TYPE_IS(type,SUCCESS) )
+#endif
     {
       neo4j_log_error(tx->logger, "Unexpected %s", description);
       tx->failed = -1;
@@ -212,7 +237,11 @@ int rollback_callback(void *cdata, neo4j_message_type_t type, const neo4j_value_
   assert(cdata != NULL);
   assert(argc == 0 || argv != NULL);
   neo4j_transaction_t *tx = (neo4j_transaction_t *) cdata;
+#ifndef NEOCLIENT_BUILD  
   if (type == NEO4J_FAILURE_MESSAGE)
+#else
+  if ( MESSAGE_TYPE_IS(type,FAILURE) )
+#endif
     {
       // get FAILURE argv and set tx failure info here
       tx->failed = 1;
@@ -224,7 +253,11 @@ int rollback_callback(void *cdata, neo4j_message_type_t type, const neo4j_value_
       neo4j_log_error_errno(tx->logger, "tx rollback failed");
       return -1;
     }
+#ifndef NEOCLIENT_BUILD  
   if (type == NEO4J_IGNORED_MESSAGE)
+#else
+  if ( MESSAGE_TYPE_IS(type,IGNORED) )
+#endif
     {
       neo4j_log_trace(tx->logger, "tx rollback ignored");
       return 0;
@@ -233,7 +266,11 @@ int rollback_callback(void *cdata, neo4j_message_type_t type, const neo4j_value_
   snprintf(description, sizeof(description), "%s in %p (response to ROLLBACK)",
            neo4j_message_type_str(type), (void *)tx->connection);
 
+#ifndef NEOCLIENT_BUILD  
   if (type != NEO4J_SUCCESS_MESSAGE)
+#else
+  if ( !MESSAGE_TYPE_IS(type,SUCCESS) )
+#endif
     {
       neo4j_log_error(tx->logger, "Unexpected %s", description);
       tx->failed = 1;
@@ -264,14 +301,15 @@ neo4j_result_stream_t *tx_run(neo4j_transaction_t *tx,
   }
   else
   {
+      
       if (tx->connection->version < 4 || neo4j_tx_dbname(tx) == NULL)
-      {
-	  tx->results = (send == 0? neo4j_run_in_db( tx->connection, statement, params, neo4j_tx_dbname(tx) ) : neo4j_send_to_db(tx->connection, statement, params, neo4j_tx_dbname(tx)));
-      }
-      else
       {
 	  // short circuit dbname if version isn't high enough
 	  tx->results = (send==0? neo4j_run( tx->connection, statement, params ): neo4j_send(tx->connection, statement, params));
+      }
+      else
+      {
+	  tx->results = (send == 0? neo4j_run_in_db( tx->connection, statement, params, neo4j_tx_dbname(tx) ) : neo4j_send_to_db(tx->connection, statement, params, neo4j_tx_dbname(tx)));
       }
   }
 
@@ -337,8 +375,8 @@ neo4j_transaction_t *new_transaction(neo4j_config_t *config, neo4j_connection_t 
   tx->run = tx_run;
 
   tx->timeout = timeout;
-  tx->mode = ( mode == NULL ? "w" : mode );
-  tx->dbname = dbname;
+  tx->mode = ( mode == NULL ? "w" : strdup(mode) );
+  tx->dbname = strdup(dbname);
   tx->is_open = 0;
   tx->is_expired = 0;
   tx->failed = 0;
@@ -397,6 +435,10 @@ neo4j_result_stream_t *neo4j_run_in_tx(neo4j_transaction_t *tx, const char *stat
       tx->results = NULL;
       return NULL;
   }
+  neo4j_log_trace(tx->logger,
+		  "Query on %p via transaction %p\n",
+		  (void *)tx->connection, (void *)tx);
+  
   return tx->run(tx, statement, params, 0);
 }
 

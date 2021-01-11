@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultColumns;
 # ABSTRACT: Structure definition of Cypher result values
-$Neo4j::Driver::ResultColumns::VERSION = '0.18';
+$Neo4j::Driver::ResultColumns::VERSION = '0.20';
 
 use Carp qw(croak);
 
@@ -72,7 +72,7 @@ Neo4j::Driver::ResultColumns - Structure definition of Cypher result values
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 DESCRIPTION
 
@@ -85,7 +85,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2020 by Arne Johannessen.
+This software is Copyright (c) 2016-2021 by Arne Johannessen.
 
 This is free software, licensed under:
 

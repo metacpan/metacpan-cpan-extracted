@@ -11,7 +11,7 @@ require DynaLoader;
 our @ISA = qw(DynaLoader);
 
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub dl_load_flags { 0x01 }
 
@@ -24,7 +24,7 @@ __END__
 
 =head1 NAME
 
-Gtk2::TrayIcon - Perl interface to the EggTrayIcon library
+Gtk2::TrayIcon - (DEPRECATED) Perl interface to the EggTrayIcon library
 
 =head1 SYNOPSIS
 
@@ -40,10 +40,56 @@ Gtk2::TrayIcon - Perl interface to the EggTrayIcon library
 
 =head1 ABSTRACT
 
-This module allows a Perl developer to embed an arbitrary widget
+B<DEPRECATED> This module allows a Perl developer to embed an arbitrary widget
 in a System Tray like the Gnome notification area.
 
 =head1 DESCRIPTION
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gtk2-trayicon
+
+=item *
+
+Upstream URL: https://gitlab.gnome.org/GNOME/libegg
+
+=item *
+
+Last upstream version: N/A
+
+=item *
+
+Last upstream release date: 2009-05-01
+
+=item *
+
+Migration path for this module: Gtk3::StatusIcon
+
+=item *
+
+Migration module URL: https://metacpan.org/pod/Gtk3
+
+=back
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
 
 EggTrayIcon is slated for inclusion in Gtk+ at some point, which is the
 reason the C<Gtk2::TrayIcon> namespace. As all egg libs, EggTrayIcon
@@ -53,7 +99,7 @@ Enough about what it is not, C<Gtk2::TrayIcon> is first and foremost
 a simple way of giving a Gtk2 script access to the system tray.
 
 System Trays are found in both KDE and Gnome. But neither support the
-spec fully (see below). 
+spec fully (see below).
 
 C<Gtk2::TrayIcon> is a subclass of C<Gtk2::Plug> and should be used
 as such.
@@ -111,8 +157,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the 
-Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
-Boston, MA  02111-1307  USA.
+License along with this library; if not, see
+<https://www.gnu.org/licenses/>.
 
 =cut

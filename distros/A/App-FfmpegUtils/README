@@ -2,7 +2,7 @@ NAME
     App::FfmpegUtils - Utilities related to ffmpeg
 
 VERSION
-    This document describes version 0.007 of App::FfmpegUtils (from Perl
+    This document describes version 0.008 of App::FfmpegUtils (from Perl
     distribution App-FfmpegUtils), released on 2020-12-12.
 
 FUNCTIONS
@@ -13,10 +13,10 @@ FUNCTIONS
 
     Re-encode video (using ffmpeg and libx264).
 
-    This utility runs ffmpeg to re-encode your video files using the libx264
-    codec. It is a wrapper to simplify invocation of ffmpeg. It selects the
-    appropriate ffmpeg options for you, allows you to specify multiple
-    files, and picks appropriate output filenames. It also sports a
+    This utility runs *ffmpeg* to re-encode your video files using the
+    libx264 codec. It is a wrapper to simplify invocation of ffmpeg. It
+    selects the appropriate ffmpeg options for you, allows you to specify
+    multiple files, and picks appropriate output filenames. It also sports a
     "--dry-run" option to let you see ffmpeg options to be used without
     actually running ffmpeg.
 
@@ -107,6 +107,17 @@ FUNCTIONS
 
     Split video by duration into parts.
 
+    This utility uses *ffmpeg* (particularly the "-t" and "-ss") option to
+    split a longer video into shorter videos. For example, if you have
+    "long.mp4" with duration of 1h12m and you run it through this utility
+    with "--every 15min" then you will have 5 new video files:
+    "long.1of5.mp4" (15min), "long.2of5.mp4" (15min), "long.3of5.mp4"
+    (15min), "long.4of5.mp4" (15min), and "long.5of5.mp4" (12min).
+
+    Currently this utility uses "-c copy" ffmpeg option, so there might be a
+    few of seconds of glitches around the cut points. An option to use other
+    codec will be provided in the future.
+
     This function is not exported.
 
     This function supports dry-run operation.
@@ -144,7 +155,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-FfmpegUtils>
+    <https://github.com/perlancar/perl-App-FfmpegUtils/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

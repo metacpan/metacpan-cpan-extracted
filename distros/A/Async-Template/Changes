@@ -1,5 +1,9 @@
 Revision history for Perl extension Async::Template
 
+0.14 2021-01-09T12:07:41Z
+
+     fix depth for tests
+
 0.12 2020-12-31T14:59:49Z
 
       Mon Mar 20 17:27:51 2017 +0400

@@ -1,6 +1,11 @@
 Changelog for Mojolicious-Plugin-Component
 
-0.03 2021-01-07T01:38:22
+0.04 2021-01-07T19:31:31
+ - Add release updates
+ - Implement preprocess, postprocess, processor, and template (#12)
+
+0.03 2021-01-07T01:38:24
+ - Built release version 0.03
  - Add release updates
  - Add support for variable-injection (#8)
 

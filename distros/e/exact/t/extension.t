@@ -1,10 +1,9 @@
-use Test::More;
-use Test::Exception;
+use Test2::V0;
 
 my $version = ( $^V =~ /v\d+\.(\d+)/ ) ? $1 : 0;
 
 SKIP: {
-    skip( ": Perl $^V does not support extensions", 1 ) if ( $version < 14 );
+    skip( "Perl $^V does not support extensions", 1 ) if ( $version < 14 );
 
     BEGIN {
         package exact::____test;
@@ -28,11 +27,11 @@ SKIP: {
         $INC{'exact/____test.pm'} = 1;
     }
 
-    use_ok( 'exact', '____test' );
+    use exact -noautoclean, '____test';
 
     my $thx = 0;
-    lives_ok( sub { $thx = thx() }, 'thx() imported OK' );
+    ok( lives { $thx = thx() }, 'thx() imported OK' ) or note $@;
     is( $thx, 1138, 'thx() returns correct value' );
 }
 
-done_testing();
+done_testing;

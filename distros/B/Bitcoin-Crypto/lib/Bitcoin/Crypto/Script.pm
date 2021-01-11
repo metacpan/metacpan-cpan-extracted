@@ -1,6 +1,9 @@
 package Bitcoin::Crypto::Script;
 
-use v5.10; use warnings;
+our $VERSION = "0.996";
+
+use v5.10;
+use warnings;
 use Moo;
 use Types::Standard qw(ArrayRef Str);
 use Crypt::Digest::SHA256 qw(sha256);
@@ -10,10 +13,8 @@ use Bitcoin::Crypto::Bech32 qw(encode_segwit);
 use Bitcoin::Crypto::Config;
 use Bitcoin::Crypto::Helpers qw(hash160 hash256 verify_bytestring);
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto;
 
 use namespace::clean;
-our $VERSION = Bitcoin::Crypto->VERSION;
 
 with "Bitcoin::Crypto::Role::Network";
 
@@ -386,7 +387,7 @@ sub get_segwit_address
 __END__
 =head1 NAME
 
-Bitcoin::Crypto::Script - class for Bitcoin script representations
+Bitcoin::Crypto::Script - Bitcoin script representations
 
 =head1 SYNOPSIS
 
@@ -414,8 +415,6 @@ You can use a script object to:
 =item * serialize script into byte string
 
 =item * create legacy (p2sh), compat (p2sh(p2wsh)) and segwit (p2wsh) adresses
-
-=item * (work in progress) run script and get resulting stack
 
 =back
 

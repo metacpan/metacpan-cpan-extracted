@@ -1,5 +1,13 @@
 Revision history for Auth::GoogleAuth
 
+1.03      2021-01-10 13:38:22-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+        - Update Travis YAML
+
 1.02      2017-12-26 13:50:58-08:00 America/Los_Angeles
         - Adding Perl versions to test; annual general update for 2018
 

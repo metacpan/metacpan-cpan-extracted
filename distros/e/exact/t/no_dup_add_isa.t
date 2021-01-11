@@ -1,6 +1,5 @@
-use Test::Most tests => 6;
-
-use_ok('exact');
+use Test2::V0;
+use exact;
 
 package Parent {
     use exact;
@@ -20,7 +19,9 @@ sub child_parents {
 }
 
 is( child_parents(), '', 'no initial relationship' );
-lives_ok( sub { exact->add_isa( qw( Parent Child ) ) }, 'add isa Parent Child' );
+ok( lives { exact->add_isa( qw( Parent Child ) ) }, 'add isa Parent Child' ) or note $@;
 is( child_parents(), 'Parent', 'parent/child relationship' );
-lives_ok( sub { exact->add_isa( qw( Parent Child ) ) }, 'add isa Parent Child again' );
+ok( lives { exact->add_isa( qw( Parent Child ) ) }, 'add isa Parent Child again' ) or note $@;
 is( child_parents(), 'Parent', 'parent/child relationship unchanged' );
+
+done_testing;

@@ -1,5 +1,17 @@
 Revision history for Neo4j::Driver
 
+0.20  2021-01-10
+
+ - track timeout of HTTP transactions
+
+0.19  2021-01-09  (TRIAL RELEASE)
+
+ - add experimental support for newer Bolt protocol versions (for Neo4j 4)
+ - add experimental protocol() method to ServerInfo
+ - version discovery succeeds on Neo4j 1.x (which is otherwise unsupported)
+ - rename StatementResult module to Result, in line with the Neo4j Driver API
+ - internal redesign (removes private Transport modules)
+
 0.18  2020-10-24
 
  - fix handling of index/key collisions in field names

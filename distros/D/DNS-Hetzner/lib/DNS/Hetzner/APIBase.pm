@@ -1,21 +1,19 @@
 package DNS::Hetzner::APIBase;
-
+$DNS::Hetzner::APIBase::VERSION = '0.05';
 # ABSTRACT: Base class for all entity classes
 
 use v5.24;
 
 use Carp;
-use Data::Printer;
 use Moo;
 use Mojo::UserAgent;
 use Mojo::Util qw(url_escape);
 use Types::Mojo qw(:all);
+use Types::Standard qw(Str);
 
 use DNS::Hetzner::Schema;
 
 use Mojo::Base -strict, -signatures;
-
-our $VERSION = '0.02';
 
 has token    => ( is => 'ro', isa => Str, required => 1 );
 has host     => ( is => 'ro', isa => MojoURL["https?"], default => sub { 'https://dns.hetzner.com' }, coerce => 1 );
@@ -91,7 +89,7 @@ sub request ( $self, $partial_uri, $params = {}, $opts = {} ) {
     my $response = $tx->res;
 
     if ( $tx->error ) {
-        carp np $tx->error;
+        carp $tx->error->{message};
         return;
     }
 
@@ -112,7 +110,7 @@ DNS::Hetzner::APIBase - Base class for all entity classes
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 ATTRIBUTES
 

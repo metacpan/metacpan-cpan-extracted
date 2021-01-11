@@ -7,7 +7,7 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -46,7 +46,7 @@ and that is used.
     ... # Set up some data
     my $object = Class::Simple::Readonly::Cached(object => $person, cache => \%hash);
     my $father1 = $object->father();    # Will call gedcom->father() to get the person's father
-    my $father2 = $object->father();    # Will retived the father from the cache without calling person->father()
+    my $father2 = $object->father();    # Will retrieve the father from the cache without calling person->father()
 
 ## object
 
@@ -120,7 +120,7 @@ You can also look for information at:
 # LICENSE AND COPYRIGHT
 
 Author Nigel Horne: `njh@bandsman.co.uk`
-Copyright (C) 2019, Nigel Horne
+Copyright (C) 2019-2021 Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

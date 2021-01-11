@@ -1,5 +1,10 @@
 #!/usr/bin/env perl
 
+#----------------------------------------------------------------------
+# NOTE: This example predates DNS::Unbound::AnyEvent; if you can,
+# use that module instead of doing your own polling.
+#----------------------------------------------------------------------
+
 use strict;
 use warnings;
 

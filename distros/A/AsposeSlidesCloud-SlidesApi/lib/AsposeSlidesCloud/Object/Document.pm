@@ -39,7 +39,6 @@ use DateTime;
 
 use AsposeSlidesCloud::Object::ResourceBase;
 use AsposeSlidesCloud::Object::ResourceUri;
-use AsposeSlidesCloud::Object::ResourceUriElement;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -181,42 +180,42 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'document_properties' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'DocumentProperties',
     	description => 'Link to Document properties.',
     	format => '',
     	read_only => '',
     		},
     'view_properties' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'ViewProperties',
     	description => 'Link to Document properties.',
     	format => '',
     	read_only => '',
     		},
     'slides' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Slides',
     	description => 'Link to slides collection.',
     	format => '',
     	read_only => '',
     		},
     'images' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Images',
     	description => 'Link to images collection.',
     	format => '',
     	read_only => '',
     		},
     'layout_slides' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'LayoutSlides',
     	description => 'Link to layout slides collection.',
     	format => '',
     	read_only => '',
     		},
     'master_slides' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'MasterSlides',
     	description => 'Link to master slides collection.',
     	format => '',
@@ -227,12 +226,12 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->swagger_types( {
     'self_uri' => 'ResourceUri',
     'alternate_links' => 'ARRAY[ResourceUri]',
-    'document_properties' => 'ResourceUriElement',
-    'view_properties' => 'ResourceUriElement',
-    'slides' => 'ResourceUriElement',
-    'images' => 'ResourceUriElement',
-    'layout_slides' => 'ResourceUriElement',
-    'master_slides' => 'ResourceUriElement'
+    'document_properties' => 'ResourceUri',
+    'view_properties' => 'ResourceUri',
+    'slides' => 'ResourceUri',
+    'images' => 'ResourceUri',
+    'layout_slides' => 'ResourceUri',
+    'master_slides' => 'ResourceUri'
 } );
 
 __PACKAGE__->attribute_map( {

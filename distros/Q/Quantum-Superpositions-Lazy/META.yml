@@ -21,7 +21,6 @@ no_index:
     - inc
 requires:
   Data::Entropy: '0'
-  List::MoreUtils: '0'
   Moo: '0'
   Sort::Key: '0'
   Type::Tiny: '0'
@@ -32,5 +31,5 @@ resources:
   homepage: https://metacpan.org/release/Quantum-Superpositions-Lazy
   license: https://dev.perl.org/licenses
   repository: https://github.com/brtastic/perl-quantum-superpositions-lazy
-version: '1.02'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

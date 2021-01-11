@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.19  2021-01-10 00:00:00
+  - supports free format of mb::use, mb::no
+  - created by INABA Hitoshi
+
 0.18  2021-01-06 00:00:00
   - tried to CPAN Test id=116942340, 116942329, 116879165, 116879164, 116879048, 116879043, 116837347
   - created by INABA Hitoshi

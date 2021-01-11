@@ -49,10 +49,27 @@ use Aspect;
 use Avro::Schema;
 
 
-our $VERSION = '0.04';
+use version 0.77; our $VERSION = version->declare('v1.0.0');
 
 our $COMPATIBILITY_LEVELS = [ qw/NONE FULL FORWARD BACKWARD/ ];
 
+
+=head1 INSTALL
+
+Installation of C<Kafka::Consumer::Avro> is a canonical:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+=head2 TEST NOTES
+
+Tests expect that in the target host is available Schema Registry listening on C<http://localhost:8081>, otherwise most of the test are skipped.
+
+You can alternatively set a different URL by exporting C<CONFLUENT_SCHEMA_REGISTY_URL> environment variable.
+
+=head1 USAGE
 
 =head2 Constructor
 

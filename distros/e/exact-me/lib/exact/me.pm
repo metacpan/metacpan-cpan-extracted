@@ -6,7 +6,7 @@ use exact;
 use strict;
 use FindBin;
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.02'; # VERSION
 
 sub import {
     my ( $self, $caller ) = @_;
@@ -61,10 +61,10 @@ exact::me - Original program path locations extension for exact
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact-me.svg)](https://travis-ci.org/gryphonshafer/exact-me)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact-me/badge.png)](https://coveralls.io/r/gryphonshafer/exact-me)
+=for markdown [![test](https://github.com/gryphonshafer/exact-me/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-me/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/exact-me/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-me)
 
 =head1 SYNOPSIS
 
@@ -130,11 +130,11 @@ L<MetaCPAN|https://metacpan.org/pod/exact::me>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/exact-me>
+L<GitHub Actions|https://github.com/gryphonshafer/exact-me/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/exact-me>
+L<Codecov|https://codecov.io/gh/gryphonshafer/exact-me>
 
 =item *
 
@@ -152,9 +152,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2020-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

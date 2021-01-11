@@ -5,8 +5,11 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Test::DiagINC: '0.002'
-  Test::More: '0'
+  Test::More: '0.94'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -26,8 +29,10 @@ requires:
   Dist::Zilla::Plugin::BumpVersionAfterRelease: '0'
   Dist::Zilla::Plugin::CopyFilesFromBuild: '0'
   Dist::Zilla::Plugin::EnsureChangesHasContent: '0'
+  Dist::Zilla::Plugin::EnsureMinimumPerl: '0'
   Dist::Zilla::Plugin::Git: '2.046'
   Dist::Zilla::Plugin::GitHub: '0.46'
+  Dist::Zilla::Plugin::GitHub::RequireGreenBuild: '0'
   Dist::Zilla::Plugin::Prereqs::AuthorDeps: '0.006'
   Dist::Zilla::Plugin::Prereqs::FromCPANfile: '0.08'
   Dist::Zilla::Plugin::PromptIfStale: '0.057'
@@ -51,11 +56,12 @@ requires:
   Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
   Dist::Zilla::Role::PluginBundle::PluginRemover: '0'
   namespace::autoclean: '0'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/bleargh45/Dist-Zilla-PluginBundle-Author-GTERMARS/issues
   homepage: http://metacpan.org/release/Dist-Zilla-PluginBundle-Author-GTERMARS/
   repository: git://github.com/bleargh45/Dist-Zilla-PluginBundle-Author-GTERMARS.git
-version: '0.02'
+version: '0.03'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

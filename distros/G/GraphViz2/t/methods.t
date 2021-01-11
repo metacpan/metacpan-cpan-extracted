@@ -76,4 +76,10 @@ for ([0,0], [0,1], [1,0], [1,1]) {
   is_deeply_snapshot $gv->edge_hash, "mve edges $is_multiv $is_multie";
 }
 
+{
+  my $g = Graph->new(directed => 0, edges => [[qw(x y)]]);
+  my $gv = GraphViz2->from_graph($g);
+  is_deeply_snapshot $gv->dot_input, "undir dot_input";
+}
+
 done_testing;

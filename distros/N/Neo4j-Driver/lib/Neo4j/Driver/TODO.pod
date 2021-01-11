@@ -17,6 +17,11 @@ See L<https://github.com/johannessen/neo4j-driver-perl/issues>.
 
 =item * Add timers to L<Neo4j::Driver::ResultSummary> (see C<Neo4j::Bolt>).
 
+=item * C<croak()> error objects (e. g. L<Exception::Class>) instead of strings.
+It seems there are about four types that would need to be distinguished: illegal
+usage errors, internal driver errors, Network errors, and Neo4j server errors.
+See also L<#7|https://github.com/johannessen/neo4j-driver-perl/issues/7>.
+
 =back
 
 =head2 Experimental features
@@ -26,7 +31,16 @@ See L<https://github.com/johannessen/neo4j-driver-perl/issues>.
 =item * L<Neo4j::Driver/"Parameter syntax conversion">: make stable and move
 filter implementation to C<Transaction> in preparation of Bolt v3 support
 
+=item * L<Neo4j::Driver/"Type system customisation">: make illegal, but
+create a new config option that continues to provide C<init> functionality
+(same flexibility, simpler API)
+
 =item * L<Neo4j::Driver::Session/"Calling in list context">: make illegal
+
+=item * L<Neo4j::Driver::Session/"Concurrent transactions">: make illegal
+for both nested explicit and nested autocommit transactions (for
+consistency with Bolt), but provide a driver config option (e. g.
+C<< nested_transactions => 1 >>) that lifts this restriction for HTTP
 
 =item * L<Neo4j::Driver::Transaction/"Calling in list context">: make illegal
 
@@ -38,6 +52,14 @@ are typically fetched I<before> the next statement is run.
 =item * L<Neo4j::Driver::Transaction/"Return results in graph format">,
 L<Neo4j::Driver::Record/"graph">: make driver config option
 
+=item * Calling list methods in scalar context
+(L<in Node|Neo4j::Driver::Type::Node/"Calling in scalar context">,
+L<in Path|Neo4j::Driver::Type::Path/"Calling in scalar context">,
+L<in Result|Neo4j::Driver::Result/"Calling in scalar context">, and
+L<in ResultSummary|Neo4j::Driver::ResultSummary/"Calling in scalar context">)
+should probably generally behave the same way using a list in scalar
+context would: It should return the number of items in the list.
+
 =back
 
 =head2 Tests, code quality, documentation
@@ -46,10 +68,6 @@ L<Neo4j::Driver::Record/"graph">: make driver config option
 
 =item * Test roundtrip of special numeric values
 (very large integers, -0.0, ±Inf, ±NaN).
-
-=item * Try to modify the way the data is stored to verify the tests fix in 0.13.
-In particular, the URLs maybe should be parsed by the new type classes instead
-of C<deep_bless>.
 
 =item * Convert tests in C<xt/compatibility> to use L<Module::Load>, so that
 testing/dev dependencies are fewer.
@@ -76,15 +94,15 @@ also fulfils the B<pod> coverage requirements.
 =item * Documenting each attribute in L<Neo4j::Driver::SummaryCounters> as individual
 methods might be a quick way to bring up the B<pod> coverage stats a bit.
 
-=item * Making sure all private methods (e. g. in Neo4j::Driver::Transport::*)
-have names beginning with C<_> might help to improve B<pod> coverage.
-
 =back
 
-=item * List possible C<croak> output in L<Neo4j::Driver/"DIAGNOSTICS">,
-allowing for indexing by search engines.
+=item * Neo4j::Test should auto-detect the Neo4j server version and
+set the C<cypher_filter> config option accordingly.
 
-=item * L<Neo4j::Driver::ResultSummary/"notifications">: clarify docs on list context
+=item * Neo4j::Sim should implement the driver HTTP net module API instead
+of the L<REST::Client> API, so that we can eventually replace REST::Client.
+
+=item * Write new unit tests for all modules.
 
 =item * Optimise the simulator for C<$hash = 0>.
 Use of C<<< << >>> causes statements to end with C<\n>, which the simulator
@@ -97,6 +115,25 @@ are required by (ab)using a particular port number on localhost; the port could
 be checked beforehand and the test skipped if it happens to be open for some
 reason. Alternatively, the tests in question could be changed to a simulated
 connection failure.
+
+=item * Verify that L<Neo4j::Driver::Type::Node/"get"> and
+L<Neo4j::Driver::Type::Relationship/"get"> really do return undef
+(as documented), even when called in list context.
+
+=item * Add test for byte arrays (C<RETURN apoc.text.bytes("DATA") AS x>).
+
+=item * Check that nodes without labels and nodes without properties are
+handled correctly in all aspects (there I<might> be issues with perlbolt).
+
+=item * Check that after a server error, the next statement will succeed
+(there I<might> be issues with perlbolt; see
+L<majensen/libneo4j-client#8|https://github.com/majensen/libneo4j-client/commit/3bec0ff2306f4d282d36e1a036f828e882dc7426>).
+
+=item * List possible C<croak> output in L<Neo4j::Driver/"DIAGNOSTICS">,
+allowing for indexing by search engines.
+
+=item * L<Neo4j::Driver::ResultSummary/"notifications">: Clarify docs that
+this method is to be called in list context.
 
 =back
 
@@ -115,14 +152,29 @@ if given (however, URLs without user info should not change the auth data
 stored in the driver). A possible implementation would be to create a new
 L<AuthToken|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/AuthTokens.html>
 module that would offer suitable methods, but this seems like overkill.
+While sending/accepting userinfo to/from others is explicitly forbidden now by
+L<RFC7230:2.7.1|https://tools.ietf.org/html/rfc7230#section-2.7.1>,
+it's still allowed to use it in cases such as ours.
 
 =item * Allow passing config options directly to the constructor, e. g. in
 place of the URL (C<< Neo4j::Driver->new({ url=>"bolt:", timeout=>30 }) >>).
+
+=item * Change the default URI scheme from HTTP to auto-detect, i. e. try
+Bolt first, then HTTP in case of failure. This could be explicitly specified
+as e. g. C<//localhost>.
+
+=item * The C<neo4j> scheme could perhaps be mapped onto Bolt or onto the
+default URL scheme, just so that C<neo4j://...> URLs will kind of work.
 
 =item * Consider writing a concrete example that re-creates LOMS logic by
 re-blessing the structural types into custom types from the business logic
 using C<< $cypher_types->{init} >>. (For example, check for Neo4j nodes that
 are labelled C<:Person> and re-bless those as C<Local::Person> or whatever.)
+
+=item * Consider adding a config option like C<tls_options> to be
+used as input to L<IO::Socket::SSL> by the default C<net_module>.
+While this avoids the need to create a new module in simple cases,
+it does introduce a potential security risk.
 
 =back
 
@@ -130,17 +182,12 @@ are labelled C<:Person> and re-bless those as C<Local::Person> or whatever.)
 
 =over
 
-=item * Sessions of some of the official drivers can have at most one
-transaction running at a time. This restriction is not necessary for this Perl
-driver when HTTP is used, but perhaps we should implement it anyway for
-consistency.
-
-=item * L<DBI> uses C<begin_work> in place of C<begin_transaction> as a method
-name. Even though C<begin_work> is shorter, it should not be the main method
-name because C<begin_transaction> is well established in the official Neo4j
-drivers, and after all this is I<not> C<DBI>. However, as this is the only
-(almost) exact equivalence with C<DBI> that we have, we should perhaps offer
-C<begin_work> as an experimental alias at least.
+=item * Once a session is created, the driver object becomes immutable. It
+should therefore be possible to store the ServerInfo in the driver object
+once it is obtained. If the default database is added as well, the Discovery
+API doesn't need to be used again for a new session. This change would keep
+down network utilisation in scenarios where many sessions are created (such
+as running the driver's test suite).
 
 =item * Consider whether to offer
 L<transaction functions|https://neo4j.com/docs/driver-manual/current/session-api/simple/#driver-simple-transaction-fn>.
@@ -174,20 +221,14 @@ feature that is almost never used. Since the server is often run on localhost
 anyway where latency is very close to zero, this item should not have high
 priority.
 
-=back
-
-=head2 L<Neo4j::Driver::StatementResult>
-
-=over
-
-=item * Rename C<Result>, in line with the official drivers.
-
-=item * Perhaps C<fetch()> should always buffer two records instead of just
-one. With the current implementation, the bolt connection might remain
-attached longer than desirable in cases where the client knows in advance
-how many records there will be and calls C<fetch()> exactly that number of
-times. (Such a change might even slightly improve performance if the driver
-successfully uses Perl threads to fill the buffer in the background.)
+=item * The current API to
+L<Neo4j::Driver::Transaction/"Execute multiple statements at once">
+seems a bit too complicated, especially for something that is probably
+hardly ever actually used in practice. It might make sense to provide a
+dedicated method (e. g. C<_run_multiple()>) for just that purpose. This
+would eventually free up the C<run()> implementation from unneeded baggage.
+The dedicated method may be private as long as the plan still is to provide
+this functionality by running statements lazily.
 
 =back
 
@@ -198,11 +239,38 @@ successfully uses Perl threads to fill the buffer in the background.)
 =item * Consider whether to implement methods to query the list of fields for
 this record (C<keys>, C<has>, C<size>) and/or a mapping function for all fields
 (C<map>/C<forEach>). Given that this data should easily be available through
-the StatementResult object, these seem slightly superfluous though.
+the Result object, these seem slightly superfluous though.
 
 =item * Implement C<graph>; see
 L<https://github.com/neo4j/neo4j/blob/3.5/community/server/src/main/java/org/neo4j/server/rest/transactional/GraphExtractionWriter.java>,
 L<https://github.com/neo4j/neo4j-python-driver/wiki/1.6-changelog#160a1>.
+
+=item * Add C<field()> as alias for C<get()>, enabling clients to avoid the
+possibly confusing C<< $record->get->get >> pattern. The official drivers
+only offer C<get()>, and C<field()> might be too similar to C<fields()> in
+the official Java driver, so this alias should perhaps be experimental.
+
+=back
+
+=head2 L<Neo4j::Driver::Result>
+
+=over
+
+=item * Perhaps C<fetch()> should always buffer two records instead of just
+one. With the current implementation, the bolt connection might remain
+attached longer than desirable in cases where the client knows in advance
+how many records there will be and calls C<fetch()> exactly that number of
+times. (In theory, such a change might even slightly improve performance
+if the driver uses Perl threads to fill the buffer in the background.)
+
+=item * Consider unrolling C<deep_bless> recursion. Based on initial profiling,
+this may save up to about 5% CPU time (for a specific HTTP test query cached in
+RAM, performance went from about 2700/s to 2850/s when skipping the call to
+C<deep_bless> entirely). However, when accessing the database, the bottleneck
+is typically I/O (querying Neo4j itself instead of the RAM-cached response let
+the performance for the very same query drop down to 650/s when executed over
+HTTP). So this optimisation may not be worth it (OTOH, Bolt performance was
+something like 7000/s, so optimising C<deep_bless> may be more useful there).
 
 =back
 
@@ -232,29 +300,50 @@ provides stats, and different APIs for HTTP and Bolt seem like a bad idea.
 
 =item * C<use Class::Accessor::Fast 0.34;>
 
+=item * It seems Neo4j 4 added new counters for system updates.
+
 =back
 
-=head2 L<Neo4j::Driver::Transport::HTTP>
+=head2 L<Neo4j::Driver::Net::Bolt>
 
 =over
 
-=item * Profile whether X-Stream has any performance impact. Remove if
+=item * Rollback behaviour on errors needs further study.
+L<Neo4j Status Codes|https://neo4j.com/docs/status-codes/4.2/>
+says that all errors have a rollback effect, but in at least some
+cases, the effect seems to be merely to mark the tx as failed and
+uncommittable, which isn't quite the same thing. This may or may not
+vary across error types, Neo4j versions, or Bolt versions. OTOH, some
+errors are internal client errors that shouldn't rollback the tx
+(L<majensen/libneo4j-client#7|https://github.com/majensen/libneo4j-client/issues/7#issuecomment-752914015>).
+Not sure if these occur in practice, but we should probably
+be able to handle them correctly anyway.
+
+=back
+
+=head2 L<Neo4j::Driver::Net::HTTP>
+
+=over
+
+=item * If a 201 is received without a C<Location> header, it is currently
+simply ignored by C<_parse_tx_status()>. (The simulator requires this.)
+According to RFC 7231, such a response means the location hasn't changed,
+i. e. the resource has been created at the default transaction endpoint.
+That should never happen; in fact, it should only ever happen for a PUT
+request, but we don't use those here. So ignoring this is probably the right
+choice. But it may still be useful to revisit this logic later on.
+
+=back
+
+=head2 Neo4j::Driver::Net::HTTP::*
+
+=over
+
+=item * Profile whether C<X-Stream> has any performance impact. Remove if
 in doubt, as we don't implement streaming (and have no plans to in the
 future, considering that Bolt should be used when speed is important).
 
-=item * Consider unrolling C<deep_bless> recursion. Based on initial profiling,
-this may save up to about 5% CPU time (for a specific HTTP test query cached in
-RAM, performance went from about 2700/s to 2850/s when skipping the call to
-C<deep_bless> entirely). However, when accessing the database, the bottleneck
-is typically I/O (querying Neo4j itself instead of the RAM-cached response let
-the performance for the very same query drop down to 650/s when executed over
-HTTP). So this optimisation may not be worth it (OTOH, Bolt performance was
-something like 7000/s, so optimising C<deep_bless> may be more useful there).
-
-=item * Consider making the JSON module configurable. For example, clients
-might wish to use L<Mojo::JSON> instead of L<JSON::MaybeXS>; it also prefers
-L<Cpanel::JSON::XS> where available, but in Pure Perl it may be faster than
-L<JSON::PP>. Also, there is L<JSON::Tiny>.
+=item * Remove the L<REST::Client> dependency and use <LWP::UserAgent> directly.
 
 =back
 
@@ -269,9 +358,14 @@ for ID comparison on nodes and relationships.
 access to e. g. properties using the pre-0.13 hashref syntax. See
 L<https://metacpan.org/pod/overload#Two-face-References> for an example.
 L<perltie> might perhaps also work.
+Note that L<overload> might be a memory hog; see L<Types::Serialiser/"BUGS">.
 
 =item * Try to refactor L<Neo4j::Driver::Type::Path>'s internal representation
 to allow either elements or nodes+rels. Have one autogenerate from the other,
 then cache the results. May not actually have advantages for deep_bless though.
+
+=item * Add C<property()> as alias for C<get()> in L<Neo4j::Driver::Type::Node>
+and L<Neo4j::Driver::Type::Relationship>, enabling clients to avoid the
+possibly confusing C<< $record->get->get >> pattern.
 
 =back

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Node;
 # ABSTRACT: Describes a node from a Neo4j graph
-$Neo4j::Driver::Type::Node::VERSION = '0.18';
+$Neo4j::Driver::Type::Node::VERSION = '0.20';
 
 use overload '%{}' => \&_hash, fallback => 1;
 
@@ -80,7 +80,7 @@ Neo4j::Driver::Type::Node - Describes a node from a Neo4j graph
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -202,7 +202,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2020 by Arne Johannessen.
+This software is Copyright (c) 2016-2021 by Arne Johannessen.
 
 This is free software, licensed under:
 

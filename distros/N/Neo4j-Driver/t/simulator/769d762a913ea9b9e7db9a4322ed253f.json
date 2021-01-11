@@ -1,0 +1,1 @@
+{"results":[{"columns":["collect(r.test)"],"data":[{"row":[[true]],"meta":[null],"rest":[[true]]}]}],"errors":[],"commit":"http://localhost:7474/db/neo4j/tx/92/commit","transaction":{"expires":"Tue, 01 Jan 2999 00:00:00 +0000"}}

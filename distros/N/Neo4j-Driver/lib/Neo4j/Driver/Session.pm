@@ -5,39 +5,60 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.18';
+$Neo4j::Driver::Session::VERSION = '0.20';
 
+use Carp qw(croak);
+our @CARP_NOT = qw(Neo4j::Driver);
 use URI 1.25;
 
+use Neo4j::Driver::Net::Bolt;
+use Neo4j::Driver::Net::HTTP;
 use Neo4j::Driver::Transaction;
 
 
 sub new {
-	my ($class, $transport) = @_;
+	my ($class, $driver) = @_;
 	
-	my $session = {
-#		driver => $driver,
-#		uri => $driver->{uri}->clone,
-		transport => $transport,
-	};
+	return Neo4j::Driver::Session::Bolt->new($driver) if $driver->{uri}->scheme eq 'bolt';
+	return Neo4j::Driver::Session::HTTP->new($driver);
+}
+
+
+# Connect and get ServerInfo (via Bolt HELLO or HTTP Discovery API),
+# then determine the default database name for Neo4j >= 4.
+sub _connect {
+	my ($self, $database) = @_;
 	
-	return bless $session, $class;
+	my $neo4j_version = $self->server->version;  # ensure contact with the server has been made
+	return $self if $neo4j_version =~ m{^Neo4j/[123]\.};  # nothing more to do
+	
+	if (! defined $database) {
+		# discover default database on Neo4j >= 4
+		eval {
+			my $sys = $self->{driver}->session(database => 'system');
+			$database = $sys->run('SHOW DEFAULT DATABASE')->single->get('name');
+		};
+		croak $@ . "Session creation failed because the default database"
+		         . " of $neo4j_version at " . $self->server->address
+		         . " could not be determined" unless defined $database;
+	}
+	
+	$self->{net}->_set_database($database);
+	return $self;
 }
 
 
 sub begin_transaction {
 	my ($self) = @_;
 	
-	my $t = Neo4j::Driver::Transaction->new($self);
-	return $t->_explicit;
+	return $self->new_tx->_begin;
 }
 
 
 sub run {
 	my ($self, $query, @parameters) = @_;
 	
-	my $t = Neo4j::Driver::Transaction->new($self);
-	return $t->_autocommit->run($query, @parameters);
+	return $self->new_tx->_run_autocommit($query, @parameters);
 }
 
 
@@ -49,7 +70,51 @@ sub close {
 sub server {
 	my ($self) = @_;
 	
-	return $self->{transport}->{server_info};
+	return $self->{net}->_server;
+}
+
+
+
+
+package # private
+        Neo4j::Driver::Session::Bolt;
+use parent -norequire => 'Neo4j::Driver::Session';
+
+
+sub new {
+	my ($class, $driver) = @_;
+	
+	return bless {
+		driver => $driver,
+		net => Neo4j::Driver::Net::Bolt->new($driver),
+	}, $class;
+}
+
+
+sub new_tx {
+	return Neo4j::Driver::Transaction::Bolt->new(shift);
+}
+
+
+
+
+package # private
+        Neo4j::Driver::Session::HTTP;
+use parent -norequire => 'Neo4j::Driver::Session';
+
+
+sub new {
+	my ($class, $driver) = @_;
+	
+	return bless {
+		driver => $driver,
+		net => Neo4j::Driver::Net::HTTP->new($driver),
+	}, $class;
+}
+
+
+sub new_tx {
+	return Neo4j::Driver::Transaction::HTTP->new(shift);
 }
 
 
@@ -67,7 +132,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -97,8 +162,8 @@ as part of a single atomic operation and can be rolled back if
 necessary.
 
 Only one open transaction per session at a time is supported. To
-work with multiple concurrent transactions (also known as "nested
-transactions"), simply use more than one session.
+work with multiple concurrent transactions, simply use more than
+one session.
 
 =head1 METHODS
 
@@ -115,7 +180,7 @@ Begin a new explicit L<Transaction|Neo4j::Driver::Transaction>.
  $result = $session->run('...');
 
 Run and commit a statement using an autocommit transaction and return
-the L<StatementResult|Neo4j::Driver::StatementResult>.
+the L<Result|Neo4j::Driver::Result>.
 
 This method is semantically exactly equivalent to the following code,
 but is faster because it doesn't require an extra server roundtrip to
@@ -148,11 +213,12 @@ these features.
 The C<run> method tries to Do What You Mean if called in list
 context.
 
-=head2 Concurrent explicit transactions
+=head2 Concurrent transactions
 
  $session = Neo4j::Driver->new('http://...')->basic_auth(...)->session;
  $tx1 = $session->begin_transaction;
  $tx2 = $session->begin_transaction;
+ $tx3 = $session->run(...);
 
 Since HTTP is a stateless protocol, the Neo4j HTTP API effectively
 allows multiple concurrently open transactions without special
@@ -160,17 +226,8 @@ client-side considerations. This driver exposes this feature to the
 client and will continue to do so, but the interface is not yet
 finalised.
 
-The Bolt protocol does not support concurrent explicit transactions.
-
-=head2 Concurrent autocommit transactions
-
- $tx1 = $session->begin_transaction;
- $tx2 = $session->run(...);
-
-Sessions support autocommit transactions while an explicit
-transaction is open. Since it is not clear to me if this is
-intended behaviour when the Bolt protocol is used, this feature
-is listed as experimental.
+The Bolt protocol does not support concurrent transactions (also
+known as "nested transactions") within the same session.
 
 =head1 SECURITY CONSIDERATIONS
 
@@ -180,7 +237,7 @@ references to the authentication credentials used to contact the
 Neo4j server. Objects of these classes should therefore not be
 passed to untrusted modules. However, objects of the
 L<ServerInfo|Neo4j::Driver::ServerInfo> class and the
-L<StatementResult|Neo4j::Driver::StatementResult> class do not
+L<Result|Neo4j::Driver::Result> class do not
 contain a reference to these credentials and are safe in this
 regard.
 
@@ -192,7 +249,7 @@ regard.
 
 =item * L<Neo4j::Driver::B<Transaction>>,
 L<Neo4j::Driver::B<ServerInfo>>,
-L<Neo4j::Driver::B<StatementResult>>
+L<Neo4j::Driver::B<Result>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Session (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Session.html>,
@@ -207,7 +264,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2020 by Arne Johannessen.
+This software is Copyright (c) 2016-2021 by Arne Johannessen.
 
 This is free software, licensed under:
 

@@ -3,11 +3,12 @@ package XML::Sig;
 use strict;
 use warnings;
 
+
 # use 'our' on v5.6.0
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-$VERSION = '0.33';
+$VERSION = '0.38';
 
 use base qw(Class::Accessor);
 XML::Sig->mk_accessors(qw(key));
@@ -24,8 +25,9 @@ use XML::LibXML;
 use MIME::Base64;
 use Carp;
 
+
 use constant TRANSFORM_ENV_SIG           => 'http://www.w3.org/2000/09/xmldsig#enveloped-signature';
-use constant TRANSFORM_C14N              => 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315#';
+use constant TRANSFORM_C14N              => 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315';
 use constant TRANSFORM_C14N_COMMENTS     => 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments';
 use constant TRANSFORM_C14N_V1_1         => 'http://www.w3.org/TR/2008/REC-xml-c14n11-20080502';
 use constant TRANSFORM_C14N_V1_1_COMMENTS => 'http://www.w3.org/TR/2008/REC-xml-c14n11-20080502#WithComments';
@@ -37,6 +39,9 @@ sub DESTROY { }
 $SIG{INT} = sub { die "Interrupted\n"; };
 
 $| = 1;  # autoflush
+
+
+
 
 sub new {
     my $class = shift;
@@ -64,6 +69,7 @@ sub new {
     return $self;
 }
 
+
 sub sign {
     my $self = shift;
     my ($xml) = @_;
@@ -79,88 +85,107 @@ sub sign {
 
     print ("Signing XML\n") if $DEBUG;
 
-    $xml = $self->_get_xml_to_sign();
+    my @ids_to_sign = $self->_get_ids_to_sign();
 
-    # Temporarily create the Signature XML from the part
-    # TODO: ths section needs a rewrite to create the xml in
-    # a better way.
+    foreach (@ids_to_sign) {
+        my $signid = $_;
+        # Temporarily create the Signature XML from the part
+        # TODO: ths section needs a rewrite to create the xml in
+        # a better way.
 
-    # Create a Reference xml fragment including digest section
-    my $digest_xml    = $self->_reference_xml( "REPLACE DIGEST" );
+        # Create a Reference xml fragment including digest section
+        my $digest_xml    = $self->_reference_xml( $signid, "REPLACE DIGEST " . $signid );
 
-    # Create a SignedInfo xml fragment including digest section
-    my $signed_info   = $self->_signedinfo_xml( $digest_xml );
+        # Create a SignedInfo xml fragment including digest section
+        my $signed_info   = $self->_signedinfo_xml( $digest_xml );
 
-    # Create a Signature xml fragment including SignedInfo section
-    my $signature_xml = $self->_signature_xml( $signed_info, 'REPLACE SIGNATURE' );
+        # Create a Signature xml fragment including SignedInfo section
+        my $signature_xml = $self->_signature_xml( $signed_info, 'REPLACE SIGNATURE ' . $signid );
 
-    # Canonicalize the XML to http://www.w3.org/2001/10/xml-exc-c14n#
-    # TODO Change the Canonicalization method in the xml fragment from _signedinfo_xml
-#    <dsig:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
-#    <dsig:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
-    my $xml_canon        = $xml->toStringEC14N();
+        print ("Sign ID: $signid\n") if $DEBUG;
 
-    # Calculate the sha1 digest of the XML being signed
-    my $bin_digest    = sha1( $xml_canon );
-    my $digest        = encode_base64( $bin_digest, '' );
-    print ("   Digest: $digest\n") if $DEBUG;
+        # Get the XML note to sign base on the ID
+        my $xml = $self->_get_xml_to_sign($signid);
 
-    # Display the ID of the XML being signed for debugging
-    my $reference = $self->{ parser }->findvalue('//@ID');
-    print ("   Reference URI: $reference\n") if $DEBUG;
+        # Set the namespace but do not apply it to the XML
+        $xml->setNamespace("http://www.w3.org/2000/09/xmldsig#", "dsig", 0);
 
-    # Add the Signature to the xml being signed
-    my $doc = $dom->documentElement();
-    $doc->appendWellBalancedChunk($signature_xml, 'UTF-8');
+        # Canonicalize the XML to http://www.w3.org/2001/10/xml-exc-c14n#
+        # TODO Change the Canonicalization method in the xml fragment from _signedinfo_xml
+        #    <dsig:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+        #    <dsig:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        my $xml_canon        = $xml->toStringEC14N();
 
-    # Add the digest value to the Signed info
-    my ($digest_value_node) = $self->{ parser }->findnodes(
-        '//dsig:Signature/dsig:SignedInfo/dsig:Reference/dsig:DigestValue');
-    $digest_value_node->removeChildNodes();
-    $digest_value_node->appendText($digest);
+        # Calculate the sha1 digest of the XML being signed
+        my $bin_digest    = sha1( $xml_canon );
+        my $digest        = encode_base64( $bin_digest, '' );
+        print ("   Digest: $digest\n") if $DEBUG;
 
-    # Canonicalize the SignedInfo to http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments
-    # TODO Change the Canonicalization method in the xml fragment from _signedinfo_xml
+        # Display the ID of the XML being signed for debugging
+        my $reference = $signid; #$self->{parser}->findvalue('//@ID', $xml);
+        print ("   Reference URI: $reference\n") if $DEBUG;
 
-    my ($signature_node) = $self->{ parser }->findnodes(
-        '//dsig:Signature');
-    my ($signed_info_node) = $self->{ parser }->findnodes(
-        '//dsig:Signature/dsig:SignedInfo');
+        # Add the Signature to the xml being signed
+        $xml->appendWellBalancedChunk($signature_xml, 'UTF-8');
 
-    # At this point the SignedInfo includes the information
-    # to allow us to use the _canonicalize_xml with the $signature_node
-    my $signed_info_canon = $self->_canonicalize_xml($signed_info_node, $signature_node);
+        # Canonicalize the SignedInfo to http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments
+        # TODO Change the Canonicalization method in the xml fragment from _signedinfo_xml
 
-    # Calculate the signature of the Canonical Form of SignedInfo
-    my $signature;
-    if ($self->{key_type} eq 'dsa') {
-        print ("    Signing SignedInfo using DSA key type\n") if $DEBUG;
-        # DSA only permits the signing of 20 bytes or less, hence the sha1
-        my $bin_signature = $self->{key_obj}->do_sign( sha1($signed_info_canon) );
-        my $r = $bin_signature->get_r;
-        my $s = $bin_signature->get_s;
-        $signature        = encode_base64( $r . $s, "\n" );
-    } else {
-        print ("    Signing SignedInfo using RSA key type\n") if $DEBUG;
-        my $bin_signature = $self->{key_obj}->sign( $signed_info_canon );
-        $signature        = encode_base64( $bin_signature, "\n" );
+        my ($signature_node) = $xml->findnodes(
+            './dsig:Signature', $xml);
+        my ($signed_info_node) = $xml->findnodes(
+            './dsig:Signature/dsig:SignedInfo',$xml);
+
+        # Add the digest value to the Signed info
+        my ($digest_value_node) = $xml->findnodes(
+            './dsig:Signature/dsig:SignedInfo/dsig:Reference/dsig:DigestValue', $signature_node);
+        $digest_value_node->removeChildNodes();
+        $digest_value_node->appendText($digest);
+
+        # At this point the SignedInfo includes the information
+        # to allow us to use the _canonicalize_xml with the $signature_node
+        my $signed_info_canon = $self->_canonicalize_xml($signed_info_node, $signature_node);
+
+        # Calculate the signature of the Canonical Form of SignedInfo
+        my $signature;
+        if ($self->{key_type} eq 'dsa') {
+            print ("    Signing SignedInfo using DSA key type\n") if $DEBUG;
+            # DSA only permits the signing of 20 bytes or less, hence the sha1
+            my $bin_signature = $self->{key_obj}->do_sign( sha1($signed_info_canon) );
+
+            # https://www.w3.org/TR/2002/REC-xmldsig-core-20020212/#sec-SignatureAlg
+            # The output of the DSA algorithm consists of a pair of integers
+            # The signature value consists of the base64 encoding of the
+            # concatonation of r and s in that order ($r . $s)
+            my $r = $bin_signature->get_r;
+            my $s = $bin_signature->get_s;
+
+            my $rs = _zero_fill_buffer(320);
+            _concat_dsa_sig_r_s(\$rs, $r, $s);
+
+            $signature        = encode_base64( $rs, "\n" );
+        } else {
+            print ("    Signing SignedInfo using RSA key type\n") if $DEBUG;
+            my $bin_signature = $self->{key_obj}->sign( $signed_info_canon );
+            $signature        = encode_base64( $bin_signature, "\n" );
+        }
+
+        # Add the Signature to the SignatureValue
+        my ($signature_value_node) = $xml->findnodes(
+            './dsig:Signature/dsig:SignatureValue', $signature_node);
+        $signature_value_node->removeChildNodes();
+        $signature_value_node->appendText($signature);
+
+        print ("\n\n\n SignatureValue:\n" . $signature_value_node . "\n\n\n") if $DEBUG;
     }
 
-    # Add the Signature to the SignatureValue
-    my ($signature_value_node) = $self->{ parser }->findnodes(
-        '//dsig:Signature/dsig:SignatureValue');
-    $signature_value_node->removeChildNodes();
-    $signature_value_node->appendText($signature);
-
-    print ("\n\n\n SignatureValue:\n" . $signature_value_node . "\n\n\n") if $DEBUG;
-
-    return $xml;
+    return $dom;
 }
+
 
 sub verify {
     my $self = shift;
     delete $self->{signer_cert};
-
     my ($xml) = @_;
 
     my $dom = XML::LibXML->load_xml( string => $xml );
@@ -180,9 +205,6 @@ sub verify {
     while (my $signature_node = $signature_nodeset->shift()) {
         $i++;
         print ("\nSignature $i\n") if $DEBUG;
-        # set the namespace for the signature to a known prefix
-        $signature_node->setNamespace(
-            'http://www.w3.org/2000/09/xmldsig#', 'dsig', 1 );
 
         # Get SignedInfo Reference ID
         my $reference = $self->{ parser }->findvalue(
@@ -193,8 +215,8 @@ sub verify {
 
         # The reference ID must point to something in the document
         # if not disregard it and look for another signature
-        # TODO check to ensure a if the is a single reference like this it
-        # won't accidentally validate
+        # TODO check to ensure that if there is only a single reference
+        # like this it won't accidentally validate
         if (! $self->{ parser }->findvalue('//*[@ID=\''. $reference . '\']')) {
             print ("   Signature reference $reference is not signing anything in this xml\n") if $DEBUG;
             if ($numsigs <= 1) {
@@ -231,6 +253,7 @@ sub verify {
         my ($signed_info) = $self->{ parser }->findnodes('dsig:SignedInfo', $signature_node);
         my $signed_info_canon = $self->_canonicalize_xml($signed_info, $signature_node);
 
+        print "$signed_info_canon\n" if $DEBUG;
         if(Digest::SHA->can($digest_method)) {
             my $rsa_hash = "use_$digest_method" . "_hash";
             $self->{rsa_hash} =  "use_$digest_method" . "_hash";
@@ -298,12 +321,16 @@ sub verify {
         # Obtain the Canonical form of the XML
         my $canonical = $self->_transform($signed_xml, $signature_node);
 
+        # Add the $signature_node back to the $signed_xml to allow other
+        # signatures to be validated if they exist
         $signed_xml->addChild( $signature_node );
 
         # Obtain the DigestValue of the Canonical XML
         my $digest = $self->{digest_method}->($canonical);
 
-        print ( "    Digest: ". _trim(encode_base64($digest, '')) ."\n") if $DEBUG;
+        print ( "    Reference Digest " . _trim($refdigest) ."\n") if $DEBUG;
+
+        print ( "    Calculated Digest: ". _trim(encode_base64($digest, '')) ."\n") if $DEBUG;
 
         # Return 0 - fail verification on the first XML signature that fails
         return 0 unless ($refdigest eq _trim(encode_base64($digest, '')));
@@ -314,26 +341,78 @@ sub verify {
     return 1;
 }
 
+
 sub signer_cert {
     my $self = shift;
     return $self->{signer_cert};
 }
 
-sub _get_xml_to_sign {
+##
+## _get_ids_to_sign()
+##
+## Arguments:
+##
+## Returns: array Value of ID attributes from XML
+##
+## Finds all the values of the ID attributes in the XML
+## and return them in reverse order found.  Reverse order
+## assumes that the Signatures should be performed on lower
+## Nodes first.
+##
+sub _get_ids_to_sign {
     my $self = shift;
-    my $id = $self->{parser}->findvalue('//@ID');
-    die "You cannot sign an XML document without identifying the element to sign with an ID attribute" unless $id;
-    $self->{'sign_id'} = $id;
-    my $xpath = "//*[\@ID='$id']";
-    #return $self->_get_node_as_text( $xpath );
-    return $self->_get_node( $xpath );
+    my @id = $self->{parser}->findnodes('//@ID');
+    my @ids;
+    foreach (@id) {
+        my $i = $_;
+        $_ =~ m/^.*\"(.*)\".*$/;
+        $i = $1;
+        #//*[@ID='identifier_1']
+        die "You cannot sign an XML document without identifying the element to sign with an ID attribute" unless $i;
+        unshift @ids, $i;
+    }
+    return @ids;
+
+
 }
 
+##
+## _get_xml_to_sign()
+##
+## Arguments:
+##    $id:     string ID of the Node for the XML to retrieve
+##
+## Returns: XML NodeSet to sign
+##
+## Find the XML node with the ID = $id and return the
+## XML NodeSet
+##
+sub _get_xml_to_sign {
+    my $self = shift;
+    my $id = shift;
+    die "You cannot sign an XML document without identifying the element to sign with an ID attribute" unless $id;
+
+    my $xpath = "//*[\@ID='$id']";
+    my ($node) = $self->_get_node( $xpath );
+    return $node;
+}
+
+##
+## _get_signed_xml($context)
+##
+## Arguments:
+##    $context:     string XML NodeSet used as context
+##
+## Returns: XML NodeSet for with ID equal to the URI
+##
+## Find the XML node with the ID = $URI and return the
+## XML NodeSet
+##
 sub _get_signed_xml {
     my $self = shift;
     my ($context) = @_;
 
-    my $id = $self->{parser}->findvalue('dsig:SignedInfo/dsig:Reference/@URI', $context);
+    my $id = $self->{parser}->findvalue('./dsig:SignedInfo/dsig:Reference/@URI', $context);
     $id =~ s/^#//;
     print ("    Signed XML id: $id\n") if $DEBUG;
 
@@ -342,6 +421,18 @@ sub _get_signed_xml {
     return $self->_get_node( $xpath, $context );
 }
 
+##
+## _transform($xml, $context)
+##
+## Arguments:
+##    $xml:     string XML NodeSet
+##    $context: string XML Context
+##
+## Returns: string  Transformed XML
+##
+## Canonicalizes/Transforms xml based on the Transforms
+## from the SignedInfo.
+##
 sub _transform {
     my $self = shift;
     my ($xml, $context) = @_;
@@ -352,26 +443,33 @@ sub _transform {
         $context
     );
 
+    print "_transform\n" if $DEBUG;
     foreach my $node ($transforms->get_nodelist) {
         my $alg = $node->getAttribute('Algorithm');
 
-        print "Algorithm: $alg\n" if $DEBUG;
+        print "    Algorithm: $alg\n" if $DEBUG;
         if ($alg eq TRANSFORM_ENV_SIG) {
             # TODO the xml being passed here currently has the
             # Signature removed.  May be better to do it all here
             next;
         }
         elsif ($alg eq TRANSFORM_C14N) {
-           $xml = $xml->toStringC14N();
+            print "        toStringC14N" if $DEBUG;
+            $xml = $xml->toStringC14N();
         }
         elsif ($alg eq TRANSFORM_C14N_COMMENTS) {
+            print "        toStringC14N(1)" if $DEBUG;
             $xml = $xml->toStringC14N(1);
         }
         elsif ($alg eq TRANSFORM_EXC_C14N) {
-            $xml = $xml->toStringEC14N();
+            my @prefixlist = $self->_find_prefixlist($node);
+            print "        toStringEC14N(0, '', @prefixlist)\n" if $DEBUG;
+            $xml = $xml->toStringEC14N(0, '', \@prefixlist);
         }
         elsif ($alg eq TRANSFORM_EXC_C14N_COMMENTS) {
-            $xml = $xml->toStringEC14N(1);
+            my @prefixlist = $self->_find_prefixlist($node);
+            print "        toStringEC14N(1, '', @prefixlist)\n" if $DEBUG;
+            $xml = $xml->toStringEC14N(1, '', \@prefixlist);
         }
         else {
             die "Unsupported transform: $alg";
@@ -380,6 +478,43 @@ sub _transform {
     return $xml;
 }
 
+##
+## _find_prefixlist($node)
+##
+## Arguments:
+##    $node:    string XML NodeSet
+##
+## Returns: ARRAY of prefix lists
+##
+## Generate an array of prefix lists defined in InclusiveNamespaces
+##
+sub _find_prefixlist {
+    my $self = shift;
+    my ($node) = @_;
+    my @children = $node->getChildrenByTagName('InclusiveNamespaces');
+
+    my $prefixlist = '';
+    foreach my $child (@children) {
+        if ($child) {
+            $prefixlist .= $child->getAttribute('PrefixList');
+        }
+        $prefixlist .= ' ';
+    }
+    return split / /, $prefixlist;
+}
+
+##
+## _verify_rsa($context,$canonical,$sig)
+##
+## Arguments:
+##    $context:     string XML Context to use
+##    $canonical:   string Canonical XML to verify
+##    $sig:         string Base64 encode of RSA Signature
+##
+## Returns: integer (1 True, 0 False) if signature is valid
+##
+## Verify the RSA signature of Canonical XML
+##
 sub _verify_rsa {
     my $self = shift;
     my ($context,$canonical,$sig) = @_;
@@ -399,6 +534,17 @@ sub _verify_rsa {
     return 0;
 }
 
+##
+## _clean_x509($cert)
+##
+## Arguments:
+##    $cert:     string Certificate in base64 from XML
+##
+## Returns: string  Certificate in Valid PEM format
+##
+## Reformats Certifcate string into PEM format 64 characters
+## with proper header and footer
+##
 sub _clean_x509 {
     my $self = shift;
     my ($cert) = @_;
@@ -422,6 +568,18 @@ sub _clean_x509 {
     return $cert;
 }
 
+##
+## _verify_x509($context,$canonical,$sig)
+##
+## Arguments:
+##    $context:     string XML Context to use
+##    $canonical:   string Canonical XML to verify
+##    $sig:         string Base64 encode of RSA Signature
+##
+## Returns: integer (1 True, 0 False) if signature is valid
+##
+## Verify the RSA signature of Canonical XML using an X509
+##
 sub _verify_x509 {
     my $self = shift;
     my ($context,$canonical,$sig) = @_;
@@ -442,6 +600,18 @@ sub _verify_x509 {
     return $self->_verify_x509_cert($cert, $canonical, $sig);
 }
 
+##
+## _verify_x509_cert($cert,$canonical,$sig)
+##
+## Arguments:
+##    $cert:        string X509 Certificate
+##    $canonical:   string Canonical XML to verify
+##    $sig:         string Base64 encode of RSA Signature
+##
+## Returns: integer (1 True, 0 False) if signature is valid
+##
+## Verify the X509 signature of Canonical XML
+##
 sub _verify_x509_cert {
     my $self = shift;
     my ($cert, $canonical, $sig) = @_;
@@ -465,6 +635,66 @@ sub _verify_x509_cert {
     return 0;
 }
 
+##
+## _zero_fill_buffer($bits)
+##
+## Arguments:
+##    $bits:     number of bits to set to zero
+##
+## Returns: Zero filled bit buffer of size $bits
+##
+## Create a buffer with all bits set to 0
+##
+sub _zero_fill_buffer {
+    my $bits = shift;
+    # set all bit to zero
+    my $v = '';
+    for (my $i = 0; $i < $bits; $i++) {
+        vec($v, $i, 1) = 0;
+    }
+    return $v;
+}
+
+##
+## _concat_dsa_sig_r_s(\$buffer,$r,$s)
+##
+## Arguments:
+##    $buffer:      Zero Filled bit buffer
+##    $r:           octet stream
+##    $s:           octet stream
+##
+## Combine r and s components of DSA signature
+##
+sub _concat_dsa_sig_r_s {
+
+    my ($buffer, $r, $s) = @_;
+    my $bits_r = (length($r)*8)-1;
+    my $bits_s = (length($s)*8)-1;
+
+    # Place $s right justified in $v starting at bit 319
+    for (my $i = $bits_s; $i >=0; $i--) {
+        vec($$buffer, 160 + $i + (159 - $bits_s) , 1) = vec($s, $i, 1);
+    }
+
+    # Place $r right justified in $v starting at bit 159
+    for (my $i = $bits_r; $i >= 0 ; $i--) {
+        vec($$buffer, $i + (159 - $bits_r) , 1) = vec($r, $i, 1);
+    }
+
+}
+
+##
+## _verify_dsa($context,$canonical,$sig)
+##
+## Arguments:
+##    $context:     string XML Context to use
+##    $canonical:   string Canonical XML to verify
+##    $sig:         string Base64 encode 40 byte string of r and s
+##
+## Returns: integer (1 True, 0 False) if signature is valid
+##
+## Verify the DSA signature of Canonical XML
+##
 sub _verify_dsa {
     my $self = shift;
     my ($context,$canonical,$sig) = @_;
@@ -487,8 +717,12 @@ sub _verify_dsa {
     # Decode signature and verify
     my $bin_signature = decode_base64($sig);
 
+    # https://www.w3.org/TR/2002/REC-xmldsig-core-20020212/#sec-SignatureAlg
+    # The output of the DSA algorithm consists of a pair of integers
+    # The signature value consists of the base64 encoding of the
+    # concatonation of r and s in that order ($r . $s)
     # Binary Signature is stored as a concatonation of r and s
-    my ($r, $s) = unpack('a20 a20', $bin_signature);
+    my ($r, $s) = unpack('a20a20', $bin_signature);
 
     # Create a new Signature Object from r and s
     my $sigobj = Crypt::OpenSSL::DSA::Signature->new();
@@ -500,6 +734,17 @@ sub _verify_dsa {
     return 0;
 }
 
+##
+## _get_node($xpath, context)
+##
+## Arguments:
+##    $xpath:       string XML XPath to use
+##    $context:     string XML context
+##
+## Returns: string  XML NodeSet
+##
+## Return a NodeSet based on the xpath string
+##
 sub _get_node {
     my $self = shift;
     my ($xpath, $context) = @_;
@@ -543,6 +788,16 @@ sub _transform_env_sig {
     return $str;
 }
 
+##
+## _trim($string)
+##
+## Arguments:
+##    $string:      string String to remove whitespace
+##
+## Returns: string  Trimmed String
+##
+## Trim the whitespace from the begining and end of the string
+##
 sub _trim {
     my $string = shift;
     $string =~ s/^\s+//;
@@ -550,6 +805,19 @@ sub _trim {
     return $string;
 }
 
+##
+## _load_dsa_key($key_text)
+##
+## Arguments:
+##    $key_text:    string DSA Private Key as String
+##
+## Returns: nothing
+##
+## Populate:
+##   self->{KeyInfo}
+##   self->{key_obj}
+##   self->{key_type}
+##
 sub _load_dsa_key {
     my $self = shift;
     my $key_text = shift;
@@ -586,7 +854,19 @@ sub _load_dsa_key {
     }
 }
 
-
+##
+## _load_rsa_key($key_text)
+##
+## Arguments:
+##    $key_text:    string RSA Private Key as String
+##
+## Returns: nothing
+##
+## Populate:
+##   self->{KeyInfo}
+##   self->{key_obj}
+##   self->{key_type}
+##
 sub _load_rsa_key {
     my $self = shift;
     my ($key_text) = @_;
@@ -625,6 +905,18 @@ sub _load_rsa_key {
     }
 }
 
+##
+## _load_x509_key($key_text)
+##
+## Arguments:
+##    $key_text:    string RSA Private Key as String
+##
+## Returns: nothing
+##
+## Populate:
+##   self->{key_obj}
+##   self->{key_type}
+##
 sub _load_x509_key {
     my $self = shift;
     my $key_text = shift;
@@ -645,6 +937,18 @@ sub _load_x509_key {
     }
 }
 
+##
+## _load_cert_file()
+##
+## Arguments: none
+##
+## Returns: nothing
+##
+## Read the file name from $self->{ cert } and
+## Populate:
+##   self->{key_obj}
+##   $self->{KeyInfo}
+##
 sub _load_cert_file {
     my $self = shift;
 
@@ -679,6 +983,18 @@ sub _load_cert_file {
     return;
 }
 
+##
+## _load_cert_text()
+##
+## Arguments: none
+##
+## Returns: nothing
+##
+## Read the certificate from $self->{ cert_text } and
+## Populate:
+##   self->{key_obj}
+##   $self->{KeyInfo}
+##
 sub _load_cert_text {
     my $self = shift;
 
@@ -703,6 +1019,15 @@ sub _load_cert_text {
     return;
 }
 
+##
+## _load_key($file)
+##
+## Arguments: $self->{ key }
+##
+## Returns: nothing
+##
+## Load the key and process it acording to its headers
+##
 sub _load_key {
     my $self = shift;
     my $file = $self->{ key };
@@ -740,6 +1065,17 @@ sub _load_key {
     return;
 }
 
+##
+## _signature_xml($signed_info,$signature_value)
+##
+## Arguments:
+##   $signed_info:      string XML String Fragment
+##   $signature_value   String Base64 Signature Value
+##
+## Returns: string      XML fragment
+##
+## Create a XML string of the Signature
+##
 sub _signature_xml {
     my $self = shift;
     my ($signed_info,$signature_value) = @_;
@@ -750,6 +1086,16 @@ sub _signature_xml {
         </dsig:Signature>};
 }
 
+##
+## _signedinfo_xml($digest_xml)
+##
+## Arguments:
+##   $digest_xml        string XML String Fragment
+##
+## Returns: string      XML fragment
+##
+## Create a XML string of the SignedInfo
+##
 sub _signedinfo_xml {
     my $self = shift;
     my ($digest_xml) = @_;
@@ -762,10 +1108,21 @@ sub _signedinfo_xml {
             </dsig:SignedInfo>};
 }
 
+##
+## _reference_xml($id)
+##
+## Arguments:
+##   $id        string XML ID related to the URI
+##   $digest    string Base64 encoded digest
+##
+## Returns: string      XML fragment
+##
+## Create a XML string of the Reference
+##
 sub _reference_xml {
     my $self = shift;
+    my $id = shift;
     my ($digest) = @_;
-    my $id = $self->{sign_id};
     return qq{<dsig:Reference URI="#$id">
                         <dsig:Transforms>
                             <dsig:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
@@ -776,6 +1133,19 @@ sub _reference_xml {
                     </dsig:Reference>};
 }
 
+
+##
+## _canonicalize_xml($xml, $context)
+##
+## Arguments:
+##    $xml:     string XML NodeSet
+##    $context: string XML Context
+##
+## Returns: string  Canonical XML
+##
+## Canonicalizes xml based on the CanonicalizationMethod
+## from the SignedInfo.
+##
 sub _canonicalize_xml {
     my $self = shift;
     my ($xml, $context) = @_;
@@ -831,7 +1201,7 @@ XML::Sig
 
 =head1 VERSION
 
-version 0.33
+version 0.38
 
 =head1 SYNOPSIS
 
@@ -852,16 +1222,146 @@ version 0.33
 =head1 DESCRIPTION
 
 This perl module provides two primary capabilities: given an XML string, create
-and insert a digital signature, or if one is already present in the string verify
+and insert digital signatures, or if one is already present in the string verify
 it -- all in accordance with the W3C standard governing XML signatures.
-
-=item _canonicalize_xml($xml, $context)
-
-Canonicalizes xml based on the CanonicalizationMethod
 
 =head1 NAME
 
 XML::Sig - A toolkit to help sign and verify XML Digital Signatures.
+
+=head1 PREREQUISITES
+
+=over
+
+=item L<Digest::SHA>
+=item L<XML::LibXML>
+=item L<MIME::Base64>
+=item L<Crypt::OpenSSL::X509>
+=item L<Crypt::OpenSSL::Bignum>
+=item L<Crypt::OpenSSL::RSA>
+=item L<Crypt::OpenSSL::DSA>
+
+=back
+
+=head1 USAGE
+
+=head2 SUPPORTED ALGORITHMS & TRANSFORMS
+
+This module supports the following signature methods:
+
+=over
+
+=item DSA
+=item RSA
+=item RSA encoded as x509
+
+=back
+
+This module supports the following canonicalization methods and transforms:
+
+=over
+
+=item Enveloped Signature
+=item REC-xml-c14n-20010315#
+=item REC-xml-c14n-20010315#WithComments
+=item REC-xml-c14n11-20080502
+=item REC-xml-c14n11-20080502#WithComments
+=item xml-exc-c14n#
+=item xml-exc-c14n#WithComments
+
+=back
+
+=head2 OPTIONS
+
+Each of the following options are also accessors on the main
+XML::Sig object. TODO Not strictly correct rewrite
+
+=over
+
+=item B<key>
+
+The path to a file containing the contents of a private key. This option
+is used only when generating signatures.
+
+=item B<cert>
+
+The path to a file containing a PEM-formatted X509 certificate. This
+option is used only when generating signatures with the "x509"
+option. This certificate will be embedded in the signed document, and
+should match the private key used for the signature.
+
+=item B<cert_text>
+
+A string containing a PEM-formatted X509 certificate. This
+option is used only when generating signatures with the "x509"
+option. This certificate will be embedded in the signed document, and
+should match the private key used for the signature.
+
+=item B<x509>
+
+Takes a true (1) or false (0) value and indicates how you want the
+signature to be encoded. When true, the X509 certificate supplied will
+be encoded in the signature. Otherwise the native encoding format for
+RSA and DSA will be used.
+
+=back
+
+=head2 METHODS
+
+=head3 B<new(...)>
+
+Constructor; see OPTIONS above.
+
+=head3 B<sign($xml)>
+
+When given a string of XML, it will return the same string with a signature
+generated from the key provided when the XML::Sig object was initialized.
+
+This method will sign all elements in your XML with an ID (case sensitive)
+attribute. Each element with an ID attribute will be the basis for a seperate
+signature. It will correspond to the URI attribute in the Reference element
+that will be contained by the signature. If no ID attribute can be found on
+an element, the signature will not be created.
+
+The elements are signed in reverse order currently assuming (possibly
+incorrectly) that the lower element in the tree may need to be signed
+inclusive of its Signature because it is a child of the higher element.
+
+Arguments:
+    $xml:     string XML string
+
+Returns: string  Signed XML
+
+=head3 B<verify($xml)>
+
+Returns true or false based upon whether the signature is valid or not.
+
+When using XML::Sig exclusively to verify a signature, no key needs to be
+specified during initialization given that the public key should be
+transmitted with the signature.
+
+XML::Sig checks all signature in the provided xml and will fail should any
+signature pointing to an existing ID in the XML fail to verify.
+
+Should there be a Signature included that does not point to an existing node
+in the XML it is ignored and other Signaures are checked.  If there are no
+other Signatures it will return false.
+
+Arguments:
+    $xml:     string XML string
+
+Returns: string  Signed XML
+
+=head3 B<signer_cert()>
+
+Following a successful verify with an X509 certificate, returns the
+signer's certificate as embedded in the XML document for verification
+against a CA certificate. The certificate is returned as a
+Crypt::OpenSSL::X509 object.
+
+Arguments: none
+
+Returns: Crypt::OpenSSL::X509: Certificate used to sign the XML
 
 =head1 ABOUT DIGITAL SIGNATURES
 
@@ -951,131 +1451,6 @@ Now, let's insert a signature:
     </Signature>
   </foo>
 
-=head1 PREREQUISITES
-
-=over
-
-=item L<Digest::SHA>
-
-=item L<XML::LibXML>
-
-=item L<MIME::Base64>
-
-=item L<Crypt::OpenSSL::X509>
-
-=item L<Crypt::OpenSSL::Bignum>
-
-=item L<Crypt::OpenSSL::RSA>
-
-=item L<Crypt::OpenSSL::DSA>
-
-=item L<Crypt::OpenSSL::X509>
-
-=back
-
-=head1 USAGE
-
-=head2 SUPPORTED ALGORITHMS & TRANSFORMS
-
-This module supports the following signature methods:
-
-=over
-
-=item DSA
-
-=item RSA
-
-=item RSA encoded as x509
-
-=back
-
-This module supports the following canonicalization methods and transforms:
-
-=over
-
-=item REC-xml-c14n-20010315#
-
-=item REC-xml-c14n-20010315#WithComments
-
-=item REC-xml-c14n11-20080502
-
-=item REC-xml-c14n11-20080502#WithComments
-
-=item xml-exc-c14n#
-
-=item xml-exc-c14n#WithComments
-
-=item Enveloped Signature
-
-=back
-
-=head2 METHODS
-
-=over
-
-=item B<new(...)>
-
-Constructor; see OPTIONS below.
-
-=item B<sign($xml)>
-
-When given a string of XML, it will return the same string with a signature
-generated from the key provided when the XML::Sig object was initialized.
-
-This method presumes that there is one and only one element in your XML
-document with an ID (case sensitive) attribute. This is the element that will
-be the basis for the signature. It will also correspond to the URI attribute
-in the Reference element that will be contained by the signature. If no ID
-attribute can be found on an element, the signature will not be created.
-
-=item B<verify($xml)>
-
-Returns true or false based upon whether the signature is valid or not.
-
-When using XML::Sig exclusively to verify a signature, no key needs to be
-specified during initialization given that the public key should be
-transmitted with the signature.
-
-XML::Sig checks all signature in the provided xml and will fail should any
-signature pointing to an existing ID in the XML fail to verify
-
-=item B<signer_cert()>
-
-Following a successful verify with an X509 certificate, returns the
-signer's certificate as embedded in the XML document for verification
-against a CA certificate. The certificate is returned as a
-Crypt::OpenSSL::X509 object.
-
-=back
-
-=head2 OPTIONS
-
-Each of the following options are also accessors on the main
-File::Download object.
-
-=over
-
-=item B<key>
-
-The path to a file containing the contents of a private key. This option
-is used only when generating signatures.
-
-=item B<cert>
-
-The path to a file containing a PEM-formatted X509 certificate. This
-option is used only when generating signatures with the "x509"
-option. This certificate will be embedded in the signed document, and
-should match the private key used for the signature.
-
-=item B<x509>
-
-Takes a true (1) or false (0) value and indicates how you want the
-signature to be encoded. When true, the X509 certificate supplied will
-be encoded in the signature. Otherwise the native encoding format for
-RSA and DSA will be used.
-
-=back
-
 =head1 SEE ALSO
 
 L<http://www.w3.org/TR/xmldsig-core/>
@@ -1102,7 +1477,7 @@ Original Author: Byrne Reese <byrne@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Byrne Reese, Chris Andrews and Others; in detail:
+This software is copyright (c) 2021 by Byrne Reese, Chris Andrews and Others; in detail:
 
   Copyright 2009       Byrne, Michael Hendricks
             2010       Chris Andrews
@@ -1111,7 +1486,7 @@ This software is copyright (c) 2020 by Byrne Reese, Chris Andrews and Others; in
             2015       Mike Wisener
             2016       Jeff Fearn
             2017       Mike Wisener, xmikew
-            2019-2020  Timothy Legge
+            2019-2021  Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

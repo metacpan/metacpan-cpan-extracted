@@ -8,7 +8,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Async::Template::Parser;
 use Async::Template::Grammar;

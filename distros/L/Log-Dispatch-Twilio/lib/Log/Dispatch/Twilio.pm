@@ -7,8 +7,9 @@ use HTTP::Status qw(:is);
 use List::Util qw(min);
 use POSIX qw(ceil);
 use WWW::Twilio::API;
+use namespace::clean;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our $MAX_TWILIO_LENGTH = 160;   # max length of SMS message allowed by Twilio
 
 sub new {
@@ -84,8 +85,8 @@ sub _expand_message {
         my $num_messages      = min($max, ceil($msg_length / $how_much));
 
         # Create entries w/prefixes
-        for my $idx (1 .. $max) {
-            my $prefix = "$idx/$max: ";
+        for my $idx (1 .. $num_messages) {
+            my $prefix = "$idx/$num_messages: ";
             my $entry = substr($msg, 0, $how_much, '');
             $entry =~ s{^\s+|\s+$}{}g;  # trim leading/trailing ws
             push @results, $prefix . $entry;
@@ -103,6 +104,8 @@ sub _expand_message {
 
 1;
 
+=for stopwords SMS Auth
+
 =head1 NAME
 
 Log::Dispatch::Twilio - Log output via Twilio SMS Message
@@ -113,7 +116,7 @@ Log::Dispatch::Twilio - Log output via Twilio SMS Message
 
   my $logger = Log::Dispatch->new(
       outputs => [
-          [ 'Twilio,
+          [ 'Twilio',
             min_level   => 'emergency',
             account_sid => '<your-twilio-account-sid>',
             auth_token  => '<your-twilio-auth-token>',

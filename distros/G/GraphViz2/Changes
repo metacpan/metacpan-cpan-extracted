@@ -1,3 +1,6 @@
+2.65 2021-01-09
+- undirected edges don't get doubled in from_graph, changes dot_input
+
 2.64 2021-01-01
 - fix multigraph-handling
 

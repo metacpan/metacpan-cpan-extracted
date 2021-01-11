@@ -61,10 +61,12 @@ sub new {
         $config = AsposeSlidesCloud::Configuration->new(@_);
     }
 
-    my (%args) = (
-        'ua' => LWP::UserAgent->new,
-        'config' => $config,
-    );
+    my $ua = LWP::UserAgent->new;
+    if (defined $config->{http_request_timeout}) {
+        $ua->{timeout} = $config->{http_request_timeout};
+    }
+
+    my (%args) = ('ua' => $ua, 'config' => $config);
   
     return bless \%args, $class;
 }
@@ -374,7 +376,7 @@ sub update_headers {
 # @param array $headerParams header parameters (by ref)
 sub update_params_for_auth {
     my ($self, $header_params) = @_;
-    if (!defined $self->{config}{access_token} || $self->{config}{access_token} eq "") {
+    if ((defined $self->{config}{app_sid} && $self->{config}{app_sid} ne "") && (!defined $self->{config}{access_token} || $self->{config}{access_token} eq "")) {
         my $_url = $self->{config}{auth_base_url} . "/connect/token";
         my $_request = POST($_url, {}, Content => 'grant_type=client_credentials&client_id='.$self->{config}{app_sid}.'&client_secret='.$self->{config}{app_key});
         my $_response = $self->{ua}->request($_request);

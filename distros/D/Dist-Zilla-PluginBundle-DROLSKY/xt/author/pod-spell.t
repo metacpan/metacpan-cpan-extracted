@@ -10,6 +10,7 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+BundleAuthordep
 CheckFor
 Contributors
 CoreCounter
@@ -17,12 +18,14 @@ CorrectBranch
 DROLSKY
 DROLSKY's
 Dave
+DevTools
 Dist
 Fowler
 Git
 License
 MakeMaker
 Mark
+MaybeFileWriter
 PayPal
 PerlLinterConfigFiles
 Plugin

@@ -1,2 +1,22 @@
 TYPEMAP
-struct ub_ctx*  T_PTROBJ
+dns_unbound_ub_ctx*  DNS_UNBOUND_T_PTROBJ
+
+INPUT
+DNS_UNBOUND_T_PTROBJ
+	if (SvROK($arg) && sv_derived_from($arg, \"${ntype}\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else {
+		const char* refstr = SvROK($arg) ? \"ref: \" : SvOK($arg) ? \"scalar: \" : \"undef\";
+		const char* valstr = SvROK($arg) ? sv_2pvbyte_nolen($arg) : SvPV_nolen($arg);
+	    Perl_croak_nocontext(\"%s: %s (%s%s) is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\",
+			refstr, valstr,
+			\"$ntype\");
+	}
+
+OUTPUT
+DNS_UNBOUND_T_PTROBJ
+	sv_setref_pv($arg, \"${ntype}\", (void*)$var);

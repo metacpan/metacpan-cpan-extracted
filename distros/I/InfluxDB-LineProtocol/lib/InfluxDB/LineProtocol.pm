@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Write and read InfluxDB LineProtocol
 
-our $VERSION = '1.013'; # VERSION
+our $VERSION = '1.014'; # VERSION
 
 use Carp qw(croak);
 use Time::HiRes qw(gettimeofday);
@@ -337,7 +337,7 @@ InfluxDB::LineProtocol - Write and read InfluxDB LineProtocol
 
 =head1 VERSION
 
-version 1.013
+version 1.014
 
 =head1 SYNOPSIS
 

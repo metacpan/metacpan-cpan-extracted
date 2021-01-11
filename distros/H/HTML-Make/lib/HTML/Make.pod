@@ -72,13 +72,13 @@ produces output
 
 =end html
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/synopsis.pl> in the distribution.)  
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/synopsis.pl> in the distribution.)  
 
 =head1 VERSION
 
-This documents HTML::Make version 0.12 corresponding to git
-commit L<2419de0d9bc9ccdec56ae906b625162e111dd639|https://github.com/benkasminbullock/HTML-Make/commit/2419de0d9bc9ccdec56ae906b625162e111dd639>
-released on Fri Jan 1 23:43:22 2021 +0900.
+This documents HTML::Make version 0.14 corresponding to git
+commit L<0ecc92d13c748282b0d59e8a927871aef36255f8|https://github.com/benkasminbullock/HTML-Make/commit/0ecc92d13c748282b0d59e8a927871aef36255f8>
+released on Mon Jan 11 19:52:47 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -108,7 +108,7 @@ produces output
     <li class="beano"></li>
 
 
-(This example is included as L<F<li-class-beano.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/li-class-beano.pl> in the distribution.)  
+(This example is included as L<F<li-class-beano.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/li-class-beano.pl> in the distribution.)  
 
 This issues a warning of the form B<"Overwriting attribute 'class' for
 'p'"> if the object already contains an attribute of the specified
@@ -126,17 +126,27 @@ produces output
     Overwriting attribute 'class' for 'p' tag at /usr/home/ben/projects/html-make/examples/p-double-class.pl line 6.
 
 
-(This example is included as L<F<p-double-class.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/p-double-class.pl> in the distribution.)  
+(This example is included as L<F<p-double-class.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/p-double-class.pl> in the distribution.)  
 
 This also issues a warning if the attribute is not valid for the tag,
 according to L<HTML::Valid::Tagset/tag_attr_ok>. This is restricted to
 what is valid in HTML5.
+
+=head2 add_class
+
+As a special case of L</add_attr>, HTML::Make allows you to add to the
+class of the item with C<add_class>. This is added to the existing
+classes of the element rather than overwriting them.
+
+🎲 This method was added in version 0.13.
 
 =head2 add_comment
 
     $element->add_comment ('This should be fixed!');
 
 Add an HTML comment to the element.
+
+🎲 This method was added in version 0.12.
 
 =head2 add_text
 
@@ -157,6 +167,13 @@ The text may contain HTML elements:
     # <p>peanuts <i>eggs</i></p>
 
 The return value is the added text object.
+
+=head2 children
+
+    my $children = $obj->children ();
+
+Returns an array reference, possibly empty, containing the child
+elements of C<$obj>, in the order they were added to $obj.
 
 =head2 multiply
 
@@ -196,7 +213,7 @@ produces output
 
 =end html
 
-(This example is included as L<F<multiply.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/multiply.pl> in the distribution.)  
+(This example is included as L<F<multiply.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/multiply.pl> in the distribution.)  
 
 =head2 new
 
@@ -235,7 +252,56 @@ produces output
     </freaky>
 
 
-(This example is included as L<F<nocheck.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/nocheck.pl> in the distribution.)  
+(This example is included as L<F<nocheck.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/nocheck.pl> in the distribution.)  
+
+=head3 Allowed options
+
+The following options are allowed in C<new> and in L</push>:
+
+=over
+
+=item attr
+
+    my $item = HTML::Make->new ('li', attr => {style => "color: #FFD"});
+
+Any HTML tag attributes can be added as a hash reference.
+
+=item class
+
+    my $item = HTML::Make->new ('li', class => 'entry');
+
+This is equivalent to C<< attr => {class => $class} >>. It is allowed
+for any HTML element. See also L</add_class>.
+
+🎲 This option was added in version 0.13.
+
+=item href
+
+    my $link = HTML::Make->new ('a', href => 'http://www.example.com');
+
+This is equivalent to C<< attr => {href => $url} >>. It is allowed
+only for C<a> elements.
+
+🎲 This option was added in version 0.13.
+
+=item id
+
+    my $item = HTML::Make->new ('li', id => 'entry');
+
+This is equivalent to C<< attr => {id => $id} >>. It is allowed for
+any HTML element.
+
+🎲 This option was added in version 0.13.
+
+=item text
+
+    my $link = HTML::Make->new ('a', href => $url, text => "My cool website");
+
+The text, the part between <a> and </a>.
+
+See also L</add_text>.
+
+=back
 
 =head2 opening_tag
 
@@ -272,7 +338,14 @@ produces output
     </table>
 
 
-(This example is included as L<F<table.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/table.pl> in the distribution.)  
+(This example is included as L<F<table.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/table.pl> in the distribution.)  
+
+It is also possible to push one HTML::Make object into another one.
+
+    my $td = HTML::Make->new ('td');
+    $tr->push ($td);
+
+In this case, the return value is the initial element itself.
 
 C<push> takes all of the same arguments as L</new>, for example:
 
@@ -304,7 +377,7 @@ link to example</a>
 
 =end html
 
-(This example is included as L<F<link-example.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/link-example.pl> in the distribution.)  
+(This example is included as L<F<link-example.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/link-example.pl> in the distribution.)  
 
 =head3 Making a colourful list
 
@@ -362,7 +435,7 @@ produces output
 
 =end html
 
-(This example is included as L<F<push-new.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/push-new.pl> in the distribution.)  
+(This example is included as L<F<push-new.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/push-new.pl> in the distribution.)  
 
 See also L<Make a list of colours with
 HTML::Make|https://www.lemoda.net/perl/colour-list/index.html>.
@@ -516,7 +589,7 @@ produces output
 
 =end html
 
-(This example is included as L<F<json-to-html.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/json-to-html.pl> in the distribution.)  
+(This example is included as L<F<json-to-html.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/json-to-html.pl> in the distribution.)  
 
 See also L<Convert JSON to HTML with JSON::Parse and
 HTML::Make|https://www.lemoda.net/perl/json-to-html/index.html>.
@@ -538,13 +611,13 @@ produces output
     Pushing non-table element <li> to a table row at /usr/home/ben/projects/html-make/examples/push-li-to-tr.pl line 6.
 
 
-(This example is included as L<F<push-li-to-tr.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/push-li-to-tr.pl> in the distribution.)  
+(This example is included as L<F<push-li-to-tr.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/push-li-to-tr.pl> in the distribution.)  
 
-I've never received a single bug report for this module, and so these
-warnings are mostly added in an ad-hoc fashion as I've found myself
-making various mistakes. If you find yourself tripping over some kind
-of error repeatedly, then feel free to ask me to add that to this
-module.
+We've never received a single bug report for this module, and so these
+warnings are mostly added in an ad-hoc fashion as we've found
+ourselves making various mistakes. If you find yourself tripping over
+some kind of error repeatedly, then feel free to ask us to add that to
+this module.
 
 =head2 text
 
@@ -578,6 +651,10 @@ This module assumes you want to make HTML5.
 There is no way to control the whitespace in the output HTML such as
 indentation.
 
+This module assumes lower case HTML tags (HTML tags are actually
+completely case insensitive, so <LI> or <A
+HREF='http://www.example.com'> and so on are all valid.)
+
 =head1 DEPENDENCIES
 
 This module depends on the following Perl modules.
@@ -598,7 +675,7 @@ L<HTML::Valid::Tagset> is used to validate tags and tag/attribute pairs.
 
 =head2 CPAN modules
 
-These are the other modules I've found on CPAN (one is only on
+These are the other modules we've found on CPAN (one is only on
 sourceforge) which generate HTML programmatically, rather than by
 template substitution.
 
@@ -653,7 +730,6 @@ update, version 1.05, was in 2009, and it doesn't include HTML5 tags.
 My L<HTML validator is on
 github|https://github.com/benkasminbullock/html-validate>. This is in
 the Go language, not in Perl.
-
 
 
 

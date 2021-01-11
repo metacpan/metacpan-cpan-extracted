@@ -1,0 +1,55 @@
+{
+   "abstract" : "Perl extensions to check USCIS (United States Citizenship and Immigration Services) case status. More features would be added in the future.",
+   "author" : [
+      "Hui Li <herdingcat@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "USCIS-Case",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::Protocol::https" : "6.02",
+            "LWP::UserAgent" : "6.02",
+            "XML::LibXML" : "2.0132",
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/meow-watermelon/USCIS-Case/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/meow-watermelon/USCIS-Case.git",
+         "web" : "https://github.com/meow-watermelon/USCIS-Case"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

@@ -3,7 +3,7 @@ package Dist::Zilla::Starter;
 use strict;
 use warnings;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v5.0.2';
 
 1;
 
@@ -33,44 +33,48 @@ distribution authoring, skip ahead to L</"DZIL AND BUNDLES">.
 
 =over
 
-=item L</"CPAN DISTRIBUTIONS">
+=item *
 
-A modern CPAN distribution should have a basic well-defined structure so its
-contents and attributes can be recognized by CPAN infrastructure and tooling.
+L</"CPAN DISTRIBUTIONS"> - A modern CPAN distribution should have a basic
+well-defined structure so its contents and attributes can be recognized by CPAN
+infrastructure and tooling.
 
-=item L</"A BRIEF HISTORY OF AUTHORING">
+=item *
 
-The historical progression of CPAN distribution authoring tools that led to the
-development of Dist::Zilla.
+L</"A BRIEF HISTORY OF AUTHORING"> - The historical progression of CPAN
+distribution authoring tools that led to the development of Dist::Zilla.
 
-=item L</"DZIL AND BUNDLES">
+=item *
 
-Dist::Zilla plugin bundles that can provide a starting point or a ready-made
-complete distribution management tool.
+L</"DZIL AND BUNDLES"> - Dist::Zilla plugin bundles that can provide a starting
+point or a ready-made complete distribution management tool.
 
-=item L</"THE DZIL CORE">
+=item *
 
-The infrastructure of Dist::Zilla provides the framework for plugins and
-commands to define specific behavior in a configurable and extensible way.
+L</"THE DZIL CORE"> - The infrastructure of Dist::Zilla provides the framework
+for plugins and commands to define specific behavior in a configurable and
+extensible way.
 
-=item L</"CONFIGURATION">
+=item *
 
-Configuring a Dist::Zilla project and the plugins for it to use in F<dist.ini>.
+L</"CONFIGURATION"> - Configuring a Dist::Zilla project and the plugins for it
+to use in F<dist.ini>.
 
-=item L</"COMMANDS">
+=item *
 
-Taking action with a configured Dist::Zilla project via built-in and
-installable commands.
+L</"COMMANDS"> - Taking action with a configured Dist::Zilla project via
+built-in and installable commands.
 
-=item L</"MINTING">
+=item *
 
-Dist::Zilla provides the ability to generate new distribution skeletons using
-the same core infrastructure and a minting profile.
+L</"MINTING"> - Dist::Zilla provides the ability to generate new distribution
+skeletons using the same core infrastructure and a minting profile.
 
-=item L</"PHASES">
+=item *
 
-Commands execute a series of phases, which each execute any actions registered
-by plugins for that phase. The known phases and their usage are listed here.
+L</"PHASES"> - Commands execute a series of phases, which each execute any
+actions registered by plugins for that phase. The known phases and their usage
+are listed here.
 
 =back
 
@@ -139,7 +143,8 @@ In order to provide infinite flexibility to how distributions can be installed,
 a file called F<Makefile.PL> consisting of regular Perl code is run, and is
 expected to generate a F<Makefile> that dictates the later steps of building,
 testing, and installing. (Note: this is user-side building, a separate task
-from the author-side distribution build that will be discussed later.)
+from the author-side distribution assembling build that will be discussed
+later.)
 
 While this is traditionally implemented by a module called
 L<ExtUtils::MakeMaker>, a slightly different process was conceived using a
@@ -296,7 +301,7 @@ tasks itself.
 
 Learning from the mistakes of Module::Install, it has a formal plugin
 configuration system, and can deterministically find what plugins are needed to
-build the distribution, using the
+build (assemble) the distribution, using the
 L<C<dzil authordeps>|Dist::Zilla::App::Command::authordeps> command.
 
 =back
@@ -304,7 +309,7 @@ L<C<dzil authordeps>|Dist::Zilla::App::Command::authordeps> command.
 =head1 DZIL AND BUNDLES
 
 Dist::Zilla is a CPAN distribution authoring framework. At its core, it only
-organizes tasks; it requires plugins to implement the specifics of building,
+organizes tasks; it requires plugins to implement the specifics of assembling,
 testing, and releasing the distribution. The author can manually specify in
 F<dist.ini> the set of plugins that suits their needs, or even write new
 plugins, but there are also ready-made tools built upon it that require very
@@ -360,9 +365,9 @@ it is up to other parts of the system to utilize this information.
 =head2 Dist::Zilla::Dist::Builder
 
 The L<Dist::Zilla::Dist::Builder> object is a subclass of the main Dist::Zilla
-object that is able to B<build> the distribution by executing all of the
-relevant plugins. Additionally it can execute the appropriate plugins to test,
-install, or release the built distribution. These functions are generally
+object that is able to B<build> (assemble) the distribution by executing all of
+the relevant plugins. Additionally it can execute the appropriate plugins to
+test, install, or release the built distribution. These functions are generally
 accessed via L</COMMANDS>, and primarily work by executing L</PHASES> in a
 certain order for each task.
 
@@ -523,7 +528,7 @@ basic operation of creating and releasing a distribution.
 
 One of the most common commands is
 L<< C<dzil test>|Dist::Zilla::App::Command::test >>, a wrapper of
-L<Dist::Zilla::Dist::Builder/test>. This will build the distribution in a
+L<Dist::Zilla::Dist::Builder/test>. This will assemble the distribution in a
 temporary directory, and then run the configure, build, and test phases of the
 L<CPAN::Meta::Spec/Phases>. It will also execute any other C<-TestRunner> phase
 plugins such as L<[RunExtraTests]|Dist::Zilla::Plugin::RunExtraTests>, which
@@ -534,10 +539,10 @@ can be passed to run release tests in addition to standard and author tests.
 
 The second most important command is
 L<< C<dzil release>|Dist::Zilla::App::Command::release >>, a wrapper of
-L<Dist::Zilla::Dist::Builder/release>. This will build the distribution, and
-then upload the archive to PAUSE with the C<-Releaser> phase. The C<--trial>
-option will mark the upload as a trial release, so it will not be indexed as
-stable.
+L<Dist::Zilla::Dist::Builder/release>. This will assemble the distribution, run
+standard/author/release tests, and then upload the archive to PAUSE with the
+C<-Releaser> phase. The C<--trial> option will mark the upload as a trial
+release, so it will not be indexed as stable.
 
 =head2 Installing Dependencies
 
@@ -559,18 +564,20 @@ this process into a single command.
 
 =item *
 
-L<C<dzil build>|Dist::Zilla::App::Command::build> builds the distribution and
-stores the tarball and extracted directory locally.
+L<C<dzil build>|Dist::Zilla::App::Command::build> assembles the distribution
+and stores the tarball and extracted directory locally.
 
 =item *
 
 L<C<dzil run>|Dist::Zilla::App::Command::run> builds the distribution
-temporarily like C<dzil test> but runs the supplied command instead.
+temporarily like C<dzil test> but runs the supplied command instead of running
+tests.
 
 =item *
 
-L<C<dzil install>|Dist::Zilla::App::Command::install> builds the distribution
-temporarily and then installs it with a CPAN installer.
+L<C<dzil install>|Dist::Zilla::App::Command::install> assembles the
+distribution temporarily and then installs it to the system with a CPAN
+installer.
 
 =item *
 
@@ -603,6 +610,12 @@ L<Starter::Git|Dist::Zilla::MintingProfile::Starter::Git> minting profiles
 provide a starting point and instructions for customizing profiles, as does
 L<dzil.org|http://dzil.org/tutorial/minting-profile.html>.
 
+A minting profile primarily consists of a F<profile.ini> file, which uses the
+same configuration format as F<dist.ini> described in L</"CONFIGURATION">. It
+may include other files as needed by the profile, including a F<dist.ini>
+plugins configuration template, module template, or a skeleton distribution
+directory of templates.
+
 Some metadata such as author, license, and copyright is set from global
 configuration by default for new distributions. This configuration is stored in
 C<~/.dzil/config.ini>, which can be initialized using the
@@ -627,6 +640,13 @@ those plugins were used. The command
 L<< C<dzil dumpphases>|Dist::Zilla::App::Command::dumpphases >> can be used to
 see a full listing of the phases that the plugins in a F<dist.ini> will run in.
 
+A property of phases that many plugins find useful is that successive phases
+will only run if previous phases completed successfully. For example, the
+L</"BeforeRelease"> phase will only run if the distribution was successfully
+built, the L</"Releaser"> phase will only run if the BeforeRelease checks and
+release tests succeeded, and the L</"AfterRelease"> phase will only run if the
+release was successful.
+
 =head2 BeforeBuild
 
 The distribution build consists of several phases, starting with
@@ -642,9 +662,10 @@ C<-BeforeBuild>.
 =head2 FileGatherer
 
 In the L<-FileGatherer|Dist::Zilla::Role::FileGatherer> phase, many plugins add
-files to the distribution; in C<[@Starter]> this includes the plugins
-L<[GatherDir]|Dist::Zilla::Plugin::GatherDir>,
-L<[MetaYAML]|Dist::Zilla::Plugin::MetaYAML>, 
+files to the distribution tree being assembled; in C<[@Starter]> this includes
+the plugins L<[GatherDir]|Dist::Zilla::Plugin::GatherDir>
+(L<[Git::GatherDir]|Dist::Zilla::Plugin::Git::GatherDir> in
+C<[@Starter::Git]>), L<[MetaYAML]|Dist::Zilla::Plugin::MetaYAML>, 
 L<[MetaJSON]|Dist::Zilla::Plugin::MetaJSON>,
 L<[License]|Dist::Zilla::Plugin::License>,
 L<[Pod2Readme]|Dist::Zilla::Plugin::Pod2Readme>,
@@ -720,8 +741,8 @@ execute during this phase by default.
 
 The L<-BuildRunner|Dist::Zilla::Role::BuildRunner> phase executes the configure
 and build phases of the L<CPAN::Meta::Spec/Phases> (not to be confused with the
-Dist::Zilla build that creates the distribution). This is primarily used to
-prepare the distribution for testing or installing. In C<[@Starter]>,
+Dist::Zilla build that has assembled the distribution). This is primarily used
+to prepare the distribution for testing or installing. In C<[@Starter]>,
 L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker> or the configured installer
 plugin handles this phase.
 
@@ -736,8 +757,8 @@ handle this phase.
 =head2 BeforeArchive
 
 The L<-BeforeArchive|Dist::Zilla::Role::BeforeArchive> phase is executed after
-building the distribution and before packaging it into an archive, such as for
-the L<< C<dzil build>|Dist::Zilla::App::Command::build >> command or before
+assembling the distribution and before packaging it into an archive, such as
+for the L<< C<dzil build>|Dist::Zilla::App::Command::build >> command or before
 releasing. No plugins in C<[@Starter]> execute during this phase by default.
 
 =head2 BeforeRelease

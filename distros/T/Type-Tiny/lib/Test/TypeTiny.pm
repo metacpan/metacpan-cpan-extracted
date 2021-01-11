@@ -6,68 +6,71 @@ use warnings;
 use Test::More qw();
 use Scalar::Util qw(blessed);
 use Types::TypeTiny ();
-use Type::Tiny ();
+use Type::Tiny      ();
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
 BEGIN {
-	*EXTENDED_TESTING = $ENV{EXTENDED_TESTING} ? sub(){!!1} : sub(){!!0};
-};
+	*EXTENDED_TESTING = $ENV{EXTENDED_TESTING} ? sub() { !!1 } : sub() { !!0 };
+}
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.012000';
+our $VERSION   = '1.012001';
 our @EXPORT    = qw( should_pass should_fail ok_subtype );
 our @EXPORT_OK = qw( EXTENDED_TESTING matchfor );
 
 $VERSION =~ tr/_//d;
 
 my $overloads_installed = 0;
-sub matchfor
-{
+
+sub matchfor {
 	my @matchers = @_;
 	bless \@matchers, do {
-		package #
-		Test::TypeTiny::Internal::MATCHFOR;
+		package    #
+			Test::TypeTiny::Internal::MATCHFOR;
 		Test::TypeTiny::Internal::MATCHFOR->Type::Tiny::_install_overloads(
 			q[==] => 'match',
 			q[eq] => 'match',
 			q[""] => 'to_string',
 		) unless $overloads_installed++;
+		
 		sub to_string {
-			$_[0][0]
+			$_[0][0];
 		}
+		
 		sub match {
-			my ($self, $e) = @_;
-			my $does = Scalar::Util::blessed($e) ? ($e->can('DOES') || $e->can('isa')) : undef;
-			for my $s (@$self) {
-				return 1 if  ref($s) && $e =~ $s;
-				return 1 if !ref($s) && $does && $e->$does($s);
+			my ( $self, $e ) = @_;
+			my $does =
+				Scalar::Util::blessed( $e )
+				? ( $e->can( 'DOES' ) || $e->can( 'isa' ) )
+				: undef;
+			for my $s ( @$self ) {
+				return 1 if ref( $s ) && $e =~ $s;
+				return 1 if !ref( $s ) && $does && $e->$does( $s );
 			}
 			return;
-		}
+		} #/ sub match
 		__PACKAGE__;
 	};
-}
+} #/ sub matchfor
 
-sub _mk_message
-{
+sub _mk_message {
 	require Type::Tiny;
-	my ($template, $value) = @_;
-	sprintf($template, Type::Tiny::_dd($value));
+	my ( $template, $value ) = @_;
+	sprintf( $template, Type::Tiny::_dd( $value ) );
 }
 
-sub ok_subtype
-{
-	my ($type, @s) = @_;
+sub ok_subtype {
+	my ( $type, @s ) = @_;
 	@_ = (
-		not(scalar grep !$_->is_subtype_of($type), @s),
-		sprintf("%s subtype: %s", $type, join q[, ], @s),
+		not( scalar grep !$_->is_subtype_of( $type ), @s ),
+		sprintf( "%s subtype: %s", $type, join q[, ], @s ),
 	);
 	goto \&Test::More::ok;
 }
 
-eval(EXTENDED_TESTING ? <<'SLOW' : <<'FAST');
+eval( EXTENDED_TESTING ? <<'SLOW' : <<'FAST');
 
 sub should_pass
 {
@@ -255,7 +258,7 @@ loaded).
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+L<https://github.com/tobyink/p5-type-tiny/issues>.
 
 =head1 SEE ALSO
 
@@ -270,7 +273,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -280,4 +283,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

@@ -1,5 +1,9 @@
 Revision history for Perl extension Class::Data::TIN.
 
+0.03      2021-01-10 17:52:53+01:00
+    - DEPRECATED!
+
+
 0.02  2002-02
 	- changed how new gets the data
 

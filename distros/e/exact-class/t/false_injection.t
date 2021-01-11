@@ -1,4 +1,4 @@
-use Test::Most;
+use Test2::V0;
 
 package Parent {
     use exact -class;
@@ -14,6 +14,8 @@ package Role {
     use Parent;
 }
 
-use_ok('Parent');
+use Parent;
 
-done_testing();
+ok( 1, '(We still live!)' );
+
+done_testing;

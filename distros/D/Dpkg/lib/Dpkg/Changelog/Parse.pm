@@ -33,7 +33,7 @@ package Dpkg::Changelog::Parse;
 use strict;
 use warnings;
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 our @EXPORT = qw(
     changelog_parse
 );
@@ -79,11 +79,13 @@ This function will parse a changelog. In list context, it returns as many
 Dpkg::Control objects as the parser did create. In scalar context, it will
 return only the first one. If the parser did not return any data, it will
 return an empty list in list context or undef on scalar context. If the
-parser failed, it will die.
+parser failed, it will die. Any parse errors will be printed as warnings
+on standard error, but this can be disabled by passing $opt{verbose} to 0.
 
 The changelog file that is parsed is F<debian/changelog> by default but it
-can be overridden with $opt{file}. The default output format is "dpkg" but
-it can be overridden with $opt{format}.
+can be overridden with $opt{file}. The changelog name used in output messages
+can be specified with $opt{label}, otherwise it will default to $opt{file}.
+The default output format is "dpkg" but it can be overridden with $opt{format}.
 
 The parsing itself is done by a parser module (searched in the standard
 perl library directories. That module is named according to the format that
@@ -104,6 +106,7 @@ All the other keys in %opt are forwarded to the parser module constructor.
 sub changelog_parse {
     my (%options) = @_;
 
+    $options{verbose} //= 1;
     $options{file} //= 'debian/changelog';
     $options{label} //= $options{file};
     $options{changelogformat} //= _changelog_detect_format($options{file});
@@ -129,7 +132,9 @@ sub changelog_parse {
         \$changes = Dpkg::Changelog::$format->new();
     };
     error(g_('changelog format %s is unknown: %s'), $format, $@) if $@;
-    $changes->set_options(reportfile => $options{label}, range => $range);
+    $changes->set_options(reportfile => $options{label},
+                          verbose => $options{verbose},
+                          range => $range);
 
     # Load and parse the changelog.
     $changes->load($options{file}, compression => $options{compression})
@@ -156,6 +161,10 @@ sub changelog_parse {
 =back
 
 =head1 CHANGES
+
+=head2 Version 2.01 (dpkg 1.20.6)
+
+New option: 'verbose' in changelog_parse().
 
 =head2 Version 2.00 (dpkg 1.20.0)
 

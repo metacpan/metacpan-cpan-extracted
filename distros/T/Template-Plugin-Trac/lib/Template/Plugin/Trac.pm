@@ -11,7 +11,7 @@ use base qw(Template::Plugin::Filter);
 ###############################################################################
 # Version number.
 ###############################################################################
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 ###############################################################################
 # Subroutine:   init()
@@ -38,9 +38,11 @@ sub filter {
 
 1;
 
+=for stopwords WikiFormatting
+
 =head1 NAME
 
-Template::Plugin::Trac - TT filter for Text::Trac
+Template::Plugin::Trac - Template::Toolkit filter for Text::Trac
 
 =head1 SYNOPSIS
 
@@ -55,8 +57,8 @@ Template::Plugin::Trac - TT filter for Text::Trac
 
 =head1 DESCRIPTION
 
-C<Template::Plugin::Trac> is a plugin for TT, which formats your text using
-Trac's WikiFormatting style.
+C<Template::Plugin::Trac> is a plugin for C<Template::Toolkit>, which formats
+your text using Trac's WikiFormatting style.
 
 =head1 METHODS
 
@@ -64,11 +66,11 @@ Trac's WikiFormatting style.
 
 =item init()
 
-Initializes the template plugin. 
+Initializes the template plugin.
 
 =item filter($txt, $args, $config)
 
-Filters the given text, by running it through C<Text::Trac>. 
+Filters the given text, by running it through C<Text::Trac>.
 
 =back
 
@@ -85,7 +87,12 @@ terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Text::Trac>,
-L<Template::Plugin::Filter>.
+=over
+
+=item L<Text::Trac>
+
+=item L<Template::Plugin::Filter>
+
+=back
 
 =cut

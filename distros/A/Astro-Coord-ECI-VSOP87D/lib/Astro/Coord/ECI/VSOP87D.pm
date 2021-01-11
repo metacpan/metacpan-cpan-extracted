@@ -28,7 +28,7 @@ BEGIN {
 	or constant->import( DEBUG => 0 );
 }
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 my @basic_export = qw{
     SUN_CLASS
@@ -906,7 +906,7 @@ __END__
 
 =head1 NAME
 
-Astro::Coord::ECI::VSOP87D - Implement the VSOP87D position model.
+Astro::Coord::ECI::VSOP87D - Implement the VSOP87D planetary position model.
 
 =head1 SYNOPSIS
 
@@ -1359,7 +1359,8 @@ for daily events involving astronomical bodies.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -1367,7 +1368,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018-2020 by Thomas R. Wyant, III
+Copyright (C) 2018-2021 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

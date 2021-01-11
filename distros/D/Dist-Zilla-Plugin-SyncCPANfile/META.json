@@ -37,6 +37,7 @@
       },
       "test" : {
          "requires" : {
+            "Clone" : "0",
             "Exporter" : "0",
             "Module::CPANfile" : "0",
             "Pod::Coverage::TrustPod" : "0",
@@ -47,7 +48,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::SyncCPANfile" : {
          "file" : "lib/Dist/Zilla/Plugin/SyncCPANfile.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -62,7 +63,7 @@
          "web" : "http://github.com/perlservices/Dist-Zilla-Plugin-SyncCPANfile"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

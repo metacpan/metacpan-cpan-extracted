@@ -16,6 +16,7 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Exporter' => '0',
                                       'Scalar::Util' => '0',
+                                      'Sentinel' => '0',
                                       'perl' => '5.008008'
                                     }
                     },

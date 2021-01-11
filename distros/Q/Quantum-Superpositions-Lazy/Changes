@@ -1,15 +1,25 @@
 Revision history for Perl extension Quantum::Superpositions::Lazy.
 
-1.00  Thu Aug 6 2020
-	- original version; created by h2xs 1.23 with options
-		-AXn Quantum::Superpositions::Lazy
+1.04 Fri Jan 8 2021
+	- fix indexer - missing version numbers of deprecated packages
 
-1.01  Sat Aug 8 2020
-	- add a manual with an introduction to the topic
-	- add superposition transformations using a custom code reference
+1.03 Fri Jan 8 2021
+	- deprecate Q::S::L::Operation::ComputationalOp in favor of Q::S::L::Operation::Computational
+	- deprecate Q::S::L::Operation::LogicOp in favor of Q::S::L::Operation::Logical
+	- add a way to plug in statistical measures
+	- remove List::MoreUtils dependency
+	- superposition ->reset() now returns $self
 
 1.02 Sat Aug 22 2020
 	- fix minimum required perl version to 5.28 (due to :prototype attribute order)
 	- minor fixes to the documentation
 	- add todo section to the docs
 	- add perltidy to the project, tidy up source files
+
+1.01  Sat Aug 8 2020
+	- add a manual with an introduction to the topic
+	- add superposition transformations using a custom code reference
+
+1.00  Thu Aug 6 2020
+	- original version
+

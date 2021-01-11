@@ -22,15 +22,17 @@ my %config = (
     VERSION_FROM        => $path_to_package,  # finds $VERSION
     MIN_PERL_VERSION    => '5.010',
     PREREQ_PM           => {            # more to the list $Module::CoreList::version{5.010}
-		'JSON::XS'					=> '3.02',
-		'Kafka::Consumer'			=> '1.07',
-		'Avro::BinaryEncoder'		=> 0,
-		'Avro::Schema'				=> 0,
-		'Confluent::SchemaRegistry'	=> '0.03'
+		'JSON::XS'					=> 'v4.30.0',
+		'Kafka::Consumer'			=> 'v1.8.0',
+		'Avro::BinaryDecoder'		=> 'v1.10.1',
+        'IO::String'                => 'v1.80.0',
+		'Avro::Schema'				=> 'v1.10.1',
+		'Confluent::SchemaRegistry'	=> 'v1.0.0'
     },
     TEST_REQUIRES       => {            # more to the list $Module::CoreList::version{5.010}
 		'Math::BigInt'				=> '1.89',
-		'Test::Exception'			=> '0.43'
+		'Test::Exception'			=> '0.43',
+        'Kafka::Producer::Avro'     => 'v1.0.0'
     },
     META_MERGE          => {
         no_index                => {

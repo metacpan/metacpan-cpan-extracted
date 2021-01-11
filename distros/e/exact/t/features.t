@@ -1,7 +1,7 @@
-use Test::More tests => 2;
-use Test::Exception;
-
+use Test2::V0;
 use exact qw( nobundle switch state );
 
-throws_ok( sub { say $^V }, qr/Can't locate object method "say"/, 'say' );
-lives_ok( sub { state $x }, 'state' );
+like( dies { say $^V }, qr/Can't locate object method "say"/, 'say' );
+ok( lives { state $x }, 'state' ) or note $@;
+
+done_testing;

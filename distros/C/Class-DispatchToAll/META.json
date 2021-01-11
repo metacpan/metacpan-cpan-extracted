@@ -1,0 +1,70 @@
+{
+   "abstract" : "DEPRECATED - dispatch a method call to all inherited methods",
+   "author" : [
+      "Thomas Klausner <domm@plix.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Class-DispatchToAll",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Class::DispatchToAll" : {
+         "file" : "lib/Class/DispatchToAll.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/Class-DispatchToAll/issues"
+      },
+      "homepage" : "https://github.com/domm/Class-DispatchToAll",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/domm/Class-DispatchToAll.git",
+         "web" : "https://github.com/domm/Class-DispatchToAll"
+      }
+   },
+   "version" : "0.13",
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

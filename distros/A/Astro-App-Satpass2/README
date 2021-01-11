@@ -1,4 +1,4 @@
-Astro-App-Satpass2 is Copyright (C) 2009-2020 by Thomas R. Wyant, III
+Astro-App-Satpass2 is Copyright (C) 2009-2021 by Thomas R. Wyant, III
 
 This package contains an application to predict satellite visibility,
 using the Astro::Coord::ECI classes. The following classes are included:

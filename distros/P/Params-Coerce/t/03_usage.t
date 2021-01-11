@@ -36,7 +36,7 @@ ok( Params::Coerce::_function_exists('Foo::Bar::Usage3', '_Bar'), "use Params::C
 	isa_ok( $Usage->{Bar}, 'Bar' );
 	$Usage = Foo::Bar::Usage1->new( $Foo );
 	isa_ok( $Usage, 'Foo::Bar::Usage1' );
-	isa_ok( $Usage->{Bar}, 'Bar' );	
+	isa_ok( $Usage->{Bar}, 'Bar' );
 }
 
 { # Usage 2
@@ -47,7 +47,7 @@ ok( Params::Coerce::_function_exists('Foo::Bar::Usage3', '_Bar'), "use Params::C
 	isa_ok( $Usage->{Bar}, 'Bar' );
 	$Usage = Foo::Bar::Usage2->new( $Foo );
 	isa_ok( $Usage, 'Foo::Bar::Usage2' );
-	isa_ok( $Usage->{Bar}, 'Bar' );	
+	isa_ok( $Usage->{Bar}, 'Bar' );
 }
 
 
@@ -59,7 +59,7 @@ ok( Params::Coerce::_function_exists('Foo::Bar::Usage3', '_Bar'), "use Params::C
 	isa_ok( $Usage->{Bar}, 'Bar' );
 	$Usage = Foo::Bar::Usage3->new( $Foo );
 	isa_ok( $Usage, 'Foo::Bar::Usage3' );
-	isa_ok( $Usage->{Bar}, 'Bar' );	
+	isa_ok( $Usage->{Bar}, 'Bar' );
 }
 
 { # Usage 4
@@ -70,7 +70,7 @@ ok( Params::Coerce::_function_exists('Foo::Bar::Usage3', '_Bar'), "use Params::C
 	isa_ok( $Usage->{Bar}, 'Bar' );
 	$Usage = Foo::Bar::Usage4->new( $Foo );
 	isa_ok( $Usage, 'Foo::Bar::Usage4' );
-	isa_ok( $Usage->{Bar}, 'Bar' );	
+	isa_ok( $Usage->{Bar}, 'Bar' );
 }
 
 { # Usage 5
@@ -81,7 +81,7 @@ ok( Params::Coerce::_function_exists('Foo::Bar::Usage3', '_Bar'), "use Params::C
 	isa_ok( $Usage->{Bar}, 'Bar' );
 	$Usage = Foo::Bar::Usage5->new( $Foo );
 	isa_ok( $Usage, 'Foo::Bar::Usage5' );
-	isa_ok( $Usage->{Bar}, 'Bar' );	
+	isa_ok( $Usage->{Bar}, 'Bar' );
 }
 
 { # __from coercion
@@ -91,7 +91,7 @@ ok( Params::Coerce::_function_exists('Foo::Bar::Usage3', '_Bar'), "use Params::C
 }
 
 
-	
+
 
 
 

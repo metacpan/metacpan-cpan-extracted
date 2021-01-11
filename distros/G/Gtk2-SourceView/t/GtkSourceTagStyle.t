@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More tests => 5;
 
-# $Id: GtkSourceTagStyle.t,v 1.2 2005/09/27 20:53:51 ebassi Exp $
+# $Id$
 
 use Gtk2::SourceView;
 

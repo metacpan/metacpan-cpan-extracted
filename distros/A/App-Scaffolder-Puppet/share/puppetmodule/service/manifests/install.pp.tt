@@ -1,16 +1,15 @@
 #
-# = Class: [% name %]::install
+# @summary Class to install [% name %].
 #
-# Class to install [% name %].
-#
-# == Parameters
-# <tt>ensure</tt>:: Ensure that the package is either <code>present</code> or
-#                   <code>absent</code>.
-# <tt>package</tt>:: Name of the package.
+# @param ensure
+#   Ensure that the package is either <code>present</code> or
+#   <code>absent</code>.
+# @param package
+#   Name of the package.
 #
 class [% name %]::install (
-    $ensure  = 'present',
-    $package = $[% name %]::params::package,
+    Enum[present, absent] $ensure  = 'present',
+    Variant[String, Boolean] $package = $[% name %]::params::package,
 ) inherits ::[% name %]::params {
     if $package {
         package {

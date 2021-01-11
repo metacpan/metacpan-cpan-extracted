@@ -1,13 +1,13 @@
 package API::Medium;
+
+# ABSTRACT: Talk with medium.com using their REST API
+our $VERSION = '0.902'; # VERSION
+
 use Moose;
 use HTTP::Tiny;
 use Log::Any qw($log);
 use JSON::MaybeXS;
 use Module::Runtime 'use_module';
-
-# ABSTRACT: Talk with medium.com using their REST API
-
-our $VERSION = '0.901';
 
 has 'server' => (
     isa     => 'Str',
@@ -111,7 +111,7 @@ API::Medium - Talk with medium.com using their REST API
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 
@@ -218,10 +218,6 @@ C<publishStatus> is set to 'draft' unless you pass in another value.
 
 =back
 
-=head2 See Also
-
-Jonathan Stowe is working on a L<Perl 6 version|https://github.com/jonathanstowe/Medium-API>
-
 =head2 Thanks
 
 Thanks to Dave Cross for starting L<Cultured
@@ -231,11 +227,11 @@ blog|http://domm.plix.at> to medium.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Thomas Klausner.
+This software is copyright (c) 2016 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

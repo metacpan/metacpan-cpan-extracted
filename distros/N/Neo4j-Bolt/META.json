@@ -1,10 +1,10 @@
 {
    "abstract" : "Neo4j server agent using Bolt protocol",
    "author" : [
-      "Mark A. Jensen"
+      "Mark A. Jensen (majensen -at- cpan -dot- org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "apache_2_0"
    ],
@@ -14,38 +14,40 @@
    },
    "name" : "Neo4j-Bolt",
    "no_index" : {
-      "package" : [
-         "Builder",
-         "t::BoltFile"
+      "directory" : [
+         "t",
+         "inc"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Inline" : "0",
-            "Test::Exception" : "0",
-            "Test::More" : "0",
-            "Try::Tiny" : "0"
+            "Alien::OpenSSL" : "0",
+            "Neo4j::Client" : "0.46",
+            "Pod::Usage" : "0",
+            "Test::Exception" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::CChecker" : "0",
-            "Module::Build" : "0.36_14",
-            "Neo4j::Client" : "0.17",
+            "Alien::OpenSSL" : "0",
+            "ExtUtils::MakeMaker" : "7.12",
+            "Neo4j::Client" : "0.46",
             "Try::Tiny" : "0"
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Mozilla::CA" : "0",
-            "Pod::Markdown" : "0"
-         },
          "requires" : {
-            "Inline::C" : "0",
+            "Alien::OpenSSL" : "0",
             "JSON::PP" : "0",
-            "Neo4j::Client" : "0.17",
-            "URI" : "0"
+            "Neo4j::Client" : "0.46",
+            "URI" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0"
          }
       }
    },
@@ -54,14 +56,11 @@
       "bugtracker" : {
          "web" : "https://github.com/majensen/perlbolt/issues"
       },
-      "license" : [
-         "http://www.apache.org/licenses/LICENSE-2.0.txt"
-      ],
       "repository" : {
          "url" : "https://github.com/majensen/perlbolt.git"
       }
    },
-   "version" : "0.20",
+   "version" : "0.4200",
    "x_contributors" : [
       "Mark A. Jensen <majensen@cpan.org>",
       "Arne Johannessen <ajnn@cpan.org>"

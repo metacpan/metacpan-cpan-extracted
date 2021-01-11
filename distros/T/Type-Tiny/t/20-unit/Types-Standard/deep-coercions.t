@@ -13,7 +13,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -534,6 +534,40 @@ THINGY2: {
 		'non-inlinable coercion of Tuple with no slurpy given input with extra fields fails'
 	);
 };
+
+THINGY3: {
+	my $IntFromStr = Int->plus_coercions( Str, 'length($_)' );
+	my $Tuple      = Dict->of( xyz => $IntFromStr, slurpy HashRef[Int] );
+	
+	is_deeply(
+		$Tuple->coerce( { xyz => "Foo", abc => 4 } ),
+		{ xyz => 3, abc => 4 },
+		'Dict where key has inlineable coercion but slurpy has no coercion'
+	);
+	
+	is_deeply(
+		$Tuple->coerce( { xyz => "Foo", abc => 4.1 } ),
+		{ xyz => "Foo", abc => 4.1 },
+		'... all or nothing'
+	);
+}
+
+THINGY4: {
+	my $IntFromStr = Int->plus_coercions( Str, sub { length($_) } );
+	my $Tuple      = Dict->of( xyz => $IntFromStr, slurpy HashRef[Int] );
+	
+	is_deeply(
+		$Tuple->coerce( { xyz => "Foo", abc => 4 } ),
+		{ xyz => 3, abc => 4 },
+		'Dict where key has non-inlineable coercion but slurpy has no coercion'
+	);
+	
+	is_deeply(
+		$Tuple->coerce( { xyz => "Foo", abc => 4.1 } ),
+		{ xyz => "Foo", abc => 4.1 },
+		'... all or nothing'
+	);
+}
 
 done_testing;
 

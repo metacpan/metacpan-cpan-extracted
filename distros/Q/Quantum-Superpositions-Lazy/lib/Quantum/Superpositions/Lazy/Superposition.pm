@@ -1,8 +1,9 @@
 package Quantum::Superpositions::Lazy::Superposition;
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
-use v5.28; use warnings;
+use v5.28;
+use warnings;
 use Moo;
 
 use feature qw(signatures);
@@ -40,12 +41,6 @@ has "_states" => (
 	],
 	coerce => 1,
 	required => 1,
-	trigger => sub ($self, $old) {
-		$self->_clear_weight_sum;
-		$self->clear_states;
-		$self->_clear_stats;
-		$self->_reset;
-	},
 	init_arg => "states",
 );
 
@@ -53,36 +48,39 @@ has "_weight_sum" => (
 	is => "ro",
 	lazy => 1,
 	default => sub ($self) {
-		sum map { $_->weight } $self->_states->@*;
+		sum map { $_->weight }
+		$self->_states->@*;
 	},
 	init_arg => undef,
 	clearer => 1,
 );
 
-sub collapse($self)
+sub collapse ($self)
 {
 	return $self->_collapsed_state;
 }
 
-sub is_collapsed($self)
+sub is_collapsed ($self)
 {
 	return $self->_is_collapsed;
 }
 
-sub weight_sum($self)
+sub weight_sum ($self)
 {
 	return $self->_weight_sum;
 }
 
-sub reset($self)
+sub reset ($self)
 {
 	foreach my $state ($self->_states->@*) {
 		$state->reset;
 	}
 	$self->_reset;
+
+	return $self;
 }
 
-sub _observe($self)
+sub _observe ($self)
 {
 	my @positions = $self->_states->@*;
 	my $sum = $self->weight_sum;
@@ -98,7 +96,7 @@ sub _observe($self)
 	}
 }
 
-sub _build_complete_states($self)
+sub _build_complete_states ($self)
 {
 	my %states;
 	for my $state ($self->_states->@*) {
@@ -204,6 +202,8 @@ Returns a boolean to tell whether the superposition is currently collapsed.
 
 Resets the collapsed state of the superposition and any nested superpositions.
 The next I<collapse> call will return a newly randomized value.
+
+Returns $self
 
 =head2 states
 

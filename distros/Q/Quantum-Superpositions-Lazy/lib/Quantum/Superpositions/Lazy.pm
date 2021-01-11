@@ -1,13 +1,14 @@
 package Quantum::Superpositions::Lazy;
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
-use v5.28; use warnings;
+use v5.28;
+use warnings;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 
 use Quantum::Superpositions::Lazy::Superposition;
-use Quantum::Superpositions::Lazy::Operation::LogicOp;
+use Quantum::Superpositions::Lazy::Operation::Logical;
 use Exporter;
 
 our @EXPORT = qw(
@@ -44,7 +45,7 @@ sub run_sub_as ($sub, %env)
 	return $sub->();
 }
 
-sub superpos(@positions)
+sub superpos (@positions)
 {
 	my $positions_ref;
 
@@ -250,7 +251,7 @@ amount of extra memory needed by the states that are created this way. Returns t
 
 	# and contain source and operation fields which will hold:
 	# source - an array reference of array references in form [$val1, $val2, ... $valn]
-	# operation - instance of Quantum::Superpositions::Lazy::Operation::ComputationalOp
+	# operation - instance of Quantum::Superpositions::Lazy::Operation::Computational
 
 =head1 DEVELOPMENT AND CONTRIBUTIONS
 
@@ -273,11 +274,6 @@ places tho).
 Math::BigRat could be harder to handle, so this could be done by an option or
 even simply allow the user to specify either float or Math::BigRat and
 calculate accordingly.
-
-=item * add a way to plug in more measures into the ::Statistics package
-
-The statistics module offers some very basic indicators and it would be useful
-to have it extendable.
 
 =item * add a shorter module name as an alias
 

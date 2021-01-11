@@ -73,10 +73,8 @@ DESCRIPTION
       [Test::UnusedVars]
       [Test::Kwalitee]
       [Test::Compile]
-      xt_mode = 1
       fake_home = 1
-      filename = xt/author/compile.t
-      fail_on_warning = author
+      filename = t/01-compile.t
       bail_out_on_fail = 1
     
       ; ==============================================================================
@@ -88,6 +86,7 @@ DESCRIPTION
       ; ==============================================================================
       ; Run "xt/" tests, but don't include them in the release.
       [RunExtraTests]
+      default_jobs = 8
     
       ; ==============================================================================
       ; Munge existing files
@@ -106,9 +105,12 @@ DESCRIPTION
       [Git::CheckFor::MergeConflicts]
       [Git::CheckFor::CorrectBranch]
       [EnsureChangesHasContent]
+      [EnsureMinimumPerl]
       [Git::Check / initial check]
       [TestRelease]
       [Git::Check / after tests]
+      [GitHub::RequireGreenBuild]
+      [CheckIssues]
     
       ; ... do the release (unless "fake_release" is set)
       [ConfirmRelease]
@@ -131,6 +133,11 @@ DESCRIPTION
       [Git::Commit / Commit Version Bump]
       allow_dirty_match = ^lib/
       commit_msg = Version bump.
+    
+      ; ... after release; push changes up to Git (unless "fake_release" is set)
+      [Git::Push]
+      push_to = origin
+      push_to = origin releases:releases
 
 CUSTOMIZATION
 

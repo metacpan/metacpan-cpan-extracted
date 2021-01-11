@@ -22,8 +22,9 @@ my $s = $driver->session;  # only for autocommit transactions
 # https://metacpan.org/pod/Cpanel::JSON::XS#JSON-%3E-PERL
 # https://metacpan.org/pod/Mojo::JSON::MaybeXS#Upgraded-Numbers
 
-use Test::More 0.96 tests => 4 + 5 + 3 + 1;
+use Test::More 0.96 tests => 4 + 5 + 3 + 2;
 use Test::Exception;
+use Test::Warnings qw(warnings);
 use JSON::PP ();
 my $transaction = $driver->session->begin_transaction;
 $transaction->{return_stats} = 0;  # optimise sim
@@ -63,7 +64,9 @@ subtest 'Property types: spatial type semantics' => sub {
 	$q = <<END;
 RETURN point({ x:3, y:0 })
 END
+	warnings {  # ignore Bolt warnings
 	lives_ok { $r = 0; $r = $s->run($q)->single; } 'get spatial property values';
+	};
 	SKIP: {
 		skip '(read failed)', 1 if ! $r;
 		is ref $r->get(0), 'Neo4j::Driver::Type::Point', 'point blessed';
@@ -82,7 +85,9 @@ subtest 'Property types: temporal type semantics' => sub {
 RETURN
 duration.between(date('1984-10-11'), date('2015-06-24'))
 END
+	warnings {  # ignore Bolt warnings
 	lives_ok { $r = 0; $r = $s->run($q)->single; } 'get temporal property values';
+	};
 	SKIP: {
 		skip '(read failed)', 1 if ! $r;
 		is ref $r->get(0), 'Neo4j::Driver::Type::Temporal', 'temporal blessed';
@@ -98,9 +103,9 @@ subtest 'Property types: use as parameters' => sub {
 	my @params = (
 		number =>  0 + $scalar,
 		string => '' . $scalar,
-		true   => \1,
-		false  => \0,
-		null   => undef,
+		yeah   => \1,
+		nope   => \0,
+		void   => undef,
 		list   => [17, 31],
 		map    => {half => .5},
 	);
@@ -108,9 +113,9 @@ subtest 'Property types: use as parameters' => sub {
 RETURN
 {number} = 47,
 {string} = '47',
-{true} = true,
-{false} = false,
-{null} IS NULL,
+{yeah} = true,
+{nope} = false,
+{void} IS NULL,
 {list} = [17, 31],
 {map} = {half: 0.5}
 END

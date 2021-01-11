@@ -25,22 +25,23 @@ lib/Bitcoin/Crypto/Util.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
-t/Base58.t
-t/Bech32.t
-t/Config.t
-t/Crypto.t
-t/examples.t
-t/Exception.t
-t/ExtPrivateKey.t
-t/ExtPublicKey.t
-t/Helpers.t
-t/KeyDerivation.t
-t/Network.t
-t/PrivateKey.t
-t/PublicKey.t
-t/Script.t
-t/Segwit.t
-t/Types.t
-t/Util.t
+t/01-Crypto.t
+t/02-Config.t
+t/03-Exception.t
+t/04-Helpers.t
+t/05-Types.t
+t/06-Util.t
+t/07-Network.t
+t/08-Base58.t
+t/09-Segwit.t
+t/10-Bech32.t
+t/11-Script.t
+t/12-PublicKey.t
+t/13-PrivateKey.t
+t/14-ExtPublicKey.t
+t/15-ExtPrivateKey.t
+t/30-key-derivation.t
+t/31-edge-cases.t
+t/99-examples.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

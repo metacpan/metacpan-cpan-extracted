@@ -1,14 +1,15 @@
 package Quantum::Superpositions::Lazy::Computation;
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
-use v5.28; use warnings;
+use v5.28;
+use warnings;
 use Moo;
 
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 
-use Quantum::Superpositions::Lazy::Operation::ComputationalOp;
+use Quantum::Superpositions::Lazy::Operation::Computational;
 use Quantum::Superpositions::Lazy::ComputedState;
 use Quantum::Superpositions::Lazy::Util qw(is_collapsible);
 use Types::Common::Numeric qw(PositiveNum);
@@ -22,7 +23,7 @@ has "operation" => (
 	is => "ro",
 	isa => (ConsumerOf ["Quantum::Superpositions::Lazy::Role::Operation"])
 		->plus_coercions(Str,
-		q{Quantum::Superpositions::Lazy::Operation::ComputationalOp->new(sign => $_)}
+			q{Quantum::Superpositions::Lazy::Operation::Computational->new(sign => $_)}
 		),
 	coerce => 1,
 	required => 1,
@@ -36,7 +37,7 @@ has "values" => (
 
 sub weight_sum { 1 }
 
-sub collapse($self)
+sub collapse ($self)
 {
 	my @members = map {
 		(is_collapsible $_) ? $_->collapse : $_
@@ -45,7 +46,7 @@ sub collapse($self)
 	return $self->operation->run(@members);
 }
 
-sub is_collapsed($self)
+sub is_collapsed ($self)
 {
 	# a single uncollapsed state means that the computation
 	# is not fully collapsed
@@ -57,7 +58,7 @@ sub is_collapsed($self)
 	return 1;
 }
 
-sub reset($self)
+sub reset ($self)
 {
 	foreach my $member ($self->values->@*) {
 		if (is_collapsible $member) {
@@ -94,7 +95,7 @@ sub _cartesian_product ($self, $values1, $values2, $sourced)
 	return [values %states];
 }
 
-sub _build_complete_states($self)
+sub _build_complete_states ($self)
 {
 	my $states;
 	my $sourced = $Quantum::Superpositions::Lazy::global_sourced_calculations;
@@ -107,7 +108,7 @@ sub _build_complete_states($self)
 			$local_states = [
 				map {
 					[$_->weight / $total, $_->value]
-					} $value->states->@*
+				} $value->states->@*
 			];
 		}
 		else {
@@ -131,7 +132,7 @@ sub _build_complete_states($self)
 					source => $_->[2] // $_->[1],
 					operation => $self->operation,
 				)
-				} $states->@*
+			} $states->@*
 		];
 	}
 	else {

@@ -1,5 +1,9 @@
 Changes for InfluxDB::Writer
 
+1.003     2021-01-08 21:58:11+01:00
+    - dist housekeeping, Dist::Zilla::PluginBundle::Author::DOMM
+
+
 1.002   2016-02-01T12:43:58
      - Check /proc/$pid/fd for open file (Klaus Ita)
      - Separate Buffer and to_Send (Klaus Ita)

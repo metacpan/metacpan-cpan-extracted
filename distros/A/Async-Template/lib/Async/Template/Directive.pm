@@ -9,7 +9,7 @@ use warnings;
 use base 'Template::Directive';
 
 
-our $VERSION = 0.12;
+our $VERSION = 0.14;
 our $DYNAMIC = 0 unless defined $DYNAMIC;
 
 

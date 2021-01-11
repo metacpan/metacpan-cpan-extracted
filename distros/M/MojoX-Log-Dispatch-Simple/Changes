@@ -1,5 +1,12 @@
 Revision history for MojoX::Log::Dispatch::Simple
 
+1.08      2021-01-10 14:35:05-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.07      2019-11-04 14:14:57-08:00 America/Los_Angeles
         - Add context() so to support the expectation of Mojolicious 8.24 for
           the experimental feature to exist

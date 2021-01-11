@@ -1,9 +1,9 @@
 package Acme::CPANModules::ColorThemed;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-21'; # DATE
+our $DATE = '2020-12-14'; # DATE
 our $DIST = 'Acme-CPANModules-ColorThemed'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use Acme::CPANModulesUtil::Misc;
@@ -42,7 +42,7 @@ Acme::CPANModules::ColorThemed - Modules that has color theme support
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::ColorThemed (from Perl distribution Acme-CPANModules-ColorThemed), released on 2020-11-21.
+This document describes version 0.003 of Acme::CPANModules::ColorThemed (from Perl distribution Acme-CPANModules-ColorThemed), released on 2020-12-14.
 
 =head1 DESCRIPTION
 
@@ -56,7 +56,7 @@ L<Text::ANSITable>
 
 B<Others>
 
-=head1 MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE
+=head1 ACME::MODULES ENTRIES
 
 =over
 
@@ -70,11 +70,10 @@ B<Others>
 
 =head1 FAQ
 
-=head2 What are ways to use this Acme::CPANModules module?
+=head2 What are ways to use this module?
 
-Aside from reading this Acme::CPANModules module's POD documentation, you can
-install all the listed modules (entries) using L<cpanmodules> CLI (from
-L<App::cpanmodules> distribution):
+Aside from reading it, you can install all the listed modules using
+L<cpanmodules>:
 
     % cpanmodules ls-entries ColorThemed | cpanm -n
 
@@ -82,13 +81,9 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=ColorThemed -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-or directly:
-
-    % perl -MAcme::CPANModules::ColorThemed -E'say $_->{module} for @{ $Acme::CPANModules::ColorThemed::LIST->{entries} }' | cpanm -n
-
-This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
-result for C<lcpan related-mods> command when it comes to finding related
-modules for the modules listed in this Acme::CPANModules module.
+This module also helps L<lcpan> produce a more meaningful result for C<lcpan
+related-mods> when it comes to finding related modules for the modules listed
+in this Acme::CPANModules module.
 
 =head1 HOMEPAGE
 
@@ -100,7 +95,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Col
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-ColorThemed>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModules-ColorThemed/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

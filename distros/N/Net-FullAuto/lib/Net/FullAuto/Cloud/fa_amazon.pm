@@ -3,7 +3,7 @@ package Net::FullAuto::Cloud::fa_amazon;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2020  Brian M. Kelly
+#    Copyright © 2000-2021  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License

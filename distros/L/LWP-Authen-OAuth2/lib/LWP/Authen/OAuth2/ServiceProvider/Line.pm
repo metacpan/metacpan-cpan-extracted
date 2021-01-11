@@ -1,5 +1,8 @@
 package LWP::Authen::OAuth2::ServiceProvider::Line;
 
+# ABSTRACT: Access Line OAuth2 API v2
+our $VERSION = '0.18'; # VERSION
+
 use strict;
 use warnings;
 
@@ -62,11 +65,22 @@ sub access_token_class {
     return $self->SUPER::access_token_class($type);
 }
 
+
+1;
+
+__END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 LWP::Authen::OAuth2::ServiceProvider::Line - Access Line OAuth2 API v2
+
+=head1 VERSION
+
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -149,7 +163,25 @@ Line access tokens can be refreshed at any time up until 10 days after the acces
 
 Adam Millerchip, C<< <adam at millerchip.net> >>
 
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Ben Tilly, <btilly at gmail.com>
+
+=item *
+
+Thomas Klausner <domm@plix.at>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 - 2021 by Ben Tilly, Rent.com, Thomas Klausner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
-
-1;
-

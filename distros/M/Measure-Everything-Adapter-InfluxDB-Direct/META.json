@@ -1,18 +1,25 @@
 {
    "abstract" : "Send stats directly to InfluxDB via http",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>"
+      "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Measure-Everything-Adapter-InfluxDB-Direct",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -32,20 +39,41 @@
             "MIME::Base64" : "0",
             "Measure::Everything::Adapter::Base" : "0",
             "Try::Tiny" : "0",
-            "base" : "0",
-            "strict" : "0",
-            "warnings" : "0"
+            "base" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::More" : "0",
-            "lib" : "0"
+            "perl" : "5.006"
          }
       }
    },
+   "provides" : {
+      "Measure::Everything::Adapter::InfluxDB::Direct" : {
+         "file" : "lib/Measure/Everything/Adapter/InfluxDB/Direct.pm",
+         "version" : "1.001"
+      }
+   },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "1.000"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/Measure-Everything-Adapter-InfluxDB-Direct/issues"
+      },
+      "homepage" : "https://github.com/domm/Measure-Everything-Adapter-InfluxDB-Direct",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/domm/Measure-Everything-Adapter-InfluxDB-Direct.git",
+         "web" : "https://github.com/domm/Measure-Everything-Adapter-InfluxDB-Direct"
+      }
+   },
+   "version" : "1.001",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

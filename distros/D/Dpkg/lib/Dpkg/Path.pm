@@ -136,6 +136,8 @@ $resolve_symlink is true then stat() is used, otherwise lstat() is used.
 
 sub check_files_are_the_same($$;$) {
     my ($file1, $file2, $resolve_symlink) = @_;
+
+    return 1 if $file1 eq $file2;
     return 0 if ((! -e $file1) || (! -e $file2));
     my (@stat1, @stat2);
     if ($resolve_symlink) {
@@ -226,6 +228,7 @@ sub check_directory_traversal {
             syserr(g_("pathname '%s' cannot be canonicalized"), $_);
         }
         return if $canon_pathname eq '/dev/null';
+        return if $canon_pathname eq $canon_basedir;
         return if $canon_pathname =~ m{^\Q$canon_basedir/\E};
 
         error(g_("pathname '%s' points outside source root (to '%s')"),

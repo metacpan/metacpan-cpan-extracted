@@ -8,7 +8,7 @@ with qw(
 );
 use namespace::autoclean;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has fake_release => (
   is         => 'ro',
@@ -83,10 +83,8 @@ sub configure {
     [ 'Test::UnusedVars' ],
     [ 'Test::Kwalitee' ],
     [ 'Test::Compile' => {
-        xt_mode          => 1,
         fake_home        => 1,
-        filename         => 'xt/author/compile.t',
-        fail_on_warning  => 'author',
+        filename         => 't/01-compile.t',
         bail_out_on_fail => 1,
       },
     ],
@@ -104,7 +102,10 @@ sub configure {
 
     ###########################################################################
     # Run "xt/" tests, but don't include them in the release.
-    [ 'RunExtraTests' ],
+    [ 'RunExtraTests', {
+        default_jobs => 8,
+      },
+    ],
 
     ###########################################################################
     # Munge existing files
@@ -124,9 +125,12 @@ sub configure {
     [ 'Git::CheckFor::MergeConflicts' ],
     [ 'Git::CheckFor::CorrectBranch' ],
     [ 'EnsureChangesHasContent' ],
+    [ 'EnsureMinimumPerl' ],
     [ 'Git::Check' => 'initial check' ],
     [ 'TestRelease' ],
     [ 'Git::Check' => 'after tests' ],
+    [ 'GitHub::RequireGreenBuild' ],
+    [ 'CheckIssues' ],
     # ... do the release
     ( $self->fake_release
       ? ( [ 'FakeRelease' ] )
@@ -152,6 +156,11 @@ sub configure {
         commit_msg        => 'Version bump.',
       },
     ],
+    # ... after release; push changes up to Git
+    ( $self->fake_release
+      ? ()
+      : ( [ 'Git::Push', { push_to => [ 'origin', 'origin releases:releases' ] } ] )
+    ),
   );
 }
 
@@ -232,10 +241,8 @@ It is I<roughly> equivalent to the following:
   [Test::UnusedVars]
   [Test::Kwalitee]
   [Test::Compile]
-  xt_mode = 1
   fake_home = 1
-  filename = xt/author/compile.t
-  fail_on_warning = author
+  filename = t/01-compile.t
   bail_out_on_fail = 1
 
   ; ==============================================================================
@@ -247,6 +254,7 @@ It is I<roughly> equivalent to the following:
   ; ==============================================================================
   ; Run "xt/" tests, but don't include them in the release.
   [RunExtraTests]
+  default_jobs = 8
 
   ; ==============================================================================
   ; Munge existing files
@@ -265,9 +273,12 @@ It is I<roughly> equivalent to the following:
   [Git::CheckFor::MergeConflicts]
   [Git::CheckFor::CorrectBranch]
   [EnsureChangesHasContent]
+  [EnsureMinimumPerl]
   [Git::Check / initial check]
   [TestRelease]
   [Git::Check / after tests]
+  [GitHub::RequireGreenBuild]
+  [CheckIssues]
 
   ; ... do the release (unless "fake_release" is set)
   [ConfirmRelease]
@@ -290,6 +301,11 @@ It is I<roughly> equivalent to the following:
   [Git::Commit / Commit Version Bump]
   allow_dirty_match = ^lib/
   commit_msg = Version bump.
+
+  ; ... after release; push changes up to Git (unless "fake_release" is set)
+  [Git::Push]
+  push_to = origin
+  push_to = origin releases:releases
 
 =head1 CUSTOMIZATION
 

@@ -1,4 +1,4 @@
-use Test::Most;
+use Test2::V0;
 
 package Thing {
     use exact 'class';
@@ -66,24 +66,24 @@ package Thing::SubClassB {
 
 my $obj;
 
-lives_ok(
-    sub {
+ok(
+    lives {
         $obj->{a} = Thing::SubClassA->new->create;
         $obj->{b} = Thing::SubClassB->new->create;
     },
     'object instantiation lives',
-);
+) or note $@;
 
 is( $obj->{a}->fetch->{a}, 42, 'inheritted values descend' );
 
-lives_ok(
-    sub {
+ok(
+    lives {
         $obj->{a2} = Thing::SubClassA->new->create2;
         $obj->{b2} = Thing::SubClassB->new->create2;
     },
     'object instantiation with roles lives',
-);
+) or note $@;
 
 is( $obj->{a2}->fetch2->{a2}, 43, 'inheritted values with roles descend' );
 
-done_testing();
+done_testing;

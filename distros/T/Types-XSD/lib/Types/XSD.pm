@@ -7,7 +7,7 @@ use utf8;
 
 BEGIN {
 	$Types::XSD::AUTHORITY = 'cpan:TOBYINK';
-	$Types::XSD::VERSION   = '0.005';
+	$Types::XSD::VERSION   = '0.007';
 }
 
 use B qw(perlstring);
@@ -41,7 +41,10 @@ use constant MAGIC_DATES => map dt($_), qw( 1696-09-01 1697-02-01 1903-03-01 190
 use constant MAGIC_TABLE => +{ "-1-1-1-1" => -1, "0000" => 0, "1111" => 1 };
 sub dur_cmp
 {
-	my @durations = map ref($_) ? $_ : dur($_), @_[0,1];
+	my @durations = do {
+		local $SIG{__WARN__} = sub {};
+		map ref($_) ? $_ : dur($_), @_[0,1];
+	};
 	my $result    = join q[], map "DateTime::Duration"->compare(@durations, $_), MAGIC_DATES;
 	return MAGIC_TABLE->{$result} if exists MAGIC_TABLE->{$result};
 	return undef;
@@ -187,16 +190,16 @@ sub dur_parse
 }
 
 facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare Name, as Types::Standard::StrMatch[qr{^(?:$XML::RegExp::Name)$}sm];
+declare Name, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::Name)\z}sm];
 
 facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare NmToken, as Types::Standard::StrMatch[qr{^(?:$XML::RegExp::NmToken)$}sm];
+declare NmToken, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::NmToken)\z}sm];
 
 facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare NmTokens, as Types::Standard::StrMatch[qr{^(?:$XML::RegExp::NmToken)(?:\s+$XML::RegExp::NmToken)*$}sm];
+declare NmTokens, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::NmToken)(?:\s+$XML::RegExp::NmToken)*\z}sm];
 
 facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare NCName, as Types::Standard::StrMatch[qr{^(?:$XML::RegExp::NCName)$}sm];
+declare NCName, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::NCName)\z}sm];
 
 facet qw( length minLength maxLength pattern enumeration whiteSpace ),
 declare Id, as NCName;
@@ -205,23 +208,25 @@ facet qw( length minLength maxLength pattern enumeration whiteSpace ),
 declare IdRef, as NCName;
 
 facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare IdRefs, as Types::Standard::StrMatch[qr{^(?:$XML::RegExp::NCName)(?:\s+$XML::RegExp::NCName)*$}sm];
+declare IdRefs, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::NCName)(?:\s+$XML::RegExp::NCName)*\z}sm];
 
 facet qw( length minLength maxLength pattern enumeration whiteSpace ),
 declare Entity, as NCName;
 
 facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare Entities, as Types::Standard::StrMatch[qr{^(?:$XML::RegExp::NCName)(?:\s+$XML::RegExp::NCName)*$}sm];
+declare Entities, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::NCName)(?:\s+$XML::RegExp::NCName)*\z}sm];
 
 facet qw( lengthQName minLengthQName maxLengthQName pattern enumeration whiteSpace ),
-declare QName, as Types::Standard::StrMatch[qr{^(?:$XML::RegExp::QName)$}sm];
+declare QName, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::QName)\z}sm];
 
 facet qw( lengthQName minLengthQName maxLengthQName pattern enumeration whiteSpace ),
 declare Notation, as QName;
 
 facet qw( pattern whiteSpace enumeration maxInclusiveDuration maxExclusiveDuration minInclusiveDuration minExclusiveDuration ),
 declare Duration, as Types::Standard::StrMatch[
-	qr{^-?P
+	qr{\A
+		-?
+		P
 		(?:[0-9]+Y)?
 		(?:[0-9]+M)?
 		(?:[0-9]+D)?
@@ -230,17 +235,17 @@ declare Duration, as Types::Standard::StrMatch[
 			(?:[0-9]+M)?
 			(?:[0-9]+(?:\.[0-9]+)?S)?
 		)?
-	$}xism
+	\z}xism
 ];
 
 facet qw( pattern whiteSpace enumeration maxInclusiveDuration maxExclusiveDuration minInclusiveDuration minExclusiveDuration ),
-declare YearMonthDuration, as Duration->parameterize(pattern => qr{^[^DT]*$}i);
+declare YearMonthDuration, as Duration->parameterize(pattern => qr{\A[^DT]*\z}i);
 
 facet qw( pattern whiteSpace enumeration maxInclusiveDuration maxExclusiveDuration minInclusiveDuration minExclusiveDuration ),
-declare DayTimeDuration, as Duration->parameterize(pattern => qr{^[^YM]*[DT].*$}i);
+declare DayTimeDuration, as Duration->parameterize(pattern => qr{\A[^YM]*[DT].*\z}i);
 
 dt_maker(
-	DateTime => qr{^
+	DateTime => qr{\A
 		(-?[0-9]{4,})
 		-
 		([0-9]{2})
@@ -253,12 +258,12 @@ dt_maker(
 		:
 		([0-9]{2}(?:\.[0-9]+)?)
 		(Z | (?: [+-]\d{2}:?\d{2} ))?
-	$}xism,
+	\z}xism,
 	qw( year month day hour minute second time_zone ),
 );
 
 dt_maker(
-	DateTimeStamp => qr{^
+	DateTimeStamp => qr{\A
 		(-?[0-9]{4,})
 		-
 		([0-9]{2})
@@ -271,82 +276,82 @@ dt_maker(
 		:
 		([0-9]{2}(?:\.[0-9]+)?)
 		(Z | (?: [+-]\d{2}:?\d{2} ))
-	$}xism,
+	\z}xism,
 	qw( year month day hour minute second time_zone ),
 );
 
 dt_maker(
-	Time => qr{^
+	Time => qr{\A
 		([0-9]{2})
 		:
 		([0-9]{2})
 		:
 		([0-9]{2}(?:\.[0-9]+)?)
 		(Z | (?: [+-]\d{2}:?\d{2} ))?
-	$}xism,
+	\z}xism,
 	qw( hour minute second time_zone ),
 );
 
 dt_maker(
-	Date => qr{^
+	Date => qr{\A
 		(-?[0-9]{4,})
 		-
 		([0-9]{2})
 		-
 		([0-9]{2})
 		(Z | (?: [+-]\d{2}:?\d{2} ))?
-	$}xism,
+	\z}xism,
 	qw( year month day time_zone ),
 );
 
 dt_maker(
-	GYearMonth => qr{^
+	GYearMonth => qr{\A
 		(-?[0-9]{4,})
 		-
 		([0-9]{2})
 		(Z | (?: [+-]\d{2}:?\d{2} ))?
-	$}xism,
+	\z}xism,
 	qw( year month time_zone ),
 );
 
 dt_maker(
-	GYear => qr{^
+	GYear => qr{\A
 		(-?[0-9]{4,})
 		(Z | (?: [+-]\d{2}:?\d{2} ))?
-	$}xism,
+	\z}xism,
 	qw( year time_zone ),
 );
 
 dt_maker(
-	GMonthDay => qr{^
+	GMonthDay => qr{\A
 		-
 		-
 		([0-9]{2})
 		-
 		([0-9]{2})
 		(Z | (?: [+-]\d{2}:?\d{2} ))?
-	$}xism,
+	\z}xism,
 	qw( month day time_zone ),
 );
 
 dt_maker(
-	GDay => qr{^
+	GDay => qr{\A
 		-
 		-
 		-
 		([0-9]{2})
 		(Z | (?: [+-]\d{2}:?\d{2} ))?
-	$}xism,
+	\z}xism,
 	qw( day time_zone ),
 );
 
 dt_maker(
-	GMonth => qr{^
+	GMonth => qr{\A
 		-
 		-
 		([0-9]{2})
 		(Z | (?: [+-]\d{2}:?\d{2} ))?
-	$}xism,
+	\z}xism,
 	qw( month time_zone ),
 );
 
@@ -367,7 +372,7 @@ Types::XSD - type constraints based on XML schema datatypes
    package Person;
    
    use Moo;
-   use Types::XSD::Lite qw( PositiveInteger String );
+   use Types::XSD qw( PositiveInteger String );
    
    has name => (is => "ro", isa => String[ minLength => 1 ]);
    has age  => (is => "ro", isa => PositiveInteger);
@@ -379,8 +384,8 @@ with L<Type::Library>. It can be used as a type constraint library for
 L<Moo>, L<Mouse> or L<Moose>, or used completely independently of any OO
 framework.
 
-This module is an extension of L<Types::XSD::Lite> which has fewer type
-constraints, but fewer dependencies. For completeness, the type constraints
+This module is an extension of L<Types::XSD::Lite> (which has fewer type
+constraints, but fewer dependencies). For completeness, the type constraints
 and other features inherited from Types::XSD::Lite are documented below
 too.
 
@@ -625,7 +630,7 @@ An month with optional timezone.
 Datatypes can be parameterized using the facets defined by XML Schema. For
 example:
 
-   use Types::XSD::Lite qw( String Decimal PositiveInteger Token );
+   use Types::XSD qw( String Decimal PositiveInteger Token );
    
    my @sizes = qw( XS S M L XL XXL );
    
@@ -780,7 +785,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

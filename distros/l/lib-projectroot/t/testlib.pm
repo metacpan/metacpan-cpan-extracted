@@ -6,6 +6,7 @@ use File::Spec::Functions qw(splitdir);
 
 sub cleanup {
     my $dir = shift;
+    $dir =~s{.build/(.*?)/}{};
     my @clean;
     my $drin=1;
     foreach my $part (reverse splitdir($dir)) {

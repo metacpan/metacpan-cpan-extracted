@@ -1,6 +1,6 @@
 package PerlPowerTools;
 
-our $VERSION = '1.020';
+our $VERSION = '1.022';
 
 1;
 
@@ -136,8 +136,6 @@ setting C<INSTALL_BASE> when you run F<Makefile.PL>.
 
 =item mail - implementation of Berkeley mail(1)
 
-=item pmake - a perl 'make' replacement
-
 =item maze - generate a maze problem
 
 =item mimedecode - extract MIME attachments in uudecode-like manner
@@ -272,7 +270,7 @@ though he wrote none of the utilities.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2004-2020 by various authors. See each program for
+Copyright © 2004-2021 by various authors. See each program for
 specific information.
 
 This program is free software; you can redistribute it and/or modify

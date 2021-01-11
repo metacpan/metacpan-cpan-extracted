@@ -3,7 +3,7 @@ package Net::FullAuto::FA_Core;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2020  Brian M. Kelly
+#    Copyright © 2000-2021  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -2644,7 +2644,7 @@ my $version=<<VERSION;
 This is Net::FullAuto©, v$Net::FullAuto::VERSION
 (See  fullauto -V  or  fa -V  for more detail)
 
-Copyright © 2000-2020, Brian M. Kelly  Brian.Kelly\@FullAuto.com
+Copyright © 2000-2021, Brian M. Kelly  Brian.Kelly\@FullAuto.com
 
 FullAuto© may be copied only under the terms of the GNU Affero General Public
 License, which may be found in the FullAuto source distribution.
@@ -9648,7 +9648,7 @@ my $affero=<<END;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Powerful Network Process Automation Software
-#    Copyright © 2000-2020  Brian M. Kelly
+#    Copyright © 2000-2021  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -11423,7 +11423,7 @@ our $fa_welcome=<<'END';
 
 
 
-   Copyright © 2000-2020  Brian M. Kelly  Brian.Kelly@FullAuto.com
+   Copyright © 2000-2021  Brian M. Kelly  Brian.Kelly@FullAuto.com
 
 
 

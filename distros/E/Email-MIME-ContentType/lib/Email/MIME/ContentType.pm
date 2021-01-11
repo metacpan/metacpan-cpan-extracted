@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Email::MIME::ContentType;
 # ABSTRACT: Parse and build a MIME Content-Type or Content-Disposition Header
-$Email::MIME::ContentType::VERSION = '1.024';
+$Email::MIME::ContentType::VERSION = '1.026';
 use Carp;
 use Encode 2.87 qw(encode find_mime_encoding);
 use Exporter 5.57 'import';
@@ -331,15 +331,15 @@ sub _process_rfc2231 {
   foreach (keys %{$attribs}) {
     next unless $_ =~ m/^(.*)\*([0-9]+)\*?$/;
     my ($attr, $sec) = ($1, $2);
-    $cont{$attr}->[$sec] = $attribs->{$_};
-    $encoded{$attr}->[$sec] = 1 if $_ =~ m/\*$/;
+    $cont{$attr}->{$sec} = $attribs->{$_};
+    $encoded{$attr} = 1 if $_ =~ m/\*$/;
     delete $attribs->{$_};
   }
 
   foreach (keys %cont) {
     my $key = $_;
     $key .= '*' if $encoded{$_};
-    $attribs->{$key} = join '', @{$cont{$_}};
+    $attribs->{$key} = join '', @{$cont{$_}}{sort { $a <=> $b } keys %{$cont{$_}}};
   }
 
   foreach (keys %{$attribs}) {
@@ -529,7 +529,7 @@ Email::MIME::ContentType - Parse and build a MIME Content-Type or Content-Dispos
 
 =head1 VERSION
 
-version 1.024
+version 1.026
 
 =head1 SYNOPSIS
 

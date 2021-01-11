@@ -1,10 +1,10 @@
 {
    "abstract" : "Talk with medium.com using their REST API",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>"
+      "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,6 +13,13 @@
       "version" : 2
    },
    "name" : "API-Medium",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -26,25 +33,45 @@
       },
       "runtime" : {
          "requires" : {
-            "Cpanel::JSON::XS" : "0",
             "HTTP::Tiny" : "0",
-            "IO::Socket::SSL" : "0",
             "JSON::MaybeXS" : "0",
             "Log::Any" : "0",
             "Module::Runtime" : "0",
             "Moose" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "API::Medium" : {
+         "file" : "lib/API/Medium.pm",
+         "version" : "0.902"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/API-Medium/issues"
+      },
+      "homepage" : "https://github.com/domm/API-Medium",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/domm/API-Medium.git",
+         "url" : "https://github.com/domm/API-Medium.git",
          "web" : "https://github.com/domm/API-Medium"
       }
    },
-   "version" : "0.901",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.902",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

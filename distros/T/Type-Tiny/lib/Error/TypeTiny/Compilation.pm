@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::Compilation::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::Compilation::VERSION   = '1.012000';
+	$Error::TypeTiny::Compilation::VERSION   = '1.012001';
 }
 
 $Error::TypeTiny::Compilation::VERSION =~ tr/_//d;
@@ -14,14 +14,13 @@ $Error::TypeTiny::Compilation::VERSION =~ tr/_//d;
 require Error::TypeTiny;
 our @ISA = 'Error::TypeTiny';
 
-sub code        { $_[0]{code} };
-sub environment { $_[0]{environment} ||= {} };
-sub errstr      { $_[0]{errstr} };
+sub code        { $_[0]{code} }
+sub environment { $_[0]{environment} ||= {} }
+sub errstr      { $_[0]{errstr} }
 
-sub _build_message
-{
+sub _build_message {
 	my $self = shift;
-	sprintf("Failed to compile source because: %s", $self->errstr);
+	sprintf( "Failed to compile source because: %s", $self->errstr );
 }
 
 1;
@@ -71,7 +70,7 @@ Error message from Perl compiler.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+L<https://github.com/tobyink/p5-type-tiny/issues>.
 
 =head1 SEE ALSO
 
@@ -83,7 +82,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -93,4 +92,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

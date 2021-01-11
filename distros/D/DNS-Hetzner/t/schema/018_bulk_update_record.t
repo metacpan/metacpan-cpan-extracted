@@ -14,6 +14,7 @@ my %tests = (
             params   => {
                 records => [
                     {
+                        id      => 'record1',
                         name    => 'record1',
                         type    => 'A',
                         value   => '192.168.123.1',
@@ -25,6 +26,7 @@ my %tests = (
                 body => {
                     records => [
                         {
+                            id      => 'record1',
                             name    => 'record1',
                             type    => 'A',
                             value   => '192.168.123.1',
@@ -39,6 +41,7 @@ my %tests = (
             params   => {
                 records => [
                     {
+                        id      => 'record1',
                         name    => 'record1',
                         type    => 'A',
                         value   => '192.168.123.1',
@@ -51,6 +54,7 @@ my %tests = (
                 body => {
                     records => [
                         {
+                            id      => 'record1',
                             name    => 'record1',
                             type    => 'A',
                             value   => '192.168.123.1',

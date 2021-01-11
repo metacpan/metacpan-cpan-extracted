@@ -13,11 +13,11 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ and that is used.
     ... # Set up some data
     my $object = Class::Simple::Readonly::Cached(object => $person, cache => \%hash);
     my $father1 = $object->father();	# Will call gedcom->father() to get the person's father
-    my $father2 = $object->father();	# Will retived the father from the cache without calling person->father()
+    my $father2 = $object->father();	# Will retrieve the father from the cache without calling person->father()
 
 =cut
 
@@ -157,7 +157,7 @@ sub AUTOLOAD {
 		# return $object->$func(\@_);
 	# }
 
-	my $key = $param . '::' . join('::', @_);
+	my $key = $param . '::' . join('::', grep defined, @_);
 
 	# Retrieving a value
 	my $rc;
@@ -172,8 +172,10 @@ sub AUTOLOAD {
 			$self->{_hits}{$key}++;
 			my @foo = @{$rc};
 			if(wantarray) {
-				die $key if($foo[0] eq __PACKAGE__ . ">UNDEF<");
-				die $key if($foo[0] eq 'never');
+				if(defined($foo[0])) {
+					die $key if($foo[0] eq __PACKAGE__ . ">UNDEF<");
+					die $key if($foo[0] eq 'never');
+				}
 				return @{$rc};
 			}
 			return pop @foo;
@@ -282,7 +284,7 @@ L<http://search.cpan.org/dist/Class-Simple-Readonly-Cached/>
 =head1 LICENSE AND COPYRIGHT
 
 Author Nigel Horne: C<njh@bandsman.co.uk>
-Copyright (C) 2019, Nigel Horne
+Copyright (C) 2019-2021 Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

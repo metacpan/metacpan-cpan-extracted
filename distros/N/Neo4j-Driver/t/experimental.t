@@ -20,9 +20,9 @@ my $s = $driver->session;
 # those features or moved elsewhere once the features are documented
 # and thus officially supported.
 
-use Test::More 0.96 tests => 11;
+use Test::More 0.96 tests => 12 + 1;
 use Test::Exception;
-use Test::Warnings qw(warnings :no_end_test);
+use Test::Warnings qw(warnings);
 
 
 my ($q, $r, @a, $a);
@@ -197,6 +197,27 @@ subtest 'nested transactions: explicit (Bolt)' => sub {
 	} qr/\bnested\b/i, 'explicit nested transactions: 2nd';
 	lives_ok { $t1->rollback; } 'explicit nested transactions: close 1st';
 	dies_ok { $t2->rollback; } 'explicit nested transactions: close 2nd';
+};
+
+
+subtest 'nested transactions: autocommit' => sub {
+	plan tests => 2;
+	my $session = $driver->session;
+	my $value = 0;
+	my $t = $session->begin_transaction;
+	$t->run("CREATE (explicit1:Test)");
+	lives_ok {
+		$value = $session->run("RETURN 42")->single->get(0);
+		$t->run("CREATE (explicit2:Test)");
+		$t->rollback;
+	} 'nested autocommit transactions: success' if ! $Neo4j::Test::bolt;
+	throws_ok {
+		$value = $session->run("RETURN 42")->single->get(0);
+		$t->run("CREATE (explicit2:Test)");
+		$t->rollback;
+	} qr/support.*Bolt/i, 'nested autocommit transactions: no success' if $Neo4j::Test::bolt;
+	my $expected = $Neo4j::Test::bolt ? 0 : 42;
+	is $value, $expected, 'nested autocommit transactions: result';
 };
 
 

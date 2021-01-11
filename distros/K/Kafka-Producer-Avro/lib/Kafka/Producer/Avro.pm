@@ -8,25 +8,79 @@ Kafka::Producer::Avro - Avro message producer for Apache Kafka.
 
 =head1 SYNOPSIS
 
-    use Kafka::Connection;
-    use Kafka::Producer::Avro;
-
-    my $connection = Kafka::Connection->new( host => 'localhost' );
-
-    my $producer = Kafka::Producer::Avro->new( Connection => $connection );
-
-    # Do some interactions with Avro & SchemaRegistry before sending messages
-
-    # Sending a single message
-    my $response = $producer->send(...);
-
-    # Sending a series of messages
-    $response = $producer->send(...);
-
-    # Closes the producer and cleans up
-    undef $producer;
-    $connection->close;
-    undef $connection;
+  use Kafka::Connection;
+  use Kafka::Producer::Avro;
+  
+  my $connection = Kafka::Connection->new( host => 'localhost' );
+  
+  my $producer = Kafka::Producer::Avro->new( Connection => $connection , SchemaRegistry => Confluent::SchemaRegistry->new() );
+  
+  # Set Avro schema for message key (valid JSON-string)
+  my $key_schema = <<KEY_SCHEMA;
+  	{
+  		"type": "long",
+  		"name": "_id"
+  	}
+  KEY_SCHEMA
+  # Set Avro schema for message value (payload) (valid JSON-string)
+  my $value_schema = <<VALUE_SCHEMA;
+  	{
+  		"type": "record",
+  		"name": "myrecord",
+  		"fields": [
+  			{
+  				"name": "f1",
+  				"type": "string"
+  			}
+  		]
+  	}
+  VALUE_SCHEMA
+  
+  # Sending a single message
+  my $response = $producer->send(
+  	'mytopic',          # topic
+  	0,                  # partition
+  	'Single message',   # message
+  	undef,              # key
+  	undef,              # compression_codec
+  	undef,              # timestamps
+  	$key_schema,        # key_schema
+  	$value_schema       # value_schema
+  );
+  
+  # Sending a series of messages
+  $response = $producer->send(
+  	'mytopic',          # topic
+  	0,                  # partition
+  	[                   # messages
+  		'The first message',
+  		'The second message',
+  		'The third message',
+  	],
+  	undef,              # key(s)
+  	undef,              # compression_codec
+  	undef,              # timestamp(s)
+  	$key_schema,        # key_schema
+  	$value_schema       # value_schema
+  );
+  
+  # ...or use named parameters
+  
+  $producer->send(
+  	topic             => $topic,
+  	partition         => $partition,
+  	messages          => $messages,
+  	keys              => $keys,
+  	compression_codec => $compression_codec,
+  	timestamps        => $timestamps,
+  	key_schema        => $key_schema,
+  	value_schema      => $value_schema
+  );    
+  
+  # Closes the producer and cleans up
+  undef $producer;
+  $connection->close;
+  undef $connection;
 
 =head1 DESCRIPTION
 
@@ -51,8 +105,42 @@ use Confluent::SchemaRegistry;
 
 use constant MAGIC_BYTE => 0; 
 
-our $VERSION = '0.02';
+use version; our $VERSION = version->declare('v1.0.0');
 
+=head1 INSTALL
+
+Installation of C<Kafka::Producer::Avro> is a canonical:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+=head2 TEST NOTES
+
+Tests are focused on verifying Avro-formatted messages and theirs interactions with Confluent Schema Registry and are intended to extend C<Kafka::Producer> test suite.
+
+They expect that in the target are listening Apache Kafka and Schema Registry services, respectively listening on C<localhost:9092> and C<http://localhost:8081>.
+
+You can alternatively set a different URLs by exporting the following environment variable:
+
+=over 3
+
+=item C<KAFKA_HOST>
+
+=item C<KAFKA_PORT>
+
+=item C<CONFLUENT_SCHEMA_REGISTY_URL>
+
+=back
+
+For example:
+
+  export KAFKA_HOST=my-kafka-host.my-domain.org
+  export FALFA_PORT=9092
+  export CONFLUENT_SCHEMA_REGISTY_URL=http://my-schema-registry-host.my-domain.org
+
+=head1 USAGE
 
 =head2 CONSTRUCTOR
 
@@ -244,48 +332,90 @@ Returns a string containing last error message.
 sub get_error { $_[0]->_get_error() }
 
 
-=head3 C<send( %params )>
+=head3 C<send( $topic, $partition, $messages, $keys, $compression_codec, $timestamps, $key_schema, $value_schema )>
 
-Sends a messages on a L<Kafka::Connection|Kafka::Connection> object.
+=head3 C<send( %named_params )>
+
+Sends Avro-formatted messages on a L<Kafka::Connection|Kafka::Connection> object.
 
 Returns a non-blank value (a reference to a hash with server response description)
 if the message is successfully sent.
 
-Despite L<Kafka::Producer|Kafka::Producer-E<gt>send()> method that expects positional arguments, 
-C<Kafka::Producer::Avro->send()> method looks for named parameters:
+In order to handle Avro format, C<Kafka::Producer|Kafka::Producer> C<send()> method is extended
+with two more positional arguments, C<$key_schema> and C<$value_schema>:
+
+  $producer->send(
+  	$topic,             # scalar 
+  	$partition,         # scalar
+  	$messages,          # scalar | array
+  	$keys,              # (optional) undef | scalar | array
+  	$compression_codec, # (optional) undef | scalar
+  	$timestamps,        # (optional) undef | scalar | array
+  	$key_schema,        # (optional) undef | JSON-string
+  	$value_schema       # (optional) undef | JSON-string
+  );
+
+Both C<$key_schema> and C<$value_schema> parameters are optional and must provide JSON strings that 
+represent Avro schemas to use to validate and serialize key(s) and value(s).
+
+These schemas are validated against C<$schema_registry> and, if compliant, they are added to the registry
+under the C<$topic+'key'> or C<$topic+'value'> Schema Registry's subjects.
+
+If an expected schema isn't provided, latest version from Schema Registry is used accordingly to the  
+(topic + key/value) subject. 
+
+Alternatively, for ease of use, the C<send()> method may be also used by suggesting named parameters:
 
   $producer->send(
   	topic             => $topic,             # scalar 
   	partition         => $partition,         # scalar
   	messages          => $messages,          # scalar | array
-  	keys              => $keys,              # scalar | array
-  	compression_codec => $compression_codec, # scalar
-  	key_schema        => $key_schema,        # optional JSON-string
-  	value_schema      => $value_schema       # optional JSON-string
+  	keys              => $keys,              # (optional) undef | scalar | array
+  	compression_codec => $compression_codec, # (optional) undef | scalar
+  	timestamps        => $timestamps,        # (optional) undef | scalar | array
+  	key_schema        => $key_schema,        # (optional) undef | JSON-string
+  	value_schema      => $value_schema       # (optional) undef | JSON-string
   );    
-
-Extra arguments may be suggested:
-
-=over 3
-
-=item C<key_schema =E<gt> $key_schema> and C<value_schema =E<gt> $value_schema>
-
-Both C<$key_schema> and C<$value_schema> parameters are optional and provide JSON strings that 
-represent Avro schemas to use to validate and serialize key(s) and value(s).
-
-These schemas are validated against C<schema_registry> and, if compliant, they are added to the registry
-under the C<$topic+'key'> or C<$topic+'value'> subjects.
-
-If an expected schema isn't provided, latest version from Schema Registry is used accordingly to the  
-subject (key or value). 
-
-=back
 
 =cut
 
 sub send {
-	my $self = shift;
-	my %params = @_;
+    my $self   = shift;
+    my %params = (
+        'topic'             => undef,
+        'partition'         => undef,
+        'messages'          => undef,
+        'keys'              => undef, # optional in Kafka::Producer
+        'compression_codec' => undef, # optional in Kafka::Producer
+        'timestamps'        => undef, # optional in Kafka::Producer
+        'key_schema'        => undef, # optional in Kafka::Producer::Avro
+        'value_schema'      => undef  # optional in Kafka::Producer::Avro
+    );
+    my @p = @_;
+    my $is_positional = 0;
+    if ( scalar(@p) % 2 == 0 ) {
+        for ( my $i = 0 ; $i < scalar(@p)-1 ; $i += 2 ) {
+			if (ref($p[$i])) {
+                $is_positional = 1;
+                last;
+			}
+            if ( grep /^$p[$i]$/, keys(%params) ) {
+                $params{ $p[$i] } = $p[ $i + 1 ];
+            }
+        }
+    } else {
+		$is_positional = 1;
+	}
+    if ($is_positional) {
+        $params{topic}             = shift @p;
+        $params{partition}         = shift @p;
+        $params{messages}          = shift @p;
+        $params{keys}              = shift @p;
+        $params{compression_codec} = shift @p;
+        $params{timestamps}        = shift @p;
+        $params{key_schema}        = shift @p;
+        $params{value_schema}      = shift @p;
+	}
 	my $avro_schemas = {
 		key => {
 			id => undef,
@@ -313,6 +443,8 @@ sub send {
 	# Get Avro schema for keys and values
 	foreach my $type (qw/key value/) {
 		($avro_schemas->{$type}->{id}, $avro_schemas->{$type}->{schema}) = $self->_get_avro_schema($params{topic}, $type, $params{"${type}_schema"});
+		return undef
+			unless $avro_schemas->{$type}->{id};
 	}
 
 	if ($params{keys}) {
@@ -367,7 +499,8 @@ sub send {
 		$params{partition},
 		$messages,
 		$keys,
-		$params{compression_codec}
+		$params{compression_codec},
+		$params{timestamps}
 	);
 	
 }
@@ -517,7 +650,8 @@ sub bulk_send {
 			'keys'					=> $bulk_keys,
 			'compressione_codec'	=> undef,
 			'key_schema'			=> $params{key_schema},
-			'value_schema'			=> $params{value_schema}
+			'value_schema'			=> $params{value_schema},
+			'timestamps'			=> $params{timestamps}
 		);
 		if (defined $res) {
 			$sent += scalar(@bulk);

@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Dist::Zilla::File::InMemory;
 
@@ -28,8 +28,8 @@ chdir "$Bin/../.."
     or die "Cannot chdir to $Bin/../..: $!";
 
 my ( $out, $err ) = capture { system(qw( precious lint -a )) };
-is( $? >> 8, 0, 'precious exited with 0' );
-is( $err, q{}, 'no output to stderr' );
+is( $? >> 8, 0,   'precious lint -a exited with 0' );
+is( $err,    q{}, 'no output to stderr' );
 
 done_testing();
 EOF
@@ -65,7 +65,7 @@ Dist::Zilla::Plugin::DROLSKY::Test::Precious - Creates a test that runs precious
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =for Pod::Coverage .*
 
@@ -85,7 +85,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

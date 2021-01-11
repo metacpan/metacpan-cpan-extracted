@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Perl implementation of the Neo4j Driver API",
+  "ABSTRACT" => "Perl Neo4j driver for Bolt and HTTP",
   "AUTHOR" => "Arne Johannessen <ajnn\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "REST::Client" => 134,
     "Try::Tiny" => 0,
     "URI" => "1.31",
-    "overload" => 0
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
     "File::Slurp" => 0,
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.18",
+  "VERSION" => "0.20",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +49,7 @@ my %FallbackPrereqs = (
   "Test::Warnings" => 0,
   "Try::Tiny" => 0,
   "URI" => "1.31",
-  "overload" => 0
+  "parent" => 0
 );
 
 

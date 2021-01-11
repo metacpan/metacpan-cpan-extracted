@@ -110,7 +110,6 @@ lib/AsposeSlidesCloud/Object/RequestInputFile.pm
 lib/AsposeSlidesCloud/Object/ResetSlide.pm
 lib/AsposeSlidesCloud/Object/ResourceBase.pm
 lib/AsposeSlidesCloud/Object/ResourceUri.pm
-lib/AsposeSlidesCloud/Object/ResourceUriElement.pm
 lib/AsposeSlidesCloud/Object/ResponseOutputFile.pm
 lib/AsposeSlidesCloud/Object/Save.pm
 lib/AsposeSlidesCloud/Object/SaveShape.pm

@@ -1,12 +1,6 @@
-use strict;
-use warnings;
-
-use Test::Most;
+use Test2::V0;
 use Log::Dispatch;
-
-BEGIN {
-    use_ok('MojoX::Log::Dispatch::Simple');
-}
+use MojoX::Log::Dispatch::Simple;
 
 my $obj;
 eval {

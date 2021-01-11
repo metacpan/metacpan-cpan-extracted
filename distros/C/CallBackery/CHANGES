@@ -1,3 +1,7 @@
+0.35.1 2021-01-11 15:31:15 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - parse last line of *.po file
+
 0.35.0 2020-11-25 11:11:23 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - bump the release number since we do have new functionality

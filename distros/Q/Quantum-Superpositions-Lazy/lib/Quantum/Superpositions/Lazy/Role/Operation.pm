@@ -1,8 +1,9 @@
 package Quantum::Superpositions::Lazy::Role::Operation;
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
-use v5.28; use warnings;
+use v5.28;
+use warnings;
 use Moo::Role;
 
 use feature qw(signatures);

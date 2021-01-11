@@ -10,7 +10,7 @@ use HTTP::Tiny;
 use List::Util qw(first);
 use namespace::clean;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has repo_root => (
   is         => 'ro',
@@ -81,7 +81,7 @@ sub before_release {
     }
 
     # Looks good!
-    $self->log_debug('GitHub Actions run successful');
+    $self->log("found successful GitHub Actions workflow run for $head_sha");
     last;
   }
 }

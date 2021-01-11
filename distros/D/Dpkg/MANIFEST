@@ -85,6 +85,7 @@ lib/Dpkg/Version.pm
 lib/Test/Dpkg.pm
 LICENSE
 MANIFEST			This list of files
+README
 t/codespell.t
 t/codespell/stopwords
 t/cppcheck.t

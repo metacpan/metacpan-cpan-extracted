@@ -30,7 +30,6 @@ sub check_cpanfile {
 
     my $from_cpanfile = $env->prereqs->as_cpan_meta->as_string_hash;
 
-use Data::Printer;
     my $ok    = 1;
     while ( my $plugin = shift @prereqs ) {
         next if !$plugin;

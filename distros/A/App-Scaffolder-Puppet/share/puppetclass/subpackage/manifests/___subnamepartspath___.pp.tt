@@ -1,18 +1,16 @@
 #
-# = Class: [% name %]
+# @summary Class to install [% package %].
 #
-# Class to install [% package %].
-#
-# == Parameters
-# <tt>ensure</tt>:: Ensure parameter to ensure that [% package %] is either
-#                   <code>present</code> or <code>absent</code>.
-# <tt>package</tt>:: Name of the package that provides [% package %]. If
-#                    <code>false</code>, no package installation will be
-#                    attempted.
+# @param ensure
+#   Ensure parameter to ensure that [% package %] is either
+#   <code>present</code> or <code>absent</code>.
+# @param package
+#   Name of the package that provides [% package %]. If
+#   <code>false</code>, no package installation will be attempted.
 #
 class [% name %] (
-    $ensure  = 'present',
-    $package = $[% nameparts.0 %]::params::[% subnamepartsjoined %]_package,
+    Enum[present, absent] $ensure  = 'present',
+    Variant[String, Boolean] $package = $[% nameparts.0 %]::params::[% subnamepartsjoined %]_package,
 ) inherits ::[% nameparts.0 %]::params {
     class {
         '::[% name %]::install':

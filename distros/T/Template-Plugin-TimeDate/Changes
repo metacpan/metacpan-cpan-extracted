@@ -1,5 +1,9 @@
 Revision history for Perl extension Template::Plugin::TimeDate
 
+1.03      2021-01-09 19:53:45-08:00 America/Vancouver
+    - Switch to Dist::Zilla for release management
+    - POD fixes; spelling
+
 1.02    Fri Apr 23 22:16 PDT 2010
     - Switch to Git
 

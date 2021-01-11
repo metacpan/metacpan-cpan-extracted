@@ -1,0 +1,56 @@
+NAME
+    App::lcpan::CmdBundle::borderstyle - lcpan subcommands related to
+    BorderStyle
+
+VERSION
+    This document describes version 0.001 of
+    App::lcpan::CmdBundle::borderstyle (from Perl distribution
+    App-lcpan-CmdBundle-borderstyle), released on 2020-12-01.
+
+SYNOPSIS
+    Install this distribution, then the lcpan subcommands below will be
+    available:
+
+     # List BorderStyle modules available on CPAN
+     % lcpan borderstyle-mods
+
+DESCRIPTION
+    This bundle provides the following lcpan subcommands:
+
+    *   lcpan borderstyle-mods
+
+    This distribution packages several lcpan subcommands related to
+    BorderStyle. More subcommands will be added in future releases.
+
+    Some ideas:
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-lcpan-CmdBundle-borderstyle>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-lcpan-CmdBundle-borderstyle>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-b
+    orderstyle>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    lcpan
+
+    BorderStyle
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

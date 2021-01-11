@@ -1,5 +1,17 @@
 Revision history for Perl extension Log::Dispatch::Twilio
 
+0.03      2021-01-10 23:31:32-08:00 America/Vancouver
+    - Augment tests to ensure we split/truncate at correct position
+    - Switch to Dist::Zilla for release management
+    - POD fixups; synopsis, spelling
+    - Fix message truncation/splitting, when message is too long
+      - was generating "max_messages" messages, even if less would suffice
+    - Ensure our namespace is kept clean
+    - Rewrite test suite, to not require a live Twilio API to connect to
+    - Explicitly note minimum version of Perl; 5.010001 (that which is
+      required by WWW::Twilio::API)
+    - Move to GitHub
+
 0.02    Tue Dec  4 23:42 PST 2012
     - Truncate long messages, or split them up across multiple SMS messages (if
       "max_messages" set to >1)

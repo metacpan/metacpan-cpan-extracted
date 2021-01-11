@@ -1,3 +1,16 @@
+BEGIN {
+  my $rc;
+  $rc = eval {
+    require PDF::API2;
+    1;
+  };
+  if (!defined $rc) { $rc = 0; }
+  unless($rc) {
+    print qq{1..0 # SKIP these tests; PDF::API2 is not installed\n};
+    exit;
+  }
+}
+
 use Test::More tests => 9;
 
 # Reproduction of http://rick.measham.id.au/pdf-api2/

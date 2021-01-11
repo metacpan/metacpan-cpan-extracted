@@ -1,17 +1,11 @@
-use strict;
-use warnings;
-
-use Test::Most;
-
-use constant MODULE => 'Config::App';
-
-BEGIN { use_ok(MODULE); }
+use Test2::V0;
+use Config::App;
 
 my ( $obj, $conf );
 
-ok( $obj = MODULE->new( 'config/libs.yaml', 1 ), MODULE . '->new( "libs.yaml", 1 )' );
+ok( $obj = Config::App->new( 'config/libs.yaml', 1 ), 'Config::App->new( "libs.yaml", 1 )' );
 
-is_deeply(
+is(
     $obj->get('libs'),
     [ qw( lib2 lib3 lib4 lib5 lib6 ) ],
     'libs setting is correct',

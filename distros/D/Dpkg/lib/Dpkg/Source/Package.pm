@@ -544,7 +544,7 @@ sub extract {
             my $dst = File::Spec->catfile($destdir, $orig);
             if (not check_files_are_the_same($src, $dst, 1)) {
                 cp($src, $dst)
-                    or syserror(g_('cannot copy %s to %s'), $src, $dst);
+                    or syserr(g_('cannot copy %s to %s'), $src, $dst);
             }
         }
     }
@@ -553,7 +553,7 @@ sub extract {
     $self->do_extract($newdirectory);
 
     # Check for directory traversals.
-    if (not $self->{options}{skip_debianization}) {
+    if (not $self->{options}{skip_debianization} and not $self->{no_check}) {
         # We need to add a trailing slash to handle the debian directory
         # possibly being a symlink.
         check_directory_traversal($newdirectory, "$newdirectory/debian/");

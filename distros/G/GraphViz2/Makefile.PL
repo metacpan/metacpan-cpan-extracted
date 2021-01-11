@@ -33,7 +33,7 @@ WriteMakefile(
     'IPC::Run3' => 0.048,
     'Moo' => 2.001001,
     'Types::Standard' => 1.000005,
-    'Graph' => '0.9706',
+    'Graph' => '0.9716',
   },
   TEST_REQUIRES => {
     'Test::More' => '0.88', # done_testing

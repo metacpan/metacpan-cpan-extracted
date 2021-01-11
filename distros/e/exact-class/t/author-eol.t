@@ -18,8 +18,6 @@ my @files = (
     'lib/exact/class.pm',
     'lib/exact/role.pm',
     't/00-compile.t',
-    't/00_use_class.t',
-    't/01_use_role.t',
     't/author-eol.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',

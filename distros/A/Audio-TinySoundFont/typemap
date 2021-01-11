@@ -1,0 +1,3 @@
+tsf *                       T_PTROBJ
+Audio::TinySoundFont::XS    T_PTROBJ
+Audio__TinySoundFont__XS    T_PTROBJ

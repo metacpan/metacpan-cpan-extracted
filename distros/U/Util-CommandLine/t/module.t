@@ -1,11 +1,6 @@
-use strict;
-use warnings;
+use Test2::V0;
+use Util::CommandLine;
 
-use Test::Most;
-
-use constant MODULE => 'Util::CommandLine';
-
-BEGIN { use_ok(MODULE); }
-require_ok(MODULE);
+ok( 1, '(We still live!)' );
 
 done_testing;

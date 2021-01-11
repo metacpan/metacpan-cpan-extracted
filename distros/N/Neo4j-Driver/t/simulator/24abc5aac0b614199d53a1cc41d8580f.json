@@ -1,1 +1,0 @@
-{"results":[{"columns":["name","address","role","requestedStatus","currentStatus","error"],"data":[{"row":["neo4j","localhost:7687","standalone","online","online",""],"meta":[null,null,null,null,null,null],"rest":["neo4j","localhost:7687","standalone","online","online",""]}]}],"errors":[]}

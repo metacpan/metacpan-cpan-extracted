@@ -10,7 +10,7 @@ use Carp qw( croak carp );
 use POSIX ":sys_wait_h";
 use IO::Pipe;
 
-our $VERSION = '1.08'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 sub new {
     my $class = shift;
@@ -331,10 +331,10 @@ Daemon::Device - Forking daemon device construct
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Daemon-Device.svg)](https://travis-ci.org/gryphonshafer/Daemon-Device)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Daemon-Device/badge.png)](https://coveralls.io/r/gryphonshafer/Daemon-Device)
+=for markdown [![test](https://github.com/gryphonshafer/Daemon-Device/workflows/test/badge.svg)](https://github.com/gryphonshafer/Daemon-Device/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Daemon-Device/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Daemon-Device)
 
 =head1 SYNOPSIS
 
@@ -734,23 +734,15 @@ L<GitHub|https://github.com/gryphonshafer/Daemon-Device>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Daemon-Device>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Daemon::Device>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/Daemon-Device>
+L<GitHub Actions|https://github.com/gryphonshafer/Daemon-Device/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Daemon-Device>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Daemon-Device>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Daemon-Device>
 
 =item *
 
@@ -770,9 +762,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is Copyright (c) 2015-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

@@ -1,3 +1,20 @@
+# ABSTRACT: Overview of accessing OAuth2 APIs with LWP::Authen::OAuth2
+# PODNAME: LWP::Authen::OAuth2::Overview
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+LWP::Authen::OAuth2::Overview - Overview of accessing OAuth2 APIs with LWP::Authen::OAuth2
+
+=head1 VERSION
+
+version 0.18
+
 =head1 NAME
 
 LWP::Authen::OAuth2::Overview - Overview of accessing OAuth2 APIs with LWP::Authen::OAuth2
@@ -628,12 +645,25 @@ redirects.  But the I<consumer> needs to be aware of it.
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Ben Tilly, C<< <btilly at gmail.com> >>
+=over 4
 
-=head1 ACKNOWLEDGEMENTS
+=item *
 
-Thanks to L<Rent.com|http://www.rent.com> for their generous support in
-letting me develop and release this module.  My thanks also to Keith Cascio
-C<< <cascio@helminthist.net> >> for very helpful feedback on early drafts.
+Ben Tilly, <btilly at gmail.com>
+
+=item *
+
+Thomas Klausner <domm@plix.at>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 - 2021 by Ben Tilly, Rent.com, Thomas Klausner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

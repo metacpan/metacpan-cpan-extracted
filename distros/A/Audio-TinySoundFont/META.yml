@@ -1,0 +1,40 @@
+---
+abstract: 'Interface to TinySoundFont, a "SoundFont2 synthesizer library in a single C/C++ file"'
+author:
+  - 'Jon Gentle <cpan@atrodo.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Audio-TinySoundFont
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Moo: '2.000'
+  Try::Tiny: '0'
+  Types::Standard: '0'
+  autodie: '0'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/atrodo/Audio-TinySoundFont/issues
+  homepage: https://github.com/atrodo/Audio-TinySoundFont
+  repository: https://github.com/atrodo/Audio-TinySoundFont.git
+version: '0.10'
+x_contributors:
+  - 'Jon Gentle <atrodo@atrodo.org>'
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0
+x_static_install: 0

@@ -10,9 +10,9 @@ Type::Tiny::Manual::Contributing - contributing to Type::Tiny development.
 
 =head2 Reporting bugs
 
-Bug reports (including wishlist items) can be submitted to RT.
+Bug reports (including wishlist items) can be submitted to GitHub.
 
-L<https://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+L<https://github.com/tobyink/p5-type-tiny/issues>.
 
 Test cases written using L<Test::More> are always appreciated.
 
@@ -26,7 +26,9 @@ L<https://github.com/tobyink/p5-type-tiny>.
 
 Please try to follow the coding style used in the rest of the project.
 (Tab indents, spaces for alignment, British English spellings, pod at
-the end of code but the start of test cases, etc.)
+the end of code but the start of test cases, etc.) 
+
+L<https://github.com/tobyink/misc-development-tools/blob/master/bin/my-perltidy>
 
 =head2 Adding Test Cases
 
@@ -71,13 +73,17 @@ You've reached the end of the manual!
 But each class, type library, and other package includes more detailed
 documentation.
 
+=head1 SEE ALSO
+
+L<https://toby.ink/open-source/contributing/>.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

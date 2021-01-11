@@ -1,5 +1,15 @@
 Revision history for Perl extension Dist::Zilla::PluginBundle::Author::GTERMARS
 
+0.03      2021-01-10 15:29:03-08:00 America/Vancouver
+    - Post-release, push branches+tags upstream to Git
+    - Pre-release, check for outstanding issues.
+    - Moved "Test::Compile" to a "t/" test, instead of "xt/"
+    - Pre-release, ensure that a successful GitHub Actions run exists
+    - Run "xt/" tests with "--jobs=8"; I've got CPU cores to spare
+    - Explicit dependency on Perl v5.14; minimum for DZil
+    - Add "EnsureMinimumPerl", to remind me to specify a minimum Perl version
+      for all my distributions.
+
 0.02      2020-12-31 11:58:32-08:00 America/Vancouver
     - Exclude `cpanfile` from distribution tarballs
     - Leave `xt/` tests in `xt/`, don't move them to `t/`

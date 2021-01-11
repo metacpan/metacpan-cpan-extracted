@@ -37,7 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
-use AsposeSlidesCloud::Object::ResourceUriElement;
+use AsposeSlidesCloud::Object::ResourceUri;
 use AsposeSlidesCloud::Object::SmartArtNode;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -173,7 +173,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'shapes' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Shapes',
     	description => 'Gets or sets the link to shapes.',
     	format => '',
@@ -204,7 +204,7 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'nodes' => 'ARRAY[SmartArtNode]',
-    'shapes' => 'ResourceUriElement',
+    'shapes' => 'ResourceUri',
     'is_assistant' => 'boolean',
     'text' => 'string',
     'org_chart_layout' => 'string'

@@ -1,14 +1,14 @@
 package Bitcoin::Crypto::Segwit;
 
-use v5.10; use warnings;
+our $VERSION = "0.996";
+
+use v5.10;
+use warnings;
 use Exporter qw(import);
 
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Config;
-use Bitcoin::Crypto;
 use Bitcoin::Crypto::Helpers qw(verify_bytestring);
-
-our $VERSION = Bitcoin::Crypto->VERSION;
 
 our @EXPORT_OK = qw(
 	validate_program
@@ -44,7 +44,7 @@ sub validate_program
 
 	my $version = unpack "C", $program;
 	Bitcoin::Crypto::Exception::SegwitProgram->raise(
-		"incorrect witness program version $version"
+		"incorrect witness program version " . ($version // "[null]")
 	) unless defined $version && $version >= 0 && $version <= $config{max_witness_version};
 
 	$program = substr $program, 1;
@@ -54,7 +54,7 @@ sub validate_program
 		$validator->($program);
 	}
 	else {
-		warn("No validator for segwit program version $version is declared");
+		warn("No validator for SegWit program version $version is declared");
 	}
 
 	return $version;
@@ -65,14 +65,17 @@ sub validate_program
 __END__
 =head1 NAME
 
-Bitcoin::Crypto::Segwit
+Bitcoin::Crypto::Segwit - Segregated Witness version definitions
 
 =head1 SYNOPSIS
 
+	use Bitcoin::Crypto::Segwit qw(validate_program);
 
+	my $program_version = validate_program($segwit_program);
 
 =head1 DESCRIPTION
 
+This module provides tools required to define and use a Segregated Witness version validator.
 
 =head1 FUNCTIONS
 

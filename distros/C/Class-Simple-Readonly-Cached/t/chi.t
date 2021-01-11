@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 34;
+use Test::Most tests => 38;
 use Test::NoWarnings;
 use CHI;
 
@@ -48,6 +48,13 @@ CHI: {
 	ok(!defined($l->empty()));
 	ok(!defined($l->empty()));
 
+	@empty = $l->notdefined();
+	ok(scalar(@empty) == 1);
+	ok(!defined($empty[0]));
+	@empty = $l->notdefined();
+	ok(scalar(@empty) == 1);
+	ok(!defined($empty[0]));
+
 	# White box test the cache
 	ok($cache->get('barney::') eq 'betty');
 	ok($cache->get('barney::betty') eq 'betty');
@@ -68,14 +75,14 @@ CHI: {
 	while(my($k, $v) = each %{$hits}) {
 		$count += $v;
 	}
-	is($count, 7, 'cache contains 7 hits');
+	is($count, 8, 'cache contains 8 hits');
 
 	my $misses = $l->state()->{'misses'};
 	$count = 0;
 	while(my($k, $v) = each %{$misses}) {
 		$count += $v;
 	}
-	is($count, 8, 'cache contains 8 misses');
+	is($count, 9, 'cache contains 9 misses');
 }
 
 package x;
@@ -89,9 +96,6 @@ sub new {
 }
 
 sub barney {
-	my $self = shift;
-	my $param = shift;
-
 	return 'betty';
 }
 
@@ -104,6 +108,10 @@ sub a {
 }
 
 sub empty {
+}
+
+sub notdefined {
+	return (undef);
 }
 
 sub echo {

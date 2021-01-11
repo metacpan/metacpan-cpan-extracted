@@ -1,4 +1,4 @@
-use Test::Most;
+use Test2::V0;
 
 my $counter = 0;
 
@@ -21,4 +21,4 @@ is( $thing->beta ->(), 2, 'code ref ref call 2' );
 is( $thing->alpha->(), 3, 'code ref ref call 3' );
 is( $thing->beta ->(), 4, 'code ref ref call 4' );
 
-done_testing();
+done_testing;

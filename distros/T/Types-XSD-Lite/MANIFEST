@@ -1,4 +1,3 @@
-CONTRIBUTING
 COPYRIGHT
 CREDITS
 Changes
@@ -15,3 +14,4 @@ doap.ttl
 lib/Types/XSD/Lite.pm
 t/01basic.t
 t/02inlinegenerator.t
+t/03anchored.t

@@ -12,7 +12,7 @@ no warnings qw(once redefine);
 
 
 BEGIN {
-  $REST::Neo4p::Constrain::VERSION = '0.4000';
+  $REST::Neo4p::Constrain::VERSION = '0.4001';
 }
 our @EXPORT = qw(create_constraint drop_constraint constrain relax);
 our @VALIDATE = qw(validate_properties validate_relationship validate_relationship_type);
@@ -795,7 +795,7 @@ L<REST::Neo4p>, L<REST::Neo4p::Constraint>
 
 =head1 LICENSE
 
-Copyright (c) 2012-2020 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2021 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

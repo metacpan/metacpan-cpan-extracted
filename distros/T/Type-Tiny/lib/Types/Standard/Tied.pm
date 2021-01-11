@@ -6,12 +6,12 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Tied::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Tied::VERSION   = '1.012000';
+	$Types::Standard::Tied::VERSION   = '1.012001';
 }
 
 $Types::Standard::Tied::VERSION =~ tr/_//d;
 
-use Type::Tiny ();
+use Type::Tiny      ();
 use Types::Standard ();
 use Types::TypeTiny ();
 
@@ -19,34 +19,37 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 no warnings;
 
-sub __constraint_generator
-{
-	return Types::Standard->meta->get_type('Tied') unless @_;
+sub __constraint_generator {
+	return Types::Standard->meta->get_type( 'Tied' ) unless @_;
 	
-	my $param = Types::TypeTiny::to_TypeTiny(shift);
-	unless (Types::TypeTiny::is_TypeTiny($param))
-	{
-		Types::TypeTiny::is_StringLike($param)
-			or _croak("Parameter to Tied[`a] expected to be a class name; got $param");
+	my $param = Types::TypeTiny::to_TypeTiny( shift );
+	unless ( Types::TypeTiny::is_TypeTiny( $param ) ) {
+		Types::TypeTiny::is_StringLike( $param )
+			or _croak( "Parameter to Tied[`a] expected to be a class name; got $param" );
 		require Type::Tiny::Class;
-		$param = "Type::Tiny::Class"->new(class => "$param");
+		$param = "Type::Tiny::Class"->new( class => "$param" );
 	}
 	
 	my $check = $param->compiled_check;
 	sub {
-		$check->(tied(Scalar::Util::reftype($_) eq 'HASH' ?  %{$_} : Scalar::Util::reftype($_) eq 'ARRAY' ?  @{$_} :  Scalar::Util::reftype($_) =~ /^(SCALAR|REF)$/ ?  ${$_} : undef));
+		$check->(
+			tied(
+				Scalar::Util::reftype( $_ ) eq 'HASH'             ? %{$_}
+				: Scalar::Util::reftype( $_ ) eq 'ARRAY'          ? @{$_}
+				: Scalar::Util::reftype( $_ ) =~ /^(SCALAR|REF)$/ ? ${$_}
+				:                                                   undef
+			)
+		);
 	};
-}
+} #/ sub __constraint_generator
 
-sub __inline_generator
-{
-	my $param = Types::TypeTiny::to_TypeTiny(shift);
-	unless (Types::TypeTiny::is_TypeTiny($param))
-	{
-		Types::TypeTiny::is_StringLike($param)
-			or _croak("Parameter to Tied[`a] expected to be a class name; got $param");
+sub __inline_generator {
+	my $param = Types::TypeTiny::to_TypeTiny( shift );
+	unless ( Types::TypeTiny::is_TypeTiny( $param ) ) {
+		Types::TypeTiny::is_StringLike( $param )
+			or _croak( "Parameter to Tied[`a] expected to be a class name; got $param" );
 		require Type::Tiny::Class;
-		$param = "Type::Tiny::Class"->new(class => "$param");
+		$param = "Type::Tiny::Class"->new( class => "$param" );
 	}
 	return unless $param->can_be_inlined;
 	
@@ -55,11 +58,11 @@ sub __inline_generator
 		my $var = $_[1];
 		sprintf(
 			"%s and do { my \$TIED = tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : Scalar::Util::reftype($var) =~ /^(SCALAR|REF)\$/ ? \${$var} : undef); %s }",
-			Types::Standard::Ref()->inline_check($var),
-			$param->inline_check('$TIED')
+			Types::Standard::Ref()->inline_check( $var ),
+			$param->inline_check( '$TIED' )
 		);
 	}
-}
+} #/ sub __inline_generator
 
 1;
 
@@ -87,7 +90,7 @@ It will be loaded on demand. You may ignore its presence.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+L<https://github.com/tobyink/p5-type-tiny/issues>.
 
 =head1 SEE ALSO
 
@@ -99,7 +102,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -109,4 +112,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

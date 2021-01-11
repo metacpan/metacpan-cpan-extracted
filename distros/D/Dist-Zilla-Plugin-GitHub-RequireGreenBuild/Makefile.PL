@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,12 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-Plugin-GitHub-RequireGreenBuild",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Dist::Zilla::Plugin::GitHub::RequireGreenBuild",
   "PREREQ_PM" => {
     "Dist::Zilla" => 0,
     "Dist::Zilla::Plugin::GitHub" => 0,
     "Git::Wrapper" => 0,
     "HTTP::Tiny" => 0,
+    "Moose" => 0,
     "namespace::clean" => 0
   },
   "TEST_REQUIRES" => {
@@ -31,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::DiagINC" => "0.002",
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +50,7 @@ my %FallbackPrereqs = (
   "HTTP::Tiny" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Moose" => 0,
   "Test::DiagINC" => "0.002",
   "Test::More" => "0.94",
   "namespace::clean" => 0

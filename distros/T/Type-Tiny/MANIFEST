@@ -296,6 +296,7 @@ t/21-types/UpperCaseStr.t
 t/21-types/Value.t
 t/21-types/_ForeignTypeConstraint.t
 t/30-integration/Class-InsideOut/basic.t
+t/30-integration/Data-Constraint/basic.t
 t/30-integration/Exporter-Tiny/basic.t
 t/30-integration/Exporter-Tiny/installer.t
 t/30-integration/Exporter-Tiny/role-conflict.t

@@ -1,7 +1,7 @@
-use Test::More tests => 2;
-use Test::Exception;
-
+use Test2::V0;
 use exact;
 
-lives_ok( sub { say $^V }, 'say' );
-lives_ok( sub { state $x }, 'state' );
+ok( lives { say $^V }, 'say' ) or note $@;
+ok( lives { state $x }, 'state' ) or note $@;
+
+done_testing;

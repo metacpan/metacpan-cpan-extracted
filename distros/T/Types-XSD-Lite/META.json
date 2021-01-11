@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.015, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Type::Library" : "0.004"
+            "Type::Library" : "0.004",
+            "perl" : "5.008003"
          }
       },
       "test" : {
@@ -50,12 +51,11 @@
    "provides" : {
       "Types::XSD::Lite" : {
          "file" : "lib/Types/XSD/Lite.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/project",
       "bugtracker" : {
          "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Types-XSD-Lite"
       },
@@ -67,7 +67,10 @@
          "type" : "git",
          "url" : "git://github.com/tobyink/p5-types-xsd-lite.git",
          "web" : "https://github.com/tobyink/p5-types-xsd-lite"
-      }
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/project"
    },
-   "version" : "0.005"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

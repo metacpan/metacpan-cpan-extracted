@@ -1,7 +1,7 @@
 Revision history for Gtk2::SourceView2.
 
 0.10 Sun May 30 23:35:52 CEST 2010
-	Unit tests now work with Test::Simple 0.95_02.
+	Unit tests now work with Test::Simple 0.95_02 (RT #57875).
 	Unit test compatible with gtksourceview 2.10.2 (view most be in a parent).
 
 0.09 Tue Apr 27 20:11:56 CEST 2010

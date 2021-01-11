@@ -1,4 +1,11 @@
 Revision history for exact::lib
 
+1.02      2021-01-10 16:44:25-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.01      2020-10-14 12:14:10-07:00 America/Los_Angeles
         - First version, released on an unsuspecting world.

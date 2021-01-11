@@ -1,6 +1,9 @@
 package Bitcoin::Crypto::Key::Private;
 
-use v5.10; use warnings;
+our $VERSION = "0.996";
+
+use v5.10;
+use warnings;
 use Moo;
 use Types::Standard qw(Str);
 use Crypt::PK::ECC;
@@ -14,10 +17,8 @@ use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto::Util qw(validate_wif);
 use Bitcoin::Crypto::Helpers qw(ensure_length);
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto;
 
 use namespace::clean;
-our $VERSION = Bitcoin::Crypto->VERSION;
 
 with "Bitcoin::Crypto::Role::BasicKey";
 
@@ -60,7 +61,9 @@ sub from_wif
 	my $wif_network_byte = substr $decoded, 0, 1;
 	my @found_networks =
 		Bitcoin::Crypto::Network->find(sub { shift->wif_byte eq $wif_network_byte });
-	@found_networks = first { $_ eq $network } @found_networks if defined $network;
+	@found_networks = first { $_ eq $network }
+		@found_networks
+		if defined $network;
 
 	Bitcoin::Crypto::Exception::KeyCreate->raise(
 		"found multiple networks possible for given WIF"
@@ -95,7 +98,7 @@ sub get_public_key
 __END__
 =head1 NAME
 
-Bitcoin::Crypto::Key::Private - class for Bitcoin private keys
+Bitcoin::Crypto::Key::Private - Bitcoin private keys
 
 =head1 SYNOPSIS
 
@@ -242,7 +245,9 @@ This module throws an instance of L<Bitcoin::Crypto::Exception> if it encounters
 
 =over 2
 
-=item * KeySign - couldn't sign the message corretcly
+=item * Sign - couldn't sign the message correctly
+
+=item * Verify - couldn't verify the message correctly
 
 =item * KeyCreate - key couldn't be created correctly
 

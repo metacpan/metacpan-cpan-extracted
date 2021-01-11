@@ -22,7 +22,7 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.53';
+our $VERSION = '1.54';
 
 # Automatically generated, see share/stations.json
 my @stations = (
@@ -1571,6 +1571,7 @@ my @stations = (
 ['HCLP','Cloppenburg',8001337,8.055763,52.843996],
 ['NC','Coburg',8001338,10.95737,50.263097],
 ['NCN','Coburg Nord',8001334,10.964825,50.2716],
+['NCBD','Coburg-Beiersdorf',8001333,10.9297,50.2867],
 ['NCNS','Coburg-Neuses',8001339,10.951361,50.278082],
 ['SCOC','Cochem(Mosel)',8001340,7.166738,50.153092],
 ['ECFS','Coesfeld Schulzentrum',8001343,7.165836,51.951269],
@@ -2203,6 +2204,7 @@ my @stations = (
 ['MEGH','Engertsham',8001792,13.358696,48.473918],
 ['XBEN','Engis',8800464,5.402714,50.582831],
 ['TKL','Engstingen',8070456,9.292419,48.392271],
+['TENS','Engstingen Schulzentrum',8003335,9.2843,48.384],
 ['TENG','Engstlatt',8001794,8.875219,48.297119],
 ['SENK','Enkenbach',8000372,7.899501,49.489933],
 ['XNEK','Enkhuizen',8400210,5.92479,52.699165344238],
@@ -3719,6 +3721,7 @@ my @stations = (
 ['ONHT','Houten',8400340,5.5505557060242,52.03402],
 ['PNSHC','Houten Castellum',8400010,5.548611164093,52.01701],
 ['ONHSG','Houthem-St. Gerlach',8400341,5.5483094,50.873332977295],
+['XLHW','Howald',8200250,6.1325,49.5811],
 ['BHW','Hoyerswerda',8010177,14.231407,51.432788],
 ['BHWN','Hoyerswerda-Neustadt',8011922,14.26823906,51.4290131],
 ['HHOY','Hoykenkamp',8003008,8.598683,53.069799],
@@ -4327,6 +4330,7 @@ my @stations = (
 ['DAG','Kurort Altenberg(Erzgebirge)',8011019,13.753634,50.766298],
 ['DKJ','Kurort Jonsdorf',8012131,14.70661,50.853855],
 ['DKJH','Kurort Jonsdorf Hst',8012132,14.725668,50.862151],
+['DKP','Kurort Kipsdorf',8012133,13.6765462,50.8059076],
 ['DKOW','Kurort Oberwiesenthal',8012134,12.971981,50.421178],
 ['DKOY','Kurort Oybin',8012135,14.745577,50.843662],
 ['DKON','Kurort Oybin-Niederdorf',8012136,14.753624,50.862166],
@@ -6446,6 +6450,7 @@ my @stations = (
 ['XSRM','Rebstein-Marbach',8506318,9.58675061708481,47.3926373927342],
 ['KREC','Rech',8004967,7.036514,50.515427],
 ['DRBG','Rechenberg',8012727,13.559902,50.733931],
+['DRBS','Rechenberg Schule',8017220,13.543867,50.7371],
 ['TRC','Rechtenstein',8004968,9.550904,48.239993],
 ['HRFD','Rechterfeld',8004970,8.391291,52.838685],
 ['NRDF','Reckendorf',8004971,10.834038,50.019394],
@@ -6973,6 +6978,7 @@ my @stations = (
 ['TSHM','Schmiechen',8005379,9.72038,48.362356],
 ['TSHA','Schmiechen Albbahn',8070974,9.715289,48.364897],
 ['MSCN','Schmiechen(Schwab)',8005381,10.978087,48.213046],
+['DSBG','Schmiedeberg (Dresden)',8012884,13.6775064,50.8338467],
 ['DNAS','Schmiedeberg-Naundorf',8012885,13.669616,50.84411],
 ['DSMI','Schmilka-Hirschmühle',8012888,14.228419,50.889918],
 ['WSCM','Schmollensee',8012892,14.077246,53.982272],
@@ -8537,6 +8543,7 @@ my @stations = (
 ['HWUN','Wunstorf',8000268,9.450976,52.422225],
 ['KW','Wuppertal Hbf',8000266,7.149543,51.254363],
 ['KWBA','Wuppertal-Barmen',8006596,7.195159,51.266972],
+['KWHD','Wuppertal-Hahnenfurth/Düssel',8006601,7.05543146,51.2539996],
 ['KWLP','Wuppertal-Langerfeld',8006607,7.242298,51.277866],
 ['KWO','Wuppertal-Oberbarmen',8006719,7.221483,51.273839],
 ['KWRO','Wuppertal-Ronsdorf',8006616,7.2156,51.226476],
@@ -8890,7 +8897,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.53
+version 1.54
 
 =head1 DESCRIPTION
 

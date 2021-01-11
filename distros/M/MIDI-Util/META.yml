@@ -20,6 +20,7 @@ meta-spec:
   version: '1.4'
 name: MIDI-Util
 requires:
+  Exporter: '0'
   MIDI: '0'
   MIDI::Simple: '0'
   Music::Tempo: '0'
@@ -30,7 +31,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Util
   repository: https://github.com/ology/MIDI-Util.git
-version: '0.0705'
+version: '0.0800'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

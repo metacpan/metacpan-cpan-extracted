@@ -5,10 +5,11 @@ use warnings;
 use Carp 'croak';
 use Exporter 'import';
 use Scalar::Util 'blessed';
+use Sentinel 'sentinel';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
-our @EXPORT_OK = qw(deep_exists deep_get deep_set);
+our @EXPORT_OK = qw(deep_exists deep_get deep_set deep_val);
 
 sub deep_exists {
   croak 'deep_exists called with no arguments' unless @_;
@@ -161,6 +162,14 @@ sub deep_set {
   }
 }
 
+sub deep_val :lvalue {
+  croak 'deep_val called with no arguments' unless @_;
+  my $parent_ref = \$_[0];
+  my @keys = @_[1..$#_];
+  sentinel get => sub { deep_get $$parent_ref, @keys },
+           set => sub { deep_set $$parent_ref, @keys, $_[0] };
+}
+
 1;
 
 =head1 NAME
@@ -178,13 +187,17 @@ Data::DeepAccess - Access or set data in deep structures
   $things{foo}{baz} = ['a'..'z'];
   say deep_get(\%things, qw(foo baz 5)); # f
 
-  deep_get(\%things, qw(foo baz 26)) = 'AA';
-  say $things{foo}{baz}[-1]; # AA
+  deep_set(\%things, qw(foo foo), undef);
+  say deep_exists(\%things, qw(foo foo)); # 1
+
+  deep_val(\%things, qw(bar bar)) = 'lvalue';
+  say deep_val(\%things, qw(bar bar)); # lvalue
 
 =head1 DESCRIPTION
 
-Provides the functions L</"deep_get"> and L</"deep_set"> that traverse nested
-data structures to retrieve or set the value located by a list of keys.
+Provides the functions L</"deep_exists">, L</"deep_get">, L</"deep_set">, and
+L</"deep_val"> that traverse nested data structures to retrieve or set the
+value located by a list of keys.
 
 When traversing, keys are applied according to the type of referenced data
 structure. A hash will be traversed by hash key, an array by array index, and
@@ -240,7 +253,7 @@ If no keys are passed, returns true.
 
 =head2 deep_get
 
-  my $value  = deep_get($structure, @keys);
+  my $value = deep_get($structure, @keys);
 
 Retrieves the value from the referenced structure located by the given keys. No
 intermediate structures will be altered or vivified; a missing structure will
@@ -259,6 +272,19 @@ structure is undefined, it must be an assignable lvalue to be vivified.
 If no keys are passed, the structure must be an assignable lvalue and will be
 assigned the value directly.
 
+=head2 deep_val
+
+  my $value = deep_val($structure, @keys);
+  deep_val($structure, @keys) = $new_value;
+
+L<Lvalue|perlsub/"Lvalue subroutines"> accessor that is equivalent to
+L</"deep_get"> when a value is retrieved from it, or L</"deep_set"> when a
+value is assigned to it (passing the assigned value as the final argument).
+
+The passed keys are used to traverse the structure at the time of retrieval or
+assignment, not when the function is called. This subtle difference may matter
+if the lvalue is preserved for later access, such as via reference.
+
 =head1 BUGS
 
 Report any issues on the public bugtracker.
@@ -266,6 +292,14 @@ Report any issues on the public bugtracker.
 =head1 AUTHOR
 
 Dan Book <dbook@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item Matt S Trout (mst)
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -277,4 +311,19 @@ This is free software, licensed under:
 
 =head1 SEE ALSO
 
-L<Hash::DeepAccess>, L<Data::DPath>, L<Data::Deep>
+Many prior modules for accessing specific items within a deep structure, which
+the author determined were either insufficient or overcomplex.
+
+=over
+
+=item * L<Hash::DeepAccess>
+
+=item * L<Data::Deep>
+
+=item * L<Data::Diver>
+
+=item * L<Data::DPath>
+
+=item * L<JSON::Pointer>
+
+=back

@@ -1,6 +1,9 @@
 package Bitcoin::Crypto::Role::Compressed;
 
-use v5.10; use warnings;
+our $VERSION = "0.996";
+
+use v5.10;
+use warnings;
 use Types::Standard qw(Bool);
 
 use Bitcoin::Crypto::Config;

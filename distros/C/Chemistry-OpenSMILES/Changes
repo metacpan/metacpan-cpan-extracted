@@ -1,3 +1,10 @@
+0.4.0 2021-01-11
+
+    - Adding Chemistry::OpenSMILES::Writer, implementing a SMILES writer
+      for the data structures built by Chemistry::OpenSMILES::Parser.
+    - Converting 'charge' atom field to integer.
+    - Exporting Chemistry::OpenSMILES::is_aromatic().
+
 0.3.2 2020-10-05
 
     - Explicitly setting bond order to ':' on bonds between aromatic

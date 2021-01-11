@@ -5,8 +5,8 @@ use warnings;
 
 BEGIN {
 	$Reply::Plugin::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
-	$Reply::Plugin::TypeTiny::VERSION   = '1.012000';
-};
+	$Reply::Plugin::TypeTiny::VERSION   = '1.012001';
+}
 
 $Reply::Plugin::TypeTiny::VERSION =~ tr/_//d;
 
@@ -17,44 +17,38 @@ use Scalar::Util qw(blessed);
 use Term::ANSIColor;
 
 sub mangle_error {
-	my $self  = shift;
-	my ($err) = @_;
+	my $self = shift;
+	my ( $err ) = @_;
 	
-	if (blessed $err and $err->isa("Error::TypeTiny::Assertion"))
-	{
+	if ( blessed $err and $err->isa( "Error::TypeTiny::Assertion" ) ) {
 		my $explain = $err->explain;
-		if ($explain)
-		{
-			print color("cyan");
+		if ( $explain ) {
+			print color( "cyan" );
 			print "Error::TypeTiny::Assertion explain:\n";
-			$self->_explanation($explain, "");
+			$self->_explanation( $explain, "" );
 			local $| = 1;
 			print "\n";
-			print color("reset");
+			print color( "reset" );
 		}
-	}
+	} #/ if ( blessed $err and ...)
 	
 	return @_;
-}
+} #/ sub mangle_error
 
-sub _explanation
-{
+sub _explanation {
 	my $self = shift;
-	my ($ex, $indent)  = @_;
+	my ( $ex, $indent ) = @_;
 	
-	for my $line (@$ex)
-	{
-		if (ref($line) eq q(ARRAY))
-		{
+	for my $line ( @$ex ) {
+		if ( ref( $line ) eq q(ARRAY) ) {
 			print "$indent * Explain:\n";
-			$self->_explanation($line, "$indent   ");
+			$self->_explanation( $line, "$indent   " );
 		}
-		else
-		{
+		else {
 			print "$indent * $line\n";
 		}
 	}
-}
+} #/ sub _explanation
 
 1;
 
@@ -87,7 +81,7 @@ Not massively tested.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+L<https://github.com/tobyink/p5-type-tiny/issues>.
 
 =head1 SEE ALSO
 
@@ -99,7 +93,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2020 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -109,4 +103,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

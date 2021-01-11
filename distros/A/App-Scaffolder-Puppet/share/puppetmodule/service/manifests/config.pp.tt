@@ -1,13 +1,11 @@
 #
-# = Class: [% name %]::config
+# @summary Class to configure [% name %].
 #
-# Class to configure [% name %].
-#
-# == Parameters
-# <tt>ensure</tt>:: Ensure that configuration is either <code>present</code> or
-#                   <code>absent</code>.
+# @param ensure
+#   Ensure that configuration is either <code>present</code> or
+#   <code>absent</code>.
 #
 class [% name %]::config (
-    $ensure = 'present',
+    Enum[present, absent] $ensure = 'present',
 ) inherits ::[% name %]::params {
 }

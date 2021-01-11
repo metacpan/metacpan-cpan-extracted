@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-Author-GTERMARS",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Dist::Zilla::PluginBundle::Author::GTERMARS",
   "PREREQ_PM" => {
     "Dist::Zilla" => "6.005",
@@ -21,8 +22,10 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::BumpVersionAfterRelease" => 0,
     "Dist::Zilla::Plugin::CopyFilesFromBuild" => 0,
     "Dist::Zilla::Plugin::EnsureChangesHasContent" => 0,
+    "Dist::Zilla::Plugin::EnsureMinimumPerl" => 0,
     "Dist::Zilla::Plugin::Git" => "2.046",
     "Dist::Zilla::Plugin::GitHub" => "0.46",
+    "Dist::Zilla::Plugin::GitHub::RequireGreenBuild" => 0,
     "Dist::Zilla::Plugin::Prereqs::AuthorDeps" => "0.006",
     "Dist::Zilla::Plugin::Prereqs::FromCPANfile" => "0.08",
     "Dist::Zilla::Plugin::PromptIfStale" => "0.057",
@@ -50,10 +53,13 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "File::Temp" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "Test::DiagINC" => "0.002",
-    "Test::More" => 0
+    "Test::More" => "0.94"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -66,8 +72,10 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::BumpVersionAfterRelease" => 0,
   "Dist::Zilla::Plugin::CopyFilesFromBuild" => 0,
   "Dist::Zilla::Plugin::EnsureChangesHasContent" => 0,
+  "Dist::Zilla::Plugin::EnsureMinimumPerl" => 0,
   "Dist::Zilla::Plugin::Git" => "2.046",
   "Dist::Zilla::Plugin::GitHub" => "0.46",
+  "Dist::Zilla::Plugin::GitHub::RequireGreenBuild" => 0,
   "Dist::Zilla::Plugin::Prereqs::AuthorDeps" => "0.006",
   "Dist::Zilla::Plugin::Prereqs::FromCPANfile" => "0.08",
   "Dist::Zilla::Plugin::PromptIfStale" => "0.057",
@@ -92,8 +100,11 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Role::PluginBundle::PluginRemover" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "File::Temp" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "Test::DiagINC" => "0.002",
-  "Test::More" => 0,
+  "Test::More" => "0.94",
   "namespace::autoclean" => 0
 );
 

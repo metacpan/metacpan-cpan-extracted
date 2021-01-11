@@ -39,7 +39,6 @@ use DateTime;
 
 use AsposeSlidesCloud::Object::ResourceBase;
 use AsposeSlidesCloud::Object::ResourceUri;
-use AsposeSlidesCloud::Object::ResourceUriElement;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -188,14 +187,14 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'layout_slides' => {
-    	datatype => 'ARRAY[ResourceUriElement]',
+    	datatype => 'ARRAY[ResourceUri]',
     	base_name => 'LayoutSlides',
     	description => 'List of layout slide links.',
     	format => '',
     	read_only => '',
     		},
     'depending_slides' => {
-    	datatype => 'ARRAY[ResourceUriElement]',
+    	datatype => 'ARRAY[ResourceUri]',
     	base_name => 'DependingSlides',
     	description => 'List of depending slide links.',
     	format => '',
@@ -207,8 +206,8 @@ __PACKAGE__->swagger_types( {
     'self_uri' => 'ResourceUri',
     'alternate_links' => 'ARRAY[ResourceUri]',
     'name' => 'string',
-    'layout_slides' => 'ARRAY[ResourceUriElement]',
-    'depending_slides' => 'ARRAY[ResourceUriElement]'
+    'layout_slides' => 'ARRAY[ResourceUri]',
+    'depending_slides' => 'ARRAY[ResourceUri]'
 } );
 
 __PACKAGE__->attribute_map( {

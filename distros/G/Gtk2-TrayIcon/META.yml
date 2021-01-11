@@ -1,11 +1,26 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Gtk2-TrayIcon
-version:      0.06
-version_from: TrayIcon.pm
-installdirs:  site
-requires:
-    Gtk2:                          0.96
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+---
+abstract: '(DEPRECATED) Perl interface to the EggTrayIcon library'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::Depends: 0.1
+  ExtUtils::MakeMaker: 0
+  ExtUtils::PkgConfig: 0.1
+  Glib: 1.00
+  Gtk2: 1.00
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Gtk2-TrayIcon
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: 0.07
+x_deprecated: 1

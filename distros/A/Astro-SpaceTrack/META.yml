@@ -23,7 +23,7 @@ no_index:
 provides:
   Astro::SpaceTrack:
     file: lib/Astro/SpaceTrack.pm
-    version: '0.142'
+    version: '0.143'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -50,8 +50,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack
+  bugtracker: https://github.com/trwyant/perl-Astro-SpaceTrack/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-SpaceTrack.git
-version: '0.142'
+version: '0.143'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

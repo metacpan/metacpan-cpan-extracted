@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Temporal;
 # ABSTRACT: Represents a Neo4j temporal value
-$Neo4j::Driver::Type::Temporal::VERSION = '0.18';
+$Neo4j::Driver::Type::Temporal::VERSION = '0.20';
 
 # may not be supported by Bolt
 
@@ -23,7 +23,7 @@ Neo4j::Driver::Type::Temporal - Represents a Neo4j temporal value
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2020 by Arne Johannessen.
+This software is Copyright (c) 2016-2021 by Arne Johannessen.
 
 This is free software, licensed under:
 

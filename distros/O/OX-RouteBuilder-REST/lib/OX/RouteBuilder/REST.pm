@@ -1,11 +1,10 @@
 package OX::RouteBuilder::REST;
-use Moose;
-use namespace::autoclean;
-
-our $VERSION = 0.003;
 
 # ABSTRACT: OX::RouteBuilder which routes to an action method in a controller class based on HTTP verbs
+our $VERSION = '0.004'; # VERSION
 
+use Moose;
+use namespace::autoclean;
 use Try::Tiny;
 
 with 'OX::RouteBuilder';
@@ -83,13 +82,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 OX::RouteBuilder::REST - OX::RouteBuilder which routes to an action method in a controller class based on HTTP verbs
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -167,7 +168,7 @@ To generate a link to an action, use C<uri_for> with either the name
 
 =item *
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =item *
 
@@ -177,7 +178,7 @@ Validad GmbH http://validad.com
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Thomas Klausner.
+This software is copyright (c) 2014 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

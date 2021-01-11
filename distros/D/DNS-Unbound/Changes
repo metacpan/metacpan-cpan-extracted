@@ -1,5 +1,12 @@
 Revision history for Perl module DNS::Unbound
 
+0.21 Sat, 9 Jan 2021
+- Fix author test resolvconf.t after default port changed from 53 to 5353
+  in Net::DNS::Nameserver version 1.28.
+- Special classes for AnyEvent, IO::Async, and Mojolicious are added.
+- Spruce up typemap’s mismatch error reporting.
+- Internal improvements.
+
 0.20 Mon, 3 Aug 2020
 - BUG FIX: Don’t free the unbound context if its reference is already gone.
 - BUG FIX: Use the “real” finally() rather than wrapping then() (badly).

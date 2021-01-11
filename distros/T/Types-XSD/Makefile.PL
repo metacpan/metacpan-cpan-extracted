@@ -4,47 +4,51 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "type constraints based on XML schema datatypes",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Types-XSD",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => {
-                          requires => {
-                            "DateTime::Incomplete" => 0,
-                            "DateTimeX::Auto"      => 0.004,
-                            "Type::Library"        => 0.004,
-                            "Types::XSD::Lite"     => 0.004,
-                            "XML::RegExp"          => 0,
+  "abstract"         => "type constraints based on XML schema datatypes",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "Types-XSD",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => {
+                            requires => {
+                              "DateTime::Incomplete" => 0,
+                              "DateTimeX::Auto"      => 0.004,
+                              "perl"                 => 5.008003,
+                              "Type::Library"        => "1.000000",
+                              "Types::XSD::Lite"     => 0.006,
+                              "XML::RegExp"          => 0,
+                            },
+                          },
+                          test => {
+                            requires => { "Test::More" => 0.96, "Test::TypeTiny" => "1.000000" },
                           },
                         },
-                        test => { requires => { "Test::More" => 0.96, "Test::TypeTiny" => 0.004 } },
-                      },
-  "provides"       => {
-                        "Types::XSD" => { file => "lib/Types/XSD.pm", version => 0.005 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Types-XSD" },
-                        homepage     => "https://metacpan.org/release/Types-XSD",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-types-xsd.git",
-                                          web  => "https://github.com/tobyink/p5-types-xsd",
-                                        },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/Types-XSD/project",
-                      },
-  "version"        => 0.005,
+  "provides"         => {
+                          "Types::XSD" => { file => "lib/Types/XSD.pm", version => 0.007 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Types-XSD" },
+                          homepage     => "https://metacpan.org/release/Types-XSD",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-types-xsd.git",
+                                            web  => "https://github.com/tobyink/p5-types-xsd",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Types-XSD/project",
+                        },
+  "version"          => 0.007,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;
@@ -118,28 +122,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

@@ -25,7 +25,6 @@ at/test.html
 cpanfile
 dist.ini
 driver-example.pl
-ide-plugin.js
 lib/Selenium/ActionChains.pm
 lib/Selenium/CanStartBinary.pm
 lib/Selenium/CanStartBinary/FindBinary.pm
@@ -70,10 +69,8 @@ t/02-webelement.t
 t/03-spec-coverage.t
 t/04-commands-implemented.t
 t/10-switch-to-window.t
-t/11-action-chains.t
 t/12-reuse-session.t
 t/CanSetWebdriverContext.t
-t/CanStartBinary.t
 t/Finders.t
 t/Firefox-Profile.t
 t/Remote-Connection.t
@@ -100,7 +97,6 @@ t/lib/TestHarness.pm
 t/mock-recordings/01-driver-mock.json
 t/mock-recordings/02-webelement-mock.json
 t/mock-recordings/10-switch-to-window-mock.json
-t/mock-recordings/11-action-chains-mock.json
 t/mock-recordings/12-reuse-session-mock.json
 t/mock-recordings/convenience-mock-darwin.json
 t/mock-recordings/convenience-mock.json

@@ -1,18 +1,11 @@
-use strict;
-use warnings;
-
-use Test::Most;
-
-use constant MODULE => 'Config::App';
-
-BEGIN { use_ok(MODULE); }
+use Test2::V0;
+use Config::App;
 
 my ( $obj, $conf );
+ok( $obj = Config::App->new( 'config/merge.yaml', 1 ), 'Config::App->new( "merge.yaml", 1 )' );
 
-ok( $obj = MODULE->new( 'config/merge.yaml', 1 ), MODULE . '->new( "merge.yaml", 1 )' );
-
-lives_ok(
-    sub {
+ok(
+    lives {
         $conf = $obj->conf({
             logs => {
                 outputs => [
@@ -32,10 +25,10 @@ lives_ok(
             },
         });
     },
-    MODULE . '->conf({...})',
-);
+    'Config::App->conf({...})',
+) or note $@;
 
-is_deeply(
+is(
     $conf->{logs},
     {
         outputs => [

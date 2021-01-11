@@ -1,0 +1,5 @@
+This archive contains the CPAN distribution for Dpkg, which
+is part of the dpkg project.
+
+Only the perl modules are included. The rest of the content can be found in
+the original upstream source code, from <https://wiki.debian.org/Teams/Dpkg>.

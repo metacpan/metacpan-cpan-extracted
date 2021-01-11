@@ -1,11 +1,12 @@
 package Pod::Strip;
 
+# ABSTRACT: Remove POD from Perl code
+our $VERSION = '1.100'; # VERSION
+
 use warnings;
 use strict;
 
 use base ('Pod::Simple');
-
-our $VERSION = "1.02";
 
 sub new {
     my $new = shift->SUPER::new(@_);
@@ -25,21 +26,26 @@ sub new {
     return $new;
 }
 
-
 sub replace_with_comments {
     my $self = shift;
     $self->{_replace_with_comments} = defined $_[0] ? $_[0] : 1;
 }
 
-
 1;
+
 __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Pod::Strip - Remove POD from Perl code
+
+=head1 VERSION
+
+version 1.100
 
 =head1 SYNOPSIS
 
@@ -51,7 +57,6 @@ Pod::Strip - Remove POD from Perl code
     $p->parse_string_document($code);   # or some other parsing method
                                         #    from Pod::Simple
     # $podless will now contain code without any POD
-
 
 =head1 DESCRIPTION
 
@@ -74,22 +79,13 @@ messages etc.
 
 =head1 AUTHOR
 
-Thomas Klausner, C<< <domm@cpan.org> >>
+Thomas Klausner <domm@plix.at>
 
-=head1 BUGS
+=head1 COPYRIGHT AND LICENSE
 
-Please report any bugs or feature requests to
-C<bug-pod-strip@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
-be notified of progress on your bug as I make changes.
+This software is copyright (c) 2004 - 2021 by Thomas Klausner.
 
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2004, 2005, 2006 Thomas Klausner, All Rights Reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-

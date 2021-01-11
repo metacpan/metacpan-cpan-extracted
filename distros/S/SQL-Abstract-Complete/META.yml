@@ -6,16 +6,15 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::V0: '0'
   Test::More: '0'
-  Test::Most: '0'
-  constant: '0'
-  perl: '5.006'
+  perl: '5.008'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
-license: perl
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -23,7 +22,7 @@ name: SQL-Abstract-Complete
 requires:
   SQL::Abstract: '1.5'
   Storable: '0'
-  perl: '5.006'
+  perl: '5.008'
   strict: '0'
   vars: '0'
   warnings: '0'
@@ -31,4 +30,7 @@ resources:
   bugtracker: https://github.com/gryphonshafer/SQL-Abstract-Complete/issues
   homepage: https://github.com/gryphonshafer/SQL-Abstract-Complete
   repository: https://github.com/gryphonshafer/SQL-Abstract-Complete.git
-version: '1.06'
+version: '1.07'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

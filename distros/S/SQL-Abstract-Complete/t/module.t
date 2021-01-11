@@ -1,21 +1,14 @@
-use strict;
-use warnings;
-
-use Test::Most;
-
-use constant MODULE => 'SQL::Abstract::Complete';
-
-BEGIN { use_ok(MODULE); }
-require_ok(MODULE);
+use Test2::V0;
+use SQL::Abstract::Complete;
 
 my %sacs;
-ok( $sacs{'A'} = MODULE->new(), MODULE . '->new() ...as A' );
+ok( $sacs{'A'} = SQL::Abstract::Complete->new(), 'SQL::Abstract::Complete->new() ...as A' );
 ok(
-    $sacs{'B'} = MODULE->new( 'part_join' => "\n" ),
-    MODULE . q{->new( 'part_join' => "\n" ) ...as B},
+    $sacs{'B'} = SQL::Abstract::Complete->new( 'part_join' => "\n" ),
+    q{SQL::Abstract::Complete->new( 'part_join' => "\n" ) ...as B},
 );
 
-is( ref( $sacs{$_} ), MODULE, 'ref($object) ...with ' . $_ )
+is( ref( $sacs{$_} ), 'SQL::Abstract::Complete', 'ref($object) ...with ' . $_ )
     foreach ( keys %sacs );
 
 my ( $sql, @bind );

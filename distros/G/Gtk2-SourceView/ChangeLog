@@ -1,3 +1,31 @@
+2006-01-30 09:38 (+0100) ebassi
+
+	Patch by Torsten Schoenfeld for allowing the usage and test of
+	Gtk2::SourceView::StyleScheme.
+
+	* t/GtkSourceStyleScheme.t:
+	* t/GtkSourceLanguage.t: test whether the style scheme stuff works.
+
+	* xs/GtkSourceStyleScheme.xs: Gtk2::SourceView::StyleScheme work by
+	sub-classing it inside the various languages, so let's not complain
+	for its children.
+
+	* Makefile.PL: require GLib 1.103 for the new lazy package mapping.
+
+2006-01-30 09:35 (+0100) ebassi
+
+	* README, Makefile.PL: begin the unstable release cycle.
+
+	* SourceView.pm: post-release bump to 1.010
+
+2005-12-26 18:43 (+0100) ebassi
+
+	* SourceView.pm: really, really update $VERSION.
+
+2005-09-28 16:06 (+0200) kaffeetisch
+
+	* MANIFEST: Remove the recently-deleted META.yml.
+
 === Gtk2::SourceView 1.000 ===
 
 2005-09-27 22:55 (+0200) ebassi

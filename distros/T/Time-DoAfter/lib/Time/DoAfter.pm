@@ -1,13 +1,14 @@
 package Time::DoAfter;
 # ABSTRACT: Wait before doing by label contoller singleton
 
+use 5.010;
 use strict;
 use warnings;
 
 use Carp 'croak';
 use Time::HiRes qw( time sleep );
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 sub _input_handler {
     my ( $input, $set ) = ( {}, {} );
@@ -168,10 +169,10 @@ Time::DoAfter - Wait before doing by label contoller singleton
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Time-DoAfter.svg)](https://travis-ci.org/gryphonshafer/Time-DoAfter)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Time-DoAfter/badge.png)](https://coveralls.io/r/gryphonshafer/Time-DoAfter)
+=for markdown [![test](https://github.com/gryphonshafer/Time-DoAfter/workflows/test/badge.svg)](https://github.com/gryphonshafer/Time-DoAfter/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Time-DoAfter/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Time-DoAfter)
 
 =head1 SYNOPSIS
 
@@ -372,23 +373,15 @@ L<GitHub|https://github.com/gryphonshafer/Time-DoAfter>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Time-DoAfter>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Time::DoAfter>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/Time-DoAfter>
+L<GitHub Actions|https://github.com/gryphonshafer/Time-DoAfter/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Time-DoAfter>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Time-DoAfter>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Time-DoAfter>
 
 =item *
 
@@ -406,9 +399,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gryphon Shafer.
+This software is Copyright (c) 2016-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

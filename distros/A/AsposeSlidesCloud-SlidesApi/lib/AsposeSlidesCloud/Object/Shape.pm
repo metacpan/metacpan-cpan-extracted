@@ -42,7 +42,6 @@ use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::GeometryShape;
 use AsposeSlidesCloud::Object::LineFormat;
 use AsposeSlidesCloud::Object::ResourceUri;
-use AsposeSlidesCloud::Object::ResourceUriElement;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -248,7 +247,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'shapes' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Shapes',
     	description => 'Gets or sets the link to shapes.',
     	format => '',
@@ -285,14 +284,7 @@ __PACKAGE__->method_documentation({
     'shape_type' => {
     	datatype => 'string',
     	base_name => 'ShapeType',
-    	description => 'Shape type.',
-    	format => '',
-    	read_only => '',
-    		},
-    'geometry_shape_type' => {
-    	datatype => 'string',
-    	base_name => 'GeometryShapeType',
-    	description => 'Geometry shape type.',
+    	description => 'Combined shape type.',
     	format => '',
     	read_only => '',
     		},
@@ -304,7 +296,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'paragraphs' => {
-    	datatype => 'ResourceUriElement',
+    	datatype => 'ResourceUri',
     	base_name => 'Paragraphs',
     	description => 'Get or sets list to paragraphs list',
     	format => '',
@@ -324,15 +316,14 @@ __PACKAGE__->swagger_types( {
     'x' => 'double',
     'y' => 'double',
     'z_order_position' => 'int',
-    'shapes' => 'ResourceUriElement',
+    'shapes' => 'ResourceUri',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'line_format' => 'LineFormat',
     'type' => 'string',
     'shape_type' => 'string',
-    'geometry_shape_type' => 'string',
     'text' => 'string',
-    'paragraphs' => 'ResourceUriElement'
+    'paragraphs' => 'ResourceUri'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -353,7 +344,6 @@ __PACKAGE__->attribute_map( {
     'line_format' => 'LineFormat',
     'type' => 'Type',
     'shape_type' => 'ShapeType',
-    'geometry_shape_type' => 'GeometryShapeType',
     'text' => 'Text',
     'paragraphs' => 'Paragraphs'
 } );

@@ -13,7 +13,7 @@ use URI::Escape 'uri_escape';
 use Convert::Base32 qw( encode_base32 decode_base32 );
 use Carp 'croak';
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 my @accessors = qw( secret secret32 issuer key_id otpauth );
 __PACKAGE__->mk_accessors(@accessors);
@@ -136,10 +136,10 @@ Auth::GoogleAuth - Google Authenticator TBOT Abstraction
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Auth-GoogleAuth.svg)](https://travis-ci.org/gryphonshafer/Auth-GoogleAuth)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Auth-GoogleAuth/badge.png)](https://coveralls.io/r/gryphonshafer/Auth-GoogleAuth)
+=for markdown [![test](https://github.com/gryphonshafer/Auth-GoogleAuth/workflows/test/badge.svg)](https://github.com/gryphonshafer/Auth-GoogleAuth/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Auth-GoogleAuth/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Auth-GoogleAuth)
 
 =head1 SYNOPSIS
 
@@ -348,23 +348,15 @@ L<GitHub|https://github.com/gryphonshafer/Auth-GoogleAuth>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Auth-GoogleAuth>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Auth::GoogleAuth>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/Auth-GoogleAuth>
+L<GitHub Actions|https://github.com/gryphonshafer/Auth-GoogleAuth/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Auth-GoogleAuth>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Auth-GoogleAuth>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Auth-GoogleAuth>
 
 =item *
 
@@ -404,9 +396,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is Copyright (c) 2015-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

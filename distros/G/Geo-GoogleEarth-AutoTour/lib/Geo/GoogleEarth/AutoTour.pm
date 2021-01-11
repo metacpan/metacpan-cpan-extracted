@@ -14,7 +14,7 @@ use XML::LibXML;
 use Date::Parse 'str2time';
 use Math::Trig 1.23 qw( deg2rad rad2deg great_circle_distance great_circle_bearing );
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 our @EXPORT_OK = qw( tour kmz_to_xml xml_to_kmz load_kml read_path gather_points build_tour );
 
@@ -272,10 +272,10 @@ Geo::GoogleEarth::AutoTour - Generate Google Earth Camera Tours from Tracks and 
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Geo-GoogleEarth-AutoTour.svg)](https://travis-ci.org/gryphonshafer/Geo-GoogleEarth-AutoTour)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Geo-GoogleEarth-AutoTour/badge.png)](https://coveralls.io/r/gryphonshafer/Geo-GoogleEarth-AutoTour)
+=for markdown [![test](https://github.com/gryphonshafer/Geo-GoogleEarth-AutoTour/workflows/test/badge.svg)](https://github.com/gryphonshafer/Geo-GoogleEarth-AutoTour/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Geo-GoogleEarth-AutoTour/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Geo-GoogleEarth-AutoTour)
 
 =for test_synopsis my( $input, $output );
 
@@ -501,23 +501,15 @@ L<GitHub|https://github.com/gryphonshafer/Geo-GoogleEarth-AutoTour>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Geo-GoogleEarth-AutoTour>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Geo::GoogleEarth::AutoTour>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/Geo-GoogleEarth-AutoTour>
+L<GitHub Actions|https://github.com/gryphonshafer/Geo-GoogleEarth-AutoTour/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Geo-GoogleEarth-AutoTour>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Geo-GoogleEarth-AutoTour>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Geo-GoogleEarth-AutoTour>
 
 =item *
 
@@ -535,9 +527,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is Copyright (c) 2016-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

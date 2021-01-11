@@ -52,14 +52,14 @@
    "provides" : {
       "Astro::Coord::ECI::TLE::Iridium" : {
          "file" : "lib/Astro/Coord/ECI/TLE/Iridium.pm",
-         "version" : "0.128"
+         "version" : "0.129"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass"
+         "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -70,6 +70,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium"
       }
    },
-   "version" : "0.128",
+   "version" : "0.129",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -48,7 +48,7 @@
          "requires" : {
             "Data::Section::Simple" : "0.02",
             "File::Which" : "1.21",
-            "Graph" : "0.9706",
+            "Graph" : "0.9716",
             "IPC::Run3" : "0.048",
             "Moo" : "2.001001",
             "Types::Standard" : "1.000005",
@@ -76,6 +76,6 @@
          "web" : "https://github.com/graphviz-perl/GraphViz2"
       }
    },
-   "version" : "2.64",
+   "version" : "2.65",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

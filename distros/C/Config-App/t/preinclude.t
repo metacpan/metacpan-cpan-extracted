@@ -1,15 +1,9 @@
-use strict;
-use warnings;
-
-use Test::Most;
-
-use constant MODULE => 'Config::App';
-
-BEGIN { use_ok(MODULE); }
+use Test2::V0;
+use Config::App;
 
 my ( $obj, $conf );
 
-ok( $obj = MODULE->new( 'config/preinclude.yaml', 1 ), MODULE . '->new( "preinclude.yaml", 1 )' );
+ok( $obj = Config::App->new( 'config/preinclude.yaml', 1 ), 'Config::App->new( "preinclude.yaml", 1 )' );
 is( $obj->get('answer'), 42, 'preinclude data merge correct' );
 
 done_testing;

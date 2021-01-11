@@ -1,3 +1,8 @@
+Travel::Status::DE::DBWagenreihung 0.06 - Sun Jan 10 2021
+
+    * DBWagenreihung: Add train_descriptions accessor
+    * Wagon: Add train_subtype accessor
+
 Travel::Status::DE::DBWagenreihung 0.05 - Sat Dec 26 2020
 
     * Distinguish between ICE 3 403 series 1/2 and ICE T 411 series 1/2

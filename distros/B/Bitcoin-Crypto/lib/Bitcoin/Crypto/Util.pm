@@ -1,15 +1,15 @@
 package Bitcoin::Crypto::Util;
 
-use v5.10; use warnings;
+our $VERSION = "0.996";
+
+use v5.10;
+use warnings;
 use Exporter qw(import);
 use List::Util qw(first);
 use Crypt::PK::ECC;
 
-use Bitcoin::Crypto;
 use Bitcoin::Crypto::Config;
 use Bitcoin::Crypto::Base58 qw(decode_base58check);
-
-our $VERSION = Bitcoin::Crypto->VERSION;
 
 our @EXPORT_OK = qw(
 	validate_wif
@@ -65,7 +65,8 @@ sub get_path_info
 		else {
 			$info{path} = [];
 		}
-		return undef if first { $_ >= $config{max_child_keys} * 2 } @{$info{path}};
+		return undef if first { $_ >= $config{max_child_keys} * 2 }
+			@{$info{path}};
 		return \%info;
 	}
 	else {

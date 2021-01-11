@@ -6,6 +6,24 @@ Home page:    <https://metacpan.org/release/Types-XSD>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Types-XSD>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.007	2021-01-08
+
+ [ Documentation ]
+ - Don't `use Types::XSD::Lite` in examples.
+   Fixes RT#121089.
+   DJERIUS++
+   <https://rt.cpan.org/Ticket/Display.html?id=121089>
+
+0.006	2021-01-08
+
+ [ Bug Fixes ]
+ - Fix regexps being applied to multiline strings.
+ - Silence warnings.
+
+ [ Packaging ]
+ - Explicit dependency on Perl 5.8.3.
+ - Require newest Types::XSD::Lite.
+
 0.005	2014-09-11
 
  [ Bug Fixes ]

@@ -17,7 +17,7 @@ use base 'Template::Context';
 use Scalar::Util 'blessed';
 
 
-our $VERSION = 0.12;
+our $VERSION = 0.14;
 our $DYNAMIC = 0 unless defined $DYNAMIC;
 
 #use constant DOCUMENT => Template::Context::DOCUMENT;

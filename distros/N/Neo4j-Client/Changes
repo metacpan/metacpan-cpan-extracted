@@ -1,4 +1,7 @@
 Revision history for Perl module Neo4j::Client
+0.45 2021-01-09
+     - Use --disable-werror on configure; may acheive more
+       successes on "alternative" OSes
 0.43 2021-01-02
     - Complete refactor to employ Alien build framework
     - majensen/libneo4j-client (source for build/ dir)

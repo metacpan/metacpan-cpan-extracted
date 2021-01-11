@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More tests => 14;
 
-# $Id: GtkSourceLanguage.t,v 1.1 2005/08/11 18:01:56 kaffeetisch Exp $
+# $Id$
 
 use Gtk2::SourceView;
 
@@ -34,15 +34,10 @@ $language -> set_mime_types(undef);
 is_deeply([$language -> get_mime_types()],
           [reverse @original_mime_types]); # FIXME: Bug in gtksourceview?
 
-SKIP: {
-  skip "style scheme stuff", 1
-    unless (0); # FIXME: See bug 311532.
+my $scheme = $language -> get_style_scheme();
+isa_ok($scheme, "Gtk2::SourceView::StyleScheme");
 
-  my $scheme = $language -> get_style_scheme();
-  isa_ok($scheme, "Gtk2::SourceView::StyleScheme");
-
-  $language -> set_style_scheme($scheme);
-}
+$language -> set_style_scheme($scheme);
 
 my $id = $tags[0] -> get("id");
 

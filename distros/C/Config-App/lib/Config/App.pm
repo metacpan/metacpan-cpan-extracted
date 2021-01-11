@@ -13,7 +13,7 @@ use JSON::XS ();
 use YAML::XS ();
 use POSIX ();
 
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.13'; # VERSION
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
@@ -353,10 +353,10 @@ Config::App - Cascading merged application configuration
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Config-App.svg)](https://travis-ci.org/gryphonshafer/Config-App)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Config-App/badge.png)](https://coveralls.io/r/gryphonshafer/Config-App)
+=for markdown [![test](https://github.com/gryphonshafer/Config-App/workflows/test/badge.svg)](https://github.com/gryphonshafer/Config-App/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Config-App/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Config-App)
 
 =head1 SYNOPSIS
 
@@ -672,11 +672,11 @@ L<MetaCPAN|https://metacpan.org/pod/Config::App>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Config-App>
+L<GitHub Actions|https://github.com/gryphonshafer/Config-App/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Config-App>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Config-App>
 
 =item *
 
@@ -694,9 +694,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2015-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

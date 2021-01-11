@@ -6,13 +6,13 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::_HalfOp::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::_HalfOp::VERSION   = '1.012000';
+	$Type::Tiny::_HalfOp::VERSION   = '1.012001';
 }
 
 $Type::Tiny::_HalfOp::VERSION =~ tr/_//d;
 
 sub new {
-	my ($class, $op, $param, $type) = @_;
+	my ( $class, $op, $param, $type ) = @_;
 	bless {
 		op    => $op,
 		param => $param,
@@ -22,10 +22,10 @@ sub new {
 
 sub complete {
 	require overload;
-	my ($self, $type) = @_;
-	my $complete_type = $type->parameterize(@{$self->{param}});
-	my $method = overload::Method($complete_type, $self->{op});
-	$complete_type->$method($self->{type});
+	my ( $self, $type ) = @_;
+	my $complete_type = $type->parameterize( @{ $self->{param} } );
+	my $method        = overload::Method( $complete_type, $self->{op} );
+	$complete_type->$method( $self->{type} );
 }
 
 1;
@@ -73,7 +73,7 @@ It is a class representing a half-completed overloaded operation.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+L<https://github.com/tobyink/p5-type-tiny/issues>.
 
 =head1 AUTHOR
 
@@ -81,7 +81,7 @@ Graham Knop E<lt>haarg@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2014, 2017-2020 by Graham Knop.
+This software is copyright (c) 2014, 2017-2021 by Graham Knop.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -91,4 +91,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

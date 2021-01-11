@@ -1,4 +1,5 @@
-use v5.28; use warnings;
+use v5.28;
+use warnings;
 use Test::More;
 use Quantum::Superpositions::Lazy;
 use List::Util qw(sum0);

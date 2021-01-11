@@ -1,2 +1,5 @@
+0.002     2021-01-08 02:53:37 EST
+  - Add deep_val lvalue accessor (suggested by mst)
+
 0.001     2020-04-30 23:26:29 EDT
   - First release

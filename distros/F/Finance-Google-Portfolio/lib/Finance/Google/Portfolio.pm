@@ -13,7 +13,7 @@ use JSON::PP;
 use Carp 'croak';
 use URI;
 
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 has user      => ( is => 'rwp' );
 has passwd    => ( is => 'rwp' );
@@ -149,10 +149,10 @@ Finance::Google::Portfolio - Manipulate Google Finance portfolios a little
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Finance-Google-Portfolio.svg)](https://travis-ci.org/gryphonshafer/Finance-Google-Portfolio)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Finance-Google-Portfolio/badge.png)](https://coveralls.io/r/gryphonshafer/Finance-Google-Portfolio)
+=for markdown [![test](https://github.com/gryphonshafer/Finance-Google-Portfolio/workflows/test/badge.svg)](https://github.com/gryphonshafer/Finance-Google-Portfolio/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Finance-Google-Portfolio/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Finance-Google-Portfolio)
 
 =head1 SYNOPSIS
 
@@ -277,23 +277,15 @@ L<GitHub|https://github.com/gryphonshafer/Finance-Google-Portfolio>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Finance-Google-Portfolio>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Finance::Google::Portfolio>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/Finance-Google-Portfolio>
+L<GitHub Actions|https://github.com/gryphonshafer/Finance-Google-Portfolio/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Finance-Google-Portfolio>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Finance-Google-Portfolio>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Finance-Google-Portfolio>
 
 =item *
 
@@ -313,9 +305,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is Copyright (c) 2015-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

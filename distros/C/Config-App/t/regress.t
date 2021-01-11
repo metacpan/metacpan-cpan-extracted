@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-
-use Test::Most;
+use Test2::V0;
 
 BEGIN {
     require Config::App;

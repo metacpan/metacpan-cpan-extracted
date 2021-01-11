@@ -1,0 +1,10 @@
+CHANGES
+cpanfile
+lib/Task/OpenTracing.pm
+LICENSE.md
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/modules_installed.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

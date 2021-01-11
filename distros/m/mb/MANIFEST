@@ -36,6 +36,8 @@ t/2025_basic_escape_s_as_q.t
 t/2026_basic_escape_s_as_qq.t
 t/2027_basic_escape_tr.t
 t/2028_basic_escape_y.t
+t/2029_mb_use_freeformat.t
+t/2030_mb_no_freeformat.t
 t/3001_regexp.t
 t/3002_regexp_capture.t
 t/3003_regexp_charclass.t

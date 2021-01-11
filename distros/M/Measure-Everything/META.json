@@ -1,10 +1,10 @@
 {
    "abstract" : "Log::Any for Stats",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>"
+      "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,6 +13,13 @@
       "version" : 2
    },
    "name" : "Measure-Everything",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -30,28 +37,60 @@
             "InfluxDB::LineProtocol" : "0",
             "Module::Runtime" : "0",
             "base" : "0",
-            "perl" : "5.010",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
-            "Module::Pluggable" : "0",
-            "Test::More" : "0",
-            "lib" : "0"
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Measure::Everything" : {
+         "file" : "lib/Measure/Everything.pm",
+         "version" : "1.003"
+      },
+      "Measure::Everything::Adapter" : {
+         "file" : "lib/Measure/Everything/Adapter.pm",
+         "version" : "1.003"
+      },
+      "Measure::Everything::Adapter::Base" : {
+         "file" : "lib/Measure/Everything/Adapter/Base.pm",
+         "version" : "1.003"
+      },
+      "Measure::Everything::Adapter::InfluxDB::File" : {
+         "file" : "lib/Measure/Everything/Adapter/InfluxDB/File.pm",
+         "version" : "1.003"
+      },
+      "Measure::Everything::Adapter::Null" : {
+         "file" : "lib/Measure/Everything/Adapter/Null.pm",
+         "version" : "1.003"
+      },
+      "Measure::Everything::Adapter::Test" : {
+         "file" : "lib/Measure/Everything/Adapter/Test.pm",
+         "version" : "1.003"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/Measure-Everything/issues"
+      },
+      "homepage" : "https://github.com/domm/Measure-Everything",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/domm/Measure-Everything.git",
+         "url" : "https://github.com/domm/Measure-Everything.git",
          "web" : "https://github.com/domm/Measure-Everything"
       }
    },
-   "version" : "1.002",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "1.003",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

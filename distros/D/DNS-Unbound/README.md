@@ -20,7 +20,10 @@ Synchronous queries:
     # See below about encodings in “data”.
     my @ns = map { $dns->decode_name($_) } @{ $res_hr->data() };
 
-Asynchronous queries use [the “Promise” pattern](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises):
+Asynchronous queries use [the “Promise” pattern](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises). Assuming you’re using
+an off-the-shelf event loop, you can do something like:
+
+    my $dns = DNS::Unbound::AnyEvent->new();
 
     my $query1 = $dns->resolve_async( 'usa.gov', 'A' )->then(
         sub { my $data = shift()->data(); ... },  # success handler
@@ -32,18 +35,22 @@ Asynchronous queries use [the “Promise” pattern](https://developer.mozilla.o
         sub { ... },
     );
 
-    # As an alternative to wait(), see below for documentation on
-    # the fd(), poll(), and process() methods.
-
-    $dns->wait();
-
-See `examples/` in the distribution for demonstrations of
-making this module interface with [AnyEvent](https://metacpan.org/pod/AnyEvent) or [IO::Async](https://metacpan.org/pod/IO::Async).
+You can also integrate with a custom event loop; see ["EVENT LOOPS"](#event-loops) below.
 
 # DESCRIPTION
 
 This library is a Perl interface to NLNetLabs’s widely-used
 [Unbound](https://nlnetlabs.nl/projects/unbound/) recursive DNS resolver.
+
+# EVENT LOOPS
+
+This distribution includes the classes [DNS::Unbound::AnyEvent](https://metacpan.org/pod/DNS::Unbound::AnyEvent),
+[DNS::Unbound::IOAsync](https://metacpan.org/pod/DNS::Unbound::IOAsync), and [DNS::Unbound::Mojo](https://metacpan.org/pod/DNS::Unbound::Mojo), which provide
+out-of-the-box compatibility with those popular event loop interfaces.
+You should probably use one of these.
+
+You can also integrate with a custom event loop via the `fd()` method
+of this class.
 
 # METHODS
 
@@ -72,8 +79,10 @@ synchronous one.
 This returns an instance of [DNS::Unbound::AsyncQuery](https://metacpan.org/pod/DNS::Unbound::AsyncQuery) (a subclass
 thereof, to be precise).
 
-[See below](#methods-for-dealing-with-asynchronous-queries) for
-the methods you’ll need to use in tandem with this one.
+If you’re using one of the special event interface subclasses
+(e.g., [DNS::Unbound::IOAsync](https://metacpan.org/pod/DNS::Unbound::IOAsync)) then the returned promise will resolve
+on its own. Otherwise, [see below](#custom-event-loop-integration)
+for the methods you’ll need to use in tandem with this one.
 
 ## _OBJ_->enable\_threads()
 
@@ -131,11 +140,14 @@ They return _OBJ_ and throw errors on failure.
 
 
 
-# METHODS FOR DEALING WITH ASYNCHRONOUS QUERIES
+# CUSTOM EVENT LOOP INTEGRATION
 
 Unless otherwise noted, the following methods correspond to their
 equivalents in libunbound. They return the same values as the
 libunbound equivalents.
+
+You don’t need these if you use one of the event loop subclasses
+(which is recommended).
 
 ## _OBJ_->poll()
 

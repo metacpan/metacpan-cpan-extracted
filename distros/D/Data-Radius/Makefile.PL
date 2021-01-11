@@ -18,9 +18,14 @@ my %M = (
         'Class::Accessor::Fast' => 0,
         'Const::Fast' => 0,
         'Socket' => "2.021",
+        'File::Spec' => 0,
+        'File::Basename' => 0,
     },
     TEST_REQUIRES => {
         'Test::More' => 0,
+        'Test::Deep' => 0,
+        'File::Temp' => 0,
+        'FindBin' => 0,
         'Data::HexDump' => 0,
     },
 );

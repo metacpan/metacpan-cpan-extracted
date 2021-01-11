@@ -1,6 +1,7 @@
 package SQL::Abstract::Complete;
 # ABSTRACT: Generate complete SQL from Perl data structures
 
+use 5.008;
 use strict;
 use warnings;
 
@@ -10,7 +11,7 @@ use Storable 'dclone';
 use vars '@ISA';
 @ISA = 'SQL::Abstract';
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 sub new {
     my $self = shift;
@@ -159,10 +160,10 @@ SQL::Abstract::Complete - Generate complete SQL from Perl data structures
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/SQL-Abstract-Complete.svg)](https://travis-ci.org/gryphonshafer/SQL-Abstract-Complete)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/SQL-Abstract-Complete/badge.png)](https://coveralls.io/r/gryphonshafer/SQL-Abstract-Complete)
+=for markdown [![test](https://github.com/gryphonshafer/SQL-Abstract-Complete/workflows/test/badge.svg)](https://github.com/gryphonshafer/SQL-Abstract-Complete/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/SQL-Abstract-Complete/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/SQL-Abstract-Complete)
 
 =for test_synopsis my( $sql, @bind, @tables, @fields, %where, %other );
 
@@ -354,23 +355,23 @@ L<GitHub|https://github.com/gryphonshafer/SQL-Abstract-Complete>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/SQL-Abstract-Complete>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/SQL::Abstract::Complete>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/SQL-Abstract-Complete>
+L<GitHub Actions|https://github.com/gryphonshafer/SQL-Abstract-Complete/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/SQL-Abstract-Complete>
+L<Codecov|https://codecov.io/gh/gryphonshafer/SQL-Abstract-Complete>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/SQL-Abstract-Complete>
+L<CPANTS|http://cpants.cpanauthors.org/dist/SQL-Abstract-Complete>
+
+=item *
+
+L<CPAN Testers|http://www.cpantesters.org/distro/S/SQL-Abstract-Complete.html>
 
 =back
 
@@ -380,9 +381,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gryphon Shafer.
+This software is Copyright (c) 2013-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

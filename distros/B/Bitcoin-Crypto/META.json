@@ -4,13 +4,13 @@
       "Bartosz Jarzyna <brtastic.dev@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Bitcoin-Crypto",
    "no_index" : {
@@ -36,7 +36,6 @@
             "CryptX" : "0.062",
             "Math::BigInt" : "1.999808",
             "Moo" : "2.003004",
-            "Throwable" : "0.2",
             "Type::Tiny" : "1.004000",
             "namespace::clean" : "0.27",
             "perl" : "5.010001"
@@ -62,5 +61,6 @@
          "url" : "https://github.com/brtastic/perl-bitcoin-crypto"
       }
    },
-   "version" : "0.995"
+   "version" : "0.996",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

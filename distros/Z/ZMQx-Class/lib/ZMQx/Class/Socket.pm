@@ -1,9 +1,11 @@
 package ZMQx::Class::Socket;
+
+# ABSTRACT: DEPRECATED: A ZMQ Socket
+our $VERSION = '0.008'; # VERSION
+
 use strict;
 use warnings;
 use 5.010;
-
-# ABSTRACT: A ZMQ Socket
 
 use Moose;
 use Carp qw(croak carp confess);
@@ -335,6 +337,7 @@ sub get_fd {
         ZMQ_BACKLOG
         ZMQ_EVENTS
         ZMQ_IDENTITY
+        ZMQ_IPV6
         ZMQ_IPV4ONLY
         ZMQ_LAST_ENDPOINT
         ZMQ_MAXMSGSIZE
@@ -443,7 +446,7 @@ sub close {
     my $self = shift;
 
     # warn "$$ CLOSE SOCKET";
-    unless ($self->socket->_socket == -1) {
+    while (! ($self->socket->_socket == -1)) {
         $self->socket->close();
     }
 }
@@ -466,11 +469,11 @@ __END__
 
 =head1 NAME
 
-ZMQx::Class::Socket - A ZMQ Socket
+ZMQx::Class::Socket - DEPRECATED: A ZMQ Socket
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 METHODS
 
@@ -611,7 +614,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Validad AG.
+This software is copyright (c) 2013 - 2015 by Validad AG.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

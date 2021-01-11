@@ -1,5 +1,9 @@
 Changes for lib::projectroot
 
+1.008     2021-01-09 23:17:49+01:00
+    - dist housekeeping, Dist::Zilla::PluginBundle::Author::DOMM
+
+
 1.007   2019-08-07T19:07:32
     - Fixed pod error reported by CPANTS. (Mohammad S Anwar)
 

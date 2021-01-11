@@ -1,18 +1,17 @@
 #
-# = Class: [% name %]::service
+# @summary Class to setup the [% name %] service.
 #
-# Class to setup the [% name %] service.
-#
-# == Parameters
-# <tt>ensure</tt>:: Ensure that the service is either <code>present</code> or
-#                   <code>absent</code>. If <code>present</code>, the service
-#                   will be started if not running and enabled on boot, if
-#                   <code>absent</code>, it will be stopped and disabled at boot.
-# <tt>service</tt>:: Name of the service.
+# @param ensure
+#   Ensure that the service is either <code>present</code> or
+#   <code>absent</code>. If <code>present</code>, the service will be started if
+#   not running and enabled on boot, if <code>absent</code>, it will be stopped
+#   and disabled at boot.
+# @param service
+#    Name of the service.
 #
 class [% name %]::service (
-    $ensure  = 'present',
-    $service = $[% name %]::params::service,
+    Enum[present, absent] $ensure  = 'present',
+    Variant[String, Boolean] $service = $[% name %]::params::service,
 ) inherits ::[% name %]::params {
     $service_ensure = $ensure ? {
         'present' => 'running',

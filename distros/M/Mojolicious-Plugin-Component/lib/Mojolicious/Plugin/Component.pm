@@ -11,6 +11,10 @@ use Data::Object::Space;
 
 extends 'Mojolicious::Plugin';
 
+our $VERSION = '0.04'; # VERSION
+
+# METHODS
+
 method register($app, $config = {}) {
   $config = (%$config) ? $config : $app->config->{component} || {
     use => join('::', ref($app), 'Component'),

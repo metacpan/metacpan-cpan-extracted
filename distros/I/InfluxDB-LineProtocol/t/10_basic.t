@@ -7,7 +7,8 @@ use Test::Most;
 use InfluxDB::LineProtocol qw(data2line line2data);
 
 my @faketime = ( 1437072205, 500681 );
-my $nano = join( '', @faketime ) * 1000;
+my $nano = join( '', @faketime ) . "000";
+
 {
     no warnings 'redefine';
 
@@ -263,7 +264,7 @@ while ( my ( $i, $case ) = each @tests ) {
         $expected_line = $raw_line;
     }
     else {
-        $expected_line = $raw_line . ' ' . $nano;
+        $expected_line = "$raw_line $nano";
         push(@$out,$nano);
     }
 

@@ -9,6 +9,7 @@ meta_prop->{env}->{OPENSSL_LIBS} = Alien::OpenSSL->libs;
 meta_prop->{env}->{OPENSSL_CFLAGS} = Alien::OpenSSL->cflags;
 my ($ssl_ver) = Alien::OpenSSL->version =~ /^([0-9]\.[0-9])/;
 meta_prop->{env}->{CFLAGS} = "-DHAVE_BIO_METH_NEW" if 0+$ssl_ver > 1.0;
+meta_prop->{env}->{CFLAGS} .= " -DNEOCLIENT_BUILD";
 
 meta->around_hook(
   probe => sub {
@@ -71,7 +72,7 @@ share sub {
   plugin 'Fetch::LocalDir';
   plugin 'Extract::Directory';
   build [
-    '%{configure} --disable-tools',
+    '%{configure} --disable-tools --disable-werror',
     '%{make}',
     '%{make} install',
    ];

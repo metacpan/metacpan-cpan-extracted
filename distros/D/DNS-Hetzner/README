@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.05
 
 SYNOPSIS
 
@@ -50,6 +50,8 @@ METHODS
  records
 
  zones
+
+ primary_servers
 
 AUTHOR
 

@@ -20,8 +20,9 @@ BEGIN {
 # see also:
 # https://github.com/majensen/rest-neo4p/pull/19/commits/227b94048a1d0277f1d5700c6934ba26fe7bfc1e
 
-use Test::More 0.96 tests => 7 + 1;
+use Test::More 0.96 tests => 7 + 2;
 use Test::Exception;
+use Test::Warnings;
 my $transaction = $driver->session->begin_transaction;
 $transaction->{return_stats} = 0;  # optimise sim
 

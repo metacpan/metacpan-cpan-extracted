@@ -38,7 +38,7 @@ use constant _NFIELDS  => 4;
 
 # ----- static data -----
 
-our $VERSION      = '1.018';
+our $VERSION      = '1.019';
 our $max_degree   = 10_000;    # limit for power operator
 
 # default values for as_string options
@@ -287,6 +287,19 @@ sub nest {
         $result = $result->mul($that)->add_const($this->coeff($i));
     }
     return $result;
+}
+
+sub unnest {
+    my ($this, $that) = @_;
+    return undef if $that->degree <= 0;
+    my @coeff = ();
+    my $q = $this;
+    while ($q) {
+        ($q, my $r) = $q->divmod($that);
+        return undef if $r->degree > 0;
+        push @coeff, $r->coeff(0);
+    }
+    return $this->new(@coeff);
 }
 
 sub mirror {
@@ -620,6 +633,21 @@ sub inflate {
     return $this->new($const, map {@zeroes, $_} @coeff);
 }
 
+sub deflate {
+    my ($this, $exp) = @_;
+    _check_int($exp);
+    return undef if !$exp;
+    return $this if $exp <= 1;
+    my $degree = $this->degree;
+    return $this if $degree <= 0;
+    my @coeff =
+        map {
+            my $c = $this->coeff($_);
+            !($_ % $exp)? $c: !$c? (): return undef
+        } 0 .. $degree;
+    return $this->new(@coeff);
+}
+
 sub slice {
     my ($this, $start, $count) = @_;
     _check_int($start, $count);
@@ -934,7 +962,7 @@ Math::Polynomial - Perl class for polynomials in one variable
 
 =head1 VERSION
 
-This documentation refers to version 1.018 of Math::Polynomial.
+This documentation refers to version 1.019 of Math::Polynomial.
 
 =head1 SYNOPSIS
 
@@ -1472,6 +1500,19 @@ The exponent C<$n> must be a non-negative integer.  To prevent accidential
 excessive memory consumption, the degree of the result must be at most
 C<$Math::Polynomial::max_degree> (if a maximal degreee is defined).
 
+=item I<deflate>
+
+C<$p = $q-E<gt>deflate($n)> is the inverse operation of
+C<$q = $p-E<gt>inflate($n)>. C<$q> must be a polynomial with zero
+coefficients except for exponents that are an integer multiple of C<$n>.
+For other polynomials, an undefined value is returned.
+
+As inflating by exponent zero is not a reversible operation, deflating
+by zero is not defined and thus yields B<undef>, too.
+
+For a polynomial of degree I<d>, deflating by exponent I<n> takes
+I<d * (n - 1) / n> comparisons with zero in the coefficient space.
+
 =item I<mul_root>
 
 C<$p-E<gt>mul_root($c)> calculates the product of a polynomial I<p>
@@ -1568,6 +1609,21 @@ degree I<m> and I<n> this takes I<O(m*m*n*n)> multiplications and
 additions in the coefficient space.  The result will be a polynomial
 of degree I<m*n> if neither of the polynomials is a zero polynomial,
 otherwise a constant or zero polynomial.
+
+=item I<unnest>
+
+C<$p1 = $q-E<gt>unnest($p2)> is the inverse operation of
+C<$q_=_$p1-E<gt>nest($p2)>.  It checks whether the polynomial C<$q> can
+in fact be derived from another polynomial C<$p1> with a substitution
+of the variable by C<$p2>.  If so, it returns C<$p1>, otherwise B<undef>.
+
+Nesting a constant polynomial within a polynomial is equivalent to
+simply evaluating the latter, yielding a constant. As this operation
+is not reversible, trying to unnest a constant from any polynomial also
+yields B<undef>.
+
+Unnesting a polynomial of degree I<d> from a polynomial with degree I<n*d>
+takes I<n> polynomial divisions.
 
 =item I<mirror>
 
@@ -1790,7 +1846,7 @@ stringification.
 If defined, code reference specifying a function that takes a
 coefficient value and returns a negative, zero, or positive integer
 if the argument is negative, zero, or positive, respectively.
-Default is C<undef>.
+Default is B<undef>.
 
 This parameter can be used to let stringification distinguish
 "negative" from other values where the coefficient space is not an
@@ -1969,7 +2025,7 @@ have to be in parentheses to maintain operator precedence.
 If defined, code reference specifying a function that takes a
 coefficient value and returns a negative, zero, or positive integer
 if the argument is negative, zero, or positive, respectively.
-Default is C<undef>.
+Default is B<undef>.
 
 This parameter can be used to let tree construction distinguish
 "negative" from other values where the coefficient space is not an
@@ -2066,6 +2122,7 @@ type of object instances.
                                                #   deg r < 3
 
   $r = $p->inflate(3);                         # r(x) == p(x ** 3)
+  $p = $r->deflate(3);                         # r(x) == p(x ** 3)
 
   $r = $p->slice(0, 3);              # p ==  q * x**3 + r, deg r < 3
   $r = $p->slice(2, 3);              # p == (q * x**3 + r) * x**2 + s,
@@ -2087,6 +2144,7 @@ type of object instances.
                                                #   c is a constant
 
   $q = $p1->nest($p2);                         # q(x) == p1(p2(x))
+  $p1 = $q->unnest($p2);                       # q(x) == p1(p2(x))
 
   $q = $p->mirror;                             # q(x) == p(-x)
 
@@ -2576,7 +2634,7 @@ and Kevin Ryde.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2007-2019 by Martin Becker, Blaubeuren.
+Copyright (c) 2007-2021 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

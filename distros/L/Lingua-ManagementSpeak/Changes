@@ -1,5 +1,14 @@
 Revision history for Lingua::ManagementSpeak
 
+1.03      2021-01-10 14:15:11-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+        - Update Travis YAML
+        - Adding Perl versions to test; annual general update for 2018
+
 1.02      2015-01-29 13:33:00-08:00 America/Los_Angeles
         - Refactoring away some old, lengthy if/else clauses
 

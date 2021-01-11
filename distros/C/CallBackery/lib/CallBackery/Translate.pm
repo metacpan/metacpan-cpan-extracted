@@ -71,6 +71,7 @@ sub setLocale {
                     next;
                 }
             }
+            $lx{$locale}{$var{id}} = $var{str} if $var{id} and $var{str};
         }
     }
     $self->{_lx} = $lx{$locale};

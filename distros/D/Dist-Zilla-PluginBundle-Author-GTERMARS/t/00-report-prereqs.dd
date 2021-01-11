@@ -6,17 +6,13 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'File::Spec' => '0',
-                                      'File::Temp' => '0',
-                                      'IO::Handle' => '0',
-                                      'IPC::Open3' => '0',
                                       'Test::CPAN::Meta' => '0',
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
                                       'Test::Kwalitee' => '1.21',
                                       'Test::MinimumVersion' => '0',
-                                      'Test::More' => '0.94',
+                                      'Test::More' => '0.88',
                                       'Test::NoBreakpoints' => '0.15',
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
@@ -31,8 +27,10 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::BumpVersionAfterRelease' => '0',
                                       'Dist::Zilla::Plugin::CopyFilesFromBuild' => '0',
                                       'Dist::Zilla::Plugin::EnsureChangesHasContent' => '0',
+                                      'Dist::Zilla::Plugin::EnsureMinimumPerl' => '0',
                                       'Dist::Zilla::Plugin::Git' => '2.046',
                                       'Dist::Zilla::Plugin::GitHub' => '0.46',
+                                      'Dist::Zilla::Plugin::GitHub::RequireGreenBuild' => '0',
                                       'Dist::Zilla::Plugin::Prereqs::AuthorDeps' => '0.006',
                                       'Dist::Zilla::Plugin::Prereqs::FromCPANfile' => '0.08',
                                       'Dist::Zilla::Plugin::PromptIfStale' => '0.057',
@@ -55,7 +53,8 @@ do { my $x = {
                                       'Dist::Zilla::PluginBundle::Git::CheckFor' => '0.014',
                                       'Dist::Zilla::Role::PluginBundle::Config::Slicer' => '0',
                                       'Dist::Zilla::Role::PluginBundle::PluginRemover' => '0',
-                                      'namespace::autoclean' => '0'
+                                      'namespace::autoclean' => '0',
+                                      'perl' => '5.014'
                                     }
                     },
        'test' => {
@@ -65,8 +64,11 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
                                    'Test::DiagINC' => '0.002',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0.94'
                                  }
                  }
      };

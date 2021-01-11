@@ -1,10 +1,8 @@
-use Test::Most;
+use Test2::V0;
 
-BEGIN {
-    use_ok( 'exact', 'conf', 'noautoclean' );
-}
+use exact -conf, -noautoclean;
 
 ok( main->can('conf'), 'can conf' );
 is( conf->get('answer'), 42, 'conf->get' );
 
-done_testing();
+done_testing;

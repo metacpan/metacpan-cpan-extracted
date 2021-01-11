@@ -1,18 +1,25 @@
 {
    "abstract" : "convert JSON columns to Perl objects",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>"
+      "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBIx-Class-InflateColumn-JSON2Object",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -33,9 +40,7 @@
             "Moose::Util::TypeConstraints" : "0",
             "Scalar::Util" : "0",
             "String::CamelCase" : "0",
-            "perl" : "5.014",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -43,23 +48,50 @@
             "DBI" : "0",
             "DBIx::Class" : "0",
             "DBIx::Class::Schema" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Moose" : "0",
             "Test::More" : "0",
             "base" : "0",
-            "lib" : "0",
-            "utf8" : "0"
+            "lib" : "0"
          }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::InflateColumn::JSON2Object" : {
+         "file" : "lib/DBIx/Class/InflateColumn/JSON2Object.pm",
+         "version" : "0.906"
+      },
+      "DBIx::Class::InflateColumn::JSON2Object::Role::Storable" : {
+         "file" : "lib/DBIx/Class/InflateColumn/JSON2Object/Role/Storable.pm",
+         "version" : "0.906"
+      },
+      "DBIx::Class::InflateColumn::JSON2Object::Trait::NoSerialize" : {
+         "file" : "lib/DBIx/Class/InflateColumn/JSON2Object/Trait/NoSerialize.pm",
+         "version" : "0.906"
+      },
+      "Moose::Meta::Attribute::Custom::Trait::NoSerialize" : {
+         "file" : "lib/DBIx/Class/InflateColumn/JSON2Object/Trait/NoSerialize.pm",
+         "version" : "0.906"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/DBIx-Class-InflateColumn-JSON2Object/issues"
+      },
+      "homepage" : "https://github.com/domm/DBIx-Class-InflateColumn-JSON2Object",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/domm/DBIx-Class-InflateColumn-JSON2Object.git",
+         "url" : "https://github.com/domm/DBIx-Class-InflateColumn-JSON2Object.git",
          "web" : "https://github.com/domm/DBIx-Class-InflateColumn-JSON2Object"
       }
    },
-   "version" : "0.905",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0104"
+   "version" : "0.906",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

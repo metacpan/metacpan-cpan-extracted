@@ -11,7 +11,7 @@ use Astro::Coord::ECI::TLE 0.059 qw{ :constants };
 use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 use Scalar::Util ();
 
-our $VERSION = '0.045';
+our $VERSION = '0.046';
 
 my @event_names;
 $event_names[PASS_EVENT_NONE]		= '';
@@ -640,7 +640,8 @@ L<Astro::App::Satpass2::Locale|Astro::App::Satpass2::Locale>
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org>, or in electronic mail to the author.
+L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -648,7 +649,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2020 by Thomas R. Wyant, III
+Copyright (C) 2014-2021 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

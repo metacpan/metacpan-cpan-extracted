@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::SyncCPANfile;
-$Dist::Zilla::Plugin::SyncCPANfile::VERSION = '0.01';
+$Dist::Zilla::Plugin::SyncCPANfile::VERSION = '0.02';
 # ABSTRACT: Sync a cpanfile with the prereqs listed in dist.ini
 
 #use v5.10;
@@ -99,7 +99,7 @@ Dist::Zilla::Plugin::SyncCPANfile - Sync a cpanfile with the prereqs listed in d
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

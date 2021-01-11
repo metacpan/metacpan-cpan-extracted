@@ -1,11 +1,11 @@
 package InfluxDB::Writer::FileTailer;
+
+# ABSTRACT: Tail files and send lines to InfluxDB
+our $VERSION = '1.003'; # VERSION
+
 use strict;
 use warnings;
 use feature 'say';
-
-our $VERSION = '1.000';
-
-# ABSTRACT: Tail files and send lines to InfluxDB
 
 use Moose;
 use IO::Async::File;
@@ -216,17 +216,23 @@ sub send {
     if ( $self->_with_auth ) {
         $args{head} = [ "Authorization" => $self->_auth_header ];
     }
+
     $log->debugf( "Sending %i lines to influx", scalar @to_send);
-    my $res = Hijk::request(
-        {   method       => "POST",
-            host         => $self->influx_host,
-            port         => $self->influx_port,
-            path         => "/write",
-            query_string => "db=" . $self->influx_db,
-            body         => join( "\n", @to_send ),
-            %args,
-        }
-    );
+
+    ( my $body = join("\n", @to_send) ) =~ s/\n{2,}/\n/gs;
+
+    my $request_data = { 
+        method       => "POST",
+        host         => $self->influx_host,
+        port         => $self->influx_port,
+        path         => "/write",
+        query_string => "db=" . $self->influx_db,
+        body         => $body,
+        %args,
+    };
+    $log->debugf("The Hijk::Request: %s", $request_data);
+    my $res = Hijk::request($request_data);
+
     if (my $current_error = $res->{error}) {
 
         my @errs = (qw/
@@ -257,9 +263,10 @@ sub send {
     }
     if ( $res->{status} != 204 ) {
         $log->errorf(
-            "Could not send %i lines to influx: %s",
+            "Could not send %i lines to influx: %s, req: %s",
             scalar @to_send,
-            $res->{body}
+            $res->{body},
+            $request_data
         );
 
         return;
@@ -297,15 +304,15 @@ InfluxDB::Writer::FileTailer - Tail files and send lines to InfluxDB
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Thomas Klausner.
+This software is copyright (c) 2015 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

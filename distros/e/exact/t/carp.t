@@ -1,7 +1,6 @@
-use Test::Most tests => 2;
+use Test2::V0;
+use exact -noautoclean;
 
-BEGIN {
-    use_ok( 'exact', 'noautoclean' );
-}
+like( dies { croak('test failure success') }, qr/^test failure success/, 'croak' );
 
-throws_ok( sub { croak('test failure success') }, qr/^test failure success/, 'croak' );
+done_testing;

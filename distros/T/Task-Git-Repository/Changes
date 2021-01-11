@@ -1,5 +1,8 @@
 Revision history for Task-Git-Repository
 
+1.004 2021-01-10 BOOK
+    - add Git::Repository::Plugin::Diff
+
 1.003 2018-01-29 BOOK
     - add Git::Repository::Plugin::Dirty
 

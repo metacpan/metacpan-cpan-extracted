@@ -4,7 +4,7 @@ use Moose;
 with 'Dist::Zilla::Role::MintingProfile::ShareDir';
 use namespace::clean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v5.0.2';
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -29,6 +29,13 @@ will be populated in the C<dist.ini> and documentation from the current dzil
 C<config.ini>, which can be initialized using
 L<< C<dzil setup>|Dist::Zilla::App::Command::setup >>. The version is
 initialized statically as C<0.001>.
+
+The L<Dist::Zilla::Starter> guide explains how the L<Dist::Zilla> plugin system
+works, and how it is specifically used for the minting process.
+
+See L<Dist::Zilla::MintingProfile::Starter::Git> for a version of this profile
+designed for the L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>
+bundle variant.
 
 =head1 CUSTOMIZING
 
@@ -55,7 +62,7 @@ option) in your dzil config (C<~/.dzil/config.ini>).
   [%Mint]
   provider = Starter
 
-  $ dzil new My::New::Dist # now uses the specified provider and/or profile
+  $ dzil new My::New::Dist # now defaults to the specified provider and/or profile
 
 If no provider or profile is configured or specified, C<dzil new> will use the
 C<default> local profile, or the default C<[@Basic]> profile shipped with

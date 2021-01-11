@@ -1,5 +1,12 @@
 Revision history for Util::CommandLine
 
+1.06      2021-01-10 14:22:54-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.05      2020-06-11 14:05:47-07:00 America/Los_Angeles
         - Provide support for "example|e=s{1,3}" syntax
         - Allow option() input to be in single string format

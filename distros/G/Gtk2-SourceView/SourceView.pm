@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2004-2005 by Emmanuele Bassi (see the file AUTHORS)
+# Copyright (c) 2004-2006 by Emmanuele Bassi (see the file AUTHORS)
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Library General Public
@@ -12,9 +12,8 @@
 # Library General Public License for more details.
 #
 # You should have received a copy of the GNU Library General Public
-# License along with this library; if not, write to the 
-# Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
-# Boston, MA  02111-1307  USA.
+# License along with this library; if not, see
+# <https://www.gnu.org/licenses/>.
 
 package Gtk2::SourceView;
 
@@ -46,7 +45,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.000';
+our $VERSION = '1.013';
 
 sub dl_load_flags { 0x01 }
 
@@ -60,7 +59,7 @@ __END__
 
 =head1 NAME
 
-Gtk2::SourceView - Perl wrappers for the GtkSourceView widget
+Gtk2::SourceView - (DEPRECATED) Perl wrappers for the GtkSourceView widget
 
 =head1 SYNOPSIS
   
@@ -110,9 +109,56 @@ Gtk2::SourceView - Perl wrappers for the GtkSourceView widget
 
 =head1 ABSTRACT
 
-Perl bindings to the 1.x series of the GtkSourceView widget libraries.
+B<DEPRECATED> Perl bindings to the 1.x series of the GtkSourceView widget
+libraries.
 
 =head1 DESCRIPTION
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gtk2-sourceview
+
+=item *
+
+Upstream URL: https://gitlab.gnome.org/GNOME/gtksourceview
+
+=item *
+
+Last compatible upstream version: 1.8.6
+
+=item *
+
+Last upstream release date: 2007-05-01
+
+=item *
+
+Migration path for this module: G:O:I
+
+=item *
+
+Migration module URL: https://metacpan.org/pod/Glib::Object::Introspection
+
+=back
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
 
 Perl bindings to the 1.x series of the GtkSourceView widget libraries.  This
 module allows you to write Perl applications that utilize the GtkSourceView
@@ -148,8 +194,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the 
-Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
-Boston, MA  02111-1307  USA.
+License along with this library; if not, see
+<https://www.gnu.org/licenses/>.
 
 =cut

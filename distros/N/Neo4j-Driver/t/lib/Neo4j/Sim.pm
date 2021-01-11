@@ -8,7 +8,6 @@ use Digest::MD5;
 use File::Basename qw(dirname);
 use File::Slurp;
 use URI;
-use Neo4j::Driver::Transport::HTTP;
 use Neo4j::Test;
 
 my $path = (dirname dirname dirname __FILE__) . "/simulator";
@@ -46,8 +45,7 @@ sub request {
 	}
 	return $self->GET($url, $headers) if $method eq 'GET';
 	return $self->not_implemented($method, $url) unless $method eq 'POST';
-	return $self->bad_request() if ($ENV{NEO4J} // 0) =~ m/^4\b/;
-	return $self->not_found($url) if $url !~ m|^/db/data/transaction\b|;
+	return $self->not_found($url) if $url !~ m(^/db/(?:data|neo4j|system)/(?:transaction|tx)\b);
 	
 	my $hash = request_hash($url, $content);
 	my $file = "$path/$hash.json";
@@ -63,10 +61,10 @@ sub request {
 
 sub GET {
 	my ($self, $url, $headers) = @_;
-	if ($url ne $Neo4j::Driver::Transport::HTTP::DISCOVERY_ENDPOINT) {
+	if ($url ne '/') {
 		return $self->not_implemented('GET', $url);
 	}
-	my $neo4j_version = '"neo4j_version":"0.0.0 (Neo4j::Sim)"';
+	my $neo4j_version = '"neo4j_version":"0.0.0"';
 	my $transaction = '"transaction":"/db/data/transaction"';
 	$self->{json} = "{$neo4j_version,$transaction}";
 	$self->{status} = 200;  # HTTP: OK
@@ -99,14 +97,6 @@ sub not_implemented {
 }
 
 
-sub bad_request {
-	my ($self) = @_;
-	$self->{json} = '{"error":"Cypher query filter active."}';
-	$self->{status} = 400;  # HTTP: Bad Request
-	return $self;
-}
-
-
 sub responseContent {
 	my ($self) = @_;
 	return $self->{json};
@@ -117,6 +107,9 @@ sub responseHeader {
 	my ($self, $header) = @_;
 	if ($header eq 'Content-Type') {
 		return 'application/json';
+	}
+	elsif ($header eq 'Date') {
+		return '';
 	}
 	elsif ($header eq 'Location') {
 		my $loc = '';
@@ -145,9 +138,9 @@ sub store {
 	my (undef, $url, $request, $response, $write_txt) = @_;
 	return if $Neo4j::Test::sim;  # don't overwrite the files while we're reading from them
 	
-	my $hash = request_hash($url, $request);
+	my $hash = request_hash($url, json_coder()->encode($request));
 	$response //= '';
-	$response =~ s/{"expires":"[A-Za-z0-9 :,+-]+"}/{"expires":"Thu, 01 Jan 1970 00:00:00 +0000"}/;
+	$response =~ s/{"expires":"[A-Za-z0-9 :,+-]+"}/{"expires":"Tue, 01 Jan 2999 00:00:00 +0000"}/;
 	File::Slurp::write_file "$path/$hash.txt", "$url\n\n\n$request" if $write_txt;  # useful for debugging
 	File::Slurp::write_file "$path/$hash.json", $response;
 }
@@ -171,12 +164,16 @@ sub json_coder () {
 
 package Neo4j::Sim::Response;
 
-sub status_line {
+sub message {
 	my $status = ${ shift() }->{status};
-	return "400 Bad Request" if $status == 400;
-	return "401 Unauthorized" if $status == 401;
-	return "404 Not Found" if $status == 404;
-	return "501 Not Implemented";
+	return "Bad Request" if $status == 400;
+	return "Unauthorized" if $status == 401;
+	return "Not Found" if $status == 404;
+	return "Not Implemented";
+}
+
+sub protocol {
+	return "Neo4j::Sim";
 }
 
 
@@ -194,16 +191,18 @@ create an empty directory t/simulator and insert these lines of code:
 
 	use lib qw(./t/lib);
 	use Neo4j::Sim;
-	BEGIN { $JSON_CODER = sub { Neo4j::Sim::json_coder } }
-	Neo4j::Sim->store("$tx_endpoint", $content, $client->responseContent()) if $method eq 'POST';
+	BEGIN { $Neo4j::Driver::Net::HTTP::REST::JSON_CODER = sub { Neo4j::Sim::json_coder } }
+	Neo4j::Sim->store("$tx_endpoint", $json, $self->{http_agent}->fetch_all, 0) if $method eq 'POST';
 
 into the method:
 
-	Neo4j::Driver::Transport::HTTP->_request
+	Neo4j::Driver::Net::HTTP->_request
 
 after the call to:
 
-	$client->request(...)
+	$self->{http_agent}->request(...)
+
+Then run the test suite once against a live Neo4j 4 server (with NEO4J=4).
 
 
 The simulator operates most efficiently when repeated identical queries are

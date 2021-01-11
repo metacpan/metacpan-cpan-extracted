@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "InfluxDB-LineProtocol",
-  "dist_version" => "1.013",
+  "dist_version" => "1.014",
   "license" => "perl",
   "module_name" => "InfluxDB::LineProtocol",
   "recursive_test_files" => 1,

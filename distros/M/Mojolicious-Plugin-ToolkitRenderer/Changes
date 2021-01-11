@@ -1,5 +1,12 @@
 Revision history for Mojolicious::Plugin::ToolkitRenderer
 
+1.10      2021-01-10 14:34:03-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.09      2020-05-18 15:08:25-07:00 America/Los_Angeles
         - Update Travis YAML
         - Update module code style

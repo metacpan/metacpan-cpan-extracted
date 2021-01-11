@@ -1,5 +1,56 @@
 Changes
 
+Version 0.38
+
+    Increment Version - Release Version same as 0.37-TRIAL
+
+    TBD     Update Changes and Increment version
+
+Version 0.37-TRIAL
+    3c18e4c Update Makefile Version
+    4936d2d Update Changes and Increment version
+    51f853d Add more patterns to .gitignore
+    adeb19c Allow you to build XML::Sig from git repo without dzil
+    2619ba4 Fix issue and add test for InclusiveNamespace in XML
+    3f06b78 Add extra debugging information
+    f8aef89 remove trailing # on TRANSFORM_C14N
+    15939af InclusiveNamespaces support from
+        1d2dac1c3eaa42359899e61323a446d0d0af3e54 accidentally removed
+
+Version 0.36
+
+    Increment Version - Release Version same as 0.35 TRIAL
+
+    24c09df (tag: 0.36) Increment Version - Release Version same as 0.35 TRIAL
+
+Version 0.35-TRIAL
+
+Major items in this version include:
+    1. Ability to sign all XML sections containing the ID attribute
+    2. Bug Fix DSA signatures would fail sometimes for XML::Sig signed xml
+    3. Documentation updates
+
+    a346d30 Update Changes and Increment Version 0.35-TRIAL
+    6a97c24 Add additional Perl version checks
+    dfb855c Fixes #19 r and r variable sizes but need to be 20 bytes xero padded
+    f867720 Merge pull request #18 from perl-net-saml2/pod-updates
+    56d605f Document xmlsec1 commands
+    57f7ceb More code documentation
+    a06417c Initial POD and Documentation updates
+    4f983b6 Fix space at EOL and missing letter
+    3b4230e Merge pull request #16 from perl-net-saml2/sign-multiple-sections
+
+Version 0.34-TRIAL
+
+This version allows for the signing of multiple IDs in an XML
+
+    96ddf3c Increment version for 0.34-TRIAL
+    3119a7e Move xml files to unsigned
+    45fadd1 Move xml files to signed and unsigned
+    bf37f9b Add and clarify comments and fix one context
+    dbbfd63 Add tests for signing and verifying multiple nodes
+    3ebef38 Allows signing multiple ID sections
+
 Version 0.33
 
 This release is mostly clean up but does inclued one important fix.

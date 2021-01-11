@@ -1,28 +1,21 @@
-use strict;
-use warnings;
-
-use Test::Most;
-
-use constant MODULE => 'Auth::GoogleAuth';
-
-BEGIN { use_ok(MODULE); }
-require_ok(MODULE);
+use Test2::V0;
+use Auth::GoogleAuth;
 
 my $obj;
-ok( $obj = MODULE->new, MODULE . '->new()' );
-is( ref $obj, MODULE, 'ref $object' );
+ok( $obj = Auth::GoogleAuth->new, 'new' );
+is( ref $obj, 'Auth::GoogleAuth', 'ref $object' );
 
 my $secret32 = $obj->generate_secret32;
 ok( $secret32 =~ /^[a-z2-7]{16}$/, 'generate_secret32() length and content' );
 is( $secret32, $obj->secret32, 'generate_secret32() stored as secret32()' );
 
-lives_ok(
-    sub { $obj = MODULE->new( { map { $_ => 'data' } qw( secret secret32 issuer key_id ) } ) },
+ok(
+    lives { $obj = Auth::GoogleAuth->new( { map { $_ => 'data' } qw( secret secret32 issuer key_id ) } ) },
     'new({...})',
-);
+) or note $@;
 is( $obj->$_, 'data', "$_ set in instantiator" ) for ( qw( secret secret32 issuer key_id ) );
 
-lives_ok( sub { $obj->clear }, 'clear' );
+ok( lives { $obj->clear }, 'clear' ) or note $@;
 is( $obj->$_, undef, "$_ unset after clear" ) for ( qw( secret secret32 issuer key_id ) );
 
 ok( $obj->qr_code =~ m|

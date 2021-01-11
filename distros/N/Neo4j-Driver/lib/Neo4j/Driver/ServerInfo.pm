@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ServerInfo;
 # ABSTRACT: Provides Neo4j server address and version
-$Neo4j::Driver::ServerInfo::VERSION = '0.18';
+$Neo4j::Driver::ServerInfo::VERSION = '0.20';
 
 use URI 1.25;
 
@@ -14,15 +14,15 @@ sub new {
 	my ($class, $server_info) = @_;
 	
 	# don't store the full URI here - it may contain auth credentials
-	return bless [
-		URI->new( $server_info->{uri} )->host_port,
-		$server_info->{version},
-	], $class;
+	$server_info->{uri} = URI->new( $server_info->{uri} )->host_port;
+	
+	return bless $server_info, $class;
 }
 
 
-sub address { shift->[0] }
-sub version { shift->[1] }
+sub address  { shift->{uri} }
+sub version  { shift->{version} }
+sub protocol { shift->{protocol} }
 
 
 1;
@@ -39,7 +39,7 @@ Neo4j::Driver::ServerInfo - Provides Neo4j server address and version
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -73,6 +73,24 @@ of an URL authority string (for example: C<localhost:7474>).
 Returns the product name and version number. Takes the form of
 a server agent string (for example: C<Neo4j/3.5.17>).
 
+=head1 EXPERIMENTAL FEATURES
+
+L<Neo4j::Driver::ServerInfo> implements the following experimental
+features. These are subject to unannounced modification or removal
+in future versions. Expect your code to break if you depend upon
+these features.
+
+=head2 protocol
+
+ $protocol_string = $session->server->protocol;
+
+Returns the protocol name and version number announced by the server.
+Similar to an agent string, this value is formed by the protocol
+name followed by a slash and the version number, usually two digits
+separated by a dot (for example: C<Bolt/1.0> or C<HTTP/1.1>).
+
+If the protocol version is unknown, just the name is returned.
+
 =head1 SEE ALSO
 
 =over
@@ -95,7 +113,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2020 by Arne Johannessen.
+This software is Copyright (c) 2016-2021 by Arne Johannessen.
 
 This is free software, licensed under:
 

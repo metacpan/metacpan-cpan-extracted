@@ -9,7 +9,7 @@ use Try::Tiny;
 use Sub::Util 'set_subname';
 use Import::Into;
 
-our $VERSION = '1.13'; # VERSION
+our $VERSION = '1.14'; # VERSION
 
 use feature    ();
 use utf8       ();
@@ -212,10 +212,10 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact.svg)](https://travis-ci.org/gryphonshafer/exact)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact/badge.png)](https://coveralls.io/r/gryphonshafer/exact)
+=for markdown [![test](https://github.com/gryphonshafer/exact/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/exact/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact)
 
 =head1 SYNOPSIS
 
@@ -481,11 +481,11 @@ L<MetaCPAN|https://metacpan.org/pod/exact>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/exact>
+L<GitHub Actions|https://github.com/gryphonshafer/exact/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/exact>
+L<Codecov|https://codecov.io/gh/gryphonshafer/exact>
 
 =item *
 
@@ -503,9 +503,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2017-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

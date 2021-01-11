@@ -1,5 +1,8 @@
 Revision history for PDF-TextBlock
 
+0.12    2021-01-06
+        Permit either PDF::API2 or PDF::Builder as your PDF library basis.
+
 0.11    2020-12-30
         Github issue #4 resolved by Filipe Custódio. Thanks!
         https://github.com/jhannah/pdf-textblock/issues/4

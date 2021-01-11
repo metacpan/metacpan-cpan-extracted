@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-20'; # DATE
+our $DATE = '2020-12-11'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,13 +42,11 @@ vtt2srt - Convert .vtt to .srt
 
 =head1 VERSION
 
-This document describes version 0.001 of vtt2srt (from Perl distribution App-SubtitleUtils), released on 2020-08-20.
+This document describes version 0.002 of vtt2srt (from Perl distribution App-SubtitleUtils), released on 2020-12-11.
 
 =head1 SYNOPSIS
 
  % vtt2srt < INPUT.vtt > OUTPUT.srt
-
-=head1 cut
 
 =head1 HOMEPAGE
 
@@ -60,7 +58,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-SubtitleUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SubtitleUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-SubtitleUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

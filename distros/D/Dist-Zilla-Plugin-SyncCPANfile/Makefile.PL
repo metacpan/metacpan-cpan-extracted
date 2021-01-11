@@ -23,12 +23,13 @@ my %WriteMakefileArgs = (
     "namespace::clean" => "0.27"
   },
   "TEST_REQUIRES" => {
+    "Clone" => 0,
     "Exporter" => 0,
     "Module::CPANfile" => 0,
     "Pod::Coverage::TrustPod" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,6 +37,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Clone" => 0,
   "Dist::Zilla" => 6,
   "Exporter" => 0,
   "Module::CPANfile" => 0,

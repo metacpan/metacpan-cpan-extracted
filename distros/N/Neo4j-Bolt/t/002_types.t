@@ -6,7 +6,7 @@ my $i = 100;
 my $v = Neo4j::Bolt::NeoValue->_new_from_perl($i);
 is $v->_neotype, "Integer", "Integer";
 is $v->_as_perl, $i, "roundtrip";
-$i = 100.1;
+$i = 100.5;
 $v = Neo4j::Bolt::NeoValue->_new_from_perl($i);
 is $v->_neotype, "Float", "Float";
 is $v->_as_perl, $i, "roundtrip";

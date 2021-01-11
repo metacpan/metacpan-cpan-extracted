@@ -71,7 +71,7 @@ use warnings;
 
 use parent qw{ Encode::Encoding };
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use Carp;
 use Encode qw{:fallback_all};
@@ -227,13 +227,17 @@ __END__
 
 =back
 
-=head1 BUGS
+=head1 SUPPORT
 
 Perlqq, HTML charref, and XML charref fallback modes are not supported,
 because the RAD50 character set does not have the necessary characters.
 In plainer language, you can't stick a backslash in the output stream
 if the backslash is an invalid character. Requests for these fallback
 modes will be ignored, and the replacement character inserted.
+
+Support is by the author. Please file bug reports at
+L<https://github.com/trwyant/perl-Encode-RAD50/issues>, or in electronic
+mail to the author.
 
 =head1 SEE ALSO
 
@@ -255,7 +259,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005-2007, 2011-2019 by Thomas R. Wyant, III
+Copyright 2005-2007, 2011-2021 by Thomas R. Wyant, III
 (F<wyant at cpan dot org>). All rights reserved.
 
 PDP-11, RSTS-11, RSTS/E,  RSX-11, RSX-11M+, P/OS and RT-11 are

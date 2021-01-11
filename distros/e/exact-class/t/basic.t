@@ -1,4 +1,4 @@
-use Test::Most;
+use Test2::V0;
 
 my $thing = q/
     package Thing {
@@ -19,11 +19,11 @@ my $thing = q/
 /;
 
 my ( $obj, $obj2 );
-lives_ok( sub { eval $thing }, 'package definition indirect' );
-lives_ok( sub { Thing->attr( password => 12345 ) }, 'Package->attr(...)' );
-lives_ok( sub { Thing->attr( method => sub { $_[0]->password } ) }, 'Package->attr( sub {...} )' );
-lives_ok( sub { $obj = Thing->new( answer => 42, name13 => 13 ) }, 'new( answer => 42, name13 => 13 )' );
-lives_ok( sub { $obj2 = Thing->new( { answer => 43 } ) }, 'new( { answer => 43 } )' );
+ok( lives { eval $thing }, 'package definition indirect' ) or note $@;
+ok( lives { Thing->attr( password => 12345 ) }, 'Package->attr(...)' ) or note $@;
+ok( lives { Thing->attr( method => sub { $_[0]->password } ) }, 'Package->attr( sub {...} )' ) or note $@;
+ok( lives { $obj = Thing->new( answer => 42, name13 => 13 ) }, 'new( answer => 42, name13 => 13 )' ) or note $@;
+ok( lives { $obj2 = Thing->new( { answer => 43 } ) }, 'new( { answer => 43 } )' ) or note $@;
 
 sub exercise {
     my ( $obj, $obj2 ) = @_;
@@ -57,8 +57,8 @@ sub exercise {
 
     is( $obj->method, 54321, 'password via "method" attr value' );
 
-    lives_ok( sub { $obj->attr('attr0') }, q{attr('attr0')} );
-    lives_ok( sub { $obj->attr( attr1 => 'value' ) }, q{attr( attr1 => 'value' )} );
+    ok( lives { $obj->attr('attr0') }, q{attr('attr0')} ) or note $@;
+    ok( lives { $obj->attr( attr1 => 'value' ) }, q{attr( attr1 => 'value' )} ) or note $@;
 
     is( $obj->attr0, undef, 'attr0 returns undef' );
     is( $obj->attr1, 'value', 'attr1 returns undef' );
@@ -74,12 +74,12 @@ exercise( $obj, $obj2 );
 $thing =~ s/use exact 'class'/use exact::class/;
 $thing =~ s/package Thing/package ThingIndirect/;
 
-lives_ok( sub { eval $thing }, 'package definition direct' );
-lives_ok( sub { ThingIndirect->attr( password => 12345 ) }, 'Package->attr(...)' );
-lives_ok( sub { ThingIndirect->attr( method => sub { $_[0]->password } ) }, 'Package->attr( sub {...} )' );
-lives_ok( sub { $obj = ThingIndirect->new( answer => 42, name13 => 13 ) }, 'new( answer => 42, name13 => 13 )' );
-lives_ok( sub { $obj2 = ThingIndirect->new( { answer => 43 } ) }, 'new( { answer => 43 } )' );
+ok( lives { eval $thing }, 'package definition direct' ) or note $@;
+ok( lives { ThingIndirect->attr( password => 12345 ) }, 'Package->attr(...)' ) or note $@;
+ok( lives { ThingIndirect->attr( method => sub { $_[0]->password } ) }, 'Package->attr( sub {...} )' ) or note $@;
+ok( lives { $obj = ThingIndirect->new( answer => 42, name13 => 13 ) }, 'new( answer => 42, name13 => 13 )' ) or note $@;
+ok( lives { $obj2 = ThingIndirect->new( { answer => 43 } ) }, 'new( { answer => 43 } )' ) or note $@;
 
 exercise( $obj, $obj2 );
 
-done_testing();
+done_testing;

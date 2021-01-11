@@ -4,7 +4,7 @@ use Moose;
 with 'Dist::Zilla::Role::MintingProfile::ShareDir';
 use namespace::clean;
 
-our $VERSION = 'v5.0.0';
+our $VERSION = 'v5.0.1';
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -30,6 +30,9 @@ documentation from the current dzil C<config.ini>, which can be initialized
 using L<< C<dzil setup>|Dist::Zilla::App::Command::setup >>. The version is
 initialized statically as C<0.001>. The directory is then initialized as a
 git repository using L<[Git::Init]|Dist::Zilla::Plugin::Git::Init>.
+
+The L<Dist::Zilla::Starter> guide explains how the L<Dist::Zilla> plugin system
+works, and how it is specifically used for the minting process.
 
 =head1 CUSTOMIZING
 

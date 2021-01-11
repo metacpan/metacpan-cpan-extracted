@@ -108,7 +108,7 @@
       },
       "Dpkg::Changelog::Parse" : {
          "file" : "lib/Dpkg/Changelog/Parse.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "Dpkg::Checksums" : {
          "file" : "lib/Dpkg/Checksums.pm",
@@ -231,7 +231,7 @@
       },
       "Dpkg::Index" : {
          "file" : "lib/Dpkg/Index.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "Dpkg::Interface::Storable" : {
          "file" : "lib/Dpkg/Interface/Storable.pm",
@@ -379,6 +379,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.20.5",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v1.20.7",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

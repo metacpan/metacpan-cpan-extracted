@@ -31,7 +31,6 @@ my @files = (
     't/no_dup_add_isa.t',
     't/release-kwalitee.t',
     't/try.t',
-    't/use.t',
     't/v10.t'
 );
 

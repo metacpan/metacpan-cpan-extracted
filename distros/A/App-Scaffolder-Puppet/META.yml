@@ -7,8 +7,9 @@ build_requires:
   App::Scaffolder: '0.002000'
   Carp: '0'
   Directory::Scratch: '0'
-  File::Find: '0'
-  File::Temp: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Module::Build: '0.3601'
   Test::Class: '0'
   Test::Exception: '0'
@@ -17,10 +18,11 @@ build_requires:
   Test::MockObject: '0'
   Test::More: '0.88'
   lib: '0'
+  perl: '5.006'
 configure_requires:
   Module::Build: '0.3601'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,4 +42,6 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/mstock/App-Scaffolder-Puppet.git
-version: '0.003001'
+version: '0.004000'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

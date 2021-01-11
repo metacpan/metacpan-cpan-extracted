@@ -1,98 +1,20 @@
 package Neo4j::Bolt;
-use Neo4j::Client;
 use Cwd qw/realpath getcwd/;
 
-
 BEGIN {
-  our $VERSION = "0.20";
+  our $VERSION = "0.4200";
+  require Neo4j::Bolt::Cxn;
+  require Neo4j::Bolt::Txn;
+  require Neo4j::Bolt::ResultStream;
+  require Neo4j::Bolt::CTypeHandlers;
+  require XSLoader;
+  XSLoader::load();
+
 }
-use Inline 'global';
-use Inline 
-  P => Config =>
-  LIBS => $Neo4j::Client::LIBS,
-  INC => join(' ',$Neo4j::Client::CCFLAGS,'-I'.realpath('include')),
-  version => $VERSION,
-  name => __PACKAGE__;
-
-use Inline P => <<'END_BOLT_C';
-#include <neo4j_config_struct.h>
-#include <neo4j-client.h>
-#define CXNCLASS "Neo4j::Bolt::Cxn"
-#define BUFLEN 100
-
-struct cxn_obj {
-  neo4j_connection_t *connection;
-  int connected;
-  int errnum;
-  const char *strerror;
-};
-
-typedef struct cxn_obj cxn_obj_t;
-
-void new_cxn_obj(cxn_obj_t **cxn_obj) {
-  Newx(*cxn_obj, 1, cxn_obj_t);
-  (*cxn_obj)->connection = (neo4j_connection_t *)NULL;
-  (*cxn_obj)->connected = 0;
-  (*cxn_obj)->errnum = 0;
-  (*cxn_obj)->strerror = (char *)NULL;
-  return;
-}
-
-SV* connect_ ( const char* classname, const char* neo4j_url,
-               int timeout, bool encrypt,
-               const char* tls_ca_dir, const char* tls_ca_file,
-               const char* tls_pk_file, const char* tls_pk_pass )
-{
-  SV *cxn;
-  SV *cxn_ref;
-  cxn_obj_t *cxn_obj;
-  char *climsg;
-  neo4j_config_t *config;
-  new_cxn_obj(&cxn_obj);
-  neo4j_client_init();
-  config = neo4j_new_config();
-  config->connect_timeout = (time_t) timeout;
-  if (strlen(tls_ca_dir)) {
-    neo4j_config_set_TLS_ca_dir(config, tls_ca_dir);
-  }
-  if (strlen(tls_ca_file)) {
-    neo4j_config_set_TLS_ca_file(config, tls_ca_file);
-  }
-  if (strlen(tls_pk_file)) {
-    neo4j_config_set_TLS_private_key(config, tls_pk_file);
-  }
-  if (strlen(tls_pk_pass)) {
-    neo4j_config_set_TLS_private_key_password(config, tls_pk_pass);
-  }
-  
-  cxn_obj->connection = neo4j_connect( neo4j_url, config,
-                                       encrypt ? 0 : NEO4J_INSECURE );
-
-  if ((cxn_obj->connection == NULL)) {
-    cxn_obj->errnum = errno;
-    Newx(climsg, BUFLEN, char);
-    cxn_obj->strerror = neo4j_strerror(errno, climsg, BUFLEN);
-  } else {
-    if ( encrypt && ! neo4j_connection_is_secure(cxn_obj->connection) ) {
-      warn("Bolt connection not secure!");
-    }
-    cxn_obj->connected = 1;
-  }
-  cxn = newSViv((IV) cxn_obj);
-  cxn_ref = newRV_noinc(cxn);
-  sv_bless(cxn_ref, gv_stashpv(CXNCLASS, GV_ADD));
-  SvREADONLY_on(cxn);
-  return cxn_ref;
-}
-
-END_BOLT_C
-
-require Neo4j::Bolt::Cxn;
-require Neo4j::Bolt::ResultStream;
-require Neo4j::Bolt::TypeHandlersC;
+our $DEFAULT_DB = "neo4j";
 
 sub connect {
-  $_[0]->connect_( $_[1], $_[2], 0, "", "", "", "" );
+  $_[0]->connect_( $_[1], $_[2] // 0, 0, "", "", "", "" );
 }
 
 sub connect_tls {
@@ -120,7 +42,7 @@ sub connect_tls {
     $tls->{pk_pass} || ""
    );
 }
-		 
+
 
 
 =head1 NAME
@@ -224,6 +146,14 @@ Example:
 When neither C<ca_dir> nor C<ca_file> are specified, an attempt will
 be made to use the default trust store instead.
 This requires L<IO::Socket::SSL> or L<Mozilla::CA> to be installed.
+
+=item set_log_level($LEVEL)
+
+When $LEVEL is set to one of the strings C<ERROR WARN INFO DEBUG> or C<TRACE>,
+libneo4j-client native logger will emit log messages at or above the given
+level, on STDERR.
+
+Set to C<NONE> to turn off completely (the default).
 
 =back
 

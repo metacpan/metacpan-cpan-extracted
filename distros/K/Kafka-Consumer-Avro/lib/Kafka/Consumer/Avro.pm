@@ -8,22 +8,41 @@ Kafka::Consumer::Avro - Avro message consumer for Apache Kafka.
 
 =head1 SYNOPSIS
 
-    use Kafka::Connection;
-    use Kafka::Consumer::Avro;
-
-    my $connection = Kafka::Connection->new( host => 'localhost' );
-
-    my $consumer = Kafka::Consumer::Avro->new( Connection => $connection );
-
-    # Do some interactions with Avro & SchemaRegistry before sending messages
-
-    # Fetch messages
-    my $response = $consumer->fetch(...);
-
-    # Closes the consumer and cleans up
-    undef $consumer;
-    $connection->close;
-    undef $connection;
+  use Kafka qw/DEFAULT_MAX_BYTES/;
+  use Kafka::Connection;
+  use Kafka::Consumer::Avro;
+  use Confluent::SchemaRegistry;
+  
+  my $connection = Kafka::Connection->new( host => 'localhost' );
+  
+  my $consumer = Kafka::Consumer::Avro->new( Connection => $connection , SchemaRegistry => Confluent::SchemaRegistry->new() );
+  
+  # Consuming messages
+  my $messages = $consumer->fetch(
+  	'mytopic',            # topic
+  	0,                    # partition
+  	0,                    # offset
+  	$DEFAULT_MAX_BYTES    # Maximum size of MESSAGE(s) to receive
+  );
+  
+  if ($messages) {
+  	foreach my $message (@$messages) {
+  		if ( $message->valid ) {
+  			say 'payload    : ', $message->payload;
+  			say 'key        : ', $message->key;
+  			say 'offset     : ', $message->offset;
+  			say 'next_offset: ', $message->next_offset;
+  		}
+  		else {
+  			say 'error      : ', $message->error;
+  		}
+  	}
+  }
+  
+  # Closes the consumer and cleans up
+  undef $consumer;
+  $connection->close;
+  undef $connection;
 
 =head1 DESCRIPTION
 
@@ -49,8 +68,24 @@ use Confluent::SchemaRegistry;
 
 use constant MAGIC_BYTE => 0; 
 
-our $VERSION = '0.01';
+use version; our $VERSION = version->declare('v1.0.0');
 
+=head1 INSTALL
+
+Installation of C<Kafka::Consumer::Avro> is a canonical:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+=head2 TEST NOTES
+
+Tests are focused on verifying Avro-formatted messages and theirs interactions with Confluent Schema Registry and are intended to extend C<Kafka::Consumer> test suite.
+
+They expect that in the target machine are available Kafka and Schema Registry listening on C<localhost> and default ports, otherwise most of the test are skipped.
+
+=head1 USAGE
 
 =head2 CONSTRUCTOR
 
@@ -99,29 +134,37 @@ sub new {
 ##### Class methods
 our $schemas = [];
 
-# Decode $payload from Avro format according to an Avro schema 
-sub _decode {
+# Decode from Avro
+sub _from_avro {
+	my $blob = shift || return undef;
+	my $sr = shift || return undef;
+	my $reader = IO::String->new( $blob );
+	seek( $reader, 1, 0 );    # Skip magic byte
+	my $buf = "\0\0\0\0";
+	read( $reader, $buf, 4 );    # Read schema version stored in avro message header
+	my $schema_id = unpack( "N", $buf ); # Retreive schema id from unsigned long (32 byte)
+	unless ( defined $schemas->[$schema_id] ) {
+		$schemas->[$schema_id] = $sr->get_schema_by_id( SCHEMA_ID => $schema_id ) || die "Unavailable schema for id $schema_id";
+	}
+	return Avro::BinaryDecoder->decode(
+		writer_schema => $schemas->[$schema_id],
+		reader_schema => $schemas->[$schema_id],
+		reader        => $reader
+	);
+}
+
+# Decode key and payload of the innput message returning a new Kafka::Message instancefrom Avro format according to an Avro schema 
+sub _decode_message {
 	my $message = shift;
 	die "Unknown message format"
-		unless ref($message) eq 'Kafka::Message';
+		unless $message->isa('Kafka::Message');
 	my $sr = shift;
-	my $reader = IO::String->new($message->payload);
-	seek($reader, 1, 0); # Skip magic byte
-	my $buf = "\0\0\0\0";
-	read($reader, $buf, 4); # Read schema version stored in avro message header
-	my $schema_id = unpack("N", $buf); # Retreive schema id from unsigned long (32 byte)
-	unless (defined $schemas->[$schema_id]) {
-		$schemas->[$schema_id] = $sr->get_schema_by_id(SCHEMA_ID => $schema_id) || die "Unavailable schema for id $schema_id";
-	}
-	my $decoded = Avro::BinaryDecoder->decode(
-		writer_schema	=> $schemas->[$schema_id],
-		reader_schema	=> $schemas->[$schema_id],
-		reader			=> $reader
-	);
+	die "Expected Confluent::SchemaRegistry object"
+		unless $sr->isa('Confluent::SchemaRegistry');
 	return Kafka::Message->new(
 		{
-			payload				=> $decoded,
-			key					=> $message->key,
+			payload				=> _from_avro($message->payload, $sr),
+			key					=> _from_avro($message->key, $sr),
 			Timestamp			=> $message->Timestamp, 
 			valid				=> $message->valid, 
 			error				=> $message->error, 
@@ -183,7 +226,7 @@ sub fetch {
 	my $messages = $self->SUPER::fetch(@_);
 	my $sr = $self->schema_registry();
 	foreach my $message (@$messages) {
-		$message = _decode($message, $sr);
+		$message = _decode_message($message, $sr);
 	}
 	return $messages;
 }

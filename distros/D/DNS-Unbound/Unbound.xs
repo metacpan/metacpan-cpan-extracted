@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
+typedef struct ub_ctx dns_unbound_ub_ctx;
+
 SV* _ub_result_to_svhv_and_free (struct ub_result* result) {
     SV *val;
 
@@ -99,10 +101,10 @@ MODULE = DNS::Unbound           PACKAGE = DNS::Unbound
 
 PROTOTYPES: DISABLE
 
-struct ub_ctx*
+dns_unbound_ub_ctx*
 _create_context()
     CODE:
-        struct ub_ctx* my_ctx = ub_ctx_create();
+        dns_unbound_ub_ctx* my_ctx = ub_ctx_create();
 
         if (!my_ctx) {
             croak("Failed to create Unbound context!");
@@ -113,19 +115,19 @@ _create_context()
         RETVAL
 
 int
-_ub_ctx_set_option( struct ub_ctx *ctx, const char* opt, const char* val)
+_ub_ctx_set_option( dns_unbound_ub_ctx *ctx, const char* opt, const char* val)
     CODE:
         RETVAL = ub_ctx_set_option(ctx, opt, val);
     OUTPUT:
         RETVAL
 
 void
-_ub_ctx_debuglevel( struct ub_ctx *ctx, int d )
+_ub_ctx_debuglevel( dns_unbound_ub_ctx *ctx, int d )
     CODE:
         ub_ctx_debuglevel(ctx, d);
 
 void
-_ub_ctx_debugout( struct ub_ctx *ctx, int fd, const char *mode )
+_ub_ctx_debugout( dns_unbound_ub_ctx *ctx, int fd, const char *mode )
     CODE:
         FILE *fstream;
 
@@ -169,7 +171,7 @@ _get_fd_mode_for_fdopen(int fd)
 
 
 SV*
-_ub_ctx_get_option( struct ub_ctx *ctx, const char* opt)
+_ub_ctx_get_option( dns_unbound_ub_ctx *ctx, const char* opt)
     CODE:
         char *str;
 
@@ -192,7 +194,7 @@ _ub_ctx_get_option( struct ub_ctx *ctx, const char* opt)
         RETVAL
 
 int
-_ub_ctx_add_ta( struct ub_ctx *ctx, char *ta )
+_ub_ctx_add_ta( dns_unbound_ub_ctx *ctx, char *ta )
     CODE:
         RETVAL = ub_ctx_add_ta( ctx, ta );
     OUTPUT:
@@ -200,7 +202,7 @@ _ub_ctx_add_ta( struct ub_ctx *ctx, char *ta )
 
 #if HAS_UB_CTX_ADD_TA_AUTR
 int
-_ub_ctx_add_ta_autr( struct ub_ctx *ctx, char *fname )
+_ub_ctx_add_ta_autr( dns_unbound_ub_ctx *ctx, char *fname )
     CODE:
         RETVAL = ub_ctx_add_ta_autr( ctx, fname );
     OUTPUT:
@@ -209,7 +211,7 @@ _ub_ctx_add_ta_autr( struct ub_ctx *ctx, char *fname )
 #endif
 
 int
-_ub_ctx_resolvconf( struct ub_ctx *ctx, SV *fname_sv )
+_ub_ctx_resolvconf( dns_unbound_ub_ctx *ctx, SV *fname_sv )
     CODE:
         char *fname = SvOK(fname_sv) ? SvPV_nolen(fname_sv) : NULL;
 
@@ -218,7 +220,7 @@ _ub_ctx_resolvconf( struct ub_ctx *ctx, SV *fname_sv )
         RETVAL
 
 int
-_ub_ctx_hosts( struct ub_ctx *ctx, SV *fname_sv )
+_ub_ctx_hosts( dns_unbound_ub_ctx *ctx, SV *fname_sv )
     CODE:
         char *fname = SvOK(fname_sv) ? SvPV_nolen(fname_sv) : NULL;
 
@@ -227,14 +229,14 @@ _ub_ctx_hosts( struct ub_ctx *ctx, SV *fname_sv )
         RETVAL
 
 int
-_ub_ctx_add_ta_file( struct ub_ctx *ctx, char *fname )
+_ub_ctx_add_ta_file( dns_unbound_ub_ctx *ctx, char *fname )
     CODE:
         RETVAL = ub_ctx_add_ta_file( ctx, fname );
     OUTPUT:
         RETVAL
 
 int
-_ub_ctx_trustedkeys( struct ub_ctx *ctx, char *fname )
+_ub_ctx_trustedkeys( dns_unbound_ub_ctx *ctx, char *fname )
     CODE:
         RETVAL = ub_ctx_trustedkeys( ctx, fname );
     OUTPUT:
@@ -248,28 +250,28 @@ _ub_strerror( int err )
         RETVAL
 
 int
-_ub_ctx_async( struct ub_ctx *ctx, int dothread )
+_ub_ctx_async( dns_unbound_ub_ctx *ctx, int dothread )
     CODE:
         RETVAL = ub_ctx_async( ctx, dothread );
     OUTPUT:
         RETVAL
 
 int
-_ub_poll( struct ub_ctx *ctx )
+_ub_poll( dns_unbound_ub_ctx *ctx )
     CODE:
         RETVAL = ub_poll(ctx);
     OUTPUT:
         RETVAL
 
 int
-_ub_wait( struct ub_ctx *ctx )
+_ub_wait( dns_unbound_ub_ctx *ctx )
     CODE:
         RETVAL = ub_wait(ctx);
     OUTPUT:
         RETVAL
 
 int
-_ub_process( struct ub_ctx *ctx )
+_ub_process( dns_unbound_ub_ctx *ctx )
     CODE:
         RETVAL = ub_process(ctx);
     OUTPUT:
@@ -277,7 +279,7 @@ _ub_process( struct ub_ctx *ctx )
 
 #if HAS_UB_CANCEL
 int
-_ub_cancel( struct ub_ctx *ctx, int async_id )
+_ub_cancel( dns_unbound_ub_ctx *ctx, int async_id )
     CODE:
         RETVAL = ub_cancel(ctx, async_id);
     OUTPUT:
@@ -286,14 +288,14 @@ _ub_cancel( struct ub_ctx *ctx, int async_id )
 #endif
 
 int
-_ub_fd( struct ub_ctx *ctx )
+_ub_fd( dns_unbound_ub_ctx *ctx )
     CODE:
         RETVAL = ub_fd(ctx);
     OUTPUT:
         RETVAL
 
 SV*
-_resolve_async( struct ub_ctx *ctx, const char *name, int type, int class, SV *result )
+_resolve_async( dns_unbound_ub_ctx *ctx, const char *name, int type, int class, SV *result )
     CODE:
         int async_id = 0;
 
@@ -320,7 +322,7 @@ _resolve_async( struct ub_ctx *ctx, const char *name, int type, int class, SV *r
         RETVAL
 
 SV*
-_resolve( struct ub_ctx *ctx, SV *name, int type, int class = 1 )
+_resolve( dns_unbound_ub_ctx *ctx, SV *name, int type, int class = 1 )
     CODE:
         struct ub_result* result;
         int retval;
@@ -345,7 +347,7 @@ BOOT:
 #endif
 
 void
-_destroy_context( struct ub_ctx *ctx )
+_destroy_context( dns_unbound_ub_ctx *ctx )
     CODE:
 
         // Workaround for https://github.com/NLnetLabs/unbound/issues/39:

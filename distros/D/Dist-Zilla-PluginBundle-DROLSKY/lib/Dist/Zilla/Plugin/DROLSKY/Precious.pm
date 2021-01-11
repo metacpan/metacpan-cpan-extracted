@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Path::Tiny qw( path );
 use Path::Tiny::Rule;
@@ -54,7 +54,7 @@ sub _new_precious_toml {
             include => $perl_include,
             cmd => [qw( perlcritic --profile=$PRECIOUS_ROOT/perlcriticrc )],
             ok_exit_codes           => 0,
-            lint_failure_exit_codes => 1,
+            lint_failure_exit_codes => 2,
         },
         'commands.perltidy' => {
             type    => 'both',
@@ -63,6 +63,33 @@ sub _new_precious_toml {
             lint_flags => [qw( --assert-tidy --standard-output )],
             tidy_flags => [
                 qw( --backup-and-modify-in-place --backup-file-extension=/ )],
+            ok_exit_codes           => 0,
+            lint_failure_exit_codes => 1,
+        },
+        'commands.omegasort-gitignore' => {
+            type                    => 'both',
+            include                 => '**/.gitignore',
+            cmd                     => [qw( omegasort --sort=path )],
+            lint_flags              => '--check',
+            tidy_flags              => '--in-place',
+            ok_exit_codes           => 0,
+            lint_failure_exit_codes => 1
+        },
+        'commands.podchecker' => {
+            type          => 'lint',
+            include       => ['**/*.{pl,pm,pod}'],
+            cmd           => [ 'podchecker', '--warnings', '--warnings' ],
+            ok_exit_codes => [ 0, 2 ],
+            lint_failure_exit_codes => 1,
+
+            # podchecker will print a warning to stderr if a file has no POD at all.
+            expect_stderr => 'true',
+        },
+        'commands.podtidy' => {
+            type    => 'tidy',
+            include => ['**/*.{pl,pm,pod}'],
+            cmd     =>
+                [ 'podtidy', '--columns', '80', '--inplace', '--nobackup' ],
             ok_exit_codes           => 0,
             lint_failure_exit_codes => 1,
         },
@@ -117,20 +144,28 @@ sub _default_perl_exclude {
     return [ sort @exclude ];
 }
 
+my @key_order = qw(
+    type
+    include
+    exclude
+    cmd
+    lint_flags
+    tidy_flags
+    ok_exit_codes
+    lint_failure_exit_codes
+);
+
+my %unquoted_keys = map { $_ => 1 } qw(
+    chdir
+    expect_stderr
+    lint_failure_exit_codes
+    ok_exit_codes
+);
+
 sub _config_to_toml {
     my $self     = shift;
     my $precious = shift;
 
-    my @key_order = qw(
-        type
-        include
-        exclude
-        cmd
-        lint_flags
-        tidy_flags
-        ok_exit_codes
-        lint_failure_exit_codes
-    );
     my $sorter = sbe(
         \@key_order,
         {
@@ -147,9 +182,10 @@ sub _config_to_toml {
         }
 
         for my $key ( $sorter->( keys %{ $precious->{$section} } ) ) {
-            my $val = $precious->{$section}{$key};
+            my $val   = $precious->{$section}{$key};
+            my $quote = $unquoted_keys{$key} ? sub { $_[0] } : \&_quote;
             if ( ref $val ) {
-                my @vals     = map { _maybe_quote($_) } @{$val};
+                my @vals     = map { $quote->($_) } @{$val};
                 my $one_line = join ', ', @vals;
                 if ( length $one_line > 70 ) {
                     $toml .= "$key = [\n";
@@ -161,7 +197,7 @@ sub _config_to_toml {
                 }
             }
             else {
-                $val = _maybe_quote($val);
+                $val = $quote->($val);
                 $toml .= "$key = $val\n";
             }
         }
@@ -174,9 +210,8 @@ sub _config_to_toml {
     return $toml;
 }
 
-sub _maybe_quote {
-    my $v = shift;
-    return $v =~ /^[0-9]+$/ ? $v : qq{"$v"};
+sub _quote {
+    return qq{"$_[0]"};
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -197,7 +232,7 @@ Dist::Zilla::Plugin::DROLSKY::Precious - Creates a default precious.toml file if
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =for Pod::Coverage .*
 
@@ -217,7 +252,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

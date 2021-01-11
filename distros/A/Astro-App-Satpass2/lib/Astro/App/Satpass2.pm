@@ -75,7 +75,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.045';
+our $VERSION = '0.046';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -285,6 +285,7 @@ my %mutator = (
     pass_variant	=> \&_set_pass_variant,
     perltime => \&_set_time_parser_attribute,
     prompt => \&_set_unmodified,
+    refraction	=> \&_set_unmodified,
     simbad_url => \&_set_unmodified,
     singleton => \&_set_unmodified,
     spacetrack => \&_set_spacetrack,
@@ -391,6 +392,7 @@ my %static = (
     pass_variant	=> PASS_VARIANT_NONE,
     perltime => 0,
     prompt => 'satpass2> ',
+    refraction	=> 1,
     simbad_url => 'simbad.u-strasbg.fr',
     singleton => 0,
 #   spacetrack => undef,	# Astro::SpaceTrack object set when accessed
@@ -3166,7 +3168,7 @@ sub station {
 	    horizon	=> deg2rad( $self->get( 'horizon' ) ),
 	    id		=> 'station',
 	    name	=> $self->{location} || '',
-	    refraction	=> 1,
+	    refraction	=> $self->{refraction} || 0,
 	)->geodetic (
 	    deg2rad( $self->{latitude} ),
 	    deg2rad( $self->{longitude} ),
@@ -3344,7 +3346,7 @@ sub version : Verb() {
 
 @{[__PACKAGE__]} $VERSION - Satellite pass predictor
 based on Astro::Coord::ECI @{[Astro::Coord::ECI->VERSION]}
-Copyright (C) 2009-2020 by Thomas R. Wyant, III
+Copyright (C) 2009-2021 by Thomas R. Wyant, III
 
 EOD
 }
@@ -8286,6 +8288,15 @@ This string attribute specifies the string used to prompt for commands.
 
 The default is C<< 'satpass2> ' >>.
 
+=head2 refraction
+
+This Boolean attribute specifies whether or not atmospheric refraction
+is taken into account. It should ordinarily not be changed, and was
+exposed only out of curiosity about the size of the effect on (say) the
+time of Sunset.
+
+The default is C<1> (i.e. true).
+
 =head2 simbad_url
 
 This string attribute does not, strictly speaking, specify a URL, but
@@ -9081,10 +9092,11 @@ initialization file, if C<-initialization_file> is not specified,
 C<SATPASS2INI> does not exist, and the initialization file was not found
 in its default location.
 
-=head1 BUGS
+=head1 SUPPORT
 
-Bugs can be reported to the author by mail, or through
-L<https://rt.cpan.org/>.
+Support is by the author. Please file bug reports at
+L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -9092,7 +9104,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2020 by Thomas R. Wyant, III
+Copyright (C) 2009-2021 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

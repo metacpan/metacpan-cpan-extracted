@@ -10,8 +10,8 @@ use parent (
 
 use constant _DEFERRED_CR => undef;
 
-*_then = \&Promise::ES6::then;
+*_dns_unbound_then = \&Promise::ES6::then;
 
-*_finally = \&Promise::ES6::finally;
+*_dns_unbound_finally = \&Promise::ES6::finally;
 
 1;

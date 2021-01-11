@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.18';
+$VERSION = '0.19';
 $VERSION = $VERSION;
 
 # internal use
@@ -2648,35 +2648,38 @@ sub parse_expr {
         $term = 1;
     }
 
-    # mb::use
-    elsif (/\G mb::use \s+ ([A-Za-z_][A-Za-z_0-9]* (?: ::[A-Za-z_][A-Za-z_0-9]*)* ) \s* (.*?) (?=[;\}]|\Z) /xmsgc) {
-        my $module = $1;
-        my $list   = $2;
-        if ($list eq '') {
-            $parsed .= qq{BEGIN { mb::require '$module'; $module->import; }};
+    # mb::use --> BEGIN { mb::require ... }
+    # mb::no  --> BEGIN { mb::require ... }
+    elsif (/\G ( mb::use | mb::no ) \b /xmsgc) {
+        my $method = { 'mb::use'=>'import', 'mb::no'=>'unimport' }->{$1} || die;
+        $parsed .= "BEGIN { mb::require";
+        while (/\G ( \s+ | [#] [^\n]* ) /xmsgc) {
+            $parsed .= $1;
         }
-        elsif (scalar(CORE::eval("()=$list")) == 0) {
-            $parsed .= qq{BEGIN { mb::require '$module'; }};
+        if (/\G ( [A-Za-z_][A-Za-z_0-9]* (?: ::[A-Za-z_][A-Za-z_0-9]*)* ) /xmsgc) {
+            my $module = $1;
+            $parsed .= qq{'$module';};
+            while (/\G ( \s+ | [#] [^\n]* ) /xmsgc) {
+                $parsed .= $1;
+            }
+            if (/\G ( [0-9]+ (?: \.[0-9]+)* ) /xmsgc) {
+                my $version = $1;
+                $parsed .= qq{$module->VERSION($version);};
+                while (/\G ( \s+ | [#] [^\n]* ) /xmsgc) {
+                    $parsed .= $1;
+                }
+            }
+            my $list = parse_expr_endswith(qr< [;\}] | \z >xms);
+            if ($list eq '') {
+                $parsed .= qq{ $module->$method; };
+            }
+            elsif (scalar(CORE::eval("()=$list")) == 0) {
+            }
+            else {
+                $parsed .= qq{ $module->$method($list); };
+            }
         }
-        else {
-            $parsed .= qq{BEGIN { mb::require '$module'; $module->import($list); }};
-        }
-        $term = 1;
-    }
-
-    # mb::no
-    elsif (/\G mb::no \s+ ([A-Za-z_][A-Za-z_0-9]* (?: ::[A-Za-z_][A-Za-z_0-9]*)* ) \s* (.*?) (?=[;\}]|\Z) /xmsgc) {
-        my $module = $1;
-        my $list   = $2;
-        if ($list eq '') {
-            $parsed .= qq{BEGIN { mb::require '$module'; $module->unimport; }};
-        }
-        elsif (scalar(CORE::eval("()=$list")) == 0) {
-            $parsed .= qq{BEGIN { mb::require '$module'; }};
-        }
-        else {
-            $parsed .= qq{BEGIN { mb::require '$module'; $module->unimport($list); }};
-        }
+        $parsed .= "}";
         $term = 1;
     }
 
@@ -2877,6 +2880,22 @@ sub parse_expr_balanced {
         }
 
         # otherwise
+        else {
+            $parsed .= parse_expr();
+        }
+    }
+    return $parsed;
+}
+
+#---------------------------------------------------------------------
+# parse expression that ends with a regexp
+sub parse_expr_endswith {
+    my($endswith) = @_;
+    my $parsed = '';
+    while (1) {
+        if (/\G (?= $endswith ) /xmsgc) {
+            last;
+        }
         else {
             $parsed .= parse_expr();
         }
@@ -5234,18 +5253,30 @@ To install this software without make, type the following:
   require 'file'                             require 'file'
   mb::require 123                            mb::require 123
   mb::require 'file'                         mb::require 'file'
-  use Module                                 use Module
-  use Module qw(A B C)                       use Module qw(A B C)
-  use Module ()                              use Module ()
-  mb::use Module                             BEGIN { mb::require 'Module'; Module->import; }
-  mb::use Module qw(A B C)                   BEGIN { mb::require 'Module'; Module->import(qw(A B C)); }
-  mb::use Module ()                          BEGIN { mb::require 'Module'; }
-  no Module                                  no Module
-  no Module qw(A B C)                        no Module qw(A B C)
-  no Module ()                               no Module ()
-  mb::no Module                              BEGIN { mb::require 'Module'; Module->unimport; }
-  mb::no Module qw(A B C)                    BEGIN { mb::require 'Module'; Module->unimport(qw(A B C)); }
-  mb::no Module ()                           BEGIN { mb::require 'Module'; }
+  use Module 5.005;                          use Module 5.005;
+  use Module 5.005 qw(A B C);                use Module 5.005 qw(A B C);
+  use Module 5.005 ();                       use Module 5.005 ();
+  use Module;                                use Module;
+  use Module qw(A B C);                      use Module qw(A B C);
+  use Module ();                             use Module ();
+  mb::use Module 5.005;                      BEGIN { mb::require 'Module'; Module->VERSION(5.005); Module->import; };
+  mb::use Module 5.005 qw(A B C);            BEGIN { mb::require 'Module'; Module->VERSION(5.005);  Module->import(qw(A B C)); };
+  mb::use Module 5.005 ();                   BEGIN { mb::require 'Module'; Module->VERSION(5.005); };
+  mb::use Module;                            BEGIN { mb::require 'Module'; Module->import; };
+  mb::use Module qw(A B C);                  BEGIN { mb::require 'Module';  Module->import(qw(A B C)); };
+  mb::use Module ();                         BEGIN { mb::require 'Module'; };
+  no Module 5.005;                           no Module 5.005;
+  no Module 5.005 qw(A B C);                 no Module 5.005 qw(A B C);
+  no Module 5.005 ();                        no Module 5.005 ();
+  no Module;                                 no Module;
+  no Module qw(A B C);                       no Module qw(A B C);
+  no Module ();                              no Module ();
+  mb::no Module 5.005;                       BEGIN { mb::require 'Module'; Module->VERSION(5.005); Module->unimport; };
+  mb::no Module 5.005 qw(A B C);             BEGIN { mb::require 'Module'; Module->VERSION(5.005);  Module->unimport(qw(A B C)); };
+  mb::no Module 5.005 ();                    BEGIN { mb::require 'Module'; Module->VERSION(5.005); };
+  mb::no Module;                             BEGIN { mb::require 'Module'; Module->unimport; };
+  mb::no Module qw(A B C);                   BEGIN { mb::require 'Module';  Module->unimport(qw(A B C)); };
+  mb::no Module ();                          BEGIN { mb::require 'Module'; };
   chop                                       chop
   lc                                         mb::lc
   lcfirst                                    mb::lcfirst

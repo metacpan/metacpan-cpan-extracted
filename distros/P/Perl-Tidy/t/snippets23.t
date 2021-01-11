@@ -17,6 +17,9 @@
 #14 wnxl.wnxl3
 #15 wnxl.wnxl4
 #16 align34.def
+#17 git47.def
+#18 git47.git47
+#19 qw.def
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -42,7 +45,24 @@ BEGIN {
 # -bot is default so we test -nbot
 -nbot
 ----------
-        'def'       => "",
+        'def'   => "",
+        'git47' => <<'----------',
+# perltidyrc from git #47
+-pbp     # Start with Perl Best Practices
+-w       # Show all warnings
+-iob     # Ignore old breakpoints
+-l=120   # 120 characters per line
+-mbl=2   # No more than 2 blank lines
+-i=2     # Indentation is 2 columns
+-ci=2    # Continuation indentation is 2 columns
+-vt=0    # Less vertical tightness
+-pt=2    # High parenthesis tightness
+-bt=2    # High brace tightness
+-sbt=2   # High square bracket tightness
+-wn      # Weld nested containers
+-isbc    # Don't indent comments without leading space
+-nst     # Don't output to STDOUT
+----------
         'hash_bang' => "-x",
         'listop1'   => <<'----------',
 # -bok is default so we test nbok
@@ -108,6 +128,37 @@ $foo =
   : 1;
 ----------
 
+        'git47' => <<'----------',
+# cannot weld here
+$promises[$i]->then(
+    sub { $all->resolve(@_); () },
+    sub {
+        $results->[$i] = [@_];
+        $all->reject(@$results) if --$remaining <= 0;
+        return ();
+    }
+);
+
+sub _absolutize { [
+    map { _is_scoped($_) ? $_ : [ [ [ 'pc', 'scope' ] ], ' ', @$_ ] }
+      @{ shift() } ] }
+
+$c->helpers->log->debug( sub {
+    my $req    = $c->req;
+    my $method = $req->method;
+    my $path   = $req->url->path->to_abs_string;
+    $c->helpers->timing->begin('mojo.timer');
+    return qq{$method "$path"};
+} ) unless $stash->{'mojo.static'};
+
+# A single signature var can weld
+return Mojo::Promise->resolve($query_params)->then(&_reveal_event)->then(
+    sub ($code) {
+        return $c->render( text => '', status => $code );
+    }
+);
+----------
+
         'hash_bang' => <<'----------',
 
 
@@ -122,6 +173,50 @@ my $date = localtime();
 my @sorted = map { $_->[0] }
   sort { $a->[1] <=> $b->[1] }
   map { [ $_, rand ] } @list;
+----------
+
+        'qw' => <<'----------',
+    # do not outdent ending ) more than initial qw line
+    if ( $pos == 0 ) {
+        @return = grep( /^$word/,
+            sort qw(
+              ! a b d h i m o q r u autobundle clean
+              make test install force reload look
+        ) );
+    }
+
+    # outdent ')' even if opening is not '('
+    @EXPORT = (
+        qw)
+          i Re Im rho theta arg
+          sqrt log ln
+          log10 logn cbrt root
+          cplx cplxe
+        ),
+        @trig
+    );
+
+    # outdent '>' like ')'
+    @EXPORT = (
+        qw<
+          i Re Im rho theta arg
+          sqrt log ln
+          log10 logn cbrt root
+          cplx cplxe
+        >,
+        @trig
+    );
+
+    # but ';' not outdented
+    @EXPORT = (
+        qw;
+          i Re Im rho theta arg
+          sqrt log ln
+          log10 logn cbrt root
+          cplx cplxe
+          ;,
+        @trig
+    );
 ----------
 
         'sbcp' => <<'----------',
@@ -296,7 +391,7 @@ if ( $PLATFORM eq 'aix' ) {
               Perl_ErrorNo
               Perl_GetVars
               PL_sys_intern
-              )
+            )
         ]
     );
 }
@@ -341,7 +436,7 @@ if ( $PLATFORM eq 'aix' ) {
               Perl_ErrorNo
               Perl_GetVars
               PL_sys_intern
-              )
+            )
         ]
     );
 }
@@ -456,7 +551,7 @@ if ( $PLATFORM eq 'aix' ) {
               Perl_ErrorNo
               Perl_GetVars
               PL_sys_intern
-              )
+            )
         ]
     );
 }
@@ -500,6 +595,123 @@ elsif ( $line =~ /^LINKNAME>(.*)/i )   { $linkname  = $1; }
 elsif ( $line =~ /^LINKURL>(.*)/i )    { $linkurl   = $1; }
 else                                   { $body .= $line; }
 #16...........
+        },
+
+        'git47.def' => {
+            source => "git47",
+            params => "def",
+            expect => <<'#17...........',
+# cannot weld here
+$promises[$i]->then(
+    sub { $all->resolve(@_); () },
+    sub {
+        $results->[$i] = [@_];
+        $all->reject(@$results) if --$remaining <= 0;
+        return ();
+    }
+);
+
+sub _absolutize {
+    [ map { _is_scoped($_) ? $_ : [ [ [ 'pc', 'scope' ] ], ' ', @$_ ] }
+          @{ shift() } ]
+}
+
+$c->helpers->log->debug(
+    sub {
+        my $req    = $c->req;
+        my $method = $req->method;
+        my $path   = $req->url->path->to_abs_string;
+        $c->helpers->timing->begin('mojo.timer');
+        return qq{$method "$path"};
+    }
+) unless $stash->{'mojo.static'};
+
+# A single signature var can weld
+return Mojo::Promise->resolve($query_params)->then(&_reveal_event)->then(
+    sub ($code) {
+        return $c->render( text => '', status => $code );
+    }
+);
+#17...........
+        },
+
+        'git47.git47' => {
+            source => "git47",
+            params => "git47",
+            expect => <<'#18...........',
+# cannot weld here
+$promises[$i]->then(
+  sub { $all->resolve(@_); () },
+  sub {
+    $results->[$i] = [@_];
+    $all->reject(@$results) if --$remaining <= 0;
+    return ();
+  }
+);
+
+sub _absolutize { [map { _is_scoped($_) ? $_ : [[['pc', 'scope']], ' ', @$_] } @{shift()}] }
+
+$c->helpers->log->debug(sub {
+  my $req    = $c->req;
+  my $method = $req->method;
+  my $path   = $req->url->path->to_abs_string;
+  $c->helpers->timing->begin('mojo.timer');
+  return qq{$method "$path"};
+}) unless $stash->{'mojo.static'};
+
+# A single signature var can weld
+return Mojo::Promise->resolve($query_params)->then(&_reveal_event)->then(sub ($code) {
+  return $c->render(text => '', status => $code);
+});
+#18...........
+        },
+
+        'qw.def' => {
+            source => "qw",
+            params => "def",
+            expect => <<'#19...........',
+    # do not outdent ending ) more than initial qw line
+    if ( $pos == 0 ) {
+        @return = grep( /^$word/,
+            sort qw(
+              ! a b d h i m o q r u autobundle clean
+              make test install force reload look
+            ) );
+    }
+
+    # outdent ')' even if opening is not '('
+    @EXPORT = (
+        qw)
+          i Re Im rho theta arg
+          sqrt log ln
+          log10 logn cbrt root
+          cplx cplxe
+        ),
+        @trig
+    );
+
+    # outdent '>' like ')'
+    @EXPORT = (
+        qw<
+          i Re Im rho theta arg
+          sqrt log ln
+          log10 logn cbrt root
+          cplx cplxe
+        >,
+        @trig
+    );
+
+    # but ';' not outdented
+    @EXPORT = (
+        qw;
+          i Re Im rho theta arg
+          sqrt log ln
+          log10 logn cbrt root
+          cplx cplxe
+          ;,
+        @trig
+    );
+#19...........
         },
     };
 

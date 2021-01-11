@@ -106,7 +106,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.142';
+our $VERSION = '0.143';
 our @EXPORT_OK = qw{
     shell
 
@@ -256,6 +256,7 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	satnogs	=> { name => 'SatNOGS' },
 	starlink	=> { name => 'Starlink' },
 	oneweb		=> { name => 'OneWeb' },
+	swarm		=> { name => 'Swarm' },
     },
     celestrak_supplemental => {
 	gps		=> { name => 'GPS',		rms => 1 },
@@ -6664,6 +6665,10 @@ systems, Perl versions, and Perl module versions. It is rather likely,
 for example, that the module will die horribly if run with an
 insufficiently-up-to-date version of LWP.
 
+Please file bug reports at
+L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues>, or in
+electronic mail to the author.
+
 =head1 MODIFICATIONS OF HISTORICAL INTEREST
 
 =head2 Data Throttling
@@ -6715,7 +6720,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005-2020 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
+Copyright 2005-2021 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
 
 =head1 LICENSE
 

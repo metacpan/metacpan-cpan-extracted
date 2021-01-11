@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More tests => 7;
 
-# $Id: GtkSourceMarker.t,v 1.1 2005/08/11 18:01:56 kaffeetisch Exp $
+# $Id$
 
 use Gtk2::SourceView;
 

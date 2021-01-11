@@ -1,11 +1,8 @@
-use Test::Most tests => 2;
+use Test2::V0;
+use exact -noautoclean;
 
-BEGIN {
-    use_ok( 'exact', 'noautoclean' );
-}
-
-lives_ok(
-    sub {
+ok(
+    lives {
         try {
             1;
         }
@@ -14,4 +11,6 @@ lives_ok(
         };
     },
     'try',
-);
+) or note $@;
+
+done_testing;

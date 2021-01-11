@@ -105,7 +105,7 @@ sub _add_build_flags {
         },
         reproducible => {
             timeless => 1,
-            fixfilepath => 0,
+            fixfilepath => 1,
             fixdebugpath => 1,
         },
         sanitize => {
@@ -159,10 +159,13 @@ sub _add_build_flags {
     ## Global defaults
 
     my $default_flags;
+    my $default_d_flags;
     if ($opts_build->has('noopt')) {
         $default_flags = '-g -O0';
+        $default_d_flags = '-fdebug';
     } else {
         $default_flags = '-g -O2';
+        $default_d_flags = '-frelease';
     }
     $flags->append('CFLAGS', $default_flags);
     $flags->append('CXXFLAGS', $default_flags);
@@ -171,6 +174,7 @@ sub _add_build_flags {
     $flags->append('FFLAGS', $default_flags);
     $flags->append('FCFLAGS', $default_flags);
     $flags->append('GCJFLAGS', $default_flags);
+    $flags->append('DFLAGS', $default_d_flags);
 
     ## Area: future
 
@@ -466,7 +470,7 @@ sub _build_tainted_by {
 
         my $linkname = readlink $pathname;
         if ($linkname eq "usr$pathname" or $linkname eq "/usr$pathname") {
-            $tainted{'merged-usr-via-symlinks'} = 1;
+            $tainted{'merged-usr-via-aliased-dirs'} = 1;
             last;
         }
     }

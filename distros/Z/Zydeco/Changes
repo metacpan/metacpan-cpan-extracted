@@ -4,8 +4,18 @@ Zydeco
 Created:      2020-01-15
 Home page:    <http://zydeco.toby.ink/>
 Home page:    <https://metacpan.org/release/Zydeco>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Zydeco>
+Bug tracker:  <https://github.com/tobyink/p5-zydeco/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.613	2020-01-09
+
+ [ Documentation ]
+ - Fixes for some typos.
+   Sébastien Feugère++
+   <https://github.com/tobyink/p5-zydeco/pull/8>
+
+ [ Packaging ]
+ - Move issue tracker to GitHub.
 
 0.612	2020-10-10
 

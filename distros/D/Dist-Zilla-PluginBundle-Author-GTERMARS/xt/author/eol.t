@@ -9,7 +9,8 @@ use Test::EOL;
 my @files = (
     'lib/Dist/Zilla/PluginBundle/Author/GTERMARS.pm',
     't/00-report-prereqs.dd',
-    't/00-report-prereqs.t'
+    't/00-report-prereqs.t',
+    't/01-compile.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

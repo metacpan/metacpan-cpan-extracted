@@ -22,6 +22,9 @@
 #include "memory.h"
 #include <stdint.h>
 
+#define MESSAGE_TYPE_IS(type,msg_type) \
+    ( (type)==NULL? false : (strcmp(type->name,#msg_type) == 0? true : false) )
+
 typedef const struct neo4j_message_type *neo4j_message_type_t;
 struct neo4j_message_type
 {

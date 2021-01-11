@@ -225,7 +225,7 @@ It is possible to set a default value for an attribute.
   my $bob = MyApp->new_person;
   say $bob->name;             # ==> Anonymous
   $bob->name( "Robert" );
-  say $bob->name;             # ==> Bob
+  say $bob->name;             # ==> Robert
 
 There are two main styles of defaults: eager and lazy. Eager defaults will
 be applied when the object is instantiated. Lazy defaults will be applied
@@ -271,7 +271,7 @@ A common pattern is to use one attribute to help set the default for another.
     );
   }
 
-Note that during object instatiation, there is no guaranteed order which
+Note that during object instantiation, there is no guaranteed order which
 attributes will be processed, so to prevent C<name_parts>'s default from
 being processed before C<name> is ready, it is made lazy.
 

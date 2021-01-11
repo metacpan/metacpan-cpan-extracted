@@ -1,8 +1,9 @@
 package Quantum::Superpositions::Lazy::ComputedState;
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
-use v5.28; use warnings;
+use v5.28;
+use warnings;
 use Moo;
 
 use feature qw(signatures);
@@ -28,7 +29,7 @@ has "operation" => (
 	required => 1,
 );
 
-sub clone($self)
+sub clone ($self)
 {
 	return $self->new(
 		$self->%{qw(value weight source operation)}

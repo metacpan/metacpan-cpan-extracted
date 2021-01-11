@@ -6,16 +6,16 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::V0: '0'
   Test::More: '0'
-  Test::Most: '0'
   perl: '5.014'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.014'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://github.com/gryphonshafer/exact-me/issues
   homepage: https://github.com/gryphonshafer/exact-me
   repository: https://github.com/gryphonshafer/exact-me.git
-version: '1.01'
+version: '1.02'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
-x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_spdx_expression: Artistic-2.0

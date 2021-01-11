@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More tests => 19;
 
-# $Id: GtkSourceBuffer.t,v 1.1 2005/08/11 18:01:56 kaffeetisch Exp $
+# $Id$
 
 use Glib qw(TRUE FALSE);
 use Gtk2::SourceView;

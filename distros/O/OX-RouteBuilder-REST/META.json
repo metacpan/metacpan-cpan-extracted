@@ -1,28 +1,35 @@
 {
    "abstract" : "OX::RouteBuilder which routes to an action method in a controller class based on HTTP verbs",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>",
+      "Thomas Klausner <domm@plix.at>",
       "Validad GmbH http://validad.com"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OX-RouteBuilder-REST",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "Module::Build" : "0.28"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "Module::Build" : "0.28"
          }
       },
       "runtime" : {
@@ -35,23 +42,40 @@
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "OX" : "0",
             "Plack::Test" : "0",
             "Test::More" : "0",
             "Test::Path::Router" : "0",
-            "strict" : "0",
-            "warnings" : "0"
+            "lib" : "0",
+            "perl" : "5.006"
          }
+      }
+   },
+   "provides" : {
+      "OX::RouteBuilder::REST" : {
+         "file" : "lib/OX/RouteBuilder/REST.pm",
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/OX-RouteBuilder-REST/issues"
+      },
+      "homepage" : "https://github.com/domm/OX-RouteBuilder-REST",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/domm/OX-RouteBuilder-REST.git",
-         "web" : "http://github.com/domm/OX-RouteBuilder-REST"
+         "url" : "https://github.com/domm/OX-RouteBuilder-REST.git",
+         "web" : "https://github.com/domm/OX-RouteBuilder-REST"
       }
    },
-   "version" : "0.003"
+   "version" : "0.004",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 
