@@ -14,14 +14,14 @@ use Helper qw(:all);
 use Hook::Output::Tiny;
 
 my $cwd = getcwd();
-like $cwd, qr/dist-mgr(-\d+\.\d+)?$/i, "in root dir ok";
-die "not in the root dir" if $cwd !~ /dist-mgr(-\d+\.\d+)?$/i;
+like $cwd, qr/dist-mgr(-\d+\.\d+)?(-\d+)?$/i, "in root dir ok";
+die "not in the root dir" if $cwd !~ /dist-mgr(-\d+\.\d+)?(-\d+)?$/i;
 
 my $module_starter_changes_sha = '97624d56464d7254ef5577e4a0c8a098d6c6d9e6';
 
 my $work = 't/data/work';
 my $orig_changes = 't/data/orig/Changes';
-my $tpl = "t/data/module_template/Changes"; # Custom one created by this dist
+my $tpl = "t/data/template/module_template/Changes"; # Custom one created by this dist
 
 unlink_changes();
 

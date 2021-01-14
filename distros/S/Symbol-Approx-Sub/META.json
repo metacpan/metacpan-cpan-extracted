@@ -5,7 +5,7 @@
       "With lots of help from Leon Brocard <leon@astray.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -47,31 +47,34 @@
    "provides" : {
       "Symbol::Approx::Sub" : {
          "file" : "lib/Symbol/Approx/Sub.pm",
-         "version" : "v3.1.2"
+         "version" : "v3.1.3"
       },
       "Symbol::Approx::Sub::Random" : {
          "file" : "lib/Symbol/Approx/Sub/Random.pm",
-         "version" : "v3.1.2"
+         "version" : "v3.1.3"
       },
       "Symbol::Approx::Sub::String::Approx" : {
          "file" : "lib/Symbol/Approx/Sub/String/Approx.pm",
-         "version" : "v3.1.2"
+         "version" : "v3.1.3"
       },
       "Symbol::Approx::Sub::String::Equal" : {
          "file" : "lib/Symbol/Approx/Sub/String/Equal.pm",
-         "version" : "v3.1.2"
+         "version" : "v3.1.3"
       },
       "Symbol::Approx::Sub::Text::Metaphone" : {
          "file" : "lib/Symbol/Approx/Sub/Text/Metaphone.pm",
-         "version" : "v3.1.2"
+         "version" : "v3.1.3"
       },
       "Symbol::Approx::Sub::Text::Soundex" : {
          "file" : "lib/Symbol/Approx/Sub/Text/Soundex.pm",
-         "version" : "v3.1.2"
+         "version" : "v3.1.3"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/symbol-approx-sub/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -81,6 +84,6 @@
          "web" : "https://github.com/davorg/symbol-approx-sub"
       }
    },
-   "version" : "v3.1.2",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v3.1.3",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

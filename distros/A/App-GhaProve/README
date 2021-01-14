@@ -1,5 +1,5 @@
 NAME
-    App::GhaProve - provides gha-prove app
+    App::GhaProve - guts for the gha-prove command
 
 SYNOPSIS
     From command-line:
@@ -46,13 +46,13 @@ ENVIRONMENT
 
 BUGS
     Please report any bugs to
-    <http://rt.cpan.org/Dist/Display.html?Queue=App-GhaProve>.
+    <https://github.com/tobyink/p5-app-ghaprove/issues>.
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2020 by Toby Inkster.
+    This software is copyright (c) 2020-2021 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

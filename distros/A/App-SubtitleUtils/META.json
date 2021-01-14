@@ -24,13 +24,20 @@
             "Pod::Coverage::TrustPod" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Rinci" : "0.151"
+         },
+         "x_spec" : {
+            "Rinci" : "v1.1.94"
          }
       },
       "runtime" : {
          "requires" : {
+            "File::Slurper::Dash" : "0",
             "Log::ger" : "0.037",
             "Log::ger::Screen" : "0",
+            "POSIX" : "0",
+            "Perinci::CmdLine::Any" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -57,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-App-SubtitleUtils"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -512,6 +519,17 @@
                }
             },
             "name" : "Prereqs",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "x_spec"
+               }
+            },
+            "name" : "DevelopX_spec",
             "version" : "6.012"
          },
          {

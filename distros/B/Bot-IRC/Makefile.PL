@@ -13,11 +13,10 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Bot-IRC",
-  "LICENSE" => "perl",
+  "LICENSE" => "artistic_2",
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Bot::IRC",
   "PREREQ_PM" => {
-    "Carp" => 0,
     "DBD::SQLite" => 0,
     "DBI" => 0,
     "Daemon::Device" => 0,
@@ -34,8 +33,9 @@ my %WriteMakefileArgs = (
     "Math::Expression" => 0,
     "Math::Units" => 0,
     "Time::Crontab" => 0,
-    "Try::Tiny" => 0,
     "YAML::XS" => 0,
+    "exact" => "1.14",
+    "exact::class" => "1.10",
     "strict" => 0,
     "warnings" => 0
   },
@@ -43,14 +43,14 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test2::Mock" => 0,
+    "Test2::V0" => 0,
     "Test::Lib" => 0,
-    "Test::MockModule" => 0,
     "Test::More" => 0,
-    "Test::Most" => 0,
     "Test::Output" => 0,
-    "constant" => 0
+    "exact::class" => "1.10"
   },
-  "VERSION" => "1.27",
+  "VERSION" => "1.32",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,7 +58,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
   "DBD::SQLite" => 0,
   "DBI" => 0,
   "Daemon::Device" => 0,
@@ -77,15 +76,15 @@ my %FallbackPrereqs = (
   "JSON::XS" => 0,
   "Math::Expression" => 0,
   "Math::Units" => 0,
+  "Test2::Mock" => 0,
+  "Test2::V0" => 0,
   "Test::Lib" => 0,
-  "Test::MockModule" => 0,
   "Test::More" => 0,
-  "Test::Most" => 0,
   "Test::Output" => 0,
   "Time::Crontab" => 0,
-  "Try::Tiny" => 0,
   "YAML::XS" => 0,
-  "constant" => 0,
+  "exact" => "1.14",
+  "exact::class" => "1.10",
   "strict" => 0,
   "warnings" => 0
 );

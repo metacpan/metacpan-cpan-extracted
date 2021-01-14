@@ -76,7 +76,7 @@ $gtkhtml2->save_config ('build/IFiles.pm');
 WriteMakefile(
     NAME            => 'Gtk2::Html2',
     VERSION_FROM    => 'Html2.pm', # finds $VERSION
-    ABSTRACT        => 'DEPRECATED Perl bindings for the GtkHtml2 Html display widget',
+    ABSTRACT        => '(DEPRECATED) Perl bindings for the GtkHtml2 Html display widget',
     PREREQ_PM       => { \%pre_reqs },
     XSPROTOARG      => '-noprototypes',
     META_MERGE    => {

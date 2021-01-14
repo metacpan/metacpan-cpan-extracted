@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 43;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More tests => 43;
 use Data::FormValidator;
 BEGIN {
     use_ok( 'Data::FormValidator::Constraints::CreditCard', qw(:all) );

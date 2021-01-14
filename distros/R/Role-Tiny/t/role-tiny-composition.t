@@ -29,7 +29,7 @@ use Test::More;
 
 eval { Role::Tiny->apply_roles_to_object(X->new, "R1", "R2") };
 like $@,
-  qr/^Method name conflict for 'foo' between roles 'R1' and 'R2', cannot apply these simultaneously to an object/,
+  qr/^Due to a method name conflict between roles 'R1' and 'R2', the method 'foo' must be implemented by 'X'/,
   'apply conflicting roles to object';
 
 eval { Role::Tiny->apply_roles_to_object(X->new); 1 }

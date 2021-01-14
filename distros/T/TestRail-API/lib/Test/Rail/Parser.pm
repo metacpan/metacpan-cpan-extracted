@@ -2,7 +2,7 @@
 # PODNAME: Test::Rail::Parser
 
 package Test::Rail::Parser;
-$Test::Rail::Parser::VERSION = '0.047';
+$Test::Rail::Parser::VERSION = '0.048';
 use strict;
 use warnings;
 use utf8;
@@ -64,10 +64,17 @@ sub new {
 
     #Allow natural confessing from constructor
     #Force-on POST redirects for maximum compatibility
-    my $tr =
-      TestRail::API->new( $tropts->{'apiurl'}, $tropts->{'user'},
-        $tropts->{'pass'}, $tropts->{'encoding'}, $tropts->{'debug'}, 1,
-        $tropts->{max_tries} );
+    #Also ensure all opts that need string type have it when undef
+    my $tr = TestRail::API->new(
+        $tropts->{'apiurl'}   // '',
+        $tropts->{'user'}     // '',
+        $tropts->{'pass'}     // '',
+        $tropts->{'encoding'} // '',
+        $tropts->{'debug'},
+        1,
+        $tropts->{max_tries},
+        { 'skip_userdata_cache' => 1 },
+    );
     $tropts->{'testrail'} = $tr;
     $tr->{'browser'}      = $tropts->{'browser'}
       if defined( $tropts->{'browser'} );    #allow mocks
@@ -91,6 +98,9 @@ sub new {
           if !$tropts->{'project'};
     }
     $tropts->{'project_id'} = $tropts->{'project'}->{'id'};
+
+    # Ok, let's cache the users since we have the project ID now
+    $tr->getUsers( $tropts->{'project_id'} );
 
     #Discover possible test statuses
     $tropts->{'statuses'} = $tr->getPossibleTestStatuses();
@@ -751,7 +761,7 @@ Test::Rail::Parser - Upload your TAP results to TestRail
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 DESCRIPTION
 
@@ -916,7 +926,7 @@ and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by George S. Baugh.
+This software is copyright (c) 2021 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

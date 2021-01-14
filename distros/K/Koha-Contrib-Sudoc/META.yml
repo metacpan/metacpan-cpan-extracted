@@ -54,7 +54,7 @@ requires:
   utf8: '0'
 resources:
   bugtracker: https://github.com/fredericd/koha-sudoc/issues
-  homepage: http://www.tamil.fr/sudoc/sudoc.html
+  homepage: https://www.tamil.fr/sudoc/sudoc.html
   repository: https://github.com/fredericd/koha-sudoc
-version: '2.33'
+version: '2.34'
 x_serialization_backend: 'YAML::Tiny version 1.70'

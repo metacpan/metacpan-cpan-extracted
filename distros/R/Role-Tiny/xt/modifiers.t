@@ -73,7 +73,7 @@ eval {
   Role::Tiny->create_class_with_roles('MyClass', 'BrokenRole');
   1;
 } or $@ ||= 'false exception!';
-like $@, qr/Evaling failed:/,
+like $@, qr/broken modifier/,
   'exception caught creating class with broken modifier in a role';
 
 done_testing;

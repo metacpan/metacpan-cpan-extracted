@@ -2,15 +2,19 @@
 
 =encoding utf8
 
-=for HTML <a href="https://travis-ci.org/briandfoy/Tie-StringArray"><img src="https://travis-ci.org/briandfoy/Tie-StringArray.svg?branch=master" /></a>
+=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
 
-=for HTML <a href='https://ci.appveyor.com/project/briandfoy/Tie-StringArray'><img src='https://ci.appveyor.com/api/projects/status/o7mrji15lmqc75ky' /></a>
+=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
 
-=for HTML <a href='https://coveralls.io/github/briandfoy/Tie-StringArray?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/Tie-StringArray/badge.svg?branch=master' alt='Coverage Status' /></a>
+=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
+
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/tie-stringarray'><img src='https://ci.appveyor.com/api/projects/status/o7mrji15lmqc75ky' /></a>
+
+=for HTML <a href='https://coveralls.io/github/briandfoy/tie-stringarray?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/tie-stringarray/badge.svg?branch=master' alt='Coverage Status' /></a>
 
 =for HTML <a href="https://github.com/briandfoy/Tie-StringArray/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Tie-StringArray.svg" /></a>
 
-=for HTML <a href="http://www.metacpan.org/module/Tie::StringArray"><img src="https://img.shields.io/cpan/v/Tie-StringArray.svg" /></A>
+=for HTML <a href="https://metacpan.org/pod/Tie::StringArray"><img src="https://img.shields.io/cpan/v/Tie-StringArray.svg" /></A>
 
 =head1 The Tie::StringArray module
 
@@ -23,7 +27,7 @@ for any Perl module.
 
 To read about L<Tie::StringArray>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|http://perldoc.perl.org/perldoc.html>:
+with L<perldoc|https://perldoc.perl.orgperldoc.html>:
 
 	% perldoc lib/Tie/StringArray.pm
 
@@ -32,17 +36,8 @@ name instead of the file location:
 
 	% perldoc Tie::StringArray
 
-You can read the documentation and inspect the meta data on one of the
-CPAN web interfaces, such as L<CPAN Search|http://search.cpan.org/dist/Tie-StringArray> or
-L<MetaCPAN|http://www.metacpan.org/module/Tie::StringArray>:
-
-=over 4
-
-=item *	L<http://search.cpan.org/dist/Tie-StringArray>
-
-=item *	L<http://www.metacpan.org/module/Tie::StringArray>
-
-=back
+You can read the documentation and inspect the meta data at
+L<MetaCPAN|https://metacpan.org/pod/Tie::StringArray>.
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's
@@ -107,7 +102,7 @@ They might not know the particulars of this module, but they can help
 you diagnose your problem.
 
 You might like to read L<brian's Guide to Solving Any Perl
-Problem|http://archive.oreilly.com/pub/a/perl/excerpts/9780596527242/brians-guide.html>.
+Problem|https://briandfoy.github.io/brians-guide-to-solving-any-perl-problem/>.
 
 =head2 Copyright and License
 

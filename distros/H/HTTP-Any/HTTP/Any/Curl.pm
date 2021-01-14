@@ -143,9 +143,13 @@ sub do_http {
 	if ($multi_ev) {
 		$multi_ev->($easy, $finish, 4 * 60);
 	} else {
-		eval {$easy->perform()};
+		eval { $easy->perform() };
 		if ($@) {
-			$finish->($easy, $@);
+			if (ref $@ eq "Net::Curl::Easy::Code" ) {
+				$finish->($easy, $@);
+			} else {
+				die $@;
+			}
 		} else {
 			$finish->($easy, CURLE_OK);
 		}
@@ -175,7 +179,6 @@ sub _parse_headers {
 		$h = "HTTP/0.9 200 Assumed OK\r\n";
 	}
 
-	$h =~ s/(?<!\r\n)\r\nHTTP/\r\n\r\nHTTP/g; # fix bad server headers
 	$h =~ s/(,\r*\n)\s+/, /g; # fix for old standard, multyline header
 
 	my ($status_line, @h) = split /\r?\n/, $h;

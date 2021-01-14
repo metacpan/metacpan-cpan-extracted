@@ -74,18 +74,22 @@ const my $FAMILY     => qr{ # underscore allowed
 }xms;
 
 const my $TAG        => qr{
-    [a-z]{1,4}              # 1-4 letter(s) (lowercase)
+    [a-z]{1,6}              # 1-6 letter(s) (lowercase)
 }xms;
+
+# TODO: add accessor methods to analyse this
+# this is feasible with a switch table with regexes to generate methods
+# return 0/1/undef
 
 # list of standard tags:
 #     c: contaminant
 #     d: divergent
 #     u: unknown taxonomy
-#     cp: encoded in plastid genome
-#     mt: encoded in mitochondrial genome
-#     nm: encoded in nucleomorph genome
-#     nucp: nuclear copy of plastid gene
-#     numt: nuclear copy of mitochondrial gene
+#     cpcpt [cp]: plastid-encoded-plastid-targeted
+#     nucpt: nuclear-encoded-and-plastid-targeted
+#     nuppct: nuclear-encoded-periplastid-compartment-targeted
+#     nm: nucleomorph-encoded
+#     mt: mitochondrion-encoded
 
 const my $GENUS      => qr{ # underscore and dash allowed
     [^\s@]+?                # single word without space, '@'
@@ -132,7 +136,7 @@ const my $GENUSONLY  => qr{
     \A                      # nothing before!
     (?:
     sspp | ssp | spp | sp   # either species (sp), species pluralis (spp),
-    )                       # subspecies (ssp) or subspecies pluralis (sspp)pa
+    )                       # subspecies (ssp) or subspecies pluralis (sspp)
     \.?                     # optionally followed by a dot
     \z                      # and nothing after!
 }xms;

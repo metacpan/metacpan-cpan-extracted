@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using the pkg-config command line interface
-our $VERSION = '2.37'; # VERSION
+our $VERSION = '2.38'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -165,8 +165,12 @@ sub init
   if($meta->prop->{platform}->{system_type} eq 'windows-mingw')
   {
     @gather = map {
-      my($pkgconf, @rest) = @$_;
-      [$pkgconf, '--dont-define-prefix', @rest],
+      if(ref $_ eq 'ARRAY') {
+        my($pkgconf, @rest) = @$_;
+        [$pkgconf, '--dont-define-prefix', @rest],
+      } else {
+        $_
+      }
     } @gather;
   }
 
@@ -199,7 +203,7 @@ Alien::Build::Plugin::PkgConfig::CommandLine - Probe system and determine librar
 
 =head1 VERSION
 
-version 2.37
+version 2.38
 
 =head1 SYNOPSIS
 

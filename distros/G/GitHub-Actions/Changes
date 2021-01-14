@@ -1,0 +1,9 @@
+2021-01-14  jmerelo  <jmerelo@princess-carolyn>
+
+	* lib/GitHub/Actions.pm: Fixes warning with empty output value.
+
+Revision history for GitHub-Actions
+
+0.0.1  Thu Jan 14 07:52:39 2021
+       Initial release.
+

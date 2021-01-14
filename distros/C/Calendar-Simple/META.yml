@@ -16,7 +16,7 @@ name: Calendar-Simple
 provides:
   Calendar::Simple:
     file: lib/Calendar/Simple.pm
-    version: v2.0.0
+    version: v2.0.1
 recommends:
   DateTime: '0'
 requires:
@@ -26,6 +26,5 @@ requires:
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/davorg/calendar-simple
-version: v2.0.0
+version: v2.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

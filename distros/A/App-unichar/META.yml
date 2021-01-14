@@ -3,7 +3,7 @@ abstract: 'get info about a character'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-  Test::More: '0.95'
+  Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
@@ -19,10 +19,11 @@ no_index:
     - t
     - inc
 requires:
+  I18N::Langinfo: '0'
   perl: '5.026'
 resources:
   bugtracker: https://github.com/briandfoy/unichar/issues
   homepage: https://github.com/briandfoy/unichar
   repository: https://github.com/briandfoy/unichar.git
-version: '0.012'
+version: '0.013'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

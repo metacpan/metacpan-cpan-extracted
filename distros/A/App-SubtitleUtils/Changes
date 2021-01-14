@@ -1,3 +1,13 @@
+0.003   2020-12-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Add script: srtsplit.
+
+        [cli vtt2srt]
+
+	- [doc] Mention youtube-dl's ability to download/convert subtitles
+	  from .vtt to .srt.
+
+
 0.002   2020-12-11  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::MUST::Core
-$Bio::MUST::Core::Types::VERSION = '0.203490';
+$Bio::MUST::Core::Types::VERSION = '0.210120';
 use Moose::Util::TypeConstraints;
 
 use autodie;
@@ -222,7 +222,7 @@ Bio::MUST::Core::Types - Distribution-wide Moose types for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.203490
+version 0.210120
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Stabilizer;
-$Lab::Moose::Stabilizer::VERSION = '3.731';
+$Lab::Moose::Stabilizer::VERSION = '3.740';
 #ABSTRACT: Sensor stabilizer subroutine
 
 use v5.20;
@@ -140,7 +140,7 @@ Lab::Moose::Stabilizer - Sensor stabilizer subroutine
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 DESCRIPTION
 
@@ -169,7 +169,7 @@ All times are given in seconds. Print status messages if C<verbose> is true.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt

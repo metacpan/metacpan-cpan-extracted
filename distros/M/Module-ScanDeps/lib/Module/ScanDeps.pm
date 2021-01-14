@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use vars qw( $VERSION @EXPORT @EXPORT_OK @ISA $CurrentPackage @IncludeLibs $ScanFileRE );
 
-$VERSION   = '1.29';
+$VERSION   = '1.30';
 @EXPORT    = qw( scan_deps scan_deps_runtime );
 @EXPORT_OK = qw( scan_line scan_chunk add_deps scan_deps_runtime path_to_inc_name );
 
@@ -18,13 +18,18 @@ use constant is_insensitive_fs => (
 );
 
 use version;
-use Cwd ();
 use File::Path ();
 use File::Temp ();
-use File::Spec ();
-use File::Basename ();
 use FileHandle;
 use Module::Metadata;
+
+# NOTE: Keep the following imports exactly as specified, even if the Module::ScanDeps source
+# doesn't reference some of them. See '"use lib" idioms' for the reason.
+use Cwd (qw(abs_path));
+use File::Spec;
+use File::Spec::Functions;
+use File::Basename;
+
 
 $ScanFileRE = qr/(?:^|\\|\/)(?:[^.]*|.*\.(?i:p[ml]|t|al))$/;
 
@@ -617,19 +622,33 @@ sub scan_deps {
     }
 
     {
-        # We want to correctly interprete statements like
+        ## "use lib" idioms
+        #
+        # We want to correctly interprete stuff like
         #
         #   use FindBin;
         #   use lib "$FindBin/../lib";
         #
         # Find out what $FindBin::Bin etc would have been if "use FindBin" had been
         # called in the first file to analyze.
+        #
+        # Notes:
         # (1) We don't want to reimplement FindBin, hence fake $0 locally (as the path of the
         #     first file analyzed) and call FindBin::again().
         # (2) If the caller of scan_deps() itself uses FindBin, we don't want to overwrite
         #     the value of "their" $FindBin::Bin.
+        #
+        # Other idioms seen sometimes:
+        #
+        # use lib "$ENV{FOO}/path";
+        # use lib File::Spec->catdir($FindBin::Bin, qw[.. qqlib] );
+        # use lib catdir(dirname($0), "perl");
+        # use lib dirname(abs_path($0));
+        #
+        # In order to correctly interprete these, the modules referenced have to be imported.
 
-        use FindBin;
+
+        require FindBin;
 
         local $FindBin::Bin;
         local $FindBin::RealBin;
@@ -1420,7 +1439,7 @@ BEGIN { my $_0 = $ENV{MSD_ORIGINAL_FILE}; *0 = \$_0; }
 
     my @dlls = grep { defined $_ && -e $_ } Module::ScanDeps::DataFeed::_dl_shared_objects();
     my @shared_objects = @dlls;
-    push @shared_objects, grep { s/\.\Q$dlext\E$/.bs/ && -e $_ } @dlls;
+    push @shared_objects, grep { -e $_ } map { (my $bs = $_) =~ s/\.\Q$dlext\E$/.bs/; $bs } @dlls;
 
     # write data file
     my $data_file = $ENV{MSD_DATA_FILE};
@@ -1499,7 +1518,8 @@ sub _info2rv {
     my $rv = {};
 
     my $incs = join('|', sort { length($b) <=> length($a) }
-                              map { s:\\:/:g; quotemeta($_) } @{ $info->{'@INC'} });
+                              map { s:\\:/:g; s:^(/.*?)/+$:$1:; quotemeta($_) }
+                                  @{ $info->{'@INC'} });
     my $i = is_insensitive_fs() ? "i" : "";
     my $strip_inc_prefix = qr{^(?$i:$incs)/};
 
@@ -1551,8 +1571,8 @@ sub _merge_rv {
         my %mark;
         if ($rv->{$key} and _not_dup($key, $rv, $rv_sub)) {
             warn "Different modules for file '$key' were found.\n"
-                . " -> Using '" . _abs_path($rv_sub->{$key}{file}) . "'.\n"
-                . " -> Ignoring '" . _abs_path($rv->{$key}{file}) . "'.\n";
+                . " -> Using '" . abs_path($rv_sub->{$key}{file}) . "'.\n"
+                . " -> Ignoring '" . abs_path($rv->{$key}{file}) . "'.\n";
             $rv->{$key}{used_by} = [
                 grep (!$mark{$_}++,
                     @{ $rv->{$key}{used_by} },
@@ -1585,21 +1605,12 @@ sub _merge_rv {
 sub _not_dup {
     my ($key, $rv1, $rv2) = @_;
     if (File::Spec->case_tolerant()) {
-        return lc(_abs_path($rv1->{$key}{file})) ne lc(_abs_path($rv2->{$key}{file}));
+        return lc(abs_path($rv1->{$key}{file})) ne lc(abs_path($rv2->{$key}{file}));
     }
     else {
-        return _abs_path($rv1->{$key}{file}) ne _abs_path($rv2->{$key}{file});
+        return abs_path($rv1->{$key}{file}) ne abs_path($rv2->{$key}{file});
     }
 }
-
-sub _abs_path {
-    return join(
-        '/',
-        Cwd::abs_path(File::Basename::dirname($_[0])),
-        File::Basename::basename($_[0]),
-    );
-}
-
 
 sub _warn_of_runtime_loader {
     my $module = shift;

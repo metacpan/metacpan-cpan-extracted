@@ -22,7 +22,7 @@ use Term::ANSIColor;
 use Getopt::Std;
 use File::Basename;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 my $me       = basename $0;
 
 # Where qmail stores all of its files
@@ -271,7 +271,7 @@ sub _get_subdir {
         grep { !/\./ }
         map  { "$dir/$_" } readdir $subdir
       ) {
-        my ( $dirno, $msgno ) = split( /\//, $file );
+        my $msgno = ( split( /\//, $file ) )[1];
         if ( $bouncehash->{$msgno} ) {
             $msglist->{$file}{bounce} = 'B';
         }
@@ -803,7 +803,7 @@ sub trash_msgs {
     foreach my $msg ( $self->all_to_delete ) {
         $grouped++;
         $deleted++;
-        my ( $dirno, $msgno ) = split( /\//, $msg );
+        my $msgno = ( split( /\//, $msg ) )[1];
         if ( $msglist->{$msg}{bounce} ) {
             push @todelete, "${queue}bounce/$msgno";
         }
@@ -916,7 +916,6 @@ sub del_msg_from_sender {
             my $msg_sender = $self->get_sender($msg);
             if ( $msg_sender eq $sender ) {
                 $ok = 1;
-                my ( $dirno, $msgno ) = split( /\//, $msg );
                 $self->add_to_delete($msg);
             }
         }
@@ -953,7 +952,6 @@ sub del_msg_from_sender_r {
             my $msg_sender = $self->get_sender($msg);
             if ( $msg_sender =~ /$sender_re/ ) {
                 $ok = 1;
-                my ( $dirno, $msgno ) = split( /\//, $msg );
                 $self->add_to_delete($msg);
             }
         }
@@ -995,7 +993,6 @@ sub del_msg_header_r {
             last if ! /\S/; # End of headers
             if (/$header_re/) {
                 $ok = 1;
-                my ( $dirno, $msgno ) = split( /\//, $msg );
                 $self->add_to_delete($msg);
                 last;
             }
@@ -1044,7 +1041,6 @@ sub del_msg_body_r {
         while (<$msg_fh>) {
             if (/$body_re/) {
                 $ok = 1;
-                my ( $dirno, $msgno ) = split( /\//, $msg );
                 $self->add_to_delete($msg);
                 last;
             }
@@ -1078,7 +1074,6 @@ sub del_msg_subj {
     # Search messages
     my $ok = 0;
     for my $msg ( keys %{ $self->msglist } ) {
-        my ( $dirno, $msgno ) = split( /\//, $msg );
         my $msgsub = $self->get_subject($msg);
 
         if ( $msgsub and $msgsub =~ /$subject/ ) {
@@ -1111,7 +1106,6 @@ sub del_all {
     my $ok = 0;
     for my $msg ( keys %{ $self->msglist } ) {
         $ok = 1;
-        my ( $dirno, $msgno ) = split( /\//, $msg );
         $self->add_to_delete($msg);
     }
 
@@ -1286,7 +1280,7 @@ sub version {
 
 Copyright (c) 2016 Dave Cross E<lt>dave@perlhacks.comE<gt>
 
-Based on original version by Michele Beltrame E<lt>mb@italpro.netE</gt>
+Based on original version by Michele Beltrame E<lt>mb@italpro.netE<gt>
 
 =head2 LICENCE
 

@@ -17,10 +17,19 @@ WriteMakefile(
 	},
 
 	PREREQ_PM => {
-		'Kelp' => '>= 1',
-		'Kelp::Module::Symbiosis' => '>= 1',
-		'Plack::App::WebSocket' => '>= 0.08',
+		'Kelp' => '1',
+		'Kelp::Module::Symbiosis' => '1',
+		'Plack::App::WebSocket' => '0.08',
 		'Try::Tiny' => 0,
+	},
+
+	META_MERGE => {
+		resources => {
+			license => 'https://dev.perl.org/licenses',
+			homepage => 'https://brtastic.xyz/project/kelp',
+			bugtracker => 'https://github.com/brtastic/perl-kelp-module-websocket-anyevent/issues',
+			repository => 'https://github.com/brtastic/perl-kelp-module-websocket-anyevent',
+		},
 	},
 
 	ABSTRACT_FROM => 'lib/Kelp/Module/WebSocket/AnyEvent.pm',

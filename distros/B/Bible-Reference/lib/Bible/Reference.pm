@@ -6,7 +6,7 @@ use 5.020;
 use exact;
 use exact::class;
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 has acronyms             => 0;
 has sorting              => 1;
@@ -1576,10 +1576,10 @@ Bible::Reference - Simple Bible reference parser, tester, and canonicalizer
 
 =head1 VERSION
 
-version 1.05
+version 1.07
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bible-Reference.svg)](https://travis-ci.org/gryphonshafer/Bible-Reference)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bible-Reference/badge.png)](https://coveralls.io/r/gryphonshafer/Bible-Reference)
+=for markdown [![test](https://github.com/gryphonshafer/Bible-Reference/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-Reference/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Bible-Reference/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-Reference)
 
 =head1 SYNOPSIS
 
@@ -1904,11 +1904,11 @@ L<MetaCPAN|https://metacpan.org/pod/Bible::Reference>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Bible-Reference>
+L<GitHub Actions|https://github.com/gryphonshafer/Bible-Reference/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Bible-Reference>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Bible-Reference>
 
 =item *
 
@@ -1926,9 +1926,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2017-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

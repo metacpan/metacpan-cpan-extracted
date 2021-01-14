@@ -66,8 +66,8 @@ is(Archive::BagIt::Role::Portability::chomp_portable("foo\r"), "foo", "chomp_por
 is(Archive::BagIt::Role::Portability::chomp_portable("foo\r\n"), "foo", "chomp_portable(), \\r\\n");
 
 
-use_ok('Archive::BagIt::Base');
-my $obj = new_ok('Archive::BagIt::Base');
+use_ok('Archive::BagIt');
+my $obj = new_ok('Archive::BagIt');
 is($obj->__file_find(qw(../bagit_conformance_suite/v0.97/valid/bag-in-a-bag)), 13, '__file_find');
 is($obj->__file_find(qw(../bagit_conformance_suite/v0.97/valid/bag-in-a-bag/data)), 9, '__file_find');
 is($obj->__file_find(qw(../bagit_conformance_suite/v0.97/valid/bag-in-a-bag), qw(../bagit_conformance_suite/v0.97/valid/bag-in-a-bag/data)), 4, '__file_find');

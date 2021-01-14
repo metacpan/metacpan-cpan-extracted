@@ -1,6 +1,6 @@
 package Mail::BIMI::Indicator;
 # ABSTRACT: Class to model a BIMI indicator
-our $VERSION = '2.20201117.2'; # VERSION
+our $VERSION = '3.20210113'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -128,13 +128,17 @@ sub _build_data($self) {
 
 sub _build_is_valid($self) {
 
-  if (!($self->data||$self->uri)) {
+  if (!(defined $self->data||$self->uri)) {
     $self->add_error('CODE_NOTHING_TO_VALIDATE');
     return 0;
   }
 
-  if (!$self->data) {
+  if (!defined $self->data) {
     $self->add_error('CODE_NO_DATA');
+    return 0;
+  }
+
+  if (!$self->data && $self->errors->@*) {
     return 0;
   }
 
@@ -211,7 +215,7 @@ Mail::BIMI::Indicator - Class to model a BIMI indicator
 
 =head1 VERSION
 
-version 2.20201117.2
+version 3.20210113
 
 =head1 DESCRIPTION
 

@@ -6,18 +6,9 @@ Source: https://metacpan.org/release/App-GhaProve
 Files: Changes
  META.json
  META.yml
- Makefile.PL
  bin/gha-prove
- dist.ini
  doap.ttl
-Copyright: Copyright 2020 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: README
- lib/App/GhaProve.pm
- t/01basic.t
- t/02worksokay.t
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
+Copyright: Copyright 2021 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -26,20 +17,35 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: Makefile.PL
+ dist.ini
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/App/GhaProve.pm
+Copyright: This software is copyright (c) 2020-2021 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: INSTALL
  LICENSE
 Copyright: Unknown
 License: Unknown
 
+Files: t/01basic.t
+ t/02worksokay.t
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2021 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2021 by the copyright holder(s).
  
  This is free software, licensed under:
  

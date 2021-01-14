@@ -23,6 +23,8 @@
          "requires" : {
             "Data::Object::Class" : "2.02",
             "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Role" : "2.01",
+            "Data::Object::RoleHas" : "2.01",
             "Data::Object::Space" : "2.10",
             "Data::Object::Types" : "0.04",
             "Zing" : "0.26",
@@ -36,6 +38,8 @@
          "requires" : {
             "Data::Object::Class" : "2.02",
             "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Role" : "2.01",
+            "Data::Object::RoleHas" : "2.01",
             "Data::Object::Space" : "2.10",
             "Data::Object::Types" : "0.04",
             "Test::Auto" : "0.12",
@@ -55,7 +59,7 @@
          "web" : "https://github.com/iamalnewkirk/Nano"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:AWNCORP",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",

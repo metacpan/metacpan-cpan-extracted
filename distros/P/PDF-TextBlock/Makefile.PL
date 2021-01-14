@@ -28,6 +28,9 @@ my %WriteMakefileArgs = (
                  url  => 'git@github.com:jhannah/pdf-textblock.git',
                  web  => 'https://github.com/jhannah/pdf-textblock.git',
              },
+             bugtracker  => {
+                 web  => 'https://github.com/jhannah/pdf-textblock/issues',
+             },
          },
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

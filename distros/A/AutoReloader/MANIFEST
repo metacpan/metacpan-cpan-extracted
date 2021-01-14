@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_basic.t
+t/01_autoload.t
+t/02_autoloader.t
+t/03_subclass.t
+lib/AutoReloader.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

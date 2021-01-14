@@ -1,9 +1,9 @@
-# Store::Directories
+# 🗃 Store::Directories 🗃
 
 Manage a key/value store of directories with controls for
 concurrent access and locking.
 
-**Version:** 0.1
+**Version:** 0.2
 
 # SYNOPSIS
 

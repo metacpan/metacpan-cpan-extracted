@@ -1,0 +1,25 @@
+Revision history for Net-OBS-Client
+
+0.0.4 2020-12-07
+
+  * improved POD documentation
+  * fixed default apiurl
+
+0.0.3 2019-10-02
+
+  * changed default OBS apiurl to public route
+  * added debugging output
+  * improved %description in spec file
+  * added manual Provides for fedora
+  * [dist] disable debug_package for fedora
+
+0.0.2   2018-02-15
+
+  * fix for changed oscrc path
+  * make password for client optional
+  * first version of rpm specfile
+
+
+0.0.1    2016-03-06
+        First version, released on an unsuspecting world.
+

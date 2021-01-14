@@ -2,8 +2,8 @@ NAME
     App::SubtitleUtils - Utilities related to video subtitles
 
 VERSION
-    This document describes version 0.002 of App::SubtitleUtils (from Perl
-    distribution App-SubtitleUtils), released on 2020-12-11.
+    This document describes version 0.003 of App::SubtitleUtils (from Perl
+    distribution App-SubtitleUtils), released on 2020-12-12.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -17,6 +17,8 @@ DESCRIPTION
     *   srtscale
 
     *   srtshift
+
+    *   srtsplit
 
     *   vtt2srt
 

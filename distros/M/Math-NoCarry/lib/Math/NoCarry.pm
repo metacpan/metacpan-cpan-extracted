@@ -9,13 +9,13 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(add subtract multiply);
 our %EXPORT_TAGS =  ( all => [ @EXPORT_OK ] );
 
-our $VERSION = '1.112';
+our $VERSION = '1.113';
 
 =encoding utf8
 
 =head1 NAME
 
-Math::NoCarry - Perl extension for no- carry arithmetic
+Math::NoCarry - Perl extension for no-carry arithmetic
 
 =head1 SYNOPSIS
 
@@ -193,17 +193,23 @@ __END__
 
 =head1 BUGS
 
-* none reported yet :)
+=over 4
+
+=item * none reported yet :)
+
+=back
 
 =head1 TO DO
 
-* this could be a full object package with overloaded
-+, *, and - operators
+=over 4
 
-* it would be nice if I could give the functions more than
-two arguments.
+=item * this could be a full object package with overloaded +, *, and - operators
 
-* addition and subtraction don't do negative numbers.
+=item * it would be nice if I could give the functions more than two arguments.
+
+=item * addition and subtraction don't do negative numbers.
+
+=back
 
 =head1 SOURCE AVAILABILITY
 
@@ -217,7 +223,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

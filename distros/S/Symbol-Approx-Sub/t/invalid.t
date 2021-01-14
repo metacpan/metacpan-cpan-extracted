@@ -1,7 +1,15 @@
+use strict;
+use warnings;
+
 use Test::More;
 use Test::Exception;
 
 require Symbol::Approx::Sub;
+
+note('Invalid option');
+throws_ok {
+  Symbol::Approx::Sub->import(foo => 1);
+} qr/^Invalid parameter/, 'Got the right exception';
 
 note('Hashref transformer');
 throws_ok {

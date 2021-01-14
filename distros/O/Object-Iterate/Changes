@@ -1,5 +1,17 @@
 Revision history for Perl module Object::Iterate
 
+1.144 2021-01-13T09:21:42Z
+	* No code changes, but distro freshening, losing Travis CI
+	* Added GitHub Actions
+	* Fixed a problem with output files from the .PL
+	* This now tries to make the right module file for pre-v5.20
+	and post v5.20 to handle the new :prototype attribute. So, the
+	module changes itself for the version of Perl that installs
+	it. See also Preparing for Perl 7: https://leanpub.com/preparing_for_perl7
+
+1.143_01 2020-07-06T04:22:39Z
+	* Support old and new prototypes at the same time
+
 1.143 2020-06-21T16:11:50Z
 	* Promote to a user release
 

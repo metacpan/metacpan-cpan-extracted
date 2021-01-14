@@ -6,10 +6,15 @@ MANIFEST			This list of files
 README
 t/00-load.t
 t/10-demo.t
+t/11-demo.t
 t/20-demo.t
+t/21-demo.t
 t/30-demo.t
+t/31-demo.t
 t/40-demo.t
+t/41-demo.t
 t/50-demo.t
+t/51-demo.t
 t/camel.jpg
 t/pod-coverage.t
 t/pod.t

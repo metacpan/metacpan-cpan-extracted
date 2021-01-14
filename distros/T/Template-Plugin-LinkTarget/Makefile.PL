@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,20 +14,24 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Template-Plugin-LinkTarget",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Template::Plugin::LinkTarget",
   "PREREQ_PM" => {
     "HTML::Entities" => 0,
     "HTML::Parser" => 0,
-    "Template::Plugin::Filter" => 0,
+    "Template::Plugin::Filter" => "2.00",
     "namespace::clean" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "File::Temp" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "Test::DiagINC" => "0.002",
-    "Test::More" => 0
+    "Test::More" => "0.94"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,11 +41,14 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "File::Temp" => 0,
   "HTML::Entities" => 0,
   "HTML::Parser" => 0,
-  "Template::Plugin::Filter" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
+  "Template::Plugin::Filter" => "2.00",
   "Test::DiagINC" => "0.002",
-  "Test::More" => 0,
+  "Test::More" => "0.94",
   "namespace::clean" => 0
 );
 

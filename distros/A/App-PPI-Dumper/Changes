@@ -1,5 +1,8 @@
 Revision history for Perl module App::PPI::Dumper
 
+1.022 2021-01-14T08:24:38Z
+	* Freshen distro, remove Travis CI, add Github actions
+
 1.021 2018-04-28T15:05:43Z
 	* Clarify that it's the Artistic License 2.0
 

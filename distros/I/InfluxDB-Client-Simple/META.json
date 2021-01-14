@@ -4,13 +4,13 @@
       "Arnaud (Arhuman) ASSAD <aassad@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "InfluxDB-Client-Simple",
    "no_index" : {
@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0",
-            "Test::Warnings" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -40,9 +38,15 @@
             "URI" : "0",
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -17,7 +17,7 @@ use warnings;
 
 our ($VERSION, @ISA, $AUTOLOAD);
 
-$VERSION = '3.1.2';
+$VERSION = '3.1.3';
 
 use Carp;
 

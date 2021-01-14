@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Protection;
-$Lab::Moose::Instrument::SCPI::Sense::Protection::VERSION = '3.731';
+$Lab::Moose::Instrument::SCPI::Sense::Protection::VERSION = '3.740';
 #ABSTRACT: Role for the SCPI SENSe:$function:Protection subsystem
 
 use v5.20;
@@ -79,7 +79,7 @@ Lab::Moose::Instrument::SCPI::Sense::Protection - Role for the SCPI SENSe:$funct
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 METHODS
 
@@ -103,7 +103,7 @@ Get/Set measure and compliance range synchronization.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
             2020       Andreas K. Huettel

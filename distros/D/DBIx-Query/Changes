@@ -1,5 +1,8 @@
 Revision history for DBIx::Query
 
+1.12      2021-01-13 11:10:03-08:00 America/Los_Angeles
+        - Override some minimum version reqs in dist.ini
+
 1.11      2021-01-10 14:29:36-08:00 America/Los_Angeles
         - Migrate to Test2::V0
         - Improve .gitignore file

@@ -3,7 +3,7 @@ package Dist::Mgr::FileData;
 use warnings;
 use strict;
 
-our $VERSION = '1.01';
+our $VERSION = '1.05';
 
 use Exporter qw(import);
 our @ISA = qw(Exporter);
@@ -11,6 +11,8 @@ our @EXPORT_OK = qw(
     _changes_file
 
     _ci_github_file
+
+    _config_file
 
     _git_ignore_file
 
@@ -101,6 +103,13 @@ sub _ci_github_file {
         qq{          cpanm -n Devel::Cover::Report::Coveralls},
         qq{          cover -test -report Coveralls},
     );
+}
+
+sub _config_file {
+    return {
+        cpan_id     => '',
+        cpan_pw     => '',
+    };
 }
 
 sub _git_ignore_file {
@@ -355,6 +364,11 @@ internally.
         l => qq{ubuntu-latest},
         w => qq{windows-latest},
         m => qq{macos-latest},
+
+=head2 _config_file
+
+Returns a hash reference containing the data that makes up a default
+configuration file.
 
 =head2 _git_ignore_file()
 

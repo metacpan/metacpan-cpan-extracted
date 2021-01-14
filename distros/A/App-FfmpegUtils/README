@@ -2,7 +2,7 @@ NAME
     App::FfmpegUtils - Utilities related to ffmpeg
 
 VERSION
-    This document describes version 0.008 of App::FfmpegUtils (from Perl
+    This document describes version 0.009 of App::FfmpegUtils (from Perl
     distribution App-FfmpegUtils), released on 2020-12-12.
 
 FUNCTIONS

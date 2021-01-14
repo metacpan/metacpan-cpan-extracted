@@ -21,4 +21,5 @@ CVS/
 ^xt/author/optionals/
 \.svn/
 \.swp$
+^\.travis\.yml$
 ^TODO$

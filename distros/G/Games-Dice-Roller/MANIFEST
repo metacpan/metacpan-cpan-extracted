@@ -1,0 +1,25 @@
+Changes
+debug.log
+lib/Games/Dice/Roller.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.bak
+MANIFEST.SKIP
+pm_to_blib
+README
+t/00-load.t
+t/01-single-die.t
+t/02-identify-type.t
+t/03-roll-basic-check.t
+t/04-validate-expr.t
+t/05-some-roll.t
+t/06-keep-drop-rolls.t
+t/07-rand-custom-funcion.t
+t/08-result-summation.t
+t/09-dice-pool.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

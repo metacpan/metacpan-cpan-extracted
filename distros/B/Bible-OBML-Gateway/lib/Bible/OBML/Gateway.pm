@@ -1,7 +1,7 @@
 package Bible::OBML::Gateway;
 # ABSTRACT: Bible Gateway content conversion to Open Bible Markup Language (OBML)
 
-use 5.016;
+use 5.020;
 
 use exact;
 use exact::class;
@@ -11,9 +11,9 @@ use Mojo::File 'path';
 use Mojo::URL;
 use Mojo::UserAgent;
 use Bible::OBML 1.14;
-use Bible::Reference 1.04;
+use Bible::Reference 1.05;
 
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
 has ua  => sub { return Mojo::UserAgent->new };
 has url => sub { return Mojo::URL->new('https://www.biblegateway.com/passage/') };
@@ -220,10 +220,10 @@ Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Lan
 
 =head1 VERSION
 
-version 1.10
+version 1.12
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bible-OBML-Gateway.svg)](https://travis-ci.org/gryphonshafer/Bible-OBML-Gateway)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bible-OBML-Gateway/badge.png)](https://coveralls.io/r/gryphonshafer/Bible-OBML-Gateway)
+=for markdown [![test](https://github.com/gryphonshafer/Bible-OBML-Gateway/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML-Gateway/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway)
 
 =head1 SYNOPSIS
 
@@ -322,11 +322,11 @@ L<MetaCPAN|https://metacpan.org/pod/Bible::OBML::Gateway>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Bible-OBML-Gateway>
+L<GitHub Actions|https://github.com/gryphonshafer/Bible-OBML-Gateway/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Bible-OBML-Gateway>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway>
 
 =item *
 
@@ -344,9 +344,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2017-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

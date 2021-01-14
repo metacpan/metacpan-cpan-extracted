@@ -1,22 +1,31 @@
 use strict;
 use warnings;
-use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Template;
-use Test::More tests => 12;
-BEGIN { use_ok('Template::Plugin::TimeDate') };
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More;
+use Test::MockTime qw(set_fixed_time);  # NEEDS to be loaded before T:P:TimeDate
+
+use Template;
+use Template::Plugin::TimeDate;
+
+###############################################################################
+# Set a fixed time, so "time stands still" while running the test.
+#
+# That way, we don't ever accidentally fail tests due to race conditions
+# between calls to "time()" during individual tests.
+set_fixed_time(CORE::time());
 
 ###############################################################################
 # Make sure that TT works.
-check_tt: {
+subtest 'Check TT' => sub {
     my $tt = Template->new( TRIM=>1 );
     my $template = qq{hello world};
     my $output;
     $tt->process( \$template, undef, \$output );
     is( $output, $template, 'TT works' );
-}
+};
 
 ###############################################################################
 # Load TimeDate plugin.
-load_plugin: {
+subtest 'Load TimeDate plugin' => sub {
     my $tt = Template->new( TRIM=>1 );
     my $template = qq{
 [%- USE TimeDate -%]
@@ -25,11 +34,11 @@ hello world
     my $output;
     $tt->process( \$template, undef, \$output );
     is( $output, 'hello world', 'TT plugin loaded' );
-}
+};
 
 ###############################################################################
 # Get current time (as seconds since the epoch).
-get_now: {
+subtest 'Get current time' => sub {
     my $tt = Template->new( TRIM=>1 );
     my $epoch = time();
     my $template = qq{
@@ -39,13 +48,14 @@ get_now: {
     my $output;
     $tt->process( \$template, undef, \$output );
     is( $output, $epoch, 'get current time' );
-}
+};
 
 ###############################################################################
 # Query current time (as seconds since the epoch).
-query_time: {
+subtest 'Get current epoch time' => sub {
     my $tt = Template->new( TRIM=>1 );
     my $epoch = time();
+
     my $template = qq{
 [%- USE TimeDate -%]
 [%- TimeDate.epoch -%]
@@ -53,11 +63,11 @@ query_time: {
     my $output;
     $tt->process( \$template, undef, \$output );
     is( $output, $epoch, 'query time' );
-}
+};
 
 ###############################################################################
 # Parse a given date/time, with embedded time zone.
-parse_with_embedded_timezone: {
+subtest 'Parse date/time, with embedded timezone' => sub {
     my $tt = Template->new( TRIM=>1 );
     my $when   = '2007-09-02 12:34:56 EDT';
     my $expect = Date::Parse::str2time($when);
@@ -68,11 +78,11 @@ parse_with_embedded_timezone: {
     my $output;
     $tt->process( \$template, undef, \$output );
     is( $output, $expect, 'parse date/time with embedded time zone' );
-}
+};
 
 ###############################################################################
 # Format date/time, with explicit time zone.
-format_with_explicit_timezone: {
+subtest 'Format date/time, with explicit timezone' => sub {
     my $tt = Template->new( TRIM=>1 );
     my $when     = '2007-09-02 12:34:56 EDT';
     my $zone_out = 'GMT';
@@ -85,11 +95,11 @@ format_with_explicit_timezone: {
     my $output;
     $tt->process( \$template, undef, \$output );
     is( $output, $expect, 'format date/time with explicit time zone' );
-}
+};
 
 ###############################################################################
 # Parse/format with explicit time zones.
-parse_format_explicit_timezone: {
+subtest 'Parse/format date/time, with explicit timezone' => sub {
     my $tt = Template->new( TRIM=>1 );
     my $when     = '2007-09-02 12:34:56';
     my $zone_in  = 'CDT';
@@ -103,11 +113,11 @@ parse_format_explicit_timezone: {
     my $output;
     $tt->process( \$template, undef, \$output );
     is( $output, $expect, 'parse/format with explicit time zone' );
-}
+};
 
 ###############################################################################
 # Default name
-default_name: {
+subtest 'Default plugin name' => sub {
     my $tt = Template->new( TRIM=>1 );
     my $when   = '2007-09-02 12:34:56 EDT';
     my $expect = Date::Parse::str2time($when);
@@ -119,11 +129,11 @@ default_name: {
     my $output;
     $tt->process( \$template, undef, \$output );
     is( $output, $expect, 'default name for TimeDate object' );
-}
+};
 
 ###############################################################################
 # Parse on instantiation
-parse_on_instantiation: {
+subtest 'Parse date/time during instantiation' => sub {
     my $tt = Template->new( TRIM=>1 );
     my $when   = '2007-09-02 12:34:56 EDT';
     my $expect = Date::Parse::str2time($when);
@@ -134,11 +144,11 @@ parse_on_instantiation: {
     my $output;
     $tt->process( \$template, undef, \$output );
     is( $output, $expect, 'parse on instantiation' );
-}
+};
 
 ###############################################################################
 # Multiple TimeDate objects
-multiple_timedate_objects: {
+subtest 'Multiple TimeDate objects' => sub {
     my $tt = Template->new( TRIM=>1 );
     my $when_one = '2007-09-02 12:34:56 EDT';
     my $when_two = '2006-12-31 00:00:00 GMT';
@@ -155,11 +165,11 @@ multiple_timedate_objects: {
     my $output;
     $tt->process( \$template, undef, \$output );
     is( $output, $expect, 'multiple timedate objects' );
-}
+};
 
 ###############################################################################
 # Alternate method names
-alternate_method_names: {
+subtest 'Alternate method names' => sub {
     my $tt = Template->new( TRIM=>1 );
     my $when     = '2007-09-02 12:34:56 EDT';
     my $zone_out = 'GMT';
@@ -172,4 +182,7 @@ alternate_method_names: {
     my $output;
     $tt->process( \$template, undef, \$output );
     is( $output, $expect, 'alternate method names' );
-}
+};
+
+###############################################################################
+done_testing();

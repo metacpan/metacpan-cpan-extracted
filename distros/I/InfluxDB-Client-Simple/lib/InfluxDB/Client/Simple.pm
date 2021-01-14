@@ -16,11 +16,11 @@ InfluxDB::Client::Simple - The lightweight InfluxDB client
 
 =head1 VERSION
 
-Version 0.06
+Version 1.00
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '1.00';
 
 =head1 SYNOPSIS
 
@@ -49,6 +49,9 @@ InfluxDB::Client::Simple provides an easy way to interact with an InfluxDB serve
 
     # UDP allows only write()
     $result = $client->write("testing,host=containment,repo=cadi-libs,file=testfile statement=47,pod=89");
+    # or with a timestamp
+    $result = $client->write("testing,host=containment,repo=cadi-libs,file=testfile statement=47,pod=89 1610462906000");
+
 
 =head1 WHY
 
@@ -59,10 +62,11 @@ The only reasons why you would use this module are:
 =over
 
 =item *
+
 Minimal dependencies (no Object::Result and its dependencies)
 
 =item *
-You want to use UDP protocol for writing (WIP)
+You want to use UDP protocol for writing
 
 =back
 
@@ -198,7 +202,7 @@ database - The database to be queried on the InfluxDB server
 chunksize - The size of the chunks used for the returned data
 
 =item *
-epoch - The precision format (h, m, s, ms, u, ns) for epoch timestamps
+epoch - The precision format (h, m, s, ms, u, ns) for epoch timestamps (default is 'ns' for nanosecond)
 
 =back
 
@@ -358,7 +362,7 @@ sub write {
 }
 
 
-=head2 send_data ($measurement, \%tags, \%fields, [%options])
+=head2 send_data ($measurement, \%tags, \%fields, [$timestamp, [%options]])
 
 Write data to the influxDB after converting them into LineProtocol format.
 (call write() underneath)
@@ -369,9 +373,9 @@ $measurement is the name to be used for measurement
 
 \%fields are the field set associated to this datapoint
 
-$timestamp is an optional timestamp value
+$timestamp is an optional timestamp value expected to be in the database precision format (default is nanosecond)
 
-\%options
+\%options are also optional
 
 %options can have the following keys:
 
@@ -403,13 +407,14 @@ error - The error message returned by the server (empty on success)
 =cut
 
 sub send_data {
-  my $self = shift;
-  my $measurement = shift;
-  my $tags = shift;
-  my $fields = shift;
-  my %options = @_;
+    my $self        = shift;
+    my $measurement = shift;
+    my $tags        = shift;
+    my $fields      = shift;
+    my $timestamp   = shift;
+    my %options     = @_;
 
-  return $self->write(_line_protocol($measurement, $tags, $fields), %options);
+    return $self->write( _line_protocol( $measurement, $tags, $fields, $timestamp ), %options );
 
 }
 
@@ -456,36 +461,40 @@ sub _format_value {
 
 
 sub _line_protocol {
-  my $measurement = shift;
-  my $tags = shift;
-  my $fields = shift;
+    my $measurement = shift;
+    my $tags        = shift;
+    my $fields      = shift;
+    my $timestamp   = shift;
 
-  # sort and encode (LineProtocol) tags
-  my @tags;
-  foreach my $k ( sort keys %$tags ) {
-    my $v = $tags->{$k};
-    next unless defined($v);
-    $k =~ s/([,\s])/\\$1/g;
-    $v =~ s/([,\s])/\\$1/g;
+    # sort and encode (LineProtocol) tags
+    my @tags;
+    foreach my $k ( sort keys %$tags ) {
+        my $v = $tags->{$k};
+        next unless defined($v);
+        $k =~ s/([,\s])/\\$1/g;
+        $v =~ s/([,\s])/\\$1/g;
 
-    push( @tags, $k . '=' . $v );
-  }
-  my $tag_string = join( ',', @tags );
+        push( @tags, $k . '=' . $v );
+    }
+    my $tag_string = join( ',', @tags );
 
+    # sort and encode (LineProtocol) fields
+    my @fields;
+    foreach my $k ( sort keys %$fields ) {
+        my $v = $fields->{$k} || '';
+        my $esc_k = $k;
+        $esc_k =~ s/([,\s])/\\$1/g;
+        my $esc_v = _format_value( $k, $v );
 
-  # sort and encode (LineProtocol) fields
-  my @fields;
-  foreach my $k ( sort keys %$fields ) {
-    my $v = $fields->{$k} || '';
-    my $esc_k = $k;
-    $esc_k =~ s/([,\s])/\\$1/g;
-    my $esc_v = _format_value($k, $v);
+        push( @fields, $esc_k . '=' . $esc_v );
+    }
+    my $field_string = join( ',', @fields );
 
-    push( @fields, $esc_k . '=' . $esc_v );
-  }
-  my $field_string = join( ',', @fields );
-
-  return sprintf( "%s,%s %s", $measurement, $tag_string, $field_string );
+    if ($timestamp) {
+        return sprintf( "%s,%s %s %s", $measurement, $tag_string, $field_string, $timestamp );
+    } else {
+        return sprintf( "%s,%s %s", $measurement, $tag_string, $field_string );
+    }
 }
 
 1;

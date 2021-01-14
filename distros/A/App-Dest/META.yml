@@ -7,16 +7,16 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::V0: '0'
   Test::More: '0'
-  Test::Most: '0'
   Test::Output: '0'
-  perl: 5.016_003
+  perl: '5.016'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: 5.016_003
+  perl: '5.016'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -32,14 +32,15 @@ requires:
   Path::Tiny: '0'
   Pod::Usage: '0'
   Text::Diff: '0'
-  Try::Tiny: '0'
-  perl: 5.016_003
+  exact: '1.14'
+  perl: '5.016'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/gryphonshafer/dest/issues
   homepage: https://github.com/gryphonshafer/dest
   repository: https://github.com/gryphonshafer/dest.git
-version: '1.27'
-x_generated_by_perl: v5.30.0
+version: '1.29'
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

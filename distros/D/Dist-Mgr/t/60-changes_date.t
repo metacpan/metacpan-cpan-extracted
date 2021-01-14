@@ -13,8 +13,8 @@ use lib 't/lib';
 use Helper qw(:all);
 
 my $cwd = getcwd();
-like $cwd, qr/dist-mgr(-\d+\.\d+)?$/i, "in root dir ok";
-die "not in the root dir" if $cwd !~ /dist-mgr(-\d+\.\d+)?$/i;
+like $cwd, qr/dist-mgr(-\d+\.\d+)?(-\d+)?$/i, "in root dir ok";
+die "not in the root dir" if $cwd !~ /dist-mgr(-\d+\.\d+)?(-\d+)?$/i;
 
 my $work = 't/data/work';
 my $orig_changes = 't/data/orig/Changes-release';

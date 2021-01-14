@@ -9,7 +9,6 @@ use Test::EOL;
 my @files = (
     'lib/Archive/BagIt.pm',
     'lib/Archive/BagIt/Base.pm',
-    'lib/Archive/BagIt/DotBagIt.pm',
     'lib/Archive/BagIt/Fast.pm',
     'lib/Archive/BagIt/Plugin/Algorithm/MD5.pm',
     'lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm',
@@ -23,7 +22,6 @@ my @files = (
     't/00-load.t',
     't/access_bag.t',
     't/base.t',
-    't/dotbagit.t',
     't/fast.t',
     't/internal.t',
     't/manifest.t',

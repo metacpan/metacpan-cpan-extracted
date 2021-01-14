@@ -1,5 +1,11 @@
 Revision history for InfluxDB-Client
 
+1.00    2021-01-12
+        - *** API CHANGE ***
+        - Add optional timestamp to _line_protocol()
+        - Add optional timestamp to send_data() (this break previous API)
+
+
 0.06    2020-10-26
         - Enhance client unit test
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "DEPRECATED Perl bindings for the GtkHtml2 Html display widget",
+   "abstract" : "(DEPRECATED) Perl bindings for the GtkHtml2 Html display widget",
    "author" : [
       "unknown"
    ],
@@ -39,6 +39,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "version" : "0.06",
    "x_deprecated" : 1
 }

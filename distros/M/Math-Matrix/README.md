@@ -2483,10 +2483,11 @@ Math::Matrix, where each element is a Math::Complex object.
 
 # BUGS
 
-Please report any bugs through the web interface at
-[https://rt.cpan.org/Ticket/Create.html?Queue=Math-Matrix](https://rt.cpan.org/Ticket/Create.html?Queue=Math-Matrix)
-(requires login). We will be notified, and then you'll automatically be
-notified of progress on your bug as I make changes.
+Please report any bugs or feature requests via
+[https://github.com/pjacklam/p5-Math-Matrix/issues](https://github.com/pjacklam/p5-Math-Matrix/issues).
+
+Old bug reports and feature requests can be found at
+[http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Matrix](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Matrix).
 
 # SUPPORT
 
@@ -2500,17 +2501,21 @@ You can also look for information at:
 
     [https://github.com/pjacklam/p5-Math-Matrix](https://github.com/pjacklam/p5-Math-Matrix)
 
-- RT: CPAN's request tracker
-
-    [https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Matrix](https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Matrix)
-
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/dist/Math-Matrix](https://cpanratings.perl.org/dist/Math-Matrix)
-
 - MetaCPAN
 
     [https://metacpan.org/release/Math-Matrix](https://metacpan.org/release/Math-Matrix)
+
+- CPAN Ratings
+
+    [http://cpanratings.perl.org/d/Math-Matrix](http://cpanratings.perl.org/d/Math-Matrix)
+
+- CPAN Testers PASS Matrix
+
+    [http://pass.cpantesters.org/distro/A/Math-Matrix.html](http://pass.cpantesters.org/distro/A/Math-Matrix.html)
+
+- CPAN Testers Reports
+
+    [http://www.cpantesters.org/distro/A/Math-Matrix.html](http://www.cpantesters.org/distro/A/Math-Matrix.html)
 
 - CPAN Testers Matrix
 
@@ -2518,7 +2523,7 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright (c) 2020, Peter John Acklam.
+Copyright (c) 2020-2021, Peter John Acklam
 
 Copyright (C) 2013, John M. Gamble <jgamble@ripco.com>, all rights reserved.
 
@@ -2531,7 +2536,7 @@ reserved.
 Copyright (C) 2001, Brian J. Watson <bjbrew@power.net>, all rights reserved.
 
 Copyright (C) 2001, Ulrich Pfeifer <pfeifer@wait.de>, all rights reserved.
-Copyright (C) 1995, Universit‰t Dortmund, all rights reserved.
+Copyright (C) 1995, Universit√§t Dortmund, all rights reserved.
 
 Copyright (C) 2001, Matthew Brett <matthew.brett@mrc-cbu.cam.ac.uk>
 
@@ -2540,7 +2545,7 @@ the same terms as Perl itself.
 
 # AUTHORS
 
-Peter John Acklam <pjacklam@gmail.com> (2020)
+Peter John Acklam <pjacklam@gmail.com> (2020-2021)
 
 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> (1995-2013)
 

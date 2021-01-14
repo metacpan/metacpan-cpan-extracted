@@ -2,14 +2,10 @@ package Log::Dispatch::Email::Mailer;
 # ABSTRACT: Log::Dispatch::Email subclass that sends mail using Email::Mailer
 
 use 5.014;
-use strict;
-use warnings;
+use exact 'Log::Dispatch::Email';
+use Email::Mailer;
 
-use base 'Log::Dispatch::Email';
-
-use Email::Mailer 1.09;
-
-our $VERSION = '1.08'; # VERSION
+our $VERSION = '1.11'; # VERSION
 
 sub _params {
     my %params = @_;
@@ -69,10 +65,10 @@ Log::Dispatch::Email::Mailer - Log::Dispatch::Email subclass that sends mail usi
 
 =head1 VERSION
 
-version 1.08
+version 1.11
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Log-Dispatch-Email-Mailer.svg)](https://travis-ci.org/gryphonshafer/Log-Dispatch-Email-Mailer)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Log-Dispatch-Email-Mailer/badge.png)](https://coveralls.io/r/gryphonshafer/Log-Dispatch-Email-Mailer)
+=for markdown [![test](https://github.com/gryphonshafer/Log-Dispatch-Email-Mailer/workflows/test/badge.svg)](https://github.com/gryphonshafer/Log-Dispatch-Email-Mailer/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Log-Dispatch-Email-Mailer/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Log-Dispatch-Email-Mailer)
 
 =head1 SYNOPSIS
 
@@ -296,11 +292,11 @@ L<MetaCPAN|https://metacpan.org/pod/Log::Dispatch::Email::Mailer>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Log-Dispatch-Email-Mailer>
+L<GitHub Actions|https://github.com/gryphonshafer/Log-Dispatch-Email-Mailer/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Log-Dispatch-Email-Mailer>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Log-Dispatch-Email-Mailer>
 
 =item *
 
@@ -318,9 +314,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2017-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

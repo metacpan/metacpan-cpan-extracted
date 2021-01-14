@@ -2,8 +2,7 @@ package Email::Mailer;
 # ABSTRACT: Multi-purpose emailer for HTML, auto-text, attachments, and templates
 
 use 5.014;
-use strict;
-use warnings;
+use exact -noautoclean;
 
 use Email::MessageID;
 use Email::MIME 1.940;
@@ -14,7 +13,7 @@ use HTML::TreeBuilder;
 use IO::All 'io';
 use MIME::Words 'encode_mimewords';
 
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.17'; # VERSION
 
 sub new {
     my $self = shift;
@@ -161,10 +160,10 @@ Email::Mailer - Multi-purpose emailer for HTML, auto-text, attachments, and temp
 
 =head1 VERSION
 
-version 1.15
+version 1.17
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Email-Mailer.svg)](https://travis-ci.org/gryphonshafer/Email-Mailer)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Email-Mailer/badge.png)](https://coveralls.io/r/gryphonshafer/Email-Mailer)
+=for markdown [![test](https://github.com/gryphonshafer/Email-Mailer/workflows/test/badge.svg)](https://github.com/gryphonshafer/Email-Mailer/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Email-Mailer/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Email-Mailer)
 
 =head1 SYNOPSIS
 
@@ -525,11 +524,11 @@ L<MetaCPAN|https://metacpan.org/pod/Email::Mailer>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Email-Mailer>
+L<GitHub Actions|https://github.com/gryphonshafer/Email-Mailer/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Email-Mailer>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Email-Mailer>
 
 =item *
 
@@ -547,9 +546,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2017-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

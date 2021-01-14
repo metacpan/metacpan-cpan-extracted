@@ -3,7 +3,6 @@ abstract: 'Core classes and utilities for Bio::MUST'
 author:
   - 'Denis BAURAIN <denis.baurain@uliege.be>'
 build_requires:
-  Config::Any: '0'
   Test::Deep: '0'
   perl: '5.013002'
 configure_requires:
@@ -24,6 +23,7 @@ requires:
   Bio::LITE::Taxonomy::NCBI::Gi2taxid: '0'
   Bio::Phylo::IO: '0'
   Carp: '0'
+  Config::Any: '0'
   Const::Fast: '0'
   Date::Format: '0'
   Exporter::Easy: '0'
@@ -69,7 +69,7 @@ requires:
   perl: '5.013002'
   strict: '0'
   warnings: '0'
-version: '0.203490'
+version: '0.210120'
 x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

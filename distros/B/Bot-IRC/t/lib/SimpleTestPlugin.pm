@@ -1,6 +1,5 @@
 package SimpleTestPlugin;
-use strict;
-use warnings;
+use exact;
 
 sub init {}
 

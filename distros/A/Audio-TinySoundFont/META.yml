@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/atrodo/Audio-TinySoundFont/issues
   homepage: https://github.com/atrodo/Audio-TinySoundFont
   repository: https://github.com/atrodo/Audio-TinySoundFont.git
-version: '0.10'
+version: '0.11'
 x_contributors:
   - 'Jon Gentle <atrodo@atrodo.org>'
 x_generated_by_perl: v5.18.2

@@ -1,0 +1,296 @@
+==================================================
+Changes from 2020-01-15 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.005 at 2021-01-14 14:54:33 +0000
+------------------------------------------
+
+  Change: eb05e54cf3583d856cf120c1ca9a0616971c22a0
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-14 15:53:06 +0000
+
+    - added POD for tools 
+
+  Change: 0d4ddabcaa69b6ee017bc0484ea3cdf107a53e6b
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-14 15:52:45 +0000
+
+    - changed to use package name of
+    File::FormatIdentification::RandomSampling 
+
+------------------------------------------
+version 0.004 at 2021-01-03 12:00:00 +0000
+------------------------------------------
+
+  Change: fc348f2de3ac02ace833404feda936efa8e475af
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-03 13:00:00 +0000
+
+    - fixed tests using correct module 
+
+  Change: be4a1f08aff18dcdc9468b6e10d004b841cbe6cd
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-03 12:59:39 +0000
+
+    - added POD 
+
+------------------------------------------
+version 0.003 at 2020-12-29 12:56:17 +0000
+------------------------------------------
+
+  Change: 9f3a88f029b76dc08f21018c1c1411fc34f35a69
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-29 13:56:17 +0000
+
+    - replaced rand() call and use normal contribution to be more
+    predictable in tests 
+
+  Change: 7fd3a1fdac78c2daffa9c9f1f533aa0ba75c5107
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-29 13:50:49 +0000
+
+    - Changes build by Dist::Zilla::Plugin::ChangelogFromGit 
+
+  Change: a241bfd2de85c1d6feea0e7afebf2e9a5a7631d4
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-29 13:49:52 +0000
+
+    - fixed header for model output 
+
+  Change: 8e2d5c0319a6f8ed532488eda5d7004f28428148
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-29 13:34:31 +0000
+
+    - fixed output, ordered by frequency - added mimetype output 
+
+  Change: 74d78e12214fd9b499a4caaa4858d032a58126a8
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-29 13:33:50 +0000
+
+    - updated model 
+
+  Change: 340aae6c0c0f39ea624884f3ba70a868c19402c1
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-29 13:32:02 +0000
+
+    - add default rule - fixed indentation in output 
+
+  Change: 7fe71bb694da2f06b1799db6561cda8c399d47c8
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-29 13:31:30 +0000
+
+    - use predefined buffersize 
+
+  Change: d5da56be23bf4744402a2727de8b08b17cdf1441
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-29 12:49:48 +0000
+
+    - fixed to ignore unwanted, git-untracked files 
+
+------------------------------------------
+version 0.001 at 2020-12-20 19:57:05 +0000
+------------------------------------------
+
+  Change: 13c85b58a201d11f2f6f846b0fe10875e65bb254
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-20 20:57:05 +0000
+
+    - added comment 
+
+  Change: 58889427b39d2e3a379cec77eee2bef280c3d1d6
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-20 20:56:46 +0000
+
+    - updated model 
+
+  Change: 68d186586b72aacb72d71ad0529b9f4fdf2e25c5
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-20 20:56:33 +0000
+
+    - init 
+
+  Change: 8ccc6cb1b12bb6301376a70daa9139971048a0ce
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-20 20:56:21 +0000
+
+    - fixed tc 
+
+  Change: 64b24475c964823edcf86b2f289cb433d3be0026
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-20 20:18:15 +0000
+
+    - updated comments - simplified CSV output 
+
+  Change: 255e65f4147798f97e64551288b363f23a75a04c
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-20 20:17:23 +0000
+
+    - updated comments 
+
+  Change: 93523ab1b1bb9229a63213c29f790d3bc4f2b40d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-20 20:16:59 +0000
+
+    - renamed 
+
+  Change: 5047cf4437113b5a67286e0a51b493065c327d24
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-20 20:10:11 +0000
+
+    - init 
+
+  Change: 05d55ccf5eb251f9c04ca0a02d4ec8f92f43ad8d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-20 20:09:56 +0000
+
+    - added model output (preliminary) 
+
+  Change: 02d7c3312064bd6671d2a74616e921f3cad5d778
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-20 20:09:27 +0000
+
+    - improved update_bytegram() - updated calc_histogram() to support
+    bigrams 
+
+  Change: 53ab7bd51dbdda8c6b64c1e277e4b2639b7bf6a7
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-20 19:58:29 +0000
+
+    - added corpus info 
+
+  Change: 647adfa4cf3648ebdf79d6a7bbc9d482ed6a05ca
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-20 19:58:15 +0000
+
+    - renamed 
+
+  Change: 2573750c4f2de9c130148b4d9fd12fde3c1b3bb5
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-18 09:41:44 +0000
+
+    - fixed tc count - adapted testcases to reflect changes in bigram
+    representation 
+
+  Change: 628fcc0f994176256e717088214cab02dd470df8
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-18 09:40:23 +0000
+
+    - changed internal bigram using words instead array of array 
+
+  Change: f31285865650ba340dfd3898e6d426804370670d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-17 11:43:54 +0000
+
+    - call init_bytegrams() if instantiated - added define-checks for
+    buffer in update_bytegram() 
+
+  Change: cf109300a08321734385a0f8b72eec0f56a243bd
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-12-17 11:42:48 +0000
+
+    - init 
+
+  Change: 652289c34b227cd1f0592a6f981ab7beda44b662
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-11-16 19:02:34 +0000
+
+    - improved performance based on Devel::NYTProf results 
+
+  Change: 8ce2de53ce26d88cf371ce5e4915324587c7a501
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-30 18:39:41 +0000
+
+    - init 
+
+  Change: 45fe40b821b3c46e247f6abb2ad0c67be808dc76
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-30 18:39:16 +0000
+
+    - adaption to use File::FormatIdentification::RandomSampling 
+
+  Change: 569aab8d1a7c49e2cecc1c04870bfe8faf11cc67
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-30 18:38:27 +0000
+
+    - moved 
+
+  Change: 187ac014a125abff3b0b38b8e7cac3d2df39486b
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-30 17:19:17 +0000
+
+    - ideas added 
+
+  Change: 1c0df46e2ca17bed663207a321abd9510ee7ea0e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-23 14:52:23 +0000
+
+    - init, to check if we get good decisiontree based on bigrams 
+
+  Change: d068a37a1bbedd4912a6153f69f683fc875d4f3d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-23 14:51:17 +0000
+
+    - using File::FormatIdentification::Pronom to test if recognition is
+    possible - improved calc_bytegram() using unpack 
+
+  Change: f5b42a5f80edf85249d5ab1390b0c3313921aac3
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-21 11:22:00 +0000
+
+    - faster init_bytegrams() - improved calc_bytegram() - fixed
+    calc_propability_of_not_finding_data() to abort if probsize >
+    imagesize - improved output 
+
+  Change: d80ef482834f769bd187f1262e83bb6689a61e52
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-19 19:13:01 +0000
+
+    - added POD - rewritten to use array-refs instead hash-refs - outout
+    of probabilities for empty sectors 
+
+  Change: 667c81535b8b69f6370eccea005f51c1fece4c88
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-12 16:36:50 +0000
+
+    - filesize ckeck more robust 
+
+  Change: 0ebca622bef21f00298287c62e1963efd1b49cd3
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-12 16:21:05 +0000
+
+    - if blockdevice is used, use sysseek to determine filesize 
+
+  Change: aa6d466ca47853b5cfbd651b8bda8dadcbc41fe1
+  Author: art1 <art1@andreas-romeyke.de>
+  Date : 2020-10-09 20:12:25 +0000
+
+    Dateien hochladen nach ââ 
+
+  Change: faf007d7ea770f97a0cdea5c231231c6b0a373c5
+  Author: art1 <art1@andreas-romeyke.de>
+  Date : 2020-10-09 20:11:16 +0000
+
+    âREADME.mdâ hinzufÃ¼gen 
+
+  Change: 7c0bc33c1607dcdabacc5eef9967b8256da120f0
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-09 20:02:42 +0000
+
+    - added Time::HiRes - improved report 
+
+  Change: 6168cc3debd4d25e19b05d00d429a41d6d6cbc50
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-09 12:42:43 +0000
+
+    - added is_empty check - added is_text check - added is_video check 
+
+  Change: 06228845fe57a9e930c1d8b0ad8a6fb3ee89797e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-08 21:57:34 +0000
+
+    - init 
+
+================
+End of releases.
+================

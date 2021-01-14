@@ -611,16 +611,16 @@ SKIP: {
 
 {
     # read configuration file
-    my $infile = file('test', 'classifier.yaml');
+    my $cfgfile = file('test', 'classifier.yaml');
     my $config = Config::Any->load_files( {
-        files           => [ $infile->stringify ],
+        files           => [ $cfgfile->stringify ],
         flatten_to_hash => 1,
         use_ext         => 1,
     } );
-    explain $config->{$infile};
+    explain $config->{$cfgfile};
 
     # build classifier
-    my $classifier = $tax->tax_classifier( $config->{$infile} );
+    my $classifier = $tax->tax_classifier( $config->{$cfgfile} );
 
     my @exp_labels = qw(strict loose);
     is_deeply [ $classifier->all_labels ], \@exp_labels,
@@ -629,13 +629,37 @@ SKIP: {
     # classify Ali files
     my @exp_cats = ('strict', ('loose') x 5);
     for my $num ( qw(392 590 593 618 639 649) ) {
-        my $infile = file('test', "GNTPAN19$num.ali");
-        my $ali = Bio::MUST::Core::Ali->load($infile);
+        my $alifile = file('test', "GNTPAN19$num.ali");
+        my $ali = Bio::MUST::Core::Ali->load($alifile);
         my $got_cat = $classifier->classify($ali) // q{undef};
         cmp_ok $got_cat, 'eq', shift @exp_cats,
-            "rightly classified $infile as $got_cat";
+            "rightly classified $alifile as $got_cat";
     }
 }
+
+{
+    # read configuration file
+    my $cfgfile = file('test', 'classifier-zero.yaml');
+    my $config = Config::Any->load_files( {
+        files           => [ $cfgfile->stringify ],
+        flatten_to_hash => 1,
+        use_ext         => 1,
+    } );
+    explain $config->{$cfgfile};
+
+    # build classifier
+    my $classifier = $tax->tax_classifier( $config->{$cfgfile} );
+
+    # classify Ali file
+    my $exp_cat = 'five_org';
+    my $alifile = file('test', "OG0001014.fasta");
+    my $ali = Bio::MUST::Core::Ali->load($alifile);
+    my $got_cat = $classifier->classify($ali);
+    cmp_ok $got_cat, 'eq', $exp_cat,
+        "rightly classified $alifile as $got_cat";
+}
+
+
 
 {
     my $frfile = file('test', 'lifemrch.fra');

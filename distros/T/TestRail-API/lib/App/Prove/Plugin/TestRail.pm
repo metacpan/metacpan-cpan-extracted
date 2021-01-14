@@ -2,7 +2,7 @@
 # PODNAME: App::Prove::Plugin::TestRail
 
 package App::Prove::Plugin::TestRail;
-$App::Prove::Plugin::TestRail::VERSION = '0.047';
+$App::Prove::Plugin::TestRail::VERSION = '0.048';
 use strict;
 use warnings;
 use utf8;
@@ -76,7 +76,7 @@ App::Prove::Plugin::TestRail - Upload your TAP results to TestRail in realtime
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 SYNOPSIS
 
@@ -169,7 +169,7 @@ and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by George S. Baugh.
+This software is copyright (c) 2021 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

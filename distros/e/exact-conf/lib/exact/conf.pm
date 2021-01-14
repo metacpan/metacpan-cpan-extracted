@@ -5,7 +5,7 @@ use 5.014;
 use exact;
 use strict;
 
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 sub import {
     my ( $self, $caller, $params ) = @_;
@@ -42,7 +42,7 @@ exact::conf - Cascading merged application configuration extension for exact
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-conf/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-conf/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-conf/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-conf)

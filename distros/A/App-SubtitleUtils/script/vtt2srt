@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-11'; # DATE
+our $DATE = '2020-12-12'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,11 +42,13 @@ vtt2srt - Convert .vtt to .srt
 
 =head1 VERSION
 
-This document describes version 0.002 of vtt2srt (from Perl distribution App-SubtitleUtils), released on 2020-12-11.
+This document describes version 0.003 of vtt2srt (from Perl distribution App-SubtitleUtils), released on 2020-12-12.
 
 =head1 SYNOPSIS
 
  % vtt2srt < INPUT.vtt > OUTPUT.srt
+
+=head1 cut
 
 =head1 HOMEPAGE
 
@@ -63,6 +65,12 @@ Please report any bugs or feature requests on the bugtracker website L<https://g
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+B<youtube-dl> downloads subtitles in .vtt format by default, but can be
+instructed to download and/or convert subtitles to .srt format (see options:
+C<--sub-format vtt>, C<--convert-subtitles srt>).
 
 =head1 AUTHOR
 

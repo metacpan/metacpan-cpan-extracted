@@ -2319,10 +2319,11 @@ SUBCLASSING
         1;
 
 BUGS
-    Please report any bugs through the web interface at
-    <https://rt.cpan.org/Ticket/Create.html?Queue=Math-Matrix> (requires
-    login). We will be notified, and then you'll automatically be notified
-    of progress on your bug as I make changes.
+    Please report any bugs or feature requests via
+    <https://github.com/pjacklam/p5-Math-Matrix/issues>.
+
+    Old bug reports and feature requests can be found at
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Matrix>.
 
 SUPPORT
     You can find documentation for this module with the perldoc command.
@@ -2335,24 +2336,28 @@ SUPPORT
 
         <https://github.com/pjacklam/p5-Math-Matrix>
 
-    *   RT: CPAN's request tracker
-
-        <https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Matrix>
-
-    *   CPAN Ratings
-
-        <https://cpanratings.perl.org/dist/Math-Matrix>
-
     *   MetaCPAN
 
         <https://metacpan.org/release/Math-Matrix>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Math-Matrix>
+
+    *   CPAN Testers PASS Matrix
+
+        <http://pass.cpantesters.org/distro/A/Math-Matrix.html>
+
+    *   CPAN Testers Reports
+
+        <http://www.cpantesters.org/distro/A/Math-Matrix.html>
 
     *   CPAN Testers Matrix
 
         <http://matrix.cpantesters.org/?dist=Math-Matrix>
 
 LICENSE AND COPYRIGHT
-    Copyright (c) 2020, Peter John Acklam.
+    Copyright (c) 2020-2021, Peter John Acklam
 
     Copyright (C) 2013, John M. Gamble <jgamble@ripco.com>, all rights
     reserved.
@@ -2375,7 +2380,7 @@ LICENSE AND COPYRIGHT
     under the same terms as Perl itself.
 
 AUTHORS
-    Peter John Acklam <pjacklam@gmail.com> (2020)
+    Peter John Acklam <pjacklam@gmail.com> (2020-2021)
 
     Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> (1995-2013)
 

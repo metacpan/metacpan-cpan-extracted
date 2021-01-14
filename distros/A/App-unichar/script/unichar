@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+use 5.026;
+use utf8;
+use warnings;
+use open qw(:std :utf8);
+
+our $VERSION = '0.013';
+
+use App::unichar;
+
+App::unichar->run( @ARGV );
+
+__END__
+=encoding utf8
+
+=pod
+
+=head1 NAME
+
+unichar - get info about a character
+
+=head1 SYNOPSIS
+
+Call it as a program with a name, character, or hex code number:
+
+	% unichar 'CHECK MARK'
+	Processing CHECK MARK
+		match type  name
+		code point  U+2713
+		decimal     10003
+		name        CHECK MARK
+		character   ✓
+
+	% unichar ✓
+	Processing CHECK MARK
+		match type  grapheme
+		code point  U+2713
+		decimal     10003
+		name        CHECK MARK
+		character   ✓
+
+	% unichar 0x2713
+	Processing 0x2713
+		match type  code point
+		code point  U+2713
+		decimal     10003
+		name        CHECK MARK
+		character   ✓
+
+=head1 DESCRIPTION
+
+I use this as a little command-line program to quickly convert between
+values of characters.
+
+=head1 AUTHOR
+
+brian d foy, C<bdfoy@cpan.org>.
+
+=head1 SOURCE AVAILABILITY
+
+This module is in Github:
+
+	https://github.com/briandfoy/unichar
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2011-2021 brian d foy
+
+This module is licensed under the Artistic License 2.0.
+
+=cut

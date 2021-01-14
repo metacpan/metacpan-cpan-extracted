@@ -1,6 +1,6 @@
 package Lab::Connection::IsoBus;
 #ABSTRACT: Oxford Instruments IsoBus connection
-$Lab::Connection::IsoBus::VERSION = '3.731';
+$Lab::Connection::IsoBus::VERSION = '3.740';
 use v5.20;
 
 use strict;
@@ -96,7 +96,7 @@ Lab::Connection::IsoBus - Oxford Instruments IsoBus connection
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 SYNOPSIS
 
@@ -156,7 +156,7 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2011       Andreas K. Huettel, Florian Olbrich
             2012       David Kalok, Florian Olbrich, Stefan Geissler

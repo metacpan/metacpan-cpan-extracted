@@ -1,5 +1,8 @@
 Change log for Mail::AuthenticationResults
 
+2.20210112 2021-01-12 22:10:28+00:00 UTC
+  - Switch to a purely numeric version string
+
 1.20200824.1 2020-08-24 01:03:58+00:00 UTC
   - Fix some POD formatting
 

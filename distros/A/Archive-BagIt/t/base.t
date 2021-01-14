@@ -16,7 +16,7 @@ use Data::Printer;
 use File::Path;
 use File::Copy;
 
-my $Class = 'Archive::BagIt::Base';
+my $Class = 'Archive::BagIt';
 use_ok($Class);
 
 my @ROOT = grep {length} 'src';

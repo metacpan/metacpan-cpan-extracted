@@ -1,0 +1,29 @@
+---
+abstract: 'Secure application server for Mojo::UserAgent'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-UserAgent-SecureServer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '8.00'
+resources:
+  bugtracker: https://github.com/jhthorsen/mojo-useragent-secureserver/issues
+  homepage: https://github.com/jhthorsen/mojo-useragent-secureserver
+  repository: https://github.com/jhthorsen/mojo-useragent-secureserver.git
+version: '0.02'
+x_contributors:
+  - 'Jan Henning Thorsen'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

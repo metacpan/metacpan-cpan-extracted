@@ -1,3 +1,8 @@
+0.077		2021-01-14	T. R. Wyant
+    Add Travis CI testing.
+
+    Use GitHub as bug tracker. R.I.P. rt.cpan.org.
+
 0.076		2020-11-28	T. R. Wyant
     Correct (I hope) detection of \K in nested assertions.
 

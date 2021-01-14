@@ -119,11 +119,11 @@ coulomb-diamonds.pl - Measure a quantum dot stability diagram, i.e. current vers
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel
 

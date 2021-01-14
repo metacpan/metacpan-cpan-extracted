@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_ZVA;
-$Lab::Moose::Instrument::RS_ZVA::VERSION = '3.731';
+$Lab::Moose::Instrument::RS_ZVA::VERSION = '3.740';
 #ABSTRACT: Rohde & Schwarz ZVA Vector Network Analyzer
 
 use v5.20;
@@ -107,12 +107,11 @@ Lab::Moose::Instrument::RS_ZVA - Rohde & Schwarz ZVA Vector Network Analyzer
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 SYNOPSIS
 
  my $data = $zva->sparam_sweep(timeout => 10);
- my $matrix = $data->matrix;
 
 =head1 METHODS
 
@@ -121,11 +120,11 @@ C<sparam_catalog> methods.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

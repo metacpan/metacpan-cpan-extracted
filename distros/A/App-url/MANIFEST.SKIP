@@ -79,3 +79,8 @@ MANIFEST\s\d
 \.releaserc
 \.lwpcookies
 App-url-*
+\bMANIFEST\s\d
+\bChanges\s\d
+\.icloud$
+\A\.github\b
+

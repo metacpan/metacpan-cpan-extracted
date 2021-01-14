@@ -1,10 +1,10 @@
 package Bot::IRC::X::Retort;
 # ABSTRACT: Bot::IRC plugin for bot-retorting to key words
 
-use strict;
-use warnings;
+use 5.014;
+use exact;
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -81,10 +81,10 @@ Bot::IRC::X::Retort - Bot::IRC plugin for bot-retorting to key words
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Retort.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Retort)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC-X-Retort/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC-X-Retort)
+=for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-Retort/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-Retort/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Retort/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Retort)
 
 =head1 SYNOPSIS
 
@@ -118,23 +118,15 @@ L<GitHub|https://github.com/gryphonshafer/Bot-IRC-X-Retort>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Bot-IRC-X-Retort>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Bot::IRC::X::Retort>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/Bot-IRC-X-Retort>
+L<GitHub Actions|https://github.com/gryphonshafer/Bot-IRC-X-Retort/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Bot-IRC-X-Retort>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Bot-IRC-X-Retort>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Retort>
 
 =item *
 
@@ -154,9 +146,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gryphon Shafer.
+This software is Copyright (c) 2016-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

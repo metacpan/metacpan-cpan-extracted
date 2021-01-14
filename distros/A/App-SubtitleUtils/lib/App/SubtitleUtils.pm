@@ -1,9 +1,9 @@
 package App::SubtitleUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-11'; # DATE
+our $DATE = '2020-12-12'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Utilities related to video subtitles
@@ -20,7 +20,7 @@ App::SubtitleUtils - Utilities related to video subtitles
 
 =head1 VERSION
 
-This document describes version 0.002 of App::SubtitleUtils (from Perl distribution App-SubtitleUtils), released on 2020-12-11.
+This document describes version 0.003 of App::SubtitleUtils (from Perl distribution App-SubtitleUtils), released on 2020-12-12.
 
 =head1 DESCRIPTION
 
@@ -37,6 +37,8 @@ This distributions provides the following command-line utilities:
 =item * L<srtscale>
 
 =item * L<srtshift>
+
+=item * L<srtsplit>
 
 =item * L<vtt2srt>
 

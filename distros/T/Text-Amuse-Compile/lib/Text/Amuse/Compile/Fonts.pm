@@ -214,7 +214,10 @@ sub BUILDARGS {
                 close $fh;
                 $list = decode_json($body);
             };
-            $list = undef if $@;
+            if ($@) {
+                warn $@;
+                $list = undef;
+            }
         }
     }
     $list ||= $class->default_font_list;

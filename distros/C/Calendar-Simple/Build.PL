@@ -24,8 +24,15 @@ my $build = Module::Build->new(
   script_files       => [ 'bin/pcal' ],
   meta_merge => {
     resources => {
-    repository => 'https://github.com/davorg/calendar-simple',
-    }
+      repository => {
+        type => 'git',
+        url => 'https://github.com/davorg/calendar-simple.git',
+        web => 'https://github.com/davorg/calendar-simple',
+      },
+      bugtracker => {
+        web => 'https://github.com/davorg/calendar-simple/issues',
+      }
+    },
   },
 );
 

@@ -1,6 +1,6 @@
 = Chargeur Sudoc Koha par Tamil =
 Tamil s.a.r.l. <contact@tamil.fr>
-v2.30, juillet 2019
+v2.34, janvier 2021
 :linkcss:
 :icons: font
 :toc: right
@@ -14,16 +14,16 @@ v2.30, juillet 2019
 Une version en-ligne de ce document est disponible à l'URL suivante :
 
 - *HTML* :
-  http://www.tamil.fr/sudoc/sudoc.html[http://www.tamil.fr/sudoc/sudoc.html]
+  https://www.tamil.fr/sudoc/sudoc.html[https://www.tamil.fr/sudoc/sudoc.html]
 - *PDF* :
-  http://www.tamil.fr/sudoc/sudoc.pdf[http://www.tamil.fr/sudoc/sudoc.pdf]
+  https://www.tamil.fr/sudoc/sudoc.pdf[https://www.tamil.fr/sudoc/sudoc.pdf]
 ================================================================================
 
 [IMPORTANT]
 .Résumé
 ===========
 Le *Chargeur Sudoc Koha* est un logiciel sous licence GNU GPL. Il permet
-de déployer un Catalogue http://koha-community.org[Koha] dans le Sudoc.
+de déployer un Catalogue https://koha-community.org[Koha] dans le Sudoc.
 Ses principales caractéristiques sont les suivantes :
 
 - Gestion du protocole d'envoi des fichiers par l'ABES à l'établissement

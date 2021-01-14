@@ -1,18 +1,11 @@
-use strict;
-use warnings;
-
+use Test2::V0;
 use Test::Lib;
-use Test::Most;
+use Bot::IRC;
 
-use constant MODULE => 'Bot::IRC';
-
-BEGIN { use_ok(MODULE); }
-require_ok(MODULE);
-
-throws_ok( sub { MODULE->new }, qr|connect/server not provided|, MODULE . '->new dies' );
-lives_ok( sub { MODULE->new(
+like( dies { Bot::IRC->new }, qr|connect/server not provided|, 'Bot::IRC->new dies' );
+ok( lives { Bot::IRC->new(
     connect => { server => 'irc.perl.org' }
-) }, MODULE . '->new( connect => { server => $server } )' );
+) }, 'Bot::IRC->new( connect => { server => $server } )' ) or note $@;
 
 my $settings = {
     spawn  => 3,
@@ -36,57 +29,57 @@ my $settings = {
 
 my $bot;
 
-lives_ok( sub { $bot = MODULE->new(%$settings) }, MODULE . '->new(@config)' );
+ok( lives { $bot = Bot::IRC->new(%$settings) }, 'Bot::IRC->new(@config)' ) or note $@;
 
-throws_ok( sub { $bot = MODULE->new(
+like( dies { $bot = Bot::IRC->new(
     %$settings,
     plugins => ['MissingPlugin'],
-) }, qr/Unable to find or properly load/, MODULE . '->new(@config) + missing plugin' );
+) }, qr/Unable to find or properly load/, 'Bot::IRC->new(@config) + missing plugin' );
 
-lives_ok( sub { $bot = MODULE->new(
+ok( lives { $bot = Bot::IRC->new(
     %$settings,
     plugins => ['SimpleTestPlugin'],
-) }, MODULE . '->new(@config) + empty plugin' );
+) }, 'Bot::IRC->new(@config) + empty plugin' ) or note $@;
 
-lives_ok( sub {
+ok( lives {
     $bot->reload('SimpleTestPlugin')
-}, MODULE . '->reload SimpleTestPlugin' );
+}, 'Bot::IRC->reload SimpleTestPlugin' ) or note $@;
 
-lives_ok( sub {
+ok( lives {
     $bot->hook( {}, sub {}, { priority => 50 } )
-}, MODULE . '->hook' );
+}, 'Bot::IRC->hook' ) or note $@;
 
-lives_ok( sub {
+ok( lives {
     $bot->hooks(
         [ {}, sub {} ],
         [ {}, sub {} ],
     )
-}, MODULE . '->hooks' );
+}, 'Bot::IRC->hooks' ) or note $@;
 
-lives_ok( sub {
+ok( lives {
     $bot->helps( term => 'Description.', term2 => 'Description two.' )
-}, MODULE . '->hooks' );
+}, 'Bot::IRC->hooks' ) or note $@;
 
-lives_ok( sub {
+ok( lives {
     $bot->tick( 10, sub {} )
-}, MODULE . '->tick' );
+}, 'Bot::IRC->tick' ) or note $@;
 
-lives_ok( sub {
+ok( lives {
     $bot->ticks(
         [ 10, sub {} ],
         [ 10, sub {} ],
     )
-}, MODULE . '->ticks' );
+}, 'Bot::IRC->ticks' ) or note $@;
 
-lives_ok( sub {
+ok( lives {
     $bot->subs(
         name0 => sub {},
         name1 => sub {},
     )
-}, MODULE . '->ticks' );
+}, 'Bot::IRC->ticks' ) or note $@;
 
-lives_ok( sub {
+ok( lives {
     $bot->register( qw( Alpha Beta Delta ) )
-}, MODULE . '->ticks' );
+}, 'Bot::IRC->ticks' ) or note $@;
 
 done_testing;

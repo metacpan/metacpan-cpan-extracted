@@ -2,9 +2,9 @@ NAME
     Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 VERSION
-    This document describes version 0.330 of Calendar::Indonesia::Holiday
+    This document describes version 0.334 of Calendar::Indonesia::Holiday
     (from Perl distribution Calendar-Indonesia-Holiday), released on
-    2020-12-08.
+    2021-01-14.
 
 SYNOPSIS
      use Calendar::Indonesia::Holiday qw(
@@ -92,7 +92,7 @@ FUNCTIONS
     counted as working days. If observe_joint_leaves is set to false, joint
     leave days are also counted as working days.
 
-    Contains data from years 2002 to 2021 (joint leave days until 2021).
+    Contains data from years 1990 to 2021 (joint leave days until 2021).
 
     This function is not exported by default, but exportable.
 
@@ -143,7 +143,7 @@ FUNCTIONS
     counted as working days. If observe_joint_leaves is set to false, joint
     leave days are also counted as working days.
 
-    Contains data from years 2002 to 2021 (joint leave days until 2021).
+    Contains data from years 1990 to 2021 (joint leave days until 2021).
 
     This function is not exported by default, but exportable.
 
@@ -182,6 +182,53 @@ FUNCTIONS
 
     Return value: (any)
 
+  is_id_holiday
+    Usage:
+
+     is_id_holiday(%args) -> [status, msg, payload, meta]
+
+    Check whether a date is an Indonesian holiday.
+
+    Will return boolean if a given date is a holiday. A joint leave day will
+    not count as holiday unless you specify "include_joint_leave" option.
+
+    Date can be given using separate "day" (of month), "month", and "year",
+    or as a single YYYY-MM-DD date.
+
+    Will return undef (exit code 2 on CLI) if year is not within range of
+    the holiday data.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   date => *str*
+
+    *   day => *int*
+
+    *   detail => *bool*
+
+    *   include_joint_leave => *bool*
+
+    *   month => *int*
+
+    *   quiet => *bool*
+
+    *   reverse => *bool*
+
+    *   year => *int*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   list_id_holidays
     Usage:
 
@@ -191,7 +238,7 @@ FUNCTIONS
 
     List holidays and joint leave days ("cuti bersama").
 
-    Contains data from years 2002 to 2021 (joint leave days until 2021).
+    Contains data from years 1990 to 2021 (joint leave days until 2021).
 
     This function is not exported by default, but exportable.
 
@@ -716,17 +763,61 @@ FUNCTIONS
 
 FAQ
   What is "joint leave"?
-    Workers are normally granted 12 days of paid leave per year. They are
-    free to spend it on whichever days they want. The joint leave ("cuti
-    bersama") is a government program of recent years (since 2002) to
-    recommend that some of these leave days be spent together nationally on
-    certain days, especially during Lebaran (Eid Ul-Fitr). It is not
-    mandated, but many do follow it anyway, e.g. government civil workers,
-    banks, etc. I am marking joint leave days with is_joint_leave=1 and
-    is_holiday=0, while the holidays themselves with is_holiday=1, so you
-    can differentiate/select both/either one.
+    Workers are normally granted around 12 days of paid leave per year
+    (excluding special leaves like maternity, etc). They are free to spend
+    them on whichever days they want. The joint leave ("cuti bersama") is a
+    government program to recommend that some of these leave days be spent
+    together nationally on certain assigned days, especially adjacent to
+    holidays like Eid Ul-Fitr ("Lebaran"). It is not mandated (companies can
+    opt to follow it or not, depending on their specific situation), but
+    many do follow it anyway, e.g. government civil workers, banks, etc. I
+    am marking joint leave days with is_joint_leave=1 and is_holiday=0,
+    while the holidays themselves with is_holiday=1, so you can
+    differentiate/select both/either one.
 
-  Holidays before 2002?
+  When was joint leave established?
+    Joint leave was first decreed in 2001 [1] for the 2002 & 2003 calendar
+    years. The 2001 calendar year does not yet have joint leave days [2].
+    See also [3]. Websites that list joint leave days for 2001 or earlier
+    years (example: [4], [5]) are incorrect; by 2001 or earlier, these joint
+    leave days had not been officially decreed by the government.
+
+    [1] https://jdih.kemnaker.go.id/data_wirata/2002-4-4.pdf
+
+    [2]
+    https://peraturan.bkpm.go.id/jdih/userfiles/batang/Kepmenag_162_2000.pdf
+
+    [3] http://www.wikiapbn.org/cuti-bersama/
+
+    [4] https://kalenderindonesia.com/libur/masehi/2001
+
+    [5] https://kalenderindonesia.com/libur/masehi/1991
+
+  What happens when multiple religious/holidays coincide on a single calendar day?
+    For example, in 1997, both Hijra and Ascension Day fall on May 8th. When
+    this happens, "ind_name" and "eng_name" will contain all the names of
+    the holidays separated by comma, respectively:
+
+     Tahun Baru Hijriah, Kenaikan Isa Al-Masih
+     Hijra, Ascension Day
+
+    All the properties that have the same value will be set in the merged
+    holiday data:
+
+     is_holiday => 1,
+     is_joint_leave => 1,
+
+    The "multiple" property will also be set to true:
+
+     multiple => 1,
+
+    All the tags will be merged:
+
+     tags => ['religious', 'religion=christianity', 'calendar=lunar']
+
+    You can get each holiday's data in the "holidays" key.
+
+  Data for older holidays?
     Will be provided if there is demand and data source.
 
   Holidays after (current year)+1?
@@ -744,8 +835,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Indonesia-Ho
-    liday>
+    <https://github.com/perlancar/perl-Calendar-Indonesia-Holiday/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -760,8 +850,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014,
-    2013, 2012, 2011 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015,
+    2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

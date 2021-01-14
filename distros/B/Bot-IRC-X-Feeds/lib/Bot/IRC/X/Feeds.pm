@@ -2,8 +2,7 @@ package Bot::IRC::X::Feeds;
 # ABSTRACT: Bot::IRC plugin to watch and notify on changes in RSS feeds
 
 use 5.014;
-use strict;
-use warnings;
+use exact;
 
 use XML::RSS;
 use LWP::UserAgent;
@@ -11,7 +10,7 @@ use LWP::Protocol::https;
 use Date::Parse 'str2time';
 use WWW::Shorten qw( TinyURL makeashorterlink );
 
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -150,10 +149,10 @@ Bot::IRC::X::Feeds - Bot::IRC plugin to watch and notify on changes in RSS feeds
 
 =head1 VERSION
 
-version 1.04
+version 1.06
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Feeds.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Feeds)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC-X-Feeds/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC-X-Feeds)
+=for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-Feeds/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-Feeds/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Feeds/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Feeds)
 
 =head1 SYNOPSIS
 
@@ -163,7 +162,7 @@ version 1.04
         connect => { server => 'irc.perl.org' },
         plugins => ['Feeds'],
         vars    => {
-            x-feeds => {
+            'x-feeds' => {
                 interval => 10,
                 max_per  => 5,
             }
@@ -202,7 +201,7 @@ Setting the C<x-feeds> values allows for configuration.
         connect => { server => 'irc.perl.org' },
         plugins => ['Feeds'],
         vars    => {
-            x-feeds => {
+            'x-feeds' => {
                 interval => 10,
                 max_per  => 5,
             }
@@ -232,23 +231,15 @@ L<GitHub|https://github.com/gryphonshafer/Bot-IRC-X-Feeds>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Bot-IRC-X-Feeds>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Bot::IRC::X::Feeds>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/Bot-IRC-X-Feeds>
+L<GitHub Actions|https://github.com/gryphonshafer/Bot-IRC-X-Feeds/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Bot-IRC-X-Feeds>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Bot-IRC-X-Feeds>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Feeds>
 
 =item *
 
@@ -268,9 +259,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is Copyright (c) 2016-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

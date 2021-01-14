@@ -1,0 +1,20 @@
+Changes
+lib/Net/OBS/Client.pm
+lib/Net/OBS/Client/Project.pm
+lib/Net/OBS/Client/Package.pm
+lib/Net/OBS/Client/BuildResults.pm
+lib/Net/OBS/Client/DTD.pm
+lib/Net/OBS/Client/Roles/BuildStatus.pm
+lib/Net/OBS/Client/Roles/Client.pm
+
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-Net_OBS_Client.t
+t/02-Net_OBS_Client_Package.t
+t/03-Net_OBS_Client_Project.t
+t/01-Net_OBS_Client_BuildResults.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

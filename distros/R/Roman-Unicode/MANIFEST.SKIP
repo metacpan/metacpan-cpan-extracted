@@ -59,6 +59,12 @@
 
 
 \.travis\.yml
+\.?appveyor.yml
 \.releaserc
 \.lwpcookies
 Roman−.*
+\bMANIFEST\s\d
+\bChanges\s\d
+\.icloud$
+\A\.github\b
+

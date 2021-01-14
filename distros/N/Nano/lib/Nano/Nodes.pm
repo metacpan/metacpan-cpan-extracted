@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Nano::Node';
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # ATTRIBUTES
 

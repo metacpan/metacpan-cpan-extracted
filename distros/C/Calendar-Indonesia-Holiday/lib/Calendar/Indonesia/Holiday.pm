@@ -1,9 +1,9 @@
 package Calendar::Indonesia::Holiday;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-08'; # DATE
+our $DATE = '2021-01-14'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.330'; # VERSION
+our $VERSION = '0.334'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,18 +37,21 @@ my @fixed_holidays = (
         ind_name   => "Tahun Baru",
         eng_name   => "New Year",
         tags       => [qw/international/],
+        fixed_date => 1,
     },
     my $indep = {
         day        => 17, month =>  8,
         ind_name   => "Proklamasi",
         eng_name   => "Declaration Of Independence",
         tags       => [qw/national/],
+        fixed_date => 1,
     },
     my $christmas = {
         day        => 25, month => 12,
         ind_name   => "Natal",
         eng_name   => "Christmas",
         tags       => [qw/international religious religion=christianity/],
+        fixed_date => 1,
     },
     my $labord = {
         day         => 1, month => 5,
@@ -59,17 +62,19 @@ my @fixed_holidays = (
         decree_date => "2013-04-29",
         decree_note => "Labor day becomes national holiday since 2014, ".
             "decreed by president",
+        fixed_date  => 1,
     },
     my $pancasilad = {
         day         => 1, month => 6,
         year_start  => 2017,
         ind_name    => "Hari Lahir Pancasila",
         eng_name    => "Pancasila Day",
-        tags       => [qw/national/],
+        tags        => [qw/national/],
         decree_date => "2016-06-01",
         decree_note => "Pancasila day becomes national holiday since 2017, ".
             "decreed by president (Keppres 24/2016)",
         # ref: http://www.kemendagri.go.id/media/documents/2016/08/03/k/e/keppres_no.24_th_2016.pdf
+        fixed_date  => 1,
     },
 );
 
@@ -91,6 +96,7 @@ sub _h_chnewyear {
     $r->{ind_aliases} = [];
     $r->{eng_aliases} = [];
     $r->{is_holiday}  = 1;
+    $r->{year_start}  = 2003; # decreed in 2002 by megawati soekarnoputri
     $r->{tags}        = [qw/international calendar=lunar/];
     ($r);
 }
@@ -178,8 +184,8 @@ sub _h_eidulf {
         ($opts->{hyear} ? " $opts->{hyear}H":"");
     my $eng_name0     = "Eid Ul-Fitr".
         ($opts->{hyear} ? " $opts->{hyear}H":"");
-    $r->{ind_name}    = $ind_name0.($opts->{day} ? ", Hari $opts->{day}":"");
-    $r->{eng_name}    = $eng_name0.($opts->{day} ? ", Day $opts->{day}":"");
+    $r->{ind_name}    = $ind_name0.($opts->{day} ? " (Hari $opts->{day})":"");
+    $r->{eng_name}    = $eng_name0.($opts->{day} ? " (Day $opts->{day})":"");
     _add_original_date($r, $opts);
     $r->{ind_aliases} = ["Lebaran"];
     $r->{eng_aliases} = [];
@@ -290,7 +296,265 @@ sub _expand_dm {
     return (day => $1+0, month => $2+0);
 }
 
+sub _uniquify_holidays {
+    my @holidays = @_;
+
+    my %seen; # key=mm-dd (e.g. 12-25), val=[hol1, hol2, ...]
+    for my $h (@holidays) {
+        my $k = sprintf "%02d-%02d", $h->{month}, $h->{day};
+        $seen{$k} //= [];
+        push @{ $seen{$k} }, $h;
+    }
+
+    for my $k (keys %seen) {
+        if (@{ $seen{$k} } == 1) {
+            $seen{$k} = $seen{$k}[0];
+        } else {
+            my $h_mult = {
+                multiple => 1,
+                ind_name => join(", ", map {$_->{ind_name}} @{ $seen{$k} }),
+                eng_name => join(", ", map {$_->{eng_name}} @{ $seen{$k} }),
+                holidays => $seen{$k},
+            };
+            # join all the tags
+            my @tags;
+            for my $h (@{ $seen{$k} }) {
+                next unless $h->{tags};
+                for my $t (@{ $h->{tags} }) {
+                    push @tags, $t unless grep { $_ eq $t } @tags;
+                }
+            }
+            $h_mult->{tags} = \@tags;
+            # join all the properties
+          PROP:
+            for my $prop (keys %{ $seen{$k}[0] }) {
+                next if exists $h_mult->{$prop};
+                my %vals;
+                for my $h (@{ $seen{$k} }) {
+                    next PROP unless defined $h->{$prop};
+                    $vals{ $h->{$prop} }++;
+                }
+                next if keys(%vals) > 1;
+                $h_mult->{$prop} = $seen{$k}[0]{$prop};
+            }
+            $seen{$k} = $h_mult;
+        }
+    }
+
+    map { $seen{$_} } sort keys %seen;
+}
+
 my %year_holidays;
+
+# decreed ?
+# source: https://id.wikipedia.org/wiki/1990
+{
+    $year_holidays{1990} = [
+        _h_isramiraj ({_expand_dm("23-02")}, {hyear=>1410}),
+        _h_nyepi     ({_expand_dm("27-03")}, {hyear=>1912}),
+        _h_goodfri   ({_expand_dm("13-04")}),
+        _h_eidulf    ({_expand_dm("26-04")}, {hyear=>1410, day=>1}),
+        _h_eidulf    ({_expand_dm("27-04")}, {hyear=>1410, day=>2}),
+        _h_vesakha   ({_expand_dm("10-05")}, {hyear=>2534}),
+        _h_ascension ({_expand_dm("24-05")}),
+        _h_eidula    ({_expand_dm("03-07")}, {hyear=>1410}),
+        _h_hijra     ({_expand_dm("23-07")}, {hyear=>1411}),
+        _h_mawlid    ({_expand_dm("01-10")}, {hyear=>1411}),
+    ];
+}
+
+# decreed ?
+# source: https://id.wikipedia.org/wiki/1991
+{
+    $year_holidays{1991} = [
+        _h_isramiraj ({_expand_dm("12-02")}, {hyear=>1411}),
+        _h_nyepi     ({_expand_dm("17-03")}, {hyear=>1913}),
+        _h_goodfri   ({_expand_dm("29-03")}),
+        _h_eidulf    ({_expand_dm("16-04")}, {hyear=>1411, day=>1}),
+        _h_eidulf    ({_expand_dm("17-04")}, {hyear=>1411, day=>2}),
+        _h_ascension ({_expand_dm("09-05")}),
+        _h_vesakha   ({_expand_dm("28-05")}, {hyear=>2535}),
+        _h_eidula    ({_expand_dm("23-06")}, {hyear=>1411}),
+        _h_hijra     ({_expand_dm("13-07")}, {hyear=>1412}),
+        _h_mawlid    ({_expand_dm("21-09")}, {hyear=>1412}),
+    ];
+}
+
+# decreed ?
+# source: https://id.wikipedia.org/wiki/1992
+{
+    $year_holidays{1992} = [
+        _h_isramiraj ({_expand_dm("01-02")}, {hyear=>1412}),
+        _h_nyepi     ({_expand_dm("05-03")}, {hyear=>1914}),
+        _h_eidulf    ({_expand_dm("05-04")}, {hyear=>1412, day=>1}),
+        _h_eidulf    ({_expand_dm("06-04")}, {hyear=>1412, day=>2}),
+        _h_goodfri   ({_expand_dm("17-04")}),
+        _h_vesakha   ({_expand_dm("16-05")}, {hyear=>2536}),
+        _h_ascension ({_expand_dm("28-05")}),
+        _h_lelection ({_expand_dm("09-06")}, {}),
+        _h_eidula    ({_expand_dm("11-06")}, {hyear=>1412}),
+        _h_hijra     ({_expand_dm("02-07")}, {hyear=>1413}),
+        _h_mawlid    ({_expand_dm("09-09")}, {hyear=>1413}),
+    ];
+}
+
+# decreed ?
+# source: https://id.wikipedia.org/wiki/1993
+{
+    $year_holidays{1993} = [
+        _h_isramiraj ({_expand_dm("20-01")}, {hyear=>1413}),
+        _h_nyepi     ({_expand_dm("24-03")}, {hyear=>1915}),
+        _h_eidulf    ({_expand_dm("25-03")}, {hyear=>1413, day=>1}),
+        _h_eidulf    ({_expand_dm("26-03")}, {hyear=>1413, day=>2}),
+        _h_goodfri   ({_expand_dm("09-04")}),
+        _h_vesakha   ({_expand_dm("06-05")}, {hyear=>2537}),
+        _h_ascension ({_expand_dm("20-05")}),
+        _h_eidula    ({_expand_dm("01-06")}, {hyear=>1413}),
+        _h_hijra     ({_expand_dm("21-06")}, {hyear=>1414}),
+        _h_mawlid    ({_expand_dm("30-08")}, {hyear=>1414}),
+    ];
+}
+
+# decreed ?
+# source: https://id.wikipedia.org/wiki/1994
+{
+    $year_holidays{1994} = [
+        _h_isramiraj ({_expand_dm("10-01")}, {hyear=>1414}),
+        _h_eidulf    ({_expand_dm("14-03")}, {hyear=>1414, day=>1}),
+        _h_eidulf    ({_expand_dm("15-03")}, {hyear=>1414, day=>2}),
+        _h_goodfri   ({_expand_dm("01-04")}),
+        _h_nyepi     ({_expand_dm("12-04")}, {hyear=>1916}),
+        _h_ascension ({_expand_dm("12-05")}),
+        _h_eidula    ({_expand_dm("21-05")}, {hyear=>1414}),
+        _h_vesakha   ({_expand_dm("25-05")}, {hyear=>2538}),
+        _h_hijra     ({_expand_dm("11-06")}, {hyear=>1415}),
+        _h_mawlid    ({_expand_dm("20-08")}, {hyear=>1415}),
+        _h_isramiraj ({_expand_dm("30-12")}, {hyear=>1415}),
+    ];
+}
+
+# decreed ?
+# source: https://id.wikipedia.org/wiki/1995
+{
+    $year_holidays{1995} = [
+        _h_eidulf    ({_expand_dm("03-03")}, {hyear=>1415, day=>1}),
+        _h_eidulf    ({_expand_dm("04-03")}, {hyear=>1415, day=>2}),
+        _h_nyepi     ({_expand_dm("01-04")}, {hyear=>1917}),
+        _h_goodfri   ({_expand_dm("14-04")}),
+        _h_eidula    ({_expand_dm("10-05")}, {hyear=>1415}),
+        _h_vesakha   ({_expand_dm("15-05")}, {hyear=>2539}),
+        _h_ascension ({_expand_dm("25-05")}),
+        _h_hijra     ({_expand_dm("31-05")}, {hyear=>1416}),
+        _h_mawlid    ({_expand_dm("09-08")}, {hyear=>1416}),
+        _h_isramiraj ({_expand_dm("20-12")}, {hyear=>1416}),
+    ];
+}
+
+# decreed ?
+# source: https://id.wikipedia.org/wiki/1996
+{
+    $year_holidays{1996} = [
+        _h_eidulf    ({_expand_dm("20-02")}, {hyear=>1416, day=>1}),
+        _h_eidulf    ({_expand_dm("21-02")}, {hyear=>1416, day=>2}),
+        _h_nyepi     ({_expand_dm("21-03")}, {hyear=>1918}),
+        _h_goodfri   ({_expand_dm("05-04")}),
+        _h_eidula    ({_expand_dm("28-04")}, {hyear=>1416}),
+        _h_ascension ({_expand_dm("16-05")}),
+        _h_hijra     ({_expand_dm("19-05")}, {hyear=>1417}),
+        _h_vesakha   ({_expand_dm("02-06")}, {hyear=>2540}),
+        _h_mawlid    ({_expand_dm("28-07")}, {hyear=>1417}),
+        _h_isramiraj ({_expand_dm("08-12")}, {hyear=>1417}),
+    ];
+}
+
+# decreed ?
+# source: https://id.wikipedia.org/wiki/1997
+{
+    $year_holidays{1997} = [
+        _h_eidulf    ({_expand_dm("09-02")}, {hyear=>1417, day=>1}),
+        _h_eidulf    ({_expand_dm("10-02")}, {hyear=>1417, day=>2}),
+        _h_goodfri   ({_expand_dm("28-03")}),
+        _h_nyepi     ({_expand_dm("09-04")}, {hyear=>1919}),
+        _h_eidula    ({_expand_dm("18-04")}, {hyear=>1417}),
+        _h_hijra     ({_expand_dm("08-05")}, {hyear=>1418}), # coincide
+        _h_ascension ({_expand_dm("08-05")}),                # coincide
+        _h_vesakha   ({_expand_dm("22-05")}, {hyear=>2541}),
+        _h_lelection ({_expand_dm("29-05")}, {}),
+        _h_mawlid    ({_expand_dm("17-07")}, {hyear=>1418}),
+        _h_isramiraj ({_expand_dm("28-11")}, {hyear=>1418}),
+    ];
+}
+
+# decreed ?
+# source: https://id.wikipedia.org/wiki/1998
+{
+    $year_holidays{1998} = [
+        _h_eidulf    ({_expand_dm("30-01")}, {hyear=>1418, day=>1}),
+        _h_eidulf    ({_expand_dm("31-01")}, {hyear=>1418, day=>2}),
+        _h_nyepi     ({_expand_dm("29-03")}, {hyear=>1920}),
+        _h_eidula    ({_expand_dm("07-04")}, {hyear=>1418}),
+        _h_goodfri   ({_expand_dm("10-04")}),
+        _h_hijra     ({_expand_dm("28-04")}, {hyear=>1419}),
+        _h_vesakha   ({_expand_dm("11-05")}, {hyear=>2542}),
+        _h_ascension ({_expand_dm("21-05")}),
+        _h_mawlid    ({_expand_dm("06-07")}, {hyear=>1419}),
+        _h_isramiraj ({_expand_dm("17-11")}, {hyear=>1419}),
+    ];
+}
+
+# decreed ?
+# source: https://id.wikipedia.org/wiki/1999
+{
+    $year_holidays{1999} = [
+        _h_eidulf    ({_expand_dm("19-01")}, {hyear=>1419, day=>1}),
+        _h_eidulf    ({_expand_dm("20-01")}, {hyear=>1419, day=>2}),
+        _h_nyepi     ({_expand_dm("18-03")}, {hyear=>1921}),
+        _h_eidula    ({_expand_dm("28-03")}, {hyear=>1419}),
+        _h_goodfri   ({_expand_dm("02-04")}),
+        _h_hijra     ({_expand_dm("17-04")}, {hyear=>1420}),
+        _h_ascension ({_expand_dm("13-05")}),
+        _h_vesakha   ({_expand_dm("30-05")}, {hyear=>2543}),
+        _h_lelection ({_expand_dm("07-06")}, {}),
+        _h_mawlid    ({_expand_dm("26-06")}, {hyear=>1420}),
+        _h_isramiraj ({_expand_dm("06-11")}, {hyear=>1420}),
+    ];
+}
+
+# decreed ?
+# source: https://id.wikipedia.org/wiki/2000
+{
+    $year_holidays{2000} = [
+        _h_eidulf    ({_expand_dm("08-01")}, {hyear=>1420, day=>1}),
+        _h_eidulf    ({_expand_dm("09-01")}, {hyear=>1420, day=>2}),
+        _h_eidula    ({_expand_dm("16-03")}, {hyear=>1420}),
+        _h_nyepi     ({_expand_dm("04-04")}, {hyear=>1922}),
+        _h_hijra     ({_expand_dm("06-04")}, {hyear=>1421}),
+        _h_goodfri   ({_expand_dm("21-04")}),
+        _h_vesakha   ({_expand_dm("18-05")}, {hyear=>2544}),
+        _h_ascension ({_expand_dm("01-06")}),
+        _h_mawlid    ({_expand_dm("15-06")}, {hyear=>1421}),
+        _h_isramiraj ({_expand_dm("25-10")}, {hyear=>1421}),
+        _h_eidulf    ({_expand_dm("16-12")}, {hyear=>1422, day=>1}),
+        _h_eidulf    ({_expand_dm("17-12")}, {hyear=>1422, day=>2}),
+    ];
+}
+
+# decreed ?
+# source: https://id.wikipedia.org/wiki/2001
+{
+    $year_holidays{2001} = [
+        _h_eidula    ({_expand_dm("05-03")}, {hyear=>1421}),
+        _h_nyepi     ({_expand_dm("25-03")}, {hyear=>1923}),
+        _h_hijra     ({_expand_dm("26-03")}, {hyear=>1422}),
+        _h_goodfri   ({_expand_dm("13-04")}),
+        _h_vesakha   ({_expand_dm("07-05")}, {hyear=>2545}),
+        _h_ascension ({_expand_dm("24-05")}),
+        _h_mawlid    ({_expand_dm("04-06")}, {hyear=>1422}),
+        _h_isramiraj ({_expand_dm("15-10")}, {hyear=>1422}),
+        _h_eidulf    ({_expand_dm("16-12")}, {hyear=>1422, day=>1}),
+        _h_eidulf    ({_expand_dm("17-12")}, {hyear=>1422, day=>2}),
+    ];
+}
 
 # decreed ?
 {
@@ -304,10 +568,10 @@ my %year_holidays;
         _h_ascension ({_expand_dm("09-05")}),
         _h_mawlid    ({_expand_dm("25-05")}, {hyear=>1423, original_date=>'2003-05-14'}),
         _h_vesakha   ({_expand_dm("26-05")}, {hyear=>2546}),
-        _h_isramiraj ({_expand_dm("04-10")}),
+        _h_isramiraj ({_expand_dm("04-10")}, {hyear=>1423}),
         ($eidulf2002 =
-        _h_eidulf    ({_expand_dm("06-12")}, {hyear=>1424, day=>1})),
-        _h_eidulf    ({_expand_dm("07-12")}, {hyear=>1424, day=>2}),
+        _h_eidulf    ({_expand_dm("06-12")}, {hyear=>1423, day=>1})),
+        _h_eidulf    ({_expand_dm("07-12")}, {hyear=>1423, day=>2}),
 
         _jointlv     ({_expand_dm("05-12")}, {holiday=>$eidulf2002}),
         _jointlv     ({_expand_dm("09-12")}, {holiday=>$eidulf2002}),
@@ -330,8 +594,8 @@ my %year_holidays;
         _h_ascension ({_expand_dm("30-05")}, {original_date=>'2003-05-29'}),
         _h_isramiraj ({_expand_dm("22-09")}, {original_date=>'2003-09-24'}),
         ($eidulf2003 =
-        _h_eidulf    ({_expand_dm("25-11")}, {hyear=>1425, day=>1})),
-        _h_eidulf    ({_expand_dm("26-11")}, {hyear=>1425, day=>2}),
+        _h_eidulf    ({_expand_dm("25-11")}, {hyear=>1424, day=>1})),
+        _h_eidulf    ({_expand_dm("26-11")}, {hyear=>1424, day=>2}),
 
         _jointlv     ({_expand_dm("24-11")}, {holiday=>$eidulf2003}),
         _jointlv     ({_expand_dm("27-11")}, {holiday=>$eidulf2003}),
@@ -350,6 +614,7 @@ my %year_holidays;
         _h_eidula    ({_expand_dm("02-02")}, {hyear=>1424, original_date=>'2004-02-01'}),
         _h_hijra     ({_expand_dm("23-02")}, {hyear=>1425, original_date=>'2004-02-01'}),
         _h_nyepi     ({_expand_dm("22-03")}, {hyear=>1926}),
+        _h_lelection ({_expand_dm("05-04")}, {}),
         _h_goodfri   ({_expand_dm("09-04")}),
         _h_mawlid    ({_expand_dm("03-05")}, {original_date=>'2004-05-02'}),
         _h_ascension ({_expand_dm("20-05")}),
@@ -780,6 +1045,7 @@ my %year_holidays;
         _h_chnewyear ({_expand_dm("05-02")}, {hyear=>2570}),
         _h_nyepi     ({_expand_dm("07-03")}, {hyear=>1941}),
         _h_isramiraj ({_expand_dm("03-04")}, {hyear=>1440}),
+        _h_lelection ({_expand_dm("17-04")}),
         _h_goodfri   ({_expand_dm("19-04")}),
         # - labor day
         _h_vesakha   ({_expand_dm("19-05")}, {hyear=>2563}),
@@ -952,7 +1218,7 @@ for my $year ($min_year .. $max_year) {
         $h->{dow}  = $dt->day_of_week;
     }
 
-    push @holidays, (sort {$a->{date} cmp $b->{date}} @hf, @hy);
+    push @holidays, _uniquify_holidays(@hf, @hy);
 }
 
 my $res = gen_read_table_func(
@@ -1219,6 +1485,84 @@ sub list_id_workdays {
     Calendar::Indonesia::Holiday::enum_id_workdays(%fargs);
 }
 
+$SPEC{is_id_holiday} = {
+    v => 1.1,
+    summary => 'Check whether a date is an Indonesian holiday',
+    description => <<'_',
+
+Will return boolean if a given date is a holiday. A joint leave day will not
+count as holiday unless you specify `include_joint_leave` option.
+
+Date can be given using separate `day` (of month), `month`, and `year`, or as a
+single YYYY-MM-DD date.
+
+Will return undef (exit code 2 on CLI) if year is not within range of the
+holiday data.
+
+_
+    args => {
+        day        => {schema=>['int*', between=>[1,31]]},
+        month      => {schema=>['int*', between=>[1, 12]]},
+        year       => {schema=>'int*'},
+        date       => {schema=>'str*', pos=>0},
+
+        include_joint_leave => {schema=>'bool*', cmdline_aliases=>{j=>{}}},
+        reverse    => {schema=>'bool*', cmdline_aliases=>{r=>{}}},
+        quiet      => {schema=>'bool*', cmdline_aliases=>{q=>{}}},
+        detail     => {schema=>'bool*', cmdline_aliases=>{l=>{}}},
+    },
+    args_rels => {
+        choose_all => [qw/day month year/],
+        req_one => [qw/day date/],
+    },
+};
+sub is_id_holiday {
+    my %args = @_;
+
+    my ($y, $m, $d);
+    if (defined $args{date}) {
+        $args{date} =~ /\A(\d{4})-(\d{1,2})-(\d{1,2})\z/
+            or return [400, "Invalid date syntax, please use 'YYYY-MM-DD' format"];
+        ($y, $m, $d) = ($1, $2, $3);
+    } else {
+        ($y = $args{year}) && ($m = $args{month}) && ($d = $args{day})
+            or return [400, "Please specify day/month/year or date"];
+    }
+    my $date = sprintf "%04d-%02d-%02d", $y, $m, $d;
+
+    for my $e (@fixed_holidays) {
+        next if defined $e->{year_start} && $y < $e->{year_start};
+        next if defined $e->{year_end} && $y > $e->{year_end};
+        next unless $e->{day} == $d && $e->{month} == $m;
+        return [200, "OK", ($args{reverse} ? 0 : ($args{detail} ? $e : 1)), {
+            'cmdline.exit_code' => ($args{reverse} ? 1 : 0),
+            ('cmdline.result' => ($args{quiet} ? '' : "Date $date IS a holiday")) x !$args{detail},
+        }];
+    }
+
+    unless ($y >= $min_year && $y <= $max_year) {
+        return [200, "OK", undef, {
+            'cmdline.exit_code' => 2,
+            'cmdline.result' => ($args{quiet} ? '' : "Date year ($y) is not within range of holiday data ($min_year-$max_year)"),
+        }];
+    }
+
+    for my $e (@{ $year_holidays{$y} }) {
+        next unless $e->{day} == $d && $e->{month} == $m;
+        next if $e->{is_joint_leave} && !$args{include_joint_leave};
+        return [200, "OK", ($args{reverse} ? 0 : ($args{detail} ? $e : 1)), {
+            'cmdline.exit_code' => ($args{reverse} ? 1 : 0),
+            ('cmdline.result' => ($args{quiet} ? '' : "Date $date IS a holiday")) x !$args{detail},
+        }];
+    }
+
+    return [200, "OK", ($args{reverse} ? 1:0), {
+        'cmdline.exit_code' => ($args{reverse} ? 0 : 1),
+        'cmdline.result' => ($args{quiet} ? '' : "Date $date is NOT a holiday"),
+    }];
+}
+
+
 1;
 # ABSTRACT: List Indonesian public holidays
 
@@ -1234,7 +1578,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.330 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2020-12-08.
+This document describes version 0.334 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2021-01-14.
 
 =head1 SYNOPSIS
 
@@ -1326,7 +1670,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 2002 to 2021 (joint leave days until
+Contains data from years 1990 to 2021 (joint leave days until
 2021).
 
 This function is not exported by default, but exportable.
@@ -1386,7 +1730,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 2002 to 2021 (joint leave days until
+Contains data from years 1990 to 2021 (joint leave days until
 2021).
 
 This function is not exported by default, but exportable.
@@ -1433,6 +1777,61 @@ Return value:  (any)
 
 
 
+=head2 is_id_holiday
+
+Usage:
+
+ is_id_holiday(%args) -> [status, msg, payload, meta]
+
+Check whether a date is an Indonesian holiday.
+
+Will return boolean if a given date is a holiday. A joint leave day will not
+count as holiday unless you specify C<include_joint_leave> option.
+
+Date can be given using separate C<day> (of month), C<month>, and C<year>, or as a
+single YYYY-MM-DD date.
+
+Will return undef (exit code 2 on CLI) if year is not within range of the
+holiday data.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<date> => I<str>
+
+=item * B<day> => I<int>
+
+=item * B<detail> => I<bool>
+
+=item * B<include_joint_leave> => I<bool>
+
+=item * B<month> => I<int>
+
+=item * B<quiet> => I<bool>
+
+=item * B<reverse> => I<bool>
+
+=item * B<year> => I<int>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 list_id_holidays
 
 Usage:
@@ -1443,7 +1842,7 @@ List Indonesian holidays in calendar.
 
 List holidays and joint leave days ("cuti bersama").
 
-Contains data from years 2002 to 2021 (joint leave days until
+Contains data from years 1990 to 2021 (joint leave days until
 2021).
 
 This function is not exported by default, but exportable.
@@ -1909,16 +2308,61 @@ Return value:  (any)
 
 =head2 What is "joint leave"?
 
-Workers are normally granted 12 days of paid leave per year. They are free to
-spend it on whichever days they want. The joint leave ("cuti bersama") is a
-government program of recent years (since 2002) to recommend that some of these
-leave days be spent together nationally on certain days, especially during
-Lebaran (Eid Ul-Fitr). It is not mandated, but many do follow it anyway, e.g.
-government civil workers, banks, etc. I am marking joint leave days with
-is_joint_leave=1 and is_holiday=0, while the holidays themselves with
-is_holiday=1, so you can differentiate/select both/either one.
+Workers are normally granted around 12 days of paid leave per year (excluding
+special leaves like maternity, etc). They are free to spend them on whichever
+days they want. The joint leave ("cuti bersama") is a government program to
+recommend that some of these leave days be spent together nationally on certain
+assigned days, especially adjacent to holidays like Eid Ul-Fitr ("Lebaran"). It
+is not mandated (companies can opt to follow it or not, depending on their
+specific situation), but many do follow it anyway, e.g. government civil
+workers, banks, etc. I am marking joint leave days with is_joint_leave=1 and
+is_holiday=0, while the holidays themselves with is_holiday=1, so you can
+differentiate/select both/either one.
 
-=head2 Holidays before 2002?
+=head2 When was joint leave established?
+
+Joint leave was first decreed in 2001 [1] for the 2002 & 2003 calendar years.
+The 2001 calendar year does not yet have joint leave days [2]. See also [3].
+Websites that list joint leave days for 2001 or earlier years (example: [4],
+[5]) are incorrect; by 2001 or earlier, these joint leave days had not been
+officially decreed by the government.
+
+[1] https://jdih.kemnaker.go.id/data_wirata/2002-4-4.pdf
+
+[2] https://peraturan.bkpm.go.id/jdih/userfiles/batang/Kepmenag_162_2000.pdf
+
+[3] http://www.wikiapbn.org/cuti-bersama/
+
+[4] https://kalenderindonesia.com/libur/masehi/2001
+
+[5] https://kalenderindonesia.com/libur/masehi/1991
+
+=head2 What happens when multiple religious/holidays coincide on a single calendar day?
+
+For example, in 1997, both Hijra and Ascension Day fall on May 8th. When this
+happens, C<ind_name> and C<eng_name> will contain all the names of the holidays
+separated by comma, respectively:
+
+ Tahun Baru Hijriah, Kenaikan Isa Al-Masih
+ Hijra, Ascension Day
+
+All the properties that have the same value will be set in the merged holiday
+data:
+
+ is_holiday => 1,
+ is_joint_leave => 1,
+
+The C<multiple> property will also be set to true:
+
+ multiple => 1,
+
+All the tags will be merged:
+
+ tags => ['religious', 'religion=christianity', 'calendar=lunar']
+
+You can get each holiday's data in the C<holidays> key.
+
+=head2 Data for older holidays?
 
 Will be provided if there is demand and data source.
 
@@ -1938,7 +2382,7 @@ Source repository is at L<https://github.com/perlancar/perl-Calendar-Indonesia-H
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Indonesia-Holiday>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Calendar-Indonesia-Holiday/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1957,7 +2401,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

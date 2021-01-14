@@ -26,7 +26,7 @@ WriteMakefile1(
       'Test::Requires'   => 0,
     },
 
-    EXE_FILES       => [ 'script/scandeps.pl' ], 
+    EXE_FILES       => [ 'script/scandeps.pl' ],
 
     META_MERGE      => {
       "meta-spec" => { version => 2 },
@@ -37,7 +37,7 @@ WriteMakefile1(
           web  => 'https://github.com/rschupp/Module-ScanDeps',
         },
         MailingList => 'mailto:par@perl.org',
-        bugtracker => { web => 'https://rt.cpan.org/Dist/Display.html?Queue=Module-ScanDeps' },
+        bugtracker => { web => 'https://github.com/rschupp/Module-ScanDeps/issues' },
       },
       no_index => {
         package => [qw( Module::ScanDeps::Cache Module::ScanDeps::DataFeed )],

@@ -2,18 +2,15 @@ package Bot::IRC;
 # ABSTRACT: Yet Another IRC Bot
 
 use 5.014;
-use strict;
-use warnings;
+use exact;
 
-use Carp 'croak';
 use Daemon::Device;
+use Date::Format 'time2str';
 use IO::Socket::IP -register;
 use IO::Socket::SSL;
 use Time::Crontab;
-use Date::Format 'time2str';
-use Try::Tiny;
 
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 sub new {
     my $class = shift;
@@ -679,7 +676,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.27
+version 1.32
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC)
@@ -1371,9 +1368,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gryphon Shafer.
+This software is Copyright (c) 2016-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

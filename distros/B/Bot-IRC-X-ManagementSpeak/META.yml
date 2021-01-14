@@ -3,32 +3,35 @@ abstract: 'Bot::IRC plugin for rendering management-speak'
 author:
   - 'Gryphon Shafer <gryphon@cpan.org>'
 build_requires:
+  Bot::IRC: '0'
+  Bot::IRC::Store: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::V0: '0'
   Test::More: '0'
-  Test::Most: '0'
-  blib: '1.01'
-  constant: '0'
-  perl: '5.006'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: '5.014'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
-license: perl
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Bot-IRC-X-ManagementSpeak
 requires:
   Lingua::ManagementSpeak: '0'
-  perl: '5.006'
-  strict: '0'
-  warnings: '0'
+  exact: '1.14'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/gryphonshafer/Bot-IRC-X-ManagementSpeak/issues
   homepage: https://github.com/gryphonshafer/Bot-IRC-X-ManagementSpeak
   repository: https://github.com/gryphonshafer/Bot-IRC-X-ManagementSpeak.git
-version: '1.01'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '1.03'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

@@ -3,7 +3,7 @@ package Workflow::Condition::LazyAND;
 use strict;
 use warnings;
 
-our $VERSION = '1.48';
+our $VERSION = '1.49';
 
 use base qw( Workflow::Condition::Nested );
 use Workflow::Exception qw( condition_error configuration_error );
@@ -40,7 +40,7 @@ sub evaluate {
         if ( not $result ) {
             condition_error("Condition '$cond' returned 'false'");
         }
-        $total += $result;
+        $total++;
     }
 
     return $total

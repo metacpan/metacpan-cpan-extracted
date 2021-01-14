@@ -1,9 +1,8 @@
 package App::Dest;
 # ABSTRACT: Deployment State Manager
 
-use 5.016_003;
-use strict;
-use warnings;
+use 5.016;
+use exact;
 
 use File::Basename qw( dirname basename );
 use File::Copy 'copy';
@@ -14,9 +13,8 @@ use File::Path qw( mkpath rmtree );
 use IPC::Run 'run';
 use Path::Tiny 'path';
 use Text::Diff ();
-use Try::Tiny qw( try catch finally );
 
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 sub init {
     my $self = _new( shift, 'expect_no_root_dir' );
@@ -763,10 +761,10 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/dest.svg)](https://travis-ci.org/gryphonshafer/dest)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/dest/badge.png)](https://coveralls.io/r/gryphonshafer/dest)
+=for markdown [![test](https://github.com/gryphonshafer/dest/workflows/test/badge.svg)](https://github.com/gryphonshafer/dest/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/dest/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/dest)
 
 =for test_synopsis BEGIN { die "SKIP: skip synopsis check because it's non-Perl\n"; }
 
@@ -1291,23 +1289,15 @@ L<GitHub|https://github.com/gryphonshafer/dest>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/App-Dest>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/App::Dest>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/App-Dest>
+L<GitHub Actions|https://github.com/gryphonshafer/dest/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/dest>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/dest>
+L<Codecov|https://codecov.io/gh/gryphonshafer/dest>
 
 =item *
 
@@ -1325,9 +1315,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is Copyright (c) 2013-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

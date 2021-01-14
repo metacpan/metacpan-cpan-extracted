@@ -22,7 +22,7 @@ use File::Copy ();
 use File::Spec ();
 use File::Temp ();
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 # ATTRIBUTES
 
@@ -56,6 +56,16 @@ fun new_file($self) {
   File::Spec->catfile(File::Temp::tempdir, "@{[$self->database]}.db")
 }
 
+has 'uri' => (
+  is => 'ro',
+  isa => 'Str',
+  new => 1,
+);
+
+fun new_uri($self) {
+  "sqlite:@{[$self->file]}"
+}
+
 # METHODS
 
 method clone(Str $source) {
@@ -67,6 +77,7 @@ method clone(Str $source) {
 method create() {
   my $dbh = $self->dbh;
 
+  $self->uri;
   $self->immutable;
 
   return $self;
@@ -176,6 +187,14 @@ This attribute is read-only, accepts C<(Str)> values, and is optional.
 =head2 file
 
   file(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 uri
+
+  uri(Str)
 
 This attribute is read-only, accepts C<(Str)> values, and is optional.
 

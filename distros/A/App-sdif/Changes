@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.18.2 2021-01-13T02:07:20Z
+
+    - Deprecate cdif options: -B, --char, --visible-cr, -visible-esc
+
 4.18.1 2021-01-03T14:28:40Z
 
     - Add --tabstop option.

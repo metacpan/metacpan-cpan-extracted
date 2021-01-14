@@ -41,10 +41,10 @@ my $module    = __PACKAGE__;
 ( my $dist = $module ) =~ s/::/-/g;
 
 my $github    = 'https://github.com/briandfoy/object-iterate';
-my $main_file = catfile( 'lib', split /::/, "$module.pm" );
+my $main_file = catfile( 'preprocess', split /::/, "$module.pm.PL" );
 
 my %WriteMakefile = (
-	'MIN_PERL_VERSION' => '5.020',
+	'MIN_PERL_VERSION' => '5.008',
 
 	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
@@ -66,6 +66,10 @@ my %WriteMakefile = (
 		},
 
 	'PREREQ_PM'     => {
+		},
+
+	'PL_FILES'      => {
+		'preprocess/Object/Iterate.pm.PL' => 'blib/lib/Object/Iterate.pm',
 		},
 
 	'META_MERGE' => {

@@ -1,10 +1,19 @@
 Changes
 
+Version 0.39
+
+    Small release to fix a digest issue
+
+    TBD     Update Changes and Increment version
+    993ed2a Add test for verify issues with embedded newlines in digest
+    8f0738f Fixes #20 Remove embedded newlines from reference digest
+
 Version 0.38
 
     Increment Version - Release Version same as 0.37-TRIAL
 
-    TBD     Update Changes and Increment version
+    de9b3d6 Fix issue with missing MANIFEST and META.yml
+    7a9e524 Update Changes and Increment version
 
 Version 0.37-TRIAL
     3c18e4c Update Makefile Version

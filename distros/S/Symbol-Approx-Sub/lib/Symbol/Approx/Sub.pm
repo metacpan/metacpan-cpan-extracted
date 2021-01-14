@@ -39,7 +39,7 @@ To use it, simply include the line:
   use Symbol::Approx::Sub;
 
 somewhere in your program. Then, each time you call a subroutine that doesn't
-exist in the the current package, Perl will search for a subroutine with
+exist in the current package, Perl will search for a subroutine with
 approximately the same name. The meaning of 'approximately the same' is
 configurable. The default is to find subroutines with the same Soundex
 value (as defined by Text::Soundex) as the missing subroutine. There are
@@ -215,7 +215,7 @@ use Exception::Class (
   'SAS::Exception::InvalidParameter'           => { isa => 'SAS::Exception' },
 );
 
-$VERSION = '3.1.2';
+$VERSION = '3.1.3';
 
 use Carp;
 
@@ -258,9 +258,9 @@ sub import  {
     ) unless exists $defaults{$_};
   }
 
-  _set_transformer(\%param, \%CONF, $defaults{xform});
-  _set_matcher(\%param, \%CONF, $defaults{match});
-  _set_chooser(\%param, \%CONF, $defaults{choose});
+  $CONF{xform}   = _set_transformer(\%param, $defaults{xform});
+  $CONF{match}   = _set_matcher(\%param, $defaults{match});
+  $CONF{choose}  =_set_chooser(\%param, $defaults{choose});
 
   $CONF{suggest} = $param{suggest} // $defaults{suggest};
 
@@ -280,42 +280,42 @@ sub import  {
 # 5/ $param{xform} is a reference to an array. Each element of the
 #    array is one of the previous two options.
 sub _set_transformer {
-  my ($param, $CONF, $default) = @_;
+  my ($param, $default) = @_;
 
   unless (exists $param->{xform}) {
     my $mod = "Symbol::Approx::Sub::$default";
     load $mod;
-    $CONF->{xform} = [\&{"${mod}::transform"}];
-    return;
+    return [\&{"${mod}::transform"}];
   }
 
   unless (defined $param->{xform}) {
-    $CONF->{xform} = [];
-    return;
+    return [];
   }
 
   my $type = ref $param->{xform};
   if ($type eq 'CODE') {
-    $CONF->{xform} = [$param->{xform}];
+    return [$param->{xform}];
   } elsif ($type eq '') {
     my $mod = "Symbol::Approx::Sub::$param->{xform}";
     load $mod;
-    $CONF->{xform} = [\&{"${mod}::transform"}];
+    return [\&{"${mod}::transform"}];
   } elsif ($type eq 'ARRAY') {
+    my @xforms;
     foreach (@{$param->{xform}}) {
-      my $type = ref $_;
-      if ($type eq 'CODE') {
-        push @{$CONF->{xform}}, $_;
-      } elsif ($type eq '') {
+      my $subtype = ref $_;
+      if ($subtype eq 'CODE') {
+        push @xforms, $_;
+      } elsif ($subtype eq '') {
         my $mod = "Symbol::Approx::Sub::$_";
         load $mod;
-        push @{$CONF->{xform}}, \&{"${mod}::transform"};
+        push @xforms, \&{"${mod}::transform"};
       } else {
         SAS::Exception::InvalidOption::Transformer->throw(
           error => 'Invalid transformer passed to Symbol::Approx::Sub'
         );
       }
     }
+    return \@xforms;
   } else {
     SAS::Exception::InvalidOption::Transformer->throw(
       error => 'Invalid transformer passed to Symbol::Approx::Sub'
@@ -331,27 +331,25 @@ sub _set_transformer {
 # 4/ $param{match} is a scalar. This is the name of a matcher
 #    module which should be loaded.
 sub _set_matcher {
-  my ($param, $CONF, $default) = @_;
+  my ($param, $default) = @_;
 
   unless (exists $param->{match}) {
     my $mod = "Symbol::Approx::Sub::$default";
     load $mod;
-    $CONF->{match} = \&{"${mod}::match"};
-    return;
+    return \&{"${mod}::match"};
   }
 
   unless (defined $param->{match}) {
-    $CONF->{match} = undef;
-    return;
+    return undef;
   }
 
   my $type = ref $param->{match};
   if ($type eq 'CODE') {
-    $CONF->{match} = $param->{match};
+    return $param->{match};
   } elsif ($type eq '') {
     my $mod = "Symbol::Approx::Sub::$param->{match}";
     load $mod;
-    $CONF->{match} = \&{"${mod}::match"};
+    return \&{"${mod}::match"};
   } else {
     SAS::Exception::InvalidOption::Matcher->throw(
       error => 'Invalid matcher passed to Symbol::Approx::Sub'
@@ -367,34 +365,72 @@ sub _set_matcher {
 # 4/ $param{choose} is a scalar. This is the name of a chooser
 #    module which should be loaded.
 sub _set_chooser {
-  my ($param, $CONF, $default) = @_;
+  my ($param, $default) = @_;
 
   unless (exists $param->{choose}) {
     my $mod = "Symbol::Approx::Sub::$default";
     load $mod;
-    $CONF->{choose} = \&{"${mod}::choose"};
-    return;
+    return \&{"${mod}::choose"};
   }
 
   unless (defined $param->{choose}) {
     my $mod = "Symbol::Approx::Sub::$default";
     load $mod;
-    $CONF->{choose} = \&{"${mod}::choose"};
-    return;
+    return \&{"${mod}::choose"};
   }
 
   my $type = ref $param->{choose};
   if ($type eq 'CODE') {
-    $CONF->{choose} = $param->{choose};
+    return $param->{choose};
   } elsif ($type eq '') {
     my $mod = "Symbol::Approx::Sub::$param->{choose}";
     load $mod;
-    $CONF->{choose} = \&{"${mod}::choose"};
+    return \&{"${mod}::choose"};
   } else {
     SAS::Exception::InvalidOption::Chooser->throw(
       error => 'Invalid chooser passed to Symbol::Approx::Sub',
     );
   }
+}
+
+sub _run_xformers {
+  my ($xforms, $sub, @subs) = @_;
+
+  foreach (@$xforms) {
+    SAS::Exception::InvalidOption::Transformer->throw(
+      error => 'Invalid transformer passed to Symbol::Approx::Sub',
+    ) unless defined &$_;
+    ($sub, @subs) = $_->($sub, @subs);
+  }
+
+  return ($sub, @subs);
+}
+
+sub _run_matcher {
+  my ($matcher, $sub, @subs) = @_;
+
+  my @match_ind;
+  if ($matcher) {
+    SAS::Exception::InvalidOption::Matcher->throw(
+      error => 'Invalid matcher passed to Symbol::Approx::Sub',
+    ) unless defined &{$matcher};
+    @match_ind = $matcher->($sub, @subs);
+  } else {
+    @match_ind = (0 .. $#subs);
+  }
+
+  return @match_ind;
+}
+
+sub _run_chooser {
+  my ($chooser, @subs) = @_;
+
+  SAS::Exception::InvalidOption::Chooser->throw(
+    error => 'Invalid chooser passed to Symbol::Approx::Sub'
+  ) unless defined &$chooser;
+  my $index = $chooser->(@subs);
+
+  return $index;
 }
 
 # Create a subroutine which is called when a given subroutine
@@ -419,24 +455,11 @@ sub _make_AUTOLOAD {
                     grep { defined &{$_} } $sym->functions();
 
     # Transform all of the subroutine names
-    foreach (@{$CONF{xform}}) {
-      SAS::Exception::InvalidOption::Transformer->throw(
-        error => 'Invalid transformer passed to Symbol::Approx::Sub',
-      ) unless defined &$_;
-      ($sub, @subs) = $_->($sub, @subs);
-    }
+    ($sub, @subs) = _run_xformers($CONF{xform}, $sub, @subs);
 
     # Call the subroutine that will look for matches
     # The matcher returns a list of the _indexes_ that match
-    my @match_ind;
-    if ($CONF{match}) {
-      SAS::Exception::InvalidOption::Matcher->throw(
-        error => 'Invalid matcher passed to Symbol::Approx::Sub',
-      ) unless defined &{$CONF{match}};
-      @match_ind = $CONF{match}->($sub, @subs);
-    } else {
-      @match_ind = (0 .. $#subs);
-    }
+    my @match_ind = _run_matcher($CONF{match}, $sub, @subs);
 
     @subs = @subs[@match_ind];
     @orig = @orig[@match_ind];
@@ -445,22 +468,20 @@ sub _make_AUTOLOAD {
     # chooser to pick one.
     # Call the matched subroutine using magic goto.
     # If no match was found, die recreating Perl's usual behaviour.
-    if (@match_ind) {
-      if (@match_ind == 1) {
-        $sub = "${pkg}::" . $orig[0];
-      } else {
-        SAS::Exception::InvalidOption::Chooser->throw(
-          error => 'Invalid chooser passed to Symbol::Approx::Sub'
-        ) unless defined $CONF{choose};
-        $sub = "${pkg}::" . $orig[$CONF{choose}->(@subs)];
-      }
-      if ($CONF{suggest}) {
-        croak "Cannot find subroutine $AUTOLOAD. Did you mean $sub?";
-      } else {
-        goto &$sub;
-      }
+
+    die "REALLY Undefined subroutine $AUTOLOAD called at $c[1] line $c[2]\n"
+      unless @match_ind;
+
+    if (@match_ind == 1) {
+      $sub = "${pkg}::" . $orig[0];
     } else {
-      die "REALLY Undefined subroutine $AUTOLOAD called at $c[1] line $c[2]\n";
+      my $index = _run_chooser($CONF{choose}, @subs);
+      $sub = "${pkg}::" . $orig[$index];
+    }
+    if ($CONF{suggest}) {
+      croak "Cannot find subroutine $AUTOLOAD. Did you mean $sub?";
+    } else {
+      goto &$sub;
     }
   }
 }

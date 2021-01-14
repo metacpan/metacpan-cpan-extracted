@@ -1,14 +1,14 @@
 package Bible::OBML::HTML;
 # ABSTRACT: Render OBML as HTML
 
-use 5.014;
+use 5.020;
 
 use exact;
 use exact::class;
 use Template;
 use Bible::OBML;
 
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.16'; # VERSION
 
 has obml => sub { Bible::OBML->new };
 
@@ -225,7 +225,7 @@ Bible::OBML::HTML - Render OBML as HTML
 
 =head1 VERSION
 
-version 1.14
+version 1.16
 
 =for test_synopsis my( $obml, $filename, $data, $skip_smartify );
 
@@ -328,11 +328,11 @@ L<MetaCPAN|https://metacpan.org/pod/Bible::OBML>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Bible-OBML>
+L<GitHub Actions|https://github.com/gryphonshafer/Bible-OBML/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Bible-OBML>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Bible-OBML>
 
 =item *
 
@@ -350,9 +350,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2014-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

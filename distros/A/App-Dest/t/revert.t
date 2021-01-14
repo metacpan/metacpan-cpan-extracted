@@ -1,11 +1,12 @@
-use Test::Most;
+use Test2::V0;
+
+use Capture::Tiny 'capture';
 use File::Basename 'dirname';
+use File::Copy::Recursive 'dircopy';
 use File::Path 'rmtree';
 use Test::Output;
-use Capture::Tiny 'capture';
-use File::Copy::Recursive 'dircopy';
 
-use_ok('App::Dest');
+use App::Dest;
 
 sub set_state {
     chdir( dirname($0) . '/revert' );
@@ -15,7 +16,7 @@ sub set_state {
     print $log "# log\n";
     close $log;
 }
-set_state();
+set_state;
 
 my $log;
 sub read_log {
@@ -68,10 +69,10 @@ stdout_is(
 );
 
 my ( $stdout, $stderr, $exit );
-lives_ok(
-    sub { ( $stdout, $stderr, $exit ) = capture { App::Dest->revert( 'actions/005', '-d' ) } },
+ok(
+    lives { ( $stdout, $stderr, $exit ) = capture { App::Dest->revert( 'actions/005', '-d' ) } },
     'dry run revert specific action',
-);
+) or note $@;
 
 like(
     $stdout,
@@ -86,5 +87,5 @@ is( $order{'005'}, 5, 'revert action "005" is ordered last' );
 ok( ( $order{'004'} >= $order{'003'} ), 'revert action "004" happens after "003"' );
 ok( ( $order{'004'} >= $order{'001'} ), 'revert action "004" happens after "001"' );
 
-set_state();
-done_testing();
+set_state;
+done_testing;

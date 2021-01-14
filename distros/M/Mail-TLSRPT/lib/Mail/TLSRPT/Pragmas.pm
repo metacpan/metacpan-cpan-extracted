@@ -1,6 +1,6 @@
 package Mail::TLSRPT::Pragmas;
 # ABSTRACT: Setup system wide pragmas
-our $VERSION = '1.20200413.1'; # VERSION
+our $VERSION = '2.20210112'; # VERSION
 use 5.20.0;
 use strict;
 use warnings;
@@ -43,7 +43,7 @@ Mail::TLSRPT::Pragmas - Setup system wide pragmas
 
 =head1 VERSION
 
-version 1.20200413.1
+version 2.20210112
 
 =head1 SYNOPSIS
 

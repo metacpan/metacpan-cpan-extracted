@@ -7,7 +7,7 @@ use Log::Log4perl qw( get_logger );
 use Workflow::Exception qw( configuration_error persist_error );
 use English qw( -no_match_vars );
 
-$Workflow::Persister::DBI::ExtraData::VERSION = '1.48';
+$Workflow::Persister::DBI::ExtraData::VERSION = '1.49';
 
 my @FIELDS = qw( table data_field context_key );
 __PACKAGE__->mk_accessors(@FIELDS);
@@ -61,9 +61,11 @@ sub fetch_extra_workflow_data {
     my $data_field = $self->data_field;
     my $select_data_fields
         = ( ref $data_field )
-        ? join( ', ', @{$data_field} )
-        : $data_field;
-    $sql = sprintf $sql, $select_data_fields, $self->table;
+        ? join( ', ',
+                map { $self->handle->quote_identifier($_) } @{$data_field} )
+        : $self->handle->quote_identifier($data_field);
+    $sql = sprintf $sql, $select_data_fields,
+        $self->handle->quote_identifier( $self->table );
     $log->is_debug
         && $log->debug("Using SQL\n$sql");
     $log->is_debug

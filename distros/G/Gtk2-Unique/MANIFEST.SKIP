@@ -7,3 +7,5 @@
 ^[.]git
 ^Unique[.]bs$
 ^Gtk2-Unique-.+\.tar\.gz$
+^[.]xs-coverage[.]ignore$
+^perl-Gtk2-Unique[.]doap$

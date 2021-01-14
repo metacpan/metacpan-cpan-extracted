@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use File::Spec::Functions qw(splitdir updir catdir file_name_is_absolute);
 use Cwd qw(abs_path);
 
-our $VERSION = '1.0.9';
+our $VERSION = '1.0.10';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -16,7 +16,7 @@ sub register {
     my $r = $app->routes;
 
     if ($conf->{controller}){
-        $r->route($root.$path)->to(
+        $r->any($root.$path)->to(
             controller  => $conf->{controller},
             action      => 'dispatch',
             $conf->{namespace} ? ( namespace   => $conf->{namespace}):(),

@@ -1,5 +1,17 @@
 Revision history for Bot::IRC::X::Message
 
+1.05      2021-01-13 11:07:31-08:00 America/Los_Angeles
+        - Override some minimum version reqs in dist.ini
+
+1.04      2021-01-12 08:26:53-08:00 America/Los_Angeles
+        - Migrate to Test2::V0 and add exact
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+        - Update Travis YAML
+        - Adding Perl versions to test; annual general update for 2018
+
 1.03      2017-08-12 08:58:29-07:00 America/Los_Angeles
         - Make messaging more flexible (by stephenhoward)
 

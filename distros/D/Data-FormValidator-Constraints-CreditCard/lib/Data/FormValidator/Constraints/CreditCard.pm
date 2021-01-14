@@ -10,7 +10,7 @@ use Business::CreditCard qw();
 ###############################################################################
 # Version number.
 ###############################################################################
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 ###############################################################################
 # Allow our methods to be exported.
@@ -169,6 +169,8 @@ sub FV_cc_expiry_year {
 
 1;
 
+=for stopwords MM YY YYYY checksum
+
 =head1 NAME
 
 Data::FormValidator::Constraints::CreditCard - Data constraints, using Business::CreditCard
@@ -213,50 +215,50 @@ C<Business::CreditCard>.
 =item FV_cc_number()
 
 Creates a constraint closure that returns true if the constrained value
-appears to be a valid credit card number. 
+appears to be a valid credit card number.
 
 NOTE: "appears to be a valid credit card number" ONLY means that the number
 appears to be valid and has passed the checksum test; -NO- tests have been
-performed to verify that this is actually a real/valid credit card number. 
+performed to verify that this is actually a real/valid credit card number.
 
 =item FV_cc_type(@set)
 
 Creates a constraint closure that returns true if the constrained value
 appears to be a credit card of one of the types listed in the given
 C<@set>. The C<@set> can be provided as either a list of scalars (which are
-compared using the C<eq> operator), or as a list of regular expressions. 
+compared using the C<eq> operator), or as a list of regular expressions.
 
 For more information on the actual card types that can be checked for,
 please refer to the information for the C<cardtype()> method in
-C<Business::CreditCard>. 
+C<Business::CreditCard>.
 
 =item FV_cc_expiry()
 
 Creates a constraint closure that returns true if the constrained value
 appears to be a valid credit card expiry date; correct integer values for
-year/month, with the date not being in the past. 
+year/month, with the date not being in the past.
 
-Accepted formats include "MM/YY" and "MM/YYYY". 
+Accepted formats include "MM/YY" and "MM/YYYY".
 
 NOTE: use of this method requires that the full credit card expiry date be
 present in a single field; no facilities are provided for gathering the
-month/year data from two separate fields. 
+month/year data from two separate fields.
 
 =item FV_cc_expiry_month()
 
 Creates a constraint closure that returns true if the constrained value
 appears to be a valid credit card expiry month; an integer in the range of
-"1-12". 
+"1-12".
 
 =item FV_cc_expiry_year()
 
 Creates a constraint closure that returns true if the constrained value
 appears to be a valid credit card expiry year; an integer value for a year,
-not in the past. 
+not in the past.
 
 Expiry years can be provided as either "YY" or "YYYY". When using the
 two-digit "YY" format, the year is considered to be part of the sliding
-window 1970-2069. 
+window 1970-2069.
 
 =back
 

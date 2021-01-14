@@ -17,21 +17,21 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "English::Script",
   "PREREQ_PM" => {
-    "Carp" => 0,
     "JavaScript::Packer" => 0,
     "Parse::RecDescent" => 0,
     "YAML::XS" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "exact" => "1.14"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test2::V0" => 0,
     "Test::More" => 0,
-    "Test::Most" => 0
+    "strict" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.05",
   "test" => {
     "TESTS" => "t/*.t t/javascript/*.t"
   }
@@ -39,15 +39,15 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JavaScript::Packer" => 0,
   "Parse::RecDescent" => 0,
+  "Test2::V0" => 0,
   "Test::More" => 0,
-  "Test::Most" => 0,
   "YAML::XS" => 0,
+  "exact" => "1.14",
   "strict" => 0,
   "warnings" => 0
 );

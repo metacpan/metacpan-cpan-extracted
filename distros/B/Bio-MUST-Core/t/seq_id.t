@@ -101,15 +101,15 @@ my @valid_ids = (
         'cp-d#Pseudo-nitzschia_mannii_587315@111559260',
         q{'cp-d#Pseudo-nitzschia mannii_587315@111559260'} ],
 
-    [ ('nucp#Vitrella brassicaformis_CCMP3155@ABC1234.1') x 2, 0, 0, 0, 0, undef, 'nucp',
+    [ ('nuppct#Vitrella brassicaformis_CCMP3155@ABC1234.1') x 2, 0, 0, 0, 0, undef, 'nuppct',
         'Vitrella', 'brassicaformis', 'CCMP3155', 'ABC1234.1', undef,
         undef, undef, undef, undef, undef, undef,
         undef, undef, undef, undef,
         'Vitrella brassicaformis', 'V. brassicaformis', 'Vitrella brassicaformis_CCMP3155',
         'Vitrella brassicaformis CCMP3155',
         'Vitrella brassicaformis CCMP3155',
-        'nucp#Vitrella_brassicaformis_CCMP3155@ABC1234.1',
-        q{'nucp#Vitrella brassicaformis_CCMP3155@ABC1234.1'} ],
+        'nuppct#Vitrella_brassicaformis_CCMP3155@ABC1234.1',
+        q{'nuppct#Vitrella brassicaformis_CCMP3155@ABC1234.1'} ],
 
     [ ('archaeon GW2011_AR10@CP010424') x 2, 0, 0, 0, 0, undef, undef,
         'archaeon', 'GW2011_AR10', undef, 'CP010424', undef,

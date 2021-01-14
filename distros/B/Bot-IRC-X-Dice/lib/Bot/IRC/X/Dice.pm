@@ -1,12 +1,12 @@
 package Bot::IRC::X::Dice;
 # ABSTRACT: Bot::IRC plugin for dice rolling
 
-use strict;
-use warnings;
+use 5.014;
+use exact;
 
 use Games::Dice 'roll';
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -39,10 +39,10 @@ Bot::IRC::X::Dice - Bot::IRC plugin for dice rolling
 
 =head1 VERSION
 
-version 1.03
+version 1.05
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Dice.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Dice)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC-X-Dice/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC-X-Dice)
+=for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-Dice/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-Dice/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Dice/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Dice)
 
 =head1 SYNOPSIS
 
@@ -76,23 +76,15 @@ L<GitHub|https://github.com/gryphonshafer/Bot-IRC-X-Dice>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Bot-IRC-X-Dice>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Bot::IRC::X::Dice>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/Bot-IRC-X-Dice>
+L<GitHub Actions|https://github.com/gryphonshafer/Bot-IRC-X-Dice/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Bot-IRC-X-Dice>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Bot-IRC-X-Dice>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Bot-IRC-X-Dice>
 
 =item *
 
@@ -112,9 +104,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gryphon Shafer.
+This software is Copyright (c) 2016-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

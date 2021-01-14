@@ -2,7 +2,7 @@ package XML::Feed::Enclosure;
 use strict;
 use warnings;
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 use base qw( Class::ErrorHandler );
 
@@ -61,7 +61,7 @@ The MIME type of the item referred to in I<url>.
 
 =head2 $enclosure->length
 
-The length of object refereed to in I<url>
+The length of object referred to in I<url>
 
 =head1 AUTHOR & COPYRIGHT
 

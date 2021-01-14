@@ -10,14 +10,14 @@ release and post-release tasks.
 =head1 DESCRIPTION
 
 For end-users, please review the
-[documentation](https://metacpan.org/pod/distribution/Dist-Mgr/bin/distmgr) for
-the [distmgr](https://metacpan.org/pod/distribution/Dist-Mgr/bin/distmgr)
+L<documentation|https://metacpan.org/pod/distribution/Dist-Mgr/bin/distmgr> for
+the L<distmgr|https://metacpan.org/pod/distribution/Dist-Mgr/bin/distmgr>
 program that we've installed for you as part of this distribution.
 
-Performs a full suite of automated creation, addition, pre-release, release and
-post release tasks for Perl distributions. It integrates with VCS, automates the
-configuration of Continuous Integration, manages version numbers and Changes
-files, amongst a slew of other tasks.
+This software performs a full suite of automated creation, addition, pre-release,
+release and post release tasks for Perl distributions. It integrates with VCS,
+automates the configuration of Continuous Integration, manages version numbers
+and Changes files, amongst a slew of other tasks.
 
 This distribution is essentially a bunch of tools that revolve around a base
 distribution created with C<module-starter>.
@@ -199,6 +199,69 @@ C<5.24>, C<5.18>, C<5.14> and C<5.10>.
 
 I<Returns>: An array of the contents of the generated file.
 
+=head2 config
+
+Writes out a default configuration file if one doesn't exist, and updates
+the C<%args> hash within a function.
+
+I<Parameters>:
+
+    \%args
+
+I<Mandatory, Hash reference>: Send in a reference to your C<%args> hash, and
+we'll update it with any directives within the configuration file before you
+send them off to other various routines.
+
+    $file
+
+I<Optional, String>: The name of an alternate configuration file you'd like to
+write out, or read from. Default is C<$ENV{USERPROFILE}/dist-mgr.json> on
+Windows systems, and C<$ENV{HOME}/dist-mgr.json> on Unix systems.
+
+I<Returns>: The reference to the C<%args> hash you sent in as the first
+parameter.
+
+=head2 config_file
+
+Returns the path and filename of the default configuration file. this is
+C<$ENV{USERPROFILE}/dist-mgr.json> on Windows systems, and
+C<$ENV{HOME}/dist-mgr.json> on Unix systems.
+
+=head2 copyright_bump
+
+Finds and updates the copyright year of a Perl POD or module file, or all Perl
+files in a directory structure. We operate on all C<*.pl>, C<*.pm> and C<*.pod>
+files.
+
+I<Use>: Before publishing a release.
+
+I<Parameters>:
+
+    $fs_entry
+
+I<Optional, String>: The name of a file or directory to work on. If a directory,
+we'll work on all Perl and POD files. Defaults to C<.>.
+
+I<Returns>: A hash reference with the file name as the key, and the updated year
+as the value.
+
+=head2 copyright_info
+
+Fetches the current copyright year in a file or all files in a directory. We
+operate on all C<*.pl>, C<*.pm> and C<*.pod> files.
+
+I<Use>: Anytime.
+
+I<Parameters>:
+
+    $fs_entry
+
+I<Optional, String>: The name of a file or directory to work on. If a directory,
+we'll work on all Perl and POD files. Defaults to C<.>.
+
+I<Returns>: A hash reference with the file name as the key, and the current
+copyright year as the value.
+
 =head2 cpan_upload
 
 Uploads the distribution tarball to PAUSE.
@@ -226,7 +289,7 @@ process.
 
 =back
 
-I<Returns>: C<1> (true) on success.
+I<Returns>: Copy of C<%args> hash on success.
 
 =head2 git_add
 
@@ -379,15 +442,15 @@ I<Use>: Any time.
 
 I<Returns>: The string repository name on success, the exit code on failure.
 
-=head2 git_status
+=head2 git_status_differs
 
-Checks whether we need to commit or push.
+Checks whether we need to commit and push.
 
-B<Note>: Calls C<Dist::Mgr::Git::_git_status()> internally.
+B<Note>: Calls C<Dist::Mgr::Git::_git_status_differs()> internally.
 
 I<Use>: Any time.
 
-<Returns>: C<0> if the repository differs and C<1> if nothing needs to be done.
+I<Returns>: C<1> if the repository differs and C<0> if nothing needs to be done.
 
 =head2 git_tag
 
@@ -496,6 +559,14 @@ Perform a C<make manifest>.
 
 I<Use>: Before running the release procedures.
 
+I<Parameters>:
+
+    $verbose
+
+I<Optional, Bool>: Set to true to display the output from the command.
+
+I<Default>: False
+
 I<Returns>: C<0> on success. Anything other than C<0> is a failure.
 
 =head2 manifest_skip
@@ -543,7 +614,7 @@ I<Parameters>:
     $module
 
 I<Mandatory, String>: The name of the module that was created with L</init>, eg.
-C<Acme-STEVEB>.
+C<Acme::STEVEB>.
 
 I<Returns>: C<0> upon success.
 
@@ -567,18 +638,16 @@ I<Parameters>:
 
 I<Mandatory, String>: The new version to update to.
 
+    $fs_entry
+
+I<Optional, String>: The name of a file or directory to work on. If a directory,
+we'll work on all Perl module files. Defaults to C<lib/>.
+
 =head3 Dry run mode
 
 The C<$version> parameter can be prepended with an optional dash (C<->), and if
 so, we'll operate in "dry-run" mode, where we'll return the results, but won't
 have written to any files. Eg: C<version_bump('-1.01')>.
-
-    $fs_entry
-
-I<Optional, String>: The directory or file to operate on. If a directory is
-sent in, we'll iterate over all files in all directories recursively.
-
-I<Default>: C<lib/>
 
 I<Returns>: An HoH:
 

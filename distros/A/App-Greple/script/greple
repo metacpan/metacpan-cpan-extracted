@@ -12,7 +12,7 @@ use File::stat;
 use IO::Handle;
 use Pod::Usage;
 use Text::ParseWords qw(shellwords);
-use List::Util qw(min max first sum uniq);
+use List::Util qw(min max first sum uniq shuffle);
 use Cwd qw(getcwd abs_path);
 use Carp;
 
@@ -61,13 +61,13 @@ my $version = $App::Greple::VERSION;
 =head1 NAME
 
 
-greple - extensible grep with lexical expression and region handling
+greple - extensible grep with lexical expression and region control
 
 
 =head1 VERSION
 
 
-Version 8.4005
+Version 8.4101
 
 
 =head1 SYNOPSIS
@@ -847,7 +847,8 @@ if ($opt_d{m}) {
 		     $pat->is_function ? '&' : '',
 		     @colors > 1 ? index_color($i++, $target) : $target);
     }
-    warn sprintf "must = %d, need = %d, allow = %d\n", $count_must, $count_need, $count_allow;
+    warn sprintf("must = %d, need = %d, allow = %d\n",
+		 $count_must, $count_need, $count_allow);
 }
 
 ## push post-process filter
@@ -1185,6 +1186,9 @@ sub display_result {
     # --colorindex
     my $indexer = do {
 	my %ci = map { uc $_ => 1 } $opt_colorindex =~ /\w/g;
+	if ($ci{S}) {
+	    @colors = shuffle @colors;
+	}
 	if ($ci{A} or $ci{D}) {
 	    my $i = 0;
 	    Indexer->new(
@@ -1225,16 +1229,16 @@ sub display_result {
 	$lastpos = $block_end;
 
 	# when --filestyle and/or --linestyle is "separate"
-	grep { $_ }
-	do {
-	    print $_file->($current_file)
-		if $opt_filestyle eq 'separate';
-	},
-	do {
-	    print $_line->($line)
-		if $opt_n and $opt_linestyle eq 'separate';
-	}
-	and print "\n";
+	grep { $_ } (
+	    do {
+		print $_file->($current_file)
+		    if $opt_filestyle eq 'separate';
+	    },
+	    do {
+		print $_line->($line)
+		    if $opt_n and $opt_linestyle eq 'separate';
+	    }
+	) and print "\n";
 
 	if ($indexer) {
 	    $indexer->reset if $indexer->block;
@@ -1336,8 +1340,8 @@ and `baz'.
 
     greple 'foo bar baz' ...
 
-Each word can appear in any order and/or any place in the string.  So
-this command find all of following texts.
+Each word can appear in any order and any place in the string.  So
+this command find all of following lines.
 
     foo bar baz
     baz bar foo
@@ -1371,11 +1375,13 @@ number of required patterns.  So
 
 commands implicitly set the option C<--need 1>, and consequently print
 all lines including `foo'.  In other words, it makes other patterns
-optional.  If you want to search lines which includes `foo' and either
-or both of `bar' and `baz', use like this:
+optional, but they are highlighted if exist.  If you want to search
+lines which includes `foo' and either or both of `bar' and `baz', use
+like this:
 
     greple '+foo bar baz' --need 2
     greple '+foo bar baz' --need +1
+    greple 'foo bar|baz'
 
 
 =head2 FLEXIBLE BLOCKS
@@ -1406,11 +1412,10 @@ You can also define arbitrary complex blocks by writing script.
 =head2 MATCH AREA CONTROL
 
 
-Using option B<--inside> and B<--outside>, you can specify text area
-where the match should be occurred.  Next commands search only in mail
-header and body area respectively.  In these cases, data block is not
-changed, so print lines which contains the pattern in the specified
-area.
+Using option B<--inside> and B<--outside>, you can specify the text
+area to be matched.  Next commands search only in mail header and body
+area respectively.  In these cases, data block is not changed, so
+print lines which contains the pattern in the specified area.
 
     greple --inside '\A(.+\n)+' pattern
 
@@ -1420,7 +1425,7 @@ Option B<--inside>/B<--outside> can be used repeatedly to enhance the
 area to be matched.  There are similar option
 B<--include>/B<--exclude>, but they are used to trim down the area.
 
-Those four options also takes user defined function and any complex
+These four options also take user defined function and any complex
 region can be used.
 
 
@@ -2047,7 +2052,11 @@ Reset sequential index on every block.
 
 =item R (Random)
 
-Apply random color.
+Use random color index everytime.
+
+=item S (Shuffle)
+
+Shuffle indexed color.
 
 =item N (Normal)
 
@@ -2167,11 +2176,11 @@ disjoint records.
 
 Specify the record block to display.  Default block is a single line.
 
-When blocks are not continuous and there are gaps between them, the
-match occurred outside blocks are ignored.
+Empty blocks are ignored.  When blocks are not continuous, the match
+occurred outside blocks are ignored.
 
-If multiple block options are supplied, overlapping blocks are merged
-into single block.
+If multiple block options are given, overlapping blocks are merged
+into a single block.
 
 Please be aware that this option is sometimes quite time consuming,
 because it finds all blocks before processing.
@@ -2798,11 +2807,17 @@ You can use the module like this:
 
     greple -Mperl --colorful --code --comment --pod default greple
 
-If special subroutine B<initialize()> is defined in the module, it is
-called at the beginning with C<Getopt::EX::Module> object as a
-first argument.  Second argument is the reference to C<@ARGV>, and you
-can modify actual C<@ARGV> using it.  See B<find> module as a sample.
+If special subroutine B<initialize()> and B<finalize()> are defined in
+the module, they are called at the beginning with
+C<Getopt::EX::Module> object as a first argument.  Second argument is
+the reference to C<@ARGV>, and you can modify actual C<@ARGV> using
+it.  See B<find> module as a sample.
 
+Calling sequence is like this.  See L<Getopt::EX::Module> for detail.
+
+    1) Call initialize()
+    2) Call function given in -Mmod::func() style
+    3) Call finalize()
 
 =head1 HISTORY
 
@@ -2817,9 +2832,9 @@ option interfaces, and change the command name. (2013.11)
 
 L<grep(1)>, L<perl(1)>
 
-L<github|http://kaz-utashiro.github.io/greple/>
+L<App::Greple>, L<https://github.com/kaz-utashiro/greple>
 
-L<Getopt::EX>
+L<Getopt::EX>, L<https://github.com/kaz-utashiro/Getopt-EX>
 
 
 =head1 AUTHOR

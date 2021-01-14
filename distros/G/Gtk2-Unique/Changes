@@ -1,5 +1,15 @@
 Revision history for Gtk2::Unique
 
+0.07 Wed Jan 13 09:18:10 PST 2021
+	[RT-76414] Makefile.PL: added 'configure_requires' to META_MERGE block
+	[RT-95016] Add whatis entries to the POD
+   Added project deprecation notice, project is now deprecated
+
+
+0.06 Fri Feb 24 22:08:59 CET 2017
+	[RT-120115] Fix: crash on starting second instance.
+	Fix compilation warnings.
+
 
 0.05 Wed May  5 19:48:14 CEST 2010
 	Minor XS update: the length of a string was computed twice.

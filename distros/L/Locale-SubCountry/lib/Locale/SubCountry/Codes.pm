@@ -1,4 +1,3 @@
-
 =head1 NAME
 
 Locale::SubCountry::Codes - data for Locale::SubCountry in JSON format
@@ -13,6 +12,7 @@ NOTE, THIS FILE IS CREATED WITH UTF-8 ENCODING. THIS SHOULD NOT BE CHANGED.
 
 All codes have been downloaded from the latest version of the Debian Salsa project
 L<https://salsa.debian.org/iso-codes-team/iso-codes>
+and then files iso_3166-1.json, iso_3166-2.json
 
 
 =cut
@@ -21,7 +21,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 package Locale::SubCountry::Codes;
 
 $Locale::SubCountry::Codes::JSON =
@@ -605,7 +605,7 @@ q{
       "alpha_3": "GMB",
       "name": "Gambia",
       "numeric": "270",
-      "official_name": "Islamic Republic of the Gambia"
+      "official_name": "Republic of the Gambia"
     },
     {
       "alpha_2": "GW",
@@ -994,9 +994,9 @@ q{
     {
       "alpha_2": "MK",
       "alpha_3": "MKD",
-      "name": "Macedonia, Republic of",
+      "name": "North Macedonia",
       "numeric": "807",
-      "official_name": "The Former Yugoslav Republic of Macedonia"
+      "official_name": "Republic of North Macedonia"
     },
     {
       "alpha_2": "ML",
@@ -1444,9 +1444,9 @@ q{
     {
       "alpha_2": "SZ",
       "alpha_3": "SWZ",
-      "name": "Swaziland",
+      "name": "Eswatini",
       "numeric": "748",
-      "official_name": "Kingdom of Swaziland"
+      "official_name": "Kingdom of Eswatini"
     },
     {
       "alpha_2": "SX",
@@ -1703,6 +1703,7 @@ q{
     }
   ],
   
+
   "3166-2": [
     {
       "code": "AD-02",
@@ -15782,460 +15783,512 @@ q{
     },
     {
       "code": "MA-01",
-      "name": "Tanger-Tétouan",
-      "type": "Economic region"
+      "name": "Tanger-Tétouan-Al Hoceïma",
+      "type": "Region"
     },
     {
       "code": "MA-02",
-      "name": "Gharb-Chrarda-Beni Hssen",
-      "type": "Economic region"
+      "name": "L'Oriental",
+      "type": "Region"
     },
     {
       "code": "MA-03",
-      "name": "Taza-Al Hoceima-Taounate",
-      "type": "Economic region"
+      "name": "Fès-Meknès",
+      "type": "Region"
     },
     {
       "code": "MA-04",
-      "name": "L'Oriental",
-      "type": "Economic region"
+      "name": "Rabat-Salé-Kénitra",
+      "type": "Region"
     },
     {
       "code": "MA-05",
-      "name": "Fès-Boulemane",
-      "type": "Economic region"
+      "name": "Béni Mellal-Khénifra",
+      "type": "Region"
     },
     {
       "code": "MA-06",
-      "name": "Meknès-Tafilalet",
-      "type": "Economic region"
+      "name": "Casablanca-Settat",
+      "type": "Region"
     },
     {
       "code": "MA-07",
-      "name": "Rabat-Salé-Zemmour-Zaer",
-      "type": "Economic region"
+      "name": "Marrakech-Safi",
+      "type": "Region"
     },
     {
       "code": "MA-08",
-      "name": "Grand Casablanca",
-      "type": "Economic region"
+      "name": "Drâa-Tafilalet",
+      "type": "Region"
     },
     {
       "code": "MA-09",
-      "name": "Chaouia-Ouardigha",
-      "type": "Economic region"
+      "name": "Souss-Massa",
+      "type": "Region"
     },
     {
       "code": "MA-10",
-      "name": "Doukhala-Abda",
-      "type": "Economic region"
+      "name": "Guelmim-Oued Noun (EH-partial)",
+      "type": "Region"
     },
     {
       "code": "MA-11",
-      "name": "Marrakech-Tensift-Al Haouz",
-      "type": "Economic region"
+      "name": "Laâyoune-Sakia El Hamra (EH-partial)",
+      "type": "Region"
     },
     {
       "code": "MA-12",
-      "name": "Tadla-Azilal",
-      "type": "Economic region"
-    },
-    {
-      "code": "MA-13",
-      "name": "Sous-Massa-Draa",
-      "type": "Economic region"
-    },
-    {
-      "code": "MA-14",
-      "name": "Guelmim-Es Smara",
-      "type": "Economic region"
-    },
-    {
-      "code": "MA-15",
-      "name": "Laâyoune-Boujdour-Sakia el Hamra",
-      "type": "Economic region"
-    },
-    {
-      "code": "MA-16",
-      "name": "Oued ed Dahab-Lagouira",
-      "type": "Economic region"
+      "name": "Dakhla-Oued Ed-Dahab (EH)",
+      "type": "Region"
     },
     {
       "code": "MA-AGD",
-      "name": "Agadir-Ida-Outanane",
-      "parent": "13",
+      "name": "Agadir-Ida-Ou-Tanane",
+      "parent": "MA-09",
       "type": "Prefecture"
     },
     {
       "code": "MA-AOU",
-      "name": "Aousserd",
-      "parent": "16",
-      "type": "Prefecture"
+      "name": "Aousserd (EH)",
+      "parent": "MA-12",
+      "type": "Province"
     },
     {
       "code": "MA-ASZ",
-      "name": "Assa-Zag",
-      "parent": "14",
+      "name": "Assa-Zag (EH-partial)",
+      "parent": "MA-10",
       "type": "Province"
     },
     {
       "code": "MA-AZI",
       "name": "Azilal",
-      "parent": "12",
+      "parent": "MA-05",
       "type": "Province"
     },
     {
       "code": "MA-BEM",
-      "name": "Beni Mellal",
-      "parent": "12",
+      "name": "Béni Mellal",
+      "parent": "MA-05",
       "type": "Province"
     },
     {
       "code": "MA-BER",
       "name": "Berkane",
-      "parent": "04",
+      "parent": "MA-02",
       "type": "Province"
     },
     {
       "code": "MA-BES",
-      "name": "Ben Slimane",
-      "parent": "09",
+      "name": "Benslimane",
+      "parent": "MA-06",
       "type": "Province"
     },
     {
       "code": "MA-BOD",
       "name": "Boujdour (EH)",
-      "parent": "15",
+      "parent": "MA-11",
       "type": "Province"
     },
     {
       "code": "MA-BOM",
       "name": "Boulemane",
-      "parent": "05",
+      "parent": "MA-03",
+      "type": "Province"
+    },
+    {
+      "code": "MA-BRR",
+      "name": "Berrechid",
+      "parent": "MA-06",
       "type": "Province"
     },
     {
       "code": "MA-CAS",
-      "name": "Casablanca [Dar el Beïda]",
-      "parent": "08",
+      "name": "Casablanca",
+      "parent": "MA-06",
       "type": "Prefecture"
     },
     {
       "code": "MA-CHE",
       "name": "Chefchaouen",
-      "parent": "01",
+      "parent": "MA-01",
       "type": "Province"
     },
     {
       "code": "MA-CHI",
       "name": "Chichaoua",
-      "parent": "11",
+      "parent": "MA-07",
       "type": "Province"
     },
     {
       "code": "MA-CHT",
       "name": "Chtouka-Ait Baha",
-      "parent": "13",
+      "parent": "MA-06",
+      "type": "Province"
+    },
+    {
+      "code": "MA-DRI",
+      "name": "Driouch",
+      "parent": "MA-02",
       "type": "Province"
     },
     {
       "code": "MA-ERR",
       "name": "Errachidia",
-      "parent": "06",
+      "parent": "MA-08",
       "type": "Province"
     },
     {
       "code": "MA-ESI",
       "name": "Essaouira",
-      "parent": "11",
+      "parent": "MA-07",
       "type": "Province"
     },
     {
       "code": "MA-ESM",
-      "name": "Es Smara (EH)",
-      "parent": "14",
+      "name": "Es-Semara (EH-partial)",
+      "parent": "MA-11",
       "type": "Province"
     },
     {
       "code": "MA-FAH",
-      "name": "Fahs-Beni Makada",
-      "parent": "01",
-      "type": "Prefecture"
+      "name": "Fahs-Anjra",
+      "parent": "MA-01",
+      "type": "Province"
     },
     {
       "code": "MA-FES",
-      "name": "Fès-Dar-Dbibegh",
-      "parent": "05",
+      "name": "Fès",
+      "parent": "MA-03",
       "type": "Prefecture"
     },
     {
       "code": "MA-FIG",
       "name": "Figuig",
-      "parent": "04",
+      "parent": "MA-02",
+      "type": "Province"
+    },
+    {
+      "code": "MA-FQH",
+      "name": "Fquih Ben Salah",
+      "parent": "MA-05",
       "type": "Province"
     },
     {
       "code": "MA-GUE",
       "name": "Guelmim",
-      "parent": "14",
+      "parent": "MA-10",
+      "type": "Province"
+    },
+    {
+      "code": "MA-GUF",
+      "name": "Guercif",
+      "parent": "MA-02",
       "type": "Province"
     },
     {
       "code": "MA-HAJ",
       "name": "El Hajeb",
-      "parent": "06",
+      "parent": "MA-03",
       "type": "Province"
     },
     {
       "code": "MA-HAO",
       "name": "Al Haouz",
-      "parent": "11",
+      "parent": "MA-07",
       "type": "Province"
     },
     {
       "code": "MA-HOC",
       "name": "Al Hoceïma",
-      "parent": "03",
+      "parent": "MA-01",
       "type": "Province"
     },
     {
       "code": "MA-IFR",
       "name": "Ifrane",
-      "parent": "06",
+      "parent": "MA-03",
       "type": "Province"
     },
     {
       "code": "MA-INE",
       "name": "Inezgane-Ait Melloul",
-      "parent": "13",
+      "parent": "MA-09",
       "type": "Prefecture"
     },
     {
       "code": "MA-JDI",
       "name": "El Jadida",
-      "parent": "10",
+      "parent": "MA-06",
       "type": "Province"
     },
     {
       "code": "MA-JRA",
-      "name": "Jrada",
-      "parent": "04",
+      "name": "Jerada",
+      "parent": "MA-02",
       "type": "Province"
     },
     {
       "code": "MA-KEN",
       "name": "Kénitra",
-      "parent": "02",
+      "parent": "MA-04",
       "type": "Province"
     },
     {
       "code": "MA-KES",
-      "name": "Kelaat es Sraghna",
-      "parent": "11",
+      "name": "El Kelâa des Sraghna",
+      "parent": "MA-07",
       "type": "Province"
     },
     {
       "code": "MA-KHE",
-      "name": "Khemisaet",
-      "parent": "07",
+      "name": "Khemisset",
+      "parent": "MA-04",
       "type": "Province"
     },
     {
       "code": "MA-KHN",
       "name": "Khenifra",
-      "parent": "06",
+      "parent": "MA-05",
       "type": "Province"
     },
     {
       "code": "MA-KHO",
       "name": "Khouribga",
-      "parent": "09",
+      "parent": "MA-05",
       "type": "Province"
     },
     {
       "code": "MA-LAA",
       "name": "Laâyoune (EH)",
-      "parent": "15",
+      "parent": "MA-11",
       "type": "Province"
     },
     {
       "code": "MA-LAR",
       "name": "Larache",
-      "parent": "01",
+      "parent": "MA-01",
       "type": "Province"
+    },
+    {
+      "code": "MA-MAR",
+      "name": "Marrakech",
+      "parent": "MA-07",
+      "type": "Prefecture"
+    },
+    {
+      "code": "MA-MDF",
+      "name": "M’diq-Fnideq",
+      "parent": "MA-01",
+      "type": "Prefecture"
     },
     {
       "code": "MA-MED",
       "name": "Médiouna",
-      "parent": "08",
+      "parent": "MA-06",
       "type": "Province"
     },
     {
       "code": "MA-MEK",
       "name": "Meknès",
-      "parent": "06",
+      "parent": "MA-03",
       "type": "Prefecture"
     },
     {
-      "code": "MA-MMD",
-      "name": "Marrakech-Medina",
-      "parent": "11",
-      "type": "Prefecture"
-    },
-    {
-      "code": "MA-MMN",
-      "name": "Marrakech-Menara",
-      "parent": "11",
-      "type": "Prefecture"
+      "code": "MA-MID",
+      "name": "Midelt",
+      "parent": "MA-08",
+      "type": "Province"
     },
     {
       "code": "MA-MOH",
       "name": "Mohammadia",
-      "parent": "08",
+      "parent": "MA-06",
       "type": "Prefecture"
     },
     {
       "code": "MA-MOU",
       "name": "Moulay Yacoub",
-      "parent": "05",
+      "parent": "MA-03",
       "type": "Province"
     },
     {
       "code": "MA-NAD",
       "name": "Nador",
-      "parent": "04",
+      "parent": "MA-02",
       "type": "Province"
     },
     {
       "code": "MA-NOU",
       "name": "Nouaceur",
-      "parent": "08",
+      "parent": "MA-04",
       "type": "Province"
     },
     {
       "code": "MA-OUA",
       "name": "Ouarzazate",
-      "parent": "13",
+      "parent": "MA-08",
       "type": "Province"
     },
     {
       "code": "MA-OUD",
-      "name": "Oued ed Dahab (EH)",
-      "parent": "16",
+      "name": "Oued Ed-Dahab (EH)",
+      "parent": "MA-12",
       "type": "Province"
     },
     {
       "code": "MA-OUJ",
       "name": "Oujda-Angad",
-      "parent": "04",
+      "parent": "MA-02",
       "type": "Prefecture"
+    },
+    {
+      "code": "MA-OUZ",
+      "name": "Ouezzane",
+      "parent": "MA-01",
+      "type": "Province"
     },
     {
       "code": "MA-RAB",
       "name": "Rabat",
-      "parent": "07",
+      "parent": "MA-04",
       "type": "Prefecture"
+    },
+    {
+      "code": "MA-REH",
+      "name": "Rehamna",
+      "parent": "MA-07",
+      "type": "Province"
     },
     {
       "code": "MA-SAF",
       "name": "Safi",
-      "parent": "10",
+      "parent": "MA-07",
       "type": "Province"
     },
     {
       "code": "MA-SAL",
       "name": "Salé",
-      "parent": "07",
+      "parent": "MA-04",
       "type": "Prefecture"
     },
     {
       "code": "MA-SEF",
       "name": "Sefrou",
-      "parent": "05",
+      "parent": "MA-03",
       "type": "Province"
     },
     {
       "code": "MA-SET",
       "name": "Settat",
-      "parent": "09",
+      "parent": "MA-06",
+      "type": "Province"
+    },
+    {
+      "code": "MA-SIB",
+      "name": "Sidi Bennour",
+      "parent": "MA-06",
+      "type": "Province"
+    },
+    {
+      "code": "MA-SIF",
+      "name": "Sidi Ifni",
+      "parent": "MA-10",
       "type": "Province"
     },
     {
       "code": "MA-SIK",
-      "name": "Sidl Kacem",
-      "parent": "02",
+      "name": "Sidi Kacem",
+      "parent": "MA-04",
+      "type": "Province"
+    },
+    {
+      "code": "MA-SIL",
+      "name": "Sidi Slimane",
+      "parent": "MA-04",
       "type": "Province"
     },
     {
       "code": "MA-SKH",
       "name": "Skhirate-Témara",
-      "parent": "07",
+      "parent": "MA-04",
       "type": "Prefecture"
     },
     {
-      "code": "MA-SYB",
-      "name": "Sidi Youssef Ben Ali",
-      "parent": "11",
-      "type": "Prefecture"
+      "code": "MA-TAF",
+      "name": "Tarfaya (EH-partial)",
+      "parent": "MA-11",
+      "type": "Province"
     },
     {
       "code": "MA-TAI",
       "name": "Taourirt",
-      "parent": "04",
+      "parent": "MA-02",
       "type": "Province"
     },
     {
       "code": "MA-TAO",
       "name": "Taounate",
-      "parent": "03",
+      "parent": "MA-03",
       "type": "Province"
     },
     {
       "code": "MA-TAR",
       "name": "Taroudant",
-      "parent": "13",
+      "parent": "MA-09",
       "type": "Province"
     },
     {
       "code": "MA-TAT",
       "name": "Tata",
-      "parent": "14",
+      "parent": "MA-09",
       "type": "Province"
     },
     {
       "code": "MA-TAZ",
       "name": "Taza",
-      "parent": "03",
+      "parent": "MA-03",
       "type": "Province"
     },
     {
       "code": "MA-TET",
       "name": "Tétouan",
-      "parent": "01",
-      "type": "Prefecture"
+      "parent": "MA-01",
+      "type": "Province"
+    },
+    {
+      "code": "MA-TIN",
+      "name": "Tinghir",
+      "parent": "MA-08",
+      "type": "Province"
     },
     {
       "code": "MA-TIZ",
       "name": "Tiznit",
-      "parent": "13",
+      "parent": "MA-09",
       "type": "Province"
     },
     {
       "code": "MA-TNG",
       "name": "Tanger-Assilah",
-      "parent": "01",
+      "parent": "MA-01",
       "type": "Prefecture"
     },
     {
       "code": "MA-TNT",
-      "name": "Tan-Tan",
-      "parent": "14",
+      "name": "Tan-Tan (EH-partial)",
+      "parent": "MA-10",
+      "type": "Province"
+    },
+    {
+      "code": "MA-YUS",
+      "name": "Youssoufia",
+      "parent": "MA-07",
       "type": "Province"
     },
     {
       "code": "MA-ZAG",
       "name": "Zagora",
-      "parent": "13",
+      "parent": "MA-08",
       "type": "Province"
     },
     {
@@ -19169,85 +19222,85 @@ q{
       "code": "NP-BA",
       "name": "Bagmati",
       "parent": "1",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-BH",
       "name": "Bheri",
       "parent": "2",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-DH",
       "name": "Dhawalagiri",
       "parent": "3",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-GA",
       "name": "Gandaki",
       "parent": "3",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-JA",
       "name": "Janakpur",
       "parent": "1",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-KA",
       "name": "Karnali",
       "parent": "2",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-KO",
       "name": "Kosi",
       "parent": "4",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-LU",
       "name": "Lumbini",
       "parent": "3",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-MA",
       "name": "Mahakali",
       "parent": "5",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-ME",
       "name": "Mechi",
       "parent": "4",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-NA",
       "name": "Narayani",
       "parent": "1",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-RA",
       "name": "Rapti",
       "parent": "2",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-SA",
       "name": "Sagarmatha",
       "parent": "4",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NP-SE",
       "name": "Seti",
       "parent": "5",
-      "type": "zone"
+      "type": "Zone"
     },
     {
       "code": "NR-01",
@@ -21900,87 +21953,87 @@ q{
     {
       "code": "SD-DC",
       "name": "Zalingei",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-DE",
       "name": "Sharq Dārfūr",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-DN",
       "name": "Shamāl Dārfūr",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-DS",
       "name": "Janūb Dārfūr",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-DW",
       "name": "Gharb Dārfūr",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-GD",
       "name": "Al Qaḑārif",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-GZ",
       "name": "Al Jazīrah",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-KA",
       "name": "Kassalā",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-KH",
       "name": "Al Kharţūm",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-KN",
       "name": "Shamāl Kurdufān",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-KS",
       "name": "Janūb Kurdufān",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-NB",
       "name": "An Nīl al Azraq",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-NO",
       "name": "Ash Shamālīyah",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-NR",
       "name": "An Nīl",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-NW",
       "name": "An Nīl al Abyaḑ",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-RS",
       "name": "Al Baḩr al Aḩmar",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SD-SI",
       "name": "Sinnār",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SE-AB",
@@ -23495,52 +23548,52 @@ q{
     {
       "code": "SS-BN",
       "name": "Northern Bahr el-Ghazal",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SS-BW",
       "name": "Western Bahr el-Ghazal",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SS-EC",
       "name": "Central Equatoria",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SS-EE8",
       "name": "Eastern Equatoria",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SS-EW",
       "name": "Western Equatoria",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SS-JG",
       "name": "Jonglei",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SS-LK",
       "name": "Lakes",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SS-NU",
       "name": "Upper Nile",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SS-UY",
       "name": "Unity",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "SS-WR",
       "name": "Warrap",
-      "type": "state"
+      "type": "State"
     },
     {
       "code": "ST-P",
@@ -27193,3 +27246,4 @@ q{
 };
 #-------------------------------------------------------------------------------
 1;
+  

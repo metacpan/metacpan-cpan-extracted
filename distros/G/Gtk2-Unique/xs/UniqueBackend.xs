@@ -16,6 +16,9 @@ Gkt2::UniqueBackend to request the name or to send messages.
 
 =cut
 
+=for object Gtk2::UniqueBackend IPC backend used by libunique
+
+=cut
 
 =for apidoc
 

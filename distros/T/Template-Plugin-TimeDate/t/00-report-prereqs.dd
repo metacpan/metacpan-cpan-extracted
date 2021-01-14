@@ -27,7 +27,8 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Date::Parse' => '0',
-                                      'Template::Plugin::Filter' => '2.00'
+                                      'Template::Plugin::Filter' => '2.00',
+                                      'perl' => '5.008'
                                     }
                     },
        'test' => {
@@ -41,7 +42,8 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::DiagINC' => '0.002',
-                                   'Test::More' => '0.94'
+                                   'Test::MockTime' => '0',
+                                   'Test::More' => '0.96'
                                  }
                  }
      };

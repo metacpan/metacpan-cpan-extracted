@@ -1,5 +1,8 @@
 Revision history for Perl module Math::NoCarry
 
+1.113 2021-01-13T06:22:25Z
+	* freshen distro, remove Travis CI, use Github Actions
+
 1.112 2018-05-24T14:14:51Z
 	* Change to Artistic License 2.0
 

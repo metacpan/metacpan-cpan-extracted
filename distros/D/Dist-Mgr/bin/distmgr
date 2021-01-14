@@ -2,14 +2,6 @@
 use warnings;
 use strict;
 
-# Test run
-
-# distmgr create --destroy -m Test::Module -a "Steve Bertrand" -e steveb@cpan.org -r test-module -u stevieb9
-# cd test-module/
-# ...add lines to Changes, commit & push
-# distmgr release -d
-# distmgr cycle
-
 use Capture::Tiny qw(:all);
 use Cwd qw(getcwd);
 use Data::Dumper;
@@ -35,6 +27,7 @@ GetOptions(
     "d|dryrun"    => \$args{cpan_dryrun},
     "v|version=s" => \$args{version},
     "V|verbose"   => \$args{verbose},
+    "w|wait!"     => \$args{wait},
 
     "g|gitignore"  => \$args{install_gitignore},
     "c|ci"         => \$args{install_ci},
@@ -51,7 +44,7 @@ GetOptions(
 # Make sure we don't upload stuff to the CPAN when in testing
 
 if ($args{destroy}) {
-    $args{dryrun} = 1;
+    $args{cpan_dryrun} = 1;
 }
 
 $args{cpan_id} //= $ENV{CPAN_USERNAME};
@@ -173,7 +166,7 @@ sub cycle {
 
     my $ver_incr = version_incr($ver);
 
-    version_bump($ver_incr, $module_file);
+    version_bump($ver_incr);
 
     changes_bump($ver_incr);
 
@@ -288,6 +281,8 @@ sub install {
 sub release {
     my (%args) = @_;
 
+    config(\%args);
+
     if ($args{help}) {
         help('release');
     }
@@ -302,7 +297,7 @@ sub release {
     # Changes (Add release date)
     changes_date();
 
-    # Git release (commit, push, CI)
+    # Convert module name to file name
     my $module_file = $module;
     $module_file =~ s/::/\//g;
     $module_file = 'lib/' . $module_file . '.pm';
@@ -313,6 +308,9 @@ sub release {
         die "ERROR: The $module_file file for $module can't be found\n";
     }
 
+    # Copyright bump
+    copyright_bump('lib/');
+
     # make manifest
     make_manifest($args{verbose});
 
@@ -322,10 +320,13 @@ sub release {
     }
 
     # CI testing
-    if ($git) {
-        if (! git_release($ver)) {
+    if ($git && git_status_differs()) {
+        if (! git_release($ver, $args{wait})) {
             die "\nERROR: User cancelled the release process due to failing CI testing\n";
         }
+    }
+    else {
+        print "\nRepository unchanged, skipping Git and CI operations\n";
     }
 
     # Bundle distribution
@@ -333,21 +334,34 @@ sub release {
     make_dist($args{verbose});
 
     # CPAN upload
+    print "\nAre you sure you're ready to upload to the CPAN?: [y/n]: ";
 
-    if ($args{cpan_id} && $args{cpan_pw}) {
-        (my $dist = $module) =~ s/::/-/g;
-        my $dist_file = (glob("${dist}-*.tar.gz"))[-1];
+    my $uploaded_to_cpan = 0;
+    my $upload_to_cpan_confirmed = $args{cpan_dryrun} ? 'No' : <>;
 
-        my $cpan_msg = capture_merged {
-            cpan_upload($dist_file, dry_run => $args{cpan_dryrun});
-        };
+    if ($upload_to_cpan_confirmed =~ /[Yy]/) {
+        if ($args{cpan_id} && $args{cpan_pw}) {
+            (my $dist = $module) =~ s/::/-/g;
+            my $dist_file = (glob("${dist}-*.tar.gz"))[-1];
 
-        if ($cpan_msg =~ /Message:\s+(.*)/) {
-            die "ERROR: CPAN failed with error '$1'. Couldn't upload.\n";
+            my $cpan_msg = capture_merged {
+                cpan_upload(
+                    $dist_file,
+                    user        => $args{cpan_id},
+                    password    => $args{cpan_pw},
+                    dry_run     => $args{cpan_dryrun}
+                    );
+            };
+
+            if ($cpan_msg =~ /Message:\s+(.*)/) {
+                die "ERROR: CPAN failed with error '$1'. Couldn't upload.\n";
+            }
+
+            $uploaded_to_cpan = 1;
         }
-    }
-    else {
-        print "\nCPAN ID nor password are set, not uploading\n";
+        else {
+            print "\nCPAN ID nor password are set, not uploading\n";
+        }
     }
 
     # Clean the working directory
@@ -361,13 +375,28 @@ sub release {
 
     $ENV{RELEASE_TESTING} = 0;
 
-    print "\nRelease process completed successfully\n";
+    $uploaded_to_cpan
+        ? print "\nRelease process completed, and build uploaded to the CPAN\n"
+        : print "\nRelease process completed, but we didn't upload to the CPAN\n";
 }
 
 # Functional
 
+sub generate_config {
+    config({});
+
+    my $file = config_file();
+
+    if (-e $file) {
+        print "\nDefault configuration file $file created ok\n";
+    }
+    else {
+        print "\nUnable to create the $file configuration file\n";
+    }
+}
 sub commands {
     return {
+        config  => \&generate_config,
         create  => \&create,
         cycle   => \&cycle,
         dist    => \&dist,
@@ -449,7 +478,7 @@ sub help {
             qq{Options:},
             qq{},
             qq{    -m | --module   Mandatory: The module name (eg. Test::Module)},
-            qq{    -a | --author   Mandatory: The name of the author (eg. Steve Bertrand)},
+            qq{    -a | --author   Mandatory: The name of the author (eg. "Steve Bertrand")},
             qq{    -e | --email    Mandatory: The email address of the author},
             qq{    -u | --user     Optional:  The Github username (eg. stevieb9)},
             qq{    -r | --repo     Optional:  The Github repository name (eg. test-module)},
@@ -470,7 +499,7 @@ sub help {
             qq{Options:},
             qq{},
             qq{    -m | --module   Mandatory: The module name (eg. Test::Module)},
-            qq{    -a | --author   Mandatory: The name of the author (eg. Steve Bertrand)},
+            qq{    -a | --author   Mandatory: The name of the author (eg. "Steve Bertrand")},
             qq{    -e | --email    Mandatory: The email address of the author},
             qq{    -V | --verbose  Optional:  (Flag) Display verbose output for each process},
             qq{    -h | --help     Optional:  (Flag) Display this help message},
@@ -544,12 +573,13 @@ Commands:
 
 create - Creates a full blown distribution with everything included
 
-    -m | --module   Mandatory: The module name (eg. Test::Module)
-    -a | --author   Mandatory: The name of the author (eg. Steve Bertrand)
-    -e | --email    Mandatory: The email address of the author
-    -u | --user     Optional:  The Github username (eg. stevieb9)
-    -r | --repo     Optional:  The Github repository name (eg. test-module)
-    -V | --verbose  Optional:  Display verbose output for each process
+    -m | --module    Mandatory: The module name (eg. Test::Module)
+    -a | --author    Mandatory: The name of the author (eg. "Steve Bertrand")
+    -e | --email     Mandatory: The email address of the author
+    -u | --user      Optional:  The Github username (eg. stevieb9)
+    -r | --repo      Optional:  The Github repository name (eg. test-module)
+    -w | --wait      Optional:  Don't wait for CI test results (--nowait to disable)
+    -V | --verbose   Optional:  Display verbose output for each process
 
 Note: For Git integration, create an empty Github repository, send in its short
 name with --repo and your Github username with --user.
@@ -561,7 +591,7 @@ cycle - Bumps version numbers and prepares for the next development cycle
 dist - Creates a bare-bones distribution with just the basics
 
     -m | --module   Mandatory: The module name (eg. Test::Module)
-    -a | --author   Mandatory: The name of the author (eg. Steve Bertrand)
+    -a | --author   Mandatory: The name of the author (eg. "Steve Bertrand")
     -e | --email    Mandatory: The email address of the author
     -V | --verbose  Optional:  (Flag) Display verbose output for each process
 
@@ -584,106 +614,7 @@ Notes: No Git operations will be performed without C<--repo> and C<--user>. If
 the --cpanid or --cpanpw aren't available or the CPAN_USERNAME or
 CPAN_PASSWORD environment variables aren't set, we won't upload to the CPAN.
 
-__END__
+config - Creates an initial default configuration file.
 
-=head1 NAME
-
-distmgr - Create, integrate, release a Perl distribution to the CPAN, and
-prepare for the next development cycle.
-
-=for html
-<a href="https://github.com/stevieb9/dist-mgr/actions"><img src="https://github.com/stevieb9/dist-mgr/workflows/CI/badge.svg"/></a>
-<a href='https://coveralls.io/github/stevieb9/dist-mgr?branch=master'><img src='https://coveralls.io/repos/stevieb9/dist-mgr/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
-
-=head1 DESCRIPTION
-
-Performs a full suite of automated creation, addition, pre-release, release and
-post release tasks for Perl distributions. It integrates with VCS, automates the
-configuration of Continuous Integration, manages version numbers and Changes
-files, amongst a slew of other tasks.
-
-This B<distmgr> application uses the L<Dist::Mgr> library as its backend.
-
-=head1 USAGE
-
-    distmgr <command> [OPTIONS]
-
-=head1 COMMANDS
-
-=head2 create
-
-Creates a full blown, brand new distribution with everything included.
-
-I<Options>:
-
-    -m | --module   Mandatory: The module name (eg. Test::Module)
-    -a | --author   Mandatory: The name of the author (eg. Steve Bertrand)
-    -e | --email    Mandatory: The email address of the author
-    -u | --user     Optional:  The Github username (eg. stevieb9)
-    -r | --repo     Optional:  The Github repository name (eg. test-module)
-    -V | --verbose  Optional:  Display verbose output for each process
-
-I<Note>: For Git integration, create an empty repository on Github, then supply
-the short name of the repository with C<--repo> and your Github username with
-C<--user> and we'll clone the new repo and use it as the top-level distribution
-directory.
-
-I<Note>: We will skip adding repository information, skip adding CI badge info,
-and skip adding repository and bugtracker information to C<Makefile.PL> file
-if --user or --repo are not present in the parameter list (see L</install>).
-
-=head2 dist
-
-Creates a bare-bones distribution with just the basics. There will be no git
-integration, no CI integration etc. Pretty well nearly a stock L<Module::Starter>
-distribution with a few small tweaks.
-
-I<Options>:
-
-    -m | --module   Mandatory: The module name (eg. Test::Module)
-    -a | --author   Mandatory: The name of the author (eg. Steve Bertrand)
-    -e | --email    Mandatory: The email address of the author
-    -V | --verbose  Optional:  (Flag) Display verbose output for each process
-
-=head2 install
-
-Installs/adds various files or file sections into an existing distribution that
-you author.
-
-I<Options>:
-
-All of the below options are flags, and don't take any arguments.
-
-    -g | --gitignore    Install .gitignore file
-    -c | --ci           Install Github Actions CI configuration file
-    -B | --badges       Insert CI/Coverage badges links into the module's POD
-    -b | --bugtracker   Insert bugtracker information into Makefile.PL
-    -R | --repository   Insert repository information into Makefile.PL
-    -A | --all          Insert/Install all above options
-
-I<Note>: For badges, bugtracker and repository, the C<--user> (Github username)
-and C<--repo> (Github repository) arguments must be supplied.
-
-=head2 release
-
-Prepares for, tests, runs Continuous Integration testing, commits, tags, pushes
-and releases to the CPAN your distribution.
-
-I<Options>:
-
-    -i | --cpanid   Optional:  Your PAUSE userid
-    -p | --cpanpw   Optional:  Your PAUSE userid's password
-    -d | --dryrun   Optional:  (Flag) Don't actually upload to the CPAN
-
-I<Note>: No Git operations will be performed without C<--repo> and C<--user>. If
-the C<--cpanid> or C<--cpanpw> aren't available or the C<CPAN_USERNAME> or
-C<CPAN_PASSWORD> environment variables aren't set, we won't upload to the CPAN.
-
-=head2  cycle
-
-After release, this command will bump version numbers in all of your modules,
-and prepare the Changes file for your next development cycle.
-
-I<Options>:
-
-    -V | --verbose  Optional:  Display verbose output for each process
+This file will be named dist-mgr.json and will be placed in your HOME
+directory on Unix systems, and in your USERPROFILE directory on Windows.

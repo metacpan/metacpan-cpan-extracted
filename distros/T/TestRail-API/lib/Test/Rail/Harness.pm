@@ -1,7 +1,7 @@
 # ABSTRACT: TestRail testing harness
 # PODNAME: Test::Rail::Harness
 package Test::Rail::Harness;
-$Test::Rail::Harness::VERSION = '0.047';
+$Test::Rail::Harness::VERSION = '0.048';
 use strict;
 use warnings;
 
@@ -83,7 +83,7 @@ Test::Rail::Harness - TestRail testing harness
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 DESCRIPTION
 
@@ -124,7 +124,7 @@ and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by George S. Baugh.
+This software is copyright (c) 2021 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 Revision history for Perl extension Template::Plugin::NoFollow
 
+1.04      2021-01-12 10:55:00-08:00 America/Vancouver
+    - Bump minimum required Perl to 5.08
+
 1.03      2021-01-04 22:49:16-08:00 America/Vancouver
     - Switch to Dist::Zilla for release management
     - POD cleanups; whitespace, spelling

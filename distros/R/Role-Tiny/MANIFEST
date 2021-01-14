@@ -8,12 +8,15 @@ t/concrete-methods.t
 t/create-hook.t
 t/does.t
 t/extend-role-tiny.t
+t/extend.t
 t/lib/BrokenModule.pm
+t/lib/ExistingModule.pm
 t/lib/FalseModule.pm
-t/lib/TrackLoad.pm
+t/lib/TrueModule.pm
 t/load-module.t
 t/make-role.t
 t/method-conflicts.t
+t/namespace-clean.t
 t/overload.t
 t/proto.t
 t/role-basic-basic.t
@@ -31,9 +34,9 @@ t/subclass.t
 xt/around-does.t
 xt/compose-modifiers.t
 xt/dependents.t
-xt/does-Moo.t
+xt/dependents/Moo-isa-assign.patch
+xt/dependents/Moo-sort-sub-quote.patch
 xt/modifiers.t
-xt/namespace-clean.t
 xt/recompose-modifier.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

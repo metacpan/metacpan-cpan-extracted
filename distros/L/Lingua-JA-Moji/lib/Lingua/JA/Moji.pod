@@ -25,7 +25,7 @@ produces output
     アイウエオ
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.57/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.58/examples/synopsis.pl> in the distribution.)
 
 
 Convert between different forms of kana:
@@ -51,13 +51,13 @@ produces output
     ㋐㋑㋒㋓㋔㋕゛ッ㋫゜㋪゜ョン
 
 
-(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.57/examples/syn-kana.pl> in the distribution.)
+(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.58/examples/syn-kana.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.57
-corresponding to git commit L<003fbbfa1e950d90086eb1c6666cda8f23b96a70|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/003fbbfa1e950d90086eb1c6666cda8f23b96a70> made on Thu Nov 26 15:46:46 2020 +0900.
+This document describes Lingua::JA::Moji version 0.58
+corresponding to git commit L<a3c4e85468fa8096b3e16d5d15082a25fb708ff3|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/a3c4e85468fa8096b3e16d5d15082a25fb708ff3> made on Wed Jan 13 01:15:51 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -88,6 +88,122 @@ or kana into kanji.
 =head1 ROMANIZATION
 
 These functions convert Japanese letters to and from romanized forms.
+
+
+
+
+
+=head2 is_romaji 
+
+
+
+    use Lingua::JA::Moji 'is_romaji';
+    # The following line returns "undef"
+    is_romaji ("abcdefg");
+    # The following line returns a defined value
+    is_romaji ('loyehye');
+    # The following line returns a defined value
+    is_romaji ("atarimae");
+
+
+
+This detects whether a string of alphabetical characters, which may
+also include characters with macrons or circumflexes, "looks like"
+romanized Japanese. If the test is successful, it returns a true
+value, and if the test is unsuccessful, it returns a false value. If
+the string is empty, it returns a false value. Hyphens are not allowed
+as the first character.
+
+This works by converting the string to kana via L</romaji2kana> and
+seeing if it converts cleanly or not.
+
+The "true" value returned is the output of the round-trip conversion,
+converted into wapuro format.
+
+
+
+
+
+
+
+=head2 is_romaji_semistrict 
+
+
+
+    use Lingua::JA::Moji 'is_romaji_semistrict';
+    # The following line returns "undef"
+    is_romaji_semistrict ("abcdefg");
+    # The following line returns "undef"
+    is_romaji_semistrict ('loyehye');
+    # The following line returns a defined value
+    is_romaji_semistrict ("atarimae");
+    # The following line returns a defined value
+    is_romaji_semistrict ("pinku no dorufin");
+
+
+
+Halfway between L</is_romaji> and L</is_romaji_strict>, this allows
+some formations like "pinku no dorufin" but not the really unlikely
+stuff which "is_romaji" allows.
+
+
+
+
+
+
+
+=head2 is_romaji_strict 
+
+
+
+    use Lingua::JA::Moji 'is_romaji_strict';
+    # The following line returns "undef"
+    is_romaji_strict ("abcdefg");
+    # The following line returns "undef"
+    is_romaji_strict ('loyehye');
+    # The following line returns a defined value
+    is_romaji_strict ("atarimae");
+
+
+
+This detects whether a string of alphabetical characters, which may
+also include characters with macrons or circumflexes, "looks like"
+romanized Japanese. If the test is successful, it returns a true
+value, and if the test is unsuccessful, it returns a false value. If
+the string is empty, it returns a false value.
+
+This test is much stricter than L</is_romaji>. It insists that the
+word does not contain constructions which may be valid as inputs to an
+IME, but which do not look like Japanese words.
+
+The "true" value returned is the output of the round-trip conversion,
+converted into wapuro format.
+
+This was added to the module in version L</0.27>.
+
+
+
+
+
+
+
+
+=head2 is_voiced 
+
+
+
+    use Lingua::JA::Moji 'is_voiced';
+    if (is_voiced ('が')) {
+         print "が is voiced.\n";
+    }
+
+
+
+Given a kana or romaji input, C<is_voiced> returns a true value if the
+sound is a voiced sound like I<a>, I<za>, I<ga>, etc. and the
+undefined value if not.
+
+
 
 
 
@@ -230,6 +346,81 @@ becomes "o".
 
 
 
+=head2 kana_consonant 
+
+
+
+    use Lingua::JA::Moji 'kana_consonant';
+    $consonant = kana_consonant ('ざる');
+    # $consonant = 's'
+
+
+
+Given a kana input, return the "dictionary order" consonant of the
+first kana. If the first kana is any of あいうえお, it returns an
+empty string. If the kana is an unvoiced kana, it returns the
+corresponding consonant of the first kana in the Nippon-shiki
+romanisation. If the kana is a voiced kana, it returns the
+corresponding consonant of the unvoiced version of the first kana in
+the Nippon-shiki romanisation.
+
+This enables Japanese words to be sorted into the order used in
+Japanese dictionaries, where the voiced/unvoiced distinction between,
+for example, za and sa, or ta and da, is ignored.
+
+
+
+
+
+
+
+=head2 normalize_romaji 
+
+
+
+    use Lingua::JA::Moji 'normalize_romaji';
+    $normalized = normalize_romaji ('tsumuji');
+
+
+
+C<normalize_romaji> converts romanized Japanese to a canonical form,
+which is based on the Nippon-shiki romanization, but without
+representing long vowels using a circumflex. In the canonical form,
+sokuon (っ) characters are converted into the string "xtu". If there
+is kana in the input string, this will also be converted to romaji.
+
+C<normalize_romaji> is for comparing two Japanese words which may be
+represented in different ways, for example in different romanization
+systems, to see if they refer to the same word despite the difference
+in writing. It does not provide a standardized or
+officially-sanctioned form of romanization.
+
+
+
+
+
+
+
+=head2 romaji2hiragana 
+
+Convert romaji to hiragana.
+
+    use Lingua::JA::Moji 'romaji2hiragana';
+    $hiragana = romaji2hiragana ('babubo');
+    # $hiragana = 'ばぶぼ'
+
+
+
+Convert romanized Japanese into hiragana. This takes the same options
+as L</romaji2kana>. It also switches on the "wapuro" option, which
+uses long vowels with a kana rather than a L</chouon>.
+
+
+
+
+
+
+
 =head2 romaji2kana 
 
 Convert romaji to kana.
@@ -263,26 +454,6 @@ option is switched on.
 
 See also L</is_romaji>, L</is_romaji_strict>, and
 L</is_romaji_semistrict> for validation of romanised Japanese inputs.
-
-
-
-
-
-
-
-=head2 romaji2hiragana 
-
-Convert romaji to hiragana.
-
-    use Lingua::JA::Moji 'romaji2hiragana';
-    $hiragana = romaji2hiragana ('babubo');
-    # $hiragana = 'ばぶぼ'
-
-
-
-Convert romanized Japanese into hiragana. This takes the same options
-as L</romaji2kana>. It also switches on the "wapuro" option, which
-uses long vowels with a kana rather than a L</chouon>.
 
 
 
@@ -331,154 +502,36 @@ Returns a list of valid styles of romaji vowels.
 
 
 
-=head2 is_voiced 
-
-
-
-    use Lingua::JA::Moji 'is_voiced';
-    if (is_voiced ('が')) {
-         print "が is voiced.\n";
-    }
-
-
-
-Given a kana or romaji input, C<is_voiced> returns a true value if the
-sound is a voiced sound like I<a>, I<za>, I<ga>, etc. and the
-undefined value if not.
-
-
-
-
-
-
-
-=head2 is_romaji 
-
-
-
-    use Lingua::JA::Moji 'is_romaji';
-    # The following line returns "undef"
-    is_romaji ("abcdefg");
-    # The following line returns a defined value
-    is_romaji ('loyehye');
-    # The following line returns a defined value
-    is_romaji ("atarimae");
-
-
-
-This detects whether a string of alphabetical characters, which may
-also include characters with macrons or circumflexes, "looks like"
-romanized Japanese. If the test is successful, it returns a true
-value, and if the test is unsuccessful, it returns a false value. If
-the string is empty, it returns a false value. Hyphens are not allowed
-as the first character.
-
-This works by converting the string to kana via L</romaji2kana> and
-seeing if it converts cleanly or not.
-
-The "true" value returned is the output of the round-trip conversion,
-converted into wapuro format.
-
-
-
-
-
-
-
-=head2 is_romaji_strict 
-
-
-
-    use Lingua::JA::Moji 'is_romaji_strict';
-    # The following line returns "undef"
-    is_romaji_strict ("abcdefg");
-    # The following line returns "undef"
-    is_romaji_strict ('loyehye');
-    # The following line returns a defined value
-    is_romaji_strict ("atarimae");
-
-
-
-This detects whether a string of alphabetical characters, which may
-also include characters with macrons or circumflexes, "looks like"
-romanized Japanese. If the test is successful, it returns a true
-value, and if the test is unsuccessful, it returns a false value. If
-the string is empty, it returns a false value.
-
-This test is much stricter than L</is_romaji>. It insists that the
-word does not contain constructions which may be valid as inputs to an
-IME, but which do not look like Japanese words.
-
-The "true" value returned is the output of the round-trip conversion,
-converted into wapuro format.
-
-This was added to the module in version L</0.27>.
-
-
-
-
-
-
-
-
-=head2 is_romaji_semistrict 
-
-
-
-    use Lingua::JA::Moji 'is_romaji_semistrict';
-    # The following line returns "undef"
-    is_romaji_semistrict ("abcdefg");
-    # The following line returns "undef"
-    is_romaji_semistrict ('loyehye');
-    # The following line returns a defined value
-    is_romaji_semistrict ("atarimae");
-    # The following line returns a defined value
-    is_romaji_semistrict ("pinku no dorufin");
-
-
-
-Halfway between L</is_romaji> and L</is_romaji_strict>, this allows
-some formations like "pinku no dorufin" but not the really unlikely
-stuff which "is_romaji" allows.
-
-
-
-
-
-
-
-=head2 normalize_romaji 
-
-
-
-    use Lingua::JA::Moji 'normalize_romaji';
-    $normalized = normalize_romaji ('tsumuji');
-
-
-
-C<normalize_romaji> converts romanized Japanese to a canonical form,
-which is based on the Nippon-shiki romanization, but without
-representing long vowels using a circumflex. In the canonical form,
-sokuon (っ) characters are converted into the string "xtu". If there
-is kana in the input string, this will also be converted to romaji.
-
-C<normalize_romaji> is for comparing two Japanese words which may be
-represented in different ways, for example in different romanization
-systems, to see if they refer to the same word despite the difference
-in writing. It does not provide a standardized or
-officially-sanctioned form of romanization.
-
-
-
-
-
-
-
 
 
 =head1 KANA
 
 These functions convert one form of kana into another.
+
+
+
+
+
+=head2 cleanup_kana 
+
+
+
+    use Lingua::JA::Moji 'cleanup_kana';
+
+
+This function converts any of hiragana, halfwidth katakana, or romaji
+input into katakana. It also converts various confusable kanji
+characters into kana. For example the "one" kanji 一 is converted into
+a L</chouon>, ー, and the "mouth" kanji 口 is converted into the
+katakana ロ (ro).
+
+This is used as the "front end" function for L<this katakana to
+English web application|https://www.sljfaq.org/cgi/k2e.cgi>.
+
+This was added to the module in version L</0.46>.
+
+
+
 
 
 
@@ -510,25 +563,160 @@ This does not convert L</chouon> signs.
 
 
 
-=head2 kata2hira 
+=head2 hw2katakana 
 
-Convert katakana to hiragana.
+Convert halfwidth katakana to katakana.
 
-    use Lingua::JA::Moji 'kata2hira';
-    $hiragana = kata2hira ('カキクケコ');
-    # $hiragana = 'かきくけこ'
+    use Lingua::JA::Moji 'hw2katakana';
+    $full_width = hw2katakana ('ｱｲｳｶｷｷﾞｮｳ｡');
+    # $full_width = 'アイウカキギョウ。'
 
 
 
-C<kata2hira> converts full-width katakana into hiragana. If the input
-is a list, it converts each element of the list, and in list context,
-returns a list of the converted inputs, otherwise it returns a
-concatenation of the strings.
+C<hw2katakana> converts L</halfwidth katakana> and halfwidth Japanese
+punctuation to fullwidth katakana and fullwidth punctuation. Its
+function is similar to the Emacs command
+C<japanese-zenkaku-region>. For the opposite function, see L<kana2hw>.
 
-    my @hiragana = hira2kata (@katakana);
 
-This function does not convert L</chouon> signs into long vowels. It
-also does not convert half-width katakana into hiragana.
+
+
+
+
+
+=head2 InHankakuKatakana 
+
+
+
+    use Lingua::JA::Moji 'InHankakuKatakana';
+    use utf8;
+    if ('ｱ' =~ /\p{InHankakuKatakana}/) {
+        print "ｱ is half-width katakana\n";
+    }
+
+
+
+C<InHankakuKatakana> is a character class for use in regular
+expressions with C<\p> which can validate L</halfwidth katakana>.
+
+
+
+
+
+
+
+=head2 InKana 
+
+
+
+    use Lingua::JA::Moji 'InKana';
+    $is_kana = ('アイウエオ' =~ /^\p{InKana}+$/);
+    # $is_kana = '1'
+
+
+
+A character class for use in regular expressions which matches all
+kana characters. This class catches meaningful combinations of
+hiragana, katakana, halfwidth katakana, circled katakana, and katakana
+combined words. It does not match the hentaigana characters of
+Unicode.
+
+This is a combination of the existing Perl character classes
+C<Katakana>, C<InKatakana>, and C<InHiragana>, minus unassigned
+characters, plus the "halfwidth katakana prolonged sound mark"
+(U+FF70) <ｰ> (chouon), the "halfwidth katakana voiced sound mark"
+(U+FF9E) <ﾞ> (L</dakuten>) and the "halfwidth katakana semivoiced
+sound mark" (U+FF9F) <ﾟ> (L</handakuten>), minus '・', Unicode 30FB,
+"KATAKANA MIDDLE DOT". It is somewhat like the following:
+
+    qr/\p{Katakana}|\p{InKatakana}|\p{InHiragana}|ｰ|ﾞ|ﾟ>/
+
+except that the unassigned points which are matched by C<\p{Katakana}>
+are not matched and KATAKANA MIDDLE DOT is not matched.
+
+
+
+
+
+
+
+=head2 is_hiragana 
+
+
+
+    use Lingua::JA::Moji 'is_hiragana';
+    
+
+
+
+This function returns a true value if its argument is a string of
+hiragana, and an undefined value if not. The entire string from
+beginning to end must all be kana for this to return true. The kana
+cannot include punctuation marks or L</chouon>.
+
+
+
+
+
+
+
+=head2 is_kana 
+
+
+
+    use Lingua::JA::Moji 'is_kana';
+    
+
+
+
+This function returns a true value if its argument is a string of
+kana, or an undefined value if not. The input cannot contain
+punctuation or L</chouon>.
+
+
+
+
+
+
+
+=head2 join_sound_marks 
+
+
+
+    use Lingua::JA::Moji 'join_sound_marks';
+    $joined = join_sound_marks ('か゛は゜つ゛');
+    # $joined = 'がぱづ'
+
+
+
+Join L</dakuten> and L</handakuten> (Unicode U+3099-U+309C) to kana
+where possible. Where they cannot be joined, strip them out. This only
+works on full width kana. The return value is the joined text.
+
+This was added to the module in version L</0.53>.
+
+
+
+
+
+
+
+
+=head2 kana2hw 
+
+Convert kana to halfwidth katakana.
+
+    use Lingua::JA::Moji 'kana2hw';
+    $half_width = kana2hw ('あいウカキぎょう。');
+    # $half_width = 'ｱｲｳｶｷｷﾞｮｳ｡'
+
+
+
+C<kana2hw> converts hiragana, katakana, and fullwidth Japanese
+punctuation to L</halfwidth katakana> and halfwidth punctuation. Its
+function is similar to the Emacs command C<japanese-hankaku-region>.
+For the opposite function, see L<hw2katakana>. See also
+L</katakana2hw> for a function which only converts katakana.
 
 
 
@@ -575,89 +763,25 @@ Convert small-sized kana such as 「ぁ」 into full-sized kana such as
 
 
 
-=head2 nigori_first 
+=head2 kata2hira 
+
+Convert katakana to hiragana.
+
+    use Lingua::JA::Moji 'kata2hira';
+    $hiragana = kata2hira ('カキクケコ');
+    # $hiragana = 'かきくけこ'
 
 
 
-    use Lingua::JA::Moji 'nigori_first';
-    my @list = (qw/カン スウ ハツ オオ/);
-    nigori_first (\@list);
-    # Now @list = (qw/カン スウ ハツ オオ ガン ズウ バツ パツ/);
+C<kata2hira> converts full-width katakana into hiragana. If the input
+is a list, it converts each element of the list, and in list context,
+returns a list of the converted inputs, otherwise it returns a
+concatenation of the strings.
 
+    my @hiragana = hira2kata (@katakana);
 
-
-Given a list of kana, add all the possible versions of the words with
-the first kana with either a L</dakuten> or a L</handakuten> added.
-
-This was intended for a search for a particular kanji in a
-dictionary. It is not actually in use anywhere at the moment.
-
-This was added to the module in version L</0.36>.
-
-
-
-
-
-
-
-
-=head2 InHankakuKatakana 
-
-
-
-    use Lingua::JA::Moji 'InHankakuKatakana';
-    use utf8;
-    if ('ｱ' =~ /\p{InHankakuKatakana}/) {
-        print "ｱ is half-width katakana\n";
-    }
-
-
-
-C<InHankakuKatakana> is a character class for use in regular
-expressions with C<\p> which can validate L</halfwidth katakana>.
-
-
-
-
-
-
-
-=head2 kana2hw 
-
-Convert kana to halfwidth katakana.
-
-    use Lingua::JA::Moji 'kana2hw';
-    $half_width = kana2hw ('あいウカキぎょう。');
-    # $half_width = 'ｱｲｳｶｷｷﾞｮｳ｡'
-
-
-
-C<kana2hw> converts hiragana, katakana, and fullwidth Japanese
-punctuation to L</halfwidth katakana> and halfwidth punctuation. Its
-function is similar to the Emacs command C<japanese-hankaku-region>.
-For the opposite function, see L<hw2katakana>. See also
-L</katakana2hw> for a function which only converts katakana.
-
-
-
-
-
-
-
-=head2 hw2katakana 
-
-Convert halfwidth katakana to katakana.
-
-    use Lingua::JA::Moji 'hw2katakana';
-    $full_width = hw2katakana ('ｱｲｳｶｷｷﾞｮｳ｡');
-    # $full_width = 'アイウカキギョウ。'
-
-
-
-C<hw2katakana> converts L</halfwidth katakana> and halfwidth Japanese
-punctuation to fullwidth katakana and fullwidth punctuation. Its
-function is similar to the Emacs command
-C<japanese-zenkaku-region>. For the opposite function, see L<kana2hw>.
+This function does not convert L</chouon> signs into long vowels. It
+also does not convert half-width katakana into hiragana.
 
 
 
@@ -684,38 +808,17 @@ unchanged. See also L</kana2hw>.
 
 
 
-=head2 is_kana 
+=head2 katakana2square 
 
 
 
-    use Lingua::JA::Moji 'is_kana';
-    
+    use Lingua::JA::Moji 'katakana2square';
+    $sq = katakana2square ('カロリーアイウエオウォン');
+    # $sq = '㌍アイウエオ㌆'
 
 
 
-This function returns a true value if its argument is a string of
-kana, or an undefined value if not. The input cannot contain
-punctuation or L</chouon>.
-
-
-
-
-
-
-
-=head2 is_hiragana 
-
-
-
-    use Lingua::JA::Moji 'is_hiragana';
-    
-
-
-
-This function returns a true value if its argument is a string of
-hiragana, and an undefined value if not. The entire string from
-beginning to end must all be kana for this to return true. The kana
-cannot include punctuation marks or L</chouon>.
+Convert katakana into a square thing if possible.
 
 
 
@@ -759,70 +862,25 @@ This was added to the module in version L</0.24>.
 
 
 
-=head2 InKana 
+=head2 nigori_first 
 
 
 
-    use Lingua::JA::Moji 'InKana';
-    $is_kana = ('アイウエオ' =~ /^\p{InKana}+$/);
-    # $is_kana = '1'
+    use Lingua::JA::Moji 'nigori_first';
+    my @list = (qw/カン スウ ハツ オオ/);
+    nigori_first (\@list);
+    # Now @list = (qw/カン スウ ハツ オオ ガン ズウ バツ パツ/);
 
 
 
-A character class for use in regular expressions which matches all
-kana characters. This class catches meaningful combinations of
-hiragana, katakana, halfwidth katakana, circled katakana, and katakana
-combined words. It does not match the hentaigana characters of
-Unicode.
+Given a list of kana, add all the possible versions of the words with
+the first kana with either a L</dakuten> or a L</handakuten> added.
 
-This is a combination of the existing Perl character classes
-C<Katakana>, C<InKatakana>, and C<InHiragana>, minus unassigned
-characters, plus the "halfwidth katakana prolonged sound mark"
-(U+FF70) <ｰ> (chouon), the "halfwidth katakana voiced sound mark"
-(U+FF9E) <ﾞ> (L</dakuten>) and the "halfwidth katakana semivoiced
-sound mark" (U+FF9F) <ﾟ> (L</handakuten>), minus '・', Unicode 30FB,
-"KATAKANA MIDDLE DOT". It is somewhat like the following:
+This was intended for a search for a particular kanji in a
+dictionary. It is not actually in use anywhere at the moment.
 
-    qr/\p{Katakana}|\p{InKatakana}|\p{InHiragana}|ｰ|ﾞ|ﾟ>/
+This was added to the module in version L</0.36>.
 
-except that the unassigned points which are matched by C<\p{Katakana}>
-are not matched and KATAKANA MIDDLE DOT is not matched.
-
-
-
-
-
-
-
-=head2 square2katakana 
-
-
-
-    use Lingua::JA::Moji 'square2katakana';
-    $kata = square2katakana ('㌆');
-    # $kata = 'ウォン'
-
-
-
-Convert a square katakana box into its components.
-
-
-
-
-
-
-
-=head2 katakana2square 
-
-
-
-    use Lingua::JA::Moji 'katakana2square';
-    $sq = katakana2square ('カロリーアイウエオウォン');
-    # $sq = '㌍アイウエオ㌆'
-
-
-
-Convert katakana into a square thing if possible.
 
 
 
@@ -862,54 +920,6 @@ This was added to the module in version L</0.46>.
 
 
 
-=head2 cleanup_kana 
-
-
-
-    use Lingua::JA::Moji 'cleanup_kana';
-
-
-This function converts any of hiragana, halfwidth katakana, or romaji
-input into katakana. It also converts various confusable kanji
-characters into kana. For example the "one" kanji 一 is converted into
-a L</chouon>, ー, and the "mouth" kanji 口 is converted into the
-katakana ロ (ro).
-
-This is used as the "front end" function for L<this katakana to
-English web application|https://www.sljfaq.org/cgi/k2e.cgi>.
-
-This was added to the module in version L</0.46>.
-
-
-
-
-
-
-
-
-=head2 join_sound_marks 
-
-
-
-    use Lingua::JA::Moji 'join_sound_marks';
-    $joined = join_sound_marks ('か゛は゜つ゛');
-    # $joined = 'がぱづ'
-
-
-
-Join L</dakuten> and L</handakuten> (Unicode U+3099-U+309C) to kana
-where possible. Where they cannot be joined, strip them out. This only
-works on full width kana. The return value is the joined text.
-
-This was added to the module in version L</0.53>.
-
-
-
-
-
-
-
-
 =head2 split_sound_marks 
 
 
@@ -929,6 +939,24 @@ works on full width kana. The return value is the split text.
 
 This was added to the module in version L</0.53>.
 
+
+
+
+
+
+
+
+=head2 square2katakana 
+
+
+
+    use Lingua::JA::Moji 'square2katakana';
+    $kata = square2katakana ('㌆');
+    # $kata = 'ウォン'
+
+
+
+Convert a square katakana box into its components.
 
 
 
@@ -987,27 +1015,6 @@ This was added to the module in version L</0.43>.
 
 
 
-=head2 kanji2hentai 
-
-
-
-    use Lingua::JA::Moji 'kanji2hentai';
-    $kanji = kanji2hentai ('家');
-    # $kanji = '𛀢'
-
-
-
-Convert kanji to equivalent hentaigana, where they exist.
-
-This was added to the module in version L</0.43>.
-
-
-
-
-
-
-
-
 =head2 kana2hentai 
 
 
@@ -1032,11 +1039,51 @@ This was added to the module in version L</0.43>.
 
 
 
+=head2 kanji2hentai 
+
+
+
+    use Lingua::JA::Moji 'kanji2hentai';
+    $kanji = kanji2hentai ('家');
+    # $kanji = '𛀢'
+
+
+
+Convert kanji to equivalent hentaigana, where they exist.
+
+This was added to the module in version L</0.43>.
+
+
+
+
+
+
+
+
 
 
 =head1 WIDE ASCII FUNCTIONS
 
 Functions for handling L</wide ASCII>.
+
+
+
+
+
+=head2 ascii2wide 
+
+Convert printable ASCII characters to wide ASCII characters.
+
+    use Lingua::JA::Moji 'ascii2wide';
+    $wide = ascii2wide ('abCE019');
+    # $wide = 'ａｂＣＥ０１９'
+
+
+
+Convert ASCII into L</wide ASCII>. It also converts the ASCII space,
+ASCII C<0x20> into a fullwidth space, C<U+3000>.
+
+
 
 
 
@@ -1082,28 +1129,96 @@ space, C<U+3000>, into an ASCII space, ASCII C<0x20>.
 
 
 
-=head2 ascii2wide 
-
-Convert printable ASCII characters to wide ASCII characters.
-
-    use Lingua::JA::Moji 'ascii2wide';
-    $wide = ascii2wide ('abCE019');
-    # $wide = 'ａｂＣＥ０１９'
-
-
-
-Convert ASCII into L</wide ASCII>. It also converts the ASCII space,
-ASCII C<0x20> into a fullwidth space, C<U+3000>.
-
-
-
-
-
-
-
 
 
 =head1 OTHER TYPES OF LETTERING
+
+
+
+
+
+=head2 braille2kana 
+
+Convert Japanese braille to kana.
+
+    use Lingua::JA::Moji 'braille2kana';
+    
+
+
+
+Converts Japanese braille (I<tenji>) into the equivalent katakana.
+
+
+
+
+
+
+
+=head2 circled2kana 
+
+Convert circled katakana to kana.
+
+    use Lingua::JA::Moji 'circled2kana';
+    $kana = circled2kana ('㋐㋑㋒㋓㋔');
+    # $kana = 'アイウエオ'
+
+
+
+This function converts the "circled katakana" of Unicode into
+full-width katakana. See also L</kana2circled>.
+
+
+
+
+
+
+
+=head2 kana2braille 
+
+Convert kana to Japanese braille.
+
+    use Lingua::JA::Moji 'kana2braille';
+    
+
+
+
+This converts kana into the equivalent Japanese braille (I<tenji>)
+forms.
+
+
+
+
+=head3 Bugs
+
+This is not an adequate Japanese braille converter. Creating Japanese
+braille requires breaking Japanese sentences up into individual words,
+but this does not attempt to do that. People who are interested in
+building a Perl braille converter could start here.
+
+
+
+
+
+=head2 kana2circled 
+
+Convert kana to circled katakana.
+
+    use Lingua::JA::Moji 'kana2circled';
+    $circled = kana2circled ('アイウエオガン');
+    # $circled = '㋐㋑㋒㋓㋔㋕゛ン'
+
+
+
+This function converts kana into the "circled katakana" of Unicode,
+which have code points from 32D0 to 32FE. See also L</circled2kana>.
+
+There is no circled form of the ン kana, L</syllabic n>, so this is
+left untouched. The L</dakuten> and L</handakuten> are split from the
+kana using L</split_sound_marks>.
+
+Circled katakana appear as Unicode code points U+32D0 to U+32FE.
+
+
 
 
 
@@ -1148,96 +1263,104 @@ Convert Japanese Morse code into kana. Each Morse code element must be separated
 
 
 
-=head2 kana2braille 
-
-Convert kana to Japanese braille.
-
-    use Lingua::JA::Moji 'kana2braille';
-    
-
-
-
-This converts kana into the equivalent Japanese braille (I<tenji>)
-forms.
-
-
-
-
-=head3 Bugs
-
-This is not an adequate Japanese braille converter. Creating Japanese
-braille requires breaking Japanese sentences up into individual words,
-but this does not attempt to do that. People who are interested in
-building a Perl braille converter could start here.
-
-
-
-
-
-=head2 braille2kana 
-
-Convert Japanese braille to kana.
-
-    use Lingua::JA::Moji 'braille2kana';
-    
-
-
-
-Converts Japanese braille (I<tenji>) into the equivalent katakana.
-
-
-
-
-
-
-
-=head2 kana2circled 
-
-Convert kana to circled katakana.
-
-    use Lingua::JA::Moji 'kana2circled';
-    $circled = kana2circled ('アイウエオガン');
-    # $circled = '㋐㋑㋒㋓㋔㋕゛ン'
-
-
-
-This function converts kana into the "circled katakana" of Unicode,
-which have code points from 32D0 to 32FE. See also L</circled2kana>.
-
-There is no circled form of the ン kana, L</syllabic n>, so this is
-left untouched. The L</dakuten> and L</handakuten> are split from the
-kana using L</split_sound_marks>.
-
-Circled katakana appear as Unicode code points U+32D0 to U+32FE.
-
-
-
-
-
-
-
-=head2 circled2kana 
-
-Convert circled katakana to kana.
-
-    use Lingua::JA::Moji 'circled2kana';
-    $kana = circled2kana ('㋐㋑㋒㋓㋔');
-    # $kana = 'アイウエオ'
-
-
-
-This function converts the "circled katakana" of Unicode into
-full-width katakana. See also L</kana2circled>.
-
-
-
-
-
-
-
 
 
 =head1 KANJI
+
+
+
+
+
+=head2 bad_kanji 
+
+
+
+    use Lingua::JA::Moji 'bad_kanji';
+    my @bad_kanji = bad_kanji ();
+
+
+
+Returns a list of kanji with negative meanings. See also
+L<https://www.lemoda.net/japanese/offensive-kanji/index.html>.
+
+This was added to the module in version L</0.47>.
+
+
+
+
+
+
+
+
+=head2 bracketed2kanji 
+
+
+
+    use Lingua::JA::Moji 'bracketed2kanji';
+    $kanji = bracketed2kanji ('㈱');
+    # $kanji = '株'
+
+
+
+Convert bracketed form of kanji into unbracketed form.
+
+
+
+
+
+
+
+=head2 circled2kanji 
+
+
+
+    use Lingua::JA::Moji 'circled2kanji';
+    $kanji = circled2kanji ('㊯');
+    # $kanji = '協'
+
+
+
+Convert the circled forms of kanji into their uncircled equivalents.
+
+
+
+
+
+
+
+=head2 kanji2bracketed 
+
+
+
+    use Lingua::JA::Moji 'kanji2bracketed';
+    $kanji = kanji2bracketed ('株');
+    # $kanji = '㈱'
+
+
+
+Convert an unbracketed form of kanji into bracketed form, if it
+exists, otherwise do nothing with it.
+
+
+
+
+
+
+
+=head2 kanji2circled 
+
+
+
+    use Lingua::JA::Moji 'kanji2circled';
+    $kanji = kanji2circled ('協嬉');
+    # $kanji = '㊯嬉'
+
+
+
+Convert the usual forms of kanji into circled equivalents, if they
+exist. Note that only a limited number of kanji have circled forms.
+
+
 
 
 
@@ -1289,80 +1412,6 @@ Convert old-style (pre-1949) kanji (Chinese characters) into new-style
 
 
 
-=head2 circled2kanji 
-
-
-
-    use Lingua::JA::Moji 'circled2kanji';
-    $kanji = circled2kanji ('㊯');
-    # $kanji = '協'
-
-
-
-Convert the circled forms of kanji into their uncircled equivalents.
-
-
-
-
-
-
-
-=head2 kanji2circled 
-
-
-
-    use Lingua::JA::Moji 'kanji2circled';
-    $kanji = kanji2circled ('協嬉');
-    # $kanji = '㊯嬉'
-
-
-
-Convert the usual forms of kanji into circled equivalents, if they
-exist. Note that only a limited number of kanji have circled forms.
-
-
-
-
-
-
-
-=head2 bracketed2kanji 
-
-
-
-    use Lingua::JA::Moji 'bracketed2kanji';
-    $kanji = bracketed2kanji ('㈱');
-    # $kanji = '株'
-
-
-
-Convert bracketed form of kanji into unbracketed form.
-
-
-
-
-
-
-
-=head2 kanji2bracketed 
-
-
-
-    use Lingua::JA::Moji 'kanji2bracketed';
-    $kanji = kanji2bracketed ('株');
-    # $kanji = '㈱'
-
-
-
-Convert an unbracketed form of kanji into bracketed form, if it
-exists, otherwise do nothing with it.
-
-
-
-
-
-
-
 =head2 yurei_moji 
 
 
@@ -1376,27 +1425,6 @@ Returns a list of the yurei moji (幽霊文字), kanji which don't
 actually exist but were mistakenly included in a computer
 standard. See L<https://www.sljfaq.org/afaq/yuureimoji.html> for more
 information.
-
-This was added to the module in version L</0.47>.
-
-
-
-
-
-
-
-
-=head2 bad_kanji 
-
-
-
-    use Lingua::JA::Moji 'bad_kanji';
-    my @bad_kanji = bad_kanji ();
-
-
-
-Returns a list of kanji with negative meanings. See also
-L<https://www.lemoda.net/japanese/offensive-kanji/index.html>.
 
 This was added to the module in version L</0.47>.
 
@@ -1421,20 +1449,6 @@ assistance in correcting this is very welcome.
 
 
 
-=head2 kana2cyrillic 
-
-Convert kana to the Cyrillic (Russian) alphabet.
-
-    use Lingua::JA::Moji 'kana2cyrillic';
-    $cyril = kana2cyrillic ('シンブン');
-    # $cyril = 'симбун'
-
-
-
-
-
-
-
 =head2 cyrillic2katakana 
 
 Convert the Cyrillic (Russian) alphabet to katakana.
@@ -1442,6 +1456,20 @@ Convert the Cyrillic (Russian) alphabet to katakana.
     use Lingua::JA::Moji 'cyrillic2katakana';
     $kana = cyrillic2katakana ('симбун');
     # $kana = 'シンブン'
+
+
+
+
+
+
+
+=head2 kana2cyrillic 
+
+Convert kana to the Cyrillic (Russian) alphabet.
+
+    use Lingua::JA::Moji 'kana2cyrillic';
+    $cyril = kana2cyrillic ('シンブン');
+    # $cyril = 'симбун'
 
 
 
@@ -1470,7 +1498,6 @@ Convert the Cyrillic (Russian) alphabet to katakana.
 
 =head3 Bugs
 
-
 =over
 
 =item May be incorrect
@@ -1485,7 +1512,6 @@ proof of correctness.
 There is currently no hangul to kana conversion.
 
 =back
-
 
 
 
@@ -1505,22 +1531,10 @@ corresponding to L</is_hiragana> in this module, and three more,
 C<is_kanji>, C<is_katakana>, and C<is_h_katakana>, for half-width
 katakana.
 
-=item L<Lingua::JA::Kana>
+=item L<Lingua::JA::Fold>
 
-This contains convertors for hiragana, half width and full width
-katakana, and romaji. As of version 0.07 [Aug 06, 2012], the romaji
-conversion is less complete than this module.
-
-=item L<Lingua::JA::Romanize::Japanese>
-
-Romanization of Japanese. The module also includes romanization of
-kanji via the kakasi kanji to romaji convertor, and other functions.
-
-=item L<Lingua::JA::Romaji::Valid>
-
-Validate romanized Japanese. This module does something similar to
-L</is_romaji>, L</is_romaji_strict>, and L</is_romaji_semistrict> in
-Lingua::JA::Moji, but it has some extra options as well.
+Full/half width conversion, collation of Japanese text, including
+handling of line breaks.
 
 =item L<Lingua::JA::Hepburn::Passport>
 
@@ -1530,29 +1544,27 @@ the C<< passport => 1 >> option, for example
 
     $romaji = kana2romaji ("かとう", {style => 'hepburn', passport => 1});
 
-=item L<Lingua::JA::Fold>
+=item L<Lingua::JA::Jtruncate>
 
-Full/half width conversion, collation of Japanese text, including
-handling of line breaks.
+Handle character boundaries over bytes in the old Japanese encodings
+EUC, JIS, and Shift-JIS, for people who don't like converting to
+Unicode.
 
-=item L<Lingua::JA::Romaji>
+Until about 2008, I used to use CP932 (Microsoft variant of Shift-JIS)
+in Perl programs, until I had the bad experience of tracking down a
+very strange bug caused by the "kanji space", U+3000, containing an @
+mark when written in CP932, and being interpreted by Perl as an array.
 
-Romaji to kana/kana to romaji conversion.
+=item L<Lingua::JA::Kana>
 
-=item L<Lingua::JA::Regular::Unicode>
-
-This includes hiragana to katakana, full width / half width, and wide
-ascii conversion. The strange name is due to its being an extension of
-L<Lingua::JA::Regular> using Unicode-encoded strings.
+This contains convertors for hiragana, half width and full width
+katakana, and romaji. As of version 0.07 [Aug 06, 2012], the romaji
+conversion is less complete than this module.
 
 =item L<Lingua::JA::NormalizeText>
 
 A huge collection of normalization functions for Japanese text. If
 Lingua::JA::Moji does not have it, Lingua::JA::NormalizeText may do.
-
-=item L<Lingua::KO::Munja>
-
-This is similar to the present module for Korean.
 
 =item L<Lingua::JA::Onbiki>
 
@@ -1590,19 +1602,29 @@ produces output
     アッタカ〜イ -> アッタカアイ
 
 
-(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.57/examples/onbiki.pl> in the distribution.)
+(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.58/examples/onbiki.pl> in the distribution.)
 
 
-=item L<Lingua::JA::Jtruncate>
+=item L<Lingua::JA::Regular::Unicode>
 
-Handle character boundaries over bytes in the old Japanese encodings
-EUC, JIS, and Shift-JIS, for people who don't like converting to
-Unicode.
+This includes hiragana to katakana, full width / half width, and wide
+ascii conversion. The strange name is due to its being an extension of
+L<Lingua::JA::Regular> using Unicode-encoded strings.
 
-Until about 2008, I used to use CP932 (Microsoft variant of Shift-JIS)
-in Perl programs, until I had the bad experience of tracking down a
-very strange bug caused by the "kanji space", U+3000, containing an @
-mark when written in CP932, and being interpreted by Perl as an array.
+=item L<Lingua::JA::Romaji>
+
+Romaji to kana/kana to romaji conversion.
+
+=item L<Lingua::JA::Romaji::Valid>
+
+Validate romanized Japanese. This module does something similar to
+L</is_romaji>, L</is_romaji_strict>, and L</is_romaji_semistrict> in
+Lingua::JA::Moji, but it has some extra options as well.
+
+=item L<Lingua::JA::Romanize::Japanese>
+
+Romanization of Japanese. The module also includes romanization of
+kanji via the kakasi kanji to romaji convertor, and other functions.
 
 =back
 
@@ -1610,15 +1632,47 @@ mark when written in CP932, and being interpreted by Perl as an array.
 
 =over
 
+=item L<Lingua::JA::Romanize::Japanese>
+
+Romanization of Japanese language via kakasi.
+
 =item L<Lingua::JA::Romanize::MeCab>
 
 Romanization of Japanese language with MeCab
 
 =item L<Text::MeCab>
 
-=item L<Lingua::JA::Romanize::Japanese>
+=back
 
-Romanization of Japanese language via kakasi.
+=head2 Related modules
+
+=over
+
+=item L<Data::HanConvert>
+
+🐉 "The data for converting between traditional and simplified Chinese
+languages"
+
+=item L<Encode::CNMap>
+
+🐉 "enhanced Chinese encodings with Simplified-Traditional auto-mapping"
+
+=item L<Encode::HanConvert>
+
+🐉 "Traditional and Simplified Chinese mappings"
+
+=item L<Lingua::KO::Munja>
+
+This is similar to the present module for Korean.
+
+=item L<Lingua::ZH::HanConvert>
+
+🐉 "Convert between Traditional and Simplified Chinese characters"
+
+=item L<Regexp::Chinese::TradSimp>
+
+🐉 "Take a string containing Chinese text, and turn it into a
+traditional-simplified-insensitive regexp."
 
 =back
 
@@ -1733,10 +1787,9 @@ Thanks to Naoki Tomita, David Steinbrunner, and Neil Bowers for fixes.
 out of a need for more comprehensive handling of Japanese text than
 was offered by any of the existing modules on CPAN. There were a lot
 of modules offering piecemeal romaji/kana conversions or
-hiragana/katakana conversions, but, with apologies, nothing truly
-comprehensive or robust. Lingua::JA::Moji was originally a private
-module. Most of the functions in the module are things I needed for my
-own projects.
+hiragana/katakana conversions, but nothing comprehensive or
+robust. Lingua::JA::Moji was originally a private module. Most of the
+functions in the module are things I needed for my own projects.
 
 The design using L<Convert::Moji> was part of an abandoned plan to
 make a cross-language module which could produce, say, a JavaScript
@@ -1800,13 +1853,16 @@ the module.
 
 =item 0.54
 
-This version removed the nonsensical C<kana_order> function from the
-module. It improved the behaviour of L</is_romaji_strict> after
-comparing its negatives and positives with a large number of English
-and nonsense words. It improved the behaviour of L</smallize_kana>
-with regard to the "tsu" kana. L</cleanup_kana> was improved to deal
-with stray dakuten and handakuten and some other odd kanji/kana
-confusions.
+This version removed a function C<kana_order> from the module. It
+improved the behaviour of L</is_romaji_strict> after comparing its
+negatives and positives with a large number of English and nonsense
+words. It improved the behaviour of L</smallize_kana> with regard to
+the "tsu" kana. L</cleanup_kana> was improved to deal with stray
+dakuten and handakuten and some other odd kanji/kana confusions.
+
+=item 0.58
+
+This added L</kana_consonant>.
 
 =back
 
@@ -1820,7 +1876,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2008-2020
+2008-2021
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

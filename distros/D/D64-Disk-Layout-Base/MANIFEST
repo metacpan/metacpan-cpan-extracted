@@ -5,3 +5,4 @@ README
 lib/D64/Disk/Layout/Base.pm
 t/01-base.t
 t/02-inherit.t
+t/03-track-data.t

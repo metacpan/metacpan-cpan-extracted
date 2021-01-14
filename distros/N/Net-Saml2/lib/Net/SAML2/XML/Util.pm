@@ -9,7 +9,7 @@ use XML::Tidy;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-$VERSION = '0.28';
+$VERSION = '0.29';
 
 # We are exporting functions
 use base qw/Exporter/;
@@ -42,7 +42,7 @@ Net::SAML2::XML::Util
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 
@@ -67,9 +67,9 @@ Original Author: Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Chris Andrews and Others; in detail:
+This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
 
-  Copyright 2019-2020  Timothy Legge
+  Copyright 2019-2021  Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

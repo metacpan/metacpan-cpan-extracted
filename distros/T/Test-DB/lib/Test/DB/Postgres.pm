@@ -19,7 +19,7 @@ with 'Data::Object::Role::Stashable';
 
 use DBI;
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 # ATTRIBUTES
 
@@ -76,6 +76,16 @@ fun new_initial($self) {
   $ENV{TESTDB_INITIAL} || 'postgres'
 }
 
+has 'uri' => (
+  is => 'ro',
+  isa => 'Str',
+  new => 1,
+);
+
+fun new_uri($self) {
+  $self->urigen($self->database)
+}
+
 has 'username' => (
   is => 'ro',
   isa => 'Str',
@@ -116,6 +126,7 @@ method clone(Str $source = $self->template) {
   $dbh->disconnect;
 
   $self->dbh;
+  $self->uri;
   $self->immutable;
 
   return $self;
@@ -139,6 +150,7 @@ method create() {
   $dbh->disconnect;
 
   $self->dbh;
+  $self->uri;
   $self->immutable;
 
   return $self;
@@ -167,9 +179,18 @@ method destroy() {
 }
 
 method dsngen(Str $name) {
-  join ';', "dbi:Pg:dbname=$name", join ';',
+  join(';', "dbi:Pg:dbname=$name", join ';',
     ($self->hostname ? ("host=@{[$self->hostname]}") : ()),
-    ($self->hostport ? ("port=@{[$self->hostport]}") : ())
+    ($self->hostport ? ("port=@{[$self->hostport]}") : ()),
+  )
+}
+
+method urigen(Str $name) {
+  join('/', 'postgresql:', ($self->username ? '' : ()), ($self->username ?
+    join('@', join(':', $self->username ? ($self->username, ($self->password ? $self->password : ())) : ()),
+    $self->hostname ? ($self->hostport ? (join(':', $self->hostname, $self->hostport)) : $self->hostname) : '') : ()),
+    $name
+  )
 }
 
 1;
@@ -287,6 +308,14 @@ This attribute is read-only, accepts C<(Str)> values, and is optional.
 =head2 password
 
   password(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 uri
+
+  uri(Str)
 
 This attribute is read-only, accepts C<(Str)> values, and is optional.
 

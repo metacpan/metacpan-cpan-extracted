@@ -4,7 +4,7 @@ package Tk::GraphViz;
 use strict;
 use warnings;
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 use Tk 800.020;
 use Tk::Font;
@@ -114,7 +114,9 @@ sub _showGraphLayout
   }
 
   # Display new contents
-  $self->_parseLayout ( $self->{layout}, %opt );
+  my $layoutData = $self->_parseLayout($self->{layout}, %opt);
+  $layoutData = $opt{prerender}->($layoutData) if $opt{prerender};
+  $self->_renderGraph($layoutData);
 
   # Update scroll-region to new bounds
   $self->_updateScrollRegion( %opt );
@@ -359,19 +361,12 @@ sub _makeLayoutCommand
 sub _parseLayout
 {
   my ($self, $layoutLines, %opt) = @_;
-
-  my $directed = 1;
-  my $context = { node => {}, edge => {}, graph => {} };
-  my ($minX, $minY, $maxX, $maxY) = ( undef, undef, undef, undef );
-  my @saveStack;
-
+  my ($context, @saveStack) = { node => {}, edge => {}, graph => {} };
+  my %returnData = (global => { map +($_ => $self->{$_}), qw(dpi) });
   my $accum = undef;
-
   foreach ( @$layoutLines ) {
     s/\r//g;  # get rid of any returns ( dos text files)
-
     chomp;
-
     # Handle line-continuation that gets put in for longer lines,
     # as well as lines that are continued with commas at the end
     if ( defined $accum ) {
@@ -383,76 +378,54 @@ sub _parseLayout
       $accum = $_;
       next;
     }
-
     s/^\s+//;
-
     #STDERR->print ( "gv _parse: '$_'\n" );
     my @words = parse_line '\s+', 1, $_;
-
     if ($words[0] =~ /^(?:di)?graph$/ and $words[-1] eq '{') {
       # starting line, ignore
       next;
     }
-
     if ( $words[0] =~ /^\]\s*;$/ ) {
       # end of attributes not finishing on same line as important info, ignore
       next;
     }
-
     if ($context->{my $c = $words[0]}) {
       shift @words;
       %{ $context->{$c} } = (%{ $context->{$c} }, %{ _parseAttrs(join ' ', @words) });
       next;
     }
-
     if ( ($words[0] eq 'subgraph' and $words[-1] eq '{') or $words[0] eq '{') {
       push @saveStack, $context;
       $context = { map +($_ => {%{ $context->{$_} }}), keys %$context };
       delete $context->{graph}{label};
       delete $context->{graph}{bb};
-      next;
-    }
-
-    if ( $words[0] eq '}' ) {
+    } elsif ( $words[0] eq '}' ) {
       # End of a graph section
       if ( @saveStack ) {
 	# Subgraph
 	if ( defined($context->{graph}{bb}) && $context->{graph}{bb} ne '' ) {
 	  my ($x1,$y1,$x2,$y2) = split ( /\s*,\s*/, $context->{graph}{bb} );
-	  $minX = min($minX,$x1);
-	  $minY = min($minY,$y1);
-	  $maxX = max($maxX,$x2);
-	  $maxY = max($maxY,$y2);
-	  $self->_createSubgraph($x1, $y1, $x2, $y2, %{ $context->{graph} });
+	  push @{ $returnData{subgraph} }, [ $x1, $y1, $x2, $y2, %{ $context->{graph} } ];
 	}
 	$context = pop @saveStack;
-	next;
       } else {
 	# End of the graph
 	# Create any whole-graph label
 	if ( defined($context->{graph}{bb}) ) {
 	  my ($x1,$y1,$x2,$y2) = split ( /\s*,\s*/, $context->{graph}{bb} );
-	  $minX = min($minX,$x1);
-	  $minY = min($minY,$y1);
-	  $maxX = max($maxX,$x2);
-	  $maxY = max($maxY,$y2);
 	  # delete bb attribute so rectangle is not drawn around whole graph
 	  delete $context->{graph}{bb};
-	  $self->_createSubgraph ($x1, $y1, $x2, $y2, %{ $context->{graph} });
+	  push @{ $returnData{subgraph} }, [ $x1, $y1, $x2, $y2, %{ $context->{graph} } ];
 	}
 	last;
       }
-    }
-
-    if ( ($words[1] || '') =~ /^-[>\-]$/ ) {
+    } elsif ( ($words[1] || '') =~ /^-[>\-]$/ ) {
       # Edge
       my ($n1, undef, $n2) = splice @words, 0, 3;
       my %edgeAttrs = (%{ $context->{edge} }, %{ _parseAttrs(join ' ', @words) });
-      my ($x1,$y1,$x2,$y2) = $self->_createEdge ( $n1, $n2, %edgeAttrs );
-      $minX = min($minX,$x1);
-      $minY = min($minY,$y1);
-      $maxX = max($maxX,$x2);
-      $maxY = max($maxY,$y2);
+      my ($drawArrows,@coords) = $self->_parseEdgePos( delete $edgeAttrs{pos} || die "no 'pos' on edge" );
+      $edgeAttrs{pos} = [ $drawArrows, \@coords ];
+      push @{ $returnData{edge}{$n1}{$n2} }, \%edgeAttrs;
     } elsif ( /(.+?)\s*(?:\[(.+)\];)?\s*$/ ) {
       # Node
       my ($name) = splice @words, 0, 1;
@@ -460,15 +433,24 @@ sub _parseLayout
       $name =~ s/^\"//;
       $name =~ s/\"?;?$//;
       my %nodeAttrs = (%{ $context->{node} }, %{ _parseAttrs(join ' ', @words) });
-      my ($x1,$y1,$x2,$y2) = $self->_createNode ( $name, %nodeAttrs );
-      $minX = min($minX,$x1);
-      $minY = min($minY,$y1);
-      $maxX = max($maxX,$x2);
-      $maxY = max($maxY,$y2);
+      $returnData{node}{$name} = { %{ $returnData{node}{$name} || {} }, %nodeAttrs };
     } else {
       warn "Failed to parse DOT line: '$_'";
     }
   }
+  \%returnData;
+}
+
+
+sub _renderGraph {
+  my ($self, $layoutData) = @_;
+  $self->_createNode($_, %{ $layoutData->{node}{$_} }) for keys %{ $layoutData->{node} };
+  for my $f (keys %{ $layoutData->{edge} }) {
+    for my $t (keys %{ $layoutData->{edge}{$f} }) {
+      $self->_createEdge($f, $t, %$_) for @{ $layoutData->{edge}{$f}{$t} };
+    }
+  }
+  $self->_createSubgraph(@$_) for @{ $layoutData->{subgraph} };
 }
 
 
@@ -942,7 +924,8 @@ sub _createEdge
 
   # Parse the edge position
   my $pos = $attrs{pos} || return;
-  my ($startEndCoords,@coords) = $self->_parseEdgePos ( $pos );
+  my ($drawArrows, $coords) = @$pos;
+  my @coords = @$coords;
   my $arrowhead = $attrs{arrowhead};
   my $arrowtail = $attrs{arrowtail};
 
@@ -952,6 +935,8 @@ sub _createEdge
   #  Canvas line smoothing doesn't use beziers, so we supply more points
   #   along the manually-calculated bezier points.
 
+  my @tailCoords = $drawArrows->{s} ? @{ shift @coords } : ();
+  my @headCoords = $drawArrows->{e} ? @{ pop @coords } : ();
   @coords = map @$_, @coords; #flatten coords array
 
   my @newCoords;
@@ -974,13 +959,8 @@ sub _createEdge
     $stopIndex += 6;
   }
 
-  # Add start/end coords
-  if(defined($startEndCoords->{s})){
-    unshift @newCoords, @{ $startEndCoords->{s} }; # put at the begining
-  }
-  if(defined($startEndCoords->{e})){
-    push @newCoords, @{ $startEndCoords->{e}}; # put at the end
-  }
+  unshift @newCoords, @tailCoords;
+  push @newCoords, @headCoords;
 
   # Convert Sign of y-values of coords, record min/max
   for( my $i = 0; $i < @newCoords; $i+= 2){
@@ -994,17 +974,17 @@ sub _createEdge
   }
 
   #STDERR->printf ( "createEdge: $n1->$n2 ($x1,$y1) ($x2,$y2)\n" );
-  if ( defined($startEndCoords->{s}) &&
-       defined($startEndCoords->{e}) &&
+  if ( $drawArrows->{s} &&
+       $drawArrows->{e} &&
        (not defined $arrowhead) &&
        (not defined $arrowtail) ) { # two-sided arrow
     push @args, -arrow => 'both';
   }
-  elsif ( defined($startEndCoords->{e}) &&
+  elsif ( $drawArrows->{e} &&
 	  (not defined $arrowhead) ) { # arrow just at the end
     push @args, -arrow => 'last';	
   }
-  elsif ( defined($startEndCoords->{s}) &&
+  elsif ( $drawArrows->{s} &&
 	  (not defined $arrowtail) ) { # arrow just at the start
     push @args, -arrow => 'first';	
   }
@@ -1088,10 +1068,6 @@ sub _createEdge
     push @args, ( -state => 'disabled' );
     $self->createText ( @args );
   }
-
-
-  # Return the bounding box of the edge
-  ($x1,$y1,$x2,$y2);
 }
 
 
@@ -1109,22 +1085,24 @@ sub _parseEdgePos
 
   # hash of start/end coords
   # Example: e => [ 12, 3 ], s = [ 1, 3 ]
-  my %startEnd;
+  my %drawArrows;
 
   # Process all start/end points (could be none, 1, or 2)
   while ( $pos =~ s/^([se])\s*\,\s*([\d.e\+]+)\s*\,\s*([\d.e\+]+)\s+// ) {
     my ($where, $x, $y) = ($1, $2, $3);
-    $startEnd{$where} = [ $x, $y ];
+    $drawArrows{$where} = [ $x, $y ];
   }
 
   my @loc = split(/ |,/, $pos);
-  my @coords = ();
+  my @coords;
   while ( @loc >= 2 ) {
     my ($x,$y) = splice(@loc,0,2);
     push @coords, [$x,$y];
   }
+  unshift(@coords, $drawArrows{s}), $drawArrows{s} = 1 if $drawArrows{s};
+  push(@coords, $drawArrows{e}), $drawArrows{e} = 1 if $drawArrows{e};
 
-  (\%startEnd, @coords);
+  (\%drawArrows, @coords);
 }
 
 
@@ -2032,6 +2010,48 @@ Allows additional default edge attributes to be specified.  Each name => value p
 
 If true, calls the L<< /$gv->fit() >> method after parsing the DOT output.
 As of 1.05, this no longer defaults to true.
+
+=item prerender => \&coderef
+
+If given, the code-ref will be called with the graph description data
+before the actual drawing on a canvas begins, in a hash-ref, e.g. for
+the file C<< digraph G { a -> b } >>:
+
+  {
+    edge => {
+      a => {
+	b => [
+	  {
+	    pos => [
+	      { e => 1 },
+	      [
+		[ '27', '71.697' ],
+		[ '27', '63.983' ],
+		[ '27', '54.712' ],
+		[ '27', '46.112' ],
+		[ '27', '36.104' ],
+	      ]
+	    ]
+	  }
+	]
+      }
+    },
+    global => { dpi => 72 }, # default value, might be overridden
+    node => {
+      a => { height => '0.5', label => '\\N', pos => '27,90', width => '0.75' },
+      b => { height => '0.5', label => '\\N', pos => '27,18', width => '0.75' }
+    },
+    subgraph => [
+      [ '0', '0', '54', '108' ]
+    ]
+  }
+
+The code's return value needs to be a hash-ref structured similarly to
+the above, which will be used to render the graph. Coordinates increase
+upwards and to the right. Nodes' C<pos> are at their centre.
+
+This feature is experimental as of 1.10, and the data-structure shape
+or interface may change.
 
 =back
 

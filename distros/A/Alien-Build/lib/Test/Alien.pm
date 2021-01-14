@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '2.37'; # VERSION
+our $VERSION = '2.38'; # VERSION
 
 
 our @aliens;
@@ -205,7 +205,8 @@ sub xs_ok
   {
     our $count;
     $count = 0 unless defined $count;
-    my $name = sprintf "Test::Alien::XS::Mod%s", $count++;
+    my $name = sprintf "Test::Alien::XS::Mod%s%s", $count, chr(65 + $count % 26 ) x 4;
+    $count++;
     my $code = $xs->{xs};
     $code =~ s{\bTA_MODULE\b}{$name}g;
     $xs->{xs} = $code;
@@ -654,7 +655,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 2.37
+version 2.38
 
 =head1 SYNOPSIS
 

@@ -1,27 +1,17 @@
-use Test::Most;
+use Test2::V0;
+use Bible::OBML;
 
-use constant PACKAGE => 'Bible::OBML';
+my $self = Bible::OBML->new;
+isa_ok( $self, 'Bible::OBML' );
 
-exit main();
+can_ok( $self, $_ ) for ( qw(
+    html bible acronyms refs
+    read_file write_file parse render canonicalize smartify desmartify
+) );
 
-sub main {
-    BEGIN { use_ok(PACKAGE) }
-    require_ok(PACKAGE);
-
-    my $self = PACKAGE->new;
-    isa_ok( $self, PACKAGE );
-
-    can_ok( PACKAGE, $_ ) for ( qw(
-        html bible acronyms refs
-        read_file write_file parse render canonicalize smartify desmartify
-    ) );
-
-    parse_render($self);
-    smartify($self);
-
-    done_testing();
-    return 0;
-};
+parse_render($self);
+smartify($self);
+done_testing;
 
 sub parse_render {
     my ($self) = @_;
@@ -29,9 +19,8 @@ sub parse_render {
     my $test = sub {
         my ( $content, $data, $name ) = @_;
 
-        oldstyle_diff;
-        eq_or_diff( $self->parse($content), $data, '$self->parse; # ' . $name );
-        eq_or_diff( $self->render($data), $content, '$self->render; # ' . $name );
+        is( $self->parse($content), $data, '$self->parse; # ' . $name );
+        is( $self->render($data), $content, '$self->render; # ' . $name );
     };
 
     $test->(
@@ -168,9 +157,8 @@ sub smartify {
         qq{A \x{201c}test\x{201d} of module\x{2019}s \x{201c}awesome \x{2018}perfect\x{2019} } .
         qq{cool\x{201d} smarts. It\x{2019}s \x{201c}not\x{201d} awesome.};
 
-    oldstyle_diff;
-    eq_or_diff( $self->smartify($content), $smart_content, '$self->smartify($content)' );
-    eq_or_diff( $self->desmartify($smart_content), $content, '$self->desmartify($smart_content)' );
+    is( $self->smartify($content), $smart_content, '$self->smartify($content)' );
+    is( $self->desmartify($smart_content), $content, '$self->desmartify($smart_content)' );
 
     return;
 }

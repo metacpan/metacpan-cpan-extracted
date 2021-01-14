@@ -41,14 +41,14 @@
    "provides" : {
       "Game::Life::Faster" : {
          "file" : "lib/Game/Life/Faster.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Game-Life-Faster"
+         "web" : "https://github.com/trwyant/perl-Game-Life-Faster/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -59,6 +59,6 @@
          "web" : "https://github.com/trwyant/perl-Game-Life-Faster"
       }
    },
-   "version" : "0.003",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

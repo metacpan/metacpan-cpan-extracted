@@ -5,8 +5,11 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Test::DiagINC: '0.002'
-  Test::More: '0'
+  Test::More: '0.94'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -23,12 +26,14 @@ no_index:
 requires:
   HTML::Entities: '0'
   HTML::Parser: '0'
-  Template::Plugin::Filter: '0'
+  Template::Plugin::Filter: '2.00'
   namespace::clean: '0'
+  perl: '5.008'
 resources:
   bugtracker: https://github.com/bleargh45/Template-Plugin-LinkTarget/issues
+  homepage: http://metacpan.org/release/Template-Plugin-LinkTarget/
   repository: git://github.com/bleargh45/Template-Plugin-LinkTarget.git
-version: '0.03'
+version: '0.04'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

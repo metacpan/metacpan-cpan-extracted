@@ -52,6 +52,21 @@ ROLE COMPOSITION
     of their provided methods clash, an exception is raised unless the class
     provides a method since this conflict indicates a potential problem.
 
+  ROLE METHODS
+    All subs created after importing Role::Tiny will be considered methods
+    to be composed. For example:
+
+        package MyRole;
+        use List::Util qw(min);
+        sub mysub { }
+        use Role::Tiny;
+        use List::Util qw(max);
+        sub mymethod { }
+
+    In this role, "max" and "mymethod" will be included when composing
+    MyRole, and "min" and "mysub" will not. For additional control,
+    namespace::clean can be used to exclude undesired subs from roles.
+
 IMPORTED SUBROUTINES
   requires
      requires qw(foo bar);
@@ -78,7 +93,7 @@ IMPORTED SUBROUTINES
   before
      before foo => sub { ... };
 
-    See "before method(s) => sub { ... }" in Class::Method::Modifiers for
+    See "before method(s) => sub { ... };" in Class::Method::Modifiers for
     full documentation.
 
     Note that since you are not required to use method modifiers,
@@ -89,7 +104,7 @@ IMPORTED SUBROUTINES
   around
      around foo => sub { ... };
 
-    See "around method(s) => sub { ... }" in Class::Method::Modifiers for
+    See "around method(s) => sub { ... };" in Class::Method::Modifiers for
     full documentation.
 
     Note that since you are not required to use method modifiers,
@@ -100,7 +115,7 @@ IMPORTED SUBROUTINES
   after
      after foo => sub { ... };
 
-    See "after method(s) => sub { ... }" in Class::Method::Modifiers for
+    See "after method(s) => sub { ... };" in Class::Method::Modifiers for
     full documentation.
 
     Note that since you are not required to use method modifiers,

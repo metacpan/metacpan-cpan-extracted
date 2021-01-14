@@ -190,12 +190,12 @@ subtest 'op_pluck' => sub {
     obs_is $o, ['(mpuuu)', {m => 'Mary', p => 'Paul', u => undef}];
 };
 
-subtest 'skip' => sub {
+subtest 'op_skip' => sub {
     my $o = rx_of(10, 20, 30, 40, 50)->pipe( op_skip(3) );
     obs_is $o, ['(de)', {d => 40, e => 50}], 'skip';
 };
 
-subtest 'repeat' => sub {
+subtest 'op_repeat' => sub {
     my $o = cold('-abc-')->pipe( op_repeat(3) );
     obs_is $o,  ['-abc-abc-abc-'], 'op_repeat';
 
@@ -209,7 +209,7 @@ subtest 'repeat' => sub {
     obs_is $o, ['-abcabcabca'], 'op_repeat -1';
 };
 
-subtest 'throw_error' => sub {
+subtest 'rx_throw_error' => sub {
     my $o = rx_concat(
         rx_EMPTY->pipe( op_delay(1) ),
         rx_throw_error,
@@ -217,12 +217,83 @@ subtest 'throw_error' => sub {
     obs_is $o, ['-#'];
 };
 
-subtest 'retry' => sub {
+subtest 'op_retry' => sub {
     my $o = cold('-abc#')->pipe( op_retry(3) );
     obs_is $o,  ['-abc-abc-abc-abc#'];
 
     $o = cold('-abc#')->pipe( op_retry(-1), op_take(10) );
     obs_is $o,  ['-abc-abc-abc-a'];
+};
+
+subtest 'op_buffer_count' => sub {
+    my $o = cold('abcdefgh')->pipe(op_buffer_count(3));
+    obs_is $o, ['--a--b-c', {a => ['a', 'b', 'c'], b => ['d', 'e', 'f'], c => ['g', 'h']}];
+
+    $o = cold('abcde')->pipe(op_buffer_count(3, 1));
+    obs_is $o, ['--ab(cde)', { a => [ 'a', 'b', 'c' ], b => [ 'b', 'c', 'd' ], c => [ 'c', 'd', 'e' ],
+        d                        => [ 'd', 'e' ], e => ['e'],
+    }];
+
+    $o = cold('abcde')->pipe(op_buffer_count(1));
+    obs_is $o, ['abcde', {a => ['a'], b => ['b'], c => ['c'], d => ['d'], e => ['e']}];
+};
+
+subtest 'rx_EMPTY' => sub {
+    my $o = rx_concat(
+        rx_of('a', 'b'),
+        rx_EMPTY,
+        rx_EMPTY,
+        rx_EMPTY,
+        rx_of('c', 'd'),
+    );
+    obs_is $o, ['(abcd)'], 'in concat';
+
+    obs_is rx_EMPTY, [''], 'alone';
+};
+
+subtest 'rx_fork_join' => sub {
+    my $o = rx_fork_join([
+        rx_of(10, 20, 30),
+        rx_of(1, 2, 3),
+        rx_of('a', 'b', 'c'),
+    ]);
+    obs_is $o, ['a', {a => [30, 3, 'c']}], 'array form';
+
+    $o = rx_fork_join({
+        x => rx_of(10, 20, 30),
+        y => rx_of(1, 2, 3),
+        z => rx_of('a', 'b', 'c'),
+    });
+    obs_is $o, ['a', {a => {
+        x => 30,
+        y => 3,
+        z => 'c',
+    }}], 'hash form';
+
+    $o = rx_fork_join([
+        rx_of(10, 20, 30),
+        rx_of(1, 2, 3),
+        rx_of('a', 'b', 'c'),
+        rx_EMPTY,
+    ]);
+    obs_is $o, [''], 'array with empty';
+
+    $o = rx_fork_join({
+        x => rx_of(10, 20, 30),
+        y => rx_of(1, 2, 3),
+        z => rx_of('a', 'b', 'c'),
+        w => rx_EMPTY,
+    });
+    obs_is $o, [''], 'hash with empty';
+};
+
+subtest 'pipeable operators as methods' => sub {
+    my $o = cold('123456789')
+        ->filter(sub {$_[0] % 2 == 1})
+        ->map(sub {$_[0] * 10})
+        ->take(3)
+        ->delay(1);
+    obs_is $o, ['-a-b-c', {a => 10, b => 30, c => 50}];
 };
 
 done_testing();

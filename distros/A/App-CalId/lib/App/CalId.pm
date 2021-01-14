@@ -1,7 +1,9 @@
 package App::CalId;
 
-our $DATE = '2019-03-26'; # DATE
-our $VERSION = '0.130'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-13'; # DATE
+our $DIST = 'App-CalId'; # DIST
+our $VERSION = '0.131'; # VERSION
 
 use 5.010001;
 use strict;
@@ -253,7 +255,7 @@ App::CalId - Display Indonesian calendar on the command-line
 
 =head1 VERSION
 
-This document describes version 0.130 of App::CalId (from Perl distribution App-CalId), released on 2019-03-26.
+This document describes version 0.131 of App::CalId (from Perl distribution App-CalId), released on 2021-01-13.
 
 =head1 SYNOPSIS
 
@@ -299,6 +301,7 @@ Not required if months=12 (generate whole year from month 1 to 12).
 
 =item * B<year>* => I<int>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -311,6 +314,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 gen_monthly_calendar
@@ -347,6 +351,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<year>* => I<int>
 
+
 =back
 
 Return value:  (any)
@@ -361,7 +366,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-CalId>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CalId>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-CalId/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -373,7 +378,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

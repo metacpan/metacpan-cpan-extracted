@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Koha;
 # ABSTRACT: Lien à Koha
-$Koha::Contrib::Sudoc::Koha::VERSION = '2.33';
+$Koha::Contrib::Sudoc::Koha::VERSION = '2.34';
 use Moose;
 use Modern::Perl;
 use Carp;
@@ -369,7 +369,7 @@ Koha::Contrib::Sudoc::Koha - Lien à Koha
 
 =head1 VERSION
 
-version 2.33
+version 2.34
 
 =head1 DESCRIPTION
 
@@ -408,7 +408,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Fréderic Demians.
+This software is Copyright (c) 2021 by Fréderic Demians.
 
 This is free software, licensed under:
 

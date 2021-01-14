@@ -10,71 +10,60 @@ use routines;
 
 use Data::Object::Class;
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 # METHODS
 
 method build(Str :$database = $ENV{TESTDB_DATABASE}, Str %options) {
-  delete $options{database};
-
   if (lc($database) eq 'mssql') {
-    require Test::DB::Mssql;
-
-    my $generator = Test::DB::Mssql->new(%options);
-
-    return $generator;
+    require Test::DB::Mssql; return Test::DB::Mssql->new(%options);
   }
   elsif (lc($database) eq 'mysql') {
-    require Test::DB::Mysql;
-
-    my $generator = Test::DB::Mysql->new(%options);
-
-    return $generator;
+    require Test::DB::Mysql; return Test::DB::Mysql->new(%options);
   }
   elsif (lc($database) eq 'postgres') {
-    require Test::DB::Postgres;
-
-    my $generator = Test::DB::Postgres->new(%options);
-
-    return $generator;
+    require Test::DB::Postgres; return Test::DB::Postgres->new(%options);
   }
   elsif (lc($database) eq 'sqlite') {
-    require Test::DB::Sqlite;
-
-    my $generator = Test::DB::Sqlite->new(%options);
-
-    return $generator;
+    require Test::DB::Sqlite; return Test::DB::Sqlite->new(%options);
   }
   else {
-
     return undef;
   }
 }
 
 method create(Str :$database = $ENV{TESTDB_DATABASE}, Str %options) {
-  my $generator = $self->build(%options);
-
-  if ($generator) {
-
+  if (my $generator = $self->build(%options, database => $database)) {
     return $generator->create;
   }
   else {
-
     return undef;
   }
 }
 
 method clone(Str :$database = $ENV{TESTDB_DATABASE}, Str %options) {
-  my $generator = $self->build(%options);
-
-  if ($generator) {
-
+  if (my $generator = $self->build(%options, database => $database)) {
     return $generator->clone;
   }
   else {
-
     return undef;
   }
+}
+
+method mssql(Str %options) {
+  return $self->build(%options, database => 'mssql');
+}
+
+method mysql(Str %options) {
+  return $self->build(%options, database => 'mysql');
+}
+
+method postgres(Str %options) {
+  return $self->build(%options, database => 'postgres');
+}
+
+method sqlite(Str %options) {
+  return $self->build(%options, database => 'sqlite');
 }
 
 1;
@@ -110,7 +99,136 @@ Temporary Databases for Testing
 This package provides a framework for setting up and tearing down temporary
 databases for testing purposes. This framework requires a user (optionally with
 password) which has the ability to create new databases and works by creating
-test-specific databases owned by the user specified.
+test-specific databases owned by the user specified. B<Note:> Test databases
+are not automatically destroyed and should be cleaned up manually by call the
+C<destroy> method on the database-specific test database object.
+
+=head2 process
+
+B<on create, clone>
+
+=over 4
+
+=item #1
+
+Establish a connection to the DB using some "initial" database.
+
+  my $tdbo = $tdb->postgres(initial => 'template0');
+
+=item #2
+
+Using the established connection, create the test/temporary database.
+
+  $tdbo->create;
+
+=item #3
+
+Establish a connection to the newly created test/temporary database.
+
+  $tdbo->create->dbh;
+
+=item #4
+
+Make the test database object immutable.
+
+  $tdbo->create->database('example'); # error
+
+=back
+
+B<on destroy>
+
+=over 4
+
+=item #1
+
+Establish a connection to the DB using the "initial" database.
+
+  # using the created test/temporary database object
+
+=item #2
+
+Using the established connection, drop the test/temporary database.
+
+  $tdbo->destroy;
+
+=back
+
+=head2 usages
+
+B<using DBI>
+
+=over 4
+
+=item #1
+
+  my $tdb = Test::DB->new;
+  my $dbh = $tdb->sqlite(%options)->dbh;
+
+=back
+
+B<using DBIx::Class>
+
+=over 4
+
+=item #1
+
+  my $tdb = Test::DB->new;
+  my $tdbo = $tdb->postgres(%options)->create;
+  my $schema = DBIx::Class::Schema->connect(
+    dsn => $tdbo->dsn,
+    username => $tdbo->username,
+    password => $tdbo->password,
+  );
+
+=back
+
+B<using Mojo::mysql>
+
+=over 4
+
+=item #1
+
+  my $tdb = Test::DB->new;
+  my $tdbo = $tdb->mysql(%options)->create;
+  my $mysql = Mojo::mysql->new($tdbo->uri);
+
+=back
+
+B<using Mojo::Pg>
+
+=over 4
+
+=item #1
+
+  my $tdb = Test::DB->new;
+  my $tdbo = $tdb->postgres(%options)->create;
+  my $postgres = Mojo::Pg->new($tdbo->uri);
+
+=back
+
+B<using Mojo::Pg (with cloning)>
+
+=over 4
+
+=item #1
+
+  my $tdb = Test::DB->new;
+  my $tdbo = $tdb->postgres(%options)->clone('template0');
+  my $postgres = Mojo::Pg->new($tdbo->uri);
+
+=back
+
+B<using Mojo::SQLite>
+
+=over 4
+
+=item #1
+
+  my $tdb = Test::DB->new;
+  my $tdbo = $tdb->sqlite(%options)->create;
+  my $sqlite = Mojo::SQLite->new($tdbo->uri);
+
+=back
 
 =cut
 
@@ -221,6 +339,78 @@ provided are passed along to the test database object class constructor.
   # given: synopsis
 
   $tdb->create(database => 'sqlite');
+
+=back
+
+=cut
+
+=head2 mssql
+
+  mssql(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+
+The mssql method builds and returns a L<Test::DB::Mssql> object.
+
+=over 4
+
+=item mssql example #1
+
+  # given: synopsis
+
+  $tdb->mssql;
+
+=back
+
+=cut
+
+=head2 mysql
+
+  mysql(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+
+The mysql method builds and returns a L<Test::DB::Mysql> object.
+
+=over 4
+
+=item mysql example #1
+
+  # given: synopsis
+
+  $tdb->mysql;
+
+=back
+
+=cut
+
+=head2 postgres
+
+  postgres(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+
+The postgres method builds and returns a L<Test::DB::Postgres> object.
+
+=over 4
+
+=item postgres example #1
+
+  # given: synopsis
+
+  $tdb->postgres;
+
+=back
+
+=cut
+
+=head2 sqlite
+
+  sqlite(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+
+The sqlite method builds and returns a L<Test::DB::Sqlite> object.
+
+=over 4
+
+=item sqlite example #1
+
+  # given: synopsis
+
+  $tdb->sqlite;
 
 =back
 

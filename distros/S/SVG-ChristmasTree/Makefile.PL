@@ -33,6 +33,9 @@ WriteMakefile(
         url => 'git://github.com/davorg/svg-christmastree.git',
         web => 'https://github.com/davorg/svg-christmastree',
       },
+      bugtracker => {
+        web => 'https://github.com/davorg/svg-christmastree/issues',
+      },
     },
   },
   EXE_FILES => [ 'bin/tree' ],

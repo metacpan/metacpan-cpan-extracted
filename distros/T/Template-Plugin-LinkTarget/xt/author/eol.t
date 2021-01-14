@@ -10,6 +10,7 @@ my @files = (
     'lib/Template/Plugin/LinkTarget.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/01-compile.t',
     't/01-filter.t'
 );
 

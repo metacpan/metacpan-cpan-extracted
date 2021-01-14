@@ -1,5 +1,11 @@
 Revision history for App-Cronjob
 
+1.200011  2021-01-11 19:06:44-05:00 America/New_York
+        - always set a logging prefix, even if its just noise; this makes it
+          easy to coordinate log lines
+        - tell syslog to include pid; this was changed in v1.200002 due to a
+          misunderstanding
+
 1.200010  2020-04-09 10:00:27-04:00 America/New_York
         - fix bogus indenting in docs
 

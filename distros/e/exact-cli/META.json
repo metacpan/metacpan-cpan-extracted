@@ -36,7 +36,7 @@
       "runtime" : {
          "requires" : {
             "Util::CommandLine" : "1.04",
-            "exact" : "0",
+            "exact" : "1.14",
             "perl" : "5.014",
             "strict" : "0"
          }
@@ -65,7 +65,7 @@
          "web" : "https://github.com/gryphonshafer/exact-cli"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-2.0"

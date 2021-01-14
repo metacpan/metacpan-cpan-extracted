@@ -1,5 +1,9 @@
 Revision history for Perl extension Data::FormValidator::EmailValid:
 
+0.08      2021-01-12 10:55:39-08:00 America/Vancouver
+    - Bump minimum required Perl to 5.10; the minimum required for
+      Regexp::Common, which is a dependency of Data::FormValidator
+
 0.07      2020-12-30 21:41:49-08:00 America/Vancouver
     - POD corrections; spelling, trailing whitespace
     - Switch to Dist::Zilla Author Bundle

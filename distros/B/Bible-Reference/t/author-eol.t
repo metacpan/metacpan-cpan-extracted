@@ -17,7 +17,6 @@ use Test::EOL;
 my @files = (
     'lib/Bible/Reference.pm',
     't/00-compile.t',
-    't/Test/Bible/Reference.pm',
     't/author-eol.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',

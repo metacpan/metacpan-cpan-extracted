@@ -2,10 +2,7 @@
 package App::Module::Lister;
 use strict;
 
-use subs qw();
-use vars qw($VERSION);
-
-$VERSION = '0.153';
+our $VERSION = '0.154';
 
 =encoding utf8
 
@@ -248,7 +245,7 @@ something like C</usr/local/lib/perl5/5.8.8/Foo/Bar.pm>, which
 translates in the module C<Foo::Bar>. If I find a directory like
 C</usr/local/lib/perl5/5.8.8/lib/Foo/Bar.pm>, where I created the
 extra C<lib> by hand, this program guesses the module name is
-C<lib::Foo::Bar>. That's not a great tradegy, but I don't have a
+C<lib::Foo::Bar>. That's not a great tragedy, but I don't have a
 simple way around that right now.
 
 =item *
@@ -279,7 +276,7 @@ Some bits stolen from C<mldistwatch> in the PAUSE code, by Andreas König.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic 2 license.
 

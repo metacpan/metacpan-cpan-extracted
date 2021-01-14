@@ -45,13 +45,21 @@ D64::Disk::Layout::Base - A base class for designing physical layouts of various
   # Get number of sectors per track information:
   my $num_sectors = $diskLayoutObj->num_sectors($track);
 
-  # Read physical sector data from disk image:
+  # Read physical sector data from a disk image:
   my $data = $diskLayoutObj->sector_data($track, $sector);
   my @data = $diskLayoutObj->sector_data($track, $sector);
 
-  # Write physical sector data into disk image:
+  # Write physical sector data into a disk image:
   $diskLayoutObj->sector_data($track, $sector, $data);
   $diskLayoutObj->sector_data($track, $sector, @data);
+
+  # Read physical track data from a disk image:
+  my $data = $diskLayoutObj->track_data($track);
+  my @data = $diskLayoutObj->track_data($track);
+
+  # Write physical track data into a disk image:
+  $diskLayoutObj->track_data($track, $data);
+  $diskLayoutObj->track_data($track, @data);
 
   # Save data changes to file:
   $diskLayoutObj->save();
@@ -89,7 +97,7 @@ $EXPORT_TAGS{'all'} = [];
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp qw(carp croak);
 
@@ -237,7 +245,7 @@ sub _read_image_data {
 
 =head2 sector_data
 
-Read physical sector data from disk image:
+Read physical sector data from a disk image:
 
   my $data = $diskLayoutObj->sector_data($track, $sector);
   my @data = $diskLayoutObj->sector_data($track, $sector);
@@ -246,7 +254,7 @@ Can either be read into a scalar (in which case it is a bytes sequence) or into 
 
 A valid sector data is returned upon successful read, an undefined value otherwise.
 
-Write physical sector data into disk image:
+Write physical sector data into a disk image:
 
   $diskLayoutObj->sector_data($track, $sector, $data);
   $diskLayoutObj->sector_data($track, $sector, @data);
@@ -265,38 +273,66 @@ sub sector_data {
     my $class = ref($self) || $self;
     my $data;
     $data .= $_ for @data;
-    # Validate track number (should be within range 1 .. $num_tracks):
-    my $sectors_per_track_aref = $class->_derived_class_property_value('@sectors_per_track');
-    my $num_tracks = @{$sectors_per_track_aref};
-    if ($track < 1 or $track > $num_tracks) {
-        carp "Invalid track number: ${track} (accepted track number range for this class is: 1 <= \$track <= ${num_tracks})";
-        return undef;
-    }
-    # Validate sector number (should be within range 0 .. $num_sectors - 1):
-    my $num_sectors = $self->num_sectors($track);
-    if ($sector < 0 or $sector >= $num_sectors) {
-        carp "Invalid sector number: ${sector} (accepted sector number range for this class is: 0 <= \$sector < ${num_sectors})";
-        return undef;
-    }
+    return unless $class->_valid_track_number($track);
+    return unless $self->_valid_sector_number($track, $sector);
     if (defined $data) {
-        my $bytes_per_sector = $class->_derived_class_property_value('$bytes_per_sector');
-        my $data_length = length $data;
-        # Validate data length (should contain exactly "$bytes_per_sector" bytes):
-        if ($data_length > $bytes_per_sector) {
-            my $bytes_truncated = $data_length - $bytes_per_sector;
-            substr $data, $bytes_per_sector, $bytes_truncated, '';
-            carp "Too much data provided while writing physical sector into disk image, last ${bytes_truncated} byte(s) of data truncated and just ${bytes_per_sector} byte(s) written";
-        }
-        # Pad data to be written to disk with zeroes (uninitialized values):
-        if ($data_length < $bytes_per_sector) {
-            my $bytes_appended = $bytes_per_sector - $data_length;
-            substr $data, $data_length, 0, chr (0x00) x $bytes_appended;
-            carp "Too little data provided while writing physical sector into disk image, ${bytes_appended} extra zero byte(s) of data appended and ${bytes_per_sector} byte(s) written";
-        }
+        $class->_validate_data_length(\$data, 1);
+        $class->_pad_data_with_zeroes(\$data, 1);
         $self->{'DATA'}->[$track]->[$sector] = $data;
     }
     return unless defined wantarray;
     $data = $self->{'DATA'}->[$track]->[$sector];
+    if (wantarray) {
+        @data = split //, $data;
+        return @data;
+    }
+    else {
+        return $data;
+    }
+}
+
+=head2 track_data
+
+Read physical track data from a disk image:
+
+  my $data = $diskLayoutObj->track_data($track);
+  my @data = $diskLayoutObj->track_data($track);
+
+Can either be read into a scalar (in which case it is a bytes sequence) or into an array (method called in a list context returns a list of single bytes of data). Length of a scalar as well as size of an array depend on number of bytes per sector storage defined within derived class in $bytes_per_sector attribute and number of sectors per track storage defined within derived class in @sectors_per_track property.
+
+A valid track data is returned upon successful read, an undefined value otherwise.
+
+Write physical track data into a disk image:
+
+  $diskLayoutObj->track_data($track, $data);
+  $diskLayoutObj->track_data($track, @data);
+
+Same as above, data to write can be provided as a scalar (a bytes sequence of strictly defined length) as well as an array (list of single bytes of data of precisely specified size).
+
+A valid track data is returned upon successful write, an undefined value otherwise.
+
+=cut
+
+sub track_data {
+    my $self = shift;
+    my $track = shift;
+    my @data = splice @_;
+    my $class = ref ($self) || $self;
+    my $data;
+    $data .= $_ for @data;
+    return unless $class->_valid_track_number($track);
+    my $num_sectors = $self->num_sectors($track);
+    if (defined $data) {
+        $class->_validate_data_length(\$data, $num_sectors);
+        $class->_pad_data_with_zeroes(\$data, $num_sectors);
+        my $bytes_per_sector = $class->_derived_class_property_value('$bytes_per_sector');
+        for (my $sector = 0; $sector < $num_sectors; $sector++) {
+          my $sector_data = substr $data, $sector * $bytes_per_sector, $bytes_per_sector;
+          $self->{'DATA'}->[$track]->[$sector] = $sector_data;
+        }
+    }
+    return unless defined wantarray;
+    $data = join '', @{$self->{'DATA'}->[$track]};
     if (wantarray) {
         @data = split //, $data;
         return @data;
@@ -342,6 +378,57 @@ sub _derived_class_property_value {
         }
     }
     return undef;
+}
+
+sub _valid_track_number {
+    my ($class, $track) = @_;
+    # Validate track number (should be within range 1 .. $num_tracks):
+    my $sectors_per_track_aref = $class->_derived_class_property_value('@sectors_per_track');
+    my $num_tracks = @{$sectors_per_track_aref};
+    if ($track < 1 or $track > $num_tracks) {
+        carp "Invalid track number: ${track} (accepted track number range for this class is: 1 <= \$track <= ${num_tracks})";
+        return 0;
+    }
+    return 1;
+}
+
+sub _valid_sector_number {
+    my ($self, $track, $sector) = @_;
+    # Validate sector number (should be within range 0 .. $num_sectors - 1):
+    my $num_sectors = $self->num_sectors($track);
+    if ($sector < 0 or $sector >= $num_sectors) {
+        carp "Invalid sector number: ${sector} (accepted sector number range for this class is: 0 <= \$sector < ${num_sectors})";
+        return 0;
+    }
+    return 1;
+}
+
+sub _validate_data_length {
+    my ($class, $data_ref, $num_sectors) = @_;
+    my $bytes_per_sector = $class->_derived_class_property_value('$bytes_per_sector');
+    my $data_length = length ${$data_ref};
+    my $data_length_wanted = $bytes_per_sector * $num_sectors;
+    # Validate data length (should contain exactly "$bytes_per_sector" times "$num_sectors" bytes):
+    if ($data_length > $data_length_wanted) {
+        my $bytes_truncated = $data_length - $data_length_wanted;
+        substr ${$data_ref}, $data_length_wanted, $bytes_truncated, '';
+        my $what = $num_sectors == 1 ? 'sector' : 'track';
+        carp "Too much data provided while writing physical ${what} into disk image, last ${bytes_truncated} bytes of data truncated and just ${data_length_wanted} bytes written";
+    }
+}
+
+sub _pad_data_with_zeroes {
+    my ($class, $data_ref, $num_sectors) = @_;
+    my $bytes_per_sector = $class->_derived_class_property_value('$bytes_per_sector');
+    my $data_length = length ${$data_ref};
+    my $data_length_wanted = $bytes_per_sector * $num_sectors;
+    # Pad data to be written to disk with zeroes (uninitialized values):
+    if ($data_length < $data_length_wanted) {
+        my $bytes_appended = $data_length_wanted - $data_length;
+        substr ${$data_ref}, $data_length, 0, chr (0x00) x $bytes_appended;
+        my $what = $num_sectors == 1 ? 'sector' : 'track';
+        carp "Too little data provided while writing physical ${what} into disk image, ${bytes_appended} extra zero bytes of data appended and ${data_length_wanted} bytes written";
+    }
 }
 
 =head2 num_tracks
@@ -481,11 +568,11 @@ Pawel Krol, E<lt>pawelkrol@cpan.orgE<gt>.
 
 =head1 VERSION
 
-Version 0.02 (2018-11-24)
+Version 0.03 (2021-01-12)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2011, 2018 by Pawel Krol <pawelkrol@cpan.org>.
+Copyright 2011-2021 by Pawel Krol <pawelkrol@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

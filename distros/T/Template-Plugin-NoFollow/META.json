@@ -48,7 +48,8 @@
       "runtime" : {
          "requires" : {
             "HTML::Parser" : "0",
-            "Template::Plugin::Filter" : "2.00"
+            "Template::Plugin::Filter" : "2.00",
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -78,7 +79,7 @@
          "web" : "https://github.com/bleargh45/Template-Plugin-NoFollow"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",

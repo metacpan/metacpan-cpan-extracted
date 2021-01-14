@@ -29,3 +29,15 @@ Draw a different Christmas tree.
     $ ./tree --layers=5 --pot_colour='rgb(0,0,255)' > another_tree.svg
 
 =head1 OPTIONS
+
+    usage: tree [-?h] [long options...]
+        -h -? --usage --help        Prints this usage information.
+        --width INT
+        --layers INT
+        --trunk_length INT
+        --leaf_colour STR
+        --bauble_colour STR
+        --trunk_colour STR
+        --pot_colour STR
+        --pot_height INT
+=cut

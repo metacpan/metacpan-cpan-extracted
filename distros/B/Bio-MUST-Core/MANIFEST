@@ -11,11 +11,13 @@ bin/ali2fasta.pl
 bin/ali2phylip.pl
 bin/app-len-ids-ali.pl
 bin/change-ids-ali.pl
+bin/classify-ali.pl
 bin/clust2mapper.pl
 bin/fasta2ali.pl
 bin/fetch-tax.pl
 bin/format-tree.pl
 bin/idealize-ali.pl
+bin/jack-ali-dir.pl
 bin/list2mapper.pl
 bin/mask-ali.pl
 bin/phylip2ali.pl
@@ -135,6 +137,7 @@ test/OG0000464-edit-MMETSP172-label.txt
 test/OG0000464-edit-MMETSP172-range.txt
 test/OG0000464-edit-MMETSP172.idm
 test/OG0000464-edit-MMETSP172.tre
+test/OG0001014.fasta
 test/P-rpoB-CYANO10254.idm
 test/PBP3-collapse.txt
 test/PBP3-color.txt
@@ -165,6 +168,7 @@ test/cbs.ali
 test/cbs.fasta
 test/cbs.stockholm
 test/classifier-simple.idl
+test/classifier-zero.yaml
 test/classifier.yaml
 test/collapse.nex
 test/collapse.tre

@@ -3,8 +3,22 @@ App-GhaProve
 
 Created:      2020-11-13
 Home page:    <https://metacpan.org/release/App-GhaProve>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=App-GhaProve>
+Bug tracker:  <https://github.com/tobyink/p5-app-ghaprove/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.007	2021-01-12
+
+ [ Packaging ]
+ - Require Test::Harness 2.40.
+
+0.006	2021-01-11
+
+ [ Packaging ]
+ - Use GitHub issue tracker.
+
+ [ Other ]
+ - Print extra output to check which version of `prove` is being used on
+   old Perls.
 
 0.005	2020-11-15
 

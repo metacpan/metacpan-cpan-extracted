@@ -2,14 +2,12 @@ package English::Script {
     # ABSTRACT: Parse English subset and convert to data or code
 
     use 5.014;
-    use strict;
-    use warnings;
+    use exact;
 
-    use Carp 'croak';
     use Parse::RecDescent;
     use YAML::XS 'Dump';
 
-    our $VERSION = '1.03'; # VERSION
+    our $VERSION = '1.05'; # VERSION
 
     sub new {
         my $self = shift;
@@ -370,11 +368,10 @@ package English::Script {
 
 package English::Script::JavaScript {
     use 5.014;
-    use strict;
-    use warnings;
+    use exact;
     use JavaScript::Packer;
 
-    our $VERSION = '1.03'; # VERSION
+    our $VERSION = '1.05'; # VERSION
 
     sub new {
         my ( $self, $args ) = @_;
@@ -641,7 +638,7 @@ English::Script - Parse English subset and convert to data or code
 
 =head1 VERSION
 
-version 1.03
+version 1.05
 
 =for markdown [![test](https://github.com/gryphonshafer/English-Script/workflows/test/badge.svg)](https://github.com/gryphonshafer/English-Script/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/English-Script/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/English-Script)

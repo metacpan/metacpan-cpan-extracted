@@ -3,7 +3,7 @@ package Role::Tiny::With;
 use strict;
 use warnings;
 
-our $VERSION = '2.001004';
+our $VERSION = '2.002003';
 $VERSION =~ tr/_//d;
 
 use Role::Tiny ();
@@ -12,8 +12,8 @@ use Exporter 'import';
 our @EXPORT = qw( with );
 
 sub with {
-    my $target = caller;
-    Role::Tiny->apply_roles_to_package($target, @_)
+  my $target = caller;
+  Role::Tiny->apply_roles_to_package($target, @_)
 }
 
 1;

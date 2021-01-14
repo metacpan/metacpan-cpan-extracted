@@ -1,16 +1,14 @@
-InfluxDB-Client-Simple
+InfluxDB-Client-Simple - Version 1.00
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+InfluxDB::Client::Simple provides an easy way to interact with an InfluxDB server.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+Its main features over InfluxDB::HTTP (from which it's derived) are:
 
+* Minimal dependencies (no Object::Result and its dependencies)
+* Possible use of UDP protocol for writing
+
+
+Note that this version contains API changes that may break code using the previous 0.x branch.
 
 INSTALLATION
 

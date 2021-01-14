@@ -13,11 +13,13 @@ typedef tsf* Audio__TinySoundFont__XS;
 
 static int atsf_perlio_read(PerlIO* f, void* ptr, unsigned int size)
 {
+  dTHX;
   return (int)PerlIO_read(f, ptr, size);
 }
 
 static int atsf_perlio_skip(PerlIO* f, unsigned int count)
 {
+  dTHX;
   return !PerlIO_seek(f, count, SEEK_CUR);
 }
 

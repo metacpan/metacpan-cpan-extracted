@@ -26,7 +26,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Template::Plugin::Filter' => '2.00'
+                                      'Template::Plugin::Filter' => '2.00',
+                                      'perl' => '5.008'
                                     }
                     },
        'test' => {

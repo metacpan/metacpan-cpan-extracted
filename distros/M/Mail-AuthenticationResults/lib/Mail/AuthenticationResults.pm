@@ -4,7 +4,7 @@ package Mail::AuthenticationResults;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20200824.1'; # VERSION
+our $VERSION = '2.20210112'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Parser;
@@ -37,7 +37,7 @@ Mail::AuthenticationResults - Object Oriented Authentication-Results Headers
 
 =head1 VERSION
 
-version 1.20200824.1
+version 2.20210112
 
 =head1 DESCRIPTION
 

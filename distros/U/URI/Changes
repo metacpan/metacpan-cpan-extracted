@@ -1,5 +1,8 @@
 Revision history for URI
 
+5.06      2021-01-14 16:01:13Z
+    - Tidy import statements (GH#80) (Olaf Alders)
+
 5.05      2020-10-21 13:00:44Z
     - Bump all versions to 5.05 in order to remove various version mismatches.
       (GH #77) (Olaf Alders)

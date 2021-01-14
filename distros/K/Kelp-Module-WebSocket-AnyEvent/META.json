@@ -4,7 +4,7 @@
       "Bartosz Jarzyna <brtastic.dev@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,6 +50,18 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.01",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brtastic/perl-kelp-module-websocket-anyevent/issues"
+      },
+      "homepage" : "https://brtastic.xyz/project/kelp",
+      "license" : [
+         "https://dev.perl.org/licenses"
+      ],
+      "repository" : {
+         "url" : "https://github.com/brtastic/perl-kelp-module-websocket-anyevent"
+      }
+   },
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -55,7 +55,7 @@ Archive::BagIt::Plugin::Manifest::SHA512 - The role to load the sha512 plugin (d
 
 =head1 VERSION
 
-version 0.070
+version 0.071
 
 =head1 AVAILABILITY
 

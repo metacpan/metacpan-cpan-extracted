@@ -7,4 +7,6 @@ ExtUtils::MakeMaker->VERSION(6.68)
 
 author 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>';
 
+manifest_include 'xt/dependents', '.patch';
+
 1;

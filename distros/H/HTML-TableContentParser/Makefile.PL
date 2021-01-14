@@ -1,3 +1,8 @@
+use strict;
+use warnings;
+
+use 5.006002;
+
 use ExtUtils::MakeMaker;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
@@ -6,7 +11,10 @@ use ExtUtils::MakeMaker;
 ( my $mmv = ExtUtils::MakeMaker->VERSION ) =~ s/ _ //smxg;
 
 my %arg = (
-    'AUTHOR'		=> 'Simon Drabble (sdrabble@cpan.org)',
+    'AUTHOR'		=> [
+	'Simon Drabble (sdrabble@cpan.org)',
+	'Tom Wyant (wyant at cpan dot org)',
+    ],
     'ABSTRACT'		=> 'Extract tables from HTML',
     'NAME'		=> 'HTML::TableContentParser',
     'VERSION_FROM'	=> 'lib/HTML/TableContentParser.pm', # finds $VERSION
@@ -22,13 +30,33 @@ my %arg = (
 $mmv >= 6.31
     and $arg{LICENSE} = 'perl_5';
 
-$mmv >= 6.4501 and $args{META_MERGE} = {
-    resources => {
-	bugtracker =>
-	'https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-TableContentParser',
-	license => 'http://dev.perl.org/licenses/',
+$mmv >= 6.4501 and $arg{META_MERGE} = {
+    'meta-spec'	=> {
+	version	=> 2,
     },
+    no_index	=> {
+	directory	=> [ qw{ inc t xt } ],
+    },
+    resources => {
+	bugtracker => {
+	    web	=> 'https://github.com/trwyant/perl-HTML-TableContentParser/issues',
+	    mailto	=> 'wyant@cpan.org',
+	},
+	license => 'http://dev.perl.org/licenses/',
+	repository	=> {
+	    type	=> 'git',
+	    url	=> 'git://github.com/trwyant/perl-HTML-TableContentParser.git',
+	    web	=> 'https://github.com/trwyant/perl-HTML-TableContentParser',
+	},
+    },
+    provides(),
 };
+
+$mmv >= 6.4701
+    and $arg{MIN_PERL_VERSION} = 5.006002;
+
+$mmv >= 6.5702
+    or $arg{AUTHOR} = join ', ', @{ $arg{AUTHOR} };
 
 $arg{ $mmv >= 6.52 ? 'CONFIGURE_REQUIRES' : 'PREREQ_PM' }
     { 'ExtUtils::MakeMaker' } = 0;
@@ -58,6 +86,17 @@ authortest :: pure_all
 testcover :: pure_all
 	cover -test
 EOD
+}
+
+sub provides {
+    -d 'lib'
+	or return;
+    local $@ = undef;
+    my $provides = eval {
+	require Module::Metadata;
+	Module::Metadata->provides( version => 2, dir => 'lib' );
+    } or return;
+    return ( provides => $provides );
 }
 
 # ex: set textwidth=72 :

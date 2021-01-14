@@ -23,6 +23,9 @@ WriteMakefile(
                 url => 'git://github.com/davorg/qmail-queuehandler.git',
                 web => 'https://github.com/davorg/qmail-queuehandler',
             },
+            bugtracker => {
+                web => 'https://github.com/davorg/qmail-queuehandler/issues',
+            },
         },
     },
 );

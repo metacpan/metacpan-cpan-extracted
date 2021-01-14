@@ -1,3 +1,6 @@
+1.10 2021-01-13
+- add prerender hook
+
 1.09 2020-12-24
 - nodes method
 - edges method

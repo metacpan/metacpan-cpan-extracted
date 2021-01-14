@@ -4,9 +4,9 @@
       "Gryphon Shafer <gryphon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -39,20 +39,22 @@
             "LWP::UserAgent" : "0",
             "WWW::Shorten" : "0",
             "XML::RSS" : "0",
-            "perl" : "5.014",
-            "strict" : "0",
-            "warnings" : "0"
+            "exact" : "1.14",
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
+            "Bot::IRC" : "0",
+            "Bot::IRC::Store" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test2::V0" : "0",
             "Test::More" : "0",
-            "Test::Most" : "0",
-            "constant" : "0",
-            "perl" : "5.014"
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
@@ -68,8 +70,9 @@
          "web" : "https://github.com/gryphonshafer/Bot-IRC-X-Feeds"
       }
    },
-   "version" : "1.04",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "version" : "1.06",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

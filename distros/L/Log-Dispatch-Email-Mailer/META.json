@@ -4,9 +4,9 @@
       "Gryphon Shafer <gryphon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -35,12 +35,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Email::Mailer" : "1.09",
-            "Log::Dispatch::Email" : "0",
-            "base" : "0",
-            "perl" : "5.014",
-            "strict" : "0",
-            "warnings" : "0"
+            "Email::Mailer" : "1.16",
+            "Log::Dispatch::Email" : "2.7",
+            "exact" : "1.14",
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -50,10 +48,11 @@
             "IO::All" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::MockObject" : "0",
+            "Test2::V0" : "0",
             "Test::More" : "0",
-            "Test::Most" : "0",
-            "perl" : "5.014"
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
@@ -69,9 +68,9 @@
          "web" : "https://github.com/gryphonshafer/Log-Dispatch-Email-Mailer"
       }
    },
-   "version" : "1.08",
+   "version" : "1.11",
    "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

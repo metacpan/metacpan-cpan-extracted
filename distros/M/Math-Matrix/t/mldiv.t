@@ -24,6 +24,7 @@ note('mldiv() when "denominator" is an M-by-N matrix with M = N');
     my $x = $y -> mldiv($A);
 
     is(ref($x), 'Math::Matrix', '$x is a Math::Matrix');
+
     is_deeply([ @$x ], [[  4, -2, -9 ],
                         [ -3, -2, -1 ],
                         [  4, -5,  7 ],
@@ -70,6 +71,15 @@ note('mldiv() when "denominator" is an M-by-N matrix with M > N');
     my $x = $y -> mldiv($A);
 
     is(ref($x), 'Math::Matrix', '$x is a Math::Matrix');
+
+    # Avoid tiny errors. If an element is very close to an integer, round it to
+    # that integer, otherwise use the original value.
+
+    $x = $x -> sapply(sub {
+                          my $r = sprintf('%.0f', $_[0]);
+                          abs($r - $_[0]) < 1e-12 ? $r : $_[0];
+                      });
+
     is_deeply([ @$x ], [[  8, -6,  1 ],
                         [  8, -9,  0 ],
                         [ -4,  2,  2 ],
@@ -112,6 +122,11 @@ note('mldiv() when "denominator" is an M-by-N matrix with M < N');
 
     my $x = $y -> mldiv($A);
     is(ref($x), 'Math::Matrix', '$x is a Math::Matrix');
+
+    # Avoid negative zero in the output.
+
+    $x = $x -> sapply(sub { $_[0] == 0 ? abs($_[0]) : $_[0] });
+
     is_deeply([ @$x ], [[       0,       0,       0,       0 ],
                         [  -0.125,       0,  -0.125,  -0.125 ],
                         [       0,       0,      -1,       1 ],

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Math::Matrix;
-use Test::More tests => 41;
+use Test::More tests => 49;
 
 note("mpow() with two matrices");
 
@@ -32,8 +32,6 @@ note("mpow() with two matrices");
                         [ 1,  4 ]], '$x is unmodified');
     is_deeply([ @$y ], [[ 0 ]], '$y is unmodified');
 }
-
-note("mpow() with matrix and scalar");
 
 {
     my $x = Math::Matrix -> new([[ 0, -2 ],
@@ -85,7 +83,75 @@ note("mpow() with matrix and scalar");
     is_deeply([ @$y ], [[5]], '$y is unmodified');
 }
 
-note("mpow() with empty matrices");
+{
+    my $x = Math::Matrix -> new([[ 1, -2 ],
+                                 [ 2, -3 ]]);
+    my $y = Math::Matrix -> new([[-1]]);
+    my $z = $x -> mpow($y);
+
+    is(ref($z), 'Math::Matrix', '$z is a Math::Matrix');
+
+    # Avoid tiny errors. If an element is very close to an integer, round it to
+    # that integer, otherwise use the original value.
+
+    $z = $z -> sapply(sub {
+                          my $r = sprintf('%.0f', $_[0]);
+                          abs($r - $_[0]) < 1e-12 ? $r : $_[0];
+                      });
+
+    is_deeply([ @$z ], [[ -3, 2 ],
+                        [ -2, 1 ]],
+              '$z has the right values');
+
+    # Verify that modifying $z does not modify $x or $y.
+
+    my ($nrowy, $ncoly) = $y -> size();
+    for my $i (0 .. $nrowy - 1) {
+        for my $j (0 .. $ncoly - 1) {
+            $z -> [$i][$j] += 100;
+        }
+    }
+
+    is_deeply([ @$x ], [[ 1, -2 ],
+                        [ 2, -3 ]], '$x is unmodified');
+    is_deeply([ @$y ], [[-1]], '$y is unmodified');
+}
+
+{
+    my $x = Math::Matrix -> new([[ 1, -2 ],
+                                 [ 2, -3 ]]);
+    my $y = Math::Matrix -> new([[-5]]);
+    my $z = $x -> mpow($y);
+
+    is(ref($z), 'Math::Matrix', '$z is a Math::Matrix');
+
+    # Avoid tiny errors. If an element is very close to an integer, round it to
+    # that integer, otherwise use the original value.
+
+    $z = $z -> sapply(sub {
+                          my $r = sprintf('%.0f', $_[0]);
+                          abs($r - $_[0]) < 1e-12 ? $r : $_[0];
+                      });
+
+    is_deeply([ @$z ], [[ -11, 10 ],
+                        [ -10,  9 ]],
+              '$z has the right values');
+
+    # Verify that modifying $z does not modify $x or $y.
+
+    my ($nrowy, $ncoly) = $y -> size();
+    for my $i (0 .. $nrowy - 1) {
+        for my $j (0 .. $ncoly - 1) {
+            $z -> [$i][$j] += 100;
+        }
+    }
+
+    is_deeply([ @$x ], [[ 1, -2 ],
+                        [ 2, -3 ]], '$x is unmodified');
+    is_deeply([ @$y ], [[-5]], '$y is unmodified');
+}
+
+note("mpow() with empty matrix");
 
 {
     my $x = Math::Matrix -> new([]);
@@ -127,8 +193,6 @@ note("pow() with two matrices");
     is_deeply([ @$y ], [[ 0 ]], '$y is unmodified');
 }
 
-note("pow() with matrix and scalar");
-
 {
     my $x = Math::Matrix -> new([[ 0, -2 ],
                                  [ 1,  4 ]]);
@@ -179,7 +243,7 @@ note("pow() with matrix and scalar");
     is_deeply([ @$y ], [[5]], '$y is unmodified');
 }
 
-note("pow() with empty matrices");
+note("pow() with empty matrix");
 
 {
     my $x = Math::Matrix -> new([]);

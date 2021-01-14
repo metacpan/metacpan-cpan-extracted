@@ -1,9 +1,9 @@
 package App::dateseq;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-30'; # DATE
+our $DATE = '2021-01-04'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.100'; # VERSION
+our $VERSION = '0.101'; # VERSION
 
 use 5.010001;
 use strict;
@@ -249,6 +249,12 @@ _
             src_plang => 'bash',
             'x.doc.show_result' => 0,
         },
+        {
+            summary => 'Use %q (see DateTimeX::strftimeq)',
+            src => q{[[prog]] 2020-12-24 2021-01-15 -f '%Y-%m-%d%( $_->day_of_week == 7 ? "su" : "" )q'},
+            src_plang => 'bash',
+            'x.doc.max_result_lines' => 10,
+        },
     ],
     links => [
         {url=>'prog:durseq', summary=>'Produce sequence of date durations'},
@@ -389,7 +395,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.100 of App::dateseq (from Perl distribution App-dateseq), released on 2020-04-30.
+This document describes version 0.101 of App::dateseq (from Perl distribution App-dateseq), released on 2021-01-04.
 
 =head1 FUNCTIONS
 
@@ -514,7 +520,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-dateseq>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-dateseq/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -526,7 +532,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

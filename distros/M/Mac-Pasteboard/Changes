@@ -1,3 +1,9 @@
+0.012		2021-01-13	T. R. Wyant
+    Use GitHub as bug tracker. R.I.P. rt.cpan.org.
+
+    Normally this release would include Travis CI testing, but they do
+    not support Perl under macOS.
+
 0.011		2019-10-21	T. R. Wyant
     Stopgap mods for macOS 10.15 Catalina
 

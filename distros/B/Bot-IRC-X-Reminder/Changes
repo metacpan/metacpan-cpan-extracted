@@ -1,5 +1,16 @@
 Revision history for Bot::IRC::X::Reminder
 
+1.06      2021-01-13 11:08:12-08:00 America/Los_Angeles
+        - Override some minimum version reqs in dist.ini
+
+1.05      2021-01-12 08:37:26-08:00 America/Los_Angeles
+        - Migrate to Test2::V0 and add exact
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+        - Update Travis YAML
+
 1.04      2019-08-26 16:42:41-07:00 America/Los_Angeles
         - Adding Perl versions to test; annual general update for 2018
         - Fix being able to forget reminders; closes #1

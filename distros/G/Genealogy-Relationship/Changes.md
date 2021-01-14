@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.5] - 2021-01-12
+
+### Added
+
+- Added bugtracker info to metadata
+
 ## [0.0.4] - 2020-11-09
 
 ### Fixed

@@ -1,6 +1,6 @@
 package Lab::Connection::TCPraw;
 #ABSTRACT: Raw TCP connection; deprecated, use Socket instead
-$Lab::Connection::TCPraw::VERSION = '3.731';
+$Lab::Connection::TCPraw::VERSION = '3.740';
 use v5.20;
 
 use strict;
@@ -52,11 +52,11 @@ Lab::Connection::TCPraw - Raw TCP connection; deprecated, use Socket instead
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2011       Andreas K. Huettel, Florian Olbrich
             2012       Florian Olbrich, Hermann Kraus

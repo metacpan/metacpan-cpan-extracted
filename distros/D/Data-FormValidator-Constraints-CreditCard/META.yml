@@ -1,22 +1,37 @@
 ---
-name: Data-FormValidator-Constraints-CreditCard
-version: 0.02
-author:
-  - Graham TerMarsch (cpan@howlingfrog.com)
 abstract: 'Data constraints, using Business::CreditCard'
-license: perl
-resources:
-  license: ~
-requires:
-  Business::CreditCard: 0.3
-  Data::FormValidator: 4
+author:
+  - 'Graham TerMarsch <cpan@howlingfrog.com>'
 build_requires:
-  Test::More: 0
-provides:
-  Data::FormValidator::Constraints::CreditCard:
-    file: lib/Data/FormValidator/Constraints/CreditCard.pm
-    version: 0.02
-generated_by: Module::Build version 0.32
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::DiagINC: '0.002'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-FormValidator-Constraints-CreditCard
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Business::CreditCard: '0.30'
+  Data::FormValidator: '4.0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/bleargh45/Data-FormValidator-Constraints-CreditCard/issues
+  repository: git://github.com/bleargh45/Data-FormValidator-Constraints-CreditCard.git
+version: '0.03'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

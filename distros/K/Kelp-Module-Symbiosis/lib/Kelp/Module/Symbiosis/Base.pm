@@ -1,5 +1,7 @@
 package Kelp::Module::Symbiosis::Base;
 
+our $VERSION = '1.01';
+
 use Kelp::Base qw(Kelp::Module);
 use Plack::Util;
 
@@ -12,6 +14,7 @@ sub run
 	my $app = $self->psgi(@_);
 	for (@{$self->middleware}) {
 		my ($class, $args) = @$_;
+
 		# Same middleware loading procedure as Kelp
 		next if $self->{_loaded_middleware}->{$class}++ && !$ENV{KELP_TESTING};
 
@@ -23,7 +26,7 @@ sub run
 
 sub psgi
 {
-	die "psgi needs to be reimplemented";
+	die __PACKAGE__ . " - psgi needs to be reimplemented";
 }
 
 sub build
@@ -42,7 +45,7 @@ __END__
 
 =head1 NAME
 
-Kelp::Module::Symbiosis::Base - base class for symbiotic modules
+Kelp::Module::Symbiosis::Base - Base class for symbiotic modules
 
 =head1 SYNOPSIS
 
@@ -61,11 +64,16 @@ Kelp::Module::Symbiosis::Base - base class for symbiotic modules
 		$self->SUPER::build(%args);
 
 		# write initialization code as usual
+		$self->register(some_method => sub { ... });
 	}
 
 =head1 DESCRIPTION
 
-This module serves as a base for a Kelp module that is supposed to be ran as a standalone Plack application (mounted separately). It takes care of middleware management, mounting into Symbiosis manager and some basic initialization chores. To write a new module that introduces a standalone Plack application as a Kelp module, simply extend this class and override I<psgi> and I<build> methods.
+This class serves as a base for a Kelp module that is supposed to be ran as a standalone Plack application (mounted separately). It takes care of middleware management, mounting into Symbiosis manager and some basic initialization chores. To write a new module that introduces a standalone Plack application as a Kelp module, simply extend this class and override I<psgi> and I<build> methods.
+
+=head2 Purpose
+
+It is a base for Kelp modules that are meant to be used with Symbiosis - it inherits from L<Kelp::Module>. It can also come very handy because of the built in middleware handling and access to Kelp application's configuration.
 
 =head1 METHODS
 
@@ -119,6 +127,6 @@ Middleware specs for this application. Every module basing on this class can spe
 
 =over 2
 
-=item L<Kelp::Module::Symbiosis>, the module manager
+=item * L<Kelp::Module::Symbiosis>, the module manager
 
 =back

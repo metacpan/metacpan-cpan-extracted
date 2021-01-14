@@ -1,0 +1,133 @@
+=head1 NAME
+
+distmgr - Create, integrate, release a Perl distribution to the CPAN, and
+prepare for the next development cycle.
+
+=for html
+<a href="https://github.com/stevieb9/dist-mgr/actions"><img src="https://github.com/stevieb9/dist-mgr/workflows/CI/badge.svg"/></a>
+<a href='https://coveralls.io/github/stevieb9/dist-mgr?branch=master'><img src='https://coveralls.io/repos/stevieb9/dist-mgr/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+
+=head1 DESCRIPTION
+
+Performs a full suite of automated creation, addition, pre-release, release and
+post release tasks for Perl distributions. It integrates with VCS, automates the
+configuration of Continuous Integration, manages version numbers and Changes
+files, amongst a slew of other tasks.
+
+This B<distmgr> application uses the L<Dist::Mgr> library as its backend.
+
+See the L<README|https://github.com/stevieb9/dist-mgr/blob/master/README.md> for
+full details beyond this document.
+
+=head1 USAGE
+
+    distmgr <command> [OPTIONS]
+
+=head1 COMMANDS
+
+=head2 Command Process Flows
+
+I<Notice>: Be sure to read the
+L<Command Process Flows|https://github.com/stevieb9/dist-mgr#command-process-flows>
+documentation in the L<README|https://github.com/stevieb9/dist-mgr/blob/master/README.md>
+so you understand what is happening, why its happening, and when it happens.
+
+=head2 create
+
+Creates a full blown, brand new distribution with everything included.
+
+I<Options>:
+
+    -m | --module    Mandatory: The module name (eg. Test::Module)
+    -a | --author    Mandatory: The name of the author (eg. "Steve Bertrand")
+    -e | --email     Mandatory: The email address of the author
+    -u | --user      Optional:  The Github username (eg. stevieb9)
+    -r | --repo      Optional:  The Github repository name (eg. test-module)
+    -w | --wait      Optional:  Wait for CI test results (--nowait to disable)
+    -V | --verbose   Optional:  Display verbose output for each process
+
+I<Note>: For Git integration, create an empty repository on Github, then supply
+the short name of the repository with C<--repo> and your Github username with
+C<--user> and we'll clone the new repo and use it as the top-level distribution
+directory.
+
+I<Note>: We will skip adding repository information, skip adding CI badge info,
+and skip adding repository and bugtracker information to C<Makefile.PL> file
+if C<--user> or C<--repo> are not present in the parameter list (see L</install>).
+
+=head2 dist
+
+Creates a bare-bones distribution with just the basics. There will be no git
+integration, no CI integration etc. Pretty well nearly a stock L<Module::Starter>
+distribution with a few small tweaks.
+
+I<Options>:
+
+    -m | --module   Mandatory: The module name (eg. Test::Module)
+    -a | --author   Mandatory: The name of the author (eg. "Steve Bertrand")
+    -e | --email    Mandatory: The email address of the author
+    -V | --verbose  Optional:  (Flag) Display verbose output for each process
+
+=head2 install
+
+Installs/adds various files or file sections into an existing distribution that
+you author.
+
+I<Options>:
+
+All of the below options are flags, and don't take any arguments.
+
+    -g | --gitignore    Install .gitignore file
+    -c | --ci           Install Github Actions CI configuration file
+    -B | --badges       Insert CI/Coverage badges links into the module's POD
+    -b | --bugtracker   Insert bugtracker information into Makefile.PL
+    -R | --repository   Insert repository information into Makefile.PL
+    -A | --all          Insert/Install all above options
+
+I<Note>: For badges, bugtracker and repository, the C<--user> (Github username)
+and C<--repo> (Github repository) arguments must be supplied.
+
+=head2 release
+
+Prepares for, tests, runs Continuous Integration testing, commits, tags, pushes
+and releases to the CPAN your distribution.
+
+I<Options>:
+
+    -i | --cpanid   Optional:  Your PAUSE userid
+    -p | --cpanpw   Optional:  Your PAUSE userid's password
+    -d | --dryrun   Optional:  (Flag) Don't actually upload to the CPAN
+
+I<Note>: No Git operations will be performed without C<--repo> and C<--user>. If
+the C<--cpanid> or C<--cpanpw> aren't available or the C<CPAN_USERNAME> or
+C<CPAN_PASSWORD> environment variables aren't set, we won't upload to the CPAN.
+
+=head2  cycle
+
+After L</release>, this command will bump version numbers in all of your modules,
+and prepare the Changes file for your next development cycle.
+
+I<Options>:
+
+    -V | --verbose  Optional:  Display verbose output for each process
+
+=head2 config
+
+config - Creates an initial default configuration file.
+
+This file will be named C<dist-mgr.json> and will be placed in your C<HOME>
+directory on Unix systems, and in your C<USERPROFILE> directory on Windows.
+
+ =head1 AUTHOR
+
+ Steve Bertrand, C<< <steveb at cpan.org> >>
+
+ =head1 LICENSE AND COPYRIGHT
+
+ Copyright 2020-2021 Steve Bertrand.
+
+ This program is free software; you can redistribute it and/or modify it
+ under the terms of the the Artistic License (2.0). You may obtain a
+ copy of the full license at:
+
+ L<http://www.perlfoundation.org/artistic_license_2_0>

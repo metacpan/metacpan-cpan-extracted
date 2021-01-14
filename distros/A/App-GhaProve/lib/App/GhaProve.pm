@@ -5,15 +5,27 @@ use warnings;
 package App::GhaProve;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005';
+our $VERSION   = '0.007';
 
 our $QUIET = 0;
 
 sub _system { scalar system( @_ ) }
 
+sub _maybe_warn {
+	my ( $class, $system ) = ( shift, @_ );
+	return if $] > 5.012000;
+	return if $QUIET;
+	print "PERL VERSION:  $]\n";
+	print "PROVE VERSION: ";
+	$system->( 'prove', '-V' );
+	return;
+}
+
 sub go {
 	my ( $class, @args ) = ( shift, @_ );
 	my $system = ref( $args[0] ) eq 'CODE' ? shift(@args) : \&_system;
+	
+	$class->_maybe_warn( $system );
 	
 	my $testing_mode = $ENV{GHA_TESTING_MODE}  || 0;
 	my $coverage     = $ENV{GHA_TESTING_COVER} || 0;
@@ -61,7 +73,7 @@ __END__
 
 =head1 NAME
 
-App::GhaProve - provides gha-prove app
+App::GhaProve - guts for the gha-prove command
 
 =head1 SYNOPSIS
 
@@ -121,7 +133,7 @@ Run test suite twice, using each of the above.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=App-GhaProve>.
+L<https://github.com/tobyink/p5-app-ghaprove/issues>.
 
 =head1 AUTHOR
 
@@ -129,11 +141,10 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Toby Inkster.
+This software is copyright (c) 2020-2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
 
 =head1 DISCLAIMER OF WARRANTIES
 

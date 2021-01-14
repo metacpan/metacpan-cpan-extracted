@@ -20,10 +20,10 @@ no_index:
     - t
     - inc
 requires:
-  perl: '5.020'
+  perl: '5.008'
 resources:
   bugtracker: https://github.com/briandfoy/object-iterate/issues
   homepage: https://github.com/briandfoy/object-iterate
   repository: https://github.com/briandfoy/object-iterate.git
-version: '1.143'
+version: '1.144'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

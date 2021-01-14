@@ -6,7 +6,7 @@ use exact;
 use strict;
 use FindBin;
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 sub import {
     my ( $self, $caller ) = @_;
@@ -61,7 +61,7 @@ exact::me - Original program path locations extension for exact
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-me/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-me/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-me/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-me)

@@ -5,8 +5,9 @@ package App::unichar;
 use 5.026;
 use utf8;
 use warnings;
+use open qw(:std :utf8);
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 =encoding utf8
 
@@ -23,14 +24,6 @@ Call it as a program with a name, character, or hex code number:
 	% perl lib/App/unichar.pm 'CHECK MARK'
 	Processing CHECK MARK
 		match type  name
-		code point  U+2713
-		decimal     10003
-		name        CHECK MARK
-		character   ✓
-
-	% perl lib/App/unichar.pm ✓
-	Processing CHECK MARK
-		match type  grapheme
 		code point  U+2713
 		decimal     10003
 		name        CHECK MARK
@@ -69,7 +62,7 @@ This module is in Github:
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2011-2018 brian d foy
+Copyright 2011-2021 brian d foy
 
 This module is licensed under the Artistic License 2.0.
 
@@ -111,11 +104,11 @@ sub run {
 			$code = $transformation{$key}( $+{$key} );
 			$fallthrough = 0;
 			}
-		if( / \A ([A-Z\s]+) \z /ix ) {
+		if( / \A ([A-Z\s]{2,}) \z /ix ) {
 			$match = 'name';
 			$code = eval { charnames::vianame( uc($1) ) };
 			unless( defined $code ) {
-				say "\tCouldn't match '$1' to a code name";
+				say "\tCouldn't match <$1> to a code name";
 				next;
 				}
 			$fallthrough = 0;
@@ -129,7 +122,6 @@ sub run {
 		if( $fallthrough ) {
 			unless( $code ) {
 				say "\tInvalid character or codepoint --> $_\n";
-				next;
 				}
 			next;
 			}

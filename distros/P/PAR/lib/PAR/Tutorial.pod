@@ -190,7 +190,6 @@ L<http://search.cpan.org/perldoc?PAR::Tutorial>
 =item * Pack one-liners:
 
  % pp -o out.exe -e 'print "Hi!"'   # turns one-liner into executable
-    
 
 =item * Generate PAR files instead of executables:
 
@@ -311,7 +310,7 @@ L<http://search.cpan.org/perldoc?PAR::Tutorial>
  /shlib/(5.8.0/)?(i386-freebsd/)?
 
 =item * PAR files may recursively contain other PAR files:
- 
+
  /par/(5.8.0/)?(i386-freebsd/)?
 
 =back
@@ -727,52 +726,6 @@ L<http://search.cpan.org/perldoc?PAR::Tutorial>
 
 
 
-=head2 Platform-specific Tips
-
-=over 4
-
-=item * Win32 and other icon-savvy platforms
-
-=over 4
-
-=item * Needs 3rd-party tools to add icons to C<pp>-generated executables
-
-=item * PE Header manipulation in Perl -- volunteers wanted!
-
-=back
-
-=item * Linux and other libc-based platforms
-
-=over 4
-
-=item * Try to avoid running C<pp> on a bleeding-edge version of the OS
-
-=item * Older versions with an earlier libc won't work with new ones
-
-=back
-
-=item * Solaris and other zlib-lacking platforms (but not Win32)
-
-=over 4
-
-=item * You need a static-linked C<Compress::Zlib> before installing PAR
-
-=item * In the future, PAR may depend on C<Compress::Zlib::Static> instead
-
-=back
-
-=item * Any platform with limited bandwidth or disk space
-
-=over 4
-
-=item * Use UPX to minimize the executable size
-
-=back
-
-=back
-
-
-
 =head2 Thank you!
 
 =over 4
@@ -798,10 +751,6 @@ L<http://search.cpan.org/perldoc?PAR::Tutorial>
 =item * Any questions?
 
 =back
-
-
-
-=head2 Bonus Slides: PAR Internals
 
 
 

@@ -2,7 +2,11 @@
 
 =encoding utf8
 
-=for HTML <a href="https://travis-ci.org/briandfoy/tie-timely"><img src="https://travis-ci.org/briandfoy/tie-timely.svg?branch=master" /></a>
+=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
+
+=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+
+=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
 
 =for HTML <a href='https://ci.appveyor.com/project/briandfoy/tie-timely'><img src='https://ci.appveyor.com/api/projects/status/l3vut7yd738o90gj' /></a>
 
@@ -10,7 +14,7 @@
 
 =for HTML <a href="https://github.com/briandfoy/tie-timely/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Tie-Timely.svg" /></a>
 
-=for HTML <a href="http://www.metacpan.org/module/Tie::Timely"><img src="https://img.shields.io/cpan/v/Tie-Timely.svg" /></A>
+=for HTML <a href="https://metacpan.org/pod/Tie::Timely"><img src="https://img.shields.io/cpan/v/Tie-Timely.svg" /></A>
 
 =head1 The Tie::Timely module
 
@@ -33,7 +37,7 @@ name instead of the file location:
 	% perldoc Tie::Timely
 
 You can read the documentation and inspect the meta data at
-L<MetaCPAN|https://www.metacpan.org/module/Tie::Timely>.
+L<MetaCPAN|https://metacpan.org/pod/Tie::Timely>.
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's
@@ -98,7 +102,7 @@ They might not know the particulars of this module, but they can help
 you diagnose your problem.
 
 You might like to read L<brian's Guide to Solving Any Perl
-Problem|http://archive.oreilly.com/pub/a/perl/excerpts/9780596527242/brians-guide.html>.
+Problem|https://briandfoy.github.io/brians-guide-to-solving-any-perl-problem/>.
 
 =head2 Copyright and License
 

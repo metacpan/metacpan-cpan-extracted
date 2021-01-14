@@ -16,6 +16,7 @@ use File::Copy;
 use File::Copy::Recursive qw(rmove_glob);
 use File::Path qw(make_path rmtree);
 use File::Find::Rule;
+use JSON;
 use Module::Starter;
 use PPI;
 use Term::ReadKey;
@@ -31,6 +32,10 @@ our @EXPORT_OK = qw(
     changes_date
     ci_badges
     ci_github
+    config
+    config_file
+    copyright_info
+    copyright_bump
     cpan_upload
     git_add
     git_commit
@@ -40,7 +45,7 @@ our @EXPORT_OK = qw(
     git_ignore
     git_release
     git_repo
-    git_status
+    git_status_differs
     git_tag
     init
     make_dist
@@ -63,9 +68,10 @@ our %EXPORT_TAGS = (
     private => _export_private(),
 );
 
-our $VERSION = '1.01';
+our $VERSION = '1.05';
 
 use constant {
+    CONFIG_FILE         => 'dist-mgr.json',
     GITHUB_CI_FILE      => 'github_ci_default.yml',
     GITHUB_CI_PATH      => '.github/workflows/',
     CHANGES_FILE        => 'Changes',
@@ -73,6 +79,7 @@ use constant {
     FSTYPE_IS_DIR       => 1,
     FSTYPE_IS_FILE      => 2,
     DEFAULT_DIR         => 'lib/',
+    DEFAULT_POD_DIR     => '.',
     MAKE                => $^O =~ /win32/i ? 'gmake' : 'make',
 };
 
@@ -219,8 +226,99 @@ sub ci_github {
 
     return @contents;
 }
+sub config {
+    my ($args, $file) = @_;
+
+    if (! defined $args) {
+        croak("config() requires \$args hash reference parameter");
+    }
+    elsif (ref $args ne 'HASH') {
+        croak("\$args parameter must be a hash reference.");
+    }
+
+    $file = config_file() if ! defined $file;
+    my $conf;
+
+    if (-e $file && -f $file) {
+        {
+            local $/;
+            open my $fh, '<', $file or croak "Can't open config file $file: $!";
+            my $json = <$fh>;
+            $conf = decode_json $json;
+
+            for (keys %{ $conf }) {
+                delete $conf->{$_} if $conf->{$_} eq '';
+            }
+        }
+    }
+    else {
+        # No config file present
+        _config_file_write($file, _config_file());
+
+        print "\nGenerated new configuration file: $file\n";
+    }
+
+    %{ $args } = (%{ $args }, %{ $conf }) if $conf;
+
+    return $args;
+}
+sub config_file {
+    my $file = $^O =~ /win32/i
+        ? "$ENV{USERPROFILE}/${\CONFIG_FILE}"
+        : "$ENV{HOME}/${\CONFIG_FILE}";
+
+    return $file;
+}
+sub copyright_bump {
+    my ($fs_entry) = @_;
+
+    $fs_entry //= DEFAULT_POD_DIR;
+    _validate_fs_entry($fs_entry);
+
+    my ($year) = (localtime)[5];
+    $year += 1900;
+
+    my @pod_files = _pod_find_files($fs_entry);
+    my %info;
+
+    for my $pod_file (@pod_files) {
+        my ($contents, $tie) = _pod_tie($pod_file);
+
+        for (0 .. $#$contents) {
+            if ($contents->[$_] =~ /^(Copyright\s+)\d{4}(\s+.*)/) {
+                $contents->[$_] = "$1$year$2";
+                $info{$pod_file} = $year;
+                last;
+            }
+        }
+        untie $tie;
+    }
+
+    return \%info;
+}
+sub copyright_info {
+    my ($fs_entry) = @_;
+
+    $fs_entry //= DEFAULT_POD_DIR;
+
+    _validate_fs_entry($fs_entry);
+
+    my @pod_files = _pod_find_files($fs_entry);
+
+    my %copyright_info;
+
+    for my $file (@pod_files) {
+        my $copyright = _pod_extract_file_copyright($file);
+        next if ! defined $copyright || $copyright !~ /^\d{4}$/;
+        $copyright_info{$file} = $copyright if defined $copyright;
+    }
+
+    return \%copyright_info;
+}
 sub cpan_upload {
     my ($dist_file_name, %args) = @_;
+
+    config(\%args);
 
     if (! defined $dist_file_name) {
         croak("cpan_upload() requires the name of a distribution file sent in");
@@ -230,11 +328,18 @@ sub cpan_upload {
         croak("File name sent to cpan_upload() isn't a valid file");
     }
 
-    $args{user} = $ENV{CPAN_USERNAME} ||= 0 if ! exists $args{user};
-    $args{password} = $ENV{CPAN_PASSWORD} ||= 0 if ! exists $args{password};
+    $args{user}     //= $args{cpan_id};
+    $args{password} //= $args{cpan_pw};
+
+    $args{user} = $ENV{CPAN_USERNAME} if ! $args{user};
+    $args{password} = $ENV{CPAN_PASSWORD} if ! $args{password};
 
     if (! $args{user} || ! $args{password}) {
-        croak("\ncpan_upload() requires the CPAN_USERNAME and CPAN_PASSWORD env vars set");
+        croak("\ncpan_upload() requires --cpan_id and --cpan_pw");
+    }
+
+    if ($args{dry_run}) {
+        print "\nCPAN upload is in dry run mode... nothing will be uploaded\n";
     }
 
     CPAN::Uploader->upload_file(
@@ -243,6 +348,8 @@ sub cpan_upload {
     );
 
     print "\nSuccessfully uploaded $dist_file_name to the CPAN\n";
+
+    return %args;
 }
 sub git_add {
     _git_add();
@@ -276,8 +383,8 @@ sub git_release {
 sub git_repo {
     _git_repo();
 }
-sub git_status {
-    _git_status(@_);
+sub git_status_differs {
+    _git_status_differs(@_);
 }
 sub git_tag {
     _git_tag(@_);
@@ -285,9 +392,11 @@ sub git_tag {
 sub init {
     my (%args) = @_;
 
+    config(\%args);
+
     my $cwd = getcwd();
 
-    if ($cwd =~ /dist-mgr(-\d+\.\d+)?$/i) {
+    if ($cwd =~ /dist-mgr(-\d+\.\d+)?(-\d+)?$/i) {
         croak "Can't run init() while in the '$cwd' directory";
     }
 
@@ -472,6 +581,8 @@ sub version_bump {
         $dry_run = 1;
     }
 
+    $fs_entry //= DEFAULT_DIR;
+
     _validate_version($version);
     _validate_fs_entry($fs_entry);
 
@@ -544,6 +655,8 @@ sub version_incr {
 sub version_info {
     my ($fs_entry) = @_;
 
+    $fs_entry //= DEFAULT_DIR;
+
     _validate_fs_entry($fs_entry);
 
     my @module_files = _module_find_files($fs_entry);
@@ -603,6 +716,25 @@ sub _ci_github_write_file {
     open my $fh, '>', $ci_file or croak $!;
 
     print $fh "$_\n" for @$contents;
+}
+
+# Configuration related
+
+sub _config_file_write {
+    my ($file, $contents) = @_;
+
+    if (ref $contents ne 'HASH') {
+        croak("_config_file_write() requires a hash ref of contents");
+    }
+
+    my $jobj = JSON->new;
+
+    my $json = $jobj->pretty->encode($contents);
+
+    open my $fh, '>', $file or croak "Can't open config $file for writing: $!";
+
+    print $fh $json;
+
 }
 
 # Distribution related
@@ -896,6 +1028,59 @@ sub _module_write_template {
     print $wfh "$_\n" for @content;
 }
 
+# POD related
+
+sub _pod_extract_file_copyright {
+    # Extracts the copyright year from POD
+
+    my ($module_file) = @_;
+
+    my $copyright_line = _pod_extract_file_copyright_line($module_file);
+
+    if (defined $copyright_line) {
+        if ($copyright_line =~ /^Copyright\s+(\d{4})\s+\w+/) {
+            return $1;
+        }
+    }
+    else {
+        warn("$_: Can't find a Copyright definition\n");
+    }
+    return undef;
+}
+sub _pod_extract_file_copyright_line {
+    # Extracts the Copyright line from a module file
+
+    my ($pod_file) = @_;
+
+    open my $fh, '<', $pod_file or croak("Can't open POD file $pod_file: $!");
+
+    while (<$fh>) {
+        if (/^Copyright\s+\d{4}\s+\w+/) {
+            return $_;
+        }
+    }
+}
+sub _pod_find_files {
+    # Finds POD files
+
+    my ($fs_entry) = @_;
+
+    $fs_entry //= DEFAULT_POD_DIR;
+
+    return File::Find::Rule->file()
+        ->name('*.pod', '*.pm', '*.pl')
+        ->in($fs_entry);
+}
+sub _pod_tie {
+    # Ties a POD file to an array
+
+    my ($pod_file) = @_;
+    croak("_pod_tie() needs a POD file name sent in") if ! defined $pod_file;
+
+    my $tie = tie my @pf, 'Tie::File', $pod_file;
+    return (\@pf, $tie);
+}
+
 # Validation related
 
 sub _validate_git {
@@ -943,7 +1128,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Steve Bertrand.
+Copyright 2021 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -951,16 +1136,3 @@ copy of the full license at:
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
 
-=head1 AUTHOR
-
-Steve Bertrand, C<< <steveb at cpan.org> >>
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2020-2021 Steve Bertrand.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>

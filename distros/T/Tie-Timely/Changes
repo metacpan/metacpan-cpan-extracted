@@ -1,5 +1,8 @@
 Revision history for Perl module Time::Timely
 
+1.023 2021-01-14T08:52:31Z
+	* Freshen distro, remove Travis CI, add Github actions
+
 1.022 2018-06-04T00:25:16Z
 	* A small fix to the MANIFEST file
 

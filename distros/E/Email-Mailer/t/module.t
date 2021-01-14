@@ -1,14 +1,10 @@
-use strict;
-use warnings;
-use Test::Most;
-use Test::MockObject;
-use IO::All 'io';
+use Test2::V0;
+use Email::Mailer;
 use File::Basename 'dirname';
-
-use_ok('Email::Mailer');
+use IO::All 'io';
 
 my @mail;
-Test::MockObject->fake_module( 'Email::Mailer', 'sendmail', sub { push( @mail, shift ) } );
+my $mock = mock 'Email::Mailer' => ( override => [ sendmail => sub { push( @mail, shift ) } ] );
 
 sub file_qr {
     my $qr = io( dirname($0) . '/qr/' . shift )->all;
@@ -34,8 +30,8 @@ sub get_headers {
 #-------------------------------------------------------------------------------
 
 @mail = ();
-lives_ok(
-    sub {
+ok(
+    lives {
         Email::Mailer->send(
             to      => 'to@example.com',
             from    => 'from@example.com',
@@ -44,7 +40,7 @@ lives_ok(
         )
     },
     'Email::Mailer->send(...) text-only email',
-);
+) or note $@;
 is( @mail, 1, '1 mail generated' );
 is( ref $mail[0], 'Email::MIME', 'mail object created is Email::MIME' );
 like( $mail[0]->as_string, file_qr('text_only.qr'), 'text_only.qr' );
@@ -52,8 +48,8 @@ like( $mail[0]->as_string, file_qr('text_only.qr'), 'text_only.qr' );
 #-------------------------------------------------------------------------------
 
 @mail = ();
-lives_ok(
-    sub {
+ok(
+    lives {
         Email::Mailer->new->send(
             to      => 'to@example.com',
             from    => 'from@example.com',
@@ -72,7 +68,7 @@ lives_ok(
         )
     },
     'Email::Mailer->new->send(...) HTML + auto-text',
-);
+) or note $@;
 is( @mail, 1, '1 mail generated' );
 is( ref $mail[0], 'Email::MIME', 'mail object created is Email::MIME' );
 
@@ -91,8 +87,8 @@ like( $headers->[3]{'Content-Type'}, qr|^text/html\b|, 'Email contains HTML port
 #-------------------------------------------------------------------------------
 
 @mail = ();
-lives_ok(
-    sub {
+ok(
+    lives {
         Email::Mailer->new(
             to      => 'to@example.com',
             from    => 'from@example.com',
@@ -112,7 +108,7 @@ lives_ok(
         )->send
     },
     'Email::Mailer->new(...)->send HTML + auto-text',
-);
+) or note $@;
 is( @mail, 1, '1 mail generated' );
 is( ref $mail[0], 'Email::MIME', 'mail object created is Email::MIME' );
 
@@ -132,8 +128,8 @@ like( $headers->[5]{'Content-Type'}, qr|^image/gif\b|, 'Email contains image por
 #-------------------------------------------------------------------------------
 
 @mail = ();
-lives_ok(
-    sub {
+ok(
+    lives {
         Email::Mailer->new->send(
             to      => 'to@example.com',
             from    => 'from@example.com',
@@ -154,7 +150,7 @@ lives_ok(
         )
     },
     'Email::Mailer->new->send(...) HTML + auto-text',
-);
+) or note $@;
 is( @mail, 1, '1 mail generated' );
 is( ref $mail[0], 'Email::MIME', 'mail object created is Email::MIME' );
 
@@ -173,8 +169,8 @@ like( $headers->[3]{'Content-Type'}, qr|^text/html\b|, 'Email contains HTML port
 #-------------------------------------------------------------------------------
 
 @mail = ();
-lives_ok(
-    sub {
+ok(
+    lives {
         Email::Mailer->send(
             to      => 'to@example.com',
             from    => 'from@example.com',
@@ -190,7 +186,7 @@ lives_ok(
         )
     },
     'Email::Mailer->send HTML + text',
-);
+) or note $@;
 is( @mail, 1, '1 mail generated' );
 is( ref $mail[0], 'Email::MIME', 'mail object created is Email::MIME' );
 
@@ -209,8 +205,8 @@ like( $headers->[3]{'Content-Type'}, qr|^text/html\b|, 'Email contains HTML port
 #-------------------------------------------------------------------------------
 
 @mail = ();
-lives_ok(
-    sub {
+ok(
+    lives {
         Email::Mailer->send(
             to      => 'to@example.com',
             from    => 'from@example.com',
@@ -233,7 +229,7 @@ lives_ok(
         )
     },
     'Email::Mailer->send HTML + text + attachments',
-);
+) or note $@;
 is( @mail, 1, '1 mail generated' );
 is( ref $mail[0], 'Email::MIME', 'mail object created is Email::MIME' );
 
@@ -254,8 +250,8 @@ like( $headers->[5]{'Content-Type'}, qr|^image/gif\b|, 'Email contains image por
 #-------------------------------------------------------------------------------
 
 @mail = ();
-lives_ok(
-    sub {
+ok(
+    lives {
         Email::Mailer->new(
             from    => 'from@example.com',
             subject => 'Test Email',
@@ -270,7 +266,7 @@ lives_ok(
         )
     },
     'Email::Mailer->new(...)->send( iterative_send )',
-);
+) or note $@;
 is( @mail, 2, '2 mails generated' );
 like( $mail[0]->as_string, file_qr('iterative_send_0.qr'), 'iterative_send_0.qr' );
 like( $mail[1]->as_string, file_qr('iterative_send_1.qr'), 'iterative_send_1.qr' );
@@ -278,8 +274,8 @@ like( $mail[1]->as_string, file_qr('iterative_send_1.qr'), 'iterative_send_1.qr'
 #-------------------------------------------------------------------------------
 
 @mail = ();
-lives_ok(
-    sub {
+ok(
+    lives {
         Email::Mailer->new(
             to      => 'to@example.com',
             from    => 'from@example.com',
@@ -293,7 +289,7 @@ lives_ok(
         )->send( to => 'override@example.com', data => { content => 'Process' } )
     },
     'Email::Mailer->new(...)->send(...) templating',
-);
+) or note $@;
 is( @mail, 1, '1 mail generated' );
 like( $mail[0]->as_string, file_qr('templating.qr'), 'templating.qr' );
 

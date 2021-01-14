@@ -1,12 +1,13 @@
-use Test::Most;
+use Test2::V0;
+
+use exact;
 use File::Basename 'dirname';
+use File::Copy 'move';
+use File::Copy::Recursive 'dircopy';
 use File::Path 'rmtree';
 use Test::Output;
-use File::Copy::Recursive 'dircopy';
-use File::Copy 'move';
-use Try::Tiny;
 
-use_ok('App::Dest');
+use App::Dest;
 
 sub set_state {
     chdir( dirname($0) . '/deploy' );
@@ -16,7 +17,7 @@ sub set_state {
     print $log "# log\n";
     close $log;
 }
-set_state();
+set_state;
 
 my $log;
 sub read_log {
@@ -176,5 +177,5 @@ $log .= ".dest/actions/002/revert\n" .
     "005 revert\n";
 is( &read_log, $log, 'log correct after update' );
 
-set_state();
-done_testing();
+set_state;
+done_testing;

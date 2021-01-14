@@ -39,6 +39,10 @@ e.g., `use Promise::XS qw(deferred)`.
 
 # DESCRIPTION
 
+<div>
+    <a href='https://coveralls.io/github/FGasper/p5-Promise-XS?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Promise-XS/badge.svg?branch=master' alt='Coverage Status' /></a>
+</div>
+
 This module exposes a Promise interface with its major parts
 implemented in XS for speed. It is a fork and refactor of
 [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent::XSPromises). That module’s interface, a “bare-bones”

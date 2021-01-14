@@ -1,8 +1,9 @@
-0.003		2020-05-31	T. R. Wyant
-    Refactor the get_*_grid() code. This has resulted in signature
-    changes, though not (I believe) to anything that was in 0.002.
+0.004		2021-01-12	T. R. Wyant
+    Add Travis CI testing.
 
-0.002_01	2020-05-15	T. R. Wyant
+    Use GitHub as bug tracker. R.I.P. rt.cpan.org.
+
+0.003		2020-05-31	T. R. Wyant
     Add methods get_active_text_grid(), get_used_text_grid(). Add
     bookkeeping of live cells in each row and column so the latter runs
     in linear time, not quadratic.

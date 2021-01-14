@@ -140,7 +140,7 @@ remove_init();
 
     like
         getcwd(),
-        qr|dist-mgr(-\d+\.\d+)?/t/data/work/init|i,
+        qr|dist-mgr(-\d+\.\d+)?.*/t/data/work/init|i,
         "in the init dir ok";
 
     my $template_dir = "$cwd/t/data/module_template/";

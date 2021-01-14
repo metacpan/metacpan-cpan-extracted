@@ -28,10 +28,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Indonesia-Holiday
+  bugtracker: https://github.com/perlancar/perl-Calendar-Indonesia-Holiday/issues
   homepage: https://metacpan.org/release/Calendar-Indonesia-Holiday
   repository: git://github.com/perlancar/perl-Calendar-Indonesia-Holiday.git
-version: '0.330'
+version: '0.334'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -127,7 +127,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.041'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'

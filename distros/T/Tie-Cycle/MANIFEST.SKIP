@@ -57,10 +57,12 @@
 ^MYMETA\.
 #!end included /usr/local/perls/perl-5.14.2/lib/5.14.2/ExtUtils/MANIFEST.SKIP
 
-
+MANIFEST\s\d
+Changes\s\d
 \.travis\.yml
 \.?appveyor.yml
 \.releaserc
 \.lwpcookies
 \.gitignore
+\.github\b
 Tie-\.*

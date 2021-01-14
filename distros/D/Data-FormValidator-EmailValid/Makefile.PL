@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Data-FormValidator-EmailValid",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Data::FormValidator::EmailValid",
   "PREREQ_PM" => {
     "Data::FormValidator" => "4.0",
@@ -22,10 +23,13 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "File::Temp" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "Test::DiagINC" => "0.002",
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +41,9 @@ my %FallbackPrereqs = (
   "Email::Valid" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "File::Temp" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "Test::DiagINC" => "0.002",
   "Test::More" => "0.96"
 );

@@ -60,6 +60,8 @@ with similiar names, they are B<NOT EQUIVALENT> to one another.
 
 use Carp;
 use Exporter;
+use Scalar::Util qw(blessed);
+
 use Devel::GlobalDestruction;
 
 use constant UN => 0;
@@ -95,7 +97,7 @@ sub new {
     my ($class, $store, $key, $mode) = @_;
     $mode //= SH;
 
-    unless (ref $store eq 'Store::Directories') {
+    unless (blessed($store) && $store->isa('Store::Directories')) {
         croak "Must provide a Store::Directories instance for this lock."
     }
     unless ($mode == SH || $mode == EX) {

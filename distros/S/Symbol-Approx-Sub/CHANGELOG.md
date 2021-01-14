@@ -1,3 +1,17 @@
+## 3.1.3 - 2021-01-13
+
+* Fix Pod typo
+* Add bugtracker to metadata
+* Some refactoring to reduce code complexity
+
+## 3.1.2 - 2018-12-23
+
+* We now need Perl 5.10.
+
+## 3.1.1 - 2018-12-22
+
+* Bring all module version numbers into line.
+
 ## 3.1.0 - 2018-12-22
 
 * Various code improvements to please kritika.io

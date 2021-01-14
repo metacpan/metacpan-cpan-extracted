@@ -1,4 +1,12 @@
 Revision history for Perl extension Log::Dispatch::TestDiag.
 
+0.03      2021-01-12 10:15:21-08:00 America/Vancouver
+    - Switch to Dist::Zilla for release management.
+    - Update test suite to use sub-tests.
+    - Move to GitHub
+
+0.02    Tues Feb 26 13:44 PST 2013
+    - allow "as_note=>1" to send output via "note()" instead of "diag()"
+
 0.01    Tues Dec 20 00:32 PST 2011
     - initial release

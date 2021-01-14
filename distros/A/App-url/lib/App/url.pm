@@ -1,9 +1,10 @@
 #!/usr/bin/perl
 use v5.26;
+use utf8;
 
 package App::url;
 
-our $VERSION = '1.004';
+our $VERSION = '1.006';
 
 use Carp qw(carp);
 use Mojo::Base -strict, -signatures;
@@ -23,9 +24,6 @@ App::url - format a URL according to a sprintf-like template
 
 	$ url '%H' http://www.example.com/a/b/c
 	www
-
-	$ url '%P' http://www.example.com/a/b/c
-	/a/b/c
 
 	$ url '%P' http://www.example.com/a/b/c
 	/a/b/c
@@ -91,7 +89,7 @@ reference
 
 =head1 COPYRIGHT
 
-Copyright © 2020, brian d foy, all rights reserved.
+Copyright © 2020-2021, brian d foy, all rights reserved.
 
 =head1 LICENSE
 

@@ -213,9 +213,8 @@ If the country has no sub countries, returns undef.
 =head1 SEE ALSO
 
 All codes have been downloaded from the latest version of the Debian Salsa project
-L<https://salsa.debian.org/iso-codes-team/iso-codes>
-
-
+L<https://salsa.debian.org/iso-codes-team/iso-codes/>
+and then files iso_3166-1.json, iso_3166-2.json
 
 L<Locale::Country>,L<Lingua::EN::AddressParse>,
 L<Geo::StreetAddress::US>,L<Geo::PostalAddress>,L<Geo::IP>
@@ -226,10 +225,6 @@ subdivisions - Part 1: Country codes
 
 ISO 3166-2 Codes for the representation of names of countries and their
 subdivisions - Part 2: Country subdivision code
-
-
-L<http://www.statoids.com/statoids.html> is a good source for sub country codes plus
-other statistical data.
 
 
 =head1 LIMITATIONS
@@ -271,7 +266,6 @@ This library is free software; you can redistribute it and/or modify it under th
 
 Ron Savage for many corrections to the data
 
-
 Terrence Brannon produced Locale::US, which was the starting point for
 this module.
 
@@ -298,7 +292,7 @@ use Locale::SubCountry::Codes;
 #-------------------------------------------------------------------------------
 
 
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 
 # Define all the methods for the 'world' class here. Note that because the
 # name space inherits from the Locale::SubCountry name space, the
@@ -354,7 +348,7 @@ sub all_codes
 #-------------------------------------------------------------------------------
 
 package Locale::SubCountry;
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 
 #-------------------------------------------------------------------------------
 # Initialization code which will be run first to create global data structure.

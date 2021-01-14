@@ -6,8 +6,9 @@ use warnings;
 
 =head1 The build file for Bundle::BDFOY
 
-This build file is a modulino; it works as both a build script and
-a module.
+This build file is a modulino; it works as both a build script and a
+module. Most of it converts the list of Perl namespaces in
+F<module_list> to Bundle:: and Task:: files.
 
 To build the distribution, run this file normally:
 
@@ -41,14 +42,14 @@ my $module    = __PACKAGE__;
 ( my $dist = $module ) =~ s/::/-/g;
 
 my $github    = 'https://github.com/briandfoy/Bundle-BDFOY';
-my $main_file = catfile( 'lib', split /::/, "$module.pm" );
+my $main_file = catfile(  qw(lib Bundle BDFOY.pm ) );
 
 my %WriteMakefile = (
 	'MIN_PERL_VERSION' => '5.008',
 
 	'NAME'          => $module,
 	'VERSION_FROM'  => $main_file,
-	'ABSTRACT_FROM' => $main_file,
+	'ABSTRACT'      => 'install all modules by BDFOY',
 	'LICENSE'       => 'artistic_2',
 	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
 
@@ -62,96 +63,17 @@ my %WriteMakefile = (
 
 	'TEST_REQUIRES' => {
 		'Test::Pod'  => '0',
-		'Test::More' => '0.94',
+		'Test::More' => '1',
 		},
 
     'PREREQ_PM'     => {
-        'App::Module::Lister' => '0',
-        'App::PPI::Dumper' => '0',
-        'App::scriptdist' => '0',
-        'Brick' => '0',
-        'Business::ISBN' => '0',
-        'Business::ISBN::Data' => '0',
-        'Business::ISMN' => '0',
-        'Business::ISSN' => '0',
-        'Business::xISBN' => '0',
-        'CACertOrg::CA' => '0',
-        'Chemistry::Elements' => '0',
-        'ConfigReader::Simple' => '0',
-        'CPAN::PackageDetails' => '0',
-        'Crypt::Rijndael' => '0',
-        'Data::Constraint' => '0',
-        'Distribution::Cooker' => '0',
-        'Distribution::Guess::BuildSystem' => '0',
-        'Dumbbench' => '0',
-        'File::Find::Closures' => '0',
-        'File::Fingerprint' => '0',
-        'Geo::GeoNames' => '0',
-        'HTML::SimpleLinkExtor' => '0',
-        'HTTP::Cookies::Chrome' => '0',
-        'HTTP::Cookies::Mozilla' => '0',
-        'HTTP::Cookies::Safari' => '0',
-        'HTTP::Size' => '0',
-        'IO::Interactive' => '0',
-        'Log::Log4perl::Appender::ScreenColoredLevels::UsingMyColors' => '0',
-        'Mac::Errors' => '0',
-        'Mac::OSVersion' => '0',
-        'Mac::PropertyList' => '0',
-        'MacOSX::Alias' => '0',
-        'Math::NoCarry' => '0',
-        'Module::Extract::DeclaredMinimumPerl' => '0',
-        'Module::Extract::Namespaces' => '0',
-        'Module::Extract::Use' => '0',
-        'Module::Extract::VERSION' => '0',
-        'Module::Release' => '0',
-        'Module::Release::Git' => '0',
-        'Module::Starter::AddModule' => '0',
-        'Modulino::Demo' => '0',
-        'MyCPAN::App::DPAN' => '0',
-        'MyCPAN::Indexer' => '0',
-        'Net::MAC::Vendor' => '0',
-        'Net::SSH::Perl::ProxiedIPC' => '0',
-        'Net::SSH::Perl::WithSocks' => '0',
-        'Object::Iterate' => '0',
-        'PeGS::PDF' => '0',
-        'Perl::MinimumVersion::Fast' => '0',
-        'Perl::Version' => '0',
-        'perlbench' => '0',
-        'PerlPowerTools' => '0',
-        'Pod::Perldoc::ToToc' => '0',
-        'Pod::PseudoPod::DocBook' => '0',
-        'Pod::PseudoPod::PerlTricks' => '0',
-        'Pod::WordML' => '0',
-        'Polyglot' => '0',
-        'PPI::App::ppi_version::BDFOY' => '0',
-        'ReturnValue' => '0',
-        'Roman::Unicode' => '0',
-        'Set::CrossProduct' => '0',
-        'SourceCode::LineCounter::Perl' => '0',
-        'String::Sprintf' => '0',
-        'Surveyor::App' => '0',
-        'Surveyor::Benchmark::HTMLEntities' => '0',
-        'Surveyor::Benchmark::SchwartzianTransform::SortFilesBySize' => '0',
-        'Task::MasteringPerl' => '0',
-        'Task::MojoLearningEnvironment' => '0',
-        'Test::Data' => '0',
-        'Test::Env' => '0',
-        'Test::File' => '0',
-        'Test::ISBN' => '0',
-        'Test::Manifest' => '0',
-        'Test::Output' => '0',
-        'Test::Prereq' => '0',
-        'Test::URI' => '0',
-        'Tie::BoundedInteger' => '0',
-        'Tie::Cycle' => '0',
-        'Tie::StringArray' => '0',
-        'Tie::Timely' => '0',
-        'Tie::Toggle' => '0',
-        'Unicode::Casing' => '0',
-        'Unicode::Support' => '0',
-        'Unicode::Tussle' => '0',
-        'WordPress::Grep' => '0',
-        },
+		map { $_ => '0' } @{ get_modules() }
+		},
+
+	'PL_FILES'      => {
+		'preprocess/Bundle-BDFOY.pm.PL' => 'blib/lib/Bundle/BDFOY.pm',
+		'preprocess/Task-BDFOY.pm.PL'   => 'blib/lib/Task/BDFOY.pm',
+		},
 
 	'META_MERGE' => {
 		'meta-spec' => { version => 2 },
@@ -193,6 +115,50 @@ sub do_it {
 	WriteMakefile( %$arguments );
 	}
 
+sub make_file {
+	my( $package, $template, $file ) = @_;
+
+	unlink $file if -e $file;
+
+	require File::Basename;
+	require File::Path;
+	my $dirname = File::Basename::dirname( $file );
+	File::Path::make_path( $dirname );
+	open my $fh, '>:utf8', $file
+		or die "Could not open file <$file>: $!";
+
+	print { $fh } process_template( $template );
+	close $fh;
+	}
+
+sub process_template {
+	my( $string ) = @_;
+	my $version = get_version();
+	my $list    = get_modules_pod_list();
+
+	$string =~ s/%%VERSION%%/$version/g;
+	$string =~ s/%%LIST%%/$list/g;
+
+	$string;
+	}
+
+sub get_version {
+	require "./lib/Bundle/BDFOY.pm";
+	$Bundle::BDFOY::VERSION;
+	}
+
+sub get_modules {
+	my $file = 'module_list';
+	local $/ = "\n";
+	chomp( my @list = do { local(@ARGV)=$file; <> } );
+	return \@list;
+	}
+
+sub get_modules_pod_list {
+	join "\n\n",
+	map { "=item * $_" }
+	@{ get_modules() }
+	}
 
 no warnings;
 __PACKAGE__;

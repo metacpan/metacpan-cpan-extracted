@@ -53,7 +53,7 @@ use base qw{PPIx::Regexp::Element};
 use Carp qw{ confess };
 use PPIx::Regexp::Constant qw{ MINIMUM_PERL @CARP_NOT };
 
-our $VERSION = '0.076';
+our $VERSION = '0.077';
 
 use constant TOKENIZER_ARGUMENT_REQUIRED => 0;
 
@@ -146,7 +146,8 @@ __END__
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org>, or in electronic mail to the author.
+L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in electronic
+mail to the author.
 
 =head1 AUTHOR
 
@@ -154,7 +155,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2020 by Thomas R. Wyant, III
+Copyright (C) 2009-2021 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

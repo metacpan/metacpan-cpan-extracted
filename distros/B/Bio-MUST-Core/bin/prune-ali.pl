@@ -50,7 +50,7 @@ prune-ali.pl - Prune sequences from ALI files based on id lists
 
 =head1 VERSION
 
-version 0.203490
+version 0.210120
 
 =head1 USAGE
 

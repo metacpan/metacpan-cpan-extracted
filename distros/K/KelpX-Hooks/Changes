@@ -1,4 +1,11 @@
 Revision history for Perl extension KelpX::Hooks.
 
-1.00 Tue Apr 14 23:00:00 2020
+1.00 Wed Jan 13 2021
+	- hooking build method now croaks
+	- hooking is now optimized with a tail call to build
+	- add more test cases
+	- minor POD improvements
+	- maintenance work
+
+1.00 Tue Apr 14 2020
 	- First version

@@ -103,6 +103,10 @@ subtest host_no_domain => sub {
 	};
 
 subtest ihost => sub {
+	my $env = join "\n", map { no warnings; "$_: $ENV{$_}" }
+		qw( LC_ALL LANG LANGUAGE );
+	diag( $env );
+
 	my @tests = (
 		[ qw( http://www.example.com/a/b/c www.example.com     ) ],
 		[ qw( http://bücher.ch/a/b/c       xn--bcher-kva.ch    ) ],
@@ -111,7 +115,10 @@ subtest ihost => sub {
 		[ qw( http://éxàmple.com/a/b/c     xn--xmple-rqa5d.com ) ],
 		);
 
-	run_table( '%i', \@tests )
+	SKIP: {
+		skip "Locale is not set!", scalar @tests unless length $ENV{LC_ALL};
+		run_table( '%i', \@tests );
+		}
 	};
 
 subtest port => sub {

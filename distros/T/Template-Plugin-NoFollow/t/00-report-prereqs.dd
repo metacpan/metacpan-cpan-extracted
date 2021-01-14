@@ -27,7 +27,8 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'HTML::Parser' => '0',
-                                      'Template::Plugin::Filter' => '2.00'
+                                      'Template::Plugin::Filter' => '2.00',
+                                      'perl' => '5.008'
                                     }
                     },
        'test' => {

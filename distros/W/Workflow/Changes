@@ -1,5 +1,41 @@
 Revision history for Perl extension Workflow
 
+1.49 2021-01-08 Maintenance and minor feature release, update not required
+
+- Addressed an issue with return values from Workflow::Condition::GreedyOR's `evaluate_condition`, PR #50 from Erik Huelsmann
+
+- Fixed a bug in condition caching described in issue #9, PR #27 from Erik Huelsmann
+
+- Fixed a bug in Workflow::Condition::LazyAND with wrongful return values, PR #40 from Erik Huelsmann
+
+- Fixed a bug in Workflow::Validator::InEnumeratedType with wrongful naming, PR #33 from Erik Huelsmann
+
+- Updated Dist::Zilla configuration and added LICENSE file to repository based on generated from Dist::Zilla build, this should be automated like the README generation at some point
+
+- Improved internal handling for quoting in internal SQL statements, PR #30 from Erik Huelsmann
+
+- Improved the SQL used for database creation by adding referentiel integrity, PR #29 from Erik Huelsmann
+
+- Addressed a bug in initialization and improved the ability to handle a database handle, PR #32 from Erik Huelsmann
+
+- Improved loading of external of a few dependencies, improving error handling, PR #31 from Erik Huelsmann
+
+- Additions to test suite, WIP on better scoped condition caching, PR #26 from Erik Huelsmann
+
+- Minor feature addition addressing issue #5 with condition caching, PR #25 from Erik Huelsmann
+  Condition caching can be disabled by setting: 
+
+    $Workflow::Condition::CACHE_RESULTS = 0; # false
+
+  The default is 1, indicating true,
+
+- Improvements to test suite, moved from time to counter, speeding up the test, PR #24 from Erik Huelsmann
+
+- Documentation updates, PR #23 from Erik Huelsmann
+
+- Addressing issue #21 fixing broken URLs, PR #22 from Erik Huelsmann
+
+
 1.48 2019-09-05 Bug fix release, update not required
 
 - Eliminated warning emitted from test run. Bug reported by Petr Pisar
@@ -91,7 +127,7 @@ Revision history for Perl extension Workflow
 
 1.38 2013-07-07 Bug fix release, update recommended
 
-- Patch to minor bug where Worflow history did not set proper timezone
+- Patch to minor bug where Workflow history did not set proper timezone
   in Workflow::Persister::DBI
 
   https://rt.cpan.org/Ticket/Display.html?id=85380 [RT:85380]

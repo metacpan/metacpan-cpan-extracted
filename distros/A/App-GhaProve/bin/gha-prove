@@ -16,7 +16,7 @@ __END__
 
 =head1 NAME
 
-App::GhaProve - provides gha-prove app
+gha-prove - wrapper around `prove` for GitHub Actions
 
 =head1 SYNOPSIS
 
@@ -58,7 +58,7 @@ Run test suite twice, using each of the above.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=App-GhaProve>.
+L<https://github.com/tobyink/p5-app-ghaprove/issues>.
 
 =head1 AUTHOR
 
@@ -66,7 +66,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Toby Inkster.
+This software is copyright (c) 2020-2021 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,16 +1,21 @@
-0.130   2019-03-26 (PERLANCAR)
+0.131   2021-01-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Bail out if CLI option parsing fails.
+
+
+0.130   2019-03-26  Released-By: PERLANCAR
 
 	- [build] Remove use of DZP:Rinci::Validate [ref: RT#128914].
 
 
-0.12    2017-03-21 (PERLANCAR)
+0.12    2017-03-21  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to remove unneeded dependency on Perl::osnames.
 
 
-0.11    2015-12-17 (PERLANCAR)
+0.11    2015-12-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -19,7 +24,7 @@
           'hash'.
 
 
-0.10    2015-08-18 (PERLANCAR)
+0.10    2015-08-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -28,20 +33,20 @@
 	  requirement.
 
 
-0.09    2014-09-06 (PERLANCAR)
+0.09    2014-09-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- D'oh, previous change not yet done.
 
 
-0.08    2014-09-06 (PERLANCAR)
+0.08    2014-09-06  Released-By: PERLANCAR
 
 	- Adjust to Perinci::Sub::Wrapper 0.62
 	  (_perinci.sub.wrapper.validate_args is now renamed).
 
 
-0.07    2014-06-19 (SHARYANTO)
+0.07    2014-06-19  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -52,35 +57,35 @@
           name becomes camel case App::FooBarBaz and dist App-FooBarBaz."
 
 
-0.06    2014-05-26 (SHARYANTO)
+0.06    2014-05-26  Released-By: SHARYANTO
 
         - No functional changes.
 
         - App 'use experimental smartmatch' for perl 5.18+.
 
 
-0.05    2013-10-31 (SHARYANTO)
+0.05    2013-10-31  Released-By: SHARYANTO
 
         - Add option 'time_zone' and defaults to $ENV{TZ}.
 
 
-0.04    2013-10-05 (SHARYANTO)
+0.04    2013-10-05  Released-By: SHARYANTO
 
         - Add option --show-joint-leave.
 
 
-0.03    2013-04-03 (SHARYANTO)
+0.03    2013-04-03  Released-By: SHARYANTO
 
         - No functional changes. Some display tweaks (short day of week names,
           not showing prev/next month's days if we are showing more than one
           month of calendar).
 
 
-0.02    2013-04-03 (SHARYANTO)
+0.02    2013-04-03  Released-By: SHARYANTO
 
         - Add options: -1, -3, -y, -h, -L.
 
 
-0.01    2013-04-03 (SHARYANTO)
+0.01    2013-04-03  Released-By: SHARYANTO
 
         - First release.

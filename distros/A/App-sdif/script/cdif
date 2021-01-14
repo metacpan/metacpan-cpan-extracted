@@ -135,7 +135,7 @@ my @optargs = (
     "env!" => \$opt_env,
     "stat!" => \$opt_stat,
     "unit=s" => \$opt_unit,
-    "B|char!" => sub { $opt_unit = $_[1] ? 'char' : $opt_unit_default },
+#   "B|char!" => sub { $opt_unit = $_[1] ? 'char' : $opt_unit_default },
     "mecab!" => sub { $opt_unit = $_[1] ? 'mecab' : $opt_unit_default },
     "old!" => \$opt_old,
     "new!" => \$opt_new,
@@ -919,6 +919,10 @@ sub unctrl {
 
 cdif - word context diff
 
+=head1 VERSION
+
+Version 4.18.2
+
 =head1 SYNOPSIS
 
 cdif [option] file1 file2
@@ -956,19 +960,19 @@ Options:
 	--prefix-pattern    prefix pattern
 	--visible char=?    set visible attributes
 	--[no]mecab	    use mecab tokenizer     (default false)
-	--[no]lenience      supress unexpected input warning (default true)
+	--[no]lenience      suppress unexpected input warning (default true)
 
 
 =head1 DESCRIPTION
 
 B<cdif> is a post-processor of the Unix diff command.  It highlights
-deleted, changed and added words based on word context.
+deleted, changed and added words based on word context (B<--unit=word>
+by default).  If you want to compare text character-by-character, use
+option B<--unit=char>.  Option B<--unit=mecab> tells to use external
+B<mecab> command as a tokenizer for Japanese text.
 
-You may want to compare character-by-character rather than
-word-by-word.  Option B<-B> option can be used for that purpose.
-
-If only one file is specified, cdif reads that file (stdin if no file)
-as a output from diff command.
+If single or no file is specified, cdif reads that file or STDIN as a
+output from diff command.
 
 Lines those don't look like diff output are simply ignored and
 printed.
@@ -998,10 +1002,14 @@ When I<mecab> is given as an unit, B<mecab> command is called as a
 tokenizer for non-ASCII text.  ASCII text is compared word-by-word.
 External B<mecab> command has to been installed.
 
+=begin deprecated
+
 =item B<-B>, B<--char>
 
 Shortcut for B<--unit=char>.  This option is being deprecated, and
 will be removed in a future.
+
+=end deprecated
 
 =item B<--mecab>
 
@@ -1201,15 +1209,17 @@ nul, bel, bs, vt, np, cr, esc, del.  Default invisible: ht, nl, sp.
     del   \177  SYMBOL FOR DELETE                 YES
 
 Multiple characters can be specified at once, by assembling them by
-commna (C<,>) like C<--visible ht=1,sp=1>; or connecting them by equal
+comma (C<,>) like C<--visible ht=1,sp=1>; or connecting them by equal
 sign (C<=>) like C<--visible ht=sp=1>.  Character name accept
 wildcard; C<--visible '*=1'>.
 
 Colormap name C<VISIBLE> is applied to those characters.  Default
 setting is C<S>, and visible characters are displayed in reverse
 video.  Unlike other colormaps, only special effects can be set to
-this name.  Effect C<D> (double-struc) is exception (see C<~> section
+this name.  Effect C<D> (double-struck) is exception (see C<~> section
 in L<Getopt::EX::Colormap>).
+
+=begin deprecated
 
 =item B<-->[B<no>]B<visible-cr>
 
@@ -1217,6 +1227,8 @@ in L<Getopt::EX::Colormap>).
 
 Set CARRIAGE-RETURN and ESCAPE visible attributes.  These options will
 be deprecated soon.  Use B<--visible> option instead.
+
+=end deprecated
 
 =item B<--stat>
 
@@ -1228,7 +1240,7 @@ number which ignores insert/delete newlines.
 
 =item B<-->[B<no>]B<lenience>
 
-Supress warning message for unexpected input from diff command.  True
+Suppress warning message for unexpected input from diff command.  True
 by default.
 
 =back
@@ -1239,23 +1251,19 @@ Environment variable B<CDIFOPTS> is used to set default options.
 
 =head1 AUTHOR
 
-=over
-
-=item Kazumasa Utashiro
-
-=item L<https://github.com/kaz-utashiro/sdif-tools>
-
-=back
+Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 1992-2020 Kazumasa Utashiro
+Copyright 1992-2021 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 
 =head1 SEE ALSO
+
+L<https://github.com/kaz-utashiro/sdif-tools>
 
 L<sdif(1)>, L<watchdiff(1)>
 
@@ -1273,5 +1281,5 @@ as a back-end processor to compare words.
 #  LocalWords:  cdif diff rcs rcsdiff colormap commandcolor markcolor
 #  LocalWords:  textcolor stdin OMARK NMARK OTEXT NTEXT OCHANGE CMARK
 #  LocalWords:  NCHANGE CTEXT MMARK MTEXT Cyan RGB nomark stat
-#  LocalWords:  watchdiff mecab tokenizer
+#  LocalWords:  watchdiff mecab tokenizer Unicode lenience CDIFOPTS
 #  LocalWords:  Kazumasa Utashiro sdif

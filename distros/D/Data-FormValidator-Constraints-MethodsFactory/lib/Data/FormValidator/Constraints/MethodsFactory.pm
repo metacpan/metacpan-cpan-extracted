@@ -9,7 +9,7 @@ use warnings;
 ###############################################################################
 # Version number.
 ###############################################################################
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 ###############################################################################
 # Allow our methods to be exported
@@ -233,6 +233,8 @@ sub FV_and {
 
 1;
 
+=for stopwords MX num
+
 =head1 NAME
 
 Data::FormValidator::Constraints::MethodsFactory - Create constraints for Data::FormValidator
@@ -243,36 +245,40 @@ Data::FormValidator::Constraints::MethodsFactory - Create constraints for Data::
 
   # SET constraints (:set)
   constraint_methods => {
-      status        => FV_set(1, qw(new active disabled)),
-      how_many      => FV_set_num(1, (1 .. 20)),
-      province      => FV_set_word(1, "AB QC ON TN NU"),
-      seen_before   => FV_set_cmp(1, sub { $seen{$_[0]} }, qw(foo bar)),
+    status      => FV_set(1, qw(new active disabled)),
+    how_many    => FV_set_num(1, (1 .. 20)),
+    province    => FV_set_word(1, "AB QC ON TN NU"),
+    seen_before => FV_set_cmp(1, sub { $seen{ $_[0] } }, qw(foo bar)),
   }
 
   # NUMERIC constraints (:num)
   constraint_methods => {
-      how_many      => FV_clamp(1, 1, 10),
-      small_amount  => FV_lt(1, 3),
-      large_amount  => FV_gt(1, 10),
-      small_again   => FV_le(1, 3),
-      large_again   => FV_ge(1, 10),
+    how_many      => FV_clamp(1, 1, 10),
+    small_amount  => FV_lt(1, 3),
+    large_amount  => FV_gt(1, 10),
+    small_again   => FV_le(1, 3),
+    large_again   => FV_ge(1, 10),
   }
 
   # BOOLEAN constraints (:bool)
   constraint_methods => {
-      bad_status    => FV_not(
-                            FV_set(1, qw(new active disabled))
-                            ),
-      email         => FV_or(
-                            FV_set(1,$current_value),
-                            Data::FormValidator::Constraints::email(),
-                            ),
-      password      => FV_and(
-                            FV_length_between(6,32),
-                            my_password_validation_constraint(),
-                            ),
-  }
+    # e.g. NOT in the given set
+    bad_status => FV_not(
+      FV_set(1, qw(new active disabled))
+    ),
 
+    # e.g. either the current value, OR validates as an e-mail address
+    email => FV_or(
+      FV_set(1, $current_value),
+      Data::FormValidator::Constraints::email(),
+    ),
+
+    # e.g. valid length, AND matches password validation routine
+    password => FV_and(
+      FV_length_between(6, 32),
+      my_password_validation_constraint(),
+    ),
+  }
 
 =head1 DESCRIPTION
 
@@ -342,78 +348,78 @@ The following constraints are exported via the C<:bool> tag:
 
 Creates a constraint closure that will return the provided C<$result> if
 the value is a member of the given C<@set>, or the negation of C<$result>
-otherwise. 
+otherwise.
 
-The C<eq> operator is used for comparison. 
+The C<eq> operator is used for comparison.
 
 =item FV_set_num($result, @set)
 
 Creates a constraint closure that will return the provided C<$result> if
 the value is a member of the given C<@set>, or the negation of C<$result>
-otherwise. 
+otherwise.
 
-The C<==> operator is used for comparison. 
+The C<==> operator is used for comparison.
 
 =item FV_set_word($result, $set)
 
 Creates a constraint closure that will return the provided C<$result> if
 the value is a word in the given C<$set>, or the negation of C<$result>
-otherwise. 
+otherwise.
 
 =item FV_set_cmp($result, $cmp, @set)
 
 Creates a constraint closure that will return the provided C<$result> if
 the value is a member of the given C<@set>, or the negation of C<$result>
-otherwise. 
+otherwise.
 
 C<$cmp> is a function which takes two arguments, and should return true if
-the two elements are considered equal, otherwise returning false. 
+the two elements are considered equal, otherwise returning false.
 
 =item FV_clamp($result, $low, $high)
 
 Creates a constraint closure that will return the provided C<$result> if
 the value is numerically between the given C<$low> and C<$high> bounds, or
-the negation of C<$result> otherwise. 
+the negation of C<$result> otherwise.
 
 =item FV_lt($result, $bound)
 
 Creates a constraint closure that will return the provided C<$result> if
 the value is numerically less than the given C<$bound>, or the negation of
-C<$result> otherwise. 
+C<$result> otherwise.
 
 =item FV_gt($result, $bound)
 
 Creates a constraint closure that will return the provided C<$result> if
 the value is numerically greater than the given C<$bound>, or the negation
-of C<$result> otherwise. 
+of C<$result> otherwise.
 
 =item FV_le($result, $bound)
 
 Creates a constraint closure that will return the provided C<$result> if
 the value is numerically less than or equal to the given C<$bound>, or the
-negation of C<$result> otherwise. 
+negation of C<$result> otherwise.
 
 =item FV_ge($result, $bound)
 
 Creates a constraint closure that will return the provided C<$result> if
 the value is numerically greater than or equal to the given C<$bound>, or
-the negation of C<$result> otherwise. 
+the negation of C<$result> otherwise.
 
 =item FV_not($constraint)
 
 Creates a constraint closure that will return the negation of the result of
-the given C<$constraint>. 
+the given C<$constraint>.
 
 =item FV_or(@constraints)
 
 Creates a constraint closure that will return the result of the first
-constraint that returns a non-false result. 
+constraint that returns a non-false result.
 
 =item FV_and(@constraints)
 
 Creates a constraint closure that will return the result of the first
 constraint to return a non-false result, -IF- ALL of the constraints return
-non-false results. 
+non-false results.
 
 =back
 

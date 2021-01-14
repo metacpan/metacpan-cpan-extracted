@@ -318,7 +318,8 @@ before sending a bug report.
 
 If F<ppport.h> was generated using the latest version of
 C<Devel::PPPort> and is causing failure of this module, please
-file a bug report using the CPAN Request Tracker at L<http://rt.cpan.org/>.
+file a bug report using the CPAN Request Tracker at
+L<https://github.com/trwyant/perl-Mac-Pasteboard/issues/>.
 
 Please include the following information:
 

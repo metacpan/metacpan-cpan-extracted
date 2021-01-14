@@ -32,7 +32,7 @@ Net::SAML2::Util - Utility functions for Net:SAML2
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ Original Author: Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Chris Andrews and Others; in detail:
+This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
 
   Copyright 2020       Timothy Legge, Wesley Schwengle
 

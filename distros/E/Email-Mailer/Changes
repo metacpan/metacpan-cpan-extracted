@@ -1,5 +1,15 @@
 Revision history for Email::Mailer
 
+1.17      2021-01-13 11:10:25-08:00 America/Los_Angeles
+        - Override some minimum version reqs in dist.ini
+
+1.16      2021-01-11 08:50:17-08:00 America/Los_Angeles
+        - Migrate to Test2::V0 and add exact
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.15      2020-09-16 11:39:54-07:00 America/Los_Angeles
         - Improve tests to work when Message-Id header contains line break
 

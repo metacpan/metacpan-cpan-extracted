@@ -1,5 +1,9 @@
 Revision history for PDF-TextBlock
 
+0.13    2021-01-11
+        New MANIFEST file for new tests (whoops!) #8
+        Explicit bugtracker URL for metacpan.org
+
 0.12    2021-01-06
         Permit either PDF::API2 or PDF::Builder as your PDF library basis.
 

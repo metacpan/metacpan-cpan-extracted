@@ -22,9 +22,11 @@ t/assets/deferred_leak.pl
 t/assets/promise_leak.pl
 t/detect_memory_leaks.t
 t/finally.t
+t/infinite_recursion.t
 t/ioasync.t
 t/mojo.t
 t/multi_return.t
+t/no_leak_stashed_ref.t
 t/promise_all_race.t
 t/reject_undef.t
 t/subclass.t

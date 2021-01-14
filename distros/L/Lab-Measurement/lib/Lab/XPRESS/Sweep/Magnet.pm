@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::Magnet;
-$Lab::XPRESS::Sweep::Magnet::VERSION = '3.731';
+$Lab::XPRESS::Sweep::Magnet::VERSION = '3.740';
 #ABSTRACT: Magnetic field sweep
 
 use v5.20;
@@ -164,7 +164,7 @@ Lab::XPRESS::Sweep::Magnet - Magnetic field sweep
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 SYNOPSIS
 
@@ -356,7 +356,7 @@ probably none
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Stefan Geissler
             2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler

@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Magnet;
-$Lab::Moose::Sweep::Step::Magnet::VERSION = '3.731';
+$Lab::Moose::Sweep::Step::Magnet::VERSION = '3.740';
 #ABSTRACT: Step/list sweep of magnetic field
 
 use v5.20;
@@ -107,7 +107,7 @@ Lab::Moose::Sweep::Step::Magnet - Step/list sweep of magnetic field
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ Default filename extension: C<'Field='>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2018-2019  Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt

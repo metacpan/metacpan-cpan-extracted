@@ -1,4 +1,4 @@
-D64::Disk::Layout::Base 0.02
+D64::Disk::Layout::Base 0.03
 ============================
 
 D64::Disk::Layout::Base provides a base class for designing physical layouts of
@@ -16,7 +16,7 @@ To install this module type the following:
 
 COPYRIGHT AND LICENCE
 
-Copyright 2011, 2018 by Pawel Krol <pawelkrol@cpan.org>.
+Copyright 2011-2021 by Pawel Krol <pawelkrol@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

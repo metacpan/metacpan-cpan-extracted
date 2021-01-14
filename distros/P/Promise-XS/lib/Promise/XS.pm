@@ -6,7 +6,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.11';
+    $VERSION = '0.12';
 }
 
 =encoding utf-8
@@ -51,6 +51,12 @@ All of C<Promise::XS>’s static functions may be exported at load time,
 e.g., C<use Promise::XS qw(deferred)>.
 
 =head1 DESCRIPTION
+
+=begin html
+
+<a href='https://coveralls.io/github/FGasper/p5-Promise-XS?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Promise-XS/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=end html
 
 This module exposes a Promise interface with its major parts
 implemented in XS for speed. It is a fork and refactor of

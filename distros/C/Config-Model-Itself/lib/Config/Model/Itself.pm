@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself 2.020;
+package Config::Model::Itself 2.021;
 
 use Mouse ;
 use Config::Model 2.134;
@@ -195,6 +195,7 @@ sub read_app_files {
 
     my $app_dir = $read_from || $self->model_dir->parent;
     my %apps;
+    my %map;
     $logger->info("reading app files from ".$app_dir);
     foreach my $dir ( $app_dir->children(qr/\.d$/) ) {
 
@@ -219,6 +220,7 @@ sub read_app_files {
 
             my $appli = $file->basename;
             $apps{$appli} = $data{model} ;
+            $map{$appli} = $file;
 
             $self->meta_root->load_data(
                 data => { application => { $appli => \%data } },
@@ -226,6 +228,8 @@ sub read_app_files {
             ) ;
         }
     }
+
+    $self->{app_map} = \%map;
 
     return \%apps;
 }
@@ -473,6 +477,7 @@ sub write_app_files {
     my $app_obj = $self->meta_root->fetch_element('application');
 
     foreach my $app_name ( $app_obj->fetch_all_indexes ) {
+        $logger->debug("writing $app_name...");
         my $app = $app_obj->fetch_with_id($app_name);
         my $cat_dir_name = $app->fetch_element_value( name =>'category' ).'.d';
         $app_dir->child($cat_dir_name)->mkpath();
@@ -489,8 +494,14 @@ sub write_app_files {
         }
         $logger->info("writing file ".$app_file);
         $app_file->spew(@lines);
+        delete $self->{app_map}{$app_name};
     }
 
+    # prune removed app files
+    foreach my $old_file ( values %{$self->{app_map}}) {
+        $logger->debug("Removing $old_file.");
+        $old_file->remove;
+    }
 }
 
 sub write_all {
@@ -529,38 +540,42 @@ sub write_all {
     my %map_to_write = (%$map,%new_map) ;
 
     foreach my $file (keys %map_to_write) {
-        $logger->info("checking model file $file");
+        my ($data,$notes) = $self->check_model_to_write($file, \%map_to_write, \%loaded_classes);
+        next unless @$data ; # don't write empty model
+        write_model_file ($dir->child($file), $self->{header}{$file}, $notes, $data);
+    }
 
-        my @data ;
-        my @notes ;
-        my $file_needs_write = 0;
+    $self->meta_instance->clear_changes ;
+}
 
-        # check if any a class of a file was modified
-        foreach my $class_name (@{$map_to_write{$file}}) {
-            $file_needs_write++ if $self->class_needs_write($class_name);
-            $logger->info("file $file class $class_name needs write ",$file_needs_write);
-        }
+sub check_model_to_write {
+    my ($self, $file, $map_to_write, $loaded_classes) = @_;
+    $logger->info("checking model file $file");
 
-        next unless $file_needs_write ;
+    my @data ;
+    my @notes ;
+    my $file_needs_write = 0;
 
-        foreach my $class_name (@{$map_to_write{$file}}) {
+    # check if any a class of a file was modified
+    foreach my $class_name (@{$map_to_write->{$file}}) {
+        $file_needs_write++ if $self->class_needs_write($class_name);
+        $logger->info("file $file class $class_name needs write ",$file_needs_write);
+    }
+
+    if ($file_needs_write) {
+        foreach my $class_name (@{$map_to_write->{$file}}) {
             $logger->info("writing class $class_name");
-            my $model
-              = $self-> get_perl_data_model(class_name => $class_name) ;
+            my $model = $self-> get_perl_data_model(class_name => $class_name) ;
             push @data, $model if defined $model and keys %$model;
 
             my $node = $self->{meta_root}->grab("class:".$class_name) ;
             push @notes, $node->dump_annotations_as_pod ;
             # remove class name from above list
-            delete $loaded_classes{$class_name} ;
+            delete $loaded_classes->{$class_name} ;
         }
-
-        next unless @data ; # don't write empty model
-
-        write_model_file ($dir->child($file), $self->{header}{$file}, \@notes, \@data);
     }
 
-    $self->meta_instance->clear_changes ;
+    return (\@data, \@notes);
 }
 
 sub write_model_plugin {
@@ -611,37 +626,41 @@ sub read_model_plugin {
     } ;
     find ($wanted, $plugin_dir ) ;
 
-    my $class_element = $self->meta_root->fetch_element('class') ;
-
     foreach my $load_file (@files) {
-        $logger->info("trying to read plugin $load_file");
-
-        $load_file = "./$load_file" if $load_file !~ m!^/! and -e $load_file;
-
-        my $plugin = do $load_file ;
-
-        unless ($plugin) {
-            if ($@) {die "couldn't parse $load_file: $@"; }
-            elsif (not defined $plugin) {die  "couldn't do $load_file: $!"}
-            else { die  "couldn't run $load_file" ;}
-        }
-
-        # there should be only only class in each plugin file
-        foreach my $model (@$plugin) {
-            my $class_name = delete $model->{name} ;
-            # load with a array ref to avoid warnings about missing order
-            $class_element->fetch_with_id($class_name)->load_data( $model ) ;
-        }
-
-        # load annotations
-        $logger->info("loading annotations from plugin file $load_file");
-        my $fh = IO::File->new($load_file) || die "Can't open $load_file: $!" ;
-        my @lines = $fh->getlines ;
-        $fh->close;
-        $self->meta_root->load_pod_annotation(join('',@lines)) ;
+        $self->read_plugin_file($load_file);
     }
 }
 
+sub read_plugin_file {
+    my ($self, $load_file) = @_;
+
+    $logger->info("trying to read plugin $load_file");
+    my $class_element = $self->meta_root->fetch_element('class') ;
+
+    $load_file = "./$load_file" if $load_file !~ m!^/! and -e $load_file;
+
+    my $plugin = do $load_file ;
+
+    unless ($plugin) {
+        if ($@) {die "couldn't parse $load_file: $@"; }
+        elsif (not defined $plugin) {die  "couldn't do $load_file: $!"}
+        else { die  "couldn't run $load_file" ;}
+    }
+
+    # there should be only only class in each plugin file
+    foreach my $model (@$plugin) {
+        my $class_name = delete $model->{name} ;
+        # load with a array ref to avoid warnings about missing order
+        $class_element->fetch_with_id($class_name)->load_data( $model ) ;
+    }
+
+    # load annotations
+    $logger->info("loading annotations from plugin file $load_file");
+    my $fh = IO::File->new($load_file) || die "Can't open $load_file: $!" ;
+    my @lines = $fh->getlines ;
+    $fh->close;
+    $self->meta_root->load_pod_annotation(join('',@lines)) ;
+}
 
 #
 # New subroutine "write_model_file" extracted - Mon Mar 12 13:38:29 2012.
@@ -832,7 +851,7 @@ Config::Model::Itself - Model (or schema) editor for Config::Model
 
 =head1 VERSION
 
-version 2.020
+version 2.021
 
 =head1 SYNOPSIS
 
@@ -994,22 +1013,6 @@ The following websites have more information about this module, and may be of he
 in addition to those websites please use your favorite search engine to discover more resources.
 
 =over 4
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Config-Model-Itself>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Config-Model-Itself>
 
 =item *
 

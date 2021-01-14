@@ -72,6 +72,7 @@ dsn: ro, opt, Str
 database: ro, opt, Str
 hostname: ro, opt, Str
 hostport: ro, opt, Str
+uri: ro, opt, Str
 username: ro, opt, Str
 password: ro, opt, Str
 

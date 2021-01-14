@@ -69,3 +69,8 @@ CHANGES\s+
 # I only need these to make the files I ship
 module_list.txt
 tools/*
+\bMANIFEST\s\d
+\bChanges\s\d
+
+\A\.github\b
+

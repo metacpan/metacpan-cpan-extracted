@@ -52,7 +52,7 @@ my $d = 't/data/orig';
     my $info = version_info($d);
     trap_warn(0);
 
-    is keys %$info, 5, "proper key count in info href ok";
+    is keys %$info, 6, "proper key count in info href ok";
 
     is $info->{"$d/One.pm"}, '0.01', "One.pm has proper version ok";
     is $info->{"$d/Two.pm"}, '2.00', "Two.pm has proper version ok";

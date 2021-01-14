@@ -17,8 +17,11 @@ meta-spec:
   version: '1.4'
 name: App-SubtitleUtils
 requires:
+  File::Slurper::Dash: '0'
   Log::ger: '0.037'
   Log::ger::Screen: '0'
+  POSIX: '0'
+  Perinci::CmdLine::Any: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -26,7 +29,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-App-SubtitleUtils/issues
   homepage: https://metacpan.org/release/App-SubtitleUtils
   repository: git://github.com/perlancar/perl-App-SubtitleUtils.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -383,6 +386,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: x_spec
+      name: DevelopX_spec
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode

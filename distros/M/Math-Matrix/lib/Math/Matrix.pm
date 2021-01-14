@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Scalar::Util 'blessed';
 
-our $VERSION = '0.92';
+our $VERSION = '0.94';
 our $eps = 0.00001;
 
 use overload
@@ -4292,13 +4292,16 @@ sub mpow {
           unless $n -> is_scalar();
         $n = $n -> [0][0];
     }
-    croak "Exponent must be a non-negative integer" unless $n == int $n;
+    croak "Exponent must be an integer" unless $n == int $n;
 
     return $class -> new([]) if $x -> is_empty();
 
     my ($nrowx, $ncolx) = $x -> size();
     return $class -> id($nrowx, $ncolx) if $n == 0;
     return $x -> clone()                if $n == 1;
+
+    my $neg = $n < 0;
+    $n = -$n if $neg;
 
     my $y = $class -> id($nrowx, $ncolx);
     my $tmp = $x;
@@ -4309,6 +4312,8 @@ sub mpow {
         last if $n == 0;
         $tmp = $tmp * $tmp;
     }
+
+    $y = $y -> minv() if $neg;
 
     return $y;
 }
@@ -7635,10 +7640,11 @@ Math::Matrix, where each element is a Math::Complex object.
 
 =head1 BUGS
 
-Please report any bugs through the web interface at
-L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-Matrix>
-(requires login). We will be notified, and then you'll automatically be
-notified of progress on your bug as I make changes.
+Please report any bugs or feature requests via
+L<https://github.com/pjacklam/p5-Math-Matrix/issues>.
+
+Old bug reports and feature requests can be found at
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Matrix>.
 
 =head1 SUPPORT
 
@@ -7654,17 +7660,21 @@ You can also look for information at:
 
 L<https://github.com/pjacklam/p5-Math-Matrix>
 
-=item * RT: CPAN's request tracker
-
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Matrix>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/dist/Math-Matrix>
-
 =item * MetaCPAN
 
 L<https://metacpan.org/release/Math-Matrix>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Math-Matrix>
+
+=item * CPAN Testers PASS Matrix
+
+L<http://pass.cpantesters.org/distro/A/Math-Matrix.html>
+
+=item * CPAN Testers Reports
+
+L<http://www.cpantesters.org/distro/A/Math-Matrix.html>
 
 =item * CPAN Testers Matrix
 
@@ -7674,7 +7684,7 @@ L<http://matrix.cpantesters.org/?dist=Math-Matrix>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2020, Peter John Acklam.
+Copyright (c) 2020-2021, Peter John Acklam
 
 Copyright (C) 2013, John M. Gamble <jgamble@ripco.com>, all rights reserved.
 
@@ -7696,7 +7706,7 @@ the same terms as Perl itself.
 
 =head1 AUTHORS
 
-Peter John Acklam E<lt>pjacklam@gmail.comE<gt> (2020)
+Peter John Acklam E<lt>pjacklam@gmail.comE<gt> (2020-2021)
 
 Ulrich Pfeifer E<lt>pfeifer@ls6.informatik.uni-dortmund.deE<gt> (1995-2013)
 

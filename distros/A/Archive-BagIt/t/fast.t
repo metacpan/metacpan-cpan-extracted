@@ -17,7 +17,7 @@ plan skip_all => "IO::AIO required for testing Archive::BagIt::Fast"
 
 
 my $Class     = 'Archive::BagIt::Fast';
-my $ClassBase = 'Archive::BagIt::Base';
+my $ClassBase = 'Archive::BagIt';
 
 use_ok($Class);
 use_ok($ClassBase);

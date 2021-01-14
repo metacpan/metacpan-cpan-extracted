@@ -7,6 +7,10 @@
 
 MODULE = Gtk2::Unique  PACKAGE = Gtk2::Unique  PREFIX = unique_
 
+=for object Gtk2::Unique Use single instance applications
+
+=cut
+
 PROTOTYPES: DISABLE
 
 

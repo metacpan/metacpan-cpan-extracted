@@ -50,7 +50,7 @@ my %WriteMakefile = (
     'VERSION_FROM'   => $main_file,
 	'ABSTRACT_FROM'  => $main_file,
     'AUTHOR'         => 'brian d foy <brian.d.foy@gmail.com>',
-	'LICENSE'        => 'perl',
+	'LICENSE'        => 'artistic_2',
 
 	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
@@ -61,8 +61,7 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::More'         => '0.94',
-		'Unicode::Casing'    => '0',
+		'Test::More'         => '1',
 		},
 
 	'PREREQ_PM'     => {

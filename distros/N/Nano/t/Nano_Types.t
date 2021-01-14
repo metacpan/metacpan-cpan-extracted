@@ -203,6 +203,40 @@ Nano::Types
 
 =cut
 
+=type Stash
+
+  Stash
+
+=type-library Stash
+
+Nano::Types
+
+=type-composite Stash
+
+  ConsumerOf["Nano::Stash"]
+
+=type-parent Stash
+
+  Object
+
+=type-example-1 Stash
+
+  # given: synopsis
+
+  package Example::Stash;
+
+  use Moo;
+
+  extends 'Nano::Node';
+
+  with 'Nano::Stash';
+
+  package main;
+
+  my $stash = Example::Stash->new;
+
+=cut
+
 =type Table
 
   Table

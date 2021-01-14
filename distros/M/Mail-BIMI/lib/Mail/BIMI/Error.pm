@@ -1,6 +1,6 @@
 package Mail::BIMI::Error;
 # ABSTRACT: Class to represent an error condition
-our $VERSION = '2.20201117.2'; # VERSION
+our $VERSION = '3.20210113'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -73,7 +73,7 @@ Mail::BIMI::Error - Class to represent an error condition
 
 =head1 VERSION
 
-version 2.20201117.2
+version 3.20210113
 
 =head1 DESCRIPTION
 

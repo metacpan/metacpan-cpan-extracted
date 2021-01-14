@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Time;
 #ABSTRACT: Simple time-controlled repeater
-$Lab::XPRESS::Sweep::Time::VERSION = '3.731';
+$Lab::XPRESS::Sweep::Time::VERSION = '3.740';
 use v5.20;
 
 use Lab::XPRESS::Sweep;
@@ -170,7 +170,7 @@ Lab::XPRESS::Sweep::Time - Simple time-controlled repeater
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 SYNOPSIS
 
@@ -267,7 +267,7 @@ probably none
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Stefan Geissler
             2013       Andreas K. Huettel, Christian Butschkow, Stefan Geissler

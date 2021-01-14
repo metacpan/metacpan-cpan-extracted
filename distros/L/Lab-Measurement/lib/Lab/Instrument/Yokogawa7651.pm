@@ -1,6 +1,6 @@
 package Lab::Instrument::Yokogawa7651;
 #ABSTRACT: Yokogawa 7651 DC source
-$Lab::Instrument::Yokogawa7651::VERSION = '3.731';
+$Lab::Instrument::Yokogawa7651::VERSION = '3.740';
 use v5.20;
 
 use warnings;
@@ -787,7 +787,7 @@ Lab::Instrument::Yokogawa7651 - Yokogawa 7651 DC source
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 SYNOPSIS
 
@@ -1041,7 +1041,7 @@ The Yokogawa7651 class is a Source (L<Lab::Instrument::Source>)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2005-2006  Daniel Schroeer
             2009       Andreas K. Huettel, Daniela Taubert

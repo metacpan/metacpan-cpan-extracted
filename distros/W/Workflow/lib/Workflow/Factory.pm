@@ -8,7 +8,7 @@ use Log::Log4perl qw( get_logger );
 use Workflow::Exception qw( configuration_error workflow_error );
 use Carp qw(croak);
 use English qw( -no_match_vars );
-$Workflow::Factory::VERSION = '1.48';
+$Workflow::Factory::VERSION = '1.49';
 
 # Extra action attribute validation is off by default for compatibility.
 our $VALIDATE_ACTION_CONFIG = 0;
@@ -1037,7 +1037,8 @@ instantiated.
 
 We also require any necessary observer classes and throw an exception
 if we cannot. If successful the observers are kept around and attached
-to a workflow in L</create_workflow()> and L</fetch_workflow()>.
+to a workflow in L<create_workflow()|/create_workflow> and
+L<fetch_workflow()|/fetch_workflow>.
 
 Returns: nothing
 

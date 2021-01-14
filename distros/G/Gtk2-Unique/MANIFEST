@@ -15,4 +15,5 @@ t/UniqueApp.t
 t/UniqueBackend.t
 t/unit-tests.pl
 examples/sample.pl
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

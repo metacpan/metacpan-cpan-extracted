@@ -1,3 +1,7 @@
+3.20210113 2021-01-13 UTC
+  - Improve errors returned on SVG fetch fail
+  - Switch to a purely numeric version string
+
 2.20201117.2 2020-11-17 UTC
   - Do not fail tests when internet is not available
   - Require valid usage flags in intermediate certs

@@ -5,8 +5,14 @@ use charnames qw{ :full };
 
 use DateTime;
 use DateTime::Fiction::JRRTolkien::Shire;
+use Date::Tolkien::Shire::Data;
 
 use Test::More tests => 4;
+
+my $fall = do {
+    ( my $dtsd_version = Date::Tolkien::Shire::Data->VERSION() ) =~ s/ _ //smx;
+    $dtsd_version ge '0.00601' ? 'fall' : 'the fall';
+};
 
 my $u_circ	= "\N{LATIN SMALL LETTER U WITH CIRCUMFLEX}";
 
@@ -30,10 +36,10 @@ $shire = DateTime::Fiction::JRRTolkien::Shire->new(
     day		=> 15,
 );
 
-is( $shire->on_date, <<'EOD' );
+is( $shire->on_date, <<"EOD" );
 Sunday 15 Afteryule 1419
 
-The Bridge of Khazad-dum, and the fall of Gandalf, 1419.
+The Bridge of Khazad-dum, and $fall of Gandalf, 1419.
 EOD
 
 $shire = DateTime::Fiction::JRRTolkien::Shire->new(
@@ -43,10 +49,10 @@ $shire = DateTime::Fiction::JRRTolkien::Shire->new(
     traditional	=> 1,
 );
 
-is( $shire->on_date, <<'EOD' );
+is( $shire->on_date, <<"EOD" );
 Sunnendei 15 Afteryule 1419
 
-The Bridge of Khazad-dum, and the fall of Gandalf, 1419.
+The Bridge of Khazad-dum, and $fall of Gandalf, 1419.
 EOD
 
 $shire = DateTime::Fiction::JRRTolkien::Shire->new(
@@ -59,5 +65,5 @@ $shire = DateTime::Fiction::JRRTolkien::Shire->new(
 is( $shire->on_date, <<"EOD" );
 Sunday 15 Afteryule 1419
 
-The Bridge of Khazad-d${u_circ}m, and the fall of Gandalf, 1419.
+The Bridge of Khazad-d${u_circ}m, and $fall of Gandalf, 1419.
 EOD

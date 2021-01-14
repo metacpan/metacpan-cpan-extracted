@@ -1,3 +1,21 @@
+0.94 2021-01-13
+
+ * Fix broken test in t/mldiv.t The rounding performed for values that are very
+   close to an integer was performed on the wrong matrix.
+
+0.93 2021-01-12
+
+ * The test is_deeply() does string comparison, so avoid negative zeros in test
+   data and output from tests. Also round test output where the output may be
+   slightly off from an integer.
+
+ * Require Math::Trig version 1.06 so Math::Trig::Inf() is available.
+
+ * Update the SUPPORT section to reflect that CPAN RT will be closing down on
+   1st March 2021.
+
+ * Add support for negative integer powers in mpow().
+
 0.92 2020-11-02
 
  * Add a larged amount of new methods. Improve existing methods. Fix

@@ -1,0 +1,12 @@
+Revision history for Perl extension D64::Disk::Layout.
+
+0.02  2021-01-13
+    - add a dependency on a specific version of "List::MoreUtils" module
+      providing "arrayify" and "zip6" functions
+    - update a dependency on "D64::Disk::Layout::Base" module (the latest
+      version 0.03 provides "track_data" method to read/write physical track
+      data from/into a disk image)
+
+0.01  2021-01-12
+    - initial version (provides miscellaneous procedures to access and modify
+      entire D64/D71/D81 disk image data)

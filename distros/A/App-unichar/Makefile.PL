@@ -61,11 +61,14 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::More' => '0.95',
+		'Test::More' => '1',
 		},
 
 	'PREREQ_PM'     => {
+		'I18N::Langinfo' => '0',
 		},
+
+	'EXE_FILES' => [ qw( script/unichar ) ],
 
 	'META_MERGE' => {
 		'meta-spec' => { version => 2 },

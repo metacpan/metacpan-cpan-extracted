@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.06
+    version 2.08
 
 SYNOPSIS
 
@@ -78,7 +78,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2020 by Chris Williams and Marcus
+    This software is copyright (c) 2021 by Chris Williams and Marcus
     Holland-Moritz.
 
     This is free software; you can redistribute it and/or modify it under

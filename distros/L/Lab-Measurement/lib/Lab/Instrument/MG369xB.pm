@@ -1,6 +1,6 @@
 package Lab::Instrument::MG369xB;
 #ABSTRACT: Anritsu MG369xB series signal generator
-$Lab::Instrument::MG369xB::VERSION = '3.731';
+$Lab::Instrument::MG369xB::VERSION = '3.740';
 use v5.20;
 
 use strict;
@@ -184,7 +184,7 @@ Lab::Instrument::MG369xB - Anritsu MG369xB series signal generator
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 CAVEATS/BUGS
 
@@ -201,7 +201,7 @@ supported by HP83732A driver.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Hermann Kraus
             2013-2014  Andreas K. Huettel

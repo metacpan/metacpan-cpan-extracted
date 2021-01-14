@@ -71,6 +71,7 @@ dbh: ro, opt, Object
 dsn: ro, opt, Str
 database: ro, opt, Str
 file: ro, opt, Str
+uri: ro, opt, Str
 
 =cut
 

@@ -1,0 +1,4 @@
+^.git/
+MYMETA.json
+MYMETA.yml
+Makefile$

@@ -6,16 +6,16 @@ use Test::More;
 # It makes 'Identifier too long' error in string 'eval'.
 # And, Moo uses string eval.
 {
-    package R::AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA;
-    use Role::Tiny;
-    package R::BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB;
-    use Role::Tiny;
-    package R::CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC;
-    use Role::Tiny;
-    package R::DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD;
-    use Role::Tiny;
-    package R::EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE;
-    use Role::Tiny;
+  package R::AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA;
+  use Role::Tiny;
+  package R::BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB;
+  use Role::Tiny;
+  package R::CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC;
+  use Role::Tiny;
+  package R::DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD;
+  use Role::Tiny;
+  package R::EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE;
+  use Role::Tiny;
 }
 
 # test various lengths so abbreviation cuts off double colon

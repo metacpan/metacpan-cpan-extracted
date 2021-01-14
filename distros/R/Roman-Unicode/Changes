@@ -1,4 +1,7 @@
 
+1.032 2021-01-14T10:34:43Z
+	* freshen distro, remove Travis CI, add GitHub Actions
+
 1.031 2016-09-19T22:23:07Z
 	* Bump to stable version
 

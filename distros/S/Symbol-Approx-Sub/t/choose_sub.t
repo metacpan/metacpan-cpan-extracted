@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 use Test::More qw(); 
 #Don't import anything or test routines become potential matches during the test
 

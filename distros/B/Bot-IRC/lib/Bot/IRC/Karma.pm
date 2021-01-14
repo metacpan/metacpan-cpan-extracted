@@ -1,11 +1,10 @@
 package Bot::IRC::Karma;
 # ABSTRACT: Bot::IRC track karma for things
 
-use 5.012;
-use strict;
-use warnings;
+use 5.014;
+use exact;
 
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -99,7 +98,7 @@ Bot::IRC::Karma - Bot::IRC track karma for things
 
 =head1 VERSION
 
-version 1.27
+version 1.32
 
 =head1 SYNOPSIS
 
@@ -146,9 +145,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gryphon Shafer.
+This software is Copyright (c) 2016-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

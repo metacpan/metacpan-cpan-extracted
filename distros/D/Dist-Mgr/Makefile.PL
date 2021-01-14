@@ -12,7 +12,7 @@ WriteMakefile(
     LICENSE          => 'perl_5',
     PL_FILES         => {},
     EXE_FILES        => [qw(bin/distmgr)],
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.010',
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources   => {
@@ -27,7 +27,7 @@ WriteMakefile(
         },
     },
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES => {
         'Capture::Tiny'      => 0,
@@ -41,6 +41,7 @@ WriteMakefile(
         'File::Find::Rule'      => 0,
         'File::Copy::Recursive' => 0,
         'File::Path'            => 0,
+        'JSON'                  => 0,
         'Module::Starter'       => '1.77',
         'PPI'                   => 0,
         'Term::ReadKey'         => 0,

@@ -1,12 +1,12 @@
 package Bot::IRC::X::MetarTaf;
 # ABSTRACT: Bot::IRC plugin for METAR and TAF reporting
 
-use strict;
-use warnings;
+use 5.014;
+use exact;
 
 use LWP::Simple 'get';
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -70,10 +70,10 @@ Bot::IRC::X::MetarTaf - Bot::IRC plugin for METAR and TAF reporting
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC-X-MetarTaf.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC-X-MetarTaf)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC-X-MetarTaf/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC-X-MetarTaf)
+=for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-MetarTaf/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-MetarTaf/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-MetarTaf/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-MetarTaf)
 
 =head1 SYNOPSIS
 
@@ -107,23 +107,15 @@ L<GitHub|https://github.com/gryphonshafer/Bot-IRC-X-MetarTaf>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Bot-IRC-X-MetarTaf>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Bot::IRC::X::MetarTaf>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/Bot-IRC-X-MetarTaf>
+L<GitHub Actions|https://github.com/gryphonshafer/Bot-IRC-X-MetarTaf/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Bot-IRC-X-MetarTaf>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Bot-IRC-X-MetarTaf>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Bot-IRC-X-MetarTaf>
 
 =item *
 
@@ -143,9 +135,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gryphon Shafer.
+This software is Copyright (c) 2016-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

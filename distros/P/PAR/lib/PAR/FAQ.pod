@@ -111,12 +111,6 @@ L<PAR::Dist> and L<PAR::Packer>; the corresponding packages are called
 C<libmodule-scandeps-perl>,  C<libpar-dist-perl>, C<libpar-perl>
 and C<libpar-packer-perl>.
 
-=head2 I specify a .ico file with --icon for Win32, but the icon is still the black and white camel. What's wrong?
-
-Unlike Perl2EXE, which can use a standard 16-color bitmap as an application icon, PAR requires a true Windows icon file. Download a trial version of Microangelo and use that to create your .ico file. The latest Netpbm tools at L<http://netpbm.sourceforge.net/> has ppmtowinicon, which can tack a pbm and convert it to a windows icon. It is open source and has win32 ports.
-
-Gimp for Windows can also create Windows icon files L<http://gimp-win.sourceforge.net/>.
-
 =head2 I added a directory to my PAR file using "zip -r" or winzip, and then generated an executable from this PAR file, and the executable failed to run (IO error: reading header signature :..). What's wrong?
 
 As pointed out by Alan Stewart, zip adds a directory entry for the new directory, and it causes the PAR executable to fail. Just use :
@@ -216,14 +210,6 @@ Use the --gui switch, ie
 I found that this is not documented on all versions of pp ... Some versions have a more complete doc than others when you type "pp -h" etc. (This should be reasonably documented now.)
 
 When searching for an answer to this myself, I found many references to using "exetype" ... it comes as a .bat with ActivePerl, or you can find an exetype.pl from several places. You run "exetype file.exe [WINDOWS|CONSOLE]". This worked, I think, but still did not achieve the desired result on my PAR executable. While the exe itself did not generate a console window, par.exe (which was invoked in my exe somewhere) DID generate a console window, with a titlebar saying "par.exe <strange-looking path to file in temp dir>", whereas before changing the console window title bar just displayed the path to my .exe.
-
-=head2 How can I change the icon of the generated .exe file under Windows?
-
-There is another not-completely-documented switch that only works on windows, --icon MyIcon.ico. So just use this:
-
-    % pp --icon "c:\path to\MyIcon.ico" -o file.exe file.pl.
-
-(This should also be documented now?)
 
 =head2 The command line parameters (@ARGV) of a pp-ed binary called from another pp-ed binary are missing or broken. What the...?
 

@@ -1,5 +1,18 @@
 Revision history for Sub::Versions
 
+1.04      2021-01-13 11:12:50-08:00 America/Los_Angeles
+        - Override some minimum version reqs in dist.ini
+
+1.03      2021-01-11 09:17:53-08:00 America/Los_Angeles
+        - Migrate to Test2::V0 and add exact
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Test update to fix coverage metrics error
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+        - Update Travis YAML
+        - Adding Perl versions to test; annual general update for 2018
+
 1.02      2017-03-15 17:32:20-07:00 America/Los_Angeles
         - Unversioned subroutines will get called with any subver() version
 

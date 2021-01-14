@@ -1,12 +1,18 @@
+1.017  2021-01-13
+
+  - change bugtracker to GitHub issues
+
+  - remove obsolete stuff from tutorial
+
 1.016  2019-05-20
 
   - Fix #129312: Code signing for OSX
-    
+
     Avoid Archive::Zip::Archive error "can't find EOCD signature" for pp'ed
     executables with lots of stuff appended (e.g. by OSX codesign):
     temporarily increase Archive::Zip::ChunkSize around the call to
     Archive::Zip::readFromFileHandle().
-    
+
     Note this is prerequisite for the corresponding fix in PAR::Packer.
 
   - Fix: Archive::Unzip::Burst::unzip result is ignored and _extract_inc
@@ -41,17 +47,17 @@
   - Fix a crucial typo, hopefully fixes RT#118981 "Tests fail (with PAR 1.012?)"
 
   - Build t/hello.par at "make" time
-    
+
 1.012  2016-11-25
 
   - Guard against concurrent extraction attempts of zip into "inc"
 
     - use a file lock to protect the extraction of the complete zip into "inc"
- 
-    - _run_member_*(), _tempfile(), _dl_extract(): 
-      make the "persistent" filename only visible when the file 
+
+    - _run_member_*(), _tempfile(), _dl_extract():
+      make the "persistent" filename only visible when the file
       has been completely written
-  
+
   - Make build and test work if @INC does not include "."
 
   - Upgrade to Module::Install 1.17
@@ -61,7 +67,7 @@
 - Move to GitHub. Thanks, OpenFoundry, for years of service.
 
 - Suppress warning "Use of uninitialized value in do "file" ..."
-    
+
 - Put a description of its purpose into the canary file
 
 - Remove all traces of Internals::PAR::CLEARSTACK
@@ -81,17 +87,17 @@
       the time of extraction as their modified time).
 
     - Add a "canary" file in $PAR_TEMP and back-date it 1 day. Hence any process
-      removing files in $PAR_TEMP based on timestamps should remove 
+      removing files in $PAR_TEMP based on timestamps should remove
       the "canary" before others.
 
-    - If the canary file is missing, extract the .par to $PAR_TEMP/inc 
+    - If the canary file is missing, extract the .par to $PAR_TEMP/inc
       as previously was done only when $PAR_TEMP/inc was missing.
 
 1.009  2015-04-22
 
   - Fix 103861 for PAR-Packer: Adding local directories to @INC for a pp executable fails
 
-  - Get rid of included PerlIO.pm, parent.pm, obsolete 
+  - Get rid of included PerlIO.pm, parent.pm, obsolete
     Module::Install::Include and included Test::More.
 
 1.008  2015-01-24
@@ -109,8 +115,8 @@
 
   - Fix RT #86650: typo fixes
 
-  - reformat ChangeLog file according to CPAN::Changes::Spec 
-    and rename it to Changes 
+  - reformat ChangeLog file according to CPAN::Changes::Spec
+    and rename it to Changes
 
   - Update to Module::Build 1.14
 
@@ -128,9 +134,9 @@
     we try to sanitize username (so that there are no problematic
     characters in the name of the per-user cache directory), but the
     strategy fails miserably for some charset encodings.
-    E.g. for EUC-KR or CP949 (as in the bug report) we may produce an 
-    illegal sequence of bytes; in other cases we may cause collisions 
-    (different usernames mapping to the same directory name). 
+    E.g. for EUC-KR or CP949 (as in the bug report) we may produce an
+    illegal sequence of bytes; in other cases we may cause collisions
+    (different usernames mapping to the same directory name).
     Fix the problem once and for all by encoding the username
     (bytewise) as 2 hex digits.
 
@@ -142,7 +148,7 @@
 
 1.004  2011-11-30
   - back out r1241: it causes errors in PAR::Packer's test suite
-  - change "unsafe directory" error message to match the wording 
+  - change "unsafe directory" error message to match the wording
     used by PAR::Packer
   - remove "debian" sub directory: it isn't released to CPAN and
     Debian will supply its own anyway
@@ -158,9 +164,9 @@
        - it's not a symlink
        - it's mode 0700
        - it's owned by USER
-  - Fix a problem packing XML::LibXSLT on Windows (see the thread starting 
+  - Fix a problem packing XML::LibXSLT on Windows (see the thread starting
     with http://www.nntp.perl.org/group/perl.par/2011/02/msg4919.html)
-  - Die (with a hopefully useful message) if any error is encountered 
+  - Die (with a hopefully useful message) if any error is encountered
     during an Archive::Zip extract operation
 
 1.002  2010-07-25
@@ -567,7 +573,7 @@
   [Bug Fixes]
 
     - Applied Alan Stewart's patch which fixes @ARGV pollution in
-      daughter programs. See also 
+      daughter programs. See also
       http://www.nntp.perl.org/group/perl.par/2152
     - Now mentioning the ENV var "PAR_VERBATIM" in the documentation.
       See also http://www.nntp.perl.org/group/perl.par/2196
@@ -859,7 +865,7 @@
     - OOified "pp" in contrib/object_oriented_pp/; not installed by default.
 
   [Bug Fixes]
-    
+
     - "pp -d" (--dependent) prevented "pp -C" (--clean) from working.
 
     - The "pp -m" (--multiarch) option was implemented incorrectly
@@ -923,7 +929,7 @@
 
     - New "pp -c" and "pp -x" (--compile/--execute) options run the
       script with "perl -c" to check for dependencies.
-      
+
     - Also, the new "pp -n" (--noscan) command skips the default
       static scanning altogether.
 
@@ -990,14 +996,14 @@
 
     - Perl 5.8.1 has an off-by-one bug that prevents "parl" to
       function properly.  We have now provided a workaround;
-      this bug should also be fixed in Perl 5.8.2. 
+      this bug should also be fixed in Perl 5.8.2.
 
     - Fixed https support for LWP via the new Module::ScapDeps.
 
 0.75  2003-09-21
 
   [New Features]
-    
+
     - "pp -o file.exe file.par" now packs file.par into file.exe;
       this means you can hand-tweak PAR files generated by "pp -p"
       before packing it into an executable.
@@ -1362,7 +1368,7 @@ This release comes with several significant improvements:
 
     - Building on Win32 in directory names that contain spaces
       did not work.
-      
+
 0.63  2003-02-06
 
   [Bug Fixes]

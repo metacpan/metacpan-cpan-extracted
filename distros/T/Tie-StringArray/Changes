@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::StringArray
 
+1.102 2021-01-14T08:59:43Z
+	* Freshen distro, remove Travis CI, add Github actions
+
 1.101 2018-05-09T18:19:48Z
 	* Clarify that it's the Artistic License 2.0.
 

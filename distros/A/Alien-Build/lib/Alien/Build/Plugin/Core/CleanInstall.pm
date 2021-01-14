@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Path::Tiny ();
 
 # ABSTRACT: Implementation for clean_install hook.
-our $VERSION = '2.37'; # VERSION
+our $VERSION = '2.38'; # VERSION
 
 
 sub init
@@ -53,7 +53,7 @@ Alien::Build::Plugin::Core::CleanInstall - Implementation for clean_install hook
 
 =head1 VERSION
 
-version 2.37
+version 2.38
 
 =head1 SYNOPSIS
 

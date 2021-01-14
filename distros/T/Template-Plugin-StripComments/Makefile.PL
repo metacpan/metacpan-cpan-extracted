@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Template-Plugin-StripComments",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Template::Plugin::StripComments",
   "PREREQ_PM" => {
     "Template::Plugin::Filter" => "2.00"
@@ -27,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::DiagINC" => "0.002",
     "Test::More" => "0.94"
   },
-  "VERSION" => "1.02",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }

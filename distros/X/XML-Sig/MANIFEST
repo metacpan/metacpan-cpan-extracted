@@ -22,6 +22,7 @@ t/009_verify_separate_cert.t
 t/011-sign_multiple_sections.t
 t/012_unassociated_signatures.t
 t/013_inclusive_prefixes.t
+t/014_verify_issues.t
 t/author-critic.t
 t/author-eof.t
 t/author-eol.t
@@ -31,6 +32,7 @@ t/author-pod-syntax.t
 t/cacert.pem
 t/dsa.private.key
 t/intermediate.pem
+t/issues/issue-20.xml
 t/pkcs8.private.key
 t/release-trailing-space.t
 t/rsa.cert.pem

@@ -1,5 +1,17 @@
 Revision history for Bot::IRC::X::Dice
 
+1.05      2021-01-13 11:06:29-08:00 America/Los_Angeles
+        - Override some minimum version reqs in dist.ini
+
+1.04      2021-01-12 08:12:54-08:00 America/Los_Angeles
+        - Migrate to Test2::V0 and add exact
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+        - Update Travis YAML
+        - Adding Perl versions to test; annual general update for 2018
+
 1.03      2016-11-10 20:35:28-08:00 America/Los_Angeles
         - Removed pointless call to math expression module
 

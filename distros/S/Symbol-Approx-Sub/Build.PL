@@ -38,6 +38,9 @@ my $build = Module::Build->new(
         url  => 'https://github.com/davorg/symbol-approx-sub.git',
         web  => 'https://github.com/davorg/symbol-approx-sub',
       },
+      bugtracker => {
+        web  => 'https://github.com/davorg/symbol-approx-sub/issues',
+      },
     },
   },
 );

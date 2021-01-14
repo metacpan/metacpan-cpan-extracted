@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-11'; # DATE
+our $DATE = '2020-12-12'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 $secs_re = qr/[+-]?\d+(?:\.\d*)?/;
 $hms_re = qr/\d\d?:\d\d?:\d\d?(?:,\d\d\d)?/;
@@ -40,7 +40,7 @@ srtcalc - Convert H:M:S to number of seconds, and vice versa
 
 =head1 VERSION
 
-This document describes version 0.002 of srtcalc (from Perl distribution App-SubtitleUtils), released on 2020-12-11.
+This document describes version 0.003 of srtcalc (from Perl distribution App-SubtitleUtils), released on 2020-12-12.
 
 =head1 SYNOPSIS
 

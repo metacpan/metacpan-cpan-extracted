@@ -2,9 +2,13 @@
 
 =encoding utf8
 
-=for HTML <a href="https://travis-ci.org/briandfoy/object-iterate"><img src="https://travis-ci.org/briandfoy/object-iterate.svg?branch=master" /></a>
+=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
 
-=for HTML <a href='https://ci.appveyor.com/project/briandfoy/object-iterate'><img src='https://ci.appveyor.com/api/projects/status/13haowmvlhq996ec' /></a>
+=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+
+=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
+
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/object-iterate-1wuin'><img src='https://ci.appveyor.com/api/projects/status/cdloub9q4e43833x?svg=true' /></a>
 
 =for HTML <a href='https://coveralls.io/github/briandfoy/object-iterate?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/object-iterate/badge.svg?branch=master' alt='Coverage Status' /></a>
 
@@ -29,6 +33,8 @@ To read about L<Object::Iterate>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
 with L<perldoc|https://perldoc.perl.orgperldoc.html>:
 
+	% perl Makefile.PL
+	% make
 	% perldoc lib/Object/Iterate.pm
 
 If you have already installed the module, you can specify the module
@@ -102,7 +108,7 @@ They might not know the particulars of this module, but they can help
 you diagnose your problem.
 
 You might like to read L<brian's Guide to Solving Any Perl
-Problem|http://archive.oreilly.com/pub/a/perl/excerpts/9780596527242/brians-guide.html>.
+Problem|https://briandfoy.github.io/brians-guide-to-solving-any-perl-problem/>.
 
 =head2 Copyright and License
 

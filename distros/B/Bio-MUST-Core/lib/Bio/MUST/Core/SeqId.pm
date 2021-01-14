@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.203490';
+$Bio::MUST::Core::SeqId::VERSION = '0.210120';
 use Moose;
 use namespace::autoclean;
 
@@ -74,18 +74,22 @@ const my $FAMILY     => qr{ # underscore allowed
 }xms;
 
 const my $TAG        => qr{
-    [a-z]{1,4}              # 1-4 letter(s) (lowercase)
+    [a-z]{1,6}              # 1-6 letter(s) (lowercase)
 }xms;
+
+# TODO: add accessor methods to analyse this
+# this is feasible with a switch table with regexes to generate methods
+# return 0/1/undef
 
 # list of standard tags:
 #     c: contaminant
 #     d: divergent
 #     u: unknown taxonomy
-#     cp: encoded in plastid genome
-#     mt: encoded in mitochondrial genome
-#     nm: encoded in nucleomorph genome
-#     nucp: nuclear copy of plastid gene
-#     numt: nuclear copy of mitochondrial gene
+#     cpcpt [cp]: plastid-encoded-plastid-targeted
+#     nucpt: nuclear-encoded-and-plastid-targeted
+#     nuppct: nuclear-encoded-periplastid-compartment-targeted
+#     nm: nucleomorph-encoded
+#     mt: mitochondrion-encoded
 
 const my $GENUS      => qr{ # underscore and dash allowed
     [^\s@]+?                # single word without space, '@'
@@ -132,7 +136,7 @@ const my $GENUSONLY  => qr{
     \A                      # nothing before!
     (?:
     sspp | ssp | spp | sp   # either species (sp), species pluralis (spp),
-    )                       # subspecies (ssp) or subspecies pluralis (sspp)pa
+    )                       # subspecies (ssp) or subspecies pluralis (sspp)
     \.?                     # optionally followed by a dot
     \z                      # and nothing after!
 }xms;
@@ -200,8 +204,8 @@ const my @GENERA  => qw(
     A-2
     acetamiprid-degrading
     Activation-tagging
-    Adeno-Associated
     Adeno-associated
+    Adeno-Associated
     Aids-associated
     alk-system
     Altai-like
@@ -502,8 +506,8 @@ const my @GENERA  => qw(
     Cysteine-free
     Cytophaga-like
     DCM-degrading
-    deep-sea
     Deep-sea
+    deep-sea
     Deinococcus-like
     Deinococcus-Thermus
     Dendro-hypnum
@@ -666,6 +670,7 @@ const my @GENERA  => qw(
     manganese-oxidizing
     Marinobacter-like
     Mason-Pfizer
+    Massilia-like
     MAST-4
     Maus-Elberfeld
     Maverick-related
@@ -770,8 +775,8 @@ const my @GENERA  => qw(
     PCB-dechlorinating
     Pechuel-loeschea
     Peptococcus-like
-    perchlorate-reducing
     Perchlorate-reducing
+    perchlorate-reducing
     Perkinsela-like
     Perkinsiella-like
     pesticide-degrading
@@ -925,9 +930,11 @@ const my @GENERA  => qw(
     Stolbur-Rus
     Stripa-derived
     Stx1-converting
+    Stx1a-converting
     Stx2-converting
+    Stx2a-converting
+    Stx2d-converting
     sulfate-reducing
-    Sulfate-reducing
     sulfide-oxidizing
     sulfite-reducing
     sulfo-oxidizing
@@ -952,8 +959,8 @@ const my @GENERA  => qw(
     Thrips-associated
     Ti-curing
     Tick-associated
-    Tick-borne
     tick-borne
+    Tick-borne
     toluene-degrading
     Tombus-like
     Totivirus-like
@@ -5188,6 +5195,7 @@ const my @SPECIES => qw(
     MF_isolate_42
     MF_isolate_43
     MF_isolate_8
+    mink/NLD/2020/NT_4
     MPB_DPBA28
     MPB_DPFF10B
     MPB_DPFF1a
@@ -6674,7 +6682,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.203490
+version 0.210120
 
 =head1 SYNOPSIS
 

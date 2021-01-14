@@ -1,5 +1,17 @@
 Revision history for Bot::IRC::X::UriTitle
 
+1.04      2021-01-13 11:09:19-08:00 America/Los_Angeles
+        - Override some minimum version reqs in dist.ini
+
+1.03      2021-01-12 08:41:51-08:00 America/Los_Angeles
+        - Migrate to Test2::V0 and add exact
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+        - Update Travis YAML
+        - Adding Perl versions to test; annual general update for 2018
+
 1.02      2016-11-29 14:13:39-08:00 America/Los_Angeles
         - Properly handles URLs it cannot resolve to HTML/Titles
 

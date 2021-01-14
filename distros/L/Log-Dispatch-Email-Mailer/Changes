@@ -1,5 +1,18 @@
 Revision history for Log::Dispatch::Email::Mailer
 
+1.11      2021-01-13 11:12:24-08:00 America/Los_Angeles
+        - Override some minimum version reqs in dist.ini
+
+1.10      2021-01-13 06:22:15-08:00 America/Los_Angeles
+        - Patch to fix missing parent dependency
+
+1.09      2021-01-11 09:04:55-08:00 America/Los_Angeles
+        - Migrate to Test2::V0 and add exact
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.08      2020-09-16 10:26:57-07:00 America/Los_Angeles
         - Improve tests to handle header changes from dependencies
 

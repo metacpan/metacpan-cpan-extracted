@@ -16,7 +16,7 @@ my @FIELDS   = qw( id type description state last_update time_zone );
 my @INTERNAL = qw( _factory );
 __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 
-$Workflow::VERSION = '1.48';
+$Workflow::VERSION = '1.49';
 
 use constant NO_CHANGE_VALUE => 'NOCHANGE';
 
@@ -134,15 +134,14 @@ sub execute_action {
         croak $error;
     }
 
+    # clear condition cache on state change
+    delete $self->{'_condition_result_cache'};
     $self->notify_observers( 'execute', $old_state, $action_name, $autorun );
 
     my $new_state_obj = $self->_get_workflow_state;
     if ( $old_state ne $new_state ) {
         $self->notify_observers( 'state change', $old_state, $action_name,
             $autorun );
-
-        # clear condition cache on state change
-        $new_state_obj->clear_condition_cache();
     }
 
     if ( $new_state_obj->autorun ) {
@@ -362,7 +361,6 @@ __END__
 [![CPAN version](https://badge.fury.io/pl/Workflow.svg)](http://badge.fury.io/pl/Workflow)
 [![Build Status](https://travis-ci.org/jonasbn/perl-workflow.svg?branch=master)](https://travis-ci.org/jonasbn/perl-workflow)
 [![Coverage Status](https://coveralls.io/repos/github/jonasbn/perl-workflow/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/perl-workflow?branch=master)
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.svg)](https://gitter.im/perl-workflow)
 
 =end markdown
 
@@ -372,7 +370,7 @@ Workflow - Simple, flexible system to implement workflows
 
 =head1 VERSION
 
-This documentation describes version 0.15 of Workflow
+This documentation describes version 1.49 of Workflow
 
 =head1 SYNOPSIS
 
@@ -1156,6 +1154,8 @@ to L<Workflow::Config>, for implementation details.
 
 =item L<File::Slurp>
 
+=item L<Data::UUID>
+
 =back
 
 =head2 DEPENDENCIES FOR THE EXAMPLE APPLICATION
@@ -1234,24 +1234,17 @@ L<http://www.cpantesters.org/cpan/report/fc85ca1c-e46e-11e2-891c-ff8a40f4ab3d>
 
 =head1 BUGS AND LIMITATIONS
 
-Known bugs and limitations can be seen in RT:
+Known bugs and limitations can be seen in the Github issue tracker:
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Workflow>
+L<https://github.com/jonasbn/perl-workflow/issues>
 
 =head1 BUG REPORTING
 
-Bug reporting should be done either via Request Tracker (RT)
+Bug reporting should be done either via Github issues
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Workflow>
+L<https://github.com/jonasbn/perl-workflow/issues>
 
-Or via email
-
-C<bug-test-timer at rt.cpan.org>
-
-A list of currently known issues can be seen via examining the RT queue for
-Workflow.
-
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Workflow>
+A list of currently known issues can be seen via the same URL.
 
 =head1 TEST
 
@@ -1357,48 +1350,21 @@ downloaded from the central repository.
 
 =head1 PROJECT
 
-The Workflow project is currently hosted with SourceForge.net and is listed on
-Ohloh.
+The Workflow project is currently hosted on GitHub
 
 =over
 
-=item SF.net: L<http://perl-workflow.sf.net>
-
-=item Ohloh: L<https://www.ohloh.net/p/perl-Workflow>
+=item GitHub: L<htts://github.com/jonasbn/perl-workflow>
 
 =back
 
 =head2 REPOSITORY
 
-The code is kept under revision control using Subversion:
+The code is kept under revision control using Git:
 
 =over
 
-=item L<https://perl-workflow.svn.sourceforge.net/svnroot/perl-workflow>
-
-=back
-
-=head2 MAILING LIST
-
-The Workflow project has a mailing list for discussion of issues and
-development. The list is low-traffic.
-
-=over
-
-=item L<http://sourceforge.net/mail/?group_id=177533> (including archive)
-
-=back
-
-=head2 RSS FEEDS
-
-=over
-
-=item Commit log L<http://rss.gmane.org/messages/excerpts/gmane.comp.lang.perl.modules.workflow.scm>
-
-=item Ohloh news L<https://www.ohloh.net/p/perl-Workflow/messages.rss>
-
-=item CPAN testers reports L<http://cpantesters.perl.org/show/Workflow.rss> in matrix:
-
+=item L<https://github.com/jonasbn/perl-workflow/tree/master/>
 
 =back
 
@@ -1406,17 +1372,13 @@ development. The list is low-traffic.
 
 =over
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Workflow>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Workflow>
 
-=item * Search CPAN
+=item * MetaCPAN
 
-L<http://search.cpan.org/dist/Workflow>
+L<https://metacpan.org/release/Workflow>
 
 =back
 
@@ -1430,9 +1392,6 @@ L<http://www.slideshare.net/jonasbn/workflow-npw2010>
 
 =item * August 2010 talk 'Workflow' given at YAPC::Europe 2010 in Pisa, Italy by jonasbn
 L<http://www.slideshare.net/jonasbn/workflow-yapceu2010>
-
-=item * October 2004 talk 'Workflows in Perl' given to
-pgh.pm by Chris Winters: L<http://www.cwinters.com/pdf/workflow_pgh_pm.pdf>
 
 =back
 
@@ -1448,17 +1407,17 @@ it under the same terms as Perl itself.
 
 =encoding utf8
 
-Jonas B. Nielsen (jonasbn) E<lt>jonasbn@cpan.orgE<gt>, current maintainer.
+Jonas B. (jonasbn) E<lt>jonasbn@cpan.orgE<gt>, current maintainer.
 
 Chris Winters E<lt>chris@cwinters.comE<gt>, original author.
 
 The following folks have also helped out (listed here in no particular order):
 
-Bug report from Petr Pisar resulted in release 1.48
+Several PRs (13 to be exact) from Erik Huelsmann resulting in release 1.49
+
+Bug report from Petr Pisar resulted in release 1.49
 
 Bug report from Tina Müller (tinita) resulted in release 1.47
-
-Patch from Oliver Welter resulting in release 1.46
 
 Bug report from Slaven Rezić resulting in maintenance release 1.45
 
@@ -1474,7 +1433,8 @@ Changes file: 1.35
 
 Oliver Welter, patch implementing custom workflows, see Changes file: 1.35 and
 patch related to this in 1.37 and factory subclassing also in 1.35. Improvements
-in logging for condition validation in 1.43 and 1.44
+in logging for condition validation in 1.43 and 1.44 and again a patch resulting
+in release 1.46
 
 Steven van der Vegt, patch for autorun in initial state and improved exception
 handling for validators, see Changes file: 1.34_1

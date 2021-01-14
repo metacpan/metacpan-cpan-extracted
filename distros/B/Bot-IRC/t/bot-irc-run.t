@@ -1,28 +1,23 @@
-use strict;
-use warnings;
-
-use Test::Most;
-use Test::MockModule;
+use Test2::V0;
 use Test::Output;
+use Bot::IRC;
 
-my $socket = Test::MockModule->new('IO::Socket::IP');
-$socket->mock( new => sub {
-    return bless( {}, shift );
-} );
-$socket->mock( print => sub {} );
+my $socket = mock 'IO::Socket::IP' => (
+    override => [
+        new   => sub { return bless( {}, shift ) },
+        print => sub {},
+    ],
+);
 
-my $device = Test::MockModule->new('Daemon::Device');
-$device->mock( new => sub {
-    return bless( {}, shift );
-} );
-$device->mock( run => sub {} );
-$device->mock( ppid => sub { return 42 } );
-$device->mock( children => sub { return [ 1024, 1138 ] } );
-$device->mock( message => sub {} );
-
-use constant MODULE => 'Bot::IRC';
-
-BEGIN { use_ok(MODULE); }
+my $device = mock 'Daemon::Device' => (
+    override => [
+        new      => sub { return bless( {}, shift ) },
+        run      => sub {},
+        ppid     => sub { return 42 },
+        children => sub { return [ 1024, 1138 ] },
+        message  => sub {},
+    ],
+);
 
 my $settings = {
     spawn  => 3,
@@ -45,11 +40,11 @@ my $settings = {
 };
 
 my $bot;
-lives_ok( sub { $bot = MODULE->new(
+ok( lives { $bot = Bot::IRC->new(
     %$settings,
-) }, MODULE . '->new(@config)' );
+) }, 'Bot::IRC->new(@config)' ) or note $@;
 
-lives_ok( sub { $bot->run }, MODULE . '->run' );
+ok( lives { $bot->run }, 'Bot::IRC->run' ) or note $@;
 
 stdout_like(
     sub { $bot->say( qw( line0 line1 ) ) },
@@ -63,8 +58,8 @@ stdout_like(
     '$bot->msg',
 );
 
-warning_like(
-    sub { $bot->reply('Message.') },
+like(
+    warning { $bot->reply('Message.') },
     qr/Didn't have a target to send reply to/,
     '$bot->reply without forum',
 );

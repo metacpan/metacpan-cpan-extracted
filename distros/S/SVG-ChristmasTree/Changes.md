@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.0.5] - 2021-01-12
+
+### Added
+
+- Added bugtracker info to metadata
+- Added GitHub Actions CI
+
 ## [0.0.4] - 2018-12-04
 
 ### Fixed

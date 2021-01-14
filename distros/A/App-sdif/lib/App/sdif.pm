@@ -7,7 +7,7 @@ our @EXPORT      = qw(usage);
 our %EXPORT_TAGS = ();
 our @EXPORT_OK   = qw();
 
-our $VERSION = "4.18.1";
+our $VERSION = "4.18.2";
 
 use Pod::Usage;
 
@@ -95,16 +95,16 @@ L<sdif>, L<cdif>, L<watchdiff>
 
 L<Getopt::EX>
 
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
 =head1 LICENSE
 
 Copyright 1992- Kazumasa Utashiro.
 
 These commands and libraries are free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
-
-=head1 AUTHOR
-
-Kazumasa Utashiro
 
 =cut
 

@@ -2,7 +2,7 @@ package Audio::TinySoundFont::Preset;
 
 use v5.14;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use autodie;
 use Carp;

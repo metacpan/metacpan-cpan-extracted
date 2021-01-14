@@ -73,7 +73,7 @@ ok(MyClass->does('MyRole'), 'class does role');
 ok(!MyClass->does('IntermediaryRole'), 'class does not do non-applied role');
 ok(!MyClass->does('Random'), 'class does not do non-role');
 
-like try_apply_to(bless {}, 'MyClass'), qr/This is apply_role_to_package/,
+like try_apply_to(bless {}, 'MyClass'), qr/\ACan't apply roles to object/,
   'error apply_role_to_package on object';
 
 like(try_apply_to('NoMethods'), qr/req1, req2/, 'error for both methods');
@@ -98,7 +98,7 @@ is(ExtraClass->baz, 'class baz', 'method from class');
 
 my $new_class;
 eval {
-    $new_class = Role::Tiny->create_class_with_roles('MyClass', 'ExtraRole');
+  $new_class = Role::Tiny->create_class_with_roles('MyClass', 'ExtraRole');
 } or $@ ||= "false exception!";
 is $@, '', 'No errors creating class with roles';
 

@@ -13,7 +13,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.3.0";
+our $VERSION = "v6.4.1";
 
 1;
 __END__
@@ -35,7 +35,7 @@ RxPerl - an implementation of Reactive Extensions / rxjs for Perl
 
     # ..and then (if installed RxPerl::Mojo, for example):
 
-    use RxPerl::Mojo 'rx_interval', 'op_take';
+    use RxPerl::Mojo 'rx_interval', 'op_take'; # or ':all'
     use Mojo::IOLoop;
 
     rx_interval(1.4)->pipe(
@@ -753,6 +753,26 @@ L<http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-meth
         op_map(sub {2 * $_[0]}),
     )->subscribe(...)
 
+=item any of the pipeable operators
+
+Apart from passing pipeable operators as arguments to an observable's pipe method, another way to use such operators
+is as direct methods on the observable object itself. Remember to remove their C<op_> prefix first.
+
+    # Instead of:
+    my $o = of(1, 2, 3, 4, 5, 6, 7, 8, 9)->pipe(
+        op_filter(sub { $_[0] % 2 == 1 }),
+        op_map(sub { $_[0] * 10 }),
+        op_take(3),
+    );
+
+    # you could also write:
+    my $o = of(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        ->filter(sub { $_[0] % 2 == 1 })
+        ->map(sub { $_[0] * 10 })
+        ->take(3);
+
+Note that this way of calling pipeable operators is B<EXPERIMENTAL> and subject to change or withdrawal if rxjs in
+one of its future versions implements an observable method whose name clashes with a pipeable operator.
 
 =back
 

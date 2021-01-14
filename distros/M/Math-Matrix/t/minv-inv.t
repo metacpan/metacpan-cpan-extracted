@@ -18,6 +18,11 @@ note('minv()');
     my $y = $x -> minv();
 
     is(ref($y), 'Math::Matrix', '$y is a Math::Matrix');
+
+    # Avoid negative zero in the output.
+
+    $y = $y -> sapply(sub { $_[0] == 0 ? abs($_[0]) : $_[0] });
+
     is_deeply([ @$y ], [[ -2.6875,       2,    -1.5, -2.1875,  -0.625 ],
                         [  -0.375,       0,    -0.5,  -0.375,    0.25 ],
                         [  -1.375,       1,      -1,  -1.375,   -0.25 ],
@@ -53,6 +58,11 @@ note('inv()');
     my $y = $x -> inv();
 
     is(ref($y), 'Math::Matrix', '$y is a Math::Matrix');
+
+    # Avoid negative zero in the output.
+
+    $y = $y -> sapply(sub { $_[0] == 0 ? abs($_[0]) : $_[0] });
+
     is_deeply([ @$y ], [[ -2.6875,       2,    -1.5, -2.1875,  -0.625 ],
                         [  -0.375,       0,    -0.5,  -0.375,    0.25 ],
                         [  -1.375,       1,      -1,  -1.375,   -0.25 ],

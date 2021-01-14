@@ -1,5 +1,11 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.52 2021-01-14
+
+ - Support \looseness in TeX magic comments
+ - Add --sl-pdf switch to muse-compile.pl (alias for --slides)
+ - Add warning if fontspec couldn't be loaded
+
 1.51 2020-09-19
 
  - Fix interaction between headings and indexes

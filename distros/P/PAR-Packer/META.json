@@ -69,7 +69,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Dist/Display.html?Queue=PAR-Packer"
+         "web" : "https://github.com/rschupp/PAR-Packer/issues"
       },
       "repository" : {
          "type" : "git",
@@ -78,6 +78,6 @@
       },
       "x_MailingList" : "mailto:par@perl.org"
    },
-   "version" : "1.051",
+   "version" : "1.052",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

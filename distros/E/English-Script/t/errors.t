@@ -1,14 +1,11 @@
-use strict;
-use warnings;
-use Test::Most;
-
-use_ok('English::Script');
+use Test2::V0;
+use English::Script;
 
 my $es;
-lives_ok( sub { $es = English::Script->new }, 'new' );
+ok( lives { $es = English::Script->new }, 'new' ) or note $@;
 
-throws_ok(
-    sub { $es->parse('This isn\'t a valid sentence.') },
+like(
+    dies { $es->parse('This isn\'t a valid sentence.') },
     qr/^Failed to parse input/,
     'bad sentence throws exception',
 );

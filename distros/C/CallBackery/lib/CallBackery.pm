@@ -34,7 +34,7 @@ use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 use CallBackery::User;
 
-our $VERSION = '0.35.1';
+our $VERSION = '0.35.2';
 use Mojo::Base 'Mojolicious';
 
 =head2 config
@@ -177,8 +177,8 @@ sub startup {
         )->slurp,
     });
 
-    $routes->route('/upload')->to(namespace => $app->rpcServiceNamespace, controller=>$app->rpcServiceController, action => 'handleUpload');
-    $routes->route('/download')->to(namespace => $app->rpcServiceNamespace, controller=>$app->rpcServiceController, action => 'handleDownload');
+    $routes->any('/upload')->to(namespace => $app->rpcServiceNamespace, controller=>$app->rpcServiceController, action => 'handleUpload');
+    $routes->any('/download')->to(namespace => $app->rpcServiceNamespace, controller=>$app->rpcServiceController, action => 'handleDownload');
 
     # this is a dummy login screen, we use inside an iframe to trick the browser
     # into storing our password for auto-fill. Since there is no standard for triggering the

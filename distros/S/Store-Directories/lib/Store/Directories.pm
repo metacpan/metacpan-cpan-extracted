@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.3';
 
 =head1 NAME
 
@@ -177,10 +177,11 @@ C<OPTIONS> is a hashref that can contain the following options:
 A subroutine used to initialize the directory in the event that it gets
 created (although if the directory already exists when C<get_or_add> is called,
 this won't be called). This is called with the absolute path to the directory
-as the first, and only argument, and an exclusive lock is active on the
-directory for the duration of the function. If the function dies, then the
-entire call to C<get_or_add> will croak and the directory will not be created.
-If this isn't specified, an empty directory is created. (B<default:> undef)
+as the first arguemnt and the key name as the second argument.
+An exclusive lock is active on the directory for the duration of the function.
+If the function dies, then the entire call to C<get_or_add> will croak and the
+directory will not be created. If this isn't specified, an empty directory
+is created. (B<default:> undef)
 
 =item * B<lock_sh> I<(scalar ref)>
 
@@ -237,12 +238,14 @@ sub get_or_add {
     }
     else { $lockmode = UN }
 
-    # The __LISTING__ lock ensures that directories cannot be added or removed
-    # while we're wokring.
-    my $listing_lock = $self->lock_ex('__LISTING__');
+    my $dbh = $self->_new_connection;
+
+    my $listing_lock;
+    if (Store::Directories::Lock::_get_lock_mode($dbh, '__LISTING__') != EX) {
+        $listing_lock = $self->lock_ex('__LISTING__');
+    }
 
     # Get directory if it exists
-    my $dbh = $self->_new_connection;
     my $sth = $dbh->prepare("SELECT dir FROM entry WHERE slug = ?");
     $sth->execute($key) or  croak "Failed to fetch entries: ".$dbh->errstr;
     my $entry = $sth->fetch;
@@ -252,7 +255,7 @@ sub get_or_add {
     if ($entry) {
         # Create a lock if the user requested one
         if ($lockmode) {
-            $listing_lock->DESTROY;
+            $listing_lock->DESTROY if $listing_lock;
             $$lockref = Store::Directories::Lock->new($self, $key, $lockmode);
         }
         return catfile($self->{dir}, $entry->[0]);
@@ -274,14 +277,14 @@ sub get_or_add {
             $lock = Store::Directories::Lock->_new_raw($self, $key, $$, EX);
         }
     });
-    $listing_lock->DESTROY;
+    $listing_lock->DESTROY if $listing_lock;
 
     # Use init function to create directory contents;
     if ($opts->{init}) {
         eval {
             use sigtrap qw(die normal-signals);
             die "'init' must be a subroutine ref" unless ref $opts->{init} eq 'CODE';
-            $opts->{init}->($dir);
+            $opts->{init}->($dir, $key);
             1;
         } or do {
             # Cleanup if callback failed
@@ -364,7 +367,10 @@ sub remove {
     my ($self, $key, $callback) = @_;
     my $dbh = $self->_new_connection;
 
-    my $listing_lock = $self->lock_ex('__LISTING__');
+    my $listing_lock;
+    if (Store::Directories::Lock::_get_lock_mode($dbh, '__LISTING__') != EX) {
+        $listing_lock = $self->lock_ex('__LISTING__');
+    }
 
     # First check that the directory exists
     my $sth = $dbh->prepare("SELECT dir FROM entry WHERE slug = ?");
@@ -389,7 +395,7 @@ sub remove {
 
     # Remove from database
     $self->_remove_directory_from_db($dbh, $key);
-    $listing_lock->DESTROY;
+    $listing_lock->DESTROY if $listing_lock;
 
     # Attempt to remove directory from disk
     eval {
@@ -455,7 +461,132 @@ END
     return \%entries;
 }
 
+=item * B<get_in_dir> I<KEY>, I<SUB> I<[INIT]>
+
+Get a shared lock for the directory with key, C<KEY>, then execute the
+subroutine reference, C<SUB> (calling with the absolute path to the directory
+as the first argument and the key as the second argument).
+Returns whatever C<SUB> returns. Essentially, this is just a convenient
+shortcut for something like this:
+
+    my $dir  = $store->get_or_add('foo');
+    my $lock = $store->lock_sh('foo');
+    my $val = do_whatever($dir, 'foo');
+
+    # shortcut
+    my $val = $store->get_in_dir('foo', \&do_whatever);
+
+Naturally, your C<SUB> subroutine shouldn't modify the contents of the
+directory or else you'll be violating the trust that L<Store::Directories>
+(and other processes!) place in you.
+
+The optional C<INIT> argument is a subroutine used to initialize the directory
+in the event it doesn't yet exist when this is called. (Same semantics as the
+C<init> option to C<get_or_add>).
+=cut
+sub get_in_dir {
+    my ($self, $key, $sub, $init) = @_;
+
+    croak "'SUB' must be a subroutine ref." unless (ref $sub eq 'CODE');
+
+    my $lock;
+    return $sub->( $self->get_or_add(
+        $key, {init=>$init,lock_sh=>\$lock}
+    ), $key );
+}
+
+=item * B<run_in_dir> I<KEY>, I<SUB> I<[INIT]>
+
+Get an exclusive lock for the directory with key, C<KEY>, then execute the
+subroutine reference, C<SUB> (calling with the absolute path to the directory
+as the first argument and the key as the second argument). Returns whatever
+C<SUB> returns. Essentially, this is just a convenient shortcut for
+something like this:
+
+    my $dir  = $store->get_or_add('foo');
+    my $lock = $store->lock_ex('foo');
+    my $val = do_whatever($dir, 'foo');
+
+    # shortcut
+    my $val = $store->run_in_dir('foo', \&do_whatever);
+
+Unlike C<get_in_dir>, your C<SUB> subroutine is allowed to modify (or even
+delete!) the directory and its contents.
+
+The optional C<INIT> argument is a subroutine used to initialize the directory
+in the event it doesn't yet exist when this is called. (Same semantics as the
+C<init> option to C<get_or_add>).
+=cut
+sub run_in_dir {
+    my ($self, $key, $sub, $init) = @_;
+
+    croak "'SUB' must be a subroutine ref." unless (ref $sub eq 'CODE');
+
+    my $lock;
+    return $sub->( $self->get_or_add(
+        $key, {init=>$init,lock_ex=>\$lock}
+    ), $key );
+}
+
+=item * B<get_or_set> I<KEY>, I<GET>, I<SET> I<[INIT]>
+
+A combination of C<get_in_dir> and C<run_in_dir>. C<GET> and C<SET> are
+subroutine references. For the directory with key, C<KEY>, runs the C<GET>
+subroutine under a shared lock and returns whatever it returns. But if C<GET>
+returns C<undef>, then it will call C<SET> under an exclusive lock before
+trying C<GET> again. (If it returns C<undef> this time, then this method
+will just return C<undef>).
+
+Both subroutines are called with the absolute path to the directory as the
+first argument, and the key as the second argument.
+If any of them die, then this entire function will croak.
+
+This is useful when you have multiple processes that may want to perform some
+operation in the same directory, but you want to make sure that operation is
+only performed once. C<GET> can be made to return undef if it detects the
+operation has not been done yet, while C<SET> performs the operation.
+
+Be aware that C<GET> may actually get called up to three times. First, under
+the shared lock. And, if it returns C<undef>, then it will be called again
+immediately after upgrading to an exclusive lock (in case another process got
+to the exclusive lock first and already called C<SET> for us). If that's still
+C<undef>, then it will be called a third and final time.
+
+The optional C<INIT> argument is a subroutine used to initialize the directory
+in the event it doesn't yet exist when this is called. (Same semantics as the
+C<init> option to C<get_or_add>).
+=cut
+sub get_or_set {
+    my ($self, $key, $get, $set, $init) = @_;
+
+    croak "'GET' must be a subroutine ref." unless (ref $get eq 'CODE');
+    croak "'SET' must be a subroutine ref." unless (ref $set eq 'CODE');
+
+    my $sh;
+    my $dir = $self->get_or_add( $key, {init=>$init,lock_sh=>\$sh} );
+
+
+    my $retval = $get->($dir, $key);
+    return $retval if defined $retval;
+
+    # GET failed, so we need to call SET
+
+    # Get an exclusive lock
+    $sh->DESTROY;
+    my $ex = $self->lock_ex($key);
+
+    # It's possible that another process beat us to the exclusive lock
+    # and just called SET for us, so we need to check GET again
+    $retval = $get->($dir, $key);
+    return $retval if defined $retval;
+
+    # Looks like *we're* the ones who're going to have to call SET after all
+    $set->($dir, $key);
+    return $get->($dir, $key);
+}
+
 =back
+
 
 =cut
 

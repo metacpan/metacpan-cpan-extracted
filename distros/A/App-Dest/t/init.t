@@ -1,8 +1,11 @@
-use Test::Most;
+use Test2::V0;
+
+use exact;
 use File::Basename 'dirname';
 use File::Path 'rmtree';
 use Test::Output;
-use Try::Tiny;
+
+use App::Dest;
 
 sub set_state {
     chdir( dirname($0) . '/init' );
@@ -11,9 +14,8 @@ sub set_state {
     print $out "actions\n";
     close $out;
 }
-set_state();
+set_state;
 
-use_ok('App::Dest');
 
 stderr_is(
     sub { App::Dest->init },
@@ -42,9 +44,9 @@ stderr_is( sub {
     };
 }, "Directory actions already added\n", 'no re-add actions' );
 
-lives_ok( sub { App::Dest->rm('actions') }, 'rm actions' );
+ok( lives { App::Dest->rm('actions') }, 'rm actions' ) or note $@;
 stdout_is( sub { App::Dest->watches }, '', 'watches (no results)' );
-lives_ok( sub { App::Dest->add('actions') }, 'add actions' );
+ok( lives { App::Dest->add('actions') }, 'add actions' ) or note $@;
 
 stderr_is( sub {
     try {
@@ -56,14 +58,14 @@ stderr_is( sub {
 }, "Directory specified does not exist\n", 'no add not exists' );
 
 stdout_is( sub { App::Dest->watches }, "actions\n", 'watches (results)' );
-lives_ok( sub { App::Dest->putwatch('dest.watch2') }, 'putwatch' );
+ok( lives { App::Dest->putwatch('dest.watch2') }, 'putwatch' ) or note $@;
 stdout_is( sub { App::Dest->watches }, "actions\nactions2\n", 'watches (results) 2' );
-lives_ok( sub { App::Dest->writewatch }, 'writewatch' );
+ok( lives { App::Dest->writewatch }, 'writewatch' ) or note $@;
 
 open( my $in, '<', 'dest.watch' );
 is( join( '', <$in> ), "actions\nactions2\n", 'new dest.watch is correct' );
 
 stdout_like( sub { App::Dest->version }, qr/^dest version [\d\.]+$/, 'version' );
 
-set_state();
-done_testing();
+set_state;
+done_testing;

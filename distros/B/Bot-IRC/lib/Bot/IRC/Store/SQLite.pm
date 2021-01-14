@@ -1,16 +1,14 @@
 package Bot::IRC::Store::SQLite;
 # ABSTRACT: Bot::IRC persistent data storage with SQLite
 
-use 5.012;
-use strict;
-use warnings;
+use 5.014;
+use exact;
 
 use DBI;
 use DBD::SQLite;
 use JSON::XS;
-use Try::Tiny;
 
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -106,7 +104,7 @@ Bot::IRC::Store::SQLite - Bot::IRC persistent data storage with SQLite
 
 =head1 VERSION
 
-version 1.27
+version 1.32
 
 =head1 SYNOPSIS
 
@@ -150,9 +148,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gryphon Shafer.
+This software is Copyright (c) 2016-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

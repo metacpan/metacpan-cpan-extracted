@@ -2,8 +2,8 @@ NAME
     App::dateseq - Generate a sequence of dates
 
 VERSION
-    This document describes version 0.100 of App::dateseq (from Perl
-    distribution App-dateseq), released on 2020-04-30.
+    This document describes version 0.101 of App::dateseq (from Perl
+    distribution App-dateseq), released on 2021-01-04.
 
 FUNCTIONS
   dateseq
@@ -120,7 +120,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq>
+    <https://github.com/perlancar/perl-App-dateseq/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -129,7 +129,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2016, 2015 by
+    This software is copyright (c) 2021, 2020, 2019, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

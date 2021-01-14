@@ -1,14 +1,10 @@
 package Tie::Timely;
 use strict;
 
-use Carp qw(croak);
-
-our $VERSION = '1.022';
+our $VERSION = '1.023';
 
 sub TIESCALAR {
-	my $class      = shift;
-	my $value      = shift;
-	my $lifetime   = shift;
+	my( $class, $value, $lifetime ) = @_;
 
 	my $self = bless [ undef, $lifetime, time ], $class;
 
@@ -63,7 +59,7 @@ brian d foy, C<< <brian.d.foy@gmail.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2005-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2005-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

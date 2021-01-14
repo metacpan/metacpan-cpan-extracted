@@ -18,7 +18,7 @@ use File::Copy;
 use File::Temp qw(tempdir);
 use File::Slurp qw( read_file write_file);
 
-my $Class1 = 'Archive::BagIt::Base';
+my $Class1 = 'Archive::BagIt';
 use_ok($Class1);
 my $Class2 = 'Archive::BagIt::Fast';
 use_ok($Class2);
@@ -64,14 +64,14 @@ foreach my $prefix (@prefix_manifestfiles) {
         _prepare_bag($bag_dir);
         SKIP: {
             skip "skipped because testbag could not created", 1 unless -d $bag_dir;
-            my $bag_ok = Archive::BagIt::Base->make_bag($bag_dir);
-            isa_ok($bag_ok, 'Archive::BagIt::Base', "create new valid IE bagit");
+            my $bag_ok = Archive::BagIt->make_bag($bag_dir);
+            isa_ok($bag_ok, 'Archive::BagIt', "create new valid IE bagit");
             ok($bag_ok->verify_bag(), "check if bag is verified correctly");
-            my $bag_ok2 = Archive::BagIt::Base->make_bag("$bag_dir/"); #add slash at end of $bag_dir
-            isa_ok($bag_ok2, 'Archive::BagIt::Base', "create new valid IE bagit (with slash)");
+            my $bag_ok2 = Archive::BagIt->make_bag("$bag_dir/"); #add slash at end of $bag_dir
+            isa_ok($bag_ok2, 'Archive::BagIt', "create new valid IE bagit (with slash)");
             ok($bag_ok2->verify_bag(), "check if bag is verified correctly (with slash)");
             _modify_bag("$bag_dir/$prefix-$alg.txt");
-            my $bag_invalid1 = new_ok("Archive::BagIt::Base" => [ bag_path => $bag_dir ]);
+            my $bag_invalid1 = new_ok("Archive::BagIt" => [ bag_path => $bag_dir ]);
             my $bag_invalid2 = new_ok("Archive::BagIt::Fast" => [ bag_path => $bag_dir ]);
 
             throws_ok(
@@ -88,7 +88,7 @@ foreach my $prefix (@prefix_manifestfiles) {
                 }, qr{bag verify for bagit version '1.0' failed with invalid files}, "check if bag fails verification of broken $prefix-$alg.txt (all errors)");
 
 
-            my $bag_invalid3 = new_ok("Archive::BagIt::Base" => [ bag_path => $bag_dir ]);
+            my $bag_invalid3 = new_ok("Archive::BagIt" => [ bag_path => $bag_dir ]);
             throws_ok(
                 sub {
                     $bag_invalid3->verify_bag()
@@ -108,15 +108,15 @@ foreach my $prefix (@prefix_manifestfiles) {
     _prepare_bag($bag_dir);
     SKIP: {
         skip "skipped because testbag could not created", 1 unless -d $bag_dir;
-        my $bag_ok = Archive::BagIt::Base->make_bag($bag_dir);
-        isa_ok($bag_ok, 'Archive::BagIt::Base', "create new valid IE bagit");
+        my $bag_ok = Archive::BagIt->make_bag($bag_dir);
+        isa_ok($bag_ok, 'Archive::BagIt', "create new valid IE bagit");
         ok($bag_ok->verify_bag(), "check if bag is verified correctly");
         write_file("$bag_dir/data/payload1.txt", "PAYLOAD_MODIFIED1");
         # write_file("$bag_dir/data/payload2.txt", "PAYLOAD2" );
         write_file("$bag_dir/data/payload3.txt", "PAYLOAD3_MODIFIED3");
         _modify_bag("$bag_dir/tagmanifest-sha512.txt");
         _modify_bag("$bag_dir/tagmanifest-md5.txt");
-        my $bag_invalid1 = new_ok("Archive::BagIt::Base" => [ bag_path => $bag_dir ]);
+        my $bag_invalid1 = new_ok("Archive::BagIt" => [ bag_path => $bag_dir ]);
         throws_ok(
             sub {
                 $bag_invalid1->verify_bag()
@@ -124,7 +124,7 @@ foreach my $prefix (@prefix_manifestfiles) {
             qr{file.*'data/payload1.txt'.* invalid, digest.*'}s,
             "check if bag fails verification of broken fixity for payload (all errors)"
         );
-        my $bag_invalid2 = new_ok("Archive::BagIt::Base" => [ bag_path => $bag_dir ]);
+        my $bag_invalid2 = new_ok("Archive::BagIt" => [ bag_path => $bag_dir ]);
         throws_ok(
             sub {
                 $bag_invalid2->verify_bag(
@@ -199,14 +199,14 @@ foreach my $prefix (@prefix_manifestfiles) {
         my $bagdir = $entry->[0];
         my $descr = $bagdir; $descr =~ s|../bagit_conformance_suite/||;
         my $expected = $entry->[1];
-        my $bag = new_ok ("Archive::BagIt::Base" => [ bag_path => $bagdir ]);
+        my $bag = new_ok ("Archive::BagIt" => [ bag_path => $bagdir ]);
         throws_ok(sub{ $bag->verify_bag();}, $expected, "conformance v0.97, fail: $descr");
     }
     foreach my $entry ( @should_pass_bags_097) {
         my $bagdir = $entry->[0];
         my $descr = $bagdir; $descr =~ s|../bagit_conformance_suite/||;
         my $expected = $entry->[1];
-        my $bag = new_ok ("Archive::BagIt::Base" => [ bag_path => $bagdir ]);
+        my $bag = new_ok ("Archive::BagIt" => [ bag_path => $bagdir ]);
         ok(sub{ $bag->verify_bag();}, "conformance v0.97, pass: $descr");
     }
 
@@ -215,7 +215,7 @@ foreach my $prefix (@prefix_manifestfiles) {
         my $bagdir = $entry->[0];
         my $descr = $bagdir; $descr =~ s|../bagit_conformance_suite/||;
         my $expected = $entry->[1];
-        my $bag = new_ok ("Archive::BagIt::Base" => [ bag_path => $bagdir ]);
+        my $bag = new_ok ("Archive::BagIt" => [ bag_path => $bagdir ]);
         throws_ok(sub{ $bag->verify_bag();}, $expected, "conformance v1.0, fail: $descr");
     }
     foreach my $entry ( @should_pass_bags_100) {
@@ -223,15 +223,15 @@ foreach my $prefix (@prefix_manifestfiles) {
         my $descr = $bagdir; $descr =~ s|../bagit_conformance_suite/||;
         my $expected = $entry->[1];
 
-        my $bag = new_ok ("Archive::BagIt::Base" => [ bag_path => $bagdir ]);
+        my $bag = new_ok ("Archive::BagIt" => [ bag_path => $bagdir ]);
         ok(sub{ $bag->verify_bag();}, "conformance v1.0, pass: $descr");
     }
 
     { # check if payload oxum is verified correctly
         my $bag_dir = File::Temp::tempdir(CLEANUP => 1);
         _prepare_bag($bag_dir);
-        my $bag_ok = Archive::BagIt::Base->make_bag($bag_dir);
-        isa_ok($bag_ok, 'Archive::BagIt::Base', "create new valid IE bagit");
+        my $bag_ok = Archive::BagIt->make_bag($bag_dir);
+        isa_ok($bag_ok, 'Archive::BagIt', "create new valid IE bagit");
         ok($bag_ok->verify_bag(), "check if bag is verified correctly");
         # modify payload oxum
         my $bif = File::Spec->catfile($bag_dir, "bag-info.txt");
@@ -239,11 +239,11 @@ foreach my $prefix (@prefix_manifestfiles) {
         $bi =~ s/Payload-Oxum: .*/Payload-Oxum: 0.0/;
         write_file($bif, $bi);
         # also modify tagmanifest files to be valid
-        my $bag = Archive::BagIt::Base->new( $bag_dir);
+        my $bag = Archive::BagIt->new( $bag_dir);
         foreach my $algorithm ( keys %{ $bag->manifests }) {
             ok($bag->manifests->{$algorithm}->create_tagmanifest(), "rewrite tagmanifests for $algorithm");
         }
-        my $bag_invalid = Archive::BagIt::Base->new( $bag_dir);
+        my $bag_invalid = Archive::BagIt->new( $bag_dir);
         throws_ok(
             sub {
                 $bag_invalid->verify_bag(

@@ -1,6 +1,13 @@
 Changelog for Test-DB
 
-0.06 2020-08-13T12:06:42
+0.07 2021-01-14T06:57:39
+ - Add release updates
+ - Improve usage documentation (#28)
+ - Support for DB URIs (#27)
+ - Fix all key/value pair unpacking method signatures (#26)
+
+0.06 2020-08-13T12:06:44
+ - Built release version 0.06
  - Add release updates
  - Include TESTDB_TEMPLATE in driver descriptions (#21)
  - Include example for MSSQL, and POD taglines for all (#20)

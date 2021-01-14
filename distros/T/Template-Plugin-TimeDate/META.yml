@@ -9,7 +9,8 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::DiagINC: '0.002'
-  Test::More: '0.94'
+  Test::MockTime: '0'
+  Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -26,11 +27,12 @@ no_index:
 requires:
   Date::Parse: '0'
   Template::Plugin::Filter: '2.00'
+  perl: '5.008'
 resources:
   bugtracker: https://github.com/bleargh45/Template-Plugin-TimeDate/issues
   homepage: http://metacpan.org/release/Template-Plugin-TimeDate/
   repository: git://github.com/bleargh45/Template-Plugin-TimeDate.git
-version: '1.03'
+version: '1.04'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

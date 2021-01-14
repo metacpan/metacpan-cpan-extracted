@@ -45,6 +45,7 @@ my @files = (
     't/join.t',
     't/karma.t',
     't/lib/SimpleTestPlugin.pm',
+    't/lib/TestCommon.pm',
     't/math.t',
     't/ping.t',
     't/release-kwalitee.t',

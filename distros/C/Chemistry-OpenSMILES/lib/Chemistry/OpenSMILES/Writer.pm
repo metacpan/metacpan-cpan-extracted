@@ -7,7 +7,7 @@ use Chemistry::OpenSMILES qw(is_aromatic);
 use Graph::Traversal::DFS;
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 sub write
 {

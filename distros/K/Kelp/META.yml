@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,12 +30,12 @@ requires:
   Encode: '0'
   File::Basename: '0'
   File::Path: '0'
-  File::Slurp: '0'
   FindBin: '0'
   Getopt::Long: '0'
   HTTP::Cookies: '0'
   JSON: '0'
   Log::Dispatch: '0'
+  Path::Tiny: '0'
   Plack::Test: '0'
   Plack::Util: '0'
   Scalar::Util: '0'
@@ -49,8 +49,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/naturalist/kelp/issues
-  homepage: http://naturalist.github.io/kelp/
-  repository: git://github.com/naturalist/kelp.git
-version: '1.02'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  bugtracker: https://github.com/sgnix/kelp/issues
+  homepage: https://brtastic.xyz/project/kelp
+  repository: git://github.com/sgnix/kelp.git
+version: '1.03'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

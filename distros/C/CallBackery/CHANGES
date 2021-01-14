@@ -1,3 +1,7 @@
+0.35.2 2021-01-11 17:01:27 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Mojolicious::Routes::Route::route is DEPRECATED in favor of Mojolicious::Routes::Route::any
+
 0.35.1 2021-01-11 15:31:15 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - parse last line of *.po file

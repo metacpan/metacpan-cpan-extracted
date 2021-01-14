@@ -1,4 +1,13 @@
 Revision history for Store-Directories
 
+0.3     January 12, 2021
+        - Fixed being unable to create locks if you extending the
+          Store::Directories class.
+        - run_in_dir, get_in_dir and get_or_set methods allow for an init callback
+        - get_or_add and remove methods won't get a new __LISTING__ lock
+          if you already have one
+        - Most callback functions now include key in arguments
+0.2     January 7, 2021
+        - Added get_in_dir, run_in_dir and get_or_set methods.
 0.1     January 7, 2021
         Initial Version

@@ -1,12 +1,12 @@
 package Bot::IRC::X::WwwShorten;
 # ABSTRACT: Bot::IRC plugin for automatic URL shortening
 
-use strict;
-use warnings;
+use 5.014;
+use exact;
 
 use WWW::Shorten qw( TinyURL makeashorterlink );
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -39,10 +39,10 @@ Bot::IRC::X::WwwShorten - Bot::IRC plugin for automatic URL shortening
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC-X-WwwShorten.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC-X-WwwShorten)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC-X-WwwShorten/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC-X-WwwShorten)
+=for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-WwwShorten/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-WwwShorten/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-WwwShorten/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-WwwShorten)
 
 =head1 SYNOPSIS
 
@@ -77,23 +77,15 @@ L<GitHub|https://github.com/gryphonshafer/Bot-IRC-X-WwwShorten>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Bot-IRC-X-WwwShorten>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Bot::IRC::X::WwwShorten>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/Bot-IRC-X-WwwShorten>
+L<GitHub Actions|https://github.com/gryphonshafer/Bot-IRC-X-WwwShorten/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Bot-IRC-X-WwwShorten>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Bot-IRC-X-WwwShorten>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Bot-IRC-X-WwwShorten>
 
 =item *
 
@@ -113,9 +105,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gryphon Shafer.
+This software is Copyright (c) 2016-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

@@ -29,6 +29,19 @@
 
 #define UNUSED(x) (void)(x)
 
+#define _MAX_RECURSION 254
+
+/* We could look here at the full stack depth
+   (PL_stack_sp - PL_stack_base), but we only really care about
+   our *own* recursion, not the overall Perl stack.
+*/
+
+#define _CROAK_IF_LOOKS_LIKE_INFINITE_RECURSION \
+    dMY_CXT; \
+    if (MY_CXT.callback_depth > _MAX_RECURSION) { \
+        croak("Exceeded %u callbacks; infinite recursion detected!", _MAX_RECURSION); \
+    }
+
 typedef struct xspr_callback_s xspr_callback_t;
 typedef struct xspr_promise_s xspr_promise_t;
 typedef struct xspr_result_s xspr_result_t;
@@ -142,6 +155,7 @@ typedef struct {
     xspr_callback_queue_t* queue_tail;
     int in_flush;
     int backend_scheduled;
+    unsigned char callback_depth;
 #ifdef USE_ITHREADS
     tTHX owner;
 #endif
@@ -569,7 +583,13 @@ void xspr_result_decref(pTHX_ xspr_result_t* result)
 
 void xspr_immediate_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* promise)
 {
+    dMY_CXT;
+
+    MY_CXT.callback_depth++;
+
     xspr_callback_process(aTHX_ callback, promise);
+
+    MY_CXT.callback_depth--;
 
     /* Destroy the structure */
     xspr_callback_free(aTHX_ callback);
@@ -962,6 +982,7 @@ BOOT:
     MY_CXT.in_flush = 0;
     MY_CXT.backend_scheduled = 0;
     MY_CXT.conversion_helper = NULL;
+    MY_CXT.callback_depth = 0;
 
     MY_CXT.pxs_base_stash = gv_stashpv(BASE_CLASS, FALSE);
     MY_CXT.pxs_promise_stash = gv_stashpv(PROMISE_CLASS, FALSE);
@@ -1213,6 +1234,8 @@ PROTOTYPES: DISABLE
 void
 then(SV* self_sv, SV* on_resolve = NULL, SV* on_reject = NULL)
     PPCODE:
+        _CROAK_IF_LOOKS_LIKE_INFINITE_RECURSION;
+
         PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
 
         xspr_promise_t* next;
@@ -1230,6 +1253,8 @@ then(SV* self_sv, SV* on_resolve = NULL, SV* on_reject = NULL)
 void
 catch(SV* self_sv, SV* on_reject)
     PPCODE:
+        _CROAK_IF_LOOKS_LIKE_INFINITE_RECURSION;
+
         PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
 
         xspr_promise_t* next = create_next_promise_if_needed(aTHX_ self_sv, &ST(0));
@@ -1242,6 +1267,8 @@ catch(SV* self_sv, SV* on_reject)
 void
 finally(SV* self_sv, SV* on_finally)
     PPCODE:
+        _CROAK_IF_LOOKS_LIKE_INFINITE_RECURSION;
+
         PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
 
         xspr_promise_t* next = create_next_promise_if_needed(aTHX_ self_sv, &ST(0));

@@ -1,4 +1,9 @@
 Revision history for MsOffice-Word-Template
 
+
+1.01    11.01.2021
+  - Template Toolkit is no longer hardwired in; other templating systems
+    can be passed as parameters
+
 1.0     13.12.2020 Initial release
 

@@ -1,5 +1,5 @@
 package Lab::Moose::DataFolder;
-$Lab::Moose::DataFolder::VERSION = '3.731';
+$Lab::Moose::DataFolder::VERSION = '3.740';
 #ABSTRACT: Create a data directory with meta data
 
 use v5.20;
@@ -203,7 +203,7 @@ Lab::Moose::DataFolder - Create a data directory with meta data
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 DESCRIPTION
 
@@ -248,7 +248,7 @@ attribute:
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017-2018  Andreas K. Huettel, Simon Reinhardt

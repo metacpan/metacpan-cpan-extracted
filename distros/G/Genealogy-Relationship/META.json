@@ -43,12 +43,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/genealogy-relationship/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/davorg/genealogy-relationship.git",
          "web" : "https://github.com/davorg/genealogy-relationship"
       }
    },
-   "version" : "v0.0.4",
+   "version" : "v0.0.5",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,5 +1,13 @@
 Revision history for Perl extension RxPerl
 
+v6.4.1 2021-01-13T09:36:31Z
+
+    - fixed Changes file
+
+v6.4.0 2021-01-13T09:31:25Z
+
+    - EXPERIMENTAL: use pipeable operators as observable methods directly
+
 v6.3.0 2020-12-15T13:51:24Z
 
     - added a video to the Learning Resources section

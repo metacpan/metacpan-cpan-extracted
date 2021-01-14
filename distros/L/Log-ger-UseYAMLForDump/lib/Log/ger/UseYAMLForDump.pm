@@ -1,9 +1,9 @@
 package Log::ger::UseYAMLForDump;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-06'; # DATE
+our $DATE = '2020-12-14'; # DATE
 our $DIST = 'Log-ger-UseYAMLForDump'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -28,7 +28,7 @@ sub import {
 }
 
 1;
-# ABSTRACT: Use YAML::PP to dump data structures (as JSON)
+# ABSTRACT: Use YAML::PP to dump data structures (as YAML)
 
 __END__
 
@@ -38,11 +38,11 @@ __END__
 
 =head1 NAME
 
-Log::ger::UseYAMLForDump - Use YAML::PP to dump data structures (as JSON)
+Log::ger::UseYAMLForDump - Use YAML::PP to dump data structures (as YAML)
 
 =head1 VERSION
 
-This document describes version 0.001 of Log::ger::UseYAMLForDump (from Perl distribution Log-ger-UseYAMLForDump), released on 2020-06-06.
+This document describes version 0.002 of Log::ger::UseYAMLForDump (from Perl distribution Log-ger-UseYAMLForDump), released on 2020-12-14.
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ Source repository is at L<https://github.com/perlancar/perl-Log-ger-UseYAMLForDu
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-UseYAMLForDump>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Log-ger-UseYAMLForDump/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -21,7 +21,7 @@ no_index:
 provides:
   Game::Life::Faster:
     file: lib/Game/Life/Faster.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
   List::Util: '0'
@@ -29,8 +29,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Game-Life-Faster
+  bugtracker: https://github.com/trwyant/perl-Game-Life-Faster/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Game-Life-Faster.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

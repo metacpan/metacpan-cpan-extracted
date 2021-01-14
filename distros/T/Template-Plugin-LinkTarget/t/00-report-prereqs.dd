@@ -8,10 +8,6 @@ do { my $x = {
                       'requires' => {
                                       'Dist::Zilla' => '5',
                                       'Dist::Zilla::PluginBundle::Author::GTERMARS' => '0',
-                                      'File::Spec' => '0',
-                                      'File::Temp' => '0',
-                                      'IO::Handle' => '0',
-                                      'IPC::Open3' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Software::License::Perl_5' => '0',
                                       'Test::CPAN::Meta' => '0',
@@ -20,7 +16,7 @@ do { my $x = {
                                       'Test::EOL' => '0',
                                       'Test::Kwalitee' => '1.21',
                                       'Test::MinimumVersion' => '0',
-                                      'Test::More' => '0.94',
+                                      'Test::More' => '0.88',
                                       'Test::NoBreakpoints' => '0.15',
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
@@ -32,8 +28,9 @@ do { my $x = {
                       'requires' => {
                                       'HTML::Entities' => '0',
                                       'HTML::Parser' => '0',
-                                      'Template::Plugin::Filter' => '0',
-                                      'namespace::clean' => '0'
+                                      'Template::Plugin::Filter' => '2.00',
+                                      'namespace::clean' => '0',
+                                      'perl' => '5.008'
                                     }
                     },
        'test' => {
@@ -43,8 +40,11 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
                                    'Test::DiagINC' => '0.002',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0.94'
                                  }
                  }
      };

@@ -16,7 +16,7 @@ use Data::Printer;
 use File::Path;
 use File::Copy;
 
-my $Class = 'Archive::BagIt::Base';
+my $Class = 'Archive::BagIt';
 use_ok($Class);
 
 my @ROOT = grep {length} 'src';
@@ -39,7 +39,7 @@ my $bag = $Class->new({bag_path=>$SRC_BAG});
       { "Foo2", "Bar2"},
       { "Foo4", "Bar4\n  Baz4\n  Bay4"},
   );
-  my @sorted = Archive::BagIt::Base::__sort_bag_info( @unsorted);
+  my @sorted = Archive::BagIt::__sort_bag_info( @unsorted);
   my @expected = (
       { "Foo", "Bar" },
       { "Foo", "Baz"},

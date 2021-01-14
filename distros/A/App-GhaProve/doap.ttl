@@ -13,9 +13,9 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ], [ doap-deps:on "Test::Harness 2.40"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
-	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=App-GhaProve>;
+	doap:bug-database    <https://github.com/tobyink/p5-app-ghaprove/issues>;
 	doap:created         "2020-11-13"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:download-page   <https://metacpan.org/release/App-GhaProve>;
@@ -24,7 +24,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "App-GhaProve";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-001>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-002>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-003>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-004>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-005>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-001>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-002>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-003>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-004>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-005>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-006>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-007>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-app-ghaprove>;
@@ -104,6 +104,37 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-GhaProve-0.005.tar.gz>;
 	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "App-GhaProve-0.006"^^xsd:string;
+	dc:issued            "2021-01-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Print extra output to check which version of `prove` is being used on old Perls.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Use GitHub issue tracker.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-GhaProve-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "App-GhaProve-0.007"^^xsd:string;
+	dc:issued            "2021-01-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Require Test::Harness 2.40.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-GhaProve-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

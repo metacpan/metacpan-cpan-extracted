@@ -38,6 +38,7 @@ t/InKana.t
 t/InWideAscii.t
 t/is-romaji-strict.t
 t/is-romaji.t
+t/kana-consonant.t
 t/kana2romaji.t
 t/katakana2syllable.t
 t/Lingua-JA-Moji.t

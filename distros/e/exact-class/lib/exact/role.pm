@@ -5,7 +5,7 @@ use 5.014;
 use exact;
 use Role::Tiny ();
 
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.11'; # VERSION
 
 sub import {
     my ( $self, $caller ) = @_;
@@ -57,7 +57,7 @@ exact::role - Simple role interface extension for exact
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
 

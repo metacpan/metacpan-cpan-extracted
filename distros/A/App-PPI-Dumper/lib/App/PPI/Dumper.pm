@@ -1,6 +1,6 @@
 package App::PPI::Dumper;
 
-our $VERSION = "1.021";
+our $VERSION = "1.022";
 
 =encoding utf8
 
@@ -83,7 +83,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2009-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2009-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

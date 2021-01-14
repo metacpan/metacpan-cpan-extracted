@@ -1,0 +1,248 @@
+Games-Dice-Roller
+
+NAME
+Games::Dice::Roller - a full featured dice roller system
+
+VERSION
+Version 0.01
+
+SYNOPSIS
+        use Games::Dice::Roller;
+
+        my $dice = Games::Dice::Roller->new();
+
+        # simple dice expressions
+        my @simple = (qw( 3d6 4d8+4 1d100-5 ));
+
+        # average results
+        my @average = (qw(4d4avg 4d8avg+2 4d12avg-7));
+
+        # reroll if equal (default), lesser than or greater than N
+        my @reroll = (qw(6d4r1 5d6rlt3 5d6rgt4 6d4r1+10 6d4r1-5));
+
+        # explode if equal (default), lesser than or greater than N 
+        my @explode = (qw( 3d6x6 3d6xlt3 3d6xgt4 3d6x6+3 3d6x6-4 ));
+
+        # just count succesful rolls
+        my @succes = (qw( 3d6cs1 3d6cslt3 3d6csgt4 ));
+
+        # keep and drop dice from final results
+        my @keep_and_drop = (qw( 4d6kh3 4d6kh2 4d6kl2+3 4d6kl2-3 4d12dh1 4d12dl3 4d12dl3+3 4d12dl1-4 ));
+        
+
+        foreach my $dice_expression ( @simple , @average, @reroll, @explode, @succes, @keep_and_drop ){
+
+                my ($res, $descr) = $dice->roll( $dice_expression );
+                print "$res [$dice_expression] $descr\n";
+        }
+
+
+
+        # 10 [3d6] 5 2 3
+        # 22 [4d8+4] 7 7 1 3 +4
+        # 14 [1d100-5] 19 -5
+        # 10 [4d4avg] 2.5 2.5 2.5 2.5
+        # 20 [4d8avg+2] 4.5 4.5 4.5 4.5 +2
+        # 19 [4d12avg-7] 6.5 6.5 6.5 6.5 -7
+        # 18 [6d4r1] 4 (1r) 3 2 3 (1r) 2 4
+        # 19 [5d6rlt3] 3 4 3 4 (2r) (2r) (2r) 5
+        # 11 [5d6rgt4] 2 4 1 (5r) 2 (5r) 2
+        # 25 [6d4r1+10] (1r) 2 (1r) 2 2 4 3 2 +10
+        # 13 [6d4r1-5] (1r) (1r) 2 (1r) 2 4 4 (1r) 4 2 -5
+        # 7 [3d6x6] 1 1 5
+        # 17 [3d6xlt3] 6 5 1x 1x 1x 3
+        # 11 [3d6xgt4] 4 3 4
+        # 11 [3d6x6+3] 2 2 4 +3
+        # 8 [3d6x6-4] 5 3 4 -4
+        # 1 [3d6cs1] (5) (3) 1
+        # 1 [3d6cslt3] 2 (6) (6)
+        # 2 [3d6csgt4] 6 (3) 5
+        # 14 [4d6kh3] (2) 6 4 4
+        # 9 [4d6kh2] 3 6 (2) (2)
+        # 8 [4d6kl2+3] (6) 4 1 (6) +3
+        # 1 [4d6kl2-3] (5) 1 3 (3) -3
+        # 13 [4d12dh1] 2 6 5 (6)
+        # 12 [4d12dl3] (9) (10) (9) 12
+        # 9 [4d12dl3+3] (1) 6 (3) (6) +3
+        # 26 [4d12dl1-4] 9 (1) 9 12 -4
+METHODS
+new
+The constructor accept only one option, an anonymous hash and the only valid key is sub_rand holding as value an anonymous sub to be invoked instead of the core function rand
+
+roll
+This method expects a single string to be passed as argument. This string can be a single dice expression or a dice pool (see below).
+
+It returns the final result and a string representing the roll.
+
+        my $result = $dice->roll('3d6+3');
+        print "result of the dice roll was: $result"; 
+        # result of the dice roll was: 16
+        
+        my ($res, $descr) = $dice->roll('3d6+3');
+        print "$descr\nResult: $res";
+        # 5 2 6 +3
+        # Result: 16
+In the descriptive string some die result can be modified by modifiers: dropped ones will be inside parens, rerolled dice result will be inside parens and with a r following them and exploded dice results will be marked by a x
+
+A third element is returned too: a hash reference intended to be used mainly internally and for debug purposes, with the internal carateristics of the dice expression. Dont rely on this because it can be changed or removed in future releases.
+
+die modifiers
+avg - average
+No dice are rolled, but the die average will be used instead. For 1d6 the average will be 3.5 so 4d6avg will always result in 14
+
+r - reroll
+Reroll dice equal, lesser than (lt) or greater than (gt) n as in 3d6r1 3d6rlt3 3d6rgt4 Each die rerolled will be not part of the final result and in the descriptive string will be inside parens and followed by r as in (1r)
+
+x - explode
+Each die roll equal, lesser than (lt) or greater than (gt) n (as in 3d6x6 3d6xlt3 3d6xgt4) will add another die of the same type. An exploded die will be added to final result and will be marked with x as in 6x in the descriptive string.
+
+For example 8d6xgt4 can lead to a result of 42 and a description like: 6x 4 6x 4 5x 3 5x 3 2 2 1 1
+
+cs - count successes
+If a die roll is equal, lesser than (lt) or greater than (gt) n (as in 3d6cs1 3d6cslt3 3d6gt4) then it will count as a success. The final result will be the succes count. In the decription string unsuccesfull rolls will be inside parens.
+
+result modifiers
+keep and drop
+With the result modifiers kh kl dh dl you can choose how many dice will be used to compute the final result, keeping or dropping highest or lowest n dice. For example 4d6kh3 will roll 4d6 but only best three ones will be used. The descriptive string in this case will be always ordered in ascending or descending order, without representing the real occurence of numbers.
+
+result sum
+An optional sum n can be added to the final result as positive or negative modifier. This must be the last element of the dice expression like in: 3d8+4 This option cannot be used with cs
+
+dice pools
+If to the roll method is passed a string containing different things (separated by spaces) this string will be treated as a dice pool
+
+A dice pool must contain at least two elements. It can contains one or more dice expression (explained above), no or one and only one bare number and no, one and only one global result modifier ( kh for keep highest or kl for keep lowest).
+
+All results of dice expressions are computed and compared each other and with an eventual bare number and the result of the dice pool will be the highest (if no global result modifier then kh will be the default) or lowest one (if kl is specified) roll among them.
+
+For example: $dice->roll('4d4+6 3d6+2 2d8+1 12') can lead to the following results (default global result modifier is kh):
+
+        # Result: 14
+        # Description: 4d4+6 = 1 2 1 4 +6, ( 3d6+2 = 4 3 4 +2 = 13 ), ( 12 ), ( 2d8+1 = 1 8 +1 = 10 )
+As you can see descriptions of discarded dice expression or eventual bare numbers (12 in the example) lower than the higher result are represented inside parens.
+
+about rand
+Some ancient perl on some unfortunate OS has proven to have problem with the core rand even if nowadays this is very rare to appear. In this case you can provide your own rand function during the constructor, for example using Math::Random::MT as in the following example:
+
+        my $gen = Math::Random::MT->new();
+        my $mt_dicer =  Games::Dice::Roller->new(
+                sub_rand => sub{ 
+                                my $sides = shift; 
+                                return $gen->rand( $sides );                    
+                },
+        );
+See the thread at perlmonks where this argument was discussed.
+
+DEBUG
+This module can produce debug informations if DICE_ROLLER_DEBUG environment variable is set to 1
+
+Under debug rolling a dice expression will produce something like:
+
+        Evaluating [12d6kh4+3]
+                        original           : [12d6kh4+3]
+                        type               : [dice_expression]
+                        dice expression    : [12d6]
+                        result modifier    : [kh]
+                        result val modifier: [4]
+                        result sum         : [+3]
+        Cleaning the expression to spot garbage:
+                        removing: 12d6
+                        removing: kh
+                        removing: 4
+                        removing: +3
+        Left in the expression: []
+        Description: 6 6 5 5 (4) (4) (3) (3) (2) (2) (1) (1) +3
+        Result     : 25
+AUTHOR
+LorenzoTa, <LORENZO at cpan.org>
+
+BUGS
+Please report any bugs or feature requests to bug-games-dice-roller at rt.cpan.org, or through the web interface at https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Games-Dice-Roller. I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+SUPPORT
+The main support site for the present module is https://perlmonks.org where I can be found as Discipulus
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Games::Dice::Roller
+You can also look for information at:
+
+RT: CPAN's request tracker (report bugs here)
+https://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-Dice-Roller
+
+AnnoCPAN: Annotated CPAN documentation
+http://annocpan.org/dist/Games-Dice-Roller
+
+CPAN Ratings
+https://cpanratings.perl.org/d/Games-Dice-Roller
+
+Search CPAN
+https://metacpan.org/release/Games-Dice-Roller
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Games::Dice::Roller
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-Dice-Roller
+
+
+    Search CPAN
+        https://metacpan.org/release/Games-Dice-Roller
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2021 LorenzoTa
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

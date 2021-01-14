@@ -30,6 +30,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Math::Trig" : "1.06",
             "Scalar::Util" : "1"
          }
       },
@@ -47,6 +49,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-Matrix"
       }
    },
-   "version" : "0.92",
+   "version" : "0.94",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

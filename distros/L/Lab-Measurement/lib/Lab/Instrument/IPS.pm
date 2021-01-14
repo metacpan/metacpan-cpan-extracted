@@ -5,7 +5,7 @@
 
 package Lab::Instrument::IPS;
 #ABSTRACT: Oxford Instruments IPS Magnet Power Supply
-$Lab::Instrument::IPS::VERSION = '3.731';
+$Lab::Instrument::IPS::VERSION = '3.740';
 use v5.20;
 
 use strict;
@@ -972,7 +972,7 @@ Lab::Instrument::IPS - Oxford Instruments IPS Magnet Power Supply
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 SYNOPSIS
 
@@ -1115,7 +1115,7 @@ probably many
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Christian Butschkow, Stefan Geissler
             2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler

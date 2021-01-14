@@ -1,15 +1,15 @@
 package Bot::IRC::X::UriTitle;
 # ABSTRACT: Bot::IRC plugin to parse and print URI titles
 
-use strict;
-use warnings;
+use 5.014;
+use exact;
 
 use LWP::UserAgent;
 use LWP::Protocol::https;
 use Text::Unidecode 'unidecode';
 use URI::Title 'title';
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -44,10 +44,10 @@ Bot::IRC::X::UriTitle - Bot::IRC plugin to parse and print URI titles
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC-X-UriTitle.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC-X-UriTitle)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC-X-UriTitle/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC-X-UriTitle)
+=for markdown [![test](https://github.com/gryphonshafer/Bot-IRC-X-UriTitle/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC-X-UriTitle/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-UriTitle/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC-X-UriTitle)
 
 =head1 SYNOPSIS
 
@@ -78,23 +78,15 @@ L<GitHub|https://github.com/gryphonshafer/Bot-IRC-X-UriTitle>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Bot-IRC-X-UriTitle>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Bot::IRC::X::UriTitle>
 
 =item *
 
-L<AnnoCPAN|http://annocpan.org/dist/Bot-IRC-X-UriTitle>
+L<GitHub Actions|https://github.com/gryphonshafer/Bot-IRC-X-UriTitle/actions>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Bot-IRC-X-UriTitle>
-
-=item *
-
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Bot-IRC-X-UriTitle>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Bot-IRC-X-UriTitle>
 
 =item *
 
@@ -114,9 +106,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gryphon Shafer.
+This software is Copyright (c) 2016-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

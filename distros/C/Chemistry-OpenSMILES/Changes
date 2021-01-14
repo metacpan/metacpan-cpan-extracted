@@ -1,3 +1,8 @@
+0.4.1 2021-01-12
+
+    - Fixing an issue with 'scalar %hash' in t/01_atoms.t.
+    - Listing a dependency on Graph::Traversal::DFS.
+
 0.4.0 2021-01-11
 
     - Adding Chemistry::OpenSMILES::Writer, implementing a SMILES writer

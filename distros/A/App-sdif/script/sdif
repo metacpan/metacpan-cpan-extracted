@@ -14,6 +14,10 @@
 
 sdif - side-by-side diff viewer for ANSI terminal
 
+=head1 VERSION
+
+Version 4.18.2
+
 =head1 SYNOPSIS
 
 sdif file_1 file_2
@@ -888,12 +892,6 @@ sub terminal_width {
 	@size = GetTerminalSize $tty, $tty;
     }
     $size[0] or $default;
-}
-
-sub unesc {
-    local $_ = shift;
-    s/\e/\\e/g;
-    $_;
 }
 
 __END__

@@ -1,10 +1,11 @@
 {
    "abstract" : "Extract tables from HTML",
    "author" : [
-      "Simon Drabble (sdrabble@cpan.org)"
+      "Simon Drabble (sdrabble@cpan.org)",
+      "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +17,10 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "inc",
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
@@ -35,6 +39,7 @@
             "Carp" : "0",
             "HTML::Parser" : "0",
             "parent" : "0",
+            "perl" : "5.006002",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -45,7 +50,27 @@
          }
       }
    },
+   "provides" : {
+      "HTML::TableContentParser" : {
+         "file" : "lib/HTML/TableContentParser.pm",
+         "version" : "0.303"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.302",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://github.com/trwyant/perl-HTML-TableContentParser/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-HTML-TableContentParser.git",
+         "web" : "https://github.com/trwyant/perl-HTML-TableContentParser"
+      }
+   },
+   "version" : "0.303",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

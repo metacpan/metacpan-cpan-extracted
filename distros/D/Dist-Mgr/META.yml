@@ -26,14 +26,15 @@ requires:
   File::Copy::Recursive: '0'
   File::Find::Rule: '0'
   File::Path: '0'
+  JSON: '0'
   Module::Starter: '1.77'
   PPI: '0'
   Term::ReadKey: '0'
   Tie::File: '0'
-  perl: '5.006'
+  perl: '5.010'
   version: '0'
 resources:
   bugtracker: https://github.com/stevieb9/dist-mgr/issues
   repository: https://github.com/stevieb9/dist-mgr.git
-version: '1.01'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

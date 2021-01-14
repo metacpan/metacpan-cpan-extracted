@@ -70,13 +70,13 @@ You can write everything in ~/.gitconfig:
 
 [Getopt::EX](https://metacpan.org/pod/Getopt::EX)
 
+# AUTHOR
+
+Kazumasa Utashiro
+
 # LICENSE
 
 Copyright 1992- Kazumasa Utashiro.
 
 These commands and libraries are free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
-
-# AUTHOR
-
-Kazumasa Utashiro

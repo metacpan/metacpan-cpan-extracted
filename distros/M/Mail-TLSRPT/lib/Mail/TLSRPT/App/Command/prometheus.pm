@@ -1,6 +1,6 @@
 package Mail::TLSRPT::App::Command::prometheus;
 # ABSTRACT: Process tlsrpt reports into prometheus
-our $VERSION = '1.20200413.1'; # VERSION
+our $VERSION = '2.20210112'; # VERSION
 use 5.20.0;
 use Mail::TLSRPT::Pragmas;
 use Mail::TLSRPT::App -command;
@@ -80,7 +80,7 @@ Mail::TLSRPT::App::Command::prometheus - Process tlsrpt reports into prometheus
 
 =head1 VERSION
 
-version 1.20200413.1
+version 2.20210112
 
 =head1 DESCRIPTION
 

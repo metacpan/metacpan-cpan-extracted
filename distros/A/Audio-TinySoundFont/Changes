@@ -1,4 +1,7 @@
 Revision history for Audio-TinySoundFont
 
+0.11  2021-01-11 23:39:33 EST
+        * Fix building on threaded perls
+
 0.10  2021-01-11 00:10:30 EST
-        - Initial release
+        * Initial release

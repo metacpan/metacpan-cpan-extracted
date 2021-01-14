@@ -25,6 +25,9 @@ WriteMakefile(
                 url => 'git://github.com/davorg/genealogy-relationship.git',
                 web => 'https://github.com/davorg/genealogy-relationship',
             },
+            bugtracker => {
+                web => 'https://github.com/davorg/genealogy-relationship/issues',
+            },
         },
 
     },

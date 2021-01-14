@@ -1,10 +1,10 @@
 package Bio::MUST::Core::Taxonomy::Criterion;
 # ABSTRACT: Helper class for multiple-criterion classifier based on taxonomy
-$Bio::MUST::Core::Taxonomy::Criterion::VERSION = '0.203490';
+$Bio::MUST::Core::Taxonomy::Criterion::VERSION = '0.210120';
 use Moose;
 use namespace::autoclean;
 
-use List::AllUtils qw(sum);
+use List::AllUtils qw(sum count_by);
 
 use Bio::MUST::Core::Types;
 
@@ -56,6 +56,14 @@ sub matches {
     my @seq_ids = grep { $self->is_allowed($_) } $listable->all_seq_ids;
     my $seq_n = @seq_ids;
 
+    # return success if positively avoided taxa are indeed absent
+    unless ($seq_n) {
+        return 1
+            if ( defined $self->max_seq_count && !$self->max_seq_count )
+            || ( defined $self->max_org_count && !$self->max_org_count )
+        ;
+    }
+
     # return failure unless #seqs within allowed bounds
     # by default there is no upper bound on #seqs
     return 0 if                                 $seq_n < $self->min_seq_count;
@@ -70,8 +78,7 @@ sub matches {
 
     # compute #orgs, #seqs/org and mean(copy/org)
     # these statistics only pertain to seq_ids having passed tax_filter
-    my %count_for;
-       $count_for{ $_->full_org // $_->taxon_id }++ for @seq_ids;
+    my %count_for = count_by { $_->full_org // $_->taxon_id } @seq_ids;
     # Note: use taxon_id if full_org is not defined (for tax-aware abbr ids)
     # this implies that each taxon_id must correspond to a single org
     my $org_n = keys %count_for;
@@ -104,7 +111,7 @@ Bio::MUST::Core::Taxonomy::Criterion - Helper class for multiple-criterion class
 
 =head1 VERSION
 
-version 0.203490
+version 0.210120
 
 =head1 SYNOPSIS
 

@@ -103,7 +103,7 @@ use Types::Standard qw[Str HashRef];
 use List::Util qw[first];
 use List::MoreUtils qw[firstidx];
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 has parent_field_name => (
   is => 'ro',

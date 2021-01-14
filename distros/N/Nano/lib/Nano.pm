@@ -14,7 +14,7 @@ use Data::Object::Space;
 
 use Scalar::Util ();
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # ATTRIBUTES
 

@@ -3,7 +3,7 @@ use Mojo::Base '-role';
 
 use strict;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 =encoding utf8
 
@@ -49,7 +49,11 @@ sub any {
 	my( $self, @promises ) = @_;
 	my $any = $self->new;
 
-	$_->then( sub { $any->resolve( @_ ) } ) foreach @promises;
+	my $count = 0;
+	$_->then(
+		sub { $any->resolve( @_ ) },
+		sub { $count++; $any->reject if $count == @promises }
+		) foreach @promises;
 
 	return @promises ? $any : $any->reject;
 	}
@@ -74,7 +78,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2018, brian d foy, All Rights Reserved.
+Copyright © 2018-2021, brian d foy, All Rights Reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Mercury::Magnet;
-$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.731';
+$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.740';
 #ABSTRACT: Oxford Instruments Mercury magnet power supply
 
 use v5.20;
@@ -530,7 +530,7 @@ Lab::Moose::Instrument::OI_Mercury::Magnet - Oxford Instruments Mercury magnet p
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 SYNOPSIS
 
@@ -760,7 +760,7 @@ Returns the current to field factor (A/T)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
             2018       Andreas K. Huettel, Simon Reinhardt

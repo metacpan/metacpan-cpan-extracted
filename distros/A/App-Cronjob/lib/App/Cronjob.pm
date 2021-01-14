@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package App::Cronjob;
 # ABSTRACT: wrap up programs to be run as cron jobs
-$App::Cronjob::VERSION = '1.200010';
+$App::Cronjob::VERSION = '1.200011';
 use Digest::MD5 qw(md5_hex);
 use Errno;
 use Fcntl qw( :DEFAULT :flock );
@@ -84,21 +84,22 @@ sub run {
   $host    = hostname_long;
   $sender  = $opt->{sender} || sprintf '%s@%s', ($ENV{USER}||'cron'), $host;
 
-  my $lockfile = sprintf '%s/cronjob.%s',
-                 $ENV{APP_CRONJOB_LOCKDIR} || '/tmp',
-                 $opt->{jobname} || md5_hex($subject);
-
   my $got_lock;
 
   my $okay = eval {
     die "illegal job name: $opt->{jobname}\n"
       if $opt->{jobname} and $opt->{jobname} !~ m{\A[-_A-Za-z0-9]+\z};
 
+    my $job_id   = $opt->{jobname} || md5_hex($subject);
+    my $lockfile = sprintf '%s/cronjob.%s',
+                   $ENV{APP_CRONJOB_LOCKDIR} || '/tmp',
+                   $job_id;
+
     my $logger  = Log::Dispatchouli->new({
       ident    => 'cronjob',
       facility => 'cron',
-      log_pid  => 0,
-      (defined $opt->{jobname} ? (prefix => "$opt->{jobname}: ") : ()),
+      log_pid  => 1,
+      prefix   => "$job_id: ",
     });
 
     my $lock_fh;
@@ -263,7 +264,7 @@ END_TEMPLATE
 
 {
   package App::Cronjob::Exception;
-$App::Cronjob::Exception::VERSION = '1.200010';
+$App::Cronjob::Exception::VERSION = '1.200011';
 sub new {
     my ($class, $type, $text, $extra) = @_;
     bless { type => $type, text => $text, extra => $extra } => $class;
@@ -284,7 +285,7 @@ App::Cronjob - wrap up programs to be run as cron jobs
 
 =head1 VERSION
 
-version 1.200010
+version 1.200011
 
 =head1 SEE INSTEAD
 

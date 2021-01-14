@@ -6,7 +6,7 @@ use warnings;
 use feature qw(postderef);
 no warnings qw(experimental::postderef);
 # ABSTRACT: Send SMTP transaction data to the Abusix transaction feed
-our $VERSION = '1.20200617.1'; ## VERSION
+our $VERSION = '2.20210112'; ## VERSION
 use Digest::MD5 qw(md5_hex);
 use IO::Socket;
 
@@ -108,7 +108,7 @@ Mail::DataFeed::Abusix - Send SMTP transaction data to the Abusix transaction fe
 
 =head1 VERSION
 
-version 1.20200617.1
+version 2.20210112
 
 =head1 SYNOPSIS
 

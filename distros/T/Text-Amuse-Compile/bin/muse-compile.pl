@@ -104,7 +104,7 @@ file.
 
 PDF output.
 
-=item --slides
+=item --slides | --sl-pdf
 
 PDF output. Extension is .sl.pdf and it is a Beamer PDF. File .sl.tex
 is left in place.
@@ -281,6 +281,9 @@ if ($options{zip}) {
 
 if ($options{pdf}) {
     $options{tex} = 1;
+}
+if ($options{slides}) {
+    $options{'sl-pdf'} = delete $options{slides};
 }
 
 my $recursive  = delete $options{recursive};

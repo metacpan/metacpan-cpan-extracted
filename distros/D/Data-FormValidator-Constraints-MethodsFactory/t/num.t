@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More tests => 16;
 use Data::FormValidator;
 BEGIN {
     use_ok( 'Data::FormValidator::Constraints::MethodsFactory', qw(:num) );

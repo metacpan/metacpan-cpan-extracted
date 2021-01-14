@@ -171,7 +171,9 @@ my @exp_masks = (
 # TODO: provision gblocks
 
 SKIP: {
-    skip q{Cannot find 'Gblocks' in $PATH}, 3 unless qx{which Gblocks};
+    skip q{Cannot find 'Gblocks' in $PATH}, 3
+        unless qx{which Gblocks} && $^O ne 'solaris';
+        # Note: Solaris has some Gblocks executable that is not what we need
 
     my $infile = file('test', 'gblocks.fasta');
     my $ali = Bio::MUST::Core::Ali->load($infile);

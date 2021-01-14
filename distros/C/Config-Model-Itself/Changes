@@ -1,3 +1,12 @@
+2.021 2021-01-13
+
+  A new 2.021 release for 2021 :-)
+
+  Bug fix:
+    * fix error message when attaching Config class to unknown Perl class
+    * update rw_config file documentation in model
+    * remove files of deleted application when writing back a model
+
 2.020 2019-12-29
 
   Dependencies:

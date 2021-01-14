@@ -7,7 +7,7 @@ use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
@@ -68,6 +68,7 @@ our @EXPORT_OK = qw/
 		    yurei_moji
 		    join_sound_marks
 		    split_sound_marks
+		    kana_consonant
 		   /;
 
 our %EXPORT_TAGS = (
@@ -1626,6 +1627,24 @@ sub yurei_moji
 sub bad_kanji
 {
     return load_kanji ('bad-kanji');
+}
+
+sub kana_consonant
+{
+    my ($kana) = @_;
+    if (length ($kana) < 1) {
+	croak "Empty input to kana_consonant";
+    }
+    my $first = substr ($kana, 0, 1);
+    if ($first !~ /\p{InKana}/) {
+	croak "First character '$first' of '$kana' is not kana";
+    }
+    $first = kana2katakana ($first);
+    my $not = $daku2not{$first};
+    if (defined $not) {
+	$first = $not;
+    }
+    my $con = $siin{$first};
 }
 
 1;

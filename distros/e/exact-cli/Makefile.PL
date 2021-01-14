@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "exact::cli",
   "PREREQ_PM" => {
     "Util::CommandLine" => "1.04",
-    "exact" => 0,
+    "exact" => "1.14",
     "strict" => 0
   },
   "TEST_REQUIRES" => {
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.04",
+  "VERSION" => "1.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %FallbackPrereqs = (
   "Test2::V0" => 0,
   "Test::More" => 0,
   "Util::CommandLine" => "1.04",
-  "exact" => 0,
+  "exact" => "1.14",
   "strict" => 0,
   "warnings" => 0
 );

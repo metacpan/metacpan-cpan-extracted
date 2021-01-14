@@ -1,8 +1,18 @@
 Revision history for Perl extension Net::SAML2.
 
+0.29    12-Jan-2021
+
+        Small release to update issues location to be github
+
+        TBD     Update Changes and Increment version
+        08e1a17 Fixes #7 - Move issues to github
+
 0.28    04-Jul-2020
 
         Increment Version for official release
+
+        3cffcc7 Merge pull request #6 from perl-net-saml2/v0.27-prep
+        9630745 (tag: 0.28, upstream/v0.27-prep) Release Version 0.28
 
 0.27-TRIAL    03-Jul-2020
 
@@ -12,8 +22,11 @@ Revision history for Perl extension Net::SAML2.
         As a point of interest the external XML::Sig module has been updated
         and is now capable of replacing Net::SAML2::XML::Sig
 
-        eac8408 Update Changes
-        9352be7 Add contributing info
+        9afd005 Increment version to 0.27
+        ccba8d8 Update Changes for v0.27
+        82ed211 Update Changes
+        5fe44e3 Add contributing info
+        e9c3fa8 Improve GitHub Action and reduce time required
         2ecbc2b Use default Moose types instead of MooseX::Types::Moose
         ecee8bf Add predicates to Net::SAML2::Protocol::AuthnRequest
         7562ff1 Make use of builders instead of using BUILDARGS

@@ -41,7 +41,10 @@ Module::Build->new(
     meta_merge   => {
         resources => {
             repository =>
-              'https://bitbucket.org/rolandvanipenburg/date-extract-p800picture'
+              'https://bitbucket.org/rolandvanipenburg/date-extract-p800picture',
+            bugtracker => {
+              web => 'https://bitbucket.org/rolandvanipenburg/date-extract-p800picture/issues'
+            }
         }
     },
 )->create_build_script;

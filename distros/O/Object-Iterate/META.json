@@ -31,7 +31,7 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.020"
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -53,6 +53,6 @@
          "web" : "https://github.com/briandfoy/object-iterate"
       }
    },
-   "version" : "1.143",
+   "version" : "1.144",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

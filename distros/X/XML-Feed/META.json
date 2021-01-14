@@ -4,7 +4,7 @@
       "Six Apart"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "URI" : "0"
+            "URI" : "0",
+            "XML::XPath" : "0"
          }
       },
       "configure" : {
@@ -52,39 +53,39 @@
    "provides" : {
       "XML::Feed" : {
          "file" : "lib/XML/Feed.pm",
-         "version" : "0.59"
+         "version" : "0.60"
       },
       "XML::Feed::Content" : {
          "file" : "lib/XML/Feed/Content.pm",
-         "version" : "0.59"
+         "version" : "0.60"
       },
       "XML::Feed::Enclosure" : {
          "file" : "lib/XML/Feed/Enclosure.pm",
-         "version" : "0.59"
+         "version" : "0.60"
       },
       "XML::Feed::Entry" : {
          "file" : "lib/XML/Feed/Entry.pm",
-         "version" : "0.59"
+         "version" : "0.60"
       },
       "XML::Feed::Entry::Format::Atom" : {
          "file" : "lib/XML/Feed/Entry/Format/Atom.pm",
-         "version" : "0.59"
+         "version" : "0.60"
       },
       "XML::Feed::Entry::Format::RSS" : {
          "file" : "lib/XML/Feed/Entry/Format/RSS.pm",
-         "version" : "0.59"
+         "version" : "0.60"
       },
       "XML::Feed::Format::Atom" : {
          "file" : "lib/XML/Feed/Format/Atom.pm",
-         "version" : "0.59"
+         "version" : "0.60"
       },
       "XML::Feed::Format::RSS" : {
          "file" : "lib/XML/Feed/Format/RSS.pm",
-         "version" : "0.59"
+         "version" : "0.60"
       },
       "XML::Feed::Util" : {
          "file" : "lib/XML/Feed/Util.pm",
-         "version" : "0.59"
+         "version" : "0.60"
       }
    },
    "release_status" : "stable",
@@ -101,7 +102,7 @@
          "web" : "https://github.com/davorg/xml-feed"
       }
    },
-   "version" : "0.59",
+   "version" : "0.60",
    "x_contributors" : [
       "Dave Cross <davecross@cpan.org>",
       "Jakob Voss <voss@gbv.de>",
@@ -113,5 +114,5 @@
       "Gerard Ribugent Navarro <ribugent@cpan.org>",
       "Matthew D. Miller <matthew.miller@okbu.edu>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -19,6 +19,7 @@ Test
 ;  :c8:   \vskip 8cm
 ;  :c8:   \sloppy
 ;  :c8:   \fussy
+Test
 ;  :c8:   \strut
 ;  :c8:   \newpage
 ;  :c8:   \vskip 20mm
@@ -34,6 +35,14 @@ Test
 ; :c8:  \raggedbottom
 Test
 
+; :c8: \looseness=1
+
+Loose + 1
+
+; :c8: \looseness=-1
+
+Loose - 1
+
 MUSE
 
 my $exp = <<'EXP';
@@ -43,6 +52,9 @@ my $exp = <<'EXP';
 \vskip 8cm
 \sloppy
 \fussy
+
+Test
+
 \strut
 \newpage
 \vskip 20mm
@@ -56,6 +68,15 @@ my $exp = <<'EXP';
 \enlargethispage{-10mm}
 \flushbottom
 \raggedbottom
+
+Test
+
+\looseness=1
+Loose + 1
+
+\looseness=-1
+Loose - 1
+
 EXP
 
 my $wd = Path::Tiny->tempdir(CLEANUP => !$ENV{NOCLEANUP});

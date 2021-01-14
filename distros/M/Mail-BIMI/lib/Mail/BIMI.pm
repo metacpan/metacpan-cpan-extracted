@@ -1,6 +1,6 @@
 package Mail::BIMI;
 # ABSTRACT: BIMI object
-our $VERSION = '2.20201117.2'; # VERSION
+our $VERSION = '3.20210113'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -259,7 +259,7 @@ Mail::BIMI - BIMI object
 
 =head1 VERSION
 
-version 2.20201117.2
+version 3.20210113
 
 =head1 DESCRIPTION
 

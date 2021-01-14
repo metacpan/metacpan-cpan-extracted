@@ -1,3 +1,11 @@
+0.101   2021-01-04  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add example in Synopsis of using %q (although this is also
+	  demonstrated in documentation on --strftime option).
+
+
 0.100   2020-04-30  Released-By: PERLANCAR; Urgency: low
 
         - [build] Rebuild with updated Perinci::Sub::To::CLIDocData to list all

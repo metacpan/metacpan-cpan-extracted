@@ -148,9 +148,9 @@ Alexandr Ciornii, C<< <alexchorny at gmail.com> >> 2007
 
 =head1 COPYRIGHT
 
-Copyright © 2011-2016, brian d foy <bdfoy@cpan.org>.
+Copyright © 2011-2021, brian d foy <bdfoy@cpan.org>.
 
-You can use this module under the same terms as Perl itself.
+You can use this module under the terms of Artistic License 2.0.
 
 =cut
 
@@ -163,7 +163,7 @@ package Roman::Unicode {
 
 	use Exporter 'import';
 	our @EXPORT_OK = qw( is_roman to_perl to_roman to_ascii );
-	our $VERSION = '1.031';
+	our $VERSION = '1.032';
 
 	use Unicode::UCD;
 	use Unicode::Normalize qw(NFKD);

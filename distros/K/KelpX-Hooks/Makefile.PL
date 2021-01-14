@@ -15,7 +15,7 @@ WriteMakefile(
 	META_MERGE => {
 		resources => {
 			license => 'https://dev.perl.org/licenses',
-			homepage => 'https://metacpan.org/release/KelpX-Hooks',
+			homepage => 'https://brtastic.xyz/project/kelp',
 			bugtracker => 'https://github.com/brtastic/perl-kelpx-hooks/issues',
 			repository => 'https://github.com/brtastic/perl-kelpx-hooks',
 		},

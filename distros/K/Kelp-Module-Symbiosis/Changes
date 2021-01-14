@@ -1,5 +1,13 @@
 Revision history for Perl extension Kelp::Module::Symbiosis.
 
-1.00 tue, 18 feb 2020, 06:32:41
-	First release
+1.01 Wed Jan 13 2021
+	- deprecate run_all, use run instead ($kelp->run_all stays the same)
+	- symbiosis can now mount plain coderefs
+	- add explicit version number to each package in module
+	- new documentation
+	- better test cases
+	- maintenance work
+
+1.00 Tue Feb 18 2020
+	- First release
 

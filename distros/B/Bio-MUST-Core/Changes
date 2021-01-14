@@ -1,3 +1,11 @@
+0.210120  2021-01-12 16:53:42+01:00 Europe/Brussels
+    - Changes
+      - binaries: reinstated classify-ali.pl and jack-ali-dir.pl executables
+    - Fixes
+      - SeqId: expanded max tag length to 6 (lowercase) chars (e.g., nuppct#)
+      - SeqMask: tests should now pass on Solaris too
+      - Taxonomy::Criterion: fixed bug for positively avoided taxa (i.e., max_org_count: 0)
+
 0.203490  2020-12-14 13:36:11+01:00 Europe/Brussels
     - Additions
       - binaries: added new collapsing modes to format-tree.pl
@@ -94,7 +102,7 @@
       - Taxonomy: new Taxable role to provide a Taxonomy attribute to any class
       - Taxonomy: new alias methods fetch_lineage and compute_lca
     - Changes
-      - binaries: removal of classify_ali.pl (now distributed with Bio::MUST::Tools::Mcl)
+      - binaries: removal of classify-ali.pl (now distributed with Bio::MUST::Tools::Mcl)
       - ColorScheme: moved under Taxonomy namespace
       - Taxonomy: again refined handling of taxonomically ambiguous NCBI names
 

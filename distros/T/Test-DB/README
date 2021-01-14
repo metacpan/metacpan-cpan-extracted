@@ -22,7 +22,104 @@ DESCRIPTION
     temporary databases for testing purposes. This framework requires a
     user (optionally with password) which has the ability to create new
     databases and works by creating test-specific databases owned by the
-    user specified.
+    user specified. Note: Test databases are not automatically destroyed
+    and should be cleaned up manually by call the destroy method on the
+    database-specific test database object.
+
+ process
+
+    on create, clone
+
+    #1
+
+      Establish a connection to the DB using some "initial" database.
+
+        my $tdbo = $tdb->postgres(initial => 'template0');
+
+    #2
+
+      Using the established connection, create the test/temporary database.
+
+        $tdbo->create;
+
+    #3
+
+      Establish a connection to the newly created test/temporary database.
+
+        $tdbo->create->dbh;
+
+    #4
+
+      Make the test database object immutable.
+
+        $tdbo->create->database('example'); # error
+
+    on destroy
+
+    #1
+
+      Establish a connection to the DB using the "initial" database.
+
+        # using the created test/temporary database object
+
+    #2
+
+      Using the established connection, drop the test/temporary database.
+
+        $tdbo->destroy;
+
+ usages
+
+    using DBI
+
+    #1
+
+        my $tdb = Test::DB->new;
+        my $dbh = $tdb->sqlite(%options)->dbh;
+
+    using DBIx::Class
+
+    #1
+
+        my $tdb = Test::DB->new;
+        my $tdbo = $tdb->postgres(%options)->create;
+        my $schema = DBIx::Class::Schema->connect(
+          dsn => $tdbo->dsn,
+          username => $tdbo->username,
+          password => $tdbo->password,
+        );
+
+    using Mojo::mysql
+
+    #1
+
+        my $tdb = Test::DB->new;
+        my $tdbo = $tdb->mysql(%options)->create;
+        my $mysql = Mojo::mysql->new($tdbo->uri);
+
+    using Mojo::Pg
+
+    #1
+
+        my $tdb = Test::DB->new;
+        my $tdbo = $tdb->postgres(%options)->create;
+        my $postgres = Mojo::Pg->new($tdbo->uri);
+
+    using Mojo::Pg (with cloning)
+
+    #1
+
+        my $tdb = Test::DB->new;
+        my $tdbo = $tdb->postgres(%options)->clone('template0');
+        my $postgres = Mojo::Pg->new($tdbo->uri);
+
+    using Mojo::SQLite
+
+    #1
+
+        my $tdb = Test::DB->new;
+        my $tdbo = $tdb->sqlite(%options)->create;
+        my $sqlite = Mojo::SQLite->new($tdbo->uri);
 
 LIBRARIES
 
@@ -104,6 +201,54 @@ METHODS
         # given: synopsis
       
         $tdb->create(database => 'sqlite');
+
+ mssql
+
+      mssql(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+
+    The mssql method builds and returns a Test::DB::Mssql object.
+
+    mssql example #1
+
+        # given: synopsis
+      
+        $tdb->mssql;
+
+ mysql
+
+      mysql(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+
+    The mysql method builds and returns a Test::DB::Mysql object.
+
+    mysql example #1
+
+        # given: synopsis
+      
+        $tdb->mysql;
+
+ postgres
+
+      postgres(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+
+    The postgres method builds and returns a Test::DB::Postgres object.
+
+    postgres example #1
+
+        # given: synopsis
+      
+        $tdb->postgres;
+
+ sqlite
+
+      sqlite(Str %options) : Maybe[InstanceOf["Test::DB::Object"]]
+
+    The sqlite method builds and returns a Test::DB::Sqlite object.
+
+    sqlite example #1
+
+        # given: synopsis
+      
+        $tdb->sqlite;
 
 AUTHOR
 

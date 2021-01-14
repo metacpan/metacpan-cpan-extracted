@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw{ HTML::Parser };
 
-our $VERSION = '0.302';
+our $VERSION = '0.303';
 
 our $CLASSIC = 0;
 our $DEBUG = 0;
@@ -386,6 +386,10 @@ is,
 occupies three columns in the HTML table, but only two entries are made
 in the C<{cells}> value of the hash that represents this row.
 
+Please file bug reports at
+L<https://github.com/trwyant/perl-HTML-TableContentParser/issues>, or in
+electronic mail to F<wyant at cpan dot org>.
+
 =head1 SEE ALSO
 
 This module is a very specific tool to address a very specific problem.
@@ -411,7 +415,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 Copyright (C) 2002 Simon Drabble
 
-Copyright (C) 2017-2019 Thomas R. Wyant, III
+Copyright (C) 2017-2021 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

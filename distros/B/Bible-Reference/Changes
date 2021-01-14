@@ -1,5 +1,15 @@
 Revision history for Bible::Reference
 
+1.07      2021-01-13 11:05:23-08:00 America/Los_Angeles
+        - Override some minimum version reqs in dist.ini
+
+1.06      2021-01-12 09:25:43-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.05      2020-10-10 12:06:43-07:00 America/Los_Angeles
         - Major input parsing code rewrite to handle a broader set of edge cases
         - Add boolean setting: add_detail

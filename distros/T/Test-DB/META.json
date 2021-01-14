@@ -4,7 +4,7 @@
       "Al Newkirk <awncorp@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -52,19 +52,19 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/iamalnewkirk/test-db/issues"
+         "web" : "https://github.com/cpanery/test-db/issues"
       },
       "homepage" : "https://metacpan.org/release/Test-DB",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/iamalnewkirk/test-db.git",
-         "web" : "https://github.com/iamalnewkirk/test-db"
+         "url" : "git://github.com/cpanery/test-db.git",
+         "web" : "https://github.com/cpanery/test-db"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_authority" : "cpan:AWNCORP",
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.21",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

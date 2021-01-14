@@ -1,23 +1,13 @@
-use strict;
-use warnings;
+use Test2::V0;
+use Test::Lib;
+use TestCommon;
+use Bot::IRC::Greeting;
 
-use Test::Most;
-use Test::MockModule;
+my $c = TestCommon->new;
 
-my $store = Test::MockModule->new('Bot::IRC::Store');
-$store->mock( LoadFile => sub {} );
-$store->mock( DumpFile => sub {} );
-
-use constant MODULE => 'Bot::IRC::Greeting';
-
-BEGIN { use_ok(MODULE); }
-BEGIN { use_ok('Bot::IRC'); }
-
-ok( MODULE->can('init'), 'init() method exists' );
-
-my $plugin;
-my $bot = Bot::IRC->new( connect => { server => 'irc.perl.org' } );
-
-lives_ok( sub { Bot::IRC::Greeting::init($bot) }, 'init()' );
+ok( Bot::IRC::Greeting->can('init'), 'init() method exists' );
+ok( lives { Bot::IRC::Greeting::init( $c->bot ) }, 'init()' ) or note $@;
+ok( lives { $c->hook( { forum => '#test', nick => 'gRyphon' }, undef ) }, 'hook()' ) or note $@;
+is( $c->replies, [['gReetings']], 'greeting text' );
 
 done_testing;

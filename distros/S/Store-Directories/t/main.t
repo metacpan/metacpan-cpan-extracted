@@ -4,7 +4,7 @@ use warnings;
 use Config;
 use Cwd qw(abs_path);
 use Time::HiRes qw(sleep);
-use Test::More  tests => 425;
+use Test::More  tests => 432;
 use Test::Cmd;
 
 use DBI;
@@ -90,6 +90,17 @@ for my $testkey (@testkeys) {
     # Confirm that the directory has been removed
     ok( !(-d $dir), "Directory '$testkey' is gone" );
 }
+
+# Test high-level methods
+# (7 tests)
+my $testdir = $store->get_or_add('foo');
+$store->run_in_dir('foo', \&init_dir);
+my $val = $store->get_in_dir('foo', \&read_file_in_dir);
+is($val, 0, "run_in_dir and get_in_dir work");
+
+fork_workers(5, \&do_get_or_set_entry, 'foo', 3);
+$val = $store->get_in_dir('foo', \&read_file_in_dir);
+is($val, 3, "get_or_set works");
 
 #
 # Helper Functions
@@ -183,6 +194,26 @@ sub fork_workers {
             is($exit_codes{$pid}, 0, "Proc ($$) exited successfully.");
         }
     }
+}
+
+# do_get_or_set_entry KEY MAX
+# (To be called in a forked child). Uses the get_or_set method to
+# increment the file in the directory with KEY, but only if its value
+# is below MAX
+sub do_get_or_set_entry {
+    my ($key, $max) = @_;
+
+    my $st = Store::Directories->init("store");
+
+    $st->get_or_set($key,
+        # GET
+        sub {
+            my $val = read_file_in_dir(shift);
+            return undef if $val < $max;
+        },
+        # SET
+        \&increment_file_in_dir
+    );
 }
 
 # do_check_entry KEY COUNT

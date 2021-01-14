@@ -1,4 +1,4 @@
-Changes
+CHANGES
 example/bin/server.pl
 example/lib/QxExample.pm
 example/lib/QxExample/JsonRpcService.pm

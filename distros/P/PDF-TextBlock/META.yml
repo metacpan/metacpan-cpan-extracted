@@ -22,6 +22,7 @@ requires:
   File::Temp: '0'
   Test::More: '0'
 resources:
+  bugtracker: https://github.com/jhannah/pdf-textblock/issues
   repository: https://github.com/jhannah/pdf-textblock.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "An interface to make and verify bags according to the BagIt standard",
+  "ABSTRACT" => "The main module to handle bags.",
   "AUTHOR" => "Rob Schmidt <rjeschmi\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -19,7 +19,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Class::Load" => 0,
-    "Data::Dumper" => 0,
     "Digest::MD5" => 0,
     "Digest::SHA" => 0,
     "Encode" => 0,
@@ -30,7 +29,6 @@ my %WriteMakefileArgs = (
     "Moo" => 0,
     "Moo::Role" => 0,
     "POSIX" => 0,
-    "String::CRC32" => 0,
     "Time::HiRes" => 0,
     "namespace::autoclean" => 0,
     "open" => 0,
@@ -39,6 +37,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Dumper" => 0,
     "Data::Printer" => 0,
     "File::Copy" => 0,
     "File::Path" => 0,
@@ -53,7 +52,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.070",
+  "VERSION" => "0.071",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -81,7 +80,6 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Moo::Role" => 0,
   "POSIX" => 0,
-  "String::CRC32" => 0,
   "Test::Exception" => 0,
   "Test::File" => 0,
   "Test::More" => 0,

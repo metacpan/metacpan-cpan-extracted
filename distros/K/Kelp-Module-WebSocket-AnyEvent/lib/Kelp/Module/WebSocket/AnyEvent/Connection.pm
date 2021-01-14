@@ -1,5 +1,7 @@
 package Kelp::Module::WebSocket::AnyEvent::Connection;
 
+our $VERSION = '1.02';
+
 use Kelp::Base;
 use Carp;
 use Scalar::Util qw(weaken blessed);

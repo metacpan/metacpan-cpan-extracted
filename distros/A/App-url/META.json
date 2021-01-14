@@ -57,6 +57,6 @@
          "web" : "https://github.com/briandfoy/app-url"
       }
    },
-   "version" : "1.004",
+   "version" : "1.006",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

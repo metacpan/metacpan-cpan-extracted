@@ -1,6 +1,32 @@
 ==================================================
-Changes from 2015-12-25 00:00:00 +0000 to present.
+Changes from 2016-01-13 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 2.08 at 2021-01-11 20:08:00 +0000
+-----------------------------------------
+
+  Change: 2e710bc17736e5d2c43875c2076db7c1a6e4fe47
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2021-01-11 20:08:00 +0000
+
+    This is 2.08 
+
+  Change: 1eaa7976957abbc533869176a390638e93850d12
+  Author: Graham Knop <haarg@haarg.org>
+  Date : 2021-01-11 08:47:00 +0000
+
+    fix darwin DynaLoader patch for older perls
+
+    The patch that was taken from blead uses a <<$^OS-eq-darwin>>
+    preprocessing token, which is handled by the DynaLoader_pm.PL script.
+    Older versions of DynaLoader_pm.PL don't include this preprocessing,
+    but the patch still applies.
+
+    In our case, the preprocessing is a check for darwin. But the patch
+    is already only applied on darwin, so it is redundant. We can just
+    remove the preprocessing token, and it should work across all
+    versions. 
 
 -----------------------------------------
 version 2.06 at 2020-12-23 17:32:27 +0000
@@ -701,5 +727,5 @@ version 1.42 at 2016-04-21 16:08:59 +0000
     Fixes GH #24 
 
 =================================================
-Plus 70 releases after 2015-12-25 00:00:00 +0000.
+Plus 70 releases after 2016-01-13 00:00:00 +0000.
 =================================================

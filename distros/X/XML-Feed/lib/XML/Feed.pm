@@ -13,7 +13,7 @@ use Module::Pluggable search_path => "XML::Feed::Format",
                       require     => 1,
                       sub_name    => 'formatters';
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 our $MULTIPLE_ENCLOSURES = 0;
 our @formatters;
 BEGIN {
@@ -364,7 +364,7 @@ L<XML::Feed::Entry> objects.
 
 =head2 $feed->items
 
-A synonym (alias) for <$feed-E<gt>entries>.
+A synonym (alias) for C<$feed-E<gt>entries>.
 
 =head2 $feed->add_entry($entry)
 

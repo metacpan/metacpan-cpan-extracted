@@ -50,14 +50,14 @@
    "provides" : {
       "Geo::WebService::Elevation::USGS" : {
          "file" : "lib/Geo/WebService/Elevation/USGS.pm",
-         "version" : "0.117"
+         "version" : "0.118"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-WebService-Elevation-USGS"
+         "web" : "https://github.com/trwyant/perl-Geo-WebService-Elevation-USGS/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -68,6 +68,6 @@
          "web" : "https://github.com/trwyant/perl-Geo-WebService-Elevation-USGS"
       }
    },
-   "version" : "0.117",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.118",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

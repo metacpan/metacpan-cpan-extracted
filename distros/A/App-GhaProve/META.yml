@@ -25,16 +25,17 @@ optional_features: {}
 provides:
   App::GhaProve:
     file: lib/App/GhaProve.pm
-    version: '0.005'
+    version: '0.007'
 requires:
+  Test::Harness: '2.40'
   perl: '5.006'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/App-GhaProve/project
-  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=App-GhaProve
+  bugtracker: https://github.com/tobyink/p5-app-ghaprove/issues
   homepage: https://metacpan.org/release/App-GhaProve
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-app-ghaprove.git
-version: '0.005'
+version: '0.007'
 x_provides_scripts:
   gha-prove:
     file: bin/gha-prove

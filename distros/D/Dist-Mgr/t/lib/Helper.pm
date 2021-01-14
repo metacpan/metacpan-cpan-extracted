@@ -22,6 +22,9 @@ our @EXPORT_OK = qw(
     copy_manifest
     copy_git_ignore
 
+    cpan_save
+    cpan_restore
+
     unlink_changes
     unlink_ci_files
     unlink_makefile
@@ -47,7 +50,7 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 my $orig_dir        = 't/data/orig';
 my $work_dir        = 't/data/work';
-my $tpl_dir         = 't/data/module_template';
+my $tpl_dir         = 't/data/template/module_template';
 my $unwanted_dir    = 't/data/work/unwanted';
 my $init_dir        = 't/data/work/init';
 my $ci_dir          = 't/data/work/ci';
@@ -96,6 +99,20 @@ sub copy_git_ignore {
     copy "$orig_dir/.gitignore", $work_dir or die $!;
 }
 
+sub cpan_save {
+    my $f = "$ENV{HOME}/dist-mgr.json";
+
+    if (-e $f) {
+        copy $f, "$f.bak" or die "Can't copy config file: $!";
+    }
+}
+sub cpan_restore {
+    my $f = "$ENV{HOME}/dist-mgr.json";
+
+    if (-e "$f.bak") {
+        copy "$f.bak", $f or die "Can't copy config file: $!";
+    }
+}
 sub unlink_changes {
     if (-e "$work_dir/Changes") {
         unlink "$work_dir/Changes" or die $!;
@@ -226,6 +243,17 @@ sub trap_warn {
     }
 }
 
+sub make_second_module {
+    my ($dest) = @_;
+
+    if (! -e $dest) {
+        mkdir $dest or die "Can't create $dest dir\n";
+        is -d $dest, 1, "$dest dir created ok";
+    }
+
+    copy 't/data/orig/One.pm', $dest or die "Can't copy One.pm to $dest\n";
+
+}
 sub module_args {
     my %module_args = (
         author  => 'Test Author',

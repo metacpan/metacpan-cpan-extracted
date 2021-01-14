@@ -38,7 +38,7 @@ SV*
 unique_message_data_get (UniqueMessageData *message_data)
 	PREINIT:
 		const guchar *string = NULL;
-		gint length = 0;
+		gsize length = 0;
 		
 	CODE:
 		string = unique_message_data_get(message_data, &length);

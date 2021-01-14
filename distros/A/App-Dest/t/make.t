@@ -1,16 +1,18 @@
-use Test::Most;
+use Test2::V0;
+
 use File::Basename 'dirname';
+use File::Copy::Recursive 'dircopy';
 use File::Path 'rmtree';
 use Test::Output;
-use File::Copy::Recursive 'dircopy';
+
+use App::Dest;
 
 sub set_state {
     chdir( dirname($0) . '/make' );
     rmtree($_) for ( '.dest', 'actions/003' );
 }
-set_state();
+set_state;
 
-use_ok('App::Dest');
 
 stderr_is(
     sub { App::Dest->init },
@@ -72,26 +74,26 @@ stdout_is(
 
 stdout_like( sub { App::Dest->diff }, qr/\-\# change/, 'diff' );
 
-lives_ok( sub { App::Dest->clean('actions/001') }, 'partial clean' );
+ok( lives { App::Dest->clean('actions/001') }, 'partial clean' ) or note $@;
 stdout_is(
     sub { App::Dest->status },
     "diff - actions\n  - actions/000\n  + actions/003\n",
     'status after partial clean',
 );
 
-lives_ok( sub { App::Dest->clean }, 'full clean' );
+ok( lives { App::Dest->clean }, 'full clean' ) or note $@;
 stdout_is(
     sub { App::Dest->status },
     "ok - actions\n",
     'status after full clean',
 );
 
-lives_ok( sub { App::Dest->preinstall }, 'preinstall' );
+ok( lives { App::Dest->preinstall }, 'preinstall' ) or note $@;
 stdout_is(
     sub { App::Dest->status },
     "diff - actions\n  + actions/001\n  + actions/002\n  + actions/003\n",
     'status after full clean',
 );
 
-set_state();
-done_testing();
+set_state;
+done_testing;

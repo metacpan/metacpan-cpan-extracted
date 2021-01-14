@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: rest-ids-ali.pl
-# ABSTRACT: Restore ids in ALI files
+# ABSTRACT: Change (restore) full seq ids in ALI files
 
 use Modern::Perl '2011';
 use autodie;
@@ -36,11 +36,11 @@ __END__
 
 =head1 NAME
 
-rest-ids-ali.pl - Restore ids in ALI files
+rest-ids-ali.pl - Change (restore) full seq ids in ALI files
 
 =head1 VERSION
 
-version 0.203490
+version 0.210120
 
 =head1 USAGE
 

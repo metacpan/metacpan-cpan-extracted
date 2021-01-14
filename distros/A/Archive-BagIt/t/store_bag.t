@@ -22,14 +22,14 @@ use File::Slurp qw( read_file write_file);
 my $special = '#--Ä--ä--Ö--ö--Ü--ü--ß--.[{!}].--$';
 my $special_re = qr|#--Ä--ä--Ö--ö--Ü--ü--ß--\.\[\{!\}\]\.--\$|;
 
-use_ok('Archive::BagIt::Base');
+use_ok('Archive::BagIt');
 
 {
     note("simple bag");
     my $dir = tempdir(CLEANUP => 1);
     mkdir(File::Spec->catdir($dir, "data"));
     write_file(File::Spec->catfile($dir, "data", "1.txt"), "1");
-    ok(Archive::BagIt::Base->make_bag($dir), "make_bag()");
+    ok(Archive::BagIt->make_bag($dir), "make_bag()");
     file_exists_ok(File::Spec->catfile($dir, "bag-info.txt"));
     file_exists_ok(File::Spec->catfile($dir, "bagit.txt"));
     file_exists_ok(File::Spec->catfile($dir, "data", "1.txt"));
@@ -57,7 +57,7 @@ use_ok('Archive::BagIt::Base');
     mkdir(File::Spec->catdir($dir, "meta"));
     write_file(File::Spec->catfile($dir, "meta", "rights.xml"));
     my $bag;
-    my $warning = Test::Warnings::warning { $bag = Archive::BagIt::Base->make_bag($dir) };
+    my $warning = Test::Warnings::warning { $bag = Archive::BagIt->make_bag($dir) };
     like (
         $warning->[0] ,
         qr/possible non portable pathname detected/s,
@@ -69,7 +69,7 @@ use_ok('Archive::BagIt::Base');
         'Got expexted warning from make_bag()',
     ) or diag 'got unexpected warnings:' , explain($warning);
     isnt($bag->force_utf8(), 1, "force_utf8 set");
-    isa_ok($bag, 'Archive::BagIt::Base', "make_bag(), force_utf8");
+    isa_ok($bag, 'Archive::BagIt', "make_bag(), force_utf8");
     file_exists_ok(File::Spec->catfile($dir, "bag-info.txt"));
     file_exists_ok(File::Spec->catfile($dir, "bagit.txt"));
     file_exists_ok(File::Spec->catfile($subdir, "1.txt"));
@@ -98,8 +98,8 @@ use_ok('Archive::BagIt::Base');
     write_file($datafile2, "1");
     mkdir(File::Spec->catdir($dir, "meta"));
     write_file(File::Spec->catfile($dir, "meta", "rights.xml"));
-    my $bag = Archive::BagIt::Base->make_bag($dir, {force_utf8 => 1});
-    isa_ok($bag, 'Archive::BagIt::Base', "make_bag(), force_utf8");
+    my $bag = Archive::BagIt->make_bag($dir, {force_utf8 => 1});
+    isa_ok($bag, 'Archive::BagIt', "make_bag(), force_utf8");
     is($bag->force_utf8(), 1, "force_utf8 set");
     file_exists_ok(File::Spec->catfile($dir, "bag-info.txt"));
     file_exists_ok(File::Spec->catfile($dir, "bagit.txt"));
@@ -125,7 +125,7 @@ use_ok('Archive::BagIt::Base');
     mkdir(File::Spec->catdir($dir, "data"));
     write_file(File::Spec->catfile($dir, "data", "1.txt"), '');
     my $bag;
-    my $warning = Test::Warnings::warning { $bag = Archive::BagIt::Base->make_bag($dir) };
+    my $warning = Test::Warnings::warning { $bag = Archive::BagIt->make_bag($dir) };
     like (
         $warning->[0] ,
         qr/empty file .* detected/,
@@ -137,7 +137,7 @@ use_ok('Archive::BagIt::Base');
         'Got expected warning from make_bag()',
     ) or diag 'got unexpected warnings:' , explain($warning);
     ok ($bag,       "Object created");
-    isa_ok ($bag, 'Archive::BagIt::Base');
+    isa_ok ($bag, 'Archive::BagIt');
     file_exists_ok(File::Spec->catfile($dir, "bag-info.txt"));
     file_exists_ok(File::Spec->catfile($dir, "bagit.txt"));
     file_exists_ok(File::Spec->catfile($dir, "data", "1.txt"));

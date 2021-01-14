@@ -3,7 +3,7 @@ package App::FfmpegUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-12-12'; # DATE
 our $DIST = 'App-FfmpegUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -300,7 +300,7 @@ _
         prog => "ffmpeg", # XXX allow FFMPEG_PATH
     },
     links => [
-        {url=>'prog:split-srt-by-duration'},
+        {url=>'prog:srtsplit', summary=>'Split .srt by duration, much like this utility'},
     ],
 };
 sub split_video_by_duration {
@@ -351,7 +351,7 @@ App::FfmpegUtils - Utilities related to ffmpeg
 
 =head1 VERSION
 
-This document describes version 0.008 of App::FfmpegUtils (from Perl distribution App-FfmpegUtils), released on 2020-12-12.
+This document describes version 0.009 of App::FfmpegUtils (from Perl distribution App-FfmpegUtils), released on 2020-12-12.
 
 =head1 FUNCTIONS
 

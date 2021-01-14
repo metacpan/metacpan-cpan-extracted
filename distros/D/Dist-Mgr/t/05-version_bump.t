@@ -122,7 +122,7 @@ copy_module_files();
     my $data = version_bump(9.12, $d);
 
     for my $file (@valid) {
-        is keys %$data, 3, "returned href has proper number of keys ok";
+        is keys %$data, 4, "returned href has proper number of keys ok";
         is exists $data->{$file}, 1, "$file is a key of the returned href ok";
         is keys %{$data->{$file}}, 4, "href $file entry has proper key count ok";
         is exists $data->{$file}{content}, 1, "$file entry has a 'content' key ok";

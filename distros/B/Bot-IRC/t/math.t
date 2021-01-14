@@ -1,19 +1,11 @@
-use strict;
-use warnings;
+use Test2::V0;
+use Test::Lib;
+use TestCommon;
+use Bot::IRC::Math;
 
-use Test::Most;
-use Test::MockModule;
+my $c = TestCommon->new;
 
-use constant MODULE => 'Bot::IRC::Math';
-
-BEGIN { use_ok(MODULE); }
-BEGIN { use_ok('Bot::IRC'); }
-
-ok( MODULE->can('init'), 'init() method exists' );
-
-my $plugin;
-my $bot = Bot::IRC->new( connect => { server => 'irc.perl.org' } );
-
-lives_ok( sub { Bot::IRC::Math::init($bot) }, 'init()' );
+ok( Bot::IRC::Math->can('init'), 'init() method exists' );
+ok( lives { Bot::IRC::Math::init( $c->bot ) }, 'init()' ) or note $@;
 
 done_testing;

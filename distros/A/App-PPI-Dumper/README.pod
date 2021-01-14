@@ -2,7 +2,11 @@
 
 =encoding utf8
 
-=for HTML <a href="https://travis-ci.org/briandfoy/app-ppi-dumper"><img src="https://travis-ci.org/briandfoy/app-ppi-dumper.svg?branch=master" /></a>
+=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
+
+=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+
+=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
 
 =for HTML <a href='https://ci.appveyor.com/project/briandfoy/app-ppi-dumper'><img src='https://ci.appveyor.com/api/projects/status/7frfy5kdtyxfij5g' /></a>
 
@@ -10,7 +14,7 @@
 
 =for HTML <a href="https://github.com/briandfoy/app-ppi-dumper/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/App-PPI-Dumper.svg" /></a>
 
-=for HTML <a href="http://www.metacpan.org/module/App::PPI::Dumper"><img src="https://img.shields.io/cpan/v/App-PPI-Dumper.svg" /></A>
+=for HTML <a href="https://metacpan.org/pod/App::PPI::Dumper"><img src="https://img.shields.io/cpan/v/App-PPI-Dumper.svg" /></A>
 
 =head1 The App::PPI::Dumper module
 
@@ -23,7 +27,7 @@ for any Perl module.
 
 To read about L<App::PPI::Dumper>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|http://perldoc.perl.org/perldoc.html>:
+with L<perldoc|https://perldoc.perl.orgperldoc.html>:
 
 	% perldoc lib/App/PPI/Dumper.pm
 
@@ -32,17 +36,8 @@ name instead of the file location:
 
 	% perldoc App::PPI::Dumper
 
-You can read the documentation and inspect the meta data on one of the
-CPAN web interfaces, such as L<CPAN Search|http://search.cpan.org/dist/App-PPI-Dumper> or
-L<MetaCPAN|http://www.metacpan.org/module/App::PPI::Dumper>:
-
-=over 4
-
-=item *	L<http://search.cpan.org/dist/App-PPI-Dumper>
-
-=item *	L<http://www.metacpan.org/module/App::PPI::Dumper>
-
-=back
+You can read the documentation and inspect the meta data at
+L<MetaCPAN|https://metacpan.org/pod/App::PPI::Dumper>.
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's
@@ -107,7 +102,7 @@ They might not know the particulars of this module, but they can help
 you diagnose your problem.
 
 You might like to read L<brian's Guide to Solving Any Perl
-Problem|http://archive.oreilly.com/pub/a/perl/excerpts/9780596527242/brians-guide.html>.
+Problem|https://briandfoy.github.io/brians-guide-to-solving-any-perl-problem/>.
 
 =head2 Copyright and License
 

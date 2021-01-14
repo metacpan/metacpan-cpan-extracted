@@ -1,5 +1,8 @@
 Revision history for Perl module TestRail::API
 
+0.048 2021-11-01 TEODESIAN
+    - Fix issue with getUsers patch in 0.047
+
 0.047 2020-04-12 TEODESIAN
     - Fix getUsers now requiring project ID
     - Allow passing TESTRAIL_PLAN_ID env in A::P::P::T

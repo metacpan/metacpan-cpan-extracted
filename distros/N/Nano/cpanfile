@@ -3,6 +3,8 @@
 
 requires "Data::Object::Class" => "2.02";
 requires "Data::Object::ClassHas" => "2.01";
+requires "Data::Object::Role" => "2.01";
+requires "Data::Object::RoleHas" => "2.01";
 requires "Data::Object::Space" => "2.10";
 requires "Data::Object::Types" => "0.04";
 requires "Zing" => "0.26";
@@ -14,6 +16,8 @@ requires "warnings" => "0";
 on 'test' => sub {
   requires "Data::Object::Class" => "2.02";
   requires "Data::Object::ClassHas" => "2.01";
+  requires "Data::Object::Role" => "2.01";
+  requires "Data::Object::RoleHas" => "2.01";
   requires "Data::Object::Space" => "2.10";
   requires "Data::Object::Types" => "0.04";
   requires "Test::Auto" => "0.12";

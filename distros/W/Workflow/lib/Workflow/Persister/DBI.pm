@@ -15,7 +15,7 @@ use Workflow::Persister::DBI::SequenceId;
 use Carp qw(croak);
 use English qw( -no_match_vars );
 
-$Workflow::Persister::DBI::VERSION = '1.48';
+$Workflow::Persister::DBI::VERSION = '1.49';
 
 my @FIELDS = qw( handle dsn user password driver
     workflow_table history_table date_format parser autocommit);
@@ -65,11 +65,15 @@ sub init {
     for (qw( dsn user password date_format autocommit )) {
         $self->$_( $params->{$_} ) if ( defined $params->{$_} );
     }
+    $self->handle($self->create_handle);
 
     my $parser
         = DateTime::Format::Strptime->new( pattern => $self->date_format );
     $self->parser($parser);
+}
 
+sub create_handle {
+    my ($self) = @_;
     my $dbh = eval {
                DBI->connect( $self->dsn, $self->user, $self->password )
             || croak "Cannot connect to database: $DBI::errstr";
@@ -81,10 +85,11 @@ sub init {
     $dbh->{PrintError} = 0;
     $dbh->{ChopBlanks} = 1;
     $dbh->{AutoCommit} = $self->autocommit();
-    $self->handle($dbh);
     $log->is_debug
         && $log->debug( "Connected to database '",
         $self->dsn, "' and ", "assigned to persister ok" );
+
+    return $dbh;
 }
 
 sub assign_generators {
@@ -210,7 +215,9 @@ sub create_workflow {
     my $sql = 'INSERT INTO %s ( %s ) VALUES ( %s )';
 
     ## no critic (ProhibitParensWithBuiltins)
-    $sql = sprintf $sql, $self->workflow_table, join( ', ', @fields ),
+    $sql = sprintf $sql,
+        $self->handle->quote_identifier( $self->workflow_table ),
+        join( ', ', @fields ),
         join( ', ', map {'?'} @values );
 
     if ( $log->is_debug ) {
@@ -246,7 +253,8 @@ sub fetch_workflow {
           FROM %s
          WHERE $WF_FIELDS[0] = ?
     };
-    $sql = sprintf $sql, $self->workflow_table;
+    $sql = sprintf $sql,
+        $self->handle->quote_identifier( $self->workflow_table );
 
     if ( $log->is_debug ) {
         $log->debug("Will use SQL\n$sql");
@@ -322,8 +330,8 @@ sub create_history {
         my $sql = 'INSERT INTO %s ( %s ) VALUES ( %s )';
 
         ## no critic (ProhibitParensWithBuiltins)
-        $sql = sprintf $sql, $self->history_table, join( ', ', @fields ),
-            join( ', ', map {'?'} @values );
+        $sql = sprintf $sql, $dbh->quote_identifier( $self->history_table ),
+            join( ', ', @fields ), join( ', ', map {'?'} @values );
         if ( $log->is_debug ) {
             $log->debug("Will use SQL\n$sql");
             $log->debug( "Will use parameters\n", join ', ', @values );
@@ -436,10 +444,14 @@ sub rollback_transaction {
 sub _init_fields {
     my ($self) = @_;
     unless ( scalar @WF_FIELDS ) {
-        @WF_FIELDS = $self->get_workflow_fields();
+        @WF_FIELDS = map {
+            $self->handle->quote_identifier($_)
+        } $self->get_workflow_fields();
     }
     unless ( scalar @HIST_FIELDS ) {
-        @HIST_FIELDS = $self->get_history_fields();
+        @HIST_FIELDS = map {
+            $self->handle->quote_identifier($_)
+        } $self->get_history_fields();
     }
 }
 
@@ -525,6 +537,9 @@ example.)
     $self->assign_tables( $params );
  }
 
+ # suppress the parent from trying to connect to the database
+ sub create_handle { return undef; }
+
  sub handle {
      my ( $self ) = @_;
      return CTX->datasource( $self->datasource_name );
@@ -567,9 +582,10 @@ All public methods are inherited from L<Workflow::Persister>.
 
 =head3 init( \%params )
 
-Create a database handle from the given parameters. You are only
-required to provide 'dsn', which is the full DBI DSN you normally use
-as the first argument to C<connect()>.
+Initializes the the instance by setting the connection parameters
+and calling C<create_handle>. You are only required to provide 'dsn',
+which is the full DBI DSN you normally use as the first argument
+to C<connect()>.
 
 You can set these parameters in your persister configuration file and
 they will be passed to init.
@@ -701,6 +717,19 @@ Length of character sequence to generate. Default: 8.
 
 Create ID generators for the workflow and history tables using
 the Oracle sequences. No parameters are necessary.
+
+=head3 create_handle
+
+Creates a database connection using DBI's C<connect> method and returns
+the resulting database handle. Override this method if you want to set
+different options than the hard-coded ones, or when you want to use a
+handle from elsewhere.
+
+The default implementation hard-codes these database handle settings:
+
+    $dbh->{RaiseError} = 1;
+    $dbh->{PrintError} = 0;
+    $dbh->{ChopBlanks} = 1;
 
 =head3 create_workflow
 

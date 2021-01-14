@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package x;
+package X;
 
 use Test::More;
 

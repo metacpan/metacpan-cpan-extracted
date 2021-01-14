@@ -34,7 +34,7 @@ use Math::Trig qw[deg2rad tan];
 
 with 'MooseX::Getopt';
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 # Constants that we haven't made into attributes yet
 use constant {
@@ -46,7 +46,7 @@ use constant {
   POT_BOT_WIDTH => 200,       # Width of the bottom of the pot
   TRUNK_WIDTH => 100,         # Width of the trunk
   BAUBLE_RADIUS => 20,        # Radius of a bauble
-  STAR_RADIUS => 40,          # Raduis of the star
+  STAR_RADIUS => 40,          # Radius of the star
 };
 
 =head1 Methods

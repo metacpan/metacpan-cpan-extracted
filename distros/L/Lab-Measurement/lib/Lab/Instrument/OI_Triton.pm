@@ -1,6 +1,6 @@
 package Lab::Instrument::OI_Triton;
 #ABSTRACT: Oxford Instruments Triton dilution refrigerator control
-$Lab::Instrument::OI_Triton::VERSION = '3.731';
+$Lab::Instrument::OI_Triton::VERSION = '3.740';
 use v5.20;
 
 use strict;
@@ -198,7 +198,7 @@ Lab::Instrument::OI_Triton - Oxford Instruments Triton dilution refrigerator con
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 SYNOPSIS
 
@@ -237,7 +237,7 @@ probably many
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2014       
             2015       Andreas K. Huettel

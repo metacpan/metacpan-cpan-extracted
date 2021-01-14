@@ -1,21 +1,12 @@
-use Test::Most;
+use Test2::V0;
+use Bible::OBML::Gateway;
 
-use constant PACKAGE => 'Bible::OBML::Gateway';
+my $self = Bible::OBML::Gateway->new;
+isa_ok( $self, 'Bible::OBML::Gateway' );
 
-exit main();
+can_ok( $self, $_ ) for ( qw(
+    ua url translation obml data
+    new translation get obml data html save load
+) );
 
-sub main {
-    BEGIN { use_ok(PACKAGE) }
-    require_ok(PACKAGE);
-
-    my $self = PACKAGE->new;
-    isa_ok( $self, PACKAGE );
-
-    can_ok( PACKAGE, $_ ) for ( qw(
-        ua url translation obml data
-        new translation get obml data html save load
-    ) );
-
-    done_testing();
-    return 0;
-};
+done_testing;

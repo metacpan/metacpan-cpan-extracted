@@ -1,5 +1,16 @@
 Revision history for Bible::OBML
 
+1.16      2021-01-13 11:01:18-08:00 America/Los_Angeles
+        - Override some minimum version reqs in dist.ini
+
+1.15      2021-01-12 09:00:29-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+        - Update to require Bible::Reference 1.05
+
 1.14      2020-07-17 15:21:06-07:00 America/Los_Angeles
         - Improved rendering of OBML from parsed data
 

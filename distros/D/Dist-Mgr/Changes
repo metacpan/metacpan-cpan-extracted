@@ -1,5 +1,35 @@
 Revision history for Dist-Mgr
 
+1.04    2021-01-13
+    - Change -x to -w in distmgr POD
+    - Moved distmgr POD from binary to separate POD file
+    - Add distmgr command process flow documentation to the README (closes #37)
+    - Added config file integration (config(), config_file(), distmgr config)
+      (closes #40)
+    - Regex cleanup in test files that check the current working directory
+      (some CPAN testers dump the dist into a numbered directory)
+    - Added copyright bump functionality (copyright_bump(), copyright_info())
+      (closes #32)
+    - We now save an existing config file before testing, and restore it after
+    - Check if git status differs before waiting for CI tests to complete
+    - Test fixes regarding MANIFEST files
+
+1.03    2021-01-12
+    - POD fixes and updates
+    - In distmgr, add user interaction prior to cpan_upload() so the user can
+      confirm for certain that the dist tarball should be uploaded
+    - Renamed git_status() to git_status_differs() to be less confusing
+    - We now skip over Git operations and CI testing if 'release' is called and
+      nothing has changed (closes #38)
+    - Added more output surrounding CPAN uploads
+    - version_info() now sets a default directory if $fs_entry not sent in
+    - distmgr release now has --wait and --nowait for CI test run completion
+    - distmgr binary now has thorough and complete unit tests
+    - distmgr release wasn't sending proper params to cpan_upload()
+
+1.02    2021-01-06
+    - This release was skipped for internal testing purposes
+
 1.01    2021-01-06
     - This release fully performed with this Dist::Mgr software!! (Crosses
       fingers)
@@ -23,6 +53,7 @@ Revision history for Dist-Mgr
     - distmgr now does a 'git add' and make_manifest() after installing Github
       Actions CI file (fixes #33)
     - Performed full release and cycle of Word::Rhymes 1.03!
+    - Re-run CI tests
 
 1.00    2020-12-30
     - Fix issue where ABSTRACT was being pulled from one of the test

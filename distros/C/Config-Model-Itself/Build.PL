@@ -69,6 +69,7 @@ my $build = $class->new
     'Getopt::Long' => '0',
     'Module::Build' => '0.34',
     'Test::Differences' => '0',
+    'Test::Exception' => '0',
     'Test::File::Contents' => '0',
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',

@@ -1,1 +1,7 @@
 Revision history for Perl module unichar
+0.012 2018-07-07T18:01:31Z
+	* Make it a modulino
+	* Add some basic docs
+	* Add a simple test 
+	* update to the Artistic License 2.0
+

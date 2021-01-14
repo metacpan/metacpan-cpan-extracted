@@ -19,14 +19,18 @@ my %WriteMakefileArgs = (
     "script/srtrenumber",
     "script/srtscale",
     "script/srtshift",
+    "script/srtsplit",
     "script/vtt2srt"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::SubtitleUtils",
   "PREREQ_PM" => {
+    "File::Slurper::Dash" => 0,
     "Log::ger" => "0.037",
     "Log::ger::Screen" => 0,
+    "POSIX" => 0,
+    "Perinci::CmdLine::Any" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -36,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,11 +48,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "File::Slurper::Dash" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.037",
   "Log::ger::Screen" => 0,
+  "POSIX" => 0,
+  "Perinci::CmdLine::Any" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

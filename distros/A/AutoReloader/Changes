@@ -1,0 +1,15 @@
+Revision history for Perl extension AutoReloader.
+
+0.03  Wed 13 Jan 09:49:26 CET 2021
+        - bump version number
+
+0.02  Thu Apr 19 11:34:51 CEST 2007
+        - bugfix: named subs got re-loaded only once; after that
+	  the outer subroutine refrence was overwritten.
+	- made %AL into a package variable; subs are visible and
+	  can be munged at own risk
+
+0.01  Tue Feb 20 15:05:58 2007
+	- original version; created by h2xs 1.23 with options
+		-AX --use-new-tests -n AutoReloader -b 5.8.0
+

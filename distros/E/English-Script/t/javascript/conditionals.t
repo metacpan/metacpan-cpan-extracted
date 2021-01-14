@@ -1,11 +1,8 @@
-use strict;
-use warnings;
-use Test::Most;
-
-use_ok('English::Script');
+use Test2::V0;
+use English::Script;
 
 my $es;
-lives_ok( sub { $es = English::Script->new }, 'new' );
+ok( lives { $es = English::Script->new }, 'new' ) or note $@;
 
 is(
     $es->parse(

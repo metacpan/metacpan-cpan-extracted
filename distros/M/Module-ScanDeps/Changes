@@ -1,9 +1,24 @@
+1.30  2021-01-13
+
+- change bugtracker to GitHub issues
+
+- guard against trailing slashes for paths in @INC
+
+- interprete more common "use lib" idioms
+
+1.29  2020-08-16
+
+- implement interpretation of stuff like
+
+  use FindBin;
+  use lib "$FindBin/../lib";
+
 1.28  2020-08-06
 
 - placate cperl ("Attempt to change hash while iterating over it.")
 
 - make _find_encoding() more robust
-    
+
 1.27  2019-01-15
 
 - fixes by Shawn Laffan <shawnlaffan@gmail.com>
@@ -18,13 +33,13 @@
   - t/7-check-dynaloader.t: improve diagnostics
 
 - drop Cwd from the list of potential XS modules
-    
+
 - suppress warnings in some ancient Perls
 
 1.26  2018-12-12
 
 - Glue DLLs of XS modules should have type "shared" rather than "data"
-    
+
   Detection broke on Windows where nowadays $Config{dlext} = "xs.dll"
   (i.e. it's not a simple suffix)
 
@@ -38,10 +53,10 @@
 1.25  2018-08-18
 
 - Merge pull request #2 from shawnlaffan/master, thanx Shawn!
-  
+
   continue scanning one-liners when use if, autouse or >5.010 found
 
-- Fix how data obtained from compiling or executing a file 
+- Fix how data obtained from compiling or executing a file
   is incorporated (_info2rv).
 
   Sanitize all pathnames to use slash (instead of backslash):
@@ -58,7 +73,7 @@
 
 - Merge pull request from Salvador Fandiño (salva), thx!
   Specio::PartialDump uses unicore
-    
+
 - Fix RT#119737: Problems with detecting DateTime::Format::Natural dependencies
   ... by adding a %Preload rule
 
@@ -67,7 +82,7 @@
 - add %Preload rules for List::SomeUtils and Pod::Simple::Transcode
 
 - get rid of Module::Install, use ExtUtils::MakeMaker
-    
+
 1.22  2016-09-17
 
 - Fix RT#117887: Not parsing new release of Net::DNS::Resolver
@@ -91,7 +106,7 @@
 1.20  2015-10-04
 
 - Fix RT #107304: Newer versions of File::Path cause warning "_Inline for _Inline: No such file or directory at Module/ScanDeps.pm line 1339."
-  - drop the dubious call to rmtree() 
+  - drop the dubious call to rmtree()
 
 - Fix RT106142: Preload dependencies for PDL and PDL::NiceSlice
   - adopted from a patch by Shawn Laffan, thanks Shawn!
@@ -103,9 +118,9 @@
 
   - A line of "use utf8;" just means "this file is encoded in UTF-8"
     and should _not_ result in scanning utf8.pm which will pull in
-    the whole Unicode shebang (propery tables and what not). 
-    Yes, utf8.pm *does* contain "require utf8_heavy.pl", but only inside 
-    an AUTOLOAD() that is *not* triggered by calling functions 
+    the whole Unicode shebang (propery tables and what not).
+    Yes, utf8.pm *does* contain "require utf8_heavy.pl", but only inside
+    an AUTOLOAD() that is *not* triggered by calling functions
     like utf8::is_utf8().
 
   - OTOH the innocently looking one-liner
@@ -114,7 +129,7 @@
 
     implicitly loads utf8.pm and triggers the AUTOLAD().
 
-  - So prevent utf8.pm from being scanned and make utf8_heavy.pl 
+  - So prevent utf8.pm from being scanned and make utf8_heavy.pl
     the indicator for "I need the Unicode stuff" instead.
 
   - Cache the results of _get_preload('utf8_heavy.pl').
@@ -128,7 +143,7 @@
     );
 
   scan_deps_static() registers a dependency on Bar.pm _and_
-  Quux.pm when it has seen "use Foo;" 
+  Quux.pm when it has seen "use Foo;"
 
 - Minor changes:
   - drop dubious %Preload of utf8.pm for SOAP::Lite and XML::Parser::Expat
@@ -140,7 +155,7 @@
 
 1.19  2015-05-27
 
-  - add %Preload rule for LWP::MediaTypes: data file LWP/media.types 
+  - add %Preload rule for LWP::MediaTypes: data file LWP/media.types
 
   - add %Preload entry for MIME::Types: data file MIME/types.db
 
@@ -190,7 +205,7 @@
     - also scandeps.pl: die if an option is not recognized
 
   - Remove some overzealous heuristics from scan_chunk()
-    - they were looking for 
+    - they were looking for
 
       Foo::Bar->something
       Foo::Bar::whatever(...)
@@ -198,9 +213,9 @@
     _anywhere_ in programs to infer a dependency on Foo/Bar.pm.
 
     BEWARE: This might break some use cases, i.e. missing some dependencies.
-    On the other hand,  this causes hard to investigate problems like the one 
+    On the other hand,  this causes hard to investigate problems like the one
     starting at http://www.mail-archive.com/par@perl.org/msg05531.html.
-    While the former can easily be worked around by the user itself (just 
+    While the former can easily be worked around by the user itself (just
     add a missing dependecy explicitly, e.g. using "pp -M ...") and
     typically can be solved in general by adding a %Preload rule,
     the latter just wastes people's times.
@@ -243,7 +258,7 @@
 
   - Fix RT #90869: Use of uninitialized value $module in substitution (s///)
 
-  - Fix RT #87775: typo fixes, thanks dsteinbrunner@pobox.com 
+  - Fix RT #87775: typo fixes, thanks dsteinbrunner@pobox.com
 
   - new %Preload rule for B::Hooks::EndOfScope
 
@@ -253,31 +268,31 @@
     or Module::Runtime is detected (coz' they're doing runtime loading)
 
   - change some tests to use Test::Requires instead of homegrown stuff;
-    hence add it to "test_requires" 
+    hence add it to "test_requires"
   - clean up some uses of Test::More
 
 1.11  2013-09-28
 
   - Fix RT #89000: test broken by indirect base.pm disuse
-    - delete base.pm from list of expected deps, 
+    - delete base.pm from list of expected deps,
       patch by Andrew Main (zefram@fysh.org)
 
   - new %Preload rule for Net::HTTPS (e.g. used by LWP::Protocol::https)
     - look for IO::Socket::SSL or Net::SSL
 
   - new %Preload rule for YAML::Any
-    - try to figure out what YAML::Any would have used 
+    - try to figure out what YAML::Any would have used
       (using YAML::Any->implementation)
     - as fallback, include anything below YAML
 
 1.10  2012-10-20
 
-  - add %Preload rule for Params::Validate to detect 
+  - add %Preload rule for Params::Validate to detect
     its PP and XS implementations
 
-  - Fix RT #80276 Module DateTime::Format::ISO8601 generates error 
+  - Fix RT #80276 Module DateTime::Format::ISO8601 generates error
     after being packaged
-    - caused by failing to pack DateTime::Format::Builder::Parser::XXX modules 
+    - caused by failing to pack DateTime::Format::Builder::Parser::XXX modules
       needed by DateTime::Format::Builder::Parser
     - add a corresponding %Preload rule
 
@@ -309,20 +324,20 @@
       is an encoding "internally" handled by Encode.pm, e.g. "UTF-8")
 
   - %Preload: add rules for Gtk2.pm and Pango.pm
-  - %Preload: fix a problem with Image::ExifTool 
+  - %Preload: fix a problem with Image::ExifTool
 
 1.07  2011-11-29
 
-  - RT #72796: dynaloader test fails when the .so files are in the 
+  - RT #72796: dynaloader test fails when the .so files are in the
     system lib dirs and local::lib is involved?
     Relax a check in t/7-check-dynaloader.t
   - Update Module::Install to 1.04
-   
+
 1.06  2011-11-28
 
   - RT #72211: pp includes way too much modules (when using 'use strict;')?
-    Rework regexes to detect "use MODULE ...": 
-    the following line from unicore/mktables 
+    Rework regexes to detect "use MODULE ...":
+    the following line from unicore/mktables
 
       my $unihan = 'Unihan properties are by default not enabled in the Perl core.  Instead use CPAN: Unicode::Unihan';
 
@@ -335,7 +350,7 @@
 1.05  2011-11-02
 
   - RT #72082: $FindBin::Bin issue on Moudel::ScanDeps 1.04
-    Make FindBin work (at least with option -c or -x) by spoofing $0 
+    Make FindBin work (at least with option -c or -x) by spoofing $0
     in the temp script generated for M:SD::DataFeed
   - RT #70134: patch suggestions for Module::ScanDeps 1.04: additional preload
     rules, used_via_preload attribute
@@ -352,9 +367,9 @@
 1.03  2011-07-18
 
   - RT #69213: ScanDeps incompatible with AnyEvent (Perl 5.14, AnyEvent 5.34, PAR 1.00.2)
-    For option -c (compile) M:SD used to wrap the file in one big sub and 
-    appended an END block where it dumps %INC etc; the outer sub causes problems 
-    with certain contructs. Instead we now use an INIT block prepended 
+    For option -c (compile) M:SD used to wrap the file in one big sub and
+    appended an END block where it dumps %INC etc; the outer sub causes problems
+    with certain contructs. Instead we now use an INIT block prepended
     to the file.
 
   - RT #69471: Problem with "eval { require SomeModule }" constructions
@@ -362,11 +377,11 @@
     (these may be created by an unsuccessful "require" under certain conditions).
     Also omit CODE refs from @INC.
 
-  - Fix for failing CPAN Testers report 
+  - Fix for failing CPAN Testers report
     http://www.cpantesters.org/cpan/report/4208fa16-a5d1-11e0-a0bc-c71a7862a918:
     Perl 5.15.0 got rid of Shell.pm
 
-  - Fix for failing CPAN Testers report 
+  - Fix for failing CPAN Testers report
     http://www.cpantesters.org/cpan/report/772147dc-6c1f-1014-baf2-318eb63ba09a:
     - regex meta characters in filenames break consistency check
 
@@ -385,7 +400,7 @@
 
 1.01  2011-03-26
 
-  - %Preload: add "unicore/version" for Unicode/UCD.pm 
+  - %Preload: add "unicore/version" for Unicode/UCD.pm
     (because it contains a call openunicode(..., "version"))
 
 1.00  2011-02-19
@@ -400,11 +415,11 @@
   - add Eric Roode to AUTHORS (Steffen Mueller)
   - RT #61027: "use lib" does not work (Roderich Schupp)
     scan_line(): When handling "use lib '/some/dir'" we add "/some/dir/ARCHNAME",
-    "/some/dir/VER" and "/some/dir/VER/ARCHNAME", but forgot 
+    "/some/dir/VER" and "/some/dir/VER/ARCHNAME", but forgot
     to add "/some/dir" itself.
     While we're at it, improve parsing the argument list of "use lib".
     Simply eval the string, this should at least make all forms of
-    quoted strings work correctly. 
+    quoted strings work correctly.
   - fix URI special case (clkao)
   - fix a regression reported by CPAN Testers (Roderich Schupp)
   - finally: bump version to 1.00
@@ -911,7 +926,7 @@ to get TrueType support.
 0.22  2003-08-07
 
 
-  - huge patch to include almost all heuristics deducible from PerlApp: 
+  - huge patch to include almost all heuristics deducible from PerlApp:
     Authen::SASL, Crypt::Random, DBI, File::Spec,
     HTTP::Message, Math::BigInt, MIME::Decoder, Net::DNS::RR,
     Net::FTP, Net::SSH::Perl, SQL::Parser, Template,
@@ -1021,4 +1036,4 @@ to get TrueType support.
   - oops, Makefile shouldn't be in RCS.
 
   - written-from-scratch version of dependency finding
-    algorithm. 
+    algorithm.

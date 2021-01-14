@@ -62,7 +62,8 @@ return [
                 ."This Perl class must inherit L<Config::Model::Node>. Use with care.",
                 assert => {
                     "1_load_class" => {
-                        code => 'not defined $_ or eval{Mouse::Util::load_class($_)}; not $@;',
+                        code => 'return 1 unless defined $_;'
+                        .'return Mouse::Util::load_class($_);',
                         msg  => 'Error while loading $_ class ',
                     },
                    "2_class_inherit" => {
@@ -176,9 +177,9 @@ return [
                     .'not be applicable depending on your application. It may also be '
                     .'hardcoded in a custom backend. If not specified, the instance name '
                     .'is used as base name for your configuration file. The configuration file name'
-                    .'can be specified with &index keyword when a backend is associated to a node '
-                    .'contained in a hash. See '
-                    .'L<backend specifications|http://search.cpan.org/dist/Config-Model/lib/Config/Model/BackendMgr.pm#Backend_specification>.'
+                    .'can be specified with &index() or &element function. See '
+                    .'L<backend specifications|http://search.cpan.org/dist/Config-Model/lib/Config/Model/BackendMgr.pm#Backend_specification> '
+                    .'and L<Config::Model::Role::ComputeFunction>.'
             },
         ]
     ],

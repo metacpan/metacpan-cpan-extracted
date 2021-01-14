@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: change-ids-ali.pl
-# ABSTRACT: Change (abbreviate or restore) ids' org component in ALI files
+# ABSTRACT: Abbreviate or restore the org component of full seq ids in ALI files
 
 use Modern::Perl '2011';
 use autodie;
@@ -24,7 +24,7 @@ for my $infile (@ARGV_infiles) {
     $ali->dont_guess if $ARGV_noguessing;
 
     # build id_mapper and change ids
-    my $id_mapper;    
+    my $id_mapper;
 
     if ($ARGV_mode eq 'long2abbr') {
         $id_mapper = $ali->org_mapper_from_long_ids($org_mapper);
@@ -34,10 +34,10 @@ for my $infile (@ARGV_infiles) {
         $id_mapper = $ali->org_mapper_from_abbr_ids($org_mapper);
         $ali->restore_ids($id_mapper);
     }
-    
+
     my $outfile = secure_outfile($infile, $ARGV_out_suffix);
     $ali->store($outfile);
-    
+
     # optionally store the id mapper
     if ($ARGV_store_id_mapper) {
         my $idmfile = change_suffix($outfile, '.idm');
@@ -51,11 +51,11 @@ __END__
 
 =head1 NAME
 
-change-ids-ali.pl - Change (abbreviate or restore) ids' org component in ALI files
+change-ids-ali.pl - Abbreviate or restore the org component of full seq ids in ALI files
 
 =head1 VERSION
 
-version 0.203490
+version 0.210120
 
 =head1 USAGE
 

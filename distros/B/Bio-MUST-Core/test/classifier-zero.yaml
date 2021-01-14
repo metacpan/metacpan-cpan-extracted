@@ -1,0 +1,8 @@
+categories:
+- label: five_org
+  description: OG with only PSM archaea (control)
+  criteria:
+  - tax_filter: [ +Methanopyrales, +Methanobacteriales ]
+    min_org_count: 5
+  - tax_filter:	[ -Methanopyrales, -Methanobacteriales ]
+    max_org_count: 0

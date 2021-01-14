@@ -1,5 +1,15 @@
 Revision history for Bible::OBML::Gateway
 
+1.12      2021-01-13 11:04:49-08:00 America/Los_Angeles
+        - Override some minimum version reqs in dist.ini
+
+1.11      2021-01-12 09:02:52-08:00 America/Los_Angeles
+        - Migrate to Test2::V0
+        - Improve .gitignore file
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.10      2020-07-20 10:04:37-07:00 America/Los_Angeles
         - Fix to handle UTF-8 on save() and load() operations
 

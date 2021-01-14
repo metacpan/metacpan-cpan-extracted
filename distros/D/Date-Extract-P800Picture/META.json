@@ -61,11 +61,11 @@
    "provides" : {
       "Date::Extract::P800Picture" : {
          "file" : "lib/Date/Extract/P800Picture.pm",
-         "version" : "v1.1.4"
+         "version" : "v1.1.5"
       },
       "Date::Extract::P800Picture::Exceptions" : {
          "file" : "lib/Date/Extract/P800Picture/Exceptions.pm",
-         "version" : "v1.1.4"
+         "version" : "v1.1.5"
       }
    },
    "release_status" : "stable",
@@ -77,6 +77,6 @@
          "url" : "https://bitbucket.org/rolandvanipenburg/date-extract-p800picture"
       }
    },
-   "version" : "v1.1.4",
+   "version" : "v1.1.5",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

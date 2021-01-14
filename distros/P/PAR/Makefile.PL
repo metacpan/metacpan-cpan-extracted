@@ -34,7 +34,7 @@ WriteMakefile1(
           web  => 'https://github.com/rschupp/PAR',
         },
         MailingList => 'mailto:par@perl.org',
-        bugtracker => { web => 'https://rt.cpan.org/Dist/Display.html?Queue=PAR' },
+        bugtracker => { web => 'https://github.com/rschupp/PAR/issues' },
       },
     },
 

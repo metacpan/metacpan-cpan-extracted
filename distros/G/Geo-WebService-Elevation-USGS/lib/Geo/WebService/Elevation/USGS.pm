@@ -76,7 +76,7 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 # use constant USGS_URL => 'https://ned.usgs.gov/epqs/pqs.php';
 use constant USGS_URL => 'https://nationalmap.gov/epqs/pqs.php';
@@ -811,7 +811,7 @@ problem in my first module to rely heavily on Test::More.
 =head1 BUGS
 
 Bugs can be reported to the author by mail, or through
-L<https://rt.cpan.org/>.
+L<https://github.com/trwyant/perl-Geo-WebService-Elevation-USGS/issues/>.
 
 =head1 SEE ALSO
 
@@ -821,7 +821,7 @@ Thomas R. Wyant, III; F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 Thomas R. Wyant, III
+Copyright (C) 2008-2021 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

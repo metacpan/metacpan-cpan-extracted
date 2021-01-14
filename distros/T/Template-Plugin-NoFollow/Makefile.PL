@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Template-Plugin-NoFollow",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Template::Plugin::NoFollow",
   "PREREQ_PM" => {
     "HTML::Parser" => 0,
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::DiagINC" => "0.002",
     "Test::More" => "0.94"
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.04",
   "test" => {
     "TESTS" => "t/*.t"
   }

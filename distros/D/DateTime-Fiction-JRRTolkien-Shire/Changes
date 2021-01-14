@@ -1,3 +1,10 @@
+0.905		2021-01-12	T. R. Wyant
+    Correct tests for tweaks in Afteryule event text.
+
+    Add Travis CI testing.
+
+    Use GitHub as bug tracker. R.I.P. rt.cpan.org.
+
 0.904		2020-05-06	T. R. Wyant
     Add Test::More as a prerequisite for building (ooops!)
 

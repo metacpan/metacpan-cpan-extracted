@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,22 +21,22 @@ name: Symbol-Approx-Sub
 provides:
   Symbol::Approx::Sub:
     file: lib/Symbol/Approx/Sub.pm
-    version: v3.1.2
+    version: v3.1.3
   Symbol::Approx::Sub::Random:
     file: lib/Symbol/Approx/Sub/Random.pm
-    version: v3.1.2
+    version: v3.1.3
   Symbol::Approx::Sub::String::Approx:
     file: lib/Symbol/Approx/Sub/String/Approx.pm
-    version: v3.1.2
+    version: v3.1.3
   Symbol::Approx::Sub::String::Equal:
     file: lib/Symbol/Approx/Sub/String/Equal.pm
-    version: v3.1.2
+    version: v3.1.3
   Symbol::Approx::Sub::Text::Metaphone:
     file: lib/Symbol/Approx/Sub/Text/Metaphone.pm
-    version: v3.1.2
+    version: v3.1.3
   Symbol::Approx::Sub::Text::Soundex:
     file: lib/Symbol/Approx/Sub/Text/Soundex.pm
-    version: v3.1.2
+    version: v3.1.3
 recommends:
   String::Approx: '0'
   Text::Metaphone: '0'
@@ -48,7 +48,8 @@ requires:
   Module::Load: '0'
   perl: '5.010'
 resources:
+  bugtracker: https://github.com/davorg/symbol-approx-sub/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/davorg/symbol-approx-sub.git
-version: v3.1.2
+version: v3.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

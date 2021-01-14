@@ -4,7 +4,7 @@ use warnings;
 
 require 5.008_001;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 $VERSION = eval {$VERSION};
 
 
@@ -39,7 +39,7 @@ Net::SAML2
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 
@@ -146,12 +146,12 @@ Original Author: Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Chris Andrews and Others; in detail:
+This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
 
   Copyright 2010-2012  Chris Andrews
             2016       Jeff Fearn
             2017       xmikew
-            2019-2020  Timothy Legge
+            2019-2021  Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

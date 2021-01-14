@@ -68,13 +68,13 @@
       "bugtracker" : {
          "web" : "https://github.com/fredericd/koha-sudoc/issues"
       },
-      "homepage" : "http://www.tamil.fr/sudoc/sudoc.html",
+      "homepage" : "https://www.tamil.fr/sudoc/sudoc.html",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/fredericd/koha-sudoc"
       }
    },
-   "version" : "2.33",
+   "version" : "2.34",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -57,7 +57,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-Indonesia-Holiday"
+         "web" : "https://github.com/perlancar/perl-Calendar-Indonesia-Holiday/issues"
       },
       "homepage" : "https://metacpan.org/release/Calendar-Indonesia-Holiday",
       "repository" : {
@@ -66,7 +66,7 @@
          "web" : "https://github.com/perlancar/perl-Calendar-Indonesia-Holiday"
       }
    },
-   "version" : "0.330",
+   "version" : "0.334",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -186,7 +186,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.041"
+            "version" : "0.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",

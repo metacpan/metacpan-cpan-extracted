@@ -1,5 +1,8 @@
 Revision history for exact::cli
 
+1.05      2021-01-13 11:13:57-08:00 America/Los_Angeles
+        - Override some minimum version reqs in dist.ini
+
 1.04      2021-01-10 15:50:11-08:00 America/Los_Angeles
         - Migrate to Test2::V0
         - Improve .gitignore file

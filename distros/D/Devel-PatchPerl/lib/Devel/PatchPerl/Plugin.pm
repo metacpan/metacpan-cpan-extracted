@@ -1,5 +1,5 @@
 package Devel::PatchPerl::Plugin;
-$Devel::PatchPerl::Plugin::VERSION = '2.06';
+$Devel::PatchPerl::Plugin::VERSION = '2.08';
 #ABSTRACT: Devel::PatchPerl plugins explained
 
 use strict;
@@ -19,7 +19,7 @@ Devel::PatchPerl::Plugin - Devel::PatchPerl plugins explained
 
 =head1 VERSION
 
-version 2.06
+version 2.08
 
 =head1 DESCRIPTION
 
@@ -82,7 +82,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Chris Williams and Marcus Holland-Moritz.
+This software is copyright (c) 2021 by Chris Williams and Marcus Holland-Moritz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

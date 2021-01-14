@@ -4,7 +4,7 @@ Mail::TLSRPT - TLSRPT object
 
 # VERSION
 
-version 1.20200413.1
+version 2.20210112
 
 # DESCRIPTION
 

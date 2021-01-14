@@ -18,11 +18,13 @@ my %WriteMakefileArgs = (
     "bin/ali2phylip.pl",
     "bin/app-len-ids-ali.pl",
     "bin/change-ids-ali.pl",
+    "bin/classify-ali.pl",
     "bin/clust2mapper.pl",
     "bin/fasta2ali.pl",
     "bin/fetch-tax.pl",
     "bin/format-tree.pl",
     "bin/idealize-ali.pl",
+    "bin/jack-ali-dir.pl",
     "bin/list2mapper.pl",
     "bin/mask-ali.pl",
     "bin/phylip2ali.pl",
@@ -51,6 +53,7 @@ my %WriteMakefileArgs = (
     "Bio::LITE::Taxonomy::NCBI::Gi2taxid" => 0,
     "Bio::Phylo::IO" => 0,
     "Carp" => 0,
+    "Config::Any" => 0,
     "Const::Fast" => 0,
     "Date::Format" => 0,
     "Exporter::Easy" => 0,
@@ -97,10 +100,9 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Config::Any" => 0,
     "Test::Deep" => 0
   },
-  "VERSION" => "0.203490",
+  "VERSION" => "0.210120",
   "test" => {
     "TESTS" => "t/*.t"
   }

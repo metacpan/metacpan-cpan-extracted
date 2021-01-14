@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2008-2020, Roland van Ipenburg
-package Date::Extract::P800Picture v1.1.4;
+package Date::Extract::P800Picture v1.1.5;
 
 use strict;
 use warnings;
@@ -121,8 +121,8 @@ __END__
 
 =encoding utf8
 
-=for stopwords Ericsson Filename MERCHANTABILITY POSIX filename timestamp jpg JPG
-YMDH DateTime undef perl Readonly perls Ipenburg
+=for stopwords Bitbucket Ericsson Filename MERCHANTABILITY POSIX filename timestamp jpg JPG
+YMDH DateTime undef perl Readonly P800 P900 P910 perls Ipenburg
 
 =head1 NAME
 
@@ -130,7 +130,7 @@ Date::Extract::P800Picture - extract the date from Sony Ericsson P800 pictures
 
 =head1 VERSION
 
-This document describes Date::Extract::P800Picture version v1.1.4.
+This document describes Date::Extract::P800Picture version C<v1.1.5>.
 
 =head1 SYNOPSIS
 
@@ -146,12 +146,18 @@ This document describes Date::Extract::P800Picture version v1.1.4.
 
 =head1 DESCRIPTION
 
-The Sony Ericsson P800 camera phone stores pictures taken with the camera on
-the device with a filename consisting of the date and the hour the picture was
-taken, followed by a four digit number and the .JPG extension. The format of
-the date and the hour is YMDH, in which the single characters are base 36 to
-fit a range of about 36 years, 12 months, 31 days and 24 hours since the year
-2000 in a case insensitive US-ASCII representation.
+The Sony Ericsson L<P800|https://en.wikipedia.org/wiki/Sony_Ericsson_P800>,
+L<P900|https://en.wikipedia.org/wiki/Sony_Ericsson_P900> and
+L<P910|https://en.wikipedia.org/wiki/Sony_Ericsson_P910> camera phones store
+pictures taken with the camera on the device with a filename consisting of the
+date and the hour the picture was taken, followed by a four digit number and
+the .JPG extension. The format of the date and the hour is YMDH, in which the
+single characters are base 36 to fit a range of about 36 years, 12 months, 31
+days and 24 hours since the year 2000 in a case insensitive US-ASCII
+representation.
+
+A L<web implementation of this parser|https://rolandvanipenburg.com/p800/> can
+be used without installing this module.
 
 =head1 SUBROUTINES/METHODS
 
@@ -214,7 +220,7 @@ same functionality in a perl 5.6 compatible way.
 =head1 DIAGNOSTICS
 
 An exception in the form of an L<Exception::Class|Exception::Class> named
-C<DateExtractP800PictureException> is thrown when a date can't be extracted
+C<DateExtractP800PictureException> is thrown when a date can not be extracted
 from the string:
 
 =over 4
@@ -229,10 +235,13 @@ from the string:
 
 =over 4
 
+=item * The date could be from another timezone, based on the device settings
+and when and where the picture was taken.
+
 =item * Usually the files are transferred from the P800 to other systems in a
-way that hasn't completely preserved the timestamp of the file, so there is no
-reliable way to double check the results by comparing the date extracted from
-the filename with the timestamp of the file.
+way that has not completely preserved the timestamp of the file, so there is
+no reliable way to double check the results by comparing the date extracted
+from the filename with the timestamp of the file.
 
 =item * There are no error values to provide different exit statuses for
 different failure reasons
@@ -240,8 +249,8 @@ different failure reasons
 =back
 
 Please report any bugs or feature requests at
-L<RT for rt.cpan.org|
-https://rt.cpan.org/Dist/Display.html?Queue=Date-Extract-P800Picture>.
+L<Bitbucket|
+https://bitbucket.org/rolandvanipenburg/date-extract-p800picture/issues>.
 
 =head1 AUTHOR
 
@@ -249,7 +258,7 @@ Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2008-2020, Roland van Ipenburg
+Copyright (C) 2008-2021, Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

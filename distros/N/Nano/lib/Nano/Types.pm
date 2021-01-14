@@ -11,7 +11,7 @@ use base 'Data::Object::Types::Library';
 
 extends 'Types::Standard';
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 register {
   name => 'Env',
@@ -47,6 +47,12 @@ register {
   name => 'KeyVal',
   parent => 'Object',
   validation => is_instance_of('Zing::KeyVal'),
+};
+
+register {
+  name => 'Stash',
+  parent => 'Object',
+  validation => is_consumer_of('Nano::Stash'),
 };
 
 register {
@@ -314,6 +320,50 @@ This type is defined in the L<Nano::Types> library.
   use Nano::Search;
 
   my $search = Nano::Search->new(nodes => Nano::Nodes->new);
+
+=back
+
+=cut
+
+=head2 stash
+
+  Stash
+
+This type is defined in the L<Nano::Types> library.
+
+=over 4
+
+=item stash parent
+
+  Object
+
+=back
+
+=over 4
+
+=item stash composition
+
+  ConsumerOf["Nano::Stash"]
+
+=back
+
+=over 4
+
+=item stash example #1
+
+  # given: synopsis
+
+  package Example::Stash;
+
+  use Moo;
+
+  extends 'Nano::Node';
+
+  with 'Nano::Stash';
+
+  package main;
+
+  my $stash = Example::Stash->new;
 
 =back
 

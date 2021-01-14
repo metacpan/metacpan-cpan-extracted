@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::ZI_MFLI;
-$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.731';
+$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.740';
 #ABSTRACT: Zurich Instruments MFLI Lock-in Amplifier
 
 use v5.20;
@@ -606,7 +606,7 @@ Lab::Moose::Instrument::ZI_MFLI - Zurich Instruments MFLI Lock-in Amplifier
 
 =head1 VERSION
 
-version 3.731
+version 3.740
 
 =head1 SYNOPSIS
 
@@ -806,7 +806,7 @@ Get demodulator X and Y output measurement values.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt

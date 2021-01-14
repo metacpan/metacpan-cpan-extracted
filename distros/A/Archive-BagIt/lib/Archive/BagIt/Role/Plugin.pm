@@ -13,7 +13,7 @@ has plugin_name => (
 
 has bagit => (
   is  => 'ro',
-  #isa => 'Archive::BagIt::Base',
+  #isa => 'Archive::BagIt',
   required => 1,
   weak_ref => 1,
 );
@@ -39,7 +39,7 @@ Archive::BagIt::Role::Plugin - A role that handles plugin loading
 
 =head1 VERSION
 
-version 0.070
+version 0.071
 
 =head1 AVAILABILITY
 

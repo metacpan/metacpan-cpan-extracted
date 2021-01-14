@@ -217,6 +217,7 @@ lib/Lab/Moose/Instrument/OI_Mercury/Magnet.pm
 lib/Lab/Moose/Instrument/OI_Triton.pm
 lib/Lab/Moose/Instrument/RS_FSV.pm
 lib/Lab/Moose/Instrument/RS_SMB.pm
+lib/Lab/Moose/Instrument/RS_ZNL.pm
 lib/Lab/Moose/Instrument/RS_ZVA.pm
 lib/Lab/Moose/Instrument/RS_ZVM.pm
 lib/Lab/Moose/Instrument/Rigol_DG5000.pm

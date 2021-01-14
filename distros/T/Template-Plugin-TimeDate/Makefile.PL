@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Template-Plugin-TimeDate",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Template::Plugin::TimeDate",
   "PREREQ_PM" => {
     "Date::Parse" => 0,
@@ -26,9 +27,10 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::DiagINC" => "0.002",
-    "Test::More" => "0.94"
+    "Test::MockTime" => 0,
+    "Test::More" => "0.96"
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +46,8 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Template::Plugin::Filter" => "2.00",
   "Test::DiagINC" => "0.002",
-  "Test::More" => "0.94"
+  "Test::MockTime" => 0,
+  "Test::More" => "0.96"
 );
 
 

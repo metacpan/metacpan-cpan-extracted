@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/briandfoy/app-url/issues
   homepage: https://github.com/briandfoy/app-url
   repository: https://github.com/briandfoy/app-url.git
-version: '1.004'
+version: '1.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -18,5 +18,5 @@ no_index:
     - t
     - inc
 requires: {}
-version: 0.91
+version: 0.92
 x_deprecated: 1

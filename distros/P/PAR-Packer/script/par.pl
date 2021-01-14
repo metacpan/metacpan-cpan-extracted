@@ -155,13 +155,13 @@ followed by a 8-bytes magic string: "C<\012PAR.pm\012>".
 =cut
 
 
-my ($PAR_MAGIC, $par_temp, $progname, @tmpfile);
+my ($PAR_MAGIC, $par_temp, $progname, @tmpfile, %ModuleCache);
 END { if ($ENV{PAR_CLEAN}) {
     require File::Temp;
     require File::Basename;
     require File::Spec;
     my $topdir = File::Basename::dirname($par_temp);
-    outs(qq{Removing files in "$par_temp"});
+    outs(qq[Removing files in "$par_temp"]);
     File::Find::finddepth(sub { ( -d ) ? rmdir : unlink }, $par_temp);
     rmdir $par_temp;
     # Don't remove topdir because this causes a race with other apps
@@ -181,8 +181,10 @@ END { if ($ENV{PAR_CLEAN}) {
             SUFFIX => '.cmd',
             UNLINK => 0,
         );
+        my $filename = $tmp->filename;
 
-        print $tmp "#!/bin/sh
+        print $tmp <<"...";
+#!/bin/sh
 x=1; while [ \$x -lt 10 ]; do
    rm -rf '$par_temp'
    if [ \! -d '$par_temp' ]; then
@@ -191,14 +193,14 @@ x=1; while [ \$x -lt 10 ]; do
    sleep 1
    x=`expr \$x + 1`
 done
-rm '" . $tmp->filename . "'
-";
-            chmod 0700,$tmp->filename;
-        my $cmd = $tmp->filename . ' >/dev/null 2>&1 &';
+rm '$filename'
+...
         close $tmp;
+
+        chmod 0700, $filename;
+        my $cmd = "$filename >/dev/null 2>&1 &";
         system($cmd);
-        outs(qq(Spawned background process to perform cleanup: )
-             . $tmp->filename);
+        outs(qq[Spawned background process to perform cleanup: $filename]);
     }
 } }
 
@@ -228,8 +230,7 @@ my ($start_pos, $data_pos);
     local $SIG{__WARN__} = sub {};
 
     # Check file type, get start of data section {{{
-    open _FH, '<', $progname or last;
-    binmode(_FH);
+    open _FH, '<:raw', $progname or last;
 
     # Search for the "\nPAR.pm\n signature backward from the end of the file
     my $buf;
@@ -247,8 +248,8 @@ my ($start_pos, $data_pos);
     # in any case, $magic_pos is a multiple of $chunk_size
 
     while ($magic_pos >= 0) {
-        seek(_FH, $magic_pos, 0);
-        read(_FH, $buf, $chunk_size + length($PAR_MAGIC));
+        seek _FH, $magic_pos, 0;
+        read _FH, $buf, $chunk_size + length($PAR_MAGIC);
         if ((my $i = rindex($buf, $PAR_MAGIC)) >= 0) {
             $magic_pos += $i;
             last;
@@ -274,7 +275,7 @@ my ($start_pos, $data_pos);
         read _FH, $buf, unpack("N", $buf);
 
         my $fullname = $buf;
-        outs(qq(Unpacking file "$fullname"...));
+        outs(qq[Unpacking FILE "$fullname"...]);
         my $crc = ( $fullname =~ s|^([a-f\d]{8})/|| ) ? $1 : undef;
         my ($basename, $ext) = ($buf =~ m|(?:.*/)?(.*)(\..*)|);
 
@@ -282,17 +283,17 @@ my ($start_pos, $data_pos);
         read _FH, $buf, unpack("N", $buf);
 
         if (defined($ext) and $ext !~ /\.(?:pm|pl|ix|al)$/i) {
-            my $filename = _tempfile("$crc$ext", $buf, 0755);
+            my $filename = _save_as("$crc$ext", $buf, 0755);
             $PAR::Heavy::FullCache{$fullname} = $filename;
             $PAR::Heavy::FullCache{$filename} = $fullname;
         }
         elsif ( $fullname =~ m|^/?shlib/| and defined $ENV{PAR_TEMP} ) {
-            my $filename = _tempfile("$basename$ext", $buf, 0755);
+            my $filename = _save_as("$basename$ext", $buf, 0755);
             outs("SHLIB: $filename\n");
         }
         else {
             $require_list{$fullname} =
-            $PAR::Heavy::ModuleCache{$fullname} = {
+            $ModuleCache{$fullname} = {
                 buf => $buf,
                 crc => $crc,
                 name => $fullname,
@@ -312,21 +313,20 @@ my ($start_pos, $data_pos);
         $INC{$module} = "/loader/$info/$module";
 
         if ($ENV{PAR_CLEAN} and defined(&IO::File::new)) {
-            my $fh = IO::File->new_tmpfile or die $!;
-            binmode($fh);
-            print $fh $info->{buf};
-            seek($fh, 0, 0);
+            my $fh = IO::File->new_tmpfile or die "Can't create temp file: $!";
+            $fh->binmode();
+            $fh->print($info->{buf});
+            $fh->seek(0, 0);
             return $fh;
         }
         else {
-            my $filename = _tempfile("$info->{crc}.pm", $info->{buf});
+            my $filename = _save_as("$info->{crc}.pm", $info->{buf});
 
-            open my $fh, '<', $filename or die "can't read $filename: $!";
-            binmode($fh);
+            open my $fh, '<:raw', $filename or die qq[Can't read "$filename": $!];
             return $fh;
         }
 
-        die "Bootstrapping failed: cannot find $module!\n";
+        die "Bootstrapping failed: can't find module $module!";
     }, @INC);
 
     # Now load all bundled files {{{
@@ -416,7 +416,7 @@ if (!$start_pos or ($ARGV[0] eq '--par-options' && shift)) {
                 $quiet = 1;
             }
             elsif ($1 eq 'L') {
-                open $logfh, ">>", $2 or die "XXX: Cannot open log: $!";
+                open $logfh, ">>", $2 or die qq[Can't open log file "$2": $!];
             }
             elsif ($1 eq 'T') {
                 $cache_name = $2;
@@ -456,13 +456,12 @@ if ($out) {
 
 
     if (defined $par) {
-        open my $fh, '<', $par or die "Cannot find '$par': $!";
-        binmode($fh);
+        open my $fh, '<:raw', $par or die qq[Can't find par file "$par": $!];
         bless($fh, 'IO::File');
 
         $zip = Archive::Zip->new;
         ( $zip->readFromFileHandle($fh, $par) == Archive::Zip::AZ_OK() )
-            or die "Read '$par' error: $!";
+            or die qq[Error reading zip archive "$par"];
     }
 
 
@@ -475,12 +474,13 @@ if ($out) {
     };
 
     # Open input and output files {{{
-    local $/ = \4;
 
     if (defined $par) {
-        open PAR, '<', $par or die "$!: $par";
-        binmode(PAR);
-        die "$par is not a PAR file" unless <PAR> eq "PK\003\004";
+        open my $ph, '<:raw', $par or die qq[Can't read par file "$par": $!];
+        my $buf;
+        read $ph, $buf, 4;
+        die qq["$par" is not a par file] unless $buf eq "PK\003\004";
+        close $ph;
     }
 
     CreatePath($out) ;
@@ -489,12 +489,19 @@ if ($out) {
         $out,
         IO::File::O_CREAT() | IO::File::O_WRONLY() | IO::File::O_TRUNC(),
         0777,
-    ) or die $!;
-    binmode($fh);
+    ) or die qq[Can't create file "$out": $!];
+    $fh->binmode();
 
-    $/ = (defined $data_pos) ? \$data_pos : undef;
     seek _FH, 0, 0;
-    my $loader = scalar <_FH>;
+
+    my $loader;
+    if (defined $data_pos) {
+        read _FH, $loader, $data_pos;
+    } else {
+        local $/ = undef;
+        $loader = <_FH>;
+    }
+
     if (!$ENV{PAR_VERBATIM} and $loader =~ /^(?:#!|\@rem)/) {
         require PAR::Filter::PodStrip;
         PAR::Filter::PodStrip->apply(\$loader, $0);
@@ -509,7 +516,6 @@ if ($out) {
         }eg;
     }
     $fh->print($loader);
-    $/ = undef;
     # }}}
 
     # Write bundled modules {{{
@@ -528,55 +534,60 @@ if ($out) {
                            $_ ne $Config::Config{privlibexp});
                        } @INC;
 
+        # normalize paths (remove trailing or multiple consecutive slashes)
+        s|/+|/|g, s|/$|| foreach @inc;
+
         # Now determine the files loaded above by require_modules():
         # Perl source files are found in values %INC and DLLs are
         # found in @DynaLoader::dl_shared_objects.
         my %files;
         $files{$_}++ for @DynaLoader::dl_shared_objects, values %INC;
 
-        my $lib_ext = $Config::Config{lib_ext};
+        my $lib_ext = $Config::Config{lib_ext};         # XXX lib_ext vs dlext ?
         my %written;
 
-        foreach (sort keys %files) {
-            my ($name, $file);
+        foreach my $key (sort keys %files) {
+            my ($file, $name);
 
-            foreach my $dir (@inc) {
-                if ($name = $PAR::Heavy::FullCache{$_}) {
-                    $file = $_;
-                    last;
-                }
-                elsif (/^(\Q$dir\E\/(.*[^Cc]))\Z/i) {
-                    ($file, $name) = ($1, $2);
-                    last;
-                }
-                elsif (m!^/loader/[^/]+/(.*[^Cc])\Z!) {
-                    if (my $ref = $PAR::Heavy::ModuleCache{$1}) {
-                        ($file, $name) = ($ref, $1);
+            if (defined(my $fc = $PAR::Heavy::FullCache{$key})) {
+                ($file, $name) = ($key, $fc);
+            }
+            else {
+                foreach my $dir (@inc) {
+                    if ($key =~ m|^\Q$dir\E/(.*)$|i) {
+                        ($file, $name) = ($key, $1);
                         last;
                     }
-                    elsif (-f "$dir/$1") {
-                        ($file, $name) = ("$dir/$1", $1);
-                        last;
+                    if ($key =~ m|^/loader/[^/]+/(.*)$|) {
+                        if (my $ref = $ModuleCache{$1}) {
+                            ($file, $name) = ($ref, $1);
+                            last;
+                        }
+                        if (-f "$dir/$1") {
+                            ($file, $name) = ("$dir/$1", $1);
+                            last;
+                        }
                     }
                 }
             }
+            # There are legitimate reasons why we couldn't find $name and $file for a $key:
+            # - cperl has e.g. $INC{"XSLoader.pm"} = "XSLoader.c",
+            #   $INC{"DynaLoader.pm"}' = "dlboot_c.PL"
+            next unless defined $name;
 
-            next unless defined $name and not $written{$name}++;
-            next if !ref($file) and $file =~ /\.\Q$lib_ext\E$/;
-            outs( join "",
-                qq(Packing "), ref $file ? $file->{name} : $file,
-                qq("...)
-            );
+            next if $written{$name}++;
+            next if !ref($file) and $file =~ /\.\Q$lib_ext\E$/i;
 
+            outs(sprintf(qq[Packing FILE "%s"...], ref $file ? $file->{name} : $file));
             my $content;
             if (ref($file)) {
                 $content = $file->{buf};
             }
             else {
-                open FILE, '<', $file or die "Can't open $file: $!";
-                binmode(FILE);
-                $content = <FILE>;
-                close FILE;
+                local $/ = undef;
+                open my $fh, '<:raw', $file or die qq[Can't read "$file": $!];
+                $content = <$fh>;
+                close $fh;
 
                 PAR::Filter::PodStrip->apply(\$content, "<embedded>/$name")
                     if !$ENV{PAR_VERBATIM} and $name =~ /\.(?:pm|ix|al)$/i;
@@ -584,14 +595,12 @@ if ($out) {
                 PAR::Filter::PatchContent->new->apply(\$content, $file, $name);
             }
 
-            outs(qq(Written as "$name"));
-            $fh->print("FILE");
-            $fh->print(pack('N', length($name) + 9));
-            $fh->print(sprintf(
-                "%08x/%s", Archive::Zip::computeCRC32($content), $name
-            ));
-            $fh->print(pack('N', length($content)));
-            $fh->print($content);
+            $fh->print("FILE",
+                       pack('N', length($name) + 9),
+                       sprintf("%08x/%s", Archive::Zip::computeCRC32($content), $name),
+                       pack('N', length($content)),
+                       $content);
+            outs(qq[Written as "$name"]);
         }
     }
     # }}}
@@ -602,10 +611,9 @@ if ($out) {
     $cache_name = substr $cache_name, 0, 40;
     if (!$cache_name and my $mtime = (stat($out))[9]) {
         my $ctx = Digest::SHA->new(1);
-        open(my $fh, "<", $out);
-        binmode($fh);
+        open my $fh, "<:raw", $out;
         $ctx->addfile($fh);
-        close($fh);
+        close $fh;
 
         $cache_name = $ctx->hexdigest;
     }
@@ -640,20 +648,21 @@ if ($out) {
     }
 
     my $fh = IO::File->new;                             # Archive::Zip operates on an IO::Handle
-    $fh->fdopen(fileno(_FH), 'r') or die "$!: $@";
+    $fh->fdopen(fileno(_FH), 'r') or die qq[fdopen() failed: $!];
 
     # Temporarily increase the chunk size for Archive::Zip so that it will find the EOCD
     # even if lots of stuff has been appended to the pp'ed exe (e.g. by OSX codesign).
     Archive::Zip::setChunkSize(-s _FH);
     my $zip = Archive::Zip->new;
-    $zip->readFromFileHandle($fh, $progname) == Archive::Zip::AZ_OK() or die "$!: $@";
+    ( $zip->readFromFileHandle($fh, $progname) == Archive::Zip::AZ_OK() )
+        or die qq[Error reading zip archive "$progname"];
     Archive::Zip::setChunkSize(64 * 1024);
 
     push @PAR::LibCache, $zip;
     $PAR::LibCache{$progname} = $zip;
 
     $quiet = !$ENV{PAR_DEBUG};
-    outs(qq(\$ENV{PAR_TEMP} = "$ENV{PAR_TEMP}"));
+    outs(qq[\$ENV{PAR_TEMP} = "$ENV{PAR_TEMP}"]);
 
     if (defined $ENV{PAR_TEMP}) { # should be set at this point!
         foreach my $member ( $zip->members ) {
@@ -670,9 +679,9 @@ if ($out) {
             my $extract_name = $1;
             my $dest_name = File::Spec->catfile($ENV{PAR_TEMP}, $extract_name);
             if (-f $dest_name && -s _ == $member->uncompressedSize()) {
-                outs(qq(Skipping "$member_name" since it already exists at "$dest_name"));
+                outs(qq[Skipping "$member_name" since it already exists at "$dest_name"]);
             } else {
-                outs(qq(Extracting "$member_name" to "$dest_name"));
+                outs(qq[Extracting "$member_name" to "$dest_name"]);
                 $member->extractToFileNamed($dest_name);
                 chmod(0555, $dest_name) if $^O eq "hpux";
             }
@@ -694,17 +703,16 @@ Usage: $0 [ -Alib.par ] [ -Idir ] [ -Mmodule ] [ src.par ] [ program.pl ]
 
 sub CreatePath {
     my ($name) = @_;
-    
+
     require File::Basename;
     my ($basename, $path, $ext) = File::Basename::fileparse($name, ('\..*'));
-    
+
     require File::Path;
-    
+
     File::Path::mkpath($path) unless(-e $path); # mkpath dies with error
 }
 
 sub require_modules {
-    #local $INC{'Cwd.pm'} = __FILE__ if $^O ne 'MSWin32';
 
     require lib;
     require DynaLoader;
@@ -774,28 +782,28 @@ sub _set_par_temp {
         my $stmpdir = "$path$Config{_delim}par-".unpack("H*", $username);
         mkdir $stmpdir, 0755;
         if (!$ENV{PAR_CLEAN} and my $mtime = (stat($progname))[9]) {
-            open (my $fh, "<". $progname);
+            open my $fh, "<:raw", $progname or die qq[Can't read "$progname": $!];
             seek $fh, -18, 2;
-            sysread $fh, my $buf, 6;
+            my $buf;
+            read $fh, $buf, 6;
             if ($buf eq "\0CACHE") {
                 seek $fh, -58, 2;
-                sysread $fh, $buf, 41;
+                read $fh, $buf, 41;
                 $buf =~ s/\0//g;
-                $stmpdir .= "$Config{_delim}cache-" . $buf;
+                $stmpdir .= "$Config{_delim}cache-$buf";
             }
             else {
-                my $digest = eval 
+                my $digest = eval
                 {
-                    require Digest::SHA; 
+                    require Digest::SHA;
                     my $ctx = Digest::SHA->new(1);
-                    open(my $fh, "<", $progname);
-                    binmode($fh);
+                    open my $fh, "<:raw", $progname or die qq[Can't read "$progname": $!];
                     $ctx->addfile($fh);
                     close($fh);
                     $ctx->hexdigest;
                 } || $mtime;
 
-                $stmpdir .= "$Config{_delim}cache-$digest"; 
+                $stmpdir .= "$Config{_delim}cache-$digest";
             }
             close($fh);
         }
@@ -814,27 +822,26 @@ sub _set_par_temp {
 
 
 # check if $name (relative to $par_temp) already exists;
-# if not, create a file with a unique temporary name, 
+# if not, create a file with a unique temporary name,
 # fill it with $contents, set its file mode to $mode if present;
-# finaly rename it to $name; 
+# finaly rename it to $name;
 # in any case return the absolute filename
-sub _tempfile {
+sub _save_as {
     my ($name, $contents, $mode) = @_;
 
     my $fullname = "$par_temp/$name";
     unless (-e $fullname) {
         my $tempname = "$fullname.$$";
 
-        open my $fh, '>', $tempname or die "can't write $tempname: $!";
-        binmode $fh;
+        open my $fh, '>:raw', $tempname or die qq[Can't write "$tempname": $!];
         print $fh $contents;
         close $fh;
         chmod $mode, $tempname if defined $mode;
 
         rename($tempname, $fullname) or unlink($tempname);
-        # NOTE: The rename() error presumably is something like ETXTBSY 
+        # NOTE: The rename() error presumably is something like ETXTBSY
         # (scenario: another process was faster at extraction $fullname
-        # than us and is already using it in some way); anyway, 
+        # than us and is already using it in some way); anyway,
         # let's assume $fullname is "good" and clean up our copy.
     }
 
@@ -940,7 +947,7 @@ require PAR;
 unshift @INC, \&PAR::find_par;
 PAR->import(@par_args);
 
-die qq(par.pl: Can't open perl script "$progname": No such file or directory\n)
+die qq[par.pl: Can't open perl script "$progname": No such file or directory\n]
     unless -e $progname;
 
 do $progname;

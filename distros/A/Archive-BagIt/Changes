@@ -1,10 +1,60 @@
 ==================================================
-Changes from 2020-01-04 00:00:00 +0000 to present.
+Changes from 2020-01-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.070 at 2021-01-03 13:19:59 +0000
+version 0.071 at 2021-01-14 14:09:17 +0000
 ------------------------------------------
+
+  Change: 9bbadc5fecc04ff09dc0de084b5ce71a589f737a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-14 15:04:42 +0000
+
+    - refactoring, extracted __handle_nonportable_local_entry() from
+    __file_find() 
+
+  Change: ef518a167a1b70558ec7b2765f23d2f0456f243d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-14 12:16:18 +0000
+
+    - refactored, using Archive::BagIt instead Archive::BagIt::Base 
+
+  Change: 102d47a9baff0a411f499d975904ecbae3b79780
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-14 12:05:04 +0000
+
+    - fixed broken test bag 
+
+  Change: 702efc1c1bf15b8513662f02995e5593456230e0
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-14 12:04:47 +0000
+
+    - fixed tc access to private routine 
+
+  Change: f2827d9a70466656412dcd920d14e1406a756aeb
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-14 12:04:11 +0000
+
+    - removed, because Archive::BagIt::DotBagIt removed 
+
+  Change: be36b96ac8c01ff746ed2a2ba06f9de7c8556a80
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-14 11:50:18 +0000
+
+    - refactoring, replaced Archive::BagIt by Archive::BagIt::Base -
+    added dummy for Archive::BagIt::Base for backwards compatibility 
+
+  Change: e1dcd82f379b62835d51973e548aef25de412cd7
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-14 11:49:27 +0000
+
+    - removed DotBagIt 
+
+  Change: 90733792184aa5187e8a966aa3f52c7c65cea181
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-03 14:20:20 +0000
+
+    Released 0.070 
 
   Change: 331ea58f0c7cb18009d53800f8f791f9ba550521
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -1648,5 +1698,5 @@ version 0.055 at 2020-04-15 09:44:51 +0000
     Adding a plugin structure 
 
 ================================================
-Plus 9 releases after 2020-01-04 00:00:00 +0000.
+Plus 9 releases after 2020-01-15 00:00:00 +0000.
 ================================================

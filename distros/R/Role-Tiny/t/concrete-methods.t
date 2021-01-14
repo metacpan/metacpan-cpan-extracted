@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+no warnings 'once';
 use Test::More;
 
 BEGIN {
@@ -116,5 +117,18 @@ like $@,
   ::is join('', @warnings), '',
     'non-methods not overwritten by role composition';
 }
+
+{
+  package RoleLikeOldMoo;
+  use Role::Tiny;
+  sub not_a_method { 1 }
+
+  # simulate what older versions of Moo do to mark non-methods
+  $Role::Tiny::INFO{+__PACKAGE__}{not_methods}{$_} = $_
+    for \&not_a_method;
+}
+
+is_deeply [Role::Tiny->methods_provided_by('RoleLikeOldMoo')], [],
+  'subs marked in not_methods (like old Moo) are excluded from method list';
 
 done_testing;

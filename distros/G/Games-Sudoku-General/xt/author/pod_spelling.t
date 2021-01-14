@@ -61,6 +61,7 @@ tuple
 xclip
 webcmd
 Wasabi
+Wayback
 Wyant
 Wyllie
 YASudoku

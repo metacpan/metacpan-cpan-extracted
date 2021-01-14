@@ -21,3 +21,4 @@ lib/Lingua/JA/Moji/(gal2kana|kanji2abc)\.txt
 xt/.*\.t$
 data/.*$
 ^examples/.*-out\.txt$
+^\.travis\.yml$

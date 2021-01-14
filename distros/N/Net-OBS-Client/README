@@ -1,0 +1,13 @@
+Net-OBS-Client
+
+Net::OBS::Client aims to simplify usage of OBS (https://openbuildservice.org) API calls in perl.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install

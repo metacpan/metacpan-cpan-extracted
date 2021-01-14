@@ -1485,6 +1485,16 @@ sub _interpolate_magic_comments {
                 \x{20}*
                 $
                /\\markright\{$1}/gmx;
+
+    # with looseness, we need to attach it to the next paragraph, so
+    # eat all the space and replace with a single \n
+
+    $latex =~ s/^
+                $prefix
+                looseness\=(-?[0-9])
+                $
+                \s*
+               /\\looseness=$1\n/gmx;
     return $latex;
 }
 

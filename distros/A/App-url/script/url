@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use v5.26;
 
-use App::url;
+use App::url 1.006;
 
 =encoding utf8
 
@@ -64,7 +64,7 @@ Decompose the URL and reformat it according to a template.
 
 =head1 COPYRIGHT
 
-Copyright © 2020, brian d foy, all rights reserved.
+Copyright © 2020-2021, brian d foy, all rights reserved.
 
 =head1 LICENSE
 
@@ -72,7 +72,7 @@ You can use this code under the terms of the Artistic License 2.
 
 =cut
 
-use Encode qw(decode);
+use Encode qw(decode encode);
 use I18N::Langinfo qw(langinfo CODESET);
 
 @ARGV = map { decode( langinfo(CODESET), $_ ) } @ARGV;
@@ -80,4 +80,5 @@ use I18N::Langinfo qw(langinfo CODESET);
 my $results = App::url->run( @ARGV );
 exit if $results->@* == 0;
 
-say join "\n", $results->@*;
+binmode STDOUT, ':raw';
+say join "\n", map { encode( langinfo(CODESET), $_ ) } $results->@*;

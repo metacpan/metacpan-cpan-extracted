@@ -1,5 +1,7 @@
 package Kelp::Module::Symbiosis::Test;
 
+our $VERSION = '1.01';
+
 use Kelp::Base;
 
 attr "-app" => sub { die "`app` parameter is required" };
@@ -9,7 +11,8 @@ sub run
 	shift->app->run_all(@_);
 }
 
-sub AUTOLOAD {
+sub AUTOLOAD
+{
 	my ($self) = shift;
 
 	my $func = our $AUTOLOAD;
@@ -26,7 +29,7 @@ __END__
 
 =head1 NAME
 
-Kelp::Module::Symbiosis::Test - allow testing symbiotic environments using Kelp::Test
+Kelp::Module::Symbiosis::Test - Allow testing symbiotic environments using Kelp::Test
 
 =head1 SYNOPSIS
 

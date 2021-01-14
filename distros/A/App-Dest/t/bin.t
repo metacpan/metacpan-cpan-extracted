@@ -1,4 +1,4 @@
-use Test::Most;
+use Test2::V0;
 use File::Basename 'dirname';
 use IPC::Run 'run';
 
@@ -12,4 +12,4 @@ like( $out, qr/Usage:\s+dest COMMAND \[OPTIONS\]/, 'help' );
 run( [ @dest, 'version' ], \undef, \$out, \$err );
 like( $out, qr/^dest version [\d\.]+$/, 'version' );
 
-done_testing();
+done_testing;

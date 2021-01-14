@@ -1,5 +1,5 @@
 {
-   "abstract" : "treat a Word document as Template Toolkit document",
+   "abstract" : "generate Microsoft Word documents from Word templates",
    "author" : [
       "DAMI <dami@cpan.org>"
    ],
@@ -40,7 +40,7 @@
    "provides" : {
       "MsOffice::Word::Template" : {
          "file" : "lib/MsOffice/Word/Template.pm",
-         "version" : "1.0"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "url" : "https://github.com/damil/MsOffice-Word-Template"
       }
    },
-   "version" : "1.0",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

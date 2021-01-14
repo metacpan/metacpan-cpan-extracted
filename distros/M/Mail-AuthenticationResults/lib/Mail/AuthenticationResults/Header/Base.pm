@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header::Base;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20200824.1'; # VERSION
+our $VERSION = '2.20210112'; # VERSION
 use Scalar::Util qw{ weaken refaddr };
 use JSON;
 use Carp;
@@ -415,7 +415,7 @@ Mail::AuthenticationResults::Header::Base - Base class for modelling parts of th
 
 =head1 VERSION
 
-version 1.20200824.1
+version 2.20210112
 
 =head1 DESCRIPTION
 

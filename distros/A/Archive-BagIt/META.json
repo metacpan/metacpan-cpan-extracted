@@ -1,5 +1,5 @@
 {
-   "abstract" : "An interface to make and verify bags according to the BagIt standard",
+   "abstract" : "The main module to handle bags.",
    "author" : [
       "Rob Schmidt <rjeschmi@gmail.com>"
    ],
@@ -57,7 +57,6 @@
          "requires" : {
             "Carp" : "0",
             "Class::Load" : "0",
-            "Data::Dumper" : "0",
             "Digest::MD5" : "0",
             "Digest::SHA" : "0",
             "Encode" : "0",
@@ -68,7 +67,6 @@
             "Moo" : "0",
             "Moo::Role" : "0",
             "POSIX" : "0",
-            "String::CRC32" : "0",
             "Time::HiRes" : "0",
             "namespace::autoclean" : "0",
             "open" : "0",
@@ -83,6 +81,7 @@
       },
       "test" : {
          "requires" : {
+            "Data::Dumper" : "0",
             "Data::Printer" : "0",
             "File::Copy" : "0",
             "File::Path" : "0",
@@ -103,51 +102,47 @@
    "provides" : {
       "Archive::BagIt" : {
          "file" : "lib/Archive/BagIt.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       },
       "Archive::BagIt::Base" : {
          "file" : "lib/Archive/BagIt/Base.pm",
-         "version" : "0.070"
-      },
-      "Archive::BagIt::DotBagIt" : {
-         "file" : "lib/Archive/BagIt/DotBagIt.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       },
       "Archive::BagIt::Fast" : {
          "file" : "lib/Archive/BagIt/Fast.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       },
       "Archive::BagIt::Plugin::Algorithm::MD5" : {
          "file" : "lib/Archive/BagIt/Plugin/Algorithm/MD5.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       },
       "Archive::BagIt::Plugin::Algorithm::SHA512" : {
          "file" : "lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       },
       "Archive::BagIt::Plugin::Manifest::MD5" : {
          "file" : "lib/Archive/BagIt/Plugin/Manifest/MD5.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       },
       "Archive::BagIt::Plugin::Manifest::SHA512" : {
          "file" : "lib/Archive/BagIt/Plugin/Manifest/SHA512.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       },
       "Archive::BagIt::Role::Algorithm" : {
          "file" : "lib/Archive/BagIt/Role/Algorithm.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       },
       "Archive::BagIt::Role::Manifest" : {
          "file" : "lib/Archive/BagIt/Role/Manifest.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       },
       "Archive::BagIt::Role::Plugin" : {
          "file" : "lib/Archive/BagIt/Role/Plugin.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       },
       "Archive::BagIt::Role::Portability" : {
          "file" : "lib/Archive/BagIt/Role/Portability.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       }
    },
    "release_status" : "stable",
@@ -159,7 +154,7 @@
          "web" : "https://art1pirat.spdns.org/art1/Archive-BagIt"
       }
    },
-   "version" : "0.070",
+   "version" : "0.071",
    "x_contributors" : [
       "Andreas Romeyke <art1@andreas-romeyke.de>",
       "Michiel Beijen <michiel.beijen@gmail.com>",

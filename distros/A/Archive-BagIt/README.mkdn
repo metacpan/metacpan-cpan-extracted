@@ -1,103 +1,103 @@
 # NAME
 
-Archive::BagIt - An interface to make and verify bags according to the BagIt standard
+Archive::BagIt - The main module to handle bags.
 
 # VERSION
 
-version 0.070
+version 0.071
 
-# WARNING
+# NAME
 
-This is experimental software for the moment and under active development.
-
-Under the hood, the module Archive::BagIt::Base was adapted and extended to
-support BagIt 1.0 according to RFC 8493 (\[https://tools.ietf.org/html/rfc8493\](https://tools.ietf.org/html/rfc8493)).
-
-Also: Check out Archive::BagIt::Fast if you are willing to add some extra dependencies to get
-better speed by mmap-ing files.
-
-# SUBROUTINES
-
-## new
-
-An Object Oriented Interface to a bag. Opens an existing bag.
-
-    my $bag = Archive::BagIt->new('/path/to/bag');
-
-## make\_bag
-
-A constructor that will make and return a bag from a directory
-
-If a data directory exists, assume it is already a bag (no checking for invalid files in root)
-
-## verify\_bag
-
-An interface to verify a bag.
-
-You might also want to check [Archive::BagIt::Fast](https://metacpan.org/pod/Archive%3A%3ABagIt%3A%3AFast) to see a more direct way of
-accessing files (and thus faster).
-
-## get\_checksum
-
-This is the checksum for the bag, md5 of the manifest-md5.txt
-
-## version
-
-Returns the bagit version according to the bagit.txt file.
-
-## payload\_files
-
-Returns an array with all of the payload files (those files that are below the data directory)
-
-## non\_payload\_files
-
-Returns an array with files that are in the root of the bag, non-manifest files
-
-## manifest\_files
-
-Return an array with the list of manifest files that exist in the bag
-
-## tagmanifest\_files
-
-Return an array with the list of tagmanifest files
+Achive::BagIt - The main module to handle Bags
 
 # SOURCE
 
-The original development version is on github at [http://github.com/rjeschmi/Archive-BagIt](http://github.com/rjeschmi/Archive-BagIt)
+The original development version was on github at [http://github.com/rjeschmi/Archive-BagIt](http://github.com/rjeschmi/Archive-BagIt)
 and may be cloned from there.
 
 The actual development version is available at [https://art1pirat.spdns.org/art1/Archive-BagIt](https://art1pirat.spdns.org/art1/Archive-BagIt)
 
-# SUPPORT
+# Conformance to RFC8493
 
-You can find documentation for this module with the perldoc command.
+The module should fulfill the RFC requirements, with following limitations:
 
-    perldoc Archive::BagIt
+- only encoding UTF-8 is supported
+- version 0.97 or 1.0 allowed
+- version 0.97 requires tag-/manifest-files with md5-fixity
+- version 1.0 requires tag-/manifest-files with sha512-fixity
+- BOM is not supported
+- Carriage Return in bagit-files are not allowed
+- fetch.txt is unsupported
 
-You can also look for information at:
+At the moment only filepaths in linux-style are supported.
 
-- RT: CPAN's request tracker (report bugs here)
+To get an more detailled overview, see the testsuite under `t/verify_bag.t` and corresponding test bags from the BagIt conformance testsuite of Library of Congress under `bagit_conformance_suite/`.
 
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Archive-BagIt](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Archive-BagIt)
+See [https://datatracker.ietf.org/doc/rfc8493/?include\_text=1](https://datatracker.ietf.org/doc/rfc8493/?include_text=1) for details.
 
-- AnnoCPAN: Annotated CPAN documentation
+# TODO
 
-    [http://annocpan.org/dist/Archive-BagIt](http://annocpan.org/dist/Archive-BagIt)
+- enhanced testsuite
+- reduce complexity
+- use modern perl code
+- add flag to enable very strict verify
 
-- CPAN Ratings
+# FAQ
 
-    [http://cpanratings.perl.org/d/Archive-BagIt](http://cpanratings.perl.org/d/Archive-BagIt)
+## How to access the manifest-entries directly?
 
-- Search CPAN
+Try this:
 
-    [http://search.cpan.org/dist/Archive-BagIt/](http://search.cpan.org/dist/Archive-BagIt/)
+    foreach my $algorithm ( keys %{ $self->manifests }) {
+        my $entries_ref = $self->manifests->{$algorithm}->manifest_entries();
+        # $entries_ref returns a hashref of form:
+        # $entries_ref->{$algorithm}->{$file} = $digest;
+    }
+
+Similar for tagmanifests
+
+## How fast is `Archive::BagIt::Fast`?
+
+It depends. On my system with SSD and a 38MB bag with 48 payload files the results for `verify_bag()` are:
+
+                   Rate        Base         Fast
+    Base         102%           --         -10%
+    Fast         125%           11%           --
+
+On network filesystem (CIFS, 1Gb) with same Bag:
+
+                   Rate         Fast         Base
+    Fast         2.20/s          --          -11%
+    Base         2.48/s          13%         --
+
+But you should measure which variant is best for you. In general the default `Archive::BagIt` is fast enough.
+
+## How to update an old bag of version v0.97 to v1.0?
+
+You could try this:
+
+    use Archive::BagIt;
+    my $bag=Archive::BagIt->new( $my_old_bag_filepath );
+    $bag->load();
+    $bag->store();
+
+## How to create UTF-8 based paths under MS Windows?
+
+For versions < Windows10: I have no idea and suggestions for a portable solution are very welcome!
+For Windows 10: Thanks to [https://superuser.com/questions/1033088/is-it-possible-to-set-locale-of-a-windows-application-to-utf-8/1451686#1451686](https://superuser.com/questions/1033088/is-it-possible-to-set-locale-of-a-windows-application-to-utf-8/1451686#1451686)
+you have to enable UTF-8 support via 'System Administration' -> 'Region' -> 'Administrative'
+\-> 'Region Settings' -> Flag 'Use Unicode UTF-8 for worldwide language support'
+
+Hint: The better way is to use only portable filenames. See [perlport](https://metacpan.org/pod/perlport) for details.
 
 # SYNOPSIS
 
 This modules will hopefully help with the basic commands needed to create
-and verify a bag. My intention is not to be strict and enforce all of the
-specification. The reference implementation is the java version
-and I will endeavour to maintain compatibility with it.
+and verify a bag. This part supports BagIt 1.0 according to RFC 8493 (\[https://tools.ietf.org/html/rfc8493\](https://tools.ietf.org/html/rfc8493)).
+
+You only need to know the following methods first:
+
+## read a BagIt
 
     use Archive::BagIt;
 
@@ -105,13 +105,241 @@ and I will endeavour to maintain compatibility with it.
     my $bag_dir = "/path/to/bag";
     my $bag = Archive::BagIt->new($bag_dir);
 
+## construct a BagIt around a payload
 
-    #construct bag in an existing directory
+    use Archive::BagIt;
     my $bag2 = Archive::BagIt->make_bag($bag_dir);
+
+## verify a BagIt-dir
+
+    use Archive::BagIt;
 
     # Validate a BagIt archive against its manifest
     my $bag3 = Archive::BagIt->new($bag_dir);
-    my $is_valid = $bag3->verify_bag();
+    my $is_valid1 = $bag3->verify_bag();
+
+    # Validate a BagIt archive against its manifest, report all errors
+    my $bag4 = Archive::BagIt->new($bag_dir);
+    my $is_valid2 = $bag4->verify_bag( {report_all_errors => 1} );
+
+## read a BagIt-dir, change something, store
+
+Because all methods operate lazy, you should ensure to parse parts of the bag \*BEFORE\* you modify it.
+Otherwise it will be overwritten!
+
+    use Archive::BagIt;
+    my $bag5 = Archive::BagIt->new($bag_dir); # lazy, nothing happened
+    $bag5->load(); # this updates the object representation by parsing the given $bag_dir
+    $bag5->store(); # this writes the bag new
+
+# METHODS
+
+## Constructor
+
+The constructor sub, will create a bag with a single argument,
+
+    use Archive::BagIt;
+
+    #read in an existing bag:
+    my $bag_dir = "/path/to/bag";
+    my $bag = Archive::BagIt->new($bag_dir);
+
+or use hashreferences
+
+    use Archive::BagIt;
+
+    #read in an existing bag:
+    my $bag_dir = "/path/to/bag";
+    my $bag = Archive::BagIt->new(
+        bag_path => $bag_dir,
+    );
+
+The arguments are:
+
+- `bag_path` - path to bag-directory
+- `force_utf8` - if set the warnings about non portable filenames are disabled (default: enabled)
+
+The bag object will use $bag\_dir, BUT an existing $bag\_dir is not read. If you use `store()` an existing bag will be overwritten!
+
+See `load()` if you want to parse/modify an existing bag.
+
+## has\_force\_utf8()
+
+to check if force\_utf8() was set.
+
+If set it ignores warnings about potential filepath problems.
+
+## bag\_path(\[$new\_value\])
+
+Getter/setter for bag path
+
+## metadata\_path()
+
+Getter for metadata path
+
+## payload\_path()
+
+Getter for payload path
+
+## checksum\_algos()
+
+Getter for registered Checksums
+
+## bag\_version()
+
+Getter for bag version
+
+## bag\_encoding()
+
+Getter for bag encoding.
+
+HINT: the current version of Archive::BagIt only supports UTF-8, but the method could return other values depending on given Bags.
+
+## bag\_info(\[$new\_value\])
+
+Getter/Setter for bag info. Expects/returns an array of HashRefs implementing simple key-value pairs.
+
+HINT: RFC8493 does not allow \*reordering\* of entries!
+
+## has\_bag\_info()
+
+returns true if bag info exists.
+
+## errors()
+
+Getter to return collected errors after a `verify_bag()` call with Option `report_all_errors`
+
+## digest\_callback()
+
+This method could be reimplemented by derived classes to handle fixity checks in own way. The
+getter returns an anonymous function with following interface:
+
+    my $digest = $self->digest_callback;
+    &$digest( $digestobject, $filename);
+
+This anonymous function MUST use the `get_hash_string()` function of the `Archive::BagIt::Role::Algorithm` role,
+which is implemented by each `Archive::BagIt::Plugin::Algorithm::XXXX` module.
+
+See `Archive::BagIt::Fast` for details.
+
+## get\_baginfo\_values\_by\_key($searchkey)
+
+Returns all values which match $searchkey, undef otherwise
+
+## is\_baginfo\_key\_reserved\_as\_uniq($searchkey)
+
+returns true if key is reserved and should be uniq
+
+## is\_baginfo\_key\_reserved( $searchkey )
+
+returns true if key is reserved
+
+## verify\_baginfo()
+
+checks baginfo-keys, returns true if all fine, otherwise returns undef and the message is pushed to `errors()`.
+
+## delete\_baginfo\_by\_key( $searchkey )
+
+deletes an entry of given $searchkey if exists
+
+## exists\_baginfo\_key( $searchkey )
+
+returns true if a given $searchkey exists
+
+## append\_baginfo\_by\_key($searchkey, $newvalue)
+
+Appends a key value pair to bag\_info.
+
+HINT: check return code if append was successful, because some keys needs to be uniq.
+
+## add\_or\_replace\_baginfo\_by\_key($searchkey, $newvalue)
+
+It replaces the first entry with $newvalue if $searchkey exists, otherwise it appends.
+
+## forced\_fixity\_algorithm()
+
+Getter to return the forced fixity algorithm depending on BagIt version
+
+## manifest\_files()
+
+Getter to find all manifest-files
+
+## tagmanifest\_files()
+
+Getter to find all tagmanifest-files
+
+## payload\_files()
+
+Getter to find all payload-files
+
+## non\_payload\_files()
+
+Getter to find all non payload-files
+
+## plugins()
+
+Getter/setter to algorithm plugins
+
+## manifests()
+
+Getter/Setter to all manifests (objects)
+
+## algos()
+
+Getter/Setter to all registered Algorithms
+
+## load\_plugins
+
+As default SHA512 and MD5 will be loaded and therefore used. If you want to create a bag only with one or a specific
+checksum-algorithm, you could use this method to (re-)register it. It expects list of strings with namespace of type:
+Archive::BagIt::Plugin::Algorithm::XXX where XXX is your chosen fixity algorithm.
+
+## load()
+
+Triggers loading of an existing bag
+
+## verify\_bag($opts)
+
+A method to verify a bag deeply. If `$opts` is set with `{return_all_errors}` all fixity errors are reported.
+The default ist to croak with error message if any error is detected.
+
+HINT: You might also want to check Archive::BagIt::Fast to see a more direct way of accessing files (and thus faster).
+
+## calc\_payload\_oxum()
+
+returns an array with octets and streamcount of payload-dir
+
+## calc\_bagsize()
+
+returns a string with human readable size of paylod
+
+## create\_bagit()
+
+creates a bagit.txt file
+
+## create\_baginfo()
+
+creates a bag-info.txt file
+
+Hint: the entries 'Bagging-Date', 'Bag-Software-Agent', 'Payload-Oxum' and 'Bag-Size' will be automagically set,
+existing values in internal bag-info representation will be overwritten!
+
+## store()
+
+store a bagit-obj if bagit directory-structure was already constructed.
+
+## init\_metadata()
+
+A constructor that will just create the metadata directory
+
+This won't make a bag, but it will create the conditions to do that eventually
+
+## make\_bag( $bag\_path )
+
+A constructor that will make and return a bag from a directory,
+
+It expects a preliminary bagit-dir exists.
+If there a data directory exists, assume it is already a bag (no checking for invalid files in root)
 
 # AVAILABILITY
 

@@ -27,6 +27,8 @@ my %WriteMakefileArgs =
 
    'PREREQ_PM'          => {
                             'Scalar::Util'        => 1.00,
+                            'Math::Trig'          => 1.06,      # for "Inf"
+                            'Carp'                => 0,
                            },
 
    # A hash of modules that are needed to test the module but not run or build

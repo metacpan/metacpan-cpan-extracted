@@ -23,7 +23,7 @@ my %cases = (
     map { $_ => $_ } @cases,
 );
 
-plan tests => 2 * scalar %cases;
+plan tests => 2 * scalar keys %cases;
 
 for (sort keys %cases) {
     my $parser   = Chemistry::OpenSMILES::Parser->new;

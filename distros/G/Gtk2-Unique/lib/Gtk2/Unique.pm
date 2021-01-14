@@ -2,7 +2,7 @@ package Gtk2::Unique;
 
 =head1 NAME
 
-Gtk2::Unique - Use single instance applications
+Gtk2::Unique - (DEPRECATED) Use single instance applications
 
 =head1 SYNOPSIS
 
@@ -55,7 +55,54 @@ Gtk2::Unique - Use single instance applications
 		});
 	}
 
+=head1 ABSTRACT
+
+B<DEPRECATED> Perl bindings for the C library 'libunique'
+
 =head1 DESCRIPTION
+
+B<NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE>
+
+This module has been deprecated by the Gtk-Perl project.  This means that the
+module will no longer be updated with security patches, bug fixes, or when
+changes are made in the Perl ABI.  The Git repo for this module has been
+archived (made read-only), it will no longer possible to submit new commits to
+it.  You are more than welcome to ask about this module on the Gtk-Perl
+mailing list, but our priorities going forward will be maintaining Gtk-Perl
+modules that are supported and maintained upstream; this module is neither.
+
+Since this module is licensed under the LGPL v2.1, you may also fork this
+module, if you wish, but you will need to use a different name for it on CPAN,
+and the Gtk-Perl team requests that you use your own resources (mailing list,
+Git repos, bug trackers, etc.) to maintain your fork going forward.
+
+=over
+
+=item *
+
+Perl URL: https://gitlab.gnome.org/GNOME/perl-gtk2-unique
+
+=item *
+
+Upstream URL: https://gitlab.gnome.org/Archive/unique
+
+=item *
+
+Last upstream version: 1.1.6
+
+=item *
+
+Last upstream release date: 2009-11-12
+
+=item *
+
+Migration path for this module: Gtk3::Application
+
+=item *
+
+Migration module URL: https://metacpan.org/pod/Gtk3
+
+=back
 
 Gtk2::Unique is a Perl binding for the C library libunique which provides a
 way for writing single instance application. If you launch a single instance
@@ -77,7 +124,7 @@ Emmanuel Rodriguez E<lt>potyl@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2010 by Emmanuel Rodriguez.
+Copyright (C) 2009-2017 by Emmanuel Rodriguez.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
@@ -91,7 +138,7 @@ use base 'DynaLoader';
 
 use Gtk2;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 

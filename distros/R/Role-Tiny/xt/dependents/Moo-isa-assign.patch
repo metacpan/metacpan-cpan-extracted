@@ -1,0 +1,11 @@
+--- i/lib/Moo.pm
++++ w/lib/Moo.pm
+@@ -15,7 +15,7 @@ sub import {
+   return if $MAKERS{$target}; # already exported into this package
+   *{_getglob("${target}::extends")} = sub {
+     _load_module($_) for @_;
+-    *{_getglob("${target}::ISA")} = \@_;
++    *{_getglob("${target}::ISA")} = [@_];
+   };
+   *{_getglob("${target}::with")} = sub {
+     require Moo::Role;

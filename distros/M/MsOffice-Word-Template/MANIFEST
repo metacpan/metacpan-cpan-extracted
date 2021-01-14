@@ -5,7 +5,9 @@ examples/describe_moose_class.tmpl.docx
 lib/MsOffice/Word/Template.pm
 MANIFEST			This list of files
 README.md
-t/etc/tst_template.docx
-t/tst_template.t
+t/etc/mustache_template.docx
+t/etc/tt2_template.docx
+t/mustache.t
+t/tt2.t
 META.yml
 META.json
