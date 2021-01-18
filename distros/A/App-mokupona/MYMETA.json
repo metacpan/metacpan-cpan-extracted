@@ -50,6 +50,6 @@
          "web" : "https://alexschroeder.ch/cgit/moku-pona/about/"
       }
    },
-   "version" : 2.08,
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : 2.09,
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -17,13 +17,13 @@ my $meta = {
   "name"               => "App-GhaProve",
   "no_index"           => { directory => ["eg", "examples", "inc", "t", "xt"] },
   "prereqs"            => {
-                            configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                            configure => { requires => { "ExtUtils::MakeMaker" => 6.64 } },
                             develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                             runtime   => { requires => { "perl" => 5.006, "Test::Harness" => "2.40" } },
                             test      => { requires => { "Test::More" => 0.96 } },
                           },
   "provides"           => {
-                            "App::GhaProve" => { file => "lib/App/GhaProve.pm", version => 0.007 },
+                            "App::GhaProve" => { file => "lib/App/GhaProve.pm", version => 0.008 },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -37,7 +37,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-GhaProve/project",
                           },
-  "version"            => 0.007,
+  "version"            => 0.008,
   "x_provides_scripts" => { "gha-prove" => { file => "bin/gha-prove" } },
 };
 

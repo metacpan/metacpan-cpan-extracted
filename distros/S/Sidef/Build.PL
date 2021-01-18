@@ -23,6 +23,7 @@ my $builder = Module::Build->new(
                        'Test::More' => 0,
                       },
 
+    dynamic_config    => 0,
     extra_manify_args => { utf8 => 1 },
 
     meta_merge => {
@@ -39,7 +40,6 @@ my $builder = Module::Build->new(
                  'parent'                   => 0,
                  'Memoize'                  => 0,
                  'Cwd'                      => 0,
-                 'Devel::Peek'              => 0,
                  'File::Spec'               => 0,
                  'File::Path'               => 0,
                  'File::Copy'               => 0,
@@ -70,6 +70,9 @@ my $builder = Module::Build->new(
                    'Data::Dump'           => 0,    # `sidef -D`
                    'Data::Dump::Filtered' => 0,    # Block.ffork()
                    'Math::Prime::Util'    => 0.73, # used in some Number methods, if available
+                   'Term::ReadLine::Gnu'  => 0,    # better STDIN support (+history)
+                   'Text::Balanced'       => 0,    # Str.extract_bracketed(), Str.extract_delimited()
+                   'Text::ParseWords'     => 0,    # Str.parse_quotewords()
                   },
 
     add_to_cleanup     => ['Sidef-*'],

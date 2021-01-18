@@ -70,7 +70,7 @@ sub handler {
       ( 'Content-Length' => 0, Cookie => ( $req->env->{HTTP_COOKIE} // '' ) );
     my $i = 0;
     while ( my ( $k, $v ) = splice( @{ $req->{respHeaders} }, 0, 2 ) ) {
-        if ( $k =~ /^(?:Lm-Remote-(?:User|Custom)|Cookie)$/ ) {
+        if ( $k =~ /^(?:Deleteheader\d+|Lm-Remote-(?:User|Custom)|Cookie)$/ ) {
             push @convertedHdrs, $k, $v;
         }
         else {

@@ -1,12 +1,11 @@
 package Lemonldap::NG::Common::Util;
 require Exporter;
 
+use strict;
 use Digest::MD5;
 use MIME::Base64 qw/encode_base64/;
 
-use 5.10.0;
-
-our $VERSION   = '2.0.9';
+our $VERSION   = '2.0.10';
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(getSameSite getPSessionID genId2F);
 

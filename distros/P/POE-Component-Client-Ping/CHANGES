@@ -1,34 +1,34 @@
-================================
-2017-07-18 22:40:01 -0400 v1_175
-================================
+==============================
+9999-99-99 99:99:99 +0000 HEAD
+==============================
 
-  commit 7c36f0b95c611c9d68a7aeb98efa38f1085c5cd9
+  commit 7b6b7e26c0004e269c72e4686c06925362181ac8
+  Merge: 1341bd5 7969589
   Author: Rocco Caputo <rcaputo@cpan.org>
-  Date:   Tue Jul 18 22:40:01 2017 -0400
+  Date:   Thu Jan 14 15:26:44 2021 -0500
   
-    Bump version to 1.175.
+    Merge branch 'master' of github.com:rcaputo/poe-component-client-ping
 
-  commit b40afdba90e65396a2e909e44fc65d7b75172099
-  Author: Alexander Hartmaier <abraxxa@cpan.org>
-  Date:   Tue Jul 4 15:28:27 2017 +0200
+  commit 1341bd55635d4a93d1e0bca3d99adfbd92b52563
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu Jan 14 15:24:49 2021 -0500
   
-    fix broken retry (RT#122131)
+    Don't assume non-root users can't open raw sockets. Check instead.
 
-    remove retry codepath which failed due to fix in commit 108c17d
-
-  commit 108c17dd27a25892457d142e02f19945535d47f3
-  Author: Alexander Hartmaier <abraxxa@cpan.org>
-  Date:   Tue Jul 4 10:59:59 2017 +0200
+  commit 796958908a9734ffd6763763344e27ec041d59cf
+  Merge: 7c36f0b 908304f
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu Jan 14 15:23:46 2021 -0500
   
-    fix missing timeout parameter
+    Merge pull request #4 from jmaslak/debug-pretty
 
-    start of fix for RT#122131 with test
+    Don't output raw bytes during debugging
 
-  commit 68a1de54d9e6d8fb6c164d7ba33d217cc1015ca5
-  Author: Brian Fraser <fraserbn@gmail.com>
-  Date:   Tue Aug 19 21:32:05 2014 +0200
+  commit 908304f93388c17ad6243a48f5ca5ccc2861d7cd
+  Author: Joel Maslak <jmaslak@antelope.net>
+  Date:   Fri Sep 30 15:34:17 2016 -0600
   
-    Handle systems without getprotobyname() 
+    Don't output raw bytes during debugging 
 
 ==============
 End of Excerpt

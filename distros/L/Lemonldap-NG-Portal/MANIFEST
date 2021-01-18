@@ -1,4 +1,3 @@
-.bowerrc
 bower.json
 Changes
 eg/index.cgi
@@ -96,12 +95,14 @@ lib/Lemonldap/NG/Portal/Main/SecondFactor.pm
 lib/Lemonldap/NG/Portal/Password/AD.pm
 lib/Lemonldap/NG/Portal/Password/Base.pm
 lib/Lemonldap/NG/Portal/Password/Choice.pm
+lib/Lemonldap/NG/Portal/Password/Combination.pm
 lib/Lemonldap/NG/Portal/Password/Custom.pm
 lib/Lemonldap/NG/Portal/Password/DBI.pm
 lib/Lemonldap/NG/Portal/Password/Demo.pm
 lib/Lemonldap/NG/Portal/Password/LDAP.pm
 lib/Lemonldap/NG/Portal/Password/Null.pm
 lib/Lemonldap/NG/Portal/Password/REST.pm
+lib/Lemonldap/NG/Portal/Plugins/AdaptativeAuthenticationLevel.pm
 lib/Lemonldap/NG/Portal/Plugins/AutoSignin.pm
 lib/Lemonldap/NG/Portal/Plugins/BruteForceProtection.pm
 lib/Lemonldap/NG/Portal/Plugins/CDA.pm
@@ -152,6 +153,7 @@ lib/Lemonldap/NG/Portal/UserDB/Slave.pm
 lib/Lemonldap/NG/Portal/UserDB/WebID.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.json
 META.yml
 README
@@ -220,16 +222,13 @@ site/htdocs/static/bwr/font-awesome/fonts/fontawesome-webfont.svg
 site/htdocs/static/bwr/font-awesome/fonts/fontawesome-webfont.ttf
 site/htdocs/static/bwr/font-awesome/fonts/fontawesome-webfont.woff
 site/htdocs/static/bwr/font-awesome/fonts/fontawesome-webfont.woff2
-site/htdocs/static/bwr/font-awesome/fonts/FontAwesome.otf
 site/htdocs/static/bwr/jquery-ui/jquery-ui.js
 site/htdocs/static/bwr/jquery-ui/jquery-ui.min.js
-site/htdocs/static/bwr/jquery-ui/jquery-ui.min.js.map
 site/htdocs/static/bwr/jquery.cookie/jquery.cookie.js
 site/htdocs/static/bwr/jquery.cookie/jquery.cookie.min.js
 site/htdocs/static/bwr/jquery.cookie/jquery.cookie.min.js.map
 site/htdocs/static/bwr/jquery/dist/jquery.js
 site/htdocs/static/bwr/jquery/dist/jquery.min.js
-site/htdocs/static/bwr/jquery/dist/jquery.min.js.map
 site/htdocs/static/bwr/jquery/dist/jquery.min.map
 site/htdocs/static/bwr/qrious/dist/qrious.js
 site/htdocs/static/bwr/qrious/dist/qrious.js.map
@@ -368,6 +367,7 @@ site/htdocs/static/common/ro.png
 site/htdocs/static/common/tr.png
 site/htdocs/static/common/vi.png
 site/htdocs/static/common/zh.png
+site/htdocs/static/common/zh_TW.png
 site/htdocs/static/languages/ar.json
 site/htdocs/static/languages/de.json
 site/htdocs/static/languages/en.json
@@ -382,6 +382,7 @@ site/htdocs/static/languages/ro.json
 site/htdocs/static/languages/tr.json
 site/htdocs/static/languages/vi.json
 site/htdocs/static/languages/zh.json
+site/htdocs/static/languages/zh_TW.json
 site/templates/bootstrap/2fchoice.tpl
 site/templates/bootstrap/2fregisters.tpl
 site/templates/bootstrap/captcha.tpl
@@ -441,7 +442,6 @@ site/templates/bootstrap/totp2fcheck.tpl
 site/templates/bootstrap/totp2fregister.tpl
 site/templates/bootstrap/u2fcheck.tpl
 site/templates/bootstrap/u2fregister.tpl
-site/templates/bootstrap/updatesession.tpl
 site/templates/bootstrap/upgradesession.tpl
 site/templates/bootstrap/utotp2fcheck.tpl
 site/templates/bootstrap/yubikey2fregister.tpl
@@ -450,6 +450,7 @@ site/templates/common/bullet_go.png
 site/templates/common/key.png
 site/templates/common/mail/ar.json
 site/templates/common/mail/en.json
+site/templates/common/mail/es.json
 site/templates/common/mail/fi.json
 site/templates/common/mail/fr.json
 site/templates/common/mail/it.json
@@ -457,6 +458,7 @@ site/templates/common/mail/ms.json
 site/templates/common/mail/tr.json
 site/templates/common/mail/vi.json
 site/templates/common/mail/zh_CN.json
+site/templates/common/mail/zh_TW.json
 site/templates/common/mail_2fcode.tpl
 site/templates/common/mail_certificateConfirm.tpl
 site/templates/common/mail_certificateReset.tpl
@@ -475,6 +477,7 @@ t/01-AuthDemo.t
 t/01-CSP-and-CORS-headers.t
 t/01-Handler-redirection-and-URL-check-by-portal.t
 t/01-pdata.t
+t/01-Unauth-Logout.t
 t/02-Password-Demo-Local-noPpolicy.t
 t/02-Password-Demo-Local-Ppolicy.t
 t/02-Password-Demo.t
@@ -487,8 +490,9 @@ t/20-Auth-and-password-DBI-dynamic-hash.t
 t/20-Auth-and-password-DBI.t
 t/20-Auth-DBI-utf8.t
 t/21-Auth-and-password-LDAP.t
+t/21-Auth-LDAP-attributes.t
+t/21-Auth-LDAP-Policy-only.t
 t/21-Auth-LDAP-Policy.t
-t/21-Auth-LDAP-utf8.t
 t/22-Auth-and-password-AD.t
 t/23-Auth-and-password-REST.t
 t/24-AuthApache.t
@@ -507,6 +511,7 @@ t/29-AuthSSL.t
 t/30-Auth-and-issuer-SAML-Artifact-with-SOAP-SLO-IdP-initiated.t
 t/30-Auth-and-issuer-SAML-Artifact-with-SOAP-SLO.t
 t/30-Auth-and-issuer-SAML-Metadata.t
+t/30-Auth-and-issuer-SAML-POST-Hook.t
 t/30-Auth-and-issuer-SAML-POST-IdP-initiated.t
 t/30-Auth-and-issuer-SAML-POST-Missing-SLO.t
 t/30-Auth-and-issuer-SAML-POST.t
@@ -522,6 +527,7 @@ t/30-SAML-Macros.t
 t/30-SAML-POST-Logout-when-expired.t
 t/30-SAML-POST-Logout-when-removed.t
 t/30-SAML-POST-with-2F-and-Notification.t
+t/30-SAML-POST-with-2F-UpgradeOnly.t
 t/30-SAML-POST-with-Notification.t
 t/30-SAML-ReAuth-with-choice.t
 t/30-SAML-ReAuth.t
@@ -549,7 +555,11 @@ t/32-Auth-and-issuer-OIDC-implicit.t
 t/32-Auth-and-issuer-OIDC-sorted.t
 t/32-CAS-10.t
 t/32-CAS-Macros.t
+t/32-CAS-Prefix.t
+t/32-OIDC-ClaimTypes.t
+t/32-OIDC-Code-Flow-with-2F-UpgradeOnly.t
 t/32-OIDC-Code-Flow-with-2F.t
+t/32-OIDC-Hooks.t
 t/32-OIDC-Macro.t
 t/32-OIDC-Offline-Session.t
 t/32-OIDC-Password-Grant-with-Bruteforce.t
@@ -570,6 +580,7 @@ t/35-REST-sessions-with-REST-server.t
 t/35-SOAP-config-backend.t
 t/35-SOAP-sessions-with-SOAP-server.t
 t/36-Combination-Kerberos-or-Demo.t
+t/36-Combination-Password.t
 t/36-Combination-with-Choice.t
 t/36-Combination-with-over.t
 t/36-Combination-with-token.t
@@ -583,6 +594,7 @@ t/37-OIDC-RP-to-SAML-IdP-GET-with-WAYF.t
 t/37-OIDC-RP-to-SAML-IdP-GET.t
 t/37-OIDC-RP-to-SAML-IdP-POST.t
 t/37-SAML-SP-GET-to-OIDC-OP.t
+t/37-SAML-SP-GET-to-SAML-with-Logout.t
 t/37-SAML-SP-POST-to-CAS-server-with-Choice.t
 t/37-SAML-SP-POST-to-CAS-server.t
 t/37-SAML-SP-POST-to-OIDC-OP.t
@@ -607,6 +619,7 @@ t/42-Register-LDAP.t
 t/42-Register-Security.t
 t/43-MailPasswordReset-Choice.t
 t/43-MailPasswordReset-Combination-LDAP.t
+t/43-MailPasswordReset-Combination.t
 t/43-MailPasswordReset-DBI.t
 t/43-MailPasswordReset-LDAP.t
 t/43-MailPasswordReset-with-captcha.t
@@ -627,6 +640,7 @@ t/59-Double-cookies-for-Double-sessions.t
 t/59-Double-cookies-Refresh-and-Logout.t
 t/59-Secured-cookie-Refresh-and-Logout.t
 t/60-Status.t
+t/61-AdaptativeAuthenticationLevel.t
 t/61-BruteForceProtection-with-Incremental-lockTimes-and-TOTP.t
 t/61-BruteForceProtection-with-Incremental-lockTimes.t
 t/61-BruteForceProtection.t
@@ -640,24 +654,31 @@ t/62-SingleSession-with-Rules.t
 t/62-SingleSession.t
 t/62-UpgradeSession.t
 t/63-History.t
-t/64-StayConnected.t
+t/64-StayConnected-with-2F-and-History.t
+t/64-StayConnected-with-History.t
 t/65-AutoSignin.t
+t/65-CheckState.t
 t/66-CDA-already-auth.t
 t/66-CDA-PSGI-Try.t
+t/66-CDA-with-doubleCookies.t
 t/66-CDA-with-REST.t
 t/66-CDA-with-SOAP.t
 t/66-CDA.t
 t/67-CheckUser-with-Global-token.t
 t/67-CheckUser-with-Impersonation-and-Macros.t
 t/67-CheckUser-with-issuer-SAML-POST.t
+t/67-CheckUser-with-rules.t
 t/67-CheckUser-with-token.t
 t/67-CheckUser-with-UnrestrictedUser.t
 t/67-CheckUser.t
+t/68-ContextSwitching-with-2F-allowed.t
+t/68-ContextSwitching-with-2F.t
 t/68-ContextSwitching-with-Impersonation.t
 t/68-ContextSwitching-with-Logout.t
 t/68-ContextSwitching-with-TOTP-and-Notification.t
 t/68-ContextSwitching-with-UnrestrictedUser.t
 t/68-ContextSwitching.t
+t/68-Impersonation-with-2F.t
 t/68-Impersonation-with-doubleCookies.t
 t/68-Impersonation-with-filtered-merge.t
 t/68-Impersonation-with-History.t
@@ -668,6 +689,7 @@ t/68-Impersonation.t
 t/70-2F-TOTP-8-with-global-storage.t
 t/70-2F-TOTP-and-U2F-with-TTL-and-JSON.t
 t/70-2F-TOTP-with-History-and-Refresh.t
+t/70-2F-TOTP-with-Range.t
 t/70-2F-TOTP-with-TTL-and-JSON.t
 t/70-2F-TOTP-with-TTL-and-XML.t
 t/70-2F-TOTP-with-TTL.t
@@ -687,10 +709,12 @@ t/76-2F-Ext-with-CodeActivation.t
 t/76-2F-Ext-with-GrantSession.t
 t/76-2F-Ext-with-History.t
 t/77-2F-Extra.t
+t/77-2F-Mail-SessionKey.t
 t/77-2F-Mail-with-global-storage.t
 t/77-2F-Mail.t
 t/78-2F-Upgrade-Many.t
 t/78-2F-Upgrade.t
+t/78-2F-UpgradeOnly.t
 t/79-2F-Yubikey-from-Session.t
 t/79-2F-Yubikey.t
 t/90-Translations.t
@@ -710,9 +734,11 @@ t/lib/Lemonldap/NG/Portal/Auth/LDAPPolicy.pm
 t/lib/Lemonldap/NG/Portal/Custom.pm
 t/lmConf-1.json
 t/oidc-lib.pm
+t/OidcHookPlugin.pm
 t/pdata.pm
 t/README.md
 t/saml-lib.pm
+t/SamlHookPlugin.pm
 t/sendCode.pl
 t/sendOTP.pl
 t/separate-handler.pm

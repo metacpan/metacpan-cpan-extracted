@@ -10,16 +10,16 @@ no warnings;
 use Carp qw(croak carp);
 use Scalar::Util qw(blessed);
 
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD
+use vars qw( @ISA $AUTOLOAD
              $debug %names %elements $maximum_Z
              %names_to_Z $Default_language %Languages
             );
 
 use Exporter qw(import);
 
-@EXPORT_OK = qw(get_Z get_symbol get_name);
-@EXPORT    = qw();
-$VERSION   = '1.072';
+our @EXPORT_OK = qw(get_Z get_symbol get_name);
+our @EXPORT    = qw();
+our $VERSION   = '1.074';
 
 use subs qw(
 	_get_name_by_Z
@@ -64,7 +64,7 @@ $debug = 0;
 %Languages = (
 	'Pig Latin' => 0,
 	'English'   => 1,
-	'Japanese' => 2,
+	'Japanese'  => 2,
 	);
 
 $Default_language = $Languages{'English'};
@@ -713,9 +713,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2000-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2000-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut

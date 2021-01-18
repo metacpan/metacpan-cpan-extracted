@@ -1,4 +1,5 @@
 AUTHOR_PLEDGE
+CODE_OF_CONDUCT.md
 CONTRIBUTORS
 Changes
 INSTALL
@@ -8,7 +9,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 Makefile.PL
-README
+README.mkdn
 SIGNATURE
 corpus/lib/DZT/Sample.pm
 cpanfile

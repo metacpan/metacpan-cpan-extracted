@@ -1,11 +1,2 @@
-<&| /Widgets/TitleBox, title => loc('Gravatar') &>
-<div class="gravatar">
-<& /Elements/Gravatar, UserObj => $UserObj &>
-</div>
-</&>
-<%INIT>
-return unless $UserObj->HasGravatar;
-</%INIT>
-<%ARGS>
-$UserObj => undef
-</%ARGS>
+%# RT 4.4.0 - 4.4.3
+<& /Callbacks/Gravatar/Prefs/Elements/EditAboutMe/FormLeftColumn, %ARGS &>

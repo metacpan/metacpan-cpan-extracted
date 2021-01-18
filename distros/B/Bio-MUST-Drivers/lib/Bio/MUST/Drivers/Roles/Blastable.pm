@@ -1,13 +1,13 @@
 package Bio::MUST::Drivers::Roles::Blastable;
 # ABSTRACT: BLAST database-related methods
-$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.193030';
+$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.210160';
 use 5.018;                      # to avoid a crash due to call to "can" below
 use Moose::Role;
 
 use autodie;
 use feature qw(say);
 
-# use Smart::Comments;
+use Smart::Comments '###';
 
 use Carp;
 use File::Temp;
@@ -74,8 +74,8 @@ sub _blast {
     my $query = shift;
     my $args  = shift // {};
 
-    ### $pgm
-    ### $args
+    #### $pgm
+    #### $args
 
     # provision executable
     my $app = use_module('Bio::MUST::Provision::Blast')->new;
@@ -108,9 +108,11 @@ sub _blast {
     my $args_str = stringify_args($args);
 
     # create BLAST command
-    $pgm = file($ENV{BMD_BLAST_BINDIR}, $pgm);
+    # Note: we need to untaint data here
+    ($pgm) = file($ENV{BMD_BLAST_BINDIR}, $pgm) =~ m/^(\S+)$/xms;
+    ### assert: $pgm
     my $cmd = join q{ }, $pgm, $args_str, '> /dev/null 2> /dev/null';
-    ### $cmd
+    #### $cmd
 
     # try to robustly execute BLAST
     my $ret_code = system( [ 0, 127 ], $cmd);
@@ -155,7 +157,7 @@ sub blastdbcmd {
     # create blastdbcmd command
     my $pgm = file($ENV{BMD_BLAST_BINDIR}, 'blastdbcmd');
     my $cmd = join q{ }, $pgm, $args_str;
-    ### $cmd
+    #### $cmd
 
     # try to robustly execute blastdbcmd
     my $ret_code = system( [ 0, 127 ], $cmd);
@@ -181,7 +183,7 @@ Bio::MUST::Drivers::Roles::Blastable - BLAST database-related methods
 
 =head1 VERSION
 
-version 0.193030
+version 0.210160
 
 =head1 SYNOPSIS
 

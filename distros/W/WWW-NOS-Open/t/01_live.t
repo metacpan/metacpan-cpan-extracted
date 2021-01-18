@@ -16,7 +16,7 @@ $e = Exception::Class->caught('NOSOpenInternalServerErrorException')
 
 TODO: {
     todo_skip
-q{Need a connection to the NOS Open server. Set the enviroment variable NOSOPEN_API_KEY to connect.},
+q{Need a connection to a live server} ,
       2
       if $e;
     my $version = $obj->get_version;
@@ -24,8 +24,8 @@ q{Need a connection to the NOS Open server. Set the enviroment variable NOSOPEN_
     is( $version->get_build,   q{0.0.1}, q{get build number} );
 }
 
-my $msg = 'Author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
+my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
 SKIP: {
-    skip $msg, 1 unless $ENV{TEST_AUTHOR};
+    skip $msg, 1 unless $ENV{AUTHOR_TESTING};
 }
-$ENV{TEST_AUTHOR} && Test::NoWarnings::had_no_warnings();
+$ENV{AUTHOR_TESTING} && Test::NoWarnings::had_no_warnings();

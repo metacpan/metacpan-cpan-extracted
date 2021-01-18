@@ -8,11 +8,9 @@ Module::Build->new(
     requires    => {
         'perl'                                 => '5.16.0',
         'Class::Measure::Scientific::FX_992vb' => 0,
-        'Data::Dumper'                         => 0,
         'English'                              => 0,
         'Geo::ICAO'                            => 0,
         'Geo::METAR'                           => 0,
-        'Log::Log4perl'                        => 0,
         'Moose'                                => 0,
         'MooseX::NonMoose'                     => 0,
         'Readonly'                             => 1.03,
@@ -28,6 +26,10 @@ Module::Build->new(
         resources => {
             repository =>
               'https://bitbucket.org/rolandvanipenburg/geo-metar-deduced',
+            bugtracker => {
+                web =>
+'https://bitbucket.org/rolandvanipenburg/geo-metar-deduced/issues',
+            },
         },
     },
     sign => 1,

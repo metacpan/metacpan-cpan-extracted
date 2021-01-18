@@ -2,7 +2,7 @@
 
 use strict;
 use Data::Dumper;
-use 5.10.0;
+
 use_ok('Lemonldap::NG::Manager::Cli::Lib');
 
 our $client;

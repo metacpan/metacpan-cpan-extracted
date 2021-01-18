@@ -19,13 +19,13 @@ no_index:
     - t
     - inc
 requires:
-  Kelp: '1'
-  Plack: '1'
+  Kelp: '0'
+  Plack: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/brtastic/perl-kelp-module-symbiosis/issues
   homepage: https://brtastic.xyz/project/kelp
   license: https://dev.perl.org/licenses
   repository: https://github.com/brtastic/perl-kelp-module-symbiosis
-version: '1.01'
+version: '1.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -10,6 +10,7 @@ README.pod
 script/cross
 t/empty_set.t
 t/error.t
+t/labeled.t
 t/load.t
 t/named_sets.t
 t/next.t

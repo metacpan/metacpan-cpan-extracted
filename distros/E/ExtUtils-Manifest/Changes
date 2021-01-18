@@ -1,5 +1,10 @@
 Revision history for ExtUtils-Manifest
 
+1.73  2021-01-16
+  - Calculate absolute path to MANIFEST.SKIP (in $DEFAULT_MSKIP) at module
+    load time, where __FILE__ is guaranteed to valid.
+  - skip github and iCloud files
+
 1.72  2019-03-10
   - also skip META_new.* (thanks, brian d foy!)
 
@@ -593,7 +598,7 @@ r1371 | schwern | 2003-04-06 03:52:59 -0500 (Sun, 06 Apr 2003) | 9 lines
 
  Fixing the ECHO macro on dmake.
 
- Fixing }} escaping on dmake, but this is just a stopgap measure.
+ Fixing double-closing-brace escaping on dmake, but this is just a stopgap measure.
 
  Making ExtUtils::Manifest sort things case-insensitively.  I think it
  displays better.

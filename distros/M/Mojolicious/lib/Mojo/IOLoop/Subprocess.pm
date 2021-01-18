@@ -49,8 +49,8 @@ sub _start {
   return $self->$parent("Can't fork: $!") unless defined(my $pid = $self->{pid} = fork);
   unless ($pid) {
     eval {
-      $self->ioloop->reset;
-      my $results = eval { [$self->$child] } || [];
+      $self->ioloop->reset({freeze => 1});
+      my $results = eval { [$self->$child] } // [];
       print {$self->{writer}} '0-', $self->serialize->([$@, @$results]);
       $self->emit('cleanup');
     } or warn $@;
@@ -81,7 +81,7 @@ sub _start {
       waitpid $pid, 0;
       $self->{exit_code} = $? >> 8;
       substr $buffer, 0, 2, '';
-      my $results = eval { $self->deserialize->($buffer) } || [];
+      my $results = eval { $self->deserialize->($buffer) } // [];
       $self->$parent(shift(@$results) // $@, @$results);
     }
   );

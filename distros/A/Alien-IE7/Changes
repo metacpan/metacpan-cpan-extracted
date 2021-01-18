@@ -1,5 +1,9 @@
 Revision history for Perl extension Alien::IE7.
 
+0.9.4   Sun Jan 17 13:12 PDT 2021
+    - DEPRECATED; DO NOT USE
+    - move to GitHub
+
 0.9.3   Fri Apr 23 22:19 PDT 2010
     - switch to Git
 

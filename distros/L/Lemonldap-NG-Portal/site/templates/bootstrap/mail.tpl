@@ -23,9 +23,9 @@
 
       <div class="input-group mb-3">
         <div class="input-group-prepend">
-          <span class="input-group-text"><label for="mailfield" class="mb-0"><i class="fa fa-envelope"></i></label></span>
+          <span class="input-group-text"><label for="mail" class="mb-0"><i class="fa fa-envelope"></i></label></span>
         </div>
-        <input id="mailfield" name="mail" type="text" value="<TMPL_VAR NAME="MAIL">" class="form-control" trplaceholder="mail" required />
+        <input id="mail" name="mail" type="text" value="<TMPL_VAR NAME="MAIL">" class="form-control" trplaceholder="mail" required />
       </div>
 
       <TMPL_IF NAME=CAPTCHA_SRC>
@@ -118,16 +118,16 @@
 
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text"><label for="newpasswordfield" class="mb-0"><i class="fa fa-lock"></i></label></span>
+            <span class="input-group-text"><label for="newpassword" class="mb-0"><i class="fa fa-lock"></i></label></span>
           </div>
-          <input id="newpasswordfield" name="newpassword" type="password" class="form-control" trplaceholder="newPassword" />
+          <input id="newpassword" name="newpassword" type="password" class="form-control" trplaceholder="newPassword" />
         </div>
 
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text"><label for="confirmpasswordfield" class="mb-0"><i class="fa fa-lock"></i></label></span>
+            <span class="input-group-text"><label for="confirmpassword" class="mb-0"><i class="fa fa-lock"></i></label></span>
           </div>
-          <input id="confirmpasswordfield" name="confirmpassword" type="password" class="form-control" trplaceholder="confirmPwd" />
+          <input id="confirmpassword" name="confirmpassword" type="password" class="form-control" trplaceholder="confirmPwd" />
         </div>
 
         <TMPL_IF NAME="DISPLAY_GENERATE_PASSWORD">

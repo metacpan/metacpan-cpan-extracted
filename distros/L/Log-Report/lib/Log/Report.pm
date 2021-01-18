@@ -1,4 +1,4 @@
-# Copyrights 2007-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2021 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Log::Report;
 use vars '$VERSION';
-$VERSION = '1.29';
+$VERSION = '1.31';
 
 use base 'Exporter';
 
@@ -62,11 +62,13 @@ my $default_dispatcher = dispatcher PERL => 'default', accept => 'NOTICE-';
 
 sub report($@)
 {   my $opts = ref $_[0] eq 'HASH' ? +{ %{ (shift) } } : {};
-    my $reason = shift;
+    my ($reason, $message) = (shift, shift);
+
     my $stop = exists $opts->{is_fatal} ? $opts->{is_fatal} : is_fatal $reason;
+    my $try  = $nested_tries[-1];  # WARNING: overloaded boolean, use 'defined'
 
     my @disp;
-    if(defined(my $try = $nested_tries[-1]))
+    if(defined $try)
     {   push @disp, @{$reporter->{needs}{$reason}||[]}
             unless $stop || $try->hides($reason);
         push @disp, $try if $try->needs($reason);
@@ -82,10 +84,8 @@ sub report($@)
     @disp || $stop
         or return;
 
-    $opts->{errno} ||= $!+0 || $? || 1
-        if use_errno($reason) && !defined $opts->{errno};
-
-    if(my $to = delete $opts->{to})
+    my $to = delete $opts->{to};
+    if($to)
     {   # explicit destination, still disp may not need it.
         if(ref $to eq 'ARRAY')
         {   my %disp = map +($_->name => $_), @disp;
@@ -94,11 +94,14 @@ sub report($@)
         else
         {   @disp    = grep $_->name eq $to, @disp;
         }
+        push @disp, $try if defined $try;
+
         @disp || $stop
             or return;
     }
 
-    my $message = shift;
+    $opts->{errno} ||= $!+0 || $? || 1
+        if use_errno($reason) && !defined $opts->{errno};
 
     unless(Log::Report::Dispatcher->can('collectLocation'))
     {   # internal Log::Report error can result in "deep recursions".
@@ -128,8 +131,11 @@ sub report($@)
         $message = $lrm->new(_prepend => $text, @_);
     }
 
-    if(my $to = $message->to)
-    {   @disp = grep $_->name eq $to, @disp;
+    $message->to(undef) if $to;  # overrule destination of message
+
+    if(my $disp_name = $message->to)
+    {   @disp = grep $_->name eq $disp_name, @disp;
+        push @disp, $try if defined $try && $disp_name ne 'try';
         @disp or return;
     }
 

@@ -5,7 +5,7 @@ use warnings;
 package App::GhaProve;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007';
+our $VERSION   = '0.008';
 
 our $QUIET = 0;
 

@@ -2,9 +2,12 @@ package Lemonldap::NG::Portal::Issuer::SAML;
 
 use strict;
 use Mouse;
+use URI;
+use URI::QueryParam;
 use Lemonldap::NG::Portal::Lib::SAML;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
+  PE_REDIRECT
   PE_SESSIONEXPIRED
   PE_SAML_ART_ERROR
   PE_SAML_DESTINATION_ERROR
@@ -18,7 +21,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_UNAUTHORIZEDPARTNER
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::SAML';
@@ -159,6 +162,10 @@ qr/^($saml_sso_get_url|$saml_sso_get_url_ret|$saml_sso_post_url|$saml_sso_post_u
         [ 'GET', 'POST' ]
     );
     $self->addUnauthRoute(
+        $self->path => { singleLogoutResume => 'sloResume' },
+        [ 'GET', 'POST' ]
+    );
+    $self->addUnauthRoute(
         $self->path => { relaySingleLogoutTermination => 'sloRelayTerm' },
         [ 'GET', 'POST' ]
     );
@@ -192,6 +199,10 @@ sub storeEnv {
               ->{samlSPMetaDataOptionsAuthnLevel};
             $req->pdata->{targetAuthnLevel} = $targetAuthnLevel
               if $targetAuthnLevel;
+        }
+        if ( $login->request ) {
+            my $acs = $login->request->AssertionConsumerServiceURL;
+            $req->env->{llng_saml_acs} = $acs if $acs;
         }
     }
     return PE_OK;
@@ -378,6 +389,10 @@ sub run {
                 return PE_SAML_SSO_ERROR;
             }
 
+            my $h =
+              $self->p->processHook( $req, 'samlGotAuthnRequest', $login );
+            return $h if ( $h != PE_OK );
+
             # Get SP entityID
             my $sp = $request ? $login->remote_providerID() : $idp_initiated_sp;
 
@@ -395,6 +410,15 @@ sub run {
 
             $self->logger->debug("$sp match $spConfKey SP in configuration");
             $req->env->{llng_saml_spconfkey} = $spConfKey;
+
+            if ( $login->request ) {
+                my $acs = $login->request->AssertionConsumerServiceURL;
+                if ($acs) {
+                    $req->env->{llng_saml_acs} = $acs;
+                    $self->logger->debug(
+                        "Using AssertionConsumerServiceURL $acs");
+                }
+            }
 
             # Check access rule
             if ( my $rule = $self->spRules->{$spConfKey} ) {
@@ -656,20 +680,20 @@ sub run {
                 unless ( defined $value ) {
                     if ($mandatory) {
                         $self->logger->error(
-"Session key $_ is required to set SAML $name attribute"
+"Session key $_ is required to set SAML $name attribute ($sp)"
                         );
                         return PE_ISSUERMISSINGREQATTR;
                     }
                     else {
                         $self->logger->debug(
-"SAML2 attribute $name has no value but is not mandatory, skip it"
+"SAML2 attribute $name has no value but is not mandatory ($sp), skip it"
                         );
                         next;
                     }
                 }
 
                 $self->logger->debug(
-                    "SAML2 attribute $name will be set with $_ session key");
+                    "SAML2 attribute $name will be set with $_ session key ($sp)");
 
                 # SAML2 attribute
                 my $attribute =
@@ -839,6 +863,10 @@ sub run {
             $self->userLogger->notice(
 "SAML authentication response sent to SAML SP $spConfKey for $user$nameIDLog"
             );
+
+            $h =
+              $self->p->processHook( $req, 'samlBuildAuthnResponse', $login );
+            return $h if ( $h != PE_OK );
 
             # Build SAML response
             $protocolProfile = $login->protocolProfile();
@@ -1117,6 +1145,12 @@ sub soapSloServer {
 
         $self->logger->debug("SLO: Logout request is valid");
 
+        my $h = $self->p->processHook( $req, 'samlGotLogoutRequest', $logout );
+        if ( $h != PE_OK ) {
+            return $self->p->sendError( $req,
+                "SLO: samlGotLogoutRequest hook returned error", 400 );
+        }
+
         # We accept only SOAP here
         unless ( $method eq $self->getHttpMethod('soap') ) {
             return $self->p->sendError( $req,
@@ -1276,6 +1310,13 @@ sub soapSloServer {
                 "SLO response signature according to metadata");
         }
 
+        $h =
+          $self->p->processHook( $req, 'samlBuildLogoutResponse', $logout );
+        if ( $h != PE_OK ) {
+            return $self->p->sendError( $req,
+                "SLO: samlBuildLogoutResponse hook returned error", 400 );
+        }
+
         # Send logout response
         unless ( $self->buildLogoutResponseMsg($logout) ) {
             $self->logger->error("Unable to build SLO response");
@@ -1414,7 +1455,8 @@ sub sloRelaySoap {
 
     # Store success status for this SLO request
     my $sloStatusSessionInfos =
-      $self->getSamlSession( $relayState, { $spConfKey => 1 } );
+      $self->getSamlSession( $relayState,
+        { $spConfKey => 1, _utime => time() } );
 
     if ($sloStatusSessionInfos) {
         $self->logger->debug(
@@ -1576,6 +1618,69 @@ sub authSloServer {
     return $self->sloServer($req);
 }
 
+sub sloResume {
+    my ( $self, $req ) = @_;
+
+    my $ResumeParams = $req->params('ResumeParams');
+
+    unless ($ResumeParams) {
+        $self->logger->error("Could not find resumption info");
+        return PE_SAML_SLO_ERROR;
+    }
+
+    my $logoutContextSession = $self->getSamlSession($ResumeParams);
+
+    unless ($logoutContextSession) {
+        $self->logger->error("Could not find logout context session");
+        return PE_SAML_SLO_ERROR;
+    }
+
+    my $spConfKey   = $logoutContextSession->data->{spConfKey};
+    my $method      = $logoutContextSession->data->{method};
+    my $provider_nb = $logoutContextSession->data->{provider_nb};
+    my $relayID     = $logoutContextSession->data->{relayID};
+
+    # Restore Lasso logout object from XML dump
+    my $logout = $self->createLogout( $self->lassoServer,
+        $logoutContextSession->data->{logout} );
+
+    # Restore session info (for logout of other SPs)
+    $req->setInfo( $logoutContextSession->data->{info} )
+      if $logoutContextSession->data->{info};
+
+    return $self->_finishSlo( $req, $logout, $method, $spConfKey,
+        $provider_nb, $relayID );
+}
+
+sub _finishSlo {
+    my ( $self, $req, $logout, $method, $spConfKey, $provider_nb, $relayID ) =
+      @_;
+
+    # Signature
+    my $signSLOMessage = $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+      ->{samlSPMetaDataOptionsSignSLOMessage};
+
+    unless ($signSLOMessage) {
+        $self->logger->debug("Do not sign this SLO response");
+        return $self->sendSLOErrorResponse( $req, $logout, $method )
+          unless ( $self->disableSignature($logout) );
+    }
+
+    # If no waiting SP, return directly SLO response
+    unless ($provider_nb) {
+        return $self->sendLogoutResponseToServiceProvider( $req, $logout,
+            $method );
+    }
+
+    # Else build SLO status relay URL and display info
+    else {
+        $req->{urldc} =
+          $self->conf->{portal} . '/saml/relaySingleLogoutTermination';
+        $self->p->setHiddenFormValue( $req, 'relay', $relayID, '', 0 );
+        return $self->p->do( $req, [] );
+    }
+}
+
 sub sloServer {
     my ( $self, $req ) = @_;
     my $url            = $req->uri;
@@ -1607,6 +1712,12 @@ sub sloServer {
         }
 
         $self->logger->debug("SLO: Logout request is valid");
+
+        my $h = $self->p->processHook( $req, 'samlGotLogoutRequest', $logout );
+        if ( $h != PE_OK ) {
+            return $self->p->sendError( $req,
+                "SLO: samlGotLogoutRequest hook returned error", 400 );
+        }
 
         # Get SP entityID
         my $sp = $logout->remote_providerID();
@@ -1757,33 +1868,64 @@ sub sloServer {
         # This flag is for logout() to say that SAML logout is already done
         $req->data->{samlSLOCalled} = 1;
 
+        # This variable decides if we call the authLogout step
+        # (which can redirect away)
+        my $doAuthLogout = 0;
+        my $logoutContextSession;
+
+        # TODO: for now, we only try authLogout to disconnect an
+        # external IDP if the current session has been opened on a
+        # SAML IDP. We only propagate logout to the IDP our SP is SAML
+        # AND our IDP is SAML too
+        if ( $req->sessionInfo->{_lassoSessionDump} ) {
+
+            $doAuthLogout = 1;
+
+            # In case we have to redirect to the IDP, save current state
+            # to allow resumption. This needs to be done here because
+            # issuerUrldc will be put in the IdP logout's RelayState
+            my $logoutInfos = {
+                logout      => $logout->dump,
+                spConfKey   => $spConfKey,
+                method      => $method,
+                provider_nb => $provider_nb,
+                relayID     => $relayID,
+                _utime      => time(),
+            };
+            $logoutContextSession =
+              $self->getSamlSession( undef, $logoutInfos );
+            my $uri =
+              URI->new( $self->conf->{portal} . '/saml/singleLogoutResume' );
+            $uri->query_param( ResumeParams => $logoutContextSession->id );
+            $req->{issuerUrldc} = $uri->as_string;
+        }
+
+        # We don't want info to interfere with the auth logout process
+        my $savedInfo = $req->info;
+        $req->setInfo('');
+
         # Launch normal logout and ignore errors
-        $req->steps( [ @{ $self->p->beforeLogout }, 'deleteSession' ] );
-        $self->p->process($req);
+        $req->steps( [
+                @{ $self->p->beforeLogout },
+                ( $doAuthLogout ? 'authLogout' : () ),
+                'deleteSession'
+            ]
+        );
+        my $res = $self->p->process($req);
 
-        # Signature
-        my $signSLOMessage = $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
-          ->{samlSPMetaDataOptionsSignSLOMessage};
+        if ( $res eq PE_REDIRECT ) {
 
-        unless ($signSLOMessage) {
-            $self->logger->debug("Do not sign this SLO response");
-            return $self->sendSLOErrorResponse( $req, $logout, $method )
-              unless ( $self->disableSignature($logout) );
+            # Save session info (for logout of other SP)
+            if ($savedInfo) {
+                $logoutContextSession->update( { info => $savedInfo } );
+            }
+            return $self->p->do( $req, [ sub { PE_REDIRECT } ] );
         }
 
-        # If no waiting SP, return directly SLO response
-        unless ($provider_nb) {
-            return $self->sendLogoutResponseToServiceProvider( $req, $logout,
-                $method );
-        }
+        $req->info($savedInfo);
 
-        # Else build SLO status relay URL and display info
-        else {
-            $req->{urldc} =
-              $self->conf->{portal} . '/saml/relaySingleLogoutTermination';
-            $self->p->setHiddenFormValue( $req, 'relay', $relayID, '', 0 );
-            return $self->p->do( $req, [] );
-        }
+        return $self->_finishSlo( $req, $logout, $method, $spConfKey,
+            $provider_nb, $relayID );
     }
 
     elsif ($response) {
@@ -1797,6 +1939,9 @@ sub sloServer {
         }
 
         $self->logger->debug("Logout response is valid");
+
+        my $h = $self->p->processHook( $req, 'samlGotLogoutResponse', $logout );
+        $self->imgnok($req) if ( $h != PE_OK );
 
         # Check Destination
         $self->imgnok($req)
@@ -1915,8 +2060,8 @@ sub attributeServer {
     my $name_id = $query->nameIdentifier();
 
     unless ($name_id) {
-        $self->p->sendError( $req, "Fail to get NameID from attribute request",
-            400 );
+        $self->p->sendError( $req,
+            "Fail to get NameID from attribute request", 400 );
     }
 
     my $user = $name_id->content();
@@ -1974,8 +2119,8 @@ sub attributeServer {
     eval { @requested_attributes = $query->request()->Attribute(); };
     if ($@) {
         $self->checkLassoError($@);
-        return $self->p->sendError( $req, "Unable to get requested attributes",
-            400 );
+        return $self->p->sendError( $req,
+            "Unable to get requested attributes", 400 );
     }
 
     # Returned attributes

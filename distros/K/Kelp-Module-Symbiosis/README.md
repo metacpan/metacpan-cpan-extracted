@@ -2,7 +2,7 @@
 Manage an entire ecosystem of Plack organisms under Kelp framework instance.
 
 ## Code and documentation
-[Kelp::Module::Symbiosis on CPAN](https://metacpan.org/release/Kelp::Module::Symbiosis)
+[Kelp::Module::Symbiosis on CPAN](https://metacpan.org/release/Kelp-Module-Symbiosis)
 
 ## Bugs and feature requests
 Please use the Github's issue tracker to file both bugs and feature requests.

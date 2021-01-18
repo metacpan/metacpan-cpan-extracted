@@ -4,6 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_APACHESESSIONERROR
+  PE_ERROR
   PE_OK
 );
 
@@ -37,9 +38,18 @@ sub changeUrldc {
             $cdaInfos->{cookie_name}  = $self->{conf}->{cookieName};
         }
         else {
-            $cdaInfos->{cookie_value} =
-              $req->{sessionInfo}->{_httpSession};
-            $cdaInfos->{cookie_name} = $self->{conf}->{cookieName} . "http";
+            if ( $req->{sessionInfo}->{_httpSession} ) {
+                $cdaInfos->{cookie_value} =
+                  $req->{sessionInfo}->{_httpSession};
+                $cdaInfos->{cookie_name} = $self->{conf}->{cookieName} . "http";
+            }
+            else {
+                $self->logger->error(
+                        "Session does not contain _httpSession field. "
+                      . "Portal must be accessed over HTTPS when using CDA with double cookie"
+                );
+                return PE_ERROR;
+            }
         }
 
         my $cdaSession =

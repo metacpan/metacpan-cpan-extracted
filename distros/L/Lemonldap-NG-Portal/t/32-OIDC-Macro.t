@@ -13,7 +13,6 @@ BEGIN {
 
 my $debug = 'error';
 my $res;
-my $url;
 
 # Initialization
 ok( my $op = op(), 'OP portal' );
@@ -49,7 +48,7 @@ ok(
         accept => 'text/html',
         length => length($query),
     ),
-    "Post authentication,        endpoint $url"
+    "Post authentication"
 );
 my $idpId = expectCookie($res);
 my ($code) = expectRedirection( $res, qr#http://rp.com/\?.*code=([^&]+)# );

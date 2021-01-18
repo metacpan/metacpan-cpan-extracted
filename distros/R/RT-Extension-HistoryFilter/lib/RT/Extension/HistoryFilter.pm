@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '2.03';
+our $VERSION = '3.01';
 
 my @types;
 {

@@ -24,7 +24,6 @@ my $builder = Module::Build->new(
         'Readonly'        => '2.05',
         'Memoize'         => '1.03',
         'Term::ANSIColor' => '1.00',
-        #'Log::Log4perl' => '1.49',
         'DateTime'        => '1.44',
         'DateTime::Format::Strptime' => '1.76',
         'List::MoreUtils'  => '0.43',

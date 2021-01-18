@@ -4,7 +4,7 @@ use warnings;
 use D64::Disk::Dir::Item;
 use D64::Disk::Layout::Sector;
 use Test::Deep;
-use Test::More tests => 8;
+use Test::More tests => 10;
 ########################################
 require './t/Util.pm';
 D64::Disk::Layout::Dir::Test::Util->import(qw(:all));
@@ -85,5 +85,13 @@ BEGIN {
     $expected_sectors[6]->sector(0x02);
     my @test_sectors = $dir->sectors();
     cmp_deeply(\@test_sectors, \@expected_sectors, 'replace disk directory layout object with item data and check sector data');
+}
+########################################
+{
+    my $dir = $class->new();
+    my @sectors = $dir->sectors();
+    my $expected_data = join '', map { chr } (0x00, 0xff, map { 0x00 } (0x03 .. $D64::Disk::Layout::Sector::SECTOR_DATA_SIZE));
+    is($sectors[0]->data(), $expected_data, 'retrieve first directory sector data');
+    is($sectors[1]->data(), $expected_data, 'retrieve second directory sector data');
 }
 ########################################

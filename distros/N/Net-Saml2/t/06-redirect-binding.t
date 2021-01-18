@@ -14,13 +14,6 @@ my $idp = Net::SAML2::IdP->new_from_xml(
 
 isa_ok($idp, "Net::SAML2::IdP");
 
-my $override = override_verify_x509_verify(1);
-$override->override(
-    'Net::SAML2::Util::generate_id' => sub {
-        return 'myid';
-    }
-);
-
 my $sso_url = $idp->sso_url($idp->binding('redirect'));
 is(
     $sso_url,

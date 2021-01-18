@@ -46,6 +46,58 @@ framework.
 
 =cut
 
+=type Changes
+
+  Changes
+
+=type-library Changes
+
+Nano::Types
+
+=type-composite Changes
+
+  InstanceOf["Nano::Changes"]
+
+=type-parent Changes
+
+  Object
+
+=type-example-1 Changes
+
+  # given: synopsis
+
+  use Nano::Changes;
+
+  my $changes = Nano::Changes->new;
+
+=cut
+
+=type Domain
+
+  Domain
+
+=type-library Domain
+
+Nano::Types
+
+=type-composite Domain
+
+  InstanceOf["Zing::Domain"]
+
+=type-parent Domain
+
+  Object
+
+=type-example-1 Domain
+
+  # given: synopsis
+
+  use Zing::Domain;
+
+  my $domain = Zing::Domain->new(name => 'changelog');
+
+=cut
+
 =type Env
 
   Env
@@ -260,6 +312,40 @@ Nano::Types
   use Zing::Table;
 
   my $lookup = Zing::Table->new(name => 'users');
+
+=cut
+
+=type Track
+
+  Track
+
+=type-library Track
+
+Nano::Types
+
+=type-composite Track
+
+  ConsumerOf["Nano::Track"]
+
+=type-parent Track
+
+  Object
+
+=type-example-1 Track
+
+  # given: synopsis
+
+  package Example::Track;
+
+  use Moo;
+
+  extends 'Nano::Node';
+
+  with 'Nano::Track';
+
+  package main;
+
+  my $track = Example::Track->new;
 
 =cut
 

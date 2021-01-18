@@ -1,5 +1,11 @@
 Revision history for Perl module Chemistry::Elements
 
+1.074 2021-01-15T08:26:43Z
+	* freshen distro, remove Travis CI, add Github Actions
+
+1.073 2018-05-22T13:57:23Z
+	* Change to Artistic License 2.0.
+
 1.072 2017-08-06T06:08:52Z
 	* Update the new heavy element symbols.
 

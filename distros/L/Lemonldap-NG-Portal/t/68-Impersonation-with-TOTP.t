@@ -23,12 +23,13 @@ SKIP: {
                 requireToken        => 0,
                 checkUser           => 1,
                 impersonationRule   => 1,
-                checkUserDisplayPersistentInfo => 0,
-                checkUserDisplayEmptyValues    => 0,
-                impersonationMergeSSOgroups    => 1,
-                totp2fSelfRegistration         => 1,
-                totp2fActivation               => 1,
-                totp2fAuthnLevel               => 8
+                checkUserDisplayPersistentInfo  => 0,
+                checkUserDisplayEmptyValues     => 0,
+                checkUserDisplayComputedSession => 1,
+                impersonationMergeSSOgroups     => 1,
+                totp2fSelfRegistration          => 1,
+                totp2fActivation                => 1,
+                totp2fAuthnLevel                => 8
             }
         }
     );
@@ -264,9 +265,9 @@ m%<div class="alert alert-success"><div class="text-center"><b><span trspan="all
 
     ( $host, $url, $query ) =
       expectForm( $res, undef, '/checkuser', 'user', 'url' );
-    ok( $res->[2]->[0] =~ m%<span trspan="checkUserComputeSession">%,
-        'Found trspan="checkUserComputeSession"' )
-      or explain( $res->[2]->[0], 'trspan="checkUserComputeSession"' );
+    ok( $res->[2]->[0] =~ m%<span trspan="checkUserComputedSession">%,
+        'Found trspan="checkUserComputedSession"' )
+      or explain( $res->[2]->[0], 'trspan="checkUserComputedSession"' );
     ok( $res->[2]->[0] =~ m%<td scope="row">authMode</td>%,
         'Found macro authMode' )
       or explain( $res->[2]->[0], 'Macro Key authMode' );

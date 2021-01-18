@@ -13,106 +13,64 @@ use Pod::Usage qw/pod2usage/;
 use DateTime;
 use Term::ANSIColor;
 
-use Readonly;
-
 use Astro::Montenbruck::MathUtils qw/frac hms/;
 use Astro::Montenbruck::Ephemeris::Planet qw/@PLANETS/;
 use Astro::Montenbruck::Time qw/jd2unix cal2jd/;
-use Astro::Montenbruck::RiseSet::Constants qw/:events :twilight/;
-use Astro::Montenbruck::RiseSet qw/:all/;
-use Astro::Montenbruck::Utils::Helpers qw/parse_datetime parse_geocoords format_geo hms_str local_now current_timezone @DEFAULT_PLACE/;
-use Astro::Montenbruck::Utils::Display qw/%LIGHT_THEME %DARK_THEME print_data/;
+use Astro::Montenbruck::RiseSet::Constants
+  qw/:altitudes :twilight :events :states/;
+use Astro::Montenbruck::RiseSet qw/rst twilight/;
+use Astro::Montenbruck::Utils::Helpers
+  qw/parse_datetime parse_geocoords format_geo hms_str local_now current_timezone @DEFAULT_PLACE/;
+use Astro::Montenbruck::Utils::Theme;
 
-binmode(STDOUT, ":encoding(UTF-8)");
+binmode( STDOUT, ":encoding(UTF-8)" );
 
-Readonly::Hash our %TWILIGHT_TITLE => (
-    $EVT_RISE => 'Dawn',
-    $EVT_SET  => 'Dusk',
-);
+sub print_rst_row {
+    my ( $obj, $res, $tzone, $theme ) = @_;
+    my $sch = $theme->scheme;
+    print $theme->decorate( sprintf( '%-8s', $obj ), $sch->{table_row_title} );
 
-sub process_planet {
-    my ($id, $func, $scheme, $tzone) = @_;
-
-    print colored( sprintf('%-8s', $id), $scheme->{table_row_title} );
-
-    for my $evt (@RS_EVENTS) {
-        $func->(
-            $evt,
-            on_event   => sub {
-                my $jd = shift; # Standard Julian date
-                my $dt = DateTime->from_epoch(epoch => jd2unix($jd))
-                                 ->set_time_zone($tzone);
-                print colored(
-                    $dt->strftime('%T'),
-                    $scheme->{table_row_data}
-                );
-                print "   ";
-            },
-            on_noevent => sub {
-                print colored(
-                    sprintf('%-8s', ' — '),
-                    $scheme->{table_row_error}
-                );
-                print " ";
-            }
-        );
-    }
-    print "\n"
-}
-
-# date   => [ $utc->year, $utc->month, $utc->day ],
-# phi    => $lat,
-# lambda => $lon,
-# type   => $twilight,
-# scheme => $scheme,
-# timezone => $local->time_zone
-sub process_twilight {
-    my %arg = @_;
-    my $date = $arg{date};
-
-    my %res;
-    twilight(
-        %arg,
-        on_event => sub {
-            my ( $evt, $ut ) = @_;
-            my $jd = cal2jd($date->[0], $date->[1], int($date->[2]) + $ut / 24);
-            my $dt = DateTime->from_epoch(epoch => jd2unix($jd))
-                             ->set_time_zone($arg{timezone});
-            $res{$evt} = $dt;
-        },
-        on_noevent => sub{}
-    );
-
-    for my $evt ($EVT_RISE, $EVT_SET) {
-        if (exists $res{$evt}) {
-            print_data(
-                $TWILIGHT_TITLE{$evt},
-                $res{$evt}->strftime('%T'),
-                scheme      => $arg{scheme},
-                title_width => 7
-            );
+    for my $key (@RS_EVENTS) {
+        my $evt = $res->{$key};
+        if ( $evt->{ok} ) {
+            my $dt = DateTime->from_epoch( epoch => jd2unix( $evt->{jd} ) )
+              ->set_time_zone($tzone);
+            print $theme->decorate( $dt->strftime('%T'),
+                $sch->{table_row_data} );
         }
         else {
-            print_data(
-                $TWILIGHT_TITLE{$evt},
-                ' — ',
-                scheme      => $arg{scheme},
-                title_width => 7
-            );
+            print $theme->decorate( sprintf( '%-8s', ' — ' ),
+                $sch->{table_row_error} );
         }
+        print "   ";
+    }
+    print("\n");
+}
+
+sub print_twilight_row {
+    my ( $evt, $res, $tzone, $theme ) = @_;
+    my $sch = $theme->scheme;
+
+    if ( exists $res->{$evt} ) {
+        my $dt = DateTime->from_epoch( epoch => jd2unix( $res->{$evt} ) )
+          ->set_time_zone($tzone);
+        $theme->print_data( $TWILIGHT_TITLE{$evt}, $dt->strftime('%T'),
+            title_width => 7 );
+    }
+    else {
+        $theme->print_data->(' — ');
     }
 }
 
 my $now = local_now();
 
-my $man     = 0;
-my $help    = 0;
-my $date    = $now->strftime('%F');
-my $tzone   = current_timezone();
+my $man   = 0;
+my $help  = 0;
+my $date  = $now->strftime('%F');
+my $tzone = current_timezone();
 my @place;
-my $theme    = 'dark';
 my $twilight = $TWILIGHT_NAUTICAL;
-
+my $theme;
 
 # Parse options and print usage if there is a syntax error,
 # or if usage was explicitly requested.
@@ -122,76 +80,67 @@ GetOptions(
     'date:s'     => \$date,
     'timezone:s' => \$tzone,
     'place:s{2}' => \@place,
-    'theme:s'    => \$theme,
+    'theme:s'    =>
+      sub { $theme //= Astro::Montenbruck::Utils::Theme->create( $_[1] ) },
+    'no-colors'  => 
+      sub { $theme = Astro::Montenbruck::Utils::Theme->create('colorless') },
     'twilight:s' => \$twilight
 ) or pod2usage(2);
 
-pod2usage(1) if $help;
-pod2usage(-verbose => 2) if $man;
+pod2usage(1)               if $help;
+pod2usage( -verbose => 2 ) if $man;
+
+# Initialize default options
+$theme //= Astro::Montenbruck::Utils::Theme->create('dark');
+my $scheme = $theme->scheme;
 
 @place = @DEFAULT_PLACE unless @place;
 
-my $scheme = do {
-    given (lc $theme) {
-        \%DARK_THEME  when 'dark';
-        \%LIGHT_THEME when 'light';
-        default { warn "Unknown theme: $theme. Using default (dark)"; \%DARK_THEME }
-    }
-};
-
 my $local = parse_datetime($date);
 $local->set_time_zone($tzone) if defined($tzone);
-print_data(
-    'Date',
-    $local->strftime('%F %Z'),
-    scheme      => $scheme,
-    title_width => 7
-);
-my $utc = $local->time_zone ne 'UTC' ? $local->clone->set_time_zone('UTC')
-                                     : $local;
+$theme->print_data( 'Date', $local->strftime('%F %Z'), title_width => 10 );
+my $utc =
+    $local->time_zone ne 'UTC'
+  ? $local->clone->set_time_zone('UTC')
+  : $local;
 
-my ($lat, $lon);
+my ( $lat, $lon );
 
 # first, check if geo-coordinates are given in decimal format
-if  (grep(/^[\+\-]?(\d+(\.?\d+)?|(\.\d+))$/, @place) == 2) {
-    ($lat, $lon) = @place;
-} else {
-    ($lat, $lon) = parse_geocoords(@place);
+if ( grep( /^[\+\-]?(\d+(\.?\d+)?|(\.\d+))$/, @place ) == 2 ) {
+    ( $lat, $lon ) = @place;
+}
+else {
+    ( $lat, $lon ) = parse_geocoords(@place);
 }
 
-print_data(
-    'Place',
-    format_geo($lat, $lon),
-    scheme      => $scheme,
-    title_width => 7
-);
+$theme->print_data( 'Place',     format_geo( $lat, $lon ), title_width => 10 );
+$theme->print_data( 'Time Zone', $tzone,                   title_width => 10 );
+
 print "\n";
-print colored(
-    "        rise       transit    set     \n",
-    $scheme->{table_row_title}
-);
-for (@PLANETS) {
-    my $func = rst_event(
-        planet => $_,
-        date   => [ $utc->year, $utc->month, $utc->day ],
-        phi    => $lat,
-        lambda => $lon
-    );
-    process_planet($_, $func, $scheme, $local->time_zone)
-}
+say $theme->decorate( "        rise       transit    set     ",
+    $scheme->{table_row_title} );
 
-say colored("\nTwilight ($twilight)\n", $scheme->{data_row_title});
-process_twilight(
+# build top-level function for any event and any celestial object
+# for given time and place
+my $rst_func = rst(
+    date   => [ $utc->year, $utc->month, $utc->day ],
+    phi    => $lat,
+    lambda => $lon
+);
+
+print_rst_row( $_, { $rst_func->($_) }, $tzone, $theme ) for (@PLANETS);
+
+say $theme->decorate( "\nTwilight ($twilight)\n", $scheme->{data_row_title} );
+my %twl = twilight(
     date   => [ $utc->year, $utc->month, $utc->day ],
     phi    => $lat,
     lambda => $lon,
     type   => $twilight,
-    scheme => $scheme,
-    timezone => $local->time_zone
 );
+print_twilight_row( $_, \%twl, $tzone, $theme ) for ( $EVT_RISE, $EVT_SET );
 
 print "\n";
-
 
 __END__
 
@@ -230,20 +179,20 @@ Current date in default local time zone If omitted.
 
 =item B<--timezone>
 
-Time zone short name, e.g.: C<EST>, C<UTC> etc. or I<offset from Greenwich>
-in format B<+HHMM> / B<-HHMM>, like C<+0300>.
+Time zone name, e.g.: C<EST>, C<UTC>, C<Europe/Berlin> etc. 
+or I<offset from Greenwich> in format B<+HHMM> / B<-HHMM>, like C<+0300>.
 
     --timezone=CET # Central European Time
     --timezone=EST # Eastern Standard Time
     --timezone=UTC # Universal Coordinated Time
     --timezone=GMT # Greenwich Mean Time, same as the UTC
     --timezone=+0300 # UTC + 3h (eastward from Greenwich)
+    --timezone="Europe/Moscow"
 
-By default, local timezone by default, UTC under Windows.
+By default, local timezone by default.
 
-Please, note: Windows platform does not recognize some time zone names, 
-C<MSK> for instance. In such cases, use 
-I<offset from Greenwich> format, as described above.
+Please, note: Windows platform does not recognize some time zone names, C<MSK> for instance.
+In such cases use I<offset from Greenwich> format, as described above.
 
 
 =item B<--place>
@@ -252,9 +201,13 @@ The observer's location. Contains 2 elements, space separated.
 
 =over
 
-=item * latitude in C<DD(N|S)MM> format, B<N> for North, B<S> for South.
+=item * 
 
-=item * longitude in C<DDD(W|E)MM> format, B<W> for West, B<E> for East.
+latitude in C<DD(N|S)MM> format, B<N> for North, B<S> for South.
+
+=item *
+
+longitude in C<DDD(W|E)MM> format, B<W> for West, B<E> for East.
 
 =back
 
@@ -264,9 +217,13 @@ B<Decimal numbers> are also supported. In that case
 
 =over
 
-=item * The latitude always goes first
+=item * 
 
-=item * Negative numbers represent I<South> latitude and I<East> longitudes. 
+The latitude always goes first
+
+=item * 
+
+Negative numbers represent I<South> latitude and I<East> longitudes. 
 
 =back
 
@@ -274,31 +231,46 @@ C<--place=55.75 -37.58> for I<Moscow, Russian Federation>.
 C<--place=40.73 73.935> for I<New-York, NY, USA>.
 
 
-=item B<--twilight> type of twilight:
+=item B<--twilight>: type of twilight:
 
 =over
 
-=item * B<civil>
+=item * 
 
-=item * B<nautical> (default)
+B<civil>
 
-=item * B<astronomical>
+=item * 
+
+B<nautical> (default)
+
+=item * 
+
+B<astronomical>
 
 =back
 
 
-=item B<--theme> color scheme:
+=item B<--theme>: color theme:
 
 =over
 
-=item * B<dark>, default: color scheme for dark consoles
+=item * 
 
-=item * B<light> color scheme for light consoles
+B<dark> (default): for dark consoles
+
+=item * 
+
+B<light>: for light consoles
+
+=item * 
+
+B<colorless>: without colors, for terminals that do not support ANSI color codes
 
 =back
 
-=back
+=item B<--no-colors>: do not use colors, same as C<--theme=colorless>
 
+=back
 
 =head1 DESCRIPTION
 

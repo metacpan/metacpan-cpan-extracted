@@ -3,16 +3,18 @@ package Lemonldap::NG::Portal::Register::LDAP;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_LDAPCONNECTFAILED
-  PE_LDAPERROR
   PE_OK
+  PE_LDAPERROR
   PE_MALFORMEDUSER
+  PE_LDAPCONNECTFAILED
 );
 
-extends 'Lemonldap::NG::Portal::Lib::LDAP',
-  'Lemonldap::NG::Portal::Register::Base';
+extends qw(
+  Lemonldap::NG::Portal::Lib::LDAP
+  Lemonldap::NG::Portal::Register::Base
+);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.10';
 
 # RUNNING METHODS
 
@@ -24,10 +26,7 @@ sub computeLogin {
 
     # Get first letter of firstname and lastname
     my $login = $self->applyLoginRule($req);
-
-    unless ($login) {
-        return PE_MALFORMEDUSER;
-    }
+    return PE_MALFORMEDUSER unless $login;
 
     my $finalLogin = $login;
 

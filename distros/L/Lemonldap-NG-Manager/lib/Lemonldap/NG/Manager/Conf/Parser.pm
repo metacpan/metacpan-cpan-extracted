@@ -407,6 +407,37 @@ sub _scanNodes {
                     hdebug("  $target");
                     $self->set( $target, $key, $leaf->{data} );
                 }
+                elsif ( $target =~ /^oidcRPMetaDataExportedVars$/ ) {
+                    hdebug("  $target");
+                    if ( $leaf->{cnodes} ) {
+                        hdebug('    unopened');
+                        $self->newConf->{$target}->{$key} =
+                          $self->refConf->{$target}->{$oldName} // {};
+                    }
+                    elsif ($h) {
+                        hdebug('    opened');
+                        $self->confChanged(1);
+                        my $tmp = $leaf->{data};
+                        if ( ref( $leaf->{data} ) eq 'ARRAY' ) {
+
+                            # Forward compatibility. If Type and Array have
+                            # default values, store in old format
+                            if (    $leaf->{data}->[1] eq "string"
+                                and $leaf->{data}->[2] eq "auto" )
+                            {
+                                $tmp = $leaf->{data}->[0];
+                            }
+                            else {
+                                $tmp = join ';', @{ $leaf->{data} };
+                            }
+                        }
+                        $self->set( $target, $key, $leaf->{title}, $tmp );
+                    }
+                    else {
+                        hdebug("  $target: looking for subnodes");
+                        $self->_scanNodes($subNodes);
+                    }
+                }
                 elsif (
                     $target =~ /^oidc(?:O|R)PMetaData(?:ExportedVars|Macros)$/ )
                 {

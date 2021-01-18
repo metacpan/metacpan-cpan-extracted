@@ -243,7 +243,7 @@ groundwork for this module!
     # fetch lyrics for a song from our local directory:
     # (The local file must be:  "/tmp/lyrics/Pink Floyd/Echos.lrc")
     print $finder->fetch('Pink Floyd','Echoes');
-      
+
     # To fetch the source (site) name and base url:
     # (Here, this will return "cache" and "/tmp/lyrics")!
     print "(Lyrics courtesy: ".$finder->source().")\n";

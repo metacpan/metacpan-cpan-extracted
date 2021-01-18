@@ -4,7 +4,7 @@ use strict;
 use Lemonldap::NG::Common::UserAgent;
 use JSON qw(from_json);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.10';
 
 our $_ua;
 
@@ -15,9 +15,9 @@ sub ua {
     return $_ua = Lemonldap::NG::Common::UserAgent->new( $_[0]->localConfig );
 }
 
-sub grant {
-    my ( $class, $req, $session, $uri, $cond, $vhost ) = @_;
-    $vhost ||= $class->resolveAlias($req);
+sub checkMaintenanceMode {
+    my ( $class, $req ) = @_;
+    my $vhost = $class->resolveAlias($req);
     $class->tsv->{lastVhostUpdate} //= {};
     unless (
         $class->tsv->{defaultCondition}->{$vhost}
@@ -28,8 +28,7 @@ sub grant {
     {
         $class->loadVhostConfig( $req, $vhost );
     }
-    return $class->Lemonldap::NG::Handler::Main::grant( $req, $session, $uri,
-        $cond, $vhost );
+    return $class->Lemonldap::NG::Handler::Main::checkMaintenanceMode($req);
 }
 
 sub loadVhostConfig {
@@ -37,7 +36,8 @@ sub loadVhostConfig {
     my $json;
     if ( $class->tsv->{useSafeJail} ) {
         my $rUrl = $req->{env}->{RULES_URL}
-          || ( (
+          || (
+            (
                 $class->localConfig->{loopBackUrl}
                 || "http://127.0.0.1:" . $req->{env}->{SERVER_PORT}
             )
@@ -66,7 +66,7 @@ q"I refuse to compile rules.json when useSafeJail isn't activated! Yes I know, I
     $json->{rules} ||= { default => 1 };
     $json->{headers} //= { 'Auth-User' => '$uid' };
     $class->locationRulesInit( undef, { $vhost => $json->{rules} } );
-    $class->headersInit( undef, { $vhost => $json->{headers} } );
+    $class->headersInit( undef,       { $vhost => $json->{headers} } );
     $class->tsv->{lastVhostUpdate}->{$vhost} = time;
     return;
 }

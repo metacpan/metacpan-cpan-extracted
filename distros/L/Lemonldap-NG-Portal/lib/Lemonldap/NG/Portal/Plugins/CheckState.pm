@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::Plugins::CheckState;
 use strict;
 use Mouse;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -21,8 +21,9 @@ sub init {
             'checkStateSecret is required for "check state" plugin');
         return 0;
     }
-    $self->addUnauthRoute( checkstate => 'check', ['GET'] );
-    $self->addAuthRoute( checkstate => 'check', ['GET'] );
+    $self->addUnauthRoute( checkstate => 'check', ['GET'] )
+      ->addAuthRoute( checkstate => 'check', ['GET'] );
+
     return 1;
 }
 
@@ -34,7 +35,7 @@ sub check {
         and $req->param('secret') eq $self->conf->{checkStateSecret} );
     $req->steps( [ 'controlUrl', @{ $self->p->beforeAuth } ] );
     my $res = $self->p->process($req);
-    if ( $res > 0 ) {
+    if ( $res && $res > 0 ) {
         push @rep, "Bad result before auth: $res";
     }
 
@@ -48,7 +49,7 @@ sub check {
         #  - "buildCookie" useless here
         $req->steps( [
                 'getUser',                         'authenticate',
-                @{ $self->p->betweenAuthAndData }, $self->sessionData,
+                @{ $self->p->betweenAuthAndData }, $self->p->sessionData,
                 @{ $self->p->afterData },          'storeHistory',
                 @{ $self->p->endAuth }
             ]

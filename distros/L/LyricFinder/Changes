@@ -3,3 +3,9 @@ Revision history for LyricFinder
 1.00    2020/12/15
         First version, released on an unsuspecting world.
         (Converted from David Precious's Lyric::Fetcher and friends)
+1.01    2021/01/15
+        - LyricFinder::Musixmatch - Handle non/high/wide/utf8 ascii characters 
+        in artist and title fields, ie. accented characters - Musixmatch.com 
+        allows these in searches and encodes them in the page URL.
+        - Add URI::Escape to prerequesites.
+        - Small Pod/doc. tweaks.

@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Ubuntu::Releases",
   "PREREQ_PM" => {
     "Exporter" => "5.57",
-    "Perinci::Sub::Gen::AccessTable" => "0.582",
+    "Perinci::Sub::Gen::AccessTable" => "0.586",
     "Perinci::Sub::Property::result::table" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "20200221.0",
+  "VERSION" => "20210115.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Perinci::Sub::Gen::AccessTable" => "0.582",
+  "Perinci::Sub::Gen::AccessTable" => "0.586",
   "Perinci::Sub::Property::result::table" => 0,
   "Test::More" => 0,
   "strict" => 0,

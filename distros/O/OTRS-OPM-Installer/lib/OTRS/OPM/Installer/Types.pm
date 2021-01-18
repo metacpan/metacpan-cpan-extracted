@@ -1,5 +1,5 @@
 package OTRS::OPM::Installer::Types;
-$OTRS::OPM::Installer::Types::VERSION = '0.04';
+$OTRS::OPM::Installer::Types::VERSION = '0.05';
 # ABSTRACT: Moo-Types for OTRS::OPM::Installer
 
 use strict;
@@ -19,7 +19,7 @@ OTRS::OPM::Installer::Types - Moo-Types for OTRS::OPM::Installer
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

@@ -384,6 +384,7 @@ t/Catmandu-IterableOnce.t
 t/Catmandu-Iterator.t
 t/Catmandu-MultiIterator.t
 t/Catmandu-Paged.t
+t/Catmandu-Path-simple.t
 t/Catmandu-Pluggable.t
 t/Catmandu-Plugin-Datestamps.t
 t/Catmandu-Plugin-Readonly.t

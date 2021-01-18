@@ -40,10 +40,8 @@ WriteMakefile(
             MailingList => 'mailto:lemonldap-ng-dev@ow2.org',
             license     => 'http://opensource.org/licenses/GPL-2.0',
             homepage    => 'http://lemonldap-ng.org/',
-            bugtracker  => {
-                web =>
-                  'https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues',
-            },
+            bugtracker =>
+              'https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues',
             x_twitter => 'https://twitter.com/lemonldapng',
         },
     },
@@ -63,7 +61,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Clone'                  => 0,
-        'Lemonldap::NG::Handler' => '2.0.9',
+        'Lemonldap::NG::Handler' => '2.0.10',
         'Regexp::Assemble'       => 0,
     },
     (

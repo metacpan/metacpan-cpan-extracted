@@ -4,18 +4,19 @@
       "Dominique Dumont (ddumont at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "lgpl_2_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Config-Model-CursesUI",
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Config::Model::Tester" : "3.006",
             "Log::Log4perl" : "0"
          }
       },
@@ -34,7 +35,7 @@
    "provides" : {
       "Config::Model::CursesUI" : {
          "file" : "lib/Config/Model/CursesUI.pm",
-         "version" : "1.106"
+         "version" : "1.107"
       },
       "Config::Model::CursesUI::AbortWizard" : {
          "file" : "lib/Config/Model/CursesUI.pm"
@@ -46,6 +47,6 @@
          "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
       ]
    },
-   "version" : "1.106",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.107",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

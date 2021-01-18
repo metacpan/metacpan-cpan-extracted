@@ -1,0 +1,13 @@
+#: lib/RT/Extension/HistoryFilter.pm:22
+msgid "Transaction types that will be shown on the ticket display page"
+msgstr ""
+
+#. (join ', ', map loc(ref($ValuesLabel{$_}) ? @{ $ValuesLabel{$_ }} : $ValuesLabel{$_} || $_), grep defined,            @DefaultValue)
+#: html/Widgets/Form/Select:125
+msgid "Use system default (%1)"
+msgstr ""
+
+#: html/Widgets/Form/Select:79
+msgid "other..."
+msgstr ""
+

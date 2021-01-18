@@ -1,10 +1,11 @@
 package Lemonldap::NG::Common::PSGI::Router;
 
+use strict;
 use Mouse;
 use Lemonldap::NG::Common::PSGI;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Common::PSGI';
 

@@ -28,7 +28,7 @@ name: Perlanet
 provides:
   Perlanet:
     file: lib/Perlanet.pm
-    version: v2.0.4
+    version: v2.0.5
   Perlanet::Entry:
     file: lib/Perlanet/Entry.pm
   Perlanet::Feed:
@@ -59,11 +59,13 @@ recommends:
 requires:
   DateTime: '0'
   DateTime::Duration: '0'
+  DateTime::Format::Strptime: '0'
   Encode: '0'
   HTML::Scrubber: '0'
   HTML::Tidy: '0'
   List::Util: '0'
   Moose: '0'
+  MooseX::ConfigFromFile: '0'
   MooseX::Traits: '0'
   Template: '0'
   Try::Tiny: '0'
@@ -73,8 +75,9 @@ requires:
   namespace::autoclean: '0'
   perl: v5.6.0
 resources:
+  bugtracker: https://github.com/davorg/perlanet/issues
   homepage: http://perlanet.mag-sol.com/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/davorg/perlanet.git
-version: v2.0.4
+version: v2.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -12,6 +12,9 @@
 <http://purl.org/NET/cpan-uri/dist/App-GhaProve/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:configure-requirement [
+		doap-deps:on "ExtUtils::MakeMaker 6.64"^^doap-deps:CpanId;
+	];
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ], [ doap-deps:on "Test::Harness 2.40"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
@@ -24,7 +27,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "App-GhaProve";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-001>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-002>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-003>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-004>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-005>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-006>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-007>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-001>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-002>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-003>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-004>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-005>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-006>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-007>, <http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-008>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-app-ghaprove>;
@@ -135,6 +138,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-GhaProve-0.007.tar.gz>;
 	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/App-GhaProve/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "App-GhaProve-0.008"^^xsd:string;
+	dc:issued            "2021-01-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Require ExtUtils::MakeMaker 6.64; not actually needed but we want it installed in GitHub Actions runners for cpanm compatibility.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/App-GhaProve-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

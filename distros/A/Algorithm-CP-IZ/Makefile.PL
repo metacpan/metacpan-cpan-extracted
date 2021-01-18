@@ -33,7 +33,11 @@ sub show_how_to_path_set {
     my $libname = get_izlib_name;
 
     print "iz.h and $libname are needed to build this module.\n";
-    print "Specify -I<dir> and -L<dir> correctly.\n";
+    print "Specify -I<header_dir> and -L<lib_dir> correctly";
+    print " or set environ variables IZ_INC_DIR and IZ_LIB_DIR.\n";
+    print "default:\n";
+    print "  header_dir: $DEFAULT_IZ_INC_DIR\n";
+    print "  lib_dir: $DEFAULT_IZ_LIB_DIR\n";
     exit 2;
 }
 

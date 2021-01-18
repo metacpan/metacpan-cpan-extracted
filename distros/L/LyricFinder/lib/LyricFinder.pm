@@ -34,7 +34,7 @@ use warnings;
 
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 our $AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0";
 our @FETCHERS = ();
 our $DEBUG = 0; # If you want debug messages, set debug to a true value, and
@@ -361,10 +361,16 @@ groundwork for this module!
 LyricFinder accepts an artist name and song title, searches supported 
 lyrics sites for song lyrics, and, if found, returns them as a string.
 
-This module is derived from the (older0 Lyrics::Fetcher collection of modules 
+The supported and currently-installed modules are:  L<ApiLyricsOvh>  
+(for searching api.lyrics.ovh), L<AZLyrics> (www.azlyrics.com), 
+L<Genius> (genius.com), and L<Musixmatch> (www.musixmatch.com).  There is a 
+special module for storing and / or fetching lyrics (.lrc) files already 
+stored locally, called L<Cache>.
+
+This module is derived from the (older) Lyrics::Fetcher collection of modules 
 by (c) 2007-2020 David Precious, but currently (as of December, 2020) supports 
-more lyric sites (4), bundles all the supported site modules together here 
-(simply install this one module), has reworked the "Cache" module to cache 
+more lyric sites (4) and bundles all the supported site modules together here 
+(simply install this one module).  We have reworked the "Cache" module to cache 
 lyrics files by artist and song title on disk in the user's desired location.  
 LyricFinder is also truly object-oriented making interaction with the 
 user-facing methods and data easier and more streamlined.
@@ -462,7 +468,7 @@ NOTE:  This value will be overridden if $founder->agent("agent") is
 called!  NOTE:  See below how to specify a different agent for a specific 
 site module.
 
-=item B<-cache> => I<"directory">, and B<-debug> => I<integer>.
+=item B<-cache> => I<"directory">
 
 Specifies a directory (ie. "/home/user/Music/Lyricsfiles") to be used for 
 disk caching.  If specified, this directory will be searched for a matching 
@@ -592,7 +598,7 @@ If an array reference (a list) of modules are provided, they will be searched
 in the order they appear in the list.
 
 The currently-installed and supported modules are:  ApiLyricsOvh, AZLyrics, 
-Genius, and Musixmatch (NOTE the "x" in the spelling of "Musixmatch"!
+Genius, and Musixmatch (NOTE the "x" in the spelling of "Musixmatch")!
 
 Returns lyrics as a string (includes line-breaks appropriate for the user's 
 operating system), or an empty string, if no lyrics found.

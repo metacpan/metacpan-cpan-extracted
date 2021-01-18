@@ -6,7 +6,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use strict;
-use Test::More tests => 13;
+use Test::More tests => 17;
 require 't/test.pm';
 BEGIN { use_ok('Lemonldap::NG::Handler::Main::Jail') }
 
@@ -59,4 +59,40 @@ ok(
 );
 ok( $res = &$code, "Function works" );
 ok( $res == 1, 'Get good result' );
+
+$sub  = "sub { return(has2f(\$_[0],\$_[1])) }";
+$code = $jail->jail_reval($sub);
+ok(
+    ( defined($code) and ref($code) eq 'CODE' ),
+    'checkDate extended function is defined'
+);
+is(
+    $code->( {
+            _2fDevices =>
+"[{\"name\":\"MyTOTP\",\"_secret\":\"g5fsxwf4d34biemlojsbbvhgtskrssos\",\"epoch\":1602173208,\"type\":\"TOTP\"}]"
+        },
+        "TOTP"
+    ),
+    1,
+    "Function works"
+);
+is(
+    $code->( {
+            _2fDevices =>
+"[{\"name\":\"MyTOTP\",\"_secret\":\"g5fsxwf4d34biemlojsbbvhgtskrssos\",\"epoch\":1602173208,\"type\":\"TOTP\"}]"
+        },
+        "UBK"
+    ),
+    0,
+    "Function works"
+);
+is(
+    $code->( {
+            _2fDevices =>
+"[{\"name\":\"MyTOTP\",\"_secret\":\"g5fsxwf4d34biemlojsbbvhgtskrssos\",\"epoch\":1602173208,\"type\":\"TOTP\"}]"
+        },
+    ),
+    1,
+    "Function works"
+);
 

@@ -1,14 +1,15 @@
 use 5.014;
 use strict;
 use warnings;
-use open IO => ':utf8';
+use open qw(:std :utf8);
 use utf8;
 use vars qw( %roman2perl );
 
 use Test::More 1.0;
 
+diag( "Test::Builder " . Test::Builder->VERSION );
 if( Test::Builder->VERSION < 2 ) {
-	foreach my $method ( qw(output failure_output) ) {
+	foreach my $method ( qw(output failure_output todo_output) ) {
 		binmode Test::More->builder->$method(), ':encoding(UTF-8)';
 		}
 	}
@@ -38,15 +39,16 @@ my %upper2lower = qw(
 	);
 
 SKIP: {
-	my $class = 'Unicode::Casing';
 	my $count = keys %upper2lower;
-	skip "$class not installed!", $count unless eval "require $class";
-
-	$class->import( lc => \&Roman::Unicode::to_roman_lower );
-	foreach my $upper ( sort keys %upper2lower ) {
-		my $lower = $upper2lower{$upper};
-		is( lc $upper, $lower, "$upper turns into $lower"   );
-		}
+	skip "Unicode::Casing not installed!", $count unless eval <<'HERE';
+		use Unicode::Casing lc => \\&Roman::Unicode::to_roman_lower;
+		foreach my $upper ( sort keys %upper2lower ) {
+			my $lower = $upper2lower{$upper};
+			is( Roman::Unicode::to_roman_lower( $upper ), $lower, "$upper turns into $lower (to_roman_lower)"   );
+			is( lc $upper, $lower, "$upper turns into $lower (lc)"   );
+			}
+		};
+HERE
 	}
 
 

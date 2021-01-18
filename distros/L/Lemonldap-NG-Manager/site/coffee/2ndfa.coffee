@@ -108,7 +108,6 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 	
 	# Delete 2FA device
 	$scope.delete2FA = (type, epoch) ->
-		#item = angular.element(".data-#{epoch}")
 		items = document.querySelectorAll(".data-#{epoch}")
 		for e in items
 			e.remove()

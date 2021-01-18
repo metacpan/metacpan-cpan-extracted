@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Calendar-Indonesia-Holiday/issues
   homepage: https://metacpan.org/release/Calendar-Indonesia-Holiday
   repository: git://github.com/perlancar/perl-Calendar-Indonesia-Holiday.git
-version: '0.334'
+version: '0.335'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

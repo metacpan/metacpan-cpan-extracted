@@ -35,7 +35,7 @@ use Image::ExifTool::Sony;
 use Image::ExifTool::Validate;
 use Image::ExifTool::MacOS;
 
-$VERSION = '3.36';
+$VERSION = '3.41';
 @ISA = qw(Exporter);
 
 sub NumbersFirst($$);
@@ -415,7 +415,7 @@ IPTC group only in the standard location.
 },
     QuickTime => q{
 The QuickTime format is used for many different types of audio, video and
-image files (most notably, MOV/MP4 videos and HEIC/CR3 images).  Exiftool
+image files (most notably, MOV/MP4 videos and HEIC/CR3 images).  ExifTool
 extracts standard meta information and a variety of audio, video and image
 parameters, as well as proprietary information written by many camera
 models.  Tags with a question mark after their name are not extracted unless
@@ -456,6 +456,11 @@ this reason, by default ExifTool does not assume a time zone for these
 values.  However, if the L<QuickTimeUTC|../ExifTool.html#QuickTimeUTC> API option is set, then ExifTool will
 assume these values are properly stored as UTC, and will convert them to
 local time when extracting.
+
+When writing string-based date/time tags, the system time zone is added if
+the PrintConv option is enabled and no time zone is specified.  This is
+because Apple software may display a crazy values if the time zone is
+missing for some tags.
 
 See
 L<https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/>
@@ -628,12 +633,14 @@ overlapping EXIF, IPTC and XMP tags to be reconciled when reading, and
 synchronized when writing.  The MWG Composite tags below are designed to aid
 in the implementation of these recommendations.  As well, the MWG defines
 new XMP tags which are listed in the subsequent tables below.  See
-L<http://www.metadataworkinggroup.org/> for the official MWG specification.
+L<https://web.archive.org/web/20181006115950/http://www.metadataworkinggroup.org/specs/>
+for the official MWG specification.
 },
     MacOS => q{
 On MacOS systems, the there are additional MDItem and XAttr Finder tags that
 may be extracted.  These tags are not extracted by default -- they must be
-specifically requested or enabled via an API option.
+specifically requested or enabled via an API option.  (Except when reading
+MacOS "._" files directly, see below.)
 
 The tables below list some of the tags that may be extracted, but ExifTool
 will extract all available information even for tags not listed.
@@ -650,7 +657,7 @@ L<Image::ExifTool::BuildTagLookup|Image::ExifTool::BuildTagLookup>.
 
 ~head1 AUTHOR
 
-Copyright 2003-2020, Phil Harvey (philharvey66 at gmail.com)
+Copyright 2003-2021, Phil Harvey (philharvey66 at gmail.com)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -877,6 +884,11 @@ TagID:  foreach $tagID (@keys) {
                     $case{$lc} = $name;
                 }
                 my $format = $$tagInfo{Format};
+                # check TagID's to make sure they don't start with 'ID-'
+                my @grps = $et->GetGroup($tagInfo);
+                foreach (@grps) {
+                    warn "Group name starts with 'ID-' for $short $name\n" if /^ID-/i;
+                }
                 # validate Name (must not start with a digit or else XML output will not be valid;
                 # must not start with a dash or exiftool command line may get confused)
                 if ($name !~ /^[_A-Za-z][-\w]+$/ and
@@ -1023,9 +1035,14 @@ TagID:  foreach $tagID (@keys) {
                     $note =~ s/(^[ \t]+|[ \t]+$)//mg;
                     push @values, "($note)";
                 }
-                if ($isXMP and lc $tagID ne lc $name) {
-                    # add note about different XMP Tag ID
-                    my $note = $$tagInfo{RootTagInfo} ? $tagID : "called $tagID by the spec";
+                if ($isXMP and (lc $tagID ne lc $name or $$tagInfo{NotFlat})) {
+                    my $note;
+                    if ($$tagInfo{NotFlat}) {
+                        $note = 'NOT a flattened tag!';
+                    } else {
+                        # add note about different XMP Tag ID
+                        $note = $$tagInfo{RootTagInfo} ? $tagID : "called $tagID by the spec";
+                    }
                     if ($$tagInfo{Notes}) {
                         $values[-1] =~ s/^\(/($note; /;
                     } else {
@@ -2715,7 +2732,7 @@ Returned list of writable pseudo tags.
 
 =head1 AUTHOR
 
-Copyright 2003-2020, Phil Harvey (philharvey66 at gmail.com)
+Copyright 2003-2021, Phil Harvey (philharvey66 at gmail.com)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

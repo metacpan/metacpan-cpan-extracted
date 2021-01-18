@@ -2,120 +2,41 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::TCP;
-use Plack::Loader;
 use LWP::UserAgent;
 use HTTP::Request;
-use AnyEvent::WebSocket::Client;
-use AnyEvent;
 
-{
+use lib 't/lib';
+use TwiggyTester;
+use WebSocketTest;
 
-	package WebSocket::Test;
-	use Kelp::Less;
-
-	module "Symbiosis";
-	module "WebSocket::AnyEvent";
-
-	my $closed;
-	my $ws = app->websocket;
-	$ws->add(open => sub { shift->send("opened") });
-	$ws->add(
-		message => sub {
-			my ($conn, $message) = @_;
-			$conn->send("got message: $message");
-		}
-	);
-	$ws->add(
-		close => sub {
-			$closed = 1;
-		}
-	);
-
-	app->symbiosis->mount("/ws", $ws);
-
-	route "/kelp" => sub {
-		"kelp still there";
-	};
-
-	route "/closed" => sub {
-		$closed ? "yes" : "no";
-	};
-
-	sub get_app
-	{
-		return app;
-	}
-
-	1;
-}
-
-my $app = WebSocket::Test::get_app();
-my $condvar = AnyEvent->condvar;
-
-my $server = Test::TCP->new(
-	code => sub {
-		my ($port) = @_;
-
-		my $server = Plack::Loader->load('Twiggy', port => $port, host => "127.0.0.1");
-		$server->run($app->run_all);
-	},
+my $app = WebSocketTest->new(mode => 'no_serializer');
+my @messages = (
+	undef,
+	'test',
+	'websocket operating',
+	'count',
+	'count',
+	'count'
 );
 
-my @expected_messages = (
-	["opened" => undef],
-	["got message: test" => "test"],
-	["got message: websocket operating" => "websocket operating"],
+my @expected_results = (
+	'opened',
+	'got message: "test"',
+	'got message: "websocket operating"',
+	0,
+	1,
+	2
 );
 
-my $client = AnyEvent::WebSocket::Client->new;
-$client->connect("ws://127.0.0.1:" . $server->port . "/ws")->cb(
-	sub {
-		our $connection = eval { shift->recv };
-		if ($@) {
-			fail $@;
-			return;
-		}
-
-		$connection->on(
-			each_message => sub {
-				my ($connection, $message) = @_;
-				if (@expected_messages) {
-					my $t = shift @expected_messages;
-					is $message->{body}, $t->[0], "message matches";
-				}
-				if (!@expected_messages) {
-					$connection->close;
-					note "Closing connection";
-					$condvar->send;
-				}
-			}
-		);
-
-		for my $t (@expected_messages) {
-			$connection->send($t->[1])
-				if defined $t->[1];
-		}
-	}
-);
-
-my $w = AnyEvent->timer(
-	after => 5,
-	cb => sub {
-		fail "event loop was not stopped";
-		$condvar->send;
-	}
-);
-
-$condvar->recv;
-undef $w;
+# will do all the websocket testing
+my $server = twiggy_test($app, \@messages, \@expected_results, 5);
 
 my $agent = LWP::UserAgent->new;
 my $base_addr = "http://127.0.0.1:" . $server->port;
 my @cases = (
 	["$base_addr/kelp", 1, "kelp still there"],
 	[$base_addr, 0],
-	["$base_addr/closed", 1, "yes"],
+	["$base_addr/closed", 1, 5],
 );
 
 for my $case_ref (@cases) {

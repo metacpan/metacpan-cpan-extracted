@@ -15,15 +15,15 @@
 use warnings;
 use strict;
 
+use POE qw(Component::Client::Ping);
+
 BEGIN {
   $| = 1;
-  if ($> and ($^O ne 'VMS')) {
+  unless (POE::Component::Client::Ping->can_open_socket()) {
     print "1..0 # skipped: ICMP ping requires root privilege\n";
     exit 0;
   }
 };
-
-use POE qw(Component::Client::Ping);
 
 use Test::More tests => 6;
 my $retries = 5;

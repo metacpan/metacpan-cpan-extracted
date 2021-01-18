@@ -6,6 +6,13 @@ use File::Copy qw(copy);
 use File::Spec;
 
 use Test::Manifest qw(get_t_files manifest_name);
+use lib './t';
+use Test::Manifest::Tempdir qw(prepare_tmp_dir);
+
+my $tmp_dir = prepare_tmp_dir();
+copy($_, $tmp_dir) or die "Cannot copy $_ to $tmp_dir: $!"
+	for qw( test_manifest test_manifest_levels );
+chdir $tmp_dir or die "Cannot chdir to $tmp_dir: $!";
 
 my $expected = join " ", map { File::Spec->catfile( "t", $_ ) } qw(
 	00load.t 01get_test_files.t 01make_test_manifest.t

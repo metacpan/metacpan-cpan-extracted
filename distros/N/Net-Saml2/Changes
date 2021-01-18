@@ -1,10 +1,47 @@
 Revision history for Perl extension Net::SAML2.
 
+0.32         16-Jan-2022
+
+        Version 0.31-TRIAL with version incremented
+        Significant Changes since 0.29
+
+            1. Replace Crypt::OpenSSL::Verify509
+            2. Merge latest XML::Sig
+
+        TBD     Update Changes and Increment version
+
+0.31-TRIAL   15-Jan-2021
+
+        78fe988 Update Changes and Increment version
+        71d67e5 Merge pull request #11 from timlegge/xml-writer
+        2c6780a Fixes #10: XML::Writer requires newer version
+
+0.30-TRIAL    13-Jan-2021
+
+        Significant Changes
+
+            1. Replace Crypt::OpenSSL::Verify509
+            2. Merge latest XML::Sig
+
+        Warning: This release require the installation of Crypt::OpenSSL::Verify.
+
+        0d07622 Merge pull request #9 from timlegge/crypt-openssl-verify
+        929894c Update Changes and Increment version
+        ccaa892 Remove the installation of Crypt::OpenSSL::VerifyX509 from action
+        36d0a5c Move to Crypt-OpenSSL-Verify as Crypt-OpenSSL-Verify is not supported
+        af050d5 Merge pull request #8 from timlegge/merge-xml-sig
+        91208a2 Update dependencies for Net::SAML2::XML::Sig
+        359a0bd Merge XML::Sig version 0.39
+        200c0ae Update some documentation details
+        ed3c265 Merge XML::Sig version 0.38
+        dfefef6 Remove XML::Lib added XML Declaration from Signed XML
+        a39774f Copy updated XML::Sig and update name and version
+
 0.29    12-Jan-2021
 
         Small release to update issues location to be github
 
-        TBD     Update Changes and Increment version
+        6a03758 Update Changes and Increment version
         08e1a17 Fixes #7 - Move issues to github
 
 0.28    04-Jul-2020

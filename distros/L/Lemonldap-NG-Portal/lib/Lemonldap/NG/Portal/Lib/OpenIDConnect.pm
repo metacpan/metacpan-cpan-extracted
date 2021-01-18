@@ -1349,9 +1349,13 @@ sub buildUserInfoResponse {
         my $list = $self->getAttributesListFromClaim( $rp, $claim );
         next unless $list;
         foreach my $attribute (@$list) {
-            my $session_key =
-              $self->conf->{oidcRPMetaDataExportedVars}->{$rp}->{$attribute};
+            my @attrConf = split /;/,
+              ( $self->conf->{oidcRPMetaDataExportedVars}->{$rp}->{$attribute}
+                  || "" );
+            my $session_key = $attrConf[0];
             if ($session_key) {
+                my $type  = $attrConf[1] || 'string';
+                my $array = $attrConf[2] || 'auto';
 
                 my $session_value;
 
@@ -1366,27 +1370,114 @@ sub buildUserInfoResponse {
                     $session_value = $session->data->{$session_key};
                 }
 
-                # Convert mutli-valued attributes to arrays
-                my $separator = $self->conf->{multiValuesSeparator};
-                if ( $session_value and $session_value =~ /$separator/ ) {
-                    my @session_array =
-                      split( $separator, $session_value );
-                    $session_value = \@session_array;
-                }
+                # Handle empty values, arrays, type, etc.
+                $session_value =
+                  $self->_formatValue( $session_value, $type, $array,
+                    $attribute, $req->user );
 
-                # Address is a JSON object
-                if ( $claim eq "address" ) {
-                    $userinfo_response->{address}->{$attribute} =
-                      $session_value;
-                }
-                else {
-                    $userinfo_response->{$attribute} = $session_value;
+             # From this point on, do NOT touch $session_value or you will break
+             # the variable's type.
+
+                # Only release claim if it has a value
+                if ( defined $session_value ) {
+
+                    # Address is a JSON object
+                    if ( $claim eq "address" ) {
+                        $userinfo_response->{address}->{$attribute} =
+                          $session_value;
+                    }
+                    else {
+                        $userinfo_response->{$attribute} = $session_value;
+                    }
                 }
             }
         }
     }
 
+    my $h = $self->p->processHook( $req, 'oidcGenerateUserInfoResponse',
+        $userinfo_response );
+    return {} if ( $h != PE_OK );
+
     return $userinfo_response;
+}
+
+sub _formatValue {
+    my ( $self, $session_value, $type, $array, $attribute, $user ) = @_;
+
+    # If $session_value is not a scalar, return it as is
+    unless ( ref($session_value) ) {
+        if ( defined $session_value ) {
+
+            # Empty strings or lists are invalid values
+            if ( length($session_value) > 0 ) {
+
+                # Format value for JSON output: multi valuation, JSON type...
+                my $separator = $self->conf->{multiValuesSeparator};
+                return $self->_applyType( $session_value, $separator, $type,
+                    $array, $attribute, $user );
+            }
+            else {
+                return undef;
+            }
+        }
+    }
+    return $session_value;
+}
+
+sub _applyType {
+    my ( $self, $session_value, $separator, $type, $array, $attribute, $user )
+      = @_;
+
+    # Array style handling
+    # In auto array mode, split as array only if there are multiple values
+    if ( $array eq "auto" ) {
+        if ( $session_value and $session_value =~ /$separator/ ) {
+            $session_value = [ map { $self->_forceType( $_, $type ) }
+                  split( $separator, $session_value ) ];
+        }
+        else {
+            $session_value = $self->_forceType( $session_value, $type );
+        }
+
+        # In always array mode, always split (even on empty values)
+    }
+    elsif ( $array eq "always" ) {
+        $session_value = [ map { $self->_forceType( $_, $type ) }
+              split( $separator, $session_value ) ];
+    }
+
+    # In never array mode, return the string as-is
+    else {
+        # No type coaxing is possible on a flattened string
+        if ( $session_value =~ /$separator/ and $type ne "string" ) {
+            $self->logger->warn( "Cannot force type of value $session_value"
+                  . " for attribute $attribute of user "
+                  . $user
+                  . " because it is multi-valued. "
+                  . "Use auto or always as array type for this attribute" );
+        }
+        else {
+            $session_value = $self->_forceType( $session_value, $type );
+        }
+    }
+
+    return $session_value;
+}
+
+sub _forceType {
+    my ( $self, $val, $type ) = @_;
+    if ( $type eq "bool" ) {
+        return ( $val ? JSON::true : JSON::false );
+    }
+
+    if ( $type eq "int" ) {
+
+        # Coax into int
+        return ( $val + 0 );
+    }
+
+    # Coax into string
+    return ( $val . "" );
 }
 
 # Return JWT
@@ -1490,12 +1581,15 @@ sub createJWT {
 # @param rp Internal Relying Party identifier
 # @return String id_token ID Token as JWT
 sub createIDToken {
-    my ( $self, $payload, $rp ) = @_;
+    my ( $self, $req, $payload, $rp ) = @_;
 
     # Get signature algorithm
     my $alg = $self->conf->{oidcRPMetaDataOptions}->{$rp}
       ->{oidcRPMetaDataOptionsIDTokenSignAlg};
     $self->logger->debug("ID Token signature algorithm: $alg");
+
+    my $h = $self->p->processHook( $req, 'oidcGenerateIDToken', $payload, $rp );
+    return undef if ( $h != PE_OK );
 
     return $self->createJWT( $payload, $alg, $rp );
 }

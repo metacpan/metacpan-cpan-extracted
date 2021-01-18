@@ -46,6 +46,8 @@ package Sidef::Sys::Sys {
         (Time::HiRes::ualarm($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *micro_alarm = \&ualarm;
+
     sub sleep {
         my ($self, $sec) = @_;
 
@@ -60,6 +62,8 @@ package Sidef::Sys::Sys {
         (Time::HiRes::nanosleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *nano_sleep = \&nanosleep;
+
     sub usleep {
         my ($self, $sec) = @_;
 
@@ -67,10 +71,14 @@ package Sidef::Sys::Sys {
         (Time::HiRes::usleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *micro_sleep = \&usleep;
+
     sub osname {
         my ($self) = @_;
         Sidef::Types::String::String->new($^O);
     }
+
+    *os = \&osname;
 
     sub user {
         my ($self) = @_;
@@ -155,8 +163,7 @@ package Sidef::Sys::Sys {
 
     sub scanln {
         my ($self, $text) = @_;
-        CORE::print $text;
-        Sidef::Types::String::String->new(scalar unpack("A*", scalar(<STDIN>) // return undef));
+        $self->read($text, 'Sidef::Types::String::String');
     }
 
     *readln = \&scanln;
@@ -164,18 +171,23 @@ package Sidef::Sys::Sys {
     sub read {
         my ($self, $type, $opt_arg) = @_;
 
-        if (defined $opt_arg) {
-            print $type;
-            $type = $opt_arg;
+        my $message = '';
+
+        if (defined($opt_arg)) {
+            $message = "$type";
+            $type    = $opt_arg;
         }
 
-        if (defined $type) {
-            chomp(my $input = <STDIN> // return undef);
-            return $type->new($input);
-        }
+        state $term = do {
+            require Term::ReadLine;
+            Term::ReadLine->new("$0");
+        };
 
-        chomp(my $input = <STDIN> // return undef);
-        Sidef::Types::String::String->new($input);
+        my $input = $term->readline($message) // return undef;
+
+        defined($type)
+          ? $type->new($input)
+          : Sidef::Types::String::String->new($input);
     }
 
     sub open {

@@ -3,12 +3,14 @@ package Lemonldap::NG::Portal::Lib::LDAP;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Lib::Net::LDAP;
-use Lemonldap::NG::Portal::Main::Constants
-  qw(PE_OK PE_LDAPCONNECTFAILED PE_LDAPERROR PE_BADCREDENTIALS);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK PE_LDAPCONNECTFAILED
+  PE_LDAPERROR PE_BADCREDENTIALS
+);
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 # PROPERTIES
 
@@ -115,10 +117,7 @@ sub getUser {
     my ( $self, $req, %args ) = @_;
 
     $self->validateLdap;
-
-    unless ( $self->ldap ) {
-        return PE_LDAPCONNECTFAILED;
-    }
+    return PE_LDAPCONNECTFAILED unless $self->ldap;
 
     $self->bind();
 
@@ -130,7 +129,7 @@ sub getUser {
             ? $self->mailFilter->($req)
             : $self->filter->($req)
         ),
-        defer => $self->conf->{ldapSearchDeref} || 'find',
+        deref => $self->conf->{ldapSearchDeref} || 'find',
         attrs => $self->attrs,
     );
     if ( $mesg->code() != 0 ) {
@@ -144,12 +143,16 @@ sub getUser {
         return PE_BADCREDENTIALS;
     }
     unless ( $req->data->{ldapentry} = $mesg->entry(0) ) {
-        $self->userLogger->warn("$req->{user} was not found in LDAP directory (".$req->address.")");
+        $self->userLogger->warn(
+                "$req->{user} was not found in LDAP directory ("
+              . $req->address
+              . ")" );
         eval { $self->p->_authentication->setSecurity($req) };
         return PE_BADCREDENTIALS;
     }
     $req->data->{dn} = $req->data->{ldapentry}->dn();
-    PE_OK;
+
+    return PE_OK;
 }
 
 # Validate LDAP connection before use
@@ -168,13 +171,14 @@ sub bind {
     my $self = shift;
 
     $self->validateLdap;
+    return undef unless $self->ldap;
 
-    return undef unless ( $self->ldap );
     my $msg = $self->ldap->bind(@_);
     if ( $msg->code ) {
         $self->logger->error( $msg->error );
         return undef;
     }
+    
     return 1;
 }
 

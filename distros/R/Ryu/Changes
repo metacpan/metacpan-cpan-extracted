@@ -1,5 +1,31 @@
 Revision history for Ryu
 
+2.006     2021-01-17 03:02:18+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - ->ordered_futures (->resolve) now also takes low/high parameters for backpressure
+
+    Bugs fixed:
+
+    - original source failure propagates after any pending Future instances are resolved,
+    thanks to Amin Marashi (Github issue #8)
+
+2.005     2021-01-17 02:16:18+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - ->as_buffer can take low/high parameters similar to ->buffer, providing backpressure
+    for buffer streams.
+
+    Bugs fixed:
+
+    - small amount of extra protection on Ryu::Observable->notify_all, which was
+    previously passing an alias to the internal value (so the notifier callback
+    was able to modify this directly). Now receives a copy.
+
+    Documentation updates:
+
+    - Mojo::Rx no longer exists, replaced with RxPerl references
+
 2.004     2020-12-03 00:38:42+08:00 Asia/Kuala_Lumpur
     No new features.
 

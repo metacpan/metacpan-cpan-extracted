@@ -1,8 +1,7 @@
 package Lemonldap::NG::Manager::2ndFA;
 
-use 5.10.0;
-use utf8;
 use strict;
+use utf8;
 use Mouse;
 
 use Lemonldap::NG::Common::Session;
@@ -10,13 +9,13 @@ use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-use feature 'state';
+extends qw(
+  Lemonldap::NG::Manager::Plugin
+  Lemonldap::NG::Common::Session::REST
+  Lemonldap::NG::Common::Conf::AccessLib
+);
 
-extends 'Lemonldap::NG::Manager::Plugin',
-  'Lemonldap::NG::Common::Conf::AccessLib',
-  'Lemonldap::NG::Common::Session::REST';
-
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -45,6 +44,8 @@ sub init {
     $self->setTypes($conf);
     $self->{multiValuesSeparator} ||= '; ';
     $self->{hiddenAttributes} //= "_password";
+    $self->{hiddenAttributes} .= ' _session_id'
+      unless $conf->{displaySessionId};
     $self->{TOTPCheck} = $self->{U2FCheck} = $self->{UBKCheck} = '1';
     return 1;
 }

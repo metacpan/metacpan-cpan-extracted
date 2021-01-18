@@ -4,13 +4,13 @@ use strict;
 use warnings;
 
 our @ISA = qw/Exporter/;
-our $VERSION   = 0.01;
+our $VERSION   = 0.02;
 
 use Readonly;
 
 my @events   = qw/$EVT_RISE $EVT_SET $EVT_TRANSIT @RS_EVENTS/;
 my @states   = qw/$STATE_CIRCUMPOLAR $STATE_NEVER_RISES/;
-my @twilight = qw/$TWILIGHT_CIVIL $TWILIGHT_ASTRO $TWILIGHT_NAUTICAL/;
+my @twilight = qw/$TWILIGHT_CIVIL $TWILIGHT_ASTRO $TWILIGHT_NAUTICAL %TWILIGHT_TITLE/;
 my @alts     = qw/$H0_SUN $H0_MOO $H0_PLA %H0_TWL/;
 
 our %EXPORT_TAGS = (
@@ -37,10 +37,16 @@ Readonly our $TWILIGHT_NAUTICAL => 'nautical';
 Readonly our $H0_SUN       => -50 / 60;
 Readonly our $H0_MOO       =>   8 / 60;
 Readonly our $H0_PLA       => -34 / 60;
+
 Readonly::Hash our %H0_TWL => (
     $TWILIGHT_CIVIL    => -6,
     $TWILIGHT_ASTRO    => -18,
     $TWILIGHT_NAUTICAL => -12
+);
+
+Readonly::Hash our %TWILIGHT_TITLE => (
+    $EVT_RISE => 'Dawn',
+    $EVT_SET  => 'Dusk',
 );
 
 1;

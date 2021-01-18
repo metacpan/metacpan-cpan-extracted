@@ -47,7 +47,7 @@ SKIP: {
         'Get Menu'
     );
     ok( $res->[2]->[0] !~ m%<span trspan="sfaManager">sfaManager</span>%,
-        'sfaManager link found' )
+        'sfaManager link not found' )
       or print STDERR Dumper( $res->[2]->[0] );
 
     # TOTP form
@@ -113,7 +113,7 @@ SKIP: {
     eval { $res = JSON::from_json( $res->[2]->[0] ) };
     ok( not($@), 'Content is JSON' )
       or explain( $res->[2]->[0], 'JSON content' );
-    ok( $res->{result} == 1, 'Key is registered' );
+    ok( $res->{result} == 1, 'TOTP is registered' );
 
     # Try to sign-in
     $client->logout($id);

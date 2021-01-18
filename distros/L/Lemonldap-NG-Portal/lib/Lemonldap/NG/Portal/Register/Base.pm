@@ -7,7 +7,7 @@ use Text::Unidecode;
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
 sub _stripaccents {
     my ( $self, $str ) = @_;
@@ -30,7 +30,9 @@ sub applyLoginRule {
       lc $self->_stripaccents( $req->data->{registerInfo}->{lastname} );
 
     # For now, get first letter of firstname and lastname
-    return substr( $firstname, 0, 1 ) . $lastname;
+    my $login = substr( $firstname, 0, 1 ) . $lastname;
+    $login =~ s/\s*//g;
+    return $login;
 }
 
 1;

@@ -2,7 +2,7 @@
 # into "plugins" list in lemonldap-ng.ini, section "portal"
 package Lemonldap::NG::Portal::Main::Plugins;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -19,8 +19,8 @@ our @pList = (
     portalStatus                        => '::Plugins::Status',
     cda                                 => '::Plugins::CDA',
     notification                        => '::Plugins::Notifications',
-    portalCheckLogins                   => '::Plugins::History',
     stayConnected                       => '::Plugins::StayConnected',
+    portalCheckLogins                   => '::Plugins::History',
     bruteForceProtection                => '::Plugins::BruteForceProtection',
     grantSessionRules                   => '::Plugins::GrantSession',
     upgradeSession                      => '::Plugins::Upgrade',
@@ -31,8 +31,10 @@ our @pList = (
     impersonationRule                   => '::Plugins::Impersonation',
     contextSwitchingRule                => '::Plugins::ContextSwitching',
     decryptValueRule                    => '::Plugins::DecryptValue',
-    globalLogoutRule                    => '::Plugins::GlobalLogout',
-    refreshSessions                     => '::Plugins::Refresh',
+    adaptativeAuthenticationLevelRules =>
+      '::Plugins::AdaptativeAuthenticationLevel',
+    globalLogoutRule => '::Plugins::GlobalLogout',
+    refreshSessions  => '::Plugins::Refresh',
 );
 
 ##@method list enabledPlugins

@@ -17,9 +17,9 @@ my $client = LLNG::Manager::Test->new( {
             bruteForceProtection                 => 1,
             bruteForceProtectionIncrementalTempo => 1,
             failedLoginNumber                    => 6,
-            bruteForceProtectionMaxLockTime      => 300,
-            bruteForceProtectionLockTimes        => '5 , 500, bad ,20, 10 ',
-            bruteForceProtectionMaxFailed        => 2,
+            bruteForceProtectionMaxLockTime      => 600,
+            bruteForceProtectionLockTimes => '5 , 500, bad ,20, -10, 700',
+            bruteForceProtectionMaxFailed => 2,
         }
     }
 );
@@ -49,8 +49,7 @@ ok(
     ),
     '1st allowed Bad Auth query'
 );
-ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span>/,
-    'Bad credential' )
+ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span>/, 'Bad credential' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(2);
 
@@ -64,8 +63,7 @@ ok(
     ),
     '2nd allowed Bad Auth query'
 );
-ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span>/,
-    'Bad credential' )
+ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span>/, 'Bad credential' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(2);
 
@@ -82,10 +80,11 @@ ok(
 ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
     'Rejected -> Protection enabled' )
   or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%5 <span trspan="seconds">seconds</span>%,
-    'LockTime = 5' )
+ok( $res->[2]->[0] =~ m%(\d) <span trspan="seconds">seconds</span>%,
+    "LockTime = $1" );
+ok( $1 <= 5 && $1 >= 3, 'LockTime in range' )
   or print STDERR Dumper( $res->[2]->[0] );
-count(3);
+count(4);
 
 # Waiting
 Time::Fake->offset("+4s");
@@ -103,32 +102,16 @@ ok(
 ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
     'Rejected -> Protection enabled' )
   or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%5 <span trspan="seconds">seconds</span>%,
-    'LockTime = 5' )
+ok( $res->[2]->[0] =~ m%(\d) <span trspan="seconds">seconds</span>%,
+    "LockTime = $1" );
+ok( $1 <= 6 && $1 >= 3, 'LockTime in range' )
   or print STDERR Dumper( $res->[2]->[0] );
-count(3);
-
-## Second failed connection
-ok(
-    $res = $client->_post(
-        '/',
-        IO::String->new('user=dwho&password=ohwd'),
-        length => 23,
-        accept => 'text/html',
-    ),
-    '2nd Bad Auth query'
-);
-ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
-    'Rejected -> Protection enabled' )
-  or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%10 <span trspan="seconds">seconds</span>%,
-    'LockTime = 10' )
-  or print STDERR Dumper( $res->[2]->[0] );
-count(3);
+count(4);
 
 # Waiting
-Time::Fake->offset("+15s");
-## Try to connect
+Time::Fake->offset("+8s");
+
+## Second failed connection
 ok(
     $res = $client->_post(
         '/',
@@ -138,10 +121,17 @@ ok(
     ),
     'Auth query'
 );
-count(1);
-$id = expectCookie($res);
-expectRedirection( $res, 'http://auth.example.com/' );
-$client->logout($id);
+ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
+    'Rejected -> Protection enabled' )
+  or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ m%(\d{2}) <span trspan="seconds">seconds</span>%,
+    "LockTime = $1" );
+ok( $1 <= 18 && $1 >= 15, 'LockTime in range' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(4);
+
+# Waiting
+Time::Fake->offset("+20s");
 
 ## Third failed connection
 ok(
@@ -156,49 +146,15 @@ ok(
 ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
     'Rejected -> Protection enabled' )
   or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%20 <span trspan="seconds">seconds</span>%,
-    'LockTime = 20' )
+ok( $res->[2]->[0] =~ m%(\d{3}) <span trspan="seconds">seconds</span>%,
+    "LockTime = $1" );
+ok( $1 <= 490 && $1 >= 480, 'LockTime in range' )
   or print STDERR Dumper( $res->[2]->[0] );
-count(3);
-
-## Forth failed connection
-ok(
-    $res = $client->_post(
-        '/',
-        IO::String->new('user=dwho&password=ohwd'),
-        length => 23,
-        accept => 'text/html',
-    ),
-    '4th Bad Auth query'
-);
-ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
-    'Rejected -> Protection enabled' )
-  or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%300 <span trspan="seconds">seconds</span>%,
-    'LockTime = 300' )
-  or print STDERR Dumper( $res->[2]->[0] );
-count(3);
-
-## Fifth failed connection
-ok(
-    $res = $client->_post(
-        '/',
-        IO::String->new('user=dwho&password=ohwd'),
-        length => 23,
-        accept => 'text/html',
-    ),
-    '5th Bad Auth query'
-);
-ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
-    'Rejected -> Protection enabled' )
-  or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%300 <span trspan="seconds">seconds</span>%,
-    'LockTime = 300' )
-  or print STDERR Dumper( $res->[2]->[0] );
-count(3);
+count(4);
 
 # Waiting
-Time::Fake->offset("+320s");
+Time::Fake->offset("+510s");
+
 ## Try to connect
 ok(
     $res = $client->_post(
@@ -213,6 +169,42 @@ count(1);
 $id = expectCookie($res);
 expectRedirection( $res, 'http://auth.example.com/' );
 $client->logout($id);
+
+# Waiting
+Time::Fake->offset("+1000s");
+
+## Allowed failed login
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=ohwd'),
+        length => 23,
+        accept => 'text/html',
+    ),
+    '2nd allowed Bad Auth query'
+);
+ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span>/, 'Bad credential' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(2);
+
+## Forth failed connection
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=ohwd'),
+        length => 23,
+        accept => 'text/html',
+    ),
+    '3rd Bad Auth query'
+);
+ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
+    'Rejected -> Protection enabled' )
+  or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ m%(\d{3}) <span trspan="seconds">seconds</span>%,
+    "LockTime = $1" );
+ok( $1 <= 5000 && $1 >= 490, 'LockTime in range' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(4);
 
 clean_sessions();
 

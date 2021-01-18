@@ -3,7 +3,7 @@ package Word::Rhymes;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Carp qw(croak);
 use HTTP::Request;
@@ -362,6 +362,11 @@ __END__
 =head1 NAME
 
 Word::Rhymes - Takes a word and fetches rhyming matches from RhymeZone.com
+
+=for html
+<a href="https://github.com/stevieb9/word-rhymes/actions"><img src="https://github.com/stevieb9/word-rhymes/workflows/CI/badge.svg"/></a>
+<a href='https://coveralls.io/github/stevieb9/word-rhymes?branch=master'><img src='https://coveralls.io/repos/stevieb9/word-rhymes/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+
 
 =head1 DESCRIPTION
 
@@ -778,7 +783,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Steve Bertrand.
+Copyright 2021 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

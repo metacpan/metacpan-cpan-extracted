@@ -8,25 +8,25 @@ BEGIN {
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                       => 'error',
-            authentication                 => 'Demo',
-            userDB                         => 'Same',
-            loginHistoryEnabled            => 0,
-            brutForceProtection            => 0,
-            portalMainLogo                 => 'common/logos/logo_llng_old.png',
-            requireToken                   => 0,
-            checkUser                      => 1,
-            checkUserSearchAttributes      => 'employee_nbr  test1 mail ',
-            impersonationRule              => 1,
-            checkUserDisplayPersistentInfo => 0,
-            checkUserDisplayEmptyValues    => 0,
-            impersonationMergeSSOgroups    => 0,
-            userControl                    => '^[\w\.\-/\s]+$',
-            whatToTrace                    => '_whatToTrace',
-            macros                         => {
+            logLevel                        => 'error',
+            authentication                  => 'Demo',
+            userDB                          => 'Same',
+            loginHistoryEnabled             => 0,
+            brutForceProtection             => 0,
+            portalMainLogo                  => 'common/logos/logo_llng_old.png',
+            requireToken                    => 0,
+            checkUser                       => 1,
+            checkUserSearchAttributes       => 'employee_nbr  test1 mail ',
+            impersonationRule               => 1,
+            checkUserDisplayComputedSession => 1,
+            checkUserDisplayPersistentInfo  => 0,
+            checkUserDisplayEmptyValues     => 0,
+            impersonationMergeSSOgroups     => 0,
+            userControl                     => '^[\w\.\-/\s]+$',
+            whatToTrace                     => '_whatToTrace',
+            macros                          => {
                 authLevel     => '"Macro_$authenticationLevel"',
                 realAuthLevel => '"realMacro_$real_authenticationLevel"',
                 _whatToTrace =>
@@ -35,6 +35,11 @@ my $client = LLNG::Manager::Test->new(
             groups => {
                 authGroup     => '$authenticationLevel == 1',
                 realAuthGroup => '$real_authenticationLevel == 1',
+            },
+            vhostOptions => {
+                'test2.example.com' => {
+                    vhostHttps => 1
+                }
             },
         }
     }
@@ -119,6 +124,11 @@ count(1);
   expectForm( $res, undef, '/checkuser', 'user', 'url' );
 ok(
     $res->[2]->[0] =~
+m%<input id="urlfield" name="url" type="text" class="form-control" value="http://test1.example.com" trplaceholder="URL / DNS"%,
+    'Found HTTP url'
+) or explain( $res->[2]->[0], 'HTTP url' );
+ok(
+    $res->[2]->[0] =~
 m%<div class="alert alert-success"><div class="text-center"><b><span trspan="allowed"></span></b></div></div>%,
     'Found trspan="allowed"'
 ) or explain( $res->[2]->[0], 'trspan="allowed"' );
@@ -142,7 +152,7 @@ ok( $res->[2]->[0] =~ m%<td scope="row">Macro_1</td>%, 'Found uid' )
 ok( my $nbr = ( $res->[2]->[0] =~ s%<td scope="row">Macro_1</td>%%g ),
     'Found two macros' )
   or explain( $res->[2]->[0], 'Macros not well computed' );
-count(10);
+count(11);
 
 ok(
     $res = $client->_get(
@@ -165,9 +175,9 @@ ok(
     ),
     'POST checkuser'
 );
-ok( $res->[2]->[0] =~ m%<span trspan="checkUserComputeSession">%,
+ok( $res->[2]->[0] =~ m%<span trspan="checkUserComputedSession">%,
     'Found trspan="checkUserComputeSession"' )
-  or explain( $res->[2]->[0], 'trspan="checkUserComputeSession"' );
+  or explain( $res->[2]->[0], 'trspan="checkUserComputedSession"' );
 ok(
     $res->[2]->[0] =~
 m%<div class="alert alert-success"><div class="text-center"><b><span trspan="allowed"></span></b></div></div>%,
@@ -185,6 +195,39 @@ ok( $res->[2]->[0] =~ m%<div class="col">realAuthGroup</div>%,
     'Found group "realAuthGroup"' )
   or explain( $res->[2]->[0], 'Found group "realAuthGroup"' );
 count(7);
+
+ok(
+    $res = $client->_get(
+        '/checkuser',
+        cookie => "lemonldap=$id",
+        accept => 'text/html'
+    ),
+    'CheckUser form',
+);
+count(1);
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/checkuser', 'user', 'url' );
+
+$query =~ s/url=/url=test2.example.com/;
+
+ok(
+    $res = $client->_post(
+        '/checkuser',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+        accept => 'text/html',
+    ),
+    'POST checkuser'
+);
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/checkuser', 'user', 'url' );
+ok(
+    $res->[2]->[0] =~
+m%<input id="urlfield" name="url" type="text" class="form-control" value="https://test2.example.com" trplaceholder="URL / DNS"%,
+    'Found HTTPS url'
+) or explain( $res->[2]->[0], 'HTTP url' );
+count(2);
 
 $client->logout($id);
 clean_sessions();

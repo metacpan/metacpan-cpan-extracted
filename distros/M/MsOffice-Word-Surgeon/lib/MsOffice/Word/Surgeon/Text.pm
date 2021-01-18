@@ -10,7 +10,7 @@ use namespace::clean -except => 'meta';
 has 'xml_before'   => (is => 'ro', isa => 'Str');
 has 'literal_text' => (is => 'ro', isa => 'Str', required => 1);
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 
 sub as_xml {

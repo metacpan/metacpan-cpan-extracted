@@ -1,7 +1,7 @@
-.travis.yml
 Changes
 html/Callbacks/Gravatar/Admin/Users/Modify.html/LeftColumnBottom
 html/Callbacks/Gravatar/Prefs/AboutMe.html/FormLeftColumn
+html/Callbacks/Gravatar/Prefs/Elements/EditAboutMe/FormLeftColumn
 html/Callbacks/Gravatar/Ticket/Elements/ShowRequestor/AboutThisUser
 html/Callbacks/Gravatar/User/Elements/Portlets/ExtraInfo/BeforeExtraInfo
 html/Callbacks/Gravatar/User/Prefs.html/FormLeftColumn

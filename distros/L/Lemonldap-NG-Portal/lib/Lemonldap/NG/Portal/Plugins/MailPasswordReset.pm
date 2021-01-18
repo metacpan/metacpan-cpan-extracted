@@ -6,36 +6,39 @@ use Mouse;
 use POSIX qw(strftime);
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_BADCREDENTIALS
+  PE_OK
+  PE_MAILOK
+  PE_NOTOKEN
+  PE_MAILERROR
+  PE_PASSWORD_OK
   PE_BADMAILTOKEN
   PE_CAPTCHAEMPTY
   PE_CAPTCHAERROR
-  PE_MAILCONFIRMATION_ALREADY_SENT
-  PE_MAILCONFIRMOK
-  PE_MAILERROR
-  PE_MAILFIRSTACCESS
-  PE_MAILFORMEMPTY
   PE_MAILNOTFOUND
-  PE_MAILOK
+  PE_TOKENEXPIRED
+  PE_USERNOTFOUND
+  PE_MAILCONFIRMOK
   PE_MALFORMEDUSER
-  PE_NOTOKEN
-  PE_OK
-  PE_PASSWORDFIRSTACCESS
+  PE_MAILFORMEMPTY
+  PE_BADCREDENTIALS
+  PE_MAILFIRSTACCESS
   PE_PASSWORDFORMEMPTY
   PE_PASSWORD_MISMATCH
-  PE_PASSWORD_OK
-  PE_PP_INSUFFICIENT_PASSWORD_QUALITY
+  PE_PASSWORDFIRSTACCESS
   PE_PP_PASSWORD_TOO_SHORT
   PE_PP_PASSWORD_TOO_YOUNG
   PE_PP_PASSWORD_IN_HISTORY
-  PE_TOKENEXPIRED
-  PE_USERNOTFOUND
+  PE_MAILCONFIRMATION_ALREADY_SENT
+  PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
-extends 'Lemonldap::NG::Portal::Main::Plugin',
-  'Lemonldap::NG::Portal::Lib::SMTP', 'Lemonldap::NG::Portal::Lib::_tokenRule';
+extends qw(
+  Lemonldap::NG::Portal::Lib::SMTP
+  Lemonldap::NG::Portal::Main::Plugin
+  Lemonldap::NG::Portal::Lib::_tokenRule
+);
 
 # PROPERTIES
 
@@ -352,7 +355,9 @@ sub _reset {
         $body =~ s/\$url/$url/g;
         $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
 
-        $self->logger->info("User ".$req->data->{mailAddress}." is trying to reset his/her password");
+        $self->logger->info( "User "
+              . $req->data->{mailAddress}
+              . " is trying to reset his/her password" );
 
         # Send mail
         unless (
@@ -468,22 +473,22 @@ sub changePwd {
         return $cpq;
     }
 
-    # Modify the password TODO: change this
-    # Populate $req->{user} for logging purpose
-    my $tmp = $self->conf->{portalRequireOldPassword};
-    $self->conf->{portalRequireOldPassword} = 0;
     $req->user( $req->{sessionInfo}->{_user} );
     my $result =
       $self->p->_passwordDB->modifyPassword( $req,
         $req->data->{newpassword}, 1 );
     $req->{user} = undef;
-    $self->conf->{portalRequireOldPassword} = $tmp;
 
     # Mail token can be used only one time, delete the session if all is ok
     unless ( $result == PE_PASSWORD_OK or $result == PE_OK ) {
         $self->ott->setToken( $req, $req->sessionInfo );
         return $result;
     }
+
+    my $userlog = $req->sessionInfo->{ $self->conf->{whatToTrace} };
+    my $iplog   = $req->sessionInfo->{ipAddr};
+    $self->userLogger->notice("Password changed for $userlog ($iplog)")
+      if ( defined $userlog and $iplog );
 
     # Send mail containing the new password
     $req->data->{mailAddress} ||=

@@ -13,8 +13,10 @@ use Tie::IxHash;
 use Bio::MUST::Core;
 use Bio::MUST::Drivers::CdHit;
 
-my $class = 'Bio::MUST::Drivers::CdHit';
 
+say 'Note: tests designed for: CD-HIT version 4.8.1 (built on Jul  5 2019)';
+
+my $class = 'Bio::MUST::Drivers::CdHit';
 
 # Note: provisioning system is not enabled to help tests to pass on CPANTS
 my $app = use_module('Bio::MUST::Provision::CdHit')->new;

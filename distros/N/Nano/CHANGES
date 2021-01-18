@@ -1,6 +1,12 @@
 Changelog for Nano
 
-0.06 2021-01-14T00:41:18
+0.07 2021-01-15T08:53:50
+ - Add release updates
+ - Update release instructions
+ - Implement Nano::Track (#32)
+
+0.06 2021-01-14T00:41:20
+ - Built release version 0.06
  - Add release updates
  - Implement Nano::Stash (#29)
 

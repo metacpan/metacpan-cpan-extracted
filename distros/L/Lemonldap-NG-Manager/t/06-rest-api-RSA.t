@@ -6,6 +6,16 @@ use JSON;
 use IO::String;
 require 't/test-lib.pm';
 
+sub checkResult {
+    my $res = shift;
+    ok( $res->[0] == 200, "Result code is 200" );
+    my $key;
+    ok( $key = from_json( $res->[2]->[0] ), 'Response is JSON' );
+    like( $key->{private}, qr/BEGIN/, "is PEM formatted" );
+    like( $key->{public},  qr/BEGIN/, "is PEM formatted" );
+    count(4);
+}
+
 my $res;
 ok(
     $res = &client->_post(
@@ -13,10 +23,8 @@ ok(
     ),
     "Request succeed"
 );
-ok( $res->[0] == 200, "Result code is 200" );
-my $key;
-ok( $key = from_json( $res->[2]->[0] ), 'Response is JSON' );
-count(3);
+count(1);
+checkResult($res);
 
 ok(
     $res = &client->_post(
@@ -25,8 +33,28 @@ ok(
     ),
     "Request succeed"
 );
-ok( $res->[0] == 200, "Result code is 200" );
-ok( $key = from_json( $res->[2]->[0] ), 'Response is JSON' );
-count(3);
+count(1);
+checkResult($res);
+
+ok(
+    $res = &client->_post(
+        '/confs/newCertificate', '',
+        IO::String->new(''),     'application/json',
+        0,
+    ),
+    "Request succeed"
+);
+count(1);
+checkResult($res);
+
+ok(
+    $res = &client->_post(
+        '/confs/newCertificate', '', IO::String->new('{"password":"hello"}'),
+        'application/json', 20,
+    ),
+    "Request succeed"
+);
+count(1);
+checkResult($res);
 
 done_testing( count() );

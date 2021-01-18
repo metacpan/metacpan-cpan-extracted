@@ -13,7 +13,7 @@ BEGIN {
         'WWW::Wookie::Widget::Property' =>
           [qw(getName setName getValue setValue getIsPublic setIsPublic)],
         'WWW::Wookie::Connector::Service' => [
-            qw(getLogger getConnection getProperty getOrCreateInstance getUsers getLocale setLocale getUser setUser addProperty deleteProperty getAvailableWidgets setProperty addParticipant deleteParticipant)
+            qw(getConnection getProperty getOrCreateInstance getUsers getLocale setLocale getUser setUser addProperty deleteProperty getAvailableWidgets setProperty addParticipant deleteParticipant)
         ],
         'WWW::Wookie::Server::Connection' =>
           [qw(getURL getApiKey getSharedDataKey as_string test)],

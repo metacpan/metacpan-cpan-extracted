@@ -1,5 +1,5 @@
 package OTRS::OPM::Installer::Utils::OTRS;
-$OTRS::OPM::Installer::Utils::OTRS::VERSION = '0.04';
+$OTRS::OPM::Installer::Utils::OTRS::VERSION = '0.05';
 # ABSTRACT: class that provides helper functionality regarding the OTRS installation
 
 use strict;
@@ -160,7 +160,7 @@ OTRS::OPM::Installer::Utils::OTRS - class that provides helper functionality reg
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

@@ -1,5 +1,8 @@
 Revision history for RT::Extension::BriefHistory
 
+3.00 2021-01-17
+ - update Module::Install for RT 5.0 compatibility
+
 2.01 2018-02-04
  - update installation instructions
  - update Module::Install and friends

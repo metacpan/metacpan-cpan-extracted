@@ -71,7 +71,7 @@ expectAuthenticatedAs( $res, 'rtyler' );
 ok(
     $res->[2]->[0] =~
       m%<span trspan="contextSwitching_ON">contextSwitching_ON</span>%,
-    'Connected as rtyler'
+    'contextSwitching allowed'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(2);
 

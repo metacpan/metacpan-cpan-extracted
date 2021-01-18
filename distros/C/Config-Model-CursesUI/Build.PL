@@ -32,6 +32,7 @@ my $build = Module::Build->new (
     },
     configure_requires => { 'Module::Build' => 0.42 },
     build_requires => {
+		'Config::Model::Tester'    => '3.006',
         'Log::Log4perl'    => 0 ,
     },
     add_to_cleanup => [qw/stderr.log wr_data/] ,

@@ -28,9 +28,8 @@ sub restCall {
     $hreq->header( 'Content-Type' => 'application/json' );
     $hreq->content( to_json($content) );
     my $resp = $self->ua->request($hreq);
-    unless ( $resp->is_success ) {
-        die $resp->status_line;
-    }
+    die $resp->status_line unless $resp->is_success;
+
     my $res = eval { from_json( $resp->content ) };
     die "Bad REST response: $@" if ($@);
     if ( ref($res) ne "HASH" ) {

@@ -47,16 +47,16 @@ DESCRIPTION
 
  Compatibility
 
-    Since Mojo::Rx follows the ReactiveX conventions quite closely, we'd
-    expect to have the ability to connect Mojo::Rx observable to a
-    Ryu::Source, and provide an adapter from a Ryu::Source to act as a
-    Mojo::Rx-style observable. This is not yet implemented, but planned for
-    a future version.
+    Since RxPerl follows the ReactiveX conventions quite closely, we'd
+    expect to have the ability to connect RxPerl observables to a
+    Ryu::Source, and provide an adapter from a Ryu::Source to act as an
+    RxPerl-style observable. This is not yet implemented, but may be added
+    in a future version.
 
     Most of the other modules in "SEE ALSO" are either not used widely
     enough or not a good semantic fit for a compatibility layer - but if
-    you're interested in this, please ask
-    <https://github.com/team-at-cpan/Ryu/issues>.
+    you're interested in this, please ask about it
+    <https://github.com/team-at-cpan/Ryu/issues> or provide patches!
 
  Components
 
@@ -193,11 +193,8 @@ SEE ALSO
 
       * Data::Monad
 
-      * Mojo::Rx - Mojolicious-specific support for ReactiveX, follows the
-      rxjs API quite closely
-
-      * RxPerl - same author as Mojo::Rx, this (will eventually!) provide a
-      ReactiveX API without being tied to Mojolicious
+      * RxPerl - previously known as Mojo::Rx, targets close compatibility
+      with rxjs <https://rxjs-dev.firebaseapp.com/guide/overview>
 
  Other references
 
@@ -213,11 +210,22 @@ SEE ALSO
 
 AUTHOR
 
-    Tom Molesworth <TEAM@cpan.org> with contributions from Mohammad S
-    Anwar, Michael Mueller, Zak Elep, Mohanad Zarzour and Nael Alolwani.
+    Tom Molesworth <TEAM@cpan.org> with contributions from:
+
+      * Mohammad S Anwar
+
+      * Michael Mueller
+
+      * Zak Elep
+
+      * Mohanad Zarzour
+
+      * Nael Alolwani
+
+      * Amin Marashi
 
 LICENSE
 
-    Copyright Tom Molesworth 2011-2020. Licensed under the same terms as
+    Copyright Tom Molesworth 2011-2021. Licensed under the same terms as
     Perl itself.
 

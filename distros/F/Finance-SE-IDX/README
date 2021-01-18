@@ -2,10 +2,56 @@ NAME
     Finance::SE::IDX - Get information from Indonesian Stock Exchange
 
 VERSION
-    This document describes version 0.005 of Finance::SE::IDX (from Perl
-    distribution Finance-SE-IDX), released on 2020-12-22.
+    This document describes version 0.006 of Finance::SE::IDX (from Perl
+    distribution Finance-SE-IDX), released on 2021-01-17.
 
 FUNCTIONS
+  get_idx_daily_trading_summary
+    Usage:
+
+     get_idx_daily_trading_summary(%args) -> [status, msg, payload, meta]
+
+    Get daily trading summary.
+
+    This will retrieve end-of-day data for a single trading day, containing
+    list of stock names along with their opening price, closing price,
+    highest price, lowest price, volume, frequency, foreign buy & sell
+    volume, etc.
+
+    To specify date you can either specify "date" (epoch, or YYYY-MM-DD
+    string in command-line, which will be coerced to epoch) or "day",
+    "month", "year".
+
+    The data for still-trading current day will not be available, so if you
+    are looking for intraday data, this is not it.
+
+    At the time of this writing (2021-01-17), the data goes back to Jan 1st,
+    2015. If you are looking for older data, you can visit one of the
+    financial data websites like Bloomberg.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   date => *date*
+
+    *   day => *int*
+
+    *   month => *int*
+
+    *   year => *int*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   list_idx_boards
     Usage:
 
@@ -132,7 +178,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

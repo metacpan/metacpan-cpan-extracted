@@ -5,7 +5,7 @@ requires 'namespace::clean', 0;
 requires 'URI::udp', 0;
 requires 'URI::tcp', 0;
 requires 'Log::Any', '>= 1.050';
-requires 'Ryu', '>= 2.001';
+requires 'Ryu', '>= 2.006';
 requires 'Future', '>= 0.45';
 requires 'IO::Async', '>= 0.71';
 requires 'IO::Socket::IP', '>= 0.37';
@@ -17,8 +17,6 @@ recommends 'IO::Async::SSL', '>= 0.19';
 
 recommends 'IO::AsyncX::Sendfile', '>= 0.002';
 recommends 'IO::AsyncX::System', '>= 0.003';
-
-suggests 'Tickit::Async', '>= 0.21';
 
 on 'test' => sub {
 	requires 'Test::More', '>= 0.98';

@@ -13,8 +13,10 @@ use Path::Class qw(file);
 use Bio::MUST::Core;
 use Bio::MUST::Drivers::Mafft;
 
-my $class = 'Bio::MUST::Drivers::Mafft';
 
+say 'Note: tests designed for: MAFFT v7.453 (2019/Nov/8)';
+
+my $class = 'Bio::MUST::Drivers::Mafft';
 
 # Note: provisioning system is not enabled to help tests to pass on CPANTS
 my $app = use_module('Bio::MUST::Provision::Mafft')->new;

@@ -466,7 +466,7 @@ Number.Ω() -> I<Obj>
 
 Return the
 
-Aliases: I<big_omega>, I<bigomega>, I<prime_power_sigma0>
+Aliases: I<bigomega>, I<prime_power_sigma0>
 
 =cut
 
@@ -591,6 +591,14 @@ Inverse cosecant of C<n> in radians.
     n.acsch
 
 Inverse hyperbolic cosecant of C<n>.
+
+=cut
+
+=head2 addmod
+
+Number.addmod() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1350,6 +1358,14 @@ Return the
 
 =cut
 
+=head2 core
+
+Number.core() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 cos
 
 Number.cos() -> I<Obj>
@@ -1530,11 +1546,13 @@ Aliases: I<sum_digits>, I<sumdigits>
 
 =cut
 
-=head2 dirichlet_hyperbola
+=head2 dirichlet_sum
 
-Number.dirichlet_hyperbola() -> I<Obj>
+Number.dirichlet_sum() -> I<Obj>
 
 Return the
+
+Aliases: I<dirichlet_hyperbola>
 
 =cut
 
@@ -1762,6 +1780,8 @@ Number.factorial_power() -> I<Obj>
 
 Return the
 
+Aliases: I<factorial_valuation>
+
 =cut
 
 =head2 factorial_sum
@@ -1877,6 +1897,14 @@ Return the
 =head2 floor
 
 Number.floor() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 flt_factor
+
+Number.flt_factor() -> I<Obj>
 
 Return the
 
@@ -2100,7 +2128,17 @@ Number.inverse_phi() -> I<Obj>
 
 Return the
 
-Aliases: I<inverse_totient>, I<inverse_euler_phi>
+Aliases: I<inverse_totient>
+
+=cut
+
+=head2 inverse_phi_len
+
+Number.inverse_phi_len() -> I<Obj>
+
+Return the
+
+Aliases: I<inverse_totient_len>
 
 =cut
 
@@ -2114,6 +2152,26 @@ Aliases: I<polygonal_inverse>
 
 =cut
 
+=head2 inverse_psi
+
+Number.inverse_psi() -> I<Obj>
+
+Return the
+
+Aliases: I<inverse_dedekind_psi>
+
+=cut
+
+=head2 inverse_psi_len
+
+Number.inverse_psi_len() -> I<Obj>
+
+Return the
+
+Aliases: I<inverse_dedekind_psi_len>
+
+=cut
+
 =head2 inverse_sigma
 
 Number.inverse_sigma() -> I<Obj>
@@ -2122,9 +2180,25 @@ Return the
 
 =cut
 
-=head2 inverse_totient_len
+=head2 inverse_sigma_len
 
-Number.inverse_totient_len() -> I<Obj>
+Number.inverse_sigma_len() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 inverse_uphi
+
+Number.inverse_uphi() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 inverse_usigma
+
+Number.inverse_usigma() -> I<Obj>
 
 Return the
 
@@ -2252,14 +2326,6 @@ Return the
 
 =cut
 
-=head2 is_bruckman_lucas_pseudoprime
-
-Number.is_bruckman_lucas_pseudoprime() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 is_carmichael
 
 Number.is_carmichael() -> I<Obj>
@@ -2268,11 +2334,13 @@ Return the
 
 =cut
 
-=head2 is_chebyshev_pseudoprime
+=head2 is_chebyshev
 
-Number.is_chebyshev_pseudoprime() -> I<Obj>
+Number.is_chebyshev() -> I<Obj>
 
 Return the
+
+Aliases: I<is_chebyshev_psp>, I<is_chebyshev_pseudoprime>
 
 =cut
 
@@ -2340,11 +2408,13 @@ Return the
 
 =cut
 
-=head2 is_euler_pseudoprime
+=head2 is_euler_psp
 
-Number.is_euler_pseudoprime() -> I<Obj>
+Number.is_euler_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_euler_pseudoprime>
 
 =cut
 
@@ -2356,19 +2426,23 @@ Return the
 
 =cut
 
-=head2 is_fibonacci_pseudoprime
+=head2 is_fib_psp
 
-Number.is_fibonacci_pseudoprime() -> I<Obj>
+Number.is_fib_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_lucasu_psp>, I<is_lucasU_psp>, I<is_fibonacci_psp>, I<is_lucasU_pseudoprime>, I<is_fibonacci_pseudoprime>
 
 =cut
 
-=head2 is_frobenius_pseudoprime
+=head2 is_frobenius_psp
 
-Number.is_frobenius_pseudoprime() -> I<Obj>
+Number.is_frobenius_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_frobenius_pseudoprime>
 
 =cut
 
@@ -2396,6 +2470,14 @@ Return the
 
 =cut
 
+=head2 is_imprimitive_carmichael
+
+Number.is_imprimitive_carmichael() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_inf
 
 Number.is_inf() -> I<Obj>
@@ -2412,13 +2494,13 @@ Return the
 
 =cut
 
-=head2 is_khashin_pseudoprime
+=head2 is_khashin_psp
 
-Number.is_khashin_pseudoprime() -> I<Obj>
+Number.is_khashin_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_frobenius_khashin_pseudoprime>
+Aliases: I<is_khashin_pseudoprime>, I<is_frobenius_khashin_psp>, I<is_frobenius_khashin_pseudoprime>
 
 =cut
 
@@ -2430,11 +2512,23 @@ Return the
 
 =cut
 
-=head2 is_lucas_pseudoprime
+=head2 is_lucas_psp
 
-Number.is_lucas_pseudoprime() -> I<Obj>
+Number.is_lucas_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_lucas_pseudoprime>
+
+=cut
+
+=head2 is_lucasv_psp
+
+Number.is_lucasv_psp() -> I<Obj>
+
+Return the
+
+Aliases: I<is_lucasV_psp>, I<is_bruckman_lucas_psp>, I<is_lucasV_pseudoprime>, I<is_bruckman_lucas_pseudoprime>
 
 =cut
 
@@ -2486,7 +2580,7 @@ Number.is_nm1_prime() -> I<Obj>
 
 Return the
 
-Aliases: I<is_nminus1_prime>
+Aliases: I<is_pm1_prime>, I<is_nminus1_prime>
 
 =cut
 
@@ -2496,13 +2590,21 @@ Number.is_np1_prime() -> I<Obj>
 
 Return the
 
-Aliases: I<is_nplus1_prime>
+Aliases: I<is_pp1_prime>, I<is_nplus1_prime>
 
 =cut
 
 =head2 is_odd
 
 Number.is_odd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_odd_composite
+
+Number.is_odd_composite() -> I<Obj>
 
 Return the
 
@@ -2516,6 +2618,16 @@ Return the
 
 =cut
 
+=head2 is_over_psp
+
+Number.is_over_psp() -> I<Obj>
+
+Return the
+
+Aliases: I<is_over_pseudoprime>, I<is_overpseudoprime>
+
+=cut
+
 =head2 is_palindrome
 
 Number.is_palindrome() -> I<Obj>
@@ -2526,37 +2638,43 @@ Aliases: I<is_palindromic>
 
 =cut
 
-=head2 is_pell_lucas_pseudoprime
+=head2 is_pell_lucas_psp
 
-Number.is_pell_lucas_pseudoprime() -> I<Obj>
+Number.is_pell_lucas_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_pell_lucas_pseudoprime>
 
 =cut
 
-=head2 is_pell_pseudoprime
+=head2 is_pell_psp
 
-Number.is_pell_pseudoprime() -> I<Obj>
+Number.is_pell_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_pell_pseudoprime>
 
 =cut
 
-=head2 is_perrin_pseudoprime
+=head2 is_perrin_psp
 
-Number.is_perrin_pseudoprime() -> I<Obj>
+Number.is_perrin_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_perrin_pseudoprime>
 
 =cut
 
-=head2 is_plumb_pseudoprime
+=head2 is_plumb_psp
 
-Number.is_plumb_pseudoprime() -> I<Obj>
+Number.is_plumb_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_euler_plumb_pseudoprime>
+Aliases: I<is_euler_plumb_psp>, I<is_plumb_pseudoprime>, I<is_euler_plumb_pseudoprime>
 
 =cut
 
@@ -2612,6 +2730,14 @@ Return the
 
 =cut
 
+=head2 is_practical
+
+Number.is_practical() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_prime
 
 Number.is_prime() -> I<Obj>
@@ -2662,13 +2788,13 @@ Aliases: I<is_provable_prime>
 
 =cut
 
-=head2 is_pseudoprime
+=head2 is_psp
 
-Number.is_pseudoprime() -> I<Obj>
+Number.is_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_fermat_pseudoprime>
+Aliases: I<is_fermat_psp>, I<is_pseudoprime>, I<is_fermat_pseudoprime>
 
 =cut
 
@@ -2764,55 +2890,63 @@ Aliases: I<is_squarefree>
 
 =cut
 
-=head2 is_stronger_lucas_pseudoprime
+=head2 is_stronger_lucas_psp
 
-Number.is_stronger_lucas_pseudoprime() -> I<Obj>
+Number.is_stronger_lucas_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_extra_strong_lucas_pseudoprime>
+Aliases: I<is_extra_strong_lucas_psp>, I<is_stronger_lucas_pseudoprime>, I<is_extra_strong_lucas_pseudoprime>
 
 =cut
 
-=head2 is_strong_fibonacci_pseudoprime
+=head2 is_strong_fib
 
-Number.is_strong_fibonacci_pseudoprime() -> I<Obj>
+Number.is_strong_fib() -> I<Obj>
 
 Return the
+
+Aliases: I<is_strong_fib_psp>, I<is_strong_fibonacci>, I<is_strong_fibonacci_psp>, I<is_strong_fibonacci_pseudoprime>
 
 =cut
 
-=head2 is_strongish_lucas_pseudoprime
+=head2 is_strongish_lucas_psp
 
-Number.is_strongish_lucas_pseudoprime() -> I<Obj>
+Number.is_strongish_lucas_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_strongish_lucas_pseudoprime>
 
 =cut
 
-=head2 is_strong_lucas_pseudoprime
+=head2 is_strong_lucas_psp
 
-Number.is_strong_lucas_pseudoprime() -> I<Obj>
+Number.is_strong_lucas_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_strong_lucas_pseudoprime>
 
 =cut
 
-=head2 is_strong_pseudoprime
+=head2 is_strong_psp
 
-Number.is_strong_pseudoprime() -> I<Obj>
+Number.is_strong_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_strong_fermat_pseudoprime>
+Aliases: I<miller_rabin>, I<is_strong_fermat_psp>, I<is_strong_pseudoprime>, I<is_strong_fermat_pseudoprime>
 
 =cut
 
-=head2 is_super_pseudoprime
+=head2 is_super_psp
 
-Number.is_super_pseudoprime() -> I<Obj>
+Number.is_super_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_super_pseudoprime>, I<is_superpseudoprime>
 
 =cut
 
@@ -2832,13 +2966,13 @@ Return the
 
 =cut
 
-=head2 is_underwood_pseudoprime
+=head2 is_underwood_psp
 
-Number.is_underwood_pseudoprime() -> I<Obj>
+Number.is_underwood_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_frobenius_underwood_pseudoprime>
+Aliases: I<is_underwood_pseudoprime>, I<is_frobenius_underwood_psp>, I<is_frobenius_underwood_pseudoprime>
 
 =cut
 
@@ -3094,6 +3228,16 @@ Return the
 
 =cut
 
+=head2 lucas_factor
+
+Number.lucas_factor() -> I<Obj>
+
+Return the
+
+Aliases: I<lucas_miller_factor>
+
+=cut
+
 =head2 lucas_mod
 
 Number.lucas_mod() -> I<Obj>
@@ -3196,6 +3340,16 @@ Aliases: I<mfactorial>, I<multi_factorial>
 
 =cut
 
+=head2 miller_factor
+
+Number.miller_factor() -> I<Obj>
+
+Return the
+
+Aliases: I<miller_rabin_factor>
+
+=cut
+
 =head2 miller_rabin_random
 
 Number.miller_rabin_random() -> I<Obj>
@@ -3231,6 +3385,14 @@ Return the
 =head2 msb
 
 Number.msb() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 mulmod
+
+Number.mulmod() -> I<Obj>
 
 Return the
 
@@ -3358,6 +3520,16 @@ Return the
 
 =cut
 
+=head2 n_primes
+
+Number.n_primes() -> I<Obj>
+
+Return the
+
+Aliases: I<nprimes>
+
+=cut
+
 =head2 nu
 
 Number.nu() -> I<Obj>
@@ -3414,7 +3586,7 @@ Number.partitions() -> I<Obj>
 
 Return the
 
-Aliases: I<number_of_partitions>
+Aliases: I<partition_number>
 
 =cut
 
@@ -3612,7 +3784,7 @@ Number.primepi() -> I<Obj>
 
 Return the
 
-Aliases: I<prime_count>
+Aliases: I<prime_count>, I<count_primes>
 
 =cut
 
@@ -3788,6 +3960,16 @@ Aliases: I<dedekind_psi>
 
 =cut
 
+=head2 qnr
+
+Number.qnr() -> I<Obj>
+
+Return the
+
+Aliases: I<quadratic_nonresidue>
+
+=cut
+
 =head2 qs_factor
 
 Number.qs_factor() -> I<Obj>
@@ -3938,6 +4120,14 @@ Return the
 
 =cut
 
+=head2 ratmod
+
+Number.ratmod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 re
 
 Number.re() -> I<Obj>
@@ -3985,6 +4175,14 @@ Return the
 =head2 rough_count
 
 Number.rough_count() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rough_part
+
+Number.rough_part() -> I<Obj>
 
 Return the
 
@@ -4116,9 +4314,25 @@ Return the
 
 =cut
 
+=head2 smooth_part
+
+Number.smooth_part() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 solve_pell
 
 Number.solve_pell() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sopf
+
+Number.sopf() -> I<Obj>
 
 Return the
 
@@ -4332,6 +4546,14 @@ Return the
 
 =cut
 
+=head2 submod
+
+Number.submod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 subsets
 
 Number.subsets() -> I<Obj>
@@ -4343,6 +4565,14 @@ Return the
 =head2 superfactorial
 
 Number.superfactorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 superprimorial
+
+Number.superprimorial() -> I<Obj>
 
 Return the
 

@@ -1,5 +1,9 @@
 Revision history for Perl module Test::Manifest
 
+2.022 2021-01-16T13:29:49Z
+	* freshen distro, remove Travis CI, add Github Actions
+	* choroba fixed parallel testing (Github #4)
+
 2.021 2018-05-08T02:47:56Z
 	* Clarify that it's the Artistic License 2.0
 

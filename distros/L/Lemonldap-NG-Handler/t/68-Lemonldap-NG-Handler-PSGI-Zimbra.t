@@ -16,8 +16,8 @@ SKIP: {
         {
             logLevel         => 'error',
             zimbraPreAuthKey => '1234567890',
-            zimbraUrl        => '/service/preauthtest',
-            zimbraSsoUrl     => '^/testsso',
+            zimbraUrl        => '/service/preauthtest ',
+            zimbraSsoUrl     => '^/testsso  ',             # Bad URLs
             vhostOptions     => {
                 'test1.example.com' => {
                     vhostHttps           => 0,

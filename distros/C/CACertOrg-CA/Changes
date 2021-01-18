@@ -1,5 +1,9 @@
 Revision history for Perl module CACertOrg::CA
 
+20210114.001 2021-01-15T08:18:50Z
+	* freshen the distro
+	* package the latest Class 1 key from CACert
+
 20110724.005 2018-06-10T11:49:11Z
 	* Freshen dist. The cert is still the same one on the website.
 

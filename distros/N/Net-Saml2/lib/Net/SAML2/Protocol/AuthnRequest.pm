@@ -3,7 +3,7 @@ package Net::SAML2::Protocol::AuthnRequest;
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
-use XML::Writer;
+use XML::Writer 0.625;
 use List::Util qw(any);
 
 with 'Net::SAML2::Role::ProtocolMessage';
@@ -225,7 +225,7 @@ Net::SAML2::Protocol::AuthnRequest - SAML2 AuthnRequest object
 
 =head1 VERSION
 
-version 0.29
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -302,6 +302,7 @@ This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
             2017       Alessandro Ranellucci
             2019       Timothy Legge
             2020       Timothy Legge, Wesley Schwengle
+            2021       Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

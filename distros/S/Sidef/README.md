@@ -32,9 +32,9 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
 
 ### WWW
 
-* Gitbook: [https://trizen.gitbooks.io/sidef-lang](https://trizen.gitbooks.io/sidef-lang)
-* Tutorial: [https://github.com/trizen/sidef/wiki](https://github.com/trizen/sidef/wiki)
-* RosettaCode: [https://rosettacode.org/wiki/Sidef](https://rosettacode.org/wiki/Sidef)
+* Gitbook: https://trizen.gitbook.io/sidef-lang/ ([legacy](https://trizen.gitbooks.io/sidef-lang))
+* Tutorial: https://github.com/trizen/sidef/wiki
+* RosettaCode: https://rosettacode.org/wiki/Sidef
 
 ## EXAMPLES
 
@@ -64,7 +64,7 @@ for i in (1..10) {
 }
 ```
 
-### ASCII generation of the [Sierpinksi triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle):
+### ASCII generation of the [Sierpinski triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle):
 ```ruby
 func sierpinski_triangle(n) {
     var triangle = ['*']
@@ -179,7 +179,7 @@ Output:
 
 ### LICENSE AND COPYRIGHT
 
-* Copyright (C) 2013-2020 Daniel Șuteu, Ioana Fălcușan
+* Copyright (C) 2013-2021 Daniel Șuteu, Ioana Fălcușan
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the *Artistic License (2.0)*. You may obtain a copy

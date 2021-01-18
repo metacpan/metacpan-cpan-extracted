@@ -263,10 +263,10 @@ groundwork for this module!
     print "(Lyrics courtesy: ".$finder->source().")\n";
     print "site url:  ".$finder->site().")\n";
 
-	# To do caching:
-	$finder->cache('/tmp/lyrics');
-	#-or-
-	my $localfinder = new LyricFinder::ApiLyricsOvh(-cache => '/tmp/lyrics');
+    # To do caching:
+    $finder->cache('/tmp/lyrics');
+    #-or-
+    my $localfinder = new LyricFinder::ApiLyricsOvh(-cache => '/tmp/lyrics');
 
 
 =head1 DESCRIPTION

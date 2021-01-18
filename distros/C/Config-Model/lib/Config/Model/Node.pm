@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2020 by Dominique Dumont.
+# This software is Copyright (c) 2005-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node 2.140;
+package Config::Model::Node 2.141;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
@@ -980,6 +980,7 @@ sub load_data {
         ") will load elt ",
         join( ' ', sort keys %$perl_data ) );
 
+    my $has_stored = 0;
     # data must be loaded according to the element order defined by
     # the model. This will not load not yet accepted parameters
     foreach my $elt ( @{ $self->{model}{element_list} } ) {
@@ -998,7 +999,7 @@ sub load_data {
             );
 
             if ($obj) {
-                $obj->load_data( %args, data => delete $perl_data->{$elt} );
+                $has_stored += $obj->load_data( %args, data => delete $perl_data->{$elt} );
             }
             elsif ( defined $obj ) {
 
@@ -1032,7 +1033,7 @@ sub load_data {
             my $obj = $self->fetch_element( name => $elt, check => $check );
             next unless $obj;    # in cas of known but unavailable elements
             $logger->info("Node load_data: accepting element $elt");
-            $obj->load_data( %args, data => delete $perl_data->{$elt} ) if defined $obj;
+            $has_stored += $obj->load_data( %args, data => delete $perl_data->{$elt} ) if defined $obj;
         }
     }
 
@@ -1044,6 +1045,7 @@ sub load_data {
             object     => $self,
         );
     }
+    return !! $has_stored;
 }
 
 sub dump_tree {
@@ -1249,7 +1251,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.140
+version 2.141
 
 =head1 SYNOPSIS
 
@@ -1930,6 +1932,8 @@ Use C<< check => skip >> to make data loading more tolerant: bad data are discar
 
 C<load_data> can be called with a single hash ref parameter.
 
+Returns 1 if some data were saved (instead of skipped).
+
 =head2 needs_save
 
 return 1 if one of the elements of the node's sub-tree has been modified.
@@ -2045,7 +2049,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2020 by Dominique Dumont.
+This software is Copyright (c) 2005-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

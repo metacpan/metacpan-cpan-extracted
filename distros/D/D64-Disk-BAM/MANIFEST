@@ -8,3 +8,4 @@ t/02-diskid.t
 t/03-trackbam.t
 t/04-print.t
 t/05-free-sectors.t
+t/06-get-bam-data.t

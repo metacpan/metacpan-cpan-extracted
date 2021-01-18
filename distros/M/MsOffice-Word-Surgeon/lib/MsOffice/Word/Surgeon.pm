@@ -12,7 +12,7 @@ use MsOffice::Word::Surgeon::Change;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 # constant integers to specify indentation modes -- see L<XML::LibXML>
 use constant XML_NO_INDENT     => 0;
@@ -176,7 +176,7 @@ sub plain_text {
   $txt =~ s/(<w:p[ >])/\n$1/g;
 
   # replace break tags by newlines
-  $txt =~ s/<br>/\n/g;
+  $txt =~ s[<w:br/>][\n]g;
 
   # replace tab nodes by ASCII tabs
   $txt =~ s/<w:tab[^s][^>]*>/\t/g;

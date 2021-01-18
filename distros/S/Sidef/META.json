@@ -4,7 +4,7 @@
       "Daniel Șuteu   (<trizen@cpan.org>)",
       "Ioana Fălcușan (<ioanaflavia@gmail.com>)"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "artistic_2"
@@ -33,13 +33,15 @@
             "Digest::SHA" : "0",
             "File::Find" : "0",
             "MIME::Base64" : "0",
-            "Math::Prime::Util" : "0.73"
+            "Math::Prime::Util" : "0.73",
+            "Term::ReadLine::Gnu" : "0",
+            "Text::Balanced" : "0",
+            "Text::ParseWords" : "0"
          },
          "requires" : {
             "Algorithm::Combinatorics" : "0",
             "Algorithm::Loops" : "0",
             "Cwd" : "0",
-            "Devel::Peek" : "0",
             "Encode" : "0",
             "Fcntl" : "0",
             "File::Basename" : "0",
@@ -68,7 +70,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "3.96"
+         "version" : "3.97"
       },
       "Sidef::Deparse::Perl" : {
          "file" : "lib/Sidef/Deparse/Perl.pm"
@@ -190,6 +192,9 @@
       "Sidef::Types::Number::Number" : {
          "file" : "lib/Sidef/Types/Number/Number.pm"
       },
+      "Sidef::Types::Number::Quadratic" : {
+         "file" : "lib/Sidef/Types/Number/Quadratic.pm"
+      },
       "Sidef::Types::Range::Range" : {
          "file" : "lib/Sidef/Types/Range/Range.pm"
       },
@@ -234,6 +239,6 @@
          "url" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "3.96",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "3.97",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -19,7 +19,7 @@ use Rewire::Engine;
 with 'Data::Object::Role::Buildable';
 with 'Data::Object::Role::Proxyable';
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # BUILD
 
@@ -183,6 +183,32 @@ L<Types::Standard>
 =head1 SCENARIOS
 
 This package supports the following scenarios:
+
+=cut
+
+=head2 $callback
+
+  use Rewire;
+
+  my $services = {
+    io => {
+      package => 'IO/Handle'
+    },
+    log => {
+      package => 'Mojo/Log',
+      argument => {
+        format => { '$callback' => 'io' }
+      }
+    },
+  };
+
+  my $rewire = Rewire->new(
+    services => $services
+  );
+
+This package supports resolving services as callbacks to be passed around
+and/or resolved by other services. The C<$callback> directive is used to
+specify the name of a service to be resolved and passed as an argument.
 
 =cut
 
@@ -456,6 +482,10 @@ routine. A constructor is always called with the package name as the invocant.
       extends => 'log',
       builder => [
         {
+          method => 'new',
+          return => 'self'
+        },
+        {
           method => 'path',
           argument => '/tmp/development.log',
           return => 'none'
@@ -472,6 +502,10 @@ routine. A constructor is always called with the package name as the invocant.
       extends => 'log',
       builder => [
         {
+          method => 'new',
+          return => 'self'
+        },
+        {
           method => 'path',
           argument => '/tmp/production.log',
           return => 'none'
@@ -483,6 +517,14 @@ routine. A constructor is always called with the package name as the invocant.
         }
       ]
     },
+    staging_log => {
+      package => 'Mojo/Log',
+      extends => 'development_log',
+    },
+    testing_log => {
+      package => 'Mojo/Log',
+      extends => 'log',
+    },
   };
 
   my $rewire = Rewire->new(
@@ -490,8 +532,8 @@ routine. A constructor is always called with the package name as the invocant.
   );
 
 This package supports extending services in the definition of other services,
-effectively using the extended service as the invocant in the creation of the
-requested service.
+recursively compiling service configurations and eventually executing the
+requested compiled service.
 
 =cut
 
@@ -934,20 +976,20 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 
 This is free software; you can redistribute it and/or modify it under the terms
 of the The Apache License, Version 2.0, as elucidated in the L<"license
-file"|https://github.com/iamalnewkirk/rewire/blob/master/LICENSE>.
+file"|https://github.com/cpanery/rewire/blob/master/LICENSE>.
 
 =head1 PROJECT
 
-L<Wiki|https://github.com/iamalnewkirk/rewire/wiki>
+L<Wiki|https://github.com/cpanery/rewire/wiki>
 
-L<Project|https://github.com/iamalnewkirk/rewire>
+L<Project|https://github.com/cpanery/rewire>
 
-L<Initiatives|https://github.com/iamalnewkirk/rewire/projects>
+L<Initiatives|https://github.com/cpanery/rewire/projects>
 
-L<Milestones|https://github.com/iamalnewkirk/rewire/milestones>
+L<Milestones|https://github.com/cpanery/rewire/milestones>
 
-L<Contributing|https://github.com/iamalnewkirk/rewire/blob/master/CONTRIBUTE.md>
+L<Contributing|https://github.com/cpanery/rewire/blob/master/CONTRIBUTE.md>
 
-L<Issues|https://github.com/iamalnewkirk/rewire/issues>
+L<Issues|https://github.com/cpanery/rewire/issues>
 
 =cut

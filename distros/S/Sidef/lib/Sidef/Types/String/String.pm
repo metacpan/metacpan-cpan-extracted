@@ -338,6 +338,48 @@ package Sidef::Types::String::String {
         bless \Digest::SHA::sha512_hex(${$_[0]});
     }
 
+    sub parse_quotewords {
+        my ($self, $delim, $keep) = @_;
+        state $x = require Text::ParseWords;
+        my @words = map { bless \$_ } Text::ParseWords::parse_line("$delim", ($keep ? 1 : 0), $$self);
+        Sidef::Types::Array::Array->new(\@words);
+    }
+
+    sub extract_bracketed {
+        my ($self, $brackets) = @_;
+        state $x = require Text::Balanced;
+        my @results = Text::Balanced::extract_bracketed($$self, "$brackets");
+        map { bless \$_ } @results;
+    }
+
+    sub extract_delimited {
+        my ($self, $delim) = @_;
+        state $x = require Text::Balanced;
+        my @results = Text::Balanced::extract_delimited($$self, "$delim");
+        map { bless \$_ } @results;
+    }
+
+    sub extract_codeblock {
+        my ($self, $delim) = @_;
+        state $x = require Text::Balanced;
+        my @results = Text::Balanced::extract_codeblock($$self, "$delim");
+        map { bless \$_ } @results;
+    }
+
+    sub extract_quotelike {
+        my ($self) = @_;
+        state $x = require Text::Balanced;
+        my @results = Text::Balanced::extract_quotelike($$self);
+        map { bless \$_ } @results;
+    }
+
+    sub extract_tagged {
+        my ($self) = @_;
+        state $x = require Text::Balanced;
+        my @results = Text::Balanced::extract_tagged($$self);
+        map { bless \$_ } @results;
+    }
+
     sub substr {
         my ($self, $offs, $len) = @_;
         bless \(

@@ -1598,6 +1598,12 @@
         "type": "bool",
         "data": 1
       }, {
+        "default": 0,
+        "id": "avoidAssignment",
+        "title": "avoidAssignment",
+        "type": "bool",
+        "data": 1
+      }, {
         "default": 1,
         "id": "checkXSS",
         "title": "checkXSS",
@@ -1859,7 +1865,7 @@
         "data": "logout_sso",
         "re": "^/logout"
       }, {
-        "data": "accept",
+        "data": "$uid = 1",
         "re": "default",
         "title": "default",
         "comment": "",

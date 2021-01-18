@@ -27,8 +27,8 @@ my $repo  = 'test-push';
 my $repo_dir = "$repos/$repo";
 
 my $cwd = getcwd();
-like $cwd, qr/dist-mgr$/, "in root dir ok";
-die "not in the root dir" if $cwd !~ /dist-mgr$/;
+like $cwd, _dist_dir_re(), "in root dir ok";
+die "not in the root dir" if $cwd !~ _dist_dir_re();
 
 chdir $repos or die "Can't change into 'repos' dir $repos: $!";
 is getcwd(), $repos, "in repos dir ok";
@@ -69,7 +69,7 @@ my $git_ok = _validate_git();
 }
 
 chdir $cwd or die $!;
-like getcwd(), qr/dist-mgr$/, "back in root dir ok";
+like getcwd(), _dist_dir_re(), "back in root dir ok";
 
 remove_init();
 

@@ -12,8 +12,10 @@ use Path::Class qw(file);
 use Bio::MUST::Core;
 use Bio::MUST::Drivers;
 
-my $class = 'Bio::MUST::Drivers::Cap3';
 
+say 'Note: tests designed for: cap3 VersionDate: 12/21/07  Size of long: 8';
+
+my $class = 'Bio::MUST::Drivers::Cap3';
 
 # Note: provisioning system is not enabled to help tests to pass on CPANTS
 my $app = use_module('Bio::MUST::Provision::Cap3')->new;

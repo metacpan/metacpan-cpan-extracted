@@ -31,7 +31,10 @@ Module::Build->new(
     meta_merge   => {
         resources => {
             repository =>
-              'https://bitbucket.org/rolandvanipenburg/html-hyphenate'
+              'https://bitbucket.org/rolandvanipenburg/html-hyphenate',
+            bugtracker => {
+              web => 'https://bitbucket.org/rolandvanipenburg/html-hyphenate/issues'
+            }
         }
     },
 )->create_build_script;

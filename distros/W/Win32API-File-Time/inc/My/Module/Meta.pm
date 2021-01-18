@@ -38,7 +38,7 @@ sub meta_merge {
 	},
 	resources	=> {
 	    bugtracker	=> {
-                web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Win32API-File-Time',
+                web	=> 'https://github.com/trwyant/perl-Win32API-File-Time/issues',
                 mailto  => 'wyant@cpan.org',
             },
 	    license	=> 'http://dev.perl.org/licenses/',
@@ -80,7 +80,6 @@ sub requires {
 sub requires_perl {
     return 5.006002;
 }
-
 
 1;
 
@@ -175,7 +174,6 @@ This method returns the version of Perl required by the package.
 
 This class has no public attributes.
 
-
 =head1 ENVIRONMENT
 
 =head2 MAKING_MODULE_DISTRIBUTION
@@ -184,11 +182,11 @@ This environment variable should be set to a true value if you are
 making a distribution. This ensures that no configuration-specific
 information makes it into F<META.yml>.
 
-
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org>, or in electronic mail to the author.
+L<https://github.com/trwyant/perl-Win32API-File-Time/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -196,7 +194,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2011, 2013-2014, 2016-2017, 2019 by Thomas R. Wyant, III
+Copyright (C) 2010-2011, 2013-2014, 2016-2017, 2019-2021 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

@@ -29,6 +29,7 @@ my $nb_error  = 0;
 
 unless (@ARGV) {
     print STDERR "Usage: $0 <uid>\n";
+    print STDERR "This script is deprecated, use lemonldap-ng-sessions instead\n";
     exit 1;
 }
 

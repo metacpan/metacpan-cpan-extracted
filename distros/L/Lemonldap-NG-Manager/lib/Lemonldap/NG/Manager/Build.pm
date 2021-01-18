@@ -433,7 +433,8 @@ sub buildZeroConf {
     open( F, '>', $self->firstLmConfFile ) or die($!);
     my $tmp = Lemonldap::NG::Manager::Conf::Zero::zeroConf(
         '__DNSDOMAIN__',   '__SESSIONDIR__',
-        '__PSESSIONDIR__', '__NOTIFICATIONDIR__', '__CACHEDIR__'
+        '__PSESSIONDIR__', '__NOTIFICATIONDIR__',
+        '__CACHEDIR__'
     );
     $tmp->{cfgNum} = 1;
     print F $jsonEnc->encode($tmp);
@@ -624,10 +625,10 @@ sub scanTree {
             # Get data type and build tree
             #
             # Types : PerlModule bool boolOrExpr catAndAppList file hostname int
-            # keyTextContainer lmAttrOrMacro longtext openidServerList pcre
-            # rulesContainer samlAssertion samlAttributeContainer samlService
-            # select text trool url virtualHostContainer word
-            # password
+            # keyTextContainer lmAttrOrMacro longtext openidServerList
+            # oidcAttributeContainer pcre rulesContainer samlAssertion
+            # samlAttributeContainer samlService select text trool url
+            # virtualHostContainer word password
 
             if ( $leaf =~ s/^\*// ) {
                 push @angularScopeVars, [ $leaf, "$path._nodes[$ord]" ];
@@ -659,12 +660,18 @@ sub scanTree {
                     my $type = $attr->{type};
                     $type =~ s/Container//;
                     foreach my $k ( sort keys( %{ $attr->{default} } ) ) {
+                        # Special handling for oidcAttribute
+                        my $default = $attr->{default}->{$k};
+                        if ( $attr->{type} eq 'oidcAttributeContainer' ) {
+                            $default = [ $default, "string", "auto" ];
+                        }
+
                         push @{ $jleaf->{default} },
                           {
                             id    => "$prefix$leaf/$k",
                             title => $k,
                             type  => $type,
-                            data  => $attr->{default}->{$k},
+                            data  => $default,
                             (
                                 $type eq 'rule'
                                 ? ( re => $k )

@@ -1,3 +1,5 @@
+use 5.008;
+
 package Data::Constraint;
 use strict;
 
@@ -83,7 +85,7 @@ I needed to generate different warnings for different failures.
 
 I can get a constraint object by asking for it.
 
-	my $constraint = Data::Constraints->get_by_name( $name );
+	my $constraint = Data::Constraint->get_by_name( $name );
 
 If no constraint has that name, I get back the default constraint which
 always returns true. Or should it be false?  I guess that depends on
@@ -94,7 +96,7 @@ names. The names are just simple strings, so they have no
 magic.  Maybe this should be a hash so you can immediately use
 the value of the key you want.
 
-	my @names = Data::Constraints->get_all_names;
+	my @names = Data::Constraint->get_all_names;
 
 Once I have the constraint, I give it a value to check if
 
@@ -102,30 +104,13 @@ Once I have the constraint, I give it a value to check if
 
 I can do this all in one step.
 
-	Data::Constraints->get_by_name( $name )->check( $value );
+	Data::Constraint->get_by_name( $name )->check( $value );
 
 =head2 Predefined constraints
 
-=over 4
-
-=item defined
-
-True if the value is defined.
-
-=item ordinal
-
-True if the value is an ordinal number, also known as a strictly
-positive integer, which means it only has digit characters [0-9].
-
-=item true
-
-True if the value is true.  That's a lot of work to find out just
-that since I could just use the value itself.  This trivial constraints
-sticks with the metaphor though.  It still returns only true or
-false, so the value I get back will be true if the value is true,
-but it won't be the value I started with, necessarily.
-
-=back
+I previously had some pre-loaded contraints (C<defined>, C<ordinal>,
+and C<test>) but that got in the way of things that didn't want them.
+You can still find them defined in the test files though.
 
 =head2 Adding a new constraint
 
@@ -171,7 +156,7 @@ You wish!  This module can't help you there.
 
 =cut
 
-our $VERSION = '1.171';
+our $VERSION = '1.202';
 
 use base qw(Class::Prototyped);
 
@@ -267,23 +252,6 @@ __PACKAGE__->reflect->addSlots(
 	run         => sub { 1  },
 	);
 
-__PACKAGE__->add_constraint(
-	'defined',
-	'run'         => sub { defined $_[1] },
-	'description' => 'True if the value is defined',
-	);
-
-__PACKAGE__->add_constraint(
-	'ordinal',
-	'run'         => sub { $_[1] =~ /^\d+\z/ },
-	'description' => 'True if the value is has only digits',
-	);
-
-__PACKAGE__->add_constraint(
-	'test',
-	'run' => sub { 1 },
-	);
-
 =head1 SOURCE AVAILABILITY
 
 This source is in Github:
@@ -296,7 +264,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

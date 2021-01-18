@@ -7,7 +7,7 @@ use Error::Pure qw(err);
 use Mo qw(build is);
 use Wikibase::Datatype::Utils qw(check_entity);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 extends 'Wikibase::Datatype::Value';
 
@@ -50,10 +50,10 @@ sub BUILD {
 			"(latitude and longitude).";
 	}
 	my ($lat, $lon) = @{$self->{'value'}};
-	if ($lat !~ m/^\d+\.?\d*$/ms) {
+	if ($lat !~ m/^\-?\d+\.?\d*$/ms) {
 		err "Parameter 'value' has bad first parameter (latitude).";
 	}
-	if ($lon !~ m/^\d+\.?\d*$/ms) {
+	if ($lon !~ m/^\-?\d+\.?\d*$/ms) {
 		err "Parameter 'value' has bad first parameter (longitude).";
 	}
 
@@ -284,6 +284,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -1,10 +1,10 @@
 use strict;
 use warnings FATAL => 'all';
-use Apache::Test;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Apache::Test;
 use Apache::TestRequest;
 use Apache::TestUtil qw(t_cmp);
 use lib 't';
-use MY::slurp;
+use File::Slurp qw(slurp);
 
 # Test minification with an explicitly specified minifier.
 plan tests => 2, need_lwp;

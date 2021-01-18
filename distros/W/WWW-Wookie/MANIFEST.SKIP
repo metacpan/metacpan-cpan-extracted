@@ -12,4 +12,9 @@
 ^_build/
 ^MYMETA.yml$
 ^MYMETA.json$
+^MYMETA.json.lock$
 ^perltidy.LOG$
+^.travis.yml$
+^bitbucket-pipelines.yml$
+^cover_db/
+\b.*\.(bak|zip|tmp)$

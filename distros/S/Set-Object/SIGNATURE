@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,18 +12,17 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Hash: RIPEMD160
 
-SHA256 19369c8fa9493475ff6084ecb39decaf92ad9dd17d16ceb1dbafed951a9a585f Changes.pod
+SHA256 a9a9813c900274a41321387a26f5a8aff0825047f491c9931d5ab9beef55cee5 Changes.pod
 SHA256 9659bf9325c647b998f10fc0534e1ab59655fa7315c92cee85aefcbfeeaf855b INSTALL.SKIP
 SHA256 59752181339961205d48a3609d320ef4238ebdb7086bd1293985dba4c2bf5c92 LICENSE
-SHA256 0d04e98e4895a52ab21d01df343252a7ebbf19a262a2aba1ad96b4a2a115a25b MANIFEST
-SHA256 57a6f8b1a3fdba3ddc314815774f04f1265e91501dc4b90928de932769b48e08 META.json
-SHA256 f3a477391515457cd4b9a223c4f92b14726167b718ca61758d7e9f763acebd4a META.yml
-SHA256 c73d2cc7f7ee67ce654b7deb1509c90def4622809bed09714222d7533bf56623 Makefile.PL
+SHA256 5a4611f82bafce31b73ecaa7086a31c1c8ff6c5afb0ed2499e6313aec537a4c5 MANIFEST
+SHA256 4692d20356c3cc890d083d604d4de74dadd9136104007120a42208a0f66c3a15 META.yml
+SHA256 c0b6d4286272e619c627e65268803c68001d06ece90603a832eacb3276af0ccb Makefile.PL
 SHA256 53901adffbdbfe423df155889ad74a45267d0789edd75b9f1ea428a7834438db Object.xs
 SHA256 9bc53b65ce28f72fcce7b04869313935783e02d3411a0e739106c4e32b5474cc README
-SHA256 f4ac78082e481873a9e357573b7e2264b6c793230748d634a1ea02748ed65bbc lib/Set/Object.pm
+SHA256 70d942ec6a56ad8f712f825356b0e92d5ee5d67c8491f97c68b06c6dd0a02a72 lib/Set/Object.pm
 SHA256 4dfcd71401b31614aca18e8e2ffbcebc654c143aa40b5bbdcb42091e34c6315c lib/Set/Object/Weak.pm
 SHA256 b11d60d5d91f0082736c519bf98679969308bdd02129f4051f9f3b35b70b225d ppport.h
 SHA256 4fe1c9d0343bd3a2838ab531ecbeabedde55e89a955df7de8df1500176e913b6 t/ingy/arrayref.t
@@ -82,12 +81,12 @@ SHA256 a33a026a39fb82064e84f6a4825875dedddef0fd1a1cb8aeb9e4f321e9e412e0 t/scalar
 SHA256 09efd5c9e09051dfa745bc05bf2dd5a8d674fa417eaf1a5e3976ce36558051c4 typemap
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEKJWogdNCcPq/6PdHtPYzOeZdZBQFAl4kCeQACgkQtPYzOeZd
-ZBQaowf/SgBbZGOT71jbjIJZl0Nb6EHdE6KFeAdMXoyRs+NwBMugXWj6m89ZSxsX
-q+g0GEY4z0lhkOJAtm5veKbglEJEDEAJxIvVT3ax2L7tabt4IqG+Ag7Yxh14QWeT
-49V8FbSXNuJzJkur6JFNZhCSSpKikmGO/Eaf3EasaoXqXqJpqt3jT2aifpLAXPtL
-XQhc9qgeSiA4sTNs9e3X8Zd7nSNe5L3KfdmaGE/Dfk3sFl2zgOwDbMXm+W2yPuC8
-E0qaGZfaQylOJ8ukxgESJT/4p6aeLugM46SVhcgOiIr+SCbWfeIFvvw3OQArv69t
-yf7/xTJ8JAmSy7OhOG+qdP+slxw5zA==
-=nm1S
+iQEzBAEBAwAdFiEEKJWogdNCcPq/6PdHtPYzOeZdZBQFAmAEjG4ACgkQtPYzOeZd
+ZBTOewf/UENyWZGN1rjPdy+bctwvN6g4MCRhGuY7x72n0q9/3bgG3PE4NCKVkeHH
+7v3EyygvhpXhGRQFP/xL/45htQDZPcm0uEy2InfsIZDlq/fkeIxdQ/SvjNE/5qAV
+ZT/7tMhPWbm3rjVatF2J6cgIZG0C0zIgExuzhkje1oFX9ZZmZ11dBIMeaDvFHX1G
+t4z7JebelvUAlsDku/HRXwz1/aem+8r9juCmTEDS/AkvpSUhICVsgxvXidhjeUgJ
++3INqnqa/7ng5sQVzP9COWlpyuE02l+vwPt/EylpLZN0FLeY19auPRxe+CoodPU6
+x/Vp+Opnbq1SATrQzgLDNsJ68XRDcg==
+=JSRi
 -----END PGP SIGNATURE-----

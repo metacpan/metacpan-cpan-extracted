@@ -12,7 +12,7 @@ use Config::Model 2.095; # for get_help_as_text
 use Config::Model::ObjTreeScanner ;
 use Curses::UI ;
 
-our $VERSION = '1.106';
+our $VERSION = '1.107';
 
 my @help_settings = qw/-bg green -fg black -border 1 
                        -titlereverse 0

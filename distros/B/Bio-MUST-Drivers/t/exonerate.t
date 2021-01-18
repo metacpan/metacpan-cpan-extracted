@@ -12,8 +12,10 @@ use Path::Class qw(file);
 use Bio::MUST::Core;
 use Bio::MUST::Drivers;
 
-my $class = 'Bio::MUST::Drivers::Exonerate';
 
+say 'Note: tests designed for: exonerate from exonerate version 2.2.0';
+
+my $class = 'Bio::MUST::Drivers::Exonerate';
 
 # Note: provisioning system is not enabled to help tests to pass on CPANTS
 my $app = use_module('Bio::MUST::Provision::Exonerate')->new;

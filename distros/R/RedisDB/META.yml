@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.3002'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 keywords:
   - redis
 license: perl
@@ -37,7 +37,7 @@ resources:
   homepage: https://github.com/trinitum/RedisDB
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trinitum/RedisDB
-version: '2.55'
+version: '2.56'
 x_contributors:
   - 'Pavel Shaydo <zwon@cpan.org>'
   - 'HIROSE Masaaki <hirose31@gmail.com>'

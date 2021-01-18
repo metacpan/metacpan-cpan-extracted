@@ -7,7 +7,7 @@ our $VERSION = 0.03;
 
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Test::Number::Delta within => 1e-6;
 
 use Math::Trig qw/:pi deg2rad :radial/;
@@ -207,4 +207,14 @@ subtest 'Coordinates conversions' => sub {
         delta_ok($y0, $y, 'y' );
         delta_ok($z0, $z, 'z' );
     };
+};
+
+subtest 'Quadratic interpolation' => sub {
+    plan tests => 5;
+    my ($nz, $xe, $ye, $zero1, $zero2) = quad(0.579584122357906, 0.539651962323748, 0.459447362223028);
+    delta_ok($xe, -1.49155054841862, 'xe' );
+    delta_ok($ye, 0.584449474939852, 'ye' );
+    delta_ok($zero1, 3.89591507857614, 'zero1' );
+    delta_ok($zero2, 3.89591507857614, 'zero2' );
+    delta_ok($nz, 0, 'nz');
 }

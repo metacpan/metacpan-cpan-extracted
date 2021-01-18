@@ -1,5 +1,12 @@
 Revision history for Net-Async-Redis
 
+3.008     2021-01-17 01:29:19+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - latest commands from 6.2
+    - this includes ->xautoclaim, ->client_unpause and the `count => 'any'` option
+    on various commands
+
 3.007     2020-12-31 07:23:30+08:00 Asia/Kuala_Lumpur
     New features:
 

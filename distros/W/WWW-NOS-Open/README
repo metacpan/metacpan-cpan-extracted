@@ -1,4 +1,4 @@
-WWW::NOS::Open version v1.0.3
+WWW::NOS::Open version v1.0.4
 =============================
 
 This is a framework that makes makes data from the Open NOS REST API
@@ -8,10 +8,10 @@ INSTALLATION
 
 To install this module type the following:
 
-   perl Build.PL
-   ./Build
-   ./Build test
-   ./Build install
+   - perl Build.PL
+   - ./Build
+   - ./Build test
+   - ./Build install
 
 WARNING: Running the test using your API key against the live server will
 temporarily hit your rate limit.
@@ -19,11 +19,11 @@ temporarily hit your rate limit.
 In the ./scripts directory are two scripts that can be used to test the
 implementation:
 
-    ./DummyServer.pl
-    NOSOPEN_SERVER=http://localhost:8888 NOSOPEN_API_KEY=TEST ./TestNOSOpen.pl
+    - ./DummyServer.pl
+    - NOSOPEN_SERVER=http://localhost:18081 NOSOPEN_API_KEY=TEST ./TestNOSOpen.pl
 
 An HTML page displaying the test data from the dummy server should then be
-available on localhost port 8081.
+available on localhost port 3000.
 
 * DummyServer.pl
 
@@ -37,39 +37,39 @@ quota exceeded error.
 
 Connects to the live Open NOS server, or the dummy server set in a
 NOSOPEN_SERVER environment variable, and serves an HTML page on an HTTP server
-listening on port 8081, or a port specified in the --port option. The API key
+listening on port 3000, or a port specified in the --port option. The API key
 to use can be set in the NOSOPEN_API_KEY environment variable.
 
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    Exception::Class
-    HTTP::Headers
-    HTTP::Request
-    HTTP::Request::Common
-    HTTP::Status
-    JSON
-    LWP::UserAgent
-    Log::Log4perl
-    Moose
-    Moose::Role
-    Moose::Util::TypeConstraints
-    MooseX::Types
-    MooseX::AttributeHelpers
-    Readonly
-    Regexp::Common
-    URI
-    URI::Escape
-    XML::Simple
-    namespace::autoclean
-    overload
-    Test::More
-    Test::NoWarnings
+    - Exception::Class
+    - HTTP::Headers
+    - HTTP::Request
+    - HTTP::Request::Common
+    - HTTP::Status
+    - JSON
+    - LWP::UserAgent
+    - Log::Log4perl
+    - Moose
+    - Moose::Role
+    - Moose::Util::TypeConstraints
+    - MooseX::Types
+    - MooseX::AttributeHelpers
+    - Readonly
+    - Regexp::Common
+    - URI
+    - URI::Escape
+    - XML::Simple
+    - namespace::autoclean
+    - overload
+    - Test::More
+    - Test::NoWarnings
 
 COPYRIGHT AND LICENCE
 
-Copyright 2012 Roland van Ipenburg
+Copyright 2011-2021 Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

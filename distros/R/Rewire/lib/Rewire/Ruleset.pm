@@ -1,7 +1,7 @@
 package Rewire::Ruleset;
 
 {
-  "\$id" => "https://raw.githubusercontent.com/iamalnewkirk/rewire/master/ruleset.yaml",
+  "\$id" => "https://raw.githubusercontent.com/cpanery/rewire/master/ruleset.yaml",
   "\$schema" => "https://json-schema.org/draft/2019-09/schema",
   definitions => {
     Argument => {

@@ -5,12 +5,10 @@
 # Slave common functions
 package Lemonldap::NG::Portal::Lib::Slave;
 
-use Exporter;
-use base qw(Exporter);
 use strict;
+use Mouse;
 
-our @EXPORT  = qw(checkIP checkHeader);
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.10';
 
 # RUNNING METHODS
 

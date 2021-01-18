@@ -40,13 +40,12 @@ ok( $res->[2]->[0] =~ qr%<img src="/static/common/logos/logo_llng_old.png"%,
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 ok( $res->[2]->[0] =~ /trspan="lastLogins"/, 'History found' )
-  or explain( $res->[2]->[0], 'trspan="noHistory"' );
+  or explain( $res->[2]->[0], 'trspan="lastLogins"' );
 my @c = ( $res->[2]->[0] =~ /<td>127.0.0.1/gs );
 
 # History with 1 successLogin
 ok( @c == 1, " -> One entry found" );
 count(2);
-
 ok( $res = $client->_get( '/', cookie => "lemonldap=$id1" ),
     'Verify connection' );
 count(1);
@@ -116,6 +115,13 @@ expectOK($res);
 $id1 = expectCookie($res);
 
 ok( $res->[2]->[0] =~ /trspan="lastLogins"/, 'History found' );
+ok( $res->[2]->[0] =~ /trspan="lastLoginsCaptionLabel"/,
+    'History array caption found' )
+  or explain( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ /trspan="lastFailedLoginsCaptionLabel"/,
+    'Failed history array caption found' )
+  or explain( $res->[2]->[0] );
+count(2);
 @c = ( $res->[2]->[0] =~ /<td>127.0.0.1/gs );
 my @cf   = ( $res->[2]->[0] =~ /PE5<\/td>/gs );
 my @ccv1 = ( $res->[2]->[0] =~ /<td>dwho<\/td>/gs );

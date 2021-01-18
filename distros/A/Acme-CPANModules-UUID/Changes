@@ -1,0 +1,33 @@
+0.004   2021-01-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Add participant: Crypt::Misc [GH#1].
+
+	- [doc] Add information about variant & version encoding, add
+	  feature v4_rfc4122.
+
+	- [ux] For Data::UUID & UUID::Tiny benchmark code, when producing
+	  the last UUID, convert to string for nicer output in 'bencher
+	  --show-items-results'.
+
+
+0.003   2021-01-17  Released-By: PERLANCAR; Urgency: medium
+
+	- Add modules: UUID::Random::Secure, UUID::Random::PERLANCAR.
+
+	- [ux] Add 1 more generation to benchmark code so it can return
+	  result when viewed by bencher's --show-items-results option.
+
+	- Some description fixes.
+
+
+0.002   2020-12-22  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Forgot to include POD Weaver plugin to show benchmark
+	  sample results.
+
+
+0.001   2020-12-22  Released-By: PERLANCAR
+
+        - First release.

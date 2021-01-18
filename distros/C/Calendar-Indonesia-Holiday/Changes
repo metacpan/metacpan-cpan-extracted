@@ -1,3 +1,19 @@
+0.335   2021-01-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename functions (_id_ infix to _idn_ for less ambiguity), old
+	  names are still available but deprecated and not documented.
+
+	- [doc] Note that list_idn_holidays() can also be used to check
+	  whether a certain date is a holiday, but show example in Synopsis
+	  using is_idn_holiday() instead.
+
+        [DEPRECATION]
+
+        - As mentioned above, old function names are now deprecated:
+          list_id_holidays(), count_id_workdays(), enum_id_workdays(), and
+          is_id_holiday(). Use the new names.
+
+
 0.334   2021-01-14  Released-By: PERLANCAR; Urgency: medium
 
         [Enhancements]

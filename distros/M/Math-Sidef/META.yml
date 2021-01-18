@@ -6,7 +6,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   Module::Build: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -16,8 +16,9 @@ name: Math-Sidef
 provides:
   Math::Sidef:
     file: lib/Math/Sidef.pm
-    version: '0.01'
+    version: '0.02'
 requires:
+  Exporter: '0'
   Math::AnyNum: '0.36'
   Sidef: '3.96'
   perl: v5.16.0
@@ -26,5 +27,5 @@ resources:
   homepage: https://github.com/trizen/Math-Sidef
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/Math-Sidef
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

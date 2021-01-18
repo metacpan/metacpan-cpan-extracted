@@ -4,18 +4,20 @@ use utf8;
 use 5.016;
 
 BEGIN {    # support for running sidef locally from everywhere
-    require File::Spec;
-    require File::Basename;
-    unshift @INC,
-      File::Spec->catdir(
-                         File::Basename::dirname(
-                                                   File::Spec->file_name_is_absolute(__FILE__)
-                                                 ? __FILE__
-                                                 : File::Spec->rel2abs(__FILE__)
-                                                ),
-                         File::Spec->updir,
-                         'lib'
-                        );
+    if (-w __FILE__) {
+        require File::Spec;
+        require File::Basename;
+        unshift @INC,
+          File::Spec->catdir(
+                             File::Basename::dirname(
+                                                       File::Spec->file_name_is_absolute(__FILE__)
+                                                     ? __FILE__
+                                                     : File::Spec->rel2abs(__FILE__)
+                                                    ),
+                             File::Spec->updir,
+                             'lib'
+                            );
+    }
 }
 
 binmode STDIN,  ":utf8";
@@ -180,6 +182,8 @@ else {
 
         if (defined($args{R}) and $args{R} eq 'Perl') {
 
+            require File::Basename;
+
             my $header =
                 "\nuse lib (" . q{"}
               . quotemeta(File::Basename::dirname($INC{"Sidef.pm"})) . q{"}
@@ -290,8 +294,8 @@ sub read_script {
 
 sub help_interactive {
 
-    require File::Basename;
     require File::Spec;
+    require File::Basename;
 
     require Encode;
     require Term::ReadLine;
@@ -361,7 +365,9 @@ HELP
 }
 
 sub code_interactive {
+
     require Encode;
+    require File::Spec;
     require Term::ReadLine;
 
     my $term = Term::ReadLine->new("$name $version -- interactive mode");
@@ -482,7 +488,7 @@ sub code_interactive {
             }
             elsif ($line eq 'copyright') {
                 print <<'EOT';
-Copyright © 2013-2020 Daniel Șuteu, Ioana Fălcușan
+Copyright © 2013-2021 Daniel Șuteu, Ioana Fălcușan
 All Rights Reserved.
 EOT
                 redo MAINLOOP;
@@ -550,7 +556,7 @@ EOT
                 or $@ =~ /invalid module declaration/i
                 or $@ =~ /unexpected end-of-statement/i
                 or (
-                      $@ =~ /unbalanced/ || $@ =~ /string terminator/
+                      $@    =~ /unbalanced/ || $@ =~ /string terminator/
                     ? $line =~ /\R\R\z/
                     : $line =~ /\R\z/
                    )
@@ -655,7 +661,9 @@ sub dump_ast {
 sub compile_to_perl {
     my (%opt) = @_;
 
+    require File::Spec;
     require File::Basename;
+
     my $path = File::Spec->catdir(File::Basename::dirname($INC{'Sidef.pm'}), 'Sidef');
 
     my $package_content = <<"HEAD";

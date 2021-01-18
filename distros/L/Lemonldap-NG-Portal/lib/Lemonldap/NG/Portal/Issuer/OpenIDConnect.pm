@@ -5,20 +5,20 @@ use JSON qw(from_json to_json);
 use Mouse;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_BADURL
-  PE_BADCREDENTIALS
-  PE_CONFIRM
-  PE_ERROR
-  PE_LOGOUT_OK
-  PE_REDIRECT
   PE_OK
+  PE_ERROR
+  PE_BADURL
+  PE_CONFIRM
+  PE_REDIRECT
+  PE_LOGOUT_OK
   PE_PASSWORD_OK
+  PE_BADCREDENTIALS
   PE_UNAUTHORIZEDPARTNER
   PE_OIDC_SERVICE_NOT_ALLOWED
 );
 use String::Random qw/random_string/;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::OpenIDConnect',
@@ -177,6 +177,10 @@ sub run {
                         '', 0 );
                 }
             }
+
+            my $h =
+              $self->p->processHook( $req, 'oidcGotRequest', $oidc_request );
+            return PE_ERROR if ( $h != PE_OK );
 
             # Detect requested flow
             my $response_type = $oidc_request->{'response_type'};
@@ -988,7 +992,12 @@ sub run {
             return PE_CONFIRM;
         }
     }
-    $self->logger->error("Unknown OIDC endpoint $path, skipping");
+
+    $self->logger->error(
+        $path
+        ? "Unknown OIDC endpoint: $path, skipping"
+        : 'No OIDC endpoint found, aborting'
+    );
     return PE_ERROR;
 }
 
@@ -998,10 +1007,7 @@ sub token {
     $self->logger->debug("URL detected as an OpenID Connect TOKEN URL");
 
     my $rp = $self->checkEndPointAuthenticationCredentials($req);
-
-    unless ($rp) {
-        return $self->p->sendError( $req, 'invalid_request', 400 );
-    }
+    return $self->p->sendError( $req, 'invalid_request', 400 ) unless ($rp);
 
     my $grant_type = $req->param('grant_type');
 
@@ -1032,8 +1038,8 @@ sub token {
     else {
         $self->userLogger->error(
             $grant_type
-            ? "Missing grant_type parameter"
-            : "Unknown grant type: $grant_type"
+            ? "Unknown grant type: $grant_type"
+            : "Missing grant_type parameter"
         );
         return $self->p->sendError( $req, 'unsupported_grant_type', 400 );
     }
@@ -1042,12 +1048,10 @@ sub token {
 
 sub _handlePasswordGrant {
     my ( $self, $req, $rp ) = @_;
-
     my $client_id = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID};
     my $scope     = $req->param('scope') || 'openid';
-
-    my $username = $req->param('username');
-    my $password = $req->param('password');
+    my $username  = $req->param('username');
+    my $password  = $req->param('password');
 
     unless ( $username and $password ) {
         $self->logger->error("Missing username or password");
@@ -1080,9 +1084,8 @@ sub _handlePasswordGrant {
       if $result;
 
     ## Make sure we returned successfuly from the process AND we were able to create a session
-    unless ( $result == PE_OK and $req->id and $req->user ) {
-        return $self->p->sendError( $req, 'invalid_grant', 400 );
-    }
+    return $self->p->sendError( $req, 'invalid_grant', 400 )
+      unless ( $result == PE_OK and $req->id and $req->user );
 
     ## Make sure the current user is allowed to use this RP
     if ( my $rule = $self->spRules->{$rp} ) {
@@ -1097,7 +1100,9 @@ sub _handlePasswordGrant {
 
     my $user_id = $self->getUserIDForRP( $req, $rp, $req->sessionInfo );
 
-    $self->logger->debug("Found corresponding user: $user_id");
+    $self->logger->debug( $user_id
+        ? "Found corresponding user: $user_id"
+        : 'Corresponding user not found' );
 
     # Generate access_token
     my $accessTokenSession = $self->newAccessToken(
@@ -1169,10 +1174,8 @@ sub _handlePasswordGrant {
 
 sub _handleAuthorizationCodeGrant {
     my ( $self, $req, $rp ) = @_;
-
     my $client_id = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID};
-
-    my $code = $req->param('code');
+    my $code      = $req->param('code');
 
     unless ($code) {
         $self->logger->error("No code found on token endpoint");
@@ -1180,7 +1183,6 @@ sub _handleAuthorizationCodeGrant {
     }
 
     my $codeSession = $self->getAuthorizationCode($code);
-
     unless ($codeSession) {
         $self->logger->error("Unable to find OIDC session $code");
         return $self->p->sendError( $req, 'invalid_request', 400 );
@@ -1366,7 +1368,7 @@ sub _handleAuthorizationCodeGrant {
     }
 
     # Create ID Token
-    my $id_token = $self->createIDToken( $id_token_payload_hash, $rp );
+    my $id_token = $self->createIDToken( $req, $id_token_payload_hash, $rp );
 
     unless ($id_token) {
         $self->logger->error(
@@ -1402,9 +1404,7 @@ sub _handleAuthorizationCodeGrant {
 }
 
 sub _handleRefreshTokenGrant {
-
     my ( $self, $req, $rp ) = @_;
-
     my $client_id = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID};
     my $refresh_token = $req->param('refresh_token');
 
@@ -1586,7 +1586,7 @@ sub _handleRefreshTokenGrant {
     }
 
     # Create ID Token
-    my $id_token = $self->createIDToken( $id_token_payload_hash, $rp );
+    my $id_token = $self->createIDToken( $req, $id_token_payload_hash, $rp );
 
     unless ($id_token) {
         $self->logger->error(
@@ -1660,10 +1660,8 @@ sub userInfo {
 
     my $userinfo_response =
       $self->buildUserInfoResponse( $req, $scope, $rp, $session );
-    unless ($userinfo_response) {
-        return $self->returnBearerError( 'invalid_request',
-            'Invalid request', 401 );
-    }
+    return $self->returnBearerError( 'invalid_request', 'Invalid request', 401 )
+      unless ($userinfo_response);
 
     my $userinfo_sign_alg = $self->conf->{oidcRPMetaDataOptions}->{$rp}
       ->{oidcRPMetaDataOptionsUserInfoSignAlg};
@@ -1695,18 +1693,14 @@ sub _getSessionFromAccessTokenData {
 
         # Get user identifier
         $session = $self->p->getApacheSession( $tokenData->{user_session_id} );
-
-        unless ($session) {
-            $self->logger->error("Unable to find user session");
-        }
+        $self->logger->error("Unable to find user session") unless ($session);
     }
     else {
         my $offline_session_id = $tokenData->{offline_session_id};
         if ($offline_session_id) {
             $session = $self->getRefreshToken($offline_session_id);
-            unless ($session) {
-                $self->logger->error("Unable to find refresh session");
-            }
+            $self->logger->error("Unable to find refresh session")
+              unless ($session);
         }
     }
     return $session;
@@ -1717,10 +1711,7 @@ sub introspection {
     $self->logger->debug("URL detected as an OpenID Connect INTROSPECTION URL");
 
     my $rp = $self->checkEndPointAuthenticationCredentials($req);
-
-    unless ($rp) {
-        return $self->p->sendError( $req, 'invalid_client', 401 );
-    }
+    return $self->p->sendError( $req, 'invalid_client', 401 ) unless ($rp);
 
     if ( $self->conf->{oidcRPMetaDataOptions}->{$rp}
         ->{oidcRPMetaDataOptionsPublic} )
@@ -1732,9 +1723,7 @@ sub introspection {
     }
 
     my $token = $req->param('token');
-    unless ($token) {
-        return $self->p->sendError( $req, 'invalid_request', 400 );
-    }
+    return $self->p->sendError( $req, 'invalid_request', 400 ) unless ($token);
 
     my $response    = { active => JSON::false };
     my $oidcSession = $self->getOpenIDConnectSession($token);
@@ -1806,9 +1795,8 @@ sub registration {
 
     # Get client metadata
     my $client_metadata_json = $req->content;
-    unless ($client_metadata_json) {
-        return $self->p->sendError( $req, 'Missing POST data', 400 );
-    }
+    return $self->p->sendError( $req, 'Missing POST data', 400 )
+      unless ($client_metadata_json);
 
     $self->logger->debug("Client metadata received: $client_metadata_json");
 
@@ -2314,7 +2302,7 @@ sub _generateIDToken {
     }
 
     # Create ID Token
-    return $self->createIDToken( $id_token_payload_hash, $rp );
+    return $self->createIDToken( $req, $id_token_payload_hash, $rp );
 }
 
 sub _redirectToUrl {

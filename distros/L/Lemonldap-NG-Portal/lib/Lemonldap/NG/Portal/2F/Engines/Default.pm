@@ -11,18 +11,19 @@ package Lemonldap::NG::Portal::2F::Engines::Default;
 
 use strict;
 use Mouse;
+use MIME::Base64 qw(encode_base64);
 use JSON qw(from_json to_json);
 use POSIX qw(strftime);
 use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
   PE_ERROR
   PE_NOTOKEN
-  PE_OK
   PE_SENDRESPONSE
   PE_TOKENEXPIRED
   PE_NO_SECOND_FACTORS
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
@@ -177,12 +178,10 @@ sub init {
         # Registration base
         $self->addAuthRoute( '2fregisters' => '_displayRegister', ['GET'] );
         $self->addAuthRoute( '2fregisters' => 'register',         ['POST'] );
-        if ( $self->conf->{sfRequired} ) {
-            $self->addUnauthRoute(
-                '2fregisters' => 'restoreSession',
-                [ 'GET', 'POST' ]
-            );
-        }
+        $self->addUnauthRoute(
+            '2fregisters' => 'restoreSession',
+            [ 'GET', 'POST' ]
+        ) if ( $self->conf->{sfRequired} );
     }
     return 1;
 }
@@ -194,8 +193,9 @@ sub init {
 # run() is called at each authentication, just after sessionInfo populated
 sub run {
     my ( $self, $req ) = @_;
-    my $checkLogins = $req->param('checkLogins');
-    my $spoofId     = $req->param('spoofId') || '';
+    my $checkLogins   = $req->param('checkLogins');
+    my $stayconnected = $req->param('stayconnected');
+    my $spoofId       = $req->param('spoofId') || '';
     $self->logger->debug("2F checkLogins set") if ($checkLogins);
 
     # Skip 2F unless a module has been registered
@@ -236,11 +236,11 @@ sub run {
             $self->logger->error("Bad encoding in _2fDevices: $@");
             return PE_ERROR;
         }
-
         $self->logger->debug(" -> 2F Device(s) found");
-        my $now     = time();
-        my $removed = 0;
+
         $self->logger->debug("Looking for expired 2F device(s)...");
+        my $removed = 0;
+        my $now     = time();
         foreach my $device (@$_2fDevices) {
             my $type = lc( $device->{type} );
             $type =~ s/2f$//i;
@@ -360,11 +360,15 @@ sub run {
         $req,
         '2fchoice',
         params => {
-            MAIN_LOGO => $self->conf->{portalMainLogo},
-            SKIN      => $self->p->getSkin($req),
-            LANGS     => $self->conf->{showLanguages},
-            TOKEN     => $token,
-            MODULES   => [
+            MAIN_LOGO     => $self->conf->{portalMainLogo},
+            SKIN          => $self->p->getSkin($req),
+            LANGS         => $self->conf->{showLanguages},
+            CHECKLOGINS   => $checkLogins,
+            STAYCONNECTED => $stayconnected,
+            TOKEN         => $token,
+            MSG           => $self->canUpdateSfa($req) || 'choose2f',
+            ALERT   => ( $self->canUpdateSfa($req) ? 'warning' : 'positive' ),
+            MODULES => [
                 map { {
                         CODE  => $_->prefix,
                         LOGO  => $_->logo,
@@ -372,7 +376,6 @@ sub run {
                     }
                 } @am
             ],
-            CHECKLOGINS => $checkLogins
         }
     );
     $req->response($tpl);
@@ -449,20 +452,18 @@ sub _displayRegister {
     if ($tpl) {
         my ($m) =
           grep { $_->{m}->prefix eq $tpl } @{ $self->sfRModules };
-        unless ($m) {
-            return $self->p->sendError( $req,
-                'Inexistent register module', 400 );
-        }
-        unless ( $m->{r}->( $req, $req->userData ) ) {
-            return $self->p->sendError( $req,
-                'Registration not authorized', 403 );
-        }
+        return $self->p->sendError( $req, 'Inexistent register module', 400 )
+          unless $m;
+        return $self->p->sendError( $req, 'Registration not authorized', 403 )
+          unless $m->{r}->( $req, $req->userData );
         return $self->p->sendHtml(
             $req,
             $m->{m}->template,
             params => {
                 MAIN_LOGO => $self->conf->{portalMainLogo},
                 LANGS     => $self->conf->{showLanguages},
+                MSG       => $self->canUpdateSfa($req) || $m->{m}->welcome,
+                ALERT => ( $self->canUpdateSfa($req) ? 'warning' : 'positive' ),
             }
         );
     }
@@ -481,32 +482,36 @@ sub _displayRegister {
               };
         }
     }
-    if (
+
+    return [ 302, [ Location => $self->conf->{portal} . $am[0]->{URL} ], [] ]
+      if (
         @am == 1
         and not( $req->userData->{_2fDevices}
             or $req->data->{sfRegRequired} )
-      )
-    {
-        return [ 302, [ Location => $self->conf->{portal} . $am[0]->{URL} ],
-            [] ];
-    }
+      );
 
     # Retrieve user all second factors
-    my $_2fDevices =
-      $req->userData->{_2fDevices}
-      ? eval {
-        from_json( $req->userData->{_2fDevices}, { allow_nonref => 1 } ); }
-      : undef;
-    unless ($_2fDevices) {
-        $self->logger->debug("No 2F Device found");
-        $_2fDevices = [];
+    my $_2fDevices = [];
+    unless ( $self->canUpdateSfa($req) ) {
+        $_2fDevices = $req->userData->{_2fDevices}
+          ? eval {
+            from_json( $req->userData->{_2fDevices}, { allow_nonref => 1 } );
+          }
+          : undef;
+        unless ($_2fDevices) {
+            $self->logger->debug("No 2F Device found");
+            $_2fDevices = [];
+        }
+    }
+    else {
+        $self->userLogger->warn("Do not diplay 2F Devices!");
     }
 
-    # Parse second factors to display delete button if allowed
-    my $action = '';
+   # Parse second factors to display delete button if allowed and upgrade button
+    my $displayUpgBtn = 0;
+    my $action        = '';
     foreach
       my $type ( split /,\s*/, $self->conf->{available2FSelfRegistration} )
-
     {
         foreach (@$_2fDevices) {
             $_->{type} =~ s/^UBK$/Yubikey/;
@@ -514,15 +519,22 @@ sub _displayRegister {
                 my $t = lc($type);
                 $t =~ s/2f$//i;
 
+                # Display delete button
                 $_->{delAllowed} =
                      $self->conf->{ $t . '2fActivation' }
                   && $self->conf->{ $t . '2fUserCanRemoveKey' }
                   && $self->conf->{ $t . '2fSelfRegistration' };
+
+                # Display upgrade button
+                $displayUpgBtn ||= $self->conf->{ $t . '2fAuthnLevel' }
+                  && $self->conf->{ $t . '2fAuthnLevel' } >
+                  $req->userData->{authenticationLevel};
             }
             $action ||= $_->{delAllowed};
             $_->{type} =~ s/^Yubikey$/UBK/;
         }
     }
+    $displayUpgBtn = 0 unless $self->conf->{upgradeSession};
 
     # Display template
     return $self->p->sendHtml(
@@ -536,6 +548,11 @@ sub _displayRegister {
             SFDEVICES    => $_2fDevices,
             ACTION       => $action,
             REG_REQUIRED => $req->data->{sfRegRequired},
+            DISPLAY_UPG  => $displayUpgBtn,
+            MSG          => $self->canUpdateSfa($req) || 'choose2f',
+            ALERT => ( $self->canUpdateSfa($req) ? 'warning' : 'positive' ),
+            SFREGISTERS_URL =>
+              encode_base64( "$self->{conf}->{portal}2fregisters", '' )
         }
     );
 }

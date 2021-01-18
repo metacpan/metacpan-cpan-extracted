@@ -16,13 +16,13 @@ build_requires:
   Test::More: '0'
   Test::Pod: '1.00'
   Test::Warn: '0.11'
-  YAML::Tiny: '0'
+  XXX: '0'
   boolean: '0'
   lib: '0'
 configure_requires:
   Module::Build: '0.34'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -64,6 +64,7 @@ requires:
   Storable: '0'
   Text::Levenshtein::Damerau: '0'
   Text::Wrap: '0'
+  YAML::Tiny: '0'
   base: '0'
   open: '0'
   overload: '0'
@@ -77,7 +78,7 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.140'
-x_generated_by_perl: v5.30.3
+version: '2.141'
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: LGPL-2.1

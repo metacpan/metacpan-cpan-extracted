@@ -45,7 +45,7 @@
          },
          "requires" : {
             "LWP::UserAgent" : "0",
-            "Lemonldap::NG::Common" : "v2.0.9",
+            "Lemonldap::NG::Common" : "v2.0.10",
             "Mouse" : "0",
             "URI" : "0"
          }
@@ -54,12 +54,15 @@
    "release_status" : "stable",
    "resources" : {
       "X_twitter" : "https://twitter.com/lemonldapng",
+      "bugtracker" : {
+         "web" : "https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues"
+      },
       "homepage" : "http://lemonldap-ng.org/",
       "license" : [
          "http://opensource.org/licenses/GPL-2.0"
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.0.9",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v2.0.10",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

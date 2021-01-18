@@ -125,8 +125,8 @@ sub _redirect {
                 ? sub {
 
                     # Restore urldc if auth doesn't need to dial with browser
-                    $self->restoreRequest( $req, $ir );
-                    $self->cleanPdata($req);
+                    $self->restoreRequest( $_[0], $ir );
+                    $self->cleanPdata( $_[0] );
                     return $self->run( @_, @path );
                 }
                 : ()

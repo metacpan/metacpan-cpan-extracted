@@ -2,7 +2,7 @@ package Catmandu::Exporter::TSV;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2013';
+our $VERSION = '1.2014';
 
 use Catmandu::Exporter::CSV;
 use Moo;
@@ -51,10 +51,12 @@ Catmandu::Exporter::TSV - a tab-delimited TSV exporter
     my $exporter = Catmandu->exporter(
                 'TSV',
                 fix => 'myfix.txt',
+                fields => "f1,f2,f3",
                 header => 1);
 
-    $exporter->fields("f1,f2,f3");
-    $exporter->fields([qw(f1 f2 f3)]);
+    my $exporter = Catmandu->exporter(
+                'TSV',
+                fields => [qw(f1 f2 f3)]);
 
     $exporter->add_many($arrayref);
     $exporter->add_many($iterator);

@@ -1,5 +1,11 @@
 Revision history for Perl extension TeX::Hyphen::Pattern
 
+v1.1.7 Sun Jan 17 20:46:41 UTC 2021
+    - fix: correct versions of non-CTAN patterns
+
+v1.1.6 Sun Jan 17 17:52:31 UTC 2021
+    - docs: migrate bugtracker from RT to Bitbucket
+
 v1.1.5 Tue Nov 24 21:45:48 UTC 2020
     - feat: improve catalog build script
 

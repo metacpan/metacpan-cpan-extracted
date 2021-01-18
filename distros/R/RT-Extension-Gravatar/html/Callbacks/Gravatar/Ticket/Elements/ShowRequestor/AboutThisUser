@@ -1,4 +1,4 @@
-<div class="gravatar" style="margin-top: 0.5em; float: right;">
+<div class="gravatar" style="margin-top: 0.3em; float: right;">
 <& /Elements/Gravatar, UserObj => $requestor &>
 </div>
 <%INIT>

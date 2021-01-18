@@ -58,6 +58,9 @@
       "^/logout": "logout_sso",
       "default": "accept"
     },
+    "test4.example.com": {
+      "default": "accept"
+    },
     "*.example.org": {
       "^/orgdeny": "deny",
       "default": "accept"
@@ -73,15 +76,20 @@
     }
   },
   "macros": {
-    "_whatToTrace": "$_auth eq 'SAML' ? \"$_user\\@$_idpConfKey\" : \"$_user\""
+    "_whatToTrace": "$_auth eq 'SAML' ? \"$_user\\@$_idpConfKey\" : \"$_user\"",
+    "UA": "$ENV{HTTP_USER_AGENT}"
   },
   "portal": "http://auth.example.com/",
   "reloadUrls": {},
   "userDB": "Demo",
   "vhostOptions": {
     "test2.example.com": {
-        "vhostAuthnLevel": 5
-      }
+      "vhostAuthnLevel": 5
+    },
+    "test4.example.com": {
+      "vhostAccessToTrace": "My::accessToTrace, Doctor, Who, UA"
+    }
   },
-  "whatToTrace": "_whatToTrace"
+  "whatToTrace": "_whatToTrace",
+  "customToTrace": "mail"
 }

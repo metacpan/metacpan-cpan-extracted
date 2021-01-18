@@ -32,7 +32,7 @@ my $nb_error  = 0;
 #=============================================================================
 my $lmconf = Lemonldap::NG::Common::Conf->new()
   or die $Lemonldap::NG::Common::Conf::msg;
-my $conf = $lmconf->getConf or die "Unable to get configuration ($!)";
+my $conf      = $lmconf->getConf or die "Unable to get configuration ($!)";
 my $localconf = $lmconf->getLocalConf(PORTALSECTION)
   or die "Unable to get local configuration ($!)";
 
@@ -236,7 +236,7 @@ for my $options (@backends) {
     # Remove lock files for File backend
     if ( $options->{backend} =~ /^Apache::Session::(?:Browseable::)?File$/i ) {
         require Apache::Session::Lock::File;
-        my $l = new Apache::Session::Lock::File;
+        my $l              = new Apache::Session::Lock::File;
         my $lock_directory = $options->{LockDirectory} || $options->{Directory};
         $l->clean( $lock_directory, $conf->{timeout} );
     }
@@ -250,6 +250,51 @@ for my $options (@backends) {
             eval { unlink $options->{Directory} . "/$id"; };
             if ($@) {
                 print STDERR "Unable to remove session $id\n";
+            }
+            else {
+                print STDERR "Session $id removed with force\n";
+                $nb_error--;
+            }
+        }
+    }
+
+    # Force deletion of corrupted sessions for DBI backend
+    if ( $options->{backend} =~
+/^Apache::Session::(?:Browseable::)?(MySQL|Postgres|DBI|Oracle|Informix|MySQLJSON|PgHstore|PgJSON|SQLLite|Sybase)$/i
+        and $force )
+    {
+        my $dbi = DBI->connect_cached( $options->{DataSource},
+            $options->{UserName}, $options->{Password} );
+        my $table = $options->{TableName} || "sessions";
+        my $req   = $dbi->prepare("DELETE from $table WHERE id=?");
+        foreach (@errors) {
+            my $id  = $_;
+            my $res = $req->execute($id);
+            unless ( $res == 1 ) {
+                print STDERR "Fail to delete session $id with force\n";
+            }
+            else {
+                print STDERR "Session $id removed with force\n";
+                $nb_error--;
+            }
+        }
+    }
+
+    # Force deletion of corrupted sessions for LDAP backend
+    if (    $options->{backend} =~ /^Apache::Session::(?:Browseable::)?LDAP$/i
+        and $force )
+    {
+        my $ldap = Net::LDAP->new( $options->{ldapServer} );
+        my $bind = $ldap->bind( $options->{ldapBindDN},
+            password => $options->{ldapBindPassword} );
+        my $attrId = $options->{ldapAttributeId} | "cn";
+        foreach (@errors) {
+            my $id = $_;
+            my $sessionDn =
+              $attrId . "=" . $id . "," . $options->{ldapConfBase};
+            my $delete = $ldap->delete($sessionDn);
+            if ( $delete->is_error ) {
+                print STDERR "Fail to delete session $id with force\n";
             }
             else {
                 print STDERR "Session $id removed with force\n";

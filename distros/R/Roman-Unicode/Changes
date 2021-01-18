@@ -1,4 +1,13 @@
 
+1.033 2021-01-18T13:44:46Z
+	* Fix a bug with testing Unicode::Casing feature.
+
+1.032_02 2021-01-15T17:46:23Z
+	* Try harder to get the Unicode::Casing tests to work.
+
+1.032_01 2021-01-15T16:52:36Z
+	* Play with CPAN Testers
+
 1.032 2021-01-14T10:34:43Z
 	* freshen distro, remove Travis CI, add GitHub Actions
 

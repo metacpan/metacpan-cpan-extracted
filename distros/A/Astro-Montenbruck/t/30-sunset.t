@@ -17,7 +17,7 @@ use Astro::Montenbruck::RiseSet;
 
 BEGIN {
     use_ok( 'Astro::Montenbruck::RiseSet::Constants', qw/:events :states :altitudes/ );
-    use_ok( 'Astro::Montenbruck::RiseSet::Sunset', qw/riseset/ );
+    use_ok( 'Astro::Montenbruck::RiseSet::Sunset', qw/riseset_func/ );
 }
 
 subtest 'Sun & Moon, normal conditions' => sub {
@@ -141,19 +141,21 @@ subtest 'Sun & Moon, normal conditions' => sub {
     );
 
     for my $case (@cases) {
+        my $func = riseset_func(
+            date   => $case->{date},
+            phi    => $lat,
+            lambda => $lng
+        );
+
         for my $pla ( $MO, $SU ) {
-            riseset(
-                date   => $case->{date},
-                phi    => $lat,
-                lambda => $lng,
+            $func->(
                 get_position => sub { Astro::Montenbruck::RiseSet::_get_equatorial( $pla, $_[0] ) },
                 sin_h0       => sin( deg2rad($h0{$pla}) ),
                 on_event => sub {
-                    my ($evt, $ut) = @_;
+                    my ($evt, $jd) = @_;
+                    my $ut = frac($jd - 0.5) * 24;
                     my @hm  = @{ $case->{$pla}->{$evt} };
-                    delta_ok( $ut, ddd(@hm),
-                        sprintf( '%s %s: %02d:%02d', $pla, $evt, @hm )
-                    );
+                    delta_ok( $ut, ddd(@hm), sprintf( '%s %s: %02d:%02d', $pla, $evt, @hm ) );
                 },
                 on_noevent => sub { fail("$pla: event expected") }
             );

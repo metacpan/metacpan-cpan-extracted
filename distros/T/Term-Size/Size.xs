@@ -6,7 +6,7 @@ extern "C" {
 #include "perl.h"
 #include "XSUB.h"
 
-#ifndef _AIX
+#if !defined(_AIX) && !defined(__DragonFly__)
 #include <sys/termios.h>
 #else
 #include <termios.h>

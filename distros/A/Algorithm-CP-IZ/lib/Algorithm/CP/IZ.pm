@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Carp;
-use Scalar::Util qw(weaken blessed);
+use Scalar::Util qw(weaken blessed looks_like_number);
 
 require Exporter;
 use AutoLoader;
@@ -44,7 +44,7 @@ our %EXPORT_TAGS = ( 'value_selector' => [ qw(
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'value_selector'} } );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -1302,6 +1302,72 @@ sub Disjunctive {
     return $ret;
 }
 
+sub Regular {
+    my $self = shift;
+    my ($x, $d, $q0, $F) = @_;
+    
+    validate([scalar(@_), $x,
+	      $d,
+	      $q0, $F
+	     ],
+	     [sub { shift == 4 }, "vA0",
+	      sub {
+		  # array of array of integer
+		  return 0 unless (ref $d eq "ARRAY");
+		  for my $row (@$d) {
+		      return 0 unless (ref $row eq "ARRAY");
+		      for my $i (@$row) {
+			  return 0 unless (looks_like_number($i));
+		      }
+		  }
+		  return 1;
+	      },
+	      "I","iA0"
+	     ],
+	     "Usage: Regular([vars], [table(QxS)], q0, [F])");
+
+    # $q0 must be in valid states
+    return unless (0 <= $q0 && $q0 < scalar(@$d));
+
+    # need acceptable states
+    return unless (grep { 0 <= $_ && $_ < scalar(@$d) } @$F);
+
+    my @xv = map { ref $_ ? $_ : $self->_const_var(int($_)) } @$x;
+
+    my $px = $self->_create_registered_var_array(\@xv);
+    my $pfarray = $self->_create_registered_int_array($F);
+
+    # get S for Regular (input alphabet size)
+    # Q is size saclar(@$d)
+    my $max_s = 0;
+    for my $row (@$d) {
+	my $s = scalar(@$row);
+	$max_s = $s if ($max_s < $s)
+    }
+
+    # no acceptable alphabet
+    if ($max_s == 0) {
+	# accept empty set only
+	return scalar(@$x) == 0;
+    }
+
+    # create d as 1d array
+    my @darray = (-1) x (scalar(@$d) * $max_s);
+    for (my $qi = 0; $qi < scalar(@$d); $qi++) {
+	my $row = $d->[$qi];
+	my $idx0 = $max_s * $qi;
+	my $idx1 = $idx0 + scalar(@$row)-1;
+	@darray[$idx0..$idx1] = @$row;
+    }
+    
+    my $pdarray = $self->_create_registered_int_array(\@darray);
+    
+    my $ret = Algorithm::CP::IZ::cs_Regular($$px, scalar(@$x), $$pdarray,
+					    scalar(@$d), $max_s, $q0,
+					    $$pfarray, scalar(@$F));
+    return $ret;
+}
+
 #
 # Create Reif* Methods
 #
@@ -1965,6 +2031,17 @@ Algorithm::CP::IZ::Int and LIMIT_VAR is an instance of Algorithm::CP::IZ::Int.
 Constraint variables as "Disjunctive".
 
 START_VARS and DURATION_VARS are an arrayref contains instances of Algorithm::CP::IZ::Int.
+
+=item Regular(VARIABLES, TRANSITION_TABLE, Q0, F_VALUES)
+
+Constraint VARIABLES to be input sequence accepted by DFA defined by TRANSITION_TABLE, Q0 and F_VALUES.
+
+TRANSITION_TABLE is an arrayref of arrayref, and each value TRANSITION_TABLE->[q]->[s] defines
+next state (index of TRANSITION_TABLE) at input s (index of TRANSITION_TABLE->[q]).
+
+Q0 is initial state of DFA.
+
+F_VALUES is an arrayref of acceptable states of DFA.
 
 =item ReifEq(VAR1, VAR2)
 

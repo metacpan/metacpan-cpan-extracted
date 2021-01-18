@@ -21,7 +21,10 @@ name: HTML-Hyphenate
 provides:
   HTML::Hyphenate:
     file: lib/HTML/Hyphenate.pm
-    version: v1.1.7
+    version: v1.1.8
+  HTML::Hyphenate::DOM:
+    file: lib/HTML/Hyphenate/DOM.pm
+    version: v1.1.8
 requires:
   Getopt::Long: '0'
   Mojolicious: '6'
@@ -35,5 +38,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://bitbucket.org/rolandvanipenburg/html-hyphenate
-version: v1.1.7
+version: v1.1.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

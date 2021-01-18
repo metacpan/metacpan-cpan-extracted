@@ -3,6 +3,7 @@ bin/hyphenate_html
 Build.PL
 Changes
 lib/HTML/Hyphenate.pm
+lib/HTML/Hyphenate/DOM.pm
 LICENSE
 LICENSES/artistic.txt
 LICENSES/gpl-1.0.txt

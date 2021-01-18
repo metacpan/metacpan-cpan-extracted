@@ -1,5 +1,8 @@
 Revision history for Perl extension Algorithm::CP::IZ.
 
+0.06  Fri Jan 15 2021
+        - Add support for cs_Reguar (iZ-C 3.7)
+
 0.05  Fri Jul 12 2019
         - Support iZ-C 3.6 APIs
 

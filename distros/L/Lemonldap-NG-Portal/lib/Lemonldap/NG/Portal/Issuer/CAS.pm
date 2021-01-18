@@ -59,10 +59,9 @@ sub init {
     );
 
     # Add CAS Services, so we can check service= parameter on logout
-    foreach my $casSrv ( keys %{ $self->conf->{casAppMetaDataOptions} } ) {
+    foreach my $casSrv ( keys %{ $self->casAppList } ) {
         if ( my $serviceUrl =
-            $self->conf->{casAppMetaDataOptions}->{$casSrv}
-            ->{casAppMetaDataOptionsService} )
+            $self->casAppList->{$casSrv}->{casAppMetaDataOptionsService} )
         {
             push @{ $self->p->{additionalTrustedDomains} }, $serviceUrl;
             $self->logger->debug(
@@ -96,14 +95,14 @@ sub storeEnvAndCheckGateway {
 
     if ( $service and $service =~ m#^(https?://[^/]+)(/.*)?$# ) {
         my ( $host, $uri ) = ( $1, $2 );
-        my $app = $self->casAppList->{$host};
+        my $app = $self->getCasApp($service);
 
         if ($app) {
             $req->env->{llng_cas_app} = $app;
 
             # Store target authentication level in pdata
-            my $targetAuthnLevel = $self->conf->{casAppMetaDataOptions}->{$app}
-              ->{casAppMetaDataOptionsAuthnLevel};
+            my $targetAuthnLevel =
+              $self->casAppList->{$app}->{casAppMetaDataOptionsAuthnLevel};
             $req->pdata->{targetAuthnLevel} = $targetAuthnLevel
               if $targetAuthnLevel;
 
@@ -168,11 +167,13 @@ sub run {
             return PE_ERROR;
         }
         my ( $host, $uri ) = ( $1, $2 );
-        my $app = $self->casAppList->{$host};
+        my $app = $self->getCasApp($service);
 
-        my $spAuthnLevel =
-          $self->conf->{casAppMetaDataOptions}->{$app}
-          ->{casAppMetaDataOptionsAuthnLevel} || 0;
+        my $spAuthnLevel = 0;
+        if ($app) {
+            $spAuthnLevel =
+              $self->casAppList->{$app}->{casAppMetaDataOptionsAuthnLevel} || 0;
+        }
 
         # Renew
         if (    $renew
@@ -849,10 +850,8 @@ sub getUsernameForApp {
 
     my $username_attribute =
       (       $app
-          and $self->conf->{casAppMetaDataOptions}->{$app}
-          ->{casAppMetaDataOptionsUserAttribute} )
-      ? $self->conf->{casAppMetaDataOptions}->{$app}
-      ->{casAppMetaDataOptionsUserAttribute}
+          and $self->casAppList->{$app}->{casAppMetaDataOptionsUserAttribute} )
+      ? $self->casAppList->{$app}->{casAppMetaDataOptionsUserAttribute}
       : (    $self->conf->{casAttr}
           || $self->conf->{whatToTrace} );
 

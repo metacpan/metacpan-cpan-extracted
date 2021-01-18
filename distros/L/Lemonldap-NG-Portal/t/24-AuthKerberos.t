@@ -6,7 +6,7 @@ BEGIN {
     eval "use GSSAPI";
 }
 
-my $maintests = 12;
+my $maintests = 14;
 my $debug     = 'error';
 
 SKIP: {
@@ -103,7 +103,58 @@ SKIP: {
         " Make sure no pdata is returned"
     );
 
-    #print STDERR Dumper($res);
+    # Test krbAllowedDomains
+    &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
+    $client = LLNG::Manager::Test->new( {
+            ini => {
+                logLevel          => $debug,
+                useSafeJail       => 1,
+                authentication    => 'Kerberos',
+                userDB            => 'Null',
+                krbKeytab         => '/etc/keytab',
+                krbByJs           => 1,
+                krbAuthnLevel     => 4,
+                krbAllowedDomains => 'toto.com titi.com',
+            }
+        }
+    );
+    ok(
+        $res = $client->_get(
+            '/',
+            query  => 'kerberos=1',
+            accept => 'application/json',
+            custom => { HTTP_AUTHORIZATION => 'Negotiate c29tZXRoaW5n' },
+            cookie => "lemonldappdata=$pdata"
+        ),
+        'Push fake kerberos in blacklisted domain'
+    );
+
+    expectReject( $res, 401, 5, "Rejected because the domain is wrong" );
+    &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
+    $client = LLNG::Manager::Test->new( {
+            ini => {
+                logLevel          => $debug,
+                useSafeJail       => 1,
+                authentication    => 'Kerberos',
+                userDB            => 'Null',
+                krbKeytab         => '/etc/keytab',
+                krbByJs           => 1,
+                krbAuthnLevel     => 4,
+                krbAllowedDomains => 'toto.com example.com',
+            }
+        }
+    );
+    ok(
+        $res = $client->_get(
+            '/',
+            query  => 'kerberos=1',
+            accept => 'application/json',
+            custom => { HTTP_AUTHORIZATION => 'Negotiate c29tZXRoaW5n' },
+            cookie => "lemonldappdata=$pdata"
+        ),
+        'Push fake kerberos in an allowed domain'
+    );
+    $id = expectCookie($res);
 }
 
 count($maintests);
@@ -123,6 +174,6 @@ package LLNG::GSSR;
 
 sub display {
     my $a = \@_;
-    $a->[1] = 'dwho';
+    $a->[1] = 'dwho@EXAMPLE.COM';
     return 1;
 }

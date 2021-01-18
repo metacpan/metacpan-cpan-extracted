@@ -1,4 +1,3 @@
-.bowerrc
 bower.json
 Changes
 eg/manager.cgi
@@ -10,7 +9,10 @@ lib/Lemonldap/NG/Manager/2ndFA.pm
 lib/Lemonldap/NG/Manager/Api.pm
 lib/Lemonldap/NG/Manager/Api/2F.pm
 lib/Lemonldap/NG/Manager/Api/Common.pm
+lib/Lemonldap/NG/Manager/Api/Menu/App.pm
+lib/Lemonldap/NG/Manager/Api/Menu/Cat.pm
 lib/Lemonldap/NG/Manager/Api/Misc.pm
+lib/Lemonldap/NG/Manager/Api/Providers/CasApp.pm
 lib/Lemonldap/NG/Manager/Api/Providers/OidcRp.pm
 lib/Lemonldap/NG/Manager/Api/Providers/SamlSp.pm
 lib/Lemonldap/NG/Manager/Attributes.pm
@@ -32,6 +34,7 @@ lib/Lemonldap/NG/Manager/Sessions.pm
 lib/Lemonldap/NG/Manager/Viewer.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.json
 META.yml
 README
@@ -90,11 +93,6 @@ site/htdocs/static/bwr/es5-shim/es5-shim.min.js
 site/htdocs/static/bwr/file-saver.js/FileSaver.js
 site/htdocs/static/bwr/file-saver.js/FileSaver.min.js
 site/htdocs/static/bwr/file-saver.js/FileSaver.min.js.map
-site/htdocs/static/bwr/jquery-ui/jquery-ui.js
-site/htdocs/static/bwr/jquery-ui/jquery-ui.min.js
-site/htdocs/static/bwr/jquery/dist/jquery.js
-site/htdocs/static/bwr/jquery/dist/jquery.min.js
-site/htdocs/static/bwr/jquery/dist/jquery.min.map
 site/htdocs/static/css/manager.css
 site/htdocs/static/css/manager.min.css
 site/htdocs/static/forms/authChoice.html
@@ -125,6 +123,8 @@ site/htdocs/static/forms/longtext.html
 site/htdocs/static/forms/menuApp.html
 site/htdocs/static/forms/menuCat.html
 site/htdocs/static/forms/mini.html
+site/htdocs/static/forms/oidcAttribute.html
+site/htdocs/static/forms/oidcAttributeContainer.html
 site/htdocs/static/forms/oidcOPMetaDataNode.html
 site/htdocs/static/forms/oidcOPMetaDataNodeContainer.html
 site/htdocs/static/forms/oidcRPMetaDataNode.html
@@ -136,7 +136,7 @@ site/htdocs/static/forms/post.html
 site/htdocs/static/forms/postContainer.html
 site/htdocs/static/forms/README.md
 site/htdocs/static/forms/restore.html
-site/htdocs/static/forms/RSAKey.html
+site/htdocs/static/forms/RSACertKey.html
 site/htdocs/static/forms/RSAKeyNoPassword.html
 site/htdocs/static/forms/rule.html
 site/htdocs/static/forms/ruleContainer.html
@@ -152,6 +152,7 @@ site/htdocs/static/forms/select.html
 site/htdocs/static/forms/sfExtra.html
 site/htdocs/static/forms/sfExtraContainer.html
 site/htdocs/static/forms/simpleInputContainer.html
+site/htdocs/static/forms/SMTP.html
 site/htdocs/static/forms/text.html
 site/htdocs/static/forms/trool.html
 site/htdocs/static/forms/virtualHost.html
@@ -190,17 +191,20 @@ site/htdocs/static/js/viewer.min.js.map
 site/htdocs/static/languages/ar.json
 site/htdocs/static/languages/de.json
 site/htdocs/static/languages/en.json
+site/htdocs/static/languages/es.json
 site/htdocs/static/languages/fr.json
 site/htdocs/static/languages/it.json
 site/htdocs/static/languages/pl.json
 site/htdocs/static/languages/tr.json
 site/htdocs/static/languages/vi.json
 site/htdocs/static/languages/zh.json
+site/htdocs/static/languages/zh_TW.json
 site/htdocs/static/logos/ar.png
 site/htdocs/static/logos/bootstrap.png
 site/htdocs/static/logos/custom.png
 site/htdocs/static/logos/de.png
 site/htdocs/static/logos/en.png
+site/htdocs/static/logos/es.png
 site/htdocs/static/logos/favicon.ico
 site/htdocs/static/logos/fr.png
 site/htdocs/static/logos/it.png
@@ -210,6 +214,7 @@ site/htdocs/static/logos/pl.png
 site/htdocs/static/logos/tr.png
 site/htdocs/static/logos/vi.png
 site/htdocs/static/logos/zh.png
+site/htdocs/static/logos/zh_TW.png
 site/htdocs/static/reverseTree.json
 site/htdocs/static/struct.json
 site/templates/2ndfa.tpl
@@ -228,6 +233,8 @@ site/templates/viewer.tpl
 t/02-HTML-template.t
 t/03-HTML-forms.t
 t/04-2F-api.t
+t/04-menu-api.t
+t/04-misc-api.t
 t/04-providers-api.t
 t/05-rest-api.t
 t/06-rest-api-RSA.t

@@ -14,12 +14,11 @@ build_requires:
   Test::NoTabs: '0'
   Test::Pod: '1.14'
   Test::Pod::Coverage: '1.04'
-  XML::LibXML: '0'
   XML::LibXML::XPathContext: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,49 +27,49 @@ name: Net-Saml2
 provides:
   Net::SAML2:
     file: lib/Net/SAML2.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::Binding::POST:
     file: lib/Net/SAML2/Binding/POST.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::Binding::Redirect:
     file: lib/Net/SAML2/Binding/Redirect.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::Binding::SOAP:
     file: lib/Net/SAML2/Binding/SOAP.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::IdP:
     file: lib/Net/SAML2/IdP.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::Protocol::ArtifactResolve:
     file: lib/Net/SAML2/Protocol/ArtifactResolve.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::Protocol::Assertion:
     file: lib/Net/SAML2/Protocol/Assertion.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::Protocol::AuthnRequest:
     file: lib/Net/SAML2/Protocol/AuthnRequest.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::Protocol::LogoutRequest:
     file: lib/Net/SAML2/Protocol/LogoutRequest.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::Protocol::LogoutResponse:
     file: lib/Net/SAML2/Protocol/LogoutResponse.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::Role::ProtocolMessage:
     file: lib/Net/SAML2/Role/ProtocolMessage.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::SP:
     file: lib/Net/SAML2/SP.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::Util:
     file: lib/Net/SAML2/Util.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::XML::Sig:
     file: lib/Net/SAML2/XML/Sig.pm
-    version: '0.29'
+    version: '0.32'
   Net::SAML2::XML::Util:
     file: lib/Net/SAML2/XML/Util.pm
-    version: '0.29'
+    version: '0.32'
 requires:
   Carp: '0'
   Class::Accessor: '0'
@@ -78,7 +77,7 @@ requires:
   Crypt::OpenSSL::DSA: '0'
   Crypt::OpenSSL::RSA: '0'
   Crypt::OpenSSL::Random: '0'
-  Crypt::OpenSSL::VerifyX509: '0'
+  Crypt::OpenSSL::Verify: '0'
   Crypt::OpenSSL::X509: '0'
   DateTime: '0'
   DateTime::Format::XSD: '0'
@@ -98,10 +97,10 @@ requires:
   MooseX::Types::URI: '0'
   URI: '0'
   URI::QueryParam: '0'
-  XML::CanonicalizeXML: '0'
   XML::Generator: '0'
+  XML::LibXML: '0'
   XML::Tidy: '0'
-  XML::Writer: '0'
+  XML::Writer: '0.625'
   XML::XPath: '0'
   base: '0'
   constant: '0'
@@ -113,7 +112,7 @@ requires:
 resources:
   bugtracker: https://github.com/perl-net-saml2/perl-Net-SAML2/issues
   repository: git://github.com/perl-net-saml2/perl-Net-SAML2.git
-version: '0.29'
+version: '0.32'
 x_contributors:
   - 'Chris Andrews <chris@nodnol.org>'
   - 'Oskari Okko Ojala <okko@frantic.com>'
@@ -128,3 +127,4 @@ x_generated_by_perl: v5.30.0
 x_maintainers:
   - 'Timothy Legge <timlegge@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

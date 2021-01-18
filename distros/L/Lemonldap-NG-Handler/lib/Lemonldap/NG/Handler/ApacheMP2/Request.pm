@@ -25,7 +25,7 @@ sub new {
         QUERY_STRING      => $args,
         REQUEST_URI       => $uri_full,
         PATH_INFO         => '',
-        SERVER_PORT       => $r->get_server_port,
+        SERVER_PORT       => $ENV{SERVER_PORT} || $r->get_server_port,
         REQUEST_METHOD    => $r->method,
         'psgi.version'    => [ 1, 1 ],
         'psgi.url_scheme' => ( $ENV{HTTPS} || 'off' ) =~ /^(?:on|1)$/i

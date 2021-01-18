@@ -3,6 +3,7 @@ package Lemonldap::NG::Common::Cli;
 use strict;
 use Mouse;
 use Lemonldap::NG::Common::Conf;
+use Lemonldap::NG::Common::EmailTransport;
 
 our $VERSION = '2.0.8';
 
@@ -54,6 +55,22 @@ sub updateCache {
       qq{Cache updated to configuration $conf->{cfgNum} for user $>\n};
 }
 
+sub testEmail {
+    my $self = shift;
+    my $dest = shift;
+    die "Must specify destination" unless ($dest);
+    my $conf = $self->confAccess->getConf();
+    eval {
+        Lemonldap::NG::Common::EmailTransport::sendTestMail( $conf, $dest );
+    };
+    my $error   = $@;
+    if ($error) {
+        die $error;
+    } else {
+        print STDERR "Test email successfully sent to $dest\n";
+    }
+}
+
 sub run {
     my $self = shift;
 
@@ -80,7 +97,7 @@ sub run {
     }
     $self->confAccess()->lastCfg() unless ( $self->cfgNum );
     my $action = shift;
-    unless ( $action =~ /^(?:info|update-cache)$/ ) {
+    unless ( $action =~ /^(?:info|update-cache|test-email)$/ ) {
         die "unknown action $action. Only info or update are accepted";
     }
     $action =~ s/\-([a-z])/uc($1)/e;

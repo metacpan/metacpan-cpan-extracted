@@ -1,4 +1,3 @@
-.travis.yml
 Changes
 etc/HistoryFilter_Config.pm
 html/Callbacks/HistoryFilter/Elements/ShowHistory/SkipTransaction
@@ -24,6 +23,8 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.yml
+po/fr.po
+po/historyfilter.pot
 README
 SIGNATURE
 xt/00-compile.t

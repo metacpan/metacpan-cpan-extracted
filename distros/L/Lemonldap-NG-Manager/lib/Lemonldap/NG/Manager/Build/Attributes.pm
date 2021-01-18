@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -27,7 +27,11 @@ sub perlExpr {
     my $err = join( '',
         grep { $_ =~ /(?:Undefined subroutine|Devel::StackTrace)/ ? () : $_ }
           split( /\n/, $@ ) );
-    return $err ? ( -1, "__badExpression__: $err" ) : (1);
+    return ( -1, "__badExpression__: $err" )
+      if ( $err && $conf->{useSafeJail} );
+    return ( $val =~ qr/(?<=[^=<!>\|\?])=(?![=~])/ && $conf->{avoidAssignment} )
+      ? ( 1, "__badExpressionAssignment__" )
+      : 1;
 }
 
 my $url_re = $RE{URI}{HTTP}{ -scheme => "https?" };
@@ -78,7 +82,7 @@ sub types {
                 my ( $val, $conf ) = @_;
                 return 1
                   if ( defined $conf->{macros}->{$val}
-                    or $val eq '_timezone' );
+                    or $val =~ m/^_/ );
                 foreach ( keys %$conf ) {
                     return 1
                       if ( $_ =~ /exportedvars$/i
@@ -154,7 +158,7 @@ sub types {
             test => sub {
                 return (
                     $_[0] =~
-/^(?:(?:\-+\s*BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY\s*\-+\r?\n)?(?:Proc-Type:.*\r?\nDEK-Info:.*\r?\n[\r\n]*)?[a-zA-Z0-9\/\+\r\n]+={0,2}(?:\r?\n\-+\s*END\s+(?:RSA\s+)?PRIVATE\s+KEY\s*\-+)?[\r\n]*)?$/s
+/^(?:(?:\-+\s*BEGIN\s+(?:(?:RSA|ENCRYPTED)\s+)?PRIVATE\s+KEY\s*\-+\r?\n)?(?:Proc-Type:.*\r?\nDEK-Info:.*\r?\n[\r\n]*)?[a-zA-Z0-9\/\+\r\n]+={0,2}(?:\r?\n\-+\s*END\s+(?:(?:RSA|ENCRYPTED)\s+)?PRIVATE\s+KEY\s*\-+)?[\r\n]*)?$/s
                     ? (1)
                     : ( 1, '__badPemEncoding__' )
                 );
@@ -179,6 +183,9 @@ sub types {
             test => sub { 1 }
         },
         menuCat => {
+            test => sub { 1 }
+        },
+        oidcAttribute => {
             test => sub { 1 }
         },
         oidcOPMetaDataNode => {
@@ -428,11 +435,24 @@ sub attributes {
             flags         => 'hmp',
         },
         stayConnected => {
-            type => 'bool',
-
-            #help          => 'stayconnected.html',
+            type          => 'bool',
             default       => 0,
             documentation => 'Enable StayConnected plugin',
+        },
+        stayConnectedTimeout => {
+            type    => 'int',
+            default => 2592000,
+            documentation =>
+              'StayConnected persistent connexion session timeout',
+            flags => 'm',
+        },
+        stayConnectedCookieName => {
+            type          => 'text',
+            test          => qr/^[a-zA-Z][a-zA-Z0-9_-]*$/,
+            msgFail       => '__badCookieName__',
+            default       => 'llngconnection',
+            documentation => 'Name of the stayConnected plugin cookie',
+            flags         => 'p',
         },
         checkState => {
             type          => 'bool',
@@ -490,6 +510,23 @@ sub attributes {
             type          => 'boolOrExpr',
             documentation => 'Display empty headers rule',
             flags         => 'p',
+        },
+        checkUserDisplayComputedSession => {
+            default       => 1,
+            type          => 'boolOrExpr',
+            documentation => 'Display empty headers rule',
+            flags         => 'p',
+        },
+        checkUserHiddenHeaders => {
+            type       => 'keyTextContainer',
+            keyTest    => qr/^\S+$/,
+            keyMsgFail => '__badHostname__',
+            test       => {
+                keyTest    => qr/^(?=[^\-])[\w\-\s]+(?<=[^-])$/,
+                keyMsgFail => '__badHeaderName__',
+                test       => sub { return perlExpr(@_) },
+            },
+            documentation => 'Header values to hide if not empty',
         },
         globalLogoutRule => {
             type          => 'boolOrExpr',
@@ -574,6 +611,12 @@ sub attributes {
             type          => 'bool',
             default       => 1,
             documentation => 'Stop context switching by logout',
+            flags         => 'p',
+        },
+        contextSwitchingAllowed2fModifications => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Allowed SFA modifications',
             flags         => 'p',
         },
         contextSwitchingPrefix => {
@@ -808,27 +851,24 @@ sub attributes {
             documentation => 'Enable brute force attack protection',
         },
         bruteForceProtectionTempo => {
-            default => 30,
-            type    => 'int',
-            documentation =>
-              'Brute force attack protection -> Tempo before try again',
+            default       => 30,
+            type          => 'int',
+            documentation => 'Lock time',
         },
         bruteForceProtectionMaxAge => {
-            default => 300,
-            type    => 'int',
-            documentation =>
-'Brute force attack protection -> Max age between last and first allowed failed login',
+            default       => 300,
+            type          => 'int',
+            documentation => 'Max age between current and first failed login',
         },
         bruteForceProtectionMaxFailed => {
-            default => 3,
-            type    => 'int',
-            documentation =>
-              'Brute force attack protection -> Max allowed failed login',
+            default       => 3,
+            type          => 'int',
+            documentation => 'Max allowed failed login',
         },
         bruteForceProtectionMaxLockTime => {
             default       => 900,
             type          => 'int',
-            documentation => 'Brute force attack protection -> Max lock time',
+            documentation => 'Max lock time',
         },
         bruteForceProtectionIncrementalTempo => {
             default => 0,
@@ -839,7 +879,7 @@ sub attributes {
         },
         bruteForceProtectionLockTimes => {
             type    => 'text',
-            default => '5, 15, 60, 300, 600',
+            default => '15, 30, 60, 300, 600',
             documentation =>
               'Incremental lock time values for brute force attack protection',
         },
@@ -854,6 +894,11 @@ sub attributes {
             type          => 'text',
             default       => '_password _2fDevices',
             documentation => 'Name of attributes to hide in logs',
+        },
+        displaySessionId => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Display _session_id with sessions explorer',
         },
         persistentSessionAttributes => {
             type          => 'text',
@@ -1014,6 +1059,13 @@ sub attributes {
             documentation => 'Activate Safe jail',
             flags         => 'hp',
         },
+        avoidAssignment => {
+            default       => 0,
+            type          => 'bool',
+            help          => 'safejail.html',
+            documentation => 'Avoid assignment in expressions',
+            flags         => 'hp',
+        },
         whatToTrace => {
             type          => 'lmAttrOrMacro',
             default       => 'uid',
@@ -1073,9 +1125,10 @@ sub attributes {
             documentation => 'Display logout tab in portal',
         },
         portalDisplayCertificateResetByMail => {
-            type          => 'boolOrExpr',
-            default       => 0,
-            documentation => 'Display Certificate Reset by mail tab in portal',
+            type    => 'bool',
+            default => 0,
+            documentation =>
+              'Display certificate reset by mail button in portal',
         },
         portalDisplayRegister => {
             default       => 1,
@@ -1106,7 +1159,7 @@ sub attributes {
         portalDisplayRefreshMyRights => {
             default       => 1,
             type          => 'bool',
-            documentation => 'Displays the link to refresh the user session',
+            documentation => 'Display link to refresh the user session',
         },
 
         # Cookies
@@ -1460,6 +1513,11 @@ sub attributes {
             type          => 'bool',
             documentation => 'Hide old password in portal',
         },
+        passwordPolicyActivation => {
+            type          => 'boolOrExpr',
+            default       => 1,
+            documentation => 'Enable password policy',
+        },
         passwordPolicyMinSize => {
             default       => 0,
             type          => 'int',
@@ -1486,9 +1544,9 @@ sub attributes {
             documentation => 'Password policy: minimal special characters',
         },
         passwordPolicySpecialChar => {
-            default       => '! @ # $ % & * ( ) - = + [ ] { } ; : , . / ?',
+            default       => '__ALL__',
             type          => 'text',
-            test          => qr/^[\s\W_]*$/,
+            test          => qr/^(?:__ALL__|[\S\W]*)$/,
             documentation => 'Password policy: allowed special characters',
         },
         portalDisplayPasswordPolicy => {
@@ -1824,6 +1882,10 @@ sub attributes {
             type          => 'text',
             documentation => 'Custom logo for Mail 2F',
         },
+        mail2fSessionKey => {
+            type          => 'text',
+            documentation => 'Session parameter where mail is stored',
+        },
 
         # External second factor
         ext2fActivation => {
@@ -2096,6 +2158,18 @@ sub attributes {
             documentation => 'List of auto signin rules',
         },
 
+        # Adaptative Authentication Level plugin
+        adaptativeAuthenticationLevelRules => {
+            type    => 'keyTextContainer',
+            keyTest => sub {
+                eval { qr/$_[0]/ };
+                return $@ ? 0 : 1;
+            },
+            keyMsgFail    => '__badRegexp__',
+            documentation => 'Adaptative authentication level rules',
+            flags         => 'p',
+        },
+
         ## Virtualhosts
 
         # Fake attribute: used by manager REST API to agglomerate all other
@@ -2173,8 +2247,9 @@ sub attributes {
             type    => 'int',
             default => -1,
         },
-        vhostAliases => { type => 'text', default => '' },
-        vhostType    => {
+        vhostAccessToTrace => { type => 'text', default => '' },
+        vhostAliases       => { type => 'text', default => '' },
+        vhostType          => {
             type   => 'select',
             select => [
                 { k => 'AuthBasic',     v => 'AuthBasic' },
@@ -2311,8 +2386,9 @@ sub attributes {
             documentation => 'CAS User attribute',
         },
         casAppMetaDataOptionsAuthnLevel => {
-            type          => 'int',
-            documentation => 'Authentication level requires to access to this CAS application',
+            type => 'int',
+            documentation =>
+              'Authentication level requires to access to this CAS application',
         },
         casAppMetaDataOptionsRule => {
             type          => 'text',
@@ -2466,8 +2542,10 @@ sub attributes {
             select => [
                 { k => 'RSA_SHA1',   v => 'RSA SHA1' },
                 { k => 'RSA_SHA256', v => 'RSA SHA256' },
+                { k => 'RSA_SHA384', v => 'RSA SHA384' },
+                { k => 'RSA_SHA512', v => 'RSA SHA512' },
             ],
-            default => 'RSA_SHA1',
+            default => 'RSA_SHA256',
         },
         samlServiceUseCertificateInResponse => {
             type    => 'bool',
@@ -2740,6 +2818,17 @@ sub attributes {
             type    => 'trool',
             default => -1,
         },
+        samlIDPMetaDataOptionsSignatureMethod => {
+            type   => 'select',
+            select => [
+                { k => '',           v => 'default' },
+                { k => 'RSA_SHA1',   v => 'RSA SHA1' },
+                { k => 'RSA_SHA256', v => 'RSA SHA256' },
+                { k => 'RSA_SHA384', v => 'RSA SHA384' },
+                { k => 'RSA_SHA512', v => 'RSA SHA512' },
+            ],
+            default => '',
+        },
         samlIDPMetaDataOptionsCheckSLOMessageSignature => {
             type    => 'bool',
             default => 1,
@@ -2896,6 +2985,17 @@ sub attributes {
             type    => 'trool',
             default => -1,
         },
+        samlSPMetaDataOptionsSignatureMethod => {
+            type   => 'select',
+            select => [
+                { k => '',           v => 'default' },
+                { k => 'RSA_SHA1',   v => 'RSA SHA1' },
+                { k => 'RSA_SHA256', v => 'RSA SHA256' },
+                { k => 'RSA_SHA384', v => 'RSA SHA384' },
+                { k => 'RSA_SHA512', v => 'RSA SHA512' },
+            ],
+            default => '',
+        },
         samlSPMetaDataOptionsCheckSSOMessageSignature => {
             type    => 'bool',
             default => 1,
@@ -2926,8 +3026,9 @@ sub attributes {
             default => 1,
         },
         samlSPMetaDataOptionsAuthnLevel => {
-            type          => 'int',
-            documentation => 'Authentication level requires to access to this SP',
+            type => 'int',
+            documentation =>
+              'Authentication level requires to access to this SP',
         },
         samlSPMetaDataOptionsRule => {
             type          => 'text',
@@ -2999,14 +3100,15 @@ sub attributes {
         passwordDB => {
             type   => 'select',
             select => [
-                { k => 'AD',     v => 'Active Directory' },
-                { k => 'Choice', v => 'authChoice' },
-                { k => 'DBI',    v => 'Database (DBI)' },
-                { k => 'Demo',   v => 'Demonstration' },
-                { k => 'LDAP',   v => 'LDAP' },
-                { k => 'REST',   v => 'REST' },
-                { k => 'Null',   v => 'None' },
-                { k => 'Custom', v => 'customModule' },
+                { k => 'AD',          v => 'Active Directory' },
+                { k => 'Choice',      v => 'authChoice' },
+                { k => 'DBI',         v => 'Database (DBI)' },
+                { k => 'Demo',        v => 'Demonstration' },
+                { k => 'LDAP',        v => 'LDAP' },
+                { k => 'REST',        v => 'REST' },
+                { k => 'Null',        v => 'None' },
+                { k => 'Combination', v => 'combineMods' },
+                { k => 'Custom',      v => 'customModule' },
             ],
             default       => 'Demo',
             documentation => 'Password module',
@@ -3190,6 +3292,10 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default => 0,
             type    => 'bool',
         },
+        ldapGetUserBeforePasswordChange => {
+            default => 0,
+            type    => 'bool',
+        },
         ldapSearchDeref => {
             type   => 'select',
             select => [
@@ -3251,8 +3357,13 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
         ldapTimeout => {
             type          => 'int',
-            default       => 120,
+            default       => 10,
             documentation => 'LDAP connection timeout',
+        },
+        ldapIOTimeout => {
+            type          => 'int',
+            default       => 10,
+            documentation => 'LDAP operation timeout',
         },
         ldapVersion => {
             type          => 'int',
@@ -3282,12 +3393,14 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default => 'require',
         },
         ldapCAFile => {
-            type          => 'text',
-            documentation => 'Location of the certificate file for LDAP connections',
+            type => 'text',
+            documentation =>
+              'Location of the certificate file for LDAP connections',
         },
         ldapCAPath => {
-            type          => 'text',
-            documentation => 'Location of the CA directory for LDAP connections',
+            type => 'text',
+            documentation =>
+              'Location of the CA directory for LDAP connections',
         },
 
         # SSL
@@ -3600,6 +3713,10 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'bool',
             default       => 1,
             documentation => 'Remove domain in Kerberos username',
+        },
+        krbAllowedDomains => {
+            type          => 'text',
+            documentation => 'Allowed domains',
         },
 
         # Slave
@@ -4013,11 +4130,13 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
 
         # OpenID Connect relying parties
         oidcRPMetaDataExportedVars => {
-            type    => 'keyTextContainer',
+            type    => 'oidcAttributeContainer',
+            keyTest => qr/\w/,
+            test    => qr/\w/,
             default => {
                 'name'        => 'cn',
                 'family_name' => 'sn',
-                'email'       => 'mail'
+                'email'       => 'mail',
             }
         },
         oidcRPMetaDataOptionsClientID       => { type => 'text', },
@@ -4104,8 +4223,9 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => 'Issue refresh tokens',
         },
         oidcRPMetaDataOptionsAuthnLevel => {
-            type          => 'int',
-            documentation => 'Authentication level requires to access to this RP',
+            type => 'int',
+            documentation =>
+              'Authentication level requires to access to this RP',
         },
         oidcRPMetaDataOptionsRule => {
             type          => 'text',

@@ -1,6 +1,8 @@
 use lib 'inc';
 use Test::More;
 use strict;
+use URI;
+use URI::QueryParam;
 use IO::String;
 use LWP::UserAgent;
 use LWP::Protocol::PSGI;
@@ -11,7 +13,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 19;
+my $maintests = 21;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 
@@ -26,9 +28,12 @@ LWP::Protocol::PSGI->register(
 );
 
 SKIP: {
-    eval "use Lasso";
-    if ($@) {
-        skip 'Lasso not found', $maintests;
+    unless (
+        eval
+'use Lasso; (Lasso::check_version( 2, 5, 1, Lasso::Constants::CHECK_VERSION_NUMERIC) )? 1 : 0'
+      )
+    {
+        skip 'Lasso not found or too old', $maintests;
     }
 
     # Initialization
@@ -101,7 +106,6 @@ SKIP: {
         ),
         'Unauth SP request'
     );
-    ( $host, $url, $query );
     ( $url, $query ) = expectRedirection( $res,
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 
@@ -152,6 +156,14 @@ SKIP: {
       expectForm( $res, 'auth.sp.com', '/saml/proxySingleSignOnPost',
         'SAMLResponse', 'RelayState' );
 
+    my ($resp) = $query =~ qr/SAMLResponse=([^&]*)/;
+    my $message = decode_base64( URI::Escape::uri_unescape $resp);
+    like(
+        $message,
+qr@SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"@,
+        "Signed using SHA-256"
+    );
+
     # Post SAML response to SP
     switch ('sp');
     ok(
@@ -189,6 +201,14 @@ SKIP: {
     );
     ( $url, $query ) = expectRedirection( $res,
         qr#^http://auth.idp.com(/saml/singleLogout)\?(SAMLRequest=.+)# );
+
+    my $uri = URI->new;
+    $uri->query($query);
+    is(
+        $uri->query_param("SigAlg"),
+        'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384',
+        'SHA256 used to sign Logout Request'
+    );
 
     # Push SAML logout request to IdP
     switch ('issuer');
@@ -264,6 +284,7 @@ sub issuer {
                         samlSPMetaDataOptionsSignSLOMessage           => 1,
                         samlSPMetaDataOptionsCheckSSOMessageSignature => 1,
                         samlSPMetaDataOptionsCheckSLOMessageSignature => 1,
+                        samlSPMetaDataOptionsSignatureMethod => "RSA_SHA256",
                     }
                 },
                 samlSPMetaDataExportedAttributes => {
@@ -281,6 +302,7 @@ sub issuer {
                 samlServicePrivateKeySig    => saml_key_idp_private_sig,
                 samlServicePublicKeyEnc     => saml_key_idp_public_enc,
                 samlServicePublicKeySig     => saml_key_idp_public_sig,
+                samlServiceSignatureMethod  => "RSA_SHA1",
                 samlSPMetaDataXML           => {
                     "sp.com" => {
                         samlSPMetaDataXML =>
@@ -319,6 +341,7 @@ sub sp {
                         samlIDPMetaDataOptionsCheckSSOMessageSignature => 1,
                         samlIDPMetaDataOptionsCheckSLOMessageSignature => 1,
                         samlIDPMetaDataOptionsForceUTF8                => 1,
+                        samlIDPMetaDataOptionsSignatureMethod => "RSA_SHA384",
                     }
                 },
                 samlIDPMetaDataExportedAttributes => {
@@ -340,6 +363,7 @@ sub sp {
                 samlServicePrivateKeyEnc    => saml_key_sp_private_enc,
                 samlServicePrivateKeySig    => saml_key_sp_private_sig,
                 samlServicePublicKeyEnc     => saml_key_sp_public_enc,
+                samlServiceSignatureMethod  => "RSA_SHA1",
                 samlSPSSODescriptorAuthnRequestsSigned => 1,
             },
         }

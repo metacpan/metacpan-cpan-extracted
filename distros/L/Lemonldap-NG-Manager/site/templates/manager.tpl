@@ -114,7 +114,7 @@
     </div>
     <div class="modal-body">
       <div class="input-group maxw">
-        <label class="input-group-addon" id="promptlabel" for="promptinput" trspan="{{elem('message').field}}"/>
+        <label class="input-group-addon" id="promptlabel" for="promptinput" trspan="{{elem('message').field}}"></label>
         <input id="promptinput" class="form-control" ng-model="result" aria-describedby="promptlabel"/>
       </div>
     </div>
@@ -161,7 +161,7 @@
     </div>
     <div class="modal-body">
       <div class="input-group maxw">
-        <label class="input-group-addon" id="mlabel" for="mdPwd" trspan="password"/>
+        <label class="input-group-addon" id="mlabel" for="mdPwd" trspan="password"></label>
         <input id="mdPwd" class="form-control" ng-model="result" aria-describedby="mlabel"/>
       </div>
     </div>

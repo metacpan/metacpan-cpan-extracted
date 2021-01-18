@@ -26,38 +26,38 @@ no_index:
 provides:
   RxPerl:
     file: lib/RxPerl.pm
-    version: v6.4.1
+    version: v6.4.2
   RxPerl::BehaviorSubject:
     file: lib/RxPerl/BehaviorSubject.pm
-    version: v6.4.1
+    version: v6.4.2
   RxPerl::ConnectableObservable:
     file: lib/RxPerl/ConnectableObservable.pm
-    version: v6.4.1
+    version: v6.4.2
   RxPerl::Observable:
     file: lib/RxPerl/Observable.pm
-    version: v6.4.1
+    version: v6.4.2
   RxPerl::Operators::Creation:
     file: lib/RxPerl/Operators/Creation.pm
   RxPerl::Operators::Pipeable:
     file: lib/RxPerl/Operators/Pipeable.pm
   RxPerl::ReplaySubject:
     file: lib/RxPerl/ReplaySubject.pm
-    version: v6.4.1
+    version: v6.4.2
   RxPerl::Subject:
     file: lib/RxPerl/Subject.pm
-    version: v6.4.1
+    version: v6.4.2
   RxPerl::Subscriber:
     file: lib/RxPerl/Subscriber.pm
   RxPerl::Subscription:
     file: lib/RxPerl/Subscription.pm
-    version: v6.4.1
+    version: v6.4.2
   RxPerl::SyncTimers:
     file: lib/RxPerl/SyncTimers.pm
   RxPerl::Test:
     file: lib/RxPerl/Test.pm
   RxPerl::Utils:
     file: lib/RxPerl/Utils.pm
-    version: v6.4.1
+    version: v6.4.2
 requires:
   Sub::Util: '1.41'
   perl: '5.010'
@@ -65,7 +65,7 @@ resources:
   bugtracker: https://gitlab.com/karjala/rxperl/issues
   homepage: https://gitlab.com/karjala/rxperl
   repository: git://gitlab.com/karjala/rxperl.git
-version: v6.4.1
+version: v6.4.2
 x_authority: cpan:KARJALA
 x_contributors:
   - 'Alexander Karelas <alex.karelas@gmail.com>'

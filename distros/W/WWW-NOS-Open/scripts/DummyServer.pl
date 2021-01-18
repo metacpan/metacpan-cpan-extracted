@@ -1,37 +1,35 @@
-#!/usr/bin/env perl -w   # -*- cperl; cperl-indent-level: 4 -*-
-## no critic qw(ProhibitCallsToUnexportedSubs RestrictLongStrings ProhibitImplicitNewlines RequireASCII)
+#!/usr/bin/env perl
+# -*- cperl; cperl-indent-level: 4 -*-
+# Copyright (C) 2011-2021, Roland van Ipenburg
+## no critic qw(RequireExplicitInclusion ProhibitCallsToUnexportedSubs ProhibitCallsToUndeclaredSubs RequireTidyCode ProhibitLongLines RestrictLongStrings ProhibitImplicitNewlines RequireASCII)
 use strict;
 use warnings;
 
 use utf8;
 use 5.014000;
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v1.0.4';
 
-use CGI qw/:all/;
-use Getopt::Long;
-use HTTP::Server::Brick;
+use Dancer2;
 use HTTP::Status qw(:constants status_message);
-use Pod::Usage;
-use Pod::Usage::CommandLine;
+use English qw( -no_match_vars);
 
 use Readonly;
 Readonly::Scalar my $EMPTY           => q{};
 Readonly::Scalar my $SPACE           => q{ };
-Readonly::Scalar my $SLASH           => q{/};
 Readonly::Scalar my $FALLBACK_OUTPUT => q{PHP};
 Readonly::Scalar my $CONNECTOR_PORT  => 18_081;
 Readonly::Scalar my $MAX_REQUESTS    => 100;
 Readonly::Scalar my $API_KEY         => q{TEST};
 Readonly::Scalar my $API_VERSION     => q{v1};
 Readonly::Scalar my $CHARSET         => q{; charset=utf-8};
-Readonly::Scalar my $ROOT            => qq{/$API_VERSION/};
+Readonly::Scalar my $ROOT            => qq{/$API_VERSION};
 Readonly::Scalar my $STRIP_QUERY     => qr{^/[?]}sxm;
+Readonly::Scalar my $ISE             => HTTP::Status::HTTP_INTERNAL_SERVER_ERROR;
+Readonly::Scalar my $BAD             => HTTP::Status::HTTP_BAD_REQUEST;
+Readonly::Scalar my $AUTH            => HTTP::Status::HTTP_UNAUTHORIZED;
+Readonly::Scalar my $FORB            => HTTP::Status::HTTP_FORBIDDEN;
 
-Readonly::Array my @GETOPT_CONFIG =>
-  qw(no_ignore_case bundling auto_version auto_help);
-Readonly::Array my @GETOPTIONS  => ( q{port|p=s}, q{verbose|v+}, );
-Readonly::Hash my %OPTS_DEFAULT => ( 'port' => $CONNECTOR_PORT, );
 Readonly::Hash my %OUTPUT       => (
     'json' => q{application/json},
     'xml'  => q{text/xml},
@@ -611,106 +609,83 @@ q{{"unauthorized, invalid key":{"error":{"code":201,"message":"Invalid key"}}}},
 q{{"forbidden, rate limit":{"error":{"code":301,"message":"Rate limit, max requests per minute is set at 60"}}}},
 );
 
-Getopt::Long::Configure(@GETOPT_CONFIG);
-my %opts = %OPTS_DEFAULT;
-Getopt::Long::GetOptions( \%opts, @GETOPTIONS ) or Pod::Usage::pod2usage(2);
-
-my $server = HTTP::Server::Brick->new( 'port' => $opts{'port'} );
-
 my $requests = 0;
+my $last_hit = 0;
 
-$server->mount(
-    $ROOT => {
-        'handler'  => \&main,
-        'wildcard' => 1,
-    },
-);
+prefix $ROOT;
 
-sub main {
-    my ( $req, $res ) = @_;
-    my $uri = $req->uri;
-    $uri =~ s{$STRIP_QUERY}{}smx;
-    my $q     = CGI->new($uri);
-    my %param = split $SLASH, $uri;
-    if ( !defined $OUTPUT{ lc $param{'output'} } ) {
-        $res->add_content_utf8( $ERROR{'bad_request_invalid'} );
-        $param{'output'} = $FALLBACK_OUTPUT;
-        $res->header( 'Content-Type',
-            $OUTPUT{ lc $param{'output'} } . $CHARSET );
-        $res->header(
-            'Status',
-            HTTP::Status::HTTP_BAD_REQUEST
-              . $SPACE
-              . status_message(HTTP::Status::HTTP_BAD_REQUEST),
-        );
-        $res->code(HTTP::Status::HTTP_BAD_REQUEST);
+get qr{.*}msx => sub {
+    if (time - $last_hit > 60) {
+        $requests = 0;
     }
-    $res->header( 'Content-Type', $OUTPUT{ lc $param{'output'} } . $CHARSET );
-    if ( !defined $param{'key'} ) {
-        $res->add_content_utf8( $ERROR{'bad_request_missing'} );
-        $res->header(
-            'Status',
-            HTTP::Status::HTTP_BAD_REQUEST
-              . $SPACE
-              . status_message(HTTP::Status::HTTP_BAD_REQUEST),
-        );
-        $res->code(HTTP::Status::HTTP_BAD_REQUEST);
+    my $re_ise = qr{FORCED_internal_server_error}msx;
+    my $re_bad = qr{FORCED_bad_request}msx;
+    my $re_cat = qr{(?<cat>[^/]+)/(?<par>[^/]+)}msx;
+    my $re_key = qr{key/(?<key>[^/]+)}msx;
+    my $re_out = qr{output/(?<out>[^/]+)}msx;
+    request->path =~ m{$ROOT/$re_cat/$re_key/$re_out}ismx;
+    my $cat = $LAST_PAREN_MATCH{'cat'};
+    my $par = $LAST_PAREN_MATCH{'par'};
+    my $key = $LAST_PAREN_MATCH{'key'};
+    my $out = $LAST_PAREN_MATCH{'out'};
+    if (request->path =~ m{$re_ise}ismx ) {
+        status $ISE;
+        return;
     }
-    if ( $param{'key'} ne $API_KEY ) {
-        $res->header(
-            'Status',
-            HTTP::Status::HTTP_UNAUTHORIZED
-              . $SPACE
-              . status_message(HTTP::Status::HTTP_UNAUTHORIZED),
-        );
-
-        ## no critic qw(ProhibitFlagComments)
-  # TODO: This also sets the content, which we don't want:
-  # (this is a TODO in HTTP::Server::Brick, so fixing it there is the way to go)
-        ## use critic
-        $res->code(HTTP::Status::HTTP_UNAUTHORIZED);
-        $res->add_content_utf8( $ERROR{'unauthorized'} );
+    if (request->path =~ m{$re_bad}ismx ) {
+        $out = q{FORCED BAD REQUEST FOR TESTING};
+    }
+    if ( !defined $OUTPUT{$out} ) {
+        $out = lc $FALLBACK_OUTPUT;
+        status $BAD;
+        content_type $OUTPUT{$out};
+        response_header 'Status' => $BAD . $SPACE . status_message($BAD);
+        return $ERROR{'bad_request_invalid'};
+    }
+    content_type $OUTPUT{$out};
+    if ( !defined $key ) {
+        status $BAD;
+        response_header 'Status' => $BAD . $SPACE . status_message($BAD);
+        return $ERROR{'bad_request_missing'};
+    }
+    if ( $key ne $API_KEY ) {
+        status $AUTH;
+        response_header 'Status' => $AUTH . $SPACE . status_message($AUTH);
+        return $ERROR{'unauthorized'};
     }
     $requests++;
-
+    $last_hit = time;
     # dummy rate limit tester:
     if ( $requests > $MAX_REQUESTS ) {
-        $res->add_content_utf8( $ERROR{'forbidden'} );
-        $res->header(
-            'Status',
-            HTTP::Status::HTTP_FORBIDDEN
-              . $SPACE
-              . status_message(HTTP::Status::HTTP_FORBIDDEN),
-        );
+        status $FORB;
+        response_header 'Status' => $FORB . $SPACE . status_message($FORB);
         $requests = 0;
-        $res->code(HTTP::Status::HTTP_FORBIDDEN);
+        return $ERROR{'forbidden'};
     }
-    if ( defined $param{'index'} && q{version} eq $param{'index'} ) {
-        $res->add_content_utf8( $RESPONSE{'version'}->{ lc $param{'output'} } );
+    if ( q{index} eq $cat ) {
+        return ${$RESPONSE{'version'}}{$out};
     }
-    if ( defined $param{'latest'} ) {
-        $res->add_content_utf8(
-            $RESPONSE{ q{latest_} . $param{'latest'} }->{ lc $param{'output'} },
-        );
+    if ( q{latest} eq $cat ) {
+        return ${$RESPONSE{ qq{latest_$par} }}{$out};
     }
-    if ( defined $param{'search'} && q{query} eq $param{'search'} ) {
-        $res->add_content_utf8( $RESPONSE{'search'}->{ lc $param{'output'} } );
+    if ( q{search} eq $cat ) {
+        return $RESPONSE{'search'}->{$out};
     }
-    if ( defined $param{'guide'} ) {
-        $res->add_content_utf8(
-            $RESPONSE{ q{guide_} . $param{'guide'} }->{ lc $param{'output'} } );
+    if ( q{guide} eq $cat ) {
+        return ${$RESPONSE{ qq{guide_$par} }}{$out};
     }
+};
 
-    return 1;
-}
-
-$server->start;
+set 'port' => $CONNECTOR_PORT;
+set 'charset' => $CHARSET;
+start;
 
 __END__
 
 =encoding utf8
 
-=for stopwords DummyServer.pl manpage Readonly Ipenburg MERCHANTABILITY
+=for stopwords Bitbucket DummyServer.pl manpage Readonly Ipenburg
+MERCHANTABILITY
 
 =head1 NAME
 
@@ -775,7 +750,7 @@ Version 2 of the API is not provided.
 Only version 1 of the API is provided.
 
 Please report any bugs or feature requests at
-L<RT for rt.cpan.org|https://rt.cpan.org/Dist/Display.html?Queue=WWW-NOS-Open>.
+L<Bitbucket|https://bitbucket.org/rolandvanipenburg/www-nos-open/issues>.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
@@ -783,11 +758,11 @@ Using the defaults it starts the HTTP service on port 18081.
 
 =head1 AUTHOR
 
-Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
+Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 by Roland van Ipenburg
+Copyright 2011-2021 by Roland van Ipenburg
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

@@ -7,7 +7,7 @@ require 't/test-lib.pm';
 use lib 't/lib';
 
 my $res;
-my $maintests = 36;
+my $maintests = 42;
 
 SKIP: {
     skip( 'LLNGTESTLDAP is not set', $maintests ) unless ( $ENV{LLNGTESTLDAP} );
@@ -33,14 +33,22 @@ SKIP: {
                 passwordPolicyMinUpper        => 1,
                 passwordPolicyMinDigit        => 1,
                 passwordPolicyMinSpeChar      => 1,
-                passwordPolicySpecialChar     => '@',
-                portalDisplayPasswordPolicy   => 1
+                passwordPolicySpecialChar     => '__ALL__',
+                portalDisplayPasswordPolicy   => 1,
+                whatToTrace                   => 'uid',
+                macros                        => {
+                    _whatToTrace => ''    # Test 2377
+                },
             }
         }
     );
-    use Lemonldap::NG::Portal::Main::Constants 'PE_PP_CHANGE_AFTER_RESET',
-      'PE_PP_PASSWORD_EXPIRED', 'PE_PASSWORD_OK', 'PE_PP_ACCOUNT_LOCKED',
-      'PE_PP_PASSWORD_TOO_SHORT', 'PE_PP_GRACE';
+    use Lemonldap::NG::Portal::Main::Constants qw(
+      PE_PASSWORD_OK
+      PE_PP_ACCOUNT_LOCKED
+      PE_PP_PASSWORD_EXPIRED
+      PE_PP_CHANGE_AFTER_RESET
+      PE_PP_PASSWORD_TOO_SHORT PE_PP_GRACE
+    );
 
     my ( $user, $code, $postString, $match );
 
@@ -74,6 +82,21 @@ SKIP: {
         my ( $host, $url, $query ) =
           expectForm( $res, '#', undef, 'user', 'oldpassword', 'newpassword',
             'confirmpassword' );
+        ok(
+            $res->[2]->[0] =~
+              m%<input name="user" type="hidden" value="$user" />%,
+            ' Hidden user input found'
+        ) or print STDERR Dumper( $res->[2]->[0], 'Hidden user input' );
+        ok(
+            $res->[2]->[0] =~
+m%<input id="oldpassword" name="oldpassword" type="password" value="$user"%,
+            ' oldpassword input found'
+        ) or print STDERR Dumper( $res->[2]->[0], 'oldpassword input' );
+        ok(
+            $res->[2]->[0] =~
+m%<input id="staticUser" type="text" readonly class="form-control" value="$user" />%,
+            ' staticUser found'
+        ) or print STDERR Dumper( $res->[2]->[0], 'staticUser' );
         ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicyMinSize">%,
             ' passwordPolicyMinSize' )
           or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinSize' );
@@ -89,13 +112,15 @@ SKIP: {
         ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicyMinSpeChar">%,
             ' passwordPolicyMinSpeChar' )
           or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinSpeChar' );
-        ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicySpecialChar">%,
+        ok( $res->[2]->[0] !~ m%<span trspan="passwordPolicySpecialChar">%,
             ' passwordPolicySpecialChar' )
           or print STDERR Dumper( $res->[2]->[0], 'passwordPolicySpecialChar' );
         ok( $query =~ /user=$user/, "User is $user" )
           or explain( $query, "user=$user" );
-        $query =~ s/(oldpassword)=/$1=$user/g;
+
+    #$query =~ s/(oldpassword)=/$1=$user/g; -> Now old password is defined #2377
         $query =~ s/((?:confirm|new)password)=/$1=Newp1@/g;
+
         ok(
             $res = $client->_post(
                 '/', IO::String->new($query),

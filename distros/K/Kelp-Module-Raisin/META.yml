@@ -1,0 +1,32 @@
+---
+abstract: 'Raisin integration with Kelp'
+author:
+  - 'Bartosz Jarzyna <brtastic.dev@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Kelp-Module-Raisin
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Kelp: '1'
+  Kelp::Module::Symbiosis: '1.10'
+  Raisin: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/brtastic/perl-kelp-module-raisin/issues
+  homepage: https://brtastic.xyz/project/kelp
+  license: https://dev.perl.org/licenses
+  repository: https://github.com/brtastic/perl-kelp-module-raisin
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

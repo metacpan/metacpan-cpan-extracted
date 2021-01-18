@@ -23,6 +23,7 @@ WriteMakefile(
         'HTTP::Request'       => 0,
         'HTML::Strip'       => 0,
         'LWP::UserAgent'    => 0,
+        'URI::Escape'       => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'LyricFinder-*' },

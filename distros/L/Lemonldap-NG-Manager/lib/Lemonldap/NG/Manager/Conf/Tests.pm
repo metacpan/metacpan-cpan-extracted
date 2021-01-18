@@ -1,11 +1,13 @@
 package Lemonldap::NG::Manager::Conf::Tests;
 
+use strict;
 use utf8;
+use strict;
 use Lemonldap::NG::Common::Regexp;
 use Lemonldap::NG::Handler::Main;
 use Lemonldap::NG::Common::Util qw(getSameSite);
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -301,36 +303,40 @@ sub tests {
             );
         },
 
+        # Test support of timeouts for LDAPS connections
+        ldapsNoTimeout => sub {
+
+            # Skip test if no SMTP configuration
+            return (1) unless ( $conf->{ldapServer} );
+
+            if ( $conf->{ldapServer} =~ /ldaps:/ ) {
+
+                if ( eval "require IO::Socket::SSL; require IO::Socket::IP;" ) {
+                    if ( IO::Socket::SSL->isa('IO::Socket::IP') ) {
+                        unless ( eval { IO::Socket::IP->VERSION(0.31) } ) {
+                            return ( 1,
+"Your version of IO::Socket::IP is too old to enforce "
+                                  . "connection timeouts on ldaps:// URLs. Use ldap+tls:// instead"
+                            );
+                        }
+                    }
+                }
+            }
+            return (1);
+        },
+
         # Test SMTP connection and authentication (warning only)
-        smtpConnectionAuthentication => sub {
+        smtpConfiguration => sub {
 
             # Skip test if no SMTP configuration
             return 1 unless ( $conf->{SMTPServer} );
 
             # Use SMTP
-            eval "use Net::SMTP";
-            return ( 1, "Net::SMTP module is required to use SMTP server" )
+            eval "use Lemonldap::NG::Common::EmailTransport";
+            return ( 1, "Could not load Lemonldap::NG::Common::EmailTransport" )
               if ($@);
 
-            # Create SMTP object
-            my $smtp = Net::SMTP->new(
-                $conf->{SMTPServer},
-                Timeout => 5,
-                ( $conf->{SMTPPort} ? ( Port => $conf->{SMTPPort} ) : () ),
-            );
-            return ( 1,
-                "SMTP connection to " . $conf->{SMTPServer} . " failed" )
-              unless ($smtp);
-
-            # Skip other tests if no authentication
-            return 1
-              unless ( $conf->{SMTPAuthUser} and $conf->{SMTPAuthPass} );
-
-            # Try authentication
-            return ( 1, "SMTP authentication failed" )
-              unless $smtp->auth( $conf->{SMTPAuthUser},
-                $conf->{SMTPAuthPass} );
-            return 1;
+            return Lemonldap::NG::Common::EmailTransport->configTest($conf);
         },
 
         # SAML entity ID must be unique
@@ -397,6 +403,76 @@ sub tests {
               unless ( $conf->{samlServicePrivateKeySig}
                 && $conf->{samlServicePublicKeySig} );
             return 1;
+        },
+
+        samlSignatureOverrideNeedsCertificate => sub {
+            return 1 if $conf->{samlServicePublicKeySig} =~ /CERTIFICATE/;
+
+            my @offenders;
+            for my $idp ( keys %{ $conf->{samlIDPMetaDataOptions} } ) {
+                if ( $conf->{samlIDPMetaDataOptions}->{$idp}
+                    ->{samlIDPMetaDataOptionsSignatureMethod} )
+                {
+                    push @offenders, $idp;
+                }
+            }
+            for my $sp ( keys %{ $conf->{samlSPMetaDataOptions} } ) {
+                if ( $conf->{samlSPMetaDataOptions}->{$sp}
+                    ->{samlSPMetaDataOptionsSignatureMethod} )
+                {
+                    push @offenders, $sp;
+                }
+            }
+            return @offenders
+              ? (
+                0,
+                "Cannot set non-default signature method on "
+                  . join( ", ", @offenders )
+                  . " unless SAML signature key is in certificate form"
+              )
+              : 1;
+        },
+
+        samlSignatureUnsupportedAlg => sub {
+            return 1
+              unless eval
+'use Lasso; Lasso::check_version( 2, 5, 1, Lasso::Constants::CHECK_VERSION_NUMERIC) ? 0:1';
+
+            my $allsha1 = 1;
+            undef $allsha1
+              unless $conf->{samlServiceSignatureMethod} eq "RSA_SHA1";
+
+            for my $idp ( keys %{ $conf->{samlIDPMetaDataOptions} } ) {
+                if ( $conf->{samlIDPMetaDataOptions}->{$idp}
+                    ->{samlIDPMetaDataOptionsSignatureMethod} )
+                {
+                    if ( $conf->{samlIDPMetaDataOptions}->{$idp}
+                        ->{samlIDPMetaDataOptionsSignatureMethod} ne
+                        "RSA_SHA1" )
+                    {
+                        undef $allsha1;
+                        last;
+                    }
+                }
+            }
+            for my $sp ( keys %{ $conf->{samlSPMetaDataOptions} } ) {
+                if ( $conf->{samlSPMetaDataOptions}->{$sp}
+                    ->{samlSPMetaDataOptionsSignatureMethod} )
+                {
+                    if ( $conf->{samlSPMetaDataOptions}->{$sp}
+                        ->{samlSPMetaDataOptionsSignatureMethod} ne "RSA_SHA1" )
+                    {
+                        undef $allsha1;
+                        last;
+                    }
+                }
+            }
+            return $allsha1
+              ? 1
+              : (
+                0,
+                "Algorithms other than SHA1 are only supported on Lasso>=2.5.1"
+              );
         },
 
         # Try to parse combination with declared modules
@@ -609,24 +685,35 @@ sub tests {
 
         # Warn if bruteForceProtection enabled without History
         bruteForceProtection => sub {
+            my @lockTimes =
+              sort { $a <=> $b }
+              map {
+                $_ =~ s/\D//;
+                abs $_;
+              }
+              grep { /\d+/ }
+              split /\s*,\s*/, $conf->{bruteForceProtectionLockTimes};
+            $conf->{bruteForceProtectionLockTimes} = join ', ', @lockTimes if scalar @lockTimes;
             return 1 unless ( $conf->{bruteForceProtection} );
-            return ( 1,
+            return ( 0,
 '"History" plugin is required to enable "BruteForceProtection" plugin'
             ) unless ( $conf->{loginHistoryEnabled} );
-            return ( 1,
-'Number of failed logins must be higher than 2 to enable "BruteForceProtection" plugin'
-            ) unless ( $conf->{failedLoginNumber} > 2 );
-            return ( 1,
-'Number of failed logins history must be higher than allowed failed logins plus lock time values'
+            return ( 0,
+'Number of failed logins must be higher than 1 to enable "BruteForceProtection" plugin'
+            ) unless ( $conf->{failedLoginNumber} > 1 );
+            return ( 0,
+'Number of allowed failed logins must be higher than 0 to enable "BruteForceProtection" plugin'
+            ) unless ( $conf->{bruteForceProtectionMaxFailed} > 0 );
+            return ( 0,
+'Number of failed logins history must be higher or equal than allowed failed logins plus lock time values'
               )
               if ( $conf->{bruteForceProtectionIncrementalTempo}
-                && $conf->{failedLoginNumber} <=
-                $conf->{bruteForceProtectionMaxFailed} +
-                $conf->{bruteForceProtectionLockTimes} );
-            return ( 1,
-'Number of failed logins history must be higher than allowed failed logins'
+                && $conf->{failedLoginNumber} <
+                $conf->{bruteForceProtectionMaxFailed} + scalar @lockTimes );
+            return ( 0,
+'Number of failed logins history must be higher or equal than allowed failed logins'
               )
-              unless ( $conf->{failedLoginNumber} >
+              unless ( $conf->{failedLoginNumber} >=
                 $conf->{bruteForceProtectionMaxFailed} );
             return 1;
         },
@@ -774,14 +861,14 @@ sub tests {
             return ( $res, join( ', ', @msg ) );
         },
 
-        # CAS APP URL must be unique
+        # CAS APP URL must be defined and unique
         casAppHostnameUniqueness => sub {
             return 1
               unless ( $conf->{casAppMetaDataOptions}
                 and %{ $conf->{casAppMetaDataOptions} } );
             my @msg;
             my $res = 1;
-            my %casHosts;
+            my %casUrl;
             foreach my $casConfKey ( keys %{ $conf->{casAppMetaDataOptions} } )
             {
                 my $appUrl =
@@ -791,19 +878,18 @@ sub tests {
                 $appUrl =~ m#^(https?://[^/]+)(/.*)?$#;
                 my $appHost = $1;
                 unless ($appHost) {
-                    push @msg,
-                      "$clientConfKey CAS Application has no Service URL";
+                    push @msg, "$casConfKey CAS Application has no Service URL";
                     $res = 0;
                     next;
                 }
 
-                if ( defined $casHosts{$appHost} ) {
+                if ( defined $casUrl{$appUrl} ) {
                     push @msg,
-"$casConfKey and $casHosts{$appHost} have the same Service hostname";
+"$casConfKey and $casUrl{$appUrl} have the same Service URL";
                     $res = 0;
                     next;
                 }
-                $casHosts{$appHost} = $casConfKey;
+                $casUrl{$appUrl} = $casConfKey;
             }
             return ( $res, join( ', ', @msg ) );
         },
@@ -829,17 +915,25 @@ sub tests {
         # Cookie SameSite=None requires Secure flag
         # Same with SameSite=(auto) and SAML issuer in use
         SameSiteNoneWithSecure => sub {
-            return ( 1, 'SameSite value = None requires the secured flag' )
+            return ( -1, 'SameSite value = None requires the secured flag' )
               if ( getSameSite($conf) eq 'None' and !$conf->{securedCookie} );
             return 1;
         },
 
         # Secure cookies require HTTPS
         SecureCookiesRequireHttps => sub {
-            return ( 1, 'Secure cookies require a HTTPS portal URL' )
+            return ( -1, 'Secure cookies require a HTTPS portal URL' )
               if (  $conf->{securedCookie} == 1
                 and $conf->{portal}
                 and $conf->{portal} !~ /^https:/ );
+            return 1;
+        },
+
+        # Password module requires a password backend
+        passwordModuleNeedsBackend => sub {
+            return ( -1, 'Password module is enabled without password backend' )
+              if (  $conf->{portalDisplayChangePassword}
+                and $conf->{passwordDB} eq 'Null' );
             return 1;
         },
     };

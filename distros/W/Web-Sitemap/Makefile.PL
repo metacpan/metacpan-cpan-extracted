@@ -1,27 +1,32 @@
-
+use 5.008000;
+use strict;
+use warnings;
 
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+
 WriteMakefile(
-    NAME         => 'Web::Sitemap',
-    VERSION_FROM => 'lib/Web/Sitemap.pm', # finds \$VERSION
-    AUTHOR       => 'Mikhail N Bogdanov (bogdanovmn@gmail.com)',
-    ABSTRACT     => 'Create sitemap files',
-    PREREQ_PM    => {
-                     'Test::Simple' => 0.44,
-					 'IO::Compress::Gzip' => 0
-                    },
-    META_MERGE   => {
-                     'meta-spec'  => {
-                                      'version' => 2,
-                                     },
-                     'resources'  => {
-                                      'repository' => {
-                                                       'type' => 'git',
-                                                       'url'  => 'https://github.com/bogdanovmn/perl-web-sitemap.git',
-                                                       'web'  => 'https://github.com/bogdanovmn/perl-web-sitemap',
-                                                      },
-                                     },
-                    },
+	NAME             => 'Web::Sitemap',
+	VERSION_FROM     => 'lib/Web/Sitemap.pm', # finds \$VERSION
+	MIN_PERL_VERSION => '5.008000',
+
+	AUTHOR           => 'Mikhail N Bogdanov (bogdanovmn@gmail.com)',
+	LICENSE          => 'perl',
+	ABSTRACT_FROM    => 'lib/Web/Sitemap.pm',
+
+	TEST_REQUIRES    => {
+		'IO::Uncompress::Gunzip' => 0,
+	},
+
+	PREREQ_PM        => {
+		'IO::Compress::Gzip' => 0,
+	},
+
+	META_MERGE => {
+		resources   => {
+			license    => 'https://dev.perl.org/licenses',
+			bugtracker => 'https://github.com/bogdanovmn/perl-web-sitemap/issues',
+			repository => 'https://github.com/bogdanovmn/perl-web-sitemap',
+		},
+	},
+
 );

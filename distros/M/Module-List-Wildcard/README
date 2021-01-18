@@ -2,8 +2,8 @@ NAME
     Module::List::Wildcard - A fork of Module::List that groks wildcard
 
 VERSION
-    This document describes version 0.004006 of Module::List::Wildcard (from
-    Perl distribution Module-List-Wildcard), released on 2020-09-21.
+    This document describes version 0.004008 of Module::List::Wildcard (from
+    Perl distribution Module-List-Wildcard), released on 2020-12-22.
 
 SYNOPSIS
     Use like you would Module::List, e.g.:
@@ -39,7 +39,7 @@ DESCRIPTION
         This boolean option can be set to true to recognize wildcard pattern
         in prefix. Wildcard patterns such as jokers ("?", "*", "**"),
         classes ("[a-z]"), as well as braces ("{One,Two}") are supported.
-        "**" implies recursive listing.
+        "**" implies recursive listing (sets "recurse" option to 1).
 
         Examples:
 
@@ -92,13 +92,20 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-List-Wildcard>
+    <https://github.com/perlancar/perl-Module-List-Wildcard/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Module::List, Module::List::Tiny, Module::List::More
+    Module::List
+
+    Module::List::Tiny
+
+    Module::List::More, from which Module::List::Wildcard is forked from.
+    Module::List::More contains more features, including wildcard support,
+    but currently I'm maintainng both. Eventually this duplication might be
+    resolved in the future.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

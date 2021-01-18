@@ -23,7 +23,7 @@ name: Astro-Montenbruck
 provides:
   Astro::Montenbruck:
     file: lib/Astro/Montenbruck.pm
-    version: '1.03'
+    version: '1.2'
   Astro::Montenbruck::CoCo:
     file: lib/Astro/Montenbruck/CoCo.pm
     version: '0.01'
@@ -80,16 +80,16 @@ provides:
     version: '0.02'
   Astro::Montenbruck::RiseSet:
     file: lib/Astro/Montenbruck/RiseSet.pm
-    version: '0.01'
+    version: '0.02'
   Astro::Montenbruck::RiseSet::Constants:
     file: lib/Astro/Montenbruck/RiseSet/Constants.pm
-    version: '0.01'
-  Astro::Montenbruck::RiseSet::RST:
-    file: lib/Astro/Montenbruck/RiseSet/RST.pm
+    version: '0.02'
+  Astro::Montenbruck::RiseSet::Plarise:
+    file: lib/Astro/Montenbruck/RiseSet/Plarise.pm
     version: '0.01'
   Astro::Montenbruck::RiseSet::Sunset:
     file: lib/Astro/Montenbruck/RiseSet/Sunset.pm
-    version: '0.01'
+    version: '0.02'
   Astro::Montenbruck::SolEqu:
     file: lib/Astro/Montenbruck/SolEqu.pm
     version: '0.02'
@@ -102,12 +102,21 @@ provides:
   Astro::Montenbruck::Time::Sidereal:
     file: lib/Astro/Montenbruck/Time/Sidereal.pm
     version: '0.01'
-  Astro::Montenbruck::Utils::Display:
-    file: lib/Astro/Montenbruck/Utils/Display.pm
-    version: '0.03'
   Astro::Montenbruck::Utils::Helpers:
     file: lib/Astro/Montenbruck/Utils/Helpers.pm
     version: '0.04'
+  Astro::Montenbruck::Utils::Theme:
+    file: lib/Astro/Montenbruck/Utils/Theme.pm
+    version: '0.01'
+  Astro::Montenbruck::Utils::Theme::Colorless:
+    file: lib/Astro/Montenbruck/Utils/Theme/Colorless.pm
+    version: '0.01'
+  Astro::Montenbruck::Utils::Theme::Dark:
+    file: lib/Astro/Montenbruck/Utils/Theme/Dark.pm
+    version: '0.01'
+  Astro::Montenbruck::Utils::Theme::Light:
+    file: lib/Astro/Montenbruck/Utils/Theme/Light.pm
+    version: '0.01'
 requires:
   DateTime: '1.44'
   DateTime::Format::Strptime: '1.76'
@@ -115,5 +124,5 @@ requires:
   Memoize: '1.03'
   Readonly: '2.05'
   Term::ANSIColor: '1.00'
-version: '1.03'
+version: '1.2'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

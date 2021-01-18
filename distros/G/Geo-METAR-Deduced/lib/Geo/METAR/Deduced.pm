@@ -1,16 +1,17 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2020, Roland van Ipenburg
-package Geo::METAR::Deduced v0.0.4;
+# Copyright (C) 2020-2021, Roland van Ipenburg
+package Geo::METAR::Deduced v0.0.5;
 use Moose;
 use MooseX::NonMoose;
 use Geo::METAR;
 extends 'Geo::METAR';
 
+#use Log::Log4perl qw(:resurrect :easy get_logger);
+
 use Class::Measure::Scientific::FX_992vb;
 use Geo::ICAO qw( :all );
 use Set::Scalar;
-use Data::Dumper;
-use Log::Log4perl qw(:easy get_logger);
+###l4p use Data::Dumper;
 
 use utf8;
 use 5.016000;
@@ -96,12 +97,13 @@ Readonly::Hash my %LOG => (
     'RESET_PROP'    => q{Resetting property '%s' to '%s'},
     'RULES_CHANGED' => q{Rules changed to '%s' based on ICAO '%s'},
     'INTERSECTION'  => q{Overlapping rules for ICAO code '%s'},
-    'UNKNOWN_RULES' => q{Unknown rules '%s'},
 );
 ## use critic
 
-Log::Log4perl->easy_init($ERROR);
-my $log = get_logger();
+## no critic qw(ProhibitCommentedOutCode)
+###l4p Log::Log4perl->easy_init($ERROR);
+###l4p my $log = get_logger();
+## use critic
 
 my %rules = ();
 
@@ -128,8 +130,8 @@ for my $k ( keys %RULES ) {
     $combined->insert( $rules{$k}->members );
 }
 if ( !$combined->is_universal ) {
-    $log->warn( sprintf $LOG{'INTERSECTING'},
-        $combined->difference( $combined->universe ) );
+    ###l4p $log->warn( sprintf $LOG{'INTERSECTING'},
+    ###l4p     $combined->difference( $combined->universe ) );
 }
 
 has 'rules' => ( 'isa' => 'Str', 'is' => 'rw', 'default' => $DEFAULT_RULES );
@@ -142,13 +144,13 @@ before 'metar' => sub {
         # Reset the object when a new METAR string is loaded because the parent
         # doesn't do that for us:
         my $PRISTINE = Geo::METAR->new();
-        $log->debug( sprintf $LOG{'RESET'}, $args );
+        ###l4p $log->debug( sprintf $LOG{'RESET'}, $args );
         for my $k ( keys %{$PRISTINE} ) {
-            $log->trace( sprintf $LOG{'RESET_PROP'},
-                $k, Data::Dumper::Dumper( ${$PRISTINE}{$k} ) );
+            ###l4p $log->trace( sprintf $LOG{'RESET_PROP'},
+            ###l4p     $k, Data::Dumper::Dumper( ${$PRISTINE}{$k} ) );
             $self->{$k} = ${$PRISTINE}{$k};
         }
-        $log->debug( join q{,}, @{ $self->{'sky'} } );
+        ###l4p $log->debug( join q{,}, @{ $self->{'sky'} } );
     }
 };
 
@@ -158,8 +160,8 @@ after 'metar' => sub {
     for my $k ( keys %rules ) {
         while ( defined( my $code = $rules{$k}->each ) ) {
             if ( 0 == rindex $self->{'SITE'}, $code, 0 ) {
-                $log->debug( sprintf $LOG{'RULES_CHANGED'},
-                    $k, $self->{'SITE'} );
+                ###l4p $log->debug( sprintf $LOG{'RULES_CHANGED'},
+                ###l4p     $k, $self->{'SITE'} );
                 $self->rules($k);
             }
         }
@@ -241,7 +243,9 @@ sub wind_gust {
     return Class::Measure::Scientific::FX_992vb->speed( $gust, $KNOTS );
 }
 
+## no critic qw(ProhibitVagueNames)
 sub temp {
+## use critic
     my $self = shift;
     return Class::Measure::Scientific::FX_992vb->temperature( $self->{'TEMP_C'},
         $CELSIUS );
@@ -265,7 +269,7 @@ sub pressure {
         $self->{'pressure'} * $HECTO, $PA );
 }
 
-# TODO: This isn't handled in Geo::METAR, it's just tokenized for the parser
+# This isn't handled in Geo::METAR, it's just tokenized for the parser
 sub _vertical_visibility {
     my $self = shift;
     my $vv   = $INF;
@@ -297,20 +301,15 @@ sub ceiling {
         },
     );
     for my $layer ( @{ $self->{'sky'} } ) {
-        $log->trace($layer);
+        ###l4p $log->trace($layer);
         ## no critic (ProhibitUnusedCapture)
         if ( $layer =~ m{(?:BKN|OVC)(?<base>\d{3})}igmsx ) {
             ## use critic
             my $cloud_base = $LAST_PAREN_MATCH{'base'};
-            if ( exists $TEST{ $self->rules } ) {
-                if (   $cloud_base < $cloud_ceiling
-                    && $TEST{ $self->rules }($cloud_base) )
-                {
-                    $cloud_ceiling = $cloud_base;
-                }
-            }
-            else {
-                $log->error( sprintf $LOG{'UNKNOWN_RULES'}, $self->rules );
+            if (   $cloud_base < $cloud_ceiling
+                && $TEST{ $self->rules }($cloud_base) )
+            {
+                $cloud_ceiling = $cloud_base;
             }
         }
     }
@@ -433,7 +432,7 @@ Geo::METAR::Deduced - deduce aviation information from parsed METAR data
 
 =head1 VERSION
 
-This document describes Geo::METAR::Deduced v0.0.4.
+This document describes Geo::METAR::Deduced C<v0.0.5>.
 
 =head1 SYNOPSIS
 
@@ -695,8 +694,9 @@ This module uses L<Log::Log4perl> for logging.
 There is still plenty to deduce from the format that METAR has to offer in
 it's fullest form.
 
-Please report any bugs or feature requests at L<RT for
-rt.cpan.org|https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-METAR-Deduced>
+Please report any bugs or feature requests at
+L<Bitbucket|
+https://bitbucket.org/rolandvanipenburg/geo-metar-deduced/issues>.
 
 =head1 AUTHOR
 
@@ -704,7 +704,7 @@ Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 by Roland van Ipenburg
+Copyright 2020-2021 by Roland van Ipenburg
 This program is free software; you can redistribute it and/or modify
 it under the GNU General Public License v3.0.
 

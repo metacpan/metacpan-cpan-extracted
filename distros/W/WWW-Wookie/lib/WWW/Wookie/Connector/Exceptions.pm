@@ -1,5 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-package WWW::Wookie::Connector::Exceptions v1.1.1;
+# Copyright (C) 2010-2021, Roland van Ipenburg
+package WWW::Wookie::Connector::Exceptions v1.1.3;
 use strict;
 use warnings;
 
@@ -17,7 +18,7 @@ __END__
 
 =encoding utf8
 
-=for stopwords Ipenburg MERCHANTABILITY
+=for stopwords Bitbucket Ipenburg MERCHANTABILITY
 
 =head1 NAME
 
@@ -25,7 +26,7 @@ WWW::Wookie::Connector::Exceptions - Handles exception information
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Connector::Exceptions version v1.1.1
+This document describes WWW::Wookie::Connector::Exceptions version C<v1.1.3>
 
 =head1 SYNOPSIS
 
@@ -54,16 +55,16 @@ L<Exception::Class|Exception::Class>
 
 =head1 BUGS AND LIMITATIONS
 
-Please report any bugs or feature requests at L<RT for
-rt.cpan.org|https://rt.cpan.org/Dist/Display.html?Queue=WWW-Wookie>.
+Please report any bugs or feature requests at
+L<Bitbucket|https://bitbucket.org/rolandvanipenburg/www-wookie/issues>.
 
 =head1 AUTHOR
 
-Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
+Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 by Roland van Ipenburg
+Copyright 2010-2021 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

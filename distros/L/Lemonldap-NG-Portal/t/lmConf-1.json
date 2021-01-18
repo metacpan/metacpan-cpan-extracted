@@ -49,6 +49,10 @@
     },
     "test2.example.com": {
       "Auth-User": "$uid"
+    },
+    "*.example.llng": {
+      "Auth-User": "$uid",
+      "testHeader1": "'testHeader_value'"
     }
   },
   "exportedVars": {

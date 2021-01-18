@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::PreviousVersion::Changelog;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: extract previous version from changelog
-$Dist::Zilla::Plugin::PreviousVersion::Changelog::VERSION = '0.2.5';
+$Dist::Zilla::Plugin::PreviousVersion::Changelog::VERSION = '0.2.6';
 
 use strict;
 use warnings;
@@ -61,7 +61,7 @@ Dist::Zilla::Plugin::PreviousVersion::Changelog - extract previous version from 
 
 =head1 VERSION
 
-version 0.2.5
+version 0.2.6
 
 =head1 DESCRIPTION
 
@@ -85,7 +85,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2021, 2015, 2014, 2013, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

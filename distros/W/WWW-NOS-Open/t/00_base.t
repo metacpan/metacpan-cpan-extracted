@@ -25,9 +25,7 @@ BEGIN {
         'WWW::NOS::Open::Broadcast' => [
             qw(get_id get_type get_channel_icon get_channel_code get_channel_name get_starttime get_endtime get_genre get_title get_description)
         ],
-        'WWW::NOS::Open::DayGuide' => [
-            qw(get_type get_date get_broadcasts)
-        ],
+        'WWW::NOS::Open::DayGuide' => [qw(get_type get_date get_broadcasts)],
     );
     my $total_methods = 0;
     foreach my $methods ( values %MAIN::methods ) {
@@ -49,7 +47,7 @@ BEGIN {
 my $version_args = [ q{v1}, q{0.0.1} ];
 new_ok('WWW::NOS::Open');
 new_ok('WWW::NOS::Open::TypeDef');
-new_ok('WWW::NOS::Open::Version', $version_args );
+new_ok( 'WWW::NOS::Open::Version', $version_args );
 new_ok('WWW::NOS::Open::Resource');
 new_ok('WWW::NOS::Open::Article');
 new_ok('WWW::NOS::Open::MediaResource');
@@ -62,7 +60,7 @@ my $sub;
 @WWW::NOS::Open::Sub::ISA          = qw(WWW::NOS::Open);
 $sub                               = new_ok('WWW::NOS::Open::Sub');
 @WWW::NOS::Open::TypeDef::Sub::ISA = qw(WWW::NOS::Open::TypeDef);
-$sub = new_ok( 'WWW::NOS::Open::TypeDef::Sub');
+$sub                               = new_ok('WWW::NOS::Open::TypeDef::Sub');
 @WWW::NOS::Open::Version::Sub::ISA = qw(WWW::NOS::Open::Version);
 $sub = new_ok( 'WWW::NOS::Open::Version::Sub', $version_args );
 @WWW::NOS::Open::Resource::Sub::ISA = qw(WWW::NOS::Open::Resource);
@@ -70,15 +68,15 @@ $sub                                = new_ok('WWW::NOS::Open::Resource::Sub');
 @WWW::NOS::Open::Article::Sub::ISA  = qw(WWW::NOS::Open::Article);
 $sub                                = new_ok('WWW::NOS::Open::Article::Sub');
 @WWW::NOS::Open::MediaResource::Sub::ISA = qw(WWW::NOS::Open::MediaResource);
-$sub                                = new_ok('WWW::NOS::Open::MediaResource::Sub');
-@WWW::NOS::Open::Video::Sub::ISA    = qw(WWW::NOS::Open::Video);
-$sub                                = new_ok('WWW::NOS::Open::Video::Sub');
+$sub                             = new_ok('WWW::NOS::Open::MediaResource::Sub');
+@WWW::NOS::Open::Video::Sub::ISA = qw(WWW::NOS::Open::Video);
+$sub                             = new_ok('WWW::NOS::Open::Video::Sub');
 @WWW::NOS::Open::AudioFragment::Sub::ISA = qw(WWW::NOS::Open::AudioFragment);
 $sub = new_ok('WWW::NOS::Open::AudioFragment::Sub');
-@WWW::NOS::Open::DayGuide::Sub::ISA = qw(WWW::NOS::Open::DayGuide);
-$sub = new_ok('WWW::NOS::Open::DayGuide::Sub');
+@WWW::NOS::Open::DayGuide::Sub::ISA  = qw(WWW::NOS::Open::DayGuide);
+$sub                                 = new_ok('WWW::NOS::Open::DayGuide::Sub');
 @WWW::NOS::Open::Broadcast::Sub::ISA = qw(WWW::NOS::Open::Broadcast);
-$sub = new_ok('WWW::NOS::Open::Broadcast::Sub');
+$sub                                 = new_ok('WWW::NOS::Open::Broadcast::Sub');
 
 foreach my $module ( keys %MAIN::methods ) {
     foreach my $method ( @{ $MAIN::methods{$module} } ) {
@@ -86,8 +84,8 @@ foreach my $module ( keys %MAIN::methods ) {
     }
 }
 
-my $msg = 'Author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
+my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
 SKIP: {
-    skip $msg, 1 unless $ENV{TEST_AUTHOR};
+    skip $msg, 1 unless $ENV{AUTHOR_TESTING};
 }
-$ENV{TEST_AUTHOR} && Test::NoWarnings::had_no_warnings();
+$ENV{AUTHOR_TESTING} && Test::NoWarnings::had_no_warnings();

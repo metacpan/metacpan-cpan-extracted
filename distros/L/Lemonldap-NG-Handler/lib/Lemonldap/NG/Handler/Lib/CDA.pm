@@ -1,6 +1,8 @@
 package Lemonldap::NG::Handler::Lib::CDA;
 
 use strict;
+use URI;
+use URI::QueryParam;
 
 our $VERSION = '2.0.9';
 
@@ -9,7 +11,7 @@ sub run {
     my $uri = $req->{env}->{REQUEST_URI};
     my $cn  = $class->tsv->{cookieName};
     my ( $id, $session );
-    if ( $uri =~ s/[\?&;]${cn}cda=(\w+)$//oi ) {
+    if ( $uri =~ m/[\?&;]${cn}cda=(\w+)/oi ) {
         if (    $id = $class->fetchId($req)
             and $session = $class->retrieveSession( $req, $id ) )
         {
@@ -17,7 +19,13 @@ sub run {
                 'CDA asked for an already available session, skipping');
         }
         else {
-            my $cdaid = $1;
+            # Extract CDA code from URI
+            my $u     = URI->new( $req->uri );
+            my $cdaid = $u->query_param("${cn}cda");
+
+            # Remove CDA param from URI
+            $u->query_param_delete("${cn}cda");
+
             $class->logger->debug("CDA request with id $cdaid");
 
             my $cdaInfos = $class->getCDAInfos( $req, $cdaid );
@@ -26,7 +34,7 @@ sub run {
                 return $class->FORBIDDEN;
             }
 
-            my $redirectUrl   = $class->_buildUrl( $req, $uri );
+            my $redirectUrl   = $class->_buildUrl( $req, $u->path_query );
             my $redirectHttps = ( $redirectUrl =~ m/^https/ );
             $class->set_header_out(
                 $req,

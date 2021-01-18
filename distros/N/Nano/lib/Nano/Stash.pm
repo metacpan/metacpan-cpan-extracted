@@ -13,7 +13,7 @@ use Data::Object::RoleHas;
 
 requires 'nano';
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 # ATTRIBUTES
 

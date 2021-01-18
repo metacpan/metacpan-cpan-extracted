@@ -12,7 +12,7 @@
 <TMPL_LOOP NAME="check">
 <p class="notifCheck">
   <div class="form-group form-check">
-    <input type="checkbox" name="check<TMPL_VAR NAME="id">" id="<TMPL_VAR NAME="id">" value="accepted"/>
+    <input class="form-check-input" type="checkbox" name="check<TMPL_VAR NAME="id">" id="<TMPL_VAR NAME="id">" value="accepted"/>
     <label class="form-check-label" for="<TMPL_VAR NAME="id">"><TMPL_VAR NAME="value"></label>
   </div>
 </p>

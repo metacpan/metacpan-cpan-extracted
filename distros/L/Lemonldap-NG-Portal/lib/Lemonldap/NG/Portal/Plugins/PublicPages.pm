@@ -5,27 +5,31 @@ use Mouse;
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.10';
 
 sub init {
     my ($self) = @_;
-    $self->addAuthRoute( public => { ':tpl' => 'run' }, ['GET'] );
-    $self->addUnauthRoute( public => { ':tpl' => 'run' }, ['GET'] );
+    $self->addAuthRoute( public => { ':tpl' => 'run' }, ['GET'] )
+      ->addUnauthRoute( public => { ':tpl'  => 'run' }, ['GET'] );
+
     return 1;
 }
 
 sub run {
     my ( $self, $req ) = @_;
     my $tpl = $req->param('tpl');
+
     unless ( $tpl =~ /^[\w\.\-]+$/ ) {
         $self->userLogger->error("Bad public path $tpl");
         return $self->p->sendError( $req, 'File not found', 404 );
     }
+
     $tpl = "public/$tpl";
     my $path =
         $self->conf->{templateDir} . '/'
       . $self->conf->{portalSkin}
       . "/$tpl.tpl";
+
     unless ( -e $path ) {
         $self->userLogger->warn("File not found: $path");
         return $self->p->sendError( $req, 'File not found', 404 );

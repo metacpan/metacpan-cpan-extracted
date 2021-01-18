@@ -15,7 +15,7 @@ use OTRS::OPM::Installer;
     sub framework {
         my ($self, $values) = @_;
         $self->{frameworks} = $values if $values;
-        return @{ $self->{frameworks} || [] };
+        return ($self->{frameworks} || []);
     }
 }
 

@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -54,9 +54,9 @@ sub run {
     my ( $self, $req ) = @_;
     my $user = $req->{userData}->{ $self->conf->{whatToTrace} };
 
-    # Check activation rules
+    # Check activation rule
     unless ( $self->rule->( $req, $req->userData ) ) {
-        $self->userLogger->info("Global logout not required for $user");
+        $self->userLogger->info("GlobaLogout not allowed for $user");
         return PE_OK;
     }
 
@@ -116,20 +116,22 @@ sub globalLogout {
                 # Read active sessions from token
                 my $sessions = eval { from_json( $token->{sessions} ) };
                 if ($@) {
-                    $self->logger->error("Bad encoding in OTT: $@");
+                    $self->logger->error(
+                        "GlobalLogout: bad encoding in OTT ($@)");
                     $res = PE_ERROR;
                 }
                 my $as;
-                foreach (@$sessions) {
-                    unless ( $as = $self->p->getApacheSession( $_->{id} ) ) {
-                        $self->userLogger->info(
-                            "GlobalLogout: session $_->{id} expired");
-                        next;
-                    }
-                    my $user = $token->{user};
-                    if ( $req->{userData}->{ $self->{conf}->{whatToTrace} } eq
-                        $user )
-                    {
+                my $user = $token->{user};
+                my $req_user =
+                  $req->{userData}->{ $self->{conf}->{whatToTrace} };
+                if ( $req_user eq $user ) {
+                    foreach (@$sessions) {
+                        unless ( $as = $self->p->getApacheSession( $_->{id} ) )
+                        {
+                            $self->userLogger->info(
+                                "GlobalLogout: session $_->{id} expired");
+                            next;
+                        }
                         unless ( $req->{userData}->{_session_id} eq $_->{id} ) {
                             $self->userLogger->info(
                                 "Remove \"$user\" session: $_->{id}");
@@ -137,11 +139,12 @@ sub globalLogout {
                             $count++;
                         }
                     }
-                    else {
-                        $self->userLogger->warn(
-                            "GlobalLogout called with an invalid token");
-                        $res = PE_TOKENEXPIRED;
-                    }
+                }
+                else {
+                    $self->userLogger->warn(
+"GlobalLogout called with an invalid token: $req_user is NOT $user"
+                    );
+                    $res = PE_TOKENEXPIRED;
                 }
             }
             else {
@@ -157,7 +160,7 @@ sub globalLogout {
     }
 
     return $self->p->do( $req, [ sub { $res } ] ) if $res;
-    $self->userLogger->info("$count remaining session(s) have been removed");
+    $self->userLogger->info("$count remaining session(s) removed");
     return $self->p->do( $req, [ 'authLogout', 'deleteSession' ] );
 }
 
@@ -177,7 +180,18 @@ sub activeSessions {
       $self->module->searchOn( $moduleOptions, $self->conf->{whatToTrace},
         $user );
 
-    $self->logger->debug("Building array ref with sessions info...");
+    $self->logger->debug('Remove non-SSO session(s)...');
+    my $other = 0;
+    foreach ( keys %$sessions ) {
+        unless ( $sessions->{$_}->{_session_kind} eq 'SSO' ) {
+            delete $sessions->{$_};
+            $other++;
+        }
+    }
+    $self->logger->info("$other non-SSO session(s) removed")
+      if $other;
+
+    $self->logger->debug('Build an array ref with sessions info...');
     @$activeSessions =
       map {
         my $epoch;

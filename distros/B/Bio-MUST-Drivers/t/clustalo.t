@@ -13,8 +13,10 @@ use Path::Class qw(file);
 use Bio::MUST::Core;
 use Bio::MUST::Drivers::ClustalO;
 
-my $class = 'Bio::MUST::Drivers::ClustalO';
 
+say 'Note: tests designed for: Clustal Omega - 1.2.4 (AndreaGiacomo)';
+
+my $class = 'Bio::MUST::Drivers::ClustalO';
 
 # Note: provisioning system is not enabled to help tests to pass on CPANTS
 my $app = use_module('Bio::MUST::Provision::ClustalO')->new;

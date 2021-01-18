@@ -7,7 +7,7 @@ use Data::Dumper;
 use File::Find::Rule;
 use File::Find;
 use Test::More;
-use Dist::Mgr qw(:all);
+use Dist::Mgr qw(:private);
 use version;
 
 BEGIN {
@@ -125,7 +125,7 @@ done_testing;
 system("rm", "-rf", "/home/spek/repos/acme-steveb");
 
 sub before {
-    like $cwd, qr/dist-mgr/, "in proper directory ok";
+    like $cwd, _dist_dir_re(), "in proper directory ok";
 
     chdir $work or die $!;
     like getcwd(), qr/$work$/, "in $work directory ok";
@@ -149,7 +149,7 @@ sub before {
 }
 sub after {
     chdir $cwd or die $!;
-    like getcwd(), qr/dist-mgr/, "back in root directory ok";
+    like getcwd(), _dist_dir_re(), "back in root directory ok";
 }
 sub file_count {
     my ($expected_count, $msg) = @_;

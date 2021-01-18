@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Data::Object::Plugin';
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 # ATTRIBUTES
 

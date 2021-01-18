@@ -1,0 +1,128 @@
+---
+abstract: 'Lightweight Ephemeris'
+author:
+  - 'Sergey Krushinsky <krushi at cpan.org>'
+build_requires:
+  Pod::Simple::HTMLBatch: '0'
+  Pod::Simple::XHTML: '0'
+  Test::CheckManifest: '0.9'
+  Test::Harness: '3.38'
+  Test::More: '1.30'
+  Test::Number::Delta: '1.06'
+  Test::Pod::Coverage: '1.08'
+  Test::Simple: '1.30'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Astro-Montenbruck
+provides:
+  Astro::Montenbruck:
+    file: lib/Astro/Montenbruck.pm
+    version: '1.2'
+  Astro::Montenbruck::CoCo:
+    file: lib/Astro/Montenbruck/CoCo.pm
+    version: '0.01'
+  Astro::Montenbruck::Ephemeris:
+    file: lib/Astro/Montenbruck/Ephemeris.pm
+    version: '0.03'
+  Astro::Montenbruck::Ephemeris::Pert:
+    file: lib/Astro/Montenbruck/Ephemeris/Pert.pm
+    version: '0.01'
+  Astro::Montenbruck::Ephemeris::Planet:
+    file: lib/Astro/Montenbruck/Ephemeris/Planet.pm
+    version: '0.04'
+  Astro::Montenbruck::Ephemeris::Planet::Jupiter:
+    file: lib/Astro/Montenbruck/Ephemeris/Planet/Jupiter.pm
+    version: '0.01'
+  Astro::Montenbruck::Ephemeris::Planet::Mars:
+    file: lib/Astro/Montenbruck/Ephemeris/Planet/Mars.pm
+    version: '0.01'
+  Astro::Montenbruck::Ephemeris::Planet::Mercury:
+    file: lib/Astro/Montenbruck/Ephemeris/Planet/Mercury.pm
+    version: '0.01'
+  Astro::Montenbruck::Ephemeris::Planet::Moon:
+    file: lib/Astro/Montenbruck/Ephemeris/Planet/Moon.pm
+    version: '0.02'
+  Astro::Montenbruck::Ephemeris::Planet::Neptune:
+    file: lib/Astro/Montenbruck/Ephemeris/Planet/Neptune.pm
+    version: '0.02'
+  Astro::Montenbruck::Ephemeris::Planet::Pluto:
+    file: lib/Astro/Montenbruck/Ephemeris/Planet/Pluto.pm
+    version: '0.01'
+  Astro::Montenbruck::Ephemeris::Planet::Saturn:
+    file: lib/Astro/Montenbruck/Ephemeris/Planet/Saturn.pm
+    version: '0.01'
+  Astro::Montenbruck::Ephemeris::Planet::Sun:
+    file: lib/Astro/Montenbruck/Ephemeris/Planet/Sun.pm
+    version: '0.01'
+  Astro::Montenbruck::Ephemeris::Planet::Uranus:
+    file: lib/Astro/Montenbruck/Ephemeris/Planet/Uranus.pm
+    version: '0.01'
+  Astro::Montenbruck::Ephemeris::Planet::Venus:
+    file: lib/Astro/Montenbruck/Ephemeris/Planet/Venus.pm
+    version: '0.01'
+  Astro::Montenbruck::Lunation:
+    file: lib/Astro/Montenbruck/Lunation.pm
+    version: '0.03'
+  Astro::Montenbruck::Lunation::Quarter:
+    file: lib/Astro/Montenbruck/Lunation/Quarter.pm
+    version: '0.01'
+  Astro::Montenbruck::MathUtils:
+    file: lib/Astro/Montenbruck/MathUtils.pm
+    version: '0.02'
+  Astro::Montenbruck::NutEqu:
+    file: lib/Astro/Montenbruck/NutEqu.pm
+    version: '0.02'
+  Astro::Montenbruck::RiseSet:
+    file: lib/Astro/Montenbruck/RiseSet.pm
+    version: '0.02'
+  Astro::Montenbruck::RiseSet::Constants:
+    file: lib/Astro/Montenbruck/RiseSet/Constants.pm
+    version: '0.02'
+  Astro::Montenbruck::RiseSet::Plarise:
+    file: lib/Astro/Montenbruck/RiseSet/Plarise.pm
+    version: '0.01'
+  Astro::Montenbruck::RiseSet::Sunset:
+    file: lib/Astro/Montenbruck/RiseSet/Sunset.pm
+    version: '0.02'
+  Astro::Montenbruck::SolEqu:
+    file: lib/Astro/Montenbruck/SolEqu.pm
+    version: '0.02'
+  Astro::Montenbruck::Time:
+    file: lib/Astro/Montenbruck/Time.pm
+    version: '0.01'
+  Astro::Montenbruck::Time::DeltaT:
+    file: lib/Astro/Montenbruck/Time/DeltaT.pm
+    version: '0.01'
+  Astro::Montenbruck::Time::Sidereal:
+    file: lib/Astro/Montenbruck/Time/Sidereal.pm
+    version: '0.01'
+  Astro::Montenbruck::Utils::Helpers:
+    file: lib/Astro/Montenbruck/Utils/Helpers.pm
+    version: '0.04'
+  Astro::Montenbruck::Utils::Theme:
+    file: lib/Astro/Montenbruck/Utils/Theme.pm
+    version: '0.01'
+  Astro::Montenbruck::Utils::Theme::Colorless:
+    file: lib/Astro/Montenbruck/Utils/Theme/Colorless.pm
+    version: '0.01'
+  Astro::Montenbruck::Utils::Theme::Dark:
+    file: lib/Astro/Montenbruck/Utils/Theme/Dark.pm
+    version: '0.01'
+  Astro::Montenbruck::Utils::Theme::Light:
+    file: lib/Astro/Montenbruck/Utils/Theme/Light.pm
+    version: '0.01'
+requires:
+  DateTime: '1.44'
+  DateTime::Format::Strptime: '1.76'
+  List::MoreUtils: '0.43'
+  Memoize: '1.03'
+  Readonly: '2.05'
+  Term::ANSIColor: '1.00'
+version: '1.2'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

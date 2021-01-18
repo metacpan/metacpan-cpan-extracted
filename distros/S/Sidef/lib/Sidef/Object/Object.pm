@@ -35,11 +35,17 @@ package Sidef::Object::Object {
       q{cmp} => sub {
         my ($obj1, $obj2, $swapped) = @_;
 
-        # Support for cyclic references
-        if (    CORE::ref($obj1) eq CORE::ref($obj2)
-            and CORE::ref($obj1) ne 'Sidef::Types::Number::Number'
-            and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
-            return 0;
+        # Optimization for identical objects
+        if (CORE::ref($obj1) eq CORE::ref($obj2)) {
+            if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
+                if (ref($$obj1) eq 'Math::GMPz' and ref($$obj2) eq 'Math::GMPz') {
+                    @_ = ($$obj1, $$obj2);
+                    goto &Math::GMPz::Rmpz_cmp;
+                }
+            }
+            elsif (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
+                return 0;
+            }
         }
 
         if ($swapped) {
@@ -62,11 +68,16 @@ package Sidef::Object::Object {
       q{eq} => sub {
         my ($obj1, $obj2) = @_;
 
-        # Support for cyclic references
-        if (    CORE::ref($obj1) eq CORE::ref($obj2)
-            and CORE::ref($obj1) ne 'Sidef::Types::Number::Number'
-            and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
-            return 1;
+        # Optimization for identical objects
+        if (CORE::ref($obj1) eq CORE::ref($obj2)) {
+            if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
+                if (ref($$obj1) eq 'Math::GMPz' and ref($$obj2) eq 'Math::GMPz') {
+                    return !Math::GMPz::Rmpz_cmp($$obj1, $$obj2);
+                }
+            }
+            elsif (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
+                return 1;
+            }
         }
 
 #<<<
@@ -390,15 +401,10 @@ package Sidef::Object::Object {
             Sidef::Types::Array::Pair->new($_[0], $_[1]);
         };
 
-        # TODO: v4.0: the following 2 methods should create an Array with 2 elements
-        # Pair (2-Array) method: Fullwidth Colon; U+FF1A
+        # Pair method: Fullwidth Colon; U+FF1A
         *{__PACKAGE__ . '::' . '：'} = sub {
             Sidef::Types::Array::Pair->new($_[0], $_[1]);
         };
-
-        # Pair (2-Array) method: Broken bar; U+A6
-        # Easier to type than U+FF1A, but uglier
-        *{__PACKAGE__ . '::' . '¦'} = \&{__PACKAGE__ . '::' . '：'};
 
         # NamedParam method: Triple Colon Operator; U+2AF6
         *{__PACKAGE__ . '::' . '⫶'} = sub {

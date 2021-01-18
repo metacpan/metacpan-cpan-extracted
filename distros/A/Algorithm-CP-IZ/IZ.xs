@@ -1345,6 +1345,25 @@ OUTPUT:
     RETVAL
 
 #endif /* (IZ_VERSION_MAJOR == 3 && IZ_VERSION_MINOR >= 6) */
+
+#if (IZ_VERSION_MAJOR == 3 && IZ_VERSION_MINOR >= 7)
+
+int
+cs_Regular(tint, size, darray, Q, S, q0, farray, fsize)
+    void* tint
+    int size
+    void* darray
+    int S
+    int Q
+    int q0
+    void* farray
+    int fsize
+CODE:
+    RETVAL = cs_Regular(tint, size, darray, Q, S, q0, farray, fsize);
+OUTPUT:
+    RETVAL
+
+#endif /* (IZ_VERSION_MAJOR == 3 && IZ_VERSION_MINOR >= 6) */
     
 int
 iz_getEndValue(vint, val)

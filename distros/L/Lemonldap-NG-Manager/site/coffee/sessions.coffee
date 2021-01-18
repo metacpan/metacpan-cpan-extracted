@@ -176,8 +176,9 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 
 	# Delete RP Consent
 	$scope.deleteOIDCConsent = (rp, epoch) ->
-		item = angular.element(".data-#{epoch}")
-		item.remove()
+		items = document.querySelectorAll(".data-#{epoch}")
+		for e in items
+			e.remove()
 		$scope.waiting = true
 		$http['delete']("#{scriptname}sessions/OIDCConsent/#{sessionType}/#{$scope.currentSession.id}?rp=#{rp}&epoch=#{epoch}").then (response) ->
 			$scope.waiting = false
@@ -225,7 +226,6 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 						title: title
 						nodes: tmp
 			time = session._utime
-			id = session._session_id
 
 			# 1. Replace values if needed
 			for key, value of session
@@ -272,7 +272,7 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 							delete session[attr]
 						else if session[attr].toString().match(/"rp":\s*"[\w-]+"/)
 							subres.push
-								title: "rp"
+								title: "RP"
 								value: "scope"
 								epoch: "date"
 								td: "0"
@@ -375,7 +375,6 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 				nodes: tmp
 			return {
 				_utime: time
-				id: id
 				nodes: res
 			}
 
@@ -383,6 +382,7 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 		sessionId = scope.$modelValue.session
 		$http.get("#{scriptname}sessions/#{sessionType}/#{sessionId}").then (response) ->
 			$scope.currentSession = transformSession response.data
+			$scope.currentSession.id = sessionId
 		$scope.showT = false
 
 	$scope.localeDate = (s) ->

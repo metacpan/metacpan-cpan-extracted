@@ -4,7 +4,7 @@ use warnings;
 
 use base 'RxPerl::Observable';
 
-our $VERSION = "v6.4.1";
+our $VERSION = "v6.4.2";
 
 # over-rideable
 # sub _on_subscribe {

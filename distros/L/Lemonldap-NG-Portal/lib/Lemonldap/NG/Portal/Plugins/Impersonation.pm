@@ -3,15 +3,17 @@ package Lemonldap::NG::Portal::Plugins::Impersonation;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_MALFORMEDUSER
   PE_OK PE_BADCREDENTIALS
   PE_IMPERSONATION_SERVICE_NOT_ALLOWED
-  PE_MALFORMEDUSER
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
-extends 'Lemonldap::NG::Portal::Main::Plugin',
-  'Lemonldap::NG::Portal::Lib::_tokenRule';
+extends qw(
+  Lemonldap::NG::Portal::Main::Plugin
+  Lemonldap::NG::Portal::Lib::_tokenRule
+);
 
 # INITIALIZATION
 

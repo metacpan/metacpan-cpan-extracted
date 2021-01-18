@@ -17,7 +17,7 @@ foreach my $package ( qw(Numbers Regexes Strings Dates General
 	print STDERR $@ if $@;
 	}
 
-$VERSION = '0.228';
+$VERSION = '0.901';
 
 =encoding utf8
 
@@ -560,7 +560,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

@@ -23,9 +23,8 @@ no_index:
     - t
     - inc
 requires:
-  Kelp: '1'
-  Kelp::Module::Symbiosis: '1'
-  Plack::App::WebSocket: '0.08'
+  Kelp::Module::Symbiosis: '0'
+  Plack::App::WebSocket: '0'
   Try::Tiny: '0'
   perl: '5.010'
 resources:
@@ -33,5 +32,5 @@ resources:
   homepage: https://brtastic.xyz/project/kelp
   license: https://dev.perl.org/licenses
   repository: https://github.com/brtastic/perl-kelp-module-websocket-anyevent
-version: '1.02'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

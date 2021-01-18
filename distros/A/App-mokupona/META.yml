@@ -27,5 +27,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://alexschroeder.ch/cgit/moku-pona
-version: 2.08
+version: 2.09
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

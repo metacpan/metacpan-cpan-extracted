@@ -3,22 +3,23 @@ package Lemonldap::NG::Portal::Password::LDAP;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_PASSWORD_OK
-  PE_LDAPERROR
-  PE_LDAPCONNECTFAILED
   PE_ERROR
+  PE_LDAPERROR
+  PE_PASSWORD_OK
+  PE_LDAPCONNECTFAILED
 );
 
-extends 'Lemonldap::NG::Portal::Lib::LDAP',
-  'Lemonldap::NG::Portal::Password::Base';
+extends qw(
+  Lemonldap::NG::Portal::Lib::LDAP
+  Lemonldap::NG::Portal::Password::Base
+);
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.10';
 
 sub init {
     my ($self) = @_;
-    $self->ldap
-      and $self->filter
-      and $self->Lemonldap::NG::Portal::Password::Base::init;
+    return (  $self->Lemonldap::NG::Portal::Password::Base::init
+          and $self->Lemonldap::NG::Portal::Lib::LDAP::init );
 }
 
 # Confirmation is done by Lib::Net::LDAP::userModifyPassword
@@ -27,31 +28,30 @@ sub confirm {
 }
 
 sub modifyPassword {
-    my ( $self, $req, $pwd ) = @_;
+    my ( $self, $req, $pwd, $useMail ) = @_;
     my $dn;
     my $requireOldPassword;
-    my $rule = $self->p->HANDLER->buildSub(
-        $self->p->HANDLER->substitute(
-            $self->conf->{portalRequireOldPassword}
-        )
-    );
-    unless ($rule) {
-        my $error = $self->p->HANDLER->tsv->{jail}->error || '???';
-    }
+
+    # If the password change is done in a different backend,
+    # we need to reload the correct DN
+    $self->getUser( $req, useMail => $useMail )
+      if $self->conf->{ldapGetUserBeforePasswordChange};
+
     if ( $req->data->{dn} ) {
         $dn                 = $req->data->{dn};
-        $requireOldPassword = $rule->( $req, $req->userData );
+        $requireOldPassword = $self->requireOldPwdRule->( $req, $req->userData );
         $self->logger->debug("Get DN from request data: $dn");
     }
     else {
         $dn                 = $req->sessionInfo->{_dn};
-        $requireOldPassword = $rule->( $req, $req->sessionInfo );
+        $requireOldPassword = $self->requireOldPwdRule->( $req, $req->sessionInfo );
         $self->logger->debug("Get DN from session data: $dn");
     }
     unless ($dn) {
         $self->logger->error('"dn" is not set, aborting password modification');
         return PE_ERROR;
     }
+    $requireOldPassword = 0 if $useMail;
 
     # Ensure connection is valid
     $self->bind;

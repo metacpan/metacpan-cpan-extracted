@@ -78,7 +78,7 @@ sub extractFormInfo {
         $self->logger->debug('Redirection to Twitter');
 
         # 1.1 Try to get token to dialog with Twitter
-        my $callback_url = $self->p->fullUrl($req);
+        my $callback_url = $self->p->portal;
 
         # Twitter callback parameter
         my %prm = ( twitterback => 1 );

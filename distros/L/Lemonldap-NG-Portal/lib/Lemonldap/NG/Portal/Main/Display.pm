@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -40,7 +40,10 @@ sub displayInit {
     }
     $self->requireOldPwd($rule);
 
-    my $speChars = $self->conf->{passwordPolicySpecialChar};
+    my $speChars =
+      $self->conf->{passwordPolicySpecialChar} eq '__ALL__'
+      ? ''
+      : $self->conf->{passwordPolicySpecialChar};
     $speChars =~ s/\s+/ /g;
     $speChars =~ s/(?:^\s|\s$)//g;
     $self->speChars($speChars);
@@ -106,8 +109,9 @@ sub display {
             CHOICE_VALUE    => $req->data->{_authChoice},
             CHECK_LOGINS    => $self->conf->{portalCheckLogins}
               && $req->data->{login},
-            ASK_LOGINS => $req->param('checkLogins') || 0,
-            CONFIRMKEY => $self->stamp(),
+            ASK_LOGINS        => $req->param('checkLogins')   || 0,
+            ASK_STAYCONNECTED => $req->param('stayconnected') || 0,
+            CONFIRMKEY        => $self->stamp(),
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -134,9 +138,10 @@ sub display {
             CHOICE_VALUE    => $req->data->{_authChoice},
             CHECK_LOGINS    => $self->conf->{portalCheckLogins}
               && $req->data->{login},
-            ASK_LOGINS => $req->param('checkLogins') || 0,
-            CONFIRMKEY => $self->stamp(),
-            LIST       => $req->data->{list} || [],
+            ASK_LOGINS        => $req->param('checkLogins')   || 0,
+            ASK_STAYCONNECTED => $req->param('stayconnected') || 0,
+            CONFIRMKEY        => $self->stamp(),
+            LIST => $req->data->{list} || [],
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -238,18 +243,17 @@ sub display {
             PING           => $self->conf->{portalPingInterval},
             REQUIRE_OLDPASSWORD =>
               $self->requireOldPwd->( $req, $req->userData ),
-            HIDE_OLDPASSWORD => 0,
-            DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy},
-            PPOLICY_MINSIZE  => $self->conf->{passwordPolicyMinSize},
-            PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
-            PPOLICY_MINUPPER => $self->conf->{passwordPolicyMinUpper},
-            PPOLICY_MINDIGIT => $self->conf->{passwordPolicyMinDigit},
-            PPOLICY_NOPOLICY => !$self->isPP(),
-            PPOLICY_ALLOWEDSPECHAR => $self->speChars(),
+            HIDE_OLDPASSWORD   => 0,
+            PPOLICY_NOPOLICY   => !$self->isPP(),
+            DISPLAY_PPOLICY    => $self->conf->{portalDisplayPasswordPolicy},
+            PPOLICY_MINSIZE    => $self->conf->{passwordPolicyMinSize},
+            PPOLICY_MINLOWER   => $self->conf->{passwordPolicyMinLower},
+            PPOLICY_MINUPPER   => $self->conf->{passwordPolicyMinUpper},
+            PPOLICY_MINDIGIT   => $self->conf->{passwordPolicyMinDigit},
+            PPOLICY_MINSPECHAR => $self->conf->{passwordPolicyMinSpeChar},
             (
-                $self->speChars()
-                ? ( PPOLICY_MINSPECHAR =>
-                      $self->conf->{passwordPolicyMinSpeChar} )
+                $self->conf->{passwordPolicyMinSpeChar}
+                ? ( PPOLICY_ALLOWEDSPECHAR => $self->speChars() )
                 : ()
             ),
             $self->menu->params($req),
@@ -375,6 +379,7 @@ sub display {
             DONT_STORE_PASSWORD   => $self->conf->{browsersDontStorePassword},
             CHECK_LOGINS          => $self->conf->{portalCheckLogins},
             ASK_LOGINS            => $req->param('checkLogins') || 0,
+            ASK_STAYCONNECTED     => $req->param('stayconnected') || 0,
             DISPLAY_RESETPASSWORD => $self->conf->{portalDisplayResetPassword},
             DISPLAY_REGISTER      => $self->conf->{portalDisplayRegister},
             DISPLAY_UPDATECERTIF =>
@@ -436,17 +441,16 @@ sub display {
                     $req->data->{oldpassword} ) ? ""
                 : $req->data->{oldpassword},
                 HIDE_OLDPASSWORD => $self->conf->{hideOldPassword},
+                PPOLICY_NOPOLICY => !$self->isPP(),
                 DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy},
                 PPOLICY_MINSIZE  => $self->conf->{passwordPolicyMinSize},
                 PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
                 PPOLICY_MINUPPER => $self->conf->{passwordPolicyMinUpper},
                 PPOLICY_MINDIGIT => $self->conf->{passwordPolicyMinDigit},
-                PPOLICY_NOPOLICY => !$self->isPP(),
-                PPOLICY_ALLOWEDSPECHAR => $self->speChars(),
+                PPOLICY_MINSPECHAR => $self->conf->{passwordPolicyMinSpeChar},
                 (
-                    $self->speChars()
-                    ? ( PPOLICY_MINSPECHAR =>
-                          $self->conf->{passwordPolicyMinSpeChar} )
+                    $self->conf->{passwordPolicyMinSpeChar}
+                    ? ( PPOLICY_ALLOWEDSPECHAR => $self->speChars() )
                     : ()
                 ),
             );
@@ -499,7 +503,7 @@ sub display {
                   eval { $self->_authentication->getDisplayType($req) }
                   || 'logo';
 
-                $self->logger->debug("Display type $displayType ");
+                $self->logger->debug("Display type $displayType");
 
                 %templateParams = (
                     %templateParams,

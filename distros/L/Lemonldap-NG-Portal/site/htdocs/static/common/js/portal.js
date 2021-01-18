@@ -233,7 +233,7 @@ LemonLDAP::NG Portal jQuery scripts
   datas = {};
 
   $(window).on('load', function() {
-    var action, al, authMenuIndex, authMenuTabs, back_url, checkpassword, checksamepass, hiddenParams, isAlphaNumeric, l, lang, langdiv, langs, langs2, len1, len2, len3, len4, link, m, menuIndex, menuTabs, method, n, nl, nlangs, o, queryLang, re, ref, ref1, ref2, setCookieLang;
+    var action, al, authMenuIndex, authMenuTabs, back_url, checkpassword, checksamepass, hiddenParams, isAlphaNumeric, l, lang, langdiv, langs, langs2, len1, len2, len3, len4, link, m, menuIndex, menuTabs, method, n, nl, nlangs, o, queryLang, re, ref, ref1, ref2, setCookieLang, togglecheckpassword;
     datas = getValues();
     if ("datas" in window && "choicetab" in window.datas) {
       datas.choicetab = window.datas.choicetab;
@@ -408,7 +408,7 @@ LemonLDAP::NG Portal jQuery scripts
       return false;
     };
     checkpassword = function(password) {
-      var digit, hasforbidden, i, len, lower, nonwhitespechar, numspechar, result, upper;
+      var digit, hasforbidden, i, len, lower, nonwhitespechar, numspechar, ref3, ref4, result, upper;
       result = true;
       if (window.datas.ppolicy.minsize > 0) {
         if (password.length >= window.datas.ppolicy.minsize) {
@@ -494,31 +494,73 @@ LemonLDAP::NG Portal jQuery scripts
           result = false;
         }
       }
+      if (window.datas.ppolicy.minspechar > 0 && !window.datas.ppolicy.allowedspechar) {
+        numspechar = 0;
+        i = 0;
+        while (i < password.length) {
+          if (!isAlphaNumeric(password.charAt(i))) {
+            numspechar++;
+          }
+          i++;
+        }
+        if (numspechar >= window.datas.ppolicy.minspechar) {
+          $('#ppolicy-minspechar-feedback').addClass('fa-check text-success');
+          $('#ppolicy-minspechar-feedback').removeClass('fa-times text-danger');
+        } else {
+          $('#ppolicy-minspechar-feedback').removeClass('fa-check text-success');
+          $('#ppolicy-minspechar-feedback').addClass('fa-times text-danger');
+          result = false;
+        }
+      }
       if (result) {
         $('.ppolicy').removeClass('border-danger').addClass('border-success');
-        $('#newpassword')[0].setCustomValidity('');
+        if ((ref3 = $('#newpassword').get(0)) != null) {
+          ref3.setCustomValidity('');
+        }
       } else {
         $('.ppolicy').removeClass('border-success').addClass('border-danger');
-        $('#newpassword')[0].setCustomValidity(translate('PE28'));
+        if ((ref4 = $('#newpassword').get(0)) != null) {
+          ref4.setCustomValidity(translate('PE28'));
+        }
       }
     };
-    if (window.datas.ppolicy != null) {
+    if ((window.datas.ppolicy != null) && $('#newpassword').length) {
       checkpassword('');
       $('#newpassword').keyup(function(e) {
         checkpassword(e.target.value);
       });
     }
+    togglecheckpassword = function(e) {
+      var ref3;
+      if (e.target.checked) {
+        $('#newpassword').off('keyup');
+        return (ref3 = $('#newpassword').get(0)) != null ? ref3.setCustomValidity('') : void 0;
+      } else {
+        $('#newpassword').keyup(function(e) {
+          checkpassword(e.target.value);
+        });
+        return checkpassword('');
+      }
+    };
     checksamepass = function() {
-      if ($('#confirmpassword')[0].value === $('#newpassword')[0].value) {
-        $('#confirmpassword')[0].setCustomValidity('');
+      var ref3, ref4, ref5, ref6;
+      if (((ref3 = $('#confirmpassword').get(0)) != null ? ref3.value : void 0) === ((ref4 = $('#newpassword').get(0)) != null ? ref4.value : void 0)) {
+        if ((ref5 = $('#confirmpassword').get(0)) != null) {
+          ref5.setCustomValidity('');
+        }
         return true;
       } else {
-        $('#confirmpassword')[0].setCustomValidity(translate('PE34'));
+        if ((ref6 = $('#confirmpassword').get(0)) != null) {
+          ref6.setCustomValidity(translate('PE34'));
+        }
         return false;
       }
     };
     $('#newpassword').change(checksamepass);
     $('#confirmpassword').change(checksamepass);
+    if ((window.datas.ppolicy != null) && $('#newpassword').length) {
+      $('#reset').change(togglecheckpassword);
+    }
     if (datas['pingInterval'] && datas['pingInterval'] > 0) {
       window.setTimeout(ping, datas['pingInterval']);
     }

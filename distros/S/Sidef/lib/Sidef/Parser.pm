@@ -13,12 +13,12 @@ package Sidef::Parser {
         my %options = (
             line          => 1,
             inc           => [],
-            class         => 'main',           # a.k.a. namespace
+            class         => 'main',    # a.k.a. namespace
             vars          => {'main' => []},
             ref_vars_refs => {'main' => []},
             EOT           => [],
 
-            postfix_ops => {                   # postfix operators
+            postfix_ops => {            # postfix operators
                              '--'  => 1,
                              '++'  => 1,
                              '...' => 1,
@@ -72,6 +72,7 @@ package Sidef::Parser {
                      | Num(?:ber)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Number') })
                      | Mod\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Mod') })
                      | Gauss\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Gauss') })
+                     | Quadratic\b                    (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Quadratic') })
                      | Inf\b                          (?{ state $x = Sidef::Types::Number::Number->inf })
                      | NaN\b                          (?{ state $x = Sidef::Types::Number::Number->nan })
                      | Infi\b                         (?{ state $x = Sidef::Types::Number::Complex->new(0, Sidef::Types::Number::Number->inf) })
@@ -206,6 +207,7 @@ package Sidef::Parser {
                   Num Number
                   Mod
                   Gauss
+                  Quadratic
                   Range
                   RangeStr RangeString
                   RangeNum RangeNumber
@@ -333,9 +335,9 @@ package Sidef::Parser {
                   != ..
                   \\\\= \\\\
                   !! !
-                  : ： ⫶ ¦
+                  : ： ⫶
                   « » ~
-                  );
+                );
 
                 qr{
                     (?(DEFINE)
@@ -391,7 +393,7 @@ package Sidef::Parser {
                   ~
             },
             %opts,
-                      );
+        );
 
         $options{ref_vars} = $options{vars};
         $options{file_name}   //= '-';
@@ -1092,7 +1094,7 @@ package Sidef::Parser {
                 my $obj = (
                     $double_quoted
                     ? do {
-                        state $str = Sidef::Types::String::String->new;                                # load the string module
+                        state $str = Sidef::Types::String::String->new;    # load the string module
                         Sidef::Types::String::String::apply_escapes($package->$method($string), $self);
                       }
                     : $package->$method($string =~ s{\\\\}{\\}gr)
@@ -1497,9 +1499,9 @@ package Sidef::Parser {
 
                 if ($type eq 'class' and /\G($self->{var_name_re})\h*/gco) {
 
-                    ($name, $class_name) = $self->get_name_and_class($1);
+                    $name = $1;
 
-                    if (exists($self->{built_in_classes}{$name})) {
+                    if (exists($self->{built_in_classes}{$name}) and /\G(?=[{<])/) {
 
                         my ($obj) = $self->parse_expr(code => \$name);
 
@@ -1507,6 +1509,9 @@ package Sidef::Parser {
                             $name         = '';
                             $built_in_obj = $obj;
                         }
+                    }
+                    else {
+                        ($name, $class_name) = $self->get_name_and_class($1);
                     }
                 }
 
@@ -1608,7 +1613,7 @@ package Sidef::Parser {
                                     # Detect inheritance from the same class
                                     if (refaddr($obj) == refaddr($class->{obj})) {
                                         $self->fatal_error(
-                                                           error => "Inheriting from the same class does is not allowed",
+                                                           error => "Inheriting from the same class is not allowed",
                                                            code  => $_,
                                                            pos   => pos($_) - length($name) - 1,
                                                           );
@@ -1628,7 +1633,7 @@ package Sidef::Parser {
                             }
                             elsif (exists $self->{built_in_classes}{$name}) {
                                 $self->fatal_error(
-                                                   error  => "Inheriting from built-in classes is not allowed",
+                                                   error  => "Inheriting from built-in classes is not supported",
                                                    reason => "`$name` is a built-in class",
                                                    code   => $_,
                                                    pos    => pos($_) - length($name) - 1,
@@ -2183,13 +2188,14 @@ package Sidef::Parser {
             }
 
             # Binary, hexadecimal and octal numbers
-            if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|[0-9_]+\b)/gc) {
+            if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|o[0-7_]*|[0-7_]+)\b/gc) {
                 my $num = $1 =~ tr/_//dr;
                 return
                   Sidef::Types::Number::Number->new(
-                                                      $num =~ /^b/ ? (substr($num, 1), 2)
-                                                    : $num =~ /^x/ ? (substr($num, 1), 16)
-                                                    :                ($num, 8)
+                                                      $num =~ /^b/ ? (substr($num, 1) || 0, 2)
+                                                    : $num =~ /^o/ ? (substr($num, 1) || 0, 8)
+                                                    : $num =~ /^x/ ? (substr($num, 1) || 0, 16)
+                                                    :                ($num            || 0, 8)
                                                    );
             }
 
@@ -2505,17 +2511,17 @@ package Sidef::Parser {
             }
 
             if (exists($self->{current_function})) {
-                /\G__FUNC__\b/gc && return $self->{current_function};
+                /\G__FUNC__\b/gc      && return $self->{current_function};
                 /\G__FUNC_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_function}{name});
             }
 
             if (exists($self->{current_class})) {
-                /\G__CLASS__\b/gc && return $self->{current_class};
+                /\G__CLASS__\b/gc      && return $self->{current_class};
                 /\G__CLASS_NAME__\b/gc && return Sidef::Types::String::String->new($self->{class_name});
             }
 
             if (exists($self->{current_method})) {
-                /\G__METHOD__\b/gc && return $self->{current_method};
+                /\G__METHOD__\b/gc      && return $self->{current_method};
                 /\G__METHOD_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_method}{name});
             }
 
@@ -2774,7 +2780,7 @@ package Sidef::Parser {
             my $count = scalar(@{$self->{vars}{$class_name}});
 
             unshift @{$self->{ref_vars_refs}{$class_name}}, @{$ref};
-            unshift @{$self->{vars}{$class_name}}, [];
+            unshift @{$self->{vars}{$class_name}},          [];
 
             $self->{vars}{$class_name} = $self->{vars}{$class_name}[0];
 

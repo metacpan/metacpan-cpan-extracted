@@ -1,3 +1,10 @@
+0.06 2021-01-14T19:16:36+01:00
+ - Add Lexeme.
+ - Add test for globe coordinate with negative value.
+ - Fix JSON null in perl structure.
+ - Fix doc for Item (missing error).
+ - Update copyright years.
+
 0.05 2020-12-23T00:38:25+01:00
  - Add Form.
 

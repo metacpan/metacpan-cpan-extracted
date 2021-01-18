@@ -9,7 +9,7 @@ use Net::SAML2::XML::Util qw/ no_comments /;
 
 use Net::SAML2::XML::Sig;
 use MIME::Base64 qw/ decode_base64 /;
-use Crypt::OpenSSL::VerifyX509;
+use Crypt::OpenSSL::Verify;
 
 
 has 'cert_text' => (isa => 'Str', is => 'ro');
@@ -32,7 +32,7 @@ sub handle_response {
         my $cert = $x->signer_cert
             or die "Certificate not provided and not in SAML Response, cannot validate";
 
-        my $ca = Crypt::OpenSSL::VerifyX509->new($self->cacert);
+        my $ca = Crypt::OpenSSL::Verify->new($self->cacert, { strict_certs => 0, });
         if ($ca->verify($cert)) {
             return sprintf("%s (verified)", $cert->subject);
         } else {
@@ -57,7 +57,7 @@ Net::SAML2::Binding::POST
 
 =head1 VERSION
 
-version 0.29
+version 0.32
 
 =head1 SYNOPSIS
 

@@ -223,7 +223,7 @@ use Test::More tests => 42;
 {
     my $diskBAM = get_empty_bam_object();
     my $sector_data = $diskBAM->get_bam_data();
-    substr ($sector_data, 0x45, 1) = chr 128;
+    substr ($sector_data, 0x45, 1) = chr 15;
     my $stderr = capture_stderr {
         $diskBAM = get_empty_bam_object($sector_data);
     };

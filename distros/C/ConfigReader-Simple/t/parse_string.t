@@ -16,6 +16,7 @@ can_ok( $class, $method );
 #
 {
 my $string = <<"HERE";
+
 cat Buster
 dog \\
 	Tuffy

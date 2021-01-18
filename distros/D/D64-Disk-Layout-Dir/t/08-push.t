@@ -62,7 +62,7 @@ our $sector_data_size = eval "\$D64::Disk::Layout::Sector::SECTOR_DATA_SIZE";
 {
     my $dir = $class->new();
     $dir->push(item => get_empty_item());
-    my @expected_data = map { chr 0x00 } (0x01 .. $sector_data_size * $total_sector_count);
+    my @expected_data = get_empty_data();
     my @data = $dir->data();
     cmp_deeply(\@data, \@expected_data, 'push an empty item to an empty directory listing');
 }
@@ -77,8 +77,7 @@ our $sector_data_size = eval "\$D64::Disk::Layout::Sector::SECTOR_DATA_SIZE";
     my $dir = $class->new();
     my ($item) = map { D64::Disk::Dir::Item->new($_) } get_item_bytes(1);
     $dir->push(item => $item);
-    my @expected_data = map { chr 0x00 } (0x01 .. $sector_data_size * $total_sector_count);
-    $expected_data[0x01] = chr 0xff;
+    my @expected_data = get_empty_data();
     add_items_to_data([$item], \@expected_data);
     my @data = $dir->data();
     cmp_deeply(\@data, \@expected_data, 'push a new item to an empty directory listing');

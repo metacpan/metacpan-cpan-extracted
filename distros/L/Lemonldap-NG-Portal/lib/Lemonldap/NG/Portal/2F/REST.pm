@@ -10,17 +10,17 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
-extends 'Lemonldap::NG::Portal::Main::SecondFactor',
-  'Lemonldap::NG::Portal::Lib::REST';
+extends qw(
+  Lemonldap::NG::Portal::Main::SecondFactor
+  Lemonldap::NG::Portal::Lib::REST
+);
 
 # INITIALIZATION
 
-has prefix => ( is => 'rw', default => 'rest' );
-
+has prefix    => ( is => 'rw', default => 'rest' );
 has initAttrs => ( is => 'rw', default => sub { {} } );
-
 has vrfyAttrs => ( is => 'rw', default => sub { {} } );
 
 sub init {
@@ -58,7 +58,10 @@ sub run {
     my ( $self, $req, $token ) = @_;
 
     my $checkLogins = $req->param('checkLogins');
-    $self->logger->debug("REST2F checkLogins set") if ($checkLogins);
+    $self->logger->debug("REST2F: checkLogins set") if $checkLogins;
+
+    my $stayconnected = $req->param('stayconnected');
+    $self->logger->debug("REST2F: stayconnected set") if $stayconnected;
 
     if ( $self->conf->{rest2fInitUrl} ) {
 
@@ -98,8 +101,9 @@ sub run {
               . $self->prefix
               . '2fcheck?skin='
               . $self->p->getSkin($req),
-            LEGEND      => 'enterRest2fCode',
-            CHECKLOGINS => $checkLogins
+            LEGEND        => 'enterRest2fCode',
+            CHECKLOGINS   => $checkLogins,
+            STAYCONNECTED => $stayconnected
         }
     );
     $self->logger->debug("Prepare external REST verification");

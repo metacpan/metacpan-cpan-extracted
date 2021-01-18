@@ -1,6 +1,11 @@
 Change history for OTRS::OPM::Parser
 ====================================
 
+1.05 2021-01-16 08:34:00
+
+  + use OTRS::OPM::Validate to validate opm files
+  + update dist.ini
+
 1.04 2020-12-10 11:59:00
 
   + fix built

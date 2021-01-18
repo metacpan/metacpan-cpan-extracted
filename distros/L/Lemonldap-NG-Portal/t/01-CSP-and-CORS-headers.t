@@ -15,6 +15,8 @@ my $client = LLNG::Manager::Test->new( {
             cspFormAction     => '*',
             cspFrameAncestors => 'test.example.com',
             customToTrace     => 'mail',
+            checkStateSecret  => 'x',
+            checkState        => 1,
         }
     }
 );
@@ -37,6 +39,12 @@ ok(
 );
 count(1);
 expectReject($res);
+
+# sendError (#2380)
+ok( $res = $client->_get( '/checkstate', accept => 'text/html' ),
+    'Get error page' );
+count(1);
+checkCorsPolicy($res);
 
 ok( $res = $client->_options( '/', accept => 'text/html' ), 'Get Menu' );
 count(1);

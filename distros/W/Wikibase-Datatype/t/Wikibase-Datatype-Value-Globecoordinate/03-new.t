@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 use Wikibase::Datatype::Value::Globecoordinate;
 
@@ -60,3 +60,9 @@ eval {
 is($EVAL_ERROR, "Parameter 'value' has bad first parameter (longitude).\n",
 	"Parameter 'value' has bad first parameter (longitude).");
 clean();
+
+# Test.
+$obj = Wikibase::Datatype::Value::Globecoordinate->new(
+	'value' => [-16.79,-60.43],
+);
+isa_ok($obj, 'Wikibase::Datatype::Value::Globecoordinate');

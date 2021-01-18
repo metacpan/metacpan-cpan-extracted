@@ -9,6 +9,7 @@
 package Lemonldap::NG::Handler::Lib::ZimbraPreAuth;
 
 use strict;
+use URI::Escape;
 use Digest::HMAC_SHA1 qw(hmac_sha1_hex);
 
 our $VERSION = '2.0.7';
@@ -32,6 +33,12 @@ sub run {
     my $zimbraUrl        = $localConfig->{zimbraUrl} || '/service/preauth';
     my $zimbraSsoUrl     = $localConfig->{zimbraSsoUrl} || '^/zimbrasso$';
     my $timeout          = $localConfig->{'timeout'} || '0';
+
+    # Remove trailing white-spaces
+    $zimbraAccountKey =~ s/\s+$//;
+    $zimbraBy         =~ s/\s+$//;
+    $zimbraUrl        =~ s/\s+$//;
+    $zimbraSsoUrl     =~ s/\s+$//;
 
     # Display found values in debug mode
     $class->logger->debug("zimbraPreAuthKey: $zimbraPreAuthKey");

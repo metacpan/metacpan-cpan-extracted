@@ -10,8 +10,8 @@ use Mouse;
 use JSON qw(from_json);
 use MIME::Entity;
 use Email::Sender::Simple qw(sendmail);
-use Email::Sender::Transport::SMTP qw();
 use Email::Date::Format qw(email_date);
+use Lemonldap::NG::Common::EmailTransport;
 use MIME::Base64;
 use Encode;
 
@@ -38,46 +38,7 @@ has transport => (
     default => sub {
         return $transport if $transport;
         my $conf = $_[0]->{conf};
-        return undef
-          unless ( $conf->{SMTPServer} );
-        if (    $conf->{SMTPTLS}
-            and $Email::Sender::Simple::VERSION < 1.300027 )
-        {
-            require Email::Sender::Transport::SMTPS;
-            $transport = Email::Sender::Transport::SMTPS->new(
-                host => $conf->{SMTPServer},
-                ( $conf->{SMTPPort} ? ( port => $conf->{SMTPPort} ) : () ),
-                (
-                    $conf->{SMTPAuthUser}
-                    ? (
-                        sasl_username => $conf->{SMTPAuthUser},
-                        sasl_password => $conf->{SMTPAuthPass}
-                      )
-                    : ()
-                ),
-                ssl => $conf->{SMTPTLS},
-            );
-        }
-        else {
-            $transport = Email::Sender::Transport::SMTP->new(
-                host => $conf->{SMTPServer},
-                ( $conf->{SMTPPort} ? ( port => $conf->{SMTPPort} ) : () ),
-                (
-                    $conf->{SMTPAuthUser}
-                    ? (
-                        sasl_username => $conf->{SMTPAuthUser},
-                        sasl_password => $conf->{SMTPAuthPass}
-                      )
-                    : ()
-                ),
-                ( $conf->{SMTPTLS} ? ( ssl => $conf->{SMTPTLS} ) : () ),
-                (
-                    $conf->{SMTPTLSOpts}
-                    ? ( ssl_options => $conf->{SMTPTLSOpts} )
-                    : ()
-                ),
-            );
-        }
+        $transport = Lemonldap::NG::Common::EmailTransport->new($conf);
         return $transport;
     },
 );
@@ -228,7 +189,8 @@ sub send_mail {
             ( $self->transport ? { transport => $self->transport } : () ) );
     };
     if ($@) {
-        $self->logger->error("Send message failed: $@");
+        $self->logger->error( "Send message failed: "
+              . ( $@->isa('Throwable::Error') ? $@->message : $@ ) );
         return 0;
     }
 

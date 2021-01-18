@@ -9,7 +9,7 @@ use XML::Tidy;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-$VERSION = '0.29';
+$VERSION = '0.32';
 
 # We are exporting functions
 use base qw/Exporter/;
@@ -42,7 +42,7 @@ Net::SAML2::XML::Util
 
 =head1 VERSION
 
-version 0.29
+version 0.32
 
 =head1 SYNOPSIS
 

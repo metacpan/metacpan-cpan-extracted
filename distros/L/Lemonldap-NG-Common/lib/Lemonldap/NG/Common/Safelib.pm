@@ -9,16 +9,17 @@ use strict;
 use Encode;
 use MIME::Base64;
 use Lemonldap::NG::Common::IPv6;
+use JSON::XS;
 
 #use AutoLoader qw(AUTOLOAD);
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.10';
 
 # Set here all the names of functions that must be available in Safe objects.
 # Not that only functions, not methods, can be written here
 our $functions =
   [
-    qw(&checkLogonHours &date &checkDate &basic &unicode2iso &iso2unicode &groupMatch &isInNet6 &varIsInUri)
+    qw(&checkLogonHours &date &checkDate &basic &unicode2iso &iso2unicode &groupMatch &isInNet6 &varIsInUri &has2f)
   ];
 
 ## @function boolean checkLogonHours(string logon_hours, string syntax, string time_correction, boolean default_access)
@@ -64,8 +65,8 @@ sub checkLogonHours {
     # Use time_correction
     if ($time_correction) {
         my ( $sign, $time ) = ( $time_correction =~ /([+|-]?)(\d+)/ );
-        if ( $sign =~ /-/ ) { $hourpos -= $time; }
-        else                { $hourpos += $time; }
+        if   ( $sign =~ /-/ ) { $hourpos -= $time; }
+        else                  { $hourpos += $time; }
     }
 
     # Get the corresponding byte
@@ -222,6 +223,28 @@ sub varIsInUri {
     return $restricted
       ? $uri =~ /$wanteduri$attribute$/o
       : $uri =~ /$wanteduri$attribute/o;
+}
+
+my $json = JSON::XS->new;
+
+sub has2f {
+    my ( $session, $type ) = @_;
+    return 0 unless ( $session->{_2fDevices} );
+
+    my $_2fDevices = eval { $json->decode( $session->{_2fDevices} ); };
+    return 0 if ( $@ or ref($_2fDevices) ne "ARRAY" );
+
+    my $length = scalar @{$_2fDevices};
+
+    # Empty array
+    return 0 unless $length;
+
+    # Array has one value and we did not specify a type, succeed
+    if ($type) {
+        my @found = grep { lc( $_->{type} ) eq lc($type) } @{$_2fDevices};
+        return ( @found ? 1 : 0 );
+    }
+    return 1;
 }
 
 1;

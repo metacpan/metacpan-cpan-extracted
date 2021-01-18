@@ -8,7 +8,7 @@ use Mo qw(build default is);
 use Mo::utils qw(check_array_object);
 use Wikibase::Datatype::Utils qw(check_entity);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 has forms => (
 	default => [],
@@ -213,7 +213,7 @@ Returns string.
 
 Get lemmas.
 
-Returns reference to array with Wikibase::Datatype::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
 
 =head2 C<lexical_category>
 
@@ -481,6 +481,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

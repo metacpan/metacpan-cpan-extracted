@@ -7,7 +7,7 @@ use Apache2::RequestRec qw();
 use Apache2::RequestUtil qw();
 use Apache2::Const -compile => qw(OK);
 use File::Spec::Functions qw(catfile);
-use MY::slurp;
+use File::Slurp qw(slurp);
 
 sub handler {
     my $r = shift;

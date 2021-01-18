@@ -4,7 +4,10 @@ use MIME::Base64;
 use Data::Dumper;
 use URI::Escape;
 
-require 't/test-psgi-lib.pm';
+BEGIN {
+    require 't/test-psgi-lib.pm';
+    require 't/custom.pm';
+}
 
 init('Lemonldap::NG::Handler::Server::Nginx');
 
@@ -32,6 +35,28 @@ count(4);
 # --------------------
 
 # Authorized query
+ok(
+    $res =
+      $client->_get( '/', undef, 'test4.example.com', "lemonldap=$sessionId" ),
+    'Authentified query'
+);
+ok( $res->[0] == 200, 'Code is 200' ) or explain( $res->[0], 200 );
+count(2);
+
+# Check headers
+%h = @{ $res->[1] };
+ok(
+    $h{'Lm-Remote-Custom'} eq
+'dwho@badwolf.org alias Doctor_Who:users; timelords by using Mozilla/5.0 (X11; VAX4000; rv:43.0) Gecko/20100101 Firefox/143.0 Iceweasel/143.0.1',
+    'Lm-Remote-Custom is overwriten'
+  )
+  or explain(
+    \%h,
+'Lm-Remote-Custom => "dwho@badwolf.org alias Doctor_Who:users; timelords by using Mozilla/5.0 (X11; VAX4000; rv:43.0) Gecko/20100101 Firefox/143.0 Iceweasel/143.0.1"'
+  );
+count(1);
+
+# Authorized query
 ok( $res = $client->_get( '/', undef, undef, "lemonldap=$sessionId" ),
     'Authentified query' );
 ok( $res->[0] == 200, 'Code is 200' ) or explain( $res->[0], 200 );
@@ -43,7 +68,11 @@ ok( $h{'Headername1'} eq 'Auth-User', 'Headername1 is set to "Auth-User"' )
   or explain( \%h, 'Headername1 => "Auth-User"' );
 ok( $h{'Headervalue1'} eq 'dwho', 'Headervalue1 is set to "dwho"' )
   or explain( \%h, 'Headervalue1 => "dwho"' );
-count(2);
+ok(
+    $h{'Lm-Remote-Custom'} eq 'dwho@badwolf.org',
+    'Lm-Remote-Custom is set "dwho@badwolf.org"'
+) or explain( \%h, 'Lm-Remote-User => "dwho@badwolf.org"' );
+count(3);
 
 # Request an URI protected by custom function -> allowed
 ok(
@@ -161,6 +190,28 @@ ok(
       . uri_escape( encode_base64( 'http://test2.example.com/', '' ) )
   );
 count(3);
+
+# Clean headers
+ok(
+    $res = $client->_get(
+        '/skipif/zz', undef, 'test1.example.com', undef,
+        HTTP_AUTH_USER => 'rtyler'
+    ),
+    'Test skip() with forged header'
+);
+ok( $res->[0] == 200, 'Code is 200' ) or explain( $res, 200 );
+count(2);
+%h = @{ $res->[1] };
+my %delete;
+foreach ( keys %h ) {
+    /^Deleteheader\d$/ and $delete{ $h{$_} }++;
+}
+foreach (qw(Cookie HTTP_COOKIE Auth-User HTTP_AUTH_USER)) {
+    ok( $delete{$_}, "Delete command for $_" )
+      or explain( \%h, 'Delete* headers' );
+    ok( !$h{$_}, "$_ is deleted" ) or explain( \%h, 'Delete* headers' );
+    count(2);
+}
 
 done_testing( count() );
 

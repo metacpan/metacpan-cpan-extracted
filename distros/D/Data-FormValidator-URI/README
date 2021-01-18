@@ -1,0 +1,85 @@
+NAME
+
+    Data::FormValidator::URI - URI constraint/filter for
+    Data::FormValidator
+
+SYNOPSIS
+
+      use Data::FormValidator;
+      use Data::FormValidator::URI;
+    
+      my $res = Data::FormValidator->check(
+        {
+          website => 'http://www.example.com/path/to/some/resource.html',
+        },
+        {
+          required      => [qw( website )],
+          field_filters => {
+            website => FV_uri_filter(default => 'http'),
+          },
+          constraint_methods => {
+            website => FV_uri(
+              schemes        => [qw( http https )],
+              hostcheck      => 1,
+              allow_userinfo => 0,
+            ),
+          },
+        },
+      );
+
+DESCRIPTION
+
+    This module provides a filter and a constraint method for use with
+    Data::FormValidator, to help make it easier to valid URIs.
+
+METHODS
+
+    FV_uri_filter(%opts)
+
+      Filter method which cleans up the given value as best it can and
+      returns something that looks like a URI.
+
+      The filtered URI will be canonicalized, and common typos will be
+      corrected.
+
+      Supported options:
+
+      default_scheme
+
+	Default URI scheme to use, if none was provided in the URI
+
+    FV_uri(%opts)
+
+      Constraint method, which ensures that we have a valid URI.
+
+      Supported options:
+
+      schemes
+
+	list-ref of valid schemes
+
+      hostcheck
+
+	host exists in URI and resolves as a valid host? (default off)
+
+      allow_userinfo
+
+	allow user info in URI (default off)
+
+AUTHOR
+
+    Graham TerMarsch <cpan@howlingfrog.com>
+
+COPYRIGHT
+
+    Copyright (C) 2013, Graham TerMarsch. All Rights Reserved.
+
+    This is free software; you can redistribute it and/or modify it under
+    the terms of the Artistic 2.0 license.
+
+SEE ALSO
+
+    Data::FormValidator
+
+    URI
+

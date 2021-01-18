@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Ryu::Async
 at lib/Ryu/Async.pm
@@ -66,6 +65,12 @@ Create a new L<Ryu::Source> from an L<IO::Async::Stream> instance.
 Note that a stream which is not already attached to an L<IO::Async::Notifier>
 will be added as a child of this instance.
 
+=head2 to_stream
+
+Provides a L<Ryu::Sink> that will send data to an L<IO::Async::Stream> instance.
+
+Requires the L<IO::Async::Stream> and will return a new L<Ryu::Sink> instance.
+
 =head2 stdin
 
 Create a new L<Ryu::Source> that wraps STDIN.
@@ -78,6 +83,10 @@ Use L<Ryu::Source/by_line> and L<Ryu::Source/decode> to split into lines and/or 
 =head2 stdout
 
 Returns a new L<Ryu::Sink> that wraps STDOUT.
+
+=head2 stderr
+
+Returns a new L<Ryu::Sink> that wraps STDERR.
 
 =head2 timer
 
@@ -185,5 +194,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
 

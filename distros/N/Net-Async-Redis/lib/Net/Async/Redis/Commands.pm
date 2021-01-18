@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.007'; # VERSION
+our $VERSION = '3.008'; # VERSION
 
 =head1 NAME
 
@@ -135,6 +135,7 @@ our %KEY_FINDER = (
     'WATCH' => 1,
     'XACK' => 1,
     'XADD' => 1,
+    'XAUTOCLAIM' => 1,
     'XCLAIM' => 1,
     'XDEL' => 1,
     'XGROUP' => 1,
@@ -740,6 +741,8 @@ Stop processing commands from clients for some time.
 
 =item * timeout
 
+=item * [WRITE|ALL]
+
 =back
 
 L<https://redis.io/commands/client-pause>
@@ -854,6 +857,19 @@ sub client_unblock : method {
     $self->execute_command(qw(CLIENT UNBLOCK) => @args)
 }
 
+=head2 client_unpause
+
+Resume processing of clients that were paused.
+
+L<https://redis.io/commands/client-unpause>
+
+=cut
+
+sub client_unpause : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(CLIENT UNPAUSE) => @args)
+}
+
 =head2 echo
 
 Echo the given string.
@@ -875,15 +891,11 @@ sub echo : method {
 
 =head2 hello
 
-switch Redis protocol.
+Handshake with Redis.
 
 =over 4
 
-=item * protover
-
-=item * [AUTH username password]
-
-=item * [SETNAME clientname]
+=item * [protover [AUTH username password] [SETNAME clientname]]
 
 =back
 
@@ -1513,6 +1525,10 @@ Add one or more geospatial items in the geospatial index represented using a sor
 
 =item * key
 
+=item * [NX|XX]
+
+=item * [CH]
+
 =item * longitude latitude member [longitude latitude member ...]
 
 =back
@@ -1615,7 +1631,7 @@ Query a sorted set representing a geospatial index to fetch members matching a g
 
 =item * [WITHHASH]
 
-=item * [COUNT count]
+=item * [COUNT count [ANY]]
 
 =item * [ASC|DESC]
 
@@ -1654,7 +1670,7 @@ Query a sorted set representing a geospatial index to fetch members matching a g
 
 =item * [WITHHASH]
 
-=item * [COUNT count]
+=item * [COUNT count [ANY]]
 
 =item * [ASC|DESC]
 
@@ -1691,7 +1707,7 @@ Query a sorted set representing a geospatial index to fetch members inside an ar
 
 =item * [ASC|DESC]
 
-=item * [COUNT count]
+=item * [COUNT count [ANY]]
 
 =item * [WITHCOORD]
 
@@ -1730,7 +1746,7 @@ Query a sorted set representing a geospatial index to fetch members inside an ar
 
 =item * [ASC|DESC]
 
-=item * [COUNT count]
+=item * [COUNT count [ANY]]
 
 =item * [WITHCOORD]
 
@@ -4408,15 +4424,21 @@ sub zpopmin : method {
 
 =head2 zrange
 
-Return a range of members in a sorted set, by index.
+Return a range of members in a sorted set.
 
 =over 4
 
 =item * key
 
-=item * start
+=item * min
 
-=item * stop
+=item * max
+
+=item * [BYSCORE|BYLEX]
+
+=item * [REV]
+
+=item * [LIMIT offset count]
 
 =item * [WITHSCORES]
 
@@ -4481,6 +4503,37 @@ L<https://redis.io/commands/zrangebyscore>
 sub zrangebyscore : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(ZRANGEBYSCORE) => @args)
+}
+
+=head2 zrangestore
+
+Store a range of members from sorted set into another key.
+
+=over 4
+
+=item * dst
+
+=item * src
+
+=item * min
+
+=item * max
+
+=item * [BYSCORE|BYLEX]
+
+=item * [REV]
+
+=item * [LIMIT offset count]
+
+=back
+
+L<https://redis.io/commands/zrangestore>
+
+=cut
+
+sub zrangestore : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ZRANGESTORE) => @args)
 }
 
 =head2 zrank
@@ -4825,9 +4878,9 @@ Appends a new entry to a stream.
 
 =item * key
 
-=item * [MAXLEN [=|~] length]
-
 =item * [NOMKSTREAM]
+
+=item * [MAXLEN|MINID [=|~] threshold [LIMIT count]]
 
 =item * *|ID
 
@@ -4842,6 +4895,37 @@ L<https://redis.io/commands/xadd>
 sub xadd : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(XADD) => @args)
+}
+
+=head2 xautoclaim
+
+Changes (or acquires) ownership of messages in a consumer group, as if the messages were delivered to the specified consumer.
+
+=over 4
+
+=item * key
+
+=item * group
+
+=item * consumer
+
+=item * min-idle-time
+
+=item * start
+
+=item * [COUNT count]
+
+=item * [JUSTID]
+
+=back
+
+L<https://redis.io/commands/xautoclaim>
+
+=cut
+
+sub xautoclaim : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XAUTOCLAIM) => @args)
 }
 
 =head2 xclaim
@@ -5112,9 +5196,7 @@ Trims the stream to (approximately if '~' is passed) a certain size.
 
 =item * key
 
-=item * MAXLEN
-
-=item * [=|~] length
+=item * MAXLEN|MINID [=|~] threshold [LIMIT count]
 
 =back
 

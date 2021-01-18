@@ -1,0 +1,145 @@
+# NAME
+
+Dist::Zilla::Plugin::NextVersion::Semantic - update the next version, semantic-wise
+
+# VERSION
+
+version 0.2.6
+
+# SYNOPSIS
+
+```
+# in dist.ini
+
+[NextVersion::Semantic]
+major = MAJOR, API CHANGE
+minor = MINOR, ENHANCEMENTS
+revision = REVISION, BUG FIXES
+
+; must also load a PreviousVersionProvider
+[PreviousVersion::Changelog]
+```
+
+# DESCRIPTION
+
+Increases the distribution's version according to the semantic versioning rules
+(see [http://semver.org/](http://semver.org/)) by inspecting the changelog.
+
+More specifically, the plugin performs the following actions:
+
+- at build time
+
+    Reads the changelog using `CPAN::Changes` and filters out of the `{{$NEXT}}`
+    release section any group without item.
+
+- before a release
+
+    Ensures that there is at least one recorded change in the changelog, and
+    increments the version number in consequence.   If there are changes given
+    outside of the sections, they are considered to be minor.
+
+- after a release
+
+    Updates the new `{{$NEXT}}` section of the changelog with placeholders for
+    all the change categories.  With categories as given in the _SYNOPSIS_,
+    this would look like
+
+    ```
+    {{$NEXT}}
+
+      [MAJOR]
+
+      [API CHANGE]
+
+      [MINOR]
+
+      [ENHANCEMENTS]
+
+      [REVISION]
+
+      [BUG FIXES]
+    ```
+
+If a version is given via the environment variable `V`, it will taken
+as-if as the next version.
+
+For this plugin to work, your [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) configuration must also contain a plugin
+consuming the [Dist::Zilla::Role::YANICK::PreviousVersionProvider](https://metacpan.org/pod/Dist::Zilla::Role::YANICK::PreviousVersionProvider) role.
+
+In the different configuration attributes where change group names are given,
+the special group name `UNGROUPED` can be given to 
+specify the nameless group.
+
+```
+0.1.3 2013-07-18
+
+- this item will be part of UNGROUPED.
+
+[BUG FIXES]
+- this one won't.
+```
+
+# PARAMETERS
+
+## change\_file
+
+File name of the changelog. Defaults to `Changes`.
+
+## numify\_version
+
+If **true**, the version will be a number using the _x.yyyzzz_ convention instead
+of _x.y.z_.  Defaults to **false**.
+
+## format
+
+Specifies the version format to use. Follows the '%d' convention of
+`sprintf` (see examples below), excepts for one detail: '%3d' won't pad 
+with whitespaces, but will only determine the maximal size of the number. 
+If a version component exceeds its given
+size, the next version level will be incremented.
+
+Examples:
+
+```
+%d.%3d.%3d 
+    PATCH LEVEL INCREASES: 0.0.998 -> 0.0.999 -> 0.1.0
+    MINOR LEVEL INCREASES: 0.0.8 -> 0.1.0 -> 0.2.0
+    MAJOR LEVEL INCREASES: 0.1.8 -> 1.0.0 -> 2.0.0
+
+%d.%02d%02d
+    PATCH LEVEL INCREASES: 0.0098 -> 0.00099 -> 0.0100
+    MINOR LEVEL INCREASES: 0.0008 -> 0.0100 -> 0.0200
+    MAJOR LEVEL INCREASES: 0.0108 -> 1.0000 -> 2.0000
+
+%d.%05d
+    MINOR LEVEL INCREASES: 0.99998 -> 0.99999 -> 1.00000
+    MAJOR LEVEL INCREASES: 0.00108 -> 1.00000 -> 2.00000
+```
+
+Defaults to '%d.%3d.%3d'.
+
+## major
+
+Comma-delimited list of categories of changes considered major.
+Defaults to `API CHANGES`.
+
+## minor
+
+Comma-delimited list of categories of changes considered minor.
+Defaults to `ENHANCEMENTS` and `UNGROUPED`.
+
+## revision
+
+Comma-delimited list of categories of changes considered revisions.
+Defaults to `BUG FIXES, DOCUMENTATION`.
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2015, 2014, 2013, 2012 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

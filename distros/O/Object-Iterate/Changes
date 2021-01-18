@@ -1,5 +1,8 @@
 Revision history for Perl module Object::Iterate
 
+1.145 2021-01-15T07:04:14Z
+	* Correct mistake that prevented PAUSE indexing
+
 1.144 2021-01-13T09:21:42Z
 	* No code changes, but distro freshening, losing Travis CI
 	* Added GitHub Actions

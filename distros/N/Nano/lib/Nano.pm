@@ -14,7 +14,7 @@ use Data::Object::Space;
 
 use Scalar::Util ();
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 # ATTRIBUTES
 
@@ -107,6 +107,10 @@ sub _load {
 }
 
 # METHODS
+
+method domain(Str $name) {
+  return $self->env->app->domain(name => $name);
+}
 
 method dump(Object $object) {
   return _dump({%{($object)}});
@@ -292,6 +296,24 @@ This attribute is read-only, accepts C<(Env)> values, and is optional.
 =head1 METHODS
 
 This package implements the following methods:
+
+=cut
+
+=head2 domain
+
+  domain(Str $name) : Domain
+
+The domain method returns a L<Zing::Domain> object for the ID provided.
+
+=over 4
+
+=item domain example #1
+
+  my $nano = Nano->new;
+
+  my $domain = $nano->domain('changelog');
+
+=back
 
 =cut
 

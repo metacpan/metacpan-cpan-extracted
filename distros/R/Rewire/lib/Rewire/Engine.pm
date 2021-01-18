@@ -31,6 +31,46 @@ fun context() {
   }
 }
 
+# returns the compilation of 2+ service configurations
+fun merger(HashRef $servSpec, HashRef $servA, HashRef $servB = {}) {
+  my $service = {};
+
+  my $service_a = $servA;
+  my $service_b = $servB;
+
+  if (my $extends = $service_b->{extends}) {
+    $service_b = merger($servSpec, $service_b, $servSpec->{$extends});
+  }
+
+  $service = {%$service_b, %$service_a};
+  delete $service->{extends};
+
+  if ( (my $arg_a = $service_a->{argument})
+    || (my $arg_b = $service_b->{argument}))
+  {
+    if ( (defined $service_a->{argument} && !ref($arg_a))
+      || (defined $service_b->{argument} && !ref($arg_b)))
+    {
+      $service->{argument} ||= $arg_a if $arg_a;
+    }
+    elsif ((defined $service_a->{argument} && (ref($arg_a) eq 'ARRAY'))
+      && (defined $service_b->{argument} && (ref($arg_b) eq 'ARRAY')))
+    {
+      $service->{argument} = [@$arg_b, @$arg_a];
+    }
+    elsif ((defined $service_a->{argument} && (ref($arg_a) eq 'HASH'))
+      && (defined $service_b->{argument} && (ref($arg_b) eq 'HASH')))
+    {
+      $service->{argument} = {%$arg_b, %$arg_a};
+    }
+    else {
+      $service->{argument} ||= $arg_a if $arg_a;
+    }
+  }
+
+  return $service;
+}
+
 # returns context with eager-loaded objects
 fun preload(HashRef $servConf, Maybe[CodeRef] $context) {
   $context = context() if !$context;
@@ -146,7 +186,7 @@ fun reifier(Str $servName, HashRef $servConf, Maybe[CodeRef] $context) {
 
   # extend existing service (if requested)
   if (my $extends = $service->{extends}) {
-    $extended = reifier($extends, $servConf, $context);
+    $service = merger($servSpec, $service, $servSpec->{$extends});
   }
 
   # build object or value
@@ -239,6 +279,13 @@ fun resolver(Any $argsData, HashRef $servConf, Maybe[CodeRef] $context) {
           }
         }
       }
+    }
+  }
+
+  # $callback
+  if (ref $argsData eq 'HASH' && (keys %$argsData) == 1) {
+    if ($servSpec && (my $callback = $argsData->{'$callback'})) {
+      $argsData = sub { reifier($callback, $servConf, $context) };
     }
   }
 

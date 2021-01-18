@@ -7,7 +7,7 @@ use warnings;
 
 use Exporter;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Sidef;
 use Math::AnyNum;
@@ -17,8 +17,7 @@ my $sidef_array  = 'Sidef::Types::Array::Array';
 my $sidef_string = 'Sidef::Types::String::String';
 my $sidef_bool   = 'Sidef::Types::Bool::Bool';
 
-my %methods = %{$sidef_number->methods->get_value};
-my @names   = grep { /^\w+\z/ } keys %methods;
+my @names = grep { /^\w+\z/ } keys %{$sidef_number->methods->get_value};
 
 our @ISA         = qw(Exporter);
 our @EXPORT_OK   = @names;
@@ -48,6 +47,18 @@ sub _unpack_value {
     return $r;
 }
 
+sub _pack_value {
+    my ($r) = @_;
+
+    my $ref = ref($r // return undef);
+
+    if ($ref eq 'Math::AnyNum') {
+        return $sidef_number->new($$r);
+    }
+
+    return $sidef_number->new($r);
+}
+
 {
     no strict 'refs';
     foreach my $name (@names) {
@@ -62,7 +73,7 @@ sub _unpack_value {
                     code => do {
                         my $v = $_;
                         sub {
-                            $v->(map { _unpack_value($_) } @_);
+                            _pack_value(scalar $v->(map { _unpack_value($_) } @_));
                         }
                     }
                   )
@@ -135,7 +146,7 @@ Additionally, for importing all the functions, use:
 
 The list of functions available for importing, can be listed with:
 
-    CORE::say for sort @Math::Sidef::EXPORT_OK;
+    CORE::say join ", ", sort @Math::Sidef::EXPORT_OK;
 
 =head1 SEE ALSO
 
@@ -150,6 +161,10 @@ The list of functions available for importing, can be listed with:
 =item * L<Math::Prime::Util::GMP> - Utilities related to prime numbers, using GMP.
 
 =back
+
+=head1 REPOSITORY
+
+L<https://github.com/trizen/Math-Sidef>
 
 =head1 AUTHOR
 

@@ -1,6 +1,15 @@
 Revision history for Dist-Mgr
 
-1.04    2021-01-13
+1.06    2021-01-15
+    - Bump prereq version of File::Copy::Recursive, as older versions of perl
+      came with v0.38 which didn't export rmove_glob(), which would cause tests
+      to fail. We now require v0.45
+    - Added _dist_dir_re(), contains the distribution's directory for using in
+      testing to confirm we're in the proper location in the file system. Some
+      CPAN testers use varying dir names, so tests were failing
+    - v1.06 RC1
+
+1.05    2021-01-13
     - Change -x to -w in distmgr POD
     - Moved distmgr POD from binary to separate POD file
     - Add distmgr command process flow documentation to the README (closes #37)

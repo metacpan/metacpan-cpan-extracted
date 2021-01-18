@@ -1,5 +1,9 @@
 Revision history for Perl module Brick
 
+0.901 2021-01-15T07:33:03Z
+	* Freshen distro, remove Travis CI, add Github actions
+	* Remove t/prereq.t test
+
 0.228 2018-05-14T12:42:32Z
 	* Clarify that it's the Artistic License 2.0
 	* Bump to user release

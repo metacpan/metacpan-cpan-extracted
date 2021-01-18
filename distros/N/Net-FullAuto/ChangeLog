@@ -20,9 +20,15 @@
 #######################################################################
 
 
+2021-01-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.000050 released
+
+        * Modified EmailServer_is.pm.
+
 2021-01-10  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
-        * Version 1.000059 released
+        * Version 1.000049 released
 
         * Modified EmailServer_is.pm
 
@@ -30,7 +36,7 @@
 
 2020-12-30  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
-        * Version 1.000058 released
+        * Version 1.000048 released
 
         * Modified EmailServer_is.pm.
 

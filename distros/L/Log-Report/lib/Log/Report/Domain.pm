@@ -1,4 +1,4 @@
-# Copyrights 2007-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2021 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Log::Report::Domain;
 use vars '$VERSION';
-$VERSION = '1.29';
+$VERSION = '1.31';
 
 use base 'Log::Report::Minimal::Domain';
 

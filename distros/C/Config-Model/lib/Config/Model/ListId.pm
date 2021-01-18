@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2020 by Dominique Dumont.
+# This software is Copyright (c) 2005-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ListId 2.140;
+package Config::Model::ListId 2.141;
 
 use 5.10.1;
 use Mouse;
@@ -215,33 +215,40 @@ sub load {
 
 sub store_set {
     my $self = shift;
-    my @v    = @_;
-    my $r    = shift;
-    my %args = ( check => 'yes' );
+    my (@v, %args);
 
-    if ( ref $r eq 'ARRAY' ) {
-        @v    = @$r;
-        %args = @_;    # note that $r was shifted out of @_
+    if (ref $_[0] eq 'ARRAY') {
+        @v    = @{ shift @_ };
+        %args = @_;
+    }
+    else {
+        %args = ( check => 'yes' );
+        @v = @_;
     }
 
-    $logger->debug(  $self->name, " called with <".join('><',@v).'>' );
-    my @comments = @{ $args{comment} || [] };
+    if ($logger->is_debug) {
+        no warnings "uninitialized";
+        $logger->debug($self->name, " store_set called with ".map {"«$_» "} @v);
+    }
 
+    my @comments = @{ $args{comment} || [] };
     my $idx = 0;
-    foreach (@v) {
-        if ( defined $_ ) {
-            my $v_obj = $self->fetch_with_id( $idx++ );
-            $v_obj->store( %args, value => $_ );
-            $v_obj->annotation( shift @comments ) if @comments;
-        }
-        else {
-            $self->{data}[$idx] = undef;    # detruit l'objet pas bon!
-        }
+    foreach my $value (@v) {
+        my $v_obj = $self->fetch_with_id( $idx++ );
+        $v_obj->store( %args, value => $value );
+        $v_obj->annotation( shift @comments ) if @comments;
     }
 
     # and delete unused items
+    $self->_prune_above_idx($idx);
+}
+
+sub _prune_above_idx {
+    my ($self, $idx) = @_;
+    # and delete unused items
     my $ref = $self->{data};
     while (scalar @$ref > $idx) {
+        $logger->debug($self->name, " pruning idx ", $#$ref);
         $self->delete($#$ref);
     }
 }
@@ -522,14 +529,17 @@ sub load_data {
         wrong_data => $raw_data,
     ) unless defined $data;
 
-    $self->clear;
-
     my $idx = 0;
     $logger->info( "ListId load_data (", $self->location, ") will load idx ", "0..$#$data" );
     foreach my $item (@$data) {
-        my $obj = $self->fetch_with_id( $idx++ );
-        $obj->load_data( %args, data => $item );
+        my $obj = $self->fetch_with_id( $idx );
+        # increment idx only if the value was accepted. This allow to
+        # prune the arrau to the right size.
+        $idx += $obj->load_data( %args, data => $item );
     }
+
+    # and delete unused items
+    $self->_prune_above_idx($idx);
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -550,7 +560,7 @@ Config::Model::ListId - Handle list element for configuration model
 
 =head1 VERSION
 
-version 2.140
+version 2.141
 
 =head1 SYNOPSIS
 
@@ -594,7 +604,7 @@ C<check> can be yes, no or skip
 
 Store a set of values (passed as list)
 
-If tinkering with check is required, use the following way : 
+If tinkering with check is required, use the following way :
 
  store_set ( \@v , check => 'skip' );
 
@@ -745,7 +755,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2020 by Dominique Dumont.
+This software is Copyright (c) 2005-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

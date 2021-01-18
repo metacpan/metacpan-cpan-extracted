@@ -54,6 +54,14 @@ METHODS
     Note that a stream which is not already attached to an
     IO::Async::Notifier will be added as a child of this instance.
 
+ to_stream
+
+    Provides a Ryu::Sink that will send data to an IO::Async::Stream
+    instance.
+
+    Requires the IO::Async::Stream and will return a new Ryu::Sink
+    instance.
+
  stdin
 
     Create a new Ryu::Source that wraps STDIN.
@@ -67,6 +75,10 @@ METHODS
  stdout
 
     Returns a new Ryu::Sink that wraps STDOUT.
+
+ stderr
+
+    Returns a new Ryu::Sink that wraps STDERR.
 
  timer
 
@@ -151,6 +163,6 @@ AUTHOR
 
 LICENSE
 
-    Copyright Tom Molesworth 2011-2019. Licensed under the same terms as
+    Copyright Tom Molesworth 2011-2021. Licensed under the same terms as
     Perl itself.
 

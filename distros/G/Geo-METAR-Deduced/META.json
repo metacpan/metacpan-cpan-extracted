@@ -22,11 +22,9 @@
       "runtime" : {
          "requires" : {
             "Class::Measure::Scientific::FX_992vb" : "0",
-            "Data::Dumper" : "0",
             "English" : "0",
             "Geo::ICAO" : "0",
             "Geo::METAR" : "0",
-            "Log::Log4perl" : "0",
             "Moose" : "0",
             "MooseX::NonMoose" : "0",
             "Readonly" : "1.03",
@@ -45,7 +43,7 @@
    "provides" : {
       "Geo::METAR::Deduced" : {
          "file" : "lib/Geo/METAR/Deduced.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.0.5"
       }
    },
    "release_status" : "stable",
@@ -57,6 +55,6 @@
          "url" : "https://bitbucket.org/rolandvanipenburg/geo-metar-deduced"
       }
    },
-   "version" : "v0.0.4",
+   "version" : "v0.0.5",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6 + 2;
+use Test::More tests => 8 + 2;
 use Test::NoWarnings;
 use WWW::NOS::Open;
 
@@ -45,22 +45,25 @@ is(
     q{throwing range exceeded error DateTime input}
 );
 
-eval { $obj->get_version; };
-$e = Exception::Class->caught('NOSOpenInternalServerErrorException')
-  || Exception::Class->caught('NOSOpenUnauthorizedException');
+SKIP: {
+    skip q{Server test. Set $ENV{NOSOPEN_SERVER} to run.}, 4
+      unless $ENV{NOSOPEN_SERVER};
+    eval { $obj->search(q{FORCED_bad_request}) };
+    $e = Exception::Class->caught('NOSOpenBadRequestException');
+    is( $e->error->{ shift @{ [ keys %{ $e->error } ] } }->{error}->{code},
+        111, q{throwing BAD REQUEST error} );
 
-TODO: {
-    todo_skip
-q{Dummy server doesn't support custom content in exception response. Need a connection to the NOS Open server. Set the enviroment variable NOSOPEN_API_KEY to connect.},
-      2
-      if $e
-          || ( $ENV{NOSOPEN_SERVER}
-              && ( $ENV{NOSOPEN_SERVER} ne q{http://open.nos.nl} ) );
+    eval { $obj->search(q{FORCED_internal_server_error}) };
+    $e = Exception::Class->caught('NOSOpenInternalServerErrorException');
+    is(
+        $e->error,
+        q{Internal server error or no response recieved},
+        q{throwing INTERNAL SERVER ERROR error}
+    );
 
-    # Try to trigger a bad request should not be possible using this framework?
-    #$e = Exception::Class->caught('NOSOpenBadRequestException');
-    #is( $e->error->{ shift @{ [ keys %{ $e->error } ] } }->{error}->{code},
-    #    111, q{throwing BAD REQUEST error} );
+    eval { $obj->get_version; };
+    $e = Exception::Class->caught('NOSOpenInternalServerErrorException')
+      || Exception::Class->caught('NOSOpenUnauthorizedException');
 
     $obj->set_api_key($INVALID_API_KEY);
     eval { $obj->get_version; };
@@ -80,10 +83,10 @@ q{Dummy server doesn't support custom content in exception response. Need a conn
         301, q{throwing FORBIDDEN error} );
     diag(qq{Waiting $MINUTE seconds for rate to recover...});
     sleep $MINUTE;
-}
 
-my $msg = 'Author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
-SKIP: {
-    skip $msg, 1 unless $ENV{TEST_AUTHOR};
 }
-$ENV{TEST_AUTHOR} && Test::NoWarnings::had_no_warnings();
+my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
+SKIP: {
+    skip $msg, 1 unless $ENV{AUTHOR_TESTING};
+}
+$ENV{AUTHOR_TESTING} && Test::NoWarnings::had_no_warnings();

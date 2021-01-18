@@ -16,7 +16,7 @@ use File::Basename qw(basename dirname);
 # Version numbering
 ###############################################################################
 our $IE7_VERSION = '0.9';
-our $VERSION     = '0.9.3';
+our $VERSION     = '0.9.4';
 
 ###############################################################################
 # Subroutine:   version()
@@ -104,7 +104,7 @@ sub install {
 
 =head1 NAME
 
-Alien::IE7 - installing and finding IE7 JS compatibility library
+Alien::IE7 - (DEPRECATED) installing and finding IE7 JS compatibility library
 
 =head1 SYNOPSIS
 
@@ -116,6 +116,8 @@ Alien::IE7 - installing and finding IE7 JS compatibility library
   Alien::IE7->install( $my_destination_directory );
 
 =head1 DESCRIPTION
+
+B<DEPRECATED> - DO NOT USE
 
 Please see L<Alien> for the manifesto of the Alien namespace.
 

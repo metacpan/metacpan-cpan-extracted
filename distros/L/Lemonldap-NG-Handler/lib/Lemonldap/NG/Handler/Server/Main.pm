@@ -5,7 +5,7 @@ package Lemonldap::NG::Handler::Server::Main;
 
 use strict;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.10';
 
 use base 'Lemonldap::NG::Handler::PSGI::Main';
 
@@ -25,13 +25,27 @@ sub set_header_in {
     push @{ $req->{respHeaders} }, %headers;
 }
 
+## @method void unset_header_in(array headers)
+# deletes request headers and push headers that will be removed by LUA
+# @param headers array containing header names
 sub unset_header_in {
-    my ( $class, $req, $header ) = @_;
-    $req->{respHeaders} = [ grep { $_ ne $header and $_ ne cgiName($header) }
-          @{ $req->{respHeaders} } ];
-    delete $req->{env}->{ cgiName($header) };
-    $header =~ s/-/_/g;
-    delete $req->{env}->{$header};
+    my ( $class, $req, @headers ) = @_;
+    $req->data->{deleteIndex} //= 1;
+    my $i = $req->data->{deleteIndex};
+    foreach my $header (@headers) {
+        $class->logger->debug("Delete header $header");
+        $req->{respHeaders} =
+          [ grep { $_ ne $header and $_ ne cgiName($header) }
+              @{ $req->{respHeaders} } ];
+        delete $req->{env}->{ cgiName($header) };
+        push @{ $req->{respHeaders} }, "Deleteheader$i", $header;
+        $i++;
+        push @{ $req->{respHeaders} }, "Deleteheader$i", cgiName($header);
+        $header =~ s/-/_/g;
+        delete $req->{env}->{$header};
+        $i++;
+    }
+    $req->data->{deleteIndex} = $i;
 }
 
 # Inheritence is broken in this case with Debian >= jessie

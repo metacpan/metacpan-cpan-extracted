@@ -74,7 +74,7 @@ sub _search {
                 $selectField, $value, @fields );
         }
         else {
-            die "Invalid --where option" . $self->opts->{where};
+            die "Invalid --where option : " . $self->opts->{where};
         }
     }
     else {
@@ -166,9 +166,19 @@ sub _get_one_data {
 sub delete {
     my ($self) = shift;
     my $result = 0;
+    my @sessions;
+
+    # Run search if a where option was provided
+    if ( $self->opts->{where} ) {
+        my $res = $self->_search();
+        @sessions = keys %{$res};
+    }
+    else {
+        @sessions = @_;
+    }
 
     my @result;
-    for my $id (@_) {
+    for my $id (@sessions) {
         my $as = $self->_get_one_session($id);
         if ($as) {
             unless ( $as->remove ) {

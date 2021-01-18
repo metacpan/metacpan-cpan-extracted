@@ -3,13 +3,13 @@
 # See https://lemonldap-ng.org/documentation/latest/handlerarch
 package Lemonldap::NG::Handler::PSGI;
 
-use 5.10.0;
+use strict;
 use Mouse;
 use Lemonldap::NG::Handler::PSGI::Main;
 
 extends 'Lemonldap::NG::Handler::Lib::PSGI', 'Lemonldap::NG::Common::PSGI';
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.10';
 
 sub init {
     my ( $self, $args ) = @_;

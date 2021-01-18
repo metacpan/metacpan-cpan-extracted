@@ -9,7 +9,7 @@ use Convert::Base32 qw(decode_base32 encode_base32);
 use Crypt::URandom;
 use Digest::HMAC_SHA1 'hmac_sha1_hex';
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.10';
 
 # Verify that TOTP $code matches with $secret
 sub verifyCode {
@@ -19,8 +19,9 @@ sub verifyCode {
         $self->logger->error('Bad characters in TOTP secret');
         return -1;
     }
-    for ( 0 .. $range ) {
+    for ( -$range .. $range ) {
         if ( $code eq $self->_code( $s, $_, $interval, $digits ) ) {
+            $self->userLogger->info("Codes match at range $_");
             return 1;
         }
     }

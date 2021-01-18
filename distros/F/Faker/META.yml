@@ -19,7 +19,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,10 +39,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/iamalnewkirk/faker/issues
+  bugtracker: https://github.com/cpanery/faker/issues
   homepage: http://metacpan.org/release/Faker/
-  repository: git://github.com/iamalnewkirk/faker.git
-version: '1.03'
+  repository: git://github.com/cpanery/faker.git
+version: '1.04'
 x_authority: cpan:AWNCORP
 x_contributors:
   - 'Al Newkirk <anewkirk@ana.io>'

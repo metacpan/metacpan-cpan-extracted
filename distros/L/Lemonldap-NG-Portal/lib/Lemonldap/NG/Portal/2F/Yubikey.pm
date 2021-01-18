@@ -8,23 +8,21 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
   PE_ERROR
   PE_BADOTP
   PE_FORMEMPTY
-  PE_OK
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 
 # INITIALIZATION
 
 has prefix => ( is => 'ro', default => 'yubikey' );
-
 has logo => ( is => 'rw', default => 'yubikey.png' );
-
 has yubi => ( is => 'rw' );
 
 sub init {
@@ -88,8 +86,7 @@ sub init {
 
 sub _findYubikey {
     my ( $self, $req, $sessionInfo ) = @_;
-    my $yubikey;
-    my $_2fDevices;
+    my ( $yubikey, $_2fDevices );
 
     # First, lookup from session attribute
     if ( $self->conf->{yubikey2fFromSessionAttribute} ) {
@@ -124,7 +121,10 @@ sub run {
     my ( $self, $req, $token, $_2fDevices ) = @_;
 
     my $checkLogins = $req->param('checkLogins');
-    $self->logger->debug("Yubikey checkLogins set") if ($checkLogins);
+    $self->logger->debug("Yubikey; checkLogins set") if ($checkLogins);
+
+    my $stayconnected = $req->param('stayconnected');
+    $self->logger->debug("Yubikey: stayconnected set") if $stayconnected;
 
     my $yubikey = $self->_findYubikey( $req, $req->sessionInfo );
 
@@ -147,7 +147,8 @@ sub run {
             TARGET      => '/yubikey2fcheck?skin=' . $self->p->getSkin($req),
             INPUTLOGO   => 'yubikey.png',
             LEGEND      => 'clickOnYubikey',
-            CHECKLOGINS => $checkLogins
+            CHECKLOGINS => $checkLogins,
+            STAYCONNECTED => $stayconnected
         }
     );
     $self->logger->debug("Display Yubikey form");

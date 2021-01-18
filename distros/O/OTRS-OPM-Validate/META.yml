@@ -1,0 +1,32 @@
+---
+abstract: 'Validate .opm files'
+author:
+  - 'Perl-Services.de <info@perl-services.de>'
+build_requires:
+  Pod::Coverage::TrustPod: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OTRS-OPM-Validate
+provides:
+  OTRS::OPM::Validate:
+    file: lib/OTRS/OPM/Validate.pm
+    version: '0.02'
+requires:
+  perl: '5.020'
+resources:
+  bugtracker: http://github.com/perlservices/OTRS-OPM-Validate/issues
+  homepage: http://github.com/perlservices/OTRS-OPM-Validate
+  repository: git://github.com/perlservices/OTRS-OPM-Validate.git
+version: '0.02'
+x_contributors:
+  - 'reneeb <info@perl-services.de>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

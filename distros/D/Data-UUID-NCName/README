@@ -2,7 +2,7 @@ NAME
     Data::UUID::NCName - Make valid NCName tokens which are also UUIDs
 
 VERSION
-    Version 0.05
+    Version 0.06
 
 SYNOPSIS
         use Data::UUID::NCName qw(:all);
@@ -12,7 +12,7 @@ SYNOPSIS
         my $ncn32 = to_ncname($uuid, version => 1, radix => 32);
 
         # $ncn is now "EH_kW827XQ6719MhfGM0QL".
-        # $ncn32 is "Ed74rn43o25b255puzbprrtiql" and case-insensitive.
+        # $ncn32 is "ed74rn43o25b255puzbprrtiql" and case-insensitive.
 
         # from Test::More, this will output 'ok':
         is(from_ncname($ncn, version => 1),
@@ -69,9 +69,8 @@ FORMAT DEPRECATION NOTICE
 
     Since I have already released this module prior to this format change, I
     have added a "version" parameter to both "to_ncname" and "from_ncname".
-    The version currently defaults to 0, the old one, but will issue a
-    warning if not explicitly set. Later I will change the default to 1,
-    while keeping the warning, then later still, finally remove the warning
+    The version currently defaults to 1, the new one, but will issue a
+    warning if not explicitly set. Later I will finally remove the warning
     with 1 as the default. This should ensure that any code written during
     the transition produces the correct results.
 
@@ -193,6 +192,8 @@ EXPORT
 
     :32 Import base32-only functions.
 
+    :58 Import base58-only functions.
+
     :64 Import base64-only functions.
 
 SUBROUTINES
@@ -200,15 +201,15 @@ SUBROUTINES
     Turn $UUID into an NCName. The UUID can be in the canonical (hyphenated)
     hexadecimal form, non-hyphenated hexadecimal, Base64 (regular and
     base64url), or binary. The function returns a legal NCName equivalent to
-    the UUID, in either Base32 or Base64 (url), given a specified $RADIX of
-    32 or 64. If the radix is omitted, Base64 is assumed.
+    the UUID, in either Base32, Base58, or Base64 (url), given a specified
+    $RADIX of 32, 58, or 64. If the radix is omitted, Base64 is assumed.
 
     The following keyword parameters are also accepted, and override the
     positional parameters where applicable:
 
-    radix 32|64
-        Either 32 or 64 to explicitly specify Base32 or Base64 output.
-        Defaults to 64.
+    radix 32|58|64
+        Either 32 or 64 to explicitly specify Base32, Base58, or Base64
+        output. Defaults to 64.
 
     version 0|1
         Version 0 will generate the original version of NCName identifiers,
@@ -220,7 +221,8 @@ SUBROUTINES
 
     align $FALSY|$TRUTHY
         Align the last 4 bits to the Base32/Base64 symbol size. You almost
-        certainly want this, so the default is *true*.
+        certainly want this, so the default is *true*. (Does not apply to
+        Base58.)
 
   from_ncname $NCNAME [, $FORMAT [, $RADIX] ] [, %PARAMS ]
     Turn an appropriate $NCNAME back into a UUID, where *appropriate*,
@@ -267,6 +269,12 @@ SUBROUTINES
     Shorthand for Base64 NCNames.
 
   from_ncname_64 $NCNAME [, $FORMAT | %PARAMS ]
+    Ditto.
+
+  to_ncname_58 $UUID [, %PARAMS ]
+    Shorthand for Base58 NCNames.
+
+  from_ncname_58 $NCNAME [, $FORMAT | %PARAMS ]
     Ditto.
 
   to_ncname_32 $UUID [, %PARAMS ]

@@ -16,12 +16,24 @@
   </developer>
   <helper>
     <foaf:Person>
+      <foaf:name>Hunter McMillen</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mcmillhj@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Michael Jemmeson</foaf:name>
       <foaf:mbox rdf:resource="mailto:michael.jemmeson@(none)" />
     </foaf:Person>
   </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.ca" />
+    </foaf:Person>
+  </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
-  <homepage rdf:resource="http://search.cpan.org/dist/Dist-Zilla-Plugin-CoalescePod/" />
+  <homepage rdf:resource="https://github.com/yanick/Dist-Zilla-Plugin-CoalescePod" />
   <bug-database rdf:resource="https://github.com/yanick/Dist-Zilla-Plugin-CoalescePod/issues" />
   <repository>
     <GitRepository>
@@ -45,6 +57,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.2.1</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-07-18</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.2.2</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-10-12</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

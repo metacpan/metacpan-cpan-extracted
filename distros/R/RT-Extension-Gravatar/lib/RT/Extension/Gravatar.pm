@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '2.01';
+our $VERSION = '3.00';
 
 package RT::User;
 

@@ -1,5 +1,9 @@
 Revision history for Perl module ReturnValue
 
+0.901 2021-01-17T11:30:35Z
+	* fix typo in docs (Github #5, nick n.)
+	* freshen distro, remove Travis CI, add Github Actions
+
 0.113 2019-07-15T04:10:20Z
 	* Fixed the example in the synopsis
 

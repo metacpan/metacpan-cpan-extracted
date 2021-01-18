@@ -1,4 +1,15 @@
-Revision history for Perl extension Kelp::Module::Websocket.
+Revision history for Perl extension Kelp::Module::WebSocket::AnyEvent.
+
+1.04 Sun Jan 17 2021
+	- try/catch incoming message decoding (can stay alive now)
+	- add malformed_message event
+	- bugfix a memory leak (circular references)
+	- add more documentation
+	- refactor and improve test suite
+
+1.03 Sat Jan 16 2021
+	- update for Symbiosis version 1.10
+	- update dependencies
 
 1.02 Wed Jan 13 2021
 	- add explicit version number to each package in module

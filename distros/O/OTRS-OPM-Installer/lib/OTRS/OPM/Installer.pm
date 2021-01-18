@@ -1,5 +1,5 @@
 package OTRS::OPM::Installer;
-$OTRS::OPM::Installer::VERSION = '0.04';
+$OTRS::OPM::Installer::VERSION = '0.05';
 # ABSTRACT: Install OTRS add ons
 
 use v5.10;
@@ -148,7 +148,7 @@ sub install {
     say sprintf "Working on %s...", $parsed->name if $self->verbose;
     $self->logger->debug( message => sprintf "Working on %s...", $parsed->name );
 
-    my @dependencies = $parsed->dependencies;
+    my @dependencies = @{ $parsed->dependencies || [] };
     my @cpan_deps    = grep{ $_->{type} eq 'CPAN' }@dependencies;
     my @otrs_deps    = grep{ $_->{type} eq 'OTRS' }@dependencies;
 
@@ -230,7 +230,7 @@ sub _check_matching_versions {
     my $check_ok;
 
     FRAMEWORK:
-    for my $required_framework ( $parsed->framework ) {
+    for my $required_framework ( @{ $parsed->framework } ) {
         my ($r_major, $r_minor, $r_patch) = split /\./, $required_framework;
 
         next FRAMEWORK if $r_major != $major;
@@ -258,7 +258,7 @@ OTRS::OPM::Installer - Install OTRS add ons
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

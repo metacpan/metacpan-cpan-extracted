@@ -1,5 +1,5 @@
 package OTRS::OPM::Installer::Utils::File;
-$OTRS::OPM::Installer::Utils::File::VERSION = '0.04';
+$OTRS::OPM::Installer::Utils::File::VERSION = '0.05';
 # ABSTRACT: File related utility functions
 
 use v5.10;
@@ -167,7 +167,7 @@ OTRS::OPM::Installer::Utils::File - File related utility functions
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

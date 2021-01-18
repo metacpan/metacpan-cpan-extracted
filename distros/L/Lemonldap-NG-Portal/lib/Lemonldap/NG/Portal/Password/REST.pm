@@ -8,10 +8,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PASSWORD_OK
 );
 
-extends 'Lemonldap::NG::Portal::Password::Base',
-  'Lemonldap::NG::Portal::Lib::REST';
+extends qw(
+  Lemonldap::NG::Portal::Lib::REST
+  Lemonldap::NG::Portal::Password::Base
+);
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 sub init {
     my ($self) = @_;

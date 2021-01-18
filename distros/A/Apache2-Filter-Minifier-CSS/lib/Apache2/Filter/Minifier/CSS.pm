@@ -18,8 +18,12 @@ use CSS::Minifier;
 eval { require CSS::Minifier::XS };
 
 ###############################################################################
+# Keep our namespace clean.
+use namespace::clean;
+
+###############################################################################
 # Version number.
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
 ###############################################################################
 # MIME-Types we're willing to minify.
@@ -121,6 +125,8 @@ sub handler {
 
 1;
 
+=for stopwords PerlVar minified minifier minification minifies minifying
+
 =head1 NAME
 
 Apache2::Filter::Minifier::CSS - CSS minifying output filter
@@ -191,7 +197,7 @@ Memory Cache
 
 =item handler($filter)
 
-CSS minification output filter. 
+CSS minification output filter.
 
 =back
 
@@ -211,9 +217,16 @@ license as Perl itself.
 
 =head1 SEE ALSO
 
-L<CSS::Minifier>,
-L<CSS::Minifier::XS>,
-L<Apache2::Filter::Minifier::JavaScript>,
-L<Apache::Clean>.
+=over
+
+=item L<CSS::Minifier>
+
+=item L<CSS::Minifier::XS>
+
+=item L<Apache2::Filter::Minifier::JavaScript>
+
+=item L<Apache::Clean>
+
+=back
 
 =cut

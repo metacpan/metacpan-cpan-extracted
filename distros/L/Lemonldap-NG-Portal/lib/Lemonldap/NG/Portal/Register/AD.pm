@@ -3,13 +3,13 @@ package Lemonldap::NG::Portal::Register::AD;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_LDAPERROR
   PE_OK
+  PE_LDAPERROR
 );
 
 extends 'Lemonldap::NG::Portal::Register::LDAP';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.10';
 
 sub createUser {
     my ( $self, $req ) = @_;

@@ -1,8 +1,17 @@
-use Test::More;
-eval "use Test::TestCoverage 0.08";
-plan skip_all => "Test::TestCoverage 0.08 required for testing test coverage"
-  if $@;
+use strict;
+use warnings;
+use utf8;
 
+use Test::More;
+
+if ( not $ENV{AUTHOR_TESTING} ) {
+    my $msg = 'Set $ENV{AUTHOR_TESTING} to run author tests.';
+    plan( skip_all => $msg );
+}
+
+if ( !eval { require Test::TestCoverage; 1 } ) {
+    plan skip_all => q{Test::TestCoverage required for testing test coverage};
+}
 plan tests => 8;
 my $TEST            = q{TEST};
 my $API_KEY         = $TEST;
@@ -18,7 +27,7 @@ my $obj;
 		  8
 		  if 1;
 
-	test_coverage("WWW::Wookie::Widget");
+	Test::TestCoverage::test_coverage("WWW::Wookie::Widget");
 	$obj = WWW::Wookie::Widget->new( $TEST, $TEST, $TEST, $TEST );
 	$obj->getIdentifier;
 	$obj->getTitle;
@@ -26,18 +35,18 @@ my $obj;
 	$obj->getIcon;
 	$obj->DESTROY();
 	$obj->meta();
-	ok_test_coverage('WWW::Wookie::Widget');
+	Test::TestCoverage::ok_test_coverage('WWW::Wookie::Widget');
 
-	test_coverage("WWW::Wookie::Widget::Category");
+	Test::TestCoverage::test_coverage("WWW::Wookie::Widget::Category");
 	$obj = WWW::Wookie::Widget::Category->new($TEST);
 	$obj->getName;
 	$obj->get;
 	$obj->put(WWW::Wookie::Widget->new( $TEST, $TEST, $TEST, $TEST ));
 	$obj->DESTROY();
 	$obj->meta();
-	ok_test_coverage('WWW::Wookie::Widget::Category');
+	Test::TestCoverage::ok_test_coverage('WWW::Wookie::Widget::Category');
 
-	test_coverage("WWW::Wookie::Widget::Instance");
+	Test::TestCoverage::test_coverage("WWW::Wookie::Widget::Instance");
 	$obj = WWW::Wookie::Widget::Instance->new( $TEST, $TEST, $TEST, 1, 1 );
 	$obj->getUrl;
 	$obj->setUrl($TEST);
@@ -51,17 +60,17 @@ my $obj;
 	$obj->setWidth(1);
 	$obj->DESTROY();
 	$obj->meta();
-	ok_test_coverage('WWW::Wookie::Widget::Instance');
+	Test::TestCoverage::ok_test_coverage('WWW::Wookie::Widget::Instance');
 
-	test_coverage("WWW::Wookie::Widget::Instances");
+	Test::TestCoverage::test_coverage("WWW::Wookie::Widget::Instances");
 	$obj = WWW::Wookie::Widget::Instances->new();
 	$obj->put( WWW::Wookie::Widget::Instance->new( $TEST, $TEST, $TEST, 1, 1 ) );
 	$obj->get;
 	$obj->DESTROY();
 	$obj->meta();
-	ok_test_coverage('WWW::Wookie::Widget::Instances');
+	Test::TestCoverage::ok_test_coverage('WWW::Wookie::Widget::Instances');
 
-	test_coverage("WWW::Wookie::Widget::Property");
+	Test::TestCoverage::test_coverage("WWW::Wookie::Widget::Property");
 	$obj = WWW::Wookie::Widget::Property->new( $TEST, $TEST, 0 );
 	$obj->getName;
 	$obj->setName($TEST);
@@ -71,9 +80,9 @@ my $obj;
 	$obj->setIsPublic(1);
 	$obj->DESTROY();
 	$obj->meta();
-	ok_test_coverage('WWW::Wookie::Widget::Property');
+	Test::TestCoverage::ok_test_coverage('WWW::Wookie::Widget::Property');
 
-	test_coverage("WWW::Wookie::User");
+	Test::TestCoverage::test_coverage("WWW::Wookie::User");
 	$obj = WWW::Wookie::User->new();
 	$obj->getLoginName;
 	$obj->setLoginName($TEST);
@@ -83,9 +92,9 @@ my $obj;
 	$obj->setThumbnailUrl($TEST);
 	$obj->DESTROY();
 	$obj->meta();
-	ok_test_coverage('WWW::Wookie::User');
+	Test::TestCoverage::ok_test_coverage('WWW::Wookie::User');
 
-	test_coverage("WWW::Wookie::Server::Connection");
+	Test::TestCoverage::test_coverage("WWW::Wookie::Server::Connection");
 	$obj = WWW::Wookie::Server::Connection->new( $SERVER, $TEST, $TEST );
 	$obj->getURL;
 	$obj->getApiKey;
@@ -95,14 +104,14 @@ my $obj;
 	my $up = $obj->test;
 	$obj->DESTROY();
 	$obj->meta();
-	ok_test_coverage('WWW::Wookie::Server::Connection');
+	Test::TestCoverage::ok_test_coverage('WWW::Wookie::Server::Connection');
 
 	TODO: {
 		todo_skip
 	q{Need a live Wookie server for this test. Set the enviroment variable WOOKIE_SERVER if the server isn't in the default location.},
 		  1
 		  if !$up;
-		test_coverage("WWW::Wookie::Connector::Service");
+		Test::TestCoverage::test_coverage("WWW::Wookie::Connector::Service");
 
 		$obj =
 		  WWW::Wookie::Connector::Service->new( $SERVER, $API_KEY, $SHARED_DATA_KEY,
@@ -134,6 +143,6 @@ my $obj;
 		}
 		$obj->DESTROY();
 		$obj->meta();
-		ok_test_coverage('WWW::Wookie::Connector::Service');
+		Test::TestCoverage::ok_test_coverage('WWW::Wookie::Connector::Service');
 	}
 }

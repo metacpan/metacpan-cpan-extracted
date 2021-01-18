@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::Measure::Scientific::FX_992vb.
 
+v0.0.6 Sun Jan 17 13:10:39 UTC 2021
+       * docs: migrate bugtracker from RT to Bitbucket
+
 v0.0.5 Sun Nov 22 19:39:04 UTC 2020
        * test: add CI and improve coverage
 

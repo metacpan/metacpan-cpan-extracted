@@ -7,6 +7,23 @@ use_ok( $class );
 
 my $predefined_constraints = 3;
 
+$class->add_constraint(
+       'defined',
+       'run'         => sub { defined $_[1] },
+       'description' => 'True if the value is defined',
+       );
+
+$class->add_constraint(
+       'ordinal',
+       'run'         => sub { $_[1] =~ /^\d+\z/ },
+       'description' => 'True if the value is has only digits',
+       );
+
+$class->add_constraint(
+       'test',
+       'run' => sub { 1 },
+       );
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 subtest 'no argument' => sub {
 	my @names = $class->get_all_names;

@@ -22,8 +22,20 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Kent Fredric</foaf:name>
+      <foaf:mbox rdf:resource="mailto:kentnl@gentoo.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Mike Doherty</foaf:name>
       <foaf:mbox rdf:resource="mailto:mike@mikedoherty.ca" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.ca" />
     </foaf:Person>
   </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
@@ -87,6 +99,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.2.4</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-05-24</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.2.5</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-06-15</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

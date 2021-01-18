@@ -21,7 +21,7 @@ use Perl::Critic::Utils qw< :booleans :characters hashify :severities >;
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.108';
+our $VERSION = '0.109';
 
 #-----------------------------------------------------------------------------
 
@@ -1402,13 +1402,19 @@ or, if you prefer,
     my ($mday,$mon,$year) = ( localtime() )[ 3, 4, 5 ];
 
 
+=head1 SUPPORT
+
+Support is by the author. Please file bug reports at
+L<https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter/issues>,
+or in electronic mail to the author.
+
 =head1 AUTHOR
 
 Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2012-2020 Thomas R. Wyant, III
+Copyright (C) 2012-2021 Thomas R. Wyant, III
 
 =head1 LICENSE
 

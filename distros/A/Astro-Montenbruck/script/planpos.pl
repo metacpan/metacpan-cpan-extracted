@@ -25,7 +25,7 @@ use Astro::Montenbruck::Ephemeris::Planet qw/@PLANETS/;
 use Astro::Montenbruck::Utils::Helpers qw/
     parse_datetime parse_geocoords format_geo hms_str dms_or_dec_str dmsz_str local_now
     @DEFAULT_PLACE/;
-use Astro::Montenbruck::Utils::Display qw/%LIGHT_THEME %DARK_THEME print_data/;
+use Astro::Montenbruck::Utils::Theme;
 
 sub ecliptic_to_horizontal {
     my ($lambda, $beta, $eps, $lst, $theta) = @_;
@@ -83,11 +83,10 @@ sub convert_beta {
 }
 
 
-
-
 sub print_position {
-    my ($id, $lambda, $beta, $delta, $motion, $obliq, $lst, $lat, $format, $coords, $scheme) = @_;
+    my ($id, $lambda, $beta, $delta, $motion, $obliq, $lst, $lat, $format, $coords, $theme) = @_;
     my $decimal = uc $format eq 'D';
+    my $scheme = $theme->scheme;
 
     state $convert_lambda = convert_lambda($coords, $decimal);
     state $convert_beta   = convert_beta($coords, $decimal);
@@ -95,19 +94,19 @@ sub print_position {
         dms_or_dec_str($_[0], decimal => uc $format eq 'D', places => 2, sign => 1 );
     };
 
-    print colored( sprintf('%-10s', $id), $scheme->{table_row_title} );
-    print colored( $convert_lambda->($lambda, $beta, $obliq, $lst, $lat), $scheme->{table_row_data} );
+    print $theme->decorate( sprintf('%-10s', $id), $scheme->{table_row_title} );
+    print $theme->decorate( $convert_lambda->($lambda, $beta, $obliq, $lst, $lat), $scheme->{table_row_data} );
     print "   ";
-    print colored( $convert_beta->($lambda, $beta, $obliq, $lst, $lat), $scheme->{table_row_data} );
+    print $theme->decorate( $convert_beta->($lambda, $beta, $obliq, $lst, $lat), $scheme->{table_row_data} );
     print "   ";
-    print colored( sprintf( '%07.4f', $delta ), $scheme->{table_row_data} );
+    print $theme->decorate( sprintf( '%07.4f', $delta ), $scheme->{table_row_data} );
     print "   ";
-    print colored( $format_motion->($motion), $scheme->{table_row_data} );
+    print $theme->decorate( $format_motion->($motion), $scheme->{table_row_data} );
     print "\n";
 }
 
 sub print_header {
-    my ($target, $format, $scheme) = @_;
+    my ($target, $format, $theme) = @_;
     my $fmt = uc $format;
     my $tmpl;
     my @titles;
@@ -143,7 +142,7 @@ sub print_header {
             @titles = qw/planet azim alt dist motion/
         }
     }
-    say colored( sprintf($tmpl, @titles), $scheme->{table_col_title} )
+    say $theme->decorate( sprintf($tmpl, @titles), $theme->scheme->{table_col_title} )
 }
 
 my $man    = 0;
@@ -153,7 +152,7 @@ my $time   = local_now()->strftime('%F %T');
 my @place;
 my $format = 'S';
 my $coords = 1;
-my $theme  = 'dark';
+my $theme;
 
 # Parse options and print usage if there is a syntax error,
 # or if usage was explicitly requested.
@@ -165,70 +164,66 @@ GetOptions(
     'dt!'           => \$use_dt,
     'format:s'      => \$format,
     'coordinates:i' => \$coords,
-    'theme:s'       => \$theme,
+    'theme:s'       => 
+      sub { $theme = Astro::Montenbruck::Utils::Theme->create( $_[1] ) },
+    'no-colors'  => 
+      sub { $theme = Astro::Montenbruck::Utils::Theme->create('colorless') }
 
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
 pod2usage(-verbose => 2) if $man;
 
-my $scheme = do {
-    given (lc $theme) {
-        \%DARK_THEME when 'dark';
-        \%LIGHT_THEME when 'light';
-        default { warn "Unknown theme: $theme. Using default (dark)"; \%DARK_THEME }
-    }
-};
-
+# Initialize default options
+$theme //= Astro::Montenbruck::Utils::Theme->create('dark');
 die "Unknown coordinates format: \"$format\"!" unless $format =~ /^D|S$/i;
 
 @place = @DEFAULT_PLACE unless @place;
 
 my $local = parse_datetime($time);
-print_data('Local Time', $local->strftime('%F %T %Z'), scheme => $scheme);
+$theme->print_data('Local Time', $local->strftime('%F %T %Z'));
 my $utc;
 if ($local->time_zone ne 'UTC') {
     $utc   = $local->clone->set_time_zone('UTC');
 } else {
     $utc = $local;
 }
-print_data('Universal Time', $utc->strftime('%F %T'), scheme => $scheme);
-print_data('Julian Day', sprintf('%.11f', $utc->jd), scheme => $scheme);
+$theme->print_data('Universal Time', $utc->strftime('%F %T'));
+$theme->print_data('Julian Day', sprintf('%.11f', $utc->jd));
 
 my $t = jd_cent($utc->jd);
 if ($use_dt) {
     # Universal -> Dynamic Time
     my $delta_t = delta_t($utc->jd);
-    print_data('Delta-T', sprintf('%05.2fs.', $delta_t), scheme => $scheme);
+    $theme->print_data('Delta-T', sprintf('%05.2fs.', $delta_t));
     $t += $delta_t / $SEC_PER_CEN;
 }
 
 my ($lat, $lon) = parse_geocoords(@place);
-print_data('Place', format_geo($lat, $lon), scheme => $scheme);
+$theme->print_data('Place', format_geo($lat, $lon));
 
 # Local Sidereal Time
 my $lst = jd2lst($utc->jd, $lon);
-print_data('Sidereal Time', hms_str($lst), scheme => $scheme);
+$theme->print_data('Sidereal Time', hms_str($lst));
 
 # Ecliptic obliquity
 my $obliq = obliquity($t);
-print_data(
+$theme->print_data(
     'Ecliptic Obliquity',
     dms_or_dec_str(
         $obliq,
         places  => 2,
         sign    => 1,
         decimal => $format eq 'D'
-    ),
-    scheme => $scheme
+    )
 );
 print "\n";
 
-print_header($coords, $format, $scheme);
+print_header($coords, $format, $theme);
 find_positions(
     $t,
     \@PLANETS,
-    sub { print_position(@_, $obliq, $lst, $lat, $format, $coords, $scheme) },
+    sub { print_position(@_, $obliq, $lst, $lat, $format, $coords, $theme) },
     with_motion => 1
 );
 print "\n";
@@ -276,60 +271,105 @@ I<"3 hours east of Greenwich">.
 
 =item B<--place>
 
-The observer's location. Contains 2 elements, space separated, in any order:
+The observer's location. Contains 2 elements, space separated. 
 
 =over
 
-=item * latitude in C<DD(N|S)MM> format, B<N> for North, B<S> for South.
+=item * 
 
-=item * longitude in C<DDD(W|E)MM> format, B<W> for West, B<E> for East.
+latitude in C<DD(N|S)MM> format, B<N> for North, B<S> for South.
+
+=item *
+
+longitude in C<DDD(W|E)MM> format, B<W> for West, B<E> for East.
 
 =back
 
-E.g.: C<--place=51N28 0W0> for I<Greenwich, UK>.
+E.g.: C<--place=51N28 0W0> for I<Greenwich, UK> (the default).
 
-=item B<--coordinates> - type and format of coordinates to display:
+B<Decimal numbers> are also supported. In that case
 
 =over
 
-=item * B<1> - Ecliptical, angular units (default)
+=item * 
 
-=item * B<2> - Ecliptical, zodiac
+The latitude always goes first
 
-=item * B<3> - Equatorial, time units
+=item * 
 
-=item * B<4> - Equatorial, angular units
-
-=item * B<5> - Horizontal, time units
-
-=item * B<6> - Horizontal, angular units
+Negative numbers represent I<South> latitude and I<East> longitudes. 
 
 =back
 
-=item B<--format> format of numbers:
+C<--place=55.75 -37.58> for I<Moscow, Russian Federation>.
+C<--place=40.73 73.935> for I<New-York, NY, USA>.
+
+
+=item B<--coordinates>: type and format of coordinates to display:
 
 =over
 
-=item * B<D> decimal: arc-degrees or hours
+=item * 
 
-=item * B<S> sexadecimal: degrees (hours), minutes, seconds
+B<1> - Ecliptical, angular units (default)
+
+=item * 
+
+B<2> - Ecliptical, zodiac
+
+=item * 
+
+B<3> - Equatorial, time units
+
+=item * 
+
+B<4> - Equatorial, angular units
+
+=item * 
+
+B<5> - Horizontal, time units
+
+=item * 
+
+B<6> - Horizontal, angular units
 
 =back
 
-=item B<--theme> color scheme:
+=item B<--format>: format of numbers:
 
 =over
 
-=item * B<dark>, default: color scheme for dark consoles
+=item * 
 
-=item * B<light> color scheme for light consoles
+B<D> decimal: arc-degrees or hours
+
+=item * 
+
+B<S> sexadecimal: degrees (hours), minutes, seconds
 
 =back
 
+=item B<--theme>: color theme:
 
+=over
+
+=item * 
+
+B<dark> (default): for dark consoles
+
+=item * 
+
+B<light>: for light consoles
+
+=item * 
+
+B<colorless>: without colors, for terminals that do not support ANSI color codes
 
 =back
 
+=item B<--no-colors>: do not use colors, same as C<--theme=colorless>
+
+=back
 
 
 

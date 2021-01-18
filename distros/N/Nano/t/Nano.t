@@ -27,6 +27,7 @@ Minimalist Object Persistence
 
 =includes
 
+method: domain
 method: dump
 method: hash
 method: find
@@ -149,6 +150,22 @@ env: ro, opt, Env
 This package provides a minimalist framework for persisting objects (I<i.e.
 class instances>) with as little effort as possible. This framework relies on
 the L<Zing> toolkit which provides pluggable storage and serialization options.
+
+=cut
+
+=method domain
+
+The domain method returns a L<Zing::Domain> object for the ID provided.
+
+=signature domain
+
+domain(Str $name) : Domain
+
+=example-1 domain
+
+  my $nano = Nano->new;
+
+  my $domain = $nano->domain('changelog');
 
 =cut
 
@@ -319,6 +336,13 @@ my $subs = $test->standard;
 
 $subs->synopsis(fun($tryable) {
   ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'domain', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Zing::Domain');
 
   $result
 });

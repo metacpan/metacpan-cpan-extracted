@@ -59,15 +59,17 @@ use Mouse;
 use JSON qw(from_json to_json);
 use MIME::Base64;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  portalConsts
   PE_OK
+  portalConsts
   PE_PASSWORD_OK
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
-extends
-  qw (Lemonldap::NG::Portal::Main::Plugin Lemonldap::NG::Portal::Lib::Captcha);
+extends qw(
+  Lemonldap::NG::Portal::Main::Plugin
+  Lemonldap::NG::Portal::Lib::Captcha
+);
 
 has configStorage => (
     is      => 'ro',

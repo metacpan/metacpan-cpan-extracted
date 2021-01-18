@@ -3,14 +3,14 @@ package Lemonldap::NG::Portal::2F::Ext2F;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_BADOTP
-  PE_ERROR
-  PE_FORMEMPTY
   PE_OK
+  PE_ERROR
+  PE_BADOTP
+  PE_FORMEMPTY
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 
@@ -51,7 +51,10 @@ sub run {
     my ( $self, $req, $token ) = @_;
 
     my $checkLogins = $req->param('checkLogins');
-    $self->logger->debug("Ext2F checkLogins set") if ($checkLogins);
+    $self->logger->debug("Ext2F: checkLogins set") if $checkLogins;
+
+    my $stayconnected = $req->param('stayconnected');
+    $self->logger->debug("Ext2F: stayconnected set") if $stayconnected;
 
     # Generate Code to send
     my $code;
@@ -87,7 +90,8 @@ sub run {
               . $self->prefix
               . '2fcheck?skin='
               . $self->p->getSkin($req),
-            CHECKLOGINS => $checkLogins
+            CHECKLOGINS   => $checkLogins,
+            STAYCONNECTED => $stayconnected
         }
     );
     $self->logger->debug("Prepare external 2F verification");

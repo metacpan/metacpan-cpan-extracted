@@ -2,12 +2,17 @@ package Lemonldap::NG::Portal::Plugins::History;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_INFO PE_OK);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_INFO
+);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
-extends 'Lemonldap::NG::Portal::Main::Plugin',
-  'Lemonldap::NG::Portal::Lib::OtherSessions';
+extends qw(
+  Lemonldap::NG::Portal::Main::Plugin
+  Lemonldap::NG::Portal::Lib::OtherSessions
+);
 
 # INITIALIZATION
 

@@ -1,3 +1,11 @@
+0.210160  2021-01-16 22:27:34+01:00 Europe/Brussels
+    Fixes
+      - Blast: made Blastable role taint-safe
+      - Blast: remote tests are now disabled by default
+      - Exonerate: now forces Homebrew to install historical version 2.2.0
+      - Hmmer: updated tests to HMMER 3.3
+      - Mafft: updated tests to MAFFT 7.453
+
 0.193030  2019-10-30 21:33:56+01:00 Europe/Brussels
     Fixes
       - ClustalO: fixed module filename (Clustalo.pm => ClustalO.pm)

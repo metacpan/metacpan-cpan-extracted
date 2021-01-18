@@ -1,7 +1,10 @@
 Revision history for Perl extension D64::Disk::BAM.
 
+0.05  2021-01-16
+    - fixed incorrect computation of sector BAM offsets
+
 0.04  2013-03-10
-    - Fixed failing unit-tests for Perl 5.6.2 by switching from IO::Capture
+    - fixed failing unit-tests for Perl 5.6.2 by switching from IO::Capture
       to Capture::Tiny which, unlikely its predecessor, is able to correctly
       capture the contents written into a standard error filehandle also for
       Perl 5.6.2

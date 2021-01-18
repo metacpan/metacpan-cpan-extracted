@@ -159,7 +159,7 @@ sub get_deleted_item {
     my @new_item_data = $item->data();
     splice @data, 0x02, 0x00, @new_item_data;
     splice @data, 0x20, 0x00, chr 0x00, chr 0x00;
-    splice @data, -0x20, 0x20;
+    splice @data, 0x20, 0x20;
     $data[0x01] = chr 0xff;
     my $data = join '', @data;
     my $test3 = $dir->data() eq $data;
@@ -180,7 +180,7 @@ sub get_deleted_item {
     my @new_item_data = $item->data();
     splice @data, 0x02, 0x00, @new_item_data;
     splice @data, 0x20, 0x00, chr 0x00, chr 0x00;
-    splice @data, -0x20, 0x20;
+    splice @data, 0x80, 0x20;
     my $data = join '', @data;
     my $test3 = $dir->data() eq $data;
     ok($test1 && $test2 && $test3, 'add an item to a directory listing designated by an offset of the first non-empty directory item');
@@ -200,7 +200,7 @@ sub get_deleted_item {
     my @new_item_data = $item->data();
     splice @data, 0x22, 0x00, @new_item_data;
     splice @data, 0x40, 0x00, chr 0x00, chr 0x00;
-    splice @data, -0x20, 0x20;
+    splice @data, 0x80, 0x20;
     my $data = join '', @data;
     my $test3 = $dir->data() eq $data;
     ok($test1 && $test2 && $test3, 'add an item to a directory listing designated by an offset of the second non-empty directory item');
@@ -220,7 +220,7 @@ sub get_deleted_item {
     my @new_item_data = $item->data();
     splice @data, 0x42, 0x00, @new_item_data;
     splice @data, 0x60, 0x00, chr 0x00, chr 0x00;
-    splice @data, -0x20, 0x20;
+    splice @data, 0x80, 0x20;
     my $data = join '', @data;
     my $test3 = $dir->data() eq $data;
     ok($test1 && $test2 && $test3, 'add an item to a directory listing designated by an offset of the last non-empty directory item');
@@ -240,7 +240,7 @@ sub get_deleted_item {
     my @new_item_data = $item->data();
     splice @data, 0x62, 0x00, @new_item_data;
     splice @data, 0x80, 0x00, chr 0x00, chr 0x00;
-    splice @data, -0x20, 0x20;
+    splice @data, 0x80, 0x20;
     my $data = join '', @data;
     my $test3 = $dir->data() eq $data;
     ok($test1 && $test2 && $test3, 'add an item to a directory listing designated by an offset right after the last non-empty directory item');

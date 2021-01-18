@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More;
 
 use Test::DZil;
 
@@ -19,3 +19,6 @@ my ($data) = grep { $_->name =~ /Data/ } @{ $tzil->files };
 
 like $data->content, qr/=head1 DESCRIPTION.*__DATA__/s, 'pod before __DATA__';
 
+like $data->content, qr/__DATA__\nthis/s, 'no added CRs after __DATA__';
+
+done_testing();

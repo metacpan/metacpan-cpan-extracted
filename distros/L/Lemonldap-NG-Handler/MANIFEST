@@ -59,6 +59,7 @@ lib/Lemonldap/NG/Handler/Server/ZimbraPreAuth.pm
 lib/Plack/Middleware/Auth/LemonldapNG.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.json
 META.yml
 README
@@ -83,6 +84,7 @@ t/69-Lemonldap-NG-Handler-PSGI-SecureToken.t
 t/70-Lemonldap-NG-Handler-PSGI-AuthBasic.t
 t/71-Lemonldap-NG-Handler-PSGI-OAuth2.t
 t/99-pod.t
+t/custom.pm
 t/lmConf-1.json
 t/sessions/lock/.exists
 t/test-psgi-lib.pm

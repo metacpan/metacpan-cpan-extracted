@@ -141,7 +141,7 @@ SKIP: {
     # Verify authentication on SP
     expectRedirection( $res, 'http://auth.sp.com' );
     my $spId      = expectCookie($res);
-    my $rawCookie = getHeader( $res, 'Set-Cookie' );
+    $rawCookie = getHeader( $res, 'Set-Cookie' );
     ok( $rawCookie =~ /;\s*SameSite=None/, 'Found SameSite=None' );
 
     ok( $res = $sp->_get( '/', cookie => "lemonldap=$spId" ), 'Get / on SP' );

@@ -83,6 +83,34 @@ objects and values.
 
 =cut
 
+=scenario $callback
+
+This package supports resolving services as callbacks to be passed around
+and/or resolved by other services. The C<$callback> directive is used to
+specify the name of a service to be resolved and passed as an argument.
+
+=example $callback
+
+  use Rewire;
+
+  my $services = {
+    io => {
+      package => 'IO/Handle'
+    },
+    log => {
+      package => 'Mojo/Log',
+      argument => {
+        format => { '$callback' => 'io' }
+      }
+    },
+  };
+
+  my $rewire = Rewire->new(
+    services => $services
+  );
+
+=cut
+
 =scenario $envvar
 
 This package supports inlining environment variables as arguments to services.
@@ -273,8 +301,8 @@ building objects and values.
 =scenario extends
 
 This package supports extending services in the definition of other services,
-effectively using the extended service as the invocant in the creation of the
-requested service.
+recursively compiling service configurations and eventually executing the
+requested compiled service.
 
 =example extends
 
@@ -295,6 +323,10 @@ requested service.
       extends => 'log',
       builder => [
         {
+          method => 'new',
+          return => 'self'
+        },
+        {
           method => 'path',
           argument => '/tmp/development.log',
           return => 'none'
@@ -311,6 +343,10 @@ requested service.
       extends => 'log',
       builder => [
         {
+          method => 'new',
+          return => 'self'
+        },
+        {
           method => 'path',
           argument => '/tmp/production.log',
           return => 'none'
@@ -321,6 +357,14 @@ requested service.
           return => 'none'
         }
       ]
+    },
+    staging_log => {
+      package => 'Mojo/Log',
+      extends => 'development_log',
+    },
+    testing_log => {
+      package => 'Mojo/Log',
+      extends => 'log',
     },
   };
 
@@ -803,6 +847,19 @@ $subs->synopsis(fun($tryable) {
   $result
 });
 
+$subs->scenario('$callback', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->validate;
+  ok my $value = $result->resolve('log');
+  ok $value->isa('Mojo::Log');
+  my $format = $value->format;
+  ok ref($format) eq 'CODE';
+  my $io = $format->();
+  ok $io->isa('IO::Handle');
+
+  $result
+});
+
 $subs->scenario('$envvar', fun($tryable) {
   local $ENV{HOME} = '/home/ubuntu';
 
@@ -892,6 +949,18 @@ $subs->scenario('extends', fun($tryable) {
   ok $value->handle->isa('IO::Handle');
   is $value->level, 'warn';
   is $value->path, '/tmp/production.log';
+
+  ok $value = $result->resolve('staging_log');
+  ok $value->isa('Mojo::Log');
+  ok $value->handle->isa('IO::Handle');
+  is $value->level, 'debug';
+  is $value->path, '/tmp/development.log';
+
+  ok $value = $result->resolve('testing_log');
+  ok $value->isa('Mojo::Log');
+  ok $value->handle->isa('IO::Handle');
+  is $value->level, 'debug';
+  ok !$value->path;
 
   $result
 });

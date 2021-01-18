@@ -1,0 +1,58 @@
+NAME
+
+    OTRS::OPM::Validate - Validate .opm files
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+        use v5.10;
+        use OTRS::OPM::Validate;
+    
+        my $content = 'content of .opm file';
+        my $success = eval {
+            OTRS::OPM::Validate->validate( $content );
+        };
+    
+        say "It's valid" if $success;
+
+DESCRIPTION
+
+    .opm files are used as addons for the ((OTRS)) Community Edition. They
+    are XML files with specific XML tags.
+
+    This module checks if all needed XML tags are there.
+
+    Currently the error messages might be misleading, this is something we
+    are working on.
+
+METHODS
+
+ validate
+
+    This checks the given string if it matches the needs. It dies if an
+    error occurs and returns 1 otherwise.
+
+        use v5.10;
+        use OTRS::OPM::Validate;
+    
+        my $content = 'content of .opm file';
+        my $success = eval {
+            OTRS::OPM::Validate->validate( $content );
+        };
+    
+        say "It's valid" if $success;
+
+AUTHOR
+
+    Perl-Services.de <info@perl-services.de>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2021 by Perl-Services.de.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

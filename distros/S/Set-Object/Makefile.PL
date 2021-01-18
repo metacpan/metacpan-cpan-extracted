@@ -12,7 +12,7 @@ unless ($] >= 5.008) {
 WriteMakefile(
   'NAME'	 => 'Set::Object',
   'VERSION_FROM' => 'lib/Set/Object.pm',
-  'AUTHOR'    => 'Jean-Louis Leroy and Sam Vilain',
+  'AUTHOR'    => 'Jean-Louis Leroy, Sam Vilain and Reini Urban',
   'LICENSE'   => 'Artistic_2',
   'ABSTRACT'  => "Unordered collections (sets) of Perl Objects",
   'PREREQ_PM' => {
@@ -23,15 +23,25 @@ WriteMakefile(
   ($ExtUtils::MakeMaker::VERSION gt '6.46' ?
    ('META_MERGE'  =>
     {
-      recommends => {
-	# deps of t/misc/more_leaks.t
-	'Test::LeakTrace' => 0,
-	'Moose'           => 0,
-      },
+      "meta-spec" => { version => 2 },
+      dynamic_config => 0,
       resources => {
-	license     => 'http://dev.perl.org/licenses/',
-	repository  => 'git://github.com/rurban/Set-Object.git',
-      }
+        repository => {
+          type => 'git',
+          url => 'git://github.com/rurban/Set-Object.git',
+          web => 'https://github.com/rurban/Set-Object',
+        },
+        license => [ 'http://dev.perl.org/licenses/' ],
+      },
+      prereqs => {
+        develop => {
+          requires => {
+            # deps of t/misc/more_leaks.t
+            'Test::LeakTrace' => 0,
+            'Moose'           => 0,
+          },
+        },
+      },
     }) : ()
   ),
   test => { TESTS => join(' ', glob('t/*/*.t')) },

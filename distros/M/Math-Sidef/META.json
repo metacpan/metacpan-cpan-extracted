@@ -3,7 +3,7 @@
    "author" : [
       "Daniel Șuteu <trizen@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "artistic_2"
@@ -26,6 +26,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Exporter" : "0",
             "Math::AnyNum" : "0.36",
             "Sidef" : "3.96",
             "perl" : "v5.16.0"
@@ -35,7 +36,7 @@
    "provides" : {
       "Math::Sidef" : {
          "file" : "lib/Math/Sidef.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -51,6 +52,6 @@
          "url" : "https://github.com/trizen/Math-Sidef"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

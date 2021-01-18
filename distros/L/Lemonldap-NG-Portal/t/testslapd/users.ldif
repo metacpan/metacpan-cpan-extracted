@@ -37,6 +37,7 @@ cn:: RnLDqWTDqXJpYyBBY2NlbnRz
 sn: Accents
 mail: french@badwolf.org
 userPassword: french
+displayName:: RnLDqWTDqXJpYyBBY2NlbnRz
 
 dn: uid=russian,ou=users,dc=example,dc=com
 objectClass: inetOrgPerson
@@ -45,6 +46,7 @@ cn:: 0KDRg9GB0YHQutC40Lk=
 sn:: 0KDRg9GB0YHQutC40Lk=
 mail: russian@badwolf.org
 userPassword: russian
+roomNumber: 0
 
 dn: uid=reset,ou=users,dc=example,dc=com
 objectClass: inetOrgPerson

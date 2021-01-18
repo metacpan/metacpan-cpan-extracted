@@ -4,10 +4,12 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_ERROR);
 
-extends 'Lemonldap::NG::Portal::Password::Base',
-  'Lemonldap::NG::Portal::Lib::Choice';
+extends qw(
+  Lemonldap::NG::Portal::Lib::Choice
+  Lemonldap::NG::Portal::Password::Base
+);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.10';
 
 sub init {
     my ($self) = @_;

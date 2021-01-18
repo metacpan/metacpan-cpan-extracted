@@ -1,13 +1,9 @@
 # This module implements all the methods that responds to '/api/*' requests
 package Lemonldap::NG::Manager::Api;
 
-use 5.10.0;
+use strict;
 use utf8;
 use Mouse;
-
-extends 'Lemonldap::NG::Manager::Plugin',
-  'Lemonldap::NG::Common::Conf::RESTServer',
-  'Lemonldap::NG::Common::Session::REST';
 
 use Lemonldap::NG::Manager::Api::2F;
 use Lemonldap::NG::Manager::Api::Misc;
@@ -17,7 +13,13 @@ use Lemonldap::NG::Manager::Api::Providers::CasApp;
 use Lemonldap::NG::Manager::Api::Menu::Cat;
 use Lemonldap::NG::Manager::Api::Menu::App;
 
-our $VERSION = '2.0.9';
+extends qw(
+  Lemonldap::NG::Manager::Plugin
+  Lemonldap::NG::Common::Conf::RESTServer
+  Lemonldap::NG::Common::Session::REST
+);
+
+our $VERSION = '2.0.10';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -27,6 +29,8 @@ use constant defaultRoute => 'api.html';
 
 sub init {
     my ( $self, $conf ) = @_;
+
+    $self->ua( Lemonldap::NG::Common::UserAgent->new($conf) );
 
     # HTML template
     $self->addRoute( 'api.html', undef, ['GET'] )

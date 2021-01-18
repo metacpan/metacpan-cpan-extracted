@@ -1,4 +1,4 @@
-# Copyrights 2013-2018 by [Mark Overmeer <mark@overmeer.net>].
+# Copyrights 2013-2021 by [Mark Overmeer <mark@overmeer.net>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Log::Report::Util;
 use vars '$VERSION';
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 use base 'Exporter';
 
@@ -37,11 +37,16 @@ our @reasons  = N__w('TRACE ASSERT INFO NOTICE WARNING
     MISTAKE ERROR FAULT ALERT FAILURE PANIC');
 our %reason_code; { my $i=1; %reason_code = map +($_ => $i++), @reasons }
 
-my @user      = qw/MISTAKE ERROR/;
-my @program   = qw/TRACE ASSERT INFO NOTICE WARNING PANIC/;
-my @system    = qw/FAULT ALERT FAILURE/;
+my %reason_set = (
+   ALL     => \@reasons,
+   FATAL   => [ qw/ERROR FAULT FAILURE PANIC/ ],
+   NONE    => [ ],
+   PROGRAM => [ qw/TRACE ASSERT INFO NOTICE WARNING PANIC/ ],
+   SYSTEM  => [ qw/FAULT ALERT FAILURE/ ],
+   USER    => [ qw/MISTAKE ERROR/ ],
+);
 
-my %is_fatal  = map +($_ => 1), qw/ERROR FAULT FAILURE PANIC/;
+my %is_fatal  = map +($_ => 1), @{$reason_set{FATAL}};
 my %use_errno = map +($_ => 1), qw/FAULT ALERT FAILURE/;
 
 my %modes     = (NORMAL => 0, VERBOSE => 1, ASSERT => 2, DEBUG => 3
@@ -56,10 +61,13 @@ sub error__x($%)
 }
 
 
+
 sub expand_reasons($)
-{   my $reasons = shift;
+{   my $reasons = shift or return ();
+    $reasons = [ split m/\,/, $reasons ] if ref $reasons ne 'ARRAY';
+
     my %r;
-    foreach my $r (split m/\,/, $reasons)
+    foreach my $r (@$reasons)
     {   if($r =~ m/^([a-z]*)\-([a-z]*)/i )
         {   my $begin = $reason_code{$1 || 'TRACE'};
             my $end   = $reason_code{$2 || 'PANIC'};
@@ -74,10 +82,7 @@ sub expand_reasons($)
             $r{$_}++ for $begin..$end;
         }
         elsif($reason_code{$r}) { $r{$reason_code{$r}}++ }
-        elsif($r eq 'USER')     { $r{$reason_code{$_}}++ for @user    }
-        elsif($r eq 'PROGRAM')  { $r{$reason_code{$_}}++ for @program }
-        elsif($r eq 'SYSTEM')   { $r{$reason_code{$_}}++ for @system  }
-        elsif($r eq 'ALL')      { $r{$reason_code{$_}}++ for @reasons }
+        elsif(my $s = $reason_set{$r}) { $r{$reason_code{$_}}++ for @$s }
         else
         {   error__x"unknown reason {which} in '{reasons}'"
               , which => $r, reasons => $reasons;

@@ -10,7 +10,7 @@ use Wikibase::Datatype::Struct::Snak;
 
 Readonly::Array our @EXPORT_OK => qw(obj_array_ref2struct struct2snaks_array_ref);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub obj_array_ref2struct {
 	my ($snaks_ar, $key, $base_uri) = @_;
@@ -277,12 +277,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2021
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

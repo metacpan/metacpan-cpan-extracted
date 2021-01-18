@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
 # TODO: Missing:
 #  * activeTimer
@@ -79,13 +79,21 @@ sub tree {
                                         'portalRequireOldPassword',
                                         'hideOldPassword',
                                         'mailOnPasswordChange',
+                                    ]
+                                },
+                                {
+                                    title => 'passwordPolicy',
+                                    help => 'portalcustom.html#password-policy',
+                                    form => 'simpleInputContainer',
+                                    nodes => [
+                                        'passwordPolicyActivation',
+                                        'portalDisplayPasswordPolicy',
                                         'passwordPolicyMinSize',
                                         'passwordPolicyMinLower',
                                         'passwordPolicyMinUpper',
                                         'passwordPolicyMinDigit',
                                         'passwordPolicyMinSpeChar',
                                         'passwordPolicySpecialChar',
-                                        'portalDisplayPasswordPolicy',
                                     ]
                                 },
                                 {
@@ -234,7 +242,8 @@ sub tree {
                             help  => 'authkerberos.html',
                             nodes => [
                                 'krbAuthnLevel', 'krbKeytab',
-                                'krbByJs',       'krbRemoveDomain'
+                                'krbByJs',       'krbRemoveDomain',
+                                'krbAllowedDomains',
                             ]
                         },
                         {
@@ -251,8 +260,9 @@ sub tree {
                                         'ldapServer',  'ldapPort',
                                         'ldapVerify',  'ldapBase',
                                         'managerDn',   'managerPassword',
-                                        'ldapTimeout', 'ldapVersion',
-                                        'ldapRaw', 'ldapCAFile', 'ldapCAPath',
+                                        'ldapTimeout', 'ldapIOTimeout',
+                                        'ldapVersion', 'ldapRaw',
+                                        'ldapCAFile',  'ldapCAPath',
                                     ]
                                 },
                                 {
@@ -292,6 +302,7 @@ sub tree {
                                         'ldapPasswordResetAttribute',
                                         'ldapPasswordResetAttributeValue',
                                         'ldapAllowResetExpiredPassword',
+                                        'ldapGetUserBeforePasswordChange',
                                         'ldapITDS'
                                     ]
                                 },
@@ -550,6 +561,7 @@ sub tree {
                     help  => 'sessions.html',
                     nodes => [
                         'storePassword',
+                        'displaySessionId',
                         'timeout',
                         'timeoutActivity',
                         'timeoutActivityInterval',
@@ -592,10 +604,20 @@ sub tree {
                     title => 'plugins',
                     help  => 'start.html#plugins',
                     nodes => [
-                        'stayConnected',
                         'portalStatus',
                         'upgradeSession',
                         'refreshSessions',
+                        'adaptativeAuthenticationLevelRules',
+                        {
+                            title => 'stayConnect',
+                            help  => 'stayconnected.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'stayConnected',
+                                'stayConnectedTimeout',
+                                'stayConnectedCookieName'
+                            ],
+                        },
                         {
                             title => 'portalServers',
                             help  => 'portalservers.html',
@@ -737,16 +759,17 @@ sub tree {
                         {
                             title => 'checkUsers',
                             help  => 'checkuser.html',
-                            form  => 'simpleInputContainer',
                             nodes => [
                                 'checkUser',
                                 'checkUserIdRule',
                                 'checkUserUnrestrictedUsersRule',
                                 'checkUserHiddenAttributes',
                                 'checkUserSearchAttributes',
+                                'checkUserDisplayComputedSession',
                                 'checkUserDisplayEmptyHeaders',
                                 'checkUserDisplayEmptyValues',
                                 'checkUserDisplayPersistentInfo',
+                                'checkUserHiddenHeaders'
                             ]
                         },
                         {
@@ -770,6 +793,7 @@ sub tree {
                                 'contextSwitchingRule',
                                 'contextSwitchingIdRule',
                                 'contextSwitchingUnrestrictedUsersRule',
+                                'contextSwitchingAllowed2fModifications',
                                 'contextSwitchingStopWithLogout',
                             ]
                         },
@@ -790,7 +814,11 @@ sub tree {
                 {
                     title => 'secondFactors',
                     help  => 'secondfactor.html',
-                    nodes => [ {
+                    nodes => [
+                        'sfManagerRule',
+                        'sfRequired',
+                        'sfOnlyUpgrade',
+                        {
                             title => 'utotp2f',
                             help  => 'utotp2f.html',
                             form  => 'simpleInputContainer',
@@ -859,6 +887,7 @@ sub tree {
                                 'mail2fTimeout',    'mail2fSubject',
                                 'mail2fBody',       'mail2fAuthnLevel',
                                 'mail2fLabel',      'mail2fLogo',
+                                'mail2fSessionKey',
                             ]
                         },
                         {
@@ -908,9 +937,6 @@ sub tree {
                                 'sfRemovedNotifMsg',
                             ],
                         },
-                        'sfOnlyUpgrade',
-                        'sfManagerRule',
-                        'sfRequired',
                     ]
                 },
                 {
@@ -923,6 +949,7 @@ sub tree {
                         {
                             title => 'SMTP',
                             help  => 'smtp.html',
+                            form  => 'SMTP',
                             nodes => [
                                 'mailSessionKey',
                                 'SMTPServer',
@@ -952,6 +979,7 @@ sub tree {
                                 'key',
                                 'trustedDomains',
                                 'useSafeJail',
+                                'avoidAssignment',
                                 'checkXSS',
                                 'requireToken',
                                 'formTimeout',
@@ -1015,7 +1043,8 @@ sub tree {
                             help  => 'redirections.html#portal-redirections',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'jsRedirect', 'noAjaxHook',
+                                'jsRedirect',
+                                'noAjaxHook',
                                 'skipRenewConfirmation',
                                 'skipUpgradeConfirmation',
                             ]
@@ -1050,7 +1079,7 @@ sub tree {
                     help  => 'samlservice.html#security-parameters',
                     nodes => [ {
                             title => 'samlServiceSecuritySig',
-                            form  => 'RSAKey',
+                            form  => 'RSACertKey',
                             group => [
                                 'samlServicePrivateKeySig',
                                 'samlServicePrivateKeySigPwd',
@@ -1059,7 +1088,7 @@ sub tree {
                         },
                         {
                             title => 'samlServiceSecurityEnc',
-                            form  => 'RSAKey',
+                            form  => 'RSACertKey',
                             group => [
                                 'samlServicePrivateKeyEnc',
                                 'samlServicePrivateKeyEncPwd',

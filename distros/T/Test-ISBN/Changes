@@ -1,5 +1,8 @@
 Revision history for Perl module Test::ISBN
 
+2.042 2021-01-16T12:53:01Z
+	* freshen distro, remove Travis CI, add Github Actions
+
 2.041 2018-04-29T14:28:56Z
 	* Clarify that it's the Artistic License 2.0.
 	* Renamed the GitHub repo to make it all lowercase. No big whoop.

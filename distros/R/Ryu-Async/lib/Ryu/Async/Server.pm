@@ -3,7 +3,7 @@ package Ryu::Async::Server;
 use strict;
 use warnings;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 sub new { bless { @_[1..$#_] }, $_[0] }
@@ -20,5 +20,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
 

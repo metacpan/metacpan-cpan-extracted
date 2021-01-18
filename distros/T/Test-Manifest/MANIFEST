@@ -17,6 +17,7 @@ t/include.t
 t/include_in_manifest.txt
 t/leading_space.t
 t/pod_coverage.t
+t/Test/Manifest/Tempdir.pm
 t/test_manifest
 t/trailing_space.t
 test_manifest

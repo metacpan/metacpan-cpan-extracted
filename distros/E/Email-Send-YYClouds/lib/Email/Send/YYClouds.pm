@@ -5,32 +5,35 @@ use strict;
 use warnings;
 use utf8;
 use MIME::Lite;
-use MIME::Words qw(encode_mimewords);
+use Encode qw(encode encode_utf8);
+
 
 =encoding utf8
 
 =head1 NAME
 
-Email::Send::YYClouds - Send email using YYClouds' smtp server
+Email::Send::YYClouds - Send email using any smtp relay server
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 =head1 SYNOPSIS
 
     use Email::Send::YYClouds;
+    use utf8;
 
     my $msg = Email::Send::YYClouds->new();
     $msg->send(recepient => ['user@yy.com','user@163.com'],
+               sender => 'foo@bar.com',
+               smtprelay => 'localhost',
                subject => '测试邮件',
-               body => '<p>这是一封测试邮件</p><p>Just a test message for you</p>',
-               is_html => 1,
+               body => '<p>这是一封测试邮件。</p><p>欢迎来到perl的世界！</p>',
           );
 
 
@@ -56,22 +59,24 @@ sub new {
 =head2 send
 
     $msg->send(recepient => [a list of recepients],
+               sender => 'foo@bar.com',
+               smtprelay => 'relay_server',
                subject => $subject,
                body => $body,
-               is_html => $boolean,
           );
 
-Default sender should always be noreply@yyclouds.com, you can't change it.
 
 recepient - a list of email addresses for receiving message.
 
+sender - from what address the message was sent.
+
+smtprelay - relay server for smtp session, default to localhost.
+
 subject - email subject, which can be either Chinese or non-Chinese.
 
-body - message body, which can be either Chinese or non-Chinese.
+body - message body, which can be either Chinese or non-Chinese. default with HTML type.
 
-is_html - default 0, it must be set to 1 if this is a html message.
-
-Please notice: Only when MTA relay has authorized the sender host from where you can send messages.
+Please notice: you must have smtp realy server to approve the sending action.
 
 Otherwise you will get error:
 
@@ -88,27 +93,26 @@ sub send {
     my %args = @_;
 
     my $recepient = $args{'recepient'};
+    my $sender = $args{'sender'};
     my $subject = $args{'subject'};
     my $body = $args{'body'};
-    my $is_html = $args{'is_html'};
-    $is_html = 0 unless defined $is_html;
 
-    my $type = $is_html ? "text/html" : "text/plain";
+    my $smtprelay = $args{'smtprelay'} || 'localhost';
     my $to_address = join ',',@$recepient;
-    my $encoded_subject = encode_mimewords($subject,'Charset','UTF-8');
+
 
     my $msg = MIME::Lite->new (
-        From => 'noreply@yyclouds.com',
+        From => $sender,
         To =>  $to_address,
-        Subject => $encoded_subject,
-        Type     => $type,
-        Data     => $body,
+        Subject => encode( 'MIME-Header', $subject ),
+        Data    => encode_utf8($body),
         Encoding => 'base64',
     ) or die "create container failed: $!";
 
-    $msg->attr('content-type.charset' => 'UTF-8');
+    $msg->attr( 'content-type' => 'text/html; charset=utf-8' );
+
     $msg->send(  'smtp',
-                 'smtp.game.yy.com',
+                 $smtprelay,
                  Debug => $self->{debug}
               );
 }

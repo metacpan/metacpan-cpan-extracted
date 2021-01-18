@@ -1,0 +1,14 @@
+^blib
+^\.bowerrc
+cpanfile
+^.git/.*
+^.github/
+^.gitignore
+^Makefile$
+^MANIFEST.bak
+^MYMETA.*
+^.*\.o
+^.perltidyrc
+^pm_to_blib
+^\.prove
+^\.proverc

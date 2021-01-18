@@ -55,8 +55,6 @@ Iavyic/p4gZtXckweq+VTn9CdZp6ZTQtVw==
 </EntityDescriptor>
 XML
 
-my $override = override_verify_x509_verify(1);
-
 my $idp = Net::SAML2::IdP->new_from_xml(
     xml    => $xml,
     cacert => 't/cacert.pem'

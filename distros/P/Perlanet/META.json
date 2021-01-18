@@ -47,11 +47,13 @@
          "requires" : {
             "DateTime" : "0",
             "DateTime::Duration" : "0",
+            "DateTime::Format::Strptime" : "0",
             "Encode" : "0",
             "HTML::Scrubber" : "0",
             "HTML::Tidy" : "0",
             "List::Util" : "0",
             "Moose" : "0",
+            "MooseX::ConfigFromFile" : "0",
             "MooseX::Traits" : "0",
             "Template" : "0",
             "Try::Tiny" : "0",
@@ -66,7 +68,7 @@
    "provides" : {
       "Perlanet" : {
          "file" : "lib/Perlanet.pm",
-         "version" : "v2.0.4"
+         "version" : "v2.0.5"
       },
       "Perlanet::Entry" : {
          "file" : "lib/Perlanet/Entry.pm"
@@ -104,6 +106,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/perlanet/issues"
+      },
       "homepage" : "http://perlanet.mag-sol.com/",
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -114,6 +119,6 @@
          "web" : "https://github.com/davorg/perlanet"
       }
    },
-   "version" : "v2.0.4",
+   "version" : "v2.0.5",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

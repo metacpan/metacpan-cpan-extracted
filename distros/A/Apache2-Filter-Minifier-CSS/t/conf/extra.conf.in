@@ -36,7 +36,6 @@ Alias /raw @DocumentRoot@
     SetHandler              modperl
     PerlResponseHandler     MY::NoCTypeHandler
     PerlOutputFilterHandler Apache2::Filter::Minifier::CSS
-    DefaultType             text/missing
 </Location>
 
 <Location /decline_uc>

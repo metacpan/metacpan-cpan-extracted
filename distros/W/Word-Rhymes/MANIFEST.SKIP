@@ -34,4 +34,4 @@ build/
 BB-Pass/
 BB-Fail/
 cover_db/
-^\.github/^\.github/
+^\.github/

@@ -42,6 +42,7 @@ sub init {
             push @{ $self->rules }, [ $sub, $id ];
         }
     }
+    
     return 1;
 }
 

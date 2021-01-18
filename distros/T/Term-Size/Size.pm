@@ -9,7 +9,7 @@ use Exporter ();
 @ISA = qw(Exporter DynaLoader);
 @EXPORT_OK = qw(chars pixels);
 
-$VERSION = '0.209';
+$VERSION = '0.211';
 
 bootstrap Term::Size $VERSION;
 
@@ -19,7 +19,7 @@ bootstrap Term::Size $VERSION;
 
 =head1 NAME
 
-Term::Size - Retrieve terminal size (Unix version)
+Term::Size - Retrieve terminal size on Unix
 
 =head1 SYNOPSIS
 
@@ -103,5 +103,11 @@ Tim Goodwin, <tim@uunet.pipex.com>, 1997-04-23.
 =head1 MANTAINER
 
 Adriano Ferreira, <ferreira@cpan.org>, 2006-05-19.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 1997-05-13 by Tim Goodwin.
+
+You may redistribute them under the same terms as Perl itself.
 
 =cut

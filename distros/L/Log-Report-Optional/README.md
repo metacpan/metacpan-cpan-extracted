@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Log-Report-Optional>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Log-Report-Optional/>
-    and <https://metacpan.org/release/Log-Report-Optional>
+  * Indexed from CPAN: <https://metacpan.org/release/Log-Report-Optional>
 
 This module will allow libraries (helper modules) to have a dependency
 to a small module instead of the full Log-Report distribution.  The full

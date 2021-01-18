@@ -1,9 +1,9 @@
 package Ubuntu::Releases;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-21'; # DATE
+our $DATE = '2021-01-15'; # DATE
 our $DIST = 'Ubuntu-Releases'; # DIST
-our $VERSION = '20200221.0'; # VERSION
+our $VERSION = '20210115.0'; # VERSION
 
 use 5.010001;
 use strict;
@@ -594,7 +594,7 @@ our $data = do {
      apache_httpd_version => "2.4.41",
      bash_version         => "5.0",
      code_name            => "eoan",
-     eoldate              => "2020-01",
+     eoldate              => "2020-07",
      linux_version        => 5.3,
      mariadb_version      => "--",
      mysql_version        => "8.0.17",
@@ -606,6 +606,42 @@ our $data = do {
      reldate              => "2019-10-17",
      ruby_version         => undef,
      version              => "19.10",
+   },
+   {
+     animal               => "fossa",
+     apache_httpd_version => "2.4.41",
+     bash_version         => "5.0",
+     code_name            => "focal",
+     eoldate              => "2025-04",
+     linux_version        => "5.4.0",
+     mariadb_version      => "--",
+     mysql_version        => "8.0.19",
+     nginx_version        => undef,
+     perl_version         => "5.30.0",
+     php_version          => "7.4.3",
+     postgresql_version   => 12.2,
+     python_version       => "3.8.2",
+     reldate              => "2020-04-23",
+     ruby_version         => undef,
+     version              => "20.04 LTS",
+   },
+   {
+     animal               => "gorilla",
+     apache_httpd_version => "--",
+     bash_version         => "5.0",
+     code_name            => "groovy",
+     eoldate              => "2021-07",
+     linux_version        => "5.8.0",
+     mariadb_version      => "--",
+     mysql_version        => "--",
+     nginx_version        => undef,
+     perl_version         => "5.30.3",
+     php_version          => "--",
+     postgresql_version   => "--",
+     python_version       => "3.8.6",
+     reldate              => "2020-10-22",
+     ruby_version         => undef,
+     version              => "20.10",
    },
  ]
 };
@@ -633,7 +669,7 @@ Ubuntu::Releases - List Ubuntu releases
 
 =head1 VERSION
 
-This document describes version 20200221.0 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2020-02-21.
+This document describes version 20210115.0 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2021-01-15.
 
 =head1 SYNOPSIS
 
@@ -1424,7 +1460,7 @@ Source repository is at L<https://github.com/perlancar/perl-Ubuntu-Releases>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Ubuntu-Releases>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Ubuntu-Releases/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1440,7 +1476,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

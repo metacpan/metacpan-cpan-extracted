@@ -44,7 +44,7 @@ SKIP: {
         $res = $client->_post(
             '/register',
             IO::String->new(
-                'firstname=Fôo&lastname=Bàr&mail=foobar%40badwolf.org'),
+                'firstname=Fôo&lastname=Bà Bar&mail=foobar%40badwolf.org'),
             length => 53,
             accept => 'text/html'
         ),
@@ -73,12 +73,12 @@ SKIP: {
     );
     $user = $1;
     $pwd  = $2;
-    ok( $user eq 'fbar', 'Get good login' );
+    ok( $user eq 'fbabar', 'Get good login' );
 
     ok(
         $res = $client->_post(
-            '/', IO::String->new("user=fbar&password=fbar"),
-            length => 23,
+            '/', IO::String->new("user=fbabar&password=fbabar"),
+            length => 27,
             accept => 'text/html'
         ),
         'Try to authenticate'

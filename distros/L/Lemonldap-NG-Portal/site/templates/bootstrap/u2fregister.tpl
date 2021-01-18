@@ -2,7 +2,7 @@
 
   <main id="menucontent" class="container">
 
-    <div id="color" class="message message-positive alert"><span id="msg" trspan="u2fWelcome"></span></div>
+    <div id="color" class="message message-<TMPL_VAR NAME="ALERT"> alert"><span id="msg" trspan="<TMPL_VAR NAME="MSG">"></span></div>
 
     <div class="card">
      <div class="card-body">

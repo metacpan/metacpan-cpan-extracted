@@ -34,7 +34,7 @@
          "requires" : {
             "Devel::GlobalDestruction" : "0.09",
             "Encode" : "2.00",
-            "Log::Report::Optional" : "1.03",
+            "Log::Report::Optional" : "1.07",
             "Scalar::Util" : "0",
             "String::Print" : "0.91",
             "Sys::Syslog" : "0.27",
@@ -54,6 +54,6 @@
          "web" : "https://github.com/markov2/perl5-Log-Report"
       }
    },
-   "version" : "1.29",
+   "version" : "1.31",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -1,5 +1,9 @@
 Revision history for Perl extension Math::Sidef.
 
+0.02    2021-01-18
+
+        - Pack values returned from callback subroutines (fixes `dirichlet_sum`).
+
 0.01    2020-12-04
 
         - First release.

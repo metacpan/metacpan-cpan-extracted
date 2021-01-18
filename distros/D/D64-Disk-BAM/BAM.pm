@@ -72,7 +72,7 @@ use bytes;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp qw/carp croak/;
 use Text::Convert::PETSCII qw/:convert/;
@@ -109,9 +109,9 @@ our @TRACK_BAM_ENTRIES = (
 );
 
 our @SECTOR_BAM_OFFSETS = (
-    0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, # sectors 0-7
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, # sectors 0-7
     0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, # sectors 8-15
-    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, # sectors 16-23
+    0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, # sectors 16-23
 );
 
 our @SECTOR_BAM_BITMASK = (
@@ -273,13 +273,20 @@ sub _track_bam_free_sectors {
     my $free_sectors = 0;
     # Get number of sectors per track storage:
     my $num_sectors = $SECTORS_PER_TRACK[$track - 1];
+    my $bit = 1 << (24 - $num_sectors);
     while ($num_sectors-- > 0) {
         $free_sectors <<= 1;
-        $free_sectors |= 1;
+        $free_sectors |= $bit;
     }
     $free_sectors = sprintf q{%06x}, $free_sectors;
     my @free_sectors = $free_sectors =~ m/(..)/g;
-    return map { hex } @free_sectors;
+    return map { _flip_bits(hex $_) } @free_sectors;
+}
+
+sub _flip_bits {
+  my ($byte) = @_;
+  my @lookup = (0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf);
+  return ($lookup[$byte & 0xf] << 4) | $lookup[$byte >> 4];
 }
 
 =head2 clear_bam
@@ -1003,11 +1010,11 @@ Pawel Krol, E<lt>pawelkrol@cpan.orgE<gt>.
 
 =head1 VERSION
 
-Version 0.04 (2013-03-10)
+Version 0.05 (2021-01-16)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2011, 2013 by Pawel Krol <pawelkrol@cpan.org>.
+Copyright 2011-2021 by Pawel Krol <pawelkrol@cpan.org>.
 
 This library is free open source software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.6 or, at your option, any later version of Perl 5 you may have available.
 

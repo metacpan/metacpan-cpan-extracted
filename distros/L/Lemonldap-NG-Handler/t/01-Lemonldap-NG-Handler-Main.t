@@ -14,7 +14,7 @@ use lib dirname( abs_path $0 );
 #########################
 
 # Insert your test code below, the Test::More module is used here so read
-# its man page ( perldoc Test::More ) for help writing this test script.
+# its man page (perldoc Test::More) for help writing this test script.
 my $h;
 $h = 'Lemonldap::NG::Handler::Test';
 $ENV{SERVER_NAME} = "test1.example.com";

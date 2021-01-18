@@ -4,30 +4,29 @@
 # have registered their U2F key
 package Lemonldap::NG::Portal::2F::U2F;
 
-#use 5.16.0;
 use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_BADCREDENTIALS
-  PE_ERROR
   PE_OK
-  PE_SENDRESPONSE
+  PE_ERROR
   PE_U2FFAILED
+  PE_SENDRESPONSE
+  PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
-extends 'Lemonldap::NG::Portal::Main::SecondFactor',
-  'Lemonldap::NG::Portal::Lib::U2F';
+extends qw(
+  Lemonldap::NG::Portal::Main::SecondFactor
+  Lemonldap::NG::Portal::Lib::U2F
+);
 
 # INITIALIZATION
 
-has rule => ( is => 'rw' );
-
+has rule   => ( is => 'rw' );
 has prefix => ( is => 'ro', default => 'u' );
-
-has logo => ( is => 'rw', default => 'u2f.png' );
+has logo   => ( is => 'rw', default => 'u2f.png' );
 
 sub init {
     my ($self) = @_;
@@ -54,7 +53,10 @@ sub run {
     my ( $self, $req, $token ) = @_;
 
     my $checkLogins = $req->param('checkLogins');
-    $self->logger->debug("U2F checkLogins set") if ($checkLogins);
+    $self->logger->debug("U2F: checkLogins set") if $checkLogins;
+
+    my $stayconnected = $req->param('stayconnected');
+    $self->logger->debug("U2F: stayconnected set") if $stayconnected;
 
     # Check if user is registered
     if ( my $res = $self->loadUser( $req, $req->sessionInfo ) ) {
@@ -93,11 +95,12 @@ sub run {
             $req,
             'u2fcheck',
             params => {
-                MAIN_LOGO   => $self->conf->{portalMainLogo},
-                SKIN        => $self->p->getSkin($req),
-                DATA        => $data,
-                TOKEN       => $token,
-                CHECKLOGINS => $checkLogins
+                MAIN_LOGO     => $self->conf->{portalMainLogo},
+                SKIN          => $self->p->getSkin($req),
+                DATA          => $data,
+                TOKEN         => $token,
+                CHECKLOGINS   => $checkLogins,
+                STAYCONNECTED => $stayconnected
             }
         );
 
@@ -109,6 +112,7 @@ sub run {
 
 sub verify {
     my ( $self, $req, $session ) = @_;
+    my $crypter;
 
     # Check U2F signature
     if (    my $resp = $req->param('signature')
@@ -136,10 +140,9 @@ sub verify {
             $req->error(PE_ERROR);
             return $self->fail($req);
         }
-        my $crypter;
-        foreach ( @{ $req->data->{crypter} } ) {
-            $crypter = $_ if ( $_->{keyHandle} eq $data->{keyHandle} );
-        }
+        $crypter = $_
+          foreach grep { $_->{keyHandle} eq $data->{keyHandle} }
+          @{ $req->data->{crypter} };
         unless ($crypter) {
             $self->userLogger->error("Unregistered U2F key");
             $req->error(PE_BADCREDENTIALS);
@@ -245,7 +248,7 @@ sub loadUser {
                     'U2F error: ' . Crypt::U2F::Server::u2fclib_getError() );
             }
         }
-        return -1 unless (@crypters);
+        return -1 unless @crypters;
 
         $req->data->{crypter} = \@crypters;
         return 1;

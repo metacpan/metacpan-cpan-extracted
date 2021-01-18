@@ -1,9 +1,9 @@
 package Calendar::Indonesia::Holiday;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-14'; # DATE
+our $DATE = '2021-01-16'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.334'; # VERSION
+our $VERSION = '0.335'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,9 +19,15 @@ use Perinci::Sub::Util qw(err gen_modified_sub);
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
+                       list_idn_holidays
+                       enum_idn_workdays
+                       count_idn_workdays
+                       is_idn_holiday
+
                        list_id_holidays
                        enum_id_workdays
                        count_id_workdays
+                       is_id_holiday
                );
 
 our %SPEC;
@@ -1222,7 +1228,7 @@ for my $year ($min_year .. $max_year) {
 }
 
 my $res = gen_read_table_func(
-    name => 'list_id_holidays',
+    name => 'list_idn_holidays',
     table_data => \@holidays,
     table_spec => {
         fields => {
@@ -1315,12 +1321,10 @@ my $res = gen_read_table_func(
 die "BUG: Can't generate func: $res->[0] - $res->[1]"
     unless $res->[0] == 200;
 
-$SPEC{list_id_holidays}{args}{year}{pos}  = 0;
-$SPEC{list_id_holidays}{args}{month}{pos} = 1;
+$SPEC{list_idn_holidays}{args}{year}{pos}  = 0;
+$SPEC{list_idn_holidays}{args}{month}{pos} = 1;
 
-my $AVAILABLE_YEARS =
-    "Contains data from years $min_year to $max_year (joint leave days until\n".
-    "$max_joint_leave_year).";
+my $TEXT_AVAILABLE_YEARS = "Contains data from years $min_year to $max_year";
 
     my $meta = $res->[2]{meta};
 $meta->{summary} = "List Indonesian holidays in calendar";
@@ -1328,7 +1332,7 @@ $meta->{description} = <<"_";
 
 List holidays and joint leave days ("cuti bersama").
 
-$AVAILABLE_YEARS
+$TEXT_AVAILABLE_YEARS
 
 _
 
@@ -1343,7 +1347,7 @@ sub _check_date_arg {
     }
 }
 
-$SPEC{enum_id_workdays} = {
+$SPEC{enum_idn_workdays} = {
     v => 1.1,
     summary => 'Enumerate working days for a certain period',
     description => <<"_",
@@ -1353,7 +1357,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-$AVAILABLE_YEARS
+$TEXT_AVAILABLE_YEARS
 
 _
     args => {
@@ -1387,7 +1391,7 @@ _
         },
     },
 };
-sub enum_id_workdays {
+sub enum_idn_workdays {
     my %args = @_;
 
     # XXX args
@@ -1413,7 +1417,7 @@ sub enum_id_workdays {
     push @args, "year.min"=>$start_date->year;
     push @args, "year.max"=>$end_date->year;
     push @args, (is_holiday=>1) if !$observe_joint_leaves;
-    my $res = list_id_holidays(@args);
+    my $res = list_idn_holidays(@args);
     return err(500, "Can't list holidays", $res)
         unless $res->[0] == 200;
     #use Data::Dump; dd $res;
@@ -1434,19 +1438,19 @@ sub enum_id_workdays {
 }
 
 gen_modified_sub(
-    output_name => 'count_id_workdays',
+    output_name => 'count_idn_workdays',
     summary     => "Count working days for a certain period",
 
-    base_name   => 'enum_id_workdays',
+    base_name   => 'enum_idn_workdays',
     output_code => sub {
-        my $res = enum_id_workdays(@_);
+        my $res = enum_idn_workdays(@_);
         return $res unless $res->[0] == 200;
         $res->[2] = @{$res->[2]};
         $res;
     },
 );
 
-$SPEC{list_id_workdays} = {
+$SPEC{list_idn_workdays} = {
     v => 1.1,
     summary => '',
     args => {
@@ -1456,7 +1460,7 @@ $SPEC{list_id_workdays} = {
         end_date   => {schema=>'str*'},
     },
 };
-sub list_id_workdays {
+sub list_idn_workdays {
     my %args = @_;
 
     my %fargs;
@@ -1482,10 +1486,10 @@ sub list_id_workdays {
         $fargs{end_date} = $fargs{end_date};
     }
 
-    Calendar::Indonesia::Holiday::enum_id_workdays(%fargs);
+    Calendar::Indonesia::Holiday::enum_idn_workdays(%fargs);
 }
 
-$SPEC{is_id_holiday} = {
+$SPEC{is_idn_holiday} = {
     v => 1.1,
     summary => 'Check whether a date is an Indonesian holiday',
     description => <<'_',
@@ -1498,6 +1502,11 @@ single YYYY-MM-DD date.
 
 Will return undef (exit code 2 on CLI) if year is not within range of the
 holiday data.
+
+Note that you can also use `list_idn_holidays` to check whether a `date` (or a
+combination of `day`, `month`, and `year`) is a holiday , but `is_idn_holiday`
+is slightly more efficient, its `include_joint_leave` option is more convenient,
+and it offers a few more options.
 
 _
     args => {
@@ -1516,7 +1525,7 @@ _
         req_one => [qw/day date/],
     },
 };
-sub is_id_holiday {
+sub is_idn_holiday {
     my %args = @_;
 
     my ($y, $m, $d);
@@ -1562,6 +1571,21 @@ sub is_id_holiday {
     }];
 }
 
+# old deprecated names, undocumented. will be removed in the future
+{
+    no strict 'refs';
+    my %aliases = (
+        list_id_holidays  => 'list_idn_holidays',
+        enum_id_workdays  => 'enum_idn_workdays',
+        count_id_workdays => 'count_idn_workdays',
+        is_id_holiday     => 'is_idn_holiday',
+    );
+    for my $al (keys %aliases) {
+        $SPEC{$al} = { %{ $SPEC{ $aliases{$al} } } };
+        $SPEC{$al}{'x.no_index'} = 1;
+        *{ $al } = \&{ $aliases{$al} };
+    }
+}
 
 1;
 # ABSTRACT: List Indonesian public holidays
@@ -1578,20 +1602,21 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.334 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2021-01-14.
+This document describes version 0.335 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2021-01-16.
 
 =head1 SYNOPSIS
 
  use Calendar::Indonesia::Holiday qw(
-     list_id_holidays
-     enum_id_workdays
-     count_id_workdays
+     list_idn_holidays
+     enum_idn_workdays
+     count_idn_workdays
+     is_idn_holiday
  );
 
 This lists Indonesian holidays for the year 2011, without the joint leave days
 ("cuti bersama"), showing only the dates:
 
- my $res = list_id_holidays(year => 2011, is_joint_leave=>0);
+ my $res = list_idn_holidays(year => 2011, is_joint_leave=>0);
 
 Sample result:
 
@@ -1614,8 +1639,8 @@ Sample result:
 
 This lists religious Indonesian holidays, showing full details:
 
- my $res = list_id_holidays(year => 2011,
-                            "tags.has" => ['religious'], detail=>1);
+ my $res = list_idn_holidays(year => 2011,
+                             "tags.has" => ['religious'], detail=>1);
 
 Sample result:
 
@@ -1636,17 +1661,18 @@ Sample result:
 
 This checks whether 2011-02-16 is a holiday:
 
- my $res = list_id_holidays(date => '2011-02-16');
- print "2011-02-16 is a holiday\n" if @{$res->[2]};
+ my $res = is_idn_holidays(date => '2011-02-16');
+ # or: my $res = is_idn_holidays(day => 16, month => 2, year => 2011);
+ print "2011-02-16 is a holiday\n" if $res->[2];
 
 This enumerate working days for a certain period:
 
- my $res = enum_id_workdays(year=>2011, month=>7);
+ my $res = enum_idn_workdays(year=>2011, month=>7);
 
 Idem, but returns a number instead. year/month defaults to current
 year/month:
 
- my $res = count_id_workdays();
+ my $res = count_idn_workdays();
 
 =head1 DESCRIPTION
 
@@ -1657,11 +1683,11 @@ There is a command-line script interface for this module: L<list-id-holidays>.
 =head1 FUNCTIONS
 
 
-=head2 count_id_workdays
+=head2 count_idn_workdays
 
 Usage:
 
- count_id_workdays(%args) -> [status, msg, payload, meta]
+ count_idn_workdays(%args) -> [status, msg, payload, meta]
 
 Count working days for a certain period.
 
@@ -1670,8 +1696,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 1990 to 2021 (joint leave days until
-2021).
+Contains data from years 1990 to 2021
 
 This function is not exported by default, but exportable.
 
@@ -1717,11 +1742,11 @@ Return value:  (any)
 
 
 
-=head2 enum_id_workdays
+=head2 enum_idn_workdays
 
 Usage:
 
- enum_id_workdays(%args) -> [status, msg, payload, meta]
+ enum_idn_workdays(%args) -> [status, msg, payload, meta]
 
 Enumerate working days for a certain period.
 
@@ -1730,8 +1755,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 1990 to 2021 (joint leave days until
-2021).
+Contains data from years 1990 to 2021
 
 This function is not exported by default, but exportable.
 
@@ -1777,11 +1801,11 @@ Return value:  (any)
 
 
 
-=head2 is_id_holiday
+=head2 is_idn_holiday
 
 Usage:
 
- is_id_holiday(%args) -> [status, msg, payload, meta]
+ is_idn_holiday(%args) -> [status, msg, payload, meta]
 
 Check whether a date is an Indonesian holiday.
 
@@ -1794,7 +1818,12 @@ single YYYY-MM-DD date.
 Will return undef (exit code 2 on CLI) if year is not within range of the
 holiday data.
 
-This function is not exported.
+Note that you can also use C<list_idn_holidays> to check whether a C<date> (or a
+combination of C<day>, C<month>, and C<year>) is a holiday , but C<is_idn_holiday>
+is slightly more efficient, its C<include_joint_leave> option is more convenient,
+and it offers a few more options.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -1832,18 +1861,17 @@ Return value:  (any)
 
 
 
-=head2 list_id_holidays
+=head2 list_idn_holidays
 
 Usage:
 
- list_id_holidays(%args) -> [status, msg, payload, meta]
+ list_idn_holidays(%args) -> [status, msg, payload, meta]
 
 List Indonesian holidays in calendar.
 
 List holidays and joint leave days ("cuti bersama").
 
-Contains data from years 1990 to 2021 (joint leave days until
-2021).
+Contains data from years 1990 to 2021
 
 This function is not exported by default, but exportable.
 
@@ -2268,11 +2296,11 @@ Return value:  (any)
 
 
 
-=head2 list_id_workdays
+=head2 list_idn_workdays
 
 Usage:
 
- list_id_workdays(%args) -> [status, msg, payload, meta]
+ list_idn_workdays(%args) -> [status, msg, payload, meta]
 
 .
 
@@ -2303,6 +2331,8 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
+=for Pod::Coverage ^(.+_id_.+)$
 
 =head1 FAQ
 

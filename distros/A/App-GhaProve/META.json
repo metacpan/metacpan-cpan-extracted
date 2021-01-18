@@ -27,7 +27,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.17"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "develop" : {
@@ -50,7 +50,7 @@
    "provides" : {
       "App::GhaProve" : {
          "file" : "lib/App/GhaProve.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -69,7 +69,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-GhaProve/project"
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_provides_scripts" : {
       "gha-prove" : {
          "file" : "bin/gha-prove"

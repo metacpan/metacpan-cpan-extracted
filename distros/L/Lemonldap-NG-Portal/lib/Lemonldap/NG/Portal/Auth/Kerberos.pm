@@ -16,10 +16,11 @@ our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
+has allowedDomains => ( is => 'rw', isa => 'ArrayRef' );
 has keytab         => ( is => 'rw' );
 has AjaxInitScript => ( is => 'rw', default => '' );
 has Name           => ( is => 'ro', default => 'Kerberos' );
-has InitCmd => (
+has InitCmd        => (
     is      => 'ro',
     default => q@$self->p->setHiddenFormValue( $req, kerberos => 0, '', 0 )@
 );
@@ -29,10 +30,16 @@ has InitCmd => (
 sub init {
     my $self = shift;
     my $file;
+    my $domains;
     unless ( $file = $self->conf->{krbKeytab} ) {
         $self->logger->error('Keytab not defined');
         return 0;
     }
+
+    if ( $domains = $self->conf->{krbAllowedDomains} ) {
+        $self->allowedDomains( [ split /[\s,]+/, $domains ] );
+    }
+
     $self->keytab("FILE:$file");
     $self->AjaxInitScript( '<script type="text/javascript" src="'
           . $self->p->staticPrefix
@@ -47,7 +54,7 @@ sub extractFormInfo {
     if ( $req->data->{_krbUser} ) {
         $self->logger->debug(
             'Kerberos ticket already validated for ' . $req->data->{_krbUser} );
-        return PE_OK;
+        return $self->_checkDomains($req);
     }
 
     my $auth = $req->env->{HTTP_AUTHORIZATION};
@@ -188,7 +195,24 @@ sub extractFormInfo {
         $client_name =~ s/^(.*)@.*$/$1/;
     }
     $req->user($client_name);
-    return PE_OK;
+    return $self->_checkDomains($req);
+}
+
+sub _checkDomains {
+    my ( $self, $req ) = @_;
+
+    # If krbAllowedDomains is not defined, allow every domain
+    return PE_OK unless ( $self->allowedDomains );
+
+    my ($domain) = $req->data->{_krbUser} =~ m/^.*@(.*)$/;
+    if ( grep { lc($_) eq lc($domain) } @{ $self->allowedDomains } ) {
+        return PE_OK;
+    }
+    else {
+        $self->userLogger->warn(
+            "Received kerberos domain $domain is not allowed");
+        return PE_BADCREDENTIALS;
+    }
 }
 
 sub authenticate {

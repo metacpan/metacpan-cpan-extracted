@@ -1,0 +1,67 @@
+{
+   "abstract" : "Validate .opm files",
+   "author" : [
+      "Perl-Services.de <info@perl-services.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OTRS-OPM-Validate",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "OTRS::OPM::Validate" : {
+         "file" : "lib/OTRS/OPM/Validate.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/perlservices/OTRS-OPM-Validate/issues"
+      },
+      "homepage" : "http://github.com/perlservices/OTRS-OPM-Validate",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perlservices/OTRS-OPM-Validate.git",
+         "web" : "http://github.com/perlservices/OTRS-OPM-Validate"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

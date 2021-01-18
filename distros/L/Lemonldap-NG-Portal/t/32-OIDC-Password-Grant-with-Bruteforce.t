@@ -17,17 +17,24 @@ my $debug = 'error';
 # Initialization
 my $op = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                        => $debug,
-            domain                          => 'op.com',
-            portal                          => 'http://auth.op.com',
-            authentication                  => 'Demo',
-            userDB                          => 'Same',
+            logLevel       => $debug,
+            domain         => 'op.com',
+            portal         => 'http://auth.op.com',
+            authentication => 'Demo',
+            userDB         => 'Same',
+            macros         => {
+                gender       => '"32"',
+                _whatToTrace => '$uid',
+                nickname     => '"froggie; frenchie"',
+            },
             issuerDBOpenIDConnectActivation => 1,
             oidcRPMetaDataExportedVars      => {
                 rp => {
-                    email              => "mail",
+                    email              => "mail;string;always",
                     preferred_username => "uid",
-                    name               => "cn"
+                    name               => "cn",
+                    gender             => "gender;int;auto",
+                    nickname           => "nickname",
                 }
             },
             oidcRPMetaDataOptions => {
@@ -131,6 +138,11 @@ $res = $op->_post(
 $payload = expectJSON($res);
 
 ok( $payload->{'name'} eq "Frédéric Accents", 'Got User Info' );
+like( $res->[2]->[0], qr/"gender":32/, "Attribute released as int in JSON" );
+is( ref( $payload->{email} ),
+    "ARRAY", "Single valued attribute forced as array" );
+is( ref( $payload->{nickname} ),
+    "ARRAY", "Multi valued attribute exposed as array" );
 
 clean_sessions();
 done_testing();

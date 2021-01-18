@@ -13,17 +13,14 @@ extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 # INITIALIZATION
 
 has prefix => ( is => 'ro', default => 'utotp' );
-
-has logo => ( is => 'rw', default => 'utotp.png' );
-
-has u2f => ( is => 'rw' );
-
-has totp => ( is => 'rw' );
+has logo   => ( is => 'rw', default => 'utotp.png' );
+has u2f    => ( is => 'rw' );
+has totp   => ( is => 'rw' );
 
 use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
   PE_ERROR
   PE_FORMEMPTY
-  PE_OK
   PE_SENDRESPONSE
 );
 
@@ -61,13 +58,17 @@ sub run {
     $self->logger->debug('Generate TOTP form');
 
     my $checkLogins = $req->param('checkLogins');
-    $self->logger->debug("UTOTP checkLogins set") if ($checkLogins);
+    $self->logger->debug("UTOTP: checkLogins set") if $checkLogins;
+
+    my $stayconnected = $req->param('stayconnected');
+    $self->logger->debug("UTOTP: stayconnected set") if $stayconnected;
 
     my %tplPrms = (
-        MAIN_LOGO   => $self->conf->{portalMainLogo},
-        SKIN        => $self->p->getSkin($req),
-        TOKEN       => $token,
-        CHECKLOGINS => $checkLogins
+        MAIN_LOGO     => $self->conf->{portalMainLogo},
+        SKIN          => $self->p->getSkin($req),
+        TOKEN         => $token,
+        CHECKLOGINS   => $checkLogins,
+        STAYCONNECTED => $stayconnected
     );
 
     if ( my $res = $self->u2f->loadUser( $req, $req->sessionInfo ) ) {

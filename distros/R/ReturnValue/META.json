@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "ReturnValue",
    "no_index" : {
@@ -37,7 +37,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94"
+            "Test::More" : "1"
          }
       }
    },
@@ -53,6 +53,6 @@
          "web" : "https://github.com/perlreview/returnvalue"
       }
    },
-   "version" : "0.113",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.901",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

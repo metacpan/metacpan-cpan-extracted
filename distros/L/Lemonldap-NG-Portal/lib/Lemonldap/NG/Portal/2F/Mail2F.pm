@@ -3,18 +3,20 @@ package Lemonldap::NG::Portal::2F::Mail2F;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_BADOTP
-  PE_ERROR
-  PE_FORMEMPTY
   PE_OK
+  PE_ERROR
+  PE_BADOTP
+  PE_FORMEMPTY
   PE_SENDRESPONSE
   PE_MUSTHAVEMAIL
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.10';
 
-extends 'Lemonldap::NG::Portal::Main::SecondFactor',
-  'Lemonldap::NG::Portal::Lib::SMTP';
+extends qw(
+  Lemonldap::NG::Portal::Main::SecondFactor
+  Lemonldap::NG::Portal::Lib::SMTP
+);
 
 # INITIALIZATION
 
@@ -38,11 +40,20 @@ has ott => (
     }
 );
 
+has sessionKey => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub {
+        return $_[0]->{conf}->{mail2fSessionKey}
+          || $_[0]->{conf}->{mailSessionKey};
+    }
+);
+
 sub init {
     my ($self) = @_;
     $self->{conf}->{mail2fCodeRegex} ||= '\d{6}';
-    unless ( $self->conf->{mailSessionKey} ) {
-        $self->error("Missing 'mailSessionKey' parameter, aborting");
+    unless ( $self->sessionKey ) {
+        $self->error("Missing session key parameter, aborting");
         return 0;
     }
     $self->prefix( $self->conf->{sfPrefix} )
@@ -54,12 +65,16 @@ sub run {
     my ( $self, $req, $token ) = @_;
 
     my $checkLogins = $req->param('checkLogins');
+    $self->logger->debug("Mail2F: checkLogins set") if $checkLogins;
+
+    my $stayconnected = $req->param('stayconnected');
+    $self->logger->debug("Mail2F: stayconnected set") if $stayconnected;
 
     my $code = $self->random->randregex( $self->conf->{mail2fCodeRegex} );
     $self->logger->debug("Generated two-factor code: $code");
     $self->ott->updateToken( $token, __mail2fcode => $code );
 
-    my $dest = $req->{sessionInfo}->{ $self->conf->{mailSessionKey} };
+    my $dest = $req->{sessionInfo}->{ $self->sessionKey };
     unless ($dest) {
         $self->logger->error( "Could not find mail attribute for login "
               . $req->{sessionInfo}->{_user} );
@@ -117,8 +132,9 @@ sub run {
               . $self->prefix
               . '2fcheck?skin='
               . $self->p->getSkin($req),
-            LEGEND      => 'enterMail2fCode',
-            CHECKLOGINS => $checkLogins
+            LEGEND        => 'enterMail2fCode',
+            CHECKLOGINS   => $checkLogins,
+            STAYCONNECTED => $stayconnected
         }
     );
     $req->response($tmp);

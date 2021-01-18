@@ -7,7 +7,7 @@ no warnings;
 use subs qw();
 use vars qw( $VERSION );
 
-$VERSION = '2.003';
+$VERSION = '2.004';
 
 =encoding utf8
 
@@ -91,6 +91,21 @@ tuples shown:
 	( c, 2, bar )
 	( c, 3, foo )
 	( c, 3, bar )
+
+In code, it looks like this:
+
+	use v5.26;
+	use Set::CrossProduct;
+
+	my $cross = Set::CrossProduct->new( {
+		A => [ qw( a b c ) ],
+		B => [ qw( 1 2 3 ) ],
+		C => [ qw( foo bar ) ],
+		} );
+
+	while( my $t = $cross->get ) {
+		printf "( %s, %s, %s )\n", $t->@{qw(A B C)};
+		}
 
 If one of the sets happens to be empty, the cross product is empty
 too.
@@ -188,7 +203,7 @@ sub new {
 		$self->{arrays}  = [ @$constructor_ref{ sort keys %$constructor_ref } ];
 		}
 	elsif( $ref_type eq ref [] ) {
-		$self->{labeled} = 1;
+		$self->{labeled} = 0;
 		$self->{arrays}  = $constructor_ref;
 		}
 	else {
@@ -526,7 +541,7 @@ of possibly non-unique tuples.
 
 =head1 BUGS
 
-* none that i know about (yet)
+* none that I know about (yet)
 
 =head1 SOURCE AVAILABILITY
 
@@ -542,7 +557,7 @@ Matt Miller implemented the named sets feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2001-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2001-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

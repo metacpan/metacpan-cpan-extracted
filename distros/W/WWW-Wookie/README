@@ -1,4 +1,4 @@
-WWW::Wookie version v1.1.1
+WWW::Wookie version v1.1.3
 ==========================
 
 This is a Perl implementation of the Wookie Connector Framework. It is intended
@@ -25,23 +25,20 @@ This module requires these other modules and libraries:
     HTTP::Request::Common
     HTTP::Status
     LWP::UserAgent
-    Log::Log4perl
     Moose
     Moose::Role
     Moose::Util::TypeConstraints
     Readonly
     Regexp::Common
-    URI
-    URI::Escape
+    URI 1.62
+    URI::Escape 1.62
     XML::Simple
     namespace::autoclean
     overload
-    Test::More
-    Test::NoWarnings
 
 COPYRIGHT AND LICENCE
 
-Copyright 2017 Roland van Ipenburg
+Copyright 2021 Roland van Ipenburg
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

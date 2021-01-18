@@ -41,7 +41,7 @@
           </TMPL_IF>
           <TMPL_IF NAME="OidcConsents">
             <li class="nav-item"><a class="nav-link" href="#oidcConsents"><span>
-              <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/oidc.png" width="16" height="16" alt="login history" />
+              <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/oidc.png" width="16" height="16" alt="OIDC consents" />
               <span trspan="oidcConsents">OIDC Consent</span>
             </span></a></li>
           </TMPL_IF>
@@ -82,13 +82,13 @@
             </TMPL_IF>
             <TMPL_IF NAME="DecryptValue">
               <li class="dropdown-item"><a href="/decryptvalue" class="nav-link">
-                <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/decryptValue.png" width="20" height="20" alt="DecryptValue" />
+                <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/decryptValue.png" width="20" height="20" alt="DecryptCipheredValue" />
                 <span trspan="decryptCipheredValue">decryptCipheredValue</span>
               </a></li>
             </TMPL_IF>
             <TMPL_IF NAME="ContextSwitching">
               <li class="dropdown-item"><a href="/switchcontext" class="nav-link">
-                <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/switchcontext_<TMPL_VAR NAME="contextSwitching">.png" width="20" height="20" alt="ContentSwitching" />
+                <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/icons/switchcontext_<TMPL_VAR NAME="contextSwitching">.png" width="20" height="20" alt="ContextSwitching" />
                 <span trspan="contextSwitching_<TMPL_VAR NAME="contextSwitching">">contextSwitching_<TMPL_VAR NAME="ContextSwitching"></span>
               </a></li>
             </TMPL_IF>
@@ -145,7 +145,7 @@
                           <div class="col-3">
                           <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/apps/<TMPL_VAR NAME="applogo">"
                             class="applogo <TMPL_VAR NAME="appid"> img-fluid"
-                            alt="<TMPL_VAR NAME="appname">" />
+                            alt="" />
                           </div>
                           <div class="col-9">
                         <TMPL_ELSE>

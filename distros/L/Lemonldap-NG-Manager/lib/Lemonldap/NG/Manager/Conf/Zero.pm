@@ -1,5 +1,7 @@
 package Lemonldap::NG::Manager::Conf::Zero;
 
+use strict;
+
 our $VERSION = '2.0.9';
 
 sub zeroConf {

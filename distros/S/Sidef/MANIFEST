@@ -78,6 +78,8 @@ lib/Sidef/Types/Number/Mod.pm
 lib/Sidef/Types/Number/Mod.pod
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
+lib/Sidef/Types/Number/Quadratic.pm
+lib/Sidef/Types/Number/Quadratic.pod
 lib/Sidef/Types/Range/Range.pm
 lib/Sidef/Types/Range/Range.pod
 lib/Sidef/Types/Range/RangeNumber.pm
@@ -873,6 +875,7 @@ scripts/Tests/next_composite.sf
 scripts/Tests/non_continuous_seq.sf
 scripts/Tests/nth_prime.sf
 scripts/Tests/number_binary_search.sf
+scripts/Tests/number_methods.sf
 scripts/Tests/object_copy.sf
 scripts/Tests/object_methods_reflection.sf
 scripts/Tests/objects_init.sf
@@ -903,6 +906,8 @@ scripts/Tests/prefix_methods.sf
 scripts/Tests/prefix_unary_operators.sf
 scripts/Tests/problem_of_apollonius.sf
 scripts/Tests/pythagorean_means.sf
+scripts/Tests/quadratic_integers.sf
+scripts/Tests/quadratic_nonresidue.sf
 scripts/Tests/quicksort.sf
 scripts/Tests/quoted_strings.sf
 scripts/Tests/rand_pick.sf
@@ -961,6 +966,7 @@ scripts/Tests/slurpy_const.sf
 scripts/Tests/slurpy_define.sf
 scripts/Tests/slurpy_static.sf
 scripts/Tests/smart_match_operator.sf
+scripts/Tests/smooth_rough.sf
 scripts/Tests/sort_disjoint_sublist.sf
 scripts/Tests/sort_with_custom_cmp.sf
 scripts/Tests/soundex.sf

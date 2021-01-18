@@ -248,7 +248,9 @@ sub try {
       $req->data->{dataKeep}->{combinationTry};
     if ( $res > 0 and $res != PE_FIRSTACCESS ) {
         $self->userLogger->warn( 'All schemes failed'
-              . ( $req->user ? ' for user ' . $req->user : '' ) );
+              . ( $req->user ? ' for user ' . $req->user : '' ) . ' ('
+              . $req->address
+              . ')' );
     }
     return $res;
 }

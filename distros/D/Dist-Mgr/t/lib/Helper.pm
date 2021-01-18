@@ -113,6 +113,7 @@ sub cpan_restore {
         copy "$f.bak", $f or die "Can't copy config file: $!";
     }
 }
+
 sub unlink_changes {
     if (-e "$work_dir/Changes") {
         unlink "$work_dir/Changes" or die $!;

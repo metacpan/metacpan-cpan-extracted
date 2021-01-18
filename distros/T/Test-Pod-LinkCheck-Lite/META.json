@@ -53,14 +53,14 @@
    "provides" : {
       "Test::Pod::LinkCheck::Lite" : {
          "file" : "lib/Test/Pod/LinkCheck/Lite.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Pod-LinkCheck-Lite"
+         "web" : "https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -71,6 +71,6 @@
          "web" : "https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite"
       }
    },
-   "version" : "0.005",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

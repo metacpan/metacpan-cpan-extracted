@@ -3,6 +3,8 @@ use warnings;
 
 use Test::More;
 use Test::Warnings qw(:all);
+use Test::Refcount;
+use Test::Fatal;
 
 use Ryu::Observable;
 
@@ -12,6 +14,7 @@ subtest 'string and number handling' => sub {
     is("$v", "123", 'string looks right');
     done_testing;
 };
+
 subtest 'subscription' => sub {
     my $v = Ryu::Observable->new(123);
     my $expected = 124;
@@ -36,6 +39,27 @@ subtest 'boolean comparison - string' => sub {
     ok(!!Ryu::Observable->new("example"), 'true string boolean');
     ok(!Ryu::Observable->new(""), 'false string boolean');
     ok(!Ryu::Observable->new(undef), 'false string boolean');
+    done_testing;
+};
+
+subtest 'sources' => sub {
+    is(exception {
+        my $v = Ryu::Observable->new('example');
+        isa_ok(my $src = $v->source, 'Ryu::Source');
+        my $count = 0;
+        $src->each(sub { ++$count });
+        is($count, 0, 'count starts as zero');
+        $v->set_string('changed');
+        is($count, 1, 'count changes after a value change');
+        {
+            isa_ok(my $src2 = $v->source, 'Ryu::Source');
+            is($src, $src2, 'same source is returned each time from ->source');
+        }
+        undef $v;
+        is($src->completed->state, 'done', 'source is marked as done on completion');
+        is_oneref($src, 'source has only a single ref left');
+        is($count, 1, 'count unchanged');
+    }, undef, 'no exceptions raised');
     done_testing;
 };
 

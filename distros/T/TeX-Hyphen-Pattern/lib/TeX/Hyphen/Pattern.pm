@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2020, Roland van Ipenburg
-package TeX::Hyphen::Pattern v1.1.5;
+# Copyright (C) 2009-2021, Roland van Ipenburg
+package TeX::Hyphen::Pattern v1.1.7;
 use Moose;
 use 5.014000;
 use utf8;
@@ -205,7 +205,7 @@ __END__
 
 =encoding utf8
 
-=for stopwords CPAN OpenOffice Readonly Subtags Apali tex Ipenburg
+=for stopwords Bitbucket CPAN OpenOffice Readonly Subtags Apali tex Ipenburg
 
 =head1 NAME
 
@@ -214,7 +214,7 @@ patterns for use with TeX::Hyphen.
 
 =head1 VERSION
 
-This is version v1.1.4. To prevent plugging in of incompatible modules the
+This is version C<v1.1.7>. To prevent plugging in of incompatible modules the
 version of the pluggable modules must be the same as this module.
 
 =head1 SYNOPSIS
@@ -332,9 +332,9 @@ scripts this can go wrong badly.
 
 =back
 
-Please report any bugs or feature requests to
-C<bug-tex-hyphen-pattern@rt.cpan.org>, or through the web interface at
-L<RT for rt.cpan.org||http://rt.cpan.org>.
+Please report any bugs or feature requests at
+L<Bitbucket|
+https://bitbucket.org/rolandvanipenburg/tex-hyphen-pattern/issues>.
 
 =head1 AUTHOR
 
@@ -342,7 +342,7 @@ Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 by Roland van Ipenburg
+Copyright 2009-2021 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

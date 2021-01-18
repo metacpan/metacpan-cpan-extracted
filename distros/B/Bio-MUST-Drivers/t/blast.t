@@ -6,6 +6,7 @@ use Test::Files;
 use autodie;
 use feature qw(say);
 
+use Const::Fast;
 use List::AllUtils;
 use Module::Runtime qw(use_module);
 use Path::Class qw(file);
@@ -13,10 +14,13 @@ use Path::Class qw(file);
 use Bio::MUST::Core;
 use Bio::MUST::Drivers;
 
+
+const my $NET_VAR => 'BMD_TEST_NETWORK';
+say 'Note: tests designed for: blast 2.10.0, build Jan  8 2020 22:00:09';
+
 my $qr_class = 'Bio::MUST::Core::Ali::Temporary';
 my $db_class = 'Bio::MUST::Drivers::Blast::Database';
 my $db_tmp_class = 'Bio::MUST::Drivers::Blast::Database::Temporary';
-
 
 # Note: provisioning system is not enabled to help tests to pass on CPANTS
 my $app = use_module('Bio::MUST::Provision::Blast')->new;
@@ -100,7 +104,14 @@ ok(!-e $filename,   'deleted query file');
 ok(!-e $report_m6,  'deleted tabular report file');
 ok(!-e $report_xml, 'deleted XML report file');
 
-{
+SKIP: {
+    skip <<"EOT", 5 unless $ENV{$NET_VAR};
+remote BLAST tests!
+These tests are long to run and can hang if NCBI servers are too busy.
+To enable them use:
+\$ $NET_VAR=1 make test
+EOT
+
     my $db = $db_class->new( file => 'nt', remote => 1 );
     cmp_ok $db->type, 'eq', 'nucl', 'got expected -db_type';
     $basename = $db->filename;

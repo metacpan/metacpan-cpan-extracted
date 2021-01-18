@@ -1,0 +1,49 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <div class="table-container">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th trspan="claimName"></th>
+          <th trspan="variableName"></th>
+          <th trspan="type"></th>
+          <th trspan="array"></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="s in currentNode.nodes">
+          <td><input class="form-control" ng-model="s.title"/></td>
+          <td><input class="form-control" ng-model="s.data[0]"/></td>
+          <td>
+            <select class="form-control" id="oatselect" ng-model="s.data[1]">
+             <option value="string" trspan="string"></option>
+             <option value="int" trspan="int"></option>
+             <option value="bool" trspan="bool"></option>
+            </select>
+          </td>
+          <td>
+            <select class="form-control" id="oatselect" ng-model="s.data[2]">
+             <option value="auto" trspan="auto"></option>
+             <option value="always" trspan="always"></option>
+             <option value="never" trspan="never"></option>
+            </select>
+          </td>
+          <td>
+            <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"></span>
+            <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'addOidcAttribute'})"></span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script type="text/menu">
+[{
+  "title": "addOidcAttribute",
+  "icon": "plus-sign"
+}]
+</script>

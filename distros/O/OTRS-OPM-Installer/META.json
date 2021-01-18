@@ -4,13 +4,13 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OTRS-OPM-Installer",
    "prereqs" : {
@@ -32,76 +32,77 @@
             "IO::All" : "0",
             "Module::Path" : "0",
             "Moo" : "0",
-            "OTRS::OPM::Parser" : "0",
+            "OTRS::OPM::Parser" : "1.05",
             "OTRS::Repository" : "0.08",
             "Regexp::Common" : "0",
             "Test::More" : "0",
             "Type::Tiny" : "0",
             "Types::Standard" : "0",
-            "perl" : "5.010001"
+            "perl" : "5.020"
          }
       }
    },
    "provides" : {
       "OTRS::OPM::Installer" : {
          "file" : "lib/OTRS/OPM/Installer.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "OTRS::OPM::Installer::Logger" : {
          "file" : "lib/OTRS/OPM/Installer/Logger.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "OTRS::OPM::Installer::Types" : {
          "file" : "lib/OTRS/OPM/Installer/Types.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "OTRS::OPM::Installer::Utils::Config" : {
          "file" : "lib/OTRS/OPM/Installer/Utils/Config.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "OTRS::OPM::Installer::Utils::File" : {
          "file" : "lib/OTRS/OPM/Installer/Utils/File.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "OTRS::OPM::Installer::Utils::OTRS" : {
          "file" : "lib/OTRS/OPM/Installer/Utils/OTRS.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "OTRS::OPM::Installer::Utils::OTRS::Linux" : {
          "file" : "lib/OTRS/OPM/Installer/Utils/OTRS/Linux.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "OTRS::OPM::Installer::Utils::OTRS::OTRS3" : {
          "file" : "lib/OTRS/OPM/Installer/Utils/OTRS/OTRS3.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "OTRS::OPM::Installer::Utils::OTRS::OTRS4" : {
          "file" : "lib/OTRS/OPM/Installer/Utils/OTRS/OTRS4.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "OTRS::OPM::Installer::Utils::OTRS::Test" : {
          "file" : "lib/OTRS/OPM/Installer/Utils/OTRS/Test.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/reneeb/OTRS-OPM-Installer/issues"
+         "web" : "http://github.com/perlservices/OTRS-OPM-Installer/issues"
       },
-      "homepage" : "http://github.com/reneeb/OTRS-OPM-Installer",
+      "homepage" : "http://github.com/perlservices/OTRS-OPM-Installer",
       "repository" : {
          "type" : "git",
-         "url" : "http://github.com/reneeb/OTRS-OPM-Installer.git",
-         "web" : "http://github.com/reneeb/OTRS-OPM-Installer"
+         "url" : "http://github.com/perlservices/OTRS-OPM-Installer.git",
+         "web" : "http://github.com/perlservices/OTRS-OPM-Installer"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"
    ],
-   "x_generated_by_perl" : "v5.22.1",
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

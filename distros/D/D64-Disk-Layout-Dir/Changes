@@ -1,5 +1,20 @@
 Revision history for Perl extension D64::Disk::Layout::Dir.
 
+0.06  2021-01-18
+    - improvement: an empty sector link value is now initialised for all empty
+      sectors when fetching directory data via "data" and "sectors" methods
+
+0.05  2021-01-16
+    - bug fixed: incorrect sector link value for an empty directory retrieved
+      via "sectors" method has been corrected in the same way as fixing "data"
+      method in a release version 0.04
+
+0.04  2021-01-16
+    - bug fixed: incorrect sector link value for an empty directory has been
+      corrected (when the directory is done and the track value is $00, the
+      sector link should contain a value of $FF, meaning the whole sector is
+      allocated, even though the actual value doesn't matter)
+
 0.03  2018-11-24
     - bug fixed: "Can't locate t/Util.pm in @INC" thrown while running "make
       test" (reason: a recent security patch to Perl removed current working

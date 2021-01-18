@@ -11,7 +11,19 @@ use base 'Data::Object::Types::Library';
 
 extends 'Types::Standard';
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
+
+register {
+  name => 'Changes',
+  parent => 'Object',
+  validation => is_instance_of('Nano::Changes'),
+};
+
+register {
+  name => 'Domain',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Domain'),
+};
 
 register {
   name => 'Env',
@@ -61,6 +73,12 @@ register {
   validation => is_instance_of('Zing::Table'),
 };
 
+register {
+  name => 'Track',
+  parent => 'Object',
+  validation => is_consumer_of('Nano::Track'),
+};
+
 1;
 
 =encoding utf8
@@ -105,6 +123,78 @@ L<Types::Standard>
 =head1 CONSTRAINTS
 
 This package declares the following type constraints:
+
+=cut
+
+=head2 changes
+
+  Changes
+
+This type is defined in the L<Nano::Types> library.
+
+=over 4
+
+=item changes parent
+
+  Object
+
+=back
+
+=over 4
+
+=item changes composition
+
+  InstanceOf["Nano::Changes"]
+
+=back
+
+=over 4
+
+=item changes example #1
+
+  # given: synopsis
+
+  use Nano::Changes;
+
+  my $changes = Nano::Changes->new;
+
+=back
+
+=cut
+
+=head2 domain
+
+  Domain
+
+This type is defined in the L<Nano::Types> library.
+
+=over 4
+
+=item domain parent
+
+  Object
+
+=back
+
+=over 4
+
+=item domain composition
+
+  InstanceOf["Zing::Domain"]
+
+=back
+
+=over 4
+
+=item domain example #1
+
+  # given: synopsis
+
+  use Zing::Domain;
+
+  my $domain = Zing::Domain->new(name => 'changelog');
+
+=back
 
 =cut
 
@@ -400,6 +490,50 @@ This type is defined in the L<Nano::Types> library.
   use Zing::Table;
 
   my $lookup = Zing::Table->new(name => 'users');
+
+=back
+
+=cut
+
+=head2 track
+
+  Track
+
+This type is defined in the L<Nano::Types> library.
+
+=over 4
+
+=item track parent
+
+  Object
+
+=back
+
+=over 4
+
+=item track composition
+
+  ConsumerOf["Nano::Track"]
+
+=back
+
+=over 4
+
+=item track example #1
+
+  # given: synopsis
+
+  package Example::Track;
+
+  use Moo;
+
+  extends 'Nano::Node';
+
+  with 'Nano::Track';
+
+  package main;
+
+  my $track = Example::Track->new;
 
 =back
 

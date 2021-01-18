@@ -14,7 +14,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_IMPERSONATION_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -140,7 +140,7 @@ sub display {
 sub run {
     my ( $self, $req ) = @_;
     my $statut  = PE_OK;
-    my $realId  = $req->{user};
+    my $realId  = $req->userData->{ $self->conf->{whatToTrace} };
     my $spoofId = $req->param('spoofId') || '';    # ContextSwitching required ?
     my $unUser = $self->unrestrictedUsersRule->( $req, $req->userData ) || 0;
 
@@ -202,7 +202,7 @@ sub _switchContext {
     my ( $self, $req, $spoofId, $unUser ) = @_;
     my $realSessionId = $req->userData->{_session_id};
     my $realAuthLevel = $req->userData->{authenticationLevel};
-    my $realId        = $req->{user};
+    my $realId        = $req->userData->{ $self->conf->{whatToTrace} };
     my $raz           = 0;
     $req->{user} = $spoofId;
 

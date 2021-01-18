@@ -7,15 +7,17 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_DONE
   PE_ERROR
   PE_LDAPCONNECTFAILED
-  PE_PP_CHANGE_AFTER_RESET
   PE_PP_PASSWORD_EXPIRED
+  PE_PP_CHANGE_AFTER_RESET
 );
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.10';
 
 # Inheritance: UserDB::LDAP provides all needed ldap functions
-extends
-  qw(Lemonldap::NG::Portal::Auth::_WebForm Lemonldap::NG::Portal::Lib::LDAP);
+extends qw(
+  Lemonldap::NG::Portal::Lib::LDAP
+  Lemonldap::NG::Portal::Auth::_WebForm
+);
 
 sub init {
     my ($self) = @_;
@@ -84,7 +86,7 @@ sub authenticate {
             and $self->conf->{ldapAllowResetExpiredPassword} )
       )
     {
-        $req->data->{oldpassword} = $self->{password};
+        $req->data->{oldpassword} = $req->data->{password};    # Fix 2377
         $req->data->{noerror}     = 1;
         $self->setSecurity($req);
     }
@@ -94,7 +96,7 @@ sub authenticate {
 }
 
 sub authLogout {
-    PE_OK;
+    return PE_OK;
 }
 
 1;

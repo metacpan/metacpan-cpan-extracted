@@ -89,7 +89,7 @@
       <div class="input-group mb-3">
         <div class="input-group-prepend">
           <div class="input-group-text">
-            <input id="resendconfirmation" type="checkbox" name="resendconfirmation" ariadescribedby="resendconfirmationlabel">
+            <input class="form-check-input" id="resendconfirmation" type="checkbox" name="resendconfirmation" ariadescribedby="resendconfirmationlabel">
           </div>
         </div>
         <p class="form-control">

@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/briandfoy/Roman-Unicode/issues
   homepage: https://github.com/briandfoy/Roman-Unicode
   repository: https://github.com/briandfoy/Roman-Unicode.git
-version: '1.032'
+version: '1.033'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

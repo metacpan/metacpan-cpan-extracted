@@ -6,26 +6,29 @@ use Mouse;
 use POSIX qw(strftime);
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_MAILOK
+  PE_NOTOKEN
+  PE_MAILERROR
   PE_BADMAILTOKEN
   PE_CAPTCHAEMPTY
   PE_CAPTCHAERROR
-  PE_MALFORMEDUSER
-  PE_MAILCONFIRMATION_ALREADY_SENT
-  PE_MAILCONFIRMOK
-  PE_MAILERROR
-  PE_MAILOK
-  PE_NOTOKEN
-  PE_OK
-  PE_REGISTERALREADYEXISTS
-  PE_REGISTERFIRSTACCESS
-  PE_REGISTERFORMEMPTY
   PE_TOKENEXPIRED
+  PE_MAILCONFIRMOK
+  PE_MALFORMEDUSER
+  PE_REGISTERFORMEMPTY
+  PE_REGISTERFIRSTACCESS
+  PE_REGISTERALREADYEXISTS
+  PE_MAILCONFIRMATION_ALREADY_SENT
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.10';
 
-extends 'Lemonldap::NG::Portal::Main::Plugin',
-  'Lemonldap::NG::Portal::Lib::SMTP', 'Lemonldap::NG::Portal::Lib::_tokenRule';
+extends qw(
+  Lemonldap::NG::Portal::Lib::SMTP
+  Lemonldap::NG::Portal::Main::Plugin
+  Lemonldap::NG::Portal::Lib::_tokenRule
+);
 
 # PROPERTIES
 

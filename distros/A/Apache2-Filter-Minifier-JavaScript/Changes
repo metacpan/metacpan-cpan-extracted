@@ -1,5 +1,15 @@
 Revision history for Perl extension Apache2::Filter::Minifier::JavaScript.
 
+1.07      2021-01-17 11:52:20-08:00 America/Vancouver
+    - Switch to Dist::Zilla for release management
+    - POD cleanups; spelling
+    - Namespace cleaned
+    - Add a GitHub actions CI workflow
+      - but unfortunately, only for Perl-5.20 or higher
+
+1.06    Fri Nov  7 17:05 PST 2014
+    - Update tests to accommodate Apache-2.4.x series
+
 1.05    Fri Apr 23 22:25 PDT 2010
     - Switch to Git
 

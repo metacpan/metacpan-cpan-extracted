@@ -13,10 +13,12 @@ use Bio::FastParsers;
 use Bio::MUST::Core;
 use Bio::MUST::Drivers;
 
+
+say 'Note: tests designed for: HMMER 3.3 (Nov 2019); http://hmmer.org/';
+
 my     $class = 'Bio::MUST::Drivers::Hmmer::Model';
 my $tmp_class = 'Bio::MUST::Drivers::Hmmer::Model::Temporary';
 my  $db_class = 'Bio::MUST::Drivers::Hmmer::Model::Database';
-
 
 # Note: provisioning system is not enabled to help tests to pass on CPANTS
 my $app = use_module('Bio::MUST::Provision::Hmmer')->new;
@@ -279,7 +281,9 @@ EOT
     ok my $consensus = $model->emit, 'got consensus from hmmemit';
     isa_ok $consensus, 'Bio::MUST::Core::Ali::Stash';
 
-    my $expected_consensus_seq = 'VVLAAEAEAARSIKSQKKDVNKIYPAHPSLFGRGVPRPADKLRAHDFAEDKVNLVVKEIGKNAAEGAALARVAGLGEALARLPLATRVLNGGICANKYDTGLLGKLGFAERIRLPALNVKKLVSLCKKKASCYGTTTISRRKKPAGEKATAIELARRARFKFHKRLKLPASPKGFKVKASSKKGPLKAANVAYLG';
+    # v3.2.1
+    #     my $expected_consensus_seq = 'VVLAAEAEAARSIKSQKKDVNKIYPAHPSLFGRGVPRPADKLRAHDFAEDKVNLVVKEIGKNAAEGAALARVAGLGEALARLPLATRVLNGGICANKYDTGLLGKLGFAERIRLPALNVKKLVSLCKKKASCYGTTTISRRKKPAGEKATAIELARRARFKFHKRLKLPASPKGFKVKASSKKGPLKAANVAYLG';
+    my $expected_consensus_seq = 'EAMFGLAGKDFVVLAADPLMARSIKSQKKDVNKIYPGHPSRFCRVGDPADKLRAHDFPELKINLIVKEYGKNSAEGAGLARGLAEALRRLPLATEVLYGGICANGYDTGYLGKLAEAERIRLPALNVKKIVSLNSCNGTISRRKKPAGEKATAIEALRRARFKKHKRLKLKKSKKGFKVKASSKKGPLKAAGVAYLGRV';
     cmp_ok $consensus->get_seq(0)->seq, 'eq', $expected_consensus_seq,
         'got expected consensus seq from hmmemit';
 }

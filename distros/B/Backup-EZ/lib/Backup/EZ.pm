@@ -1,5 +1,5 @@
 package Backup::EZ;
-$Backup::EZ::VERSION = '0.45';
+$Backup::EZ::VERSION = '0.46';
 use strict;
 use warnings;
 use warnings FATAL => 'all';
@@ -35,7 +35,7 @@ Backup::EZ - Simple backups based on rsync
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =cut
 
@@ -214,9 +214,12 @@ sub _ssh {
         $sshcmd = "$cmd";
     }
     else {
-        if ($cmd !~ /^ *sudo /) {
-            $cmd = sprintf( "%s $cmd", $self->{conf}->{use_sudo} ? 'sudo' : '' );
-        }
+#    	
+# this breaks stuff.  commenting out for now.
+#
+#        if ($cmd !~ /^ *sudo /) {
+#            $cmd = sprintf( "%s $cmd", $self->{conf}->{use_sudo} ? 'sudo' : '' );
+#        }
 
         my $ssh_opts = [];
         if ( $self->{conf}->{ssh_opts} ) {

@@ -205,13 +205,10 @@ llapp.controller 'NotificationsExplorerCtrl', [ '$scope', '$translator', '$locat
 		$scope.waiting = true
 		$scope.currentScope = scope
 		node = scope.$modelValue
-		notificationId = node.notification
-		query = ''
+		notificationId = node.notification.replace(/#/g, '_')
 		if $scope.type == 'actives'
 			notificationId = "#{node.uid}_#{node.reference}"
-		if $scope.type == 'done'
-			query = "?uid=#{node.uid}&reference=#{node.reference}"
-		$http.get("#{scriptname}notifications/#{$scope.type}/#{notificationId}#{query}").then (response) ->
+		$http.get("#{scriptname}notifications/#{$scope.type}/#{notificationId}").then (response) ->
 			$scope.currentNotification =
 				uid: node.uid
 				reference: node.reference

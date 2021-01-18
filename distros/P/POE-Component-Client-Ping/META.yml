@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,5 +23,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/rcaputo/poe-component-client-ping/
-version: '1.175'
+version: '1.176'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

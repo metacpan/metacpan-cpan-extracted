@@ -6,7 +6,7 @@ Ryu::Manual::Reactive - reactive programming using L<Ryu>
 
 =head1 DESCRIPTION
 
-
+TBD
 
 =cut
 

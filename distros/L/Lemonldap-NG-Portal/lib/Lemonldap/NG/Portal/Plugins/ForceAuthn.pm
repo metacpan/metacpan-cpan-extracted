@@ -2,9 +2,12 @@ package Lemonldap::NG::Portal::Plugins::ForceAuthn;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_MUSTAUTHN);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_MUSTAUTHN
+);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 

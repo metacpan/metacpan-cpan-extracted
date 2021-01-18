@@ -87,6 +87,22 @@ Lemonldap::NG::Common::Session->new( {
         }
     }
 );
+Lemonldap::NG::Common::Session->new( {
+        @sessionsOpts,
+        id   => "1234",
+        info => {
+            "uid" => "foo",
+        }
+    }
+);
+Lemonldap::NG::Common::Session->new( {
+        @sessionsOpts,
+        id   => "1235",
+        info => {
+            "uid" => "foo",
+        }
+    }
+);
 
 Lemonldap::NG::Common::Session->new( {
         @psessionsOpts,
@@ -194,7 +210,7 @@ is(
 
 # Test search
 $res = getJson( "search", {} );
-is( @{$res}, 3, "Found 3 sessions" );
+is( @{$res}, 5, "Found 5 sessions" );
 
 # Test search with different backend
 $res = getJson( "search", { backend => 'persistent' } );
@@ -236,6 +252,17 @@ $res = getJson(
     "8d3bc3b0e14ea2a155f275aa7c07ebee"
 );
 is( @{$res}, 0, "Session was removed" );
+
+# We should have 2 foo sessions now
+$res = getJson( "search", { where => "uid=foo" } );
+is( @{$res}, 2, "Found 2 foo sessions" );
+
+# Test delete by filter, remove two foo sessions
+$cli->run( 'delete', { where => "uid=foo" } );
+
+# We should have no foo sessions left
+$res = getJson( "search", { where => "uid=foo" } );
+is( @{$res}, 0, "Found 0 foo sessions" );
 
 # Set key
 

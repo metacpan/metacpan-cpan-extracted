@@ -9,6 +9,11 @@ use Test::Fatal;
 use Ryu;
 use Future;
 
+# Ignore failures here
+eval {
+    require Log::Any::Adapter;
+    Log::Any::Adapter->import('TAP');
+};
 my $src = Ryu::Source->new;
 my @actual;
 my $ordered = $src->ordered_futures->each(sub {
@@ -35,6 +40,46 @@ subtest 'handle failed Future in source' => sub {
     ok($ordered->completed->is_failed, 'ordered futures marked as failed');
     ok($src->completed->is_cancelled, 'source is cancelled');
     ok($_->is_cancelled, 'pending items are cancelled') for @f[1, 2];
+    done_testing;
 };
 
+subtest 'backpressure for Futures' => sub {
+    my $src = Ryu::Source->new;
+    my $ordered = $src->ordered_futures(
+        low => 2,
+        high => 5
+    );
+    my @f = map { my $f = Future->new; $src->emit($f); $f } 0..2;
+    ok(!$ordered->is_paused, 'not paused yet');
+    push @f, map { my $f = Future->new; $src->emit($f); $f } 1..2;
+    ok($ordered->is_paused, 'now paused');
+    shift(@f)->done;
+    ok($ordered->is_paused, 'still paused');
+    shift(@f)->done for 1..3;
+    ok(!$ordered->is_paused, 'no longer paused');
+    done_testing;
+};
+
+subtest 'failure propagation' => sub {
+    my $src = Ryu::Source->new;
+    my $ordered = $src->ordered_futures;
+    $src->emit(my $f = Future->new);
+    $src->fail('example error');
+    ok(!$ordered->completed->is_ready, 'still pending on original failure');
+    $f->done(1);
+    ok($ordered->completed->is_ready, 'now ready');
+    is($ordered->completed->failure, 'example error', 'propagated correct error');
+};
+
+subtest 'immediate failure propagation' => sub {
+    my $src = Ryu::Source->new;
+    my $ordered = $src->ordered_futures;
+    $src->emit(my $f = Future->new);
+    # after this, should have nothing pending!
+    $f->done;
+    $src->fail('example error');
+    ok($ordered->completed->is_ready, 'now ready');
+    is($ordered->completed->failure, 'example error', 'propagated correct error');
+    done_testing;
+};
 done_testing;

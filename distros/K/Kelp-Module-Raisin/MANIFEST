@@ -1,0 +1,18 @@
+Changes
+lib/Kelp/Module/Raisin.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/01-raisin.t
+t/02-errors.t
+t/conf/base.pl
+t/conf/cannot_app.pl
+t/conf/no_class.pl
+t/conf/not_raisin.pl
+t/conf/wrong_class.pl
+t/lib/AppWithNoAppMethod.pm
+t/lib/KelpApp.pm
+t/lib/NotARaisinApp.pm
+t/lib/RaisinApp.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1256,17 +1256,4 @@ sub _eqq {
     return length(ref $x) ? refaddr $x == refaddr $y : $x eq $y;
 }
 
-foreach my $function_name (@EXPORT_OK) {
-    my $method_name = $function_name;
-    $method_name =~ s/^op\_//;
-
-    no strict 'refs';
-    my $function = \&{ $function_name };
-    *{ 'RxPerl::Observable::' . $method_name } = sub {
-        my ($source, @rest) = @_;
-
-        return &{ $function }(@rest)->($source);
-    };
-}
-
 1;

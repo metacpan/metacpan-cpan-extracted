@@ -5,6 +5,7 @@ use Mouse;
 use Lemonldap::NG::Common::FormEncode;
 use XML::Simple;
 use Lemonldap::NG::Common::UserAgent;
+use URI;
 
 our $VERSION = '2.0.8';
 
@@ -43,20 +44,21 @@ sub loadSrv {
     return 1;
 }
 
-# Load CAS application list, key is the service URL
+# Load CAS application list
 sub loadApp {
     my ($self) = @_;
-    unless ( $self->conf->{casAppMetaDataOptions}
+    if ( $self->conf->{casAppMetaDataOptions}
         and %{ $self->conf->{casAppMetaDataOptions} } )
     {
+        $self->casAppList( $self->conf->{casAppMetaDataOptions} );
+    }
+    else {
         $self->logger->info("No CAS apps found in configuration");
     }
+
     foreach ( keys %{ $self->conf->{casAppMetaDataOptions} } ) {
-        my $tmp =
-          $self->conf->{casAppMetaDataOptions}->{$_}
-          ->{casAppMetaDataOptionsService};
-        $tmp =~ s#^(https?://[^/]+).*$#$1#;
-        $self->casAppList->{$tmp} = $_;
+
+        # Load access rule
         my $rule = $self->conf->{casAppMetaDataOptions}->{$_}
           ->{casAppMetaDataOptionsRule};
         if ( length $rule ) {
@@ -495,6 +497,59 @@ sub retrievePT {
     my $pt = $xml->{'cas:proxySuccess'}->{'cas:proxyTicket'};
 
     return $pt;
+}
+
+# Get CAS App from service URL
+sub getCasApp {
+    my ( $self, $uri_param ) = @_;
+
+    my $uri      = URI->new($uri_param);
+    my $hostname = $uri->authority;
+    my $uriCanon = $uri->canonical;
+    return undef unless $hostname;
+
+    my $prefixConfKey;
+    my $longestCandidate = "";
+    my $hostnameConfKey;
+
+    for my $app ( keys %{ $self->casAppList } ) {
+
+        my $candidateUri =
+          URI->new( $self->casAppList->{$app}->{casAppMetaDataOptionsService} );
+        my $candidateHost  = $candidateUri->authority;
+        my $candidateCanon = $candidateUri->canonical;
+
+        # Try to match prefix, remembering the longest match found
+        if ( index( $uriCanon, $candidateCanon ) == 0 ) {
+            if ( length($longestCandidate) < length($candidateCanon) ) {
+                $longestCandidate = $candidateCanon;
+                $prefixConfKey    = $app;
+            }
+        }
+
+        # Try to match host
+        $hostnameConfKey = $app if ( $hostname eq $candidateHost );
+    }
+
+    # Application found by prefix has priority
+    return $prefixConfKey if $prefixConfKey;
+    $self->logger->warn(
+            "Matched CAS service $hostnameConfKey based on hostname only. "
+          . "This will be deprecated in a future version" )
+      if $hostnameConfKey;
+    return $hostnameConfKey;
+}
+
+# This method returns the host part of the given URL
+# If the URL has no scheme, return it completely
+# http://example.com/uri => example.com
+# foo.bar => foo.bar
+sub _getHostForService {
+    my ( $self, $service ) = @_;
+    return undef unless $service;
+
+    my $uri = URI->new($service);
+    return $uri->scheme ? $uri->host : $uri->as_string;
 }
 
 1;

@@ -32,6 +32,14 @@ Aliases: I<arithmetic_mean>
 
 =cut
 
+=head2 binsplit
+
+Math.binsplit() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 chinese
 
 Math.chinese() -> I<Obj>
@@ -125,6 +133,14 @@ Return the
 =head2 range_sum
 
 Math.range_sum() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 smooth_numbers
+
+Math.smooth_numbers() -> I<Obj>
 
 Return the
 

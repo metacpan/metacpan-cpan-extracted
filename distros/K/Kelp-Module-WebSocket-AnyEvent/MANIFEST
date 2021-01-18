@@ -5,5 +5,10 @@ Makefile.PL
 MANIFEST			This list of files
 README.md
 t/01-websocket.t
+t/02-serializer.t
+t/conf/no_serializer.pl
+t/conf/serializer_json.pl
+t/lib/TwiggyTester.pm
+t/lib/WebSocketTest.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,14 +1,21 @@
 Revision history for Perl module Data::Constraint
 
+1.202 2021-01-17T11:56:05Z
+	* freshen distro, remove Travis CI, add Github Actions
+
+1.171_01 2020-11-06T06:11:45Z
+	* Remove the default constraints (but they show up in the test files)
+	* A couple of typos in the docs (GitHub #1, tobyink)
+
 1.171 2018-06-03T14:07:44Z
 	* Change to the Artistic License 2.0
-
-1.16 - 2008-01-16
-	* just a bump of the version for PAUSE
 
 1.17 - 2014-08-26
 	* Modernizing this module
 	* Get rid of UNIVERSAL::isa, RT #98151
+
+1.16 - 2008-01-16
+	* just a bump of the version for PAUSE
 
 1.12 - 2008-01-16
 	* Updated for the move from CVS to SVN. No need to upgrade.
@@ -18,7 +25,7 @@ Revision history for Perl module Data::Constraint
 	* No need to upgrade
 
 1.14 - 2007-11-28
-	* Cleanus for the move from CVS to SVN
+	* Cleanups for the move from CVS to SVN
 	* No need to upgrade
 
 1.11 - 2007-01-25

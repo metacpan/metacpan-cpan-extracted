@@ -13,14 +13,15 @@ my $res;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                    => 'error',
-            passwordDB                  => 'Demo',
-            portalRequireOldPassword    => 1,
-            passwordPolicyMinSize       => 6,
-            passwordPolicyMinLower      => 3,
-            passwordPolicyMinUpper      => 3,
-            passwordPolicyMinDigit      => 1,
-            passwordPolicyMinSpeChar    => 2,
+            logLevel                 => 'error',
+            passwordDB               => 'Demo',
+            passwordPolicy           => 1,
+            portalRequireOldPassword => 1,
+            passwordPolicyMinSize    => 6,
+            passwordPolicyMinLower   => 3,
+            passwordPolicyMinUpper   => 3,
+            passwordPolicyMinDigit   => 1,
+            passwordPolicyMinSpeChar => 2,
             passwordPolicySpecialChar   => '   [  } \   ',
             portalDisplayPasswordPolicy => 1
         }

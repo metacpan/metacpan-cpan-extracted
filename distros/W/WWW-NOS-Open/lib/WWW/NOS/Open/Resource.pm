@@ -1,4 +1,6 @@
-package WWW::NOS::Open::Resource v1.0.3;  # -*- cperl; cperl-indent-level: 4 -*-
+# -*- cperl; cperl-indent-level: 4 -*-
+# Copyright (C) 2011-2021, Roland van Ipenburg
+package WWW::NOS::Open::Resource v1.0.4;
 use strict;
 use warnings;
 
@@ -92,7 +94,8 @@ __END__
 
 =encoding utf8
 
-=for stopwords multiline DateTime URI Readonly Ipenburg MERCHANTABILITY
+=for stopwords Bitbucket multiline DateTime URI Readonly Ipenburg
+MERCHANTABILITY
 
 =head1 NAME
 
@@ -100,7 +103,7 @@ WWW::NOS::Open::Resource - client side resource in the Open NOS REST API.
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open::Resource version v1.0.3.
+This document describes WWW::NOS::Open::Resource version C<v1.0.4>.
 
 =head1 SYNOPSIS
 
@@ -222,15 +225,15 @@ strings.
 =head1 BUGS AND LIMITATIONS
 
 Please report any bugs or feature requests at
-L<RT for rt.cpan.org|https://rt.cpan.org/Dist/Display.html?Queue=WWW-NOS-Open>.
+L<Bitbucket|https://bitbucket.org/rolandvanipenburg/www-nos-open/issues>.
 
 =head1 AUTHOR
 
-Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
+Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 by Roland van Ipenburg
+Copyright 2011-2021 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

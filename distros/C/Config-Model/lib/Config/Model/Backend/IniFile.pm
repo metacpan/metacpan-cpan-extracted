@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2020 by Dominique Dumont.
+# This software is Copyright (c) 2005-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::IniFile 2.140;
+package Config::Model::Backend::IniFile 2.141;
 
 use Carp;
 use Mouse;
@@ -44,6 +44,7 @@ sub read {
     my $split_reg   = $args{split_list_value};
     my $check       = $args{check}               || 'yes';
     my $assign_char = $args{assign_char}         || '=';
+    my $quote_value = $args{quote_value}         || '';
     my $obj         = $self->node;
 
     my %force_lc;
@@ -120,6 +121,7 @@ sub read {
             my ( $name, $val ) = split( /\s*$assign_char\s*/, $vdata, 2 );
             $name = lc($name) if $force_lc{key};
             $val  = lc($val)  if $force_lc{value};
+            $val  =~ s/"([^"]*)"/$1/g if $quote_value eq "shell_style";
             $comment_path = $section_path . ' ' . $self->set_or_push( $section_ref, $name, $val );
             $logger->debug("step 1: found node $comment_path name $name in [$section]");
         }
@@ -211,27 +213,27 @@ sub _write_list{
     my $join_list = $args->{join_list_value};
     my $delimiter = $args->{comment_delimiter} || '#';
     my $assign_with = $args->{assign_with} // $args->{assign_char} // ' = ';
-    my $obj = $node->fetch_element($elt);
+    my $list_obj = $node->fetch_element($elt);
 
-    my $obj_note = $obj->annotation;
+    my $list_obj_note = $list_obj->annotation;
 
     if ( $join_list ) {
-        my @v = grep { length } $obj->fetch_all_values();
+        my @v = grep { length } $list_obj->fetch_all_values();
         my $v = join( $join_list, @v );
         if ( length($v) ) {
             $logger->debug("writing joined list elt $elt -> $v");
-            $res .= $self->write_data_and_comments( $delimiter, "$elt$assign_with$v", $obj_note );
+            $res .= $self->write_data_and_comments( $delimiter, "$elt$assign_with$v", $list_obj_note );
         }
     }
     else {
-        foreach my $item ( $obj->fetch_all('custom') ) {
-            my $note = $item->annotation;
-            my $v    = $item->fetch;
+        foreach my $obj ( $list_obj->fetch_all('custom') ) {
+            my $note = $obj->annotation;
+            my $v = $self->_fetch_obj_value($args, $obj);
             if ( length $v ) {
                 $logger->debug("writing list elt $elt -> $v");
                 $res .=
                     $self->write_data_and_comments( $delimiter, "$elt$assign_with$v",
-                                                    $obj_note . $note );
+                                                    $list_obj_note . $note );
             }
             else {
                 $logger->trace("NOT writing undef or empty list elt");
@@ -268,7 +270,20 @@ sub _write_check_list{
     return $res;
 }
 
-sub _write_leaf{
+sub _fetch_obj_value {
+    my ($self, $args, $obj)  = @_ ;
+    my $v = $obj->fetch;
+    if (    defined $args->{quote_value}
+        and $args->{quote_value} eq 'shell_style'
+        and defined $v
+        and $v =~ /\s/
+    ) {
+        $v = qq!"$v"!;
+    }
+    return $v;
+}
+
+sub _write_leaf {
     my ($self, $args, $node, $elt)  = @_ ;
     my $res = '';
 
@@ -279,7 +294,7 @@ sub _write_leaf{
 
     my $obj_note = $obj->annotation;
 
-    my $v = $obj->fetch;
+    my $v = $self->_fetch_obj_value($args, $obj);
     if ( $write_bool_as and defined($v) and length($v) and $obj->value_type eq 'boolean' ) {
         $v = $write_bool_as->[$v];
     }
@@ -415,7 +430,7 @@ Config::Model::Backend::IniFile - Read and write config as a INI file
 
 =head1 VERSION
 
-version 2.140
+version 2.141
 
 =head1 SYNOPSIS
 
@@ -528,9 +543,7 @@ called by L<Config::Model::BackendMgr>.
 
 Optional parameters declared in the model:
 
-=over
-
-=item comment_delimiter
+=head2 comment_delimiter
 
 Change the character that starts comments in the INI file. Default is 'C<#>'.
 
@@ -540,65 +553,81 @@ possible characters (e.g "C<#;>"). The first character is used to
 write back comments. (In the example above, comment C<; blah> is
 written back as C<# blah>.
 
-=item store_class_in_hash
+=head2 store_class_in_hash
 
 See L</"Arbitrary class name">
 
-=item section_map
+=head2 section_map
 
 Is a kind of exception of the above rule. See also L</"Arbitrary class name">
 
-=item force_lc_section
+=head2 force_lc_section
 
 Boolean. When set, sections names are converted to lowercase.
 
-=item force_lc_key
+=head2 force_lc_key
 
 Idem for key name 
 
-=item force_lc_value
+=head2 force_lc_value
 
 Idem for all values.
 
-=item split_list_value
+=head2 split_list_value
 
 Some INI values are in fact a list of items separated by a space or a comma.
 This parameter specifies the regex  to use to split the value into a list. This
 applies only to C<list> elements.
 
-=item join_list_value
+=head2 join_list_value
 
 Conversely, the list element split with C<split_list_value> needs to be written
 back with a string to join them. Specify this string (usually ' ' or ', ')
 with C<join_list_value>.
 
-=item split_check_list_value
+=head2 split_check_list_value
 
 Some INI values are in fact a check list of items separated by a space or a comma.
 This parameter specifies the regex to use to split the value read from the file
 into a list of items to check. This applies only to C<check_list> elements.
 
-=item join_check_list_value
+=head2 join_check_list_value
 
 Conversely, the check_list element split with C<split_list_value> needs to be written
 back with a string to join them. Specify this string (usually ' ' or ', ')
 with C<join_check_list_value>.
 
-=item write_boolean_as
+=head2 write_boolean_as
 
 Array ref. Reserved for boolean value. Specify how to write a boolean value. 
 Default is C<[0,1]> which may not be the most readable. C<write_boolean_as> can be 
 specified as C<['false','true']> or C<['no','yes']>. 
 
-=item assign_char
+=head2 assign_char
 
 Character used to assign value in INI file. Default is C<=>.
 
-=item assign_with
+=head2 assign_with
 
 String used write assignment in INI file. Default is "C< = >".
 
-=back
+=head2 quote_value
+
+How to quote value in INI file. Currrently only C<shell_style> is
+supported for C<quote_value>.
+
+E.g. INI backend declaration can contain this parameter:
+
+   quote_value => 'shell_style'
+
+Here are some example of quoted values. The 3 columns shows the
+original value in file, how it's stored internally and how it's
+written back:
+
+   # read    => shown   => write
+   "foo"     => foo     => "foo"
+   "foo bar" => foo bar => "foo bar"
+   "20"x"4"  => 20x4    => "20x4"
 
 =head1 Mapping between INI structure and model
 
@@ -743,7 +772,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2020 by Dominique Dumont.
+This software is Copyright (c) 2005-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

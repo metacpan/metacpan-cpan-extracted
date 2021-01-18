@@ -1,3 +1,17 @@
+0.004008  2020-12-22  Released-By: PERLANCAR; Urgency: low
+
+	  - No functional changes.
+
+	  - [doc] Add more details about Module::List::More.
+
+
+0.004007  2020-12-22  Released-By: PERLANCAR; Urgency: low
+
+	  - No functional changes.
+
+	  - [doc] Make it clear what ** does to recurse.
+
+
 0.004006  2020-09-21  Released-By: PERLANCAR; Urgency: low
 
 	  - No functional changes.

@@ -1,3 +1,9 @@
+2021-01-15  Dominique Dumont  <domi.dumont@free.fr> v1.107
+
+    * update obsolete structures in test model
+    * use init_test in t/curses_ui.t
+      (tests require Config::Model::Tester 3.006)
+
 2017-05-11  Dominique Dumont  <domi.dumont@free.fr> v1.106
 
     * updated copyright and fixed license (still LGPL2.1+)

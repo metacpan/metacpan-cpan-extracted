@@ -377,6 +377,15 @@ llapp.controller 'TreeCtrl', [
 				type: 'samlAttribute'
 				data: ['0', 'New', '', '']
 
+		# OIDC attribute entry
+		$scope.addOidcAttribute = ->
+			node = $scope._findContainer()
+			node.nodes.push
+				id: "#{node.id}/n#{idinc++}"
+				title: 'new'
+				type: 'oidcAttribute'
+				data: ['', 'string', 'auto']
+
 		# Nodes with template
 		$scope.addVhost = ->
 			name = if $scope.domain then ".#{$scope.domain.data}" else '.example.com'
@@ -568,7 +577,9 @@ llapp.controller 'TreeCtrl', [
 			d = $q.defer()
 			d.notify 'Trying to get datas'
 			$scope.waiting = true
-			$http.get("#{window.confPrefix}#{$scope.currentCfg.cfgNum}/#{node.cnodes}").then (response) ->
+			console.log "Trying to get key #{node.cnodes}"
+			uri = encodeURI node.cnodes
+			$http.get("#{window.confPrefix}#{$scope.currentCfg.cfgNum}/#{uri}").then (response) ->
 				data = response.data
 				# Manage datas errors
 				if not data
@@ -661,7 +672,49 @@ llapp.controller 'TreeCtrl', [
 			#  virtualHost
 			return if node.type and node.type.match /^(?:s(?:aml(?:(?:ID|S)PMetaDataNod|Attribut)e|fExtra)|(?:(?:cmbMod|r)ul|authChoic)e|(?:virtualHos|keyTex)t|menu(?:App|Cat))$/ then true else false
 
+		# Send test Email
+		$scope.sendTestMail = ->
+			$scope.message =
+				title: 'sendTestMail'
+				field: 'dest'
+			$scope.showModal('prompt.html').then ->
+				n= $scope.result
+				$scope.waiting = true
+				dest = $scope.result
+				$http.post("#{window.confPrefix}/sendTestMail", {"dest": dest}).then (response) ->
+					success = response.data.success
+					error = response.data.error
+					$scope.waiting = false
+					if success
+						$scope.message =
+							title: 'ok'
+							message: '__sendTestMailSuccess__'
+							items: []
+					else
+						$scope.message =
+							title: 'error'
+							message: error
+							items: []
+					
+					$scope.showModal 'message.html'
+				, readError
+			, ->
+				console.log('Error sending test email')
+
 		# RSA keys generation
+		$scope.newCertificate = ->
+			$scope.showModal('password.html').then ->
+				$scope.waiting = true
+				currentNode = $scope.currentNode
+				password = $scope.result
+				$http.post("#{window.confPrefix}/newCertificate", {"password": password}).then (response) ->
+					currentNode.data[0].data = response.data.private
+					currentNode.data[1].data = password
+					currentNode.data[2].data = response.data.public
+					$scope.waiting = false
+				, readError
+			, ->
+				console.log('New key cancelled')
 		$scope.newRSAKey = ->
 			$scope.showModal('password.html').then ->
 				$scope.waiting = true
@@ -708,7 +761,13 @@ llapp.controller 'TreeCtrl', [
 						d.reject response.statusLine
 						$scope.waiting = false
 				else
-					$http.get("#{window.confPrefix}#{$scope.currentCfg.cfgNum}/#{if node.get then node.get else node.title}").then (response) ->
+					uri = ''
+					if node.get
+						console.log "Trying to get key #{node.get}"
+						uri = encodeURI node.get
+					else
+						console.log "Trying to get title #{node.title}"
+					$http.get("#{window.confPrefix}#{$scope.currentCfg.cfgNum}/#{if node.get then uri else node.title}").then (response) ->
 						# Set default value if response is null or if asked by server
 						data = response.data
 						if (data.value == null or (data.error and data.error.match /setDefault$/ ) ) and node['default'] != null

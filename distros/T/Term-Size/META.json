@@ -1,16 +1,17 @@
 {
-   "abstract" : "Retrieve terminal size (Unix version)",
+   "abstract" : "Retrieve terminal size on Unix",
    "author" : [
-      "unknown"
+      "Tim Goodwin <tim@uunet.pipex.com>",
+      "Adriano Ferreira <ferreira@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Term-Size",
    "no_index" : {
@@ -30,12 +31,36 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.18"
+         }
+      },
       "runtime" : {
+         "requires" : {
+            "DynaLoader" : "0",
+            "Exporter" : "0",
+            "strict" : "0",
+            "vars" : "0"
+         }
+      },
+      "test" : {
          "requires" : {
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.209"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aferreira/cpan-Term-Size/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/aferreira/cpan-Term-Size.git",
+         "web" : "https://github.com/aferreira/cpan-Term-Size"
+      }
+   },
+   "version" : "0.211",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

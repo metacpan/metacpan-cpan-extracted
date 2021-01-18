@@ -5,7 +5,7 @@ use Mouse;
 
 #use Lemonldap::NG::Handler::Main qw(:jailSharedVars);
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.10';
 
 has protection => ( is => 'rw', isa => 'Str' );
 has rule       => ( is => 'rw', isa => 'Str' );
@@ -198,9 +198,14 @@ sub custom {
 # @return user identifier to log
 sub userId {
     my ( $self, $req ) = @_;
-    return $req->userData->{ $Lemonldap::NG::Handler::Main::tsv->{whatToTrace}
+    my $userId =
+      $req->userData->{ $Lemonldap::NG::Handler::Main::tsv->{whatToTrace}
           || '_whatToTrace' }
+      || $req->userData->{'_user'} # Fix 2377
       || 'anonymous';
+
+    $self->logger->debug("Returned userId: $userId");
+    return $userId;
 }
 
 ## @method boolean group(string group)

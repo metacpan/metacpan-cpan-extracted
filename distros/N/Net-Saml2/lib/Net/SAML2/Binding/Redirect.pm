@@ -90,7 +90,7 @@ Net::SAML2::Binding::Redirect
 
 =head1 VERSION
 
-version 0.29
+version 0.32
 
 =head1 SYNOPSIS
 

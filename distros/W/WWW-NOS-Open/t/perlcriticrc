@@ -2,6 +2,7 @@
 [-Compatibility::PodMinimumVersion]
 [-Subroutines::ProhibitCallsToUnexportedSubs]
 [-CodeLayout::ProhibitHashBarewords]
+[-CodeLayout::RequireTidyCode]
 [-Tics::ProhibitLongLines]
 [Modules::PerlMinimumVersion]
 version = 5.014

@@ -1,10 +1,10 @@
 package Lemonldap::NG::Manager::Api::2F;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 package Lemonldap::NG::Manager::Api;
 
-use 5.10.0;
+use strict;
 use utf8;
 use Mouse;
 use JSON;

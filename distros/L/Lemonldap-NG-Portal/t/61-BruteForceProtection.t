@@ -224,14 +224,20 @@ $id1 = expectCookie($res);
 
 ok( $res->[2]->[0] =~ /trspan="lastLogins"/, 'History found' )
   or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ /<caption trspan="lastFailedLoginsCaptionLabel">/, 'History found' )
+  or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ /<caption trspan="lastLoginsCaptionLabel">/, 'History found' )
+  or print STDERR Dumper( $res->[2]->[0] );
 
 my @c  = ( $res->[2]->[0] =~ /<td>127.0.0.1/gs );
 my @cf = ( $res->[2]->[0] =~ /PE5<\/td>/gs );
 
-# History with 10 entries
-ok( @c == 10, ' -> Ten entries found' );
-ok( @cf == 6, "  -> Six 'failedLogin' entries found" );
-count(3);
+# History with 8 entries
+ok( @c == 8, ' -> Eight entries found' )
+  or print STDERR Dumper( $res->[2]->[0] );
+ok( @cf == 4, "  -> Four 'failedLogin' entries found" )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(5);
 
 $client->logout($id1);
 clean_sessions();

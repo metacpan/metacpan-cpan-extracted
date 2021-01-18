@@ -13,8 +13,19 @@ Revision history for AstroScript
 
 2020-12-26 - Solstices and Equinoxes 
              Aparent position of the Sun
+
 2020-12-31 - Apparent positions of the objects, Planet interface changed
              Numerous bugfixes
+
 2021-01-01 - Demo script for computing solstices / Equinoxes
              Utility modules renamed to avoid CPAN authorization issues
+
 2021-01-05 - List::MoreUtils dependency added to build prerequisites
+
+2021-01-09 - Routines for calculating rise/set/transit times rewritten. 
+             Algorithms from J.Meeus book substituted with the alternatives,
+             found in Montenbruck & Phleger's "Astronomy on the PC".
+             Thanks to Tom Browder for testing and collaborating!   
+
+2021-01-10 - Support of colorless output. Color schemes replaced with
+             themes, responsible for output. 

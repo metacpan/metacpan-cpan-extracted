@@ -4,11 +4,11 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
-  PE_SESSIONNOTGRANTED
   PE_BADCREDENTIALS
+  PE_SESSIONNOTGRANTED
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -18,20 +18,13 @@ has rules => ( is => 'rw', default => sub { {} } );
 
 sub init {
     my ($self) = @_;
-    my $hd = $self->p->HANDLER;
     foreach ( keys %{ $self->conf->{grantSessionRules} // {} } ) {
         $self->logger->debug("GrantRule key -> $_");
         $self->logger->debug(
             "GrantRule value -> " . $self->conf->{grantSessionRules}->{$_} );
-        my $rule =
-          $hd->buildSub(
-            $hd->substitute( $self->conf->{grantSessionRules}->{$_} ) );
-        unless ($rule) {
-            my $error = $hd->tsv->{jail}->error || '???';
-            $self->logger->error("Bad grantSession rule -> $error");
-            $self->logger->debug("Skipping GrantSession rule \"$_\"");
-            next;
-        }
+        my $rule = $self->p->buildRule( $self->conf->{grantSessionRules}->{$_},
+            'grantSessionRules' );
+        next unless ($rule);
         $self->rules->{$_} = $rule;
     }
     return 1;
@@ -79,16 +72,17 @@ sub run {
                         $req, 'simpleInfo', params => { trspan => $msg }
                     )
                 );
-                $self->userLogger->error( 'User '
-                      . $req->sessionInfo->{uid}
-                      . " was not granted to open session (rule -> $rule)" );
+                $self->userLogger->error( 'User "'
+                      . $req->{sessionInfo}->{ $self->conf->{whatToTrace} }
+                      . '" was not granted to open session (rule ->'
+                      . "$rule)" );
                 $req->urldc( $self->conf->{portal} );
                 return $req->authResult(PE_SESSIONNOTGRANTED);
             }
             else {
-                $self->userLogger->error( 'User '
-                      . $req->sessionInfo->{uid}
-                      . " was not granted to open session (rule -> "
+                $self->userLogger->error( 'User "'
+                      . $req->{sessionInfo}->{ $self->conf->{whatToTrace} }
+                      . '" was not granted to open session (rule -> '
                       . $self->conf->{grantSessionRules}->{$_}
                       . ")" );
                 $req->urldc( $self->conf->{portal} );

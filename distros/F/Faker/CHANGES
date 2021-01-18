@@ -1,1 +1,82 @@
 Changelog for Faker
+
+1.04 2021-01-15T04:42:12
+ - Add release updates
+ - Fix inaccurate random array item selection (#22)
+
+1.03 2020-03-19T00:58:19
+ - Built release version 1.03
+ - Added release updates
+ - Update documentation and acknowledgements
+
+1.02 2020-03-18T22:37:17
+ - Built release version 1.02
+ - Added release updates
+ - Replace F/Process with Faker/Maker
+
+1.01 2020-03-14T19:00:56
+ - Built release version 1.01
+ - Added release updates
+ - Explain autoloading plugins
+ - Add type-library to plugin docs
+ - Add missing D/O/Role dependency
+ - Remove quotes from acknowledgments
+ - Configure proxyable
+
+1.00 2020-03-14T02:15:31
+ - Built release version 1.00
+ - Added release updates
+ - Refactor library using plugin architecture
+
+0.12 2015-04-11T06:23:21
+ - v0.12
+ - Update build.
+ - Added Payment provider and reworked some tests.
+ - Fixed loading token data from subclasses.
+
+0.11 2015-03-29T07:01:58
+ - v0.11
+ - Updated build.
+ - Updated documentation.
+ - POD cleanup, removed namespace::autoclean, and miscellaneous changes.
+
+0.10 2015-03-28T07:16:27
+ - v0.10
+ - Updated build.
+ - Initial commit.
+
+0.09 2014-04-04T04:10:14
+ - Updated POD, Makefile and README.
+ - Fixed bug formatting email addresses.
+
+0.08 2014-03-21T18:06:05
+ - Updated Makefile and README.
+ - Modified to avoid breaking changes in Bubblegum 0.20.
+ - Many miscellaneous cosmetic changes.
+
+0.07 2014-02-27T05:06:33
+ - Updated Makefile and README.
+ - Added dashify routine and enhanced the Internet provider.
+ - Fixed bug in company data lookup.
+
+0.06 2014-02-22T07:41:12
+ - Miscellaneous cleanup and removed given/when usage breaking 5.16+.
+
+0.05 2014-02-17T06:34:04
+ - Refactor and Fixed en_US last names with apostrophes
+
+0.04 2014-02-03T01:33:00
+ - Fixed test failures due to using given syntax without enabling it.
+
+0.03 2014-01-30T17:34:01
+ - Updated dist.ini and added Type::Tiny dependency.
+ - Updated gitignore and dist.ini.
+ - Include INSTALL file in repo.
+ - Fixed duplicate company data.
+
+0.02 2014-01-29T17:12:09
+ - Added Function::Parameters as a dependency to fix failing tests.
+
+0.01 2014-01-28T11:57:45
+ - Initial CPAN release.
+ - Initial commit.

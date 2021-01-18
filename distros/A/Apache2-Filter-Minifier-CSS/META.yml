@@ -1,28 +1,49 @@
 ---
-name: Apache2-Filter-Minifier-CSS
-version: 1.05
+abstract: 'CSS minifying output filter'
 author:
-  - Graham TerMarsch (cpan@howlingfrog.com)
-abstract: CSS minifying output filter
-license: perl
-resources:
-  license: ~
-requires:
-  CSS::Minifier: 0
-  Time::HiRes: 0
-  mod_perl2: 2
-  perl: 5.6.0
+  - 'Graham TerMarsch <cpan@howlingfrog.com>'
 build_requires:
-  Apache::Test: 1.12
-recommends:
-  CSS::Minifier::XS: 0
-provides:
-  Apache2::Filter::Minifier::CSS:
-    file: lib/Apache2/Filter/Minifier/CSS.pm
-    version: 1.05
-generated_by: Module::Build version 0.32
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  Apache::Test: '1.12'
+  ExtUtils::MakeMaker: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  LWP::UserAgent: '0'
+  Test::DiagINC: '0.002'
+  Test::More: '0.96'
 configure_requires:
-  Apache::Test: 1.12
+  Apache::Test: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache2-Filter-Minifier-CSS
+no_index:
+  directory:
+    - t
+    - xt
+recommends:
+  CSS::Minifier::XS: '0'
+requires:
+  APR::Table: '0'
+  Apache2::Const: '0'
+  Apache2::Filter: '0'
+  Apache2::Log: '0'
+  Apache2::RequestRec: '0'
+  Apache2::RequestUtil: '0'
+  CSS::Minifier: '0'
+  namespace::clean: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/bleargh45/Apache2-Filter-Minifier-CSS/issues
+  repository: git://github.com/bleargh45/Apache2-Filter-Minifier-CSS.git
+version: '1.07'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 0

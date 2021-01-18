@@ -48,7 +48,7 @@ delete2F = (device, epoch) ->
 
 # Register "click" events
 $(document).ready ->
-	$('body').on 'click', '.btn-danger', () -> delete2F ( $(this).attr 'device' ), ( $(this).attr 'epoch' )
+	$('body').on 'click', '.remove2f', () -> delete2F ( $(this).attr 'device' ), ( $(this).attr 'epoch' )
 	$('#goback').attr 'href', portal
 	$(".data-epoch").each ->
 		myDate = new Date($(this).text() * 1000)

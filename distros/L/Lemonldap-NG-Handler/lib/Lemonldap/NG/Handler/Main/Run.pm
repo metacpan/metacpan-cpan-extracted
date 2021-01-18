@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -105,6 +105,7 @@ sub checkType {
 sub run {
     my ( $class, $req, $rule, $protection ) = @_;
     my ( $id, $session );
+    my $vhost = $class->resolveAlias($req);
 
     return $class->DECLINED unless ( $class->is_initial_req($req) );
 
@@ -149,9 +150,41 @@ sub run {
 
         # ACCOUNTING (1. Inform web server)
         $class->set_user( $req, $session->{ $class->tsv->{whatToTrace} } );
-        $class->set_custom( $req, $session->{ $class->tsv->{customToTrace} } )
-          if $class->tsv->{customToTrace}
-          and $session->{ $class->tsv->{customToTrace} };
+
+        my $custom;
+        $custom = $session->{ $class->tsv->{customToTrace} }
+          if (  $class->tsv->{customToTrace}
+            and $session->{ $class->tsv->{customToTrace} } );
+        if ( $class->tsv->{accessToTrace}->{$vhost} ) {
+            my ( $function, @params ) = split /\s*,\s*/,
+              $class->tsv->{accessToTrace}->{$vhost};
+            if ( $function =~ qr/^(?:\w+(?:::\w+)*(?:\s+\w+(?:::\w+)*)*)?$/ ) {
+                my $c = eval {
+                    no strict 'refs';
+                    &{$function}( {
+                            req     => $req,
+                            vhost   => $vhost,
+                            session => $session,
+                            custom  => $custom,
+                            params  => \@params
+                        }
+                    );
+                };
+                if ($@) {
+                    $class->logger->error(
+                        "Failed to overwrite customToTrace: $@");
+                }
+                else {
+                    $class->logger->debug("Overwrite customToTrace with: $c");
+                    $custom = $c;
+                }
+            }
+            else {
+                $class->logger->error(
+                    "accessToTrace: Bad custom function name");
+            }
+        }
+        $class->set_custom( $req, $custom ) if $custom;
 
         # AUTHORIZATION
         return ( $class->forbidden( $req, $session ), $session )
@@ -195,6 +228,10 @@ sub run {
     elsif ( $protection == $class->MAYSKIP
         and $class->grant( $req, $session, $uri, $cond ) eq '999_SKIP' )
     {
+        $class->logger->debug("Access control skipped");
+        $class->updateStatus( $req, 'SKIP' );
+        $class->hideCookie($req);
+        $class->cleanHeaders($req);
         return $class->OK;
     }
 
@@ -465,10 +502,9 @@ sub fetchId {
     my $lookForHttpCookie = ( $class->tsv->{securedCookie} =~ /^(2|3)$/
           and not $class->_isHttps( $req, $vhost ) );
     my $cn = $class->tsv->{cookieName};
-    my $value =
-      $lookForHttpCookie
-      ? ( $t =~ /${cn}http=([^,; ]+)/o ? $1 : 0 )
-      : ( $t =~ /$cn=([^,; ]+)/o       ? $1 : 0 );
+    my $value = $lookForHttpCookie    # Avoid prefix and bad cookie name (#2417)
+      ? ( $t =~ /(?<![-.~])\b${cn}http=([^,; ]+)/o ? $1 : 0 )
+      : ( $t =~ /(?<![-.~])\b$cn=([^,; ]+)/o       ? $1 : 0 );
 
     if ( $value && $lookForHttpCookie && $class->tsv->{securedCookie} == 3 ) {
         $value = $class->tsv->{cipher}->decryptHex( $value, "http" );
@@ -613,7 +649,7 @@ sub _getPort {
             return $class->tsv->{port}->{_};
         }
         else {
-            return $req->{env}->{SERVER_PORT};
+            return $req->port;
         }
     }
 }
@@ -637,7 +673,7 @@ sub _isHttps {
             return $class->tsv->{https}->{_};
         }
         else {
-            return ( uc( $req->{env}->{HTTPS} || "OFF" ) eq "ON" );
+            return $req->secure;
         }
     }
 }
@@ -732,6 +768,7 @@ sub cleanHeaders {
     my ( $class, $req ) = @_;
     my $vhost = $class->resolveAlias($req);
     if ( defined( $class->tsv->{headerList}->{$vhost} ) ) {
+        $class->logger->debug("Remove headers relative to $vhost");
         $class->unset_header_in( $req,
             @{ $class->tsv->{headerList}->{$vhost} } );
     }
@@ -793,10 +830,14 @@ sub localUnlog {
     if ( $id //= $class->fetchId($req) ) {
 
         # Delete local cache
-        if (    $class->tsv->{refLocalStorage}
-            and $class->tsv->{refLocalStorage}->get($id) )
-        {
-            $class->tsv->{refLocalStorage}->remove($id);
+        if ( $class->tsv->{sessionCacheModule} ) {
+            my $module  = $class->tsv->{sessionCacheModule};
+            my $options = $class->tsv->{sessionCacheOptions};
+            eval "use $module;";
+            my $cache = $module->new($options);
+            if ( $cache->get($id) ) {
+                $cache->remove($id);
+            }
         }
     }
 }

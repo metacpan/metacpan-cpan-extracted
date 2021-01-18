@@ -23,22 +23,23 @@ close F;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                       => 'error',
-            authentication                 => 'Demo',
-            userDB                         => 'Same',
-            loginHistoryEnabled            => 0,
-            portalMainLogo                 => 'common/logos/logo_llng_old.png',
-            contextSwitchingRule           => 1,
-            contextSwitchingIdRule         => 1,
-            totp2fSelfRegistration         => 1,
-            totp2fActivation               => 1,
-            totp2fAuthnLevel               => 8,
-            contextSwitchingStopWithLogout => 0,
-            checkUser                      => 1,
-            notification                   => 1,
-            tokenUseGlobalStorage          => 1,
-            notificationStorage            => 'File',
-            notificationStorageOptions     => { dirName => $main::tmpDir },
+            logLevel                        => 'error',
+            authentication                  => 'Demo',
+            userDB                          => 'Same',
+            loginHistoryEnabled             => 0,
+            portalMainLogo                  => 'common/logos/logo_llng_old.png',
+            contextSwitchingRule            => 1,
+            contextSwitchingIdRule          => 1,
+            totp2fSelfRegistration          => 1,
+            totp2fActivation                => 1,
+            totp2fAuthnLevel                => 8,
+            contextSwitchingStopWithLogout  => 0,
+            checkUser                       => 1,
+            checkUserDisplayComputedSession => 1,
+            notification                    => 1,
+            tokenUseGlobalStorage           => 1,
+            notificationStorage             => 'File',
+            notificationStorageOptions      => { dirName => $main::tmpDir },
         }
     }
 );
@@ -134,7 +135,7 @@ expectAuthenticatedAs( $res, 'rtyler' );
 ok(
     $res->[2]->[0] =~
       m%<span trspan="contextSwitching_ON">contextSwitching_ON</span>%,
-    'Connected as rtyler'
+    'contextSwitching allowed'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(3);
 
@@ -408,9 +409,9 @@ ok(
 
 ( $host, $url, $query ) =
   expectForm( $res, undef, '/checkuser', 'user', 'url' );
-ok( $res->[2]->[0] =~ m%<span trspan="checkUserComputeSession">%,
-    'Found trspan="checkUserComputeSession"' )
-  or explain( $res->[2]->[0], 'trspan="checkUserComputeSession"' );
+ok( $res->[2]->[0] =~ m%<span trspan="checkUserComputedSession">%,
+    'Found trspan="checkUserComputedSession"' )
+  or explain( $res->[2]->[0], 'trspan="checkUserComputedSession"' );
 ok( $res->[2]->[0] =~ m%<td scope="row">authMode</td>%, 'Found macro authMode' )
   or explain( $res->[2]->[0], 'Macro Key authMode' );
 ok( $res->[2]->[0] =~ m%<td scope="row">TOTP</td>%, 'Found TOTP' )

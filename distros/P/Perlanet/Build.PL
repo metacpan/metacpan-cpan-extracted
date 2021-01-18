@@ -23,6 +23,8 @@ my $build = Module::Build->new(
     'Try::Tiny'            => 0,
     'MooseX::Traits'       => 0,
     'namespace::autoclean' => 0,
+    'MooseX::ConfigFromFile' => 0,
+    'DateTime::Format::Strptime' => 0,
   },
   recommends         => {
     'CHI'                    => 0,
@@ -50,6 +52,9 @@ my $build = Module::Build->new(
        type => 'git',
        url  => 'git://github.com/davorg/perlanet.git',
        web  => 'https://github.com/davorg/perlanet',
+     },
+      bugtracker => {
+       web  => 'https://github.com/davorg/perlanet/issues',
      },
      homepage => "http://perlanet.mag-sol.com/",
    },

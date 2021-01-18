@@ -11,7 +11,7 @@ use Wikibase::Datatype::Value::Globecoordinate;
 
 Readonly::Array our @EXPORT_OK => qw(obj2struct struct2obj);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub obj2struct {
 	my ($obj, $base_uri) = @_;
@@ -53,7 +53,7 @@ sub struct2obj {
 	my @path_segments = $u->path_segments;
 	my $globe = $path_segments[-1];
 	my $obj = Wikibase::Datatype::Value::Globecoordinate->new(
-		$struct_hr->{'value'}->{'altitude'} ne 'null' ? (
+		defined $struct_hr->{'value'}->{'altitude'} ? (
 			'altitude' => $struct_hr->{'value'}->{'altitude'},
 		) : (),
 		'globe' => $globe,
@@ -242,12 +242,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2021
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

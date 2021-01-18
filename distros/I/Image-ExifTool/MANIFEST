@@ -115,6 +115,7 @@ html/TagNames/Motorola.html
 html/TagNames/Nikon.html
 html/TagNames/NikonCapture.html
 html/TagNames/NikonCustom.html
+html/TagNames/NikonSettings.html
 html/TagNames/Nintendo.html
 html/TagNames/OOXML.html
 html/TagNames/Ogg.html
@@ -169,6 +170,7 @@ html/TagNames/Vorbis.html
 html/TagNames/WTV.html
 html/TagNames/XMP.html
 html/TagNames/ZIP.html
+html/TagNames/ZISRAW.html
 html/TagNames/iWork.html
 html/TagNames/index.html
 html/TagNames/style.css
@@ -336,6 +338,7 @@ lib/Image/ExifTool/Motorola.pm
 lib/Image/ExifTool/Nikon.pm
 lib/Image/ExifTool/NikonCapture.pm
 lib/Image/ExifTool/NikonCustom.pm
+lib/Image/ExifTool/NikonSettings.pm
 lib/Image/ExifTool/Nintendo.pm
 lib/Image/ExifTool/OOXML.pm
 lib/Image/ExifTool/Ogg.pm
@@ -410,6 +413,7 @@ lib/Image/ExifTool/XMP.pm
 lib/Image/ExifTool/XMP2.pl
 lib/Image/ExifTool/XMPStruct.pl
 lib/Image/ExifTool/ZIP.pm
+lib/Image/ExifTool/ZISRAW.pm
 lib/Image/ExifTool/iWork.pm
 perl-Image-ExifTool.spec
 t/AFCP.t
@@ -565,6 +569,7 @@ t/GeoTiff_4.out
 t/Geotag.t
 t/Geotag_10.out
 t/Geotag_11.out
+t/Geotag_12.out
 t/Geotag_2.out
 t/Geotag_3.out
 t/Geotag_5.out
@@ -600,6 +605,7 @@ t/Jpeg2000.t
 t/Jpeg2000_2.out
 t/Jpeg2000_3.out
 t/Jpeg2000_4.out
+t/Jpeg2000_5.out
 t/Kodak.t
 t/Kodak_2.out
 t/Kodak_3.out
@@ -650,6 +656,8 @@ t/MWG_6.out
 t/MWG_7.out
 t/MXF.t
 t/MXF_2.out
+t/MacOS.t
+t/MacOS_2.out
 t/Matroska.t
 t/Matroska_2.out
 t/Minolta.t
@@ -915,6 +923,8 @@ t/ZIP_4.out
 t/ZIP_5.out
 t/ZIP_6.out
 t/ZIP_7.out
+t/ZISRAW.t
+t/ZISRAW_2.out
 t/images/AFCP.jpg
 t/images/AIFF.aif
 t/images/APE.ape
@@ -980,6 +990,7 @@ t/images/Geotag.log
 t/images/Geotag.xml
 t/images/Geotag2.log
 t/images/Geotag3.log
+t/images/Geotag_DJI_2020-12-02_[07-50-31].csv
 t/images/GoPro.jpg
 t/images/HTML.html
 t/images/ICC_Profile.icc
@@ -1003,6 +1014,7 @@ t/images/MOI.moi
 t/images/MP3.mp3
 t/images/MWG.jpg
 t/images/MXF.mxf
+t/images/MacOS.macos
 t/images/Matroska.mkv
 t/images/Minolta.jpg
 t/images/Minolta.mrw
@@ -1089,4 +1101,5 @@ t/images/XMP8.xmp
 t/images/XMP9.xmp
 t/images/ZIP.gz
 t/images/ZIP.zip
+t/images/ZISRAW.czi
 t/images/iWork.numbers

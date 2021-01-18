@@ -5,6 +5,17 @@
 
 REVISION HISTORY - Set::Object
 
+=head1 1.41, 2021-01-17
+
+=over
+
+=item *
+
+Use meta-spec 2, Moose -> dev.requires not runtime.recommends
+(GH #6, RT #134034) by mohawk
+
+=back
+
 =head1 1.40, 2020-01-19
 
 =over

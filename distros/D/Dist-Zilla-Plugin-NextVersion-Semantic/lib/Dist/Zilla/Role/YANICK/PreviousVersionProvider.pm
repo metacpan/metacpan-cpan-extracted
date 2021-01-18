@@ -1,7 +1,7 @@
 package Dist::Zilla::Role::YANICK::PreviousVersionProvider;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: provides the distribution's previously released version
-$Dist::Zilla::Role::YANICK::PreviousVersionProvider::VERSION = '0.2.5';
+$Dist::Zilla::Role::YANICK::PreviousVersionProvider::VERSION = '0.2.6';
 
 use strict;
 use warnings;
@@ -25,7 +25,7 @@ Dist::Zilla::Role::YANICK::PreviousVersionProvider - provides the distribution's
 
 =head1 VERSION
 
-version 0.2.5
+version 0.2.6
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2021, 2015, 2014, 2013, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

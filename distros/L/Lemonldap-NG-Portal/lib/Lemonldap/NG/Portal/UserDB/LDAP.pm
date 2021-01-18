@@ -40,12 +40,16 @@ sub setSessionInfo {
         %{ $self->conf->{ldapExportedVars} } );
     while ( my ( $k, $v ) = each %vars ) {
 
+        my $value = $self->ldap->getLdapValue( $req->data->{ldapentry}, $v );
+
         # getLdapValue returns an empty string for missing attribute
         # but we really want to return undef so they don't get stored in session
-        $req->sessionInfo->{$k} =
-          $self->ldap->getLdapValue( $req->data->{ldapentry}, $v ) || undef;
-    }
+        # This has to be a string comparison because "0" is a valid attribute
+        # value. See #2403
+        $value = undef if ( $value eq "" );
 
+        $req->sessionInfo->{$k} = $value;
+    }
     PE_OK;
 }
 

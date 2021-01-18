@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2015-2020, Roland van Ipenburg
+# Copyright (C) 2009-2021, Roland van Ipenburg
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ use Perl::Tidy;
 use Progress::Any;
 use Progress::Any::Output q{TermProgressBarColor};
 
-our $VERSION = v1.1.5;
+our $VERSION = v1.1.7;
 use Readonly;
 
 ## no critic qw(prohibitCallsToUnexportedSubs)
@@ -290,10 +290,9 @@ fail, but also not very likely to occur.
 
 =head1 BUGS AND LIMITATIONS
 
-Please report any bugs or feature requests to
-C<bug-tex-hyphen-pattern@rt.cpan.org>, or through the web interface at
-L<RT for rt.cpan.org|
-https://rt.cpan.org/Dist/Display.html?Queue=TeX-Hyphen-Pattern>.
+Please report any bugs or feature requests at
+L<Bitbucket|
+https://bitbucket.org/rolandvanipenburg/tex-hyphen-pattern/issues>.
 
 =head1 AUTHOR
 
@@ -301,7 +300,7 @@ Roland van Ipenburg  C<< <roland@rolandvanipenburg.com> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015-2020 by Roland van Ipenburg
+Copyright 2009-2021 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.12.2 or,

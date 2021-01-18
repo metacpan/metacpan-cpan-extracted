@@ -1,0 +1,43 @@
+---
+abstract: 'Scripts for processing MCL clusters'
+author:
+  - 'Denis BAURAIN <denis.baurain@uliege.be>'
+build_requires:
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-MUST-Tools-Mcl
+requires:
+  Bio::FastParsers::Blast::Table: '0'
+  Bio::MUST::Core: '0'
+  Bio::MUST::Core::Ali: '0'
+  Bio::MUST::Core::Ali::Stash: '0'
+  Bio::MUST::Core::Constants: '0'
+  Bio::MUST::Core::IdList: '0'
+  Bio::MUST::Core::IdMapper: '0'
+  Bio::MUST::Core::SeqId: '0'
+  Bio::MUST::Core::Taxonomy: '0'
+  Bio::MUST::Core::Utils: '0'
+  Config::Any: '0'
+  File::Basename: '0'
+  Getopt::Euclid: '0'
+  Modern::Perl: '0'
+  Path::Class: '0'
+  Smart::Comments: '0'
+  Test::Most: '0'
+  aliased: '0'
+  autodie: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+version: '0.210170'
+x_generated_by_perl: v5.26.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -459,15 +459,30 @@ $(window).on 'load', () ->
 				$('#ppolicy-minspechar-feedback').removeClass 'fa-check text-success'
 				$('#ppolicy-minspechar-feedback').addClass 'fa-times text-danger'
 				result = false
+
+		if window.datas.ppolicy.minspechar > 0 and !window.datas.ppolicy.allowedspechar
+			numspechar = 0
+			i = 0
+			while i < password.length
+				numspechar++ if !isAlphaNumeric(password.charAt(i))
+				i++
+			if numspechar >= window.datas.ppolicy.minspechar
+				$('#ppolicy-minspechar-feedback').addClass 'fa-check text-success'
+				$('#ppolicy-minspechar-feedback').removeClass 'fa-times text-danger'
+			else
+				$('#ppolicy-minspechar-feedback').removeClass 'fa-check text-success'
+				$('#ppolicy-minspechar-feedback').addClass 'fa-times text-danger'
+				result = false
+
 		if result
 			$('.ppolicy').removeClass('border-danger').addClass 'border-success'
-			$('#newpassword')[0].setCustomValidity('')
+			$('#newpassword').get(0)?.setCustomValidity('')
 		else
 			$('.ppolicy').removeClass('border-success').addClass 'border-danger'
-			$('#newpassword')[0].setCustomValidity(translate('PE28'))
+			$('#newpassword').get(0)?.setCustomValidity(translate('PE28'))
 		return
 
-	if window.datas.ppolicy?
+	if window.datas.ppolicy? and $('#newpassword').length
 		# Initialize display
 		checkpassword ''
 
@@ -475,16 +490,30 @@ $(window).on 'load', () ->
 			checkpassword e.target.value
 			return
 
+	# If generating password, disable policy check
+	togglecheckpassword = (e) ->
+		if e.target.checked
+			$('#newpassword').off('keyup')
+			$('#newpassword').get(0)?.setCustomValidity('')
+		# Restore check
+		else
+			$('#newpassword').keyup (e) ->
+				checkpassword e.target.value
+				return
+			checkpassword ''
+
 	checksamepass = () ->
-		if $('#confirmpassword')[0].value == $('#newpassword')[0].value
-			$('#confirmpassword')[0].setCustomValidity('')
+		if $('#confirmpassword').get(0)?.value == $('#newpassword').get(0)?.value
+			$('#confirmpassword').get(0)?.setCustomValidity('')
 			return true
 		else
-			$('#confirmpassword')[0].setCustomValidity(translate('PE34'))
+			$('#confirmpassword').get(0)?.setCustomValidity(translate('PE34'))
 			return false
 
 	$('#newpassword').change checksamepass
 	$('#confirmpassword').change checksamepass
+	if window.datas.ppolicy? and $('#newpassword').length
+		$('#reset').change togglecheckpassword
 
 	# Ping if asked
 	if datas['pingInterval'] and datas['pingInterval'] > 0

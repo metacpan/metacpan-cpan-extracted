@@ -1,11 +1,12 @@
 <TMPL_INCLUDE NAME="header.tpl">
 
 <div class="container">
-  <div class="message message-positive alert" trspan="choose2f"></div>
+  <div class="message message-<TMPL_VAR NAME="ALERT"> alert" trspan="<TMPL_VAR NAME="MSG">"></div>
   <div class="buttons">
     <form action="/2fchoice" method="POST">
       <input type="hidden" id="token" name="token" value="<TMPL_VAR NAME="TOKEN">" />
-      <input type="hidden" id="checkLogins" name="checkLogins" value="<TMPL_VAR NAME="CHECKLOGINS">">
+      <input type="hidden" id="checkLogins" name="checkLogins" value="<TMPL_VAR NAME="CHECKLOGINS">" />
+      <input type="hidden" id="stayconnected" name="stayconnected" value="<TMPL_VAR NAME="STAYCONNECTED">" />
       <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
       <TMPL_LOOP NAME="MODULES">
         <button type="submit" name="sf" value="<TMPL_VAR NAME="CODE">" class="mx-3 btn btn-light" role="button">

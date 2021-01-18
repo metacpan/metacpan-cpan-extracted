@@ -1,4 +1,4 @@
-# Copyrights 2007-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2021 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Log::Report::Dispatcher::Try;
 use vars '$VERSION';
-$VERSION = '1.29';
+$VERSION = '1.31';
 
 use base 'Log::Report::Dispatcher';
 
@@ -17,7 +17,7 @@ use strict;
 
 use Log::Report 'log-report', syntax => 'SHORT';
 use Log::Report::Exception ();
-use Log::Report::Util      qw/%reason_code/;
+use Log::Report::Util      qw/%reason_code expand_reasons/;
 use List::Util             qw/first/;
 
 
@@ -49,21 +49,13 @@ sub died(;$)
 sub exceptions() { @{shift->{exceptions}} }
 
 
-sub hides($)
-{   my $h = shift->{hides} or return 0;
-    keys %$h ? $h->{(shift)} : 1;
-}
+sub hides($) { $_[0]->{LRDT_hides}{$_[1]} }
 
 
 sub hide(@)
 {   my $self = shift;
-    my @h = map { ref $_ eq 'ARRAY' ? @$_ : defined($_) ? $_ : () } @_;
-
-    $self->{hides}
-      = @h==0 ? undef
-      : @h==1 && $h[0] eq 'ALL'  ? {}    # empty HASH = ALL
-      : @h==1 && $h[0] eq 'NONE' ? undef
-      :    +{ map +($_ => 1), @h };
+    my @reasons = expand_reasons(@_ > 1 ? \@_ : shift);
+    $self->{LRDT_hides} = +{ map +($_ => 1), @reasons };
 }
 
 
@@ -106,7 +98,6 @@ sub reportAll(@)   { $_->throw(@_) for shift->exceptions }
 
 sub failed()  {   defined shift->{died}}
 sub success() { ! defined shift->{died}}
-
 
 
 sub wasFatal(@)

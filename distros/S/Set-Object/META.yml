@@ -1,30 +1,36 @@
----
-abstract: 'Unordered collections (sets) of Perl Objects'
+--- #YAML:1.0
+name:               Set-Object
+version:            1.41
+abstract:           Unordered collections (sets) of Perl Objects
 author:
-  - 'Jean-Louis Leroy and Sam Vilain'
-build_requires:
-  ExtUtils::MakeMaker: '0'
+    - Jean-Louis Leroy, Sam Vilain and Reini Urban
+license:            Artistic_2
+distribution_type:  module
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
-license: artistic_2
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
-name: Set-Object
-no_index:
-  directory:
-    - t
-    - inc
-recommends:
-  Moose: '0'
-  Test::LeakTrace: '0'
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
 requires:
-  Scalar::Util: '0'
-  Test::More: '0'
+    Scalar::Util:  0
+    Test::More:    0
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/rurban/Set-Object.git
-version: '1.40'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+    license:
+        - http://dev.perl.org/licenses/
+    repository:
+        type:  git
+        url:   git://github.com/rurban/Set-Object.git
+        web:   https://github.com/rurban/Set-Object
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  2
+dynamic_config:     0
+prereqs:
+    develop:
+        requires:
+            Moose:            0
+            Test::LeakTrace:  0

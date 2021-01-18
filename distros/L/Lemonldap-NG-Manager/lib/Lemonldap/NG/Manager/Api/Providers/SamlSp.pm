@@ -1,10 +1,10 @@
 package Lemonldap::NG::Manager::Api::Providers::SamlSp;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
 package Lemonldap::NG::Manager::Api;
 
-use 5.10.0;
+use strict;
 use utf8;
 use Mouse;
 
@@ -95,6 +95,9 @@ sub addSamlSp {
 
     return $self->sendError( $req, 'Invalid input: metadata is missing', 400 )
       unless ( defined $add->{metadata} );
+
+    return $self->sendError( $req, 'Invalid input: confKey is empty', 400 )
+      unless ( $add->{confKey} );
 
     my $entityId = $self->_readSamlSpEntityId( $add->{metadata} );
 
@@ -234,7 +237,7 @@ sub deleteSamlSp {
     delete $conf->{samlSPMetaDataMacros}->{$confKey};
 
     # Save configuration
-    $self->_confAcc->saveConf($conf);
+    $self->_saveApplyConf($conf);
 
     return $self->sendJSONresponse( $req, undef, code => 204 );
 }
@@ -252,8 +255,11 @@ sub _getSamlSpByConfKey {
     my $options = {};
     for my $confOption ( keys %{ $conf->{samlSPMetaDataOptions}->{$confKey} } )
     {
-        $options->{ $self->_translateOptionConfToApi($confOption) } =
-          $conf->{samlSPMetaDataOptions}->{$confKey}->{$confOption};
+        my $optionName  = $self->_translateOptionConfToApi($confOption);
+        my $optionValue = $self->_translateValueConfToApi( $confOption,
+            $conf->{samlSPMetaDataOptions}->{$confKey}->{$confOption} );
+
+        $options->{$optionName} = $optionValue;
     }
 
     # Get macros
@@ -369,13 +375,16 @@ sub _pushSamlSp {
     }
 
     $conf->{samlSPMetaDataXML}->{$confKey}->{samlSPMetaDataXML} =
-      $push->{metadata};
+      $push->{metadata}
+      if defined $push->{metadata};
 
     if ( defined $push->{options} ) {
 
         foreach ( keys %{ $push->{options} } ) {
-            $translatedOptions->{ $self->_translateOptionApiToConf( $_,
-                    'samlSP' ) } = $push->{options}->{$_};
+            my $optionName = $self->_translateOptionApiToConf( $_, 'samlSP' );
+            my $optionValue =
+              $self->_translateValueApiToConf( $_, $push->{options}->{$_} );
+            $translatedOptions->{$optionName} = $optionValue;
         }
 
         my $res = $self->_hasAllowedAttributes( $translatedOptions,
@@ -431,7 +440,7 @@ sub _pushSamlSp {
     }
 
     # Save configuration
-    $self->_confAcc->saveConf($conf);
+    $self->_saveApplyConf($conf);
 
     return { res => 'ok' };
 }

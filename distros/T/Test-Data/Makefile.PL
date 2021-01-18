@@ -49,7 +49,7 @@ my %WriteMakefile = (
 	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
-	'LICENSE'		=> 'artistic2',
+	'LICENSE'		=> 'artistic_2',
 	'AUTHOR'		=> 'brian d foy <bdfoy@cpan.org>',
 
   	'CONFIGURE_REQUIRES' => {
@@ -62,7 +62,7 @@ my %WriteMakefile = (
 	'TEST_REQUIRES' => {
 		'Test::Builder'         => '0',
 		'Test::Builder::Tester' => '0',
-		'Test::More'            => '0.95',
+		'Test::More'            => '1',
 		},
 
 	'PREREQ_PM'     => {

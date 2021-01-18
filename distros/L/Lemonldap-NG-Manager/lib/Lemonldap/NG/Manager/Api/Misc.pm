@@ -1,10 +1,11 @@
 # Miscenalleous endpoints
 package Lemonldap::NG::Manager::Api::Misc;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 package Lemonldap::NG::Manager::Api;
 
+use strict;
 use Mouse;
 extends 'Lemonldap::NG::Manager::Api::Common';
 
@@ -85,16 +86,11 @@ sub _getSessionDBState {
 
     # Handle DBI-type session stores
     if ( $fakeobj->{object_store}->isa("Apache::Session::Store::DBI") ) {
-        #
+
         # The 'connection' method will fail if the DB is unreachable
         # this is good enough a test for now
         eval { $fakeobj->{object_store}->connection($fakeobj) };
-        if ($@) {
-            return 0;
-        }
-        else {
-            return 1;
-        }
+        return $@ ? 0 : 1;
     }
 
     # Handle MongoDB
@@ -105,17 +101,11 @@ sub _getSessionDBState {
             $fakeobj->{object_store}->connection($fakeobj);
             $fakeobj->{object_store}->{collection}->estimated_document_count;
         };
-        if ($@) {
-            return 0;
-        }
-        else {
-            return 1;
-        }
+        return $@ ? 0 : 1;
     }
 
     # We don't know
     return 2;
-
 }
 
 sub _getObjectSessionModule {

@@ -381,27 +381,39 @@ function templates(tpl,key) {
       "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataExportedVars",
       "default" : [
          {
-            "data" : "mail",
+            "data" : [
+               "mail",
+               "string",
+               "auto"
+            ],
             "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataExportedVars/email",
             "title" : "email",
-            "type" : "keyText"
+            "type" : "oidcAttribute"
          },
          {
-            "data" : "sn",
+            "data" : [
+               "sn",
+               "string",
+               "auto"
+            ],
             "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataExportedVars/family_name",
             "title" : "family_name",
-            "type" : "keyText"
+            "type" : "oidcAttribute"
          },
          {
-            "data" : "cn",
+            "data" : [
+               "cn",
+               "string",
+               "auto"
+            ],
             "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataExportedVars/name",
             "title" : "name",
-            "type" : "keyText"
+            "type" : "oidcAttribute"
          }
       ],
       "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataExportedVars",
       "title" : "oidcRPMetaDataExportedVars",
-      "type" : "keyTextContainer"
+      "type" : "oidcAttributeContainer"
    },
    {
       "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsExtraClaims",
@@ -708,6 +720,35 @@ function templates(tpl,key) {
    },
    {
       "_nodes" : [
+         {
+            "default" : "",
+            "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsSignatureMethod",
+            "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsSignatureMethod",
+            "select" : [
+               {
+                  "k" : "",
+                  "v" : "default"
+               },
+               {
+                  "k" : "RSA_SHA1",
+                  "v" : "RSA SHA1"
+               },
+               {
+                  "k" : "RSA_SHA256",
+                  "v" : "RSA SHA256"
+               },
+               {
+                  "k" : "RSA_SHA384",
+                  "v" : "RSA SHA384"
+               },
+               {
+                  "k" : "RSA_SHA512",
+                  "v" : "RSA SHA512"
+               }
+            ],
+            "title" : "samlIDPMetaDataOptionsSignatureMethod",
+            "type" : "select"
+         },
          {
             "default" : -1,
             "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsSignSSOMessage",
@@ -1103,6 +1144,35 @@ function templates(tpl,key) {
          {
             "_nodes" : [
                {
+                  "default" : "",
+                  "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsSignatureMethod",
+                  "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsSignatureMethod",
+                  "select" : [
+                     {
+                        "k" : "",
+                        "v" : "default"
+                     },
+                     {
+                        "k" : "RSA_SHA1",
+                        "v" : "RSA SHA1"
+                     },
+                     {
+                        "k" : "RSA_SHA256",
+                        "v" : "RSA SHA256"
+                     },
+                     {
+                        "k" : "RSA_SHA384",
+                        "v" : "RSA SHA384"
+                     },
+                     {
+                        "k" : "RSA_SHA512",
+                        "v" : "RSA SHA512"
+                     }
+                  ],
+                  "title" : "samlSPMetaDataOptionsSignatureMethod",
+                  "type" : "select"
+               },
+               {
                   "default" : -1,
                   "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsSignSSOMessage",
                   "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsSignSSOMessage",
@@ -1256,6 +1326,12 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"vhostAliases",
             "id" : tpl+"s/"+key+"/"+"vhostAliases",
             "title" : "vhostAliases"
+         },
+         {
+            "default" : "",
+            "get" : tpl+"s/"+key+"/"+"vhostAccessToTrace",
+            "id" : tpl+"s/"+key+"/"+"vhostAccessToTrace",
+            "title" : "vhostAccessToTrace"
          },
          {
             "default" : "Main",

@@ -33,10 +33,11 @@ man-page may contain some useful background information.
 
 Returns a sub-set of all existing message reason labels, based on the
 content $reasons string. The following rules apply:
- REASONS = BLOCK [ ',' BLOCKS]
- BLOCK   = '-' TO | FROM '-' TO | ONE | SOURCE
+
+ REASONS     = BLOCK [ ',' BLOCKS ] | ARRAY-of-REASON
+ BLOCK       = '-' TO | FROM '-' TO | ONE | SOURCE
  FROM,TO,ONE = 'TRACE' | 'ASSERT' | ,,, | 'PANIC'
- SOURCE  = 'USER' | 'PROGRAM' | 'SYSTEM' | 'ALL'
+ SOURCE      = 'USER' | 'PROGRAM' | 'SYSTEM' | 'FATAL' | 'ALL' | 'NONE'
 
 The SOURCE specification group all reasons which are usually related to
 the problem: report about problems caused by the user, reported by
@@ -45,10 +46,13 @@ the program, or with system interaction.
 example: of expended REASONS
 
  WARNING-FAULT # == WARNING,MISTAKE,ERROR,FAULT
+ WARNING,INFO  # == WARNING,INFO
  -INFO         # == TRACE-INFO
  ALERT-        # == ALERT,FAILURE,PANIC
  USER          # == MISTAKE,ERROR
  ALL           # == TRACE-PANIC
+ FATAL         # == ERROR,FAULT,FAILURE,PANIC [1.07]
+ NONE          # ==
 
 =item B<is_fatal>($reason)
 
@@ -132,12 +136,12 @@ For instance, backslash-t is replaced by a tab character.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Optional distribution version 1.06,
-built on February 02, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Optional distribution version 1.07,
+built on January 15, 2021. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2013-2018 by [Mark Overmeer <mark@overmeer.net>]. For other contributors see ChangeLog.
+Copyrights 2013-2021 by [Mark Overmeer <mark@overmeer.net>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

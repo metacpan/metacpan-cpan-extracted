@@ -8,8 +8,6 @@ require Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
     get_xpath
-    override
-    override_verify_x509_verify
     test_xml_attribute_ok
     test_xml_value_ok
     net_saml2_sp
@@ -82,28 +80,6 @@ sub test_xml_value_ok {
         return is($nodes[0]->textContent, $value, ".. and has value '$value'");
     }
     return 0;
-}
-
-sub override {
-  return Sub::Override->override(@_);
-}
-
-# On debian testing we have an issue with an underlying module. For one
-# reason or another I have the module installed, but it breaks on
-# reinstallation. So we mock the module
-#
-# TODO: https://gitlab.com/waterkip/perl-net-saml2/issues/1
-sub override_verify_x509_verify {
-    my $return_ok = shift;
-
-    return override(
-        'Crypt::OpenSSL::VerifyX509::verify' => sub {
-            return $return_ok if $return_ok;
-            die
-
-            "override of Crypt::OpenSSL::VerifyX509::verify says failure!";
-        }
-    );
 }
 
 sub looks_like_a_cert {

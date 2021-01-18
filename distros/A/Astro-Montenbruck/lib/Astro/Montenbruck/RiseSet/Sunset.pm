@@ -10,12 +10,13 @@ use Readonly;
 
 use Math::Trig qw/:pi deg2rad/;
 
+use Astro::Montenbruck::MathUtils qw/quad/;
 use Astro::Montenbruck::Time qw/cal2jd jd_cent/;
 use Astro::Montenbruck::Time::Sidereal qw/ramc/;
 use Astro::Montenbruck::RiseSet::Constants qw/:events :states/;
 
-our @EXPORT_OK = qw/riseset/;
-our $VERSION   = 0.01;
+our @EXPORT_OK = qw/riseset_func/;
+our $VERSION   = 0.02;
 
 sub _cs_phi {
     my $phi  = shift;
@@ -23,97 +24,101 @@ sub _cs_phi {
     cos($rphi), sin($rphi);
 }
 
-# Finds a parabola through 3 points: (-1, $y_minus), (0, $y_0) and (1, $y_plus),
-# that do not lie on straight line.
-# Arguments:
-# $y_minus, $y_0, $y_plus - three Y-values
-# Returns:
-# $nz - number of roots within the interval [-1, +1]
-# $xe, $ye - X and Y of the extreme value of the parabola
-# $zero1 - first root within [-1, +1] (for $nz = 1, 2)
-# $zero2 - second root within [-1, +1] (only for $nz = 2)
-sub _quad {
-    my ( $y_minus, $y_0, $y_plus ) = @_;
-    my $nz = 0;
-    my $a  = 0.5 * ( $y_minus + $y_plus ) - $y_0;
-    my $b  = 0.5 * ( $y_plus - $y_minus );
-    my $c  = $y_0;
-
-    my $xe  = -$b / ( 2 * $a );
-    my $ye  = ( $a * $xe + $b ) * $xe + $c;
-    my $dis = $b * $b - 4 * $a * $c;          # discriminant of y = axx+bx+c
-    my @zeroes;
-    if ( $dis >= 0 ) {
-
-        # parabola intersects x-axis
-        my $dx = 0.5 * sqrt($dis) / abs($a);
-        @zeroes[ 0, 1 ] = ( $xe - $dx, $xe + $dx );
-        $nz++ if abs( $zeroes[0] ) <= 1;
-        $nz++ if abs( $zeroes[1] ) <= 1;
-        $zeroes[0] = $zeroes[1] if $zeroes[0] < -1;
-    }
-    $nz, $xe, $ye, @zeroes;
-}
-
 # Calculates sine of the altitude at hourly intervals.
 sub _sin_alt {
     my ( $jd, $lambda, $cphi, $sphi, $get_position ) = @_;
     my ( $ra, $de ) = $get_position->($jd);
+
+    # hour angle
     my $tau = deg2rad( ramc( $jd, $lambda ) ) - $ra;
     $sphi * sin($de) + $cphi * cos($de) * cos($tau);
 }
 
-sub riseset {
-    my %arg = @_;
-    my $jd0 = cal2jd( @{$arg{date}} );
-    my ( $cphi, $sphi ) = _cs_phi($arg{phi});
+sub riseset_func {
+    my %arg = ( date => undef, phi => undef, lambda => undef, @_ );
+    my $jd0 = cal2jd( @{ $arg{date} } );
+    my ( $cphi, $sphi ) = _cs_phi( $arg{phi} );
+
     my $sin_alt = sub {
-        my $hour = shift;
-        _sin_alt( $jd0 + $hour / 24, $arg{lambda}, $cphi, $sphi, $arg{get_position} );
+        my ( $hour, $get_position ) = @_;
+        _sin_alt( $jd0 + $hour / 24, $arg{lambda}, $cphi, $sphi,
+            $get_position );
     };
-    my $hour    = 1;
-    my $y_minus = $sin_alt->( $hour - 1 ) - $arg{sin_h0};
-    my $above   = $y_minus > 0;
-    my ( $rise_found, $set_found ) = ( 0, 0 );
 
-    # loop over search intervals from [0h-2h] to [22h-24h]
-    do {
-        my $y_0    = $sin_alt->($hour) - $arg{sin_h0};
-        my $y_plus = $sin_alt->( $hour + 1 ) - $arg{sin_h0};
+    sub {
+        # h0 = altitude corection
+        my %arg = (
+            sin_h0 => undef,          # sine of altitude correction
+            get_position =>
+              undef
+            ,    # function for calculation equatorial coordinates of the body
+            on_event   => sub { },    # callback for rise/set event
+            on_noevent => sub { },    # callback when an event is missing
+            @_
+        );
 
-        # find parabola through three values $y_minus, $y_0, $y_plus
-        my ( $nz, $xe, $ye, @zeroes ) = _quad( $y_minus, $y_0, $y_plus );
-        given ($nz) {
-            when (1) {
-                if ( $y_minus < 0 ) {
-                    $arg{on_event}->( $EVT_RISE, $hour + $zeroes[0] );
-                    $rise_found = 1;
+        my $get_coords = $arg{get_position};
+        my $sin_h0     = $arg{sin_h0};
+        my $on_event   = $arg{on_event};
+
+        my $hour    = 1;
+        my $y_minus = $sin_alt->( $hour - 1, $get_coords ) - $sin_h0;
+        my $above   = $y_minus > 0;
+        my ( $rise_found, $set_found ) = ( 0, 0 );
+
+        my $jd_with_hour = sub { $jd0 + $_[0] / 24 };
+
+        # loop over search intervals from [0h-2h] to [22h-24h]
+        do {
+            my $y_0    = $sin_alt->( $hour,     $get_coords ) - $sin_h0;
+            my $y_plus = $sin_alt->( $hour + 1, $get_coords ) - $sin_h0;
+
+            # find parabola through three values $y_minus, $y_0, $y_plus
+            my ( $nz, $xe, $ye, @zeroes ) = quad( $y_minus, $y_0, $y_plus );
+            given ($nz) {
+                when (1) {
+                    if ( $y_minus < 0 ) {
+                        $on_event->(
+                            $EVT_RISE, $jd_with_hour->( $hour + $zeroes[0] )
+                        );
+                        $rise_found = 1;
+                    }
+                    else {
+                        $on_event->(
+                            $EVT_SET, $jd_with_hour->( $hour + $zeroes[0] )
+                        );
+                        $set_found = 1;
+                    }
                 }
-                else {
-                    $arg{on_event}->( $EVT_SET, $hour + $zeroes[0] );
-                    $set_found = 1;
+                when (2) {
+                    if ( $ye < 0 ) {
+                        $on_event->(
+                            $EVT_RISE, $jd_with_hour->( $hour + $zeroes[1] )
+                        );
+                        $on_event->(
+                            $EVT_SET, $jd_with_hour->( $hour + $zeroes[0] )
+                        );
+                    }
+                    else {
+                        $on_event->(
+                            $EVT_RISE, $jd_with_hour->( $hour + $zeroes[0] )
+                        );
+                        $on_event->(
+                            $EVT_SET, $jd_with_hour->( $hour + $zeroes[1] )
+                        );
+                    }
+                    ( $rise_found, $set_found ) = ( 1, 1 );
                 }
             }
-            when (2) {
-                if ( $ye < 0 ) {
-                    $arg{on_event}->( $EVT_RISE, $hour + $zeroes[1] );
-                    $arg{on_event}->( $EVT_SET,  $hour + $zeroes[0] );
-                }
-                else {
-                    $arg{on_event}->( $EVT_RISE, $hour + $zeroes[0] );
-                    $arg{on_event}->( $EVT_SET,  $hour + $zeroes[1] );
-                }
-                ( $rise_found, $set_found ) = ( 1, 1 );
-            }
-        }
 
-        # prepare for next interval
-        $y_minus = $y_plus;
-        $hour += 2;
-    } until ( ( $hour == 25 ) || ( $rise_found && $set_found ) );
+            # prepare for next interval
+            $y_minus = $y_plus;
+            $hour += 2;
+        } until ( ( $hour == 25 ) || ( $rise_found && $set_found ) );
 
-    $arg{on_noevent}->( $above ? $STATE_CIRCUMPOLAR : $STATE_NEVER_RISES)
-        unless ( $rise_found || $set_found );
+        $arg{on_noevent}->( $above ? $STATE_CIRCUMPOLAR : $STATE_NEVER_RISES )
+          unless ( $rise_found || $set_found );
+    }
 }
 
 1;
@@ -131,20 +136,23 @@ Astro::Montenbruck::RiseSet::Sunset — rise and set.
 
     use Astro::Montenbruck::MathUtils qw/frac/;
     use Astro::Montenbruck::RiseSet::Constants qw/:events :altitudes/;
-    use Astro::Montenbruck::RiseSet::Sunset qw/:riseset/;
+    use Astro::Montenbruck::RiseSet::Sunset qw/:riseset_func/;
 
-    riseset(
+    my $func = riseset_func(
         date     => [1989, 3, 23],
         phi    => 48.1,
-        lambda => -11.6,
+        lambda => -11.6
+    );
+
+    $func->(
         get_position => sub {
             my $jd = shift;
             # return equatorial coordinates of the celestial body for the Julian Day.
         },
         sin_h0       => sin( deg2rad($H0_PLANET) ),
         on_event     => sub {
-            my ($evt, $ut) = @_;
-            say "$evt: $ut";
+            my ($evt, $jd) = @_;
+            say "$evt: $jd";
         },
         on_noevent   => sub {
             my $state = shift;

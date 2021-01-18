@@ -58,6 +58,7 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Number::Number        Sidef::Types::Number::Number
                   Sidef::DataTypes::Number::Mod           Sidef::Types::Number::Mod
                   Sidef::DataTypes::Number::Gauss         Sidef::Types::Number::Gauss
+                  Sidef::DataTypes::Number::Quadratic     Sidef::Types::Number::Quadratic
                   Sidef::DataTypes::Number::Complex       Sidef::Types::Number::Complex
                   Sidef::DataTypes::Range::Range          Sidef::Types::Range::Range
                   Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber
@@ -1658,8 +1659,8 @@ HEADER
                             'do{my$cmp='
                           . $code . 'cmp'
                           . $self->deparse_args(@{$call->{arg}})
-                          . ';ref($cmp) ? $cmp : (($cmp<0) ? Sidef::Types::Number::Number::MONE : '
-                          . '($cmp>0) ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::ZERO)}';
+                          . ';ref($cmp) ? $cmp : defined($cmp) ? (($cmp<0) ? Sidef::Types::Number::Number::MONE : '
+                          . '($cmp>0) ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::ZERO) : undef}';
                         next;
                     }
 

@@ -15,7 +15,7 @@
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <div class="input-group-text">
-          <input type="checkbox" id="stayconnected" name="stayconnected" aria-describedby="stayConnectedLabel" />
+          <input type="checkbox" id="stayconnected" name="stayconnected" aria-describedby="stayConnectedLabel" <TMPL_IF NAME="ASK_STAYCONNECTED">checked</TMPL_IF> />
         </div>
       </div>
       <p class="form-control">

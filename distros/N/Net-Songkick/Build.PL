@@ -25,7 +25,14 @@ my $build = Module::Build->new(
     script_files       => [ 'bin/gigs' ],
     meta_merge         => {
         resources => {
-            repository => 'https://github.com/davorg/net-songkick',
+            repository => {
+                type => 'git',
+                web => 'https://github.com/davorg/net-songkick',
+                url => 'https://github.com/davorg/net-songkick.git',
+            },
+            bugtracker => {
+                web => 'https://github.com/davorg/net-songkick/issues',
+            },
         },
     },
 );

@@ -1,13 +1,12 @@
 package Lemonldap::NG::Common::PSGI::Request;
 
 use strict;
-use 5.14.0;
 use Mouse;
 use JSON;
 use Plack::Request;
 use URI::Escape;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
 our @ISA = ('Plack::Request');
 

@@ -5,18 +5,19 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
-extends 'Lemonldap::NG::Portal::Main::Plugin',
-  'Lemonldap::NG::Portal::Lib::U2F';
+extends qw(
+  Lemonldap::NG::Portal::Main::Plugin
+  Lemonldap::NG::Portal::Lib::U2F
+);
 
 # INITIALIZATION
 
-has prefix => ( is => 'rw', default => 'u' );
-
+has prefix   => ( is => 'rw', default => 'u' );
 has template => ( is => 'ro', default => 'u2fregister' );
-
-has logo => ( is => 'rw', default => 'u2f.png' );
+has welcome  => ( is => 'ro', default => 'u2fWelcome' );
+has logo     => ( is => 'rw', default => 'u2f.png' );
 
 sub init {
     my ($self) = @_;
@@ -30,15 +31,19 @@ sub init {
 sub run {
     my ( $self, $req, $action ) = @_;
     my $user = $req->userData->{ $self->conf->{whatToTrace} };
-    unless ($user) {
-        return $self->p->sendError( $req,
-            'No ' . $self->conf->{whatToTrace} . ' found in user data', 500 );
-    }
+
+    return $self->p->sendError( $req,
+        'No ' . $self->conf->{whatToTrace} . ' found in user data', 500 )
+      unless $user;
+
+    # Check if U2F key can be updated
+    my $msg = $self->canUpdateSfa( $req, $action );
+    return $self->p->sendError( $req, $msg, 400 ) if $msg;
 
     if ( $action eq 'register' ) {
 
         # Read existing 2FDevices
-        $self->logger->debug("Looking for 2F Devices ...");
+        $self->logger->debug("Looking for 2F Devices...");
         my $_2fDevices;
         if ( $req->userData->{_2fDevices} ) {
             $_2fDevices = eval {
@@ -50,7 +55,6 @@ sub run {
                 return $self->p->sendError( $req, "Corrupted session", 500 );
             }
         }
-
         else {
             $self->logger->debug("No 2F Device found");
             $_2fDevices = [];
@@ -59,7 +63,7 @@ sub run {
         # Check if user can register one more 2F device
         my $size    = @$_2fDevices;
         my $maxSize = $self->conf->{max2FDevices};
-        $self->logger->debug("Registered 2F Device(s) : $size / $maxSize");
+        $self->logger->debug("Registered 2F Device(s): $size / $maxSize");
         if ( $size >= $maxSize ) {
             $self->userLogger->warn("Max number of 2F devices is reached");
             return $self->p->sendError( $req, 'maxNumberof2FDevicesReached',
@@ -99,7 +103,7 @@ sub run {
             if ( $keyHandle and $userKey ) {
 
                 # Read existing 2FDevices
-                $self->logger->debug("Looking for 2F Devices ...");
+                $self->logger->debug("Looking for 2F Devices...");
                 my $_2fDevices;
                 if ( $req->userData->{_2fDevices} ) {
                     $_2fDevices = eval {
@@ -115,7 +119,6 @@ sub run {
                             500 );
                     }
                 }
-
                 else {
                     $self->logger->debug("No 2F Device found");
                     $_2fDevices = [];
@@ -132,7 +135,7 @@ sub run {
                 }
                 $keyName =
                   substr( $keyName, 0, $self->conf->{max2FDevicesNameLength} );
-                $self->logger->debug("Key name : $keyName");
+                $self->logger->debug("Key name: $keyName");
 
                 push @{$_2fDevices},
                   {
@@ -143,7 +146,7 @@ sub run {
                     epoch      => $epoch
                   };
                 $self->logger->debug(
-                    "Append 2F Device : { type => 'U2F', name => $keyName }");
+                    "Append 2F Device: { type => 'U2F', name => $keyName }");
                 $self->p->updatePersistentSession( $req,
                     { _2fDevices => to_json($_2fDevices) } );
                 $self->userLogger->notice(
@@ -182,13 +185,6 @@ sub run {
         }
 
         # Get registered keys
-
-        # my @rk;
-        # foreach ( @{ $req->data->{crypter} } ) {
-        #     my $k = push @rk,
-        #       { keyHandle => $_->{keyHandle}, version => $data->{version} };
-        # }
-
         my @rk =
           map { { keyHandle => $_->{keyHandle}, version => $data->{version} } }
           @{ $req->data->{crypter} };
@@ -230,10 +226,6 @@ sub run {
             return $self->p->sendError( $req, "U2FAnswerError" );
         }
 
-        # my $crypter;
-        # foreach ( @{ $req->data->{crypter} } ) {
-        #     $crypter = $_ if ( $_->{keyHandle} eq $data->{keyHandle} );
-        # }
         $crypter = $_
           foreach grep { $_->{keyHandle} eq $data->{keyHandle} }
           @{ $req->data->{crypter} };
@@ -246,7 +238,6 @@ sub run {
         if ( not $crypter->setChallenge($challenge) ) {
             $self->logger->error(
                 $@ ? $@ : Crypt::U2F::Server::Simple::lastError() );
-
             return $self->p->sendError( $req, "U2FServerError" );
         }
 
@@ -269,7 +260,7 @@ sub run {
             400 );
 
         # Read existing 2FDevices
-        $self->logger->debug("Looking for 2F Devices ...");
+        $self->logger->debug("Looking for 2F Devices...");
         my ( $_2fDevices, $keyName );
         if ( $req->userData->{_2fDevices} ) {
             $_2fDevices = eval {
@@ -287,27 +278,30 @@ sub run {
         }
 
         # Delete U2F device
-
-        # my $keyName;
-        # foreach (@$_2fDevices) {
-        #     $keyName = $_->{name} if $_->{epoch} eq $epoch;
-        # }
-
-        $keyName = $_->{name}
-          foreach grep { $_->{epoch} eq $epoch } @$_2fDevices;
-        @$_2fDevices = grep { $_->{epoch} ne $epoch } @$_2fDevices;
-        $self->logger->debug(
-"Delete 2F Device : { type => 'U2F', epoch => $epoch, name => $keyName }"
-        );
-        $self->p->updatePersistentSession( $req,
-            { _2fDevices => to_json($_2fDevices) } );
-        $self->userLogger->notice(
-            "U2F key $keyName unregistration succeeds for $user");
-        return [
-            200,
-            [ 'Content-Type' => 'application/json', 'Content-Length' => 12, ],
-            ['{"result":1}']
-        ];
+        @$_2fDevices = map {
+            if ( $_->{epoch} eq $epoch ) { $keyName = $_->{name}; () }
+            else                         { $_ }
+        } @$_2fDevices;
+        if ($keyName) {
+            $self->logger->debug(
+"Delete 2F Device: { type => 'U2F', epoch => $epoch, name => $keyName }"
+            );
+            $self->p->updatePersistentSession( $req,
+                { _2fDevices => to_json($_2fDevices) } );
+            $self->userLogger->notice(
+                "U2F key $keyName unregistration succeeds for $user");
+            return [
+                200,
+                [
+                    'Content-Type'   => 'application/json',
+                    'Content-Length' => 12,
+                ],
+                ['{"result":1}']
+            ];
+        }
+        else {
+            $self->p->sendError( $req, '2FDeviceNotFound', 400 );
+        }
     }
     else {
         $self->logger->error("Unknown U2F action -> $action");
@@ -318,10 +312,10 @@ sub run {
 
 sub loadUser {
     my ( $self, $req ) = @_;
-    $self->logger->debug("Loading user U2F Devices ...");
+    $self->logger->debug("Loading user U2F Devices...");
 
     # Read existing 2FDevices
-    $self->logger->debug("Looking for 2F Devices ...");
+    $self->logger->debug("Looking for 2F Devices...");
     my ( $kh, $uk, $_2fDevices );
     my @u2fs = ();
 
@@ -341,7 +335,7 @@ sub loadUser {
 
     # Reading existing U2F keys
     foreach (@$_2fDevices) {
-        $self->logger->debug("Looking for registered U2F key(s) ...");
+        $self->logger->debug("Looking for registered U2F key(s)...");
         if ( $_->{type} eq 'U2F' ) {
             unless ( $_->{_userKey} and $_->{_keyHandle} ) {
                 $self->logger->error(

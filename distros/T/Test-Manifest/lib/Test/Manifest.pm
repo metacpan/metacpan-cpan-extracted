@@ -12,12 +12,12 @@ use File::Spec::Functions qw(catfile);
 our @EXPORT    = qw(run_t_manifest);
 our @EXPORT_OK = qw(get_t_files make_test_manifest manifest_name);
 
-our $VERSION = '2.021';
+our $VERSION = '2.022';
 
 my %SeenInclude = ();
 my %SeenTest = ();
 
-require 5.006;
+require 5.008;
 
 sub MY::test_via_harness {
 	my($self, $perl, $tests) = @_;
@@ -445,7 +445,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

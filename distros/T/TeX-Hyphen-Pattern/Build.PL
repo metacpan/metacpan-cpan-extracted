@@ -4,7 +4,7 @@ use warnings;
 use 5.014000;
 use Module::Build;
 
-our $VERSION = v1.1.5;
+our $VERSION = v1.1.6;
 
 Module::Build->new(
     'module_name' => 'TeX::Hyphen::Pattern',
@@ -39,6 +39,10 @@ Module::Build->new(
         'resources' => {
             'repository' =>
               'https://bitbucket.org/rolandvanipenburg/tex-hyphen-pattern',
+            bugtracker => {
+                web =>
+'https://bitbucket.org/rolandvanipenburg/tex-hyphen-pattern/issues',
+            },
         },
     },
     'sign' => 1,

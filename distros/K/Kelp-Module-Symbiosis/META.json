@@ -32,8 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Kelp" : "1",
-            "Plack" : "1",
+            "Kelp" : "0",
+            "Plack" : "0",
             "perl" : "5.010"
          }
       },
@@ -56,6 +56,6 @@
          "url" : "https://github.com/brtastic/perl-kelp-module-symbiosis"
       }
    },
-   "version" : "1.01",
+   "version" : "1.10",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

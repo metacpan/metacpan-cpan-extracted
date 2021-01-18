@@ -23,6 +23,7 @@ my @files = (
     't/tcp.t',
     't/timer.t',
     't/udp.t',
+    'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
@@ -31,8 +32,7 @@ my @files = (
     'xt/author/portability.t',
     'xt/author/test-version.t',
     'xt/release/common_spelling.t',
-    'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t'
+    'xt/release/cpan-changes.t'
 );
 
 notabs_ok($_) foreach @files;

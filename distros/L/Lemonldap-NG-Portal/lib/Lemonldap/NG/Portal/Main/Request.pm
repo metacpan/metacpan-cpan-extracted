@@ -152,6 +152,12 @@ sub loginInfo {
     print STDERR "TODO Request::loginInfo()\n";
 }
 
+sub setInfo {
+    my ( $self, $info ) = @_;
+    $self->data->{_info} = $info if ( defined $info );
+    return $self->data->{_info};
+}
+
 sub info {
     my ( $self, $info ) = @_;
     $self->data->{_info} .= $info if ( defined $info );

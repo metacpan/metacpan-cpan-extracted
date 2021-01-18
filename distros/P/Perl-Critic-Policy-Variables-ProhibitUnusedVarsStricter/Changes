@@ -1,3 +1,8 @@
+0.109		2021-01-15	T. R. Wyant
+    Add Travis CI testing.
+
+    Use GitHub as bug tracker. R.I.P. rt.cpan.org.
+
 0.108		2020-09-18	T. R. Wyant
     Add POD section AVOIDING UNUSED VARIABLES. Thanks to Ben Martin for
     the suggestion.

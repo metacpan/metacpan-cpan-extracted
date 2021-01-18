@@ -4,7 +4,7 @@ use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
 
 
-use Crypt::OpenSSL::VerifyX509;
+use Crypt::OpenSSL::Verify;
 use Crypt::OpenSSL::X509;
 use HTTP::Request::Common;
 use LWP::UserAgent;
@@ -139,7 +139,7 @@ sub BUILD {
     my($self) = @_;
 
     if ($self->cacert) {
-        my $ca = Crypt::OpenSSL::VerifyX509->new($self->cacert);
+        my $ca = Crypt::OpenSSL::Verify->new($self->cacert, { strict_certs => 0, });
 
         for my $use (keys %{$self->certs}) {
             my $cert = Crypt::OpenSSL::X509->new_from_string($self->certs->{$use});
@@ -220,7 +220,7 @@ Net::SAML2::IdP
 
 =head1 VERSION
 
-version 0.29
+version 0.32
 
 =head1 SYNOPSIS
 

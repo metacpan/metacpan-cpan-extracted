@@ -1,10 +1,10 @@
 use strict;
 use warnings FATAL => 'all';
-use Apache::Test;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Apache::Test;
 use Apache::TestRequest;
 use Apache::TestUtil qw(t_cmp);
 use lib 't';
-use MY::slurp;
+use File::Slurp qw(slurp);
 
 # Test filtered ModPerl::Registry output
 plan tests => 4, need_lwp;
@@ -24,7 +24,6 @@ registry_minified: {
     my $res  = GET '/perl-bin/js.pl';
     my $body = $res->content;
     my $min  = slurp('t/htdocs/minified.txt');
-    chomp($min);
 
     ok( $res->content_type eq 'text/javascript' );
     ok( t_cmp($body, $min) );

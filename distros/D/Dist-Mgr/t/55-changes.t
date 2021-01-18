@@ -6,7 +6,7 @@ use Carp;
 use Cwd qw(getcwd);
 use Data::Dumper;
 use Test::More;
-use Dist::Mgr qw(:all);
+use Dist::Mgr qw(:private);
 use version;
 
 use lib 't/lib';
@@ -14,8 +14,8 @@ use Helper qw(:all);
 use Hook::Output::Tiny;
 
 my $cwd = getcwd();
-like $cwd, qr/dist-mgr(-\d+\.\d+)?(-\d+)?$/i, "in root dir ok";
-die "not in the root dir" if $cwd !~ /dist-mgr(-\d+\.\d+)?(-\d+)?$/i;
+like $cwd, _dist_dir_re(), "in root dir ok";
+die "not in the root dir" if $cwd !~ _dist_dir_re();
 
 my $module_starter_changes_sha = '97624d56464d7254ef5577e4a0c8a098d6c6d9e6';
 

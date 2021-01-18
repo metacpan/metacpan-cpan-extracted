@@ -286,6 +286,14 @@ Return the
 
 =cut
 
+=head2 i
+
+Gauss.i() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 iabs
 
 Gauss.iabs() -> I<Obj>
@@ -410,6 +418,14 @@ Return the
 
 =cut
 
+=head2 ratmod
+
+Gauss.ratmod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 re
 
 Gauss.re() -> I<Obj>
@@ -450,13 +466,7 @@ Gauss.to_c() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 to_n
-
-Gauss.to_n() -> I<Obj>
-
-Return the
+Aliases: I<to_n>
 
 =cut
 

@@ -89,7 +89,7 @@ Net::SAML2::Role::ProtocolMessage - Common behaviour for Protocol messages
 
 =head1 VERSION
 
-version 0.29
+version 0.32
 
 =head1 DESCRIPTION
 

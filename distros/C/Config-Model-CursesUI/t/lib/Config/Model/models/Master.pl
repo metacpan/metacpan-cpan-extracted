@@ -77,13 +77,15 @@
 			   },
 	       warp2 => {
 			 type => 'warped_node',
-			 follow  => '! tree_macro',
 			 config_class_name   => 'SubSlave', 
 			 morph => 1 ,
-			 rules => [
-				   mXY => { config_class_name => 'SubSlave2'},
-				   XZ  => { config_class_name => 'SubSlave2'}
-				  ]
+			 warp => {
+                 follow  => '! tree_macro',
+                 rules => [
+                     mXY => { config_class_name => 'SubSlave2'},
+                     XZ  => { config_class_name => 'SubSlave2'}
+                 ]
+             }
 			},
 	       Y => { type => 'leaf',
 		      value_type => 'enum',
@@ -194,16 +196,17 @@
 				       }
 			     },
 	       warp => {
-			type => 'warped_node',
-			follow  => '! tree_macro',
-			config_class_name   => 'SlaveY', 
-			morph => 1 ,
-			rules => [
-				  #XY => { config_class_name => 'SlaveY'},
-				  mXY => { config_class_name => 'SlaveY'},
-				  XZ  => { config_class_name => 'SlaveZ'}
-				 ]
-		       },
+               type => 'warped_node',
+               config_class_name   => 'SlaveY',
+               morph => 1 ,
+               warp => {
+                   follow  => '! tree_macro',
+                   rules => [
+                       mXY => { config_class_name => 'SlaveY'},
+                       XZ  => { config_class_name => 'SlaveZ'}
+                   ]
+               }
+           },
 
 	       'slave_y' => { type => 'node',
 			      config_class_name => 'SlaveY' ,

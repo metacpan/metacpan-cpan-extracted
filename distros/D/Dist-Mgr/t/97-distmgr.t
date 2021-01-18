@@ -11,7 +11,7 @@ use File::Path qw(make_path rmtree);
 use File::Find;
 use JSON;
 use Test::More;
-use Dist::Mgr qw(:all);
+use Dist::Mgr qw(:private);
 use version;
 
 BEGIN {
@@ -231,7 +231,7 @@ sub before {
 }
 sub after {
     chdir $cwd or die $!;
-    like getcwd(), qr/dist-mgr/, "back in root directory $cwd ok";
+    like getcwd(), _dist_dir_re(), "back in root directory $cwd ok";
 }
 sub file_count {
     my ($expected_count, $msg) = @_;

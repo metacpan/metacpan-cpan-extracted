@@ -1,10 +1,11 @@
 package Lemonldap::NG::Common::PSGI::Cli::Lib;
 
+use strict;
 use JSON;
 use Mouse;
 use Lemonldap::NG::Common::PSGI;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
 has iniFile => ( is => 'ro', isa => 'Str' );
 

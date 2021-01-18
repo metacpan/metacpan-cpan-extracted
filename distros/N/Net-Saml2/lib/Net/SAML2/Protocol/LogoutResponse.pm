@@ -83,7 +83,7 @@ Net::SAML2::Protocol::LogoutResponse
 
 =head1 VERSION
 
-version 0.29
+version 0.32
 
 =head1 SYNOPSIS
 

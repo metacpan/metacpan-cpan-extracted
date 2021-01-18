@@ -4,13 +4,18 @@ use strict;
 use Mouse;
 
 # Add constants used by this module
-use Lemonldap::NG::Portal::Main::Constants
-  qw(PE_OK PE_FORBIDDENIP PE_USERNOTFOUND);
-use Lemonldap::NG::Portal::Lib::Slave;
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_FORBIDDENIP
+  PE_USERNOTFOUND
+);
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.10';
 
-extends 'Lemonldap::NG::Portal::Main::Auth';
+extends qw(
+  Lemonldap::NG::Portal::Main::Auth
+  Lemonldap::NG::Portal::Lib::Slave
+);
 
 # INITIALIZATION
 

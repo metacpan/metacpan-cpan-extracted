@@ -47,6 +47,30 @@ This package uses type constraints from:
 
 This package supports the following scenarios:
 
+## $callback
+
+    use Rewire;
+
+    my $services = {
+      io => {
+        package => 'IO/Handle'
+      },
+      log => {
+        package => 'Mojo/Log',
+        argument => {
+          format => { '$callback' => 'io' }
+        }
+      },
+    };
+
+    my $rewire = Rewire->new(
+      services => $services
+    );
+
+This package supports resolving services as callbacks to be passed around
+and/or resolved by other services. The `$callback` directive is used to
+specify the name of a service to be resolved and passed as an argument.
+
 ## $envvar
 
     use Rewire;
@@ -297,6 +321,10 @@ routine. A constructor is always called with the package name as the invocant.
         extends => 'log',
         builder => [
           {
+            method => 'new',
+            return => 'self'
+          },
+          {
             method => 'path',
             argument => '/tmp/development.log',
             return => 'none'
@@ -313,6 +341,10 @@ routine. A constructor is always called with the package name as the invocant.
         extends => 'log',
         builder => [
           {
+            method => 'new',
+            return => 'self'
+          },
+          {
             method => 'path',
             argument => '/tmp/production.log',
             return => 'none'
@@ -324,6 +356,14 @@ routine. A constructor is always called with the package name as the invocant.
           }
         ]
       },
+      staging_log => {
+        package => 'Mojo/Log',
+        extends => 'development_log',
+      },
+      testing_log => {
+        package => 'Mojo/Log',
+        extends => 'log',
+      },
     };
 
     my $rewire = Rewire->new(
@@ -331,8 +371,8 @@ routine. A constructor is always called with the package name as the invocant.
     );
 
 This package supports extending services in the definition of other services,
-effectively using the extended service as the invocant in the creation of the
-requested service.
+recursively compiling service configurations and eventually executing the
+requested compiled service.
 
 ## function
 
@@ -707,18 +747,18 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 
 This is free software; you can redistribute it and/or modify it under the terms
 of the The Apache License, Version 2.0, as elucidated in the ["license
-file"](https://github.com/iamalnewkirk/rewire/blob/master/LICENSE).
+file"](https://github.com/cpanery/rewire/blob/master/LICENSE).
 
 # PROJECT
 
-[Wiki](https://github.com/iamalnewkirk/rewire/wiki)
+[Wiki](https://github.com/cpanery/rewire/wiki)
 
-[Project](https://github.com/iamalnewkirk/rewire)
+[Project](https://github.com/cpanery/rewire)
 
-[Initiatives](https://github.com/iamalnewkirk/rewire/projects)
+[Initiatives](https://github.com/cpanery/rewire/projects)
 
-[Milestones](https://github.com/iamalnewkirk/rewire/milestones)
+[Milestones](https://github.com/cpanery/rewire/milestones)
 
-[Contributing](https://github.com/iamalnewkirk/rewire/blob/master/CONTRIBUTE.md)
+[Contributing](https://github.com/cpanery/rewire/blob/master/CONTRIBUTE.md)
 
-[Issues](https://github.com/iamalnewkirk/rewire/issues)
+[Issues](https://github.com/cpanery/rewire/issues)

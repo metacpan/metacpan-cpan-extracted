@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2020 by Dominique Dumont.
+# This software is Copyright (c) 2005-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader 2.140;
+package Config::Model::Loader 2.141;
 
 use Carp;
 use strict;
@@ -17,6 +17,9 @@ use Mouse;
 
 use Config::Model::Exception;
 use Log::Log4perl qw(get_logger :levels);
+use JSON;
+use Path::Tiny;
+use YAML::Tiny;
 
 my $logger = get_logger("Loader");
 my $verbose_logger = get_logger("Verbose.Loader");
@@ -508,6 +511,7 @@ sub _load_check_list {
         },
         fallback => {
             ':.rm' => \&_remove_by_id,
+            ':.json' => \&_load_json_vector_data,
         }
     );
 
@@ -557,6 +561,19 @@ sub _remove_by_id {
     my ( $self, $element, $check, $inst, $cmdref, $id ) = @_;
     $logger->debug("_remove_by_id: removing id '$id'");
     $element->remove($id);
+    return 'ok';
+}
+
+sub _load_json_vector_data {
+    my ( $self, $element, $check, $inst, $cmdref, $vector ) = @_;
+    $logger->debug("_load_json_vector_data: loading '$vector'");
+    my ($file, @vector) = $self->__get_file_from_vector($element,$inst,$vector);
+    my $data = decode_json($file->slurp_utf8);
+    # test for diff before clobbering ? What about deep data ???
+    $element->load_data(
+        data => __data_from_vector($data, @vector),
+        check => $check
+    );
     return 'ok';
 }
 
@@ -871,6 +888,8 @@ my %load_value_dispatch = (
     '.=' => \&_append_value,
     '=~' => \&_apply_regexp_on_value,
     '=.file' => \&_store_file_in_value,
+    '=.json' => \&_store_json_vector_in_value,
+    '=.yaml' => \&_store_yaml_vector_in_value,
     '=.env' => sub { $_[1]->store( value => $ENV{$_[2]}, check => $_[3] ); return 'ok'; },
 );
 
@@ -944,6 +963,63 @@ sub _store_file_in_value {
     }
 }
 
+sub __data_from_vector {
+    my ($data, @vector) = @_;
+    for my $step (@vector) {
+        $data = (ref($data) eq 'HASH') ? $data->{$step} : $data->[$step];
+    }
+    return $data;
+}
+
+sub __get_file_from_vector {
+    my ($self, $element,$instructions,$raw_vector) =  @_;
+    my @vector = split m![/]+!m, $raw_vector;
+    my $cur = path('.');
+    my $file;
+    while (my $subpath = shift @vector) {
+        my $new_path = $cur->child($subpath);
+        if ($new_path->is_file) {
+            $file = $new_path;
+            last;
+        }
+        elsif ($new_path->is_dir) {
+            $cur = $new_path;
+        }
+    }
+    if (not defined $file) {
+        my ( $element_name, $action, $f_arg, $id, $subaction, $value, $note )
+            = @$instructions;
+        Config::Model::Exception::Load->throw(
+            object  => $element,
+            command => "$element_name"
+                . ( $action    ? "$action($f_arg)"    : '' )
+                . ( $subaction ? "$subaction($value)" : '' ),
+            error   => qq!Load error: Cannot find file in $value!
+        );
+    }
+    return ($file, @vector);
+}
+
+sub _store_json_vector_in_value {
+    my ( $self, $element, $value, $check, $instructions, $cmd ) = @_;
+    my ($file, @vector) = $self->__get_file_from_vector($element,$instructions,$value);
+    my $data = decode_json($file->slurp_utf8);
+    $element->store(
+        value => __data_from_vector($data, @vector),
+        check => $check
+    );
+}
+
+sub _store_yaml_vector_in_value {
+    my ( $self, $element, $value, $check, $instructions, $cmd ) = @_;
+    my ($file, @vector) = $self->__get_file_from_vector($element,$instructions,$value);
+    my $data = YAML::Tiny->read($file->stringify);
+    $element->store(
+        value => __data_from_vector($data, @vector),
+        check => $check
+    );
+}
+
 sub _load_value {
     my ( $self, $element, $check, $subaction, $value, $instructions, $cmd ) = @_;
 
@@ -989,7 +1065,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.140
+version 2.141
 
 =head1 SYNOPSIS
 
@@ -1196,7 +1272,7 @@ Does not not complain if the value to delete is not found.
 Remove the element whose value matches C<yy>. For list or hash of leaves.
 Does not not complain if no value were deleted.
 
-=item xxx:.substitute(/yy/zz/) or xxx=~s/yy/zz/
+=item xxx:.substitute(/yy/zz/) or xxx:=~s/yy/zz/
 
 Substitute a value with another. Perl switches can be used(e.g. C<xxx:=~s/yy/zz/gi>)
 
@@ -1263,6 +1339,15 @@ Using C<xxx:~/yy/=zz> is also possible.
 
 copy item C<yy> in C<zz> (hash or list).
 
+=item xxx:.json("path/to/file.json/foo/bar")
+
+Store C<bar> content in array or hash. This should be used to store
+hash or list of values.
+
+You may store deep data structure. In this case, make sure that the
+structure of the loaded data matches the structure of the model. This
+won't happen by chance.
+
 =item xxx:.clear
 
 Clear the hash or list.
@@ -1307,6 +1392,40 @@ Appends C<zzz> value to current value (valid for C<leaf> elements).
 Store the content of file C<yyy> in element C<xxx>.
 
 Store STDIn in value xxx when C<yyy> is '-'.
+
+=item xxx=.json(path/to/data.json/foo/bar)
+
+Open file C<data.json> and store value from JSON data extracted with
+C<foo/bar> subpath.
+
+For instance, if C<data.json> contains:
+
+ {
+    "foo": {
+       "bar": 42
+    }
+ }
+
+The instruction C<baz=.json(data.json/foo/bar)> stores C<42> in C<baz>
+element.
+
+=item xxx=.yaml(path/to/data.yaml/0/foo/bar)
+
+Open file C<data.yaml> and store value from YAML data extracted with
+C<0/foo/bar> subpath.
+
+Since a YAML file can contain several documents (separated by C<--->
+lines, the subpath must begin with a number to select the document
+containing the required value.
+
+For instance, if C<data.yaml> contains:
+
+  ---
+  foo:
+    bar: 42
+
+The instruction C<baz=.yaml(data.yaml/0/foo/bar)> stores C<42> in
+C<baz> element.
 
 =item xxx=.env(yyy)
 
@@ -1409,7 +1528,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2020 by Dominique Dumont.
+This software is Copyright (c) 2005-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

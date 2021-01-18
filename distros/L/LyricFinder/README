@@ -63,14 +63,20 @@ DESCRIPTION
     LyricFinder accepts an artist name and song title, searches supported
     lyrics sites for song lyrics, and, if found, returns them as a string.
 
-    This module is derived from the (older0 Lyrics::Fetcher collection of
+    The supported and currently-installed modules are: ApiLyricsOvh (for
+    searching api.lyrics.ovh), AZLyrics (www.azlyrics.com), Genius
+    (genius.com), and Musixmatch (www.musixmatch.com). There is a special
+    module for storing and / or fetching lyrics (.lrc) files already stored
+    locally, called Cache.
+
+    This module is derived from the (older) Lyrics::Fetcher collection of
     modules by (c) 2007-2020 David Precious, but currently (as of December,
-    2020) supports more lyric sites (4), bundles all the supported site
-    modules together here (simply install this one module), has reworked the
-    "Cache" module to cache lyrics files by artist and song title on disk in
-    the user's desired location. LyricFinder is also truly object-oriented
-    making interaction with the user-facing methods and data easier and more
-    streamlined.
+    2020) supports more lyric sites (4) and bundles all the supported site
+    modules together here (simply install this one module). We have reworked
+    the "Cache" module to cache lyrics files by artist and song title on
+    disk in the user's desired location. LyricFinder is also truly
+    object-oriented making interaction with the user-facing methods and data
+    easier and more streamlined.
 
     NOTE: This module is used completely independent of any of those
     modules, but the code is derived from them, as allowed by and the
@@ -163,7 +169,7 @@ SUBROUTINES/METHODS
             is called! NOTE: See below how to specify a different agent for
             a specific site module.
 
-        -cache => *"directory"*, and -debug => *integer*.
+        -cache => *"directory"*
             Specifies a directory (ie. "/home/user/Music/Lyricsfiles") to be
             used for disk caching. If specified, this directory will be
             searched for a matching lyrics (.lrc) file (in this example,
@@ -295,7 +301,7 @@ SUBROUTINES/METHODS
 
         The currently-installed and supported modules are: ApiLyricsOvh,
         AZLyrics, Genius, and Musixmatch (NOTE the "x" in the spelling of
-        "Musixmatch"!
+        "Musixmatch")!
 
         Returns lyrics as a string (includes line-breaks appropriate for the
         user's operating system), or an empty string, if no lyrics found.

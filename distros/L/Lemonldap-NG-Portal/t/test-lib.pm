@@ -59,6 +59,7 @@ use File::Find;
 use LWP::UserAgent;
 use Time::Fake;
 use URI::Escape;
+use MIME::Base64;
 use Lemonldap::NG::Common::FormEncode;
 
 #use 5.10.0;
@@ -392,10 +393,10 @@ sub expectPortalError {
     count(1);
 }
 
-=head4 expectReject( $res, $code )
+=head4 expectReject( $res, $status, $code )
 
-Verify that returned code is 401 and JSON result contains C<error:"$code">.
-Note that it works only for Ajax request (see below).
+Verify that returned code is 401 (or $status)  and JSON result contains
+C<error:"$code">.  Note that it works only for Ajax request (see below).
 
 =cut
 
@@ -569,6 +570,17 @@ sub switch {
     };
 }
 
+=head4 encodeUrl( $url );
+
+Encode URL like the handler would, see ::Handler::Main
+
+=cut
+
+sub encodeUrl {
+    my ($url) = @_;
+    return uri_escape( encode_base64( $url, '' ) );
+}
+
 =head2 LLNG::Manager::Test Class
 
 =cut
@@ -598,8 +610,16 @@ our $defaultIni = {
     staticPrefix          => '/static',
     tokenUseGlobalStorage => 0,
     securedCookie         => 0,
-    https                 => 0,
-    globalStorageOptions  => {
+
+    # If lasso is too old, force algo to SHA1
+    (
+        eval
+'use Lasso; Lasso::check_version( 2, 5, 1, Lasso::Constants::CHECK_VERSION_NUMERIC) ? 0:1'
+        ? ( samlServiceSignatureMethod => "RSA_SHA1" )
+        : ()
+    ),
+    https                => 0,
+    globalStorageOptions => {
         Directory     => $tmpDir,
         LockDirectory => "$tmpDir/lock",
         generateModule =>
@@ -669,7 +689,7 @@ has ini => (
         main::ok( $self->{p} = $self->class->new(), 'Portal object' );
         main::count(1);
         unless ( $self->confFailure ) {
-            main::ok( $self->{p}->init($ini),           'Init' );
+            main::ok( $self->{p}->init($ini), 'Init' );
             main::ok( $self->{app} = $self->{p}->run(), 'Portal app' );
             main::count(2);
             no warnings 'redefine';
@@ -690,6 +710,11 @@ has ini => (
                 cn   => 'Русский',
                 mail => 'ru@badwolf.org',
             };
+            push
+              @{ $Lemonldap::NG::Portal::UserDB::Demo::demoGroups{earthlings} },
+              "french", "russian";
+            push @{ $Lemonldap::NG::Portal::UserDB::Demo::demoGroups{users} },
+              "french", "russian", "davros";
         }
         $self;
     }
@@ -800,6 +825,7 @@ sub _get {
             'SERVER_NAME'     => 'auth.example.com',
             'SERVER_PORT'     => '80',
             'SERVER_PROTOCOL' => 'HTTP/1.1',
+            'psgi.url_scheme' => ( $args{secure} ? 'https' : 'http' ),
             ( $args{custom} ? %{ $args{custom} } : () ),
         }
     );
@@ -852,6 +878,7 @@ sub _post {
             'SERVER_NAME'    => 'auth.example.com',
             'SERVER_PORT'    => '80',
             'SERVER_PROTOCOL' => 'HTTP/1.1',
+            'psgi.url_scheme' => ( $args{secure} ? 'https' : 'http' ),
             ( $args{custom} ? %{ $args{custom} } : () ),
             'psgix.input.buffered' => 0,
             'psgi.input'           => $body,

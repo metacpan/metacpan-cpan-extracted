@@ -1,12 +1,12 @@
 package Backup::EZ::Dir;
-$Backup::EZ::Dir::VERSION = '0.45';
+$Backup::EZ::Dir::VERSION = '0.46';
 =head1 NAME
 
 Backup::EZ::Dir
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =cut
 

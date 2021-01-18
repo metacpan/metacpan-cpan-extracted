@@ -1,6 +1,6 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -41,6 +41,22 @@ sub process {
     }
     $self->logger->debug( "Returned " . $self->_formatProcessResult($err) )
       if ($err);
+    return $err;
+}
+
+sub processHook {
+    my ( $self, $req, $hookName, @args ) = @_;
+
+    $self->logger->debug("Calling hook $hookName");
+    my $err = PE_OK;
+    for my $sub ( @{ $self->hook->{$hookName} } ) {
+        if ( ref $sub eq 'CODE' ) {
+            last if ( $err = $sub->( $req, @args ) );
+        }
+        else {
+            $self->logger->debug("Not a code ref: $sub");
+        }
+    }
     return $err;
 }
 
@@ -136,12 +152,12 @@ sub controlUrl {
         }
 
         # Unprotected hosts
-        my ( $vhost, $appuri ) = $tmp =~ m#^https?://([^/]*)(.*)#;
+        my ( $proto, $vhost, $appuri ) = $tmp =~ m#^(https?://)([^/]*)(.*)#;
         $vhost =~ s/:\d+$//;
 
-        # try to resolve alias
+        # Try to resolve alias
         my $originalVhost = $self->HANDLER->resolveAlias($vhost);
-        $vhost = 'http://' . $originalVhost;
+        $vhost = $proto . $originalVhost;
         $self->logger->debug( "Required URL (param: "
               . ( $req->param('logout') ? 'HTTP Referer' : 'urldc' )
               . " | value: $tmp | alias: $vhost)" );
@@ -175,6 +191,27 @@ sub checkLogout {
     if ( defined $req->param('logout') ) {
         $req->steps(
             [ @{ $self->beforeLogout }, 'authLogout', 'deleteSession' ] );
+    }
+    PE_OK;
+}
+
+sub checkUnauthLogout {
+    my ( $self, $req ) = @_;
+    if ( defined $req->param('logout') ) {
+        $self->userLogger->info('Unauthenticated logout request');
+        $self->logger->debug('Cleaning pdata');
+        $self->logger->debug("Removing $self->{conf}->{cookieName} cookie");
+        $req->pdata( {} );
+        $req->addCookie(
+            $self->cookie(
+                name    => $self->conf->{cookieName},
+                domain  => $self->conf->{domain},
+                secure  => $self->conf->{securedCookie},
+                expires => 'Wed, 21 Oct 2015 00:00:00 GMT',
+                value   => 0
+            )
+        );
+        $req->steps( [ sub { PE_LOGOUT_OK } ] );
     }
     PE_OK;
 }
@@ -349,7 +386,7 @@ sub authenticate {
     $req->steps( [
             'setSessionInfo',           'setMacros',
             'setPersistentSessionInfo', 'storeHistory',
-            @{ $self->afterData }, sub { PE_BADCREDENTIALS }
+            @{ $self->afterData },      sub { PE_BADCREDENTIALS }
         ]
     );
 
@@ -428,12 +465,13 @@ sub setGroups {
 }
 
 sub setPersistentSessionInfo {
-    my ( $self, $req ) = @_;
+
+    # $user passed by BruteForceProtection plugin
+    my ( $self, $req, $user ) = @_;
 
     # Do not restore infos if session already opened
     unless ( $req->id ) {
-        my $key = $req->{sessionInfo}->{ $self->conf->{whatToTrace} };
-
+        my $key = $req->{sessionInfo}->{ $self->conf->{whatToTrace} } || $user;
         return PE_OK unless ( $key and length($key) );
 
         my $persistentSession = $self->getPersistentSession($key);
@@ -572,9 +610,9 @@ sub secondFactor {
 }
 
 sub storeHistory {
-    my ( $self, $req ) = @_;
+    my ( $self, $req, $uid ) = @_;  # $uid passed by BruteForceProtection plugin
     if ( $self->conf->{loginHistoryEnabled} ) {
-        $self->registerLogin($req);
+        $self->registerLogin( $req, $uid );
     }
     PE_OK;
 }

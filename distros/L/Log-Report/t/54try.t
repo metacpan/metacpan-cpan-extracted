@@ -4,7 +4,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 36;
+use Test::More;
 
 use Log::Report undef, syntax => 'SHORT';
 use Carp;  # required for tests
@@ -115,3 +115,5 @@ my $confess_ex = $@->wasFatal;
 isa_ok($confess_ex, 'Log::Report::Exception');
 is($confess_ex->reason, 'PANIC');
 like("$@", qr[^try-block stopped with PANIC: oops3 at ] );
+
+done_testing;

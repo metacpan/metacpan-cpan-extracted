@@ -1,0 +1,20 @@
+{
+"resetCertificat":"Su certificado fue reiniciado",
+"accountCreated":"Su cuenta ha sido creada, su contraseña temporal ha sido enviada a su dirección de e-mail.",
+"autoMail":"Este e-mail ha sido enviado automáticamente",
+"click2Register":"Haga clic para confirmar el registro de su cuenta",
+"click2Reset":"Haga clic para reiniciar su contraseña",
+"goToPortal":"Ir al portal",
+"hello":"Hola",
+"mail2fSubject":"[LemonLDAP::NG] Su código de acceso",
+"mailConfirmSubject":"[LemonLDAP::NG] Confirmación de reinicio de contraseña",
+"mailSubject":"[LemonLDAP::NG] Su nueva contraseña",
+"newPwdIs":"Su nueva contraseña es",
+"pwdChanged":"Su contraseña ha sido cambiada.",
+"pwdIs":"Su contraseña es",
+"registerConfirmSubject":"[LemonLDAP::NG] Confirmación de creación de cuenta",
+"registerDoneSubject":"[LemonLDAP::NG] Su nueva cuenta",
+"requestIssuedFromIP":"El pedido fue emitido desde la IP",
+"yourLoginCodeIs":"Su código de acceso es ",
+"yourLoginIs":"Su nombre de usuario es"
+}

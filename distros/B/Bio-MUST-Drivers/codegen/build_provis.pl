@@ -33,8 +33,9 @@ my @provisions = (
     { 'class' => 'Exonerate',
       'app'   => 'Exonerate',
       'pgm'   => 'exonerate',
-      'form'  => 'exonerate',           # brewsci/bio
-    },
+#     'form'  => 'exonerate',           # brewsci/bio
+      'form'  => 'https://raw.githubusercontent.com/brewsci/homebrew-bio/f68615713d23ab36d979f8cf06268808ff3dd9dc/Formula/exonerate.rb',
+    },                                  # force version historical 2.2.0
     { 'class' => 'Hmmer',
       'app'   => 'HMMER',
       'pgm'   => 'hmmsearch',

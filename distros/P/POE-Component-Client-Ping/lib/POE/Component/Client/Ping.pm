@@ -24,7 +24,7 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 );
 
 use vars qw($VERSION $PKTSIZE);
-$VERSION = '1.175';
+$VERSION = '1.176';
 $PKTSIZE = $^O eq 'linux' ? 3_000 : 100;
 
 use Carp qw(croak);
@@ -83,14 +83,7 @@ sub spawn {
   croak "$type requires an even number of parameters" if @_ % 2;
   my %params = @_;
 
-  # If we aren't given a socket, then we'll need privileges to create
-  # one ourselves.
-
-  croak "$type requires root privilege" if (
-    $> and ($^O ne "VMS") and
-    ($^O ne "cygwin") and
-    not defined $params{Socket}
-  );
+  croak "$type requires root privilege" unless can_open_socket();
 
   my $alias         = delete $params{Alias};
   $alias            = "pinger" unless defined $alias and length $alias;
@@ -157,11 +150,19 @@ sub poco_ping_start {
 
 
 # (NOT A POE EVENT HANDLER)
+# Test whether this process can open raw sockets.
+sub can_open_socket {
+  my $socket = eval { _create_handle() };
+  return 0 if $@ or not $socket;
+  return 1;
+}
+
+
+# (NOT A POE EVENT HANDLER)
 # Create a raw socket to send ICMP packets down.
 # (optionally) mess with the size of the buffers on the socket.
 
 sub _create_handle {
-  my ($kernel, $heap) = @_;
   DEBUG_SOCKET and warn "opening a raw socket for icmp";
 
   my $protocol = Socket::IPPROTO_ICMP;
@@ -170,9 +171,7 @@ sub _create_handle {
   socket($socket, PF_INET, SOCK_RAW, $protocol)
     or die "can't create icmp socket: $!";
 
-  $heap->{socket_handle} = $socket;
-
-  _setup_handle($kernel, $heap);
+  return $socket;
 }
 
 ### NOT A POE EVENT HANDLER
@@ -234,11 +233,9 @@ sub _do_ping {
   # No current pings.  Open a socket, or setup the existing one.
   unless (scalar(keys %{$heap->{ping_by_seq}})) {
     unless (defined $heap->{socket_handle}) {
-      _create_handle($kernel, $heap);
+      $heap->{socket_handle} = _create_handle();
     }
-    else {
-      _setup_handle($kernel, $heap);
-    }
+    _setup_handle($kernel, $heap);
   }
 
   # Get the timeout, or default to the one set for the component.
@@ -601,7 +598,7 @@ sub poco_ping_pong {
     warn ",----- packet from ", inet_ntoa($from_ip), ", port $from_port\n";
     warn "| type = $from_type / subtype = $from_subcode\n";
     warn "| checksum = $from_checksum, pid = $from_pid, seq = $from_seq\n";
-    warn "| message: $from_message\n";
+    warn "| message: ", unpack("H*", $from_message), "\n";
     warn "`------------------------------------------------------------\n";
   };
 
@@ -1023,7 +1020,7 @@ http://search.cpan.org/dist/POE-Component-Client-Ping/
 
 =head1 AUTHOR & COPYRIGHTS
 
-POE::Component::Client::Ping is Copyright 1999-2009 by Rocco Caputo.
+POE::Component::Client::Ping is Copyright 1999-2020 by Rocco Caputo.
 All rights are reserved.  POE::Component::Client::Ping is free
 software; you may redistribute it and/or modify it under the same
 terms as Perl itself.

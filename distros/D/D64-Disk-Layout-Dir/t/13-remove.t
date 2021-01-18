@@ -154,7 +154,7 @@ sub get_dir_layout_object {
     # last directory item gets completely removed
     my @expected_data = get_dir_data();
     splice @expected_data, 0x40, 0x20;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x1f);
+    splice @expected_data, 0x40, 0x00, map { chr 0x00 } (0x00 .. 0x1f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -172,7 +172,7 @@ sub get_dir_layout_object {
     my @expected_data = get_dir_data();
     splice @expected_data, 0x00, 0x20;
     $expected_data[0x01] = chr 0xff;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x1f);
+    splice @expected_data, 0x40, 0x00, map { chr 0x00 } (0x00 .. 0x1f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -191,7 +191,7 @@ sub get_dir_layout_object {
     my @expected_data = get_dir_data();
     splice @expected_data, 0x00, 0x40;
     $expected_data[0x01] = chr 0xff;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x3f);
+    splice @expected_data, 0x20, 0x00, map { chr 0x00 } (0x00 .. 0x3f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -210,7 +210,7 @@ sub get_dir_layout_object {
     my @expected_data = get_dir_data();
     splice @expected_data, 0x00, 0x20;
     $expected_data[0x01] = chr 0xff;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x1f);
+    splice @expected_data, 0x40, 0x00, map { chr 0x00 } (0x00 .. 0x1f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -230,7 +230,7 @@ sub get_dir_layout_object {
     my @expected_data = get_dir_data();
     splice @expected_data, 0x00, 0x40;
     $expected_data[0x01] = chr 0xff;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x3f);
+    splice @expected_data, 0x20, 0x00, map { chr 0x00 } (0x00 .. 0x3f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -264,7 +264,7 @@ sub get_dir_layout_object {
     my @expected_data = get_dir_data();
     splice @expected_data, 0x00, 0x20;
     $expected_data[0x01] = chr 0xff;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x1f);
+    splice @expected_data, 0x40, 0x00, map { chr 0x00 } (0x00 .. 0x1f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -284,7 +284,7 @@ sub get_dir_layout_object {
     my @expected_data = get_dir_data();
     splice @expected_data, 0x00, 0x40;
     $expected_data[0x01] = chr 0xff;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x3f);
+    splice @expected_data, 0x20, 0x00, map { chr 0x00 } (0x00 .. 0x3f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -318,7 +318,7 @@ sub get_dir_layout_object {
     my @expected_data = get_dir_data();
     splice @expected_data, 0x00, 0x20;
     $expected_data[0x01] = chr 0xff;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x1f);
+    splice @expected_data, 0x40, 0x00, map { chr 0x00 } (0x00 .. 0x1f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -338,7 +338,7 @@ sub get_dir_layout_object {
     my @expected_data = get_dir_data();
     splice @expected_data, 0x00, 0x20;
     $expected_data[0x01] = chr 0xff;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x1f);
+    splice @expected_data, 0x40, 0x00, map { chr 0x00 } (0x00 .. 0x1f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -357,7 +357,7 @@ sub get_dir_layout_object {
     my @expected_data = get_dir_data();
     splice @expected_data, 0x00, 0x20;
     $expected_data[0x01] = chr 0xff;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x1f);
+    splice @expected_data, 0x40, 0x00, map { chr 0x00 } (0x00 .. 0x1f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -375,7 +375,7 @@ sub get_dir_layout_object {
     # second directory item gets completely removed
     my @expected_data = get_dir_data();
     splice @expected_data, 0x20, 0x20;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x1f);
+    splice @expected_data, 0x40, 0x00, map { chr 0x00 } (0x00 .. 0x1f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -394,7 +394,7 @@ sub get_dir_layout_object {
     # second directory item gets completely removed
     my @expected_data = get_dir_data();
     splice @expected_data, 0x20, 0x20;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x1f);
+    splice @expected_data, 0x40, 0x00, map { chr 0x00 } (0x00 .. 0x1f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -412,7 +412,7 @@ sub get_dir_layout_object {
     # second directory item gets completely removed
     my @expected_data = get_dir_data();
     splice @expected_data, 0x20, 0x20;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x1f);
+    splice @expected_data, 0x40, 0x00, map { chr 0x00 } (0x00 .. 0x1f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -431,7 +431,7 @@ sub get_dir_layout_object {
     my @expected_data = get_dir_data();
     splice @expected_data, 0x00, 0x20;
     $expected_data[0x01] = chr 0xff;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x1f);
+    splice @expected_data, 0x40, 0x00, map { chr 0x00 } (0x00 .. 0x1f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;
@@ -451,7 +451,7 @@ sub get_dir_layout_object {
     my @expected_data = get_dir_data();
     splice @expected_data, 0x00, 0x40;
     $expected_data[0x01] = chr 0xff;
-    push (@expected_data, chr 0x00) for (0x00 .. 0x3f);
+    splice @expected_data, 0x20, 0x00, map { chr 0x00 } (0x00 .. 0x3f);
     my $expected_data = join '', @expected_data;
     my $data = $dir->data();
     my $test3 = $data eq $expected_data;

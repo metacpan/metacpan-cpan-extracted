@@ -1,4 +1,4 @@
-D64::Disk::BAM Version 0.04
+D64::Disk::BAM Version 0.05
 ===========================
 
 D64::Disk::BAM provides the complete set of methods essential for accessing,
@@ -16,7 +16,7 @@ To install this module type the following:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2011, 2013 by Pawel Krol <pawelkrol@cpan.org>.
+Copyright (C) 2011-2021 by Pawel Krol <pawelkrol@cpan.org>.
 
 This library is free open source software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or, at your

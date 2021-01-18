@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -102,6 +102,63 @@ sub createNotification {
         $self->logger->debug("Notification $ref NOT created!");
         return PE_ERROR;
     }
+}
+
+sub canUpdateSfa {
+    my ( $self, $req, $action ) = @_;
+    my $user = $req->userData->{ $self->conf->{whatToTrace} };
+    my $msg = undef;
+
+    # Test action
+    if ( $action && $action eq 'delete' ) {
+        my $module = lc ref $self;
+        $module = ( $module =~ /2f::register::(\w+)$/ )[0];
+        $module =~ s/2f//;
+        $self->logger->debug("$user request to delete ${module}2f device");
+        if (   $self->{conf}->{"${module}2fAuthnLevel"}
+            && $req->userData->{authenticationLevel} <
+            $self->{conf}->{"${module}2fAuthnLevel"} )
+        {
+            $self->userLogger->warn(
+"$user request to delete ${module}2f device rejected due to insufficient authentication level!"
+            );
+            $self->logger->debug(
+"authLevel: $req->{userData}->{authenticationLevel} < requiredLevel: "
+                  . $self->{conf}->{"${module}2fAuthnLevel"} );
+            $msg = 'notAuthorizedAuthLevel';
+        }
+    }
+
+    # Test if impersonation is in progress
+    if ( !$msg && $self->conf->{impersonationRule} ) {
+        $self->logger->debug('Impersonation plugin is enabled');
+        if (   $req->userData->{"$self->{conf}->{impersonationPrefix}_user"}
+            && $req->userData->{"$self->{conf}->{impersonationPrefix}_user"} ne
+            $req->userData->{_user} )
+        {
+            $self->userLogger->warn(
+                "Impersonation in progress! $user is not allowed to update 2FA."
+            );
+            $msg = 'notAuthorized';
+        }
+    }
+
+    # Test if contextSwitching is in progress
+    if ( !$msg && $self->conf->{contextSwitchingRule} ) {
+        $self->logger->debug('ContextSwitching plugin is enabled');
+        if (
+            $req->userData->{
+                "$self->{conf}->{contextSwitchingPrefix}_session_id"}
+            && !$self->conf->{contextSwitchingAllowed2fModifications} )
+        {
+            $self->userLogger->warn(
+"ContextSwitching in progress! $user is not allowed to update 2FA."
+            );
+            $msg = 'notAuthorized';
+        }
+    }
+    $self->userLogger->info("$user is allowed to update 2FA") unless $msg;
+    return $msg;
 }
 
 1;
@@ -262,6 +319,19 @@ method. Example:
 
 Do not launch "getUser" but use the given C<$sub>. This permits multiple
 plugins to use "aroundSub" in the same time.
+
+=item C<hook>: hash ref that gives methods to call when a hook is triggered in the 
+LemonLDAP::NG code. Example:
+
+  use constant hook => {
+      oidcGenerateIDToken          => 'addClaimToIDToken'
+  };
+
+  sub addClaimToIDToken {
+    my ( $self, $req, $payload, $rp ) = @_;
+    $payload->{"id_token_hook"} = 1;
+    return PE_OK;
+  }
 
 =back
 

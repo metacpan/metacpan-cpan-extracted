@@ -5,14 +5,14 @@ use Cwd qw(getcwd);
 use Data::Dumper;
 use Test::More;
 use Hook::Output::Tiny;
-use Dist::Mgr qw(:all);
+use Dist::Mgr qw(:private);
 use Mock::Sub;
 
 use lib 't/lib';
 use Helper qw(:all);
 
 my $cwd = getcwd();
-my $in_cwd = getcwd() =~ qr/dist-mgr(-\d+\.\d+)?(-\d+)?$/i;
+my $in_cwd = getcwd() =~ _dist_dir_re();
 
 my $init_dir = 't/data/work/init';
 
@@ -58,7 +58,7 @@ remove_init();
     mkdir $init_dir or die $! if ! -e $init_dir;
     chdir $init_dir or die $!;
 
-    my $in_init_dir = getcwd() =~ qr|dist-mgr(-\d+\.\d+)?(-\d+)?/$init_dir$|i;
+    my $in_init_dir = getcwd() =~ qr|dist-mgr.*?/$init_dir$|i;
     is $in_init_dir, 1, "in the init directory ok";
 
     if (! $in_init_dir) {

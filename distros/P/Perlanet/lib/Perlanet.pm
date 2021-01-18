@@ -17,11 +17,7 @@ use XML::Feed;
 
 use Perlanet::Types;
 
-use vars qw{$VERSION};
-
-BEGIN {
-  $VERSION = '2.0.4';
-}
+our $VERSION = '2.0.5';
 
 with 'MooseX::Traits';
 
@@ -240,32 +236,44 @@ sub select_entries {
   my $self = shift;
   my ($feeds) = @_;
 
+
+  my $date_zero = DateTime->from_epoch(epoch => 0);
+
   my @feed_entries;
   for my $feed (@$feeds) {
     my @entries = $feed->_xml_feed->entries;
 
+    for (@entries) {
+      # "Fix" entries with no dates
+      unless ($_->issued or $_->modified) {
+        $_->issued($date_zero);
+        $_->modified($date_zero);
+      }
+
+      # Problem with XML::Feed's conversion of RSS to Atom
+      if ($_->issued && ! $_->modified) {
+        $_->modified($_->issued);
+      }
+    }
+
     @entries = @{ $self->sort_entries(\@entries) };
+    @entries = @{ $self->cutoff_entries(\@entries) };
 
     my $number_of_entries =
-      defined $feed->max_entries ? $feed->max_entries 
+      defined $feed->max_entries ? $feed->max_entries
                                  : $self->entries_per_feed;
 
     if ($number_of_entries and @entries > $number_of_entries) {
       $#entries = $number_of_entries - 1;
     }
 
-    push @feed_entries,
-      map {
-        # Problem with XML::Feed's conversion of RSS to Atom
-        if ($_->issued && ! $_->modified) {
-          $_->modified($_->issued);
-        }
-
+    for (@entries) {
+      push @feed_entries,
         Perlanet::Entry->new(
           _entry => $_,
           feed => $feed
         );
-      } @entries;
+    }
   }
 
   return \@feed_entries;
@@ -286,34 +294,45 @@ Takes a list of L<Perlanet::Entry>s, and returns an ordered list.
 sub sort_entries {
   my $self = shift;
   my ($entries) = @_;
-  my $day_zero = DateTime->from_epoch(epoch => 0);
 
   my @entries;
 
   if ($self->entry_sort_order eq 'modified') {
-    @entries = grep {
-      ($_->modified || $_->issued || $day_zero) > $self->cutoff
-    } sort {
-      ($b->modified || $b->issued || $day_zero)
+    @entries = sort {
+      ($b->modified || $b->issued)
           <=>
-      ($a->modified || $a->issued || $day_zero)
+      ($a->modified || $a->issued)
     } @$entries;
   } elsif ($self->entry_sort_order eq 'issued') {
-    @entries = grep {
-      ($_->issued || $_->modified || $day_zero) > $self->cutoff
-    } sort {
-      ($b->issued || $b->modified || $day_zero)
+    @entries = sort {
+      ($b->issued || $b->modified)
           <=>
-      ($a->issued || $a->modified || $day_zero)
+      ($a->issued || $a->modified)
     } @$entries;
   } else {
     die 'Invalid entry sort order: ' . $self->entry_sort_order;
   }
 
-  # Only need so many entries
-  if ($self->entries && @entries > $self->entries) {
-    $#entries = $self->entries - 1;
-  }
+  return \@entries;
+}
+
+=head2 cutoff_entries
+
+Called internally by L</run> and passed the list of entries from
+L</sort_entries>.
+
+Removes any entries that were published earlier than the cut-off
+date for this feed.
+
+=cut
+
+sub cutoff_entries {
+  my $self = shift;
+  my ($entries) = @_;
+
+  my @entries = grep {
+    ($_->issued || $_->modified) > $self->cutoff
+  } @$entries;
 
   return \@entries;
 }

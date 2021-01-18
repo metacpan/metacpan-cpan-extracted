@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '2.004'; # VERSION
+our $VERSION = '2.006'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
@@ -41,6 +41,8 @@ use overload
 
 use Scalar::Util;
 use List::UtilsBy;
+
+use Ryu::Source;
 
 =head1 METHODS
 
@@ -163,17 +165,14 @@ until the observable is destroyed.
 
 sub source {
     my ($self) = @_;
-    my $src = Ryu::Source->new;
-    Scalar::Util::weaken(my $copy = $self);
-    $self->subscribe(my $code = sub {
-        return unless my $self = $copy;
-        $src->emit($self->value)
-    });
-    $src->completed->on_ready(sub {
-        $copy->unsubscribe($code) if $copy;
-        undef $code;
-    });
-    $src
+    $self->{source} //= do {
+        my $src = Ryu::Source->new;
+        Scalar::Util::weaken(my $copy = $self);
+        $src->completed->on_ready(sub {
+            delete $copy->{source} if $copy
+        });
+        $src;
+    };
 }
 
 =head1 METHODS - Internal
@@ -188,8 +187,10 @@ Notifies all currently-subscribed callbacks with the current value.
 
 sub notify_all {
     my $self = shift;
+    my $v = $self->{value};
+    $self->{source}->emit($v) if $self->{source};
     for my $sub (@{$self->{subscriptions}}) {
-        $sub->($_) for $self->{value}
+        $sub->($_) for $v;
     }
     $self
 }
@@ -197,7 +198,9 @@ sub notify_all {
 sub DESTROY {
     my ($self) = @_;
     return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
-    $_->finish for splice @{$self->{sources} || []};
+    if(my $src = $self->{source}) {
+        $src->finish;
+    }
     delete $self->{value};
     return;
 }
@@ -212,5 +215,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
 

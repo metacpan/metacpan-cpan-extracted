@@ -6,7 +6,7 @@ use warnings;
 # Older versions cannot complete the test suite successfully
 use 5.018;
 
-our $VERSION = '2.004';
+our $VERSION = '2.006';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
@@ -58,13 +58,14 @@ and on the verge of reaching for alternatives. The L</SEE ALSO> section may spee
 
 =head2 Compatibility
 
-Since L<Mojo::Rx> follows the ReactiveX conventions quite closely, we'd expect to have
-the ability to connect L<Mojo::Rx> observable to a L<Ryu::Source>, and provide an
-adapter from a L<Ryu::Source> to act as a L<Mojo::Rx>-style observable. This is not yet
-implemented, but planned for a future version.
+Since L<RxPerl> follows the ReactiveX conventions quite closely, we'd expect to have
+the ability to connect L<RxPerl> observables to a L<Ryu::Source>, and provide an
+adapter from a L<Ryu::Source> to act as an L<RxPerl>-style observable. This is not yet
+implemented, but may be added in a future version.
 
 Most of the other modules in L<SEE ALSO> are either not used widely enough or not a good
-semantic fit for a compatibility layer - but if you're interested in this, L<please ask|https://github.com/team-at-cpan/Ryu/issues>.
+semantic fit for a compatibility layer - but if you're interested in this,
+L<please ask about it|https://github.com/team-at-cpan/Ryu/issues> or provide patches!
 
 =head2 Components
 
@@ -246,9 +247,7 @@ syntax is "backwards" (same as grep/map chains in Perl)
 
 =item * L<Data::Monad>
 
-=item * L<Mojo::Rx> - Mojolicious-specific support for ReactiveX, follows the rxjs API quite closely
-
-=item * L<RxPerl> - same author as L<Mojo::Rx>, this (will eventually!) provide a ReactiveX API without being tied to Mojolicious
+=item * L<RxPerl> - previously known as L<Mojo::Rx>, targets close compatibility with L<rxjs|https://rxjs-dev.firebaseapp.com/guide/overview>
 
 =back
 
@@ -268,10 +267,25 @@ There are various documents, specifications and discussions relating to the conc
 
 =head1 AUTHOR
 
-Tom Molesworth C<< <TEAM@cpan.org> >> with contributions from Mohammad S Anwar,
-Michael Mueller, Zak Elep, Mohanad Zarzour and Nael Alolwani.
+Tom Molesworth C<< <TEAM@cpan.org> >> with contributions from:
+
+=over 4
+
+=item * Mohammad S Anwar
+
+=item * Michael Mueller
+
+=item * Zak Elep
+
+=item * Mohanad Zarzour
+
+=item * Nael Alolwani
+
+=item * Amin Marashi
+
+=back
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
 

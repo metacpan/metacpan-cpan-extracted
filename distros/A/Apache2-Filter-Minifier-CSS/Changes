@@ -1,5 +1,16 @@
 Revision history for Perl extension Apache2::Filter::Minifier::CSS.
 
+1.07      2021-01-17 12:44:24-08:00 America/Vancouver
+    - Switch to Dist::Zilla for release management
+    - Use File::Slurp, instead of a home-grown version
+    - POD cleanups; EOLs, spelling
+    - Namespace cleaned
+    - Add GitHub Actions CI workflow
+      - but only for Perl-5.20 and above
+
+1.06    Fri Nov  7 17:07 PST 2014
+    - Update tests to work with Apache-2.4.x series
+
 1.05    Fri Apr 23 22:25 PDT 2010
     - Switch to Git
 

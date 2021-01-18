@@ -1,6 +1,6 @@
 use strict;
 use warnings FATAL => 'all';
-use Apache::Test;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Apache::Test;
 use Apache::TestRequest;
 
 # Test "Content-Length" logic

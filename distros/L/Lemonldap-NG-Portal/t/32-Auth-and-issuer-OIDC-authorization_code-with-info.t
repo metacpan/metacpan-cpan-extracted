@@ -12,7 +12,7 @@ BEGIN {
 }
 
 my $debug = 'error';
-my ( $op, $rp, $res );
+my ( $op, $rp, $res, $url );
 
 my $access_token;
 
@@ -88,8 +88,6 @@ my $metadata = $res->[2]->[0];
 count(3);
 
 # Do a user login to have an existing session
-
-my $res;
 my $query = "user=french&password=french";
 ok(
     $res = $op->_post(
@@ -112,7 +110,7 @@ count(1);
 # Query RP for auth
 ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth SP request' );
 count(1);
-my ( $url, $query ) =
+( $url, $query ) =
   expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
 # Push request to OP

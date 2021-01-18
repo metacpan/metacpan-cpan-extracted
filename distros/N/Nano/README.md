@@ -124,6 +124,18 @@ This attribute is read-only, accepts `(Env)` values, and is optional.
 
 This package implements the following methods:
 
+## domain
+
+    domain(Str $name) : Domain
+
+The domain method returns a [Zing::Domain](https://metacpan.org/pod/Zing::Domain) object for the ID provided.
+
+- domain example #1
+
+        my $nano = Nano->new;
+
+        my $domain = $nano->domain('changelog');
+
 ## dump
 
     dump(Object $object) : HashRef

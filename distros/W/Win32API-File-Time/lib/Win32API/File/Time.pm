@@ -71,7 +71,7 @@ use Time::Local;
 use Win32::API;
 use Win32API::File qw{ :ALL };
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 our @EXPORT_OK = qw{ GetFileTime SetFileTime utime };
 our %EXPORT_TAGS = (
@@ -368,6 +368,10 @@ FAT file time resolution is 2 seconds at best, as documented at
 L<https://docs.microsoft.com/en-us/windows/win32/sysinfo/file-times>.
 Access time resolution seems to be to the nearest day.
 
+Support is by the author. Please file bug reports at
+L<https://github.com/trwyant/perl-Win32API-File-Time/issues>, or in
+electronic mail to the author.
+
 =head1 ACKNOWLEDGMENTS
 
 This module would not exist without the following people:
@@ -398,7 +402,7 @@ Thomas R. Wyant, III (F<Thomas.R.Wyant-III@usa.dupont.com>)
 Copyright (C) 2004-2005 by E. I. DuPont de Nemours and Company, Inc. All
 rights reserved.
 
-Copyright (C) 2007, 2010, 2016-2017, 2019 by Thomas R. Wyant, III
+Copyright (C) 2007, 2010, 2016-2017, 2019-2021 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

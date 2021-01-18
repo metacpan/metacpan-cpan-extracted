@@ -5,8 +5,6 @@ use Net::SAML2::IdP;
 
 use LWP::UserAgent;
 
-my $override = override_verify_x509_verify(1);
-
 my $sp = net_saml2_sp();
 
 my $metadata = path('t/idp-metadata.xml')->slurp;

@@ -29,6 +29,7 @@ my @files = (
     't/buffer.t',
     't/observable.t',
     't/ryu.t',
+    't/source/as_buffer.t',
     't/source/batch.t',
     't/source/buffer.t',
     't/source/chained.t',

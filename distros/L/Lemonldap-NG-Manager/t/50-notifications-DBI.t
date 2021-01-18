@@ -70,6 +70,12 @@ SKIP: {
       $client->jsonPostResponse( 'notifications/actives', '',
         IO::String->new($notif),
         'application/json', length($notif) );
+    $notif =
+'{"date":"2099-12-31","uid":"dwho","reference":"Test2","xml":"{\"title\":\"Test\"}"}';
+    $res =
+      $client->jsonPostResponse( 'notifications/actives', '',
+        IO::String->new($notif),
+        'application/json', length($notif) );
 
     ok( $res->{result}, 'Result is true' );
 
@@ -89,20 +95,17 @@ SKIP: {
     $res =
       $client->jsonResponse( 'notifications/actives', 'groupBy=substr(uid,1)' );
     ok( $res->{result} == 1, 'Result = 1' );
-    ok( $res->{count} == 0,  'Count = 0' );
+    ok( $res->{count} == 1,  'Count = 1' );
 
     # Test "done" notifications display
     displayTests('done');
 
     # Delete notification
-    $res =
-      $client->_del('notifications/done/dwho_Test_20991231_dwho_VGVzdA==.done');
+    $res = $client->_del('notifications/done/dwho_Test_20991231');
     $res =
       $client->jsonResponse( 'notifications/done', 'groupBy=substr(uid,1)' );
     ok( $res->{result} == 1, 'Result = 1' );
     ok( $res->{count} == 0,  'Count = 0' ) or diag Dumper($res);
-
-    #print STDERR Dumper($res);
 }
 
 eval { unlink $file };
@@ -110,35 +113,37 @@ count($maintests);
 done_testing( count() );
 
 sub displayTests {
-    my $type = shift;
+    my $type  = shift;
+    my $count = $type eq 'actives' ? 2 : 1;
+
     $res =
       $client->jsonResponse( "notifications/$type", 'groupBy=substr(uid,1)' );
     ok( $res->{result} == 1,                 'Result = 1' );
-    ok( $res->{count} == 1,                  'Count = 1' );
+    ok( $res->{count} == $count,             "Count = $count" );
     ok( $res->{values}->[0]->{value} eq 'd', 'Value is "d"' );
     count(3);
 
     $res = $client->jsonResponse( "notifications/$type", 'groupBy=uid' );
     ok( $res->{result} == 1,                    'Result = 1' );
-    ok( $res->{count} == 1,                     'Count = 1' );
+    ok( $res->{count} == $count,                "Count = $count" );
     ok( $res->{values}->[0]->{value} eq 'dwho', 'Value is "dwho"' );
     count(3);
 
     $res = $client->jsonResponse( "notifications/$type", 'uid=d*&groupBy=uid' );
     ok( $res->{result} == 1,                    'Result = 1' );
-    ok( $res->{count} == 1,                     'Count = 1' );
+    ok( $res->{count} == $count,                "Count = $count" );
     ok( $res->{values}->[0]->{value} eq 'dwho', 'Value is "dwho"' );
     count(3);
 
     $res = $client->jsonResponse( "notifications/$type", 'uid=d*' );
     ok( $res->{result} == 1,                  'Result = 1' );
-    ok( $res->{count} == 1,                   'Count = 1' );
+    ok( $res->{count} == $count,              "Count = $count" );
     ok( $res->{values}->[0]->{uid} eq 'dwho', 'Value is "dwho"' );
     count(3);
 
     $res = $client->jsonResponse( "notifications/$type", 'uid=dwho' );
     ok( $res->{result} == 1,                  'Result = 1' );
-    ok( $res->{count} == 1,                   'Count = 1' );
+    ok( $res->{count} == $count,              "Count = $count" );
     ok( $res->{values}->[0]->{uid} eq 'dwho', 'Value is "dwho"' );
     count(3);
 
@@ -161,8 +166,8 @@ sub displayTests {
         ) or diag Dumper($res);
         my $internal_ref = $res->{values}->[0]->{notification};
         my $ref          = $res->{values}->[0]->{reference};
-        $res = $client->jsonResponse( "notifications/$type/$internal_ref",
-            "uid=dwho&reference=$ref" )
+        $internal_ref =~ s/#/_/g;    # Fix 2353
+        $res = $client->jsonResponse("notifications/$type/$internal_ref")
           or diag Dumper($res);
         ok( $res = eval { from_json( $res->{notifications}->[0] ) },
             'Response is JSON' )
@@ -175,12 +180,6 @@ sub displayTests {
           or diag Dumper($res);
         ok( $res->{uid} eq 'dwho', 'uid found' )
           or diag Dumper($res);
-        $res = $client->jsonResponse( "notifications/$type/$internal_ref",
-            "uid=davros&reference=$ref" )
-          or diag Dumper($res);
-        ok( $res->{error} eq 'Notification Test not found for user davros',
-            'error found' )
-          or diag Dumper($res);
-        count(7);
+        count(6);
     }
 }

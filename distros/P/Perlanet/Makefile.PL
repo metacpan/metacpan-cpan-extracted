@@ -9,6 +9,7 @@ WriteMakefile
                    'Alien::Tidyp' => 0,
                    'DateTime' => 0,
                    'DateTime::Duration' => 0,
+                   'DateTime::Format::Strptime' => 0,
                    'Encode' => 0,
                    'File::Path' => 0,
                    'HTML::Scrubber' => 0,

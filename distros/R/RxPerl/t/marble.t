@@ -287,13 +287,4 @@ subtest 'rx_fork_join' => sub {
     obs_is $o, [''], 'hash with empty';
 };
 
-subtest 'pipeable operators as methods' => sub {
-    my $o = cold('123456789')
-        ->filter(sub {$_[0] % 2 == 1})
-        ->map(sub {$_[0] * 10})
-        ->take(3)
-        ->delay(1);
-    obs_is $o, ['-a-b-c', {a => 10, b => 30, c => 50}];
-};
-
 done_testing();

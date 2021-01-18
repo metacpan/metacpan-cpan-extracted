@@ -1,6 +1,7 @@
 Changes
 examples/README
 INSTALL.SKIP
+lib/Object/Iterate.pm
 lib/Object/Iterate/Tester.pm
 LICENSE
 Makefile.PL

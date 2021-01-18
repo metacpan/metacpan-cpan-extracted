@@ -13,8 +13,8 @@ WriteMakefile(
 	},
 
 	PREREQ_PM => {
-		'Kelp' => '1',
-		'Plack' => '1',
+		'Kelp' => 0,
+		'Plack' => 0,
 	},
 
 	META_MERGE => {
@@ -29,4 +29,6 @@ WriteMakefile(
 	ABSTRACT_FROM => 'lib/Kelp/Module/Symbiosis.pm',
 	AUTHOR => 'Bartosz Jarzyna <brtastic.dev@gmail.com>',
 	LICENSE => 'perl',
+
+	test => {TESTS => 't/*.t t/*/*.t'},
 );

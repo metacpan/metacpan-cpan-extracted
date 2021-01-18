@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -57,6 +57,8 @@ sub checkConf {
             $class->logger->debug($Lemonldap::NG::Common::Conf::msg);
         }
     }
+    $Lemonldap::NG::Common::Conf::msg = '';
+
     if ( $force or !$class->cfgNum or $class->cfgNum != $conf->{cfgNum} ) {
         $class->logger->debug("Get configuration $conf->{cfgNum}");
         unless ( $class->cfgNum( $conf->{cfgNum} ) ) {
@@ -236,6 +238,8 @@ sub defaultValuesInit {
               $conf->{vhostOptions}->{$vhost}->{vhostAuthnLevel};
             $class->tsv->{serviceTokenTTL}->{$vhost} =
               $conf->{vhostOptions}->{$vhost}->{vhostServiceTokenTTL};
+            $class->tsv->{accessToTrace}->{$vhost} =
+              $conf->{vhostOptions}->{$vhost}->{vhostAccessToTrace};
         }
     }
     return 1;
@@ -621,7 +625,10 @@ sub substitute {
     $expr =~ s/\bskip\b/q\{999_SKIP\}/g;
 
     # handle inGroup
-    $expr =~ s/\binGroup\(([^)]*)\)/listMatch(\$s->{'hGroups'},$1,1),/g;
+    $expr =~ s/\binGroup\(([^)]*)\)/listMatch(\$s->{'hGroups'},$1,1)/g;
+
+    # handle has2f
+    $expr =~ s/\bhas2f\(([^),]*)\)/has2f(\$s,$1)/g;
 
     return $expr;
 }

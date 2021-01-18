@@ -15,7 +15,6 @@
   go = function() {
     return Fingerprint2.get(function(components) {
       var result, values;
-      console.error(components);
       values = components.map((function(_this) {
         return function(component) {
           return component.value;

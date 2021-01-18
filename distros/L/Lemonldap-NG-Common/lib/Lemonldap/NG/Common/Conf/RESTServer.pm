@@ -393,8 +393,31 @@ sub _oidcMetaDataNodes {
 
     my ( $id, $resp ) = ( 1, [] );
 
+    # Handle RP Attributes
+    if ($query eq "oidcRPMetaDataExportedVars") {
+        my $pk = eval { $self->getConfKey( $req, $query )->{$partner} } // {};
+        return $self->sendError( $req, undef, 400 ) if ( $req->error );
+        foreach my $h ( sort keys %$pk ) {
+            # Set default values for type and array
+            my $data = [ split /;/, $pk->{$h} ];
+            unless ( $data->[1]) {
+                $data->[1] = "string";
+            }
+            unless ( $data->[2]) {
+                $data->[2] = "auto";
+            }
+            push @$resp,
+              {
+                id    => "oidc${type}MetaDataNodes/$partner/$query/" . $id++,
+                title => $h,
+                data  => $data,
+                type  => 'oidcAttribute',
+              };
+        }
+        return $self->sendJSONresponse( $req, $resp );
+    }
     # Return all exported attributes if asked
-    if ( $query =~
+    elsif ( $query =~
 /^(?:oidc${type}MetaDataExportedVars|oidcRPMetaDataOptionsExtraClaims|oidcRPMetaDataMacros)$/
       )
     {

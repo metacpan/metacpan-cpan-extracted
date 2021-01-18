@@ -1,11 +1,11 @@
 <TMPL_INCLUDE NAME="header.tpl">
 
 <div class="container">
-  <div id="color" class="message message-positive alert">
+  <div id="color" class="message message-<TMPL_VAR NAME="ALERT"> alert">
    <TMPL_IF NAME="REG_REQUIRED">
     <span trspan="2fRegRequired"></span>
    <TMPL_ELSE>
-    <span id="msg" trspan="choose2f"></span>
+    <span id="msg" trspan="<TMPL_VAR NAME="MSG">"></span>
    </TMPL_IF>
   </div>
   <TMPL_IF NAME="SFDEVICES">
@@ -32,7 +32,7 @@
             <td class="data-epoch"><TMPL_VAR NAME="epoch"></td>
             <td>
               <TMPL_IF NAME="delAllowed">
-                <span device='<TMPL_VAR NAME="type">' epoch='<TMPL_VAR NAME="epoch">' class="btn btn-danger" role="button">
+                <span device='<TMPL_VAR NAME="type">' epoch='<TMPL_VAR NAME="epoch">' class="btn btn-danger" role="button" data-toggle="modal" data-target="#remove2fModal">
                   <span class="fa fa-minus-circle"></span>
                   <span trspan="unregister">Unregister</span>
   	            </span>
@@ -45,6 +45,31 @@
     </div>
     </div>
   </TMPL_IF>
+
+  <div class="modal fade" id="remove2fModal" tabindex="-1" role="dialog" aria-labelledby="remove2fModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="remove2fModalLabel"><span trspan="areYouSure">Are you sure ?</span></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <span trspan="remove2fWarning">This operation cannot be undone</span>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                  <span trspan="cancel">Cancel</span>
+          </button>
+          <button type="button" class="btn btn-danger remove2f" data-dismiss="modal">
+            <span class="fa fa-minus-circle"></span>
+            <span trspan="unregister">Unregister</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="text-center mb-3 row"> 
     <TMPL_LOOP NAME="MODULES">
@@ -64,6 +89,12 @@
 </div>
 
 <div class="buttons">
+  <TMPL_IF NAME="DISPLAY_UPG">
+    <a href="<TMPL_VAR NAME="PORTAL_URL">upgradesession?url=<TMPL_VAR NAME="SFREGISTERS_URL">" class="btn btn-success" role="button">
+      <span class="fa fa-sign-in"></span>
+      <span trspan="upgradeSession">Upgrade session</span>
+    </a>
+  </TMPL_IF>
   <a href="<TMPL_VAR NAME="PORTAL_URL">?cancel=1&skin=<TMPL_VAR NAME="SKIN">" class="btn btn-primary" role="button">
     <span class="fa fa-home"></span>
     <span trspan="goToPortal">Go to portal</span>

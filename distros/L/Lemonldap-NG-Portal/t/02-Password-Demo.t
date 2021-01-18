@@ -15,6 +15,9 @@ my $client = LLNG::Manager::Test->new( {
             passwordDB               => 'Demo',
             portalRequireOldPassword => 1,
             showLanguages            => 0,
+            storePassword            => 1,
+            restSessionServer        => 1,
+            restExportSecretKeys     => 1,
             error_de_85              => 'From lemonlap-ng.ini',
         }
     }
@@ -117,6 +120,28 @@ ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
 ok( $json->{error} == PE_BADOLDPASSWORD, 'Response is PE_BADOLDPASSWORD' )
   or explain( $json, "error => 27" );
 count(3);
+
+# Test good password
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new(
+            'oldpassword=dwho&newpassword=test&confirmpassword=test'),
+        cookie => "lemonldap=$id",
+        accept => 'application/json',
+        length => 54
+    ),
+    'Correct password'
+);
+count(1);
+
+expectReject( $res, 200, 35, "Expect PE_PASSWORD_OK" );
+
+# Check updated password in session (#2430)
+my $json =
+  expectJSON( $client->_get("/sessions/global/$id"), 'Get session content' );
+is( $json->{_password}, "test", "password updated in session" );
+count(1);
 
 # Test $client->logout
 $client->logout($id);

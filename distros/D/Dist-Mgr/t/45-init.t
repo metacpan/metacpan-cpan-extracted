@@ -5,7 +5,7 @@ use Cwd qw(getcwd);
 use Data::Dumper;
 use Test::More;
 use Hook::Output::Tiny;
-use Dist::Mgr qw(:all);
+use Dist::Mgr qw(:private);
 use Dist::Mgr::FileData qw(:all);
 
 use lib 't/lib';

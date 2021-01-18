@@ -24,7 +24,7 @@ requires 'Exporter' => 0;
 requires 'List::MoreUtils' => 0;
 requires 'Readonly' => 0;
 requires 'URI' => 0;
-requires 'Wikibase::Datatype' => 0.03;
+requires 'Wikibase::Datatype' => 0.06;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Wikibase-Datatype-Struct/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Wikibase-Datatype-Struct';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Wikibase-Datatype-Struct';
@@ -35,7 +35,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 test_requires 'Wikibase::Datatype' => 0.03;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

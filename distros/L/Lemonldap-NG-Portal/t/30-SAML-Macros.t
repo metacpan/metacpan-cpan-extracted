@@ -14,7 +14,7 @@ BEGIN {
 
 my $debug = 'error';
 my ( $issuer, $res );
-my $maintests = 7;
+my $maintests = 8;
 
 SKIP: {
     eval "use Lasso";
@@ -67,6 +67,12 @@ SKIP: {
     {
         is( $value->textContent, 'Accents', 'Check Attribute' );
     }
+    foreach my $value (
+        $xpc->findnodes('//saml:Attribute[@Name="planet"]/saml:AttributeValue')
+      )
+    {
+        is( $value->textContent, 'Earth', 'Check Attribute' );
+    }
     foreach my $value ( $xpc->findnodes('//saml:NameID') ) {
         is( $value->textContent, 'customfrench', 'Check NameID from macro' );
     }
@@ -89,6 +95,7 @@ sub issuer {
                     'sp.com' => {
                         extracted_sn => '(split(/\s/, $cn))[1]',
                         customnameid => '"custom".$uid',
+                        planet => 'inGroup("earthlings") ? "Earth" : "UNKNOWN"',
                     }
                 },
                 samlSPMetaDataOptions => {
@@ -110,6 +117,8 @@ sub issuer {
 '1;sn;urn:oasis:names:tc:SAML:2.0:attrname-format:basic',
                         uid =>
 '1;uid;urn:oasis:names:tc:SAML:2.0:attrname-format:basic',
+                        planet =>
+'1;planet;urn:oasis:names:tc:SAML:2.0:attrname-format:basic',
                     }
                 },
                 samlOrganizationDisplayName => "IDP",

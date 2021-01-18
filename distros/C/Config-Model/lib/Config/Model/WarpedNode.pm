@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2020 by Dominique Dumont.
+# This software is Copyright (c) 2005-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::WarpedNode 2.140;
+package Config::Model::WarpedNode 2.141;
 
 use Mouse;
 
@@ -80,7 +80,7 @@ sub config_model {
 # Forward selected methods (See man perltootc)
 foreach my $method (
     qw/fetch_element config_class_name copy_from get_element_name
-    fetch_gist has_element is_element_available element_type load
+    get_info fetch_gist has_element is_element_available element_type load
     fetch_element_value get_type get_cargo_type dump_tree needs_save
     describe get_help get_help_as_text children get set accept_regexp/
     ) {
@@ -316,7 +316,7 @@ Config::Model::WarpedNode - Node that change config class properties
 
 =head1 VERSION
 
-version 2.140
+version 2.141
 
 =head1 SYNOPSIS
 
@@ -566,7 +566,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2020 by Dominique Dumont.
+This software is Copyright (c) 2005-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

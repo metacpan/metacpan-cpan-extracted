@@ -6,6 +6,10 @@ use Test::Exception;
 
 use Test::DZil;
 
+# V=1 is common in MAKEOPTS for gnu autotools
+# to set "verbose mode"
+delete $ENV{V} if exists $ENV{V};
+
 my $changes = make_changes(<<'END_CHANGES');
     - got included in an awesome test suite
 END_CHANGES

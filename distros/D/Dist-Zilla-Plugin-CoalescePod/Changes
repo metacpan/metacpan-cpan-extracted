@@ -1,4 +1,15 @@
-Revision history for Dist-Zilla-Plugin-MergePod
+Revision history for Dist-Zilla-Plugin-CoalescePod
+
+0.3.0 2021-01-18
+ [ENHANCEMENTS]
+ - Cache pod files in attribute.
+   [#3](https://github.com/yanick/Dist-Zilla-Plugin-CoalescePod/pull/3),
+   thanks to Hunter McMillen.
+ - Pad the POD and DATA with added carriage returns.
+   [#4](https://github.com/yanick/Dist-Zilla-Plugin-CoalescePod/issues/4)
+
+ [STATISTICS]
+ - code churn: 11 files changed, 195 insertions(+), 16 deletions(-)
 
 0.2.2 2014-10-12
  [DOCUMENTATION]
@@ -25,4 +36,3 @@ Revision history for Dist-Zilla-Plugin-MergePod
 
 0.1.0 2012-02-04
  - Initial release
-

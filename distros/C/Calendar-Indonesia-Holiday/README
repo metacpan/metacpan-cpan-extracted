@@ -2,21 +2,22 @@ NAME
     Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 VERSION
-    This document describes version 0.334 of Calendar::Indonesia::Holiday
+    This document describes version 0.335 of Calendar::Indonesia::Holiday
     (from Perl distribution Calendar-Indonesia-Holiday), released on
-    2021-01-14.
+    2021-01-16.
 
 SYNOPSIS
      use Calendar::Indonesia::Holiday qw(
-         list_id_holidays
-         enum_id_workdays
-         count_id_workdays
+         list_idn_holidays
+         enum_idn_workdays
+         count_idn_workdays
+         is_idn_holiday
      );
 
     This lists Indonesian holidays for the year 2011, without the joint
     leave days ("cuti bersama"), showing only the dates:
 
-     my $res = list_id_holidays(year => 2011, is_joint_leave=>0);
+     my $res = list_idn_holidays(year => 2011, is_joint_leave=>0);
 
     Sample result:
 
@@ -39,8 +40,8 @@ SYNOPSIS
 
     This lists religious Indonesian holidays, showing full details:
 
-     my $res = list_id_holidays(year => 2011,
-                                "tags.has" => ['religious'], detail=>1);
+     my $res = list_idn_holidays(year => 2011,
+                                 "tags.has" => ['religious'], detail=>1);
 
     Sample result:
 
@@ -61,17 +62,18 @@ SYNOPSIS
 
     This checks whether 2011-02-16 is a holiday:
 
-     my $res = list_id_holidays(date => '2011-02-16');
-     print "2011-02-16 is a holiday\n" if @{$res->[2]};
+     my $res = is_idn_holidays(date => '2011-02-16');
+     # or: my $res = is_idn_holidays(day => 16, month => 2, year => 2011);
+     print "2011-02-16 is a holiday\n" if $res->[2];
 
     This enumerate working days for a certain period:
 
-     my $res = enum_id_workdays(year=>2011, month=>7);
+     my $res = enum_idn_workdays(year=>2011, month=>7);
 
     Idem, but returns a number instead. year/month defaults to current
     year/month:
 
-     my $res = count_id_workdays();
+     my $res = count_idn_workdays();
 
 DESCRIPTION
     This module provides functions to list Indonesian holidays.
@@ -80,10 +82,10 @@ DESCRIPTION
     list-id-holidays.
 
 FUNCTIONS
-  count_id_workdays
+  count_idn_workdays
     Usage:
 
-     count_id_workdays(%args) -> [status, msg, payload, meta]
+     count_idn_workdays(%args) -> [status, msg, payload, meta]
 
     Count working days for a certain period.
 
@@ -92,7 +94,7 @@ FUNCTIONS
     counted as working days. If observe_joint_leaves is set to false, joint
     leave days are also counted as working days.
 
-    Contains data from years 1990 to 2021 (joint leave days until 2021).
+    Contains data from years 1990 to 2021
 
     This function is not exported by default, but exportable.
 
@@ -131,10 +133,10 @@ FUNCTIONS
 
     Return value: (any)
 
-  enum_id_workdays
+  enum_idn_workdays
     Usage:
 
-     enum_id_workdays(%args) -> [status, msg, payload, meta]
+     enum_idn_workdays(%args) -> [status, msg, payload, meta]
 
     Enumerate working days for a certain period.
 
@@ -143,7 +145,7 @@ FUNCTIONS
     counted as working days. If observe_joint_leaves is set to false, joint
     leave days are also counted as working days.
 
-    Contains data from years 1990 to 2021 (joint leave days until 2021).
+    Contains data from years 1990 to 2021
 
     This function is not exported by default, but exportable.
 
@@ -182,10 +184,10 @@ FUNCTIONS
 
     Return value: (any)
 
-  is_id_holiday
+  is_idn_holiday
     Usage:
 
-     is_id_holiday(%args) -> [status, msg, payload, meta]
+     is_idn_holiday(%args) -> [status, msg, payload, meta]
 
     Check whether a date is an Indonesian holiday.
 
@@ -198,7 +200,12 @@ FUNCTIONS
     Will return undef (exit code 2 on CLI) if year is not within range of
     the holiday data.
 
-    This function is not exported.
+    Note that you can also use "list_idn_holidays" to check whether a "date"
+    (or a combination of "day", "month", and "year") is a holiday , but
+    "is_idn_holiday" is slightly more efficient, its "include_joint_leave"
+    option is more convenient, and it offers a few more options.
+
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -229,16 +236,16 @@ FUNCTIONS
 
     Return value: (any)
 
-  list_id_holidays
+  list_idn_holidays
     Usage:
 
-     list_id_holidays(%args) -> [status, msg, payload, meta]
+     list_idn_holidays(%args) -> [status, msg, payload, meta]
 
     List Indonesian holidays in calendar.
 
     List holidays and joint leave days ("cuti bersama").
 
-    Contains data from years 1990 to 2021 (joint leave days until 2021).
+    Contains data from years 1990 to 2021
 
     This function is not exported by default, but exportable.
 
@@ -731,10 +738,10 @@ FUNCTIONS
 
     Return value: (any)
 
-  list_id_workdays
+  list_idn_workdays
     Usage:
 
-     list_id_workdays(%args) -> [status, msg, payload, meta]
+     list_idn_workdays(%args) -> [status, msg, payload, meta]
 
     .
 

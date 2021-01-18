@@ -1,8 +1,9 @@
 package Lemonldap::NG::Common::UserAgent;
 
+use strict;
 use LWP::UserAgent;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.10';
 
 sub new {
     my ( $class, $conf ) = @_;

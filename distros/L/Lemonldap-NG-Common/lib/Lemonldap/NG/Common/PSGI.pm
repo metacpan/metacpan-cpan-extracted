@@ -1,12 +1,12 @@
 package Lemonldap::NG::Common::PSGI;
 
-use 5.10.0;
+use strict;
 use Mouse;
 use JSON;
 use Lemonldap::NG::Common::PSGI::Constants;
 use Lemonldap::NG::Common::PSGI::Request;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 our $_json = JSON->new->allow_nonref;
 
@@ -191,6 +191,8 @@ sub sendError {
             : $code == 400 ? 'Bad request'
             :                'Error'
         );
+
+        # TODO: this should probably use a template instead
         my $s = "<html><head><title>$title</title>
 <style>
 body{background:#000;color:#fff;padding:10px 50px;font-family:sans-serif;}a{text-decoration:none;color:#fff;}h1{text-align:center;}
@@ -202,16 +204,23 @@ body{background:#000;color:#fff;padding:10px 50px;font-family:sans-serif;}a{text
 <center><a href=\"https://lemonldap-ng.org\">LemonLDAP::NG</a></center>
 </body>
 </html>";
-        return [
-            $code,
-            [
-                'Content-Type'   => 'text/html; charset=utf-8',
-                'Content-Length' => length($s),
-                $req->spliceHdrs,
-            ],
-            [$s]
-        ];
+        return $self->sendRawHtml( $req, $s, code => $code );
     }
+}
+
+sub sendRawHtml {
+    my ( $self, $req, $s, %args ) = @_;
+    my $code    = $args{code}    || 200;
+    my $headers = $args{headers} || [ $req->spliceHdrs ];
+    return [
+        $code,
+        [
+            'Content-Type'   => 'text/html; charset=utf-8',
+            'Content-Length' => length($s),
+            @{$headers},
+        ],
+        [$s]
+    ];
 }
 
 sub abort {
@@ -249,7 +258,7 @@ sub sendJs {
     return [
         200,
         [
-            'Content-Type'   => 'application/javascript',
+            'Content-Type'   => 'application/json',
             'Content-Length' => length($s),
             'Cache-Control'  => 'public,max-age=2592000',
         ],

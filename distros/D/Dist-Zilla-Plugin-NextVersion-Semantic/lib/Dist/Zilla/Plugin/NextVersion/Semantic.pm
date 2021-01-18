@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::NextVersion::Semantic;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: update the next version, semantic-wise
-$Dist::Zilla::Plugin::NextVersion::Semantic::VERSION = '0.2.5';
+$Dist::Zilla::Plugin::NextVersion::Semantic::VERSION = '0.2.6';
 use strict;
 use warnings;
 
@@ -231,7 +231,7 @@ no Moose;
 {
     package Dist::Zilla::Plugin::NextVersion::Semantic::Incrementer;
 our $AUTHORITY = 'cpan:YANICK';
-$Dist::Zilla::Plugin::NextVersion::Semantic::Incrementer::VERSION = '0.2.5';
+$Dist::Zilla::Plugin::NextVersion::Semantic::Incrementer::VERSION = '0.2.6';
 use List::AllUtils qw/ first_index any /;
 
     use Moose::Role;
@@ -312,7 +312,7 @@ Dist::Zilla::Plugin::NextVersion::Semantic - update the next version, semantic-w
 
 =head1 VERSION
 
-version 0.2.5
+version 0.2.6
 
 =head1 SYNOPSIS
 
@@ -443,7 +443,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2021, 2015, 2014, 2013, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

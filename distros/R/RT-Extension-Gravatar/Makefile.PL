@@ -9,7 +9,7 @@ requires 'Digest::MD5';
 requires 'LWP::UserAgent';
 
 requires_rt '4.0.0';
-rt_too_new '4.6.0';
+rt_too_new '5.2.0';
 
 no_index( 'package' => 'RT::User' );
 

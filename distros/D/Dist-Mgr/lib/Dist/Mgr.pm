@@ -61,6 +61,7 @@ our @EXPORT_OK = qw(
     version_info
 );
 our @EXPORT_PRIVATE = qw(
+    _dist_dir_re
     _validate_git
 );
 our %EXPORT_TAGS = (
@@ -68,7 +69,7 @@ our %EXPORT_TAGS = (
     private => _export_private(),
 );
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use constant {
     CONFIG_FILE         => 'dist-mgr.json',
@@ -396,7 +397,7 @@ sub init {
 
     my $cwd = getcwd();
 
-    if ($cwd =~ /dist-mgr(-\d+\.\d+)?(-\d+)?$/i) {
+    if ($cwd =~ _dist_dir_re()) {
         croak "Can't run init() while in the '$cwd' directory";
     }
 
@@ -1083,6 +1084,13 @@ sub _pod_tie {
 
 # Validation related
 
+sub _dist_dir_re {
+    # Capture permutations of the distribution directory for various
+    # CPAN testers
+    # Use YAPE::Regex::Explain for details
+
+    return qr/dist-mgr(?:-\d+\.\d+)?(?:-\w+)?$/i;
+}
 sub _validate_git {
     my $sep = $^O =~ /win32/i ? ';' : ':';
     return grep {-x "$_/git" } split /$sep/, $ENV{PATH};

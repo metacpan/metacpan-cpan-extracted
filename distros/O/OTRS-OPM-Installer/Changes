@@ -1,6 +1,10 @@
 History for OTRS::OPM::Installer
 ================================
 
+0.05 2021-01-16 10:08:00
+
+     * OTRS::OPM::Parser switched to Moo and changed the behaviour, now OTRS::OPM::Installer adopted that behaviour
+
 0.04 2018-06-05 10:49:00
 
      [BUGFIXES]

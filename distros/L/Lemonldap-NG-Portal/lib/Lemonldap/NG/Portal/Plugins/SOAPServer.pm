@@ -13,12 +13,17 @@ package Lemonldap::NG::Portal::Plugins::SOAPServer;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_FORMEMPTY);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_FORMEMPTY
+);
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.10';
 
-extends 'Lemonldap::NG::Portal::Main::Plugin',
-  'Lemonldap::NG::Common::Conf::AccessLib';
+extends qw(
+  Lemonldap::NG::Portal::Main::Plugin
+  Lemonldap::NG::Common::Conf::AccessLib
+);
 
 has server => ( is => 'rw' );
 
@@ -112,29 +117,33 @@ sub init {
         $self->addUnauthRoute(
             sessions => { '*' => 'unauthSessions' },
             ['POST']
-        );
-        $self->addUnauthRoute(
+          )
+
+          ->addUnauthRoute(
             adminSessions => 'unauthAdminSessions',
             ['POST']
-        );
-        $self->addAuthRoute(
+          )
+
+          ->addAuthRoute(
             sessions => { '*' => 'badSoapRequest' },
             ['POST']
-        );
-        $self->addAuthRoute(
+          )
+
+          ->addAuthRoute(
             adminSessions => { '*' => 'badSoapRequest' },
             ['POST']
-        );
+          );
     }
     if ( $self->conf->{soapConfigServer} ) {
-        $self->addUnauthRoute( config => { '*' => 'config' }, ['POST'] );
-        $self->addAuthRoute( config => { '*' => 'badSoapRequest' }, ['POST'] );
+        $self->addUnauthRoute( config => { '*' => 'config' }, ['POST'] )
+          ->addAuthRoute( config => { '*' => 'badSoapRequest' }, ['POST'] );
     }
     if ( $self->conf->{wsdlServer} ) {
-        $self->addUnauthRoute( 'portal.wsdl' => 'getWsdl', ['GET'] );
-        $self->addAuthRoute( 'portal.wsdl' => 'getWsdl', ['GET'] );
+        $self->addUnauthRoute( 'portal.wsdl' => 'getWsdl', ['GET'] )
+          ->addAuthRoute( 'portal.wsdl' => 'getWsdl', ['GET'] );
     }
-    1;
+
+    return 1;
 }
 
 # SOAP DISPATCHERS

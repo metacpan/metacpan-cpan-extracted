@@ -1,11 +1,11 @@
 use strict;
 use warnings FATAL => 'all';
-use Apache::Test;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Apache::Test;
 use Apache::TestRequest;
 use Apache::TestUtil qw(t_cmp t_write_perl_script);
 use File::Spec::Functions qw(catfile);
 use lib 't';
-use MY::slurp;
+use File::Slurp qw(slurp);
 
 # Test filtered mod_cgi output
 plan tests => 4, (need_lwp && need_cgi);
@@ -21,7 +21,7 @@ cgi_unaltered: {
     t_write_perl_script(
         catfile($svrroot, qw(cgi-bin plain.cgi)),
         qq{ use lib "$svrroot";
-            use MY::slurp;
+            use File::Slurp qw(slurp);
             print "Content-Type: text/plain\\n\\n";
             print slurp("$docroot/test.css");
         } );
@@ -41,7 +41,7 @@ cgi_minified: {
     t_write_perl_script(
         catfile($svrroot, qw(cgi-bin css.cgi)),
         qq{ use lib "$svrroot";
-            use MY::slurp;
+            use File::Slurp qw(slurp);
             print "Content-Type: text/css\\n\\n";
             print slurp("$docroot/test.css");
         } );

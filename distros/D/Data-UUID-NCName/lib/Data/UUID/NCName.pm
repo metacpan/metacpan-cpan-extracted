@@ -7,9 +7,11 @@ use feature 'state';
 use base 'Exporter::Tiny';
 use overload;
 
-use MIME::Base32 ();
-use MIME::Base64 ();
-use Carp         ();
+use MIME::Base32           ();
+use MIME::Base64           ();
+use Math::BigInt           ();
+use Encode::Base58::BigInt ();
+use Carp                   ();
 
 use Type::Params qw(compile multisig);
 use Types::Standard qw(slurpy Maybe Any Item Str Int Dict Object Optional);
@@ -19,6 +21,36 @@ use Type::Utils -all;
 sub _to_string {
     my $x = shift;
     overload::Method($x, '""') || $x->can('to_string') || $x->can('as_string');
+}
+
+my %B58_FWD = do {
+    my @flickr = split //,
+        q{123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ};
+    my @btc = split //,
+        q{123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz};
+    map { $flickr[$_] => $btc[$_] } (0..$#flickr);
+};
+my %B58_REV = reverse %B58_FWD;
+
+
+sub _to_base58 {
+    # if we turn this to a bigint we need to remove the leading nulls first
+    my $str = shift;
+    $str =~ s/\A(\0*)//;
+    my $null = $1 // '';
+    # warn unpack 'H*', $str;
+    my $big = Math::BigInt->from_bytes($str);
+    my $b58 = Encode::Base58::BigInt::encode_base58($big);
+    ('1' x length($null)) . join '', map { $B58_FWD{$_} } (split //, $b58);
+}
+
+sub _from_base58 {
+    # again we have to remove any leading zero values (1 in base58) or
+    # they will be clobbered when turned into a bigint
+    my ($null, $b58) = ($_[0] =~ /\A(1*)(.*?)\z/);
+    $b58 = join '', map { $B58_REV{$_} } (split //, $b58);
+    my $big = Math::BigInt->new(Encode::Base58::BigInt::decode_base58($b58));
+    ("\0" x length($null)) . $big->to_bytes;
 }
 
 declare Stringable, as Object, where \&_to_string;
@@ -43,7 +75,7 @@ declare AnyUUID, as Str|Stringable, where {
 };
 
 enum Format, [qw(str hex b64 bin)];
-enum Radix,  [32, 64];
+enum Radix,  [32, 58, 64];
 enum Ver,    [0, 1]; # there may be more versions later on
 
 =encoding utf8
@@ -54,11 +86,11 @@ Data::UUID::NCName - Make valid NCName tokens which are also UUIDs
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -69,7 +101,7 @@ our $VERSION = '0.05';
     my $ncn32 = to_ncname($uuid, version => 1, radix => 32);
 
     # $ncn is now "EH_kW827XQ6719MhfGM0QL".
-    # $ncn32 is "Ed74rn43o25b255puzbprrtiql" and case-insensitive.
+    # $ncn32 is "ed74rn43o25b255puzbprrtiql" and case-insensitive.
 
     # from Test::More, this will output 'ok':
     is(from_ncname($ncn, version => 1),
@@ -129,9 +161,8 @@ Base64 variants.
 
 Since I have already released this module prior to this format change,
 I have added a C<version> parameter to both L</to_ncname> and
-L</from_ncname>. The version currently defaults to C<0>, the old one,
-but will issue a warning if not explicitly set. Later I will change
-the default to C<1>, while keeping the warning, then later still,
+L</from_ncname>. The version currently defaults to C<1>, the new one,
+but will issue a warning if not explicitly set. Later I will
 finally remove the warning with C<1> as the default. This should
 ensure that any code written during the transition produces the
 correct results.
@@ -287,6 +318,10 @@ Import encode-only functions.
 
 Import base32-only functions.
 
+=item :58
+
+Import base58-only functions.
+
 =item :64
 
 Import base64-only functions.
@@ -300,10 +335,12 @@ Import base64-only functions.
 our %EXPORT_TAGS = (
     all => [qw(to_ncname from_ncname
                to_ncname_32 from_ncname_32
+               to_ncname_58 from_ncname_58
                to_ncname_64 from_ncname_64)],
-    decode => [qw(from_ncname from_ncname_32 from_ncname_64)],
-    encode => [qw(to_ncname to_ncname_32 to_ncname_64)],
+    decode => [qw(from_ncname from_ncname_32 from_ncname_58 from_ncname_64)],
+    encode => [qw(to_ncname to_ncname_32 to_ncname_58 to_ncname_64)],
     32     => [qw(to_ncname_32 from_ncname_32)],
+    58     => [qw(to_ncname_58 from_ncname_58)],
     64     => [qw(to_ncname_64 from_ncname_64)],
 );
 
@@ -328,6 +365,14 @@ my %ENCODE = (
         # we want lower case because IT IS RUDE TO SHOUT
         lc substr($out, 0, 25);
     },
+    58 => sub {
+        my @in = unpack 'C*', shift;
+        my $variant = pop(@in) >> 4;
+        # warn unpack 'H*', pack 'C*', @in;
+        my $out = _to_base58(pack 'C*', @in);
+        # warn $out;
+        $out . ('_' x (21 - length $out)) . _encode_version($variant);
+    },
     64 => sub {
         my @in = unpack 'C*', shift;
         my $align = shift;
@@ -351,6 +396,13 @@ my %DECODE = (
         $out[-1] <<= 1 if $align;
 
         pack 'C*', @out;
+    },
+    58 => sub {
+        my ($in, $align) = @_;
+        my ($b58, $variant) = ($in =~ /^(.*)(.)$/);
+        $variant = _decode_version($variant) << 4;
+        $b58 =~ tr/_//d;
+        _from_base58($b58) . chr($variant);
     },
     64 => sub {
         my ($in, $align) = @_;
@@ -377,11 +429,13 @@ my @TRANSFORM = (
             my $data = shift;
             my @list = unpack 'N4', $data;
 
+            # take the 4 bits the version
             my $ver = ($list[1] & 0x0000f000) >> 12;
+            # patch the hole with by shifting everything left by 4 bits
             $list[1] = ($list[1] & 0xffff0000) |
                 (($list[1] & 0x00000fff) << 4) | ($list[2] >> 28);
             $list[2] = ($list[2] & 0x0fffffff) << 4 | ($list[3] >> 28);
-            $list[3] <<= 4;
+            $list[3] <<= 4; # note variant bits are not removed
 
             return $ver, pack 'N4', @list;
         },
@@ -412,8 +466,8 @@ my @TRANSFORM = (
             my $data = shift;
             my @list = unpack 'N4', $data;
 
-            my $ver = ($list[1] & 0x0000f000) >> 12;
-            my $var = ($list[2] & 0xf0000000) >> 24;
+            my $ver = ($list[1] & 0x0000f000) >> 12; # version
+            my $var = ($list[2] & 0xf0000000) >> 24; # variant
             $list[1] = ($list[1] & 0xffff0000) |
                 (($list[1] & 0x00000fff) << 4) |
                 (($list[2] & 0x0fffffff) >> 24);
@@ -448,12 +502,13 @@ my @TRANSFORM = (
 
 sub _encode_version {
     my $ver = $_[0] & 15;
+    my $off = ($_[1] // 64) == 32 ? 97 : 65;
     # A (0) starts at 65. this should never be higher than F (version
     # 5) for a valid UUID, but even an invalid one will never be
     # higher than P (15).
 
     # XXX boo-hoo, this will break in EBCDIC.
-    chr($ver + 65);
+    chr($ver + $off);
 }
 
 sub _decode_version {
@@ -468,19 +523,19 @@ sub _decode_version {
 Turn C<$UUID> into an NCName. The UUID can be in the canonical
 (hyphenated) hexadecimal form, non-hyphenated hexadecimal, Base64
 (regular and base64url), or binary. The function returns a legal
-NCName equivalent to the UUID, in either Base32 or Base64 (url), given
-a specified C<$RADIX> of 32 or 64. If the radix is omitted, Base64
-is assumed.
+NCName equivalent to the UUID, in either Base32, Base58, or Base64
+(url), given a specified C<$RADIX> of 32, 58, or 64. If the radix is
+omitted, Base64 is assumed.
 
 The following keyword parameters are also accepted, and override the
 positional parameters where applicable:
 
 =over 4
 
-=item radix 32|64
+=item radix 32|58|64
 
-Either 32 or 64 to explicitly specify Base32 or Base64 output.
-Defaults to 64.
+Either 32 or 64 to explicitly specify Base32, Base58, or Base64
+output. Defaults to 64.
 
 =item version 0|1
 
@@ -494,7 +549,8 @@ to eliminate the warning messages.
 =item align $FALSY|$TRUTHY
 
 Align the last 4 bits to the Base32/Base64 symbol size. You almost
-certainly want this, so the default is I<true>.
+certainly want this, so the default is I<true>. (Does not apply to
+Base58.)
 
 =back
 
@@ -524,7 +580,7 @@ sub to_ncname {
     unless (defined $p->{version}) {
         Carp::carp('Set an explicit `version` to eliminate this warning.' .
                        ' See Data::UUID::NCName docs.');
-        $p->{version} = 0;
+        $p->{version} = 1;
     }
 
     # type checking has ensured this is Stringable so get the string
@@ -562,7 +618,8 @@ sub to_ncname {
     my ($version, $content) = $TRANSFORM[$p->{version}][0]->($bin);
 
     # wah-lah.
-    _encode_version($version) . $ENCODE{$radix}->($content, $p->{align});
+    _encode_version($version, $radix) .
+        $ENCODE{$radix}->($content, $p->{align});
 }
 
 =head2 from_ncname $NCNAME [, $FORMAT [, $RADIX] ] [, %PARAMS ]
@@ -687,7 +744,7 @@ sub from_ncname {
     unless (defined $p->{version}) {
         Carp::carp('Set an explicit `version` to eliminate this warning.' .
                        ' See Data::UUID::NCName docs.');
-        $p->{version} = 0;
+        $p->{version} = 1;
     }
 
     # obviously this must be defined
@@ -701,22 +758,21 @@ sub from_ncname {
         or return;
 
     if ($radix) {
-        Carp::croak("Radix must be either 32 or 64, not $radix")
-              unless $radix == 32 || $radix == 64;
+        Carp::croak("Radix must be either 32, 58, or 64, not $radix")
+              unless $radix == 32 || $radix == 58 || $radix == 64;
     }
     else {
         # detect what to do based on input
         my $len = length $ncname;
-        if ($ncname =~ m![_-]!) {
-            # containing these characters means base64url
+
+        if ($len == 22) {
             $radix = 64;
         }
-        elsif ($len >= 26) {
-            # if it didn't contain those characters and is this long
+        elsif ($len == 23) {
+            $radix = 58;
+        }
+        elsif ($len == 26) {
             $radix = 32;
-        }
-        elsif ($len >= 22) {
-            $radix = 64;
         }
         else {
             # the regex above should ensure this is never reached.
@@ -756,6 +812,26 @@ Ditto.
 
 sub from_ncname_64 {
     from_ncname(@_, radix => 64);
+}
+
+=head2 to_ncname_58 $UUID [, %PARAMS ]
+
+Shorthand for Base58 NCNames.
+
+=cut
+
+sub to_ncname_58 {
+    to_ncname(shift, 58, @_);
+}
+
+=head2 from_ncname_58 $NCNAME [, $FORMAT | %PARAMS ]
+
+Ditto.
+
+=cut
+
+sub from_ncname_58 {
+    from_ncname(@_, radix => 58);
 }
 
 =head2 to_ncname_32 $UUID [, %PARAMS ]

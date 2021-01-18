@@ -5,9 +5,11 @@
 # SOAP wrapper used to restrict exported functions
 package Lemonldap::NG::Common::PSGI::SOAPService;
 
+use strict;
+
 require SOAP::Lite;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.10';
 
 ## @cmethod Lemonldap::NG::Common::PSGI::SOAPService new(object obj,string @func)
 # Constructor
@@ -28,7 +30,7 @@ sub new {
 # @return data provided by the exported function
 sub AUTOLOAD {
     my $self = shift;
-    $AUTOLOAD =~ s/.*:://;
+    our $AUTOLOAD =~ s/.*:://;
     if ( grep { $_ eq $AUTOLOAD } @{ $self->{func} } ) {
         my $tmp = $self->{obj}->$AUTOLOAD( $self->{req}, @_ );
         unless ( ref($tmp) and ref($tmp) =~ /^SOAP/ ) {

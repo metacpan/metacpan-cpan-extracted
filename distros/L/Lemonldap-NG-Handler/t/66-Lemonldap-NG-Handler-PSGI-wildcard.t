@@ -4,6 +4,7 @@ use MIME::Base64;
 
 BEGIN {
     require 't/test-psgi-lib.pm';
+    require 't/custom.pm';
 }
 
 init('Lemonldap::NG::Handler::PSGI');
@@ -39,7 +40,6 @@ ok(
     'Authentified query'
 );
 ok( $res->[0] == 200, 'Code is 200' ) or explain( $res, 200 );
-
 count(2);
 
 # Denied query
@@ -50,7 +50,6 @@ ok(
     'Denied query'
 );
 ok( $res->[0] == 403, 'Code is 403' ) or explain( $res->[0], 403 );
-
 count(2);
 
 # Bad cookie
@@ -67,11 +66,9 @@ ok( $res->[0] == 302, 'Code is 302' ) or explain( $res->[0], 302 );
 unlink(
 't/sessions/lock/Apache-Session-e5eec18ebb9bc96352595e2d8ce962e8ecf7af7c9a98cb9a43f9cd181cf4b545.lock'
 );
-
 count(2);
 
 done_testing( count() );
-
 clean();
 
 sub Lemonldap::NG::Handler::PSGI::handler {

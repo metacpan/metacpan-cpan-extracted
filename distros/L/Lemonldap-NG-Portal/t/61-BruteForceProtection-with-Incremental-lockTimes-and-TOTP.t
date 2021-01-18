@@ -26,7 +26,7 @@ SKIP: {
                 totp2fSelfRegistration               => 1,
                 totp2fActivation                     => 1,
                 failedLoginNumber                    => 4,
-                bruteForceProtectionMaxFailed        => 0,
+                bruteForceProtectionMaxFailed        => 0
             }
         }
     );
@@ -95,16 +95,73 @@ SKIP: {
         ),
         '1st Bad Auth query'
     );
+    ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span>/, 'Bad credential' )
+      or print STDERR Dumper( $res->[2]->[0] );
+    count(2);
+
+    ## Second failed connection
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new('user=dwho&password=ohwd'),
+            length => 23,
+            accept => 'text/html',
+        ),
+        '1st Bad Auth query'
+    );
     ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
         'Rejected -> Protection enabled' )
       or print STDERR Dumper( $res->[2]->[0] );
-    ok( $res->[2]->[0] =~ m%5 <span trspan="seconds">seconds</span>%,
-        'LockTime = 5' )
+    ok( $res->[2]->[0] =~ m%(\d{2}) <span trspan="seconds">seconds</span>%,
+        "LockTime = $1" );
+    ok( $1 <= 15 && $1 >= 13, 'LockTime in range' )
       or print STDERR Dumper( $res->[2]->[0] );
-    count(3);
+    count(4);
 
     # Waiting
     Time::Fake->offset("+3s");
+    ## Try to connect
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new('user=dwho&password=dwho'),
+            length => 23,
+            accept => 'text/html',
+        ),
+        'Auth query'
+    );
+    ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
+        'Rejected -> Protection enabled' )
+      or print STDERR Dumper( $res->[2]->[0] );
+    ok( $res->[2]->[0] =~ m%(\d{2}) <span trspan="seconds">seconds</span>%,
+        "LockTime = $1" );
+    ok( $1 < 30 && $1 >= 25, 'LockTime in range' )
+      or print STDERR Dumper( $res->[2]->[0] );
+    count(4);
+
+    # Waiting
+    Time::Fake->offset("+6s");
+    ## Third failed connection
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new('user=dwho&password=ohwd'),
+            length => 23,
+            accept => 'text/html',
+        ),
+        '2nd Bad Auth query'
+    );
+    ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
+        'Rejected -> Protection enabled' )
+      or print STDERR Dumper( $res->[2]->[0] );
+    ok( $res->[2]->[0] =~ m%(\d{2}) <span trspan="seconds">seconds</span>%,
+        "LockTime = $1" );
+    ok( $1 < 60 && $1 >= 55, 'LockTime in range' )
+      or print STDERR Dumper( $res->[2]->[0] );
+    count(4);
+
+    # Waiting
+    Time::Fake->offset("+70s");
     ## Try to connect
     ok(
         $res = $client->_post(
@@ -120,117 +177,6 @@ SKIP: {
     count(2);
 
     my ( $host, $url, $query ) =
-      expectForm( $res, undef, '/totp2fcheck', 'token' );
-    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-        'Code' );
-    $query =~ s/code=/code=$code/;
-    ok(
-        $res = $client->_post(
-            '/totp2fcheck', IO::String->new($query),
-            length => length($query),
-            accept => 'text/html',
-        ),
-        'Post code'
-    );
-    ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
-        'Rejected -> Protection enabled' )
-      or print STDERR Dumper( $res->[2]->[0] );
-    ok( $res->[2]->[0] =~ m%5 <span trspan="seconds">seconds</span>%,
-        'LockTime = 5' )
-      or print STDERR Dumper( $res->[2]->[0] );
-    count(4);
-
-    ## Second failed connection
-    ok(
-        $res = $client->_post(
-            '/',
-            IO::String->new('user=dwho&password=ohwd'),
-            length => 23,
-            accept => 'text/html',
-        ),
-        '2nd Bad Auth query'
-    );
-    ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
-        'Rejected -> Protection enabled' )
-      or print STDERR Dumper( $res->[2]->[0] );
-    ok( $res->[2]->[0] =~ m%15 <span trspan="seconds">seconds</span>%,
-        'LockTime = 15' )
-      or print STDERR Dumper( $res->[2]->[0] );
-    count(3);
-
-    # Waiting
-    Time::Fake->offset("+10s");
-    ## Try to connect
-    ok(
-        $res = $client->_post(
-            '/',
-            IO::String->new('user=dwho&password=dwho'),
-            length => 23,
-            accept => 'text/html',
-        ),
-        'Auth query'
-    );
-    ok( $res->[2]->[0] =~ /<span trspan="enterTotpCode">/, 'Enter TOTP code' )
-      or print STDERR Dumper( $res->[2]->[0] );
-    count(2);
-
-    ( $host, $url, $query ) =
-      expectForm( $res, undef, '/totp2fcheck', 'token' );
-    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-        'Code' );
-    $query =~ s/code=/code=$code/;
-    ok(
-        $res = $client->_post(
-            '/totp2fcheck', IO::String->new($query),
-            length => length($query),
-            accept => 'text/html',
-        ),
-        'Post code'
-    );
-    ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
-        'Rejected -> Protection enabled' )
-      or print STDERR Dumper( $res->[2]->[0] );
-    ok( $res->[2]->[0] =~ m%15 <span trspan="seconds">seconds</span>%,
-        'LockTime = 15' )
-      or print STDERR Dumper( $res->[2]->[0] );
-    count(4);
-
-    ## Third failed connection
-    ok(
-        $res = $client->_post(
-            '/',
-            IO::String->new('user=dwho&password=ohwd'),
-            length => 23,
-            accept => 'text/html',
-        ),
-        '3rd Bad Auth query'
-    );
-    ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
-        'Rejected -> Protection enabled' )
-      or print STDERR Dumper( $res->[2]->[0] );
-    ok( $res->[2]->[0] =~ m%60 <span trspan="seconds">seconds</span>%,
-        'LockTime = 60' )
-      or print STDERR Dumper( $res->[2]->[0] );
-    count(3);
-
-    # Waiting
-    Time::Fake->offset("+80s");
-    ## Try to connect
-    ok(
-        $res = $client->_post(
-            '/',
-            IO::String->new('user=dwho&password=dwho'),
-            length => 23,
-            accept => 'text/html',
-        ),
-        'Auth query'
-    );
-    ok( $res->[2]->[0] =~ /<span trspan="enterTotpCode"><\/span>/,
-        'Enter TOTP code' )
-      or print STDERR Dumper( $res->[2]->[0] );
-    count(2);
-
-    ( $host, $url, $query ) =
       expectForm( $res, undef, '/totp2fcheck', 'token' );
     ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
         'Code' );

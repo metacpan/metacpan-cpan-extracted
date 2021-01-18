@@ -24,8 +24,7 @@ SKIP: {
                 totp2fSelfRegistration => 1,
                 u2fSelfRegistration    => 1,
                 portalMainLogo         => 'common/logos/logo_llng_old.png',
-                u2fSelfRegistration =>
-                  '$_2fDevices =~ /"type":\s*"(?:TOTP|U2F)"/s',
+                u2fSelfRegistration    => 'has2f("TOTP") or has2f("U2F")',
             }
         }
     );

@@ -14,12 +14,16 @@ use Time::HiRes qw(gettimeofday tv_interval);
 
 ###############################################################################
 # Load up the JS minifier modules.
-use JavaScript::Minifier;
+use JavaScript::Minifier qw(minify);
 eval { require JavaScript::Minifier::XS; };
 
 ###############################################################################
+# Keep our namespace clean.
+use namespace::clean;
+
+###############################################################################
 # Version number.
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
 ###############################################################################
 # MIME-Types we're willing to minify.
@@ -125,9 +129,11 @@ sub handler {
 
 1;
 
+=for stopwords PerlVar minified minifier minification minifies minifying
+
 =head1 NAME
 
-Apache2::Filter::Minifier::JavaScript - JS minifying output filter
+Apache2::Filter::Minifier::JavaScript - JavaScript minifying output filter for mod_perl
 
 =head1 SYNOPSIS
 
@@ -197,7 +203,7 @@ Memory Cache
 
 =item handler($filter)
 
-JavaScript minification output filter. 
+JavaScript minification output filter.
 
 =back
 
@@ -217,9 +223,16 @@ license as Perl itself.
 
 =head1 SEE ALSO
 
-L<JavaScript::Minifier>,
-L<JavaScript::Minifier::XS>,
-L<Apache2::Filter::Minifier::CSS>,
-L<Apache::Clean>.
+=over
+
+=item L<JavaScript::Minifier>
+
+=item L<JavaScript::Minifier::XS>
+
+=item L<Apache2::Filter::Minifier::CSS>
+
+=item L<Apache::Clean>
+
+=back
 
 =cut

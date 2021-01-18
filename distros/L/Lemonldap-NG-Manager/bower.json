@@ -14,9 +14,7 @@
     "angular-ui-tree": "x",
     "bootstrap": "3.x",
     "es5-shim": "x",
-    "file-saver.js": "x",
-    "jquery": "x",
-    "jquery-ui": "x"
+    "file-saver.js": "x"
   },
   "resolutions": {
     "angular": "1.7.x"

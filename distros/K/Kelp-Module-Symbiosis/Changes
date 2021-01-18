@@ -1,5 +1,18 @@
 Revision history for Perl extension Kelp::Module::Symbiosis.
 
+1.10 Sat Jan 16 2021
+	- deprecate 'automount' config, introduce 'mount' in its place
+	- deprecate K::M::Symbiosis::Test, introduce KelpX::Symbiosis::Test
+	- KelpX::Symbiosis::Test class now offers a 'wrap' method for easier setup
+	- Symbiosis must now be loaded before any module that uses it
+	- child modules should now have a 'name' method, returning their name
+	- child modules now register themselves into 'loaded' method (hash)
+	- child modules can now specify 'mount' in their config
+	- 'mount' method now also allows mounting modules by their name
+	- mounting the same object in many paths will now only call its 'run' once
+	- update and improve test cases
+	- maintenance work
+
 1.01 Wed Jan 13 2021
 	- deprecate run_all, use run instead ($kelp->run_all stays the same)
 	- symbiosis can now mount plain coderefs

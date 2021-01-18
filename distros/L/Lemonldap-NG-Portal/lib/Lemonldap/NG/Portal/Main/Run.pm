@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -133,10 +133,11 @@ sub login {
     return $self->do(
         $req,
         [
-            'controlUrl',        @{ $self->beforeAuth },
-            $self->authProcess,  @{ $self->betweenAuthAndData },
-            $self->sessionData,  @{ $self->afterData },
-            $self->validSession, @{ $self->endAuth },
+            'checkUnauthLogout', 'controlUrl',    # Fix 2342
+            @{ $self->beforeAuth },         $self->authProcess,
+            @{ $self->betweenAuthAndData }, $self->sessionData,
+            @{ $self->afterData },          $self->validSession,
+            @{ $self->endAuth }
         ]
     );
 }
@@ -146,11 +147,11 @@ sub postLogin {
     return $self->do(
         $req,
         [
-            'restoreArgs',                  'controlUrl',
-            @{ $self->beforeAuth },         $self->authProcess,
-            @{ $self->betweenAuthAndData }, $self->sessionData,
-            @{ $self->afterData },          $self->validSession,
-            @{ $self->endAuth },
+            'checkUnauthLogout', 'restoreArgs',            # Fix 2342
+            'controlUrl',        @{ $self->beforeAuth },
+            $self->authProcess,  @{ $self->betweenAuthAndData },
+            $self->sessionData,  @{ $self->afterData },
+            $self->validSession, @{ $self->endAuth }
         ]
     );
 }
@@ -199,8 +200,8 @@ sub refresh {
             $self->groupsAndMacros,
             'setLocalGroups',
             sub {
-                $req->sessionInfo->{$_} = $data{$_} foreach ( keys %data );
-                $req->refresh(1);
+                $_[0]->sessionInfo->{$_} = $data{$_} foreach ( keys %data );
+                $_[0]->refresh(1);
                 return PE_OK;
             },
             'store',
@@ -230,6 +231,24 @@ sub logout {
             'deleteSession'
         ]
     );
+}
+
+sub unauthLogout {
+    my ( $self, $req ) = @_;
+    $self->userLogger->info('Unauthenticated logout request');
+    $self->logger->debug('Cleaning pdata');
+    $self->logger->debug("Removing $self->{conf}->{cookieName} cookie");
+    $req->pdata( {} );
+    $req->addCookie(
+        $self->cookie(
+            name    => $self->conf->{cookieName},
+            domain  => $self->conf->{domain},
+            secure  => $self->conf->{securedCookie},
+            expires => 'Wed, 21 Oct 2015 00:00:00 GMT',
+            value   => 0
+        )
+    );
+    return $self->do( $req, [ sub { PE_LOGOUT_OK } ] );
 }
 
 # RUNNING METHODS
@@ -277,7 +296,7 @@ sub do {
                 code    => 401,
                 headers => [
                     'WWW-Authenticate' => "SSO " . $self->conf->{portal},
-                    "Content-Type"     => "application/javascript"
+                    "Content-Type"     => "application/json"
                 ],
             );
         }
@@ -1018,7 +1037,9 @@ sub tplParams {
 }
 
 sub registerLogin {
-    my ( $self, $req ) = @_;
+
+    # $user passed by BruteForceProtection plugin
+    my ( $self, $req, $uid ) = @_;
     return
       unless ( $self->conf->{loginHistoryEnabled}
         and defined $req->authResult );
@@ -1048,12 +1069,13 @@ sub registerLogin {
                 }
             }
         }
-        $self->updatePersistentSession( $req, { 'loginHistory' => undef } );
+        $self->updatePersistentSession( $req, { 'loginHistory' => undef },
+            $uid );
         delete $req->sessionInfo->{loginHistory};
     }
 
     my $history = $req->sessionInfo->{_loginHistory} ||= {};
-    my $type = ( $req->authResult > 0 ? 'failed' : 'success' ) . 'Login';
+    my $type    = ( $req->authResult > 0 ? 'failed' : 'success' ) . 'Login';
     $history->{$type} ||= [];
     $self->logger->debug("Current login saved into $type");
 
@@ -1073,7 +1095,7 @@ sub registerLogin {
       if ( scalar @{ $history->{$type} } > $self->conf->{ $type . "Number" } );
 
     # Save into persistent session
-    $self->updatePersistentSession( $req, { _loginHistory => $history, } );
+    $self->updatePersistentSession( $req, { _loginHistory => $history }, $uid );
 
     PE_OK;
 }
@@ -1132,6 +1154,18 @@ sub sendJSONresponse {
 
     }
     elsif ( $self->conf->{corsEnabled} ) {
+        my @cors = split /;/, $self->cors;
+        push @{ $res->[1] }, @cors;
+        $self->logger->debug('Apply following CORS policy :');
+        $self->logger->debug(" $_") for @cors;
+    }
+    return $res;
+}
+
+sub sendRawHtml {
+    my ($self) = $_[0];
+    my $res = Lemonldap::NG::Common::PSGI::sendRawHtml(@_);
+    if ( $self->conf->{corsEnabled} ) {
         my @cors = split /;/, $self->cors;
         push @{ $res->[1] }, @cors;
         $self->logger->debug('Apply following CORS policy :');

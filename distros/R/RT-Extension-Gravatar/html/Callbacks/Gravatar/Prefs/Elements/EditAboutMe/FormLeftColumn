@@ -1,0 +1,11 @@
+<&| /Widgets/TitleBox, title => loc('Gravatar') &>
+<div class="gravatar">
+<& /Elements/Gravatar, UserObj => $UserObj &>
+</div>
+</&>
+<%INIT>
+return unless $UserObj->HasGravatar;
+</%INIT>
+<%ARGS>
+$UserObj => undef
+</%ARGS>

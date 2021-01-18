@@ -24,6 +24,9 @@ Module::Build->new(
         resources => {
             repository =>
 'https://bitbucket.org/rolandvanipenburg/class-measure-scientific-fx_992vb',
+            bugtracker => {
+              web => 'https://bitbucket.org/rolandvanipenburg/class-measure-scientific-fx_992vb/issues'
+            },
         },
     },
     sign => 1,

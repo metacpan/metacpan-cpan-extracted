@@ -1,0 +1,43 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+        <div class="form-group">
+          <label for="privateKey" id="lpv"><span>{{translateTitle(currentNode.data[0])}}</span></label>
+          <textarea id="privateKey" aria-describedby="lpv" class="form-control" rows="8" ng-model="currentNode.data[0].data"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="privkfile" id="lprivkfile"><span trspan="replaceByFile"></span></label>
+          <input id="privkfile" aria-describedby="lprivkfile" type="file" class="form-control" on-read-file="replaceContent(currentNode.data[0],$fileContent)"/>
+        </div>
+        <div class="form-group">
+          <label for="keypwd" id="lkp"><span>{{translateTitle(currentNode.data[1])}}</span></label>
+          <input id="keypwd" aria-describedby="lkp" class="form-control" ng-model="currentNode.data[1].data"/>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+        <div class="form-group">
+          <label for="publicKey" id="lpub"><span>{{translateTitle(currentNode.data[2])}}</span></label>
+          <textarea id="publicKey" aria-describedby="lpub" class="form-control" rows="8" ng-model="currentNode.data[2].data"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="privkfile" id="lprivkfile"><span trspan="replaceByFile"></span></label>
+          <input id="privkfile" aria-describedby="lprivkfile" type="file" class="form-control" on-read-file="replaceContent(currentNode.data[2],$fileContent)"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/menu">
+[{
+ "title": "newCertificate",
+ "icon": "plus-sign"
+},{
+  "title": "download",
+  "icon": "save-file",
+  "action": "saveAsPem"
+}]
+</script>

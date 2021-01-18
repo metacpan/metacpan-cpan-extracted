@@ -9,7 +9,7 @@ use vars qw($VERSION $AUTOLOAD %ERROR $ERROR $Warn $Die);
 use Carp qw(croak carp);
 
 $ERROR     = '';
-$VERSION   = '1.293';
+$VERSION   = '1.294';
 $Warn      = 0;
 $Die       = '';
 
@@ -131,7 +131,7 @@ line. These three entries are the same:
 	from \
 	Peru
 
-If a line is only whitespace, or the first whitespace character is
+If a line is only whitespace, or the first non-whitespace character is
 a #, the Perl comment character, C<ConfigReader::Simple> ignores the
 line unless it is the continuation of the previous line.
 
@@ -400,7 +400,7 @@ sub parse_string {
 	chomp( @lines );
 #	carp "A: Found " . @lines . " lines" if $DEBUG;
 
-	while( my $line = shift @lines ) {
+	while( defined( my $line = shift @lines )) {
 #		carp "1: Line is $line" if $DEBUG;
 
 		CONT: {
@@ -795,7 +795,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

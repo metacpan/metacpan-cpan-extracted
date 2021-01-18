@@ -74,7 +74,7 @@ de_opm.pl - create the files listed in the .opm (unpack it)
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 AUTHOR
 

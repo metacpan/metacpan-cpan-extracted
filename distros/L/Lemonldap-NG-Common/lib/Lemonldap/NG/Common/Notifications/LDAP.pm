@@ -486,7 +486,8 @@ sub _ldap {
     # Connect
     my $ldap = Net::LDAP->new(
         \@servers,
-        onerror => undef,
+        onerror   => undef,
+        keepalive => 1,
         ( $self->ldapPort   ? ( port   => $self->ldapPort )   : () ),
         ( $self->ldapVerify ? ( verify => $self->ldapVerify ) : () ),
         ( $self->ldapCAFile ? ( cafile => $self->ldapCAFile ) : () ),

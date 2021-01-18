@@ -3,16 +3,17 @@
 
 use strict;
 
+sub POE::Kernel::ASSERT_DEFAULT () { 1 }
+use POE qw(Component::Client::Ping);
+
 BEGIN {
   $| = 1;
-  if ($> and ($^O ne 'VMS')) {
+  unless (POE::Component::Client::Ping->can_open_socket()) {
     print "1..0 # skipped: ICMP ping requires root privilege\n";
     exit 0;
   }
 };
 
-sub POE::Kernel::ASSERT_DEFAULT () { 1 }
-use POE qw(Component::Client::Ping);
 use Test::More tests => 2;
 
 sub PING_TIMEOUT () { 5 }; # seconds between pings

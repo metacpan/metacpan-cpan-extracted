@@ -8,21 +8,23 @@ package Lemonldap::NG::Portal::Auth::_WebForm;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_NOTOKEN
+  PE_FORMEMPTY
+  PE_FIRSTACCESS
   PE_CAPTCHAEMPTY
   PE_CAPTCHAERROR
-  PE_FIRSTACCESS
-  PE_FORMEMPTY
-  PE_NOTOKEN
-  PE_OK
-  PE_PASSWORDFORMEMPTY
   PE_TOKENEXPIRED
   PE_MALFORMEDUSER
+  PE_PASSWORDFORMEMPTY
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
-extends 'Lemonldap::NG::Portal::Main::Auth',
-  'Lemonldap::NG::Portal::Lib::_tokenRule';
+extends qw(
+  Lemonldap::NG::Portal::Main::Auth
+  Lemonldap::NG::Portal::Lib::_tokenRule
+);
 
 has authnLevel => (
     is      => 'rw',
@@ -138,7 +140,7 @@ sub extractFormInfo {
     # Other parameters
     $req->data->{timezone} = $req->param('timezone');
 
-    PE_OK;
+    return PE_OK;
 }
 
 # Set password in session data if wanted.
@@ -158,7 +160,7 @@ sub setAuthSessionInfo {
     # Store user timezone
     $req->{sessionInfo}->{'_timezone'} = $self->{'timezone'};
 
-    PE_OK;
+    return PE_OK;
 }
 
 # @return display type

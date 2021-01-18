@@ -16,7 +16,6 @@
     <PackageRequired Version="1.2.4">LocalPackage</PackageRequired>
     <ModuleRequired Version="4.32">Mojolicious</ModuleRequired>
     <Filelist>
-        <File Permission="644" Location="Kernel/Config/Files/QuickMerge.xml"></File>
         <File Permission="644" Location="Kernel/Config/Files/QuickMerge.xml" Encode="Base64">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8b3Ryc19jb25maWcg
 dmVyc2lvbj0iMS4wIiBpbml0PSJBcHBsaWNhdGlvbiI+CiAgICA8Q1ZTPiRJZDogUXVpY2tNZXJn
 ZS54bWwsdiAxLjEuMS4xIDIwMTEvMDQvMTUgMDc6NDk6NTggcmIgRXhwICQ8L0NWUz4KICAgIDxD
@@ -136,4 +135,4 @@ LCBhbiBBSkFYIGNhbGwgaXMgc2VudCB0byBtZXJnZSBhbGwgdGlja2V0cyBpbnRvIHRoZSBvbGRl
 c3Qgc2VsZWN0ZWQgdGlja2V0LgoK
 </File>
     </Filelist>
-<BuildHost>2013-11-05 10:08:54</BuildHost><BuildHost>lvps83-169-20-244.dedicated.hosteurope.de</BuildHost></otrs_package>
+<BuildDate>2013-11-05 10:08:54</BuildDate><BuildHost>lvps83-169-20-244.dedicated.hosteurope.de</BuildHost></otrs_package>

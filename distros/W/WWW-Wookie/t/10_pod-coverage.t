@@ -1,5 +1,15 @@
+use strict;
+use warnings;
+use utf8;
+
 use Test::More;
-eval "use Test::Pod::Coverage 1.00";
-plan skip_all => "Test::Pod::Coverage 1.00 required for testing POD coverage"
-  if $@;
-all_pod_coverage_ok( { also_private => [q{BUILD}] } );
+
+if ( not $ENV{AUTHOR_TESTING} ) {
+    my $msg = 'Set $ENV{AUTHOR_TESTING} to run author tests.';
+    plan( skip_all => $msg );
+}
+
+if ( !eval { require Test::Pod::Coverage; 1 } ) {
+    plan skip_all => q{Test::Pod::Coverage required for testing POD coverage};
+}
+Test::Pod::Coverage::all_pod_coverage_ok();

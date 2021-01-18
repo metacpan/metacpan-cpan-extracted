@@ -4,7 +4,7 @@ use warnings;
 
 require 5.008_001;
 
-our $VERSION = '0.29';
+our $VERSION = '0.32';
 $VERSION = eval {$VERSION};
 
 
@@ -39,7 +39,7 @@ Net::SAML2
 
 =head1 VERSION
 
-version 0.29
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -106,8 +106,14 @@ version 0.29
 
 Support for the Web Browser SSO profile of SAML2.
 
-This is a very early release, but one which will correctly perform the
-SSO process.
+Net::SAML2 correctly perform the SSO process against numerous SAML
+Identity Providers (IdPs).  It has been tested against:
+
+GSuite
+Azure (Office 365)
+OneLogin
+Jump
+Mircosoft ADFS
 
 =head1 NAME
 

@@ -8,7 +8,7 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -73,6 +73,9 @@ BEGIN {
 # Endpoints inserted after any main sub
 has 'afterSub'  => ( is => 'rw', default => sub { {} } );
 has 'aroundSub' => ( is => 'rw', default => sub { {} } );
+
+# Issuer hooks
+has 'hook' => ( is => 'rw', default => sub { {} } );
 
 has spRules => (
     is      => 'rw',
@@ -161,28 +164,29 @@ sub setPortalRoutes {
 
       # psgi.js
       ->addUnauthRoute( 'psgi.js' => 'sendJs', ['GET'] )
-      ->addAuthRoute( 'psgi.js' => 'sendJs', ['GET'] )
+      ->addAuthRoute( 'psgi.js' => 'sendJs',   ['GET'] )
 
       # portal.css
       ->addUnauthRoute( 'portal.css' => 'sendCss', ['GET'] )
-      ->addAuthRoute( 'portal.css' => 'sendCss', ['GET'] )
+      ->addAuthRoute( 'portal.css' => 'sendCss',   ['GET'] )
 
       # lmerror
       ->addUnauthRoute( lmerror => { ':code' => 'lmError' }, ['GET'] )
-      ->addAuthRoute( lmerror => { ':code' => 'lmError' }, ['GET'] )
+      ->addAuthRoute( lmerror => { ':code'   => 'lmError' }, ['GET'] )
 
       # Core REST API
-      ->addUnauthRoute( ping => 'pleaseAuth', ['GET'] )
+      ->addUnauthRoute( ping => 'pleaseAuth',  ['GET'] )
       ->addAuthRoute( ping => 'authenticated', ['GET'] )
 
       # Refresh session
       ->addAuthRoute( refresh => 'refresh', ['GET'] )
 
-      ->addAuthRoute( '*' => 'corsPreflight', ['OPTIONS'] )
+      ->addAuthRoute( '*' => 'corsPreflight',   ['OPTIONS'] )
       ->addUnauthRoute( '*' => 'corsPreflight', ['OPTIONS'] )
 
       # Logout
-      ->addAuthRoute( logout => 'logout', ['GET'] );
+      ->addAuthRoute( logout => 'logout', ['GET'] )
+      ->addUnauthRoute( logout => 'unauthLogout', ['GET'] );
 
     # Default routes must point to routines declared above
     $self->defaultAuthRoute('');
@@ -239,9 +243,11 @@ sub reloadConf {
 
     # Initialize templateDir
     $self->{templateDir} =
-      $self->conf->{templateDir} . '/' . $self->conf->{portalSkin};
+      $self->conf->{templateDir} . '/' . $self->conf->{portalSkin}
+      if ( $self->conf->{templateDir} and $self->conf->{portalSkin} );
     unless ( -d $self->{templateDir} ) {
-        $self->error("Template dir $self->{templateDir} doesn't exist");
+        $self->error("Template dir $self->{templateDir} doesn't exist")
+          if ref( $self->{templateDir} ) eq 'SCALAR';
         return $self->fail;
     }
     $self->templateDir(
@@ -493,6 +499,25 @@ sub findEP {
             }
         }
     }
+    if ( $obj->can('hook') ) {
+        $self->logger->debug("Found hook in $plugin");
+        my $h = $obj->hook;
+        unless ( ref $h and ref($h) eq 'HASH' ) {
+            $self->logger->error('"hook" endpoint must be a hashref, skipped');
+        }
+        else {
+            foreach my $hookname ( keys %$h ) {
+                my $callback = $h->{$hookname};
+                push @{ $self->hook->{$hookname} }, sub {
+                    eval {
+                        $obj->logger->debug(
+                            "Launching ${plugin}::$callback on hook $hookname");
+                    };
+                    $obj->$callback(@_);
+                };
+            }
+        }
+    }
     $self->logger->debug("Plugin $plugin initializated");
 
     # Rules for menu
@@ -526,7 +551,11 @@ sub loadModule {
         $self->error("Unable to build $module object: $@");
         return 0;
     }
-    ( $obj and $obj->init ) or return 0;
+    unless ( $obj and $obj->init ) {
+        $self->error("$module init failed");
+        return 0;
+    }
+
     $self->loadedModules->{$module} = $obj;
     return $obj;
 }

@@ -3,16 +3,18 @@ package Lemonldap::NG::Portal::Password::AD;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_PASSWORD_OK
-  PE_LDAPERROR
-  PE_LDAPCONNECTFAILED
   PE_ERROR
+  PE_LDAPERROR
+  PE_PASSWORD_OK
+  PE_LDAPCONNECTFAILED
 );
 
-extends 'Lemonldap::NG::Portal::Lib::LDAP',
-  'Lemonldap::NG::Portal::Password::Base';
+extends qw(
+  Lemonldap::NG::Portal::Lib::LDAP
+  Lemonldap::NG::Portal::Password::Base
+);
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 sub init {
     my ($self) = @_;
@@ -27,25 +29,25 @@ sub confirm {
 }
 
 sub modifyPassword {
-    my ( $self, $req, $pwd ) = @_;
+    my ( $self, $req, $pwd, $useMail ) = @_;
+
+    # If the password change is done in a different backend,
+    # we need to reload the correct DN
+    $self->getUser( $req, useMail => $useMail )
+      if $self->conf->{ldapGetUserBeforePasswordChange};
+
     my $dn = $req->data->{dn} || $req->sessionInfo->{_dn};
     unless ($dn) {
-        $self->logger->error('"dn" is not set, aborting password modification');
+        $self->logger->error('"dn" is not set, abort password modification');
         return PE_ERROR;
     }
-    my $rule = $self->p->HANDLER->buildSub(
-        $self->p->HANDLER->substitute(
-            $self->conf->{portalRequireOldPassword}
-        )
-    );
-    unless ($rule) {
-        my $error = $self->p->HANDLER->tsv->{jail}->error || '???';
-    }
+
     my $requireOldPassword = (
           $req->userData
-        ? $rule->( $req, $req->userData )
-        : $rule->( $req, $req->sessionInfo )
+        ? $self->requireOldPwdRule->( $req, $req->userData )
+        : $self->requireOldPwdRule->( $req, $req->sessionInfo )
     );
+    $requireOldPassword = 0 if $useMail;
 
     # Ensure connection is valid
     $self->bind;
@@ -55,10 +57,7 @@ sub modifyPassword {
     my $code =
       $self->ldap->userModifyPassword( $dn, $pwd, $req->data->{oldpassword},
         1, $requireOldPassword );
-
-    unless ( $code == PE_PASSWORD_OK ) {
-        return $code;
-    }
+    return $code unless ( $code == PE_PASSWORD_OK );
 
     # If force reset, set reset flag
     if ( $req->data->{forceReset} ) {

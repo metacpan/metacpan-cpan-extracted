@@ -1,18 +1,19 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-package WWW::Wookie::Connector::Service v1.1.1;
+# Copyright (C) 2010-2021, Roland van Ipenburg
+package WWW::Wookie::Connector::Service v1.1.3;
 use strict;
 use warnings;
 
 use utf8;
 use 5.020000;
 
+#use Log::Log4perl qw(:resurrect :easy get_logger);
 use Exception::Class;
 use HTTP::Headers;
 use HTTP::Request;
 use HTTP::Request::Common;
 use HTTP::Status qw(HTTP_CREATED HTTP_OK HTTP_UNAUTHORIZED HTTP_FORBIDDEN);
 use LWP::UserAgent qw/POST/;
-use Log::Log4perl qw(:easy get_logger);
 use Moose qw/around has with/;
 use Regexp::Common qw(URI);
 use URI::Escape qw(uri_escape);
@@ -83,17 +84,15 @@ Readonly::Hash my %ERR => (
 );
 ## use critic
 
-## no critic qw(ProhibitCallsToUnexportedSubs)
-Log::Log4perl::easy_init($ERROR);
-## use critic
+###l4p Log::Log4perl::easy_init($ERROR);
 
-has '_logger' => (
-    'is'  => 'ro',
-    'isa' => 'Log::Log4perl::Logger',
-    'default' =>
-      sub { Log::Log4perl->get_logger('WWW::Wookie::Connector::Service') },
-    'reader' => 'getLogger',
-);
+###l4p has '_logger' => (
+###l4p     'is'      => 'ro',
+###l4p     'isa'     => 'Log::Log4perl::Logger',
+###l4p     'default' =>
+###l4p       sub { Log::Log4perl->get_logger('WWW::Wookie::Connector::Service') },
+###l4p     'reader' => 'getLogger',
+###l4p );
 
 has '_conn' => (
     'is'     => 'rw',
@@ -120,7 +119,7 @@ sub getAvailableServices {
         $url .= $SLASH . URI::Escape::uri_escape($service_name);
     }
     if ( $self->getLocale ) {
-        $content->{'locale'} = $self->getLocale;
+        ${$content}{'locale'} = $self->getLocale;
     }
 
     my %services = ();
@@ -129,10 +128,10 @@ sub getAvailableServices {
         'ForceArray' => 1,
         'KeyAttr'    => { 'widget' => q{id}, 'service' => q{name} },
     )->XMLin( $response->content );
-    while ( my ( $name, $value ) = each %{ $xml_obj->{'service'} } ) {
-        $self->getLogger->debug($name);
+    while ( my ( $name, $value ) = each %{ ${$xml_obj}{'service'} } ) {
+        ###l4p $self->getLogger->debug($name);
         my $service = WWW::Wookie::Widget::Category->new( 'name' => $name );
-        while ( my ( $id, $value ) = each %{ $value->{'widget'} } ) {
+        while ( my ( $id, $value ) = each %{ ${$value}{'widget'} } ) {
             $service->put(
                 WWW::Wookie::Widget->new( $id, $self->_parse_widget($value) ) );
         }
@@ -149,14 +148,14 @@ sub getAvailableWidgets {
     my $url     = $self->_append_path($WIDGETS);
     my $content = {};
     if ( !defined $service || $service eq $ALL ) {
-        $self->getLogger->debug( $LOG{'ALL_TRUE'} );
-        $content->{'all'} = q{true};
+        ###l4p $self->getLogger->debug( $LOG{'ALL_TRUE'} );
+        ${$content}{'all'} = q{true};
     }
     elsif ($service) {
         $url .= $SLASH . URI::Escape::uri_escape($service);
     }
     if ( $self->getLocale ) {
-        $content->{'locale'} = $self->getLocale;
+        ${$content}{'locale'} = $self->getLocale;
     }
     __check_url( $url, $ERR{'MALFORMED_URL'} );
 
@@ -164,10 +163,10 @@ sub getAvailableWidgets {
     my $xml_obj =
       XML::Simple->new( 'ForceArray' => 1, 'KeyAttr' => 'id' )
       ->XMLin( $response->content );
-    while ( my ( $id, $value ) = each %{ $xml_obj->{'widget'} } ) {
+    while ( my ( $id, $value ) = each %{ ${$xml_obj}{'widget'} } ) {
         $widgets{$id} =
           WWW::Wookie::Widget->new( $id,
-            $self->_parse_widget( $xml_obj->{'widget'}->{$id} ) );
+            $self->_parse_widget( ${ ${$xml_obj}{'widget'} }{$id} ) );
     }
     return values %widgets;
 }
@@ -247,7 +246,7 @@ sub getOrCreateInstance {
         __check_url( $url, $ERR{'MALFORMED_URL'} );
         my $content = { 'widgetid' => $guid };
         if ( my $locale = $self->getLocale ) {
-            $content->{'locale'} = $locale;
+            ${$content}{'locale'} = $locale;
         }
         my $response = $self->_do_request( $url, $content );
         if ( $response->code == HTTP_CREATED ) {
@@ -263,7 +262,7 @@ sub getOrCreateInstance {
     };
 
     if ( my $e = Exception::Class->caught('WookieConnectorException') ) {
-        $self->getLogger->error( $e->error );
+        ###l4p $self->getLogger->error( $e->error );
         $e->rethrow;
         return $FALSE;
     }
@@ -277,10 +276,10 @@ sub getUsers {
     if ( ref $instance ne q{WWW::Wookie::Widget::Instance} ) {
         $instance = $self->getOrCreateInstance($instance);
     }
-    $self->getLogger->debug( sprintf $LOG{'GET_USERS'},
-        $instance->getIdentifier );
+    ###l4p $self->getLogger->debug( sprintf $LOG{'GET_USERS'},
+    ###l4p     $instance->getIdentifier );
     my $url = $self->_append_path($PARTICIPANTS);
-    $self->getLogger->debug( sprintf $LOG{'USING_URL'}, $url );
+    ###l4p $self->getLogger->debug( sprintf $LOG{'USING_URL'}, $url );
 
     __check_url( $url, $ERR{'MALFORMED_URL'} );
     my $response =
@@ -294,11 +293,11 @@ sub getUsers {
       XML::Simple->new( 'ForceArray' => 1, 'KeyAttr' => 'id' )
       ->XMLin( $response->content );
     my @users = ();
-    while ( my ( $id, $value ) = each %{ $xml_obj->{'participant'} } ) {
+    while ( my ( $id, $value ) = each %{ ${$xml_obj}{'participant'} } ) {
         my $new_user = WWW::Wookie::User->new(
             $id,
-            defined $value->{'displayName'}   || $id,
-            defined $value->{'thumbnail_url'} || $EMPTY,
+            defined ${$value}{'displayName'}   || $id,
+            defined ${$value}{'thumbnail_url'} || $EMPTY,
         );
         push @users, $new_user;
     }
@@ -386,12 +385,12 @@ sub setProperty {
         }
     };
     if ( my $e = Exception::Class->caught('WookieConnectorException') ) {
-        $self->getLogger->error( $e->error );
+        ###l4p $self->getLogger->error( $e->error );
         $e->rethrow;
         return $FALSE;
     }
     if ( my $e = Exception::Class->caught('WookieWidgetInstanceException') ) {
-        $self->getLogger->error( $e->error );
+        ###l4p $self->getLogger->error( $e->error );
         $e->rethrow;
         return $FALSE;
     }
@@ -593,13 +592,13 @@ sub _do_request {
     {
         $url .= $QUERY . $content;
     }
-    $self->getLogger->debug( sprintf $LOG{'DO_REQUEST'}, $method, $url );
+    ###l4p $self->getLogger->debug( sprintf $LOG{'DO_REQUEST'}, $method, $url );
     my $request = HTTP::Request->new(
         $method => $url,
         HTTP::Headers->new(),
     );
     my $response = $self->_ua->request($request);
-    $self->getLogger->debug( sprintf $LOG{'RESPONSE_CODE'}, $response->code );
+    ###l4p $self->getLogger->debug( sprintf $LOG{'RESPONSE_CODE'}, $response->code );
     if (   $response->code == HTTP_UNAUTHORIZED
         || $response->code == HTTP_FORBIDDEN )
     {
@@ -616,9 +615,9 @@ sub _parse_instance {
       XML::Simple->new( 'ForceArray' => 1, 'KeyAttr' => 'id' )->XMLin($xml);
     if (
         my $instance = WWW::Wookie::Widget::Instance->new(
-            $xml_obj->{'url'}[0],   $guid,
-            $xml_obj->{'title'}[0], $xml_obj->{'height'}[0],
-            $xml_obj->{'width'}[0],
+            ${$xml_obj}{'url'}[0],   $guid,
+            ${$xml_obj}{'title'}[0], ${$xml_obj}{'height'}[0],
+            ${$xml_obj}{'width'}[0],
         )
       )
     {
@@ -631,15 +630,15 @@ sub _parse_instance {
 
 sub _parse_widget {
     my ( $self, $xml ) = @_;
-    my $title = $xml->{'name'}[0]->{'content'};
+    my $title = ${ ${$xml}{'name'}[0] }{'content'};
     my $description =
-      ref $xml->{'description'}[0]
-      ? $xml->{'description'}[0]->{'content'}
-      : $xml->{'description'}[0];
+      ref ${$xml}{'description'}[0]
+      ? ${ ${$xml}{'description'}[0] }{'content'}
+      : ${$xml}{'description'}[0];
     my $icon =
-      ref $xml->{'icon'}[0]
-      ? $xml->{'icon'}[0]->{'content'}
-      : $xml->{'icon'}[0];
+      ref ${$xml}{'icon'}[0]
+      ? ${ ${$xml}{'icon'}[0] }{'content'}
+      : ${$xml}{'icon'}[0];
     if ( !$icon ) {
         $icon = $DEFAULT_ICON;
     }
@@ -658,7 +657,7 @@ __END__
 
 =encoding utf8
 
-=for stopwords API Readonly Wookie guid Ipenburg login MERCHANTABILITY
+=for stopwords Bitbucket API Readonly Wookie guid Ipenburg login MERCHANTABILITY
 
 =head1 NAME
 
@@ -667,7 +666,7 @@ data requests and responses
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Connector::Service version v1.1.1
+This document describes WWW::Wookie::Connector::Service version C<v1.1.3>
 
 =head1 SYNOPSIS
 
@@ -884,6 +883,10 @@ Set a locale.
 
 Get the current locale setting. Returns current locale as string.
 
+=head2 C<BUILD>
+
+The Moose internal BUILD method.
+
 =head1 CONFIGURATION AND ENVIRONMENT
 
 =head1 DEPENDENCIES
@@ -936,16 +939,16 @@ Get the current locale setting. Returns current locale as string.
 
 =head1 BUGS AND LIMITATIONS
 
-Please report any bugs or feature requests at L<RT for
-rt.cpan.org|https://rt.cpan.org/Dist/Display.html?Queue=WWW-Wookie>.
+Please report any bugs or feature requests at
+L<Bitbucket|https://bitbucket.org/rolandvanipenburg/www-wookie/issues>.
 
 =head1 AUTHOR
 
-Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
+Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 by Roland van Ipenburg
+Copyright 2010-2021 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

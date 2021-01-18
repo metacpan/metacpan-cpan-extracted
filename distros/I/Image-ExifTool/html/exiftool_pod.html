@@ -4,7 +4,7 @@
 <head>
 <title>exiftool Application Documentation</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@osx316.apple.com" />
+<link rev="made" href="mailto:root@osx219.apple.com" />
 </head>
 
 <body style="background-color: white">
@@ -56,6 +56,7 @@
   <li><a href="#RENAMING-EXAMPLES">RENAMING EXAMPLES</a></li>
   <li><a href="#GEOTAGGING-EXAMPLES">GEOTAGGING EXAMPLES</a></li>
   <li><a href="#PIPING-EXAMPLES">PIPING EXAMPLES</a></li>
+  <li><a href="#INTERRUPTING-EXIFTOOL">INTERRUPTING EXIFTOOL</a></li>
   <li><a href="#EXIT-STATUS">EXIT STATUS</a></li>
   <li><a href="#AUTHOR">AUTHOR</a></li>
   <li><a href="#SEE-ALSO">SEE ALSO</a></li>
@@ -99,46 +100,47 @@
 
 <pre><code>  File Types
   ------------+-------------+-------------+-------------+------------
-  3FR   r     | DR4   r/w/c | ITC   r     | ODP   r     | RIFF  r
-  3G2   r/w   | DSS   r     | J2C   r     | ODS   r     | RSRC  r
-  3GP   r/w   | DV    r     | JNG   r/w   | ODT   r     | RTF   r
-  A     r     | DVB   r/w   | JP2   r/w   | OFR   r     | RW2   r/w
-  AA    r     | DVR-MS r    | JPEG  r/w   | OGG   r     | RWL   r/w
-  AAE   r     | DYLIB r     | JSON  r     | OGV   r     | RWZ   r
-  AAX   r/w   | EIP   r     | K25   r     | OPUS  r     | RM    r
-  ACR   r     | EPS   r/w   | KDC   r     | ORF   r/w   | SEQ   r
-  AFM   r     | EPUB  r     | KEY   r     | OTF   r     | SKETCH r
-  AI    r/w   | ERF   r/w   | LA    r     | PAC   r     | SO    r
-  AIFF  r     | EXE   r     | LFP   r     | PAGES r     | SR2   r/w
-  APE   r     | EXIF  r/w/c | LNK   r     | PBM   r/w   | SRF   r
-  ARQ   r/w   | EXR   r     | LRV   r/w   | PCD   r     | SRW   r/w
-  ARW   r/w   | EXV   r/w/c | M2TS  r     | PCX   r     | SVG   r
-  ASF   r     | F4A/V r/w   | M4A/V r/w   | PDB   r     | SWF   r
-  AVI   r     | FFF   r/w   | MAX   r     | PDF   r/w   | THM   r/w
-  AVIF  r/w   | FITS  r     | MEF   r/w   | PEF   r/w   | TIFF  r/w
-  AZW   r     | FLA   r     | MIE   r/w/c | PFA   r     | TORRENT r
-  BMP   r     | FLAC  r     | MIFF  r     | PFB   r     | TTC   r
-  BPG   r     | FLIF  r/w   | MKA   r     | PFM   r     | TTF   r
-  BTF   r     | FLV   r     | MKS   r     | PGF   r     | TXT   r
-  CHM   r     | FPF   r     | MKV   r     | PGM   r/w   | VCF   r
-  COS   r     | FPX   r     | MNG   r/w   | PLIST r     | VRD   r/w/c
-  CR2   r/w   | GIF   r/w   | MOBI  r     | PICT  r     | VSD   r
-  CR3   r/w   | GPR   r/w   | MODD  r     | PMP   r     | WAV   r
-  CRM   r/w   | GZ    r     | MOI   r     | PNG   r/w   | WDP   r/w
-  CRW   r/w   | HDP   r/w   | MOS   r/w   | PPM   r/w   | WEBP  r
-  CS1   r/w   | HDR   r     | MOV   r/w   | PPT   r     | WEBM  r
-  CSV   r     | HEIC  r/w   | MP3   r     | PPTX  r     | WMA   r
-  DCM   r     | HEIF  r/w   | MP4   r/w   | PS    r/w   | WMV   r
-  DCP   r/w   | HTML  r     | MPC   r     | PSB   r/w   | WTV   r
-  DCR   r     | ICC   r/w/c | MPG   r     | PSD   r/w   | WV    r
-  DFONT r     | ICS   r     | MPO   r/w   | PSP   r     | X3F   r/w
-  DIVX  r     | IDML  r     | MQV   r/w   | QTIF  r/w   | XCF   r
-  DJVU  r     | IIQ   r/w   | MRW   r/w   | R3D   r     | XLS   r
-  DLL   r     | IND   r/w   | MXF   r     | RA    r     | XLSX  r
-  DNG   r/w   | INSP  r/w   | NEF   r/w   | RAF   r/w   | XMP   r/w/c
-  DOC   r     | INSV  r     | NRW   r/w   | RAM   r     | ZIP   r
-  DOCX  r     | INX   r     | NUMBERS r   | RAR   r     |
-  DPX   r     | ISO   r     | O     r     | RAW   r/w   |
+  360   r/w   | DPX   r     | ITC   r     | ODP   r     | RIFF  r
+  3FR   r     | DR4   r/w/c | J2C   r     | ODS   r     | RSRC  r
+  3G2   r/w   | DSS   r     | JNG   r/w   | ODT   r     | RTF   r
+  3GP   r/w   | DV    r     | JP2   r/w   | OFR   r     | RW2   r/w
+  A     r     | DVB   r/w   | JPEG  r/w   | OGG   r     | RWL   r/w
+  AA    r     | DVR-MS r    | JSON  r     | OGV   r     | RWZ   r
+  AAE   r     | DYLIB r     | K25   r     | ONP   r     | RM    r
+  AAX   r/w   | EIP   r     | KDC   r     | OPUS  r     | SEQ   r
+  ACR   r     | EPS   r/w   | KEY   r     | ORF   r/w   | SKETCH r
+  AFM   r     | EPUB  r     | LA    r     | OTF   r     | SO    r
+  AI    r/w   | ERF   r/w   | LFP   r     | PAC   r     | SR2   r/w
+  AIFF  r     | EXE   r     | LNK   r     | PAGES r     | SRF   r
+  APE   r     | EXIF  r/w/c | LRV   r/w   | PBM   r/w   | SRW   r/w
+  ARQ   r/w   | EXR   r     | M2TS  r     | PCD   r     | SVG   r
+  ARW   r/w   | EXV   r/w/c | M4A/V r/w   | PCX   r     | SWF   r
+  ASF   r     | F4A/V r/w   | MACOS r     | PDB   r     | THM   r/w
+  AVI   r     | FFF   r/w   | MAX   r     | PDF   r/w   | TIFF  r/w
+  AVIF  r/w   | FITS  r     | MEF   r/w   | PEF   r/w   | TORRENT r
+  AZW   r     | FLA   r     | MIE   r/w/c | PFA   r     | TTC   r
+  BMP   r     | FLAC  r     | MIFF  r     | PFB   r     | TTF   r
+  BPG   r     | FLIF  r/w   | MKA   r     | PFM   r     | TXT   r
+  BTF   r     | FLV   r     | MKS   r     | PGF   r     | VCF   r
+  CHM   r     | FPF   r     | MKV   r     | PGM   r/w   | VRD   r/w/c
+  COS   r     | FPX   r     | MNG   r/w   | PLIST r     | VSD   r
+  CR2   r/w   | GIF   r/w   | MOBI  r     | PICT  r     | WAV   r
+  CR3   r/w   | GPR   r/w   | MODD  r     | PMP   r     | WDP   r/w
+  CRM   r/w   | GZ    r     | MOI   r     | PNG   r/w   | WEBP  r
+  CRW   r/w   | HDP   r/w   | MOS   r/w   | PPM   r/w   | WEBM  r
+  CS1   r/w   | HDR   r     | MOV   r/w   | PPT   r     | WMA   r
+  CSV   r     | HEIC  r/w   | MP3   r     | PPTX  r     | WMV   r
+  CZI   r     | HEIF  r/w   | MP4   r/w   | PS    r/w   | WTV   r
+  DCM   r     | HTML  r     | MPC   r     | PSB   r/w   | WV    r
+  DCP   r/w   | ICC   r/w/c | MPG   r     | PSD   r/w   | X3F   r/w
+  DCR   r     | ICS   r     | MPO   r/w   | PSP   r     | XCF   r
+  DFONT r     | IDML  r     | MQV   r/w   | QTIF  r/w   | XLS   r
+  DIVX  r     | IIQ   r/w   | MRW   r/w   | R3D   r     | XLSX  r
+  DJVU  r     | IND   r/w   | MXF   r     | RA    r     | XMP   r/w/c
+  DLL   r     | INSP  r/w   | NEF   r/w   | RAF   r/w   | ZIP   r
+  DNG   r/w   | INSV  r     | NRW   r/w   | RAM   r     |
+  DOC   r     | INX   r     | NUMBERS r   | RAR   r     |
+  DOCX  r     | ISO   r     | O     r     | RAW   r/w   |
 
   Meta Information
   ----------------------+----------------------+---------------------
@@ -181,6 +183,7 @@
   -c FMT      (-coordFormat)       Set format for GPS coordinates
   -charset [[TYPE=]CHARSET]        Specify encoding for special characters
   -csv[[+]=CSVFILE]                Export/import tags in CSV format
+  -csvDelim STR                    Set delimiter for CSV file
   -d FMT      (-dateFormat)        Set format for date/time values
   -D          (-decimal)           Show tag ID numbers in decimal
   -E,-ex,-ec  (-escape(HTML|XML|C))Escape tag values for HTML, XML or C
@@ -299,7 +302,7 @@
 
 <p>Write a new value for the specified tag (eg. <code>-comment=wow</code>), or delete the tag if no <i>VALUE</i> is given (eg. <code>-comment=</code>). <code>+=</code> and <code>-=</code> are used to add or remove existing entries from a list, or to shift date/time values (see <a>Image::ExifTool::Shift.pl</a> and note 6 below for more details). <code>+=</code> may also be used to increment numerical values (or decrement if <i>VALUE</i> is negative), and <code>-=</code> may be used to conditionally delete or replace a tag (see <a href="#WRITING-EXAMPLES">&quot;WRITING EXAMPLES&quot;</a> for examples). <code>^=</code> is used to write an empty string instead of deleting the tag when no <i>VALUE</i> is given, but otherwise it is equivalent to <code>=</code>.</p>
 
-<p><i>TAG</i> may contain one or more leading family 0, 1 or 2 group names, prefixed by optional family numbers, and separated colons. If no group name is specified, the tag is created in the preferred group, and updated in any other location where a same-named tag already exists. The preferred group is the first group in the following list where <i>TAG</i> is valid: 1) EXIF, 2) IPTC, 3) XMP.</p>
+<p><i>TAG</i> may contain one or more leading family 0, 1, 2 or 7 group names, prefixed by optional family numbers, and separated colons. If no group name is specified, the tag is created in the preferred group, and updated in any other location where a same-named tag already exists. The preferred group is the first group in the following list where <i>TAG</i> is valid: 1) EXIF, 2) IPTC, 3) XMP.</p>
 
 <p>The wildcards <code>*</code> and <code>?</code> may be used in tag names to assign the same value to multiple tags. When specified with wildcards, &quot;unsafe&quot; tags are not written. A tag name of <code>All</code> is equivalent to <code>*</code> (except that it doesn&#39;t require quoting, while arguments with wildcards do on systems with shell globbing), and is often used when deleting all metadata (ie. <code>-All=</code>) or an entire group (eg. <code>-XMP-dc:All=</code>, see note 4 below). Note that not all groups are deletable, and that the JPEG APP14 &quot;Adobe&quot; group is not removed by default with <code>-All=</code> because it may affect the appearance of the image. However, color space information is removed, so the colors may be affected (but this may be avoided by copying back the tags defined by the ColorSpaceTags shortcut). Use the <b>-listd</b> option for a complete list of deletable groups, and see note 5 below regarding the &quot;APP&quot; groups. Also, within an image some groups may be contained within others, and these groups are removed if the containing group is deleted:</p>
 
@@ -488,7 +491,9 @@
 <dt id="csv-CSVFILE"><b>-csv</b>[[+]=<i>CSVFILE</i>]</dt>
 <dd>
 
-<p>Export information in CSV format, or import information if <i>CSVFILE</i> is specified. When importing, the CSV file must be in exactly the same format as the exported file. The first row of the <i>CSVFILE</i> must be the ExifTool tag names (with optional group names) for each column of the file, and values must be separated by commas. A special &quot;SourceFile&quot; column specifies the files associated with each row of information (and a SourceFile of &quot;*&quot; may be used to define default tags to be imported for all files which are combined with any tags specified for the specific SourceFile processed). The following examples demonstrate basic use of this option:</p>
+<p>Export information in CSV format, or import information if <i>CSVFILE</i> is specified. When importing, the CSV file must be in exactly the same format as the exported file. The first row of the <i>CSVFILE</i> must be the ExifTool tag names (with optional group names) for each column of the file, and values must be separated by commas. A special &quot;SourceFile&quot; column specifies the files associated with each row of information (and a SourceFile of &quot;*&quot; may be used to define default tags to be imported for all files which are combined with any tags specified for the specific SourceFile processed). The <b>-csvDelim</b> option may be used to change the input/output field delimiter if something other than a comma is required.</p>
+
+<p>The following examples demonstrate basic use of the <b>-csv</b> option:</p>
 
 <pre><code>    # generate CSV file with common tags from all images in a directory
     exiftool -common -csv dir &gt; out.csv
@@ -509,6 +514,12 @@
 <p>Special feature: <b>-csv</b>+=<i>CSVFILE</i> may be used to add items to existing lists. This affects only list-type tags. Also applies to the <b>-j</b> option.</p>
 
 <p>Note that this option is fundamentally different than all other output format options because it requires information from all input files to be buffered in memory before the output is written. This may result in excessive memory usage when processing a very large number of files with a single command. Also, it makes this option incompatible with the <b>-w</b> option. When processing a large number of files, it is recommended to either use the JSON (<b>-j</b>) or XML (<b>-X</b>) output format, or use <b>-p</b> to generate a fixed-column CSV file instead of using the <b>-csv</b> option.</p>
+
+</dd>
+<dt id="csvDelim-STR"><b>-csvDelim</b> <i>STR</i></dt>
+<dd>
+
+<p>Set the delimiter for separating CSV entries for CSV file input/output via the <b>-csv</b> option. <i>STR</i> may contain &quot;\t&quot;, &quot;\n&quot;, &quot;\r&quot; and &quot;\\&quot; to represent TAB, LF, CR and &#39;\&#39; respectively. A double quote is not allowed in the delimiter. Default is &#39;,&#39;.</p>
 
 </dd>
 <dt id="d-FMT--dateFormat"><b>-d</b> <i>FMT</i> (<b>-dateFormat</b>)</dt>
@@ -538,7 +549,7 @@
 <dt id="g-NUM-:NUM...--groupHeadings"><b>-g</b>[<i>NUM</i>][:<i>NUM</i>...] (<b>-groupHeadings</b>)</dt>
 <dd>
 
-<p>Organize output by tag group. <i>NUM</i> specifies a group family number, and may be 0 (general location), 1 (specific location), 2 (category), 3 (document number), 4 (instance number), 5 (metadata path) or 6 (EXIF/TIFF format). <b>-g0</b> is assumed if a family number is not specified, and family numbers may be added wherever <b>-g</b> is mentioned in the documentation. Multiple families may be specified by separating them with colons. By default the resulting group name is simplified by removing any leading <code>Main:</code> and collapsing adjacent identical group names, but this can be avoided by placing a colon before the first family number (eg. <b>-g:3:1</b>). Use the <b>-listg</b> option to list group names for a specified family. The SavePath and SaveFormat API options are automatically enabled if the respective family 5 or 6 group names are requested. See the <a>API GetGroup documentation</a> for more information.</p>
+<p>Organize output by tag group. <i>NUM</i> specifies a group family number, and may be 0 (general location), 1 (specific location), 2 (category), 3 (document number), 4 (instance number), 5 (metadata path), 6 (EXIF/TIFF format) or 7 (tag ID). <b>-g0</b> is assumed if a family number is not specified. May be combined with other options to add group names to the output. Multiple families may be specified by separating them with colons. By default the resulting group name is simplified by removing any leading <code>Main:</code> and collapsing adjacent identical group names, but this can be avoided by placing a colon before the first family number (eg. <b>-g:3:1</b>). Use the <b>-listg</b> option to list group names for a specified family. The SavePath and SaveFormat API options are automatically enabled if the respective family 5 or 6 group names are requested. See the <a>API GetGroup documentation</a> for more information.</p>
 
 </dd>
 <dt id="G-NUM-:NUM...--groupNames"><b>-G</b>[<i>NUM</i>][:<i>NUM</i>...] (<b>-groupNames</b>)</dt>
@@ -671,7 +682,7 @@
 
 <p>produces output like this:</p>
 
-<pre><code>    -- Generated by ExifTool 12.00 --
+<pre><code>    -- Generated by ExifTool 12.15 --
     File: a.jpg - 2003:10:31 15:44:19
     (f/5.6, 1/60s, ISO 100)
     File: b.jpg - 2006:05:23 11:57:38
@@ -928,7 +939,7 @@
 <dt id="fast-NUM"><b>-fast</b>[<i>NUM</i>]</dt>
 <dd>
 
-<p>Increase speed of extracting information. With <b>-fast</b> (or <b>-fast1</b>), ExifTool will not scan to the end of a JPEG image to check for an AFCP or PreviewImage trailer, or past the first comment in GIF images or the audio/video data in WAV/AVI files to search for additional metadata. These speed benefits are small when reading images directly from disk, but can be substantial if piping images through a network connection. For more substantial speed benefits, <b>-fast2</b> also causes exiftool to avoid extracting any EXIF MakerNote information. <b>-fast3</b> avoids extracting metadata from the file, and returns only pseudo System tags, but still reads the file header to obtain an educated guess at FileType. <b>-fast4</b> doesn&#39;t even read the file header, and returns only System tags and a FileType based on the file extension. Has no effect when writing.</p>
+<p>Increase speed of extracting information. With <b>-fast</b> (or <b>-fast1</b>), ExifTool will not scan to the end of a JPEG image to check for an AFCP or PreviewImage trailer, or past the first comment in GIF images or the audio/video data in WAV/AVI files to search for additional metadata. These speed benefits are small when reading images directly from disk, but can be substantial if piping images through a network connection. For more substantial speed benefits, <b>-fast2</b> also causes exiftool to avoid extracting any EXIF MakerNote information. <b>-fast3</b> avoids extracting metadata from the file, and returns only pseudo System tags, but still reads the file header to obtain an educated guess at FileType. <b>-fast4</b> doesn&#39;t even read the file header, and returns only System tags and a FileType based on the file extension. <b>-fast5</b> also disables generation of the Composite tags (like <b>-e</b>). Has no effect when writing.</p>
 
 <p>Note that a separate <b>-fast</b> setting may be used for evaluation of a <b>-if</b> condition, or when ordering files with the <b>-fileOrder</b> option. See the <b>-if</b> and <b>-fileOrder</b> options for details.</p>
 
@@ -940,13 +951,13 @@
 
 <pre><code>    exiftool -fileOrder DateTimeOriginal DIR</code></pre>
 
-<p>Additional <b>-fileOrder</b> options may be added for secondary sort keys. Numbers are sorted numerically, and all other values are sorted alphabetically. Files missing the specified tag are sorted last. The sort order may be reversed by prefixing the tag name with a <code>-</code> (eg. <code>-fileOrder -createdate</code>). Print conversion of the sorted values is disabled with the <b>-n</b> option, or a <code>#</code> appended to the tag name. Other formatting options (eg. <b>-d</b>) have no effect on the sorted values. Note that the <b>-fileOrder</b> option can have a large performance impact since it involves an additional processing pass of each file, but this impact may be reduced by specifying a <i>NUM</i> for the <b>-fast</b> level used during the metadata-extraction phase. For example, <b>-fileOrder4</b> may be used if <i>TAG</i> is a pseudo System tag. If multiple <b>-fileOrder</b> options are used, the extraction is done at the lowest <b>-fast</b> level.</p>
+<p>Additional <b>-fileOrder</b> options may be added for secondary sort keys. Numbers are sorted numerically, and all other values are sorted alphabetically. Files missing the specified tag are sorted last. The sort order may be reversed by prefixing the tag name with a <code>-</code> (eg. <code>-fileOrder -createdate</code>). Print conversion of the sorted values is disabled with the <b>-n</b> option, or a <code>#</code> appended to the tag name. Other formatting options (eg. <b>-d</b>) have no effect on the sorted values. Note that the <b>-fileOrder</b> option can have a large performance impact since it involves an additional processing pass of each file, but this impact may be reduced by specifying a <i>NUM</i> for the <b>-fast</b> level used during the metadata-extraction phase. For example, <b>-fileOrder4</b> may be used if <i>TAG</i> is a pseudo System tag. If multiple <b>-fileOrder</b> options are used, the extraction is done at the lowest <b>-fast</b> level. Note that files are sorted across directory boundaries if multiple input directories are specified.</p>
 
 </dd>
 <dt id="i-DIR--ignore"><b>-i</b> <i>DIR</i> (<b>-ignore</b>)</dt>
 <dd>
 
-<p>Ignore specified directory name. <i>DIR</i> may be either an individual folder name, or a full path. If a full path is specified, it must match the Directory tag exactly to be ignored. Use multiple <b>-i</b> options to ignore more than one directory name. A special <i>DIR</i> value of <code>SYMLINKS</code> (case sensitive) may be specified to ignore symbolic links when the <b>-r</b> option is used.</p>
+<p>Ignore specified directory name. <i>DIR</i> may be either an individual folder name, or a full path. If a full path is specified, it must match the Directory tag exactly to be ignored. Use multiple <b>-i</b> options to ignore more than one directory name. A special <i>DIR</i> value of <code>SYMLINKS</code> (case sensitive) may be specified to ignore symbolic links when the <b>-r</b> option is used. As well, a value of <code>HIDDEN</code> (case sensitive) may be used to ignore files with names that start with a &quot;.&quot; (ie. hidden files on Unix systems) when scanning a directory.</p>
 
 </dd>
 <dt id="if-NUM-EXPR"><b>-if</b>[<i>NUM</i>] <i>EXPR</i></dt>
@@ -966,12 +977,13 @@
     # find images containing a specific keyword (case insensitive)
     exiftool -if &#39;$keywords =~ /harvey/i&#39; -filename dir</code></pre>
 
-<p>Adding <i>NUM</i> to the <b>-if</b> option causes a separate processing pass to be executed for evaluating <i>EXPR</i> at a <b>-fast</b> level given by <i>NUM</i> (see the <b>-fast</b> option documentation for details). Without <i>NUM</i>, only one processing pass is done at the level specified by the <b>-fast</b> option. For example, using <b>-if4</b> is possible if <i>EXPR</i> uses only pseudo System tags, and may significantly speed processing if enough files fail the condition.</p>
+<p>Adding <i>NUM</i> to the <b>-if</b> option causes a separate processing pass to be executed for evaluating <i>EXPR</i> at a <b>-fast</b> level given by <i>NUM</i> (see the <b>-fast</b> option documentation for details). Without <i>NUM</i>, only one processing pass is done at the level specified by the <b>-fast</b> option. For example, using <b>-if5</b> is possible if <i>EXPR</i> uses only pseudo System tags, and may significantly speed processing if enough files fail the condition.</p>
 
 <p>The expression has access to the current ExifTool object through <code>$self</code>, and the following special functions are available to allow short-circuiting of the file processing. Both functions have a return value of 1. Case is significant for function names.</p>
 
 <pre><code>    End()    - end processing after this file
-    EndDir() - end processing of files in this directory</code></pre>
+    EndDir() - end processing of files in this directory (not
+               compatible with the B&lt;-fileOrder&gt; option)</code></pre>
 
 <p>Notes:</p>
 
@@ -1259,7 +1271,7 @@
 <dt id="echo-NUM-TEXT"><b>-echo</b>[<i>NUM</i>] <i>TEXT</i></dt>
 <dd>
 
-<p>Echo <i>TEXT</i> to stdout (<b>-echo</b> or <b>-echo1</b>) or stderr (<b>-echo2</b>). Text is output as the command line is parsed, before the processing of any input files. <i>NUM</i> may also be 3 or 4 to output text (to stdout or stderr respectively) after processing is complete.</p>
+<p>Echo <i>TEXT</i> to stdout (<b>-echo</b> or <b>-echo1</b>) or stderr (<b>-echo2</b>). Text is output as the command line is parsed, before the processing of any input files. <i>NUM</i> may also be 3 or 4 to output text (to stdout or stderr respectively) after processing is complete. For <b>-echo3</b> and <b>-echo4</b>, &quot;${status}&quot; may be used in the <i>TEXT</i> string to represent the numerical exit status of the command (see <a href="#EXIT-STATUS">&quot;EXIT STATUS&quot;</a>).</p>
 
 </dd>
 <dt id="efile-NUM-ERRFILE"><b>-efile</b>[<i>NUM</i>][!] <i>ERRFILE</i></dt>
@@ -1271,7 +1283,7 @@
 <dt id="execute-NUM"><b>-execute</b>[<i>NUM</i>]</dt>
 <dd>
 
-<p>Execute command for all arguments up to this point on the command line (plus any arguments specified by <b>-common_args</b>). The result is as if the commands were executed as separate command lines (with the exception of the <b>-config</b> and <b>-use</b> options which remain in effect for subsequent commands). Allows multiple commands to be executed from a single command line. <i>NUM</i> is an optional number that is echoed in the &quot;{ready}&quot; message when using the <b>-stay_open</b> feature.</p>
+<p>Execute command for all arguments up to this point on the command line (plus any arguments specified by <b>-common_args</b>). The result is as if the commands were executed as separate command lines (with the exception of the <b>-config</b> and <b>-use</b> options which remain in effect for subsequent commands). Allows multiple commands to be executed from a single command line. <i>NUM</i> is an optional number that is echoed in the &quot;{ready}&quot; message when using the <b>-stay_open</b> feature. If a <i>NUM</i> is specified, the <b>-q</b> option no longer suppresses the output &quot;{readyNUM}&quot; message.</p>
 
 </dd>
 <dt id="srcfile-FMT"><b>-srcfile</b> <i>FMT</i></dt>
@@ -1293,17 +1305,17 @@
 <dt id="stay_open-FLAG"><b>-stay_open</b> <i>FLAG</i></dt>
 <dd>
 
-<p>If <i>FLAG</i> is <code>1</code> or <code>True</code>, causes exiftool keep reading from the <b>-@</b> <i>ARGFILE</i> even after reaching the end of file. This feature allows calling applications to pre-load exiftool, thus avoiding the overhead of loading exiftool for each command. The procedure is as follows:</p>
+<p>If <i>FLAG</i> is <code>1</code> or <code>True</code> (case insensitive), causes exiftool keep reading from the <b>-@</b> <i>ARGFILE</i> even after reaching the end of file. This feature allows calling applications to pre-load exiftool, thus avoiding the overhead of loading exiftool for each command. The procedure is as follows:</p>
 
 <p>1) Execute <code>exiftool -stay_open True -@ <i>ARGFILE</i></code>, where <i>ARGFILE</i> is the name of an existing (possibly empty) argument file or <code>-</code> to pipe arguments from the standard input.</p>
 
 <p>2) Write exiftool command-line arguments to <i>ARGFILE</i>, one argument per line (see the <b>-@</b> option for details).</p>
 
-<p>3) Write <code>-execute\n</code> to <i>ARGFILE</i>, where <code>\n</code> represents a newline sequence. (Note: You may need to flush your write buffers here if using buffered output.) Exiftool will then execute the command with the arguments received up to this point, send a &quot;{ready}&quot; message to stdout when done (unless the <b>-q</b> or <b>-T</b> option is used), and continue trying to read arguments for the next command from <i>ARGFILE</i>. To aid in command/response synchronization, any number appended to the <code>-execute</code> option is echoed in the &quot;{ready}&quot; message. For example, <code>-execute613</code> results in &quot;{ready613}&quot;.</p>
+<p>3) Write <code>-execute\n</code> to <i>ARGFILE</i>, where <code>\n</code> represents a newline sequence. (Note: You may need to flush your write buffers here if using buffered output.) ExifTool will then execute the command with the arguments received up to this point, send a &quot;{ready}&quot; message to stdout when done (unless the <b>-q</b> or <b>-T</b> option is used), and continue trying to read arguments for the next command from <i>ARGFILE</i>. To aid in command/response synchronization, any number appended to the <code>-execute</code> option is echoed in the &quot;{ready}&quot; message. For example, <code>-execute613</code> results in &quot;{ready613}&quot;. When this number is added, <b>-q</b> no longer suppresses the &quot;{ready}&quot; message. (Also, see the <b>-echo3</b> and <b>-echo4</b> options for additional ways to pass signals back to your application.)</p>
 
 <p>4) Repeat steps 2 and 3 for each command.</p>
 
-<p>5) Write <code>-stay_open\nFalse\n</code> to <i>ARGFILE</i> when done. This will cause exiftool to process any remaining command-line arguments then exit normally.</p>
+<p>5) Write <code>-stay_open\nFalse\n</code> (or <code>-stay_open\n0\n</code>) to <i>ARGFILE</i> when done. This will cause exiftool to process any remaining command-line arguments then exit normally.</p>
 
 <p>The input <i>ARGFILE</i> may be changed at any time before step 5 above by writing the following lines to the currently open <i>ARGFILE</i>:</p>
 
@@ -1320,7 +1332,7 @@
 <dt id="userParam-PARAM-VAL"><b>-userParam</b> <i>PARAM[[^]=[VAL]]</i></dt>
 <dd>
 
-<p>Set user parameter. <i>PARAM</i> is an arbitrary user parameter name. This is an interface to the API UserParam option (see the <a>Image::ExifTool Options</a> documentation), and provides a method to access user-defined parameters in arguments to the <b>-if</b> and <b>-p</b> options as if they were any other tag. Appending a hash tag (<code>#</code>) to <i>PARAM</i> also causes the parameter to be extracted as a normal tag (in the UserParam group). Similar to the <b>-api</b> option, the parameter value is set to 1 if <i>=VAL</i> is omitted, undef if just <i>VAL</i> is omitted with <code>=</code>, or an empty string if <i>VAL</i> is omitted with <code>^=</code>.</p>
+<p>Set user parameter. <i>PARAM</i> is an arbitrary user parameter name. This is an interface to the API UserParam option (see the <a>Image::ExifTool Options</a> documentation), and provides a method to access user-defined parameters in arguments to the <b>-if</b> and <b>-p</b> options as if they were any other tag. Appending a hash tag (<code>#</code>) to <i>PARAM</i> (eg. <code>-userParam MyTag#=yes</code>) also causes the parameter to be extracted as a normal tag in the UserParam group. Similar to the <b>-api</b> option, the parameter value is set to 1 if <i>=VAL</i> is omitted, undef if just <i>VAL</i> is omitted with <code>=</code>, or an empty string if <i>VAL</i> is omitted with <code>^=</code>.</p>
 
 <pre><code>    exiftool -p &#39;$test from $filename&#39; -userparam test=Hello FILE</code></pre>
 
@@ -1361,7 +1373,7 @@
 
 <p>The <b>-sep</b> option is necessary to split the string back into individual list items when writing to a list-type tag.</p>
 
-<p>An optional flag argument may be set to 1 to cause <code>NoDups</code> to return undef if no duplicates existed, thus preventing the file from being rewritten unnecessarily:</p>
+<p>An optional flag argument may be set to 1 to cause <code>NoDups</code> to set <code>$_</code> to undef if no duplicates existed, thus preventing the file from being rewritten unnecessarily:</p>
 
 <pre><code>    exiftool -sep &#39;##&#39; &#39;-keywords&lt;${keywords;NoDups(1)}&#39; a.jpg</code></pre>
 
@@ -1989,13 +2001,17 @@
 </dd>
 </dl>
 
+<h1 id="INTERRUPTING-EXIFTOOL">INTERRUPTING EXIFTOOL</h1>
+
+<p>Interrupting exiftool with a CTRL-C or SIGINT will not result in partially written files or temporary files remaining on the hard disk. The exiftool application traps SIGINT and defers it until the end of critical processes if necessary, then does a proper cleanup before exiting.</p>
+
 <h1 id="EXIT-STATUS">EXIT STATUS</h1>
 
 <p>The exiftool application exits with a status of 0 on success, or 1 if an error occurred, or 2 if all files failed the <b>-if</b> condition (for any of the commands if <b>-execute</b> was used).</p>
 
 <h1 id="AUTHOR">AUTHOR</h1>
 
-<p>Copyright 2003-2020, Phil Harvey</p>
+<p>Copyright 2003-2021, Phil Harvey</p>
 
 <p>This is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
 

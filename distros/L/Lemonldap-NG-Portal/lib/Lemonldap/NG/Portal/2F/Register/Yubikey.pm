@@ -9,17 +9,16 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
 # INITIALIZATION
 
-has prefix => ( is => 'rw', default => 'yubikey' );
-
+has prefix   => ( is => 'rw', default => 'yubikey' );
 has template => ( is => 'ro', default => 'yubikey2fregister' );
-
-has logo => ( is => 'rw', default => 'yubikey.png' );
+has welcome  => ( is => 'ro', default => 'clickOnYubikey' );
+has logo     => ( is => 'rw', default => 'yubikey.png' );
 
 sub init {
     my ($self) = @_;
@@ -36,6 +35,17 @@ sub run {
         'No ' . $self->conf->{whatToTrace} . ' found in user data', 500 )
       unless $user;
 
+    # Check if UBK key can be updated
+    my $msg = $self->canUpdateSfa( $req, $action );
+    return $self->p->sendHtml(
+        $req, 'error',
+        params => {
+            MAIN_LOGO       => $self->conf->{portalMainLogo},
+            RAW_ERROR       => 'notAuthorizedAuthLevel',
+            AUTH_ERROR_TYPE => 'warning',
+        }
+    ) if $msg;
+
     if ( $action eq 'register' ) {
         my $otp     = $req->param('otp');
         my $UBKName = $req->param('UBKName');
@@ -48,7 +58,7 @@ sub run {
             return $self->p->sendError( $req, 'badName', 200 );
         }
         $UBKName = substr( $UBKName, 0, $self->conf->{max2FDevicesNameLength} );
-        $self->logger->debug("Yubikey name : $UBKName");
+        $self->logger->debug("Yubikey name: $UBKName");
 
         if ( $otp
             and length($otp) > $self->conf->{yubikey2fPublicIDSize} )
@@ -56,7 +66,7 @@ sub run {
             my $key = substr( $otp, 0, $self->conf->{yubikey2fPublicIDSize} );
 
             # Read existing 2FDevices
-            $self->logger->debug("Looking for 2F Devices ...");
+            $self->logger->debug("Looking for 2F Devices...");
             my $_2fDevices;
             if ( $req->userData->{_2fDevices} ) {
                 $_2fDevices = eval {
@@ -78,7 +88,7 @@ sub run {
             # Search if the Yubikey is already registered
             my $SameUBKFound = 0;
             foreach (@$_2fDevices) {
-                $self->logger->debug("Reading Yubikeys ...");
+                $self->logger->debug("Reading Yubikeys...");
                 if ( $_->{_yubikey} eq $key ) {
                     $SameUBKFound = 1;
                     last;
@@ -100,7 +110,7 @@ sub run {
             # Check if user can register one more device
             my $size    = @$_2fDevices;
             my $maxSize = $self->conf->{max2FDevices};
-            $self->logger->debug("Nbr 2FDevices = $size / $maxSize");
+            $self->logger->debug("Registered 2F Device(s): $size / $maxSize");
             if ( $size >= $maxSize ) {
                 $self->userLogger->warn("Max number of 2F devices is reached");
                 return $self->p->sendHtml(
@@ -120,9 +130,8 @@ sub run {
                 _yubikey => $key,
                 epoch    => $epoch
               };
-
             $self->logger->debug(
-                "Append 2F Device : { type => 'UBK', name => $UBKName }");
+                "Append 2F Device: { type => 'UBK', name => $UBKName }");
             $self->p->updatePersistentSession( $req,
                 { _2fDevices => to_json($_2fDevices) } );
             $self->userLogger->notice(
@@ -161,8 +170,8 @@ sub run {
             400 );
 
         # Read existing 2FDevices
-        $self->logger->debug("Looking for 2F Devices ...");
-        my $_2fDevices;
+        $self->logger->debug("Looking for 2F Devices...");
+        my ( $_2fDevices, $UBKName );
         if ( $req->userData->{_2fDevices} ) {
             $_2fDevices = eval {
                 from_json( $req->userData->{_2fDevices},
@@ -179,23 +188,30 @@ sub run {
         }
 
         # Delete Yubikey device
-        my $UBKName;
-        foreach (@$_2fDevices) {
-            $UBKName = $_->{name} if $_->{epoch} eq $epoch;
+        @$_2fDevices = map {
+            if ( $_->{epoch} eq $epoch ) { $UBKName = $_->{name}; () }
+            else                         { $_ }
+        } @$_2fDevices;
+        if ($UBKName) {
+            $self->logger->debug(
+"Delete 2F Device: { type => 'UBK', epoch => $epoch, name => $UBKName }"
+            );
+            $self->p->updatePersistentSession( $req,
+                { _2fDevices => to_json($_2fDevices) } );
+            $self->userLogger->notice(
+                "Yubikey $UBKName unregistration succeeds for $user");
+            return [
+                200,
+                [
+                    'Content-Type'   => 'application/json',
+                    'Content-Length' => 12,
+                ],
+                ['{"result":1}']
+            ];
         }
-        @$_2fDevices = grep { $_->{epoch} ne $epoch } @$_2fDevices;
-        $self->logger->debug(
-"Delete 2F Device : { type => 'UBK', epoch => $epoch, name => $UBKName }"
-        );
-        $self->p->updatePersistentSession( $req,
-            { _2fDevices => to_json($_2fDevices) } );
-        $self->userLogger->notice(
-            "Yubikey $UBKName unregistration succeeds for $user");
-        return [
-            200,
-            [ 'Content-Type' => 'application/json', 'Content-Length' => 12, ],
-            ['{"result":1}']
-        ];
+        else {
+            $self->p->sendError( $req, '2FDeviceNotFound', 400 );
+        }
     }
     else {
         $self->logger->error("Unknown Yubikey action -> $action");

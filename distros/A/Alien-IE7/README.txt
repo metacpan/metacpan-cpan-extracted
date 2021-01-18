@@ -1,5 +1,11 @@
 Alien::IE7 automatically installs IE7 JS compatibility library
 
+
+
+*** DEPRECATED *** - DO NOT USE
+
+
+
 Copyright (C) 2007, Graham TerMarsch.  All Rights Reserved.
 
 This is free software; you can redistribute it and/or modify it under the same

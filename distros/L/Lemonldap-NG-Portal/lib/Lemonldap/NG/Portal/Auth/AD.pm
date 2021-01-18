@@ -150,7 +150,7 @@ sub authenticate {
             and $self->conf->{ldapAllowResetExpiredPassword} )
       )
     {
-        $req->data->{oldpassword} = $self->{password};
+        $req->data->{oldpassword} = $req->data->{password};    # Fix 2377
         $req->data->{noerror}     = 1;
         $self->setSecurity($req);
     }

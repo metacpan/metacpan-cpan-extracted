@@ -1,10 +1,14 @@
 package main;
 
 my $mail;
-my $envelope;
+my $mail_envelope;
 
 sub mail {
     return $mail;
+}
+
+sub envelope {
+    return $mail_envelope;
 }
 
 package Email::Sender::Transport::LLNG::Test;
@@ -17,8 +21,8 @@ extends 'Email::Sender::Transport';
 
 sub send_email {
     my ( $self, $email, $envelope ) = @_;
-    $mail     = $email->get_body;
-    $envelope = $envelope;
+    $mail          = $email->get_body;
+    $mail_envelope = $envelope;
     return $self->success;
 }
 

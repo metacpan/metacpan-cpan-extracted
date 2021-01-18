@@ -1,3 +1,9 @@
+2021-01-15  2.0.5 Dave Cross <dave@perlhacks.com>
+
+  * Added bugtracker to metadata
+  * CI improvements
+  * Code refactoring
+
 2020-09-24  2.0.4 Dave Cross <dave@perlhacks.com>
 
   * Added missing new library to MANIFEST

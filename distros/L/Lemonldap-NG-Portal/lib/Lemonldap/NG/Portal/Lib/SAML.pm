@@ -300,6 +300,29 @@ sub loadIDPs {
         }
         $self->logger->debug("Set encryption mode $encryption_mode on IDP $_");
 
+        # Set signature method if overriden
+        my $signature_method = $self->conf->{samlIDPMetaDataOptions}->{$_}
+          ->{samlIDPMetaDataOptionsSignatureMethod};
+        if ($signature_method) {
+            my $lasso_signature_method =
+              $self->getSignatureMethod($signature_method);
+
+            unless (
+                $self->setProviderSignatureMethod(
+                    $self->lassoServer->get_provider($entityID),
+                    $lasso_signature_method
+                )
+              )
+            {
+                $self->logger->error(
+                    "Unable to set signature method $signature_method on IDP $_"
+                );
+                next;
+            }
+            $self->logger->debug(
+                "Set signature method $signature_method on IDP $_");
+        }
+
         # Set display options
         $self->idpList->{$entityID}->{displayName} =
           $self->conf->{samlIDPMetaDataOptions}->{$_}
@@ -405,6 +428,29 @@ sub loadSPs {
             next;
         }
         $self->logger->debug("Set encryption mode $encryption_mode on SP $_");
+
+        # Set signature method if overriden
+        my $signature_method = $self->conf->{samlSPMetaDataOptions}->{$_}
+          ->{samlSPMetaDataOptionsSignatureMethod};
+        if ($signature_method) {
+            my $lasso_signature_method =
+              $self->getSignatureMethod($signature_method);
+
+            unless (
+                $self->setProviderSignatureMethod(
+                    $self->lassoServer->get_provider($entityID),
+                    $lasso_signature_method
+                )
+              )
+            {
+                $self->logger->error(
+                    "Unable to set signature method $signature_method on SP $_"
+                );
+                next;
+            }
+            $self->logger->debug(
+                "Set signature method $signature_method on SP $_");
+        }
 
         my $rule = $self->conf->{samlSPMetaDataOptions}->{$_}
           ->{samlSPMetaDataOptionsRule};
@@ -1425,7 +1471,9 @@ sub createLogoutRequest {
     }
 
     # Set RelayState
-    if ( my $relaystate = $self->storeRelayState( $req, 'urldc' ) ) {
+    if ( my $relaystate =
+        $self->storeRelayState( $req, 'urldc', 'issuerUrldc' ) )
+    {
         $logout->msg_relayState($relaystate);
         $self->logger->debug("Set $relaystate in RelayState");
     }
@@ -2700,18 +2748,21 @@ sub sendLogoutRequestToProvider {
                 return ( 0, $method, undef );
             }
 
-            # Store success status for this SLO request
-            my $sloStatusSessionInfos = $self->getSamlSession($relayState);
+            if ($relayState) {
 
-            if ($sloStatusSessionInfos) {
-                $sloStatusSessionInfos->update( { $confKey => 1 } );
-                $self->logger->debug(
-                    "Store SLO status for $confKey in session $relayState");
-            }
-            else {
-                $self->logger->warn(
+                # Store success status for this SLO request
+                my $sloStatusSessionInfos = $self->getSamlSession($relayState);
+
+                if ($sloStatusSessionInfos) {
+                    $sloStatusSessionInfos->update( { $confKey => 1 } );
+                    $self->logger->debug(
+                        "Store SLO status for $confKey in session $relayState");
+                }
+                else {
+                    $self->logger->warn(
 "Unable to store SLO status for $confKey in session $relayState"
-                );
+                    );
+                }
             }
 
             $self->logger->debug("Logout response is valid");
@@ -3153,13 +3204,42 @@ sub getSignatureMethod {
       eval 'Lasso::Constants::SIGNATURE_METHOD_RSA_SHA1';
     my $signature_method_rsa_sha256 =
       eval 'Lasso::Constants::SIGNATURE_METHOD_RSA_SHA256';
+    my $signature_method_rsa_sha384 =
+      eval 'Lasso::Constants::SIGNATURE_METHOD_RSA_SHA384';
+    my $signature_method_rsa_sha512 =
+      eval 'Lasso::Constants::SIGNATURE_METHOD_RSA_SHA512';
     my $signature_method_none = eval 'Lasso::Constants::SIGNATURE_METHOD_NONE';
 
     return $signature_method_rsa_sha1
       if ( $signature_method =~ /^RSA_SHA1$/i );
     return $signature_method_rsa_sha256
       if ( $signature_method =~ /^RSA_SHA256$/i );
+    return $signature_method_rsa_sha384
+      if ( $signature_method =~ /^RSA_SHA384$/i );
+    return $signature_method_rsa_sha512
+      if ( $signature_method =~ /^RSA_SHA512$/i );
     return $signature_method_none;
+}
+
+## @method boolean setProviderSignatureMethod(Lasso::Provider provider, int signature_method)
+# Set signature method on a provider
+# @param provider Lasso::Provider object
+# @param signature_method Lasso signature method
+# @return result
+sub setProviderSignatureMethod {
+    my ( $self, $provider, $signature_method ) = @_;
+
+    eval {
+        my $key = Lasso::Key::new_for_signature_from_file(
+            $self->conf->{samlServicePrivateKeySig},
+            $self->conf->{samlServicePrivateKeySigPwd} || '',
+            $signature_method,
+            $self->conf->{samlServicePublicKeySig}
+        );
+        $provider->set_server_signing_key($key);
+    };
+
+    return $self->checkLassoError($@);
 }
 
 1;
@@ -3526,6 +3606,10 @@ Get query string with or without CGI query_string() method
 =head2 getSignatureMethod
 
 Return Lasso signature method
+
+=head2 setProviderSignatureMethod
+
+Set signature method on a provider
 
 =head1 SEE ALSO
 

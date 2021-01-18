@@ -152,7 +152,7 @@ div.oidc_consent_message > ul {
   cursor: pointer;
 }
 
-.nodecor:hover, .nodecor:active.nodecor:focus {
+.nodecor:hover, .nodecor:active, .nodecor:focus {
   text-decoration: none;
 }
 
@@ -174,4 +174,20 @@ input.key {
   /*font-style: normal;*/
   /*font-weight: 400;*/
   src: url(/static/common/fonts/password.ttf);
+}
+
+.info.table caption {
+  color: black;
+  text-align: center;
+  caption-side: bottom;
+}
+
+/* Allow full height for check box label */
+div.input-group > p.form-control {
+  height: auto;
+}
+div.input-group > p.form-control > label {
+  display: revert;
+  user-select: none;
+  cursor: pointer;
 }

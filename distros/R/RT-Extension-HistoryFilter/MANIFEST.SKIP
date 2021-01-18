@@ -1,5 +1,5 @@
 
-#!start included /usr/share/perl/5.22/ExtUtils/MANIFEST.SKIP
+#!start included /usr/share/perl/5.28/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
@@ -63,7 +63,8 @@
 
 # Avoid MYMETA files
 ^MYMETA\.
-#!end included /usr/share/perl/5.22/ExtUtils/MANIFEST.SKIP
+#!end included /usr/share/perl/5.28/ExtUtils/MANIFEST.SKIP
 
-^xt/lib/RT/Extension/HistoryFilter/Test.pm$
-^xt/tmp/
+\B\.github\b
+\bxt/lib/RT/Extension/.+/Test.pm$
+\bxt/tmp\b

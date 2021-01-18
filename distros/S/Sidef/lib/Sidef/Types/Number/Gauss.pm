@@ -1,5 +1,8 @@
 package Sidef::Types::Number::Gauss {
 
+    # Reference:
+    #   https://en.wikipedia.org/wiki/Gaussian_integer
+
     use utf8;
     use 5.016;
 
@@ -35,13 +38,21 @@ package Sidef::Types::Number::Gauss {
         }
     }
 
+    sub i {
+        my ($x) = @_;
+
+        if (ref($x) eq __PACKAGE__) {    # (a+bi)*i = -b + a*i
+            return __PACKAGE__->new($x->{im}->neg, $x->{re});
+        }
+
+        __PACKAGE__->new(Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ONE);
+    }
+
     sub to_c {
         Sidef::Types::Number::Complex->new($_[0]->{re}, $_[0]->{im});
     }
 
-    sub to_n {
-        $_[0];
-    }
+    *to_n = \&to_c;
 
     sub re {
         $_[0]->{re};
@@ -172,11 +183,6 @@ package Sidef::Types::Number::Gauss {
         __PACKAGE__->new(Sidef::Types::Number::Number::complex_inv($x->{re}, $x->{im}));
     }
 
-    sub inc {
-        my ($x) = @_;
-        __PACKAGE__->new(Sidef::Types::Number::Number::complex_add($x->{re}, $x->{im}, Sidef::Types::Number::Number::ONE));
-    }
-
     sub is_prime {
         my ($x) = @_;
         Sidef::Types::Number::Number::is_gaussian_prime($x->{re}, $x->{im});
@@ -249,14 +255,24 @@ package Sidef::Types::Number::Gauss {
         $n->norm->gcd($k->norm)->is_one;
     }
 
+    sub ratmod {
+        my ($x, $m) = @_;
+        __PACKAGE__->new($x->{re}->ratmod($m), $x->{im}->ratmod($m));
+    }
+
     sub invmod {
         my ($x, $m) = @_;
         __PACKAGE__->new(Sidef::Types::Number::Number::complex_invmod($x->{re}, $x->{im}, $m));
     }
 
+    sub inc {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{re}->inc, $x->{im});
+    }
+
     sub dec {
         my ($x) = @_;
-        __PACKAGE__->new(Sidef::Types::Number::Number::complex_sub($x->{re}, $x->{im}, Sidef::Types::Number::Number::ONE));
+        __PACKAGE__->new($x->{re}->dec, $x->{im});
     }
 
     sub pow {
@@ -333,7 +349,7 @@ package Sidef::Types::Number::Gauss {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
                 _valid(\$y);
-                __PACKAGE__->new($x->{re}->$method($y->{re}), $x->{im}->$method($y->{im}),);
+                __PACKAGE__->new($x->{re}->$method($y->{re}), $x->{im}->$method($y->{im}));
             };
         }
 

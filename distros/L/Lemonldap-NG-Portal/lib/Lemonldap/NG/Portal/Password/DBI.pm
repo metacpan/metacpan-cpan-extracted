@@ -2,12 +2,18 @@ package Lemonldap::NG::Portal::Password::DBI;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_PASSWORD_OK PE_ERROR);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_ERROR
+  PE_PASSWORD_OK
+);
 
-extends 'Lemonldap::NG::Portal::Password::Base',
-  'Lemonldap::NG::Portal::Lib::DBI';
+extends qw(
+  Lemonldap::NG::Portal::Lib::DBI
+  Lemonldap::NG::Portal::Password::Base
 
-our $VERSION = '2.0.0';
+);
+
+our $VERSION = '2.0.10';
 
 sub init {
     $_[0]->Lemonldap::NG::Portal::Password::Base::init

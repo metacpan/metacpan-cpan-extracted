@@ -7,11 +7,11 @@
 <br /> 
 <br /> 
 <span trspan="yourLoginIs">Your login is</span> 
-<span><img src="cid:key:../common/bullet_go.png" /></span>
+<span><img src="cid:key:../common/bullet_go.png" alt="go"/></span>
 <b>$login</b>
 <br /> 
 <span trspan="pwdIs">Your password is</span> 
-<span><img src="cid:key:../common/key.png" /></span>
+<span><img src="cid:key:../common/key.png" alt="key"/></span>
 <b>$password</b>
 </p>
 <p><a href="$url"><span trspan="goToPortal">Click here to access to portal</span></a></p>

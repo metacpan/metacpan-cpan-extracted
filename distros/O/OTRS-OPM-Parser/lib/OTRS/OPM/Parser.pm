@@ -1,14 +1,13 @@
 package OTRS::OPM::Parser;
-
+$OTRS::OPM::Parser::VERSION = '1.05';
 # ABSTRACT: Parser for the .opm file
-
-our $VERSION = 1.04;
 
 use Moo;
 use MooX::HandlesVia;
 use OTRS::OPM::Parser::Types qw(:all);
 
 use MIME::Base64 ();
+use OTRS::OPM::Validate;
 use Path::Class;
 use Try::Tiny;
 use XML::LibXML;
@@ -120,25 +119,13 @@ sub validate {
         return;
     }
 
-    my $tree;
     try {
-        my $parser = XML::LibXML->new;
-        $tree      = $parser->parse_file( $self->opm_file );
+        my $fh      = IO::File->new( $self->opm_file, 'r' );
+        my $content = join '', $fh->getlines;
+        OTRS::OPM::Validate->validate( $content );
     }
     catch {
-        $self->error_string( 'Could not parse .opm: ' . $_ );
-    };
-
-    return if $self->error_string;
-
-    try {
-        my $xsd    = $self->_get_xsd;
-        my $schema = XML::LibXML::Schema->new( string => $xsd );
-
-        $schema->validate( $tree );
-    }
-    catch {
-        $self->error_string( 'Could not validate against XML schema: ' . $_ );
+        $self->error_string( 'opm file is invalid: ' . $_ );
     };
 
     return if $self->error_string;
@@ -169,15 +156,8 @@ sub parse {
 
     return if $self->error_string;
     
-    # check if the opm file is valid.
-    try {
-        my $xsd = $self->_get_xsd;
-        XML::LibXML::Schema->new( string => $xsd )
-    }
-    catch {
-        $self->error_string( 'Could not validate against XML schema: ' . $_ );
-        #return;
-    };
+    my $is_valid = $self->validate;
+    return if !$is_valid;
     
     my $root = $tree->getDocumentElement;
     
@@ -601,21 +581,21 @@ sub _get_xsd {
     
     <xs:complexType name="ForeignKey">
         <xs:sequence>
-            <xs:element ref="Reference" maxOccurs="unbounded" />
+            <xs:element name="Reference" type="Reference" maxOccurs="unbounded" />
         </xs:sequence>
         <xs:attribute name="ForeignTable" use="required" type="xs:anySimpleType"/>
     </xs:complexType>
 
     <xs:complexType name="ForeignKeyCreate">
         <xs:sequence>
-            <xs:element ref="Reference" maxOccurs="unbounded" />
+            <xs:element name="Reference" type="Reference" maxOccurs="unbounded" />
         </xs:sequence>
         <xs:attribute name="ForeignTable" use="required" type="xs:anySimpleType"/>
     </xs:complexType>
 
     <xs:complexType name="ForeignKeyDrop">
         <xs:sequence>
-            <xs:element ref="Reference" maxOccurs="unbounded" />
+            <xs:element name="Reference" type="Reference" maxOccurs="unbounded" />
         </xs:sequence>
         <xs:attribute name="ForeignTable" use="required" type="xs:anySimpleType"/>
     </xs:complexType>
@@ -666,7 +646,7 @@ sub _get_xsd {
     
     <xs:complexType name="Index">
         <xs:sequence>
-            <xs:element ref="IndexColumn" maxOccurs="unbounded" />
+            <xs:element name="IndexColumn" type="IndexColumn" maxOccurs="unbounded" />
         </xs:sequence>
         <xs:attribute name="Name" use="optional" type="xs:anySimpleType"/>
     </xs:complexType>
@@ -732,7 +712,7 @@ OTRS::OPM::Parser - Parser for the .opm file
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

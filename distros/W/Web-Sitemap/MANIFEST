@@ -1,8 +1,14 @@
-MANIFEST
-README
-LICENSE
 Changes
-Makefile.PL
 lib/Web/Sitemap.pm
 lib/Web/Sitemap/Url.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
 t/001_load.t
+t/002_generate.t
+t/003_exceptions.t
+t/004_big_sitemap.t
+t/lib/SitemapTesters.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

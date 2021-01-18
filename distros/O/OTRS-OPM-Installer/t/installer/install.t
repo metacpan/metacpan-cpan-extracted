@@ -29,6 +29,7 @@ my $installer = OTRS::OPM::Installer->new(
     otrs_version => $version,
     utils_otrs   => MyUtils->new,
     logger       => MyLogger->new,
+    #verbose      => 1,
 );
 
 # package already installed

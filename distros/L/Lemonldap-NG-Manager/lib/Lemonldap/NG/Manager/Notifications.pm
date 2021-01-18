@@ -1,25 +1,24 @@
 package Lemonldap::NG::Manager::Notifications;
 
-use 5.10.0;
+use strict;
 use utf8;
 use Mouse;
 use JSON qw(from_json to_json);
 use POSIX qw(strftime);
+use MIME::Base64 qw(decode_base64);
 
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 use Lemonldap::NG::Common::Conf::ReConstants;
 require Lemonldap::NG::Common::Notifications;
 
-use feature 'state';
-
 extends qw(
   Lemonldap::NG::Manager::Plugin
-  Lemonldap::NG::Common::Conf::AccessLib
   Lemonldap::NG::Common::PSGI::Router
+  Lemonldap::NG::Common::Conf::AccessLib
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 has notifAccess => ( is => 'rw' );
 has notifFormat => ( is => 'rw' );
@@ -243,40 +242,60 @@ sub notifications {
 }
 
 sub notification {
-    my ( $self, $req, $id, $type, $uid, $ref ) = @_;
+    my ( $self, $req, $id, $type ) = @_;
+    my $backend = $self->{notificationStorage};
+    $self->logger->debug("Notification storage backend: $backend");
+    $self->logger->debug("Notification id: $id");
 
     if ( $type eq 'actives' ) {
-        ( $uid, $ref ) = ( $id =~ /([^_]+?)_(.+)/ );
+        my ( $uid, $ref ) = ( $id =~ /([^_]+?)_(.+)/ );
         my $n = $self->notifAccess->get( $uid, $ref );
         unless ($n) {
             $self->userLogger->notice(
-                "Notification $ref not found for user $uid");
+                "Active notification $ref not found for user $uid");
             return $self->sendJSONresponse(
                 $req,
                 {
                     result => 0,
-                    error  => "Notification $ref not found for user $uid"
+                    error  => "Active notification $ref not found for user $uid"
                 }
             );
         }
+        $self->logger->debug("Active notification $ref found for user $uid");
         return $self->sendJSONresponse( $req,
             { result => 1, count => 1, notifications => [ values %$n ] } );
     }
     else {
+        my ( $date, $uid, $ref ) =
+          $backend eq 'File'
+          ? ( $id =~ /([^_]+?)_(.+?)_(.+?)\.done/ )
+          : ( $id =~ /([^_]+?)_(.+?)_(.+)/ );
+        $ref = decode_base64($ref) if ( $backend eq 'File' );
         my $n = $self->notifAccess->getAccepted( $uid, $ref );
         unless ($n) {
-            $self->userLogger->notice(
-                "Notification $ref not found for user $uid");
+            my $msg =
+              $ref && $uid
+              ? "Done notification $ref not found for user $uid"
+              : 'Done notification not found';
+            $self->userLogger->notice($msg);
             return $self->sendJSONresponse(
                 $req,
                 {
                     result => 0,
-                    error  => "Notification $ref not found for user $uid"
+                    error  => $msg
                 }
             );
         }
-        return $self->sendJSONresponse( $req,
-            { result => 1, count => 1, done => $id, notifications => [ values %$n ] } );
+        $self->logger->debug("Done notification $ref found for user $uid");
+        return $self->sendJSONresponse(
+            $req,
+            {
+                result        => 1,
+                count         => 1,
+                done          => $id,
+                notifications => [ values %$n ]
+            }
+        );
     }
 }
 

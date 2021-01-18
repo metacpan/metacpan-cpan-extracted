@@ -72,7 +72,8 @@ ok(
     ),
     '4th Bad Auth query -> Rejected'
 );
-ok( $res->[2]->[0] =~ /<span trmsg="86">/, 'Protection enabled' );
+ok( $res->[2]->[0] =~ /<span trmsg="86">/, 'Protection enabled' )
+  or print STDERR Dumper( $res->[2]->[0] );
 count(2);
 
 # Count down
@@ -80,6 +81,29 @@ Time::Fake->offset("+2s");
 
 # Try to authenticate
 # -------------------
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=dwho&checkLogins=1'),
+        length => 37,
+        accept => 'text/html',
+    ),
+    'Auth query'
+);
+ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
+    'Rejected -> Protection enabled' )
+  or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ m%(\d) <span trspan="seconds">seconds</span>%,
+    "LockTime = $1" );
+ok( $1 < 5 && $1 >= 2, 'LockTime in range' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(4);
+
+# Cool down
+Time::Fake->offset("+6s");
+
+# Try to authenticate again
+# -------------------------
 ok(
     $res = $client->_post(
         '/',
@@ -100,46 +124,6 @@ ok(
 qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
     'Found EXTCODE input'
 ) or print STDERR Dumper( $res->[2]->[0] );
-count(1);
-
-$query =~ s/code=/code=123456/;
-ok(
-    $res = $client->_post(
-        '/ext2fcheck',
-        IO::String->new($query),
-        length => length($query),
-        accept => 'text/html',
-    ),
-    'Post code'
-);
-ok( $res->[2]->[0] =~ /<span trmsg="86">/, 'Protection enabled' );
-count(2);
-
-# Cool down
-Time::Fake->offset("+6s");
-
-# Try to authenticate again
-# -------------------------
-ok(
-    $res = $client->_post(
-        '/',
-        IO::String->new('user=dwho&password=dwho&checkLogins=1'),
-        length => 37,
-        accept => 'text/html',
-    ),
-    'Auth query'
-);
-count(1);
-
-( $host, $url, $query ) =
-  expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code',
-    'checkLogins' );
-
-ok(
-    $res->[2]->[0] =~
-qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
-    'Found EXTCODE input'
-) or print STDERR Dumper( $res->[2]->[0] );
 
 $query =~ s/code=/code=123456/;
 ok(
@@ -152,13 +136,12 @@ ok(
     'Post code'
 );
 count(2);
-
 my $id = expectCookie($res);
 
 ok( $res->[2]->[0] =~ /trspan="lastLogins"/, 'History found' )
   or print STDERR Dumper( $res->[2]->[0] );
 my @c = ( $res->[2]->[0] =~ /<td>127.0.0.1/gs );
-ok( @c == 6, 'Six entries found' )
+ok( @c == 4, 'Four entries found' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(2);
 

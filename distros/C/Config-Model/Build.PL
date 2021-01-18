@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2020 by Dominique Dumont.
+# This software is Copyright (c) 2005-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -80,7 +80,7 @@ my $build = $class->new(
     'Test::More' => '0',
     'Test::Pod' => '1.00',
     'Test::Warn' => '0.11',
-    'YAML::Tiny' => '0',
+    'XXX' => '0',
     'boolean' => '0',
     'lib' => '0'
   },
@@ -124,6 +124,7 @@ my $build = $class->new(
     'Storable' => '0',
     'Text::Levenshtein::Damerau' => '0',
     'Text::Wrap' => '0',
+    'YAML::Tiny' => '0',
     'base' => '0',
     'open' => '0',
     'overload' => '0',

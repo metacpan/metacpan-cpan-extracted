@@ -4,13 +4,13 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-Plugin-NextVersion-Semantic",
    "no_index" : {
@@ -22,6 +22,12 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -62,19 +68,19 @@
    "provides" : {
       "Dist::Zilla::Plugin::NextVersion::Semantic" : {
          "file" : "lib/Dist/Zilla/Plugin/NextVersion/Semantic.pm",
-         "version" : "v0.2.5"
+         "version" : "v0.2.6"
       },
       "Dist::Zilla::Plugin::NextVersion::Semantic::Incrementer" : {
          "file" : "lib/Dist/Zilla/Plugin/NextVersion/Semantic.pm",
-         "version" : "v0.2.5"
+         "version" : "v0.2.6"
       },
       "Dist::Zilla::Plugin::PreviousVersion::Changelog" : {
          "file" : "lib/Dist/Zilla/Plugin/PreviousVersion/Changelog.pm",
-         "version" : "v0.2.5"
+         "version" : "v0.2.6"
       },
       "Dist::Zilla::Role::YANICK::PreviousVersionProvider" : {
          "file" : "lib/Dist/Zilla/Role/YANICK/PreviousVersionProvider.pm",
-         "version" : "v0.2.5"
+         "version" : "v0.2.6"
       }
    },
    "release_status" : "stable",
@@ -89,14 +95,21 @@
          "web" : "https://github.com/yanick/Dist-Zilla-Plugin-NextVersion-Semantic"
       }
    },
-   "version" : "0.2.5",
+   "version" : "0.2.6",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
    "x_contributors" : [
       "Alex Peters <lxp@cpan.org>",
-      "Mike Doherty <mike@mikedoherty.ca>"
-   ]
+      "Kent Fredric <kentnl@gentoo.org>",
+      "Mike Doherty <mike@mikedoherty.ca>",
+      "Yanick Champoux <yanick@babyl.ca>"
+   ],
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

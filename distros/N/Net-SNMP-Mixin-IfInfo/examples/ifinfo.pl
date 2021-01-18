@@ -100,24 +100,50 @@ sub print_if {
   print "\n";
   printf "Hostname: %-15.15s\n", $session->hostname;
 
-  print '-' x 78, "\n";
-  printf "%5s %5s %6s %10s %26s %21s\n",
-    'ifIdx', 'ad/op', 'ifName', 'ifDesc', 'ifAlias', 'ifType';
-  print '-' x 78, "\n";
+  print '-' x 138, "\n";
+  printf "%-9s " . "%5s " . "%-15s " . "%-15s " . "%-35s " . "%6s " . "%-17s " . "%6s " . "%10s " . "%11s\n",
+    'ifIdx', 'ad/op', 'ifName', 'ifDesc', 'ifAlias', 'ifType', 'ifPhysAddress', 'ifMtu', 'ifSpeed', 'ifHighspeed';
+  print '-' x 138, "\n";
 
   my $if_entries = $session->get_if_entries;
   foreach my $if_index ( sort { $a <=> $b } keys %$if_entries ) {
-    my $ifAdminStatus = $if_entries->{$if_index}->{ifAdminStatus} || 0;
-    my $ifOperStatus  = $if_entries->{$if_index}->{ifOperStatus}  || 0;
-    my $ifName        = $if_entries->{$if_index}->{ifName}        || '';
-    my $ifDescr       = $if_entries->{$if_index}->{ifDescr}       || '';
-    my $ifType        = $if_entries->{$if_index}->{ifType}        || '';
-    my $ifAlias       = $if_entries->{$if_index}->{ifAlias}       || '';
+    my $ifName  = shorten( $if_entries->{$if_index}->{ifName}  // '' );
+    my $ifDescr = shorten( $if_entries->{$if_index}->{ifDescr} // '' );
+    my $ifAlias       = $if_entries->{$if_index}->{ifAlias}       // '';
+    my $ifType        = $if_entries->{$if_index}->{ifType}        // '';
+    my $ifPhysAddress = $if_entries->{$if_index}->{ifPhysAddress} // '';
+    my $ifMtu         = $if_entries->{$if_index}->{ifMtu}         // 0;
+    my $ifSpeed       = $if_entries->{$if_index}->{ifSpeed}       // 0;
+    my $ifHighspeed   = $if_entries->{$if_index}->{ifHighspeed}   // 0;
+    my $ifAdminStatus = $if_entries->{$if_index}->{ifAdminStatus} // 0;
+    my $ifOperStatus  = $if_entries->{$if_index}->{ifOperStatus}  // 0;
 
-    printf "%5d  %1d/%1d  %-10.10s %-25.25s %-22.22s %2d\n", $if_index,
-      $ifAdminStatus, $ifOperStatus, $ifName, $ifDescr, $ifAlias, $ifType;
+    printf "%9d " . "%2d/%-2d " . "%-15.15s " . "%-15.15s " . "%-35.35s " . "%6d " . "%17.17s " .    "%6d " . "%10d " . "%11d\n",
+      $if_index, $ifAdminStatus, $ifOperStatus, $ifName, $ifDescr, $ifAlias, $ifType, $ifPhysAddress, $ifMtu,  $ifSpeed, $ifHighspeed;
   }
   print "\n";
+}
+
+sub shorten {
+  my $if = shift // croak("missing param - ifName,");
+
+  $if =~ s/Vlan/Vl/i;
+  $if =~ s/Interface/IF/i;
+  $if =~ s/^(.+)\sIF$/$1/i;
+  $if =~ s/FastEthernet/Fa/i;
+  $if =~ s/Ethernet/E/i;
+  $if =~ s/Ether/E/i;
+  $if =~ s/Eth/E/i;
+  $if =~ s/Gigabit/G/i;
+  $if =~ s/Gig/G/i;
+  $if =~ s/Forty/F/i;
+  $if =~ s/Mega/M/i;
+  $if =~ s/Ten-?/T/i;
+  $if =~ s/Hundred/H/i;
+  $if =~ s/Bridge-?Aggregation/BAgg/i;
+  $if =~ s/Port-?Channel/Po/i;
+
+  return $if;
 }
 
 sub usage {
@@ -142,7 +168,7 @@ Karl Gaissmaier, karl.gaissmaier (at) uni-ulm.de
 
 =head1 COPYRIGHT
 
-Copyright (C) 2008-2015 by Karl Gaissmaier
+Copyright (C) 2008-2021 by Karl Gaissmaier
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

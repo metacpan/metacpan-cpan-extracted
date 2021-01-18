@@ -15,12 +15,12 @@ use strict;
 use Mouse;
 use MIME::Base64;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_NOTIFICATION
-  PE_ERROR
   PE_OK
+  PE_ERROR
+  PE_NOTIFICATION
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -40,8 +40,8 @@ sub init {
     my ($self) = @_;
 
     # Declare new routes
-    $self->addUnauthRoute( notifback => 'getNotifBack', [ 'POST', 'GET' ] );
-    $self->addAuthRoute( notifback => 'getNotifBack', ['POST'] );
+    $self->addUnauthRoute( notifback => 'getNotifBack', [ 'POST', 'GET' ] )
+      ->addAuthRoute( notifback => 'getNotifBack', ['POST'] );
     $self->addAuthRouteWithRedirect(
         mynotifications => { '*' => 'myNotifs' },
         ['GET']
@@ -104,7 +104,7 @@ sub init {
         return 0;
     }
 
-    1;
+    return 1;
 }
 
 #sub checkNotifForAuthUser {

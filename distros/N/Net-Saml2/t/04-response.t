@@ -61,8 +61,6 @@ XML
 
 my $response = encode_base64($xml);
 
-my $override = override_verify_x509_verify(1);
-
 my $sp = net_saml2_sp();
 
 my $post = $sp->post_binding;

@@ -35,6 +35,7 @@ lib/Lemonldap/NG/Common/Conf/SAML/Metadata.pm
 lib/Lemonldap/NG/Common/Conf/Serializer.pm
 lib/Lemonldap/NG/Common/Conf/Wrapper.pm
 lib/Lemonldap/NG/Common/Crypto.pm
+lib/Lemonldap/NG/Common/EmailTransport.pm
 lib/Lemonldap/NG/Common/FormEncode.pm
 lib/Lemonldap/NG/Common/IPv6.pm
 lib/Lemonldap/NG/Common/Logger/_Duplicate.pm
@@ -68,6 +69,7 @@ lib/Lemonldap/NG/Common/UserAgent.pm
 lib/Lemonldap/NG/Common/Util.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.json
 META.yml
 README

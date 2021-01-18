@@ -451,6 +451,16 @@ This file contains:
           data: ['0', 'New', '', '']
         });
       };
+      $scope.addOidcAttribute = function() {
+        var node;
+        node = $scope._findContainer();
+        return node.nodes.push({
+          id: node.id + "/n" + (idinc++),
+          title: 'new',
+          type: 'oidcAttribute',
+          data: ['', 'string', 'auto']
+        });
+      };
       $scope.addVhost = function() {
         var name;
         name = $scope.domain ? "." + $scope.domain.data : '.example.com';
@@ -708,11 +718,13 @@ This file contains:
         return _download(node);
       };
       _download = function(node) {
-        var d;
+        var d, uri;
         d = $q.defer();
         d.notify('Trying to get datas');
         $scope.waiting = true;
-        $http.get("" + window.confPrefix + $scope.currentCfg.cfgNum + "/" + node.cnodes).then(function(response) {
+        console.log("Trying to get key " + node.cnodes);
+        uri = encodeURI(node.cnodes);
+        $http.get("" + window.confPrefix + $scope.currentCfg.cfgNum + "/" + uri).then(function(response) {
           var a, data, len, o;
           data = response.data;
           if (!data) {
@@ -805,6 +817,60 @@ This file contains:
           return false;
         }
       };
+      $scope.sendTestMail = function() {
+        $scope.message = {
+          title: 'sendTestMail',
+          field: 'dest'
+        };
+        return $scope.showModal('prompt.html').then(function() {
+          var dest, n;
+          n = $scope.result;
+          $scope.waiting = true;
+          dest = $scope.result;
+          return $http.post(window.confPrefix + "/sendTestMail", {
+            "dest": dest
+          }).then(function(response) {
+            var error, success;
+            success = response.data.success;
+            error = response.data.error;
+            $scope.waiting = false;
+            if (success) {
+              $scope.message = {
+                title: 'ok',
+                message: '__sendTestMailSuccess__',
+                items: []
+              };
+            } else {
+              $scope.message = {
+                title: 'error',
+                message: error,
+                items: []
+              };
+            }
+            return $scope.showModal('message.html');
+          }, readError);
+        }, function() {
+          return console.log('Error sending test email');
+        });
+      };
+      $scope.newCertificate = function() {
+        return $scope.showModal('password.html').then(function() {
+          var currentNode, password;
+          $scope.waiting = true;
+          currentNode = $scope.currentNode;
+          password = $scope.result;
+          return $http.post(window.confPrefix + "/newCertificate", {
+            "password": password
+          }).then(function(response) {
+            currentNode.data[0].data = response.data["private"];
+            currentNode.data[1].data = password;
+            currentNode.data[2].data = response.data["public"];
+            return $scope.waiting = false;
+          }, readError);
+        }, function() {
+          return console.log('New key cancelled');
+        });
+      };
       $scope.newRSAKey = function() {
         return $scope.showModal('password.html').then(function() {
           var currentNode, password;
@@ -836,7 +902,7 @@ This file contains:
         }, readError);
       };
       $scope.getKey = function(node) {
-        var d, i, len, n, o, ref, tmp;
+        var d, i, len, n, o, ref, tmp, uri;
         d = $q.defer();
         if (!node.data) {
           $scope.waiting = true;
@@ -859,7 +925,14 @@ This file contains:
               return $scope.waiting = false;
             });
           } else {
-            $http.get("" + window.confPrefix + $scope.currentCfg.cfgNum + "/" + (node.get ? node.get : node.title)).then(function(response) {
+            uri = '';
+            if (node.get) {
+              console.log("Trying to get key " + node.get);
+              uri = encodeURI(node.get);
+            } else {
+              console.log("Trying to get title " + node.title);
+            }
+            $http.get("" + window.confPrefix + $scope.currentCfg.cfgNum + "/" + (node.get ? uri : node.title)).then(function(response) {
               var data;
               data = response.data;
               if ((data.value === null || (data.error && data.error.match(/setDefault$/))) && node['default'] !== null) {

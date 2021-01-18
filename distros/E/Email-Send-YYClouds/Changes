@@ -8,3 +8,6 @@ Revision history for Email-Send-YYClouds
 
 0.03    2016-8-4
         Update PREREQ_PM in Makefile
+
+0.04    2021-1-15
+        bug fix: encode message body with utf8

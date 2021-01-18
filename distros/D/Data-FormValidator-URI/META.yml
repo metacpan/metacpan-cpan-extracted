@@ -1,0 +1,38 @@
+---
+abstract: 'URI constraint/filter for Data::FormValidator'
+author:
+  - 'Graham TerMarsch <cpan@howlingfrog.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::DiagINC: '0.002'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-FormValidator-URI
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Data::FormValidator: '4.0'
+  URI: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/bleargh45/Data-FormValidator-URI/issues
+  homepage: http://metacpan.org/release/Data-FormValidator-URI/
+  repository: git://github.com/bleargh45/Data-FormValidator-URI.git
+version: '0.03'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0
+x_static_install: 1

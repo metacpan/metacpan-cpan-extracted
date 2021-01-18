@@ -1,5 +1,9 @@
 Revision history for perl module Sys::Virt
 
+7.0.0 2021-01-15
+
+ - Add VIR_DOMAIN_GUEST_INFO_DISKS constant
+
 6.10.0 2020-12-01
 
  - Add VIR_DOMAIN_CHECKPOINT_CREATE_REDEFINE_VALIDATE constant

@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/App-GhaProve>
 Bug tracker:  <https://github.com/tobyink/p5-app-ghaprove/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.008	2021-01-17
+
+ [ Packaging ]
+ - Require ExtUtils::MakeMaker 6.64; not actually needed but we want it
+   installed in GitHub Actions runners for cpanm compatibility.
+
 0.007	2021-01-12
 
  [ Packaging ]

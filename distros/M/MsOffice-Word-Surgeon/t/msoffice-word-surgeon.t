@@ -18,6 +18,7 @@ like $plain_text, qr/because documents edited in MsWord often have run boundarie
 
 like $plain_text, qr/1st/, "found 1st";
 like $plain_text, qr/2nd/, "found 2nd";
+like $plain_text, qr/paragraph\ncontains a soft line break/, "soft line break";
 
 
 $surgeon->reduce_all_noises;

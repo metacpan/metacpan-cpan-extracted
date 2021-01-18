@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2020, Roland van Ipenburg
-package Class::Measure::Scientific::FX_992vb v0.0.5;
+# Copyright (C) 2020-2021, Roland van Ipenburg
+package Class::Measure::Scientific::FX_992vb v0.0.6;
 use Moose;
 use MooseX::NonMoose;
 use List::MoreUtils qw(uniq);
@@ -382,7 +382,7 @@ __END__
 
 Ipenburg JIS merchantability fx gradian poundal torr pdl inHg thermo ps BTUlbR
 BTUlb muB magneton gammap gyromagnetic Rinf weber wavenumber luminance lambert
-footlambert candela mol Vm polarizability Ds Neper thermochemical
+footlambert candela mol Vm polarizability Ds Neper thermochemical Bitbucket
 
 =end stopwords
 
@@ -392,7 +392,7 @@ Class::Measure::Scientific::FX_992vb - units of measurement like the CASIO fx-99
 
 =head1 VERSION
 
-This document describes Class::Measure::Scientific::FX_992vb v0.0.5.
+This document describes Class::Measure::Scientific::FX_992vb C<v0.0.6>.
 
 =head1 SYNOPSIS
 
@@ -834,8 +834,9 @@ C<Class::Measure::Scientific::FX_992vb::a()> as I<7.2973506e-3>
 
 =back
 
-Please report any bugs or feature requests at L<RT for
-rt.cpan.org|https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Measure-Scientific-FX_992vb>.
+Please report any bugs or feature requests at
+L<Bitbucket|
+https://bitbucket.org/rolandvanipenburg/class-measure-scientific-fx_992vb/issues>.
 
 =head1 AUTHOR
 
@@ -843,7 +844,7 @@ Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 by Roland van Ipenburg
+Copyright 2020-2021 by Roland van Ipenburg
 This program is free software; you can redistribute it and/or modify
 it under the GNU General Public License v3.0.
 

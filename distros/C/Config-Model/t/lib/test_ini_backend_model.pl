@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2020 by Dominique Dumont.
+# This software is Copyright (c) 2005-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -199,6 +199,29 @@ return [
                 type  => 'check_list',
                 choice => [qw/lista1 lista2 lista3 nolist/],
             },
+        ]
+    },
+    {
+        name => 'IniDQuotes',
+        rw_config => {
+            backend           => 'IniFile',
+            file              => 'test.ini',
+            auto_create       => 1,
+            quote_value       => 'shell_style',
+        },
+
+        element => [
+            baz => {
+                qw/type leaf value_type string/,
+            },
+            a_list => {
+                type  => 'list',
+                cargo => {
+                    type       => 'leaf',
+                    value_type => 'uniline',
+                }
+            },
+
         ]
     },
 ];

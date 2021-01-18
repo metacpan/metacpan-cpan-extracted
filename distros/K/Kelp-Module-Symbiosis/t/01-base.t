@@ -2,20 +2,18 @@ use strict;
 use warnings;
 
 use Test::More;
-use Kelp::Test;
 use HTTP::Request::Common;
-use Kelp::Module::Symbiosis::Test;
-use File::Basename;
-use lib dirname(__FILE__) . '/lib';
+use KelpX::Symbiosis::Test;
+use lib 't/lib';
 
 # Kelp module being tested
 {
 
 	package Symbiosis::Test;
 
-	use Kelp::Less config_module => 'Kelp::Module::Config::Null';
+	use Kelp::Less;
 
-	module "Symbiosis", automount => 0;
+	module "Symbiosis", mount => undef;
 	module "+TestSymbiont", middleware => [qw(ContentMD5)];
 
 	app->symbiosis->mount("/kelp", app);
@@ -34,13 +32,21 @@ use lib dirname(__FILE__) . '/lib';
 }
 
 my $app = Symbiosis::Test::get_app;
-can_ok $app, "symbiosis", "run_all";
+can_ok $app, qw(symbiosis run_all testmod);
 
-my $mounted = $app->symbiosis->mounted;
-ok exists $mounted->{"/kelp"}, "something was mounted";
+my $symbiosis = $app->symbiosis;
+can_ok $symbiosis, qw(loaded mounted run mount);
+
+my $mounted = $symbiosis->mounted;
+is scalar keys %$mounted, 2, "mounted count ok";
 isa_ok $mounted->{"/kelp"}, "Kelp";
+isa_ok $mounted->{"/test"}, "TestSymbiont";
 
-my $t = Kelp::Test->new(app => Kelp::Module::Symbiosis::Test->new(app => $app));
+my $loaded = $symbiosis->loaded;
+is scalar keys %$loaded, 1, "loaded count ok";
+isa_ok $loaded->{"symbiont"}, "TestSymbiont";
+
+my $t = KelpX::Symbiosis::Test->wrap(app => $app);
 
 $t->request(GET "/kelp/test")
 	->code_is(200)
@@ -48,13 +54,13 @@ $t->request(GET "/kelp/test")
 
 $t->request(GET "/test")
 	->code_is(200)
-	->header_is("Content-MD5", "d7a414cac18f91e2de29b206f0ac1c21")
-	->content_is("mounted1");
+	->header_is("Content-MD5", "81c4e3af4002170ab76fe2e53488b6a4")
+	->content_is("mounted");
 
 $t->request(GET "/test/test")
 	->code_is(200)
-	->header_is("Content-MD5", "d7a414cac18f91e2de29b206f0ac1c21")
-	->content_is("mounted1");
+	->header_is("Content-MD5", "81c4e3af4002170ab76fe2e53488b6a4")
+	->content_is("mounted");
 
 $t->request(GET "/kelp/kelp")
 	->code_is(404);

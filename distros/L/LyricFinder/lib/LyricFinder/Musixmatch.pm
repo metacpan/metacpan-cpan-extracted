@@ -6,6 +6,7 @@ use warnings;
 use LWP::UserAgent;
 use HTTP::Request;
 use HTML::Strip;
+use URI::Escape;
 use Carp;
 
 my $Source = 'Musixmatch';
@@ -137,13 +138,17 @@ sub fetch {
 	$song =~ s/\&/feat/;
 	$artist =~ s/ +/\-/g;
 	$song =~ s/ +/\-/g;
-	$artist =~ s/[^a-z0-9\-]//gi;
-	$song   =~ s/[^a-z0-9\-]//gi;
+	$artist =~ tr/A-Z/a-z/;
+	$song =~ tr/A-Z/a-z/;
+	$artist = uri_escape_utf8($artist);
+	$song = uri_escape_utf8($song);
+	$artist =~ s/[^a-z0-9\-\%]//gi;
+	$song   =~ s/[^a-z0-9\-\%]//gi;
 
 	# Their URLs look like e.g.:
 	#https://www.musixmatch.com/lyrics/Artist-name/Title
 	$self->{'Url'} = 'https://www.musixmatch.com/lyrics/'
-			. join('/', lc $artist, lc $song);
+			. join('/', $artist, $song);
 
 	my $ua = LWP::UserAgent->new(
 		ssl_opts => { verify_hostname => 0, },
@@ -266,10 +271,10 @@ groundwork for this module!
     print "(Lyrics courtesy: ".$finder->source().")\n";
     print "site url:  ".$finder->site().")\n";
 
-	# To do caching:
-	$finder->cache('/tmp/lyrics');
-	#-or-
-	my $localfinder = new LyricFinder::Musixmatch(-cache => '/tmp/lyrics');
+    # To do caching:
+    $finder->cache('/tmp/lyrics');
+    #-or-
+    my $localfinder = new LyricFinder::Musixmatch(-cache => '/tmp/lyrics');
 
 
 =head1 DESCRIPTION

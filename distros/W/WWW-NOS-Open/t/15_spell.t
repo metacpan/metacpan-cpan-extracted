@@ -3,9 +3,8 @@ use warnings;
 use English;
 use Test::More;
 
-if ( not $ENV{TEST_AUTHOR} ) {
-    my $msg =
-'Author test. Set the environment variable TEST_AUTHOR to enable this test.';
+if ( not $ENV{AUTHOR_TESTING} ) {
+    my $msg = 'Set $ENV{AUTHOR_TESTING} to run author tests.';
     plan( skip_all => $msg );
 }
 
@@ -27,12 +26,8 @@ Ipenburg
 JSON
 NOS
 PHP
-RT
 Readonly
 TestNOSOpen
 URI
 apikey
-cpan
-org
 pl
-rt

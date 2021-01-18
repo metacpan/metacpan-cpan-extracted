@@ -4,16 +4,16 @@ use warnings;
 use Test::More;
 use Kelp::Test;
 use HTTP::Request::Common;
-use Kelp::Module::Symbiosis::Test;
+use KelpX::Symbiosis::Test;
 
 {
 
 	package Plain::Test;
 
-	use Kelp::Less config_module => 'Kelp::Module::Config::Null';
+	use Kelp::Less;
 	use Plack::Response;
 
-	module "Symbiosis", automount => 1;
+	module "Symbiosis";
 
 	my $app = sub {
 		my $res = Plack::Response->new(200);
@@ -35,8 +35,7 @@ use Kelp::Module::Symbiosis::Test;
 	1;
 }
 
-my $app = Kelp::Module::Symbiosis::Test->new(app => Plain::Test::get_app);
-my $t = Kelp::Test->new(app => $app);
+my $t = KelpX::Symbiosis::Test->wrap(app => Plain::Test::get_app);
 
 $t->request(GET "/")
 	->code_is(200)
@@ -45,5 +44,8 @@ $t->request(GET "/")
 $t->request(GET "/test")
 	->code_is(200)
 	->content_is("mounted");
+
+$t->request(GET "/ke")
+	->code_is(404);
 
 done_testing;

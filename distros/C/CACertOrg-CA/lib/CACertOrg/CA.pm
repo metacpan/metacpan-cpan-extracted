@@ -2,7 +2,7 @@ package CACertOrg::CA;
 
 use strict;
 use vars qw( $VERSION );
-$VERSION = '20110724.005';
+$VERSION = '20210114.001';
 
 use Cwd            qw();
 use File::Spec     qw();
@@ -42,11 +42,20 @@ CACertOrg::CA - CACert.org's CA root certificate in PEM format
 =head1 DESCRIPTION
 
 CACertOrg::CA provides a copy of Certificate Authority
-certificate for CACert.org. This is the Class 1 PKI Key.
+certificate for CACert.org. If you don't already have that, certain
+web user-agents such as L<LWP> may need it to verify site certificates.
 
-sha1 13:5C:EC:36:F4:9C:B8:E9:3B:1A:B2:70:CD:80:88:46:76:CE:8F:33
+This is the Class 1 PKI Key. See http://www.cacert.org/index.php?id=3
 
-md5 A6:1B:37:5E:39:0D:9C:36:54:EE:BD:20:31:46:1F:6B
+This key lasts to Mar 29 12:29:49 2033 GMT
+
+=over 4
+
+=item * SHA256 fingerprint: 07ED BD82 4A49 88CF EF42 15DA 20D4 8C2B 41D7 1529 D7C9 00F5 7092 6F27 7CC2 30C5
+
+=item * SHA1 fingerprint: DDFC DA54 1E75 77AD DCA8 7E88 27A9 8A50 6032 52A5
+
+=back
 
 =head2 Functions
 

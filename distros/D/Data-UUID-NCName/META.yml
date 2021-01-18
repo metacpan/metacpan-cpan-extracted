@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,6 +20,7 @@ no_index:
     - inc
     - t
 requires:
+  Encode::Base58: '0.01'
   MIME::Base32: '1.303'
   MIME::Base64: '3.15'
   Type::Tiny: '1.002002'
@@ -28,4 +29,4 @@ requires:
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
   repository: https://github.com/doriantaylor/p5-data-uuid-ncname
-version: '0.05'
+version: '0.06'

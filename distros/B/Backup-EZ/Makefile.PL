@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "File::Touch" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.45",
+  "VERSION" => "0.46",
   "test" => {
     "TESTS" => "t/*.t"
   }

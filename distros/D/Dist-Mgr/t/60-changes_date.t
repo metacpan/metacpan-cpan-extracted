@@ -6,15 +6,15 @@ use Carp;
 use Cwd qw(getcwd);
 use Data::Dumper;
 use Test::More;
-use Dist::Mgr qw(:all);
+use Dist::Mgr qw(:private);
 use version;
 
 use lib 't/lib';
 use Helper qw(:all);
 
 my $cwd = getcwd();
-like $cwd, qr/dist-mgr(-\d+\.\d+)?(-\d+)?$/i, "in root dir ok";
-die "not in the root dir" if $cwd !~ /dist-mgr(-\d+\.\d+)?(-\d+)?$/i;
+like $cwd, _dist_dir_re(), "in root dir ok";
+die "not in the root dir" if $cwd !~ _dist_dir_re();
 
 my $work = 't/data/work';
 my $orig_changes = 't/data/orig/Changes-release';

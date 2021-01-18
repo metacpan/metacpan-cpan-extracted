@@ -2,9 +2,11 @@ Build.PL
 Changes
 CONTRIBUTING
 lib/Geo/METAR/Deduced.pm
+LICENSE
 LICENSES/Artistic
 LICENSES/Copying
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 t/00_base.t
 t/00_signature.t

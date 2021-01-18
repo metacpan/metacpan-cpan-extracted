@@ -1,6 +1,5 @@
 
 #!/usr/bin/env perl -w
-
 use strict;
 use warnings;
 
@@ -15,96 +14,91 @@ use Astro::Montenbruck::Ephemeris::Planet qw/:ids @PLANETS/;
 
 BEGIN {
     use_ok( 'Astro::Montenbruck::RiseSet::Constants', qw/:events :states/ );
-    use_ok( 'Astro::Montenbruck::RiseSet', qw/:all/ );
+    use_ok( 'Astro::Montenbruck::RiseSet',            qw/:all/ );
 }
 
 subtest 'Rise, Set, Transit, normal conditions' => sub {
     my @cases = (
         {
-            id => $SU,
+            id           => $SU,
             $EVT_RISE    => [ 7,  4 ],
             $EVT_TRANSIT => [ 11, 16 ],
             $EVT_SET     => [ 15, 29 ]
         },
         {
-            id => $ME,
+            id           => $ME,
             $EVT_RISE    => [ 6,  33 ],
             $EVT_TRANSIT => [ 10, 37 ],
             $EVT_SET     => [ 14, 41 ]
         },
         {
-            id => $VE,
+            id           => $VE,
             $EVT_RISE    => [ 3,  52 ],
             $EVT_TRANSIT => [ 8,  30 ],
             $EVT_SET     => [ 13, 8 ]
         },
         {
-            id => $MA,
+            id           => $MA,
             $EVT_RISE    => [ 9,  33 ],
             $EVT_TRANSIT => [ 14, 35 ],
             $EVT_SET     => [ 19, 37 ]
         },
         {
-            id => $JU,
+            id           => $JU,
             $EVT_RISE    => [ 11, 29 ],
             $EVT_TRANSIT => [ 18, 10 ],
             $EVT_SET     => [ 0,  55 ]
         },
         {
-            id => $SA,
+            id           => $SA,
             $EVT_RISE    => [ 12, 9 ],
             $EVT_TRANSIT => [ 19, 10 ],
             $EVT_SET     => [ 2,  14 ]
         },
         {
-            id => $UR,
+            id           => $UR,
             $EVT_RISE    => [ 9,  2 ],
             $EVT_TRANSIT => [ 13, 45 ],
             $EVT_SET     => [ 18, 28 ]
         },
         {
-            id => $NE,
+            id           => $NE,
             $EVT_RISE    => [ 8,  25 ],
             $EVT_TRANSIT => [ 12, 57 ],
             $EVT_SET     => [ 17, 29 ]
         },
         {
-            id => $PL,
+            id           => $PL,
             $EVT_RISE    => [ 4,  11 ],
             $EVT_TRANSIT => [ 9,  22 ],
             $EVT_SET     => [ 14, 32 ]
         },
     );
-    plan tests => @cases * 3;
 
-    my @date = ( 1999, 12, 31 );
-    my ( $lat, $lng ) = ( 48.1, -11.6 );
+    my $func = rst(
+        date   => [ 1999, 12, 31 ],
+        phi    => 48.1,
+        lambda => -11.6
+    );
 
     for my $case (@cases) {
-        my $func = rst_event(
-            planet => $case->{id},
-            date   => \@date,
-            phi    => $lat,
-            lambda => $lng
+        $func->(
+            $case->{id},
+            on_event => sub {
+                my ( $evt, $jd ) = @_;
+                my $ut = frac( $jd - 0.5 ) * 24;
+                my @hm = @{ $case->{$evt} };
+                delta_ok( $ut, ddd(@hm),
+                    sprintf( '%s %s: %02d:%02d', $case->{id}, $evt, @hm ) );
+            },
+            on_noevent => sub {
+                fail("$case->{id}: event expected");
+            }
         );
-
-        for my $evt ( $EVT_RISE, $EVT_SET, $EVT_TRANSIT ) {
-            my @hm  = @{ $case->{$evt} };
-            $func->(
-                $evt,
-                on_event => sub {
-                    my $ut = frac( $_[0] - 0.5 ) * 24;
-                    delta_ok( $ut, ddd(@hm),
-                        sprintf( '%s %s: %02d:%02d', $case->{id}, $evt, @hm ) );
-                },
-                on_noevent => sub { fail("$case->{id}: $evt event expected") }
-            );
-        }
-
     }
 
+    done_testing();
 };
-
 
 subtest 'Twilight, normal conditions' => sub {
     my ( $lat, $lng ) = ( 48.1, -11.6 );
@@ -167,7 +161,8 @@ subtest 'Twilight, normal conditions' => sub {
             phi      => $lat,
             lambda   => $lng,
             on_event => sub {
-                my ( $evt, $ut ) = @_;
+                my ( $evt, $jd ) = @_;
+                my $ut = frac( $jd - 0.5 ) * 24;
                 my @hm = @{ $case->{$evt} };
                 delta_ok( $ut, ddd(@hm),
                     sprintf( '%s: %02d:%02d', $evt, @hm ) );
@@ -193,7 +188,7 @@ subtest 'Twilight, extreme latitude' => sub {
         },
         on_noevent => sub {
             my $state = shift;
-            cmp_ok($state, 'eq', $STATE_CIRCUMPOLAR);
+            cmp_ok( $state, 'eq', $STATE_CIRCUMPOLAR );
         }
     );
 };

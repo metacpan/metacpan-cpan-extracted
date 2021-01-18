@@ -15,7 +15,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More' => 0,
         'MIME::Lite' => 0,
-        'MIME::Words' => 0,
+        'Encode' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Email-Send-YYClouds-*' },

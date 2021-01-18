@@ -1,5 +1,8 @@
 Revision history for Perl module Test::URI
 
+1.083 2021-01-17T11:04:56Z
+	* freshen distro, remove Travis CI, add Github Actions
+
 1.082 2018-04-25T17:56:59Z
 	* Clarify that it's Artistic License 2.0.
 

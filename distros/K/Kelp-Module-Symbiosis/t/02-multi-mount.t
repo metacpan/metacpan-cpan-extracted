@@ -2,41 +2,37 @@ use strict;
 use warnings;
 
 use Test::More;
-use Kelp::Test;
 use HTTP::Request::Common;
-use Kelp::Module::Symbiosis::Test;
-use File::Basename;
-use lib dirname(__FILE__) . '/lib';
+use KelpX::Symbiosis::Test;
+use lib 't/lib';
 use TestApp;
 
-my $app = Kelp::Module::Symbiosis::Test->new(app => TestApp->new);
-my $t = Kelp::Test->new(app => $app);
+my $app = TestApp->new(mode => 'mostly_mounted');
+$app->build_from_methods;
+my $t = KelpX::Symbiosis::Test->wrap(app => $app);
 
-$t->request(GET "/home")
+my $loaded = $app->symbiosis->loaded;
+is scalar keys %$loaded, 2, "loaded count ok";
+isa_ok $loaded->{"symbiont"}, "TestSymbiont";
+isa_ok $loaded->{"AnotherTestSymbiont"}, "AnotherTestSymbiont";
+
+$t->request(GET "/s/home")
 	->code_is(200)
 	->content_is("this is home");
 
 $t->request(GET "/test")
 	->code_is(200)
-	->content_is("mounted1");
+	->content_is("mounted");
 
-$t->request(GET "/test2")
+$t->request(GET "/test/test2")
 	->code_is(200)
-	->content_is("mounted2");
+	->content_is("also mounted");
 
 $t->request(GET "/test/wt")
 	->code_is(200)
-	->content_is("mounted1");
+	->content_is("mounted");
 
-$t->request(GET "/test/test")
-	->code_is(200)
-	->content_is("mounted3");
-
-$t->request(GET "/test/test/test")
-	->code_is(200)
-	->content_is("mounted3");
-
-$t->request(GET "/home/test")
+$t->request(GET "/s")
 	->code_is(404);
 
 done_testing;

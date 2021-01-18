@@ -4,7 +4,7 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -38,6 +38,7 @@
             "MIME::Base64" : "0",
             "Moo" : "2",
             "MooX::HandlesVia" : "0.001",
+            "OTRS::OPM::Validate" : "0.01",
             "Path::Class" : "0",
             "Try::Tiny" : "0",
             "Type::Library" : "1",
@@ -45,7 +46,7 @@
             "Type::Utils" : "1",
             "Types::Standard" : "1",
             "XML::LibXML" : "0",
-            "perl" : "5.010"
+            "perl" : "5.020"
          }
       },
       "test" : {
@@ -57,11 +58,11 @@
    "provides" : {
       "OTRS::OPM::Parser" : {
          "file" : "lib/OTRS/OPM/Parser.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "OTRS::OPM::Parser::Types" : {
          "file" : "lib/OTRS/OPM/Parser/Types.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -76,12 +77,14 @@
          "web" : "http://github.com/reneeb/OTRS-OPM-Parser"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_contributors" : [
       "H\u00e5kon H\u00e6gland <hakon.hagland@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

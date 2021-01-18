@@ -1,4 +1,15 @@
+use strict;
+use warnings;
+use utf8;
+
 use Test::More;
-eval "use Test::Pod 1.41";
-plan skip_all => "Test::Pod 1.41 required for testing POD" if $@;
-all_pod_files_ok();
+
+if ( not $ENV{AUTHOR_TESTING} ) {
+    my $msg = 'Set $ENV{AUTHOR_TESTING} to run author tests.';
+    plan( skip_all => $msg );
+}
+
+if ( !eval { require Test::Pod; 1 } ) {
+    plan skip_all => "Test::Pod required for testing POD";
+}
+Test::Pod::all_pod_files_ok();

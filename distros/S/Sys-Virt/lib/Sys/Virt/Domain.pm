@@ -2217,6 +2217,10 @@ The guest hostname
 
 Filesystem mount information
 
+=item Sys::Virt::Domain::GUEST_INFO_DISKS
+
+Block device information
+
 =back
 
 C<$flags> is currently unused and defaults to zero.

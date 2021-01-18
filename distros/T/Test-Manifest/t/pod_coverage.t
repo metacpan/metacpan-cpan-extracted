@@ -1,13 +1,10 @@
 use Test::More;
 eval "use Test::Pod::Coverage";
 
-if( $@ )
-	{
+if( $@ ) {
 	plan skip_all => "Test::Pod::Coverage required for testing POD";
 	}
-else
-	{
+else {
 	plan tests => 1;
-
 	pod_coverage_ok( "Test::Manifest" );
 	}

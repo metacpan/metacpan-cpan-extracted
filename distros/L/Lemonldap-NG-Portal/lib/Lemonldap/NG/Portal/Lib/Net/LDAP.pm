@@ -10,9 +10,10 @@ use Lemonldap::NG::Portal::Main::Constants ':all';
 use Encode;
 use Unicode::String qw(utf8);
 use Scalar::Util 'weaken';
+use IO::Socket::Timeout;
 use utf8;
 
-our $VERSION  = '2.0.9';
+our $VERSION  = '2.0.10';
 our $ppLoaded = 0;
 
 BEGIN {
@@ -47,7 +48,8 @@ sub new {
     }
     $self = Net::LDAP->new(
         \@servers,
-        onerror => undef,
+        onerror   => undef,
+        keepalive => 1,
         ( $conf->{ldapPort}    ? ( port    => $conf->{ldapPort} )    : () ),
         ( $conf->{ldapTimeout} ? ( timeout => $conf->{ldapTimeout} ) : () ),
         ( $conf->{ldapVersion} ? ( version => $conf->{ldapVersion} ) : () ),
@@ -66,7 +68,7 @@ sub new {
         # socket when certificate validation fails. Net::LDAP does not catch
         # it, and the process ends up crashing.
         # As a precaution, make sure the underlying socket is doing fine:
-        if ( $self->socket->isa('IO::Socket::SSL')
+        if (    $self->socket->isa('IO::Socket::SSL')
             and $self->socket->errstr < 0 )
         {
             $portal->logger->error(
@@ -75,6 +77,13 @@ sub new {
         }
     }
     bless $self, $class;
+
+    # Set socket timeouts
+    my $socket = $self->socket;
+    IO::Socket::Timeout->enable_timeouts_on($socket);
+    $socket->read_timeout( $conf->{ldapIOTimeout} );
+    $socket->write_timeout( $conf->{ldapIOTimeout} );
+
     if ($useTls) {
         my %h = split( /[&=]/, $tlsParam );
         $h{cafile} ||= $conf->{ldapCAFile} if ( $conf->{ldapCAFile} );
@@ -446,7 +455,7 @@ sub userModifyPassword {
             return PE_LDAPERROR;
         }
 
-        $self->{portal}->userLogger->notice("Password changed for $dn");
+        $self->{portal}->logger->notice("Password changed for $dn");
 
         # Rebind as manager for next LDAP operations if we were bound as user
         $self->bind() if $asUser;
@@ -579,8 +588,7 @@ sub userModifyPassword {
         return PE_WRONGMANAGERACCOUNT
           if ( $mesg->code == 50 || $mesg->code == 8 );
         if ( $mesg->code == 0 ) {
-            $self->{portal}
-              ->userLogger->notice("Password changed $self->{portal}->{user}");
+            $self->{portal}->logger->notice("Password changed for $dn");
 
            # Rebind as manager for next LDAP operations if we were bound as user
             $self->bind() if $asUser;

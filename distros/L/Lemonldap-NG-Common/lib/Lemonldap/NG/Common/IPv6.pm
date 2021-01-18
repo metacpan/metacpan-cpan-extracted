@@ -1,8 +1,10 @@
 package Lemonldap::NG::Common::IPv6;
 
+use strict;
 use base 'Exporter';
 
-@EXPORT = qw(&isIPv6 &net6 &expand6);
+our $VERSION = '2.0.10';
+our @EXPORT = qw(&isIPv6 &net6 &expand6);
 
 sub isIPv6 {
     my ($ip) = @_;
@@ -15,7 +17,7 @@ sub net6 {
     # Convert to binary
     my $b = join '',
       map { unpack( 'B*', pack( 'H*', $_ ) ) } split( ':', expand6($ip) );
-    $net = substr $b, 0, $bits;
+    my $net = substr $b, 0, $bits;
     $net .= '0' x ( 128 - length($net) );
     $net = unpack( 'H*', pack( 'B*', $net ) );
     $net = join( ':', ( unpack "a4" x 8, $net ) );
@@ -24,6 +26,7 @@ sub net6 {
 }
 
 sub expand6 {
+    my @arr;
     my @_parts = ( $_[0] =~ /([0-9A-Fa-f]+)/g );
     my $nparts = scalar @_parts;
     if ( $nparts != 8 ) {

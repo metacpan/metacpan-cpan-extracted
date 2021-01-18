@@ -6,10 +6,10 @@ use vars qw( @ISA $VERSION );
 
 use Wiki::Toolkit::Store::Database;
 use Carp qw/carp croak/;
-use Digest::SHA1 qw/ sha1_hex /;
+use Digest::SHA qw/ sha1_hex /;
 
 @ISA = qw( Wiki::Toolkit::Store::Database );
-$VERSION = 0.06;
+$VERSION = 0.07;
 
 =head1 NAME
 

@@ -10,7 +10,7 @@ use Exporter qw{ import };
 use Test2::V0;
 use Test2::Util qw{ pkg_to_file };
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 our @EXPORT_OK = qw{
     build_skip_reason
@@ -114,7 +114,8 @@ L<Test2::V0|Test2::V0>
 
 This module is unsupported in the usual sense, but if you think it is
 causing test failures, please file a bug report at
-L<https://rt.cpan.org>, or in electronic mail to the author.
+L<https://github.com/trwyant/perl-Test2-Tools-LoadModule/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -122,7 +123,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2020 by Thomas R. Wyant, III
+Copyright (C) 2020-2021 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

@@ -4,13 +4,13 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-URI",
    "no_index" : {
@@ -38,7 +38,7 @@
       "test" : {
          "requires" : {
             "Test::Builder::Tester" : "0",
-            "Test::More" : "0"
+            "Test::More" : "1"
          }
       }
    },
@@ -54,6 +54,6 @@
          "web" : "https://github.com/briandfoy/test-uri"
       }
    },
-   "version" : "1.082",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.083",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -38,7 +38,7 @@
             "DBD::mysql" : "0",
             "DBI" : "0",
             "Digest::MD5" : "0",
-            "Digest::SHA1" : "0",
+            "Digest::SHA" : "0",
             "HTML::PullParser" : "0",
             "Plucene" : "1.19",
             "Test::More" : "0",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/OpenGuides/Wiki-Toolkit"
       }
    },
-   "version" : "0.86",
+   "version" : "0.87",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

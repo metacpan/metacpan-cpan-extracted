@@ -1,4 +1,6 @@
-package WWW::NOS::Open v1.0.3;    # -*- cperl; cperl-indent-level: 4 -*-
+# -*- cperl; cperl-indent-level: 4 -*-
+# Copyright (C) 2011-2021, Roland van Ipenburg
+package WWW::NOS::Open v1.0.4;
 use strict;
 use warnings;
 
@@ -49,17 +51,15 @@ Readonly::Scalar my $DASH             => q{-};
 Readonly::Scalar my $DOUBLE_COLON     => q{::};
 Readonly::Scalar my $FRAGMENT         => q{Fragment};
 Readonly::Scalar my $VERSION_PATH => q{%s/v1/index/version/key/%s/output/%s/};
-Readonly::Scalar my $LATEST_PATH =>
+Readonly::Scalar my $LATEST_PATH  =>
   q{%s/v1/latest/%s/key/%s/output/%s/category/%s/};
 Readonly::Scalar my $SEARCH_PATH => q{%s/v1/search/query/key/%s/output/%s/q/%s};
-Readonly::Scalar my $GUIDE_PATH =>
+Readonly::Scalar my $GUIDE_PATH  =>
   q{%s/v1/guide/%s/key/%s/output/%s/start/%s/end/%s/};
-Readonly::Scalar my $XML_DETECT    => qr{^<}smx;
 Readonly::Scalar my $STRIP_PRIVATE => qr{^_}smx;
 
 Readonly::Hash my %ERR => (
     'INTERNAL_SERVER' => q{Internal server error or no response recieved},
-    'UNPARSABLE'      => q{Could not parse data},
     'EXCEEDED_RANGE'  => qq{Date range exceeds maximum of $MAX_RANGE days},
 );
 Readonly::Hash my %LOG => (
@@ -100,14 +100,9 @@ sub get_version {
 sub _parse_version {
     my ( $self, $body ) = @_;
     my ( $version, $build );
-    if ( $body =~ /$XML_DETECT/gsmx ) {
-        my $xml = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
-        $version = $xml->{'item'}[0]->{'version'}[0];
-        $build   = $xml->{'item'}[0]->{'build'}[0];
-    }
-    else {
-        $log->fatal( $ERR{'UNPARSABLE'} );
-    }
+    my $xml = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
+    $version = $xml->{'item'}[0]->{'version'}[0];
+    $build   = $xml->{'item'}[0]->{'build'}[0];
     return WWW::NOS::Open::Version->new( $version, $build );
 }
 
@@ -176,28 +171,18 @@ sub _parse_resource {
           : $hr_resource->{$prop}[0];
     }
     $param{'keywords'} = $hr_resource->{'keywords'}->[0]->{'keyword'} || [];
-    if ( my $resource = ( $mapping{$type} )->new(%param) ) {
-        return $resource;
-    }
-    return;
+    return ( $mapping{$type} )->new(%param);
 }
 
 sub _parse_resources {
     my ( $self, $type, $body ) = @_;
     my @resources;
-
-    if ( $body =~ /$XML_DETECT/gsmx ) {
-        my $xml           = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
-        my @xml_resources = @{ $xml->{$type} };
-        while ( my $resource = shift @xml_resources ) {
-            push @resources, $self->_parse_resource( $type, $resource );
-        }
-        return @resources;
+    my $xml           = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
+    my @xml_resources = @{ $xml->{$type} };
+    while ( my $resource = shift @xml_resources ) {
+        push @resources, $self->_parse_resource( $type, $resource );
     }
-    else {
-        $log->fatal( $ERR{'UNPARSABLE'} );
-    }
-    return ();
+    return @resources;
 }
 
 sub get_latest_videos {
@@ -213,23 +198,16 @@ sub get_latest_audio_fragments {
 sub _parse_result {
     my ( $self, $body ) = @_;
     my @documents;
-    if ( $body =~ /$XML_DETECT/gsmx ) {
-        my $xml           = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
-        my @xml_documents = @{ $xml->{'documents'}->[0]->{'document'} };
-        while ( my $hr_document = shift @xml_documents ) {
-            push @documents,
-              $self->_parse_resource( q{document}, $hr_document );
-        }
-        my $result = WWW::NOS::Open::Result->new(
-            'documents' => [@documents],
-            'related'   => $xml->{'related'}->[0]->{'related'},
-        );
-        return $result;
+    my $xml           = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
+    my @xml_documents = @{ $xml->{'documents'}->[0]->{'document'} };
+    while ( my $hr_document = shift @xml_documents ) {
+        push @documents, $self->_parse_resource( q{document}, $hr_document );
     }
-    else {
-        $log->fatal( $ERR{'UNPARSABLE'} );
-    }
-    return ();
+    my $result = WWW::NOS::Open::Result->new(
+        'documents' => [@documents],
+        'related'   => $xml->{'related'}->[0]->{'related'},
+    );
+    return $result;
 }
 
 sub search {
@@ -265,14 +243,7 @@ sub _parse_dayguide {
     my @props = __get_props( WWW::NOS::Open::DayGuide->meta );
     my %param;
     while ( my $prop = shift @props ) {
-        $param{$prop} =
-          ( q{ARRAY} eq ref $hr_dayguide->{$prop} )
-          ? (
-            ( q{HASH} eq ref $hr_dayguide->{$prop}[0] )
-            ? %{ $hr_dayguide->{$prop}[0] }
-            : $hr_dayguide->{$prop}[0]
-          )
-          : $hr_dayguide->{$prop};
+        $param{$prop} = $hr_dayguide->{$prop};
     }
     $param{'broadcasts'} = [];
     my @broadcasts = $hr_dayguide->{'item'};
@@ -280,27 +251,18 @@ sub _parse_dayguide {
         push @{ $param{'broadcasts'} },
           $self->_parse_resource( q{broadcast}, $ar_broadcast->[0] );
     }
-    if ( my $dayguide = WWW::NOS::Open::DayGuide->new(%param) ) {
-        return $dayguide;
-    }
-    return;
+    return WWW::NOS::Open::DayGuide->new(%param);
 }
 
 sub _parse_guide {
     my ( $self, $body ) = @_;
     my @dayguides;
-    if ( $body =~ /$XML_DETECT/gsmx ) {
-        my $xml           = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
-        my @xml_dayguides = @{ $xml->{'dayguide'} };
-        while ( my $hr_dayguide = shift @xml_dayguides ) {
-            push @dayguides, $self->_parse_dayguide($hr_dayguide);
-        }
-        return @dayguides;
+    my $xml           = XML::Simple->new( 'ForceArray' => 1 )->XMLin($body);
+    my @xml_dayguides = @{ $xml->{'dayguide'} };
+    while ( my $hr_dayguide = shift @xml_dayguides ) {
+        push @dayguides, $self->_parse_dayguide($hr_dayguide);
     }
-    else {
-        $log->fatal( $ERR{'UNPARSABLE'} );
-    }
-    return ();
+    return @dayguides;
 }
 
 sub _get_broadcasts {
@@ -343,6 +305,18 @@ sub get_radio_broadcasts {
     return $self->_get_broadcasts( q{radio}, @param );
 }
 
+sub __throw {
+    my $json = JSON->new;
+    my %map  = (
+        HTTP::Status::HTTP_BAD_REQUEST  => q{NOSOpenBadRequestException},
+        HTTP::Status::HTTP_UNAUTHORIZED => q{NOSOpenUnauthorizedException},
+        HTTP::Status::HTTP_FORBIDDEN    => q{NOSOpenForbiddenException},
+    );
+    my $res = shift;
+    $map{ $res->code }
+      ->throw( 'error' => $json->decode( $res->decoded_content ), );
+}
+
 sub _do_request {
     my ( $self, $url ) = @_;
     my $request = HTTP::Request->new(
@@ -360,32 +334,7 @@ sub _do_request {
         );
     }
     elsif ( $response->code > HTTP_OK ) {
-        my $json = JSON->new;
-        if ( $response->code == HTTP_BAD_REQUEST ) {
-            ## no critic qw(RequireExplicitInclusion)
-            NOSOpenBadRequestException->throw(
-                ## use critic
-                'error' => $json->decode( $response->decoded_content ),
-            );
-        }
-        elsif ( $response->code == HTTP_UNAUTHORIZED ) {
-            ## no critic qw(RequireExplicitInclusion)
-            NOSOpenUnauthorizedException->throw(
-                ## use critic
-                'error' => $json->decode(
-                    $response->decoded_content || $response->content,
-                ),
-            );
-        }
-        elsif ( $response->code == HTTP_FORBIDDEN ) {
-            ## no critic qw(RequireExplicitInclusion)
-            NOSOpenForbiddenException->throw(
-                ## use critic
-                'error' => $json->decode(
-                    $response->decoded_content || $response->content,
-                ),
-            );
-        }
+        __throw($response);
     }
     return $response;
 }
@@ -413,15 +362,16 @@ __END__
 
 =encoding utf8
 
-=for stopwords DateTime perl JSON Readonly URI PHP Ipenburg MERCHANTABILITY
+=for stopwords Bitbucket DateTime perl JSON Readonly URI PHP Ipenburg
+MERCHANTABILITY
 
 =head1 NAME
 
-WWW::NOS::Open - Perl framework for the Open NOS REST API.
+WWW::NOS::Open - Perl framework for the Open NOS REST API
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open version v1.0.3.
+This document describes WWW::NOS::Open version C<v1.0.4>.
 
 =head1 SYNOPSIS
 
@@ -551,7 +501,7 @@ specify a server URL that is not the default Open NOS live service at
 L<http://open.nos.nl|http://open.nos.nl>.
 
 The user agent identifier used in the request to the REST API is
-C<WWW::NOS::Open/v1.0.3>.
+C<WWW::NOS::Open/v1.0.4>.
 
 =head1 DEPENDENCIES
 
@@ -644,15 +594,15 @@ other output options might be added and the content of the raw responses
 exposed for further processing in an appropriate environment.
 
 Please report any bugs or feature requests at
-L<RT for rt.cpan.org|https://rt.cpan.org/Dist/Display.html?Queue=WWW-NOS-Open>.
+L<Bitbucket|https://bitbucket.org/rolandvanipenburg/www-nos-open/issues>.
 
 =head1 AUTHOR
 
-Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
+Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 by Roland van Ipenburg
+Copyright 2011-2021 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

@@ -3,12 +3,12 @@ package Lemonldap::NG::Portal::Plugins::Upgrade;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_CONFIRM
   PE_OK
+  PE_CONFIRM
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -32,10 +32,12 @@ sub init {
             "-> Upgrade tokens will be stored into global storage");
         $self->ott->cache(undef);
     }
-    $self->addAuthRoute( upgradesession => 'askUpgrade',     ['GET'] );
-    $self->addAuthRoute( upgradesession => 'confirmUpgrade', ['POST'] );
-    $self->addAuthRoute( renewsession   => 'askRenew',       ['GET'] );
-    $self->addAuthRoute( renewsession   => 'confirmRenew',   ['POST'] );
+    $self->addAuthRoute( upgradesession => 'askUpgrade', ['GET'] )
+      ->addAuthRoute( upgradesession => 'confirmUpgrade', ['POST'] )
+      ->addAuthRoute( renewsession   => 'askRenew',       ['GET'] )
+      ->addAuthRoute( renewsession   => 'confirmRenew',   ['POST'] );
+
+    return 1;
 }
 
 sub askUpgrade {
@@ -63,14 +65,18 @@ sub confirmRenew {
 # RUNNING METHOD
 
 sub ask {
-    my ( $self, $req, $url, $message, $buttonlabel ) = @_;
+    my ( $self, $req, $form_action, $message, $buttonlabel ) = @_;
 
     # Check if auth is already running
-    if ( $req->param('upgrading') or $req->param('kerberos') ) {
+    # and verify token
+    return $self->confirm($req)
+      if ( $req->param('upgrading') or $req->param('kerberos') );
 
-        # verify token
-        return $self->confirm($req);
-    }
+    my $url    = $req->param('url') || '';
+    my $action = ( $message =~ /^askTo(\w+)$/ )[0];
+    $self->logger->debug(" -> $action required");
+    $self->logger->debug(" -> Skip confirmation is enabled")
+      if $self->conf->{"skip${action}Confirmation"};
 
     # Display form
     return $self->p->sendHtml(
@@ -79,13 +85,20 @@ sub ask {
         params => {
             MAIN_LOGO    => $self->conf->{portalMainLogo},
             LANGS        => $self->conf->{showLanguages},
-            FORMACTION   => $url,
+            FORMACTION   => $form_action,
             PORTALBUTTON => 1,
             MSG          => $message,
             BUTTON       => $buttonlabel,
             CONFIRMKEY   => $self->p->stamp,
             PORTAL       => $self->conf->{portal},
-            URL          => $req->param('url'),
+            URL          => $url,
+            (
+                $self->conf->{"skip${action}Confirmation"}
+                ? ( CUSTOM_SCRIPT =>
+qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/autoRenew.min.js"></script>'
+                  )
+                : ()
+            )
         }
     );
 }
@@ -107,14 +120,15 @@ sub confirm {
             }
         }
     }
+
     $req->steps( ['controlUrl'] );
     my $res = $self->p->process($req);
-    return $self->p->do( $req, [ sub { $res } ] ) if ($res);
+    return $self->p->do( $req, [ sub { $res } ] ) if $res;
+
     if ( $upg or $req->param('confirm') == 1 ) {
         $req->data->{noerror} = 1;
 
         if ($sfOnly) {
-
             $req->data->{doingSfUpgrade} = 1;
 
             # Short circuit the first part of login, only do a 2FA step
@@ -134,7 +148,6 @@ sub confirm {
                 '', 0
             );    # Insert token
                   # Do a regular login
-            # Do a regular login
             return $self->p->login($req);
         }
     }

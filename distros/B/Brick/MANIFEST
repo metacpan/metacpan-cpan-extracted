@@ -98,7 +98,6 @@ t/numbers/_numeric_strictly_less_than.t
 t/numbers/number_within_range.t
 t/pod.t
 t/pod_coverage.t
-t/prereq.t
 t/regexes/_matches_regex.t
 t/selectors/_is_even_number.t
 t/selectors/_is_odd_number.t

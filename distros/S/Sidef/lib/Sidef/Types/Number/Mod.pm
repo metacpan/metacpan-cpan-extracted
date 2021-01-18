@@ -66,6 +66,11 @@ package Sidef::Types::Number::Mod {
         __PACKAGE__->new($x->{n}->mul($y->{n}->invmod($x->{m})), $x->{m});
     }
 
+    sub neg {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{n}->neg, $x->{m});
+    }
+
     sub inv {
         my ($x) = @_;
         __PACKAGE__->new($x->{n}->invmod($x->{m}), $x->{m});
@@ -84,14 +89,26 @@ package Sidef::Types::Number::Mod {
     sub chinese {
         my (@values) = @_;
 
-        my $crt = __PACKAGE__->new(Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ONE);
+#<<<
+        my $crt = __PACKAGE__->new(
+            Sidef::Types::Number::Number::ZERO,
+            Sidef::Types::Number::Number::ONE
+        );
+#>>>
 
         foreach my $mod (@values) {
 
             ref($mod) eq __PACKAGE__ or next;
 
-            $crt = __PACKAGE__->new(Sidef::Math::Math->chinese([$crt->{n}, $crt->{m}], [$mod->{n}, $mod->{m}]),
-                                    Sidef::Types::Number::Number::lcm($crt->{m}, $mod->{m}));
+#<<<
+            $crt = __PACKAGE__->new(
+                Sidef::Math::Math->chinese(
+                    [$crt->{n}, $crt->{m}],
+                    [$mod->{n}, $mod->{m}]
+                ),
+                Sidef::Types::Number::Number::lcm($crt->{m}, $mod->{m})
+            );
+#>>>
         }
 
         $crt;
@@ -104,7 +121,7 @@ package Sidef::Types::Number::Mod {
 
     sub znorder {
         my ($x) = @_;
-        __PACKAGE__->new($x->{n}->znorder($x->{m}), $x->{m});
+        $x->{n}->znorder($x->{m});
     }
 
     sub pow {

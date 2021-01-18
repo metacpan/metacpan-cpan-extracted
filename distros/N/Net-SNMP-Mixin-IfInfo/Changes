@@ -1,5 +1,11 @@
 Revision history for Net-SNMP-Mixin-IfInfo
 
+1.01	Sat, 16 Jan 2021 14:01:40 +0100
+	minor glitch for ifPhysAddress for non MAC addresses
+
+1.00	Sat, 16 Jan 2021 13:36:00 +0100
+	fetch additional OIDs from if(X)Table: Speed, HighSpeed, MTU, PhysAddress
+
 0.07	Wed, 22 Jun 2016 17:40:21 +0200
 	bump version
 	newer tests, minor changes

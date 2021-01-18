@@ -1,22 +1,33 @@
 ---
-name: Alien-IE7
-version: 0.9.3
+abstract: '(DEPRECATED) installing and finding IE7 JS compatibility library'
 author:
-  - Graham TerMarsch (cpan@howlingfrog.com)
-abstract: installing and finding IE7 JS compatibility library
-license: perl
-resources:
-  license: ~
-requires:
-  perl: 5.6.0
+  - 'Graham TerMarsch (cpan@howlingfrog.com)'
 build_requires:
-  Archive::Zip: 0
-  Test::Exception: 0
+  Archive::Zip: '0'
+  Test::Exception: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-IE7
 provides:
   Alien::IE7:
     file: lib/Alien/IE7.pm
-    version: 0.9.3
-generated_by: Module::Build version 0.32
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: v0.9.4
+requires:
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.9.4
+x_bugtracker:
+  web: https://github.com/bleargh45/Alien-IE7/issues
+x_deprecated: 1
+x_repository:
+  type: git
+  url: git://github.com/bleargh45/Alien-IE7.git
+  web: https://github.com/bleargh45/Alien-IE7
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

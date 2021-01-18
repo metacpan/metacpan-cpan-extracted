@@ -1,11 +1,13 @@
-#!/usr/bin/env perl    # -*- cperl; cperl-indent-level: 4 -*-
+#!/usr/bin/env perl
+# -*- cperl; cperl-indent-level: 4 -*-
+# Copyright (C) 2010-2021, Roland van Ipenburg
 use strict;
 use warnings;
 
 use utf8;
 use 5.020000;
 
-our $VERSION = 'v1.1.1';
+our $VERSION = 'v1.1.3';
 
 use lib qw(./lib ../lib);
 
@@ -102,10 +104,10 @@ sub main {
         $res->add_content(
             $q->popup_menu(
                 {
-                    'name'    => $id->{'id'},
+                    'name'    => ${$id}{'id'},
                     'values'  => [ sort keys %labels ],
                     'labels'  => \%labels,
-                    'default' => [ $q->param( $id->{'id'} ) ],
+                    'default' => [ $q->param( ${$id}{'id'} ) ],
                 },
             ),
         );
@@ -114,11 +116,12 @@ sub main {
     $res->add_content( $q->submit( { 'value' => $SELECT } ) . $q->end_form );
 
     for my $id (@IDS) {
-        if ( defined $q->param( $id->{'id'} )
-            && $q->param( $id->{'id'} ) ne $EMPTY )
+        if ( defined $q->param( ${$id}{'id'} )
+            && $q->param( ${$id}{'id'} ) ne $EMPTY )
         {
-            $test->getUser->setLoginName( $id->{'login'} );
-            my $widget = $test->getOrCreateInstance( $q->param( $id->{'id'} ) );
+            $test->getUser->setLoginName( ${$id}{'login'} );
+            my $widget =
+              $test->getOrCreateInstance( $q->param( ${$id}{'id'} ) );
             if ($widget) {
                 $res->add_content(
                     $q->start_iframe(
@@ -131,8 +134,10 @@ sub main {
                       . $q->end_iframe
                       . $q->br,
                 );
-                $test->addParticipant( $widget,
-                    WWW::Wookie::User->new( $id->{'login'}, $id->{'login'} ) );
+                $test->addParticipant(
+                    $widget,
+                    WWW::Wookie::User->new( ${$id}{'login'}, ${$id}{'login'} ),
+                );
                 $res->add_content(
                     $q->escapeHTML(
                         Data::Dumper::Dumper $test->getUsers($widget),
@@ -140,8 +145,10 @@ sub main {
                 );
 
                 ( $id != $IDS[0] ) && next;
-                $test->deleteParticipant( $widget,
-                    WWW::Wookie::User->new( $id->{'login'}, $id->{'login'} ) );
+                $test->deleteParticipant(
+                    $widget,
+                    WWW::Wookie::User->new( ${$id}{'login'}, ${$id}{'login'} ),
+                );
                 $res->add_content(
                         $USERS_AFTER_DEL
                       . $q->br
@@ -188,7 +195,8 @@ __END__
 
 =encoding utf8
 
-=for stopwords CGI Readonly TestWookieService.pl Ipenburg Wookie MERCHANTABILITY
+=for stopwords Bitbucket CGI Readonly TestWookieService.pl Ipenburg Wookie
+MERCHANTABILITY
 
 =head1 NAME
 
@@ -197,7 +205,7 @@ Framework Perl implementation
 
 =head1 VERSION
 
-This document describes C<TestWookieService.pl> version v1.1.1
+This document describes C<TestWookieService.pl> version C<v1.1.3>
 
 =head1 USAGE
 
@@ -253,6 +261,9 @@ C<localhost>, default port 8081
 
 =head1 BUGS AND LIMITATIONS
 
+Please report any bugs or feature requests at
+L<Bitbucket|https://bitbucket.org/rolandvanipenburg/www-wookie/issues>.
+
 =head1 DESCRIPTION
 
 This starts an HTTP service which presents an HTML page that interacts with an
@@ -267,11 +278,11 @@ connect to an Apache Wookie service on C<localhost> port 8080.
 
 =head1 AUTHOR
 
-Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
+Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 by Roland van Ipenburg
+Copyright 2010-2021 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

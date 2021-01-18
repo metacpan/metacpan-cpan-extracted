@@ -5,7 +5,7 @@ RTx 'RT-Extension-BriefHistory';
 repository 'https://github.com/cloos/RT-Extension-BriefHistory';
 
 requires_rt '4.0.0';
-rt_too_new '4.6.0';
+rt_too_new '5.2.0';
 
 substitute(
     { RT_LIB_PATH => "$RT::LocalPath/lib " . File::Basename::dirname( $INC{'RT.pm'} ) },

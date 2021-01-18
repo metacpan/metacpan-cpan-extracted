@@ -384,6 +384,22 @@ Intended for stream protocol handling - individual
 sized packets are perhaps better suited to the
 L<Ryu::Source> per-item behaviour.
 
+Supports the following named parameters:
+
+=over 4
+
+=item * C<low> - low waterlevel for buffer, start accepting more bytes
+once the L<Ryu::Buffer> has less content than this
+
+=item * C<high> - high waterlevel for buffer, will pause the parent stream
+if this is reached
+
+=back
+
+The backpressure (low/high) values default to undefined, meaning
+no backpressure is applied: the buffer will continue to fill
+indefinitely.
+
 =head2 combine_latest
 
 Takes the most recent item from one or more L<Ryu::Source>s, and emits
@@ -445,6 +461,18 @@ and leave the L<Future> instances active, use:
      ->ordered_futures
 
 See L<Future/without_cancel> for more details.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<high> - once at least this many unresolved L<Future> instances are pending,
+will L</pause> the upstream L<Ryu::Source>.
+
+=item * C<low> - if the pending count drops to this number, will L</resume>
+the upstream L<Ryu::Source>.
+
+=back
 
 This method is also available as L</resolve>.
 
@@ -710,5 +738,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2021. Licensed under the same terms as Perl itself.
 

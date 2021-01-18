@@ -4,14 +4,13 @@ use warnings;
 
 use Readonly;
 use Exporter qw/import/;
-use Astro::Montenbruck::MathUtils qw/reduce_deg/;
+use Astro::Montenbruck::MathUtils qw/reduce_deg frac/;
 use Astro::Montenbruck::Time qw/jd_cent/;
 use Astro::Montenbruck::NutEqu qw/deltas obliquity/;
 
-our @EXPORT = qw/ramc/;
+our @EXPORT = qw/ramc lmst/;
 
 our $VERSION = 0.01;
-
 
 Readonly::Scalar our $SOLAR_TO_SIDEREAL => 1.002737909350795;
 # Difference in between Sidereal and Solar hour (the former is shorter)
@@ -33,6 +32,17 @@ sub ramc {
     $result -= $lambda;
     reduce_deg($result);
 }
+
+sub lmst {
+    my ($mjd, $lambda) = @_;
+
+    my $mj0 = int($mjd);
+    my $ut = ($mjd - $mj0) * 24; 
+    my $t = ($mj0 - 51544.5) / 36525.0;
+    my $gmst = 6.697374558 + 1.0027379093 * $ut + (8640184.812866 + (0.093104 - 6.2E-6 * $t) * $t) * $t / 3600.0;
+    24.0 * frac( ($gmst - $lambda / 15.0) / 24.0 );   
+}
+
 
 1;
 __END__
@@ -77,6 +87,21 @@ Right Ascension of the Meridian
 =item * B<$lambda> — geographic longitude in degrees, negative for East
 
 =back
+
+=head2 lmst($mjd, $lambda)
+
+Local Mean Sidereal Time
+
+=head3 Arguments
+
+=over
+
+=item * B<$jd> — Modified Julian Date.
+
+=item * B<$lambda> — geographic longitude in degrees, negative for East
+
+=back
+
 
 =head3 Returns
 

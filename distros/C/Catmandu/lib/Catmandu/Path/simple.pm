@@ -2,7 +2,7 @@ package Catmandu::Path::simple;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2013';
+our $VERSION = '1.2014';
 
 use Catmandu::Util
     qw(is_hash_ref is_array_ref is_value is_natural is_code_ref trim);
@@ -69,7 +69,8 @@ sub setter {
                 $val = "${val_var}->(${var}, ${data_var})";
             }
             elsif (exists $opts{value}) {
-                $val = $self->_emit_value($opts{value});
+                $captures->{$val_var} = $opts{value};
+                $val = $val_var;
             }
             else {
                 push @$args, $val_var;
@@ -150,10 +151,10 @@ sub creator {
         };
     }
     elsif (exists $opts{value}) {
-        my $val = $self->_emit_value($opts{value});
+        $captures->{$val_var} = $opts{value};
         $cb = sub {
             my $var = $_[0];
-            "${var} = ${val};";
+            "${var} = ${val_var};";
         };
     }
     else {

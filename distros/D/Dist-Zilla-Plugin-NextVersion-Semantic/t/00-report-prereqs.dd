@@ -4,6 +4,12 @@ do { my $x = {
                                         'ExtUtils::MakeMaker' => '0'
                                       }
                       },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
        'runtime' => {
                       'requires' => {
                                       'CPAN::Changes' => '0.20',

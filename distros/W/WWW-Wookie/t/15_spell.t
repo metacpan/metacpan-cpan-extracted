@@ -4,8 +4,7 @@ use English;
 use Test::More;
 
 if ( not $ENV{AUTHOR_TESTING} ) {
-    my $msg =
-'Author test. Set the environment variable AUTHOR_TESTING to enable this test.';
+    my $msg = 'Set $ENV{AUTHOR_TESTING} to run author tests.';
     plan( skip_all => $msg );
 }
 

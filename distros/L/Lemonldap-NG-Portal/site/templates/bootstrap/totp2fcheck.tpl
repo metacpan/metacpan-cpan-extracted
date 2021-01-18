@@ -10,6 +10,7 @@
   <div class="form">
     <input type="hidden" id="token" name="token" value="<TMPL_VAR NAME="TOKEN">" />
     <input type="hidden" id="checkLogins" name="checkLogins" value="<TMPL_VAR NAME="CHECKLOGINS">" />
+    <input type="hidden" id="stayconnected" name="stayconnected" value="<TMPL_VAR NAME="STAYCONNECTED">" />
     <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
     <div class="input-group mb-3">
       <div class="input-group-prepend">

@@ -1472,7 +1472,7 @@ END
          next;
       } elsif ($cmd_sent==2 && $output=~/MariaDB.*?>\s*$/) {
          my $cmd='CREATE DATABASE roundcubemail CHARACTER SET '.
-                 'utf8 COLLATE utf8_general_ci;'.
+                 'utf8 COLLATE utf8_general_ci;';
          print "$cmd\n";
          $handle->print($cmd);
          $handle->print(';');

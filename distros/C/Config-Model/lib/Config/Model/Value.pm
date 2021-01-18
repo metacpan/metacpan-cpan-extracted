@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2020 by Dominique Dumont.
+# This software is Copyright (c) 2005-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.140;
+package Config::Model::Value 2.141;
 
 use 5.10.1;
 
@@ -1078,7 +1078,7 @@ sub run_code_set_on_value {
                     message => "Eval of assert or warning code failed : $@"
                 );
             }
-            return $invert ^ $ret;
+            return ($invert xor $ret) ;
         };
 
         $self->run_code_on_value( $value_r, $apply_fix, $array, $label, $sub, $msg, $fix );
@@ -1997,7 +1997,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.140
+version 2.141
 
 =head1 SYNOPSIS
 
@@ -3096,7 +3096,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2020 by Dominique Dumont.
+This software is Copyright (c) 2005-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -5,23 +5,19 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  IO::Async::Loop: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Socket: '0'
   Test::CheckDeps: '0.010'
   Test::Deep: '1.126'
   Test::Fatal: '0.010'
   Test::More: '0.98'
   Test::Refcount: '0.07'
-  Time::HiRes: '0'
   Variable::Disposition: '0.004'
   indirect: '0'
-  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,19 +33,19 @@ no_index:
 provides:
   Ryu::Async:
     file: lib/Ryu/Async.pm
-    version: '0.017'
+    version: '0.018'
   Ryu::Async::Client:
     file: lib/Ryu/Async/Client.pm
-    version: '0.017'
+    version: '0.018'
   Ryu::Async::Packet:
     file: lib/Ryu/Async/Packet.pm
-    version: '0.017'
+    version: '0.018'
   Ryu::Async::Process:
     file: lib/Ryu/Async/Process.pm
-    version: '0.017'
+    version: '0.018'
   Ryu::Async::Server:
     file: lib/Ryu/Async/Server.pm
-    version: '0.017'
+    version: '0.018'
 recommends:
   Heap: '0'
   IO::Async::SSL: '0.19'
@@ -58,39 +54,21 @@ recommends:
 requires:
   Future: '0.45'
   IO::Async: '0.71'
-  IO::Async::Handle: '0'
-  IO::Async::Listener: '0'
-  IO::Async::Notifier: '0'
-  IO::Async::Process: '0'
-  IO::Async::Resolver: '0'
-  IO::Async::Signal: '0'
-  IO::Async::Socket: '0'
-  IO::Async::Stream: '0'
-  IO::Async::Timer::Absolute: '0'
-  IO::Async::Timer::Countdown: '0'
-  IO::Async::Timer::Periodic: '0'
   IO::Socket::IP: '0.37'
   Log::Any: '1.050'
-  Ryu: '2.001'
-  Ryu::Sink: '0'
-  Ryu::Source: '0'
-  Scalar::Util: '0'
+  Ryu: '2.006'
   Syntax::Keyword::Try: '0'
   URI::tcp: '0'
   URI::udp: '0'
   curry: '1.001'
-  curry::weak: '0'
-  mro: '0'
   namespace::clean: '0'
   parent: '0'
-  strict: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Ryu-Async/issues
   homepage: https://github.com/team-at-cpan/Ryu-Async
   repository: https://github.com/team-at-cpan/Ryu-Async.git
-version: '0.017'
+version: '0.018'
 x_authority: cpan:TEAM
-x_generated_by_perl: v5.30.2
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

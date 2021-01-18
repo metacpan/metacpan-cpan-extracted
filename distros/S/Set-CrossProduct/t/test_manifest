@@ -2,6 +2,7 @@ load.t
 pod.t
 pod_coverage.t
 tuple.t
+labeled.t
 named_sets.t
 next.t
 error.t

@@ -54,6 +54,6 @@
          "web" : "https://github.com/briandfoy/Roman-Unicode"
       }
    },
-   "version" : "1.032",
+   "version" : "1.033",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

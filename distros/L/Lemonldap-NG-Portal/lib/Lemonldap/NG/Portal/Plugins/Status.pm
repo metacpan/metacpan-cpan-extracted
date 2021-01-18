@@ -11,7 +11,7 @@ use JSON qw(from_json);
 use MIME::Base64;
 use IO::Socket::INET;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -19,8 +19,9 @@ extends 'Lemonldap::NG::Portal::Main::Plugin';
 
 sub init {
     my ($self) = @_;
-    $self->addUnauthRoute( portalStatus => 'status', ['GET'] );
-    $self->addAuthRoute( portalStatus => 'status', ['GET'] );
+    $self->addUnauthRoute( portalStatus => 'status', ['GET'] )
+      ->addAuthRoute( portalStatus => 'status', ['GET'] );
+
     return 1;
 }
 

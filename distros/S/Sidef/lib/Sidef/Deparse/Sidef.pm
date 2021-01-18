@@ -31,6 +31,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Number::Number        Number
                   Sidef::DataTypes::Number::Mod           Mod
                   Sidef::DataTypes::Number::Gauss         Gauss
+                  Sidef::DataTypes::Number::Quadratic     Quadratic
                   Sidef::DataTypes::Number::Complex       Complex
                   Sidef::DataTypes::Range::Range          Range
                   Sidef::DataTypes::Range::RangeNumber    RangeNum
@@ -342,7 +343,12 @@ package Sidef::Deparse::Sidef {
                 my $name = $self->_dump_class_name($obj);
 
                 $code .= "class " . $name;
-                $code .= '(' . $self->_dump_vars(@{$obj->{vars}}) . ')';
+
+                my $class_vars = $self->_dump_vars(@{$obj->{vars}});
+
+                if (length($class_vars)) {
+                    $code .= '(' . $class_vars . ')';
+                }
 
                 if (exists $obj->{inherit}) {
 

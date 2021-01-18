@@ -1,0 +1,19 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/RT/Extension/HistoryFilter.pm:22
+msgid "Transaction types that will be shown on the ticket display page"
+msgstr "Type de transactions à afficher dans un ticket"
+
+#. (join ', ', map loc(ref($ValuesLabel{$_}) ? @{ $ValuesLabel{$_ }} : $ValuesLabel{$_} || $_), grep defined,            @DefaultValue)
+#: html/Widgets/Form/Select:125
+msgid "Use system default (%1)"
+msgstr "Utiliser la valeur par défaut (%1)"
+
+#: html/Widgets/Form/Select:79
+msgid "other..."
+msgstr "autre…"
+

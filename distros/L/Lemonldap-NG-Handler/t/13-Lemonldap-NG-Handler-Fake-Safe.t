@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 9;
+use Test::More tests => 13;
 require 't/test.pm';
 BEGIN { use_ok('Lemonldap::NG::Handler::Main::Jail') }
 
@@ -54,3 +54,40 @@ $listMatch = $jail->jail_reval($sub5);
 ok( ( defined($listMatch) and ref($listMatch) eq 'CODE' ),
     'listMatch function is defined' );
 ok( &$listMatch eq '0', 'Get good result' );
+
+# Test has2f method
+my $sub6  = "sub { return(has2f(\$_[0],\$_[1])) }";
+my $has2f = $jail->jail_reval($sub6);
+ok(
+    ( defined($has2f) and ref($has2f) eq 'CODE' ),
+    'checkDate extended function is defined'
+);
+is(
+    $has2f->( {
+            _2fDevices =>
+"[{\"name\":\"MyTOTP\",\"_secret\":\"g5fsxwf4d34biemlojsbbvhgtskrssos\",\"epoch\":1602173208,\"type\":\"TOTP\"}]"
+        },
+        "TOTP"
+    ),
+    1,
+    "Function works"
+);
+is(
+    $has2f->( {
+            _2fDevices =>
+"[{\"name\":\"MyTOTP\",\"_secret\":\"g5fsxwf4d34biemlojsbbvhgtskrssos\",\"epoch\":1602173208,\"type\":\"TOTP\"}]"
+        },
+    ),
+    1,
+    "Function works"
+);
+is(
+    $has2f->( {
+            _2fDevices =>
+"[{\"name\":\"MyTOTP\",\"_secret\":\"g5fsxwf4d34biemlojsbbvhgtskrssos\",\"epoch\":1602173208,\"type\":\"TOTP\"}]"
+        },
+        "UBK"
+    ),
+    0,
+    "Function works"
+);

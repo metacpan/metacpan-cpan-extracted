@@ -1,6 +1,12 @@
 Changelog for Rewire
 
-0.05 2020-05-20T02:02:56
+0.06 2021-01-15T04:20:30
+ - Add release updates
+ - Return and reference callbacks which resolve services (#4)
+ - Ensure extended service inherits arguments (#3)
+
+0.05 2020-05-20T02:02:57
+ - Built release version 0.05
  - Add release updates
  - Update documentation
  - Add proxyable services (#26)

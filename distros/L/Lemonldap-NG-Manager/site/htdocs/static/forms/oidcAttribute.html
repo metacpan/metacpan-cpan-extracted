@@ -1,0 +1,48 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title" trspan="oidcAttribute"></h3>
+  </div>
+  <table class="table">
+    <!-- Key Name -->
+    <tr>
+      <th><span trspan="claimName"></span></th>
+      <td><input id="oakinput" class="form-control" ng-model="currentNode.title"/></td>
+    </tr>
+    <!-- Name -->
+    <tr>
+      <th><span trspan="variableName"></span></th>
+      <td><input id="oaninput" class="form-control" ng-model="currentNode.data[0]"/></td>
+    </tr>
+    <!-- Type -->
+    <tr>
+      <th><span trspan="type"></span></th>
+      <td>
+      <select class="form-control" id="oatselect" aria-describedby="oatlbl" ng-model="currentNode.data[1]">
+          <option value="string" trspan="string"></option>
+          <option value="int" trspan="int"></option>
+          <option value="bool" trspan="bool"></option>
+      </select>
+      </td>
+    </tr>
+    <!-- Array -->
+    <tr>
+      <th><span trspan="array"></span></th>
+      <td>
+      <select class="form-control" id="oaaselect" aria-describedby="oaalbl" ng-model="currentNode.data[2]">
+          <option value="auto" trspan="auto"></option>
+          <option value="always" trspan="always"></option>
+          <option value="never" trspan="never"></option>
+       </select>
+       </td>
+     </tr>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "title": "addOidcAttribute",
+  "icon": "plus-sign"
+},{
+  "title": "deleteEntry",
+  "icon": "minus-sign"
+}]
+</script>

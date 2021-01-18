@@ -170,7 +170,7 @@ list.</p>
     <br><b>2-N)</b> [<i>optional</i>] list of tag names to find (or tag list reference or
     options hash reference, see below)
 </td></tr>
-<tr><td valign=top><b>Returns</b></td><td>Reference to hash of tag key/value pairs</td></tr>
+<tr><td valign=top><b>Returns</b></td><td>Reference to hash of tag-key/value pairs</td></tr>
 </table></blockquote>
 
 <p><b>Examples:</b></p>
@@ -303,12 +303,12 @@ take precedence over <a href="#Options">Options</a> settings.
 
 <p><b>Return Value:</b></p>
 
-<p><a href="#ImageInfo">ImageInfo</a> returns a reference to a hash of tag
-key/value pairs.  The tag keys are identifiers -- essentially case-sensitive tag
-names with an appended instance number if multiple tags with the same name were
-extracted from the image.  Many of the ExifTool functions require a tag key as
-an argument.  Use <a href="#GetTagName">GetTagName</a> to get the tag name for a
-given tag key.  Note that the case of the tag names may not be the same as
+<p><a href="#ImageInfo">ImageInfo</a> returns a reference to a hash of
+tag-key/value pairs.  The tag keys are identifiers -- essentially case-sensitive
+tag names with an appended instance number if multiple tags with the same name
+were extracted from the image.  Many of the ExifTool functions require a tag key
+as an argument.  Use <a href="#GetTagName">GetTagName</a> to get the tag name
+for a given tag key.  Note that the case of the tag names may not be the same as
 requested.</p>
 
 <p>Values of the returned hash are usually simple scalars, but a scalar
@@ -585,11 +585,12 @@ distribution for examples.</p>
     MakerNote information, and will stop parsing at the IDAT chunk of PNG
     images.  (By the PNG specification, metadata is allowed after IDAT, but
     ExifTool always writes it before because some utilities will ignore it
-    otherwise.)  When set to 3 or 4, only pseudo system tags and FileType are
+    otherwise.)  When set to 3 or higher, only pseudo system tags and FileType are
     generated.  For 3, the file header is read to provide an educated guess at
     FileType.  For 4, the file is not read at all and FileType is determined
-    based on the file's extension.</td>
-    <td align=center>0, 1, 2, 3 or 4</td><td align=center>undef</td></tr>
+    based on the file's extension.  For 5, generation of Composite tags is also
+    disabled (like setting <a href="#Composite">Composite</a> to 0).</td>
+    <td align=center>0, 1, 2, 3, 4 or 5</td><td align=center>undef</td></tr>
 <tr id="Filter"><td>Filter</td>
     <td>Perl expression used to filter all returned tag values.  Applies to
     PrintConv values only.  List items are filtered individually.</td>
@@ -665,6 +666,9 @@ distribution for examples.</p>
     See <a href="#GetGroup">GetGroup</a> for a description of group families,
     and <a href="#GetAllGroups">GetAllGroups</a> for a list of available groups.</td>
     <td align=center>undef</td></tr>
+<tr id="HexTagIDs"><td>HexTagIDs</td><td>Use hexadecimal instead of decimal for the family 7
+	group names of tags with numerical ID's.</td>
+    <td align=center>0 or 1</td><td align=center>undef</td></tr>
 <tr id="HtmlDump"><td>HtmlDump</td><td>Dump information in hex to a dynamic HTML web page.
     Option value sets a limit on the maximum block size.  Output file is
     specified by the TextOut option.</td>
@@ -760,9 +764,10 @@ distribution for examples.</p>
     extracted and from local time when written. According to the QuickTime
     specification date/time values should be UTC, but many digital cameras store
     local time instead (presumably because they don't know the time zone), so
-    the default is to not convert these times.  This option also disables the
-    autodetection of incorrect time-zero offsets in QuickTime date/time values,
-    and enforces a time zero of 1904 as per the QuickTime specification.</td>
+    the default is to not convert these times (except for Canon CR3 files, which
+    always use UTC times).  This option also disables the autodetection of
+    incorrect time-zero offsets in QuickTime date/time values, and enforces a
+    time zero of 1904 as per the QuickTime specification.</td>
     <td align=center>0 or 1</td>
     <td align=center>undef</td></tr>
 <tr id="RequestAll"><td>RequestAll</td><td>Flag to request all tags to be extracted.
@@ -901,7 +906,7 @@ distribution for examples.</p>
     <a href="TagNames/MacOS.html#XAttr">MacOS XAttr Tags documentation</a> for more information).</td>
     <td align=center>0 or 1</td><td align=center>undef</td></tr>
 <tr id="XMPAutoConv"><td>XMPAutoConv</td><td>Flag to enable automatic conversion
-    for unknown XMP tags with values that look like rational numbers or dates.</td>
+    when reading unknown XMP tags with values that look like rational numbers or dates.</td>
     <td align=center>0 or 1</td>
     <td align=center>1</td></tr>
 </table></blockquote>
@@ -1038,7 +1043,16 @@ specified information.  May be called repeatedly to write the same information
 to additional files without the need to call <a href="#SetNewValue">SetNewValue</a>
 again.</p>
 
-<p>Note that it is <b>NOT</b> necessary to call <a href="#ExtractInfo">ExtractInfo</a>
+<p>ExifTool queues all new values that are assigned via calls to
+<a href="#SetNewValue">SetNewValue</a>, then applies them to any number of files
+through one or more calls to <a href="#WriteInfo">WriteInfo</a>.  These queued
+values may be accessed through <a href="#GetNewValue">GetNewValue</a>, and are
+completely separate from metadata extracted from files via
+<a href="#ExtractInfo">ExtractInfo</a> or <a href="#ImageInfo">ImageInfo</a>
+and accessed through <a href="#GetInfo">GetInfo</a> or
+<a href="#GetValue">GetValue</a>.</p>
+
+<p>To be clear, it is <b>NOT</b> necessary to call <a href="#ExtractInfo">ExtractInfo</a>
 or <a href="#ImageInfo">ImageInfo</a> before <a href="#WriteInfo">WriteInfo</a>.
 <a href="#WriteInfo">WriteInfo</a> changes only metadata specified by previous
 calls to <a href="#SetNewValue">SetNewValue</a>.</p>
@@ -1469,7 +1483,8 @@ file.  List-type tags may return multiple values in list context.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetNewValue($$)</td></tr>
 <tr><td valign=top><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
- <br><b>1)</b> Tag name (case sensitive, may be prefixed by family 0 or 1 group name)
+ <br><b>1)</b> Tag name (case sensitive, may be prefixed by family 0, 1 or 7
+ group names, separated by colons)
 </td></tr>
 <tr><td valign=top><b>Returns</b></td><td>List of new Raw tag values, or first value in
 list when called in scalar context. The list may be empty either if the tag
@@ -1495,8 +1510,8 @@ in a specified file.</p>
  <br><b>1)</b> File name, file reference, or scalar reference
  <br><b>2-N)</b> [<i>optional</i>] List of tag names to set or options hash
  references.  All writable tags are set if none are specified.  The tag names
- are not case sensitive, and may be prefixed by one or more family 0, 1 or 2
- group names with optional leading family numbers, separated by colons (eg.
+ are not case sensitive, and may be prefixed by one or more family 0, 1, 2
+ or 7 group names with optional leading family numbers, separated by colons (eg.
  '<code>exif:iso</code>').  A leading '<code>-</code>' indicates tags to be
  excluded (eg. '<code>-comment</code>'), or a trailing '<code>#</code>' causes
  the ValueConv value to be copied (same as setting the Type option to
@@ -1737,7 +1752,8 @@ my $result = $exifTool-&gt;<b>SetFileName</b>($file, $newName);
 </pre></td></tr></table></blockquote>
 <p><b>Notes:</b></p>
 <p>Will not overwrite existing files. New directories are created as
-necessary.</p>
+necessary. If the file is successfully renamed, the new file name may be
+accessed via <code>$$exifTool{NewName}</code>.</p>
 
 <hr><h2><a name="SetNewGroups">SetNewGroups</a></h2>
 <p>Set the order of the preferred groups when adding new information.  In
@@ -1878,6 +1894,13 @@ option is used when extracting.</p>
 <p>Family 6 is currently used only for EXIF/TIFF metadata, and gives the format
 type of the extracted value.  Generated only if the
 <a href="#SaveFormat">SaveFormat</a> option is used when extracting.</p>
+<p>Family 7 is used for tag ID's.  The group names are "ID-" followed by the
+tag ID with characters other than [-_A-Za-z0-9] converted to hex.  Numerical tag ID's are
+given in hex if the <a href="#HexTagIDs">HexTagIDs</a> option is set.  When
+specifying a family 7 group name, numerical ID's may be in hex or decimal, and
+non-numercal ID's may or may not have characters other than [-_A-Za-z0-9]
+converted to hex.  Note that unlike other group names, family 7 group names are
+case sensitive (except for the leading "ID-").</p>
 <p>See <a href="#GetAllGroups">GetAllGroups</a> for lists of group names.</p>
 
 <p><b>Examples:</b></p>
@@ -2065,22 +2088,22 @@ ICC-meta, ICC-view, ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v1_Enh,
 ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ISO, ITC, Insta360,
 InteropIFD, ItemList, JFIF, JFXX, JPEG, JPEG-HDR, JSON, JVC, Jpeg2000,
 KDC_IFD, Keys, Kodak, KodakBordersIFD, KodakEffectsIFD, KodakIFD,
-KyoceraRaw, LNK, Leaf, LeafSubIFD, Leica, Lytro, M2TS, MAC, MIE-Audio,
-MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo,
-MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient,
-MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MNG,
-MOBI, MOI, MPC, MPEG, MPF0, MPImage, MS-DOC, MXF, MacOS, MakerNotes,
-MakerUnknown, Matroska, MediaJukebox, Meta, MetaIFD, Microsoft, Minolta,
-MinoltaRaw, Motorola, NITF, Nikon, NikonCapture, NikonCustom, NikonScan,
-Nintendo, Ocad, Ogg, Olympus, OpenEXR, Opus, PDF, PICT, PNG, PNG-pHYs, PSP,
-Palm, Panasonic, PanasonicRaw, Pentax, PhaseOne, PhotoCD, PhotoMechanic,
-Photoshop, PictureInfo, PostScript, PreviewIFD, PrintIM, ProfileIFD,
-Qualcomm, QuickTime, RAF, RAF2, RIFF, RMETA, RSRC, RTF, Radiance, Rawzor,
-Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5,
-Real-RJMD, Reconyx, Red, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#,
-SVG, Samsung, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD,
-System, Theora, Torrent, Track#, UserData, UserParam, VCalendar, VCard,
-Version0, Vorbis, WTV, XML, XMP, XMP-DICOM, XMP-Device, XMP-GAudio,
+KyoceraRaw, LNK, Leaf, LeafSubIFD, Leica, Lyrics3, Lytro, M2TS, MAC,
+MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS,
+MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
+MIFF, MNG, MOBI, MOI, MPC, MPEG, MPF0, MPImage, MS-DOC, MXF, MacOS,
+MakerNotes, MakerUnknown, Matroska, MediaJukebox, Meta, MetaIFD, Microsoft,
+Minolta, MinoltaRaw, Motorola, NITF, Nikon, NikonCapture, NikonCustom,
+NikonScan, NikonSettings, Nintendo, Ocad, Ogg, Olympus, OpenEXR, Opus, PDF,
+PICT, PNG, PNG-pHYs, PSP, Palm, Panasonic, PanasonicRaw, Pentax, PhaseOne,
+PhotoCD, PhotoMechanic, Photoshop, PictureInfo, PostScript, PreviewIFD,
+PrintIM, ProfileIFD, Qualcomm, QuickTime, RAF, RAF2, RIFF, RMETA, RSRC, RTF,
+Radiance, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4,
+Real-RA5, Real-RJMD, Reconyx, Red, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
+SRF#, SVG, Samsung, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim,
+SubIFD, System, Theora, Torrent, Track#, UserData, UserParam, VCalendar,
+VCard, Version0, Vorbis, WTV, XML, XMP, XMP-DICOM, XMP-Device, XMP-GAudio,
 XMP-GDepth, XMP-GFocus, XMP-GImage, XMP-GPano, XMP-GSpherical, XMP-LImage,
 XMP-MP, XMP-MP1, XMP-PixelLive, XMP-aas, XMP-acdsee, XMP-album,
 XMP-apple-fi, XMP-aux, XMP-cc, XMP-cell, XMP-creatorAtom, XMP-crs, XMP-dc,
@@ -2108,6 +2131,10 @@ Preview, Printing, Time, Unknown, Video
 <tr><td><b>6&nbsp;(EXIF/TIFF&nbsp;Format)</b></td>
 <td>int8u, string, int16u, int32u, rational64u, int8s, undef, int16s, int32s,
 rational64s, float, double, ifd, unicode, complex, int64u, int64s, ifd64</td></tr>
+<tr><td><b>7&nbsp;(Tag&nbsp;ID)</b></td>
+<td>ID-xxx (where xxx is the tag ID.  Numerical ID's are given in hex with a
+leading "0x" if the HexTagIDs option is set, as are characters in non-numerical
+ID's which are not valid in a group name)</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>

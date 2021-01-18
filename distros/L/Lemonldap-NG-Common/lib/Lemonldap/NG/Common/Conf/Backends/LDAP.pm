@@ -91,8 +91,9 @@ sub ldap {
     # Connect
     my $ldap = Net::LDAP->new(
         \@servers,
-        onerror => undef,
-        verify  => ( $self->{ldapVerify} || "require" ),
+        keepalive => 1,
+        onerror   => undef,
+        verify    => ( $self->{ldapVerify} || "require" ),
         ( $self->{ldapCAFile} ? ( cafile => $self->{ldapCAFile} ) : () ),
         ( $self->{ldapCAPath} ? ( capath => $self->{ldapCAPath} ) : () ),
         ( $self->{ldapPort}   ? ( port   => $self->{ldapPort} )   : () ),

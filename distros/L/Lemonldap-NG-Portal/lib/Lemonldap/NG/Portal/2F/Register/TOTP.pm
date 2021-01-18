@@ -5,19 +5,20 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.10';
 
-extends 'Lemonldap::NG::Portal::Main::Plugin', 'Lemonldap::NG::Common::TOTP';
+extends qw(
+  Lemonldap::NG::Portal::Main::Plugin
+  Lemonldap::NG::Common::TOTP
+);
 
 # INITIALIZATION
 
-has prefix => ( is => 'rw', default => 'totp' );
-
+has prefix   => ( is => 'rw', default => 'totp' );
 has template => ( is => 'ro', default => 'totp2fregister' );
-
-has logo => ( is => 'rw', default => 'totp.png' );
-
-has ott => (
+has welcome  => ( is => 'ro', default => 'yourNewTotpKey' );
+has logo     => ( is => 'rw', default => 'totp.png' );
+has ott      => (
     is      => 'rw',
     lazy    => 1,
     default => sub {
@@ -35,10 +36,13 @@ sub init {
 sub run {
     my ( $self, $req, $action ) = @_;
     my $user = $req->userData->{ $self->conf->{whatToTrace} };
-    unless ($user) {
-        return $self->p->sendError( $req,
-            'No ' . $self->conf->{whatToTrace} . ' found in user data', 500 );
-    }
+    return $self->p->sendError( $req,
+        'No ' . $self->conf->{whatToTrace} . ' found in user data', 500 )
+      unless $user;
+
+    # Check if TOTP can be updated
+    my $msg = $self->canUpdateSfa( $req, $action );
+    return $self->p->sendError( $req, $msg, 400 ) if $msg;
 
     # Verification that user has a valid TOTP app
     if ( $action eq 'verify' ) {
@@ -75,7 +79,7 @@ sub run {
         }
         $TOTPName =
           substr( $TOTPName, 0, $self->conf->{max2FDevicesNameLength} );
-        $self->logger->debug("TOTP name : $TOTPName");
+        $self->logger->debug("TOTP name: $TOTPName");
 
         unless ($code) {
             $self->userLogger->info('TOTP registration: empty validation form');
@@ -102,11 +106,10 @@ sub run {
         $self->logger->debug('TOTP code verified');
 
         # Now code is verified, let's store the master key in persistent data
-
         my $secret = '';
 
         # Reading existing 2FDevices
-        $self->logger->debug("Looking for 2F Devices ...");
+        $self->logger->debug("Looking for 2F Devices...");
         my $_2fDevices;
         if ( $req->userData->{_2fDevices} ) {
             $_2fDevices = eval {
@@ -124,7 +127,7 @@ sub run {
         }
 
         # Reading existing TOTP
-        my @totp2f = grep { $_->{type} eq "TOTP" } @$_2fDevices;
+        my @totp2f = grep { $_->{type} eq 'TOTP' } @$_2fDevices;
         unless (@totp2f) {
             $self->logger->debug("No TOTP Device found");
 
@@ -133,26 +136,20 @@ sub run {
         }
 
         # Loading TOTP secret
-        $self->logger->debug("Reading TOTP secret if exists ...");
+        $self->logger->debug("Reading TOTP secret if exists...");
         $secret = $_->{_secret} foreach (@totp2f);
-
-        if ( $token->{_totp2fSecret} eq $secret ) {
-            return $self->p->sendError( $req, 'totpExistingKey', 200 );
-        }
+        return $self->p->sendError( $req, 'totpExistingKey', 200 )
+          if ( $token->{_totp2fSecret} eq $secret );
 
         ### USER CAN ONLY REGISTER ONE TOTP ###
         # Delete TOTP previously registered
-        my @keep = ();
-        while (@$_2fDevices) {
-            my $element = shift @$_2fDevices;
-            $self->logger->debug("Looking for TOTP to delete ...");
-            push @keep, $element unless ( $element->{type} eq "TOTP" );
-        }
+        $self->logger->debug("Looking for TOTP to delete...");
+        my $size = my @keep =
+          map { $_->{type} eq 'TOTP' ? () : $_ } @$_2fDevices;
 
         # Check if user can register one more device
-        my $size    = @keep;
         my $maxSize = $self->conf->{max2FDevices};
-        $self->logger->debug("Nbr 2FDevices = $size / $maxSize");
+        $self->logger->debug("Registered 2F Device(s): $size / $maxSize");
         if ( $size >= $maxSize ) {
             $self->userLogger->warn("Max number of 2F devices is reached");
             return $self->p->sendError( $req, 'maxNumberof2FDevicesReached',
@@ -167,9 +164,8 @@ sub run {
             _secret => $token->{_totp2fSecret},
             epoch   => $epoch
           };
-
         $self->logger->debug(
-            "Append 2F Device : { type => 'TOTP', name => $TOTPName }");
+            "Append 2F Device: { type => 'TOTP', name => $TOTPName }");
         $self->p->updatePersistentSession( $req,
             { _2fDevices => to_json( \@keep ) } );
         $self->userLogger->notice(
@@ -187,7 +183,7 @@ sub run {
         my $secret = '';
 
         # Read existing 2FDevices
-        $self->logger->debug("Looking for 2F Devices ...");
+        $self->logger->debug("Looking for 2F Devices...");
         my $_2fDevices;
         if ( $req->userData->{_2fDevices} ) {
             $_2fDevices = eval {
@@ -215,7 +211,7 @@ sub run {
         }
 
         # Loading TOTP secret
-        $self->logger->debug("Reading TOTP secret if exists ...");
+        $self->logger->debug("Reading TOTP secret if exists...");
         $secret = $_->{_secret} foreach (@totp2f);
 
         if ( ( $req->param('newkey') and $self->conf->{totp2fUserCanChangeKey} )
@@ -278,8 +274,8 @@ sub run {
             400 );
 
         # Read existing 2FDevices
-        $self->logger->debug("Loading 2F Devices ...");
-        my $_2fDevices;
+        $self->logger->debug("Loading 2F Devices...");
+        my ( $_2fDevices, $TOTPName );
         if ( $req->userData->{_2fDevices} ) {
             $_2fDevices = eval {
                 from_json( $req->userData->{_2fDevices},
@@ -296,23 +292,30 @@ sub run {
         }
 
         # Delete TOTP 2F device
-        my $TOTPName;
-        foreach (@$_2fDevices) {
-            $TOTPName = $_->{name} if $_->{epoch} eq $epoch;
+        @$_2fDevices = map {
+            if ( $_->{epoch} eq $epoch ) { $TOTPName = $_->{name}; () }
+            else                         { $_ }
+        } @$_2fDevices;
+        if ($TOTPName) {
+            $self->logger->debug(
+"Delete 2F Device: { type => 'TOTP', epoch => $epoch, name => $TOTPName }"
+            );
+            $self->p->updatePersistentSession( $req,
+                { _2fDevices => to_json($_2fDevices) } );
+            $self->userLogger->notice(
+                "TOTP $TOTPName unregistration succeeds for $user");
+            return [
+                200,
+                [
+                    'Content-Type'   => 'application/json',
+                    'Content-Length' => 12,
+                ],
+                ['{"result":1}']
+            ];
         }
-        @$_2fDevices = grep { $_->{epoch} ne $epoch } @$_2fDevices;
-        $self->logger->debug(
-"Delete 2F Device : { type => 'TOTP', epoch => $epoch, name => $TOTPName }"
-        );
-        $self->p->updatePersistentSession( $req,
-            { _2fDevices => to_json($_2fDevices) } );
-        $self->userLogger->notice(
-            "TOTP $TOTPName unregistration succeeds for $user");
-        return [
-            200,
-            [ 'Content-Type' => 'application/json', 'Content-Length' => 12, ],
-            ['{"result":1}']
-        ];
+        else {
+            $self->p->sendError( $req, '2FDeviceNotFound', 400 );
+        }
     }
     else {
         $self->logger->error("Unknown TOTP action -> $action");

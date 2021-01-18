@@ -1,3 +1,86 @@
+sub saml_key_proxy_private_enc {
+    "-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA2vzoUiQ4GsM5qLjoxslEDKj+RrPh/A743JCWe1Hbadjd5yD4
+gPwmJUxMF+MJcQlo/TkmKbTonPdIoAqDknbUxfFTntp0VkdKrB64xr0Stpy7123h
+Pszat3SbU3RYypdobEcuSAS77w9X1KnkRL1+CIe59qSsghO3l3b2IJ6qPFXdx/cr
+o7+K3O7w8wAEJ9KmxA0KdiZpSFgTAqfNDSKx8NLwZOeDpsHouAxy1E2kine+9ESB
+TRAM2PgiGZvU5JA1SZscdEg3wTftJxxPFnAJMwtqM3IVC6B+TqsIP5Wlk1PQQqH7
+5gjtBYDVduynBwU+l/UUmp1aDRZupuH8PF51pwIDAQABAoIBAF11xqkX8CHr4/XQ
+RPhh+Xr1vN/r8ayjry5jPvYOr3fzKHF2LtjNxHHyqB8htGvbukUoWNM/9G7ZUtOK
+6TBfKtv37NpFHZWdA4+F5RJcq1nodnqw2Ir23vmg+JGbfDGqgNSFZIk0DAkxISkQ
+AO4deWamloVfLoitZZNtIAo37SumJ1JBiqLOTsTL/bVQCYTkFG0zZ+XYi9+JrIMb
+UZj5BEnWzUYiqg3dsGg+USO84811U4DjMmfkJrOBTkd1VucJhNpWbaFl8uzpO4/r
+yBPGSsIwzuomP7ePotK+ZWrDmYAHej7ZaZ6KvJzDgMWTIzqLj7jXAn8h5H0ix1Az
+QGCufxECgYEA/ewbcN+aB54NDaiCmvnvCVMYA+KcI3OldbvJY7iXHduJrRmEvoSB
+Hm9NRx02gb45XtRL46SlnRIXWnbmdfsAqSlYVNrI62Qd7PVeLVon9fK2V88AnHDA
+Z5Rt6A9kDhYPmvRC7vlN5Al/lWeDxwfOWzRLmsGYfBe0fGLoyX5p3LUCgYEA3Mef
+fzKOPcj9NozLStttYxvWwcYA/ELO81dhujgFGJG774CeR2hwJL/tFg868gLNL1Io
+b5LKxasp6V2EkMEaI1RPOkQIldVZCju+UJnmmC4fWpkdhivElzWIRIOCoIRqNSNu
+HIoihdl/j62yWGArpXVuBr4Wm70eZUTYz5B6HmsCgYEAvxrwHCdtmcYONPVaNqFc
+kjwDmwj2Uog7Qzyt+Wt38HTGTY0jJvA67Vj/ZEJMP6GXNBO7efz02B5BjUhncuwS
+Nz5yyIpRJTgYfbq9woxT/vtI2RVmdFc3t70yarEKsL9Rx2GG7qybPsEXUK6zsxvg
+5yuYq0SBKwP8RpF6egu2SPECgYAa2Iczb1FOf/8SQAKEQrRFZeAyRcJe6jzB6DEw
+9JjiCO6CS/BzHGbugQvyL73qKZ8LjwDtuDrB2HNLNhzlgSWNgDX2DsnAdmXSUbtt
+j5kzjgAwAwhNBUttW4wLULZ0kEVd2sYL4FwcTHsvXF6gUmlcQDA1z61uGIv2om1+
+p8HBqwKBgQCRDCfLGk4HCtz5nIg3JDnRXILXzdNFUfRDdcj7zZlF4BQ9ryn4SGrO
+LrY+vU6d9cIVPcG8yei6s7zLCDED4tcdUxL1a1XvWUr5eVglVARkGu739Qta2G5c
+ZnWPY16ZL7eafmAm8QRKMNh1So9dnEe8MzBMvHBno67JFVSWjyNY/A==
+-----END RSA PRIVATE KEY-----";
+}
+sub saml_key_proxy_private_sig {
+    "-----BEGIN RSA PRIVATE KEY-----
+MIIEpgIBAAKCAQEAztmb1JZk/agkYYm23D4dqaLS4EKHKrjO4eBvwtWZLexAGR1K
+DpcrHqLyqJoal+q4A8drI7lxElSt6xRKJ4DIxQM1jqRcmE6EzdL6BfTaRace3zIu
+hjDSQUZJdtFtlJynQT1cJbx5ZYhqZbYANm9NZRcYZ5gWeyF9nl41xA79AMuYlpt7
+eWDR8cnQJXwV790991FQ9yA2BBgTdSKkFqZ72P4lWu4shz3JCGf5hyq03hCHQ7bs
+fpgAdCrbQPTuJNFtS599ClMu+AcRcwJcS233pHd306PRHCXn3Eapq6gEoHxgLVNp
++luAIhRA9EaOnZ0nVkFwFKn3vLXzV01iTliMeQIDAQABAoIBAQCEQj+RPlh0l/4r
+H5L8X/s3bBTJr8AdYO1nH8pWGZ1H77dMV53yllXL0QS3KVG3sSzXvbqTrQ7PWbWa
+ie6gM4gr8FFeU1mhSRNBR5T2Ggk2YBUtQTjeNHk7o2V1w5L9YuzOmh1BQ7Gbag4d
+2rFoHOKvsIS6OFSnhlJ74GEgazT6PA0I4Y3Bue6tJEzdITVtU0ZWnKEBOWvxb/XV
+6fCFgVF1IfYx5ufHFmJA/PTm6cDyXyMTOk50vRVqSF1R50y/Ew18BGNQmeflVMWr
+oEy821feLz2+C4hdyhtx3grVLVH4iyHzt0+0hFi6YpkEv4uSJGI5HT43GpjJbZGz
+lAgAVFMBAoGBAPUTiYyzckOGx/cYzTUpk3EV+eaLJ8KtEr6DJMdLhHKhORwjXl51
+E0L3D6xLJhugEglrNHQ6c34AIJIudq4sz5qwuOvMKARkK7jBc0OZTkixr7dQdYeI
+HfR46aQCoFhBdBvPVr8TzoX35qr41VibyaBUi6NkHSeAqjPZwPsJTwTVAoGBANgR
+4ytCOChToKA/6hjj80WJpOH60DIshptimQu3LmhJV+GCEBaDkGrAUTpYeHqSvY3c
+oYsKG6Z6HTOzW1zD6LkAQMrJFZwqHVs7iqWRIjIqKNcCyDM8JCStZdbq3J7xq7vr
+Rdv+xGqt+Er3Fsr2rvF3/NEo0rQPCxfx1SeDCAsVAoGBAInFY+vu7Os9F6i3DpU2
+PCa0ffm2fLGZ7hGfU8udjmWKcLp6v5BGLH/Wt77ZuCCLidg1phU4zrgkhirnZ9xe
+YI7LjgkwicZ+MX35cjysMC/5g5h/6LI6OOy4FFAZEd7LXORNWKyuC8mQJOI0ZGsd
+mOlC3gUKQMF2OThQz4XQI9XJAoGBAIA5PUKyrXjhB/WReG8E951QrdSdb2gXHFqi
+DIjzUEr7G3fsI3f44382Wf3x+q1i37KMOCG3Aemtlh7UVWebq0P+bnTpGDXwmDNI
+BmNy2YRDmLDgKcad7iUF8eW0wvBgIrYGTRLdAdr9GtgCAji4Y+FQf2vwefn443B2
+RzSHggJxAoGBAKOHVA6JohafcaGBNEdEUgFX+bheBAxVsYhtnMgiEKK2Zvlf4jc5
+/iBp1VzYrAmZXHLXkI2BkxXBX3rsRJ04IoCnF0VCOLGBilu3u/eg+c0S1RAbTxWh
+onzAhxhnMjGAHRHCOlWVYosZQ9m4BI9Aq0COlbs/qDk0EfTT4FpO93Gd
+-----END RSA PRIVATE KEY-----";
+}
+
+sub saml_key_proxy_public_enc {
+    "-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2vzoUiQ4GsM5qLjoxslE
+DKj+RrPh/A743JCWe1Hbadjd5yD4gPwmJUxMF+MJcQlo/TkmKbTonPdIoAqDknbU
+xfFTntp0VkdKrB64xr0Stpy7123hPszat3SbU3RYypdobEcuSAS77w9X1KnkRL1+
+CIe59qSsghO3l3b2IJ6qPFXdx/cro7+K3O7w8wAEJ9KmxA0KdiZpSFgTAqfNDSKx
+8NLwZOeDpsHouAxy1E2kine+9ESBTRAM2PgiGZvU5JA1SZscdEg3wTftJxxPFnAJ
+MwtqM3IVC6B+TqsIP5Wlk1PQQqH75gjtBYDVduynBwU+l/UUmp1aDRZupuH8PF51
+pwIDAQAB
+-----END PUBLIC KEY-----";
+}
+
+sub saml_key_proxy_public_sig {
+    "-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAztmb1JZk/agkYYm23D4d
+qaLS4EKHKrjO4eBvwtWZLexAGR1KDpcrHqLyqJoal+q4A8drI7lxElSt6xRKJ4DI
+xQM1jqRcmE6EzdL6BfTaRace3zIuhjDSQUZJdtFtlJynQT1cJbx5ZYhqZbYANm9N
+ZRcYZ5gWeyF9nl41xA79AMuYlpt7eWDR8cnQJXwV790991FQ9yA2BBgTdSKkFqZ7
+2P4lWu4shz3JCGf5hyq03hCHQ7bsfpgAdCrbQPTuJNFtS599ClMu+AcRcwJcS233
+pHd306PRHCXn3Eapq6gEoHxgLVNp+luAIhRA9EaOnZ0nVkFwFKn3vLXzV01iTliM
+eQIDAQAB
+-----END PUBLIC KEY-----";
+}
+
 sub saml_key_idp_private_enc {
     "-----BEGIN RSA PRIVATE KEY-----
 MIIEogIBAAKCAQEAnfKBDG/K0TnGT7Xu8q1N45sNWvIK91SqNg8nvN2uVeKoHADT
@@ -347,6 +430,192 @@ EOF
       ;
 }
 
+sub samlProxyMetaDataXML {
+    my ( $name, $type ) = @_;
+    my $org = uc($name);
+    return <<"EOF"
+<?xml version="1.0"?>
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+entityID="http://auth.$name.com/saml/metadata">
+  <IDPSSODescriptor WantAuthnRequestsSigned="true"
+  protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <ds:KeyValue>
+	<RSAKeyValue xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<Modulus>ztmb1JZk/agkYYm23D4dqaLS4EKHKrjO4eBvwtWZLexAGR1KDpcrHqLyqJoal+q4A8drI7lxElSt
+6xRKJ4DIxQM1jqRcmE6EzdL6BfTaRace3zIuhjDSQUZJdtFtlJynQT1cJbx5ZYhqZbYANm9NZRcY
+Z5gWeyF9nl41xA79AMuYlpt7eWDR8cnQJXwV790991FQ9yA2BBgTdSKkFqZ72P4lWu4shz3JCGf5
+hyq03hCHQ7bsfpgAdCrbQPTuJNFtS599ClMu+AcRcwJcS233pHd306PRHCXn3Eapq6gEoHxgLVNp
++luAIhRA9EaOnZ0nVkFwFKn3vLXzV01iTliMeQ==
+</Modulus>
+		<Exponent>AQAB
+</Exponent>
+	</RSAKeyValue>
+</ds:KeyValue>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <KeyDescriptor use="encryption">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <ds:KeyValue>
+	<RSAKeyValue xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<Modulus>2vzoUiQ4GsM5qLjoxslEDKj+RrPh/A743JCWe1Hbadjd5yD4gPwmJUxMF+MJcQlo/TkmKbTonPdI
+oAqDknbUxfFTntp0VkdKrB64xr0Stpy7123hPszat3SbU3RYypdobEcuSAS77w9X1KnkRL1+CIe5
+9qSsghO3l3b2IJ6qPFXdx/cro7+K3O7w8wAEJ9KmxA0KdiZpSFgTAqfNDSKx8NLwZOeDpsHouAxy
+1E2kine+9ESBTRAM2PgiGZvU5JA1SZscdEg3wTftJxxPFnAJMwtqM3IVC6B+TqsIP5Wlk1PQQqH7
+5gjtBYDVduynBwU+l/UUmp1aDRZupuH8PF51pw==
+</Modulus>
+		<Exponent>AQAB
+</Exponent>
+	</RSAKeyValue>
+</ds:KeyValue>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <ArtifactResolutionService isDefault="true" index="0"
+     Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+     Location="http://auth.$name.com/saml/artifact" />
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
+     Location="http://auth.$name.com/saml/singleLogout"
+    ResponseLocation="http://auth.$name.com/saml/singleLogoutReturn" />
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
+     Location="http://auth.$name.com/saml/singleSignOn" />
+  </IDPSSODescriptor>
+  <SPSSODescriptor AuthnRequestsSigned="true"
+  WantAssertionsSigned="true"
+  protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <ds:KeyValue>
+	<RSAKeyValue xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<Modulus>ztmb1JZk/agkYYm23D4dqaLS4EKHKrjO4eBvwtWZLexAGR1KDpcrHqLyqJoal+q4A8drI7lxElSt
+6xRKJ4DIxQM1jqRcmE6EzdL6BfTaRace3zIuhjDSQUZJdtFtlJynQT1cJbx5ZYhqZbYANm9NZRcY
+Z5gWeyF9nl41xA79AMuYlpt7eWDR8cnQJXwV790991FQ9yA2BBgTdSKkFqZ72P4lWu4shz3JCGf5
+hyq03hCHQ7bsfpgAdCrbQPTuJNFtS599ClMu+AcRcwJcS233pHd306PRHCXn3Eapq6gEoHxgLVNp
++luAIhRA9EaOnZ0nVkFwFKn3vLXzV01iTliMeQ==
+</Modulus>
+		<Exponent>AQAB
+</Exponent>
+	</RSAKeyValue>
+</ds:KeyValue>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <KeyDescriptor use="encryption">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <ds:KeyValue>
+	<RSAKeyValue xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<Modulus>2vzoUiQ4GsM5qLjoxslEDKj+RrPh/A743JCWe1Hbadjd5yD4gPwmJUxMF+MJcQlo/TkmKbTonPdI
+oAqDknbUxfFTntp0VkdKrB64xr0Stpy7123hPszat3SbU3RYypdobEcuSAS77w9X1KnkRL1+CIe5
+9qSsghO3l3b2IJ6qPFXdx/cro7+K3O7w8wAEJ9KmxA0KdiZpSFgTAqfNDSKx8NLwZOeDpsHouAxy
+1E2kine+9ESBTRAM2PgiGZvU5JA1SZscdEg3wTftJxxPFnAJMwtqM3IVC6B+TqsIP5Wlk1PQQqH7
+5gjtBYDVduynBwU+l/UUmp1aDRZupuH8PF51pw==
+</Modulus>
+		<Exponent>AQAB
+</Exponent>
+	</RSAKeyValue>
+</ds:KeyValue>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <ArtifactResolutionService isDefault="true" index="0"
+     Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+     Location="http://auth.$name.com/saml/artifact" />
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
+     Location="http://auth.$name.com/saml/proxySingleLogout"
+    ResponseLocation="http://auth.$name.com/saml/proxySingleLogoutReturn" />
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <AssertionConsumerService isDefault="true" index="0"
+     Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+     Location="http://auth.$name.com/saml/proxySingleSignOnPost" />
+    <AssertionConsumerService isDefault="false" index="1"
+     Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
+     Location="http://auth.$name.com/saml/proxySingleSignOnArtifact" />
+  </SPSSODescriptor>
+  <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <ds:KeyValue>
+	<RSAKeyValue xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<Modulus>ztmb1JZk/agkYYm23D4dqaLS4EKHKrjO4eBvwtWZLexAGR1KDpcrHqLyqJoal+q4A8drI7lxElSt
+6xRKJ4DIxQM1jqRcmE6EzdL6BfTaRace3zIuhjDSQUZJdtFtlJynQT1cJbx5ZYhqZbYANm9NZRcY
+Z5gWeyF9nl41xA79AMuYlpt7eWDR8cnQJXwV790991FQ9yA2BBgTdSKkFqZ72P4lWu4shz3JCGf5
+hyq03hCHQ7bsfpgAdCrbQPTuJNFtS599ClMu+AcRcwJcS233pHd306PRHCXn3Eapq6gEoHxgLVNp
++luAIhRA9EaOnZ0nVkFwFKn3vLXzV01iTliMeQ==
+</Modulus>
+		<Exponent>AQAB
+</Exponent>
+	</RSAKeyValue>
+</ds:KeyValue>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <KeyDescriptor use="encryption">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <ds:KeyValue>
+	<RSAKeyValue xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<Modulus>2vzoUiQ4GsM5qLjoxslEDKj+RrPh/A743JCWe1Hbadjd5yD4gPwmJUxMF+MJcQlo/TkmKbTonPdI
+oAqDknbUxfFTntp0VkdKrB64xr0Stpy7123hPszat3SbU3RYypdobEcuSAS77w9X1KnkRL1+CIe5
+9qSsghO3l3b2IJ6qPFXdx/cro7+K3O7w8wAEJ9KmxA0KdiZpSFgTAqfNDSKx8NLwZOeDpsHouAxy
+1E2kine+9ESBTRAM2PgiGZvU5JA1SZscdEg3wTftJxxPFnAJMwtqM3IVC6B+TqsIP5Wlk1PQQqH7
+5gjtBYDVduynBwU+l/UUmp1aDRZupuH8PF51pw==
+</Modulus>
+		<Exponent>AQAB
+</Exponent>
+	</RSAKeyValue>
+</ds:KeyValue>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+     Location="http://auth.$name.com/saml/AA/SOAP" />
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:2.0:nameid-format:entity</NameIDFormat>
+    <NameIDFormat>
+    urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+  </AttributeAuthorityDescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">$org</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">
+    $org</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">
+    http://www.$name.com</OrganizationURL>
+  </Organization>
+</EntityDescriptor>
+EOF
+      ;
+}
+
 sub samlIDPMetaDataXML {
     my ( $name, $type ) = @_;
     my $org = uc($name);
@@ -463,7 +732,7 @@ entityID="http://auth.$name.com/saml/metadata">
     <NameIDFormat>
     urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
     <AssertionConsumerService isDefault="true" index="0"
-     Binding="urn:oasis:names:tc:SAML:2.0:bindings:$type"
+     Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
      Location="http://auth.$name.com/saml/proxySingleSignOnPost" />
     <AssertionConsumerService isDefault="false" index="1"
      Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
