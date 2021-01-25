@@ -1,5 +1,9 @@
 Revision history for Net-IPAM-Block
 
+3.00    Tue, 19 Jan 2021 08:12:14 +0100
+        * faster sorting
+        * remove deprecated find_free_cidrs()
+
 2.03    Mon, 03 Aug 2020 11:01:11 +0200
         * wrong hint in POD for aggregate()
 
@@ -11,8 +15,7 @@ Revision history for Net-IPAM-Block
         * more test coverage
 
 2.00    Thu, 30 Jul 2020 09:42:09 +0200
-        * API CHANGE: aggregate returns now longer the blocks to cidrs,
-          just returns the aggregated blocks
+        * API CHANGE: aggregate now returns the aggregated blocks, no implicit conversion to_cidrs
         * new diff(), find_free_cidrs is now DEPRECATED
 
 1.17    Wed, 29 Jul 2020 21:55:25 +0200

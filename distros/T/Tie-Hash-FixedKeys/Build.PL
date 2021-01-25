@@ -1,7 +1,6 @@
 use Module::Build;
 my $build = Module::Build->new(
   module_name => 'Tie::Hash::FixedKeys',
-  dist_version => '1.13.1',
   license => 'perl',
   requires => {
     perl           => '5.6.0',
@@ -14,6 +13,9 @@ my $build = Module::Build->new(
        type => 'git',
        url  => 'git://github.com/davorg/tie-hash-fixedkeys.git',
        web  => 'https://github.com/davorg/tie-hash-fixedkeys',
+      },
+      bugtracker => {
+       web  => 'https://github.com/davorg/tie-hash-fixedkeys/issues',
       },
     },
   },

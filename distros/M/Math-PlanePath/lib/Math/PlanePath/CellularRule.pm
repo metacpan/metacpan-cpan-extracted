@@ -40,7 +40,7 @@ use strict;
 use Carp 'croak';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -1163,7 +1163,7 @@ sub _UNDOCUMENTED__rule_to_mirror {
   use strict;
   use Carp 'croak';
   use vars '$VERSION', '@ISA';
-  $VERSION = 128;
+  $VERSION = 129;
   use Math::PlanePath;
   @ISA = ('Math::PlanePath');
 
@@ -1362,7 +1362,7 @@ sub _UNDOCUMENTED__rule_to_mirror {
   package Math::PlanePath::CellularRule::OddSolid;
   use strict;
   use vars '$VERSION', '@ISA';
-  $VERSION = 128;
+  $VERSION = 129;
   use Math::PlanePath;
   @ISA = ('Math::PlanePath');
 
@@ -1449,7 +1449,7 @@ sub _UNDOCUMENTED__rule_to_mirror {
   use strict;
   use Carp 'croak';
   use vars '$VERSION', '@ISA';
-  $VERSION = 128;
+  $VERSION = 129;
   use Math::PlanePath;
   @ISA = ('Math::PlanePath');
   *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
@@ -1691,7 +1691,7 @@ sub _UNDOCUMENTED__rule_to_mirror {
   use strict;
   use Carp 'croak';
   use vars '$VERSION', '@ISA';
-  $VERSION = 128;
+  $VERSION = 129;
   use Math::PlanePath;
   @ISA = ('Math::PlanePath');
   *_divrem = \&Math::PlanePath::_divrem;

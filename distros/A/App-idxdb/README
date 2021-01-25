@@ -1,0 +1,153 @@
+NAME
+    App::idxdb - Import data for stocks on the IDX (Indonesian Stock
+    Exchange) and perform queries on them
+
+VERSION
+    This document describes version 0.004 of App::idxdb (from Perl
+    distribution App-idxdb), released on 2021-01-22.
+
+SYNOPSIS
+    See the included CLI script idxdb.
+
+DESCRIPTION
+FUNCTIONS
+  daily
+    Usage:
+
+     daily(%args) -> [status, msg, payload, meta]
+
+    Show data from daily stock/trading summary.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   date_end => *date* (default: 1611273600)
+
+    *   date_start => *date* (default: 1608681600)
+
+    *   fields => *array[str]* (default: ["Volume","Value","ForeignNetBuy"])
+
+    *   graph => *bool*
+
+        Show graph instead of table.
+
+    *   stocks* => *array[idx::listed_stock_code]*
+
+    *   total => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  ownership
+    Usage:
+
+     ownership(%args) -> [status, msg, payload, meta]
+
+    Show ownership of some stock through time.
+
+    Examples:
+
+    *   Show legends instead (e.g. ForeignIB = foreign bank, etc):
+
+         ownership(legend => 1); # -> [400, "Missing required argument: stock", undef, {}]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   date_end => *date* (default: 1611273600)
+
+    *   date_start => *date* (default: 1608681600)
+
+    *   fields => *array[str]* (default: ["LocalTotal","ForeignTotal"])
+
+    *   graph => *bool*
+
+        Show graph instead of table.
+
+    *   legend => *bool*
+
+        Show legend of ownership instead (e.g. ForeignIB = foreign bank,
+        etc).
+
+    *   stock* => *idx::listed_stock_code*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  update
+    Usage:
+
+     update(%args) -> [status, msg, payload, meta]
+
+    Update data.
+
+    Currently this routine imports from text files in the "gudangdata"
+    repository on the local filesystem. Functionality to import from server
+    directly using Finance::SE::IDX and Finance::ID::KSEI will be added in
+    the future.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbpath => *str*
+
+        Path for SQLite database.
+
+        If not specified, will default to "~/idxdb.db".
+
+    *   gudangdata_path* => *dirname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-idxdb>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-idxdb>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-App-idxdb/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

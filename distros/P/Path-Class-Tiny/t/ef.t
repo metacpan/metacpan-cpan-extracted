@@ -31,4 +31,10 @@ ok $a->ef("$rel"), "file A -ef ./A (as string)";
 ok $rel->ef( $rel2 ), "./A -ef ../S/A (as Path::Class::Tiny)";
 ok $rel->ef("$rel2"), "./A -ef ../S/A (as string)";
 
+
+####################################################
+## TESTING AGAINST SYMLINKS DONE IN: t/symlinks.t ##
+####################################################
+
+
 done_testing;

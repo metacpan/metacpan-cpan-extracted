@@ -1,5 +1,15 @@
 Revision history for Perl extension UV
 
+1.903 TRIAL 2021-01-19
+    - Switch build system to Module::Build::Using::PkgConfig to see if the
+      late-alien handling there works better for users to install
+
+1.902     2021-01-19
+    - Adjust Makefile.PL for better pkg-config or Alien handling
+
+1.900, 1.901
+    - Totally rewritten XS logic by Paul "LeoNerd" Evans
+
 1.000009  2019-02-07
     - Improve the way we create constants. (xenu: pr/27)
     - Update the build to use @Starter v3

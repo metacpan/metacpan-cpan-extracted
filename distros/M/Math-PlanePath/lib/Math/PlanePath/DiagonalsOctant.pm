@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -22,7 +22,7 @@ use strict;
 use Carp 'croak';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
 @ISA = ('Math::PlanePath');
@@ -571,6 +571,7 @@ L<http://oeis.org/A055087> (etc)
       A055086    X+Y, k repeating floor(k/2)+1 times
 
     A004652      N start and end of each even-numbered diagonal
+    A274427      map to N of full Diagonals
 
     permutations
       A056536     N of PyramidRows in DiagonalsOctant order
@@ -594,7 +595,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

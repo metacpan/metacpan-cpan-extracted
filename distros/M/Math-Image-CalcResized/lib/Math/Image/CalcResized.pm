@@ -1,9 +1,9 @@
 package Math::Image::CalcResized;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-23'; # DATE
+our $DATE = '2020-12-24'; # DATE
 our $DIST = 'Math-Image-CalcResized'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -284,6 +284,9 @@ _
         {args=>{size=>"2592x1944", resize=>"^1024<"}, naked_result=>"2592x1944"},
         {args=>{size=>"2592x1944", resize=>"^10240<"}, naked_result=>"10240x7680"},
     ],
+    links => [
+        {url=>'prog:imgsize'},
+    ],
 };
 sub calc_image_resized_size {
     _calc_or_human('calc', @_);
@@ -380,7 +383,7 @@ Math::Image::CalcResized - Calculate dimensions of image/video resized by ImageM
 
 =head1 VERSION
 
-This document describes version 0.003 of Math::Image::CalcResized (from Perl distribution Math-Image-CalcResized), released on 2020-09-23.
+This document describes version 0.004 of Math::Image::CalcResized (from Perl distribution Math-Image-CalcResized), released on 2020-12-24.
 
 =head1 FUNCTIONS
 
@@ -399,163 +402,311 @@ Examples:
 
 =item * Example #1:
 
- calc_image_resized_size(size => "2592x1944", resize => ""); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => ""); # -> [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #2:
 
- calc_image_resized_size(size => "2592x1944", resize => "20%"); # -> "518x388"
+ calc_image_resized_size(size => "2592x1944", resize => "20%"); # -> [200, "OK (envelope generated)", "518x388"]
 
 =item * Example #3:
 
- calc_image_resized_size(size => "2592x1944", resize => "20%x40%"); # -> "518x777"
+ calc_image_resized_size(size => "2592x1944", resize => "20%x40%");
+
+Result:
+
+ [200, "OK (envelope generated)", "518x777"]
 
 =item * Example #4:
 
- calc_image_resized_size(size => "2592x1944", resize => "20x40%"); # -> "518x777"
+ calc_image_resized_size(size => "2592x1944", resize => "20x40%");
+
+Result:
+
+ [200, "OK (envelope generated)", "518x777"]
 
 =item * Example #5:
 
- calc_image_resized_size(size => "2592x1944", resize => 1024); # -> "1024x768"
+ calc_image_resized_size(size => "2592x1944", resize => 1024); # -> [200, "OK (envelope generated)", "1024x768"]
 
 =item * Example #6:
 
- calc_image_resized_size(size => "2592x1944", resize => "1024>"); # -> "1024x768"
+ calc_image_resized_size(size => "2592x1944", resize => "1024>");
+
+Result:
+
+ [200, "OK (envelope generated)", "1024x768"]
 
 =item * Example #7:
 
- calc_image_resized_size(size => "2592x1944", resize => "10240>"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "10240>");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #8:
 
- calc_image_resized_size(size => "2592x1944", resize => "1024^"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "1024^");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #9:
 
- calc_image_resized_size(size => "2592x1944", resize => "10240^"); # -> "10240x7680"
+ calc_image_resized_size(size => "2592x1944", resize => "10240^");
+
+Result:
+
+ [200, "OK (envelope generated)", "10240x7680"]
 
 =item * Example #10:
 
- calc_image_resized_size(size => "2592x1944", resize => "x1024"); # -> "1365x1024"
+ calc_image_resized_size(size => "2592x1944", resize => "x1024");
+
+Result:
+
+ [200, "OK (envelope generated)", "1365x1024"]
 
 =item * Example #11:
 
- calc_image_resized_size(size => "2592x1944", resize => "x768>"); # -> "1024x768"
+ calc_image_resized_size(size => "2592x1944", resize => "x768>");
+
+Result:
+
+ [200, "OK (envelope generated)", "1024x768"]
 
 =item * Example #12:
 
- calc_image_resized_size(size => "2592x1944", resize => "x7680>"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "x7680>");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #13:
 
- calc_image_resized_size(size => "2592x1944", resize => "x768^"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "x768^");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #14:
 
- calc_image_resized_size(size => "2592x1944", resize => "x7680^"); # -> "10240x7680"
+ calc_image_resized_size(size => "2592x1944", resize => "x7680^");
+
+Result:
+
+ [200, "OK (envelope generated)", "10240x7680"]
 
 =item * Example #15:
 
- calc_image_resized_size(size => "2592x1944", resize => "20000x10000"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "20000x10000");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #16:
 
- calc_image_resized_size(size => "2592x1944", resize => "20000x1000"); # -> "1333x1000"
+ calc_image_resized_size(size => "2592x1944", resize => "20000x1000");
+
+Result:
+
+ [200, "OK (envelope generated)", "1333x1000"]
 
 =item * Example #17:
 
- calc_image_resized_size(size => "2592x1944", resize => "100x200"); # -> "100x75"
+ calc_image_resized_size(size => "2592x1944", resize => "100x200");
+
+Result:
+
+ [200, "OK (envelope generated)", "100x75"]
 
 =item * Example #18:
 
- calc_image_resized_size(size => "2592x1944", resize => "100x100"); # -> "100x75"
+ calc_image_resized_size(size => "2592x1944", resize => "100x100");
+
+Result:
+
+ [200, "OK (envelope generated)", "100x75"]
 
 =item * Example #19:
 
- calc_image_resized_size(size => "2592x1944", resize => "10000x5000^"); # -> "10000x7500"
+ calc_image_resized_size(size => "2592x1944", resize => "10000x5000^");
+
+Result:
+
+ [200, "OK (envelope generated)", "10000x7500"]
 
 =item * Example #20:
 
- calc_image_resized_size(size => "2592x1944", resize => "5000x10000^"); # -> "13333x10000"
+ calc_image_resized_size(size => "2592x1944", resize => "5000x10000^");
+
+Result:
+
+ [200, "OK (envelope generated)", "13333x10000"]
 
 =item * Example #21:
 
- calc_image_resized_size(size => "2592x1944", resize => "100x100^"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "100x100^");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #22:
 
- calc_image_resized_size(size => "2592x1944", resize => "100x100!"); # -> "100x100"
+ calc_image_resized_size(size => "2592x1944", resize => "100x100!");
+
+Result:
+
+ [200, "OK (envelope generated)", "100x100"]
 
 =item * Example #23:
 
- calc_image_resized_size(size => "2592x1944", resize => "10000x5000>"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "10000x5000>");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #24:
 
- calc_image_resized_size(size => "2592x1944", resize => "5000x10000>"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "5000x10000>");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #25:
 
- calc_image_resized_size(size => "2592x1944", resize => "3000x1000>"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "3000x1000>");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #26:
 
- calc_image_resized_size(size => "2592x1944", resize => "2000x1000>"); # -> "1333x1000"
+ calc_image_resized_size(size => "2592x1944", resize => "2000x1000>");
+
+Result:
+
+ [200, "OK (envelope generated)", "1333x1000"]
 
 =item * Example #27:
 
- calc_image_resized_size(size => "2592x1944", resize => "100x100>"); # -> "100x75"
+ calc_image_resized_size(size => "2592x1944", resize => "100x100>");
+
+Result:
+
+ [200, "OK (envelope generated)", "100x75"]
 
 =item * Example #28:
 
- calc_image_resized_size(size => "2592x1944", resize => "10000x5000<"); # -> "10000x7500"
+ calc_image_resized_size(size => "2592x1944", resize => "10000x5000<");
+
+Result:
+
+ [200, "OK (envelope generated)", "10000x7500"]
 
 =item * Example #29:
 
- calc_image_resized_size(size => "2592x1944", resize => "5000x10000<"); # -> "13333x10000"
+ calc_image_resized_size(size => "2592x1944", resize => "5000x10000<");
+
+Result:
+
+ [200, "OK (envelope generated)", "13333x10000"]
 
 =item * Example #30:
 
- calc_image_resized_size(size => "2592x1944", resize => "3000x1000<"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "3000x1000<");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #31:
 
- calc_image_resized_size(size => "2592x1944", resize => "2000x1000<"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "2000x1000<");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #32:
 
- calc_image_resized_size(size => "2592x1944", resize => "100x100<"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "100x100<");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #33:
 
- calc_image_resized_size(size => "2592x1944", resize => "1024^>"); # -> "1365x1024"
+ calc_image_resized_size(size => "2592x1944", resize => "1024^>");
+
+Result:
+
+ [200, "OK (envelope generated)", "1365x1024"]
 
 =item * Example #34:
 
- calc_image_resized_size(size => "2592x1944", resize => "10240^>"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "10240^>");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #35:
 
- calc_image_resized_size(size => "2592x1944", resize => "1024^<"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "1024^<");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #36:
 
- calc_image_resized_size(size => "2592x1944", resize => "10240^<"); # -> "13653x10240"
+ calc_image_resized_size(size => "2592x1944", resize => "10240^<");
+
+Result:
+
+ [200, "OK (envelope generated)", "13653x10240"]
 
 =item * Example #37:
 
- calc_image_resized_size(size => "2592x1944", resize => "^1024>"); # -> "1024x768"
+ calc_image_resized_size(size => "2592x1944", resize => "^1024>");
+
+Result:
+
+ [200, "OK (envelope generated)", "1024x768"]
 
 =item * Example #38:
 
- calc_image_resized_size(size => "2592x1944", resize => "^10240>"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "^10240>");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #39:
 
- calc_image_resized_size(size => "2592x1944", resize => "^1024<"); # -> "2592x1944"
+ calc_image_resized_size(size => "2592x1944", resize => "^1024<");
+
+Result:
+
+ [200, "OK (envelope generated)", "2592x1944"]
 
 =item * Example #40:
 
- calc_image_resized_size(size => "2592x1944", resize => "^10240<"); # -> "10240x7680"
+ calc_image_resized_size(size => "2592x1944", resize => "^10240<");
+
+Result:
+
+ [200, "OK (envelope generated)", "10240x7680"]
 
 =back
 
@@ -638,75 +789,139 @@ Examples:
 
 =item * Example #1:
 
- image_resize_notation_to_human(resize => ""); # -> "no resizing"
+ image_resize_notation_to_human(resize => ""); # -> [200, "OK (envelope generated)", "no resizing"]
 
 =item * Example #2:
 
- image_resize_notation_to_human(resize => "50%"); # -> "scale to 50%"
+ image_resize_notation_to_human(resize => "50%"); # -> [200, "OK (envelope generated)", "scale to 50%"]
 
 =item * Example #3:
 
- image_resize_notation_to_human(resize => "50%x50%"); # -> "scale width to 50%, height to 50%"
+ image_resize_notation_to_human(resize => "50%x50%");
+
+Result:
+
+ [
+   200,
+   "OK (envelope generated)",
+   "scale width to 50%, height to 50%",
+ ]
 
 =item * Example #4:
 
- image_resize_notation_to_human(resize => 720); # -> "set width to 720px"
+ image_resize_notation_to_human(resize => 720); # -> [200, "OK (envelope generated)", "set width to 720px"]
 
 =item * Example #5:
 
- image_resize_notation_to_human(resize => "720>"); # -> "shrink width to 720px"
+ image_resize_notation_to_human(resize => "720>"); # -> [200, "OK (envelope generated)", "shrink width to 720px"]
 
 =item * Example #6:
 
- image_resize_notation_to_human(resize => "720^"); # -> "enlarge width to 720px"
+ image_resize_notation_to_human(resize => "720^"); # -> [200, "OK (envelope generated)", "enlarge width to 720px"]
 
 =item * Example #7:
 
- image_resize_notation_to_human(resize => "x720"); # -> "set height to 720px"
+ image_resize_notation_to_human(resize => "x720"); # -> [200, "OK (envelope generated)", "set height to 720px"]
 
 =item * Example #8:
 
- image_resize_notation_to_human(resize => "x720>"); # -> "shrink height to 720px"
+ image_resize_notation_to_human(resize => "x720>"); # -> [200, "OK (envelope generated)", "shrink height to 720px"]
 
 =item * Example #9:
 
- image_resize_notation_to_human(resize => "x720^"); # -> "enlarge height to 720px"
+ image_resize_notation_to_human(resize => "x720^"); # -> [200, "OK (envelope generated)", "enlarge height to 720px"]
 
 =item * Example #10:
 
- image_resize_notation_to_human(resize => "640x480"); # -> "fit image inside 640x480"
+ image_resize_notation_to_human(resize => "640x480"); # -> [200, "OK (envelope generated)", "fit image inside 640x480"]
 
 =item * Example #11:
 
- image_resize_notation_to_human(resize => "640x480^"); # -> "fit image to fit 640x480 inside it"
+ image_resize_notation_to_human(resize => "640x480^");
+
+Result:
+
+ [
+   200,
+   "OK (envelope generated)",
+   "fit image to fit 640x480 inside it",
+ ]
 
 =item * Example #12:
 
- image_resize_notation_to_human(resize => "640x480>"); # -> "shrink image to fit inside 640x480"
+ image_resize_notation_to_human(resize => "640x480>");
+
+Result:
+
+ [
+   200,
+   "OK (envelope generated)",
+   "shrink image to fit inside 640x480",
+ ]
 
 =item * Example #13:
 
- image_resize_notation_to_human(resize => "640x480<"); # -> "enlarge image to fit 640x480 inside it"
+ image_resize_notation_to_human(resize => "640x480<");
+
+Result:
+
+ [
+   200,
+   "OK (envelope generated)",
+   "enlarge image to fit 640x480 inside it",
+ ]
 
 =item * Example #14:
 
- image_resize_notation_to_human(resize => "640x480!"); # -> "set dimension to 640x480"
+ image_resize_notation_to_human(resize => "640x480!");
+
+Result:
+
+ [200, "OK (envelope generated)", "set dimension to 640x480"]
 
 =item * Example #15:
 
- image_resize_notation_to_human(resize => "720^>"); # -> "shrink shortest side to 720px"
+ image_resize_notation_to_human(resize => "720^>");
+
+Result:
+
+ [
+   200,
+   "OK (envelope generated)",
+   "shrink shortest side to 720px",
+ ]
 
 =item * Example #16:
 
- image_resize_notation_to_human(resize => "720^<"); # -> "enlarge shortest side to 720px"
+ image_resize_notation_to_human(resize => "720^<");
+
+Result:
+
+ [
+   200,
+   "OK (envelope generated)",
+   "enlarge shortest side to 720px",
+ ]
 
 =item * Example #17:
 
- image_resize_notation_to_human(resize => "^720>"); # -> "shrink longest side to 720px"
+ image_resize_notation_to_human(resize => "^720>");
+
+Result:
+
+ [200, "OK (envelope generated)", "shrink longest side to 720px"]
 
 =item * Example #18:
 
- image_resize_notation_to_human(resize => "^720<"); # -> "enlarge longest side to 720px"
+ image_resize_notation_to_human(resize => "^720<");
+
+Result:
+
+ [
+   200,
+   "OK (envelope generated)",
+   "enlarge longest side to 720px",
+ ]
 
 =back
 
@@ -742,7 +957,7 @@ Source repository is at L<https://github.com/perlancar/perl-Math-Image-CalcResiz
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Image-CalcResized>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Math-Image-CalcResized/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

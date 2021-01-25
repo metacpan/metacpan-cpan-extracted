@@ -34,7 +34,7 @@ BEGIN {
          await $f;
          $ret = "result";
       }
-      catch {
+      catch ($e) {
          $ret = "oopsie";
       }
       return $ret;
@@ -65,7 +65,7 @@ BEGIN {
          await $f;
          return "result";
       }
-      catch {}
+      catch ($e) {}
       $fellthrough++;
       return "fallthrough";
    }

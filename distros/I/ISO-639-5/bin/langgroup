@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/env perl
 #-*-perl-*-
 
 
@@ -27,6 +27,8 @@ langgroup - print language groups according to ISO639-5
 use strict;
 use warnings;
 
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
 use lib 'lib';
 use ISO::639::5 qw/:all/;
 

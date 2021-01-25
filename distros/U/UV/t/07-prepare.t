@@ -17,7 +17,8 @@ sub prepare_cb {
 
 my $prepare = UV::Prepare->new(on_prepare => \&prepare_cb);
 isa_ok($prepare, 'UV::Prepare');
-is($prepare->start(), 0, 'prepare start');
+$prepare->start();
+
 is(UV::Loop->default()->run(), 0, 'loop run');
 is($prepare_cb_called, 1, 'right number of prepare callbacks');
 

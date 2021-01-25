@@ -1,24 +1,11 @@
 package UV::Check;
 
-our $VERSION = '1.000009';
+our $VERSION = '1.903';
 
 use strict;
 use warnings;
 use Carp ();
-use Exporter qw(import);
 use parent 'UV::Handle';
-
-sub _after_new {
-    my ($self, $args) = @_;
-    $self->_add_event('check', $args->{on_check});
-    my $err = do { #catch
-        local $@;
-        eval { $self->_init($self->{_loop}); 1; }; #try
-        $@;
-    };
-    Carp::croak($err) if $err; # throw
-    return $self;
-}
 
 sub start {
     my $self = shift;
@@ -63,7 +50,6 @@ UV::Check - Check handles in libuv
   my $loop = UV::Loop->new(); # non-default loop
   my $check = UV::Check->new(
     loop => $loop,
-    on_alloc => sub {say "alloc!"},
     on_close => sub {say "close!"},
     on_check => sub {say "check!"},
   );
@@ -117,7 +103,6 @@ following extra methods available.
     # Or tell it what loop to initialize against
     my $check = UV::Check->new(
         loop => $loop,
-        on_alloc => sub {say "alloc!"},
         on_close => sub {say "close!"},
         on_check => sub {say "check!"},
     );

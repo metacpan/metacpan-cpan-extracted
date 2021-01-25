@@ -1,7 +1,7 @@
 use v5.28;
 use warnings;
 use Test::More;
-use Quantum::Superpositions::Lazy qw(fetch_matches with_sources);
+use Quantum::Superpositions::Lazy qw(superpos fetch_matches with_sources);
 
 sub power_sources
 {

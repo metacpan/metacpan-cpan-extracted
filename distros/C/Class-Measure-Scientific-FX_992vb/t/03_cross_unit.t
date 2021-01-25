@@ -29,7 +29,11 @@ $d = Class::Measure::Scientific::FX_992vb->length( 1, 'mile' );
 my $m =
   Class::Measure::Scientific::FX_992vb->area( ( ( $d->m()**2 ) / 640 ), 'm2' );
 my $a = Class::Measure::Scientific::FX_992vb->area( 1, 'acre' );
-is( $m->m2(), $a->m2(), q{One acre is 1/640 of a square mile} );
+is(
+    sprintf( qq{%.${acc}e}, $m->m2() ),
+    sprintf( qq{%.${acc}e}, $a->m2() ),
+    q{One acre is 1/640 of a square mile}
+);
 
 $d = Class::Measure::Scientific::FX_992vb->length( 1, 'ft' );
 my $i = Class::Measure::Scientific::FX_992vb->length( 1, 'in' );

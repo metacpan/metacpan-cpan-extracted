@@ -6,6 +6,9 @@ MANIFEST			This list of files
 README.md
 script/bookmarks
 t/00-load.t
+t/bookmarks.t
+t/data/test.md
+t/data/test.txt
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

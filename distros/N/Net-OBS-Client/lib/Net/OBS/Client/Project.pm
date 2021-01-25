@@ -18,9 +18,10 @@ package Net::OBS::Client::Project;
 
 use Moose;
 use XML::Structured;
+use Carp;
 
-with "Net::OBS::Client::Roles::BuildStatus";
-with "Net::OBS::Client::Roles::Client";
+with 'Net::OBS::Client::Roles::BuildStatus';
+with 'Net::OBS::Client::Roles::Client';
 
 =head1 NAME
 
@@ -49,10 +50,10 @@ has resultlist => (
   is      => 'rw',
   isa     => 'HashRef',
   lazy    => 1,
-  default => \&fetch_resultlist
+  default => \&fetch_resultlist,
 );
 
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 =head2 fetch_resultlist - fetch build result code and other information for a project
 
@@ -62,14 +63,14 @@ has resultlist => (
 sub fetch_resultlist {
   my ($self, %opts) = @_;
 
-  my $api_path = "/build/" . $self->name . "/_result";
+  my $api_path = '/build/'.$self->name.'/_result';
   my @ext;
 
   while (my ($k,$v) = each %opts) { push @ext, "$k=$v"; }
 
-  $api_path .= "?" . join '&', @ext if @ext;
-  my $list = $self->request( GET => $api_path );
-  my $data = XMLin( $self->dtd->resultlist, $list );
+  $api_path .= q{?} . join q{&}, @ext if @ext;
+  my $list = $self->request(GET=>$api_path);
+  my $data = XMLin($self->dtd->resultlist, $list);
 
   $self->resultlist($data);
 
@@ -85,8 +86,8 @@ sub fetch_resultlist {
 =cut
 
 sub code {
-  my $self = shift;
-  my $ra   = $self->_get_repo_arch(@_);
+  my ($self, @args) = @_;
+  my $ra   = $self->_get_repo_arch(@args);
   return $ra->{code};
 }
 
@@ -99,31 +100,29 @@ sub code {
 =cut
 
 sub dirty {
-  my $self = shift;
+  my ($self, @args) = @_;
 
-  my $ra = $self->_get_repo_arch(@_);
+  my $ra = $self->_get_repo_arch(@args);
 
   return ( exists $ra->{dirty} && $ra->{dirty} eq 'true' ) ? 1 : 0;
-
 }
 
 sub _get_repo_arch {
-  my $self = shift;
-  my ( $repo, $arch ) = @_;
+  my ($self, $repo, $arch) = @_;
 
   $self->repository($repo) if $repo;
   $self->arch($arch)       if $arch;
 
-  die "repository and arch needed to get code"
+  croak("repository and arch needed to get code\n")
     if ( !$self->repository || !$self->arch );
 
-  foreach my $result ( @{ $self->resultlist->{result} } ) {
+  foreach my $result ( @{$self->resultlist->{result}} ) {
     return $result
       if ( $result->{repository} eq $self->repository
       && $result->{arch} eq $self->arch );
   }
 
-  die "combination of repository and arch not found";
+  croak("combination of repository and arch not found\n");
 }
 
 __PACKAGE__->meta->make_immutable();

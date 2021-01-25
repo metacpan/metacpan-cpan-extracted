@@ -7,7 +7,7 @@ use warnings;
 use utf8;
 use 5.020000;
 
-our $VERSION = 'v1.1.3';
+our $VERSION = 'v1.1.4';
 
 use lib qw(./lib ../lib);
 
@@ -205,7 +205,7 @@ Framework Perl implementation
 
 =head1 VERSION
 
-This document describes C<TestWookieService.pl> version C<v1.1.3>
+This document describes C<TestWookieService.pl> version C<v1.1.4>
 
 =head1 USAGE
 

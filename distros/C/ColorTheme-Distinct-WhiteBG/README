@@ -1,0 +1,44 @@
+NAME
+    ColorTheme::Distinct::WhiteBG - Pick some distinct colors (that are
+    suitable for white background) for you
+
+VERSION
+    This document describes version 0.002 of ColorTheme::Distinct::WhiteBG
+    (from Perl distribution ColorTheme-Distinct-WhiteBG), released on
+    2021-01-20.
+
+DESCRIPTION
+    This is suitable when you want to have different colors for several
+    (like 5 or 10) items, e.g. in line or bar charts.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ColorTheme-Distinct-WhiteBG>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-ColorTheme-Distinct-WhiteBG>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-ColorTheme-Distinct-WhiteBG/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    ColorTheme::Distinct::BlackBG
+
+    Acme::CPANModules::CreatingPaletteOfVisuallyDistinctColors
+
+    Other "ColorTheme::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

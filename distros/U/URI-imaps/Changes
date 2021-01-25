@@ -1,3 +1,7 @@
+1.04    2021-01-24
+
+  - Move bugtracker to github.com.
+
 1.03    2016-09-03
 
   - Set URI version in PREREQ_PM.

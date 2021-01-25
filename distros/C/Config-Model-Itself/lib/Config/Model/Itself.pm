@@ -7,10 +7,10 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself 2.021;
+package Config::Model::Itself 2.022;
 
 use Mouse ;
-use Config::Model 2.134;
+use Config::Model 2.141;
 use 5.014; # for the /r modifier
 
 use IO::File ;
@@ -851,7 +851,7 @@ Config::Model::Itself - Model (or schema) editor for Config::Model
 
 =head1 VERSION
 
-version 2.021
+version 2.022
 
 =head1 SYNOPSIS
 

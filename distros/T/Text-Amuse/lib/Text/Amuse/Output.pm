@@ -1178,7 +1178,7 @@ sub manage_table_html {
     # here it's full of hardcoded things, but it can't be done differently
     my $attrs = '';
     if ($table->{specification}) {
-        $attrs =q{ class="markdown-style-table"}
+        $attrs =q{ class="markdown-style-table" style="width:100%"}
     }
     push @out, "\n<table${attrs}>";
 
@@ -1318,6 +1318,16 @@ sub _table_row_specification {
                 push @spec, 'r';
             }
             else {
+                push @spec, 'X';
+            }
+        }
+        elsif ($c =~ m/\A\s*---+\s*([0-9]+)\s*---+\s*\z/) {
+            my $percentage = $1;
+            if ($percentage > 0 and $percentage < 100) {
+                push @spec, 'p{' . sprintf('%.2f', $percentage / 100) . "\\textwidth}";
+            }
+            else {
+                warn "Table width should be a percentage between 1 and 99, you provided $percentage\n";
                 push @spec, 'X';
             }
         }
@@ -2037,6 +2047,9 @@ sub _format_table_tag {
                     );
         if (my $align = $specs{$spec}) {
             $attrs = qq{ style="text-align:$align"};
+        }
+        elsif ($spec =~ m/p\{0\.([0-9][0-9])\\textwidth/) {
+            $attrs = qq{ style="width:$1%" };
         }
     }
     return '<' . $tag . $attrs . '>';

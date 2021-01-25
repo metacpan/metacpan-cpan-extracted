@@ -2,7 +2,7 @@ use Module::Build;
 
 my $build = Module::Build->new(
   module_name        => 'Template::Plugin::XML::Feed',
-  dist_version       => '1.0.1',
+  dist_version       => '1.0.2',
   license            => 'perl',
   create_makefile_pl => 'traditional',
   requires           => {
@@ -23,6 +23,9 @@ my $build = Module::Build->new(
        type => 'git',
        url  => 'git://github.com/davorg/template-plugin-xml-feed.git',
        web  => 'https://github.com/davorg/template-plugin-xml-feed',
+     },
+      bugtrakcer => {
+       web  => 'https://github.com/davorg/template-plugin-xml-feed/issues',
      },
    },
  },

@@ -33,7 +33,8 @@ sub repeat_1_cb {
     is($handle->repeat(), 50, 'Got the right timer repeat value');
     $repeat_1_cb_called++;
 
-    is(0, $repeat_2->again(), 'Repeat 2 again success');
+    $repeat_2->again();
+
     if ($repeat_1_cb_called == 10) {
         $handle->close(\&close_cb);
         # we're not calling ->again on repeat_2 anymore. so after this,
@@ -52,7 +53,7 @@ sub repeat_2_cb {
     $repeat_2_cb_called++;
 
     if (0 == $repeat_2->repeat()) {
-        is(0, $handle->active(), 'not active');
+        ok(!$handle->active(), 'not active');
         $handle->close(\&close_cb);
         return;
     }
@@ -67,13 +68,14 @@ sub repeat_2_cb {
     # Verify that it is not possible to uv_timer_again a never-started timer
     $dummy = UV::Timer->new();
     isa_ok($dummy, 'UV::Timer', 'Got a new timer');
-    is(UV::UV_EINVAL, $dummy->again(), '->again erred as expected');
-    $dummy->unref();
+    my $err = do { local $@; eval { $dummy->again(); 1 } ? undef : $@ };
+    isa_ok($err, "UV::Exception::EINVAL", '->again failed EINVAL as expected');
+    undef $dummy;
 
     # Start timer repeat_1
     $repeat_1 = UV::Timer->new();
     isa_ok($repeat_1, 'UV::Timer', 'repeat_1 timer new');
-    is($repeat_1->start(50, 0, \&repeat_1_cb), 0, 'repeat_1 started');
+    $repeat_1->start(50, 0, \&repeat_1_cb);
     is($repeat_1->repeat(), 0, 'repeat_1 has the right repeat');
 
     # Actually make repeat_1 repeating
@@ -84,7 +86,7 @@ sub repeat_2_cb {
     # it should not time out until repeat_1 stops
     $repeat_2 = UV::Timer->new();
     isa_ok($repeat_2, 'UV::Timer', 'repeat_2 timer new');
-    is($repeat_2->start(100, 100, \&repeat_2_cb), 0, 'repeat_2 started');
+    $repeat_2->start(100, 100, \&repeat_2_cb);
     is($repeat_2->repeat(), 100, 'Got the right repeat value for repeat_2');
 
     UV::default_loop()->run(UV::Loop::UV_RUN_DEFAULT);

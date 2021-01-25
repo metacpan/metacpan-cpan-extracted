@@ -47,6 +47,20 @@ Redis Server >= 2.6.12.
 
     If $blocking is true, lock\_guard will be blocked until getting a lock. Otherwise returns immedetly when the lock is held by others .
 
+# Variables
+
+- **$WAIT\_QUEUE**
+
+    Default: 0
+
+    If set to 1, Use the Redis BLPOP command to wait for unlocking instead of periodical polling.
+
+- **$WARN\_LOCK\_TIME\_THRESHOLD**
+
+    Default: 0
+
+    If set to number over 0, put a warnings message to stderr when a lock guard unlocked spent over that seconds.
+
 # LICENSE
 
 Copyright (C) FUJIWARA Shunichiro.

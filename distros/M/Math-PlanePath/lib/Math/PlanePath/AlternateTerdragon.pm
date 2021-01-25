@@ -1,4 +1,4 @@
-# Copyright 2018, 2019 Kevin Ryde
+# Copyright 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -36,7 +36,7 @@ use Math::PlanePath::Base::Digits
   'round_up_pow';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 @ISA = ('Math::PlanePath');
 
 use Math::PlanePath::TerdragonMidpoint;
@@ -809,7 +809,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2018, 2019 Kevin Ryde
+Copyright 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

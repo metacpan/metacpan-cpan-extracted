@@ -4,14 +4,14 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
   'NAME' => 'Tie::Hash::Regex',
-  'INSTALLDIRS' => 'site',
-  'EXE_FILES' => [],
-  'PL_FILES' => {},
   'VERSION_FROM' => 'lib/Tie/Hash/Regex.pm',
   'PREREQ_PM' => {
+                   'Attribute::Handlers' => 0,
                    'Test::More' => 0,
-                   'Tie::Hash' => 0,
-                   'Attribute::Handlers' => 0
-                 }
+                   'Tie::Hash' => 0
+                 },
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
+  'PL_FILES' => {}
 )
 ;

@@ -5,7 +5,6 @@ use Moose::Role;
 use LWP::UserAgent;
 use XML::Structured;
 use Config::Tiny;
-use feature 'say';
 use HTTP::Request;
 use URI::URL;
 use Path::Class qw/file/;
@@ -13,7 +12,7 @@ use HTTP::Cookies;
 
 has use_oscrc => (
   is      =>    'rw',
-  isa     =>    'Bool'
+  isa     =>    'Bool',
 );
 
 has apiurl => (
@@ -22,9 +21,9 @@ has apiurl => (
   lazy    =>    1,
   default =>    sub {
     return ($_[0]->use_oscrc)
-     ? $_[0]->oscrc->{general}->{apiurl} 
+     ? $_[0]->oscrc->{general}->{apiurl}
      : 'https://api.opensuse.org/public';
-  }
+  },
 );
 
 has user => (
@@ -34,8 +33,8 @@ has user => (
   default =>    sub {
     my $self = shift;
     return $self->oscrc->{$self->apiurl}->{user} if ($self->use_oscrc);
-    return ''
-  }
+    return q{};
+  },
 );
 
 has pass => (
@@ -45,8 +44,8 @@ has pass => (
   default =>    sub {
     my $self = shift;
     return $self->oscrc->{$self->apiurl}->{pass} if ($self->use_oscrc);
-    return ''
-  }
+    return q{};
+  },
 );
 
 
@@ -58,19 +57,20 @@ has user_agent => (
     my $self = shift;
     my $ua = LWP::UserAgent->new;
     if ($ENV{NET_OBS_CLIENT_DEBUG}) {
-      require LWP::ConsoleLogger::Easy;
-      LWP::ConsoleLogger::Easy->import('debug_ua');
-      debug_ua($ua);
+      eval {
+        require LWP::ConsoleLogger::Easy;
+        LWP::ConsoleLogger::Easy->import('debug_ua');
+        debug_ua($ua);
+      };
     }
     $ua->timeout(10);
     $ua->env_proxy;
 
     return $ua
-  }
-  
+  },
 );
 
-has oscrc => ( 
+has oscrc => (
   is      =>    'rw',
   isa     =>    'Object',
   lazy    =>    1,
@@ -81,21 +81,29 @@ has oscrc => (
     } elsif (-f "$ENV{HOME}/.config/osc/oscrc") {
       $rc = "$ENV{HOME}/.config/osc/oscrc";
     } else {
-      die "No oscrc found";
+      die "No oscrc found\n";
     }
     my $cf =  Config::Tiny->read($rc);
-    die "Cannot open .oscrc" if ! $cf;
+    die "Cannot open .oscrc\n" if ! $cf;
     return $cf;
-  }
+  },
+);
 
+has repository => (
+  is      =>    'rw',
+  isa     =>    'Str',
+);
+
+has arch => (
+  is      =>    'rw',
+  isa     =>    'Str',
 );
 
 sub debug {
-  if ( $ENV{NET_OBS_CLIENT_DEBUG} ){
-    foreach my $line (@_) {
-      say $line
-    }
-  }
+  my @lines = @_;
+  return if (! $ENV{NET_OBS_CLIENT_DEBUG} );
+  for (@lines) {print "$_\n"};
+  return;
 }
 
 sub request {
@@ -115,11 +123,10 @@ sub request {
 
   my $response = $ua->request($req);
 
-  if ($response->is_success) {
-    return $response->decoded_content;  # or whatever
-  } else {
-      die $response->status_line . " while $method Request on $url\n";
+  if (!$response->is_success) {
+    die $response->status_line . " while $method Request on $url\n";
   }
+  return $response->decoded_content;  # or whatever
 }
 
 1; # End of Net::OBS::Client

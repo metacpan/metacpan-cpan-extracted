@@ -1,6 +1,6 @@
 package KelpX::Symbiosis::Test;
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use Kelp::Base;
 use Kelp::Test;
@@ -17,6 +17,18 @@ sub wrap
 sub run
 {
 	shift->app->run_all(@_);
+}
+
+sub can
+{
+	my ($self, $func) = @_;
+
+	if (ref $self) {
+		my $can = $self->app->can($func);
+		return $can if defined $can;
+	}
+
+	return $self->SUPER::can($func);
 }
 
 sub AUTOLOAD

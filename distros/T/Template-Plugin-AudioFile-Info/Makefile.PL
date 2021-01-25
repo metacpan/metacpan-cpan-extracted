@@ -3,14 +3,14 @@ require 5.006000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PREREQ_PM' => {
-                   'Template' => 0,
-                   'AudioFile::Info' => '2.000001'
-                 },
   'NAME' => 'Template::Plugin::AudioFile::Info',
-  'PL_FILES' => {},
-  'EXE_FILES' => [],
   'VERSION_FROM' => 'lib/Template/Plugin/AudioFile/Info.pm',
-  'INSTALLDIRS' => 'site'
+  'PREREQ_PM' => {
+                   'AudioFile::Info' => '2.000001',
+                   'Template' => 0
+                 },
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
+  'PL_FILES' => {}
 )
 ;

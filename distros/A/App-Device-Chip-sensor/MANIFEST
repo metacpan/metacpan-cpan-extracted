@@ -1,0 +1,14 @@
+bin/device-chip-sensor
+bin/device-chip-sensor-datalogger
+Build.PL
+Changes
+lib/App/Device/Chip/sensor.pm
+MANIFEST			This list of files
+t/00use.t
+t/10args.t
+t/11chips.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

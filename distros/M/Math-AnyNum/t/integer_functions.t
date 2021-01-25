@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 633;
+plan tests => 637;
 
 use Math::AnyNum qw(:ntheory prod);
 use Math::GMPz::V qw();
@@ -745,6 +745,14 @@ is(faulhaber_sum(10, 0), 10);
 is(faulhaber_sum(10, 1), 55);
 is(faulhaber_sum(10, 2), 385);
 
+is(faulhaber(2,  10),                       faulhaber_sum(10, 2));
+is(faulhaber(10, Math::AnyNum->new("4/3")), "3147578/177147");
+
+#<<<
+is(faulhaber(15, "7/11"), (bernoulli(15+1, Math::AnyNum->new("7/11") + 1) - bernoulli(15+1, 0)) / (15+1));
+is(faulhaber(Math::AnyNum->new(16), Math::AnyNum->new("3/12")), (bernoulli(Math::AnyNum->new(16+1), "5/4") - bernoulli(16+1, 0)) / (16+1));
+#>>>
+
 #<<<
 is(faulhaber_sum(97,   20), '27930470253682554320726764539206479400753');
 is(faulhaber_sum(1234, 13), '1363782530586069716227147685797600627310545');
@@ -942,7 +950,7 @@ is_deeply(
        )
     ],
     "subfactoral(n) for n=0..23"
-         );
+);
 
 is_deeply([map { subfactorial(7, $_) } 0 .. 7], [qw(1854 1855 924 315 70 21 0 1)], "subfactorial(7, n) for n=0..7");
 

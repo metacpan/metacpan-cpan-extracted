@@ -1,0 +1,45 @@
+AUTHORS
+bin/wg-meta
+CHANGES
+COPYRIGHT
+dist.sh
+lib/Wireguard/WGmeta.pm
+lib/Wireguard/WGmeta/Cli/Commands/Add.pm
+lib/Wireguard/WGmeta/Cli/Commands/Apply.pm
+lib/Wireguard/WGmeta/Cli/Commands/Command.pm
+lib/Wireguard/WGmeta/Cli/Commands/Disable.pm
+lib/Wireguard/WGmeta/Cli/Commands/Enable.pm
+lib/Wireguard/WGmeta/Cli/Commands/Help.pm
+lib/Wireguard/WGmeta/Cli/Commands/Set.pm
+lib/Wireguard/WGmeta/Cli/Commands/Show.pm
+lib/Wireguard/WGmeta/Cli/Human.pm
+lib/Wireguard/WGmeta/Cli/Router.pm
+lib/Wireguard/WGmeta/Cli/TerminalHelpers.pm
+lib/Wireguard/WGmeta/Index.pod
+lib/Wireguard/WGmeta/Utils.pm
+lib/Wireguard/WGmeta/Validator.pm
+lib/Wireguard/WGmeta/ValidAttributes.pm
+lib/Wireguard/WGmeta/Wrapper/Bridge.pm
+lib/Wireguard/WGmeta/Wrapper/Config.pm
+lib/Wireguard/WGmeta/Wrapper/Show.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/cli_test.t
+t/Data/wg0.conf
+t/Data/wg1.conf
+t/Data/wg2.conf
+t/Data/wg_show_dummy
+t/test_data/empty.conf
+t/test_data/mini_wg0.conf
+t/test_data/mini_wg0.conf_skip
+t/test_data/mini_wg1.conf
+t/test_data/not_a_wg_config.conf
+t/test_data/wg_show_dump
+t/wrapper_test.t
+VERSION
+wg-meta_completions.sh
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

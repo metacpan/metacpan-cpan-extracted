@@ -1,11 +1,10 @@
+use v5.10;
+
 package Distribution::Guess::BuildSystem;
 use strict;
 
 use warnings;
 no warnings;
-
-use subs qw();
-use vars qw($VERSION);
 
 use Carp                  qw(carp);
 use Config                qw(%Config);
@@ -14,7 +13,7 @@ use File::Spec::Functions qw(catfile);
 
 use Module::Extract::VERSION;
 
-$VERSION = '1.002';
+our $VERSION = '1.003';
 
 =encoding utf8
 
@@ -700,7 +699,7 @@ BEGIN { require Module::Extract::Use }
 
 This source is in Github:
 
-	git://github.com/briandfoy/distribution-guess-buildsystem.git
+	https://github.com/briandfoy/distribution-guess-buildsystem.git
 
 =head1 AUTHOR
 
@@ -708,7 +707,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2008-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

@@ -28,5 +28,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://alexschroeder.ch/cgit/lupa-pona
-version: 1.03
+version: 1.05
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

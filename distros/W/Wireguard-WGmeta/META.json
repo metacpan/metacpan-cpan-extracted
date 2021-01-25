@@ -1,0 +1,52 @@
+{
+   "abstract" : "An approach to add metadata to the main Wireguard config",
+   "author" : [
+      "Tobias Bossert <tobib at cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Wireguard-WGmeta",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.020000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sirtoobii/wg-meta/issues"
+      },
+      "license" : [
+         "https://opensource.org/licenses/mit"
+      ],
+      "repository" : {
+         "url" : "https://github.com/sirtoobii/wg-meta"
+      }
+   },
+   "version" : "v0.1.2",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

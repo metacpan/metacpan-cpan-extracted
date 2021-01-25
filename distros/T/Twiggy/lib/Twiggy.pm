@@ -2,14 +2,14 @@ package Twiggy;
 use strict;
 use warnings;
 use 5.008_001;
-our $VERSION = '0.1025';
+our $VERSION = '0.1026';
 
 1;
 __END__
 
 =head1 NAME
 
-Twiggy - AnyEvent HTTP server for PSGI (like Thin)
+Twiggy - AnyEvent HTTP server for PSGI
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ jobs or delayed responses such as long-poll, WebSocket or streaming
 content (server push).
 
 This software used to be called Plack::Server::AnyEvent but was
-renamed to Twiggy. See L</NAMING> for details.
+renamed to Twiggy.
 
 =item Fast header parser
 
@@ -63,8 +63,7 @@ late 2009.
 
 =item Superdaemon aware
 
-Supports L<Server::Starter> for hot deploy and
-graceful restarts.
+Supports L<Server::Starter> for hot deploy and graceful restarts.
 
 To use it, instead of the usual:
 
@@ -72,10 +71,9 @@ To use it, instead of the usual:
 
 install L<Server::Starter> and use:
 
-    start_server --port 8111 plackup --server Twiggy app.psgi
+    start_server --port 8111 -- plackup --server Twiggy app.psgi
 
 =back
-
 
 =head1 ENVIRONMENT
 
@@ -88,28 +86,6 @@ The following environment variables are supported.
 Set to true to enable debug messages from Twiggy.
 
 =back
-
-
-=head1 NAMING
-
-=head2 Twiggy?
-
-Because it is like L<Thin|http://code.macournoyer.com/thin/>, Ruby's
-Rack web server using EventMachine. You know, Twiggy is thin :)
-
-=head2 Why the cute name instead of more descriptive namespace? Are you on drugs?
-
-I'm sick of naming Perl software like
-HTTP::Server::PSGI::How::Its::Written::With::What::Module and people
-call it HSPHIWWWM on IRC. It's hard to say on speeches and newbies
-would ask questions what they stand for every day. That's crazy.
-
-This module actually includes the longer alias and an empty subclass
-L<AnyEvent::Server::PSGI> for those who like to type more ::'s. It
-would actually help you find this software by searching for I<PSGI
-Server AnyEvent> on CPAN, which i believe is a good thing.
-
-Yes, maybe I'm on drugs. We'll see.
 
 =head1 LICENSE
 

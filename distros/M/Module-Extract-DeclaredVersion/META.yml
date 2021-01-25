@@ -3,7 +3,7 @@ abstract: 'Extract the version of Perl a module declares'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-  Test::More: '0.94'
+  Test::More: '1'
   Test::Output: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
@@ -33,5 +33,5 @@ resources:
   bugtracker: https://github.com/briandfoy/module-extract-declaredversion/issues
   homepage: https://github.com/briandfoy/module-extract-declaredversion
   repository: https://github.com/briandfoy/module-extract-declaredversion.git
-version: '1.022'
+version: '1.023'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

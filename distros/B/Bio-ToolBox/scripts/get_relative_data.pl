@@ -27,7 +27,7 @@ use constant DATASET_HASH_LIMIT => 4999;
 		# region, and a hash returned with potentially a score for each basepair. 
 		# This may become unwieldy for very large regions, which may be better 
 		# served by separate database queries for each window.
-my $VERSION = '1.67';
+my $VERSION = '1.68';
 
 print "\n A script to collect windowed data flanking a relative position of a feature\n\n";
   
@@ -66,6 +66,8 @@ my (
 	$long_data,
 	$smooth,
 	$sum,
+	$format,
+	$groupcol,
 	$gz,
 	$cpu,
 	$help,
@@ -95,7 +97,9 @@ GetOptions(
 	'avtype=s'     => \$avoidtype, # type of feature to avoid
 	'long!'        => \$long_data, # collecting long data features
 	'smooth!'      => \$smooth, # smooth by interpolation
-	'U|sum!'         => \$sum, # generate average profile
+	'U|sum!'       => \$sum, # generate average profile
+	'r|format=i'   => \$format, # decimal formatting
+	'g|groups'     => \$groupcol, # write group column file
 	'z|gz!'        => \$gz, # compress the output file
 	'c|cpu=i'      => \$cpu, # number of execution threads
 	'h|help'       => \$help, # print help
@@ -131,6 +135,7 @@ if ($print_version) {
 
 
 ## Check for required values
+my $formatter;
 check_defaults();
 my $start_time = time;
 
@@ -182,7 +187,8 @@ $Data->program("$0, v $VERSION");
 
 
 # the number of columns already in the data array
-my $startcolumn; # this is now calculated separately for each datasets
+my $beginningcolumn = $Data->last_column; 
+my $startcolumn; # this is now calculated separately for each dataset
 
 
 # Check output file name
@@ -303,6 +309,23 @@ else {
 	# failure! the subroutine will have printed error messages
 	print " unable to write output file!\n";
 }
+
+# write the column group file
+if ($groupcol) {
+	my $groupfile = $written_file;
+	$groupfile =~ s/\.txt(?:\.gz)?$/.groups.txt/;
+	my $fh = Bio::ToolBox::Data->open_to_write_fh($groupfile);
+	$fh->print("Name\tDataset\n");
+	for (my $i = $beginningcolumn + 1; $i <= $Data->last_column; $i++) {
+		my $name = $Data->name($i);
+		my $dataset = $name;
+		$dataset =~ s/:[\-\d]+$//;
+		$fh->print("$name\t$dataset\n");
+	}
+	$fh->close;
+	print " wrote group column file $groupfile\n";
+}
+
 printf " Completed in %.1f minutes\n", (time - $start_time)/60;
 
 
@@ -411,6 +434,11 @@ sub check_defaults {
 		$sum = 1;
 	}
 
+	# generate formatter
+	if (defined $format) {
+		$formatter = '%.' . $format . 'f';
+	}
+	
 	if ($parallel) {
 		$cpu ||= 4;
 	}
@@ -589,6 +617,7 @@ sub prepare_window_datasets {
 		$Data->metadata($new_index, 'window' , $win);
 		$Data->metadata($new_index, 'dataset' , $dataset);
 		$Data->metadata($new_index, 'method' , $method);
+		$Data->metadata($new_index, 'decimal_format', $format) if defined $format;
 		if ($position == 5) {
 			$Data->metadata($new_index, 'relative_position', '5prime_end');
 		}
@@ -659,7 +688,9 @@ sub map_relative_data {
 							keys %$regionscores;
 			
 			# put the value into the data table
-			$row->value($column, calculate_score($method, \@scores) );
+			my $score = calculate_score($method, \@scores);
+			$score = sprintf($formatter, $score) if ($formatter and $score ne '.');
+			$row->value($column, $score);
 		}
 	}
 }
@@ -726,6 +757,7 @@ sub map_relative_long_data {
 				'method'      => $method,
 				'stranded'    => $strand_sense,
 			);
+			$score = sprintf($formatter, $score) if ($formatter and $score ne '.');
 			$row->value($column, $score);
 		}
 	}
@@ -772,7 +804,9 @@ sub go_interpolate_values {
 				
 				# apply fractional values
 				for (my $n = $col; $n < $next_i; $n++) {
-					$row->value($n, $initial + ($fraction * ($n - $col + 1)) );
+					my $score = $initial + ($fraction * ($n - $col + 1));
+					$score = sprintf($formatter, $score) if ($formatter and $score ne '.');
+					$row->value($n, $score);
 				}
 				
 				# jump ahead
@@ -818,6 +852,7 @@ get_relative_data.pl [--options] -i <filename> <data1> <data2...>
   --avoid                             avoid neighboring features
   --avtype [type,type,...]            alternative types of feature to avoid
   --long                              collect each window independently
+  -r --format <integer>               number of decimal places for numbers
   
   Bin specification:
   -w --win <integer>                  size of windows, default 50 bp
@@ -831,6 +866,7 @@ get_relative_data.pl [--options] -i <filename> <data1> <data2...>
   --smooth                            smoothen sparse data
   
   General Options:
+  -g --groups                         write columns group index file for plotting
   -z --gz                             compress output file
   -c --cpu <integer>                  number of threads, default 4
   --noparse                           do not parse input file into SeqFeatures
@@ -995,6 +1031,12 @@ then divide the results into the different windows. Datasets consisting
 of "long" features, for example long alignments, may be counted more 
 than once in long mode when they span multiple windows.
 
+=item --format E<lt>integerE<gt>
+
+Specify the number of decimal positions to format the collected scores. 
+Default is not to format, often leading to more than the intended 
+significant digits.
+
 =back
 
 =head2 Bin specification
@@ -1050,6 +1092,13 @@ from neighboring values. The default is false (nosmooth).
 =head2 General options
 
 =over 4
+
+=item --groups
+
+Optionally write a secondary file with the list of column group names and 
+their corresponding dataset group. This can be used to assist in designating 
+the metadata when plotting files, for example in R with pheatmap. The 
+file is named the output basename appended with F<.groups.txt>.
 
 =item --gz
 

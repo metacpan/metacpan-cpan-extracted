@@ -68,7 +68,7 @@ my %WriteMakefileArgs = (
     "ZOOM" => 0,
     "utf8" => 0
   },
-  "VERSION" => "2.34",
+  "VERSION" => "2.36",
   "test" => {
     "TESTS" => ""
   }

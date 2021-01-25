@@ -39,7 +39,7 @@ use warnings;
 use Tie::Hash;
 use Attribute::Handlers autotie => { "__CALLER__::Stoned" => __PACKAGE__ };
 
-our $VERSION = '1.12.1';
+our $VERSION = '1.12.2';
 our @ISA = qw(Tie::StdHash);
 
 =head2 STORE

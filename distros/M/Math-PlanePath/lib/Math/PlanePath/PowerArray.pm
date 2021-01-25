@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -23,7 +23,7 @@ use strict;
 use List::Util 'max';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -172,6 +172,14 @@ sub rect_to_n_range {
 1;
 __END__
 
+# Cf
+# Matthew P. Szudzik, "The Rosenberg-Strong Pairing Function",
+# arxiv 1706.04129.
+# Figure 3 drawing binary (transposed x<->y).
+# Binary used variously Minsky, 1967; Cutland, 1980; Davis and Weyuker, 1983
+# Sierpinski, 1912; Hausdorff, 1927; Hrbacek and Jech, 1978.
+
+
 =for stopwords Ryde Math-PlanePath Radix radix ie OEIS DOI
 
 =head1 NAME
@@ -194,25 +202,23 @@ This is a split of N into an odd part and power of 2,
 
 =pod
 
-     14  |   29    58   116   232   464   928  1856  3712  7424 14848
-     13  |   27    54   108   216   432   864  1728  3456  6912 13824
-     12  |   25    50   100   200   400   800  1600  3200  6400 12800
-     11  |   23    46    92   184   368   736  1472  2944  5888 11776
-     10  |   21    42    84   168   336   672  1344  2688  5376 10752
-      9  |   19    38    76   152   304   608  1216  2432  4864  9728
-      8  |   17    34    68   136   272   544  1088  2176  4352  8704
-      7  |   15    30    60   120   240   480   960  1920  3840  7680
-      6  |   13    26    52   104   208   416   832  1664  3328  6656
-      5  |   11    22    44    88   176   352   704  1408  2816  5632
-      4  |    9    18    36    72   144   288   576  1152  2304  4608
-      3  |    7    14    28    56   112   224   448   896  1792  3584
-      2  |    5    10    20    40    80   160   320   640  1280  2560
-      1  |    3     6    12    24    48    96   192   384   768  1536
-    Y=0  |    1     2     4     8    16    32    64   128   256   512
-         +-----------------------------------------------------------
-            X=0     1     2     3     4     5     6     7     8     9
+     12  |   25    50   100   200   400   800  1600  3200  6400
+     11  |   23    46    92   184   368   736  1472  2944  5888
+     10  |   21    42    84   168   336   672  1344  2688  5376
+      9  |   19    38    76   152   304   608  1216  2432  4864
+      8  |   17    34    68   136   272   544  1088  2176  4352
+      7  |   15    30    60   120   240   480   960  1920  3840
+      6  |   13    26    52   104   208   416   832  1664  3328
+      5  |   11    22    44    88   176   352   704  1408  2816
+      4  |    9    18    36    72   144   288   576  1152  2304
+      3  |    7    14    28    56   112   224   448   896  1792
+      2  |    5    10    20    40    80   160   320   640  1280
+      1  |    3     6    12    24    48    96   192   384   768
+    Y=0  |    1     2     4     8    16    32    64   128   256
+         +------------------------------------------------------
+            X=0     1     2     3     4     5     6     7     8
 
-For N=odd*2^k the coordinates are X=k, Y=(odd-1)/2.  The X coordinate is how
+For N=odd*2^k, the coordinates are X=k, Y=(odd-1)/2.  The X coordinate is how
 many factors of 2 can be divided out.  The Y coordinate counts odd integers
 1,3,5,7,etc as 0,1,2,3,etc.  This is clearer by writing N values in binary,
 
@@ -225,8 +231,11 @@ many factors of 2 can be divided out.  The Y coordinate counts odd integers
       2  |   101      1010     10100    101000   1010000  10100000
       1  |    11       110      1100     11000    110000   1100000
     Y=0  |     1        10       100      1000     10000    100000
-         +----------------------------------------------------------
+         +---------------------------------------------------------
              X=0         1         2         3         4         5
+
+Column X=0 is all the odd numbers, column X=1 is exactly one low 0-bit, and
+so on.
 
 =head2 Radix
 
@@ -241,7 +250,6 @@ example radix 3 divides out factors of 3,
 
      radix => 3
 
-      9  |   14    42   126   378  1134  3402 10206 30618
       8  |   13    39   117   351  1053  3159  9477 28431
       7  |   11    33    99   297   891  2673  8019 24057
       6  |   10    30    90   270   810  2430  7290 21870
@@ -256,9 +264,9 @@ example radix 3 divides out factors of 3,
 
 N=1,3,9,27,etc on the X axis is the powers of 3.
 
-N=1,2,4,5,7,etc on the Y axis is the integers N=1or2 mod 3, ie. those not a
-multiple of 3.  Notice if Y=1or2 mod 4 then the N values in that row are all
-even, or if Y=0or3 mod 4 then the N values are all odd.
+N=1,2,4,5,7,etc on the Y axis is the integers N = 1or2 mod 3, ie. those not
+a multiple of 3.  Notice if Y = 1or2 mod 4 then the N values in that row are
+all even, or if Y = 0or3 mod 4 then the N values are all odd.
 
     radix => 3,  N values in ternary
 
@@ -276,7 +284,19 @@ even, or if Y=0or3 mod 4 then the N values are all odd.
 
 The points N=1 to N=2^k-1 inclusive have a boundary length
 
-    boundary = 2^k + 2k
+    boundary = 2^k + 2k   = 4,8,14,24,42,76,...   (OEIS A100314)
+
+=cut
+
+# GP-DEFINE  read("my-oeis.gp");
+# GP-DEFINE  boundary_2ksub1(k) = 2^k + 2*k;
+# GP-Test  my(k=0);  2^k-1 == 0
+# GP-Test  my(k=1);  2^k-1 == 1
+# GP-Test  vector(6,k, boundary_2ksub1(k)) == [4, 8, 14, 24, 42, 76]
+# GP-Test  my(v=OEIS_samples("A100314")); /* OFFSET=0 */ \
+# GP-Test    vector(#v,k,k--; boundary_2ksub1(k)) == v
+
+=pod
 
 For example N=1 to N=7 is
 
@@ -293,24 +313,34 @@ For example N=1 to N=7 is
 The height is the odd numbers, so 2^(k-1).  The width is the power k.  So
 total boundary 2*height+2*width = 2^k + 2k.
 
-If N=2^k is included then it's on the X axis and so add 2, for boundary =
-2^k + 2k + 2.
+If N=2^k is included then it's on the X axis and so add 2 for boundary =
+2^k + 2k + 2 (OEIS 2*A052968).
 
-For other radix the calculation is similar
+=cut
+
+# GP-DEFINE  boundary_2k(k) = 2^k + 2*k + 2;
+# GP-Test  my(v=OEIS_samples("A052968")); /* OFFSET=0 */ \
+# GP-Test    vector(#v,k,k--; if(k==0,4, boundary_2k(k))) == 2*v
+# GP-Test  my(k=0); boundary_2k(k) == 3
+# vector(15,k, boundary_2k(k))
+
+=pod
+
+For another radix the calculation is similar
 
     boundary = 2 * (radix-1) * radix^(k-1) + 2*k
 
 For example radix=3, N=1 to N=8 is
 
-    8 
-    7 
-    5 
-    4 
+    8
+    7
+    5
+    4
     2  6
     1  3
 
 The height is the non-multiples of the radix, so (radix-1)/radix * radix^k.
-The width is the power k again.  So total boundary = 2*height+2*width.
+The width is the power k.  Total boundary = 2*height+2*width.
 
 =head1 FUNCTIONS
 
@@ -347,9 +377,9 @@ and biggest in the rectangle.
 
 =head2 Rectangle to N Range
 
-Within each row increasing X is increasing N, and in each column increasing
-Y is increasing N.  So in a rectangle the lower left corner is the minimum N
-and the upper right is the maximum N.
+Within each row, increasing X is increasing N.  Within each column,
+increasing Y is increasing N.  So in a rectangle the lower left corner is
+the minimum N and the upper right is the maximum N.
 
     |               N max
     |     ----------+
@@ -403,7 +433,7 @@ Points N=2 mod 4 are X=1 and Y=N/2 whereas N=0 mod 4 has 2 or more trailing
        1         left
        2        left
        3         right
-                
+
 =head1 OEIS
 
 Entries in Sloane's Online Encyclopedia of Integer Sequences related to this
@@ -440,7 +470,9 @@ L<http://oeis.org/A007814> (etc)
                    (just below X=Y diagonal)
 
       A054582    permutation N by diagonals, upwards
+      A209268      inverse
       A135764    permutation N by diagonals, downwards
+      A249725      inverse
       A075300    permutation N-1 by diagonals, upwards
       A117303    permutation N at transpose X,Y
 
@@ -454,6 +486,8 @@ L<http://oeis.org/A007814> (etc)
       A007949    X coordinate, power-of-3 dividing N
       A000244    N on X axis, powers 3^X
       A001651    N on Y axis (X=0), not divisible by 3
+      A016051    N on Y column X=1
+      A051063    N on Y column X=1
       A007417    N in X=even columns, even trailing 0 digits
       A145204    N in X=odd columns (extra initial 0)
       A141396    permutation, N by diagonals down from Y axis
@@ -492,7 +526,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

@@ -1,27 +1,23 @@
-#!/usr/bin/perl
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More;
 use Net::SSLeay;
-use Symbol qw( gensym );
-use IO::Handle;
-use File::Spec;
-use Config;
+use Test::Net::SSLeay qw( can_really_fork data_file_path initialise_libssl );
 
-BEGIN {
-  plan skip_all => "Either pipes or fork() not supported on $^O"
-      if ($^O eq 'MSWin32' || !$Config{d_fork});
+use IO::Handle;
+use Symbol qw( gensym );
+
+if (not can_really_fork()) {
+    # Perl's pseudofork implementation doesn't correctly dup file handles
+    # connected to pipes, so this test requires a native fork() system call
+    plan skip_all => "fork() not natively supported on this system";
+} else {
+    plan tests => 11;
 }
 
-plan tests => 11;
+initialise_libssl();
 
-Net::SSLeay::randomize();
-Net::SSLeay::load_error_strings();
-Net::SSLeay::OpenSSL_add_ssl_algorithms();
-
-my $cert = File::Spec->catfile('t', 'data', 'testcert_wildcard.crt.pem');
-my $key  = File::Spec->catfile('t', 'data', 'testcert_key_2048.pem');
+my $cert = data_file_path('simple-cert.cert.pem');
+my $key  = data_file_path('simple-cert.key.pem');
 
 my $how_much = 1024 ** 2;
 

@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -24,6 +24,9 @@
 # A072734
 # A072740 X coord
 # A072741 Y coord
+#
+# plothraw(OEIS_samples("A072736"), OEIS_samples("A072737"), 1)
+# A072737 Y coord
 
 
 package Math::PlanePath::NxNinv;
@@ -31,7 +34,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_sqrtint = \&Math::PlanePath::_sqrtint;

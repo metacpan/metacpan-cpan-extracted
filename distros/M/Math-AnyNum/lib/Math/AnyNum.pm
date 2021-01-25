@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -233,9 +233,11 @@ use overload
 
         euler     => \&euler,
         bernoulli => \&bernfrac,
+        faulhaber => \&faulhaber_polynomial,
 
         euler_polynomial     => \&euler_polynomial,
         bernoulli_polynomial => \&bernoulli_polynomial,
+        faulhaber_polynomial => \&faulhaber_polynomial,
 
         lcm    => \&lcm,
         gcd    => \&gcd,
@@ -827,7 +829,7 @@ sub _any2ui {
   Math_GMPz: {
 
         if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
-            goto &Math::GMPz::Rmpz_get_ui;
+            return Math::GMPz::Rmpz_get_ui($x);
         }
 
         return;
@@ -836,7 +838,7 @@ sub _any2ui {
   Math_GMPq: {
 
         if (Math::GMPq::Rmpq_integer_p($x)) {
-            @_ = ($x = _mpq2mpz($x));
+            $x = _mpq2mpz($x);
             goto Math_GMPz;
         }
 
@@ -847,8 +849,7 @@ sub _any2ui {
   Math_MPFR: {
 
         if (Math::MPFR::Rmpfr_integer_p($x) and Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
-            push @_, $ROUND;
-            goto &Math::MPFR::Rmpfr_get_ui;
+            return Math::MPFR::Rmpfr_get_ui($x, $ROUND);
         }
 
         if (Math::MPFR::Rmpfr_number_p($x)) {
@@ -860,7 +861,7 @@ sub _any2ui {
     }
 
   Math_MPC: {
-        @_ = ($x = _any2mpfr($x));
+        $x = _any2mpfr($x);
         goto Math_MPFR;
     }
 }
@@ -872,11 +873,11 @@ sub _any2si {
   Math_GMPz: {
 
         if (Math::GMPz::Rmpz_fits_slong_p($x)) {
-            goto &Math::GMPz::Rmpz_get_si;
+            return Math::GMPz::Rmpz_get_si($x);
         }
 
         if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
-            goto &Math::GMPz::Rmpz_get_ui;
+            return Math::GMPz::Rmpz_get_ui($x);
         }
 
         return;
@@ -885,7 +886,7 @@ sub _any2si {
   Math_GMPq: {
 
         if (Math::GMPq::Rmpq_integer_p($x)) {
-            @_ = ($x = _mpq2mpz($x));
+            $x = _mpq2mpz($x);
             goto Math_GMPz;
         }
 
@@ -897,13 +898,11 @@ sub _any2si {
 
         if (Math::MPFR::Rmpfr_integer_p($x)) {
             if (Math::MPFR::Rmpfr_fits_slong_p($x, $ROUND)) {
-                push @_, $ROUND;
-                goto &Math::MPFR::Rmpfr_get_si;
+                return Math::MPFR::Rmpfr_get_si($x, $ROUND);
             }
 
             if (Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
-                push @_, $ROUND;
-                goto &Math::MPFR::Rmpfr_get_ui;
+                return Math::MPFR::Rmpfr_get_ui($x, $ROUND);
             }
         }
 
@@ -916,7 +915,7 @@ sub _any2si {
     }
 
   Math_MPC: {
-        @_ = ($x = _any2mpfr($x));
+        $x = _any2mpfr($x);
         goto Math_MPFR;
     }
 }
@@ -1462,13 +1461,11 @@ sub __stringify__ {
     goto(ref($x) =~ tr/:/_/rs);
 
   Math_GMPz: {
-        push @_, 10;
-        goto &Math::GMPz::Rmpz_get_str;
+        return Math::GMPz::Rmpz_get_str($x, 10);
     }
 
   Math_GMPq: {
-        push @_, 10;
-        goto &Math::GMPq::Rmpq_get_str;
+        return Math::GMPq::Rmpq_get_str($x, 10);
     }
 
   Math_MPFR: {
@@ -7743,6 +7740,20 @@ sub bernfrac ($;$) {
 
 *bernoulli = \&bernfrac;
 
+sub faulhaber_polynomial {
+    my ($n, $x) = @_;
+
+    $n = _star2ui($n) // goto &nan;
+    $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
+
+    $n += 1;
+    $x = __inc__($x);
+
+    bernoulli_polynomial($n, $x)->sub(bernfrac($n))->div($n);
+}
+
+*faulhaber = \&faulhaber_polynomial;
+
 sub euler_polynomial ($$) {
     my ($n, $x) = @_;
 
@@ -8704,15 +8715,15 @@ sub __sgn__ {
     goto(ref($x) =~ tr/:/_/rs);
 
   Math_MPFR: {
-        goto &Math::MPFR::Rmpfr_sgn;
+        return Math::MPFR::Rmpfr_sgn($x);
     }
 
   Math_GMPq: {
-        goto &Math::GMPq::Rmpq_sgn;
+        return Math::GMPq::Rmpq_sgn($x);
     }
 
   Math_GMPz: {
-        goto &Math::GMPz::Rmpz_sgn;
+        return Math::GMPz::Rmpz_sgn($x);
     }
 
     # sgn(x) = x / abs(x)
@@ -9117,10 +9128,10 @@ sub polygonal ($$) {
         Math::GMPz::Rmpz_sub($r, $r, $k);       # r = r-k
     }
 
-    Math::GMPz::Rmpz_submul_ui($r, $n, 2);      # r = r-2*n
-    Math::GMPz::Rmpz_add_ui($r, $r, 4);         # r = r+4
-    Math::GMPz::Rmpz_mul($r, $r, $n);           # r = r*n
-    Math::GMPz::Rmpz_div_2exp($r, $r, 1);       # r = r/2
+    Math::GMPz::Rmpz_submul_ui($r, $n, 2);    # r = r-2*n
+    Math::GMPz::Rmpz_add_ui($r, $r, 4);       # r = r+4
+    Math::GMPz::Rmpz_mul($r, $r, $n);         # r = r*n
+    Math::GMPz::Rmpz_div_2exp($r, $r, 1);     # r = r/2
 
     bless \$r;
 }

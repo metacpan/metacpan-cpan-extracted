@@ -1,20 +1,17 @@
-#!/usr/bin/perl
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More;
-use Socket;
-use File::Spec;
 use Net::SSLeay;
-use Config;
-use IO::Socket::INET;
+use Test::Net::SSLeay qw(
+    can_fork data_file_path initialise_libssl is_libressl tcp_socket
+);
 
-BEGIN {
-  plan skip_all => "fork() not supported on $^O" unless $Config{d_fork};
+if (not can_fork()) {
+    plan skip_all => "fork() not supported on this system";
+} else {
+    plan tests => 46;
 }
 
-my $tests = 34;
-plan tests => $tests;
+initialise_libssl();
 
 my $pid;
 alarm(30);
@@ -60,22 +57,23 @@ our %version_str2int =
      'TLSv1.3' => sub {return eval {Net::SSLeay::TLS1_3_VERSION();}},
     );
 
-my $server;
-Net::SSLeay::initialize();
+# Tests that don't need a connection
+client_test_ciphersuites();
+test_cipher_funcs();
+
+# Tests that need a connection
+my $server = tcp_socket();
 
 {
     # SSL server - just handle single connect, send information to
     # client and exit
 
-    my $cert_pem = File::Spec->catfile('t', 'data', 'testcert_wildcard.crt.pem');
-    my $key_pem = File::Spec->catfile('t', 'data', 'testcert_key_2048.pem');
-
-    $server = IO::Socket::INET->new( LocalAddr => '127.0.0.1', Listen => 3)
-	or BAIL_OUT("failed to create server socket: $!");
+    my $cert_pem = data_file_path('simple-cert.cert.pem');
+    my $key_pem  = data_file_path('simple-cert.key.pem');
 
     defined($pid = fork()) or BAIL_OUT("failed to fork: $!");
     if ($pid == 0) {
-	my $cl = $server->accept or BAIL_OUT("accept failed: $!");
+	my $cl = $server->accept();
 	my $ctx = Net::SSLeay::CTX_new();
 	Net::SSLeay::set_cert_and_key($ctx, $cert_pem, $key_pem);
 #	my $get_keyblock_size_ciphers = join(':', keys(%cipher_to_keyblock_size));
@@ -108,9 +106,7 @@ sub client {
 
     my ($f_len, $f_len_trunc, $finished_s, $finished_c, $msg, $expected);
 
-    my $saddr = $server->sockhost.':'.$server->sockport;
-    my $cl = IO::Socket::INET->new($saddr)
-	or BAIL_OUT("failed to connect to server: $!");
+    my $cl = $server->connect();
     my $ctx = Net::SSLeay::CTX_new();
     Net::SSLeay::CTX_set_options($ctx, &Net::SSLeay::OP_ALL);
     my $ssl = Net::SSLeay::new($ctx);
@@ -120,7 +116,6 @@ sub client {
     client_test_finished($ssl);
     client_test_keyblock_size($ssl);
     client_test_version_funcs($ssl);
-    client_test_ciphersuites();
 
     # Tell the server to quit and see that our connection is still up
     my $end = "end";
@@ -196,7 +191,7 @@ sub client_test_keyblock_size
     if ($keyblock_size == -1)
     {
 	# Accept -1 with AEAD ciphers with LibreSSL
-	like(Net::SSLeay::SSLeay_version(Net::SSLeay::SSLEAY_VERSION()), qr/^LibreSSL/, 'get_keyblock_size returns -1 with LibreSSL');
+	ok(is_libressl(), 'get_keyblock_size returns -1 with LibreSSL');
 	ok(defined $aead_cipher_to_keyblock_size{$cipher}, 'keyblock size is -1 for an AEAD cipher');
     }
     else
@@ -280,6 +275,69 @@ sub client_test_ciphersuites
     is($rv, 0, 'SSL set partially bad ciphersuites');
     $rv = Net::SSLeay::set_ciphersuites($ssl, 'nosuchthing:');
     is($rv, 0, 'SSL set bad ciphersuites');
+
+    return;
+}
+
+sub test_cipher_funcs
+{
+
+    my ($ctx, $rv, $ssl);
+    $ctx = Net::SSLeay::CTX_new();
+    $ssl = Net::SSLeay::new($ctx);
+
+    # OpenSSL API says these can accept NULL ssl
+    {
+	no warnings 'uninitialized';
+	my @a = Net::SSLeay::get_ciphers(undef);
+	is(@a, 0, 'SSL_get_ciphers with undefined ssl');
+
+	is(Net::SSLeay::get_cipher_list(undef, 0), undef, 'SSL_get_cipher_list with undefined ssl');
+	is(Net::SSLeay::CIPHER_get_name(undef), '(NONE)', 'SSL_CIPHER_get_name with undefined ssl');
+	is(Net::SSLeay::CIPHER_get_bits(undef), 0, 'SSL_CIPHER_get_bits with undefined ssl');
+	is(Net::SSLeay::CIPHER_get_version(undef), '(NONE)', 'SSL_CIPHER_get_version with undefined ssl');
+    }
+
+    # 10 is based on experimentation. Lowest count seen was 15 in
+    # OpenSSL 0.9.8zh.
+    my @ciphers = Net::SSLeay::get_ciphers($ssl);
+    cmp_ok(@ciphers, '>=', 10, 'SSL_get_ciphers: number of ciphers: ' . @ciphers);
+
+    my $first;
+    my ($name_failed, $desc_failed, $vers_failed, $bits_failed, $alg_bits_failed) = (0, 0, 0, 0, 0);
+    foreach my $c (@ciphers)
+    {
+	# Shortest seen: RC4-MD5
+	my $name = Net::SSLeay::CIPHER_get_name($c);
+	$name_failed++ if $name !~ m/^[A-Z0-9_-]{7,}\z/s;
+	$first = $name unless $first;
+
+	# Cipher description should begin with its name
+	my $desc = Net::SSLeay::CIPHER_description($c);
+	$desc_failed++ if $desc !~ m/^$name\s+/s;
+
+	# For example: TLSv1/SSLv3, SSLv2
+	my $vers = Net::SSLeay::CIPHER_get_version($c);
+	$vers_failed++ if length($vers) < 5;
+
+	# See that get_bits returns the same no matter how it's called
+	my $alg_bits;
+	my $bits = Net::SSLeay::CIPHER_get_bits($c, $alg_bits);
+	$bits_failed++ if $bits ne Net::SSLeay::CIPHER_get_bits($c);
+
+	# Once again, a value that should be reasonable
+	$alg_bits_failed++ if $alg_bits < 56;
+    }
+
+    is($name_failed, 0, 'CIPHER_get_name');
+    is($desc_failed, 0, 'CIPHER_description matches with CIPHER_name');
+    is($vers_failed, 0, 'CIPHER_get_version');
+    is($bits_failed, 0, 'CIPHER_get_bits');
+    is($alg_bits_failed, 0, 'CIPHER_get_bits with alg_bits');
+    is($first, Net::SSLeay::get_cipher_list($ssl, 0), 'SSL_get_cipher_list');
+
+    Net::SSLeay::free($ssl);
+    Net::SSLeay::CTX_free($ctx);
 
     return;
 }

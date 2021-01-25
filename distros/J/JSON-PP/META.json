@@ -4,7 +4,7 @@
       "Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,6 +46,6 @@
          "url" : "https://github.com/makamaka/JSON-PP"
       }
    },
-   "version" : "4.05",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "4.06",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

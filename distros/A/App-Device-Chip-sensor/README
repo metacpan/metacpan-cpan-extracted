@@ -1,0 +1,192 @@
+NAME
+
+    App::Device::Chip::sensor - Base class to build
+    Device::Chip::Sensor-based applications on
+
+SYNOPSIS
+
+       #!/usr/bin/perl
+       use v5.26;
+    
+       use Object::Pad;
+       use Future::AsyncAwait;
+    
+       class App extends App::Device::Chip::sensor
+       {
+          method output_readings ( $now, $sensors, $values )
+          {
+             print "At time $now, we have some sensor values...\n";
+          }
+       }
+    
+       await App->new->parse_argv->run;
+
+DESCRIPTION
+
+    This module provides a base class to assist in writing applications
+    that process data periodically from one or more Device::Chip-based
+    sensors, via the Device::Chip::Sensor interface. A typical program
+    using this module would derive a subclass from it, provide the
+    remaining methods as necessary, and eventually call the "run" method to
+    start the application.
+
+COMMANDLINE OPTIONS
+
+    The following commandline options are recognised by the base class and
+    may be used in addition to any defined by the actual application logic.
+
+      * --blib, -b
+
+      Uses the blib module to add additional paths into @INC to search for
+      more Perl modules. May be useful when testing chip drivers under
+      development without needing to install them.
+
+      * --interval, -i TIME
+
+      Specifies the time, in seconds, between every round of collecting
+      sensor readings and invoking the "output_readings" method.
+
+      Defaults to 10 seconds.
+
+      * --adapter, -A STR
+
+      Adapter configuration string to pass to "new_from_description" in
+      Device::Chip::Adapter to construct the chip adapter used for
+      communication with the actual chip hardware.
+
+PROVIDED METHODS
+
+    The following methods are provided on the base class, intended for
+    subclasses or applications to invoke.
+
+ parse_argv
+
+       $app->parse_argv()
+       $app->parse_argv( \@argv )
+
+    Provides a list of commandline arguments for parsing, either from a
+    given array reference or defaulting to the process @ARGV if not
+    supplied.
+
+    This uses "OPTSPEC" to collect the defined arguments, whose references
+    should handle the results.
+
+ adapter
+
+       $adapter = $app->adapter;
+
+    A memoized lazy accessor for the application's configured
+    Device::Chip::Adapter instance, taken from the --adapter option.
+
+ chips
+
+       @chips = await $app->chips;
+
+    An asynchronous memoized lazy accessor for the list of Device::Chip
+    instances, whose class names are taken from the remaining commandline
+    arguments after the options are parsed.
+
+ chips
+
+       @sensors = await $app->sensors;
+
+    An asynchronous memoized lazy accessor for the list of
+    Device::Chip::Sensor instances of each of the configured chips (from
+    the "chips" method).
+
+ run
+
+       await $app->run;
+
+    An asynchronous method which performs the actual run loop of the sensor
+    application. This implements the main application logic, of regular
+    collection of values from all of the sensor instances and reporting
+    them to the "output_readings" method.
+
+    In normal circumstances the Future instance returned by this method
+    would remain pending for the lifetime of the program, and not complete.
+    For an application that has nothing else to perform concurrently it can
+    simply await this future to run the logic. If it has other logic to
+    perform as well it could combine this with other futures using a
+    Future->needs_all or similar techniques.
+
+REQUIRED METHODS
+
+    This base class itself is incomplete, requiring the following methods
+    to be provided by an implementing subclass to contain the actual
+    application logic.
+
+ output_readings
+
+       $app->output_readings( $now, $sensors, $values );
+
+    This method is invoked regularly by the "run" method, to provide the
+    application with the latest round of sensor readings. It is passed the
+    current UNIX epoch timestamp as $now, an array reference containing the
+    individual Device::Chip::Sensor instances as $sensors, and a congruent
+    array reference containing the most recent readings taken from them, as
+    plain numbers.
+
+    The application should put the bulk of its processing logic in here,
+    for example writing the values to some sort of file or database,
+    displaying them in some form, or whatever else the application is
+    supposed to do.
+
+OVERRIDABLE METHODS
+
+    The base class provides the following methods, but it is expected that
+    applications may wish to override them to customise the logic contained
+    in them.
+
+    If using Object::Pad to do so, don't forget to provide the :override
+    method attribute.
+
+ OPTSPEC
+
+       %optspec = $app->OPTSPEC;
+
+    This method is invoked by the "parse_argv" method to construct a
+    definition of the commandline options understood by the program. These
+    are returned in a key/value list to be processed by Getopt::Long. If
+    the application wishes to parse additional arguments it should override
+    this method, call the superclass version, and append any extra argument
+    specifications it requires.
+
+    As this is invoked as a regular instance method, a convenient way to
+    store the parsed values is to pass references to instance slot
+    variables created by the Object::Pad has keyword:
+
+       has $_title;
+       has $_bgcol = "#cccccc";
+    
+       method OPTSPEC :override
+       {
+          return ( $self->SUPER::OPTSPEC,
+             'title=s'            => \$_title,
+             'background-color=s' => \$_bgcol,
+          );
+       }
+
+ after_sensors
+
+       await $app->after_sensors( @sensors )
+
+    This method is invoked once on startup by the "run" method, after it
+    has configured the chip adapter and chips and obtained their individual
+    sensor instances. The application may wish to perform one-time startup
+    tasks in here, such as creating database files with knowledge of the
+    specific sensor data types, or other such behaviours.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 57:
+
+      You forgot a '=back' before '=head1'
+

@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+
+use v5.26;
+use warnings;
+
+use Object::Pad 0.19;
+
+use Future::AsyncAwait;
+
+STDOUT->binmode( ":encoding(UTF-8)" );
+
+=head1 NAME
+
+C<device-chip-sensor-datalogger> - write CSV files from C<Device::Chip> sensor data
+
+=head1 SYNOPSIS
+
+   $ device-chip-sensor-datalogger -A BusPirate BME280 -o data.csv
+
+=head1 DESCRIPTION
+
+This program periodically queries sensor values from L<Device::Chip> instances
+attached via a L<Device::Chip::Adapter> and writes the results as records in
+a CSV file.
+
+=cut
+
+class MyApp extends App::Device::Chip::sensor
+{
+   use Text::CSV;
+   use POSIX qw( strftime );
+
+   has $_OUTFILE;
+   has $_TIMESTAMP = "%Y-%m-%d %H:%M:%S";
+
+=head1 COMMANDLINE OPTIONS
+
+The following commandline options are recognised, in addition to those
+provided by the common base class - see
+L<App::Device::Chip::sensor/COMMANDLINE OPTIONS>.
+
+=over 4
+
+=item * --output, -o FILE
+
+Gives the filename to write the CSV data into.
+
+=item * --timestamp STR
+
+A strftime(3) format string to use for writing the initial timestamp column.
+
+Defaults to C<"%Y-%m-%d %H:%M:%S">.
+
+=back
+
+=cut
+
+   method OPTSPEC :override
+   {
+      return $self->SUPER::OPTSPEC, (
+         'o|output=s' => \$_OUTFILE,
+
+         'timestamp=s'  => \$_TIMESTAMP,
+      );
+   }
+
+   has $_csv;
+   has $_outh;
+
+   async method after_sensors :override ( @sensors )
+   {
+      $_csv = Text::CSV->new;
+
+      open $_outh, ">", $_OUTFILE or die "Unable to open $_OUTFILE for writing - $!\n";
+      $_outh->binmode( ":encoding(UTF-8)" );
+      $_outh->autoflush;
+
+      $_csv->say( $_outh,
+         [ "# timestamp", map {
+            my $sensor = $_;
+            my $chip = $sensor->chip;
+            my $chipname = ( ref $chip ) =~ s/^Device::Chip:://r;
+
+            sprintf "%s %s (%s)", $chipname, $_->name, $_->units
+         } @sensors ]
+      );
+   }
+
+   method output_readings ( $now, $sensors, $values )
+   {
+      $_csv->say( $_outh,
+         [ strftime( $_TIMESTAMP, localtime $now ), map { $sensors->[$_]->format( $values->[$_] ) } 0 .. $#$sensors ]
+      );
+   }
+}
+
+await MyApp->new->parse_argv->run;
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

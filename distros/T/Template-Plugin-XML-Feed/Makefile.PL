@@ -2,15 +2,15 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'NAME' => 'Template::Plugin::XML::Feed',
+  'VERSION_FROM' => 'lib/Template/Plugin/XML/Feed.pm',
   'PREREQ_PM' => {
                    'Template' => 0,
                    'Test::More' => 0,
                    'XML::Feed' => 0
                  },
-  'PL_FILES' => {},
   'INSTALLDIRS' => 'site',
-  'NAME' => 'Template::Plugin::XML::Feed',
-  'VERSION_FROM' => 'lib/Template/Plugin/XML/Feed.pm',
-  'EXE_FILES' => []
+  'EXE_FILES' => [],
+  'PL_FILES' => {}
 )
 ;

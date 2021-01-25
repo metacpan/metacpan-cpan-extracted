@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "List::Util" => 0,
     "Math::Random" => 0,
+    "Moose" => 0,
     "Path::Tiny" => 0,
     "Pod::Usage" => 0,
     "Time::HiRes" => 0,
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::File" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +49,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "List::Util" => 0,
   "Math::Random" => 0,
+  "Moose" => 0,
   "Path::Tiny" => 0,
   "Pod::Usage" => 0,
   "Test::Exception" => 0,

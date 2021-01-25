@@ -1,76 +1,48 @@
-#!/usr/bin/perl
+# Various TLS exporter-related tests
 
-# Various TLS exporter related tests.
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More;
-use Socket;
-use File::Spec;
 use Net::SSLeay;
-use Config;
-use IO::Socket::INET;
+use Test::Net::SSLeay qw(
+    can_fork data_file_path initialise_libssl is_protocol_usable new_ctx
+    tcp_socket
+);
+
 use Storable;
 
-BEGIN {
-  plan skip_all => "fork() not supported on $^O" unless $Config{d_fork};
-  plan skip_all => "No export_keying_material()" unless defined &Net::SSLeay::export_keying_material;
-
+if (not can_fork()) {
+    plan skip_all => "fork() not supported on this system";
+} elsif (!defined &Net::SSLeay::export_keying_material) {
+    plan skip_all => "No export_keying_material()";
+} else {
+    plan tests => 36;
 }
 
-my $tests = 36;
-plan tests => $tests;
+initialise_libssl();
+
+my @rounds = qw( TLSv1 TLSv1.1 TLSv1.2 TLSv1.3 );
+
+my %usable =
+    map {
+        $_ => is_protocol_usable($_)
+    }
+    @rounds;
 
 my $pid;
 alarm(30);
 END { kill 9,$pid if $pid }
 
-my @rounds = qw(TLSv1 TLSv1.1 TLSv1.2 TLSv1.3);
 my (%server_stats, %client_stats);
 
-my ($server, $server_ctx, $client_ctx, $server_ssl, $client_ssl);
-Net::SSLeay::initialize();
+my ($server_ctx, $client_ctx, $server_ssl, $client_ssl);
 
-# Helper for client and server
-sub make_ctx
-{
-    my ($round) = @_;
-
-    my $ctx;
-    if ($round =~ /^TLSv1\.3/) {
-	return undef unless eval { Net::SSLeay::TLS1_3_VERSION(); };
-
-	# Use API introduced in OpenSSL 1.1.0
-	$ctx = Net::SSLeay::CTX_new_with_method(Net::SSLeay::TLS_method());
-	Net::SSLeay::CTX_set_min_proto_version($ctx, Net::SSLeay::TLS1_3_VERSION());
-	Net::SSLeay::CTX_set_max_proto_version($ctx, Net::SSLeay::TLS1_3_VERSION());
-    }
-    elsif ($round =~ /^TLSv1\.2/) {
-	return undef unless exists &Net::SSLeay::TLSv1_2_method;
-
-	$ctx = Net::SSLeay::CTX_new_with_method(Net::SSLeay::TLSv1_2_method());
-    }
-    elsif ($round =~ /^TLSv1\.1/) {
-	return undef unless exists &Net::SSLeay::TLSv1_1_method;
-
-	$ctx = Net::SSLeay::CTX_new_with_method(Net::SSLeay::TLSv1_1_method());
-    }
-    else
-    {
-	$ctx = Net::SSLeay::CTX_new_with_method(Net::SSLeay::TLSv1_method());
-    }
-
-    return $ctx;
-}
+my $server = tcp_socket();
 
 sub server
 {
     # SSL server - just handle connections, write, wait for read and repeat
-    my $cert_pem = File::Spec->catfile('t', 'data', 'testcert_wildcard.crt.pem');
-    my $key_pem = File::Spec->catfile('t', 'data', 'testcert_key_2048.pem');
-
-    $server = IO::Socket::INET->new( LocalAddr => '127.0.0.1', Listen => 3)
-	or BAIL_OUT("failed to create server socket: $!");
+    my $cert_pem = data_file_path('simple-cert.cert.pem');
+    my $key_pem  = data_file_path('simple-cert.key.pem');
 
     defined($pid = fork()) or BAIL_OUT("failed to fork: $!");
     if ($pid == 0) {
@@ -78,10 +50,11 @@ sub server
 
 	foreach my $round (@rounds)
 	{
-	    $cl = $server->accept or BAIL_OUT("accept failed: $!");
+	    next unless $usable{$round};
 
-	    $ctx = make_ctx($round);
-	    next unless $ctx;
+	    $cl = $server->accept();
+
+	    $ctx = new_ctx( $round, $round );
 
 	    Net::SSLeay::set_cert_and_key($ctx, $cert_pem, $key_pem);
 	    $ssl = Net::SSLeay::new($ctx);
@@ -98,40 +71,34 @@ sub server
     }
 }
 
+# SSL client - connect to server, read, test and repeat
 sub client {
-    # SSL client - connect to server, read, test and repeat
+    for my $round (@rounds) {
+        if ($usable{$round}) {
+            my $cl = $server->connect();
 
-    my $saddr = $server->sockhost.':'.$server->sockport;
-    my ($ctx, $ssl, $ret, $cl);
-    my $end = "end";
+            my $ctx = new_ctx( $round, $round );
+            my $ssl = Net::SSLeay::new($ctx);
+            Net::SSLeay::set_fd( $ssl, $cl );
+            Net::SSLeay::connect($ssl);
 
-    foreach my $round (@rounds)
-    {
-	$cl = IO::Socket::INET->new($saddr)
-	    or BAIL_OUT("failed to connect to server: $!");
+            my $msg = Net::SSLeay::read($ssl);
 
-	$ctx = make_ctx($round);
-	unless($ctx) {
-	  SKIP: {
-	      skip("Skipping round $round", 9);
-	    }
-	    next;
-	}
+            test_export($ssl);
 
-	$ssl = Net::SSLeay::new($ctx);
-	Net::SSLeay::set_fd($ssl, $cl);
-	Net::SSLeay::connect($ssl);
-	my $msg = Net::SSLeay::read($ssl);
+            Net::SSLeay::write( $ssl, $msg );
 
-	test_export($ssl);
-
-	Net::SSLeay::write($ssl, $msg);
-
-	Net::SSLeay::shutdown($ssl);
-	Net::SSLeay::free($ssl);
+            Net::SSLeay::shutdown($ssl);
+            Net::SSLeay::free($ssl);
+        }
+        else {
+            SKIP: {
+                skip( "$round not available in this libssl", 9 );
+            }
+        }
     }
 
-    return;
+    return 1;
 }
 
 sub test_export

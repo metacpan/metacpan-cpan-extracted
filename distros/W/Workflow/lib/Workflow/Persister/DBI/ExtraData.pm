@@ -7,7 +7,7 @@ use Log::Log4perl qw( get_logger );
 use Workflow::Exception qw( configuration_error persist_error );
 use English qw( -no_match_vars );
 
-$Workflow::Persister::DBI::ExtraData::VERSION = '1.49';
+$Workflow::Persister::DBI::ExtraData::VERSION = '1.50';
 
 my @FIELDS = qw( table data_field context_key );
 __PACKAGE__->mk_accessors(@FIELDS);
@@ -84,8 +84,7 @@ sub fetch_extra_workflow_data {
             && $log->debug("Prepared/executed extra data fetch ok");
         my $row = $sth->fetchrow_arrayref;
         if ( ref $data_field ) {
-            ## no critic (ProhibitCStyleForLoops)
-            for ( my $i = 0; $i < scalar @{$data_field}; $i++ ) {
+            foreach my $i ( 0 .. $#{$data_field} ) {
                 $wf->context->param( $data_field->[$i], $row->[$i] );
                 $log->is_info
                     && $log->info(

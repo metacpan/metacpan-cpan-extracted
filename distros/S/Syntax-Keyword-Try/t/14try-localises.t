@@ -12,7 +12,7 @@ use Syntax::Keyword::Try;
    eval { die "oopsie" };
    like( $@, qr/^oopsie at /, '$@ before try/catch' );
 
-   try { die "another failure" } catch {}
+   try { die "another failure" } catch ($e) {}
 
    like( $@, qr/^oopsie at /, '$@ after try/catch' );
 }

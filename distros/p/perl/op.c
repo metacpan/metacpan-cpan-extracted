@@ -5605,7 +5605,7 @@ Perl_cmpchain_finish(pTHX_ OP *ch)
 	    cmpop->op_private = 2;
 	    cmpop = CHECKOP(cmpoptype, cmpop);
 	    if(!cmpop->op_next && cmpop->op_type == cmpoptype)
-		cmpop = fold_constants(op_integerize(op_std_init(cmpop)));
+		cmpop = op_integerize(op_std_init(cmpop));
 	    condop = condop ? newLOGOP(OP_CMPCHAIN_AND, 0, cmpop, condop) :
 			cmpop;
 	    if (!nextrightarg)
@@ -15724,11 +15724,15 @@ S_aassign_scan(pTHX_ OP* o, bool rhs, int *scalars_p)
         goto do_next;
 
     case OP_UNDEF:
-        /* undef counts as a scalar on the RHS:
-         *   (undef, $x) = ...;         # only 1 scalar on LHS: always safe
+        /* undef on LHS following a var is significant, e.g.
+         *    my $x = 1;
+         *    @a = (($x, undef) = (2 => $x));
+         *    # @a shoul be (2,1) not (2,2)
+         *
+         * undef on RHS counts as a scalar:
          *   ($x, $y)    = (undef, $x); # 2 scalars on RHS: unsafe
          */
-        if (rhs)
+        if ((!rhs && *scalars_p) || rhs)
             (*scalars_p)++;
         flags = AAS_SAFE_SCALAR;
         break;

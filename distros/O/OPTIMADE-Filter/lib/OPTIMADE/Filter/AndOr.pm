@@ -4,8 +4,9 @@ use strict;
 use warnings;
 
 use parent 'OPTIMADE::Filter::Modifiable';
-
 use Scalar::Util qw(blessed);
+
+our $VERSION = '0.10.2'; # VERSION
 
 sub new {
     my $class = shift;

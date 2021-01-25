@@ -23,7 +23,6 @@
          "requires" : {
             "Class::Measure" : "0.08",
             "List::MoreUtils" : "0",
-            "Log::Log4perl" : "0",
             "Moose" : "0",
             "MooseX::NonMoose" : "0",
             "Readonly" : "1.03",
@@ -41,11 +40,14 @@
    "provides" : {
       "Class::Measure::Scientific::FX_992vb" : {
          "file" : "lib/Class/Measure/Scientific/FX_992vb.pm",
-         "version" : "v0.0.6"
+         "version" : "v0.0.7"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/rolandvanipenburg/class-measure-scientific-fx_992vb/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -53,6 +55,6 @@
          "url" : "https://bitbucket.org/rolandvanipenburg/class-measure-scientific-fx_992vb"
       }
    },
-   "version" : "v0.0.6",
+   "version" : "v0.0.7",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

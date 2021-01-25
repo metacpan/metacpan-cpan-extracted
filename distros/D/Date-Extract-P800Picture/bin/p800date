@@ -7,7 +7,7 @@ use warnings;
 use utf8;
 use 5.014000;
 
-BEGIN { our $VERSION = v1.1.5; }
+BEGIN { our $VERSION = v1.1.6; }
 
 use Date::Extract::P800Picture;
 

@@ -1,13 +1,12 @@
+use 5.008;
+
 package Module::Extract::Namespaces;
 use strict;
 
 use warnings;
 no warnings;
 
-use subs qw();
-use vars qw($VERSION);
-
-$VERSION = '1.021';
+our $VERSION = '1.022';
 
 use Carp qw(croak);
 use File::Spec::Functions qw(splitdir catfile);
@@ -94,7 +93,7 @@ sub _module_to_file {
 
 	my @module_parts = split /\b(?:::|')\b/, $module;
 	$module_parts[-1] .= '.pm';
-	
+
 	foreach my $dir ( @dirs ) {
 		unless( -d $dir ) {
 			carp( "The path [$dir] does not appear to be a directory" );
@@ -134,7 +133,9 @@ sub from_file {
 		}
 
 	my $Document = $class->get_pdom( $file );
-	return unless $Document;
+	unless( $Document ) {
+		return;
+		}
 
 	my $method = $with_versions ?
 		'get_namespaces_and_versions_from_pdom'
@@ -190,7 +191,7 @@ sub get_pdom {
 
 	my $pdom_class = $class->pdom_base_class;
 
-	eval "require $pdom_class";
+	eval "require $pdom_class; 1";
 
 	my $Document = eval {
 		my $pdom_document_class = $class->pdom_document_class;
@@ -332,7 +333,7 @@ sub error        { $Error }
 
 This code is in Github:
 
-	git://github.com/briandfoy/module-extract-namespaces.git
+	http://github.com/briandfoy/module-extract-namespaces
 
 =head1 AUTHOR
 
@@ -345,7 +346,7 @@ created this module.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2017, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2008-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the Artistic License 2.0.
 

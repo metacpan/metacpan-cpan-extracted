@@ -1,65 +1,38 @@
-#!/usr/bin/perl
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More;
-use Socket;
-use File::Spec;
-use Symbol qw(gensym);
 use Net::SSLeay;
-use Config;
+use Test::Net::SSLeay qw(
+    can_fork data_file_path initialise_libssl tcp_socket
+);
 
 BEGIN {
-  plan skip_all => "fork() not supported on $^O" unless $Config{d_fork};
+    if (not can_fork()) {
+        plan skip_all => "fork() not supported on this system";
+    } else {
+        plan tests => 122;
+    }
 }
 
-plan tests => 102;
+initialise_libssl();
+
 $SIG{'PIPE'} = 'IGNORE';
 
-my $sock;
+my $server = tcp_socket();
 my $pid;
 
-my $port = 1212;
-my $dest_ip = "\x7F\0\0\x01";
-my $dest_serv_params  = sockaddr_in($port, $dest_ip);
-my $port_trials = 1000;
-
 my $msg = 'ssleay-test';
-my $ca_cert_pem = File::Spec->catfile('t', 'data', 'test_CA1_2048.crt.pem');
-my $cert_pem = File::Spec->catfile('t', 'data', 'testcert_wildcard_CA1_2048.crt.pem');
-my $key_pem = File::Spec->catfile('t', 'data', 'testcert_key_2048.pem');
 
-my $cert_name = (Net::SSLeay::SSLeay >= 0x0090700f) ?
-                '/C=US/ST=State/L=City/O=Company/OU=Unit/CN=*.example.com/emailAddress=wildcard@example.com' :
-                '/C=US/ST=State/L=City/O=Company/OU=Unit/CN=*.example.com/Email=wildcard@example.com';
-my $cert_issuer = '/C=US/O=Demo1/CN=CA1';
-my $cert_sha1_fp = '91:41:FD:7D:99:02:2E:70:91:53:EF:C6:F3:F8:9D:E2:CF:B0:5F:0C';
+my $ca_cert_pem = data_file_path('intermediate-ca.certchain.pem');
+my $cert_pem    = data_file_path('simple-cert.cert.pem');
+my $key_pem     = data_file_path('simple-cert.key.pem');
+
+my $cert_name    = '/C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example';
+my $cert_issuer  = '/C=PL/O=Net-SSLeay/OU=Test Suite/CN=Intermediate CA';
+my $cert_sha1_fp = '9C:2E:90:B9:A7:84:7A:3A:2B:BE:FD:A5:D1:46:EA:31:75:E9:03:26';
 
 $ENV{RND_SEED} = '1234567890123456789012345678901234567890';
 
-Net::SSLeay::randomize();
-Net::SSLeay::load_error_strings();
-Net::SSLeay::ERR_load_crypto_strings();
-Net::SSLeay::library_init();
-
 {
-    my $ip = "\x7F\0\0\x01";
-    my $serv_params = sockaddr_in($port, $ip);
-    $sock = gensym();
-    socket($sock, AF_INET, SOCK_STREAM, 0) or BAIL_OUT("failed to open socket: $!");
-    # Try to find an available port to bind to
-    my $i;
-    for ($i = 0; $i < $port_trials; $i++)
-    {
-	my $serv_params = sockaddr_in($port, $ip);
-
-	last if bind($sock, $serv_params);
-	$port++;
-    }
-    BAIL_OUT("Could not find a port to bind to: $!") if $i >= 1000;
-    listen($sock, 3) or BAIL_OUT("failed to listen on socket: $!");
-
-
     my $ctx = Net::SSLeay::CTX_new();
     ok($ctx, 'CTX_new');
     ok(Net::SSLeay::CTX_set_cipher_list($ctx, 'ALL'), 'CTX_set_cipher_list');
@@ -80,12 +53,7 @@ Net::SSLeay::library_init();
     BAIL_OUT("failed to fork: $!") unless defined $pid;
     if ($pid == 0) {
         for (1 .. 7) {
-            my $ns = gensym();
-            my $addr = accept($ns, $sock);
-
-            my $old_out = select($ns);
-            $| = 1;
-            select($old_out);
+            my $ns = $server->accept();
 
             my $ssl = Net::SSLeay::new($ctx);
             ok($ssl, 'new');
@@ -103,14 +71,34 @@ Net::SSLeay::library_init();
 
             my $got = Net::SSLeay::ssl_read_all($ssl);
             is($got, $msg, 'ssl_read_all') if $_ < 7;
+
+	    is(Net::SSLeay::get_shutdown($ssl), Net::SSLeay::RECEIVED_SHUTDOWN(), 'shutdown from peer');
             ok(Net::SSLeay::ssl_write_all($ssl, uc($got)), 'ssl_write_all');
+
+	    # With 1.1.1e and $Net::SSLeay::trace=3 you'll see these without shutdown:
+	    # SSL_read 9740: 1 - error:14095126:SSL routines:ssl3_read_n:unexpected eof while reading
+	    my $sret = Net::SSLeay::shutdown($ssl);
+	    if ($sret < 0)
+	    {
+		# ERROR_SYSCALL seen on < 1.1.1, if so also print errno string
+		my $err = Net::SSLeay::get_error($ssl, $sret);
+		my $extra = ($err == Net::SSLeay::ERROR_SYSCALL()) ? "$err, $!" : "$err";
+
+		ok($err == Net::SSLeay::ERROR_ZERO_RETURN() ||
+		   $err == Net::SSLeay::ERROR_SYSCALL(),
+		    "server shutdown not success, but acceptable: $extra");
+	    }
+	    else
+	    {
+		pass('server shutdown success');
+	    }
 
             Net::SSLeay::free($ssl);
             close $ns;
         }
 
         Net::SSLeay::CTX_free($ctx);
-        close $sock;
+        $server->close();
 
         exit;
     }
@@ -118,21 +106,13 @@ Net::SSLeay::library_init();
 
 my @results;
 {
-    my ($got) = Net::SSLeay::sslcat('127.0.0.1', $port, $msg);
+    my ($got) = Net::SSLeay::sslcat($server->get_addr(), $server->get_port(), $msg);
     push @results, [ $got eq uc($msg), 'send and received correctly' ];
 
 }
 
 {
-    my $s = gensym();
-    socket($s, AF_INET, SOCK_STREAM, 0) or BAIL_OUT("failed to open socket");
-    connect($s, $dest_serv_params) or BAIL_OUT("failed to connect");
-
-    {
-        my $old_out = select($s);
-        $| = 1;
-        select($old_out);
-    }
+    my $s = $server->connect();
 
     push @results, [ my $ctx = Net::SSLeay::CTX_new(), 'CTX_new' ];
     push @results, [ my $ssl = Net::SSLeay::new($ctx), 'new' ];
@@ -143,6 +123,7 @@ my @results;
     push @results, [ Net::SSLeay::get_cipher($ssl), 'get_cipher' ];
 
     push @results, [ Net::SSLeay::ssl_write_all($ssl, $msg), 'write' ];
+    push @results, [ Net::SSLeay::shutdown($ssl) >= 0, 'client side ssl shutdown' ];
     shutdown($s, 1);
 
     my $got = Net::SSLeay::ssl_read_all($ssl);
@@ -169,15 +150,7 @@ my @results;
         Net::SSLeay::CTX_set_cert_verify_callback($ctx2, \&verify4, 1);
 
         {
-            my $s = gensym();
-            socket($s, AF_INET, SOCK_STREAM, 0) or BAIL_OUT("failed to open socket: $!");
-            connect($s, $dest_serv_params) or BAIL_OUT("failed to connect: $!");
-
-            {
-                my $old_out = select($s);
-                $| = 1;
-                select($old_out);
-            }
+            my $s = $server->connect();
 
             my $ssl = Net::SSLeay::new($ctx);
             Net::SSLeay::set_fd($ssl, fileno($s));
@@ -185,6 +158,7 @@ my @results;
 
             Net::SSLeay::ssl_write_all($ssl, $msg);
 
+	    push @results, [Net::SSLeay::shutdown($ssl) >= 0, 'verify: client side ssl shutdown' ];
             shutdown $s, 2;
             close $s;
             Net::SSLeay::free($ssl);
@@ -195,35 +169,9 @@ my @results;
         }
 
         {
-            my $s1 = gensym();
-            socket($s1, AF_INET, SOCK_STREAM, 0) or BAIL_OUT("failed to open socket: $!");
-            connect($s1, $dest_serv_params) or BAIL_OUT("failed to connect: $!");
-
-            {
-                my $old_out = select($s1);
-                $| = 1;
-                select($old_out);
-            }
-
-            my $s2 = gensym();
-            socket($s2, AF_INET, SOCK_STREAM, 0) or BAIL_OUT("failed to open socket: $!");
-            connect($s2, $dest_serv_params) or BAIL_OUT("failed to connect: $!");
-
-            {
-                my $old_out = select($s2);
-                $| = 1;
-                select($old_out);
-            }
-
-            my $s3 = gensym();
-            socket($s3, AF_INET, SOCK_STREAM, 0) or BAIL_OUT("failed to open socket: $!");
-            connect($s3, $dest_serv_params) or BAIL_OUT("failed to connect: $!");
-
-            {
-                my $old_out = select($s3);
-                $| = 1;
-                select($old_out);
-            }
+            my $s1 = $server->connect();
+            my $s2 = $server->connect();
+            my $s3 = $server->connect();
 
             my $ssl1 = Net::SSLeay::new($ctx);
             Net::SSLeay::set_verify($ssl1, &Net::SSLeay::VERIFY_PEER, \&verify2);
@@ -238,14 +186,17 @@ my @results;
 
             Net::SSLeay::connect($ssl1);
             Net::SSLeay::ssl_write_all($ssl1, $msg);
+	    push @results, [Net::SSLeay::shutdown($ssl1) >= 0, 'client side ssl1 shutdown' ];
             shutdown $s1, 2;
 
             Net::SSLeay::connect($ssl2);
             Net::SSLeay::ssl_write_all($ssl2, $msg);
+	    push @results, [Net::SSLeay::shutdown($ssl2) >= 0, 'client side ssl2 shutdown' ];
             shutdown $s2, 2;
 
             Net::SSLeay::connect($ssl3);
             Net::SSLeay::ssl_write_all($ssl3, $msg);
+	    push @results, [Net::SSLeay::shutdown($ssl3) >= 0, 'client side ssl3 shutdown' ];
             shutdown $s3, 2;
 
             close $s1;
@@ -329,15 +280,7 @@ my @results;
 }
 
 {
-    my $s = gensym();
-    socket($s, AF_INET, SOCK_STREAM, 0) or BAIL_OUT("failed to open socket: $!");
-    connect($s, $dest_serv_params) or BAIL_OUT("failed to connect: $!");
-
-    {
-        my $old_out = select($s);
-        $| = 1;
-        select($old_out);
-    }
+    my $s = $server->connect();
 
     my $ctx = Net::SSLeay::CTX_new();
     my $ssl = Net::SSLeay::new($ctx);
@@ -362,6 +305,7 @@ my @results;
     my $written = Net::SSLeay::ssl_write_all($ssl, \$data);
     push @results, [ $written == length $data, 'ssl_write_all' ];
 
+    push @results, [Net::SSLeay::shutdown($ssl) >= 0, 'client side aaa write ssl shutdown' ];
     shutdown $s, 1;
 
     my $got = Net::SSLeay::ssl_read_all($ssl);
@@ -377,7 +321,7 @@ waitpid $pid, 0;
 push @results, [ $? == 0, 'server exited with 0' ];
 
 END {
-    Test::More->builder->current_test(73);
+    Test::More->builder->current_test(87);
     for my $t (@results) {
         ok( $t->[0], $t->[1] );
     }

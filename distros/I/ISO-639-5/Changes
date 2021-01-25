@@ -7,3 +7,6 @@ Revision history for ISO-639-5
 	- added function language_group_children (immediate children in language group hierarchy)
 	- redefined function language_group (returns all languages and not immediate children only)
 
+0.04	Tue Jan 19 23:43:56 EET 2021
+	- added missing language groups
+	- fixed ISO639-5 hierarchy

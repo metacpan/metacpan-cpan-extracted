@@ -5,7 +5,7 @@ use Mojo::File qw(path);
 use Mojo::JSON qw(decode_json);
 use Carp;
 
-our $VERSION = '0.11';
+our $VERSION = '0.15';
 
 has client_email => undef;
 has expires_in   => 3600;
@@ -22,16 +22,8 @@ sub new {
 
   my $result = $self->from_json($self->{from_json});
 
-  if ( $result == 0 ) {
-    croak 'Your JSON file import failed.';
-    return undef;
-  }
   return $self;
 }
-
-#Mojo::JWT::Google->attr( claims => sub {
-#  return shift->_construct_claims;
-#}, sub { {} });
 
 sub claims {
   my ($self, $value) = @_;
@@ -71,15 +63,23 @@ sub _construct_claims {
 
 sub from_json {
   my ($self, $value) = @_;
-  return 0 if not defined $value;
-  return 0 if not -f $value;
+  croak 'You did not pass a filename to from_json' if not defined $value;
+  croak 'Cannot find file passed to from_json' if not -f $value;
   my $json = decode_json( path($value)->slurp );
-  return 0 if not defined $json->{private_key};
-  return 0 if $json->{type} ne 'service_account';
+  croak 'private key was not found in file passed to from_json' unless $json->{private_key};
+  croak 'from_json only works with service accounts' if $json->{type} ne 'service_account';
   $self->algorithm('RS256');
   $self->secret($json->{private_key});
   $self->client_email($json->{client_email});
   return 1
+}
+
+sub as_form_data {
+  my ($self) = @_;
+  return {
+    grant_type => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+    assertion => $self->encode
+  }
 }
 
 1;
@@ -91,13 +91,30 @@ Mojo::JWT::Google - Service Account tokens
 
 =head1 VERSION
 
-0.11
+version 0.15
 
 =head1 SYNOPSIS
 
   my $gjwt = Mojo::JWT::Google->new(secret => 's3cr3t',
                                     scopes => [ '/my/scope/a', '/my/scope/b' ],
                                     client_email => 'riche@cpan.org')->encode;
+
+  # authenticating for apis as a service account
+  my $gjwt = Mojo::JWT::Google->new(
+     from_json => '/my/secret/project-b98ale897.json',
+     scopes    => 'https://www.googleapis.com/auth/gmail.send',
+     user_as   => 'some-email@your-org.com'); # if you have domain-wide delegation
+  my $ua = Mojo::UserAgent->new;
+  my $tx = $ua->post('https://www.googleapis.com/oauth2/v4/token', form => $gjwt->as_form_data);
+  $tx->res->json('/access_token') # will contain your access token 
+  
+  # authenticating to use the Identity Aware Proxy
+  my $gjwt = Mojo::JWT::Google->new(
+     from_json => '/my/secret/project-b98ale897.json',
+     audience  => 'the-client-id-from-your-IAP');
+  my $ua = Mojo::UserAgent->new;
+  my $tx = $ua->post('https://www.googleapis.com/oauth2/v4/token', form => $gjwt->as_form_data);
+  $tx->res->json('/id_token') # will contain your id token 
 
 =head1 DESCRIPTION
 
@@ -122,6 +139,12 @@ need to impersonate.
   my $gjwt = Mojo::JWT::Google
     ->new( from_json => '/my/secret.json',
            scopes    => [ '/my/scope/a', '/my/scope/b' ])->encode;
+
+
+To authenticate, send a post request to https://www.googleapis.com/oauth2/v4/token, 
+with your Mojo::JWT::Google's as_form_data method as the payload.
+
+  $ua->post('https://www.googleapis.com/oauth2/v4/token', form => $gjwt->as_form_data);
 
 =cut
 
@@ -178,7 +201,7 @@ Inherits all methods from L<Mojo::JWT> and defines the following new ones.
 Loads the JSON file from Google with the client ID information in it and sets
 the respective attributes.
 
-Returns 0 on failure: file not found or value not defined
+Dies on failure: file not found or value not defined
 
  $gjwt->from_json('/my/google/app/project/sa/json/file');
 

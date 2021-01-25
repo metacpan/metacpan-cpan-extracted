@@ -1,0 +1,21 @@
+NAME
+
+    Future::IO::Impl::UV - implement Future::IO using UV
+
+DESCRIPTION
+
+    This module provides an implementation for Future::IO which uses UV.
+
+    There are no additional methods to use in this odule; it simply has to
+    be loaded, and it will provide the Future::IO implementation methods:
+
+       use Future::IO;
+       use Future::IO::Impl::UV;
+    
+       my $f = Future::IO->sleep(5);
+       ...
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

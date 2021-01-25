@@ -7,7 +7,7 @@ use Mojo::JSON;
 use Mojo::Util;
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '3.40';
+our $VERSION = '3.41';
 my $X_RE = qr{^x-};
 
 has route     => sub {undef};
@@ -50,7 +50,7 @@ sub register {
 
   $self->{default_response_codes} = $config->{default_response_codes} || [400, 401, 404, 500, 501];
   $self->{default_response_name}  = $config->{default_response_name}  || 'DefaultResponse';
-  $self->{log_level} = $ENV{MOJO_OPENAPI_LOG_LEVEL} || $config->{log_level} || 'warn';
+  $self->{log_level}              = $ENV{MOJO_OPENAPI_LOG_LEVEL} || $config->{log_level} || 'warn';
   $self->_renderer($config->{renderer}) if $config->{renderer};
   $self->_build_route($app, $config);
 
@@ -98,51 +98,43 @@ sub _add_routes {
   my ($self, $app, $config) = @_;
   my (@routes, %uniq);
 
-  my @sorted_openapi_paths
-    = map { $_->[0] }
-    sort { $a->[1] <=> $b->[1] || length $a->[0] <=> length $b->[0] }
-    map { [$_, /\{/ ? 1 : 0] } grep { !/$X_RE/ } keys %{$self->validator->get('/paths') || {}};
-
-  for my $openapi_path (@sorted_openapi_paths) {
+  $self->_each_route(sub {
+    my ($http_method, $openapi_path) = @_;
     my $path_parameters = $self->validator->get([paths => $openapi_path => 'parameters']) || [];
+    my $op_spec         = $self->validator->get([paths => $openapi_path => $http_method]);
+    my $name            = $op_spec->{'x-mojo-name'} || $op_spec->{operationId};
+    my $to              = $op_spec->{'x-mojo-to'};
+    my $r;
 
-    for my $http_method (sort keys %{$self->validator->get([paths => $openapi_path]) || {}}) {
-      next if $http_method =~ $X_RE or $http_method eq 'parameters';
-      my $op_spec = $self->validator->get([paths => $openapi_path => $http_method]);
-      my $name    = $op_spec->{'x-mojo-name'} || $op_spec->{operationId};
-      my $to      = $op_spec->{'x-mojo-to'};
-      my $r;
+    $self->{parameters_for}{$openapi_path}{$http_method}
+      = [@$path_parameters, @{$op_spec->{parameters} || []}];
 
-      $self->{parameters_for}{$openapi_path}{$http_method}
-        = [@$path_parameters, @{$op_spec->{parameters} || []}];
+    die qq([OpenAPI] operationId "$op_spec->{operationId}" is not unique)
+      if $op_spec->{operationId} and $uniq{o}{$op_spec->{operationId}}++;
+    die qq([OpenAPI] Route name "$name" is not unique.) if $name and $uniq{r}{$name}++;
 
-      die qq([OpenAPI] operationId "$op_spec->{operationId}" is not unique)
-        if $op_spec->{operationId} and $uniq{o}{$op_spec->{operationId}}++;
-      die qq([OpenAPI] Route name "$name" is not unique.) if $name and $uniq{r}{$name}++;
-
-      if (!$to and $name) {
-        $r = $self->route->root->find($name);
-        warn "[OpenAPI] Found existing route by name '$name'.\n" if DEBUG and $r;
-        $self->route->add_child($r)                              if $r;
-      }
-      if (!$r) {
-        my $route_path = $self->_openapi_path_to_route_path($http_method, $openapi_path);
-        $name ||= $op_spec->{operationId};
-        warn "[OpenAPI] Creating new route for '$route_path'.\n" if DEBUG;
-        $r = $self->route->$http_method($route_path);
-        $r->name("$self->{route_prefix}$name") if $name;
-      }
-
-      $self->_add_default_response($op_spec);
-
-      $r->to(ref $to eq 'ARRAY' ? @$to : $to) if $to;
-      $r->to({'openapi.method' => $http_method});
-      $r->to({'openapi.path'   => $openapi_path});
-      warn "[OpenAPI] Add route $http_method @{[$r->to_string]} (@{[$r->name // '']})\n" if DEBUG;
-
-      push @routes, $r;
+    if (!$to and $name) {
+      $r = $self->route->root->find($name);
+      warn "[OpenAPI] Found existing route by name '$name'.\n" if DEBUG and $r;
+      $self->route->add_child($r) if $r;
     }
-  }
+    if (!$r) {
+      my $route_path = $self->_openapi_path_to_route_path($http_method, $openapi_path);
+      $name ||= $op_spec->{operationId};
+      warn "[OpenAPI] Creating new route for '$route_path'.\n" if DEBUG;
+      $r = $self->route->$http_method($route_path);
+      $r->name("$self->{route_prefix}$name") if $name;
+    }
+
+    $self->_add_default_response($op_spec);
+
+    $r->to(ref $to eq 'ARRAY' ? @$to : $to) if $to;
+    $r->to({'openapi.method' => $http_method});
+    $r->to({'openapi.path'   => $openapi_path});
+    warn "[OpenAPI] Add route $http_method @{[$r->to_string]} (@{[$r->name // '']})\n" if DEBUG;
+
+    push @routes, $r;
+  });
 
   $app->plugins->emit_hook(openapi_routes_added => $self, \@routes);
 }
@@ -226,6 +218,22 @@ sub _default_schema_v3 {
     description => 'default Mojolicious::Plugin::OpenAPI response',
     content     => {'application/json' => {schema => $schema}},
   };
+}
+
+sub _each_route {
+  my ($self, $cb) = @_;
+
+  my @sorted_paths
+    = map { $_->[0] }
+    sort  { $a->[1] <=> $b->[1] || length $a->[0] <=> length $b->[0] }
+    map   { [$_, /\{/ ? 1 : 0] } grep { !/$X_RE/ } keys %{$self->validator->get('/paths') || {}};
+
+  my @routes;
+  for my $path (@sorted_paths) {
+    for my $http_method (sort keys %{$self->validator->get([paths => $path]) || {}}) {
+      $cb->($http_method => $path) unless $http_method =~ $X_RE or $http_method eq 'parameters';
+    }
+  }
 }
 
 sub _helper_get_spec {
@@ -408,6 +416,16 @@ Mojolicious::Plugin::OpenAPI - OpenAPI / Swagger plugin for Mojolicious
 See L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2> or
 L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv3> for tutorials on how to
 write a "full" app with application class and controllers.
+
+=head1 IMPORTANT ANNOUNCEMENT
+
+Next version of L<Mojolicious::Plugin::OpenAPI> will not be shipped with
+L<JSON::Validator::OpenAPI::Mojolicious>. Instead, it will depend on the new
+L<JSON::Validator::Schema::OpenAPIv2> and L<JSON::Validator::Schema::OpenAPIv3>
+modules.
+
+The next version is available at
+L<https://github.com/jhthorsen/mojolicious-plugin-openapi/pull/160>.
 
 =head1 DESCRIPTION
 

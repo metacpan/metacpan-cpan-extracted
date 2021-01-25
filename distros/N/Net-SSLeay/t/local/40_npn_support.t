@@ -1,52 +1,46 @@
-#!/usr/bin/perl
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More;
-use Socket;
-use File::Spec;
-use Symbol qw(gensym);
 use Net::SSLeay;
-use Config;
+use Test::Net::SSLeay qw(
+    can_fork data_file_path initialise_libssl new_ctx tcp_socket
+);
 
 BEGIN {
-  plan skip_all => "openssl 1.0.1 required" unless Net::SSLeay::SSLeay >= 0x10001000;
-  plan skip_all => "libressl removed support for NPN" if Net::SSLeay::constant("LIBRESSL_VERSION_NUMBER");
-  plan skip_all => "fork() not supported on $^O" unless $Config{d_fork};
+    if (Net::SSLeay::SSLeay < 0x10001000) {
+        plan skip_all => "OpenSSL 1.0.1 or above required";
+    } elsif (Net::SSLeay::constant("LIBRESSL_VERSION_NUMBER")) {
+        plan skip_all => "LibreSSL removed support for NPN";
+    } elsif (not can_fork()) {
+        plan skip_all => "fork() not supported on this system";
+    } elsif ( !eval { new_ctx( undef, 'TLSv1.2' ); 1 } ) {
+        # NPN isn't well-defined for TLSv1.3, so these tests can't be run if
+        # that's the only available protocol version
+        plan skip_all => 'TLSv1.2 or below not available in this libssl';
+    } else {
+        plan tests => 7;
+    }
 }
 
-plan tests => 7; 
+initialise_libssl();
 
-my $sock;
+my $server = tcp_socket();
+my $msg = 'ssleay-npn-test';
+
 my $pid;
 
-my $port = 40000+int(rand(9999));
-my $ip = "\x7F\0\0\x01";
-my $serv_params  = sockaddr_in($port, $ip);
+my $cert_pem = data_file_path('simple-cert.cert.pem');
+my $key_pem  = data_file_path('simple-cert.key.pem');
 
-my $msg = 'ssleay-npn-test';
-my $cert_pem = File::Spec->catfile('t', 'data', 'testcert_wildcard.crt.pem');
-my $key_pem = File::Spec->catfile('t', 'data', 'testcert_key_2048.pem');
 my @results;
-Net::SSLeay::initialize();
 
 {
     # SSL server
-    $sock = gensym();
-    socket($sock, AF_INET, SOCK_STREAM, 0) or BAIL_OUT("failed to open socket: $!");
-    bind($sock, $serv_params) or BAIL_OUT("failed to bind socket: $!");
-    listen($sock, 3) or BAIL_OUT("failed to listen on socket: $!");
-
     $pid = fork();
     BAIL_OUT("failed to fork: $!") unless defined $pid;
     if ($pid == 0) {
-        my $ns = gensym();
-        my $addr = accept($ns, $sock);
-        my $old_out = select($ns);
-        $| = 1;
-        select($old_out);
+        my $ns = $server->accept();
 
-        my $ctx = Net::SSLeay::CTX_tlsv1_new();
+        my ( $ctx, $proto ) = new_ctx( undef, 'TLSv1.2' );
         Net::SSLeay::set_cert_and_key($ctx, $cert_pem, $key_pem);
 
         my $rv = Net::SSLeay::CTX_set_next_protos_advertised_cb($ctx, ['spdy/2','http1.1']);
@@ -65,21 +59,16 @@ Net::SSLeay::initialize();
         Net::SSLeay::free($ssl);
         Net::SSLeay::CTX_free($ctx);
         close $ns;
-        close $sock;
+        $server->close();
         exit;
     }
 }
 
 {
     # SSL client
-    my $s1 = gensym();
-    socket($s1, AF_INET, SOCK_STREAM, 0) or BAIL_OUT("failed to open socket: $!");
-    connect($s1, $serv_params) or BAIL_OUT("failed to connect: $!");
-    my $old_out = select($s1);
-    $| = 1;
-    select($old_out);
+    my $s1 = $server->connect();
 
-    my $ctx1 = Net::SSLeay::CTX_tlsv1_new();
+    my $ctx1 = new_ctx( undef, 'TLSv1.2' );
 
     my $rv = Net::SSLeay::CTX_set_next_proto_select_cb($ctx1, ['http1.1','spdy/2']);
     push @results, [ $rv==1, 'CTX_set_next_proto_select_cb'];

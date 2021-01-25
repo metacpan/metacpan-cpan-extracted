@@ -56,10 +56,13 @@
       "X_metaspec" : {
          "version" : 2
       },
+      "bugtracker" : {
+         "web" : "https://github.com/rjt-pl/Net-RCON-Minecraft/issues"
+      },
       "repository" : {
          "url" : "https://github.com/rjt-pl/Net-RCON-Minecraft.git"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

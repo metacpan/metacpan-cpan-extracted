@@ -15,7 +15,7 @@ use Syntax::Keyword::Try;
          $count++;
          redo LOOP if $count < 2;
       }
-      catch { }
+      catch ($e) { }
    }
 
    is( $count, 2, 'try{redo} works' );
@@ -28,7 +28,7 @@ use Syntax::Keyword::Try;
          last LOOP2;
          $after++; # just to put a statement after 'last'
       }
-      catch { }
+      catch ($e) { }
       $count++;
    }
 
@@ -42,7 +42,7 @@ use Syntax::Keyword::Try;
       try {
          die "oopsie";
       }
-      catch {
+      catch ($e) {
          $count++;
          redo LOOP if $count < 2;
       }
@@ -56,7 +56,7 @@ use Syntax::Keyword::Try;
       try {
          die "oopsie";
       }
-      catch {
+      catch ($e) {
          last LOOP2;
       }
       $count++;

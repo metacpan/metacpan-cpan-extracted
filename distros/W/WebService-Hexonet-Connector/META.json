@@ -4,7 +4,7 @@
       "hexonet <middleware@hexonet.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -51,16 +51,16 @@
          "requires" : {
             "Config" : "0",
             "POSIX" : "0",
-            "Readonly" : "2.05",
+            "Readonly" : "0",
             "Scalar::Util" : "0",
-            "Test::Exception" : "0.43",
+            "Test::Exception" : "0",
             "Test::More" : "0",
-            "Test::RequiresInternet" : "0.05",
-            "version" : "0.9924"
+            "Test::RequiresInternet" : "0",
+            "version" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v2.10.0",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v2.10.1",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

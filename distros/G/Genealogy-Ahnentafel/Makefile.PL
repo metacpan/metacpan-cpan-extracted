@@ -24,6 +24,9 @@ WriteMakefile(
                 url => 'git://github.com/davorg/genealogy-ahnentafel.git',
                 web => 'https://github.com/davorg/genealogy-ahnentafel',
             },
+            bugtracker => {
+                web => 'https://github.com/davorg/genealogy-ahnentafel/issues',
+            },
         },
     },
 );

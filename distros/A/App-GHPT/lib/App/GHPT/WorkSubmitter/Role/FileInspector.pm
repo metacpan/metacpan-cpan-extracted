@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter::Role::FileInspector;
 
 use App::GHPT::Wrapper::OurMoose::Role;
 
-our $VERSION = '1.000012';
+our $VERSION = '1.001000';
 
 use IPC::Run3 qw( run3 );
 
@@ -42,7 +42,7 @@ App::GHPT::WorkSubmitter::Role::FileInspector - Role for examining the committed
 
 =head1 VERSION
 
-version 1.000012
+version 1.001000
 
 =head1 SUPPORT
 
@@ -64,7 +64,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by MaxMind, Inc.
+This software is Copyright (c) 2021 by MaxMind, Inc.
 
 This is free software, licensed under:
 

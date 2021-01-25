@@ -1,7 +1,7 @@
 package App::TimeTracker::Data::Task;
 
 # ABSTRACT: App::TimeTracker Task storage
-our $VERSION = '3.008'; # VERSION
+our $VERSION = '3.009'; # VERSION
 
 use 5.010;
 
@@ -221,7 +221,7 @@ App::TimeTracker::Data::Task - App::TimeTracker Task storage
 
 =head1 VERSION
 
-version 3.008
+version 3.009
 
 =head1 DESCRIPTION
 

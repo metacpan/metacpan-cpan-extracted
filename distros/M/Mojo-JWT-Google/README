@@ -2,12 +2,29 @@ NAME
     Mojo::JWT::Google - Service Account tokens
 
 VERSION
-    0.11
+    version 0.15
 
 SYNOPSIS
       my $gjwt = Mojo::JWT::Google->new(secret => 's3cr3t',
                                         scopes => [ '/my/scope/a', '/my/scope/b' ],
                                         client_email => 'riche@cpan.org')->encode;
+
+      # authenticating for apis as a service account
+      my $gjwt = Mojo::JWT::Google->new(
+         from_json => '/my/secret/project-b98ale897.json',
+         scopes    => 'https://www.googleapis.com/auth/gmail.send',
+         user_as   => 'some-email@your-org.com'); # if you have domain-wide delegation
+      my $ua = Mojo::UserAgent->new;
+      my $tx = $ua->post('https://www.googleapis.com/oauth2/v4/token', form => $gjwt->as_form_data);
+      $tx->res->json('/access_token') # will contain your access token 
+  
+      # authenticating to use the Identity Aware Proxy
+      my $gjwt = Mojo::JWT::Google->new(
+         from_json => '/my/secret/project-b98ale897.json',
+         audience  => 'the-client-id-from-your-IAP');
+      my $ua = Mojo::UserAgent->new;
+      my $tx = $ua->post('https://www.googleapis.com/oauth2/v4/token', form => $gjwt->as_form_data);
+      $tx->res->json('/id_token') # will contain your id token
 
 DESCRIPTION
     Like Mojo::JWT, you can instantiate this class by using the same syntax,
@@ -31,6 +48,12 @@ DESCRIPTION
       my $gjwt = Mojo::JWT::Google
         ->new( from_json => '/my/secret.json',
                scopes    => [ '/my/scope/a', '/my/scope/b' ])->encode;
+
+    To authenticate, send a post request to
+    https://www.googleapis.com/oauth2/v4/token, with your
+    Mojo::JWT::Google's as_form_data method as the payload.
+
+      $ua->post('https://www.googleapis.com/oauth2/v4/token', form => $gjwt->as_form_data);
 
 ATTRIBUTES
     Mojo::JWT::Google inherits all attributes from Mojo::JWT and defines the
@@ -72,7 +95,7 @@ METHODS
     Loads the JSON file from Google with the client ID information in it and
     sets the respective attributes.
 
-    Returns 0 on failure: file not found or value not defined
+    Dies on failure: file not found or value not defined
 
      $gjwt->from_json('/my/google/app/project/sa/json/file');
 

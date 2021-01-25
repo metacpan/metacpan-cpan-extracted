@@ -1,7 +1,7 @@
 use v5.28;
 use warnings;
 use Test::More;
-use Quantum::Superpositions::Lazy qw(with_sources);
+use Quantum::Superpositions::Lazy qw(superpos with_sources);
 use Data::Dumper;
 
 ##############################################################################

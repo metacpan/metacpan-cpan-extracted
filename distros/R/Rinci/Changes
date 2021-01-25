@@ -1,3 +1,10 @@
+1.1.96  2021-01-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Introduce result metadata properties: content_type, location.
+
+	- Introduce special function argument -content_type_ARGNAME.
+
+
 1.1.95  2020-10-01  Released-By: PERLANCAR; Urgency: low
 
 	- No spec changes.

@@ -542,6 +542,9 @@ EXPORTABLE FUNCTIONS
     containing the unpacked version of the supplied literal SQL and bind
     values.
 
+  is_undef_value
+    Tests for undef, whether expanded or not.
+
 WHERE CLAUSES
   Introduction
     This module uses a variation on the idea from DBIx::Abstract. It is NOT,
@@ -1153,7 +1156,8 @@ ORDER BY CLAUSES
         ]                             |   /* ...with $x bound to ? */
         ===============================================================
 
-SPECIAL OPERATORS
+OLD EXTENSION SYSTEM
+  SPECIAL OPERATORS
       my $sqlmaker = SQL::Abstract->new(special_ops => [
          {
           regex => qr/.../,
@@ -1227,7 +1231,7 @@ SPECIAL OPERATORS
 
       ]);
 
-UNARY OPERATORS
+  UNARY OPERATORS
       my $sqlmaker = SQL::Abstract->new(unary_ops => [
          {
           regex => qr/.../,
@@ -1269,6 +1273,140 @@ UNARY OPERATORS
         When supplied with a coderef, it is called as:
 
          $coderef->($self, $op, $arg)
+
+NEW METHODS (EXPERIMENTAL)
+    See SQL::Abstract::Reference for the "expr" versus "aqt" concept and an
+    explanation of what the below extensions are extending.
+
+  plugin
+      $sqla->plugin('+Foo');
+
+    Enables plugin SQL::Abstract::Plugin::Foo.
+
+  render_expr
+      my ($sql, @bind) = $sqla->render_expr($expr);
+
+  render_statement
+    Use this if you may be rendering a top level statement so e.g. a SELECT
+    query doesn't get wrapped in parens
+
+      my ($sql, @bind) = $sqla->render_statement($expr);
+
+  expand_expr
+    Expression expansion with optional default for scalars.
+
+      my $aqt = $self->expand_expr($expr);
+      my $aqt = $self->expand_expr($expr, -ident);
+
+  render_aqt
+    Top level means avoid parens on statement AQT.
+
+      my $res = $self->render_aqt($aqt, $top_level);
+      my ($sql, @bind) = @$res;
+
+  join_query_parts
+    Similar to join() but will render hashrefs as nodes for both join and
+    parts, and treats arrayref as a nested "[ $join, @parts ]" structure.
+
+      my $part = $self->join_query_parts($join, @parts);
+
+NEW EXTENSION SYSTEM
+  clone
+      my $sqla2 = $sqla->clone;
+
+    Performs a semi-shallow copy such that extension methods won't leak
+    state but excessive depth is avoided.
+
+  expander
+  expanders
+  op_expander
+  op_expanders
+  clause_expander
+  clause_expanders
+      $sqla->expander('name' => sub { ... });
+      $sqla->expanders('name1' => sub { ... }, 'name2' => sub { ... });
+
+  expander_list
+  op_expander_list
+  clause_expander_list
+      my @names = $sqla->expander_list;
+
+  wrap_expander
+  wrap_expanders
+  wrap_op_expander
+  wrap_op_expanders
+  wrap_clause_expander
+  wrap_clause_expanders
+      $sqla->wrap_expander('name' => sub { my ($orig) = @_; sub { ... } });
+      $sqla->wrap_expanders(
+        'name1' => sub { my ($orig1) = @_; sub { ... } },
+        'name2' => sub { my ($orig2) = @_; sub { ... } },
+      );
+
+  renderer
+  renderers
+  op_renderer
+  op_renderers
+  clause_renderer
+  clause_renderers
+      $sqla->renderer('name' => sub { ... });
+      $sqla->renderers('name1' => sub { ... }, 'name2' => sub { ... });
+
+  renderer_list
+  op_renderer_list
+  clause_renderer_list
+      my @names = $sqla->renderer_list;
+
+  wrap_renderer
+  wrap_renderers
+  wrap_op_renderer
+  wrap_op_renderers
+  wrap_clause_renderer
+  wrap_clause_renderers
+      $sqla->wrap_renderer('name' => sub { my ($orig) = @_; sub { ... } });
+      $sqla->wrap_renderers(
+        'name1' => sub { my ($orig1) = @_; sub { ... } },
+        'name2' => sub { my ($orig2) = @_; sub { ... } },
+      );
+
+  clauses_of
+      my @clauses = $sqla->clauses_of('select');
+      $sqla->clauses_of(select => \@new_clauses);
+      $sqla->clauses_of(select => sub {
+        my (undef, @old_clauses) = @_;
+        ...
+        return @new_clauses;
+      });
+
+  statement_list
+      my @list = $sqla->statement_list;
+
+  make_unop_expander
+      my $exp = $sqla->make_unop_expander(sub { ... });
+
+    If the op is found as a binop, assumes it wants a default comparison, so
+    the inner expander sub can reliably operate as
+
+      sub { my ($self, $name, $body) = @_; ... }
+
+  make_binop_expander
+      my $exp = $sqla->make_binop_expander(sub { ... });
+
+    If the op is found as a unop, assumes the value will be an arrayref with
+    the LHS as the first entry, and converts that to an ident node if it's a
+    simple scalar. So the inner expander sub looks like
+
+      sub {
+        my ($self, $name, $body, $k) = @_;
+        { -blah => [ map $self->expand_expr($_), $k, $body ] }
+      }
+
+  unop_expander
+  unop_expanders
+  binop_expander
+  binop_expanders
+    The above methods operate exactly like the op_ versions but wrap the
+    coderef using the appropriate make_ method first.
 
 PERFORMANCE
     Thanks to some benchmarking by Mark Stosberg, it turns out that this

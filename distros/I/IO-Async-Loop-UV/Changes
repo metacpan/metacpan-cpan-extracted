@@ -1,4 +1,12 @@
 Revision history for IO-Async-Loop-UV
 
+0.02    2021-01-22
+        [CHANGES]
+         * Updated to complete API wrapping provided by UV 1.900
+         * Implement a ->watch_process sufficient for our purposes
+            + Declare the all-childs PID watch unsupported
+         * Add the various t/1?share-*.t unit tests to demonstrate mixed
+           UV + IO::Async resource sharing
+
 0.01    First version, released on an unsuspecting world.
 

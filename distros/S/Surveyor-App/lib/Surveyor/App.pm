@@ -1,8 +1,10 @@
+use v5.14;
+
 package Surveyor::App;
 use strict;
 use warnings;
 
-our $VERSION = '0.121';
+our $VERSION = '0.122';
 
 =encoding utf8
 
@@ -155,7 +157,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2013-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2013-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

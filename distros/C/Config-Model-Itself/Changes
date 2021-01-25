@@ -1,3 +1,9 @@
+2.022 2021-01-21
+
+  Model update:
+    * feature (Class model): add IniFile quote_value parameter
+      (require Config::Model 2.141)
+
 2.021 2021-01-13
 
   A new 2.021 release for 2021 :-)

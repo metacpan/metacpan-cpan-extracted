@@ -1,0 +1,28 @@
+Neo4j::Types
+
+version 1.00
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021 by Arne Johannessen.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

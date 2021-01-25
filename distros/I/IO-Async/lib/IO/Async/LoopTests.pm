@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
 package IO::Async::LoopTests;
 
@@ -28,7 +28,7 @@ use POSIX qw( SIGTERM );
 use Socket qw( sockaddr_family AF_UNIX );
 use Time::HiRes qw( time );
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 # Abstract Units of Time
 use constant AUT => $ENV{TEST_QUICK_TIMERS} ? 0.1 : 1;
@@ -428,58 +428,71 @@ Tests the Loop's ability to handle timer events
 
 sub run_tests_timer
 {
-   my $done = 0;
    # New watch/unwatch API
 
    cmp_ok( abs( $loop->time - time ), "<", 0.1, '$loop->time gives the current time' );
 
-   $loop->watch_time( after => 2 * AUT, code => sub { $done = 1; } );
+   # ->watch_time after
+   {
+      my $done;
+      $loop->watch_time( after => 2 * AUT, code => sub { $done = 1; } );
 
-   is_oneref( $loop, '$loop has refcount 1 after watch_time' );
+      is_oneref( $loop, '$loop has refcount 1 after watch_time' );
 
-   time_between {
-      my $now = time;
-      $loop->loop_once( 5 * AUT );
+      time_between {
+         my $now = time;
+         $loop->loop_once( 5 * AUT );
 
-      # poll might have returned just a little early, such that the TimerQueue
-      # doesn't think anything is ready yet. We need to handle that case.
-      while( !$done ) {
-         die "It should have been ready by now" if( time - $now > 5 * AUT );
-         $loop->loop_once( 0.1 * AUT );
-      }
-   } 1.5, 2.5, 'loop_once(5) while waiting for watch_time after';
+         # poll might have returned just a little early, such that the TimerQueue
+         # doesn't think anything is ready yet. We need to handle that case.
+         while( !$done ) {
+            die "It should have been ready by now" if( time - $now > 5 * AUT );
+            $loop->loop_once( 0.1 * AUT );
+         }
+      } 1.5, 2.5, 'loop_once(5) while waiting for watch_time after';
+   }
 
-   $loop->watch_time( at => time + 2 * AUT, code => sub { $done = 2; } );
+   # ->watch_time at
+   {
+      my $done;
+      $loop->watch_time( at => time + 2 * AUT, code => sub { $done = 1; } );
 
-   time_between {
-      my $now = time;
-      $loop->loop_once( 5 * AUT );
+      time_between {
+         my $now = time;
+         $loop->loop_once( 5 * AUT );
 
-      # poll might have returned just a little early, such that the TimerQueue
-      # doesn't think anything is ready yet. We need to handle that case.
-      while( !$done ) {
-         die "It should have been ready by now" if( time - $now > 5 * AUT );
-         $loop->loop_once( 0.1 * AUT );
-      }
-   } 1.5, 2.5, 'loop_once(5) while waiting for watch_time at';
+         # poll might have returned just a little early, such that the TimerQueue
+         # doesn't think anything is ready yet. We need to handle that case.
+         while( !$done ) {
+            die "It should have been ready by now" if( time - $now > 5 * AUT );
+            $loop->loop_once( 0.1 * AUT );
+         }
+      } 1.5, 2.5, 'loop_once(5) while waiting for watch_time at';
+   }
 
-   my $cancelled_fired = 0;
-   my $id = $loop->watch_time( after => 1 * AUT, code => sub { $cancelled_fired = 1 } );
-   $loop->unwatch_time( $id );
-   undef $id;
+   # cancelled timer
+   {
+      my $cancelled_fired = 0;
+      my $id = $loop->watch_time( after => 1 * AUT, code => sub { $cancelled_fired = 1 } );
+      $loop->unwatch_time( $id );
+      undef $id;
 
-   $loop->loop_once( 2 * AUT );
+      $loop->loop_once( 2 * AUT );
 
-   ok( !$cancelled_fired, 'unwatched watch_time does not fire' );
+      ok( !$cancelled_fired, 'unwatched watch_time does not fire' );
+   }
 
-   $loop->watch_time( after => -1, code => sub { $done = 1 } );
+   # ->watch_after negative time
+   {
+      my $done;
+      $loop->watch_time( after => -1, code => sub { $done = 1 } );
 
-   $done = 0;
+      time_between {
+         $loop->loop_once while !$done;
+      } 0, 0.1, 'loop_once while waiting for negative interval timer';
+   }
 
-   time_between {
-      $loop->loop_once while !$done;
-   } 0, 0.1, 'loop_once while waiting for negative interval timer';
-
+   # self-cancellation
    {
       my $done;
 
@@ -497,25 +510,6 @@ sub run_tests_timer
       is( $done, 1, 'Other timers still fire after self-cancelling one' );
    }
 
-   # Legacy enqueue/requeue/cancel API
-   $done = 0;
-
-   $loop->enqueue_timer( delay => 2 * AUT, code => sub { $done = 1; } );
-
-   is_oneref( $loop, '$loop has refcount 1 after enqueue_timer' );
-
-   time_between {
-      my $now = time;
-      $loop->loop_once( 5 * AUT );
-
-      # poll might have returned just a little early, such that the TimerQueue
-      # doesn't think anything is ready yet. We need to handle that case.
-      while( !$done ) {
-         die "It should have been ready by now" if( time - $now > 5 * AUT );
-         $loop->loop_once( 0.1 * AUT );
-      }
-   } 1.5, 2.5, 'loop_once(5) while waiting for timer';
-
    SKIP: {
       skip "Unable to handle sub-second timers accurately", 3 unless $loop->_CAN_SUBSECOND_ACCURATELY;
 
@@ -525,7 +519,7 @@ sub run_tests_timer
          my $count = 0;
          my $start = time;
 
-         $loop->enqueue_timer( delay => $delay, code => sub { $done++ } );
+         $loop->watch_timer( delay => $delay, code => sub { $done++ } );
 
          while( !$done ) {
             $loop->loop_once( 1 );
@@ -536,38 +530,6 @@ sub run_tests_timer
          is( $count, 1, "One ->loop_once(1) sufficient for a single $delay second timer" );
       }
    }
-
-   $cancelled_fired = 0;
-   $id = $loop->enqueue_timer( delay => 1 * AUT, code => sub { $cancelled_fired = 1 } );
-   $loop->cancel_timer( $id );
-   undef $id;
-
-   $loop->loop_once( 2 * AUT );
-
-   ok( !$cancelled_fired, 'cancelled timer does not fire' );
-
-   $id = $loop->enqueue_timer( delay => 1 * AUT, code => sub { $done = 2; } );
-   $id = $loop->requeue_timer( $id, delay => 2 * AUT );
-
-   $done = 0;
-
-   time_between {
-      $loop->loop_once( 1 * AUT );
-
-      is( $done, 0, '$done still 0 so far' );
-
-      my $now = time;
-      $loop->loop_once( 5 * AUT );
-
-      # poll might have returned just a little early, such that the TimerQueue
-      # doesn't think anything is ready yet. We need to handle that case.
-      while( !$done ) {
-         die "It should have been ready by now" if( time - $now > 5 * AUT );
-         $loop->loop_once( 0.1 * AUT );
-      }
-   } 1.5, 2.5, 'requeued timer of delay 2';
-
-   is( $done, 2, '$done is 2 after requeued timer' );
 }
 
 =head2 signal
@@ -696,6 +658,10 @@ sub run_tests_idle
 
    $loop->unwatch_idle( $id );
 
+   # Some loop types (e.g. UV) need to clear a pending queue first and thus the
+   # first loop_once will take zero time
+   $loop->loop_once( 0 );
+
    time_between { $loop->loop_once( 1 * AUT ) } 0.5, 1.5, 'loop_once(1) with unwatched deferral';
 
    is( $called, 2, 'unwatched deferral not called' );
@@ -777,16 +743,20 @@ sub run_tests_process
       is( ($exitcode & 0x7f), SIGTERM, 'WTERMSIG($exitcode) after SIGTERM' );
    }
 
-   my %kids;
+   SKIP: {
+      my %kids;
 
-   $loop->watch_process( 0 => sub { my ( $kid ) = @_; delete $kids{$kid} } );
+      $loop->_CAN_WATCH_ALL_PIDS or skip "Loop cannot watch_process for all PIDs", 2;
 
-   %kids = map { run_in_child { exit 0 } => 1 } 1 .. 3;
+      $loop->watch_process( 0 => sub { my ( $kid ) = @_; delete $kids{$kid} } );
 
-   is( scalar keys %kids, 3, 'Waiting for 3 child processes' );
+      %kids = map { run_in_child { exit 0 } => 1 } 1 .. 3;
 
-   wait_for { !keys %kids };
-   ok( !keys %kids, 'All child processes reclaimed' );
+      is( scalar keys %kids, 3, 'Waiting for 3 child processes' );
+
+      wait_for { !keys %kids };
+      ok( !keys %kids, 'All child processes reclaimed' );
+   }
 
    # Legacy API name
    $kid = run_in_child { exit 2 };

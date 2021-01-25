@@ -1,5 +1,11 @@
 Revision history for XS-Parse-Sublike
 
+0.11    2021-01-18
+        [BUGFIXES]
+         * Don't SEGV on signature parse error (RT133865)
+         * Account for change of signature validation error message in latest
+           bleadperl (RT134012)
+
 0.10    2020-06-20
         [BREAKING CHANGES]
          * New ABI version 3

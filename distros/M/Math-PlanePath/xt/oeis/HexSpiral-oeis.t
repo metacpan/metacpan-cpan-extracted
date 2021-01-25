@@ -40,7 +40,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 9;
+plan tests => 18;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -57,6 +57,53 @@ use Math::NumSeq::PlanePathTurn;
 my @dir6_to_dx = (2, 1,-1,-2, -1, 1);
 my @dir6_to_dy = (0, 1, 1, 0, -1,-1);
 
+
+#------------------------------------------------------------------------------
+# sloped lines
+
+foreach my $elem (['A062783', 3, 1,  n_start => 0],
+                  ['A063436', -3, -1,  n_start => 0],
+
+                  # ['A063436', -3, 1,  n_start => 0],
+                  # not in OEIS: 0,13,50,111,196,305,438
+
+                  # ['A063436', 3, -1,  n_start => 0],
+                  # not in OEIS: 0,7,38,93,172,275
+                  # not A270704 is double
+
+                  # ['A000001', 0, 2,  n_start => 0],
+                  # not in OEIS: 0,11,46,105,188,295
+
+                  ['A000002', 0, -2,  n_start => 0],
+                  # not in OEIS: 0,17,58,123,212,325,462
+
+                  # names of these are angles starting vertical Y axis and
+                  # measuring clockwise
+                  ['A244802', 3, 1],     # 30 deg  1, 10, 43, 100
+                  ['A244803', 0, 2],     # 90 deg  1, 12, 47, 106
+                  ['A244804', -3, 1],    # 150 deg
+                  ['A244805', -3, -1],   # -150 deg
+                  ['A244806', 0, -2],    # -90 deg
+                 ) {
+  my ($anum,$dx,$dy, %options) = @$elem;
+
+  MyOEIS::compare_values
+      (anum => $anum,
+       name => "line slope $dx,$dy",
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         my $path = Math::PlanePath::HexSpiral->new (%options);
+         my $x = 0;
+         my $y = 0;
+         while (@got < $count) {
+           push @got, $path->xy_to_n ($x,$y);
+           $x += $dx;
+           $y += $dy;
+         }
+         return \@got;
+       });
+}
 
 #------------------------------------------------------------------------------
 # A001399 -- N where turn left

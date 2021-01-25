@@ -7,12 +7,12 @@ use feature ':5.10';
 
 use Net::OpenVAS::Error;
 
-use XML::Simple qw( :strict );
 use Carp;
+use XML::Hash::XS;
 
 use overload q|""| => 'raw', fallback => 1;
 
-our $VERSION = '0.101';
+our $VERSION = '0.200';
 
 sub new {
 
@@ -25,9 +25,10 @@ sub new {
     croak q/Net::OpenVAS::OMP::Response ( 'request' => ... ) must be "Net::OpenVAS::OMP::Request" instance/
         if ( !ref $request eq 'Net::OpenVAS::OMP::Request' );
 
-    my $result      = XMLin( $response, ForceArray => 1, KeyAttr => "${command}_response" );
-    my $status      = delete( $result->{status} );
-    my $status_text = delete( $result->{status_text} );
+    $response =~ s/<\?xml.*?\?>//;    # Remove XML version and encoding from the response for XML report
+
+    my $status      = ( $response =~ /(status)="([^"]*)"/ )[1];
+    my $status_text = ( $response =~ /(status_text)="([^"]*)"/ )[1];
     my $error       = undef;
 
     if ( $status >= 400 ) {
@@ -35,12 +36,12 @@ sub new {
     }
 
     my $self = {
-        result      => $result,
         status      => $status + 0,
         raw         => $response,
         request     => $request,
         status_text => $status_text,
         error       => $error,
+        result      => eval { xml2hash $response },
     };
 
     return bless $self, $class;

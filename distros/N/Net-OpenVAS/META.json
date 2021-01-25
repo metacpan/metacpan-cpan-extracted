@@ -33,8 +33,8 @@
       "runtime" : {
          "requires" : {
             "IO::Socket::SSL" : "0",
-            "XML::Simple" : "0",
-            "perl" : "5.008"
+            "XML::Hash::XS" : "0",
+            "perl" : "5.01"
          }
       },
       "test" : {
@@ -51,6 +51,6 @@
          "web" : "https://github.com/giterlizzi/perl-Net-OpenVAS"
       }
    },
-   "version" : "0.101",
+   "version" : "0.200",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

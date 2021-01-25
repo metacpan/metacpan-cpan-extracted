@@ -23,11 +23,11 @@ WriteMakefile(
     },
     TEST_REQUIRES => {
         'Test::More'             => 0,
-        'Test::Exception'        => 0.43,
-        'Test::RequiresInternet' => 0.05,
+        'Test::Exception'        => 0,
+        'Test::RequiresInternet' => 0,
         'Scalar::Util'           => 0,
-        'Readonly'               => 2.05,
-        'version'                => 0.9924,
+        'Readonly'               => 0,
+        'version'                => 0,
         'POSIX'                  => 0,
         'Config'                 => 0
     },

@@ -6,6 +6,7 @@ use Hash::Objectify qw( objectify );
 use Helper::MockPTAPI     ();
 use Helper::WorkSubmitter ();
 use Test::Differences;
+use Test::More;
 use Test::Output qw( stdout_is stdout_like );
 
 # This test suite relies upon mock PT data returned by Helper::MockPTAPI
@@ -146,6 +147,12 @@ sub test_chore_filter ( $self, @ ) {
         [],
         q{empty array ref when only chores are found}
     );
+}
+
+sub test_token_from_env ( $self, @ ) {
+    my $ws = App::GHPT::WorkSubmitter->new;
+    local $ENV{PIVOTALTRACKER_TOKEN} = 'env value';
+    is( $ws->_pt_token, 'env value', 'value comes from environment' );
 }
 
 __PACKAGE__->meta->make_immutable;

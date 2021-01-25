@@ -1,5 +1,12 @@
 Revision history for Ryu-Async
 
+0.019     2021-01-19 06:18:09+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - Override $Ryu::Source::FUTURE_FACTORY to create new futures from the loop
+
 0.018     2021-01-17 03:09:14+08:00 Asia/Kuala_Lumpur
     New features:
 

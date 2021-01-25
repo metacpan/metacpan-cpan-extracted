@@ -44,8 +44,8 @@ use Moose;
 use XML::Structured;
 
 # define roles
-with "Net::OBS::Client::Roles::BuildStatus";
-with "Net::OBS::Client::Roles::Client";
+with 'Net::OBS::Client::Roles::BuildStatus';
+with 'Net::OBS::Client::Roles::Client';
 
 =head1 ATTRIBUTES
 
@@ -68,10 +68,10 @@ has _status => (
   is => 'rw',
   isa => 'HashRef',
   lazy => 1,
-  default => \&fetch_status
+  default => \&fetch_status,
 );
 
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 =head2 fetch_status -
 
@@ -80,9 +80,9 @@ has _status => (
 =cut
 
 sub fetch_status {
-  my $self = shift;
+  my ($self, @args) = @_;
 
-  my $api_path = join('/',"/build",$self->project,$self->repository,$self->arch,$self->name,"_status");
+  my $api_path = join q{/}, '/build', $self->project, $self->repository, $self->arch, $self->name, '_status';
 
   my $list = $self->request(GET=>$api_path);
 
@@ -98,7 +98,8 @@ sub fetch_status {
 =cut
 
 sub code {
-  return $_[0]->_status->{code};
+  my ($self) = @_;
+  return $self->_status->{code};
 }
 
 

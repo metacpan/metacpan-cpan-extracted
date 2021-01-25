@@ -1,3 +1,5 @@
+use 5.008;
+
 package Business::ISBN;
 use strict;
 
@@ -52,6 +54,11 @@ Business::ISBN - work with International Standard Book Numbers
 
 This modules handles International Standard Book Numbers, including
 ISBN-10 and ISBN-13.
+
+The data come from L<Business::ISBN::Data>, which means you can update
+the data separately from the code. Also, you can use L<Business::ISBN::Data>
+with whatever F<RangeMessage.xml> you like if you have updated data. See
+that module for details.
 
 =cut
 
@@ -120,7 +127,7 @@ BEGIN {
 		);
 	};
 
-our $VERSION   = '3.005';
+our $VERSION   = '3.006';
 
 sub ARTICLE_CODE_OUT_OF_RANGE () { -5 }
 sub INVALID_PREFIX            () { -4 };
@@ -895,7 +902,7 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2001-2017, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2001-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This module is licensed under the Artistic License 2.0. See the LICENSE
 file in the distribution, or https://opensource.org/licenses/Artistic-2.0

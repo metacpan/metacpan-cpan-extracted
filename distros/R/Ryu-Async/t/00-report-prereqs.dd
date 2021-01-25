@@ -31,10 +31,10 @@ do { my $x = {
                                         'IO::AsyncX::System' => '0.003'
                                       },
                       'requires' => {
-                                      'Future' => '0.45',
-                                      'IO::Async' => '0.71',
-                                      'IO::Socket::IP' => '0.37',
-                                      'Log::Any' => '1.050',
+                                      'Future' => '0.47',
+                                      'IO::Async' => '0.77',
+                                      'IO::Socket::IP' => '0.41',
+                                      'Log::Any' => '1.708',
                                       'Ryu' => '2.006',
                                       'Syntax::Keyword::Try' => '0',
                                       'URI::tcp' => '0',

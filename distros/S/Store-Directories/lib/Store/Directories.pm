@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4.1';
 
 =head1 NAME
 
@@ -101,7 +101,6 @@ use Carp;
 use Cwd qw(abs_path);
 use File::Spec::Functions qw(catfile);
 use File::Path qw(make_path remove_tree);
-use Time::HiRes qw(sleep);
 use File::Basename;
 
 use DBI;
@@ -136,8 +135,9 @@ sub init {
     my $dir   = shift;
 
     croak "Must specify a directory." unless $dir;
-    $dir = abs_path $dir;
     make_path($dir) unless -d $dir;
+    $dir = abs_path $dir;
+    croak "Could not get absolute path: $!" unless $dir;
 
     my $self = bless {
         dir         => $dir,
@@ -243,6 +243,7 @@ sub get_or_add {
     my $listing_lock;
     if (Store::Directories::Lock::_get_lock_mode($dbh, '__LISTING__') != EX) {
         $listing_lock = $self->lock_ex('__LISTING__');
+        croak "Could not get lock on store listing." unless $listing_lock;
     }
 
     # Get directory if it exists
@@ -257,6 +258,7 @@ sub get_or_add {
         if ($lockmode) {
             $listing_lock->DESTROY if $listing_lock;
             $$lockref = Store::Directories::Lock->new($self, $key, $lockmode);
+            croak "Could not get requested lock on key '$key'." unless $$lockref;
         }
         return catfile($self->{dir}, $entry->[0]);
     }
@@ -273,8 +275,8 @@ sub get_or_add {
             # (if we're going to call an init function, we need it to be
             # an exclusive lock first, regardless of what the user asked for)
             my $mode = defined $opts->{init} ? EX : $lockmode;
-            Store::Directories::Lock::_add_lock_noblock($dbh, $key, EX);
-            $lock = Store::Directories::Lock->_new_raw($self, $key, $$, EX);
+            Store::Directories::Lock::_add_lock_noblock($dbh, $key, $mode);
+            $lock = Store::Directories::Lock->_new_raw($self, $key, $$, $mode);
         }
     });
     $listing_lock->DESTROY if $listing_lock;
@@ -291,6 +293,7 @@ sub get_or_add {
             my $errmsg = "Function call to initialize directory died. $@";
             {
                 my $temp_lock = $self->lock_ex('__LISTING__');
+                croak "Could not get lock on store listing." unless $temp_lock;
                 $self->_remove_directory_from_db($dbh, $key);
             }
             eval {
@@ -313,7 +316,7 @@ sub get_or_add {
     return $dir;
 }
 
-=item * B<lock_sh> I<KEY>
+=item * B<lock_sh> I<KEY>, I<[NOBLOCK]>
 
 Create and return a new I<shared> lock for the given key. This asserts that
 no other process can modify the corresponding entry until this lock goes
@@ -321,33 +324,34 @@ out-of-scope.
 
 This blocks until the lock can be obtained. So it will wait for any processes
 that already have an exclusive lock on this key to release their locks before
-returning.
+returning. But if C<NOBLOCK> is true, then this will not block but may return
+undef if the lock couldn't be obtained.
 
 This will croak if this process already has a lock (either kind) on this key,
 or if the key does not exist in the store.
 =cut
 sub lock_sh {
-    my $self = shift;
-    my $key  = shift;
-    return Store::Directories::Lock->new($self, $key, SH);
+    my ($self, $key, $noblock) = @_;
+    return Store::Directories::Lock->new($self, $key, SH, $noblock);
 }
 
-=item * B<lock_ex> I<KEY>
+=item * B<lock_ex> I<KEY> I<[NOBLOCK]>
 
 Create and return a new I<exclusive> lock for the given key. This asserts that
 no other process can read the corresponding entry until this lock goes
 out-of-scope.
 
 This blocks until the lock can be obtained. So it will wait for any processes
-that have locks on this key to release them before returning.
+that have locks on this key to release them before returning. But if C<NOBLOCK>
+is true, then this will not block but may return undef if the lock couldn't
+be obtained.
 
 This will croak if this process already has a lock (either kind) on this key,
 or if the key does not exist in the store.
 =cut
 sub lock_ex {
-    my $self = shift;
-    my $key  = shift;
-    return Store::Directories::Lock->new($self, $key, EX);
+    my ($self, $key, $noblock) = @_;
+    return Store::Directories::Lock->new($self, $key, EX, $noblock);
 }
 
 =item * B<remove> I<KEY> I<[SUB]>
@@ -355,8 +359,8 @@ sub lock_ex {
 Remove the directory with the given key from the store. You I<MUST> have an
 exclusive lock already on the directory before calling this. C<SUB> is a
 subroutine ref which, if specified, will be called immediately before deleting
-the directory. C<SUB> is called with the path to the directory as the first and
-only argument.
+the directory. C<SUB> is called with the path to the directory as the first
+argument and the key for the directory as the second argument.
 
 If an error occurs removing the directory from disk, (from C<SUB> failing,
 or otherwise), then the directory will still be removed from the store's index
@@ -370,6 +374,7 @@ sub remove {
     my $listing_lock;
     if (Store::Directories::Lock::_get_lock_mode($dbh, '__LISTING__') != EX) {
         $listing_lock = $self->lock_ex('__LISTING__');
+        croak "Could not get lock on store listing." unless $listing_lock;
     }
 
     # First check that the directory exists
@@ -384,7 +389,7 @@ sub remove {
         return 1;
     }
     my $dir  = $entry->[0];
-    my $path = abs_path( catfile($self->{dir}, $dir) );
+    my $path = catfile($self->{dir}, $dir);
 
     # Check that we have an exclusive lock
     my $current_lock = Store::Directories::Lock::_get_lock_mode($dbh, $key);
@@ -401,7 +406,7 @@ sub remove {
     eval {
         if ($callback) {
             die "'SUB' must be a subroutine ref" unless ref $callback eq 'CODE';
-            $callback->($path);
+            $callback->($path, $key);
         }
         $self->_remove_directory_from_disk($dir);
         1;
@@ -574,6 +579,7 @@ sub get_or_set {
     # Get an exclusive lock
     $sh->DESTROY;
     my $ex = $self->lock_ex($key);
+    croak "Could not get exclusive lock." unless $ex;
 
     # It's possible that another process beat us to the exclusive lock
     # and just called SET for us, so we need to check GET again
@@ -623,6 +629,10 @@ sub _new_connection {
         { %attrs, @_ }
     );
     croak "Failed to connect to database." unless $dbh;
+
+    $dbh->do("PRAGMA foreign_keys = ON")
+        or croak "Database error: ".$dbh->errstr;
+
     return $dbh;
 }
 
@@ -669,7 +679,11 @@ sub _add_directory {
 
     # Find a new UUID
     my $uuid;
-    do { $uuid = $UUIDGEN->create_str() } while (exists $names->{$uuid});
+    my $dir;
+    do {
+        $uuid = $UUIDGEN->create_str();
+        $dir  = catfile($self->{dir}, $uuid);
+    } while ( exists $names->{$uuid} or -d $dir );
 
     # Insert
     my $sth = $dbh->prepare("INSERT INTO entry (slug, dir) VALUES (? , ?);");
@@ -685,7 +699,6 @@ sub _add_directory {
     }
 
     # Create directory
-    my $dir = catfile($self->{dir}, $uuid);
     make_path($dir);
 
     return $dir;

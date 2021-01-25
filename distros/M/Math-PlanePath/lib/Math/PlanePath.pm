@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION';
-$VERSION = 128;
+$VERSION = 129;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -743,6 +743,7 @@ related things are further down like C<Math::PlanePath::Base::Xyzzy>.
     Staircase              stairs down from the Y to X axes
     StaircaseAlternating   stairs Y to X and back again
     Corner                 expanding stripes around a corner
+    CornerAlternating      expanding up and down around a corner
     PyramidRows            expanding stacked rows pyramid
     PyramidSides           along the sides of a 45-degree pyramid
     CellularRule           cellular automaton by rule number
@@ -1656,7 +1657,8 @@ is 8 more N points than the preceding.
         0       Rows, Columns (fixed widths)
         1       Diagonals
        2/2      DiagonalsOctant (2 rows for +2)
-        2       SacksSpiral, PyramidSides, Corner, PyramidRows (default)
+        2       SacksSpiral, Corner, CornerAlternating,
+                  PyramidSides, PyramidRows (default)
         4       DiamondSpiral, AztecDiamondRings, Staircase
        4/2      CellularRule54, CellularRule57,
                   DiagonalsAlternating (2 rows for +4)
@@ -2248,6 +2250,7 @@ L<Math::PlanePath::DiagonalsOctant>,
 L<Math::PlanePath::Staircase>,
 L<Math::PlanePath::StaircaseAlternating>,
 L<Math::PlanePath::Corner>
+L<Math::PlanePath::CornerAlternating>
 
 L<Math::PlanePath::PyramidRows>,
 L<Math::PlanePath::PyramidSides>,

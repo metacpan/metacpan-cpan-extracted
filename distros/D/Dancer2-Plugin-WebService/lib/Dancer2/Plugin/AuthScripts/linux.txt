@@ -1,15 +1,15 @@
 Authenticate using the Linux native method
-Script waits two mandatory arguments
+Accepts two arguments
 
-	hex packed username e.g 6a6f65            produced as    echo -n joe      | xxd -ps
-	hex packed password e.g 736f6d6570617373  produced as    echo -n somepass | xxd -ps
+	1st) hex packed username e.g 6a6f65            produced as    echo -n joe      | xxd -ps
+	2nd) hex packed password e.g 736f6d6570617373  produced as    echo -n somepass | xxd -ps
 
 	./linux.sh 6a6f65 736f6d6570617373
 
-It prints at screen the two lines
+It prints two lines
 
 	1st)  0 for succesfull login  or a message of why the login was failed
-	2rd)  A comma delimited group list, the user is member
+	2nd)  A comma delimited group list, the user is member
 
 e.g for success
 

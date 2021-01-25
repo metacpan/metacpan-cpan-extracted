@@ -24,6 +24,7 @@ requires:
   Types::Standard: '0'
   perl: '5.006000'
 resources:
+  bugtracker: https://github.com/davorg/genealogy-ahnentafel/issues
   repository: git://github.com/davorg/genealogy-ahnentafel.git
-version: v1.0.2
+version: v1.0.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

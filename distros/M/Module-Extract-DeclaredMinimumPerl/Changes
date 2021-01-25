@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::DeclaredMinimumPerl
 
+1.022 2021-01-20T09:14:55Z
+	* freshen distro, dump Travis CI, add Github Action
+
 1.021 2018-06-09T13:01:54Z
 	* Change to Artistic License 2.0.
 

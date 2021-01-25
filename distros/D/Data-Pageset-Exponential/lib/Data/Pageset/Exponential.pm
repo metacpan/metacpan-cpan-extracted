@@ -22,7 +22,7 @@ use namespace::autoclean;
 # RECOMMEND PREREQ: Type::Tiny::XS
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.3.2';
 
 
 has total_entries => (
@@ -329,7 +329,7 @@ Data::Pageset::Exponential - Page numbering for very large page numbers
 
 =head1 VERSION
 
-version v0.3.1
+version v0.3.2
 
 =head1 SYNOPSIS
 
@@ -541,7 +541,7 @@ Test code was adapted from L<Data::Page> to ensure compatability.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

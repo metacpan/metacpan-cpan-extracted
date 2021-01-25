@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Utils;
 # ABSTRACT: Utility functions for enabling multiple file processing
-$Bio::MUST::Core::Utils::VERSION = '0.210120';
+$Bio::MUST::Core::Utils::VERSION = '0.210230';
 use strict;
 use warnings;
 use autodie;
@@ -9,6 +9,8 @@ use File::Basename;
 use Path::Class qw(file);
 use Test::Files;
 use Test::Most;
+
+# TODO: use :filenames in some binaries
 
 use Exporter::Easy (
     OK   => [ qw(secure_outfile :filenames :tests) ],
@@ -103,7 +105,7 @@ Bio::MUST::Core::Utils - Utility functions for enabling multiple file processing
 
 =head1 VERSION
 
-version 0.210120
+version 0.210230
 
 =head1 SYNOPSIS
 

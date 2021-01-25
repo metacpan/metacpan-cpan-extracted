@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -196,22 +196,25 @@ Math::PlanePath::DiagonalsAlternating -- points in diagonal stripes of alternati
 =head1 DESCRIPTION
 
 This path follows successive diagonals going from the Y axis down to the X
-axis and then back again,
+axis and then back up again,
 
 =cut
 
-# math-image --path=DiagonalsAlternating --expression='i<=31?i:0' --output=numbers
+# math-image --path=DiagonalsAlternating --output=numbers_dash --size=35x14
 
 =pod
 
-      7  |  29 
-      6  |  28  30
-      5  |  16  27  31
-      4  |  15  17  26  ...
-      3  |   7  14  18  25 
-      2  |   6   8  13  19  24 
+      5  |  16
+         |   |\
+      4  |  15  17
+         |    \   \
+      3  |   7  14  18
+         |   |\   \   \
+      2  |   6   8  13  19  ...
+         |    \   \   \   \   \
       1  |   2   5   9  12  20  23
-    Y=0  |   1   3   4  10  11  21  22
+         |   |\   \   \   \   \   \
+    Y=0  |   1   3-- 4  10--11  21--22
          +----------------------------
            X=0   1   2   3   4   5   6
 
@@ -233,15 +236,15 @@ start at 0,
 
 =pod
 
-    n_start => 0            
+    n_start => 0
 
       4  |  14
       3  |   6 13
       2  |   5  7 12
       1  |   1  4  8 11
     Y=0  |   0  2  3  9 10
-         +----------------- 
-           X=0  1  2  3  4  
+         +-----------------
+           X=0  1  2  3  4
 
 =head1 FUNCTIONS
 
@@ -336,7 +339,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

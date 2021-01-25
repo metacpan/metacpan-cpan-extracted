@@ -12,6 +12,7 @@ my %opsview = (
     url      => 'http://localhost',
     username => 'admin',
     password => 'initial',
+    ssl_verify_hostname => 0,
 );
 
 for my $var (qw/ url username password /) {
@@ -107,9 +108,9 @@ SKIP: {
     $trap->quiet("No extra output");
 
     like( $output->{opsview_version},
-        qr/^\d\.\d+\.\d$/, "opsview_info 'opsview_version' returned okay" );
+        qr/^\d\.\d+\.\d+$/, "opsview_info 'opsview_version' returned okay" );
     like( $output->{opsview_build},
-        qr/^\d\.\d+\.\d\.\d+$/,
+        qr/^\d\.\d+\.\d+\.\d+$/,
         "opsview_info 'opsview_build' returned okay" );
     like( $output->{opsview_edition},
         qr/^\w+$/, "opsview_info 'opsview_edition' returned okay" );
@@ -124,7 +125,7 @@ SKIP: {
     $trap->did_return(" ... returned");
     $trap->quiet(" ... quietly");
     isa_ok( $version, 'version', "direct call to 'opsview_version' returned a version object");
-    like ($version, qr/^\d\.\d+\.\d$/, "direct call to 'opsview_version' returned okay" );
+    like ($version, qr/^\d\.\d+\.\d+$/, "direct call to 'opsview_version' returned okay" );
     note("Opsview version: $version");
 
     # Now log out and make sure we can no longer get the info

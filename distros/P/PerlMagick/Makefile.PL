@@ -1,10 +1,10 @@
-#  Copyright 1999-2013 ImageMagick Studio LLC, a non-profit organization
+#  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
 #  dedicated to making software imaging solutions freely available.
 #
 #  You may not use this file except in compliance with the License.  You may
 #  obtain a copy of the License at
 #
-#    http://www.imagemagick.org/script/license.php
+#    https://imagemagick.org/script/license.php
 #
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
@@ -101,7 +101,7 @@ sub AutodetectWin32gcc {
 # Please check the following prerequisites:
 #
 # 1) You need to have installed ImageMagick Windows binaries from
-#    http://www.imagemagick.org/script/binary-releases.php#windows
+#    https://imagemagick.org/script/binary-releases.php#windows
 #
 # 2) We only support dynamic (DLL) ImageMagick binaries
 #    note: it is not possible to mix 32/64-bit binaries of perl and ImageMagick
@@ -161,11 +161,11 @@ foreach my $delegate (@tested_delegates) {
 }
 
 # defaults for LIBS & INC & CCFLAGS params that we later pass to Writemakefile
-my $INC_magick = '-I/usr/local/include/ImageMagick-6 -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/libxml2 -I"' . $Config{'usrinc'} . '/ImageMagick-6"';
-my $LIBS_magick = '-L/usr/local/lib -lMagickCore-6.Q16 -lperl -lm';
+my $INC_magick = '-I/usr/local/include/ImageMagick-7 -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/include/libxml2 -I"' . $Config{'usrinc'} . '/ImageMagick-7"';
+my $LIBS_magick = '-L/usr/local/lib -lMagickCore-7.Q16HDRI -lperl -lm';
 my $CCFLAGS_magick = "$Config{'ccflags'} -I/usr/include/freetype2 -g -O2 -Wall -pthread -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16";
-my $LDFLAGS_magick   = "-L/usr/local/lib -lMagickCore-6.Q16 $Config{'ldflags'} ";
-my $LDDLFLAGS_magick = "-L/usr/local/lib -lMagickCore-6.Q16 $Config{'lddlflags'} ";
+my $LDFLAGS_magick   = "-L/usr/local/lib -lMagickCore-7.Q16HDRI $Config{'ldflags'} ";
+my $LDDLFLAGS_magick = "-L/usr/local/lib -lMagickCore-7.Q16HDRI $Config{'lddlflags'} ";
 
 if (($^O eq 'MSWin32') && ($Config{cc} =~ /gcc/)) {
   my($Ipaths, $Lpaths) = AutodetectWin32gcc();
@@ -194,7 +194,10 @@ WriteMakefile
    'AUTHOR' => 'ImageMagick Studio LLC',
 
    # Module version
-   'VERSION' => '6.89',
+   'VERSION' => '7.0.10',
+
+   # Prerequisite version
+   'PREREQ_PM' => {'parent' => '0'},
 
    # Preprocessor defines
    'DEFINE'	=> ' -D_LARGE_FILES=1 -DHAVE_CONFIG_H',     # e.g., '-DHAVE_SOMETHING'
@@ -244,6 +247,9 @@ WriteMakefile
    test	=> { TESTS	=>	$delegate_tests},
 
    ($Config{'archname'} =~ /-object$/i ? ('CAPI' => 'TRUE') : ()),
+
+   # sane version
+   depend => { '$(FIRST_MAKEFILE)' => '$(VERSION_FROM)' }
 );
 
 

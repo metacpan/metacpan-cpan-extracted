@@ -15,7 +15,7 @@ configure_requires:
   Module::Build: '0.28'
   Module::Build::Parse::Yapp: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,6 +24,9 @@ name: OPTIMADE-Filter
 requires:
   Parse::Yapp: '0'
   Scalar::Util: '0'
-version: 0.10.0
-x_generated_by_perl: v5.30.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+resources:
+  bugtracker: https://github.com/Materials-Consortia/optimade-filter/issues
+  homepage: https://search.cpan.org/dist/OPTIMADE-Filter
+  repository: git://github.com/Materials-Consortia/optimade-filter.git
+version: 0.10.2
+x_serialization_backend: 'YAML::Tiny version 1.70'

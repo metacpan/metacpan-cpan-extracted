@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -38,7 +38,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -273,9 +273,9 @@ Math::PlanePath::HilbertCurve -- 2x2 self-similar quadrant traversal
 
 =head1 DESCRIPTION
 
-This path is an integer version of the curve described by David Hilbert in
-1891 for filling a unit square.  It traverses a quadrant of the plane one
-step at a time in a self-similar 2x2 pattern,
+This path is an integer version of the curve described by Hilbert in 1891
+for filling a unit square.  It traverses a quadrant of the plane one step at
+a time in a self-similar 2x2 pattern,
 
 =over
 
@@ -331,8 +331,8 @@ The process repeats, doubling in size each time and alternately sideways or
 upside-down U with invert and/or transpose as necessary in the sub-parts.
 
 The pattern is sometimes drawn with the first step 0->1 upwards instead of
-to the right.  Right is used here since that's what most of the other
-PlanePaths do.  Swap X and Y for upwards first instead.
+to the right.  First step right is used here for consistency with other
+PlanePaths.  Swap X and Y for upwards first instead.
 
 See F<examples/hilbert-path.pl> for a sample program printing the path
 pattern in ascii.
@@ -357,8 +357,8 @@ rectangle (or other shape) is usually a small range of N.  This property is
 used in some database systems to store X,Y coordinates using the resulting
 Hilbert curve N as an index.  A search through a 2-D region is then usually
 a fairly modest linear search through N values.  C<rect_to_n_range()> gives
-exact N range for a rectangle, or see L<Rectangle to N Range> below for
-calculating on any shape.
+exact N range for a rectangle, or see notes L<Rectangle to N Range> below
+for calculating on any shape.
 
 The N range can be large when crossing sub-parts.  In the sample above it
 can be seen for instance adjacent points X=0,Y=3 and X=0,Y=4 have rather
@@ -458,9 +458,9 @@ L<http://www.jjj.de/fxt/#fxtbook> (section 1.31.1)
 It also works to process N from low to high, at each stage applying any
 transpose (swap X,Y) and/or invert (bitwise NOT) to the low X,Y bits
 generated so far.  This works because there's no "reverse" sections, or
-since the curve is the same forward and reverse.  Low to high saves locating
-the top bits of N, but if using bignums then the bitwise inverts of the full
-X,Y values will be much more work.
+equivalently the curve is the same forward and reverse.  Low to high saves
+locating the top bits of N, but if using bignums then the bitwise inverts of
+the full X,Y values will be much more work.
 
 =head2 X,Y to N
 
@@ -493,7 +493,7 @@ which overlaps.
 
 The biggest and smallest N digit for a sub-part can be found with a lookup
 table.  The X range might cover one or both sub-parts, and the Y range
-similarly, for a total 9 possible configurations.  Then a table of
+similarly, for a total 4 possible configurations.  Then a table of
 state+coverage -E<gt> digit gives the minimum and maximum N bit-pair, and
 state+digit gives a new state the same as X,Y to N.
 
@@ -504,7 +504,7 @@ can thus be done in a single loop.
 
 The N range for any shape can be found this way, not just a rectangle like
 C<rect_to_n_range()>.  At each level the procedure only depends on asking
-which combination of the four sub-parts overlaps some of the target area.
+which of the four sub-parts overlaps some of the target area.
 
 =head2 Direction
 
@@ -522,11 +522,11 @@ N=0,4,8,12.
 
 This non-3 (or non whatever highest digit) is a general procedure and can be
 used on any state-based high-to-low procedure of self-similar curves.  In
-the current code it's used to apply a fractional part of N in the correct
+the current code, it's used to apply a fractional part of N in the correct
 direction but is not otherwise made directly available.
 
-Because the Hilbert curve has no "reversal" sections it also works to build
-a direction from low to high N digits.  1 and 2 digits make no change to the
+Because the Hilbert curve has no "reverse" sections it also works to build a
+direction from low to high N digits.  1 and 2 digits make no change to the
 orientation, 0 digit is a transpose, and a 3 digit is a rotate and
 transpose, except that low 3s are transpose-only (no rotate) for the same
 reason as taking the lowest non-3 above.
@@ -541,7 +541,7 @@ starting n=1, unlike PlanePath here starting N=0, so it becomes
     -(N+1) count 3s  / 0 mod 2   N or E
                      \ 1 mod 2   S or W
 
-For the twos-complement negation an even number of base-4 digits of N must
+For the twos-complement negation, an even number of base-4 digits of N must
 be taken.  Because -(N+1) = ~N, ie. a ones-complement, the second part is
 also
 
@@ -567,14 +567,43 @@ The number of segments in each direction is calculated in
 Sergey Kitaev, Toufik Mansour and Patrice SE<233>E<233>bold, "Generating the
 Peano Curve and Counting Occurrences of Some Patterns", Journal of Automata,
 Languages and Combinatorics, volume 9, number 4, 2004, pages 439-455.
-L<https://personal.cis.strath.ac.uk/sergey.kitaev/publications.html>,
-L<https://personal.cis.strath.ac.uk/sergey.kitaev/index_files/Papers/peano.ps>
+L<http://personal.strath.ac.uk/sergey.kitaev/publications.html>,
+L<http://www.jalc.de/issues/2004/issue_9_4/jalc-2004-439-455.php>
 
 (Preprint as Sergey Kitaev and Toufik Mansour, "The Peano Curve and Counting
 Occurrences of Some Patterns", October 2002.
-L<http://arxiv.org/abs/math/0210268/>, version 1.)
+L<http://arxiv.org/abs/math/0210268/>.)
 
 =cut
+
+# http://personal.strath.ac.uk/sergey.kitaev/
+# http://personal.strath.ac.uk/sergey.kitaev/publications.html
+# https://www.researchgate.net/publication/230802620_Generating_the_Peano_curve_and_counting_occurrences_of_some_patterns
+#     full text html
+# https://www.researchgate.net/profile/Toufik_Mansour/publication/230802620_Generating_the_Peano_curve_and_counting_occurrences_of_some_patterns/links/00b7d5299d5a89bb02000000/Generating-the-Peano-curve-and-counting-occurrences-of-some-patterns.pdf
+#
+# https://personal.cis.strath.ac.uk/sergey.kitaev/publications.html
+#     old home
+# https://personal.cis.strath.ac.uk/sergey.kitaev/index_files/Papers/peano.ps
+#     old postscript
+# http://web.archive.org/web/1id_/http://personal.cis.strath.ac.uk/sergey.kitaev/index_files/Papers/peano.ps
+#     not in wayback
+#
+# http://www.math.chalmers.se/Math/Research/Combinatorics/preprints/kitaev/kitmansel.ps
+#    216253
+# https://hal.archives-ouvertes.fr/hal-01645132
+#    journal ref only (?)
+#
+# http://www.jalc.de/issues/2004/issue_9_4/jalc-2004-439-455.php
+# http://www.jalc.de/issues/2004/issue_9_4/fulltext/pp-439-455.pdf
+# https://doi.org/10.25596/jalc-2004-439
+#     account required
+#
+# http://www.ms.uky.edu/~kitaev/       [no such ?]
+# http://www.ms.uky.edu/~readdy/DM/DM-RESEARCH/kitaev_research.html
+#
+# Toufik Mansour, list only no links:
+# http://math.haifa.ac.il/toufik/manpubff.html
 
 =pod
 
@@ -675,10 +704,10 @@ each bit-pair of N becomes a bit of X and a bit of Y,
     2 = 10    1   1
     3 = 11    0   1     <- difference 1 bit
 
-So the Hamming distance for N=0to3 is 1 at N=1 and N=3.  As higher levels
+So the Hamming distance for N=0to3 is 1 at N=1 and N=3.  At higher levels,
 these X,Y bits may be transposed (swapped) or rotated by 180 or both.
 A transpose swapping XE<lt>-E<gt>Y doesn't change the bit difference.
-A rotate by 180 is a flip 0E<lt>-E<gt>1 of the bit in each X and Y, so that
+A rotate by 180 is a flip 0E<lt>-E<gt>1 of the bit in both X and Y, so that
 doesn't change the bit difference either.
 
 On that basis, the Hamming distance X,Y is the number of base4 digits of N
@@ -687,7 +716,7 @@ significant bit then
 
     X,Y coordinates of N
     HammingDist(X,Y) = count 1-bits at even bit positions in N
-                     = 0,1,0,1, 1,2,1,2, 0,1,0,1, 1,2,1,2, ... (A139351)
+           = 0,1,0,1, 1,2,1,2, 0,1,0,1, 1,2,1,2, ... (A139351)
 
 See also L<Math::PlanePath::CornerReplicate/Hamming Distance> which is the
 same formula, but arising directly from 01 or 11, no transpose or rotate.
@@ -731,7 +760,7 @@ L<http://oeis.org/A059252> (etc)
 
     A163538    dX -1,0,1 change in X
     A163539    dY -1,0,1 change in Y
-    A163540    absolute direction of each step (0=E,1=S,2=W,3=N)
+    A163540    absolute direction of each step (0=E,1=N,2=W,3=S)
     A163541    absolute direction, swapped X,Y
     A163542    relative direction (ahead=0,right=1,left=2)
     A163543    relative direction, swapped X,Y
@@ -752,7 +781,7 @@ sequence being the N of the Hilbert curve at those positions.
     A166041    N by the PeanoCurve points sequence
     A166042      inverse, PeanoCurve N by Hilbert points order
     A163357    N by diagonals like Math::PlanePath::Diagonals with
-               first Hilbert step along same axis the diagonals start
+                 first Hilbert step along same axis the diagonals start
     A163358      inverse
     A163359    N by diagonals, transposed start along the opposite axis
     A163360      inverse
@@ -761,10 +790,11 @@ sequence being the N of the Hilbert curve at those positions.
     A163363    A163355 + 1, numbering the Hilbert N's from N=1
     A163364      inverse
 
-These sequences are permutations of the integers since all X,Y positions of
-the first quadrant are covered by each path (Hilbert, ZOrder, Peano).  The
-inverse permutations can be thought of taking X,Y positions in the Hilbert
-order and asking what N the ZOrder, Peano or Diagonals path would put there.
+The above sequences are permutations of the integers since all X,Y positions
+of the first quadrant are covered by each path (Hilbert, ZOrder, Peano).
+The inverse permutations can be thought of taking X,Y positions in the
+Hilbert order and asking what N the ZOrder, Peano or Diagonals path would
+put there.
 
 The A163355 permutation by ZOrderCurve can be considered for repeats or
 cycles,
@@ -813,7 +843,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

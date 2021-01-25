@@ -1,4 +1,14 @@
-Fri Jun 20 09:27:24 2003  jwheeler  <upsmodule@datademons.com>
+Revision history for Perl extension Business::UPS
+
+2.02 Thu Jan 21 2020
+ - Github Issues (RT is shutting down)
+ - Use https:// URLs
+ - Github CI
+ - Automate manifest and ignores.
+ - Kill use vars.
+ - Tidy.
+
+2.01 Fri Jun 20 2003  jwheeler  <upsmodule@datademons.com>
 
 	* Changed namespace to the original Business::UPS to make room for
 	Dan Browning's Business::Shipping modules.

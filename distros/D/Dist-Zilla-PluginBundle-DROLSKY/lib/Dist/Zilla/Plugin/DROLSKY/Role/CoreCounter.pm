@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.12';
+our $VERSION = '1.18';
 
 use File::Which qw( which );
 
@@ -43,7 +43,7 @@ Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter - Knows how to count cores (on L
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =for Pod::Coverage .*
 

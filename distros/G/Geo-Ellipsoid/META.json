@@ -1,16 +1,16 @@
 {
-   "abstract" : "Accurate latitude/longitude calculations",
+   "abstract" : "longitude and latitude calculations using an ellipsoid model",
    "author" : [
-      "Peter John Acklam <pjacklam@online.no>"
+      "Peter John Acklam <pjacklam@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geo-Ellipsoid",
    "no_index" : {
@@ -21,26 +21,35 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.58"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "1.04",
-            "Math::Trig" : "1.03",
-            "Scalar::Util" : "1.19",
+            "Carp" : "1.22",
+            "Math::Trig" : "1.23",
+            "Scalar::Util" : "1.19"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::More" : "0.47",
-            "Test::Number::Delta" : "0.16"
+            "Test::Number::Delta" : "0.13"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.14",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pjacklam/p5-Geo-Ellipsoid.git",
+         "web" : "https://github.com/pjacklam/p5-Geo-Ellipsoid"
+      }
+   },
+   "version" : "1.15",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -28,6 +28,10 @@ SKIP: {
     $trap->did_return("got host ID 1");
     $trap->quiet("with no errors");
 
+    if ( ! $host_id_1->{object}->{servicechecks}->[0]->{name} ) {
+      skip "No servicechecks assigned directly to the Orchestrator";
+    }
+
     # Add downtime just using parameters
     my $result = trap {
         $ora_test->rest->post(

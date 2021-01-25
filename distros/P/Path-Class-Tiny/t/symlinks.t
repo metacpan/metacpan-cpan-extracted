@@ -6,6 +6,9 @@ plan skip_all => "Missing symlink function ..." unless ($can_symlink);
 use Path::Class::Tiny;
 use Path::Tiny ();
 
+
+# SETUP
+
 my $dir = path(Path::Tiny->tempdir)->child('sub');
 $dir->mkpath or die("can't make dir: $dir");
 chdir $dir or die("can't change to dir: $dir");
@@ -19,6 +22,9 @@ $a->touch;
 symlink $a, $b;
 symlink $dir, $ldir;
 my $rel = path('a');
+
+
+# test -ef stuff
 
 # file is the same as its symlink
 ok $a->ef( $b ), "file A -ef link B (as Path::Class::Tiny)";
@@ -35,5 +41,6 @@ ok $ldir->child('a')->ef("$a"), "alt A -ef file A (string)";
 # file is the same as symlink when accessed via symlinked dir
 ok $ldir->child('a')->ef( $b ), "alt A -ef link B (as Path::Class::Tiny)";
 ok $ldir->child('a')->ef("$b"), "alt A -ef link B (string)";
+
 
 done_testing;

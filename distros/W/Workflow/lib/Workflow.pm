@@ -16,7 +16,7 @@ my @FIELDS   = qw( id type description state last_update time_zone );
 my @INTERNAL = qw( _factory );
 __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 
-$Workflow::VERSION = '1.49';
+$Workflow::VERSION = '1.50';
 
 use constant NO_CHANGE_VALUE => 'NOCHANGE';
 
@@ -350,6 +350,19 @@ sub _auto_execute_state {
     }
 }
 
+# This DESTROY method is a work-around for the problem with Class::Observable
+# that when an instance gets allocated in *exactly* the same address as an
+# earlier instance (which has since been destroyed), the observer registration
+# was actually *not* destroyed and the observers are applied to the new
+# instance. See gh issue #10.
+sub DESTROY {
+    my ($self) = @_;
+
+    # ignore all errors: during interpreter shutdown, none of the wrapped
+    # code is expected to work...
+    eval { $self->delete_all_observers() };
+}
+
 1;
 
 __END__
@@ -370,7 +383,7 @@ Workflow - Simple, flexible system to implement workflows
 
 =head1 VERSION
 
-This documentation describes version 1.49 of Workflow
+This documentation describes version 1.50 of Workflow
 
 =head1 SYNOPSIS
 
@@ -1138,8 +1151,6 @@ to L<Workflow::Config>, for implementation details.
 
 =item L<Exception::Class>
 
-=item L<Log::Dispatch>
-
 =item L<Log::Log4perl>
 
 =item L<Safe>
@@ -1211,26 +1222,6 @@ The following diagnostic points to the problem:
 Your L<XML::SAX> configuration is located in the file:
 
 	XML/SAX/ParserDetails.ini
-
-=head2 Perl 5.8.x
-
-CPAN testers reports indicate an issue with observers for Perl 5.8.8
-
-    #   Failed test 'One observation sent on workflow fetch to two observers'
-    #   at t/workflow.t line 79.
-    #          got: '4'
-    #     expected: '2'
-    # Looks like you failed 1 test of 35.
-    t/workflow.t .......................
-    Dubious, test returned 1 (wstat 256, 0x100)
-    Failed 1/35 subtests
-
-The issue is being investigated further, so this information is to be regarded
-as a warning before you dig too much into the issue.
-
-See also:
-
-L<http://www.cpantesters.org/cpan/report/fc85ca1c-e46e-11e2-891c-ff8a40f4ab3d>
 
 =head1 BUGS AND LIMITATIONS
 
@@ -1398,7 +1389,7 @@ L<http://www.slideshare.net/jonasbn/workflow-yapceu2010>
 =head1 COPYRIGHT
 
 Copyright (c) 2003 Chris Winters and Arvato Direct;
-Copyright (c) 2004-2017 Chris Winters. All rights reserved.
+Copyright (c) 2004-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -1413,9 +1404,10 @@ Chris Winters E<lt>chris@cwinters.comE<gt>, original author.
 
 The following folks have also helped out (listed here in no particular order):
 
-Several PRs (13 to be exact) from Erik Huelsmann resulting in release 1.49
+Several PRs (13 to be exact) from Erik Huelsmann resulting in release 1.49. Yet another
+batch of PRs resulted in release 1.50
 
-Bug report from Petr Pisar resulted in release 1.49
+Bug report from Petr Pisar resulted in release 1.48
 
 Bug report from Tina Müller (tinita) resulted in release 1.47
 

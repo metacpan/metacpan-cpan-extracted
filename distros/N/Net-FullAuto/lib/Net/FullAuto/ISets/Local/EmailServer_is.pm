@@ -201,7 +201,7 @@ my $configure_emailserver=sub {
          ' libcurl libcurl-devel libicu libicu-devel re2c'.
          ' libpng-devel.x86_64 freetype-devel.x86_64 cmake'.
          ' oniguruma oniguruma-devel tcl tcl-devel git-all'.
-         ' libffi-devel',
+         ' libffi-devel libc-client-devel',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'yum -y update','__display__');
@@ -1726,7 +1726,9 @@ END
          '--enable-xmlreader '.
          '--enable-xmlwriter '.
          '--with-zip '.
-         '--with-zlib','__display__');
+         '--with-zlib '.
+         '--with-libdir=lib64 '.
+         '--with-kerberos','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make -j2',300,'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1918,10 +1920,9 @@ END
    $gtarfile=~s/.tar.gz$//;
    ($stdout,$stderr)=$handle->cwd($gtarfile);
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'make -f Makefile.init makefiles '.
-      'CCARGS=-DHAS_MYSQL -I/usr/include/mysql '.
-      'AUXLIBS_MYSQL=-L/usr/lib64/mysql -lmysqlclient -lz -lm',
-      '__display__');
+      'make -f Makefile.init makefiles \'CCARGS=-DHAS_MYSQL '.
+      '-I/usr/include/mysql\' \'AUXLIBS_MYSQL=-L/usr/lib64/mysql '.
+      '-lmysqlclient -lz -lm\'','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "make",'__display__');
    $handle->print($sudo.'make install');
@@ -2029,9 +2030,9 @@ where_field = email
 hosts = 127.0.0.1
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$mailboxes\" > ".
-      "mysql-virtual_mailboxes.cf");
+      "~/mysql-virtual_mailboxes.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v mysql-virtual_mailboxes.cf /etc/postfix',
+      'mv -v ~/mysql-virtual_mailboxes.cf /etc/postfix',
       '__display__');
    my $email2=<<END;
 user = mailuser
@@ -2043,9 +2044,9 @@ where_field = email
 hosts = 127.0.0.1
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$email2\" > ".
-      "mysql-virtual_email2email.cf");
+      "~/mysql-virtual_email2email.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v mysql-virtual_email2email.cf /etc/postfix',
+      'mv -v ~/mysql-virtual_email2email.cf /etc/postfix',
       '__display__');
    my $transport=<<END;
 user = mailuser
@@ -2057,9 +2058,9 @@ where_field = domain
 hosts = 127.0.0.1
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$transport\" > ".
-      "mysql-virtual_transports.cf");
+      "~/mysql-virtual_transports.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v mysql-virtual_transports.cf /etc/postfix',
+      'mv -v ~/mysql-virtual_transports.cf /etc/postfix',
       '__display__');
    my $limit=<<END;
 user = mailuser
@@ -2071,9 +2072,9 @@ where_field = email
 hosts = 127.0.0.1
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$limit\" > ".
-      "mysql-virtual_mailbox_limit_maps.cf");
+      "~/mysql-virtual_mailbox_limit_maps.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v mysql-virtual_mailbox_limit_maps.cf /etc/postfix',
+      'mv -v ~/mysql-virtual_mailbox_limit_maps.cf /etc/postfix',
       '__display__');
    my $destination=<<END;
 user = mailuser
@@ -2085,9 +2086,9 @@ where_field = domain
 hosts = 127.0.0.1
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$destination\" > ".
-      "mysql-mydestination.cf");
+      "~/mysql-mydestination.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v mysql-mydestination.cf /etc/postfix',
+      'mv -v ~/mysql-mydestination.cf /etc/postfix',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "postfix start",'__display__');

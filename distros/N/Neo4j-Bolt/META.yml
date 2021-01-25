@@ -3,9 +3,6 @@ abstract: 'Neo4j server agent using Bolt protocol'
 author:
   - 'Mark A. Jensen (majensen -at- cpan -dot- org)'
 build_requires:
-  Alien::OpenSSL: '0'
-  Neo4j::Client: '0.46'
-  Pod::Usage: '0'
   Test::Exception: '0'
 configure_requires:
   Alien::OpenSSL: '0'
@@ -27,12 +24,14 @@ requires:
   Alien::OpenSSL: '0'
   JSON::PP: '0'
   Neo4j::Client: '0.46'
+  Neo4j::Types: '1.00'
   URI: '0'
+  parent: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/majensen/perlbolt/issues
   repository: https://github.com/majensen/perlbolt.git
-version: '0.4200'
+version: '0.4201'
 x_contributors:
   - 'Mark A. Jensen <majensen@cpan.org>'
   - 'Arne Johannessen <ajnn@cpan.org>'

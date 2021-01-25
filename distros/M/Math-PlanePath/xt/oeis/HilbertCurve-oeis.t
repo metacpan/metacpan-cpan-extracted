@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 use List::Util 'min', 'max';
 use Test;
-plan tests => 46;
+plan tests => 48;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -89,7 +89,73 @@ sub zorder_is_3cycle {
 
 
 #------------------------------------------------------------------------------
-# A059253 - X coordinate (catalogued)
+# A166041 - N in Peano order
+
+MyOEIS::compare_values
+  (anum => 'A166041',
+   func => sub {
+     my ($count) = @_;
+     require Math::PlanePath::PeanoCurve;
+     my $peano = Math::PlanePath::PeanoCurve->new;
+     my @got;
+     for (my $n = $peano->n_start; @got < $count; $n++) {
+       my ($x, $y) = $peano->n_to_xy($n);
+       push @got, $hilbert->xy_to_n ($x, $y);
+     }
+     return \@got;
+   });
+
+# inverse Peano in Hilbert order
+MyOEIS::compare_values
+  (anum => 'A166042',
+   func => sub {
+     my ($count) = @_;
+     require Math::PlanePath::PeanoCurve;
+     my $peano = Math::PlanePath::PeanoCurve->new;
+     my @got;
+     for (my $n = $hilbert->n_start; @got < $count; $n++) {
+       my ($x, $y) = $hilbert->n_to_xy($n);
+       push @got, $peano->xy_to_n ($x, $y);
+     }
+     return \@got;
+   });
+
+# A166043 - N in Peano order, transpose
+MyOEIS::compare_values
+  (anum => 'A166043',
+   func => sub {
+     my ($count) = @_;
+     require Math::PlanePath::PeanoCurve;
+     my $peano = Math::PlanePath::PeanoCurve->new;
+     my @got;
+     for (my $n = $peano->n_start; @got < $count; $n++) {
+       my ($x, $y) = $peano->n_to_xy($n);
+       ($x,$y) = ($y,$x);
+       push @got, $hilbert->xy_to_n ($x, $y);
+     }
+     return \@got;
+   });
+
+# inverse Peano in Hilbert order, transpose
+MyOEIS::compare_values
+  (anum => 'A166044',
+   func => sub {
+     my ($count) = @_;
+     require Math::PlanePath::PeanoCurve;
+     my $peano = Math::PlanePath::PeanoCurve->new;
+     my @got;
+     for (my $n = $hilbert->n_start; @got < $count; $n++) {
+       my ($x, $y) = $hilbert->n_to_xy($n);
+       ($x,$y) = ($y,$x);
+       push @got, $peano->xy_to_n ($x, $y);
+     }
+     return \@got;
+   });
+
+
+
+#------------------------------------------------------------------------------
+# A059253 - X coordinate (PlanePathCoord catalogue)
 
 # Gosper HAKMEM 115.
 # GP-DEFINE  table = {[[[0,0], [0,0], [0,0], [1,0]],
@@ -209,31 +275,6 @@ sub zorder_is_3cycle {
 # vector(20,n, Hilbert_dir_0231(n))
 # not in OEIS: 3, 2, 2, 0, 1, 0, 2, 0, 1, 1, 3, 1, 0, 0, 2, 0, 1, 0, 0, 2
 
-
-#------------------------------------------------------------------------------
-# A163541 -- absolute direction transpose 0=east, 1=south, 2=west, 3=north
-
-#        1  /
-#        | /         transpose 0<->1
-#    2---+---0                 2<->3
-#      / |
-#    /   3
-
-my @dir4_transpose = (1,0, 3,2);
-MyOEIS::compare_values
-  (anum => 'A163541',
-   name => 'absolute direction transpose',
-   func => sub {
-     my ($count) = @_;
-     my $seq = Math::NumSeq::PlanePathDelta->new(planepath_object=>$hilbert,
-                                                 delta_type => 'Dir4');
-     my @got;
-     while (@got < $count) {
-       my ($n, $value) = $seq->next;
-       push @got, $dir4_transpose[$value];
-     }
-     return \@got;
-   });
 
 #------------------------------------------------------------------------------
 # A083885 etc counts of segments in direction
@@ -511,6 +552,38 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
+# A163538 -- dX
+# extra first entry for N=0 no change
+
+MyOEIS::compare_values
+  (anum => 'A163538',
+   func => sub {
+     my ($count) = @_;
+     my @got = (0);
+     for (my $n = $hilbert->n_start; @got < $count; $n++) {
+       my ($dx, $dy) = $hilbert->n_to_dxdy ($n);
+       push @got, $dx;
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A163539 -- dY
+# extra first entry for N=0 no change
+
+MyOEIS::compare_values
+  (anum => 'A163539',
+   func => sub {
+     my ($count) = @_;
+     my @got = (0);
+     for (my $n = $hilbert->n_start; @got < $count; $n++) {
+       my ($dx, $dy) = $hilbert->n_to_dxdy ($n);
+       push @got, $dy;
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
 # A165467 -- N where Hilbert and Peano same X,Y
 MyOEIS::compare_values
   (anum => 'A165467',
@@ -551,73 +624,9 @@ MyOEIS::compare_values
 
 
 #------------------------------------------------------------------------------
-# A163538 -- dX
-# extra first entry for N=0 no change
-
-MyOEIS::compare_values
-  (anum => 'A163538',
-   func => sub {
-     my ($count) = @_;
-     my @got = (0);
-     for (my $n = $hilbert->n_start; @got < $count; $n++) {
-       my ($dx, $dy) = $hilbert->n_to_dxdy ($n);
-       push @got, $dx;
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A163539 -- dY
-# extra first entry for N=0 no change
-
-MyOEIS::compare_values
-  (anum => 'A163539',
-   func => sub {
-     my ($count) = @_;
-     my @got = (0);
-     for (my $n = $hilbert->n_start; @got < $count; $n++) {
-       my ($dx, $dy) = $hilbert->n_to_dxdy ($n);
-       push @got, $dy;
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A166041 - N in Peano order
-
-MyOEIS::compare_values
-  (anum => 'A166041',
-   func => sub {
-     my ($count) = @_;
-     require Math::PlanePath::PeanoCurve;
-     my $peano = Math::PlanePath::PeanoCurve->new;
-     my @got;
-     for (my $n = $peano->n_start; @got < $count; $n++) {
-       my ($x, $y) = $peano->n_to_xy($n);
-       push @got, $hilbert->xy_to_n ($x, $y);
-     }
-     return \@got;
-   });
-
-# inverse Peano in Hilbert order
-MyOEIS::compare_values
-  (anum => 'A166042',
-   func => sub {
-     my ($count) = @_;
-     require Math::PlanePath::PeanoCurve;
-     my $peano = Math::PlanePath::PeanoCurve->new;
-     my @got;
-     for (my $n = $hilbert->n_start; @got < $count; $n++) {
-       my ($x, $y) = $hilbert->n_to_xy($n);
-       push @got, $peano->xy_to_n ($x, $y);
-     }
-     return \@got;
-   });
-
-
-#------------------------------------------------------------------------------
-# A163540 -- absolute direction 0=east, 1=south, 2=west, 3=north
-# Y coordinates reckoned down the page, so south is Y increasing
+# A163540 -- absolute direction (0=E,1=N,2=W,3=S)
+# sequence description is for Y coordinates reckoned down the page,
+# so Y increasing is described there as "South", whereas North here.
 
 MyOEIS::compare_values
   (anum => 'A163540',
@@ -630,6 +639,38 @@ MyOEIS::compare_values
      }
      return \@got;
    });
+
+# A163541 -- absolute direction transpose 0=east, 1=south, 2=west, 3=north
+#        1  /
+#        | /         transpose 0<->1
+#    2---+---0                 2<->3
+#      / |
+#    /   3
+my @dir4_transpose = (1,0, 3,2);
+MyOEIS::compare_values
+  (anum => 'A163541',
+   name => 'absolute direction transpose',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathDelta->new(planepath_object=>$hilbert,
+                                                 delta_type => 'Dir4');
+     my @got;
+     while (@got < $count) {
+       my ($n, $value) = $seq->next;
+       push @got, $dir4_transpose[$value];
+     }
+     return \@got;
+   });
+
+# Cf Joerg fxtbook section 1.31.1 hilbert_dir() directions 0..3 = >v^<
+#         0,2,3,2,2,0,1,0,2,0,1,1,3,1,0,0,2,0,1,0,0,2,3,2,0,2,3,3,1,3,2,2,
+# cf ENWS 0,1,2,1,1,0,3,0,1,0,3,3,2,3,0,0,1,0,3,0,0,1,2,1, 
+#                       2  up
+#                       |
+#             left 3 ---*--- 0 right
+#                       |
+#                       1  down
+
 
 #------------------------------------------------------------------------------
 # A163909 - num 3-cycles in 4^k blocks, even k only

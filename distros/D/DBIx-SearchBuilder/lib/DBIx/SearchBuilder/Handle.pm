@@ -50,13 +50,17 @@ sub new  {
     my $self  = {};
     bless ($self, $class);
 
+    # Enable quotes table names
+    my %args = ( QuoteTableNames => 0, @_ );
+    $self->{'QuoteTableNames'} = $args{QuoteTableNames};
+
     @{$self->{'StatementLog'}} = ();
     return $self;
 }
 
 
 
-=head2 Connect PARAMHASH: Driver, Database, Host, User, Password
+=head2 Connect PARAMHASH: Driver, Database, Host, User, Password, QuoteTableNames
 
 Takes a paramhash and connects to your DBI datasource. 
 
@@ -70,6 +74,9 @@ If you created the handle with
      DBIx::SearchBuilder::Handle->new
 and there is a DBIx::SearchBuilder::Handle::(Driver) subclass for the driver you have chosen,
 the handle will be automatically "upgraded" into that subclass.
+
+QuoteTableNames option will force all table names to be quoted if the driver subclass has a method
+for quoting implemented. The mysql subclass will detect mysql version 8 and set the flag.
 
 =cut
 
@@ -85,6 +92,7 @@ sub Connect  {
         Password => undef,
         RequireSSL => undef,
         DisconnectHandleOnDestroy => undef,
+        QuoteTableNames => undef,
         @_
     );
 
@@ -95,6 +103,9 @@ sub Connect  {
     # Setting this actually breaks old RT versions in subtle ways.
     # So we need to explicitly call it
     $self->{'DisconnectHandleOnDestroy'} = $args{'DisconnectHandleOnDestroy'};
+
+    # Enable optional quoted table names
+    $self->{'QuoteTableNames'} = delete $args{QuoteTableNames} if defined $args{QuoteTableNames};
 
     my $old_dsn = $self->DSN || '';
     my $new_dsn = $self->BuildDSN( %args );
@@ -115,6 +126,9 @@ sub Connect  {
 
     # Cache version info
     $self->DatabaseVersion;
+
+    # force quoted tables for mysql 8
+    $self->{'QuoteTableNames'} = 1 if $self->_RequireQuotedTables;
 
     return 1;
 }
@@ -390,6 +404,7 @@ sub InsertQueryString {
         push @bind, shift @pairs;
     }
 
+    $table = $self->QuoteName($table) if $self->QuoteTableNames;
     my $QueryString = "INSERT INTO $table";
     $QueryString .= " (". join(", ", @cols) .")";
     $QueryString .= " VALUES (". join(", ", @vals). ")";
@@ -415,6 +430,7 @@ sub InsertFromSelect {
     $columns = join ', ', @$columns
         if $columns;
 
+    $table = $self->QuoteName($table) if $self->{'QuoteTableNames'};
     my $full_query = "INSERT INTO $table";
     $full_query .= " ($columns)" if $columns;
     $full_query .= ' '. $query;
@@ -446,6 +462,7 @@ sub UpdateRecordValue {
                  @_ );
 
     my @bind  = ();
+    $args{Table} = $self->QuoteName($args{Table}) if $self->{'QuoteTableNames'};
     my $query = 'UPDATE ' . $args{'Table'} . ' ';
      $query .= 'SET '    . $args{'Column'} . '=';
 
@@ -518,6 +535,7 @@ sub SimpleUpdateFromSelect {
         push @binds, $values->{$k};
     }
 
+    $table = $self->QuoteName($table) if $self->{'QuoteTableNames'};
     my $full_query = "UPDATE $table SET ";
     $full_query .= join ', ', map "$_ = ?", @columns;
     $full_query .= ' WHERE id IN ('. $query .')';
@@ -541,6 +559,7 @@ select query, eg:
 
 sub DeleteFromSelect {
     my ($self, $table, $query, @binds) = @_;
+    $table = $self->QuoteName($table) if $self->{'QuoteTableNames'};
     my $sth = $self->SimpleQuery(
         "DELETE FROM $table WHERE id IN ($query)",
         @binds
@@ -751,6 +770,16 @@ Returns undef otherwise
 sub CaseSensitive {
     my $self = shift;
     return(1);
+}
+
+=head2 QuoteTableNames
+
+Returns 1 if table names will be quoted in queries, otherwise 0
+
+=cut
+
+sub QuoteTableNames  {
+    return shift->{'QuoteTableNames'}
 }
 
 
@@ -1016,6 +1045,7 @@ sub Join {
             if ( $old_alias =~ /^(.*?) (\Q$args{'ALIAS2'}\E)$/ ) {
                 $args{'TABLE2'} = $1;
                 $alias = $2;
+                $args{'TABLE2'} = $self->DequoteName($args{'TABLE2'}) if $self->QuoteTableNames;
             }
             else {
                 push @new_aliases, $old_alias;
@@ -1039,7 +1069,7 @@ sub Join {
                 if ( $old_alias =~ /^(.*?) ($args{'ALIAS2'})$/ ) {
                     $args{'TABLE2'} = $1;
                     $alias = $2;
-
+                    $args{'TABLE2'} = $self->DequoteName($args{'TABLE2'}) if $self->QuoteTableNames;
                 }
                 else {
                     push @new_aliases, $old_alias;
@@ -1088,6 +1118,7 @@ sub Join {
     } else {
         $alias = $args{'SearchBuilder'}->_GetAlias( $args{'TABLE2'} );
     }
+    $args{TABLE2} = $self->QuoteName($args{TABLE2}) if $self->QuoteTableNames;
 
     my $meta = $args{'SearchBuilder'}->{'left_joins'}{"$alias"} ||= {};
     if ( $args{'TYPE'} =~ /LEFT/i ) {
@@ -1161,6 +1192,7 @@ sub _NormalJoin {
     if ( $args{'TYPE'} =~ /LEFT/i ) {
         my $alias = $sb->_GetAlias( $args{'TABLE2'} );
         my $meta = $sb->{'left_joins'}{"$alias"} ||= {};
+        $args{TABLE2} = $self->QuoteName($args{TABLE2}) if $self->QuoteTableNames;
         $meta->{'alias_string'} = " LEFT JOIN $args{'TABLE2'} $alias ";
         $meta->{'depends_on'}   = $args{'ALIAS1'};
         $meta->{'type'}         = 'LEFT';
@@ -1192,8 +1224,9 @@ sub _BuildJoins {
     my $sb   = shift;
 
     $self->OptimizeJoins( SearchBuilder => $sb );
+    my $table = $self->{'QuoteTableNames'} ? $self->QuoteName($sb->Table) : $sb->Table;
 
-    my $join_clause = join " CROSS JOIN ", ($sb->Table ." main"), @{ $sb->{'aliases'} };
+    my $join_clause = join " CROSS JOIN ", ("$table main"), @{ $sb->{'aliases'} };
     my %processed = map { /^\S+\s+(\S+)$/; $1 => 1 } @{ $sb->{'aliases'} };
     $processed{'main'} = 1;
 
@@ -1737,6 +1770,50 @@ sub HasSupportForNullsOrder {
     return 0;
 }
 
+
+=head2 QuoteName
+
+Quote table or column name to avoid reserved word errors.
+
+Returns same value passed unless over-ridden in database-specific subclass.
+
+=cut
+
+# over-ride in subclass
+sub QuoteName {
+    my ($self, $name) = @_;
+    # use dbi built in quoting if we have a connection,
+    if ($self->dbh) {
+        return $self->dbh->quote_identifier($name);
+    }
+    warn "QuoteName called without a db handle";
+    return $name;
+}
+
+=head2 DequoteName
+
+Undo the effects of QuoteName by removing quoting.
+
+=cut
+
+sub DequoteName {
+    my ($self, $name) = @_;
+    if ($self->dbh) {
+        # 29 = SQL_IDENTIFIER_QUOTE_CHAR; see "perldoc DBI"
+        my $quote_char = $self->dbh->get_info( 29 );
+
+        if ($quote_char) {
+            if ($name =~ /^$quote_char(.*)$quote_char$/) {
+                return $1;
+            }
+        }
+        return $name;
+    }
+    warn "DequoteName called without a db handle";
+    return $name;
+}
+
+sub _RequireQuotedTables { return 0 };
 
 =head2 DESTROY
 

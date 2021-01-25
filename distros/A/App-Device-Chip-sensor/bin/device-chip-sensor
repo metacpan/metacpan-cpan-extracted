@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+
+use v5.26;
+use warnings;
+
+use Object::Pad 0.19;
+
+use Future::AsyncAwait;
+
+STDOUT->binmode( ":encoding(UTF-8)" );
+
+=head1 NAME
+
+C<device-chip-sensor> - commandline test utility for C<Device::Chip> sensor data
+
+=head1 SYNOPSIS
+
+   $ device-chip-sensor -A BusPirate BME280
+
+=head1 DESCRIPTION
+
+This program periodically queries sensor values from L<Device::Chip> instances
+attached via a L<Device::Chip::Adapter> and writes the results as records in
+a CSV file.
+
+=cut
+
+class MyApp extends App::Device::Chip::sensor
+{
+   has $_PRINT_CONFIG;
+
+=head1 COMMANDLINE OPTIONS
+
+The following commandline options are recognised, in addition to those
+provided by the common base class - see
+L<App::Device::Chip::sensor/COMMANDLINE OPTIONS>.
+
+=over 4
+
+=item * --print-config, -p
+
+Prints all the values of each chip's configuration (according to the
+C<read_config> method) on startup.
+
+=back
+
+=cut
+
+   method OPTSPEC :override
+   {
+      return $self->SUPER::OPTSPEC, (
+         'p|print-config' => \$_PRINT_CONFIG,
+      );
+   }
+
+   async method after_sensors :override ( @sensors )
+   {
+      my @chips = await $self->chips;
+
+      if( $_PRINT_CONFIG ) {
+         foreach my $chip ( @chips ) {
+            my $config = await $chip->read_config;
+            printf "%20s: %s\n", $_, $config->{$_} for sort keys %$config;
+         }
+      }
+   }
+
+   method output_readings ( $now, $sensors, $values )
+   {
+      foreach my $i ( 0 .. $#$sensors ) {
+         my $sensor = $sensors->[$i];
+         my $value  = $values->[$i];
+
+         my $chip = $sensor->chip;
+         my $chipname = ( ref $chip ) =~ s/^Device::Chip:://r;
+
+         printf "%s %s: %s %s\n", $chipname, $sensor->name,
+            $sensor->format( $value ), $sensor->units;
+      }
+   }
+}
+
+await MyApp->new->parse_argv->run;
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

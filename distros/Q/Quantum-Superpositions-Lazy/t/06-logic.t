@@ -1,7 +1,7 @@
 use v5.28;
 use warnings;
 use Test::More;
-use Quantum::Superpositions::Lazy qw(every_state any_state one_state);
+use Quantum::Superpositions::Lazy qw(superpos every_state any_state one_state);
 use Data::Dumper;
 
 ##############################################################################

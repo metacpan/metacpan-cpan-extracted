@@ -32,7 +32,7 @@ has specification => sub {
 sub bundle {
   my $self   = shift;
   my $params = shift || {};
-  return $self->new(%$self)->data($self->SUPER::bundle({%$params, schema => $self}));
+  return $self->new(%$self)->data($self->SUPER::bundle({schema => $self, %$params}));
 }
 
 sub contains {
@@ -110,8 +110,9 @@ JSON::Validator::Schema - Base class for JSON::Validator schemas
 
 L<JSON::Validator::Schema> is the base class for
 L<JSON::Validator::Schema::Draft4>,
-L<JSON::Validator::Schema::Draft6> and
-L<JSON::Validator::Schema::Draft7>.
+L<JSON::Validator::Schema::Draft6>,
+L<JSON::Validator::Schema::Draft7> and
+L<JSON::Validator::Schema::Draft201909>.
 
 L<JSON::Validator::Schema> is currently EXPERIMENTAL, and most probably will
 change over the next versions as

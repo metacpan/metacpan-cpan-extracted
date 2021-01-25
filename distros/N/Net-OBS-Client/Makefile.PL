@@ -17,6 +17,7 @@ WriteMakefile(
     BUILD_REQUIRES => {
         'Test::More' => 0,
         'XML::Parser' => 0,
+        'Test::HTTP::MockServer' => 0,
     },
     PREREQ_PM => {
         'Moose'               =>  0,

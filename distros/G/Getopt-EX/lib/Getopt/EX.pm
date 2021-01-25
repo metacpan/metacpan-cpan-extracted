@@ -1,6 +1,6 @@
 package Getopt::EX;
 use 5.014;
-use version; our $VERSION = version->declare("v1.21.1");
+use version; our $VERSION = version->declare("v1.22.0");
 
 1;
 
@@ -11,7 +11,7 @@ Getopt::EX - Getopt Extender
 
 =head1 VERSION
 
-Version v1.21.1
+Version v1.22.0
 
 
 =head1 DESCRIPTION
@@ -60,7 +60,8 @@ L<Getopt::EX::Module> document what you can do in this file.
 If the rc file includes a section start with C<__PERL__>, it is
 evaluated as a perl program.  User can define any kind of functions
 there, which can be invoked from command line option if the script is
-aware of them.
+aware of them.  At this time, module object is assigned to variable
+C<$MODULE>, and you can access module API through it.
 
 Also, special command option preceded by B<-M> is taken and
 corresponding perl module is loaded.  For example,

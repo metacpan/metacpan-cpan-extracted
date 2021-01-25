@@ -1,17 +1,13 @@
-#!/usr/bin/perl
+# Test SSL_CTX_new and related functions, and handshake state machine retrieval
 
-# Tests for SSL_CTX_new and related functions
-# Also test handshake state machine retrieval
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More tests => 44;
 use Net::SSLeay;
+use Test::Net::SSLeay qw(initialise_libssl);
 
-Net::SSLeay::randomize();
-Net::SSLeay::load_error_strings();
-Net::SSLeay::add_ssl_algorithms();
-Net::SSLeay::OpenSSL_add_all_algorithms();
+plan tests => 44;
+
+initialise_libssl();
 
 sub is_known_proto_version {
     return 1 if $_[0] == 0x0000;                            # Automatic version selection

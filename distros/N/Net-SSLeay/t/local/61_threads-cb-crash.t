@@ -1,29 +1,27 @@
-use strict;
-use warnings;
-use Config;
-use Test::More;
+use lib 'inc';
 
-BEGIN {
-  plan skip_all => "your perl is not compiled with ithreads" unless $Config{useithreads};
-  require threads;
-};
-
-#XXX-TODO perhaps perl+ithreads related issue (needs more investigation)
-plan skip_all => "this test sometimes crashes on cygwin" if $^O eq 'cygwin';
-
-# NOTE: expect warnings about threads still running under perl 5.8 and threads 1.71
-plan tests => 1;
+use Net::SSLeay;
+use Test::Net::SSLeay qw( can_thread data_file_path initialise_libssl );
 
 use FindBin;
-use File::Spec;
-use Net::SSLeay;
+
+if (not can_thread()) {
+    plan skip_all => "Threads not supported on this system";
+} elsif ($^O eq 'cygwin') {
+    # XXX-TODO perhaps perl+ithreads related issue (needs more investigation)
+    plan skip_all => "this test sometimes crashes on Cygwin";
+} else {
+    # NOTE: expect warnings about threads still running under perl 5.8 and threads 1.71
+    plan tests => 1;
+}
+
+require threads;
+
+initialise_libssl();
 
 my $start_time = time;
-my $file = File::Spec->catfile('t', 'data', 'testcert_key_2048.pem');
 
-Net::SSLeay::randomize();
-Net::SSLeay::load_error_strings();
-Net::SSLeay::SSLeay_add_ssl_algorithms();
+my $file = data_file_path('simple-cert.key.pem');
 
 #exit the whole program if it runs too long
 threads->new( sub { sleep 20; warn "FATAL: TIMEOUT!"; exit } )->detach;

@@ -1,5 +1,12 @@
 Revision history for Store-Directories
 
+0.4.1   January 22, 2021
+        - Fix Devel::GlobalDestruction not being declared in Build.PL
+0.4     January 21, 2021
+        - Can be configured so that waiting on a lock will bail out
+          (either after a certain time, or controlled by a callback)
+        - The optional callback for the 'remove' method now includes the
+          key in its arguments
 0.3     January 12, 2021
         - Fixed being unable to create locks if you extending the
           Store::Directories class.

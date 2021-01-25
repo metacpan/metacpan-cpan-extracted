@@ -2,7 +2,7 @@ package Neo4j::Bolt::Txn;
 use Carp qw/croak/;
 
 BEGIN {
-  our $VERSION = "0.4200";
+  our $VERSION = "0.4201";
   require Neo4j::Bolt::CTypeHandlers;
   require Neo4j::Bolt::ResultStream;  
   require XSLoader;
@@ -130,7 +130,7 @@ Completely analogous to same functions in L<Neo4j::Bolt::Cxn>.
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2020 by Mark A. Jensen.
+This software is Copyright (c) 2019-2021 by Mark A. Jensen.
 
 This is free software, licensed under:
 

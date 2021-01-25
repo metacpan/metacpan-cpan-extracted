@@ -26,9 +26,9 @@ my @keys = qw(one two three four);
 
 # keys() not random
 {
-    my @keys = keys %hash;
+    my @hashkeys = keys %hash;
     for (1..20) {
-        is_deeply [sort keys %hash], [sort @keys];
+        is_deeply [sort keys %hash], [sort @hashkeys];
     }
 }
 
@@ -68,7 +68,7 @@ TEST: {
 {
     my @values;
     my $iters = 1000;
-    push(@values, grep(defined, values %hash)) for 1..$iters;
+    push @values, grep { defined } values %hash for 1..$iters;
 
     cmp_ok( abs( @values - ($iters * keys(%hash) * 3/4) ) / $iters, '<=', $EP);
 }

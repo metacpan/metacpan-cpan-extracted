@@ -1,15 +1,16 @@
-#!/usr/bin/perl
-
-use strict;
-use warnings;
-use Test::More;
-
-eval "use Test::Exception; use Test::Warn; use Test::NoWarnings; 1;";
-plan skip_all => 'Requires Test::Exception, Test::Warn and Test::NoWarnings' if $@;
-plan tests => 11;
+use lib 'inc';
 
 use Net::SSLeay;
-Net::SSLeay::load_error_strings();
+use Test::Net::SSLeay qw(initialise_libssl);
+
+eval "use Test::Exception; use Test::Warn; use Test::NoWarnings; 1;";
+if ($@) {
+    plan skip_all => 'Requires Test::Exception, Test::Warn and Test::NoWarnings';
+} else {
+    plan tests => 11;
+}
+
+initialise_libssl();
 
 # Note, die_now usually just prints the process id and the argument string eg:
 # 57611: test

@@ -48,6 +48,6 @@
          "url" : "http://github.com/salva/p5-Net-SFTP-Foreign"
       }
    },
-   "version" : "1.91",
+   "version" : "1.93",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

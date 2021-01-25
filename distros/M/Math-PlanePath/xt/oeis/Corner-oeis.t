@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -45,9 +45,7 @@ MyOEIS::compare_values
      return \@got;
    });
 
-#------------------------------------------------------------------------------
 # A078633 -- grid sticks
-
 {
   my @dir4_to_dx = (1,0,-1,0);
   my @dir4_to_dy = (0,1,0,-1);
@@ -63,7 +61,6 @@ MyOEIS::compare_values
     return $dsticks;
   }
 }
-
 MyOEIS::compare_values
   (anum => 'A078633',
    func => sub {
@@ -74,21 +71,6 @@ MyOEIS::compare_values
      for (my $n = $path->n_start; @got < $count; $n++) {
        $boundary += path_n_to_dsticks($path,$n);
        push @got, $boundary;
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A000290 -- N on X axis, perfect squares starting from 1
-
-MyOEIS::compare_values
-  (anum => 'A000290',
-   func => sub {
-     my ($count) = @_;
-     my @got = (0);
-     my $path = Math::PlanePath::Corner->new;
-     for (my $x = 0; @got < $count; $x++) {
-       push @got, $path->xy_to_n ($x, 0);
      }
      return \@got;
    });
@@ -229,6 +211,25 @@ MyOEIS::compare_values
      }
      return \@got;
    });
+
+
+#------------------------------------------------------------------------------
+
+# Matthew P. Szudzik, "The Rosenberg-Strong Pairing Function",
+# arxiv 1706.04129.
+# Ref in A319514 coordinate pairs
+# 
+# A. L. Rosenberg and H. R. Strong, "Addressing Arrays By Shells", IBM
+# Technical Disclosure Bulletin, 14(10):3026-3028, March 1972.
+#
+# max(x,y) as "shell number" of point x,y.
+#
+# GP-DEFINE  r2(x,y) = max(x,y)^2 + max(x,y) + x - y;
+# matrix(10,10,x,y,x--;y--; r2(x,y))
+
+
+
+
 
 
 #------------------------------------------------------------------------------

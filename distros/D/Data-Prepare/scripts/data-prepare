@@ -1,0 +1,241 @@
+#!perl
+
+use strict;
+use warnings;
+use Text::CSV qw(csv);
+use Data::Prepare qw(
+  cols_non_empty non_unique_cols
+  chop_lines chop_cols header_merge
+);
+use YAML qw(LoadFile);
+use Getopt::Long qw(GetOptions);
+
+my $config = "data-prepare-conf.yml";
+my ($analyse, $uniq_cols, $verbose, $slice_num, $slice_key);
+if (!GetOptions("a!" => \$analyse,
+                "u!"  => \$uniq_cols,
+                "v!"  => \$verbose,
+                "f=s" => \$config,
+                "sn=i" => \$slice_num,
+                "sk=s" => \$slice_key,
+               )) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(1);
+}
+
+if ($uniq_cols) {
+  die "Usage: -u file..." unless @ARGV;
+  my (@files, %f2col2count) = @_;
+  for my $file (@ARGV) {
+    my $data = csv(in => $file, encoding => "UTF-8");
+    my $col2count = non_unique_cols($data);
+    next if !keys %$col2count;
+    $f2col2count{$file} = $col2count;
+  }
+  for my $f (keys %f2col2count) {
+    my $c2c = $f2col2count{$f};
+    print "$f:\n", map "  '$_': $c2c->{$_}\n", sort keys %$c2c;
+  }
+  exit;
+}
+
+if ($analyse) {
+  die "Usage: -a file..." unless @ARGV;
+  my %f2cs;
+  for my $file (@ARGV) {
+    my $data = csv(in => $file, encoding => "UTF-8");
+    $f2cs{$file} = [ cols_non_empty($data) ];
+  }
+  require Data::Dumper;
+  $Data::Dumper::Indent = $Data::Dumper::Indent = $Data::Dumper::Sortkeys = $Data::Dumper::Sortkeys = $Data::Dumper::Terse = $Data::Dumper::Terse = 1;
+  print Data::Dumper::Dumper(\%f2cs);
+  exit;
+}
+
+if (grep defined, $slice_num, $slice_key) {
+  die "Usage: -s[kn] col[num|key] file..." unless @ARGV;
+  require Encode;
+  for my $file (@ARGV) {
+    my $data = csv(in => $file, encoding => "UTF-8");
+    if (!defined $slice_num) {
+      ($slice_num) = grep $data->[0][$_] eq $slice_key, 0..$#{$data->[0]};
+      die "Unknown column-name '$slice_key' in '$file'" if !defined $slice_num;
+    }
+    print Encode::encode("UTF-8", $_->[$slice_num]), "\n" for @$data;
+  }
+  exit;
+}
+
+my $process_config = LoadFile($config);
+
+my %set_to_process; @set_to_process{
+  (map @{ $_->{files} }, @{$process_config->{merge}}),
+  (map keys(%{$process_config->{$_}}), qw(chop_cols chop_lines)),
+} = ();
+
+my %file2data = map +($_ => csv(in => $_, encoding => "UTF-8")), keys %set_to_process;
+for my $file (sort keys %{ $process_config->{chop_cols} }) {
+  my $cols = $process_config->{chop_cols}{$file};
+  print "$file: cols (@$cols)\n" if $verbose;
+  chop_cols($cols, $file2data{$file});
+}
+for my $merge_set (@{ $process_config->{merge} }) {
+  my ($spec, @files) = ($merge_set->{spec}, @{$merge_set->{files}});
+  for my $file (@files) {
+    print "$file: merge\n" if $verbose;
+    header_merge($spec, $file2data{$file});
+  }
+}
+for my $file (sort keys %{ $process_config->{chop_lines} }) {
+  my $lines = $process_config->{chop_lines}{$file};
+  print "$file: lines (@$lines)\n" if $verbose;
+  chop_lines($lines, $file2data{$file});
+}
+for my $file (sort keys %file2data) {
+  print "to $file\n" if $verbose;
+  csv (in => $file2data{$file}, out => $file, encoding => "UTF-8");
+}
+
+=head1 NAME
+
+data-prepare - prepare CSV data for automatic processing
+
+=head1 SYNOPSIS
+
+    data-prepare [-f config] [-v] [[-u|-a|-sn colnum|-sk key] file...]
+
+=head1 DESCRIPTION
+
+Uses L<Data::Prepare> to process the specified CSV files to make them
+suitable for automatic processing (such as data science applications).
+It will first delete columns specified in C<chop_cols>, then do the
+C<merge> operations, then the C<chop_lines> operations (in that order
+so that all lines are available for C<merge> purposes).
+
+If the flags that take files are given, the config file is not read and
+no operations executed.
+
+B<Please note this program overwrites the data files> with updated data.
+Your workflow needs to take this into account by e.g. copying the data
+into place before calling this program. Use of a version-control system
+such as Git is also recommended.
+
+=head1 OPTIONS
+
+=over
+
+=item -u F<file...>
+
+For each given file (the config is ignored), prints out any non-unique
+column values in the first row ("column headers"), with the number of
+times they occur. Use this to see if further merge/modify operations
+are needed on column headers in order to achieve uniquely-named columns.
+
+=item -a F<file...>
+
+Print for each file, a sequence of numbers. Each number is the count of
+non-blank entries in that column (from left to right). This helps you
+spot columns with few or no entries that you may wish to "chop".
+
+=item -s colnum F<file...>
+
+Print for each file, the zero-based-number-th column ("slice") from that file.
+
+=item -v
+
+Turn on verbose mode.
+
+=item -f F<config>
+
+Use the given YAML-formatted config file rather than the default of
+F<data-prepare-conf.yml>. See below for format.
+
+=back
+
+=head1 CONFIGURATION FILE FORMAT
+
+This is in L<YAML> format. An example is given below (included in the
+distribution, together with the applicable CSV file, in the F<examples>
+directory):
+
+  ---
+  chop_cols:
+    examples/CoreHouseholdIndicators.csv: [0, 2, 4, 7, 10, 13, 16, 19, 21, 22, 23, 25, 26, 29, 32]
+  chop_lines:
+    examples/CoreHouseholdIndicators.csv: [0, 0, 0, -1, -1, -1, -1, -1]
+  merge:
+    - files:
+        - examples/CoreHouseholdIndicators.csv
+      spec:
+        - do:
+            - overwrite
+          from: up
+          fromspec: lastnonblank
+          line: 2
+          matchto: HH
+          to: self
+        - do:
+            - prepend
+            - ' '
+          from: self
+          line: 2
+          matchfrom: .
+          to: down
+        - do:
+            - prepend
+            - /
+          from: self
+          fromspec: left
+          line: 3
+          matchto: Year
+          to: self
+        - do:
+            - overwrite
+          from: self
+          fromspec: literal:Country
+          line: 3
+          to: self
+          tospec: index:0
+
+This turns the first three lines of CSV excerpted from the supplied example
+data (spaces inserted for alignment reasons only):
+
+        ,Proportion of households with,       ,     ,
+        ,(HH1)                        ,Year   ,(HH2),Year
+        ,Radio                        ,of data,TV   ,of data
+  Belize,58.7                         ,2019   ,78.7 ,2019
+
+into the following. Note that the first two lines will still be present
+(not shown), possibly modified, so you will need your chop_lines to
+remove them. The columns of the third line are shown, one per line,
+for readability:
+
+  Country,
+  Proportion of households with Radio,
+  Proportion of households with Radio/Year of data,
+  Proportion of households with TV,
+  Proportion of households with TV/Year of data
+
+This achieves a single row of column-headings, with each column-heading
+being unique, and sufficiently meaningful.
+
+=head1 WORKFLOW
+
+This is one workflow, using the supplied example config, and recreating
+the supplied example data by re-downloading it from the International
+Telecommunication Union (ITU):
+
+  mkdir -p xlsx examples
+  # localc --convert-to xlsx:"Calc MS Excel 2007 XML" --outdir xlsx file.xls # convert other spreadsheet format
+  wget https://www.itu.int/en/ITU-D/Statistics/Documents/statistics/2020/CoreHouseholdIndicators.xlsx -P xlsx
+  # after: pip3 install --user xlsx2csv
+  ~/.local/bin/xlsx2csv -i -a xlsx/CoreHouseholdIndicators.xlsx examples
+  data-prepare -f examples/data-prepare-conf.yml # the supplied example config
+
+C<localc> is LibreOffice's spreadsheet program.
+
+=head1 SEE ALSO
+
+L<Data::Prepare>, L<Text::CSV>, L<YAML>.
+
+=cut

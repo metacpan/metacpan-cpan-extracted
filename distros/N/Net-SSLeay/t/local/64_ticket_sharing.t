@@ -1,34 +1,43 @@
-#!/usr/bin/perl
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More;
-use Socket;
-use File::Spec;
 use Net::SSLeay;
-use Config;
+use Test::Net::SSLeay qw( data_file_path initialise_libssl new_ctx );
+
+use English qw( $EVAL_ERROR -no_match_vars );
+
+if ( !defined &Net::SSLeay::CTX_set_tlsext_ticket_getkey_cb ) {
+    plan skip_all => "no support for tlsext_ticket_key_cb";
+}
+elsif ( !eval { Net::SSLeay::CTX_free( new_ctx( undef, 'TLSv1.2' ) ); 1 } ) {
+    my $err = $EVAL_ERROR;
+    # This test only reflects the session protocol found in TLSv1.2 and below:
+    # https://wiki.openssl.org/index.php/TLS1.3#Sessions
+    # TODO(GH-224): write an equivalent test for TLSv1.3
+    if ( $err =~ /no usable protocol versions/ ) {
+        plan skip_all => 'TLSv1.2 or below not available in this libssl';
+    }
+    else {
+        die $err;
+    }
+}
+else {
+    plan tests => 15;
+}
+
+initialise_libssl();
 
 # for debugging only
 my $DEBUG = 0;
 my $PCAP = 0;
 require Net::PcapWriter if $PCAP;
 
-plan skip_all => "no support for tlsext_ticket_key_cb"
-    if ! defined &Net::SSLeay::CTX_set_tlsext_ticket_getkey_cb;
-plan tests => 15;
-
-Net::SSLeay::randomize();
-Net::SSLeay::load_error_strings();
-Net::SSLeay::ERR_load_crypto_strings();
-Net::SSLeay::SSLeay_add_ssl_algorithms();
-
 my $SSL_ERROR; # set in _minSSL
 my %TRANSFER;  # set in _handshake
 
 my $client = _minSSL->new();
 my $server = _minSSL->new( cert => [
-    File::Spec->catfile('t', 'data', 'testcert_wildcard.crt.pem'),
-    File::Spec->catfile('t', 'data', 'testcert_key_2048.pem')
+    data_file_path('simple-cert.cert.pem'),
+    data_file_path('simple-cert.key.pem'),
 ]);
 
 
@@ -67,8 +76,8 @@ is( _handshake($client,$server,$reuse),'reuse',"handshake again with reuse");
 # should not be reused
 # ----------------------------------------------
 my $server2 = _minSSL->new( cert => [
-    File::Spec->catfile('t', 'data', 'testcert_wildcard.crt.pem'),
-    File::Spec->catfile('t', 'data', 'testcert_key_2048.pem')
+    data_file_path('simple-cert.cert.pem'),
+    data_file_path('simple-cert.key.pem'),
 ]);
 is( _handshake($client,$server2,$reuse),'full',"handshake with server2 is full");
 
@@ -193,11 +202,15 @@ sub _handshake {
 
 {
     package _minSSL;
+
+    use Test::Net::SSLeay qw(new_ctx);
+
     sub new {
 	my ($class,%args) = @_;
-	my $ctx = Net::SSLeay::CTX_tlsv1_new();
-	Net::SSLeay::CTX_set_options($ctx,Net::SSLeay::OP_ALL());
-	Net::SSLeay::CTX_set_cipher_list($ctx,'AES128-SHA');
+	my $ctx = new_ctx( 'TLSv1', 'TLSv1.2' );
+	# Explicitly disable compression, otherwise the "no more data from client to
+	# server" test may fail sometimes:
+	Net::SSLeay::CTX_set_options( $ctx, Net::SSLeay::OP_ALL() | Net::SSLeay::OP_NO_COMPRESSION() );
 	my $id = 'client';
 	if ($args{cert}) {
 	    my ($cert,$key) = @{ delete $args{cert} };
@@ -260,7 +273,6 @@ sub _handshake {
     sub _reset {
 	my $self = shift;
 	my $ssl = Net::SSLeay::new($self->{ctx});
-	Net::SSLeay::set_security_level($ssl, 1) if exists &Net::SSLeay::set_security_level;
 	my @bio = (
 	    Net::SSLeay::BIO_new(Net::SSLeay::BIO_s_mem()),
 	    Net::SSLeay::BIO_new(Net::SSLeay::BIO_s_mem()),

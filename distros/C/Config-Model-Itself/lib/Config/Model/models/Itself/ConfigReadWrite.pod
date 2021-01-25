@@ -223,6 +223,10 @@ list of characters that start a comment. When more that one character is used. t
 
 
 
+=head2 quote_value
+
+Specify how to handle quoted values. By default, quoted values are left as is. With C<shell_style>, value are parsed and unquoted like in a shell. Values containing a space are written back with double quotes. I< Optional. Type enum. choice: 'shell_style'.  > 
+
 =head2 auto_delete - Delete empty configuration file
 
 Delete configuration files when no information is left in there. This may happen when data is removed by user. This is mostly useful when the  configuration of an application is made of several files. I< Optional. Type boolean.  > 

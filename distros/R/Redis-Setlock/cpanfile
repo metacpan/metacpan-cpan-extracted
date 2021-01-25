@@ -13,6 +13,5 @@ on 'test' => sub {
     requires 'Test::RedisServer';
     requires 'Test::TCP', '2.00';
     requires 'Test::SharedFork';
+    requires 'Capture::Tiny';
 };
-
-

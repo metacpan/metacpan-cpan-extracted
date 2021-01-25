@@ -8,7 +8,7 @@ BEGIN {
 	$^W = 1;
 }
 
-use File::Slurp ();
+use Path::Tiny ();
 use File::Spec::Functions ':ALL';
 use Test::More tests => 7;
 use Test::Inline::Extract ();
@@ -20,10 +20,8 @@ use Test::Inline::Extract ();
 #####################################################################
 # Test the examples from Inline.pm
 {
-	my $inline_file = File::Slurp::read_file(
-		catfile( 't', 'data', '10_legacy_extract', 'Inline.pm' ),
-		scalar_ref => 1,
-		) or die "Failed to load Inline.pm test file";
+	my $content = Path::Tiny::path(catfile( 't', 'data', '10_legacy_extract', 'Inline.pm' ))->slurp;
+	my $inline_file = \$content;
 	is( ref($inline_file), 'SCALAR', 'Loaded Inline.pm examples' );
 
 	my $Extract = Test::Inline::Extract->new( $inline_file );

@@ -1,13 +1,14 @@
 ---
-abstract: 'Accurate latitude/longitude calculations'
+abstract: 'longitude and latitude calculations using an ellipsoid model'
 author:
-  - 'Peter John Acklam <pjacklam@online.no>'
+  - 'Peter John Acklam <pjacklam@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0.47'
+  Test::Number::Delta: '0.13'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.58'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '1.04'
-  Math::Trig: '1.03'
+  Carp: '1.22'
+  Math::Trig: '1.23'
   Scalar::Util: '1.19'
-  Test::More: '0.47'
-  Test::Number::Delta: '0.16'
-version: '1.14'
+resources:
+  repository: https://github.com/pjacklam/p5-Geo-Ellipsoid.git
+version: '1.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

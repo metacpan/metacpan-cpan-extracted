@@ -1,6 +1,6 @@
 use lib 't/lib';
 use Test::More;
-use TidierTests;
+use TidierTests qw(run_test $indent);
 
 run_test( <<'RAW', <<'TIDIED', 'Simple method usage', '',  );
 method name1{
@@ -144,7 +144,7 @@ fun morning ( Str :$name,
 }
 TIDIED
 
-run_test( <<'RAW', <<'TIDIED', 'With trailing comments', '',  );
+run_test( <<'RAW', <<"TIDIED", 'With trailing comments', '',  );
 method name1{# Trailing comment
 }
 sub name2{  # Trailing comment
@@ -153,11 +153,11 @@ RAW
 method name1 {    # Trailing comment
 }
 
-sub name2 {      # Trailing comment
+sub name2 {$indent# Trailing comment
 }
 TIDIED
 
-run_test( <<'RAW', <<'TIDIED', 'With attribs trailing comments', '',  );
+run_test( <<'RAW', <<"TIDIED", 'With attribs trailing comments', '',  );
 method name1 :Attrib(Arg) {# comment
 }
 sub name2 :Attrib(Arg) {  # comment
@@ -166,7 +166,7 @@ RAW
 method name1 : Attrib(Arg) {    # comment
 }
 
-sub name2 : Attrib(Arg) {      # comment
+sub name2 : Attrib(Arg) {$indent# comment
 }
 TIDIED
 

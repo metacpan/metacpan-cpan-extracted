@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2016, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,11 +20,50 @@
 
 use 5.004;
 use strict;
+use List::Util 'min';
 use POSIX ();
+$|=1;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
 
+{
+  # current List::Util min() and other funcs run overloads,
+  # early versions cast to UV or NV or something
+
+  use Math::BigInt;
+  my $x = Math::BigInt->new(2)**256 + 1;
+  my $y = Math::BigInt->new(2)**256;
+  $x!=$y or die;
+  $x = MyNum->new(101);
+  $y = MyNum->new(100);
+  print "cmp ",$x <=> $y,"\n";
+  print "call min\n";
+  my $m = min($x,$y);
+  ### $m
+  if ($m==$x) { print "is x\n"; }
+  if ($m==$y) { print "is y\n"; }
+  exit 0;
+
+  {
+    package MyNum;
+    use overload '<=>' => \&spaceship,
+      fallback => 1;
+
+    sub new {
+      my ($class, $n) = @_;
+      ### MyNum: $n
+      return bless { num => $n }, $class;
+    }
+    sub spaceship {
+      my ($self, $other) = @_;
+      ### spaceship
+      ### $self
+      ### $other
+      return $self->{'num'} <=> $other->{'num'};
+    }
+  }
+}
 {
   use Math::BigInt;
   my $b = Math::BigInt->new('463168356949264781694283940034751631414441068130246010011683834461379591405565');

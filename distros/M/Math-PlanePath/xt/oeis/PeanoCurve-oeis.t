@@ -72,7 +72,8 @@ MyOEIS::compare_values
 # GP-DEFINE    for(i=1,#v, if(k[1],v[i]=2-v[i]); k[2]+=v[i]; k=Vecrev(k));
 # GP-DEFINE    fromdigits(v,3);
 # GP-DEFINE  }
-# my(v=OEIS_samples("A163332")); vector(#v,n,n--; A163332(n)) == v  \\ OFFSET=0
+# GP-Test  my(v=OEIS_samples("A163332")); /* OFFSET=0 */ \
+# GP-Test    vector(#v,n,n--; A163332(n)) == v
 # my(g=OEIS_bfile_gf("A163332")); \
 #   g==Polrev(vector(poldegree(g)+1,n,n--;A163332(n)))
 # poldegree(OEIS_bfile_gf("A163332"))
@@ -119,7 +120,7 @@ MyOEIS::compare_values
 
 
 #------------------------------------------------------------------------------
-# A163334 -- diagonals same axis
+# A163334 -- N by diagonals same axis
 
 MyOEIS::compare_values
   (anum => 'A163334',
@@ -135,7 +136,7 @@ MyOEIS::compare_values
      return \@got;
    });
 
-# A163335 -- diagonals same axis, inverse
+# A163335 -- N by diagonals same axis, inverse
 MyOEIS::compare_values
   (anum => 'A163335',
    func => sub {
@@ -271,20 +272,6 @@ MyOEIS::compare_values
          $sum += $peano->xy_to_n ($x, $y);
        }
        push @got, int($sum/6);
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A163344 -- N/4 on X=Y diagonal
-
-MyOEIS::compare_values
-  (anum => 'A163344',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $x = 0; @got < $count; $x++) {
-       push @got, int($peano->xy_to_n($x,$x) / 4);
      }
      return \@got;
    });
@@ -509,8 +496,8 @@ MyOEIS::compare_values
 # GP-Test    vector(#v,n,n--; A163480(n)) == v
 #
 # GP-DEFINE  A163480_compact(n) = {
-# GP-DEFINE    my(v=digits(n,3),k=Mod(0,2));
-# GP-DEFINE    for(i=1,#v, if(k,v[i]+=6); k+=v[i]);
+# GP-DEFINE    my(v=digits(n,3),s=Mod(0,2));
+# GP-DEFINE    for(i=1,#v, if(s,v[i]+=6); s+=v[i]);
 # GP-DEFINE    fromdigits(v,9);
 # GP-DEFINE  }
 # GP-Test  to_ternary(A163480(3))         == 120
@@ -518,18 +505,94 @@ MyOEIS::compare_values
 # GP-Test  vector(3^6,n,n--; A163480(n)) == \
 # GP-Test  vector(3^6,n,n--; A163480_compact(n))
 
-# GP-DEFINE  \\ Peano Y -> N, on Y axis
+# GP-DEFINE  \\ Peano Y -> N, points on Y axis
 # GP-DEFINE  A163481(n) = A163332(A208665(n));
 # GP-Test  my(v=OEIS_samples("A163481"));  /* OFFSET=0 */ \
 # GP-Test    vector(#v,n,n--; A163481(n)) == v
 #
+# GP-Test  /* Y axis from X axis */ \
+# GP-Test  vector(3^6,n,n--; A163481(n)) == \
+# GP-Test  vector(3^6,n,n--; 3*A163480(n) + if(n%2,2))
+#
 # GP-DEFINE  A163481_compact(n) = {
-# GP-DEFINE    my(v=digits(n,3),k=Mod(0,2));
-# GP-DEFINE    for(i=1,#v, k+=v[i]; v[i]=3*v[i]+if(k,2));
+# GP-DEFINE    my(v=digits(n,3),s=Mod(0,2));
+# GP-DEFINE    for(i=1,#v, s+=v[i]; v[i]=3*v[i]+if(s,2));
 # GP-DEFINE    fromdigits(v,9);
 # GP-DEFINE  }
 # GP-Test  vector(3^6,n,n--; A163481(n)) == \
 # GP-Test  vector(3^6,n,n--; A163481_compact(n))
+
+
+#------------------------------------------------------------------------------
+# A163343 - N on diagonal (in Math::NumSeq::PlanePathN)
+# = 4*A163344
+
+# GP-DEFINE  \\ ternary reflected Gray code
+# GP-DEFINE  Gray3(n) = {
+# GP-DEFINE    my(v=digits(n,3),s=Mod(0,2));
+# GP-DEFINE    for(i=1,#v, if(s,v[i]=2-v[i]); s+=v[i]);
+# GP-DEFINE    fromdigits(v,3);
+# GP-DEFINE  }
+# GP-DEFINE  A128173(n) = Gray3(n);
+# GP-Test  my(v=OEIS_samples("A128173"));  /* OFFSET=0 */ \
+# GP-Test    vector(#v,n,n--; A128173(n)) == v
+# my(g=OEIS_bfile_gf("A128173")); \
+#   g==Polrev(vector(poldegree(g)+1,n,n--;A128173(n)))
+# poldegree(OEIS_bfile_gf("A128173"))
+#
+# GP-DEFINE  \\ 00 11 22 duplicate ternary digits
+# GP-DEFINE  Dup3(n) = fromdigits(digits(n,3),9)<<2;
+# GP-DEFINE  A338086(n) = Dup3(n);
+# GP-Test  my(v=OEIS_samples("A338086"));  /* OFFSET=1 */ \
+# GP-Test    vector(#v,n,n--; A338086(n)) == v
+# my(g=OEIS_bfile_gf("A338086")); \
+#   g==Polrev(vector(poldegree(g)+1,n,n--;A338086(n)))
+# poldegree(OEIS_bfile_gf("A338086"))
+
+# GP-DEFINE  \\ Peano d -> N, on diagonal
+# GP-DEFINE  A163343(n) = A163332(Dup3(n));
+# GP-Test  my(v=OEIS_samples("A163343"));  /* OFFSET=0 */ \
+# GP-Test    vector(#v,n,n--; A163343(n)) == v
+# my(g=OEIS_bfile_gf("A163343")); \
+#   g==Polrev(vector(poldegree(g)+1,n,n--;A163343(n)))
+# poldegree(OEIS_bfile_gf("A163343"))
+#
+# GP-Test  /* diagonal by Z-order diagonal converted */ \
+# GP-Test  vector(3^6,n,n--; A163343(n)) == \
+# GP-Test  vector(3^6,n,n--; A163332(A338086(n)))
+#
+# GP-Test  /* diagonal by ternary reflected Gray then 3 -> 9 */ \
+# GP-Test  vector(3^6,n,n--; A163343(n)) == \
+# GP-Test  vector(3^6,n,n--; A338086(A128173(n)))
+#
+# GP-DEFINE  A163343_compact(n) = {
+# GP-DEFINE    my(v=digits(n,3),s=Mod(0,2));
+# GP-DEFINE    for(i=1,#v, if(s,v[i]=2-v[i]); s+=v[i]);
+# GP-DEFINE    fromdigits(v,9)<<2;
+# GP-DEFINE  }
+# GP-Test  vector(3^6,n,n--; A163343(n)) == \
+# GP-Test  vector(3^6,n,n--; A163343_compact(n))
+
+#------------------------------------------------------------------------------
+# A163344 -- N/4 on X=Y diagonal
+
+MyOEIS::compare_values
+  (anum => 'A163344',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $x = 0; @got < $count; $x++) {
+       push @got, int($peano->xy_to_n($x,$x) / 4);
+     }
+     return \@got;
+   });
+
+# GP-DEFINE  A163344(n) = A163343(n)/4;
+# GP-Test  my(v=OEIS_samples("A163344"));  /* OFFSET=1 */ \
+# GP-Test    vector(#v,n,n--; A163344(n)) == v
+# my(g=OEIS_bfile_gf("A163344")); \
+#   g==Polrev(vector(poldegree(g)+1,n,n--;A163344(n)))
+# poldegree(OEIS_bfile_gf("A163344"))
 
 
 #------------------------------------------------------------------------------

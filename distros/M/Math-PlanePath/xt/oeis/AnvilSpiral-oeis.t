@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2018, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 2;
+plan tests => 3;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -57,6 +57,22 @@ MyOEIS::compare_values
      my @got;
      for (my $y = 0; @got < $count; $y--) {
        push @got, $path->xy_to_n(0,$y);
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A033569 - N-1 on NW diagonal, wider=1,  (2*n-1)*(3*n+1)
+
+MyOEIS::compare_values
+  (anum => 'A033569',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::AnvilSpiral->new (wider => 1);
+     my @got = (-1);  # A033569 initial -1 instead of 1
+     for (my $i = 1; @got < $count; $i++) {
+       push @got, $path->xy_to_n(-$i, $i) - 1;
      }
      return \@got;
    });

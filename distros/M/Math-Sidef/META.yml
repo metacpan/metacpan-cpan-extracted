@@ -16,16 +16,16 @@ name: Math-Sidef
 provides:
   Math::Sidef:
     file: lib/Math/Sidef.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Exporter: '0'
   Math::AnyNum: '0.36'
-  Sidef: '3.96'
+  Sidef: '3.97'
   perl: v5.16.0
 resources:
   bugtracker: https://github.com/trizen/Math-Sidef/issues
   homepage: https://github.com/trizen/Math-Sidef
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/Math-Sidef
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

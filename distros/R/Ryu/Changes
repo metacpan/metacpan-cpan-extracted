@@ -1,5 +1,16 @@
 Revision history for Ryu
 
+2.007     2021-01-25 02:01:08+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - the `->source` provided by a Ryu::Sink is now a child of the sink itself,
+    to facilitate backpressure algorithms and help with common streaming configurations
+
+    Bugs fixed:
+
+    - ->ordered_futures would call ->pause or ->resume more often than required,
+    these are now only triggered when they would change state
+
 2.006     2021-01-17 03:02:18+08:00 Asia/Kuala_Lumpur
     New features:
 

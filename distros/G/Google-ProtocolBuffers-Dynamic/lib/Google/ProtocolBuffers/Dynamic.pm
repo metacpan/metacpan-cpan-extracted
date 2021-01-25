@@ -9,7 +9,7 @@ use Exporter ();
 # @EXPORT_OK/%EXPORT_TAGS are set up in XS
 *import = \&Exporter::import;
 
-our $VERSION = '0.29'; # VERSION
+our $VERSION = '0.30'; # VERSION
 
 XSLoader::load(__PACKAGE__);
 
@@ -87,7 +87,7 @@ Google::ProtocolBuffers::Dynamic - fast and complete protocol buffer implementat
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -558,6 +558,13 @@ explicitly set or not.
 
 When enabled, and a value was explicitly set for the field, the field
 is always emitted.
+
+=head2 encode_defaults_proto3
+
+Disabled by default, it can't be enabled for C<proto2>.
+
+Same as C<encode_defaults>. The only reason to enable this is as an
+hack to emulate proto3 field presence support.
 
 =head2 explicit_defaults
 

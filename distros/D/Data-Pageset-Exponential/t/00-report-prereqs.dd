@@ -32,10 +32,12 @@ do { my $x = {
                                       'Moo' => '1.006000',
                                       'MooX::Aliases' => '0',
                                       'MooX::TypeTiny' => '0',
+                                      'POSIX' => '0',
                                       'PerlX::Maybe' => '0',
                                       'Types::Common::Numeric' => '0',
                                       'Types::Standard' => '0',
                                       'asa' => '0',
+                                      'integer' => '0',
                                       'namespace::autoclean' => '0',
                                       'perl' => 'v5.10.1'
                                     }
@@ -48,7 +50,9 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
                                    'Test::Exception' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'strict' => '0',
+                                   'warnings' => '0'
                                  }
                  }
      };

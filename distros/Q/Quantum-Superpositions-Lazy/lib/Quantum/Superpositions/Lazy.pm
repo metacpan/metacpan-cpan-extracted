@@ -1,21 +1,24 @@
 package Quantum::Superpositions::Lazy;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use v5.28;
 use warnings;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 
+use Carp qw(croak);
 use Quantum::Superpositions::Lazy::Superposition;
 use Quantum::Superpositions::Lazy::Operation::Logical;
-use Exporter;
+use Quantum::Superpositions::Lazy::Util qw(is_collapsible);
+use Exporter qw(import);
 
 our @EXPORT = qw(
 	superpos
 );
 
 our @EXPORT_OK = qw(
+	collapse
 	any_state
 	every_state
 	one_state
@@ -26,16 +29,6 @@ our @EXPORT_OK = qw(
 our $global_reducer_type = "any";
 our $global_compare_bool = 1;
 our $global_sourced_calculations = 0;
-
-sub import
-{
-	for my $exported (@EXPORT) {
-		push @_, $exported
-			unless grep { $_ eq $exported } @_;
-	}
-
-	goto &Exporter::import;
-}
 
 sub run_sub_as ($sub, %env)
 {
@@ -59,6 +52,15 @@ sub superpos (@positions)
 	return Quantum::Superpositions::Lazy::Superposition->new(
 		states => $positions_ref
 	);
+}
+
+sub collapse (@superpositions)
+{
+	return map {
+		croak "Element not collapsible"
+			unless is_collapsible($_);
+		$_->collapse;
+	} @superpositions;
 }
 
 sub any_state : prototype(&) ($sub)
@@ -181,7 +183,7 @@ Refer to L<Quantum::Superpositions::Lazy::Manual> for a quick tutorial.
 	superpos(@data)
 	superpos([@data])
 
-Always exported. Feeds its arguments to the
+Exported by default. Feeds its arguments to the
 L<Quantum::Superpositions::Lazy::Superposition> constructor. If the only argument is an
 array reference, it is passed as-is into the constructor, resulting with a
 state for every array ref element. Otherwise creates a reference out of the
@@ -198,6 +200,12 @@ arguments and passes them instead.
 
 	# Any data is OK
 	superpos(qw(dont eat the fish));
+
+=head2 collapse
+
+	collapse(@data)
+
+Takes a list of argument that each must be an instance of I<Quantum::Superpositions::Lazy::Role::Collapsible>. Returns the list of results of calling a L<Quantum::Superpositions::Lazy::Superposition/collapse> method on each of them.
 
 =head2 any_state
 

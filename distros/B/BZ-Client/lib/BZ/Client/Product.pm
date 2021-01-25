@@ -7,7 +7,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::Product;
-$BZ::Client::Product::VERSION = '4.4003';
+$BZ::Client::Product::VERSION = '4.4004';
 
 use parent qw( BZ::Client::API );
 
@@ -16,8 +16,8 @@ use parent qw( BZ::Client::API );
 ## functions
 
 sub create {
-    my(undef, $client, $params) = @_;
-    return _create($client, 'Product.create', $params);
+    my($class, $client, $params) = @_;
+    return $class->_create($client, 'Product.create', $params);
 }
 
 sub update {
@@ -221,7 +221,7 @@ BZ::Client::Product - Client side representation of a product in Bugzilla
 
 =head1 VERSION
 
-version 4.4003
+version 4.4004
 
 =head1 SYNOPSIS
 
@@ -811,7 +811,7 @@ Jochen Wiedmann <jochen.wiedmann@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dean Hamstad.
+This software is copyright (c) 2021 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

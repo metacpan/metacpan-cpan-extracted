@@ -3,6 +3,12 @@ use warnings;
 use utf8;
 use Test::More;
 
+BEGIN {
+    for (grep /^GETOPTEX/, keys %ENV) {
+	delete $ENV{$_};
+    }
+}
+
 use Getopt::EX::Colormap qw(colorize colorize24 ansi_code);
 
 use constant {

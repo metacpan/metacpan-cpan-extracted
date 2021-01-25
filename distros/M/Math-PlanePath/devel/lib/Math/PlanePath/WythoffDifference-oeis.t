@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013 Kevin Ryde
+# Copyright 2013, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,6 +20,7 @@
 use 5.004;
 use strict;
 use List::Util 'max';
+use Math::BigInt try => 'GMP';   # for bignums in reverse-add steps
 use Test;
 plan tests => 46;
 
@@ -29,28 +30,8 @@ MyTestHelpers::nowarnings();
 use MyOEIS;
 
 use Math::PlanePath::WythoffDifference;
+use Math::PlanePath::Diagonals;
 
-sub BIGINT {
-  require Math::NumSeq::PlanePathN;
-  return Math::NumSeq::PlanePathN::_bigint();
-}
-
-#------------------------------------------------------------------------------
-# A191361 -- Wythoff difference array X-Y, diagonal containing n
-
-MyOEIS::compare_values
-  (anum => 'A191361',
-   func => sub {
-     my ($count) = @_;
-     require Math::PlanePath::Diagonals;
-     my $path = Math::PlanePath::WythoffDifference->new;
-     my @got;
-     for (my $n = $path->n_start; @got < $count; $n++) {
-       my ($x,$y) = $path->n_to_xy($n);
-       push @got, $x-$y;
-     }
-     return \@got;
-   });
 
 #------------------------------------------------------------------------------
 # A080164 -- Wythoff difference array by anti-diagonals
@@ -59,13 +40,44 @@ MyOEIS::compare_values
   (anum => 'A080164',
    func => sub {
      my ($count) = @_;
-     require Math::PlanePath::Diagonals;
      my $path = Math::PlanePath::WythoffDifference->new;
      my $diag = Math::PlanePath::Diagonals->new (direction => 'up');
      my @got;
      for (my $d = $diag->n_start; @got < $count; $d++) {
        my ($x,$y) = $diag->n_to_xy($d);  # by anti-diagonals
        push @got, $path->xy_to_n($x,$y);
+     }
+     return \@got;
+   });
+
+# A134571 downwards
+MyOEIS::compare_values
+  (anum => 'A134571',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::WythoffDifference->new;
+     my $diag = Math::PlanePath::Diagonals->new (direction => 'down');
+     my @got;
+     for (my $d = $diag->n_start; @got < $count; $d++) {
+       my ($x,$y) = $diag->n_to_xy($d);  # by anti-diagonals
+       push @got, $path->xy_to_n($x,$y);
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A191361 -- Wythoff difference array X-Y, diagonal containing n
+
+MyOEIS::compare_values
+  (anum => 'A191361',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::WythoffDifference->new;
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x-$y;
      }
      return \@got;
    });
@@ -81,7 +93,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path = Math::PlanePath::WythoffDifference->new;
      my @got;
-     for (my $y = BIGINT()->new(0); @got < $count; $y++) {
+     for (my $y = Math::BigInt->new(0); @got < $count; $y++) {
        push @got, $path->xy_to_n (0, $y);
      }
      return \@got;
@@ -97,7 +109,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path = Math::PlanePath::WythoffDifference->new;
      my @got;
-     for (my $x = BIGINT()->new(0); @got < $count; $x++) {
+     for (my $x = Math::BigInt->new(0); @got < $count; $x++) {
        push @got, $path->xy_to_n ($x, 0);
      }
      return \@got;
@@ -109,7 +121,7 @@ MyOEIS::compare_values
      my ($count) = @_;
      my $path = Math::PlanePath::WythoffDifference->new;
      my @got = (1); # extra initial 1
-     for (my $x = BIGINT()->new(0); @got < $count; $x++) {
+     for (my $x = Math::BigInt->new(0); @got < $count; $x++) {
        push @got, $path->xy_to_n ($x, 0);
      }
      return \@got;

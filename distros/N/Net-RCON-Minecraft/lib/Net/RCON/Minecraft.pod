@@ -4,7 +4,7 @@ Net::RCON::Minecraft - Minecraft RCON remote console
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -233,7 +233,8 @@ L<MC-72390 Minecraft RCON bug|https://bugs.mojang.com/browse/MC-72390>
 
 =item
 
-L<RT, CPAN's request tracker|https://rt.cpan.org/NoAuth/Bugs.html?Queue=Net-RCON-Minecraft>: Report bugs here.
+L<https://github.com/rjt-pl/Net-RCON-Minecraft/issues>: Issue tracker (bug
+reports and feature requests here)
 
 =item
 
@@ -248,7 +249,7 @@ B<Ryan Thompson> E<lt>rjt@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2019 Ryan Thompson
+Copyright 2020 Ryan Thompson
 
 This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

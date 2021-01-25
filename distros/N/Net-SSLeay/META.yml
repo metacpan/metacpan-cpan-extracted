@@ -1,15 +1,26 @@
 ---
 abstract: 'Perl extension for using OpenSSL'
 author:
-  - 'Sampo KellomÃ¤ki <sampo@iki.fi>'
+  - 'Sampo Kellomäki <sampo@iki.fi>'
   - 'Florian Ragwitz <rafl@debian.org>'
   - 'Mike McCauley <mikem@airspayce.com>'
   - 'Chris Novakovic <chris@chrisn.me.uk>'
   - 'Tuure Vartiainen <vartiait@radiatorsoftware.com>'
   - 'Heikki Vatiainen <hvn@radiatorsoftware.com>'
 build_requires:
+  Carp: '0'
+  Config: '0'
+  Cwd: '0'
+  English: '0'
   ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  Scalar::Util: '0'
+  SelectSaver: '0'
+  Socket: '0'
+  Storable: '0'
   Test::More: 0.60_01
+  base: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -29,7 +40,7 @@ requires:
   MIME::Base64: '0'
   perl: '5.008001'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=net-ssleay
-  repository: https://github.com/radiator-software/p5-net-ssleay
-version: '1.88'
+  bugtracker: https://github.com/radiator-software/p5-net-ssleay/issues
+  repository: git://github.com/radiator-software/p5-net-ssleay.git
+version: '1.90'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

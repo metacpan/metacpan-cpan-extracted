@@ -9,7 +9,6 @@ sub _cleanup_loop {
     my $loop = shift;
     $loop->walk(sub {diag(" -> walking");shift->close()});
     $loop->run(UV::Loop::UV_RUN_DEFAULT);
-    is($loop->close(), 0, 'loop closed');;
 }
 
 {
@@ -43,10 +42,10 @@ sub cb {
     my $timer = UV::Timer->new();
     isa_ok($timer, 'UV::Timer', 'timer: got a new timer');
 
-    is($loop->alive(), 0, 'loop->alive: not alive yet');
+    ok(!$loop->alive(), 'loop->alive: not alive yet');
     is($loop->backend_timeout(), 0, 'loop->backend_timeout: still zero');
 
-    is($timer->start(1000, 0, \&cb), 0, 'timer: started correctly');
+    $timer->start(1000, 0, \&cb);
 
     ok($loop->backend_timeout() > 100, 'backend_timeout > 0.1 sec' );
     ok($loop->backend_timeout() <= 1000, 'backend_timeout <= 1 sec');

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -33,7 +33,7 @@ use strict;
 use List::Util 'max';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -595,7 +595,8 @@ L<http://oeis.org/A059905> (etc)
       A163325    X coordinate
       A163326    Y coordinate
       A037314    N on X axis, base 9 digits 0,1,2
-      A208665    N on X=Y diagonal, base 9 digits 0,3,6
+      A208665    N on Y axis, base 9 digits 0,3,6
+      A338086    N on X=Y diagonal, base 9 digits 0,4,8
       A163327    permutation N at transpose Y,X (swap trit pairs)
 
     radix=4
@@ -606,6 +607,7 @@ L<http://oeis.org/A059905> (etc)
       A080464    X*Y of radix=10 (from N=10 onwards)
       A080465    abs(X-Y), from N=10 onwards
       A051022    N on X axis (base 100 digits 0 to 9)
+      A338754    N on X=Y diagonal (double-digits 00 to 99)
 
     radix=16
       A217558    permutation N at transpose Y,X (swap digit pairs)
@@ -646,7 +648,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

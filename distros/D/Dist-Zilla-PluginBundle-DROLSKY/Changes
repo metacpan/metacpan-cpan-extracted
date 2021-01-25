@@ -1,3 +1,37 @@
+1.18     2021-01-24
+
+- Fix development prereqs for projects that use precious. This was still using
+  very old Perl::Tidy and Perl::Critic versions.
+
+
+1.17     2021-01-24
+
+- Fix the generated precious.toml to expect stderr output from omegasort.
+
+
+1.16     2021-01-24
+
+- Really fix generated precious.toml for perltidy.
+
+
+1.15     2021-01-24
+
+- Fix generated precious.toml to expect `perltidy --assert-tidy` to exit with
+  2 when a file is not tidy, not 1.
+
+
+1.14     2021-01-24
+
+- Include Test::TidyAll plugin if there's a tidyall.ini file present.
+
+- Skip the DROLSKY::BundleAuthordep plugin when checking for stale prereqs.
+
+
+1.13     2021-01-21
+
+- Use GitHub issues for all distros.
+
+
 1.12     2021-01-08
 
 - Fixed a bug in the generated precious.toml config for perlcritic.

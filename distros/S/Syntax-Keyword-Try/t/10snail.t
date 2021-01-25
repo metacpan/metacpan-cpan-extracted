@@ -12,7 +12,7 @@ use Syntax::Keyword::Try;
    my @args;
    ( sub {
       try { @args = @_ }
-      catch {}
+      catch ($e) {}
    } )->( 1, 2, 3 );
 
    is_deeply( \@args, [ 1, 2, 3 ], 'try{} sees surrounding @_' );
@@ -23,7 +23,7 @@ use Syntax::Keyword::Try;
    my @args;
    ( sub {
       try { die "oopsie" }
-      catch { @args = @_ }
+      catch ($e) { @args = @_ }
    } )->( 4, 5, 6 );
 
    is_deeply( \@args, [ 4, 5, 6 ], 'catch{} sees @_' );

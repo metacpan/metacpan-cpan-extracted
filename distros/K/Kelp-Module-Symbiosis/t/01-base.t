@@ -33,6 +33,7 @@ use lib 't/lib';
 
 my $app = Symbiosis::Test::get_app;
 can_ok $app, qw(symbiosis run_all testmod);
+is $app->symbiosis->reverse_proxy, 0, 'reverse proxy status ok';
 
 my $symbiosis = $app->symbiosis;
 can_ok $symbiosis, qw(loaded mounted run mount);

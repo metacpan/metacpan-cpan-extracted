@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -62,7 +62,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
 use Math::PlanePath::Base::NSEW;
@@ -956,9 +956,11 @@ L<https://oeis.org/wiki/Ulam's_spiral>
       A185413    permutation N at 1-X,Y
                    being rotate +180, offset X+1, clockwise
 
-      A068225    permutation N to the N to its right, X+1,Y
-      A121496     run lengths of consecutive N in that permutation
-      A068226    permutation N to the N to its left, X-1,Y
+      A068225    permutation N at X+1,Y
+      A121496     run lengths of consecutive N in this permutation
+      A068226    permutation N at X-1,Y
+      A334752    permutation N at X,Y+1
+      A334751    permutation N at X,Y-1
       A020703    permutation N at transpose Y,X
                    (clockwise <-> anti-clockwise)
 
@@ -1010,7 +1012,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

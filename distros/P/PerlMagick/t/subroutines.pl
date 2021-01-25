@@ -1,10 +1,10 @@
-#  Copyright 1999-2014 ImageMagick Studio LLC, a non-profit organization
+#  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
 #  dedicated to making software imaging solutions freely available.
 #
 #  You may not use this file except in compliance with the License.  You may
 #  obtain a copy of the License at
 #
-#    http://www.imagemagick.org/script/license.php
+#    https://imagemagick.org/script/license.php
 #
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,6 +45,8 @@ sub testCompositeCompare {
 
   $errorinfo='';
   $status='';
+  $normalized_mean_error_max+=1.0e-12;
+  $normalized_maximum_error_max+=1.0e-12;
 
   #print( $filter, " ...\n" );
 
@@ -291,6 +293,8 @@ sub testReadCompare {
   my($srcimage, $refimage, $normalized_mean_error, $normalized_maximum_error);
 
   $errorinfo='';
+  $normalized_mean_error_max+=1.0e-12;
+  $normalized_maximum_error_max+=1.0e-12;
 
   # Create images
   $srcimage=Image::Magick->new;
@@ -567,6 +571,8 @@ sub testReadWriteCompare {
     $normalized_maximum_error);
 
   $errorinfo='';
+  $normalized_mean_error_max+=1.0e-12;
+  $normalized_maximum_error_max+=1.0e-12;
 
   $image=Image::Magick->new;
   $refimage=Image::Magick->new;  
@@ -956,7 +962,7 @@ sub testGetAttribute {
 #       [, expected REF_16] );
 #
 sub testMontage {
-  my( $imageOptions, $montageOptions, $ref_8, $ref_16, $ref_32 ) = @_;
+  my( $imageOptions, $montageOptions, $ref_8, $ref_16, $ref_32, $ref_32_hdri ) = @_;
 
   my($image,$ref_signature);
 
@@ -967,19 +973,6 @@ sub testMontage {
   if ( !defined( $ref_32 ) )
     {
       $ref_32 = $ref_16;
-    }
-
-  if (Image::Magick->new()->QuantumDepth == 32)
-    {
-      $ref_signature=$ref_32;
-    }
-  elsif (Image::Magick->new()->QuantumDepth == 16)
-    {
-      $ref_signature=$ref_16;
-    }
-  else
-    {
-      $ref_signature=$ref_8;
     }
 
   # Create image for image list
@@ -1024,6 +1017,7 @@ sub testMontage {
   #print "Montage Options: $montageOptions\n";
   print("\$montage=\$images->Montage( $montageOptions )\n");
   eval "\$montage=\$images->Montage( $montageOptions ) ;";
+  #$montage->Clamp();
   if( $@ ) {
     print "$@";
     print "not ok $test\n";
@@ -1037,10 +1031,10 @@ sub testMontage {
     # $montage->Display();
     $signature=$montage->GetAttribute('signature');
     if ( defined( $signature ) ) {
-      if ( $signature ne $ref_signature ) {
+      if ( $signature ne $ref_8 && $signature ne $ref_16 && $signature ne $ref_32 && $signature ne $ref_32_hdri) {
         print "ReadImage()\n";
         print "Test $test, signatures do not match.\n";
-      	print "     Expected: $ref_signature\n";
+      	print "     Expected: $ref_8\n";
       	print "     Computed: $signature\n";
         print "     Depth:    ", Image::Magick->new()->QuantumDepth, "\n";
         $status = $montage->Write("test_${test}_out.miff");
@@ -1050,7 +1044,7 @@ sub testMontage {
       } else {
         # Check montage directory
         my $directory = $montage->Get('directory');
-        my $expected = join( "\n", @colors ) . "\n";
+        my $expected = join( "\xff", @colors ) . "\xff";
         if ( !defined($directory) ) {
           print "ok $test\n";
         } elsif ( $directory  ne $expected) {
@@ -1157,6 +1151,8 @@ sub testFilterCompare {
 
   $errorinfo='';
   $status='';
+  $normalized_mean_error_max+=1.0e-12;
+  $normalized_maximum_error_max+=1.0e-12;
 
   #print( $filter, " ...\n" );
 

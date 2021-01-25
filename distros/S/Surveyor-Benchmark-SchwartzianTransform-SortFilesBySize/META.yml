@@ -3,12 +3,12 @@ abstract: 'Compare the low-tech and Schwartzian Transform sorts'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-  Test::More: '0.94'
+  Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  perl: '5.008'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/briandfoy/surveyor-benchmark-schwartziantransform-sortfilesbysize/issues
   homepage: https://github.com/briandfoy/surveyor-benchmark-schwartziantransform-sortfilesbysize
   repository: https://github.com/briandfoy/surveyor-benchmark-schwartziantransform-sortfilesbysize.git
-version: '0.121'
+version: '0.122'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

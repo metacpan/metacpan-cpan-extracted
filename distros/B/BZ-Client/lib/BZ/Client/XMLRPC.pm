@@ -7,7 +7,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::XMLRPC;
-$BZ::Client::XMLRPC::VERSION = '4.4003';
+$BZ::Client::XMLRPC::VERSION = '4.4004';
 
 use URI;
 use Encode qw/ encode_utf8 /;
@@ -337,7 +337,7 @@ sub logDirectory {
 ### Objects to represent data types
 
 package BZ::Client::XMLRPC::int;
-$BZ::Client::XMLRPC::int::VERSION = '4.4003';
+$BZ::Client::XMLRPC::int::VERSION = '4.4004';
 sub new {
     my($class, $value) = @_;
     return bless(\$value, (ref($class) || $class))
@@ -349,7 +349,7 @@ sub stringify {
 }
 
 package BZ::Client::XMLRPC::base64;
-$BZ::Client::XMLRPC::base64::VERSION = '4.4003';
+$BZ::Client::XMLRPC::base64::VERSION = '4.4004';
 use MIME::Base64 qw( encode_base64 decode_base64 );
 
 sub new {
@@ -383,7 +383,7 @@ sub raw {
 }
 
 package BZ::Client::XMLRPC::boolean;
-$BZ::Client::XMLRPC::boolean::VERSION = '4.4003';
+$BZ::Client::XMLRPC::boolean::VERSION = '4.4004';
 sub new {
     my($class, $value) = @_;
     return bless(\$value, (ref($class) || $class))
@@ -405,7 +405,7 @@ sub FALSE { $false }
 }
 
 package BZ::Client::XMLRPC::double;
-$BZ::Client::XMLRPC::double::VERSION = '4.4003';
+$BZ::Client::XMLRPC::double::VERSION = '4.4004';
 sub new {
     my($class, $value) = @_;
     return bless(\$value, (ref($class) || $class))
@@ -430,7 +430,7 @@ BZ::Client::XMLRPC - Performs XML-RPC calls on behalf of the client.
 
 =head1 VERSION
 
-version 4.4003
+version 4.4004
 
 =head1 SYNOPSIS
 
@@ -492,7 +492,7 @@ Jochen Wiedmann <jochen.wiedmann@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dean Hamstad.
+This software is copyright (c) 2021 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

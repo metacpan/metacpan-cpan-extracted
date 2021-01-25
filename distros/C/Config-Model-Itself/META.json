@@ -35,7 +35,7 @@
             "App::Cme" : "1.002",
             "App::Cme::Common" : "0",
             "Carp" : "0",
-            "Config::Model" : "2.138",
+            "Config::Model" : "2.141",
             "Config::Model::TkUI" : "1.370",
             "Config::Model::Value" : "0",
             "Data::Compare" : "0",
@@ -62,7 +62,6 @@
       "test" : {
          "requires" : {
             "App::Cmd::Tester" : "0",
-            "Config::Model" : "2.138",
             "Config::Model::Tester::Setup" : "0",
             "File::Copy::Recursive" : "0",
             "Getopt::Long" : "0",
@@ -90,7 +89,7 @@
          "web" : "http://github.com/dod38fr/config-model-itself"
       }
    },
-   "version" : "2.021",
+   "version" : "2.022",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "LGPL-2.1"

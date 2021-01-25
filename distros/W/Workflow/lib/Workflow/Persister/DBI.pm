@@ -15,7 +15,7 @@ use Workflow::Persister::DBI::SequenceId;
 use Carp qw(croak);
 use English qw( -no_match_vars );
 
-$Workflow::Persister::DBI::VERSION = '1.49';
+$Workflow::Persister::DBI::VERSION = '1.50';
 
 my @FIELDS = qw( handle dsn user password driver
     workflow_table history_table date_format parser autocommit);
@@ -29,13 +29,20 @@ sub init {
     my ( $self, $params ) = @_;
     $self->SUPER::init($params);
     $log ||= get_logger();
-    unless ( $params->{dsn} ) {
-        configuration_error "DBI persister configuration must include ",
-            "key 'dsn' which maps to the first paramter ",
-            "in the DBI 'connect()' call.";
-    }
 
-    my ( $dbi, $driver, $etc ) = split m/[:]/, $params->{dsn}, 3;
+# Default to old date format if not provided so we don't break old configurations.
+    $self->date_format('%Y-%m-%d %H:%M');
+
+    # Default to autocommit on for backward compatibility.
+    $self->autocommit(1);
+
+    # Load user-provided values from config.
+    for (qw( dsn user password date_format autocommit )) {
+        $self->$_( $params->{$_} ) if ( defined $params->{$_} );
+    }
+    $self->handle($self->create_handle);
+    my $driver
+        = $self->handle ? $self->handle->{Driver}->{Name} : ($params->{driver} || '');
     $log->is_debug
         && $log->debug("Pulled driver '$driver' from DBI DSN");
     $self->driver($driver);
@@ -55,25 +62,18 @@ sub init {
         $self->history_table, "'"
     );
 
-# Default to old date format if not provided so we don't break old configurations.
-    $self->date_format('%Y-%m-%d %H:%M');
-
-    # Default to autocommit on for backward compatibility.
-    $self->autocommit(1);
-
-    # Load user-provided values from config.
-    for (qw( dsn user password date_format autocommit )) {
-        $self->$_( $params->{$_} ) if ( defined $params->{$_} );
-    }
-    $self->handle($self->create_handle);
-
     my $parser
         = DateTime::Format::Strptime->new( pattern => $self->date_format );
     $self->parser($parser);
 }
 
 sub create_handle {
-    my ($self) = @_;
+    my ($self, $params) = @_;
+    unless ( $self->dsn ) {
+        configuration_error "DBI persister configuration must include ",
+            "key 'dsn' which maps to the first paramter ",
+            "in the DBI 'connect()' call.";
+    }
     my $dbh = eval {
                DBI->connect( $self->dsn, $self->user, $self->password )
             || croak "Cannot connect to database: $DBI::errstr";
@@ -214,7 +214,6 @@ sub create_workflow {
     }
     my $sql = 'INSERT INTO %s ( %s ) VALUES ( %s )';
 
-    ## no critic (ProhibitParensWithBuiltins)
     $sql = sprintf $sql,
         $self->handle->quote_identifier( $self->workflow_table ),
         join( ', ', @fields ),
@@ -329,7 +328,6 @@ sub create_history {
         }
         my $sql = 'INSERT INTO %s ( %s ) VALUES ( %s )';
 
-        ## no critic (ProhibitParensWithBuiltins)
         $sql = sprintf $sql, $dbh->quote_identifier( $self->history_table ),
             join( ', ', @fields ), join( ', ', map {'?'} @values );
         if ( $log->is_debug ) {
@@ -497,6 +495,11 @@ This documentation describes version 1.19 of this package
             history_table="wf_history"
             history_sequence="wf_history_seq"/>
 
+ <persister name="OtherDatabase"
+            class="My::Persister::DBHFromElsewhere"
+            driver="mysql"
+            />
+
 
 =head1 DESCRIPTION
 
@@ -532,9 +535,8 @@ example.)
     my $ds_config = CTX->lookup_datasource_config( $self->datasource_name );
 
     # delegate the other assignment tasks to the parent class
-
-    $self->assign_generators( $ds_config->{driver_name}, $params );
-    $self->assign_tables( $params );
+    $params->{driver} = $ds_config->{driver_name};
+    $self->SUPER::init( $params );
  }
 
  # suppress the parent from trying to connect to the database

@@ -3,7 +3,7 @@
 Manage a key/value store of directories with controls for
 concurrent access and locking.
 
-**Version:** 0.2
+**Version:** 0.4.1
 
 # SYNOPSIS
 

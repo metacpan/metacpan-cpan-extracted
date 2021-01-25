@@ -15,6 +15,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Crypt::OpenSSL::RSA' => '0',
                                       'Mojo::JWT' => '0',
                                       'Mojolicious' => '8.00'
                                     }

@@ -1,6 +1,19 @@
+4.3.9  2021-01-23
+
+  - Use as posted data also anything passed as url paramater
+
+4.3.8  2021-01-21
+
+  - Code improvements for speed
+
+4.3.7  2021-01-20
+
+  - Documentation changes
+  - Clean up code
+
 4.3.6  2020-08-24
 
-  - Remove useless code
+  - Clean up code
 
 4.3.5  2020-07-27
 

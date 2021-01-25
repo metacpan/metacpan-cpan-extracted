@@ -8,7 +8,7 @@ use Test::More;
 BEGIN { require "t/utils.pl" }
 our (@AvailableDrivers);
 
-use constant TESTS_PER_DRIVER => 63;
+use constant TESTS_PER_DRIVER => 66;
 
 my $total = scalar(@AvailableDrivers) * TESTS_PER_DRIVER;
 plan tests => $total;
@@ -180,7 +180,13 @@ SKIP: {
 	    is($phone_collection->Next, undef);
 	}
 	
-	
+    ok( $phone3->Delete, "Deleted phone $p3_id" );
+
+    my $group = TestApp::Group->new($handle);
+    my $g_id  = $group->Create( Name => 'Employees' );
+    ok( $g_id, "Got an id for the new group: $g_id" );
+    $group->Load($g_id);
+    is( $group->id, $g_id, "loaded group ok" );
 
 	cleanup_schema( 'TestApp', $handle );
 }} # SKIP, foreach blocks
@@ -201,6 +207,10 @@ CREATE TABLE Phones (
 	id integer primary key,
 	Employee integer NOT NULL,
 	Phone varchar(18)
+) },
+q{CREATE TABLE Groups (
+	id integer primary key,
+	Name varchar(36)
 ) }
 ]
 }
@@ -217,7 +227,12 @@ CREATE TEMPORARY TABLE Phones (
 	Employee integer NOT NULL,
 	Phone varchar(18)
 )
-} ]
+},
+q{CREATE TEMPORARY TABLE `Groups` (
+	id integer AUTO_INCREMENT primary key,
+	Name varchar(36)
+) }
+]
 }
 
 sub schema_pg {
@@ -232,7 +247,12 @@ CREATE TEMPORARY TABLE Phones (
 	Employee integer references Employees(id),
 	Phone varchar
 )
-} ]
+},
+q{CREATE TEMPORARY TABLE Groups (
+	id serial primary key,
+	Name varchar
+) }
+]
 }
 
 package TestApp::Employee;
@@ -291,5 +311,36 @@ sub NewItem {
 
 }
 
+
+package TestApp::Group;
+
+use base $ENV{SB_TEST_CACHABLE}?
+    qw/DBIx::SearchBuilder::Record::Cachable/:
+    qw/DBIx::SearchBuilder::Record/;
+
+sub Table { 'Groups' }
+
+sub Schema {
+    return {
+        Name => { TYPE => 'varchar' },
+    }
+}
+
+package TestApp::GroupCollection;
+
+use base qw/DBIx::SearchBuilder/;
+
+sub Table {
+    my $self = shift;
+    my $tab = $self->NewItem->Table();
+    return $tab;
+}
+
+sub NewItem {
+    my $self = shift;
+    my $class = 'TestApp::Group';
+    return $class->new( $self->_Handle );
+
+}
 
 1;

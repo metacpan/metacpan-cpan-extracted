@@ -1,3 +1,21 @@
+0.15      2021-01-23 22:54:31 IST
+
+- added missing prereq and fixed typo
+
+0.14      2021-01-21 19:16:42 IST
+
+- added as_form_data method, to simplify actual usage of this module
+
+0.13      2021-01-21 16:09:14 IST
+
+- from_json now dies on errors
+- docs now include examples of real world use
+
+0.12
+
+- Fix test issue. Needed an explicit secret to encode
+
+
 0.10
 
 Cleaned up some code, explicitly depend on Mojolicious (not sure

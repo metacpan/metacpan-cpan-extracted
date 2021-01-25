@@ -32,6 +32,10 @@ be in future it becomes configurable)
 
 =over 4
 
+=item B<-n | --dry-run>
+
+dry run
+
 =item B<-a | --age> I<INTEGER>
 
 in seconds, default is 2 weeks
@@ -109,6 +113,10 @@ process only first page of rows
 =item B<-v | --package-version>
 
 package version to manipulate with
+
+=item B<--versions-to-hold>
+
+minimum number of versions to hold (default: 2)
 
 =item B<-V | --version>
 

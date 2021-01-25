@@ -1,30 +1,21 @@
-uv_run_mode         T_RUN_UV
-uv_loop_option      T_RUN_UV
+UV::Loop            T_PTROBJ
 
-int64_t             T_INT64
-uint64_t            T_UINT64
+UV::Handle          T_PTROBJ
 
-uv_loop_t *         T_PTROBJ_MG
-uv_handle_t *       T_PTROBJ_MG
+UV::Async           T_PTROBJ
+UV::Check           T_PTROBJ
+UV::Idle            T_PTROBJ
+UV::Pipe            T_PTROBJ
+UV::Poll            T_PTROBJ
+UV::Prepare         T_PTROBJ
+UV::Process         T_PTROBJ
+UV::Signal          T_PTROBJ
+UV::Stream          T_PTROBJ
+UV::Timer           T_PTROBJ
+UV::TCP             T_PTROBJ
+UV::TTY             T_PTROBJ
+UV::UDP             T_PTROBJ
 
-INPUT
+UV::Req             T_PTROBJ
 
-T_RUN_UV
-    $var = SvIV($arg)
-
-T_INT64
-    $var = SvI64($arg);
-
-T_UINT64
-    $var = SvU64($arg);
-
-T_PTROBJ_MG
-    $var = ($type)xs_object_magic_get_struct_rv_pretty(aTHX_ $arg, \"$var\");
-
-OUTPUT
-
-T_INT64
-    $arg = newSVi64($var);
-
-T_UINT64
-    $arg = newSVu64($var);
+UV::getaddrinfo_result T_PTROBJ

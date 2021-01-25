@@ -1,6 +1,6 @@
 package Net::IPAM::Tree;
 
-our $VERSION = '1.12';
+our $VERSION = '2.00';
 
 use 5.10.0;
 use strict;
@@ -10,8 +10,8 @@ use utf8;
 use Carp qw();
 use Scalar::Util qw();
 
-use Net::IPAM::Block;
-use Net::IPAM::Tree::Node;
+use Net::IPAM::Block      ();
+use Net::IPAM::Tree::Node ();
 
 =head1 NAME
 
@@ -113,7 +113,7 @@ sub insert {
   if ( scalar @blocks > 1 ) {
 
     # sort before insert, makes insertion much faster, no - or at least less - parent-child-relinking needed.
-    @blocks = sort { $a->cmp($b) } @blocks;
+    @blocks = Net::IPAM::Block::sort_block @blocks;
   }
 
   my $warnings;
@@ -428,7 +428,7 @@ L<Net::IPAM::Block>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020 by Karl Gaissmaier.
+This software is copyright (c) 2020-2021 by Karl Gaissmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

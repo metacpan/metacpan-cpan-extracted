@@ -1,3 +1,13 @@
+0.03    2021-01-25
+
+ - Move bugtracker to github.com.
+ - Update repository links.
+ - Rename old dzil plugins:
+   - CriticTests to Test::Perl::Critic.
+   - KwaliteeTests to Test::Kwalitee.
+ - Remove extra information links.
+ - Bump copyright years.
+
 0.02    2011-05-13
 
  - Add dzil plugin for $VERSION.

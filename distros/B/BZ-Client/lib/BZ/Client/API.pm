@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::API;
-$BZ::Client::API::VERSION = '4.4003';
+$BZ::Client::API::VERSION = '4.4004';
 
 sub api_call {
     my(undef, $client, $methodName, $params, $options) = @_;
@@ -68,7 +68,7 @@ BZ::Client::API - Abstract base class for the clients of the Bugzilla API.
 
 =head1 VERSION
 
-version 4.4003
+version 4.4004
 
 =head1 SYNOPSIS
 
@@ -119,7 +119,7 @@ Jochen Wiedmann <jochen.wiedmann@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dean Hamstad.
+This software is copyright (c) 2021 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,7 +3,7 @@ package Ryu::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use utf8;
 
@@ -79,6 +79,27 @@ use Ryu::Async::Process;
 use Scalar::Util qw(blessed weaken);
 
 use Log::Any qw($log);
+
+=head1 Interaction with L<Ryu>
+
+On load, this module will provide a L<Ryu::Source/$FUTURE_FACTORY> which assigns
+L<Future> instances from L<IO::Async::Loop>.
+
+You can override this behaviour by doing this instead:
+
+ BEGIN {
+  require Ryu::Source;
+  local $Ryu::Source::FUTURE_FACTORY = sub { };
+  require Ryu::Async;
+ }
+
+to ensure the original factory function is preserved.
+
+=cut
+
+$Ryu::Source::FUTURE_FACTORY = sub {
+    IO::Async::Loop->new->new_future(label => $_[1]);
+};
 
 =head1 METHODS
 
@@ -635,7 +656,7 @@ __END__
 
 =head1 AUTHOR
 
-Tom Molesworth <TEAM@cpan.org>
+Tom Molesworth C<< TEAM@cpan.org >> with contributions from Eyad Arnabeh.
 
 =head1 LICENSE
 

@@ -7,6 +7,8 @@ if ( $^O eq 'MSWin32' ) {
 }
 
 use strict;
+use warnings;
+
 use IO::File;
 use File::Spec;
 use Config qw(%Config);
@@ -35,7 +37,7 @@ $^W=1;
 
 my %define;
 my @libs;
-my $Package_Version = '1.15';  # keep this consistent with Tty.pm
+my $Package_Version = '1.16';  # keep this consistent with Tty.pm
 my $Is_Beta = ($Package_Version =~ m/_/);
 
 open(SUB, ">xssubs.c") or die "open: $!";
@@ -470,7 +472,9 @@ WriteMakefile1(
     },
     'META_MERGE'     => {
 	'resources'    => {
-	    'repository'  => 'https://github.com/toddr/IO-Tty',
+            license => 'http://dev.perl.org/licenses/',
+            repository  => 'https://github.com/toddr/IO-Tty',
+            bugtracker => 'https://github.com/toddr/IO-Tty/issues',
 	},
     },
 );

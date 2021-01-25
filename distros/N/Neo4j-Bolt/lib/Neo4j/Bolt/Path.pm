@@ -1,10 +1,12 @@
 package Neo4j::Bolt::Path;
 # ABSTRACT: Representation of Neo4j Path
 
-$Neo4j::Bolt::Path::VERSION = '0.40';
+$Neo4j::Bolt::Path::VERSION = '0.4201';
 
 use strict;
 use warnings;
+
+use parent 'Neo4j::Types::Path';
 
 sub as_simple {
   my ($self) = @_;
@@ -43,10 +45,17 @@ a Cypher query that returns paths from a Neo4j database.
 Their nodes, relationships and metadata can be accessed
 as shown in the synopsis above.
 
+This package inherits from L<Neo4j::Types::Path>, which
+offers an object-oriented interface to the paths's
+elements and metadata. This is entirely optional to use.
+
 If a query returns the same path twice, two separate
 L<Neo4j::Bolt::Path> instances will be created.
 
 =head1 METHODS
+
+This package inherits all methods from L<Neo4j::Types::Path>.
+The following additional method is provided:
 
 =over
 
@@ -63,7 +72,7 @@ of the L<Neo4j::Bolt::Path> instance.
 
 =head1 SEE ALSO
 
-L<Neo4j::Bolt>
+L<Neo4j::Bolt>, L<Neo4j::Types::Path>
 
 =head1 AUTHOR
 
@@ -72,7 +81,7 @@ L<Neo4j::Bolt>
 
 =head1 LICENSE
 
-This software is Copyright (c) 2020 by Arne Johannessen.
+This software is Copyright (c) 2020-2021 by Arne Johannessen.
 
 This is free software, licensed under:
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Surveyor::Benchmark::SchwartzianTransform::SortFilesBySize
 
+0.122 2021-01-23T19:53:46Z
+	* freshen distro, dump Travis CI, add Github Actions
+
 0.121 2018-05-24T14:55:07Z
 	* Change to the Artistic License 2.0
 

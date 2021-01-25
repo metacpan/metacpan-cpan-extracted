@@ -1,7 +1,7 @@
 use v5.28;
 use warnings;
 use Test::More;
-use Quantum::Superpositions::Lazy qw(fetch_matches);
+use Quantum::Superpositions::Lazy qw(superpos fetch_matches);
 use Data::Dumper;
 use lib 't/lib';
 use StateTesters;

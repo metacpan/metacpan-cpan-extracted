@@ -1,0 +1,16 @@
+Changes
+examples/CoreHouseholdIndicators.csv
+examples/data-prepare-conf.yml
+lib/Data/Prepare.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+scripts/data-prepare
+t/00-report-prereqs.t
+t/basic.t
+t/snapshots/basic_t/chop_cols
+t/snapshots/basic_t/chop_lines
+t/snapshots/basic_t/cols_non_empty
+t/snapshots/basic_t/header_merge
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

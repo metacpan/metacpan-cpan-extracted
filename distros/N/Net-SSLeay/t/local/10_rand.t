@@ -1,14 +1,13 @@
-#!/usr/bin/perl
+# RAND-related tests
 
-# RAND related tests
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More;
-use File::Spec;
 use Net::SSLeay;
+use Test::Net::SSLeay qw( data_file_path initialise_libssl );
 
 plan tests => 52;
+
+initialise_libssl();
 
 is(Net::SSLeay::RAND_status(), 1, 'RAND_status');
 is(Net::SSLeay::RAND_poll(), 1, 'RAND_poll');
@@ -19,8 +18,9 @@ isnt($file_name, undef, 'RAND_file_name returns defined value');
 isnt($file_name, "", "RAND_file_name returns non-empty string: $file_name");
 
 # RAND_load_file
-my $binary_file = File::Spec->catfile('t', 'data', 'binary-test.file');
+my $binary_file      = data_file_path('binary-test.file');
 my $binary_file_size = -s $binary_file;
+
 cmp_ok($binary_file_size, '>=', 1000, "Have binary file with good size: $binary_file $binary_file_size");
 is(Net::SSLeay::RAND_load_file($binary_file, $binary_file_size), $binary_file_size, 'RAND_load with specific size');
 if (Net::SSLeay::constant("LIBRESSL_VERSION_NUMBER"))

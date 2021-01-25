@@ -11,6 +11,8 @@ t/02-multi-mount.t
 t/03-plain-plack.t
 t/04-mount-from-loaded.t
 t/05-alias.t
+t/06-test-can.t
+t/conf/json.pl
 t/conf/mostly_mounted.pl
 t/conf/none_mounted.pl
 t/deprecated/01-module-test.t

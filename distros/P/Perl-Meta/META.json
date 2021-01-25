@@ -44,7 +44,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Meta"
+         "web" : "https://github.com/chorny/Perl-Meta/issues"
       },
       "repository" : {
          "type" : "git",
@@ -52,6 +52,6 @@
          "web" : "https://github.com/chorny/Perl-Meta"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON version 2.90"
 }

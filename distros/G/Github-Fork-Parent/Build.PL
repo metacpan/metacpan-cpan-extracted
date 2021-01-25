@@ -21,7 +21,8 @@ my $builder = Module::Build->new(
     },
     meta_merge => {
         resources=> {
-            repository => 'http://github.com/chorny/Github-Fork-Parent',
+            repository => 'https://github.com/chorny/Github-Fork-Parent',
+            bugtracker => 'https://github.com/chorny/Github-Fork-Parent/issues',
         },
         keywords => ['github','repository','fork'],
     },

@@ -1,5 +1,8 @@
 Revision history for Github-Fork-Parent
 
+1.01    2020-01-24
+        Move bug tracker to github
+
 1.0     2017-02-23
         Support repository names containing '.'
 

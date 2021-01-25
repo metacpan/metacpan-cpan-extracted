@@ -1,0 +1,96 @@
+NAME
+
+    Feature::Compat::Try - make try/catch syntax available
+
+SYNOPSIS
+
+       use Feature::Compat::Try;
+    
+       sub foo
+       {
+          try {
+             attempt_a_thing();
+             return "success";
+          }
+          catch ($e) {
+             warn "It failed - $e";
+             return "failure";
+          }
+       }
+
+DESCRIPTION
+
+    This module is written in the aspiration that one day perl will gain
+    true native syntax support for try/catch control flow, and that it will
+    be spelled using the syntax defined here. The intention here is that on
+    such a version of perl that provides this syntax this module will
+    simply enable it, equivalent to perhaps
+
+       use feature 'try';
+
+    On older versions of perl before such syntax is available, it is
+    currently provided instead using the Syntax::Keyword::Try module,
+    imported with a special set of options to configure it to recognise
+    exactly and only the same syntax as this as-yet-aspirational core perl
+    feature, thus ensuring that any code using it will still continue to
+    function on that newer perl.
+
+KEYWORDS
+
+ try
+
+       try {
+          STATEMENTS...
+       }
+       ...
+
+    A try statement provides the main body of code that will be invoked,
+    and must be followed by a catch statement.
+
+    Execution of the try statement itself begins from the block given to
+    the statement and continues until either it throws an exception, or
+    completes successfully by reaching the end of the block.
+
+    The body of a try {} block may contain a return expression. If
+    executed, such an expression will cause the entire containing function
+    to return with the value provided. This is different from a plain eval
+    {} block, in which circumstance only the eval itself would return, not
+    the entire function.
+
+    The body of a try {} block may contain loop control expressions (redo,
+    next, last) which will have their usual effect on any loops that the
+    try {} block is contained by.
+
+    The parsing rules for the set of statements (the try block and its
+    associated catch) are such that they are parsed as a self-contained
+    statement. Because of this, there is no need to end with a terminating
+    semicolon.
+
+ catch
+
+       ...
+       catch ($var) {
+          STATEMENTS...
+       }
+
+    A catch statement provides a block of code to the preceding try
+    statement that will be invoked in the case that the main block of code
+    throws an exception. A new lexical variable is created to store the
+    exception in.
+
+    Presence of this catch statement causes any exception thrown by the
+    preceding try block to be non-fatal to the surrounding code. If the
+    catch block wishes to optionally handle some exceptions but not others,
+    it can re-raise it (or another exception) by calling die in the usual
+    manner.
+
+    As with try, the body of a catch {} block may also contain a return
+    expression, which as before, has its usual meaning, causing the entire
+    containing function to return with the given value. The body may also
+    contain loop control expressions (redo, next or last) which also have
+    their usual effect.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

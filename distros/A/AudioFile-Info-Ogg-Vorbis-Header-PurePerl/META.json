@@ -21,14 +21,14 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.42",
+            "YAML" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "AudioFile::Info" : "0",
             "Ogg::Vorbis::Header::PurePerl" : "0",
-            "YAML" : "0",
             "perl" : "v5.6.0"
          }
       }
@@ -39,11 +39,14 @@
       },
       "AudioFile::Info::Ogg::Vorbis::Header::PurePerl" : {
          "file" : "lib/AudioFile/Info/Ogg/Vorbis/Header/PurePerl.pm",
-         "version" : "v1.5.3"
+         "version" : "v1.5.5"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/audiofile-info-ogg-vorbis-header-pureperl/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -53,6 +56,6 @@
          "web" : "https://github.com/davorg/audiofile-info-ogg-vorbis-header-pureperl"
       }
    },
-   "version" : "v1.5.3",
+   "version" : "v1.5.5",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

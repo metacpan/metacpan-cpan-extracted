@@ -1,6 +1,6 @@
 package Net::IPAM::IP;
 
-our $VERSION = '1.24';
+our $VERSION = '2.01';
 
 use 5.10.0;
 use strict;
@@ -10,6 +10,9 @@ use utf8;
 use Carp            ();
 use Socket          ();
 use Net::IPAM::Util ();
+
+use Exporter 'import';
+our @EXPORT_OK = qw(sort_ip);
 
 =head1 NAME
 
@@ -237,11 +240,13 @@ Fast bytewise lexical comparison of the binary representation in network byte or
 
 IPv4 addresses are B<always> treated as smaller than IPv6 addresses (::ffff:0.0.0.0 < ::)
 
+For even faster sorting import L</sort_ip>.
+
 =cut
 
-# the first byte is the version: IPv4 is sorted before IPv6
-# there is no utf8-flag in packed values,
-# we can just use string compare for the bytes
+# the first byte is the version
+# use fast builtin cmp
+# IPv4 is sorted before IPv6
 sub cmp {
   $_[0]->{binary} cmp $_[1]->{binary};
 }
@@ -332,7 +337,7 @@ sub incr {
 
 Returns the previous IP address, returns undef on underflow.
 
-  $prev_ip = Net::IPAM::IP->new('fe80::1')->decr // die 'overflow,';
+  $prev_ip = Net::IPAM::IP->new('fe80::1')->decr // die 'underflow,';
   say $prev_ip;   # fe80::
 
 =cut
@@ -473,6 +478,26 @@ sub bytes {
   substr( $_[0]->{binary}, 1 );
 }
 
+=head1 FUNCTIONS
+
+=head2 sort_ip
+
+  use Net::IPAM::IP 'sort_ip';
+
+  @sorted_ips = sort_ip @unsorted_ips;
+
+Faster sort implemention (Schwartzian transform) as explcit sort function:
+
+  @sorted_ips = sort { $a->cmp($b) } @unsorted_ips;
+
+=cut
+
+sub sort_ip {
+  return map { $_->[0] }
+    sort     { $a->[1] cmp $b->[1] }
+    map      { [ $_, $_->{binary} ] } @_;
+}
+
 =head1 OPERATORS
 
 L<Net::IPAM::IP> overloads the following operators.
@@ -564,7 +589,7 @@ L<Net::IPAM::Tree>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020 by Karl Gaissmaier.
+This software is copyright (c) 2020-2021 by Karl Gaissmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

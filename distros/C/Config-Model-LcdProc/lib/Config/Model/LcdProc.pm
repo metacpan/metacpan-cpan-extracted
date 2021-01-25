@@ -1,17 +1,17 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2017 by Dominique Dumont.
+# This software is Copyright (c) 2013-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::LcdProc;
-$Config::Model::LcdProc::VERSION = '2.052';
+$Config::Model::LcdProc::VERSION = '2.053';
 use 5.10.1;
 
-use Config::Model 2.111;
+use Config::Model 2.022;
 
 1;
 
@@ -29,7 +29,7 @@ Config::Model::LcdProc - Edit and validate LcdProc configuration file
 
 =head1 VERSION
 
-version 2.052
+version 2.053
 
 =head1 SYNOPSIS
 
@@ -94,13 +94,13 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2017 by Dominique Dumont.
+This software is Copyright (c) 2013-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 
   The GNU Lesser General Public License, Version 2.1, February 1999
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -110,30 +110,6 @@ The following websites have more information about this module, and may be of he
 in addition to those websites please use your favorite search engine to discover more resources.
 
 =over 4
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Config-Model-LcdProc>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Config-Model-LcdProc>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Config-Model-LcdProc>
 
 =item *
 
@@ -147,7 +123,7 @@ L<http://cpants.cpanauthors.org/dist/Config-Model-LcdProc>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/C/Config-Model-LcdProc>
 

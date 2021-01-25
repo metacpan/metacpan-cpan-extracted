@@ -37,7 +37,7 @@ package Time::OlsonTZ::Data;
 use warnings;
 use strict;
 
-our $VERSION = "0.202006";
+our $VERSION = "0.202101";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -77,7 +77,7 @@ retain this format in the future.
 
 =cut
 
-use constant olson_version => "2020f";
+use constant olson_version => "2021a";
 
 =item olson_code_version
 
@@ -89,7 +89,7 @@ piece of information.
 
 =cut
 
-use constant olson_code_version => "2020f";
+use constant olson_code_version => "2021a";
 
 =item olson_data_version
 
@@ -101,7 +101,7 @@ piece of information.
 
 =cut
 
-use constant olson_data_version => "2020f";
+use constant olson_data_version => "2021a";
 
 =back
 
@@ -645,7 +645,7 @@ developed by Andrew Main (Zefram) <zefram@fysh.org>.
 The Olson timezone database is is the public domain.
 
 The C<Time::OlsonTZ::Data> Perl module wrapper for the database is
-Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017, 2018, 2019, 2020
+Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017, 2018, 2019, 2020, 2021
 Andrew Main (Zefram) <zefram@fysh.org>.
 
 =head1 LICENSE

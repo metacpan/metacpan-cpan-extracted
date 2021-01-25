@@ -1,5 +1,9 @@
 Revision history for Role-Tiny
 
+2.002004 - 2021-01-24
+  - restore requiring base class when using create_class_with_roles, which was
+    accidentally lost in 2.002_000 (RT#134075)
+
 2.002003 - 2021-01-11
   - set dynamic_config to 0 and x_static_install to 1
   - fixed filenames in dependents author test to not use colons

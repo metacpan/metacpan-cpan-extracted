@@ -20,7 +20,7 @@ use Time::Piece;
 use Template;
 
 my  @PROGARG = ($0, @ARGV);
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub new {
   my $class = shift;
@@ -32,6 +32,7 @@ sub new {
 			  colored          => 0,
 			  rows_number      => 100,
 			  age              => 60*60*24*14,
+			  versions_to_hold => 2,
 			  url              => 'https://api.github.com/graphql',
 			  single_iteration => 0,
 			  http_timeout     => 180,
@@ -59,6 +60,7 @@ sub new {
 	      'P|package=s'         => \$self->{_option}{package},
 	      'n|dry-run'           => \$self->{_option}{dry_run},
 	      'N|rows-number=i'     => \$self->{_option}{rows_number},
+	      'versions-to-hold=i'  => \$self->{_option}{versions_to_hold},
 	      'http-timeout=i'      => \$self->{_option}{http_timeout},
 	      'C|colored'           => \$self->{_option}{colored},
 	      'D|delete'            => \$self->{_option}{delete},
@@ -142,6 +144,7 @@ sub run {
     my $re = $self->option('re')->{$self->option('package')};
     foreach ( @{$versions} ) {
       next if $_->{version} =~ /$re/;
+      p ($_, caller_message => "VERSION DOES NOT MATCH REGEX: __FILENAME__:__LINE__ ") if $self->option('d') > 2;
 
       if ( defined $_->{files}->{nodes}->[0]->{updatedAt} ) {
 	$t_ver = Time::Piece->strptime( $_->{files}->{nodes}->[0]->{updatedAt},
@@ -161,11 +164,12 @@ sub run {
 					   ts      => 'STUB TS' };
   }
 
-  if ( $self->option('delete') && defined $to_delete ) {
+  if ( $self->option('delete') && defined $to_delete &&
+       scalar(keys(%{$to_delete})) gt $self->option('versions_to_hold') ) {
     $self->del_versions ({
 			  del => $to_delete,
-			  dbg => $self->option('d'),
-			  dry => $self->option('dry_run')
+			  # dbg => $self->option('d'),
+			  # dry => $self->option('dry_run')
 			 });
 
   } elsif ( $self->option('delete') && !defined $to_delete ) {
@@ -289,6 +293,9 @@ sub get_versions {
 
   my $reply = $self->jso->decode( $res->decoded_content );
 
+  p ( $reply, caller_message => "REPLY: __FILENAME__:__LINE__ ", colored => $self->option('colored') )
+    if $self->option('d') > 2 && ! defined $arg->{inf}->{startCursor};
+
   if ( exists $reply->{errors} ) {
     unshift @{$reply->{errors}}, "--- ERROR ---";
     p ( $reply->{errors}, colored => $self->option('colored') );
@@ -296,8 +303,6 @@ sub get_versions {
   }
 
   push @{$arg->{res}}, @{$reply->{data}->{repository}->{packages}->{nodes}->[0]->{versions}->{nodes}};
-
-  p ( $reply, colored => $self->option('colored') ) if $self->option('d') > 2;
 
   return 1 if $arg->{inf}->{hasPreviousPage} == 0 || $self->option('single_iteration') == 1;
 
@@ -333,6 +338,10 @@ sub query_default {
                                            totalCount
                                            nodes {
                                              updatedAt
+                                             packageVersion {
+                                               version
+                                               id
+                                             }
                                            }
                                          }
                                        }

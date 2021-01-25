@@ -31,6 +31,21 @@ DESCRIPTION
 
     This is an IO::Async::Notifier subclass for interacting with Ryu.
 
+Interaction with Ryu
+
+    On load, this module will provide a "$FUTURE_FACTORY" in Ryu::Source
+    which assigns Future instances from IO::Async::Loop.
+
+    You can override this behaviour by doing this instead:
+
+     BEGIN {
+      require Ryu::Source;
+      local $Ryu::Source::FUTURE_FACTORY = sub { };
+      require Ryu::Async;
+     }
+
+    to ensure the original factory function is preserved.
+
 METHODS
 
  from
@@ -159,7 +174,7 @@ SEE ALSO
 
 AUTHOR
 
-    Tom Molesworth <TEAM@cpan.org>
+    Tom Molesworth TEAM@cpan.org with contributions from Eyad Arnabeh.
 
 LICENSE
 

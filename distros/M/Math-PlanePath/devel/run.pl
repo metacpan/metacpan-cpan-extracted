@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -165,15 +165,18 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
   $path_class = 'Math::PlanePath::AlternatePaper';
   $path_class = 'Math::PlanePath::PeanoCurve';
   $path_class = 'Math::PlanePath::PeanoDiagonals';
+  $path_class = 'Math::PlanePath::CornerAlternating';
 
   my $lo = 0;
-  my $hi = 27;
+  my $hi = 64;
 
   Module::Load::load($path_class);
   my $path = $path_class->new
     (
-     arms => 1,
-     radix => 3,
+     n_start => 0,
+     wider => 3,
+     # arms => 1,
+     # radix => 3,
 
      # numbering_type => 'rotate',
      # k=>5,
@@ -189,7 +192,6 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
 
      # sign_encoding => 'revbinary',
 
-     # n_start => 0,
      # parts => 'wedge',
      # shift => 6,
      # pn_encoding => 'negabinary',
@@ -205,7 +207,6 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
 
      # divisor_type => 'proper',
 
-     # wider => 3,
      # reverse => 1,
      # tree_type => 'L',
      # sides=>3,

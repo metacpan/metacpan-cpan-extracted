@@ -22,7 +22,7 @@ use Net::OBS::Client::DTD;
 use XML::Structured;
 use Data::Dumper;
 
-with "Net::OBS::Client::Roles::Client";
+with 'Net::OBS::Client::Roles::Client';
 
 =head1 NAME
 
@@ -82,7 +82,7 @@ has package => (
   isa => 'Str',
 );
 
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 =head2 binarylist - fetch list of binary buildresults
 
@@ -91,23 +91,22 @@ has package => (
 =cut
 
 sub binarylist {
-  my $self = shift;
+  my ($self) = @_;
 
-  my $api_path = "/build/"
-    . join(
-        "/",
+  my $api_path = '/build/'
+    . join
+        q{/},
         $self->project,
         $self->repository,
         $self->arch,
-        $self->package
-      );
+        $self->package,
+  ;
 
-  my $binarylist = $self->request( GET => $api_path );
+  my $binarylist = $self->request(GET=>$api_path);
 
   my $dtd = Net::OBS::Client::DTD->new()->binarylist();
 
-  return XMLin( $dtd, $binarylist )->{binary};
-
+  return XMLin($dtd, $binarylist)->{binary};
 }
 
 =head2 fileinfo - get detailed information about a specific package
@@ -117,28 +116,26 @@ sub binarylist {
 =cut
 
 sub fileinfo {
-  my $self   = shift;
-  my $binary = shift;
+  my ($self, $binary) = @_;
 
   # /build/OBS:Server:Unstable/images/x86_64/OBS-Appliance-qcow2/obs-server.x86_64-2.5.51-Build6.4.qcow2?view=fileinfo
   #
-  my $api_path = "/build/"
-    . join(
-        "/",
+  my $api_path = '/build/'
+    . join
+        q{/},
           $self->project,
           $self->repository,
           $self->arch,
           $self->package,
-          $binary
-      );
+          $binary,
+  ;
   $api_path .= '?view=fileinfo';
 
-  my $binarylist = $self->request( GET => $api_path );
+  my $binarylist = $self->request(GET=>$api_path);
 
   my $dtd = Net::OBS::Client::DTD->new()->fileinfo();
 
-  return XMLin( $dtd, $binarylist );
-
+  return XMLin($dtd, $binarylist);
 }
 
 __PACKAGE__->meta->make_immutable();

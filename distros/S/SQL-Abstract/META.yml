@@ -3,6 +3,7 @@ abstract: 'Generate SQL from Perl data structures'
 author:
   - 'Nathan Wiger <nate@wiger.org>'
 build_requires:
+  Data::Dumper::Concise: '0'
   Storable: '0'
   Test::Exception: '0.31'
   Test::More: '0.88'
@@ -10,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,5 +41,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Abstract
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dbsrgits/sql-abstract.git
-version: '1.87'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '2.000001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

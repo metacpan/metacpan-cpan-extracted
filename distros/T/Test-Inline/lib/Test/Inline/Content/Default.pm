@@ -1,29 +1,23 @@
 package Test::Inline::Content::Default;
+# ABSTRACT: est::Inline 2 fallback/default Content Handler
 
-=pod
-
-=head1 NAME
-
-Test::Inline::Content::Default - Test::Inline 2 fallback/default Content Handler
-
-=head1 DESCRIPTION
-
-This class implements the default generator for script content. It generates
-test script content inteded for use in a standard CPAN dist.
-
-This module contains no user servicable parts.
-
-=cut
+#pod =pod
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This class implements the default generator for script content. It generates
+#pod test script content inteded for use in a standard CPAN dist.
+#pod
+#pod This module contains no user servicable parts.
+#pod
+#pod =cut
 
 use strict;
 use Params::Util qw{_INSTANCE};
 use Test::Inline::Content ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '2.213';
-	@ISA = 'Test::Inline::Content';
-}
+our $VERSION = '2.214';
+our @ISA = 'Test::Inline::Content';
 
 sub process {
 	my $self   = shift;
@@ -63,24 +57,43 @@ END_TEST
 
 1;
 
+__END__
+
 =pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Test::Inline::Content::Default - est::Inline 2 fallback/default Content Handler
+
+=head1 VERSION
+
+version 2.214
+
+=head1 DESCRIPTION
+
+This class implements the default generator for script content. It generates
+test script content inteded for use in a standard CPAN dist.
+
+This module contains no user servicable parts.
 
 =head1 SUPPORT
 
 See the main L<SUPPORT|Test::Inline/SUPPORT> section.
 
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Inline>
+(or L<bug-Test-Inline@rt.cpan.org|mailto:bug-Test-Inline@rt.cpan.org>).
+
 =head1 AUTHOR
 
-Adam Kennedy E<lt>adamk@cpan.orgE<gt>, L<http://ali.as/>
+Adam Kennedy <adamk@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2004 - 2013 Adam Kennedy.
+This software is copyright (c) 2003 by Adam Kennedy.
 
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
-
-The full text of the license can be found in the
-LICENSE file included with this module.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

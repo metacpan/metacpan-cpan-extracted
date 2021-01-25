@@ -44,8 +44,9 @@ ok( ! $File->exists_file( $inline3 ), '->exists return false for a file that doe
 # Read the contents of Test::Inline and check the file length
 my $source = $File->read( $inline2 );
 ok( ref $source eq 'SCALAR', '->read returns a SCALAR reference' );
-ok( length $$source > 10000, '->read returns a string that is long enough' );
-ok( length $$source < 25000, '->read returns a string that is not TOO long' );
+(my $content = $$source) =~ s/^#pod.*$//gm;
+ok( length $content > 10000, '->read returns a string that is long enough' );
+ok( length $content < 25000, '->read returns a string that is not TOO long' );
 
 # Read of a bad file returns undef
 is( $File->read( $inline3 ), undef, '->read of a bad file returns undef' );

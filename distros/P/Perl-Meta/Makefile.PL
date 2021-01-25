@@ -12,7 +12,7 @@ WriteMakefile1(
                 url => 'git://github.com/chorny/Perl-Meta.git',
                 web => 'https://github.com/chorny/Perl-Meta',
             },
-            bugtracker => { 'web' => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Meta' },
+            bugtracker => { 'web' => 'https://github.com/chorny/Perl-Meta/issues' },
         },
     },
     NAME                => 'Perl::Meta',

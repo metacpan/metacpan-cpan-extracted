@@ -1,13 +1,12 @@
 id=ImageMagick  version=1.0
-class=DirectClass  colors=0  matte=False
+class=DirectClass  colors=0  alpha-trait=Undefined
 columns=70  rows=46  depth=8
 colorspace=Gray
 compression=None  quality=0
-resolution=72x72
 page=70x46+0+0
-gamma=1
-date:create=2012-06-21T06:59:09-04:00
-date:modify=2012-06-17T12:29:53-04:00
+gamma=0.454545
+date:create=2015-04-15T08:36:04-04:00
+date:modify=2012-06-17T12:29:59-04:00
 fits:bitpix={8                                                  }
 fits:bscale={1.000000E+00                                                  }
 fits:bzero={0.000000E+00                                                  }

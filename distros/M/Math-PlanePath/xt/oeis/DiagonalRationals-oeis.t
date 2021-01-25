@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2019, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,6 +28,7 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::DiagonalRationals;
+use Math::PlanePath::RationalsTree;
 my $diagrat = Math::PlanePath::DiagonalRationals->new;
 
 # uncomment this to run the ### lines

@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Tree::VERSION = '0.210120';
+$Bio::MUST::Core::Tree::VERSION = '0.210230';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -318,7 +318,7 @@ sub store {
     $args->{-nodelabels} //= 1;         # default to nodelabels on
 
     open my $out, '>', $outfile;
-    say {$out} _clean_newick_str( $self->tree->to_newick( %$args ) );
+    say {$out} _clean_newick_str( $self->tree->to_newick( %{$args} ) );
 
     return;
 }
@@ -552,7 +552,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.210120
+version 0.210230
 
 =head1 SYNOPSIS
 

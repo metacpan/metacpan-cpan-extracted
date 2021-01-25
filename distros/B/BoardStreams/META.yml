@@ -26,16 +26,40 @@ no_index:
 provides:
   BoardStreams:
     file: lib/BoardStreams.pm
-    version: v0.0.1
+    version: v0.0.3
+  BoardStreams::Exception:
+    file: lib/BoardStreams/Exception.pm
+  BoardStreams::Exception::DbError:
+    file: lib/BoardStreams/Exception.pm
+  BoardStreams::Exception::DbError::Duplicate:
+    file: lib/BoardStreams/Exception.pm
+  BoardStreams::ListenerObservable:
+    file: lib/BoardStreams/ListenerObservable.pm
+  BoardStreams::Registry:
+    file: lib/BoardStreams/Registry.pm
+  BoardStreams::Util:
+    file: lib/BoardStreams/Util.pm
   Mojolicious::Plugin::BoardStreams:
     file: lib/Mojolicious/Plugin/BoardStreams.pm
-    version: v0.0.1
 requires:
-  perl: '5.008001'
+  CryptX: '0'
+  Future::AsyncAwait: '0.36'
+  Mojo::Pg: '4.12'
+  Mojolicious: '8.32'
+  Moo: '0'
+  RxPerl: v6.2.0
+  RxPerl::Mojo: v6.0.0
+  Safe::Isa: '0'
+  Struct::Diff: '0'
+  Syntax::Keyword::Try: '0'
+  Throwable: '0'
+  autovivification: '0'
+  perl: '5.020'
 resources:
-  bugtracker: https://gitlab.com/karjala/boardstreams.pm/issues
-  homepage: https://gitlab.com/karjala/boardstreams.pm
-  repository: git://gitlab.com/karjala/boardstreams.pm.git
-version: v0.0.1
+  bugtracker: https://gitlab.com/karjala/boardstreams.pm-for-perl/issues
+  homepage: https://gitlab.com/karjala/boardstreams.pm-for-perl
+  repository: git://gitlab.com/karjala/boardstreams.pm-for-perl.git
+version: v0.0.3
+x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -1,17 +1,19 @@
+use v5.10;
+
 package Mac::PropertyList;
 use strict;
 
 use warnings;
 no warnings;
 
-use vars qw($ERROR $VERSION @EXPORT_OK %EXPORT_TAGS);
+use vars qw($ERROR);
 use Carp qw(croak carp);
 use Data::Dumper;
 use XML::Entities;
 
 use Exporter qw(import);
 
-@EXPORT_OK = qw(
+our @EXPORT_OK = qw(
 	parse_plist
 	parse_plist_fh
 	parse_plist_file
@@ -21,11 +23,11 @@ use Exporter qw(import);
 	create_from_string
 	);
 
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
 	'all' => \@EXPORT_OK,
 	);
 
-$VERSION = '1.501';
+our $VERSION = '1.502';
 
 =encoding utf8
 
@@ -425,6 +427,9 @@ sub read_next {
 		$_ .= $source->get_line;
 		if( s[^\s* < (string|date|real|integer|data) > \s*(.*?)\s* </\1> ][]sx ) {
 			$value = $Readers{$1}->( $2 );
+			}
+		elsif( s[^\s* < string / > ][]x ){
+			$value = $Readers{'string'}->( '' );
 			}
 	    elsif( s[^\s* < (dict|array) > ][]x ) {
 			# We need to put back the unprocessed text if
@@ -1020,7 +1025,7 @@ Tom Wyant added support for UID types.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2020, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

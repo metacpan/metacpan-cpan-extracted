@@ -33,29 +33,29 @@ no_index:
 provides:
   Ryu::Async:
     file: lib/Ryu/Async.pm
-    version: '0.018'
+    version: '0.019'
   Ryu::Async::Client:
     file: lib/Ryu/Async/Client.pm
-    version: '0.018'
+    version: '0.019'
   Ryu::Async::Packet:
     file: lib/Ryu/Async/Packet.pm
-    version: '0.018'
+    version: '0.019'
   Ryu::Async::Process:
     file: lib/Ryu/Async/Process.pm
-    version: '0.018'
+    version: '0.019'
   Ryu::Async::Server:
     file: lib/Ryu/Async/Server.pm
-    version: '0.018'
+    version: '0.019'
 recommends:
   Heap: '0'
   IO::Async::SSL: '0.19'
   IO::AsyncX::Sendfile: '0.002'
   IO::AsyncX::System: '0.003'
 requires:
-  Future: '0.45'
-  IO::Async: '0.71'
-  IO::Socket::IP: '0.37'
-  Log::Any: '1.050'
+  Future: '0.47'
+  IO::Async: '0.77'
+  IO::Socket::IP: '0.41'
+  Log::Any: '1.708'
   Ryu: '2.006'
   Syntax::Keyword::Try: '0'
   URI::tcp: '0'
@@ -67,8 +67,10 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Ryu-Async/issues
   homepage: https://github.com/team-at-cpan/Ryu-Async
   repository: https://github.com/team-at-cpan/Ryu-Async.git
-version: '0.018'
+version: '0.019'
 x_authority: cpan:TEAM
+x_contributors:
+  - 'Eyad Arnabeh <eyadof@gmail.com>'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

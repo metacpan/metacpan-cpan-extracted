@@ -42,7 +42,7 @@ requires:
 resources:
   bugtracker: https://github.com/vanstyn/DBIx-Class-Schema-Diff/issues
   repository: https://github.com/vanstyn/DBIx-Class-Schema-Diff.git
-version: 1.12
+version: 1.13
 x_contributors:
   - 'Peter Rabbitson <ribasushi@cpan.org>'
   - 'Michael Lackhoff <michael@lackhoff.de>'

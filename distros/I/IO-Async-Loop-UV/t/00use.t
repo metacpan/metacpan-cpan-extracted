@@ -1,8 +1,12 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
-use Test::More tests => 1;
+use warnings;
+
+use Test::More;
 
 use UV; # avoid CHECK warning
 
 use_ok( "IO::Async::Loop::UV" );
+
+done_testing;

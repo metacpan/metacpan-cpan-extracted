@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -30,7 +30,7 @@ use List::Util 'min'; # 'max'
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -1123,7 +1123,7 @@ successively advancing.
 Return the X,Y coordinates of point number C<$n> on the path.  Points begin
 at 0 and if C<$n E<lt> 0> then the return is an empty list.
 
-Fractional positions give an X,Y position along a straight line between the
+Fractional C<$n> gives an X,Y position along a straight line between the
 integer positions.
 
 =item C<$n = $path-E<gt>xy_to_n ($x,$y)>
@@ -1512,6 +1512,9 @@ turn" forms begin at n=0 for turn at N=1 and so are the turn at N=n+1.
     A289265   growth rate r = 1.695 of boundaries etc
     A272031   fractal dimension log(r)/log(sqrt(2))
 
+    arms=4
+      A165211   abs(dY), 0,1,0,1,1,0,1,0 repeating
+
 For reference, "dragon-like" A059125 is similar to the turn sequence
 A014707, but differs in having the "middle" values for each replication come
 from successive values of the sequence itself, or some such.
@@ -1525,9 +1528,8 @@ of an infinite sum
     1 + - + - + -- + --- + ----- + ... + ------- + ...
         2   4   16   256   65536         2^(2^k)
 
-X<Shallit, Jeffrey>X<Kmosek>Jeffrey Shallit and independently M. Kmosek show
-how continued fraction terms repeated in reverse give rise to this sort of
-power sum,
+Jeffrey Shallit and independently M. Kmosek show how continued fraction
+terms repeated in reverse give rise to this sort of power sum,
 
 =over
 
@@ -1615,7 +1617,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

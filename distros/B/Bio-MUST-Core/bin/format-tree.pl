@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: format-tree.pl
 # ABSTRACT: Format (and annotate) trees for printing
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
 
 use Modern::Perl '2011';
 use autodie;
@@ -178,7 +179,7 @@ format-tree.pl - Format (and annotate) trees for printing
 
 =head1 VERSION
 
-version 0.210120
+version 0.210230
 
 =head1 USAGE
 
@@ -341,6 +342,12 @@ Print the usual program information
 =head1 AUTHOR
 
 Denis BAURAIN <denis.baurain@uliege.be>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Valerian LUPO
+
+Valerian LUPO <valerian.lupo@doct.uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

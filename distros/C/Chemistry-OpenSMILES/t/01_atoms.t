@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Chemistry::OpenSMILES::Parser;
-use Chemistry::OpenSMILES::Writer;
+use Chemistry::OpenSMILES::Writer qw( write_SMILES );
 use Test::More;
 
 my @cases = qw(
@@ -15,12 +15,14 @@ my @cases = qw(
 );
 
 my %cases = (
-    '[*]'    => '*',
-    '[ClH1]' => '[ClH]',
-    '[Cu++]' => '[Cu+2]',
-    '[OH-1]' => '[OH-]',
-    '[OH1-]' => '[OH-]',
-    map { $_ => $_ } @cases,
+    '[*]'     => '*',
+    '[ClH1]'  => '[ClH]',
+    '[Cu++]'  => '[Cu+2]',
+    '[OH-1]'  => '[OH-]',
+    '[OH1-]'  => '[OH-]',
+    '[C@TH1]' => '[C@]',
+    '[C@TH2]' => '[C@@]',
+    map { $_  => $_ } @cases,
 );
 
 plan tests => 2 * scalar keys %cases;
@@ -30,8 +32,6 @@ for (sort keys %cases) {
     my( $graph ) = $parser->parse( $_, { raw => 1 } );
     is( $graph->vertices, 1 );
 
-    # s/H([\]\-])/H1$1/;
-    is( join( '', map { Chemistry::OpenSMILES::Writer::_pre_vertex( $_ ) }
-                      $graph->vertices ),
+    is( join( '', map { write_SMILES( $_ ) } $graph->vertices ),
         $cases{$_} );
 }

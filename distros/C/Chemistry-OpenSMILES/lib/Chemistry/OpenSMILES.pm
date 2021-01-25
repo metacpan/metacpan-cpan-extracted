@@ -5,7 +5,7 @@ use warnings;
 use 5.0100;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.4.1'; # VERSION
+our $VERSION = '0.4.3'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -17,6 +17,50 @@ sub is_aromatic($)
 {
     my( $atom ) = @_;
     return $atom->{symbol} ne ucfirst $atom->{symbol};
+}
+
+sub _validate($)
+{
+    my( $moiety ) = @_;
+
+    for my $atom (sort { $a->{number} <=> $b->{number} } $moiety->vertices) {
+        # TODO: TH and AL chiral centers also have to be checked
+        if( $atom->{chirality} && $atom->{chirality} =~ /^@@?$/ &&
+            $moiety->degree($atom) < 4 ) {
+            # FIXME: tetrahedral allenes are false-positives
+            warn sprintf 'chiral center %s(%d) has %d bonds while ' .
+                         'at least 4 is required' . "\n",
+                         $atom->{symbol},
+                         $atom->{number},
+                         $moiety->degree($atom);
+        }
+
+        # FIXME: this code yields false-positives, see COD entries
+        # 1100780 and 1547257
+        my %bond_types;
+        for my $neighbour ($moiety->neighbours($atom)) {
+            next if !$moiety->has_edge_attribute( $atom, $neighbour, 'bond' );
+            my  $bond_type = $moiety->get_edge_attribute( $atom, $neighbour, 'bond' );
+            if( $bond_type =~ /^[\\\/]$/ &&
+                $atom->{number} > $neighbour->{number} ) {
+                $bond_type = $bond_type eq '\\' ? '/' : '\\';
+            }
+            $bond_types{$bond_type}++;
+        }
+        foreach ('/', '\\') {
+            if( $bond_types{$_} && $bond_types{$_} > 1 ) {
+                warn sprintf 'atom %s(%d) has %d bonds of type \'%s\', ' .
+                             'cis/trans definitions must not conflict' . "\n",
+                             $atom->{symbol},
+                             $atom->{number},
+                             $bond_types{$_},
+                             $_;
+            }
+        }
+    }
+
+    # TODO: cis/trans bond not next to a double bond
+    # TODO: SP, TB, OH chiral centers
 }
 
 1;
@@ -43,9 +87,9 @@ Chemistry::OpenSMILES - OpenSMILES format reader and writer
         print scalar $moiety->edges;
     }
 
-    use Chemistry::OpenSMILES::Writer;
+    use Chemistry::OpenSMILES::Writer qw(write_SMILES);
 
-    print Chemistry::OpenSMILES::Writer::write( \@moieties );
+    print write_SMILES( \@moieties );
 
 =head1 DESCRIPTION
 

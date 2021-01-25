@@ -5,12 +5,7 @@ use warnings;
 use Test::More;
 use List::Util qw(shuffle);
 
-BEGIN {
-  use_ok('Net::IPAM::Block')
-    || print "Bail out!\n";
-}
-
-can_ok( 'Net::IPAM::Block', 'new' );
+BEGIN { use_ok( 'Net::IPAM::Block', qw(sort_block) ) || print "Bail out!\n"; }
 
 # sorted
 my @input = (
@@ -52,10 +47,13 @@ foreach my $b ( shuffle @input ) {
   push @blocks, Net::IPAM::Block->new($b) // fail("wrong format: $b");
 }
 
-my @sorted = map { $_->to_string }
-  sort { $a->cmp($b) } @blocks;
+my @sorted = map { $_->to_string } sort { $a->cmp($b) } @blocks;
+is_deeply( \@sorted, \@input, 'sort with cmp()' );
 
-is_deeply( \@input, \@sorted, 'sort with cmp()' );
+undef @sorted;
+@sorted = map { $_->to_string } sort_block @blocks;
+is_deeply( \@sorted, \@input, 'sort_block' );
 
+#diag explain [ map { $_->to_string } @blocks ];
 #diag explain \@sorted;
 done_testing();

@@ -1,0 +1,28 @@
+---
+abstract: 'implement C<Future::IO> using C<UV>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Future-IO-Impl-UV
+provides:
+  Future::IO::Impl::UV:
+    file: lib/Future/IO/Impl/UV.pm
+    version: '0.01'
+requires:
+  Future: '0'
+  Future::IO::ImplBase: '0'
+  UV: '1.900'
+  perl: '5.010'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

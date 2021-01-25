@@ -66,6 +66,6 @@
       },
       "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
    },
-   "version" : "1.108",
+   "version" : "1.109",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

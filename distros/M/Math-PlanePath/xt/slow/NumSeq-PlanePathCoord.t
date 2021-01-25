@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,7 +32,7 @@ use Math::PlanePath::Base::Generic
 # use Smart::Comments '###';
 
 
-my $test_count = (tests => 1045)[1];
+my $test_count = (tests => 1913)[1];
 plan tests => $test_count;
 
 if (! eval { require Math::NumSeq; 1 }) {
@@ -404,6 +404,18 @@ my @modules = (
 
                # module list begin
 
+               'Corner',
+               'Corner,wider=1',
+               'Corner,wider=2',
+               'Corner,wider=5',
+               'Corner,wider=37',
+
+               'CornerAlternating',
+               'CornerAlternating,wider=1',
+               'CornerAlternating,wider=2',
+               'CornerAlternating,wider=5',
+               'CornerAlternating,wider=37',
+
                'PeanoDiagonals',
                'PeanoDiagonals,radix=2',
                'PeanoDiagonals,radix=4',
@@ -522,12 +534,6 @@ my @modules = (
                'TriangularHypot,points=hex',
                'TriangularHypot,points=hex_rotated',
                'TriangularHypot,points=hex_centred',
-
-               'Corner',
-               'Corner,wider=1',
-               'Corner,wider=2',
-               'Corner,wider=5',
-               'Corner,wider=37',
 
                'PythagoreanTree,tree_type=UMT',
                'PythagoreanTree,tree_type=UMT,coordinates=AC',

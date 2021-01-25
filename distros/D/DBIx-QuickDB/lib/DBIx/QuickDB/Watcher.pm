@@ -2,7 +2,7 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use POSIX();
 use Carp qw/croak/;

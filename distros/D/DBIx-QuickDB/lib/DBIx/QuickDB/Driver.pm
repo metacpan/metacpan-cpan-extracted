@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
@@ -326,7 +326,7 @@ sub stop {
             my $waited = time - $start;
 
             if ($waited > 10) {
-                confess "Times out waiting for server to stop";
+                confess "Timed out waiting for server to stop";
                 last;
             }
 

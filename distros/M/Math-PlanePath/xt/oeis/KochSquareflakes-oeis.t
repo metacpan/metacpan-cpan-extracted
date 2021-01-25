@@ -34,8 +34,16 @@ my $path = Math::PlanePath::KochSquareflakes->new;
 #------------------------------------------------------------------------------
 # A332204 -- X coordinate
 # A332205 -- Y coordinate
-#
-# of a horizontal ...
+# ~/OEIS/a332204.gp.txt
+#         *       
+#       /  \          0, 45, -45, 0 degrees
+#      /    \
+# *---*      *---*
+# my(x=OEIS_bfile_func("A332204"), \
+#    y=OEIS_bfile_func("A332205")); \
+# plothraw(vector(3^3,n,n--; x(n)), \
+#          vector(3^3,n,n--; y(n)), 1+8+16+32)
+
 
 MyOEIS::compare_values
   (anum => 'A332204',

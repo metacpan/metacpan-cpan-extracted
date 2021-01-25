@@ -74,7 +74,7 @@
          "url" : "https://github.com/fredericd/koha-sudoc"
       }
    },
-   "version" : "2.34",
+   "version" : "2.36",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -1,24 +1,26 @@
 NAME
+
     UV - Perl interface to libuv
 
 SYNOPSIS
+
       #!/usr/bin/env perl
       use strict;
       use warnings;
-
+    
       use UV;
       use UV::Loop;
-
+    
       # hi-resolution time
       my $hi_res_time = UV::hrtime();
-
+    
       # A new loop
       my $loop = UV::Loop->new();
-
+    
       # default loop
       my $loop = UV::Loop->default_loop(); # convenience singleton constructor
       my $loop = UV::Loop->default(); # convenience singleton constructor
-
+    
       # run a loop with one of three options:
       # UV_RUN_DEFAULT, UV_RUN_ONCE, UV_RUN_NOWAIT
       $loop->run(); # runs with UV_RUN_DEFAULT
@@ -27,257 +29,345 @@ SYNOPSIS
       $loop->run(UV::Loop::UV_RUN_NOWAIT);
 
 DESCRIPTION
+
     This module provides an interface to libuv <http://libuv.org>. We will
     try to document things here as best as we can, but we also suggest you
-    look at the libuv docs <http://docs.libuv.org> directly for more details
-    on how things work.
+    look at the libuv docs <http://docs.libuv.org> directly for more
+    details on how things work.
 
     Event loops that work properly on all platforms. YAY!
 
 CONSTANTS
-  VERSION CONSTANTS
-   UV_VERSION_MAJOR
-   UV_VERSION_MINOR
-   UV_VERSION_PATCH
-   UV_VERSION_IS_RELEASE
-   UV_VERSION_SUFFIX
-   UV_VERSION_HEX
-  ERROR CONSTANTS
-   UV_E2BIG
+
+ VERSION CONSTANTS
+
+  UV_VERSION_MAJOR
+
+  UV_VERSION_MINOR
+
+  UV_VERSION_PATCH
+
+  UV_VERSION_IS_RELEASE
+
+  UV_VERSION_SUFFIX
+
+  UV_VERSION_HEX
+
+ ERROR CONSTANTS
+
+  UV_E2BIG
+
     Argument list too long
 
-   UV_EACCES
+  UV_EACCES
+
     Permission denied
 
-   UV_EADDRINUSE
+  UV_EADDRINUSE
+
     Address already in use
 
-   UV_EADDRNOTAVAIL
+  UV_EADDRNOTAVAIL
+
     Address not available
 
-   UV_EAFNOSUPPORT
+  UV_EAFNOSUPPORT
+
     Address family not supported
 
-   UV_EAGAIN
+  UV_EAGAIN
+
     Resource temporarily unavailable
 
-   UV_EAI_ADDRFAMILY
+  UV_EAI_ADDRFAMILY
+
     Address family not supported
 
-   UV_EAI_AGAIN
+  UV_EAI_AGAIN
+
     Temporary failure
 
-   UV_EAI_BADFLAGS
+  UV_EAI_BADFLAGS
+
     Bad ai_flags value
 
-   UV_EAI_BADHINTS
+  UV_EAI_BADHINTS
+
     Invalid value for hints
 
-   UV_EAI_CANCELED
+  UV_EAI_CANCELED
+
     Request canceled
 
-   UV_EAI_FAIL
+  UV_EAI_FAIL
+
     Permanent failure
 
-   UV_EAI_FAMILY
+  UV_EAI_FAMILY
+
     ai_family not supported
 
-   UV_EAI_MEMORY
+  UV_EAI_MEMORY
+
     Out of memory
 
-   UV_EAI_NODATA
+  UV_EAI_NODATA
+
     No address
 
-   UV_EAI_NONAME
+  UV_EAI_NONAME
+
     Unknown node or service
 
-   UV_EAI_OVERFLOW
+  UV_EAI_OVERFLOW
+
     Argument buffer overflow
 
-   UV_EAI_PROTOCOL
+  UV_EAI_PROTOCOL
+
     Resolved protocol is unknown
 
-   UV_EAI_SERVICE
+  UV_EAI_SERVICE
+
     Service not available for socket type
 
-   UV_EAI_SOCKTYPE
+  UV_EAI_SOCKTYPE
+
     Socket type not supported
 
-   UV_EALREADY
+  UV_EALREADY
+
     Connection already in progress
 
-   UV_EBADF
+  UV_EBADF
+
     Bad file descriptor
 
-   UV_EBUSY
+  UV_EBUSY
+
     Resource busy or locked
 
-   UV_ECANCELED
+  UV_ECANCELED
+
     Operation canceled
 
-   UV_ECHARSET
+  UV_ECHARSET
+
     Invalid Unicode character
 
-   UV_ECONNABORTED
+  UV_ECONNABORTED
+
     Software caused connection abort
 
-   UV_ECONNREFUSED
+  UV_ECONNREFUSED
+
     Connection refused
 
-   UV_ECONNRESET
+  UV_ECONNRESET
+
     Connection reset by peer
 
-   UV_EDESTADDRREQ
+  UV_EDESTADDRREQ
+
     Destination address required
 
-   UV_EEXIST
+  UV_EEXIST
+
     File already exists
 
-   UV_EFAULT
+  UV_EFAULT
+
     Bad address in system call argument
 
-   UV_EFBIG
+  UV_EFBIG
+
     File too large
 
-   UV_EHOSTUNREACH
+  UV_EHOSTUNREACH
+
     Host is unreachable
 
-   UV_EINTR
+  UV_EINTR
+
     Interrupted system call
 
-   UV_EINVAL
+  UV_EINVAL
+
     Invalid argument
 
-   UV_EIO
+  UV_EIO
+
     i/o error
 
-   UV_EISCONN
+  UV_EISCONN
+
     Socket is already connected
 
-   UV_EISDIR
+  UV_EISDIR
+
     Illegal operation on a directory
 
-   UV_ELOOP
+  UV_ELOOP
+
     Too many symbolic links encountered
 
-   UV_EMFILE
+  UV_EMFILE
+
     Too many open files
 
-   UV_EMLINK
+  UV_EMLINK
+
     Too many links
 
-   UV_EMSGSIZE
+  UV_EMSGSIZE
+
     Message too long
 
-   UV_ENAMETOOLONG
+  UV_ENAMETOOLONG
+
     Name too long
 
-   UV_ENETDOWN
+  UV_ENETDOWN
+
     Network is down
 
-   UV_ENETUNREACH
+  UV_ENETUNREACH
+
     Network is unreachable
 
-   UV_ENFILE
+  UV_ENFILE
+
     File table overflow
 
-   UV_ENOBUFS
+  UV_ENOBUFS
+
     No buffer space available
 
-   UV_ENODEV
+  UV_ENODEV
+
     No such device
 
-   UV_ENOENT
+  UV_ENOENT
+
     No such file or directory
 
-   UV_ENOMEM
+  UV_ENOMEM
+
     Not enough memory
 
-   UV_ENONET
+  UV_ENONET
+
     Machine is not on the network
 
-   UV_ENOPROTOOPT
+  UV_ENOPROTOOPT
+
     Protocol not available
 
-   UV_ENOSPC
+  UV_ENOSPC
+
     No space left on device
 
-   UV_ENOSYS
+  UV_ENOSYS
+
     Function not implemented
 
-   UV_ENOTCONN
+  UV_ENOTCONN
+
     Socket is not connected
 
-   UV_ENOTDIR
+  UV_ENOTDIR
+
     Not a directory
 
-   UV_ENOTEMPTY
+  UV_ENOTEMPTY
+
     Directory not empty
 
-   UV_ENOTSOCK
+  UV_ENOTSOCK
+
     Socket operation on non-socket
 
-   UV_ENOTSUP
+  UV_ENOTSUP
+
     Operation not supported on socket
 
-   UV_ENXIO
+  UV_ENXIO
+
     No such device or address
 
-   UV_EOF
+  UV_EOF
+
     End of file
 
-   UV_EPERM
+  UV_EPERM
+
     Operation not permitted
 
-   UV_EPIPE
+  UV_EPIPE
+
     Broken pipe
 
-   UV_EPROTO
+  UV_EPROTO
+
     Protocol error
 
-   UV_EPROTONOSUPPORT
+  UV_EPROTONOSUPPORT
+
     Protocol not supported
 
-   UV_EPROTOTYPE
+  UV_EPROTOTYPE
+
     Protocol wrong type for socket
 
-   UV_ERANGE
+  UV_ERANGE
+
     Result too large
 
-   UV_EROFS
+  UV_EROFS
+
     Read-only file system
 
-   UV_ESHUTDOWN
+  UV_ESHUTDOWN
+
     Cannot send after transport endpoint shutdown
 
-   UV_ESPIPE
+  UV_ESPIPE
+
     Invalid seek
 
-   UV_ESRCH
+  UV_ESRCH
+
     No such process
 
-   UV_ETIMEDOUT
+  UV_ETIMEDOUT
+
     Connection timed out
 
-   UV_ETXTBSY
+  UV_ETXTBSY
+
     Text file is busy
 
-   UV_EXDEV
+  UV_EXDEV
+
     Cross-device link not permitted
 
-   UV_UNKNOWN
+  UV_UNKNOWN
+
     Unknown error
 
 FUNCTIONS
+
     The following functions are available:
 
-  check
+ check
+
         my $handle = UV::check(); # uses the default loop
         my $handle = UV::check(loop => $some_other_loop); # non-default loop
 
     Returns a new UV::Check Handle object.
 
-  default_loop
+ default_loop
+
         my $loop = UV::default_loop();
         # You can also get it with the UV::Loop methods below:
         my $loop = UV::Loop->default_loop();
@@ -290,7 +380,8 @@ FUNCTIONS
     already creates the default loop and you get access to it with this
     method.
 
-  err_name
+ err_name
+
         my $error_name = UV::err_name(UV::UV_EAI_BADFLAGS);
         say $error_name; # EAI_BADFLAGS
 
@@ -305,18 +396,21 @@ FUNCTIONS
     When a function which takes a callback returns an error, the callback
     will never be called.
 
-  hrtime
+ hrtime
+
         my $uint64_t = UV::hrtime();
 
-    Get the current Hi-Res time ("uint64_t").
+    Get the current Hi-Res time (uint64_t).
 
-  idle
+ idle
+
         my $handle = UV::idle(); # uses the default loop
         my $handle = UV::idle(loop => $some_other_loop); # non-default loop
 
     Returns a new UV::Idle Handle object.
 
-  loop
+ loop
+
         my $loop = UV::loop();
         # You can also get it with the UV::Loop methods below:
         my $loop = UV::Loop->default_loop();
@@ -326,25 +420,37 @@ FUNCTIONS
     already creates the default loop and you get access to it with this
     method.
 
-  poll
+ poll
+
         my $handle = UV::poll(); # uses the default loop
         my $handle = UV::poll(loop => $some_other_loop); # non-default loop
 
     Returns a new UV::Poll Handle object.
 
-  prepare
+ prepare
+
         my $handle = UV::prepare(); # uses the default loop
         my $handle = UV::prepare(loop => $some_other_loop); # non-default loop
 
     Returns a new UV::Prepare Handle object.
 
-  strerror
+ signal
+
+        my $handle = UV::signal(POSIX::SIGHUP); # uses the default loop
+    
+        my $handle = UV::signal(loop => $some_other_loop, signal => POSIX::SIGHUP);
+            # non-default loop
+
+    Returns a new UV::Signal Handle object.
+
+ strerror
+
         my $error = UV::strerror(UV::UV_EAI_BADFLAGS);
         say $error; # bad ai_flags value
 
     The strerror <http://docs.libuv.org/en/v1.x/errors.html#c.uv_strerror>
-    function returns the error message for the given error code. Leaks a few
-    bytes of memory when you call it with an unknown error code.
+    function returns the error message for the given error code. Leaks a
+    few bytes of memory when you call it with an unknown error code.
 
     In libuv errors are negative numbered constants. As a rule of thumb,
     whenever there is a status parameter, or an API functions returns an
@@ -353,22 +459,43 @@ FUNCTIONS
     When a function which takes a callback returns an error, the callback
     will never be called.
 
-  timer
+ tcp
+
+        my $tcp = UV::tcp();
+
+    Returns a new UV::TCP object.
+
+ timer
+
         my $timer = UV::timer(); # uses the default loop
         my $timer = UV::timer(loop => $some_other_loop); # non-default loop
 
     Returns a new UV::Timer object.
 
-  version
+ tty
+
+        my $tty = UV::tty(fd => 0);
+
+    Returns a new UV::TTY object.
+
+ udp
+
+        my $udp = UV::udp();
+
+    Returns a new UV::UDP object.
+
+ version
+
         my $int = UV::version();
 
     The version <http://docs.libuv.org/en/v1.x/version.html#c.uv_version>
-    function returns "UV::UV_VERSION_HEX", the libuv version packed into a
+    function returns UV::UV_VERSION_HEX, the libuv version packed into a
     single integer. 8 bits are used for each component, with the patch
-    number stored in the 8 least significant bits. E.g. for libuv 1.2.3 this
-    would be 0x010203.
+    number stored in the 8 least significant bits. E.g. for libuv 1.2.3
+    this would be 0x010203.
 
-  version_string
+ version_string
+
         say UV::version_string();
         # 1.13.1
 
@@ -377,13 +504,47 @@ FUNCTIONS
     function returns the libuv version number as a string. For non-release
     versions the version suffix is included.
 
+EXCEPTIONS
+
+    If any call to libuv fails, an exception will be thrown. The exception
+    will be a blessed object having a code method which returns the
+    numerical error code (which can be compared to one of the UV::UV_E*
+    error constants), and a message method which returns a human-readable
+    string describing the failure.
+
+        try { ... }
+        catch my $e {
+            if(blessed $e and $e->isa("UV::Exception")) {
+                print "The failure was ", $e->message, " of code ", $e->code;
+            }
+        }
+
+    The exception class provides stringify overload to call the message
+    method, so the normal Perl behaviour of just printing the exception
+    will print the message from it, as expected.
+
+    Exceptions are blessed into a subclass of UV::Exception named after the
+    type of the failure code. This allows type-based testing of error
+    types.
+
+        try { ... }
+        catch my $e {
+            if(blessed $e and $e->isa("UV::Exception::ECANCELED") {
+                # ignore
+            }
+            else ...
+        }
+
 AUTHOR
+
     Chase Whitener <capoeirab@cpan.org>
 
 AUTHOR EMERITUS
+
     Daisuke Murase <typester@cpan.org>
 
 COPYRIGHT AND LICENSE
+
     Copyright 2012, Daisuke Murase.
 
     This library is free software; you can redistribute it and/or modify it

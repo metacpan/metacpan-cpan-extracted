@@ -3,15 +3,15 @@ require 5.006000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'EXE_FILES' => [],
-  'INSTALLDIRS' => 'site',
-  'PREREQ_PM' => {
-                   'Test::More' => 0,
-                   'Test::Exception' => 0,
-                   'Moose' => 0
-                 },
-  'PL_FILES' => {},
+  'NAME' => 'Parse::RPM::Spec',
   'VERSION_FROM' => 'lib/Parse/RPM/Spec.pm',
-  'NAME' => 'Parse::RPM::Spec'
+  'PREREQ_PM' => {
+                   'Moose' => 0,
+                   'Test::Exception' => 0,
+                   'Test::More' => 0
+                 },
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
+  'PL_FILES' => {}
 )
 ;

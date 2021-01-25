@@ -30,11 +30,14 @@
    "provides" : {
       "Template::Plugin::AudioFile::Info" : {
          "file" : "lib/Template/Plugin/AudioFile/Info.pm",
-         "version" : "v2.0.1"
+         "version" : "v2.0.2"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/template-plugin-audiofile-info/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -44,6 +47,6 @@
          "web" : "https://github.com/davorg/template-plugin-audiofile-info"
       }
    },
-   "version" : "v2.0.1",
+   "version" : "v2.0.2",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

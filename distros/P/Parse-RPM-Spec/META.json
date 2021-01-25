@@ -35,11 +35,14 @@
    "provides" : {
       "Parse::RPM::Spec" : {
          "file" : "lib/Parse/RPM/Spec.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/parse-rpm-spec/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -49,6 +52,6 @@
          "web" : "https://github.com/davorg/parse-rpm-spec"
       }
    },
-   "version" : "v1.0.2",
+   "version" : "v1.0.3",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

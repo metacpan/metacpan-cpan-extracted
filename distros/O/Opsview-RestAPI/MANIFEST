@@ -21,4 +21,5 @@ t/host.t
 t/lib/ORA_Test.pm
 t/opsview.t
 t/reload.t
+t/urls.t
 weaver.ini

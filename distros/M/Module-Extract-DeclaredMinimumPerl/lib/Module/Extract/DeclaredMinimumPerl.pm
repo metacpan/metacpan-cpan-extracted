@@ -7,9 +7,7 @@ use strict;
 use warnings;
 no warnings;
 
-use subs qw();
-
-our $VERSION = '1.021';
+our $VERSION = '1.022';
 
 =encoding utf8
 
@@ -137,7 +135,7 @@ sub _get_ppi_for_file {
 
 =item error
 
-Return the error from the last call to C<get_modules>.
+Return the error from the last call to C<get_minimum_declared_perl>.
 
 =cut
 
@@ -173,7 +171,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2011-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2011-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

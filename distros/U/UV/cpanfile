@@ -13,6 +13,7 @@ on 'runtime' => sub {
 };
 
 on 'build' => sub {
+    requires 'Alien::Base::Wrapper';
     requires 'Alien::libuv' => '1.000';
     requires 'Config';
     requires 'ExtUtils::MakeMaker' => '7.12';
@@ -20,6 +21,7 @@ on 'build' => sub {
 };
 
 on 'configure' => sub {
+    requires 'Alien::Base::Wrapper';
     requires 'Alien::libuv' => '1.000';
     requires 'ExtUtils::MakeMaker' => '7.12';
 };

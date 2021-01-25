@@ -2,109 +2,103 @@ Make sure you have the prerequisite modules installed.
 
 Packages for Redhat/Centos
 
-	yum install perl-devel perl-ExtUtils-ParseXS perl-ExtUtils-Install perl-ExtUtils-MakeMaker perl-ExtUtils-Manifest perl-Test-Harness
-	yum install perl-CPAN perl-CPAN-Meta perl-CPAN-Meta-Requirements perl-CPAN-Meta-YAML perl-CPANPLUS-Dist-Build perl-Parse-CPAN-Meta perl-Test-CPAN-Meta perl-CPAN-Changes perl-CPANPLUS perl-Module-Signature perl-Version-Requirements perl-YAML
-	yum install perl-Data-Dumper
-	yum install perl-App-cpanminus 
+    yum install perl-devel perl-ExtUtils-ParseXS perl-ExtUtils-Install perl-ExtUtils-MakeMaker perl-ExtUtils-Manifest perl-Test-Harness
+    yum install perl-CPAN perl-CPAN-Meta perl-CPAN-Meta-Requirements perl-CPAN-Meta-YAML perl-CPANPLUS-Dist-Build perl-Parse-CPAN-Meta perl-Test-CPAN-Meta perl-CPAN-Changes perl-CPANPLUS perl-Module-Signature perl-Version-Requirements perl-YAML
+    yum install perl-Data-Dumper
+    yum install perl-App-cpanminus 
 
 Packages for Archlinux
 
-	pacman -S perl-data-dump
-	pacman -S cpanminus
+    pacman -S perl-data-dump
+    pacman -S cpanminus
 
 Modules to install from cpan
 
-	cpanm XML::Hash::XS
-	cpanm Cpanel::JSON::XS
-	cpanm YAML::Syck
-	cpanm Moo
-	cpanm ExtUtils::Config
-	cpanm IO::HTML
-	cpanm HTTP::Headers
-	cpanm HTTP::Entity::Parser
-	cpanm HTTP::Request::Common
-	cpanm Net::Server
-	cpanm Plack
-	cpanm Plack::Middleware::Deflater
-	cpanm Starman
-	cpanm Template::Toolkit
-	cpanm Dancer2
-	cpanm Dancer2::Plugin::WebService
+    cpanm XML::Hash::XS
+    cpanm Cpanel::JSON::XS
+    cpanm YAML::Syck
+    cpanm Moo
+    cpanm ExtUtils::Config
+    cpanm IO::HTML
+    cpanm HTTP::Headers
+    cpanm HTTP::Entity::Parser
+    cpanm HTTP::Request::Common
+    cpanm Net::Server
+    cpanm Plack
+    cpanm Plack::Middleware::Deflater
+    cpanm Starman
+    cpanm Template::Toolkit
+    cpanm Dancer2
+    cpanm Dancer2::Plugin::WebService
 
 Use logrotate for housekeeping the log files
 vi /etc/logrotate.d/WebService
 
-	/var/log/WebService/*.log {
-	create 640 dancer dancer
-	compress
-	missingok
-	notifempty
-	daily
-	rotate 7
-	}
+    /var/log/WebService/*.log {
+    create 640 dancer dancer
+    compress
+    missingok
+    notifempty
+    daily
+    rotate 7
+    }
 
 You should your run your service as a non privileged user e.g. dancer.
 Be careful, non root users can not bind ports up to 1024
 Create the user if not exist
 
-	getent group  dancer >/dev/null || groupadd dancer
-	getent passwd dancer >/dev/null || useradd -g dancer -l -M -c "Dancer2 WebService" -s $(which nologin) dancer
+    getent group  dancer >/dev/null || groupadd dancer
+    getent passwd dancer >/dev/null || useradd -g dancer -l -M -c "Dancer2 WebService" -s $(which nologin) dancer
 
 Create the Persistent data and log directories. You can change them if you want
 
-	mkdir /var/lib/WebService
-	mkdir /var/log/WebService
+    mkdir /var/lib/WebService
+    mkdir /var/log/WebService
 
-	chown -R dancer:dancer /var/lib/WebService
-	chown -R dancer:dancer /var/log/WebService
+    chown -R dancer:dancer /var/lib/WebService
+    chown -R dancer:dancer /var/log/WebService
 
-If you have a firewall you should create a rule for the listening port e.g. at Redhat
+If you have a firewall you should create a rule for the listening port e.g.
 
-	firewall-cmd --zone=public --permanent --add-port=3000/tcp
-	firewall-cmd --reload
-	firewall-cmd --list-all
-
-
-If you are running the service as user dancer, and want to want to use an authentication method that needs root privileges
-make sudoers groups to run any command, and the user to the wheel group e.g.
-
-	vi /etc/sudoers
-
-		%wheel ALL=(ALL) NOPASSWD: ALL
-
-	usermod -aG wheel dancer
-
-
+    # Redhat
+    firewall-cmd --zone=public --permanent --add-port=3000/tcp
+    firewall-cmd --reload
+    firewall-cmd --list-all
 
 Make sure the authorization scripts are executable
 
-	# Redhat
-	find /usr/local/share/perl5/Dancer2/Plugin      -regex ".*\.\(sh\|pl\)\$" -type f -exec chmod 755 {} \;	
-	# Archlinux
-	find /usr/share/perl5/site_perl/Dancer2/Plugin  -regex ".*\.\(sh\|pl\)\$" -type f -exec chmod 755 {} \;
+    # Redhat
+    find /usr/local/share/perl5/Dancer2/Plugin      -regex ".*\.\(sh\|pl\)\$" -type f -exec chmod 755 {} \;	
+    # Archlinux
+    find /usr/share/perl5/site_perl/Dancer2/Plugin  -regex ".*\.\(sh\|pl\)\$" -type f -exec chmod 755 {} \;
+
+If you are running the service as user dancer, and want to want to use an authentication method that needs root privileges
+give the appropriate privileges	using the sudoers e.g
+vi /etc/sudoers
+
+    dancer ALL=(ALL:ALL) NOPASSWD: /usr/share/perl5/site_perl/Dancer2/Plugin/AuthScripts/linux.sh
 
 quick view the Dancer2::Plugin::WebService documentation as web page
 
-	install darkhttpd (once)
-	pod2html --infile=/opt/Dancer2-Plugin-WebService/lib/Dancer2/Plugin/WebService.pm --outfile=/tmp/index.html --title="Dancer2 WebService" --verbose
-	darkhttpd /tmp --addr 0.0.0.0 --port 80 --chroot --index index.html
-	yourbrowser http://yourserver
+    install darkhttpd (once)
+    pod2html --infile=/opt/Dancer2-Plugin-WebService/lib/Dancer2/Plugin/WebService.pm --outfile=/tmp/index.html --title="Dancer2 WebService" --verbose
+    darkhttpd /tmp --addr 0.0.0.0 --port 80 --chroot --index index.html
+    yourbrowser http://yourserver
 
 Create your application with the name e.g.  TestService  at the directory  /opt/TestService
 
-	dancer2 gen --application TestService --directory TestService --path /opt --overwrite
-	chown -R dancer:dancer /opt/TestService
+    dancer2 gen --application TestService --directory TestService --path /opt --overwrite
+    chown -R dancer:dancer /opt/TestService
 
 Use compressed http if you have fast CPU and large replies
 vi /opt/TestService/bin/app.psgi
 
-	#!/usr/bin/env perl
-	use FindBin;
-	use lib "$FindBin::Bin/../lib";
-	use TestService;
-	use Plack::Builder;
-	builder { enable 'Deflater'; TestService->to_app }
-
+    #!/usr/bin/env perl
+    use FindBin;
+    use lib "$FindBin::Bin/../lib";
+    use TestService;
+    use Plack::Builder;
+    builder { enable 'Deflater'; TestService->to_app }
 
 Configure the production enviroment
 vi /opt/TestService/environments/production.yml
@@ -128,15 +122,8 @@ vi /opt/TestService/environments/production.yml
         console:
           log_format : '{"ts":"%{%Y-%m-%d %H:%M:%S}t","host":"%h","level":"%L","message":"%m"}'
 
-
-
-
-
 Configure your application settings, changing the values to your needs
 vi /opt/TestService/config.yml
-
-
-
 
 
 # Enviroment settings are at   environments/*.yml
@@ -192,11 +179,11 @@ Write your rest service code at   /opt/TestService/lib/TestService.pm   e.g.
 vi /opt/TestService/lib/TestService.pm
 
 
-package	TestService;
-use		Dancer2;
-use		Dancer2::Plugin::WebService;
-use		strict;
-use		warnings;
+package	MyApi;
+use Dancer2;
+use Dancer2::Plugin::WebService;
+use strict;
+use warnings;
 
 any '/mirror' => sub { reply 'SEND_DATA' };
 get '/route1' => sub { reply };
@@ -230,25 +217,25 @@ If you are using nginx web server to reverse proxy you service
 from port 80 or for adding https protection ( port 443 )
 Add at your nginx.conf something similar to
 
-	...
-	upstream TestService { server 127.0.0.1:3000 fail_timeout=0; keepalive 1024; }
-	...
-	server
-	{
-	server_name      anotherdimension.mooo.com;
-	listen           80;
-	listen           443 ssl;
-	root             /tmp;
-	proxy_redirect   off;
-	proxy_set_header Host      $host;
-	proxy_set_header X-Real-IP $remote_addr; # needed for real client IP pass as server enviroment variable HTTP_X_REAL_IP
+    ...
+    upstream TestService { server 127.0.0.1:3000 fail_timeout=0; keepalive 1024; }
+    ...
+    server
+    {
+    server_name      anotherdimension.mooo.com;
+    listen           80;
+    listen           443 ssl;
+    root             /tmp;
+    proxy_redirect   off;
+    proxy_set_header Host      $host;
+    proxy_set_header X-Real-IP $remote_addr; # needed for real client IP pass as server enviroment variable HTTP_X_REAL_IP
 
-	    location /
-	    {
-	    fastcgi_param REMOTE_ADDR X-Real-IP;
-	    proxy_pass http://TestService;
-	    } 
-	}
+        location /
+        {
+        fastcgi_param REMOTE_ADDR X-Real-IP;
+        proxy_pass http://TestService;
+        } 
+    }
 
 
 
@@ -296,34 +283,34 @@ WantedBy=multi-user.target
 
 start the service
 
-	systemctl enable    testservice.service
-	systemctl cat       testservice
-	systemctl start     testservice
-	systemctl is-active testservice
-	systemctl status    testservice
-	journalctl -xelu    testservice | less
+    systemctl enable    testservice.service
+    systemctl cat       testservice
+    systemctl start     testservice
+    systemctl is-active testservice
+    systemctl status    testservice
+    journalctl -xelu    testservice | less
 
 delete the service
 
-	systemctl stop      testservice
-	systemctl disable   testservice.service
-	rm /usr/lib/systemd/system/testservice.service
+    systemctl stop      testservice
+    systemctl disable   testservice.service
+    rm /usr/lib/systemd/system/testservice.service
 
 start the application manual
 
-	cd /opt/TestService
+    cd /opt/TestService
 
-	# production
-	sudo -u dancer plackup --host 0.0.0.0 --port 3000 --server Starman --workers=5 --env production -a /opt/TestService/bin/app.psgi
+    # production
+    sudo -u dancer plackup --host 0.0.0.0 --port 3000 --server Starman --workers=5 --env production -a /opt/TestService/bin/app.psgi
 	
-	# development
-	sudo -u dancer plackup --host 0.0.0.0 --port 3000 --server HTTP::Server::PSGI --env development --Reload /opt/TestService/lib/TestService.pm,/opt/TestService/config.yml -a /opt/TestService/bin/app.psgi
-	sudo -u dancer plackup --host 0.0.0.0 --port 3000 --server HTTP::Server::PSGI --env development --Reload /opt/TestService/lib/TestService.pm,/opt/TestService/config.yml,/opt/Dancer2-Plugin-WebService/lib/Dancer2/Plugin/WebService.pm -a /opt/TestService/bin/app.psgi
+    # development
+    sudo -u dancer plackup --host 0.0.0.0 --port 3000 --server HTTP::Server::PSGI --env development --Reload /opt/TestService/lib/TestService.pm,/opt/TestService/config.yml -a /opt/TestService/bin/app.psgi
+    sudo -u dancer plackup --host 0.0.0.0 --port 3000 --server HTTP::Server::PSGI --env development --Reload /opt/TestService/lib/TestService.pm,/opt/TestService/config.yml,/opt/Dancer2-Plugin-WebService/lib/Dancer2/Plugin/WebService.pm -a /opt/TestService/bin/app.psgi
 
-	# without Plack
-	sudo -u dancer perl /opt/TestService/bin/app.psgi
+    # without Plack
+    sudo -u dancer perl /opt/TestService/bin/app.psgi
 
 quick test
 
-	ss -tln 'sport = :3000'
-	curl -X GET http://localhost:3000/WebService
+    ss -tln 'sport = :3000'
+    curl -X GET http://localhost:3000/WebService

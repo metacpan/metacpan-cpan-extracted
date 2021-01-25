@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000012';
+our $VERSION = '1.001000';
 
 use App::GHPT::Types qw( ArrayRef Bool PositiveInt Str );
 use App::GHPT::WorkSubmitter::AskPullRequestQuestions;
@@ -18,15 +18,15 @@ use WebService::PivotalTracker 0.10;
 with 'MooseX::Getopt::Dashes';
 
 has create_story => (
-    is  => 'ro',
-    isa => Bool,
+    is            => 'ro',
+    isa           => Bool,
     documentation =>
         'If true, will create a new story instead of finding an existing one.',
 );
 
 has project => (
-    is  => 'ro',
-    isa => Str,
+    is            => 'ro',
+    isa           => Str,
     documentation =>
         'The name of the PT project to search. This will be matched against the names of all the projects you have access to. By default, all projects will be searched.',
     default => sub {
@@ -35,9 +35,9 @@ has project => (
 );
 
 has base => (
-    is      => 'ro',
-    isa     => Str,
-    default => 'master',
+    is            => 'ro',
+    isa           => Str,
+    default       => 'master',
     documentation =>
         'The branch against which you want base the pull request. This defaults to master.',
 );
@@ -50,17 +50,17 @@ has dry_run => (
 );
 
 has requester => (
-    is      => 'ro',
-    isa     => Str,
-    default => q{},
+    is            => 'ro',
+    isa           => Str,
+    default       => q{},
     documentation =>
         q{When creating a story, this will be the requester. You can provide a substring of the person's name (case insensitive) and it will find them.},
 );
 
 has story_name => (
-    is      => 'ro',
-    isa     => Str,
-    default => q{},
+    is            => 'ro',
+    isa           => Str,
+    default       => q{},
     documentation =>
         'When creating a story, this is the name (title) to set.',
 );
@@ -90,10 +90,10 @@ has _username => (
 );
 
 has _pt_api => (
-    is      => 'ro',
-    isa     => 'WebService::PivotalTracker',
-    lazy    => 1,
-    builder => '_build_pt_api',
+    is            => 'ro',
+    isa           => 'WebService::PivotalTracker',
+    lazy          => 1,
+    builder       => '_build_pt_api',
     documentation =>
         'A WebService::PivotalTracker object built using $self->_pt_token',
 );
@@ -213,8 +213,10 @@ sub _append_question_answers ( $self, $text ) {
 
 ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _pt_token ($self) {
-    my $key = 'submit-work.pivotaltracker.token';
-    return $self->_config_val($key) // $self->_require_git_config($key);
+    my $env_key = 'PIVOTALTRACKER_TOKEN';
+    my $key     = 'submit-work.pivotaltracker.token';
+    return $ENV{$env_key} // $self->_config_val($key)
+        // $self->_require_git_config($key);
 }
 ## use critic
 
@@ -311,7 +313,10 @@ sub _filter_chores_and_maybe_warn_user ( $self, $stories ) {
 }
 
 sub _confirm_story ( $self, $text ) {
-    my $result = $self->_choose( [ 'Accept', 'Edit' ], { prompt => $text } );
+    my $result = $self->_choose(
+        [ 'Accept', 'Edit' ],
+        { prompt => $text, clear_screen => $ENV{'SUBMIT_WORK_CLEAR'} // 0 }
+    );
     return $text if $result eq 'Accept';
     my $fh = solicit($text);
     return do { local $/ = undef; <$fh> };
@@ -349,7 +354,7 @@ sub _create_pull_request ( $self, $text ) {
     );
 
     warn $err if $err;
-    exit 1 if $?;
+    exit 1    if $?;
 
     return $hub_output;
 }
@@ -374,7 +379,7 @@ sub _build_git_config ($self) {
     }
 
     return {
-        map { split /=/, $_, 2 }
+        map      { split /=/, $_, 2 }
             grep {/^submit-work/}
             ## no critic (BuiltinFunctions::ProhibitComplexMappings)
             map { chomp; $_ } @conf_values

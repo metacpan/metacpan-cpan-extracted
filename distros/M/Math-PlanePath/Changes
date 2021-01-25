@@ -1,4 +1,4 @@
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is part of Math-PlanePath.
 
@@ -15,6 +15,10 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
 
+
+Version 129, January 2021
+    - new CornerAlternating
+    - t/number-fraction.t avoid trouble with Number::Fraction 3.0.3
 
 Version 128, September 2020
     - new PeanoDiagonals

@@ -19,6 +19,7 @@ lib/App/TimeTracker/Constants.pm
 lib/App/TimeTracker/Data/Task.pm
 lib/App/TimeTracker/Proto.pm
 lib/App/TimeTracker/Utils.pm
+perltidyrc
 t/00-compile.t
 t/00-load.t
 t/Command/core.t

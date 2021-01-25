@@ -28,11 +28,14 @@
    "provides" : {
       "Tie::Hash::FixedKeys" : {
          "file" : "lib/Tie/Hash/FixedKeys.pm",
-         "version" : "v1.13.1"
+         "version" : "v1.13.2"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/tie-hash-fixedkeys/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -42,6 +45,6 @@
          "web" : "https://github.com/davorg/tie-hash-fixedkeys"
       }
    },
-   "version" : "v1.13.1",
+   "version" : "v1.13.2",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

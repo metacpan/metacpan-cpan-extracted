@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use Safe;		# Safe module, creates a compartment for eval's and tests for disabled commands
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 sub AUTOLOAD {
         my $self = shift;
@@ -59,6 +59,17 @@ sub _hide_passwords {
     return $string;
 }
 
+# Initialise the Safe compartment once
+# Operators can be listed as follows
+# perl -MOpcode=opdump -e 'opdump'
+#
+# http://search.cpan.org/~nwclark/perl-5.8.8/ext/Opcode/Opcode.pm
+#
+# We want to allow // m// s/// && || ! !~ != >= > == < <= =~ lt gt le ge ne eq not and or + - % * x .
+#
+my $cmp = new Safe;
+$cmp->permit_only( qw( :base_core :base_mem :base_loop print sprintf prtf padsv padav padhv padany localtime rv2gv ) );
+
 sub expand {
 	my $self = shift;
 	my $string = shift;
@@ -98,22 +109,17 @@ sub expand {
 		# Otherwise possible infinite loop
 		# though not sure why (see tests for examples)
 		#$string =~ s/\${$key}/$newval/;
-		$string =~ s/\$\{([\w\-\.\*:]+)\}/$newval/;
+        $string =~ s/\$\{([\w\-\.\*:]+)\}/$newval/;
+	}
 
+	# eval calculation performed within Safe for security
+	my $eval_re = qr/eval\s*{(.*?)}/;
+	while ( ($key) = ($string =~ /$eval_re/) ) {
+		my $eval_result = $cmp->reval($key) || '';
+		$string  =~ s/$eval_re/$eval_result/;
 	}
 	return $string;
 }
-
-# Initialise the Safe compartment once
-# Operators can be listed as follows
-# perl -MOpcode=opdump -e 'opdump'
-#
-# http://search.cpan.org/~nwclark/perl-5.8.8/ext/Opcode/Opcode.pm
-#
-# We want to allow // m// s/// && || ! !~ != >= > == < <= =~ lt gt le ge ne eq not and or + - % * x .
-#
-my $cmp = new Safe;
-$cmp->permit_only( qw( :base_core :base_mem :base_loop print sprintf prtf padsv padav padhv padany localtime rv2gv ) );
 
 sub eval {
 	my ($self, $string) = @_;
@@ -176,6 +182,36 @@ sub read {
 	}
 	$self->{packet} =~ s/\n*$//;
 	my @packet = split("\n", $self->{packet});
+	{
+		# Go through the array and look for lines that might be joinable.
+		# Assume multi-lines are surrounded by quotes, so only one quote
+		# character means join the next line onto the current one
+
+		# Work from a copy of the packet in case we decide to make no changes
+		my @copy_packet = @packet;
+		my @new_packet;
+		my $within_quotes=0;
+		# use defined here to allow blank lines through
+		while( defined( my $line = shift @copy_packet)) {
+			if($within_quotes) {
+				$new_packet[-1] .= "\n".$line;
+				my $quotes = $new_packet[-1] =~ tr/"/"/;
+				$within_quotes = 0 if( $quotes % 2 == 0 );
+				next;
+			}
+
+			push(@new_packet, $line);
+
+			{
+				my $quotes = $new_packet[-1] =~ tr/"/"/;
+				$within_quotes = 1 if( $quotes % 2 == 1 );
+			}
+		}
+
+		# Only rewrite the packet if it looks like we have correctly
+		# joined up all the lines
+		@packet=@new_packet if($within_quotes == 0 );
+	}
 	chomp($_ = shift @packet);
 	$self->hostname($_);
 	$self->{P}->[0] = $_;
@@ -193,7 +229,7 @@ sub read {
 	foreach $_ (@packet) {
 		$i++;
 		# Ignore spaces in middle
-		my ($key, $value) = /^([^ ]+) +([^ ].*)$/;
+		my ($key, $value) = /^([^ ]+) +([^ ].*)$/s;
 		# If syntax is wrong, ignore this line
 		next unless defined $key;
 		$key = $self->cleanup_string($key);
@@ -328,6 +364,13 @@ Any trailing linefeeds will be stripped.
 Apart from the first two lines, expects each line to be of the format: key value. If not, then will silently ignore
 the line.
 
+The value can be enclosed with double quotes and the quoted value may contain multiple lines
+
+  SNMPv2-SMI::enterprises.12345.1.1.1 = STRING: "
+  Alert Name: Multiple login failures detected
+  Current value: 10.0
+  Threshold: 2.0"
+
 If you want to use multiple packets within a stream, you have to put a marker in between
 each trap: "#---next trap---#\n". Then call SNMP::Trapinfo->new(*STDIN) again. Will receive an undef if 
 there are no more packets to read or the packet is malformed (such as no IP on the 2nd line).
@@ -432,6 +475,18 @@ this would return:
 
   Port 2 (ifType=ppp) is Up with message "PPP LCP Open"
 
+It is also possible to perform calculations between values within C<expand()>.  For example:
+
+  $result = $trap->expand('eval { ${V5} * ${V8} }');
+  $result = $trap->expand('eval { ${V10} * ${V9} / 100 }');
+  $result = $trap->expand('eval { sprintf("%.2f", ${V3} / ${V4} ) }');
+
+Invalid calculations will return empty strings.
+
+  $result = $trap->expand('eval{ ${V5} / 0 }');  # divide by zero
+  $result = $trap->expand('eval{ ${V10} * 1 }'); # where V10 is empty
+  $result = $trap->expand('eval{ ${V10  }');     # mismatched braces
+
 =item eval($string)
 
 $string is passed into expand to expand any macros. Then the entire string is eval'd.
@@ -477,7 +532,7 @@ Thanks to Brand Hilton for documentation suggestions and Rob Moss for integratin
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2014 Opsview Limited. All rights reserved
+Copyright (C) 2006-2021 Opsview Limited. All rights reserved
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

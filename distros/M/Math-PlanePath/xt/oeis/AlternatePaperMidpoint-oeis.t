@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013, 2015, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2013, 2015, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -22,7 +22,7 @@ use strict;
 use Math::BigInt try => 'GMP';
 use Math::PlanePath::AlternatePaperMidpoint;
 use Test;
-plan tests => 3;
+plan tests => 1;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -32,33 +32,8 @@ use MyOEIS;
 
 #------------------------------------------------------------------------------
 # A334576 -- X coordinate
-
-MyOEIS::compare_values
-  (anum => 'A334576',
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::AlternatePaperMidpoint->new;
-     my @got;
-     for (my $n = 0; @got < $count; $n++) {
-       my ($x,$y) = $path->n_to_xy($n);
-       push @got, $x;
-     }
-     return \@got;
-   });
-
 # A334577 -- Y coordinate
-MyOEIS::compare_values
-  (anum => 'A334577',
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::AlternatePaperMidpoint->new;
-     my @got;
-     for (my $n = 0; @got < $count; $n++) {
-       my ($x,$y) = $path->n_to_xy($n);
-       push @got, $y;
-     }
-     return \@got;
-   });
+# checked through PlanePathCoord
 
 # my(g=OEIS_bfile_gf("A334576")); x(n) = polcoeff(g,n);
 # my(g=OEIS_bfile_gf("A334577")); y(n) = polcoeff(g,n);

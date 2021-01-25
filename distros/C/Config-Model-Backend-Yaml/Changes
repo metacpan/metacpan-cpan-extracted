@@ -1,3 +1,9 @@
+2.134 2021-01-22
+
+  * fail test if object can be loaded with YAML
+  * use new style of model_test spec
+    (tests require Config::Model::Tester 4.001)
+
 2.133 2018-12-29
 
   * fix read/write of UTF-8 data

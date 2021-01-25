@@ -1,0 +1,122 @@
+=head1 NAME
+
+Wireguard::WGmeta::Index - A toolkit to manage Wireguard configurations.
+
+=head1 DESCRIPTION
+
+An approach to add metadata to the main wireguard config, written in Perl.
+
+=head1 HIGHLIGHTS
+
+=over 1
+
+=item *
+
+Compatible with your existing setup (no configuration changes needed).
+
+=item *
+
+A CLI interface with abilities to I<set>, I<enable>, I<disable> and I<apply> your wireguard config(s).
+
+=item *
+
+A fancy C<show> output which combines the meta-data, running-config and static-configs
+
+=item *
+
+Modular structure: The whole parser is independent of the CLI module - and can be used as a standalone library.
+
+=item *
+
+The config parser/writer and as well as the C<wg show dump> parser are independent too.
+For more info, please refer to L<Wireguard::WGmeta::Wrapper::Config> and L<Wireguard::WGmeta::Wrapper::Show>
+
+=item *
+
+No external dependencies, runs on plain Perl (>=v5.20)!
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 1
+
+=item *
+
+B<WIREGUARD_HOME>: Directory containing the Wireguard configuration -> Make sure the path ends with a `/`. Defaults to I</etc/wireguard/>.
+
+=item *
+
+B<IS_TESTING>: When defined, it has the following effects:
+
+=over 2
+
+=item *
+
+No external commands are run, all data required is obtained from C<t/test_data>. Also very useful for developing
+
+=item *
+
+<Commands::Set|Enable|Disable> omits the header of the generated configuration files.
+
+=item *
+
+Line of code is shown for warnings and errors.
+
+=back
+
+=item *
+
+B<WG_NO_COLOR>: If defined, the show command does not prettify the output with colors.
+
+=back
+
+=head1 TECH DOCUMENTATION
+
+=over
+
+=item *
+
+L<Wireguard::WGmeta::Cli::Router> - Entry point for the CLI
+
+=item *
+
+L<Wireguard::WGmeta::Wrapper::Config> - Class for reading/writing and modifying wireguard configurations and as well handle metadata.
+
+=item *
+
+L<Wireguard::WGmeta::Wrapper::Show> - Class for parsing the output of C<wg show dump>
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+S<Tobias Bossert E<lt>tobib at cpan.orgE<gt>>
+
+=head1 COPYRIGHT AND LICENSE
+
+MIT License
+
+Copyright (c) 2020 Tobias Bossert
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+

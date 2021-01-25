@@ -1,7 +1,7 @@
 package App::TimeTracker::Proto;
 
 # ABSTRACT: App::TimeTracker Proto Class
-our $VERSION = '3.008'; # VERSION
+our $VERSION = '3.009'; # VERSION
 
 use strict;
 use warnings;
@@ -271,7 +271,7 @@ App::TimeTracker::Proto - App::TimeTracker Proto Class
 
 =head1 VERSION
 
-version 3.008
+version 3.009
 
 =head1 DESCRIPTION
 

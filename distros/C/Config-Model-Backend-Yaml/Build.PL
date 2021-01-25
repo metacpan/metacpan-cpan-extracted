@@ -25,8 +25,7 @@ my $build = Module::Build->new(
     dist_author   => 'Dominique Dumont (ddumont at cpan dot org)',
 
   'build_requires' => {
-    'Config::Model::BackendMgr' => '0',
-    'Config::Model::Tester' => '3.006',
+    'Config::Model::Tester' => '4.001',
     'Config::Model::Tester::Setup' => '0',
     'ExtUtils::testlib' => '0',
     'Module::Build' => '0.34',

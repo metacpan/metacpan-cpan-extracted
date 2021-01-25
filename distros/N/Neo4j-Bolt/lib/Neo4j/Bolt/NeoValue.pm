@@ -1,7 +1,7 @@
 package Neo4j::Bolt::NeoValue;
 
 BEGIN {
-  our $VERSION = "0.4200";
+  our $VERSION = "0.4201";
   require Neo4j::Bolt::CTypeHandlers;
   require Neo4j::Bolt::CResultStream;
   require XSLoader;
@@ -97,7 +97,7 @@ Class method. Syntactic sugar; runs L</"_as_perl()"> on the arguments.
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2020 by Mark A. Jensen.
+This software is Copyright (c) 2019-2021 by Mark A. Jensen.
 
 This is free software, licensed under:
 

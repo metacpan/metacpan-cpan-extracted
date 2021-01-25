@@ -1,0 +1,48 @@
+=encoding utf-8
+
+=head1 NAME
+
+Apache2::SSI::Datetime - Apache2 SSI Datetime Wrapper
+
+=head1 SYNOPSIS
+
+    my $finfo = Apache2::SSI::Finfo->new( '/some/file/path/file.txt', apache_request => $r ) ||
+    die( Apache2::SSI::Finfo->error );
+    # File modification time as a Datetime object
+    my $mtime = $finfo->mtime;
+    if( $mtime == $other_object_or_epoch_value )
+    {
+        # Do something
+    }
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+L<Apache2::SSI::Datetime> is a thin wrapper around L<Datetime> to allow Datetime objects to be comparable.
+
+When created, L<Apache2::SSI::Datetime> objects default to an epoch time value when stringified and can be used in comparison.
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+CPAN ID: jdeguest
+
+L<https://git.deguest.jp/jack/Apache2-SSI>
+
+=head1 SEE ALSO
+
+L<Apache2::SSI::Finfo>, L<Apache2::SSI>, L<Datetime>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

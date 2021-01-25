@@ -1,9 +1,9 @@
 package Module::List::More;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-22'; # DATE
+our $DATE = '2020-12-22'; # DATE
 our $DIST = 'Module-List-More'; # DIST
-our $VERSION = '0.004009'; # VERSION
+our $VERSION = '0.004010'; # VERSION
 
 #IFUNBUILT
 # # use strict 'subs', 'vars';
@@ -242,7 +242,7 @@ Module::List::More - Module::List, with more options
 
 =head1 VERSION
 
-This document describes version 0.004009 of Module::List::More (from Perl distribution Module-List-More), released on 2020-09-22.
+This document describes version 0.004010 of Module::List::More (from Perl distribution Module-List-More), released on 2020-12-22.
 
 =head1 SYNOPSIS
 
@@ -317,7 +317,8 @@ C<'undef'>) is returned.
 
 This boolean option can be set to true to recognize wildcard pattern in prefix.
 Wildcard patterns such as jokers (C<?>, C<*>, C<**>), classes (C<[a-z]>), as
-well as braces (C<{One,Two}>) are supported. C<**> implies recursive listing.
+well as braces (C<{One,Two}>) are supported. C<**> implies recursive listing
+(sets C<recurse> option to 1).
 
 Examples:
 
@@ -380,7 +381,7 @@ Source repository is at L<https://github.com/perlancar/perl-Module-List-More>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-List-More>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Module-List-More/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -392,7 +393,9 @@ L<Module::List>
 
 L<Module::List::Tiny>
 
-L<Module::List::Wildcard>
+L<Module::List::Wildcard> is spun off from this module with the main feature of
+wildcard. I might deprecate one of the modules in the future, but currently I
+maintain both.
 
 =head1 AUTHOR
 

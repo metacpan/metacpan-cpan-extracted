@@ -1,7 +1,7 @@
 package App::TimeTracker;
 
 # ABSTRACT: time tracking for impatient and lazy command line lovers
-our $VERSION = '3.008'; # VERSION
+our $VERSION = '3.009'; # VERSION
 
 use strict;
 use warnings;
@@ -307,7 +307,7 @@ App::TimeTracker - time tracking for impatient and lazy command line lovers
 
 =head1 VERSION
 
-version 3.008
+version 3.009
 
 =head1 SYNOPSIS
 
@@ -452,7 +452,7 @@ L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-TimeTracker>
 
 =head1 CONTRIBUTORS
 
-Maros Kollar, Klaus Ita, Yanick Champoux, Lukas Rampa, David Schmidt, Michael Kröll, Thomas Sibley, Nelo Onyiah, Jozef Kutej, Roland Lammel, Ruslan Zakirov, Kartik Thakore, Tokuhiro Matsuno, Paul Cochrane, David Provost, Mohammad S Anwar, Håkon Hægland
+Maros Kollar, Klaus Ita, Yanick Champoux, Lukas Rampa, David Schmidt, Michael Kröll, Thomas Sibley, Nelo Onyiah, Jozef Kutej, Roland Lammel, Ruslan Zakirov, Kartik Thakore, Tokuhiro Matsuno, Paul Cochrane, David Provost, Mohammad S Anwar, Håkon Hægland, Thomas Mantl
 
 =head1 AUTHOR
 

@@ -17,7 +17,8 @@ sub idle_cb {
 
 my $idle = UV::Idle->new(on_idle => \&idle_cb);
 isa_ok($idle, 'UV::Idle');
-is($idle->start(), 0, 'idle run success');
+$idle->start();
+
 is(UV::Loop->default()->run(), 0, 'Default loop ran');
 
 is($idle_cb_called, 1, "The Idle callback was run");

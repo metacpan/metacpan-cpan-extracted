@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -47,7 +47,7 @@ use List::Util 'min';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -769,12 +769,16 @@ L<http://oeis.org/A318438> (etc)
       A318439    Y coordinate
       A318479    norm X^2 + Y^2
       A066321    N on X>=0 axis, or N/2 of North-West diagonal
-      A271472      and in binary
-      A066322    diffs (N at X=16k+4) - (N at X=16k+3)
-      A066323    N on X axis, number of 1 bits
+      A271472      same in binary
+      A066323      number of 1 bits
+      A256441    N on negative X axis, X<=0
+      A073791    X axis X sorted by N
+      A320283    Y axis Y sorted by N
+
       A137426    dX/2 at N=2^(k+2)-1
                    dY at N=2^k-1   (step to next replication level)
-      A256441    N on negative X axis, X<=0
+      A066322    diffs (N at X=16k+4) - (N at X=16k+3)
+      A340566    permutation N by diagonals +/-
 
       A003476    boundary length / 2
                    recurrence a(n) = a(n-1) + 2*a(n-3)
@@ -803,7 +807,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

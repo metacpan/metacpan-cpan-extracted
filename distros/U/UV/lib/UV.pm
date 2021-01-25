@@ -1,14 +1,12 @@
 package UV;
 
-our $VERSION = '1.000009';
+our $VERSION = '1.903';
 our $XS_VERSION = $VERSION;
 
 use strict;
 use warnings;
 use Carp ();
 use Exporter qw(import);
-use Math::Int64 ();
-use XS::Object::Magic ();
 require XSLoader;
 XSLoader::load('UV', $XS_VERSION);
 
@@ -68,9 +66,37 @@ sub prepare {
     return UV::Prepare->new(@_);
 }
 
+sub signal {
+    require UV::Signal;
+    return UV::Signal->new(@_);
+}
+
+sub tcp {
+    require UV::TCP;
+    return UV::TCP->new(@_);
+}
+
 sub timer {
     require UV::Timer;
     return UV::Timer->new(@_);
+}
+
+sub tty {
+    require UV::TTY;
+    return UV::TTY->new(@_);
+}
+
+sub udp {
+    require UV::UDP;
+    return UV::UDP->new(@_);
+}
+
+{
+    package UV::Exception;
+
+    use overload
+        '""' => sub { $_[0]->message },
+        fallback => 1;
 }
 
 1;
@@ -515,6 +541,15 @@ Returns a new L<UV::Poll> Handle object.
 
 Returns a new L<UV::Prepare> Handle object.
 
+=head2 signal
+
+    my $handle = UV::signal(POSIX::SIGHUP); # uses the default loop
+
+    my $handle = UV::signal(loop => $some_other_loop, signal => POSIX::SIGHUP);
+        # non-default loop
+
+Returns a new L<UV::Signal> Handle object.
+
 =head2 strerror
 
     my $error = UV::strerror(UV::UV_EAI_BADFLAGS);
@@ -531,12 +566,30 @@ number will imply an error.
 When a function which takes a callback returns an error, the callback will
 never be called.
 
+=head2 tcp
+
+    my $tcp = UV::tcp();
+
+Returns a new L<UV::TCP> object.
+
 =head2 timer
 
     my $timer = UV::timer(); # uses the default loop
     my $timer = UV::timer(loop => $some_other_loop); # non-default loop
 
 Returns a new L<UV::Timer> object.
+
+=head2 tty
+
+    my $tty = UV::tty(fd => 0);
+
+Returns a new L<UV::TTY> object.
+
+=head2 udp
+
+    my $udp = UV::udp();
+
+Returns a new L<UV::UDP> object.
 
 =head2 version
 
@@ -555,6 +608,37 @@ significant bits. E.g. for libuv 1.2.3 this would be C<0x010203>.
 The L<version_string|http://docs.libuv.org/en/v1.x/version.html#c.uv_version_string>
 function returns the libuv version number as a string. For non-release versions
 the version suffix is included.
+
+=head1 EXCEPTIONS
+
+If any call to F<libuv> fails, an exception will be thrown. The exception will
+be a blessed object having a C<code> method which returns the numerical error
+code (which can be compared to one of the C<UV::UV_E*> error constants), and a
+C<message> method which returns a human-readable string describing the failure.
+
+    try { ... }
+    catch my $e {
+        if(blessed $e and $e->isa("UV::Exception")) {
+            print "The failure was ", $e->message, " of code ", $e->code;
+        }
+    }
+
+The exception class provides stringify overload to call the C<message> method,
+so the normal Perl behaviour of just printing the exception will print the
+message from it, as expected.
+
+Exceptions are blessed into a subclass of C<UV::Exception> named after the
+type of the failure code. This allows type-based testing of error types.
+
+    try { ... }
+    catch my $e {
+        if(blessed $e and $e->isa("UV::Exception::ECANCELED") {
+            # ignore
+        }
+        else ...
+    }
+
+=cut
 
 =head1 AUTHOR
 

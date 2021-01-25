@@ -1,0 +1,10 @@
+Revision history for Feature-Compat-Try
+
+0.02    2021-01-23
+        [CHANGES]
+         * Attempt to `use feature 'try';` to see if core perl supports the
+           feature natively. For use when testing
+             https://github.com/Perl/perl5/tree/leonerd/feature-try
+
+0.01    2021-01-22
+        First version, released on an unsuspecting world.

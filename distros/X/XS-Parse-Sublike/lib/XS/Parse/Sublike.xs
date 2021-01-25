@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -180,7 +180,7 @@ static int parse2(pTHX_
   SvREFCNT_inc(PL_compcv);
 
 #ifdef HAVE_PARSE_SUBSIGNATURE
-  if(sigop) {
+  if(ctx.body && sigop) {
     /* parse_block() returns an empy block as a stub op.
      * no need to keep that if we we have a signature.
      */

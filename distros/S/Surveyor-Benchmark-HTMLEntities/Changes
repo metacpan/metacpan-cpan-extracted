@@ -1,5 +1,8 @@
 Revision history for Perl module Surveyor::Benchmark::HTMLEntities
 
+1.022 2021-01-23T20:15:23Z
+	* freshen distro, dump Travis CI, add Github Actions
+
 1.021 2018-05-24T14:46:30Z
 	* Change to the Artistic License 2.0
 

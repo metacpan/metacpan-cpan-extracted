@@ -1,6 +1,15 @@
+1.001000 2021-01-19
+
+- Support retrieving the Pivotal Tracker token from the environment variable
+  PIVOTALTRACKER_TOKEN. If set, the variable takes precedence over the value in
+  the Git config.
+- You may now set SUBMIT_WORK_CLEAR to clear the screen between questions.
+
+
 1.000012 2019-06-17
 
 - Add feature to create simple stories. Written by Narsimham Chelluri.
+
 
 1.000011 2019-06-12
 

@@ -1,6 +1,5 @@
 use Test::More;
 use Test::Exception;
-use Module::Build;
 use Neo4j::Client;
 use lib '..';
 use blib;
@@ -10,22 +9,6 @@ use Fcntl;
 use File::Spec;
 use Neo4j::Bolt;
 use Neo4j::Bolt::NeoValue;
-
-BEGIN {
-  my $build;
-  try {
-    $build = Module::Build->current();
-  } catch {
-    my $d = getcwd;
-    chdir '..';
-    $build = Module::Build->current();
-    chdir $d;
-  };
-
-  unless (defined $build) {
-    plan skip_all => "No build context. Run tests with ./Build test.";
-  }
-}
 
 use t::BoltFile;
 

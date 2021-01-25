@@ -1,10 +1,10 @@
 {
    "abstract" : "Interact with the North American Derivatives Exchange",
    "author" : [
-      "mhandisi <mhandisi@cpan.org>"
+      "Mtu Mzuri <mhandisi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.142060",
    "license" : [
       "unknown"
    ],
@@ -32,15 +32,10 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON" : "0",
-            "LWP::Protocol::https" : "0",
-            "LWP::UserAgent" : "0",
-            "Test::Exception" : "0",
-            "Test::LWP::UserAgent" : "0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.06"
+   "version" : "0.08"
 }

@@ -1,18 +1,16 @@
 #
 # This file is part of Config-Model-Approx
 #
-# This software is Copyright (c) 2015-2018 by Dominique Dumont.
+# This software is Copyright (c) 2015-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
+use strict;
+use warnings;
 
-$model_to_test = "Approx" ;
-$conf_file_name = 'approx.conf';
-$conf_dir = '/etc/approx' ;
-
-@tests = (
+my @tests = (
     {
         name => 'basic' ,
         check => {
@@ -25,4 +23,9 @@ $conf_dir = '/etc/approx' ;
     },
 );
 
-1;
+return {
+    model_to_test => "Approx" ,
+    conf_file_name => 'approx.conf',
+    conf_dir => '/etc/approx',
+    tests => \@tests
+};

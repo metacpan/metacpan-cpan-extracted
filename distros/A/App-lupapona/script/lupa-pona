@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright (C) 2017–2020  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2017–2021  Alex Schroeder <alex@gnu.org>
 
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -208,14 +208,12 @@ if (not -f $key_file or not -f $cert_file) {
   my $hostname = <STDIN>;
   alarm(0);  # done, no more alarm
   chomp $hostname;
+  die "Some other day.\n" unless $hostname;
   die "The hostname may not contain any whitespace\n" if $hostname =~ /\s/;
   my $cmd = qq(openssl req -new -x509 -newkey ec -subj "/CN=$hostname" )
       . qq(-pkeyopt ec_paramgen_curve:prime256v1 -days 1825 -nodes -out cert.pem -keyout key.pem);
-  if ($hostname) {
-    say "$cmd ";
-    system($cmd) == 0
-      or die "openssl failed: $?";
-  }
+  say "$cmd ";
+  system($cmd) == 0 or die "openssl failed: $?";
 }
 
 Mojo::IOLoop->server(
@@ -255,7 +253,7 @@ sub serve_gemini {
       next if $_ eq $cert_file;
       next if $_ eq $key_file;
       next if /~$/; # Emacs backup files
-      $stream->write("=> $_") if -f;
+      $stream->write("=> $_\n") if -f;
     }
   } elsif ($path eq "/$cert_file" or $path eq "/$key_file") {
     $stream->write("50 Forbidden\n");

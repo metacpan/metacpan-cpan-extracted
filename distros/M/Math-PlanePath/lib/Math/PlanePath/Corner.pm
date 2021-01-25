@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -16,7 +16,7 @@
 # with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# cf Matthew Szudzik ElegantPairing.pdf going inwardly.
+# cf Matthew Szudzik http://www.szudzik.com/ElegantPairing.pdf going inwardly:
 #
 #   5 | 25--...
 #     |
@@ -26,24 +26,18 @@
 #     |              |   |
 #   2 |  4-- 5   8  14  22
 #     |          |   |   |
-#   1 |  1   4   7  13  21
+#   1 |  1   3   7  13  21
 #     |      |   |   |   |
 # Y=0 |  0   2   6  12  20
 #     +---------------------
 #      X=0   1   2   3   4
+# not in OEIS: 0, 1,2,  4,3,6, 9,5,7,12, 16,10,8,13,20 
+# not in OEIS: 1, 2,3,  5,4,7, 10,6,8,13, 17,11,9,14,21
+# one-based: 1, 3,2,  7,4,5, 13,8,6,10  = A108644
 #
 # cf A185728 where diagonal is last in each gnomon
 #    A185725 gnomon sides alternately starting from ends
 #    A185726 gnomon sides alternately starting from diagonal
-#
-# corner going alternately up and down
-#    A081344,A194280 by diagonals
-#    A081345 X axis, A081346 Y axis
-#
-# corner alternately up and down, starting with 3-wide
-#   A080335  N on diagonal
-#   A081347  N on axis
-#   A081348  N on axis
 #
 # cf A004120 ??
 #
@@ -51,8 +45,8 @@
 # corners alternating "shell"
 #
 # A319514 interleaved x,y
-# my(g=OEIS_bfile_gf("A319289")); x(n) = polcoeff(g,n);
-# my(g=OEIS_bfile_gf("A319290")); y(n) = polcoeff(g,n);
+# x=OEIS_bfile_func("A319289");
+# y=OEIS_bfile_func("A319290");
 # plothraw(vector(3^3,n,n--; x(n)), \
 #          vector(3^3,n,n--; y(n)), 1+8+16+32)
 
@@ -64,7 +58,7 @@ use strict;
 use List::Util 'min';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
 @ISA = ('Math::PlanePath');
@@ -473,7 +467,7 @@ to start at 0,
           -----------------
            X=0   1   2   3
 
-In Nstart=0 the squares are on the Y axis and the pronic numbers are on the
+In Nstart=0, the squares are on the Y axis and the pronic numbers are on the
 X=Y leading diagonal.
 
 =head1 FUNCTIONS
@@ -631,7 +625,6 @@ the top right corner otherwise.
     min N at Xmin,Ymin            if Ymin >= Xmin
              Xmin,min(Xmin,Ymax)  if Ymin <= Xmin
 
-
 =head1 OEIS
 
 This path is in Sloane's Online Encyclopedia of Integer Sequences as,
@@ -680,6 +673,8 @@ L<http://oeis.org/A196199> (etc)
     wider=1, n_start=2
       A014206    N on Y axis, pronic+2
 
+    wider=2, n_start=1
+      A028387    N on X=Y diagonal, k*(k+3) + 1
     wider=2, n_start=0
       A005563    N on Y axis, (Y+1)^2-1
       A028552    N on X=Y diagonal, k*(k+3)
@@ -701,7 +696,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

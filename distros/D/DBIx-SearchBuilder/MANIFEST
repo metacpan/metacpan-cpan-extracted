@@ -56,6 +56,7 @@ t/03cud_from_select.t
 t/03rebless.t
 t/03transactions.t
 t/03versions.t
+t/04mysql_identifier_quoting.t
 t/10schema.t
 t/11schema_records.t
 t/20set_edge_cases.t

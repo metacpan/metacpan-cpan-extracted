@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Opsview::RestAPI::Exception;
-$Opsview::RestAPI::Exception::VERSION = '1.191660';
+$Opsview::RestAPI::Exception::VERSION = '1.210250';
 # ABSTRACT: Opsview::RestAPI Exception object
 
 
@@ -53,7 +53,8 @@ sub http_code {
 
 sub as_string {
     my $self = shift;
-    return sprintf( "%s at %s line %s.\n",
+
+    return sprintf( "Error: %s at %s line %s.\n",
         $self->message, $self->path, $self->line );
 }
 
@@ -72,7 +73,7 @@ Opsview::RestAPI::Exception - Opsview::RestAPI Exception object
 
 =head1 VERSION
 
-version 1.191660
+version 1.210250
 
 =head1 SYNOPSIS
 

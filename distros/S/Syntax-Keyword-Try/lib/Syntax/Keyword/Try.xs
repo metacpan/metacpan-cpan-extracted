@@ -444,6 +444,8 @@ static int try_keyword(pTHX_ OP **op)
   try = parse_scoped_block(0);
   lex_read_space(0);
 
+  bool require_var = hints && hv_fetchs(hints, "Syntax::Keyword::Try/require_var", 0);
+
   while(lex_consume("catch")) {
     OP *assignop = NULL, *condop = NULL;
     OP *body;
@@ -514,6 +516,9 @@ static int try_keyword(pTHX_ OP **op)
 
       intro_my();
     }
+    else if(require_var) {
+      croak("Expected (VAR) for catch");
+    }
 
     body = block_end(save_ix, parse_block(0));
     lex_read_space(0);
@@ -554,8 +559,9 @@ static int try_keyword(pTHX_ OP **op)
     SvREFCNT_dec(condcatch);
   }
 
-  if(!hv_fetchs(hints, "Syntax::Keyword::Try/no_finally", 0) &&
-     lex_consume("finally")) {
+  bool no_finally = hints && hv_fetchs(hints, "Syntax::Keyword::Try/no_finally", 0);
+
+  if(!no_finally && lex_consume("finally")) {
     I32 floor_ix, save_ix;
     OP *body;
 
@@ -581,7 +587,9 @@ static int try_keyword(pTHX_ OP **op)
 
   if(!catch && !finally) {
     op_free(try);
-    croak("Expected try {} to be followed by either catch {} or finally {}");
+    croak(no_finally
+      ? "Expected try {} to be followed by catch {}"
+      : "Expected try {} to be followed by either catch {} or finally {}");
   }
 
   ret = try;

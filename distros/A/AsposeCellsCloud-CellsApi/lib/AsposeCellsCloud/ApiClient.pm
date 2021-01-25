@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2020 Aspose.Cells Cloud
+Copyright (c) 2021 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -74,11 +74,12 @@ sub new {
 sub need_auth{
     my ($self) = @_;
     
-    if( $self->{config}->{app_sid}  ||  $self->{config}->{app_key} ) {
+    if( $self->{config}->{client_id}  ||  $self->{config}->{client_secret} ) {
         return 1;
     }
     return  0;
 }
+
 # Set the user agent of the API client
 #
 # @param string $user_agent The user agent of the API client
@@ -180,7 +181,7 @@ sub check_access_token {
             return;
         }
     }
-    my $access_token  =  $self->o_auth_post('grant_type' => "client_credentials", 'client_id' => $self->{config}->{app_sid}, 'client_secret' =>$self->{config}->{app_key})->access_token;
+    my $access_token  =  $self->o_auth_post('grant_type' => "client_credentials", 'client_id' => $self->{config}->{client_id}, 'client_secret' =>$self->{config}->{client_secret})->access_token;
     $self->{config}->{access_token} = $access_token;
 }
 
@@ -464,9 +465,9 @@ sub get_api_key_with_prefix
 # @param array $authSettings array of authentication scheme (e.g ['api_key'])
 sub update_params_for_auth {
     my ($self, $header_params, $query_params, $auth_settings) = @_;
-    if(!$self->need_auth()){
+	if(!$self->need_auth()){
         return;
-    }
+    }    
     return $self->_global_auth_setup($header_params, $query_params) 
     	unless $auth_settings && @$auth_settings;
   
@@ -508,7 +509,7 @@ elsif ($auth eq 'signature') {
 # auth tokens and if we find any, we use them for all endpoints; 
 sub _global_auth_setup {
 	my ($self, $header_params, $query_params) = @_; 
-	
+
 	my $tokens = $self->{config}->get_tokens;
 	return unless keys %$tokens;
 	
@@ -518,10 +519,10 @@ sub _global_auth_setup {
 		$header_params->{'Authorization'} = 'Basic '.encode_base64($uname.":".$pword);
 	}
 	# sid key
-	if (my $app_sid = delete $tokens->{app_sid}) {
-		my $app_key = delete $tokens->{app_key};
-		$query_params->{'app_sid'} = $app_sid;
-        $query_params->{'app_key'} = $app_key;
+	if (my $client_id = delete $tokens->{client_id}) {
+		my $client_secret = delete $tokens->{client_secret};
+		$query_params->{'client_id'} = $client_id;
+        $query_params->{'client_secret'} = $client_secret;
 	}
 	
 	# oauth

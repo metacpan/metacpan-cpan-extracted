@@ -23,6 +23,9 @@ my $build = Module::Build->new(
                                url  => 'git://github.com/davorg/tie-hash-regex.git',
                                web  => 'https://github.com/davorg/tie-hash-regex',
                         },
+                        bugtracker => {
+                               web  => 'https://github.com/davorg/tie-hash-regex/issues',
+                        },
                 },
         },
 );

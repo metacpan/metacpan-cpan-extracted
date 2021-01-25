@@ -34,6 +34,7 @@ lib/App/cpm/Worker/Installer.pm
 lib/App/cpm/Worker/Installer/Menlo.pm
 lib/App/cpm/Worker/Installer/Prebuilt.pm
 lib/App/cpm/Worker/Resolver.pm
+lib/App/cpm/file.pm
 lib/App/cpm/version.pm
 script/cpm
 t/basic.t

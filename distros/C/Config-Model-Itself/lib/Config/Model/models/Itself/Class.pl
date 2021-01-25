@@ -438,6 +438,20 @@ return [
                 }
             },
 
+            quote_value => {
+                type       => 'leaf',
+                value_type => 'enum',
+                choice => ['shell_style'],
+                level      => 'hidden',
+                description => 'Specify how to handle quoted values. By default, quoted values '
+                .'are left as is. With C<shell_style>, value are parsed and unquoted like in a shell. '
+                .'Values containing a space are written back with double quotes.',
+                warp => {
+                    follow => '- backend',
+                    rules  => [ IniFile => { level => 'normal', } ],
+                }
+            },
+
             'auto_delete' => {
                 type             => 'leaf',
                 value_type       => 'boolean',

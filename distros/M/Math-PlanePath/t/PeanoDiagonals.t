@@ -33,7 +33,7 @@ use Math::PlanePath::PeanoDiagonals;
 # VERSION
 
 {
-  my $want_version = 128;
+  my $want_version = 129;
   ok ($Math::PlanePath::PeanoDiagonals::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::PeanoDiagonals->VERSION,  $want_version,

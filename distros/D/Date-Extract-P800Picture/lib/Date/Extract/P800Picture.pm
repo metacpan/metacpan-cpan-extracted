@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2008-2020, Roland van Ipenburg
-package Date::Extract::P800Picture v1.1.5;
+package Date::Extract::P800Picture v1.1.6;
 
 use strict;
 use warnings;
@@ -130,7 +130,7 @@ Date::Extract::P800Picture - extract the date from Sony Ericsson P800 pictures
 
 =head1 VERSION
 
-This document describes Date::Extract::P800Picture version C<v1.1.5>.
+This document describes Date::Extract::P800Picture version C<v1.1.6>.
 
 =head1 SYNOPSIS
 

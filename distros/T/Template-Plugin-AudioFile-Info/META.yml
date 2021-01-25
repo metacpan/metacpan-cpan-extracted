@@ -15,13 +15,14 @@ name: Template-Plugin-AudioFile-Info
 provides:
   Template::Plugin::AudioFile::Info:
     file: lib/Template/Plugin/AudioFile/Info.pm
-    version: v2.0.1
+    version: v2.0.2
 requires:
   AudioFile::Info: '2.000001'
   Template: '0'
   perl: v5.6.0
 resources:
+  bugtracker: https://github.com/davorg/template-plugin-audiofile-info/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/davorg/template-plugin-audiofile-info.git
-version: v2.0.1
+version: v2.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

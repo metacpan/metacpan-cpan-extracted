@@ -13,10 +13,9 @@ skip_all('XML::Feed') if $@;
 my $file = abs_path( -d 't' ? 't/xml' : 'xml' );
 $file .= '/example.rdf';   
 
-local *RSS;
-open RSS, $file or die "Can't open $file: $!";
-my $data = join "" => <RSS>;
-close RSS;
+open my $rss_fh, '<', $file or die "Can't open $file: $!";
+my $data = do { local $/; <$rss_fh> };
+close $rss_fh;
 
 test_expect(\*DATA, undef, { 'newsfile' => $file, 'newsdata' => \$data });
 

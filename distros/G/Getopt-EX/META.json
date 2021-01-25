@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -57,45 +57,45 @@
    "provides" : {
       "Getopt::EX" : {
          "file" : "lib/Getopt/EX.pm",
-         "version" : "v1.21.1"
+         "version" : "v1.22.0"
       },
       "Getopt::EX::Colormap" : {
          "file" : "lib/Getopt/EX/Colormap.pm",
-         "version" : "v1.21.1"
+         "version" : "v1.22.0"
       },
       "Getopt::EX::Func" : {
          "file" : "lib/Getopt/EX/Func.pm",
-         "version" : "v1.21.1"
+         "version" : "v1.22.0"
       },
       "Getopt::EX::LabeledParam" : {
          "file" : "lib/Getopt/EX/LabeledParam.pm",
-         "version" : "v1.21.1"
+         "version" : "v1.22.0"
       },
       "Getopt::EX::Loader" : {
          "file" : "lib/Getopt/EX/Loader.pm",
-         "version" : "v1.21.1"
+         "version" : "v1.22.0"
       },
       "Getopt::EX::Long" : {
          "file" : "lib/Getopt/EX/Long.pm",
-         "version" : "v1.21.1"
+         "version" : "v1.22.0"
       },
       "Getopt::EX::Long::Parser" : {
          "file" : "lib/Getopt/EX/Long.pm"
       },
       "Getopt::EX::Module" : {
          "file" : "lib/Getopt/EX/Module.pm",
-         "version" : "v1.21.1"
+         "version" : "v1.22.0"
       },
       "Getopt::EX::Numbers" : {
          "file" : "lib/Getopt/EX/Numbers.pm",
-         "version" : "v1.21.1"
+         "version" : "v1.22.0"
       },
       "Getopt::EX::ToggleValue" : {
          "file" : "lib/Getopt/EX/Util.pm"
       },
       "Getopt::EX::Util" : {
          "file" : "lib/Getopt/EX/Util.pm",
-         "version" : "v1.21.1"
+         "version" : "v1.22.0"
       }
    },
    "release_status" : "stable",
@@ -109,7 +109,7 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX"
       }
    },
-   "version" : "v1.21.1",
+   "version" : "v1.22.0",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <utashiro@cpan.org>"

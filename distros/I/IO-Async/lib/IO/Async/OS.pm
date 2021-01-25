@@ -8,7 +8,7 @@ package IO::Async::OS;
 use strict;
 use warnings;
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 our @ISA = qw( IO::Async::OS::_Base );
 
@@ -526,6 +526,43 @@ sub _extract_addrinfo_unix
 =back
 
 =cut
+
+=head2 make_addr_for_peer
+
+   $connectaddr = IO::Async::OS->make_addr_for_peer( $family, $listenaddr )
+
+Given the C<sockdomain> and C<sockname> of a listening socket. creates an
+address suitable to C<connect()> to it.
+
+This method will handle specially any C<AF_INET> address bound to
+C<INADDR_ANY> or any C<AF_INET6> address bound to C<IN6ADDR_ANY>, as some OSes
+do not allow C<connect(2)>ing to those and would instead insist on receiving
+C<INADDR_LOOPBACK> or C<IN6ADDR_LOOPBACK> respectively.
+
+This method is used by the C<< ->connect( peer => $sock ) >> parameter of
+handle and loop connect methods.
+
+=cut
+
+sub make_addr_for_peer
+{
+   shift;
+   my ( $p_family, $p_addr ) = @_;
+
+   if( $p_family == Socket::AF_INET ) {
+      my @params = Socket::unpack_sockaddr_in $p_addr;
+      $params[1] = Socket::INADDR_LOOPBACK if $params[1] eq Socket::INADDR_ANY;
+      return Socket::pack_sockaddr_in @params;
+   }
+   if( HAVE_SOCKADDR_IN6 and $p_family == Socket::AF_INET6 ) {
+      my @params = Socket::unpack_sockaddr_in6 $p_addr;
+      $params[1] = Socket::IN6ADDR_LOOPBACK if $params[1] eq Socket::IN6ADDR_ANY;
+      return Socket::pack_sockaddr_in6 @params;
+   }
+
+   # Most other cases should be fine
+   return $p_addr;
+}
 
 =head1 LOOP IMPLEMENTATION METHODS
 

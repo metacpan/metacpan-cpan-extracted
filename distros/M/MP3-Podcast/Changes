@@ -1,0 +1,25 @@
+2021-01-19  jmerelo  <jmerelo@princess-carolyn>
+
+	* lib/MP3/Podcast.pm: Preparing for next release, since it had apparently disappeared from CPAN. Adds utf8 files thanks to Ypid, taken from their branch.
+
+2009-03-19  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
+
+	* Makefile.PL: Added URI to prerrequisites.
+
+2006-01-24  JJ Merelo  <jmerelo@geneura.ugr.es>
+
+	* MANIFEST: 
+	Added new files to the examples subdir; added the sort option to
+	the podcast function, and fixed a few bugs in the test files. Now
+	files in the dir-to-podcast can have the MP3 or mp3 extension.
+
+2005-09-10  Juan J. Merelo Guervós  <jmerelo@geneura.ugr.es>
+
+	* "length" tag added, thanks to Juan Schwindt. Deleted "Podcast" from comment.
+
+Revision history for Perl extension MP3::Podcast.
+
+0.01  Tue Apr 12 14:01:20 2005
+	- original version; created by h2xs 1.22 with options
+		-AX -n MP3::Podcast
+

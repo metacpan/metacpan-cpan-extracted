@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2019, 2020 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,8 +32,12 @@ use strict;
 use Carp 'croak';
 use List::Util 'max';
 use Math::BigInt try => 'GMP';
+use Math::BaseCnv 'cnv';
+use Math::NumSeq::Fibbinary;
+use Math::NumSeq::FibbinaryBitCount;
+use Math::NumSeq::FibonacciWord;
 use Test;
-plan tests => 46;
+plan tests => 47;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -41,9 +45,10 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::WythoffArray;
-
 use Math::PlanePath::CoprimeColumns;
 *_coprime = \&Math::PlanePath::CoprimeColumns::_coprime;
+use Math::PlanePath::Diagonals;
+use Math::NumSeq::PlanePathTurn;
 
 # uncomment this to run the ### lines
 # use Smart::Comments '###';
@@ -85,6 +90,36 @@ sub path_find_row_with_pair {
   }
   die "oops, pair $a,$b not found";
 }
+
+{
+  my $seq = Math::NumSeq::Fibbinary->new;
+  sub to_Zeck_bitstr {
+    my ($n) = @_;
+    return sprintf '%b', $seq->ith($n);
+  }
+  ok (to_Zeck_bitstr(12), 10101);
+}
+
+#------------------------------------------------------------------------------
+# A114579 -- N at transpose Y,X
+#
+# In Zeckendorf base
+# not in OEIS: 1,101,1001,10,10001,100,1010,10101,1000,10100
+
+MyOEIS::compare_values
+  (anum => 'A114579',
+   # max_count => 100,  # big b-file
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::WythoffArray->new;
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x, $y) = $path->n_to_xy (Math::BigInt->new($n));
+       my $t = $path->xy_to_n ($y, $x);
+       push @got, $t;
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 # A186007 -- row(i+j) - row(i)
@@ -143,7 +178,6 @@ sub path_find_row_with_pair {
 
 
 {
-  require Math::PlanePath::Diagonals;
   my $path = Math::PlanePath::WythoffArray->new (x_start=>1, y_start=>1);
   my $diag = Math::PlanePath::Diagonals->new    (x_start=>1, y_start=>1,
                                                  direction => 'up',
@@ -206,7 +240,6 @@ MyOEIS::compare_values
   (anum => 'A185735',
    func => sub {
      my ($count) = @_;
-     require Math::PlanePath::Diagonals;
      my $path = Math::PlanePath::WythoffArray->new (x_start=>1, y_start=>1);
 
      # Y>=1, 0<=X<Y
@@ -258,7 +291,6 @@ MyOEIS::compare_values
   (anum => 'A165357',
    func => sub {
      my ($count) = @_;
-     require Math::PlanePath::Diagonals;
      my $diag = Math::PlanePath::Diagonals->new (direction => 'up');
      my @got;
      for (my $d = $diag->n_start; @got < $count; $d++) {
@@ -277,7 +309,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my $path = Math::PlanePath::WythoffArray->new;
-     require Math::PlanePath::Diagonals;
      my $diag = Math::PlanePath::Diagonals->new (direction => 'up');
      my @got;
      for (my $d = $diag->n_start; @got < $count; $d++) {
@@ -352,7 +383,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my $path = Math::PlanePath::WythoffArray->new (x_start=>1, y_start=>1);
-     require Math::PlanePath::Diagonals;
      my $diag = Math::PlanePath::Diagonals->new (x_start => $path->x_minimum,
                                                  y_start => $path->y_minimum,
                                                  direction => 'up');
@@ -385,30 +415,12 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A114579 -- N at transpose Y,X
-
-MyOEIS::compare_values
-  (anum => 'A114579',
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::WythoffArray->new;
-     my @got;
-     for (my $n = $path->n_start; @got < $count; $n++) {
-       my ($x, $y) = $path->n_to_xy (Math::BigInt->new($n));
-       my $t = $path->xy_to_n ($y, $x);
-       push @got, $t;
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
 # A220249 -- which row is n * Lucas numbers
 
 MyOEIS::compare_values
   (anum => 'A220249',
    func => sub {
      my ($count) = @_;
-     require Math::PlanePath::Diagonals;
      my $path = Math::PlanePath::WythoffArray->new (x_start=>1, y_start=>1);
      my @got;
      for (my $k = 1; @got < $count; $k++) {
@@ -425,7 +437,6 @@ MyOEIS::compare_values
   (anum => 'A173027',
    func => sub {
      my ($count) = @_;
-     require Math::PlanePath::Diagonals;
      my $path = Math::PlanePath::WythoffArray->new (x_start=>1, y_start=>1);
      my @got;
      for (my $k = 1; @got < $count; $k++) {
@@ -476,7 +487,6 @@ MyOEIS::compare_values
   (anum => 'A188436',
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'WythoffArray',
                                                  turn_type => 'Right');
      my @got = (0,0,0,0,0);
@@ -495,7 +505,6 @@ sub A188436_func {
 }
 
 {
-  require Math::NumSeq::Fibbinary;
   my $seq = Math::NumSeq::Fibbinary->new;
   my $bad = 0;
   foreach (1 .. 50000) {
@@ -511,7 +520,6 @@ sub A188436_func {
   ok (0, $bad);
 }
 {
-  require Math::NumSeq::PlanePathTurn;
   my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'WythoffArray',
                                               turn_type => 'Right');
   my $bad = 0;
@@ -538,7 +546,6 @@ MyOEIS::compare_values
   (anum => 'A003622',
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
      my $path = Math::PlanePath::WythoffArray->new;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                                  turn_type => 'Right');
@@ -562,7 +569,6 @@ MyOEIS::compare_values
   (anum => 'A134860',
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'WythoffArray',
                                                  turn_type => 'Right');
      my @got;
@@ -579,8 +585,6 @@ MyOEIS::compare_values
 # Y axis 0=left,1=right is Fibonacci word
 
 {
-  require Math::NumSeq::PlanePathTurn;
-  require Math::NumSeq::FibonacciWord;
   my $path = Math::PlanePath::WythoffArray->new;
   my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                               turn_type => 'Right');
@@ -606,7 +610,6 @@ MyOEIS::compare_values
   (anum => 'A080164',
    func => sub {
      my ($count) = @_;
-     require Math::PlanePath::Diagonals;
      my $path = Math::PlanePath::WythoffArray->new;
      my $diag = Math::PlanePath::Diagonals->new (direction => 'up');
      my @got;
@@ -625,7 +628,6 @@ MyOEIS::compare_values
   (anum => 'A143299',
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::FibbinaryBitCount;
      my $seq = Math::NumSeq::FibbinaryBitCount->new;
      my $path = Math::PlanePath::WythoffArray->new;
      my @got;
@@ -647,7 +649,6 @@ MyOEIS::compare_values
 #   (anum => 'A137707',
 #    func => sub {
 #      my ($count) = @_;
-#      require Math::PlanePath::Diagonals;
 #      my $path = Math::PlanePath::WythoffArray->new;
 #      my $diag = Math::PlanePath::Diagonals->new;
 #      my @got;
@@ -804,7 +805,6 @@ MyOEIS::compare_values
   (anum => 'A064274',
    func => sub {
      my ($count) = @_;
-     require Math::PlanePath::Diagonals;
      my $diagonals  = Math::PlanePath::Diagonals->new (direction => 'up');
      my $wythoff = Math::PlanePath::WythoffArray->new;
      my @got = (0);  # extra 0
@@ -892,7 +892,6 @@ MyOEIS::compare_values
   (anum => 'A083412',
    func => sub {
      my ($count) = @_;
-     require Math::PlanePath::Diagonals;
      my $diagonals  = Math::PlanePath::Diagonals->new (direction => 'down');
      my $wythoff = Math::PlanePath::WythoffArray->new;
      my @got;
@@ -910,7 +909,6 @@ MyOEIS::compare_values
   (anum => 'A035513',
    func => sub {
      my ($count) = @_;
-     require Math::PlanePath::Diagonals;
      my $diagonals  = Math::PlanePath::Diagonals->new (direction => 'up');
      my $wythoff = Math::PlanePath::WythoffArray->new;
      my @got;

@@ -78,7 +78,7 @@ work. For example, Windows users will probably want to use `gmake` instead of
 
 # Support
 
- - [RT, CPAN's request tracker](https://rt.cpan.org/NoAuth/Bugs.html?Queue=Net-RCON-Minecraft): Please report bugs here.
+ - [Issue Tracker](https://github.com/rjt-pl/Net-RCON-Minecraft/issues): Bug reports and feature requests
  - [GitHub Repository](https://github.com/rjt-pl/Net-RCON-Minecraft)
 
 # License and Copyright

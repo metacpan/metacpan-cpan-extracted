@@ -43,7 +43,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Rinci"
+         "web" : "https://github.com/perlancar/perl-Rinci/issues"
       },
       "homepage" : "https://metacpan.org/release/Rinci",
       "repository" : {
@@ -52,7 +52,7 @@
          "web" : "https://github.com/perlancar/perl-Rinci"
       }
    },
-   "version" : "1.1.95",
+   "version" : "1.1.96",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -152,7 +152,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.602"
+            "version" : "0.603"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -172,7 +172,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.040"
+            "version" : "0.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",

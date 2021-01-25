@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -45,6 +45,21 @@ my %seen_filename;
 
 foreach my $elem
   (
+   ['corner-alternating-small.png',
+    'math-image --path=CornerAlternating --lines --scale=4 --size=32'],
+   ['corner-alternating-big.png',
+    'math-image --path=CornerAlternating --lines --scale=12 --size=200'],
+   ['corner-alternating-wider4-big.png',
+    'math-image --path=CornerAlternating,wider=4 --lines --scale=12 --size=200'],
+
+   ['corner-small.png',
+    'math-image --path=Corner --lines --scale=4 --size=32'],
+   ['corner-big.png',
+    'math-image --path=Corner --lines --scale=12 --size=200'],
+   ['corner-wider4-big.png',
+    'math-image --path=Corner,wider=4 --lines --scale=12 --size=200'],
+
+
    ['peano-diagonals-small.png',
     'math-image --path=PeanoDiagonals --lines --scale=3 --size=32'],
    ['peano-diagonals-big.png',
@@ -807,14 +822,6 @@ foreach my $elem
     'math-image --path=CoprimeColumns --all --scale=3 --size=32'],
    ['coprime-columns-big.png',
     'math-image --path=CoprimeColumns --all --scale=3 --size=200'],
-
-
-   ['corner-small.png',
-    'math-image --path=Corner --lines --scale=4 --size=32'],
-   ['corner-big.png',
-    'math-image --path=Corner --lines --scale=12 --size=200'],
-   ['corner-wider4-big.png',
-    'math-image --path=Corner,wider=4 --lines --scale=12 --size=200'],
 
 
    ['kochel-small.png',

@@ -1,0 +1,15 @@
+Changes
+examples/.podcast
+examples/gen-podcast.pl
+examples/podcast-sort.pl
+examples/podcast.cgi
+examples/podcast.conf
+lib/MP3/Podcast.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/1.t
+t/music/04-En_tus_Brazos.mp3
+t/music/07-Alter_Ego.mp3
+META.json                                Module JSON meta-data (added by MakeMaker)

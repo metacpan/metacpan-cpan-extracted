@@ -1,0 +1,17 @@
+0.003   2021-01-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Crypt::Misc.
+
+
+0.002   2021-01-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add note about RFC 4122 compliance.
+
+
+0.001   2021-01-17  Released-By: PERLANCAR
+
+        - First release.

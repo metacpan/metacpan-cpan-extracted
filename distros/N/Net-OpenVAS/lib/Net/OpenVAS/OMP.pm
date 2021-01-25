@@ -7,13 +7,12 @@ use feature ':5.10';
 
 use Carp;
 use IO::Socket::SSL;
-use XML::Simple qw( :strict );
 
 use Net::OpenVAS::Error;
 use Net::OpenVAS::OMP::Response;
 use Net::OpenVAS::OMP::Request;
 
-our $VERSION = '0.101';
+our $VERSION = '0.200';
 
 sub import {
 
@@ -304,7 +303,7 @@ the REST request and response messages.
 
 =head2 $openvas->command ( $command [, \%arguments ] )
 
-Execute a command to OpenVAS via OMP and return L<Net::OpenVAS::OMP::Result> class instance.
+Execute a command to OpenVAS via OMP and return L<Net::OpenVAS::OMP::Response> class instance.
 
     my $task = $openvas->command( 'get_tasks', task_id => '46f15597-b721-403c-96a1-cce439af63a7' );
 
@@ -326,28 +325,136 @@ L<Net::OpenVAS::OMP> provide a flag (C<-commands>) for import all OpenVAS OMP co
 
 Available commands:
 
-    authenticate commands create_agent create_alert create_asset create_config
-    create_credential create_filter create_group create_note create_override
-    create_permission create_port_list create_port_range create_report
-    create_report_format create_role create_scanner create_schedule create_tag
-    create_target create_task create_user delete_agent delete_asset
-    delete_config delete_alert delete_credential delete_filter delete_group
-    delete_note delete_override delete_report delete_permission delete_port_list
-    delete_port_range delete_report_format delete_role delete_scanner
-    delete_schedule delete_tag delete_target delete_task delete_user
-    describe_auth empty_trashcan get_agents get_configs get_aggregates
-    get_alerts get_assets get_credentials get_feeds get_filters get_groups
-    get_info get_notes get_nvts get_nvt_families get_overrides get_permissions
-    get_port_lists get_preferences get_reports get_report_formats get_results
-    get_roles get_scanners get_schedules get_settings get_system_reports
-    get_tags get_targets get_tasks get_users get_version help modify_agent
-    modify_alert modify_asset modify_auth modify_config modify_credential
-    modify_filter modify_group modify_note modify_override modify_permission
-    modify_port_list modify_report modify_report_format modify_role
-    modify_scanner modify_schedule modify_setting modify_target modify_tag
-    modify_task modify_user move_task restore resume_task run_wizard start_task
-    stop_task sync_cert sync_feed sync_config sync_scap test_alert verify_agent
-    verify_report_format verify_scanner
+=over 4
+
+=item * C<authenticate> : Authenticate with the manager.
+
+=item * C<commands> : Run a list of commands.
+
+=item * C<create_agent> : Create an agent.
+
+=item * C<create_config> : Create a config.
+
+=item * C<create_escalator> : Create an escalator.
+
+=item * C<create_lsc_credential> : Create an LSC credential.
+
+=item * C<create_note> : Create a note.
+
+=item * C<create_override> : Create an override.
+
+=item * C<create_report_format> : Create a report format.
+
+=item * C<create_schedule> : Create a schedule.
+
+=item * C<create_slave> : Create a slave.
+
+=item * C<create_target> : Create a target.
+
+=item * C<create_task> : Create a task.
+
+=item * C<delete_agent> : Delete an agent.
+
+=item * C<delete_config> : Delete a config.
+
+=item * C<delete_escalator> : Delete an escalator.
+
+=item * C<delete_lsc_credential> : Delete an LSC credential.
+
+=item * C<delete_note> : Delete a note.
+
+=item * C<delete_override> : Delete an override.
+
+=item * C<delete_report> : Delete a report.
+
+=item * C<delete_report_format> : Delete a report format.
+
+=item * C<delete_schedule> : Delete a schedule.
+
+=item * C<delete_slave> : Delete a slave.
+
+=item * C<delete_target> : Delete a target.
+
+=item * C<delete_task> : Delete a task.
+
+=item * C<get_agents> : Get all agents.
+
+=item * C<get_configs> : Get all configs.
+
+=item * C<get_dependencies> : Get dependencies for all available NVTs.
+
+=item * C<get_escalators> : Get all escalators.
+
+=item * C<get_lsc_credentials> : Get all LSC credentials.
+
+=item * C<get_notes> : Get all notes.
+
+=item * C<get_nvts> : Get all NVTs.
+
+=item * C<get_nvt_families> : Get a list of all NVT families.
+
+=item * C<get_nvt_feed_checksum> : Get checksum for entire NVT collection.
+
+=item * C<get_overrides> : Get all overrides.
+
+=item * C<get_preferences> : Get all preferences.
+
+=item * C<get_reports> : Get all reports.
+
+=item * C<get_report_formats> : Get all report formats.
+
+=item * C<get_results> : Get results.
+
+=item * C<get_schedules> : Get all schedules.
+
+=item * C<get_slaves> : Get all slaves.
+
+=item * C<get_system_reports> : Get all system reports.
+
+=item * C<get_target_locators> : Get configured target locators.
+
+=item * C<get_targets> : Get all targets.
+
+=item * C<get_tasks> : Get all tasks.
+
+=item * C<get_version> : Get the OpenVAS Manager Protocol version.
+
+=item * C<help> : Get the help text.
+
+=item * C<modify_config> : Update an existing config.
+
+=item * C<modify_lsc_credential> : Modify an existing LSC credential.
+
+=item * C<modify_note> : Modify an existing note.
+
+=item * C<modify_override> : Modify an existing override.
+
+=item * C<modify_report> : Modify an existing report.
+
+=item * C<modify_report_format> : Update an existing report format.
+
+=item * C<modify_task> : Modify an existing task.
+
+=item * C<pause_task> : Pause a running task.
+
+=item * C<resume_or_start_task> : Resume task if stopped, else start task.
+
+=item * C<resume_paused_task> : Resume a paused task.
+
+=item * C<resume_stopped_task> : Resume a stopped task.
+
+=item * C<start_task> : Manually start an existing task.
+
+=item * C<stop_task> : Stop a running task.
+
+=item * C<test_escalator> : Run an escalator.
+
+=item * C<verify_agent> : Verify an agent.
+
+=item * C<verify_report_format> : Verify a report format.
+
+=back
+
 
 =head1 SUPPORT
 

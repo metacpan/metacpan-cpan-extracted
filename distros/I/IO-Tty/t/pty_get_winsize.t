@@ -6,10 +6,10 @@ use warnings;
 use Test::More;
 
 if ( $^O =~ m!^(solaris|nto)$! ) {
-  plan skip_all => 'Problems on Solaris and QNX with this test';
+    plan skip_all => 'Problems on Solaris and QNX with this test';
 }
 else {
-  plan tests => 1;
+    plan tests => 1;
 }
 
 use IO::Pty ();

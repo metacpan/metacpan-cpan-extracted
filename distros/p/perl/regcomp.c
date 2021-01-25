@@ -242,8 +242,7 @@ struct RExC_state_t {
     U8          *study_chunk_recursed;  /* bitmap of which subs we have moved
                                            through */
     U32         study_chunk_recursed_bytes;  /* bytes in bitmap */
-    I32		in_lookbehind;
-    I32		in_lookahead;
+    I32		in_lookaround;
     I32		contains_locale;
     I32		override_recoding;
     I32         recode_x_to_native;
@@ -330,8 +329,7 @@ struct RExC_state_t {
 #define RExC_study_chunk_recursed        (pRExC_state->study_chunk_recursed)
 #define RExC_study_chunk_recursed_bytes  \
                                    (pRExC_state->study_chunk_recursed_bytes)
-#define RExC_in_lookbehind	(pRExC_state->in_lookbehind)
-#define RExC_in_lookahead	(pRExC_state->in_lookahead)
+#define RExC_in_lookaround	(pRExC_state->in_lookaround)
 #define RExC_contains_locale	(pRExC_state->contains_locale)
 #define RExC_recode_x_to_native (pRExC_state->recode_x_to_native)
 
@@ -420,6 +418,11 @@ struct RExC_state_t {
                                          return 0;                         \
                                      }                                     \
                              } STMT_END
+
+/* /u is to be chosen if we are supposed to use Unicode rules, or if the
+ * pattern is in UTF-8.  This latter condition is in case the outermost rules
+ * are locale.  See GH #17278 */
+#define toUSE_UNI_CHARSET_NOT_DEPENDS (RExC_uni_semantics || UTF)
 
 /* Change from /d into /u rules, and restart the parse.  RExC_uni_semantics is
  * a flag that indicates we need to override /d with /u as a result of
@@ -5219,7 +5222,12 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
                      * might result in a minlen of 1 and not of 4,
                      * but this doesn't make us mismatch, just try a bit
                      * harder than we should.
-                     * */
+                     *
+                     * However we must assume this GOSUB is infinite, to
+                     * avoid wrongly applying other optimizations in the
+                     * enclosing scope - see GH 18096, for example.
+                     */
+                    is_inf = is_inf_internal = 1;
                     scan= regnext(scan);
                     continue;
                 }
@@ -7750,7 +7758,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 
     rx_flags = orig_rx_flags;
 
-    if (   (UTF || RExC_uni_semantics)
+    if (   toUSE_UNI_CHARSET_NOT_DEPENDS
         && initial_charset == REGEX_DEPENDS_CHARSET)
     {
 
@@ -7781,8 +7789,7 @@ Perl_re_op_compile(pTHX_ SV ** const patternp, int pat_count,
 
     RExC_seen = 0;
     RExC_maxlen = 0;
-    RExC_in_lookbehind = 0;
-    RExC_in_lookahead = 0;
+    RExC_in_lookaround = 0;
     RExC_seen_zerolen = *exp == '^' ? -1 : 0;
     RExC_recode_x_to_native = 0;
     RExC_in_multi_char_class = 0;
@@ -10852,7 +10859,7 @@ S_parse_lparen_question_flags(pTHX_ RExC_state_t *pRExC_state)
         RExC_parse++;
         has_use_defaults = TRUE;
         STD_PMMOD_FLAGS_CLEAR(&RExC_flags);
-        cs = (RExC_uni_semantics)
+        cs = (toUSE_UNI_CHARSET_NOT_DEPENDS)
              ? REGEX_UNICODE_CHARSET
              : REGEX_DEPENDS_CHARSET;
         set_regex_charset(&RExC_flags, cs);
@@ -10860,7 +10867,7 @@ S_parse_lparen_question_flags(pTHX_ RExC_state_t *pRExC_state)
     else {
         cs = get_regex_charset(RExC_flags);
         if (   cs == REGEX_DEPENDS_CHARSET
-            && RExC_uni_semantics)
+            && (toUSE_UNI_CHARSET_NOT_DEPENDS))
         {
             cs = REGEX_UNICODE_CHARSET;
         }
@@ -10944,7 +10951,7 @@ S_parse_lparen_question_flags(pTHX_ RExC_state_t *pRExC_state)
                  * pattern (or target, not known until runtime) are
                  * utf8, or something in the pattern indicates unicode
                  * semantics */
-                cs = (RExC_uni_semantics)
+                cs = (toUSE_UNI_CHARSET_NOT_DEPENDS)
                      ? REGEX_UNICODE_CHARSET
                      : REGEX_DEPENDS_CHARSET;
                 has_charset_modifier = DEPENDS_PAT_MOD;
@@ -11170,6 +11177,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp, U32 depth)
     I32 after_freeze = 0;
     I32 num; /* numeric backreferences */
     SV * max_open;  /* Max number of unclosed parens */
+    I32 was_in_lookaround = RExC_in_lookaround;
 
     char * parse_start = RExC_parse; /* MJD */
     char * const oregcomp_parse = RExC_parse;
@@ -11190,13 +11198,6 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp, U32 depth)
     }
 
     *flagp = 0;				/* Tentatively. */
-
-    if (RExC_in_lookbehind) {
-	RExC_in_lookbehind++;
-    }
-    if (RExC_in_lookahead) {
-        RExC_in_lookahead++;
-    }
 
     /* Having this true makes it feasible to have a lot fewer tests for the
      * parse pointer being in scope.  For example, we can write
@@ -11451,11 +11452,11 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp, U32 depth)
 
             lookbehind_alpha_assertions:
                 RExC_seen |= REG_LOOKBEHIND_SEEN;
-                RExC_in_lookbehind++;
                 /*FALLTHROUGH*/
 
             alpha_assertions:
 
+                RExC_in_lookaround++;
                 RExC_seen_zerolen++;
 
                 if (! start_arg) {
@@ -11658,7 +11659,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp, U32 depth)
 		}
 
                 RExC_seen |= REG_LOOKBEHIND_SEEN;
-		RExC_in_lookbehind++;
+		RExC_in_lookaround++;
 		RExC_parse++;
                 if (RExC_parse >= RExC_end) {
                     vFAIL("Sequence (?... not terminated");
@@ -11667,7 +11668,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp, U32 depth)
                 break;
 	    case '=':           /* (?=...) */
 		RExC_seen_zerolen++;
-                RExC_in_lookahead++;
+                RExC_in_lookaround++;
                 break;
 	    case '!':           /* (?!...) */
 		RExC_seen_zerolen++;
@@ -11679,6 +11680,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp, U32 depth)
 	            nextchar(pRExC_state);
 	            return ret;
 	        }
+                RExC_in_lookaround++;
 	        break;
 	    case '|':           /* (?|...) */
 	        /* branch reset, behave like a (?:...) except that
@@ -12480,7 +12482,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp, U32 depth)
         /* restore original flags, but keep (?p) and, if we've encountered
          * something in the parse that changes /d rules into /u, keep the /u */
 	RExC_flags = oregflags | (RExC_flags & RXf_PMf_KEEPCOPY);
-        if (DEPENDS_SEMANTICS && RExC_uni_semantics) {
+        if (DEPENDS_SEMANTICS && toUSE_UNI_CHARSET_NOT_DEPENDS) {
             set_regex_charset(&RExC_flags, REGEX_UNICODE_CHARSET);
         }
 	if (RExC_parse >= RExC_end || UCHARAT(RExC_parse) != ')') {
@@ -12499,14 +12501,11 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp, U32 depth)
 	NOT_REACHED; /* NOTREACHED */
     }
 
-    if (RExC_in_lookbehind) {
-	RExC_in_lookbehind--;
-    }
-    if (RExC_in_lookahead) {
-        RExC_in_lookahead--;
-    }
     if (after_freeze > RExC_npar)
         RExC_npar = after_freeze;
+
+    RExC_in_lookaround = was_in_lookaround;
+    
     return(ret);
 }
 
@@ -13617,7 +13616,7 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 	    *flagp |= SIMPLE;
 	    goto finish_meta_pat;
 	case 'K':
-            if (!RExC_in_lookbehind && !RExC_in_lookahead) {
+            if (!RExC_in_lookaround) {
                 RExC_seen_zerolen++;
                 ret = reg_node(pRExC_state, KEEPS);
                 *flagp |= SIMPLE;
@@ -15212,6 +15211,8 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
                                 FAIL2("panic: loc_correspondence[%d] is 0",
                                       (int) (s - s_start));
                             }
+                            Safefree(locfold_buf);
+                            Safefree(loc_correspondence);
                         }
                         else {
                             upper_fill = s - s0;
@@ -17250,10 +17251,10 @@ S_add_multi_match(pTHX_ AV* multi_char_matches, SV* multi_string, const STRLEN c
  *
  * There is a line below that uses the same white space criteria but is outside
  * this macro.  Both here and there must use the same definition */
-#define SKIP_BRACKETED_WHITE_SPACE(do_skip, p)                          \
+#define SKIP_BRACKETED_WHITE_SPACE(do_skip, p, stop_p)                  \
     STMT_START {                                                        \
         if (do_skip) {                                                  \
-            while (isBLANK_A(UCHARAT(p)))                               \
+            while (p < stop_p && isBLANK_A(UCHARAT(p)))                 \
             {                                                           \
                 p++;                                                    \
             }                                                           \
@@ -17429,7 +17430,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
     initial_listsv_len = SvCUR(listsv);
     SvTEMP_off(listsv); /* Grr, TEMPs and mortals are conflated.  */
 
-    SKIP_BRACKETED_WHITE_SPACE(skip_white, RExC_parse);
+    SKIP_BRACKETED_WHITE_SPACE(skip_white, RExC_parse, RExC_end);
 
     assert(RExC_parse <= RExC_end);
 
@@ -17438,7 +17439,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
         invert = TRUE;
         allow_mutiple_chars = FALSE;
         MARK_NAUGHTY(1);
-        SKIP_BRACKETED_WHITE_SPACE(skip_white, RExC_parse);
+        SKIP_BRACKETED_WHITE_SPACE(skip_white, RExC_parse, RExC_end);
     }
 
     /* Check that they didn't say [:posix:] instead of [[:posix:]] */
@@ -17485,11 +17486,11 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
             output_posix_warnings(pRExC_state, posix_warnings);
         }
 
+        SKIP_BRACKETED_WHITE_SPACE(skip_white, RExC_parse, RExC_end);
+
         if  (RExC_parse >= stop_ptr) {
             break;
         }
-
-        SKIP_BRACKETED_WHITE_SPACE(skip_white, RExC_parse);
 
         if  (UCHARAT(RExC_parse) == ']') {
             break;
@@ -18179,7 +18180,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
 	    }
 	} /* end of namedclass \blah */
 
-        SKIP_BRACKETED_WHITE_SPACE(skip_white, RExC_parse);
+        SKIP_BRACKETED_WHITE_SPACE(skip_white, RExC_parse, RExC_end);
 
         /* If 'range' is set, 'value' is the ending of a range--check its
          * validity.  (If value isn't a single code point in the case of a
@@ -18222,7 +18223,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                 char* next_char_ptr = RExC_parse + 1;
 
                 /* Get the next real char after the '-' */
-                SKIP_BRACKETED_WHITE_SPACE(skip_white, next_char_ptr);
+                SKIP_BRACKETED_WHITE_SPACE(skip_white, next_char_ptr, RExC_end);
 
                 /* If the '-' is at the end of the class (just before the ']',
                  * it is a literal minus; otherwise it is a range */

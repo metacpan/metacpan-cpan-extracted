@@ -16,13 +16,14 @@ name: Tie-Hash-Regex
 provides:
   Tie::Hash::Regex:
     file: lib/Tie/Hash/Regex.pm
-    version: '1.13'
+    version: '1.14'
 requires:
   Attribute::Handlers: '0'
   Tie::Hash: '0'
   perl: v5.6.0
 resources:
+  bugtracker: https://github.com/davorg/tie-hash-regex/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/davorg/tie-hash-regex.git
-version: '1.13'
+version: '1.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,10 +1,10 @@
-#  Copyright 1999-2012 ImageMagick Studio LLC, a non-profit organization
+#  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
 #  dedicated to making software imaging solutions freely available.
 #
 #  You may not use this file except in compliance with the License.  You may
 #  obtain a copy of the License at
 #
-#    http://www.imagemagick.org/script/license.php
+#    https://imagemagick.org/script/license.php
 #
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,12 +17,21 @@
 #  Makefile for building PerlMagick.
 
 # If source files missing, see if they can be obtained via VPATH
-perl-sources:
+#
+$(PERLMAGICK)/quantum/@MAGICK_ABI_SUFFIX@.xs: $(PERLMAGICK)/quantum/quantum.xs
+	$(AM_V_GEN) $(LN_S) quantum.xs $@
+
+$(PERLMAGICK)/quantum/@MAGICK_ABI_SUFFIX@.pm: $(PERLMAGICK)/quantum/quantum.pm
+	$(AM_V_GEN) $(LN_S) quantum.pm $@
+
+perl-quantum-sources: $(PERLMAGICK)/quantum/@MAGICK_ABI_SUFFIX@.xs $(PERLMAGICK)/quantum/@MAGICK_ABI_SUFFIX@.pm
+
+perl-sources: perl-quantum-sources
 	@if test -n "$(VPATH)" ; then \
 	  echo "Linking PerlMagick Sources ..." ; \
 	  imagemagick=`(cd $(VPATH) ; pwd)` && \
 	  ( cd $(PERLMAGICK) && \
-	    sh $$imagemagick/config/lndir.sh $$imagemagick/$(PERLMAGICK) ) \
+	    sh $$imagemagick/config/lndir.sh $$imagemagick/$(PERLMAGICK) ; ) \
 	fi ; \
 	touch perl-sources
 
@@ -43,7 +52,7 @@ PERLMAGICK_TESTS = PerlMagick/check.sh
 
 if WITH_PERL_DYNAMIC
 
-PERLMAGICK_CHECKSCRIPTS =
+PERLMAGICK_CHECKSCRPTS =
 
 $(PERLMAKEFILE): perl-sources $(MAGICKCORE_LIBS) $(MAGICKWAND_LIBS) $(PERLMAKEMAKER)
 	cd $(PERLMAGICK) && @PERL@ Makefile.PL $(PERL_MAKE_OPTIONS)
@@ -68,7 +77,7 @@ if WITH_PERL_STATIC
 
 PERLSTATICNAME=PerlMagick
 
-PERLMAGICK_CHECKSCRIPTS = perl-build
+PERLMAGICK_CHECKSCRPTS = perl-build
 
 $(PERLMAKEFILE): perl-sources $(MAGICKCORE_LIBS) $(MAGICKWAND_LIBS) $(PERLMAKEMAKER)
 	cd $(PERLMAGICK) && @PERL@ Makefile.PL MAP_TARGET=$(PERLSTATICNAME) $(PERL_MAKE_OPTIONS) && $(MAKE) Makefile ; $(MAKE) Makefile
@@ -110,7 +119,10 @@ clean-perl:
 	( if test -f Makefile ; then $(MAKE) CC='@CC@' clean ; fi ) ; \
 	( if test -f Makefile ; then $(MAKE) CC='@CC@' clean ; fi ) ; \
 	rm -f Makefile.old PerlMagick ; \
-	rm -f t/output* t/jng/*_tmp.jng t/*/output* )
+	rm -f t/output* t/jng/*_tmp.jng t/*/output* ; \
+	rm -f quantum/@MAGICK_ABI_SUFFIX@.xs;\
+	rm -f quantum/@MAGICK_ABI_SUFFIX@.pm;\
+	rm -f Magick.pm;)
 	rm -f perl-sources
 
 distclean-perl: clean-perl

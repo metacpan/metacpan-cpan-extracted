@@ -1,5 +1,9 @@
 Revision history for Perl module 
 
+20210112.001 2021-01-19T14:48:12Z
+	* freshen distro, dump Travis CI, add Github Actions
+	* Update to latest Business::ISBN::Data
+
 20191107 2019-12-11T20:04:42Z
 	* Peter Williams fixed the 978/979 distinction (GitHub #5)
 

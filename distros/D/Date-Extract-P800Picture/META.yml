@@ -3,6 +3,7 @@ abstract: 'extract the date from Sony Ericsson P800 pictures'
 author:
   - 'Roland van Ipenburg <roland@rolandvanipenburg.com>'
 build_requires:
+  Module::Build: '0.4'
   Perl::Critic: '0'
   Perl::Critic::StricterSubs: '0'
   Test::Compile: '0'
@@ -23,10 +24,10 @@ name: Date-Extract-P800Picture
 provides:
   Date::Extract::P800Picture:
     file: lib/Date/Extract/P800Picture.pm
-    version: v1.1.5
+    version: v1.1.6
   Date::Extract::P800Picture::Exceptions:
     file: lib/Date/Extract/P800Picture/Exceptions.pm
-    version: v1.1.5
+    version: v1.1.6
 recommends:
   Module::Signature: '0'
 requires:
@@ -45,8 +46,12 @@ requires:
   Pod::Usage::CommandLine: '0'
   Readonly: '0'
   perl: v5.14.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://bitbucket.org/rolandvanipenburg/date-extract-p800picture/issues
   license: http://dev.perl.org/licenses/
   repository: https://bitbucket.org/rolandvanipenburg/date-extract-p800picture
-version: v1.1.5
+version: v1.1.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

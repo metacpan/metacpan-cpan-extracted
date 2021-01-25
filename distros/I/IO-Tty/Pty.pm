@@ -10,140 +10,143 @@ require POSIX;
 
 use vars qw(@ISA $VERSION);
 
-$VERSION = '1.15'; # keep same as in Tty.pm
+$VERSION = '1.16';    # keep same as in Tty.pm
 
 @ISA = qw(IO::Handle);
 eval { local $^W = 0; undef local $SIG{__DIE__}; require IO::Stty };
-push @ISA, "IO::Stty" if (not $@);  # if IO::Stty is installed
+push @ISA, "IO::Stty" if ( not $@ );    # if IO::Stty is installed
 
 sub new {
-  my ($class) = $_[0] || "IO::Pty";
-  $class = ref($class) if ref($class);
-  @_ <= 1 or croak 'usage: new $class';
+    my ($class) = $_[0] || "IO::Pty";
+    $class = ref($class) if ref($class);
+    @_ <= 1 or croak 'usage: new $class';
 
-  my ($ptyfd, $ttyfd, $ttyname) = pty_allocate();
+    my ( $ptyfd, $ttyfd, $ttyname ) = pty_allocate();
 
-  croak "Cannot open a pty" if not defined $ptyfd;
+    croak "Cannot open a pty" if not defined $ptyfd;
 
-  my $pty = $class->SUPER::new_from_fd($ptyfd, "r+");
-  croak "Cannot create a new $class from fd $ptyfd: $!" if not $pty;
-  $pty->autoflush(1);
-  bless $pty => $class;
+    my $pty = $class->SUPER::new_from_fd( $ptyfd, "r+" );
+    croak "Cannot create a new $class from fd $ptyfd: $!" if not $pty;
+    $pty->autoflush(1);
+    bless $pty => $class;
 
-  my $slave = IO::Tty->new_from_fd($ttyfd, "r+");
-  croak "Cannot create a new IO::Tty from fd $ttyfd: $!" if not $slave;
-  $slave->autoflush(1);
+    my $slave = IO::Tty->new_from_fd( $ttyfd, "r+" );
+    croak "Cannot create a new IO::Tty from fd $ttyfd: $!" if not $slave;
+    $slave->autoflush(1);
 
-  ${*$pty}{'io_pty_slave'} = $slave;
-  ${*$pty}{'io_pty_ttyname'} = $ttyname;
-  ${*$slave}{'io_tty_ttyname'} = $ttyname;
+    ${*$pty}{'io_pty_slave'}     = $slave;
+    ${*$pty}{'io_pty_ttyname'}   = $ttyname;
+    ${*$slave}{'io_tty_ttyname'} = $ttyname;
 
-  return $pty;
+    return $pty;
 }
 
 sub ttyname {
-  @_ == 1 or croak 'usage: $pty->ttyname();';
-  my $pty = shift;
-  ${*$pty}{'io_pty_ttyname'};
+    @_ == 1 or croak 'usage: $pty->ttyname();';
+    my $pty = shift;
+    ${*$pty}{'io_pty_ttyname'};
 }
 
-
 sub close_slave {
-  @_ == 1 or croak 'usage: $pty->close_slave();';
+    @_ == 1 or croak 'usage: $pty->close_slave();';
 
-  my $master = shift;
+    my $master = shift;
 
-  if (exists ${*$master}{'io_pty_slave'}) {
-    close ${*$master}{'io_pty_slave'};
-    delete ${*$master}{'io_pty_slave'};
-  }
+    if ( exists ${*$master}{'io_pty_slave'} ) {
+        close ${*$master}{'io_pty_slave'};
+        delete ${*$master}{'io_pty_slave'};
+    }
 }
 
 sub slave {
-  @_ == 1 or croak 'usage: $pty->slave();';
+    @_ == 1 or croak 'usage: $pty->slave();';
 
-  my $master = shift;
+    my $master = shift;
 
-  if (exists ${*$master}{'io_pty_slave'}) {
-    return ${*$master}{'io_pty_slave'};
-  }
+    if ( exists ${*$master}{'io_pty_slave'} ) {
+        return ${*$master}{'io_pty_slave'};
+    }
 
-  my $tty = ${*$master}{'io_pty_ttyname'};
+    my $tty = ${*$master}{'io_pty_ttyname'};
 
-  my $slave = new IO::Tty;
+    my $slave = new IO::Tty;
 
-  $slave->open($tty, O_RDWR | O_NOCTTY) ||
-    croak "Cannot open slave $tty: $!";
+    $slave->open( $tty, O_RDWR | O_NOCTTY )
+      || croak "Cannot open slave $tty: $!";
 
-  return $slave;
+    return $slave;
 }
 
 sub make_slave_controlling_terminal {
-  @_ == 1 or croak 'usage: $pty->make_slave_controlling_terminal();';
+    @_ == 1 or croak 'usage: $pty->make_slave_controlling_terminal();';
 
-  my $self = shift;
-  local(*DEVTTY);
+    my $self = shift;
+    local (*DEVTTY);
 
-  # loose controlling terminal explicitly
-  if (defined TIOCNOTTY) {
-    if (open (\*DEVTTY, "/dev/tty")) {
-      ioctl( \*DEVTTY, TIOCNOTTY, 0 );
-      close \*DEVTTY;
+    # loose controlling terminal explicitly
+    if ( defined TIOCNOTTY ) {
+        if ( open( \*DEVTTY, "/dev/tty" ) ) {
+            ioctl( \*DEVTTY, TIOCNOTTY, 0 );
+            close \*DEVTTY;
+        }
     }
-  }
 
-  # Create a new 'session', lose controlling terminal.
-  if (POSIX::setsid() == -1) {
-    warn "setsid() failed, strange behavior may result: $!\r\n" if $^W;
-  }
-
-  if (open(\*DEVTTY, "/dev/tty")) {
-    warn "Could not disconnect from controlling terminal?!\n" if $^W;
-    close \*DEVTTY;
-  }
-
-  # now open slave, this should set it as controlling tty on some systems
-  my $ttyname = ${*$self}{'io_pty_ttyname'};
-  my $slv = new IO::Tty;
-  $slv->open($ttyname, O_RDWR)
-    or croak "Cannot open slave $ttyname: $!";
-
-  if (not exists ${*$self}{'io_pty_slave'}) {
-    ${*$self}{'io_pty_slave'} = $slv;
-  } else {
-    $slv->close;
-  }
-
-  # Acquire a controlling terminal if this doesn't happen automatically
-  if (not open(\*DEVTTY, "/dev/tty")) {
-    if (defined TIOCSCTTY) {
-      if (not defined ioctl( ${*$self}{'io_pty_slave'}, TIOCSCTTY, 0 )) {
-        warn "warning: TIOCSCTTY failed, slave might not be set as controlling terminal: $!" if $^W;
-      }
-    } elsif (defined TCSETCTTY) {
-      if (not defined ioctl( ${*$self}{'io_pty_slave'}, TCSETCTTY, 0 )) {
-        warn "warning: TCSETCTTY failed, slave might not be set as controlling terminal: $!" if $^W;
-      }
-    } else {
-      warn "warning: You have neither TIOCSCTTY nor TCSETCTTY on your system\n" if $^W;
-      return 0;
+    # Create a new 'session', lose controlling terminal.
+    if ( POSIX::setsid() == -1 ) {
+        warn "setsid() failed, strange behavior may result: $!\r\n" if $^W;
     }
-  }
 
-  if (not open(\*DEVTTY, "/dev/tty")) {
-    warn "Error: could not connect pty as controlling terminal!\n";
-    return undef;
-  } else {
-    close \*DEVTTY;
-  }
-  
-  return 1;
+    if ( open( \*DEVTTY, "/dev/tty" ) ) {
+        warn "Could not disconnect from controlling terminal?!\n" if $^W;
+        close \*DEVTTY;
+    }
+
+    # now open slave, this should set it as controlling tty on some systems
+    my $ttyname = ${*$self}{'io_pty_ttyname'};
+    my $slv     = new IO::Tty;
+    $slv->open( $ttyname, O_RDWR )
+      or croak "Cannot open slave $ttyname: $!";
+
+    if ( not exists ${*$self}{'io_pty_slave'} ) {
+        ${*$self}{'io_pty_slave'} = $slv;
+    }
+    else {
+        $slv->close;
+    }
+
+    # Acquire a controlling terminal if this doesn't happen automatically
+    if ( not open( \*DEVTTY, "/dev/tty" ) ) {
+        if ( defined TIOCSCTTY ) {
+            if ( not defined ioctl( ${*$self}{'io_pty_slave'}, TIOCSCTTY, 0 ) ) {
+                warn "warning: TIOCSCTTY failed, slave might not be set as controlling terminal: $!" if $^W;
+            }
+        }
+        elsif ( defined TCSETCTTY ) {
+            if ( not defined ioctl( ${*$self}{'io_pty_slave'}, TCSETCTTY, 0 ) ) {
+                warn "warning: TCSETCTTY failed, slave might not be set as controlling terminal: $!" if $^W;
+            }
+        }
+        else {
+            warn "warning: You have neither TIOCSCTTY nor TCSETCTTY on your system\n" if $^W;
+            return 0;
+        }
+    }
+
+    if ( not open( \*DEVTTY, "/dev/tty" ) ) {
+        warn "Error: could not connect pty as controlling terminal!\n";
+        return undef;
+    }
+    else {
+        close \*DEVTTY;
+    }
+
+    return 1;
 }
 
 *clone_winsize_from = \&IO::Tty::clone_winsize_from;
-*get_winsize = \&IO::Tty::get_winsize;
-*set_winsize = \&IO::Tty::set_winsize;
-*set_raw = \&IO::Tty::set_raw;
+*get_winsize        = \&IO::Tty::get_winsize;
+*set_winsize        = \&IO::Tty::set_winsize;
+*set_raw            = \&IO::Tty::set_raw;
 
 1;
 
@@ -155,7 +158,7 @@ IO::Pty - Pseudo TTY object class
 
 =head1 VERSION
 
-1.15
+1.16
 
 =head1 SYNOPSIS
 

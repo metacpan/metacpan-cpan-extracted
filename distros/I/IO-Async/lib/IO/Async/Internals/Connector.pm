@@ -9,9 +9,9 @@ package # hide from CPAN
 use strict;
 use warnings;
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
-use Scalar::Util qw( weaken );
+use Scalar::Util qw( weaken blessed );
 
 use POSIX qw( EINPROGRESS );
 use Socket qw( SOL_SOCKET SO_ERROR );
@@ -23,7 +23,10 @@ use IO::Async::OS;
 
 use Carp;
 
-use constant CONNECT_EWOULDLBOCK => IO::Async::OS->HAVE_CONNECT_EWOULDBLOCK;
+use constant {
+   CONNECT_EWOULDLBOCK => IO::Async::OS->HAVE_CONNECT_EWOULDBLOCK,
+   HAVE_SOCKADDR_IN6   => IO::Async::OS->HAVE_SOCKADDR_IN6,
+};
 
 # Internal constructor
 sub new
@@ -186,7 +189,36 @@ sub connect
       );
    }
    elsif( exists $params{addrs} or exists $params{addr} ) {
-      $peeraddrfuture = $loop->new_future->done( exists $params{addrs} ? @{ $params{addrs} } : ( $params{addr} ) );
+      my @addrs = exists $params{addrs} ? @{ $params{addrs} } : ( $params{addr} );
+
+      # Warn about some common mistakes
+      foreach my $peer ( @addrs ) {
+         my ( $p_family, undef, undef, $p_addr ) = IO::Async::OS->extract_addrinfo( $peer );
+
+         local our @CARP_NOT = qw( IO::Async::Loop IO::Async::Handle );
+
+         if( $p_family == Socket::AF_INET ) {
+            carp "Connecting to 0.0.0.0 is non-portable and ill-advised"
+               if ( Socket::unpack_sockaddr_in  $p_addr )[1] eq Socket::INADDR_ANY;
+         }
+         elsif( HAVE_SOCKADDR_IN6 and $p_family == Socket::AF_INET6 ) {
+            carp "Connecting to :: is non-portable and ill-advised"
+               if ( Socket::unpack_sockaddr_in6 $p_addr )[1] eq Socket::IN6ADDR_ANY;
+         }
+      }
+
+      $peeraddrfuture = $loop->new_future->done( @addrs );
+   }
+   elsif( exists $params{peer} ) {
+      my $peer = delete $params{peer};
+      croak "Expected 'peer' to be an IO::Socket or subclass"
+         unless blessed $peer and $peer->isa( "IO::Socket" );
+
+      my $p_family = $peer->sockdomain;
+
+      $peeraddrfuture = $loop->new_future->done(
+         [ $p_family, $peer->socktype, $peer->protocol, IO::Async::OS->make_addr_for_peer( $p_family, $peer->sockname ) ]
+      );
    }
    else {
       croak "Expected 'host' and 'service' or 'addrs' or 'addr' arguments";

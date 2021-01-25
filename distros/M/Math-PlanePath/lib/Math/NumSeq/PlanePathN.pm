@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,7 +28,7 @@ use Carp 'croak';
 use constant 1.02;
 
 use vars '$VERSION','@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -1571,8 +1571,10 @@ sub values_max {
         # OEIS-Catalogue: A001196 planepath=ZOrderCurve line_type=Diagonal
       },
       'radix=3' =>
-      { X_axis => 'A037314',  # base 9 digits 0,1,2 only
+      { X_axis   => 'A037314',  # base 9 digits 0,1,2 only
+        Diagonal => 'A338086',  # base 9 digits 0,4,8 only
         # OEIS-Catalogue: A037314 planepath=ZOrderCurve,radix=3
+        # OEIS-Catalogue: A338086 planepath=ZOrderCurve,radix=3 line_type=Diagonal
       },
       'radix=3,i_start=1' =>
       { Y_axis => 'A208665',  # base 9 digits 0,3,6 only, starting OFFSET=1 value=3
@@ -1584,8 +1586,10 @@ sub values_max {
         # base 9 digits 0,3,6 only
       },
       'radix=10' =>
-      { X_axis => 'A051022',  # base 10 insert 0s, for digits 0 to 9 base 100
+      { X_axis   => 'A051022',  # base 10 insert 0s, for digits 0 to 9 base 100
+        Diagonal => 'A338754',  # base 10 duplicate digits
         # OEIS-Catalogue: A051022 planepath=ZOrderCurve,radix=10
+        # OEIS-Catalogue: A338754 planepath=ZOrderCurve,radix=10 line_type=Diagonal
       },
     };
 }
@@ -2333,6 +2337,46 @@ sub values_max {
       },
     };
 }
+{ package Math::PlanePath::CornerAlternating;
+  use constant _NumSeq_X_axis_increasing => 1;
+  use constant _NumSeq_Y_axis_increasing => 1;
+  use constant _NumSeq_Diagonal_increasing => 1;
+
+  use constant _NumSeq_N_oeis_anum =>
+    { 'wider=0,n_start=1' =>
+      { X_axis   => 'A081346',  # picture in A081344
+        Y_axis   => 'A081345',
+        # OEIS-Catalogue: A081346 planepath=CornerAlternating
+        # OEIS-Catalogue: A081345 planepath=CornerAlternating line_type=Y_axis
+      },
+      'wider=0,n_start=0' =>
+      { Diagonal => 'A002378',  # pronic
+        # OEIS-Other: A002378 planepath=CornerAlternating,n_start=0 line_type=Diagonal
+      },
+      'wider=0,n_start=2' =>
+      { Diagonal => 'A014206',  # pronic
+        # OEIS-Other: A014206 planepath=CornerAlternating,n_start=2 line_type=Diagonal
+      },
+
+      'wider=1,n_start=1' =>
+      { X_axis   => 'A081347',  # maze, picture in A081344
+        Y_axis   => 'A081348',
+        Diagonal => 'A080335',
+        # OEIS-Catalogue: A081347 planepath=CornerAlternating,wider=1
+        # OEIS-Catalogue: A081348 planepath=CornerAlternating,wider=1 line_type=Y_axis
+        # OEIS-Catalogue: A080335 planepath=CornerAlternating,wider=1 line_type=Diagonal
+      },
+
+      'wider=2,n_start=1' =>
+      { X_axis   => 'A081350',  # another maze, picture in A081349
+        Y_axis   => 'A081351',
+        Diagonal => 'A081352',
+        # OEIS-Catalogue: A081350 planepath=CornerAlternating,wider=2
+        # OEIS-Catalogue: A081351 planepath=CornerAlternating,wider=2 line_type=Y_axis
+        # OEIS-Catalogue: A081352 planepath=CornerAlternating,wider=2 line_type=Diagonal
+      },
+    };
+}
 { package Math::PlanePath::PyramidRows;
   use constant _NumSeq_Y_axis_increasing => 1;
   use constant _NumSeq_Diagonal_increasing => 1; # when covered, or single
@@ -2980,7 +3024,7 @@ sub values_max {
         # OEIS-Other: A188135 planepath=ToothpickSpiral line_type=Diagonal_SE
       },
       'n_start=0' =>
-      { Diagonal    => 'A033587',  # 
+      { Diagonal    => 'A033587',  #
         Diagonal_SW => 'A014635',  # even-index hexagonals
         Diagonal_SE => 'A033585',  #
         Diagonal_NW => 'A139271',
@@ -3219,7 +3263,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

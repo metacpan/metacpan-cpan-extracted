@@ -3,7 +3,7 @@ package Ryu::Node;
 use strict;
 use warnings;
 
-our $VERSION = '2.006'; # VERSION
+our $VERSION = '2.007'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -31,6 +31,19 @@ sub new {
         pause_propagation => 1,
         @_[1..$#_]
     }, $_[0]
+}
+
+=head2 describe
+
+Returns a string describing this node and any parents - typically this will result in a chain
+like C<< from->combine_latest->count >>.
+
+=cut
+
+# It'd be nice if L<Future> already provided a method for this, maybe I should suggest it
+sub describe {
+    my ($self) = @_;
+    ($self->parent ? $self->parent->describe . '=>' : '') . $self->label . '(' . $self->completed->state . ')';
 }
 
 =head2 pause

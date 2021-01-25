@@ -98,7 +98,7 @@ my $tz = DateTime::TimeZone->new( name => 'America/Chicago' );
         day       => 10,
         time_zone => 'UTC',
     );
-    is( $tz->offset_for_datetime($dt), -18000, 'offset should be -18000' );
+    is( $tz->offset_for_datetime($dt), -18000,    'offset should be -18000' );
     is( $tz->short_name_for_datetime($dt), 'CDT', 'name should be CDT' );
 }
 
@@ -109,7 +109,7 @@ my $tz = DateTime::TimeZone->new( name => 'America/Chicago' );
         day       => 29,
         time_zone => 'UTC',
     );
-    is( $tz->offset_for_datetime($dt), -21600, 'offset should be -21600' );
+    is( $tz->offset_for_datetime($dt), -21600,    'offset should be -21600' );
     is( $tz->short_name_for_datetime($dt), 'CST', 'name should be CST' );
 }
 
@@ -158,7 +158,7 @@ my $tz = DateTime::TimeZone->new( name => 'America/Chicago' );
         day       => 29,
         time_zone => 'UTC',
     );
-    is( $tz->offset_for_datetime($dt), -18000, 'offset should be -18000' );
+    is( $tz->offset_for_datetime($dt), -18000,    'offset should be -18000' );
     is( $tz->short_name_for_datetime($dt), 'CWT', 'name should be CWT' );
 }
 
@@ -170,7 +170,7 @@ my $tz = DateTime::TimeZone->new( name => 'America/Chicago' );
         time_zone => 'UTC',
     );
 
-    is( $tz->offset_for_datetime($dt), -18000, 'offset should be -18000' );
+    is( $tz->offset_for_datetime($dt), -18000,    'offset should be -18000' );
     is( $tz->short_name_for_datetime($dt), 'EST', 'name should be EST' );
 }
 
@@ -182,7 +182,7 @@ my $tz = DateTime::TimeZone->new( name => 'America/Chicago' );
         time_zone => 'UTC',
     );
 
-    is( $tz->offset_for_datetime($dt), -21036, 'offset should be -21036' );
+    is( $tz->offset_for_datetime($dt), -21036,    'offset should be -21036' );
     is( $tz->short_name_for_datetime($dt), 'LMT', 'name should be LMT' );
 }
 

@@ -2,7 +2,11 @@
 
 =encoding utf8
 
-=for HTML <a href="https://travis-ci.org/briandfoy/business-isbn-data"><img src="https://travis-ci.org/briandfoy/business-isbn-data.svg?branch=master" /></a>
+=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
+
+=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+
+=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
 
 =for HTML <a href='https://ci.appveyor.com/project/briandfoy/business-isbn-data'><img src='https://ci.appveyor.com/api/projects/status/v9isunqajl3h3ftf' /></a>
 
@@ -13,6 +17,12 @@
 =for HTML <a href="http://www.metacpan.org/module/Business::ISBN::Data"><img src="https://img.shields.io/cpan/v/Business-ISBN-Data.svg" /></A>
 
 =head1 The Business::ISBN::Data module
+
+B<Version 20191107 changed the internal data structure. You need
+Business::ISBN 3.005 to use this new data structure. Installing
+the right Business::ISBN with cpan should update this for you. However,
+installing this module by itself will not update Business::ISBN for
+you>.
 
 This is the I<README> for the L<Business::ISBN::Data> Perl module. You're probably
 looking at this because you don't know where else to find what you're
@@ -41,8 +51,15 @@ there), or look at the test files in I<t/>.
 
 =head2 Installation
 
-You can install this module with a CPAN client, which will resolve
-and install the dependencies:
+Usually you don't need to install this module on its own because
+L<Business::ISBN> will do it for you. You should always try this
+first:
+
+	% cpan Business::ISBN
+
+However, this module might update with the latest data even though
+L<Business::ISBN> did not change. In that case, you can install this
+directly:
 
 	% cpan Business::ISBN::Data
 	% cpanm Business::ISBN::Data
@@ -98,7 +115,7 @@ They might not know the particulars of this module, but they can help
 you diagnose your problem.
 
 You might like to read L<brian's Guide to Solving Any Perl
-Problem|http://archive.oreilly.com/pub/a/perl/excerpts/9780596527242/brians-guide.html>.
+Problem|https://briandfoy.github.io/brians-guide-to-solving-any-perl-problem/>.
 
 =head2 Copyright and License
 

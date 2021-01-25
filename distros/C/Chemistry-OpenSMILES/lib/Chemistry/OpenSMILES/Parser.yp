@@ -223,6 +223,11 @@ sub _Lexer
             $atom->{charge} = int $atom->{charge};
         }
 
+        if( $atom->{chirality} ) {
+            $atom->{chirality} =~ s/^\@TH1$/@/;
+            $atom->{chirality} =~ s/^\@TH2$/@@/;
+        }
+
         if( $atom->{hcount} ) {
             $atom->{hcount} =~ s/^H//;
             $atom->{hcount} = $atom->{hcount} ? int $atom->{hcount} : 1;

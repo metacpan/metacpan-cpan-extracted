@@ -1,10 +1,11 @@
-#  Copyright 1999-2012 ImageMagick Studio LLC, a non-profit organization
+#!/bin/sh
+#  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
 #  dedicated to making software imaging solutions freely available.
 #
 #  You may not use this file except in compliance with the License.  You may
 #  obtain a copy of the License at
 #
-#    http://www.imagemagick.org/script/license.php
+#    https://imagemagick.org/script/license.php
 #
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,10 +42,10 @@ fi
 
 if test -x PerlMagick -a -f Makefile.aperl ; then
   # Static build test incantation
-  ${MAKE} -f Makefile.aperl CC='gcc -std=gnu99 -std=gnu99' TEST_VERBOSE=1 test
+  ${MAKE} -f Makefile.aperl CC='gcc' TEST_VERBOSE=1 test
 elif test -f Makefile -a -f Magick.o; then
   # Shared build test incantation
-  ${MAKE} CC='gcc -std=gnu99 -std=gnu99' TEST_VERBOSE=1 test
+  ${MAKE} CC='gcc' TEST_VERBOSE=1 test
 else
   echo 'PerlMagick has not been built!'
   exit 1

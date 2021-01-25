@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -40,7 +40,7 @@ use MyOEIS;
 
 sub want_anum {
   my ($anum) = @_;
-  # return 0 unless $anum =~ /A001477/;
+  # return 0 unless $anum =~ /A338754/;
   # return 0 unless $anum =~ /A151922|A183060/;
   # return 0 unless $anum =~ /A177702|A102283|A131756/;
   return 1;
@@ -58,7 +58,7 @@ sub want_planepath {
   # return 0 unless $planepath =~ /TriangleSpiralSkewed/;
   # return 0 unless $planepath =~ /DiamondSpiral/;
   # return 0 unless $planepath =~ /AlternateTerdragon/;
-  # return 0 unless $planepath =~ /Pythagorean/;
+  return 0 unless $planepath =~ /Corner|PyramidSp/;
   # return 0 unless $planepath =~ /Square/;
   return 1;
 }
@@ -67,7 +67,7 @@ sub want_coordinate {
   # return 0 unless $type =~ /^[XY]$/;
   # return 0 unless $type =~ /NotStraight/;
   # return 0 unless $type =~ /^Abs[XY]/;
-  # return 0 unless $type =~ /DiffYX/i;
+  # return 0 unless $type =~ /dDiff/i;
   # return 0 unless $type =~ /ExperimentalPairsYX/;
   # return 0 unless $type =~ /SLR|SRL|LSR/;
   return 1;
@@ -422,4 +422,5 @@ MyTestHelpers::diag ("Catalogue sequences:");
 MyTestHelpers::diag ("total checks $total_checks");
 ok ($good);
 
+#------------------------------------------------------------------------------
 exit 0;

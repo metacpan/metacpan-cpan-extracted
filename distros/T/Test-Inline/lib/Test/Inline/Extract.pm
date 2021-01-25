@@ -1,30 +1,23 @@
 package Test::Inline::Extract;
+# ABSTRACT: Extract relevant Pod sections from source code.
 
-=pod
-
-=head1 NAME
-
-Test::Inline::Extract - Extract relevant Pod sections from source
-code.
-
-=head1 DESCRIPTION
-
-The Test::Inline::Extract package extracts content interesting to
-L<Test::Inline> from source files.
-
-=head1 METHODS
-
-=cut
+#pod =pod
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod The Test::Inline::Extract package extracts content interesting to
+#pod L<Test::Inline> from source files.
+#pod
+#pod =head1 METHODS
+#pod
+#pod =cut
 
 use strict;
 use List::Util   ();
-use File::Slurp  ();
+use Path::Tiny ();
 use Params::Util qw{_CLASS _INSTANCE _SCALAR};
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '2.213';
-}
+our $VERSION = '2.214';
 
 
 
@@ -33,17 +26,17 @@ BEGIN {
 #####################################################################
 # Constructor
 
-=pod
-
-=head2 new $file | \$source
-
-The C<new> constructor creates a new Extract object. It is passed either a
-file name from which the source code would be loaded, or a reference to a
-string that directly contains source code.
-
-Returns a new C<Test::Inline::Extract> object or C<undef> on error.
-
-=cut
+#pod =pod
+#pod
+#pod =head2 new $file | \$source
+#pod
+#pod The C<new> constructor creates a new Extract object. It is passed either a
+#pod file name from which the source code would be loaded, or a reference to a
+#pod string that directly contains source code.
+#pod
+#pod Returns a new C<Test::Inline::Extract> object or C<undef> on error.
+#pod
+#pod =cut
 
 sub new {
 	my $class  = _CLASS(shift) or die '->new is a static method';
@@ -67,27 +60,28 @@ sub _source {
 	return undef unless defined $_[0];
 	return shift if     _SCALAR($_[0]);
 	return undef if     ref $_[0];
-	File::Slurp::read_file( shift, scalar_ref => 1 );
+	my $content = Path::Tiny::path(shift)->slurp;
+	return \$content;
 }
 
-=pod
-
-=head2 elements
-
-  my $elements = $Extract->elements;
-
-The C<elements> method extracts from the Pod any parts of the file that are
-relevant to the extraction and generation process of C<Test::Inline>.
-
-The elements will be either a package statements, or a section of inline
-unit tests. They will only be returned if there is at least one section
-of inline unit tests.
-
-Returns a reference to an array of package strings and sections of inline
-unit tests. Returns false if there are no sections containing inline
-unit tests.
-
-=cut
+#pod =pod
+#pod
+#pod =head2 elements
+#pod
+#pod   my $elements = $Extract->elements;
+#pod
+#pod The C<elements> method extracts from the Pod any parts of the file that are
+#pod relevant to the extraction and generation process of C<Test::Inline>.
+#pod
+#pod The elements will be either a package statements, or a section of inline
+#pod unit tests. They will only be returned if there is at least one section
+#pod of inline unit tests.
+#pod
+#pod Returns a reference to an array of package strings and sections of inline
+#pod unit tests. Returns false if there are no sections containing inline
+#pod unit tests.
+#pod
+#pod =cut
 
 # Define the search pattern we will use
 use vars qw{$search};
@@ -129,7 +123,49 @@ sub _elements {
 
 1;
 
+__END__
+
 =pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Test::Inline::Extract - Extract relevant Pod sections from source code.
+
+=head1 VERSION
+
+version 2.214
+
+=head1 DESCRIPTION
+
+The Test::Inline::Extract package extracts content interesting to
+L<Test::Inline> from source files.
+
+=head1 METHODS
+
+=head2 new $file | \$source
+
+The C<new> constructor creates a new Extract object. It is passed either a
+file name from which the source code would be loaded, or a reference to a
+string that directly contains source code.
+
+Returns a new C<Test::Inline::Extract> object or C<undef> on error.
+
+=head2 elements
+
+  my $elements = $Extract->elements;
+
+The C<elements> method extracts from the Pod any parts of the file that are
+relevant to the extraction and generation process of C<Test::Inline>.
+
+The elements will be either a package statements, or a section of inline
+unit tests. They will only be returned if there is at least one section
+of inline unit tests.
+
+Returns a reference to an array of package strings and sections of inline
+unit tests. Returns false if there are no sections containing inline
+unit tests.
 
 =head1 TO DO
 
@@ -140,18 +176,18 @@ based on PPI
 
 See the main L<SUPPORT|Test::Inline/SUPPORT> section.
 
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Inline>
+(or L<bug-Test-Inline@rt.cpan.org|mailto:bug-Test-Inline@rt.cpan.org>).
+
 =head1 AUTHOR
 
-Adam Kennedy E<lt>adamk@cpan.orgE<gt>, L<http://ali.as/>
+Adam Kennedy <adamk@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2004 - 2013 Adam Kennedy.
+This software is copyright (c) 2003 by Adam Kennedy.
 
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
-
-The full text of the license can be found in the
-LICENSE file included with this module.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -56,6 +56,6 @@
          "url" : "https://github.com/brtastic/perl-kelp-module-symbiosis"
       }
    },
-   "version" : "1.10",
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

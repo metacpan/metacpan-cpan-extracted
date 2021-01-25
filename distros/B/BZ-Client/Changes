@@ -1,5 +1,8 @@
 Revision history for Perl extension BZ::Client.
 
+4.4004 Wednesday Janurary 20 07:36 2021
+    - Fix GH#6 bug
+
 4.4003 Tuesday September 21 22:02 2020
     - dist.ini changes
     - Dropped TODO file, moved to GH issues

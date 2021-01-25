@@ -1,7 +1,7 @@
 package App::TimeTracker::Utils;
 
 # ABSTRACT: Utility Methods/Functions for App::TimeTracker
-our $VERSION = '3.008'; # VERSION
+our $VERSION = '3.009'; # VERSION
 
 use strict;
 use warnings;
@@ -76,7 +76,7 @@ App::TimeTracker::Utils - Utility Methods/Functions for App::TimeTracker
 
 =head1 VERSION
 
-version 3.008
+version 3.009
 
 =head1 AUTHOR
 

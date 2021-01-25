@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,13 +26,13 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
 # uncomment this to run the ### lines
-#use Smart::Comments '###';
+# use Smart::Comments '###';
 
 
-my $test_count = (tests => 457)[1];
+my $test_count = (tests => 459)[1];
 plan tests => $test_count;
 
-# version 1.14 for abs() overload
+# Number::Fraction version 1.14 wanted for abs() overload.
 if (! eval 'use Number::Fraction 1.14; 1') {
   MyTestHelpers::diag ('skip due to Number::Fraction 1.14 not available -- ',$@);
   foreach (1 .. $test_count) {
@@ -42,6 +42,16 @@ if (! eval 'use Number::Fraction 1.14; 1') {
 }
 MyTestHelpers::diag ('Number::Fraction version ', Number::Fraction->VERSION);
 
+{
+  # Number::Fraction version 3.0.3 had a bug where some "plain == blessed"
+  # compares give the wrong answer.  But "blessed == plain" ok and writing
+  # that way here is enough.
+  #
+  my $plain = 123;
+  my $nf    = Number::Fraction->new($plain);
+  MyTestHelpers::diag ('Number::Fraction plain == nf: ',
+                       ($plain == $nf ? "yes, good" : "no, bad"));
+}
 
 
 #------------------------------------------------------------------------------
@@ -98,7 +108,7 @@ ok (floor(Number::Fraction->new('2'))   == 2,  1);
 
     my ($got_x,$got_y) = $path->n_to_xy($n);
     ok ($got_x == $x, 1, "got $got_x want $x");
-    ok ($got_y == $y);
+    ok ($y == $got_y, 1);
 
     my $got_n = $path->xy_to_n($x,$y);
     ok ($got_n == $n, 1);
@@ -242,6 +252,10 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
 ### Modules ...
 
 my @modules = (
+               'Corner',
+               'CornerAlternating',
+               'PyramidSides',
+
                'HilbertSides',
                'HilbertCurve',
                'HilbertSpiral',
@@ -508,8 +522,6 @@ my @modules = (
                'CubicBase',
 
                # 'File',  # not applicable
-               'Corner',
-               'PyramidSides',
                'Staircase',
                'StaircaseAlternating',
                'StaircaseAlternating,end_type=square',

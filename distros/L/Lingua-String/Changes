@@ -1,0 +1,9 @@
+Revision history for Lingua-String
+
+0.02	Sun Jan 24 13:05:03 EST 2021
+	Allow strings to be passed to the constructor
+	Added encode()
+	Fixed https://github.com/nigelhorne/Lingua-String/issues/1
+
+0.01:	Fri Jan 22 16:58:26 EST 2021
+        First draft

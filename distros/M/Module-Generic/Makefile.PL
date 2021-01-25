@@ -43,7 +43,7 @@ WriteMakefile(
     MIN_PERL_VERSION    => 'v5.26.1',
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Module-Generic-*' },
-    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? () : ( META_MERGE => {
+    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },
         dynamic_config => 1,
         resources => {
@@ -57,5 +57,5 @@ WriteMakefile(
                 web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=Module::Generic',
             },
         },
-    })),
+    }) : ()),
 );

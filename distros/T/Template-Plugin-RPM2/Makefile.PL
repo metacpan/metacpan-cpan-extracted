@@ -2,15 +2,15 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'VERSION_FROM' => 'lib/Template/Plugin/RPM2.pm',
-  'EXE_FILES' => [],
   'NAME' => 'Template::Plugin::RPM2',
-  'PL_FILES' => {},
-  'INSTALLDIRS' => 'site',
+  'VERSION_FROM' => 'lib/Template/Plugin/RPM2.pm',
   'PREREQ_PM' => {
-                   'Template' => 2,
                    'RPM2' => 0,
+                   'Template' => 2,
                    'Test::More' => 0
-                 }
+                 },
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
+  'PL_FILES' => {}
 )
 ;

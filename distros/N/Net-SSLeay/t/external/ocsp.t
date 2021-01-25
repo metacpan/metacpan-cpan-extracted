@@ -1,13 +1,13 @@
-#!/usr/bin/perl
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More;
-use IO::Socket::INET;
 use Net::SSLeay;
+use Test::Net::SSLeay qw(initialise_libssl);
 
-plan skip_all => "no OCSP support" 
-    if ! defined &Net::SSLeay::OCSP_response_status;
+use IO::Socket::INET;
+
+if (!defined &Net::SSLeay::OCSP_response_status) {
+    plan skip_all => 'No support for OCSP in your OpenSSL';
+}
 
 #$Net::SSLeay::trace=3;
 
@@ -39,14 +39,11 @@ my @tests = (
 my $release_tests = $ENV{RELEASE_TESTING} ? 1:0;
 plan tests => $release_tests + @tests;
 
+initialise_libssl();
 
 my $timeout = 10; # used to TCP connect and SSL connect
 my $http_ua = eval { require HTTP::Tiny } && HTTP::Tiny->new(verify_SSL => 0);
 
-Net::SSLeay::randomize();
-Net::SSLeay::load_error_strings();
-Net::SSLeay::ERR_load_crypto_strings();
-Net::SSLeay::SSLeay_add_ssl_algorithms();
 my $sha1 = Net::SSLeay::EVP_get_digestbyname('sha1');
 
 

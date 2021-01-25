@@ -26,6 +26,9 @@ my $build = Module::Build->new(
                                url  => 'git://github.com/davorg/parse-rpm-spec.git',
                                web  => 'https://github.com/davorg/parse-rpm-spec',
                         },
+                        bugtracker => {
+                               web  => 'https://github.com/davorg/parse-rpm-spec/issues',
+                        },
                 },
         },
 );

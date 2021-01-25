@@ -1,3 +1,9 @@
+2.0.4   2021-01-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Relabel border characters, introduce 6 more border characters for
+	  table with row/column spans.
+
+
 2.0.3   2020-06-19  Released-By: PERLANCAR; Urgency: medium
 
 	- State that get_struct() must also be available as a static

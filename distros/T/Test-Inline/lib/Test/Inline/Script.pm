@@ -1,21 +1,18 @@
 package Test::Inline::Script;
+# ABSTRACT: Generate the test file for a single source file
 
-=pod
-
-=head1 NAME
-
-Test::Inline::Script - Generate the test file for a single source file
-
-=head1 DESCRIPTION
-
-This class is where the heavy lifting happens to actually generating a
-test file takes place. Given a source filename, this modules will load
-it, parse out the relavent bits, put them into order based on the tags,
-and then merge them into a test file.
-
-=head1 METHODS
-
-=cut
+#pod =pod
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This class is where the heavy lifting happens to actually generating a
+#pod test file takes place. Given a source filename, this modules will load
+#pod it, parse out the relavent bits, put them into order based on the tags,
+#pod and then merge them into a test file.
+#pod
+#pod =head1 METHODS
+#pod
+#pod =cut
 
 use strict;
 use List::Util                     ();
@@ -27,14 +24,11 @@ use Algorithm::Dependency::Ordered ();
 use overload 'bool' => sub () { 1 },
              '""'   => 'filename';
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '2.213';
-	@ISA     = qw{
-		Algorithm::Dependency::Source
-		Algorithm::Dependency::Item
-	};
-}
+our $VERSION = '2.214';
+our @ISA     = qw{
+	Algorithm::Dependency::Source
+	Algorithm::Dependency::Item
+};
 
 # Special case, for when doing unit tests ONLY.
 # Don't throw the missing files warning.
@@ -50,19 +44,19 @@ BEGIN {
 #####################################################################
 # Constructor and Accessors
 
-=pod
-
-=head2 new
-
-  my $File = Test::Inline::Script->new( $class, \@sections, $check_count );
-
-The C<new> constructor takes a class name, set of Section objects and
-an optional C<check_count> flag.
-
-Returns a Test::Inline::Script object on success.
-Returns C<undef> on error.
-
-=cut
+#pod =pod
+#pod
+#pod =head2 new
+#pod
+#pod   my $File = Test::Inline::Script->new( $class, \@sections, $check_count );
+#pod
+#pod The C<new> constructor takes a class name, set of Section objects and
+#pod an optional C<check_count> flag.
+#pod
+#pod Returns a Test::Inline::Script object on success.
+#pod Returns C<undef> on error.
+#pod
+#pod =cut
 
 sub new {
 	my $class       = shift;
@@ -117,53 +111,53 @@ sub new {
 	$self;
 }
 
-=pod
-
-=head2 class
-
-Returns the class that the test file will test
-
-=head2 filename
-
-  my $filename = $File->filename;
-
-The C<filename> method returns the name of the output file that the tests
-should be written to. For example, the class C<Foo::Bar> would have the
-filename value C<foo_bar.t>.
-
-=head2 config
-
-  my $config = $File->config;
-
-The C<config> method returns the config object for the file, assuming that 
-it has one. If more than one are found, the first will be used, and any 
-additional config sections discarded.
-
-Returns a L<Test::Inline::Config> object on success, or false if the
-file does not contain a config section.
-
-=head2 setup
-
-  my @setup = $File->setup;
-
-The C<setup> method returns the setup sections from the file, in the same
-order as in the file.
-
-Returns a list of setup L<Test::Inline::Section> objects, the null
-array C<()> if the file does not contain any setup objects.
-
-=head2 sections
-
-  my @sections = $File->sections;
-
-The C<sections> method returns all normal sections from the file, in the
-same order as in the file. This may not be the order they will be written
-to the test file, for that you should see the C<sorted> method.
-
-Returns a list of L<Test::Inline::Section> objects, or the null array
-C<()> if the file does not contain any non-setup sections.
-
-=cut
+#pod =pod
+#pod
+#pod =head2 class
+#pod
+#pod Returns the class that the test file will test
+#pod
+#pod =head2 filename
+#pod
+#pod   my $filename = $File->filename;
+#pod
+#pod The C<filename> method returns the name of the output file that the tests
+#pod should be written to. For example, the class C<Foo::Bar> would have the
+#pod filename value C<foo_bar.t>.
+#pod
+#pod =head2 config
+#pod
+#pod   my $config = $File->config;
+#pod
+#pod The C<config> method returns the config object for the file, assuming that 
+#pod it has one. If more than one are found, the first will be used, and any 
+#pod additional config sections discarded.
+#pod
+#pod Returns a L<Test::Inline::Config> object on success, or false if the
+#pod file does not contain a config section.
+#pod
+#pod =head2 setup
+#pod
+#pod   my @setup = $File->setup;
+#pod
+#pod The C<setup> method returns the setup sections from the file, in the same
+#pod order as in the file.
+#pod
+#pod Returns a list of setup L<Test::Inline::Section> objects, the null
+#pod array C<()> if the file does not contain any setup objects.
+#pod
+#pod =head2 sections
+#pod
+#pod   my @sections = $File->sections;
+#pod
+#pod The C<sections> method returns all normal sections from the file, in the
+#pod same order as in the file. This may not be the order they will be written
+#pod to the test file, for that you should see the C<sorted> method.
+#pod
+#pod Returns a list of L<Test::Inline::Section> objects, or the null array
+#pod C<()> if the file does not contain any non-setup sections.
+#pod
+#pod =cut
 
 sub class    { $_[0]->{class}        }
 sub filename { $_[0]->{filename}     }
@@ -178,18 +172,18 @@ sub sections { @{$_[0]->{sections}}  }
 #####################################################################
 # Main Methods
 
-=pod
-
-=head2 sorted
-
-The C<sorted> method returns all normal sections from the file, in an order
-that satisfies any dependencies in the sections.
-
-Returns a reference to an array of L<Test::Inline::Section> objects,
-C<0> if the file does not contain any non-setup sections, or C<undef> on
-error.
-
-=cut
+#pod =pod
+#pod
+#pod =head2 sorted
+#pod
+#pod The C<sorted> method returns all normal sections from the file, in an order
+#pod that satisfies any dependencies in the sections.
+#pod
+#pod Returns a reference to an array of L<Test::Inline::Section> objects,
+#pod C<0> if the file does not contain any non-setup sections, or C<undef> on
+#pod error.
+#pod
+#pod =cut
 
 sub sorted {
 	my $self = shift;
@@ -229,18 +223,18 @@ sub sorted {
 	$self->{sorted} = \@sorted;
 }
 
-=pod
-
-=head2 tests
-
-If the number of tests for all of the sections within the file are known,
-then the number of tests for the entire file can also be determined.
-
-The C<tests> method determines if the number of tests can be known, and
-if so, calculates and returns the number of tests. Returns false if the
-number of tests is not known.
-
-=cut
+#pod =pod
+#pod
+#pod =head2 tests
+#pod
+#pod If the number of tests for all of the sections within the file are known,
+#pod then the number of tests for the entire file can also be determined.
+#pod
+#pod The C<tests> method determines if the number of tests can be known, and
+#pod if so, calculates and returns the number of tests. Returns false if the
+#pod number of tests is not known.
+#pod
+#pod =cut
 
 sub tests {
 	my $self = shift;
@@ -258,20 +252,20 @@ sub tests {
 	$self->{tests} = $total || undef;
 }
 
-=pod
-
-=head2 merged_content
-
-The C<merged_content> method generates and returns the merged contents of all
-the sections in the file, including the setup sections at the beginning. The
-method does not return the entire file, merely the part contained in the
-sections. For the full file contents, see the C<file_content> method.
-
-Returns a string containing the merged section content on success, false
-if there is no content, despite the existance of sections ( which would
-have been empty ), or C<undef> on error.
-
-=cut
+#pod =pod
+#pod
+#pod =head2 merged_content
+#pod
+#pod The C<merged_content> method generates and returns the merged contents of all
+#pod the sections in the file, including the setup sections at the beginning. The
+#pod method does not return the entire file, merely the part contained in the
+#pod sections. For the full file contents, see the C<file_content> method.
+#pod
+#pod Returns a string containing the merged section content on success, false
+#pod if there is no content, despite the existance of sections ( which would
+#pod have been empty ), or C<undef> on error.
+#pod
+#pod =cut
 
 sub merged_content {
 	my $self = shift;
@@ -408,24 +402,128 @@ sub _duplicate_names(@) {
 
 1;
 
+__END__
+
 =pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Test::Inline::Script - Generate the test file for a single source file
+
+=head1 VERSION
+
+version 2.214
+
+=head1 DESCRIPTION
+
+This class is where the heavy lifting happens to actually generating a
+test file takes place. Given a source filename, this modules will load
+it, parse out the relavent bits, put them into order based on the tags,
+and then merge them into a test file.
+
+=head1 METHODS
+
+=head2 new
+
+  my $File = Test::Inline::Script->new( $class, \@sections, $check_count );
+
+The C<new> constructor takes a class name, set of Section objects and
+an optional C<check_count> flag.
+
+Returns a Test::Inline::Script object on success.
+Returns C<undef> on error.
+
+=head2 class
+
+Returns the class that the test file will test
+
+=head2 filename
+
+  my $filename = $File->filename;
+
+The C<filename> method returns the name of the output file that the tests
+should be written to. For example, the class C<Foo::Bar> would have the
+filename value C<foo_bar.t>.
+
+=head2 config
+
+  my $config = $File->config;
+
+The C<config> method returns the config object for the file, assuming that 
+it has one. If more than one are found, the first will be used, and any 
+additional config sections discarded.
+
+Returns a L<Test::Inline::Config> object on success, or false if the
+file does not contain a config section.
+
+=head2 setup
+
+  my @setup = $File->setup;
+
+The C<setup> method returns the setup sections from the file, in the same
+order as in the file.
+
+Returns a list of setup L<Test::Inline::Section> objects, the null
+array C<()> if the file does not contain any setup objects.
+
+=head2 sections
+
+  my @sections = $File->sections;
+
+The C<sections> method returns all normal sections from the file, in the
+same order as in the file. This may not be the order they will be written
+to the test file, for that you should see the C<sorted> method.
+
+Returns a list of L<Test::Inline::Section> objects, or the null array
+C<()> if the file does not contain any non-setup sections.
+
+=head2 sorted
+
+The C<sorted> method returns all normal sections from the file, in an order
+that satisfies any dependencies in the sections.
+
+Returns a reference to an array of L<Test::Inline::Section> objects,
+C<0> if the file does not contain any non-setup sections, or C<undef> on
+error.
+
+=head2 tests
+
+If the number of tests for all of the sections within the file are known,
+then the number of tests for the entire file can also be determined.
+
+The C<tests> method determines if the number of tests can be known, and
+if so, calculates and returns the number of tests. Returns false if the
+number of tests is not known.
+
+=head2 merged_content
+
+The C<merged_content> method generates and returns the merged contents of all
+the sections in the file, including the setup sections at the beginning. The
+method does not return the entire file, merely the part contained in the
+sections. For the full file contents, see the C<file_content> method.
+
+Returns a string containing the merged section content on success, false
+if there is no content, despite the existance of sections ( which would
+have been empty ), or C<undef> on error.
 
 =head1 SUPPORT
 
 See the main L<SUPPORT|Test::Inline/SUPPORT> section.
 
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Inline>
+(or L<bug-Test-Inline@rt.cpan.org|mailto:bug-Test-Inline@rt.cpan.org>).
+
 =head1 AUTHOR
 
-Adam Kennedy E<lt>adamk@cpan.orgE<gt>, L<http://ali.as/>
+Adam Kennedy <adamk@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2004 - 2013 Adam Kennedy.
+This software is copyright (c) 2003 by Adam Kennedy.
 
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
-
-The full text of the license can be found in the
-LICENSE file included with this module.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

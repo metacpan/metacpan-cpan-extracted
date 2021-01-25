@@ -1,6 +1,10 @@
 Revision history for Perl extension BoardStreams
 
-v0.0.1 2020-03-30T20:33:51Z
+v0.0.3 2021-01-22T20:36:06Z
 
-    - original version (not much here)
+    - renamed exception classes
+
+v0.0.2 2021-01-21T21:32:18Z
+
+    - original version
 

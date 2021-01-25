@@ -1,3 +1,8 @@
+0.035   2021-01-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to anchor patterns.
+
+
 0.034   2020-06-19  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Forgot to load Regexp::Pattern::Perl::Module in

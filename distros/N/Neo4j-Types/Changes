@@ -1,0 +1,5 @@
+Revision history for Neo4j::Types
+
+1.00  2021-01-18
+
+ - initial release, based on Neo4j::Driver 0.20 and Neo4j::Bolt 0.4200

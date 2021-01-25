@@ -25,4 +25,5 @@ t/04.colour.t
 t/05.scalar.t
 t/06.array.t
 t/07.iterator.t
+t/99.kwalitee.t
 META.json                                Module JSON meta-data (added by MakeMaker)

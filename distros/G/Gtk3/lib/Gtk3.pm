@@ -1,5 +1,5 @@
 package Gtk3;
-$Gtk3::VERSION = '0.037';
+$Gtk3::VERSION = '0.038';
 =encoding utf8
 
 =head1 NAME
@@ -1132,6 +1132,9 @@ sub Gtk3::Dialog::new {
     my $dialog = Gtk3::Dialog->new;
     defined $title and $dialog->set_title ($title);
     defined $parent and $dialog->set_transient_for ($parent);
+    if (! eval { $flags->isa ('Gtk3::DialogFlags'); }) {
+      $flags = Gtk3::DialogFlags->new ($flags);
+    }
     $flags & 'modal' and $dialog->set_modal (Glib::TRUE);
     $flags & 'destroy-with-parent' and $dialog->set_destroy_with_parent (Glib::TRUE);
     $dialog->add_buttons (@rest);
@@ -1421,6 +1424,9 @@ sub Gtk3::MessageDialog::new {
   if (defined $parent) {
     $dialog->set_transient_for ($parent);
   }
+  if (! eval { $flags->isa ('Gtk3::DialogFlags'); }) {
+    $flags = Gtk3::DialogFlags->new ($flags);
+  }
   if ($flags & 'modal') {
     $dialog->set_modal (Glib::TRUE);
   }
@@ -1428,6 +1434,39 @@ sub Gtk3::MessageDialog::new {
     $dialog->set_destroy_with_parent (Glib::TRUE);
   }
   return $dialog;
+}
+
+=item * A Perl reimplementation of C<Gtk3::MessageDialog::new_with_markup> is provided.
+
+=cut
+
+sub Gtk3::MessageDialog::new_with_markup {
+  my ($class, $parent, $flags, $type, $buttons, $format, @args) = @_;
+  my $dialog = Gtk3::MessageDialog::new ($class, $parent, $flags, $type, $buttons, undef);
+  if (defined $format) {
+    my $markup = sprintf $format, @args;
+    $dialog->set_markup ($markup);
+  }
+  return $dialog;
+}
+
+=item * A Perl reimplementation of C<Gtk3::MessageDialog::format_secondary_text> and
+C<Gtk3::MessageDialog::format_secondary_markup> is provided
+
+=cut
+
+sub Gtk3::MessageDialog::format_secondary_text {
+  my ($dialog, $format, @args) = @_;
+
+  my $text = sprintf $format, @args;
+  $dialog->set ('secondary-text' => $text, 'secondary-use-markup' => 0);
+}
+
+sub Gtk3::MessageDialog::format_secondary_markup {
+  my ($dialog, $format, @args) = @_;
+
+  my $text = sprintf $format, @args;
+  $dialog->set ('secondary-text' => $text, 'secondary-use-markup' => 1);
 }
 
 =item * The group handling in the constructors and accessors of
@@ -2404,7 +2443,7 @@ sub _rest_to_ref {
 }
 
 package Gtk3::Gdk::EventMask;
-$Gtk3::Gdk::EventMask::VERSION = '0.037';
+$Gtk3::Gdk::EventMask::VERSION = '0.038';
 use overload
   '==' => \&eq,
   '>=' => \&ge;

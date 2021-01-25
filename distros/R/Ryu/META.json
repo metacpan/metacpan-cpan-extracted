@@ -30,6 +30,7 @@
       },
       "develop" : {
          "requires" : {
+            "Devel::Cover" : "0",
             "Devel::Cover::Report::Coveralls" : "0.11",
             "Dist::Zilla" : "5",
             "Dist::Zilla::PluginBundle::Author::TEAM" : "0",
@@ -100,35 +101,35 @@
    "provides" : {
       "Ryu" : {
          "file" : "lib/Ryu.pm",
-         "version" : "2.006"
+         "version" : "2.007"
       },
       "Ryu::Buffer" : {
          "file" : "lib/Ryu/Buffer.pm",
-         "version" : "2.006"
+         "version" : "2.007"
       },
       "Ryu::Exception" : {
          "file" : "lib/Ryu/Exception.pm",
-         "version" : "2.006"
+         "version" : "2.007"
       },
       "Ryu::Node" : {
          "file" : "lib/Ryu/Node.pm",
-         "version" : "2.006"
+         "version" : "2.007"
       },
       "Ryu::Observable" : {
          "file" : "lib/Ryu/Observable.pm",
-         "version" : "2.006"
+         "version" : "2.007"
       },
       "Ryu::Sink" : {
          "file" : "lib/Ryu/Sink.pm",
-         "version" : "2.006"
+         "version" : "2.007"
       },
       "Ryu::Source" : {
          "file" : "lib/Ryu/Source.pm",
-         "version" : "2.006"
+         "version" : "2.007"
       },
       "Ryu::Stream" : {
          "file" : "lib/Ryu/Stream.pm",
-         "version" : "2.006"
+         "version" : "2.007"
       }
    },
    "release_status" : "stable",
@@ -143,7 +144,7 @@
          "web" : "https://github.com/team-at-cpan/Ryu"
       }
    },
-   "version" : "2.006",
+   "version" : "2.007",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Binary-Mohanad <mohanad@binary.com>",

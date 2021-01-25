@@ -81,7 +81,7 @@ use Attribute::Handlers autotie => { "__CALLER__::Regex" => __PACKAGE__ };
 @EXPORT = qw();
 @EXPORT_OK =();
 
-$VERSION = 1.13;
+$VERSION = 1.14;
 
 =head1 METHODS
 

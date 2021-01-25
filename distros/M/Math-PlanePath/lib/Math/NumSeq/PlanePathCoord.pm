@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,7 +28,7 @@ use List::Util;
 *min = \&Math::PlanePath::_min;
 
 use vars '$VERSION','@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -4056,6 +4056,47 @@ sub characteristic_smaller {
         # Not quite, A053188 has extra initial 0
         # AbsDiff => 'A053188', # distance to nearest square
       },
+
+      'wider=2,n_start=1' =>
+      { Sum     => 'A213088', # Manhattan X+Y
+        SumAbs  => 'A213088',
+        # OEIS-Other: A213088 planepath=Corner,wider=2 coordinate_type=Sum
+        # OEIS-Other: A213088 planepath=Corner,wider=2 coordinate_type=SumAbs
+      },
+      
+    };
+}
+{ package Math::PlanePath::CornerAlternating;
+  use constant _NumSeq_Coord_filling_type => 'quadrant';
+  *_NumSeq_Coord_Max_non_decreasing
+    = \&Math::PlanePath::Corner::_NumSeq_Coord_Max_non_decreasing;
+
+  use constant _NumSeq_Coord_oeis_anum =>
+    { 'wider=0,n_start=1' =>
+      { Sum     => 'A213088', # Manhattan X+Y, OFFSET=0
+        SumAbs  => 'A213088',
+        # OEIS-Other:     A213088 planepath=CornerAlternating coordinate_type=Sum
+        # OEIS-Other:     A213088 planepath=CornerAlternating coordinate_type=SumAbs
+      },
+      'wider=0,n_start=0' =>
+      { X       => 'A319290',
+        Y       => 'A319289',
+        DiffXY  => 'A329116',
+        AbsDiff => 'A053615', # runs n..0..n
+        Max     => 'A000196', # n repeated 2n+1 times, floor(sqrt(N))
+        MaxAbs  => 'A000196', #  MaxAbs=Max
+        # OEIS-Catalogue: A319290 planepath=CornerAlternating,n_start=0 coordinate_type=X
+        # OEIS-Catalogue: A319289 planepath=CornerAlternating,n_start=0 coordinate_type=Y
+        # OEIS-Other:     A329116 planepath=CornerAlternating,n_start=0 coordinate_type=DiffXY
+        # OEIS-Other:     A053615 planepath=CornerAlternating,n_start=0 coordinate_type=AbsDiff
+        # OEIS-Other:     A000196 planepath=CornerAlternating,n_start=0 coordinate_type=Max
+        # OEIS-Other:     A000196 planepath=CornerAlternating,n_start=0 coordinate_type=MaxAbs
+      },
+
+      'wider=1,n_start=0' =>
+      { DiffXY    => 'A180714', # X+Y of square spiral
+        # OEIS-Other: A180714 planepath=CornerAlternating,wider=1,n_start=0 coordinate_type=DiffXY
+      }
     };
 }
 { package Math::PlanePath::PyramidRows;

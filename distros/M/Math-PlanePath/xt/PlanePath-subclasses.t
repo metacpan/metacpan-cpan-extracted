@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -50,6 +50,15 @@ my @modules = (
                # elsewhere and are skipped if not available to test
 
                # module list begin
+
+               'CornerAlternating',
+               'CornerAlternating,n_start=0',
+               'CornerAlternating,n_start=101',
+               'CornerAlternating,wider=1',
+               'CornerAlternating,wider=1,n_start=101',
+               'CornerAlternating,wider=3,n_start=37',
+               'CornerAlternating,wider=4,n_start=37',
+               'CornerAlternating,wider=10',
 
                'PeanoDiagonals',
                'PeanoDiagonals,radix=2',
@@ -892,7 +901,7 @@ BEGIN {
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 128;
+my $want_version = 129;
 
 ok ($Math::PlanePath::VERSION, $want_version, 'VERSION variable');
 ok (Math::PlanePath->VERSION,  $want_version, 'VERSION class method');
@@ -971,6 +980,8 @@ my %xy_maximum_duplication_at_origin =
 
 # modules for which rect_to_n_range() is exact
 my %rect_exact = (
+                  'Math::PlanePath::CornerAlternating' => 1,
+
                   # rect_to_n_range exact begin
                   'Math::PlanePath::ImaginaryBase' => 1,
                   'Math::PlanePath::CincoCurve' => 1,

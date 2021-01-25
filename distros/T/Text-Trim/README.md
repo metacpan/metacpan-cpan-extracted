@@ -4,7 +4,7 @@ Text::Trim - remove leading and/or trailing whitespace from strings
 
 # VERSION
 
-version 1.03
+version 1.04
 
 # SYNOPSIS
 
@@ -139,11 +139,10 @@ Brent B. Powers' [String::Strip](https://metacpan.org/pod/String::Strip) perform
 
 **Ryan Thompson** <rjt@cpan.org> - Co-maintainer, miscellaneous fixes
 
-# BUGS
+# SUPPORT
 
-Please report any bugs or feature requests to `bug-text-trim@rt.cpan.org`, 
-or through the web interface at
-[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Trim](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Trim). 
+ - [Issue Tracker](https://github.com/rjt-pl/Text-Trim/issues): Bug reports and feature requests
+ - [GitHub Repository](https://github.com/rjt-pl/Text-Trim.git)
 
 # ACKNOWLEDGEMENTS
 

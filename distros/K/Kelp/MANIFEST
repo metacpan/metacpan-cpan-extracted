@@ -12,6 +12,8 @@ conf/test.pl
 dist.ini
 lib/Kelp.pm
 lib/Kelp/Base.pm
+lib/Kelp/Exception.pm
+lib/Kelp/Generator.pm
 lib/Kelp/Less.pm
 lib/Kelp/Manual.pod
 lib/Kelp/Manual/Cookbook.pod
@@ -33,8 +35,19 @@ lib/Kelp/Routes/Controller.pm
 lib/Kelp/Routes/Pattern.pm
 lib/Kelp/Template.pm
 lib/Kelp/Test.pm
+lib/Kelp/templates/kelp/app.psgi.gen
+lib/Kelp/templates/kelp/conf-config.pl.gen
+lib/Kelp/templates/kelp/conf-deployment.pl.gen
+lib/Kelp/templates/kelp/conf-development.pl.gen
+lib/Kelp/templates/kelp/conf-test.pl.gen
+lib/Kelp/templates/kelp/lib-PATH-FILE.pm.gen
+lib/Kelp/templates/kelp/log-keep.gen
+lib/Kelp/templates/kelp/t-main.t.gen
+lib/Kelp/templates/kelp/template
+lib/Kelp/templates/kelp/views-welcome.tt
+lib/Kelp/templates/less/NAME.psgi.gen
+lib/Kelp/templates/less/template
 log/keep
-pod2htmd.tmp
 t/author-pod-syntax.t
 t/base.t
 t/bin_tests.t
@@ -54,7 +67,10 @@ t/conf/process_mode/a.pl
 t/conf/process_mode/b.pl
 t/conf/stack_trace_enabled/test.pl
 t/custom_req_resp.t
+t/exceptions.t
+t/json-encode-error.t
 t/less.t
+t/lib/JsonError.pm
 t/lib/MyApp.pm
 t/lib/MyApp/Module/Null.pm
 t/lib/MyApp/Request.pm
@@ -79,6 +95,7 @@ t/module_load.t
 t/module_logger.t
 t/module_template.t
 t/module_template_null.t
+t/new_anonymous.t
 t/pattern_build.t
 t/pattern_cache.t
 t/pattern_match.t
@@ -96,6 +113,7 @@ t/routes_match.t
 t/routes_url.t
 t/run.t
 t/run_bridge.t
+t/safe_param.t
 t/subclassed.t
 t/template.t
 t/test.psgi

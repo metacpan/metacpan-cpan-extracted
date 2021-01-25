@@ -1,9 +1,9 @@
 package Sah::PSchema::perl::modname_with_optional_args;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2021-01-20'; # DATE
 our $DIST = 'Sah-PSchemas-Perl'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 sub meta {
     my $class = shift;
@@ -20,7 +20,7 @@ sub meta {
 }
 
 sub get_schema {
-    return ["perl::modname_with_optional_prefix" => {
+    return ["perl::modname_with_optional_args" => {
         'x.perl.coerce_rules' => [
             ['From_str::normalize_perl_modname' => {ns_prefix=>$args->{ns_prefix}}],
         ],
@@ -45,7 +45,7 @@ Sah::PSchema::perl::modname_with_optional_args - Perl module name with optional 
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::PSchema::perl::modname_with_optional_args (from Perl distribution Sah-PSchemas-Perl), released on 2020-06-09.
+This document describes version 0.004 of Sah::PSchema::perl::modname_with_optional_args (from Perl distribution Sah-PSchemas-Perl), released on 2021-01-20.
 
 =head1 DESCRIPTION
 
@@ -63,7 +63,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-PSchemas-Perl>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-PSchemas-Perl>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-PSchemas-Perl/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -79,7 +79,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

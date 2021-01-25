@@ -1,0 +1,45 @@
+# -*- conf -*-
+# this file will be Include-d by @ServerRoot@/conf/httpd.conf
+
+# where Apache2::SSI can be found
+PerlSwitches -I@ServerRoot@/../lib
+PerlSwitches -I@ServerRoot@/..
+# preload the module
+PerlModule Apache2::SSI
+PerlOptions +GlobalRequest
+PerlSetupEnv On
+<Directory "@documentroot@/ssi">
+    SetHandler modperl
+    ## PerlResponseHandler Apache2::SSI
+    PerlOutputFilterHandler Apache2::SSI
+    AcceptPathInfo On
+    # Example of useful section to put given ssi are dynamic
+    <IfModule mod_headers.c>
+        Header Set Pragma "no-cache"
+        Header Set Expires "Thu, 1 Jan 1970 00:00:00 GMT"
+        Header Set Cache-Control "max-age=0, no-store, no-cache, must-revalidate"
+        Header Unset ETag
+    </IfModule>
+    # Alternatively, you can do also:
+    PerlSetVar Apache2_SSI_NO_CACHE On
+    <Files ~ "\.(pl|cgi)$">
+        Options All +Includes +ExecCGI -Indexes -MultiViews
+        ## AllowOverride All
+        ## SetHandler perl-script
+        SetHandler cgi-script
+        AcceptPathInfo On
+        ## PerlResponseHandler ModPerl::PerlRun
+        ## Even better for stable cgi scripts:
+        ## PerlResponseHandler ModPerl::Registry
+        ## Change this in mod_perl1 PerlSendHeader On to the following:
+        ## <https://perl.apache.org/docs/2.0/user/porting/compat.html#C_PerlSendHeader_>
+        ##  PerlOptions +ParseHeaders
+    </Files>
+</Directory>
+<Location "/tests">
+    SetHandler modperl
+    PerlResponseHandler SSITest
+    AcceptPathInfo On
+</Location>
+# To cleanup Apache2 notes in memory
+PerlPostConfigRequire @ServerRoot@/../scripts/startup.pl

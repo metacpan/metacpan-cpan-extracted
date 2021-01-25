@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -123,6 +123,8 @@ my @all_classes = ('SquareSpiral',
                    'StaircaseAlternating,end_type=square',
                    'Corner',
                    'Corner,wider=5',
+                   'CornerAlternating',
+                   'CornerAlternating,wider=5',
                    'KnightSpiral',
                    'CretanLabyrinth',
 

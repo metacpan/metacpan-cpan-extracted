@@ -38,18 +38,21 @@
    "provides" : {
       "Github::Fork::Parent" : {
          "file" : "lib/Github/Fork/Parent.pm",
-         "version" : "1.0"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/chorny/Github-Fork-Parent/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/chorny/Github-Fork-Parent"
+         "url" : "https://github.com/chorny/Github-Fork-Parent"
       }
    },
-   "version" : "1.0",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON version 2.90"
 }

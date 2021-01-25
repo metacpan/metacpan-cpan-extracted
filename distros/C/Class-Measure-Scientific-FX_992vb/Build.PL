@@ -8,7 +8,6 @@ Module::Build->new(
     requires    => {
         'perl'             => '5.16.0',
         'Class::Measure'   => 0.08,
-        'Log::Log4perl'    => 0,
         'Moose'            => 0,
         'MooseX::NonMoose' => 0,
         'Readonly'         => 1.03,
@@ -24,9 +23,8 @@ Module::Build->new(
         resources => {
             repository =>
 'https://bitbucket.org/rolandvanipenburg/class-measure-scientific-fx_992vb',
-            bugtracker => {
-              web => 'https://bitbucket.org/rolandvanipenburg/class-measure-scientific-fx_992vb/issues'
-            },
+            bugtracker =>
+'https://bitbucket.org/rolandvanipenburg/class-measure-scientific-fx_992vb/issues'
         },
     },
     sign => 1,

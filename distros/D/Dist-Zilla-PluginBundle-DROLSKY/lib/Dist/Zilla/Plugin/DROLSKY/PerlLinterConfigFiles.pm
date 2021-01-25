@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.12';
+our $VERSION = '1.18';
 
 use Path::Tiny qw( path );
 use Path::Tiny::Rule;
@@ -148,7 +148,7 @@ Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles - Creates default perltidyrc
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =for Pod::Coverage .*
 

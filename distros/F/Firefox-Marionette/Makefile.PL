@@ -63,8 +63,12 @@ elsif ( $> == 0 ) {    # see RT#131304
     }
     else {
         $ENV{HOME} = $correct;
-        print
+        warn
 "Running as root.  Resetting HOME environment variable from $current to $ENV{HOME}\n";
+    }
+    if ( exists $ENV{XAUTHORITY} ) {    # see GH#1
+        delete $ENV{XAUTHORITY};
+        warn "Running as root.  Deleting the XAUTHORITY environment variable\n";
     }
 }
 
@@ -74,24 +78,24 @@ my $dev_null  = File::Spec->devnull();
 sub last_desperate_search {
     if ( ( $^O eq 'MSWin32' ) ) {
         foreach my $possible (@possibles) {
-            print "Checking for $possible in Path:"
+            warn "Checking for $possible in Path:"
               . `"$possible.exe" -version 2>$dev_null` . "\n";
         }
     }
     elsif ( ( $^O eq 'darwin' ) or ( $^O eq 'cygwin' ) ) {
         foreach my $possible (@possibles) {
-            print "Checking for $possible in PATH:"
+            warn "Checking for $possible in PATH:"
               . `$possible -version $dev_null` . "\n";
         }
     }
     my $glob_path = '/usr/share/applications/firefox*.desktop';
     foreach my $path ( glob $glob_path ) {
-        print `$^X -nle 'print "\$ARGV:\$_" if (/(Exec|^\\[)/);' $path`;
+        warn `$^X -nle 'print "\$ARGV:\$_" if (/(Exec|^\\[)/);' $path`;
     }
 }
 
-my $binary; #                      = 'firefox';
-my $suffix = (( $^O eq 'MSWin32' ) || ( $^O eq 'cygwin' )) ? '.exe' : q[];
+my $binary;    #                      = 'firefox';
+my $suffix = ( ( $^O eq 'MSWin32' ) || ( $^O eq 'cygwin' ) ) ? '.exe' : q[];
 my %known_win32_preferred_names = (
     'Mozilla Firefox'           => 1,
     'Mozilla Firefox ESR'       => 2,
@@ -146,7 +150,7 @@ if ( $^O eq 'MSWin32' ) {
                 ],
                 name => 'PathToExe'
             );
-            if (( defined $path ) && (-e $path)) {
+            if ( ( defined $path ) && ( -e $path ) ) {
                 $binary = $path;
                 last NAME;
             }
@@ -201,7 +205,8 @@ elsif ( $^O eq 'cygwin' ) {
                   . $name_for_path_to_exe . q[/]
                   . $version
                   . '/Main/PathToExe' );
-            if (   ( defined $path ) && (-e $path)
+            if (   ( defined $path )
+                && ( -e $path )
                 && ( $initial_version =~ /^$version_regex$/smx ) )
             {
                 $binary         = `cygpath -s -m "$path"`;
@@ -212,42 +217,48 @@ elsif ( $^O eq 'cygwin' ) {
         }
     }
 }
-if (!defined $binary) {
+if ( !defined $binary ) {
   POSSIBLE: foreach my $possible (@possibles) {
-        foreach my $path ( split /$Config::Config{path_sep}/, defined $ENV{PATH} ? $ENV{PATH} : $ENV{Path} ) {
+        foreach my $path ( split /$Config::Config{path_sep}/,
+            defined $ENV{PATH} ? $ENV{PATH} : $ENV{Path} )
+        {
             if ( -e "$path/$possible$suffix" ) {
                 $binary = "$path/$possible";
-		last POSSIBLE;
+                last POSSIBLE;
             }
         }
     }
 }
-if (( !defined $version_string ) && (defined $binary)) {
-	my $ini_path = $binary;
-	$ini_path =~ s/(firefox|waterfox)(?:[.]exe)?$/application.ini/smx;
-	if (my $ini_handle = open INI_HANDLE, '<', $ini_path) {
-		my $vendor;
-		my $name;
-	    while(my $line = <INI_HANDLE>) {
-		chomp $line;
-		if ($line =~ /^Vendor=(.*)$/smx) {
-			($vendor) = ($1);
-		} elsif ($line =~ /^Name=(.*)$/smx) {
-			($name) = ($1);
-		} elsif ($line =~ /^Version=($version_regex)$/smx) {
-			$version_string = "$vendor $name $1\n";
-			warn "Determining version string from $ini_path\n";
-		 }
-	    }
-	}
+if ( ( !defined $version_string ) && ( defined $binary ) ) {
+    my $ini_path = $binary;
+    $ini_path =~ s/(firefox|waterfox)(?:[.]exe)?$/application.ini/smx;
+    if ( my $ini_handle = open INI_HANDLE, '<', $ini_path ) {
+        my $vendor;
+        my $name;
+        while ( my $line = <INI_HANDLE> ) {
+            chomp $line;
+            if ( $line =~ /^Vendor=(.*)$/smx ) {
+                ($vendor) = ($1);
+            }
+            elsif ( $line =~ /^Name=(.*)$/smx ) {
+                ($name) = ($1);
+            }
+            elsif ( $line =~ /^Version=($version_regex)$/smx ) {
+                $version_string = "$vendor $name $1\n";
+                warn "Determining version string from $ini_path\n";
+            }
+        }
+    }
 }
-if (( !defined $version_string ) && (defined $binary)) {
+if ( ( !defined $version_string ) && ( defined $binary ) ) {
     $version_string = `"$binary" -version 2>$dev_null`;
 }
 my $major;
 if ($version_string) {
-    print $version_string;
-    if ( $version_string =~ /^(?:Mozilla[ ]Firefox|Firefox[ ]Developer[ ]Edition|Nightly)[ ](\d+)[.]\d+(?:a\d+)?([.]\d+)?\s*/smx )
+    warn $version_string;
+    if ( $version_string =~
+/^(?:Mozilla[ ]Firefox|Firefox[ ]Developer[ ]Edition|Nightly)[ ](\d+)[.]\d+(?:a\d+)?([.]\d+)?\s*/smx
+      )
     {
         ($major) = ($1);
         if ( $major < 31 ) {
@@ -273,17 +284,17 @@ else {
 }
 if ( $^O eq 'linux' ) {
     local $ENV{PATH} = '/usr/bin:/bin:/usr/sbin:/sbin';
-    print "grep -r Mem /proc/meminfo\n";
-    print `grep -r Mem /proc/meminfo`;
-    print "ulimit -a | grep -i mem\n";
-    print `ulimit -a | grep -i mem`;
+    warn "grep -r Mem /proc/meminfo\n";
+    warn `grep -r Mem /proc/meminfo`;
+    warn "ulimit -a | grep -i mem\n";
+    warn `ulimit -a | grep -i mem`;
 }
 elsif ( $^O =~ /bsd/i ) {
     local $ENV{PATH} = '/usr/bin:/bin:/usr/sbin:/sbin';
-    print "sysctl hw | egrep 'hw.(phys|user|real)'\n";
-    print `sysctl hw | egrep 'hw.(phys|user|real)'`;
-    print "ulimit -a | grep -i mem\n";
-    print `ulimit -a | grep -i mem`;
+    warn "sysctl hw | egrep 'hw.(phys|user|real)'\n";
+    warn `sysctl hw | egrep 'hw.(phys|user|real)'`;
+    warn "ulimit -a | grep -i mem\n";
+    warn `ulimit -a | grep -i mem`;
 }
 if ( ( $^O eq 'linux' ) || ( $^O eq 'freebsd' ) ) {
     local $ENV{PATH} = '/usr/bin:/bin:/usr/sbin:/sbin';
@@ -329,8 +340,8 @@ WriteMakefile(
         ? ( 'MIN_PERL_VERSION' => '5.006' )
         : ()
     ),
-    META_MERGE     => {
-        resources  => {
+    META_MERGE => {
+        resources => {
             repository => 'https://github.com/david-dick/firefox-marionette',
         },
     },
@@ -342,7 +353,6 @@ WriteMakefile(
         'Digest::SHA'     => 0,
         'File::HomeDir'   => 0,
         'HTTP::Daemon'    => 0,
-        'HTTP::Response'  => 0,
         'HTTP::Status'    => 0,
         'IO::Socket::SSL' => 0,
         $] ge '5.010' ? ( 'PDF::API2' => 2.036 ) : (),
@@ -361,6 +371,7 @@ WriteMakefile(
         'File::Find'          => 0,
         'File::Spec'          => 0,
         'File::Temp'          => 0,
+        'HTTP::Response'      => 0,
         'IPC::Open3'          => 1.03,
         'JSON'                => 0,
         'MIME::Base64'        => 0,

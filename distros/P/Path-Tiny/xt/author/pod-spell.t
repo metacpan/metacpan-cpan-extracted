@@ -54,6 +54,7 @@ Keedi
 Kim
 Kjeldsen
 Knop
+Lustre
 Mark
 Martin
 Michael
@@ -64,7 +65,6 @@ Ollis
 Pagaltzis
 Path
 Philippe
-Regina
 Rolsky
 Roy
 SHA
@@ -79,7 +79,6 @@ Tatsuhiko
 Tiny
 Toby
 UNC
-Verbae
 Williams
 Yanick
 autarch
@@ -118,12 +117,14 @@ openr
 openrw
 openw
 pagaltzis
+perms
 plicease
 powerman
 realpath
 regina
 rivy
 shlomif
+stat
 stringifying
 subclasses
 szabgab

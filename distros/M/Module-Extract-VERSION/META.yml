@@ -3,12 +3,12 @@ abstract: 'Extract a module version safely'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-  Test::More: '0.95'
+  Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,6 +16,8 @@ meta-spec:
 name: Module-Extract-VERSION
 no_index:
   directory:
+    - t
+    - inc
     - corpus
     - t
 requires:
@@ -26,5 +28,5 @@ resources:
   bugtracker: https://github.com/briandfoy/module-extract-version/issues
   homepage: https://github.com/briandfoy/module-extract-version
   repository: https://github.com/briandfoy/module-extract-version.git
-version: '1.113'
+version: '1.114'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

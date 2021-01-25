@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2018 Kevin Ryde
+# Copyright 2012, 2013, 2018, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 7;
+plan tests => 3;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -28,8 +28,40 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::Staircase;
+use Math::PlanePath::Diagonals;
 
+#------------------------------------------------------------------------------
+# A210521 - staircase points traversed by diagonals
 
+{
+  my $diag  = Math::PlanePath::Diagonals->new (direction => 'down');
+  my $stair = Math::PlanePath::Staircase->new;
+
+  MyOEIS::compare_values
+      (anum => 'A210521',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         for (my $n = $diag->n_start; @got < $count; $n++) {
+           my ($x, $y) = $diag->n_to_xy ($n);
+           push @got, $stair->xy_to_n($x,$y);
+         }
+         return \@got;
+       });
+
+  # A199855 - inverse
+  MyOEIS::compare_values
+      (anum => 'A199855',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         for (my $n = $stair->n_start; @got < $count; $n++) {
+           my ($x, $y) = $stair->n_to_xy ($n);
+           push @got, $diag->xy_to_n($x,$y);
+         }
+         return \@got;
+       });
+}
 #------------------------------------------------------------------------------
 # A128918 -- N on X axis except initial 1,1
 

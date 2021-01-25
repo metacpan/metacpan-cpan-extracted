@@ -1,5 +1,9 @@
 Revision history for Finance-Nadex
 
+0.08    1/18/21 20:29:10
+        Removes the get_quote() method
+        Updates internally used retrieval functions for recent Nadex API changes
+
 0.07    9/7/16 12:17:09 CST
         Adds an example to the POD of connecting to the demo platform
 

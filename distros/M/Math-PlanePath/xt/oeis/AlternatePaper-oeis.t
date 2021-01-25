@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,6 +19,7 @@
 
 use 5.004;
 use strict;
+use Math::BaseCnv 'cnv';
 use Math::BigInt try => 'GMP';
 use Math::PlanePath::AlternatePaper 124;  # v.124 for n_to_n_list()
 use List::Util 'min';
@@ -31,6 +32,37 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 my $paper = Math::PlanePath::AlternatePaper->new;
+
+
+#------------------------------------------------------------------------------
+# A007088 -- N on X axis in base 4
+
+MyOEIS::compare_values
+  (anum => 'A007088',
+   max_value => 2**28,
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $x = 0; @got < $count; $x++) {
+       my $n = $paper->xy_to_n ($x,0);
+       push @got, cnv($n,10,4);
+     }
+     return \@got;
+   });
+
+# A169965 -- N on X=Y diagonal in base 4
+MyOEIS::compare_values
+  (anum => 'A169965',
+   max_value => 2**28,
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $i = 0; @got < $count; $i++) {
+       my $n = $paper->xy_to_n ($i,$i);
+       push @got, cnv($n,10,4);
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
@@ -78,6 +110,24 @@ MyOEIS::compare_values
      }
      return \@got;
    });
+
+# A270804 -- N segments of diagonal stair step
+MyOEIS::compare_values
+  (anum => 'A270804',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $i = 0; @got < $count; $i++) {
+       #        i+1,i+1
+       #          |
+       # i,i -- i+1,i
+       push @got, $paper->xyxy_to_n ($i,$i, $i+1,$i);
+       @got < $count or last;
+       push @got, $paper->xyxy_to_n ($i+1,$i, $i+1,$i+1);
+     }
+     return \@got;
+   });
+
 
 #------------------------------------------------------------------------------
 # A052955 single-visited points  to N=2^k
@@ -287,6 +337,21 @@ foreach my $elem (['A005418',  1,0, 1],  # East
        });
 }
 
+# A122746 - also area increment  to N=2^k
+MyOEIS::compare_values
+  (anum => q{A122746},
+   max_value => 10_000,
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $k = 2; @got < $count; $k++) {
+       push @got, (MyOEIS::path_enclosed_area($paper, 2**($k+1))
+                   - MyOEIS::path_enclosed_area($paper, 2**$k));
+     }
+     return \@got;
+   });
+
+
 #------------------------------------------------------------------------------
 # A126684 - N single-visited points
 
@@ -400,22 +465,6 @@ MyOEIS::compare_values
      }
      return \@got;
    });
-
-#------------------------------------------------------------------------------
-# A122746  area increment  to N=2^k
-MyOEIS::compare_values
-  (anum => 'A122746',
-   max_value => 10_000,
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $k = 2; @got < $count; $k++) {
-       push @got, (MyOEIS::path_enclosed_area($paper, 2**($k+1))
-                   - MyOEIS::path_enclosed_area($paper, 2**$k));
-     }
-     return \@got;
-   });
-
 
 #------------------------------------------------------------------------------
 

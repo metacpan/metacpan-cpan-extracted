@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pm_or_pod_to_path;
 
 # AUTHOR
-our $DATE = '2020-06-19'; # DATE
+our $DATE = '2021-01-20'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.034'; # VERSION
+our $VERSION = '0.035'; # VERSION
 
 use 5.010001;
 use strict;
@@ -57,7 +57,7 @@ Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pm_or_pod_to_path
 
 =head1 VERSION
 
-This document describes version 0.034 of Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pm_or_pod_to_path (from Perl distribution Sah-Schemas-Perl), released on 2020-06-19.
+This document describes version 0.035 of Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pm_or_pod_to_path (from Perl distribution Sah-Schemas-Perl), released on 2021-01-20.
 
 =head1 DESCRIPTION
 
@@ -87,7 +87,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Perl>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-Perl/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -99,7 +99,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

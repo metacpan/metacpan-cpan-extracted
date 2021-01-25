@@ -6,12 +6,9 @@ use strict;
 use warnings;
 no warnings;
 
-use subs qw();
-use vars qw($VERSION);
-
 use Carp qw(carp);
 
-$VERSION = '1.113';
+our $VERSION = '1.114';
 
 =encoding utf8
 
@@ -150,7 +147,7 @@ sub _eval_version {
 
 This code is in Github:
 
-	git://github.com/briandfoy/module-extract-version.git
+	https://github.com/briandfoy/module-extract-version.git
 
 =head1 AUTHOR
 
@@ -164,7 +161,7 @@ C<package> syntax.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2016, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2008-2021, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 You may redistribute this under the Artistic License 2.0.
 

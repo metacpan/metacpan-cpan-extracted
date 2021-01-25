@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
 
     binomial(n,k)             binomial coefficient
     multinomial(@list)        multinomial coefficient
-    factorial(n)              product of first n integers: n!
+    factorial(n)              product of first n positive integers: n!
     dfactorial(n)             double-factorial: n!!
     mfactorial(n,k)           multi-factorial: n*(n-k)*(n-2k)*...
     subfactorial(n)           number of derangements: !n
@@ -78,6 +78,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     euler(n,x)                Euler polynomials: E_n(x)
     bernoulli(n)              n-th Bernoulli number: B_n
     bernoulli(n,x)            Bernoulli polynomials: B_n(x)
+    faulhaber(n,x)            Faulhaber polynomials: F_n(x)
     laguerreL(n,x)            Laguerre polynomials: L_n(x)
     legendreP(n,x)            Legendre polynomials: P_n(x)
     hermiteH(n,x)             Physicists' Hermite polynomials: H_n(x)
@@ -1255,11 +1256,11 @@ Returns the Kronecker symbol I<(n|m)>, which is a generalization of the Jacobi s
 
 Computes the power sum C<1^k + 2^k + 3^k +...+ n^k>, using Faulhaber's formula.
 
-C<k> must be a non-negative integer. Returns NaN otherwise.
+The value for C<k> must be a non-negative integer. Returns NaN otherwise.
 
 Example:
 
-    faulhaber_sum(5, 8) = 1^8 + 2^8 + 3^8 + 4^8 + 5^8 = 462979
+    faulhaber_sum(5, 2) = 1^2 + 2^2 + 3^2 + 4^2 + 5^2 = 55
 
 =head2 geometric_sum
 
@@ -1327,6 +1328,12 @@ Returns the n-th tangent number (A000182), starting with C<tangent_number(1) = 1
     bernoulli_polynomial(n, x)                    #=> Any
 
 Returns the n-th Bernoulli polynomial: C<B_n(x)>.
+
+=head2 faulhaber_polynomial | faulhaber
+
+    faulhaber_polynomial(n, x)                        #=> Any
+
+Returns the n-th Faulhaber polynomial: C<F_n(x)>.
 
 =head2 euler_polynomial
 
@@ -2699,7 +2706,7 @@ Daniel Șuteu, C<< <trizen at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2020 Daniel Șuteu
+Copyright (C) 2017-2021 Daniel Șuteu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.22.0 or,

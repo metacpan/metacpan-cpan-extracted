@@ -1,12 +1,12 @@
 package Image::Magick;
 
-#  Copyright 1999-2014 ImageMagick Studio LLC, a non-profit organization
+#  Copyright 1999-2020 ImageMagick Studio LLC, a non-profit organization
 #  dedicated to making software imaging solutions freely available.
 #
 #  You may not use this file except in compliance with the License.  You may
 #  obtain a copy of the License at
 #
-#    http://www.imagemagick.org/script/license.php
+#    https://imagemagick.org/script/license.php
 #
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,7 @@ package Image::Magick;
 #  limitations under the License.
 #
 #  Initial version, written by Kyle Shorter.
+
 
 use strict;
 use Carp;
@@ -43,12 +44,13 @@ require AutoLoader;
       ConfigureError FatalErrorException
     );
 
-$VERSION = '6.89';
+$VERSION = '7.0.10';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
     # XS function.  If a constant is not found then control is passed
     # to the AUTOLOAD in AutoLoader.
+    no warnings;
 
     my $constname;
     ($constname = $AUTOLOAD) =~ s/.*:://;
@@ -101,7 +103,7 @@ __END__
 
 =head1 NAME
 
-Image::Magick - objected-oriented Perl interface to ImageMagick. Use it to create, edit, compose, or convert bitmap images from within a Perl script.
+Image::Magick - objected-oriented Perl interface to ImageMagick. Use it to read, manipulate, or write an image or image sequence from within a Perl script.
 
 =head1 SYNOPSIS
 
@@ -122,12 +124,12 @@ It was originally developed to be used by CGI scripts for Web pages.
 
 A web page has been set up for this extension. See:
 
-	 file:///usr/share/doc/ImageMagick-6.8.0/www/perl-magick.html
-	 http://www.imagemagick.org/script/perl-magick.php
+	 file:///usr/local/share/doc/ImageMagick-7/www/perl-magick.html
+	 https://imagemagick.org/script/perl-magick.php
 
 If you have problems, go to
 
-   http://www.imagemagick.org/discourse-server/viewforum.php?f=7
+   https://github.com/ImageMagick/ImageMagick/issue
 
 =head1 AUTHOR
 

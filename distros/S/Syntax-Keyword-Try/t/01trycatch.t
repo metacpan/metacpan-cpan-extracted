@@ -13,7 +13,7 @@ use Syntax::Keyword::Try;
    try {
       $s = 1;
    }
-   catch {
+   catch ($e) {
       $s = 2;
    }
 
@@ -27,7 +27,7 @@ use Syntax::Keyword::Try;
       try {
          die "oopsie";
       }
-      catch { }
+      catch ($e) { }
 
       $s = 3;
       "ok";
@@ -42,7 +42,7 @@ use Syntax::Keyword::Try;
    try {
       die FALSE->new;
    }
-   catch {
+   catch ($e) {
       $caught++;
    }
 
@@ -55,17 +55,17 @@ use Syntax::Keyword::Try;
    }
 }
 
-# catch sees $@
+# catch sees exception
 {
-   my $e;
+   my $caught;
    try {
       die "oopsie";
    }
-   catch {
-      $e = $@;
+   catch ($e) {
+      $caught = $e;
    }
 
-   like( $e, qr/^oopsie at /, 'catch{} sees $@' );
+   like( $caught, qr/^oopsie at /, 'catch{} sees $@' );
 }
 
 # catch block executes
@@ -74,7 +74,7 @@ use Syntax::Keyword::Try;
    try {
       die "oopsie";
    }
-   catch {
+   catch ($e) {
       $s = 4;
    }
 
@@ -86,7 +86,7 @@ use Syntax::Keyword::Try;
    my $caught;
    ok( !eval {
       try { die "oopsie"; }
-      catch { $caught = $@; die $@ }
+      catch ($e) { $caught = $e; die $e }
    }, 'die in catch{} is fatal' );
    my $e = $@;
 
@@ -94,17 +94,18 @@ use Syntax::Keyword::Try;
    like( $caught, qr/^oopsie at /, 'exception was seen by catch{}' );
 }
 
-# catch into new lexical
+# catch without VAR
 {
    try {
       die "caught\n";
    }
-   catch ( $e ) {
-      is( $e, "caught\n", 'exception is caught into new lexical' );
+   catch {
+      my $e = $@;
+      is( $e, "caught\n", 'exception visible in $@' );
    }
 }
 
-# catch into lexical does not retain
+# catch lexical does not retain
 {
    my $destroyed;
    sub Canary::DESTROY { $destroyed++ }
@@ -112,7 +113,7 @@ use Syntax::Keyword::Try;
    try {
       die bless [], "Canary";
    }
-   catch ( $e ) {
+   catch ($e) {
       # don't touch $e
    }
 

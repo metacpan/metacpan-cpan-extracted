@@ -18,6 +18,8 @@ no_index:
     - t
     - inc
 resources:
+  bugtracker: https://github.com/toddr/IO-Tty/issues
+  license: http://dev.perl.org/licenses/
   repository: https://github.com/toddr/IO-Tty
-version: '1.15'
+version: '1.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,41 +1,34 @@
-#!/usr/bin/perl
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More;
-use Socket;
-use File::Spec;
 use Net::SSLeay;
-use Config;
-use IO::Socket::INET;
+use Test::Net::SSLeay qw(
+    can_fork data_file_path initialise_libssl new_ctx tcp_socket
+);
 
-BEGIN {
-  plan skip_all => "fork() not supported on $^O" unless $Config{d_fork};
+if (not can_fork()) {
+    plan skip_all => "fork() not supported on this system";
+} else {
+    plan tests => 2;
 }
 
-plan tests => 2; 
-
+initialise_libssl();
 
 my $pid;
 alarm(30);
 END { kill 9,$pid if $pid }
 
-my $server;
-Net::SSLeay::initialize();
+my $server = tcp_socket();
 
 {
     # SSL server - just handle single connect and  shutdown connection
-    my $cert_pem = File::Spec->catfile('t', 'data', 'testcert_wildcard.crt.pem');
-    my $key_pem = File::Spec->catfile('t', 'data', 'testcert_key_2048.pem');
-
-    $server = IO::Socket::INET->new( LocalAddr => '127.0.0.1', Listen => 3)
-	or BAIL_OUT("failed to create server socket: $!");
+    my $cert_pem = data_file_path('simple-cert.cert.pem');
+    my $key_pem  = data_file_path('simple-cert.key.pem');
 
     defined($pid = fork()) or BAIL_OUT("failed to fork: $!");
     if ($pid == 0) {
 	for(qw(ctx ssl)) {
-	    my $cl = $server->accept or BAIL_OUT("accept failed: $!");
-	    my $ctx = Net::SSLeay::CTX_tlsv1_new();
+	    my $cl = $server->accept();
+	    my $ctx = new_ctx();
 	    Net::SSLeay::set_cert_and_key($ctx, $cert_pem, $key_pem);
 	    my $ssl = Net::SSLeay::new($ctx);
 	    Net::SSLeay::set_fd($ssl, fileno($cl));
@@ -59,10 +52,8 @@ sub client {
 	push @states,[$where,$ret];
     };
 
-    my $saddr = $server->sockhost.':'.$server->sockport;
-    my $cl = IO::Socket::INET->new($saddr) 
-	or BAIL_OUT("failed to connect to server: $!");
-    my $ctx = Net::SSLeay::CTX_tlsv1_new();
+    my $cl = $server->connect();
+    my $ctx = new_ctx();
     Net::SSLeay::CTX_set_options($ctx, &Net::SSLeay::OP_ALL);
     Net::SSLeay::CTX_set_info_callback($ctx, $infocb) if $where eq 'ctx';
     my $ssl = Net::SSLeay::new($ctx);

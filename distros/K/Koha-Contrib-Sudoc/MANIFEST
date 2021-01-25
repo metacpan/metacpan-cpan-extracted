@@ -7,12 +7,11 @@ META.json
 META.yml
 Makefile.PL
 README
-README.adoc
+README.md
 bin/sudoc
 bin/sudoc-localisation
 bin/sudoc-ppnize
 bin/sudoc-trans
-builddoc.sh
 diag.dia
 diag.svg
 dist.ini
@@ -34,8 +33,6 @@ lib/Koha/Contrib/Sudoc/Spool.pm
 lib/Koha/Contrib/Sudoc/TransferDaemon.pm
 lib/LocaleData/de/LC_MESSAGES/fr.tamil.sudoc.mo
 lib/LocaleData/fr/LC_MESSAGES/fr.tamil.sudoc.mo
-pdftheme/base-theme.yml
-pdftheme/tamil-theme.yml
 share/etc/sudoc.conf
 share/lib/BibliConverter.pm
 share/lib/Retro.pm

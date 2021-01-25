@@ -1,5 +1,9 @@
 Revision history for Perl extension Kelp::Module::Symbiosis.
 
+1.11 Mon Jan 18 2021
+	- fix KelpX::Symbiosis::Test->can to match autoload
+	- add reverse_proxy configuration field
+
 1.10 Sat Jan 16 2021
 	- deprecate 'automount' config, introduce 'mount' in its place
 	- deprecate K::M::Symbiosis::Test, introduce KelpX::Symbiosis::Test

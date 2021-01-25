@@ -1,5 +1,8 @@
 Revision history for perl module DBIx::Class::Schema::Diff
 
+1.13 2021-01-20
+   - Use weak refs in parent objects to avoid memory leaks (PR #8, @nrdvana)
+
 1.12 2020-12-11
    - Remove rogue RapidApp::Util use statement (PR #7, @jwrightecs)
 

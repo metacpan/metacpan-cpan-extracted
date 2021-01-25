@@ -8,7 +8,7 @@ use Safe;
 use Workflow::Exception qw( condition_error configuration_error );
 use English qw( -no_match_vars );
 
-$Workflow::Condition::Evaluate::VERSION = '1.49';
+$Workflow::Condition::Evaluate::VERSION = '1.50';
 
 my @FIELDS = qw( test );
 __PACKAGE__->mk_accessors(@FIELDS);
@@ -45,7 +45,6 @@ sub evaluate {
     # Create the Safe compartment and safely eval the test...
     my $safe = Safe->new();
 
-    ## no critic (RequireInterpolationOfMetachars)
     $safe->share('$context');
     my $rv = $safe->reval($to_eval);
     if ($EVAL_ERROR) {

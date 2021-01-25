@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2015, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2012, 2013, 2015, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 20;
+plan tests => 22;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -34,6 +34,40 @@ use Math::NumSeq::PlanePathTurn;
 my $path = Math::PlanePath::KochCurve->new;
 
 # GP-DEFINE  read("my-oeis.gp");
+
+
+#------------------------------------------------------------------------------
+# A332206 -- N on X axis
+
+MyOEIS::compare_values
+  (anum => 'A332206',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $x = 0; @got < $count; $x++) {
+       if (defined(my $n = $path->xy_to_n($x,0))) {
+         push @got, $n;
+       }
+     }
+     return \@got;
+   });
+
+# A001196 -- N segments on X axis, so N and N+1 points both on X axis
+# Segment N=0 on axis, then on expansion must new low base 4 digit 0 or 3.
+# All other segments leave the X axis and never return.
+# So all base 4 digits 0,3, which is binary 00 11
+MyOEIS::compare_values
+  (anum => 'A001196',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $x = 0; @got < $count; $x++) {
+       if (defined(my $n = $path->xyxy_to_n($x,0, $x+2,0))) {
+         push @got, $n;
+       }
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
@@ -85,16 +119,131 @@ MyOEIS::compare_values
 # GP-Test  my(v=OEIS_samples("A335358")); v==vector(#v,n,n--; real(Z(n)))
 # GP-Test  my(v=OEIS_samples("A335359")); v==vector(#v,n,n--; imag(Z(n)))
 
-# GP-DEFINE  my(w=quadgen(-3), table=[[1,0], [w,1], [conj(w),1+w], [1,2]]); \
-# GP-DEFINE  X(n) = {
+# GP-DEFINE  { my(w=quadgen(-3), table=[[1,0], [w,1], [conj(w),1+w], [1,2]]);
+# GP-DEFINE  X(n) =
 # GP-DEFINE    my(v=digits(n,4),rot=1);
 # GP-DEFINE    for(i=1,#v, [rot,v[i]] = rot*table[v[i]+1]);
 # GP-DEFINE    fromdigits(real(v),3);
 # GP-DEFINE  }
 # GP-Test  my(v=OEIS_samples("A335358")); v==vector(#v,n,n--; X(n))
+# GP-Test  my(g=OEIS_bfile_gf("A335358")); \
+# GP-Test    g==Polrev(vector(poldegree(g)+1,n,n--; X(n)))
+
+# GP-DEFINE  { my(w=quadgen(-3), table=[[1,0], [w,1], [conj(w),1+w], [1,2]]);
+# GP-DEFINE  Y(n) =
+# GP-DEFINE    my(v=digits(n,4),rot=1);
+# GP-DEFINE    for(i=1,#v, [rot,v[i]] = rot*table[v[i]+1]);
+# GP-DEFINE    fromdigits(imag(v),3);
+# GP-DEFINE  }
+# GP-Test  my(v=OEIS_samples("A335359")); v==vector(#v,n,n--; Y(n))
+# GP-Test  my(g=OEIS_bfile_gf("A335359")); \
+# GP-Test    g==Polrev(vector(poldegree(g)+1,n,n--; Y(n)))
+
+# GP-DEFINE  \\ 0,2,3 mod 6
+# GP-DEFINE  A047244(n) = 2*n - (n%3==2);
+# GP-Test  my(v=OEIS_samples("A047244")); v==vector(#v,n,n--; A047244(n))
+#
+# GP-Test  /* Andrey Zabolotskiy in A335359 */ \
+# GP-Test  vector(4^6,n,n--; X(n)) == \
+# GP-Test  vector(4^6,n,n--; Y(n) + Y(A047244(n)))
+# GP-Test  vector(4^6,n,n--; Y(A047244(n))) == \
+# GP-Test  vector(4^6,n,n--; X(n)-Y(n))
+# GP-Test  vector(4^6,n,n--; Y(2*n)) == \
+# GP-Test  vector(4^6,n,n--; X(n)-Y(n))
+# GP-Test  X(4) == 3
+# GP-Test  Y(4) == 0
+# GP-Test  Y(A047244(4)) == 3
+# vector(20,n,n--; A047244(n))
+
+# vector(20,n,n--; X(n)-Y(n))
+# not in OEIS: 0, 1, 0, 2, 3, 2, 0, 1, 0, 2, 3, 4, 6, 7, 6, 8, 9, 8, 6, 7
+# vector(20,n,n--; Y(2*n))
+# not in OEIS: 0, 1, 0, 2, 3, 2, 0, 1, 0, 2, 3, 4, 6, 7, 6, 8, 9, 8, 6, 7
+# vector(20,n,n--; Y(2*n))
+# vector(20,n,n--; Y(2*n))
+
+# vector(20,n,n--; X(2*n))
+# not in OEIS: 0, 1, 3, 2, 3, 5, 6, 7, 9, 8, 9, 7, 6, 7, 9, 8, 9, 11, 12, 13
+# vector(50,n, X(n)-X(n-1))
+# not in OEIS: 1, 0, 1, 1, 0, -1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, -1, 1, 0, -1, -1, 0, -1, 1, 0, 1, 1, 0, -1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, -1, 0, 1, 1, 0, 1, 1, 0
+
+# GP-DEFINE  dY(n) = Y(n+1) - Y(n);
+# vector(20,n, dY(2*n-1))
+# not in OEIS: 1, 0, 1, 1, 0, -1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, -1, 1, 0
+# turn 1, -2, 1
+
+# for(k=200,210, print(digits(6*k + 3,4)))
+
+# GP-DEFINE  w6 = quadgen(-3);
+# GP-DEFINE  w3 = w6 - 1;
+# GP-DEFINE  w12_times_sqrt3 = quadgen(-3) + 1;
+# GP-Test  w12_times_sqrt3^6 == - 3^(6/2)
+# GP-DEFINE  Z(n) = X(n) + Y(n)*w6;
+# GP-Test  vector(4^6,n, conj(Z(2*n) / w12_times_sqrt3)) == \
+# GP-Test  vector(4^6,n, Z(n))
+
+# GP-Test  vector(4^6,n, X(n)+Y(n) + w3*Y(n)) == \
+# GP-Test  vector(4^6,n, Z(n))
+# GP-Test  vector(4^6,n, X(n)-Y(n) + (w6+1)*Y(n)) == \
+# GP-Test  vector(4^6,n, Z(n))
+
+# z = x + w6*y
+#   = x + (w3+1)*y
+#   = x + w3*y + y
+#   = x+y + w3*y
+#   = x-y + (w6+1)*y   basis 1, w6+1 at 30 degrees length sqrt3
+
+#-------------
+# X+Y
+# vector(20,n,n--; X(n)+Y(n))
+# not in OEIS: 0, 1, 2, 2, 3, 4, 4, 5, 6, 6, 7, 6, 6, 7, 8, 8, 9, 10, 10, 11
+
+# GP-DEFINE  \\ curve  0---1   3---*
+# GP-DEFINE  \\             \ /
+# GP-DEFINE  \\              2
+# GP-DEFINE  { my(w=quadgen(-3), table=[[1,0], [conj(w),1], [w,2-w], [1,2]]);
+# GP-DEFINE  X120(n) =
+# GP-DEFINE    my(v=digits(n,4),rot=1);
+# GP-DEFINE    for(i=1,#v, [rot,v[i]] = rot*table[v[i]+1]);
+# GP-DEFINE    fromdigits(real(v),3);
+# GP-DEFINE  }
+# GP-Test  vector(4^6,n,n--; X120(n)) == \
+# GP-Test  vector(4^6,n,n--; X(n) + Y(n))
+
+#-------------
+# X-Y
+# vector(20,n,n--; X(n)-Y(n))
+# 0, 1, 0, 2,   3, 2, 0, 1,   0, 2, 3, 4
+#               0 -1 -3 -2
+#      Y
+#     /
+#    /
+#   *-----X
+
+# GP-DEFINE  { my(w=quadgen(-3), table=[[1,0], [w,1], [conj(w),1+w], [1,2]]);
+# GP-DEFINE  XYdiff(n) =
+# GP-DEFINE    my(v=digits(n,4),rot=1);
+# GP-DEFINE    for(i=1,#v, [rot,v[i]] = rot*table[v[i]+1]);
+# GP-DEFINE    fromdigits(imag(conj(v)),3);
+# GP-DEFINE  }
+# vector(46,n,n--; XYdiff(n))  \\ like A335359 Y coord
+# vector(16,n,n--; X(n) - Y(n))
+# vector(16,n,n--; X(n) + Y(n))  \\ like A335380 X coord
+# not in OEIS: 0, 1, 0, 2, 3, 2, 0, 1, 0, 2, 3, 4, 6, 7, 6, 8
+
+# my(w=quadgen(-3), table=[[1,0], [w,1], [conj(w),1+w], [1,2]]); \
+# for(c=0,1, my(table=if(c,conj(table),table)); \
+#   for(r=0,5, my(table=table*w^r); \
+#     my(f=(n)-> my(v=digits(n,4),rot=1); \
+#                for(i=1,#v, [rot,v[i]] = rot*table[v[i]+1]); \
+#                fromdigits(real(v),3)); \
+#     print(vector(16,n,n--; f(n)))))
+#
+# w=quadgen(-3)
+# for(r=0,5, print(imag(('x-'y*w)*w^r)))
 
 
-#---------------
+#------------------------------------------------------------------------------
 # Cf wave-like at high resoluation
 #
 #         *
@@ -106,7 +255,7 @@ MyOEIS::compare_values
 # plothraw(vector(3^3,n,n--; x(n)), \
 #          vector(3^3,n,n--; y(n)), 1+8+16+32)
 
-#-------------
+#------------------------------------------------------------------------------
 # Koch square grid base 5 -> base 3
 # A229217   directions
 # A332249 \  coords
@@ -147,10 +296,10 @@ MyOEIS::compare_values
 # GP-DEFINE  A229217_final = [1,2,-1,-2];
 # GP-DEFINE  dir_to_A229217_final(d) = A229217_final[d%4+1];
 # GP-DEFINE  A229217_final_to_dir(f) = [3,2,'none,0,1][f+3];
-# GP-DEFINE  A229217_final_to_dir(1) == 0
-# GP-DEFINE  A229217_final_to_dir(2) == 1
-# GP-DEFINE  A229217_final_to_dir(-1) == 2
-# GP-DEFINE  A229217_final_to_dir(-2) == 3
+# GP-Test  A229217_final_to_dir(1) == 0
+# GP-Test  A229217_final_to_dir(2) == 1
+# GP-Test  A229217_final_to_dir(-1) == 2
+# GP-Test  A229217_final_to_dir(-2) == 3
 # GP-Test  vector(5^6,n, n++; /* to 1-based */ \
 # GP-Test                ((A229217_final_to_dir(A229217(n)) \
 # GP-Test                - A229217_final_to_dir(A229217(n-1))) + 1) % 4 - 1) ==\

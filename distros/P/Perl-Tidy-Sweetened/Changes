@@ -1,5 +1,16 @@
 Changes for Perl::Tidy::Sweetend
 
+1.17 - Sun Jan 24 11:36:21 EST 2021
+    Handles errors in closing sub comments when there are 10+ subs.
+    Fixes GH#20. Thanks to @fpostma72 for the bug report and PR.
+    
+    Perl-Tidy-20200907 changed an indentation of side comments. This patch
+    adjusts the tests.
+    Fixes GH#18. Thanks to @ppisar for the bug report and PR.
+    
+    Respects the -cscp argument.
+    [Upgrade recommended if you use closing sub comments.]
+
 1.16 - Wed Apr  8 11:57:37 EDT 2020
     Adds support for 'around/before/after' keywords (GH#17)
     Thanks to witoldwegner for the PR.

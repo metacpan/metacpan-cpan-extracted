@@ -45,11 +45,11 @@
  *    for example: there already exists: PEM_get_string_X509_CRL + PEM_get_string_X509_REQ and you want
  *    to add PEM_get_string_SOMETHING - then no need to follow 3/ (do not prefix with "P_")
  *
- * Support for different openssl versions, different platforms, different compilers:
+ * Support for different Perl versions, libssl implementations, platforms, and compilers:
  *
- * 1/ SSleay.xs is expected to build/pass test suite
- *    - with openssl 0.9.6 and newer versions
- *    - with perl 5.8 and newer versions
+ * 1/ Net-SSLeay has a version support policy for Perl and OpenSSL/LibreSSL (described in the
+ *    "Prerequisites" section in the README file). The test suite must pass when run on any
+ *    of those version combinations.
  *
  * 2/ Fix all compiler warnings - we expect 100% clean build
  *
@@ -1189,11 +1189,15 @@ int next_proto_select_cb_invoke(SSL *ssl, unsigned char **out, unsigned char *ou
         next_proto_len = next_proto_helper_AV2protodata((AV*)SvRV(cb_data), next_proto_data);
 
         next_proto_status = SSL_select_next_proto(out, outlen, in, inlen, next_proto_data, next_proto_len);
+        Safefree(next_proto_data);
+        if (next_proto_status != OPENSSL_NPN_NEGOTIATED) {
+            *outlen = *in;
+            *out = (unsigned char *)in+1;
+        }
 
         /* store last_status + last_negotiated into global hash */
         cb_data_advanced_put(ssl, "next_proto_select_cb!!last_status", newSViv(next_proto_status));
         cb_data_advanced_put(ssl, "next_proto_select_cb!!last_negotiated", newSVpv((const char*)*out, *outlen));
-        Safefree(next_proto_data);
         return SSL_TLSEXT_ERR_OK;
     }
     return SSL_TLSEXT_ERR_ALERT_FATAL;
@@ -1320,6 +1324,10 @@ int alpn_select_cb_invoke(SSL *ssl, const unsigned char **out, unsigned char *ou
         /* This is the same function that is used for NPN. */
         status = SSL_select_next_proto((unsigned char **)out, outlen, in, inlen, alpn_data, alpn_len);
         Safefree(alpn_data);
+        if (status != OPENSSL_NPN_NEGOTIATED) {
+            *outlen = *in;
+            *out = in+1;
+        }
         return status == OPENSSL_NPN_NEGOTIATED ? SSL_TLSEXT_ERR_OK : SSL_TLSEXT_ERR_NOACK;
     }
     return SSL_TLSEXT_ERR_ALERT_FATAL;
@@ -1925,8 +1933,8 @@ void
 SSL_CTX_free(ctx)
         SSL_CTX * ctx
      CODE:
-        cb_data_advanced_drop(ctx); /* clean callback related data from global hash */
         SSL_CTX_free(ctx);
+        cb_data_advanced_drop(ctx); /* clean callback related data from global hash */
 
 int
 SSL_CTX_add_session(ctx,ses)
@@ -2059,8 +2067,8 @@ void
 SSL_free(s)
         SSL * s
      CODE:
-        cb_data_advanced_drop(s); /* clean callback related data from global hash */
         SSL_free(s);
+        cb_data_advanced_drop(s); /* clean callback related data from global hash */
 
 #if 0 /* this seems to be gone in 0.9.0 */
 void
@@ -2446,6 +2454,23 @@ SSL_CTX_set_cipher_list(s,str)
      SSL_CTX *              s
      char *             str
 
+void
+SSL_get_ciphers(s)
+        SSL *              s
+    PREINIT:
+        STACK_OF(SSL_CIPHER) *sk = NULL;
+        const SSL_CIPHER *c;
+        int i;
+    PPCODE:
+        sk = SSL_get_ciphers(s);
+        if( sk == NULL ) {
+            XSRETURN_EMPTY;
+        }
+        for (i=0; i<sk_SSL_CIPHER_num(sk); i++) {
+            c = sk_SSL_CIPHER_value(sk, i);
+            XPUSHs(sv_2mortal(newSViv(PTR2IV(c))));
+        }
+
 const char *
 SSL_get_cipher_list(s,n)
      SSL *              s
@@ -2585,7 +2610,7 @@ d2i_SSL_SESSION(pv)
     OUTPUT:
 	RETVAL
 
-#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100004L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
 
 int
 SSL_SESSION_up_ref(sess)
@@ -2614,15 +2639,16 @@ X509 *
 SSL_get_certificate(s)
      SSL *              s
 
-#if OPENSSL_VERSION_NUMBER >= 0x0090806fL
-#define REM18 "NOTE: requires 0.9.8f+"
-
 SSL_CTX *
 SSL_get_SSL_CTX(s)
      SSL *              s
 
+#if OPENSSL_VERSION_NUMBER >= 0x0090806fL
+
 SSL_CTX *
 SSL_set_SSL_CTX(SSL *ssl, SSL_CTX* ctx)
+
+#endif
 
 long
 SSL_ctrl(ssl,cmd,larg,parg)
@@ -2630,8 +2656,6 @@ SSL_ctrl(ssl,cmd,larg,parg)
 	 int cmd
 	 long larg
 	 char * parg
-
-#endif
 
 long
 SSL_CTX_ctrl(ctx,cmd,larg,parg)
@@ -3642,6 +3666,41 @@ P_X509_add_extensions(x,ca_cert,...)
     OUTPUT:
             RETVAL
 
+int
+P_X509_CRL_add_extensions(x,ca_cert,...)
+        X509_CRL *x
+        X509 *ca_cert
+    PREINIT:
+        int i=2;
+        int nid;
+        char *data;
+        X509_EXTENSION *ex;
+        X509V3_CTX ctx;
+    CODE:
+        if (items>1) {
+            RETVAL = 1;
+            while(i+1<items) {
+                nid = SvIV(ST(i));
+                data = SvPV_nolen(ST(i+1));
+                i+=2;
+                X509V3_set_ctx(&ctx, ca_cert, NULL, NULL, x, 0);
+                ex = X509V3_EXT_conf_nid(NULL, &ctx, nid, data);
+                if (ex) {
+                    X509_CRL_add_ext(x,ex,-1);
+                    X509_EXTENSION_free(ex);
+                }
+                else {
+                    warn("failure during X509V3_EXT_conf_nid() for nid=%d\n", nid);
+                    ERR_print_errors_fp(stderr);
+                    RETVAL = 0;
+                }
+            }
+        }
+        else
+            RETVAL = 0;
+    OUTPUT:
+            RETVAL
+
 void
 P_X509_copy_extensions(x509_req,x509,override=1)
         X509_REQ *x509_req
@@ -3678,6 +3737,19 @@ P_X509_copy_extensions(x509_req,x509,override=1)
 X509 *
 X509_STORE_CTX_get_current_cert(x509_store_ctx)
      X509_STORE_CTX * 	x509_store_ctx
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10100005L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL) /* OpenSSL 1.1.0-pre5, LibreSSL 2.7.0 */
+
+X509 *
+X509_STORE_CTX_get0_cert(x509_store_ctx)
+    X509_STORE_CTX *x509_store_ctx
+
+#endif
+
+STACK_OF(X509) *
+X509_STORE_CTX_get1_chain(x509_store_ctx)
+    X509_STORE_CTX *x509_store_ctx
+
 
 int
 X509_STORE_CTX_get_ex_new_index(argl,argp=NULL,new_func=NULL,dup_func=NULL,free_func=NULL)
@@ -3790,8 +3862,21 @@ X509_get_subjectAltNames(cert)
                          count++;
                          PUSHs(sv_2mortal(newSViv(subjAltNameDN->type)));
                          PUSHs(sv_2mortal(newSVpv((buf), strlen((buf)))));
-                         break;
                          }
+                         break;
+
+                     case GEN_RID:
+                         {
+			 char buf[2501]; /* Much more than what's suggested on OBJ_obj2txt manual page */
+                         int len = OBJ_obj2txt(buf, sizeof(buf), subjAltNameDN->d.rid, 1);
+			 if (len < 0 || len > (int)((sizeof(buf) - 1)))
+			   break; /* Skip bad or overly long RID */
+                         EXTEND(SP, 2);
+                         count++;
+                         PUSHs(sv_2mortal(newSViv(subjAltNameDN->type)));
+                         PUSHs(sv_2mortal(newSVpv(buf, 0)));
+                         }
+                         break;
 
                      case GEN_IPADD:
                          EXTEND(SP, 2);
@@ -4774,7 +4859,7 @@ TLS_client_method()
 #endif /* OpenSSL 1.1.0 or LibreSSL 2.2.2 */
 
 
-#if  (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2060000fL)
+#if  (OPENSSL_VERSION_NUMBER >= 0x10100002L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2060000fL)
 
 int
 SSL_CTX_set_min_proto_version(ctx, version)
@@ -4796,7 +4881,7 @@ SSL_set_max_proto_version(ssl, version)
      SSL *  ssl
      int    version
 
-#endif /* OpenSSL 1.1.0 or LibreSSL 2.6.0 */
+#endif /* OpenSSL 1.1.0-pre2 or LibreSSL 2.6.0 */
 
 
 #if OPENSSL_VERSION_NUMBER >= 0x1010007fL && !defined(LIBRESSL_VERSION_NUMBER)
@@ -4946,47 +5031,36 @@ int
 SSL_check_private_key(ctx)
      SSL *	ctx
 
-#if OPENSSL_VERSION_NUMBER < 0x009080dfL
-#define REM8 "NOTE: before 0.9.8m"
-
-char *
-SSL_CIPHER_description(cipher,buf,size)
-     SSL_CIPHER *	cipher
-     char *	buf
-     int 	size
-
-#else
-
-char *
-SSL_CIPHER_description(cipher,buf,size)
-     const SSL_CIPHER *  cipher
-     char *	buf
-     int 	size
-
-#endif
-
-#if OPENSSL_VERSION_NUMBER < 0x0090707fL
-#define REM9 "NOTE: before 0.9.7g"
-
-const char *
-SSL_CIPHER_get_name(SSL_CIPHER *c)
-
-int
-SSL_CIPHER_get_bits(c,alg_bits=NULL)
-     SSL_CIPHER *	c
-     int *	alg_bits
-
-#else
+# /* buf and size were required with Net::SSLeay 1.88 and earlier. */
+# /* With OpenSSL 0.9.8l and older compile can warn about discarded const. */
+void
+SSL_CIPHER_description(const SSL_CIPHER *cipher, char *unused_buf=NULL, int unused_size=0)
+    PREINIT:
+        char *description;
+        char buf[512];
+    PPCODE:
+        description = SSL_CIPHER_description(cipher, buf, sizeof(buf));
+        if(description == NULL) {
+            XSRETURN_EMPTY;
+        }
+        XPUSHs(sv_2mortal(newSVpv(description, 0)));
 
 const char *
 SSL_CIPHER_get_name(const SSL_CIPHER *c)
 
 int
-SSL_CIPHER_get_bits(c,alg_bits=NULL)
-     const SSL_CIPHER *	c
-     int *	alg_bits
+SSL_CIPHER_get_bits(c, ...)
+        const SSL_CIPHER *      c
+    CODE:
+        int alg_bits;
+        RETVAL = SSL_CIPHER_get_bits(c, &alg_bits);
+        if (items > 2) croak("SSL_CIPHER_get_bits: Need to call with one or two parameters");
+        if (items > 1) sv_setsv(ST(1), sv_2mortal(newSViv(alg_bits)));
+    OUTPUT:
+        RETVAL
 
-#endif
+const char *
+SSL_CIPHER_get_version(const SSL_CIPHER *cipher)
 
 #ifndef OPENSSL_NO_COMP
 
@@ -5863,7 +5937,7 @@ RSA_generate_key(bits,ee,perl_cb=&PL_sv_undef,perl_data=&PL_sv_undef)
        /* This equivalent was contributed by Brian Fraser for Android, */
        /* but was not portable to old OpenSSLs where RSA_generate_key_ex is not available. */
        /* It should now be more versatile. */
-       /* as of openssl 1.1.0 it is not possible anymore to generate the BN_GENCB structure directly. */
+       /* as of openssl 1.1.0-pre1 it is not possible anymore to generate the BN_GENCB structure directly. */
        /* instead BN_EGNCB_new() has to be used. */
        int rc;
        RSA * ret;
@@ -5880,7 +5954,7 @@ RSA_generate_key(bits,ee,perl_cb=&PL_sv_undef,perl_data=&PL_sv_undef)
 	   BN_free(e);
            croak("Net::SSLeay: RSA_generate_key perl function could not create RSA structure.\n");
        }
-#if (OPENSSL_VERSION_NUMBER >= 0x1010000fL && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100001L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
        BN_GENCB *new_cb;
        new_cb = BN_GENCB_new();
        if(!new_cb) {
@@ -6015,6 +6089,39 @@ int
 sk_X509_push(stack, data)
     STACK_OF(X509) * stack
     X509 * data
+
+X509 *
+sk_X509_pop(stack)
+    STACK_OF(X509) * stack
+
+X509 *
+sk_X509_shift(stack)
+    STACK_OF(X509) * stack
+
+int
+sk_X509_unshift(stack,x509)
+    STACK_OF(X509) * stack
+    X509 * x509
+
+int
+sk_X509_insert(stack,x509,index)
+    STACK_OF(X509) * stack
+    X509 * x509
+    int index
+
+X509 *
+sk_X509_delete(stack,index)
+    STACK_OF(X509) * stack
+    int index
+
+X509 *
+sk_X509_value(stack,index)
+    STACK_OF(X509) * stack
+    int index
+
+int
+sk_X509_num(stack)
+    STACK_OF(X509) * stack
 
 X509 *
 P_X509_INFO_get_x509(info)
@@ -6446,7 +6553,7 @@ OPENSSL_add_all_algorithms_conf()
 
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
+#if OPENSSL_VERSION_NUMBER >= 0x10000003L
 
 int
 SSL_CTX_set1_param(ctx, vpm)
@@ -6548,7 +6655,7 @@ X509_VERIFY_PARAM_lookup(name)
 void
 X509_VERIFY_PARAM_table_cleanup()
 
-#if (OPENSSL_VERSION_NUMBER >= 0x10002000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL) /* OpenSSL 1.0.2, LibreSSL 2.7.0 */
+#if (OPENSSL_VERSION_NUMBER >= 0x10002001L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL) /* OpenSSL 1.0.2-beta1, LibreSSL 2.7.0 */
 
 X509_VERIFY_PARAM *
 SSL_CTX_get0_param(ctx)
@@ -6569,27 +6676,6 @@ X509_VERIFY_PARAM_set1_host(param, name)
     RETVAL = X509_VERIFY_PARAM_set1_host(param, name, namelen);
     OUTPUT:
     RETVAL
-
-int
-X509_VERIFY_PARAM_add1_host(param, name)
-    X509_VERIFY_PARAM *param
-    PREINIT:
-    STRLEN namelen;
-    INPUT:
-    const char * name = SvPV(ST(1), namelen);
-    CODE:
-    RETVAL = X509_VERIFY_PARAM_add1_host(param, name, namelen);
-    OUTPUT:
-    RETVAL
-
-void
-X509_VERIFY_PARAM_set_hostflags(param, flags)
-    X509_VERIFY_PARAM *param
-    unsigned int flags
-
-char *
-X509_VERIFY_PARAM_get0_peername(param)
-    X509_VERIFY_PARAM *param
 
 int
 X509_VERIFY_PARAM_set1_email(param, email)
@@ -6620,7 +6706,32 @@ X509_VERIFY_PARAM_set1_ip_asc(param, ipasc)
     X509_VERIFY_PARAM *param
     const char *ipasc
 
-#endif /* OpenSSL 1.0.2, LibreSSL 2.7.0 */
+#endif /* OpenSSL 1.0.2-beta1, LibreSSL 2.7.0 */
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10002002L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL) /* OpenSSL 1.0.2-beta2, LibreSSL 2.7.0 */
+
+int
+X509_VERIFY_PARAM_add1_host(param, name)
+    X509_VERIFY_PARAM *param
+    PREINIT:
+    STRLEN namelen;
+    INPUT:
+    const char * name = SvPV(ST(1), namelen);
+    CODE:
+    RETVAL = X509_VERIFY_PARAM_add1_host(param, name, namelen);
+    OUTPUT:
+    RETVAL
+
+void
+X509_VERIFY_PARAM_set_hostflags(param, flags)
+    X509_VERIFY_PARAM *param
+    unsigned int flags
+
+char *
+X509_VERIFY_PARAM_get0_peername(param)
+    X509_VERIFY_PARAM *param
+
+#endif /* OpenSSL 1.0.2-beta2, LibreSSL 2.7.0 */
 
 void
 X509_policy_tree_free(tree)
@@ -7301,7 +7412,7 @@ OCSP_response_results(rsp,...)
 		if (!idsv) {
 		    /* getall: create new SV with OCSP_CERTID */
 		    unsigned char *pi,*pc;
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if OPENSSL_VERSION_NUMBER >= 0x10100003L && !defined(LIBRESSL_VERSION_NUMBER)
 		    int len = i2d_OCSP_CERTID(OCSP_SINGLERESP_get0_id(sir),NULL);
 #else
 		    int len = i2d_OCSP_CERTID(sir->certId,NULL);
@@ -7310,7 +7421,7 @@ OCSP_response_results(rsp,...)
 		    Newx(pc,len,unsigned char);
 		    if (!pc) croak("out of memory");
 		    pi = pc;
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if OPENSSL_VERSION_NUMBER >= 0x10100003L && !defined(LIBRESSL_VERSION_NUMBER)
 		    i2d_OCSP_CERTID(OCSP_SINGLERESP_get0_id(sir),&pi);
 #else
 		    i2d_OCSP_CERTID(sir->certId,&pi);

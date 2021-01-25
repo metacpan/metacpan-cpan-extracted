@@ -32,7 +32,6 @@ my %WriteMakefileArgs = (
     "DateTime::Format::Strptime" => "1.00",
     "Exception::Class" => "1.10",
     "File::Slurp" => 0,
-    "Log::Dispatch" => "2.00",
     "Log::Log4perl" => "0.34",
     "Safe" => 0,
     "XML::Simple" => "2.00"
@@ -50,7 +49,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.41",
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "1.49",
+  "VERSION" => "1.50",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,7 +73,6 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::MoreUtils" => 0,
-  "Log::Dispatch" => "2.00",
   "Log::Log4perl" => "0.34",
   "Module::Build" => "0.30",
   "Pod::Coverage::TrustPod" => 0,

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2017 by Dominique Dumont.
+# This software is Copyright (c) 2013-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -48,18 +48,18 @@ my $build = $class->new(
     dist_author   => 'Dominique Dumont (ddumont at cpan dot org)',
 
   'build_requires' => {
-    'Config::Model::Tester' => '0',
+    'Config::Model::Tester' => '3.006',
     'Module::Build' => '0.34'
   },
   'configure_requires' => {
-    'Config::Model' => '2.111',
-    'Config::Model::Itself' => '2.012',
+    'Config::Model' => '2.141',
+    'Config::Model::Itself' => '2.022',
     'Getopt::Long' => '0',
     'Module::Build' => '0.34',
     'Path::Tiny' => '0'
   },
   'requires' => {
-    'Config::Model' => '2.111',
+    'Config::Model' => '2.022',
     'perl' => '5.010'
   },
 

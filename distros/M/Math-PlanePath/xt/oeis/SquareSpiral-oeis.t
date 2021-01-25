@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -25,12 +25,12 @@
 # A168026 Non-composite numbers in the southwestern ray of the Ulam spiral as oriented on the March 1964 cover of Scientific American.
 # A168027 Non-composite numbers in the southern ray of the Ulam spiral as oriented on the March 1964 cover of Scientific American.
 
-# A217014 Permutation of natural numbers arising from applying the walk of a square spiral (e.g. A214526) to the data of triangular horizontal-last spiral (defined in A214226).
-
 # A053823 Product of primes in n-th shell of prime spiral.
 # A053997 Sum of primes in n-th shell of prime spiral.
 # A053998 Smallest prime in n-th shell of prime spiral.
 # A004652 maybe?
+
+# A340171, A340172  double-spaced spiral
 
 use 5.004;
 use strict;
@@ -42,7 +42,7 @@ use Math::NumSeq::PlanePathTurn;
 use Math::Prime::XS 'is_prime';
 use POSIX 'ceil';
 use Test;
-plan tests => 105;
+plan tests => 107;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -87,6 +87,66 @@ sub dxdy_to_dir4_1 {
 # GP-DEFINE  read("my-oeis.gp");
 
 
+
+#------------------------------------------------------------------------------
+# A068225 -- permutation N at X+1,Y
+
+MyOEIS::compare_values
+  (anum => 'A068225',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       push @got, A068225($n);
+     }
+     return \@got;
+   });
+
+# starting n=1
+sub A068225 {
+  my ($n) = @_;
+  my ($x, $y) = $path->n_to_xy ($n);
+  return $path->xy_to_n ($x+1,$y);
+}
+
+# A068226 -- permutation N at X-1,Y
+MyOEIS::compare_values
+  (anum => 'A068226',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x, $y) = $path->n_to_xy ($n);
+       push @got, $path->xy_to_n ($x-1,$y);
+     }
+     return \@got;
+   });
+
+# A334751 -- permutation N at Y-1
+MyOEIS::compare_values
+  (anum => 'A334751',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x, $y) = $path->n_to_xy ($n);
+       push @got, $path->xy_to_n ($x, $y-1);
+     }
+     return \@got;
+   });
+
+# A334752 -- permutation N at Y+1
+MyOEIS::compare_values
+  (anum => 'A334752',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x, $y) = $path->n_to_xy ($n);
+       push @got, $path->xy_to_n ($x, $y+1);
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 # A320281 -- N values in pattern 4,5,5 on positive X axis
@@ -2260,40 +2320,6 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A068225 -- permutation N at X+1,Y
-
-MyOEIS::compare_values
-  (anum => 'A068225',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $n = $path->n_start; @got < $count; $n++) {
-       push @got, A068225($n);
-     }
-     return \@got;
-   });
-
-# starting n=1
-sub A068225 {
-  my ($n) = @_;
-  my ($x, $y) = $path->n_to_xy ($n);
-  return $path->xy_to_n ($x+1,$y);
-}
-
-#------------------------------------------------------------------------------
-# A068226 -- permutation N at X-1,Y
-
-MyOEIS::compare_values
-  (anum => 'A068226',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $n = $path->n_start; @got < $count; $n++) {
-       my ($x, $y) = $path->n_to_xy ($n);
-       push @got, $path->xy_to_n ($x-1,$y);
-     }
-     return \@got;
-   });
 
 
 #------------------------------------------------------------------------------

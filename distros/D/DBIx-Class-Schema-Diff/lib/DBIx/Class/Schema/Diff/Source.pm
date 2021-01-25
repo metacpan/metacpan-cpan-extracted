@@ -17,7 +17,7 @@ has 'new_source', required => 1, is => 'ro', isa => Maybe[HashRef];
 
 has 'diff_added', is => 'ro', isa => Bool, default => sub { 0 };
 
-has '_schema_diff', required => 1, is => 'ro', isa => InstanceOf[
+has '_schema_diff', required => 1, is => 'ro', weak_ref => 1, isa => InstanceOf[
   'DBIx::Class::Schema::Diff::Schema'
 ];
 

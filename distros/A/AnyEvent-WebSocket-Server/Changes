@@ -1,5 +1,10 @@
 Revision history for AnyEvent-WebSocket-Server
 
+0.10    2020-01-25
+        - No functional change from 0.09.
+        - Fix test: The RSA key used in the test (in t/data) is now 3072 bit long,
+          because some TLS implementation now requires at least 2048 bit. (#5)
+
 0.09    2016-11-05
         [ENHANCEMENT]
         - Add "max_payload_size" option. (gh #3 by rp3u)

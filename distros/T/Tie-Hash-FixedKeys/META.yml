@@ -15,11 +15,12 @@ name: Tie-Hash-FixedKeys
 provides:
   Tie::Hash::FixedKeys:
     file: lib/Tie/Hash/FixedKeys.pm
-    version: v1.13.1
+    version: v1.13.2
 requires:
   perl: v5.6.0
 resources:
+  bugtracker: https://github.com/davorg/tie-hash-fixedkeys/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/davorg/tie-hash-fixedkeys.git
-version: v1.13.1
+version: v1.13.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

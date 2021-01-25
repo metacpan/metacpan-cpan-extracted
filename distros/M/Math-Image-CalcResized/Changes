@@ -1,3 +1,10 @@
+0.004   2020-12-24  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention imgsize script.
+
+
 0.003   2020-09-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Add function: image_resize_notation_to_human.

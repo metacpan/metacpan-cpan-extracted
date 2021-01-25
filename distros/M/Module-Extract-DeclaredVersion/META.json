@@ -16,7 +16,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Module-Extract-DeclaredVersion",
    "no_index" : {
@@ -45,7 +45,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94",
+            "Test::More" : "1",
             "Test::Output" : "0"
          }
       }
@@ -62,6 +62,6 @@
          "web" : "https://github.com/briandfoy/module-extract-declaredversion"
       }
    },
-   "version" : "1.022",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.023",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

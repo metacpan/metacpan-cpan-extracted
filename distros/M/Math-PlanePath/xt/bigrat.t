@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -38,7 +38,7 @@ BEGIN { MyTestHelpers::nowarnings(); }
 # use Smart::Comments '###';
 
 
-my $test_count = (tests => 484)[1];
+my $test_count = (tests => 486)[1];
 plan tests => $test_count;
 
 if (! eval { require Math::BigRat; 1 }) {
@@ -425,6 +425,10 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
 #------------------------------------------------------------------------------
 
 my @modules = (
+               'Corner',
+               'CornerAlternating',
+               'PyramidSides',
+
                'HilbertSides',
                'HilbertCurve',
                'HilbertSpiral',
@@ -698,8 +702,6 @@ my @modules = (
                'ComplexRevolving',
                
                # 'File',  # not applicable
-               'Corner',
-               'PyramidSides',
                'Staircase',
                'StaircaseAlternating',
                'StaircaseAlternating,end_type=square',

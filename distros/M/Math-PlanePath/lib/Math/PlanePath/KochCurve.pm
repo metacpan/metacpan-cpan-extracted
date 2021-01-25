@@ -55,7 +55,7 @@ use strict;
 use List::Util 'sum','first';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
@@ -913,6 +913,8 @@ L<http://oeis.org/A035263> (etc)
 
     A003159   N positions of left turns, ending even number 0 bits
     A036554   N positions of right turns, ending odd number 0 bits
+    A332206   N on X axis
+    A001196   N segments on X axis (N and N+1 on X axis)
 
     A065359   segment direction, *60 degrees
     A229216   segment direction, 1,2,3,-1,-2,-3

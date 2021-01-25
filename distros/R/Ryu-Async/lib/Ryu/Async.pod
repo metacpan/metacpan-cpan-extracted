@@ -43,6 +43,21 @@ Ryu::Async - use L<Ryu> with L<IO::Async>
 
 This is an L<IO::Async::Notifier> subclass for interacting with L<Ryu>.
 
+=head1 Interaction with L<Ryu>
+
+On load, this module will provide a L<Ryu::Source/$FUTURE_FACTORY> which assigns
+L<Future> instances from L<IO::Async::Loop>.
+
+You can override this behaviour by doing this instead:
+
+ BEGIN {
+  require Ryu::Source;
+  local $Ryu::Source::FUTURE_FACTORY = sub { };
+  require Ryu::Async;
+ }
+
+to ensure the original factory function is preserved.
+
 =head1 METHODS
 
 =head2 from
@@ -190,7 +205,7 @@ L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/a
 
 =head1 AUTHOR
 
-Tom Molesworth <TEAM@cpan.org>
+Tom Molesworth C<TEAM@cpan.org> with contributions from Eyad Arnabeh.
 
 =head1 LICENSE
 

@@ -18,16 +18,17 @@ name: Store-Directories
 provides:
   Store::Directories:
     file: lib/Store/Directories.pm
-    version: '0.3'
+    version: v0.4.1
   Store::Directories::Lock:
     file: lib/Store/Directories/Lock.pm
 requires:
   DBD::SQLite: '1.66'
   Data::UUID: '1.226'
+  Devel::GlobalDestruction: '0.14'
   IPC::System::Simple: '1.30'
   SQL::SplitStatement: '1.00020'
   perl: '5.014'
 resources:
   repository: https://github.com/camtauxe/store-directories.git
-version: '0.3'
+version: v0.4.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

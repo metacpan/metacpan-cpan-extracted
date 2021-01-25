@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Handle );
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 use IO::Async::Handle;
 use IO::Async::OS;
@@ -412,7 +412,7 @@ sub socktype
 
 =head2 listen
 
-   $listener->listen( %params )
+   $listener->listen( %params )->get
 
 This method sets up a listening socket and arranges for the acceptor callback
 to be invoked each time a new connection is accepted on the socket.

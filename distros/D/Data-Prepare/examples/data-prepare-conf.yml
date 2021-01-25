@@ -1,0 +1,38 @@
+---
+chop_cols:
+  examples/CoreHouseholdIndicators.csv: [0, 2, 4, 7, 10, 13, 16, 19, 21, 22, 23, 25, 26, 29, 32]
+chop_lines:
+  examples/CoreHouseholdIndicators.csv: [0, 0, 0, -1, -1, -1, -1, -1]
+merge:
+  - files:
+      - examples/CoreHouseholdIndicators.csv
+    spec:
+      - do:
+          - overwrite
+        from: up
+        fromspec: lastnonblank
+        line: 2
+        matchto: HH
+        to: self
+      - do:
+          - prepend
+          - ' '
+        from: self
+        line: 2
+        matchfrom: .
+        to: down
+      - do:
+          - prepend
+          - /
+        from: self
+        fromspec: left
+        line: 3
+        matchto: Year
+        to: self
+      - do:
+          - overwrite
+        from: self
+        fromspec: literal:Country
+        line: 3
+        to: self
+        tospec: index:0

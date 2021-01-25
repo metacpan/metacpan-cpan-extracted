@@ -1,0 +1,24 @@
+Changes
+lib/Lingua/String.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/10-new.t
+t/carp.t
+t/coverage.t
+t/eof.t
+t/eol.t
+t/links.t
+t/no404s.t
+t/pod-cm.t
+t/pod.t
+t/snippets.t
+t/spelling.t
+t/strict.t
+t/string.t
+t/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

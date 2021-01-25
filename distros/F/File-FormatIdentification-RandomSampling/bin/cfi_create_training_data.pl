@@ -92,7 +92,7 @@ cfi_create_training_data.pl
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

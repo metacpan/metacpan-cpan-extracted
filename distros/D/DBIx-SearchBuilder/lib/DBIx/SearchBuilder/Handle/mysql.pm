@@ -74,6 +74,7 @@ sub SimpleUpdateFromSelect {
         push @binds, $values->{$k};
     }
 
+    $table = $self->QuoteName($table) if $self->{'QuoteTableNames'};
     my $update_query = "UPDATE $table SET "
         . join( ', ', map "$_ = ?", @columns )
         .' WHERE ID IN ';
@@ -92,6 +93,7 @@ sub DeleteFromSelect {
         $table, $query, @query_binds
     ) unless $query =~ /\b\Q$table\E\b/i;
 
+    $table = $self->QuoteName($table) if $self->{'QuoteTableNames'};
     return $self->SimpleMassChangeFromSelect(
         "DELETE FROM $table WHERE id IN ", [],
         $query, @query_binds
@@ -287,6 +289,64 @@ sub _DateTimeIntervalFunction {
     my %args = ( From => undef, To => undef, @_ );
 
     return "TIMESTAMPDIFF(SECOND, $args{'From'}, $args{'To'})";
+}
+
+
+=head2 QuoteName
+
+Quote table or column name to avoid reserved word errors.
+
+=cut
+
+# over-rides inherited method
+sub QuoteName {
+    my ($self, $name) = @_;
+    # use dbi built in quoting if we have a connection,
+    if ($self->dbh) {
+        return $self->SUPER::QuoteName($name);
+    }
+
+    return sprintf('`%s`', $name);
+}
+
+sub DequoteName {
+    my ($self, $name) = @_;
+
+    # If we have a handle, the base class can do it for us
+    if ($self->dbh) {
+        return $self->SUPER::DequoteName($name);
+    }
+
+    if ($name =~ /^`(.*)`$/) {
+        return $1;
+    }
+    return $name;
+}
+
+sub _IsMariaDB {
+    my $self = shift;
+
+    # We override DatabaseVersion to chop off "-MariaDB-whatever", so
+    # call super here to get the original version
+    my $v = $self->SUPER::DatabaseVersion();
+
+    return ($v =~ /mariadb/i);
+}
+
+sub _RequireQuotedTables {
+    my $self = shift;
+
+    # MariaDB version does not match mysql, and hasn't added new reserved words
+    return 0 if $self->_IsMariaDB;
+
+    my $version = $self->DatabaseVersion;
+
+    # Get major version number by chopping off everything after the first "."
+    $version =~ s/\..*//;
+    if ( $version >= 8 ) {
+        return 1;
+    }
+    return 0;
 }
 
 1;

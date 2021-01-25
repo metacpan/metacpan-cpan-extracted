@@ -1,0 +1,3 @@
+This directory contains the test html files that will be accessed under the Apache/mod_perl2 instance.
+
+The temporary document root for our tests thus should be ./t/www and base uri /ssi.

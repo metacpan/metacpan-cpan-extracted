@@ -1,15 +1,18 @@
-#!perl
 
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for release candidate testing');
+    print qq{1..0 # SKIP these tests are for release candidate testing\n};
+    exit
   }
 }
 
+use strict;
+use warnings;
 
-use Test::More;
-eval 'use Test::CPAN::Changes';
-plan skip_all => 'Test::CPAN::Changes required for this test' if $@;
-changes_ok();
-done_testing();
+# this test was generated with Dist::Zilla::Plugin::Test::CPAN::Changes 0.012
+
+use Test::More 0.96 tests => 1;
+use Test::CPAN::Changes;
+subtest 'changes_ok' => sub {
+    changes_file_ok('Changes');
+};

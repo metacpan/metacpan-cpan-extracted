@@ -1,19 +1,16 @@
-#!/usr/bin/perl
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More;
 use Net::SSLeay;
+use Test::Net::SSLeay qw(initialise_libssl);
 
 eval 'use Test::Exception';
-plan skip_all => 'Test::Exception required' if $@;
+if ($@) {
+    plan skip_all => 'Test::Exception required';
+} else {
+    plan tests => 14;
+}
 
-plan tests => 14;
-
-Net::SSLeay::randomize();
-Net::SSLeay::load_error_strings();
-Net::SSLeay::ERR_load_crypto_strings();
-Net::SSLeay::SSLeay_add_ssl_algorithms();
+initialise_libssl();
 
 lives_ok(sub {
         Net::SSLeay::RSA_generate_key(2048, 0x10001);

@@ -1,0 +1,17 @@
+wg0 noaj8/91er0S0CigsCsgd4PRPeY5/qwEsMqohH1x+X8=	wg0d845RRItYcmcEW3i+dqatmja18F2P9ujy+lAtsBM=	51888	off
+wg0	WG_0_PEER_B_PUBLIC_KEY	(none)	(none)	192.168.3.10/32	0	0	0	off
+wg0	WG_0_PEER_C_PUBLIC_KEY	(none)	213.55.224.113:37159	192.168.3.11/32	1605833687	5055024	87864720	off
+wg0	WG_0_PEER_A_PUBLIC_KEY	(none)	147.86.207.49:10400	192.168.3.12/32	1605538966	259684	1362368	off
+wg0	WG_0_PEER_D_PUBLIC_KEY	(none)	(none)	192.168.3.13/32	0	0	0	off
+wg0	DtGrNBijn+o91/tTNBx9EbDqC0552tuzruY14Ii5mi4=	(none)	(none)	192.168.3.14/32	0	0	0	off
+wg0	TolTfLzAXEj7u/gpWEFk4wzNA0OGtc2TruUNwKP5nlc=	(none)	(none)	192.168.3.15/32	0	0	0	off
+wg1	noaj8/91er0S0CigsCsgd4PRPeY5/qwEsMqohH1x+X8=	wg1zd845RRItYcmcEW3i+dqatmja18F2P9ujy+lAtsBM=	51889	off
+wg1	WG_1_PEER_B_PUBLIC_KEY	(none)	(none)	192.168.4.10/32	0	0	0	off
+wg1	WG_1_PEER_C_PUBLIC_KEY	(none)	(none)	192.168.4.11/32	0	0	0	off
+wg1	WG_1_PEER_D_PUBLIC_KEY	(none)	(none)	192.168.4.12/32	0	0	0	off
+wg1	WG_1_PEER_A_PUBLIC_KEY	(none)	(none)	192.168.4.13/32	0	0	0	off
+wg1	DtGrNBijn+o91/tTNBx9EbDqC0552tuzruY14Ii5mi4=	(none)	(none)	192.168.4.14/32	0	0	0	off
+wg1	TolTfLzAXEj7u/gpWEFk4wzNA0OGtc2TruUNwKP5nlc=	(none)	(none)	192.168.4.15/32	0	0	0	off
+wg2	WG_1_PEER_A_PUBLIC_KEY	(none)	(none)	192.168.4.13/32	0	0	0	off
+wg2	DtGrNBijn+o91/tTNBx9EbDqC0552tuzruY14Ii5mi4=	(none)	(none)	192.168.4.14/32	0	0	0	off
+wg2	TolTfLzAXEj7u/gpWEFk4wzNA0OGtc2TruUNwKP5nlc=	(none)	(none)	192.168.4.15/32	0	0	0	off

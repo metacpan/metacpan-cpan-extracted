@@ -1,0 +1,89 @@
+=encoding utf-8
+
+=head1 NAME
+
+Apache2::SSI::SemStat - Apache2 SSI Notes Shared Memory Manipulation
+
+=head1 SYNOPSIS
+
+    semctl( $id, 0, IPC_STAT, $data ) || die( "$!\n" );
+    my @values = unpack( $data );
+    my $semstat => Apache2::SSI::SemStat->new( @values );
+    my $cgid = $semstat->cgid;
+    my $ctime = $semstat->ctime;
+    my $cuid = $semstat->cuid;
+    my $gid = $semstat->gid;
+    my $mode = $semstat->mode;
+    my $nsems = $semstat->nsems;
+    my $otime = $semstat->otime;
+    my $uid = $semstat->uid;
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+L<Apache2::SSI::SemStat> provides an object oriented way to access semaphore stat information after being populated during object instantiation.
+
+=head1 METHODS
+
+=head2 new
+
+Creates a new L<Apache2::SSI::SemStat> object and return it.
+
+=head2 cgid
+
+Effective GID of creator
+
+=head2 ctime
+
+Last semop time
+
+=head2 cuid
+
+Effective UID of creator
+
+=head2 gid
+
+Effective UID of owner
+
+=head2 mode
+
+Permissions
+
+=head2 nsems
+
+No. of semaphores in set
+
+=head2 otime
+
+Last semop time
+
+=head2 uid
+
+Effective UID of owner
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+CPAN ID: jdeguest
+
+L<https://git.deguest.jp/jack/Apache2-SSI>
+
+=head1 SEE ALSO
+
+L<Apache2::SSI>, L<Apache2::SSI::Notes>
+
+L<perlipc>, L<perlmod>, L<IPC::Shareable>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

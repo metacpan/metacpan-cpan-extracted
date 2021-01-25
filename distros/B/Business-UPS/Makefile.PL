@@ -19,10 +19,8 @@ WriteMakefile(
         },
         resources => {
             license => 'http://dev.perl.org/licenses/',
-            homepage => 'http://wiki.github.com/toddr/business-ups',
-#            bugtracker => 'http://code.google.com/p/business-ups/issues/list',
-            repository => 'http://github.com/toddr/business-ups/tree/master',
-#            MailingList => 'http://groups.google.com/group/business-ups',
+            bugtracker => 'https://github.com/toddr/Business-UPS/issues',
+            repository => 'https://github.com/toddr/Business-UPS',
         },
     },
     );

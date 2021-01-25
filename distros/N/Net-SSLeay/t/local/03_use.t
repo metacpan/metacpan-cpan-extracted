@@ -1,10 +1,13 @@
-#!/usr/bin/perl
+# Basic module loading test, plus OS/Perl/libssl information to assist
+# with diagnosing later test failures
 
-use strict;
-use warnings;
-use Test::More tests => 1;
+use lib 'inc';
+
+use Test::Net::SSLeay;
 
 BEGIN {
+    plan tests => 1;
+
     use_ok('Net::SSLeay');
 }
 

@@ -30,6 +30,20 @@ my $loop = IO::Async::Loop->new_builtin;
 }
 
 {
+   my $future = $loop->later;
+   my $cancellable_future = $loop->later;
+
+   ok( !$future->is_ready, '$loop->later returns a pending Future' );
+   ok( !$cancellable_future->is_ready, 'another $loop->later also returns a pending Future' );
+
+   $cancellable_future->cancel;
+   $loop->loop_once;
+
+   ok( $future->is_done, '$loop->later Future is resolved after one loop iteration' );
+   ok( $cancellable_future->is_cancelled, '$loop->later Future cancels cleanly' );
+}
+
+{
    my @futures = map { Future->new } 0 .. 2;
 
    do { my $id = $_; $loop->later( sub { $futures[$id]->done } ) } for 0 .. 2;

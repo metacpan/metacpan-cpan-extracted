@@ -206,6 +206,8 @@ lib/Catmandu/Path/simple.pm
 lib/Catmandu/Pluggable.pm
 lib/Catmandu/Plugin/Datestamps.pm
 lib/Catmandu/Plugin/Readonly.pm
+lib/Catmandu/Plugin/Readonly/Droppable.pm
+lib/Catmandu/Plugin/Readonly/Searchable.pm
 lib/Catmandu/Plugin/Versioning.pm
 lib/Catmandu/Sane.pm
 lib/Catmandu/Searchable.pm

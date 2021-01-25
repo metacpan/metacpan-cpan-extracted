@@ -1,3 +1,9 @@
+0.000021  2021-01-19 14:55:27-08:00 America/Los_Angeles
+
+    - For pools, make sure cache db is stopped before marking it as ready
+    - Move ready file outside the directory so it is not copied with the dir (ooops)
+    - Add ability to show pool diag without showing all sql-server output
+
 0.000020  2020-12-01 15:35:36-08:00 America/Los_Angeles
 
     - Watcher should use POSIX::_exit() since it is exec-like

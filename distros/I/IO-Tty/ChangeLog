@@ -1,3 +1,8 @@
+1.16 2021-01-2 Todd Rinaldo <toddr@cpan.org>
+    * Switch to github for issue tracker.
+    * Switch to testsuite CI workflow.
+    * Tidy
+
 2020-10-03 Todd Rinaldo <toddr@cpan.org> 1.15
     * Skip winsize test on Solaris and QNX NTO
     * Make function tests more robust

@@ -3,7 +3,9 @@ use strict;
 use warnings;
 
 use SQL::Abstract 1.85;
-use parent 'SQL::Abstract';
+use parent 'SQL::Abstract'; # THINK : maybe there should be an import option to
+                            # inherit from SQL::Abstract::Classic instead of SQL::Abstract,
+                            # so that clients may choose...
 use MRO::Compat;
 use mro 'c3'; # implements next::method
 
@@ -17,7 +19,7 @@ BEGIN {*puke = \&SQL::Abstract::puke; *belch = \&SQL::Abstract::belch;}
 # remove all previously defined or imported functions
 use namespace::clean;
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 
 #----------------------------------------------------------------------
@@ -28,11 +30,11 @@ our $VERSION = '1.34';
 
 # shallow_clone(): copies of the top-level keys and values, blessed into the same class
 sub shallow_clone {
-  my $orig = shift;
+  my ($orig, %override) = @_;
 
   my $class = ref $orig
     or puke "arg must be an object";
-  my $clone = {%$orig};
+  my $clone = {%$orig, %override};
   return bless $clone, $class;
 }
 
@@ -179,6 +181,7 @@ my %params_for_WITH = (
   -table        => {type => SCALAR},
   -columns      => {type => SCALAR|ARRAYREF,         optional => 1},
   -as_select    => {type => HASHREF},
+  -final_clause => {type => SCALAR,                  optional => 1},
 );
 
 
@@ -250,7 +253,7 @@ sub with_recursive {
   my $self = shift;
 
   my $new_instance = $self->with(@_);
-  $new_instance->{with_recursive} = 1; # flag to be used in _prepend_WITH_clause()
+  $new_instance->{WITH}{sql} =~ s/^WITH\b/WITH RECURSIVE/;
 
   return $new_instance;
 }
@@ -258,44 +261,43 @@ sub with_recursive {
 sub with {
   my $self = shift;
 
-  ! $self->{common_table_expressions}
+  ! $self->{WITH}
     or puke "calls to the with() or with_recursive() method cannot be chained";
 
   @_
     or puke "->with() : missing arguments";
 
-  my @cte_params_list = does($_[0], 'ARRAY') ? @_ : ( [ @_]);
-  my @cte_list;
-  foreach my $cte_params (@cte_params_list) {
-    my %cte = validate(@$cte_params, \%params_for_WITH);
-    ($cte{sql}, @{$cte{bind}}) = $self->select(%{$cte{-as_select}});
-    push @cte_list, \%cte;
+  # create a copy of the current object with an additional attribute WITH
+  my $clone = shallow_clone($self, WITH => {sql => "", bind => []});
+
+  # assemble SQL and bind values for each table expression
+  my @table_expressions = does($_[0], 'ARRAY') ? @_ : ( [ @_]);
+  foreach my $table_expression (@table_expressions) {
+    my %args = validate(@$table_expression, \%params_for_WITH);
+    my ($sql, @bind) = $self->select(%{$args{-as_select}});
+    $clone->{WITH}{sql} .= ", " if $clone->{WITH}{sql};
+    $clone->{WITH}{sql} .= $args{-table};
+    $clone->{WITH}{sql} .= "(" . join(", ", @{$args{-columns}}) . ")" if $args{-columns};
+    $clone->{WITH}{sql} .= " AS ($sql) ";
+    $clone->{WITH}{sql} .= $args{-final_clause} . " "                 if $args{-final_clause};
+    push @{$clone->{WITH}{bind}}, @bind;
   }
 
-  my $copy = {%$self};
-  $copy->{common_table_expressions} = \@cte_list;
-  return bless $copy, ref $self;
+  # add the initial keyword WITH 
+  substr($clone->{WITH}{sql}, 0, 0, 'WITH ');
+
+  return $clone;
 }
 
 
 sub _prepend_WITH_clause {
   my ($self, $ref_sql, $ref_bind) = @_;
 
-  return if !$self->{common_table_expressions};
+  return if !$self->{WITH};
 
-  my $preamble = "";
-  foreach my $cte (@{$self->{common_table_expressions}}) {
-    $preamble .= ", " if $preamble;
-    $preamble .= $cte->{-table};
-    $preamble .= "(" . join(", ", @{$cte->{-columns}}) . ")" if $cte->{-columns};
-    $preamble .= " AS ($cte->{sql}) ";
-    unshift @$ref_bind, @{$cte->{bind}};
-  }
-  if ($preamble) {
-    substr($preamble, 0, 0, 'RECURSIVE ') if $self->{with_recursive};
-    substr($preamble, 0, 0, 'WITH ');
-    substr($$ref_sql, 0, 0, $preamble);
-  }
+  substr($$ref_sql, 0, 0, $self->{WITH}{sql});
+  unshift @$ref_bind, @{$self->{WITH}{bind}};
+
 }
 
 
@@ -361,6 +363,7 @@ sub select {
     if ($args{-$set_op}) {
       my %sub_args = @{$args{-$set_op}};
       $sub_args{$_} ||= $args{$_} for qw/-columns -from/;
+      local $self->{WITH}; # temporarily enable the WITH part during the subquery
       my ($sql1, @bind1) = $self->select(%sub_args);
       (my $sql_op = uc($set_op)) =~ s/_/ /g;
       $sql .= " $sql_op $sql1";
@@ -427,6 +430,7 @@ sub insert {
   my @old_API_args;
   my $returning_into;
   my $sql_to_add;
+  my $fix_RT134127;
 
   if (&_called_with_named_args) {
     # extract named args and translate to old SQLA API
@@ -444,11 +448,13 @@ sub insert {
       $old_API_args[1] = $args{-values};
     }
     elsif ($args{-select}) {
+      local $self->{WITH}; # temporarily enable the WITH part during the subquery
       my ($sql, @bind) = $self->select(%{$args{-select}});
       $old_API_args[1] = \ [$sql, @bind];
       if (my $cols = $args{-columns}) {
         $old_API_args[0] .= "(" . CORE::join(", ", @$cols) . ")";
       }
+      $fix_RT134127 = 1 if $SQL::Abstract::VERSION >= 2.0;
     }
     else {
       puke "insert(-into => ..) : need either -values arg or -select arg";
@@ -468,6 +474,10 @@ sub insert {
 
   # get results from parent method
   my ($sql, @bind) = $self->next::method(@old_API_args);
+
+  # temporary fix for RT#134127 due to a change of behaviour of insert() in SQLA V2.0
+  # .. waiting for SQLA to fix RT#134128
+  $sql =~ s/VALUES SELECT/SELECT/ if $fix_RT134127;
 
   # inject more stuff if using Oracle's "RETURNING ... INTO ..."
   if ($returning_into) {
@@ -510,7 +520,7 @@ sub update {
     @old_API_args = @_;
   }
 
-  # call clone of parent method and merge with bind values from $join_info
+  # call parent method and merge with bind values from $join_info
   my ($sql, @bind) = $self->next::method(@old_API_args);
   unshift @bind, @{$join_info->{bind}} if $join_info;
 
@@ -1962,10 +1972,12 @@ injecting additional SQL keywords after the C<DELETE> keyword. Examples :
 Returns a new instance with an encapsulated I<common table expression (CTE)>, i.e. a
 kind of local view that can be used as a table name for the rest of the SQL statement
 -- see L<https://en.wikipedia.org/wiki/Hierarchical_and_recursive_queries_in_SQL> for
-an explanation of such expressions. The next C<select> on that instance will automatically
-build a C<WITH RECURSIVE> clause added as a preamble to the usual SQL statement.
-This works not only for C<select> but also for C<insert>, C<update> and C<delete>.
-The C<with()> variant produces the same result but without the C<RECURSIVE> keyword.
+an explanation of such expressions, or, if you are using Oracle, see the documentation
+for so-called I<subquery factoring clauses> in SELECT statements.
+
+Further calls to C<select>, C<insert>, C<update> and C<delete> on that new instance
+will automatically prepend a C<WITH> or C<WITH RECURSIVE> clause before the usual
+SQL statement.
 
 Arguments to C<with_recursive()> are expressed as a list of arrayrefs; each arrayref
 corresponds to one table expression, with the following named parameters :
@@ -1985,6 +1997,18 @@ columns resulting from the internal select
 
 The implementation of the table expression, given as a hashref
 of arguments following the same syntax as the L</select> method.
+
+=item C<-final_clause>
+
+An optional SQL clause that will be added after the table expression.
+This may be needed for example for an Oracle I<cycle clause>, like
+
+  ($sql, @bind) = $sqla->with_recursive(
+    -table        => ...,
+    -as_select    => ...,
+    -final_clause => "CYCLE x SET is_cycle TO '1' DEFAULT '0'",
+   )->select(...);
+
 
 =back
 
@@ -2331,12 +2355,15 @@ bindings before executing the statement.
 
 =head2 shallow_clone
 
-  my $clone = SQL::Abstract::More::shallow_clone($some_object);
+  my $clone = SQL::Abstract::More::shallow_clone($some_object, %override);
 
 Returns a shallow copy of the object passed as argument. A new hash is created
 with copies of the top-level keys and values, and it is blessed into the same
 class as the original object. Not to be confused with the full recursive copy
 performed by L<Clone/clone>.
+
+The optional C<%override> hash is also copied into C<$clone>; it can be used
+to add other attributes or to override existing attributes in C<$some_object>.
 
 =head2 does()
 

@@ -339,7 +339,9 @@ SKIP: {
     is( ( $future->failure )[2], "getaddrinfo", '->failure [2] gives getaddrinfo' );
 
     my $errno = ( $future->failure )[3];
-    ok( $errno == Socket::EAI_NONAME || $errno == Socket::EAI_NODATA, '->failure [3] gives EAI_NONAME or EAI_NODATA' ) or
+    ok( $errno == Socket::EAI_FAIL || $errno == Socket::EAI_AGAIN || # no server available
+        $errno == Socket::EAI_NONAME || $errno == Socket::EAI_NODATA, # server confirmed no DNS entry
+        '->failure [3] gives EAI_FAIL or EAI_AGAIN or EAI_NONAME or EAI_NODATA' ) or
       diag( '$errno is ' . $errno );
 }
 

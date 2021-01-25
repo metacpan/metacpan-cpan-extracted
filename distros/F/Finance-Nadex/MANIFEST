@@ -15,7 +15,6 @@ t/05-get_markets.t
 t/06-market_instruments.t
 t/07-time_series.t
 t/08-contracts.t
-t/09-quote.t
 t/10-order.t
 t/11-orders.t
 t/12-position.t
@@ -26,9 +25,12 @@ examples/contracts
 examples/getmarket
 examples/getmarkets
 examples/getorders
-examples/getquote
 examples/positions
 examples/timeseries
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
 
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

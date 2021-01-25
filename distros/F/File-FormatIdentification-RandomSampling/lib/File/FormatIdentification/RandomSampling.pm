@@ -1,6 +1,6 @@
 package File::FormatIdentification::RandomSampling;
 # ABSTRACT: methods to identify content of device o media files using random sampling
-our $VERSION = '0.005'; # VERSION:
+our $VERSION = '0.006'; # VERSION:
 # (c) 2020/2021 by Andreas Romeyke
 # licensed via GPL v3.0 or later
 
@@ -214,7 +214,7 @@ File::FormatIdentification::RandomSampling - methods to identify content of devi
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

@@ -12,21 +12,21 @@ use Syntax::Keyword::Try qw( try try_value );
 
 # try do { } yields result
 {
-   is( try do { "result" } catch {},
+   is( try do { "result" } catch ($e) {},
        "result",
        'try do { } yields result' );
 }
 
 # try do { } failure returns catch
 {
-   is( try do { die "oops\n" } catch { "failure" },
+   is( try do { die "oops\n" } catch ($e) { "failure" },
        "failure",
        'try do { } yields catch result on failure' );
 }
 
 # stack discipline
 {
-   my @v = ( 1, [ 2, try do { 3 } catch {}, 4 ], 5 );
+   my @v = ( 1, [ 2, try do { 3 } catch ($e) {}, 4 ], 5 );
    is_deeply( \@v, [ 1, [ 2 .. 4 ], 5 ],
       'try do { } preserves stack discipline' ) or
          diag "Got ", explain \@v;
@@ -37,7 +37,7 @@ use Syntax::Keyword::Try qw( try try_value );
    local $TODO = "list context";
 
    no warnings 'void';
-   my @v = try do { 1, 2, 3 } catch {};
+   my @v = try do { 1, 2, 3 } catch ($e) {};
    is_deeply( \@v, [ 1 .. 3 ],
       'try do can yield lists' );
 }
@@ -49,7 +49,7 @@ SKIP: {
 
    eval { die "oopsie" };
 
-   my $ret = try do { die "another failure" } catch {};
+   my $ret = try do { die "another failure" } catch ($e) {};
    like( $@, qr/^oopsie at /, '$@ after try do/catch' );
 }
 
@@ -67,7 +67,7 @@ SKIP: {
    my $warnings = "";
    local $SIG{__WARN__} = sub { $warnings .= join "", @_ };
 
-   eval "try do { 1 } catch { 2 }" or die $@;
+   eval "try do { 1 } catch (\$e) { 2 }" or die $@;
 
    like( $warnings, qr/^'try do' syntax is experimental/,
       'try do syntax produces experimental warnings' );
@@ -76,7 +76,7 @@ SKIP: {
    use Syntax::Keyword::Try qw( :experimental(try_value) );
    $warnings = "";
 
-   eval "try do { 3 } catch { 4 }" or die $@;
+   eval "try do { 3 } catch (\$e) { 4 }" or die $@;
    is( $warnings, "", 'no warnings when :experimental(try_value) is enabled' );
 }
 

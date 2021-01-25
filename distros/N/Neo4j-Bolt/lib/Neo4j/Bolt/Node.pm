@@ -1,10 +1,12 @@
 package Neo4j::Bolt::Node;
 # ABSTRACT: Representation of Neo4j Node
 
-$Neo4j::Bolt::Node::VERSION = '0.40';
+$Neo4j::Bolt::Node::VERSION = '0.4201';
 
 use strict;
 use warnings;
+
+use parent 'Neo4j::Types::Node';
 
 sub as_simple {
   my ($self) = @_;
@@ -46,10 +48,17 @@ a Cypher query that returns nodes from a Neo4j database.
 Their properties and metadata can be accessed as shown in the
 synopsis above.
 
+This package inherits from L<Neo4j::Types::Node>, which
+offers an object-oriented interface to the node's
+properties and metadata. This is entirely optional to use.
+
 If a query returns the same node twice, two separate
 L<Neo4j::Bolt::Node> instances will be created.
 
 =head1 METHODS
+
+This package inherits all methods from L<Neo4j::Types::Node>.
+The following additional method is provided:
 
 =over
 
@@ -71,7 +80,7 @@ replaced with the node's metadata.
 
 =head1 SEE ALSO
 
-L<Neo4j::Bolt>
+L<Neo4j::Bolt>, L<Neo4j::Types::Node>
 
 =head1 AUTHOR
 
@@ -80,7 +89,7 @@ L<Neo4j::Bolt>
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2020 by Arne Johannessen.
+This software is Copyright (c) 2019-2021 by Arne Johannessen.
 
 This is free software, licensed under:
 

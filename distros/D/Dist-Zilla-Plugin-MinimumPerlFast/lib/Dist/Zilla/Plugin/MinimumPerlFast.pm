@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::MinimumPerlFast;
-$Dist::Zilla::Plugin::MinimumPerlFast::VERSION = '0.003';
+$Dist::Zilla::Plugin::MinimumPerlFast::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -8,13 +8,24 @@ use Moose;
 use Carp 'croak';
 use MooseX::Types::Perl 0.101340 qw( StrictVersionStr );
 use Perl::MinimumVersion::Fast;
-use List::Util qw//;
+use List::Util qw/max/;
 
 with(
 	'Dist::Zilla::Role::PrereqSource' => { -version => '4.102345' },
 	'Dist::Zilla::Role::FileFinderUser' => {
-		-version => '4.102345',
-		default_finders => [ ':InstallModules', ':ExecFiles', ':TestFiles' ]
+		finder_arg_names => [ 'configure_finder' ],
+		method => 'found_configure',
+		default_finders => [ ':IncModules' ]
+	},
+	'Dist::Zilla::Role::FileFinderUser' => {
+		finder_arg_names => [ 'runtime_finder' ],
+		method => 'found_runtime',
+		default_finders => [ ':InstallModules', ':ExecFiles' ]
+	},
+	'Dist::Zilla::Role::FileFinderUser' => {
+		finder_arg_names => [ 'test_finder' ],
+		method => 'found_tests',
+		default_finders => [ ':TestFiles' ]
 	},
 );
 
@@ -25,30 +36,22 @@ has version => (
 	builder => '_build_version',
 );
 
-has min => (
+has default_version => (
 	is      => 'ro',
 	lazy    => 1,
 	isa     => StrictVersionStr,
 	default => '5.008'
 );
 
-has max => (
-	is        => 'ro',
-	isa       => StrictVersionStr,
-	required  => 0,
-);
-
 sub _build_version {
 	my $self = shift;
-	return List::Util::max($self->min, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->stringify } @{ $self->found_files });
+	my @files = @{ $self->found_runtime }, @{ $self->found_configure }, grep { /\.(t|pm)$/ } @{ $self->found_tests };
+	return max($self->default_version, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->numify } @files);
 }
 
 sub register_prereqs {
 	my $self = shift;
-	my $version = $self->version;
-	my $max = $self->max;
-	croak "Required perl version $version is higher than maximum $max" if defined $max && $version > $max;
-	$self->zilla->register_prereqs({ phase => 'runtime' }, perl => $version);
+	$self->zilla->register_prereqs({ phase => 'runtime' }, perl => $self->version);
 	return;
 }
 
@@ -70,7 +73,7 @@ Dist::Zilla::Plugin::MinimumPerlFast - Quickly detects the minimum version of Pe
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -80,6 +83,16 @@ This plugin uses L<Perl::MinimumVersion::Fast> to automatically find the minimum
  [MinimumPerlFast]
 
 This plugin will search for files matching C</\.(t|pl|pm)$/i> in the C<lib/>, C<bin/>, and C<t/> directories.
+
+=head1 ATTRIBUTES
+
+=head2 version
+
+The minimum version of perl for this module. Determining this is the reason for existence of this module, but if necessary this can easily be overridden.
+
+=head2 default_version
+
+The minimum version that is used if no minimum can be detected. By default it's C<5.008> because that's the oldest that C<Perl::MinimumVersion::Fast> can detect.
 
 =head1 SEE ALSO
 Dist::Zilla

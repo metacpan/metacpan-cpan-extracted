@@ -1,5 +1,20 @@
 Revision history for Net::SFTP::Foreign
 
+1.93  Jan 19, 2021
+        - put_content was not handling optional arguments correctly
+          (bug report by Bas van Sisseren).
+
+1.92_03 Oct 1, 2020
+	- Write buffer could grow uncontrolled after a connection
+	  lost error (bug report by Jozef Kutej, #gh17).
+
+1.92_02 Jun 25, 2020
+	- Fix handling of out of order responses.
+
+1.92_01 Jun 24, 2020
+	- Add support for receiving out of order responses from the
+	  server (bug report by Dimitar Kolev #rt130641 and ftumsh
+	  #rt132768).
 
 1.91  Jun 24, 2020
 	- ls was not handling the queue size correctly in some

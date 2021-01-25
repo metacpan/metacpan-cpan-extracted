@@ -3,15 +3,15 @@ require 5.006000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'INSTALLDIRS' => 'site',
-  'VERSION_FROM' => 'lib/Tie/Hash/Cannabinol.pm',
   'NAME' => 'Tie::Hash::Cannabinol',
-  'EXE_FILES' => [],
+  'VERSION_FROM' => 'lib/Tie/Hash/Cannabinol.pm',
   'PREREQ_PM' => {
                    'Attribute::Handlers' => 0,
                    'Test::More' => 0,
                    'Tie::Hash' => 0
                  },
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
   'PL_FILES' => {}
 )
 ;

@@ -1,13 +1,19 @@
 Revision history for App-bookmarks
 
-0.21    2020.06.29 
+0.23    2021.01.23
+        added tests and fixed firefox default location
+
+0.22    2021.01.20
+        fixed firefox query
+
+0.21    2020.06.29
         added markdown and text files support
 
-0.20    2020.03.10 
+0.20    2020.03.10
         fixed EXCLUSIVE SQLite lock set by Firefox
 
-0.19    2019.12.29 
+0.19    2019.12.29
         added chrome support, require, bugfixes
 
-0.17    2019.10.22 
+0.17    2019.10.22
         created module

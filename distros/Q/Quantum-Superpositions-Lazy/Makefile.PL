@@ -24,7 +24,7 @@ WriteMakefile(
 	META_MERGE => {
 		resources => {
 			license => 'https://dev.perl.org/licenses',
-			homepage => 'https://metacpan.org/release/Quantum-Superpositions-Lazy',
+			homepage => 'https://brtastic.xyz/project/quantum-superpositions-lazy',
 			bugtracker => 'https://github.com/brtastic/perl-quantum-superpositions-lazy/issues',
 			repository => 'https://github.com/brtastic/perl-quantum-superpositions-lazy',
 		},

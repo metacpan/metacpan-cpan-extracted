@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2018, 2019, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 use Math::BigInt try => 'GMP';
 use Test;
-plan tests => 12;
+plan tests => 13;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -29,7 +29,29 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::DiagonalsOctant;
+use Math::PlanePath::Diagonals;
+use Math::PlanePath::PyramidRows;
 
+
+#------------------------------------------------------------------------------
+# A274427 -- DiagonalsOctant part of Diagonals
+
+MyOEIS::compare_values
+  (anum => 'A274427',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my $oct = Math::PlanePath::DiagonalsOctant->new;
+     my $all = Math::PlanePath::Diagonals->new;
+     for (my $n = $oct->n_start; @got < $count; $n++) {
+       my ($x,$y) = $oct->n_to_xy($n);
+       push @got, $all->xy_to_n($x,$y);
+     }
+
+     my $path = Math::PlanePath::DiagonalsOctant->new (n_start => 0);
+
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 # A079826 -- concat of rows numbers in diagonals octant order
@@ -42,7 +64,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::PyramidRows;
      my $diag = Math::PlanePath::DiagonalsOctant->new;
      my $rows = Math::PlanePath::PyramidRows->new(step=>1);
      my $prev_d = 0;
@@ -104,7 +125,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::PyramidRows;
      my $diag = Math::PlanePath::DiagonalsOctant->new;
      my $rows = Math::PlanePath::PyramidRows->new(step=>1);
      my $prev_d = 0;
@@ -130,7 +150,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::PyramidRows;
      my $diag = Math::PlanePath::DiagonalsOctant->new;
      my $rows = Math::PlanePath::PyramidRows->new(step=>1);
      for (my $n = $diag->n_start; @got < $count; $n++) {
@@ -148,7 +167,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::PyramidRows;
      my $diag = Math::PlanePath::DiagonalsOctant->new(direction=>'up');
      my $rows = Math::PlanePath::PyramidRows->new(step=>1);
      for (my $n = $diag->n_start; @got < $count; $n++) {
@@ -166,7 +184,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::PyramidRows;
      my $diag = Math::PlanePath::DiagonalsOctant->new(direction=>'up');
      my $rows = Math::PlanePath::PyramidRows->new(step=>1);
      for (my $n = $diag->n_start; @got < $count; $n++) {
@@ -184,7 +201,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::PyramidRows;
      my $diag = Math::PlanePath::DiagonalsOctant->new;
      my $rows = Math::PlanePath::PyramidRows->new(step=>1);
      for (my $n = $diag->n_start; @got < $count; $n++) {
@@ -202,7 +218,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::PyramidRows;
      my $diag = Math::PlanePath::DiagonalsOctant->new;
      my $rows = Math::PlanePath::PyramidRows->new(step=>1);
      for (my $n = $rows->n_start; @got < $count; $n++) {
@@ -266,7 +281,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::PyramidRows;
      my $diag = Math::PlanePath::DiagonalsOctant->new(direction=>'up');
      my $rows = Math::PlanePath::PyramidRows->new(step=>1);
      for (my $n = $diag->n_start; @got < $count; $n++) {

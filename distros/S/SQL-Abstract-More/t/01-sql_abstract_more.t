@@ -7,10 +7,10 @@ use SQL::Abstract::More;
 use Test::More;
 use SQL::Abstract::Test import => [qw/is_same_sql_bind/];
 
-diag( "Testing SQL::Abstract::More $SQL::Abstract::More::VERSION, Perl $], $^X" );
+diag( "Testing SQL::Abstract::More $SQL::Abstract::More::VERSION "
+      ."with SQL::Abstract $SQL::Abstract::VERSION, Perl $], $^X" );
 
 use constant N_DBI_MOCK_TESTS =>  2;
-
 
 
 my $sqla = SQL::Abstract::More->new;

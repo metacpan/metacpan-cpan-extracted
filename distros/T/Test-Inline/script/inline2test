@@ -1,45 +1,39 @@
 #!/usr/bin/perl
+# PODNAME: inline2test
+# ABSTRACT: The Test::Inline 2 Test Compiler
 
-=pod
-
-=head1 NAME
-
-inline2test - The Test::Inline 2 Test Compiler
-
-=head1 SYNOPIS
-
-  > inline2test ./inline2test.conf
-  
-  # In your inline2test.conf
-  input=lib
-  output=t
-  execute=0
-  verbose=1
-  readonly=1
-  header=inline2text.txt
-
-=head1 DESCRIPTION
-
-C<inline2test> is the L<Test::Inline> 2 test compiler.
-
-It's job is to scan through an arbitrary tree of Perl source code files,
-locate inline test sections, extract them, convert them to test scripts,
-and write them to an output path.
-
-=cut
+#pod =pod
+#pod
+#pod =head1 SYNOPIS
+#pod
+#pod   > inline2test ./inline2test.conf
+#pod   
+#pod   # In your inline2test.conf
+#pod   input=lib
+#pod   output=t
+#pod   execute=0
+#pod   verbose=1
+#pod   readonly=1
+#pod   header=inline2text.txt
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod C<inline2test> is the L<Test::Inline> 2 test compiler.
+#pod
+#pod It's job is to scan through an arbitrary tree of Perl source code files,
+#pod locate inline test sections, extract them, convert them to test scripts,
+#pod and write them to an output path.
+#pod
+#pod =cut
 
 use strict;
 use File::Spec::Functions  ':ALL';
 use Getopt::Long           ();
 use Config::Tiny           ();
 use Test::Inline           ();
-use File::Slurp            ();
 use Test::Inline::IO::File ();
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '2.213';
-}
+our $VERSION = '2.214';
 
 # Predeclare things
 sub stop ($);
@@ -167,3 +161,55 @@ sub stop ($) {
 	print "$_[0]\n";
 	exit(1);
 }
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+inline2test - The Test::Inline 2 Test Compiler
+
+=head1 VERSION
+
+version 2.214
+
+=head1 DESCRIPTION
+
+C<inline2test> is the L<Test::Inline> 2 test compiler.
+
+It's job is to scan through an arbitrary tree of Perl source code files,
+locate inline test sections, extract them, convert them to test scripts,
+and write them to an output path.
+
+=head1 SYNOPIS
+
+  > inline2test ./inline2test.conf
+  
+  # In your inline2test.conf
+  input=lib
+  output=t
+  execute=0
+  verbose=1
+  readonly=1
+  header=inline2text.txt
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Inline>
+(or L<bug-Test-Inline@rt.cpan.org|mailto:bug-Test-Inline@rt.cpan.org>).
+
+=head1 AUTHOR
+
+Adam Kennedy <adamk@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2003 by Adam Kennedy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

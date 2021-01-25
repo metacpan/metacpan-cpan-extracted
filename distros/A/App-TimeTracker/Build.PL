@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "App-TimeTracker",
-  "dist_version" => "3.008",
+  "dist_version" => "3.009",
   "license" => "perl",
   "module_name" => "App::TimeTracker",
   "recursive_test_files" => 1,

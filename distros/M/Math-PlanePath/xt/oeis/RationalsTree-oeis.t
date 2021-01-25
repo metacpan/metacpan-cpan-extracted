@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2017, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2017, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -55,6 +55,73 @@ sub gcd {
     ($x,$y) = ($y, $x % $y);
   }
 }
+
+# GP-DEFINE  read("my-oeis.gp");
+
+
+#------------------------------------------------------------------------------
+# A004755 -- map SB f -> f+1
+
+MyOEIS::compare_values
+  (anum => 'A004755',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::RationalsTree->new (tree_type => 'SB');
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $path->xy_to_n($x+$y,$y);   # frac + 1
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A065249 -- permutation SB f -> f/2
+# A065250 -- permutation SB f -> 2f
+
+MyOEIS::compare_values
+  (anum => 'A065249',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::RationalsTree->new (tree_type => 'SB');
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       if ($x%2==0) { $x /= 2; } else { $y *= 2; }    # frac/2
+       push @got, $path->xy_to_n($x,$y);
+     }
+     return \@got;
+   });
+MyOEIS::compare_values
+  (anum => 'A065250',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::RationalsTree->new (tree_type => 'SB');
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       if ($y%2==0) { $y /= 2; } else { $x *=2; }    # frac*2
+       push @got, $path->xy_to_n($x,$y);
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A153778 - SB parity X mod 2
+# rationals.tex on sum bits alternating signs mod 3
+
+MyOEIS::compare_values
+  (anum => 'A153778',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::RationalsTree->new (tree_type => 'SB');
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x % 2;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------

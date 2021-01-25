@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 1.12
+version 1.18
 
 # SYNOPSIS
 
@@ -39,8 +39,6 @@ version 1.12
     stopwords_file = ..
     ; Defaults to false
     use_github_homepage = 0
-    ; Defaults to false
-    use_github_issues = 0
 
 # DESCRIPTION
 
@@ -100,16 +98,13 @@ This is more or less equivalent to the following `dist.ini`:
     copy = ppport.h
 
     [GitHub::Meta]
-    ; Configured by setting use_github_issues for the bundle
-    bugs = 0
+    bugs = 1
     ; Configured by setting use_github_homepage for the bundle
     homepage = 0
 
     [MetaResources]
     homepage = https://metacpan.org/release/My-Module
-    ; RT bits are omitted if use_github_issues is true
-    bugtracker.web  = https://rt.cpan.org/Public/Dist/Display.html?Name=My-Module
-    bugtracker.mail = bug-My-Module@rt.cpan.org
+    bugtracker.web  = https://github.com/...
 
     [MetaProvides::Pckage]
     meta_noindex = 1
@@ -138,8 +133,11 @@ This is more or less equivalent to the following `dist.ini`:
     [Prereqs / Modules for use with precious]
     -phase = develop
     -type  = requires
-    Perl::Critic                      = 1.126
-    Perl::Tidy                        = 20160302
+    Perl::Critic        = 1.138
+    Perl::Critic::Moose = 1.05
+    Perl::Tidy          = 20210111
+    Pod::Checker        = 1.74
+    Pod::Tidy           = 0.10
 
     [Prereqs / Test::Version which fixes https://github.com/plicease/Test-Version/issues/7]
     -phase = develop
@@ -155,6 +153,7 @@ This is more or less equivalent to the following `dist.ini`:
     check_all_plugins = 1
     check_all_prereqs = 1
     check_authordeps  = 1
+    skip = Dist::Zilla::Plugin::DROLSKY::BundleAuthordep
     skip = Dist::Zilla::Plugin::DROLSKY::Contributors
     skip = Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
     skip = Dist::Zilla::Plugin::DROLSKY::License
@@ -163,6 +162,7 @@ This is more or less equivalent to the following `dist.ini`:
     skip = Dist::Zilla::Plugin::DROLSKY::Precious
     skip = Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter
     skip = Dist::Zilla::Plugin::DROLSKY::RunExtraTests
+    skip = Dist::Zilla::Plugin::DROLSKY::Test::Precious
     skip = Dist::Zilla::Plugin::DROLSKY::WeaverConfig
     skip = Pod::Weaver::PluginBundle::DROLSKY
 

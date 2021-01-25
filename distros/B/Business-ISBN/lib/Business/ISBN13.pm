@@ -1,3 +1,5 @@
+use 5.008;
+
 package Business::ISBN13;
 use strict;
 use base qw(Business::ISBN);
@@ -9,7 +11,7 @@ use Carp qw(carp croak cluck);
 
 my $debug = 0;
 
-our $VERSION   = '3.005';
+our $VERSION   = '3.006';
 
 sub _max_length { 13 }
 
@@ -112,7 +114,7 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2001-2017, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2001-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This module is licensed under the Artistic License 2.0. See the LICENSE
 file in the distribution, or https://opensource.org/licenses/Artistic-2.0

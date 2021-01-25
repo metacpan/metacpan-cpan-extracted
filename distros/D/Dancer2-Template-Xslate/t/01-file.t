@@ -16,7 +16,7 @@ my $views = rel2abs(catfile((splitdir(__FILE__, 1))[0], "views"));
 
 my $txs = Dancer2::Template::Xslate->new(
     views  => $views,
-    layout => "main.tx",
+    layout => "layouts/main.tx",
     config => { cache => 0 },
 );
 

@@ -3,6 +3,7 @@ abstract: 'Apache Wookie Connector Framework implementation'
 author:
   - 'Roland van Ipenburg <roland@rolandvanipenburg.com>'
 build_requires:
+  Module::Build: '0.4'
   Test::More: '0.81'
   Test::NoWarnings: '0.81'
 configure_requires:
@@ -17,37 +18,37 @@ name: WWW-Wookie
 provides:
   WWW::Wookie:
     file: lib/WWW/Wookie.pm
-    version: v1.1.3
+    version: v1.1.4
   WWW::Wookie::Connector::Exceptions:
     file: lib/WWW/Wookie/Connector/Exceptions.pm
-    version: v1.1.3
+    version: v1.1.4
   WWW::Wookie::Connector::Service:
     file: lib/WWW/Wookie/Connector/Service.pm
-    version: v1.1.3
+    version: v1.1.4
   WWW::Wookie::Connector::Service::Interface:
     file: lib/WWW/Wookie/Connector/Service/Interface.pm
-    version: v1.1.3
+    version: v1.1.4
   WWW::Wookie::Server::Connection:
     file: lib/WWW/Wookie/Server/Connection.pm
-    version: v1.1.3
+    version: v1.1.4
   WWW::Wookie::User:
     file: lib/WWW/Wookie/User.pm
-    version: v1.1.3
+    version: v1.1.4
   WWW::Wookie::Widget:
     file: lib/WWW/Wookie/Widget.pm
-    version: v1.1.3
+    version: v1.1.4
   WWW::Wookie::Widget::Category:
     file: lib/WWW/Wookie/Widget/Category.pm
-    version: v1.1.3
+    version: v1.1.4
   WWW::Wookie::Widget::Instance:
     file: lib/WWW/Wookie/Widget/Instance.pm
-    version: v1.1.3
+    version: v1.1.4
   WWW::Wookie::Widget::Instances:
     file: lib/WWW/Wookie/Widget/Instances.pm
-    version: v1.1.3
+    version: v1.1.4
   WWW::Wookie::Widget::Property:
     file: lib/WWW/Wookie/Widget/Property.pm
-    version: v1.1.3
+    version: v1.1.4
 recommends:
   CGI: '0'
   Getopt::Long: '0'
@@ -85,8 +86,12 @@ requires:
   namespace::autoclean: '0'
   overload: '0'
   perl: v5.20.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://bitbucket.org/rolandvanipenburg/www-wookie/issues
   license: http://dev.perl.org/licenses/
   repository: https://bitbucket.org/rolandvanipenburg/www-wookie
-version: v1.1.3
+version: v1.1.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

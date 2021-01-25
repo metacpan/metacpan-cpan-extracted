@@ -1,11 +1,12 @@
-use 5.8.1;
-
+use 5.008001;
+use utf8;
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+
 use Config;
-use File::Spec;
+use ExtUtils::MakeMaker;
 use File::Basename ();
+use File::Spec;
 use Symbol qw(gensym);
 
 # Define this to one if you want to link the openssl libraries statically into 
@@ -36,7 +37,18 @@ my %eumm_args = (
     'ExtUtils::MakeMaker' => '0',
   },
   TEST_REQUIRES => {
+    'Carp' => '0',
+    'Config' => '0',
+    'Cwd' => '0',
+    'English' => '0',
+    'File::Basename' => '0',
+    'File::Spec::Functions' => '0',
+    'Scalar::Util' => '0',
+    'SelectSaver' => '0',
+    'Socket' => '0',
+    'Storable' => '0',
     'Test::More' => '0.60_01',
+    'base' => '0',
   },
   PREREQ_PM => {
     'MIME::Base64' => '0',
@@ -59,11 +71,11 @@ my %eumm_args = (
     resources => {
       repository => {
         type => 'git',
-        url => 'git@github.com/radiator-software/p5-net-ssleay.git',
+        url => 'git://github.com/radiator-software/p5-net-ssleay.git',
         web => 'https://github.com/radiator-software/p5-net-ssleay',
       },
       bugtracker  => {
-        web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=net-ssleay',
+        web => 'https://github.com/radiator-software/p5-net-ssleay/issues',
       },
     },
     no_index => { directory => [ qw(helper_script examples) ] },
@@ -105,14 +117,14 @@ MAKE
 sub ssleay {
     my $prefix = find_openssl_prefix();
     my $exec   = find_openssl_exec($prefix);
-    unless (-x $exec) {
+    unless (defined $exec && -x $exec) {
         print <<EOM;
 *** Could not find OpenSSL
     If it's already installed, please set the OPENSSL_PREFIX environment
     variable accordingly. If it isn't installed yet, get the latest version
     from http://www.openssl.org/.
 EOM
-        exit 0; # according http://wiki.cpantesters.org/wiki/CPANAuthorNotes this is best-practice when "missing library"
+        exit 0; # according https://wiki.cpantesters.org/wiki/CPANAuthorNotes this is best-practice when "missing library"
     }
     check_openssl_version($prefix, $exec);
     my $opts = ssleay_get_build_opts($prefix, $exec);
@@ -146,15 +158,12 @@ sub ssleay_get_build_opts {
       push @{$opts->{lib_paths}}, $_ if -d $_;
     }
 
-    my $rsaref  = ssleay_is_rsaref();
-
     print <<EOM;
 *** Be sure to use the same compiler and options to compile your OpenSSL, perl,
     and Net::SSLeay. Mixing and matching compilers is not supported.
 EOM
 
     if ($^O eq 'MSWin32') {
-        print "*** RSAREF build on Windows not supported out of box" if $rsaref;
         if ($win_link_statically) {
             # Link to static libs
             push @{ $opts->{lib_paths} }, "$prefix/lib/VC/static" if -d "$prefix/lib/VC/static";
@@ -167,7 +176,7 @@ EOM
         my @pairs = ();
         # Library names depend on the compiler
         @pairs = (['eay32','ssl32'],['crypto.dll','ssl.dll'],['crypto','ssl']) if $Config{cc} =~ /gcc/;
-        @pairs = (['libeay32','ssleay32'],['libeay32MD','ssleay32MD'],['libeay32MT','ssleay32MT'],['libcrypto','libssl']) if $Config{cc} =~ /cl/;
+        @pairs = (['libeay32','ssleay32'],['libeay32MD','ssleay32MD'],['libeay32MT','ssleay32MT'],['libcrypto','libssl'],['crypto','ssl']) if $Config{cc} =~ /cl/;
         for my $dir (@{$opts->{lib_paths}}) {
           for my $p (@pairs) {
             $found = 1 if ($Config{cc} =~ /gcc/ && -f "$dir/lib$p->[0].a" && -f "$dir/lib$p->[1].a");
@@ -200,11 +209,7 @@ EOM
         @{ $opts->{lib_links} } = map { $_ =~ s/32\b//g } @{ $opts->{lib_links} } if $Config{use64bitall};
     }
     else {
-        push @{ $opts->{lib_links} },
-             ($rsaref
-              ? qw( ssl crypto RSAglue rsaref z )
-              : qw( ssl crypto z )
-             );
+        push @{ $opts->{lib_links} }, qw( ssl crypto z );
 
         if (($Config{cc} =~ /aCC/i) && $^O eq 'hpux') {
             print "*** Enabling HPUX aCC options (+e)\n";
@@ -217,10 +222,6 @@ EOM
         }
     }
     return $opts;
-}
-
-sub ssleay_is_rsaref {
-    return $ENV{OPENSSL_RSAREF};
 }
 
 my $other_try = 0;
@@ -299,19 +300,24 @@ sub find_openssl_exec {
 
 sub check_openssl_version {
     my ($prefix, $exec) = @_;
-    my ($major, $minor, $letter);
+    my ($output, $major, $minor, $letter);
 
     {
         my $pipe = gensym();
         open($pipe, qq{"$exec" version |})
             or die "Could not execute $exec";
-        my $output = <$pipe>;
+        $output = <$pipe>;
         chomp $output;
         close $pipe;
 
 	if ( ($major, $minor, $letter) = $output =~ /^OpenSSL\s+(\d+\.\d+)\.(\d+)([a-z]?)/ ) {
 	    print "*** Found OpenSSL-${major}.${minor}${letter} installed in $prefix\n";
-	} elsif ( ($major, $minor) = $output =~ /^LibreSSL\s+(\d+\.\d+)\.(\d+)/ ) {
+	} elsif ( ($major, $minor) = $output =~ /^LibreSSL\s+(\d+\.\d+)(?:\.(\d+))?/ ) {
+	    # LibreSSL 2.0.x releases only identify themselves as "LibreSSL 2.0",
+	    # with no patch release number
+	    if ( !defined $minor ) {
+	        $minor = "x";
+	    }
 	    print "*** Found LibreSSL-${major}.${minor} installed in $prefix\n";
 	} else {
             die <<EOM
@@ -323,12 +329,24 @@ EOM
         }
     }
 
-    if ($major < 0.9 || ($major == 0.9 && $minor < 3)) {
+    if ($major < 0.9 || ($major == 0.9 && $minor < 8)) {
         print <<EOM;
 *** That's too old!
     Please upgrade OpenSSL to the latest version (http://www.openssl.org/)
 EOM
-        exit 0; # according http://wiki.cpantesters.org/wiki/CPANAuthorNotes this is best-practice when "missing library"
+        exit 0; # according https://wiki.cpantesters.org/wiki/CPANAuthorNotes this is best-practice when "missing library"
+    }
+
+    # On Windows, 64-bit versions of OpenSSL from 1.0.0-beta1 to 1.0.0b are
+    # known to malfunction when used in conjunction with pseudoforking processes
+    # (see GH-189)
+    if (    $Config{archname} =~ m{^MSWin32-x64}
+         && $output =~ m{^OpenSSL \s+ 1\.0\.0 (?:-beta[1-5]|[ab])}x ) {
+        print <<EOM;
+*** 64-bit versions of OpenSSL from 1.0.0-beta1 to 1.0.0b are broken on Windows.
+    Please upgrade to OpenSSL 1.0.0c or newer.
+EOM
+        exit 0;
     }
 
     if ($major == 1.1 && $minor > 1) {

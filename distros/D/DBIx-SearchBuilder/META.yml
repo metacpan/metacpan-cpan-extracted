@@ -35,4 +35,4 @@ requires:
   capitalization: '0.03'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.68'
+version: '1.69'

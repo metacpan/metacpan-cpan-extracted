@@ -1,5 +1,9 @@
 Revision history for Perl extension Quantum::Superpositions::Lazy.
 
+1.05 Tue Jan 19 2021
+	- add collapse function to Q::S::L
+	- remove superpos function from export when use argument is specified (minor breakage)
+
 1.04 Fri Jan 8 2021
 	- fix indexer - missing version numbers of deprecated packages
 

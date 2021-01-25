@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::Exception;
-$BZ::Client::Exception::VERSION = '4.4003';
+$BZ::Client::Exception::VERSION = '4.4004';
 
 sub throw {
     my $class = shift;
@@ -49,7 +49,7 @@ BZ::Client::Exception - Exception class thrown by BZ::Client in case of errors.
 
 =head1 VERSION
 
-version 4.4003
+version 4.4004
 
 =head1 SYNOPSIS
 
@@ -151,7 +151,7 @@ Jochen Wiedmann <jochen.wiedmann@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dean Hamstad.
+This software is copyright (c) 2021 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

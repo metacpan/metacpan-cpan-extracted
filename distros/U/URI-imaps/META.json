@@ -4,13 +4,13 @@
       "Casey West <casey@geeknest.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "URI-imaps",
    "no_index" : {
@@ -38,9 +38,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alexm/URI-imaps/issues"
+      },
       "repository" : {
-         "url" : "https://github.com/alexm/URI-imaps"
+         "type" : "git",
+         "url" : "https://github.com/alexm/URI-imaps.git",
+         "web" : "https://github.com/alexm/URI-imaps"
       }
    },
-   "version" : "1.03"
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,3 +1,8 @@
+Overview of changes in Cairo 1.109
+==================================
+
+* Remove PDF outline exports that do not exist
+
 Overview of changes in Cairo 1.108
 ==================================
 

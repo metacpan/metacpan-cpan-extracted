@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.20;
+package Syntax::Keyword::Try 0.21;
 
 use v5.14;
 use warnings;
@@ -390,7 +390,9 @@ sub import_into
    $^H{"Syntax::Keyword::Try/try"}++ if delete $syms{try};
    $^H{"Syntax::Keyword::Try/try_value"}++ if delete $syms{try_value};
 
-   $^H{"Syntax::Keyword::Try/no_finally"}++ if delete $syms{no_finally};
+   # Largely for Feature::Compat::Try's benefit
+   $^H{"Syntax::Keyword::Try/no_finally"}++ if delete $syms{"-no_finally"};
+   $^H{"Syntax::Keyword::Try/require_var"}++ if delete $syms{"-require_var"};
 
    # stablised experiments
    delete $syms{":experimental($_)"} for qw( var );

@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Business-ISBN",
    "no_index" : {
@@ -37,7 +37,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.95"
+            "Test::More" : "1"
          }
       }
    },
@@ -53,6 +53,6 @@
          "web" : "https://github.com/briandfoy/business-isbn"
       }
    },
-   "version" : "3.005",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "3.006",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

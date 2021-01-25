@@ -61,6 +61,7 @@ devel/grid.pl
 devel/hex-arms.pl
 devel/hexhypot.pl
 devel/hilbert-diamond.pl
+devel/hilbert-sides.pl
 devel/hilbert.pl
 devel/hypot.pl
 devel/imaginary-base.pl
@@ -151,6 +152,7 @@ devel/vertical.pl
 devel/vogel.pl
 devel/wunderlich.pl
 devel/wythoff-array.pl
+devel/zorder.pl
 examples/a023531.l
 examples/c-curve-wx.pl
 examples/cellular-rules.pl
@@ -209,6 +211,7 @@ lib/Math/PlanePath/ComplexPlus.pm
 lib/Math/PlanePath/ComplexRevolving.pm
 lib/Math/PlanePath/CoprimeColumns.pm
 lib/Math/PlanePath/Corner.pm
+lib/Math/PlanePath/CornerAlternating.pm
 lib/Math/PlanePath/CornerReplicate.pm
 lib/Math/PlanePath/CretanLabyrinth.pm
 lib/Math/PlanePath/CubicBase.pm
@@ -334,6 +337,7 @@ t/ComplexMinus.t
 t/ComplexPlus.t
 t/CoprimeColumns.t
 t/Corner.t
+t/CornerAlternating.t
 t/CornerReplicate.t
 t/CubicBase.t
 t/DekkingCurve.t
@@ -436,6 +440,7 @@ tools/gallery.pl
 tools/hilbert-curve-table.pl
 tools/hilbert-spiral-table.pl
 tools/kochel-curve-table.pl
+tools/man-page-listing.pl
 tools/moore-spiral-table.pl
 tools/peano-diagonal-samples.pl
 tools/pythagorean-tree.pl
@@ -451,7 +456,7 @@ xt/0-Test-ConsistentVersion.t
 xt/0-Test-Pod.t
 xt/0-Test-Synopsis.t
 xt/0-Test-YAML-Meta.t
-xt/AlternatePaperfolding-hog.t
+xt/AlternatePaper-hog.t
 xt/AlternateTerdragon-hog.t
 xt/bigrat.t
 xt/CCurve-hog.t
@@ -477,6 +482,7 @@ xt/oeis/ComplexMinus-oeis.t
 xt/oeis/ComplexPlus-oeis.t
 xt/oeis/CoprimeColumns-oeis.t
 xt/oeis/Corner-oeis.t
+xt/oeis/CornerAlternating-oeis.t
 xt/oeis/CornerReplicate-oeis.t
 xt/oeis/DiagonalRationals-oeis.t
 xt/oeis/Diagonals-oeis.t

@@ -1,3 +1,15 @@
+0.210230  2021-01-23 14:01:23+01:00 Europe/Brussels
+    - Additions
+      - binaries: new script export-itol.pl
+    - Changes
+      - binaries: renamed upload2itol.pl into import-itol.pl and added support for tree id output
+      - binaries: reinstated extract-ali.pl executable
+      - binaries: removed clust2mapper.pl executable
+      - distribution: removed dependency on Bio::FastParsers
+      - distribution: improved MANIFEST.SKIP
+    - Fixes
+      - SeqMask and Tree: tests should now pass on Solaris too (again)
+
 0.210120  2021-01-12 16:53:42+01:00 Europe/Brussels
     - Changes
       - binaries: reinstated classify-ali.pl and jack-ali-dir.pl executables

@@ -1,0 +1,623 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-22'; # DATE
+our $DIST = 'App-idxdb'; # DIST
+our $VERSION = '0.004'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+
+my $prefix = '/App/idxdb/';
+
+Perinci::CmdLine::Any->new(
+    url => $prefix,
+    subcommands => {
+        'update'     => {url => "${prefix}update"},
+        'ownership'  => {url => "${prefix}ownership"},
+        'daily'      => {url => "${prefix}daily"},
+    },
+    log => 1,
+)->run;
+
+# ABSTRACT: Import data for stocks on the IDX (Indonesian Stock Exchange) and perform queries on them
+# PODNAME: idxdb
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+idxdb - Import data for stocks on the IDX (Indonesian Stock Exchange) and perform queries on them
+
+=head1 VERSION
+
+This document describes version 0.004 of idxdb (from Perl distribution App-idxdb), released on 2021-01-22.
+
+=head1 SYNOPSIS
+
+To update data:
+
+ % idxdb update
+
+To see the legends for ownership field names (e.g. ForeignIB = foreign bank):
+
+ % idxdb ownership --legend
+
+To see ownership (e.g. % foreign/local) of some stock through time:
+
+ % idxdb ownership BBRI
+ % idxdb ownership --fields-all BBRI --date-start 2020-01-01 --date-end 2020-09-30
+ % idxdb ownership --fields-foreign-total --6month --graph BBNI
+
+To graph ownership composition (% foreign bank, foreign total, local bank, etc)
+of some stock:
+
+ % idxdb graph-ownership-composition BBRI
+
+To see a table of daily trading summary of some stock:
+
+ % idxdb table-daily-trading-summary BBRI
+
+To graph accumulated foreign net buy of some stock in the last year:
+
+ % idxdb graph-daily-trading-summary --field AccumForeignNetBuy --year BBRI
+
+=head1 DESCRIPTION
+
+B<NOTE: EARLY RELEASE, ONLY A FEW SUBCOMMANDS HAVE BEEN IMPLEMENTED.>
+
+This utility lets you load some data like IDX's daily trading summary (stock
+summary), list of stocks, and KSEI's monthly ownership into a SQLite database
+and perform some SQL queries against it.
+
+Keywords: stock trading, Indonesian Stock Exchange, securities analysis.
+
+=head1 SUBCOMMANDS
+
+=head2 B<daily>
+
+Show data from daily stock/trading summary.
+
+=head2 B<ownership>
+
+Show ownership of some stock through time.
+
+=head2 B<update>
+
+Update data.
+
+Currently this routine imports from text files in the C<gudangdata> repository on
+the local filesystem. Functionality to import from server directly using
+L<Finance::SE::IDX> and L<Finance::ID::KSEI> will be added in the future.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+=back
+
+=head2 Options for subcommand daily
+
+=over
+
+=item B<--10year>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--1month>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--1week>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--1year>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--3month>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--3year>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--5year>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--6month>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--date-end>=I<s>
+
+Default value:
+
+ 1611273600
+
+=item B<--date-start>=I<s>
+
+Default value:
+
+ 1608681600
+
+=item B<--field>=I<s@>
+
+Default value:
+
+ ["Volume","Value","ForeignNetBuy"]
+
+Can be specified multiple times.
+
+=item B<--fields-all>
+
+Alias for --field.
+
+See C<--field>.
+
+=item B<--fields-json>=I<s>
+
+See C<--field>.
+
+=item B<--fields-price>
+
+Alias for --field.
+
+See C<--field>.
+
+=item B<--fields-price-close>
+
+Alias for --field.
+
+See C<--field>.
+
+=item B<--graph>
+
+Show graph instead of table.
+
+=item B<--month>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--stock>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--stocks-json>=I<s>
+
+See C<--stock>.
+
+=item B<--total>
+
+=item B<--week>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--year>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--ytd>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=back
+
+=head2 Options for subcommand ownership
+
+=over
+
+=item B<--10year>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--1month>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--1week>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--1year>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--3month>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--3year>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--5year>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--6month>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--date-end>=I<s>
+
+Default value:
+
+ 1611273600
+
+=item B<--date-start>=I<s>
+
+Default value:
+
+ 1608681600
+
+=item B<--field>=I<s@>
+
+Default value:
+
+ ["LocalTotal","ForeignTotal"]
+
+Can be specified multiple times.
+
+=item B<--fields-all>
+
+Alias for --field.
+
+See C<--field>.
+
+=item B<--fields-foreign>
+
+Alias for --field.
+
+See C<--field>.
+
+=item B<--fields-foreign-total>
+
+Alias for --field.
+
+See C<--field>.
+
+=item B<--fields-json>=I<s>
+
+See C<--field>.
+
+=item B<--fields-local>
+
+Alias for --field.
+
+See C<--field>.
+
+=item B<--graph>
+
+Show graph instead of table.
+
+=item B<--legend>
+
+Show legend of ownership instead (e.g. ForeignIB = foreign bank, etc).
+
+=item B<--month>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--stock>=I<s>*
+
+=item B<--week>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--year>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=item B<--ytd>
+
+Alias for --date-start.
+
+See C<--date-start>.
+
+=back
+
+=head2 Options for subcommand update
+
+=over
+
+=item B<--gudangdata-path>=I<s>*
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C idxdb idxdb
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete idxdb 'p/*/`idxdb`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/idxdb.conf>, F<~/idxdb.conf>, or F</etc/idxdb.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand daily
+
+ date_end (see --date-end)
+ date_start (see --date-start)
+ fields (see --field)
+ graph (see --graph)
+ stocks (see --stock)
+ total (see --total)
+
+=head2 Configuration for subcommand ownership
+
+ date_end (see --date-end)
+ date_start (see --date-start)
+ fields (see --field)
+ graph (see --graph)
+ legend (see --legend)
+ stock (see --stock)
+
+=head2 Configuration for subcommand update
+
+ gudangdata_path (see --gudangdata-path)
+
+=head1 ENVIRONMENT
+
+=head2 IDXDB_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/idxdb.conf>
+
+F<~/idxdb.conf>
+
+F</etc/idxdb.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-idxdb>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-idxdb>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-idxdb/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Finance::SE::IDX>
+
+L<Finance::ID::KSEI>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

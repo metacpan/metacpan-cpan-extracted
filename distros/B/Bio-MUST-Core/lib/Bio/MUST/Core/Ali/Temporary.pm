@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Ali::Temporary;
 # ABSTRACT: Thin wrapper for a temporary mapped Ali written on disk
-$Bio::MUST::Core::Ali::Temporary::VERSION = '0.210120';
+$Bio::MUST::Core::Ali::Temporary::VERSION = '0.210230';
 use Moose;
 use namespace::autoclean;
 
@@ -124,7 +124,7 @@ Bio::MUST::Core::Ali::Temporary - Thin wrapper for a temporary mapped Ali writte
 
 =head1 VERSION
 
-version 0.210120
+version 0.210230
 
 =head1 SYNOPSIS
 

@@ -51,6 +51,6 @@
          "web" : "https://alexschroeder.ch/cgit/lupa-pona/about/"
       }
    },
-   "version" : 1.03,
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : 1.05,
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

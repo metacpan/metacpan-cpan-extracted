@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-Approx
 #
-# This software is Copyright (c) 2015-2018 by Dominique Dumont.
+# This software is Copyright (c) 2015-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Approx ;
-$Config::Model::Backend::Approx::VERSION = '1.011';
+$Config::Model::Backend::Approx::VERSION = '1.012';
 use Mouse ;
 use Log::Log4perl qw(get_logger :levels);
 use Carp ;
@@ -110,7 +110,7 @@ Config::Model::Backend::Approx - Read and write Approx configuration file
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2018 by Dominique Dumont.
+This software is Copyright (c) 2015-2021 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -1,5 +1,8 @@
 Revision history for Text::Trim
 
+1.04    2020-12-24
+        - RT -> GitHub for issue tracker, as RT is being shut down
+
 1.03    2019-09-22
         - Per 1.02_01, module will now build successfully on certain 
           systems with unprivileged accounts.

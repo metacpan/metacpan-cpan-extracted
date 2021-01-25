@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.22.0 2021-01-25T13:19:57Z
+
+    - Introduce $MODULE variable to access module object in rc file.
+
 v1.21.1 2020-11-30T13:28:04Z
 
     - Declare version number in all modules.

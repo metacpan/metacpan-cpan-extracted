@@ -5,6 +5,8 @@ use warnings;
 
 use parent 'OPTIMADE::Filter::Modifiable';
 
+our $VERSION = '0.10.2'; # VERSION
+
 sub new {
     my( $class, $is_known, $property ) = @_;
     return bless { is_known => $is_known, property => $property }, $class;

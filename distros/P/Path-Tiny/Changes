@@ -1,5 +1,15 @@
 Revision history for Path-Tiny
 
+0.116     2021-01-22 10:32:22-05:00 America/New_York
+
+    - No changes from 0.115-TRIAL.
+
+0.115     2021-01-19 12:01:33-05:00 America/New_York (TRIAL RELEASE)
+
+    [Tests]
+
+    - Fixes tests on MSYS without symlinks enabled.
+
 0.114     2020-04-26 10:10:29-04:00 America/New_York
 
     - No changes from 0.113-TRIAL.

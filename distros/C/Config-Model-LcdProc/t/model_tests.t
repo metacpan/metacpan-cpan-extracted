@@ -3,11 +3,9 @@ use warnings;
 
 use strict;
 
-use Config::Model::Tester ;
+use Config::Model::Tester 3.006;
 use ExtUtils::testlib;
 
-my $arg = shift || '';
-my $test_only_model = shift || '';
-my $do = shift ;
+$::_use_log4perl_to_warn =1;
 
-run_tests($arg, $test_only_model, $do) ;
+run_tests() ;

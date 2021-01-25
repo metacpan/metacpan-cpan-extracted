@@ -4,7 +4,9 @@ lib/Geo/Ellipsoid.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
+README.md
 t/00-load.t
 t/01-create.t
 t/02-defaults.t
@@ -16,9 +18,32 @@ t/07-location.t
 t/08-range.t
 t/09-bearing.t
 t/10-displacement.t
-t/11-subclass.t
+t/20-subclass.t
+t/30-get_ellipsoids.t
+t/40-get_angle_unit.t
+t/41-get_distance_unit.t
+t/42-get_longitude_symmetric.t
+t/43-get_bearing_symmetric.t
+t/44-get_ellipsoid.t
+t/45-get_equatorial_radius.t
+t/46-get_polar_radius.t
+t/47-get_geocentric_radius.t
+t/48-get_flattening.t
+t/49-get_eccentricity.t
+t/author-changelog.t
+t/author-git.t
+t/Geo/Ellipsoid/TestUtils.pm
+t/release-cpan-changes.t
+t/release-kwalitee.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/release-portability.t
+t/release-test-version.t
+t/release-unused-vars.t
+t/release-whitespaces.t
 test/results.txt
 test/test_ellipsoid.pl
 Todo
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

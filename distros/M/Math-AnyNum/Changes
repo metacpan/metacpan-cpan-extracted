@@ -1,5 +1,10 @@
 Revision history for Math-AnyNum
 
+0.37    2021-01-19
+
+        - Added the `faulhaber_polynomial(n,x)` function (also aliased as `faulhaber`).
+        - Fixed some memory leaks in some special cases, such as `index(o, s)`, where `o` is a Math::AnyNum object.
+
 0.36    2020-11-22
 
         - Make a copy of Math::{GMPz,GMPq,MPC,MPFR} objects when passed to Math::AnyNum->new().

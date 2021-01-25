@@ -34,7 +34,7 @@ my $path = Math::PlanePath::TriangleSpiral->new;
 # VERSION
 
 {
-  my $want_version = 128;
+  my $want_version = 129;
   ok ($Math::PlanePath::TriangleSpiral::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::TriangleSpiral->VERSION,  $want_version,

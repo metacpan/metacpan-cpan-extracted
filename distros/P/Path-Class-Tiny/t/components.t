@@ -30,4 +30,8 @@ eq_or_diff [$p1->child($p2)->components], ['', qw< foo bar baz qux >], "PT style
 is scalar $p1->child($p2)->components, 5, "PT style: components in scalar context is correct (combined)";
 
 
+# make sure dirname is just an alias to parent
+is path("/root/bin")->dirname, "/root", 'dirname is not stupid Path::Tiny::dirname';
+
+
 done_testing;

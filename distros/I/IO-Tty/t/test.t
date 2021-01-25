@@ -30,29 +30,29 @@ diag("TCSETCTTY") if defined TCSETCTTY;
         close STDIN;
         close STDOUT;
         my $master = new IO::Pty;
-        my $slave = $master->slave();
-        
+        my $slave  = $master->slave();
+
         my $master_fileno = $master->fileno;
-        my $slave_fileno = $slave->fileno;
-        
+        my $slave_fileno  = $slave->fileno;
+
         $master->close();
-        if ($master_fileno < 3 or $slave_fileno < 3) { # altered
-            die("ERROR: masterfd=$master_fileno, slavefd=$slave_fileno"); # altered
+        if ( $master_fileno < 3 or $slave_fileno < 3 ) {    # altered
+            die("ERROR: masterfd=$master_fileno, slavefd=$slave_fileno");    # altered
         }
         exit(0);
     }
 
     is( wait, $pid, "fork exits with 0 exit code" ) or die("Wrong child");
-    is( $?, 0, "0 exit code from forked child - Checking that returned fd's don't clash with stdin/out/err" );
+    is( $?,   0,    "0 exit code from forked child - Checking that returned fd's don't clash with stdin/out/err" );
 }
 
 {
     diag(" === Checking if child gets pty as controlling terminal");
-    
+
     my $master = new IO::Pty;
 
     pipe( FROM_CHILD, TO_PARENT )
-        or die "Cannot create pipe: $!";
+      or die "Cannot create pipe: $!";
     my $pid = fork();
     die "Cannot fork" if not defined $pid;
     unless ($pid) {
@@ -85,11 +85,11 @@ diag("TCSETCTTY") if defined TCSETCTTY;
     close FROM_CHILD;
 
     my ( $s, $chunk );
-    $SIG{ALRM} = sub { die("Timeout ($s)");};
+    $SIG{ALRM} = sub { die("Timeout ($s)"); };
     alarm(10);
 
     sysread( $master, $s, 100 ) or die "sysread() failed: $!";
-    like($s, qr/gimme.*:/ , "master object outputs: '$s'");
+    like( $s, qr/gimme.*:/, "master object outputs: '$s'" );
 
     print $master "seems OK!\n";
 
@@ -98,7 +98,7 @@ diag("TCSETCTTY") if defined TCSETCTTY;
     while ( $ret = sysread( $master, $chunk, 100 ) ) {
         $s .= $chunk;
     }
-    like($s, qr/back on STDOUT: SEEMS OK!/, "STDOUT looks right");
+    like( $s, qr/back on STDOUT: SEEMS OK!/, "STDOUT looks right" );
     warn <<"_EOT_" unless defined $ret;
 
 WARNING: when the client closes the slave pty, the master gets an error
@@ -113,15 +113,18 @@ _EOT_
 }
 
 # now for the echoback tests
-diag("Checking basic functionality and how your ptys handle large strings...
+diag(
+    "Checking basic functionality and how your ptys handle large strings...
   This test may hang on certain systems, even though it is protected
-  by alarm().  If the counter stops, try Ctrl-C, the test should continue.");
+  by alarm().  If the counter stops, try Ctrl-C, the test should continue."
+);
 
 {
-    my $randstring = q{fakjdf ijj845jtirg\r8e 4jy8 gfuoyhj\agt8h\0x00 gues98\0xFF 45th guoa\beh gt98hae 45t8u ha8rhg ue4ht 8eh tgo8he4 t8 gfj aoingf9a8hgf uain dgkjadshft+uehgf =usüand9ß87vgh afugh 8*h 98H 978H 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a sldjkf ha\@j<\rksdhf jk>~|ahsd fjkh asdHJKGDSG TRJKSGO  JGDSFJDFHJGSDK1%&FJGSDGFSH\0xADJäDGFljkhf lakjs(dh fkjahs djfk hasjkdh fjklahs dfkjhdjkf haöjksdh fkjah sdjf)\$/§&k hasÄÜÖjkdh fkjhuerhtuwe htui eruth ZI AHD BIZA Di7GH )/g98 9 97 86tr(& TA&(t 6t &T 75r 5\$R%/4r76 5&/% R79 5 )/&};
+    my $randstring =
+      q{fakjdf ijj845jtirg\r8e 4jy8 gfuoyhj\agt8h\0x00 gues98\0xFF 45th guoa\beh gt98hae 45t8u ha8rhg ue4ht 8eh tgo8he4 t8 gfj aoingf9a8hgf uain dgkjadshft+uehgf =usüand9ß87vgh afugh 8*h 98H 978H 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a sldjkf ha\@j<\rksdhf jk>~|ahsd fjkh asdHJKGDSG TRJKSGO  JGDSFJDFHJGSDK1%&FJGSDGFSH\0xADJäDGFljkhf lakjs(dh fkjahs djfk hasjkdh fjklahs dfkjhdjkf haöjksdh fkjah sdjf)\$/§&k hasÄÜÖjkdh fkjhuerhtuwe htui eruth ZI AHD BIZA Di7GH )/g98 9 97 86tr(& TA&(t 6t &T 75r 5\$R%/4r76 5&/% R79 5 )/&};
 
     my $master = new IO::Pty;
-    diag("isatty(\$master): ", POSIX::isatty($master) ? "YES" : "NO");
+    diag( "isatty(\$master): ", POSIX::isatty($master) ? "YES" : "NO" );
     if ( POSIX::isatty($master) ) {
         $master->set_raw()
           or warn "warning: \$master->set_raw(): $!";
@@ -137,7 +140,7 @@ diag("Checking basic functionality and how your ptys handle large strings...
         my $c;
         my $slave = $master->slave();
         close $master;
-        diag("isatty(\$slave): ", POSIX::isatty($slave) ? "YES" : "NO");
+        diag( "isatty(\$slave): ", POSIX::isatty($slave) ? "YES" : "NO" );
         $slave->set_raw()
           or warn "warning: \$slave->set_raw(): $!";
         close FROM_CHILD;
@@ -148,7 +151,7 @@ diag("Checking basic functionality and how your ptys handle large strings...
 
         while (1) {
             my $ret = sysread( $slave, $c, 1 );
-            warn "sysread(): $!" unless defined $ret;
+            warn "sysread(): $!"                               unless defined $ret;
             die "Slave got EOF at line $linecnt, byte $cnt.\n" unless $ret;
             $cnt++;
             if ( $c eq "\n" ) {
@@ -229,10 +232,9 @@ _EOT_
     else {
         diag("Good, your raw ptys can handle at least $maxlen bytes at once.");
     }
-    ok( $maxlen >= 200, "\$maxlen >= 200 ($maxlen)");
+    ok( $maxlen >= 200, "\$maxlen >= 200 ($maxlen)" );
     close($master);
     sleep(1);
     kill TERM => $pid;
 }
-
 

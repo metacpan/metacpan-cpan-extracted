@@ -1,21 +1,16 @@
-#!/usr/bin/perl
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More tests => 123;
-use Net::SSLeay qw/MBSTRING_ASC MBSTRING_UTF8 EVP_PK_RSA EVP_PKT_SIGN EVP_PKT_ENC/;
-use File::Spec;
+use Net::SSLeay qw(MBSTRING_ASC MBSTRING_UTF8 EVP_PK_RSA EVP_PKT_SIGN EVP_PKT_ENC);
+use Test::Net::SSLeay qw( data_file_path initialise_libssl is_openssl );
+
 use utf8;
 
-#use File::Slurp;
+plan tests => 139;
 
-Net::SSLeay::randomize();
-Net::SSLeay::load_error_strings();
-Net::SSLeay::ERR_load_crypto_strings();
-Net::SSLeay::SSLeay_add_ssl_algorithms();
+initialise_libssl();
 
-my $ca_crt_pem = File::Spec->catfile('t', 'data', 'test_CA1.crt.pem');
-my $ca_key_pem = File::Spec->catfile('t', 'data', 'test_CA1.key.pem');
+my $ca_crt_pem = data_file_path('root-ca.cert.pem');
+my $ca_key_pem = data_file_path('root-ca.key.pem');
 
 ok(my $bio1 = Net::SSLeay::BIO_new_file($ca_crt_pem, 'r'), "BIO_new_file 1");
 ok(my $ca_cert = Net::SSLeay::PEM_read_bio_X509($bio1), "PEM_read_bio_X509");
@@ -102,12 +97,6 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
   like(my $key_pem1 = Net::SSLeay::PEM_get_string_PrivateKey($pk), qr/-----BEGIN (RSA )?PRIVATE KEY-----/, "PEM_get_string_PrivateKey+nopasswd");        
   like(my $key_pem2 = Net::SSLeay::PEM_get_string_PrivateKey($pk,"password"), qr/-----BEGIN (ENCRYPTED|RSA) PRIVATE KEY-----/, "PEM_get_string_PrivateKey+passwd");
   
-  Net::SSLeay::OpenSSL_add_all_algorithms();
-  if (Net::SSLeay::SSLeay >= 0x0090700f) {
-    #just test whether we can call the following functions
-    Net::SSLeay::OPENSSL_add_all_algorithms_conf();
-    Net::SSLeay::OPENSSL_add_all_algorithms_noconf();
-  }
   ok(my $alg1 = Net::SSLeay::EVP_get_cipherbyname("DES-EDE3-CBC"), "EVP_get_cipherbyname");
   like(my $key_pem3 = Net::SSLeay::PEM_get_string_PrivateKey($pk,"password",$alg1), qr/-----BEGIN (ENCRYPTED|RSA) PRIVATE KEY-----/, "PEM_get_string_PrivateKey+passwd+enc_alg");
 
@@ -148,13 +137,38 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
   ok(Net::SSLeay::X509_NAME_add_entry_by_txt($name, "commonName", MBSTRING_UTF8, "Common name text X509_REQ"), "X509_NAME_add_entry_by_txt");
   ok(Net::SSLeay::X509_NAME_add_entry_by_txt($name, "countryName", MBSTRING_UTF8, "UK"), "X509_NAME_add_entry_by_txt");
   ok(Net::SSLeay::X509_NAME_add_entry_by_txt($name, "organizationName", MBSTRING_UTF8, "Company Name"), "X509_NAME_add_entry_by_txt");
-  
+
+  # All these subjectAltNames should be copied to the
+  # certificate. This array is also used later when checking the
+  # signed certificate.
+  my @req_altnames = (
+      # Numeric type,                 Type name,       Value to add,     Value to expect back, if not equal
+     #[ Net::SSLeay::GEN_DIRNAME(),   'dirName',       'dir_sect' ], # Would need config file
+      [ Net::SSLeay::GEN_DNS(),       'DNS',           's1.com' ],
+      [ Net::SSLeay::GEN_DNS(),       'DNS',           's2.com' ],
+     #[ Net::SSLeay::GEN_EDIPARTY(),  'EdiPartyName?', '' ], # Name not in OpenSSL source
+      [ Net::SSLeay::GEN_EMAIL(),     'email',         'foo@xample.com.com' ],
+      [ Net::SSLeay::GEN_IPADD(),     'IP',            '10.20.30.41', pack('CCCC', '10', '20', '30', '41') ],
+      [ Net::SSLeay::GEN_IPADD(),     'IP',            '2001:db8:23::1', pack('nnnnnnnn', 0x2001, 0x0db8, 0x23, 0, 0, 0, 0, 0x01) ],
+      [ Net::SSLeay::GEN_OTHERNAME(), 'otherName',     '2.3.4.5;UTF8:some other identifier', 'some other identifier' ],
+      [ Net::SSLeay::GEN_RID(),       'RID',           '1.2.3.4.1.2.3.4.1.2.3.4.1.2.3.4.1.2.3.4.1.2.3.4.1.2.3.4.1.2.3.4.1.2.3.4.1.2.3.4.1.2.3.4.1.2.3.4.1.2.3.4.1.2.3.4.1.2.3.4.99.1234' ],
+      [ Net::SSLeay::GEN_URI(),       'URI',           'https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top' ],
+     #[ Net::SSLeay::GEN_X400(),      'X400Name?',     '' ], # Name not in OpenSSL source
+      );
+
+  # Create a comma separated list of typename:value altnames
+  my $req_ext_altname = '';
+  foreach my $alt (@req_altnames) {
+      $req_ext_altname .= "$alt->[1]:$alt->[2],";
+  }
+  chop $req_ext_altname; # Remove trailing comma
+
   ok(Net::SSLeay::P_X509_REQ_add_extensions($req,
         &Net::SSLeay::NID_key_usage => 'digitalSignature,keyEncipherment',
         &Net::SSLeay::NID_basic_constraints => 'CA:FALSE',
         &Net::SSLeay::NID_ext_key_usage => 'serverAuth,clientAuth',
         &Net::SSLeay::NID_netscape_cert_type => 'server',
-        &Net::SSLeay::NID_subject_alt_name => 'DNS:s1.com,DNS:s2.com',
+        &Net::SSLeay::NID_subject_alt_name => $req_ext_altname,
         &Net::SSLeay::NID_crl_distribution_points => 'URI:http://pki.com/crl1,URI:http://pki.com/crl2',        
     ), "P_X509_REQ_add_extensions");
   
@@ -214,13 +228,25 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
 
   ## PHASE3 - check some certificate parameters
   is(Net::SSLeay::X509_NAME_print_ex(Net::SSLeay::X509_get_subject_name($x509ss)), "O=Company Name,C=UK,CN=Common name text X509_REQ", "X509_NAME_print_ex 1");
-  is(Net::SSLeay::X509_NAME_print_ex(Net::SSLeay::X509_get_issuer_name($x509ss)), "CN=CA1,O=Demo1,C=US", "X509_NAME_print_ex 2");
+  is(Net::SSLeay::X509_NAME_print_ex(Net::SSLeay::X509_get_issuer_name($x509ss)), 'CN=Root CA,OU=Test Suite,O=Net-SSLeay,C=PL', "X509_NAME_print_ex 2");
   SKIP: {
     skip 'openssl-0.9.7e required', 2 unless Net::SSLeay::SSLeay >= 0x0090705f; 
     like(Net::SSLeay::P_ASN1_TIME_get_isotime(Net::SSLeay::X509_get_notBefore($x509ss)), qr/^\d\d\d\d-\d\d-\d\d/, "X509_get_notBefore");
     like(Net::SSLeay::P_ASN1_TIME_get_isotime(Net::SSLeay::X509_get_notAfter($x509ss)), qr/^\d\d\d\d-\d\d-\d\d/, "X509_get_notAfter");
   }
-  
+
+  # See that all subjectAltNames added to request were copied to the certificate
+  my @altnames = Net::SSLeay::X509_get_subjectAltNames($x509ss);
+  for (my $i = 0; $i < @req_altnames; $i++)
+  {
+      my ($type, $name) = ($altnames[2*$i], $altnames[2*$i+1]);
+      my $test_vec = $req_altnames[$i];
+      my $expected = defined $test_vec->[3] ? $test_vec->[3] : $test_vec->[2];
+
+      is($type, $test_vec->[0], "subjectAltName type in certificate matches request: $type");
+      is($name, $expected, "subjectAltName value in certificate matches request: $test_vec->[2]");
+  }
+
   my $mask = EVP_PK_RSA | EVP_PKT_SIGN | EVP_PKT_ENC;
   is(Net::SSLeay::X509_certificate_type($x509ss)&$mask, $mask, "X509_certificate_type");
  
@@ -240,7 +266,7 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
 
 { ### X509 certificate - copy some fields from other certificate
 
-  my $orig_crt_pem = File::Spec->catfile('t', 'data', 'test_leaf.crt.pem');
+  my $orig_crt_pem = data_file_path('wildcard-cert.cert.pem');
   ok(my $bio = Net::SSLeay::BIO_new_file($orig_crt_pem, 'r'), "BIO_new_file");
   ok(my $orig_cert = Net::SSLeay::PEM_read_bio_X509($bio), "PEM_read_bio_X509");
 
@@ -260,7 +286,7 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
   SKIP: {
     skip 'openssl-0.9.7e required', 2 unless Net::SSLeay::SSLeay >= 0x0090705f;
     ok(Net::SSLeay::P_ASN1_TIME_set_isotime(Net::SSLeay::X509_get_notBefore($x509), "2010-02-01T00:00:00Z") , "P_ASN1_TIME_set_isotime+X509_get_notBefore");
-    ok(Net::SSLeay::P_ASN1_TIME_set_isotime(Net::SSLeay::X509_get_notAfter($x509), "2099-02-01T00:00:00Z"), "P_ASN1_TIME_set_isotime+X509_get_notAfter");
+    ok(Net::SSLeay::P_ASN1_TIME_set_isotime(Net::SSLeay::X509_get_notAfter($x509), "2038-01-01T00:00:00Z"), "P_ASN1_TIME_set_isotime+X509_get_notAfter");
   }
   
   ok(my $sha1_digest = Net::SSLeay::EVP_get_digestbyname("sha1"), "EVP_get_digestbyname");
@@ -274,12 +300,12 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
 }
 
 { ### X509 request from file + some special tests
-  my $req_pem = File::Spec->catfile('t', 'data', 'testreq1.pem');
+  my $req_pem = data_file_path('simple-cert.csr.pem');
   ok(my $bio = Net::SSLeay::BIO_new_file($req_pem, 'r'), "BIO_new_file");
   ok(my $req = Net::SSLeay::PEM_read_bio_X509_REQ($bio), "PEM_read_bio_X509");
   
   ok(my $sha1_digest = Net::SSLeay::EVP_get_digestbyname("sha1"), "EVP_get_digestbyname");
-  is(unpack("H*", Net::SSLeay::X509_REQ_digest($req, $sha1_digest)), "1eda97a279f2bb518f96d1690aa9342c72d1c4ee", "X509_REQ_digest");
+  is(unpack("H*", Net::SSLeay::X509_REQ_digest($req, $sha1_digest)), "372c21a20a6d4e15bf8ecefb487cc604d9a10960", "X509_REQ_digest");
   
   ok(my $req2  = Net::SSLeay::X509_REQ_new(), "X509_REQ_new");  
   ok(my $name = Net::SSLeay::X509_REQ_get_subject_name($req), "X509_REQ_get_subject_name");
@@ -288,17 +314,11 @@ is(Net::SSLeay::X509_NAME_cmp($ca_issuer, $ca_subject), 0, "X509_NAME_cmp");
 }
 
 { ### X509 + X509_REQ loading DER format
-  my $req_der = File::Spec->catfile('t', 'data', 'testreq1.der');
-  ok(my $bio1 = Net::SSLeay::BIO_new_file($req_der, 'r'), "BIO_new_file");
+  my $req_der = data_file_path('simple-cert.csr.der');
+  ok(my $bio1 = Net::SSLeay::BIO_new_file($req_der, 'rb'), "BIO_new_file");
   ok(my $req = Net::SSLeay::d2i_X509_REQ_bio($bio1), "d2i_X509_REQ_bio");
   
-  my $x509_der = File::Spec->catfile('t', 'data', 'testcert_simple.crt.der');
-  ok(my $bio2 = Net::SSLeay::BIO_new_file($x509_der, 'r'), "BIO_new_file");
-
-
- SKIP: 
-  {
-      skip 'd2i_X509_bio fails for openssl-1.1.0e and later', 1 unless Net::SSLeay::SSLeay < 0x1010005f or Net::SSLeay::constant("LIBRESSL_VERSION_NUMBER");
-      ok(my $x509 = Net::SSLeay::d2i_X509_bio($bio2), "d2i_X509_bio");
-  }
+  my $x509_der = data_file_path('simple-cert.cert.der');
+  ok(my $bio2 = Net::SSLeay::BIO_new_file($x509_der, 'rb'), "BIO_new_file");
+  ok(my $x509 = Net::SSLeay::d2i_X509_bio($bio2), "d2i_X509_bio");
 }

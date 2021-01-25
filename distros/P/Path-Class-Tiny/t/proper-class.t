@@ -15,6 +15,7 @@ $file->touch;
 
 isa_ok $dir, $CLASS, "base object [sanity check]";
 isa_ok $dir->parent, $CLASS, "obj returned by parent()";
+isa_ok $dir->dirname, $CLASS, "obj returned by dirname()";
 isa_ok $dir->dir, $CLASS, "obj returned by dir()";
 isa_ok $dir->child('foo'), $CLASS, "obj returned by child()";
 isa_ok $dir->file('foo'), $CLASS, "obj returned by file()";

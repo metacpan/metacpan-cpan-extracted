@@ -7,13 +7,11 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-use Config::Model::BackendMgr;
+use strict;
+use warnings;
 use utf8;
 
-$conf_dir = '/etc';
-$conf_file_name = 'test.yaml';
-
-$model->create_config_class(
+my @config_classes = ({
     name => 'Master',
 
     rw_config => {
@@ -29,11 +27,9 @@ $model->create_config_class(
         null_value => { qw/type leaf value_type uniline/},
         utf8_string => { qw/type leaf value_type uniline/},
     ]
-);
+});
 
-$model_to_test = "Master";
-
-@tests = (
+my @tests = (
     {
         name  => 'basic',
         check => [
@@ -59,4 +55,11 @@ $model_to_test = "Master";
     }
 );
 
-1;
+return {
+    model_to_test => "Master",
+    conf_dir => '/etc',
+    conf_file_name => 'test.yaml',
+    config_classes => \@config_classes,
+    tests => \@tests
+};
+

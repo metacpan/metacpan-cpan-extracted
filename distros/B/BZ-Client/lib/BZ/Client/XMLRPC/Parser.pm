@@ -7,7 +7,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::XMLRPC::Parser;
-$BZ::Client::XMLRPC::Parser::VERSION = '4.4003';
+$BZ::Client::XMLRPC::Parser::VERSION = '4.4004';
 use BZ::Client::XMLRPC::Response;
 use BZ::Client::Exception;
 use XML::Parser ();
@@ -109,7 +109,7 @@ BZ::Client::XMLRPC::Parser - A parser for an XML-RPC response.
 
 =head1 VERSION
 
-version 4.4003
+version 4.4004
 
 =head1 AUTHORS
 
@@ -127,7 +127,7 @@ Jochen Wiedmann <jochen.wiedmann@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dean Hamstad.
+This software is copyright (c) 2021 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

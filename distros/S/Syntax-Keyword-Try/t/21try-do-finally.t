@@ -28,7 +28,7 @@ use Syntax::Keyword::Try qw( try try_value );
 {
    my $x;
    my $result = try do { $x .= 4; die "oops" }
-      catch { $x .= 5; "failure" }
+      catch ($e) { $x .= 5; "failure" }
       finally { $x .= 6 };
    is( $result, "failure", 'try do {} catch finally catches exception' );
    is( $x, "456", 'try do {} catch finally has finally side-effect' );

@@ -2,12 +2,12 @@ package Mojo::IOLoop::Signal;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Config;
-use IO::Handle;
-use Mojo::IOLoop;
 use Mojo::IOLoop::Stream;
+use Mojo::IOLoop;
+use Mojo::Util ();
 use Scalar::Util 'weaken';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 my %SIGNAME = map { $_ => 1 } split /\s+/, $Config{sig_name};
 our %EXCLUDE = map { $_ => 1 } qw(PIPE KILL);
 
@@ -35,8 +35,7 @@ sub _new {
 }
 
 sub DESTROY {
-    my $self = shift;
-    $self->stop;
+    Mojo::Util::_global_destruction() or shift->stop;
 }
 
 sub stop {

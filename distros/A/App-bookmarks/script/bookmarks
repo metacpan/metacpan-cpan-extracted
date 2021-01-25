@@ -21,6 +21,11 @@
 # are available for exporting (in the desired format), by default :
 # <title> <url> <description>
 #
+# The same format is used for plain text and markdown files :
+#
+# 	plain text example http://example.txt #tag1 #tag2
+# 	[markdown example](http://example.md) #tag1 #tag2
+#
 # The <description> field is filled with Safari 'Description', Firefox 'Tags' or
 # empty for Chrome and Internet Explorer.
 #
@@ -32,6 +37,8 @@
 #
 # - Since Firefox sets an EXCLUSIVE SQLite lock, a tmp DB file copy is used.
 #
+# 2021.01.23 v0.23 jul : added tests and fixed firefox default location
+# 2021.01.20 v0.22 jul : fixed firefox query again
 # 2020.06.29 v0.21 jul : added markdown and text files support
 # 2020.03.10 v0.20 jul : fixed EXCLUSIVE SQLite lock set by Firefox
 # 2019.12.22 v0.19 jul : added chrome support, require, bugfixes
@@ -55,7 +62,7 @@ use File::Copy qw(copy);
 use URI::Find;
 use URI::Find::Schemeless;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 my $program	 = basename($0);
 my $usage    = <<EOF;
 
@@ -93,7 +100,7 @@ if (!@ARGV or $all)
     if ($^O eq "darwin")
     {    
         push @ARGV, glob('~/Library/Safari/Bookmarks.plist');
-        push @ARGV, glob('~/Library/Application\ Support/Firefox/Profiles/*.default/places.sqlite');
+        push @ARGV, glob('~/Library/Application\ Support/Firefox/Profiles/*.default*/places.sqlite');
         push @ARGV, glob('~/Library/Application\ Support/Google/Chrome/Default/Bookmarks');
     }
     elsif ($^O eq "linux")
@@ -208,11 +215,18 @@ sub _firefox {
 	from moz_bookmarks b
 	left join 
 	(
-	select b1.fk as fk, group_concat(b2.title, ' ') as tags
-	from moz_bookmarks b1
-	join moz_bookmarks b2 on b2.id = b1.parent
-	where b1.fk is not null
-	and b1.title is null
+		select fk, group_concat(tag, ' ') as tags
+		from
+		(
+			select distinct
+			b1.fk as fk,
+			b3.title as tag
+			from moz_bookmarks b1
+			left join moz_bookmarks b2 on b2.fk = b1.fk and b2.type = 1 and b2.title is null
+			left join moz_bookmarks b3 on b3.id = b2.parent 
+			where b1.type = 1 and b1.title is not null
+		)
+		group by fk
 	) t on t.fk = b.fk
 	left join moz_places p on p.id = b.fk
 	left join moz_origins o on o.id = p.origin_id
@@ -413,6 +427,18 @@ Chrome (Mac/Linux/Windows), Internet Explorer (Windows), plain text (.txt) and
 markdown (.md). Files named *.plist, *.sqlite and *Bookmarks are processed as
 Safari, Firefox and Chrome bookmarks, respectively. Directories named
 *Favorites are processed as Internet Explorer favorites.
+
+The fields <title>, <url> and <description> are retrieved (when existing) and
+are available for exporting (in the desired format), by default :
+<title> <url> <description>
+
+The same format is used for plain text and markdown files :
+
+	plain text example http://example.txt #tag1 #tag2
+	[markdown example](http://example.md) #tag1 #tag2
+
+The <description> field is filled with Safari 'Description', Firefox 'Tags' or
+empty for Chrome and Internet Explorer.
 
 =head1 BUGS
 

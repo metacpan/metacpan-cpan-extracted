@@ -5193,6 +5193,7 @@ pod/perl5300delta.pod		Perl changes in version 5.30.0
 pod/perl5301delta.pod		Perl changes in version 5.30.1
 pod/perl5302delta.pod		Perl changes in version 5.30.2
 pod/perl5303delta.pod		Perl changes in version 5.30.3
+pod/perl5320delta.pod		Perl changes in version 5.32.0
 pod/perl561delta.pod		Perl changes in version 5.6.1
 pod/perl56delta.pod		Perl changes in version 5.6
 pod/perl581delta.pod		Perl changes in version 5.8.1
@@ -5232,6 +5233,7 @@ pod/perlfork.pod		Perl fork() information
 pod/perlform.pod		Perl formats
 pod/perlfunc.pod		Perl built-in functions
 pod/perlgit.pod			Using git with the Perl repository
+pod/perlgov.pod			Perl Rules of Governance
 pod/perlgpl.pod			GNU General Public License
 pod/perlguts.pod		Perl internal functions for those doing extensions
 pod/perlhack.pod		Perl hackers guide
@@ -5277,6 +5279,7 @@ pod/perlreref.pod		Perl regular expressions quick reference
 pod/perlretut.pod		Perl regular expressions tutorial
 pod/perlrun.pod			Perl execution and options
 pod/perlsec.pod			Perl security
+pod/perlsecpolicy.pod		Perl security report handling policy
 pod/perlsource.pod		Guide to the Perl source tree
 pod/perlstyle.pod		Perl style guide
 pod/perlsub.pod			Perl subroutines

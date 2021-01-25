@@ -2,7 +2,7 @@
 #
 # This file is part of Config-Model-LcdProc
 #
-# This software is Copyright (c) 2013-2017 by Dominique Dumont.
+# This software is Copyright (c) 2013-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -38,8 +38,8 @@ use warnings;
 #    user documentation
 # 5/ Write the resulting LCDd model
 
-use Config::Model 2.111;
-use Config::Model::Itself 2.012;    # to create the model
+use Config::Model 2.141;
+use Config::Model::Itself 2.022;    # to create the model
 
 use 5.010;
 use Path::Tiny;
@@ -195,6 +195,7 @@ $meta_root->load( qq!
             backend=ini_file
             config_dir="/etc"
             file="LCDd.conf"
+            quote_value=shell_style
 !
 );
 

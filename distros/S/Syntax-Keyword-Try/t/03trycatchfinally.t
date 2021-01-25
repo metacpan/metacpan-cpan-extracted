@@ -13,7 +13,7 @@ use Syntax::Keyword::Try;
    try {
       $s = 1;  # overwritten
    }
-   catch {
+   catch ($e) {
       die "FAIL";
    }
    finally {
@@ -29,7 +29,7 @@ use Syntax::Keyword::Try;
    try {
       die "oopsie";
    }
-   catch {
+   catch ($e) {
       $s = 3;
    }
    finally {

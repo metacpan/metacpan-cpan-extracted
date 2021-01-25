@@ -22,13 +22,13 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::NumSeq::OEIS::Catalogue::Plugin;
 @ISA = ('Math::NumSeq::OEIS::Catalogue::Plugin');
 
 ## no critic (CodeLayout::RequireTrailingCommaAtNewline)
 
-# total 287 A-numbers in 4 modules
+# total 300 A-numbers in 4 modules
 
 use constant info_arrayref =>
 [
@@ -973,6 +973,26 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A319290',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'CornerAlternating,n_start=0',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A319289',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'CornerAlternating,n_start=0',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
     'anum' => 'A079904',
     'class' => 'Math::NumSeq::PlanePathCoord',
     'parameters' => [
@@ -1318,6 +1338,16 @@ use constant info_arrayref =>
       'SquareSpiral',
       'delta_type',
       'AbsdY'
+    ]
+  },
+  {
+    'anum' => 'A339265',
+    'class' => 'Math::NumSeq::PlanePathDelta',
+    'parameters' => [
+      'planepath',
+      'PyramidSpiral,n_start=0',
+      'delta_type',
+      'dX'
     ]
   },
   {
@@ -2309,6 +2339,16 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A338086',
+    'class' => 'Math::NumSeq::PlanePathN',
+    'parameters' => [
+      'planepath',
+      'ZOrderCurve,radix=3',
+      'line_type',
+      'Diagonal'
+    ]
+  },
+  {
     'anum' => 'A208665',
     'class' => 'Math::NumSeq::PlanePathN',
     'parameters' => [
@@ -2326,6 +2366,16 @@ use constant info_arrayref =>
     'parameters' => [
       'planepath',
       'ZOrderCurve,radix=10'
+    ]
+  },
+  {
+    'anum' => 'A338754',
+    'class' => 'Math::NumSeq::PlanePathN',
+    'parameters' => [
+      'planepath',
+      'ZOrderCurve,radix=10',
+      'line_type',
+      'Diagonal'
     ]
   },
   {
@@ -2492,6 +2542,80 @@ use constant info_arrayref =>
     'parameters' => [
       'planepath',
       'Corner,wider=2,n_start=1',
+      'line_type',
+      'Diagonal'
+    ]
+  },
+  {
+    'anum' => 'A081346',
+    'class' => 'Math::NumSeq::PlanePathN',
+    'parameters' => [
+      'planepath',
+      'CornerAlternating'
+    ]
+  },
+  {
+    'anum' => 'A081345',
+    'class' => 'Math::NumSeq::PlanePathN',
+    'parameters' => [
+      'planepath',
+      'CornerAlternating',
+      'line_type',
+      'Y_axis'
+    ]
+  },
+  {
+    'anum' => 'A081347',
+    'class' => 'Math::NumSeq::PlanePathN',
+    'parameters' => [
+      'planepath',
+      'CornerAlternating,wider=1'
+    ]
+  },
+  {
+    'anum' => 'A081348',
+    'class' => 'Math::NumSeq::PlanePathN',
+    'parameters' => [
+      'planepath',
+      'CornerAlternating,wider=1',
+      'line_type',
+      'Y_axis'
+    ]
+  },
+  {
+    'anum' => 'A080335',
+    'class' => 'Math::NumSeq::PlanePathN',
+    'parameters' => [
+      'planepath',
+      'CornerAlternating,wider=1',
+      'line_type',
+      'Diagonal'
+    ]
+  },
+  {
+    'anum' => 'A081350',
+    'class' => 'Math::NumSeq::PlanePathN',
+    'parameters' => [
+      'planepath',
+      'CornerAlternating,wider=2'
+    ]
+  },
+  {
+    'anum' => 'A081351',
+    'class' => 'Math::NumSeq::PlanePathN',
+    'parameters' => [
+      'planepath',
+      'CornerAlternating,wider=2',
+      'line_type',
+      'Y_axis'
+    ]
+  },
+  {
+    'anum' => 'A081352',
+    'class' => 'Math::NumSeq::PlanePathN',
+    'parameters' => [
+      'planepath',
+      'CornerAlternating,wider=2',
       'line_type',
       'Diagonal'
     ]

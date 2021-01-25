@@ -1,4 +1,4 @@
-use Test::More tests => 27;
+use Test::More tests => 30;
 
 use Mac::PropertyList;
 
@@ -37,6 +37,14 @@ my $string0_9 =<<"HERE";
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <string>This is it</string>
+</plist>
+HERE
+
+my $empty_string =<<"HERE";
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<string/>
 </plist>
 HERE
 
@@ -109,3 +117,12 @@ is( $plist->type, 'dict', 'item is a dict type'                       );
 isa_ok( $plist->value, 'Mac::PropertyList::dict'            );
 is( $hash->value->{Roscoe}->value, 1,       'Roscoe string has right value'   );
 is( $hash->value->{Boolean}->value, 'true', 'Boolean string has right value'  );
+
+########################################################################
+
+$plist = Mac::PropertyList::parse_plist( $empty_string );
+
+isa_ok( $plist, 'Mac::PropertyList::string' );
+is( $plist->type, 'string',      'type key has right value for string' );
+is( $plist->value, '', 'value is right for string'           );
+

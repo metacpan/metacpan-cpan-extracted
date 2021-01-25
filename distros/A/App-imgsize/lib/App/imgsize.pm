@@ -1,7 +1,9 @@
 package App::imgsize;
 
-our $DATE = '2016-10-07'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-12-24'; # DATE
+our $DIST = 'App-imgsize'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -25,8 +27,33 @@ $SPEC{imgsize} = {
             pos => 0,
             greedy => 1,
         },
+        detail => {
+            summary => 'Whether to show detailed records',
+            schema => 'bool*',
+            description => <<'_',
+
+The default is to show detailed records when there are more than 1 filenames
+specified; when there is only 1 filename, will only show dimension in WxH format
+(e.g. 640x480). If this option is specified, will show detailed records even if
+there is only one filename specified.
+
+_
+            cmdline_aliases => {l=>{}},
+        },
     },
     examples => [
+        {
+            args => {filenames => ['foo.jpg']},
+            result => [200, "OK", '640x480'],
+            test => 0,
+        },
+        {
+            args => {filenames => ['foo.jpg'], detail=>1},
+            result => [200, "OK", [
+                {filename => 'foo.jpg', filesize => 23844, width => 640, height => 480, res_name => "VGA"},
+            ], $res_meta],
+            test => 0,
+        },
         {
             args => {filenames => ['foo.jpg', 'bar.png', 'baz.txt']},
             result => [200, "OK", [
@@ -35,7 +62,10 @@ $SPEC{imgsize} = {
                 {filename => 'baz.txt', filesize =>  2393, width =>   0, height =>   0, res_name => undef},
             ], $res_meta],
             test => 0,
-        }
+        },
+    ],
+    links => [
+        {url=>'prog:calc-image-resized-size'},
     ],
 };
 sub imgsize {
@@ -68,7 +98,11 @@ sub imgsize {
         };
     }
 
-    [200, "OK", \@res, $res_meta];
+    if ($args{detail} || @res > 1) {
+        [200, "OK", \@res, $res_meta];
+    } else {
+        [200, "OK", sprintf("%dx%d", $res[0]{width}, $res[0]{height})];
+    }
 }
 
 1;
@@ -86,7 +120,7 @@ App::imgsize - Show dimensions of image files
 
 =head1 VERSION
 
-This document describes version 0.002 of App::imgsize (from Perl distribution App-imgsize), released on 2016-10-07.
+This document describes version 0.004 of App::imgsize (from Perl distribution App-imgsize), released on 2020-12-24.
 
 =head1 SYNOPSIS
 
@@ -95,7 +129,11 @@ This document describes version 0.002 of App::imgsize (from Perl distribution Ap
 =head1 FUNCTIONS
 
 
-=head2 imgsize(%args) -> [status, msg, result, meta]
+=head2 imgsize
+
+Usage:
+
+ imgsize(%args) -> [status, msg, payload, meta]
 
 Show dimensions of image files.
 
@@ -104,6 +142,33 @@ Examples:
 =over
 
 =item * Example #1:
+
+ imgsize(filenames => ["foo.jpg"]); # -> [200, "OK", "640x480", {}]
+
+=item * Example #2:
+
+ imgsize(filenames => ["foo.jpg"], detail => 1);
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     {
+       filename => "foo.jpg",
+       filesize => 23844,
+       width    => 640,
+       height   => 480,
+       res_name => "VGA",
+     },
+   ],
+   {
+     "table.fields" => ["filename", "filesize", "width", "height", "res_name"],
+   },
+ ]
+
+=item * Example #3:
 
  imgsize(filenames => ["foo.jpg", "bar.png", "baz.txt"]);
 
@@ -148,7 +213,17 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<detail> => I<bool>
+
+Whether to show detailed records.
+
+The default is to show detailed records when there are more than 1 filenames
+specified; when there is only 1 filename, will only show dimension in WxH format
+(e.g. 640x480). If this option is specified, will show detailed records even if
+there is only one filename specified.
+
 =item * B<filenames>* => I<array[filename]>
+
 
 =back
 
@@ -157,7 +232,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -173,7 +248,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-imgsize>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-imgsize>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-imgsize/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -185,7 +260,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

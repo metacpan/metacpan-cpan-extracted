@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::XMLRPC::Value;
-$BZ::Client::XMLRPC::Value::VERSION = '4.4003';
+$BZ::Client::XMLRPC::Value::VERSION = '4.4004';
 use parent qw( BZ::Client::XMLRPC::Handler );
 use BZ::Client::XMLRPC::Struct;
 use BZ::Client::XMLRPC::Array;
@@ -136,7 +136,7 @@ BZ::Client::XMLRPC::Value - Event handler for parsing a single XML-RPC value.
 
 =head1 VERSION
 
-version 4.4003
+version 4.4004
 
 =head1 AUTHORS
 
@@ -154,7 +154,7 @@ Jochen Wiedmann <jochen.wiedmann@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dean Hamstad.
+This software is copyright (c) 2021 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

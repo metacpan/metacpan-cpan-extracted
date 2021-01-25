@@ -67,6 +67,15 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.13.0",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/NoAuth/Bugs.html?Dist=Module::Generic"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://git.deguest.jp/jack/Module-Generic"
+      }
+   },
+   "version" : "v0.13.3",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

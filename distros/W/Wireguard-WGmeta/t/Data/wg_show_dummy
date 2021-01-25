@@ -1,0 +1,42 @@
+interface: wg0
+  public key: WG_1_PEER_A_PUBLIC_KEY
+  private key: (hidden)
+  listening port: 51888
+
+peer: WG_1_PEER_A_PUBLIC_KEY
+  endpoint: 213.55.224.113:37159
+  allowed ips: 192.168.3.11/32
+  latest handshake: 14 hours, 14 minutes, 34 seconds ago
+  transfer: 4.82 MiB received, 83.79 MiB sent
+
+peer: WG_1_PEER_B_PUBLIC_KEY
+  endpoint: 147.86.207.49:10400
+  allowed ips: 192.168.3.12/32
+  latest handshake: 1 day, 16 hours, 33 minutes, 15 seconds ago
+  transfer: 253.60 KiB received, 1.30 MiB sent
+
+peer: WG_1_PEER_C_PUBLIC_KEY
+  allowed ips: 192.168.3.10/32
+
+peer: WG_1_PEER_D_PUBLIC_KEY
+  allowed ips: 192.168.3.13/32
+
+interface: wg1
+  public key: dpzd845RRItYcmcEW3i+dqatmja18F2P9ujy+lAtsBM=
+  private key: (hidden)
+  listening port: 51889
+
+peer: WG_1_PEER_A_PUBLIC_KEY
+  allowed ips: 192.168.4.10/32
+
+peer: WG_1_PEER_B_PUBLIC_KEY
+  allowed ips: 192.168.4.11/32
+
+peer: WG_1_PEER_C_PUBLIC_KEY
+  allowed ips: 192.168.4.12/32
+  endpoint: 188.86.207.49:10400
+  latest handshake: 3 days, 16 hours, 33 minutes, 15 seconds ago
+  transfer: 253.60 KiB received, 1.30 MiB sent
+
+peer: WG_1_PEER_D_PUBLIC_KEY
+  allowed ips: 192.168.4.13/32

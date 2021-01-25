@@ -1,39 +1,33 @@
-#!/usr/bin/perl
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More;
-use Socket;
-use File::Spec;
 use Net::SSLeay;
-use Config;
+use Test::Net::SSLeay qw( data_file_path initialise_libssl );
 
-# for debugging only
-my $DEBUG = 0;
-my $PCAP = 0;
-require Net::PcapWriter if $PCAP;
+initialise_libssl();
 
 my @set_list = (
     defined &Net::SSLeay::CTX_set1_groups_list ? (\&Net::SSLeay::CTX_set1_groups_list) : (),
     defined &Net::SSLeay::CTX_set1_curves_list ? (\&Net::SSLeay::CTX_set1_curves_list) : (),
 );
 
-plan skip_all => "no support for CTX_set_curves_list" if ! @set_list;
-my $tests = 4*@set_list;
-plan tests => $tests;
+if (!@set_list) {
+    plan skip_all => "no support for CTX_set_curves_list";
+} else {
+    plan tests => 4 * @set_list;
+}
 
-Net::SSLeay::randomize();
-Net::SSLeay::load_error_strings();
-Net::SSLeay::ERR_load_crypto_strings();
-Net::SSLeay::SSLeay_add_ssl_algorithms();
+# for debugging only
+my $DEBUG = 0;
+my $PCAP = 0;
+require Net::PcapWriter if $PCAP;
 
 my $SSL_ERROR; # set in _minSSL
 my %TRANSFER;  # set in _handshake
 
 my $client = _minSSL->new();
 my $server = _minSSL->new( cert => [
-    File::Spec->catfile('t','data','testcert_wildcard.crt.pem'),
-    File::Spec->catfile('t','data','testcert_key_2048.pem')
+    data_file_path('simple-cert.cert.pem'),
+    data_file_path('simple-cert.key.pem'),
 ]);
 
 
@@ -100,9 +94,12 @@ sub _handshake {
 
 {
     package _minSSL;
+
+    use Test::Net::SSLeay qw(new_ctx);
+
     sub new {
 	my ($class,%args) = @_;
-	my $ctx = Net::SSLeay::CTX_tlsv1_new();
+	my $ctx = new_ctx();
 	Net::SSLeay::CTX_set_options($ctx,Net::SSLeay::OP_ALL());
 	Net::SSLeay::CTX_set_cipher_list($ctx,'ECDHE');
 	Net::SSLeay::CTX_set_ecdh_auto($ctx,1)

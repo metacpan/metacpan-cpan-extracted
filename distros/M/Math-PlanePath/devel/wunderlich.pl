@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2020 Kevin Ryde
+# Copyright 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,6 +32,46 @@ use Math::PlanePath::Base::Digits
 use Smart::Comments;
 
 
+
+{
+  # Numbers Samples, transposed
+
+  my $path = Math::PlanePath::WunderlichSerpentine->new;
+  foreach my $y (reverse 0..8) {
+    foreach my $x (0..8) {
+      my ($x,$y) = ($y,$x);  # transposed
+      my $n = $path->xy_to_n($x,$y);
+      printf "%2d ", $n;
+    }
+    print "\n";
+  }
+
+  foreach my $n (0..9**3) {
+    my ($x,$y) = $path->n_to_xy($n);
+    print "$x,"
+  }
+  print "\n";
+
+  {
+    ! defined($path->xyxy_to_n_either(-1,1, 0,1)) or die;
+    my $width = 4;
+    foreach my $y (reverse 0..8) {
+      foreach my $x (0..8) {
+        my $bar = defined($path->xyxy_to_n_either($y,$x, $y+1,$x)) ? '|' : '';
+        printf "%*s", $width, $bar;
+      }
+      print "\n";
+      foreach my $x (0..8) {
+        my $n = sprintf '%d', $path->xy_to_n($y,$x);
+        my $dash = defined($path->xyxy_to_n_either($y,$x, $y,$x-1)) ? '-' : ' ';
+        $dash x= $width-length($n);
+        print $dash,$n;
+      }
+      print "\n";
+    }
+  }
+  exit 0;
+}
 
 {
   # WunderlichSerpentine

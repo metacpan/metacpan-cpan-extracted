@@ -547,8 +547,7 @@ if ($have_cairo_1_16) {
 		CAIRO_PDF_OUTLINE_FLAG_ITALIC
 	/];
 
-	 push @exports, qw/newSVCairoPdfOutline
-			SvCairoPdfOutline
+	 push @exports, qw/
 			cairo_pdf_outline_flags_from_sv
 			cairo_pdf_outline_flags_to_sv/;
 } else {

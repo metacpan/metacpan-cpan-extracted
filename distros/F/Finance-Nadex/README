@@ -4,19 +4,15 @@ Installation is straightforward as outlined
 in the INSTALLATION section of this document.
 
 Use this module to login to the North American Derivatives Exchange, send
-orders to the exchange, check the account balance, get price quotes,
-get information about currently available contracts, and check on open positions.
+orders to the exchange, check the account balance, get information about
+currently available contracts, and check on open positions.
 
 It isn't clear whether the use of this module to access your Nadex account
 runs afoul of any Nadex Member Rules.  I don't believe it does.  However,
 the exchange itself is the ultimate arbiter of the meaning of
 member rules.  So, use at your own risk.
 
-This module does not (yet) support streaming quotes.  It can be used to
-continuously fetch quotes from the exchange, however, using it in that
-way will likely raise eyebrows at the exchange and possibly get your account
-deactivated.  So, don't do that.  You have been warned.  A future version
-of the module may support streaming quotes.
+This module does not support retrieving quotes for underlying assets.
 
 Be aware that this module represents a very sharp knife which can be
 used improperly.  Since there is real money at stake when automating
@@ -29,7 +25,6 @@ is once again essentially zero.  By creating such orders that
 will never be filled, you can test the key part of your code which
 is the logic of when to send orders to the exchange based on your
 algorithm without having to spend any actual money.
-
 
 Here's a sample of code that could be used to submit an order to buy
 5 GBP/USD > 1.5020 (3PM) contracts at a price of $34.50:

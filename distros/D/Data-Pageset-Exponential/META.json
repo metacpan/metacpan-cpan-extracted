@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Data::Page",
       "Data::Pageset",
@@ -52,10 +52,12 @@
             "Moo" : "1.006000",
             "MooX::Aliases" : "0",
             "MooX::TypeTiny" : "0",
+            "POSIX" : "0",
             "PerlX::Maybe" : "0",
             "Types::Common::Numeric" : "0",
             "Types::Standard" : "0",
             "asa" : "0",
+            "integer" : "0",
             "namespace::autoclean" : "0",
             "perl" : "v5.10.1"
          }
@@ -68,14 +70,16 @@
             "File::Spec" : "0",
             "Module::Metadata" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "Data::Pageset::Exponential" : {
          "file" : "lib/Data/Pageset/Exponential.pm",
-         "version" : "v0.3.1"
+         "version" : "v0.3.2"
       }
    },
    "release_status" : "stable",
@@ -89,9 +93,10 @@
          "web" : "https://github.com/robrwo/Data-Pageset-Exponential"
       }
    },
-   "version" : "v0.3.1",
+   "version" : "v0.3.2",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

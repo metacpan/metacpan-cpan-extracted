@@ -9,8 +9,10 @@ use Try::Tiny;
 use Data::Dumper;
 use Sys::Hostname;
 use Plack::Util;
+use Class::Inspector;
+use Scalar::Util qw(blessed);
 
-our $VERSION = 1.03;
+our $VERSION = '1.05';
 
 # Basic attributes
 attr -host => hostname;
@@ -58,6 +60,39 @@ sub new {
 
     $self->build();
     return $self;
+}
+
+my $last_anon = 0;
+sub new_anon {
+    my $class = shift;
+
+    # make sure we don't eval something dodgy
+    die "invalid class for new_anon"
+        if ref $class                         # not a string
+        || !$class                            # not an empty string, undef or 0
+        || !Class::Inspector->loaded($class)  # not a loaded class
+        || !$class->isa(__PACKAGE__)          # not a correct class
+    ;
+
+    my $anon_class = "Kelp::Anonymous::$class" . ++$last_anon;
+    my $err = do {
+        local $@;
+        my $eval_status = eval qq[
+            {
+                package $anon_class;
+                use parent -norequire, '$class';
+            }
+            1;
+        ];
+        $@ || !$eval_status;
+    };
+
+    if ($err) {
+        die "Couldn't create anonymous Kelp instance: " .
+            (length $err > 1 ? $err : 'unknown error');
+    }
+
+    return $anon_class->new(@_);
 }
 
 sub _load_config {
@@ -226,13 +261,25 @@ sub psgi {
         $self->finalize;
     }
     catch {
-        my $message = $self->long_error ? longmess($_) : $_;
+        my $exception = $_;
+        my $res = $self->res;
 
-        # Log error
-        $self->logger( 'critical', $message ) if $self->can('logger');
+        if (blessed $exception && $exception->isa('Kelp::Exception')) {
+            # No logging here, since it is a message for the user with a code
+            # rather than a real exceptional case
+            # (Nothing really broke, user code invoked this)
 
-        # Render 500
-        $self->res->render_500($_);
+            $res->render_exception($exception);
+        }
+        else {
+            my $message = $self->long_error ? longmess($exception) : $exception;
+
+            # Log error
+            $self->logger( 'critical', $message ) if $self->can('logger');
+
+            # Render 500
+            $res->render_500($_);
+        }
         $self->finalize;
     };
 }
@@ -247,7 +294,13 @@ sub finalize {
 #----------------------------------------------------------------
 # Request and Response shortcuts
 #----------------------------------------------------------------
-sub param { shift->req->param(@_) }
+sub param {
+    my $self = shift;
+    unshift @_, $self->req;
+
+    # goto will allow carp show the correct caller
+    goto $_[0]->can('param');
+}
 
 sub session { shift->req->session(@_) }
 
@@ -429,6 +482,25 @@ contain a reference to the current L<Kelp::Response> instance.
 
 =head1 METHODS
 
+=head2 new
+
+    my $the_only_kelp = KelpApp->new;
+
+A standard constructor. B<Cannot> be called multiple times: see L</new_anon>.
+
+=head2 new_anon
+
+    my $kelp1 = KelpApp->new_anon(config => 'conf1');
+    my $kelp2 = KelpApp->new_anon(config => 'conf2');
+
+A constructor that can be called repeatedly. Cannot be mixed with L</new>.
+
+It works by creating a new anonymous class extending the class of your
+application and running I<new> on it. C<ref $kelp> will return I<something
+else> than the name of your Kelp class, but C<< $kelp->isa('KelpApp') >> will
+be true. This will likely be useful during testing or when running multiple
+instances of the same application with different configurations.
+
 =head2 build
 
 On its own, the C<build> method doesn't do anything. It is called by the
@@ -526,7 +598,8 @@ A shortcut to C<$self-E<gt>req-E<gt>param>:
         }
     }
 
-See L<Kelp::Request> for more information and examples.
+This function can be tricky to use because of context sensivity. See
+L<Kelp::Request/param> for more information and examples.
 
 =head2 session
 
@@ -564,6 +637,11 @@ arguments.
         my $url_for_name = $self->url_for('name', name => 'jake', id => 1003);
         $self->res->redirect_to( $url_for_name );
     }
+
+=head2 abs_url
+
+Same as L</url_for>, but returns the full absolute URI for the current
+application (based on configuration).
 
 =head1 AUTHOR
 

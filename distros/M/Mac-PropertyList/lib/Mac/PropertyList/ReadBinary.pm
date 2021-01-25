@@ -1,8 +1,8 @@
+use v5.10;
+
 package Mac::PropertyList::ReadBinary;
 use strict;
 use warnings;
-
-use vars qw( $VERSION );
 
 use Carp;
 use Data::Dumper;
@@ -13,7 +13,7 @@ use MIME::Base64      qw(decode_base64);
 use POSIX             qw(SEEK_END SEEK_SET);
 use XML::Entities     ();
 
-$VERSION = '1.501';
+our $VERSION = '1.502';
 
 __PACKAGE__->_run( @ARGV ) unless caller;
 
@@ -406,7 +406,7 @@ Tom Wyant added support for UID types.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2020, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

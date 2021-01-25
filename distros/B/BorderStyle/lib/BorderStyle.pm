@@ -1,9 +1,9 @@
 package BorderStyle;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-19'; # DATE
+our $DATE = '2021-01-23'; # DATE
 our $DIST = 'BorderStyle'; # DIST
-our $VERSION = '2.0.3'; # VERSION
+our $VERSION = '2.0.4'; # VERSION
 
 1;
 # ABSTRACT: Border styles
@@ -24,7 +24,7 @@ BorderStyle - Border styles
 
 =head1 VERSION
 
-This document describes version 2.0.3 of BorderStyle (from Perl distribution BorderStyle), released on 2020-06-19.
+This document describes version 2.0.4 of BorderStyle (from Perl distribution BorderStyle), released on 2021-01-23.
 
 =head1 DESCRIPTION
 
@@ -130,25 +130,42 @@ Box-drawing characters must not be mixed with other characters (ASCII or UTF8).
 
 An array. Required. Format for the characters in C<chars>:
 
- [                # y
- #x 0  1  2  3
-   [A, b, C, D],  # 0
-   [E, F, G],     # 1
-   [H, i, J, K],  # 2
-   [L, M, N],     # 3
-   [O, p, Q, R],  # 4
-   [S, t, U, V],  # 5
+ [                           # y
+ #x 0  1  2  3  4  5  6  7
+   [A, B, C, D,              # 0 Top border characters
+   [E, F, G],                # 1 Vertical separators for header row
+   [H, I, J, K, a, b],       # 2 Separator between header row and first data row
+   [L, M, N],                # 3 Vertical separators for data row
+   [O, P, Q, R, e, f, g, h], # 4 Separator between data rows
+   [S, T, U, V],             # 5 Bottom border characters
  ]
 
 When drawing border, below is how the border characters will be used:
 
- AbbbCbbbD        #0 Top border characters
+ ABBBCBBBD        #0 Top border characters
  E   F   G        #1 Vertical separators for header row
- HiiiJiiiK        #2 Separator between header row and first data row
+ HIIIJIIIK        #2 Separator between header row and first data row
  L   M   N        #3 Vertical separators for data row
- OpppQpppR        #4 Separator between data rows
+ OPPPQPPPR        #4 Separator between data rows
  L   M   N        #3
- StttUtttV        #5 Bottom border characters
+ STTTUTTTV        #5 Bottom border characters
+
+In table with column and row spans (demonstrates characters C<a>, C<b>, C<e>,
+C<f>, C<g>, C<h>):
+
+ ABBBCBBBCBBBCBBBD
+ E       F   F   G
+ HIIIaIIIJIIIbIIIK         # a=no top line, b=no bottom line
+ L   M   M       N
+ OPPPfPPPQPPPePPPR         # e=no top line, f=no bottom line
+ L       M   M   N
+ OPPPPPPPQPPPePPPR
+ L       M       N
+ L       gPPPPPPPR         # g=no left line
+ L       M       N
+ OPPPPPPPh       N         # h=on right line
+ L       M       N
+ STTTTTTTUTTTTTTTV
 
 A character can also be a coderef that will be called with C<< ($self, $y, $x,
 $n, \%args) >>. See L</Border style character>.
@@ -178,7 +195,7 @@ Source repository is at L<https://github.com/perlancar/perl-BorderStyle>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyle>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-BorderStyle/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -190,7 +207,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

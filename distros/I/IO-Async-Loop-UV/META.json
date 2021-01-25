@@ -4,33 +4,38 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "IO-Async-Loop-UV",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "IO::Async::LoopTests" : "0.24",
-            "Test::More" : "0"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
          "requires" : {
             "IO::Async::Loop" : "0.49",
-            "UV" : "0.24"
+            "UV" : "1.900"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Async::LoopTests" : "0.78",
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "IO::Async::Loop::UV" : {
          "file" : "lib/IO/Async/Loop/UV.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -39,5 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

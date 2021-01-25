@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2018, 2019, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 use Math::BigInt try => 'GMP';
 use Test;
-plan tests => 18;
+plan tests => 40;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -29,7 +29,114 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::PowerArray;
+use Math::PlanePath::Diagonals;
 
+
+#------------------------------------------------------------------------------
+# A000975 -- radix=3, Y at N=2^k, being Y=1010101..101 in binary
+
+MyOEIS::compare_values
+  (anum => 'A000975',
+   max_count => 1000,
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::PowerArray->new (radix => 3);
+     my @got;
+     for (my $n = Math::BigInt->new(1); @got < $count; $n *= 2) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A016051 -- radix=3, N in column X=1
+# 9*n+3 and 9*n+6
+
+foreach my $elem ([q{A001651}, 0],   # in PlanePathCoord
+                  ['A016051', 1],
+                  ['A051063', 2],
+                 ) {
+  my ($anum,$column_x, @extra_initial) = @$elem;
+  MyOEIS::compare_values
+      (anum => $anum,
+       name => "column X=$column_x",
+       func => sub {
+         my ($count) = @_;
+         my $path = Math::PlanePath::PowerArray->new (radix => 3);
+         my @got = @extra_initial;
+         for (my $y = Math::BigInt->new(0); @got < $count; $y++) {
+           push @got, $path->xy_to_n($column_x, $y);
+         }
+         return \@got;
+       });
+}
+
+# column at X=3
+# not in OEIS: 27,54,108,135,189,216,270,297,351,378
+
+#----------
+# A008776 - X row at Y=1
+# in general 3^x * (1or2 mod 3)
+
+foreach my $elem ([q{A000244}, 0],   # in PlanePathCoord
+                  ['A008776', 1],
+                  ['A003946', 2,  1],
+                  ['A005030', 3],
+                  ['A005032', 4],      # 7*3^x etc
+                  ['A005051', 5],
+                  ['A005052', 6],
+                  ['A120354', 7],
+                  ['A258597', 8],
+                  # ['', 9],   # only 2*A005032 to get 14
+                 ) {
+  my ($anum,$row_y, @extra_initial) = @$elem;
+  MyOEIS::compare_values
+      (anum => $anum,
+       func => sub {
+         my ($count) = @_;
+         my $path = Math::PlanePath::PowerArray->new (radix => 3);
+         my @got = @extra_initial;
+         for (my $x = Math::BigInt->new(0); @got < $count; $x++) {
+           push @got, $path->xy_to_n($x, $row_y);
+         }
+         return \@got;
+       });
+}
+
+
+#------------------------------------------------------------------------------
+# A135764 -- dispersion traversed by diagonals, down from Y axis
+
+{
+  my $diagonals  = Math::PlanePath::Diagonals->new (direction => 'down');
+  my $power = Math::PlanePath::PowerArray->new;
+
+  MyOEIS::compare_values
+      (anum => 'A135764',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         for (my $n = $diagonals->n_start; @got < $count; $n++) {
+           my ($x, $y) = $diagonals->n_to_xy ($n);
+           push @got, $power->xy_to_n($x,$y);
+         }
+         return \@got;
+       });
+
+  # A249725 - inverse
+  MyOEIS::compare_values
+      (anum => 'A249725',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         for (my $n = $power->n_start; @got < $count; $n++) {
+           my ($x, $y) = $power->n_to_xy ($n);
+           push @got, $diagonals->xy_to_n($x,$y);
+         }
+         return \@got;
+       });
+}
 
 #------------------------------------------------------------------------------
 # A117303 -- permutation, N at transpose (2*x-1)*2^(y-1) <--> (2*y-1)*2^(x-1)
@@ -38,7 +145,6 @@ MyOEIS::compare_values
   (anum => 'A117303',
    func => sub {
      my ($count) = @_;
-     require Math::PlanePath::PowerArray;
      my $path = Math::PlanePath::PowerArray->new;
      my @got;
      for (my $n = $path->n_start; @got < $count; $n++) {
@@ -64,25 +170,6 @@ MyOEIS::compare_values
      }
      return \@got;
    });
-
-#------------------------------------------------------------------------------
-# A000975 -- radix=3, Y at N=2^k, being Y=1010101..101 in binary
-
-MyOEIS::compare_values
-  (anum => 'A000975',
-   max_count => 1000,
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::PowerArray->new (radix => 3);
-     my @got;
-     for (my $n = Math::BigInt->new(1); @got < $count; $n *= 2) {
-       my ($x,$y) = $path->n_to_xy($n);
-       push @got, $y;
-     }
-     return \@got;
-   });
-
-
 
 #------------------------------------------------------------------------------
 # A050603 -- radix=2 abs(dX), but OFFSET=0
@@ -175,7 +262,6 @@ MyOEIS::compare_values
   (anum => 'A141396',
    func => sub {
      my ($count) = @_;
-     require Math::PlanePath::Diagonals;
      my $power = Math::PlanePath::PowerArray->new (radix => 3);
      my $diagonal = Math::PlanePath::Diagonals->new (direction => 'down');
      my @got;
@@ -194,27 +280,8 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::Diagonals;
      my $diagonals  = Math::PlanePath::Diagonals->new (direction => 'up');
      my $power = Math::PlanePath::PowerArray->new (radix => 3);
-     for (my $n = $diagonals->n_start; @got < $count; $n++) {
-       my ($x, $y) = $diagonals->n_to_xy ($n);
-       push @got, $power->xy_to_n($x,$y);
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A135764 -- dispersion traversed by diagonals, down from Y axis
-
-MyOEIS::compare_values
-  (anum => 'A135764',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     require Math::PlanePath::Diagonals;
-     my $diagonals  = Math::PlanePath::Diagonals->new (direction => 'down');
-     my $power = Math::PlanePath::PowerArray->new;
      for (my $n = $diagonals->n_start; @got < $count; $n++) {
        my ($x, $y) = $diagonals->n_to_xy ($n);
        push @got, $power->xy_to_n($x,$y);
@@ -229,7 +296,6 @@ MyOEIS::compare_values
   (anum => 'A075300',
    func => sub {
      my ($count) = @_;
-     require Math::PlanePath::Diagonals;
      my $diagonals  = Math::PlanePath::Diagonals->new (direction => 'up');
      my $power = Math::PlanePath::PowerArray->new;
      my @got;
@@ -342,7 +408,6 @@ MyOEIS::compare_values
      my ($count) = @_;
      my @got;
      my $path = Math::PlanePath::PowerArray->new (radix => 2);
-     require Math::BigInt;
      for (my $i = Math::BigInt->new(0); @got < $count; $i++) {
        push @got, $path->xy_to_n($i+1,$i);
      }
@@ -409,7 +474,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::Diagonals;
      my $diagonals  = Math::PlanePath::Diagonals->new (direction => 'down');
      my $power = Math::PlanePath::PowerArray->new (radix => 3);
      for (my $n = $diagonals->n_start; @got < $count; $n++) {
@@ -471,20 +535,35 @@ MyOEIS::compare_values
 #------------------------------------------------------------------------------
 # A054582 -- dispersion traversed by diagonals, up from X axis
 
-MyOEIS::compare_values
-  (anum => 'A054582',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     require Math::PlanePath::Diagonals;
-     my $diagonals  = Math::PlanePath::Diagonals->new (direction => 'up');
-     my $power = Math::PlanePath::PowerArray->new;
-     for (my $n = $diagonals->n_start; @got < $count; $n++) {
-       my ($x, $y) = $diagonals->n_to_xy ($n);
-       push @got, $power->xy_to_n($x,$y);
-     }
-     return \@got;
-   });
+{
+  my $diagonals  = Math::PlanePath::Diagonals->new (direction => 'up');
+  my $power = Math::PlanePath::PowerArray->new;
+
+  MyOEIS::compare_values
+      (anum => 'A054582',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         for (my $n = $diagonals->n_start; @got < $count; $n++) {
+           my ($x, $y) = $diagonals->n_to_xy ($n);
+           push @got, $power->xy_to_n($x,$y);
+         }
+         return \@got;
+       });
+
+  # A209268 - inverse
+  MyOEIS::compare_values
+      (anum => 'A209268',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         for (my $n = $power->n_start; @got < $count; $n++) {
+           my ($x, $y) = $power->n_to_xy ($n);
+           push @got, $diagonals->xy_to_n($x,$y);
+         }
+         return \@got;
+       });
+}
 
 #------------------------------------------------------------------------------
 exit 0;

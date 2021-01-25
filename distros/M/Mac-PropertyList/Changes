@@ -1,5 +1,8 @@
 Revision history for Perl module Mac::PropertyList
 
+1.502 2021-01-19T10:17:29Z
+	* freshen distro, dump Travis CI, add Github Actions
+
 1.501 2020-09-30T04:50:46Z
 	* Added create_plist_from_string()
 	* Merged Tom Wyant's code to handle CF$UID types

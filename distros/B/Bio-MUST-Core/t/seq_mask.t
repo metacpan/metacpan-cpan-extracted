@@ -173,7 +173,7 @@ my @exp_masks = (
 SKIP: {
     skip q{Cannot find 'Gblocks' in $PATH}, 3
         unless qx{which Gblocks} && $^O ne 'solaris';
-        # Note: Solaris has some Gblocks executable that is not what we need
+        # Note: For some reason Solaris return value for 'which' is not usable
 
     my $infile = file('test', 'gblocks.fasta');
     my $ali = Bio::MUST::Core::Ali->load($infile);
@@ -194,7 +194,9 @@ SKIP: {
 # TODO: provision BMGE
 
 SKIP: {
-    skip q{Cannot find 'bmge.sh' in $PATH}, 3 unless qx{which bmge.sh};
+    skip q{Cannot find 'bmge.sh' in $PATH}, 3
+        unless qx{which bmge.sh} && $^O ne 'solaris';
+        # Note: For some reason Solaris return value for 'which' is not usable
 
     my $infile = file('test', 'bmge.fasta');
     my $ali = Bio::MUST::Core::Ali->load($infile);

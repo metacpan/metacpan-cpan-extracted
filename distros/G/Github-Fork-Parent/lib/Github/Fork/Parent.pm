@@ -14,7 +14,7 @@ Version 1.0
 
 =cut
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 
 =head1 SYNOPSIS
@@ -109,7 +109,6 @@ sub github_parent_author {
     my $source=$yaml->{source}{owner}{login};
     die "No login in YAML for $link" unless $source;
     return $source;
-    die;
   } else {
     die "No content";
   }

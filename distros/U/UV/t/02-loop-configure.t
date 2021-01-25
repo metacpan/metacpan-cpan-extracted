@@ -29,22 +29,27 @@ sub timer_cb {
     my $loop = UV::Loop->new();
     isa_ok($loop, 'UV::Loop', 'got a new loop');
 
+    my $err = do {
+        local $@;
+        eval { $loop->configure(UV_LOOP_BLOCK_SIGNAL, SIGPROF); 1 } ? undef : $@
+    };
+
     if (WINLIKE) {
-        is(UV_ENOSYS, $loop->configure(UV_LOOP_BLOCK_SIGNAL, 0), 'Block signal does not work on Windows');
+        isa_ok($err, "UV::Exception::ENOSYS", 'Block signal does not work on Windows');
     }
     elsif (CYGWIN) {
-        is(UV_ENOTSOCK, $loop->configure(UV_LOOP_BLOCK_SIGNAL, 0), 'Block signal does not work on Windows');
+        isa_ok($err, "UV::Exception::ENOTSOCK", 'Block signal does not work on Cygwin');
     }
     else {
-        is(0, $loop->configure(UV_LOOP_BLOCK_SIGNAL, SIGPROF), 'Configure worked properly');
+        ok(!$err, "Block signal works fine on this OS") or
+            diag("Error was $err");
     }
 
     my $timer = UV::Timer->new(loop => $loop);
     isa_ok($timer, 'UV::Timer', 'got a new timer for the loop');
-    is(0, $timer->start(10, 0, \&timer_cb), 'Timer started');
+    $timer->start(10, 0, \&timer_cb);
 
     is(0, $loop->run(UV_RUN_DEFAULT), 'Loop started');
-    is(0, $loop->close(), 'Loop closed');
 }
 
 done_testing();

@@ -1,9 +1,9 @@
 package App::ImageMagickUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-23'; # DATE
+our $DATE = '2020-12-24'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -185,7 +185,7 @@ App::ImageMagickUtils - Utilities related to ImageMagick
 
 =head1 VERSION
 
-This document describes version 0.003 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2020-09-23.
+This document describes version 0.004 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2020-12-24.
 
 =head1 FUNCTIONS
 
@@ -264,7 +264,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ImageMagickUtils
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ImageMagickUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ImageMagickUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

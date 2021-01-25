@@ -6,16 +6,16 @@ build_requires:
   Config: '0'
   ExtUtils::MakeMaker: '0'
   POSIX: '0'
-  Readonly: '2.05'
+  Readonly: '0'
   Scalar::Util: '0'
-  Test::Exception: '0.43'
+  Test::Exception: '0'
   Test::More: '0'
-  Test::RequiresInternet: '0.05'
-  version: '0.9924'
+  Test::RequiresInternet: '0'
+  version: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,5 +39,5 @@ requires:
   perl: '5.030000'
   utf8: '0'
   version: '0.9924'
-version: v2.10.0
+version: v2.10.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

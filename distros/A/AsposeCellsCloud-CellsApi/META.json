@@ -62,7 +62,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "20.11"
+         "version" : "21.1"
       },
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -138,6 +138,9 @@
       },
       "AsposeCellsCloud::Object::CellsObjectOperateTaskParameter" : {
          "file" : "lib/AsposeCellsCloud/Object/CellsObjectOperateTaskParameter.pm"
+      },
+      "AsposeCellsCloud::Object::ConvertWorksheetTaskParameter" : {
+         "file" : "lib/AsposeCellsCloud/Object/ConvertWorksheetTaskParameter.pm"
       },
       "AsposeCellsCloud::Object::CellsResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/CellsResponse.pm"
@@ -807,6 +810,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "20.11",
+   "version" : "21.1",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

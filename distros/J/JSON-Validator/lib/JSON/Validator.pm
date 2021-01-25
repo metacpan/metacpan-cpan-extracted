@@ -16,14 +16,16 @@ use Scalar::Util qw(blessed refaddr);
 
 use constant RECURSION_LIMIT => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 
-our $VERSION = '4.10';
+our $VERSION = '4.12';
 our @EXPORT_OK = qw(joi validate_json);
 
 our %SCHEMAS = (
-  'http://json-schema.org/draft-04/schema#'      => '+Draft4',
-  'http://json-schema.org/draft-06/schema#'      => '+Draft6',
-  'http://json-schema.org/draft-07/schema#'      => '+Draft7',
-  'https://json-schema.org/draft/2019-09/schema' => '+Draft201909',
+  'http://json-schema.org/draft-04/schema#'             => '+Draft4',
+  'http://json-schema.org/draft-06/schema#'             => '+Draft6',
+  'http://json-schema.org/draft-07/schema#'             => '+Draft7',
+  'https://json-schema.org/draft/2019-09/schema'        => '+Draft201909',
+  'http://swagger.io/v2/schema.json'                    => '+OpenAPIv2',
+  'https://spec.openapis.org/oas/3.0/schema/2019-04-02' => '+OpenAPIv3',
 );
 
 has formats                   => sub { shift->_build_formats };
@@ -246,7 +248,7 @@ sub _definitions_path {
   # Generate definitions key based on filename
   my $fqn = Mojo::URL->new($ref->fqn);
   my $key = $fqn->fragment;
-  if ($fqn->scheme eq 'file') {
+  if ($fqn->scheme and $fqn->scheme eq 'file') {
     $key = join '-', map { s!^\W+!!; $_ } grep {$_} path($fqn->path)->basename, $key,
       substr(sha1_sum($fqn->path), 0, 10);
   }
@@ -316,7 +318,7 @@ sub _new_schema {
 
   my $loadable
     = (blessed $source && ($source->can('scheme') || $source->isa('Mojo::File')))
-    || -f $source
+    || ($source !~ /\n/ && -f $source)
     || (!ref $source && $source =~ /^\w/);
 
   my $store  = $self->store;
@@ -424,6 +426,16 @@ sub _resolve_ref {
 sub _schema_class {
   my ($self, $spec) = @_;
 
+  # Detect openapiv2 and v3 schemas by content, since no "$schema" is present
+  if (ref $spec eq 'HASH' and $spec->{paths}) {
+    if ($spec->{swagger} and $spec->{swagger} eq '2.0') {
+      $spec = 'http://swagger.io/v2/schema.json';
+    }
+    elsif ($spec->{openapi} and $spec->{openapi} =~ m!^3\.0\.\d+$!) {
+      $spec = 'https://spec.openapis.org/oas/3.0/schema/2019-04-02';
+    }
+  }
+
   my $schema_class = $spec && $SCHEMAS{$spec} || 'JSON::Validator::Schema';
   $schema_class =~ s!^\+(.+)$!JSON::Validator::Schema::$1!;
   confess "Could not load $schema_class: $@" unless $schema_class->can('new') or eval "require $schema_class;1";
@@ -437,7 +449,7 @@ sub _schema_class {
   return $package if $package->can('new');
 
   die "package $package: $@" unless eval "package $package; use Mojo::Base '$jv_class'; 1";
-  Mojo::Util::monkey_patch($package, $_ => $schema_class->can($_))
+  Mojo::Util::monkey_patch($package, $_ => JSON::Validator::Schema->can($_))
     for qw(_register_root_schema bundle contains data errors get id new resolve specification validate);
   return $package;
 }
@@ -503,7 +515,7 @@ sub _validate_all_of {
   my $i = 0;
   for my $rule (@$rules) {
     next unless my @e = $self->_validate($_[1], $path, $rule);
-    push @errors, @e;
+    push @errors,             @e;
     push @errors_with_prefix, [$i, @e];
   }
   continue {
@@ -549,7 +561,7 @@ sub _validate_any_of {
   my $i = 0;
   for my $rule (@$rules) {
     return unless my @e = $self->_validate($_[1], $path, $rule);
-    push @errors, @e;
+    push @errors,             @e;
     push @errors_with_prefix, [$i, @e];
   }
   continue {
@@ -574,7 +586,7 @@ sub _validate_one_of {
   for my $rule (@$rules) {
     my @e = $self->_validate($_[1], $path, $rule) or push @passed, $i and next;
     push @errors_with_prefix, [$i, @e];
-    push @errors, @e;
+    push @errors,             @e;
   }
   continue {
     $i++;

@@ -82,13 +82,11 @@ METHODS
         }
 
     You can get a reply_token from a webhook event object
-    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-
-    objects>. See the documentation for the parse_events_from_json($json)
-    method.
+    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-objects>.
+    See the documentation for the parse_events_from_json($json) method.
 
     See also the API reference of this method:
-    https://developers.line.biz/en/reference/messaging-api/#send-reply-mess
-    age
+    https://developers.line.biz/en/reference/messaging-api/#send-reply-message
 
  push_message( $user_id|$room_id|$group_id, $message, $options)
 
@@ -99,9 +97,8 @@ METHODS
         $bot->push_message($user_id, $messages->build);
 
     You can get a user_id, room_id or group_id from a webhook event object
-    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-
-    objects> See the documentation for the parse_events_from_json($json)
-    method.
+    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-objects>
+    See the documentation for the parse_events_from_json($json) method.
 
     The last parameter $options is an HashRef with a list of key-values
     pairs to fine-tune the behaviour of this message. At the moment, the
@@ -110,8 +107,7 @@ METHODS
     meaning of this particular option.
 
     For mor detail, read the LINE Developers API reference of this method:
-    https://developers.line.biz/en/reference/messaging-api/#send-push-messa
-    ge
+    https://developers.line.biz/en/reference/messaging-api/#send-push-message
 
  multicast( $user_id, $message, $options )
 
@@ -122,9 +118,8 @@ METHODS
         $bot->multicast([ $user_id ], $messages->build);
 
     You can get a user_id from a webhook event object
-    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-
-    objects>. See the documentation for the parse_events_from_json($json)
-    method.
+    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-objects>.
+    See the documentation for the parse_events_from_json($json) method.
 
     The last parameter $options is an HashRef with a list of key-values
     pairs to fine-tune the behaviour of this message. At the moment, the
@@ -133,8 +128,7 @@ METHODS
     meaning of this particular option.
 
     See also the LINE Developers API reference of this method:
-    https://developers.line.biz/en/reference/messaging-api/#send-multicast-
-    messages
+    https://developers.line.biz/en/reference/messaging-api/#send-multicast-messages
 
  broadcast($message, $options)
 
@@ -151,8 +145,7 @@ METHODS
     meaning of this particular option.
 
     See also the LINE Developers API reference of thi smethod:
-    https://developers.line.biz/en/reference/messaging-api/#send-broadcast-
-    message
+    https://developers.line.biz/en/reference/messaging-api/#send-broadcast-message
 
  validate_signature($json, $signature)
 
@@ -198,8 +191,8 @@ METHODS
         $bot->leave_room($room_id);
 
     You can get a room_id by a Webhook Event Object
-    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-
-    objects>. And see also parse_events_from_json($json) method's document.
+    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-objects>.
+    And see also parse_events_from_json($json) method's document.
 
  leave_group($group_id)
 
@@ -208,9 +201,8 @@ METHODS
         $bot->leave_group($group_id);
 
     You can get a group_id from a webhook event object
-    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-
-    objects>. See the documentation for the parse_events_from_json($json)
-    method.
+    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-objects>.
+    See the documentation for the parse_events_from_json($json) method.
 
  get_message_content($message_id)
 
@@ -224,9 +216,8 @@ METHODS
         }
 
     You can get a message_id from a webhook event object
-    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-
-    objects>. See the documentation for the parse_events_from_json($json)
-    method.
+    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-objects>.
+    See the documentation for the parse_events_from_json($json) method.
 
     You can also see the online API reference documentation.
 
@@ -253,8 +244,7 @@ METHODS
     specified day.
 
     See also the LINE Developers API reference of this method:
-    https://developers.line.biz/en/reference/messaging-api/#get-number-of-d
-    elivery-messages
+    https://developers.line.biz/en/reference/messaging-api/#get-number-of-delivery-messages
 
     The argument is a HashRef with one pair of mandatory key-values;
 
@@ -309,8 +299,7 @@ METHODS
         }
 
     See also the LINE Developers API reference of this method:
-    https://developers.line.biz/en/reference/messaging-api/#get-group-membe
-    r-profile
+    https://developers.line.biz/en/reference/messaging-api/#get-group-member-profile
 
  get_member_in_room_count($room_id)
 
@@ -324,8 +313,7 @@ METHODS
         }
 
     See also the LINE Developers API reference of this method:
-    https://developers.line.biz/en/reference/messaging-api/#get-members-roo
-    m-count
+    https://developers.line.biz/en/reference/messaging-api/#get-members-room-count
 
  get_member_in_group_count($group_id)
 
@@ -339,8 +327,7 @@ METHODS
         }
 
     See also the LINE Developers API reference of this method:
-    https://developers.line.biz/en/reference/messaging-api/#get-members-gro
-    up-count
+    https://developers.line.biz/en/reference/messaging-api/#get-members-group-count
 
  get_group_summary($group_id)
 
@@ -355,8 +342,7 @@ METHODS
         }
 
     See also the LINE Developers API reference of this method:
-    https://developers.line.biz/en/reference/messaging-api/#get-group-summa
-    ry
+    https://developers.line.biz/en/reference/messaging-api/#get-group-summary
 
  get_room_member_profile($room_id, $user_id)
 
@@ -364,8 +350,7 @@ METHODS
     group name. The response is similar to get_group_member_profile.
 
     See also the LINE Developers API reference of this method:
-    https://developers.line.biz/en/reference/messaging-api/#get-room-member
-    -profile
+    https://developers.line.biz/en/reference/messaging-api/#get-room-member-profile
 
  get_number_of_sent_reply_messages($date)
 
@@ -423,13 +408,11 @@ METHODS
  create_rich_menu( $rich_menu_object )
 
     This method corresponds to the API of Creating rich menu
-    <https://developers.line.biz/en/reference/messaging-api/#create-rich-me
-    nu>
+    <https://developers.line.biz/en/reference/messaging-api/#create-rich-menu>
 
     One argument is needed: $rich_menu_object, which is a plain HashRef
     representing rich menu object
-    <https://developers.line.biz/en/reference/messaging-api/#rich-menu-obje
-    ct>
+    <https://developers.line.biz/en/reference/messaging-api/#rich-menu-object>
 
  get_rich_menu( $rich_menu_id )
 
@@ -442,8 +425,7 @@ METHODS
  delete_rich_menu( $rich_menu_id )
 
     This method corresponds to the API of Delete rich menu
-    <https://developers.line.biz/en/reference/messaging-api/#delete-rich-me
-    nu>
+    <https://developers.line.biz/en/reference/messaging-api/#delete-rich-menu>
 
     One argument is needed: $rich_menu_id -- which correspond to the
     richMenuId property of the object returned by create_rich_menu method.
@@ -454,16 +436,14 @@ METHODS
  get_rich_menu_list
 
     This method corresponds to the API of Get rich menu list
-    <https://developers.line.biz/en/reference/messaging-api/#get-rich-menu-
-    list>
+    <https://developers.line.biz/en/reference/messaging-api/#get-rich-menu-list>
 
     No arguments are needed.
 
  set_default_rich_menu( $rich_menu_id )
 
     This method corresponds to the API of Set default rich menu
-    <https://developers.line.biz/en/reference/messaging-api/#set-default-ri
-    ch-menu>
+    <https://developers.line.biz/en/reference/messaging-api/#set-default-rich-menu>
 
     One argument is needed: $rich_menu_id -- which correspond to the
     richMenuId property of the object returned by create_rich_menu method.
@@ -471,8 +451,7 @@ METHODS
  get_default_rich_menu_id
 
     This method corresponds to the API of Get default rich menu ID
-    <https://developers.line.biz/en/reference/messaging-api/#get-default-ri
-    ch-menu-id>
+    <https://developers.line.biz/en/reference/messaging-api/#get-default-rich-menu-id>
 
     No arguments are needed. The return value is a RichMenu object with
     only one property: richMenuId.
@@ -480,22 +459,19 @@ METHODS
  cancel_default_rich_menu
 
     This method corresponds to the API of Cancel default rich menu ID
-    <https://developers.line.biz/en/reference/messaging-api/#cancel-default
-    -rich-menu>
+    <https://developers.line.biz/en/reference/messaging-api/#cancel-default-rich-menu>
 
  link_rich_menu_to_user( $user_id, $rich_menu_id )
 
     This method corresponds to the API of Link rich menu to user
-    <https://developers.line.biz/en/reference/messaging-api/#link-rich-menu
-    -to-user>
+    <https://developers.line.biz/en/reference/messaging-api/#link-rich-menu-to-user>
 
     Both of $user_id and $rich_menu_id are required.
 
  link_rich_menu_to_multiple_users( $user_ids, $rich_menu_id )
 
     This method corresponds to the API of Link rich menu to multiple users
-    <https://developers.line.biz/en/reference/messaging-api/#link-rich-menu
-    -to-users>
+    <https://developers.line.biz/en/reference/messaging-api/#link-rich-menu-to-users>
 
     Both of $user_ids and $rich_menu_id are required. $user_ids should be
     an ArrayRef of user ids, while $rich_menu_id should be a simple scalar.
@@ -503,8 +479,7 @@ METHODS
  get_rich_menu_id_of_user( $user_id )
 
     This method corresponds to the API of Get rich menu ID of user
-    <https://developers.line.biz/en/reference/messaging-api/#get-rich-menu-
-    id-of-user>
+    <https://developers.line.biz/en/reference/messaging-api/#get-rich-menu-id-of-user>
 
     The argument $user_id is mandatory. The return value is a RichMenu
     object with only one property: richMenuId.
@@ -512,8 +487,7 @@ METHODS
  unlink_rich_menu_from_user( $user_id )
 
     This method corresponds to the API of Unlink rich menu from user
-    <https://developers.line.biz/en/reference/messaging-api/#unlink-rich-me
-    nu-from-user>
+    <https://developers.line.biz/en/reference/messaging-api/#unlink-rich-menu-from-user>
 
     The argument $user_id is mandatory. The return value is an empty
     object.
@@ -522,8 +496,7 @@ METHODS
 
     This method corresponds to the API of Unlink rich menu from multiple
     users
-    <https://developers.line.biz/en/reference/messaging-api/#unlink-rich-me
-    nu-from-users>
+    <https://developers.line.biz/en/reference/messaging-api/#unlink-rich-menu-from-users>
 
     The mandatory argument $user_ids is an ArrayRef of user ids. The return
     value is an empty object.
@@ -531,8 +504,7 @@ METHODS
  issue_channel_access_token({ client_id => '...', client_secret => '...' })
 
     This method corresponds to the API of: Issue Channel access token
-    <https://developers.line.biz/en/reference/messaging-api/#issue-channel-
-    access-token>
+    <https://developers.line.biz/en/reference/messaging-api/#issue-channel-access-token>
 
     The argument is a HashRef with two pairs of mandatory key-values:
 
@@ -553,8 +525,7 @@ METHODS
  issue_channel_access_token_v2_1({ jwt => '...' })
 
     This method corresponds to the API of: Issue Channel access token v2.1
-    <https://developers.line.biz/en/reference/messaging-api/#issue-channel-
-    access-token-v2-1>
+    <https://developers.line.biz/en/reference/messaging-api/#issue-channel-access-token-v2-1>
 
     The argument is a HashRef with a pair of mandatory key-values:
 
@@ -576,8 +547,7 @@ METHODS
 
     This method corresponds to the API of: Get all valid channel access
     token key IDs v2.1
-    <https://developers.line.biz/en/reference/messaging-api/#get-all-valid-
-    channel-access-token-key-ids-v2-1>
+    <https://developers.line.biz/en/reference/messaging-api/#get-all-valid-channel-access-token-key-ids-v2-1>
 
     The argument is a HashRef with a pair of mandatory key-values:
 
@@ -597,8 +567,7 @@ METHODS
  revoke_channel_access_token({ access_token => "..." })
 
     This method corresponds to the API of: Revoke channel access token
-    <https://developers.line.biz/en/reference/messaging-api/#revoke-channel
-    -access-token>
+    <https://developers.line.biz/en/reference/messaging-api/#revoke-channel-access-token>
 
     The argument is a HashRef with one pair of mandatory key-values;
 
@@ -611,8 +580,7 @@ METHODS
  get_number_of_followers({ date => "..." })
 
     This method corresponds to the API of: Get number of followers
-    <https://developers.line.biz/en/reference/messaging-api/#get-number-of-
-    followers>
+    <https://developers.line.biz/en/reference/messaging-api/#get-number-of-followers>
 
     The argument is a HashRef with one pair of mandatory key-values;
 
@@ -642,14 +610,12 @@ METHODS
     broadcast messages sent from your LINE Official Account.
 
     See also the LINE Developers API reference of this method:
-    https://developers.line.biz/en/reference/messaging-api/#get-message-eve
-    nt
+    https://developers.line.biz/en/reference/messaging-api/#get-message-event
 
 How to build a send message object
 
     See the LINE Developers API reference about Message objects
-    <https://developers.line.biz/en/reference/messaging-api/#message-object
-    s>
+    <https://developers.line.biz/en/reference/messaging-api/#message-objects>
 
     When the LINE::Bot::API::Builder::SendMessage class is used, it is
     possible easily to build a send message object. That class supports a
@@ -804,8 +770,7 @@ How to build a send message object
         )->build;
 
     For more detail about Imagemap message, see:
-    https://developers.line.biz/en/reference/messaging-api/#imagemap-messag
-    e
+    https://developers.line.biz/en/reference/messaging-api/#imagemap-message
 
  Template type
 
@@ -958,8 +923,7 @@ How to build a send message object
 
     The value of 'retry_key' is essentially value of an HTTP header name
     'X-Line-Retry-Key'. Read more about retrying a failed push_message at:
-    https://developers.line.biz/en/reference/messaging-api/#retry-api-reque
-    st
+    https://developers.line.biz/en/reference/messaging-api/#retry-api-request
 
 AUTHORS
 
@@ -967,7 +931,7 @@ AUTHORS
 
 COPYRIGHT
 
-    Copyright 2016-2020
+    Copyright 2016-2021
 
 LICENSE
 

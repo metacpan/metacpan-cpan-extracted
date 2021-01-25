@@ -11,7 +11,7 @@ use Config;
 use Cwd;
 
 my $base = Cwd::cwd;
-my $commit = 'e42be46f19d4bca6aee063ce947f6974d790892e';
+my $commit = 'd0838c21ef7104e3dc4e4bad74676ed815aed981';
 
 sub new {
     my $class = shift;
@@ -28,7 +28,7 @@ sub new {
             'Alien::gmake' => 0.11, # needed for %{gmake} helper
         },
         alien_build_commands => [
-            "%{gmake} default googlepb CXXFLAGS=\"$protobuf_cxxflags\" USER_CPPFLAGS=\"$protobuf_flags -fPIC\" $make_args",
+            "%{gmake} default googlepb CXXFLAGS=\"$protobuf_cxxflags\" USER_CPPFLAGS=\"$protobuf_flags -fPIC -DUPB_GOOGLEPB_NOREFLECTION\" $make_args",
         ],
         alien_install_commands => [
             "$^X ../../scripts/install.pl %s",

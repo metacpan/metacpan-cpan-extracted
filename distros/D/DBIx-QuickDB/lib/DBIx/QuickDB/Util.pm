@@ -2,7 +2,7 @@ package DBIx::QuickDB::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use IPC::Cmd qw/can_run/;
 use Carp qw/confess/;
@@ -27,7 +27,7 @@ sub clone_dir {
 
 sub _clone_dir_rsync {
     my ($src, $dest, %params) = @_;
-    system($RSYNC, '-a', $params{verbose} ? ( '-vP' ) : (), "$src/", $dest) and die "$RSYNC returned $?";
+    system($RSYNC, '-a', '--exclude' => '.nfs*', $params{verbose} ? ( '-vP' ) : (), "$src/", $dest) and die "$RSYNC returned $?";
 }
 
 sub _clone_dir_cp {

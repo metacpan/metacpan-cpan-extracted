@@ -21,7 +21,7 @@ no_index:
 requires:
   perl: 5.005
 resources:
-  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Meta
+  bugtracker: https://github.com/chorny/Perl-Meta/issues
   repository: git://github.com/chorny/Perl-Meta.git
-version: 0.03
-x_serialization_backend: YAML version 0.73
+version: 0.04
+x_serialization_backend: YAML version 1.23

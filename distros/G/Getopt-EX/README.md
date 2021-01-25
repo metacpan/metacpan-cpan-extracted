@@ -5,7 +5,7 @@ Getopt::EX - Getopt Extender
 
 # VERSION
 
-Version v1.21.1
+Version v1.22.0
 
 # DESCRIPTION
 
@@ -53,7 +53,8 @@ gives option _-n_ always when the script executed.  See
 If the rc file includes a section start with `__PERL__`, it is
 evaluated as a perl program.  User can define any kind of functions
 there, which can be invoked from command line option if the script is
-aware of them.
+aware of them.  At this time, module object is assigned to variable
+`$MODULE`, and you can access module API through it.
 
 Also, special command option preceded by **-M** is taken and
 corresponding perl module is loaded.  For example,

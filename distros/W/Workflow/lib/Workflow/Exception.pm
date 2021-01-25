@@ -35,7 +35,7 @@ my %TYPE_CLASSES = (
     workflow_error      => 'Workflow::Exception',
 );
 
-$Workflow::Exception::VERSION   = '1.49';
+$Workflow::Exception::VERSION   = '1.50';
 @Workflow::Exception::ISA       = qw( Exporter Exception::Class::Base );
 @Workflow::Exception::EXPORT_OK = keys %TYPE_CLASSES;
 
@@ -63,8 +63,6 @@ sub _mythrow {
 }
 
 # Use 'goto' here to maintain the stack trace
-
-## no critic (Subroutines::RequireArgUnpacking)
 
 sub condition_error {
     unshift @_, 'condition_error';

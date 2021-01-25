@@ -937,6 +937,19 @@ MyOEIS::compare_values
      return \@got;
    });
 
+# GP-DEFINE  \\ mine in A128173
+# GP-DEFINE  ternary_reflected_Gray(n) = {
+# GP-DEFINE    my(v=digits(n,3),r=Mod(0,2));
+# GP-DEFINE    for(i=1,#v, if(r,v[i]=2-v[i]); r+=v[i]); fromdigits(v,3);
+# GP-DEFINE  }
+# GP-DEFINE  A128173 = ternary_reflected_Gray;
+# GP-Test  my(v=OEIS_samples("A128173")); /* OFFSET=0 */ \
+# GP-Test    vector(#v,n,n--; A128173(n)) == v
+# my(g=OEIS_bfile_gf("A128173")); \
+#   g==Polrev(vector(poldegree(g)+1,n,n--; A128173(n)))
+# poldegree(OEIS_bfile_gf("A128173"))
+
+
 #------------------------------------------------------------------------------
 # A003100 - decimal Gray reflected
 

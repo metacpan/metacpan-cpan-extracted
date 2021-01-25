@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '2.006'; # VERSION
+our $VERSION = '2.007'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -317,19 +317,6 @@ sub never {
 =head1 METHODS - Instance
 
 =cut
-
-=head2 describe
-
-Returns a string describing this source and any parents - typically this will result in a chain
-like C<< from->combine_latest->count >>.
-
-=cut
-
-# It'd be nice if L<Future> already provided a method for this, maybe I should suggest it
-sub describe {
-    my ($self) = @_;
-    ($self->parent ? $self->parent->describe . '=>' : '') . $self->label . '(' . $self->completed->state . ')';
-}
 
 =head2 encode
 
@@ -1238,7 +1225,7 @@ sub ordered_futures {
         # ->is_ready callback removes it
         $pending{$k} = $f;
         $log->tracef('Ordered futures has %d pending', 0 + keys %pending);
-        $src->pause if $high and keys(%pending) >= $high;
+        $src->pause if $high and keys(%pending) >= $high and not $src->is_paused;
         $_->on_done(sub {
             my @pending = @_;
             while(@pending and not $src_completed->is_ready) {
@@ -1248,7 +1235,7 @@ sub ordered_futures {
           ->on_fail(sub { $src->fail(@_) unless $src_completed->is_ready; })
           ->on_ready(sub {
               delete $pending{$k};
-              $src->resume if $low and keys(%pending) <= $low;
+              $src->resume if $low and keys(%pending) <= $low and $src->is_paused;
               $log->tracef('Ordered futures now has %d pending after completion, upstream finish status is %d', 0 + keys(%pending), $all_finished);
               return if %pending;
               $all_finished->on_ready($src_completed) if $all_finished and not $src_completed->is_ready;
@@ -2122,7 +2109,7 @@ sub prepare_await {
     my ($self) = @_;
     (delete $self->{on_get})->() if $self->{on_get};
     return unless my $parent = $self->parent;
-    my $code = $parent->can('prepare_await');
+    my $code = $parent->can('prepare_await') or return;
     local @_ = ($parent);
     goto &$code;
 }

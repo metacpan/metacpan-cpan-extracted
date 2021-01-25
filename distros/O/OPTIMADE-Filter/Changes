@@ -1,3 +1,14 @@
+0.10.2 2021-01-23
+
+    - Fixing repository and issue tracker URLs.
+
+0.10.1 2021-01-22
+
+    - Acknowledging conformance to OPTiMaDe specification v1.0.0.
+    - Adding version numbers to all modules.
+    - Correcting copyright years.
+    - Adding homepage and pointers to GitHub.
+
 0.10.0 2020-06-09
 
     - Reducing the number of parentheses in produced SQL statements.

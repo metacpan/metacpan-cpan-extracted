@@ -1,4 +1,3 @@
-.eachperlrc
 Build.PL
 Changes
 hax/block_end.c.inc
@@ -35,15 +34,10 @@ t/40parts-name.t
 t/41parts-attrs.t
 t/42parts-signature.t
 t/99pod.t
-t/any.c
 t/any.xs
-t/func.c
 t/func.xs
-t/parts.c
 t/parts.xs
-t/registrations.c
 t/registrations.xs
-t/stages.c
 t/stages.xs
 t/testcase.pm
 XSParseSublike.h

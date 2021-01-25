@@ -1,8 +1,8 @@
 #!/usr/local/bin/perl
 #
-#	test_ellipsoid.pl
+#       test_ellipsoid.pl
 #
-#	Test Geo::Ellipsoid.pm module coordinate transformations
+#       Test Geo::Ellipsoid.pm module coordinate transformations
 
 use strict;
 use warnings;
@@ -29,7 +29,7 @@ for ( @ARGV) {
 
 print "WGS84 ellipsoid values:\n";
 my $earth = Geo::Ellipsoid->new(
-  units => 'degrees', 
+  units => 'degrees',
   ellipsoid => 'WGS84'
 );
 if( $xdebug ) {
@@ -67,14 +67,14 @@ my @ord_28c = ( Angle(41,58,06,98), Angle(-87,53,30,02) );
 print_dist(@ord_orig,@ord_9l);
 print_dist(@ord_9l,@ord_27r);
 
-print_vector( 
+print_vector(
   32, 53, 45.42, -97, 2, 13.92,
   32, 52, 44.02, -97, 1, 48.29
 );
 
 print_dist(@dfw_arp,@ffc_orig);
 print_dist(@c1,@c1);
-    
+
 print_dist(@c2,@c2);
 print_dist(@c3,@c3);
 print_dist(@c4,@c4);
@@ -109,7 +109,7 @@ print_dist(@c5,@c7);
 
 print_dist(@c6,@c7);
 
-print_target( 
+print_target(
   32, 53, 45.42, -97, 2, 13.92,
   2005.3871, 160.5960
 );
@@ -131,7 +131,7 @@ sub print_latlon_scale
   my $deg = shift;
   print "print_latlon_scale($deg)\n" if $debug;
   my( $r_lat, $r_lon ) = $earth->scales($deg);
-  
+
   printf "| %8.4f | %12.4f | %12.4f |\n", $deg, $r_lat, $r_lon;
 }
 
@@ -162,7 +162,7 @@ sub print_vector
   print "(${lat1deg}d ${lat1min}m ${lat1sec})-(" .
     "${lon1deg}d ${lon1min}m ${lon1sec}) ";
   printf "[%.8f,%.8f] to\n", $lat1, $lon1;
-  print 
+  print
   "(${lat2deg}d ${lat2min}m ${lat2sec})-(${lon2deg}d ${lon2min}m ${lon2sec}) ";
   printf "[%.8f,%.8f]\n", $lat2, $lon2;
 
@@ -177,7 +177,7 @@ sub print_dist
 
   printf "Here   = [%.12f,%.12f]\n", $dlat1, $dlon1;
   printf "There  = [%.12f,%.12f]\n", $dlat2, $dlon2;
-  
+
   my @d = $ellipsoid->displacement( $lat1, $lon1, $lat2, $lon2 );
   my( $range, $bearing ) = $ellipsoid->to( $lat1, $lon1, $lat2, $lon2 );
   my @loc = $ellipsoid->location($lat1, $lon1, $range, $bearing);
@@ -192,8 +192,8 @@ sub print_dist
 
 sub print_target
 {
-  my( $lat1deg, $lat1min, $lat1sec, 
-      $lon1deg, $lon1min, $lon1sec, 
+  my( $lat1deg, $lat1min, $lat1sec,
+      $lon1deg, $lon1min, $lon1sec,
       $range, $degrees ) = @_;
 
   my $lat1 = Angle($lat1deg,$lat1min,$lat1sec);
@@ -227,12 +227,12 @@ sub print_all_ellipsoids
 sub print_ellipsoid_values
 {
   my( $ell ) = @_;
-  
+
   print "$ell ellipsoid values:\n";
   my $earth = Geo::Ellipsoid->new(
-    units => 'degrees', 
-    ellipsoid => 'WGS84', 
-    debug => $debug 
+    units => 'degrees',
+    ellipsoid => 'WGS84',
+    debug => $debug
   );
 
   printf "    Equatorial radius = %.10f\n", $earth->{equatorial};
@@ -250,7 +250,7 @@ sub Angle
   my $deg = shift || 0;
   my $min = shift || 0;
   my $sec = shift || 0;
-  my $csec = shift || 0;	# optional 100th's of a second
+  my $csec = shift || 0;        # optional 100th's of a second
 
   #print "convert (@_) to angle in radians\n" if $debug;
   my $frac = ( $min + (($sec + ($csec/100))/60))/60;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,13 +21,22 @@
 use 5.010;
 use strict;
 use warnings;
-use lib '/so/perl/number-fraction/number-fraction/lib/';
+# use lib '/so/perl/number-fraction/number-fraction/lib/';
+use lib '/so/perl/number-fraction/';
 use Number::Fraction;
-print Number::Fraction->VERSION,"\n";
+print "Number::Fraction version ",Number::Fraction->VERSION,"\n";
 
 # uncomment this to run the ### lines
 use Smart::Comments;
 
+{
+  # Number::Fraction 3.0.3 problem with plain scalar first compares
+  print 123 < Number::Fraction->new(123) ? "yes\n" : "no\n";
+  print Number::Fraction->new(123) < 123 ? "yes\n" : "no\n";
+  print 123 == Number::Fraction->new(123) ? "yes\n" : "no\n";
+  print Number::Fraction->new(123) == 123 ? "yes\n" : "no\n";
+  exit 0;
+}
 {
   my $x = Number::Fraction->new('4/3');
   my $y = Number::Fraction->new('2/1');

@@ -143,6 +143,7 @@ and then store the data into the config database.
 sub processData {
     my $self = shift;
     my $args = shift;
+    $self->args($args) if $args;
     my $form = $self->formCfgMap;
     my $formData = $args->{formData};
     # this is only to be sure ... data should be pre-validated

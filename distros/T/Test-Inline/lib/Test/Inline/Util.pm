@@ -6,10 +6,7 @@
 package Test::Inline::Util;
 use strict;
 use File::Spec::Functions ':ALL';
-use vars qw{$VERSION};
-BEGIN {
-$VERSION = '2.213';
-}
+our $VERSION = '2.214';
 sub shorten {
 my $class = ref $_[0] ? ref shift : shift;
 my $path = (defined $_[0] and length $_[0])

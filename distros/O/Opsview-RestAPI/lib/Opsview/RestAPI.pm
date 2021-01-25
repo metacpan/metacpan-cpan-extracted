@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Opsview::RestAPI;
-$Opsview::RestAPI::VERSION = '1.191660';
+$Opsview::RestAPI::VERSION = '1.210250';
 # ABSTRACT: Interact with the Opsview Rest API interface
 
 use version;
@@ -21,7 +21,7 @@ sub new {
     my $self = bless {%args}, $class;
 
     $self->{url} ||= 'http://localhost';
-    $self->{ssl_verify_hostname} //= 1;
+    $self->{ssl_verify_hostname} = defined $args{ssl_verify_hostname} ? $args{ssl_verify_hostname} : 1;
     $self->{username} ||= 'admin';
     $self->{password} ||= 'initial';
     $self->{debug} //= 0;
@@ -75,22 +75,63 @@ sub _parse_response_to_json {
 
     my $json_result = eval { $self->_json->decode($response); };
 
-    if (my $error = $@) {
-        my %exception = (
+    my %call_info = (
             type      => $self->{type},
             url       => $self->url,
             http_code => $code,
-            eval_error => $error,
             response  => $response,
+    );
+
+    if (my $error = $@) {
+        my %exception = (
+            eval_error => $error,
             message  => "Failed to read JSON in response from server ($response)",
         );
 
-        croak( Opsview::RestAPI::Exception->new(%exception) );
+        croak( Opsview::RestAPI::Exception->new(%call_info, %exception) );
     }
 
     $self->_log( 2, "result: ", pp($json_result) );
 
+    if ( $json_result->{message}) {
+        croak( Opsview::RestAPI::Exception->new(
+            %call_info,
+            response => $response,
+            message => $json_result->{message},
+        ));
+    }
+
     return $json_result;
+}
+
+sub _generate_url {
+    my ( $self, %args ) = @_;
+
+    $args{api} =~ s!^/rest/!!;    # tidy any 'ref' URL we may have been given
+
+    my $url = "/rest" . ( $args{api} ? '/' . $args{api} : '' );
+
+    my @param_list;
+
+    for my $param ( sort keys( %{ $args{params} } ) ) {
+        if ( ! defined $args{params}{$param} ) {
+          croak( Opsview::RestAPI::Exception->new( message => "Parameter '$param' is not valid" ) );
+        } elsif ( ! ref($args{params}{$param}) ) {
+            push(@param_list, $param . '=' . uri_encode( $args{params}{$param} ) );
+        } elsif (ref($args{params}{$param}) eq "ARRAY" ) {
+            for my $arg ( @{ $args{params}{$param} }) {
+                push(@param_list, $param . '=' . uri_encode( $arg ) );
+            }
+        } else {
+            croak( Opsview::RestAPI::Exception->new( message => "Parameter '$param' is not an accepted type: " . ref( $args{params}{$param} ) ) );
+        }
+    }
+
+    my $params = join( '&', @param_list);
+
+    $url .= '?' . $params if $params;
+
+    return $url;
 }
 
 sub _query {
@@ -105,26 +146,9 @@ sub _query {
         || $args{api} =~ m/login/ );
 
     $self->{type} = $args{type};
-    $args{api} =~ s!^/rest/!!;    # tidy any 'ref' URL we may have been given
-    my $url = "/rest/" . ( $args{api} || '' );
 
-    my @param_list;
+    my $url = $self->_generate_url( %args );
 
-    for my $param ( keys( %{ $args{params} } ) ) {
-        if ( ! ref($args{params}{$param}) ) {
-            push(@param_list, $param . '=' . uri_encode( $args{params}{$param} ) );
-        } elsif (ref($args{params}{$param}) eq "ARRAY" ) {
-            for my $arg ( @{ $args{params}{$param} }) {
-                push(@param_list, $param . '=' . uri_encode( $arg ) );
-            }
-        } else {
-            croak( Opsview::RestAPI::Exception->new( message => "Parameter '$param' is not an accepted type: " . ref( $args{params}{$param} ) ) );
-        }
-    }
-
-    my $params = join( '&', @param_list);
-
-    $url .= '?' . $params;
     my $data = $args{data} ? $self->_json->encode( $args{data} ) : undef;
 
     $self->_log( 2, "TYPE: $self->{type} URL: $url DATA: ",
@@ -471,7 +495,7 @@ Opsview::RestAPI - Interact with the Opsview Rest API interface
 
 =head1 VERSION
 
-version 1.191660
+version 1.210250
 
 =head1 SYNOPSIS
 

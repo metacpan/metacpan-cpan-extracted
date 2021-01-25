@@ -1,0 +1,50 @@
+NAME
+    UUID::Random::PERLANCAR - Another implementation of UUID::Random
+
+VERSION
+    This document describes version 0.003 of UUID::Random::PERLANCAR (from
+    Perl distribution UUID-Random-PERLANCAR), released on 2021-01-18.
+
+SYNOPSIS
+    Use like you would UUID::Random:
+
+     use UUID::Random::PERLANCAR;
+     say UUID::Random::PERLANCAR::generate();
+
+DESCRIPTION
+    Note that this module does not produce RFC 4122-compliant v4 (random)
+    UUIDs (no encoding of variant and version information into the UUID).
+
+FUNCTIONS
+  generate
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/UUID-Random-PERLANCAR>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-UUID-Random-PERLANCAR>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-UUID-Random-PERLANCAR/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    UUID::Random
+
+    Benchmark in Acme::CPANModules::UUID
+
+    Crypt::Misc
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

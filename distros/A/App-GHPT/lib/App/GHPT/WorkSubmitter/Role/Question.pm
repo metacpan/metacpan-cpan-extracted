@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter::Role::Question;
 
 use App::GHPT::Wrapper::OurMoose::Role;
 
-our $VERSION = '1.000012';
+our $VERSION = '1.001000';
 
 use Term::CallEditor qw( solicit );
 use Term::Choose qw( choose );
@@ -21,7 +21,10 @@ sub ask_question ( $self, $question, @responses ) {
             @responses,
             'Launch Editor'
         ],
-        { prompt => $question }
+        {
+            prompt       => $question,
+            clear_screen => $ENV{'SUBMIT_WORK_CLEAR'} // 0
+        }
     ) or exit;    # user hit 'q' or ctrl-d to stop
 
     return $self->format_qa_markdown( $question, $choice )
@@ -77,7 +80,7 @@ App::GHPT::WorkSubmitter::Role::Question - Role for writing interactive question
 
 =head1 VERSION
 
-version 1.000012
+version 1.001000
 
 =head1 SYNOPSIS
 
@@ -150,7 +153,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by MaxMind, Inc.
+This software is Copyright (c) 2021 by MaxMind, Inc.
 
 This is free software, licensed under:
 

@@ -25,10 +25,17 @@ a Cypher query that returns nodes from a Neo4j database.
 Their properties and metadata can be accessed as shown in the
 synopsis above.
 
+This package inherits from [Neo4j::Types::Node](https://metacpan.org/pod/Neo4j/Types/Node.md), which
+offers an object-oriented interface to the node's
+properties and metadata. This is entirely optional to use.
+
 If a query returns the same node twice, two separate
 [Neo4j::Bolt::Node](/lib/Neo4j/Bolt/Node.md) instances will be created.
 
 # METHODS
+
+This package inherits all methods from [Neo4j::Types::Node](https://metacpan.org/pod/Neo4j/Types/Node.md).
+The following additional method is provided:
 
 - as\_simple()
 
@@ -46,7 +53,7 @@ If a query returns the same node twice, two separate
 
 # SEE ALSO
 
-[Neo4j::Bolt](/lib/Neo4j/Bolt.md)
+[Neo4j::Bolt](/lib/Neo4j/Bolt.md), [Neo4j::Types::Node](https://metacpan.org/pod/Neo4j/Types/Node.md)
 
 # AUTHOR
 
@@ -55,7 +62,7 @@ If a query returns the same node twice, two separate
 
 # LICENSE
 
-This software is Copyright (c) 2019-2020 by Arne Johannessen.
+This software is Copyright (c) 2019-2021 by Arne Johannessen.
 
 This is free software, licensed under:
 

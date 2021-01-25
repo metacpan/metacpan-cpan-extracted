@@ -1,5 +1,10 @@
 Revision history for Perl extension SNMP::Trapinfo
 
+1.06 2021-01-25
+    Added parsing of multiline traps, where lines are quoted using "
+    Added 'eval { ... }' to enable some calculations
+      Example: $result = $cp->expand( 'eval { sprintf("%.2f", ${V6} / ${V9} ) }');
+
 1.05 2018-12-10
     Set license to perl_5 (Mohammad S Anwar)
 

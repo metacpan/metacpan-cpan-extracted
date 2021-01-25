@@ -1,5 +1,9 @@
 Revision history for Perl module Business::ISBN
 
+3.006 2021-01-19T14:44:51Z
+	* freshen distro, dump Travis CI, add Github Actions
+	* New Business::ISBN::Data is on the way too
+
 3.005 2019-12-11T20:27:13Z
 	* Peter Williams fixed a big problem with ISBN-13 (GitHub #12)
 	* You'll need to update Business::ISBN::Data too because Peter

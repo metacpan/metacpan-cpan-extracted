@@ -16,6 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "IO::Socket::SSL" : "1.42",
             "Module::Build" : "0.28"
          }
       },
@@ -45,7 +46,7 @@
          "web" : "https://github.com/mbarbon/alien-upb"
       }
    },
-   "version" : "0.13",
+   "version" : "0.15",
    "x_generated_by_perl" : "v5.24.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }

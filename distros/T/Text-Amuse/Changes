@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.71 2021-01-23
+
+ - EXPERIMENTAL feature: table specification with widths
+
 1.70 2020-10-14
 
  - EXPERIMENTAL feature: support image rotation via a90|a180|a270

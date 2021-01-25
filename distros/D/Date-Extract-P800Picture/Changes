@@ -1,5 +1,8 @@
 Revision history for Perl extension Date::Extract::P800Picture.
 
+v1.1.6 Mon Jan 25 10:08:14 UTC 2021
+    - fix: bugtracker meta
+
 v1.1.5 Thu Jan 14 14:42:25 UTC 2021
     - docs: bugtracker migration, P9XX compatibility and web implementation
 

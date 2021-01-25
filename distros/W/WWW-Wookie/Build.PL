@@ -6,7 +6,6 @@ Module::Build->new(
     license     => 'perl',
     dist_author => 'Roland van Ipenburg <roland@rolandvanipenburg.com>',
     requires    => {
-        'perl'                         => '5.20.0',
         'Exception::Class'             => 0,
         'HTTP::Headers'                => 0,
         'HTTP::Request'                => 0,
@@ -23,9 +22,13 @@ Module::Build->new(
         'XML::Simple'                  => 0,
         'namespace::autoclean'         => 0,
         'overload'                     => 0,
+        'perl'                         => '5.20.0',
+        'strict'                       => 0,
+        'utf8'                         => 0,
+        'warnings'                     => 0,
     },
     configure_requires => { 'Module::Build' => 0.40, },
-    build_requires     => {},
+    build_requires     => { 'Module::Build' => 0.40, },
     test_requires      => {
         'Test::More'       => 0.81,
         'Test::NoWarnings' => 0.81,
@@ -55,10 +58,8 @@ Module::Build->new(
     meta_merge   => {
         resources => {
             repository => 'https://bitbucket.org/rolandvanipenburg/www-wookie',
-            bugtracker => {
-                web =>
-                  'https://bitbucket.org/rolandvanipenburg/www-wookie/issues',
-            },
+            bugtracker =>
+              'https://bitbucket.org/rolandvanipenburg/www-wookie/issues',
         },
     },
 )->create_build_script;

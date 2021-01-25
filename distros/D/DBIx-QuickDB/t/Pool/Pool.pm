@@ -46,7 +46,7 @@ can_ok(
 is(QDB_POOL()->library, __PACKAGE__, "Set the library");
 
 driver $driver => (
-    driver_args => { $caller->can('DBD_DRIVER') ? (dbd_driver => $caller->DBD_DRIVER) : () },
+    driver_args => { $caller && $caller->can('DBD_DRIVER') ? (dbd_driver => $caller->DBD_DRIVER) : () },
     build => sub {
         my $class = shift;
         my ($db) = @_;
@@ -79,7 +79,10 @@ QDB_POOL->clear_old_cache(500);
 ok(-d $ddb->dir, "Did not Delete the directory when expiring cache");
 alter_cloned($ddb, -1000);
 QDB_POOL->clear_old_cache(500);
-ok(!-d $ddb->dir, "Deleted the directory when expiring cache");
+my $dir = $ddb->dir;
+ok(!-d $dir, "Deleted the directory when expiring cache");
+ok(!-e "$dir.READY", "Deleted the READY file when expiring cache");
+ok(!-e "$dir.lock", "Deleted the lock when expiring cache");
 
 $base = db($driver);
 my $stamp = check_cloned(QDB_POOL->{databases}->{$driver}->{db});

@@ -1,28 +1,29 @@
---- #YAML:1.0
-name:               Business-UPS
-version:            2.01
-abstract:           A UPS Interface Module
+---
+abstract: 'A UPS Interface Module'
 author:
-    - Justin Wheeler <upsmodule@datademons.com>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Justin Wheeler <upsmodule@datademons.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-    Test::More:           0
-requires:
-    LWP::UserAgent:  0
-    Test::More:      0
-resources:
-    homepage:    http://wiki.github.com/toddr/business-ups
-    license:     http://dev.perl.org/licenses/
-    repository:  http://github.com/toddr/business-ups/tree/master
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-UPS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LWP::UserAgent: '0'
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/toddr/Business-UPS/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/toddr/Business-UPS
+version: '2.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

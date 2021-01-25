@@ -20,8 +20,8 @@ my $builder = Module::Build->new(
         'perl'             => '5.10.0',
         'List::MoreUtils'  => '0.420_001',
         'Scalar::Util'     => '1.39',
-        'Net::IPAM::IP'    => '1.23',
-        'Net::IPAM::Block' => '1.16',
+        'Net::IPAM::IP'    => '2.00',
+        'Net::IPAM::Block' => '3.00',
     },
     add_to_cleanup => ['Net-IPAM-Tree-*'],
 );

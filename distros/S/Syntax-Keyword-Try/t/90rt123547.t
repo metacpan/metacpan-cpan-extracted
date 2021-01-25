@@ -29,7 +29,7 @@ my @threads = map {
          $x = "a";
          die "oops";
       }
-      catch {
+      catch ($e) {
          $x .= "b";
       }
       finally {

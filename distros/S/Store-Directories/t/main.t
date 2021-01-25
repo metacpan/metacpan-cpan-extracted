@@ -4,7 +4,7 @@ use warnings;
 use Config;
 use Cwd qw(abs_path);
 use Time::HiRes qw(sleep);
-use Test::More  tests => 432;
+use Test::More  tests => 435;
 use Test::Cmd;
 
 use DBI;
@@ -93,14 +93,38 @@ for my $testkey (@testkeys) {
 
 # Test high-level methods
 # (7 tests)
-my $testdir = $store->get_or_add('foo');
-$store->run_in_dir('foo', \&init_dir);
+$store->run_in_dir('foo', \&increment_file_in_dir, \&init_dir);
 my $val = $store->get_in_dir('foo', \&read_file_in_dir);
-is($val, 0, "run_in_dir and get_in_dir work");
+is($val, 1, "run_in_dir and get_in_dir work");
 
-fork_workers(5, \&do_get_or_set_entry, 'foo', 3);
-$val = $store->get_in_dir('foo', \&read_file_in_dir);
+fork_workers(5, \&do_get_or_set_entry, 'bar', 3);
+$val = $store->get_in_dir('bar', \&read_file_in_dir);
 is($val, 3, "get_or_set works");
+
+# Test bail-out settings
+# (3 tests)
+$Store::Directories::Lock::wait_time = 0.5;
+$Store::Directories::Lock::wait_callback = sub {
+    ok(1, "wait_callback runs");
+    return 0;
+};
+
+my $pid = fork;
+die "unable to fork: $!" unless defined $pid;
+
+if ($pid == 0) {
+    # Child: Get a shared lock and wait
+    $testenv->preserve;
+    my $start = time;
+    my $lock = $store->lock_sh('foo');
+    while (time - $start < 3) { 1; }
+    exit 0;
+}
+sleep 1;
+my $ex = $store->lock_ex('foo', 1);
+ok( !(defined $ex), "Exclusive lock should be undef" );
+$ex = $store->lock_ex('foo');
+ok( !(defined $ex), "Exclusive lock should be undef" );
 
 #
 # Helper Functions
@@ -212,7 +236,9 @@ sub do_get_or_set_entry {
             return undef if $val < $max;
         },
         # SET
-        \&increment_file_in_dir
+        \&increment_file_in_dir,
+        # INIT
+        \&init_dir
     );
 }
 

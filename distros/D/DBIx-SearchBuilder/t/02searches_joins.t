@@ -336,7 +336,7 @@ CREATE TEMPORARY TABLE UsersToGroups (
     GroupId integer
 ) },
 q{
-CREATE TEMPORARY TABLE Groups (
+CREATE TEMPORARY TABLE `Groups` (
     id integer primary key AUTO_INCREMENT,
     Name varchar(36)
 ) },

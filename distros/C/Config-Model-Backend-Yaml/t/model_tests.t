@@ -1,10 +1,11 @@
 # -*- cperl -*-
 use warnings;
-
 use strict;
 
-use Config::Model::Tester 3.006;
-use ExtUtils::testlib;
+use Config::Model::Tester 4.001;
+
+use lib 't/lib';
+use SneakyObject;
 
 $::_use_log4perl_to_warn = 1;
 

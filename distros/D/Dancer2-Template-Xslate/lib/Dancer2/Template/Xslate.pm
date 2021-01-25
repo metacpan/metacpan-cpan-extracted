@@ -12,7 +12,7 @@ use Dancer2::Core::Types qw(InstanceOf);
 use Text::Xslate;
 use File::Spec::Functions qw(abs2rel file_name_is_absolute);
 
-our $VERSION = 'v0.1.1'; # VERSION
+our $VERSION = 'v0.1.2'; # VERSION
 # ABSTRACT: Text::Xslate template engine for Dancer2
 
 with 'Dancer2::Core::Role::Template';
@@ -62,6 +62,8 @@ sub render {
 }
 
 1;
+
+
 =encoding utf8
 
 =head1 NAME
@@ -73,15 +75,12 @@ Dancer2::Template::Xslate - Text::Xslate template engine for Dancer2
 C<config.yaml>:
 
     template: Xslate
-    engines:
-      template:
-        Xslate: { path: "views" }
 
 A Dancer 2 application:
 
     use Dancer2;
 
-    get /page/:number => sub {
+    get '/page/:number' => sub {
         my $page_num = params->{number};
         template "foo.tx", { page_num => $page_num };
     };

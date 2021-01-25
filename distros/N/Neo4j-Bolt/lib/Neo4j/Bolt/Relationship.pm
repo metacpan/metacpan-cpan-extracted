@@ -1,10 +1,12 @@
 package Neo4j::Bolt::Relationship;
 # ABSTRACT: Representation of Neo4j Relationship
 
-$Neo4j::Bolt::Relationship::VERSION = '0.40';
+$Neo4j::Bolt::Relationship::VERSION = '0.4201';
 
 use strict;
 use warnings;
+
+use parent 'Neo4j::Types::Relationship';
 
 sub as_simple {
   my ($self) = @_;
@@ -49,10 +51,17 @@ a Cypher query that returns relationships from a Neo4j database.
 Their properties and metadata can be accessed as shown in the
 synopsis above.
 
+This package inherits from L<Neo4j::Types::Relationship>, which
+offers an object-oriented interface to the relationship's
+properties and metadata. This is entirely optional to use.
+
 If a query returns the same relationship twice, two separate
 L<Neo4j::Bolt::Relationship> instances will be created.
 
 =head1 METHODS
+
+This package inherits all methods from L<Neo4j::Types::Relationship>.
+The following additional method is provided:
 
 =over
 
@@ -76,7 +85,7 @@ or C<_end> will be replaced with the relationship's metadata.
 
 =head1 SEE ALSO
 
-L<Neo4j::Bolt>
+L<Neo4j::Bolt>, L<Neo4j::Types::Relationship>
 
 =head1 AUTHOR
 
@@ -85,7 +94,7 @@ L<Neo4j::Bolt>
 
 =head1 LICENSE
 
-This software is Copyright (c) 2020 by Arne Johannessen
+This software is Copyright (c) 2020-2021 by Arne Johannessen
 
 This is free software, licensed under:
 

@@ -4,13 +4,13 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Module-Extract-Namespaces",
    "no_index" : {
@@ -35,13 +35,13 @@
       },
       "runtime" : {
          "requires" : {
-            "PPI" : "1.126",
+            "PPI" : "1.270",
             "perl" : "5.008"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94"
+            "Test::More" : "1"
          }
       }
    },
@@ -57,6 +57,6 @@
          "web" : "https://github.com/briandfoy/module-extract-namespaces"
       }
    },
-   "version" : "1.021",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.022",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

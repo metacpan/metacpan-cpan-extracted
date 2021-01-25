@@ -35,11 +35,14 @@
    "provides" : {
       "Tie::Hash::Regex" : {
          "file" : "lib/Tie/Hash/Regex.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/tie-hash-regex/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -49,6 +52,6 @@
          "web" : "https://github.com/davorg/tie-hash-regex"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

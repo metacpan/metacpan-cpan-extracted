@@ -1,9 +1,9 @@
 ChangeLog
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 Pty.pm
-README.md
+README
 t/pty_get_winsize.t
 t/test.t
 try

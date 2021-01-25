@@ -9,8 +9,11 @@ use Test::Fatal;
 use IO::Async::OS;
 
 use Socket qw(
-   AF_INET AF_INET6 AF_UNIX SOCK_STREAM SOCK_DGRAM SO_TYPE
-   pack_sockaddr_in pack_sockaddr_in6 pack_sockaddr_un inet_aton inet_pton
+   SOCK_STREAM SOCK_DGRAM SO_TYPE
+   AF_INET  pack_sockaddr_in  unpack_sockaddr_in
+   AF_INET6 pack_sockaddr_in6 unpack_sockaddr_in6
+   AF_UNIX  pack_sockaddr_un  unpack_sockaddr_un
+   inet_aton inet_pton inet_ntoa inet_ntop
    INADDR_ANY
 );
 
@@ -135,6 +138,18 @@ is( IO::Async::OS->getsocktypebyname( SOCK_STREAM ), SOCK_STREAM, 'getsocktypeby
                      family  => "inet",
                      host    => "foobar.com",
                    } ) }, 'extract_addrinfo for inet complains about unrecognised key' );
+
+   # ->make_addr_for_peer should rewrite 0.0.0.0 to 127.0.0.1
+   my ( $port, $host ) = unpack_sockaddr_in(
+      IO::Async::OS->make_addr_for_peer( AF_INET, pack_sockaddr_in( 567, inet_aton( "0.0.0.0" ) ) )
+   );
+   is( $port,              567,         'make_addr_for_peer preserves AF_INET port' );
+   is( inet_ntoa( $host ), "127.0.0.1", 'make_addr_for_peer rewrites INADDR_ANY to _LOCALHOST' );
+
+   ( undef, $host ) = unpack_sockaddr_in(
+      IO::Async::OS->make_addr_for_peer( AF_INET, pack_sockaddr_in( 567, inet_aton( "1.2.3.4" ) ) )
+   );
+   is( inet_ntoa( $host ), "1.2.3.4",   'make_addr_for_peer preserves AF_INET other host' );
 }
 
 SKIP: {
@@ -149,6 +164,18 @@ SKIP: {
                 } ) ],
               [ AF_INET6, SOCK_STREAM, 0, $sin6addr ],
               'extract_addrinfo( HASH ) with inet6, ip+port' );
+
+   # ->make_addr_for_peer should rewrite :: to ::1
+   my ( $port, $host ) = unpack_sockaddr_in6(
+      IO::Async::OS->make_addr_for_peer( AF_INET6, pack_sockaddr_in6( 567, inet_pton( AF_INET6, "::" ) ) )
+   );
+   is( $port,                        567,   'make_addr_for_peer preserves AF_INET6 port' );
+   is( inet_ntop( AF_INET6, $host ), "::1", 'make_addr_for_peer rewrites IN6ADDR_ANY to _LOCALHOST' );
+
+   ( undef, $host ) = unpack_sockaddr_in6(
+      IO::Async::OS->make_addr_for_peer( AF_INET6, pack_sockaddr_in6( 567, inet_pton( AF_INET6, "fe80::1234" ) ) )
+   );
+   is( inet_ntop( AF_INET6, $host ), "fe80::1234",   'make_addr_for_peer preserves AF_INET6 other host' );
 }
 
 SKIP: {
@@ -162,6 +189,12 @@ SKIP: {
                 } ) ],
               [ AF_UNIX, SOCK_STREAM, 0, $sunaddr ],
               'extract_addrinfo( HASH ) with unix, path' );
+
+   # ->make_addr_for_peer should leave address undisturbed
+   my ( $path ) = unpack_sockaddr_un(
+      IO::Async::OS->make_addr_for_peer( AF_UNIX, pack_sockaddr_un( "/tmp/mysock" ) )
+   );
+   is( $path, "/tmp/mysock", 'make_addr_for_peer preserves AF_UNIX path' );
 }
 
 ok( exception { IO::Async::OS->extract_addrinfo( { family => "hohum" } ) },

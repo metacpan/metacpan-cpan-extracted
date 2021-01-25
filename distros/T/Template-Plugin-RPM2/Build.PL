@@ -27,6 +27,9 @@ my $builder = Module::Build->new(
                 url  => 'git://github.com/davorg/template-plugin-rpm2.git',
                 web  => 'https://github.com/davorg/template-plugin-rpm2',
             },
+            bugtracker => {
+                web  => 'https://github.com/davorg/template-plugin-rpm2/issues',
+            },
         },
     },
 );

@@ -4,10 +4,10 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 use Exporter;
-our @EXPORT = qw< cwd path file >;
+our @EXPORT = qw< cwd path file tempfile >;			# dir() handled by `import`
 
 sub import
 {
@@ -61,13 +61,15 @@ sub child { path(shift->[0], @_) }
 
 
 # essentially just reblessings
-sub parent		{ path( &Path::Tiny::parent   )          }
-sub realpath	{ path( &Path::Tiny::realpath )          }
-sub copy_to		{ path( &Path::Tiny::copy     )          }
-sub children	{ map { path($_) } &Path::Tiny::children }
+sub parent		{ path( &Path::Tiny::parent   )            }
+sub realpath	{ path( &Path::Tiny::realpath )            }
+sub copy_to		{ path( &Path::Tiny::copy     )            }
+sub children	{ map { path($_) } &Path::Tiny::children   }
+sub tempfile    { bless &Path::Tiny::tempfile, __PACKAGE__ }
 
 # simple correspondences
 *dir		=	\&parent;
+*dirname	=	\&parent;
 *subdir		=	\&child;
 *rmtree		=	\&Path::Tiny::remove_tree;
 
@@ -211,7 +213,7 @@ Path::Class::Tiny - a Path::Tiny wrapper for Path::Class compatibility
 
 =head1 VERSION
 
-This document describes version 0.04 of Path::Class::Tiny.
+This document describes version 0.05 of Path::Class::Tiny.
 
 =head1 SYNOPSIS
 
@@ -308,9 +310,6 @@ should work for most common cases, and, if it doesn't, patches are welcome.
 
 Performance of Path::Class::Tiny should be comparable to Path::Tiny.  Again, if it's not, please let
 me know.
-
-The POD is somewhat impoverished at the moment.  Hopefully that will improve over time.  Again,
-patches welcomed.
 
 =head1 PATH::CLASS STYLE METHODS
 
@@ -459,7 +458,37 @@ file-as-it-was, which could be considered less useful.  But at least it doesn't 
 so it's got that going for it.  If you actually I<want> the object to be mutated, try L</move_to>
 instead.
 
+=head2 tempfile
+
+Basically works just like L<Path::Tiny/tempfile>, except it:
+
+=over
+
+=item *
+
+is exported whether you like it or not.
+
+=item *
+
+can't be called as a class method, only a global function.
+
+=item *
+
+returns a Path::Class::Tiny instead of a Path::Tiny (obviously).
+
+=back
+
+Other than that, it retains all the coolness of C<Path::Tiny::tempfile>, including the normalization
+of arguments, the handling of template as either named or positional argument, and the addition of
+C<< TMPDIR => 1 >> as a default (which you can override).
+
 =head1 NEW METHODS
+
+=head2 dirname
+
+Since C<dirname> in Path::Tiny is stupid, and C<dirname> in Path::Class doesn't even exist,
+C<dirname> in Path::Class::Tiny is just an alias for C<parent>, on the grounds that that's almost
+certainly what you wanted anyway.
 
 =head2 ef
 
@@ -533,7 +562,7 @@ via TDD (Test-Driven Development), so a patch that includes a failing test is mu
 likely to get accepted (or at least likely to get accepted more quickly).
 
 If you just want to report a problem or suggest a feature, that's okay too.  You can create
-an issue on GitHub here: L<http://github.com/barefootcoder/path-class-tiny/issues>.
+an issue on GitHub here: L<https://github.com/barefootcoder/path-class-tiny/issues>.
 
 =head2 Source Code
 
@@ -548,7 +577,7 @@ Buddy Burden <barefootcoder@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Buddy Burden.
+This software is Copyright (c) 2021 by Buddy Burden.
 
 This is free software, licensed under:
 

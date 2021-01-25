@@ -35,8 +35,6 @@
 # On Stern-Brocot tree.
 
 # cf A054429 permutation reverse within binary row
-#    A065249 - permutation SB X -> X/2
-#    A065250 - permutation SB X -> 2X
 #    A057114 - permutation SB X -> X+1
 #    A057115 - permutation SB X -> X-1
 #
@@ -145,7 +143,7 @@ use Carp 'croak';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 128;
+$VERSION = 129;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -1579,6 +1577,8 @@ L<http://oeis.org/A007305> (etc)
       A007306   X+Y sum, Farey 0 to 1 part (extra 1,1)
       A153036   int(X/Y), integer part
       A088696   length of continued fraction SB left half (X/Y<1)
+      A153778   X mod 2
+      A004755   N of frac+1, so X+Y,Y 
 
     tree_type=CW
       A002487   X and Y, Stern diatomic sequence (extra 0)

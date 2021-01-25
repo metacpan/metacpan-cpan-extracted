@@ -5,11 +5,11 @@ use warnings;
 use utf8;
 use feature ':5.10';
 
-use XML::Simple qw( :strict );
+use XML::Hash::XS;
 
 use overload q|""| => 'raw', fallback => 1;
 
-our $VERSION = '0.101';
+our $VERSION = '0.200';
 
 sub new {
 
@@ -19,13 +19,7 @@ sub new {
     my $arguments = $args{'arguments'};
 
     my $request = { $command => $arguments };
-    my $raw     = XMLout(
-        $request,
-        NoEscape      => 0,
-        SuppressEmpty => 1,
-        KeepRoot      => 1,
-        KeyAttr       => $command
-    );
+    my $raw     = hash2xml( \%{$arguments}, root => $command, use_attr => 1, xml_decl => 0 );
 
     chomp($raw);
 

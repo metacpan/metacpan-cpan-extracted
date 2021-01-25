@@ -1,0 +1,8 @@
+lib/Pod/Modifier.pm
+lib/Pod/SectionToAdd.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

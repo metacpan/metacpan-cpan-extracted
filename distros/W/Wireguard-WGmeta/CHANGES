@@ -1,0 +1,46 @@
+0.1.2 2021-01-22 Tobias Bossert (tobib at cpan.org)
+- fix: Required perl version in Makefile.PL
+- changed: doc upgrades and fixes
+
+0.1.1 2021-01-21 Tobias Bossert (tobib at cpan.org)
+- Small QoL-changes (dist)
+
+0.1.0 2021-01-21 Tobias Bossert (tobib at cpan.org)
+- added: more doc
+- fix: set min version everywhere to v5.20
+
+0.0.6 2021-01-20 Tobias Bossert (tobib at cpan.org)
+- added: permission check (CLI)
+- added: Pretty errors and warnings (CLI)
+- changed: Refactored to Wireguard::WGmeta namespace
+- added: Interface state to show output (CLI)
+- added: methods to remove peers and interfaces (API)
+- cpan release
+
+0.0.5 2020-12-31 Tobias Bossert (tobib at cpan.org)
+
+- fix: Allow non wireguard .conf files in $WIREGUARD_HOME
+- changed: Added interface public key to the show command
+
+0.0.4 2020-12-20 Tobias Bossert (tobib at cpan.org)
+
+- added: add peer functionality to cli
+- fix: Makefile version updates
+
+0.0.3 2020-12-20 Tobias Bossert (tobib at cpan.org)
+
+- added: Makefile for .deb package
+- fix: apply command
+- added: support for custom wg-meta attributes
+- added: foundation for validating attribute values
+- changed: show output (cleanup)
+
+0.0.2 2020-12-20 Tobias Bossert (tobib at cpan.org)
+
+- fix: Alias must be unique
+- change: prettified wg-meta show output
+
+
+0.0.1 2020-12-20  Tobias Bossert (tobib at cpan.org)
+
+- initial release

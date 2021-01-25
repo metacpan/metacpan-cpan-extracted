@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Hyde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Hyde
 #
 # This file is shared by a couple of distributions.
 #
@@ -1329,7 +1329,7 @@ HERE
   close $h or die;
 
   print scalar(@graphs)," graphs\n";
-  print "mozilla file://$html_filename >/dev/null 2>&1 &\n";
+  print "iceweasel file://$html_filename >/dev/null 2>&1 &\n";
 }
 
 # blank out all labels of a Graph::Easy
@@ -1532,7 +1532,7 @@ $num_vertices vertices, $num_edges edges, size $upsize bytes
 HERE
   close $h or die;
 
-  print "mozilla file://$html_filename >/dev/null 2>&1 &\n";
+  print "iceweasel file://$html_filename >/dev/null 2>&1 &\n";
 }
 
 # Return true of all arguments are different, as compared by "eq".
@@ -3009,6 +3009,8 @@ sub Graph_rename_vertex {
   }
 
   $graph->add_vertex($new_name);
+  $graph->set_vertex_attributes($new_name,
+                                $graph->get_vertex_attributes($old_name));
   foreach my $edge ($graph->edges_at($old_name)) {
     my ($from,$to) = @$edge;
     if ($from eq $old_name) { $from = $new_name; }
@@ -3501,6 +3503,65 @@ sub Graph_indnum_and_count {
 
 
 #------------------------------------------------------------------------------
+# Domination Number
+
+# Cockayne, Goodman, Hedetniemi, "A Linear Algorithm for the Domination
+# Number of a Tree", Information Processing Letters, volume 4, number 2,
+# November 1975, pages 41-44.
+
+# $graph is a Graph.pm undirected tree or forest.
+# Return its domination number.
+#
+sub Graph_tree_domnum {
+  my ($graph) = @_;
+  ### Graph_tree_domnum: "num_vertices ".scalar($graph->vertices)
+  $graph->expect_acyclic;
+
+  $graph = $graph->copy;
+  my $domnum = 0;
+  my %mtype = map {$_=>'bound'} $graph->vertices;
+ OUTER: while ($graph->vertices) {
+    foreach my $v ($graph->vertices) {
+      my $degree = $graph->vertex_degree($v);
+      next unless $degree <= 1;
+      ### consider: $v
+      ### $degree
+
+      my ($u) = $graph->neighbours($v);
+      if ($mtype{$v} eq 'free') {
+        ### free, delete ...
+
+      } elsif ($mtype{$v} eq 'bound') {
+        ### bound ...
+        if (defined $u) {
+          ### set neighbour $u required ...
+          $mtype{$u} = 'required';
+        } else {
+          ### no neighbour, domnum++ ...
+          $domnum++;
+        }
+
+      } elsif ($mtype{$v} eq 'required') {
+        ### required, domnum++ ...
+        $domnum++;
+        if (defined $u && $mtype{$u} eq 'bound') {
+          ### set neighbour $u free ...
+          $mtype{$u} = 'free';
+        }
+      } else {
+        die;
+      }
+      delete $mtype{$v};
+      $graph->delete_vertex($v);
+      next OUTER;
+    }
+    die "oops, not a tree";
+  }
+  return $domnum;
+}
+
+
+#------------------------------------------------------------------------------
 # Dominating Sets Count
 
 # with(n)   = prod(child any)     # sets including parent
@@ -3737,7 +3798,7 @@ sub tree_minimal_domsets_count_data_product_into {
 #
 sub Graph_is_domset {
   my ($graph, $aref) = @_;
-  my %vertices = map {$_=>1} $graph->vertices;
+  my %vertices; @vertices{$graph->vertices} = ();
   delete @vertices{@$aref,
                      map {$graph->neighbours($_)} @$aref};
   return keys(%vertices) == 0;
@@ -3782,17 +3843,41 @@ sub Graph_is_minimal_domset {
 #
 sub Graph_minimal_domsets_count_by_pred {
   my ($graph) = @_;
+  return Graph_sets_count_by_pred($graph, \&Graph_is_minimal_domset);
+}
+sub Graph_sets_count_by_pred {
+  my ($graph, $func) = @_;
   require Algorithm::ChooseSubsets;
   my $count = 0;
   my @vertices = sort $graph->vertices;
   my $it = Algorithm::ChooseSubsets->new(\@vertices);
   while (my $aref = $it->next) {
-    if (Graph_is_minimal_domset($graph,$aref)) {
+    if ($func->($graph,$aref)) {
       $count++;
     }
   }
   return $count;
 }
+sub Graph_sets_minimum_and_count_by_pred {
+  my ($graph, $func) = @_;
+  require Algorithm::ChooseSubsets;
+  my @count;
+  my $minsize = $graph->vertices;
+  my @vertices = sort $graph->vertices;
+  my $it = Algorithm::ChooseSubsets->new(\@vertices);
+  while (my $aref = $it->next) {
+    my $size = @$aref;
+    next if $size > $minsize;
+    if ($func->($graph,$aref)) {
+      $count[$size]++;
+      $minsize = min($minsize,$size);
+    }
+  }
+  return ($minsize, $count[$minsize]);
+}
+
+#------------------------------------------------------------------------------
+# Total Dominating Sets
 
 # $graph is a Graph.pm.
 # $aref is an arrayref of vertex names.
@@ -3803,68 +3888,9 @@ sub Graph_minimal_domsets_count_by_pred {
 #
 sub Graph_is_total_domset {
   my ($graph, $aref) = @_;
-  my %vertices = map {$_=>1} $graph->vertices;
+  my %vertices; @vertices{$graph->vertices} = ();
   delete @vertices{map {$graph->neighbours($_)} @$aref};
   return keys(%vertices) == 0;
-}
-
-
-#------------------------------------------------------------------------------
-# Domination Number
-
-# Cockayne, Goodman, Hedetniemi, "A Linear Algorithm for the Domination
-# Number of a Tree", Information Processing Letters, volume 4, number 2,
-# November 1975, pages 41-44.
-
-# $graph is a Graph.pm undirected tree or forest.
-# Return its domination number.
-#
-sub Graph_tree_domnum {
-  my ($graph) = @_;
-  ### Graph_tree_domnum: "num_vertices ".scalar($graph->vertices)
-  $graph->expect_acyclic;
-
-  $graph = $graph->copy;
-  my $domnum = 0;
-  my %mtype = map {$_=>'bound'} $graph->vertices;
- OUTER: while ($graph->vertices) {
-    foreach my $v ($graph->vertices) {
-      my $degree = $graph->vertex_degree($v);
-      next unless $degree <= 1;
-      ### consider: $v
-      ### $degree
-
-      my ($u) = $graph->neighbours($v);
-      if ($mtype{$v} eq 'free') {
-        ### free, delete ...
-
-      } elsif ($mtype{$v} eq 'bound') {
-        ### bound ...
-        if (defined $u) {
-          ### set neighbour $u required ...
-          $mtype{$u} = 'required';
-        } else {
-          ### no neighbour, domnum++ ...
-          $domnum++;
-        }
-
-      } elsif ($mtype{$v} eq 'required') {
-        ### required, domnum++ ...
-        $domnum++;
-        if (defined $u && $mtype{$u} eq 'bound') {
-          ### set neighbour $u free ...
-          $mtype{$u} = 'free';
-        }
-      } else {
-        die;
-      }
-      delete $mtype{$v};
-      $graph->delete_vertex($v);
-      next OUTER;
-    }
-    die "oops, not a tree";
-  }
-  return $domnum;
 }
 
 

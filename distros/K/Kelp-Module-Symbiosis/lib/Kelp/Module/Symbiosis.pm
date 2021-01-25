@@ -1,14 +1,17 @@
 package Kelp::Module::Symbiosis;
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use Kelp::Base qw(Kelp::Module);
 use Plack::App::URLMap;
 use Carp;
 use Scalar::Util qw(blessed refaddr);
+use Plack::Middleware::Conditional;
+use Plack::Util;
 
-attr "-mounted" => sub { {} };
-attr "-loaded" => sub { {} };
+attr -mounted => sub { {} };
+attr -loaded => sub { {} };
+attr reverse_proxy => 0;
 
 sub mount
 {
@@ -77,7 +80,20 @@ sub run
 		}
 	}
 
-	return $psgi_apps->to_app;
+	return $self->_reverse_proxy_wrap($psgi_apps->to_app);
+}
+
+sub _reverse_proxy_wrap
+{
+	my ($self, $app) = @_;
+	return $app unless $self->reverse_proxy;
+
+	my $mw_class = Plack::Util::load_class('ReverseProxy', 'Plack::Middleware');
+	return Plack::Middleware::Conditional->wrap(
+		$app,
+		condition => sub { !$_[0]{REMOTE_ADDR} || $_[0]{REMOTE_ADDR} =~ m{127\.0\.0\.1} },
+		builder => sub { $mw_class->wrap($_[0]) },
+	);
 }
 
 sub build
@@ -91,6 +107,10 @@ sub build
 
 	if ($args{mount} && (!exists $args{automount} || $args{automount})) {
 		$self->mount($args{mount}, $self->app);
+	}
+
+	if ($args{reverse_proxy}) {
+		$self->reverse_proxy(1);
 	}
 
 	$self->register(
@@ -268,6 +288,12 @@ I<new in 1.10>
 A path to mount the Kelp instance, which defaults to I<'/'>. Specify a string if you wish a to use different path. Specify an I<undef> or empty string to avoid mounting at all - you will have to run something like C<< $kelp->symbiosis->mount($mount_path, $kelp); >> in Kelp's I<build> method.
 
 Collides with now deprecated L</automount> - if you specify both, automount will control if the app will be mounted where the I<mount> points to.
+
+=head2 reverse_proxy
+
+I<new in 1.11>
+
+A boolean flag (I<1/0>) which enables reverse proxy for all the Plack apps at once. Requires L<Plack::Middleware::ReverseProxy> to be installed. This feature is experimental.
 
 =head1 CAVEATS
 

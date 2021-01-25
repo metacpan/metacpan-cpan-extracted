@@ -1,6 +1,6 @@
 package File::FormatIdentification::RandomSampling::Model;
 # ABSTRACT: methods to identify files using random sampling
-our $VERSION = '0.005'; # VERSION:
+our $VERSION = '0.006'; # VERSION:
 # (c) 2020 by Andreas Romeyke
 # licensed via GPL v3.0 or later
 use strict;
@@ -443,7 +443,7 @@ File::FormatIdentification::RandomSampling::Model - methods to identify files us
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

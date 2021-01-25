@@ -20,6 +20,7 @@ SKIP: {
         skip "ENV is not defined for driver '$d'", TESTS_PER_DRIVER;
     }
 
+    my $groups_table = ($d eq 'mysql') ? '`Groups`' : 'Groups';
     my $handle = get_handle( $d );
     connect_handle( $handle );
     isa_ok($handle->dbh, 'DBI::db');
@@ -50,7 +51,7 @@ diag "insert into table from two tables" if $ENV{'TEST_VERBOSE'};
 {
     my $res = $handle->InsertFromSelect(
         'UsersToGroups' => ['UserId', 'GroupId'],
-        'SELECT u.id as col1, g.id as col2 FROM Users u, Groups g WHERE u.Login LIKE ? AND g.Name = ?',
+        "SELECT u.id as col1, g.id as col2 FROM Users u, $groups_table g WHERE u.Login LIKE ? AND g.Name = ?",
         '%a%', 'Support'
     );
     is( $res, 2 );
@@ -113,7 +114,7 @@ diag "insert into table from two tables" if $ENV{'TEST_VERBOSE'};
         local $SIG{__WARN__} = sub {};
         $handle->InsertFromSelect(
             'UsersToGroups' => ['UserId', 'GroupId'],
-            'SELECT u.id, g.id FROM Users u, Groups g WHERE u.Login LIKE ? AND g.Name = ?',
+            "SELECT u.id, g.id FROM Users u, $groups_table g WHERE u.Login LIKE ? AND g.Name = ?",
             '%a%', 'Support'
         );
     };
@@ -172,7 +173,7 @@ CREATE TABLE UsersToGroups (
     GroupId integer
 ) },
 q{
-CREATE TEMPORARY TABLE Groups (
+CREATE TEMPORARY TABLE `Groups` (
     id integer primary key AUTO_INCREMENT,
     Name varchar(36)
 ) },

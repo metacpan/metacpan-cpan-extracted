@@ -98,7 +98,7 @@ cfi_learn_model.pl - methods to identify files using random sampling
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

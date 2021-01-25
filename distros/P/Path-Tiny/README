@@ -2,7 +2,7 @@ NAME
     Path::Tiny - File path utility
 
 VERSION
-    version 0.114
+    version 0.116
 
 SYNOPSIS
       use Path::Tiny;
@@ -1036,20 +1036,6 @@ SEE ALSO
     This module was featured in the 2013 Perl Advent Calendar
     <http://www.perladvent.org/2013/2013-12-18.html>.
 
-SUPPORT
-  Bugs / Feature Requests
-    Please report any bugs or feature requests through the issue tracker at
-    <https://github.com/dagolden/Path-Tiny/issues>. You will be notified
-    automatically of any progress on your issue.
-
-  Source Code
-    This is open source software. The code repository is available for
-    public review and contribution under the terms of the license.
-
-    <https://github.com/dagolden/Path-Tiny>
-
-      git clone https://github.com/dagolden/Path-Tiny.git
-
 AUTHOR
     David Golden <dagolden@cpan.org>
 
@@ -1102,7 +1088,7 @@ CONTRIBUTORS
 
     *   Philippe Bruhat (BooK) <book@cpan.org>
 
-    *   Regina Verbae <regina-verbae@users.noreply.github.com>
+    *   regina-verbae <regina-verbae@users.noreply.github.com>
 
     *   Roy Ivy III <rivy@cpan.org>
 

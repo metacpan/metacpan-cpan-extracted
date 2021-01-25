@@ -42,8 +42,8 @@ has buildstatus =>(
 
       'uri',      # obsolete
       'arch',     # obsolete
-    ]
-  }
+    ];
+  },
 );
 
 
@@ -61,7 +61,7 @@ has binarylist => (
             'mtime',
          ]],
     ];
-  }
+  },
 );
 
 has summary => (
@@ -75,7 +75,7 @@ has summary => (
                'count',
             ]],
     ];
-  }
+  },
 );
 
 
@@ -90,7 +90,7 @@ has schedulerstats => (
             'lastfinished',
             'lastpublished',
     ];
-  }
+  },
 );
 
 has result => (
@@ -112,7 +112,7 @@ has result => (
                 $_[0]->summary,
             $_[0]->schedulerstats,
     ];
-  }
+  },
 );
 
 has resultlist => (
@@ -126,7 +126,7 @@ has resultlist => (
         'retryafter',
           [ $_[0]->result ],
     ];
-  }
+  },
 );
 
 has fileinfo => (
@@ -183,7 +183,7 @@ has fileinfo => (
          ]],
          ]],
     ];
-  }
+  },
 );
 
 __PACKAGE__->meta->make_immutable();

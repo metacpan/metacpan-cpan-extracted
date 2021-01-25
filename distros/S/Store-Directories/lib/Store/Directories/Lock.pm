@@ -61,6 +61,7 @@ with similiar names, they are B<NOT EQUIVALENT> to one another.
 use Carp;
 use Exporter;
 use Scalar::Util qw(blessed);
+use Time::HiRes qw(sleep time);
 
 use Devel::GlobalDestruction;
 
@@ -71,11 +72,40 @@ use constant EX => 2;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(UN SH EX);
 
+=head1 GLOBALS
+
+=over 4
+
+=item * B<Store::Directories::Lock::wait_time> I<(number)>
+
+If this is set, then any blocking attempt to obtain a lock will bail out
+after waiting at least this number of seconds. If a bail-out occurs, then
+calls to the C<lock_ex> and C<lock_sh> methods of L<Store::Directories> will
+return undef, and calls to methods like C<get_or_add> or C<get_or_set> will
+croak.
+
+=item * B<Store::Directories::Lock::wait_callback> I<(subroutine ref)>
+
+If this and C<wait_time> are set, then instead of bailing out, this method
+will be called once the C<wait_time> has passed. The subroutine is called with
+the name of key being waited on as the first argument,a boolean representing
+whether the lock is exclusive or not as the second argument and the time (in
+seconds) that it's been waiting as the third argument. If the subroutine
+returns a false value, then a bail-out will occur. Otherwise, the wait for the
+lock will continue.
+
+=back
+
+=cut
+
+our $wait_time;
+our $wait_callback;
+
 =head1 METHODS
 
 =over 4
 
-=item * B<new> I<STORE>, I<KEY>, I<[MODE]>
+=item * B<new> I<STORE>, I<KEY>, I<MODE> I<[NOBLOCK]>
 
 (You I<can> call this method if you like, but you really should use
 the C<lock_sh> or C<lock_ex> methods on L<Store::Directories> instead).
@@ -83,19 +113,20 @@ the C<lock_sh> or C<lock_ex> methods on L<Store::Directories> instead).
 Create a new lock that asserts this process has a lock over the directory with
 C<KEY> in the L<Store::Directories> referred to by C<STORE>.
 C<MODE> is one of the constants (C<EX> or C<SH>) specifying which kind of lock
-to create. If undefined, defaults to C<SH> (for a shared lock).
+to create.
 
 This will block until the desired lock can be obtained. For a shared lock,
 this means the function will wait until any processes with exclusive locks
 release them and for an exclusive lock, it will wait until any other
-processes release all of their locks on the key.
+processes release all of their locks on the key. However, if I<NOBLOCK> is
+true, then this won't block but instead return undef if the lock could not
+be obtained.
 
 This will croak if this process already has a lock for that key, or
 if the key does not exist in the store (or if a database error occurs).
 =cut
 sub new {
-    my ($class, $store, $key, $mode) = @_;
-    $mode //= SH;
+    my ($class, $store, $key, $mode, $noblock) = @_;
 
     unless (blessed($store) && $store->isa('Store::Directories')) {
         croak "Must provide a Store::Directories instance for this lock."
@@ -109,7 +140,8 @@ sub new {
     croak "Process already has lock on key '$key'." if _get_lock_mode($dbh, $key);
 
     # Add a new lock
-    _add_lock($dbh, $key, $mode);
+    my $status = _add_lock($dbh, $key, $mode, $noblock);
+    return undef unless defined $status;
     return $class->_new_raw($store, $key, $$, $mode);
 
 }
@@ -138,12 +170,13 @@ sub DESTROY {
     # forked)
     return unless $self->{ownerpid} == $$;
 
-    my $dbh = $self->{store}->_new_connection;
-    my $sth = $dbh->prepare("DELETE FROM lock WHERE pid = ? AND slug = ?");
-    my $rv  = $sth->execute($$, $self->{key});
-    defined $rv or die "could not release lock in DESTROY: ".$dbh->errstr;
+    eval {
+        my $dbh = $self->{store}->_new_connection;
+        my $sth = $dbh->prepare("DELETE FROM lock WHERE pid = ? AND slug = ?");
+        my $rv  = $sth->execute($$, $self->{key});
 
-    $self->{_destroyed} = 1;
+        $self->{_destroyed} = 1;
+    }
 }
 
 =back
@@ -242,7 +275,7 @@ sub _prune_locks {
 
 }
 
-# _add_lock DBH KEY MODE
+# _add_lock DBH KEY MODE [NOBLOCK]
 # Same semantics as _add_lock_noblock (below), but will repeatedly try to get
 # a lock until it succeeds. Always returns true, but returns -1 if the this
 # process already has the requested lock. Otherwise returns 1.
@@ -251,18 +284,34 @@ sub _prune_locks {
 # won't get a chance to remove their locks and you'll potentially get
 # deadlocked.
 sub _add_lock {
-    my $dbh = $_[0];
+    my ($dbh, $key, $mode, $noblock) = @_;
 
     my $status;
-    until ($status) {
+    my $start_time = time;
+    my $total_time = 0;
+    while (1) {
         $dbh->begin_work;
-        $status = eval { _add_lock_noblock(@_); };
+        $status = eval { _add_lock_noblock($dbh, $key, $mode); };
         unless(defined $status) {
             $dbh->rollback;
             croak $@;
         };
         $dbh->commit;
-        #sleep rand 0.05;
+        last if $status;
+
+        return undef if $noblock;
+
+        my $waiting = time - $start_time;
+        if (defined $wait_time && $waiting > $wait_time) {
+            return undef unless defined $wait_callback;
+
+            $total_time += $waiting;
+            my $continue = $wait_callback->($key, $mode == EX, $total_time);
+            $start_time = time;
+            return undef unless $continue;
+        }
+
+        sleep rand 0.01;
     }
     return $status;
 }
@@ -330,8 +379,15 @@ sub _add_lock_noblock {
         VALUES
             (?, ?, ?, ?)
 END
-    $sth->execute($$, _get_proc_start_time, $key, $mode)
-        or croak "Failed to insert lock. ".$dbh->errstr;
+    $sth->execute($$, _get_proc_start_time, $key, $mode);
+    if ($dbh->err) {
+        # The key not being in the store is a predictable error,
+        # so if that's whate happened, we can report a more
+        # meaningful error message.
+        croak   $dbh->errstr =~ m/FOREIGN KEY/i
+                ? "Key '$key' not in store."
+                : "Failed to insert lock. ".$dbh->errstr;
+    }
 
     1;
 }

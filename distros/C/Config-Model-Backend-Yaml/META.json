@@ -4,7 +4,7 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
@@ -43,8 +43,7 @@
       },
       "test" : {
          "requires" : {
-            "Config::Model::BackendMgr" : "0",
-            "Config::Model::Tester" : "3.006",
+            "Config::Model::Tester" : "4.001",
             "Config::Model::Tester::Setup" : "0",
             "ExtUtils::testlib" : "0",
             "Path::Tiny" : "0",
@@ -68,8 +67,9 @@
          "web" : "http://github.com/dod38fr/config-model-backend-yaml"
       }
    },
-   "version" : "2.133",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "version" : "2.134",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "LGPL-2.1"
 }
 

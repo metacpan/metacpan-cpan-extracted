@@ -42,12 +42,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/genealogy-ahnentafel/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/davorg/genealogy-ahnentafel.git",
          "web" : "https://github.com/davorg/genealogy-ahnentafel"
       }
    },
-   "version" : "v1.0.2",
+   "version" : "v1.0.3",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

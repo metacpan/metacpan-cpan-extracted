@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 use Math::BigInt;
 use Test;
-plan tests => 12;
+plan tests => 47;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -29,6 +29,7 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::TerdragonCurve;
+use Math::NumSeq::PlanePathTurn;
 
 # uncomment this to run the ### lines
 # use Smart::Comments '###';
@@ -46,6 +47,121 @@ sub ternary_digit_above_low_zeros {
   }
   return ($n % 3);
 }
+
+
+#------------------------------------------------------------------------------
+# A189674 - num left turns 1..N
+
+MyOEIS::compare_values
+  (anum => 'A189674',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
+                                                 turn_type => 'Left');
+     my $total = 0;
+     my @got;
+     for (my $n = $path->n_start + 1; @got < $count; $n++) {
+       push @got, $total;
+       $total += $seq->ith($n);
+     }
+     return \@got;
+   });
+
+# A189641 - num right turns 1..N
+MyOEIS::compare_values
+  (anum => 'A189641',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
+                                                 turn_type => 'Right');
+     my $total = 0;
+     my @got;
+     for (my $n = $path->n_start + 1; @got < $count; $n++) {
+       push @got, $total;
+       $total += $seq->ith($n);
+     }
+     return \@got;
+   });
+
+# A189672 - num right turns 1..N, sans one initial 0
+MyOEIS::compare_values
+  (anum => 'A189672',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
+                                                 turn_type => 'Right');
+     my $total = 0;
+     my @got;
+     for (my $n = $path->n_start + 1; @got < $count; $n++) {
+       $total += $seq->ith($n);
+       push @got, $total;
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A133162 - 1 for each segment, 2 when right turn between
+
+MyOEIS::compare_values
+  (anum => 'A133162',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
+                                                 turn_type => 'Right');
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       push @got, 1;
+       if ($seq->ith($n+1)) {
+         push @got, 2;
+       }
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A000001 -- (X-Y)/2 coordinate, at 60 degrees
+
+# # not in OEIS: 0,1,0,1,0,0,-1,0,-1,0,-1,-1,-2,-2,-1,-1,-2,-2,-3,-2,-3,-2,-3,-3
+# MyOEIS::compare_values
+#   (anum => 'A000001',
+#    func => sub {
+#      my ($count) = @_;
+#      my @got;
+#      for (my $n = 0; @got < $count; $n++) {
+#        my ($x,$y) = $path->n_to_xy($n);
+#        push @got, ($x-$y)/2;
+#      }
+#      return \@got;
+#    });
+#
+# A000001 -- (X+Y)/2 coordinate, at 120 degrees
+# # not in OEIS: 0,1,1,2,2,1,1,2,2,3,3,2,2,1,2,1,1,0,0,1,1,2,2,1,1,2,2,3,3,2,2,1
+# MyOEIS::compare_values
+#   (anum => 'A000001',
+#    func => sub {
+#      my ($count) = @_;
+#      my @got;
+#      for (my $n = 0; @got < $count; $n++) {
+#        my ($x,$y) = $path->n_to_xy($n);
+#        push @got, ($x+$y)/2;
+#      }
+#      return \@got;
+#    });
+#
+# # A000001 -- Y coordinate
+# # not in OEIS: 0,0,1,1,2,1,2,2,3,3,4,3,4,3,3,2,3,2,3,3,4,4,5,4,5,5,6,6,7,6,7,6
+# MyOEIS::compare_values
+#   (anum => 'A000001',
+#    func => sub {
+#      my ($count) = @_;
+#      my @got;
+#      for (my $n = 0; @got < $count; $n++) {
+#        my ($x,$y) = $path->n_to_xy($n);
+#        push @got, $y;
+#      }
+#      return \@got;
+#    });
+
 
 #------------------------------------------------------------------------------
 # A005823 - N positions with net turn == 0, no ternary 1s
@@ -65,7 +181,6 @@ foreach my $elem (['A005823',0],
       (anum => $anum,
        func => sub {
          my ($count) = @_;
-         require Math::NumSeq::PlanePathTurn;
          my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                                      turn_type => 'LSR');
          my $i = 0;
@@ -93,7 +208,6 @@ foreach my $anum ('A026141','A026171') {
        name => "dTurnLeft $anum",
        func => sub {
          my ($count) = @_;
-         require Math::NumSeq::PlanePathTurn;
          my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                                      turn_type => 'Left');
          my $prev = 0;
@@ -116,7 +230,6 @@ foreach my $anum ('A026181','A131989') {
        name => "dTurnRight $anum",
        func => sub {
          my ($count) = @_;
-         require Math::NumSeq::PlanePathTurn;
          my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                                      turn_type => 'Right');
          my $prev = 0;
@@ -170,7 +283,7 @@ foreach my $elem (['A057682', 1, 0, 0, [0,1]],  # X
 }
 
 #------------------------------------------------------------------------------
-# A092236 etc counts of segments in direction
+# A092236 etc counts of segments in direction within level
 
 foreach my $elem ([1, 'A057083', [],  1],
                   [0, 'A092236', [],  0],
@@ -179,7 +292,7 @@ foreach my $elem ([1, 'A057083', [],  1],
   my ($dir, $anum, $initial_got, $offset_3k) = @$elem;
   MyOEIS::compare_values
       (anum => $anum,
-       max_value => 9,
+       max_value => 8,
        func => sub {
          my ($count) = @_;
          my @got = @$initial_got;
@@ -293,7 +406,7 @@ MyOEIS::compare_values
      return \@got;
    });
 MyOEIS::compare_values
-  (anum => 'A002023',
+  (anum => q{A002023},
    max_value => 10_000,
    func => sub {
      my ($count) = @_;
@@ -387,7 +500,6 @@ MyOEIS::compare_values
 #   (anum => 'A136442',
 #    func => sub {
 #      my ($count) = @_;
-#      require Math::NumSeq::PlanePathTurn;
 #      my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
 #                                                  turn_type => 'Left');
 #      my @got = (1);
@@ -405,7 +517,6 @@ MyOEIS::compare_values
   (anum => 'A060032',
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                                  turn_type => 'LSR');
      my @got;
@@ -428,7 +539,6 @@ MyOEIS::compare_values
   (anum => 'A189673',
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                                  turn_type => 'Left');
      my @got = (0);
@@ -446,7 +556,6 @@ MyOEIS::compare_values
   (anum => 'A189640',
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                                  turn_type => 'Right');
      my @got = (0);
@@ -464,7 +573,6 @@ MyOEIS::compare_values
   (anum => 'A062756',
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                                  turn_type => 'LSR');
      my @got;
@@ -485,7 +593,6 @@ MyOEIS::compare_values
   (anum => 'A080846',
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                                  turn_type => 'Right');
      my @got;
@@ -507,7 +614,6 @@ MyOEIS::compare_values
    },
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                                  turn_type => 'Right');
      my @got;
@@ -525,7 +631,6 @@ MyOEIS::compare_values
   (anum => 'A026225',
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                                  turn_type => 'Left');
      my @got;
@@ -559,7 +664,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got = (1);   # extra initial 1 ...
-     require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
                                                  turn_type => 'Right');
      while (@got < $count) {
@@ -570,9 +674,8 @@ MyOEIS::compare_values
      }
      return \@got;
    });
-
 MyOEIS::compare_values
-  (anum => 'A026179',
+  (anum => q{A026179},
    func => sub {
      my ($count) = @_;
      my @got = (1);

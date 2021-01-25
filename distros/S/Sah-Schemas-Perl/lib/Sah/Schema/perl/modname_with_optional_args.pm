@@ -1,9 +1,9 @@
 package Sah::Schema::perl::modname_with_optional_args;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-19'; # DATE
+our $DATE = '2021-01-20'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.034'; # VERSION
+our $VERSION = '0.035'; # VERSION
 
 use Regexp::Pattern::Perl::Module ();
 
@@ -21,7 +21,7 @@ just like the `-MMODULE=ARGS` shortcut that `perl` provides. Examples:
 See also: `perl::modname`.
 
 _
-    match => $Regexp::Pattern::Perl::Module::RE{perl_modname_with_optional_args}{pat},
+    match => '\\A(?:' . $Regexp::Pattern::Perl::Module::RE{perl_modname_with_optional_args}{pat} . ')\\z',
 
     'x.perl.coerce_rules' => [
         'From_str::normalize_perl_modname',
@@ -35,6 +35,7 @@ _
         {value=>'Foo::Bar', valid=>1},
         {value=>'Foo::Bar=arg1,arg2', valid=>1},
         {value=>'Foo-Bar=arg1,arg2', valid=>1, validated_value=>'Foo::Bar=arg1,arg2'},
+        #{value=>'Foo::Bar=arg1,arg2 foo', valid=>0}, # XXX why fail?
     ],
 
 }, {}];
@@ -54,7 +55,7 @@ Sah::Schema::perl::modname_with_optional_args - Perl module name (e.g. Foo::Bar)
 
 =head1 VERSION
 
-This document describes version 0.034 of Sah::Schema::perl::modname_with_optional_args (from Perl distribution Sah-Schemas-Perl), released on 2020-06-19.
+This document describes version 0.035 of Sah::Schema::perl::modname_with_optional_args (from Perl distribution Sah-Schemas-Perl), released on 2021-01-20.
 
 =head1 SYNOPSIS
 
@@ -148,7 +149,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Perl>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-Perl/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -160,7 +161,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

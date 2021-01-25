@@ -32,16 +32,16 @@ no_index:
 provides:
   Dist::Zilla::Plugin::DROLSKY::DevTools:
     file: lib/Dist/Zilla/Plugin/DROLSKY/DevTools.pm
-    version: '1.12'
+    version: '1.18'
   Dist::Zilla::Plugin::DROLSKY::Role::MaybeFileWriter:
     file: lib/Dist/Zilla/Plugin/DROLSKY/Role/MaybeFileWriter.pm
-    version: '1.12'
+    version: '1.18'
   Dist::Zilla::PluginBundle::DROLSKY:
     file: lib/Dist/Zilla/PluginBundle/DROLSKY.pm
-    version: '1.12'
+    version: '1.18'
   Pod::Weaver::PluginBundle::DROLSKY:
     file: lib/Pod/Weaver/PluginBundle/DROLSKY.pm
-    version: '1.12'
+    version: '1.18'
 requires:
   Devel::PPPort: '3.42'
   Dist::Zilla: '6.0'
@@ -139,7 +139,7 @@ resources:
   bugtracker: https://github.com/autarch/Dist-Zilla-PluginBundle-DROLSKY/issues
   homepage: https://metacpan.org/release/Dist-Zilla-PluginBundle-DROLSKY
   repository: git://github.com/autarch/Dist-Zilla-PluginBundle-DROLSKY.git
-version: '1.12'
+version: '1.18'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -323,6 +323,7 @@ x_Dist_Zilla:
           phase: release
           run_under_travis: 0
           skip:
+            - Dist::Zilla::Plugin::DROLSKY::BundleAuthordep
             - Dist::Zilla::Plugin::DROLSKY::Contributors
             - Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
             - Dist::Zilla::Plugin::DROLSKY::License
@@ -375,11 +376,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 24
       name: '@DROLSKY/DROLSKY::RunExtraTests'
-      version: '1.12'
-    -
-      class: Dist::Zilla::Plugin::DROLSKY::Test::Precious
-      name: '@DROLSKY/DROLSKY::Test::Precious'
-      version: '1.12'
+      version: '1.18'
     -
       class: Dist::Zilla::Plugin::MojibakeTests
       name: '@DROLSKY/MojibakeTests'
@@ -460,9 +457,13 @@ x_Dist_Zilla:
       name: '@DROLSKY/Test::Version'
       version: '1.09'
     -
+      class: Dist::Zilla::Plugin::DROLSKY::Test::Precious
+      name: '@DROLSKY/DROLSKY::Test::Precious'
+      version: '1.18'
+    -
       class: Dist::Zilla::Plugin::DROLSKY::Contributors
       name: '@DROLSKY/DROLSKY::Contributors'
-      version: '1.12'
+      version: '1.18'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -597,7 +598,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::WeaverConfig
       name: '@DROLSKY/DROLSKY::WeaverConfig'
-      version: '1.12'
+      version: '1.18'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -652,7 +653,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
-      version: '1.12'
+      version: '1.18'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@DROLSKY/CheckStrictVersion'
@@ -679,7 +680,7 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
-      version: '1.12'
+      version: '1.18'
     -
       class: Dist::Zilla::Plugin::EnsureChangesHasContent
       name: '@DROLSKY/EnsureChangesHasContent'
@@ -695,15 +696,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles
       name: '@DROLSKY/DROLSKY::PerlLinterConfigFiles'
-      version: '1.12'
+      version: '1.18'
     -
       class: Dist::Zilla::Plugin::DROLSKY::DevTools
       name: '@DROLSKY/DROLSKY::DevTools'
-      version: '1.12'
+      version: '1.18'
     -
       class: Dist::Zilla::Plugin::DROLSKY::Precious
       name: '@DROLSKY/DROLSKY::Precious'
-      version: '1.12'
+      version: '1.18'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -759,7 +760,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.12
+          tag: v1.18
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -837,7 +838,7 @@ x_Dist_Zilla:
           default_jobs: 24
           version: '6.017'
       name: '@DROLSKY/DROLSKY::MakeMaker'
-      version: '1.12'
+      version: '1.18'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: MetaNoIndex

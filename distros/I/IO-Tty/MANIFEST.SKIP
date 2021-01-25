@@ -8,3 +8,4 @@
 ^Tty/Constant.pm
 ^Makefile$
 ^IO-Tty-\d
+^IO-Tty\.ppd$

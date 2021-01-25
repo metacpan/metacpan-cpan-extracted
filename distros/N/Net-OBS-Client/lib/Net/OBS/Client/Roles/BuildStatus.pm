@@ -17,23 +17,12 @@
 package Net::OBS::Client::Roles::BuildStatus;
 
 use Moose::Role;
-use Net::OBS::Client;
 use Net::OBS::Client::DTD;
 use XML::Structured;
 
 requires 'code';
 
 has project => (
-  is      =>    'rw',
-  isa     =>    'Str',
-);
-
-has repository => (
-  is      =>    'rw',
-  isa     =>    'Str',
-);
-
-has arch => (
   is      =>    'rw',
   isa     =>    'Str',
 );
@@ -49,7 +38,7 @@ has dtd => (
   lazy    =>    1,
   default => sub {
     Net::OBS::Client::DTD->new()
-  }
+  },
 );
 
 has name => (
@@ -57,4 +46,4 @@ has name => (
   isa => 'Str',
 );
 
-1; 
+1;

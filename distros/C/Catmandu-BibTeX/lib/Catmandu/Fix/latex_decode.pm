@@ -1,6 +1,6 @@
 package Catmandu::Fix::latex_decode;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Moo;
 use Catmandu::Sane;

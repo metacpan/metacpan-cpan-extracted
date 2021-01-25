@@ -1,10 +1,12 @@
-#!/usr/bin/perl
+use lib 'inc';
 
-use strict;
-use warnings;
-use Test::More tests => 203;
-use File::Spec;
 use Net::SSLeay;
+use Test::Net::SSLeay qw( data_file_path initialise_libssl );
+
+plan tests => 203;
+
+initialise_libssl();
+Net::SSLeay::OpenSSL_add_all_digests();
 
 sub digest_chunked_f1 {
   my ($file, $digest) = @_;
@@ -155,8 +157,6 @@ sub digest_strings {
 my %all_digests;
 
 eval {
-  Net::SSLeay::initialize();
-  Net::SSLeay::OpenSSL_add_all_digests();
   if (Net::SSLeay::SSLeay >= 0x1000000f) {
 	my $ctx = Net::SSLeay::EVP_MD_CTX_create();
     %all_digests = map { $_=>1 } grep {
@@ -177,7 +177,8 @@ SKIP: {
   isnt(scalar(keys %all_digests), 0, 'non-empty digest list');
 }
 
-my $file = File::Spec->catfile('t', 'data', 'binary-test.file'); 
+my $file = data_file_path('binary-test.file');
+
 my $file_digests = {
         md2       => '67ae6d821be6898101414c56b1fb4f46',
         md4       => '480438696e7d9a6ab3ecc1e2a3419f78',

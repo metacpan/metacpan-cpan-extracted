@@ -17,6 +17,9 @@ my $build = Module::Build->new(
                 url  => 'https://github.com/davorg/template-plugin-audiofile-info.git',
                 web  => 'https://github.com/davorg/template-plugin-audiofile-info',
             },
+            bugtracker => {
+                web  => 'https://github.com/davorg/template-plugin-audiofile-info/issues',
+            },
         },
     },
 );

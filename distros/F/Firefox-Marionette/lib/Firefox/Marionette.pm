@@ -49,7 +49,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -160,7 +160,7 @@ sub _download_directory {
         my $context = $self->context();
         $self->context('chrome');
         $directory =
-          $self->script( 'var branch = Components.classes["' . q[@]
+          $self->script( 'let branch = Components.classes["' . q[@]
               . 'mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch(""); return branch.getStringPref ? branch.getStringPref("browser.download.downloadDir") : branch.getComplexValue("browser.download.downloadDir", Components.interfaces.nsISupportsString).data;'
           );
         $self->context($context);
@@ -525,6 +525,9 @@ sub _init {
     }
     elsif ( $parameters{firefox} ) {
         $self->{firefox_binary} = $parameters{firefox};
+    }
+    if ( $parameters{console} ) {
+        $self->{console} = 1;
     }
 
     if ( defined $parameters{adb} ) {
@@ -927,8 +930,9 @@ sub _clean_local_extension_directory {
 sub har {
     my ($self)  = @_;
     my $context = $self->context('content');
-    my $log     = $self->script(
-        'return (async function() { return await HAR.triggerExport() })();');
+    my $log     = $self->script(<<'_JS_');
+return (async function() { return await HAR.triggerExport() })();
+_JS_
     $self->context($context);
     return { log => $log };
 }
@@ -1055,6 +1059,9 @@ sub _setup_arguments {
     }
     if ( defined $self->{window_height} ) {
         push @arguments, '-height', $self->{window_height};
+    }
+    if ( defined $self->{console} ) {
+        push @arguments, '--jsconsole';
     }
     push @arguments, $self->_check_addons(%parameters);
     push @arguments, $self->_check_visible(%parameters);
@@ -4461,29 +4468,31 @@ sub _set_headers {
     my ($self) = @_;
     $self->context('chrome');
     my $script = <<'_JS_';
-if (typeof PerlFirefoxMarionette == "undefined" ) {
-    PerlFirefoxMarionette = {};
-} else {
-    PerlFirefoxMarionette.headers.unregister();
-}
-PerlFirefoxMarionette.headers =
-{ 
+(function() {
+    let observerService = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
+    let iterator = observerService.enumerateObservers("http-on-modify-request");
+    while (iterator.hasMoreElements()) {
+        observerService.removeObserver(iterator.getNext(), "http-on-modify-request");
+    }
+})();
+
+({
   observe: function(subject, topic, data) {
     this.onHeaderChanged(subject.QueryInterface(Components.interfaces.nsIHttpChannel), topic, data);
   },
 
   register: function() {
-    var observerService = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
+    let observerService = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
     observerService.addObserver(this, "http-on-modify-request", false);
   },
 
   unregister: function() {
-    var observerService = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
+    let observerService = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
     observerService.removeObserver(this, "http-on-modify-request");
   },
 
   onHeaderChanged: function(channel, topic, data) {
-    var host = channel.URI.host;
+    let host = channel.URI.host;
 _JS_
     foreach my $name ( sort { $a cmp $b } keys %{ $self->{_headers} } ) {
         my @headers      = @{ $self->{_headers}->{$name} };
@@ -4541,15 +4550,19 @@ _JS_
     }
     $script .= <<'_JS_';
   }
-};
-
-PerlFirefoxMarionette.headers.register();
+}).register();
 _JS_
-    $script =~ s/[\r\n\t]+/ /smxg;
-    $script =~ s/[ ]+/ /smxg;
-    $self->script($script);
+    $self->script( $self->_compress_script($script) );
     $self->context('content');
     return;
+}
+
+sub _compress_script {
+    my ( $self, $script ) = @_;
+    $script =~ s/\/[*].*?[*]\///smxg;
+    $script =~ s/[\r\n\t]+/ /smxg;
+    $script =~ s/[ ]+/ /smxg;
+    return $script;
 }
 
 sub is_selected {
@@ -7014,7 +7027,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -7028,6 +7041,8 @@ Version 1.00
     say $firefox->html();
 
     $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+
+    say "Height of search box is " . $firefox->find_class('container-fluid')->css('height');
 
     my $file_handle = $firefox->selfie();
 
@@ -7242,6 +7257,12 @@ returns the L<contents|Firefox::Marionette::Cookie> of the cookie jar in scalar 
 =head2 css
 
 accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar CSS property name as the second parameter.  It returns the value of the computed style for that property.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    say $firefox->find_id('search-input')->css('height');
 
 =head2 current_chrome_window_handle 
 
@@ -7710,7 +7731,9 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * capabilities - use the supplied L<capabilities|Firefox::Marionette::Capabilities> object, for example to set whether the browser should L<accept insecure certs|Firefox::Marionette::Capabilities#accept_insecure_certs> or whether the browser should use a L<proxy|Firefox::Marionette::Proxy>.
 
-=item * chatty - Firefox is extremely chatty on the network, including checking for the lastest malware/phishing sites, updates to firefox/etc.  This option is therefore off ("0") by default, however, it can be switched on ("1") if required.  Even with chatty switched off, connections to firefox.settings.services.mozilla.com may still be made.  The only way to prevent this seems to be to set firefox.settings.services.mozilla.com to 127.0.0.1 via L</etc/hosts|https://en.wikipedia.org/wiki//etc/hosts>.  NOTE: that this option only works when profile_name/profile is not specified.
+=item * chatty - Firefox is extremely chatty on the network, including checking for the lastest malware/phishing sites, updates to firefox/etc.  This option is therefore off ("0") by default, however, it can be switched on ("1") if required.  Even with chatty switched off, L<connections to firefox.settings.services.mozilla.com will still be made|https://bugzilla.mozilla.org/show_bug.cgi?id=1598562#c13>.  The only way to prevent this seems to be to set firefox.settings.services.mozilla.com to 127.0.0.1 via L</etc/hosts|https://en.wikipedia.org/wiki//etc/hosts>.  NOTE: that this option only works when profile_name/profile is not specified.
+
+=item * console - show the L<browser console|https://developer.mozilla.org/en-US/docs/Tools/Browser_Console/> when the browser is launched.
 
 =item * debug - should firefox's debug to be available via STDERR. This defaults to "0". Any ssh connections will also be printed to STDERR.
 

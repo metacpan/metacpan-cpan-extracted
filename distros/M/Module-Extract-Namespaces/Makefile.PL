@@ -49,7 +49,7 @@ my %WriteMakefile = (
 	'NAME'	        => $module,
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => 'lib/Module/Extract/Namespaces.pm',
-	'LICENSE'       => 'artistic2',
+	'LICENSE'       => 'artistic_2',
 	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
 
 	'CONFIGURE_REQUIRES' => {
@@ -61,11 +61,11 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::More' => '0.94',
+		'Test::More' => '1',
 		},
 
 	'PREREQ_PM'     => {
-		'PPI' => '1.126'
+		'PPI' => '1.270'
 		},
 
 	'META_MERGE' => {

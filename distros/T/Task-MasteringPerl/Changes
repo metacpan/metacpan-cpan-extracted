@@ -1,5 +1,8 @@
 Revision history for Perl module Task::MasteringPerl
 
+1.006 2021-01-23T20:57:06Z
+	* freshen distro, remove Travis CI, add Github Actions
+
 1.005 2018-06-07T15:12:16Z
 	* Fix up Makefile.PL to specify the META_MERGE stuff
 

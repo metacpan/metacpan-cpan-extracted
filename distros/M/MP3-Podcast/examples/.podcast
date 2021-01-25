@@ -1,0 +1,2 @@
+our $creator = "PerlPodder"; #Allmighty podcaster creator
+our $channelTitle = "Big mistake"; #Title of the channel. You guessed it, huh?

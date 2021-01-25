@@ -14,7 +14,7 @@ use Syntax::Keyword::Try;
    is(
       ( sub {
          try { return "result" }
-         catch {}
+         catch ($e) {}
          $after++;
          return "nope";
       } )->(),
@@ -28,7 +28,7 @@ use Syntax::Keyword::Try;
 {
    is_deeply(
       [ sub {
-         try { return qw( A B C ) } catch {}
+         try { return qw( A B C ) } catch ($e) {}
       }->() ],
       [qw( A B C )],
       'return LIST in try yields correct values'
@@ -43,9 +43,9 @@ use Syntax::Keyword::Try;
       ( sub {
          try {
             try { return "result" }
-            catch {}
+            catch ($e) {}
          }
-         catch {}
+         catch ($e) {}
          $after++;
          return "nope";
       } )->(),
@@ -64,7 +64,7 @@ use Syntax::Keyword::Try;
             my $one = eval { return 1 };
             $two = $one + 1;
          }
-         catch {}
+         catch ($e) {}
          return $two;
       } )->(),
       2,
@@ -78,7 +78,7 @@ use Syntax::Keyword::Try;
       ( sub {
          my $ret = eval {
             try { return "part"; }
-            catch {}
+            catch ($e) {}
          };
          return "($ret)";
       } )->(),
@@ -92,7 +92,7 @@ use Syntax::Keyword::Try;
    is(
       ( sub {
          try { die "oopsie" }
-         catch { return "result" }
+         catch ($e) { return "result" }
          return "nope";
       } )->(),
       "result",

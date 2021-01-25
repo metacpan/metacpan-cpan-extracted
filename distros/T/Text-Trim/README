@@ -2,7 +2,7 @@ NAME
     Text::Trim - remove leading and/or trailing whitespace from strings
 
 VERSION
-    version 1.03
+    version 1.04
 
 SYNOPSIS
         use Text::Trim;
@@ -115,10 +115,12 @@ AUTHORS
 
     Ryan Thompson <rjt@cpan.org> - Co-maintainer, miscellaneous fixes
 
-BUGS
-    Please report any bugs or feature requests to
-    "bug-text-trim@rt.cpan.org", or through the web interface at
-    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Trim>.
+SUPPORT
+    Issue Tracker:      https://github.com/rjt-pl/Text-Trim/issues
+                        Bug reports and feature requests
+
+    GitHub Repository:  https://github.com/rjt-pl/Text-Trim.git
+
 
 ACKNOWLEDGEMENTS
     Terrence Brannon <metaperl@gmail.com> for bringing my attention to

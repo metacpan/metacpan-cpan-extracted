@@ -77,7 +77,7 @@
 -[\d\.\_]+\.tar\.gz
 
 # Github files
-\.travis\.yml
+^\.github
 
 # Komodo files
 \.komodoproject

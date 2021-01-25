@@ -1,4 +1,4 @@
-# Copyright 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -2522,7 +2522,7 @@ sub read_att_fh {
   while (defined(my $line = readline $fh)) {
     chomp $line;
     if (my ($from,$to,$symbol) = $line =~ /^(\d+)\s+(\d+)\s+(\S+)/) {
-      next if $symbol eq '@_IDENTITY_SYMBOL_@';
+      # next if $symbol eq '@_IDENTITY_SYMBOL_@';
       $fa->MyFLAT::ensure_states($from, $to);
       if (defined $epsilon_symbol && $symbol eq $epsilon_symbol) {
         $symbol = '';  # FLAT epsilon transition
@@ -2748,7 +2748,7 @@ sub optional_leading_0s {
 #   ($new_transmute,$new_symbol) = $func->($transmute,$symbol)
 #
 # $transmute is a string representing the current transmutation conditions.
-
+#
 sub transmute {
   my ($fa, %options) = @_;
   ### transmute() ...
@@ -2778,7 +2778,7 @@ sub transmute {
       $new_state;
     });
   };
-    
+
   my @state_and_transmute_done;
   my @pending = map {[$_,$initial]} $fa->get_starting;
   while (my $elem = shift @pending) {
@@ -2811,6 +2811,30 @@ sub transmute {
   return $new_fa;
 }
 
+# add       => integer, default 1
+# radix     => integer>=2, default from alphabet
+# direction => "hightolow" (default) or "lowtohigh"
+sub digits_multiply {
+  my ($fa, %options) = @_;
+
+  my $direction = $options{'direction'} || 'hightolow';
+  my $radix     = $options{'radix'} || max($fa->alphabet)+1;
+  my $mul       = $options{'mul'} // 1;
+  my $carry     = $options{'add'} // 0;
+  ### $radix
+  ### $mul
+  ### $carry
+
+  return $fa->MyFLAT::transmute(initial => 0,
+                                direction => ($direction eq 'lowtohigh'
+                                              ? 'forward'
+                                              : 'reverse'),
+                                func => sub {
+                                  my ($carry,$symbol) = @_;
+                                  ### func: "carry=$carry symbol $symbol"
+                                  return _divrem ($symbol*$mul+$carry, $radix);
+                                });
+}
 
 #------------------------------------------------------------------------------
 1;

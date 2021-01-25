@@ -13,8 +13,8 @@ sub inner
    try {
       return 123;
    }
-   catch {
-      die "Something terrible happened: $@";
+   catch ($e) {
+      die "Something terrible happened: $e";
    }
 }
 
@@ -25,8 +25,8 @@ sub outer
       @result = (1, scalar inner()); # scalar or void context is mandatory
       1; # or catch will be triggered
    }
-   catch {
-      die "Something terrible happened: $@";
+   catch ($e) {
+      die "Something terrible happened: $e";
    }
    return @result;
 }

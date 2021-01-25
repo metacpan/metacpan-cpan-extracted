@@ -1,5 +1,8 @@
 Revision history for Perl module Surveyor::App
 
+0.122 2021-01-23T19:44:12Z
+	* freshen distro, dump Travis CI, add Github Actions
+
 0.121 2018-05-23T22:50:56Z
 	* Change to the Artistic License 2.0
 

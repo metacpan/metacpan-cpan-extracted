@@ -6,34 +6,36 @@ use Net::OBS::Client::Package;
 use Net::OBS::Client::BuildResults;
 
 
-with "Net::OBS::Client::Roles::Client";
+with 'Net::OBS::Client::Roles::Client';
 
-our $VERSION = '0.0.6';
+our $VERSION = '0.0.8';
 
 sub project {
-  my $self = shift;
+  my ($self, @args) = @_;
   return Net::OBS::Client::Project->new(
     apiurl     => $self->apiurl,
     use_oscrc  => $self->use_oscrc,
-    @_
+    repository => $self->repository,
+    arch       => $self->arch,
+    @args,
   );
 }
 
 sub package {
-  my $self = shift;
+  my ($self, @args) = @_;
   return Net::OBS::Client::Package->new(
     apiurl     => $self->apiurl,
     use_oscrc  => $self->use_oscrc,
-    @_
+    @args,
   );
 }
 
 sub buildresults {
-  my $self = shift;
+  my ($self, @args) = @_;
   return Net::OBS::Client::BuildResults->new(
     apiurl     => $self->apiurl,
     use_oscrc  => $self->use_oscrc,
-    @_
+    @args,
   );
 }
 
@@ -49,23 +51,23 @@ Net::OBS::Client - simple OBS API calls
 
   #
   use Net::OBS::Client;
-  my $c = Net::OBS::Client->new(
+  my $client = Net::OBS::Client->new(
     apiurl     => $apiurl,
     use_oscrc  => 0,
   );
 
-  my $prj = $c->project(
+  my $prj = $client->project(
     name       => $project,
   );
 
-  my $pkg = $c->package(
+  my $pkg = $client->package(
     project    => 'OBS:Server:Unstable',
     name       => 'obs-server',
     repository => 'openSUSE_Factory',
     arch       => 'x86_64',
   );
 
-  my $res = $c->buildresults(
+  my $res = $client->buildresults(
     project    => $project,
     package    => $package,
     repository => $repo,
@@ -100,6 +102,23 @@ Net::OBS::Client - simple OBS API calls
 
 Net::OBS::Client aims to simplify usage of OBS (https://openbuildservice.org) API calls in perl.
 
+=head1 SUBROUTINES/METHODS
+
+=over 4
+
+=item * $client->project
+
+Returns a L<Net::OBS::Client::Project> object.
+
+=item * $client->package
+
+Returns a L<Net::OBS::Client::Package> object.
+
+=item * $client->buildresults
+
+Returns a L<Net::OBS::Client::BuildResults> object.
+
+=back
 
 =head1 AUTHOR
 

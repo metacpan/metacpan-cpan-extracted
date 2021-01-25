@@ -1,7 +1,13 @@
+2.47    2021-01-24
+
+- This release is based on version 2021a of the Olson database. This release
+  includes contemporary changes for South Sudan.
+
+
 2.46    2020-12-22
 
 - This release is based on version 2020e of the Olson database. This release
-  includes contemporary changes for Russia (Volograd).
+  includes contemporary changes for Russia (Volgograd).
 
 
 2.45    2020-12-21
@@ -110,7 +116,7 @@
   zone.
 
 - This release is based on version 2018f of the Olson database. This release
-  includes contemporary changes for Russia (Volograd), Fiji, and Chile.
+  includes contemporary changes for Russia (Volgograd), Fiji, and Chile.
 
 
 2.19    2018-05-13

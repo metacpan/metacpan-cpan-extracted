@@ -2,11 +2,8 @@ use strict;
 use warnings;
 
 package DateTime::Format::RFC3501;
-BEGIN {
-  $DateTime::Format::RFC3501::VERSION = '0.02';
-}
 # ABSTRACT: Parse and format RFC3501 datetime strings
-
+$DateTime::Format::RFC3501::VERSION = '0.03';
 
 use Carp;
 use DateTime();
@@ -95,9 +92,11 @@ sub format_datetime {
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -105,7 +104,7 @@ DateTime::Format::RFC3501 - Parse and format RFC3501 datetime strings
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -172,10 +171,9 @@ L<http://tools.ietf.org/html/rfc3501>, "Internet Message Access Protocol - versi
 
 =head1 BUGS
 
-Please report any bugs or feature requests to
-C<bug-datetime-format-rfc3501 at rt.cpan.org>,
-or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTime-Format-RFC3501>.
+Please report any bugs or feature requests
+through the web interface at
+L<https://github.com/alexm/DateTime-Format-RFC3501/issues>.
 I will be notified, and then you'll automatically be notified of progress
 on your bug as I make changes.
 
@@ -185,38 +183,15 @@ You can find documentation for this module with the perldoc command.
 
     perldoc DateTime::Format::RFC3501
 
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-RFC3501>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/DateTime-Format-RFC3501>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/DateTime-Format-RFC3501>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/DateTime-Format-RFC3501>
-
-=back
-
 =head1 AUTHOR
 
 Alex Muntada <alexm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Alex Muntada.
+This software is copyright (c) 2011-2021 by Alex Muntada.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

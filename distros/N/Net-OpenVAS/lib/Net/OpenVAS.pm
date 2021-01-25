@@ -2,11 +2,12 @@ package Net::OpenVAS;
 
 use warnings;
 use strict;
-use v5.10;
+use utf8;
+use feature ':5.10';
 
 use base 'Net::OpenVAS::OMP';
 
-our $VERSION = '0.101';
+our $VERSION = '0.200';
 
 1;
 __END__

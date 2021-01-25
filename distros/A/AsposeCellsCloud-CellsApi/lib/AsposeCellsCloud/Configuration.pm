@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2020 Aspose.Cells Cloud
+Copyright (c) 2021 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -37,7 +37,7 @@ use utf8;
 use Log::Any qw($log);
 use Carp;
 
-use constant VERSION => '20.10';
+use constant VERSION => '21.1';
 
 =head1 Name
 
@@ -57,7 +57,7 @@ default: 180
 
 String. custom UserAgent header
 
-default: Swagger-Codegen/20.10/perl
+default: Swagger-Codegen/21.1/perl
 
 =item api_key: (optional)
 
@@ -97,10 +97,10 @@ String. The base URL of the API
 
 default: https://api.aspose.cloud/v3.0
 
-=item app_sid: (optional)
+=item client_id: (optional)
 String. Application SID.
 
-=item app_key: (optional)
+=item client_secret: (optional)
 String. Application Key.
 
 =item api_version:(optional)
@@ -116,7 +116,7 @@ sub new {
 
 	# class/static variables
 	$p{http_timeout} //= 180;
-	$p{http_user_agent} //= 'Swagger-Codegen/20.10/perl';
+	$p{http_user_agent} //= 'Swagger-Codegen/21.1/perl';
 
 	# authentication setting
 	$p{api_key} //= {};
@@ -144,8 +144,8 @@ sub get_tokens {
 	my $tokens = {};
 	$tokens->{username} = $self->{username} if $self->{username};
 	$tokens->{password} = $self->{password} if $self->{password};
-	#$tokens->{app_sid} = $self->{app_sid} if $self->{app_sid};
-	#$tokens->{app_key} = $self->{app_key} if $self->{app_key};
+	#$tokens->{client_id} = $self->{client_id} if $self->{client_id};
+	#$tokens->{client_secret} = $self->{client_secret} if $self->{client_secret};
 	$tokens->{access_token} = $self->{access_token} if $self->{access_token};
 	
 	foreach my $token_name (keys %{ $self->{api_key} }) {
@@ -163,8 +163,8 @@ sub clear_tokens {
 	
 	$self->{username} = '';
 	$self->{password} = '';
-	$self->{app_sid} = '';
-	$self->{app_key} = '';
+	$self->{client_id} = '';
+	$self->{client_secret} = '';
 	$self->{access_token} = '';
 
 	$self->{api_key} = {};

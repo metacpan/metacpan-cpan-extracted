@@ -28,8 +28,8 @@ requires:
   perl: '5.028'
 resources:
   bugtracker: https://github.com/brtastic/perl-quantum-superpositions-lazy/issues
-  homepage: https://metacpan.org/release/Quantum-Superpositions-Lazy
+  homepage: https://brtastic.xyz/project/quantum-superpositions-lazy
   license: https://dev.perl.org/licenses
   repository: https://github.com/brtastic/perl-quantum-superpositions-lazy
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

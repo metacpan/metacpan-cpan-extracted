@@ -5,7 +5,7 @@ use Test::More;
 use strict;
 use warnings;
 
-BEGIN { use_ok('Net::IPAM::IP')             || print "Bail out!\n"; }
+BEGIN { use_ok( 'Net::IPAM::IP', qw(sort_ip) ) || print "Bail out!\n"; }
 
 my @unsorted_str = qw(
   127.0.0.1
@@ -35,19 +35,13 @@ my @expected = qw(
   ff00::
 );
 
-my @unsorted;
-foreach my $addr (@unsorted_str) {
-	my $ip;
-	ok($ip = Net::IPAM::IP->new($addr), $addr);
-	push @unsorted, $ip;
-}
+my @unsorted  = map { Net::IPAM::IP->new($_) } @unsorted_str;
 
-my @sorted;
-foreach my $ip ( sort { $a->cmp($b) } @unsorted ) {
-  push @sorted, $ip->to_string;
-}
-
+my @sorted = sort { $a->cmp($b) } @unsorted;
 is_deeply(\@sorted, \@expected, 'sort by cmp');
+
+@sorted = sort_ip @unsorted;
+is_deeply(\@sorted, \@expected, 'sort_ip');
 
 done_testing()
 

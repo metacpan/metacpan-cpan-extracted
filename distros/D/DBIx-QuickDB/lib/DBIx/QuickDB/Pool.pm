@@ -2,7 +2,7 @@ package DBIx::QuickDB::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;
@@ -23,6 +23,7 @@ use DBIx::QuickDB::Util::HashBase qw{
     update_checksums
     purge_old
     verbose
+    show_diag
 };
 
 sub import {
@@ -74,7 +75,12 @@ sub clear_old_cache {
 
         next unless $age <= (time - $stamp);
 
-        eval { remove_tree($full, {safe => 1}); 1 } or warn $@;
+        eval {
+            remove_tree($full, {safe => 1});
+            unlink("$full.lock") if -e "$full.lock";
+            unlink("$full.READY") if -e "$full.READY";
+            1;
+        } or warn $@;
     }
 }
 
@@ -114,14 +120,15 @@ sub alert {
 sub diag {
     my $self = shift;
     my ($msg, %params) = @_;
-    return unless $self->{+VERBOSE};
+    my $show = $self->{+VERBOSE} || $self->{+SHOW_DIAG};
+    return unless $show;
 
     # Only append caller info when asked
     if (my $caller = $params{caller}) {
         $msg .= " at $caller->[1] line $caller->[2].";
     }
 
-    if ($self->{+VERBOSE} > 1) {
+    if ($show > 1) {
         print STDERR "$msg\n";
     }
     else {
@@ -232,7 +239,7 @@ sub vivify_db {
     $spec->{dir} = $dir;
 
     # Already built, we can use it.
-    if (-e "$dir/READY") {
+    if (-e "$dir.READY") {
         $self->diag("$$ Found existing '$spec->{name}' database at '$dir'...");
         return $spec->{db} = $self->reclaim($dir => $spec);
     }
@@ -241,19 +248,19 @@ sub vivify_db {
     my $lock_fh = $self->lock($lock);
 
     # Another process got the lock first and built the db, start the loop over to build it.
-    if (-e "$dir/READY") {
+    if (-e "$dir.READY") {
         # Unlock immedietly to unblock other processes
         $self->unlock($lock_fh, $lock);
         $self->diag("$$ Previous lock holder built the '$spec->{name}' db...");
         $db = $self->reclaim($dir => $spec);
     }
     else {
-        $db = $self->build_db($dir => $spec);
+        $db = $self->build_db($dir => $spec, stop => 1);
         # Unlock AFTER building
         $self->unlock($lock_fh, $lock);
     }
 
-    $db->stop();
+    $db->stop() if $db->started;
 
     return $spec->{db} = $db;
 }
@@ -317,7 +324,7 @@ sub cache_check {
 
 sub build_db {
     my $self = shift;
-    my ($dir, $spec) = @_;
+    my ($dir, $spec, %params) = @_;
 
     # Create the dir, deleting it if it exists
     remove_tree($dir, {safe => 1}) if -d $dir;
@@ -332,8 +339,10 @@ sub build_db {
         $db = $self->build_via_driver($dir, $spec);
     }
 
+    $db->stop if $params{stop};
+
     $self->diag("$$ Built new db '$spec->{name}', marking as ready!");
-    open(my $ready, '>', "$dir/READY") or die "Could not create ready file '$dir/READY': $!";
+    open(my $ready, '>', "$dir.READY") or die "Could not create ready file '$dir.READY': $!";
     print $ready "1\n";
     close($ready);
 

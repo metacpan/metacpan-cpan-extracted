@@ -1,0 +1,53 @@
+{
+   "abstract" : "This library allows merchants to use Verotel payment gateway and get paid by their users via Credit Card and other payment methods.",
+   "author" : [
+      "Verotel dev team"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Verotel-FlexPay",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Digest::SHA1" : "0",
+            "Exporter" : "0",
+            "Params::Validate" : "0",
+            "Test::Exception" : "0",
+            "Test::Spec" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.020003",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v4.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

@@ -1,5 +1,5 @@
 package Getopt::EX::Module;
-use version; our $VERSION = version->declare("v1.21.1");
+use version; our $VERSION = version->declare("v1.22.0");
 
 use v5.14;
 use warnings;
@@ -46,10 +46,9 @@ sub configure {
     }
 
     if (my $file = delete $opt{FILE}) {
-	$obj->module($file);
-	if (open(RC, "<:encoding(utf8)", $file)) {
-	    $obj->readrc(*RC);
-	    close RC;
+	if (open my $fh, "<:encoding(utf8)", $file) {
+	    $obj->module($file);
+	    $obj->readrc($fh);
 	}
     }
     elsif (my $module = delete $opt{MODULE}) {
@@ -96,6 +95,8 @@ sub readrc {
     for ($text) {
 	s/^__(?:CODE|PERL)__\s*\n(.*)//ms and do {
 	    package main;
+	    no warnings 'once';
+	    local $main::MODULE = $obj;
 	    eval $1;
 	    die if $@;
 	};
@@ -460,6 +461,8 @@ Getopt::EX::Module - RC/Module data container
 This module is usually used from L<Getopt::EX::Loader>, and keeps
 all data about loaded rc file or module.
 
+=head2 MODULE
+
 After user defined module was loaded, subroutine C<initialize> is
 called if it exists in the module.  At this time, container object is
 passed to the function as the first argument and following command
@@ -471,6 +474,15 @@ Following C<initialize>, function defined with module option is called.
 Finally subroutine C<finalize> is called if defined, to finalize start
 up process of the module.
 
+=head2 FILE
+
+As for rc file, section after C<__PERL__> mark is executed as Perl
+program.  At this time, module object is assigned to variable
+C<$MODULE>, and you can access module API through it.
+
+    if (our $MODULE) {
+        $MODULE->setopt('default', '--number');
+    }
 
 =head1 RC FILE FORMAT
 
@@ -534,7 +546,6 @@ equivalent and existing module sometimes use it.
 
     option --deprecated $<ignore>
     option --deprecated $<move(0,0)>
-
 
 =item B<expand> I<name> I<string>
 
@@ -610,7 +621,6 @@ produce parameters on the fly.
     option --dyncmap &dyncmap($<shift>)
 
 =back
-
 
 =head1 METHODS
 

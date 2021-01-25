@@ -18,7 +18,7 @@ $File::Copy::Recursive::DirPerms = 0755;
 
 my ($meta_model, $trace, $args) = init_test('show','interactive');
 
-note("You can play with the widget if you run the test with 's' argument");
+note("You can play with the widget if you run the test with '--show' parameter");
 
 my $wr_test = setup_test_dir ;
 my $wr_conf1 = $wr_test->child("wr_conf1");

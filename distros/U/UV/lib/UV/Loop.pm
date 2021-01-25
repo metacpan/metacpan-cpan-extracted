@@ -1,6 +1,6 @@
 package UV::Loop;
 
-our $VERSION = '1.000009';
+our $VERSION = '1.903';
 
 use strict;
 use warnings;
@@ -26,79 +26,24 @@ sub _is_a_loop {
 }
 
 sub new {
+    my $class = shift;
     print STDERR "UV::Loop->new() called\n" if DEBUG;
-    my $self = bless {}, shift;
     my $args = UV::_parse_args(@_);
+
+    my $self = $class->_new($args->{_default} // 0);
+
     $self->on('walk', $args->{on_walk});
     print STDERR "UV::Loop->new() walk callback added\n" if DEBUG;
 
-    $self->{data} = $args->{data};
-    $self->{_default} = (exists($args->{_default}) && $args->{_default})? 1: 0;
-    print STDERR "UV::Loop->new() wants a default? $self->{_default}\n" if DEBUG;
-    my $err = do { #catch
-        local $@;
-        eval {
-            $self->_create($self->{_default});
-            1;
-        }; #try
-        $@;
-    };
-    Carp::croak($err) if $err; # throw
     print STDERR "UV::Loop->new() done\n" if DEBUG;
     return $self;
-}
-
-sub DESTROY {
-    my $self = shift;
-    $self->close();
-}
-
-# closing a loop releases all data associated with it and the uv_loop_t *
-# should be freed!
-# However, if it's the default loop, we never actually free() the memory for
-# that structure!!!
-sub close {
-    my $self = shift;
-    my $res = UV::UV_ENOSYS;
-    print STDERR "loop close()\n" if DEBUG;
-
-    if ($self->{_closing}) {
-        print STDERR "loop close() We are already in a close process. exiting\n" if DEBUG;
-        return 0;
-    }
-    unless ($self->_has_struct()) {
-        print STDERR "loop close() object has no struct. ENOSYS\n" if DEBUG;
-        return UV::UV_ENOSYS;
-    }
-
-    print STDERR "loop close() set closing flag and attempt to close\n" if DEBUG;
-    $self->{_closing} = 1;
-    my $err = do { # catch
-        local $@;
-        eval {
-            $res = $self->_close($self->{_default});
-            1;
-        }; # try
-        $@;
-    };
-    warn $err if $err;
-    print STDERR "loop close() close attempt complete. unset flag\n" if DEBUG;
-    $self->{_closing} = undef;
-
-    if (0 == $res) {
-        print STDERR "loop close() close success.\n" if DEBUG;
-    }
-    else {
-        print STDERR "loop close() close failed\n" if DEBUG;
-    }
-    return $res;
 }
 
 # Return the singleton uv_default_loop
 sub default {
     print STDERR "loop default() singleton called\n" if DEBUG;
     my $class = shift;
-    if (defined($default_loop) && $default_loop->_has_struct) {
+    if (defined($default_loop)) {
         print STDERR "loop default() returning already stored default loop\n" if DEBUG;
         return $default_loop;
     }
@@ -110,20 +55,10 @@ sub default {
 
 sub default_loop { return shift->default(); }
 
-sub is_default {
-    my $self = shift;
-    return 1 if $self->{_default};
-    return 0;
-}
-
 sub on {
     my $self = shift;
-    my $event = lc(shift || '');
-    return $self unless $event && $event eq 'walk';
-    return $self->{"_on_$event"} unless @_;
-    my $cb = ($_[-1] && ref($_[-1]) eq 'CODE')? pop: undef;
-    $self->{"_on_$event"} = $cb;
-    return $self;
+    my $method = "_on_" . shift;
+    return $self->$method( @_ );
 }
 
 sub walk {
@@ -131,6 +66,13 @@ sub walk {
     return unless $self->alive();
     $self->on('walk', @_) if @_; # set the callback ahead of time if exists
     $self->_walk();
+}
+
+sub getaddrinfo {
+    my $self = shift;
+    my ($args, $cb) = @_;
+
+    $self->_getaddrinfo(@{$args}{qw( node service flags family socktype protocol )}, $cb);
 }
 
 1;
@@ -263,41 +205,6 @@ The L<backend_timeout|http://docs.libuv.org/en/v1.x/loop.html#c.uv_backend_timeo
 method returns the poll timeout. The return value is in milliseconds, or C<-1>
 for no timeout.
 
-=head2 close
-
-    my $loop = UV::Loop->default();
-    $loop->close();
-    # $loop is no longer a valid handle to the default loop.
-    # we must grab another default loop to continue after a close call.
-    $loop = UV::Loop->default();
-    # with a non-default loop, we render that loop useless.
-    $loop = UV::Loop->new();
-    $loop->close();
-    $loop->run(); # BOOM. error. the loop no longer exists here.
-
-The L<close|http://docs.libuv.org/en/v1.x/loop.html#c.uv_loop_close> method
-releases all internal loop resources. Call this method only when the loop has
-finished executing and all open handles and requests have been closed, or it
-will return C<UV::UV_EBUSY>.
-
-Calling C<close> on a loop will effectively destroy that loop. You will not be
-able to continue using the loop after calling C<close>.
-
-C<close> is essentially a wrapper around:
-
-    $loop->walk(sub {
-        my $handle = shift;
-        $handle->stop() if $handle->can('stop');
-        $handle->close() unless $handle->closing();
-        $handle->unref();
-    });
-    if (0 == $loop->run(UV::Loop::UV_RUN_DEFAULT)) {
-        # all loop memory is freed here.
-        if (0 == $loop->close()) {
-            $loop = undef;
-        }
-    }
-
 =head2 configure
 
     my $int = $loop->configure();
@@ -305,10 +212,6 @@ C<close> is essentially a wrapper around:
 The L<configure|http://docs.libuv.org/en/v1.x/loop.html#c.uv_loop_configure>
 method sets additional loop options. You should normally call this before the
 first call to L<UV::Loop/"run"> unless mentioned otherwise.
-
-Returns C<0> on success or a C<UV/"CONSTANTS"> error code on failure. Be
-prepared to handle C<UV::UV_ENOSYS>; it means the loop option is not supported
-by the platform.
 
 Supported options:
 
@@ -451,13 +354,62 @@ subjective but probably on the order of a millisecond or more.
         $handle->stop() if $handle->can('stop');
         $handle->close() unless $handle->closing();
         $loop->run(UV::Loop::UV_RUN_DEFAULT);
-        $loop->close();
     });
 
 The L<walk|http://docs.libuv.org/en/v1.x/loop.html#c.uv_walk> method will
 C<walk> the list of handles and fire off the callback supplied.
 
 This is an excellent way to ensure your loop is completely cleaned up.
+
+=head2 getaddrinfo
+
+    $req = $loop->getaddrinfo($args, $callback);
+
+        $callback->($status, @results)
+
+The L<getaddrinfo|http://docs.libuv.org/en/v1.x/dns.html#c.uv_getaddrinfo>
+method performs an asynchronous name lookup, turning a hostname and/or service
+name into a set of socket addresses suitable for C<connect()> or C<bind()>.
+
+The arguments passed by hash reference must include at least one of C<node>
+and C<service>, giving names of the entity to be looked up. Optional numerical
+parameters C<flags>, C<family>, C<socktype> and C<protocol> will be passed as
+hints if given.
+
+The method returns a L<UV::Req> instance representing the pending request. The
+caller does not need to hold a reference to it, but it may be used to cancel
+the request if so.
+
+When complete, the callback will be invoked with a status code indicating
+success or failure, and a list of result objects. Each value in the result
+list will have methods C<family>, C<socktype> and C<protocol> returning
+integers, and C<addr> and C<canonname> returning a string.
+
+    $result->family
+    $result->socktype
+    $result->protocol
+    $result->addr
+    $result->canonname
+
+The C<canonname> field will only be set on the first result, and only if the
+C<AI_CANONNAME> flag was included in the request.
+
+=head2 getnameinfo
+
+    $req = $loop->getnameinfo($addr, $flags)
+
+        $callback->($status, $hostname, $service)
+
+The L<getnameinfo|http://docs.libuv.org/en/v1.x/dns.html#c.uv_getnameinfo>
+method performs an asynchronous reverse name lookup, turning a socket address
+into a human-readable host and service name.
+
+The method returns a L<UV::Req> instance representing the pending request. The
+caller does not need to hold a reference to it, but it may be used to cancel
+the request if so.
+
+When complete, the callback will be invoked with a status code indicating
+success or failure, and the resolved host and service names.
 
 
 =head1 AUTHOR

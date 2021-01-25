@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.210120';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.210230';
 use Moose;
 use namespace::autoclean;
 
@@ -1013,6 +1013,7 @@ sub attach_taxa_to_entities {
 #     return $self->$method($listable, @_);
 # };
 
+# TODO: remove support for GI numbers
 
 
 sub gi_mapper {
@@ -1752,7 +1753,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.210120
+version 0.210230
 
 =head1 SYNOPSIS
 

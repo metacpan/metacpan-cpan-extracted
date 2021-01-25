@@ -1,5 +1,24 @@
 Revision history for IO-Async
 
+0.78    2021-01-21
+        [CHANGES]
+         * Warn on attempts to ->connect to INADDR(6)_LOOPBACK as some OSes
+           (e.g. OpenBSD) do not allow it
+         * Various fixes for IO::Async::LoopTests to better support
+           IO::Async::Loop::UV:
+            + Insert some ->loop_once(0) calls between timing tests to allow
+              libuv to clear its pending queues
+            + Allow loops to declare that they cannot perform all-child PID
+              watch and skip the relevant tests for it if so
+         * Have $loop->later return a future instance if not passed any code
+           (RT133240)
+
+        [BUGFIXES]
+         * Accept more error codes for failure to resolve missing hostname
+           (RT131109)
+         * Defend against some undef values at global destruction time
+           (RT132677)
+
 0.77    2020-05-13
         [CHANGES]
          * Updated for Metrics::Any 0.05

@@ -1,9 +1,18 @@
-2018-06-25 - 1.011
+1.012 2021-01-22
+
+  Tests update:
+    * use new style of test declaration
+      (require Config::Model::Tester 4.001)
+
+  Other changes:
+    * update copyright year
+
+1.011 - 2018-06-25
 
   Update to cope with newer Config::Model
     * Backend: use file_path instead of io_handle (gh #1)
 
-2017-11-13 - 1.010
+1.010 - 2017-11-13
 
     * upgrade model with cme meta
     * update support info in application file
@@ -14,16 +23,16 @@
     * fix GPL wording to keep Debian's lintian happy (and may be RMS)
     * fix typo detected by Debian lintian
 
-2013-08-21 - 1.009
+1.009 - 2013-08-21
 
     * Build-depends on Config::Model::Tester
     * Removed tests dependency now handler by Config::Model::Tester
 
-2013-05-05 - 1.008
+1.008 - 2013-05-05
 
     * Fixed pod test
 
-2013-05-04 - 1.007
+1.007 - 2013-05-04
 
     * depends directly on Mouse instead of Any::Moose
     * Build.PL: fix pod doc generation

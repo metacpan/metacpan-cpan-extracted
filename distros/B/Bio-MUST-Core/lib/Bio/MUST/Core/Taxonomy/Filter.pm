@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::Filter;
 # ABSTRACT: Helper class for filtering seqs according to taxonomy
-$Bio::MUST::Core::Taxonomy::Filter::VERSION = '0.210120';
+$Bio::MUST::Core::Taxonomy::Filter::VERSION = '0.210230';
 use Moose;
 use namespace::autoclean;
 
@@ -41,6 +41,9 @@ has '_is_' . $_ => (
     },
 ) for qw(wanted unwanted);
 
+
+# TODO: allow specifying taxa as partial lineages to solve ambiguities
+# TODO: allow specifying taxa as taxid and/or mustids (for strains)
 
 # regexes for deriving filter from specifications
 const my $WANTED   => qr{\A \+ \s* (.*) }xms;
@@ -117,7 +120,7 @@ Bio::MUST::Core::Taxonomy::Filter - Helper class for filtering seqs according to
 
 =head1 VERSION
 
-version 0.210120
+version 0.210230
 
 =head1 SYNOPSIS
 

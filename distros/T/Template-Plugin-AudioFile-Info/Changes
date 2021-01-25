@@ -1,7 +1,12 @@
+2021-01-23  Dave Cross <dave@perlhacks.com>
+
+	* Version 2.0.2
+	* Added bugtracker to metadata
+
 2020-11-04  Dave Cross <dave@perlhacks.com>
 
         * Version 2.0.1
-        * Adde repo information
+        * Added repo information
 
 2019-08-19  dave
 

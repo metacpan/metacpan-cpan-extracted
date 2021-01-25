@@ -9,7 +9,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Net/OpenVAS.pm',
     LICENSE          => 'artistic_2',
     EXE_FILES        => [],
-    MIN_PERL_VERSION => 5.008,
+    MIN_PERL_VERSION => 5.010,
     PL_FILES         => {},
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
@@ -18,7 +18,7 @@ WriteMakefile(
         'Test::More'   => '0',
     },
     PREREQ_PM => {
-        'XML::Simple' => '0',
+        'XML::Hash::XS'   => '0',
         'IO::Socket::SSL' => '0'
     },
     META_MERGE => {

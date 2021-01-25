@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '2.006'; # VERSION
+our $VERSION = '2.007'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -67,9 +67,11 @@ sub emit {
 
 sub source {
     my ($self) = @_;
-    $self->{source} //= (
-        $self->{new_source} //= sub { Ryu::Source->new }
-    )->()
+    $self->{source} //= do {
+        my $src = ($self->{new_source} //= sub { Ryu::Source->new })->();
+        Scalar::Util::weaken($src->{parent} = $self);
+        $src;
+    };
 }
 
 sub new_future {
@@ -80,6 +82,9 @@ sub new_future {
         }
     )->(@_)
 }
+
+sub completed { shift->source->completed }
+sub notify_child_completion { }
 
 1;
 

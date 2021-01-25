@@ -1,12 +1,24 @@
-Revision history for App-imgsize
+0.004   2020-12-24  Released-By: PERLANCAR; Urgency: low
 
-0.002   2016-10-07 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Mention calc-image-resized-size script.
+
+
+0.003   2020-12-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] When there is only 1 filename specified, show only 'WxH' by
+	  default instead of default record; add option --detail (-l) to
+	  force showing detailed record on 1 input.
+
+
+0.002   2016-10-07  Released-By: PERLANCAR
 
 	- Add example.
 
 	- Show resolution names for known sizes (e.g. 640x480 = VGA).
 
 
-0.001   2016-10-06 (PERLANCAR)
+0.001   2016-10-06  Released-By: PERLANCAR
 
         - First release.

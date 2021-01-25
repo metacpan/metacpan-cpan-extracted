@@ -1,7 +1,6 @@
 use Module::Build;
 my $build = Module::Build->new(
 	module_name => 'Tie::Hash::Cannabinol',
-	dist_version => '1.12.1',
 	license => 'perl',
 	requires => {
 		perl		      => '5.6.0',
@@ -23,6 +22,9 @@ my $build = Module::Build->new(
               type => 'git',
               url  => 'git://github.com/davorg/tie-hash-cannabinol.git',
               web  => 'https://github.com/davorg/tie-hash-cannabinol',
+            },
+            bugtracker => {
+              web  => 'https://github.com/davorg/tie-hash-cannabinol/issues',
             },
           },
         },

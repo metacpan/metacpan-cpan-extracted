@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2016, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2016, 2018, 2019, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,9 +19,10 @@
 
 use 5.004;
 use strict;
+use Math::BaseCnv 'cnv';
 use Math::BigInt try => 'GMP';   # for bignums in reverse-add steps
 use Test;
-plan tests => 24;
+plan tests => 27;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -32,8 +33,156 @@ use MyOEIS;
 # use Smart::Comments '###';
 
 use Math::PlanePath::ComplexMinus;
+use Math::PlanePath::Diagonals;
+
 my $path = Math::PlanePath::ComplexMinus->new;
 
+# Cf catalogued NumSeq sequences
+# A318438 X coordinate
+# A318439 Y coordinate
+# A318479 norm
+
+
+#------------------------------------------------------------------------------
+# A340566 - permutation N by diagonals +/-
+#   in binary
+
+# A001057 alternating pos and neg 0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5
+sub A001057 {
+  my ($n) = @_;
+  return ($n&1 ? ($n>>1)+1 : -($n>>1));
+}
+MyOEIS::compare_values
+  (anum => 'A001057',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       push @got, A001057($n);
+     }
+     return \@got;
+   });
+
+MyOEIS::compare_values
+  (anum => 'A340566',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my $diag = Math::PlanePath::Diagonals->new;
+     for (my $n = $diag->n_start; @got < $count; $n++) {
+       my ($x,$y) = $diag->n_to_xy($n);
+       $x = A001057($x);
+       $y = A001057($y);
+       my $n = $path->xy_to_n($x,$y);
+       push @got, cnv($n,10,2);
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A073791 - X axis X sorted by N, being base conversion 4 to -4
+#   X axis points (+ and -) in the order visited by the path
+
+MyOEIS::compare_values
+  (anum => 'A073791',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       if ($y==0) { push @got, $x; }
+     }
+     return \@got;
+   });
+
+# A320283 - Y axis Y sorted by N
+#   Y axis points (+ and -) in the order visited by the path
+MyOEIS::compare_values
+  (anum => 'A320283',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       if ($x==0) { push @got, $y; }
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A256441    N on negative X axis, X<=0
+
+MyOEIS::compare_values
+  (anum => 'A256441',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $x = 0; @got < $count; $x++) {
+       push @got, $path->xy_to_n (-$x,0);
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A066321    N on X axis, being the base i-1 positive reals
+MyOEIS::compare_values
+  (anum => 'A066321',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $x = 0; @got < $count; $x++) {
+       push @got, $path->xy_to_n ($x,0);
+     }
+     return \@got;
+   });
+# and 2*A066321 on North-West diagonal by one expansion
+MyOEIS::compare_values
+  (anum => q{A066321},
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $i = 0; @got < $count; $i++) {
+       push @got, $path->xy_to_n(-$i,$i) / 2;
+     }
+     return \@got;
+   });
+
+# A271472 - and in binary
+MyOEIS::compare_values
+  (anum => 'A271472',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $x = 0; @got < $count; $x++) {
+       push @got, sprintf '%b', $path->xy_to_n ($x,0);
+     }
+     return \@got;
+   });
+
+# A066323 - N on X axis, count 1 bits
+MyOEIS::compare_values
+  (anum => 'A066323',
+   func => sub {
+     my ($count) = @_;
+     my @got = (0);
+     for (my $x = 1; @got < $count; $x++) {
+       my $n = $path->xy_to_n ($x,0);
+       push @got, count_1_bits($n);
+     }
+     return \@got;
+   });
+sub count_1_bits {
+  my ($n) = @_;
+  my $count = 0;
+  while ($n) {
+    $count += ($n & 1);
+    $n >>= 1;
+  }
+  return $count;
+}
+
+
+#------------------------------------------------------------------------------
 sub is_string_palindrome {
   my ($str) = @_;
   return $str eq reverse($str);
@@ -168,48 +317,6 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A318438 X coordinate
-# A318439 Y coordinate
-
-MyOEIS::compare_values
-  (anum => 'A318438',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $n = 0; @got < $count; $n++) {
-       my ($x,$y) = $path->n_to_xy ($n);
-       push @got, $x;
-     }
-     return \@got;
-   });
-MyOEIS::compare_values
-  (anum => 'A318439',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $n = 0; @got < $count; $n++) {
-       my ($x,$y) = $path->n_to_xy ($n);
-       push @got, $y;
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A318479 norm
-
-MyOEIS::compare_values
-  (anum => 'A318479',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $n = 0; @got < $count; $n++) {
-       my ($x,$y) = $path->n_to_xy ($n);
-       push @got, $x**2 + $y**2;
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
 # A193241 reverse-add trajectory of binary 10110, in binary
 MyOEIS::compare_values
   (anum => 'A193241',
@@ -249,56 +356,6 @@ MyOEIS::compare_values
      }
      return \@got;
    });
-
-#------------------------------------------------------------------------------
-# A256441    N on negative X axis, X<=0
-MyOEIS::compare_values
-  (anum => 'A256441',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $x = 0; @got < $count; $x++) {
-       push @got, $path->xy_to_n (-$x,0);
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A066321    N on X axis, being the base i-1 positive reals
-MyOEIS::compare_values
-  (anum => 'A066321',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $x = 0; @got < $count; $x++) {
-       push @got, $path->xy_to_n ($x,0);
-     }
-     return \@got;
-   });
-# and 2*A066321 on North-West diagonal by one expansion
-MyOEIS::compare_values
-  (anum => q{A066321},
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $i = 0; @got < $count; $i++) {
-       push @got, $path->xy_to_n(-$i,$i) / 2;
-     }
-     return \@got;
-   });
-
-# A271472      and in binary
-MyOEIS::compare_values
-  (anum => 'A271472',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     for (my $x = 0; @got < $count; $x++) {
-       push @got, sprintf '%b', $path->xy_to_n ($x,0);
-     }
-     return \@got;
-   });
-
 
 #------------------------------------------------------------------------------
 # A137426 - dX/2 at N=2^(k+2)-1, for k>=0
@@ -423,31 +480,6 @@ MyOEIS::compare_values
      }
      return \@got;
    });
-
-#------------------------------------------------------------------------------
-# A066323 - N on X axis, count 1 bits
-
-MyOEIS::compare_values
-  (anum => 'A066323',
-   func => sub {
-     my ($count) = @_;
-     my @got = (0);
-     for (my $x = 1; @got < $count; $x++) {
-       my $n = $path->xy_to_n ($x,0);
-       push @got, count_1_bits($n);
-     }
-     return \@got;
-   });
-
-sub count_1_bits {
-  my ($n) = @_;
-  my $count = 0;
-  while ($n) {
-    $count += ($n & 1);
-    $n >>= 1;
-  }
-  return $count;
-}
 
 #------------------------------------------------------------------------------
 

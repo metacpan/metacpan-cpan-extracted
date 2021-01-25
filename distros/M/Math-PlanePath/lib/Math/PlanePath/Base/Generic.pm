@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION','@ISA','@EXPORT_OK';
-$VERSION = 128;
+$VERSION = 129;
 
 use Exporter;
 @ISA = ('Exporter');
@@ -30,7 +30,9 @@ use Exporter;
               # not documented yet
               'is_infinite',
               'floor',
-              'xy_is_even');
+              'xy_is_even',
+              'xy_is_visited_quad1',
+             );
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -117,7 +119,7 @@ sub floor {
 }
 
 # not documented yet
-sub xy_is_visited_quad1 {
+sub xy_is_visited_quad1 {      # or maybe base class with class_x_negative too
   my ($self, $x, $y) = @_;
   return ! (2*$x < -1 || 2*$y < -1);
 }
@@ -222,7 +224,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

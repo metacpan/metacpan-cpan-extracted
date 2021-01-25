@@ -1,5 +1,8 @@
 Net-RCON-Minecraft Changes
 
+0.04    2021-01-21
+        - RT -> GitHub for issue tracker, as RT is being shut down
+
 0.03    2019-12-10
         - Removed support for Perl 5.8.
 

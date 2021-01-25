@@ -4,7 +4,7 @@ use App::GHPT::Wrapper::Ourperl;
 
 use v5.20;
 
-our $VERSION = '1.000012';
+our $VERSION = '1.001000';
 
 1;
 
@@ -22,7 +22,7 @@ App::GHPT - A command line tool to simplify using Github and Pivotal Tracker for
 
 =head1 VERSION
 
-version 1.000012
+version 1.001000
 
 =head1 SYNOPSIS
 
@@ -111,13 +111,15 @@ You'll also need to tell git about your PT account:
 Your actual username and token can be found at
 L<https://www.pivotaltracker.com/profile>.
 
+You can alternatively provide the token via the C<PIVOTALTRACKER_TOKEN> environment variable.
+
 =head1 CREATING PULL REQUEST QUESTIONS
 
 A question is a class which consumes the
 L<App::GHPT::WorkSubmitter::Role::Question> and implements a method named
 C<ask>. See that role's documentation for details.
 
-By default, this tools looks for modules that have a a package name beginning
+By default, this tool looks for modules that have a package name beginning
 with C<App::GHPT::WorkSubmitter::Question> to find question classes. However,
 you can configure one or more alternative namespaces by setting the git config
 key C<submit-work.question-namespaces>. This should be a space-separated list
@@ -204,13 +206,21 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Florian Ragwitz Greg Oschwald Kevin Phair Mark Fowler Narsimham Chelluri Patrick Cronin
+=for stopwords Dave Rolsky Florian Ragwitz gabe Greg Oschwald Kevin Phair Mark Fowler Narsimham Chelluri Patrick Cronin William Storey
 
 =over 4
 
 =item *
 
+Dave Rolsky <drolsky@maxmind.com>
+
+=item *
+
 Florian Ragwitz <rafl@debian.org>
+
+=item *
+
+gabe <gpacuilla@maxmind.com>
 
 =item *
 
@@ -232,11 +242,15 @@ Narsimham Chelluri <nchelluri@maxmind.com>
 
 Patrick Cronin <pcronin@maxmind.com>
 
+=item *
+
+William Storey <wstorey@maxmind.com>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by MaxMind, Inc.
+This software is Copyright (c) 2021 by MaxMind, Inc.
 
 This is free software, licensed under:
 

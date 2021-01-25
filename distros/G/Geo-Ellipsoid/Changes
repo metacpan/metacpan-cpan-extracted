@@ -1,60 +1,122 @@
-Revision history for Perl module Geo::Ellipsoid
+1.15 2021-01-23
 
-0.01 Mon Oct 24 17:18:31 2005
-    - original version; created by ExtUtils::ModuleMaker 0.43
+ - Provide set_angle_unit() as an alternative to the too generically
+   named method set_units(). The name set_angle_unit() corresponds
+   nicely to the existing method set_distance_unit().
 
-0.9 Fri Oct 28 2005
-    - first version uploaded to PAUSE
+ - Add accessors get_angle_unit(), get_distance_unit(), get_ellipsoid(),
+   get_equatorial_radius(), get_polar_radius(), get_flattening(), and
+   get_eccentricity(), get_longitude_symmetric(), and
+   get_bearing_symmetric(). These are necessary for subclassing.
 
-0.901 Mon Oct 31 2005
-    1. Add Test::Number::Delta to prerequisites in Makefile.PL.
-    2. Include correct README file.
-    3. Correct version number in Ellipsoid.pm POD.
+ - Correct the version numbering in Changes (this file) and add missing entry
+   for version 1.11. Format CHANGES according to CPAN::Changes::Spec.
 
-0.902 Fri Nov 4 2005
-    1. Change WGS84 flattening value to 298.257223563.
-    2. Add set_defaults package method (and tests).
-    3. Add 'IAU76' to POD section on DEFINED ELLIPSOIDS
-    4. Croak on invalid ellipsoid or units.
-    5. Don't change defaults except by set_defaults.
-    6. Use package $DEBUG instead of instance $self->{debug} for debug.
-    7. Don't test bearing angle between points when the same.
+ - Rename the too generically property "units" to "angle_unit", and
+   "distance_units" to "distance_unit".
 
-0.903 Sat Aug 19 2006
-    1. Change test for zero flattening to use delta_within instead of delta_ok
+ - Rename the following internal object properties:
 
-0.904 Tue Aug 22 2006
-    1. Eliminate tests using points too far away.
-    2. Use delta_ok with relative test instead of delta_within for large
-       ranges.
+      "latitude"  -> "latitude_symmetric"   (only used internally)
+      "longitude" -> "longitude_symmetric"
+      "bearing"   -> "bearing_symmetric"
 
-1.0 Fri Mar 21 2008
-    1. Normalized calculated angle result from _inverse to be
-       less than 360.00 using _normalize_input subroutine.
-    2. Fixed POD error (extraneous =over)
-    3. Add 'use 5.006_00;' statement to abort Perls earlier than 5.6.0
-       because of 'our' statements.
-    4. Fix tests expecting 360 degrees for angles; change to 0.
+   This makes them more descriptive, and they now match the methods
+   set_latitude_symmetric() and set_bearing_symmetric(). The old object
+   property names without the "_symmtric" suffix are still supported.
 
-1.1 Sun Jun 30 2008
-    1. Added set_longitude_symmetric, set_bearing_symmetric, and
-       set_distance_unit methods
-    2. Corrected example of at method in documentation
-    3. Ensured no test too close to range boundaries (0,360 or -180,180)
-    4. Removed non-POD method headers as redundant.
-    5. Added tests for different distance units and symmetrical output
-       ranges.
+ - Improve documentation and fix typos in the POD. Add more information to the
+   SYNOPSIS. Update BUGS and SUPPORT sections. Update AUTHOR and COPYRIGHT
+   information.
 
-1.2 Fri Jul 4 2008
-    1. Correct bearing tests in 09-bearing.t
+1.14 2016-09-18
 
-1.13 Wed Sep 07 2016
-    1. Use OO syntax to make subclassing possible.
-    2. Add test file t/11-subclass.t
-    3. Update require version of Test::More to 0.47.
-    4. Minor POD changes.
-    5. Clean up whitespace.
+ - Avoid "use parent" in t/11-subclass.t since "parent" was not supported
+   before 5.8.9.
 
-1.14 Sun Sep 18 2016
-    1. Avoid "use parent" in t/11-subclass.t since "parent" was not supported
-       before 5.8.9.
+1.13 2016-09-07
+
+ - Use OO syntax to make subclassing possible.
+
+ - Add test file t/11-subclass.t
+
+ - Update require version of Test::More to 0.47.
+
+ - Minor POD changes.
+
+ - Clean up whitespace.
+
+1.12 2008-07-04
+
+ - Correct bearing tests in 09-bearing.t
+
+1.11 2008-07-01
+
+ - Removed ._* files added by Mac OS 10.5 tar by setting COPYFILE_DISABLE
+
+1.10 2008-06-30
+
+ - Add methods set_longitude_symmetric(), set_bearing_symmetric(), and
+   set_distance_unit methods().
+
+ - Corrected example of at() method in documentation.
+
+ - Ensured no test too close to range boundaries (0,360 or -180,180)
+
+ - Removed non-POD method headers as redundant.
+
+ - Added tests for different distance units and symmetrical output ranges.
+
+1.0 2008-03-21
+
+ - Normalized calculated angle result from _inverse to be less than 360.00
+   using _normalize_input subroutine.
+
+ - Fixed POD error (extraneous =over)
+
+ - Add 'use 5.006_00;' statement to abort Perls earlier than 5.6.0 because of
+   'our' statements.
+
+ - Fix tests expecting 360 degrees for angles; change to 0.
+
+0.904 2006-08-22
+
+ - Eliminate tests using points too far away.
+
+ - Use delta_ok with relative test instead of delta_within for large ranges.
+
+0.903 2006-08-19
+
+ - Change test for zero flattening to use delta_within instead of delta_ok
+
+0.902 2005-11-04
+
+ - Change WGS84 flattening value to 298.257223563.
+
+ - Add set_defaults package method (and tests).
+
+ - Add 'IAU76' to POD section on DEFINED ELLIPSOIDS
+
+ - Croak on invalid ellipsoid or units.
+
+ - Don't change defaults except by set_defaults.
+
+ - Use package $DEBUG instead of instance $self->{debug} for debug.
+
+ - Don't test bearing angle between points when the same.
+
+0.901 2005-10-31
+
+ - Add Test::Number::Delta to prerequisites in Makefile.PL.
+
+ - Include correct README file.
+
+ - Correct version number in Ellipsoid.pm POD.
+
+0.9 2005-10-28
+
+ - first version uploaded to PAUSE
+
+0.01 2005-10-24
+
+ - original version; created by ExtUtils::ModuleMaker 0.43

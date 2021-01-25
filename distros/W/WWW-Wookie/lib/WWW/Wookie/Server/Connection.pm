@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2010-2021, Roland van Ipenburg
-package WWW::Wookie::Server::Connection v1.1.3;
+package WWW::Wookie::Server::Connection v1.1.4;
 use strict;
 use warnings;
 
@@ -113,7 +113,7 @@ WWW::Wookie::Server::Connection - A connection to a Wookie server
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Server::Connection version C<v1.1.3>
+This document describes WWW::Wookie::Server::Connection version C<v1.1.4>
 
 =head1 SYNOPSIS
 

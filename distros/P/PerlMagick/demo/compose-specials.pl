@@ -9,7 +9,7 @@
 # Also not that "composite -watermark" is actually known as the compose
 # method "Modulate".
 #
-# Essentually each image is equivelent to
+# Essentially each image is equivelent to
 #   convert logo: -crop 80x80+140+60 +repage \
 #           -size 60x60 gradient:black-white \
 #           -alpha set miff:- |\
@@ -37,9 +37,9 @@ my $offset="+10+10";
 
 # Circle Mask Image (same size as Destination)
 my $circle=Image::Magick->new();
-$circle->Set(size=>'100x100');
+$circle->Set(size=>'80x80');
 $circle->Read('xc:black');
-$circle->Draw(fill=>'white',primitive=>'circle',points=>'49.5,49.5 10,49.5');
+$circle->Draw(fill=>'white',primitive=>'circle',points=>'39.5,39.5 10,39.5');
 
 my $texture=Image::Magick->new();
 $texture->Read('pattern:checkerboard');

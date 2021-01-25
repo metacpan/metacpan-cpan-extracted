@@ -21,14 +21,18 @@ my $test_time_limit = 90;
 
 if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
 } elsif ($> == 0) { # see RT#131304
-	my $current = $ENV{HOME};
-	my $correct = (getpwuid($>))[7];
-	if ($current eq $correct) {
-	} else {
-		$ENV{HOME} = $correct;
-		diag("Running as root.  Resetting HOME environment variable from $current to $ENV{HOME}");
-		diag("Could be running in an environment where sudo does not reset the HOME environment variable, such as ubuntu");
-	}
+       my $current = $ENV{HOME};
+       my $correct = (getpwuid($>))[7];
+       if ($current eq $correct) {
+       } else {
+               $ENV{HOME} = $correct;
+               diag("Running as root.  Resetting HOME environment variable from $current to $ENV{HOME}");
+               diag("Could be running in an environment where sudo does not reset the HOME environment variable, such as ubuntu");
+       }
+       if ( exists $ENV{XAUTHORITY} ) {    # see GH#1
+               delete $ENV{XAUTHORITY};
+               warn "Running as root.  Deleting the XAUTHORITY environment variable\n";
+       }
 }
 
 my @sig_nums  = split q[ ], $Config{sig_num};
@@ -87,6 +91,9 @@ sub start_firefox {
 	} elsif ($parameters{har}) {
 		diag("HAR support is not available for Firefox versions less than 61");
 		delete $parameters{har};
+	}
+	if ($parameters{console}) {
+		$parameters{console} = 1;
 	}
         if (defined $ENV{FIREFOX_NIGHTLY}) {
 		$parameters{nightly} = 1;
@@ -604,7 +611,7 @@ SKIP: {
 	ok($firefox->child_error() == $child_error, "Firefox returns $child_error for the child error, matching the return value of quit():$child_error:" . $firefox->child_error());
 	ok(!$firefox->alive(), "Firefox is not still alive");
 }
-if ($major_version < 40) {
+if ((!defined $major_version) || ($major_version < 40)) {
 	$profile->set_value('security.tls.version.max', 3); 
 }
 $profile->set_value('browser.newtabpage.activity-stream.feeds.favicon', 'true'); 
@@ -2189,7 +2196,7 @@ SKIP: {
 
 SKIP: {
 	my $proxy_host = 'all.example.org';
-	($skip_message, $firefox) = start_firefox(1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0, proxy => Firefox::Marionette::Proxy->new(host => $proxy_host)), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
+	($skip_message, $firefox) = start_firefox(1, console => 1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0, proxy => Firefox::Marionette::Proxy->new(host => $proxy_host)), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}

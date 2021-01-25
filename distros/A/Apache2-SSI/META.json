@@ -1,0 +1,85 @@
+{
+   "abstract" : "Apache2 Server Side Include",
+   "author" : [
+      "Jacques Deguest (jack@deguest.jp)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Apache2-SSI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache::Test" : "0",
+            "Cwd" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Digest::MD5" : "0",
+            "Digest::SHA" : "0",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "File::Which" : "0",
+            "HTML::Entities" : "0",
+            "IO::File" : "0",
+            "MIME::Base64" : "0",
+            "Module::Generic" : "v0.13.3",
+            "Net::Subnet" : "1.03",
+            "Nice::Try" : "v0.1.7",
+            "Regexp::Common::net" : "0",
+            "Scalar::Util" : "1.50",
+            "URI" : "0",
+            "URI::Escape::XS" : "0",
+            "URI::file" : "0",
+            "URL::Encode::XS" : "0",
+            "parent" : "0",
+            "perl" : "5.022001",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Test::More" : "1.302162",
+            "Test::Pod" : "1.52",
+            "lib" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://git.deguest.jp/jack/Apache2-SSI/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://git.deguest.jp/jack/Apache2-SSI"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

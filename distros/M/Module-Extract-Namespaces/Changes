@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::Namespaces
 
+1.022 2021-01-20T09:52:22Z
+	* freshen distro, dump Travis CI, add Appveyor, add Github Actions
+
 1.021 2017-11-30T04:41:09Z
 	* Removed the shim code for PPI's older than 1.125. Now you 
 	have to have an updated PPI that understand the v5.12 package 

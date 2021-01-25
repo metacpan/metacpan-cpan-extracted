@@ -1,26 +1,32 @@
-#!/usr/local/bin/perl
+#!perl
 # Test Geo::Ellipsoid load
-use Test::More tests => 21;
-use Test::Number::Delta relative => 1e-6;
-use Geo::Ellipsoid;
-use blib;
+
 use strict;
 use warnings;
 
+use Test::More tests => 21;
+use Test::Number::Delta relative => 1e-6;
+use Geo::Ellipsoid;
+
 BEGIN { use_ok( 'Geo::Ellipsoid' ); }
+
 my $e = Geo::Ellipsoid->new();
 isa_ok( $e, 'Geo::Ellipsoid');
-my $e1 = Geo::Ellipsoid->new( units => 'degrees' );
+
+my $e1 = Geo::Ellipsoid->new( angle_unit => 'degrees' );
 isa_ok( $e1, 'Geo::Ellipsoid');
-my $e2 = Geo::Ellipsoid->new( distance_units => 'foot' );
+
+my $e2 = Geo::Ellipsoid->new( distance_unit => 'foot' );
 isa_ok( $e2, 'Geo::Ellipsoid');
-my $e3 = Geo::Ellipsoid->new( bearing => 1 );
+
+my $e3 = Geo::Ellipsoid->new( bearing_symmetric => 1 );
 isa_ok( $e3, 'Geo::Ellipsoid');
-my $e4 = Geo::Ellipsoid->new( longitude => 1 );
+
+my $e4 = Geo::Ellipsoid->new( longitude_symmetric => 1 );
 isa_ok( $e4, 'Geo::Ellipsoid');
 
 can_ok( 'Geo::Ellipsoid', 'new' );
-can_ok( 'Geo::Ellipsoid', 'set_units' );
+can_ok( 'Geo::Ellipsoid', 'set_angle_unit' );
 can_ok( 'Geo::Ellipsoid', 'set_distance_unit' );
 can_ok( 'Geo::Ellipsoid', 'set_ellipsoid' );
 can_ok( 'Geo::Ellipsoid', 'set_custom_ellipsoid' );

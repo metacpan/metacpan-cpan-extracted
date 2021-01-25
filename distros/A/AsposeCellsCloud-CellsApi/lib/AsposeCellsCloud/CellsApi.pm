@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2020 Aspose.Cells Cloud
+Copyright (c) 2021 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -49,10 +49,12 @@ sub new {
     } else {
         $api_client = AsposeCellsCloud::ApiClient->new(@_);
     }
+
     if($api_client->need_auth()){
-        my $access_token  =  $api_client->o_auth_post('grant_type' => "client_credentials", 'client_id' => $api_client->{config}->{app_sid}, 'client_secret' =>$api_client->{config}->{app_key})->access_token;
+        my $access_token  =  $api_client->o_auth_post('grant_type' => "client_credentials", 'client_id' => $api_client->{config}->{client_id}, 'client_secret' =>$api_client->{config}->{client_secret})->access_token;
         $api_client->{config}->{access_token} = $access_token;
     }
+
     bless { api_client => $api_client }, $class;
 
 }
@@ -21263,6 +21265,146 @@ sub cells_put_insert_worksheet_rows {
 }
 
 #
+# cells_ranges_delete_worksheet_cells_range
+#
+# Delete range in the worksheet
+# 
+# @param string $name workbook name (required)
+# @param string $sheet_name worksheet name (required)
+# @param string $range range (required)
+# @param string $shift Represent the shift options when deleting a range of cells. (Left,Up)  (required)
+# @param string $folder Workbook folder. (optional)
+# @param string $storage_name storage name. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'workbook name',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => 'worksheet name',
+        required => '1',
+    },
+    'range' => {
+        data_type => 'string',
+        description => 'range',
+        required => '1',
+    },
+    'shift' => {
+        data_type => 'string',
+        description => 'Represent the shift options when deleting a range of cells. (Left,Up) ',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Workbook folder.',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => 'storage name.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_ranges_delete_worksheet_cells_range' } = { 
+    	summary => 'Delete range in the worksheet',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_ranges_delete_worksheet_cells_range {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_ranges_delete_worksheet_cells_range");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_ranges_delete_worksheet_cells_range");
+    }
+
+    # verify the required parameter 'range' is set
+    unless (exists $args{'range'}) {
+      croak("Missing the required parameter 'range' when calling cells_ranges_delete_worksheet_cells_range");
+    }
+
+    # verify the required parameter 'shift' is set
+    unless (exists $args{'shift'}) {
+      croak("Missing the required parameter 'shift' when calling cells_ranges_delete_worksheet_cells_range");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/ranges';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'range'}) {
+        $query_params->{'range'} = $self->{api_client}->to_query_value($args{'range'});
+    }
+
+    # query params
+    if ( exists $args{'shift'}) {
+        $query_params->{'shift'} = $self->{api_client}->to_query_value($args{'shift'});
+    }
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
 # cells_ranges_get_worksheet_cells_range_value
 #
 # Get cells list in a range by range name or row column indexes  
@@ -22584,6 +22726,146 @@ sub cells_ranges_post_worksheet_cells_ranges {
         $_body_data = $args{'range_operate'};
     }
 
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_ranges_put_worksheet_cells_range
+#
+# Put range in the worksheet
+# 
+# @param string $name workbook name (required)
+# @param string $sheet_name worksheet name (required)
+# @param string $range range (required)
+# @param string $shift Represent the shift options when deleting a range of cells. (Right,Down)  (required)
+# @param string $folder Workbook folder. (optional)
+# @param string $storage_name storage name. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'workbook name',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => 'worksheet name',
+        required => '1',
+    },
+    'range' => {
+        data_type => 'string',
+        description => 'range',
+        required => '1',
+    },
+    'shift' => {
+        data_type => 'string',
+        description => 'Represent the shift options when deleting a range of cells. (Right,Down) ',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Workbook folder.',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => 'storage name.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_ranges_put_worksheet_cells_range' } = { 
+    	summary => 'Put range in the worksheet',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_ranges_put_worksheet_cells_range {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_ranges_put_worksheet_cells_range");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_ranges_put_worksheet_cells_range");
+    }
+
+    # verify the required parameter 'range' is set
+    unless (exists $args{'range'}) {
+      croak("Missing the required parameter 'range' when calling cells_ranges_put_worksheet_cells_range");
+    }
+
+    # verify the required parameter 'shift' is set
+    unless (exists $args{'shift'}) {
+      croak("Missing the required parameter 'shift' when calling cells_ranges_put_worksheet_cells_range");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/ranges';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'range'}) {
+        $query_params->{'range'} = $self->{api_client}->to_query_value($args{'range'});
+    }
+
+    # query params
+    if ( exists $args{'shift'}) {
+        $query_params->{'shift'} = $self->{api_client}->to_query_value($args{'shift'});
+    }
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
     # authentication setting, if any
     my $auth_settings = [qw()];
 
@@ -33713,7 +33995,8 @@ sub upload_file {
         my $_base_variable = "{" . "path" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }    
+    }
+
     $self->{api_client}->check_access_token();
     my $_body_data;
     # body params

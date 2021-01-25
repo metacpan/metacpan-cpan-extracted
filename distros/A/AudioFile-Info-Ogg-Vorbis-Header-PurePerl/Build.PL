@@ -10,6 +10,8 @@ my $b = AudioFile::Info::Build->new(
         perl            => '5.6.0',
         AudioFile::Info => 0,
         Ogg::Vorbis::Header::PurePerl => 0,
+    },
+    configure_requires => {
         YAML => 0,
     },
     build_requires => {
@@ -24,6 +26,9 @@ my $b = AudioFile::Info::Build->new(
           type => 'git',
           url  => 'git://github.com/davorg/audiofile-info-ogg-vorbis-header-pureperl.git',
           web  => 'https://github.com/davorg/audiofile-info-ogg-vorbis-header-pureperl',
+       },
+        bugtracker => {
+          web  => 'https://github.com/davorg/audiofile-info-ogg-vorbis-header-pureperl/issues',
        },
       },
     },

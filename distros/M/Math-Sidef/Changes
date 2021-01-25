@@ -1,5 +1,9 @@
 Revision history for Perl extension Math::Sidef.
 
+0.03    2021-01-19
+
+        - Increased the required version of Sidef to 3.97.
+
 0.02    2021-01-18
 
         - Pack values returned from callback subroutines (fixes `dirichlet_sum`).

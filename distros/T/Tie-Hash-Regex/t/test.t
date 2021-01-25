@@ -1,4 +1,7 @@
-use Test::More tests=> 14;
+use strict;
+use warnings;
+
+use Test::More;
 
 BEGIN { use_ok 'Tie::Hash::Regex' };
 
@@ -32,3 +35,4 @@ is(@k, 1);
 delete $hash{qr/^k/};
 ok(not keys %hash);
 
+done_testing();

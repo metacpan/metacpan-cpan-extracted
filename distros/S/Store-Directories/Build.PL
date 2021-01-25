@@ -23,7 +23,8 @@ my $builder = Module::Build->new(
         'DBD::SQLite'   => '1.66',
         'Data::UUID'    => '1.226',
         'SQL::SplitStatement'   => '1.00020',
-        'IPC::System::Simple'   => '1.30'
+        'IPC::System::Simple'   => '1.30',
+        'Devel::GlobalDestruction' => '0.14'
     },
     add_to_cleanup     => [ 'Store-Directories-*' ],
     meta_merge => {

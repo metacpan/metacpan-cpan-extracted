@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2008-2020, Roland van Ipenburg
-package Date::Extract::P800Picture::Exceptions v1.1.5;
+package Date::Extract::P800Picture::Exceptions v1.1.6;
 use strict;
 use warnings;
 
@@ -22,12 +22,12 @@ Bitbucket Ipenburg
 
 =head1 NAME
 
-Date::Extract::P800Picture::Exceptions - exceptions.
+Date::Extract::P800Picture::Exceptions - exceptions
 
 =head1 VERSION
 
 This document describes Date::Extract::P800Picture::Exceptions version
-C<v1.1.5>.
+C<v1.1.6>.
 
 =head1 SYNOPSIS
 

@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
         resources => {
             'meta-spec' => { version => 2 },
             repository  => 'https://github.com/rjt-pl/Net-RCON-Minecraft.git',
+            bugtracker  => 'https://github.com/rjt-pl/Net-RCON-Minecraft/issues',
         },
     },
     dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz',           },

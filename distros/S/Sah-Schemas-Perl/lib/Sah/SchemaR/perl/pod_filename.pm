@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::pod_filename;
 
-our $DATE = '2020-06-19'; # DATE
-our $VERSION = '0.034'; # VERSION
+our $DATE = '2021-01-20'; # DATE
+our $VERSION = '0.035'; # VERSION
 
 our $rschema = ["str",[{description=>"\nUse this schema if you want to accept a filesystem path containing Perl POD. The\nvalue of this schema is in the convenience of CLI completion, as well as\ncoercion from POD name.\n\nString containing filename of a Perl .pod file. For convenience, when value is\nin the form of:\n\n    Foo\n    Foo.pod\n    Foo::Bar\n    Foo/Bar\n    Foo/Bar.pod\n\nand a matching .pod file is found in `\@INC`, then it will be coerced (converted)\ninto the filesystem path of that .pod file, e.g.:\n\n    /home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/Foo/Bar.pod\n\nTo prevent such coercion, you can use prefixing path, e.g.:\n\n    ./Foo::Bar\n    ../Foo/Bar\n    /path/to/Foo/Bar\n\nThis schema comes with convenience completion too.\n\n",summary=>"A .pod filename, e.g. /path/Foo.pod","x.completion"=>sub{package Sah::Schema::perl::pod_filename;require Complete::File;require Complete::Module;require Complete::Util;my(%args) = @_;my $word = $args{'word'};my @answers;push @answers, Complete::File::complete_file('word', $word);if ($word =~ m[\A\w*((?:::|/)\w+)*\z]) {push @answers, Complete::Module::complete_module('word', $word, 'find_pod', 1, 'find_pm', 0, 'find_pmc', 0);}Complete::Util::combine_answers(@answers)},"x.perl.coerce_rules"=>["From_str::convert_perl_pod_to_path"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::pod_filename - A .pod filename, e.g. /path/Foo.pod
 
 =head1 VERSION
 
-This document describes version 0.034 of Sah::SchemaR::perl::pod_filename (from Perl distribution Sah-Schemas-Perl), released on 2020-06-19.
+This document describes version 0.035 of Sah::SchemaR::perl::pod_filename (from Perl distribution Sah-Schemas-Perl), released on 2021-01-20.
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Perl>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-Perl/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

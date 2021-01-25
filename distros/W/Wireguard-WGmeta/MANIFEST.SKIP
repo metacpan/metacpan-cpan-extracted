@@ -1,0 +1,16 @@
+.*\.old$
+\.tar\.gz$
+^Makefile$
+^MYMETA\.
+^blib
+^pm_to_blib
+\.idea
+\.debian
+\.git
+_build
+\.gitignore
+cpanfile
+.*.am
+\.perl-version
+configure\.ac
+^_Deparsed_XSubs\.pm

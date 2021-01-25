@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Approx
 #
-# This software is Copyright (c) 2015-2018 by Dominique Dumont.
+# This software is Copyright (c) 2015-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -62,7 +62,7 @@ my $build = $class->new
    appli_files => \%appli_files ,
  
   'build_requires' => {
-    'Config::Model::Tester' => '3.006',
+    'Config::Model::Tester' => '4.001',
     'Config::Model::Tester::Setup' => '0',
     'Module::Build' => '0.34',
     'Test::More' => '0'

@@ -53,6 +53,7 @@ on develop => sub {
     requires "Dist::Zilla::Plugin::Git::Remote::Check";
     requires "Dist::Zilla::Plugin::Git::Check";
     requires "Dist::Zilla::Plugin::Git::Commit";
+    requires "Dist::Zilla::Plugin::Git::GatherDir";
     requires "Dist::Zilla::Plugin::Git::Tag";
     requires "Dist::Zilla::Plugin::PruneCruft";
     requires "Dist::Zilla::Plugin::Clean";

@@ -1,18 +1,17 @@
-#!/usr/bin/perl
+# Test password entry callback functionality
 
-use strict;
-use warnings;
-use Test::More tests => 36;
-use File::Spec;
+use lib 'inc';
+
 use Net::SSLeay;
+use Test::Net::SSLeay qw( data_file_path initialise_libssl );
 
-Net::SSLeay::randomize();
-Net::SSLeay::load_error_strings();
-Net::SSLeay::add_ssl_algorithms();
-Net::SSLeay::OpenSSL_add_all_algorithms();
+plan tests => 36;
 
-my $key_pem = File::Spec->catfile('t', 'data', 'testcert_key_2048.pem.e');
-my $key_password = 'secret';
+initialise_libssl();
+
+my $key_pem      = data_file_path('simple-cert.key.enc.pem');
+my $key_password = 'test';
+
 my $cb_1_calls = 0;
 my $cb_2_calls = 0;
 my $cb_3_calls = 0;
@@ -85,7 +84,7 @@ ok( Net::SSLeay::CTX_use_PrivateKey_file($ctx_2, $key_pem, &Net::SSLeay::FILETYP
 ok( Net::SSLeay::CTX_use_PrivateKey_file($ctx_3, $key_pem, &Net::SSLeay::FILETYPE_PEM),
         'CTX_use_PrivateKey_file works with right passphrase and without userdata' );
 
-Net::SSLeay::CTX_set_default_passwd_cb($ctx_4, sub { $cb_4_calls++; return 'secret';});
+Net::SSLeay::CTX_set_default_passwd_cb($ctx_4, sub { $cb_4_calls++; return $key_password; });
 ok( Net::SSLeay::CTX_use_PrivateKey_file($ctx_4, $key_pem, &Net::SSLeay::FILETYPE_PEM),
         'CTX_use_PrivateKey_file works when callback data is unset' );
 
@@ -137,7 +136,7 @@ sub test_ssl_funcs
     ok($ssl_4, 'SSL_new 4');
 
     $cb_1_calls = $cb_2_calls = $cb_3_calls = $cb_4_calls = $cb_bad_calls = 0;
-    $key_password = 'secret';
+    $key_password = 'test';
 
     Net::SSLeay::set_default_passwd_cb($ssl_1, \&callback1);
     Net::SSLeay::set_default_passwd_cb_userdata($ssl_1, \$key_password);
@@ -162,7 +161,7 @@ sub test_ssl_funcs
     ok( Net::SSLeay::use_PrivateKey_file($ssl_3, $key_pem, &Net::SSLeay::FILETYPE_PEM),
         'use_PrivateKey_file works with right passphrase and without userdata' );
 
-    Net::SSLeay::set_default_passwd_cb($ssl_4, sub { $cb_4_calls++; return 'secret';});
+    Net::SSLeay::set_default_passwd_cb($ssl_4, sub { $cb_4_calls++; return $key_password; });
     ok( Net::SSLeay::use_PrivateKey_file($ssl_4, $key_pem, &Net::SSLeay::FILETYPE_PEM),
         'use_PrivateKey_file works when callback data is unset' );
 

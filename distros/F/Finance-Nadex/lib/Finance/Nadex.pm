@@ -2,7 +2,7 @@ package Finance::Nadex;
 
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use LWP::UserAgent;
 use JSON;
@@ -479,51 +479,6 @@ sub get_markets {
     return @markets;
 }
 
-sub get_quote {
-
-    my $self = shift;
-    my %args = @_;
-
-    croak "ERROR: Finance::Nadex::get_quote(): must be logged in\n"
-      unless $self->logged_in;
-
-    croak
-"ERROR: Finance::Nadex::get_quote(): must specify a named argument 'instrument'\n"
-      unless exists $args{instrument};
-    croak "ERROR: Finance::Nadex::get_quote(): invalid instrument\n"
-      unless $args{instrument};
-
-    $args{instrument} = $index_name{ $args{instrument} }
-      if exists $index_name{ $args{instrument} };
-
-    my @markets = $self->get_markets();
-    foreach my $market (@markets) {
-        my @instruments = $self->get_market_instruments( name => $market );
-        foreach my $instrument (@instruments) {
-            if ( $instrument eq $args{instrument} ) {
-                my ($series) = $self->get_time_series(
-                    market     => $market,
-                    instrument => $instrument
-                );
-                my ($contract) = $self->get_contracts(
-                    market     => $market,
-                    instrument => $instrument,
-                    series     => $series
-                );
-                my $epic_url = $self->{base_url}.EPIC_URL . '/' . $contract->epic;
-                my $epic_ref = $self->_get($epic_url);
-
-                return undef unless $epic_ref;
-
-                die
-"ERROR: Finance::Nadex::get_quote(): failed to retrieve the market list from the exchange for epic $args{epic}\n"
-                  if !$epic_ref;
-                return $epic_ref->{instrument}->{underlyingIndicativePrice};
-            }
-        }
-    }
-}
-
 sub get_time_series {
 
     my $self = shift;
@@ -798,20 +753,15 @@ sub _delete {
 
     my $response = $self->{user_agent}->delete(
         $url,
-        clientApplication  => 'dxd',
-        clientPlatform     => 'ANDROID_PHONE',
-        clientVersion      => '1.13.2',
-        Accept             => 'application/json; charset=UTF-8',
-        'Content-Type'     => 'application/json; charset=UTF-8',
-        'Accept-Encoding'  => 'text/html',
-        Host               => 'www.nadex.com',
-        Connection         => 'Keep-Alive',
-        'X-SECURITY-TOKEN' => $self->{security_token},
-        Content            => $delete_content
+        'Accept'              => 'application/json; charset=UTF-8',
+        'Content-Type'        => 'application/json; charset=UTF-8',
+        'Accept-Encoding'     => 'text/html',
+        'X-SECURITY-TOKEN'    => $self->{security_token},
+        'X-DEVICE-USER-AGENT' => 'vendor=IG | applicationType=Nadex | platform=web | deviceType=phone | version=0.707.0+8fa77b16',
+        'Content'             => $delete_content
     );
 
-    $self->{security_token} = $response->header('X-SECURITY-TOKEN')
-      if $response->header('X-SECURITY-TOKEN');
+    $self->{security_token} = $response->header('X-SECURITY-TOKEN') if $response->header('X-SECURITY-TOKEN');
     $self->{code}    = $response->code;
     $self->{content} = $response->content;
 
@@ -828,20 +778,15 @@ sub _get {
 
     my $response = $self->{user_agent}->get(
         $url,
-        clientApplication  => 'dxd',
-        clientPlatform     => 'ANDROID_PHONE',
-        clientVersion      => '1.13.2',
-        Accept             => 'application/json; charset=UTF-8',
-        'Content-Type'     => 'application/json; charset=UTF-8',
-        'Accept-Encoding'  => 'text/html',
-        Host               => 'www.nadex.com',
-        Connection         => 'Keep-Alive',
-        'X-SECURITY-TOKEN' => $self->{security_token},
-        Content            => ""
+        'Accept'              => 'application/json; charset=UTF-8',
+        'Content-Type'        => 'application/json; charset=UTF-8',
+        'Accept-Encoding'     => 'text/html',
+        'X-SECURITY-TOKEN'    => $self->{security_token},
+        'X-DEVICE-USER-AGENT' => 'vendor=IG | applicationType=Nadex | platform=web | deviceType=phone | version=0.707.0+8fa77b16',
+        Content               => ""
     );
 
-    $self->{security_token} = $response->header('X-SECURITY-TOKEN')
-      if $response->header('X-SECURITY-TOKEN');
+    $self->{security_token} = $response->header('X-SECURITY-TOKEN') if $response->header('X-SECURITY-TOKEN');
     $self->{code}    = $response->code;
     $self->{content} = $response->content;
 
@@ -858,28 +803,15 @@ sub _post {
 
     my $response = $self->{user_agent}->post(
         $url,
-        clientApplication          => 'dxd',
-        clientPlatform             => 'APPLE_TABLET',
-        version                    => '1',
-        Accept                     => 'application/json; charset=UTF-8',
-        'Content-Type'             => 'application/json; charset=UTF-8',
-        'Accept-Encoding'          => 'text/html',
-        'X-IG-DEVICE_MANUFACTURER' => 'LGE',
-        'X-IG-DEVICE_MODEL'        => 'Nexus 4',
-        'X-IG-DEVICE_OS_NAME'      => 'Android',
-        'X-IG-DEVICE_OS_VERSION'   => '5.0.1',
-        'X-IG-DEVICE_LOCALE'       => 'en_US',
-        'X-IG-DEVICE_CARRIER'      => 'AT&T',
-        'X-DEVICE-USER-AGENT' =>
-'vendor=Minsk | applicationType=NADEX_PROMO | platform=Android | deviceType=phone | version=5.0.5',
-        Host               => 'www.nadex.com',
-        Connection         => 'Keep-Alive',
-        'X-SECURITY-TOKEN' => $self->{security_token},
-        Content            => $post_content
+        'Accept'              => 'application/json; charset=UTF-8',
+        'Content-Type'        => 'application/json; charset=UTF-8',
+        'Accept-Encoding'     => 'text/html',
+        'Accept-Language'     => 'en-US,en;q=0.9',
+        'X-DEVICE-USER-AGENT' => 'vendor=IG | applicationType=Nadex | platform=web | deviceType=phone | version=0.707.0+8fa77b16',
+        Content               => $post_content
     );
 
-    $self->{security_token} = $response->header('X-SECURITY-TOKEN')
-      if $response->header('X-SECURITY-TOKEN');
+    $self->{security_token} = $response->header('X-SECURITY-TOKEN') if $response->header('X-SECURITY-TOKEN');
     $self->{code} = $response->code;
     $self->{content} = $response->content || undef;
 
@@ -992,11 +924,6 @@ Easily create orders, cancel orders, retrieve orders and retrieve positions on t
     
     # get the available balance in the account
     my $balance = $client->balance();
-    
-    # get a quote for GBP/USD
-    my $quote = $client->get_quote('instrument' => 'GBP/USD');
-
-    # $quote may now be (for example), 1.5010
     
     # retrieve the epic (Nadex-assigned contract unique identifier) for the
     # Daily, 3pm, GBP/USD > 1.5120 contract
@@ -1160,19 +1087,6 @@ information about the market
 get_markets()
 
 Returns a list in which each element is a string containing the name of a market in which instruments are traded   
-
-=head2 get_quote
-
-Retrieves the current price level of the instrument specified as reported by the exchange (the Indicative Price)
-
-get_quote( instrument => 'GBP/USD' );
-
-	instrument : the name of the instrument within the market for which a quote is to be retrieved; the 
-                instrument specified must be one of the instruments currently available for trading 
-                on the exchange for the provided market; the list of valid instruments can be obtained 
-                via get_market_instruments()
-                
-Returns the current price level or undef if it cannot be obtained
 
 =head2 get_time_series
 

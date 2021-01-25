@@ -1,3 +1,14 @@
+2.053 2021-01-22
+
+  Bug fix:
+    * no longer show quotes in values
+      (require Config::Model 2.022)
+
+  Other changes:
+    * update copyright year
+    * update dependency versions in model generator
+    * added README file for the test suite
+
 2.052 2017-10-05
 
   Update following the deprecation done recently in Config::Model:

@@ -93,7 +93,7 @@ a call to `Neo4j::Bolt->connect()`.
 
 # LICENSE
 
-This software is Copyright (c) 2019-2020 by Mark A. Jensen.
+This software is Copyright (c) 2019-2021 by Mark A. Jensen.
 
 This is free software, licensed under:
 

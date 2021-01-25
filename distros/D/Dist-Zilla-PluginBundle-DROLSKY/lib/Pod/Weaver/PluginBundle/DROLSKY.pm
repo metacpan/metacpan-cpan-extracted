@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean -also => ['_exp'];
 
-our $VERSION = '1.12';
+our $VERSION = '1.18';
 
 use Dist::Zilla::Plugin::PodWeaver;
 use List::Util qw( first );
@@ -322,7 +322,7 @@ Pod::Weaver::PluginBundle::DROLSKY - A plugin bundle for pod woven by DROLSKY
 
 =head1 VERSION
 
-version 1.12
+version 1.18
 
 =head1 SYNOPSIS
 

@@ -4,13 +4,13 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Config-Model-LcdProc",
    "prereqs" : {
@@ -21,8 +21,8 @@
       },
       "configure" : {
          "requires" : {
-            "Config::Model" : "2.111",
-            "Config::Model::Itself" : "2.012",
+            "Config::Model" : "2.141",
+            "Config::Model::Itself" : "2.022",
             "Getopt::Long" : "0",
             "Module::Build" : "0.34",
             "Path::Tiny" : "0"
@@ -30,13 +30,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Config::Model" : "2.111",
+            "Config::Model" : "2.022",
             "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
-            "Config::Model::Tester" : "0"
+            "Config::Model::Tester" : "3.006"
          }
       }
    },
@@ -53,7 +53,9 @@
          "web" : "http://github.com/dod38fr/config-model-lcdproc"
       }
    },
-   "version" : "2.052",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "2.053",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "LGPL-2.1"
 }
 

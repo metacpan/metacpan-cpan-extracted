@@ -1,5 +1,12 @@
 Revision history for Data-Pageset-Exponential:
 
+v0.3.2    2021-01-25 16:18:02+00:00 Europe/London
+  [Documentation]
+  - Bump copyright year.
+
+  [Toolchain]
+  - Explicitly declare core modules in prereqs.
+
 v0.3.1    2019-07-31 18:19:04+01:00 Europe/London
   [Enhancements]
   - @ISA spoofing done through asa module.

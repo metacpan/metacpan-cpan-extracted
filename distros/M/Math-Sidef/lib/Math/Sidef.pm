@@ -7,7 +7,7 @@ use warnings;
 
 use Exporter;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Sidef;
 use Math::AnyNum;

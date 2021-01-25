@@ -1,12 +1,14 @@
 package Kelp::Module::JSON;
 
 use Kelp::Base 'Kelp::Module';
-use JSON;
+
+use JSON::MaybeXS;
 
 sub build {
     my ( $self, %args ) = @_;
-    my $json = JSON->new;
-    $json->property( $_ => $args{$_} ) for keys %args;
+    my $json = JSON::MaybeXS->new(
+        map { $_ => $args{$_} } keys %args
+    );
     $self->register( json => $json );
 }
 
@@ -31,5 +33,7 @@ Kelp::Module::JSON - Simple JSON module for a Kelp application
 =head1 REGISTERED METHODS
 
 This module registers only one method into the application: C<json>.
+
+The module will try to use backends in this order: I<Cpanel::JSON::XS, JSON::XS, JSON::PP>.
 
 =cut

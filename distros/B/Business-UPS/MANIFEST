@@ -1,10 +1,11 @@
 Changes
-MANIFEST
-Makefile.PL
-lib/Business/UPS.pm
-README
-product-codes.txt
 country-codes.txt
 examples/test.pl
+lib/Business/UPS.pm
+Makefile.PL
+MANIFEST
+product-codes.txt
+README
 t/00-load.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

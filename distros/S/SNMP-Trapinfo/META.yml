@@ -22,4 +22,4 @@ requires:
   Safe: '2.11'
 resources:
   repository: https://github.com/tonvoon/perl-snmp-trapinfo.git
-version: '1.05'
+version: '1.06'

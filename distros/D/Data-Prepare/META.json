@@ -1,0 +1,74 @@
+{
+   "abstract" : "prepare CSV (etc) data for automatic processing",
+   "author" : [
+      "Ed J <etj@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Prepare",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.10"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage" : "0.18",
+            "Pod::Markdown" : "0",
+            "Test::Pod" : "1.00",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "Text::CSV" : "2.00",
+            "YAML" : "1.30",
+            "perl" : "5.008003"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "App::Prove" : "3.00"
+         },
+         "requires" : {
+            "Test::Snapshot" : "0.06"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mohawk2/data-prepare/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mohawk2/data-prepare"
+      },
+      "x_IRC" : "irc://irc.perl.org/#graphql-perl"
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

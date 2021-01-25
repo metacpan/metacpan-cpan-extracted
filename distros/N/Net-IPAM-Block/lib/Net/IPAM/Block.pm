@@ -1,6 +1,6 @@
 package Net::IPAM::Block;
 
-our $VERSION = '2.03';
+our $VERSION = '3.00';
 
 use 5.10.0;
 use strict;
@@ -14,15 +14,11 @@ use Net::IPAM::Util           ();
 use Net::IPAM::Block::Private ();
 
 use Exporter 'import';
-our @EXPORT_OK = qw(aggregate);
+our @EXPORT_OK = qw(sort_block aggregate);
 
 =head1 NAME
 
-Net::IPAM::Block - A library for reading, formatting, sorting and converting IP-blocks.
-
-=cut
-
-our $MaxCIDRSplit = 1 << 20;
+Net::IPAM::Block - A library for reading, formatting, sorting, ... and much more for IP-blocks.
 
 =head1 SYNOPSIS
 
@@ -122,7 +118,7 @@ Returns 4 or 6.
 
 # just return the version from the base IP
 sub version {
-  return $_[0]->{base}->version;
+  return $_[0]->{base}{version};
 }
 
 =head2 to_string
@@ -490,16 +486,13 @@ cmp() returns -1, 0, +1:
 
 =cut
 
+#  ( $_[0]->{base}{binary} cmp $_[1]->{base}{binary} )
+#    ||
+#	( $_[1]->{last}{binary} cmp $_[0]->{last}{binary} ); <<<< ATTENTION: last cmp is reversed!
+
 sub cmp {
-  return -1 if $_[0]->{base}->cmp( $_[1]->{base} ) < 0;
-  return 1  if $_[0]->{base}->cmp( $_[1]->{base} ) > 0;
-
-  # base is equal, test for superset/subset
-  return -1 if $_[0]->{last}->cmp( $_[1]->{last} ) > 0;
-  return 1  if $_[0]->{last}->cmp( $_[1]->{last} ) < 0;
-
-  # base and last are also equal
-  return 0;
+  return ( $_[0]->{base}{binary} cmp $_[1]->{base}{binary} )
+    || ( $_[1]->{last}{binary} cmp $_[0]->{last}{binary} );
 }
 
 =head2 is_disjunct_with
@@ -684,119 +677,31 @@ sub diff {
   return wantarray ? @diff : [@diff];
 }
 
-=head2 find_free_cidrs
+=head1 FUNCTIONS
 
-  DEPRECATED: find_free_cidrs() is deprecated in favor of diff(), maybe followed by to_cidrs()
+=head2 sort_block
 
-  @free = $outer->find_free_cidrs(@inner)
+  use Net::IPAM::Block 'sort_block';
 
-Returns all free cidrs within given block, minus the inner blocks.
+  @sorted_blocks = sort_block @unsorted_blocks;
 
-  my $outer = Net::IPAM::Block->new("192.168.2.0/24");
-  my @inner = (
-  	Net::IPAM::Block->new("192.168.2.0/26"),
-  	Net::IPAM::Block->new("192.168.2.240-192.168.2.249"),
-  );
+Faster sort implemention (Schwartzian transform) as explcit sort function:
 
-  my @free = $outer->find_free_cidrs(@inner);
-
-  # outer: 192.168.2.0/24 - inner: [192.168.2.0/26 192.168.2.240-192.168.2.249]
-  # free: [192.168.2.64/26 192.168.2.128/26 192.168.2.192/27 192.168.2.224/28 192.168.2.250/31 192.168.2.252/30]
+  @sorted_blocks = sort { $a->cmp($b) } @unsorted_blocks;
 
 =cut
 
-sub find_free_cidrs {
-  Carp::carp('DEPRECATED: find_free_cidrs() is deprecated in favor of diff(), maybe followed by to_cidrs()');
+# see also cmp()
 
-  my ( $outer, @inner ) = @_;
-
-  my @purged;
-
-  # purge inner blocks
-  foreach my $inner (@inner) {
-
-    # no free cidrs
-    if ( $inner->cmp($outer) == 0 or $inner->contains($outer) ) {
-      return wantarray ? () : [];
-    }
-    next if $outer->is_disjunct_with($inner);
-
-    push @purged, $inner;
-  }
-
-  # sort inner blocks
-  my @sorted = sort { $a->cmp($b) } @purged;
-
-  # purge equals and containments in inner blcoks
-  undef @purged;
-  my $i = 0;
-  while ( $i <= $#sorted ) {
-    push @purged, $sorted[$i];
-    my $j = $i + 1;
-    while ( $j <= $#sorted ) {
-
-      # purge equal
-      if ( $sorted[$i]->cmp( $sorted[$j] ) == 0 ) {
-        $j++;
-        next;
-      }
-
-      # purge containments
-      if ( $sorted[$i]->contains( $sorted[$j] ) ) {
-        $j++;
-        next;
-      }
-      last;
-    }
-    $i = $j;
-  }
-
-  # collect free blocks
-  my @free;
-
-  my $cursor = $outer->base;
-  foreach my $inner (@purged) {
-
-    if ( $cursor->cmp( $inner->base ) < 0 ) {
-      my $base_ip = $cursor;
-      my $last_ip = $inner->base->decr;
-
-      # make new block
-      my $block = bless( {}, ref $outer );
-      $block->{base} = $base_ip;
-      $block->{last} = $last_ip;
-      $block->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $base_ip, $last_ip );
-
-      push @free, $block->to_cidrs;
-
-      $cursor = $inner->last->incr;
-      next;
-    }
-
-    $cursor = $inner->last->incr;
-    next;
-  }
-
-  if ( $cursor->cmp( $outer->last ) < 0 ) {
-    my $base_ip = $cursor;
-    my $last_ip = $outer->last;
-
-    # make new cidr block
-    # watch out inheritende
-    my $block = bless( {}, ref $outer );
-    $block->{base} = $base_ip;
-    $block->{last} = $last_ip;
-    $block->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $base_ip, $last_ip );
-
-    push @free, $block->to_cidrs;
-  }
-
-  return wantarray ? @free : [@free];
+sub sort_block {
+  return map { $_->[0] }
+    sort     { ( $a->[1] cmp $b->[1] ) || ( $b->[2] cmp $a->[2] ) }
+    map      { [ $_, $_->{base}{binary}, $_->{last}{binary} ] } @_;
 }
 
-=head1 FUNCTIONS
-
 =head2 aggregate
+
+  use Net::IPAM::Block 'aggregate';
 
   @agg = aggregate(@blocks)
 

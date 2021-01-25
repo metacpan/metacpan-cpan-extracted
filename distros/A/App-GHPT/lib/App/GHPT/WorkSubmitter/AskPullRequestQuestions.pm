@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter::AskPullRequestQuestions;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000012';
+our $VERSION = '1.001000';
 
 use App::GHPT::Types qw( ArrayRef Str );
 use Module::Pluggable::Object;
@@ -72,7 +72,7 @@ App::GHPT::WorkSubmitter::AskPullRequestQuestions - Ask questions to go in the p
 
 =head1 VERSION
 
-version 1.000012
+version 1.001000
 
 =head1 SYNOPSIS
 
@@ -123,7 +123,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by MaxMind, Inc.
+This software is Copyright (c) 2021 by MaxMind, Inc.
 
 This is free software, licensed under:
 

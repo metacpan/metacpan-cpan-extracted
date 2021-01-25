@@ -2,6 +2,10 @@
 localhost:
   ipaddr: 127.0.0.1
   alias: localhost
-bilbo:
+bilbo: !!perl/hash:SneakyObject
   ipaddr: 192.168.0.1
 yada:
+
+# Local Variables:
+# mode: yaml
+# End: 

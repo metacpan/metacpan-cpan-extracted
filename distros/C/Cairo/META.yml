@@ -31,5 +31,5 @@ resources:
   homepage: http://gtk2-perl.sourceforge.net
   license: http://www.gnu.org/licenses/lgpl-2.1.html
   repository: https://gitlab.gnome.org/GNOME/perl-cairo.git
-version: '1.108'
+version: '1.109'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

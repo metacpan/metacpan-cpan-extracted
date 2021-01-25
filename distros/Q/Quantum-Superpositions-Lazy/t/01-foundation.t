@@ -15,7 +15,7 @@ BEGIN {
 	# mock before importing, so that we control the RNG in Q::S
 	use_ok('Quantum::Superpositions::Lazy::Util');
 	$rand = Mock::Sub->new->mock("Quantum::Superpositions::Lazy::Util::get_rand");
-	use_ok('Quantum::Superpositions::Lazy');
+	use_ok('Quantum::Superpositions::Lazy', 'superpos', 'collapse');
 }
 
 my $pos = superpos(1);
@@ -48,5 +48,13 @@ my $nested = superpos($pos);
 is $nested->collapse, 1, "nested superpositions ok";
 $nested->reset;
 ok !$pos->is_collapsed, "nested reset ok";
+
+my $one_of = superpos(1);
+is_deeply
+	[collapse($one_of, superpos(2), superpos(3))],
+	[1, 2, 3],
+	"collapse function ok";
+
+ok $one_of->is_collapsed, "collapsed ok";
 
 done_testing;

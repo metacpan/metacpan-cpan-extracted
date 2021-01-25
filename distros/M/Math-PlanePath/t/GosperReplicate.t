@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2018, 2019 Kevin Ryde
+# Copyright 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -36,7 +36,7 @@ require Math::PlanePath::GosperReplicate;
 # VERSION
 
 {
-  my $want_version = 128;
+  my $want_version = 129;
   ok ($Math::PlanePath::GosperReplicate::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::GosperReplicate->VERSION,  $want_version,

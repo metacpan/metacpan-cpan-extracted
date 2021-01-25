@@ -1,27 +1,12 @@
 package UV::Idle;
 
-our $VERSION = '1.000009';
+our $VERSION = '1.903';
 
 use strict;
 use warnings;
-use Exporter qw(import);
 use parent 'UV::Handle';
 
 use Carp ();
-
-sub _after_new {
-    my ($self, $args) = @_;
-    # add to the default set of events for a Handle object
-    $self->_add_event('idle', $args->{on_idle});
-
-    my $err = do { #catch
-        local $@;
-        eval { $self->_init($self->{_loop}); 1; }; #try
-        $@;
-    };
-    Carp::croak($err) if $err; # throw
-    return $self;
-}
 
 sub start {
     my $self = shift;
@@ -66,7 +51,6 @@ UV::Idle - Idle handles in libuv
   my $loop = UV::Loop->new(); # non-default loop
   my $idle = UV::Idle->new(
     loop => $loop,
-    on_alloc => sub {say "alloc!"},
     on_close => sub {say "close!"},
     on_idle => sub {say "idle!"},
   );
@@ -128,7 +112,6 @@ following extra methods available.
     # Or tell it what loop to initialize against
     my $idle = UV::Idle->new(
         loop => $loop,
-        on_alloc => sub {say "alloc!"},
         on_close => sub {say "close!"},
         on_idle => sub {say "idle!"},
     );

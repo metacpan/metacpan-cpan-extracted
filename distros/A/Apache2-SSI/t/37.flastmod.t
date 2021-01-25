@@ -1,0 +1,82 @@
+#!/usr/local/bin/perl
+BEGIN
+{
+    use Test::More qw( no_plan );
+    use lib './lib';
+    require( "./t/functions.pl" ) || BAIL_OUT( "Unable to find library \"functions.pl\"." );
+    our $BASE_URI;
+    use Path::Tiny;
+    use DateTime;
+    use DateTime::Format::Strptime;
+    use Nice::Try;
+    our $DEBUG = 0;
+};
+
+my( $inc_ts, $me_ts, $year );
+try
+{
+    my $dt = DateTime->now( time_zone => 'local' );
+    $year = $dt->year;
+    my $inc = Path::Tiny->new( "./t/htdocs${BASE_URI}/include.01.txt" );
+    ## diag( "File $inc last modified time is ", $inc->stat->mtime, " (", scalar( localtime( $inc->stat->mtime ) ), ")." );
+    $inc_ts = DateTime->from_epoch( epoch => $inc->stat->mtime, time_zone => 'local' );
+    my $params =
+    {
+        pattern => '%A %B %d, %Y',
+        time_zone => 'local',
+    };
+    $params->{locale} = $ENV{lang} if( length( $ENV{lang} ) );
+    my $fmt = DateTime::Format::Strptime->new( %$params );
+    $inc_ts->set_formatter( $fmt );
+    my $me = Path::Tiny->new( "./t/htdocs${BASE_URI}/07.03.flastmod.html" );
+    $me_ts = DateTime->from_epoch( epoch => $me->stat->mtime, time_zone => 'local' );
+    my $fmt2 = DateTime::Format::Strptime->new(
+        pattern => '%D',
+        time_zone => 'local',
+        locale => 'en_US',
+    );
+    $me_ts->set_formatter( $fmt2 );
+    diag( __FILE__, " last modification date time is '$me_ts'." ) if( $DEBUG );
+}
+catch( $e )
+{
+    BAIL_OUT( $e );
+}
+
+my $tests =
+[
+    {
+        expect => <<EOT,
+
+This file last modified ${inc_ts}
+EOT
+        name => 'with time format preset',
+        uri => "${BASE_URI}/07.01.flastmod.html",
+        code => 200,
+    },
+    {
+        expect => <<EOT,
+
+Year: ${year}
+EOT
+        name => 'using DATE_LOCAL',
+        uri => "${BASE_URI}/07.02.flastmod.html",
+        code => 200,
+    },
+    {
+        expect => <<EOT,
+
+This file last modified ${me_ts}
+EOT
+        name => 'using LAST_MODIFIED',
+        uri => "${BASE_URI}/07.03.flastmod.html",
+        code => 200,
+    },
+];
+
+run_tests( $tests,
+{
+    debug => 0,
+    type => 'flastmod',
+});
+

@@ -19,7 +19,7 @@ my %module_build_args = (
     "Chris Winters <chris\@cwinters.com>"
   ],
   "dist_name" => "Workflow",
-  "dist_version" => "1.49",
+  "dist_version" => "1.50",
   "license" => "perl",
   "module_name" => "Workflow",
   "recommends" => {
@@ -38,7 +38,6 @@ my %module_build_args = (
     "DateTime::Format::Strptime" => "1.00",
     "Exception::Class" => "1.10",
     "File::Slurp" => 0,
-    "Log::Dispatch" => "2.00",
     "Log::Log4perl" => "0.34",
     "Safe" => 0,
     "XML::Simple" => "2.00",

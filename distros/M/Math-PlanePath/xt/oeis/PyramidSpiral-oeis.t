@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2018, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2018, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -33,8 +33,67 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::PyramidSpiral;
+use Math::PlanePath::SquareSpiral;
 use Math::NumSeq::PlanePathTurn;
 
+
+
+#------------------------------------------------------------------------------
+# A217013 - permutation, SquareSpiral -> PyramidSpiral
+#   X,Y in SquareSpiral order, N of PyramidSpiral
+# A217294 - inverse
+
+{
+  my $pyramid = Math::PlanePath::PyramidSpiral->new;
+  my $square  = Math::PlanePath::SquareSpiral->new;
+
+  # N= 1  2   3  4  5  6  7  8   9  10
+  #    1, 3, 14, 4, 6, 7, 8, 2, 12, 30, 13, 32, 59, 33, 15, 5, 19, 20, 21
+  MyOEIS::compare_values
+      (anum => 'A217013',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         for (my $n = $square->n_start; @got < $count; $n++) {
+           my ($x, $y) = $square->n_to_xy($n);
+           ($x,$y) = (-$y,$x);  # rotate +90
+           push @got, $pyramid->xy_to_n($x,$y);
+         }
+         return \@got;
+       });
+  # N= 1  2  3  4  5  6  7  8   9  10
+  #    1, 8, 2, 4, 16, 5, 6, 7, 22, 45, 23, 9, 11, 3, 15, 35, 63, 36, 17
+  MyOEIS::compare_values
+      (anum => 'A217294',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         for (my $n = $pyramid->n_start; @got < $count; $n++) {
+           my ($x,$y) = $pyramid->n_to_xy($n);
+           ($x,$y) = ($y,-$x);  # rotate -90
+           push @got, $square->xy_to_n ($x,$y);
+         }
+         return \@got;
+       });
+
+  # Different side lengths by horizontal long side at different phase ...
+  #
+  # side lengths 1,3,2,3,7,4           1,1,2,5,3,4,9
+  #        picture A214226             PyramidSpiral
+  #               21                         13
+  #              /  \                       /  \ 
+  #            20  7 22                   14  3 12
+  #           /  /   \ \                 /  /  \  \
+  #         19  6  1  8                15  4  1--2 11
+  #        /  /     \   \             /  /           \
+  #      18  5--4--3--2  9          16  5--6--7--8--9-10
+  #     /                 \        /                        \
+  #   17 16 15 14 13 12 11 10    17-18-19-20-21-22-23-24-25-26 51
+  #
+  # N= 1  2   3  4  5  6  7  8   9  10
+  #    1, 7, 22, 8, 2, 3, 4, 6, 20, 42, 21, 44, 75, 45, 23, 9, 11, 12, 13
+  # square spiral order, upward first, clockwise
+}
 
 
 #------------------------------------------------------------------------------
@@ -100,26 +159,6 @@ MyOEIS::compare_values
 #      return \@got;
 #    });
 
-
-#------------------------------------------------------------------------------
-# A217013 - inverse permutation, SquareSpiral -> PyramidSpiral
-#   X,Y in SquareSpiral order, N of PyramidSpiral
-
-MyOEIS::compare_values
-  (anum => 'A217013',
-   func => sub {
-     my ($count) = @_;
-     require Math::PlanePath::SquareSpiral;
-     my $pyramid = Math::PlanePath::PyramidSpiral->new;
-     my $square  = Math::PlanePath::SquareSpiral->new;
-     my @got;
-     for (my $n = $square->n_start; @got < $count; $n++) {
-       my ($x, $y) = $square->n_to_xy($n);
-       ($x,$y) = (-$y,$x);  # rotate +90
-       push @got, $pyramid->xy_to_n($x,$y);
-     }
-     return \@got;
-   });
 
 #------------------------------------------------------------------------------
 # A217294 - permutation PyramidSpiral -> SquareSpiral

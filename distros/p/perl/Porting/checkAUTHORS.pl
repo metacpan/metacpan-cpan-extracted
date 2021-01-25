@@ -644,6 +644,9 @@ __DATA__
 #
 #  Committers.
 #
+adamh                                   \100BytesGuy
++                                       bytesguy\100users.noreply.github.com
++                                       git\100ahartley.com
 adi                                     enache\100rdslink.ro
 alanbur                                 alan.burlison\100sun.com
 +                                       alan.burlison\100uk.sun.com
@@ -720,6 +723,7 @@ merijn                                  h.m.brand\100xs4all.nl
 +                                       h.m.brand\100hccnet.nl
 +                                       merijn\100l1.procura.nl
 +                                       merijn\100a5.(none)
++                                       perl5\100tux.freedom.nl
 mhx                                     mhx-perl\100gmx.net
 +                                       mhx\100r2d2.(none)
 mst                                     mst\100shadowcat.co.uk

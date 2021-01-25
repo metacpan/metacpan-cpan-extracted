@@ -34,7 +34,13 @@ as Internet Explorer favorites.
 The fields `<title>`, `<url>` and `<description>` are retrieved (when existing) and
 are available for exporting (in the desired format), by default :
 `<title> <url> <description>`
-    
+
+The same format is used for plain text and markdown files :
+```
+plain text example http://example.txt #tag1 #tag2
+[markdown example](http://example.md) #tag1 #tag2
+```
+
 The `<description>` field is filled with Safari's Description, Firefox's Tags or
 empty for Chrome and Internet Explorer.
 

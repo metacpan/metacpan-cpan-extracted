@@ -22,7 +22,7 @@ Rinci::function - Metadata for your functions/methods
 
 =head1 VERSION
 
-This document describes version 1.1.95 of Rinci::function (from Perl distribution Rinci), released on 2020-10-01.
+This document describes version 1.1.96 of Rinci::function (from Perl distribution Rinci), released on 2021-01-22.
 
 =head1 INTRODUCTION
 
@@ -72,7 +72,20 @@ Special arguments are some known arguments that start with dash (C<->) and serve
 special purposes. You need not specify them in the C<args> metadata property.
 Examples of special arguments include C<-dry_run>, C<-tx_action>, C<-action>,
 C<-confirm/*>, C<-arg_part_start>, C<-arg_part_len>, C<-res_part_start>,
-C<-res_part_len>. They will be explained in other related sections/documents.
+C<-res_part_len>. Many of them will be explained in other related
+sections/documents, but some will be described here:
+
+=over
+
+=item * -content_type_ARGNAME
+
+This special argument can be used to describe the MIME content type of an
+argument, where C<ARGNAME> is the argument name. For example, if you are
+creating a function that accepts data upload (in Perl):
+
+ upload(data => '...', -content_type_data => 'image/jpeg');
+
+=back
 
 =head2 Functions vs methods
 
@@ -1548,7 +1561,7 @@ Source repository is at L<https://github.com/perlancar/perl-Rinci>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Rinci>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Rinci/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1566,7 +1579,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

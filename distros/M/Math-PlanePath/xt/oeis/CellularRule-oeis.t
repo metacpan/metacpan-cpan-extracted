@@ -20,8 +20,6 @@
 
 # cf A094605 rule 30 period of nth diagonal
 #    A094606 log2 of that period
-#
-
 
 
 use 5.004;
@@ -29,7 +27,7 @@ use strict;
 use Math::BigInt try => 'GMP';   # for bignums in reverse-add steps
 use List::Util 'min','max';
 use Test;
-plan tests => 541;
+plan tests => 800;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -99,275 +97,233 @@ MyOEIS::compare_values
 
 #------------------------------------------------------------------------------
 
-# A262867 Total number of ON (black) cells after n iterations of the "Rule 153" elementary cellular automaton starting with a single ON (black) cell.
-# A263511 Total number of ON (black) cells after n iterations of the "Rule 155" elementary cellular automaton starting with a single ON (black) cell.
-# A263807 Total number of ON (black) cells after n iterations of the "Rule 157" elementary cellular automaton starting with a single ON (black) cell.
-# A265205 Number of ON cells in the n-th iteration of the "Rule 73" elementary cellular automaton starting with a single ON cell.
-# A265206 Total number of ON cells after n iterations of the "Rule 73" elementary cellular automaton starting with a single ON cell.
-# A265219 Number of OFF (white) cells in the n-th iteration of the "Rule 73" elementary cellular automaton starting with a single ON (black) cell.
-# A265220 Total number of OFF (white) cells after n iterations of the "Rule 73" elementary cellular automaton starting with a single ON (black) cell.
-# A265225 Total number of ON (black) cells after n iterations of the "Rule 54" elementary cellular automaton starting with a single ON (black) cell.
-# A265283 Number of ON (black) cells in the n-th iteration of the "Rule 94" elementary cellular automaton starting with a single ON (black) cell.
-# A265284 Total number of ON (black) cells after n iterations of the "Rule 94" elementary cellular automaton starting with a single ON (black) cell.
-# A265321 Total number of ON (black) cells after n iterations of the "Rule 110" elementary cellular automaton starting with a single ON (black) cell.
-# A265322 Number of OFF (white) cells in the n-th iteration of the "Rule 110" elementary cellular automaton starting with a single ON (black) cell.
-# A265323 Total number of OFF (white) cells after n iterations of the "Rule 110" elementary cellular automaton starting with a single ON (black) cell.
-# A265382 Total number of ON (black) cells after n iterations of the "Rule 158" elementary cellular automaton starting with a single ON (black) cell.
-# A265428 Number of ON (black) cells in the n-th iteration of the "Rule 188" elementary cellular automaton starting with a single ON (black) cell.
-# A265429 Total number of ON (black) cells after n iterations of the "Rule 188" elementary cellular automaton starting with a single ON (black) cell.
-# A265430 Number of OFF (white) cells in the n-th iteration of the "Rule 188" elementary cellular automaton starting with a single ON (black) cell.
-# A265431 Total number of OFF (white) cells after n iterations of the "Rule 188" elementary cellular automaton starting with a single ON (black) cell.
-# A267880 Decimal representation of the middle column of the "Rule 233" elementary cellular automaton starting with a single ON (black) cell.
-# A267881 Number of ON (black) cells in the n-th iteration of the "Rule 233" elementary cellular automaton starting with a single ON (black) cell.
-# A267882 Total number of ON (black) cells after n iterations of the "Rule 233" elementary cellular automaton starting with a single ON (black) cell.
-# A267883 Number of OFF (white) cells in the n-th iteration of the "Rule 233" elementary cellular automaton starting with a single ON (black) cell.
-# A267884 Total number of OFF (white) cells after n iterations of the "Rule 233" elementary cellular automaton starting with a single ON (black) cell.
-# A267872 Number of ON (black) cells in the n-th iteration of the "Rule 237" elementary cellular automaton starting with a single ON (black) cell.
-# A267873 Number of ON (black) cells in the n-th iteration of the "Rule 235" elementary cellular automaton starting with a single ON (black) cell.
-# A267874 Total number of ON (black) cells after n iterations of the "Rule 235" elementary cellular automaton starting with a single ON (black) cell.
-
-# A267610 Total number of OFF (white) cells after n iterations of the "Rule 182" elementary cellular automaton starting with a single ON (black) cell.
-   # A267590 Number of ON (black) cells in the n-th iteration of the "Rule 169" elementary cellular automaton starting with a single ON (black) cell.
-   # A267591 Total number of ON (black) cells after n iterations of the "Rule 169" elementary cellular automaton starting with a single ON (black) cell.
-   # A267592 Number of OFF (white) cells in the n-th iteration of the "Rule 169" elementary cellular automaton starting with a single ON (black) cell.
-   # A267593 Total number of OFF (white) cells after n iterations of the "Rule 169" elementary cellular automaton starting with a single ON (black) cell.
-   # A267582 Number of ON (black) cells in the n-th iteration of the "Rule 167" elementary cellular automaton starting with a single ON (black) cell.
-   # A267583 Total number of ON (black) cells after n iterations of the "Rule 167" elementary cellular automaton starting with a single ON (black) cell.
-   # A267516 Number of ON (black) cells in the n-th iteration of the "Rule 137" elementary cellular automaton starting with a single ON (black) cell.
-   # A267517 Total number of ON (black) cells after n iterations of the "Rule 137" elementary cellular automaton starting with a single ON (black) cell.
-   # A267518 Number of OFF (white) cells in the n-th iteration of the "Rule 137" elementary cellular automaton starting with a single ON (black) cell.
-   # A267519 Total number of OFF (white) cells after n iterations of the "Rule 137" elementary cellular automaton starting with a single ON (black) cell.
-   # A267458 Number of ON (black) cells in the n-th iteration of the "Rule 133" elementary cellular automaton starting with a single ON (black) cell.
-   # A267459 Total number of ON (black) cells after n iterations of the "Rule 133" elementary cellular automaton starting with a single ON (black) cell.
-   # A267460 Number of OFF (white) cells in the n-th iteration of the "Rule 133" elementary cellular automaton starting with a single ON (black) cell.
-   # A267461 Total number of OFF (white) cells after n iterations of the "Rule 133" elementary cellular automaton starting with a single ON (black) cell.
-   # A267451 Number of ON (black) cells in the n-th iteration of the "Rule 131" elementary cellular automaton starting with a single ON (black) cell.
-   # A267452 Total number of ON (black) cells after n iterations of the "Rule 131" elementary cellular automaton starting with a single ON (black) cell.
-   # A267453 Number of OFF (white) cells in the n-th iteration of the "Rule 131" elementary cellular automaton starting with a single ON (black) cell.
-   # A267454 Total number of OFF (white) cells after n iterations of the "Rule 131" elementary cellular automaton starting with a single ON (black) cell.
-   # A267445 Number of ON (black) cells in the n-th iteration of the "Rule 129" elementary cellular automaton starting with a single ON (black) cell.
-   # A267446 Total number of ON (black) cells after n iterations of the "Rule 129" elementary cellular automaton starting with a single ON (black) cell.
-   # A267447 Number of OFF (white) cells in the n-th iteration of the "Rule 129" elementary cellular automaton starting with a single ON (black) cell.
-   # A267448 Total number of OFF (white) cells after n iterations of the "Rule 129" elementary cellular automaton starting with a single ON (black) cell.
-   # A267368 Total number of ON (black) cells after n iterations of the "Rule 126" elementary cellular automaton starting with a single ON (black) cell.
-   # A267369 Total number of OFF (white) cells after n iterations of the "Rule 126" elementary cellular automaton starting with a single ON (black) cell.
-   # A267352 Number of ON (black) cells in the n-th iteration of the "Rule 123" elementary cellular automaton starting with a single ON (black) cell.
-   # A267353 Total number of ON (black) cells after n iterations of the "Rule 123" elementary cellular automaton starting with a single ON (black) cell.
-   # A267354 Number of OFF (white) cells in the n-th iteration of the "Rule 123" elementary cellular automaton starting with a single ON (black) cell.
-   # A267259 Number of ON (black) cells in the n-th iteration of the "Rule 111" elementary cellular automaton starting with a single ON (black) cell.
-   # A267260 Total number of ON (black) cells after n iterations of the "Rule 111" elementary cellular automaton starting with a single ON (black) cell.
-   # A267261 Number of OFF (white) cells in the n-th iteration of the "Rule 111" elementary cellular automaton starting with a single ON (black) cell.
-   # A267262 Total number of OFF (white) cells after n iterations of the "Rule 111" elementary cellular automaton starting with a single ON (black) cell.
-   # A267212 Total number of ON (black) cells after n iterations of the "Rule 109" elementary cellular automaton starting with a single ON (black) cell.
-   # A267214 Total number of OFF (white) cells after n iterations of the "Rule 109" elementary cellular automaton starting with a single ON (black) cell.
-   # A267159 Total number of ON (black) cells after n iterations of the "Rule 107" elementary cellular automaton starting with a single ON (black) cell.
-   # A267161 Total number of OFF (white) cells after n iterations of the "Rule 107" elementary cellular automaton starting with a single ON (black) cell.
-   # A267149 Total number of ON (black) cells after n iterations of the "Rule 105" elementary cellular automaton starting with a single ON (black) cell.
-   # A267151 Total number of OFF (white) cells after n iterations of the "Rule 105" elementary cellular automaton starting with a single ON (black) cell.
-   # A267047 Total number of ON (black) cells after n iterations of the "Rule 91" elementary cellular automaton starting with a single ON (black) cell.
-   # A267049 Total number of OFF (white) cells after n iterations of the "Rule 91" elementary cellular automaton starting with a single ON (black) cell.
-   # A266899 Total number of ON (black) cells after n iterations of the "Rule 75" elementary cellular automaton starting with a single ON (black) cell.
-   # A266901 Total number of OFF (white) cells after n iterations of the "Rule 75" elementary cellular automaton starting with a single ON (black) cell.
-
-   # A080513 Number of ON (black) cells in the n-th iteration of the "Rule 70" elementary cellular automaton starting with a single ON (black) cell.
-   #
-   # A226463 Triangle read by rows giving successive states of cellular automaton generated by "Rule 135".
-   # A226464 Triangle read by rows giving successive states of cellular automaton generated by "Rule 149".
-   #
-   # A265695 Triangle read by rows giving successive states of cellular automaton generated by "Rule 135" initiated with a single ON (black) cell.
-   # A265696 Binary representation of the n-th iteration of the "Rule 135" elementary cellular automaton starting with a single ON (black) cell.
-   # A265697 Decimal representation of the n-th iteration of the "Rule 135" elementary cellular automaton starting with a single ON (black) cell.
-   # A265698 Middle column of the "Rule 135" elementary cellular automaton starting with a single ON (black) cell.
-   # A265699 Binary representation of the middle column of the "Rule 135" elementary cellular automaton starting with a single ON (black) cell.
-   # A265700 Decimal representation of the middle column of the "Rule 135" elementary cellular automaton starting with a single ON (black) cell.
-   # A265701 Number of ON (black) cells in the n-th iteration of the "Rule 135" elementary cellular automaton starting with a single ON (black) cell.
-   # A265702 Total number of ON (black) cells after n iterations of the "Rule 135" elementary cellular automaton starting with a single ON (black) cell.
-   # A265703 Number of OFF (white) cells in the n-th iteration of the "Rule 135" elementary cellular automaton starting with a single ON (black) cell.
-   # A265704 Total number of OFF (white) cells after n iterations of the "Rule 135" elementary cellular automaton starting with a single ON (black) cell.
-   # A265715 Binary representation of the n-th iteration of the "Rule 149" elementary cellular automaton starting with a single ON (black) cell.
-   # A265717 Decimal representation of the n-th iteration of the "Rule 149" elementary cellular automaton starting with a single ON (black) cell.
-   # A265718 Triangle read by rows giving successive states of cellular automaton generated by "Rule 1" initiated with a single ON (black) cell.
-   # A265720 Binary representation of the n-th iteration of the "Rule 1" elementary cellular automaton starting with a single ON (black) cell.
-   # A265721 Decimal representation of the n-th iteration of the "Rule 1" elementary cellular automaton starting with a single ON (black) cell.
-   # A265722 Number of ON (black) cells in the n-th iteration of the "Rule 1" elementary cellular automaton starting with a single ON (black) cell.
-   # A265723 Number of OFF (white) cells in the n-th iteration of the "Rule 1" elementary cellular automaton starting with a single ON (black) cell.
-   # A265724 Total number of OFF (white) cells after n iterations of the "Rule 1" elementary cellular automaton starting with a single ON (black) cell.
-   # A266068 Binary representation of the n-th iteration of the "Rule 3" elementary cellular automaton starting with a single ON (black) cell.
-   # A266069 Decimal representation of the n-th iteration of the "Rule 3" elementary cellular automaton starting with a single ON (black) cell.
-   # A266070 Middle column of the "Rule 3" elementary cellular automaton starting with a single ON (black) cell.
-   # A266071 Binary representation of the middle column of the "Rule 3" elementary cellular automaton starting with a single ON (black) cell.
-   # A266072 Number of ON (black) cells in the n-th iteration of the "Rule 3" elementary cellular automaton starting with a single ON (black) cell.
-   # A266073 Number of OFF (white) cells in the n-th iteration of the "Rule 3" elementary cellular automaton starting with a single ON (black) cell.
-   # A266074 Total number of OFF (white) cells after n iterations of the "Rule 3" elementary cellular automaton starting with a single ON (black) cell.
-   # A266090 Decimal representation of the n-th iteration of the "Rule 17" elementary cellular automaton starting with a single ON (black) cell.
-   # A266155 Triangle read by rows giving successive states of cellular automaton generated by "Rule 19" initiated with a single ON (black) cell.
-   # A266174 Triangle read by rows giving successive states of cellular automaton generated by "Rule 5" initiated with a single ON (black) cell.
-   # A266175 Binary representation of the n-th iteration of the "Rule 5" elementary cellular automaton starting with a single ON (black) cell.
-   # A266176 Decimal representation of the n-th iteration of the "Rule 5" elementary cellular automaton starting with a single ON (black) cell.
-   # A266178 Triangle read by rows giving successive states of cellular automaton generated by "Rule 6" initiated with a single ON (black) cell.
-   # A266179 Binary representation of the n-th iteration of the "Rule 6" elementary cellular automaton starting with a single ON (black) cell.
-   # A266180 Decimal representation of the n-th iteration of the "Rule 6" elementary cellular automaton starting with a single ON (black) cell.
-   # A266216 Triangle read by rows giving successive states of cellular automaton generated by "Rule 7" initiated with a single ON (black) cell.
-   # A266217 Binary representation of the n-th iteration of the "Rule 7" elementary cellular automaton starting with a single ON (black) cell.
-   # A266218 Decimal representation of the n-th iteration of the "Rule 7" elementary cellular automaton starting with a single ON (black) cell.
-   # A266219 Binary representation of the middle column of the "Rule 7" elementary cellular automaton starting with a single ON (black) cell.
-   # A266220 Number of ON (black) cells in the n-th iteration of the "Rule 7" elementary cellular automaton starting with a single ON (black) cell.
-   # A266221 Total number of ON (black) cells after n iterations of the "Rule 7" elementary cellular automaton starting with a single ON (black) cell.
-   # A266222 Number of OFF (white) cells in the n-th iteration of the "Rule 7" elementary cellular automaton starting with a single ON (black) cell.
-   # A266223 Total number of OFF (white) cells after n iterations of the "Rule 7" elementary cellular automaton starting with a single ON (black) cell.
-   # A266243 Triangle read by rows giving successive states of cellular automaton generated by "Rule 9" initiated with a single ON (black) cell.
-   # A266244 Binary representation of the n-th iteration of the "Rule 9" elementary cellular automaton starting with a single ON (black) cell.
-   # A266245 Decimal representation of the n-th iteration of the "Rule 9" elementary cellular automaton starting with a single ON (black) cell.
-   # A266246 Middle column of the "Rule 9" elementary cellular automaton starting with a single ON (black) cell.
-   # A266247 Binary representation of the middle column of the "Rule 9" elementary cellular automaton starting with a single ON (black) cell.
-   # A266248 Decimal representation of the middle column of the "Rule 9" elementary cellular automaton starting with a single ON (black) cell.
-   # A266249 Number of ON (black) cells in the n-th iteration of the "Rule 9" elementary cellular automaton starting with a single ON (black) cell.
-   # A266250 Total number of ON (black) cells after n iterations of the "Rule 9" elementary cellular automaton starting with a single ON (black) cell.
-   # A266251 Number of OFF (white) cells in the n-th iteration of the "Rule 9" elementary cellular automaton starting with a single ON (black) cell.
-   # A266252 Total number of OFF (white) cells after n iterations of the "Rule 9" elementary cellular automaton starting with a single ON (black) cell.
-   # A266253 Triangle read by rows giving successive states of cellular automaton generated by "Rule 11" initiated with a single ON (black) cell.
-   # A266254 Binary representation of the n-th iteration of the "Rule 11" elementary cellular automaton starting with a single ON (black) cell.
-   # A266255 Decimal representation of the n-th iteration of the "Rule 11" elementary cellular automaton starting with a single ON (black) cell.
-   # A266256 Number of ON (black) cells in the n-th iteration of the "Rule 11" elementary cellular automaton starting with a single ON (black) cell.
-   # A266257 Total number of ON (black) cells after n iterations of the "Rule 11" elementary cellular automaton starting with a single ON (black) cell.
-   # A266258 Number of OFF (white) cells in the n-th iteration of the "Rule 11" elementary cellular automaton starting with a single ON (black) cell.
-   # A266259 Total number of OFF (white) cells after n iterations of the "Rule 11" elementary cellular automaton starting with a single ON (black) cell.
-   # A266282 Triangle read by rows giving successive states of cellular automaton generated by "Rule 13" initiated with a single ON (black) cell.
-   # A266283 Binary representation of the n-th iteration of the "Rule 13" elementary cellular automaton starting with a single ON (black) cell.
-   # A266284 Decimal representation of the n-th iteration of the "Rule 13" elementary cellular automaton starting with a single ON (black) cell.
-   # A266285 Number of ON (black) cells in the n-th iteration of the "Rule 13" elementary cellular automaton starting with a single ON (black) cell.
-   # A266286 Number of OFF (white) cells in the n-th iteration of the "Rule 13" elementary cellular automaton starting with a single ON (black) cell.
-   # A266287 Total number of OFF (white) cells after n iterations of the "Rule 13" elementary cellular automaton starting with a single ON (black) cell.
-   # A266298 Triangle read by rows giving successive states of cellular automaton generated by "Rule 14" initiated with a single ON (black) cell.
-   # A266299 Binary representation of the n-th iteration of the "Rule 14" elementary cellular automaton starting with a single ON (black) cell.
-   # A266300 Triangle read by rows giving successive states of cellular automaton generated by "Rule 15" initiated with a single ON (black) cell.
-   # A266301 Binary representation of the n-th iteration of the "Rule 15" elementary cellular automaton starting with a single ON (black) cell.
-   # A266302 Decimal representation of the n-th iteration of the "Rule 15" elementary cellular automaton starting with a single ON (black) cell.
-   # A266303 Number of ON (black) cells in the n-th iteration of the "Rule 15" elementary cellular automaton starting with a single ON (black) cell.
-   # A266304 Total number of OFF (white) cells after n iterations of the "Rule 15" elementary cellular automaton starting with a single ON (black) cell.
-   # A266323 Binary representation of the n-th iteration of the "Rule 19" elementary cellular automaton starting with a single ON (black) cell.
-   # A266324 Decimal representation of the n-th iteration of the "Rule 19" elementary cellular automaton starting with a single ON (black) cell.
-   # A266326 Triangle read by rows giving successive states of cellular automaton generated by "Rule 20" initiated with a single ON (black) cell.
-   # A266327 Binary representation of the n-th iteration of the "Rule 20" elementary cellular automaton starting with a single ON (black) cell.
-   # A266377 Triangle read by rows giving successive states of cellular automaton generated by "Rule 21" initiated with a single ON (black) cell.
-   # A266379 Binary representation of the n-th iteration of the "Rule 21" elementary cellular automaton starting with a single ON (black) cell.
-   # A266380 Decimal representation of the n-th iteration of the "Rule 21" elementary cellular automaton starting with a single ON (black) cell.
-   # A266381 Binary representation of the n-th iteration of the "Rule 22" elementary cellular automaton starting with a single ON (black) cell.
-   # A266382 Decimal representation of the n-th iteration of the "Rule 22" elementary cellular automaton starting with a single ON (black) cell.
-   # A266383 Total number of ON (black) cells after n iterations of the "Rule 22" elementary cellular automaton starting with a single ON (black) cell.
-   # A266384 Total number of OFF (white) cells after n iterations of the "Rule 22" elementary cellular automaton starting with a single ON (black) cell.
-   # A266434 Triangle read by rows giving successive states of cellular automaton generated by "Rule 23" initiated with a single ON (black) cell.
-   # A266435 Binary representation of the n-th iteration of the "Rule 23" elementary cellular automaton starting with a single ON (black) cell.
-   # A266436 Decimal representation of the n-th iteration of the "Rule 23" elementary cellular automaton starting with a single ON (black) cell.
-   # A266437 Number of ON (black) cells in the n-th iteration of the "Rule 23" elementary cellular automaton starting with a single ON (black) cell.
-   # A266438 Total number of ON (black) cells after n iterations of the "Rule 23" elementary cellular automaton starting with a single ON (black) cell.
-   # A266439 Number of OFF (white) cells in the n-th iteration of the "Rule 23" elementary cellular automaton starting with a single ON (black) cell.
-   # A266440 Total number of OFF (white) cells after n iterations of the "Rule 23" elementary cellular automaton starting with a single ON (black) cell.
-   # A266441 Triangle read by rows giving successive states of cellular automaton generated by "Rule 25" initiated with a single ON (black) cell.
-   # A266442 Binary representation of the n-th iteration of the "Rule 25" elementary cellular automaton starting with a single ON (black) cell.
-   # A266443 Decimal representation of the n-th iteration of the "Rule 25" elementary cellular automaton starting with a single ON (black) cell.
-   # A266444 Middle column of the "Rule 25" elementary cellular automaton starting with a single ON (black) cell.
-   # A266445 Binary representation of the middle column of the "Rule 25" elementary cellular automaton starting with a single ON (black) cell.
-   # A266446 Decimal representation of the middle column of the "Rule 25" elementary cellular automaton starting with a single ON (black) cell.
-   # A266447 Number of ON (black) cells in the n-th iteration of the "Rule 25" elementary cellular automaton starting with a single ON (black) cell.
-   # A266448 Total number of ON (black) cells after n iterations of the "Rule 25" elementary cellular automaton starting with a single ON (black) cell.
-   # A266449 Number of OFF (white) cells in the n-th iteration of the "Rule 25" elementary cellular automaton starting with a single ON (black) cell.
-   # A266450 Total number of OFF (white) cells after n iterations of the "Rule 25" elementary cellular automaton starting with a single ON (black) cell.
-   # A266459 Triangle read by rows giving successive states of cellular automaton generated by "Rule 27" initiated with a single ON (black) cell.
-   # A266460 Binary representation of the n-th iteration of the "Rule 27" elementary cellular automaton starting with a single ON (black) cell.
-   # A266461 Decimal representation of the n-th iteration of the "Rule 27" elementary cellular automaton starting with a single ON (black) cell.
-   # A266502 Triangle read by rows giving successive states of cellular automaton generated by "Rule 28" initiated with a single ON (black) cell.
-   # A266508 Binary representation of the n-th iteration of the "Rule 28" elementary cellular automaton starting with a single ON (black) cell.
-   # A266514 Triangle read by rows giving successive states of cellular automaton generated by "Rule 29" initiated with a single ON (black) cell.
-   # A266515 Binary representation of the n-th iteration of the "Rule 29" elementary cellular automaton starting with a single ON (black) cell.
-   # A266516 Decimal representation of the n-th iteration of the "Rule 29" elementary cellular automaton starting with a single ON (black) cell.
-   # A266588 Triangle read by rows giving successive states of cellular automaton generated by "Rule 37" initiated with a single ON (black) cell.
-   # A266589 Binary representation of the n-th iteration of the "Rule 37" elementary cellular automaton starting with a single ON (black) cell.
-   # A266590 Decimal representation of the n-th iteration of the "Rule 37" elementary cellular automaton starting with a single ON (black) cell.
-   # A266591 Middle column of the "Rule 37" elementary cellular automaton starting with a single ON (black) cell.
-   # A266592 Binary representation of the middle column of the "Rule 37" elementary cellular automaton starting with a single ON (black) cell.
-   # A266593 Number of ON (black) cells in the n-th iteration of the "Rule 37" elementary cellular automaton starting with a single ON (black) cell.
-   # A266594 Total number of ON (black) cells after n iterations of the "Rule 37" elementary cellular automaton starting with a single ON (black) cell.
-   # A266595 Number of OFF (white) cells in the n-th iteration of the "Rule 37" elementary cellular automaton starting with a single ON (black) cell.
-   # A266596 Total number of OFF (white) cells after n iterations of the "Rule 37" elementary cellular automaton starting with a single ON (black) cell.
-   # A266605 Triangle read by rows giving successive states of cellular automaton generated by "Rule 39" initiated with a single ON (black) cell.
-   # A266606 Binary representation of the n-th iteration of the "Rule 39" elementary cellular automaton starting with a single ON (black) cell.
-   # A266607 Decimal representation of the n-th iteration of the "Rule 39" elementary cellular automaton starting with a single ON (black) cell.
-   # A266608 Triangle read by rows giving successive states of cellular automaton generated by "Rule 41" initiated with a single ON (black) cell.
-   # A266609 Binary representation of the n-th iteration of the "Rule 41" elementary cellular automaton starting with a single ON (black) cell.
-   # A266610 Decimal representation of the n-th iteration of the "Rule 41" elementary cellular automaton starting with a single ON (black) cell.
-   # A266611 Middle column of the "Rule 41" elementary cellular automaton starting with a single ON (black) cell.
-   # A266612 Binary representation of the middle column of the "Rule 41" elementary cellular automaton starting with a single ON (black) cell.
-   # A266613 Decimal representation of the middle column of the "Rule 41" elementary cellular automaton starting with a single ON (black) cell.
-   # A266614 Number of ON (black) cells in the n-th iteration of the "Rule 41" elementary cellular automaton starting with a single ON (black) cell.
-   # A266615 Total number of ON (black) cells after n iterations of the "Rule 41" elementary cellular automaton starting with a single ON (black) cell.
-   # A266616 Number of OFF (white) cells in the n-th iteration of the "Rule 41" elementary cellular automaton starting with a single ON (black) cell.
-   # A266617 Total number of OFF (white) cells after n iterations of the "Rule 41" elementary cellular automaton starting with a single ON (black) cell.
-   # A266619 Triangle read by rows giving successive states of cellular automaton generated by "Rule 45" initiated with a single ON (black) cell.
-   # A266621 Binary representation of the n-th iteration of the "Rule 45" elementary cellular automaton starting with a single ON (black) cell.
-   # A266622 Decimal representation of the n-th iteration of the "Rule 45" elementary cellular automaton starting with a single ON (black) cell.
-   # A266623 Middle column of the "Rule 45" elementary cellular automaton starting with a single ON (black) cell.
-   # A266624 Binary representation of the middle column of the "Rule 45" elementary cellular automaton starting with a single ON (black) cell.
-   # A266625 Decimal representation of the middle column of the "Rule 45" elementary cellular automaton starting with a single ON (black) cell.
-   # A266626 Number of ON (black) cells in the n-th iteration of the "Rule 45" elementary cellular automaton starting with a single ON (black) cell.
-   # A266627 Total number of ON (black) cells after n iterations of the "Rule 45" elementary cellular automaton starting with a single ON (black) cell.
-   # A266628 Number of OFF (white) cells in the n-th iteration of the "Rule 45" elementary cellular automaton starting with a single ON (black) cell.
-   # A266629 Total number of OFF (white) cells after n iterations of the "Rule 45" elementary cellular automaton starting with a single ON (black) cell.
-   # A266659 Triangle read by rows giving successive states of cellular automaton generated by "Rule 47" initiated with a single ON (black) cell.
-   # A266660 Binary representation of the n-th iteration of the "Rule 47" elementary cellular automaton starting with a single ON (black) cell.
-   # A266661 Decimal representation of the n-th iteration of the "Rule 47" elementary cellular automaton starting with a single ON (black) cell.
-   # A266662 Number of ON (black) cells in the n-th iteration of the "Rule 47" elementary cellular automaton starting with a single ON (black) cell.
-   # A266663 Total number of ON (black) cells after n iterations of the "Rule 47" elementary cellular automaton starting with a single ON (black) cell.
-   # A266664 Number of OFF (white) cells in the n-th iteration of the "Rule 47" elementary cellular automaton starting with a single ON (black) cell.
-   # A266665 Total number of OFF (white) cells after n iterations of the "Rule 47" elementary cellular automaton starting with a single ON (black) cell.
-   # A266666 Triangle read by rows giving successive states of cellular automaton generated by "Rule 51" initiated with a single ON (black) cell.
-   # A266667 Binary representation of the n-th iteration of the "Rule 51" elementary cellular automaton starting with a single ON (black) cell.
-   # A266668 Decimal representation of the n-th iteration of the "Rule 51" elementary cellular automaton starting with a single ON (black) cell.
-   # A266669 Triangle read by rows giving successive states of cellular automaton generated by "Rule 53" initiated with a single ON (black) cell.
-   # A266670 Binary representation of the n-th iteration of the "Rule 53" elementary cellular automaton starting with a single ON (black) cell.
-   # A266671 Decimal representation of the n-th iteration of the "Rule 53" elementary cellular automaton starting with a single ON (black) cell.
-   # A266672 Triangle read by rows giving successive states of cellular automaton generated by "Rule 57" initiated with a single ON (black) cell.
-   # A266673 Binary representation of the n-th iteration of the "Rule 57" elementary cellular automaton starting with a single ON (black) cell.
-   # A266674 Decimal representation of the n-th iteration of the "Rule 57" elementary cellular automaton starting with a single ON (black) cell.
-   # A266678 Middle column of the "Rule 175" elementary cellular automaton starting with a single ON (black) cell.
-   # A266680 Binary representation of the middle column of the "Rule 175" elementary cellular automaton starting with a single ON (black) cell.
-   # A266716 Triangle read by rows giving successive states of cellular automaton generated by "Rule 59" initiated with a single ON (black) cell.
-   # A266717 Binary representation of the n-th iteration of the "Rule 59" elementary cellular automaton starting with a single ON (black) cell.
-   # A266718 Decimal representation of the n-th iteration of the "Rule 59" elementary cellular automaton starting with a single ON (black) cell.
-   # A266719 Middle column of the "Rule 59" elementary cellular automaton starting with a single ON (black) cell.
-   # A266720 Binary representation of the middle column of the "Rule 59" elementary cellular automaton starting with a single ON (black) cell.
-   # A266721 Decimal representation of the middle column of the "Rule 59" elementary cellular automaton starting with a single ON (black) cell.
-   # A266722 Number of ON (black) cells in the n-th iteration of the "Rule 59" elementary cellular automaton starting with a single ON (black) cell.
-   # A266723 Total number of ON (black) cells after n iterations of the "Rule 59" elementary cellular automaton starting with a single ON (black) cell.
-   # A266724 Number of OFF (white) cells in the n-th iteration of the "Rule 59" elementary cellular automaton starting with a single ON (black) cell.
-   # A266725 Total number of OFF (white) cells after n iterations of the "Rule 59" elementary cellular automaton starting with a single ON (black) cell.
-   # A266752 Binary representation of the n-th iteration of the "Rule 163" elementary cellular automaton starting with a single ON (black) cell.
-   # A266753 Decimal representation of the n-th iteration of the "Rule 163" elementary cellular automaton starting with a single ON (black) cell.
-   # A266754 Triangle read by rows giving successive states of cellular automaton generated by "Rule 165" initiated with a single ON (black) cell.
-   # A266786 Triangle read by rows giving successive states of cellular automaton generated by "Rule 61" initiated with a single ON (black) cell.
-   # A266787 Binary representation of the n-th iteration of the "Rule 61" elementary cellular automaton starting with a single ON (black) cell.
-   # A266788 Decimal representation of the n-th iteration of the "Rule 61" elementary cellular automaton starting with a single ON (black) cell.
-   # A266789 Middle column of the "Rule 61" elementary cellular automaton starting with a single ON (black) cell.
-   # A266790 Binary representation of the middle column of the "Rule 61" elementary cellular automaton starting with a single ON (black) cell.
-   # A266791 Decimal representation of the middle column of the "Rule 61" elementary cellular automaton starting with a single ON (black) cell.
-   # A266792 Number of ON (black) cells in the n-th iteration of the "Rule 61" elementary cellular automaton starting with a single ON (black) cell.
-   # A266793 Total number of ON (black) cells after n iterations of the "Rule 61" elementary cellular automaton starting with a single ON (black) cell.
-   # A266794 Number of OFF (white) cells in the n-th iteration of the "Rule 61" elementary cellular automaton starting with a single ON (black) cell.
-   # A266795 Total number of OFF (white) cells after n iterations of the "Rule 61" elementary cellular automaton starting with a single ON (black) cell.
-
 my @data =
   (
    # Not quite, initial values differ
    # [ 'A051341', 7, 'bits' ],
+   
+   [ 'A265718',    1, 'bits' ],
+   [ 'A265721',    1, 'bignum' ],
+   [ 'A265720',    1, 'bignum', base=>2 ],
+   [ 'A265722',    1, 'number_of', value=>1 ],
+   [ 'A265723',    1, 'number_of', value=>0 ],
+   [ 'A265724',    1, 'number_of', value=>0, cumulative=>1 ],
+   
+   # rule=2,10,34,42,66,74,98,106,130,138,162,170,194,202,226,234 (mirror image is rule 16)
+   [ 'A098608',    2, 'bignum', base=>2 ],  # 100^n
+   
+   # rule=3,35 (mirror image is rule 17)
+   [ 'A263428',    3, 'bits' ],
+   [ 'A266069',    3, 'bignum' ],
+   [ 'A266068',    3, 'bignum', base=>2 ],
+   [ 'A266070',    3, 'bits', part => 'centre' ],
+   [ 'A266071',    3, 'bignum_central_column' ],
+   [ 'A266072',    3, 'number_of', value=>1 ],
+   [ 'A266073',    3, 'number_of', value=>0 ],
+   [ 'A266074',    3, 'number_of', value=>0, cumulative=>1 ],
+   
+   # characteristic func of pronics m*(m+1)
+   # rule=4,12,36,44,68,76,100,108,132,140,164,172,196,204,228,236
+   [ 'A005369',    4, 'bits' ],
+   [ 'A011557',    4, 'bignum', base=>2 ],  # 10^n
+   
+   [ 'A266174',    5, 'bits' ],
+   [ 'A266176',    5, 'bignum' ],
+   [ 'A266175',    5, 'bignum', base=>2 ],
+   
+   [ 'A266178',    6, 'bits' ],
+   [ 'A266180',    6, 'bignum' ],
+   [ 'A266179',    6, 'bignum', base=>2 ],
+   
+   [ 'A266216',    7, 'bits' ],
+   [ 'A266218',    7, 'bignum' ],
+   [ 'A266217',    7, 'bignum', base=>2 ],
+   [ 'A266219',    7, 'bignum_central_column' ],
+   [ 'A266220',    7, 'number_of', value=>1 ],
+   [ 'A266222',    7, 'number_of', value=>0 ],
+   [ 'A266221',    7, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266223',    7, 'number_of', value=>0, cumulative=>1 ],
+   
+   [ 'A266243',    9, 'bits' ],
+   [ 'A266245',    9, 'bignum' ],
+   [ 'A266244',    9, 'bignum', base=>2 ],
+   [ 'A266246',    9, 'bits', part => 'centre' ],
+   [ 'A266247',    9, 'bignum_central_column' ],
+   [ 'A266248',    9, 'bignum_central_column', base=>2 ],
+   [ 'A266249',    9, 'number_of', value=>1 ],
+   [ 'A266251',    9, 'number_of', value=>0 ],
+   [ 'A266250',    9, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266252',    9, 'number_of', value=>0, cumulative=>1 ],
+   
+   [ 'A266253',   11, 'bits' ],
+   [ 'A266255',   11, 'bignum' ],
+   [ 'A266254',   11, 'bignum', base=>2 ],
+   [ 'A266256',   11, 'number_of', value=>1 ],
+   [ 'A266258',   11, 'number_of', value=>0 ],
+   [ 'A266257',   11, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266259',   11, 'number_of', value=>0, cumulative=>1 ],
+   
+   [ 'A266282',   13, 'bits' ],
+   [ 'A266284',   13, 'bignum' ],
+   [ 'A266283',   13, 'bignum', base=>2 ],
+   [ 'A266285',   13, 'number_of', value=>1 ],
+   [ 'A266286',   13, 'number_of', value=>0 ],
+   [ 'A266287',   13, 'number_of', value=>0, cumulative=>1 ],
+   
+   [ 'A266298',   14, 'bits' ],
+   [ 'A266299',   14, 'bignum', base=>2 ],
+   
+   [ 'A266300',   15, 'bits' ],
+   [ 'A266302',   15, 'bignum' ],
+   [ 'A266301',   15, 'bignum', base=>2 ],
+   [ 'A266303',   15, 'number_of', value=>1 ],
+   [ 'A266304',   15, 'number_of', value=>0, cumulative=>1 ],
+   
+   [ 'A260552',   17, 'bits' ],
+   [ 'A266090',   17, 'bignum' ],
+   [ 'A260692',   17, 'bignum', base=>2 ],
+   
+   # rule=19
+   [ 'A266155',   19, 'bits' ],
+   [ 'A266323',   19, 'bignum', base=>2 ],
+   [ 'A266324',   19, 'bignum' ],
+   
+   # rule=20,52,148,180 (mirror image of rule 6)
+   [ 'A266326',   20, 'bits' ],
+   [ 'A266327',   20, 'bignum', base=>2 ],
+   
+   # rule=21 (mirror image of rule 7)
+   [ 'A266377',   21, 'bits' ],
+   [ 'A266379',   21, 'bignum', base=>2 ],
+   [ 'A266380',   21, 'bignum' ],
+   
+   # rule=22
+   [ 'A071029',   22, 'bits' ],
+   [ 'A266381',   22, 'bignum', base=>2 ],
+   [ 'A266382',   22, 'bignum' ],
+   [ 'A071043',   22, 'number_of', value=>0 ],
+   [ 'A071044',   22, 'number_of', value=>1 ],
+   [ 'A266383',   22, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266384',   22, 'number_of', value=>0, cumulative=>1 ],
+   
+   # rule=23,31,55,63,87,95,119,127
+   [ 'A266434',   23, 'bits' ],
+   [ 'A266435',   23, 'bignum', base=>2 ],
+   [ 'A266436',   23, 'bignum' ],
+   [ 'A266437',   23, 'number_of', value=>1 ],
+   [ 'A266439',   23, 'number_of', value=>0 ],
+   [ 'A266438',   23, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266440',   23, 'number_of', value=>0, cumulative=>1 ],
+   
+   # rule=25 (mirror image is rule 67)
+   [ 'A266441',   25, 'bits' ],
+   [ 'A266443',   25, 'bignum' ],
+   [ 'A266442',   25, 'bignum', base=>2 ],
+   [ 'A266444',   25, 'bits', part => 'centre' ],
+   [ 'A266445',   25, 'bignum_central_column' ],
+   [ 'A266446',   25, 'bignum_central_column', base=>2 ],
+   [ 'A266447',   25, 'number_of', value=>1 ],
+   [ 'A266449',   25, 'number_of', value=>0 ],
+   [ 'A266448',   25, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266450',   25, 'number_of', value=>0, cumulative=>1 ],
+   
+   # rule=27 (mirror image is rule 83)
+   [ 'A266459',   27, 'bits' ],
+   [ 'A266461',   27, 'bignum' ],
+   [ 'A266460',   27, 'bignum', base=>2 ],
+   
+   # rule=28,156 (mirror image is rule 70)
+   [ 'A266502',   28, 'bits' ],
+   [ 'A283642',   28, 'bignum' ],     # sharing "Rule 678"
+   [ 'A001045',   28, 'bignum', initial=>[0,1] ], # Jacobsthal
+   [ 'A266508',   28, 'bignum', base=>2 ],
+   [ 'A070909',   28, 'bits', part=>'right' ],
+   
+   # rule=29 (mirror image is rule 71)
+   [ 'A266514',   29, 'bits' ],
+   [ 'A266516',   29, 'bignum' ],
+   [ 'A266515',   29, 'bignum', base=>2 ],
+   
+   # rule=30 (mirror image is rule 86)
+   # 111 110 101 100 011 010 001 000
+   #  0   0   0   1   1   1   1   0
+   # 135 started from 0 = complement of rule 30 started from 1
+   [ 'A070950',  30, 'bits' ],
+   [ 'A226463',  30, 'bits', complement => 1 ],    # rule 135 starting from "0"
+   [ 'A110240',  30, 'bignum' ], # cf A074890 some strange form
+   [ 'A245549',  30, 'bignum', base=>2 ],
+   [ 'A051023',  30, 'bits', part=>'centre' ],
+   [ 'A261299',  30, 'bignum_central_column' ],
+   [ 'A070951',  30, 'number_of', value=>0 ],
+   [ 'A070952',  30, 'number_of', value=>1, max_count=>400, initial=>[0] ],
+   [ 'A151929',  30, 'number_of_1s_first_diff', max_count=>200,
+     initial=>[0], # without diffs yet applied ...
+   ],
+   [ 'A110267',  30, 'number_of', cumulative=>1 ],
+   [ 'A265224',  30, 'number_of', cumulative=>1, value=>0 ],
+   [ 'A226482',  30, 'number_of_runs' ],
+   [ 'A110266',  30, 'number_of_runs', value=>1 ],
+   [ 'A092539',  30, 'bignum_central_column', base=>2 ],
+   [ 'A094603',  30, 'trailing_number_of', value=>1 ],
+   [ 'A094604',  30, 'new_maximum_trailing_number_of', 1 ],
+   [ 'A100053',  30, 'longest_run', value=>0 ],
+   
+   [ 'A266588',   37, 'bits' ],
+   [ 'A266590',   37, 'bignum' ],
+   [ 'A266589',   37, 'bignum', base=>2 ],
+   [ 'A266591',   37, 'bits', part => 'centre' ],
+   [ 'A266592',   37, 'bignum_central_column' ],
+   [ 'A052997',   37, 'bignum_central_column', base=>2 ],
+   [ 'A266593',   37, 'number_of', value=>1 ],
+   [ 'A266595',   37, 'number_of', value=>0 ],
+   [ 'A266594',   37, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266596',   37, 'number_of', value=>0, cumulative=>1 ],
+   
+   [ 'A266605',   39, 'bits' ],
+   [ 'A266607',   39, 'bignum' ],
+   [ 'A266606',   39, 'bignum', base=>2 ],
+   
+   [ 'A266608',   41, 'bits' ],
+   [ 'A266610',   41, 'bignum' ],
+   [ 'A266609',   41, 'bignum', base=>2 ],
+   [ 'A266611',   41, 'bits', part => 'centre' ],
+   [ 'A266612',   41, 'bignum_central_column' ],
+   [ 'A266613',   41, 'bignum_central_column', base=>2 ],
+   [ 'A266614',   41, 'number_of', value=>1 ],
+   [ 'A266616',   41, 'number_of', value=>0 ],
+   [ 'A266615',   41, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266617',   41, 'number_of', value=>0, cumulative=>1 ],
+   
+   [ 'A266619',   45, 'bits' ],
+   [ 'A266622',   45, 'bignum' ],
+   [ 'A266621',   45, 'bignum', base=>2 ],
+   [ 'A266623',   45, 'bits', part => 'centre' ],
+   [ 'A266624',   45, 'bignum_central_column' ],
+   [ 'A266625',   45, 'bignum_central_column', base=>2 ],
+   [ 'A266628',   45, 'number_of', value=>0 ],
+   [ 'A266626',   45, 'number_of', value=>1 ],
+   [ 'A266627',   45, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266629',   45, 'number_of', value=>0, cumulative=>1 ],
+   
+   [ 'A266659',   47, 'bits' ],
+   [ 'A266661',   47, 'bignum' ],
+   [ 'A266660',   47, 'bignum', base=>2 ],
+   [ 'A266664',   47, 'number_of', value=>0 ],
+   [ 'A266662',   47, 'number_of', value=>1 ],
+   [ 'A266663',   47, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266665',   47, 'number_of', value=>0, cumulative=>1 ],
+   
+   [ 'A071028',   50, 'bits' ],
+   [ 'A094028',   50, 'bignum', base=>2 ],
 
-   [ 'A071031',  62, 'bits' ],
-   [ 'A266809',  62, 'bignum', base=>2 ],
-   [ 'A266810',  62, 'bignum' ],
-   [ 'A071046',  62, 'number_of', value=>0 ],
-   [ 'A071047',  62, 'number_of', value=>1 ],
-   [ 'A266811',  62, 'number_of', value=>1, cumulative=>1 ],
-   [ 'A266813',  62, 'number_of', value=>0, cumulative=>1 ],
-
+   [ 'A266666',   51, 'bits' ],
+   [ 'A266668',   51, 'bignum' ],
+   [ 'A266667',   51, 'bignum', base=>2 ],
+   
+   [ 'A266669',   53, 'bits' ],
+   [ 'A266671',   53, 'bignum' ],
+   [ 'A266670',   53, 'bignum', base=>2 ],
+   
    [ 'A071030',   54, 'bits' ],
    [ 'A118108',   54, 'bignum' ],
    [ 'A118109',   54, 'bignum', base=>2 ],
@@ -377,53 +333,79 @@ my @data =
    [ 'A265225',   54, 'number_of', value=>1, cumulative=>1 ],
    [ 'A050187',   54, 'number_of', value=>0, cumulative=>1, y_start=>1 ],
 
-   [ 'A071036',  150, 'bits' ],
-   [ 'A038184',  150, 'bignum' ],
-   [ 'A118110',  150, 'bignum', base=>2 ],  # (previously also A245548)
-   [ 'A038185',  150, 'bignum', part=>'left' ], # cut after central column
-   [ 'A071053',  150, 'number_of', value=>1 ],
-   [ 'A071052',  150, 'number_of', value=>0 ],
-   [ 'A134659',  150, 'number_of', value=>1, cumulative=>1 ],
-   [ 'A265223',  150, 'number_of', value=>0, cumulative=>1 ],
+   [ 'A266672',   57, 'bits' ],
+   [ 'A266674',   57, 'bignum' ],
+   [ 'A266673',   57, 'bignum', base=>2 ],
+   
+   [ 'A266716',   59, 'bits' ],
+   [ 'A266717',   59, 'bignum', base=>2 ],
+   [ 'A266718',   59, 'bignum' ],
+   [ 'A266719',   59, 'bits', part=>'centre' ],
+   [ 'A266720',   59, 'bignum_central_column' ],
+   [ 'A266721',   59, 'bignum_central_column', base=>2 ],
+   [ 'A266722',   59, 'number_of', value=>1 ],
+   [ 'A266724',   59, 'number_of', value=>0 ],
+   [ 'A266723',   59, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266725',   59, 'number_of', value=>0, cumulative=>1 ],
 
-   [ 'A118111',  190, 'bits' ],
-   [ 'A071039',  190, 'bits' ],  # dupliate
-   [ 'A037576',  190, 'bignum' ],
-   [ 'A265688',  190, 'bignum', base=>2 ],
-   [ 'A032766',  190, 'number_of', value=>1, initial=>[0] ],
-   [ 'A004526',  190, 'number_of', value=>0 ],
-   [ 'A006578',  190, 'number_of', value=>1, cumulative=>1, initial=>[0] ],
-   [ 'A002620',  190, 'number_of', value=>0, cumulative=>1 ],
-   [ 'A166486',  190, 'bits', part => 'centre', initial=>[0] ], # rep 1,1,1,0
-   [ 'A265380',  190, 'bignum_central_column' ],                # same rule 158
-   [ 'A265381',  190, 'bignum_central_column', base=>2 ],       #
+   [ 'A006943',   60, 'bignum', base=>2 ],  # Sierpinski
+   
+   [ 'A266786',   61, 'bits' ],
+   [ 'A266788',   61, 'bignum' ],
+   [ 'A266787',   61, 'bignum', base=>2 ],
+   [ 'A266789',   61, 'bits', part=>'centre' ],
+   [ 'A266790',   61, 'bignum_central_column' ],
+   [ 'A266791',   61, 'bignum_central_column', base=>2 ],
+   [ 'A266792',   61, 'number_of', value=>1 ],
+   [ 'A266794',   61, 'number_of', value=>0 ],
+   [ 'A266793',   61, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266795',   61, 'number_of', value=>0, cumulative=>1 ],
+   
+   [ 'A071031',   62, 'bits' ],
+   [ 'A266809',   62, 'bignum', base=>2 ],
+   [ 'A266810',   62, 'bignum' ],
+   [ 'A071046',   62, 'number_of', value=>0 ],
+   [ 'A071047',   62, 'number_of', value=>1 ],
+   [ 'A266811',   62, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266813',   62, 'number_of', value=>0, cumulative=>1 ],
+   
+   [ 'A266837',   67, 'bits' ],
+   [ 'A266838',   67, 'bignum', base=>2 ],
+   [ 'A266839',   67, 'bignum' ],
 
-   [ 'A266837',  67, 'bits' ],
-   [ 'A266838',  67, 'bignum', base=>2 ],
-   [ 'A266839',  67, 'bignum' ],
+   [ 'A266840',   69, 'bits' ],
+   [ 'A266841',   69, 'bignum', base=>2 ],
+   [ 'A266842',   69, 'bignum' ],
 
-   [ 'A266840',  69, 'bits' ],
-   [ 'A266841',  69, 'bignum', base=>2 ],
-   [ 'A266842',  69, 'bignum' ],
-
-   [ 'A266843',  70, 'bits' ],
-   [ 'A266844',  70, 'bignum', base=>2 ],
-   [ 'A266846',  70, 'bignum' ],
-   [ 'A071022',  70, 'bits', part=>'left' ],
-
+   [ 'A266843',   70, 'bits' ],
+   [ 'A266844',   70, 'bignum', base=>2 ],
+   [ 'A266846',   70, 'bignum' ],
+   [ 'A071022',   70, 'bits', part=>'left' ],
+   [ 'A080513',   70, 'number_of', value=>1 ],
+   
    [ 'A266848',   71, 'bits' ],
    [ 'A266849',   71, 'bignum', base=>2 ],
    [ 'A266850',   71, 'bignum' ],
 
+   [ 'A262448',   73, 'bits' ],
+   [ 'A265122',   73, 'bignum', base=>2 ],
+   [ 'A265156',   73, 'bignum' ],
+   [ 'A265205',   73, 'number_of', value=>1 ],
+   [ 'A265219',   73, 'number_of', value=>0 ],
+   [ 'A265206',   73, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A265220',   73, 'number_of', value=>0, cumulative=>1 ],
+   
    [ 'A266892',   75, 'bits' ],
-   [ 'A266893',   75, 'bignum', base=>2 ],
    [ 'A266894',   75, 'bignum' ],
+   [ 'A266893',   75, 'bignum', base=>2 ],
    [ 'A266895',   75, 'bits', part => 'centre' ],
    [ 'A266896',   75, 'bignum_central_column' ],
    [ 'A266897',   75, 'bignum_central_column', base=>2 ],
    [ 'A266900',   75, 'number_of', value=>0 ],
    [ 'A266898',   75, 'number_of', value=>1 ],
-
+   [ 'A266899',   75, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A266901',   75, 'number_of', value=>0, cumulative=>1 ],
+   
    [ 'A266872',   77, 'bignum', base=>2 ],
    [ 'A266873',   77, 'bignum' ],
 
@@ -431,6 +413,7 @@ my @data =
    [ 'A266975',   78, 'bignum', base=>2 ],
    [ 'A266976',   78, 'bignum' ],
    [ 'A266977',   78, 'number_of', value=>1 ],
+   [ 'A071023',   78, 'bits', part=>'left' ],
 
    [ 'A266978',   79, 'bits' ],
    [ 'A266979',   79, 'bignum', base=>2 ],
@@ -451,11 +434,18 @@ my @data =
    [ 'A267035',   85, 'bignum', base=>2 ],
    [ 'A267036',   85, 'bignum' ],
 
+   # mirror image of rule 30
+   [ 'A071032',  86, 'bits' ],
+   [ 'A265280',  86, 'bignum', base=>2 ],
+   [ 'A265281',  86, 'bignum' ],
+
    [ 'A267037',   89, 'bits' ],
    [ 'A267038',   89, 'bignum', base=>2 ],
    [ 'A267039',   89, 'bignum' ],
 
    [ 'A265172',   90, 'bignum', base=>2 ],
+   [ 'A001316',   90, 'number_of', value=>1 ], # Gould's sequence
+   [ 'A071042',   90, 'number_of', value=>0 ],
 
    [ 'A267015',   91, 'bits' ],
    [ 'A267041',   91, 'bignum', base=>2 ],
@@ -465,14 +455,23 @@ my @data =
    [ 'A267045',   91, 'bignum_central_column', base=>2 ],
    [ 'A267048',   91, 'number_of', value=>0 ],
    [ 'A267046',   91, 'number_of', value=>1 ],
-
+   [ 'A267047',   91, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A267049',   91, 'number_of', value=>0, cumulative=>1 ],
+   
    [ 'A267050',   92, 'bits' ],
    [ 'A267051',   92, 'bignum', base=>2 ],
    [ 'A267052',   92, 'bignum' ],
+   [ 'A071024',   92, 'bits', part=>'right' ],
 
    [ 'A267053',   93, 'bits' ],
    [ 'A267054',   93, 'bignum', base=>2 ],
    [ 'A267055',   93, 'bignum' ],
+
+   [ 'A118102',   94, 'bits' ],
+   [ 'A118101',   94, 'bignum' ],
+   [ 'A071033',   94, 'bignum', base=>2 ],
+   [ 'A265283',   94, 'number_of', value=>1 ],
+   [ 'A265284',   94, 'number_of', value=>1, cumulative=>1 ],
 
    [ 'A267056',   97, 'bits' ],
    [ 'A267057',   97, 'bignum', base=>2 ],
@@ -486,6 +485,7 @@ my @data =
    [ 'A267130',  101, 'bignum', base=>2 ],
    [ 'A267131',  101, 'bignum' ],
 
+   [ 'A117998',  102, 'bignum' ],
    [ 'A265319',  102, 'bignum', base=>2 ],
 
    [ 'A267136',  103, 'bits' ],
@@ -495,8 +495,10 @@ my @data =
    [ 'A267145',  105, 'bits' ],
    [ 'A267146',  105, 'bignum', base=>2 ],
    [ 'A267147',  105, 'bignum' ],
-   [ 'A267150',  105, 'number_of', value=>0 ],
    [ 'A267148',  105, 'number_of', value=>1 ],
+   [ 'A267150',  105, 'number_of', value=>0 ],
+   [ 'A267149',  105, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A267151',  105, 'number_of', value=>0, cumulative=>1 ],
 
    [ 'A267152',  107, 'bits' ],
    [ 'A267153',  107, 'bignum', base=>2 ],
@@ -506,6 +508,8 @@ my @data =
    [ 'A267157',  107, 'bignum_central_column', base=>2 ],
    [ 'A267160',  107, 'number_of', value=>0 ],
    [ 'A267158',  107, 'number_of', value=>1 ],
+   [ 'A267159',  107, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A267161',  107, 'number_of', value=>0, cumulative=>1 ],
 
    [ 'A243566',  109, 'bits' ],
    [ 'A267206',  109, 'bignum', base=>2 ],
@@ -513,10 +517,19 @@ my @data =
    [ 'A267208',  109, 'bits', part => 'centre' ],
    [ 'A267209',  109, 'bignum_central_column' ],
    [ 'A267210',  109, 'bignum_central_column', base=>2 ],
-   [ 'A267213',  109, 'number_of', value=>0 ],
    [ 'A267211',  109, 'number_of', value=>1 ],
+   [ 'A267213',  109, 'number_of', value=>0 ],
+   [ 'A267212',  109, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A267214',  109, 'number_of', value=>0, cumulative=>1 ],
 
+   [ 'A075437',  110, 'bits' ],
+   [ 'A117999',  110, 'bignum' ],
    [ 'A265320',  110, 'bignum', base=>2 ],
+   [ 'A265322',  110, 'number_of', value=>0 ],
+   [ 'A265321',  110, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A265323',  110, 'number_of', value=>0, cumulative=>1 ],
+   [ 'A070887',  110, 'bits', part=>'left' ],
+   [ 'A071049',  110, 'number_of', value=>1, initial=>[0] ],
 
    [ 'A267253',  111, 'bits' ],
    [ 'A267254',  111, 'bignum', base=>2 ],
@@ -524,6 +537,10 @@ my @data =
    [ 'A267256',  111, 'bits', part => 'centre' ],
    [ 'A267257',  111, 'bignum_central_column' ],
    [ 'A267258',  111, 'bignum_central_column', base=>2 ],
+   [ 'A267259',  111, 'number_of', value=>1 ],
+   [ 'A267261',  111, 'number_of', value=>0 ],
+   [ 'A267260',  111, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A267262',  111, 'number_of', value=>0, cumulative=>1 ],
 
    [ 'A267269',  115, 'bits' ],
    [ 'A267270',  115, 'bignum', base=>2 ],
@@ -533,6 +550,7 @@ my @data =
    [ 'A267273',  117, 'bignum', base=>2 ],
    [ 'A267274',  117, 'bignum' ],
 
+   [ 'A071034',  118, 'bits' ],
    [ 'A267275',  118, 'bignum', base=>2 ],
    [ 'A267276',  118, 'bignum' ],
 
@@ -543,10 +561,14 @@ my @data =
    [ 'A267349',  123, 'bits' ],
    [ 'A267350',  123, 'bignum', base=>2 ],
    [ 'A267351',  123, 'bignum' ],
+   [ 'A267352',  123, 'number_of', value=>1 ],
+   [ 'A267354',  123, 'number_of', value=>0 ],
+   [ 'A267353',  123, 'number_of', value=>1, cumulative=>1 ],
 
    [ 'A267355',  124, 'bits' ],
    [ 'A267356',  124, 'bignum', base=>2 ],
    [ 'A267357',  124, 'bignum' ],
+   [ 'A071025',  124, 'bits', part=>'right' ],
 
    [ 'A267358',  125, 'bits' ],
    [ 'A267359',  125, 'bignum', base=>2 ],
@@ -557,28 +579,95 @@ my @data =
    [ 'A267365',  126, 'bignum' ],
    [ 'A267366',  126, 'bignum_central_column' ],
    [ 'A267367',  126, 'bignum_central_column', base=>2 ],
-
+   [ 'A071050',  126, 'number_of', value=>0 ],
+   [ 'A071051',  126, 'number_of', value=>1 ],
+   [ 'A267368',  126, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A267369',  126, 'number_of', value=>0, cumulative=>1 ],
+   
    [ 'A267417',  129, 'bits' ],
    [ 'A267440',  129, 'bignum', base=>2 ],
    [ 'A267441',  129, 'bignum' ],
    [ 'A267442',  129, 'bits', part => 'centre' ],
    [ 'A267443',  129, 'bignum_central_column' ],
    [ 'A267444',  129, 'bignum_central_column', base=>2 ],
+   [ 'A267445',  129, 'number_of', value=>1 ],
+   [ 'A267447',  129, 'number_of', value=>0 ],
+   [ 'A267446',  129, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A267448',  129, 'number_of', value=>0, cumulative=>1 ],
 
    [ 'A267418',  131, 'bits' ],
    [ 'A267449',  131, 'bignum', base=>2 ],
    [ 'A267450',  131, 'bignum' ],
+   [ 'A267451',  131, 'number_of', value=>1 ],
+   [ 'A267453',  131, 'number_of', value=>0 ],
+   [ 'A267452',  131, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A267454',  131, 'number_of', value=>0, cumulative=>1 ],
 
    [ 'A267423',  133, 'bits' ],
    [ 'A267456',  133, 'bignum', base=>2 ],
    [ 'A267457',  133, 'bignum' ],
+   [ 'A267458',  133, 'number_of', value=>1 ],
+   [ 'A267460',  133, 'number_of', value=>0 ],
+   [ 'A267459',  133, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A267461',  133, 'number_of', value=>0, cumulative=>1 ],
 
+   # 111 110 101 100 011 010 001 000
+   #  1   0   0   0   0   1   1   1
+   [ 'A265695',  135, 'bits' ],
+   [ 'A265697',  135, 'bignum' ],
+   [ 'A265696',  135, 'bignum', base=>2 ],
+   [ 'A265698',  135, 'bits', part => 'centre' ],
+   [ 'A265699',  135, 'bignum_central_column' ],
+   [ 'A265700',  135, 'bignum_central_column', base=>2 ],
+   [ 'A265703',  135, 'number_of', value=>0 ],
+   [ 'A265701',  135, 'number_of', value=>1 ],
+   [ 'A265702',  135, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A265704',  135, 'number_of', value=>0, cumulative=>1 ],
+   
+   [ 'A071036',  150, 'bits' ],
+   [ 'A038184',  150, 'bignum' ],
+   [ 'A118110',  150, 'bignum', base=>2 ],  # (previously also A245548)
+   [ 'A038185',  150, 'bignum', part=>'left' ], # cut after central column
+   [ 'A071053',  150, 'number_of', value=>1 ],
+   [ 'A071052',  150, 'number_of', value=>0 ],
+   [ 'A134659',  150, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A265223',  150, 'number_of', value=>0, cumulative=>1 ],
+
+   [ 'A262866',  153, 'bignum' ],
+   [ 'A262855',  153, 'bits' ],
+   [ 'A262865',  153, 'bignum', part => 'centre', base=>2 ],
+   [ 'A262867',  153, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A074330',  153, 'number_of', value=>0, cumulative=>1, y_start=>1 ],
+   [ 'A071042',  153, 'number_of', value=>1,  # cf rule 90
+      y_start=>1, initial=>[0] ], # sequence starts 0,... instead
+   # [ 'A999999',  153, 'number_of', value=>0 ],  # 2*A001316
+   
+   [ 'A263243',  155, 'bits' ],
+   [ 'A263244',  155, 'bignum', base=>2 ],
+   [ 'A263245',  155, 'bignum' ],
+   [ 'A263511',  155, 'number_of', value=>1, cumulative=>1 ],
+   
+   [ 'A071037',  158, 'bits' ],
+   [ 'A118172',  158, 'bits' ],  # duplicate
+   [ 'A118171',  158, 'bignum' ],
+   [ 'A265379',  158, 'bignum', base=>2 ],
+   [ 'A265380',  158, 'bignum_central_column' ],
+   [ 'A265381',  158, 'bignum_central_column', base=>2 ],
+   [ 'A071054',  158, 'number_of', value=>1 ],
+   [ 'A029578',  158, 'number_of', value=>0 ],
+   [ 'A265382',  158, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A211538',  158, 'number_of', value=>0, cumulative=>1, initial=>[0] ],
+   
    [ 'A267463',  137, 'bits' ],
    [ 'A267511',  137, 'bignum', base=>2 ],
    [ 'A267512',  137, 'bignum' ],
    [ 'A267513',  137, 'bits', part => 'centre' ],
    [ 'A267514',  137, 'bignum_central_column' ],
    [ 'A267515',  137, 'bignum_central_column', base=>2 ],
+   [ 'A267516',  137, 'number_of', value=>1 ],
+   [ 'A267518',  137, 'number_of', value=>0 ],
+   [ 'A267517',  137, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A267519',  137, 'number_of', value=>0, cumulative=>1 ],
 
    [ 'A267520',  139, 'bits' ],
    [ 'A267523',  139, 'bignum', base=>2 ],
@@ -610,34 +699,33 @@ my @data =
    [ 'A262863',  147, 'bignum_central_column' ],
 
    [ 'A265246',  149, 'bits' ],
+   # [ 'A226464',  149, 'bits' ],  # no, this started from single 0
+   [ 'A265717',  149, 'bignum' ],
+   [ 'A265715',  149, 'bignum', base=>2 ],
 
-   [ 'A262866',  153, 'bignum' ],
-   [ 'A262855',  153, 'bits' ],
-   [ 'A262865',  153, 'bignum', part => 'centre', base=>2 ],
-
-   [ 'A263243',  155, 'bits' ],
-   [ 'A263244',  155, 'bignum', base=>2 ],
-   [ 'A263245',  155, 'bignum' ],
+   [ 'A070909',  156, 'bits', part=>'right' ],
 
    [ 'A263804',  157, 'bits' ],
-   [ 'A263805',  157, 'bignum', base=>2 ],
    [ 'A263806',  157, 'bignum' ],
-
-   [ 'A265379',  158, 'bignum', base=>2 ],
-   [ 'A265380',  158, 'bignum_central_column' ],
-   [ 'A265381',  158, 'bignum_central_column', base=>2 ],
+   [ 'A263805',  157, 'bignum', base=>2 ],
+   [ 'A263807',  157, 'number_of', value=>1, cumulative=>1 ],
 
    [ 'A263919',  163, 'bits' ],
-
+   [ 'A266753',  163, 'bignum' ],
+   [ 'A266752',  163, 'bignum', base=>2 ],
+   
+   [ 'A266754',  165, 'bits' ],
    [ 'A267246',  165, 'bignum', base=>2 ],
    [ 'A267247',  165, 'bignum' ],
-
+   
    [ 'A267576',  167, 'bits' ],
    [ 'A267577',  167, 'bignum', base=>2 ],
    [ 'A267578',  167, 'bignum' ],
    [ 'A267579',  167, 'bits', part => 'centre' ],
    [ 'A267580',  167, 'bignum_central_column' ],
    [ 'A267581',  167, 'bignum_central_column', base=>2 ],
+   [ 'A267582',  167, 'number_of', value=>1 ],
+   [ 'A267583',  167, 'number_of', value=>1, cumulative=>1 ],
 
    [ 'A264442',  169, 'bits' ],
    [ 'A267585',  169, 'bignum', base=>2 ],
@@ -645,6 +733,10 @@ my @data =
    [ 'A267587',  169, 'bits', part => 'centre' ],
    [ 'A267588',  169, 'bignum_central_column' ],
    [ 'A267589',  169, 'bignum_central_column', base=>2 ],
+   [ 'A267590',  169, 'number_of', value=>1 ],
+   [ 'A267592',  169, 'number_of', value=>0 ],
+   [ 'A267591',  169, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A267593',  169, 'number_of', value=>0, cumulative=>1 ],
 
    [ 'A267594',  173, 'bits' ],
    [ 'A267595',  173, 'bignum', base=>2 ],
@@ -652,8 +744,10 @@ my @data =
 
    [ 'A265186',  175, 'bits' ],
    [ 'A262779',  175, 'bignum', base=>2 ],
+   [ 'A266678',  175, 'bits', part=>'centre' ],
+   [ 'A266680',  175, 'bignum_central_column' ],
    [ 'A267604',  175, 'bignum_central_column', base=>2 ],
-
+   
    [ 'A267598',  177, 'bits' ],
    [ 'A267599',  177, 'bignum', base=>2 ],
 
@@ -661,8 +755,11 @@ my @data =
    [ 'A267606',  181, 'bignum', base=>2 ],
    [ 'A267607',  181, 'bignum' ],
 
+   [ 'A071038',  182, 'bits' ],
    [ 'A267608',  182, 'bignum', base=>2 ],
    [ 'A267609',  182, 'bignum' ],
+   [ 'A071055',  182, 'number_of', value=>0 ],
+   [ 'A267610',  182, 'number_of', value=>0, cumulative=>1 ],
 
    [ 'A267612',  185, 'bits' ],
    [ 'A267613',  185, 'bignum', base=>2 ],
@@ -672,9 +769,28 @@ my @data =
    [ 'A267622',  187, 'bignum', base=>2 ],
    [ 'A267623',  187, 'bignum_central_column' ],
 
+   [ 'A118174',  188, 'bits' ],
+   [ 'A118173',  188, 'bignum' ],
    [ 'A265427',  188, 'bignum', base=>2 ],
+   [ 'A071026',  188, 'bits', part=>'right' ],
+   [ 'A265428',  188, 'number_of', value=>1 ],
+   [ 'A265430',  188, 'number_of', value=>0 ],
+   [ 'A265429',  188, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A265431',  188, 'number_of', value=>0, cumulative=>1 ],
 
    [ 'A267635',  189, 'bits' ],
+
+   [ 'A118111',  190, 'bits' ],
+   [ 'A071039',  190, 'bits' ],  # dupliate
+   [ 'A037576',  190, 'bignum' ],
+   [ 'A265688',  190, 'bignum', base=>2 ],
+   [ 'A032766',  190, 'number_of', value=>1, initial=>[0] ],
+   [ 'A004526',  190, 'number_of', value=>0 ],
+   [ 'A006578',  190, 'number_of', value=>1, cumulative=>1, initial=>[0] ],
+   [ 'A002620',  190, 'number_of', value=>0, cumulative=>1 ],
+   [ 'A166486',  190, 'bits', part => 'centre', initial=>[0] ], # rep 1,1,1,0
+   [ 'A265380',  190, 'bignum_central_column' ],                # same rule 158
+   [ 'A265381',  190, 'bignum_central_column', base=>2 ],       #
 
    [ 'A267636',  193, 'bits' ],
    [ 'A267645',  193, 'bignum', base=>2 ],
@@ -710,6 +826,7 @@ my @data =
    [ 'A267705',  205, 'bignum', base=>2 ],
 
    [ 'A267708',  206, 'bits' ],
+   [ 'A109241',  206, 'bignum', base=>2 ],
 
    [ 'A267773',  207, 'bits' ],
    [ 'A267774',  207, 'bignum' ],
@@ -726,8 +843,9 @@ my @data =
    [ 'A267801',  213, 'bignum', base=>2 ],
    [ 'A267802',  213, 'bignum' ],
 
-   [ 'A267804',  214, 'bignum', base=>2 ],
+   [ 'A071040',  214, 'bits' ],
    [ 'A267805',  214, 'bignum' ],
+   [ 'A267804',  214, 'bignum', base=>2 ],
 
    [ 'A267810',  217, 'bits' ],
    [ 'A267811',  217, 'bignum', base=>2 ],
@@ -742,6 +860,7 @@ my @data =
    [ 'A267841',  225, 'bits' ],
    [ 'A267842',  225, 'bignum', base=>2 ],
    [ 'A267843',  225, 'bignum' ],
+   [ 'A078176',  225, 'bignum', part=>'whole', ystart=>1, inverse=>1 ],
 
    [ 'A267845',  227, 'bits' ],
    [ 'A267846',  227, 'bignum', base=>2 ],
@@ -752,27 +871,38 @@ my @data =
    [ 'A267851',  229, 'bignum' ],
 
    [ 'A267853',  230, 'bits' ],
-   [ 'A267854',  230, 'bignum', base=>2 ],
    [ 'A267855',  230, 'bignum' ],
+   [ 'A267854',  230, 'bignum', base=>2 ],
+   [ 'A071027',  230, 'bits', part=>'left' ],
+   [ 'A006977',  230, 'bignum', part=>'left' ],
 
    [ 'A267866',  231, 'bits' ],
    [ 'A267867',  231, 'bignum', base=>2 ],
-   [ 'A267868',  233, 'bits' ],
-   [ 'A267869',  235, 'bits' ],
-   [ 'A267870',  237, 'bits' ],
-   [ 'A267871',  239, 'bits' ],
 
-   [ 'A267876',  233, 'bignum', base=>2 ],
+   [ 'A267868',  233, 'bits' ],
    [ 'A267877',  233, 'bignum' ],
+   [ 'A267876',  233, 'bignum', base=>2 ],
    [ 'A267878',  233, 'bits', part => 'centre' ],
    [ 'A267879',  233, 'bignum_central_column' ],
+   [ 'A267880',  233, 'bignum_central_column', base=>2 ],
+   [ 'A267881',  233, 'number_of', value=>1 ],
+   [ 'A267883',  233, 'number_of', value=>0 ],
+   [ 'A267882',  233, 'number_of', value=>1, cumulative=>1 ],
+   [ 'A267884',  233, 'number_of', value=>0, cumulative=>1 ],
 
+   [ 'A267869',  235, 'bits' ],
    [ 'A267885',  235, 'bignum', base=>2 ],
    [ 'A267886',  235, 'bignum' ],
-
-   [ 'A267887',  237, 'bignum', base=>2 ],
+   [ 'A267873',  235, 'number_of', value=>1 ],
+   [ 'A267874',  235, 'number_of', value=>1, cumulative=>1 ],
+   # 0s are fixed 0,1,2
+   
+   [ 'A267870',  237, 'bits' ],
    [ 'A267888',  237, 'bignum' ],
+   [ 'A267887',  237, 'bignum', base=>2 ],
+   [ 'A267872',  237, 'number_of', value=>1 ],
 
+   [ 'A267871',  239, 'bits' ],
    [ 'A267889',  239, 'bignum', base=>2 ],
    [ 'A267890',  239, 'bignum' ],
 
@@ -784,127 +914,37 @@ my @data =
    [ 'A267923',  245, 'bignum', base=>2 ],
    [ 'A267924',  245, 'bignum' ],
 
-   [ 'A267925',  246, 'bignum', base=>2 ],
+   [ 'A071041',  246, 'bits' ],
    [ 'A267926',  246, 'bignum' ],
+   [ 'A267925',  246, 'bignum', base=>2 ],
 
    [ 'A267927',  249, 'bits' ],
    [ 'A267934',  249, 'bignum', base=>2 ],
    [ 'A267935',  249, 'bignum' ],
 
+   [ 'A002450',  250, 'bignum', initial=>[0] ], # (4^n-1)/3 10101 extra 0 start
+
    [ 'A267936',  251, 'bits' ],
    [ 'A267937',  251, 'bignum', base=>2 ],
    [ 'A267938',  251, 'bignum' ],
 
+   [ 'A118175',  252, 'bits' ],
+
    [ 'A267940',  253, 'bignum', base=>2 ],
    [ 'A267941',  253, 'bignum' ],
 
-
-   [ 'A265122',   73, 'bignum', base=>2 ],
-   [ 'A265156',   73, 'bignum' ],
-
-   [ 'A263428',    3, 'bits' ],
-
-   [ 'A262448',   73, 'bits' ],
-
-   [ 'A260552',   17, 'bits' ],
-   [ 'A260692',   17, 'bignum', base=>2 ],
-
-
-
-
-
-   [ 'A098608',   2, 'bignum', base=>2 ],  # 100^n
-   [ 'A011557',   4, 'bignum', base=>2 ],  # 10^n
-   [ 'A094028',  50, 'bignum', base=>2 ],
-   [ 'A006943',  60, 'bignum', base=>2 ],  # Sierpinski
-   [ 'A100706', 151, 'bignum', base=>2 ],
-   [ 'A109241', 206, 'bignum', base=>2 ],
-   [ 'A000042', 220, 'bignum', base=>2 ],  # half-width 1s
-
-   # http://oeis.org/A118110
-   # http://oeis.org/A245548
-
-   # characteristic func of pronics m*(m+1)
-   # rule=4,12,36,44,68,76,100,108,132,140,164,172,196,204,228,236
-   [ 'A005369',   4, 'bits' ],
-
-   [ 'A071022', 198, 'bits', part=>'left' ],
-   [ 'A071023',  78, 'bits', part=>'left' ],
-   [ 'A071024',  92, 'bits', part=>'right' ],
-   [ 'A071025', 124, 'bits', part=>'right' ],
-   [ 'A071026', 188, 'bits', part=>'right' ],
-   [ 'A071027', 230, 'bits', part=>'left' ],
-   [ 'A071028',  50, 'bits' ],
-   [ 'A071029',  22, 'bits' ],
-   [ 'A071033',  94, 'bignum', base=>2 ],
-   [ 'A071034', 118, 'bits' ],
-   [ 'A071037', 158, 'bits' ],
-   [ 'A071038', 182, 'bits' ],
-   [ 'A071040', 214, 'bits' ],
-   [ 'A071041', 246, 'bits' ],
-
    # [ 'A060576', 255, 'bits' ], # homeomorphically irreducibles ...
 
-   [ 'A070909',  28, 'bits', part=>'right' ],
-   [ 'A070909', 156, 'bits', part=>'right' ],
+   [ 'A071022', 198, 'bits', part=>'left' ],
 
-   [ 'A075437', 110, 'bits' ],
-
-   [ 'A118101',  94, 'bignum' ],
-   [ 'A118102',  94, 'bits' ],
-
-   [ 'A118171', 158, 'bignum' ],
-   [ 'A118172', 158, 'bits' ],
-   [ 'A118173', 188, 'bignum' ],
-   [ 'A118174', 188, 'bits' ],
+   # right half solid 2^n-1
    [ 'A118175', 220, 'bits' ],
-   [ 'A118175', 252, 'bits' ],
+   [ 'A000225', 220, 'bignum', initial=>[0] ], # 2^n-1 want start from 1
+   [ 'A000042', 220, 'bignum', base=>2 ],  # half-width 1s
 
-   [ 'A070887', 110, 'bits', part=>'left' ],
 
-   [ 'A071042',  90, 'number_of', value=>0 ],
-   [ 'A071043',  22, 'number_of', value=>0 ],
-   [ 'A071044',  22, 'number_of', value=>1 ],
-   [ 'A071049', 110, 'number_of', value=>1, initial=>[0] ],
    [ 'A071048', 110, 'number_of', value=>0, part=>'left' ],
-   [ 'A071050', 126, 'number_of', value=>0 ],
-   [ 'A071051', 126, 'number_of', value=>1 ],
-   [ 'A071054', 158, 'number_of', value=>1 ],
-   [ 'A071055', 182, 'number_of', value=>0 ],
 
-   [ 'A001045',  28, 'bignum', initial=>[0,1] ], # Jacobsthal
-   [ 'A117998', 102, 'bignum' ],
-   [ 'A117999', 110, 'bignum' ],
-   [ 'A002450', 250, 'bignum', initial=>[0] ], # (4^n-1)/3 10101 extra 0 start
-
-   [ 'A006977', 230, 'bignum', part=>'left' ],
-   [ 'A078176', 225, 'bignum', part=>'whole', ystart=>1, inverse=>1 ],
-
-   [ 'A051023',  30, 'bits', part=>'centre' ],
-   [ 'A070950',  30, 'bits' ],
-   [ 'A110240',  30, 'bignum' ], # cf A074890 some strange form
-   [ 'A245549',  30, 'bignum', base=>2 ],
-   [ 'A261299',  30, 'bignum_central_column' ],
-   [ 'A070951',  30, 'number_of', value=>0 ],
-   [ 'A070952',  30, 'number_of', value=>1, max_count=>400, initial=>[0] ],
-   [ 'A151929',  30, 'number_of_1s_first_diff', max_count=>200,
-     initial=>[0], # without diffs yet applied ...
-   ],
-   [ 'A110267',  30, 'number_of', cumulative=>1 ],
-   [ 'A265224',  30, 'number_of', cumulative=>1, value=>0 ],
-   [ 'A226482',  30, 'number_of_runs' ],
-   [ 'A110266',  30, 'number_of_runs', value=>1 ],
-   [ 'A092539',  30, 'bignum_central_column', base=>2 ],
-   [ 'A094603',  30, 'trailing_number_of', value=>1 ],
-   [ 'A094604',  30, 'new_maximum_trailing_number_of', 1 ],
-   [ 'A100053',  30, 'longest_run', value=>0 ],
-
-   # mirror image of rule 30
-   [ 'A071032',  86, 'bits' ],
-   [ 'A265280',  86, 'bignum', base=>2 ],
-   [ 'A265281',  86, 'bignum' ],
-
-   [ 'A001316',  90, 'number_of', value=>1 ], # Gould's sequence
 
 
    #--------------------------------------------------------------------------
@@ -940,6 +980,9 @@ my @data =
    #--------------------------------------------------------------------------
    # simple stuff
 
+   # whole solid, decimal repunits
+   [ 'A100706', 151, 'bignum', base=>2 ],
+
    # whole solid, values 2^(2n)-1
    [ 'A083420', 151, 'bignum' ], # 8 of
    [ 'A083420', 159, 'bignum' ],
@@ -954,7 +997,6 @@ my @data =
    [ 'A083420', 255, 'bignum' ],
 
    # right half solid 2^n-1
-   [ 'A000225', 220, 'bignum', initial=>[0] ], # 2^n-1 want start from 1
    [ 'A000225', 252, 'bignum', initial=>[0] ],
 
    # left half solid, # 2^n-1
@@ -1088,6 +1130,18 @@ my @data =
 #   }
 # }
 
+if (0) {
+  my @seen;
+  my $prev = $data[0]->[1];
+  foreach my $elem (@data) {
+    my ($anum, $rule, $method, @params) = @$elem;
+    if ($rule != $prev && $seen[$rule]) {
+      warn "rule $rule second block, method=$method";
+    }
+    $seen[$rule] = 1;
+    $prev = $rule;
+  }
+}
 foreach my $elem (@data) {
   ### $elem
   my ($anum, $rule, $method, @params) = @$elem;
@@ -1367,8 +1421,9 @@ sub bits {
            foreach my $x (($part eq 'right' || $part eq 'centre' ? 0 : -$y)
                           .. ($part eq 'left' || $part eq 'centre' ? 0 : $y)) {
              last OUTER if @got >= $count;
-
-             push @got, ($path->xy_to_n ($x, $y) ? 1 : 0);
+             my $cell = $path->xy_is_visited ($x,$y) ? 1 : 0;
+             if ($params{'complement'}) { $cell = 1-$cell; }
+             push @got, $cell;
            }
          }
          return \@got;

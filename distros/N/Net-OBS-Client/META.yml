@@ -1,0 +1,35 @@
+---
+abstract: 'simple OBS API calls'
+author:
+  - 'Frank Schreiner <frank@samaxi.de>'
+build_requires:
+  Test::HTTP::MockServer: '0'
+  Test::More: '0'
+  XML::Parser: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-OBS-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::INI::Reader: '0'
+  Config::Tiny: '0'
+  HTTP::Cookies: '0'
+  HTTP::Request: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Path::Class: '0'
+  URI::URL: '0'
+  XML::Structured: '0'
+  perl: '5.006'
+version: v0.0.8
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

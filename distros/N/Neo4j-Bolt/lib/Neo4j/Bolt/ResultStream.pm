@@ -2,7 +2,7 @@ package Neo4j::Bolt::ResultStream;
 # use Neo4j::Client;
 
 BEGIN {
-  our $VERSION = "0.4200";
+  our $VERSION = "0.4201";
   require Neo4j::Bolt::Cxn;
   require Neo4j::Bolt::CResultStream;
   require XSLoader;
@@ -151,7 +151,7 @@ L<Neo4j::Bolt>, L<Neo4j::Bolt::Cxn>.
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2020 by Mark A. Jensen.
+This software is Copyright (c) 2019-2021 by Mark A. Jensen.
 
 This is free software, licensed under:
 

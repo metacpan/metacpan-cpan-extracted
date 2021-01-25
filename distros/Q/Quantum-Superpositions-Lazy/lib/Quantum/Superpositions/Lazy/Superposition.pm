@@ -1,6 +1,6 @@
 package Quantum::Superpositions::Lazy::Superposition;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use v5.28;
 use warnings;
@@ -227,8 +227,8 @@ caches it for later use.
 =head2 weight_sum
 
 Returns the sum of all states' weights. A possibility for each state occuring
-during collapsing can be calculated with a simple division: C<$state->weight /
-$superposition->weight_sum>.
+during collapsing can be calculated with a simple division: C<< $state->weight
+/ $superposition->weight_sum >>.
 
 =head2 to_ket_notation
 

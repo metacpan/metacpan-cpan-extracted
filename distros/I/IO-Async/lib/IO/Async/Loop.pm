@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2021 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 # When editing this value don't forget to update the docs below
 use constant NEED_API_VERSION => '0.33';
@@ -22,6 +22,9 @@ use constant _CAN_SUBSECOND_ACCURATELY => 0;
 
 # Does the loop implementation support IO_ASYNC_WATCHDOG?
 use constant _CAN_WATCHDOG => 0;
+
+# Does the loop support ->watch_process on PID 0 to observe all exits?
+use constant _CAN_WATCH_ALL_PIDS => 1;
 
 # Watchdog configuration constants
 use constant WATCHDOG_ENABLE   => $ENV{IO_ASYNC_WATCHDOG};
@@ -873,6 +876,8 @@ sub detach_signal
 
    $loop->later( $code )
 
+   $f = $loop->later
+
 Schedules a code reference to be invoked as soon as the current round of IO
 operations is complete.
 
@@ -886,6 +891,11 @@ This method is implemented using the C<watch_idle> method, with the C<when>
 parameter set to C<later>. It will return an ID value that can be passed to
 C<unwatch_idle> if required.
 
+I<Since version 0.78>: If no C<$code> value is passed, a L<Future> will be
+returned instead. This allows for constructs such as:
+
+   await $loop->later;
+
 =cut
 
 sub later
@@ -893,7 +903,17 @@ sub later
    my $self = shift;
    my ( $code ) = @_;
 
-   return $self->watch_idle( when => 'later', code => $code );
+   return $self->watch_idle( when => 'later', code => $code )
+      if $code;
+
+   my $f = $self->new_future;
+   my $id = $self->watch_idle( when => 'later', code => sub {
+      $f->done unless $f->is_ready;
+   } );
+   $f->on_cancel( sub {
+      $self->unwatch_idle( $id );
+   } );
+   return $f;
 }
 
 =head2 spawn_child
@@ -1518,6 +1538,13 @@ This example shows another way to connect to a UNIX socket at F<echo.sock>.
     },
     ...
  );
+
+=item peer => IO
+
+Shortcut for constructing an address to connect to the given IO handle, which
+must be a L<IO::Socket> or subclass, and is presumed to be a local listening
+socket (perhaps on C<PF_UNIX> or C<PF_INET>). This is convenient for
+connecting to a local filehandle, for example during a unit test or similar.
 
 =item local_addrs => ARRAY
 
@@ -2938,6 +2965,13 @@ look for exited child processes.
 
 If both a PID-specific and an all-process watch are installed, there is no
 ordering guarantee as to which will be called first.
+
+B<NOTE> that not all loop classes may be able to support the all-child watch.
+The basic Select and Poll-based classes provided by this distribution do, and
+those built on top of similar OS-specific mechanisms such as Linux's Epoll
+probably will, but typically those built on top of other event systems such
+as F<glib> or F<libuv> may not be able, as the underlying event system may not
+provide the necessary hooks to support it.
 
 =cut
 

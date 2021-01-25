@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter::ChangedFiles;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000012';
+our $VERSION = '1.001000';
 
 use List::Util 1.44 qw( any uniq );
 use App::GHPT::Types qw( ArrayRef HashRef Str );
@@ -13,7 +13,7 @@ has [
         all_files
         deleted_files
         modified_files
-        )
+    )
 ] => (
     is       => 'ro',
     isa      => ArrayRef [Str],
@@ -50,9 +50,9 @@ sub file_exists ( $self, $path ) {
 # this is inefficently written, but it shouldn't really make any difference
 # for the number of files we're talking about here
 sub file_status ( $self, $path ) {
-    return 'A' if any { $_ eq $path } $self->added_files->@*;
-    return 'M' if any { $_ eq $path } $self->modified_files->@*;
-    return 'D' if any { $_ eq $path } $self->deleted_files->@*;
+    return 'A'  if any { $_ eq $path } $self->added_files->@*;
+    return 'M'  if any { $_ eq $path } $self->modified_files->@*;
+    return 'D'  if any { $_ eq $path } $self->deleted_files->@*;
     return q{ } if $self->file_exists($path);
     return undef;
 }
@@ -75,7 +75,7 @@ App::GHPT::WorkSubmitter::ChangedFiles - Contains all the files that were modifi
 
 =head1 VERSION
 
-version 1.000012
+version 1.001000
 
 =head1 SYNOPSIS
 
@@ -171,7 +171,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by MaxMind, Inc.
+This software is Copyright (c) 2021 by MaxMind, Inc.
 
 This is free software, licensed under:
 

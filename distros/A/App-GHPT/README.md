@@ -4,7 +4,7 @@ App::GHPT - A command line tool to simplify using Github and Pivotal Tracker for
 
 # VERSION
 
-version 1.000012
+version 1.001000
 
 # SYNOPSIS
 
@@ -64,13 +64,15 @@ You'll also need to tell git about your PT account:
 Your actual username and token can be found at
 [https://www.pivotaltracker.com/profile](https://www.pivotaltracker.com/profile).
 
+You can alternatively provide the token via the `PIVOTALTRACKER_TOKEN` environment variable.
+
 # CREATING PULL REQUEST QUESTIONS
 
 A question is a class which consumes the
 [App::GHPT::WorkSubmitter::Role::Question](https://metacpan.org/pod/App::GHPT::WorkSubmitter::Role::Question) and implements a method named
 `ask`. See that role's documentation for details.
 
-By default, this tools looks for modules that have a a package name beginning
+By default, this tool looks for modules that have a package name beginning
 with `App::GHPT::WorkSubmitter::Question` to find question classes. However,
 you can configure one or more alternative namespaces by setting the git config
 key `submit-work.question-namespaces`. This should be a space-separated list
@@ -148,16 +150,19 @@ Bugs may be submitted through [https://github.com/maxmind/App-GHPT/issues](https
 
 # CONTRIBUTORS
 
+- Dave Rolsky <drolsky@maxmind.com>
 - Florian Ragwitz <rafl@debian.org>
+- gabe <gpacuilla@maxmind.com>
 - Greg Oschwald <goschwald@maxmind.com>
 - Kevin Phair <phair.kevin@gmail.com>
 - Mark Fowler <mfowler@maxmind.com>
 - Narsimham Chelluri <nchelluri@maxmind.com>
 - Patrick Cronin <pcronin@maxmind.com>
+- William Storey <wstorey@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by MaxMind, Inc.
+This software is Copyright (c) 2021 by MaxMind, Inc.
 
 This is free software, licensed under:
 

@@ -1,34 +1,59 @@
-NAME:
-    Geo::Ellipsoid - Longitude and latitude calculations using an ellipsoid
-                     model.
+NAME
 
-INSTALLATION
-
-To install this module, run the following commands:
-
-    perl Makefile.PL
-    make
-    make test
-    make install
-
-RELEASE NOTES
-
-This is version 1.13. 
+    Geo::Ellipsoid - longitude and latitude calculations using an ellipsoid
+    model
 
 Methods are now guaranteed to return angle values in the range [0,2pi) or
-[-pi,pi). The output range may be selected with arguments to the new() 
-constructor method or by calling the set_longitude_symmetric or 
+[-pi,pi). The output range may be selected with arguments to the new()
+constructor method or by calling the set_longitude_symmetric or
 set_bearing_symmetric methods.
 
 Perls older than 5.6 are not supported.
 
 This module is a port of existing Fortran subroutines to Perl.
 
+INSTALLATION
+
+To install this module, unpack the distribution file, and run the following
+commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc
+command.
+
+    perldoc Geo::Ellipsoid
+
+You can also look for information at:
+
+    GitHub
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Ellipsoid
+
+    MetaCPAN
+        https://metacpan.org/release/Geo-Ellipsoid
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Geo-Ellipsoid
+
+    CPAN Testers PASS Matrix
+        http://pass.cpantesters.org/distro/A/Geo-Ellipsoid.html
+
+    CPAN Testers Reports
+        http://www.cpantesters.org/distro/A/Geo-Ellipsoid.html
+
+    CPAN Testers Matrix
+        http://matrix.cpantesters.org/?dist=Geo-Ellipsoid
+
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005-2008 Jim Gibson
+Copyright (C) 2016-2021 Peter John Acklam (current maintaner)
 
-Copyright (C) 2016 Peter John Acklam
+Copyright (C) 2005-2008 Jim Gibson (original author)
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

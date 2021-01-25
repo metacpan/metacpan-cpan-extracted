@@ -5,8 +5,8 @@ BEGIN {
   use lib 'lib';
 }
 use Inline C => Config =>
-  LIBS  => $Neo4j::Client::LIBS,
-  INC => $Neo4j::Client::DEV_CCFLAGS;
+  LIBS => Neo4j::Client->libs_static,
+  CCFLAGS => Neo4j::Client->cflags;
 
 use Inline C => <<'END_BOLTFILE_C';
 

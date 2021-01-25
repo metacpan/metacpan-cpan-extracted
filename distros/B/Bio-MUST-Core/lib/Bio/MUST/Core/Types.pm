@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::MUST::Core
-$Bio::MUST::Core::Types::VERSION = '0.210120';
+$Bio::MUST::Core::Types::VERSION = '0.210230';
 use Moose::Util::TypeConstraints;
 
 use autodie;
@@ -189,7 +189,6 @@ coerce 'Bio::MUST::Core::Types::Dir'
 ;
 
 # === in part borrowed from Bio::FastParsers to avoid dependency
-# TODO: consolidate at next update of FastParsers as it is now a dependency
 
 # subtype for 'file' attributes
 subtype 'Bio::MUST::Core::Types::File'
@@ -222,7 +221,7 @@ Bio::MUST::Core::Types - Distribution-wide Moose types for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.210120
+version 0.210230
 
 =head1 SYNOPSIS
 

@@ -58,7 +58,7 @@ sub _write ( $filename, $mode, $text ) {
     close $fh;
 }
 
-sub _commit($message) {
+sub _commit ($message) {
     system( 'git', 'commit', '-m', $message );
 }
 

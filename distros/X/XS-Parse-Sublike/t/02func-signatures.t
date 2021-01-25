@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -57,7 +57,8 @@ use testcase "t::func";
 
    is( noparams, "constant", 'func with no params' );
    like( exception { noparams( 1, 2, 3 ) },
-      qr/^Too many arguments for subroutine 'main::noparams' at /,
+      # message was extended somewhere in perl 5.33
+      qr/^Too many arguments for subroutine 'main::noparams' (\(.*\) )?at /,
       'Exception thrown from empty signature validation failure' );
 }
 

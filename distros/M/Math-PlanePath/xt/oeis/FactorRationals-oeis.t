@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2018, 2021 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,6 +28,9 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::FactorRationals;
+use Math::PlanePath::DiagonalRationals;
+use Math::PlanePath::RationalsTree;
+
 my $path = Math::PlanePath::FactorRationals->new;
 
 
@@ -38,7 +41,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::FactorRationals;
      for (my $i = 0; @got < $count; $i++) {
        push @got, Math::PlanePath::FactorRationals::_pos_to_pn__negabinary($i);
      }
@@ -51,7 +53,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::FactorRationals;
      for (my $i = 0; @got < $count; $i++) {
        push @got, Math::PlanePath::FactorRationals::_pn_to_pos__negabinary($i);
      }
@@ -63,7 +64,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::FactorRationals;
      for (my $i = 0; @got < $count; $i++) {
        push @got, sprintf('%b', Math::PlanePath::FactorRationals::_pn_to_pos__negabinary($i));
      }
@@ -76,7 +76,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::FactorRationals;
      for (my $i = -1; @got < $count; $i--) {
        push @got, Math::PlanePath::FactorRationals::_pn_to_pos__negabinary($i);
      }
@@ -91,8 +90,7 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::FactorRationals;
-     for (my $i = 1; @got < $count; $i++) {
+     for (my $i = 0; @got < $count; $i++) {
        push @got, Math::PlanePath::FactorRationals::_pos_to_pn__revbinary($i);
      }
      return \@got;
@@ -104,7 +102,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::FactorRationals;
      for (my $i = 1; @got < $count; $i++) {
        push @got, Math::PlanePath::FactorRationals::_pn_to_pos__revbinary($i);
      }
@@ -117,7 +114,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::FactorRationals;
      for (my $i = 0; @got < $count; $i--) {
        push @got, Math::PlanePath::FactorRationals::_pn_to_pos__revbinary($i);
      }
@@ -224,7 +220,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::DiagonalRationals;
      my $columns = Math::PlanePath::DiagonalRationals->new;
      for (my $n = $path->n_start; @got < $count; $n++) {
        my ($x,$y) = $columns->n_to_xy ($n);
@@ -242,7 +237,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my @got;
-     require Math::PlanePath::RationalsTree;
      my $sb = Math::PlanePath::RationalsTree->new (tree_type => 'CW');
      for (my $n = $path->n_start; @got < $count; $n++) {
        my ($x,$y) = $sb->n_to_xy ($n);

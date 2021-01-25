@@ -5,6 +5,8 @@ use warnings;
 
 use Scalar::Util qw(blessed);
 
+our $VERSION = '0.10.2'; # VERSION
+
 sub modify
 {
     my $node = shift;

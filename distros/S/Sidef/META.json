@@ -70,7 +70,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "3.97"
+         "version" : "v3.97.1"
       },
       "Sidef::Deparse::Perl" : {
          "file" : "lib/Sidef/Deparse/Perl.pm"
@@ -239,6 +239,6 @@
          "url" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "3.97",
+   "version" : "v3.97.1",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

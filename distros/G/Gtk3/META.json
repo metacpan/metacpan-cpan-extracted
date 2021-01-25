@@ -44,7 +44,7 @@
       "x_IRC" : "irc://irc.gimp.org/#gtk-perl",
       "x_twitter" : "https://twitter.com/GTKPerl"
    },
-   "version" : "0.037",
+   "version" : "0.038",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }

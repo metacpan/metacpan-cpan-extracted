@@ -2,7 +2,7 @@ package Role::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '2.002003';
+our $VERSION = '2.002004';
 $VERSION =~ tr/_//d;
 
 our %INFO;
@@ -197,6 +197,7 @@ sub _composite_name {
 sub create_class_with_roles {
   my ($me, $superclass, @roles) = @_;
 
+  $me->_require_module($superclass);
   $me->_check_roles(@roles);
 
   my $new_name = $me->_composite_name($superclass, @roles);
