@@ -2,30 +2,30 @@ NAME
     App::GitHubUtils - Utilities related to GitHub
 
 VERSION
-    This document describes version 0.005 of App::GitHubUtils (from Perl
-    distribution App-GitHubUtils), released on 2020-04-27.
+    This document describes version 0.006 of App::GitHubUtils (from Perl
+    distribution App-GitHubUtils), released on 2020-12-24.
 
 DESCRIPTION
     This distribution provides the following command-line utilities related
     to GitHub:
 
-    *   create-the-github-repo
+    *   create-this-repo-on-github
 
     *   git-clone-from-github
 
 FUNCTIONS
-  create_the_github_repo
+  create_this_repo_on_github
     Usage:
 
-     create_the_github_repo() -> [status, msg, payload, meta]
+     create_this_repo_on_github() -> [status, msg, payload, meta]
 
-    Create github repo.
+    Create this repo on github.
 
     This is a convenient no-argument-needed command to create GitHub
-    repository. Will use prog:github-cmd from pm:App::github::cmd to create
-    the repository. To find out the repo name to be created, will first
-    check .git/config if it exists. Otherwise, will just use the name of the
-    current directory.
+    repository of the current ("this") repo. Will use github-cmd from
+    App::github::cmd to create the repository. To find out the repo name to
+    be created, will first check .git/config if it exists. Otherwise, will
+    just use the name of the current directory.
 
     This function is not exported.
 
@@ -110,7 +110,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitHubUtils>
+    <https://github.com/perlancar/perl-App-GitHubUtils/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

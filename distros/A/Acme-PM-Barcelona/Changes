@@ -1,5 +1,10 @@
 Revision history for Acme-PM-Barcelona
 
+0.06    Tue Jan 26 13:49:05 CET 2021
+        - Update copyright years.
+        - Move bugtracker to github.com.
+        - Move repository to barcelonapm.
+
 0.05    Sun Sep  4 17:05:26 CEST 2016
         - Convert to Dist::Zilla.
         - Remove boilerplate documentation.

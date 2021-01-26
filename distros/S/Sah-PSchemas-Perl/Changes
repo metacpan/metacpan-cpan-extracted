@@ -1,3 +1,9 @@
+0.005   2021-01-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix missing variable declaration which was not caught
+	  because we didn't use strict, derp.
+
+
 0.004   2021-01-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Fix typo.

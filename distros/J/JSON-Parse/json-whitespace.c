@@ -1,8 +1,17 @@
 /* Type for adding whitespace. */
 
+typedef struct json_s {
+    SV * sv;
+    char * s;
+    STRLEN sl;
+}
+json_s_t;
+
 typedef struct json_ws {
     SV * news;
     SV * olds;
+    /* Length of original string. */
+    STRLEN olds_l;
     /* Length of new string. */
     unsigned int news_l;
     /* Copy point. */

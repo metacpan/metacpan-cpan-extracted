@@ -2,10 +2,9 @@
 # can fail, and also check that correct, yet weird or stupid inputs
 # are not marked as invalid.
 
-use warnings;
-use strict;
-use Test::More;
-use JSON::Parse qw/valid_json validate_json/;
+use FindBin '$Bin';
+use lib "$Bin";
+use JPT;
 
 # https://github.com/benkasminbullock/JSON-Parse/issues/2
 

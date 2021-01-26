@@ -14,9 +14,14 @@
    },
    "name" : "Geo-METAR-Deduced",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.4"
          }
       },
       "runtime" : {
@@ -29,7 +34,10 @@
             "MooseX::NonMoose" : "0",
             "Readonly" : "1.03",
             "Set::Scalar" : "0",
-            "perl" : "v5.16.0"
+            "perl" : "v5.16.0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -43,11 +51,14 @@
    "provides" : {
       "Geo::METAR::Deduced" : {
          "file" : "lib/Geo/METAR/Deduced.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.6"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/rolandvanipenburg/geo-metar-deduced/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -55,6 +66,6 @@
          "url" : "https://bitbucket.org/rolandvanipenburg/geo-metar-deduced"
       }
    },
-   "version" : "v0.0.5",
+   "version" : "v0.0.6",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

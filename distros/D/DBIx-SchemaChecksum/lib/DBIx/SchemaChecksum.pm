@@ -1,7 +1,7 @@
 package DBIx::SchemaChecksum;
 
 # ABSTRACT: Manage your datebase schema via checksums
-our $VERSION = '1.103'; # VERSION
+our $VERSION = '1.104'; # VERSION
 
 use 5.010;
 use Moose;
@@ -12,6 +12,7 @@ use Data::Dumper;
 use Path::Class;
 use Carp;
 use File::Find::Rule;
+use File::HomeDir;
 
 has 'dbh' => (
     is => 'ro',
@@ -295,7 +296,7 @@ DBIx::SchemaChecksum - Manage your datebase schema via checksums
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 SYNOPSIS
 

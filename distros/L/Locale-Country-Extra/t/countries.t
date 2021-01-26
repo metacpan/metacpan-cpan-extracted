@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use utf8;
 use lib 'lib';
-use Test::More (tests => 10);
+use Test::More (tests => 11);
 use Test::NoWarnings;
 use Locale::Country::Extra;
-
 my $countries = Locale::Country::Extra->new();
 
 subtest 'country_from_code' => sub {
@@ -29,7 +29,7 @@ subtest 'code_from_country' => sub {
     is $countries->code_from_country("Macau"),           'mo',  "Macau also mo";
 };
 
-subtest 'country_from_mt5' => sub {
+subtest 'country_extra' => sub {
     is $countries->code_from_country("Brunei Darussalam"),                 "bn", "Brunei Darussalam is bn";
     is $countries->code_from_country("Cocos Islands"),                     "cc", "Cocos Islands is cc";
     is $countries->code_from_country("Congo"),                             "cg", "Congo is cg";
@@ -47,6 +47,9 @@ subtest 'country_from_mt5' => sub {
     is $countries->code_from_country("U.A.E."),                            "ae", "U.A.E. is ae";
     is $countries->code_from_country("Vatican City State"),                "va", "Vatican City State is va";
     is $countries->code_from_country("Virgin Islands"),                    "vg", "Virgin Islands is vg";
+    is $countries->code_from_country("Réunion"),                           "re", "Réunion is re";
+    is $countries->code_from_country("taiwan"),                            "tw", "taiwan is tw";
+    is $countries->code_from_country("Curacao"),                           "cw", "Curaçao is cw";
 };
 
 subtest 'idd_from_code' => sub {
@@ -91,5 +94,11 @@ subtest 'all_country_codes' => sub {
 subtest 'localized_code2country' => sub {
     my $c = $countries->localized_code2country('id', 'en');
     is $c, 'Indonesia', 'id is Indonesia';
+};
+
+subtest 'all idd codes' => sub {
+    my $idd_codes = $countries->_idd_codes();
+
+    is scalar(keys %$idd_codes), 244, 'correct number of idd codes';
 };
 

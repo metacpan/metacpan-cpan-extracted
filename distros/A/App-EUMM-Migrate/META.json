@@ -30,7 +30,7 @@
          "requires" : {
             "Data::Dumper" : "0",
             "File::Slurp" : "0",
-            "Github::Fork::Parent" : "0.2",
+            "Github::Fork::Parent" : "1",
             "Perl::Meta" : "0",
             "perl" : "5.006"
          }
@@ -39,17 +39,21 @@
    "provides" : {
       "App::EUMM::Migrate" : {
          "file" : "lib/App/EUMM/Migrate.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/chorny/EUMM-migrate/issues"
+      },
       "license" : [
          "http://opensource.org/licenses/gpl-3.0.html"
       ],
       "repository" : {
-         "url" : "http://github.com/chorny/EUMM-migrate"
+         "url" : "https://github.com/chorny/EUMM-migrate"
       }
    },
-   "version" : "0.11"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON version 2.90"
 }

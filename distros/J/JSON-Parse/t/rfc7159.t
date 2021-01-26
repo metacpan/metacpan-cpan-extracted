@@ -1,13 +1,11 @@
-use warnings;
-use strict;
-use Test::More;
-my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
-binmode STDOUT, ":encoding(utf8)";
-binmode STDERR, ":encoding(utf8)";
-use JSON::Parse qw/parse_json valid_json/;
+# This tests for the new behaviour of the JSON specification as of RFC
+# 7159 where a single item without braces {} or square brackets [] is
+# also valid as JSON.
+
+use FindBin '$Bin';
+use lib "$Bin";
+use JPT;
+
 my $stringonly = '"this"';
 my $j;
 eval {

@@ -30,10 +30,17 @@ WriteMakefile (
 		web => "$repo/issues",
 	    },
         },
+	no_index => {
+	    file => [
+		'build/JPB.pm',
+		't/JPT.pm',
+		'xt/JPXT.pm',
+	    ],
+	},
     },
-    # All the C files are actually #included into Json3.xs so there is
+    # All the C files are actually #included into Parse.xs so there is
     # only one object file.
-    OBJECT => 'Json3.o',
+    OBJECT => 'Parse.o',
     # Currently the oldest version to pass at CPAN testers.
     # http://matrix.cpantesters.org/?dist=JSON-Parse+0.24
     MIN_PERL_VERSION => '5.008009',

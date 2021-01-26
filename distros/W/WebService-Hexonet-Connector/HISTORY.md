@@ -1,3 +1,10 @@
+## [2.10.2](https://github.com/hexonet/perl-sdk/compare/v2.10.1...v2.10.2) (2021-01-26)
+
+
+### Bug Fixes
+
+* **manifest.skip:** to not exclude MYMETA.json/.yml ([3e8c278](https://github.com/hexonet/perl-sdk/commit/3e8c278f155fc0fc46ed1e3d6e4bfcc93aee235f))
+
 ## [2.10.1](https://github.com/hexonet/perl-sdk/compare/v2.10.0...v2.10.1) (2021-01-25)
 
 

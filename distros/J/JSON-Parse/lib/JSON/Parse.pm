@@ -1,7 +1,9 @@
 package JSON::Parse;
+use warnings;
+use strict;
 require Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw/
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw/
 		   assert_valid_json
 		   json_file_to_perl
 		   json_to_perl
@@ -12,13 +14,11 @@ require Exporter;
 		   validate_json
 	       /;
 
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
-use warnings;
-use strict;
 use Carp;
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 require XSLoader;
 XSLoader::load (__PACKAGE__, $VERSION);
 
@@ -65,9 +65,35 @@ sub validate_json
     goto &assert_valid_json;
 }
 
+sub read_file
+{
+    my ($file_name) = @_;
+    if (! -f $file_name) {
+	# Trap possible errors from "open" before getting there.
+	croak "File does not exist: '$file_name'";
+    }
+    my $json = '';
+    open my $in, "<:encoding(utf8)", $file_name
+        or croak "Error opening $file_name: $!";
+    while (<$in>) {
+	$json .= $_;
+    }
+    close $in or croak $!;
+    return $json;
+}
+
+sub JSON::Parse::read
+{
+    my ($jp, $file_name) = @_;
+    my $json = read_file ($file_name);
+    return $jp->parse ($json);
+}
+
 sub read_json
 {
-    goto &json_file_to_perl;
+    my ($file_name) = @_;
+    my $json = read_file ($file_name);
+    return parse_json ($json);
 }
 
 sub valid_json
@@ -85,15 +111,7 @@ sub valid_json
 
 sub json_file_to_perl
 {
-    my ($file_name) = @_;
-    my $json = '';
-    open my $in, "<:encoding(utf8)", $file_name
-        or croak "Error opening $file_name: $!";
-    while (<$in>) {
-	$json .= $_;
-    }
-    close $in or croak $!;
-    return parse_json ($json);
+    goto &read_json;
 }
 
 sub run
@@ -112,6 +130,11 @@ sub run
     else {
 	return $parser->run_internal ($json);
     }
+}
+
+sub parse
+{
+    goto &run;
 }
 
 1;

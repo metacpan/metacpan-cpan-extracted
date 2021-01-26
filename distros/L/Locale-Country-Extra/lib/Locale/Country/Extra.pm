@@ -1,8 +1,8 @@
 package Locale::Country::Extra;
 use strict;
 use warnings;
-
-our $VERSION = '1.0.3';
+use utf8;
+our $VERSION = '1.0.4';
 
 use Locale::Country qw();
 use Locale::Country::Multilingual {use_io_layer => 1};
@@ -11,6 +11,7 @@ our %COUNTRY_MAP = (
     "brunei darussalam"                 => "bn",
     "cocos islands"                     => "cc",
     "congo"                             => "cg",
+    "curacao"                           => "cw",
     "heard island and mcdonald islands" => "hm",
     "hong kong s.a.r."                  => "hk",
     "korea"                             => "kr",
@@ -19,10 +20,12 @@ our %COUNTRY_MAP = (
     "islamic republic of pakistan"      => "pk",
     "palestinian authority"             => "ps",
     "pitcairn"                          => "pn",
+    "r\x{e9}union"                      => "re",
     "saint vincent and the grenadines"  => "vc",
     "south georgia"                     => "gs",
     "south georgia & south sandwich"    => "gs",
     "syrian arab republic"              => "sy",
+    "taiwan"                            => "tw",
     "u.a.e."                            => "ae",
     "vatican city state"                => "va",
     "virgin islands"                    => "vg"
@@ -145,6 +148,8 @@ sub _idd_codes {
 }
 
 sub _build_idd_codes {
+    # List is order by zones: https://en.wikipedia.org/wiki/List_of_country_calling_codes#Ordered_by_code
+    # TODO: Hardcoding this is not a good idea. IDD's change from time to time.
     return {
         "us" => 1,
         "bs" => 1242,
@@ -169,6 +174,7 @@ sub _build_idd_codes {
         "jm" => 1876,
         "eg" => 20,
         "eh" => 21,
+        "ss" => 211,
         "ma" => 212,
         "dz" => 213,
         "tn" => 216,
@@ -213,14 +219,15 @@ sub _build_idd_codes {
         "mz" => 258,
         "zm" => 260,
         "mg" => 261,
-        "RE" => 262,
+        "re" => 262,
         "zw" => 263,
         "na" => 264,
         "mw" => 265,
         "ls" => 266,
         "bw" => 267,
         "sz" => 268,
-        "yt" => 269,
+        "km" => 269,
+        "yt" => 262269,
         "za" => 27,
         "sh" => 290,
         "er" => 291,
@@ -241,6 +248,7 @@ sub _build_idd_codes {
         "mt" => 356,
         "cy" => 357,
         "fi" => 358,
+        "ax" => 35818,
         "bg" => 359,
         "hu" => 36,
         "lt" => 370,
@@ -255,6 +263,7 @@ sub _build_idd_codes {
         "va" => 379,
         "ua" => 380,
         "rs" => 381,
+        "me" => 382,
         "hr" => 385,
         "si" => 386,
         "ba" => 387,
@@ -266,15 +275,18 @@ sub _build_idd_codes {
         "cz" => 420,
         "sk" => 421,
         "at" => 43,
+        "gg" => 441481,
         "je" => 441534,
         "im" => 44,
         "gb" => 44,
         "dk" => 45,
         "se" => 46,
         "no" => 47,
+        "sj" => 4779,
         "pl" => 48,
         "de" => 49,
         "fk" => 500,
+        "gs" => 500,
         "bz" => 501,
         "gt" => 502,
         "sv" => 503,
@@ -293,6 +305,8 @@ sub _build_idd_codes {
         "co" => 57,
         "ve" => 58,
         "gp" => 590,
+        "mf" => 590,
+        "bl" => 590,
         "bo" => 591,
         "gy" => 592,
         "ec" => 593,
@@ -302,9 +316,12 @@ sub _build_idd_codes {
         "sr" => 597,
         "uy" => 598,
         "an" => 599,
+        "sx" => 1721,
+        "cw" => 5999,
         "my" => 60,
         "au" => 61,
         "cx" => 618,
+        "cc" => 6189162,
         "id" => 62,
         "ph" => 63,
         "nz" => 64,
@@ -314,6 +331,7 @@ sub _build_idd_codes {
         "tl" => 670,
         "gu" => 671,
         "aq" => 672,
+        "nf" => 6723,
         "bn" => 673,
         "nr" => 674,
         "pg" => 675,
@@ -384,6 +402,9 @@ sub _build_idd_codes {
 
 __END__
 
+
+=encoding utf8
+
 =head1 NAME
 
 Locale::Country::Extra - Standard and IDD codes for Country identification, with Multilingual support
@@ -452,6 +473,7 @@ Version 1.0.0
         "islamic republic of pakistan"      => "pk",
         "palestinian authority"             => "ps",
         "pitcairn"                          => "pn",
+        "réunion"                           => "re",
         "saint vincent and the grenadines"  => "vc",
         "south georgia"                     => "gs",
         "south georgia & south sandwich"    => "gs",

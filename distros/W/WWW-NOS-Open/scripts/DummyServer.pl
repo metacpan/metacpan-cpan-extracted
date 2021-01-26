@@ -8,7 +8,7 @@ use warnings;
 use utf8;
 use 5.014000;
 
-our $VERSION = 'v1.0.4';
+our $VERSION = 'v1.0.5';
 
 use Dancer2;
 use HTTP::Status qw(:constants status_message);

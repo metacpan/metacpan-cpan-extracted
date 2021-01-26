@@ -1,3 +1,7 @@
+0.10 - 2021-01-25:
+  - Changed internal representation of generators in %EXPORT to resolve an
+    ambiguity for generated scalar exports.
+
 0.08 - 2020-08-06:
   - Performance improvements
 

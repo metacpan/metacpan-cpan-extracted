@@ -1,7 +1,7 @@
 package DBIx::SchemaChecksum::App::Checksum;
 
 # ABSTRACT: get the current DB checksum
-our $VERSION = '1.103'; # VERSION
+our $VERSION = '1.104'; # VERSION
 
 use 5.010;
 
@@ -37,7 +37,7 @@ DBIx::SchemaChecksum::App::Checksum - get the current DB checksum
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 DESCRIPTION
 

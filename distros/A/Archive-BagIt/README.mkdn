@@ -4,7 +4,7 @@ Archive::BagIt - The main module to handle bags.
 
 # VERSION
 
-version 0.071
+version 0.072
 
 # NAME
 
@@ -209,6 +209,10 @@ returns true if bag info exists.
 
 Getter to return collected errors after a `verify_bag()` call with Option `report_all_errors`
 
+## warnings()
+
+Getter to return collected warnings after a `verify_bag()` call
+
 ## digest\_callback()
 
 This method could be reimplemented by derived classes to handle fixity checks in own way. The
@@ -237,6 +241,7 @@ returns true if key is reserved
 ## verify\_baginfo()
 
 checks baginfo-keys, returns true if all fine, otherwise returns undef and the message is pushed to `errors()`.
+Warnings pushed to ` warnings() `
 
 ## delete\_baginfo\_by\_key( $searchkey )
 

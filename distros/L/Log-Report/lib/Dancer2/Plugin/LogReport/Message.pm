@@ -8,7 +8,7 @@
 
 package Dancer2::Plugin::LogReport::Message;
 use vars '$VERSION';
-$VERSION = '1.31';
+$VERSION = '1.32';
 
 use parent 'Log::Report::Message';
 

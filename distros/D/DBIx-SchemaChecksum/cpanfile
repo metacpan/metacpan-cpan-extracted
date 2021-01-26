@@ -6,6 +6,7 @@ requires "DBI" => "0";
 requires "Data::Dumper" => "0";
 requires "Digest::SHA1" => "0";
 requires "File::Find::Rule" => "0";
+requires "File::HomeDir" => "0";
 requires "IO::Prompt::Tiny" => "0";
 requires "Moose" => "0";
 requires "Moose::Role" => "0";

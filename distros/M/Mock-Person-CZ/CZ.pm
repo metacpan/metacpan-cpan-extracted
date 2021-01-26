@@ -12,7 +12,7 @@ Readonly::Scalar our $SPACE => q{ };
 Readonly::Array our @EXPORT_OK => qw(first_male first_female middle_female
 	last_male last_female middle_male middle_female name);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # First and middle male names.
 our @first_male = our @middle_male = qw(
@@ -561,12 +561,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2013-2020
+© Michal Josef Špaček 2013-2021
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

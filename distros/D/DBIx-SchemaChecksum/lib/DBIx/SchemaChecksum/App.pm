@@ -1,7 +1,7 @@
 package DBIx::SchemaChecksum::App;
 
 # ABSTRACT: Manage your datebase schema via checksums
-our $VERSION = '1.103'; # VERSION
+our $VERSION = '1.104'; # VERSION
 
 use 5.010;
 use MooseX::App 1.21 qw(Config ConfigHome);
@@ -52,7 +52,7 @@ DBIx::SchemaChecksum::App - Manage your datebase schema via checksums
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 DESCRIPTION
 

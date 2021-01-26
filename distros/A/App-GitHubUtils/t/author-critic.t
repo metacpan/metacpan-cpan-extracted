@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/GitHubUtils.pm','script/create-the-github-repo','script/git-clone-from-github'];
+my $filenames = ['lib/App/GitHubUtils.pm','script/create-this-repo-on-github','script/git-clone-from-github'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

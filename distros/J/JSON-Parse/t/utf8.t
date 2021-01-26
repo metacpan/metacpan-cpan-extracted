@@ -1,9 +1,10 @@
-use warnings;
-use strict;
-use Test::More;
-use JSON::Parse ':all';
+# Test UTF-8 processing.
 
-# Test valid JSON.
+use FindBin '$Bin';
+use lib "$Bin";
+use JPT;
+
+# Test for valid and invalid JSON with Perl's flag switched off.
 
 no utf8;
 
@@ -16,6 +17,7 @@ eval {
 };
 like ($@, qr/Unexpected character 0x80 parsing string/);
 
+# Test with the flag switched back on.
 
 use utf8;
 

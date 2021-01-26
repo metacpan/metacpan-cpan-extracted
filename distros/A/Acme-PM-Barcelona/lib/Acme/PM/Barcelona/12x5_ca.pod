@@ -13,7 +13,7 @@ Acme::PM::Barcelona::12x5_ca - 12 xerrades, 5 minuts cadascuna
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SINOPSI
 
@@ -859,8 +859,7 @@ Moltes gràcies!
 =head1 ERRADES
 
 Si us plau, informeu de qualsevol errada o millora a
-C<bug-acme-pm-barcelona at rt.cpan.org>, o a través
-de la web L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Acme-PM-Barcelona>.
+a través de la web L<https://github.com/barcelonapm/Acme-PM-Barcelona/issues>.
 Jo rebré un avís i se us notificarà
 automàticament dels canvis que jo hi faci.
 
@@ -878,7 +877,7 @@ automàticament dels canvis que jo hi faci.
 
 =head1 COPYRIGHT I LLICÈNCIA
 
-Copyright 2009 Alex Muntada, tots els drets reservats.
+Copyright 2009-2021 Alex Muntada, tots els drets reservats.
 
 Aquest programa és programari lliure; el podeu redistribuir i/o
 modificar sota els mateixos termes que el propi Perl.
@@ -889,7 +888,7 @@ Alex Muntada <alexm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2009,2016 by Alex Muntada.
+This software is copyright (c) 2009-2021 by Alex Muntada.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

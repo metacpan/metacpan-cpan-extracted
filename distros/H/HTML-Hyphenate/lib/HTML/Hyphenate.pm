@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2009-2021, Roland van Ipenburg
-package HTML::Hyphenate v1.1.8;
+package HTML::Hyphenate v1.1.9;
 use Moose;
 use utf8;
 use 5.016000;
@@ -376,7 +376,7 @@ HTML::Hyphenate - insert soft hyphens into HTML
 
 =head1 VERSION
 
-This document describes HTML::Hyphenate version C<v1.1.8>.
+This document describes HTML::Hyphenate version C<v1.1.9>.
 
 =head1 SYNOPSIS
 

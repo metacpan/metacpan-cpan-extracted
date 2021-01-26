@@ -1,16 +1,16 @@
 {
    "abstract" : "View for Pod::POM that outputs reStructuredText",
    "author" : [
-      "Alex Muntada"
+      "Alex Muntada <alexm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Pod-POM-View-Restructured",
    "prereqs" : {
@@ -49,14 +49,18 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cuberat/Pod-POM-View-Restructured/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/cuberat/Pod-POM-View-Restructured",
          "web" : "https://github.com/cuberat/Pod-POM-View-Restructured"
       }
    },
-   "version" : "1.000002",
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "1.000003",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

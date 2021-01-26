@@ -1,7 +1,7 @@
 package DBIx::SchemaChecksum::App::ShowUpdatePath;
 
 # ABSTRACT: Show the update path
-our $VERSION = '1.103'; # VERSION
+our $VERSION = '1.104'; # VERSION
 
 use 5.010;
 
@@ -79,7 +79,7 @@ DBIx::SchemaChecksum::App::ShowUpdatePath - Show the update path
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 DESCRIPTION
 

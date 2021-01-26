@@ -1,3 +1,13 @@
+Version 1.000003
+	* Update download link.
+	* Remove link to old Changes.
+	* Update test using old Changes.
+	* Update Sphinx home page URL.
+	* Use https for pygments.org.
+	* Add missing author to README.
+	* Move bugtracker to github.com.
+	* Update copyright years.
+
 Version 1.000002
 	* Fix list items without bullet (thanks to Wouter Depypere)
 

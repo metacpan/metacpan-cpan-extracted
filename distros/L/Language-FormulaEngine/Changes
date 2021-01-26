@@ -1,3 +1,18 @@
+0.06 - 2021-01-26
+  - Compiled formulas now access vars via Namespace->get_value
+    the same as uncompiled evaluated formulas, though this may be
+    internally optimized to the $vars hashref like before if the
+    Namespace has not customized get_value.
+  - Compiler->output_api now determines whether compiled formula
+    take %vars or $namespace as arguments.
+  - Deprecated Compiler->variables_via_namespace
+  - Parser's scanner_rules have a 4th argument of the variables
+    to make available to the code (3rd argument)
+  - Fixed a bug in Parser->keyword_map where wrong values could
+    get cached between subclass and parent class.
+  - Document scanner_rules, keyword_map, etc.
+  - Remove dependency on Const::Fast
+
 0.05 - 2020-04-07
   - Parser's scanner_rules can now be overridden in subclasses
   - Added method Namespace->find_methods

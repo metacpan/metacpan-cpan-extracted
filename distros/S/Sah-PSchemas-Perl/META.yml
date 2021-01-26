@@ -23,7 +23,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Sah-PSchemas-Perl/issues
   homepage: https://metacpan.org/release/Sah-PSchemas-Perl
   repository: git://github.com/perlancar/perl-Sah-PSchemas-Perl.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

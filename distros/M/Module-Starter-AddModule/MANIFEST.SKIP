@@ -58,8 +58,12 @@
 #!end included /usr/local/perls/perl-5.18.1/lib/5.18.1/ExtUtils/MANIFEST.SKIP
 
 
-\.travis\.yml
 \.appveyor\.yml
 \.releaserc
 \.lwpcookies
 Module-.*
+\bMANIFEST\s\d
+\bChanges\s\d
+\.icloud$
+\A\.github\b
+

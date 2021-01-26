@@ -5,7 +5,7 @@ use Exporter 'import';
 our @EXPORT_OK= qw( calc_text_coordinates format_context_string format_context_multiline );
 
 # ABSTRACT: utility methods for parsers
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub calc_text_coordinates {
@@ -99,7 +99,7 @@ Language::FormulaEngine::Parser::ContextUtil - utility methods for parsers
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 EXPORTED FUNCTIONS
 
@@ -140,7 +140,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2021 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

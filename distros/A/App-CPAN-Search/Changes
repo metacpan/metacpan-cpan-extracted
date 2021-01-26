@@ -1,3 +1,7 @@
+0.05 2021-01-26T11:13:40+01:00
+ - Change bugtracker.
+ - Update copyright years.
+
 0.04 2020-04-05T15:40:18+02:00
  - Add test for constructor.
  - Change behaviour of run() to return exit code. And run exit in script to

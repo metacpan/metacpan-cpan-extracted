@@ -1,8 +1,5 @@
-on configure => sub {
-    requires 'Locale::Country', '3.42';
-    requires 'Locale::Country::Multilingual';
-    requires 'Locale::Codes';
-};
+requires 'Locale::Codes', '3.66';
+requires 'Locale::Country::Multilingual';
 
 on test => sub {
     requires 'Test::Exception';

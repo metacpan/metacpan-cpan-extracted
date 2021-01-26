@@ -1,0 +1,10 @@
+0.002   2021-01-26  Released-By: PERLANCAR
+
+        - [build] Rebuild to update Sah::SchemaR::* (fix
+          Sah::SchemaP::perl::modname_with_optional_args in 0.005 which caused
+          completion to not be in ColorTheme::* namespace but under root).
+
+
+0.001   2021-01-20  Released-By: PERLANCAR
+
+        - First release.

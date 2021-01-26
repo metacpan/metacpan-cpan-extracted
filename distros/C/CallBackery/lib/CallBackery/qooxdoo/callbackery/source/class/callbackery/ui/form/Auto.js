@@ -17,7 +17,7 @@
  *           label: 'label',
  *           widget: 'text',
  *           cfg: {},                // widget specific configuration
- *           set: {}                 // normal qx porperties to apply
+ *           set: {}                 // normal qx properties to apply
  *          },
  *          ....
  *     ]
@@ -48,10 +48,24 @@ qx.Class.define("callbackery.ui.form.Auto", {
         this._ctrl = {};
         var formCtrl = new qx.data.controller.Form(null, form);
         this._boxCtrl = {};
+        this._keyToFormKey = {};
+        this._formKeyToKey = {};
         var tm = this._typeMap = {};
         var that = this;
+        var formKeyIdx = 0;
         structure.forEach(function(s){
             var options = {};
+            // value binding in qooxdoo does not like keys
+            // with strange characters ... (like -)
+            if (s.key) {
+                formKeyIdx++;
+                var formKey = s.key.replace(/[^_a-z]/ig,'');
+                if (this._formKeyToKey[formKey]) {
+                    formKey += String(formKeyIdx);
+                }
+                this._keyToFormKey[s.key] = formKey;
+                this._formKeyToKey[formKey] = s.key;
+            }
             ['note','copyOnTap','copyFailMsg','copySuccessMsg'].forEach(function(prop){
                 if (s[prop]){
                     options[prop] = qx.lang.Type.isString(s[prop]) 
@@ -182,10 +196,9 @@ qx.Class.define("callbackery.ui.form.Auto", {
             }
 
             this._ctrl[s.key] = control;
-            form.add(control, s.label != null ? this.xtr(s.label) : null, null, s.key,null,options);
-
+            form.add(control, s.label != null ? this.xtr(s.label) : null, null, formKey,null,options);
             if (s.widget == 'date') {
-                formCtrl.addBindingOptions(s.key, {
+                formCtrl.addBindingOptions(formKey, {
                     converter : function(data) {
                         if (/^-?\d+$/.test(String(data))) {
                             var d = new Date();
@@ -211,7 +224,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 });
             }
             if (s.widget == 'dateTime') {
-                formCtrl.addBindingOptions(s.key, {
+                formCtrl.addBindingOptions(formKey, {
                     converter : function(data) {
                         if (/^\d+$/.test(String(data))) {
                             var d = new Date();
@@ -266,6 +279,8 @@ qx.Class.define("callbackery.ui.form.Auto", {
         _model : null,
         _settingData : false,
         _typeMap : null,
+        _keyToFormKey: null,
+        _formKeyToKey: null,
 
 
         /**
@@ -361,7 +376,11 @@ qx.Class.define("callbackery.ui.form.Auto", {
             this._settingData = true;
 
             for (var key in data) {
-                var upkey = qx.lang.String.firstUp(key);
+                var formKey = this._keyToFormKey[key];
+                if (!formKey) {
+                    continue;
+                }
+                var upkey = qx.lang.String.firstUp(formKey);
                 var setter = 'set' + upkey;
                 var getter = 'get' + upkey;
                 var value = data[key];
@@ -414,8 +433,9 @@ qx.Class.define("callbackery.ui.form.Auto", {
             var props = model.constructor.$$properties;
             var data = {};
 
-            for (var key in props) {
-                var getter = 'get' + qx.lang.String.firstUp(key);
+            for (var formKey in props) {
+                var key = this._formKeyToKey[formKey];
+                var getter = 'get' + qx.lang.String.firstUp(formKey);
                 data[key] = model[getter]();
             }
 

@@ -4,10 +4,18 @@ use strict;
 require Exporter;
 our @ISA = qw(Exporter);
 use JSON::Parse;
-our @EXPORT_OK = qw/tokenize_json tokenize_start tokenize_next tokenize_start tokenize_end tokenize_type tokenize_child tokenize_text/;
+our @EXPORT_OK = qw/
+		       tokenize_child
+		       tokenize_end
+		       tokenize_json
+		       tokenize_next
+		       tokenize_start
+		       tokenize_text
+		       tokenize_type
+		   /;
 our %EXPORT_TAGS = ('all' => \@EXPORT_OK);
 use Carp;
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 sub tokenize_text
 {

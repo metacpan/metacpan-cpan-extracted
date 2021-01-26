@@ -8,7 +8,7 @@
 
 package Log::Report::Domain;
 use vars '$VERSION';
-$VERSION = '1.31';
+$VERSION = '1.32';
 
 use base 'Log::Report::Minimal::Domain';
 

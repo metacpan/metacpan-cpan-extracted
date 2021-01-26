@@ -1,3 +1,13 @@
+0.35.5 2021-01-26 13:28:43 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix form loading (regression from 0.35.4)
+
+0.35.4 2021-01-26 12:07:42 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - if keys in form descriptions contained '-' this would break
+   qooxdoo singlevalue binding ... so now the keys do not get
+   used directly in the model created inside the frontend app anymore
+
 0.35.3 2021-01-21 15:12:49 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - provide access to the calling argument when in processData path

@@ -2,7 +2,7 @@
 
 # PODNAME: dbchecksum
 # ABSTRACT: wrapper script to run DBIx::SchemaChecksum
-our $VERSION = '1.103'; # VERSION
+our $VERSION = '1.104'; # VERSION
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ dbchecksum - wrapper script to run DBIx::SchemaChecksum
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 USAGE
 

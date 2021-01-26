@@ -99,7 +99,6 @@ dist		-
     $result{requires}{perl}=$params{'MIN_PERL_VERSION'};
   }
   if (!exists $params{'META_MERGE'}{resources}{repository}) {
-    #require Module::Install::Repository;
     my $repo = Module::Install::Repository::_find_repo(\&Module::Install::Repository::_execute);
     if ($repo and $repo=~m#://#) {
       print "Repository found: $repo\n";
@@ -111,7 +110,6 @@ dist		-
       $result{'meta_merge'}{resources}{repository}=$repo;
     }
   }
-  #require Module::Install::Metadata;
   if (exists $params{'VERSION_FROM'}) {
     my $main_file_content=eval { read_file($params{'VERSION_FROM'}) };
     if (! exists($result{requires}{perl})) {

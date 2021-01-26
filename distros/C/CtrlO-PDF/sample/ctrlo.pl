@@ -1,7 +1,5 @@
 use warnings;
 use strict;
-# not shipped as part of package
-# update synopsis to write out $file to "out.pdf"
 
 use CtrlO::PDF;
 use Text::Lorem;
@@ -10,6 +8,12 @@ my $pdf = CtrlO::PDF->new(
     logo        => "sample/logo.png",
     orientation => "portrait", # Default
     footer      => "My PDF document footer",
+    header      => "My PDF document header",
+    margin      => 50,
+    logo_padding=> 50,
+    top_padding => 60,
+    PDFlib      => 'builder',
+    # PDFlib default is Builder; use API2 if Builder not installed
 );
 
 # Add a page

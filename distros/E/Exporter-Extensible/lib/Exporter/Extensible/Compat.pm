@@ -3,22 +3,8 @@ use strict;
 use warnings;
 require MRO::Compat if "$]" < '5.009005';
 
-=head1 DESCRIPTION
+# ABSTRACT: 5.8 and 5.10 compatibiliy for Exporter::Extensible
 
-This module provides a compatibility layer for perl 5.10 and 5.8.
-The module itself is not used at all; loading it applies monkey patches
-to Exporter::Extensible.  Do not use this module, as it gets loaded
-automatically by Exporter::Extensible if needed.
-
-The main problem solved here is that perl earlier than 5.12 does not install
-a sub into the package stash until after calling MODIFY_CODE_ATTRIBUTES, so
-the :Export attributes can't resolve to a name until later.
-
-There isn't any good spot in the API of Exporter::Extensible to put this
-delayed processing, so about the only way to fix is to just perform it
-before any public API method, and at the end of the scope.
-
-=cut
 
 my $process_attr= \&Exporter::Extensible::_exporter_process_attribute;
 our @_pending_attr= ();
@@ -74,3 +60,45 @@ sub _exporter_process_attribute {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Exporter::Extensible::Compat - 5.8 and 5.10 compatibiliy for Exporter::Extensible
+
+=head1 VERSION
+
+version 0.10
+
+=head1 DESCRIPTION
+
+This module provides a compatibility layer for perl 5.10 and 5.8.
+The module itself is not used at all; loading it applies monkey patches
+to Exporter::Extensible.  Do not use this module, as it gets loaded
+automatically by Exporter::Extensible if needed.
+
+The main problem solved here is that perl earlier than 5.12 does not install
+a sub into the package stash until after calling MODIFY_CODE_ATTRIBUTES, so
+the :Export attributes can't resolve to a name until later.
+
+There isn't any good spot in the API of Exporter::Extensible to put this
+delayed processing, so about the only way to fix is to just perform it
+before any public API method, and at the end of the scope.
+
+=head1 AUTHOR
+
+Michael Conrad <mike@nrdvana.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Michael Conrad.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

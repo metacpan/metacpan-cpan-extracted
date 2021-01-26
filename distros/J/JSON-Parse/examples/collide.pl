@@ -5,6 +5,6 @@ use JSON::Parse;
 my $jp = JSON::Parse->new ();
 $jp->detect_collisions (1);
 eval {
-    $jp->run ('{"animals":{"cat":"moggy","cat":"feline","cat":"neko"}}');
+    $jp->parse ('{"animals":{"cat":"moggy","cat":"feline","cat":"neko"}}');
 };
 print "$@\n" if $@;

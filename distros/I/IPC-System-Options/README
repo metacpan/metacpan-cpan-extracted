@@ -3,8 +3,8 @@ NAME
     start() (with more options)
 
 VERSION
-    This document describes version 0.338 of IPC::System::Options (from Perl
-    distribution IPC-System-Options), released on 2020-08-18.
+    This document describes version 0.339 of IPC::System::Options (from Perl
+    distribution IPC-System-Options), released on 2021-01-26.
 
 SYNOPSIS
      use IPC::System::Options qw(system readpipe run start);
@@ -115,6 +115,13 @@ FUNCTIONS
 
         If set to true, then will log invocation as well as return/result
         value. Will log using Log::ger at the "trace" level.
+
+    *   fail_log_level => str
+
+        When a command fail (and logging is enabled), log the failure
+        message at this level. The default is "error" which is a sensible
+        default but sometimes you want to log the failure at different
+        level.
 
     *   die => bool
 
@@ -353,7 +360,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-System-Options>
+    <https://github.com/perlancar/perl-IPC-System-Options/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -371,7 +378,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by
+    This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

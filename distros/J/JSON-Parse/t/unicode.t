@@ -1,13 +1,6 @@
-use warnings;
-use strict;
-use Test::More;
-use JSON::Parse qw/json_to_perl valid_json parse_json/;
-use utf8;
-binmode STDOUT, ":utf8";
-my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
+use FindBin '$Bin';
+use lib "$Bin";
+use JPT;
 
 my $m = '{"骪":"\u9aaa"}';
 ok (valid_json ($m), "Valid good JSON");
@@ -68,7 +61,7 @@ is (length ($p->[2]), 2, "length is two by magic");
 
 ok (! valid_json ('["\uDE8C "]'), "invalid \uDE8C + space");
 
-# Test of the strangely-named "surrogate pairs".
+# Test of "surrogate pairs".
 
 my $jc = JSON::Parse->new ();
 my $wikipedia_1 = '"\ud801\udc37"';

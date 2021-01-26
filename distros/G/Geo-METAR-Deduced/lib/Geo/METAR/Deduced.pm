@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2020-2021, Roland van Ipenburg
-package Geo::METAR::Deduced v0.0.5;
+package Geo::METAR::Deduced v0.0.6;
 use Moose;
 use MooseX::NonMoose;
 use Geo::METAR;
@@ -432,7 +432,7 @@ Geo::METAR::Deduced - deduce aviation information from parsed METAR data
 
 =head1 VERSION
 
-This document describes Geo::METAR::Deduced C<v0.0.5>.
+This document describes Geo::METAR::Deduced C<v0.0.6>.
 
 =head1 SYNOPSIS
 

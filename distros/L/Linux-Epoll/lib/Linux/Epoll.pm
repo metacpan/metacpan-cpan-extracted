@@ -1,5 +1,5 @@
 package Linux::Epoll;
-$Linux::Epoll::VERSION = '0.017';
+$Linux::Epoll::VERSION = '0.018';
 use 5.010;
 use strict;
 use warnings FATAL => 'all';
@@ -24,7 +24,7 @@ Linux::Epoll - O(1) multiplexing for Linux
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -47,11 +47,11 @@ Epoll is a multiplexing mechanism that scales up O(1) with number of watched fil
 
 =item * in
 
-The associated filehandle is availible for reading.
+The associated filehandle is available for reading.
 
 =item * out
 
-The associated filehandle is availible for writing.
+The associated filehandle is available for writing.
 
 =item * err
 

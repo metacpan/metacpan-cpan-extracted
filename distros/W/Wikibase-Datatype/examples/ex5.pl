@@ -3,18 +3,32 @@
 use strict;
 use warnings;
 
-use Error::Pure;
-use Wikibase::Datatype::Utils qw(check_entity);
+use Wikibase::Datatype::MediainfoSnak;
+use Wikibase::Datatype::Value::Item;
 
-$Error::Pure::TYPE = 'Error';
+# Object.
+my $obj = Wikibase::Datatype::MediainfoSnak->new(
+        'datavalue' => Wikibase::Datatype::Value::Item->new(
+                'value' => 'Q5',
+        ),
+        'property' => 'P31',
+);
 
-my $self = {
-        'key' => 'bad_entity',
-};
-check_entity($self, 'key');
+# Get value.
+my $datavalue = $obj->datavalue->value;
+
+# Get property.
+my $property = $obj->property;
+
+# Get snak type.
+my $snaktype = $obj->snaktype;
 
 # Print out.
-print "ok\n";
+print "Property: $property\n";
+print "Value: $datavalue\n";
+print "Snak type: $snaktype\n";
 
-# Output like:
-# #Error [/../Wikibase/Datatype/Utils.pm:?] Parameter 'key' must begin with 'Q' and number after it.
+# Output:
+# Property: P31
+# Value: Q5
+# Snak type: value

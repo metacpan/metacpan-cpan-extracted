@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 'tests' => 3;
+use Test::More 'tests' => 4;
 use Test::NoWarnings;
 use Wikibase::Datatype::Snak;
 use Wikibase::Datatype::Value::String;
@@ -19,12 +19,18 @@ is($ret, 'value', 'Get default snaktype() value.');
 
 # Test.
 $obj = Wikibase::Datatype::Snak->new(
-	'datavalue' => Wikibase::Datatype::Value::String->new(
-		'value' => 'foo',
-	),
 	'datatype' => 'string',
 	'property' => 'P123',
 	'snaktype' => 'novalue',
 );
 $ret = $obj->snaktype;
 is($ret, 'novalue', 'Get explicit snaktype() value.');
+
+# Test.
+$obj = Wikibase::Datatype::Snak->new(
+	'datatype' => 'string',
+	'property' => 'P123',
+	'snaktype' => 'somevalue',
+);
+$ret = $obj->snaktype;
+is($ret, 'somevalue', 'Get explicit snaktype() value.');

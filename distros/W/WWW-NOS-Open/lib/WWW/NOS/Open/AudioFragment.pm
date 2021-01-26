@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2011-2021, Roland van Ipenburg
-package WWW::NOS::Open::AudioFragment v1.0.4;
+package WWW::NOS::Open::AudioFragment v1.0.5;
 use strict;
 use warnings;
 
@@ -30,7 +30,7 @@ WWW::NOS::Open::AudioFragment - client side audio fragment.
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open::AudioFragment version C<v1.0.4>.
+This document describes WWW::NOS::Open::AudioFragment version C<v1.0.5>.
 
 =head1 SYNOPSIS
 

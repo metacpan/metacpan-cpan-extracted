@@ -12,6 +12,7 @@ benchmark.pl
 dist.ini
 lib/Exporter/Extensible.pm
 lib/Exporter/Extensible/Compat.pm
+lib/Exporter/Extensible/UnimportScopeGuard.pm
 t/01-basic.t
 t/02-glob-splitting.t
 t/03-inheritance.t

@@ -21,37 +21,41 @@ requires:
   Cwd: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
-  IPC::System::Options: '0.332'
+  IPC::System::Options: '0.335'
   Log::ger: '0.037'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Call: '0'
   Perinci::CmdLine::Lite: '1.827'
-  Perinci::CmdLine::Util::Config: '1.722'
+  Perinci::CmdLine::Util::Config: '1.724'
   Perinci::Sub::DepChecker: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitHubUtils
+  bugtracker: https://github.com/perlancar/perl-App-GitHubUtils/issues
   homepage: https://metacpan.org/release/App-GitHubUtils
   repository: git://github.com/perlancar/perl-App-GitHubUtils.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript create-the-github-repo'
-      version: '0.422'
+      name: 'GenPericmdScript create-this-repo-on-github'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript git-clone-from-github'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
       version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -123,7 +127,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.600'
+      version: '0.603'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -139,7 +143,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -176,9 +180,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
@@ -324,7 +328,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Author::PERLANCAR/Rinci::EmbedValidator'
-      version: '0.250'
+      version: '0.251'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'

@@ -10,6 +10,6 @@ is recommended.
 eumm-migrate tries to automatically detect some properties like license, minimum Perl version
 required and repository used.
 
-Copyright 2009-2015 Alexandr Ciornii.
+Copyright 2009-2021 Alexandr Ciornii.
 
 GPL3

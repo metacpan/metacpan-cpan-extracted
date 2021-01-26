@@ -24,7 +24,7 @@ BEGIN {
     $@ and plan skip_all => 'Unable to load HTTP::Request::Common';
     HTTP::Request::Common->import;
 
-    plan tests => 3;
+    plan tests => 4;
 }
 
 {
@@ -41,6 +41,20 @@ BEGIN {
 
     dispatcher close => 'default';
 
+    hook before => sub {
+        if (query_parameters->get('is_fatal'))
+        {
+            my $foo;
+            $foo->bar;
+        }
+    };
+
+    # Unhandled exception in default route
+    get '/' => sub {
+        my $foo;
+        $foo->bar;
+    };
+
     get '/write_message/:level/:text' => sub {
         my $level = param('level');
         my $text  = param('text');
@@ -56,6 +70,10 @@ BEGIN {
 
     get '/process' => sub {
         process(sub { error "Fatal error text" });
+    };
+
+    get '/show_error/:show_error' => sub {
+        set show_errors => route_parameters->get('show_error');
     };
 
     # Route to add custom handlers during later tests
@@ -144,6 +162,43 @@ subtest 'Throw error' => sub {
         $jar->add_cookie_header($req);
         $res = $test->request( $req );
         is ($res->content, 'Fatal error text');
+    }
+};
+
+# Tests to check unexpected exceptions
+subtest 'Unexpected exception default page' => sub {
+
+    # An exception generated from the default route which cannot redirect to
+    # the default route, so it throws a plain text error
+    {
+        my $req = GET "$url/";
+        my $res = $test->request( $req );
+        ok !$res->is_redirect, "No redirect for exception on default route";
+        is $res->content, "An unexpected error has occurred", "Plain text exception text correct";
+    }
+
+    # The same as previous, but this time we enable the development setting
+    # show_error, which means that the content returned is the actual Perl
+    # error string
+    {
+        # First set show_error parameter
+        $test->request(GET "$url/show_error/1");
+        my $req = GET "$url/";
+        my $res = $test->request( $req );
+        ok !$res->is_redirect, "get /write_message";
+        like $res->content, qr/Can't call method "bar" on an undefined value/;
+        # Then set show_error back to disabled
+        $test->request(GET "$url/show_error/0");
+    }
+
+    # This time the exception occurs in an early hook and we are not able to do
+    # anything as the request hasn't been populated yet. Therefore we should
+    # expect Dancer's default error handling
+    {
+        my $req = GET "$url/?is_fatal=1";
+        my $res = $test->request( $req );
+        ok !$res->is_redirect, "get /write_message";
+        like $res->content, qr/Error 500 - Internal Server Error/;
     }
 };
 

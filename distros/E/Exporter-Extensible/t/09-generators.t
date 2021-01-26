@@ -12,13 +12,13 @@ ok( eval q{
 	$INC{'Example.pm'}=1;
 
 	use Exporter::Extensible -exporter_setup => 1;
-	our %EXPORT= ( alpha => \\\\"alpha", beta => \\\\&beta, '@gamma' => \\\\&gamma, '*zeta' => \\\\'_generateGlob_zeta' );
-	our %EXPORT_TAGS= ( delta => \"delta" );
+	our %EXPORT= ( alpha => \ \ "alpha", beta => \ \ &beta, '@gamma' => &gamma, '*zeta' => '_generateGlob_zeta' );
+	our %EXPORT_TAGS= ( delta => \ "delta" );
 	sub alpha { sub { 'a' } }
 	sub beta  { sub { 'b' } }
 	sub gamma { ['g'] }
 	sub delta { ['alpha', 'beta'] }
-	sub _generateGlob_zeta { open my $fh, '<', \"test"; $fh; }
+	sub _generateGlob_zeta { open my $fh, '<', \ "test"; $fh; }
 	1;
 }, 'declare Example' ) or diag $@;
 

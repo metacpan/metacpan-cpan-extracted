@@ -6,7 +6,7 @@ require Exporter::Extensible::Compat if "$]" < "5.012";
 require mro;
 
 # ABSTRACT: Create easy-to-extend modules which export symbols
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 our %EXPORT_FAST_SUB_CACHE;
 our %EXPORT_PKG_CACHE;
@@ -153,24 +153,12 @@ sub _exporter_build_install_set {
 		
 		# If it starts with '-', it is an option, and might consume additional args
 		if (ord $symbol == $hyphen) {
-			my ($method, $count)= @$ref;
-			if ($count eq '*') {
-				my $consumed= $self->$method(@$todo);
-				$consumed =~ /^[0-9]+$/ or $croak->("Method $method in ".ref($self)." must return a number of arguments consumed");
-				splice(@$todo, 0, $consumed);
+			# back-compat for when opt was arrayref
+			if (ref $ref eq 'ARRAY') {
+				my ($method, $count)= @$ref;
+				$ref= $self->_exporter_wrap_option_handler($method, $count);
 			}
-			elsif ($count eq '?') {
-				if (ref $todo->[0]) {
-					my $arg= shift @$todo;
-					(ref $arg eq 'HASH'? $self->exporter_apply_inline_config($arg) : $self)
-						->$method($arg);
-				} else {
-					$self->$method();
-				}
-			}
-			else {
-				$self->$method(splice(@$todo, 0, $count));
-			}
+			$self->$ref;
 		}
 		else {
 			my ($sigil, $name)= $ord_is_sigil{ord $symbol}? ( substr($symbol,0,1), substr($symbol,1) ) : ( '', $symbol );
@@ -184,15 +172,15 @@ sub _exporter_build_install_set {
 				# If 'as' was the only reason for _name_mangle, then disable it to return to fast-path
 				delete $self2->{_name_mangle} unless defined $self2->{prefix} || defined $self2->{suffix} || defined $self2->{not};
 			}
-			# If $ref is a generator (ref-ref) then run it, unless it was already run for the
-			# current symbol exporting to the current dest.
-			if (ref $ref eq 'REF') {
-				$ref= $self2->{_generator_cache}{$symbol.";".$name} ||= do {
+			# If $ref is a generator (method name or coderef or coderefref in the case of exported subs) then run it,
+			# unless it was already run for the current symbol exporting to the current dest.
+			if (!ref $ref || ref $ref eq ($sigil? 'CODE':'REF')) {
+				$ref= ($self2->{_generator_cache}{$symbol.";".$name} ||= do {
 					# Run the generator.
-					my $method= $$ref;
-					$method= $$method unless ref $method eq 'CODE';
+					my $method= ref $ref eq 'REF'? $$ref : $ref;
+					$method= $$method if ref $method eq 'SCALAR'; # back-compat for \\$method_name
 					$self2->$method($symbol, $self2->{generator_arg});
-				};
+				});
 				# Verify generator output matches sigil
 				ref $ref eq $sigil_to_reftype{$sigil} or (ref $ref eq 'REF' && $sigil eq '$')
 					or $croak->("Trying to export '$symbol', but generator returned "
@@ -442,18 +430,51 @@ sub exporter_get_inherited {
 sub exporter_register_option {
 	my ($class, $option_name, $method_name, $arg_count)= @_;
 	$class= ref($class)||$class;
-	${$class.'::EXPORT'}{'-'.$option_name}= [ $method_name, $arg_count||0 ];
+	${$class.'::EXPORT'}{'-'.$option_name}= $class->_exporter_wrap_option_handler($method_name, $arg_count);
+}
+
+sub _exporter_wrap_option_handler {
+	my ($class, $method, $count)= @_;
+	return $method unless $count;
+	if ($count eq '*') {
+		return sub {
+			my $consumed= $_[0]->$method(@{$_[0]{todo}});
+			$consumed =~ /^[0-9]+$/ or $croak->("Method $method in ".ref($_[0])." must return a number of arguments consumed");
+			splice(@{$_[0]{todo}}, 0, $consumed);
+		}
+	}
+	elsif ($count eq '?') {
+		return sub {
+			if (ref $_[0]{todo}[0]) {
+				my $arg= shift @{$_[0]{todo}};
+				(ref $arg eq 'HASH'? $_[0]->exporter_apply_inline_config($arg) : $_[0])
+					->$method($arg);
+			} else {
+				$_[0]->$method();
+			}
+		}
+	}
+	else {
+		return sub {
+			$_[0]->$method(splice(@{$_[0]{todo}}, 0, $count));
+		}
+	}
 }
 
 sub exporter_register_generator {
-	my ($class, $export_name, $method_name)= @_;
+	my ($class, $export_name, $method)= @_;
 	$class= ref($class)||$class;
+	!ref $method or ref $method eq 'CODE'
+		or $croak->("Generator method must be method name (scalar) or coderef");
+	# Register tag generators in %EXPORT_TAGS
 	if (ord $export_name == $colon) {
-		(${$class.'::EXPORT_TAGS'}{substr($export_name,1)} ||= $method_name) eq $method_name
+		(${$class.'::EXPORT_TAGS'}{substr($export_name,1)} ||= $method) eq $method
 			or $croak->("Cannot set generator for $export_name when that tag is already populated within this class ($class)");
-	} else {
-		# If method name is a scalar, make it a scalar-ref-ref.  If it is a coderef, make it a coderef-ref
-		${$class.'::EXPORT'}{$export_name}= ref $method_name? \$method_name : \\$method_name;
+	}
+	# Register variable generators (export having a sigil) in %EXPORT
+	# Sub generators (for coderef methods) get an extra layer of ref added
+	else {
+		${$class.'::EXPORT'}{$export_name}= (ref $method && !$ord_is_sigil{ord $export_name})? \$method : $method;
 	}
 }
 
@@ -655,40 +676,46 @@ sub _exporter_export_from_caller {
 }
 sub exporter_export {
 	my $class= shift;
-	for (my $i= 0; $i < @_;) {
-		my ($is_gen, $sigil, $name, $args, $ref);
-		my $export= $_[$i++];
+	my ($export, $is_gen, $sigil, $name, $args, $ref);
+	arg_loop: for (my $i= 0; $i < @_;) {
+		$export= $_[$i++];
 		ref $export and $croak->("Expected non-ref export name at argument $i");
 		# If they provided the ref, capture it from arg list.
-		$ref= $_[$i++] if ref $_[$i];
+		$ref= ref $_[$i]? $_[$i++] : undef;
 		# Common case first - ordinary functions
 		if ($export =~ /^\w+$/) {
-			$ref ||= $class->can($export) or $croak->("Export '$export' not found in $class");
+			if ($ref) {
+				ref $ref eq 'CODE' or $croak->("Expected CODEref following '$export'");
+			} else {
+				$ref= $class->can($export) or $croak->("Export '$export' not found in $class");
+			}
 			${$class.'::EXPORT'}{$export}= $ref;
 		}
-		# Next, check for generators or variables with sigils
+		# Next, check for generators
 		elsif (($is_gen, $sigil, $name)= ($export =~ /^(=?)([\$\@\%\*]?)(\w+)$/)) {
-			$ref ||= $class->_exporter_get_ref_to_package_var($sigil, $name)
-				unless $is_gen;
-			if (!$ref) {
-				for (@{ $sigil_to_generator_prefix{$sigil} }) {
-					my $gen= $_ . $name;
-					next unless $class->can($gen);
-					$ref= \\$gen;  # REF REF to method name
-					last;
+			if ($is_gen) {
+				if ($ref) {
+					# special case, remove ref on method name (since it isn't possible to pass
+					# a plain scalar as the second asrgument)
+					$ref= $$ref if ref $ref eq 'SCALAR';
+					$class->exporter_register_generator($sigil.$name, $ref);
+				} else {
+					for (@{ $sigil_to_generator_prefix{$sigil} }) {
+						my $method= $_ . $name;
+						if ($class->can($method)) {
+							$class->exporter_register_generator($sigil.$name, $method);
+							next arg_loop;
+						}
+					}
+					$croak->("Export '$export' not found in package $class, nor a generator $sigil_to_generator_prefix{$sigil}[0]");
 				}
-				$ref or $croak->("Export '$export' not found in package $class, nor a generator $sigil_to_generator_prefix{$sigil}[0]");
-			}
-			elsif ($is_gen) {
-				ref $ref eq 'CODE' or $croak->("Export '$export' should be followed by a generator coderef");
-				my $coderef= $ref;
-				$ref= \$coderef; # REF to coderef
 			}
 			else {
+				$ref ||= $class->_exporter_get_ref_to_package_var($sigil, $name);
 				ref $ref eq $sigil_to_reftype{$sigil} or (ref $ref eq 'REF' && $sigil eq '$')
 					or $croak->("'$export' should be $sigil_to_reftype{$sigil} but you supplied ".ref($ref));
+				${$class.'::EXPORT'}{$sigil.$name}= $ref;
 			}
-			${$class.'::EXPORT'}{$sigil.$name}= $ref;
 		}
 		# Tags ":foo"
 		elsif (($is_gen, $name)= ($export =~ /^(=?):(\w+)$/)) {
@@ -722,6 +749,18 @@ sub exporter_export {
 1;
 
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Exporter::Extensible - Create easy-to-extend modules which export symbols
+
+=head1 VERSION
+
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -1179,7 +1218,7 @@ Sometimes you want to generate the thing to be exported.  To indicate this, use 
 the method name, or a ref of the coderef to execute.  For example:
 
   {
-    foo => \\"_generate_foo",
+    foo => "_generate_foo",
     bar => \\&generate_bar,
     baz => \sub { ... },
   }
@@ -1189,7 +1228,7 @@ backward-compatibility.
 
 =back
 
-Meanwhile the C<%EXPORT_TAGS> variable is almost identical to the one used by Exporter, but
+Meanwhile the C<%EXPORT_TAGS> variable is almost identical to the one used by L<Exporter>, but
 with a few enhancements:
 
 =over
@@ -1345,5 +1384,16 @@ L<Sub::Exporter>
 L<Export::Declare>
 
 L<Badger::Exporter>
+
+=head1 AUTHOR
+
+Michael Conrad <mike@nrdvana.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Michael Conrad.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

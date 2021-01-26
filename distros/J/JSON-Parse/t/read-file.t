@@ -1,9 +1,10 @@
-#!/home/ben/software/install/bin/perl
-use warnings;
-use strict;
-use Test::More;
+# This tests reading a file using the two different names of the
+# routine.
+
 use FindBin '$Bin';
-use JSON::Parse qw!read_json json_file_to_perl!;
+use lib "$Bin";
+use JPT;
+
 my $p = json_file_to_perl ("$Bin/test.json");
 ok ($p->{distribution} eq 'Algorithm-NGram');
 my $q = read_json ("$Bin/test.json");

@@ -1,0 +1,83 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+JSON::Whitespace - Alter the insignificant whitespace of JSON
+
+=head1 SYNOPSIS
+
+    use JSON::Whitespace ':all';
+    
+    my $in = <<EOF;
+    {
+                "animals":{
+                        "kingkong":"🦍"
+                },
+                "baka":[
+                        "ドジ"
+                ],
+                "fruit":{
+                        "grape":"🍇"
+                },
+                "moons":{
+                        "🌑":0
+                }
+        }
+    EOF
+    my $minify = json_minify ($in);
+    print $minify;
+
+
+This outputs
+
+    {"animals":{"kingkong":"🦍"},"baka":["ドジ"],"fruit":{"grape":"🍇"},"moons":{"🌑":0}}
+
+=head1 VERSION
+
+This documents version 0.60 of JSON::Whitespace corresponding to
+L<git commit 27b70e98176290ddd145cadfe8aa6ff43bb71703|https://github.com/benkasminbullock/JSON-Parse/commit/27b70e98176290ddd145cadfe8aa6ff43bb71703> released on Tue Jan 26 08:51:47 2021 +0900.
+
+
+
+=head1 DESCRIPTION
+
+This module offers functions to manipulate the "insignificant
+whitespace" part of a JSON string (the whitespace which is not inside
+strings). According to L<the JSON specification|JSON::Parse/SEE ALSO>
+"insignificant whitespace" consists of space (C<%x20>), horizontal tab
+(C<%x09>), line feed or new line (C<%x0A>) and carriage return
+(C<%x0D).
+
+=head1 FUNCTIONS
+
+=head2 json_minify
+
+    my $minified = json_minify ($json);
+
+Remove all whitespace, including trailing newlines, from C<$json>.
+
+=head1 SEE ALSO
+
+Documentation about JSON is in L<JSON::Parse>. JSON::Whitespace is
+based on L<JSON::Tokenize>, which breaks JSON into tokens without
+putting it into Perl structures.
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2016-2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

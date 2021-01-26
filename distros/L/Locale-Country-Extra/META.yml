@@ -14,19 +14,19 @@ build_requires:
   perl: '5.014000'
 configure_requires:
   ExtUtils::MakeMaker: '6.48'
-  Locale::Codes: '0'
-  Locale::Country: '3.42'
-  Locale::Country::Multilingual: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Locale-Country-Extra
+requires:
+  Locale::Codes: '3.66'
+  Locale::Country::Multilingual: '0'
 resources:
   bugtracker: https://github.com/binary-com/perl-Locale-Country-Extra/issues
   repository: git://github.com/binary-com/perl-Locale-Country-Extra.git
-version: 1.0.3
+version: 1.0.4
 x_generated_by_perl: v5.26.2
-x_serialization_backend: 'YAML::Tiny version 1.66'
+x_serialization_backend: 'YAML::Tiny version 1.73'

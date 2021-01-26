@@ -1,10 +1,27 @@
 ==================================================
-Changes from 2020-01-15 00:00:00 +0000 to present.
+Changes from 2020-01-27 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.071 at 2021-01-14 14:09:17 +0000
+version 0.072 at 2021-01-26 08:45:55 +0000
 ------------------------------------------
+
+  Change: af0350517a9c7b98fc546e43140ed0a3aaeb9125
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-26 09:44:33 +0000
+
+    - added warnings() - bugfix in verify_baginfo(), because Payload-Oxum
+    is recommended, but not required by RFC8493 
+
+------------------------------------------
+version 0.071 at 2021-01-14 14:10:38 +0000
+------------------------------------------
+
+  Change: db75e0e9fdfb74304216deed5b66d419085fa9fc
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-14 15:10:38 +0000
+
+    Released 0.071 
 
   Change: 9bbadc5fecc04ff09dc0de084b5ce71a589f737a
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -1698,5 +1715,5 @@ version 0.055 at 2020-04-15 09:44:51 +0000
     Adding a plugin structure 
 
 ================================================
-Plus 9 releases after 2020-01-15 00:00:00 +0000.
+Plus 9 releases after 2020-01-27 00:00:00 +0000.
 ================================================

@@ -1,9 +1,9 @@
 package Sah::PSchemas::Perl;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-01-26'; # DATE
 our $DIST = 'Sah-PSchemas-Perl'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Parameterized schemas related to Perl
@@ -20,7 +20,7 @@ Sah::PSchemas::Perl - Parameterized schemas related to Perl
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::PSchemas::Perl (from Perl distribution Sah-PSchemas-Perl), released on 2021-01-20.
+This document describes version 0.005 of Sah::PSchemas::Perl (from Perl distribution Sah-PSchemas-Perl), released on 2021-01-26.
 
 =head1 DESCRIPTION
 

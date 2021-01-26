@@ -7,7 +7,7 @@ use Language::FormulaEngine::Error ':all';
 use namespace::clean;
 
 # ABSTRACT: Object holding function and variable names
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 has variables            => ( is => 'rw', default => sub { +{} } );
@@ -23,11 +23,12 @@ sub clone {
 	$self->new( %$self, %attrs );
 }
 
+# potentially hot method
 sub clone_and_merge {
 	my $self= shift;
 	my %attrs= @_==1 && ref $_[0] eq 'HASH'? %{$_[0]} : @_;
-	$attrs{variables}= { %{ $self->variables }, %{ $attrs{variables}||{} } };
-	$attrs{constants}= { %{ $self->constants }, %{ $attrs{constants}||{} } };
+	$attrs{variables}= { %{ $self->variables }, ($attrs{variables}? %{ $attrs{variables} } : () ) };
+	$attrs{constants}= { %{ $self->constants }, ($attrs{constants}? %{ $attrs{constants} } : () ) };
 	$self->new( %$self, %attrs );
 }
 
@@ -35,16 +36,19 @@ sub clone_and_merge {
 sub get_constant {
 	my ($self, $name)= @_;
 	$name= lc $name;
-	$self->{constants}{$name};
+	$self->constants->{$name};
 }
 
 sub get_value {
 	my ($self, $name)= @_;
 	$name= lc $name;
-	exists $self->{variables}{$name}? $self->{variables}{$name}
-	: exists $self->{constants}{$name}? $self->{constants}{$name}
-	: !$self->die_on_unknown_value? undef
-	: die ErrREF("Unknown variable or constant '$_[1]'");
+	my $set= $self->variables;
+	return $set->{$name} if exists $set->{$name};
+	$set= $self->constants;
+	return $set->{$name} if exists $set->{$name};
+	die ErrREF("Unknown variable or constant '$_[1]'")
+		if $self->die_on_unknown_value;
+	return undef;
 }
 
 sub get_function {
@@ -121,7 +125,7 @@ Language::FormulaEngine::Namespace - Object holding function and variable names
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -255,7 +259,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2021 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

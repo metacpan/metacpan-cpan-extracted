@@ -1,7 +1,7 @@
 package DBIx::SchemaChecksum::App::NewChangesFile;
 
 # ABSTRACT: Generate a new changes-file
-our $VERSION = '1.103'; # VERSION
+our $VERSION = '1.104'; # VERSION
 
 use 5.010;
 
@@ -60,7 +60,7 @@ DBIx::SchemaChecksum::App::NewChangesFile - Generate a new changes-file
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 DESCRIPTION
 

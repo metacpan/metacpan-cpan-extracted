@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2011-2021, Roland van Ipenburg
-package WWW::NOS::Open::DayGuide v1.0.4;
+package WWW::NOS::Open::DayGuide v1.0.5;
 use strict;
 use warnings;
 
@@ -56,7 +56,7 @@ WWW::NOS::Open::DayGuide - client side television or radio program guide
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open::DayGuide version C<v1.0.4>.
+This document describes WWW::NOS::Open::DayGuide version C<v1.0.5>.
 
 =head1 SYNOPSIS
 

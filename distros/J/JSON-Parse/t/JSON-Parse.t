@@ -1,16 +1,9 @@
-use warnings;
-use strict;
-use Test::More;
-use JSON::Parse qw/parse_json valid_json parse_json_safe/;
-use utf8;
+# This is a basic test of parsing JSON. See also Json3.t.
 
-binmode STDOUT, ":utf8";
-my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
+use FindBin '$Bin';
+use lib "$Bin";
+use JPT;
 
-#binmode STDOUT, ":utf8";
 my $jason = <<'EOF';
 {"bog":"log","frog":[1,2,3],"guff":{"x":"y","z":"monkey","t":[0,1,2.3,4,59999]}}
 EOF
@@ -39,8 +32,7 @@ ok (! ($zs->{medea}->{nice}), "Parse false literal.");
 
 ok (valid_json ($argonauts), "Valid OK JSON");
 
-# Test that empty inputs result in an undefined return value, and no
-# error message.
+# Test that empty inputs result in an error message.
 
 eval {
     my $Q = parse_json ('');
@@ -55,10 +47,12 @@ eval {
 ok ($@, "Empty string makes error");
 ok ($@ =~ /empty input/i, "Empty input error for empty input");
 eval {
-my $S = parse_json ('    ');
+    my $S = parse_json ('    ');
 };
 ok ($@, "Empty string makes error");
 ok ($@ =~ /empty input/i, "Empty input error for empty input");
+
+# Test that errors are produced if we are missing the final brace.
 
 my $n;
 eval {
@@ -82,6 +76,7 @@ ok ($@, "found error");
 
 ok (! valid_json ($n), "! Not valid missing end }");
 
+# Test that errors are produced if we are missing the initial brace {.
 
 my $bad1 = '"bad":"city"}';
 $@ = undef;
@@ -89,15 +84,16 @@ eval {
     parse_json ($bad1);
 };
 ok ($@, "found error in '$bad1'");
-#like ($@, qr/stray characters/, "Error message as expected");
 my $notjson = 'this is not lexable';
 $@ = undef;
 eval {
     parse_json ($notjson);
 };
 ok ($@, "Got error message");
-#like ($@, qr/stray characters/i, "unlexable message $@ OK");
 ok (! valid_json ($notjson), "Not valid bad json");
+
+# This is the example from either the JSON RFC or from Douglas
+# Crockford's web page.
 
 my $wi =<<EOF;
 {

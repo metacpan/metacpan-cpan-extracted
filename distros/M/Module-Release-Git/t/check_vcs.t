@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use vars qw(
-	$output 
+	$output
 	$newfile_output $changedfile_output
 	$untrackedfile_output $combined_output
 	);
@@ -33,6 +33,7 @@ foreach my $try (qw(fine_output clean_output_git_2x)) {
 
 	my $rc = eval { $class->$method() };
 	my $at = $@;
+	diag( "EVAL error: $at" ) if $at;
 
 	ok( ! $at, "(Nothing left to commit) \$@ undef (good)" );
 	ok( $rc, "(Nothing left to commit) returns true (good)" );
@@ -44,16 +45,16 @@ foreach my $try (qw(newfile_output changedfile_output
 	untrackedfile_output combined_output ) )
 	{
 	no strict 'refs';
-	local $Module::Release::Git::run_output = 
+	local $Module::Release::Git::run_output =
 		${ "Module::Release::Git::$try" };
-		
+
 	#print STDERR "try is $Module::Release::Git::run_output\n";
-	
+
 	my $rc = eval { $class->$method() };
 	my $at = $@;
-	
+
 	#print STDERR "At is $@\n";
-	
+
 	ok( defined $at, "(Dirty working dir) \$@ defined (good)" );
 	ok( ! $rc, "(Dirty working dir) returns true (good)" );
 	like( $at, qr/not up-to-date/, "Reports that Git is not up-to-date" );
@@ -62,9 +63,9 @@ foreach my $try (qw(newfile_output changedfile_output
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 =pod
 
-To test these functions, I want to give them some sample git 
+To test these functions, I want to give them some sample git
 output and ensure they do what I want them to do. Instead of
-running git, I override the run() method to return whatever 
+running git, I override the run() method to return whatever
 is in the global variable $output. I can change that during
 the test run to try different things.
 
@@ -77,15 +78,14 @@ use vars qw( $run_output $fine_output $clean_output_git_2x
 	$untrackedfile_output $combined_output
 	);
 
+
+# https://github.com/briandfoy/module-release-git/pull/2
+# This used to be sample output, but Corion used more
+# sophisticated steps that don't require output parsing
 $fine_output = <<"HERE";
-# On branch master
-nothing to commit (working directory clean)
 HERE
 
 $clean_output_git_2x = <<"HERE";
-On branch master
-Your branch is up-to-date with 'origin/master'
-nothing to commit, working tree clean
 HERE
 
 no warnings 'redefine';

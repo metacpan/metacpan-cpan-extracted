@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::METAR::Deduced.
 
+v0.0.6 Mon Jan 25 23:27:34 UTC 2021
+       * fix: meta bugtracker
+
 v0.0.5 Sun Jan 17 16:41:19 UTC 2021
        * docs: migrate bugtracker from RT to Bitbucket
        * test: add CI and improve coverage

@@ -2,7 +2,7 @@
 
 # PODNAME: scs.pl
 # ABSTRACT: run DBIx::SchemaChecksum, but really you should use dbchecksum
-our $VERSION = '1.103'; # VERSION
+our $VERSION = '1.104'; # VERSION
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ scs.pl - run DBIx::SchemaChecksum, but really you should use dbchecksum
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 USAGE
 

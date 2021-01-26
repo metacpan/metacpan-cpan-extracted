@@ -4,7 +4,7 @@ DBIx::SchemaChecksum - Manage your datebase schema via checksums
 
 # VERSION
 
-version 1.103
+version 1.104
 
 # SYNOPSIS
 

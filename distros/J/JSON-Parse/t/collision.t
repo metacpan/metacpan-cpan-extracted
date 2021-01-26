@@ -1,16 +1,17 @@
-use warnings;
-use strict;
-use utf8;
+# This tests what happens when a JSON object has two keys with the
+# same string, as in {"a":1,"a":2}. These are called "collisions"
+# because the entries for the two bits of the JSON in the storing
+# object "collide".
+
 use FindBin '$Bin';
-use Test::More;
+use lib "$Bin";
+use JPT;
+
+# We need to do some work with Unicode. This is a core module so it's
+# always available.
+
 use Encode 'decode_utf8';
-my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
-binmode STDOUT, ":encoding(utf8)";
-binmode STDERR, ":encoding(utf8)";
-use JSON::Parse 'parse_json';
+
 my $j = '{"a":1, "a":2}';
 my $p = parse_json ($j);
 cmp_ok ($p->{a}, '==', 2, "Test documented hash key collision behaviour");
@@ -27,6 +28,8 @@ eval {
 };
 ok ($@);
 like ($@, qr/"hocus"/);
+
+# Test functioning with Unicode strings.
 
 my $yodi = '{"ほかす":10,"ぽかす":20,"ほかす":30,"ふぉかす":40}';
 eval {

@@ -8,7 +8,7 @@
 
 package Log::Report::Message;
 use vars '$VERSION';
-$VERSION = '1.31';
+$VERSION = '1.32';
 
 
 use warnings;

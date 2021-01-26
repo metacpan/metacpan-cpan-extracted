@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2011-2021, Roland van Ipenburg
-package WWW::NOS::Open::Resource v1.0.4;
+package WWW::NOS::Open::Resource v1.0.5;
 use strict;
 use warnings;
 
@@ -103,7 +103,7 @@ WWW::NOS::Open::Resource - client side resource in the Open NOS REST API.
 
 =head1 VERSION
 
-This document describes WWW::NOS::Open::Resource version C<v1.0.4>.
+This document describes WWW::NOS::Open::Resource version C<v1.0.5>.
 
 =head1 SYNOPSIS
 

@@ -56,7 +56,7 @@ Archive::BagIt::Role::Portability
 
 =head1 VERSION
 
-version 0.071
+version 0.072
 
 =head1 AVAILABILITY
 

@@ -1,5 +1,10 @@
 Revision history for Perl module Module::Starter::AddModule
 
+1.007 2021-01-25T17:54:18Z
+	Fix Windows problem with ./Build (Github #3, BillKSmith)
+	https://www.perlmonks.org/?node_id=1219584
+	* Freshen the distro, remove Travis, add Github Actions
+
 1.006 2018-06-04T14:16:26Z
 	* Change to Artistic License 2.0.
 

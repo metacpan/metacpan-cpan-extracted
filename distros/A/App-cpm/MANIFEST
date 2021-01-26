@@ -6,8 +6,7 @@ MANIFEST
 META.json
 META.yml
 README
-cpanfile
-dist.ini
+cpm.yml
 lib/App/cpm.pm
 lib/App/cpm/CLI.pm
 lib/App/cpm/CircularDependency.pm

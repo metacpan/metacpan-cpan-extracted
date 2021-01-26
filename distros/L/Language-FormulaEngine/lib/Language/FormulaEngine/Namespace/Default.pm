@@ -15,7 +15,7 @@ use DateTime::Format::Flexible;
 use namespace::clean;
 
 # ABSTRACT: Default spreadsheet-like set of functions and behavior
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # No official versioned namespace yet, but this code is for when I publish one.
 
@@ -448,7 +448,7 @@ Language::FormulaEngine::Namespace::Default - Default spreadsheet-like set of fu
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 
@@ -775,7 +775,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2021 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

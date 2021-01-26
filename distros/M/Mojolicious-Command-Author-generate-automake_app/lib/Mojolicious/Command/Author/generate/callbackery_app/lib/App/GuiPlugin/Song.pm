@@ -259,7 +259,7 @@ sub getTableData {
         $SORT = 'ORDER BY '.$self->dbh->quote_identifier($args->{sortColumn});
         $SORT .= $args->{sortDesc} ? ' DESC' : ' ASC';
     }
-    my $data = $self->db->query(<<"SQL",$args->{lastRow}-$args->{firstRow}+1,$args->{firstRow});
+    my $data = $self->db->query(<<"SQL",$args->{lastRow}-$args->{firstRow}+1,$args->{firstRow})->hashes;
 SELECT *
 FROM song
 $filter

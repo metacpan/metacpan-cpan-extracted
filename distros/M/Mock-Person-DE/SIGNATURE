@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,47 +12,50 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 27fe41925c2c9382f8c27d7cf1296e875f26614c Changes
-SHA1 215e0f8df3e23754e43b8c6de12846d7d86f994a DE.pm
-SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
-SHA1 8cb687519e83ba535b8a6bf9c847e2f99ed44ea4 MANIFEST
-SHA1 64bb0934b44bf1a4584905aa03690bcd1c422fb2 META.yml
-SHA1 6109cda26182904f8e04708d274248ea401d87b3 Makefile.PL
-SHA1 30402f9778cb6a302ed12ac5abea41b6158de52c README
-SHA1 959ea252cd9f549db58f32f6c80ae0c0b65d33c6 examples/ex1.pl
-SHA1 58f709a4faf7ebc7b10c00cbe5a0493e4332b7d2 examples/ex2.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 eb68c63cadeaefb46492209ba22b0148dfed41d8 t/Mock-Person-DE/01-use.t
-SHA1 c01b67c3fc59a5e35f4d3b8a2a7e47f2af0de7a9 t/Mock-Person-DE/02-version.t
-SHA1 e3dc14f4acd426686bfdf8f6bf3c85c40f695505 t/Mock-Person-DE/03-first_male.t
-SHA1 227da7fd5e4d26323ebccb50c99a676d5e7b35d8 t/Mock-Person-DE/04-first_female.t
-SHA1 78152050da082bb36d2d9aa63684a056e7a9842a t/Mock-Person-DE/05-last_male.t
-SHA1 db542d643fc9d01e1711c6c4e5a5821f2c8dbea6 t/Mock-Person-DE/06-last_female.t
-SHA1 992d5efaefed5fef77e84a445d98e4219fd4ed1c t/Mock-Person-DE/07-middle_male.t
-SHA1 106e3a1ce1c78c96a8344b8092f37ededbf10550 t/Mock-Person-DE/08-middle_female.t
-SHA1 7c5bf76aa3556e117a9974494101eef21428a993 t/Mock-Person-DE/09-name.t
-SHA1 b54ee1ce8e21dd9bf4daf2d45096a672c95adcff xt/Mock-Person-DE/01-pod_coverage.t
-SHA1 0b1dcd3e92c134f6a3ae46e01dc97bbf7656f2fc xt/Mock-Person-DE/02-pod.t
+SHA256 921534f55c813ab203a2a03a0d4ab6534afdb658f61812611269d051a91730c2 Changes
+SHA256 d0a6d1c4f490131e96f1a88288a82d5c1e3f5614f4e92aa594c0b11387cf6442 DE.pm
+SHA256 82bb78d30f3fc53788670ba77036bf18779b3d7a762a9933166eb9e4f064c94f LICENSE
+SHA256 7bd40615033fb1687d1aba775957affba9813e3fcdd94790827bda49813446fb MANIFEST
+SHA256 044dc17647fafbb98ecb76c9d72c27c80b6c8f1c27f549ce01450e88b031489e META.yml
+SHA256 10f69ad558d3de668b493162aea83311f0586168bf9d60c98302138d1c3cf4ba Makefile.PL
+SHA256 eb093b044568e9f1596ae6ca93cedc40f5c42f8723a933b67bf39e53acdefe1b README
+SHA256 a9fe18a08380d2ec69b569266d91c033861ab5c780db0e326dd13425717a93e0 examples/ex1.pl
+SHA256 ab158ea8ab24b1b08a579ffcf2398ce4bbb36b930fa61beb3e33a4a08e356065 examples/ex2.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 d1cb0bd4fbdaafa34db17fbf95de94f27859327f0c53b06f5c2cad21eebd2163 t/Mock-Person-DE/01-use.t
+SHA256 eeed809a6e64e3e075b4dde578fd03c408814f53a1a8ce510c62d07ce746286b t/Mock-Person-DE/02-version.t
+SHA256 30b075a0b0fc37d20e004433852d29fe3fa57cb78e55515441ad1308e48caf1e t/Mock-Person-DE/03-first_male.t
+SHA256 ab3035c1ef94597716f36ff4e655fb367ba6f01b79542553de4c63818a1c9b0e t/Mock-Person-DE/04-first_female.t
+SHA256 8b778c639f3707c78042c1013bc91a8458d8eb5aa51745c20478255f56d10147 t/Mock-Person-DE/05-last_male.t
+SHA256 f532d33b0d6aa579c6b3913b782be993c6b0390af5d82c15891819f9f337f2de t/Mock-Person-DE/06-last_female.t
+SHA256 c87602ea4effe558e4ae5d780972fe48b5fa5837da1d97aed7cde666b4b0da2b t/Mock-Person-DE/07-middle_male.t
+SHA256 13d71eab0df0009540b3be2b2436c1c7ff2a0ce18a4c8c1e42a9fad7a8d120c9 t/Mock-Person-DE/08-middle_female.t
+SHA256 3a4e3daca8893adc3db249d344262b65d74c8879b9c52fd3e2c0b7c608be452b t/Mock-Person-DE/09-name.t
+SHA256 898c6acec9857c99e4f2b2855c736bd17eb742027373f24ea7a94bdf12e38c1a xt/Mock-Person-DE/01-pod_coverage.t
+SHA256 5eeda20b512f46455b74d6a0e5da8e3583d1065daf30e812d4c562a9632baee6 xt/Mock-Person-DE/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWAUVnAAoJEJe+XXKaIuTl+FcIAJPKRd9oLYBAjVExHJrl1XKH
-5riEf1sx93WZJvrb6jFAj1G/5mbiPuLzIS5LwUR1bBH37sMN3emJZ6N8Wj/g/qfE
-8lDvYKlwIw/jE9cRNM0W8UWBSTYyAIhvtDjB+yJA2heEQHaKi9b4CzN1xYqS+Kg4
-irHOsvO86WgTU9vhz9gtjWcux1q2TFf9b7kAO1MIIy6rRNh+58+UkgTc5ETodWsy
-P79WUbyabLYLoAtJcZVWTepEn03L0IrLIloAdpHoqXPtqze10vg4BrXqGN+4lPmq
-Vj5ogcBU1RGDogZ5tl7asaEdKkQrm+SwBUnhDC62QTqH5L+/Lr8jPgKsntUdiSs=
-=dMCC
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmAP9JgACgkQgmqNLzlX
+aRdiawwAzXMn2z0MTnof33dNrScHkYIWIsuUfbCk5/iMu5v63VxjWm6HBXIE6OFS
+JV7f3dr/UpxrGCRyJ6TuaMraZFeCyD4ALCuW0wUQ3fQXWpe9oQFy/2ngKPAJ/8rm
+Ux9UymlLGW7CtGUi3HzPSP9ywYUAqjYFJLTp0z8zNLaxM+/vlVF1rpVmIxFask94
+UdEEnWLROqz/fJW8n9by992f4+sZuqfV1buPyTUb9XfdftVOA6Gn306LfY3Je7Ha
+HSY7u1T5MgJm0aJbRklITUeK4Zbjr6Qygb1QzOML1VrLCts+z6TOKP75QzAJOshH
+NCSrvumeFI2ZhUYAA8CEaM0RvzxS/mgMoKi88dOxlLYrsZxG6W4b/s2OiGL015D+
++NgUuCA9ERSOYTsqB5vtq4OW5Dwmt0Hqv8fWHG1gBh9l7QHBqCyTAdktktomXckf
+h4cdStYWXWrUknWXSie74kk+EK/Pui6Yowk3mV9VSO+8VnWYbAlJtrupc7H4+h/D
+8nz59Zu5
+=rB7n
 -----END PGP SIGNATURE-----

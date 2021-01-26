@@ -7,6 +7,13 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.32: Tue 26 Jan 09:13:31 CET 2021
+
+	Fixes:
+	- ::Dancer2, use correct VERSION, github issue#3
+	- ::Dancer2, fix stacktrace sent to browser with show_errors disabled
+	  by [Andy Beverley], github issue#7
+	  
 version 1.31: Fri 15 Jan 16:35:39 CET 2021
 
 	Fixes:

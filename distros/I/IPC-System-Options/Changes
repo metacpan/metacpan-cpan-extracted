@@ -1,3 +1,8 @@
+0.339   2021-01-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: fail_log_level.
+
+
 0.338   2020-08-18  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

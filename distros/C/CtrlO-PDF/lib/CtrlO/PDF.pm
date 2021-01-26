@@ -4,17 +4,16 @@ use strict;
 use warnings;
 use utf8;
 
-use Carp qw/croak/;
+use Carp qw/croak carp/;
 use Image::Info qw(image_info image_type);
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
-use PDF::API2;
 use PDF::Table;
 use PDF::TextBlock;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
-=head1 NAME 
+=head1 NAME
 
 CtrlO::PDF - high level PDF creator
 
@@ -24,10 +23,24 @@ CtrlO::PDF - high level PDF creator
   use Text::Lorem;
 
   my $pdf = CtrlO::PDF->new(
-      logo        => "sample/logo.png", # optional
-      orientation => "portrait", # Default
-      footer      => "My PDF document footer",
+      logo         => "sample/logo.png", # optional
+      logo_scaling => 0.5,               # Default
+      width        => 595,               # Default (A4, portrait mode)
+      height       => 842,               # Default (A4, portrait mode)
+      orientation  => "portrait",        # Default
+      margin       => 40,                # Default, all 4 sides
+      top_padding  => 0,                 # Default
+      header       => "My PDF document header",  # optional
+      footer       => "My PDF document footer",  # optional
+      PDFlib       => "API2",            # Default is Builder
   );
+  # width, height page dimensions in points (default A4 paper)
+  # orientation defaults to portrait (taller than wide)
+  # margin in points on all four sides
+  # top padding below header in points
+  # header, footer text line to place at top or bottom
+  # PDFlib actually checked only for '[aA]' or '[bB]', permitting a wide
+  #   range of formats to specify the PDF support library
 
   # Add a page
   $pdf->add_page;
@@ -77,9 +90,9 @@ pagination, headings, paragraph text, images and tables. Although there are a
 number of other modules to create PDFs with a high-level interface, I found
 that these each lack certain features (e.g. image insertion, paragraph text).
 This module tries to include each of those features through another existing
-module. Also, it is built on PDF::API2, and provides access to that object, so
-content can also be added directly using that, thereby providing any powerful
-features required.
+module. Also, it is built on either PDF::Builder or PDF::API2, and provides
+access to that object, so content can also be added directly using that,
+thereby providing any powerful features required.
 
 =head1 METHODS
 
@@ -87,7 +100,7 @@ features required.
 
 =head2 pdf
 
-Returns the C<PDF::API2> object used to create the PDF.
+Returns the C<PDF::Builder> or C<PDF::API2> object used to create the PDF.
 
 =cut
 
@@ -97,7 +110,55 @@ has pdf => (
 
 sub _build_pdf
 {   my $self = shift;
-    PDF::API2->new;
+
+    # what's available?
+    my ($rc);
+    if (lc($self->PDFlib) =~ m/b/) {
+        # PDF::Builder preferred, try to see if it's installed
+        $rc = eval {
+            require PDF::Builder;
+            1;
+        };
+        if (!defined $rc) {
+            # PDF::Builder not available, try PDF::API2
+            $rc = eval {
+                require PDF::API2;
+                1;
+            };
+            if (!defined $rc) {
+                die "Neither PDF::Builder nor PDF::API2 is installed!\n";
+            } else {
+                #print "PDF::Builder requested, but was not available. Using PDF::API2\n";
+                PDF::API2->new;
+            }
+        } else {
+            PDF::Builder->new;
+        }
+
+    } else {
+        # PDF::API2 preferred, try to see if it's installed
+        $rc = eval {
+            require PDF::API2;
+            1;
+        };
+        if (!defined $rc) {
+            # PDF::API2 not available, try PDF::Builder
+            $rc = eval {
+                require PDF::Builder;
+                1;
+            };
+            if (!defined $rc) {
+                die "Neither PDF::API2 nor PDF::Builder is installed!\n";
+            } else {
+                #print "PDF::API2 requested, but was not available. Using PDF::Builder\n";
+                PDF::Builder->new;
+            }
+        } else {
+            PDF::API2->new;
+        }
+
+    }
+
 }
 
 =head2 page
@@ -169,7 +230,8 @@ sub clear_new_page
 
 =head2 orientation
 
-Sets or returns the page orientation (portrait or landscape). Portrait is default.
+Sets or returns the page orientation (portrait or landscape). The default is
+Portrait (taller than wide).
 
 =cut
 
@@ -177,6 +239,21 @@ has orientation => (
     is      => 'ro',
     isa     => Str,
     default => 'portrait',
+);
+
+=head2 PDFlib
+
+Sets or returns the PDF-building library in use. The choices are "PDF::Builder"
+and "PDF::API2" (case-insensitive). "PDF::Builder" is the default, indicating
+that PDF::Builder will be used I<unless> it is not found, in which case
+PDF::API2 will be used. If neither is found, CtrlO::PDF will fail.
+
+=cut
+
+has PDFlib => (
+    is      => 'ro',
+    isa     => Str,
+    default => 'PDF::Builder',
 );
 
 =head2 width
@@ -192,7 +269,7 @@ has width => (
 
 sub _build_width
 {   my $self = shift;
-    $self->orientation eq 'portrait' ? 595 : 842;
+    $self->orientation eq 'portrait' ? 595 : 842;  # A4 media
 }
 
 has _width_print => (
@@ -218,7 +295,7 @@ has height => (
 
 sub _build_height
 {   my $self = shift;
-    $self->orientation eq 'portrait' ? 842 : 595;
+    $self->orientation eq 'portrait' ? 842 : 595;  # A4 media
 }
 
 =head2 margin
@@ -267,9 +344,10 @@ has footer => (
 
 =head2 font
 
-Sets or returns the font. This is based on PDF::API2 ttfont which returns a
-TrueType or OpenType font object. By default it assumes the font is available
-in the exact path C<truetype/liberation/LiberationSans-Regular.ttf>. A future
+Sets or returns the font. This is based on PDF::Builder or PDF::API2 ttfont,
+which returns a TrueType or OpenType font object. By default it assumes the
+font is available in the exact path
+C<truetype/liberation/LiberationSans-Regular.ttf>. A future
 version may make this more flexible.
 
 =cut
@@ -545,7 +623,22 @@ sub text
         !$string and last;
         $tb->text($string);
         my $endw; my $ypos;
+        my $string_before = $string;
         ($endw, $ypos, $string) = $tb->apply;
+        # Check whether no text has been added to the page. This happens if the
+        # word is too long. If so, warn, chop-off and retry, otherwise an
+        # infinite loop occurs. Ideally the word would be broken - issue will
+        # be raised in PDF::TextBlock to see if this is possible.
+        if ($string_before eq $string)
+        {
+            carp "Unable to fit text onto line: $string";
+            # If no more breaks then skip
+            last if $string !~ /\s/;
+            # Otherwise start from after next break
+            $string =~ s/\S+\s//;
+            $tb->text($string);
+            ($endw, $ypos, $string) = $tb->apply;
+        }
         $self->_set__y($ypos);
         last unless $string; # while loop does not work with $string
         $self->add_page;
@@ -562,7 +655,11 @@ sub text
                 b => PDF::TextBlock::Font->new({
                     pdf  => $self->pdf,
                     font => $self->fontbold,
+                   #fillcolor => ??,   TBD
                 }),
+                # TBD any way to specify the "normal" font? otherwise,
+                # PDF::TextBlock opens up Helvetica corefont.
+                # see PDF::TextBlock::Font for possible solution
             },
         });
     }
@@ -600,8 +697,9 @@ sub table
         w         => $self->_width_print,
         font_size => 10,
         padding   => 5,
-        start_y   => $self->_y,
-        start_h   => $self->height - ($self->height - $self->_y) - $self->margin - $hf_space,
+        # start_y deprecated, change soon to y. start_h deprecated, change to h
+        y         => $self->_y,
+        h         => $self->height - ($self->height - $self->_y) - $self->margin - $hf_space,
         next_y    => $self->height - $self->margin - ($self->height - $self->_y_start_default),
     );
     my ($final_page, $number_of_pages, $final_y) = $table->table(
@@ -609,10 +707,10 @@ sub table
         $self->page,
         $data,
         %dimensions,
-        horizontal_borders => 2,
-        vertical_borders   => 0,
-        border_color => '#dddddd',
-        background_color_odd => '#f9f9f9',
+        h_border_w    => 2,
+        v_border_w    => 0,
+        border_c      => '#dddddd',
+        bg_color_odd  => '#f9f9f9',
         new_page_func => sub { $self->add_page },
         font          => $self->font,
         header_props => {
@@ -621,7 +719,7 @@ sub table
             justify    => 'left',
             font_size  => 10,
             bg_color   => 'white',
-            font_color => 'black',
+            fg_color   => 'black',
         },
         %options,
     );
@@ -713,10 +811,10 @@ sub content
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018-2020 Ctrl O Ltd
+Copyright 2018-2021 Ctrl O Ltd
 
 This program is free software; you can redistribute it and/or modify it under
-the terms of either: the GNU General Public License (GPL) as published by the 
+the terms of either: the GNU General Public License (GPL) as published by the
 Free Software Foundation; or the Perl Artistic License (PAL).
 
 See http://dev.perl.org/licenses/ for more information.

@@ -11,7 +11,7 @@ my $builder = Module::Build->new(
     requires => {
         'File::Slurp' => 0,
         #'Text::FindIndent' => 0,
-        'Github::Fork::Parent' => 0.20,
+        'Github::Fork::Parent' => 1.0,
         'Data::Dumper' => 0,
         'Perl::Meta' => 0,
         'perl' => 5.006,
@@ -24,7 +24,8 @@ my $builder = Module::Build->new(
     ],
     meta_merge => {
         resources => {
-            repository => 'http://github.com/chorny/EUMM-migrate',
+            repository => 'https://github.com/chorny/EUMM-migrate',
+            bugtracker => 'https://github.com/chorny/EUMM-migrate/issues',
         },
         keywords => [
             'development','upgrade','EU::MM','Makefile.PL','Module::Build',

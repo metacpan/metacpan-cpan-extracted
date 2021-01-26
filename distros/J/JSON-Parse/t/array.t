@@ -1,7 +1,6 @@
-use warnings;
-use strict;
-use Test::More;
-use JSON::Parse ':all';
+use FindBin '$Bin';
+use lib "$Bin";
+use JPT;
 
 # This was a bug with uninitialized memory.
 

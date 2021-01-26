@@ -11,7 +11,11 @@ use Readonly;
 
 Readonly::Array our @RANKS => qw(normal preferred deprecated);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
+
+has id => (
+	is => 'ro',
+);
 
 has property_snaks => (
 	default => [],
@@ -75,6 +79,7 @@ Wikibase::Datatype::Statement - Wikibase statement datatype.
  use Wikibase::Datatype::Statement;
 
  my $obj = Wikibase::Datatype::Statement->new(%params);
+ my $id = $obj->id;
  my $property_snaks_ar = $obj->property_snaks;
  my $rank = $obj->rank;
  my $referenes_ar = $obj->references;
@@ -95,6 +100,11 @@ Constructor.
 Returns instance of object.
 
 =over 8
+
+=item * C<id>
+
+Id of statement.
+Parameter is optional.
 
 =item * C<property_snaks>
 
@@ -123,6 +133,14 @@ Parameter is Wikibase::Datatype::Snak instance.
 Parameter is required.
 
 =back
+
+=head2 C<id>
+
+ my $id = $obj->id;
+
+Get id of statement.
+
+Returns string.
 
 =head2 C<property_snaks>
 
@@ -182,6 +200,8 @@ Returns Wikibase::Datatype::Snak instance.
 
  # Object.
  my $obj = Wikibase::Datatype::Statement->new(
+         'id' => 'Q123$00C04D2A-49AF-40C2-9930-C551916887E8',
+
          # instance of (P31) human (Q5)
          'snak' => Wikibase::Datatype::Snak->new(
                   'datatype' => 'wikibase-item',
@@ -235,6 +255,7 @@ Returns Wikibase::Datatype::Snak instance.
  );
 
  # Print out.
+ print 'Id: '.$obj->id."\n";
  print 'Claim: '.$obj->snak->property.' -> '.$obj->snak->datavalue->value."\n";
  print "Qualifiers:\n";
  foreach my $property_snak (@{$obj->property_snaks}) {
@@ -252,6 +273,7 @@ Returns Wikibase::Datatype::Snak instance.
  print 'Rank: '.$obj->rank."\n";
 
  # Output:
+ # Id: Q123$00C04D2A-49AF-40C2-9930-C551916887E8
  # Claim: P31 -> Q5
  # Qualifiers:
  #         P642 -> Q474741
@@ -292,12 +314,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2021
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

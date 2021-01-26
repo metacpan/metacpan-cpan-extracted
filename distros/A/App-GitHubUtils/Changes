@@ -1,3 +1,10 @@
+0.006   2020-12-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] Rename script create-the-github-repo ->
+	  create-this-repo-on-github to be more consistent with other
+	  scripts e.g. 'this-dist'.
+
+
 0.005   2020-04-27  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

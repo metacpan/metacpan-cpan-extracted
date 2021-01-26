@@ -1,12 +1,10 @@
 package Mock::Person::DE;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use utf8;
 use warnings;
 
-# Modules.
 use List::MoreUtils qw(none);
 use Readonly;
 
@@ -20,7 +18,7 @@ Readonly::Array our @EXPORT_OK => qw(first_male first_female middle_female
 our $TYPE = 'three';
 
 # Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # First and middle male names.
 our @first_male = our @middle_male = qw(
@@ -424,6 +422,7 @@ Mock::Person::DE - Generate random sets of German names.
 
  use Mock::Person::DE qw(first_male first_female last_male last_female
          middle_male middle_female name);
+
  my $first_male = first_male();
  my $first_female = first_female();
  my $last_male = last_male();
@@ -510,11 +509,9 @@ Returns random female name.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Mock::Person::DE qw(name);
 
@@ -526,11 +523,9 @@ Returns random female name.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Mock::Person::DE;
 
@@ -660,21 +655,22 @@ Install the Mock::Person modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Mock-Person-DE>
+L<https://github.com/michal-josef-spacek/Mock-Person-DE>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2013-2015
- BSD 2-Clause License
+© Michal Josef Špaček 2013-2021
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

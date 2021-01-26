@@ -1,19 +1,10 @@
 # Test for JSON::Tokenize
 
-use warnings;
-use strict;
-use utf8;
 use FindBin '$Bin';
-use Test::More;
-my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
-binmode STDOUT, ":encoding(utf8)";
-binmode STDERR, ":encoding(utf8)";
-use JSON::Parse 'valid_json';
-use JSON::Tokenize;
+use lib "$Bin";
+use JPT;
 use JSON::Tokenize ':all';
+
 my $input = '{"tuttie":["fruity", true, 100]}';
 ok (valid_json ($input));
 my $token = tokenize_json ($input);

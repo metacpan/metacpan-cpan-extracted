@@ -20,7 +20,7 @@ my %module_build_args = (
     "Klaus Ita <koki\@worstofall.com>"
   ],
   "dist_name" => "DBIx-SchemaChecksum",
-  "dist_version" => "1.103",
+  "dist_version" => "1.104",
   "license" => "perl",
   "module_name" => "DBIx::SchemaChecksum",
   "recursive_test_files" => 1,
@@ -30,6 +30,7 @@ my %module_build_args = (
     "Data::Dumper" => 0,
     "Digest::SHA1" => 0,
     "File::Find::Rule" => 0,
+    "File::HomeDir" => 0,
     "IO::Prompt::Tiny" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,

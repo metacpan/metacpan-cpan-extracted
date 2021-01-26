@@ -1,5 +1,11 @@
 Revision history for Perl module Module::Release::Git
 
+1.015 2021-01-25T19:03:38Z
+	* Corion added better git-fu that avoids localization problems
+	https://github.com/briandfoy/module-release-git/pull/2
+	* Fixed the contributor list searching (stupid stupid mistake)
+	* Freshen the distro, remove Travis CI, add Github Actions
+
 1.014 2018-03-22T18:55:19Z
 	* Change to Artistic License 2.0
 

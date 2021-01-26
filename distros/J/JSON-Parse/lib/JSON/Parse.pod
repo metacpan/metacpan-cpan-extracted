@@ -23,8 +23,8 @@ Convert JSON into Perl.
 
 =head1 VERSION
 
-This documents version 0.59 of JSON::Parse corresponding to
-L<git commit e10440285845d6b0f29746bce84c6b546e557f6f|https://github.com/benkasminbullock/JSON-Parse/commit/e10440285845d6b0f29746bce84c6b546e557f6f> released on Mon Jan 4 08:46:00 2021 +0900.
+This documents version 0.60 of JSON::Parse corresponding to
+L<git commit 27b70e98176290ddd145cadfe8aa6ff43bb71703|https://github.com/benkasminbullock/JSON-Parse/commit/27b70e98176290ddd145cadfe8aa6ff43bb71703> released on Tue Jan 26 08:51:47 2021 +0900.
 
 
 
@@ -43,7 +43,7 @@ file, and there is a safer version of L</parse_json> called
 L</parse_json_safe> which doesn't throw exceptions.
 
 For special cases of parsing, there are also methods L</new> and
-L</run>, which create a JSON parsing object and run it on text. See
+L</parse>, which create a JSON parsing object and run it on text. See
 L</METHODS>.
 
 JSON::Parse accepts only UTF-8 as input. See L</UTF-8 only> and
@@ -66,11 +66,11 @@ L</Handling of Unicode>.
 
 produces output
 
-    Your JSON was invalid: JSON error at line 1, byte 7/11: Unexpected character ':' parsing array starting from byte 1: expecting whitespace: '\n', '\r', '\t', ' ' or comma: ',' or end of array: ']' at /usr/home/ben/projects/Json3/examples/assert.pl line 6.
+    Your JSON was invalid: JSON error at line 1, byte 7/11: Unexpected character ':' parsing array starting from byte 1: expecting whitespace: 'n', '\r', '\t', ' ' or comma: ',' or end of array: ']' at /usr/home/ben/projects/json-parse/examples/assert.pl line 6.
     
 
 
-(This example is included as L<F<assert.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.59/examples/assert.pl> in the distribution.)
+(This example is included as L<F<assert.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.60/examples/assert.pl> in the distribution.)
 
 
 This is the underlying function for L</valid_json>. It runs at the
@@ -81,6 +81,8 @@ identical to L</parse_json>.
 This cannot detect key collisions in the JSON since it does not store
 values. See L</Key collisions> for more on this module's handling of
 non-unique names in the JSON.
+
+The method equivalent to this is L</check>.
 
 The behaviour of disallowing empty inputs was changed in version
 0.49.
@@ -113,7 +115,7 @@ produces output
     HASH
 
 
-(This example is included as L<F<hash.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.59/examples/hash.pl> in the distribution.)
+(This example is included as L<F<hash.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.60/examples/hash.pl> in the distribution.)
 
 
 If the input JSON text is a serialized array, an array reference is
@@ -131,7 +133,7 @@ produces output
     ARRAY
 
 
-(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.59/examples/array.pl> in the distribution.)
+(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.60/examples/array.pl> in the distribution.)
 
 
 Otherwise a Perl scalar is returned. 
@@ -142,7 +144,8 @@ JSON. The behaviour of disallowing empty inputs was changed in version
 0.49.
 
 The function L</parse_json_safe> offers a version of this function
-with various safety features enabled.
+with various safety features enabled. The method L</parse> is
+equivalent to this.
 
 =head2 parse_json_safe
 
@@ -197,8 +200,10 @@ L</parse_json>.
 This is exactly the same as L</parse_json> except that it reads the
 JSON from the specified file rather than a scalar. The file must be in
 the UTF-8 encoding, and is opened as a character file using
-C<:encoding(UTF-8)> (see L<PerlIO::encoding> and L<perluniintro> for
-details). The output is marked as character strings.
+C<:encoding(utf8)> (see L<PerlIO::encoding> and L<perluniintro>). The
+output is marked as character strings.
+
+The method equivalent is L</read>.
 
 This is a convenience function written in Perl. You may prefer to read
 the file yourself using another module if you need faster performance.
@@ -221,24 +226,28 @@ rather than storing it into Perl variables.
 This does not supply the actual errors which caused invalidity. Use
 L</assert_valid_json> to get error messages when the JSON is invalid.
 
-This cannot detect key collisions in the JSON since it does not store
-values. See L</Key collisions> for more on this module's handling of
-non-unique names in the JSON.
+This cannot detect duplicate keys in JSON objects because it does not
+store values. See L</Key collisions> for more on this module's
+handling of non-unique names in the JSON.
 
 =head1 METHODS
 
 If you need to parse JSON and you are not satisfied with the parsing
 options offered by L</parse_json> and L</parse_json_safe>, you can
 create a JSON parsing object with L</new> and set various options on
-the object, then use it with L</run>. These options include the
-ability to copy JSON literals with L</copy_literals>, switch off fatal
-errors with L</warn_only>, detect key collisions in objects with
-L</detect_collisions>, and set the JSON literals to user defined
-values with the methods described under L</Methods for manipulating
-literals>.
+the object, then use it with L</parse> or L</read>. 
 
-These methods only work on an object created with L</new>; they do not
-affect the behaviour of L</parse_json> or L</parse_json_safe>.
+There are options to copy JSON literals (C<true>, C<false>, C<null>)
+with L</copy_literals>, switch off fatal errors with L</warn_only>,
+detect duplicate keys in objects with L</detect_collisions>, set the
+maximum depth of nested objects and arrays with L</set_max_depth>,
+produce machine-readable parsing errors with L</diagnostics_hash>, and
+set the JSON literals to user defined values with the methods
+described under L</Methods for manipulating literals>.
+
+These methods only affect the object created with L</new>; they do not
+globally affect the behaviour of L</parse_json> or
+L</parse_json_safe>.
 
 =head2 check
 
@@ -287,18 +296,18 @@ byte position where the start of the colliding string was found:
     my $jp = JSON::Parse->new ();
     $jp->detect_collisions (1);
     eval {
-        $jp->run ('{"animals":{"cat":"moggy","cat":"feline","cat":"neko"}}');
+        $jp->parse ('{"animals":{"cat":"moggy","cat":"feline","cat":"neko"}}');
     };
     print "$@\n" if $@;
 
 
 produces output
 
-    JSON error at line 1, byte 28/55: Name is not unique: "cat" parsing object starting from byte 12 at /usr/home/ben/projects/Json3/blib/lib/JSON/Parse.pm line 103.
+    JSON error at line 1, byte 28/55: Name is not unique: "cat" parsing object starting from byte 12 at /usr/home/ben/projects/json-parse/examples/../blib/lib/JSON/Parse.pm line 131.
     
 
 
-(This example is included as L<F<collide.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.59/examples/collide.pl> in the distribution.)
+(This example is included as L<F<collide.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.60/examples/collide.pl> in the distribution.)
 
 
 The C<detect_collisions (1)> behaviour is the behaviour of
@@ -312,8 +321,8 @@ behaviour of L</parse_json>.
     $jp->diagnostics_hash (1);
 
 This changes diagnostics produced by errors from a simple string into
-a hash reference containing various fields. This is experimental and
-subject to change. This is incompatible with L</warn_only>.
+a hash reference containing various fields. This is incompatible with
+L</warn_only>.
 
 This replaces the previous experimental global variable
 C<$json_diagnostics>, which was removed from the module. The hash keys
@@ -322,6 +331,9 @@ C<$json_diagnostics>, with the addition of a key C<error as string>
 which returns the usual error.
 
 This requires Perl version 5.14 or later.
+
+An example of the use of this method to "repair" broken JSON is in the
+module L</JSON::Repair>.
 
 🎲 This method was added in version 0.46.
 
@@ -342,14 +354,25 @@ Create a new JSON::Parse object.
 
 🎲 This method was added in version 0.38.
 
-=head2 run
+=head2 parse
 
-    my $out = $jp->run ($json);
+    my $out = $jp->parse ($json);
 
 This does the same thing as L</parse_json>, except its behaviour can
 be modified using the methods below.
 
 🎲 This method was added in version 0.38.
+
+This was renamed from C<run> in version 0.60.
+
+=head2 read
+
+    my $json = $jp->read ($file);
+
+Read a file, parse the contained JSON, and return the output. This
+method is equivalent to the function L</read_json>.
+
+🎲 This method was added in version 0.60.
 
 =head2 set_max_depth
 
@@ -408,7 +431,7 @@ scalar:
     my $json = '{"yes":true,"no":false}';
     my $jp = JSON::Parse->new ();
     $jp->set_true ('Yes, that is so true');
-    my $out = $jp->run ($json);
+    my $out = $jp->parse ($json);
     print $out->{yes}, "\n";
     
 
@@ -553,6 +576,10 @@ This is exactly the same function as L</read_json>. The function was
 renamed in version 0.59, after the same function in
 L</File::JSON::Slurper>.
 
+=head2 run
+
+This is the old name for L</parse>.
+
 =head2 validate_json
 
 This is exactly the same function as L</assert_valid_json>.
@@ -582,6 +609,19 @@ mapped to the equivalent ASCII character.
 =head3 Handling of Unicode
 
 Inputs must be in the UTF-8 format. See L</UTF-8 only>.
+
+In addition, JSON::Parse rejects UTF-8 which encodes non-characters
+such as C<U+FFFF> and ill-formed characters such as incomplete halves
+of surrogate pairs.
+
+Unicode encoding points in the input of the form C<\u3000> are
+converted into the equivalent UTF-8 bytes.
+
+Surrogate pairs in the form C<\uD834\uDD1E> are also handled. If the
+second half of the surrogate pair is missing, an L</Unexpected
+character> or L</Unexpected end of input> error is thrown. If the
+second half of the surrogate pair is present but contains an
+impossible value, a L</Not surrogate pair> error is thrown.
 
 If the input to L</parse_json> is marked as Unicode characters, the
 output strings will be marked as Unicode characters. If the input is
@@ -688,7 +728,7 @@ produces output
     Native Perl: かあ
 
 
-(This example is included as L<F<unicode-details.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.59/examples/unicode-details.pl> in the distribution.)
+(This example is included as L<F<unicode-details.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.60/examples/unicode-details.pl> in the distribution.)
 
 
 Although in general the above would be an unsafe practice, JSON::Parse
@@ -698,12 +738,6 @@ checks each input byte to make sure that it forms UTF-8. See also
 L</UTF-8 only>. Doing things this way, rather than the way that Perl
 does it, was one of the original motivations for writing this
 module.
-
-Surrogate pairs in the form C<\uD834\uDD1E> are also handled. If the
-second half of the surrogate pair is missing, an L</Unexpected
-character> or L</Unexpected end of input> error is thrown. If the
-second half of the surrogate pair is present but contains an
-impossible value, a L</Not surrogate pair> error is thrown.
 
 =head2 JSON arrays
 
@@ -757,11 +791,11 @@ A key collision is something like the following.
 
 produces output
 
-    JSON::Parse::parse_json_safe: JSON error at line 1, byte 10/14: Name is not unique: "a" parsing object starting from byte 1  at /usr/home/ben/projects/Json3/examples/key-collision.pl line 8.
+    JSON::Parse::parse_json_safe: Name is not unique: "a" parsing object starting from byte 1 at /usr/home/ben/projects/json-parse/examples/key-collision.pl line 8.
     Ambiguous key 'a' is 2
 
 
-(This example is included as L<F<key-collision.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.59/examples/key-collision.pl> in the distribution.)
+(This example is included as L<F<key-collision.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.60/examples/key-collision.pl> in the distribution.)
 
 
 Here the key "a" could be either 1 or 2. As seen in the example,
@@ -837,28 +871,28 @@ version 0.58:
     my $jc = JSON::Create->new (sort => 1);
     
     print "First do a round-trip of our modules:\n\n";
-    print $jc->run ($jp->run ($cream)), "\n\n";
+    print $jc->create ($jp->parse ($cream)), "\n\n";
     
     print "Now do a round-trip of JSON::Tiny:\n\n";
     print encode_json (decode_json ($cream)), "\n\n";
     
     print "🥴 First, incompatible mode:\n\n";
-    print 'tiny(parse): ', encode_json ($jp->run ($cream)), "\n";
-    print 'create(tiny): ', $jc->run (decode_json ($cream)), "\n\n";
+    print 'tiny(parse): ', encode_json ($jp->parse ($cream)), "\n";
+    print 'create(tiny): ', $jc->create (decode_json ($cream)), "\n\n";
     
     # Set our parser to produce these things as literals:
     $jp->set_true (JSON::Tiny::true);
     $jp->set_false (JSON::Tiny::false);
     
     print "🔄 Compatibility with JSON::Parse:\n\n";
-    print 'tiny(parse):', encode_json ($jp->run ($cream)), "\n\n";
+    print 'tiny(parse):', encode_json ($jp->parse ($cream)), "\n\n";
     $jc->bool ('JSON::Tiny::_Bool');
     
     print "🔄 Compatibility with JSON::Create:\n\n";
-    print 'create(tiny):', $jc->run (decode_json ($cream)), "\n\n";
+    print 'create(tiny):', $jc->create (decode_json ($cream)), "\n\n";
     
     print "🔄 JSON::Parse and JSON::Create are still compatible too:\n\n";
-    print $jc->run ($jp->run ($cream)), "\n";
+    print $jc->create ($jp->parse ($cream)), "\n";
 
 
 produces output
@@ -889,7 +923,7 @@ produces output
     {"clapton":true,"hendrix":false}
 
 
-(This example is included as L<F<json-tiny-round-trip-demo.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.59/examples/json-tiny-round-trip-demo.pl> in the distribution.)
+(This example is included as L<F<json-tiny-round-trip-demo.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.60/examples/json-tiny-round-trip-demo.pl> in the distribution.)
 
 
 Most of the other CPAN modules use similar methods to L<JSON::Tiny>,
@@ -972,10 +1006,9 @@ diligently verified.
 
 =item UTF-8 only
 
-Although JSON may come in various encodings of Unicode, JSON::Parse
-only parses the UTF-8 format. If input is in a different Unicode
-encoding than UTF-8, convert the input before handing it to this
-module. For example, for the UTF-16 format,
+JSON::Parse only parses the UTF-8 format. If input is in a different
+Unicode encoding than UTF-8, convert the input before handing it to
+this module. For example, for the UTF-16 format,
 
     use Encode 'decode';
     my $input_utf8 = decode ('UTF-16', $input);
@@ -988,8 +1021,8 @@ L<perluniintro>):
 
 JSON::Parse does not try to determine the nature of the octet stream
 using BOM markers. A BOM marker in the input consists of bytes C<0xFE>
-and C<0xFF> which are invalid as UTF-8, and thus will cause a fatal
-error.
+and C<0xFF>, both of which are invalid as UTF-8, and thus will cause a
+fatal error.
 
 This restriction to UTF-8 applies regardless of whether Perl thinks
 that the input string is a character string or a byte
@@ -1229,7 +1262,7 @@ L</detect_collisions>. For example an input like
 
 gives output
 
-    JSON error at line 1, byte 23/31: Name is not unique: "hocus" parsing object starting from byte 1 at blib/lib/JSON/Parse.pm line 113.
+    JSON error at line 1, byte 23/31: Name is not unique: "hocus" parsing object starting from byte 1 at blib/lib/JSON/Parse.pm line 131.
 
 
 
@@ -1298,8 +1331,8 @@ able to fully work out the reason behind the better speed.
 
 There is some benchmarking code in the github repository under the
 directory "benchmarks" for those wishing to test these claims. The
-script L<F<benchmarks/bench>|https://github.com/benkasminbullock/JSON-Parse/e10440285845d6b0f29746bce84c6b546e557f6f/benchmarks/bench> is an adaptation of the similar
-script in the L<JSON::XS> distribution. The script L<F<benchmarks/pub-bench.pl>|https://github.com/benkasminbullock/JSON-Parse/e10440285845d6b0f29746bce84c6b546e557f6f/benchmarks/pub-bench.pl> runs the benchmarks and prints them
+script L<F<benchmarks/bench>|https://github.com/benkasminbullock/JSON-Parse/27b70e98176290ddd145cadfe8aa6ff43bb71703/benchmarks/bench> is an adaptation of the similar
+script in the L<JSON::XS> distribution. The script L<F<benchmarks/pub-bench.pl>|https://github.com/benkasminbullock/JSON-Parse/27b70e98176290ddd145cadfe8aa6ff43bb71703/benchmarks/pub-bench.pl> runs the benchmarks and prints them
 out as POD.
 
 The following benchmark tests used version 0.58_01 of JSON::Parse, version 4.03 of L</JSON::XS>, and version 4.25 of L</Cpanel::JSON::XS> on Perl
@@ -1434,12 +1467,21 @@ L<JSON::Repair> is an example module which demonstrates using
 JSON::Parse to apply some kinds of heuristics to repair "relaxed JSON"
 or otherwise broken JSON into compliant JSON.
 
+=item JSON::Server
+
+L<JSON::Server> is a module which offers a JSON-only, UTF-8 only
+server using C<JSON::Parse> and L</JSON::Create>.
+
 =item JSON::Tokenize
 
 L<JSON::Tokenize> is part of the JSON::Parse distribution, a tokenizer
 which reduces a JSON string to tokens. This makes the JSON::Parse
 tokenizer available to people who want to write their own JSON
 parsers.
+
+=item JSON::Whitespace
+
+L<JSON::Whitespace> is for stripping whitespace from JSON.
 
 =back
 
@@ -1488,7 +1530,7 @@ Perl structure wholesale into JSON.
 =item L<JSON>
 
 
-[⭐⭐ Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>; Date: C<2019-02-23>; Version: C<4.02>]
+[⭐⭐ Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>; Date: C<2021-01-24>; Version: C<4.03>]
 
 
 
@@ -1513,7 +1555,7 @@ strings, trailing commas, etc.
 =item L<JSON::PP>
 
 
-[⭐⭐ Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>; Date: C<2020-07-08>; Version: C<4.05>]
+[⭐⭐ Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>; Date: C<2021-01-23>; Version: C<4.06>]
 
 
 
@@ -1592,7 +1634,7 @@ requests have been ignored.
 =item L<Mojo::JSON>
 
 
-[⭐⭐⭐ Author: L<SRI|https://metacpan.org/author/SRI>; Date: C<2020-12-30>; Version: C<8.70>]
+[⭐⭐⭐ Author: L<SRI|https://metacpan.org/author/SRI>; Date: C<2021-01-17>; Version: C<8.71>]
 
 
 
@@ -1910,7 +1952,7 @@ tied scalars.
 
 =back
 
-=item Patch, path, pointer, and transform modules
+=item Patch, path, pointer, schema, and transform modules
 
 =over
 
@@ -1983,6 +2025,17 @@ Transform JSON using JsonT
 
 
 
+
+=item L<JSON::Validator>
+
+
+[⭐⭐ Author: L<JHTHORSEN|https://metacpan.org/author/JHTHORSEN>; Date: C<2021-01-24>; Version: C<4.12>]
+
+
+
+"Validate data against a JSON schema" - you can decide what the JSON
+is supposed to contain.
+
 =back
 
 =item JSON extensions
@@ -2026,6 +2079,17 @@ These modules extend JSON with comments and other things.
 =item Web interactions via JSON
 
 =over
+
+
+=item L<Crypt::JWT>
+
+
+[⭐⭐ Author: L<MIK|https://metacpan.org/author/MIK>; Date: C<2021-01-10>; Version: C<0.031>]
+
+
+
+Module covers JSON Web Tokens, JSON Web Signature, and JSON Web
+Encryption.
 
 
 =item L<JSON::API>
@@ -2140,8 +2204,8 @@ L<our bug report|https://github.com/pegex-parser/pegex-json-pm/issues/3>.
 
 =item Other modules
 
-Modules which are parts of bigger releases have not been included here
-except by accident.
+Modules which are parts of bigger distributions have not been included
+here except by accident.
 
 =over
 
@@ -2180,14 +2244,12 @@ the forked module L</Cpanel::JSON::XS>.
 
 
 
-=item L<Haineko::JSON>
+=item L<Jasonify>
 
 
-[⭐ Author: L<AKXLIX|https://metacpan.org/author/AKXLIX>; Date: C<2014-01-25>; Version: C<v0.2.16>]
+[Author: L<BOBK|https://metacpan.org/author/BOBK>; Date: C<2020-03-04>; Version: C<v0.20.064>]
 
 
-
-😕 We can't quite figure out the documentation here.
 
 
 =item L<JS::JSON>
@@ -2278,8 +2340,6 @@ JavaScript object notation object notator.
 
 
 
-😕
-
 
 =item L<JSON::Streaming::Reader>
 
@@ -2333,6 +2393,14 @@ reimplementation.
 We haven't tried downloading this or installing it, but according to
 the documentation, this module encodes numbers with quotes around
 them, so C<< {this => 2} >> turns into C<{"this":"2"}>.
+
+
+=item L<JSON_minify>
+
+
+[Author: L<RCOSCALI|https://metacpan.org/author/RCOSCALI>; Date: C<2021-01-24>; Version: C<1.1>]
+
+
 
 
 =item L<Text::JSON::Nibble>
@@ -2403,7 +2471,7 @@ supplied with the module in the F</t/> subdirectory of the
 distribution.
 
 More extensive testing code is in the git repository. This is not
-supplied in the CPAN distribution. A script, L<F<randomjson.pl>|https://github.com/benkasminbullock/JSON-Parse/e10440285845d6b0f29746bce84c6b546e557f6f/randomjson.pl>,
+supplied in the CPAN distribution. A script, L<F<randomjson.pl>|https://github.com/benkasminbullock/JSON-Parse/27b70e98176290ddd145cadfe8aa6ff43bb71703/randomjson.pl>,
 generates a set number of bytes of random JSON and checks that the
 module's bytewise validation of input is correct. It does this by
 taking a valid fragment, then adding each possible byte from 0 to 255
@@ -2413,17 +2481,17 @@ it to the fragment and continuing the process until a complete valid
 JSON input is formed. The module has undergone about a billion
 repetitions of this test.
 
-This setup relies on a C file, L<F<json-random-test.c>|https://github.com/benkasminbullock/JSON-Parse/e10440285845d6b0f29746bce84c6b546e557f6f/json-random-test.c>, which
-isn't in the CPAN distribution, and it also requires L<F<Json3.xs>|https://github.com/benkasminbullock/JSON-Parse/e10440285845d6b0f29746bce84c6b546e557f6f/Json3.xs> to be edited to make the macro C<TESTRANDOM> true
+This setup relies on a C file, L<F<json-random-test.c>|https://github.com/benkasminbullock/JSON-Parse/27b70e98176290ddd145cadfe8aa6ff43bb71703/json-random-test.c>, which
+isn't in the CPAN distribution, and it also requires L<F<Json3.xs>|https://github.com/benkasminbullock/JSON-Parse/27b70e98176290ddd145cadfe8aa6ff43bb71703/Json3.xs> to be edited to make the macro C<TESTRANDOM> true
 (uncomment line 7 of the file). The testing code uses C
 setjmp/longjmp, so it's not guaranteed to work on all operating
 systems and is commented out for CPAN releases.
 
-A pure C version called L<F<random-test.c>|https://github.com/benkasminbullock/JSON-Parse/e10440285845d6b0f29746bce84c6b546e557f6f/random-test.c> also exists. This applies
+A pure C version called L<F<random-test.c>|https://github.com/benkasminbullock/JSON-Parse/27b70e98176290ddd145cadfe8aa6ff43bb71703/random-test.c> also exists. This applies
 exactly the same tests, and requires no Perl at all.
 
 If you're interested in testing your own JSON parser, the outputs
-generated by L<F<randomjson.pl>|https://github.com/benkasminbullock/JSON-Parse/e10440285845d6b0f29746bce84c6b546e557f6f/randomjson.pl> are quite a good place to
+generated by L<F<randomjson.pl>|https://github.com/benkasminbullock/JSON-Parse/27b70e98176290ddd145cadfe8aa6ff43bb71703/randomjson.pl> are quite a good place to
 start. The default is to produce UTF-8 output, which looks pretty
 horrible since it tends to produce long strings of UTF-8
 garbage. (This is because it chooses randomly from 256 bytes and the
@@ -2463,9 +2531,7 @@ Suite.
 
 =over
 
-=item L<ActiveState PPM|http://code.activestate.com/ppm/JSON-Parse/>.
-
-=item L<CPAN testers|http://matrix.cpantesters.org/?dist=JSON-Parse+0.59>
+=item L<CPAN testers|http://matrix.cpantesters.org/?dist=JSON-Parse+0.60>
 
 =item L<Travis CI|https://travis-ci.com/github/benkasminbullock/JSON-Parse>
 

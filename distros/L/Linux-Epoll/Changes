@@ -1,5 +1,8 @@
 Revision history for Linux-Epoll
 
+0.018     2021-01-25 22:59:36+01:00 Europe/Amsterdam
+          - Explicitly run signal handlers right after EINTR
+
 0.017     2019-10-04 16:57:07+02:00 Europe/Amsterdam
           - Eliminate superfluous SAVETMPS
 

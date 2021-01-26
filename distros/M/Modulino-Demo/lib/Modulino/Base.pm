@@ -1,13 +1,14 @@
+use v5.14;
+
 package Modulino::Base;
 use utf8;
 use strict;
 no warnings;
 
-use v5.10.1;
 
 use Carp;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 =encoding utf8
 

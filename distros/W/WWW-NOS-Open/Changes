@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW::NOS::Open.
 
+v1.0.5 Mon Jan 25 23:15:09 UTC 2021
+    - fix: meta bugtracker
+
 v1.0.4 Sun Jan 17 12:10:53 UTC 2021
     - docs: migrate bugtracker from RT to Bitbucket
     - test: RT#130653 improve testing and coverage

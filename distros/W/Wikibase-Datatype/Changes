@@ -1,3 +1,15 @@
+0.07 2021-01-26T13:28:48+01:00
+ - Add Mediainfo datatype.
+ - Add MediainfoSnak datatype. There is difference between normal Snak in
+   requirements of datatype.
+ - Add MediainfoStatement datatype. There is difference between normal
+   Statement in use of Snak and references.
+ - Add id parameter and id() method to Statement.
+ - Fix doc of Datatype.
+ - Fix tests for Snak (there isn't datavalue for somevalue and novalue).
+ - Improve doc example for Snak by adding of snaktype.
+ - Update copyright years.
+
 0.06 2021-01-14T18:43:21+01:00
  - Fix doc in Lexeme.
  - Fix negative coordinate.

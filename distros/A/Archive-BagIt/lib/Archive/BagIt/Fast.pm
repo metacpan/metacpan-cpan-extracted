@@ -7,7 +7,7 @@ use Time::HiRes qw(time);
 use Moo;
 extends "Archive::BagIt";
 
-our $VERSION = '0.071'; # VERSION
+our $VERSION = '0.072'; # VERSION
 
 
 has 'digest_callback' => (
@@ -62,7 +62,7 @@ Archive::BagIt::Fast
 
 =head1 VERSION
 
-version 0.071
+version 0.072
 
 =head1 NAME
 

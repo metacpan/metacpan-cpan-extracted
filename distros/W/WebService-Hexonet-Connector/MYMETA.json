@@ -1,0 +1,66 @@
+{
+   "abstract" : "Connector library for the insanely fast L<HEXONET Backend API|https://www.hexonet.net/>.",
+   "author" : [
+      "hexonet <middleware@hexonet.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-Hexonet-Connector",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "Data::Dumper" : "0",
+            "LWP::Protocol::https" : "6.07",
+            "LWP::UserAgent" : "6.46",
+            "List::MoreUtils" : "0.428",
+            "MIME::Base64" : "0",
+            "POSIX" : "0",
+            "Readonly" : "2.05",
+            "Time::Local" : "0",
+            "perl" : "5.030000",
+            "utf8" : "0",
+            "version" : "0.9924"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "POSIX" : "0",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::RequiresInternet" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v2.10.2",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

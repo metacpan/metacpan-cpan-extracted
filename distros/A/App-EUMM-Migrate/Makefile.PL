@@ -8,7 +8,7 @@ WriteMakefile
   'PREREQ_PM' => {
                    'Data::Dumper' => 0,
                    'File::Slurp' => 0,
-                   'Github::Fork::Parent' => '0.2',
+                   'Github::Fork::Parent' => '1',
                    'Perl::Meta' => 0,
                    'Test::More' => 0
                  },

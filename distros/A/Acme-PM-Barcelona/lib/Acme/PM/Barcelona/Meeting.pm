@@ -3,7 +3,7 @@ use strict;
 
 package Acme::PM::Barcelona::Meeting;
 # ABSTRACT: When is the next meeting?
-$Acme::PM::Barcelona::Meeting::VERSION = '0.05';
+$Acme::PM::Barcelona::Meeting::VERSION = '0.06';
 use base 'DateTime::Set';
 use DateTime;
 use DateTime::Event::ICal;
@@ -40,7 +40,7 @@ Acme::PM::Barcelona::Meeting - When is the next meeting?
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -74,7 +74,7 @@ Alex Muntada <alexm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2009,2016 by Alex Muntada.
+This software is copyright (c) 2009-2021 by Alex Muntada.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

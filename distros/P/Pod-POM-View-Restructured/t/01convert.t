@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 use Pod::POM::View::Restructured;
 
@@ -24,7 +24,6 @@ ok($rv);
 my @expected = (
     '.. _Pod::POM::View::Restructured:',
     '.. _Pod::POM::View::Restructured::NAME:',
-    ':ref:`Pod::POM::View::Restructured::Changes <Pod::POM::View::Restructured::Changes>`',
     '`Pod::POM <http://search.cpan.org/search\?query=Pod%3a%3aPOM&mode=module>`_'
 );
 

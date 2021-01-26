@@ -5,6 +5,6 @@ use JSON::Parse;
 my $json = '{"yes":true,"no":false}';
 my $jp = JSON::Parse->new ();
 $jp->set_true ('Yes, that is so true');
-my $out = $jp->run ($json);
+my $out = $jp->parse ($json);
 print $out->{yes}, "\n";
 

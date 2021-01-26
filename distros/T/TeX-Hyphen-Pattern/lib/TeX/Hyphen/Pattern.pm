@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2009-2021, Roland van Ipenburg
-package TeX::Hyphen::Pattern v1.1.7;
+package TeX::Hyphen::Pattern v1.1.8;
 use Moose;
 use 5.014000;
 use utf8;
@@ -214,7 +214,7 @@ patterns for use with TeX::Hyphen.
 
 =head1 VERSION
 
-This is version C<v1.1.7>. To prevent plugging in of incompatible modules the
+This is version C<v1.1.8>. To prevent plugging in of incompatible modules the
 version of the pluggable modules must be the same as this module.
 
 =head1 SYNOPSIS

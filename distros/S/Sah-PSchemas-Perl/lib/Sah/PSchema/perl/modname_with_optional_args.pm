@@ -1,9 +1,12 @@
 package Sah::PSchema::perl::modname_with_optional_args;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-01-26'; # DATE
 our $DIST = 'Sah-PSchemas-Perl'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
+
+use strict;
+use warnings;
 
 sub meta {
     my $class = shift;
@@ -20,6 +23,8 @@ sub meta {
 }
 
 sub get_schema {
+    my ($class, $args, $merge) = @_;
+
     return ["perl::modname_with_optional_args" => {
         'x.perl.coerce_rules' => [
             ['From_str::normalize_perl_modname' => {ns_prefix=>$args->{ns_prefix}}],
@@ -45,7 +50,7 @@ Sah::PSchema::perl::modname_with_optional_args - Perl module name with optional 
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::PSchema::perl::modname_with_optional_args (from Perl distribution Sah-PSchemas-Perl), released on 2021-01-20.
+This document describes version 0.005 of Sah::PSchema::perl::modname_with_optional_args (from Perl distribution Sah-PSchemas-Perl), released on 2021-01-26.
 
 =head1 DESCRIPTION
 

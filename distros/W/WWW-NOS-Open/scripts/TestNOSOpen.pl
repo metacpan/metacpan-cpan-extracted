@@ -8,7 +8,7 @@ use warnings;
 use utf8;
 use 5.014000;
 
-our $VERSION = 'v1.0.4';
+our $VERSION = 'v1.0.5';
 
 use CGI qw/:all/;
 use Dancer2;

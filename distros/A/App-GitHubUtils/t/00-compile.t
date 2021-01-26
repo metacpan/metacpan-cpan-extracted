@@ -13,7 +13,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'script/create-the-github-repo',
+    'script/create-this-repo-on-github',
     'script/git-clone-from-github'
 );
 

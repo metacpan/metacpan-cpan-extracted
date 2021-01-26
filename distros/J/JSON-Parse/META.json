@@ -17,6 +17,11 @@
       "directory" : [
          "t",
          "inc"
+      ],
+      "file" : [
+         "build/JPB.pm",
+         "t/JPT.pm",
+         "xt/JPXT.pm"
       ]
    },
    "prereqs" : {
@@ -48,6 +53,6 @@
          "web" : "https://github.com/benkasminbullock/JSON-Parse"
       }
    },
-   "version" : "0.59",
+   "version" : "0.60",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

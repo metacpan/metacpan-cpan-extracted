@@ -8,7 +8,7 @@ use Language::FormulaEngine::Parser::ContextUtil
 use namespace::clean;
 
 # ABSTRACT: Create parse tree from an input string
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 has parse_tree   => ( is => 'rw' );
@@ -255,16 +255,12 @@ sub cmp_operators { qw(  =  ==  !=  <>  >  >=  <  <=  ), "\x{2260}", "\x{2264}",
 sub math_operators { qw(  +  -  *  /  ) }
 sub logic_operators { qw(  and  or  not  !  ) }
 sub list_operators { ',', '(', ')' }
-my $keyword_map;
 sub keyword_map {
-	$keyword_map ||= do {
-		use Const::Fast;
-		const my %keyword_map,
-			(map { $_ => $_ } cmp_operators, math_operators, logic_operators, list_operators),
-			'=' => '==', '<>' => '!=', "\x{2260}" => '!=',
-			"\x{2264}" => '<=', "\x{2265}" => '>=';
-		\%keyword_map;
-	};
+	return {
+		(map { $_ => $_ } cmp_operators, math_operators, logic_operators, list_operators),
+		'=' => '==', '<>' => '!=', "\x{2260}" => '!=',
+		"\x{2264}" => '<=', "\x{2265}" => '>='
+	}
 }
 sub scanner_rules {
 	my $self= shift;
@@ -281,7 +277,7 @@ sub scanner_rules {
 		[ 'Whitespace',  qr/(\s+)/, '"" => ""' ], # empty string causes next_token to loop
 		[ 'Decimal',     qr/([0-9]*\.?[0-9]+(?:[eE][+-]?[0-9]+)?)\b/, 'Number => $1+0' ],
 		[ 'Hexadecimal', qr/0x([0-9A-Fa-f]+)/, 'Number => hex($1)' ],
-		[ 'Keywords',    qr/($kw_regex)/, $kw_canonical.' => $1' ],
+		[ 'Keywords',    qr/($kw_regex)/, $kw_canonical.' => $1', { keywords => $keywords } ],
 		[ 'Identifiers', qr/([A-Za-z_][A-Za-z0-9_.]*)\b/, 'Identifier => $1' ],
 		# Single or double quoted string, using Pascal-style repeated quotes for escaping
 		[ 'StringLiteral', qr/(?:"((?:[^"]|"")*)"|'((?:[^']|'')*)')/, q%
@@ -296,10 +292,10 @@ sub scanner_rules {
 }
 
 sub _build_scan_token_method_body {
-	my $self= shift;
+	my ($self, $rules)= @_;
 	return join('', map
 			'  return ' . $_->[2] . ' if $self->{input} =~ /\G' . $_->[1] . "/gc;\n",
-			$self->scanner_rules
+			@$rules
 		).'  return;' # return empty list of no rule matched
 }
 
@@ -307,15 +303,19 @@ sub _build_scan_token_method {
 	my ($pkg, $method_name)= @_;
 	$pkg= ref $pkg if ref $pkg;
 	$method_name= 'scan_token' unless defined $method_name;
-	my $keywords= $pkg->keyword_map; # this is made available to the eval
-	my $code= "sub ${pkg}::$method_name {\n"
-		."  my \$self= shift;\n"
-		.$pkg->_build_scan_token_method_body
-		."}\n";
+	my @rules= $pkg->scanner_rules;
+	# collect variables which should be available to the code
+	my %vars= map { $_->[3]? %{ $_->[3] } : () } @rules;
+	my $code= join "\n",
+		(map 'my $'.$_.' = $vars{'.$_.'};', keys %vars),
+	    "sub ${pkg}::$method_name {",
+		'  my $self= shift;',
+		$pkg->_build_scan_token_method_body(\@rules),
+		"}\n";
 	# closure needed for 5.8 and 5.10 which complain about using a lexical
 	# in a sub declared at package scope.
 	no warnings 'redefine','closure';
-	eval "$code; 1" or die $@ . "for generated scanner code:\n".$code;
+	eval "$code; 1" or die $@ . " for generated scanner code:\n".$code;
 	return $pkg->can('scan_token');
 }
 
@@ -407,7 +407,7 @@ Language::FormulaEngine::Parser - Create parse tree from an input string
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -612,6 +612,54 @@ Any alpha (or underscore) followed by any run of alphanumerics,
 
 =back
 
+=head2 Customizing the Token Scanner
+
+The tokens are parsed using a series of regex tests.  The regexes and the code that handles a
+match of that regex are found in package attribute L</scanner_rules>.  These regexes and code
+fragments get lazily compiled into a package method on the first use (per package).
+Meanwhile, several of those regex are built from other package attributes.
+
+=over
+
+=item scanner_rules
+
+This package method returns a list (not arrayref) of ordered elements of the form
+C<< [ $name, $regex, $code_fragment, \%vars ] >>.  You can subclass this method to inspect
+the rules (probably based on C<$name>) and replace the regexes, or alter the handler code,
+or add/remove your own rules.  The regexes are attempted in the order they appear in this
+list.  You do not need to use "\G" or "/gc" on these regexes because those are added
+automatically during compilation.
+
+=item keyword_map
+
+This package method returns a hashref of all known keywords, mapped to their canonical form.
+So for instance, a key of C<< '<>' >> with a value of C<< '!=' >>.  These tokens automatically
+become the scanner rule named C<Keywords>.  In turn, the contents of this hashref include
+the L</cmp_operators>, L</math_operators>, L</logic_operators>, and L</list_operators> which
+can be overridden separately.
+
+This method is called once during the compilation of L</scan_token>, and the result is then
+made into a constant and referenced by the compiled method, so dynamic changes to the output
+of this method will be ignored.
+
+=item cmp_operators
+
+Package method that returns a list of comparison operators, like '<', '>=', etc.
+
+=item math_operators
+
+Package method that returns a list of math operators, like '*', '+', etc.
+
+=item logic_operators
+
+Package method that returns a list of keywords like 'and', 'or', etc.
+
+=item list_operators
+
+Package method that returns a list of '(', ')', ','
+
+=back
+
 =head2 Parse Nodes
 
 The parse tree takes a minimalist approach to node classification.  In this default
@@ -677,7 +725,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2021 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

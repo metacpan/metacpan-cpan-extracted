@@ -1,0 +1,5 @@
+![Test](https://github.com/philiprbrenan/SimdAvx512/workflows/Test/badge.svg)
+
+Single Instruction Multiple Data Emulation in Pure Perl
+
+https://metacpan.org/pod/Simd::Avx512

@@ -3,8 +3,23 @@ abstract: 'Perl framework for the Open NOS REST API'
 author:
   - 'Roland van Ipenburg <roland@rolandvanipenburg.com>'
 build_requires:
+  Module::Build: '0.4'
+  Perl::Critic::Bangs: '0'
+  Perl::Critic::Itch: '0'
+  Perl::Critic::More: '0'
+  Perl::Critic::Nits: '0'
+  Perl::Critic::Pulp: '0'
+  Perl::Critic::StricterSubs: '0'
+  Perl::Critic::Tics: '0'
+  Test::CheckManifest: '1.01'
+  Test::Kwalitee: '0'
   Test::More: '0.81'
   Test::NoWarnings: '0.81'
+  Test::Perl::Critic: '0'
+  Test::Pod: '1.41'
+  Test::Pod::Coverage: '1'
+  Test::Spelling: '0'
+  Test::TestCoverage: '0.08'
 configure_requires:
   Module::Build: '0.4'
 dynamic_config: 1
@@ -17,67 +32,53 @@ name: WWW-NOS-Open
 provides:
   WWW::NOS::Open:
     file: lib/WWW/NOS/Open.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::Article:
     file: lib/WWW/NOS/Open/Article.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::AudioFragment:
     file: lib/WWW/NOS/Open/AudioFragment.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::Broadcast:
     file: lib/WWW/NOS/Open/Broadcast.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::DayGuide:
     file: lib/WWW/NOS/Open/DayGuide.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::Document:
     file: lib/WWW/NOS/Open/Document.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::Exceptions:
     file: lib/WWW/NOS/Open/Exceptions.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::Interface:
     file: lib/WWW/NOS/Open/Interface.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::MediaResource:
     file: lib/WWW/NOS/Open/MediaResource.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::Resource:
     file: lib/WWW/NOS/Open/Resource.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::Result:
     file: lib/WWW/NOS/Open/Result.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::TypeDef:
     file: lib/WWW/NOS/Open/TypeDef.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::Version:
     file: lib/WWW/NOS/Open/Version.pm
-    version: v1.0.4
+    version: v1.0.5
   WWW::NOS::Open::Video:
     file: lib/WWW/NOS/Open/Video.pm
-    version: v1.0.4
+    version: v1.0.5
 recommends:
   CGI: '0'
   Dancer2: '0'
   Getopt::Long: '0'
   HTTP::Status: '0'
-  Perl::Critic::Bangs: '0'
-  Perl::Critic::Itch: '0'
-  Perl::Critic::More: '0'
-  Perl::Critic::Nits: '0'
-  Perl::Critic::Pulp: '0'
-  Perl::Critic::StricterSubs: '0'
-  Perl::Critic::Tics: '0'
   Pod::Usage: '0'
   Pod::Usage::CommandLine: '0'
-  Test::CheckManifest: '1.01'
-  Test::Kwalitee: '0'
-  Test::Perl::Critic: '0'
-  Test::Pod: '1.41'
-  Test::Pod::Coverage: '1'
-  Test::Spelling: '0'
-  Test::TestCoverage: '0.08'
 requires:
   Date::Calc: '0'
   Date::Format: '0'
@@ -101,8 +102,12 @@ requires:
   XML::Simple: '0'
   namespace::autoclean: '0'
   perl: v5.14.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://bitbucket.org/rolandvanipenburg/www-nos-open/issues
   license: http://dev.perl.org/licenses/
   repository: https://bitbucket.org/rolandvanipenburg/www-nos-open
-version: v1.0.4
+version: v1.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

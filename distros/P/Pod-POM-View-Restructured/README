@@ -17,11 +17,8 @@ DESCRIPTION
     commands specifically for reStructuredText" for how to change this for a
     particular block.
 
-    For a list of changes in recent versions, see the documentation for
-    Pod::POM::View::Restructured::Changes.
-
     This module can be downloaded from
-    <http://www.cpan.org/authors/id/D/DO/DOWENS/>.
+    <https://metacpan.org/release/Pod-POM-View-Restructured>.
 
 METHODS
   "new(\%params)"
@@ -141,12 +138,13 @@ DEPENDENCIES
 AUTHORS
     Don Owens <don@regexguy.com>
     Jeff Fearn <Jeff.Fearn@gmail.com>
+    Alex Muntada <alexm@cpan.org>
 
 LICENSE AND COPYRIGHT
     Copyright (c) 2010 Don Owens <don@regexguy.com>. All rights reserved.
     Copyright (c) 2016 Jeff Fearn <Jeff.Fearn@gmail.com>. All rights
     reserved.
-    Copyright (c) 2016-2018 Alex Muntada <alexm@cpan.org>. All rights
+    Copyright (c) 2016-2021 Alex Muntada <alexm@cpan.org>. All rights
     reserved.
 
     This is free software; you can redistribute it and/or modify it under
@@ -165,7 +163,7 @@ SEE ALSO
 
     reStructuredText: <http://docutils.sourceforge.net/rst.html>
 
-    Sphinx (uses reStructuredText): <http://sphinx.pocoo.org/>
+    Sphinx (uses reStructuredText): <https://www.sphinx-doc.org/>
 
     Pygments (used by Sphinx for syntax highlighting):
-    <http://pygments.org/>
+    <https://pygments.org/>

@@ -23,12 +23,12 @@ use Perl::Tidy;
 use Progress::Any;
 use Progress::Any::Output q{TermProgressBarColor};
 
-our $VERSION = v1.1.7;
+our $VERSION = v1.1.8;
 use Readonly;
 
 ## no critic qw(prohibitCallsToUnexportedSubs)
 Readonly::Scalar my $ZIP =>
-  q{https://mirror.ctan.org/language/hyphenation-utf8.zip};
+  q{http://mirror.ctan.org/language/hyphenation-utf8.zip};
 Readonly::Scalar my $PREFIX      => q{../};
 Readonly::Scalar my $TARGET      => q{lib/TeX/Hyphen/Pattern/};
 Readonly::Scalar my $TARGET_PATH => File::Spec->catdir( $PREFIX, $TARGET );

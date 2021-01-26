@@ -11,6 +11,15 @@ SEE ALSO
     Wikibase::Datatype::Item
         Wikibase item datatype.
 
+    Wikibase::Datatype::Lexeme
+        Wikibase lexeme datatype.
+
+    Wikibase::Datatype::Mediainfo
+        Wikibase mediainfo datatype.
+
+    Wikibase::Datatype::MediainfoSnak
+        Wikibase mediainfo snak datatype.
+
     Wikibase::Datatype::Reference
         Wikibase reference datatype.
 
@@ -67,10 +76,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2020
+    © Michal Josef Špaček 2020-2021
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

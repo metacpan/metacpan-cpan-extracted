@@ -17,7 +17,6 @@ my %WriteMakefileArgs = (
   "NAME" => "Language::FormulaEngine",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Const::Fast" => 0,
     "DateTime" => 0,
     "DateTime::Format::Flexible" => 0,
     "Exporter" => 0,
@@ -41,7 +40,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +49,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Const::Fast" => 0,
   "Data::Dumper" => 0,
   "DateTime" => 0,
   "DateTime::Format::Flexible" => 0,

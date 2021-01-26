@@ -3,7 +3,7 @@ package Wikibase::Datatype;
 use strict;
 use warnings;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 1;
 
@@ -32,6 +32,18 @@ Wikibase form datatype.
 =item L<Wikibase::Datatype::Item>
 
 Wikibase item datatype.
+
+=item L<Wikibase::Datatype::Lexeme>
+
+Wikibase lexeme datatype.
+
+=item L<Wikibase::Datatype::Mediainfo>
+
+Wikibase mediainfo datatype.
+
+=item L<Wikibase::Datatype::MediainfoSnak>
+
+Wikibase mediainfo snak datatype.
 
 =item L<Wikibase::Datatype::Reference>
 
@@ -113,12 +125,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2021
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

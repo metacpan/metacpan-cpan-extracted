@@ -1,7 +1,9 @@
 package App::GitHubUtils;
 
-our $DATE = '2020-04-27'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-12-24'; # DATE
+our $DIST = 'App-GitHubUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,15 +17,16 @@ $SPEC{':package'} = {
     summary => 'Utilities related to GitHub',
 };
 
-$SPEC{create_the_github_repo} = {
+$SPEC{create_this_repo_on_github} = {
     v => 1.1,
-    summary => 'Create github repo',
+    summary => 'Create this repo on github',
     description => <<'_',
 
-This is a convenient no-argument-needed command to create GitHub repository.
-Will use prog:github-cmd from pm:App::github::cmd to create the repository. To
-find out the repo name to be created, will first check .git/config if it exists.
-Otherwise, will just use the name of the current directory.
+This is a convenient no-argument-needed command to create GitHub repository of
+the current ("this") repo. Will use <prog:github-cmd> from <pm:App::github::cmd>
+to create the repository. To find out the repo name to be created, will first
+check .git/config if it exists. Otherwise, will just use the name of the current
+directory.
 
 _
     args => {
@@ -32,7 +35,7 @@ _
         prog => 'github-cmd',
     },
 };
-sub create_the_github_repo {
+sub create_this_repo_on_github {
     require App::GitUtils;
     require Cwd;
     require IPC::System::Options;
@@ -212,7 +215,7 @@ App::GitHubUtils - Utilities related to GitHub
 
 =head1 VERSION
 
-This document describes version 0.005 of App::GitHubUtils (from Perl distribution App-GitHubUtils), released on 2020-04-27.
+This document describes version 0.006 of App::GitHubUtils (from Perl distribution App-GitHubUtils), released on 2020-12-24.
 
 =head1 DESCRIPTION
 
@@ -221,7 +224,7 @@ GitHub:
 
 =over
 
-=item * L<create-the-github-repo>
+=item * L<create-this-repo-on-github>
 
 =item * L<git-clone-from-github>
 
@@ -230,18 +233,19 @@ GitHub:
 =head1 FUNCTIONS
 
 
-=head2 create_the_github_repo
+=head2 create_this_repo_on_github
 
 Usage:
 
- create_the_github_repo() -> [status, msg, payload, meta]
+ create_this_repo_on_github() -> [status, msg, payload, meta]
 
-Create github repo.
+Create this repo on github.
 
-This is a convenient no-argument-needed command to create GitHub repository.
-Will use prog:github-cmd from pm:App::github::cmd to create the repository. To
-find out the repo name to be created, will first check .git/config if it exists.
-Otherwise, will just use the name of the current directory.
+This is a convenient no-argument-needed command to create GitHub repository of
+the current ("this") repo. Will use L<github-cmd> from L<App::github::cmd>
+to create the repository. To find out the repo name to be created, will first
+check .git/config if it exists. Otherwise, will just use the name of the current
+directory.
 
 This function is not exported.
 
@@ -334,7 +338,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-GitHubUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitHubUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-GitHubUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

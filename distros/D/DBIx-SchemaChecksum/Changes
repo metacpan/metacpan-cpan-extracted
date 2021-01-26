@@ -1,5 +1,9 @@
 Revision history for DBIx-SchemaChecksum
 
+1.104     2021-01-26 13:11:18+01:00
+    - explicitly use File::HomeDir, because MooseX::App only lists it as a recommended prereq
+
+
 1.103     2021-01-09 23:31:10+01:00
     - dist housekeeping, Dist::Zilla::PluginBundle::Author::DOMM
 

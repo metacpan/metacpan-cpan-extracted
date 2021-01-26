@@ -9,7 +9,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(check_entity check_lexeme check_property);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub check_entity {
 	my ($self, $key) = @_;
@@ -255,12 +255,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2021
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

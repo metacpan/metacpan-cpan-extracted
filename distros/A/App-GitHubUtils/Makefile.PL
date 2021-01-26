@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-GitHubUtils",
   "EXE_FILES" => [
-    "script/create-the-github-repo",
+    "script/create-this-repo-on-github",
     "script/git-clone-from-github"
   ],
   "LICENSE" => "perl",
@@ -25,12 +25,12 @@ my %WriteMakefileArgs = (
     "Cwd" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
-    "IPC::System::Options" => "0.332",
+    "IPC::System::Options" => "0.335",
     "Log::ger" => "0.037",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Call" => 0,
     "Perinci::CmdLine::Lite" => "1.827",
-    "Perinci::CmdLine::Util::Config" => "1.722",
+    "Perinci::CmdLine::Util::Config" => "1.724",
     "Perinci::Sub::DepChecker" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,12 +56,12 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "IPC::System::Options" => "0.332",
+  "IPC::System::Options" => "0.335",
   "Log::ger" => "0.037",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Call" => 0,
   "Perinci::CmdLine::Lite" => "1.827",
-  "Perinci::CmdLine::Util::Config" => "1.722",
+  "Perinci::CmdLine::Util::Config" => "1.724",
   "Perinci::Sub::DepChecker" => 0,
   "Test::More" => 0,
   "strict" => 0,

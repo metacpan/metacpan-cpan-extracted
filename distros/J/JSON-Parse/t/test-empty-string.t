@@ -1,8 +1,7 @@
 # This tests for an old bug where empty strings didn't work properly.
-use warnings;
-use strict;
-use JSON::Parse 'parse_json';
-use Test::More;
+use FindBin '$Bin';
+use lib "$Bin";
+use JPT;
 my $json = parse_json ('{"buggles":"","bibbles":""}');
 is ($json->{buggles}, '');
 is ($json->{bibbles}, '');

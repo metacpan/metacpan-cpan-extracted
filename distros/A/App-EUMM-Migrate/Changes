@@ -1,5 +1,8 @@
 Revision history for App-EUMM-Migrate
 
+0.12    2020-01-25
+        Move bug tracker to github
+
 0.11    2015-04-12
         "dist" should be ignored
 

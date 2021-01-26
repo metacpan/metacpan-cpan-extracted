@@ -19,7 +19,7 @@ BEGIN {
 
 use Cwd;
 
-$VERSION = '1.006';
+$VERSION = '1.007';
 
 =encoding utf8
 
@@ -91,7 +91,7 @@ sub create_MANIFEST {
 		if( $guesser->uses_module_build ) {
 			$self->verbose( "Detected Module::Build" );
 			system( $^X, 'Build.PL' );
-			system( './Build', 'manifest' );
+			system( $^X, 'Build', 'manifest' );
 			}
 		elsif( $guesser->uses_makemaker or $guesser->uses_module_install ) {
 			$self->verbose( "Detected ExtUtils::Makemaker or Module::Install" );
@@ -131,7 +131,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2010-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2010-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

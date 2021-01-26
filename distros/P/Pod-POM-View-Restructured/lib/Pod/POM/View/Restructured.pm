@@ -3,7 +3,7 @@
 # AUTHOR: Alex Muntada <alexm@cpan.org>
 # OWNER: 2010 Don Owens <don@regexguy.com>
 # OWNER: 2016 Jeff Fearn <Jeff.Fearn@gmail.com>
-# OWNER: 2016-2018 Alex Muntada <alexm@cpan.org>
+# OWNER: 2016-2021 Alex Muntada <alexm@cpan.org>
 # LICENSE: Perl_5
 
 
@@ -15,7 +15,7 @@ use Pod::POM;
 
 package Pod::POM::View::Restructured;
 
-our $VERSION = '1.000002'; # VERSION
+our $VERSION = '1.000003'; # VERSION
 
 use base 'Pod::POM::View::Text';
 
@@ -546,10 +546,7 @@ will be output with syntax highlighting for Perl code by default.
 See L</"POD commands specifically for reStructuredText"> for how
 to change this for a particular block.
 
-For a list of changes in recent versions, see the documentation
-for L<Pod::POM::View::Restructured::Changes>.
-
-This module can be downloaded from L<http://www.cpan.org/authors/id/D/DO/DOWENS/>.
+This module can be downloaded from L<https://metacpan.org/release/Pod-POM-View-Restructured>.
 
 =head1 METHODS
 
@@ -713,9 +710,9 @@ L<pod2rst> (distributed with Pod::POM::View::HTML)
 
 reStructuredText: L<http://docutils.sourceforge.net/rst.html>
 
-Sphinx (uses reStructuredText): L<http://sphinx.pocoo.org/>
+Sphinx (uses reStructuredText): L<https://www.sphinx-doc.org/>
 
-Pygments (used by Sphinx for syntax highlighting): L<http://pygments.org/>
+Pygments (used by Sphinx for syntax highlighting): L<https://pygments.org/>
 
 =head1 AUTHORS
 
@@ -727,12 +724,12 @@ Alex Muntada <alexm@cpan.org>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2010 by Don Owens <don@regexguy.com>, 2016 by Jeff Fearn <Jeff.Fearn@gmail.com>, and 2016-2018 by Alex Muntada <alexm@cpan.org>.
+This software is copyright (c) 2010 by Don Owens <don@regexguy.com>, 2016 by Jeff Fearn <Jeff.Fearn@gmail.com>, and 2016-2021 by Alex Muntada <alexm@cpan.org>.
 
 This software is available under the same terms as the perl 5 programming language system itself.
 
 =head1 VERSION
 
-1.000002
+1.000003
 
 =cut

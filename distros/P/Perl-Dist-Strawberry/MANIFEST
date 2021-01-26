@@ -96,6 +96,7 @@ share/32bit-5.30.1.1.pp
 share/32bit-5.30.2.1.pp
 share/32bit-5.30.3.1.pp
 share/32bit-5.32.0.1.pp
+share/32bit-5.32.1.1.pp
 share/64bit-5.16.3.1.pp
 share/64bit-5.18.2.1.pp
 share/64bit-5.18.2.2.pp
@@ -134,6 +135,7 @@ share/64bit-5.30.1.1.pp
 share/64bit-5.30.2.1.pp
 share/64bit-5.30.3.1.pp
 share/64bit-5.32.0.1.pp
+share/64bit-5.32.1.1.pp
 share/config-files/CPAN_Config.pm.tt
 share/extra-files/DISTRIBUTIONS.txt.tt
 share/extra-files/licenses/License.rtf
@@ -274,6 +276,14 @@ share/perl-5.30/perlexe.rc.tt
 share/perl-5.30/win32_config.gc.tt
 share/perl-5.30/win32_config_H.gc
 share/perl-5.30/win32_FindExt.pm
+share/perl-5.32/diffs_for_info_only/win32_config.gc.diff
+share/perl-5.32/diffs_for_info_only/win32_config_H.gc.diff
+share/perl-5.32/diffs_for_info_only/win32_FindExt.pm.diff
+share/perl-5.32/diffs_for_info_only/win32_perlexe.rc.diff
+share/perl-5.32/perlexe.rc.tt
+share/perl-5.32/win32_config.gc.tt
+share/perl-5.32/win32_config_H.gc
+share/perl-5.32/win32_FindExt.pm
 share/portable/portable.perl.32
 share/portable/portable.perl.32-NEW
 share/portable/portable.perl.473.32

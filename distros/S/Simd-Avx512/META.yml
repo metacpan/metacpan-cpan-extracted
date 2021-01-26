@@ -1,0 +1,29 @@
+---
+abstract: 'Simd::Avx512 - Emulate SIMD instructions'
+author:
+  - philiprbrenan@gmail.com
+build_requires: {}
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Simd-Avx512
+provides:
+  Simd::Avx512:
+    file: lib/Simd/Avx512.pm
+    version: '20210121'
+requires:
+  Carp: '0'
+  Data::Dump: '0'
+  Test2::API: '0'
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/philiprbrenan/SimdAvx512/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/philiprbrenan/SimdAvx512
+version: '20210121'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

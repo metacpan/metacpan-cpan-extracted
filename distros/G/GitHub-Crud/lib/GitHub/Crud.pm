@@ -7,13 +7,14 @@
 #podDocumentation
 package GitHub::Crud;
 use v5.16;
-our $VERSION = 20201117;
+our $VERSION = 20210125;
 use warnings FATAL => qw(all);
 use strict;
 use Carp              qw(confess);
 use Data::Dump        qw(dump);
 use Data::Table::Text qw(:all !fileList);
 use Digest::SHA1      qw(sha1_hex);
+use Date::Manip;
 use Time::HiRes       qw(time);
 use Encode            qw(encode decode);
 use utf8;                                                                       # To allow utf8 constants for testing
@@ -33,11 +34,11 @@ sub GitHub::Crud::Response::new($$)                                             
 
   $r =~ s/\r//gs;                                                               # Internet line ends
   my ($http, @r) = split /\n/, $r;
-  while(@r > 2 and $http =~ "HTTP/1.1" and $http =~ /100/)                      # Continue messages
+  while(@r > 2 and $http =~ "HTTP" and $http =~ /100/)                          # Continue messages
    {shift @r; $http = shift @r;
    }
 
-  if ($http and $http =~ "HTTP/1.1" and $http =~ /200|201|404|409|422/)
+  if ($http and $http =~ "HTTP" and $http =~ /200|201|404|409|422/)
    {my $ps = 0;                                                                 # Parse the response
     my @data;
     my %can;
@@ -63,7 +64,7 @@ sub GitHub::Crud::Response::new($$)                                             
 
     if (keys %can)                                                              # List of new methods required
      {lll "Add the following fields to package GitHub::Crud::Response";
-      say STDERR "qw($_)," for(sort keys %can);
+      say STDERR "  $_=> undef," for(sort keys %can);
      }
 
     if (@data)                                                                  # Save any data
@@ -74,7 +75,7 @@ sub GitHub::Crud::Response::new($$)                                             
        }
      }
 
-    ($R->status) = split / /, $R->Status;                                       # Save response status
+    ($R->status) = split / /, $R->Status || $R->status;                         # Save response status
 
     return $gitHub->response = $R;                                              # Return successful response
    }
@@ -85,47 +86,71 @@ sub GitHub::Crud::Response::new($$)                                             
 
 genHash(q(GitHub::Crud::Response),                                              # Attributes describing a response from L<GitHub>.
   Accept_Ranges                           => undef,
+  access_control_allow_origin             => undef,
   Access_Control_Allow_Origin             => undef,
+  access_control_expose_headers           => undef,
   Access_Control_Expose_Headers           => undef,
+  cache_control                           => undef,
   Cache_Control                           => undef,
   Connection                              => undef,
+  content_length                          => undef,
   Content_Length                          => undef,
-  content                                 => undef,                             # The actual content of the file from L<GitHub>.
+  content_security_policy                 => undef,
   Content_Security_Policy                 => undef,
+  content_type                            => undef,
   Content_Type                            => undef,
+  content                                 => undef,                             # The actual content of the file from L<GitHub>.
   data                                    => undef,                             # The data received from L<GitHub>, normally in L<json> format.
+  date                                    => undef,
   Date                                    => undef,
+  etag                                    => undef,
   ETag                                    => undef,
   Expires                                 => undef,
+  last_modified                           => undef,
   Last_Modified                           => undef,
   Link                                    => undef,
   Location                                => undef,
+  referrer_policy                         => undef,
   Referrer_Policy                         => undef,
+  server                                  => undef,
   Server                                  => undef,
   Source_Age                              => undef,
-  status                                  => undef,                             # Our version of Status.
   Status                                  => undef,
+  status                                  => undef,                             # Our version of Status.
+  strict_transport_security               => undef,
   Strict_Transport_Security               => undef,
+  vary                                    => undef,
   Vary                                    => undef,
   Via                                     => undef,
+  x_accepted_oauth_scopes                 => undef,
   X_Accepted_OAuth_Scopes                 => undef,
-  X_Cache                                 => undef,
   X_Cache_Hits                            => undef,
-  X_Content_Type                          => undef,
+  X_Cache                                 => undef,
+  x_content_type_options                  => undef,
   X_Content_Type_Options                  => undef,
+  X_Content_Type                          => undef,
   X_Fastly_Request_ID                     => undef,
+  x_frame_options                         => undef,
   X_Frame_Options                         => undef,
   X_Geo_Block_List                        => undef,
+  x_github_media_type                     => undef,
   X_GitHub_Media_Type                     => undef,
+  x_github_request_id                     => undef,
   X_GitHub_Request_Id                     => undef,
+  x_oauth_scopes                          => undef,
   X_OAuth_Scopes                          => undef,
+  x_ratelimit_limit                       => undef,
   X_RateLimit_Limit                       => undef,
+  x_ratelimit_remaining                   => undef,
   X_RateLimit_Remaining                   => undef,
+  x_ratelimit_reset                       => undef,
   X_RateLimit_Reset                       => undef,
+  x_ratelimit_used                        => undef,
   X_RateLimit_Used                        => undef,
   X_Runtime_rack                          => undef,
   X_Served_By                             => undef,
   X_Timer                                 => undef,
+  x_xss_protection                        => undef,
   X_XSS_Protection                        => undef,
  );
 
@@ -376,7 +401,7 @@ sub write($$;$)                                                                 
     else
      {$gitHub->delete;
      }
-    return 1;                                                                   # Success
+    return 'empty';                                                             # Success
    }
 
   my $pat  = $gitHub->patKey(1);
@@ -552,6 +577,22 @@ sub delete($)                                                                   
  }
 
 #D1 Repositories                                                                # Perform actions on L<github> repositories.
+
+sub getRepository($)                                                            # Get the overall details of a repository
+ {my ($gitHub) = @_;                                                            # GitHub object
+
+  my $pat    = $gitHub->patKey(1);
+  my $user   = qm $gitHub->userid;     $user or confess "userid required";
+  my $repo   = qm $gitHub->repository; $repo or confess "repository required";
+  my $url    = url;
+
+  my $c = qq(curl -si $pat $url/$user/$repo);
+  my $r = GitHub::Crud::Response::new($gitHub, $c);
+  my $success = $r->status == 200;                                              # Check response code
+  !$success and $gitHub->confessOnFailure and confess dump([$gitHub, $c]);      # Confess to any failure if so requested
+
+  $r
+ }
 
 sub listCommits($)                                                              # List all the commits in a L<GitHub> repository.\mRequired attributes: L<userid|/userid>, L<repository|/repository>.
  {my ($gitHub) = @_;                                                            # GitHub object
@@ -864,6 +905,14 @@ sub writeFileFromFileUsingSavedToken($$$$;$)                                    
                            readBinaryFile($localFile), $accessFolderOrToken);
  }
 
+sub writeFileFromCurrentRun($$)                                                 # Write a file into the repository from the current run
+ {my ($target, $text) = @_;                                                     # The target file name in the repo, the text to write into this file
+  if (my $g = currentRepo)                                                      # We are on GitHub
+   {$g->gitFile = $target;
+    $g->write($text);
+   }
+ }
+
 sub writeBinaryFileFromFileInCurrentRun($$)                                     # Upload a binary file from the current run into the repo.
  {my ($target, $source) = @_;                                                   # The target file name in the repo, the current file name in the run
   if (my $g = currentRepo)                                                      # We are on GitHub
@@ -921,6 +970,23 @@ sub deleteFileUsingSavedToken($$$;$)                                            
   $g->delete;
  }
 
+sub getRepositoryUsingSavedToken($$;$)                                          # Get repository details using a saved token
+ {my ($userid, $repository, $accessFolderOrToken) = @_;                         # Userid on GitHub, repository name, optionally: location of access token.
+  my $g = GitHub::Crud::new;
+  $g->userid     = $userid;     $userid     or confess "Userid required";
+  $g->repository = $repository; $repository or confess "Repository required";
+  $g->personalAccessTokenFolder = $accessFolderOrToken;
+  $g->loadPersonalAccessToken;
+  $g->getRepository;
+ }
+
+sub getRepositoryUpdatedAtUsingSavedToken($$;$)                                 # Get repository 'updated_at' using a saved token and return the time in number of seconds since the Unix epoch.
+ {my ($userid, $repository, $accessFolderOrToken) = @_;                         # Userid on GitHub, repository name, optionally: location of access token.
+  my $r = &getRepositoryUsingSavedToken(@_);                                    # Get repository details using a saved token
+  my $u = $r->data->{updated_at};
+  return Date::Manip::UnixDate($u,'%s');
+ }
+
 #D1 Access tokens                                                               # Load and save access tokens. Some L<github> requets must be signed with an L<OAuth>  access token. These methods allow you to store and reuse such tokens.
 
 sub savePersonalAccessToken($)                                                  # Save a L<GitHub> personal access token by userid in folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
@@ -974,9 +1040,13 @@ createIssueFromSavedToken
 createIssueInCurrentRepo
 createRepositoryFromSavedToken
 deleteFileUsingSavedToken
+getRepository
+getRepositoryUsingSavedToken
+getRepositoryUpdatedAtUsingSavedToken
 readFileUsingSavedToken
 writeBinaryFileFromFileInCurrentRun
 writeCommitUsingSavedToken
+writeFileFromCurrentRun
 writeFileFromFileUsingSavedToken
 writeFileUsingSavedToken
 writeFolderUsingSavedToken
@@ -2030,7 +2100,7 @@ use Test::More tests => 1;
 
 ok 1;
 
-sub success(@)                                                                  # Write a succes message and exit
+sub success(@)                                                                  # Write a success message and exit
  {say STDERR join ' ', @_;
 # exit;
  }
@@ -2244,6 +2314,21 @@ if (0) {                                                                        
 
 if (0) {                                                                        #TlistRepositories
   success "List repositories: ", dump(gitHub()->listRepositories);
+ }
+
+if (0) {                                                                        #TgetRepository
+  my $r = gitHub(repository => q(C))->getRepository;
+  success "Get repository succeeded";
+ }
+
+if (0) {                                                                        #TgetRepositoryUsingSavedToken
+  my $r = getRepositoryUsingSavedToken(q(philiprbrenan), q(aaa));
+  success "Get repository using saved access token succeeded";
+ }
+
+if (1) {                                                                        #TgetRepositoryUpdatedAtUsingSavedToken
+  my $u = getRepositoryUpdatedAtUsingSavedToken(q(philiprbrenan), q(aaa));
+  success "Get repository updated_at field succeeded";
  }
 
 if (0) {                                                                        #TcreateRepository

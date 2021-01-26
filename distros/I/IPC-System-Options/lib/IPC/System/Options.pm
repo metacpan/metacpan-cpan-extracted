@@ -1,9 +1,9 @@
 package IPC::System::Options;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-18'; # DATE
+our $DATE = '2021-01-26'; # DATE
 our $DIST = 'IPC-System-Options'; # DIST
-our $VERSION = '0.338'; # VERSION
+our $VERSION = '0.339'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -67,9 +67,13 @@ sub _system_or_readpipe_or_run_or_start {
                         tee_stdout|tee_stderr|tee_merged|
                         chdir|dies?|dry_run|env|lang|log|max_log_output|shell|
                         exit_code_success_criteria|
+                        fail_log_level|
                         stdin # XXX: only for run()
                     )\z/x;
     }
+
+    # defaults
+    $opts->{fail_log_level} ||= 'error';
 
     my $opt_die = $opts->{die} || $opts->{dies};
 
@@ -92,6 +96,9 @@ sub _system_or_readpipe_or_run_or_start {
     };
 
     if ($opts->{log}) {
+        require Log::ger::Plugin::MultilevelLog;
+        require Log::ger::Plugin;
+        Log::ger::Plugin->set(MultilevelLog => (sub_name => 'logger'));
         require Log::ger;
         Log::ger->import;
     }
@@ -429,7 +436,7 @@ sub _system_or_readpipe_or_run_or_start {
                      ", captured merged: <<" .
                      (defined ${$opts->{capture_merged}} ? ${$opts->{capture_merged}} : ''). ">>" : ""),
             );
-            log_error($msg) if $opts->{log};
+            logger($opts->{fail_log_level}, $msg) if $opts->{log};
             die $msg if $opt_die;
         }
     }
@@ -477,7 +484,7 @@ IPC::System::Options - Perl's system(), readpipe()/qx, IPC::Run's run(), start()
 
 =head1 VERSION
 
-This document describes version 0.338 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2020-08-18.
+This document describes version 0.339 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2021-01-26.
 
 =head1 SYNOPSIS
 
@@ -594,6 +601,12 @@ Temporarily set environment variables.
 
 If set to true, then will log invocation as well as return/result value. Will
 log using L<Log::ger> at the C<trace> level.
+
+=item * fail_log_level => str
+
+When a command fail (and logging is enabled), log the failure message at this
+level. The default is C<error> which is a sensible default but sometimes you
+want to log the failure at different level.
 
 =item * die => bool
 
@@ -838,7 +851,7 @@ Source repository is at L<https://github.com/perlancar/perl-IPC-System-Options>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-System-Options>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-IPC-System-Options/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -860,7 +873,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

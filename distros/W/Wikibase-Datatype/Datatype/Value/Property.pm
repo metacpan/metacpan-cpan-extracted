@@ -7,7 +7,7 @@ use Error::Pure qw(err);
 use Mo qw(build);
 use Wikibase::Datatype::Utils qw(check_property);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 extends 'Wikibase::Datatype::Value';
 
@@ -146,12 +146,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2021
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

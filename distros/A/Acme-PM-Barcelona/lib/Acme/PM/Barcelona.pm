@@ -3,7 +3,7 @@ use strict;
 
 package Acme::PM::Barcelona;
 # ABSTRACT: Talks and projects by Barcelona.pm
-$Acme::PM::Barcelona::VERSION = '0.05';
+$Acme::PM::Barcelona::VERSION = '0.06';
 
 1; # End of Acme::PM::Barcelona
 
@@ -19,7 +19,7 @@ Acme::PM::Barcelona - Talks and projects by Barcelona.pm
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -59,7 +59,7 @@ Alex Muntada <alexm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2009,2016 by Alex Muntada.
+This software is copyright (c) 2009-2021 by Alex Muntada.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,19 +1,12 @@
-# http://perlmonks.org/?node_id=1165399
+# This is a test for the fix of the following bug:
 # https://github.com/benkasminbullock/JSON-Parse/issues/34
 
-use warnings;
-use strict;
-use utf8;
+# There is also a discussion here:
+# http://perlmonks.org/?node_id=1165399
+
 use FindBin '$Bin';
-use Test::More;
-my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
-binmode STDOUT, ":encoding(utf8)";
-binmode STDERR, ":encoding(utf8)";
-use Data::Dumper;
-use JSON::Parse;
+use lib "$Bin";
+use JPT;
 
 my $j = JSON::Parse->new();
 # no complain, no effect:

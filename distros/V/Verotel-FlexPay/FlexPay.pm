@@ -12,7 +12,7 @@ use base 'Exporter';
 
 # WARNING: Use X.X.X format for $VERSION -> see: https://rt.cpan.org/Public/Bug/Display.html?id=119713
 # because 0.20.1 < 0.1 (0.1 is converted to real number)
-our $VERSION = '4.0.1';
+our $VERSION = '4.0.2';
 
 our @EXPORT_OK = qw(
     get_signature
@@ -52,7 +52,7 @@ Verotel dev team
 
 =head1 SUPPORT
 
-Documentation PDF for the library can be found on the Verotel blog (http://blog.verotel.com/downloads/).
+Flexpay documentation can be found on https://controlcenter.verotel.com/flexpay-doc/index.html.
 
 =over 2
 

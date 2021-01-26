@@ -1,3 +1,7 @@
+0.7.2 2021-01-26 12:14:01 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix table query in songs demo app
+
 0.7.1 2020-09-02 17:31:58 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - drop config.json and app.cfg.dist from MANIFEST

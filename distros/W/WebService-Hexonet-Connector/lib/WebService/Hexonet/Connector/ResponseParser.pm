@@ -4,7 +4,7 @@ use 5.030;
 use strict;
 use warnings;
 
-use version 0.9917; our $VERSION = version->declare('v2.10.1');
+use version 0.9917; our $VERSION = version->declare('v2.10.2');
 
 
 sub parse {

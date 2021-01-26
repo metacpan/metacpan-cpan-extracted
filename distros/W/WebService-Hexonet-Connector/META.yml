@@ -39,5 +39,5 @@ requires:
   perl: '5.030000'
   utf8: '0'
   version: '0.9924'
-version: v2.10.1
+version: v2.10.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

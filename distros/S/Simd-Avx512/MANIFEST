@@ -1,0 +1,10 @@
+Build.PL
+CHANGES
+CONTRIBUTING
+lib/Simd/Avx512.pm
+MANIFEST
+README
+README.md
+test.pl
+META.yml
+META.json

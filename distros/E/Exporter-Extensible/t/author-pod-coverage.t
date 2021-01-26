@@ -35,7 +35,7 @@ plan tests => scalar @modules;
 
 my %trustme = (
              'Exporter::Extensible' => [
-                                         qr/^exporter_(config_|apply_global_config|apply_inline_config|export|get_inherited|get_tag|install|setup|uninstall)/
+                                         qr/^exporter_(config_|apply_global_config|apply_inline_config|get_inherited|get_tag|install|setup|uninstall)/
                                        ]
            );
 

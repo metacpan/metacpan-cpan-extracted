@@ -334,6 +334,7 @@ wait(self, maxevents = 1, timeout = undef, sigset = undef)
 		if (RETVAL == -1) {
 			if (errno != EINTR)
 				die_sys("Couldn't wait on epollfd: %s");
+			PERL_ASYNC_CHECK();
 			XSRETURN_EMPTY;
 		}
 		for (i = 0; i < RETVAL; ++i) {

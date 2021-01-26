@@ -17,7 +17,12 @@ ok( eval q{
 	sub _generate_delta { sub { 'd' } }
 	sub _generateArray_epsillon { [ 'e' ] }
 	sub _generateGlob_zeta { open my $fh, '>+', \""; $fh; }
-	our $scalar;
+	our $scalar0;
+	our $scalar1= \"test";
+	our $scalar2= [ 'test' ];
+	our $scalar3= bless {}, "Foo";
+	our $scalar4= sub { 1 };
+	our $scalar5= \sub { 1 };
 	our @array;
 	our %hash;
 	our ($glob, @glob, %glob); sub glob { "glob" };
@@ -31,8 +36,28 @@ my @tests= (
 		{ alpha => Example->can('alpha') }
 	],
 	[ 'export a scalar',
-		['$scalar'],
-		{ '$scalar' => eval '*Example::scalar{SCALAR}' },
+		['$scalar0'],
+		{ '$scalar0' => eval '*Example::scalar0{SCALAR}' },
+	],
+	[ 'export a scalar holding a scalar ref',
+		['$scalar1'],
+		{ '$scalar1' => eval '*Example::scalar1{SCALAR}' },
+	],
+	[ 'export a scalar holding an array ref',
+		['$scalar2'],
+		{ '$scalar2' => eval '*Example::scalar2{SCALAR}' },
+	],
+	[ 'export a scalar holding a blesed object',
+		['$scalar3'],
+		{ '$scalar3' => eval '*Example::scalar3{SCALAR}' },
+	],
+	[ 'export a scalar holding a coderef',
+		['$scalar4'],
+		{ '$scalar4' => eval '*Example::scalar4{SCALAR}' },
+	],
+	[ 'export a scalar holding a coderef-ref',
+		['$scalar5'],
+		{ '$scalar5' => eval '*Example::scalar5{SCALAR}' },
 	],
 	[ 'export a sub',
 		['alpha'],
@@ -57,28 +82,28 @@ my @tests= (
 	],
 	[ 'export a generator',
 		['=delta'],
-		{ delta => \\'_generate_delta' },
+		{ delta => '_generate_delta' },
 	],
 	[ 'export a generator - 2',
-		['delta' => \\'_generate_delta' ],
-		{ delta => \\'_generate_delta' },
+		['=delta' => \'_generate_delta' ],
+		{ delta => '_generate_delta' },
 	],
 	[ 'export an array generator',
 		['=@epsillon'],
-		{ '@epsillon' => \\'_generateArray_epsillon' },
+		{ '@epsillon' => '_generateArray_epsillon' },
 	],
 	[ 'export a typeglob generator',
 		['=*zeta'],
-		{ '*zeta' => \\'_generateGlob_zeta' },
+		{ '*zeta' => '_generateGlob_zeta' },
 	],
 	[ 'export an option',
 		['-gamma'],
-		{ -gamma => [ gamma => 0 ] },
+		{ -gamma => 'gamma' },
 	],
-	[ 'export an option with args',
-		['-alpha(2)','-beta(*)','-delta(?)'],
-		{ -alpha => [ alpha => 2 ], -beta => [ beta => '*' ], -delta => [ delta => '?' ] },
-	],
+	#[ 'export an option with args',
+	#	['-alpha(2)','-beta(*)','-delta(?)'],
+	#	{ -alpha => [ alpha => 2 ], -beta => [ beta => '*' ], -delta => [ delta => '?' ] },
+	#],
 );
 for (@tests) {
 	my ($name, $args, $expected, $expected_tags)= @$_;

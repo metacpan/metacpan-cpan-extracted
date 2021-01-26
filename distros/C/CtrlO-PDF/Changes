@@ -1,6 +1,25 @@
 Revision history for CtrlO::PDF
 
-0.07 Sat Dec 12 2020  UNRELEASED
+0.09 Tue Jan 26 2021
+
+    * Further workdaround for words that are too long, when they don't have
+      any more words after them
+
+0.08 Wed Jan 06 2021
+
+    * remove PDF::API2 as a prerequisite, allowing PDF::Builder to be used
+      (and if absent, look for PDF::API2). The PDFlib option can be used to
+      specify either PDF::API2 or PDF::Builder (the default) as your PDF
+      support library.
+    * PDF::API2 removed as an installation prerequisite (either PDF::API2 or
+      PDF::Builder is needed to run). If neither is installed, Makefile.PL 
+      will install PDF::Builder (easily configured which).
+    * use README.md instead of README, to get formatting
+    * Fix infinite loop if text is too long to fit on one-line. This fix
+      implements a workaround, which removes the word that is too long, carps,
+      and then continues.
+
+0.07 Tue Dec 22 2020
 
     * minor corrections and cleanup to make POD and README consistent
     * make example (POD, README) fully working, save out.pdf file

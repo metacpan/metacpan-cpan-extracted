@@ -1,9 +1,8 @@
-# This is a test for module Json3.
+# These are basic tests for JSON::Parse.
 
-use warnings;
-use strict;
-use Test::More;
-use JSON::Parse 'parse_json';
+use FindBin '$Bin';
+use lib "$Bin";
+use JPT;
 
 # Empty array.
 

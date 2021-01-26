@@ -10,16 +10,16 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Standard and IDD codes for Country identification, with Multilingual support",
   "AUTHOR" => "binary.com <cpan\@binary.com>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.48",
-    "Locale::Codes" => 0,
-    "Locale::Country" => "3.42",
-    "Locale::Country::Multilingual" => 0
+    "ExtUtils::MakeMaker" => "6.48"
   },
   "DISTNAME" => "Locale-Country-Extra",
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Locale::Country::Extra",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Locale::Codes" => "3.66",
+    "Locale::Country::Multilingual" => 0
+  },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.94",
     "Test::NoWarnings" => 0
   },
-  "VERSION" => "1.0.3",
+  "VERSION" => "1.0.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +42,8 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Locale::Codes" => "3.66",
+  "Locale::Country::Multilingual" => 0,
   "Test::CheckDeps" => "0.010",
   "Test::Exception" => 0,
   "Test::More" => "0.94",

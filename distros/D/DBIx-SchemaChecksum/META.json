@@ -40,6 +40,7 @@
             "Data::Dumper" : "0",
             "Digest::SHA1" : "0",
             "File::Find::Rule" : "0",
+            "File::HomeDir" : "0",
             "IO::Prompt::Tiny" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
@@ -70,35 +71,35 @@
    "provides" : {
       "DBIx::SchemaChecksum" : {
          "file" : "lib/DBIx/SchemaChecksum.pm",
-         "version" : "1.103"
+         "version" : "1.104"
       },
       "DBIx::SchemaChecksum::App" : {
          "file" : "lib/DBIx/SchemaChecksum/App.pm",
-         "version" : "1.103"
+         "version" : "1.104"
       },
       "DBIx::SchemaChecksum::App::ApplyChanges" : {
          "file" : "lib/DBIx/SchemaChecksum/App/ApplyChanges.pm",
-         "version" : "1.103"
+         "version" : "1.104"
       },
       "DBIx::SchemaChecksum::App::Checksum" : {
          "file" : "lib/DBIx/SchemaChecksum/App/Checksum.pm",
-         "version" : "1.103"
+         "version" : "1.104"
       },
       "DBIx::SchemaChecksum::App::NewChangesFile" : {
          "file" : "lib/DBIx/SchemaChecksum/App/NewChangesFile.pm",
-         "version" : "1.103"
+         "version" : "1.104"
       },
       "DBIx::SchemaChecksum::App::ShowUpdatePath" : {
          "file" : "lib/DBIx/SchemaChecksum/App/ShowUpdatePath.pm",
-         "version" : "1.103"
+         "version" : "1.104"
       },
       "DBIx::SchemaChecksum::Driver::Pg" : {
          "file" : "lib/DBIx/SchemaChecksum/Driver/Pg.pm",
-         "version" : "1.103"
+         "version" : "1.104"
       },
       "DBIx::SchemaChecksum::Driver::SQLite" : {
          "file" : "lib/DBIx/SchemaChecksum/Driver/SQLite.pm",
-         "version" : "1.103"
+         "version" : "1.104"
       }
    },
    "release_status" : "stable",
@@ -113,7 +114,7 @@
          "web" : "https://github.com/domm/DBIx-SchemaChecksum"
       }
    },
-   "version" : "1.103",
+   "version" : "1.104",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

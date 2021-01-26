@@ -195,22 +195,6 @@ fi
 
 % }
 
-if test "$mod_ok" = "0"; then
-    cat <<NOTES
-
-** SOME PERL MODULES ARE MISSING ******************************
-
-If you know where perl can find the missing modules, set
-the PERL5LIB environment variable accordingly. Otherwise
-just proceed and the missing modules will be installed
-automatically.
-
-To force the system to download missing perl modules, you can
-do a `touch PERL_MODULES` before running `$GMAKE`
-NOTES
-
-fi
-
 cat <<NOTES
 
 ** CONFIGURE DONE **********************************************

@@ -4,6 +4,7 @@ NAME
 SYNOPSIS
      use Mock::Person::DE qw(first_male first_female last_male last_female
              middle_male middle_female name);
+
      my $first_male = first_male();
      my $first_female = first_female();
      my $last_male = last_male();
@@ -63,11 +64,9 @@ VARIABLES
              Default value is 'three'.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Mock::Person::DE qw(name);
 
@@ -78,11 +77,9 @@ EXAMPLE1
      # Cedric Nick Baumann
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Mock::Person::DE;
 
@@ -202,17 +199,18 @@ SEE ALSO
         Install the Mock::Person modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Mock-Person-DE>
+    <https://github.com/michal-josef-spacek/Mock-Person-DE>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2013-2015
-     BSD 2-Clause License
+    © Michal Josef Špaček 2013-2021
+
+    BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

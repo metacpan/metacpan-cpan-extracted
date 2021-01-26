@@ -1,9 +1,9 @@
 package Sah::PSchema::perl::modname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-01-26'; # DATE
 our $DIST = 'Sah-PSchemas-Perl'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -46,7 +46,7 @@ Sah::PSchema::perl::modname - Perl module name (parameterized)
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::PSchema::perl::modname (from Perl distribution Sah-PSchemas-Perl), released on 2021-01-20.
+This document describes version 0.005 of Sah::PSchema::perl::modname (from Perl distribution Sah-PSchemas-Perl), released on 2021-01-26.
 
 =head1 DESCRIPTION
 

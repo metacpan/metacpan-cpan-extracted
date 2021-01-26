@@ -1,3 +1,5 @@
+use v5.10;
+
 package Module::Release::Git;
 
 use strict;
@@ -9,8 +11,7 @@ our @EXPORT = qw(
 	get_recent_contributors
 	);
 
-use vars qw($VERSION);
-$VERSION = '1.014';
+our $VERSION = '1.015';
 
 =encoding utf8
 
@@ -48,13 +49,13 @@ sub check_vcs {
 
 	$self->_print( "Checking state of Git... " );
 
-	my $git_status = $self->run('git status 2>&1');
+	my $git_status = $self->run('git status -s 2>&1');
 
 	no warnings 'uninitialized';
 
-	my( $branch ) = $git_status =~ /On branch (\w+)/;
+	my( $branch ) = $self->run('git rev-parse --abbrev-ref HEAD');
 
-	my $up_to_date = $git_status =~ /working (directory|tree) clean/m;
+	my $up_to_date = ($git_status eq '');
 
 	$self->_die( "\nERROR: Git is not up-to-date: Can't release files\n\n$git_status\n" )
 		unless $up_to_date;
@@ -168,7 +169,8 @@ sub get_recent_contributors {
 	my $self = shift;
 
 	chomp( my $last_tagged_commit    = $self->run("git rev-list --tags --max-count=1") );
-	chomp( my @commits_from_last_tag = $self->run("git rev-list $last_tagged_commit..HEAD") );
+	chomp( my @commits_from_last_tag = split /\R/, $self->run("git rev-list $last_tagged_commit..HEAD") );
+
 	my @authors_since_last_tag =
 		map { qx{git show --no-patch --pretty=format:'%an <%ae>' $_} }
 		@commits_from_last_tag;
@@ -206,7 +208,7 @@ brian d foy, <bdfoy@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the same terms as the Artistic License 2.0.
 

@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/GitHubUtils/git_clone_from_github
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-27'; # DATE
+our $DATE = '2020-12-24'; # DATE
 our $DIST = 'App-GitHubUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,7 +41,7 @@ git-clone-from-github - git clone, with some conveniences
 
 =head1 VERSION
 
-This document describes version 0.005 of git-clone-from-github (from Perl distribution App-GitHubUtils), released on 2020-04-27.
+This document describes version 0.006 of git-clone-from-github (from Perl distribution App-GitHubUtils), released on 2020-12-24.
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,8 @@ Usage:
      [--log-level=level] [--(no)naked-res] [--no-config | -C] [--no-env]
      [--page-result[=program]] [--prefixes-json=s] [--prefixes=s+]
      [--quiet] [--suffixes-json=s] [--suffixes=s+] [--trace]
-     [--users-json=s] [--users=s+] [--verbose] <name>
+     [--users-json=s] [--users=s+] [--verbose] [--view-result[=program]]
+     <name>
 
 =head1 DESCRIPTION
 
@@ -216,6 +217,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
 Filter output through a pager.
 
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Other options
@@ -280,7 +285,22 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
 
 List of available configuration parameters:
 
@@ -316,7 +336,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-GitHubUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitHubUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-GitHubUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

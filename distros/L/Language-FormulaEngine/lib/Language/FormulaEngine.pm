@@ -5,7 +5,7 @@ use Try::Tiny;
 use Module::Runtime 'require_module';
 
 # ABSTRACT: Parser/Interpreter/Compiler for simple spreadsheet formula language
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 has parser => (
@@ -34,11 +34,13 @@ sub _coerce_instance {
 	my ($thing, $req_method, $default_class)= @_;
 	return $thing if ref $thing and ref($thing)->can($req_method);
 	
-	my $class= !(defined $thing || ref $thing)? $default_class
+	my $class= !defined $thing? $default_class
+		: ref $thing eq 'HASH'? $thing->{CLASS} || $default_class
+		: ref $thing? $default_class
 		: ($req_method eq 'get_function' && $thing =~ /^[0-9]+$/)? "Language::FormulaEngine::Namespace::Default::V$thing"
 		: $thing;
 	require_module($class)
-		unless $class->can('new');
+		unless $class->can($req_method);
 	
 	my @args= !ref $thing? ()
 		: (ref $thing eq 'ARRAY')? @$thing
@@ -81,7 +83,7 @@ Language::FormulaEngine - Parser/Interpreter/Compiler for simple spreadsheet for
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -292,7 +294,7 @@ Michael Conrad <mconrad@intellitree.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2021 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

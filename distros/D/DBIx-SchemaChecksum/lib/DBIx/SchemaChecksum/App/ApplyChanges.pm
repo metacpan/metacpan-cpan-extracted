@@ -1,7 +1,7 @@
 package DBIx::SchemaChecksum::App::ApplyChanges;
 
 # ABSTRACT: Apply changes based on current checksum
-our $VERSION = '1.103'; # VERSION
+our $VERSION = '1.104'; # VERSION
 
 use 5.010;
 
@@ -162,7 +162,7 @@ DBIx::SchemaChecksum::App::ApplyChanges - Apply changes based on current checksu
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 DESCRIPTION
 

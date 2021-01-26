@@ -65,7 +65,7 @@
 \B\.prove$
 
 # Avoid MYMETA files
-^MYMETA\.
+MYMETA\.json\.lock
 
 #########################################################################
 # My own additions                                                      #

@@ -1,7 +1,6 @@
-use warnings;
-use strict;
-use Test::More tests => 2;
-use JSON::Parse qw/valid_json json_to_perl/;
+use FindBin '$Bin';
+use lib "$Bin";
+use JPT;
 my $json = <<EOF;
 {
    "timed_out" : false,
@@ -13,3 +12,4 @@ eval {
     json_to_perl ($json);
 };
 ok (! $@, "No errors parsing JSON");
+done_testing ();

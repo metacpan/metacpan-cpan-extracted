@@ -1,7 +1,7 @@
 package DBIx::SchemaChecksum::Driver::SQLite;
 
 # ABSTRACT: SQLite driver for DBIx::SchemaChecksum
-our $VERSION = '1.103'; # VERSION
+our $VERSION = '1.104'; # VERSION
 
 use utf8;
 use namespace::autoclean;
@@ -33,7 +33,7 @@ DBIx::SchemaChecksum::Driver::SQLite - SQLite driver for DBIx::SchemaChecksum
 
 =head1 VERSION
 
-version 1.103
+version 1.104
 
 =head1 DESCRIPTION
 

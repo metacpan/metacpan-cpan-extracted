@@ -8,19 +8,9 @@
 # ** Deletion of user-defined booleans
 # * Detect hash collisions
 
-use warnings;
-use strict;
-use utf8;
 use FindBin '$Bin';
-use Test::More;
-my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
-binmode STDOUT, ":encoding(utf8)";
-binmode STDERR, ":encoding(utf8)";
-
-use JSON::Parse;
+use lib "$Bin";
+use JPT;
 
 #   ____                    _ _ _                 _     
 #  / ___|___  _ __  _   _  | (_) |_ ___ _ __ __ _| |___ 

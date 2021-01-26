@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Mock::Person::DE qw(middle_female);
 use List::MoreUtils qw(any);
 use Test::More 'tests' => 3;
