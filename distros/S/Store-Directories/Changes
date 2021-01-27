@@ -1,5 +1,7 @@
 Revision history for Store-Directories
 
+0.4.2   January 26, 2021
+        - Test for proper OS in Build.PL
 0.4.1   January 22, 2021
         - Fix Devel::GlobalDestruction not being declared in Build.PL
 0.4     January 21, 2021

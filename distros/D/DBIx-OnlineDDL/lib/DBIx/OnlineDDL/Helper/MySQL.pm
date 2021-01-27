@@ -3,7 +3,7 @@ package DBIx::OnlineDDL::Helper::MySQL;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for MySQL-specific code
 use version;
-our $VERSION = 'v0.930.0'; # VERSION
+our $VERSION = 'v0.930.1'; # VERSION
 
 use v5.10;
 use Moo;
@@ -139,8 +139,12 @@ sub rename_fks_in_table_sql {
         my $new_fk_name = $self->find_new_identifier(
             "_${fk_name}" => set_subname '_fk_name_finder', sub {
                 $_[0]->selectrow_array(
-                    'SELECT table_name FROM information_schema.key_column_usage WHERE constraint_schema = DATABASE() AND constraint_name = ?',
-                    undef, $_[1]
+                    'SELECT table_name FROM information_schema.key_column_usage WHERE '.join(' AND ',
+                        'constraint_schema = DATABASE()',
+                        'constraint_name = ?',
+                        # This is required for MySQL 5 server table cache optimization in the EXPLAIN plan
+                        'table_schema = DATABASE()',
+                    ), undef, $_[1]
                 );
             },
         );
@@ -200,6 +204,88 @@ sub swap_tables {
     );
 }
 
+### NOTE: The typical SQL in DBD::mysql is badly optimized for MySQL 5 and very large sets
+### of databases/table/column combos.  Furthermore, the kludgy join to TABLE_CONSTRAINTS
+### is entirely unnecessary.  See also: https://github.com/perl5-dbi/DBD-mysql/issues/326
+sub foreign_key_info {
+    my $self   = shift;
+    my $dbh    = $self->dbh;
+    my ($mver) = ($dbh->get_info($GetInfoType{SQL_DBMS_VER}) =~ /(\d+)\./);
+
+    # MySQL 8's information_schema implementation isn't a complete dumpster fire of
+    # in-memory jank, and totes won't send your precious DB server into a horrible
+    # OOM death.  So, skip this noise in that case.
+    #
+    # More info: https://mysqlserverteam.com/mysql-8-0-improvements-to-information_schema/
+    return $dbh->foreign_key_info(@_) if $mver >= 8;
+    return if $mver < 5;  # not supported by OnlineDDL, anyway
+
+    my (
+        $pk_catalog, $pk_schema, $pk_table,
+        $fk_catalog, $fk_schema, $fk_table,
+    ) = @_;
+
+    my $sql = <<'EOF';
+SELECT
+   NULL AS PKTABLE_CAT,
+   REFERENCED_TABLE_SCHEMA AS PKTABLE_SCHEM,
+   REFERENCED_TABLE_NAME AS PKTABLE_NAME,
+   REFERENCED_COLUMN_NAME AS PKCOLUMN_NAME,
+   TABLE_CATALOG AS FKTABLE_CAT,
+   TABLE_SCHEMA AS FKTABLE_SCHEM,
+   TABLE_NAME AS FKTABLE_NAME,
+   COLUMN_NAME AS FKCOLUMN_NAME,
+   ORDINAL_POSITION AS KEY_SEQ,
+   NULL AS UPDATE_RULE,
+   NULL AS DELETE_RULE,
+   CONSTRAINT_NAME AS FK_NAME,
+   NULL AS PK_NAME,
+   NULL AS DEFERABILITY,
+   NULL AS UNIQUE_OR_PRIMARY
+FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+EOF
+
+    ### XXX: This breaks OnlineDDL's re-applying of cross-database FKs in foreign child
+    ### tables.  But, without this fix, MySQL has to scan all databases to find them.
+    ### Again, this is no longer a problem with MySQL 8.
+    $fk_schema //= $pk_schema;
+
+    my @where;
+    my @bind;
+
+    if (defined $pk_schema) {
+        push @where, 'REFERENCED_TABLE_SCHEMA = ?';
+        push @bind, $pk_schema;
+    }
+
+    if (defined $pk_table) {
+        push @where, 'REFERENCED_TABLE_NAME = ?';
+        push @bind, $pk_table;
+    }
+
+    if (defined $fk_schema) {
+        push @where, 'TABLE_SCHEMA = ?';
+        push @bind,  $fk_schema;
+    }
+
+    if (defined $fk_table) {
+        push @where, 'TABLE_NAME = ?';
+        push @bind,  $fk_table;
+    }
+
+    if (@where) {
+        $sql .= "\nWHERE ";
+        $sql .= join ' AND ', @where;
+    }
+    $sql .= "\nORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION";
+
+    local $dbh->{FetchHashKeyName} = 'NAME_uc';
+    my $sth = $dbh->prepare($sql);
+    $sth->execute(@bind);
+
+    return $sth;
+}
+
 # MySQL uses 'FOREIGN KEY' on DROPs, for some reason
 around 'remove_fks_from_child_tables_stmts' => sub {
     my $orig  = shift;
@@ -231,7 +317,7 @@ DBIx::OnlineDDL::Helper::MySQL - Private OnlineDDL helper for MySQL-specific cod
 
 =head1 VERSION
 
-version v0.930.0
+version v0.930.1
 
 =head1 DESCRIPTION
 

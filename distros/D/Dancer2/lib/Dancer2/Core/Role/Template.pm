@@ -1,7 +1,7 @@
 # ABSTRACT: Role for template engines
 
 package Dancer2::Core::Role::Template;
-$Dancer2::Core::Role::Template::VERSION = '0.300004';
+$Dancer2::Core::Role::Template::VERSION = '0.300005';
 use Dancer2::Core::Types;
 use Dancer2::FileUtils 'path';
 use Carp 'croak';
@@ -237,7 +237,7 @@ Dancer2::Core::Role::Template - Role for template engines
 
 =head1 VERSION
 
-version 0.300004
+version 0.300005
 
 =head1 DESCRIPTION
 
@@ -353,13 +353,15 @@ Render the layout with the applied tokens
 
 =head2 process($view, \%tokens, \%options)
 
+=head2 template($view, \%tokens, \%options)
+
 =head1 AUTHOR
 
 Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexis Sukrieh.
+This software is copyright (c) 2021 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

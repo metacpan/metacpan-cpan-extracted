@@ -1,3 +1,11 @@
+0.07 2021-01-27T19:29:14+01:00
+ - Fix bugtracker.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rewrite doc to use =head2 in METHODS section.
+ - Update author github username.
+ - Update copyright years.
+
 0.06 2018-02-07T07:46:51+01:00
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
 

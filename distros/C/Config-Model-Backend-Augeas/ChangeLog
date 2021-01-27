@@ -1,3 +1,9 @@
+2018-02-26  Dominique Dumont  <domi.dumont@free.fr> v0.125
+
+  * fix wiki url
+  * remove mentions of sourceforge mailing list
+  * use init_test during tests (require Config::Model::Tester 3.006)
+
 2018-02-26  Dominique Dumont  <domi.dumont@free.fr> v0.124
 
     * Handle backend parameter based on Path::Tiny that were

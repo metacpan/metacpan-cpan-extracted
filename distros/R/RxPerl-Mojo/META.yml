@@ -26,17 +26,17 @@ no_index:
 provides:
   RxPerl::Mojo:
     file: lib/RxPerl/Mojo.pm
-    version: v6.0.0
+    version: v6.0.1
 requires:
   Mojo::IOLoop: '0'
-  RxPerl: v0.28.0
+  RxPerl: v6.0.0
   Sub::Util: '1.41'
   perl: '5.010'
 resources:
   bugtracker: https://gitlab.com/karjala/rxperl-mojo-for-perl/issues
   homepage: https://gitlab.com/karjala/rxperl-mojo-for-perl
   repository: git://gitlab.com/karjala/rxperl-mojo-for-perl.git
-version: v6.0.0
+version: v6.0.1
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

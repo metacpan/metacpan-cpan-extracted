@@ -3,31 +3,44 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Struct::Value::Property qw(struct2obj);
+use Wikibase::Datatype::Struct::Value::Time qw(struct2obj);
 
-# Property structure.
+# Time structure.
 my $struct_hr = {
-        'type' => 'wikibase-entityid',
+        'type' => 'time',
         'value' => {
-                'entity-type' => 'property',
-                'id' => 'P123',
-                'numeric-id' => 123,
+                'after' => 0,
+                'before' => 0,
+                'calendarmodel' => 'http://test.wikidata.org/entity/Q1985727',
+                'precision' => 10,
+                'time' => '+2020-09-01T00:00:00Z',
+                'timezone' => 0,
         },
 };
 
 # Get object.
 my $obj = struct2obj($struct_hr);
 
-# Get value.
-my $value = $obj->value;
+# Get calendar model.
+my $calendarmodel = $obj->calendarmodel;
+
+# Get precision.
+my $precision = $obj->precision;
 
 # Get type.
 my $type = $obj->type;
 
+# Get value.
+my $value = $obj->value;
+
 # Print out.
+print "Calendar model: $calendarmodel\n";
+print "Precision: $precision\n";
 print "Type: $type\n";
 print "Value: $value\n";
 
 # Output:
-# Type: property
-# Value: P123
+# Calendar model: Q1985727
+# Precision: 10
+# Type: time
+# Value: +2020-09-01T00:00:00Z

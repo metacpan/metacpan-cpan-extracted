@@ -31,7 +31,10 @@ $html->parse($data);
 $html->eof;
 my %commands_by_group;
 my @commands;
-my %key_finder;
+my %key_finder = (
+    PUBLISH => 1,
+    SUBSCRIBE => 1,
+);
 for my $cmd ($html->look_down(_tag => 'span', class => 'command')) {
     my ($txt) = $cmd->parent->attr('href') =~ m{/commands/([\w-]+)$} or die "failed on " . $cmd->as_text;
     $txt =~ tr/-/_/;
@@ -55,6 +58,9 @@ for my $cmd ($html->look_down(_tag => 'span', class => 'command')) {
     $info->{summary} =~ s{\.$}{};
     $log->debugf("Adding command %s", $info);
 }
+
+# This one's more complicated... so we assign manually for now
+$key_finder{XGROUP} = 2;
 
 for my $group (sort keys %commands_by_group) {
     $log->infof('%s', $group);

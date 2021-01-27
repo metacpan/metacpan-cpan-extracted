@@ -102,7 +102,7 @@ sub are_po_files_empty {
         close $fh;
 
         # join multi-line entries
-        $text =~ s/"\n"//sg;
+        $text =~ s/"\r?\n"//sg;
 
         if ($text =~ m/msgid "[^"]/s) {
             $empty = undef;

@@ -48,6 +48,11 @@ WriteMakefile(
           'Pod::Markdown' => 0,
         },
       },
+      runtime => {
+        suggests => {
+          'Text::CSV_XS' => 0,
+        },
+      },
       test => {
         recommends => {
           'App::Prove' => '3.00', # prove -j4

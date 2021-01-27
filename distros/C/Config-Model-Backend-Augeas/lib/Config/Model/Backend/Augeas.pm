@@ -33,11 +33,9 @@ my $has_augeas = 1;
 eval { require Config::Augeas; };
 $has_augeas = 0 if $@;
 
-our $VERSION = '0.124';
+our $VERSION = '0.125';
 
 my $logger = get_logger('Backend::Augeas');
-
-sub suffix { return ''; }
 
 =head1 NAME
 
@@ -754,15 +752,15 @@ http://augeas.net/ : Augeas project page
 
 =item *
 
-L<Config::Model> 
+config-model wiki: L<http://github.com/dod38fr/config-model/wiki>
+
+=item *
+
+Blogs about this project: L<https://ddumont.wordpress.com/category/perl/configmodel/>
 
 =item *
 
 Augeas mailing list: http://augeas.net/developers.html
-
-=item *
-
-Config::Model mailing list : http://sourceforge.net/mail/?group_id=155650
 
 =back
 

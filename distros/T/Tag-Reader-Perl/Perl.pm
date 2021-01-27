@@ -1,10 +1,8 @@
 package Tag::Reader::Perl;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Readonly;
@@ -12,8 +10,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # Constructor.
 sub new {
@@ -388,6 +385,7 @@ __END__
 =head1 SYNOPSIS
 
  use Tags::Reader::Perl;
+
  my $obj = Tags::Reader::Perl->new;
  my @tokens = $obj->gettoken;
  $obj->set_file($file, $force);
@@ -395,31 +393,42 @@ __END__
 
 =head1 METHODS
 
-=over 8
+=head2 C<new()>
 
-=item C<new()>
+ my $obj = Tags::Reader::Perl->new;
 
- Constructor.
+Constructor.
 
-=item C<gettoken()>
+Returns instance of object.
 
- Get parsed token.
- Returns structure defining parsed token in array context. See TOKEN STRUCTURE
- e.g. <xml> → ('<xml>', 'xml', 1, 1)
- Returns parsed token in scalar mode.
- e.g. <xml> → '<xml>'
+=head2 C<gettoken>
 
-=item C<set_file($file[, $force])>
+ my @tokens = $obj->gettoken;
 
- Set file for parsing.
- If $force present, reset file for parsing if exists previous text or file.
+Get parsed token.
 
-=item C<set_text($text[, $force])>
+Returns structure defining parsed token in array context. See TOKEN STRUCTURE
+e.g. <xml> → ('<xml>', 'xml', 1, 1)
 
- Set text for parsing.
- if $force present, reset text for parsing if exists previous text or file.
+Returns parsed token in scalar mode. e.g. <xml> → '<xml>'
 
-=back
+=head2 C<set_file>
+
+ $obj->set_file($file, $force);
+
+Set file for parsing.
+If $force present, reset file for parsing if exists previous text or file.
+
+Returns undef.
+
+=head2 C<set_text>
+
+ $obj->set_text($text, $force);
+
+Set text for parsing.
+if $force present, reset text for parsing if exists previous text or file.
+
+Returns undef.
 
 =head1 TOKEN STRUCTURE
 
@@ -461,13 +470,11 @@ __END__
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
- use Encode qw(decode_utf8 encode_utf8);
  use Tag::Reader::Perl;
+ use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
  # Object.
  my $obj = Tag::Reader::Perl->new;
@@ -633,19 +640,24 @@ Perl extension module for reading html/sgml/xml files by tags.
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/Tag-Reader-Perl>
+
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2005-2016
- BSD 2-Clause License
+© Michal Josef Špaček 2005-2021
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

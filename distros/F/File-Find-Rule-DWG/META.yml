@@ -24,12 +24,12 @@ no_index:
     - t
     - xt
 requires:
-  CAD::AutoCAD::Detect: 0
+  CAD::AutoCAD::Detect: 0.02
   File::Find::Rule: 0
   perl: 5.6.2
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-Rule-DWG
+  bugtracker: https://github.com/michal-josef-spacek/File-Find-Rule-DWG/issues
   homepage: https://github.com/michal-josef-spacek/File-Find-Rule-DWG
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/File-Find-Rule-DWG
-version: '0.02'
+version: '0.03'

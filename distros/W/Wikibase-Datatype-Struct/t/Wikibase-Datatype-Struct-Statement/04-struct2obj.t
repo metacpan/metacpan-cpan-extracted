@@ -1,12 +1,13 @@
 use strict;
 use warnings;
 
-use Test::More 'tests' => 9;
+use Test::More 'tests' => 10;
 use Test::NoWarnings;
 use Wikibase::Datatype::Struct::Statement;
 
 # Test.
 my $struct_hr = {
+	'id' => 'Q123$00C04D2A-49AF-40C2-9930-C551916887E8',
 	'mainsnak' => {
 		'datatype' => 'string',
 		'datavalue' => {
@@ -89,6 +90,7 @@ my $struct_hr = {
 my $ret = Wikibase::Datatype::Struct::Statement::struct2obj($struct_hr);
 isa_ok($ret, 'Wikibase::Datatype::Statement');
 isa_ok($ret->snak, 'Wikibase::Datatype::Snak');
+is($ret->id, 'Q123$00C04D2A-49AF-40C2-9930-C551916887E8', 'Method id().');
 is($ret->rank, 'normal', 'Method rank().');
 is(@{$ret->references}, 1, 'Count of references.');
 is(@{$ret->references->[0]->snaks}, 3, 'Count of snaks in reference.');

@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/CpanelInc/cPanel-PublicAPI/issues
   repository: git://github.com/CpanelInc/cPanel-PublicAPI.git
-version: '2.7'
+version: '2.8'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -9,9 +9,9 @@ use Wikibase::Datatype::Value::Item;
 # Object.
 my $obj = Wikibase::Datatype::MediainfoSnak->new(
         'datavalue' => Wikibase::Datatype::Value::Item->new(
-                'value' => 'Q5',
+                'value' => 'Q14946043',
         ),
-        'property' => 'P31',
+        'property' => 'P275',
 );
 
 # Get value.
@@ -29,6 +29,6 @@ print "Value: $datavalue\n";
 print "Snak type: $snaktype\n";
 
 # Output:
-# Property: P31
-# Value: Q5
+# Property: P275
+# Value: Q14946043
 # Snak type: value

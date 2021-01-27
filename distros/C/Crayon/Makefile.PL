@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'Struct::Match' => '0',
         'Colouring::In' => '0',
+	'Blessed::Merge' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Crayon-*' },

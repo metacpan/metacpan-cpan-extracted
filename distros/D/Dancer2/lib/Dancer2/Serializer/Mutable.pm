@@ -1,9 +1,10 @@
 package Dancer2::Serializer::Mutable;
 # ABSTRACT: Serialize and deserialize content based on HTTP header
-$Dancer2::Serializer::Mutable::VERSION = '0.300004';
+$Dancer2::Serializer::Mutable::VERSION = '0.300005';
 use Moo;
 use Carp 'croak';
 use Encode;
+use Module::Runtime 'require_module';
 with 'Dancer2::Core::Role::Serializer';
 
 use constant DEFAULT_CONTENT_TYPE => 'application/json';
@@ -37,7 +38,9 @@ has mapping => (
             for my $s ( values %$mapping ) {
                 # TODO allow for arguments via the config
                 next if $serializer->{$s};
-                my $serializer_object = ('Dancer2::Serializer::'.$s)->new;
+                my $serializer_class = "Dancer2::Serializer::$s";
+                require_module($serializer_class);
+                my $serializer_object = $serializer_class->new;
                 $serializer->{$s} = {
                     from => sub { shift; $serializer_object->deserialize(@_) },
                     to   => sub { shift; $serializer_object->serialize(@_)   },
@@ -118,7 +121,7 @@ Dancer2::Serializer::Mutable - Serialize and deserialize content based on HTTP h
 
 =head1 VERSION
 
-version 0.300004
+version 0.300005
 
 =head1 SYNOPSIS
 
@@ -238,7 +241,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexis Sukrieh.
+This software is copyright (c) 2021 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

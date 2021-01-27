@@ -1,3 +1,8 @@
+0.07 2021-01-26T21:32:59+01:00
+ - Fix bugtracker.
+ - Rewrite doc to use =head2 in SUBROUTINES section.
+ - Update copyright years.
+
 0.06 2020-03-23T11:18:38+01:00
  - Update author github username.
 

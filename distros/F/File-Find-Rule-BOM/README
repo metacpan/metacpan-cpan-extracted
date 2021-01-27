@@ -135,7 +135,7 @@ DEPENDENCIES
 
 SEE ALSO
     File::Find::Rule
-        Alternative interface to File::Find
+        Alternative interface to File::Find.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/File-Find-Rule-BOM>
@@ -146,10 +146,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2015-2020
+    © Michal Josef Špaček 2015-2021
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

@@ -13,3 +13,4 @@ t/augeas_from_scratch.t
 t/model_extension.t
 t/pod.t
 t/test_model.pl
+t/lib/LoadTest.pm

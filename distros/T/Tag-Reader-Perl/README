@@ -3,29 +3,45 @@ NAME
 
 SYNOPSIS
      use Tags::Reader::Perl;
+
      my $obj = Tags::Reader::Perl->new;
      my @tokens = $obj->gettoken;
      $obj->set_file($file, $force);
      $obj->set_text($text, $force);
 
 METHODS
-    "new()"
-             Constructor.
+  "new()"
+     my $obj = Tags::Reader::Perl->new;
 
-    "gettoken()"
-             Get parsed token.
-             Returns structure defining parsed token in array context. See TOKEN STRUCTURE
-             e.g. <xml> → ('<xml>', 'xml', 1, 1)
-             Returns parsed token in scalar mode.
-             e.g. <xml> → '<xml>'
+    Constructor.
 
-    "set_file($file[, $force])"
-             Set file for parsing.
-             If $force present, reset file for parsing if exists previous text or file.
+    Returns instance of object.
 
-    "set_text($text[, $force])"
-             Set text for parsing.
-             if $force present, reset text for parsing if exists previous text or file.
+  "gettoken"
+     my @tokens = $obj->gettoken;
+
+    Get parsed token.
+
+    Returns structure defining parsed token in array context. See TOKEN
+    STRUCTURE e.g. <xml> → ('<xml>', 'xml', 1, 1)
+
+    Returns parsed token in scalar mode. e.g. <xml> → '<xml>'
+
+  "set_file"
+     $obj->set_file($file, $force);
+
+    Set file for parsing. If $force present, reset file for parsing if
+    exists previous text or file.
+
+    Returns undef.
+
+  "set_text"
+     $obj->set_text($text, $force);
+
+    Set text for parsing. if $force present, reset text for parsing if
+    exists previous text or file.
+
+    Returns undef.
 
 TOKEN STRUCTURE
      Structure contains 4 fields in array:
@@ -64,11 +80,9 @@ ERRORS
              Cannot open file '%s'.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Tag::Reader::Perl;
 
@@ -226,15 +240,19 @@ SEE ALSO
     HTML::TagReader
         Perl extension module for reading html/sgml/xml files by tags.
 
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tag-Reader-Perl>
+
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2005-2016
-     BSD 2-Clause License
+    © Michal Josef Špaček 2005-2021
+
+    BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

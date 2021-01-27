@@ -32,6 +32,7 @@
       "runtime" : {
          "requires" : {
             "Cpanel::JSON::XS" : "4.08",
+            "LWP::Protocol::https" : "6.04",
             "LWP::UserAgent" : "6.05",
             "MARC::File::XML" : "v1.0.5",
             "MARC::Record" : "2",
@@ -55,5 +56,5 @@
          "web" : "https://github.com/folio-org/Net-Z3950-FOLIO"
       }
    },
-   "version" : "1.5"
+   "version" : "1.6"
 }

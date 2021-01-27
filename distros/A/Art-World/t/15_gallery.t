@@ -1,5 +1,4 @@
-use v5.16;
-use Test::More;
+use Test::More tests => 7;
 use Art::World;
 use Faker;
 
@@ -19,10 +18,13 @@ ok $gallery->does('Art::World::Exhibit'), 'Gallery does role Exhibit';
 ok $gallery->exhibition, 'Gallery got an exhibition attribute';
 ok $gallery->owner, 'Gallery got an owner';
 
+$gallery->serve;
+
 #ok $gallery->does('Art::Collectionable');
 can_ok $gallery, 'acquire';
 can_ok $gallery, 'serve';
 can_ok $gallery, 'sale';
+
 
 
 done_testing();

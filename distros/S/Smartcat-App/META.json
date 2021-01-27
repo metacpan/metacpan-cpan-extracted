@@ -96,7 +96,7 @@
          "web" : "https://github.com/smartcatai/smartcat-app-perl"
       }
    },
-   "version" : "0.0.4",
+   "version" : "0.0.5",
    "x_contributors" : [
       "Igor Afanasyev <igor.afanasyev@gmail.com>"
    ],

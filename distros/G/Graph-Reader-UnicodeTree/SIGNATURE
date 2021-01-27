@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,46 +12,50 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 1b55bc2b088cecf81900c5b1a343f097139daeed Changes
-SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
-SHA1 da60ca1b51c76d690ebd559f4e1060bdcf657de1 MANIFEST
-SHA1 bb9e9253e2fca442b3e01346a6a01e7d4c3ca0d9 META.yml
-SHA1 d552ec6f958cb6b921466667af490279b5ad0706 Makefile.PL
-SHA1 93f077ed3625d716cde639e4d4624b50452f4f8b README
-SHA1 2f672e0d7ebd6e4f125dd627492a900ed8c29017 UnicodeTree.pm
-SHA1 0db6c0a890ab8b36805dc0c3f2820a959c5f145b examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 55ca316ecb6e8e16b39cb396027c42f0240b0cd2 t/Graph-Reader-UnicodeTree/01-use.t
-SHA1 c689d15016dd61344f930d44d0c581a8c86d43ed t/Graph-Reader-UnicodeTree/02-version.t
-SHA1 6d1544917669d7859d830aee2b77e1b1108f50a3 t/Graph-Reader-UnicodeTree/03-new.t
-SHA1 be6e44edd56d2650f75625963ca3d1b6938d1917 t/Graph-Reader-UnicodeTree/04-read_graph.t
-SHA1 522714d11e697fbbfc8a5549e178f0d4541ca514 t/data/ex1.pstree
-SHA1 6409db8bbec1fee5b3b4b653b95a16b78bed5c36 t/data/ex2.pstree
-SHA1 3b1fa759f562dbc83601f59532a700b48e8d64bf t/data/ex3.pstree
-SHA1 38149038aa5bfeb946d2c0f75d52e74aed89badf t/data/ex4.pstree
-SHA1 c884c4f755e70e456551aac68e7e874003ef97b1 t/data/ex5.pstree
-SHA1 98f937695047890faa75bbe7ce2bd3c2fc7033c2 xt/Graph-Reader-UnicodeTree/01-pod_coverage.t
-SHA1 4684aa3abf3970bd1a2fd1b498cecfeae8a4e2dc xt/Graph-Reader-UnicodeTree/02-pod.t
+SHA256 4bc6fd9233c472fffbb65b58c1b5d17127e248af5d617445ba9d5e8b666d7392 Changes
+SHA256 82bb78d30f3fc53788670ba77036bf18779b3d7a762a9933166eb9e4f064c94f LICENSE
+SHA256 59301111345e23584bf92ea0c5f0706347e849d91c5db698005db998a9f6c7c1 MANIFEST
+SHA256 401a9113a0693b4c74e59f1747a67d930504ea55dbeba23d157978e2652e4cdc META.yml
+SHA256 6392b090148c8fd98cdbe571977c8feb19ad9fbe33f21ee8061cdb1b5235d0cf Makefile.PL
+SHA256 6564fa0c2d5ddecc954db706902f2fe977af4eb9b85524f1a34901672b994be0 README
+SHA256 55443fdb0c766605d8bb9449a2f3615050fff30f816d5f9ab5b2f6d287b9ce16 UnicodeTree.pm
+SHA256 e422446c7eca750a467a87fe4a40e87878832e3b37e5110e58dc33c86736eea5 examples/ex1.pl
+SHA256 11f2a5b4ce57307ef26d1e67f8eb52c48b2a69a5c9c7343987c2b5a521d206f6 examples/ex2.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 fbce28e58f553e0487949e913272dcbc42a6a0a0a2d83086ba0a41a7d0f6dbab t/Graph-Reader-UnicodeTree/01-use.t
+SHA256 a909995516c1a4f6358bd16cc31a859b6bdbb0387bf302ab6a15159a727b2b5b t/Graph-Reader-UnicodeTree/02-version.t
+SHA256 74f89a7f90ad6d3049f2747e883144e2007550206581f0c70e93a9f964804890 t/Graph-Reader-UnicodeTree/03-new.t
+SHA256 8a25d698c77baecd9622661f563ff6416f2f817aff1325e466aeba4931bba0b9 t/Graph-Reader-UnicodeTree/04-read_graph.t
+SHA256 453989a6ae58ae38fb9acc87e6b03a78a4e1a6f2cd62549d4260cc4a0b43b973 t/data/ex1.pstree
+SHA256 fa754d8e6d0e0c3b7f66c45c3013f0ff8352ed1e8270f1f70ab6933892ece146 t/data/ex2.pstree
+SHA256 9552cddbf1da1ce088070c2dc2784cebd8afe91aa74b4de75720d6a0b1b206bb t/data/ex3.pstree
+SHA256 920af0db6bced3a6ec246ca99b983cc12c61be5288111ca3416f23614f1a7609 t/data/ex4.pstree
+SHA256 2b2995632444f8e31a8e3e2662354ada8020629548c1311d850a40845b54ad5c t/data/ex5.pstree
+SHA256 d2fb5475ae82e5a013088bb9e9f6b211b54ad4b13ad3e615c2e2b7cbb3374a00 xt/Graph-Reader-UnicodeTree/01-pod_coverage.t
+SHA256 90336a9a58e4838b2f2c2dbd30c931502c499476ec167e02a3f3863f7f96354b xt/Graph-Reader-UnicodeTree/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWCX9NAAoJEJe+XXKaIuTlY3gH/1u/66irk8LBYAfDX02MXyiu
-dThAXRaWB+aMm3us1zckDnFL0zM3t11v2OBHlcr2MBsdQVRS7knXu3vem5qIQJ+P
-cQg/2tUv9zQf1lmN6ExISWmAFHfBtGaLImTaYTia46EBVjf9cYKVBKAB7+5TQdWt
-6Izftv7XjUQ2pbW04Mr3JiXQWbC2+/3YXy6psWLIzR922EjS7v9g0dIvksov9xCM
-KcvRL8i4POggnQZAmk6zFhx9y7Vchj1B4nufinHlq0ewimciyv1KrL+WSntS05hu
-GrE4lnwFHiTvsw5KGgZiihmWUwtVnPC6J3VEwV9g9pPxQNU1hxJK6r5MYvzYX5A=
-=7MMU
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmARVZ4ACgkQgmqNLzlX
+aRfSjQv7B4zaV58SCGOhqBBWqNpcyNOlmJDyM4MOEETMaLk8tzd8l6zpH+chnzJ9
+o5lpjFEUPemQqcEgIFZzdRzwgfcIheh8phc2oIKYyFOO+pG32t45A9pwQ6MZAJes
+qpIvIVvqeGOLF6ALSRjhgg7PtLsmOxK6n2y2jKPjxaQ4XqyCSx925Mlnk4atN+vJ
+QSnpqswDYDFSoAw/3d9jCJyJ/SMY/rSb9quKK9DXETQkASVC6pPXV9Ef47bE8IUN
+VlXTq6RnOOA1bySSH09mIJwkz+fWowM5nhGV7c3PP4BsaSC+bYuV5ytnjcGh80qr
+m4bNwog0r/75kfW1GYYn8NkvecWg2bMDaOydURBNB8BE8xIKrenQiMnIspUInuT8
+GCPZxYODpEB0ZOcCguu8q0s+85uELPK9vtYduxaDcqXbs1IOmvB0XGdxJTgJJi5O
+/Pp+TCOuzy8bpxtYgvkBUZzKSaDJd29n26k7Gb+lgmG1vc3+xREt0WaBCeTjF+il
+i1gk9zsY
+=BNea
 -----END PGP SIGNATURE-----

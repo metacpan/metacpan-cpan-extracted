@@ -16,7 +16,7 @@ Readonly::Array our @SNAK_TYPES => qw(
 	value
 );
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 has datavalue => (
 	is => 'ro',
@@ -164,9 +164,9 @@ Returns string.
  # Object.
  my $obj = Wikibase::Datatype::MediainfoSnak->new(
          'datavalue' => Wikibase::Datatype::Value::Item->new(
-                 'value' => 'Q5',
+                 'value' => 'Q14946043',
          ),
-         'property' => 'P31',
+         'property' => 'P275',
  );
 
  # Get value.
@@ -184,8 +184,8 @@ Returns string.
  print "Snak type: $snaktype\n";
 
  # Output:
- # Property: P31
- # Value: Q5
+ # Property: P275
+ # Value: Q14946043
  # Snak type: value
 
 =head1 DEPENDENCIES
@@ -229,6 +229,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

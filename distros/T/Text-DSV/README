@@ -2,6 +2,8 @@ NAME
     Text::DSV - DSV parser and serializer.
 
 SYNOPSIS
+     use Text::DSV;
+
      my $obj = Text::DSV->new;
      my @data_lines = $obj->parse($data);
      my @data_line = $obj->parse_line($line);
@@ -9,31 +11,45 @@ SYNOPSIS
      my $line_string = $obj->serialize_line(@data_line);
 
 METHODS
-    "new"
-             Constructor.
+  "new"
+     my $obj = Text::DSV->new;
 
-    "parse($data)"
-             Parse all data.
-             Returns array of arrays of data.
+    Constructor.
 
-    "parse_line($line)"
-             Parse one line.
-             Returns array of data.
+    Returns instance of object.
 
-    "serialize(@data_lines)"
-             Serialize all data.
-             Returns string.
+  "parse"
+     my @data_lines = $obj->parse($data);
 
-    "serialize_line(@data_line)"
-             Serialize one line.
-             Returns line string.
+    Parse all data.
+
+    Returns array of arrays of data.
+
+  "parse_line"
+     my @data_line = $obj->parse_line($line);
+
+    Parse one line.
+
+    Returns array of data.
+
+  "serialize"
+     my $string = $obj->serialize(@data_lines);
+
+    Serialize all data.
+
+    Returns string.
+
+  "serialize_line"
+     my $line_string = $obj->serialize_line(@data_line);
+
+    Serialize one line.
+
+    Returns line string.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Dumpvalue;
      use Text::DSV;
 
@@ -64,11 +80,9 @@ EXAMPLE1
      #       2  6
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Text::DSV;
 
      # Object.
@@ -89,17 +103,18 @@ SEE ALSO
         comma-separated values manipulator (using XS or PurePerl)
 
 REPOSITORY
-    <https://github.com/tupinek/Text-DSV>
+    <https://github.com/michal-josef-spacek/Text-DSV>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2011-2021 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.10
+    0.11
 

@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use File::Object;
 use Tag::Reader::Perl;
 use Test::More 'tests' => 20;

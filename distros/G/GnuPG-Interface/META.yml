@@ -25,6 +25,7 @@ requires:
   Moo: '0.091011'
   MooX::HandlesVia: '0.001004'
   MooX::late: '0.014'
+  Scalar::Util: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.00'
+version: '1.01'

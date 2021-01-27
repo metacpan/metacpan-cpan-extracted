@@ -4,13 +4,13 @@ use strict;
 use warnings;
 
 use Class::Utils qw(set_params);
-use Encode qw(encode_utf8);
+use Encode qw(decode_utf8 encode_utf8);
 use Error::Pure qw(err);
 use Tag::Reader::Perl;
 use PYX qw(comment end_element char instruction start_element);
 use PYX::Utils qw(decode entity_decode);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -49,6 +49,9 @@ sub parsefile {
 	# Process.
 	while (my ($data, $tag_type, $line, $column)
 		= $self->{'_tag_reader'}->gettoken) {
+
+		# Decode data to internal form.
+		$data = decode_utf8($data);
 
 		# Data.
 		if ($tag_type eq '!data') {
@@ -180,10 +183,10 @@ Returns instance of object.
 
  Output callback, which prints output PYX code.
  Default value is subroutine:
-   my (@data) = @_;
-   print join "\n", map { encode_utf8($_) } @data;
-   print "\n";
-   return;
+         my (@data) = @_;
+         print join "\n", map { encode_utf8($_) } @data;
+         print "\n";
+         return;
 
 =back
 
@@ -273,12 +276,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2015-2020
+© Michal Josef Špaček 2015-2021
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

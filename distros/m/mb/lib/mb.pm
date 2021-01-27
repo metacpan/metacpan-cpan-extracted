@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.19';
+$VERSION = '0.20';
 $VERSION = $VERSION;
 
 # internal use
@@ -1488,7 +1488,7 @@ sub mb::_chdir {
 #---------------------------------------------------------------------
 # stackable filetest -X -Y -Z for MSWin32
 sub mb::_filetest {
-    my @filetest = @{ shift(@_) };
+    my @filetest = map { /(-[A-Za-z])/g } @{ shift(@_) };
     local $_ = @_ ? shift : (($filetest[-1] eq '-t') ? \*STDIN : $_);
     confess "Too many arguments for filetest @filetest" if @_ and not wantarray;
 
@@ -1726,7 +1726,6 @@ sub detect_system_encoding {
     }
 }
 
-my $term = 0;
 my @here_document_delimiter = ();
 
 #---------------------------------------------------------------------
@@ -1737,7 +1736,6 @@ sub parse {
     # Yes, I studied study yesterday, once again.
     study $_; # acts between perl 5.005 to perl 5.014
 
-    $term = 0;
     @here_document_delimiter = ();
 
     # transpile JPerl script to Perl script
@@ -1748,6 +1746,51 @@ sub parse {
 
     # return octet-oriented Perl script
     return $parsed_script;
+}
+
+#---------------------------------------------------------------------
+# parse ambiguous characters
+sub parse_ambiguous_char {
+    my $parsed = '';
+
+    # Ambiguous characters
+    # --------------------------------------------------------
+    # Character   Operator          Term
+    # --------------------------------------------------------
+    # %           modulo            %hash
+    # &           &, &&             &subroutine
+    # '           package           'string'
+    # *           multiplication    *typeglob
+    # +           addition          unary plus
+    # -           subtraction       unary minus
+    # .           concatenation     .3333
+    # /           division          /pattern/
+    # <           less than         <>, <HANDLE>, <fileglob>
+    # <<          left shift        <<HERE, <<~HERE, <<>>
+    # ?           ?:                ?pattern?
+    # --------------------------------------------------------
+
+    # any term then operator
+    # "\x25" [%] PERCENT SIGN (U+0025)
+    # "\x26" [&] AMPERSAND (U+0026)
+    # "\x2A" [*] ASTERISK (U+002A)
+    # "\x2E" [.] FULL STOP (U+002E)
+    # "\x2F" [/] SOLIDUS (U+002F)
+    # "\x3C" [<] LESS-THAN SIGN (U+003C)
+    # "\x3F" [?] QUESTION MARK (U+003F)
+    if (/\G ( \s* (?:
+        %=     | %    |
+        &&=    | &&   | &\.= | &\. | &= | & |
+        \*\*=  | \*\* | \*=  | \*  |
+        \.\.\. | \.\. | \.=  | \.  |
+        \/\/=  | \/\/ | \/=  | \/  |
+        <=>    | <<   | <=   | <   |
+        \?
+    )) /xmsgc) {
+        $parsed .= $1;
+    }
+
+    return $parsed;
 }
 
 #---------------------------------------------------------------------
@@ -1765,7 +1808,7 @@ sub parse_expr {
         $parsed .= $1;
     }
 
-    # \r\n, \r, \n
+    # "\r\n", "\r", "\n"
     elsif (/\G (?= $R ) /xmsgc) {
         while (my $here_document_delimiter = shift @here_document_delimiter) {
             my($delimiter, $quote_type) = @{$here_document_delimiter};
@@ -1791,7 +1834,7 @@ sub parse_expr {
         }
     }
 
-    # \t
+    # "\t"
     # "\x20" [ ] SPACE (U+0020)
     elsif (/\G ( [\t ]+ ) /xmsgc) {
         $parsed .= $1;
@@ -1800,19 +1843,18 @@ sub parse_expr {
     # "\x3B" [;] SEMICOLON (U+003B)
     elsif (/\G ( ; ) /xmsgc) {
         $parsed .= $1;
-        $term = 0;
     }
 
-    # balanced bracket
+    # balanced brackets
     # "\x28" [(] LEFT PARENTHESIS (U+0028)
     # "\x7B" [{] LEFT CURLY BRACKET (U+007B)
     # "\x5B" [[] LEFT SQUARE BRACKET (U+005B)
     elsif (/\G ( [(\{\[] ) /xmsgc) {
         $parsed .= parse_expr_balanced($1);
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
-    # number
+    # numbers
     # "\x30" [0] DIGIT ZERO (U+0030)
     # "\x31" [1] DIGIT ONE (U+0031)
     # "\x32" [2] DIGIT TWO (U+0032)
@@ -1831,77 +1873,61 @@ sub parse_expr {
         [1-9] [0-9_]* (?: \.[0-9_]* )? (?: [Ee] [0-9_]+ )?
     ) /xmsgc) {
         $parsed .= $1;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
-    # any term then operator
-    # "\x25" [%] PERCENT SIGN (U+0025)
-    # "\x26" [&] AMPERSAND (U+0026)
-    # "\x2A" [*] ASTERISK (U+002A)
-    # "\x2E" [.] FULL STOP (U+002E)
-    # "\x2F" [/] SOLIDUS (U+002F)
-    # "\x3C" [<] LESS-THAN SIGN (U+003C)
-    # "\x3F" [?] QUESTION MARK (U+003F)
-    elsif ($term and /\G ( %= | % | &&= | && | &\.= | &\. | &= | & | \*\*= | \*\* | \*= | \* | \.\.\. | \.\. | \.= | \. | \/\/= | \/\/ | \/= | \/ | <=> | << | <= | < | \? ) /xmsgc) {
-        $parsed .= $1;
-        $term = 0;
-    }
-
-    # file test operator on MSWin32
+    # file test operators on MSWin32
     # "\x2D" [-] HYPHEN-MINUS (U+002D)
 
     # -X -Y -Z 'file' --> mb::_filetest [qw( -X -Y -Z )], 'file'
     # -X -Y -Z "file" --> mb::_filetest [qw( -X -Y -Z )], "file"
     # -X -Y -Z `file` --> mb::_filetest [qw( -X -Y -Z )], `file`
     # -X -Y -Z $file  --> mb::_filetest [qw( -X -Y -Z )], $file
-    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    #                                           vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv        vvvvvvvvvvvv  vvvvvvvvvvvvvvvvvvvv
-    elsif (/\G ( -[ABCMORSTWXbcdefgkloprstuwxz] (?: \s+ -[ABCMORSTWXbcdefgkloprstuwxz] )* ) (?= (?: \( \s* )* (?: ' | " | ` | \$ ) ) /xmsgc) {
+    # ..., and filetest any word except file handle or directory handle
+    # -X -Y -Z m//    --> mb::_filetest [qw( -X -Y -Z )], m//
+    # -X -Y -Z q//    --> mb::_filetest [qw( -X -Y -Z )], q//
+    # -X -Y -Z qq//   --> mb::_filetest [qw( -X -Y -Z )], qq//
+    # -X -Y -Z qr//   --> mb::_filetest [qw( -X -Y -Z )], qr//
+    # -X -Y -Z qw//   --> mb::_filetest [qw( -X -Y -Z )], qw//
+    # -X -Y -Z qx//   --> mb::_filetest [qw( -X -Y -Z )], qx//
+    # -X -Y -Z s///   --> mb::_filetest [qw( -X -Y -Z )], s///
+    # -X -Y -Z tr///  --> mb::_filetest [qw( -X -Y -Z )], tr///
+    # -X -Y -Z y///   --> mb::_filetest [qw( -X -Y -Z )], y///
+    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    #                                                               vvvvvvvvvvvv  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \s* )+ \b ) (?= (?: \( \s* )* (?: ' | " | ` | \$ | (?: (?: m | q | qq | qr | qw | qx | s | tr | y ) \b )) ) /xmsgc) {
         $parsed .= "mb::_filetest [qw( $1 )], ";
-        $term = 1;
     }
 
-    # -X -Y -Z m//   --> mb::_filetest [qw( -X -Y -Z )], m//
-    # -X -Y -Z q//   --> mb::_filetest [qw( -X -Y -Z )], q//
-    # -X -Y -Z qq//  --> mb::_filetest [qw( -X -Y -Z )], qq//
-    # -X -Y -Z qr//  --> mb::_filetest [qw( -X -Y -Z )], qr//
-    # -X -Y -Z qw//  --> mb::_filetest [qw( -X -Y -Z )], qw//
-    # -X -Y -Z qx//  --> mb::_filetest [qw( -X -Y -Z )], qx//
-    # -X -Y -Z s///  --> mb::_filetest [qw( -X -Y -Z )], s///
-    # -X -Y -Z tr/// --> mb::_filetest [qw( -X -Y -Z )], tr///
-    # -X -Y -Z y///  --> mb::_filetest [qw( -X -Y -Z )], y///
-    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    #            vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv        vvvvvvvvvvvv  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \s+ )+ ) (?= (?: \( \s* )* (?: m | q | qq | qr | qw | qx | s | tr | y ) \b ) /xmsgc) {
-        $parsed .= "mb::_filetest [qw( $1)], ";
-        $term = 1;
-    }
-
+    # filetest file handle or directory handle
     # -X -Y -Z _    --> mb::_filetest [qw( -X -Y -Z )], \*_
     # -X -Y -Z FILE --> mb::_filetest [qw( -X -Y -Z )], \*FILE
-    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    #            vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv    vvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \s+ )+ ) (?= [A-Za-z_][A-Za-z0-9_]* ) /xmsgc) {
+    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    #            vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv       vvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \s* )+ \b ) (?= [A-Za-z_][A-Za-z0-9_]* ) /xmsgc) {
         $parsed .= "mb::_filetest [qw( $1)], ";
         $parsed .= '\\*';
-        $term = 1;
     }
 
     # -X -Y -Z ... --> mb::_filetest [qw( -X -Y -Z )], ...
-    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     #            vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \s+ )+ ) /xmsgc) {
-        $parsed .= "mb::_filetest [qw( $1)], ";
-        $term = 1;
+    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \s* )+ \b ) /xmsgc) {
+        $parsed .= "mb::_filetest [qw( $1)]";
+        if (my $ambiguous_char = parse_ambiguous_char()) {
+            $parsed .= $ambiguous_char;
+        }
+        else {
+            $parsed .= ', ';
+        }
     }
 
     # yada-yada or triple-dot operator
     elsif (/\G ( \.\.\. ) /xmsgc) {
         $parsed .= $1;
-        $term = 0;
     }
 
-    # any operator
+    # any operators
     # "\x21" [!] EXCLAMATION MARK (U+0021)
     # "\x2B" [+] PLUS SIGN (U+002B)
     # "\x2C" [,] COMMA (U+002C)
@@ -1913,7 +1939,6 @@ sub parse_expr {
     # "\x7E" [~] TILDE (U+007E)
     elsif (/\G ( != | !~ | ! | \+\+ | \+= | \+ | , | -- | -= | -> | - | == | => | =~ | = | >> | >= | > | \\ | \^\.= | \^\. | \^= | \^ | (?: and | cmp | eq | ge | gt | isa | le | lt | ne | not | or | x | x= | xor ) \b | \|\|= | \|\| | \|\.= | \|\. | \|= | \| | ~~ | ~\. | ~= | ~ ) /xmsgc) {
         $parsed .= $1;
-        $term = 0;
     }
 
     # $`           --> mb::_PREMATCH()
@@ -1923,7 +1948,7 @@ sub parse_expr {
     # ${^PREMATCH} --> mb::_PREMATCH()
     elsif (/\G (?: \$` | \$\{`\} | \$PREMATCH | \$\{PREMATCH\} | \$\{\^PREMATCH\} ) /xmsgc) {
         $parsed .= 'mb::_PREMATCH()';
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # $&        --> mb::_MATCH()
@@ -1933,7 +1958,7 @@ sub parse_expr {
     # ${^MATCH} --> mb::_MATCH()
     elsif (/\G (?: \$& | \$\{&\} | \$MATCH | \$\{MATCH\} | \$\{\^MATCH\} ) /xmsgc) {
         $parsed .= 'mb::_MATCH()';
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # $1 --> mb::_CAPTURE(1)
@@ -1941,13 +1966,13 @@ sub parse_expr {
     # $3 --> mb::_CAPTURE(3)
     elsif (/\G \$ ([1-9][0-9]*) /xmsgc) {
         $parsed .= "mb::_CAPTURE($1)";
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # @{^CAPTURE} --> mb::_CAPTURE()
     elsif (/\G \@\{\^CAPTURE\} /xmsgc) {
         $parsed .= 'mb::_CAPTURE()';
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # ${^CAPTURE}[0] --> mb::_CAPTURE(1)
@@ -1956,7 +1981,7 @@ sub parse_expr {
     elsif (/\G \$\{\^CAPTURE\} \s* (\[) /xmsgc) {
         my $n_th = quotee_of(parse_expr_balanced($1));
         $parsed .= "mb::_CAPTURE($n_th+1)";
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # @-                   --> mb::_LAST_MATCH_START()
@@ -1965,7 +1990,7 @@ sub parse_expr {
     # @{^LAST_MATCH_START} --> mb::_LAST_MATCH_START()
     elsif (/\G (?: \@- | \@LAST_MATCH_START | \@\{LAST_MATCH_START\} | \@\{\^LAST_MATCH_START\} ) /xmsgc) {
         $parsed .= 'mb::_LAST_MATCH_START()';
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # $-[1]                   --> mb::_LAST_MATCH_START(1)
@@ -1975,7 +2000,7 @@ sub parse_expr {
     elsif (/\G (?: \$- | \$LAST_MATCH_START | \$\{LAST_MATCH_START\} | \$\{\^LAST_MATCH_START\} ) \s* (\[) /xmsgc) {
         my $n_th = quotee_of(parse_expr_balanced($1));
         $parsed .= "mb::_LAST_MATCH_START($n_th)";
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # @+                 --> mb::_LAST_MATCH_END()
@@ -1984,7 +2009,7 @@ sub parse_expr {
     # @{^LAST_MATCH_END} --> mb::_LAST_MATCH_END()
     elsif (/\G (?: \@\+ | \@LAST_MATCH_END | \@\{LAST_MATCH_END\} | \@\{\^LAST_MATCH_END\} ) /xmsgc) {
         $parsed .= 'mb::_LAST_MATCH_END()';
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # $+[1]                 --> mb::_LAST_MATCH_END(1)
@@ -1994,7 +2019,7 @@ sub parse_expr {
     elsif (/\G (?: \$\+ | \$LAST_MATCH_END | \$\{LAST_MATCH_END\} | \$\{\^LAST_MATCH_END\} ) \s* (\[) /xmsgc) {
         my $n_th = quotee_of(parse_expr_balanced($1));
         $parsed .= "mb::_LAST_MATCH_END($n_th)";
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # mb::do { block }   --> do { block }
@@ -2004,7 +2029,7 @@ sub parse_expr {
     elsif (/\G (?: mb:: )? ( (?: do | eval ) \s* ) ( \{ ) /xmsgc) {
         $parsed .= $1;
         $parsed .= parse_expr_balanced($2);
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # $#{}, ${}, @{}, %{}, &{}, *{}, do {}, eval {}, sub {}
@@ -2012,60 +2037,54 @@ sub parse_expr {
     elsif (/\G ((?: \$[#] | [\$\@%&*] | (?:CORE::)? do | (?:CORE::)? eval | sub ) \s* ) ( \{ ) /xmsgc) {
         $parsed .= $1;
         $parsed .= parse_expr_balanced($2);
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # mb::do   --> mb::do
-    # mb::eval --> mb::eval
-    elsif (/\G ( mb:: (?: do | eval ) ) \b /xmsgc) {
+    # CORE::do --> CORE::do
+    # do       --> do
+    elsif (/\G ( (?: mb:: | CORE:: )? do ) \b /xmsgc) {
         $parsed .= $1;
-        $term = 1;
     }
 
-    # CORE::do   --> CORE::do
+    # mb::eval   --> mb::eval
     # CORE::eval --> CORE::eval
-    elsif (/\G ( CORE:: (?: do | eval ) ) \b /xmsgc) {
+    # eval       --> eval
+    elsif (/\G ( (?: mb:: | CORE:: )? eval ) \b /xmsgc) {
         $parsed .= $1;
-        $term = 1;
-    }
-
-    # do   --> do
-    # eval --> eval
-    elsif (/\G ( do | eval ) \b /xmsgc) {
-        $parsed .= $1;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # last index of array
     elsif (/\G ( [\$] [#] (?: [A-Za-z_][A-Za-z_0-9]*(?:(?:'|::)[A-Za-z_][A-Za-z_0-9]*)* ) ) /xmsgc) {
         $parsed .= $1;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # scalar variable
     elsif (/\G (     [\$] [\$]* (?: [A-Za-z_][A-Za-z_0-9]*(?:(?:'|::)[A-Za-z_][A-Za-z_0-9]*)* | ^\{[A-Za-z_][A-Za-z_0-9]*\} | [0-9]+ | [!"#\$%&'()+,\-.\/:;<=>?\@\[\\\]\^_`|~] ) (?: \s* (?: \+\+ | -- ) )? ) /xmsgc) {
         $parsed .= $1;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # array variable
     # "\x40" [@] COMMERCIAL AT (U+0040)
     elsif (/\G (   [\@\$] [\$]* (?: [A-Za-z_][A-Za-z_0-9]*(?:(?:'|::)[A-Za-z_][A-Za-z_0-9]*)* | [_] ) ) /xmsgc) {
         $parsed .= $1;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # hash variable
     elsif (/\G ( [\%\@\$] [\$]* (?: [A-Za-z_][A-Za-z_0-9]*(?:(?:'|::)[A-Za-z_][A-Za-z_0-9]*)* | [!+\-] ) ) /xmsgc) {
         $parsed .= $1;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # user subroutine call
     # type glob
     elsif (/\G (     [&*] [\$]* (?: [A-Za-z_][A-Za-z_0-9]*(?:(?:'|::)[A-Za-z_][A-Za-z_0-9]*)* ) ) /xmsgc) {
         $parsed .= $1;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # comment
@@ -2078,15 +2097,21 @@ sub parse_expr {
 
     # '...'
     # "\x27" ['] APOSTROPHE (U+0027)
-    elsif (m{\G ( ' )    }xmsgc) { $parsed .= parse_q__like_endswith($1); $term = 1; }
+    elsif (m{\G ( ' ) }xmsgc) {
+        $parsed .= parse_q__like_endswith($1);
+        $parsed .= parse_ambiguous_char();
+    }
 
     # "...", `...`
     # "\x22" ["] QUOTATION MARK (U+0022)
     # "\x60" [`] GRAVE ACCENT (U+0060)
-    elsif (m{\G ( ["`] ) }xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
+    elsif (m{\G ( ["`] ) }xmsgc) {
+        $parsed .= parse_qq_like_endswith($1);
+        $parsed .= parse_ambiguous_char();
+    }
 
     # /.../
-    elsif (m{\G ( [/] )  }xmsgc) {
+    elsif (m{\G ( [/] ) }xmsgc) {
         my $regexp = parse_re_endswith('m',$1);
         my($modifier_i, $modifier_not_cegir, $modifier_cegr) = parse_re_modifier();
         if ($modifier_i) {
@@ -2095,11 +2120,11 @@ sub parse_expr {
         else {
             $parsed .= sprintf('m{\\G${mb::_anchor}@{[' .            'qr%s%s ]}@{[mb::_m_passed()]}}%s', $regexp, $modifier_not_cegir, $modifier_cegr);
         }
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # ?...?
-    elsif (m{\G ( [?] )  }xmsgc) {
+    elsif (m{\G ( [?] ) }xmsgc) {
         my $regexp = parse_re_endswith('m',$1);
         my($modifier_i, $modifier_not_cegir, $modifier_cegr) = parse_re_modifier();
         if ($modifier_i) {
@@ -2108,13 +2133,13 @@ sub parse_expr {
         else {
             $parsed .= sprintf('m{\\G${mb::_anchor}@{[' .            'qr%s%s ]}@{[mb::_m_passed()]}}%s', $regexp, $modifier_not_cegir, $modifier_cegr);
         }
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # <<>> double-diamond operator
     elsif (/\G ( <<>> ) /xmsgc) {
         $parsed .= $1;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # <FILE> diamond operator
@@ -2128,73 +2153,76 @@ sub parse_expr {
             $parsed .= escape_qq($1, $close_bracket);
         }
         $parsed .= $close_bracket;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # qw/.../, q/.../
     elsif (/\G ( qw | q ) \b /xmsgc) {
         $parsed .= $1;
-        if    (/\G ( [#] )        /xmsgc) { $parsed .= parse_q__like_endswith($1); $term = 1; }
-        elsif (/\G ( ['] )        /xmsgc) { $parsed .= parse_q__like_endswith($1); $term = 1; }
-        elsif (/\G ( [\(\{\[\<] ) /xmsgc) { $parsed .= parse_q__like_balanced($1); $term = 1; }
-        elsif (m{\G( [/] )        }xmsgc) { $parsed .= parse_q__like_endswith($1); $term = 1; }
-        elsif (/\G ( [\S] )       /xmsgc) { $parsed .= parse_q__like_endswith($1); $term = 1; }
+        if    (/\G ( [#] )        /xmsgc) { $parsed .= parse_q__like_endswith($1); }
+        elsif (/\G ( ['] )        /xmsgc) { $parsed .= parse_q__like_endswith($1); }
+        elsif (/\G ( [\(\{\[\<] ) /xmsgc) { $parsed .= parse_q__like_balanced($1); }
+        elsif (m{\G( [/] )        }xmsgc) { $parsed .= parse_q__like_endswith($1); }
+        elsif (/\G ( [\S] )       /xmsgc) { $parsed .= parse_q__like_endswith($1); }
         elsif (/\G ( \s+ )        /xmsgc) { $parsed .= $1;
             while (/\G ( \s+ | [#] [^\n]* ) /xmsgc) {
                 $parsed .= $1;
             }
-            if    (/\G ( [A-Za-z_0-9] ) /xmsgc) { $parsed .= parse_q__like_endswith($1); $term = 1; }
-            elsif (/\G ( ['] )          /xmsgc) { $parsed .= parse_q__like_endswith($1); $term = 1; }
-            elsif (/\G ( [\(\{\[\<] )   /xmsgc) { $parsed .= parse_q__like_balanced($1); $term = 1; }
-            elsif (m{\G( [/] )          }xmsgc) { $parsed .= parse_q__like_endswith($1); $term = 1; }
-            elsif (/\G ( [\S] )         /xmsgc) { $parsed .= parse_q__like_endswith($1); $term = 1; }
+            if    (/\G ( [A-Za-z_0-9] ) /xmsgc) { $parsed .= parse_q__like_endswith($1); }
+            elsif (/\G ( ['] )          /xmsgc) { $parsed .= parse_q__like_endswith($1); }
+            elsif (/\G ( [\(\{\[\<] )   /xmsgc) { $parsed .= parse_q__like_balanced($1); }
+            elsif (m{\G( [/] )          }xmsgc) { $parsed .= parse_q__like_endswith($1); }
+            elsif (/\G ( [\S] )         /xmsgc) { $parsed .= parse_q__like_endswith($1); }
             else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
         }
         else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
+        $parsed .= parse_ambiguous_char();
     }
 
     # qq/.../
     elsif (/\G ( qq ) \b /xmsgc) {
         $parsed .= $1;
-        if    (/\G ( [#] )        /xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
-        elsif (/\G ( ['] )        /xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; } # qq'...' works as "..."
-        elsif (/\G ( [\(\{\[\<] ) /xmsgc) { $parsed .= parse_qq_like_balanced($1); $term = 1; }
-        elsif (m{\G( [/] )        }xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
-        elsif (/\G ( [\S] )       /xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
+        if    (/\G ( [#] )        /xmsgc) { $parsed .= parse_qq_like_endswith($1); }
+        elsif (/\G ( ['] )        /xmsgc) { $parsed .= parse_qq_like_endswith($1); } # qq'...' works as "..."
+        elsif (/\G ( [\(\{\[\<] ) /xmsgc) { $parsed .= parse_qq_like_balanced($1); }
+        elsif (m{\G( [/] )        }xmsgc) { $parsed .= parse_qq_like_endswith($1); }
+        elsif (/\G ( [\S] )       /xmsgc) { $parsed .= parse_qq_like_endswith($1); }
         elsif (/\G ( \s+ )        /xmsgc) { $parsed .= $1;
             while (/\G ( \s+ | [#] [^\n]* ) /xmsgc) {
                 $parsed .= $1;
             }
-            if    (/\G ( [A-Za-z_0-9] ) /xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
-            elsif (/\G ( ['] )          /xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; } # qq'...' works as "..."
-            elsif (/\G ( [\(\{\[\<] )   /xmsgc) { $parsed .= parse_qq_like_balanced($1); $term = 1; }
-            elsif (m{\G( [/] )          }xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
-            elsif (/\G ( [\S] )         /xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
+            if    (/\G ( [A-Za-z_0-9] ) /xmsgc) { $parsed .= parse_qq_like_endswith($1); }
+            elsif (/\G ( ['] )          /xmsgc) { $parsed .= parse_qq_like_endswith($1); } # qq'...' works as "..."
+            elsif (/\G ( [\(\{\[\<] )   /xmsgc) { $parsed .= parse_qq_like_balanced($1); }
+            elsif (m{\G( [/] )          }xmsgc) { $parsed .= parse_qq_like_endswith($1); }
+            elsif (/\G ( [\S] )         /xmsgc) { $parsed .= parse_qq_like_endswith($1); }
             else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
         }
         else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
+        $parsed .= parse_ambiguous_char();
     }
 
     # qx/.../
     elsif (/\G ( qx ) \b /xmsgc) {
         $parsed .= $1;
-        if    (/\G ( [#] )        /xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
-        elsif (/\G ( ['] )        /xmsgc) { $parsed .= parse_q__like_endswith($1); $term = 1; }
-        elsif (/\G ( [\(\{\[\<] ) /xmsgc) { $parsed .= parse_qq_like_balanced($1); $term = 1; }
-        elsif (m{\G( [/] )        }xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
-        elsif (/\G ( [\S] )       /xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
+        if    (/\G ( [#] )        /xmsgc) { $parsed .= parse_qq_like_endswith($1); }
+        elsif (/\G ( ['] )        /xmsgc) { $parsed .= parse_q__like_endswith($1); }
+        elsif (/\G ( [\(\{\[\<] ) /xmsgc) { $parsed .= parse_qq_like_balanced($1); }
+        elsif (m{\G( [/] )        }xmsgc) { $parsed .= parse_qq_like_endswith($1); }
+        elsif (/\G ( [\S] )       /xmsgc) { $parsed .= parse_qq_like_endswith($1); }
         elsif (/\G ( \s+ )        /xmsgc) { $parsed .= $1;
             while (/\G ( \s+ | [#] [^\n]* ) /xmsgc) {
                 $parsed .= $1;
             }
-            if    (/\G ( [A-Za-z_0-9] ) /xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
-            elsif (/\G ( ['] )          /xmsgc) { $parsed .= parse_q__like_endswith($1); $term = 1; }
-            elsif (/\G ( [\(\{\[\<] )   /xmsgc) { $parsed .= parse_qq_like_balanced($1); $term = 1; }
-            elsif (m{\G( [/] )          }xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
-            elsif (/\G ( [\S] )         /xmsgc) { $parsed .= parse_qq_like_endswith($1); $term = 1; }
+            if    (/\G ( [A-Za-z_0-9] ) /xmsgc) { $parsed .= parse_qq_like_endswith($1); }
+            elsif (/\G ( ['] )          /xmsgc) { $parsed .= parse_q__like_endswith($1); }
+            elsif (/\G ( [\(\{\[\<] )   /xmsgc) { $parsed .= parse_qq_like_balanced($1); }
+            elsif (m{\G( [/] )          }xmsgc) { $parsed .= parse_qq_like_endswith($1); }
+            elsif (/\G ( [\S] )         /xmsgc) { $parsed .= parse_qq_like_endswith($1); }
             else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
         }
         else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
+        $parsed .= parse_ambiguous_char();
     }
 
     # m/.../, qr/.../
@@ -2229,7 +2257,7 @@ sub parse_expr {
         else {
             $parsed .= sprintf('{\\G${mb::_anchor}@{[' .            'qr%s%s ]}@{[mb::_m_passed()]}}%s', $regexp, $modifier_not_cegir, $modifier_cegr);
         }
-        $term = 1; 
+        $parsed .= parse_ambiguous_char();
     }
 
     # 3-quotes
@@ -2330,7 +2358,7 @@ sub parse_expr {
         else {
             $parsed .= sprintf('{(\\G${mb::_anchor})@{[' .            'qr%s%s ]}@{[mb::_s_passed()]}}%s{$1 . %s%s}e%s', $regexp, $modifier_not_cegir, $comment, $eval, $replacement, $modifier_cegr);
         }
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # tr/.../.../, y/.../.../
@@ -2406,27 +2434,36 @@ sub parse_expr {
         else {
             $parsed .= sprintf(q<{(\\G${mb::_anchor})(%s)}%s{$1.mb::tr($2,q%s,q%s,'%sr')}eg>, codepoint_tr($search, $modifier_not_r),  $comment, $search, $replacement, $modifier_not_r);
         }
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # indented here document
-    elsif (/\G ( <<~         ([A-Za-z_][A-Za-z_0-9]*)  ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, ["[\\t ]*$2$R", 'qq']; $term = 1; }
-    elsif (/\G ( <<~       \\([A-Za-z_][A-Za-z_0-9]*)  ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, ["[\\t ]*$2$R", 'q' ]; $term = 1; }
-    elsif (/\G ( <<~ [\t ]* '([A-Za-z_][A-Za-z_0-9]*)' ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, ["[\\t ]*$2$R", 'q' ]; $term = 1; }
-    elsif (/\G ( <<~ [\t ]* "([A-Za-z_][A-Za-z_0-9]*)" ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, ["[\\t ]*$2$R", 'qq']; $term = 1; }
-    elsif (/\G ( <<~ [\t ]* `([A-Za-z_][A-Za-z_0-9]*)` ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, ["[\\t ]*$2$R", 'qq']; $term = 1; }
+    elsif (/\G ( <<~ ) /xmsgc) {
+        $parsed .= $1;
+        if    (/\G (         ([A-Za-z_][A-Za-z_0-9]*)  ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, ["[\\t ]*$2$R", 'qq']; }
+        elsif (/\G (       \\([A-Za-z_][A-Za-z_0-9]*)  ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, ["[\\t ]*$2$R", 'q' ]; }
+        elsif (/\G ( [\t ]* '([A-Za-z_][A-Za-z_0-9]*)' ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, ["[\\t ]*$2$R", 'q' ]; }
+        elsif (/\G ( [\t ]* "([A-Za-z_][A-Za-z_0-9]*)" ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, ["[\\t ]*$2$R", 'qq']; }
+        elsif (/\G ( [\t ]* `([A-Za-z_][A-Za-z_0-9]*)` ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, ["[\\t ]*$2$R", 'qq']; }
+        else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
+        $parsed .= parse_ambiguous_char();
+    }
 
     # here document
-    elsif (/\G ( <<          ([A-Za-z_][A-Za-z_0-9]*)  ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, [       "$2$R", 'qq']; $term = 1; }
-    elsif (/\G ( <<        \\([A-Za-z_][A-Za-z_0-9]*)  ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, [       "$2$R", 'q' ]; $term = 1; }
-    elsif (/\G ( <<  [\t ]* '([A-Za-z_][A-Za-z_0-9]*)' ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, [       "$2$R", 'q' ]; $term = 1; }
-    elsif (/\G ( <<  [\t ]* "([A-Za-z_][A-Za-z_0-9]*)" ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, [       "$2$R", 'qq']; $term = 1; }
-    elsif (/\G ( <<  [\t ]* `([A-Za-z_][A-Za-z_0-9]*)` ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, [       "$2$R", 'qq']; $term = 1; }
+    elsif (/\G ( << ) /xmsgc) {
+        $parsed .= $1;
+        if    (/\G (         ([A-Za-z_][A-Za-z_0-9]*)  ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, [       "$2$R", 'qq']; }
+        elsif (/\G (       \\([A-Za-z_][A-Za-z_0-9]*)  ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, [       "$2$R", 'q' ]; }
+        elsif (/\G ( [\t ]* '([A-Za-z_][A-Za-z_0-9]*)' ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, [       "$2$R", 'q' ]; }
+        elsif (/\G ( [\t ]* "([A-Za-z_][A-Za-z_0-9]*)" ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, [       "$2$R", 'qq']; }
+        elsif (/\G ( [\t ]* `([A-Za-z_][A-Za-z_0-9]*)` ) /xmsgc) { $parsed .= $1; push @here_document_delimiter, [       "$2$R", 'qq']; }
+        else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
+        $parsed .= parse_ambiguous_char();
+    }
 
     # sub subroutine();
     elsif (/\G ( sub \s+ [A-Za-z_][A-Za-z_0-9]*(?:(?:'|::)[A-Za-z_][A-Za-z_0-9]*)* \s* ) /xmsgc) {
         $parsed .= $1;
-        $term = 0;
     }
 
     # while (<<>>)
@@ -2434,7 +2471,6 @@ sub parse_expr {
         $parsed .= $1;
         $parsed .= $2;
         $parsed .= $3;
-        $term = 0;
     }
 
     # while (<${file}>)
@@ -2451,14 +2487,12 @@ sub parse_expr {
         }
         $parsed .= $close_bracket;
         $parsed .= $close_bracket2;
-        $term = 0;
     }
 
     # while <<>>
     elsif (/\G ( while \s* ) ( <<>> ) /xmsgc) {
         $parsed .= $1;
         $parsed .= $2;
-        $term = 0;
     }
 
     # while <${file}>
@@ -2473,7 +2507,6 @@ sub parse_expr {
             $parsed .= escape_qq($1, $close_bracket);
         }
         $parsed .= $close_bracket;
-        $term = 0;
     }
 
     # if     (expr)
@@ -2489,13 +2522,11 @@ sub parse_expr {
         # outputs expr
         my $expr = parse_expr_balanced($2);
         $parsed .= $expr;
-        $term = 0;
     }
 
     # else
     elsif (/\G ( else ) \b /xmsgc) {
         $parsed .= $1;
-        $term = 0;
     }
 
     # ... if     expr;
@@ -2504,7 +2535,6 @@ sub parse_expr {
     # ... until  expr;
     elsif (/\G ( if | unless | while | until ) \b /xmsgc) {
         $parsed .= $1;
-        $term = 0;
     }
 
     # foreach my $var (expr) --> foreach my $var (expr)
@@ -2512,7 +2542,6 @@ sub parse_expr {
     elsif (/\G ( (?: foreach | for ) \s+ my \s* [\$] [A-Za-z_][A-Za-z_0-9]* ) ( \( ) /xmsgc) {
         $parsed .= $1;
         $parsed .= parse_expr_balanced($2);
-        $term = 0;
     }
 
     # foreach $var (expr) --> foreach $var (expr)
@@ -2520,7 +2549,6 @@ sub parse_expr {
     elsif (/\G ( (?: foreach | for ) \s* [\$] [\$]* (?: \{[A-Za-z_][A-Za-z_0-9]*(?:(?:'|::)[A-Za-z_][A-Za-z_0-9]*)*\} | [A-Za-z_][A-Za-z_0-9]*(?:(?:'|::)[A-Za-z_][A-Za-z_0-9]* ) ) ) ( \( ) /xmsgc) {
         $parsed .= $1;
         $parsed .= parse_expr_balanced($2);
-        $term = 0;
     }
 
     # foreach (expr1; expr2; expr3) --> foreach (expr1; expr2; expr3)
@@ -2530,17 +2558,12 @@ sub parse_expr {
     elsif (/\G ( (?: foreach | for ) \s* ) ( \( ) /xmsgc) {
         $parsed .= $1;
         $parsed .= parse_expr_balanced($2);
-        $term = 0;
     }
 
-    # CORE::split --> CORE::split
-    elsif (/\G ( CORE::split ) \b /xmsgc) {
-        $parsed .= $1;
-        $term = 1;
-    }
-
-    # split --> mb::_split by default
-    elsif (/\G (?: mb:: )? ( split ) \b /xmsgc) {
+    # CORE::split --> mb::_split
+    # mb::split   --> mb::_split
+    # split       --> mb::_split
+    elsif (/\G (?: CORE:: | mb:: )? ( split ) \b /xmsgc) {
         $parsed .= "mb::_split";
 
         # parse \s and '('
@@ -2633,19 +2656,19 @@ sub parse_expr {
             }
         }
 
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # provides bare Perl and JPerl compatible functions
     elsif (/\G ( (?: lc | lcfirst | uc | ucfirst ) ) \b /xmsgc) {
         $parsed .= "mb::$1";
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # CORE::require, mb::require, require
     elsif (/\G ( (?: CORE:: | mb:: )? require ) /xmsgc) {
         $parsed .= $1;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # mb::use --> BEGIN { mb::require ... }
@@ -2680,7 +2703,6 @@ sub parse_expr {
             }
         }
         $parsed .= "}";
-        $term = 1;
     }
 
     # mb::getc() --> mb::getc()
@@ -2688,7 +2710,6 @@ sub parse_expr {
     #                           vvvvvvvvvvvv
     elsif (/\G ( mb::getc ) (?= (?: \s* \( )+ \s* \) ) /xmsgc) {
         $parsed .= $1;
-        $term = 1;
     }
 
     # mb::getc($fh) --> mb::getc($fh)
@@ -2697,7 +2718,6 @@ sub parse_expr {
     #                           vvvvvvvvvvvv
     elsif (/\G ( mb::getc ) (?= (?: \s* \( )* \s* \$ ) /xmsgc) {
         $parsed .= $1;
-        $term = 1;
     }
 
     # mb::getc(FILE) --> mb::getc(\*FILE)
@@ -2708,30 +2728,76 @@ sub parse_expr {
         $parsed .= $1;
         $parsed .= $2;
         $parsed .= '\\*';
-        $term = 1;
     }
 
     # mb::getc --> mb::getc
     elsif (/\G ( mb::getc ) /xmsgc) {
         $parsed .= $1;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
-    elsif (/\G ( (?: CORE:: | mb:: )? (?: chop | chr | getc | index | lc | lcfirst | length | ord | reverse | rindex | substr | uc | ucfirst ) ) \b /xmsgc) {
+    # CORE::functions that allow zero parameters
+    # mb::functions that allow zero parameters
+    elsif (/\G ( (?: CORE:: | mb:: )? (?:
+        chop    |
+        chr     |
+        getc    |
+        lc      |
+        lcfirst |
+        length  |
+        ord     |
+        uc      |
+        ucfirst
+    ) ) \b /xmsgc) {
         $parsed .= $1;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
-    # mb::subroutine
+    # CORE::functions that must parameters
+    # mb::functions that must parameters
+    elsif (/\G ( (?: CORE:: | mb:: )? (?:
+        index   |
+        reverse |
+        rindex  |
+        substr
+    ) ) \b /xmsgc) {
+        $parsed .= $1;
+    }
+
+    # mb::subroutines
     elsif (/\G ( mb:: (?: index_byte | rindex_byte ) ) \b /xmsgc) {
         $parsed .= $1;
-        $term = 1;
     }
 
-    # CORE::function, function
-    elsif (/\G ( (?: CORE:: )? (?: _ | abs | chomp | cos | exp | fc | hex | int | __LINE__ | log | oct | pop | pos | quotemeta | rand | rmdir | shift | sin | sqrt | tell | time | umask | wantarray ) ) \b /xmsgc) {
+    # CORE::functions that allow zero parameters
+    # functions that allow zero parameters
+    elsif (/\G ( (?: CORE:: )? (?:
+        _         |
+        abs       |
+        chomp     |
+        cos       |
+        exp       |
+        fc        |
+        hex       |
+        int       |
+        __LINE__  |
+        log       |
+        oct       |
+        pop       |
+        pos       |
+        quotemeta |
+        rand      |
+        rmdir     |
+        shift     |
+        sin       |
+        sqrt      |
+        tell      |
+        time      |
+        umask     |
+        wantarray
+    ) ) \b /xmsgc) {
         $parsed .= $1;
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # lstat(), stat() on MSWin32
@@ -2742,7 +2808,6 @@ sub parse_expr {
     #                               vvvvvvvvvvvv
     elsif (/\G ( lstat | stat ) (?= (?: \s* \( )+ \s* \) ) /xmsgc) {
         $parsed .= "mb::_$1";
-        $term = 1;
     }
 
     # lstat(...) --> mb::_lstat(...)
@@ -2751,7 +2816,6 @@ sub parse_expr {
     #                               vvvvvvvvvvvv     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     elsif (/\G ( lstat | stat ) (?= (?: \s* \( )* \b (?: ' | " | ` | m | q | qq | qr | qw | qx | s | tr | y | \$ ) \b ) /xmsgc) {
         $parsed .= "mb::_$1";
-        $term = 1;
     }
 
     # lstat(FILE)  --> mb::_lstat(\*FILE)
@@ -2766,14 +2830,16 @@ sub parse_expr {
         $parsed .= "mb::_$1";
         $parsed .= $2;
         $parsed .= '\\*';
-        $term = 1;
     }
 
     # function --> mb::subroutine on MSWin32
     # implements run on any systems by transpiling once
-    elsif (/\G ( chdir | lstat | opendir | stat | unlink ) \b /xmsgc) {
+    elsif (/\G ( chdir | lstat | stat | unlink ) \b /xmsgc) {
         $parsed .= "mb::_$1";
-        $term = 1;
+        $parsed .= parse_ambiguous_char();
+    }
+    elsif (/\G ( opendir ) \b /xmsgc) {
+        $parsed .= "mb::_$1";
     }
 
     # any word
@@ -2832,17 +2898,22 @@ sub parse_expr {
     # "\x7A" [z] LATIN SMALL LETTER Z (U+007A)
     elsif (/\G ( [A-Za-z_][A-Za-z_0-9]*(?:(?:'|::)[A-Za-z_][A-Za-z_0-9]*)* ) /xmsgc) {
         $parsed .= $1;
-        $term = 0;
+        $parsed .= parse_ambiguous_char();
+    }
+
+    # any right parenthesis
+    # "\x29" [)] RIGHT PARENTHESIS (U+0029)
+    # "\x7D" [}] RIGHT CURLY BRACKET (U+007D)
+    # "\x5D" []] RIGHT SQUARE BRACKET (U+005D)
+    elsif (/\G ([\)\}\]]) /xmsgc) {
+        $parsed .= $1;
+        $parsed .= parse_ambiguous_char();
     }
 
     # any US-ASCII
     # "\x3A" [:] COLON (U+003A)
-    # "\x29" [)] RIGHT PARENTHESIS (U+0029)
-    # "\x7D" [}] RIGHT CURLY BRACKET (U+007D)
-    # "\x5D" []] RIGHT SQUARE BRACKET (U+005D)
     elsif (/\G ([\x00-\x7F]) /xmsgc) {
         $parsed .= $1;
-        $term = 0;
     }
 
     # otherwise
@@ -2860,20 +2931,17 @@ sub parse_expr_balanced {
     my $close_bracket = {qw| ( ) { } [ ] < > |}->{$open_bracket} || die;
     my $parsed = $open_bracket;
     my $nest_bracket = 1;
-    $term = 0;
     while (1) {
 
         # open bracket
         if (/\G (\Q$open_bracket\E) /xmsgc) {
             $parsed .= $1;
-            $term = 0;
             $nest_bracket++;
         }
 
         # close bracket
         elsif (/\G (\Q$close_bracket\E) /xmsgc) {
             $parsed .= $1;
-            $term = 1;
             if (--$nest_bracket <= 0) {
                 last;
             }
@@ -4632,79 +4700,6 @@ sub escape_to_hex {
     }
     else {
         return $codepoint;
-    }
-}
-
-#---------------------------------------------------------------------
-# import Perl module in MBCS encoding
-BEGIN { $INC{'mb/PERL.pm'} = __FILE__ }
-sub mb::PERL::import {
-    my $self = shift; # 'mb::PERL' (not used)
-    my $module = shift;
-    my @caller = caller;
-
-    # require file
-    CORE::eval sprintf(<<'END', @caller[0,2,1], $module);
-package %s;
-#line %s "%s"
-mb::require %s;
-END
-
-    # calling VERSION()
-    if (defined($_[0]) and ($_[0] =~ /\A [0-9] /x)) {
-        my $want_version = shift;
-        if ($module->can('VERSION')) {
-            CORE::eval sprintf(<<'END', @caller[0,2,1], $module, $want_version);
-package %s;
-#line %s "%s"
-%s->VERSION(%s);
-END
-        }
-    }
-
-    # calling import()
-    if ($module->can('import')) {
-        CORE::eval sprintf(<<'END', @caller[0,2,1], $module, "@_");
-package %s;
-#line %s "%s"
-%s->import(qw(%s));
-END
-    }
-}
-
-#---------------------------------------------------------------------
-# unimport Perl module in MBCS encoding
-sub mb::PERL::unimport {
-    my $self = shift; # 'mb::PERL' (not used)
-    my $module = shift;
-    my @caller = caller;
-
-    # require file
-    CORE::eval sprintf(<<'END', @caller[0,2,1], $module);
-package %s;
-#line %s "%s"
-mb::require %s;
-END
-
-    # calling VERSION()
-    if (defined($_[0]) and ($_[0] =~ /\A [0-9] /x)) {
-        my $want_version = shift;
-        if ($module->can('VERSION')) {
-            CORE::eval sprintf(<<'END', @caller[0,2,1], $module, $want_version);
-package %s;
-#line %s "%s"
-%s->VERSION(%s);
-END
-        }
-    }
-
-    # calling unimport()
-    if ($module->can('unimport')) {
-        CORE::eval sprintf(<<'END', @caller[0,2,1], $module, "@_");
-package %s;
-#line %s "%s"
-%s->unimport(qw(%s));
-END
     }
 }
 

@@ -19,10 +19,10 @@ METHODS
 
              Output callback, which prints output PYX code.
              Default value is subroutine:
-               my (@data) = @_;
-               print join "\n", map { encode_utf8($_) } @data;
-               print "\n";
-               return;
+                     my (@data) = @_;
+                     print join "\n", map { encode_utf8($_) } @data;
+                     print "\n";
+                     return;
 
   "parsefile"
      $obj->parsefile($sgml_file);
@@ -92,10 +92,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2015-2020
+    © Michal Josef Špaček 2015-2021
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,15 +12,15 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: RIPEMD160
 
-SHA256 5754eae8dd511ec700e2a00b110c57060b1c25c2231122c1d22dde24fb67de85 Changes
-SHA256 0bdc9b0758d0cbf5793b2f195de03eb3474ccd0f44970536636b31088f330b42 DMIDecode.pm
-SHA256 9984f7b209d43761721f55f57d3b943c1d5308788d8d1818642db5deac235044 LICENSE
+SHA256 e98d669fc2b0c456794157b85fff3aef1abacb836010c622203021d04d7bfae5 Changes
+SHA256 b4ff362083b54232540478c30d878dbefd191729a9fa6ecc7600e4a85e334c09 DMIDecode.pm
+SHA256 df90c63e005650319cec1060a7a92b33abae8c22de8f95dffee72423c7a80ac8 LICENSE
 SHA256 2362683075426e8ecdc7b7f12d486b2e1d9bbd63ff9e9f6761ab1bf5fa896238 MANIFEST
-SHA256 18f6a10ba4480ccc9ec3bb38c2bad972aa77168fe186dc8234a4caa2d6c648bd META.yml
-SHA256 5acd2a9ecbbc28447796ff5e642ee838f91cb5f5c5c2ae27aeea177438567161 Makefile.PL
-SHA256 accaffdb1f64b72014bc62ccee97a52fb0caf2efc2a69754016a76899687b88e README
+SHA256 e45bfb9840df7763945015d484ec4d2a442193026c8e947782ea98cac4dc1e9d META.yml
+SHA256 86e2c5a1c9e1fb6ff6ddacb45c1eb43bd1f27f4453e3ded4c3c15b5b80b8d7ac Makefile.PL
+SHA256 020bdc17b7219e92befaf60cc4c12cd849d9102560d01433500a172e1e1ef10c README
 SHA256 d8ca7a8f337582a557546563d67b260faae62b8ff024d19c691c4665c25705c2 examples/ex1.pl
 SHA256 5cdd06c4921d3fc255e142a35f8e1308274dab39580f7dbeb706590afa8c5240 examples/ex2.pl
 SHA256 6bd7a9b7889f6ec7ada9cee335da4da2a228bf2e289110ab3a0540a14da7f165 examples/ex3.pl
@@ -36,7 +36,7 @@ SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Modu
 SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
 SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
 SHA256 708d446a92275c4a4ec1f82ac748ce38accd5880077d2020bbf86c0b3d727c57 t/File-Find-Rule-DMIDecode/01-use.t
-SHA256 0fb28720c7f39c2d2c3feb2e5aec3eda52a97a28b983d2fff92aa242dfb0321e t/File-Find-Rule-DMIDecode/02-version.t
+SHA256 dabc5659dc63bc4d475e9367902cf42ef18f2a45938892f2787d7de6338e0443 t/File-Find-Rule-DMIDecode/02-version.t
 SHA256 74c53f8cbbc4cb66b77519765d83a0740c310c4f302bf146ed70497db9bd1fd9 t/File-Find-Rule-DMIDecode/03-dmidecode_file.t
 SHA256 4500ff9d3e3cd27ab78aa2522ddb5f9668ea9ab6b7610b10e18f298dcbf0cff5 t/File-Find-Rule-DMIDecode/04-dmidecode_handle.t
 SHA256 b88834c514f5f7eae1816a921a4cd42994ae0ede534bee8b78faac9985658489 t/File-Find-Rule-DMIDecode/05-dmidecode_type.t
@@ -45,12 +45,15 @@ SHA256 c2e24e8286d0d846b9d96fdf833c4cda84c2ec2595b9d8ea26e53806e2f135dd xt/File-
 SHA256 8ec0ea9b485e11a9fe91ee26d335259288ae6d95ad4fc7d3f2255886e48b912f xt/File-Find-Rule-DMIDecode/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl5ZQ8YACgkQKyiOZjWe
-rHaO3Af/eYjXDIc1eYjd57r+JAvSph8tThKFHx4Cb9ON81ke12D23EL8U8XCT93M
-KjQnA7wCwstxR9QnK6wLnruyRj/i2fg7yI6OHyIHdXJcHPrGt0Kbl4A4BsPjWYHq
-EZtQSc3gJ8B7MzIVKQ3lcdUyULOLZSFGdpoNmxc8m0Egcqq9mzxxvjpiIXHChltW
-wfK3dVn6lJcoEWnPU+dlYRyuR9sQvjTYf3qrhIuT3w3i6vv4C7s5ZcWiIbqRQsO3
-yW4f0M2d01qvFuF/jNQ8GJiGB8GmWOfZATEvBEquADhvvBVVIiZtrggDqpM8rKym
-EojfnBb7DgUUQjI1DJ2Zg7iPoTvwvg==
-=Tera
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmARQiwACgkQgmqNLzlX
+aRfBrQwAiDCPdxNQwa7ju4rZcIAzx9UQeQy6eYgel0Nw8Wz7xe3FHXuih1pYiwia
+wvU4peyyi5wNFPqI9BlVqBxc2SPWMNxKo4kIZi1NDcUQQL8Wy+e2E0vsKGcidX/N
+m9gN8mGH3SJyWBJwHq/p2u0J1AsSITLUHJekYSLF6Wmyue9Lhz/wcrnUqiQ3GBUv
+bqBEpVaVfAKtD5FQc5Xkb5l//avv7muMqju4ebZMTDU99Sm98+SnILyWVEPDgLbH
+9bujk7qxJzt7OvCX3AtGA45vTnLPuoCltyyFcv0Ps2a6GTfNZukOGUnhUMvWu86W
++iMF4rAmVGiSOvCst+mBvXCdeFat0XeVuKnXFhRuasAvMvaz7eutWzEOURqKqv+p
+OIQnHAAA+SrcYnLoOndidP7nI4/2zltUhBPnMdXsRB1GZNnzTpZ2M9mbV8O3k9ie
+zLf5/hJONcNE9oHaYReiUbYzjkGBG9cgpiHSWil0wB9CBpTxrIcRlQgeTRVHI60t
+FDwx9iLX
+=rMQD
 -----END PGP SIGNATURE-----

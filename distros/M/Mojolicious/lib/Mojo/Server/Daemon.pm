@@ -20,8 +20,8 @@ has listen             => sub { [split /,/, $ENV{MOJO_LISTEN} || 'http://*:3000'
 has max_requests       => 100;
 
 sub DESTROY {
-  return if Mojo::Util::_global_destruction();
   my $self = shift;
+  return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
   my $loop = $self->ioloop;
   $loop->remove($_) for keys %{$self->{connections} // {}}, @{$self->acceptors};
 }
@@ -177,12 +177,15 @@ sub _listen {
     if ((my $host = $url->host) ne '*') { $options->{address} = $host }
     if (my $port = $url->port) { $options->{port} = $port }
   }
-  $options->{"tls_$_"} = $query->param($_) for qw(ca ciphers version);
+
+  $options->{tls_ca} = $query->param('ca');
   /^(.*)_(cert|key)$/ and $options->{"tls_$2"}{$1} = $query->param($_) for @{$query->names};
-  if (my $cert = $query->param('cert')) { $options->{'tls_cert'}{''} = $cert }
-  if (my $key  = $query->param('key'))  { $options->{'tls_key'}{''}  = $key }
-  my $verify = $query->param('verify');
-  $options->{tls_verify} = hex $verify if defined $verify;
+  if (my $cert = $query->param('cert')) { $options->{tls_cert}{''} = $cert }
+  if (my $key  = $query->param('key'))  { $options->{tls_key}{''}  = $key }
+  my ($ciphers, $verify, $version) = ($query->param('ciphers'), $query->param('verify'), $query->param('version'));
+  $options->{tls_options}{SSL_cipher_list} = $ciphers    if defined $ciphers;
+  $options->{tls_options}{SSL_verify_mode} = hex $verify if defined $verify;
+  $options->{tls_options}{SSL_version}     = $version    if defined $version;
   my $tls = $options->{tls} = $proto eq 'https';
 
   weaken $self;

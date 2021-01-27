@@ -21,14 +21,13 @@ requires 'Exporter' => 0;
 requires 'HTML::Entities' => 0;
 requires 'Readonly' => 0;
 requires 'perl' => '5.8.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=PYX-Utils';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/PYX-Utils/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/PYX-Utils';
 resources 'repository' => 'git://github.com/michal-josef-spacek/PYX-Utils';
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.06';
+version '0.07';
 
 # Run.
 WriteAll();

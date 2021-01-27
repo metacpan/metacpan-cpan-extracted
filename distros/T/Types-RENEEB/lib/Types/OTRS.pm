@@ -1,5 +1,5 @@
 package Types::OTRS;
-
+$Types::OTRS::VERSION = '0.09';
 # ABSTRACT: OTRS related types
 
 use v5.10;
@@ -14,8 +14,6 @@ use Type::Library
 use Type::Utils -all;
 use Types::Standard -types;
 use OTRS::OPM::Parser;
-
-our $VERSION = 0.05;
 
 declare OTRSVersion =>
     as Str,
@@ -37,8 +35,7 @@ declare OTRSVersionWildcard =>
 declare OPMFile =>
     as InstanceOf['OTRS::OPM::Parser'],
     where {
-        $_->opm_file =~ m{\.s?opm\z} and
-        ( $_->error_string eq '' or $_->error_string =~ m{Invalid value for maxOccurs} );
+        $_->opm_file =~ m{\.s?opm\z} and $_->error_string eq '';
     }
 ;
 
@@ -67,7 +64,7 @@ Types::OTRS - OTRS related types
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 TYPES
 

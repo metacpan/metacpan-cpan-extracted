@@ -1,6 +1,10 @@
 Changelog for Dist-Zilla-PluginBundle-Author-GSG
 
-v0.1.3 2020-05-12T15:10:02
+v0.1.4 2021-01-27T17:48:40
+ - Update README (Andrew Hewus Fresh)
+ - Move ReadmeAnyFromPod below PodWeaver (Andrew Hewus Fresh)
+
+v0.1.3 2020-05-12T15:09:47
  - Update README (Andrew Hewus Fresh)
  - Sanitize version numbers from the environment (Andrew Hewus Fresh)
  - Require a new enough NextVersion Plugin (Andrew Hewus Fresh)

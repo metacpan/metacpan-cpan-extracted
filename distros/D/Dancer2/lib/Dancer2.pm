@@ -1,5 +1,5 @@
 package Dancer2;
-$Dancer2::VERSION = '0.300004';
+$Dancer2::VERSION = '0.300005';
 # ABSTRACT: Lightweight yet powerful web application framework
 
 use strict;
@@ -128,7 +128,7 @@ Dancer2 - Lightweight yet powerful web application framework
 
 =head1 VERSION
 
-version 0.300004
+version 0.300005
 
 =head1 DESCRIPTION
 
@@ -250,6 +250,7 @@ We are also on IRC: #dancer on irc.perl.org.
     Ahmad M. Zawawi
     Alex Beamish
     Alexander Karelas
+    Alexander Pankoff
     Alexandr Ciornii
     Andrew Beverley
     Andrew Grangaard
@@ -273,6 +274,7 @@ We are also on IRC: #dancer on irc.perl.org.
     Chi Trinh
     Christian Walde
     Christopher White
+    cloveistaken
     Colin Kuskie
     cym0n
     Dale Gallagher
@@ -290,6 +292,7 @@ We are also on IRC: #dancer on irc.perl.org.
     Dennis Lichtenthäler
     Dinis Rebolo
     dtcyganov
+    Elliot Holden
     Erik Smit
     Fayland Lam
     ferki
@@ -355,6 +358,7 @@ We are also on IRC: #dancer on irc.perl.org.
     pants
     Patrick Zimmermann
     Pau Amma
+    Paul Clements
     Paul Cochrane
     Paul Williams
     Pedro Bruno
@@ -391,7 +395,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexis Sukrieh.
+This software is copyright (c) 2021 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

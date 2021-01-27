@@ -96,6 +96,7 @@ t/6101_filetest.t
 t/6102_filetest.t
 t/6103_filetest.t
 t/6104_filetest.t
+t/6106_filetest.t
 t/7001_CORE_split.t
 t/7002_split.t
 t/7003_split_use_mb.t

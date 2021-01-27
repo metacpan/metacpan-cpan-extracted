@@ -4,47 +4,61 @@ use strict;
 use warnings;
 
 use Data::Printer;
-use Wikibase::Datatype::Form;
-use Wikibase::Datatype::Statement;
-use Wikibase::Datatype::Struct::Form qw(obj2struct);
+use Wikibase::Datatype::Mediainfo;
+use Wikibase::Datatype::MediainfoSnak;
+use Wikibase::Datatype::MediainfoStatement;
+use Wikibase::Datatype::Struct::Mediainfo qw(obj2struct);
+use Wikibase::Datatype::Value::Item;
 use Wikibase::Datatype::Value::Monolingual;
 
-# Statement.
-my $statement = Wikibase::Datatype::Statement->new(
+# Object.
+my $statement1 = Wikibase::Datatype::MediainfoStatement->new(
         # instance of (P31) human (Q5)
-        'snak' => Wikibase::Datatype::Snak->new(
-                'datatype' => 'wikibase-item',
+        'snak' => Wikibase::Datatype::MediainfoSnak->new(
                 'datavalue' => Wikibase::Datatype::Value::Item->new(
                         'value' => 'Q5',
                 ),
                 'property' => 'P31',
         ),
+        'property_snaks' => [
+                # of (P642) alien (Q474741)
+                Wikibase::Datatype::MediainfoSnak->new(
+                        'datavalue' => Wikibase::Datatype::Value::Item->new(
+                                'value' => 'Q474741',
+                        ),
+                        'property' => 'P642',
+                ),
+        ],
+);
+my $statement2 = Wikibase::Datatype::MediainfoStatement->new(
+        # sex or gender (P21) male (Q6581097)
+        'snak' => Wikibase::Datatype::MediainfoSnak->new(
+                'datavalue' => Wikibase::Datatype::Value::Item->new(
+                        'value' => 'Q6581097',
+                ),
+                'property' => 'P21',
+        ),
 );
 
-# Object.
-my $obj = Wikibase::Datatype::Form->new(
-        'grammatical_features' => [
-                Wikibase::Datatype::Value::Item->new(
-                        'value' => 'Q163012',
-                ),
-                Wikibase::Datatype::Value::Item->new(
-                        'value' => 'Q163014',
-                ),
-        ],
-        'id' => 'ID',
-        'representations' => [
-                Wikibase::Datatype::Value::Monolingual->new(
-                        'language' => 'en',
-                        'value' => 'Representation en',
-                ),
+# Main item.
+my $obj = Wikibase::Datatype::Mediainfo->new(
+        'id' => 'Q42',
+        'labels' => [
                 Wikibase::Datatype::Value::Monolingual->new(
                         'language' => 'cs',
-                        'value' => 'Representation cs',
+                        'value' => 'Douglas Adams',
+                ),
+                Wikibase::Datatype::Value::Monolingual->new(
+                        'language' => 'en',
+                        'value' => 'Douglas Adams',
                 ),
         ],
+        'page_id' => 123,
         'statements' => [
-                $statement,
+                $statement1,
+                $statement2,
         ],
+        'title' => 'Q42',
 );
 
 # Get structure.
@@ -54,41 +68,4 @@ my $struct_hr = obj2struct($obj, 'http://test.wikidata.org/entity/');
 p $struct_hr;
 
 # Output:
-# \ {
-#     claims                {
-#         P31   [
-#             [0] {
-#                 mainsnak   {
-#                     datatype    "wikibase-item",
-#                     datavalue   {
-#                         type    "wikibase-entityid",
-#                         value   {
-#                             entity-type   "item",
-#                             id            "Q5",
-#                             numeric-id    5
-#                         }
-#                     },
-#                     property    "P31",
-#                     snaktype    "value"
-#                 },
-#                 rank       "normal",
-#                 type       "statement"
-#             }
-#         ]
-#     },
-#     grammaticalFeatures   [
-#         [0] "Q163012",
-#         [1] "Q163014"
-#     ],
-#     id                    "ID",
-#     represenations        {
-#         cs   {
-#             language   "cs",
-#             value      "Representation cs"
-#         },
-#         en   {
-#             language   "en",
-#             value      "Representation en"
-#         }
-#     }
-# }
+# TODO

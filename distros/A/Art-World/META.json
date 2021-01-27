@@ -1,7 +1,7 @@
 {
    "abstract" : "Agents interactions modeling  🎨",
    "author" : [
-      "Seb. Hu-Rillettes <shr@balik.network>"
+      "Sébastien Feugère <sebastien@feugere.net>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.11",
@@ -45,11 +45,15 @@
       },
       "runtime" : {
          "requires" : {
+            "Config::Tiny" : "== 2.24",
             "Data::Printer" : "== 0.40",
             "Faker" : "== 1.03",
+            "Math::Round" : "0.07",
+            "PadWalker" : "0",
+            "Type::Tiny" : "== 1.012001",
             "Type::Tiny::XS" : "== 0.022",
-            "Zydeco" : "== 0.611",
-            "perl" : "v5.16.0"
+            "Zydeco" : "== 0.613",
+            "perl" : "v5.24.1"
          }
       },
       "test" : {
@@ -61,7 +65,7 @@
    "provides" : {
       "Art::World" : {
          "file" : "lib/Art/World.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -75,9 +79,10 @@
          "web" : "https://gitlab.com/smonff/art-world"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_authority" : "cpan:SMONFF",
    "x_contributors" : [
+      "Seb Hu-Rillettes <shr@balik.network>",
       "Sébastien Feugère <smonff@riseup.net>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.04",

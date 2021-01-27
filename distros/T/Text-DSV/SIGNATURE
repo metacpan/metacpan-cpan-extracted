@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,45 +12,48 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 67fa1d823078f70c6981d7282c55698c47d7d165 Changes
-SHA1 aceb10ab21db399be1d72c373aabcf22e27f6925 DSV.pm
-SHA1 1179f98d0de353aafbd6ac4d01401f030d8a1003 LICENSE
-SHA1 098d090e8877272138193256491a2fbb9ad4e71e MANIFEST
-SHA1 12b892963319ffb6e303652033e4669771b90593 META.yml
-SHA1 774b9599fef28034688bb55e7d8a48b134db7dc2 Makefile.PL
-SHA1 777a7e58ec384c0caa7ad32ea17ac9bdbde5f80c README
-SHA1 e5de9cc6bf0d962f3d585cefa9be430914a2bb57 examples/ex1.pl
-SHA1 0d30b4654a8fc3bee372ac05532516e69d73ee58 examples/ex2.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 c2004061092e68eaca517d25350922811671dc8b t/Text-DSV/01-use.t
-SHA1 0d29a5a31c08230949030cc505af9c5453a2302b t/Text-DSV/02-version.t
-SHA1 2440554930de3a9b9ad4ba6dfc1705d8b678a898 t/Text-DSV/03-new.t
-SHA1 a12218e5c2150ad1cc7bb922432aa12cfdc3a97e t/Text-DSV/04-parse.t
-SHA1 7dbaa34dd4cddfa4f1a406cad97cc48ca94c4093 t/Text-DSV/05-parse_line.t
-SHA1 fb3568b9c52d56639d4edf7c1b89b8cc07981ec9 t/Text-DSV/06-serialize.t
-SHA1 9e7bafc84ea95a413d867a893671d2beeaa29341 t/Text-DSV/07-serialize_line.t
-SHA1 a7b54c8707cf8dc1ea77fd22b4459a15b9d1c91a xt/Text-DSV/01-pod_coverage.t
-SHA1 4aee6411277b063ce3e83114abac8886e4c0add1 xt/Text-DSV/02-pod.t
+SHA256 ee2738eeb35f46a268a1632d1dc459993d567f1dcc5fde7e5e1af8eba08a5506 Changes
+SHA256 b2fc069505b1fe8d8e4dcf398403be0183f7cb1690378d174cb3cc3ef823b90a DSV.pm
+SHA256 34d2556257954a24f966c4da3104507e1a97c3899588d1acfd3b4e7c2002abb3 LICENSE
+SHA256 d26aea2c5b05e8050b8b47cced1440138afc7f054c37d388a23f2b828fc14d95 MANIFEST
+SHA256 dd8644926d198b52d113827dfedaadcfd789184db022d8b399615e8c177b8e1f META.yml
+SHA256 49e9ba804d31ca0b008d0eb8a8e9871a9570cfc7cef19d6550478eada72fd8da Makefile.PL
+SHA256 4aa6d1bebb40c2a4615c17bd1df158114ff0493273823ae7a9b396fbfb84c96d README
+SHA256 061d9393b61376a1779ab6825e5d79fd9b6fa8a7074ef25194682a68600574da examples/ex1.pl
+SHA256 24b9be928ab38d9845956f0a14f01f941fcf633c3f1dc9dfdd4ccb8c594ee84d examples/ex2.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 1d066c494e4688ef870f7727c12cab459076d8ec8a0b7c7b25c64a19be0614b2 t/Text-DSV/01-use.t
+SHA256 4f382ef4c8e703a8b6d870473e6733d5acb30f97566da8a2e0cb495c46d11924 t/Text-DSV/02-version.t
+SHA256 754ddb3f839d32b00a012b59f608724f425fd23bf4d9329cc5ebaf4a3f414294 t/Text-DSV/03-new.t
+SHA256 e144891b2a1e96bd08fae208703eda7977c648e5370078316ed5ff9e026eb5f8 t/Text-DSV/04-parse.t
+SHA256 aa2ad39e681da9b1fb1aea36929f74db1b5a45a0086d336d767ce15acd7a1322 t/Text-DSV/05-parse_line.t
+SHA256 4cdbc6470d0012b4088bae36ec0ee4d2a2677b48035141f9044283ccfa318aaa t/Text-DSV/06-serialize.t
+SHA256 3824caaf26ad3646c168981f4d25b2681d870aa44fd50e9f06b03698ceb558a0 t/Text-DSV/07-serialize_line.t
+SHA256 586bdc5be23508f3bf80f30bb87f1109cb77a029ab0888cfd4883086f79295ba xt/Text-DSV/01-pod_coverage.t
+SHA256 026f9b4e836a4b05fc7d4b0840cb3b9308b68d233796dbeb5f07d9ee5a815697 xt/Text-DSV/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWBUlNAAoJEJe+XXKaIuTlwakH/0JCevsFpkOvr6fBR2slVIh0
-75cbnhNNtNN/faltjE5HomtimLKxIeU5M8cHmN83dWeN+FYi8UIbZ6BEmmaNshFK
-m+AjqNly9fyhIMUkyPxW4yJwkoOBgvptREHDeLrxI1tdjIBWLkV5R6znYVGDsLPR
-rwF4Qbnp3FotzxBx2AZ+raDh4pfOVxq6kx0oeYZS4/JhALcdXFI481+S7yBBeeEi
-wZ+B47Rtn0J0fjvm26SiuMYtTJgaa/khbjbbPfEwboCOOp5HwLfp1YaeSIDVIXu+
-aczRooh3MSFVHtURpVvsaYkNFcoCYls+UOXiGTd2+UZGPCxlYX4AzTW/VqM0bcg=
-=XPyF
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmARuToACgkQgmqNLzlX
+aRea+Qv/WvKWflRT/wY5mCMo9VcVJBM3tkpn+HGkL8SZvN25uEqMrOG0Z0atzHoR
+UDuPDo0DskIZ99trlGT01ID+LMKczkdhQvJSYxpItgyD86oRjHHdbD1WTG6VI5+l
+Y+4VCkc4DtH9kkzWpuHyf2GjDpWJ2+tkqTq5N3esG03WHIMwPLS6iYC/KGizJrWi
+4ecu+mrajq7M8iQs0QNxD2qX+kUVxOAi54k/rRPCdyfdrGNLrDu9tTrblQv5Vs6u
+W088p7o4xswsRKOJxPG7QniVz/vnfwGnsWMRXJKgbsdMW1Qh2fgd6UxZJhmcJ3n8
+8/zGXOa8LvCE1Cue4+M/IbivGraVmfMLNxdnJOBnxG5cPTLbvTjtbRXkcJudouZG
+RT0We+HIn3F5ZgBPxZhnVJlBgbPzKKPormxNhxNxp8NGsXwXUSw3RabAzuxAAfAt
+FCJ9MS+aeyKvCZfAHO/KS4dyG/E15AqaMJ/smT4LM5h/gI7pLMGjnQ+RME6bDujE
+bkDG2g2p
+=r5Sj
 -----END PGP SIGNATURE-----

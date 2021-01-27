@@ -1,3 +1,96 @@
+0.18 2021-01-27T17:56:41Z
+
+        - The great Manager->influence() reputation bump!
+        - Add some attributes to the Manager role
+        - Proper abstract Concept class that can be inherited by some sub classes
+        - Updated Zydeco to 0.613 and Type::Tiny to 1.012001
+        - Testing properly the Manager role
+        - Move some fame constants to configuration
+
+0.17_13 2020-12-24T23:35:29Z
+
+        - Supporting only 5.24.1+ because why not
+        - Fixing postderef feature import in a test
+
+0.17_12 2020-12-24T10:45:14Z
+
+        - Simplification of the enabling of postderef feature
+
+0.17_11 2020-12-23T12:33:13Z
+
+        - Requiring Perl 5.20
+        - Use feature postderef if 5.20 < $] < 5.24
+        - Declaring tests plans
+
+0.17_10 2020-12-22T12:45:48Z
+
+        - Making event a role since otherwise I would have to do multiple inheritance for Exhibition
+        - Updating synopsis
+        - Fixing an issue with required Perl versions
+        - Adding Meta->generate_discourse and Meta->titlify methods
+
+0.17_09 2020-12-18T21:26:57Z
+
+        - The Abstraction role provide all kind of abstract concepts
+        - We are now able to bump agents reputation who are networking
+        - Exchanging order of classes and roles and nesting all classes in a Parent Art class so we can use shared attributes
+        - Introducing Conf::Tiny and replacing some hardcoded values to conf
+        - Use Type::Tiny 1.012000 (again) that allow the use of non quoted attributes types constraints of custom Zydeco classes.. See Gitlab #37
+        - Adding Makefile to  the project
+        - Lots of tidying up and formatting
+
+0.17_08 2020-10-21T12:11:50Z
+
+        - A more robust test of the dynamic Fame attribut
+        - Reverting the use of Type::Tiny dev versions for the use of non quoted attributes types constraints of custom Zydeco classes.. See Gitlab #37
+        - Extensive tests of all the dynamic Fame aura/reputation attributes thingy
+
+0.17_07 2020-10-21T11:11:05Z
+
+        - Updating to Type::tiny 1.011_011
+
+0.17_06 2020-10-21T08:58:05Z
+
+        - Changing the way the dynamic Fame attribute is generated
+
+0.17_05 2020-10-19T21:18:54Z
+
+        - Fame can now adapt to the class that consume it by deciding if it is a Work or an Agent
+        - Adding 3 methods in the Meta class for simple manipulation of objects
+        - Working on the Artwork aura: guess this is something different of the Fame's reputation
+        - Introducing some Meta class to work on the objects themselves
+        - Working on Curators and Manager role
+        - Update to Type::Tiny 1.011_009 so we can use non quoted types constraints for attributes (see RT #133448)
+
+0.17_04 2020-10-07T20:39:25Z
+
+        - A more complete Buyer role
+        - aquire() add an Artwork to the Collector->collection (an take the Artwork->value)
+        - sale() remove and Artwork from the collection (and add some money)
+        - Force the Collector->collection to be composed of Artwork
+        - Add a title attribute to the works
+        - Complete the contributors list with a good friend
+        - More tests!
+
+0.17_03 2020-10-04T20:04:31Z
+
+        - Adding some documentation for the Fame
+        - If you try to bump_fame to a negative value, nothing happens properly, and a warning is showed, fix #31
+        - Extensive testing of the Fame because I experienced weird floating point issues
+
+0.17_02 2020-10-01T21:44:06Z
+
+	- Adding a Fame role, and moving the Agent reputation attribute there
+        - Testing Fame
+
+0.17_01 2020-09-30T20:55:36Z
+
+        - Removing duplicated declaration of attributes in nested classes (tobyink)
+        - Listing contributors
+        - Removed the Wildlife class since it is redundant with Agent
+        - Applying Collector type constraints on class Artist and role Collectionable
+        - Fixed some example code that was using the old code structure
+
 0.17 2020-09-29T20:15:04Z
 
         - Adding Space and Market role
@@ -28,7 +121,7 @@
         - Adding the Agent::Public class
         - Adding The Place::Behavior::Exhibit role
         - Adding a sale() method to the Wildlife::Behavior::Buyer role
-        - Added Type::Tiny::XS as a dependency for some optimization 
+        - Added Type::Tiny::XS as a dependency for some optimization
 
 0.16 2020-09-18T20:14:16Z
 

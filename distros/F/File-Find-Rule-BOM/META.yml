@@ -28,8 +28,8 @@ requires:
   String::BOM: 0
   perl: 5.6.2
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-Rule-BOM
+  bugtracker: https://github.com/michal-josef-spacek/File-Find-Rule-BOM/issues
   homepage: https://github.com/michal-josef-spacek/File-Find-Rule-BOM
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/File-Find-Rule-BOM
-version: '0.02'
+version: '0.03'

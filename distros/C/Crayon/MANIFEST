@@ -8,6 +8,9 @@ t/00-load.t
 t/01-parse.t
 t/02-compile.t
 t/03-synopsis.t
+t/04-global.t
+t/05-comments.t
+t/06-syntax.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

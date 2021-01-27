@@ -6,7 +6,7 @@ use warnings;
 
 use CAD::AutoCAD::Detect qw(detect_dwg_file);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Detect DWG.
 sub File::Find::Rule::dwg {
@@ -155,12 +155,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2021
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

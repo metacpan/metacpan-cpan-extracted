@@ -247,24 +247,22 @@ onlineddl_test 'Drop PK' => 'Track' => sub {
 
                 $oddl->dbh_runner_do("ALTER TABLE $qname DROP COLUMN $qcol");
 
-                $oddl->dbh_runner(run => sub {
-                    $dbh = $_;
-
+                my $fk_hash = $oddl->dbh_runner(run => sub {
                     # Need to also drop the FK on lyrics
-                    my $fk_hash = $oddl->_fk_info_to_hash( $dbh->foreign_key_info(
+                    return $oddl->_fk_info_to_hash( $oddl->_helper->foreign_key_info(
                         $oddl->_vars->{catalog}, $oddl->_vars->{schema}, $oddl->table_name,
                         undef, undef, undef
                     ) );
-
-                    $dbh->do(join ' ',
-                        'ALTER TABLE',
-                        $dbh->quote_identifier('lyrics'),
-                        'DROP',
-                        # MySQL uses 'FOREIGN KEY' on DROPs, and everybody else uses 'CONSTRAINT' on both
-                        ($dbms_name eq 'MySQL' ? 'FOREIGN KEY' : 'CONSTRAINT'),
-                        $dbh->quote_identifier( (values %$fk_hash)[0]->{fk_name} ),
-                    );
                 });
+
+                $oddl->dbh_runner_do(join ' ',
+                    'ALTER TABLE',
+                    $dbh->quote_identifier('lyrics'),
+                    'DROP',
+                    # MySQL uses 'FOREIGN KEY' on DROPs, and everybody else uses 'CONSTRAINT' on both
+                    ($dbms_name eq 'MySQL' ? 'FOREIGN KEY' : 'CONSTRAINT'),
+                    $dbh->quote_identifier( (values %$fk_hash)[0]->{fk_name} ),
+                );
             },
         },
 

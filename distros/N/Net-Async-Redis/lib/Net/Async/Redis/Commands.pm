@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.008'; # VERSION
+our $VERSION = '3.009'; # VERSION
 
 =head1 NAME
 
@@ -100,6 +100,7 @@ our %KEY_FINDER = (
     'PFCOUNT' => 1,
     'PSETEX' => 1,
     'PTTL' => 1,
+    'PUBLISH' => 1,
     'RENAME' => 1,
     'RENAMENX' => 1,
     'RESTORE' => 1,
@@ -126,6 +127,7 @@ our %KEY_FINDER = (
     'SREM' => 1,
     'SSCAN' => 1,
     'STRLEN' => 1,
+    'SUBSCRIBE' => 1,
     'SUNION' => 1,
     'SUNIONSTORE' => 2,
     'TOUCH' => 1,
@@ -138,7 +140,7 @@ our %KEY_FINDER = (
     'XAUTOCLAIM' => 1,
     'XCLAIM' => 1,
     'XDEL' => 1,
-    'XGROUP' => 1,
+    'XGROUP' => 2,
     'XINFO' => 1,
     'XLEN' => 1,
     'XPENDING' => 1,

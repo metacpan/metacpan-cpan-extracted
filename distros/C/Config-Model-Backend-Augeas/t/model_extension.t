@@ -7,7 +7,7 @@ use Test::More ;
 
 # this test checks that the model extension 
 # (e.g. lib/Config/Model/models/Itself/Class.d/augeas-backend.pl)
-# containing the "meta" model for Augeas backend can be loaded by 
+# containing the "meta" model for Augeas backend can be loaded by
 # Config::Model::Itself and used
 
 # I.e.
@@ -17,34 +17,11 @@ use Test::More ;
 
 
 use ExtUtils::testlib;
-use Log::Log4perl qw(:easy :levels) ;
 use Config::Model ;
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 use Config::Model::Itself 2.012;
 
-no warnings qw(once);
-
-my $arg = shift || '';
-my ($log,$show) = (0) x 2 ;
-
-my $trace = $arg =~ /t/ ? 1 : 0 ;
-$log                = 1 if $arg =~ /l/;
-$show               = 1 if $arg =~ /s/;
-
-my $home = $ENV{HOME} || "";
-my $log4perl_user_conf_file = "$home/.log4config-model";
-
-if ($log and -e $log4perl_user_conf_file ) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init($log ? $WARN: $ERROR);
-}
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-my $meta_model = Config::Model -> new ( ) ;# model_dir => '.' );
-
-ok(1,"compiled");
+my ($meta_model, $trace) = init_test();
 
 my $meta_inst = $meta_model->instance(
     root_class_name => 'Itself::Model',

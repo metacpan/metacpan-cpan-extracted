@@ -17,7 +17,7 @@ use Net::Z3950::FOLIO::OPACXMLRecord qw(makeOPACXMLRecord);
 use Net::Z3950::FOLIO::RPN;;
 
 
-our $VERSION = '1.5';
+our $VERSION = '1.6';
 
 
 sub FORMAT_USMARC { '1.2.840.10003.5.10' }
@@ -197,7 +197,7 @@ sub _fetch_handler {
 	_throw(1, "missing record") if !defined $rec;
     }
 
-    my $comp = $args->{COMP} || '';
+    my $comp = lc($args->{COMP} || '');
     my $format = $args->{REQ_FORM};
     warn "REQ_FORM=$format, COMP=$comp\n";
 

@@ -42,6 +42,7 @@ my $build = Module::Build->new
    build_requires => {
        'Config::Model'     => '2.117',
        'Config::Model::Itself' => '2.012', # for t/model_extension.t
+       'Config::Model::Tester' => '3.006', # for init_test() calls
        'Test::More'        => 0,
        'Test::Exception'   => 0,
        'Test::Differences' => 0,

@@ -147,6 +147,31 @@ columns with only a couple of entries, which are more usefully chopped.
 Takes the first row of the given data, and returns a hash-ref mapping
 any non-unique column-names to the number of times they appear.
 
+## key\_to\_index
+
+Given an array-ref (probably the first row of a CSV file, i.e. column
+headings), returns a hash-ref mapping the cell values to their zero-based
+index.
+
+## make\_pk\_map
+
+    my $altcol2value2pk = make_pk_map($data, $pk_colkey, \@other_colkeys);
+
+Given `$data`, the heading of the primary-key column, and an array-ref
+of headings of alternative key columns, returns a hash-ref mapping each
+of those alternative key columns (plus the `$pk_colkey`) to a map from
+that column's value to the relevant row's primary-key value.
+
+## pk\_col\_counts
+
+    my ($colname2potential_key2count, $no_exact_match) = pk_col_counts($data, $pk_map);
+
+Given `$data` and a primary-key (etc) map created by the above, returns
+a tuple of a hash-ref mapping each column that gave any matches to a
+further hash-ref mapping each of the potential key columns given above
+to how many matches it gave, and an array-ref of rows that had no exact
+matches.
+
 # SEE ALSO
 
 [Text::CSV](https://metacpan.org/pod/Text%3A%3ACSV)

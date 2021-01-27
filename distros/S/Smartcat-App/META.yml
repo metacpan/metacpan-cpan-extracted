@@ -64,7 +64,7 @@ resources:
   bugtracker: https://github.com/smartcatai/smartcat-app-perl/issues
   homepage: https://github.com/smartcatai/smartcat-app-perl
   repository: https://github.com/smartcatai/smartcat-app-perl.git
-version: 0.0.4
+version: 0.0.5
 x_contributors:
   - 'Igor Afanasyev <igor.afanasyev@gmail.com>'
 x_generated_by_perl: v5.20.3

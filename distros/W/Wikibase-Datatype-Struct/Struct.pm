@@ -3,7 +3,7 @@ package Wikibase::Datatype::Struct;
 use strict;
 use warnings;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 1;
 
@@ -25,6 +25,18 @@ serialized via JSON to MediaWiki.
 =head1 SEE ALSO
 
 =over
+
+=item L<Wikibase::Datatype::Struct::Mediainfo>
+
+Wikibase mediainfo structure serialization.
+
+=item L<Wikibase::Datatype::Struct::MediainfoSnak>
+
+Wikibase mediainfo snak structure serialization.
+
+=item L<Wikibase::Datatype::Struct::MediainfoStatement>
+
+Wikibase mediainfo statement structure serialization.
 
 =item L<Wikibase::Datatype::Struct::Reference>
 
@@ -98,6 +110,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

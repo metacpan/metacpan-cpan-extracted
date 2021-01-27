@@ -7,8 +7,12 @@ SYNOPSIS
      barf($file_or_handler, 'CONTENT');
 
 SUBROUTINES
-    "barf($file_or_handler, $content)"
-             Barf content to file or handler.
+  "barf"
+     barf($file_or_handler, 'CONTENT');
+
+    Barf content to file or handler.
+
+    Returns undef.
 
 ERRORS
      barf():
@@ -182,10 +186,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2009-2020 Michal Josef Špaček
+    © 2009-2021 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.09
+    0.10
 

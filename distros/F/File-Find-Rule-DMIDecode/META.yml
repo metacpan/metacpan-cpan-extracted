@@ -30,8 +30,8 @@ requires:
   Perl6::Slurp: 0
   perl: 5.6.2
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-Rule-DMIDecode
+  bugtracker: https://github.com/michal-josef-spacek/File-Find-Rule-DMIDecode/issues
   homepage: https://github.com/michal-josef-spacek/File-Find-Rule-DMIDecode
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/File-Find-Rule-DMIDecode
-version: '0.04'
+version: '0.05'

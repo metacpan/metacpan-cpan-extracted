@@ -10,8 +10,8 @@ use MyTest;
 
 use GnuPG::Interface;
 
-my $v1 = 'gpg';
-my $v2 = 'gnupg';
+my $v1 = './test/fake-gpg-v1';
+my $v2 = './test/fake-gpg-v2';
 
 my $gnupg = GnuPG::Interface->new( call => $v1 );
 

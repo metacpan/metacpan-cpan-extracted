@@ -8,7 +8,7 @@ use List::MoreUtils qw(any);
 use Parse::DMIDecode;
 use Perl6::Slurp;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Detect dmidecode file.
 sub File::Find::Rule::dmidecode_file {
@@ -206,12 +206,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2021
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

@@ -1,12 +1,12 @@
 requires 'parent', 0;
 requires 'curry', 0;
-requires 'Future', '>= 0.42';
-requires 'Future::AsyncAwait', '>= 0.40';
-requires 'Syntax::Keyword::Try', '>= 0.11';
+requires 'Future', '>= 0.47';
+requires 'Future::AsyncAwait', '>= 0.47';
+requires 'Syntax::Keyword::Try', '>= 0.21';
 requires 'IO::Async', 0;
-requires 'Ryu::Async', '>= 0.016';
-requires 'List::Util', '>= 1.29';
-requires 'Log::Any', '>= 1.050';
+requires 'Ryu::Async', '>= 0.019';
+requires 'List::Util', '>= 1.55';
+requires 'Log::Any', '>= 1.708';
 requires 'URI', 0;
 requires 'URI::redis', 0;
 requires 'Class::Method::Modifiers', 0;

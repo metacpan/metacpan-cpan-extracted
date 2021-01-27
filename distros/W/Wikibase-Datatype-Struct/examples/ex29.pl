@@ -4,26 +4,30 @@ use strict;
 use warnings;
 
 use Data::Printer;
-use Wikibase::Datatype::Value::Property;
-use Wikibase::Datatype::Struct::Value::Property qw(obj2struct);
+use Wikibase::Datatype::Value::Time;
+use Wikibase::Datatype::Struct::Value::Time qw(obj2struct);
 
 # Object.
-my $obj = Wikibase::Datatype::Value::Property->new(
-        'value' => 'P123',
+my $obj = Wikibase::Datatype::Value::Time->new(
+        'precision' => 10,
+        'value' => '+2020-09-01T00:00:00Z',
 );
 
 # Get structure.
-my $struct_hr = obj2struct($obj);
+my $struct_hr = obj2struct($obj, 'http://test.wikidata.org/entity/');
 
 # Dump to output.
 p $struct_hr;
 
 # Output:
 # \ {
-#     type    "wikibase-entityid",
+#     type    "time",
 #     value   {
-#         entity-type   "property",
-#         id            "P123",
-#         numeric-id    123
+#         after           0,
+#         before          0,
+#         calendarmodel   "http://test.wikidata.org/entity/Q1985727",
+#         precision       10,
+#         time            "+2020-09-01T00:00:00Z",
+#         timezone        0
 #     }
 # }

@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::SessionFactory;
 # ABSTRACT: Role for session factories
-$Dancer2::Core::Role::SessionFactory::VERSION = '0.300004';
+$Dancer2::Core::Role::SessionFactory::VERSION = '0.300005';
 use Moo::Role;
 with 'Dancer2::Core::Role::Engine';
 
@@ -301,7 +301,7 @@ Dancer2::Core::Role::SessionFactory - Role for session factories
 
 =head1 VERSION
 
-version 0.300004
+version 0.300005
 
 =head1 DESCRIPTION
 
@@ -334,6 +334,12 @@ Defaults to "/".
 Default duration before session cookie expiration.  If set, the
 L<Dancer2::Core::Session> C<expires> attribute will be set to the current time
 plus this duration (expression parsed by L<Dancer2::Core::Time>).
+
+=head2 cookie_same_site
+
+Restricts the session cookie to a first-party or same-site context.
+Defaults to the empty string and is unused as a result.
+See L<Dancer2::Core::Cookie/same_site>.
 
 =head2 session_duration
 
@@ -505,7 +511,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexis Sukrieh.
+This software is copyright (c) 2021 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

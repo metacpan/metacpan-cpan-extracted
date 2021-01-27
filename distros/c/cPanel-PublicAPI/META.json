@@ -54,6 +54,6 @@
          "web" : "https://github.com/CpanelInc/cPanel-PublicAPI"
       }
    },
-   "version" : "2.7",
+   "version" : "2.8",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

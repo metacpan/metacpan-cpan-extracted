@@ -1,0 +1,36 @@
+---
+abstract: 'a simplistic module to connect to chat servers via matterbridge'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Matterbridge
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '5'
+  Filter::signatures: '0.16'
+  JSON: '0'
+  Mojolicious: '8'
+  Moo: '2'
+  Moo::Role: '2'
+  POSIX: '0'
+  perl: '5.016'
+resources:
+  bugtracker: http://github.com/Corion/Mojolicious-Matterbridge/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/Mojolicious-Matterbridge.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

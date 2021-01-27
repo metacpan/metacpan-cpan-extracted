@@ -1,6 +1,6 @@
 package Dancer2::Logger::Note;
 # ABSTRACT: Test::More note() logging engine for Dancer2
-$Dancer2::Logger::Note::VERSION = '0.300004';
+$Dancer2::Logger::Note::VERSION = '0.300005';
 use Moo;
 use Test::More;
 
@@ -26,7 +26,7 @@ Dancer2::Logger::Note - Test::More note() logging engine for Dancer2
 
 =head1 VERSION
 
-version 0.300004
+version 0.300005
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexis Sukrieh.
+This software is copyright (c) 2021 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

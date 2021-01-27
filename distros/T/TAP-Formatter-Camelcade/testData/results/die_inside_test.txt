@@ -1,0 +1,19 @@
+teamcity[enteredTheMatrix timestamp='2019-03-10T12:56:49.973']
+teamcity[testingStarted timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteStarted locationHint='myfile://testData/tests/die_inside_test.t' name='testData/tests/die_inside_test.t' nodeId='myfile://testData/tests/die_inside_test.t-0' parentNodeId='0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testStarted name='first test' nodeId='myfile://testData/tests/die_inside_test.t-0-first test-1' parentNodeId='myfile://testData/tests/die_inside_test.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testStdErr name='first test' nodeId='myfile://testData/tests/die_inside_test.t-0-first test-1' out='Died at testData/tests/die_inside_test.t line 5.|n# Tests were run but no plan was declared and done_testing() was not seen.|n# Looks like your test exited with 255 just after 1.|n' parentNodeId='myfile://testData/tests/die_inside_test.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testFinished duration='42' name='first test' nodeId='myfile://testData/tests/die_inside_test.t-0-first test-1' parentNodeId='myfile://testData/tests/die_inside_test.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testStarted name='Initialization error' nodeId='myfile://testData/tests/die_inside_test.t-0-Initialization error-2' parentNodeId='myfile://testData/tests/die_inside_test.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testFailed message='Non-zero exit code: 255' name='Initialization error' nodeId='myfile://testData/tests/die_inside_test.t-0-Initialization error-2' parentNodeId='myfile://testData/tests/die_inside_test.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testFinished duration='0' name='Initialization error' nodeId='myfile://testData/tests/die_inside_test.t-0-Initialization error-2' parentNodeId='myfile://testData/tests/die_inside_test.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteFinished locationHint='testData/tests/die_inside_test.t' name='testData/tests/die_inside_test.t' nodeId='myfile://testData/tests/die_inside_test.t-0' parentNodeId='0' timestamp='2019-03-10T12:56:49.973']
+
+Test Summary Report
+-------------------
+testData/tests/die_inside_test.t (Wstat: 65280 Tests: 1 Failed: 0)
+  Non-zero exit status: 255
+  Parse errors: No plan found in TAP output
+Files=1, Tests=1, TEST_MODE_STATS;
+Result: FAIL
+teamcity[testingFinished timestamp='2019-03-10T12:56:49.973']

@@ -1,6 +1,6 @@
 package Dancer2::Core::Cookie;
 # ABSTRACT: A cookie representing class
-$Dancer2::Core::Cookie::VERSION = '0.300004';
+$Dancer2::Core::Cookie::VERSION = '0.300005';
 use Moo;
 use URI::Escape;
 use Dancer2::Core::Types;
@@ -41,7 +41,7 @@ sub xs_to_header {
             path     => $self->path,
             domain   => $self->domain,
             expires  => $self->expires,
-            httponly => !!$self->http_only, # HTTP::XSCookies seems to distinguish between '"0"' and '0'
+            httponly => $self->http_only,
             secure   => $self->secure,
             samesite => $self->same_site,
         }
@@ -152,7 +152,7 @@ Dancer2::Core::Cookie - A cookie representing class
 
 =head1 VERSION
 
-version 0.300004
+version 0.300005
 
 =head1 SYNOPSIS
 
@@ -221,8 +221,11 @@ attribute to 0.
 
 =head2 same_site
 
-Whether the cookie ought not to be sent along with cross-site requests,
-an enum of either "Strict" or "Lax", default is unset.
+Whether the cookie ought not to be sent along with cross-site requests.
+Valid values are C<Strict>, C<Lax>, or C<None>. Default is unset.
+Refer to
+L<RFC6265bis|https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site>
+for further details regarding same-site context.
 
 =head1 METHODS
 
@@ -242,7 +245,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexis Sukrieh.
+This software is copyright (c) 2021 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

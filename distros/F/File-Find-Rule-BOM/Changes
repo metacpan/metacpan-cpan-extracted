@@ -1,3 +1,9 @@
+0.03 2021-01-27T09:52:39+01:00
+ - Add missing dot in sentence in doc.
+ - Fix bugtracker.
+ - Sort modules in tests.
+ - Update copyright years.
+
 0.02 2020-02-27T22:39:39+01:00
  - Add sort of output files in test. Maybe fixes #131997.
  - Fix dependencies.

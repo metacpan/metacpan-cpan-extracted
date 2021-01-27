@@ -1,3 +1,8 @@
+0.09 2021-01-27T01:39:53+01:00
+ - Fix bugtracker.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Update copyright years.
+
 0.08 2020-02-02T21:26:39+01:00
  - Add tests for append_param() method.
  - Fix and improve functionality of append_param() method.

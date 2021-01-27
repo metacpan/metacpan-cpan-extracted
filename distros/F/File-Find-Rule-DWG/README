@@ -6,6 +6,7 @@ SYNOPSIS
      use File::Find::Rule::DWG;
 
      my @files = File::Find::Rule->dwg->in($dir);
+     my @files = File::Find::Rule->dwg_magic($acad_magic)->in($dir);
 
 DESCRIPTION
     This Perl module contains File::Find::Rule rules for detecting DWG
@@ -19,7 +20,13 @@ SUBROUTINES
 
     The "dwg()" rule detect DWG files.
 
-EXAMPLE
+  "dwg_magic"
+     my @files = File::Find::Rule->dwg_magic($acad_magic)->in($dir);
+
+    The "dwg_magic($acad_magic)" rule detect DWG files for one magic version
+    (e.g. AC1008).
+
+EXAMPLE1
      use strict;
      use warnings;
 
@@ -40,6 +47,29 @@ EXAMPLE
 
      # Output like:
      # Usage: qr{[\w\/]+} dir
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use File::Find::Rule;
+     use File::Find::Rule::DWG;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 dir acad_magic\n";
+             exit 1;
+     }
+     my $dir = $ARGV[0];
+     my $acad_magic = $ARGV[1];
+
+     # Print all DWG files in directory.
+     foreach my $file (File::Find::Rule->dwg_magic($acad_magic)->in($dir)) {
+             print "$file\n";
+     }
+
+     # Output like:
+     # Usage: qr{[\w\/]+} dir acad_magic
 
 DEPENDENCIES
     CAD::AutoCAD::Detect, File::Find::Rule.
@@ -63,10 +93,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2020
+    © Michal Josef Špaček 2020-2021
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

@@ -1,9 +1,9 @@
 package WordList::ColorName::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-10'; # DATE
+our $DATE = '2020-12-26'; # DATE
 our $DIST = 'WordList-ColorName-Any'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use parent qw(WordList);
 
@@ -60,19 +60,47 @@ WordList::ColorName::Any - Wordlist from any Graphics::ColorNames::* module
 
 =head1 VERSION
 
-This document describes version 0.002 of WordList::ColorName::Any (from Perl distribution WordList-ColorName-Any), released on 2020-07-10.
+This document describes version 0.003 of WordList::ColorName::Any (from Perl distribution WordList-ColorName-Any), released on 2020-12-26.
 
 =head1 SYNOPSIS
+
+From Perl:
 
  use WordList::ColorName::Any;
 
  my $wl = WordList::ColorName::Any->new(scheme => 'WWW');
  $wl->each_word(sub { ... });
 
+From the command-line:
+
+ % wordlist -w ColorName::Any=scheme,WWW
+
 =head1 DESCRIPTION
 
 This is a dynamic, parameterized wordlist to get list of words from a
 Graphics::ColorNames::* module.
+
+=head1 WORDLIST PARAMETERS
+
+
+This is a parameterized wordlist module. When loading in Perl, you can specify
+the parameters to the constructor, for example:
+
+ use WordList::ColorName::Any;
+ my $wl = WordList::ColorName::Any->(bar => 2, foo => 1);
+
+
+When loading on the command-line, you can specify parameters using the
+C<WORDLISTNAME=ARGNAME1,ARGVAL1,ARGNAME2,ARGVAL2> syntax, like in L<perl>'s
+C<-M> option, for example:
+
+ % wordlist -w ColorName::Any=foo,1,bar,2 ...
+
+Known parameters:
+
+=head2 scheme
+
+Required. Graphics::ColorNames scheme name, e.g. "WWW" for Graphics::ColorNames::WWW.
 
 =head1 HOMEPAGE
 
@@ -84,7 +112,7 @@ Source repository is at L<https://github.com/perlancar/perl-WordList-ColorName-A
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-ColorName-Any>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WordList-ColorName-Any/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

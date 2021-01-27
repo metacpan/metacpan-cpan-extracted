@@ -3,44 +3,57 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Struct::Value qw(struct2obj);
+use Wikibase::Datatype::Struct::Utils qw(struct2snaks_array_ref);
 
-# Time structure.
 my $struct_hr = {
-        'type' => 'time',
-        'value' => {
-                'after' => 0,
-                'before' => 0,
-                'calendarmodel' => 'http://test.wikidata.org/entity/Q1985727',
-                'precision' => 10,
-                'time' => '+2020-09-01T00:00:00Z',
-                'timezone' => 0,
+        'snaks' => {
+                'P31' => [{
+                        'datatype' => 'wikibase-item',
+                        'datavalue' => {
+                                'type' => 'wikibase-entityid',
+                                'value' => {
+                                        'entity-type' => 'item',
+                                        'id' => 'Q5',
+                                        'numeric-id' => 5,
+                                },
+                        },
+                        'property' => 'P31',
+                        'snaktype' => 'value',
+
+                }],
+                'P2534' => [{
+                        'datatype' => 'math',
+                        'datavalue' => {
+                                'type' => 'string',
+                                'value' => 'E = m c^2',
+                        },
+                        'property' => 'P2534',
+                        'snaktype' => 'value',
+                }],
         },
+        'snaks-order' => [
+                'P31',
+                'P2534',
+        ],
 };
 
-# Get object.
-my $obj = struct2obj($struct_hr);
+# Convert snaks structure to list of Snak objects.
+my $snaks_ar = struct2snaks_array_ref($struct_hr, 'snaks');
 
-# Get calendar model.
-my $calendarmodel = $obj->calendarmodel;
-
-# Get precision.
-my $precision = $obj->precision;
-
-# Get type.
-my $type = $obj->type;
-
-# Get value.
-my $value = $obj->value;
-
-# Print out.
-print "Calendar model: $calendarmodel\n";
-print "Precision: $precision\n";
-print "Type: $type\n";
-print "Value: $value\n";
+# Print out. 
+foreach my $snak (@{$snaks_ar}) {
+        print 'Property: '.$snak->property."\n";
+        print 'Type: '.$snak->datatype."\n";
+        print 'Value: '.$snak->datavalue->value."\n";
+        print "\n";
+}
 
 # Output:
-# Calendar model: Q1985727
-# Precision: 10
-# Type: time
-# Value: +2020-09-01T00:00:00Z
+# Property: P31
+# Type: wikibase-item
+# Value: Q5
+#
+# Property: P2534
+# Type: math
+# Value: E = m c^2
+#

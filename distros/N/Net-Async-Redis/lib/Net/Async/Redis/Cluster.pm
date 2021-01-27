@@ -10,7 +10,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.008'; # VERSION
+our $VERSION = '3.009'; # VERSION
 
 =encoding utf8
 
@@ -268,7 +268,9 @@ async sub execute_command {
     my $slot = $self->hash_slot_for_key($k);
     $log->tracef('Look up hash slot for %s - %d', $k, $slot);
     my $redis = await $self->connection_for_slot($slot);
-    return await $redis->execute_command(@cmd);
+    # Some commands have modifiers around them for RESP2/3 transparent support
+    my $command = lc(shift @cmd);
+    return await $redis->$command(@cmd);
 }
 
 1;

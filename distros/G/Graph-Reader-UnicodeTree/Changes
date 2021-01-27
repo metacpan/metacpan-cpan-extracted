@@ -1,3 +1,15 @@
+0.03 2021-01-27T12:59:25+01:00
+ - Add example to doc.
+ - Fix Makefile.PL and use lib.
+ - Fix bugtracker.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rewrite doc to use =head2 in METHODS section.
+ - Update Module::Install to 1.19 version.
+ - Update author name.
+ - Update author github username.
+ - Update copyright years.
+
 0.02 2015-09-28T19:56:27+02:00
  - Fix LICENSE file.
  - Fix cleaning of temporary file in EXAMPLE section in doc.

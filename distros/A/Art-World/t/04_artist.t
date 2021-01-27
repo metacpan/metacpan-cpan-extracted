@@ -1,5 +1,4 @@
-use v5.16;
-use Test::More;
+use Test::More tests => 9;
 use Art::World;
 use Faker;
 

@@ -13,7 +13,7 @@ Dancer2::Config - Configure Dancer2 to suit your needs
 
 =head1 VERSION
 
-version 0.300004
+version 0.300005
 
 =head1 DESCRIPTION
 
@@ -536,6 +536,15 @@ The session expiry time in seconds, or as e.g. "2 hours" (see
 L<Dancer2::Core::Cookie/expires>.  By default, there is no specific expiry
 time.
 
+=head3 cookie_same_site
+
+Restricts the session cookie to a first-party or same-site context. Valid
+values are C<Strict>, C<Lax>, or C<None>.
+
+Refer to
+L<RFC6265bis|https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site>
+for further details regarding same-site context.
+
 =head3 is_secure
 
 The user's session ID is stored in a cookie.  If the C<is_secure> setting is
@@ -547,15 +556,6 @@ only be sent over HTTPS connections.
 This setting defaults to 1 and instructs the session cookie to be created
 with the C<HttpOnly> option active, meaning that JavaScript will not be able
 to access to its value.
-
-=head2 cookie_same_site
-
-Restricts the session cookie to a first-party or same-site context. Valid
-values are C<Strict>, C<Lax>, or C<None>.
-
-Refer to
-L<RFC6265bis|https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site>
-for further details regarding same-site context.
 
 =head2 auto_page (boolean)
 
@@ -686,7 +686,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexis Sukrieh.
+This software is copyright (c) 2021 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

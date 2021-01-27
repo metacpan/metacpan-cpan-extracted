@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 666feabe4193271e5a909e83f76cf6aa7ca963b7e6af378271972af1ac5a261a Changes
+SHA256 c53c6b96081b0a5b9b2fb4d0133d55c20e5e00e4c127ade62f03434ee7b3d2de LICENSE
+SHA256 ad15f35dc9d686e09e11806d2cb3ffeaa164549b09941257c68b6372d5f14cb0 MANIFEST
+SHA256 a1608418f03ee453abf2e5262f35f283f2eef91396ddd458408d2bd4a3e96275 META.json
+SHA256 473ce771f4d2c42079219ff7536d00cfd2da78fd2486d80476770a3e0b74ad50 META.yml
+SHA256 9929b600e06bd27cd0a57bedc5e41cd59b1c8507352f05c6ec0ebf49b700f4a1 Makefile.PL
+SHA256 cc9f64351b15380b13a11fe8404d1c9b9fd0979679d3dd1f4cd5a37b01c8bd31 README
+SHA256 5fb9242200428b056301b460e1da2e8684486b7c319ec517c505f58b741a87f1 lib/Task/Devel/Essentials.pm
+SHA256 b9c3c81a03a0584ee9cbdd9301b80bf8b6d98ccbdc056d56c94e106fde0172c0 maint/modlist
+SHA256 435678cbd35835f0dd411eabfc705c01afbe5c21739c363a2b74ae4f0524e802 maint/upgrade
+SHA256 d70ec164c73c1fd43ccd0f1e681d9f7e9d5bd8ea59c7ea38a25912190b0b6826 t/01_requirements.t
+SHA256 0165775539e1bd612a8911281ea0717c0a051c014370a33757ced041187eca34 t/80_documentation.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBAwAdFiEEjUydDHaxELVSK+hYp13NmW8fHSUFAmAR0vEACgkQp13NmW8f
+HSWNcwf+Jaf8fcRa5qvBwxV52TYpDwjwUr+uFKoC30xA26SOFv6c8yYVRTfLmAe8
+1kIc+tmYyRvTMgG3eAkPrzx2fPav44XA3G+baAaaCZmxyg9kAFErGfbvyJ3MR+gw
+b9cTEbakicQaVQI+iOspClY4EJj/wuB40E6zsjA7bL57NlpM5JTmTHT2mGcHQtHJ
+kqwnMSkKQ7e8EXgCOgFedoQTpJgdmB06DSUix1qMYhHOh0/udhpfC7ZkkczDJ792
+SDxInJQv86gy/W2U1+UbINFJDhaWLbYZddi6qjkuSIDmJ5ptUIDCjaWYf7Pms4rC
+SaJ0CPUhh1IOq8N7Iez6fgTc6JagVw==
+=KrQR
+-----END PGP SIGNATURE-----

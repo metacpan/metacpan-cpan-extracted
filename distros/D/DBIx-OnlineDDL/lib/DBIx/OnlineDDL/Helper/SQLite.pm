@@ -3,7 +3,7 @@ package DBIx::OnlineDDL::Helper::SQLite;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for SQLite-specific code
 use version;
-our $VERSION = 'v0.930.0'; # VERSION
+our $VERSION = 'v0.930.1'; # VERSION
 
 use v5.10;
 use Moo;
@@ -171,7 +171,7 @@ DBIx::OnlineDDL::Helper::SQLite - Private OnlineDDL helper for SQLite-specific c
 
 =head1 VERSION
 
-version v0.930.0
+version v0.930.1
 
 =head1 DESCRIPTION
 

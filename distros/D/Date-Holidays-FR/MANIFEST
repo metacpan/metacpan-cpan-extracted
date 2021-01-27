@@ -5,6 +5,7 @@ MANIFEST
 README
 t/Date-Holidays-FR.t
 t/utf-8.t
+t/conflict.t
 lib/Date/Holidays/FR.pm
 META.yml                                 Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

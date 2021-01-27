@@ -1,12 +1,10 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Encode qw(decode_utf8 encode_utf8);
 use Tag::Reader::Perl;
+use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
 # Object.
 my $obj = Tag::Reader::Perl->new;
@@ -45,7 +43,7 @@ while (my @tag = $obj->gettoken) {
 # [
 # 	[0]: ' 
 #   '
-# 	[1]: data
+# 	[1]: !data
 # 	[2]: 1
 # 	[3]: 11
 # ]
@@ -58,7 +56,7 @@ while (my @tag = $obj->gettoken) {
 # [
 # 	[0]: '
 #     '
-# 	[1]: data
+# 	[1]: !data
 # 	[2]: 2
 # 	[3]: 21
 # ]
@@ -71,7 +69,7 @@ while (my @tag = $obj->gettoken) {
 # [
 # 	[0]: '
 #     '
-# 	[1]: data
+# 	[1]: !data
 # 	[2]: 3
 # 	[3]: 12
 # ]
@@ -83,7 +81,7 @@ while (my @tag = $obj->gettoken) {
 # ]
 # [
 # 	[0]: 'Nová'
-# 	[1]: data
+# 	[1]: !data
 # 	[2]: 4
 # 	[3]: 12
 # ]
@@ -96,7 +94,7 @@ while (my @tag = $obj->gettoken) {
 # [
 # 	[0]: '
 #     '
-# 	[1]: data
+# 	[1]: !data
 # 	[2]: 4
 # 	[3]: 24
 # ]
@@ -108,7 +106,7 @@ while (my @tag = $obj->gettoken) {
 # ]
 # [
 # 	[0]: '5'
-# 	[1]: data
+# 	[1]: !data
 # 	[2]: 5
 # 	[3]: 12
 # ]
@@ -121,7 +119,7 @@ while (my @tag = $obj->gettoken) {
 # [
 # 	[0]: '
 #   '
-# 	[1]: data
+# 	[1]: !data
 # 	[2]: 5
 # 	[3]: 21
 # ]
@@ -134,7 +132,7 @@ while (my @tag = $obj->gettoken) {
 # [
 # 	[0]: '
 # '
-# 	[1]: data
+# 	[1]: !data
 # 	[2]: 6
 # 	[3]: 12
 # ]
@@ -147,7 +145,7 @@ while (my @tag = $obj->gettoken) {
 # [
 # 	[0]: '
 # '
-# 	[1]: data
+# 	[1]: !data
 # 	[2]: 7
 # 	[3]: 12
 # ]

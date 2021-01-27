@@ -3,118 +3,70 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Struct::Statement qw(struct2obj);
+use Data::Printer;
+use Wikibase::Datatype::Struct::Lexeme qw(struct2obj);
 
-# Item structure.
+# Lexeme structure.
 my $struct_hr = {
-        'mainsnak' => {
-                'datatype' => 'wikibase-item',
-                'datavalue' => {
-                        'type' => 'wikibase-entityid',
-                        'value' => {
-                                'entity-type' => 'item',
-                                'id' => 'Q5',
-                                'numeric-id' => 5,
-                        },
-                },
-                'property' => 'P31',
-                'snaktype' => 'value',
-        },
-        'qualifiers' => {
-                'P642' => [{
-                        'datatype' => 'wikibase-item',
-                        'datavalue' => {
-                                'type' => 'wikibase-entityid',
-                                'value' => {
-                                        'entity-type' => 'item',
-                                        'id' => 'Q474741',
-                                        'numeric-id' => 474741,
-                                },
-                        },
-                        'property' => 'P642',
-                        'snaktype' => 'value',
-                }],
-        },
-        'qualifiers-order' => [
-                'P642',
+        'grammaticalFeatures' => [
+                'Q163012',
+                'Q163014',
         ],
-        'rank' => 'normal',
-        'references' => [{
-                'snaks' => {
-                        'P214' => [{
-                                'datatype' => 'external-id',
-                                'datavalue' => {
-                                        'type' => 'string',
-                                        'value' => '113230702',
-                                },
-                                'property' => 'P214',
-                                'snaktype' => 'value',
-                        }],
-                        'P248' => [{
+        'representations' => {
+                'cs' => {
+                        'language' => 'cs',
+                        'value' => 'Representation cs',
+                },
+                'en' => {
+                        'language' => 'en',
+                        'value' => 'Representation en',
+                },
+        },
+        'claims' => {
+                'P31' => [{
+                        'mainsnak' => {
                                 'datatype' => 'wikibase-item',
                                 'datavalue' => {
                                         'type' => 'wikibase-entityid',
                                         'value' => {
                                                 'entity-type' => 'item',
-                                                'id' => 'Q53919',
-                                                'numeric-id' => 53919,
+                                                'id' => 'Q5',
+                                                'numeric-id' => 5,
                                         },
                                 },
-                                'property' => 'P248',
+                                'property' => 'P31',
                                 'snaktype' => 'value',
-                        }],
-                        'P813' => [{
-                                'datatype' => 'time',
-                                'datavalue' => {
-                                        'type' => 'time',
-                                        'value' => {
-                                                'after' => 0,
-                                                'before' => 0,
-                                                'calendarmodel' => 'http://test.wikidata.org/entity/Q1985727',
-                                                'precision' => 11,
-                                                'time' => '+2013-12-07T00:00:00Z',
-                                                'timezone' => 0,
-                                        },
-                                },
-                                'property' => 'P813',
-                                'snaktype' => 'value',
-                        }],
-                },
-                'snaks-order' => [
-                        'P248',
-                        'P214',
-                        'P813',
-                ],
-        }],
-        'type' => 'statement',
+                        },
+                        'rank' => 'normal',
+                        'type' => 'statement',
+                }],
+        },
+        'type' => 'lexeme',
 };
 
 # Get object.
 my $obj = struct2obj($struct_hr);
 
-print 'Claim: '.$obj->snak->property.' -> '.$obj->snak->datavalue->value."\n";
-print "Qualifiers:\n";
-foreach my $property_snak (@{$obj->property_snaks}) {
-        print "\t".$property_snak->property.' -> '.
-                $property_snak->datavalue->value."\n";
-}
-print "References:\n";
-foreach my $reference (@{$obj->references}) {
-        print "\tReference:\n";
-        foreach my $reference_snak (@{$reference->snaks}) {
-                print "\t\t".$reference_snak->property.' -> '.
-                        $reference_snak->datavalue->value."\n";
-        }
-}
-print 'Rank: '.$obj->rank."\n";
+# Dump object.
+p $obj;
 
 # Output:
-# Claim: P31 -> Q5
-# Qualifiers:
-#         P642 -> Q474741
-# References:
-#         Reference:
-#                 P248 -> Q53919
-#                 P214 -> 113230702
-#                 P813 -> +2013-12-07T00:00:00Z
-# Rank: normal
+# Wikibase::Datatype::Lexeme  {
+#     Parents       Mo::Object
+#     public methods (8) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), err (Error::Pure), check_array_object (Mo::utils), check_entity (Wikibase::Datatype::Utils), isa (UNIVERSAL), VERSION (UNIVERSAL)
+#     private methods (1) : __ANON__ (Mo::is)
+#     internals: {
+#         grammatical_features   [
+#             [0] Wikibase::Datatype::Value::Item,
+#             [1] Wikibase::Datatype::Value::Item
+#         ],
+#         id                     undef,
+#         representations        [
+#             [0] Wikibase::Datatype::Value::Monolingual,
+#             [1] Wikibase::Datatype::Value::Monolingual
+#         ],
+#         statements             [
+#             [0] Wikibase::Datatype::Statement
+#         ]
+#     }
+# }

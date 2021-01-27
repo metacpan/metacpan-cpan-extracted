@@ -13,37 +13,15 @@ use ExtUtils::testlib;
 use Test::More ;
 use Test::Differences;
 use Config::Model;
-use File::Path;
-use File::Copy ;
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
+use Path::Tiny;
 use version 0.77 ;
-use Log::Log4perl qw(:easy :levels);
+
+use lib 't/lib';
+use LoadTest;
 
 use warnings;
-no warnings qw(once);
-
 use strict;
-
-use vars qw/$model/;
-
-my $arg = shift || '';
-my ( $trace, $log, $show ) = (0) x 3;
-
-$log  = 1  if $arg =~ /l/;
-$show = 1  if $arg =~ /s/;
-$trace = 1 if $arg =~ /t/ ;
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-my $home = $ENV{HOME} || "";
-my $log4perl_user_conf_file = "$home/.log4config-model";
-
-if ( $log and -e $log4perl_user_conf_file ) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init( $log ? $WARN : $ERROR );
-}
-
-$model = Config::Model -> new (legacy => 'ignore',) ;
 
 eval { require Config::Augeas ;} ;
 if ( $@ ) {
@@ -53,27 +31,27 @@ else {
     plan tests => 18;
 }
 
-ok(1,"compiled");
+my ($model, $trace) = init_test();
 
 # pseudo root were input config file are read
-my $r_root = 'augeas-box/';
+my $r_root = path('augeas-box');
 
 # pseudo root where config files are written by config-model
-my $wr_root = 'wr_root/';
+my $wr_root = setup_test_dir;
 
 # cleanup before tests
-rmtree($wr_root);
-mkpath($wr_root.'etc/ssh/', { mode => 0755 }) ;
-copy($r_root.'etc/hosts',$wr_root.'etc/') ;
-copy($r_root.'etc/ssh/sshd_config',$wr_root.'etc/ssh/') ;
+$wr_root->child('etc/ssh')->mkpath;
+$r_root->child('etc/hosts')->copy($wr_root->child('etc')) ;
+$r_root->child('etc/ssh/sshd_config')->copy($wr_root->child('etc/ssh/')) ;
 
 # set_up data
-do "./t/test_model.pl" ;
+load_test_model($model);
 
-my $i_hosts = $model->instance(instance_name    => 'hosts_inst',
-			       root_class_name  => 'Hosts',
-			       root_dir    => $wr_root ,
-			      );
+my $i_hosts = $model->instance(
+    instance_name    => 'hosts_inst',
+    root_class_name  => 'Hosts',
+    root_dir    => $wr_root ,
+);
 
 ok( $i_hosts, "Created instance for /etc/hosts" );
 
@@ -104,19 +82,18 @@ print $dump if $trace ;
 $i_hosts->write_back ;
 ok(1,"/etc/hosts write back done") ;
 
-my $aug_file      = $wr_root.'etc/hosts';
-my $aug_save_file = $aug_file.'.augsave' ;
-ok(-e $aug_save_file, "check that backup config file $aug_save_file was written");
+my $aug_file      = $wr_root->child('etc/hosts');
+my $aug_save_file = $aug_file->parent->child('hosts.augsave') ;
+ok($aug_save_file->is_file, "check that backup config file $aug_save_file was written");
 
-my @expect = ("192.168.0.1 buildbot\n",
-	      "192.168.0.10\tkomarr\n",
-	      "192.168.0.11\trepoman\n",
-	      "192.168.0.111\tgoner\n"
-	     );
+my @expect = (
+    "192.168.0.1 buildbot\n",
+    "192.168.0.10\tkomarr\n",
+    "192.168.0.11\trepoman\n",
+    "192.168.0.111\tgoner\n"
+);
 
-open(AUG,$aug_file) || die "Can't open $aug_file:$!"; 
-is_deeply([<AUG>],\@expect,"check content of $aug_file") ;
-close AUG;
+is_deeply([$aug_file->lines],\@expect,"check content of $aug_file") ;
 
 # check directly the content of augeas
 my $augeas_obj = $i_root->backend_mgr->backend_obj->_augeas_object ;
@@ -133,9 +110,7 @@ $nb = $augeas_obj -> count_match("/files/etc/hosts/*") ;
 is($nb,3,"Check nb of hosts in Augeas after deletion") ;
 
 pop @expect; # remove goner entry
-open(AUG,$aug_file) || die "Can't open $aug_file:$!"; 
-is_deeply([<AUG>],\@expect,"check content of $aug_file after deletion of goner") ;
-close AUG;
+is_deeply([$aug_file->lines],\@expect,"check content of $aug_file after deletion of goner") ;
 
 $augeas_obj->print('/') if $trace;
 
@@ -152,33 +127,31 @@ my $skip =  (not $have_pkg_config)  ? 'pkgconfig is not installed'
 SKIP: {
     skip $skip , 8 if $skip ;
 
-my $i_sshd = $model->instance(instance_name    => 'sshd_inst',
-			      root_class_name  => 'Sshd',
-			      root_dir    => $wr_root ,
-			     );
+    my $i_sshd = $model->instance(
+        instance_name    => 'sshd_inst',
+        root_class_name  => 'Sshd',
+        root_dir    => $wr_root ,
+    );
 
-ok( $i_sshd, "Created instance for sshd" );
+    ok( $i_sshd, "Created instance for sshd" );
 
-ok( $i_sshd, "Created instance for /etc/ssh/sshd_config" );
+    ok( $i_sshd, "Created instance for /etc/ssh/sshd_config" );
 
-open(SSHD,"$wr_root/etc/ssh/sshd_config")
-  || die "can't open file: $!";
+    my $sshd_config = $wr_root->child('etc/ssh/sshd_config');
+    my @sshd_orig = $sshd_config->lines ;
 
-my @sshd_orig = <SSHD> ;
-close SSHD ;
+    my $sshd_root = $i_sshd->config_root ;
+    $sshd_root->init; # required by Config::Model 1.236
 
-my $sshd_root = $i_sshd->config_root ;
-$sshd_root->init; # required by Config::Model 1.236
+    my $ssh_augeas_obj = $sshd_root->backend_mgr->backend_obj->_augeas_object ;
 
-my $ssh_augeas_obj = $sshd_root->backend_mgr->backend_obj->_augeas_object ;
+    $ssh_augeas_obj->print('/files/etc/ssh/sshd_config/*') if $trace;
+    #my @aug_content = $ssh_augeas_obj->match("/files/etc/ssh/sshd_config/*") ;
+    #print join("\n",@aug_content) ;
 
-$ssh_augeas_obj->print('/files/etc/ssh/sshd_config/*') if $trace;
-#my @aug_content = $ssh_augeas_obj->match("/files/etc/ssh/sshd_config/*") ;
-#print join("\n",@aug_content) ;
+    my $assign = $Config::Model::VERSION >= 2.052 ? ':=' : ':' ;
 
-my $assign = $Config::Model::VERSION >= 2.052 ? ':=' : ':' ;
-
-$expect = qq(AcceptEnv${assign}LC_PAPER,LC_NAME,LC_ADDRESS,LC_TELEPHONE,LC_MEASUREMENT,LC_IDENTIFICATION,LC_ALL
+    $expect = qq(AcceptEnv${assign}LC_PAPER,LC_NAME,LC_ADDRESS,LC_TELEPHONE,LC_MEASUREMENT,LC_IDENTIFICATION,LC_ALL
 AllowUsers${assign}foo,"bar\@192.168.0.*"
 HostbasedAuthentication=no
 HostKey${assign}/etc/ssh/ssh_host_key,/etc/ssh/ssh_host_rsa_key,/etc/ssh/ssh_host_dsa_key
@@ -206,86 +179,73 @@ Match:2
 Ciphers=arcfour256,aes192-cbc,aes192-ctr,aes256-cbc,aes256-ctr -
 );
 
-$dump = $sshd_root->dump_tree ;
-print $dump if $trace ;
-eq_or_diff(  [ split /\n/, $dump ] , [ split /\n/, $expect ] ,"check dump of augeas data");
+    $dump = $sshd_root->dump_tree ;
+    print $dump if $trace ;
+    eq_or_diff(  [ split /\n/, $dump ] , [ split /\n/, $expect ] ,"check dump of augeas data");
 
-# change data content, '~' is like a splice, 'record~0' like a "shift"
-$sshd_root->load("HostbasedAuthentication=yes 
+    # change data content, '~' is like a splice, 'record~0' like a "shift"
+    $sshd_root->load("HostbasedAuthentication=yes 
                   Subsystem:ddftp=/home/dd/bin/ddftp
                   Subsystem~rftp
                   ") ;
 
-# augeas is broken somehow when reloading CIphers, let's delete this field
-$sshd_root->fetch_element("Ciphers")->clear ;
+    # augeas is broken somehow when reloading CIphers, let's delete this field
+    $sshd_root->fetch_element("Ciphers")->clear ;
 
-$dump = $sshd_root->dump_tree ;
-print $dump if $trace ;
+    $dump = $sshd_root->dump_tree ;
+    print $dump if $trace ;
 
-$i_sshd->write_back ;
+    $i_sshd->write_back ;
 
-my $aug_sshd_file      = $wr_root.'etc/ssh/sshd_config';
-my $aug_save_sshd_file = $aug_sshd_file.'.augsave' ;
-ok(-e $aug_save_sshd_file, 
-   "check that backup config file $aug_save_sshd_file was written");
+    my $aug_save_sshd_file = $sshd_config->parent->child('sshd_config.augsave') ;
+    ok($aug_save_sshd_file -> is_file,
+       "check that backup config file $aug_save_sshd_file was written");
 
-my @mod = @sshd_orig;
-$mod[2] = "HostbasedAuthentication yes\n";
-splice @mod, 8,0,"Protocol 1,2\n";
+    my @mod = @sshd_orig;
+    $mod[2] = "HostbasedAuthentication yes\n";
+    splice @mod, 8,0,"Protocol 1,2\n";
 
-$mod[15] = "Subsystem            ddftp /home/dd/bin/ddftp\n";
-splice @mod,24,1 ; # remove Ciphers check because Augeas looks broken
+    $mod[15] = "Subsystem            ddftp /home/dd/bin/ddftp\n";
+    splice @mod,24,1 ; # remove Ciphers check because Augeas looks broken
 
-open(AUG,$aug_sshd_file) || die "Can't open $aug_sshd_file:$!"; 
-eq_or_diff([<AUG>],\@mod,"check content of $aug_sshd_file") ;
-close AUG;
+    eq_or_diff([$sshd_config->lines],\@mod,"check content of $sshd_config") ;
 
-$sshd_root->load("Match~1") ;
+    $sshd_root->load("Match~1") ;
 
-$dump = $sshd_root->dump_tree ;
-print $dump if $trace ;
-$i_sshd->write_back ;
+    $dump = $sshd_root->dump_tree ;
+    print $dump if $trace ;
+    $i_sshd->write_back ;
 
-my $i=0;
-print "mod--\n",map { $i++ . ': '. $_} @mod,"---\n" if $trace ;
+    my $i=0;
+    print "mod--\n",map { $i++ . ': '. $_} @mod,"---\n" if $trace ;
 
-my @lines = splice @mod,36,2 ;
-splice @mod, 32,2, @lines ;
-pop @mod ;
+    my @lines = splice @mod,36,2 ;
+    splice @mod, 32,2, @lines ;
+    pop @mod ;
 
-open(AUG,$aug_sshd_file) || die "Can't open $aug_sshd_file:$!"; 
-is_deeply([<AUG>],\@mod,"check content of $aug_sshd_file after Match~1") ;
-close AUG;
+    is_deeply([$sshd_config->lines],\@mod,"check content of $sshd_config after Match~1") ;
 
-$sshd_root->load("Match:2 Condition User=sarko Group=pres.* -
+    $sshd_root->load("Match:2 Condition User=sarko Group=pres.* -
                           Settings  Banner=/etc/bienvenue2.txt") ;
 
-$i_sshd->write_back ;
+    $i_sshd->write_back ;
 
 
-push @mod,"Match User sarko Group pres.*\n","Banner /etc/bienvenue2.txt\n";
+    push @mod,"Match User sarko Group pres.*\n","Banner /etc/bienvenue2.txt\n";
 
+    my @got = map {s/^[\t ]+//; $_; } $sshd_config->lines;
+    eq_or_diff(\@got,\@mod,"check content of $sshd_config after Match:2 ...") ;
 
-open(AUG,$aug_sshd_file) || die "Can't open $aug_sshd_file:$!"; 
-my @got =  <AUG> ;
-map {s/^[\t ]+//;} @got;
-eq_or_diff(\@got,\@mod,"check content of $aug_sshd_file after Match:2 ...") ;
-close AUG;
-
-$sshd_root->load("Match:2 Condition User=sarko Group=pres.* -
+    $sshd_root->load("Match:2 Condition User=sarko Group=pres.* -
                           Settings  AllowTcpForwarding=yes") ;
 
-$i_sshd->write_back ;
+    $i_sshd->write_back ;
 
-$i=0;
-print "mod--\n",map { $i++ . ': '. $_} @mod,"---\n" if $trace ;
-splice @mod,37,0,"AllowTcpForwarding yes\n";
+    $i=0;
+    print "mod--\n",map { $i++ . ': '. $_} @mod,"---\n" if $trace ;
+    splice @mod,37,0,"AllowTcpForwarding yes\n";
 
-open(AUG,$aug_sshd_file) || die "Can't open $aug_sshd_file:$!"; 
-@got =  <AUG> ;
-map {s/^[\t ]+//;} @got;
-eq_or_diff( \@got,\@mod,"check content of $aug_sshd_file after Match:2 AllowTcpForwarding=yes") ;
-close AUG;
-
+    @got = map {s/^[\t ]+//; $_; } $sshd_config->lines;
+    eq_or_diff( \@got,\@mod,"check content of $sshd_config after Match:2 AllowTcpForwarding=yes") ;
 
 } # end SKIP section

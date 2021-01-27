@@ -83,22 +83,57 @@ sub execute {
                 );
             }
         }
+        $log->info(
+            sprintf(
+                "Found %d complete documents on the server",
+                scalar(@$documents)
+            )
+        );
     }
     else {
         $documents = $project->documents;
+        $log->info(
+            sprintf(
+                "Found %d documents on the server",
+                scalar(@$documents)
+            )
+        );
     }
 
     if ( $rundata->{skip_missing} ) {
         my @existing_documents = grep {
-            -e get_file_path(
+            my $filepath = get_file_path(
                 $rundata->{project_workdir},
                 $_->target_language,
-                $_->name, $rundata->{filetype})
-            } @$documents;
+                $_->name, $rundata->{filetype});
+
+            my $exists = -e $filepath;
+
+            if ($rundata->{debug}) {
+                my $status = $exists ? 'exists' : 'does not exist';
+                $log->info(
+                    sprintf("%s (%s)", $filepath, $status)
+                );
+            }
+
+            # return the status
+            $exists;
+        } @$documents;
         $documents = \@existing_documents;
     }
 
-    $self->app->document_export_api->export_files($documents);
+    my $count = scalar(@$documents);
+    if ($count == 0) {
+        $log->warn('List of documents to download is empty; nothing to do.');
+    } else {
+        $log->info(
+            sprintf(
+                "Will download %d documents",
+                $count
+            )
+        );
+        $self->app->document_export_api->export_files($documents);
+    }
 
     $log->info(
         sprintf(

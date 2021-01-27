@@ -4,6 +4,8 @@ use warnings;
 use Module::Build;
 Module::Build->VERSION('0.4004');
 
+use Config;
+
 my $builder = Module::Build->new(
     module_name         => 'Store::Directories',
     license             => 'perl_5',
@@ -33,6 +35,11 @@ my $builder = Module::Build->new(
         }
     }
 );
+
+unless ($Config{osname} =~ /linux/i) {
+    print STDERR "Store::Directories is for Linux ONLY\n";
+    exit 1;
+}
 
 $builder->add_build_element('sql');
 $builder->create_build_script();

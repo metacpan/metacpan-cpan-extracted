@@ -1,6 +1,6 @@
 package Dancer2::CLI;
 # ABSTRACT: Dancer2 cli application
-$Dancer2::CLI::VERSION = '0.300004';
+$Dancer2::CLI::VERSION = '0.300005';
 use strict;
 use warnings;
 use App::Cmd::Setup -app;
@@ -19,7 +19,7 @@ Dancer2::CLI - Dancer2 cli application
 
 =head1 VERSION
 
-version 0.300004
+version 0.300005
 
 =head1 AUTHOR
 
@@ -27,7 +27,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexis Sukrieh.
+This software is copyright (c) 2021 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

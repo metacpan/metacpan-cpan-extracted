@@ -4,7 +4,9 @@ use warnings;
 
 use base 'RxPerl::Observable';
 
-our $VERSION = "v6.4.2";
+use Hash::Ordered;
+
+our $VERSION = "v6.5.0";
 
 # over-rideable
 # sub _on_subscribe {
@@ -21,7 +23,7 @@ our $VERSION = "v6.4.2";
 sub new {
     my ($class) = @_;
 
-    my %subscribers;
+    my $subscribers_oh = Hash::Ordered->new();
 
     my $self; $self = $class->SUPER::new(sub {
         my ($subscriber) = @_;
@@ -33,11 +35,11 @@ sub new {
             return;
         }
 
-        $subscribers{$subscriber} = $subscriber;
+        $subscribers_oh->set("$subscriber", $subscriber);
         $self->_on_subscribe($subscriber) if $self->can('_on_subscribe');
 
         return sub {
-            delete $subscribers{$subscriber};
+            $subscribers_oh->delete("$subscriber");
         };
     });
 
@@ -46,16 +48,16 @@ sub new {
         $self->{$type} = sub {
             return if $self->{_closed};
             $self->{_closed} = [$type, @_];
-            foreach my $subscriber (values %subscribers) {
+            foreach my $subscriber ($subscribers_oh->values) {
                 $subscriber->{$type}->(@_) if defined $subscriber->{$type};
             }
-            %subscribers = ();
+            $subscribers_oh->clear();
             # TODO: maybe: delete @$self{qw/ next error complete /};
             # (Think about how subclasses such as BehaviorSubjects will be affected)
         };
     }
     $self->{next} = sub {
-        foreach my $subscriber (values %subscribers) {
+        foreach my $subscriber ($subscribers_oh->values) {
             $subscriber->{next}->(@_) if defined $subscriber->{next};
         }
     };

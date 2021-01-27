@@ -1,11 +1,9 @@
 package Graph::Reader::UnicodeTree;
 
-# Pragmas.
 use base qw(Graph::Reader);
 use strict;
 use warnings;
 
-# Modules.
 use Encode qw(decode_utf8);
 use Readonly;
 
@@ -13,8 +11,7 @@ use Readonly;
 Readonly::Scalar our $GR_LINE => decode_utf8(q{───});
 Readonly::Scalar our $GR_TREE => decode_utf8(q{─┬─});
 
-# Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Read graph subroutine.
 sub _read_graph {
@@ -89,26 +86,29 @@ Graph::Reader::UnicodeTree - Perl class for reading a graph from unicode tree te
 =head1 SYNOPSIS
 
  use Graph::Reader::UnicodeTree;
+
  my $obj = Graph::Reader::UnicodeTree->new;
  my $graph = $obj->read_graph($unicode_tree_file);
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+ my $obj = Graph::Reader::UnicodeTree->new;
 
- Constructor.
- This doesn't take any arguments.
- Returns Graph::Reader::UnicodeTree object.
+Constructor.
+This doesn't take any arguments.
 
-=item C<read_graph($unicode_tree_file)>
+Returns Graph::Reader::UnicodeTree object.
 
- Read a graph from the specified file.
- The argument can either be a filename, or a filehandle for a previously opened file.
- Returns Graph object.
+=head2 C<read_graph>
 
-=back
+ my $graph = $obj->read_graph($unicode_tree_file);
+
+Read a graph from the specified file.
+The argument can either be a filename, or a filehandle for a previously opened file.
+
+Returns Graph object.
 
 =head1 UNICODE TREE FILE FORMAT
 
@@ -123,13 +123,11 @@ Graph::Reader::UnicodeTree - Perl class for reading a graph from unicode tree te
    │   └─9
    └─10
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Graph::Reader::UnicodeTree;
  use IO::Barf qw(barf);
@@ -167,6 +165,31 @@ Graph::Reader::UnicodeTree - Perl class for reading a graph from unicode tree te
  # Output:
  # 1-10,1-2,1-3,1-5,1-6,3-4,6-7,6-8,6-9
 
+=head1 EXAMPLE2
+
+ use strict;
+ use warnings;
+
+ use Graph::Reader::UnicodeTree;
+
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 data_file\n";
+         exit 1;
+ }
+ my $data_file = $ARGV[0];
+
+ # Reader object.
+ my $obj = Graph::Reader::UnicodeTree->new;
+
+ # Get graph from file.
+ my $g = $obj->read_graph($data_file);
+
+ # Print to output.
+ print $g."\n";
+
+ # Output like:
+ # 1-10,1-2,1-3,1-5,1-6,3-4,6-7,6-8,6-9
+
 =head1 DEPENDENCIES
 
 L<Encode>,
@@ -189,21 +212,22 @@ Install the Graph::Reader modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Graph-Reader-UnicodeTree>
+L<https://github.com/michal-josef-spacek/Graph-Reader-UnicodeTree>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2013-2015
- BSD 2-Clause License
+© Michal Josef Špaček 2013-2021
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

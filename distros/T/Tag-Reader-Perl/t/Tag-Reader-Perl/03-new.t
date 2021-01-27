@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use English qw(-no_match_vars);
 use Tag::Reader::Perl;
 use Test::More 'tests' => 3;

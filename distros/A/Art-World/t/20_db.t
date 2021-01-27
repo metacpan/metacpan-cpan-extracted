@@ -1,6 +1,6 @@
-use Test::More;
+use Test::More tests => 1;
 SKIP: {
-    skip('The DBI is not yet implemented');
+    skip 'The DBI is not yet implemented', 1;
 
 # use Data::Dump;
 # use BSON::Document;

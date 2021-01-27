@@ -1,5 +1,10 @@
 Revision history for Perl extension RxPerl
 
+v6.5.0 2021-01-27T08:53:33Z
+
+    - added op_skip_until
+    - FIXED: subjects emit to subscribers in the right order
+
 v6.4.2 2021-01-16T06:59:54Z
 
     - removed the ability to call pipeable operators as observable methods

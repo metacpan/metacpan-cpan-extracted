@@ -22,14 +22,16 @@ no_index:
 provides:
   Date::Holidays::FR:
     file: lib/Date/Holidays/FR.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Date::Easter: '0'
-  Time::Local: '0'
+  Readonly: '0'
+  Time::Local: '1.28'
   perl: '5.006000'
   strict: '0'
   warnings: '0'
 resources:
+  bugtracker: https://github.com/jforget/Date-Holidays-FR/issues
   repository: https://github.com/jforget/Date-Holidays-FR.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

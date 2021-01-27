@@ -10,7 +10,7 @@ use DateTime::Event::Recurrence;
 use English;
 use Error::Pure qw(err);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -431,12 +431,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2013-2020
+© Michal Josef Špaček 2013-2021
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

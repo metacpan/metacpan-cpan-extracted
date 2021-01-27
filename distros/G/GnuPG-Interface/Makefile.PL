@@ -23,6 +23,7 @@ requires 'MooX::HandlesVia' => '0.001004';
 requires 'MooX::late' => '0.014';
 requires 'Math::BigInt' => '1.78';
 requires 'Fatal';
+requires 'Scalar::Util';
 license 'perl';
 
 

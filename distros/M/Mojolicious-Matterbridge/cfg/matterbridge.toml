@@ -1,0 +1,37 @@
+[[gateway]]
+name="gateway1"
+enable=true
+
+[api.myapi]
+BindAddress="127.0.0.1:4242"
+Buffer=1000
+RemoteNickFormat="{NICK}"
+
+#[irc.myirc]
+#Server="irc.perl.org:6667"
+#Nick="corion-matterbridge-testbot"
+##RemoteNickFormat="[{PROTOCOL}] <{NICK}> "
+##RemoteNickFormat=""
+
+[xmpp.myxmpp]
+Server="localhost:5280"
+#Jid your userid
+Jid="trinity1@corion.net"
+#Password="yourpass"
+Muc="meet.jit.si"
+Nick="Trinity1"
+RemoteNickFormat="[{PROTOCOL}] <{NICK}> "
+
+#[[gateway.inout]]
+#account="irc.myirc"
+#channel="#bottest-corion"
+##options = { key="password" }
+
+[[gateway.inout]]
+account="api.myapi"
+channel="api"
+
+[[gateway.inout]]
+account="xmpp.myxmpp"
+channel="german-pm"
+

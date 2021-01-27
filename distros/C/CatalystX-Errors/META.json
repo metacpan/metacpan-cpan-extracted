@@ -1,0 +1,56 @@
+{
+   "abstract" : "Default Web HTTP Error Pages",
+   "author" : [
+      "John Napiorkowski <jjn1056@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CatalystX-Errors",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Utils" : "0",
+            "HTTP::Headers::ActionPack" : "0",
+            "JSON::MaybeXS" : "0",
+            "MRO::Compat" : "0",
+            "Moose" : "0",
+            "Scalar::List::Utils" : "0",
+            "Text::Template" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Test::Most" : "0.34"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jjn1056/CatalystX-Errors/issues"
+      },
+      "homepage" : "https://github.com/jjn1056/CatalystX-Errors",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jjn1056/CatalystX-Errors",
+         "web" : "https://github.com/jjn1056/CatalystX-Errors"
+      }
+   },
+   "version" : "0.001002",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+}
+

@@ -38,8 +38,8 @@ requires:
   URI::Escape: 0
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Pure
+  bugtracker: https://github.com/michal-josef-spacek/CGI-Pure/issues
   homepage: https://github.com/michal-josef-spacek/CGI-Pure
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/CGI-Pure
-version: '0.08'
+version: '0.09'

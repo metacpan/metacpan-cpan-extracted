@@ -1,5 +1,9 @@
 Revision history for Task-Devel-Essentials
 
+0.015   Mon, 25 Jan 2021 23:30:46 +0100
+        upgraded versions
+        added resources metadata
+
 0.014   Thu, 02 Jan 2020 12:00:58 +0100
         upgraded versions
         switched to Artistic License 2.0

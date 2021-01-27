@@ -18,6 +18,7 @@ no_index:
     - Net::Z3950::RPN
 requires:
   Cpanel::JSON::XS: 4.08
+  LWP::Protocol::https: 6.04
   LWP::UserAgent: 6.05
   MARC::File::XML: v1.0.5
   MARC::Record: 2
@@ -30,4 +31,4 @@ requires:
 resources:
   bugtracker: https://issues.folio.org/projects/ZF/issues
   repository: https://github.com/folio-org/Net-Z3950-FOLIO.git
-version: 1.5
+version: 1.6

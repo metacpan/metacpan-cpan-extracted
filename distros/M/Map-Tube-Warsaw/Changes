@@ -1,3 +1,9 @@
+0.08 2021-01-27T01:34:51+01:00
+ - Fix bugtracker.
+ - Improve SYNOPSIS section in doc.
+ - Rewrite doc to use =head2 in METHODS section.
+ - Update copyright years.
+
 0.07 2020-11-03T23:23:41+01:00
  - Add new stations.
  - Add EXAMPLE5 section to doc.

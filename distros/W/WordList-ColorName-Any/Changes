@@ -1,3 +1,10 @@
+0.003   2020-12-26  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Show how to use from CLI.
+
+
 0.002   2020-07-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename distro WordList-Color{,Name}-Any.

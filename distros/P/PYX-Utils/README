@@ -10,30 +10,41 @@ SYNOPSIS
      my $encoded_text = entity_encode($text);
 
 SUBROUTINES
-    "decode($text)"
-             Decode characters.
-             Currently decode newline to '\n'.
-             Returns decoded text.
+  "decode"
+     my $decoded_text = decode($text);
 
-    "encode($text)"
-             Encode characters.
-             Currently encode '\n' to newline.
-             Returns encoded text.
+    Decode characters. Currently decode newline to '\n'.
 
-    "entity_decode($text)"
-             Decode entities.
-             - '&lt;' => '<'
-             - '&amp;' => '&'
-             - '&quot;' => '"'
-             Returns decoded text.
+    Returns decoded text.
 
-    "entity_encode($text)"
-             Encode some chars for HTML/XML/SGML.
-             Currenctly encode these characters:
-             - '<' => '&lt;'
-             - '&' => '&amp;'
-             - '"' => '&quot;'
-             Returns encoded text.
+  "encode"
+     my $encoded_text = encode($text);
+
+    Encode characters. Currently encode '\n' to newline.
+
+    Returns encoded text.
+
+  "entity_decode"
+     my $decoded_text = entity_decode($text);
+
+    Decode entities.
+
+     '&lt;' => '<'
+     '&amp;' => '&'
+     '&quot;' => '"'
+
+    Returns decoded text.
+
+  "entity_encode"
+     my $encoded_text = entity_encode($text);
+
+    Encode some chars for HTML/XML/SGML. Currenctly encode these characters:
+
+     '<' => '&lt;'
+     '&' => '&amp;'
+     '"' => '&quot;'
+
+    Returns encoded text.
 
 EXAMPLE1
      use strict;
@@ -131,10 +142,10 @@ AUTHOR
     Michal Josef Špaček skim@cpan.org
 
 LICENSE AND COPYRIGHT
-    © 2005-2020 Michal Josef Špaček
+    © 2005-2021 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

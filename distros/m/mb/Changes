@@ -1,5 +1,12 @@
 Revision history for this software.
 
+0.20  2021-01-27 00:00:00
+  - removes $term and introduce parse_ambiguous_char()
+  - removes mb::PERL package
+  - CORE::split() acts as mb::split()
+  - supports stacking filetest with no space like -r-w-x
+  - created by INABA Hitoshi
+
 0.19  2021-01-10 00:00:00
   - supports free format of mb::use, mb::no
   - created by INABA Hitoshi

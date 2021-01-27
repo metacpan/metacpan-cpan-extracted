@@ -8,15 +8,15 @@ use RxPerl::Utils qw/ get_timer_subs /;
 use RxPerl::Subscription;
 
 use Carp 'croak';
-use Scalar::Util 'reftype', 'refaddr';
+use Scalar::Util 'reftype', 'refaddr', 'blessed';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
     op_audit_time op_buffer_count op_catch_error op_concat_map op_debounce_time op_delay op_distinct_until_changed
     op_distinct_until_key_changed op_end_with op_exhaust_map op_filter op_finalize op_first op_map op_map_to
     op_merge_map op_multicast op_pairwise op_pluck op_ref_count op_repeat op_retry op_sample_time op_scan
-    op_share op_skip op_start_with op_switch_map op_take op_take_until op_take_while op_tap op_throttle_time
-    op_with_latest_from
+    op_share op_skip op_skip_until op_start_with op_switch_map op_take op_take_until op_take_while op_tap
+    op_throttle_time op_with_latest_from
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -958,6 +958,48 @@ sub op_skip {
     };
 }
 
+sub op_skip_until {
+    my ($notifier) = @_;
+
+    # FUTURE TODO: allow notifier to be a promise
+    croak q"You provided 'undef' where a stream was expected. You can provide an observable."
+        unless defined $notifier;
+    croak q"The notifier of 'op_skip_until' needs to be an observable."
+        unless blessed $notifier and $notifier->isa('RxPerl::Observable');
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $notifier_has_emitted;
+            my $n_s = $notifier->pipe(
+                op_take(1),
+            )->subscribe(
+                sub {
+                    $notifier_has_emitted = 1;
+                },
+                sub {
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                },
+            );
+
+            my $own_subscriber = {
+                %$subscriber,
+                next => sub {
+                    $subscriber->{next}->(@_) if defined $subscriber->{next}
+                        and $notifier_has_emitted;
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return $n_s;
+        });
+    };
+}
+
 sub op_start_with {
     my (@values) = @_;
 
@@ -968,7 +1010,7 @@ sub op_start_with {
             rx_of(@values),
             $source,
         );
-    }
+    };
 }
 
 sub op_switch_map {

@@ -19,15 +19,14 @@ perl_version 5.008;
 readme_from 'Set.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.03;
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Random-Set';
-resources 'homepage' => 'https://github.com/tupinek/Random-Set';
-resources 'repository' => 'git://github.com/tupinek/Random-Set';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Random-Set/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Random-Set';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Random-Set';
 test_requires 'English' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.06';
+version '0.07';
 
 # Run.
 WriteAll();

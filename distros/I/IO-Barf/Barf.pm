@@ -11,7 +11,7 @@ use Scalar::Util qw(blessed);
 # Constants.
 Readonly::Array our @EXPORT => qw(barf);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Barf content to file.
 sub barf {
@@ -63,13 +63,13 @@ IO::Barf - Barfing content to output file.
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<barf>
 
-=item C<barf($file_or_handler, $content)>
+ barf($file_or_handler, 'CONTENT');
 
- Barf content to file or handler.
+Barf content to file or handler.
 
-=back
+Returns undef.
 
 =head1 ERRORS
 
@@ -263,12 +263,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2009-2020 Michal Josef Špaček
+© 2009-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

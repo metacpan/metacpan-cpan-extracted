@@ -3,7 +3,7 @@ package DBIx::OnlineDDL;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Run DDL on online databases safely
 use version;
-our $VERSION = 'v0.930.0'; # VERSION
+our $VERSION = 'v0.930.1'; # VERSION
 
 use v5.10;
 use Moo;
@@ -1322,8 +1322,8 @@ sub swap_tables {
         my $fk_hash = $vars->{foreign_keys}{definitions} //= {};
         $self->dbh_runner(run => set_subname '_fk_info_query', sub {
             $dbh = $_;
-            $fk_hash->{parent} = $self->_fk_info_to_hash( $dbh->foreign_key_info(undef, undef, undef, $catalog, $schema, $new_table_name)  );
-            $fk_hash->{child}  = $self->_fk_info_to_hash( $dbh->foreign_key_info($catalog, $schema, $orig_table_name, undef, undef, undef) );
+            $fk_hash->{parent} = $self->_fk_info_to_hash( $helper->foreign_key_info(undef, undef, undef, $catalog, $schema, $new_table_name)  );
+            $fk_hash->{child}  = $self->_fk_info_to_hash( $helper->foreign_key_info($catalog, $schema, $orig_table_name, undef, undef, undef) );
         });
     }
 
@@ -1680,7 +1680,7 @@ DBIx::OnlineDDL - Run DDL on online databases safely
 
 =head1 VERSION
 
-version v0.930.0
+version v0.930.1
 
 =head1 SYNOPSIS
 

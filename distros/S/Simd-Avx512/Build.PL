@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+require v5.26;
 use Module::Build;
 
 my $b = Module::Build->new
@@ -9,6 +10,7 @@ my $b = Module::Build->new
   requires      =>
    {'Carp'              =>0,
     'Data::Dump'        =>0,
+    'feature'           =>0,
 #   'Data::Table::Text'
     'Test2::API'        =>0,
     'Test::More'        =>0,

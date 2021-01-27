@@ -4,16 +4,27 @@ use base qw(Exporter);
 use strict;
 use warnings;
 
+use English;
 use Error::Pure qw(err);
 use List::MoreUtils qw(none);
-use Wikibase::Datatype::Struct::Snak;
 
 Readonly::Array our @EXPORT_OK => qw(obj_array_ref2struct struct2snaks_array_ref);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub obj_array_ref2struct {
-	my ($snaks_ar, $key, $base_uri) = @_;
+	my ($snaks_ar, $key, $base_uri, $snak_obj, $struct_snak_obj) = @_;
+
+	if (! defined $snak_obj) {
+		$snak_obj = 'Wikibase::Datatype::Snak';
+	}
+	if (! defined $struct_snak_obj) {
+		$struct_snak_obj = 'Wikibase::Datatype::Struct::Snak';
+	}
+	eval "require $struct_snak_obj";
+	if ($EVAL_ERROR) {
+		err "Cannot load '$struct_snak_obj'";
+	}
 
 	if (! defined $base_uri) {
 		err 'Base URI is required.';
@@ -24,8 +35,8 @@ sub obj_array_ref2struct {
 		$key => {},
 	};
 	foreach my $snak_o (@{$snaks_ar}) {
-		if (! $snak_o->isa('Wikibase::Datatype::Snak')) {
-			err "Object isn't 'Wikibase::Datatype::Snak'.";
+		if (! $snak_o->isa($snak_obj)) {
+			err "Object isn't '$snak_obj'.";
 		}
 
 		if (! exists $snaks_hr->{$key}->{$snak_o->property}) {
@@ -37,20 +48,31 @@ sub obj_array_ref2struct {
 			push @{$snaks_hr->{$key.'-order'}}, $snak_o->property;
 		}
 		push @{$snaks_hr->{$key}->{$snak_o->property}},
-			Wikibase::Datatype::Struct::Snak::obj2struct($snak_o, $base_uri);
+			eval $struct_snak_obj.'::obj2struct($snak_o, $base_uri);';
 	}
 
 	return $snaks_hr;
 }
 
 sub struct2snaks_array_ref {
-	my ($struct_hr, $key) = @_;
+	my ($struct_hr, $key, $struct_snak_obj) = @_;
+
+	if (! defined $struct_snak_obj) {
+		$struct_snak_obj = 'Wikibase::Datatype::Struct::Snak';
+	}
+	eval "require $struct_snak_obj";
+	if ($EVAL_ERROR) {
+		err "Cannot load '$struct_snak_obj'";
+	}
 
 	my $snaks_ar = [];
 	foreach my $property (@{$struct_hr->{$key.'-order'}}) {
 		push @{$snaks_ar}, map {
-			Wikibase::Datatype::Struct::Snak::struct2obj($_);
+			eval $struct_snak_obj.'::struct2obj($_)';
 		} @{$struct_hr->{$key}->{$property}};
+		if ($EVAL_ERROR) {
+			err $EVAL_ERROR;
+		}
 	}
 
 	return $snaks_ar;
@@ -72,27 +94,30 @@ Wikibase::Datatype::Struct::Utils - Wikibase structure serialization utilities.
 
  use Wikibase::Datatype::Struct::Utils qw(obj_array_ref2struct struct2snaks_array_ref);
 
- my $snaks_hr = obj_array_ref2struct($snaks_ar, $key, $base_uri);
- my $snaks_ar = struct2snaks_array_ref($struct_hr, $key);
+ my $snaks_hr = obj_array_ref2struct($snaks_ar, $key, $base_uri, $snak_obj, $struct_snak_obj);
+ my $snaks_ar = struct2snaks_array_ref($struct_hr, $key, $struct_snak_obj);
 
 =head1 SUBROUTINES
 
 =head2 C<obj_array_ref2struct>
 
- my $snaks_hr = obj_array_ref2struct($snaks_ar, $key, $base_uri);
+ my $snaks_hr = obj_array_ref2struct($snaks_ar, $key, $base_uri, $snak_obj);
 
 Helper subroutine for converting list of Snak objects to snaks structure.
 This subroutine is used in Statement and Reference module.
 C<$base_uri> is base URI of Wikibase system (e.g. http://test.wikidata.org/entity/).
+C<$snak_obj> is object for snak (default value is 'Wikibase::Datatype::Snak').
+C<$struct_snak_obj> is object for struct snak (default value is 'Wikibase::Datatype::Struct::Snak').
 
 Returns structure with multiple snaks.
 
 =head2 C<struct2snaks_array_ref>
 
- my $snaks_ar = struct2snaks_array_ref($struct_hr, $key);
+ my $snaks_ar = struct2snaks_array_ref($struct_hr, $key, $struct_snak_obj);
 
 Helper subroutine for converting snaks structure to list of Snak objects.
 This subroutine is used in Statement and Reference module.
+C<$struct_snak_obj> is object for struct snak (default value is 'Wikibase::Datatype::Struct::Snak').
 
 Returns reference to array with snaks objects.
 
@@ -252,8 +277,7 @@ Returns reference to array with snaks objects.
 
 L<Error::Pure>,
 L<Exporter>,
-L<List::MoreUtils>,
-L<Wikibase::Datatype::Struct::Snak>.
+L<List::MoreUtils>.
 
 =head1 SEE ALSO
 
@@ -283,6 +307,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

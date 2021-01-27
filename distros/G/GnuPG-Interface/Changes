@@ -1,5 +1,9 @@
 Revision history for GnuPG-Interface
 
+1.01 - 2021-01-26
+ - Make $gnupg->call('foo') update the internal GnuPG version number.
+ - Localize tainted PATH env to make exec happy
+
 1.0 - 2020-05-13
  - Limit support to GnuPG 2.2+ and 1.4
  - Additional information from keys when using GnuPG 2.2 or higher

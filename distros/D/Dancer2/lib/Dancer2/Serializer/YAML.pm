@@ -1,19 +1,28 @@
 package Dancer2::Serializer::YAML;
 # ABSTRACT: Serializer for handling YAML data
-$Dancer2::Serializer::YAML::VERSION = '0.300004';
+$Dancer2::Serializer::YAML::VERSION = '0.300005';
 use Moo;
 use Carp 'croak';
 use Encode;
 use Module::Runtime 'use_module';
+use Sub::Defer;
 
 with 'Dancer2::Core::Role::Serializer';
 
 has '+content_type' => ( default => sub {'text/x-yaml'} );
 
-# helpers
-sub from_yaml { __PACKAGE__->deserialize(@_) }
+# deferred helpers. These are called as class methods, but need to
+# ensure YAML is loaded.
 
-sub to_yaml { __PACKAGE__->serialize(@_) }
+my $_from_yaml = defer_sub 'Dancer2::Serializer::YAML::from_yaml' => sub {
+    use_module('YAML');
+    sub { __PACKAGE__->deserialize(@_) };
+};
+
+my $_to_yaml = defer_sub 'Dancer2::Serializer::YAML::to_yaml' => sub {
+    use_module('YAML');
+    sub { __PACKAGE__->serialize(@_) };
+};
 
 # class definition
 sub BUILD { use_module('YAML') }
@@ -42,7 +51,7 @@ Dancer2::Serializer::YAML - Serializer for handling YAML data
 
 =head1 VERSION
 
-version 0.300004
+version 0.300005
 
 =head1 DESCRIPTION
 
@@ -83,7 +92,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexis Sukrieh.
+This software is copyright (c) 2021 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -50,10 +50,13 @@ t/sign.t
 t/sign_and_encrypt.t
 t/UserId.t
 t/verify.t
+t/version_updates.t
 t/wrap_call.t
 t/zzz_cleanup.t
 test/encrypted.1.gpg
 test/encrypted.2.gpg
+test/fake-gpg-v1
+test/fake-gpg-v2
 test/fake-pinentry.pl
 test/gpg.conf
 test/key.1.asc

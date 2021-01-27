@@ -34,8 +34,8 @@ requires:
   PYX::Utils: 0.04
   Tag::Reader::Perl: 0.01
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SGML-PYX
+  bugtracker: https://github.com/michal-josef-spacek/SGML-PYX/issues
   homepage: https://github.com/michal-josef-spacek/SGML-PYX
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/SGML-PYX
-version: '0.06'
+version: '0.07'

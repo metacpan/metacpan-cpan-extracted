@@ -1,5 +1,9 @@
 Revision history for Perl extension RxPerl-Mojo
 
+v6.0.1 2021-01-27T04:42:59Z
+
+    - updated version of RxPerl dependency
+
 v6.0.0 2020-09-24T17:20:53Z
 
     - no changes, release v6.0

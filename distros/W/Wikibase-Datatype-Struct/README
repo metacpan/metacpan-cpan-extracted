@@ -6,6 +6,15 @@ DESCRIPTION
     structures serialized via JSON to MediaWiki.
 
 SEE ALSO
+    Wikibase::Datatype::Struct::Mediainfo
+        Wikibase mediainfo structure serialization.
+
+    Wikibase::Datatype::Struct::MediainfoSnak
+        Wikibase mediainfo snak structure serialization.
+
+    Wikibase::Datatype::Struct::MediainfoStatement
+        Wikibase mediainfo statement structure serialization.
+
     Wikibase::Datatype::Struct::Reference
         Wikibase reference structure serialization.
 
@@ -59,5 +68,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

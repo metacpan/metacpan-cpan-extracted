@@ -1,5 +1,5 @@
 use strict; use warnings;
-use Test::More tests => 194;
+use Test::More;
 
 use Graph::Undirected;
 use Graph::Directed;
@@ -20,6 +20,10 @@ my @EDGES = (
 );
 $g0->add_edge(@$_) for @EDGES;
 $g1->add_edge(@$_) for @EDGES;
+is(Graph::Undirected->new->add_edges(@EDGES), $g0, 'add_edges equivalence');
+is(Graph::Directed->new->add_edges(@EDGES), $g1, 'add_edges equivalence');
+is(Graph::Undirected->new(edges=>\@EDGES), $g0, 'new(edges) equivalence');
+is(Graph::Directed->new(edges=>\@EDGES), $g1, 'new(edges) equivalence');
 
 ok !$_->has_edge('a') for $g0, $g1;
 ok !$_->has_edge('a', 'a') for $g0, $g1;
@@ -160,6 +164,22 @@ Graph::AdjacencyMap arity=2 flags: _MULTI
    0 {'0' => {}} {'x' => {'weight' => '2'}}
 EOF
 
+for my $cv (0, 1) {
+    my $g3 = Graph::Directed->new(hyperedged => 1, countvertexed => $cv);
+    $g3->add_edge([qw(a c)], [qw(d e f)]);
+    $g3->set_edge_attribute([qw(a c)], [qw(e g)], qw(weight 2));
+    is $g3->[ Graph::_E ]->stringify, <<'EOF';
+Graph::AdjacencyMap arity=0 flags: 0
+[[0,1],[2,3,4]]    0
+[[0,1],[3,5]] 1,{'weight' => '2'}
+EOF
+    my $got = [ $g3->as_hashes ];
+    is_deeply $got->[1], [
+	{ predecessors => [qw(a c)], successors => [qw(d e f)], attributes => {} },
+	{ predecessors => [qw(a c)], successors => [qw(e g)], attributes => { weight => 2 } },
+    ] or diag explain $got;
+}
+
 {
   my $null = Graph->new;
   ok($null, "boolify wins over stringify for empty graph");
@@ -177,3 +197,5 @@ EOF
   }
   is($null, "");
 }
+
+done_testing;

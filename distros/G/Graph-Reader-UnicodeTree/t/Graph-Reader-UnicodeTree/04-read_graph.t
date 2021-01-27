@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Encode qw(decode_utf8);
 use File::Object;
 use Graph::Reader::UnicodeTree;

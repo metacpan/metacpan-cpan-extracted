@@ -6,7 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -65,16 +65,19 @@ Random::Set - Class for random set generation.
 =head1 SYNOPSIS
 
  use Random::Set;
+
  my $obj = Random::Set->new(%params);
  my $random = $obj->get;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%params)>
+ my $obj = Random::Set->new(%params);
 
- Constructor.
+Constructor.
+
+Returns instance of object.
 
 =over 8
 
@@ -93,12 +96,13 @@ Random::Set - Class for random set generation.
 
 =back
 
-=item C<get()>
+=head2 C<get>
 
- Get random value from set.
- Returns value from set.
+ my $random = $obj->get;
 
-=back
+Get random value from set.
+
+Returns value from set.
 
 =head1 ERRORS
 
@@ -148,7 +152,7 @@ Class for random day generation.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Random-Set>
+L<https://github.com/michal-josef-spacek/Random-Set>
 
 =head1 AUTHOR
 
@@ -158,11 +162,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Josef Špaček 2013-2017
- BSD 2-Clause License
+© Michal Josef Špaček 2013-2021
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

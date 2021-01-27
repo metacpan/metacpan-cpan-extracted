@@ -20,5 +20,6 @@ lib/RxPerl/Utils.pm
 minil.toml
 t/marble.t
 t/simple.t
+t/subject_order.t
 META.yml
 MANIFEST

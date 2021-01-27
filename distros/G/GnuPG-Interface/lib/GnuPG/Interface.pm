@@ -27,14 +27,22 @@ use IO::Handle;
 use Math::BigInt try => 'GMP';
 use GnuPG::Options;
 use GnuPG::Handles;
+use Scalar::Util 'tainted';
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
-has $_ => (
+has passphrase => (
     isa     => 'Any',
     is      => 'rw',
-    clearer => 'clear_' . $_,
-) for qw(call passphrase);
+    clearer => 'clear_passphrase',
+);
+
+has call => (
+    isa     => 'Any',
+    is      => 'rw',
+    trigger => 1,
+    clearer => 'clear_call',
+);
 
 # NB: GnuPG versions
 #
@@ -68,10 +76,7 @@ sub gnupg_call { shift->call(@_); }
 
 sub BUILD {
     my ( $self, $args ) = @_;
-
-    $self->hash_init( call => 'gpg' );
-    $self->hash_init(%$args);
-    $self->_set_version($self->_version());
+    $self->hash_init( call => 'gpg', %$args );
 }
 
 struct(
@@ -81,6 +86,12 @@ struct(
         parent_is_source => '$', name_shows_dup => '$',
     }
 );
+
+# Update version if "call" is updated
+sub _trigger_call {
+    my ( $self, $gpg ) = @_;
+    $self->_set_version( $self->_version() );
+}
 
 #################################################################
 # real worker functions
@@ -333,6 +344,7 @@ sub fork_attach_exec( $% ) {
             @commands,     @command_args
         );
 
+        local $ENV{PATH} if tainted $ENV{PATH};
         exec @command or die "exec() error: $ERRNO";
     }
 

@@ -13,7 +13,7 @@ Dancer2::Manual - A gentle introduction to Dancer2
 
 =head1 VERSION
 
-version 0.300004
+version 0.300005
 
 =head1 DESCRIPTION
 
@@ -843,9 +843,6 @@ error page with the HTTP status code 500.
 It's possible either to display the content of the error message or to hide
 it with a generic error page. This is a choice left to the end-user and can
 be controlled with the B<show_errors> setting (see above).
-
-Note that you can also choose to consider all warnings in your route
-handlers as errors when the setting B<warnings> is set to 1.
 
 =head2 Error Hooks
 
@@ -3360,7 +3357,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexis Sukrieh.
+This software is copyright (c) 2021 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

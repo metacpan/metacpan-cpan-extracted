@@ -22,15 +22,14 @@ requires 'Parse::DMIDecode' => 0;
 requires 'Perl6::Slurp' => 0;
 requires 'File::Find::Rule' => 0;
 requires 'perl' => '5.6.2';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=File-Find-Rule-DMIDecode';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/File-Find-Rule-DMIDecode/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/File-Find-Rule-DMIDecode';
 resources 'repository' => 'git://github.com/michal-josef-spacek/File-Find-Rule-DMIDecode';
 test_requires 'File::Object' => 0.08;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

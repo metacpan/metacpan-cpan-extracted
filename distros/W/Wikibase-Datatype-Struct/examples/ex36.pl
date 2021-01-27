@@ -3,37 +3,31 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Struct::Value::Quantity qw(struct2obj);
+use Wikibase::Datatype::Struct::Value::Property qw(struct2obj);
 
-# Quantity structure.
+# Property structure.
 my $struct_hr = {
-        'type' => 'quantity',
+        'type' => 'wikibase-entityid',
         'value' => {
-                'amount' => '+10',
-                'unit' => 'http://test.wikidata.org/entity/Q190900',
+                'entity-type' => 'property',
+                'id' => 'P123',
+                'numeric-id' => 123,
         },
 };
 
 # Get object.
 my $obj = struct2obj($struct_hr);
 
-# Get type.
-my $type = $obj->type;
-
-# Get unit.
-my $unit = $obj->unit;
-
 # Get value.
 my $value = $obj->value;
 
+# Get type.
+my $type = $obj->type;
+
 # Print out.
 print "Type: $type\n";
-if (defined $unit) {
-        print "Unit: $unit\n";
-}
 print "Value: $value\n";
 
 # Output:
-# Type: quantity
-# Unit: Q190900
-# Value: 10
+# Type: property
+# Value: P123

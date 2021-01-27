@@ -1,3 +1,9 @@
+0.46 2021-01-27
+- PromiseCode example to interoperate with Promises - thanks @hitode909
+
+0.45 2021-01-27
+- Promise only needs then method - resolve/reject go via PromiseCode - thanks @hitode909 for prompt
+
 0.44 2020-11-09
 - Allow serialising already-blessed bools (#30) - thanks @ccakes
 

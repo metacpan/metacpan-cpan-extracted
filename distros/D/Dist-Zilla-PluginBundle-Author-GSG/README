@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.1.3
+    version v0.1.4
 
 SYNOPSIS
 
@@ -46,7 +46,6 @@ SYNOPSIS
         [MetaJSON]
         [OurPkgVersion]
         [Prereqs::FromCPANfile]
-        [ReadmeAnyFromPod]
         [$meta_provides] # defaults to MetaProvides::Package
     
         [StaticInstall]
@@ -61,6 +60,7 @@ SYNOPSIS
         post_code_replacer = replace_with_nothing
         config_plugin = [ @Default, Contributors ]
     
+        [ReadmeAnyFromPod]
         [ChangelogFromGit::CPAN::Changes]
         file_name    = CHANGES
         ; Support both old 0.90 versioning and new v1.2.3 semantic versioning formats
@@ -313,8 +313,7 @@ Setting up a new dist
     Set github.user and github.token
 
       You can get a GitHub token by following GitHub's instructions
-      <https://help.github.com/en/articles/creating-a-personal-access-token
-      -for-the-command-line>.
+      <https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line>.
 
           git config --global github.user  github_login_name
           git config --global github.token token_from_instructions_above
@@ -325,7 +324,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2019 - 2020 by Grant Street Group.
+    This software is Copyright (c) 2019 - 2021 by Grant Street Group.
 
     This is free software, licensed under:
 

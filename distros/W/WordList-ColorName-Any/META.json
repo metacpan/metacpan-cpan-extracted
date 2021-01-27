@@ -32,7 +32,7 @@
             "Role::Tiny::With" : "0",
             "Sah::PSchema" : "0",
             "Sah::PSchema::perl::modname" : "0",
-            "WordList" : "v0.7.4",
+            "WordList" : "v0.7.6",
             "WordListRole::FirstNextResetFromEach" : "0",
             "parent" : "0",
             "warnings" : "0"
@@ -50,7 +50,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-ColorName-Any"
+         "web" : "https://github.com/perlancar/perl-WordList-ColorName-Any/issues"
       },
       "homepage" : "https://metacpan.org/release/WordList-ColorName-Any",
       "repository" : {
@@ -59,12 +59,22 @@
          "web" : "https://github.com/perlancar/perl-WordList-ColorName-Any"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::WordList",
+            "name" : "WordList",
+            "version" : "0.058"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
+            "version" : "0.001"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
             "config" : {
@@ -154,7 +164,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.600"
+            "version" : "0.603"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -174,7 +184,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.040"
+            "version" : "0.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",
@@ -223,9 +233,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Author::PERLANCAR/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Author::PERLANCAR/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
@@ -380,6 +390,11 @@
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
                         "version" : "0.082"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::WordList",
+                        "name" : "-WordList",
+                        "version" : "0.063"
                      }
                   ]
                }

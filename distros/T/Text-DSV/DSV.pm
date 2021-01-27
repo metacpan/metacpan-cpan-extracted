@@ -1,11 +1,9 @@
 package Text::DSV;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Version.
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # Constructor.
 sub new {
@@ -77,6 +75,8 @@ Text::DSV - DSV parser and serializer.
 
 =head1 SYNOPSIS
 
+ use Text::DSV;
+
  my $obj = Text::DSV->new;
  my @data_lines = $obj->parse($data);
  my @data_line = $obj->parse_line($line);
@@ -85,41 +85,51 @@ Text::DSV - DSV parser and serializer.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new>
+ my $obj = Text::DSV->new;
 
- Constructor.
+Constructor.
 
-=item C<parse($data)>
+Returns instance of object.
 
- Parse all data.
- Returns array of arrays of data.
+=head2 C<parse>
 
-=item C<parse_line($line)>
+ my @data_lines = $obj->parse($data);
 
- Parse one line.
- Returns array of data.
+Parse all data.
 
-=item C<serialize(@data_lines)>
+Returns array of arrays of data.
 
- Serialize all data.
- Returns string.
+=head2 C<parse_line>
 
-=item C<serialize_line(@data_line)>
+ my @data_line = $obj->parse_line($line);
 
- Serialize one line.
- Returns line string.
+Parse one line.
 
-=back
+Returns array of data.
+
+=head2 C<serialize>
+
+ my $string = $obj->serialize(@data_lines);
+
+Serialize all data.
+
+Returns string.
+
+=head2 C<serialize_line>
+
+ my $line_string = $obj->serialize_line(@data_line);
+
+Serialize one line.
+
+Returns line string.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Dumpvalue;
  use Text::DSV;
 
@@ -151,11 +161,9 @@ Text::DSV - DSV parser and serializer.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Text::DSV;
 
  # Object.
@@ -183,21 +191,22 @@ comma-separated values manipulator (using XS or PurePerl)
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Text-DSV>
+L<https://github.com/michal-josef-spacek/Text-DSV>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
- BSD 2-Clause License
+© 2011-2021 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

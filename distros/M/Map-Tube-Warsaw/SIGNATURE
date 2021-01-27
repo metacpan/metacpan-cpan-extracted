@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,16 +12,16 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: RIPEMD160
 
-SHA256 84b347f1ce1d69fd451fcfb8b687374794743348d3825b1a08f7edf0cf91b4a8 Changes
+SHA256 c1c7cea76f74deac9324b740e87f8d30ed813b7d57b99208cc5e941e23e84708 Changes
 SHA256 4fd520fd3174c7bc1875a90a588fe12fbd2268830d6275df890f9acb6b76ec7b LICENSE.artistic_2
-SHA256 73c54c20df0c1eb887cbbc99b6dea34fcb6714e5cebc0bbbcd3a571560f1ec80 LICENSE.bsd
+SHA256 5edcf21a55753b6644ff28fc1f3cf0da959301324b213a574776aae78cf1e141 LICENSE.bsd
 SHA256 7240af1a17b6b56c848ba10c6b26feb99e9972eed24e9c4458d404aee1491833 MANIFEST
-SHA256 f65b9c739e55737d291bd66e8ae453fe95fe225b7ed8d4084e0fab1509247fcf META.yml
-SHA256 50b26df3fc80da211d0469f53c11c02ea399c1a282cceb11869431cbdf630d08 Makefile.PL
-SHA256 c929f5d4399f2c8341f2022c36e05afbc93654e2513274e81c18c580b53bfcfe README
-SHA256 ad3201500410c031c6fb397836db28c2208e4aa83c9db05655bd1bc2ea544472 Warsaw.pm
+SHA256 19488ae3ba5f628883cd5a2ad10b8b193427e6a314675e498dcb59f41a0c8a4d META.yml
+SHA256 119a3e9cec4a9c4b99eb7df78217697d09cb723d93ffa2a5bf3304f6e9b894a2 Makefile.PL
+SHA256 2bd31a5d53febb20d1bf2c4aabe39fce15455f382061862e7bc104312258a4e1 README
+SHA256 da0b0c7b4bcb3917a4c755ca7f5926be6557fb989798abf2837ad0b8c0bebb3c Warsaw.pm
 SHA256 e784d21267147d0c24c643ffb3de3a4e1db2b908ae66cf6c7891dec23c4390cb examples/ex1.pl
 SHA256 2fbabf170cd808ffa182df78a98a0e9621f34e0c489ea1dd60c1d18884633377 examples/ex2.pl
 SHA256 b70006e8b3df8098dae7d03b7fab65ae6e87e67309c79d7265816a5ec5f936ae examples/ex3.pl
@@ -42,7 +42,7 @@ SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Modu
 SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
 SHA256 2b4a76a25bf49bdc8d7cf5f8d17dfc033c7424d0f6adf4c2db5f93cce16d5ded share/warsaw-map.xml
 SHA256 e75d59fbf9e28b2f096b5d4a3a2421a0a7101494634f85e349e3c66eda3315e0 t/Map-Tube-Warsaw/01-use.t
-SHA256 2bea064febe78c53f10b45ad6c0f23f8ed37647ee041fdf5d6b8d6f8e0db6e53 t/Map-Tube-Warsaw/02-version.t
+SHA256 8e2661df6f0a9ae0426bbcdb9c03dbd38501c42779f7a1e2be72bb3f99edc42b t/Map-Tube-Warsaw/02-version.t
 SHA256 27ef51ec3cd4d2f5f9b69566358b942fc34402ed59261314570c74854c66ff49 t/Map-Tube-Warsaw/03-map.t
 SHA256 330a4592c9d8aa3cd5fbc7dd82b3160f69b895d4920c1f89a42474e9ff4d7676 t/Map-Tube-Warsaw/04-get_node_by_id.t
 SHA256 846a75c2d9c0b09ce26274a52eff5db263ef9ba4dab747b35f4d5a13578c7ef1 t/Map-Tube-Warsaw/05-get_node_by_name.t
@@ -53,12 +53,15 @@ SHA256 a8c2b5245cd1e14e46eb07f4398a192735915a941966cb6f40a46fb658a1931c xt/Map-T
 SHA256 58f85af8e1381dcdcd61944e8bd0b1dd0c4a395343881e740c125d0a094602f4 xt/Map-Tube-Warsaw/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl+h2HYACgkQKyiOZjWe
-rHZRAAgAvIMxmeCEcGIQXgqKXWtaUT/3OvDkKvieUMB1U73ukJzUSGBgBdpHnfWF
-nZaNaqLEdjdQVcbO0EjI2cw5ChitjKaBCOnrQAxGGD13+DNiI4KJynrIFey/Vb+i
-gWQq1/RaRZfKJi0ehepduM6Wj8de6gcQnMTvxPr63iUu2Pl2wZoegPurcQwylDV5
-XtmK3B2R8Ds6Um6rnYBPEbggeHrBpODV2aWil0yJ8DC30XJ9Nw7DGeeJBI4uaGLU
-QqlBQP7wOpo1VbSpkNlG1c4KTmCrSczZxWS3Z6sbtpl96Prt66Glro8qBdKBBmKN
-YuyY60KyQMUqtQBqFTjdceQsZI3Ajw==
-=cdV9
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmAQtSwACgkQgmqNLzlX
+aRensQv+OBvmDylyL+sUPIetKl+/9qMhXMhOp26V7GWSg7645gYt9If3Zrg4KIIS
+0kh7i7WLQEg2fQhSo7UCslDpLYKvIaRfBmbz42hXpYWmtWOYPdteK4Kj4juZFUqa
+hbblTeZSgzKgK+X4jUjCX35Hun60ONIfckCssaX3vLMxfvnCjvqPgejD8GXwN1AH
+XOPHbDDb4vXGslKn7RsRx+rkTHfuQxwRbH+1S/64wDZzz6TBpwGmJwkyVeFg18qk
+p4ogJu5mjrljjDW3iDnG14ajWi7sQqQq2KfBs1TPVCGWfD684m/IXTwIgu5ZdY8Y
+7RVGps7/t6OutFwa/rGhNQKm5zVGyHyE3tZZRrvzIE6gUUyZ1NSVWVh3tVACdbP3
+CbnTofCu01Nw0flCftZXaGCw+Bbp10jz4PpAgQ943qaXgeR9kaLQdRMYOv2r9GBl
+/i2ztZczWkC/BfhcDbG9+NWLq8ZVU1ovNU9Tjkbz2ZmGJP/JXi0J0FINmM1KxUhy
+8bJnEUSB
+=qkwr
 -----END PGP SIGNATURE-----

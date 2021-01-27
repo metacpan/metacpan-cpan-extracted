@@ -4,13 +4,13 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Types-RENEEB",
    "prereqs" : {
@@ -29,7 +29,7 @@
       "runtime" : {
          "requires" : {
             "Module::CPANfile" : "0",
-            "OTRS::OPM::Parser" : "1.01",
+            "OTRS::OPM::Parser" : "1.05",
             "Type::Library" : "1.004004",
             "Type::Utils" : "1.004004",
             "Types::Standard" : "1.004004",
@@ -49,15 +49,15 @@
    "provides" : {
       "Types::Dist" : {
          "file" : "lib/Types/Dist.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Types::OTRS" : {
          "file" : "lib/Types/OTRS.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Types::RENEEB" : {
          "file" : "lib/Types/RENEEB.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -72,10 +72,12 @@
          "web" : "http://github.com/reneeb/Types-RENEEB"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

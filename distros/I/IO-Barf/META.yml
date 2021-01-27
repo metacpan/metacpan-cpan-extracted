@@ -37,8 +37,8 @@ requires:
   Scalar::Util: 0
   perl: 5.6.2
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Barf
+  bugtracker: https://github.com/michal-josef-spacek/IO-Barf/issues
   homepage: https://github.com/michal-josef-spacek/IO-Barf
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/IO-Barf
-version: '0.09'
+version: '0.10'

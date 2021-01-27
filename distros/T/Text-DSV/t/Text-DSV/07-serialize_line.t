@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Text::DSV;
 use Test::More 'tests' => 7;
 use Test::NoWarnings;

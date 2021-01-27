@@ -1,6 +1,6 @@
 package Dancer2::Core::Request::Upload;
 # ABSTRACT: Class representing file upload requests
-$Dancer2::Core::Request::Upload::VERSION = '0.300004';
+$Dancer2::Core::Request::Upload::VERSION = '0.300005';
 use Moo;
 
 use Carp;
@@ -92,7 +92,7 @@ Dancer2::Core::Request::Upload - Class representing file upload requests
 
 =head1 VERSION
 
-version 0.300004
+version 0.300005
 
 =head1 DESCRIPTION
 
@@ -170,7 +170,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexis Sukrieh.
+This software is copyright (c) 2021 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

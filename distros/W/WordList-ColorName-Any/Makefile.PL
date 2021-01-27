@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     "Role::Tiny::With" => 0,
     "Sah::PSchema" => 0,
     "Sah::PSchema::perl::modname" => 0,
-    "WordList" => "0.7.4",
+    "WordList" => "0.7.6",
     "WordListRole::FirstNextResetFromEach" => 0,
     "parent" => 0,
     "warnings" => 0
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %FallbackPrereqs = (
   "Sah::PSchema" => 0,
   "Sah::PSchema::perl::modname" => 0,
   "Test::More" => 0,
-  "WordList" => "0.7.4",
+  "WordList" => "0.7.6",
   "WordListRole::FirstNextResetFromEach" => 0,
   "parent" => 0,
   "warnings" => 0

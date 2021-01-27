@@ -5,16 +5,15 @@
 use ExtUtils::testlib;
 use Test::More ;
 use Config::Model 2.116;
-use File::Path;
-use File::Copy ;
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
+use Path::Tiny;
 use version 0.77 ;
 
+use lib 't/lib';
+use LoadTest;
+
 use warnings;
-no warnings qw(once);
-
 use strict;
-
-use vars qw/$model/;
 
 # workaround Augeas locale bug
 if (not defined $ENV{LC_ALL} or $ENV{LC_ALL} ne 'C' or $ENV{LANG} ne 'C') {
@@ -22,18 +21,6 @@ if (not defined $ENV{LC_ALL} or $ENV{LC_ALL} ne 'C' or $ENV{LANG} ne 'C') {
   # use the Perl interpreter that ran this script. See RT #116750
   exec("$^X $0 @ARGV");
 }
-
-my $arg = shift || '';
-
-my $trace = $arg =~ /t/ ? 1 : 0 ;
-$::verbose          = 1 if $arg =~ /v/;
-$::debug            = 1 if $arg =~ /d/;
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-use Log::Log4perl qw(:easy) ;
-Log::Log4perl->easy_init($arg =~ /l/ ? $TRACE: $WARN);
-
-$model = Config::Model -> new (legacy => 'ignore',) ;
 
 eval { require Config::Augeas ;} ;
 if ( $@ ) {
@@ -43,17 +30,16 @@ else {
     plan tests => 4;
 }
 
-ok(1,"compiled");
+my ($model, $trace) = init_test();
 
 # pseudo root where config files are written by config-model
-my $wr_root = 'wr_root/';
+my $wr_root = setup_test_dir;
 
 # cleanup before tests
-rmtree($wr_root);
-mkpath($wr_root.'etc/ssh/', { mode => 0755 }) ;
+$wr_root->child('etc/ssh')->mkpath;
 
 # set_up data
-do "./t/test_model.pl" ;
+load_test_model($model);
 
 my $have_pkg_config = `pkg-config --version` || '';
 chomp $have_pkg_config ;
@@ -68,43 +54,39 @@ my $skip =  (not $have_pkg_config)  ? 'pkgconfig is not installed'
 SKIP: {
     skip $skip , 3 if $skip ;
 
-my $i_sshd = $model->instance(instance_name    => 'sshd_inst',
-			      root_class_name  => 'Sshd',
-			      root_dir         => $wr_root ,
-			     );
+    my $i_sshd = $model->instance(
+        instance_name    => 'sshd_inst',
+        root_class_name  => 'Sshd',
+        root_dir         => $wr_root ,
+    );
 
-ok( $i_sshd, "Created instance for sshd" );
+    ok( $i_sshd, "Created instance for sshd" );
 
-ok( $i_sshd, "Created instance for /etc/ssh/sshd_config" );
+    ok( $i_sshd, "Created instance for /etc/ssh/sshd_config" );
 
-my $sshd_root = $i_sshd->config_root ;
-$sshd_root->init ;
+    my $sshd_root = $i_sshd->config_root ;
+    $sshd_root->init ;
 
-my $ssh_augeas_obj = $sshd_root->backend_mgr->backend_obj->_augeas_object ;
+    my $ssh_augeas_obj = $sshd_root->backend_mgr->backend_obj->_augeas_object ;
 
-$ssh_augeas_obj->print('/files/etc/ssh/sshd_config/*') if $trace;
-#my @aug_content = $ssh_augeas_obj->match("/files/etc/ssh/sshd_config/*") ;
-#print join("\n",@aug_content) ;
+    $ssh_augeas_obj->print('/files/etc/ssh/sshd_config/*') if $trace;
 
-# change data content, '~' is like a splice, 'record~0' like a "shift"
-$sshd_root->load("HostbasedAuthentication=yes 
+    # change data content, '~' is like a splice, 'record~0' like a "shift"
+    $sshd_root->load("HostbasedAuthentication=yes 
                   Subsystem:ddftp=/home/dd/bin/ddftp
                   ") ;
 
-my $dump = $sshd_root->dump_tree ;
-print $dump if $trace ;
+    my $dump = $sshd_root->dump_tree ;
+    print $dump if $trace ;
 
-$i_sshd->write_back ;
+    $i_sshd->write_back ;
 
-my @mod = ("HostbasedAuthentication yes\n",
-	   "Protocol 1,2\n",
-	   "Subsystem ddftp /home/dd/bin/ddftp\n"
-	  );
+    my @mod = ("HostbasedAuthentication yes\n",
+               "Protocol 1,2\n",
+               "Subsystem ddftp /home/dd/bin/ddftp\n"
+           );
 
-my $aug_sshd_file      = $wr_root.'etc/ssh/sshd_config';
-open(AUG,$aug_sshd_file) || die "Can't open $aug_sshd_file:$!"; 
-is_deeply([<AUG>],\@mod,"check content of $aug_sshd_file") ;
-close AUG;
-
+    my $aug_sshd_file = $wr_root->child('etc/ssh/sshd_config');
+    is_deeply([$aug_sshd_file->lines],\@mod,"check content of $aug_sshd_file") ;
 
 } # end SKIP section

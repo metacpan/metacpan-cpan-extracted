@@ -111,6 +111,8 @@ sub close_pending_test {
             details => $test_output,
             @extra
         );
+
+        $self->{failures}++;
     }
     builder->test_finished(@$pending_test{qw/name duration nodeId parentNodeId/});
 }
@@ -127,12 +129,12 @@ sub start_test {
     $self->{last_test} = {
         name         => $test_name,
         duration     => $ENV{TAP_FORMATTER_CAMELCADE_DURATION} // $test_duration,
-        is_ok        => $test->is_ok,
-        is_skip      => $test->has_directive,
+        is_ok        => scalar $test->is_ok,
+        is_skip      => scalar $test->has_directive,
         output       => [],
-        explanation  => $test->explanation,
-        nodeId       => $self->generate_test_id($test_name),
-        parentNodeId => $self->get_parent_node_id
+        explanation  => scalar $test->explanation,
+        nodeId       => scalar $self->generate_test_id($test_name),
+        parentNodeId => scalar $self->get_parent_node_id
     };
     builder->test_started(@{$self->{last_test}}{qw/name nodeId parentNodeId/});
 }
@@ -288,7 +290,7 @@ sub process_as_comment {
     $comment =~ s/^\s+//;
     # use Data::Dumper;    print STDERR "Handling: ".Dumper($result);
     $self->result(TAP::Parser::Result::Comment->new({
-        raw     => $result->raw,
+        raw     => scalar $result->raw,
         type    => 'comment',
         comment => $comment
     }));
@@ -316,6 +318,7 @@ sub _initialize {
     $self->{subtests} = [];
     $self->{suites} = [];
     $self->{counter} = 0;
+    $self->{failures} = 0;
     # $arg_for has parser, name, formatter
     $self->start_suite($self->name, $self->{location});
     $self->set_last_time;
@@ -328,8 +331,8 @@ sub start_suite {
     my $location = shift;
     my $suite = {
         name         => $name,
-        nodeId       => $self->generate_suite_id($name, $location),
-        parentNodeId => $self->get_parent_node_id(),
+        nodeId       => scalar $self->generate_suite_id($name, $location),
+        parentNodeId => scalar $self->get_parent_node_id(),
         location     => $location || $name
     };
     push @{$self->{suites}}, $suite;
@@ -368,6 +371,16 @@ sub get_parent_node_id {
 sub finish_suite {
     my $self = shift;
     $self->close_pending_test;
+
+    my $parser = $self->parser;
+    if (!$self->{failures} && UNIVERSAL::isa($parser, 'TAP::Parser') && $parser->{exit}) {
+        my $test_name = 'Initialization error';
+        my $test_id = $self->generate_test_id($test_name);
+        my $parent_node_id = $self->get_parent_node_id;
+        builder->test_started($test_name, $test_id, $parent_node_id);
+        builder->test_failed($test_name, "Non-zero exit code: $parser->{exit}", $test_id, $parent_node_id);
+        builder->test_finished($test_name, 0, $test_id, $parent_node_id);
+    }
 
     my $current_suite = pop @{$self->{suites}};
     return unless $current_suite;

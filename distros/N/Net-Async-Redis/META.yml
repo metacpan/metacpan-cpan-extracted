@@ -31,53 +31,53 @@ no_index:
 provides:
   Net::Async::Redis:
     file: lib/Net/Async/Redis.pm
-    version: '3.008'
+    version: '3.009'
   Net::Async::Redis::Cluster:
     file: lib/Net/Async/Redis/Cluster.pm
-    version: '3.008'
+    version: '3.009'
   Net::Async::Redis::Cluster::Node:
     file: lib/Net/Async/Redis/Cluster/Node.pm
-    version: '3.008'
+    version: '3.009'
   Net::Async::Redis::Commands:
     file: lib/Net/Async/Redis/Commands.pm
-    version: '3.008'
+    version: '3.009'
   Net::Async::Redis::Multi:
     file: lib/Net/Async/Redis/Multi.pm
-    version: '3.008'
+    version: '3.009'
   Net::Async::Redis::Protocol:
     file: lib/Net/Async/Redis/Protocol.pm
-    version: '3.008'
+    version: '3.009'
   Net::Async::Redis::Server:
     file: lib/Net/Async/Redis/Server.pm
-    version: '3.008'
+    version: '3.009'
   Net::Async::Redis::Server::Connection:
     file: lib/Net/Async/Redis/Server/Connection.pm
-    version: '3.008'
+    version: '3.009'
   Net::Async::Redis::Server::Database:
     file: lib/Net/Async/Redis/Server/Database.pm
-    version: '3.008'
+    version: '3.009'
   Net::Async::Redis::Subscription:
     file: lib/Net/Async/Redis/Subscription.pm
-    version: '3.008'
+    version: '3.009'
   Net::Async::Redis::Subscription::Message:
     file: lib/Net/Async/Redis/Subscription/Message.pm
-    version: '3.008'
+    version: '3.009'
 requires:
   Cache::LRU: '0.04'
   Class::Method::Modifiers: '0'
   Digest::CRC: '0.22'
-  Future: '0.42'
-  Future::AsyncAwait: '0.40'
+  Future: '0.47'
+  Future::AsyncAwait: '0.47'
   IO::Async: '0'
   List::BinarySearch::XS: '0.09'
-  List::Util: '1.29'
-  Log::Any: '1.050'
+  List::Util: '1.55'
+  Log::Any: '1.708'
   Math::Random::Secure: '0'
   Metrics::Any: '0'
   OpenTracing::Any: '1.003'
-  Ryu::Async: '0.016'
+  Ryu::Async: '0.019'
   Syntax::Keyword::Dynamically: '0.06'
-  Syntax::Keyword::Try: '0.11'
+  Syntax::Keyword::Try: '0.21'
   URI: '0'
   URI::redis: '0'
   curry: '0'
@@ -86,7 +86,7 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
   homepage: https://github.com/team-at-cpan/Net-Async-Redis
   repository: https://github.com/team-at-cpan/Net-Async-Redis.git
-version: '3.008'
+version: '3.009'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Eyad Arnabeh <eyadof@gmail.com>'

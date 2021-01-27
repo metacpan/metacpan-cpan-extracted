@@ -23,8 +23,7 @@ requires 'Error::Pure' => 0.22;
 requires 'Tag::Reader::Perl' => 0.01;
 requires 'PYX' => 0.05;
 requires 'PYX::Utils' => 0.04;
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=SGML-PYX';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/SGML-PYX/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/SGML-PYX';
 resources 'repository' => 'git://github.com/michal-josef-spacek/SGML-PYX';
 test_requires 'English' => 0;
@@ -34,7 +33,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 1.02;
 tests_recursive;
-version '0.06';
+version '0.07';
 
 # Run.
 WriteAll();

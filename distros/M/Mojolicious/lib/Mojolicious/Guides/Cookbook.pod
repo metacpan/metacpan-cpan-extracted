@@ -106,7 +106,10 @@ instead of something meaningful for the client, like this:
 
 To solve these problems, you can configure your reverse proxy to send the missing data (see L</Nginx> and
 L</"Apache/mod_proxy">) and tell your application about it by setting the environment variable C<MOJO_REVERSE_PROXY>.
-For finer control, L</Rewriting> includes examples of how the changes could be implemented manually.
+In more complex situations, usually involving multiple proxies or proxies that live outside your network, it can be
+necessary to tell the application from which ip addresses to expect proxy requests by setting C<MOJO_TRUSTED_PROXIES>
+to a list of comma separated addresses or CIDR networks. For even finer control, L</Rewriting> includes examples of how
+the changes could be implemented manually.
 
 =head1 DEPLOYMENT
 
@@ -1373,8 +1376,8 @@ keep many concurrent connections active at the same time.
 But don't try to open too many connections to one server at the same time, it might get overwhelmed. Better use a queue
 to process requests in smaller batches.
 
+  use Mojo::Promise;
   use Mojo::UserAgent;
-  use Mojo::IOLoop;
 
   my @urls = (
     'https://docs.mojolicious.org/Mojo/DOM',  'https://docs.mojolicious.org/Mojo',
@@ -1385,28 +1388,28 @@ to process requests in smaller batches.
   my $ua = Mojo::UserAgent->new(max_redirects => 5);
   $ua->transactor->name('MyParallelCrawler 1.0');
 
-  # Use a delay to keep the event loop running until we are done
-  my $delay = Mojo::IOLoop->delay;
-  my $fetch;
-  $fetch = sub {
+  # Use a promise to keep the event loop running until we are done
+  my $promise = Mojo::Promise->new;
+  my $count = 0;
+  my $fetch = sub {
 
     # Stop if there are no more URLs
     return unless my $url = shift @urls;
 
     # Fetch the next title
-    my $end = $delay->begin;
     $ua->get($url => sub ($ua, $tx) {
       say "$url: ", $tx->result->dom->at('title')->text;
 
       # Next request
-      $fetch->();
-      $end->();
+      __SUB__->();
+      $promise->resolve if --$count == 0;
     });
+    $count++;
   };
 
   # Process two requests at a time
   $fetch->() for 1 .. 2;
-  $delay->wait;
+  $promise->wait;
 
 It is also strongly recommended to respect every sites C<robots.txt> file as well as terms of service, and to wait a
 little before reopening connections to the same host, or the operators might be forced to block your access.

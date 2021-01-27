@@ -13,7 +13,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.4.2";
+our $VERSION = "v6.5.0";
 
 1;
 __END__
@@ -59,7 +59,7 @@ The documentation in this POD applies to all three adapter modules as well.
 This module is an implementation of L<Reactive Extensions|http://reactivex.io/> in Perl. It replicates the
 behavior of L<rxjs 6|https://www.npmjs.com/package/rxjs> which is the JavaScript implementation of ReactiveX.
 
-Currently 53 of the 100+ operators in rxjs are implemented in this module.
+Currently 54 of the 100+ operators in rxjs are implemented in this module.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -626,6 +626,15 @@ L<https://rxjs.dev/api/operators/skip>
     # 40, 50, complete
     rx_of(10, 20, 30, 40, 50)->pipe(
         op_skip(3),
+    )->subscribe($observer);
+
+=item op_skip_until
+
+L<https://rxjs.dev/api/operators/skipUntil>
+
+    # (pause 4 seconds) 3, 4, 5, ...
+    rx_interval(1)->pipe(
+        op_skip_until( rx_timer(3.5) ),
     )->subscribe($observer);
 
 =item op_start_with

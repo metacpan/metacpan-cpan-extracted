@@ -1,0 +1,25 @@
+
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Mojolicious-Matterbridge?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Mojolicious-Matterbridge)
+[![Windows](https://github.com/Corion/Mojolicious-Matterbridge/workflows/windows/badge.svg)](https://github.com/Corion/Mojolicious-Matterbridge/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Mojolicious-Matterbridge/workflows/macos/badge.svg)](https://github.com/Corion/Mojolicious-Matterbridge/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Mojolicious-Matterbridge/workflows/linux/badge.svg)](https://github.com/Corion/Mojolicious-Matterbridge/actions?query=workflow%3Alinux)
+
+# NAME
+
+Mojolicious::Matterbridge - a simplistic module to connect to chat servers via matterbridge
+
+# SYNOPSIS
+
+    use Mojolicious::Matterbridge;
+
+    my $client = Mojolicious::Matterbridge->new(
+        url => 'http://localhost:4242/api/',
+    );
+    
+    $client->on('message' => sub( $c, $message ) {
+        print sprintf "<%s> %s\n", $message->username, $message->text;
+        $client->send( "Haha!" );
+    });
+    $client->connect();
+    
+    Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

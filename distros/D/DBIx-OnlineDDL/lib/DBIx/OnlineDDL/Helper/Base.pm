@@ -3,7 +3,7 @@ package DBIx::OnlineDDL::Helper::Base;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for RDBMS-specific code
 use version;
-our $VERSION = 'v0.930.0'; # VERSION
+our $VERSION = 'v0.930.1'; # VERSION
 
 use v5.10;
 use Moo;
@@ -319,6 +319,24 @@ sub swap_tables {
     });
 }
 
+#pod =head2 foreign_key_info
+#pod
+#pod     my $sth = $helper->foreign_key_info(
+#pod         $pk_catalog, $pk_schema, $pk_table_name,
+#pod         $fk_catalog, $fk_schema, $fk_table_name
+#pod     );
+#pod
+#pod Returns a statement handle in the same manner as a L<DBI/foreign_key_info> call.  In the
+#pod default case, this is just that call, but certain implementations may need it to be
+#pod overloaded or overridden.
+#pod
+#pod =cut
+
+sub foreign_key_info {
+    my $self = shift;
+    return $self->dbh->foreign_key_info(@_);
+}
+
 #pod =head2 remove_fks_from_child_tables_stmts
 #pod
 #pod     @stmts = $helper->remove_fks_from_child_tables_stmts if $helper->child_fks_need_adjusting;
@@ -446,7 +464,7 @@ DBIx::OnlineDDL::Helper::Base - Private OnlineDDL helper for RDBMS-specific code
 
 =head1 VERSION
 
-version v0.930.0
+version v0.930.1
 
 =head1 DESCRIPTION
 
@@ -582,6 +600,17 @@ Run the DDL statement to re-analyze the table, typically C<ANALYZE TABLE>.
 Runs the SQL to swap the tables in a safe and atomic manner.  The default ANSI SQL
 solution is to run two C<ALTER TABLE> statements in a transaction, but only if the RDBMS
 supports transactional DDL.
+
+=head2 foreign_key_info
+
+    my $sth = $helper->foreign_key_info(
+        $pk_catalog, $pk_schema, $pk_table_name,
+        $fk_catalog, $fk_schema, $fk_table_name
+    );
+
+Returns a statement handle in the same manner as a L<DBI/foreign_key_info> call.  In the
+default case, this is just that call, but certain implementations may need it to be
+overloaded or overridden.
 
 =head2 remove_fks_from_child_tables_stmts
 

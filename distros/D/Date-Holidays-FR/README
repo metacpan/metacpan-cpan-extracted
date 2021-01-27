@@ -1,10 +1,33 @@
 Date-Holidays-FR
 ================
 
+USAGE
+.....
+
+Checking one day
+
+  use Date::Holidays::FR;
+  my ($year, $month, $day) = (localtime)[5, 4, 3];
+  $year  += 1900;
+  $month +=    1;
+  if (is_fr_holiday($year, $month, $day)) {
+    print "Woohoo!!! today is ", is_fr_holiday($year, $month, $day), "\n";
+  }
+
+Checking a whole year
+
+  use Date::Holidays::FR;
+  my $days_off = holidays($year);
+  for my $mmdd (sort keys  %$days_off) {
+    print "$mmdd $days_off->{$mmdd}\n";
+  }
+
 INSTALLATION
 ............
 
-To install this module type the following:
+To install this module, use the CPAN shell or cpanminus
+
+Or you can type the following:
 
    perl Makefile.PL
    make
@@ -18,11 +41,12 @@ This module requires these other modules and libraries:
 
   Date::Easter
   Time::Local
+  Readonly
 
 COPYRIGHT AND LICENCE
 .....................
 
-Copyright © 2004, 2019 by Fabien POTENCIER and Jean FORGET
+Copyright (c) 2004, 2019, 2021 by Fabien POTENCIER and Jean FORGET
 
 This library is  free software; you can redistribute  it and/or modify
 it under the same terms as  Perl itself, either Perl version 5.8.3 or,

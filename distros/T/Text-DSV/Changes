@@ -1,3 +1,13 @@
+0.11 2021-01-27T20:04:22+01:00
+ - Fix SYNOPSIS section in doc.
+ - Fix bugtracker.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Rewrite doc to use =head2 in METHODS section.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.10 2015-09-25T15:16:58+02:00
  - Add 'readme_from' directive to Makefile.PL.
  - Fix LICENSE file.

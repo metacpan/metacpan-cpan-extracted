@@ -1,0 +1,5 @@
+requires 'Catalyst', '5.90114';
+requires 'Catalyst::View::Errors';
+requires 'Plack';
+requires 'Module::Runtime';
+

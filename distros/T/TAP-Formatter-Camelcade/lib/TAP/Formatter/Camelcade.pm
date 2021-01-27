@@ -6,7 +6,7 @@ use TAP::Formatter::Camelcade::Session;
 use TAP::Formatter::Camelcade::MessageBuilder;
 use Cwd;
 
-our $VERSION = '0.009';
+our $VERSION = '2021.1';
 
 sub open_test{
     my ( $self, $test, $parser ) = @_;

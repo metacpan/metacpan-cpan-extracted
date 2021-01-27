@@ -1,3 +1,7 @@
+2021.1
+    Fixed problem with false-positive result on non-zero exiting without failed tests. NB: error messages sticks to the
+     previous test or warning because there is no explicit test finished event.
+
 0.007
     Fixed module testing problems
 

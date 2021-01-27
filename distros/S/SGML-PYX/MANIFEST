@@ -24,6 +24,7 @@ t/data/cdata3.sgml
 t/data/cdata4.sgml
 t/data/char1.sgml
 t/data/char2.sgml
+t/data/char3.sgml
 t/data/comment1.sgml
 t/data/comment2.sgml
 t/data/doctype1.sgml
@@ -62,6 +63,7 @@ t/data/start_element22.sgml
 t/data/start_element23.sgml
 t/data/start_element24.sgml
 t/data/start_element25.sgml
+t/data/start_element26.sgml
 t/data/xml1.sgml
 t/SGML-PYX/01-use.t
 t/SGML-PYX/02-version.t

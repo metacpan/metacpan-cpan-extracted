@@ -1,3 +1,8 @@
+0.08 2021-01-26T21:24:31+01:00
+ - Rewrite example in doc for Mediainfo to some real.
+ - Rewrite exmaple in doc for MediainfoSnak to some real.
+ - Rewrite example in doc for MediainfoStatement to some real.
+
 0.07 2021-01-26T13:28:48+01:00
  - Add Mediainfo datatype.
  - Add MediainfoSnak datatype. There is difference between normal Snak in

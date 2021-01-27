@@ -20,19 +20,27 @@ requires:
   Role::Tiny::With: '0'
   Sah::PSchema: '0'
   Sah::PSchema::perl::modname: '0'
-  WordList: v0.7.4
+  WordList: v0.7.6
   WordListRole::FirstNextResetFromEach: '0'
   parent: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-ColorName-Any
+  bugtracker: https://github.com/perlancar/perl-WordList-ColorName-Any/issues
   homepage: https://metacpan.org/release/WordList-ColorName-Any
   repository: git://github.com/perlancar/perl-WordList-ColorName-Any.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::WordList
+      name: WordList
+      version: '0.058'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -104,7 +112,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.600'
+      version: '0.603'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -120,7 +128,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -157,9 +165,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
@@ -284,6 +292,10 @@ x_Dist_Zilla:
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
               version: '0.082'
+            -
+              class: Pod::Weaver::Plugin::WordList
+              name: -WordList
+              version: '0.063'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

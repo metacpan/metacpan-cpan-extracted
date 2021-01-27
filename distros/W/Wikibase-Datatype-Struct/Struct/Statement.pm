@@ -13,7 +13,7 @@ use Wikibase::Datatype::Struct::Utils qw(obj_array_ref2struct struct2snaks_array
 
 Readonly::Array our @EXPORT_OK => qw(obj2struct struct2obj);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub obj2struct {
 	my ($obj, $base_uri) = @_;
@@ -29,6 +29,7 @@ sub obj2struct {
 	}
 
 	my $struct_hr = {
+		defined $obj->id ? ('id' => $obj->id) : (),
 		'mainsnak' => Wikibase::Datatype::Struct::Snak::obj2struct($obj->snak, $base_uri),
 		@{$obj->property_snaks} ? (
 			%{obj_array_ref2struct($obj->property_snaks, 'qualifiers', $base_uri)},
@@ -50,6 +51,7 @@ sub struct2obj {
 	my $struct_hr = shift;
 
 	my $obj = Wikibase::Datatype::Statement->new(
+		exists $struct_hr->{'id'} ? ('id' => $struct_hr->{'id'}) : (),
 		'property_snaks' => struct2snaks_array_ref($struct_hr, 'qualifiers'),
 		'snak' => Wikibase::Datatype::Struct::Snak::struct2obj($struct_hr->{'mainsnak'}),
 		'references' => [
@@ -128,6 +130,8 @@ Returns Wikibase::Datatype::Statement instance.
 
  # Object.
  my $obj = Wikibase::Datatype::Statement->new(
+         'id' => 'Q123$00C04D2A-49AF-40C2-9930-C551916887E8',
+
          # instance of (P31) human (Q5)
          'snak' => Wikibase::Datatype::Snak->new(
                   'datatype' => 'wikibase-item',
@@ -188,6 +192,7 @@ Returns Wikibase::Datatype::Statement instance.
 
  # Output:
  # \ {
+ #     id                 "Q123$00C04D2A-49AF-40C2-9930-C551916887E8",
  #     mainsnak           {
  #         datatype    "wikibase-item",
  #         datavalue   {
@@ -289,6 +294,7 @@ Returns Wikibase::Datatype::Statement instance.
 
  # Item structure.
  my $struct_hr = {
+         'id' => 'Q123$00C04D2A-49AF-40C2-9930-C551916887E8',
          'mainsnak' => {
                  'datatype' => 'wikibase-item',
                  'datavalue' => {
@@ -374,6 +380,8 @@ Returns Wikibase::Datatype::Statement instance.
  # Get object.
  my $obj = struct2obj($struct_hr);
 
+ # Print out.
+ print 'Id: '.$obj->id."\n";
  print 'Claim: '.$obj->snak->property.' -> '.$obj->snak->datavalue->value."\n";
  print "Qualifiers:\n";
  foreach my $property_snak (@{$obj->property_snaks}) {
@@ -391,6 +399,7 @@ Returns Wikibase::Datatype::Statement instance.
  print 'Rank: '.$obj->rank."\n";
 
  # Output:
+ # Id: Q123$00C04D2A-49AF-40C2-9930-C551916887E8
  # Claim: P31 -> Q5
  # Qualifiers:
  #         P642 -> Q474741
@@ -443,6 +452,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

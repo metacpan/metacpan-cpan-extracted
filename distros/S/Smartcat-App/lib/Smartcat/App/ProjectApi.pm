@@ -48,17 +48,25 @@ sub get_project {
 }
 
 sub update_project_external_tag {
-    my ($self, $name, $external_tag) = @_;
+    my ($self, $project, $external_tag) = @_;
 
-    my %args = (name => $name);
+    my %args = (
+        name            => $project->name,
+        description     => $project->description,
+        deadline        => $project->deadline,
+        clientId        => $project->client_id,
+        domainId        => $project->domain_id,
+        vendorAccountId => $project->vendor_account_id
+    );
+
     $args{externalTag} = $external_tag if defined $external_tag;
 
-    my $project =
+    my $model =
       Smartcat::Client::Object::ProjectChangesModel->new(%args);
 
     %args = (
         project_id => $self->{rundata}->{project_id},
-        model => $project);
+        model => $model);
 
     $log->info("Updating project '$self->{rundata}->{project_id}' with '$external_tag' external tag...");
     eval {

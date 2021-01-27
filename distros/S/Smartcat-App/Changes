@@ -1,7 +1,13 @@
 Revision history for Smartcat-App
 
-0.0.4  2020-08-18 19:04:56 UTC
+0.0.5  2021-01-27 18:48:23 UTC
+        - Improved logging
+        - Split file deletion into batches
+        - Added some resilience to Windows-style line endings
+        - Added `auto-asign` parameter to `push` command to assign
+          users from my team to uploded documents
 
+0.0.4  2020-08-18 19:04:56 UTC
         - Fix the detection of empty .po files
 
 0.0.3  2020-07-20 22:40:42 UTC

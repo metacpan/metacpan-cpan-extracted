@@ -1,3 +1,8 @@
+0.10 2021-01-26T21:46:25+01:00
+ - Fix bugtracker.
+ - Rewrite doc to use =head2 in SUBROUTINES section.
+ - Update copyright years.
+
 0.09 2020-03-23T17:25:17+01:00
  - Improve LICENSE AND COPYRIGHT section in doc.
  - Improve SYNOPSIS section in doc.

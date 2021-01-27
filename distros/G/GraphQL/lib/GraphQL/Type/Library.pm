@@ -407,18 +407,27 @@ declare "ExecutionPartialResult",
 
 =head2 Promise
 
-An object that has C<then>, C<resolve>, C<reject> methods.
+An object that has a C<then> method.
 
 =cut
 
 declare "Promise",
-  as HasMethods[qw(then resolve reject)];
+  as HasMethods[qw(then)];
 
 =head2 PromiseCode
 
 A hash-ref with three keys: C<resolve>, C<all>, C<reject>. The values are
 all code-refs that take one value (for C<all>, an array-ref), and create
 the given kind of Promise.
+
+An example, enabling interoperation with L<Promises>:
+
+  use Promises qw(collect resolved rejected);
+  {
+    all     => \&collect,
+    resolve => \&resolved,
+    reject  => \&rejected,
+  },
 
 Must also have a C<new> key for use with L<GraphQL::Subscription>,
 with code returning a promise that can then have C<resolve> or C<reject>

@@ -1,5 +1,9 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## [1.6](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v1.6) (Tue Jan 26 15:34:56 GMT 2021)
+
+* Element-set names are treated case-insensitively, meaning that (among other things) "F" and "B" are recognized as well as "f" and "b". Fixes ZF-29.
+
 ## [1.5](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v1.5) (Mon Nov 30 15:07:08 GMT 2020)
 
 * Bring version-number in [`ModuleDescriptor.json`](ModuleDescriptor.json) up to date. I forgot to do this in v1.4, with the result that it wouldn't build in Jenkins.

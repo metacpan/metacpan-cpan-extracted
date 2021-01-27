@@ -28,8 +28,8 @@ requires:
   Readonly: 0
   perl: 5.8.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PYX-Utils
+  bugtracker: https://github.com/michal-josef-spacek/PYX-Utils/issues
   homepage: https://github.com/michal-josef-spacek/PYX-Utils
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/PYX-Utils
-version: '0.06'
+version: '0.07'

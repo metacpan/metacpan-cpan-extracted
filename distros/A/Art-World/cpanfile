@@ -1,9 +1,14 @@
+requires 'Config::Tiny', '== 2.24';
 requires 'Data::Printer', '== 0.40';
 requires 'Faker', '== 1.03';
-requires 'Zydeco', '== 0.611';
+requires 'Math::Round', '0.07';
+# Needed by Zydeco see
+requires 'PadWalker', '';
+requires 'Type::Tiny',  '== 1.012001';
 # It's supposed to accelerate some stuff
 # https://typetiny.toby.ink/Optimization.html
 requires 'Type::Tiny::XS', '== 0.022';
+requires 'Zydeco', '== 0.613';
 
 on 'test' => sub {
     requires 'Test::Pod', '== 1.52';

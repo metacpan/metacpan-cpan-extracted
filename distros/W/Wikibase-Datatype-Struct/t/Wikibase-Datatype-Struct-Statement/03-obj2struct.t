@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
 use Wikibase::Datatype::Snak;
 use Wikibase::Datatype::Statement;
@@ -27,6 +27,39 @@ my $ret_hr = Wikibase::Datatype::Struct::Statement::obj2struct($obj,
 is_deeply(
 	$ret_hr,
 	{
+		'mainsnak' => {
+			'datatype' => 'string',
+			'datavalue' => {
+				'type' => 'string',
+				'value' => '1.1',
+			},
+			'property' => 'P11',
+			'snaktype' => 'value',
+		},
+		'rank' => 'normal',
+		'type' => 'statement',
+	},
+	'Output of obj2struct() subroutine.',
+);
+
+# Test.
+$obj = Wikibase::Datatype::Statement->new(
+	'id' => 'Q123$00C04D2A-49AF-40C2-9930-C551916887E8',
+	'snak' => Wikibase::Datatype::Snak->new(
+		'datatype' => 'string',
+		'datavalue' => Wikibase::Datatype::Value::String->new(
+			'value' => '1.1',
+		),
+		'property' => 'P11',
+	),
+	'rank' => 'normal',
+);
+$ret_hr = Wikibase::Datatype::Struct::Statement::obj2struct($obj,
+	'http://www.wikidata.org/entity/');
+is_deeply(
+	$ret_hr,
+	{
+		'id' => 'Q123$00C04D2A-49AF-40C2-9930-C551916887E8',
 		'mainsnak' => {
 			'datatype' => 'string',
 			'datavalue' => {

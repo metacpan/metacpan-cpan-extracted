@@ -1,0 +1,2 @@
+#!/bin/sh
+echo 'gpg (GnuPG) 1.4.23'

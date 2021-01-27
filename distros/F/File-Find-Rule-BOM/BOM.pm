@@ -6,7 +6,7 @@ use warnings;
 
 use String::BOM qw(file_has_bom);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Detect BOM.
 sub File::Find::Rule::bom {
@@ -209,7 +209,7 @@ L<String::BOM>.
 
 =item L<File::Find::Rule>
 
-Alternative interface to File::Find
+Alternative interface to File::Find.
 
 =back
 
@@ -225,12 +225,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2015-2020
+© Michal Josef Špaček 2015-2021
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

@@ -30,5 +30,5 @@ requires:
 resources:
   bugtracker: https://github.com/graphviz-perl/Graph/issues
   repository: git://github.com/graphviz-perl/Graph.git
-version: '0.9716'
+version: '0.9717'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

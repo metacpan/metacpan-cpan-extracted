@@ -40,7 +40,7 @@
    "provides" : {
       "Store::Directories" : {
          "file" : "lib/Store/Directories.pm",
-         "version" : "v0.4.1"
+         "version" : "v0.4.2"
       },
       "Store::Directories::Lock" : {
          "file" : "lib/Store/Directories/Lock.pm"
@@ -52,6 +52,6 @@
          "url" : "https://github.com/camtauxe/store-directories.git"
       }
    },
-   "version" : "v0.4.1",
+   "version" : "v0.4.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

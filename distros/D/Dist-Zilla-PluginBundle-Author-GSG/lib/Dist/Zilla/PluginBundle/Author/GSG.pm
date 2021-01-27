@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
 use version;
-our $VERSION = 'v0.1.3'; # VERSION
+our $VERSION = 'v0.1.4'; # VERSION
 
 use Carp;
 use Git::Wrapper;
@@ -54,7 +54,6 @@ sub configure {
             semantic_version => 1,
         } ],
         'Prereqs::FromCPANfile',
-        'ReadmeAnyFromPod',
         $meta_provides,
 
         [ 'StaticInstall' => $self->config_slice( {
@@ -71,6 +70,7 @@ sub configure {
             config_plugin      => [ '@Default', 'Contributors' ]
         } ],
 
+        'ReadmeAnyFromPod',
         [ 'ChangelogFromGit::CPAN::Changes' => {
             file_name    => 'CHANGES',
             # Support both old 0.90 versioning and new v1.2.3 semantic versioning formats
@@ -266,7 +266,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version v0.1.3
+version v0.1.4
 
 =head1 SYNOPSIS
 
@@ -308,7 +308,6 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     [MetaJSON]
     [OurPkgVersion]
     [Prereqs::FromCPANfile]
-    [ReadmeAnyFromPod]
     [$meta_provides] # defaults to MetaProvides::Package
 
     [StaticInstall]
@@ -323,6 +322,7 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     post_code_replacer = replace_with_nothing
     config_plugin = [ @Default, Contributors ]
 
+    [ReadmeAnyFromPod]
     [ChangelogFromGit::CPAN::Changes]
     file_name    = CHANGES
     ; Support both old 0.90 versioning and new v1.2.3 semantic versioning formats
@@ -607,7 +607,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 - 2020 by Grant Street Group.
+This software is Copyright (c) 2019 - 2021 by Grant Street Group.
 
 This is free software, licensed under:
 

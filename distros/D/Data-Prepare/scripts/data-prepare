@@ -5,19 +5,22 @@ use warnings;
 use Text::CSV qw(csv);
 use Data::Prepare qw(
   cols_non_empty non_unique_cols
+  key_to_index
+  make_pk_map pk_col_counts
   chop_lines chop_cols header_merge
 );
 use YAML qw(LoadFile);
 use Getopt::Long qw(GetOptions);
 
 my $config = "data-prepare-conf.yml";
-my ($analyse, $uniq_cols, $verbose, $slice_num, $slice_key);
+my ($analyse, $uniq_cols, $verbose, $slice_num, $slice_key, $key_analyse);
 if (!GetOptions("a!" => \$analyse,
                 "u!"  => \$uniq_cols,
                 "v!"  => \$verbose,
                 "f=s" => \$config,
                 "sn=i" => \$slice_num,
                 "sk=s" => \$slice_key,
+                "k!" => \$key_analyse,
                )) {
     require Pod::Usage;
     Pod::Usage::pod2usage(1);
@@ -46,10 +49,14 @@ if ($analyse) {
     my $data = csv(in => $file, encoding => "UTF-8");
     $f2cs{$file} = [ cols_non_empty($data) ];
   }
+  print _dump(\%f2cs);
+  exit;
+}
+
+sub _dump {
   require Data::Dumper;
   $Data::Dumper::Indent = $Data::Dumper::Indent = $Data::Dumper::Sortkeys = $Data::Dumper::Sortkeys = $Data::Dumper::Terse = $Data::Dumper::Terse = 1;
-  print Data::Dumper::Dumper(\%f2cs);
-  exit;
+  Data::Dumper::Dumper($_[0]);
 }
 
 if (grep defined, $slice_num, $slice_key) {
@@ -58,7 +65,7 @@ if (grep defined, $slice_num, $slice_key) {
   for my $file (@ARGV) {
     my $data = csv(in => $file, encoding => "UTF-8");
     if (!defined $slice_num) {
-      ($slice_num) = grep $data->[0][$_] eq $slice_key, 0..$#{$data->[0]};
+      $slice_num = key_to_index($data->[0])->{$slice_key};
       die "Unknown column-name '$slice_key' in '$file'" if !defined $slice_num;
     }
     print Encode::encode("UTF-8", $_->[$slice_num]), "\n" for @$data;
@@ -68,8 +75,21 @@ if (grep defined, $slice_num, $slice_key) {
 
 my $process_config = LoadFile($config);
 
+if ($key_analyse) {
+  die "Usage: -k file..." unless @ARGV;
+  my $pk_map = make_pk_map(
+    csv(in => $process_config->{pk_spec}{file}, encoding => "UTF-8"),
+    @{ $process_config->{pk_spec} }{ qw(primary_key alt_keys) },
+  );
+  for my $file (@ARGV) {
+    my $data = csv(in => $file, encoding => "UTF-8");
+    print "$file: ", _dump([ pk_col_counts($data, $pk_map) ]);
+  }
+  exit;
+}
+
 my %set_to_process; @set_to_process{
-  (map @{ $_->{files} }, @{$process_config->{merge}}),
+  (map @{ $_->{files} }, map @{$process_config->{$_}}, qw(merge pk_insert)),
   (map keys(%{$process_config->{$_}}), qw(chop_cols chop_lines)),
 } = ();
 
@@ -91,6 +111,26 @@ for my $file (sort keys %{ $process_config->{chop_lines} }) {
   print "$file: lines (@$lines)\n" if $verbose;
   chop_lines($lines, $file2data{$file});
 }
+my $pk_map; $pk_map = make_pk_map(
+  csv(in => $process_config->{pk_spec}{file}, encoding => "UTF-8"),
+  @{ $process_config->{pk_spec} }{ qw(primary_key alt_keys) },
+) if $process_config->{pk_insert};
+for my $pk_set (@{ $process_config->{pk_insert} }) {
+  my ($ch, $lc, $pkc) = (@$pk_set{qw(column_heading local_column pk_column)});
+  for my $file (@{$pk_set->{files}}) {
+    print "$file: pk_insert\n" if $verbose;
+    my $data = $file2data{$file};
+    my $key_index = key_to_index($data->[0])->{$lc};
+    die "undef index in '$file' for key '$lc'" if !defined $key_index;
+    unshift @{ $data->[0] }, $ch;
+    my $exact_map = $pk_map->{$pkc};
+    for my $row (@$data[ 1..$#$data ]) {
+      my $key_val = $row->[ $key_index ];
+      my $pkv = $exact_map->{ $key_val };
+      unshift(@$row, $pkv);
+    }
+  }
+}
 for my $file (sort keys %file2data) {
   print "to $file\n" if $verbose;
   csv (in => $file2data{$file}, out => $file, encoding => "UTF-8");
@@ -102,7 +142,7 @@ data-prepare - prepare CSV data for automatic processing
 
 =head1 SYNOPSIS
 
-    data-prepare [-f config] [-v] [[-u|-a|-sn colnum|-sk key] file...]
+    data-prepare [-f config] [-v] [[-u|-a|-k|-sn colnum|-sk key] file...]
 
 =head1 DESCRIPTION
 
@@ -137,9 +177,11 @@ Print for each file, a sequence of numbers. Each number is the count of
 non-blank entries in that column (from left to right). This helps you
 spot columns with few or no entries that you may wish to "chop".
 
-=item -s colnum F<file...>
+=item -s[kn] col F<file...>
 
-Print for each file, the zero-based-number-th column ("slice") from that file.
+Print for each file, either the zero-based-number-th column ("slice")
+from that file, or in the C<-sk> form, it gets the number using
+L<Data::Prepare/key_to_index>.
 
 =item -v
 
@@ -149,6 +191,16 @@ Turn on verbose mode.
 
 Use the given YAML-formatted config file rather than the default of
 F<data-prepare-conf.yml>. See below for format.
+
+=item -k F<file...>
+
+Requires a config file with a C<pk_spec> key giving keys C<file>,
+C<primary_key>, and an array C<alt_keys>.
+
+Print for each file, a data structure mapping each column that gave any
+matches to a further hash-ref mapping each of the potential key columns
+to how many matches it gave. This is to help you select the best main
+C<primary_key> to specify for that file.
 
 =back
 
@@ -196,6 +248,15 @@ directory):
           line: 3
           to: self
           tospec: index:0
+  pk_spec:
+    file: examples/country-codes.csv
+    primary_key: ISO3166-1-Alpha-3
+    alt_keys:
+      - ISO3166-1-Alpha-2
+      - UNTERM English Short
+      - UNTERM English Formal
+      - official_name_en
+      - CLDR display name
 
 This turns the first three lines of CSV excerpted from the supplied example
 data (spaces inserted for alignment reasons only):

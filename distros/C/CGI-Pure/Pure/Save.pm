@@ -12,7 +12,7 @@ use URI::Escape;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -253,11 +253,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2004-2020 Michal Josef Špaček
- BSD 2-Clause License
+© 2004-2021 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

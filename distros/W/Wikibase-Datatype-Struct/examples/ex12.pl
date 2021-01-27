@@ -3,52 +3,60 @@
 use strict;
 use warnings;
 
-use Data::Printer;
-use Wikibase::Datatype::Struct::Lexeme qw(struct2obj);
+use Wikibase::Datatype::Struct::MediainfoStatement qw(struct2obj);
 
-# Lexeme structure.
+# Item structure.
 my $struct_hr = {
-        'grammaticalFeatures' => [
-                'Q163012',
-                'Q163014',
-        ],
-        'representations' => {
-                'cs' => {
-                        'language' => 'cs',
-                        'value' => 'Representation cs',
-                },
-                'en' => {
-                        'language' => 'en',
-                        'value' => 'Representation en',
-                },
-        },
-        'claims' => {
-                'P31' => [{
-                        'mainsnak' => {
-                                'datatype' => 'wikibase-item',
-                                'datavalue' => {
-                                        'type' => 'wikibase-entityid',
-                                        'value' => {
-                                                'entity-type' => 'item',
-                                                'id' => 'Q5',
-                                                'numeric-id' => 5,
-                                        },
-                                },
-                                'property' => 'P31',
-                                'snaktype' => 'value',
+        'id' => 'M123$00C04D2A-49AF-40C2-9930-C551916887E8',
+        'mainsnak' => {
+                'datavalue' => {
+                        'type' => 'wikibase-entityid',
+                        'value' => {
+                                'entity-type' => 'item',
+                                'id' => 'Q5',
+                                'numeric-id' => 5,
                         },
-                        'rank' => 'normal',
-                        'type' => 'statement',
+                },
+                'property' => 'P31',
+                'snaktype' => 'value',
+        },
+        'qualifiers' => {
+                'P642' => [{
+                        'datavalue' => {
+                                'type' => 'wikibase-entityid',
+                                'value' => {
+                                        'entity-type' => 'item',
+                                        'id' => 'Q474741',
+                                        'numeric-id' => 474741,
+                                },
+                        },
+                        'property' => 'P642',
+                        'snaktype' => 'value',
                 }],
         },
-        'type' => 'lexeme',
+        'qualifiers-order' => [
+                'P642',
+        ],
+        'rank' => 'normal',
+        'type' => 'statement',
 };
 
 # Get object.
 my $obj = struct2obj($struct_hr);
 
-# Dump object.
-p $obj;
+# Print out.
+print 'Id: '.$obj->id."\n";
+print 'Statements: '.$obj->snak->property.' -> '.$obj->snak->datavalue->value."\n";
+print "Qualifiers:\n";
+foreach my $property_snak (@{$obj->property_snaks}) {
+        print "\t".$property_snak->property.' -> '.
+                $property_snak->datavalue->value."\n";
+}
+print 'Rank: '.$obj->rank."\n";
 
 # Output:
-# TODO
+# Id: M123$00C04D2A-49AF-40C2-9930-C551916887E8
+# Statements: P31 -> Q5
+# Qualifiers:
+#         P642 -> Q474741
+# Rank: normal

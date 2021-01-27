@@ -3,65 +3,67 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Struct::Reference qw(struct2obj);
+use Data::Printer;
+use Wikibase::Datatype::Struct::Form qw(struct2obj);
 
 # Item structure.
 my $struct_hr = {
-        'snaks' => {
-                'P214' => [{
-                        'datatype' => 'external-id',
-                        'datavalue' => {
-                                'type' => 'string',
-                                'value' => '113230702',
-                        },
-                        'property' => 'P214',
-                        'snaktype' => 'value',
-                }],
-                'P248' => [{
-                        'datatype' => 'wikibase-item',
-                        'datavalue' => {
-                                'type' => 'wikibase-entityid',
-                                'value' => {
-                                        'entity-type' => 'item',
-                                        'id' => 'Q53919',
-                                        'numeric-id' => 53919,
+        'grammaticalFeatures' => [
+                'Q163012',
+                'Q163014',
+        ],
+        'id' => 'ID',
+        'representations' => {
+                'cs' => {
+                        'language' => 'cs',
+                        'value' => 'Representation cs',
+                },
+                'en' => {
+                        'language' => 'en',
+                        'value' => 'Representation en',
+                },
+        },
+        'claims' => {
+                'P31' => [{
+                        'mainsnak' => {
+                                'datatype' => 'wikibase-item',
+                                'datavalue' => {
+                                        'type' => 'wikibase-entityid',
+                                        'value' => {
+                                                'entity-type' => 'item',
+                                                'id' => 'Q5',
+                                                'numeric-id' => 5,
+                                        },
                                 },
+                                'property' => 'P31',
+                                'snaktype' => 'value',
                         },
-                        'property' => 'P248',
-                        'snaktype' => 'value',
-                }],
-                'P813' => [{
-                        'datatype' => 'time',
-                        'datavalue' => {
-                                'type' => 'time',
-                                'value' => {
-                                        'after' => 0,
-                                        'before' => 0,
-                                        'calendarmodel' => 'http://test.wikidata.org/entity/Q1985727',
-                                        'precision' => 11,
-                                        'time' => '+2013-12-07T00:00:00Z',
-                                        'timezone' => 0,
-                                },
-                        },
-                        'property' => 'P813',
-                        'snaktype' => 'value',
+                        'rank' => 'normal',
+                        'type' => 'statement',
                 }],
         },
-        'snaks-order' => [
-                'P248',
-                'P214',
-                'P813',
-        ],
 };
 
 # Get object.
 my $obj = struct2obj($struct_hr);
 
-# Get value.
-my $snaks_ar = $obj->snaks;
-
-# Print out number of snaks.
-print "Number of snaks: ".@{$snaks_ar}."\n";
+# Dump object.
+p $obj;
 
 # Output:
-# Number of snaks: 3
+# Wikibase::Datatype::Form  {
+#     Parents       Mo::Object
+#     public methods (6) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), check_array_object (Mo::utils), isa (UNIVERSAL), VERSION (UNIVERSAL)
+#     private methods (1) : __ANON__ (Mo::is)
+#     internals: {
+#         grammatical_features   [
+#             [0] Wikibase::Datatype::Value::Item,
+#             [1] Wikibase::Datatype::Value::Item
+#         ],
+#         id                     "ID",
+#         represenations         undef,
+#         statements             [
+#             [0] Wikibase::Datatype::Statement
+#         ]
+#     }
+# }

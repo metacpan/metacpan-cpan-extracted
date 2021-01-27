@@ -1,3 +1,11 @@
+0.07 2021-01-27T01:43:29+01:00
+ - Add support for Mediainfo.
+ - Add support for MediainfoSnak.
+ - Add support for MediainfoStatement.
+ - Add support for id parameter and method in Statement.
+ - Rewrite Utils to abstract Snak way.
+ - Update examples/ dir.
+
 0.06 2021-01-14T19:16:36+01:00
  - Add Lexeme.
  - Add test for globe coordinate with negative value.
