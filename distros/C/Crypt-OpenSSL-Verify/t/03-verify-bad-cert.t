@@ -39,7 +39,7 @@ my $ret;
 eval {
         $ret = $v->verify($cert);
 };
-ok($@ =~ /(verify: unable to get local)|(verify: unknown certificate)/);
+ok($@ =~ /(verify: certificate has expired)|(verify: unable to get local)|(verify: unknown certificate)/);
 ok(!$ret);
 
 $v = Crypt::OpenSSL::Verify->new(
@@ -55,7 +55,7 @@ $ret = undef;
 eval {
         $ret = $v->verify($cert);
 };
-ok($@ =~ /(verify: unable to get local)|(verify: unknown certificate)/);
+ok($@ =~ /(verify: certificate has expired)|(verify: unable to get local)|(verify: unknown certificate)/);
 ok(!$ret);
 
 done_testing;

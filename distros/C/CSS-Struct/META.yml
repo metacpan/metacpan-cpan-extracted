@@ -22,6 +22,7 @@ meta-spec:
 name: CSS-Struct
 no_index:
   directory:
+    - examples
     - inc
     - t
     - xt
@@ -31,8 +32,8 @@ requires:
   List::MoreUtils: 0
   Readonly: 0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CSS-Struct
+  bugtracker: https://github.com/michal-josef-spacek/CSS-Struct/issues
   homepage: https://github.com/michal-josef-spacek/CSS-Struct
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/CSS-Struct
-version: '0.03'
+version: '0.04'

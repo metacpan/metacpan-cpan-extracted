@@ -15,7 +15,7 @@ name: Simd-Avx512
 provides:
   Simd::Avx512:
     file: lib/Simd/Avx512.pm
-    version: '20210122'
+    version: '20210128'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/philiprbrenan/SimdAvx512/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/philiprbrenan/SimdAvx512
-version: '20210122'
+version: '20210128'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -143,6 +143,11 @@ compile_spvm(...)
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
   SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
   
+  
+  // Include directries
+  SV** sv_include_dirs_ptr = hv_fetch(hv_self, "include_dirs", strlen("include_dirs"), 0);
+  SV* sv_include_dirs = sv_include_dirs_ptr ? *sv_include_dirs_ptr : &PL_sv_undef;
+  
   // Name
   const char* name = SvPV_nolen(sv_name);
   char* name_copy = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, sv_len(sv_name) + 1);
@@ -164,13 +169,19 @@ compile_spvm(...)
   SPVM_LIST_push(compiler->op_use_stack, op_use_package);
   
   // Add include paths
-  AV* av_include_paths = get_av("main::INC", 0);;
-  int32_t av_include_paths_length = (int32_t)av_len(av_include_paths) + 1;
-  for (int32_t i = 0; i < av_include_paths_length; i++) {
-    SV** sv_include_path_ptr = av_fetch(av_include_paths, i, 0);
-    SV* sv_include_path = sv_include_path_ptr ? *sv_include_path_ptr : &PL_sv_undef;
-    char* include_path = SvPV_nolen(sv_include_path);
-    SPVM_LIST_push(compiler->module_include_pathes, include_path);
+  AV* av_include_dirs;
+  if (SvOK(sv_include_dirs)) {
+    av_include_dirs = (AV*)SvRV(sv_include_dirs);
+  }
+  else {
+    av_include_dirs = (AV*)sv_2mortal((SV*)newAV());
+  }
+  int32_t av_include_dirs_length = (int32_t)av_len(av_include_dirs) + 1;
+  for (int32_t i = 0; i < av_include_dirs_length; i++) {
+    SV** sv_include_dir_ptr = av_fetch(av_include_dirs, i, 0);
+    SV* sv_include_dir = sv_include_dir_ptr ? *sv_include_dir_ptr : &PL_sv_undef;
+    char* include_dir = SvPV_nolen(sv_include_dir);
+    SPVM_LIST_push(compiler->module_include_dirs, include_dir);
   }
 
   // Compile SPVM
@@ -385,6 +396,72 @@ get_module_file(...)
   SV* sv_module_file = sv_2mortal(newSVpv(module_file, 0));
 
   XPUSHs(sv_module_file);
+  XSRETURN(1);
+}
+
+SV*
+get_module_source(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  SV* sv_package_name = ST(1);
+
+  HV* hv_self = (HV*)SvRV(sv_self);
+  
+  // Name
+  const char* package_name = SvPV_nolen(sv_package_name);
+
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  // Copy package load path to builder
+  SV* sv_module_source;
+  const char* module_source = SPVM_HASH_fetch(compiler->module_source_symtable, package_name, strlen(package_name));
+  if (module_source) {
+    sv_module_source = sv_2mortal(newSVpv(module_source, 0));
+  }
+  else {
+    sv_module_source = &PL_sv_undef;
+  }
+
+  XPUSHs(sv_module_source);
+  XSRETURN(1);
+}
+
+SV*
+get_loaded_module_file(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  SV* sv_package_name = ST(1);
+
+  HV* hv_self = (HV*)SvRV(sv_self);
+  
+  // Name
+  const char* package_name = SvPV_nolen(sv_package_name);
+
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  // Copy package load path to builder
+  SV* sv_loaded_module_file;
+  const char* loaded_module_file = SPVM_HASH_fetch(compiler->loaded_module_file_symtable, package_name, strlen(package_name));
+  if (loaded_module_file) {
+    sv_loaded_module_file = sv_2mortal(newSVpv(loaded_module_file, 0));
+  }
+  else {
+    sv_loaded_module_file = &PL_sv_undef;
+  }
+
+  XPUSHs(sv_loaded_module_file);
   XSRETURN(1);
 }
 

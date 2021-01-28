@@ -1,9 +1,9 @@
 package WordList::MetaSyntactic::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-05'; # DATE
+our $DATE = '2020-12-26'; # DATE
 our $DIST = 'WordList-MetaSyntactic-Any'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use parent qw(WordList);
 
@@ -70,14 +70,20 @@ WordList::MetaSyntactic::Any - Wordlist from any Acme::MetaSyntactic::* module
 
 =head1 VERSION
 
-This document describes version 0.002 of WordList::MetaSyntactic::Any (from Perl distribution WordList-MetaSyntactic-Any), released on 2020-06-05.
+This document describes version 0.003 of WordList::MetaSyntactic::Any (from Perl distribution WordList-MetaSyntactic-Any), released on 2020-12-26.
 
 =head1 SYNOPSIS
+
+From Perl:
 
  use WordList::MetaSyntactic::Any;
 
  my $wl = WordList::MetaSyntactic::Any->new(theme => 'dangdut');
  $wl->each_word(sub { ... });
+
+From the command-line:
+
+ % wordlist -w MetaSyntactic::Any=theme,dangdut
 
 =head1 DESCRIPTION
 
@@ -94,7 +100,7 @@ Source repository is at L<https://github.com/perlancar/perl-WordList-MetaSyntact
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-MetaSyntactic-Any>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WordList-MetaSyntactic-Any/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

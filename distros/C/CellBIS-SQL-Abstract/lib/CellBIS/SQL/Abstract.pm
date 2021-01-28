@@ -3,18 +3,16 @@ use Mojo::Base -base;
 
 use Scalar::Util qw(blessed);
 use Carp ();
-use Mojo::Util qw(trim);
+use Mojo::Util qw(trim dumper);
 use CellBIS::SQL::Abstract::Util;
 use CellBIS::SQL::Abstract::Table;
 
 # ABSTRACT: SQL Query Generator
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 has 'QueryUtil' => sub { state $qu = CellBIS::SQL::Abstract::Util->new };
-has 'db_type';
+has 'db_type'   => 'mariadb';
 
-# For Query Insert :
-# ------------------------------------------------------------------------
 sub insert {
   my $self    = shift;
   my $arg_len = scalar @_;
@@ -35,17 +33,15 @@ sub insert {
   if ((scalar @table_field) == (scalar @table_data)) {
 
     if ($type && $type eq 'no-pre-st') {
-      $value_col = join ', ',
-        $self->QueryUtil->replace_data_value_insert_no_pre_st(\@table_data);
+      $value_col = join ', ', $self->QueryUtil->data_insert(\@table_data);
     }
     elsif ($type && $type eq 'pre-st') {
       @get_data_value
-        = $self->QueryUtil->replace_data_value_insert(\@table_data);
+        = @{$self->QueryUtil->data_insert_pre_st(\@table_data)->[0]};
       $value_col = join ', ', @get_data_value;
     }
     else {
-      $value_col = join ', ',
-        $self->QueryUtil->replace_data_value_insert_no_pre_st(\@table_data);
+      $value_col = join ', ', $self->QueryUtil->data_insert(\@table_data);
     }
 
     $field_col = trim($field_col);
@@ -58,8 +54,42 @@ sub insert {
   return $data;
 }
 
-# For Query Update :
-# ------------------------------------------------------------------------
+sub insert_bulk {
+  my ($self, $table_name, $column, $col_val, $type) = @_;
+
+  $type //= '';
+  my @table_field = @{$column};
+  my @table_data  = ();
+  my @value_data  = ();
+
+  # for field column
+  my $field_col = join ', ', @table_field;
+  my $value_col = '';
+
+  # for data column
+  for my $value (@{$col_val}) {
+    if ($type eq 'pre-st') {
+      push @value_data, @{$self->QueryUtil->data_insert_pre_st($value)->[1]};
+      push @table_data,
+          '('
+        . (join ', ', @{$self->QueryUtil->data_insert_pre_st($value)->[0]})
+        . ')';
+    }
+    else {
+      push @table_data,
+        '(' . (join ', ', $self->QueryUtil->data_insert($value)) . ')';
+    }
+  }
+
+  $field_col = trim($field_col);
+  $value_col = trim(join(', ', @table_data));
+  $value_col =~ s/\,$//g;
+  $value_col =~ s/\s\,//g;
+
+  return ["INSERT INTO ${table_name}($field_col) VALUES $value_col",
+    @value_data];
+}
+
 sub update {
   my $self    = shift;
   my $arg_len = scalar @_;
@@ -73,8 +103,6 @@ sub update {
   return '';
 }
 
-# For Query Delete :
-# ------------------------------------------------------------------------
 sub delete {
   my $self = shift;
   my ($table_name, $clause) = @_;
@@ -82,7 +110,6 @@ sub delete {
 
   if (ref($clause) eq "HASH") {
 
-    #    my $size_clause = scalar keys %{$clause};
     if (exists $clause->{where}) {
       my $where_clause = $self->QueryUtil->create_clause($clause);
       $data = "DELETE FROM $table_name \n$where_clause";
@@ -91,8 +118,6 @@ sub delete {
   return $data;
 }
 
-# For Query Select :
-# ------------------------------------------------------------------------
 sub select {
   my $self    = shift;
   my $arg_len = scalar @_;
@@ -102,8 +127,6 @@ sub select {
   return $data;
 }
 
-# For Query Select Join :
-# ------------------------------------------------------------------------
 sub select_join {
   my $self    = shift;
   my $arg_len = scalar @_;
@@ -113,24 +136,25 @@ sub select_join {
   return $data;
 }
 
-# For Create Table :
-# ------------------------------------------------------------------------
 sub create_table {
   my $self    = shift;
   my $arg_len = scalar @_;
   my $result  = '';
 
   if ($arg_len >= 3) {
-    my $tables = CellBIS::SQL::Abstract::Table->new(db_type => $self->db_type
-        // 'mysql');
+    my $tables
+      = CellBIS::SQL::Abstract::Table->new(db_type => $self->db_type);
     $result = $tables->create_query_table(@_);
   }
   return $result;
 }
 
+# For Action Query String - "update"
+# --------------------------------------------------------------
 sub _qUpdate_arg3 {
   my $self = shift;
   my ($table_name, $col_val, $clause) = @_;
+
   my $data = '';
 
   Carp::croak '$col_val is must be hashref datatype'
@@ -138,8 +162,8 @@ sub _qUpdate_arg3 {
 
   if (exists $clause->{where}) {
     my @field = map {
-          $col_val->{$_} =~ qr/date|datetime|now|NOW/
-        ? $_ . ' = ' . $col_val->{$_}
+          $self->QueryUtil->is_sql_function($col_val->{$_})
+        ? $_ . ' = ' . $col_val->{$_}->[0]
         : $_ . ' = ' . "'"
         . $col_val->{$_} . "'"
     } keys %{$col_val};
@@ -156,7 +180,7 @@ sub _qUpdate_arg4 {
   my $data = '';
 
   if (exists $clause->{where}) {
-    my @get_value = $self->QueryUtil->col_with_val($column, $value);
+    my @get_value    = $self->QueryUtil->col_with_val($column, $value);
     my $field_change = join ', ', @get_value;
     my $where_clause = $self->QueryUtil->create_clause($clause);
     $data = "UPDATE $table_name \nSET $field_change \n$where_clause";
@@ -195,8 +219,8 @@ sub _qUpdate_arg5 {
   return $data;
 }
 
-# For Action Query String - "select" - arg3 :
-# ------------------------------------------------------------------------
+# For Action Query String - "select" :
+# --------------------------------------------------------------
 sub _qSelect_arg3 {
   my $self = shift;
   my ($table_name, $column, $clause) = @_;
@@ -250,8 +274,8 @@ sub _qSelect_arg3 {
   return $data;
 }
 
-# For Action Query String - "select_join" - arg3 :
-# ------------------------------------------------------------------------
+# For Action Query String - "select_join" :
+# --------------------------------------------------------------
 sub _qSelectJoin_arg3 {
   my $self = shift;
   my ($table_name, $column, $clause) = @_;
@@ -266,7 +290,7 @@ sub _qSelectJoin_arg3 {
 
   if (ref($clause) eq "HASH") {
     if (exists $clause->{join}) {
-      $join_clause = $self->QueryUtil->for_onjoin($clause, $table_name);
+      $join_clause  = $self->QueryUtil->for_onjoin($clause, $table_name);
       $where_clause = $self->QueryUtil->create_clause($clause);
       $data = "SELECT $field_change $join_clause" . "\n" . $where_clause;
     }

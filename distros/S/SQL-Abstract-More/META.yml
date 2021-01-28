@@ -23,10 +23,13 @@ no_index:
   directory:
     - inc
     - t
+    - xt
+recommends:
+  SQL::Abstract::Classic: 0
 requires:
   MRO::Compat: 0
   Params::Validate: 0
-  SQL::Abstract: 1.85
+  SQL::Abstract: 1.73
   Scalar::Util: 0
   namespace::clean: 0
   parent: 0
@@ -36,4 +39,4 @@ resources:
   homepage: https://metacpan.org/author/DAMI
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/damil/SQL-Abstract-More.git
-version: '1.35'
+version: '1.36'

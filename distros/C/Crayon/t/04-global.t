@@ -10,7 +10,7 @@ parse_test(
 			background: $black;
 			color: $white;
 		);
-		body .class, body .other {
+		body .thing #other .class, body .other {
 			$black: #0f0;
 			%colours;
 		}
@@ -25,11 +25,15 @@ parse_test(
 			'black' => '#000'
 		},
 		body => {
-			'.class' => {
-				'%colours' => 1,
-				'VARIABLES' => {
-                            		'black' => '#0f0'
-				}
+			'.thing' => {
+				'#other' => {
+					'.class' => {
+						'%colours' => 1,
+						'VARIABLES' => {
+							'black' => '#0f0'
+						}
+					}
+				},
 			},
 			'.other' => {
 				'%colours' => 1,
@@ -39,7 +43,7 @@ parse_test(
 			}
 		}
 	},
-	q|body .class, body .other {
+	q|body .other, body .thing #other .class {
 	background: #0f0;
 	color: #fff;
 }

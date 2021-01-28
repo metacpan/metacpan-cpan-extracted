@@ -55,7 +55,8 @@ my $object = from_json(<<'JSON');
 		"bicycle": {
 			"color": "red",
 			"price": 19.95
-		}
+		},
+		"boolean": false
 	}
 }
 JSON

@@ -63,6 +63,7 @@ subtest simple => sub {
     my @expressions = (
         '$.array[-1:]'             => single_ref( sub { $_[0]->{array}[-1] } ),
         '$.simple'                 => single_ref( sub { $_[0]->{simple} } ),
+        '$.boolean'                => single_ref( sub { $_[0]->{boolean} } ),
         '$.long_hash.key1.subkey2' => single_ref( sub { $_[0]->{long_hash}{key1}{subkey2} } ),
         '$.multilevel_array.1.0.0' => single_ref( sub { $_[0]->{multilevel_array}[1][0][0] } ),
         '$.store.book[0].title'    => single_ref( sub { $_[0]->{store}{book}[0]{title} } ),
@@ -165,6 +166,7 @@ sub sample_json {
     my $data = <<END;
 {
    "simple" : "Simple",
+   "boolean": false,
    "hash" : {
       "key" : "value"
    },

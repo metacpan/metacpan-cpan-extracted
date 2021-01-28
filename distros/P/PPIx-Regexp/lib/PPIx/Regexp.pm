@@ -145,6 +145,17 @@ were introduced to deal with this complication.
 is parsed as the octal equivalent of C<\x{...}>. This is its meaning as
 of perl 5.13.2. Before 5.13.2 it was simply literal C<'o'> and so on.
 
+=item C<x{,3}>
+
+(with first count omitted) is allowed as a quantifier as of Perl 5.33.6.
+The previous parse made this all literals.
+
+=item C<x{ 0 , 3 }>
+
+(with spaces inside but adjacent to curly brackets, or around the comma
+if any) is allowed as a quantifier as of Perl 5.33.6. The previous parse
+made this all literals.
+
 =back
 
 There are very probably other examples of this. When they come to light
@@ -186,7 +197,7 @@ use PPIx::Regexp::Util qw{
 use Scalar::Util qw{ refaddr };
 use Text::Tabs ();
 
-our $VERSION = '0.077';
+our $VERSION = '0.078';
 
 =head2 new
 

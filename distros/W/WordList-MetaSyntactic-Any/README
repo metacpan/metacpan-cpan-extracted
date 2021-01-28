@@ -3,15 +3,21 @@ NAME
     module
 
 VERSION
-    This document describes version 0.002 of WordList::MetaSyntactic::Any
+    This document describes version 0.003 of WordList::MetaSyntactic::Any
     (from Perl distribution WordList-MetaSyntactic-Any), released on
-    2020-06-05.
+    2020-12-26.
 
 SYNOPSIS
+    From Perl:
+
      use WordList::MetaSyntactic::Any;
 
      my $wl = WordList::MetaSyntactic::Any->new(theme => 'dangdut');
      $wl->each_word(sub { ... });
+
+    From the command-line:
+
+     % wordlist -w MetaSyntactic::Any=theme,dangdut
 
 DESCRIPTION
     This is a dynamic, parameterized wordlist to get list of words from an
@@ -27,8 +33,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-MetaSyntacti
-    c-Any>
+    <https://github.com/perlancar/perl-WordList-MetaSyntactic-Any/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

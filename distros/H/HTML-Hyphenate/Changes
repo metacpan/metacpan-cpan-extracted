@@ -1,5 +1,9 @@
 Revision history for Perl extension HTML::Hyphenate.
 
+v1.1.10 Thu Jan 28 13:53:54 UTC 2021
+    - feat: depend on I18N::LangTags to fall back to similar language (BB#1)
+    - fix: avoid depending on broken version of TeX::Hyphen::Pattern (BB#5)
+
 v1.1.9 Mon Jan 25 22:56:34 UTC 2021
     - fix: meta bugtracker
 

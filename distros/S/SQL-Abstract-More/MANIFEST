@@ -21,9 +21,11 @@ t/03-join_with_constants.t
 t/04-multicols_in.t
 t/05-join-with-using.t
 t/06_with_table_expression.t
+t/07-import.t
 t/99_sqla_tests.t
+t/classic/parent_classic.t
 t/lib/UsurpSQLA.pm
-t/pod.t
 t/rt_084972.t
 t/rt_086895.t
 t/rt_099455.t
+xt/pod.t

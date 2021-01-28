@@ -1,5 +1,9 @@
 Revision history for SQL-Abstract-More
 
+1.36 28.01.2021
+  - fix inheritance bug with SQL::Abstract v2.0 (RT#134151)
+  - can inherit from SQL::Abstract::Classic through '-extends' arg to import()
+
 1.35 24.01.2021
   - new arg -final_clause for with()
   - temporary fix for RT#134127 -- wait for resolution of RT#134128

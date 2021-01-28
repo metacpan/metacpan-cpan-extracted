@@ -814,20 +814,23 @@ m_call(	perl_version_removed	=> undef );
 {
     note <<'EOD';
 
-Test look-around assertions. This generally can not be done using the
-version-testing framework because it is too dependent on context.
+Test thing that can not be done using the version-testing framework
+because they are too dependent on context.
 
 EOD
     foreach my $test (
-	[ '=f?',	'5.000', undef, 'Variable-length look-ahead' ],
-	[ '=f{1,2}',	'5.000', undef, 'Variable-length look-ahead' ],
-	[ '<=f?',	'5.029009', undef, 'Variable-length look-behind' ],
-	[ '<=f{1,2}',	'5.029009', undef, 'Variable-length look-behind' ],
-	[ '(?=(?=x)x)\K', '5.009005', undef, '\K not really in look-ahead' ],
-	[ '(?=(?=x)x\K)', '5.009005', '5.031003', '\K nested one deep' ],
-	[ '(?=(?=x\K)x)', '5.009005', '5.031003', '\K nested two deep' ],
+	[ '(?=f?)',	'5.000', undef, 'Variable-length look-ahead' ],
+	[ '(?=f{1,2})',	'5.000', undef, 'Variable-length look-ahead' ],
+	[ '(?<=f?)',	'5.029009', undef, 'Variable-length look-behind' ],
+	[ '(?<=f{1,2})',	'5.029009', undef, 'Variable-length look-behind' ],
+	[ '(?(?=(?=x)x)\K)', '5.009005', undef, '\K not really in look-ahead' ],
+	[ '(?(?=(?=x)x\K))', '5.009005', '5.031003', '\K nested one deep' ],
+	[ '(?(?=(?=x\K)x))', '5.009005', '5.031003', '\K nested two deep' ],
+	[ 'x{0,3}',	'5.000', undef, 'Quantifier {0,3}' ],
+	[ 'x{,3}',	'5.033006', undef, 'Quantifier {,3}' ],
+	[ 'x{ 0 , 3 }',	'5.033006', undef, 'Quantifier { 0 , 3 }' ],
     ) {
-	my $re = "/(?$test->[0])/";
+	my $re = "/$test->[0]/";
 	my $pre = PPIx::Regexp->new( $re );
 	is $pre->perl_version_introduced(), $test->[1],
 	    "$test->[3] $re introduced in $test->[1]";

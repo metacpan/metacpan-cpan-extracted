@@ -1,5 +1,5 @@
 package Crayon;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use 5.006;
 use strict;
 use warnings;
@@ -302,11 +302,11 @@ __END__
 
 =head1 NAME
 
-Crayon - CSS Toolkit
+Crayon - dedupe, minify and extend CSS
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04 
 
 =cut
 
@@ -345,9 +345,26 @@ Version 0.01
 
 =head2 new
 
+Instantiate a new Crayon Object.
+
+	Crayon->new();
+
 =head2 parse
 
+Parse css strings into Crayons internal struct.
+
+	$crayon->parse(q|
+		.some .class {
+			...
+		}
+	|);
+
+
 =head2 compile
+
+Compile the current Crayon struct into CSS.
+
+	$crayon->compile();
 
 =head1 Crayon
 
@@ -507,6 +524,37 @@ Both block-style and inline comments may be used:
 
 	// Get in line!
 	$var: white;
+
+=head2 Deduplication
+
+Crayon attempts to deduplicate your CSS so when compiled the final string contains the least amount of characters possible.
+
+	body .class {
+		background: lighten(#000, 50%);
+		color: darken(#fff, 50%);
+	}
+	body {
+		.other {
+			background: lighten(#000, 50%);
+			color: darken(#fff, 50%);
+		}
+	}
+
+Output:
+
+	body .class, body .other {
+		background: #7f7f7f;
+		color: #7f7f7f;
+	}
+
+
+=head2 Pretty
+
+The default behaviour for Crayon is to minify CSS. However if you prefer you have the option to pretty print aswell.
+
+
+	Crayon->new( pretty => 1 );
+
 
 =head1 AUTHOR
 

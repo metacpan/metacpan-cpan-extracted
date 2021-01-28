@@ -1,4 +1,4 @@
-package  # hide from PAUSE
+package    # hide from PAUSE
   CellBIS::SQL::Abstract::Table;
 use Mojo::Base -base;
 
@@ -6,19 +6,14 @@ use Scalar::Util qw(blessed);
 use Mojo::Util qw(trim);
 use Hash::MultiValue;
 
-has 'db_type' => 'mysql';
+has 'db_type' => 'mariadb';
 
 # For Foreign Key Validator:
 # ------------------------------------------------------------------------
 sub fk_validator {
   my ($table_attr, $col_attr) = @_;
-  my %fk_attr = (
-    name         => 0,
-    col_name     => 0,
-    table_target => 0,
-    col_target   => 0,
-  );
-  
+  my %fk_attr = (name => 0, col_name => 0, table_target => 0, col_target => 0,);
+
   my $fk = $table_attr->{fk};
   if (exists $fk->{name} && $fk->{name} ne '') {
     $fk_attr{name} = 1;
@@ -26,17 +21,17 @@ sub fk_validator {
   if (exists $fk->{col_name} && $fk->{col_name} ne '') {
     $fk_attr{col_name} = 1;
   }
-  
+
   if (exists $fk->{table_target} && $fk->{table_target} ne '') {
     $fk_attr{table_target} = 1;
   }
-  
+
   if (exists $fk->{col_target} && $fk->{col_target} ne '') {
     $fk_attr{col_target} = 1;
   }
-  my @r_val = grep {!$_} values %fk_attr;
+  my @r_val       = grep { !$_ } values %fk_attr;
   my $size_result = scalar @r_val;
-  
+
   if ($size_result >= 1) {
     my $new_TableAttr = Hash::MultiValue->new(%{$table_attr});
     $new_TableAttr->remove('fk');
@@ -56,12 +51,9 @@ sub fk_validator {
 # ------------------------------------------------------------------------
 sub fk_attr_validator {
   my ($fk_table) = @_;
-  my $data = '';
-  my %ondelup = (
-    'cascade' => 'CASCADE',
-    'null'    => 'SET NULL',
-    'default' => 'SET DEFAULT'
-  );
+  my $data       = '';
+  my %ondelup    = ('cascade' => 'CASCADE', 'null' => 'SET NULL',
+    'default' => 'SET DEFAULT');
   my $ondel = 0;
   if (exists $fk_table->{ondelete}) {
     if (exists $ondelup{(lc $fk_table->{ondelete})}) {
@@ -69,7 +61,7 @@ sub fk_attr_validator {
       $data .= 'ON DELETE ' . $ondelup{(lc $fk_table->{ondelete})};
     }
   }
-  
+
   if (exists $fk_table->{onupdate}) {
     if (exists $ondelup{(lc $fk_table->{onupdate})}) {
       $data .= ' ' if $ondel == 1;
@@ -85,43 +77,51 @@ sub fk_attr_validator {
 sub table_attr_val {
   my $self = shift;
   my ($col_attr, $table_attr) = @_;
-  my $new_tblAttr = {};
+  my $new_tblAttr  = {};
   my $attrib_table = '';
-  my $db_type = $self->db_type // 'mysql';
-  
+  my $db_type      = $self->db_type // 'mariadb';
+
   if (exists $table_attr->{fk}) {
     $table_attr = fk_validator($table_attr, $col_attr);
     my $table_fk = '';
     if (exists $table_attr->{fk}) {
-      my $fk_table = $table_attr->{fk};
-      my $fk_name = $fk_table->{name};
-      my $col_name = $fk_table->{col_name};
+      my $fk_table     = $table_attr->{fk};
+      my $fk_name      = $fk_table->{name};
+      my $col_name     = $fk_table->{col_name};
       my $table_target = $fk_table->{table_target};
-      my $col_target = $fk_table->{col_target};
-      my $fk_attr = '';
+      my $col_target   = $fk_table->{col_target};
+      my $fk_attr      = '';
       if ($fk_table->{attr}) {
         $fk_attr = fk_attr_validator($fk_table->{attr});
       }
       if ($db_type eq 'sqlite') {
         $table_fk .= "\tCONSTRAINT $fk_name ";
         $table_fk .= "FOREIGN KEY ($col_name) ";
-        $table_fk .= "REFERENCES $table_target ($col_target)\n" if $fk_attr eq '';
-        $table_fk .= "REFERENCES $table_target ($col_target) \n\t$fk_attr\n" unless $fk_attr eq '';
-      } else {
-        $table_fk .= "\tKEY " . $fk_name . " ($col_name), \n";
+        $table_fk .= "REFERENCES $table_target ($col_target)\n"
+          if $fk_attr eq '';
+        $table_fk .= "REFERENCES $table_target ($col_target) \n\t$fk_attr\n"
+          unless $fk_attr eq '';
+      }
+      else {
+        $table_fk .= "\tKEY " . $fk_name . " ($col_name), \n"
+          if $db_type eq 'mariadb';
         $table_fk .= "\tCONSTRAINT $fk_name ";
         $table_fk .= "FOREIGN KEY ($col_name) ";
-        $table_fk .= "REFERENCES $table_target ($col_target)\n" if $fk_attr eq '';
-        $table_fk .= "REFERENCES $table_target ($col_target) \n\t$fk_attr\n" unless $fk_attr eq '';
+        $table_fk .= "REFERENCES $table_target ($col_target)\n"
+          if $fk_attr eq '';
+        $table_fk .= "REFERENCES $table_target ($col_target) \n\t$fk_attr\n"
+          unless $fk_attr eq '';
       }
-      
+
       my $new_attrTbl = Hash::MultiValue->new(%{$table_attr});
       $new_attrTbl->set(fk => $table_fk);
       $table_attr = $new_attrTbl->as_hashref;
     }
   }
   if (exists $table_attr->{index}) {
-    if (ref($table_attr->{index}) eq "ARRAY" and (scalar @{$table_attr->{index}}) > 0) {
+    if (ref($table_attr->{index}) eq "ARRAY"
+      and (scalar @{$table_attr->{index}}) > 0)
+    {
       my $table_index = join ',', @{$table_attr->{index}};
       $table_index = 'INDEX (' . $table_index . ')';
       my $new_attrTbl = Hash::MultiValue->new(%{$table_attr});
@@ -136,12 +136,14 @@ sub table_attr_val {
     $attrib_table .= 'ENGINE=' . $r_engine;
   }
   $attrib_table .= ' ' if ($engine == 1);
-  $attrib_table .= exists $table_attr->{charset} ?
-    'DEFAULT CHARSET=' . $table_attr->{charset} : 'DEFAULT CHARSET=utf8';
+  $attrib_table
+    .= exists $table_attr->{charset}
+    ? 'DEFAULT CHARSET=' . $table_attr->{charset}
+    : 'DEFAULT CHARSET=utf8';
   $new_tblAttr = Hash::MultiValue->new(%{$table_attr});
   $new_tblAttr->set(attr => $attrib_table);
   $table_attr = $new_tblAttr->as_hashref;
-  
+
   return $table_attr;
 }
 
@@ -150,17 +152,18 @@ sub table_attr_val {
 sub table_col_attr_val {
   my $self = shift;
   my ($col_list, $col_attr) = @_;
-  
+
   if (ref($col_attr) eq "HASH") {
-    my $i = 0;
-    my $until = scalar @{$col_list};
-    my @pk_list = ();
-    my @ai_list = ();
-    my $size_pk = 0;
-    my $size_ai = 0;
-    my $col_name = '';
+    my $i            = 0;
+    my $until        = scalar @{$col_list};
+    my @pk_list      = ();
+    my @ai_list      = ();
+    my $size_pk      = 0;
+    my $size_ai      = 0;
+    my $col_name     = '';
     my $curr_colAttr = {};
-    my $new_colAttr = Hash::MultiValue->new(%{$col_attr});
+    my $new_colAttr  = Hash::MultiValue->new(%{$col_attr});
+
     while ($i < $until) {
       $col_name = $col_attr->{$col_list->[$i]};
       if (exists $col_name->{'is_autoincre'}) {
@@ -168,13 +171,13 @@ sub table_col_attr_val {
         push @ai_list, $col_list->[$i];
         $curr_colAttr = Hash::MultiValue->new(%{$col_name});
         $curr_colAttr->remove('is_autoincre');
-        
+
         $new_colAttr->set($col_list->[$i] => $curr_colAttr->as_hashref);
       }
       $i++;
     }
     $col_attr = $new_colAttr->as_hashref;
-    
+
     $i = 0;
     while ($i < $until) {
       $col_name = $col_attr->{$col_list->[$i]};
@@ -183,40 +186,40 @@ sub table_col_attr_val {
         push @pk_list, $col_list->[$i];
         $curr_colAttr = Hash::MultiValue->new(%{$col_name});
         $curr_colAttr->remove('is_primarykey');
-        
+
         $new_colAttr->set($col_list->[$i] => $curr_colAttr->as_hashref);
       }
       $i++;
     }
-    
+
     if ($size_pk >= 1) {
       my $r_colAttr = $new_colAttr->as_hashref;
-      my $pk_table = $r_colAttr->{$pk_list[0]};
-      
+      my $pk_table  = $r_colAttr->{$pk_list[0]};
+
       $curr_colAttr = Hash::MultiValue->new(%{$pk_table});
       $curr_colAttr->set('is_primarykey' => 1);
-      
+
       $col_attr = Hash::MultiValue->new(%{$r_colAttr});
       $col_attr->set($pk_list[0] => $curr_colAttr->as_hashref);
       $col_attr = $col_attr->as_hashref;
     }
-    
+
     if ($size_ai >= 1) {
       my $pk_table = $col_attr->{$pk_list[0]};
-      
+
       $curr_colAttr = Hash::MultiValue->new(%{$pk_table});
       $curr_colAttr->set('is_autoincre' => 1);
-      
+
       $col_attr = Hash::MultiValue->new(%{$col_attr});
       $col_attr->set($pk_list[0] => $curr_colAttr->as_hashref);
       $col_attr = $col_attr->as_hashref;
     }
-    
-    $i = 0;
+
+    $i           = 0;
     $new_colAttr = Hash::MultiValue->new();
     while ($i < $until) {
       $col_name = $col_attr->{$col_list->[$i]};
-      
+
       $new_colAttr->add($col_list->[$i] => $col_name);
       $i++;
     }
@@ -247,32 +250,44 @@ sub create_colAttr {
   my $self = shift;
   my ($col_name, $attr, $db_type) = @_;
   my $data = $col_name . ' ';
-  
+
   if (exists $attr->{type}) {
     if ($db_type eq 'sqlite') {
-      $data .= exists $attr->{type}->{name} ? (uc $attr->{type}->{name}) . ' ' : 'varchar ';
-    } else {
-      $data .= exists $attr->{type}->{name} ? (uc $attr->{type}->{name}) : 'varchar';
-      $data .= exists $attr->{type}->{size} ? '(' . $attr->{type}->{size} . ') ' : ' ';
+      $data
+        .= exists $attr->{type}->{name}
+        ? (uc $attr->{type}->{name}) . ' '
+        : 'varchar ';
+    }
+    else {
+      $data
+        .= exists $attr->{type}->{name}
+        ? (uc $attr->{type}->{name})
+        : 'varchar';
+      $data
+        .= exists $attr->{type}->{size}
+        ? '(' . $attr->{type}->{size} . ') '
+        : ' ';
     }
   }
-  
+
   unless (exists $attr->{custom}) {
     if (exists $attr->{default} and $attr->{default} ne '') {
       if (exists $attr->{onupdate} and $attr->{onupdate} ne '') {
-        my $field_default_val = default_field_tbl_val($attr->{type}->{name}, $attr->{onupdate});
+        my $field_default_val
+          = default_field_tbl_val($attr->{type}->{name}, $attr->{onupdate});
         $data .= "ON UPDATE $field_default_val ";
       }
       else {
         $data .= "DEFAULT $attr->{default} ";
       }
     }
-    
+
     if (exists $attr->{onupdate} and $attr->{onupdate} ne '') {
-      my $field_default_val = default_field_tbl_val($attr->{type}->{name}, $attr->{onupdate});
+      my $field_default_val
+        = default_field_tbl_val($attr->{type}->{name}, $attr->{onupdate});
       $data .= "ON UPDATE $field_default_val ";
     }
-    
+
     if (exists $attr->{is_null}) {
       $data .= 'NOT NULL ' unless $attr->{is_null};
       $data .= 'NULL ' if $attr->{is_null} == 1;
@@ -280,11 +295,11 @@ sub create_colAttr {
     else {
       $data .= 'NOT NULL ';
     }
-    
+
     if (exists $attr->{is_primarykey} and $attr->{is_primarykey} == 1) {
       $data .= 'PRIMARY KEY ';
     }
-    
+
     if (exists $attr->{is_autoincre} and $attr->{is_autoincre} == 1) {
       if ($db_type eq 'sqlite') {
         $data .= 'AUTOINCREMENT ';
@@ -302,53 +317,56 @@ sub create_colAttr {
 # For create query table :
 # ------------------------------------------------------------------------
 sub create_query_table {
-  my $self = shift;
+  my $self    = shift;
   my $arg_len = scalar @_;
   my ($table_name, $col_list, $col_attr, $table_attr, $db_type);
-  my $data = '';
+  my $data         = '';
   my $size_tblAttr = 0;
   $db_type = $self->db_type;
-  
+
   if ($arg_len == 3) {
     ($table_name, $col_list, $col_attr) = @_;
   }
-  
+
   if ($arg_len == 4) {
     ($table_name, $col_list, $col_attr, $table_attr) = @_;
     if (ref($table_attr) eq "HASH") {
       $size_tblAttr = scalar keys %{$table_attr};
-    } else {
+    }
+    else {
       $table_attr = {};
     }
   }
-  
+
   if ($arg_len >= 5) {
     ($table_name, $col_list, $col_attr, $table_attr, $self->db_type) = @_;
     $size_tblAttr = scalar keys %{$table_attr};
   }
-  
-  $col_attr = $self->table_col_attr_val($col_list, $col_attr);
+
+  $col_attr   = $self->table_col_attr_val($col_list, $col_attr);
   $table_attr = $self->table_attr_val($col_attr, $table_attr);
-  
+
   my $size_col = scalar @{$col_list};
-  my $i = 0;
+  my $i        = 0;
   my @list_col = ();
   while ($i < $size_col) {
-    push @list_col, $self->create_colAttr($col_list->[$i], $col_attr->{$col_list->[$i]}, $self->db_type);
+    push @list_col,
+      $self->create_colAttr($col_list->[$i], $col_attr->{$col_list->[$i]},
+      $self->db_type);
     $i++;
   }
   my $list_column = join ",\n", @list_col;
-  my $fk_table = '';
+  my $fk_table    = '';
   my $index_table = '';
-  my $attr_table = '';
-  
+  my $attr_table  = '';
+
   $data .= "CREATE TABLE IF NOT EXISTS $table_name(\n";
-  
+
   if ($size_tblAttr != 0) {
     $data .= "$list_column";
     my $size_fk = 0;
     if (exists $table_attr->{fk}) {
-      $size_fk = 1;
+      $size_fk  = 1;
       $fk_table = $table_attr->{fk};
       $data .= ",\n$fk_table";
     }
@@ -359,20 +377,24 @@ sub create_query_table {
     if (exists $table_attr->{attr} and $table_attr->{attr} ne '') {
       if ($size_fk == 1) {
         $attr_table = $table_attr->{attr};
-        $data .= $db_type eq 'sqlite' ? " \n)" : ") $attr_table";
+        $data .= $db_type eq 'sqlite'
+          || $db_type eq 'pg' ? " \n)" : ") $attr_table";
       }
       else {
-        $data .= $db_type eq 'sqlite' ? " \n)" : ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
+        $data .= $db_type eq 'sqlite'
+          || $db_type eq 'pg' ? " \n)" : ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
       }
     }
     else {
-      $data .= $db_type eq 'sqlite' ? " \n)" : ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
+      $data .= $db_type eq 'sqlite'
+        || $db_type eq 'pg' ? " \n)" : ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
     }
-    
+
   }
   else {
     $data .= "$list_column\n";
-    $data .= $db_type eq 'sqlite' ? ")" : ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
+    $data .= $db_type eq 'sqlite'
+      || $db_type eq 'pg' ? ")" : ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
   }
   return $data;
 }
@@ -385,13 +407,10 @@ sub create_query_table {
 # ------------------------------------------------------------------------
 sub _check_engine {
   my ($self, $engine) = @_;
-  
+
   $engine = lc $engine;
-  my %list_engine = (
-    'myisam' => 'MyISAM',
-    'innodb' => 'InnoDB',
-  );
-  
+  my %list_engine = ('myisam' => 'MyISAM', 'innodb' => 'InnoDB',);
+
   if (exists $list_engine{$engine}) {
     return $list_engine{$engine};
   }

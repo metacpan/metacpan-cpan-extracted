@@ -1,9 +1,13 @@
-0.420     2018-05-04 22:34:21-05:00 America/Chicago
+0.430     2021-01-27 23:34:50-06:00 America/Chicago
 
     [ Bug Fixes ]
     - multiple recursion (e.g. $..foo..bar) works properly.
       Fixes RT #122529
       Thomas Helsel ++
+
+    - Non-array-like and non-hash-like refs work properly for paths and map.
+      Fixes RT #123381
+      Patrick Cronin++
 
     [ Other ]
     - Warnings at the calling line when attempting to set on a non-object via set() or value() as an lvalue

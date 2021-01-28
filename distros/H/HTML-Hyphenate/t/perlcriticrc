@@ -1,2 +1,4 @@
 severity = 1
 verbose = 8
+# Since we require 5.16 don't cater for older perls:
+[-ValuesAndExpressions::ProhibitVersionStrings]

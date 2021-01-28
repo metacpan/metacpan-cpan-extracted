@@ -1,4 +1,5 @@
 Changes
+examples/ex1.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

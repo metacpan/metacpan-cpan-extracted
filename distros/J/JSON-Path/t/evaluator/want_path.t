@@ -30,7 +30,8 @@ my $json = q({
             "author" : "J. R. R. Tolkien",
             "category" : "fiction"
          }
-      ]
+      ],
+      "open_for_the_holidays": false
    }
 });
 my $obj = decode_json($json);
@@ -41,6 +42,7 @@ my @expressions = (
     q{$.store.book[?($_->{author} eq "J. R. R. Tolkien")]} => q{$['store']['book']['3']},
     q{$.store.book[?($_->{category} eq "fiction")]} =>
         [ q{$['store']['book']['1']}, q{$['store']['book']['2']}, q{$['store']['book']['3']} ],
+    q{$.store.open_for_the_holidays} => q{$['store']['open_for_the_holidays']},
 );
 do_test(@expressions);
 done_testing;

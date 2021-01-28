@@ -67,56 +67,6 @@ Currently, only supports MariaDB/MySQL and SQLite Syntax
 
 The following are the methods available from this module:
 
-=head2 create_table - MariaDB/MySQL
-
-  use CellBIS::SQL::Abstract
-
-  my $sql_abstract = CellBIS::SQL::Abstract->new;
-
-  my $table_name = 'my_users';
-  my $col_list = [ 'id', 'first_name', 'last_name', 'other_col_name' ];
-  my $col_attr = {
-    'id'             => {
-      type          => {
-        name => 'int',
-        size => 11
-      },
-      is_primarykey => 1,
-      is_autoincre  => 1,
-    },
-    'first_name'     => {
-      type    => {
-        name => 'varchar',
-        size => 50,
-      },
-      is_null => 0,
-    },
-    'last_name'      => {
-      type    => {
-        name => 'varchar',
-        size => 50,
-      },
-      is_null => 0,
-    },
-    'other_col_name' => {
-      type    => {
-        name => 'varchar',
-        size => 60,
-      },
-      is_null => 0,
-    }
-  };
-  $create_table = $sql_abstract->create_table($table_name, $col_list, $col_attr);
-
-SQL equivalent :
-
-  CREATE TABLE IF NOT EXISTS users(
-      id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-      first_name VARCHAR(50) NOT NULL,
-      last_name VARCHAR(50) NOT NULL,
-      other_col_name VARCHAR(60) NOT NULL
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-
 =head2 create_table - SQLite
 
   use CellBIS::SQL::Abstract
@@ -164,11 +114,165 @@ SQL equivalent :
       other_col_name VARCHAR(60) NOT NULL
   )
 
+=head2 create_table - MariaDB/MySQL
+
+  use CellBIS::SQL::Abstract
+
+  my $sql_abstract = CellBIS::SQL::Abstract->new(db_type => 'mariadb');
+
+  my $table_name = 'my_users';
+  my $col_list = [ 'id', 'first_name', 'last_name', 'other_col_name' ];
+  my $col_attr = {
+    'id'             => {
+      type          => {
+        name => 'int',
+        size => 11
+      },
+      is_primarykey => 1,
+      is_autoincre  => 1,
+    },
+    'first_name'     => {
+      type    => {
+        name => 'varchar',
+        size => 50,
+      },
+      is_null => 0,
+    },
+    'last_name'      => {
+      type    => {
+        name => 'varchar',
+        size => 50,
+      },
+      is_null => 0,
+    },
+    'other_col_name' => {
+      type    => {
+        name => 'varchar',
+        size => 60,
+      },
+      is_null => 0,
+    }
+  };
+  $create_table = $sql_abstract->create_table($table_name, $col_list, $col_attr);
+
+SQL equivalent :
+
+  CREATE TABLE IF NOT EXISTS users(
+      id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+      first_name VARCHAR(50) NOT NULL,
+      last_name VARCHAR(50) NOT NULL,
+      other_col_name VARCHAR(60) NOT NULL
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+=head2 create_table - PostgreSQL
+
+  use CellBIS::SQL::Abstract
+
+  my $sql_abstract = CellBIS::SQL::Abstract->new(db_type => 'pg');
+
+  my $table_name = 'my_users';
+  my $col_list = [ 'id', 'first_name', 'last_name', 'other_col_name' ];
+  my $col_attr = {
+    'id' => {
+      type => {
+        name => 'serial'
+      },
+      is_primarykey => 1
+    },
+    'first_name' => {
+      type => {
+        name => 'varchar',
+        size => 50,
+      },
+      is_null => 0,
+    },
+    'last_name' => {
+      type => {
+        name => 'varchar',
+        size => 50,
+      },
+      is_null => 0,
+    },
+    'other_col_name' => {
+      type => {
+        name => 'varchar',
+        size => 60,
+      },
+      is_null => 0,
+    }
+  };
+  $create_table = $sql_abstract->create_table($table_name, $col_list, $col_attr);
+
+SQL equivalent :
+
+  CREATE TABLE IF NOT EXISTS users(
+      id SERIAL NOT NULL PRIMARY KEY,
+      first_name VARCHAR(50) NOT NULL,
+      last_name VARCHAR(50) NOT NULL,
+      other_col_name VARCHAR(60) NOT NULL
+  )
+
+=head2 create_table with foreign key - SQLite
+
+  use CellBIS::SQL::Abstract
+
+  my $sql_abstract = CellBIS::SQL::Abstract->new(db_type => 'sqlite');
+
+  my $table_name = 'my_companies';
+  my $col_list = [
+    'id_company',
+    'id_company_users',
+    'company_name',
+  ];
+  my $col_attr = {
+    'id_company'       => {
+      type          => { name => 'integer' },
+      is_primarykey => 1,
+      is_autoincre  => 1,
+    },
+    'id_company_users' => {
+      type    => { name => 'integer' },
+      is_null => 0,
+    },
+    'company_name'     => {
+      type    => {
+        name => 'varchar',
+        size => '200',
+      },
+      is_null => 0,
+    }
+  };
+  my $table_attr = {
+    fk      => {
+      name         => 'user_companies_fk',
+      col_name     => 'id_company_users',
+      table_target => 'users',
+      col_target   => 'id',
+      attr         => {
+        onupdate => 'cascade',
+        ondelete => 'cascade'
+      }
+    },
+    charset => 'utf8',
+    engine  => 'innodb',
+  };
+  $create_table = $sql_abstract->create_table($table_name, $col_list, $col_attr, $table_attr);
+
+SQL equivalent :
+
+  CREATE TABLE IF NOT EXISTS company(
+      id_company INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      id_company_users INTEGER NOT NULL,
+      company_name VARCHAR NOT NULL,
+      CONSTRAINT user_company_fk FOREIGN KEY (id_company_users) REFERENCES users (id)
+      ON DELETE CASCADE ON UPDATE CASCADE
+  )
+
 =head2 create_table with foreign key - MariaDB/MySQL
 
   use CellBIS::SQL::Abstract
 
-  my $sql_abstract = CellBIS::SQL::Abstract->new;
+  my $sql_abstract = CellBIS::SQL::Abstract->new(db_type => 'mariadb');
 
   my $table_name = 'my_companies';
   my $col_list = [
@@ -227,11 +331,11 @@ SQL equivalent :
       ON DELETE CASCADE ON UPDATE CASCADE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 
-=head2 create_table with foreign key - SQLite
+=head2 create_table with foreign key - PostgreSQL
 
   use CellBIS::SQL::Abstract
 
-  my $sql_abstract = CellBIS::SQL::Abstract->new(db_type => 'sqlite');
+  my $sql_abstract = CellBIS::SQL::Abstract->new(db_type => 'pg');
 
   my $table_name = 'my_companies';
   my $col_list = [
@@ -240,17 +344,21 @@ SQL equivalent :
     'company_name',
   ];
   my $col_attr = {
-    'id_company'       => {
-      type          => { name => 'integer' },
-      is_primarykey => 1,
-      is_autoincre  => 1,
+    'id_company' => {
+      type => {
+        name => 'serial'
+      },
+      is_primarykey => 1
     },
     'id_company_users' => {
-      type    => { name => 'integer' },
+      type => {
+        name => 'int',
+        size => 11
+      },
       is_null => 0,
     },
-    'company_name'     => {
-      type    => {
+    'company_name' => {
+      type => {
         name => 'varchar',
         size => '200',
       },
@@ -258,7 +366,7 @@ SQL equivalent :
     }
   };
   my $table_attr = {
-    fk      => {
+    fk => {
       name         => 'user_companies_fk',
       col_name     => 'id_company_users',
       table_target => 'users',
@@ -276,9 +384,9 @@ SQL equivalent :
 SQL equivalent :
 
   CREATE TABLE IF NOT EXISTS company(
-      id_company INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-      id_company_users INTEGER NOT NULL,
-      company_name VARCHAR NOT NULL,
+      id_company serial NOT NULL PRIMARY KEY,
+      id_company_users INT(11) NOT NULL,
+      company_name VARCHAR(200) NOT NULL,
       CONSTRAINT user_company_fk FOREIGN KEY (id_company_users) REFERENCES users (id)
       ON DELETE CASCADE ON UPDATE CASCADE
   )
@@ -291,11 +399,15 @@ SQL equivalent :
   my $table_name = 'my_users';
   my $column = [
     'first_name',
-    'last_name'
+    'last_name',
+    'date_create',
+    'date_update'
   ];
   my $value = [
     'my_name',
-    'my_last_name'
+    'my_last_name',
+    ['NOW()'],
+    ['NOW()']
   ];
 
   # If no Prepare Statement
@@ -307,10 +419,39 @@ SQL equivalent :
 SQL equivalent :
 
   # No Prepare Statement :
-  INSERT INTO my_users(first_name, last_name) VALUES('my_name', 'my_last_name');
+  INSERT INTO my_users(first_name, last_name, date_create, date_update) VALUES('my_name', 'my_last_name', NOW(), NOW());
 
   # Prepare Statement :
-  INSERT INTO my_users(first_name, last_name) VALUES(?, ?);
+  INSERT INTO my_users(first_name, last_name, date_create, date_update) VALUES(?, ?, NOW(), NOW());
+
+=head2 insert_bulk
+
+  use CellBIS::SQL::Abstract
+  my $sql_abstract = CellBIS::SQL::Abstract->new;
+
+  my $table_name = 'my_users';
+  my $column     = ['first_name', 'last_name', 'date_create', 'date_update'];
+  my $values     = [
+    ['my_name0', 'my_last_name0', ['NOW()'], ['NOW()']],
+    ['my_name1', 'my_last_name1', ['NOW()'], ['NOW()']],
+    ['my_name2', 'my_last_name2', ['NOW()'], ['NOW()']],
+    ['my_name3', 'my_last_name3', ['NOW()'], ['NOW()']],
+    ['my_name4', 'my_last_name4', ['NOW()'], ['NOW()']],
+  ];
+
+  # If no Prepare Statement
+  my $insert_no_pre_st = $sql_abstract->insert_bulk($table_name, $column, $values)->[0];
+
+  # IF Prepare Statement
+  my $insert = $sql_abstract->insert_bulk($table_name, $column, $values, 'pre-st')->[0];
+
+SQL equivalent :
+
+  # No Prepare Statement
+  INSERT INTO my_users(first_name, last_name, date_create, date_update) VALUES ('my_name', 'my_last_name', NOW(), NOW()), ('my_name1', 'my_last_name1', NOW(), NOW()), ('my_name2', 'my_last_name2', NOW(), NOW()), ('my_name3', 'my_last_name3', NOW(), NOW()), ('my_name4', 'my_last_name4', NOW(), NOW())
+
+  # With prepare statement
+  INSERT INTO my_users(first_name, last_name, date_create, date_update) VALUES (?, ?, NOW(), NOW()), (?, ?, NOW(), NOW()), (?, ?, NOW(), NOW()), (?, ?, NOW(), NOW()), (?, ?, NOW(), NOW())
 
 =head2 update
 
@@ -320,11 +461,13 @@ SQL equivalent :
   my $table_name = 'my_users'; # Table name.
   my $column = [
     'first_name',
-    'last_name'
+    'last_name',
+    'date_update'
   ];
   my $value = [
     'Achmad Yusri',
-    'Afandi'
+    'Afandi',
+    ['NOW()']
   ];
   my $clause = {
     where => 'id = 2'
@@ -342,7 +485,7 @@ SQL equivalent :
   UPDATE my_users SET first_name=?, last_name=? WHERE id = 2;
 
   # No Prepare Statement :
-  UPDATE my_users SET first_name='Achmad Yusri', last_name='Afandi' WHERE id = 2;
+  UPDATE my_users SET first_name='Achmad Yusri', last_name='Afandi' date_update=NOW() WHERE id = 2;
 
 =head2 update - with simple
 
@@ -442,7 +585,7 @@ Achmad Yusri Afandi, E<lt>yusrideb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 by Achmad Yusri Afandi
+Copyright (C) 2021 by Achmad Yusri Afandi
 
 This program is free software, you can redistribute it and/or modify it under the terms of
 the Artistic License version 2.0.

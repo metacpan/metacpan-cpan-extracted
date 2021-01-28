@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2009-2021, Roland van Ipenburg
-package HTML::Hyphenate::DOM v1.1.9;
+package HTML::Hyphenate::DOM v1.1.10;
 use Moose;
 use utf8;
 use 5.016000;
@@ -32,7 +32,7 @@ HTML::Hyphenate::DOM - DOM helper for HTML::Hyphenate
 
 =head1 VERSION
 
-This document describes HTML::Hyphenate::DOM version C<v1.1.9>.
+This document describes HTML::Hyphenate::DOM version C<v1.1.10>.
 
 =head1 SYNOPSIS
 

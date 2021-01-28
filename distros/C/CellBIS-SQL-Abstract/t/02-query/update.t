@@ -20,8 +20,8 @@ $update = $sql_abstract->update(
   {
     'where'   => "clause_col1 = ? AND clause_col2 = ? OR clause_col3 = ?",
     'orderby' => 'col1',
-    'order' => 'asc',    # asc || desc
-    'limit' => '1'
+    'order'   => 'asc',    # asc || desc
+    'limit'   => '1'
   },
   'pre-st'
 );
@@ -60,7 +60,7 @@ $update = $sql_abstract->update(
   {
     'where'   => 'clause_col1 = ? AND clause_col2 = ? OR clause_col3 = ?',
     'orderby' => 'col1',
-    'order' => 'asc',    # asc || desc
+    'order'   => 'asc',    # asc || desc
   },
   'pre-st'
 );
@@ -129,5 +129,24 @@ like(
   "SQL Query : \n$update"
 );
 
+# 3 argument with function test
+$update = $sql_abstract->update(
+  'table_test',
+  {
+    'clause_col1' => 'function',
+    'col2'        => ['function'],
+    'col3'        => ['function'],
+    col4          => 'data update test'
+  },
+  {
+    'where' =>
+      "clause_col1 = 'clause_val1' AND clause_col2 = 'clause_val2' OR clause_col3 = 'clause_val3'",
+  }
+);
+like(
+  $sql_abstract->to_one_liner($update),
+  qr/UPDATE(.*)SET(.*)\=(.*)WHERE(.*)/,
+  "SQL Query : \n$update"
+);
 
 done_testing();

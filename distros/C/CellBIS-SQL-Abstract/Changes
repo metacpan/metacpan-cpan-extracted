@@ -1,5 +1,12 @@
 Revision history for perl distribution CellBIS-SQL-Abstract
 
+1.3       2021-01-28 07:44:33+08:00 Asia/Makassar
+          - fix error if create table with foreign key
+          - support create table PostgreSQL
+          - fix error if use sql function.
+          - Add method insert_bulk
+          - Add testing instrument in actual DBMS transactions.
+
 1.2       2018-08-21 04:48:50+08:00 Asia/Makassar
           - Allow generate SQL Query insert with empty value.
           - fixed bug "if operator" in "CellBIS::SQL::Abstract::Table"

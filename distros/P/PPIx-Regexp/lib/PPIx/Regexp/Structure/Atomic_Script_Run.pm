@@ -1,6 +1,4 @@
-# Cargo cult to try to prevent CPAN from indexing
-package
-PPIx::Regexp::Structure::Atomic_Script_Run;
+package PPIx::Regexp::Structure::Atomic_Script_Run;
 
 use 5.006;
 
@@ -11,7 +9,7 @@ use base qw{ PPIx::Regexp::Structure };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.077';
+our $VERSION = '0.078';
 
 1;
 

@@ -28,6 +28,7 @@ subtest simple => sub {
     my @expressions = (
         '$.nonexistent'               => [ ],
         '$.simple'                    => [ $data{simple} ],
+        '$.boolean'                   => [ $data{boolean} ],
         '$.long_hash.key1.subkey2'    => [ $data{long_hash}{key1}{subkey2} ],
         '$.long_hash.key1'            => [ dclone $data{long_hash}{key1} ],
         q{$.complex_array[0]['foo']}  => [ $data{complex_array}[0]{foo} ],
@@ -91,6 +92,7 @@ sub sample_json {
     my $data = <<END;
 {
    "simple" : "Simple",
+   "boolean" : false,
    "hash" : {
       "key" : "value"
    },

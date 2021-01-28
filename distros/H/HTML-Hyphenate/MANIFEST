@@ -17,6 +17,7 @@ t/00_signature.t
 t/01_default.t
 t/02_classes.t
 t/03_lang.t
+t/03_langtags.t
 t/04_register.t
 t/05_svg.t
 t/06_doctype.t

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package JSON::Path;
-$JSON::Path::VERSION = '0.420';
+$JSON::Path::VERSION = '0.430';
 # VERSION
 
 use Exporter::Tiny ();
@@ -138,7 +138,7 @@ JSON::Path
 
 =head1 VERSION
 
-version 0.420
+version 0.430
 
 =head1 SYNOPSIS
 
@@ -420,11 +420,11 @@ THE SOFTWARE.
 
 =head1 AUTHOR
 
-Kit Peters <kit.peters@broadbean.com>
+Kit Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Kit Peters.
+This software is copyright (c) 2021 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2009-2021, Roland van Ipenburg
-package HTML::Hyphenate v1.1.9;
+package HTML::Hyphenate v1.1.10;
 use Moose;
 use utf8;
 use 5.016000;
@@ -8,9 +8,10 @@ use 5.016000;
 use charnames ();
 
 #use Log::Log4perl qw(:resurrect :easy get_logger);
+use I18N::LangTags;
 use Set::Scalar;
 use TeX::Hyphen;
-use TeX::Hyphen::Pattern 0.100;
+use TeX::Hyphen::Pattern v1.1.8;
 use HTML::Hyphenate::DOM;
 
 use Readonly;
@@ -47,6 +48,8 @@ Readonly::Hash my %LOG => (
     'HTML_METHOD'   => q{Using HTML passed to method '%s'},
     'HTML_PROPERTY' => q{Using HTML property '%s'},
     'NOT_HYPHEN'    => q{No pattern found for '%s'},
+    'TRY_SIMILAR'   => q{Searching a pattern similar to the unmatched '%s'},
+    'SIMILARITY'    => q{Similarity of candidate '%s' is %i},
     'REGISTER'      => q{Registering TeX::Hyphen object for label '%s'},
     'NO_CLASSES'    => q{No classes defined, so not check for them},
 );
@@ -288,12 +291,33 @@ sub _configure_lang {
 
 sub _add_tex_hyphen_to_cache {
     my ($self) = @_;
-    my $thp = TeX::Hyphen::Pattern->new();
-    $thp->label( $self->_lang );
-    my $cache = $self->_hyphenators;
-    if ( my $file = $thp->filename ) {
+    my $thp    = TeX::Hyphen::Pattern->new();
+    my $pat    = $self->_lang;
+    $thp->label($pat);
+    my $file = $thp->filename;
+    if ( !defined $file ) {
+        ###l4p $log->debug( sprintf $LOG{'TRY_SIMILAR'}, $pat );
+        my $max_sim = 0;
+        for my $tag ( $thp->available() ) {
+            $tag =~ s{.*::}{}msx;
+            $tag =~ s{[_]}{-}msx;
+            my $sim =
+              I18N::LangTags::similarity_language_tag( $tag, $self->_lang );
+            ###l4p $log->debug( sprintf $LOG{'SIMILARITY'}, $tag, $sim );
+            if ( $sim > $max_sim ) {
+                $pat     = $tag;
+                $max_sim = $sim;
+            }
+        }
+        if ( $max_sim > 0 ) {
+            $thp->label($pat);
+            $file = $thp->filename;
+        }
+    }
+    if ( defined $file ) {
 
         ###l4p $log->debug( sprintf $LOG{'PATTERN_FILE'}, $file );
+        my $cache = $self->_hyphenators;
         ${$cache}{ $self->_lang } = TeX::Hyphen->new(
             q{file}     => $file,
             q{leftmin}  => $self->min_pre,
@@ -376,7 +400,7 @@ HTML::Hyphenate - insert soft hyphens into HTML
 
 =head1 VERSION
 
-This document describes HTML::Hyphenate version C<v1.1.9>.
+This document describes HTML::Hyphenate version C<v1.1.10>.
 
 =head1 SYNOPSIS
 

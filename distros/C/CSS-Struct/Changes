@@ -1,3 +1,12 @@
+0.04 2021-01-28T11:40:01+01:00
+ - Add DESCRIPTION to CSS::Struct.
+ - Add EXAMPLE to CSS::Struct.
+ - Add EXAMPLE to CSS::Struct::Output::Raw doc.
+ - Fix bugtracker.
+ - Rewrite CSS::Struct::Output to use =head2 in doc.
+ - Rewrite CSS::Struct::Output::Raw to use =head2 in doc.
+ - Update copyright years.
+
 0.03 2020-08-11T15:50:26+02:00
  - Fix test dependencies.
 

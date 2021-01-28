@@ -1,7 +1,7 @@
 ---
 abstract: 'search nested hashref/arrayref structures using JSONPath'
 author:
-  - 'Kit Peters <kit.peters@broadbean.com>'
+  - 'Kit Peters <popefelix@gmail.com>'
 build_requires:
   JSON: '0'
   JSON::Parse: '0'
@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,16 +23,16 @@ name: JSON-Path
 provides:
   JSON::Path:
     file: lib/JSON/Path.pm
-    version: '0.420'
+    version: '0.430'
   JSON::Path::Constants:
     file: lib/JSON/Path/Constants.pm
-    version: '0.420'
+    version: '0.430'
   JSON::Path::Evaluator:
     file: lib/JSON/Path/Evaluator.pm
-    version: '0.420'
+    version: '0.430'
   JSON::Path::Tokenizer:
     file: lib/JSON/Path/Tokenizer.pm
-    version: '0.420'
+    version: '0.430'
 requires:
   Carp: '0'
   Carp::Assert: '0'
@@ -57,6 +57,7 @@ resources:
   bugtracker: https://github.com/popefelix/p5-json-path/issues
   homepage: https://github.com/popefelix/p5-json-path
   repository: https://github.com/popefelix/p5-json-path.git
-version: '0.420'
-x_generated_by_perl: v5.16.3
+version: '0.430'
+x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

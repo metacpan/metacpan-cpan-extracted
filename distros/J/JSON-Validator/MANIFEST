@@ -52,7 +52,6 @@ t/draft6-acceptance.t
 t/draft6.t
 t/draft7-acceptance.t
 t/draft7.t
-t/formats.t
 t/get.t
 t/Helper.pm
 t/id-keyword-draft4.t

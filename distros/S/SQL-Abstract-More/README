@@ -11,7 +11,7 @@ INSTALLATION
 To install this module, run the following commands:
 
    perl Makefile.PL
-   make (or dmake on Windows Strawberry Perl)
+   make (or gmake on Windows Strawberry Perl)
    make test
    make install
 
@@ -27,19 +27,16 @@ You can also look for information at:
     RT, CPAN's request tracker
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Abstract-More
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/SQL-Abstract-More
-
     CPAN Ratings
         http://cpanratings.perl.org/d/SQL-Abstract-More
 
     Search CPAN
-        http://search.cpan.org/dist/SQL-Abstract-More/
+        http://metacpan.org/pod/SQL::Abstract::More
 
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011 Laurent Dami
+Copyright (C) 2011-2021 Laurent Dami
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

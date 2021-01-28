@@ -1,4 +1,4 @@
-# CellBIS::SQL::Abstract - SQL Query Generator
+# CellBIS::SQL::Abstract - SQL Query Generator ![linux](https://github.com/CellBIS/CellBIS-SQL-Abstract/workflows/linux/badge.svg)
 
 The purpose of this module is to generate SQL Query. General queries has covered
 `insert`, `delete`, `update`, `select`, and **select** with **join** - (`select_join`).
@@ -10,7 +10,7 @@ or [DBI](https://metacpan.org/pod/DBI).
 ## How to Install :
 From Source :
 ```bash
-git clone -b v0.8 git@github.com:CellBIS/CellBIS-SQL-Abstract.git
+git clone -b v1.3 git@github.com:CellBIS/CellBIS-SQL-Abstract.git
 perl Makefile.PL
 make && make test
 make install && make clean

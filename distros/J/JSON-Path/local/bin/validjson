@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use lib '/home/ben/projects/Json3/blib/lib';
+use lib '/home/ben/projects/Json3/blib/arch';
+use JSON::Parse 'assert_valid_json';
+use Getopt::Long;
+my $ok = GetOptions (
+    "verbose" => \my $verbose,
+    "help" => \my $help,
+);
+if (! $ok || $help) {
+    usage ();
+    exit;
+}
+for my $file (@ARGV) {
+    eval {
+	open my $in, "<:raw", $file or die "Can't open '$file': $!";
+	my $text = '';
+	while (my $line = <$in>) {
+	    $text .= $line;
+	}
+	close $in or die $!;
+	assert_valid_json ($text);
+    };
+    if ($@) {
+	my $error = $@;
+	$error =~ s/\n+$//;
+	if ($error !~ /\Q$file/) {
+	    $error = "$file: $error";
+	}
+	if ($error =~ /validjson line [0-9]+\.$/) {
+	    $error =~ s/\sat\s\S+\sline.*$/\./;
+	}
+	print "$error\n";
+    }
+    else {
+	if ($verbose) {
+	    print "'$file' is valid JSON.\n";
+	}
+    }
+}
+
+sub usage
+{
+    print <<EOF;
+$0: validate JSON. Default behaviour is to produce nothing except errors.
+
+Options:
+
+--verbose       Get confirmation that the files are valid.
+--help          View this message.
+
+This script requires JSON::Parse to be installed.
+EOF
+
+    exit;
+}

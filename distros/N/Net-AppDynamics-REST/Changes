@@ -15,3 +15,6 @@
   -- added support for getting application metrics
 1.006
   -- added support for listing nodes by tiers
+1.007
+  -- Added support for oauth
+  -- pod fix ups

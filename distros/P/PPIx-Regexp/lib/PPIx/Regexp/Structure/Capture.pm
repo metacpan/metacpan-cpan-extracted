@@ -37,7 +37,7 @@ use base qw{ PPIx::Regexp::Structure };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.077';
+our $VERSION = '0.078';
 
 sub explain {
     my ( $self ) = @_;

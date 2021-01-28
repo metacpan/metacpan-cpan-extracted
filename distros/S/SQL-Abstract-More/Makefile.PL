@@ -29,12 +29,17 @@ test_requires (
 
 requires (
   'MRO::Compat'          => 0,
-  'SQL::Abstract'        => 1.85,
+  'SQL::Abstract'        => 1.73,
   'Params::Validate'     => 0,
   'parent'               => 0,
   'namespace::clean'     => 0,
   'Scalar::Util'         => 0,
 );
+
+recommends (
+  'SQL::Abstract::Classic' => 0,
+ );
+
 
 install_as_cpan;
 auto_install;

@@ -12,6 +12,7 @@ use URI::Escape;
 use HTTP::Request;
 use HTTP::Headers;
 use Ref::Util qw(is_plain_arrayref);
+use URI::Escape;
 use namespace::clean;
 
 BEGIN {
@@ -60,14 +61,20 @@ Optional
   CUSTOMER: default customer1
   PORT: default 8090
   PROTO: default http
+  use_oauth: 0
+    # boolean value when set to true, the PASS option is assumed to be required for OAUTH.
   cache_max_age: how long to keep the cache for in seconds
     default value is 3600
   agent: Gets/Sets the AnyEvent::HTTP::MultiGet object we will use
+  oauth_slack: 10
+    # how much slack we give oauth before we regenerate our token
 
 For Internal use
 
   data_cache: Data structure used to cache object resolion
   cache_check: boolean value, if true a cache check is in progress
+  backlog array ref of post oauth requests to run
+  token current auth token structure
 
 =head2 Moo::Roles
 
@@ -75,12 +82,18 @@ This module makes use of the following roles:  L<HTTP::MultiGet::Role>, L<Log::L
 
 =cut
 
-our $VERSION = "1.006";
+our $VERSION = "1.007";
 
 has USER => (
   is       => 'ro',
   isa      => Str,
   required => 1,
+);
+
+has request_id=>(
+  isa=>Int,
+  is=>'rw',
+  default=>0,
 );
 
 has cache_check => (
@@ -135,6 +148,32 @@ has cache_max_age => (
   lazy     => 1,
   required => 1,
   default  => 3600,
+);
+
+has use_oauth=>(
+  is=>'ro',
+  lazy=>1,
+  default=>0,
+);
+
+has oauth_slack=>(
+  is=>'ro',
+  lazy=>1,
+  default=>10,
+  isa=>Int,
+);
+
+has backlog=>(
+  isa=>ArrayRef,
+  is=>'rw',
+  default=>sub { [] },
+);
+
+has token=>(
+  isa=>HashRef,
+  is=>'rw',
+  lazy=>1,
+  default=>sub { { expires=>0 } },
 );
 
 # This method runs after the new constructor
@@ -197,12 +236,12 @@ Queues a requst to fetch the list of all applications.
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =cut
@@ -211,7 +250,7 @@ sub que_list_applications {
   my ( $self, $cb ) = @_;
   my $path = '/controller/rest/applications';
   my $req  = $self->create_get($path);
-  return $self->queue_request( $req, $cb );
+  return $self->do_oauth_request( $req, $cb );
 }
 
 =back
@@ -233,12 +272,12 @@ Queues a request to fetch the list of tiers within a given application.
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =cut
@@ -248,7 +287,7 @@ sub que_list_tiers {
   my $path = sprintf '/controller/rest/applications/%s/tiers', uri_escape($app);
 
   my $req = $self->create_get($path);
-  return $self->queue_request( $req, $cb );
+  return $self->do_oauth_request( $req, $cb );
 }
 
 =back
@@ -268,12 +307,12 @@ Ques a request for the details of the application tier.
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =cut
@@ -283,7 +322,7 @@ sub que_list_tier {
   my $path = sprintf '/controller/rest/applications/%s/tiers/%s', uri_escape($app), uri_escape($tier);
 
   my $req = $self->create_get($path);
-  return $self->queue_request( $req, $cb );
+  return $self->do_oauth_request( $req, $cb );
 }
 
 =back
@@ -303,12 +342,12 @@ Queues a request to fetch the list of business transactions for a given applicat
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =cut
@@ -318,7 +357,7 @@ sub que_list_business_transactions {
   my $path = sprintf '/controller/rest/applications/%s/business-transactions', uri_escape($app);
 
   my $req = $self->create_get($path);
-  return $self->queue_request( $req, $cb );
+  return $self->do_oauth_request( $req, $cb );
 }
 
 =back
@@ -340,12 +379,12 @@ Ques a request to all the nodes in a given application
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =cut
@@ -355,7 +394,7 @@ sub que_list_nodes {
   my $path = sprintf '/controller/rest/applications/%s/nodes', uri_escape($app);
 
   my $req = $self->create_get($path);
-  return $self->queue_request( $req, $cb );
+  return $self->do_oauth_request( $req, $cb );
 }
 
 =back
@@ -377,12 +416,12 @@ Ques a request to all the nodes in a given application
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =cut
@@ -392,7 +431,7 @@ sub que_list_tier_nodes {
   my $path = sprintf '/controller/rest/applications/%s/tiers/%s/nodes', uri_escape($app),uri_escape($tier);
 
   my $req = $self->create_get($path);
-  return $self->queue_request( $req, $cb );
+  return $self->do_oauth_request( $req, $cb );
 }
 
 =back
@@ -412,12 +451,12 @@ Queues a request to list the details of a node in a given tier
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =cut
@@ -427,7 +466,7 @@ sub que_list_node {
   my $path = sprintf '/controller/rest/applications/%s/nodes/%s', uri_escape($app), uri_escape($node);
 
   my $req = $self->create_get($path);
-  return $self->queue_request( $req, $cb );
+  return $self->do_oauth_request( $req, $cb );
 }
 
 =back
@@ -449,12 +488,12 @@ Queues a request to list the backends for a given application
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =cut
@@ -464,7 +503,7 @@ sub que_list_backends {
   my $path = sprintf '/controller/rest/applications/%s/backends', uri_escape($app);
 
   my $req = $self->create_get($path);
-  return $self->queue_request( $req, $cb );
+  return $self->do_oauth_request( $req, $cb );
 }
 
 =back
@@ -604,12 +643,12 @@ Example ( defaults if no arguments are passed ):
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =cut
@@ -623,7 +662,7 @@ sub que_health_rule_violations {
   }
 
   my $req = $self->create_get( $path, %args );
-  return $self->queue_request( $req, $cb );
+  return $self->do_oauth_request( $req, $cb );
 }
 
 =back
@@ -643,12 +682,12 @@ Queues the exporting of a policy
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =cut
@@ -658,7 +697,7 @@ sub que_export_policies {
   my $path = sprintf '/controller/policies/%s', uri_escape($app);
 
   my $req = $self->create_get($path);
-  return $self->queue_request( $req, $cb );
+  return $self->do_oauth_request( $req, $cb );
 }
 
 =back
@@ -779,12 +818,12 @@ Queues a request to fetch a given metric
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =item * Blocking my $result=$self->get_application_metric($application,,%args);
@@ -800,7 +839,7 @@ sub que_get_application_metric {
 
   my $path = '/controller/rest/applications/' . $app . '/metric-data';
   my $get  = $self->create_get( $path, @args );
-  return $self->queue_request( $get, $cb );
+  return $self->do_oauth_request( $get, $cb );
 }
 
 
@@ -825,12 +864,12 @@ Returns a Data::Result object, when true it contains the resolved object.
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =cut
@@ -887,12 +926,12 @@ Queues a cache check.  The resolve cache is refreshed if it is too old.
 Example Callback: 
 
   my $cb=sub {
-    my ($self,$id,$result,$request,$result)=@_;
+    my ($self,$id,$result,$request,$response)=@_;
     # 0 Net::AppDynamics::REST Object
     # 1 Id of the request
     # 2 Data::Result Object
     # 3 HTTP::Request Object
-    # 4 HTTP::Result Object
+    # 4 HTTP::Response Object
   };
 
 =cut
@@ -957,10 +996,109 @@ sub create_get {
     }
   }
 
+  
   my $headers = HTTP::Headers->new( @{ $self->{header} } );
   my $request = HTTP::Request->new( GET => $str, $headers );
 
   return $request;
+}
+
+=item * my $request=$self->que_setup_token($cb)
+
+Runs a non blocking oauth request
+
+    my ($self,$id,$result,$request,$response)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Response Object
+
+=item * my $result=$self->setup_token()
+
+Runs a blocking oatuh request, reutrns a Data::Result object.
+
+=cut
+
+sub que_setup_token {
+  my ($self,$cb)=@_;
+  
+  my $headers = HTTP::Headers->new();
+  $headers->header('Content-Type','application/vnd.appd.cntrl+protobuf;v=1');
+  my $content=sprintf 'grant_type=client_credentials&client_id=%s@%s&client_secret=%s',
+    map { uri_escape($_) } $self->USER,$self->CUSTOMER,$self->PASS;
+  my $req=HTTP::Request->new('POST'=>$self->base_url.'/controller/api/oauth/access_token',$headers,$content);
+  
+  return $self->queue_request( $req, $cb);
+}
+
+
+=item * \&handle_token_setup
+
+A Hard code ref used to handle setting up of oauth tokens
+
+=cut
+
+sub handle_token_setup {
+  my ($self,$id,$result,$request,$response)=@_;
+  delete $self->{_do_oauth};
+
+  unless($result) {
+    foreach my $set (@{$self->backlog}) {
+      my ($req,$cb)=@$set;
+      eval { $cb->(@_) };
+      $self->log_error("Failed to run callback, error was: $@") if $@;
+    }
+  } else {
+    my $data=$result->get_data;
+    $data->{expires}=time + $data->{expires_in} - $self->oauth_slack;
+    $self->token($data);
+    $self->{header}=['Authorization','Bearer '.$data->{access_token}];
+    my @ids;
+    my $count=0;
+    foreach my $set (@{$self->backlog}) {
+      my ($req,$cb)=@$set;
+      my $headers = HTTP::Headers->new( @{ $self->{header} } );
+      my $request = HTTP::Request->new( $req->method=> $req->uri, $headers,$req->content );
+      my $id=$self->queue_request($request,$cb);
+      push @ids,$id;
+    }
+    @{$self->backlog}=();
+    $self->add_ids_for_blocking(@ids);
+    $self->agent->run_next;
+  }
+}
+
+=item * $self->do_oauth_request($req,$cb)
+
+Handles the added logic for dealing with blocking and non blocking when oauth mode is inabled.
+
+=cut
+
+sub do_oauth_request {
+  my ($self,$req,$cb)=@_;
+
+  # stop here and run like we always have when using oauth
+  return $self->queue_request($req,$cb) unless $self->use_oauth;
+
+
+  if($self->token->{expires}<=time) {
+    my $id=$self->agent->false_id($self->agent->false_id -1);
+    my $code=sub {
+      my ($self,$real_id,$result,$req,$res)=@_;
+      $cb->($self,$id,$result,$req,$res);
+    };
+
+    push @{$self->backlog},[$req,$code];
+    return $id if  $self->{_do_oauth};
+
+    $self->que_setup_token(\&handle_token_setup);
+    $self->add_ids_for_blocking($id);
+
+    return $id;
+  } else {
+    return $self->queue_request($req,$cb);
+  }
 }
 
 =back

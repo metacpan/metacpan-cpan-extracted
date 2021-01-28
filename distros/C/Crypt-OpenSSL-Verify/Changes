@@ -1,7 +1,32 @@
 Version History
 
+0.27
+
+    TBD     Update Version and Changes
+    5b499ba Fix test error on OpenBSD 6.8
+
+0.26-TRIAL 25-Jan-2021
+
+    7416597 Update Changes
+    e43029a Disable -Werror if not author testing and gcc flags if not gcc
+
+0.25-TRIAL 19-Jan-2021
+
+    Same as Version 0.24-TRIAL rename cpan file
+
+    0bd0ec5 Update Version and Changes
+
+0.24-TRIAL 19-Jan-2021
+
+    e60d7cf Update Version and Changes
+    3b083e3 Fix some dist issues with extra files
+    9794729 Attempt to fix solaris issue by disabling inline optimization
+    0ab1b9f Fixes #15 - openssl-detection fails for w10/cygwin
+
 0.23 03-Dec-2020
 
+    b34cabb (tag: 0.23) Roll version 0.23
+    5e5bb90 Merge pull request #12 from fastmailops/ConfigurableLibPth
     2243383 Respect PERL_LIBPATH if set
 
 0.22 03-Jul-2020

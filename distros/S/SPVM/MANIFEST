@@ -358,6 +358,7 @@ lib/SPVM/BlessedObject/String.pm
 lib/SPVM/Builder.pm
 lib/SPVM/Builder/CC.pm
 lib/SPVM/Builder/Config.pm
+lib/SPVM/Builder/Exe.pm
 lib/SPVM/Builder/include/spvm_allow.h
 lib/SPVM/Builder/include/spvm_api.h
 lib/SPVM/Builder/include/spvm_array_field_access.h
@@ -446,7 +447,6 @@ lib/SPVM/Builder/src/spvm_yacc.c
 lib/SPVM/Builder/src/spvm_yacc_util.c
 lib/SPVM/Builder/Util.pm
 lib/SPVM/Byte.pm
-lib/SPVM/Byte.spvm
 lib/SPVM/ByteList.pm
 lib/SPVM/ByteList.spvm
 lib/SPVM/Cloner.pm
@@ -458,7 +458,6 @@ lib/SPVM/Complex_2d.spvm
 lib/SPVM/Complex_2f.pm
 lib/SPVM/Complex_2f.spvm
 lib/SPVM/Double.pm
-lib/SPVM/Double.spvm
 lib/SPVM/DoubleList.pm
 lib/SPVM/DoubleList.spvm
 lib/SPVM/EqualityChecker.pm
@@ -467,7 +466,6 @@ lib/SPVM/EqualityChecker/SameObject.pm
 lib/SPVM/EqualityChecker/SameObject.spvm
 lib/SPVM/ExchangeAPI.pm
 lib/SPVM/Float.pm
-lib/SPVM/Float.spvm
 lib/SPVM/FloatList.pm
 lib/SPVM/FloatList.spvm
 lib/SPVM/Hash.c
@@ -477,7 +475,6 @@ lib/SPVM/Hash.spvm
 lib/SPVM/Hash/Entry.pm
 lib/SPVM/Hash/Entry.spvm
 lib/SPVM/Int.pm
-lib/SPVM/Int.spvm
 lib/SPVM/IntList.pm
 lib/SPVM/IntList.spvm
 lib/SPVM/IO/Stderr.c
@@ -491,7 +488,6 @@ lib/SPVM/IO/Stdout.spvm
 lib/SPVM/List.pm
 lib/SPVM/List.spvm
 lib/SPVM/Long.pm
-lib/SPVM/Long.spvm
 lib/SPVM/LongList.pm
 lib/SPVM/LongList.spvm
 lib/SPVM/Math.c
@@ -505,7 +501,6 @@ lib/SPVM/Regex/Pattern.spvm
 lib/SPVM/Regex/Replacer.pm
 lib/SPVM/Regex/Replacer.spvm
 lib/SPVM/Short.pm
-lib/SPVM/Short.spvm
 lib/SPVM/ShortList.pm
 lib/SPVM/ShortList.spvm
 lib/SPVM/Sort.c
@@ -539,6 +534,7 @@ Makefile.PL
 MANIFEST			This list of files
 ppport.h
 README.md
+script/spvmcc
 solo/Main.spvm
 solo/solo_Makefile.PL
 solo/SPVM/Byte.spvm
@@ -625,6 +621,7 @@ spvmdoc/jp/public/native-api.html
 spvmdoc/jp/public/purpose.html
 spvmdoc/jp/public/tutorial.html
 spvmdoc/jp/serve.pl
+t/.spvm_build/work/exe/myexe
 t/copy_default_to_precompile.pl
 t/default/000-use-spvm.t
 t/default/001-use-empty-package.t
@@ -825,7 +822,6 @@ t/default/lib/TestCase/Minimal.spvm
 t/default/lib/TestCase/ModuleContainsMultiPackage.spvm
 t/default/lib/TestCase/ModuleContainsMultiPackage/FloatMatrix.spvm
 t/default/lib/TestCase/Multiply.spvm
-t/default/lib/TestCase/MyExe.spvm
 t/default/lib/TestCase/NativeAPI.c
 t/default/lib/TestCase/NativeAPI.config
 t/default/lib/TestCase/NativeAPI.spvm
@@ -845,7 +841,6 @@ t/default/lib/TestCase/NumericOperator.spvm
 t/default/lib/TestCase/Object.spvm
 t/default/lib/TestCase/OnlyField.spvm
 t/default/lib/TestCase/PACKAGE.spvm
-t/default/lib/TestCase/PackagePrecompile.spvm
 t/default/lib/TestCase/PackageVar.spvm
 t/default/lib/TestCase/Point_3b.spvm
 t/default/lib/TestCase/Point_3d.spvm
@@ -890,7 +885,6 @@ t/default/multiply.t
 t/default/native-api.t
 t/default/numeric-operator.t
 t/default/object.t
-t/default/package-precompile.t
 t/default/package_var.t
 t/default/precedence.t
 t/default/print.t
@@ -914,6 +908,33 @@ t/default/value_array.t
 t/default/warn.t
 t/default/weaken.t
 t/default/while.t
+t/exe/.spvm_build/work/myexe
+t/exe/.spvm_build/work/src/MyExe.boot.c
+t/exe/.spvm_build/work/src/MyExe.modsrc.c
+t/exe/.spvm_build/work/src/MyExe/Precompile.modsrc.c
+t/exe/.spvm_build/work/src/MyExe/Precompile.precompile.c
+t/exe/.spvm_build/work/src/SPVM/Byte.modsrc.c
+t/exe/.spvm_build/work/src/SPVM/Double.modsrc.c
+t/exe/.spvm_build/work/src/SPVM/Float.modsrc.c
+t/exe/.spvm_build/work/src/SPVM/Int.modsrc.c
+t/exe/.spvm_build/work/src/SPVM/Long.modsrc.c
+t/exe/.spvm_build/work/src/SPVM/Short.modsrc.c
+t/exe/.spvm_build/work/src/TestCase/NativeAPI2.modsrc.c
+t/exe/lib/MyExe.spvm
+t/exe/lib/MyExe/Precompile.spvm
+t/exe/lib/TestCase/NativeAPI2.c
+t/exe/lib/TestCase/NativeAPI2.config
+t/exe/lib/TestCase/NativeAPI2.native/include/bar.h
+t/exe/lib/TestCase/NativeAPI2.native/include/base.h
+t/exe/lib/TestCase/NativeAPI2.native/include/baz/baz.h
+t/exe/lib/TestCase/NativeAPI2.native/include/foo.h
+t/exe/lib/TestCase/NativeAPI2.native/src/bar.c
+t/exe/lib/TestCase/NativeAPI2.native/src/baz/baz.c
+t/exe/lib/TestCase/NativeAPI2.native/src/baz/noneed.txt
+t/exe/lib/TestCase/NativeAPI2.native/src/foo.c
+t/exe/lib/TestCase/NativeAPI2.native/src/noneed.txt
+t/exe/lib/TestCase/NativeAPI2.spvm
+t/exe/spvmcc.t
 t/lib/TestAuto.pm
 t/lib/TestFile.pm
 t/test_files/file_eof.txt

@@ -18,7 +18,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $HASH => q{#};
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 # Constructor.
 sub new {
@@ -133,7 +133,6 @@ sub _debug {
 
 1;
 
-
 __END__
 
 =pod
@@ -159,7 +158,7 @@ App::Pod::Example - Base class for pod-example script.
 
 Constructor.
 
-Returns object.
+Returns instance of object.
 
 =head2 C<run>
 
@@ -223,12 +222,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2020 Michal Josef Špaček
+© 2011-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.18
+0.19
 
 =cut

@@ -2,10 +2,9 @@ package SQL::Abstract::More;
 use strict;
 use warnings;
 
-use SQL::Abstract 1.85;
-use parent 'SQL::Abstract'; # THINK : maybe there should be an import option to
-                            # inherit from SQL::Abstract::Classic instead of SQL::Abstract,
-                            # so that clients may choose...
+# no "use parent ..." here -- the inheritance is specified dynamically in the
+# import() method -- inheriting either from SQL::Abstract or SQL::Abstract::Classic
+
 use MRO::Compat;
 use mro 'c3'; # implements next::method
 
@@ -13,13 +12,50 @@ use Params::Validate  qw/validate SCALAR SCALARREF CODEREF ARRAYREF HASHREF
                                   UNDEF  BOOLEAN/;
 use Scalar::Util      qw/blessed reftype/;
 
-# import error-reporting functions from SQL::Abstract
-BEGIN {*puke = \&SQL::Abstract::puke; *belch = \&SQL::Abstract::belch;}
 
 # remove all previously defined or imported functions
 use namespace::clean;
 
-our $VERSION = '1.35';
+# declare error-reporting functions from SQL::Abstract
+sub puke(@); sub belch(@);  # these will be defined later in import()
+
+
+our $VERSION = '1.36';
+our @ISA;
+
+sub import {
+  my $class = shift;
+
+  # parent class specified from environment variable, or default value
+  my $parent_sqla = $ENV{SQL_ABSTRACT_MORE_EXTENDS} || 'SQL::Abstract';
+
+  # parent class specified through -extends => .. when calling import()
+  $parent_sqla = $_[1] if @_ >= 2 && $_[0] eq '-extends';
+
+  # syntactic sugar : 'Classic' is expanded into SQLA::Classic
+  $parent_sqla = 'SQL::Abstract::Classic' if $parent_sqla eq 'Classic';
+
+  # make sure that import() does never get called with different parents
+  if (my $already_isa = $ISA[0]) {
+    $already_isa eq $parent_sqla
+      or die "cannot use SQL::Abstract::More -extends => '$parent_sqla', "
+           . "this module was already loaded with -extends => '$already_isa'";
+
+    # the rest of the import() job was already performed, so just return from here
+    return;
+  }
+
+  # load the parent, inherit from it, import puke() and belch()
+  eval qq{use parent '$parent_sqla';
+          *puke  = \\&${parent_sqla}::puke;
+          *belch = \\&${parent_sqla}::belch;
+         };
+
+  # local override of some methods for insert() and update()
+  _setup_insert_inheritance($parent_sqla);
+  _setup_update_inheritance($parent_sqla);
+}
+
 
 
 #----------------------------------------------------------------------
@@ -421,8 +457,119 @@ sub select {
 }
 
 #----------------------------------------------------------------------
-# insert, update and delete methods
+# insert
 #----------------------------------------------------------------------
+
+sub _setup_insert_inheritance {
+  my ($parent_sqla) = @_;
+
+  # if the parent has method '_expand_insert_value' (SQL::Abstract >= v2.0),
+  # we need to override it in this subclass
+  if ($parent_sqla->can('_expand_insert_value')) {
+    *_expand_insert_value = sub {
+      my ($self, $v) = @_;
+
+      my $k = our $Cur_Col_Meta;
+
+      if (ref($v) eq 'ARRAY') {
+        if ($self->{array_datatypes} || $self->is_bind_value_with_type($v)) {
+          return +{ -bind => [ $k, $v ] };
+        }
+        my ($sql, @bind) = @$v;
+        $self->_assert_bindval_matches_bindtype(@bind);
+        return +{ -literal => $v };
+      }
+      if (ref($v) eq 'HASH') {
+        if (grep !/^-/, keys %$v) {
+          belch "HASH ref as bind value in insert is not supported";
+          return +{ -bind => [ $k, $v ] };
+        }
+      }
+      if (!defined($v)) {
+        return +{ -bind => [ $k, undef ] };
+      }
+      return $self->expand_expr($v);
+    };
+  }
+
+  # otherwise, if the parent is an old SQL::Abstract or it is SQL::Abstract::Classic
+  elsif ($parent_sqla->can('_insert_values')) {
+
+    # if the parent has no method '_insert_value', this is the old
+    # monolithic _insert_values() method. We must override it
+    if (!$parent_sqla->can('_insert_value')) {
+      *_insert_values = sub {
+         my ($self, $data) = @_;
+
+         my (@values, @all_bind);
+         foreach my $column (sort keys %$data) {
+           my ($values, @bind) = $self->_insert_value($column, $data->{$column});
+           push @values, $values;
+           push @all_bind, @bind;
+         }
+         my $sql = $self->_sqlcase('values')." ( ".join(", ", @values)." )";
+         return ($sql, @all_bind);
+      };
+    }
+
+    # now override the _insert_value() method
+    *_insert_value = sub {
+
+      # unfortunately, we can't just override the ARRAYREF part, so the whole
+      # parent method is copied here
+
+      my ($self, $column, $v) = @_;
+
+      my (@values, @all_bind);
+      $self->_SWITCH_refkind($v, {
+
+        ARRAYREF => sub {
+          if ($self->{array_datatypes} # if array datatype are activated
+                || $self->is_bind_value_with_type($v)) { # or if this is a bind val
+            push @values, '?';
+            push @all_bind, $self->_bindtype($column, $v);
+          }
+          else {                  # else literal SQL with bind
+            my ($sql, @bind) = @$v;
+            $self->_assert_bindval_matches_bindtype(@bind);
+            push @values, $sql;
+            push @all_bind, @bind;
+          }
+        },
+
+        ARRAYREFREF => sub {        # literal SQL with bind
+          my ($sql, @bind) = @${$v};
+          $self->_assert_bindval_matches_bindtype(@bind);
+          push @values, $sql;
+          push @all_bind, @bind;
+        },
+
+        # THINK : anything useful to do with a HASHREF ?
+        HASHREF => sub {       # (nothing, but old SQLA passed it through)
+          #TODO in SQLA >= 2.0 it will die instead
+          belch "HASH ref as bind value in insert is not supported";
+          push @values, '?';
+          push @all_bind, $self->_bindtype($column, $v);
+        },
+
+        SCALARREF => sub {          # literal SQL without bind
+          push @values, $$v;
+        },
+
+        SCALAR_or_UNDEF => sub {
+          push @values, '?';
+          push @all_bind, $self->_bindtype($column, $v);
+        },
+
+      });
+
+      my $sql = CORE::join(", ", @values);
+      return ($sql, @all_bind);
+    }
+  }
+}
+
+
 
 sub insert {
   my $self = shift;
@@ -454,7 +601,7 @@ sub insert {
       if (my $cols = $args{-columns}) {
         $old_API_args[0] .= "(" . CORE::join(", ", @$cols) . ")";
       }
-      $fix_RT134127 = 1 if $SQL::Abstract::VERSION >= 2.0;
+      $fix_RT134127 = 1 if ($SQL::Abstract::VERSION // 0) >= 2.0;
     }
     else {
       puke "insert(-into => ..) : need either -values arg or -select arg";
@@ -494,6 +641,155 @@ sub insert {
   return ($sql, @bind);
 }
 
+#----------------------------------------------------------------------
+# update
+#----------------------------------------------------------------------
+
+
+sub _setup_update_inheritance {
+  my ($parent_sqla) = @_;
+
+  # if the parent has method '_expand_update_set_value' (SQL::Abstract >= v2.0),
+  # we need to override it in this subclass
+  if ($parent_sqla->can('_expand_update_set_values')) {
+    *_parent_update            = $parent_sqla->can('update');
+    *_expand_update_set_values = sub {
+      my ($self, undef, $data) = @_;
+      $self->expand_expr({ -list => [
+        map {
+          my ($k, $set) = @$_;
+          $set = { -bind => $_ } unless defined $set;
+          +{ -op => [ '=', { -ident => $k }, $set ] };
+        }
+        map {
+          my $k = $_;
+          my $v = $data->{$k};
+          (ref($v) eq 'ARRAY'
+            ? ($self->{array_datatypes} || $self->is_bind_value_with_type($v)
+                ? [ $k, +{ -bind => [ $k, $v ] } ]
+                : [ $k, +{ -literal => $v } ])
+            : do {
+                local our $Cur_Col_Meta = $k;
+                [ $k, $self->_expand_expr($v) ]
+              }
+          );
+        } sort keys %$data
+      ] });
+    };
+  }
+
+
+  # otherwise, if the parent is an old SQL::Abstract or it is SQL::Abstract::Classic
+  else {
+    # if the parent has method '_update_set_values()', it is a SQLA version >=1.85.
+    # We can just use its update() method as _parent_update().
+    if ($parent_sqla->can('_update_set_values')) {
+      *_parent_update = $parent_sqla->can('update');
+    }
+
+    # otherwise, it's the old monolithic update() method. We need to supply our own
+    # version as _parent_update().
+    else {
+      *_parent_update = sub {
+         my $self    = shift;
+         my $table   = $self->_table(shift);
+         my $data    = shift || return;
+         my $where   = shift;
+         my $options = shift;
+
+         # first build the 'SET' part of the sql statement
+         puke "Unsupported data type specified to \$sql->update"
+           unless ref $data eq 'HASH';
+
+         my ($sql, @all_bind) = $self->_update_set_values($data);
+         $sql = $self->_sqlcase('update ') . $table . $self->_sqlcase(' set ')
+                 . $sql;
+
+         if ($where) {
+           my($where_sql, @where_bind) = $self->where($where);
+           $sql .= $where_sql;
+           push @all_bind, @where_bind;
+         }
+
+         if ($options->{returning}) {
+           my ($returning_sql, @returning_bind) = $self->_update_returning($options);
+           $sql .= $returning_sql;
+           push @all_bind, @returning_bind;
+         }
+
+         return wantarray ? ($sql, @all_bind) : $sql;
+       };
+      *_update_returning = sub {
+         my ($self, $options) = @_;
+
+         my $f = $options->{returning};
+
+         my $fieldlist = $self->_SWITCH_refkind($f, {
+           ARRAYREF     => sub {join ', ', map { $self->_quote($_) } @$f;},
+           SCALAR       => sub {$self->_quote($f)},
+           SCALARREF    => sub {$$f},
+         });
+         return $self->_sqlcase(' returning ') . $fieldlist;
+      };
+    }
+
+    # now override or supply the _update_set_value() method
+    *_update_set_values = sub {
+      my ($self, $data) = @_;
+
+      my (@set, @all_bind);
+      for my $k (sort keys %$data) {
+        my $v = $data->{$k};
+        my $r = ref $v;
+        my $label = $self->_quote($k);
+
+        $self->_SWITCH_refkind($v, {
+          ARRAYREF => sub {
+            if ($self->{array_datatypes}                  # array datatype
+                || $self->is_bind_value_with_type($v)) {  # or bind value with type
+              push @set, "$label = ?";
+              push @all_bind, $self->_bindtype($k, $v);
+            }
+            else {                          # literal SQL with bind
+              my ($sql, @bind) = @$v;
+              $self->_assert_bindval_matches_bindtype(@bind);
+              push @set, "$label = $sql";
+              push @all_bind, @bind;
+            }
+          },
+          ARRAYREFREF => sub { # literal SQL with bind
+            my ($sql, @bind) = @${$v};
+            $self->_assert_bindval_matches_bindtype(@bind);
+            push @set, "$label = $sql";
+            push @all_bind, @bind;
+          },
+          SCALARREF => sub {  # literal SQL without bind
+            push @set, "$label = $$v";
+          },
+          HASHREF => sub {
+            my ($op, $arg, @rest) = %$v;
+
+            puke 'Operator calls in update must be in the form { -op => $arg }'
+              if (@rest or not $op =~ /^\-(.+)/);
+
+            local $self->{_nested_func_lhs} = $k;
+            my ($sql, @bind) = $self->_where_unary_op($1, $arg);
+
+            push @set, "$label = $sql";
+            push @all_bind, @bind;
+          },
+          SCALAR_or_UNDEF => sub {
+            push @set, "$label = ?";
+            push @all_bind, $self->_bindtype($k, $v);
+          },
+        });
+      }
+      # generate sql
+      my $sql = CORE::join ', ', @set;
+      return ($sql, @all_bind);
+    };
+  }
+}
 
 sub update {
   my $self = shift;
@@ -521,7 +817,8 @@ sub update {
   }
 
   # call parent method and merge with bind values from $join_info
-  my ($sql, @bind) = $self->next::method(@old_API_args);
+  my ($sql, @bind) = $self->_parent_update(@old_API_args);
+
   unshift @bind, @{$join_info->{bind}} if $join_info;
 
   # handle additional args if needed
@@ -539,6 +836,46 @@ sub update {
   return ($sql, @bind);
 }
 
+
+
+
+
+
+#----------------------------------------------------------------------
+# delete
+#----------------------------------------------------------------------
+
+sub delete {
+  my $self = shift;
+
+  my @old_API_args;
+  my %args;
+  if (&_called_with_named_args) {
+    %args = validate(@_, \%params_for_delete);
+    @old_API_args = @args{qw/-from -where/};
+  }
+  else {
+    @old_API_args = @_;
+  }
+
+  # call parent method
+  my ($sql, @bind) = $self->next::method(@old_API_args);
+
+  # maybe need to handle additional args
+  $self->_handle_additional_args_for_update_delete(\%args, \$sql, \@bind, qr/DELETE/);
+
+  # initial WITH clause
+  $self->_prepend_WITH_clause(\$sql, \@bind);
+
+  return ($sql, @bind);
+}
+
+
+
+
+#----------------------------------------------------------------------
+# auxiliary methods for insert(), update() and delete()
+#----------------------------------------------------------------------
 
 sub _compute_returning {
   my ($self, $arg_returning) = @_; 
@@ -584,6 +921,7 @@ sub _handle_additional_args_for_update_delete {
   }
 }
 
+
 sub _order_by {
   my ($self, $order) = @_;
 
@@ -604,31 +942,6 @@ sub _order_by {
   }
 
   return $self->next::method($order);
-}
-
-sub delete {
-  my $self = shift;
-
-  my @old_API_args;
-  my %args;
-  if (&_called_with_named_args) {
-    %args = validate(@_, \%params_for_delete);
-    @old_API_args = @args{qw/-from -where/};
-  }
-  else {
-    @old_API_args = @_;
-  }
-
-  # call parent method
-  my ($sql, @bind) = $self->next::method(@old_API_args);
-
-  # maybe need to handle additional args
-  $self->_handle_additional_args_for_update_delete(\%args, \$sql, \@bind, qr/DELETE/);
-
-  # initial WITH clause
-  $self->_prepend_WITH_clause(\$sql, \@bind);
-
-  return ($sql, @bind);
 }
 
 #----------------------------------------------------------------------
@@ -1077,125 +1390,6 @@ sub _assert_no_bindtype_columns {
 }
 
 
-sub _insert_value { # called from _insert_values() in parent class
-
-  # unfortunately, we can't just override the ARRAYREF part, so the whole
-  # parent method is copied here
-
-  my ($self, $column, $v) = @_;
-
-  my (@values, @all_bind);
-  $self->_SWITCH_refkind($v, {
-
-    ARRAYREF => sub {
-      if ($self->{array_datatypes} # if array datatype are activated
-            || $self->is_bind_value_with_type($v)) { # or if this is a bind val
-        push @values, '?';
-        push @all_bind, $self->_bindtype($column, $v);
-      }
-      else {                  # else literal SQL with bind
-        my ($sql, @bind) = @$v;
-        $self->_assert_bindval_matches_bindtype(@bind);
-        push @values, $sql;
-        push @all_bind, @bind;
-      }
-    },
-
-    ARRAYREFREF => sub {        # literal SQL with bind
-      my ($sql, @bind) = @${$v};
-      $self->_assert_bindval_matches_bindtype(@bind);
-      push @values, $sql;
-      push @all_bind, @bind;
-    },
-
-    # THINK : anything useful to do with a HASHREF ?
-    HASHREF => sub {       # (nothing, but old SQLA passed it through)
-      #TODO in SQLA >= 2.0 it will die instead
-      SQL::Abstract::belch "HASH ref as bind value in insert is not supported";
-      push @values, '?';
-      push @all_bind, $self->_bindtype($column, $v);
-    },
-
-    SCALARREF => sub {          # literal SQL without bind
-      push @values, $$v;
-    },
-
-    SCALAR_or_UNDEF => sub {
-      push @values, '?';
-      push @all_bind, $self->_bindtype($column, $v);
-    },
-
-  });
-
-  my $sql = CORE::join(", ", @values);
-  return ($sql, @all_bind);
-}
-
-
-
-
-
-sub _update_set_values { # called from update() in parent class
-  my ($self, $data) = @_;
-
-  my (@set, @all_bind);
-  for my $k (sort keys %$data) {
-    my $v = $data->{$k};
-    my $r = ref $v;
-    my $label = $self->_quote($k);
-
-    $self->_SWITCH_refkind($v, {
-      ARRAYREF => sub {
-        if ($self->{array_datatypes}                  # array datatype
-            || $self->is_bind_value_with_type($v)) {  # or bind value with type
-          push @set, "$label = ?";
-          push @all_bind, $self->_bindtype($k, $v);
-        }
-        else {                          # literal SQL with bind
-          my ($sql, @bind) = @$v;
-          $self->_assert_bindval_matches_bindtype(@bind);
-          push @set, "$label = $sql";
-          push @all_bind, @bind;
-        }
-      },
-      ARRAYREFREF => sub { # literal SQL with bind
-        my ($sql, @bind) = @${$v};
-        $self->_assert_bindval_matches_bindtype(@bind);
-        push @set, "$label = $sql";
-        push @all_bind, @bind;
-      },
-      SCALARREF => sub {  # literal SQL without bind
-        push @set, "$label = $$v";
-      },
-      HASHREF => sub {
-        my ($op, $arg, @rest) = %$v;
-
-        puke 'Operator calls in update must be in the form { -op => $arg }'
-          if (@rest or not $op =~ /^\-(.+)/);
-
-        local $self->{_nested_func_lhs} = $k;
-        my ($sql, @bind) = $self->_where_unary_op($1, $arg);
-
-        push @set, "$label = $sql";
-        push @all_bind, @bind;
-      },
-      SCALAR_or_UNDEF => sub {
-        push @set, "$label = ?";
-        push @all_bind, $self->_bindtype($k, $v);
-      },
-    });
-  }
-
-  # generate sql
-  my $sql = CORE::join ', ', @set;
-
-  return ($sql, @all_bind);
-}
-
-
-
-
-
 
 #----------------------------------------------------------------------
 # method creations through closures
@@ -1265,8 +1459,8 @@ SQL::Abstract::More - extension of SQL::Abstract with more constructs and more f
 =head1 DESCRIPTION
 
 This module generates SQL from Perl data structures.  It is a subclass of
-L<SQL::Abstract>, fully compatible with the parent class, but with
-some improvements :
+L<SQL::Abstract> or L<SQL::Abstract::Classic>, fully compatible with the parent 
+class, but with some improvements :
 
 =over
 
@@ -1306,6 +1500,10 @@ C<DBIx::Class> creates its own instance of C<SQL::Abstract>
 and has no API to let the client instantiate from any other class.
 
 =head1 SYNOPSIS
+
+  use SQL::Abstract::More;                       # will inherit from SQL::Abstract;
+  #or
+  use SQL::Abstract::More -extends => 'Classic'; # will inherit from SQL::Abstract::Classic;
 
   my $sqla = SQL::Abstract::More->new();
   my ($sql, @bind);
@@ -1408,6 +1606,47 @@ and has no API to let the client instantiate from any other class.
 
 
 =head1 CLASS METHODS
+
+=head2 import
+
+The C<import()> method is called automatically when a client writes C<use SQL::Abstract::More>.
+It can choose to inherit either from L<SQL::Abstract> or from L<SQL::Abstract::Classic>,
+according to the following rules :
+
+=over
+
+=item *
+
+L<SQL::Abstract> is the default parent.
+
+=item *
+
+another parent can be specified through the C<-extends> keyword:
+
+  use SQL::Abstract::More -extends => 'SQL::Abstract::Classic';
+
+=item *
+
+C<Classic> is a shorthand to C<SQL::Abstract::Classic>
+
+  use SQL::Abstract::More -extends => 'Classic';
+
+=item *
+
+If the environment variable C<SQL_ABSTRACT_MORE_EXTENDS> is defined,
+its value is used as an implicit C<-extends>
+
+   BEGIN {$ENV{SQL_ABSTRACT_MORE_EXTENDS} = 'Classic';
+          use SQL::Abstract::More; # will inherit from SQL::Abstract::Classic;
+         }
+
+=item *
+
+Multiple calls to C<import()> must all resolve to the same parent; otherwise
+an exception is raised.
+
+=back
+
 
 =head2 new
 

@@ -1,6 +1,4 @@
-# Cargo cult to try to prevent CPAN from indexing
-package
-PPIx::Regexp::Token::GroupType::Script_Run;
+package PPIx::Regexp::Token::GroupType::Script_Run;
 
 use 5.006;
 
@@ -11,7 +9,7 @@ use base qw{ PPIx::Regexp::Token::GroupType };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.077';
+our $VERSION = '0.078';
 
 use constant EXPL => 'All characters must be in same script';
 

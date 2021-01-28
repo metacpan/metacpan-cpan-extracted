@@ -374,7 +374,7 @@ choose  ( 8 );
 klass   ( 'PPIx::Regexp::Token::Structure' );
 content ( '}' );
 false   ( can_be_quantified => [] );
-false   ( is_quantifier => [] );
+true    ( is_quantifier => [] );	# As of 5.33.6; previously false
 
 tokenize( '/{}/' );
 count   ( 6 );

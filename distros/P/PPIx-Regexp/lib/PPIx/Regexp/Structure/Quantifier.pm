@@ -42,13 +42,14 @@ use base qw{ PPIx::Regexp::Structure };
 
 use PPIx::Regexp::Constant qw{
     LITERAL_LEFT_CURLY_ALLOWED
+    MINIMUM_PERL
     MSG_LOOK_BEHIND_TOO_LONG
     STRUCTURE_UNKNOWN
     VARIABLE_LENGTH_LOOK_BEHIND_INTRODUCED
     @CARP_NOT
 };
 
-our $VERSION = '0.077';
+our $VERSION = '0.078';
 
 sub can_be_quantified {
     return;
@@ -60,6 +61,15 @@ sub explain {
     if ( $content =~ m/ \A [{] ( .*? ) [}] \z /smx ) {
 	my $quant = $1;
 	my ( $lo, $hi ) = split qr{ , }smx, $quant;
+	foreach ( $lo, $hi ) {
+	    defined
+		or next;
+	    s/ \A \s+ //smx;
+	    s/ \s+ \z //smx;
+	}
+	defined $lo
+	    and '' ne $lo
+	    or $lo = '0';
 	defined $hi
 	    and '' ne $hi
 	    and return "match $lo to $hi times";
@@ -90,8 +100,10 @@ sub _too_big {
 
 sub __PPIX_LEXER__finalize {
     my ( $self ) = @_;
+
+    my $content = $self->content();
+
     if ( $self->__in_look_behind() ) {
-	my $content = $self->content();
 	if ( $content =~ m/ \A [{] ( .*? ) [}] \z /smx ) {
 	    my $quant = $1;
 
@@ -130,6 +142,10 @@ sub __PPIX_LEXER__finalize {
 
 	}
     }
+
+    ( $content =~ m/ \s /smx or $content =~ m/ \A \{ , /smx )
+	and $self->finish()->{perl_version_introduced} = '5.033006';
+
     return 0;
 }
 

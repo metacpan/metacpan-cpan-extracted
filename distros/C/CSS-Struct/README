@@ -1,6 +1,12 @@
 NAME
     CSS::Struct - Struct oriented CSS manipulation.
 
+DESCRIPTION
+    This class is for description of CSS::Struct concept. There is
+    specification of structure. Concrete implementations are in
+    CSS::Struct::Output::Raw and CSS::Struct::Output::Indent. Abstract class
+    for other implementations is in CSS::Struct::Output.
+
 STRUCTURE
      Perl structure:
 
@@ -25,6 +31,52 @@ STRUCTURE
      r - @raw_data
      s - $selector
 
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Raw;
+     use CSS::Struct::Output::Indent;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 indent\n";
+             exit 1;
+     }
+     my $indent = $ARGV[0];
+
+     my $css;
+     my %params = (
+             'output_handler' => \*STDOUT,
+     );
+     if ($indent) {
+             $css = CSS::Struct::Output::Indent->new(%params);
+     } else {
+             $css = CSS::Struct::Output::Raw->new(%params);
+     }
+
+     $css->put(['s', 'selector#id']);
+     $css->put(['s', 'div div']);
+     $css->put(['s', '.class']);
+     $css->put(['d', 'weight', '100px']);
+     $css->put(['d', 'font-size', '10em']);
+     $css->put(['e']);
+
+     # Flush to output.
+     $css->flush;
+     print "\n";
+
+     # Output without argument:
+     # Usage: __SCRIPT__ indent
+
+     # Output with argument 0:
+     # selector#id,div div,.class{weight:100px;font-size:10em;}
+
+     # Output with argument 1:
+     # selector#id, div div, .class {
+     #         weight: 100px;
+     #         font-size: 10em;
+     # }
+
 SEE ALSO
     CSS::Struct::Output
         Base class for CSS::Struct::Output::*.
@@ -41,10 +93,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2007-2020 Michal Josef Špaček
+    © 2007-2021 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

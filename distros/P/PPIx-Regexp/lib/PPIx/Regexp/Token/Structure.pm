@@ -54,7 +54,7 @@ use PPIx::Regexp::Token::Backreference	();
 use PPIx::Regexp::Token::Backtrack	();
 use PPIx::Regexp::Token::Recursion	();
 
-our $VERSION = '0.077';
+our $VERSION = '0.078';
 
 # Return true if the token can be quantified, and false otherwise
 
@@ -223,20 +223,28 @@ sub is_quantifier {
 
 	    # A cookie for the next '}'.
 	    my $commas = 0;
+	    my $allow_digit = 1;
 	    $tokenizer->cookie( COOKIE_QUANT, sub {
 		    my ( $tokenizer, $token ) = @_;
 		    $token or return 1;
 
-		    # Of literals, we accept exactly one comma provided it
-		    # is not immediately after a '{'. We also accept
-		    # anything that matches '[0-9]';
+		    # Code for 5.33.6 and after.
+		    # We allow {,...}, and we allow space inside and
+		    # adjacent to the curlys, and around the comma if
+		    # any. But not interior to the numbers.
 		    if ( $token->isa( TOKEN_LITERAL ) ) {
 			my $character = $token->content();
-			if ( $character eq ',' ) {
-			    $commas++ and return;
-			    return $tokenizer->prior_significant_token(
-				'content' ) ne '{';
+			if ( $character =~ m/ \A \s \z /smx ) {
+			    # Digits only allowed if the prior
+			    # significant was an open curly or a comma.
+			    $allow_digit = $tokenizer->prior_significant_token(
+				'content' ) =~ m/ \A [{,] \z /smx; # }
+			    return 1;
 			}
+			$character eq ','
+			    and return( ! $commas++ );
+			$allow_digit
+			    or return;
 			return $character =~ m/ \A [0-9] \z /smx;
 		    }
 

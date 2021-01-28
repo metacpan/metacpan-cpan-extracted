@@ -28,6 +28,9 @@ struct SPVM_compiler {
   // Current parsed source
   char* cur_src;
 
+  // Current parsed source
+  int32_t cur_src_length;
+
   // Current line number
   int32_t cur_line;
   
@@ -68,7 +71,7 @@ struct SPVM_compiler {
   int32_t error_count;
   
   // Include pathes
-  SPVM_LIST* module_include_pathes;
+  SPVM_LIST* module_include_dirs;
 
   // OP name symtable
   SPVM_HASH* name_symtable;
@@ -95,7 +98,13 @@ struct SPVM_compiler {
   SPVM_LIST* added_packages;
 
   // module file symtable
-  SPVM_HASH* module_file_symtable;
+  SPVM_HASH* loaded_module_file_symtable;
+
+  // module relative file symtable
+  SPVM_HASH* module_rel_file_symtable;
+
+  // module source symtable
+  SPVM_HASH* module_source_symtable;
   
   // OP package symtable
   SPVM_HASH* package_symtable;
@@ -117,6 +126,9 @@ struct SPVM_compiler {
 
   // Field ops
   SPVM_LIST* fields;
+  
+  // No directory module search
+  int32_t no_directry_module_search;
   
   char* next_double_quote_start_bufptr;
 };

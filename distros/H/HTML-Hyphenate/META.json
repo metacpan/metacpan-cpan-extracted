@@ -27,13 +27,14 @@
       "runtime" : {
          "requires" : {
             "Getopt::Long" : "0",
+            "I18N::LangTags" : "0",
             "Mojolicious" : "6",
             "Moose" : "0",
             "Pod::Usage" : "0",
             "Readonly" : "1.03",
             "Set::Scalar" : "0",
             "TeX::Hyphen" : "0",
-            "TeX::Hyphen::Pattern" : "v1.1.5",
+            "TeX::Hyphen::Pattern" : "v1.1.8",
             "perl" : "v5.16.0",
             "strict" : "0",
             "utf8" : "0",
@@ -53,11 +54,11 @@
    "provides" : {
       "HTML::Hyphenate" : {
          "file" : "lib/HTML/Hyphenate.pm",
-         "version" : "v1.1.9"
+         "version" : "v1.1.10"
       },
       "HTML::Hyphenate::DOM" : {
          "file" : "lib/HTML/Hyphenate/DOM.pm",
-         "version" : "v1.1.9"
+         "version" : "v1.1.10"
       }
    },
    "release_status" : "stable",
@@ -72,6 +73,6 @@
          "url" : "https://bitbucket.org/rolandvanipenburg/html-hyphenate"
       }
    },
-   "version" : "v1.1.9",
+   "version" : "v1.1.10",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

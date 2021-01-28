@@ -13,7 +13,7 @@ $to_compare = 'INSERT INTO table_test(col1, col2, col3) VALUES(?, ?, NOW())';
 $insert     = $sql_abstract->insert(
   'table_test',
   ['col1', 'col2', 'col3'],
-  ['val1', 'val2', 'NOW()'], 'pre-st'
+  ['val1', 'val2', ['NOW()']], 'pre-st'
 );
 is($insert, $to_compare, "SQL Query : \n$insert");
 
@@ -38,4 +38,3 @@ $insert = $sql_abstract->insert(
 is($insert, $to_compare, "SQL Query : \n$insert");
 
 done_testing();
-

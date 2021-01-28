@@ -16,7 +16,7 @@ use Scalar::Util qw(blessed refaddr);
 
 use constant RECURSION_LIMIT => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 
-our $VERSION = '4.12';
+our $VERSION = '4.13';
 our @EXPORT_OK = qw(joi validate_json);
 
 our %SCHEMAS = (
@@ -55,8 +55,9 @@ sub bundle {
   my ($self, $args) = @_;
   my $cloner;
 
-  my $schema    = $self->_new_schema($args->{schema} || $self->schema);
-  my $schema_id = $schema->id || ($self->schema ? $self->schema->id : '');
+  my $get_data  = $self->can('data') ? 'data' : 'schema';
+  my $schema    = $self->_new_schema($args->{schema} || $self->$get_data);
+  my $schema_id = $schema->id;
   my @topics    = ([$schema->data, my $bundle = {}]);                        # ([$from, $to], ...);
 
   if ($args->{replace}) {

@@ -27,8 +27,7 @@ requires 'Getopt::Std' => 0;
 requires 'IO::Barf' => 0.04;
 requires 'Pod::Example' => 0.03;
 requires 'Readonly' => 0;
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=App-Pod-Example';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-Pod-Example/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-Pod-Example';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-Pod-Example';
 test_requires 'English' => 0;
@@ -40,7 +39,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 1.02;
 test_requires 'Test::Warn' => 0;
 tests_recursive;
-version '0.18';
+version '0.19';
 
 # Run.
 WriteAll();

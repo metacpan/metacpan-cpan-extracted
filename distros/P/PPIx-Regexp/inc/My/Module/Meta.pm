@@ -20,6 +20,8 @@ sub new {
 sub build_requires {
     return +{
 	'Test::More'	=> 0.88,	# Because of done_testing().
+	charnames	=> 0,
+	lib		=> 0,
     };
 }
 
@@ -70,9 +72,11 @@ sub requires {
 ##  }
     return {
         'Carp'			=> 0,
+	'Encode'		=> 0,
         'Exporter'		=> 0,
         'List::Util'		=> 0,
 	'PPI::Document'		=> 1.117,	# for new( readonly => 1 )
+	'PPI::Dumper'		=> 1.117,
         'Scalar::Util'		=> 0,
 	'Task::Weaken'		=> 0,
 	'Text::Tabs'		=> 0,
