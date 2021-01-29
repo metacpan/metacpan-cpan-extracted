@@ -13,6 +13,16 @@
       "version" : 2
    },
    "name" : "JSON-Path",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
@@ -21,9 +31,13 @@
       },
       "develop" : {
          "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::EOL" : "0",
             "Test::HasVersion" : "0",
             "Test::More" : "0",
+            "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "0",
             "Test::RDF::DOAP::Version" : "0",
             "Test::Tabs" : "0",
@@ -54,7 +68,12 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
             "JSON" : "0",
             "JSON::Parse" : "0",
             "Test2::V0" : "0",
@@ -69,19 +88,19 @@
    "provides" : {
       "JSON::Path" : {
          "file" : "lib/JSON/Path.pm",
-         "version" : "0.430"
+         "version" : "0.431"
       },
       "JSON::Path::Constants" : {
          "file" : "lib/JSON/Path/Constants.pm",
-         "version" : "0.430"
+         "version" : "0.431"
       },
       "JSON::Path::Evaluator" : {
          "file" : "lib/JSON/Path/Evaluator.pm",
-         "version" : "0.430"
+         "version" : "0.431"
       },
       "JSON::Path::Tokenizer" : {
          "file" : "lib/JSON/Path/Tokenizer.pm",
-         "version" : "0.430"
+         "version" : "0.431"
       }
    },
    "release_status" : "stable",
@@ -96,7 +115,7 @@
          "web" : "https://github.com/popefelix/p5-json-path"
       }
    },
-   "version" : "0.430",
+   "version" : "0.431",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

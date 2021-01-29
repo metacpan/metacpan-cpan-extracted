@@ -39,6 +39,7 @@
             "Moo" : "2",
             "Moo::Role" : "2",
             "POSIX" : "0",
+            "URI" : "0",
             "perl" : "5.016"
          }
       },
@@ -62,7 +63,7 @@
          "web" : "https://github.com/Corion/Mojolicious-Matterbridge"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

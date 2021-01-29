@@ -3,119 +3,112 @@
 use strictures;
 
 package goauth;
-$goauth::VERSION = '0.21';
+
+our $VERSION = '0.24';    # VERSION
+
 use Carp;
 use Mojolicious::Lite;
-use Path::Class;
 use Config::JSON;
-use Tie::File;
 use feature 'say';
 use Net::EmptyPort qw(empty_port);
-
-use Crypt::JWT qw(decode_jwt);
-
 
 # ABSTRACT: CLI tool with mini http server for negotiating Google OAuth2 Authorisation access tokens that allow offline access to Google API Services on behalf of the user.
 
 
-#use Path::Class; # ::File; ## cros-platform file paths handling # Exports file() by default
-
 
 my $filename = $ARGV[0] || 'gapi.json';
-my $file = file( $filename );
+my $file     = file($filename);
 
-if ( $file->stat() )    ## file exists
+if ($file->stat())    ## file exists
 {
   say 'File ', $file->absolute() . ' exists';
-  input_if_not_exists( ['gapi/client_id', 'gapi/client_secret', 'gapi/scopes'] );    ## this potentially allows mreging with a json file with data external
+  input_if_not_exists(['gapi/client_id', 'gapi/client_secret', 'gapi/scopes']);
+  ## this potentially allows mreging with a json file with data external
   ## to the app or to augment missing scope from file generated from
   ##  earlier versions of goauth from other libs
   runserver();
-}
-else
-{
-
+} else {
   setup();
   runserver();
 }
 
-sub setup
-{
-  say 'Project Credentials config file "' . $file->absolute() . '" with OAUTH App Secrets and user tokens not found. Creating new file...';
+sub setup {
+  say 'Project Credentials config file "'
+    . $file->absolute()
+    . '" with OAUTH App Secrets and user tokens not found. Creating new file...';
 
   ## TODO: consider allowing the gapi.json to be either seeded or to extend the credentials.json provided by Google
   my $oauth = {};
-  say "Obtain project app client_id and client_secret from http://console.developers.google.com/";
+  say
+"Obtain project app client_id and client_secret from http://console.developers.google.com/";
   print "client_id: ";
 
-  $oauth->{ client_id } = _stdin() || croak( 'client_id is required and has no default' );
+  $oauth->{client_id} = _stdin()
+    || croak('client_id is required and has no default');
   print "client_secret: ";
 
-  $oauth->{ client_secret } = _stdin() || croak( 'client secret is required and has no default' );
+  $oauth->{client_secret} = _stdin()
+    || croak('client secret is required and has no default');
 
   print
-    'scopes ( space sep list - see https://developers.google.com/identity/protocols/googlescopes ): default is - email profile https://www.googleapis.com/auth/plus.profile.emails.read '
+'scopes ( space sep list - see https://developers.google.com/identity/protocols/googlescopes ): default is - email profile https://www.googleapis.com/auth/plus.profile.emails.read '
     . "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/contacts.readonly https://mail.google.com\n";
 
-  $oauth->{ scopes } = _stdin();    ## no croak because empty string is allowed an will evoke defaults
+  $oauth->{scopes} =
+    _stdin(); ## no croak because empty string is allowed an will evoke defaults
 
   ## set default scope if empty string provided
-  if ( $oauth->{ scopes } eq '' )
-  {
-    $oauth->{ scopes }
-      = 'email profile https://www.googleapis.com/auth/plus.profile.emails.read '
+  if ($oauth->{scopes} eq '') {
+    $oauth->{scopes} =
+      'email profile https://www.googleapis.com/auth/plus.profile.emails.read '
       . 'https://www.googleapis.com/auth/calendar '
       . 'https://www.googleapis.com/auth/contacts.readonly https://mail.google.com';
   }
 
-  my $tokensfile = Config::JSON->create( $file->absolute() );
-  $tokensfile->set( 'gapi/client_id',     $oauth->{ client_id } );
-  $tokensfile->set( 'gapi/client_secret', $oauth->{ client_secret } );
-  $tokensfile->set( 'gapi/scopes',        $oauth->{ scopes } );
+  my $tokensfile = Config::JSON->create($file->absolute());
+  $tokensfile->set('gapi/client_id',     $oauth->{client_id});
+  $tokensfile->set('gapi/client_secret', $oauth->{client_secret});
+  $tokensfile->set('gapi/scopes',        $oauth->{scopes});
   say 'OAuth details  updated!';
 
-  # Remove comment for Mojolicious::Plugin::JSONConfig compatibility
-  #tie my @array, 'Tie::File', $file->absolute() or croak $!;
-  #shift @array;
-  #untie @array;
   return 1;
 }
 
-sub input_if_not_exists
-{
+sub input_if_not_exists {
   my $fields = shift;
-  my $config = Config::JSON->new( $filename );
-  for my $i ( @$fields )
-  {
-    if ( !defined $config->get( $i ) )
-    {
+  my $config = Config::JSON->new($filename);
+  for my $i (@$fields) {
+    if (!defined $config->get($i)) {
       print "$i: ";
 
       #chomp( my $val = <STDIN> );
       my $val = _stdin();
-      $config->set( $i, $val );
+      $config->set($i, $val);
     }
   }
   return 1;
 }
 
-sub runserver
-{
-  my $port = empty_port( 3000 );
-  say "Starting web server. Before authorization don't forget to allow redirect_uri to http://127.0.0.1 in your Google Console Project";
-  $ENV{ 'GOAUTH_TOKENSFILE' } = $file->absolute();
+sub runserver {
+  my $port = empty_port(3000);
+  say
+"Starting web server. Before authorization don't forget to allow redirect_uri to http://127.0.0.1 in your Google Console Project";
+  $ENV{'GOAUTH_TOKENSFILE'} = $file->absolute();
 
-  my $config = Config::JSON->new( $ENV{ 'GOAUTH_TOKENSFILE' } );
+  my $config = Config::JSON->new($ENV{'GOAUTH_TOKENSFILE'});
 
 
   # authorize_url and token_url can be retrieved from OAuth discovery document
   # https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2/issues/52
   plugin "OAuth2" => {
     google => {
-      key           => $config->get( 'gapi/client_id' ),                                    # $config->{gapi}{client_id},
-      secret        => $config->get( 'gapi/client_secret' ),                                #$config->{gapi}{client_secret},
-      authorize_url => 'https://accounts.google.com/o/oauth2/v2/auth?response_type=code',
-      token_url     => 'https://www.googleapis.com/oauth2/v4/token'                         ## NB Google credentials.json specifies "https://www.googleapis.com/oauth2/v3/token"
+      key    => $config->get('gapi/client_id'),    # $config->{gapi}{client_id},
+      secret => $config->get('gapi/client_secret')
+      ,    #$config->{gapi}{client_secret},
+      authorize_url =>
+        'https://accounts.google.com/o/oauth2/v2/auth?response_type=code',
+      token_url =>
+        'https://www.googleapis.com/oauth2/v4/token' ## NB Google credentials.json specifies "https://www.googleapis.com/oauth2/v3/token"
     }
   };
 
@@ -127,82 +120,82 @@ sub runserver
 #  };
 
   helper get_new_tokens => sub {
-    my ( $c, $auth_code ) = @_;
+    my ($c, $auth_code) = @_;
     my $hash = {};
-    $hash->{ code }          = $c->param( 'code' );
-    $hash->{ redirect_uri }  = $c->url_for->to_abs->to_string;
-    $hash->{ client_id }     = $config->get( 'gapi/client_id' );
-    $hash->{ client_secret } = $config->get( 'gapi/client_secret' );
-    $hash->{ grant_type }    = 'authorization_code';
-    my $tokens = $c->ua->post( 'https://www.googleapis.com/oauth2/v4/token' => form => $hash )->res->json;
+    $hash->{code}          = $c->param('code');
+    $hash->{redirect_uri}  = $c->url_for->to_abs->to_string;
+    $hash->{client_id}     = $config->get('gapi/client_id');
+    $hash->{client_secret} = $config->get('gapi/client_secret');
+    $hash->{grant_type}    = 'authorization_code';
+    my $tokens = $c->ua->post(
+      'https://www.googleapis.com/oauth2/v4/token' => form => $hash)->res->json;
     return $tokens;
   };
 
   get "/" => sub {
     my $c = shift;
-    $c->{ config } = $config;
+    $c->{config} = $config;
     my $user_data;
     my $tokens;
-    app->log->info( "Will store tokens in " . $config->getFilename( $config->pathToFile ) );
+    app->log->info(
+      "Will store tokens in " . $config->getFilename($config->pathToFile));
 
-    if ( $c->param( 'code' ) )    ## postback from google
+    if ($c->param('code'))    ## postback from google
     {
-      app->log->info( "Authorization code was retrieved: " . $c->param( 'code' ) );
-      $tokens = $c->get_new_tokens( $c->param( 'code' ) );
-      app->log->info( "App got new tokens: " );    # . join(',' keys %{$tokens})
-      if ( $tokens )
-      {
+      app->log->info("Authorization code was retrieved: " . $c->param('code'));
+      $tokens = $c->get_new_tokens($c->param('code'));
+      app->log->info("App got new tokens: ");    # . join(',' keys %{$tokens})
+      if ($tokens) {
 
-        if ( $tokens->{ id_token } )
-        {
-          $user_data = decode_jwt( token => $tokens->{ id_token }, kid_keys => $c->ua->get( 'https://www.googleapis.com/oauth2/v3/certs' )->res->json, );
+        if ($tokens->{id_token}) {
+          $user_data = decode_jwt(
+            token    => $tokens->{id_token},
+            kid_keys =>
+              $c->ua->get('https://www.googleapis.com/oauth2/v3/certs')
+              ->res->json,
+          );
         }
 
-        $config->addToHash( 'gapi/tokens/' . $user_data->{ email }, 'access_token', $tokens->{ access_token } );
+        $config->addToHash('gapi/tokens/' . $user_data->{email},
+          'access_token', $tokens->{access_token});
 
-        if ( $tokens->{ refresh_token } )
-        {
-          $config->addToHash( 'gapi/tokens/' . $user_data->{ email }, 'refresh_token', $tokens->{ refresh_token } );
-        }
-        else    ## with access_type=offline set we should receive a refresh token unless user already has an active one.
+        if ($tokens->{refresh_token}) {
+          $config->addToHash('gapi/tokens/' . $user_data->{email},
+            'refresh_token', $tokens->{refresh_token});
+        } else ## with access_type=offline set we should receive a refresh token unless user already has an active one.
         {
           ## carp('Google JWT Did not incude a refresh token - when the access token expires services will become inaccessible');
         }
       }
 
       #$c->render( json => $config->get( 'gapi' ) );
-      $c->{ access_token } = $tokens->{ access_token };
-      $c->{ user_email }   = $user_data->{ email };
-      $c->render( template => 'oauth_granted' );
-    }
-    else        ## PRESENT USER DEFAULT PAGE TO REQUEST GOOGLE AUTH'D ACCESS TO SERVICES
+      $c->{access_token} = $tokens->{access_token};
+      $c->{user_email}   = $user_data->{email};
+      $c->render(template => 'oauth_granted');
+    } else ## PRESENT USER DEFAULT PAGE TO REQUEST GOOGLE AUTH'D ACCESS TO SERVICES
     {
-      $c->render( template => 'oauth' );
+      $c->render(template => 'oauth');
     }
   };
 
-  #delete $static->extra->{'favicon.ico'};  ## look into https://mojolicious.org/perldoc/Mojolicious/Static with view to repalcing default favicon
-  app->secrets( ['putyourownsecretcookieseedhereforsecurity' . time] );    ## NB persistence cookies not required beyond server run
-  app->start( 'daemon', '-l', "http://*:$port" );
+#delete $static->extra->{'favicon.ico'};  ## look into https://mojolicious.org/perldoc/Mojolicious/Static with view to repalcing default favicon
+  app->start('daemon', '-l', "http://*:$port");
   return 1;
 }
 
 ## replacement for STDIN as per https://coderwall.com/p/l9-uvq/reading-from-stdin-the-good-way
-sub _stdin
-{
+sub _stdin {
   my $io;
   my $string = q{};
 
   $io = IO::Handle->new();
-  if ( $io->fdopen( fileno( STDIN ), 'r' ) )
-  {
+  if ($io->fdopen(fileno(STDIN), 'r')) {
     $string = $io->getline();
     $io->close();
   }
   chomp $string;
   return $string;
 }
-
 
 
 #  data:image/vnd.microsoft.icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAAAAAAAAAAAAACMhSAAAAGUBS04uKWNqJXxyeiK+d4Af2XeAINhweCK4YWcmckdJMCEAAP8AGRdQAAAAAAAAAAAAAAAAAERFMwA1NToKY2kmbH6HH9uOmR39lKAc/5WhHP+VoRz/k58c/42YHfx7hCDSX2QoXSgmQQY8PDgAAAAAAERGNwAzMj4KaXAkjIqVHfmWohz/laEc/5WhHP+VoRz/laEc/5WhHP+Wohz/laEc/4eRHvRlayV4HRhMBT8/PQD//wAAZGonboqVHfmWohz/laEc/5WhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP+Wohz/h5Ee819kKlmLmAUATlEzLH+IINuWohz/laEc/5WhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP96gyHLRkc5G2VrJX+Omh3+lqId/ZaiHviVoRz/laEc/5WhHP+Woh/wlqIf8JWhHfyWoh74laEc/5aiHvmWohz9i5Yd+V5kJ2NzeyHClKAc/5aiH+SbpimjlaEc/5WhHP+YoyLSnagumpynK6+ZpCTVm6YoqJWhHP+ZpSaqlqIf5JKeHP9udSOmeYIf4JWhHP+Woh7enqkxeZikI9SWoh7ynKcrk5umKa6ZpCTOmaQkzZumKZGVoRz+maUllZaiH92UoBz/dHwgxnqDHuGVoRz/lqIe3qGrNW6cpyurnagtjZ2oLpSeqTCen6kxl5umKq6gqjN4mKQj2JqlJ5OWoh/dlKAc/3R9H8h1fSHJlKAc/5aiH92cpiuLlqIe+p2nLYeYpCPJm6Yov5qlJsOXoh/tm6YowpumKb+bpiiPlqIf3ZOfHP9vdyOtZ24kjJCbHP+Woh7nnagufpynK5WbpiihlaEd95WhHP+VoRz/laEc/5WhHP+VoRz/maQkpJejHuKNmB39YWcmb1NWLzeCjB/llqIc/5aiHvWWoh7zlaEd/ZWhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHfWWohz+focg10xONSUAAIgCaG8mg42ZHf6Wohz/laEc/5WhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP+Wohz/ipUd+mNpKGz//wAAS04xAD9BNhJvdyKmjpkd/paiHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP+Wohz/i5Yd+2tyI5IzMz0LRUY2AAAAqQBRVCsAQUMzFGpxJYuEjh7skp0c/5WhHP+Wohz/lqIc/5WhHP+RnBz/gowf5mZtJns5OjYNR0kwAAAAAAAAAAAAAAAAADc3OgAnJUMFVVkqRGtzI6N5giDgfoge936IHvZ4gSDcaXAjmVFVLDkdGVIDMzJEAAAAAAAAAAAA4AcAAMADAACAAQAAgAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAIABAADAAwAA4AcAAA==
@@ -217,12 +210,13 @@ goauth - CLI tool with mini http server for negotiating Google OAuth2 Authorisat
 
 =head1 VERSION
 
-version 0.21
+version 0.24
 
 =head2 SUMMARY
 
-Supports multiple users
-OAuth2 for Google. You can find the key (CLIENT ID) and secret (CLIENT SECRET) from the app console here under "APIs & Auth" and "Credentials" in the menu at https://console.developers.google.com/project .
+Supports multiple users OAuth2 for Google. You can find the key (CLIENT ID) and
+secret (CLIENT SECRET) from the app console here under "APIs & Auth" and
+"Credentials" in the menu at https://console.developers.google.com/project.
 
 Included as a utility within the CPAN L<Webservice::GoogleAPI::Client> Bundle.
 
@@ -236,61 +230,89 @@ Optionally you can provide an alternate filename to the default gapi.json as a p
 
     goauth my_differently_named_gapi.json 
 
-Once installed as part of the WebService::GoogleAPI::Client bundle, this tool can be run from the command line to configure a Google Project to access a Project
-configuration that allows authenticated and authorised users to grant permission to access Google API services on their data (Email, Files etc) to the extent
-provided by the Access Scopes for the project and the auth tokens.
+Once installed as part of the WebService::GoogleAPI::Client bundle, this tool
+can be run from the command line to configure a Google Project to access a
+Project configuration that allows authenticated and authorised users to grant
+permission to access Google API services on their data (Email, Files etc) to the
+extent provided by the Access Scopes for the project and the auth tokens.
 
-In order to successfully run _go_auth_ for the first time requires the following Google Project configuration variables:
-Client ID
-Client Secret
-List of Scopes to request access to on behalf of users ( must be a subset of those enabled for the project. )
+In order to successfully run C<goauth> for the first time requires the following
+Google Project configuration variables:
 
-If not already available in the gapi.json file, you will be prompted to supply these as the file is created.
+=over 4
 
-Once this configuration is complete, the go_auth tool will launch a  mini HTTP server to provide an interface to request users to authorise your project application.
+=item * Client ID
 
-NB: To run successfully your Google Project must be configured to accept requests from the domain. For initial testing ensure that you include localhost in your allowed domains.
+=item * Client Secret
 
-Once you have succesfully created a gapi.json file and ahve authenticated a user that is represented in this file then use WebServices::Google::Client
-to start making Google API Requests.
+=item * List of Scopes to request access to on behalf of users ( must be a subset of those enabled for the project. )
 
-    perldoc WebServices::Google::Client for more detail.
+=back
+
+You must also add whatever URL you end up accessing C<goauth> from as a valid
+Redirect URI in your Google Cloud Console. You can get there from
+L<https://console.cloud.google.com/apis/credentials>, and then clicking edit on
+the OAuth Client ID that you're using for this project.
+
+You need to add something like
+
+   http://localhost:3001/
+
+with the port number set to whichever C<goauth> ends up picking. (This is
+assuming that you typed C<http://localhost:3001> in your browser when you opened
+it, it won't work if you typed in C<127.0.0.1:3001>).
+
+If not already available in the gapi.json file, you will be prompted to supply
+these as the file is created.
+
+Once this configuration is complete, the C<goauth> tool will launch a mini HTTP
+server to provide an interface to request users to authorise your project
+application.
+
+Once you have succesfully created a gapi.json file and have authenticated a user
+that is represented in this file then you can start making Google API Requests.
+
+See L<WebServices::Google::Client> for more detail.
 
 =head2 gapi.json 
 
-The ultimate output of this is the gapi.json file that contains both the Google Project Specification as well as the authorised user access tokens.
-The file describes a set of scopes that must all be configured as available to the Project through the Google Admin Console.
-You may have multiple gapi.json files for the same project containing a different subset of scopes.
-The gapi.json file also contains the authorisation tokens granted by users. Multiple users can be described within a single gapi.json file.
-If users exist across multiple gapi.json files for the same project then (I believe) only the most recently granted set of scopes will be usable.
+The ultimate output of this is the gapi.json file that contains both the Google
+Project Specification as well as the authorised user access tokens.  The file
+describes a set of scopes that must all be configured as available to the
+Project through the Google Admin Console.  You may have multiple gapi.json files
+for the same project containing a different subset of scopes.  The gapi.json
+file also contains the authorisation tokens granted by users. Multiple users can
+be described within a single gapi.json file.  If users exist across multiple
+gapi.json files for the same project then (I believe) only the most recently
+granted set of scopes will be usable.
 
-The user can revoke permissions granted to a project ( Application ) by visiting https://myaccount.google.com/permissions
+The user can revoke permissions granted to a project ( Application ) by visiting
+L<https://myaccount.google.com/permissions>.
 
-This file can be used to access Google API Services using the WebService::Google:API:Client Google API Client Library.
+This file can be used to access Google API Services using the
+WebService::Google:API:Client Google API Client Library.
 
 =head2 References
 
 * probably originally based on https://gist.github.com/throughnothing/3726907
 
-=head2 TODO: Improve user interface of the HTML templates beneath DATA section
+=head1 AUTHORS
 
-=over 1
+=over 4
 
-=item More Testing and documentation - explore cases where refresh token is not returned because previous token was issued
+=item *
 
-=item Describe alternative User Agent approaches to WebServices::Google::Client
+Veesh Goldman <veesh@cpan.org>
 
-=item Explore service accounts and possible inclusion into gapi.json
-
-=back
-
-=head1 AUTHOR
+=item *
 
 Peter Scott <localshop@cpan.org>
 
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Peter Scott and others.
+This software is Copyright (c) 2017-2021 by Peter Scott and others.
 
 This is free software, licensed under:
 

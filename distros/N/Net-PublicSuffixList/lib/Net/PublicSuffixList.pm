@@ -12,7 +12,7 @@ use File::Basename        qw(basename dirname);
 use File::Path            qw(make_path);
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '0.500';
+our $VERSION = '0.501';
 
 =encoding utf8
 
@@ -44,6 +44,14 @@ was the top-level domain.
 
 The Public Suffix List is essentially a self-reported collection of the
 top-level, generic, country code, or whatever domains.
+
+There are other modules that try to do this, but they come with packaged
+(old) versions of the Public Suffix List or have limited functionality.
+
+This module can fetch the most current one for you, use one that you
+provide locally, or even let you completely make it up. You can add
+entries you want but don't show up in the list, and remove ones you don't
+think should be there.
 
 =over 4
 
@@ -133,7 +141,11 @@ sub parse_list ( $self, $list ) {
 		carp "Argument is not a scalar reference";
 		return;
 		}
+
+	my( $line_ending ) = $$list =~ m/(\R)/;
 	open my $string_fh, '<:utf8', $list;
+	$string_fh->input_record_separator( $line_ending );
+
 	while( <$string_fh> ) {
 		chomp;
 		next if( /\A\s*\z/ || m|\A\s*//| );
@@ -385,7 +397,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020, brian d foy, All Rights Reserved.
+Copyright © 2020-2021, brian d foy, All Rights Reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

@@ -1,0 +1,18 @@
+0.24      2021-01-29 10:33:10+02:00 Asia/Jerusalem
+
+- Fix some test breakage - min perl version now 5.20.0
+
+0.23      2021-01-28 19:18:11+02:00 Asia/Jerusalem
+
+ENHANCEMENTS
+- add support for service accounts
+- rework storage backend to allow custom implementations (here's looking at you, redis)
+- allow introspection for credentials on $res returned from an api query
+
+BREAKING CHANGES
+- will immediately on non-existent API endpoints
+- rework AuthStorage classes: anything that depended on
+  ::AuthStorage or ::Credentials in an undocumented way will likely explode.
+  Please open an issue on github and I'll try and help you migrate
+- remove some undocumented options
+- the examples/ dir MAY be broken, I didn't check (they need cleaning up anyways)

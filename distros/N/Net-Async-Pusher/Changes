@@ -1,11 +1,9 @@
 Revision history for Net-Async-Pusher
 
-0.003     2017-09-11 06:35:07+08:00 Asia/Kuala_Lumpur
-    No new features.
-
+0.005     2021-01-29 07:51:58+08:00 Asia/Kuala_Lumpur
     Bugs fixed:
 
-    * Make sure outgoing frames apply websocket masking
+    - ping/pong handling was failing with latest version of pusher.com
 
 0.003     2017-09-11 04:32:20+08:00 Asia/Kuala_Lumpur
     New features:

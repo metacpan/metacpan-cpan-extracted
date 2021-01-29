@@ -1,0 +1,311 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+CSS::Tidy - reformat CSS
+
+=head1 SYNOPSIS
+
+    use CSS::Tidy 'tidy_css';
+    my $output = tidy_css ($input);
+
+=head1 VERSION
+
+This documents version 0.01 of CSS-Tidy
+corresponding to L<git commit 50d0ef7baaf1754a2cd58fd02be293916c3270e6|https://github.com/benkasminbullock/css-tidy/commit/50d0ef7baaf1754a2cd58fd02be293916c3270e6> released on Fri Jan 29 22:55:52 2021 +0900.
+
+=head1 DESCRIPTION
+
+This reformats CSS.
+
+The idea is to have a formatting script which can be used to
+consistently format CSS.
+
+=head1 FUNCTIONS
+
+=head2 tidy_css
+
+    my $output = tidy_css ($input);
+
+Given CSS in C<$input>, reformat it into a consistent format and
+return the value.
+
+=head1 TRANSFORMATIONS APPLIED
+
+=over
+
+=item Indentation
+
+Indentation is changed to multiples of four spaces.
+
+=item Trailing whitespace
+
+Trailing whitespace (blanks after the end of the line) is removed.
+
+=item Property/value pairs
+
+The spacing between property/value pairs such as
+
+    font-size:21em;
+
+is altered to put a single space after the colon:
+
+    font-size: 21em;
+
+=item Declaration blocks
+
+A blank line is inserted between declaration blocks.
+
+=item Single-line braces are expanded out
+
+    .something { something:something; }
+
+is expanded to
+
+    .something {
+        something: something;
+    }
+
+=item Comments have a blank line before and after
+
+If the comment is on a line by itself, it will be given one blank line
+before and after itself.
+
+=back
+
+=head1 SCRIPT
+
+The script L<csstidy> runs L</tidy_css> on STDIN and prints the result
+to STDOUT. There is also F<css-tidy.el> in the distribution which
+enables one to run L<csstidy> on the current buffer.
+
+=head1 SEE ALSO
+
+ 
+
+
+
+=head2 About CSS
+
+=over
+
+=item CSS Specification
+
+L<CSS Syntax Module Level 3|https://www.w3.org/TR/css-syntax-3/> at
+the W3 Consortium.
+
+=back
+
+=head2 Other CPAN modules
+
+=head3 Parsers
+
+=over
+
+
+=item L<CSS>
+
+
+[Author: L<IAMCAL|https://metacpan.org/author/IAMCAL>; Date: C<2011-03-22>; Version: C<1.09>]
+
+
+
+
+=item L<CSS::Croco>
+
+
+[Author: L<GUGU|https://metacpan.org/author/GUGU>; Date: C<2009-12-26>; Version: C<0.09>]
+
+
+
+
+=item L<CSS::DOM>
+
+
+[⭐ Author: L<SPROUT|https://metacpan.org/author/SPROUT>; Date: C<2018-01-29>; Version: C<0.17>]
+
+
+
+
+=item L<CSS::Object>
+
+
+[⭐ Author: L<JDEGUEST|https://metacpan.org/author/JDEGUEST>; Date: C<2020-08-12>; Version: C<v0.1.3>]
+
+
+
+
+=item L<CSS::SAC>
+
+
+[Author: L<BJOERN|https://metacpan.org/author/BJOERN>; Date: C<2008-07-05>; Version: C<0.08>]
+
+
+
+👎 This seems to be unusable, it fails on the CSS stylesheets we've
+tried it on.
+
+
+=item L<CSS::Simple>
+
+
+[Author: L<KAMELKEV|https://metacpan.org/author/KAMELKEV>; Date: C<2017-11-16>; Version: C<3224>]
+
+
+
+
+=item L<CSS::Struct>
+
+
+[Author: L<SKIM|https://metacpan.org/author/SKIM>; Date: C<2020-08-11>; Version: C<0.03>]
+
+
+
+
+=item L<CSS::Tiny>
+
+
+[⭐ Author: L<CHORNY|https://metacpan.org/author/CHORNY>; Date: C<2016-03-10>; Version: C<1.20>]
+
+
+
+=back
+
+=head3 Preprocessors
+
+=over
+
+
+=item L<CSS::LESS>
+
+
+[Author: L<MUGIFLY|https://metacpan.org/author/MUGIFLY>; Date: C<2013-09-20>; Version: C<v0.0.3>]
+
+
+
+
+=item L<CSS::Sass>
+
+
+[⭐ Author: L<OCBNET|https://metacpan.org/author/OCBNET>; Date: C<2020-05-04>; Version: C<v3.6.3>]
+
+
+
+Unfortunately this is built on top of a deprecated library which is
+being replaced with Dart Sass.
+
+=back
+
+=head3 Minifiers
+
+=over
+
+
+=item L<CSS::Compressor>
+
+
+[⭐ Author: L<JANUS|https://metacpan.org/author/JANUS>; Date: C<2018-12-03>; Version: C<0.05>]
+
+
+
+
+=item L<CSS::Minifier>
+
+
+[⭐ Author: L<PMICHAUX|https://metacpan.org/author/PMICHAUX>; Date: C<2007-08-03>; Version: C<0.01>]
+
+
+
+
+=item L<CSS::Minifier::XS>
+
+
+[⭐ Author: L<GTERMARS|https://metacpan.org/author/GTERMARS>; Date: C<2020-12-31>; Version: C<0.11>]
+
+
+
+
+=item L<CSS::Packer>
+
+
+[⭐ Author: L<LEEJO|https://metacpan.org/author/LEEJO>; Date: C<2018-11-06>; Version: C<2.07>]
+
+
+
+
+=item L<CSS::Squish>
+
+
+[Author: L<TSIBLEY|https://metacpan.org/author/TSIBLEY>; Date: C<2010-11-05>; Version: C<0.10>]
+
+
+
+=back
+
+=head3 Other
+
+=over
+
+
+=item L<CSS::Coverage>
+
+
+[⭐ Author: L<SARTAK|https://metacpan.org/author/SARTAK>; Date: C<2013-08-08>; Version: C<0.04>]
+
+
+
+👎 Test whether your styles are actually in use or not. Unfortunately
+it depends on L</CSS::SAC> which seems to be unusable.
+
+
+=item L<CSS::Inliner>
+
+
+[⭐ Author: L<KAMELKEV|https://metacpan.org/author/KAMELKEV>; Date: C<2020-01-01>; Version: C<4014>]
+
+
+
+
+=item L<Graphics::ColorNames::CSS>
+
+
+
+This provides a map from the names of colours valid in CSS to their
+RGB values.
+
+
+=item L<Test::CSS>
+
+
+[Author: L<MANWAR|https://metacpan.org/author/MANWAR>; Date: C<2017-09-09>; Version: C<0.08>]
+
+
+
+Test CSS files or strings using regular expressions and a list of
+properties. The properties list is somewhat out of date, for example
+it doesn't have the C<touch-action> property. See
+L<https://github.com/manwar/Test-CSS/issues/2>.
+
+=back
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

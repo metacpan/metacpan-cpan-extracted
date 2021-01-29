@@ -31,8 +31,8 @@ SQL::Translator::Parser::OpenAPI - convert OpenAPI schema to SQL::Translator sch
 
 # DESCRIPTION
 
-This module implements a [SQL::Translator::Parser](https://metacpan.org/pod/SQL::Translator::Parser) to convert
-a [JSON::Validator::OpenAPI::Mojolicious](https://metacpan.org/pod/JSON::Validator::OpenAPI::Mojolicious) specification to a [SQL::Translator::Schema](https://metacpan.org/pod/SQL::Translator::Schema).
+This module implements a [SQL::Translator::Parser](https://metacpan.org/pod/SQL%3A%3ATranslator%3A%3AParser) to convert
+a [JSON::Validator::OpenAPI::Mojolicious](https://metacpan.org/pod/JSON%3A%3AValidator%3A%3AOpenAPI%3A%3AMojolicious) specification to a [SQL::Translator::Schema](https://metacpan.org/pod/SQL%3A%3ATranslator%3A%3ASchema).
 
 It uses, from the given API spec, the given "definitions" to generate
 tables in an RDBMS with suitable columns and types.
@@ -66,9 +66,9 @@ default, the tables will be named after simply the definitions.
 
 ## parse
 
-Standard as per [SQL::Translator::Parser](https://metacpan.org/pod/SQL::Translator::Parser). The input $data is a scalar
+Standard as per [SQL::Translator::Parser](https://metacpan.org/pod/SQL%3A%3ATranslator%3A%3AParser). The input $data is a scalar
 that can be understood as a [JSON::Validator
-specification](https://metacpan.org/pod/JSON::Validator#schema).
+specification](https://metacpan.org/pod/JSON%3A%3AValidator#schema).
 
 ## defs2mask
 
@@ -181,8 +181,8 @@ it under the same terms as Perl itself.
 
 # SEE ALSO
 
-[SQL::Translator](https://metacpan.org/pod/SQL::Translator).
+[SQL::Translator](https://metacpan.org/pod/SQL%3A%3ATranslator).
 
-[SQL::Translator::Parser](https://metacpan.org/pod/SQL::Translator::Parser).
+[SQL::Translator::Parser](https://metacpan.org/pod/SQL%3A%3ATranslator%3A%3AParser).
 
-[JSON::Validator::OpenAPI::Mojolicious](https://metacpan.org/pod/JSON::Validator::OpenAPI::Mojolicious).
+[JSON::Validator::OpenAPI::Mojolicious](https://metacpan.org/pod/JSON%3A%3AValidator%3A%3AOpenAPI%3A%3AMojolicious).

@@ -13,7 +13,7 @@ $obj->put(
 	['i', 'target', 'code'],
 );
 my $ret = $obj->flush;
-is($ret, '');
+is($ret, '', 'XXX Skip instruction (as comment).');
 
 # Test.
 $obj = CSS::Struct::Output::Indent->new(
@@ -23,4 +23,4 @@ $obj->put(
 	['i', 'target', 'code'],
 );
 $ret = $obj->flush;
-is($ret, "/* targetcode */");
+is($ret, "/* targetcode */", 'XXX Instruction (as comment).');

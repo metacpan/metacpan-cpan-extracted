@@ -97,7 +97,7 @@ I was unable to get the [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) pack
     my $gapi = WebService::GoogleAPI::Client->new(debug => 0);
     
     ## This idiom selects the first authorised user from gapi.json 
-    my $aref_token_emails = $gapi->auth_storage->storage->get_token_emails_from_storage;
+    my $aref_token_emails = $gapi->auth_storage->get_token_emails_from_storage;
     my $user = $aref_token_emails->[0];
     print "Running tests with default user email = $user\n";
     $gapi->user($user);
@@ -222,7 +222,7 @@ See the examples folder for specific access examples.
 - API Discovery with local caching using [CHI](https://metacpan.org/pod/CHI) File
 - OAUTH app credentials (client\_id, client\_secret, users access\_token && refresh\_token) storage stored in local gapi.json file
 - Automatic access\_token refresh (if user has refresh\_token) and saving refreshed token to storage
-- CLI tool ([go_auth](https://metacpan.org/pod/distribution/WebService-GoogleAPI-Client/bin/goauth)) with lightweight HTTP server to simplify config OAuth2 configuration, sccoping, authorization and obtaining access\_ and refresh\_ tokens
+- CLI tool ([goauth](https://metacpan.org/pod/distribution/WebService-GoogleAPI-Client/bin/goauth)) with lightweight HTTP server to simplify config OAuth2 configuration, sccoping, authorization and obtaining access\_ and refresh\_ tokens
 
 
 # SEE ALSO

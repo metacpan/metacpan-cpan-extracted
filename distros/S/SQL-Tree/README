@@ -1,0 +1,89 @@
+NAME
+    sqltree - hierarchical data (tree) implementation in SQL
+
+VERSION
+    0.05 (2021-01-28)
+
+SYNOPSIS
+      sqltree DRIVER TABLE [OPTIONS]
+
+DESCRIPTION
+    sqltree generates the SQL for a herarchical data (tree)
+    implementation using triggers, as described here:
+
+        http://www.depesz.com/index.php/2008/04/11/my-take-on-trees-in-sql/
+
+    This implementation relies on a previously-defined table containing:
+
+    *   a single primary key column
+
+    *   a parent column that references the primary key
+
+    *   a column to hold path data [optional]
+
+    Several triggers are added to this previously-defined table, which
+    update a new table holding in-depth tree information.
+
+    Output from sqltree can usually be piped directly to the "sqlite3"
+    or "psql" command line tools.
+
+ARGUMENTS
+    DRIVER
+        Must be 'SQLite' or 'Pg'. Patches for other database systems are
+        welcome.
+
+    TABLE
+        The name of the (existing) table holding the hierarchical data.
+        The additional tree table will be postfixed with the value of
+        the "--postfix" option.
+
+OPTIONS
+    --id, -i STR
+        The primary key of the source table holding the hierarchical
+        data. Defaults to "id".
+
+    --no-comments, -C
+        Do not include descriptive comments.
+
+    --drop, -d
+        Include DROP TABLE/TRIGGER statements.
+
+    --name, -n STR
+        When "--path" is used this option identifies the source column
+        from which path names will be built. Defaults to "name".
+
+    --parent_id, -I STR
+        The parent column of the source table holding the hierarchical
+        data. Defaults to "parent_id".
+
+    --path, -p STR
+        The destination column into which the tree path will be
+        automatically calculated. This column would usually be defined
+        as TEXT or VARCHAR, and should be UNIQUE.
+
+    --postfix, -f STR
+        The string postfixed to "TABLE" to name the additional table.
+        Defaults to "_tree".
+
+    --separator, -s CHAR
+        The string that separates components in the "--path" column.
+        Defaults to "/".
+
+    --type, -t TYPE
+        The SQL column type of the source table primary key and parent
+        columns. Defaults to "INTEGER".
+
+SEE ALSO
+    SQL::Tree(3pm)
+
+AUTHOR
+    Mark Lawrence <nomad@null.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010-2021 Mark Lawrence <nomad@null.net>
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+

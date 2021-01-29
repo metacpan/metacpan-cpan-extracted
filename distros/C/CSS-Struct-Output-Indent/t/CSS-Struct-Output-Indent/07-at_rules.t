@@ -11,4 +11,4 @@ $obj->put(
 	['a', '@import', 'file.css'],
 );
 my $ret = $obj->flush;
-is($ret, '@import "file.css";');
+is($ret, '@import "file.css";', 'At rule example.');

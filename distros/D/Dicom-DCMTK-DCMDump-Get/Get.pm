@@ -1,14 +1,11 @@
 package Dicom::DCMTK::DCMDump::Get;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -47,23 +44,27 @@ Dicom::DCMTK::DCMDump::Get - Perl Class for getting DICOM DCMTK dcmdump output f
 =head1 SYNOPSIS
 
  use Dicom::DCMTK::DCMDump::Get;
+
  my $obj = Dicom::DCMTK::DCMDump::Get->new(%parameters);
  my $dcmdump = $obj->get($dicom_file);
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = Dicom::DCMTK::DCMDump::Get->new(%parameters);
 
 Constructor.
 
-=item C<get($dicom_file)>
+Returns instance of object.
 
- Get dcmdump for DICOM file.
- Returns string with dcmdump output.
+=head2 C<get>
 
-=back
+ my $dcmdump = $obj->get($dicom_file);
+
+Get dcmdump for DICOM file.
+
+Returns string with dcmdump output.
 
 =head1 ERRORS
 
@@ -73,11 +74,9 @@ Constructor.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Dicom::DCMTK::DCMDump::Get;
  use File::Temp qw(tempfile);
  use IO::Barf qw(barf);
@@ -187,21 +186,22 @@ Install the Dicom modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Dicom-DCMTK-DCMDump-Get>
+L<https://github.com/michal-josef-spacek/Dicom-DCMTK-DCMDump-Get>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2014-2015
- BSD 2-Clause License
+© Michal Josef Špaček 2014-2021
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

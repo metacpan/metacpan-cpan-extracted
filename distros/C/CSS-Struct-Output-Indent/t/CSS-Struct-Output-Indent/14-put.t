@@ -13,4 +13,4 @@ $obj->put(
 	['x', 'bad selector'],
 );
 my $ret = $obj->flush;
-is($ret, '');
+is($ret, '', 'Skip bad CSS::Struct type.');

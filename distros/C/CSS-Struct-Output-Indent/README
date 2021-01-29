@@ -76,7 +76,7 @@ METHODS
     Returns undef.
 
 ERRORS
-     From CSS::Struct::Core:
+     From CSS::Struct::Output:
              Auto-flush can't use without output handler.
              Bad comment delimeters.
              Bad data.
@@ -140,5 +140,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

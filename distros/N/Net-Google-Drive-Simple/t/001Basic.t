@@ -8,7 +8,7 @@ use strict;
 use FindBin qw( $Bin );
 use Test::More;
 
-my $nof_tests      = 11;
+my $nof_tests      = 13;
 my $nof_live_tests = $nof_tests - 1;
 plan tests => $nof_tests;
 
@@ -26,18 +26,19 @@ SKIP: {
         skip "LIVE_TEST not set, skipping live tests", $nof_live_tests;
     }
 
-    my( $files, $parent ) = $gd->children( "/this-path-does-not-exist", 
+    my( $files, $parent ) = $gd->children( "/this-path-does-not-exist",
         { maxResults => 3 }, { page => 0 },
     );
 
     ok !defined $files, "non-existent path";
-    is $gd->error(), 
-      "Child this-path-does-not-exist not found", 
+    is $gd->error(),
+      "Child this-path-does-not-exist not found",
       "error message";
 
-    ( $files, $parent ) = $gd->children( "/", 
+    ( $files, $parent ) = $gd->children( "/",
         { maxResults => 3 }, { page => 0 },
     );
+    is ref($files), "ARRAY", "children returned ok";
 
     # upload a test file
     my $testfile = "$Bin/data/testfile";
@@ -45,21 +46,21 @@ SKIP: {
     ok defined $file_id, "upload ok";
     my $metadata = $gd->file_metadata( $file_id );
     ok (((defined $metadata) && ($metadata->{title} eq 'testfile')), "metadata ok");
+
+    # Search for the file as both children method
+    # and the 'files' method (direct api access)
+    ( $files, $parent ) = $gd->children( "/", {}, { title => 'testfile' } );
+    ok( ref($files) eq "ARRAY" && scalar(@$files), "file founds via children()" );
+    is( $files->[0]->originalFilename(), "testfile", "Got the file, original filename looks right (via children())");
+    $files = $gd->files( {}, { title => 'testfile' } );
+    ok( ref($files) eq "ARRAY" && scalar(@$files), "files found via files()" );
+    is( $files->[0]->originalFilename(), "testfile", "Got the file, original filename looks right (via files())");
+
+    # Delete the file
     ok $gd->file_delete( $file_id ), "delete ok";
 
-    is ref($files), "ARRAY", "children returned ok";
-
-    $files = $gd->children( "/",
-        { maxResults => 3 }, { page => 0 },
-    );
-
-    is ref($files), "ARRAY", "scalar context children";
-
-    $files = $gd->files( { maxResults => 3 }, { page => 0 } );
-    is ref($files), "ARRAY", "files found";
-
-    ( $files ) = $gd->files( { maxResults => 10 }, { page => 0 },
-    );
-    is ref($files), "ARRAY", "files found";
-    ok length $files->[0]->originalFilename(), "org filename";
+    ( $files, $parent ) = $gd->children( "/", {}, { title => 'testfile' } );
+    ok( ref($files) eq "ARRAY" && !scalar(@$files), "Can no longer find deleted file (via children())" );
+    $files = $gd->files( {}, { 'title' => 'testfile' } );
+    ok( ref($files) eq "ARRAY" && !scalar(@$files), "Can no longer find deleted file (via files)" );
 }

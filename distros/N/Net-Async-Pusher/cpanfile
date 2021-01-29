@@ -6,7 +6,9 @@ requires 'Mixin::Event::Dispatch', '>= 1.006';
 requires 'Net::Async::WebSocket::Client', 0;
 requires 'IO::Async::SSL', 0;
 requires 'JSON::MaybeXS', 0;
+requires 'JSON::MaybeUTF8', 0;
 requires 'Log::Any', 0;
+requires 'Syntax::Keyword::Try', 0;
 requires 'Ryu::Async', '>= 0.006';
 requires 'Variable::Disposition', '>= 0.004';
 

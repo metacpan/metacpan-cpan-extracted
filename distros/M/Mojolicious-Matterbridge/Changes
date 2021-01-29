@@ -1,2 +1,6 @@
 0.01 2021-01-27
     * Released on an unsuspecting world
+
+0.02 2021-01-28
+    * Fix missing URI prerequisite
+    * Add documentation, license information etc.

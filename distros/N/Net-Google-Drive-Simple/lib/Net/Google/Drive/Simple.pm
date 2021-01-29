@@ -8,19 +8,16 @@ use warnings;
 use LWP::UserAgent;
 use HTTP::Request;
 use HTTP::Headers;
-use HTTP::Request::Common;
-use Sysadm::Install qw( slurp );
 use File::Basename;
 use YAML qw( LoadFile DumpFile );
 use JSON qw( from_json to_json );
 use Log::Log4perl qw(:easy);
-use Data::Dumper;
 use File::MMagic;
 use OAuth::Cmdline::GoogleDrive;
 
 use Net::Google::Drive::Simple::Item;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 ###########################################
 sub new {
@@ -144,13 +141,10 @@ sub files {
     while (1) {
         my $url  = $self->file_url($opts);
         my $data = $self->http_json($url);
-
         return unless defined $data;
-
         my $next_item = $self->item_iterator($data);
 
         while ( my $item = $next_item->() ) {
-
             if ( $item->{kind} eq "drive#file" ) {
                 my $file = $item->{originalFilename};
                 if ( !defined $file ) {
@@ -218,7 +212,6 @@ sub file_upload {
 
     # First, insert the file placeholder, according to
     # http://stackoverflow.com/questions/10317638
-    my $file_data = slurp $file;
     my $mime_type = $self->file_mime_type($file);
 
     my $url;
@@ -243,12 +236,16 @@ sub file_upload {
     $url = URI->new( $self->{api_upload_url} . "/$file_id" );
     $url->query_form( uploadType => "media" );
 
+    my $file_length = -s $file;
+    my $file_data = _content_sub($file);
+
     if (
         $self->http_put(
             $url,
             {
-                "Content-Type" => $mime_type,
-                Content        => $file_data,
+                'Content-Type'   => $mime_type,
+                'Content'        => $file_data,
+                'Content-Length' => $file_length
             }
         )
     ) {
@@ -284,9 +281,10 @@ sub http_put {
 ###########################################
     my ( $self, $url, $body ) = @_;
 
-    my $req = &HTTP::Request::Common::PUT(
+    my $req = HTTP::Request->new(
+		'PUT',
         $url->as_string,
-        $self->{oauth}->authorization_headers(),
+        [ $self->{oauth}->authorization_headers() ],
         %$body,
     );
 
@@ -419,9 +417,10 @@ sub http_delete {
 ###########################################
     my ( $self, $url ) = @_;
 
-    my $req = &HTTP::Request::Common::DELETE(
+    my $req = HTTP::Request->new(
+        'DELETE',
         $url,
-        $self->{oauth}->authorization_headers(),
+        [ $self->{oauth}->authorization_headers() ],
     );
 
     my $resp = $self->http_loop($req);
@@ -466,7 +465,6 @@ sub children_by_folder_id {
         $url->query_form($opts);
 
         my $data = $self->http_json($url);
-
         return unless defined $data;
 
         my $next_item = $self->item_iterator($data);
@@ -641,22 +639,20 @@ sub http_json {
 ###########################################
     my ( $self, $url, $post_data ) = @_;
 
-    my $req;
-
+    my @headers = ( $self->{'oauth'}->authorization_headers() );
+    my $verb = 'GET';
+    my $content;
     if ($post_data) {
-        $req = &HTTP::Request::Common::POST(
-            $url->as_string,
-            $self->{oauth}->authorization_headers(),
-            "Content-Type" => "application/json",
-            Content        => to_json($post_data),
-        );
+        $verb = 'POST';
+        push @headers, "Content-Type", "application/json";
+        $content = to_json($post_data);
     }
-    else {
-        $req = HTTP::Request->new(
-            GET => $url->as_string,
-        );
-        $req->header( $self->{oauth}->authorization_headers() );
-    }
+    my $req = HTTP::Request->new(
+        $verb,
+        $url->as_string(),
+        \@headers,
+        $content,
+    );
 
     my $resp = $self->http_loop($req);
 
@@ -721,23 +717,48 @@ sub file_metadata {
 
     my $url = URI->new( $self->{api_file_url} . "/$file_id" );
 
-    my $req = &HTTP::Request::Common::GET(
-        $url->as_string,
-        $self->{oauth}->authorization_headers(),
-    );
+    return $self->http_json($url);
+}
 
-    my $ua   = LWP::UserAgent->new();
-    my $resp = $ua->request($req);
+###########################################
+sub _content_sub {
+###########################################
+    my $filename  = shift;
+    my @stat      = stat $filename;
+    my $remaining = $stat[7];
+    my $blksize   = $stat[11] || 4096;
 
-    if ( $resp->is_error ) {
-        $self->error( $resp->message() );
-        return;
-    }
+    die "$filename not a readable file with fixed size"
+      unless -r $filename
+          and $remaining;
 
-    my $data = from_json( $resp->content() );
+    my $fh = IO::File->new($filename, 'r')
+      or die "Could not open $filename: $!";
+    $fh->binmode;
 
-    # return $self->data_factory( $data );
-    return $data;
+    return sub {
+        my $buffer;
+
+        # upon retries the file is closed and we must reopen it
+        unless ($fh->opened) {
+            $fh = IO::File->new($filename, 'r')
+              or die "Could not open $filename: $!";
+            $fh->binmode;
+            $remaining = $stat[7];
+        }
+
+        unless (my $read = $fh->read($buffer, $blksize)) {
+            die
+              "Error while reading upload content $filename ($remaining remaining) $!"
+              if $! and $remaining;
+            $fh->close    # otherwise, we found EOF
+              or die "close of upload content $filename failed: $!";
+            $buffer
+              ||= '';  # LWP expects an empty string on finish, read returns 0
+        }
+        $remaining -= length($buffer);
+        return $buffer;
+    };
 }
 
 1;

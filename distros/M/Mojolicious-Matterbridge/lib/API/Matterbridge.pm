@@ -11,7 +11,7 @@ use URI;
 
 requires 'build_request', 'short_ua', 'stream_ua';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SEE ALSO
 
@@ -86,3 +86,31 @@ sub build_get_message_stream( $self ) {
 }
 
 1;
+
+=head1 REPOSITORY
+
+The public repository of this module is
+L<https://github.com/Corion/Mojolicious-Matterbridge>.
+
+=head1 SUPPORT
+
+The public support forum of this module is L<https://perlmonks.org/>.
+
+=head1 BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/Mojolicious-Matterbridge/issues>
+
+=head1 AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+=head1 COPYRIGHT (c)
+
+Copyright 2020 by Max Maischein C<corion@cpan.org>.
+
+=head1 LICENSE
+
+This module is released under the same terms as Perl itself.
+
+=cut

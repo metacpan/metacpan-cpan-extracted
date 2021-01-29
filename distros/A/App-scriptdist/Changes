@@ -1,7 +1,7 @@
-Revision history for Perl module scriptdist
+Revision history for Perl module App::scriptdist
 
-0.242 2017-04-24T05:45:35Z
-	* Fix a testing problem on Windows
+1.001 2021-01-29T02:25:15Z
+	* Freshen distro, remove Travis CI, add Github Actions
 
 0.242 2017-04-24T05:44:38Z
 	* Fix a testing problem on Windows

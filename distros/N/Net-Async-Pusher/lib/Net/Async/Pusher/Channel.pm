@@ -1,9 +1,12 @@
-package Net::Async::Pusher::Channel 0.004;
+package Net::Async::Pusher::Channel;
 
 use strict;
 use warnings;
 
 use parent qw(IO::Async::Notifier);
+
+our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
 
@@ -107,4 +110,4 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2021. Licensed under the same terms as Perl itself.

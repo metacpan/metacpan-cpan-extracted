@@ -2,37 +2,43 @@
 
 =encoding utf8
 
-=head1 The App::scriptdist module
+=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
 
-This is the I<README> for the L<App::scriptdist> Perl module. You're probably 
+=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+
+=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
+
+=for HTML <a href="https://ci.appveyor.com/project/briandfoy/scriptdist"><img src="https://ci.appveyor.com/api/projects/status/ecrprlft60phjowx?svg=true"></a>
+
+=for HTML <a href='https://coveralls.io/github/briandfoy/scriptdist?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/scriptdist/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=for HTML <a href="https://github.com/briandfoy/scriptdist/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/App-scriptdist.svg" /></a>
+
+=for HTML <a href="https://metacpan.org/pod/App::scriptdist"><img src="https://img.shields.io/cpan/v/App-scriptdist.svg" /></A>
+
+.=head1 The App::scriptdist module
+
+This is the I<README> for the L<App::scriptdist> Perl module. You're probably
 looking at this because you don't know where else to find what you're
-looking for. Read this once and you might never have to read one again 
+looking for. Read this once and you might never have to read one again
 for any Perl module.
 
 =head2 Documentation
 
-To read about L<App::scriptdist>, look at the embedded documentation 
-in the module itself. Inside the distribution, you can format it 
+To read about L<App::scriptdist>, look at the embedded documentation
+in the module itself. Inside the distribution, you can format it
 with L<perldoc|http://perldoc.perl.org/perldoc.html>:
 
-	% perldoc lib/0.23.pm
+	% perldoc lib/App/scriptdist.pm
 
 If you have already installed the module, you can specify the module
 name instead of the file location:
 
 	% perldoc App::scriptdist
 
-You can read the documentation and inspect the meta data on one of the 
-CPAN web interfaces, such as L<CPAN Search|http://search.cpan.org/dist/App-scriptdist> or 
-L<MetaCPAN|http://www.metacpan.org/module/App::scriptdist>:
+You can read the documentation and inspect the meta data on
+L<MetaCPAN|http://www.metacpan.org/module/App::scriptdist>.
 
-=over 4
-
-=item *	L<http://search.cpan.org/dist/App-scriptdist>
-
-=item *	L<http://www.metacpan.org/module/App::scriptdist>
-
-=back
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's
@@ -59,11 +65,11 @@ You could install just this module manually:
 	% make test
 	% make install
 
-You probably don't want to do that unless you're fiddling with the 
+You probably don't want to do that unless you're fiddling with the
 module and only want to run the tests without installing anything.
 
 =head2 Source location
-	
+
 The meta data, such as the source repository and bug tracker, is in
 I<Makefile.PL> or the I<META.*> files it creates. You can find that on
 those CPAN web interfaces, but you can also look at files directly in
@@ -75,7 +81,7 @@ the source repository:
 
 =back
 
-If you find a problem, file a ticket in the L<issue 
+If you find a problem, file a ticket in the L<issue
 tracker|https://github.com/briandfoy/scriptdist/issues>:
 
 =over 4
@@ -94,20 +100,20 @@ L<Perlmonks|http://www.perlmonks.org> or
 L<Stackoverflow|http://www.stackoverflow.com>, both of which have many
 competent Perlers who can answer your question, almost in real time.
 They might not know the particulars of this module, but they can help
-you diagnose your problem. 
+you diagnose your problem.
 
-You might like to read L<brian's Guide to Solving Any Perl 
-Problem|http://archive.oreilly.com/pub/a/perl/excerpts/9780596527242/brians-guide.html>.
+You might like to read L<brian's Guide to Solving Any Perl
+Problem|https://briandfoy.github.io/brians-guide-to-solving-any-perl-problem/>.
 
 =head2 Copyright and License
 
 You should have received a I<LICENSE> file, but the license is also noted
 in the module files. About the only thing you can't do is pretend that
-you wrote code that you didn't. 
+you wrote code that you didn't.
 
 =head2 Good luck!
 
-Enjoy, 
+Enjoy,
 
 brian d foy, bdfoy@cpan.org
 

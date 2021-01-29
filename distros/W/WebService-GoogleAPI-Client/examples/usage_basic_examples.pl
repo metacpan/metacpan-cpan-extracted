@@ -8,9 +8,17 @@ use File::Temp qw/ tempfile tempdir /;
 use File::Which;
 use feature 'say';
 
+use Mojo::Util qw/getopt/;
+
+getopt
+  'c|credentials' => \my $creds,
+  'u|user'        => \my $user;
+
+$creds //= './gapi.json';
+die "can't do cool things with no username!" unless $user;
 
 ## assumes gapi.json configuration in working directory with scoped project and user authorization
-my $gapi_client = WebService::GoogleAPI::Client->new( debug => 1, gapi_json => './gapi.json', user => 'peter@shotgundriver.com' );
+my $gapi_client = WebService::GoogleAPI::Client->new(gapi_json => $creds, user => $user);
 
 
 use Email::Simple;    ## RFC2822 formatted messages
@@ -18,25 +26,20 @@ use MIME::Base64;
 
 my $r;                ## using to contain result of queries ( Mojo::Message::Response instance )
 
-my $my_email_address = 'peter@shotgundriver.com';
 
-
-if ( 0 )
-{
-  print "Sending email to self\n";
-  $r = $gapi_client->api_query(
-    api_endpoint_id => 'gmail.users.messages.send',
-    options         => {
-      raw => encode_base64(
-        Email::Simple->create(
-          header => [To => $my_email_address, From => $my_email_address, Subject => "Test email from '$my_email_address' ",],
-          body   => "This is the body of email to '$my_email_address'",
-        )->as_string
-      )
-    },
-  );
-
-}
+print "Sending email to self\n";
+$r = $gapi_client->api_query(
+  api_endpoint_id => 'gmail.users.messages.send',
+  options         => {
+    raw => encode_base64(
+      Email::Simple->create(
+        header =>
+          [To => $user, From => $user, Subject => "Test email from '$user' ",],
+        body => "This is the body of email to '$user'",
+      )->as_string
+    )
+  },
+);
 
 if ( 0 )
 {
@@ -120,18 +123,6 @@ use WebService::GoogleAPI::Client::Discovery;
 #say my $x = WebService::GoogleAPI::Client::Discovery->new->list_of_available_google_api_ids();
 say 'fnarly' if ref( WebService::GoogleAPI::Client::Discovery->new->discover_all() ) eq 'HASH';
 
-#exit;
-if ( WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api() )
-{
-  #say  Dumper [ WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api() ];
-}
-else
-{
-  #say Dumper WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api();
-}
-
-say length( WebService::GoogleAPI::Client::Discovery->new->supported_as_text ) > 100;
-
 #say Dumper $x;
 
 say WebService::GoogleAPI::Client::Discovery->new->api_verson_urls;
@@ -141,6 +132,5 @@ print Dumper $f;
 my $dd = $f->get_credentials_for_refresh();
 
 
-#say WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api();
 #say join(',', WebService::GoogleAPI::Client->new->list_of_available_google_api_ids() ) . ' as list';
 #say  WebService::GoogleAPI::Client->new->list_of_available_google_api_ids() . ' as scalar';

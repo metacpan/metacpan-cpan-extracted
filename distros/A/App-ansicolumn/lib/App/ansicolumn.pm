@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 use v5.14;
 use warnings;
@@ -287,10 +287,12 @@ sub table_out {
 			 [ map --$_, split /,/, $obj->{table_right} ] => '');
     my @format = map { '%' . $align[$_] . $max[$_] . 's' } 0 .. $#max;
     for my $line (@lines) {
+	next unless @$line;
 	my @fmt = @format[0 .. $#{$line}];
 	$fmt[$#{$line}] = '%s' if $align[$#{$line}] eq '-';
 	my $format = join $obj->{output_separator}, @fmt;
 	ansi_printf $format, @$line;
+    } continue {
 	print "\n";
     }
 }

@@ -2,15 +2,11 @@
 use strict;
 use warnings;
 use feature qw(say);
-
 # For more details, enable this
 # use Log::Any::Adapter qw(Stdout);
-
 use IO::Async::Loop;
 use Net::Async::Pusher;
-
 my $loop = IO::Async::Loop->new;
-
 $loop->add(
 	my $pusher = Net::Async::Pusher->new
 );
@@ -32,4 +28,3 @@ my $sub = $pusher->connect(
 say "Subscribed and waiting for events...";
 $loop->run;
 $sub->()->get;
-

@@ -57,6 +57,7 @@ my %module = (
         'Moo::Role'          => 2,
         'Filter::signatures' => 0.16,
         'JSON'               => 0,
+        'URI'                => 0,
     },
     TEST_REQUIRES => {
         'Test::More'   => 0,

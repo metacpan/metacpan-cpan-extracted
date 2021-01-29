@@ -14,7 +14,7 @@ use URI;
 use Mojo::UserAgent;
 use API::Matterbridge::Message;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -27,13 +27,13 @@ Mojolicious::Matterbridge - a simplistic module to connect to chat servers via m
   my $client = Mojolicious::Matterbridge->new(
       url => 'http://localhost:4242/api/',
   );
-  
+
   $client->on('message' => sub( $c, $message ) {
       print sprintf "<%s> %s\n", $message->username, $message->text;
       $client->send( "Haha!" );
   });
   $client->connect();
-  
+
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =cut
@@ -137,3 +137,31 @@ sub send( $self, @messages ) {
 }
 
 1;
+
+=head1 REPOSITORY
+
+The public repository of this module is
+L<https://github.com/Corion/Mojolicious-Matterbridge>.
+
+=head1 SUPPORT
+
+The public support forum of this module is L<https://perlmonks.org/>.
+
+=head1 BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/Mojolicious-Matterbridge/issues>
+
+=head1 AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+=head1 COPYRIGHT (c)
+
+Copyright 2020 by Max Maischein C<corion@cpan.org>.
+
+=head1 LICENSE
+
+This module is released under the same terms as Perl itself.
+
+=cut

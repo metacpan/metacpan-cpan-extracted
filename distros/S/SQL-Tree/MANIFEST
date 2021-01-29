@@ -1,0 +1,17 @@
+bin/sqltree
+Changes
+cpanfile
+lib/SQL/Tree.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+share/Pg.sqlt
+share/SQLite.sqlt
+t/sqltree.t
+TODO
+xt/package-names.t
+xt/pod-coverage.t
+xt/pod.t
+xt/test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

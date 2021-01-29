@@ -31,8 +31,8 @@ requires:
   Indent: 0.01
   Readonly: 0
 resources:
-  bugtracker: https://github.com/michal-josef-spacek/issues
+  bugtracker: https://github.com/michal-josef-spacek/CSS-Struct-Output-Indent/issues
   homepage: https://github.com/michal-josef-spacek/CSS-Struct-Output-Indent
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/CSS-Struct-Output-Indent
-version: '0.03'
+version: '0.04'

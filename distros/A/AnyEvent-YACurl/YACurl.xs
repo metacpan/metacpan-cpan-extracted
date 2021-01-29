@@ -7,6 +7,7 @@
 #define MY_CXT_KEY "AnyEvent::YACurl::_guts" XS_VERSION
 
 #include <curl/curl.h>
+#include "libcurl-symbols.h"
 
 typedef struct {
     SV *watchset_fn;
@@ -474,6 +475,7 @@ CURLcode setopt_sv_or_croak(pTHX_ AnyEvent__YACurl__Response *request, CURLoptio
             break;
         }
 
+#ifdef CURL_BLOB_COPY
         /* blobs */
 #include "curlopt-blob.inc"
         {
@@ -483,6 +485,7 @@ CURLcode setopt_sv_or_croak(pTHX_ AnyEvent__YACurl__Response *request, CURLoptio
             result = curl_easy_setopt(request->easy, option, &blob);
             break;
         }
+#endif
 
         /* File handles */
         case CURLOPT_STDERR:

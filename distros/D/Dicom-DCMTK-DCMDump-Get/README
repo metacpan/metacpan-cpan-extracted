@@ -4,16 +4,24 @@ NAME
 
 SYNOPSIS
      use Dicom::DCMTK::DCMDump::Get;
+
      my $obj = Dicom::DCMTK::DCMDump::Get->new(%parameters);
      my $dcmdump = $obj->get($dicom_file);
 
 METHODS
-    "new(%parameters)"
-            Constructor.
+  "new"
+     my $obj = Dicom::DCMTK::DCMDump::Get->new(%parameters);
 
-    "get($dicom_file)"
-             Get dcmdump for DICOM file.
-             Returns string with dcmdump output.
+    Constructor.
+
+    Returns instance of object.
+
+  "get"
+     my $dcmdump = $obj->get($dicom_file);
+
+    Get dcmdump for DICOM file.
+
+    Returns string with dcmdump output.
 
 ERRORS
      new():
@@ -21,11 +29,9 @@ ERRORS
                      Unknown parameter '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Dicom::DCMTK::DCMDump::Get;
      use File::Temp qw(tempfile);
      use IO::Barf qw(barf);
@@ -127,17 +133,18 @@ SEE ALSO
         Install the Dicom modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Dicom-DCMTK-DCMDump-Get>
+    <https://github.com/michal-josef-spacek/Dicom-DCMTK-DCMDump-Get>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2014-2015
-     BSD 2-Clause License
+    © Michal Josef Špaček 2014-2021
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

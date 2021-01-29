@@ -1,0 +1,38 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use utf8;
+use CSS::Tidy 'tidy_css';
+
+my $text = '';
+
+while (<STDIN>) {
+    $text .= $_;
+}
+
+my $out = tidy_css ($text);
+print "$out\n";
+
+=head1 NAME
+
+csstidy - tidy CSS files to a consistent format
+
+=head1 DESCRIPTION
+
+This tidies CSS files into a consistent format.
+
+=head1 USAGE
+
+csstidy < in.css > out.css
+
+=head1 SEE ALSO
+
+L<CSS::Tidy>
+
+=head1 AUTHOR
+
+Ben Bullock <bkb@cpan.org>
+
+# Local variables:
+# mode: perl
+# End:

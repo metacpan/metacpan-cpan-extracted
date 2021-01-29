@@ -15,11 +15,37 @@ Mojolicious::Matterbridge - a simplistic module to connect to chat servers via m
     my $client = Mojolicious::Matterbridge->new(
         url => 'http://localhost:4242/api/',
     );
-    
+
     $client->on('message' => sub( $c, $message ) {
         print sprintf "<%s> %s\n", $message->username, $message->text;
         $client->send( "Haha!" );
     });
     $client->connect();
-    
+
     Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/Mojolicious-Matterbridge](https://github.com/Corion/Mojolicious-Matterbridge).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+[https://github.com/Corion/Mojolicious-Matterbridge/issues](https://github.com/Corion/Mojolicious-Matterbridge/issues)
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2020 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

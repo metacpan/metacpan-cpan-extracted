@@ -15,7 +15,8 @@ isa_ok($obj, 'CSS::Struct::Output::Indent');
 eval {
 	CSS::Struct::Output::Indent->new('');
 };
-is($EVAL_ERROR, "Unknown parameter ''.\n");
+is($EVAL_ERROR, "Unknown parameter ''.\n",
+	"Unknown parameter ''.");
 clean();
 
 # Test.
@@ -24,7 +25,8 @@ eval {
 		'output_handler' => '',
 	);
 };
-is($EVAL_ERROR, 'Output handler is bad file handler.'."\n");
+is($EVAL_ERROR, 'Output handler is bad file handler.'."\n",
+	'Output handler is bad file handler.');
 clean();
 
 # Test.
@@ -33,7 +35,8 @@ eval {
 		'comment_delimeters' => 'x',
 	);
 };
-is($EVAL_ERROR, "Bad comment delimeters.\n");
+is($EVAL_ERROR, "Bad comment delimeters.\n",
+	'Bad comment delimeters (x).');
 clean();
 
 # Test.
@@ -42,7 +45,8 @@ eval {
 		'comment_delimeters' => [q{/*}, 'x'],
 	);
 };
-is($EVAL_ERROR, "Bad comment delimeters.\n");
+is($EVAL_ERROR, "Bad comment delimeters.\n",
+	'Bad comment delimeters (/* and x).');
 clean();
 
 # Test.
@@ -51,7 +55,8 @@ eval {
 		'comment_delimeters' => ['x', 'x'],
 	);
 };
-is($EVAL_ERROR, "Bad comment delimeters.\n");
+is($EVAL_ERROR, "Bad comment delimeters.\n",
+	'Bad comment delimeters (x and x).');
 clean();
 
 # Test.
@@ -60,5 +65,6 @@ eval {
 		'auto_flush' => 1,
 	);
 };
-is($EVAL_ERROR, 'Auto-flush can\'t use without output handler.'."\n");
+is($EVAL_ERROR, 'Auto-flush can\'t use without output handler.'."\n",
+	'Auto-flush can\'t use without output handler.');
 clean();

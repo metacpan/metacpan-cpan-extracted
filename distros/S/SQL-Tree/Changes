@@ -1,0 +1,71 @@
+0.05 (2021-01-28)
+
+    Enhancements:
+        - Add a --no-comments option.
+        - Various code cleanups and improvements
+
+0.05_1 (2021-01-27)
+
+    API / Behaviour Changes:
+        - SQL::Tree function is now just "generate(\%args)" and is not
+          exported.
+        - sqltree: revamp of all arguments and options
+
+    Enhancements:
+        - Modernizing and refactoring. Much better SQLite code.
+
+    Dependencies:
+        - Remove a bunch of DBI/DBD::SQLite and Test:: stuff (made
+          development requirements)
+        - File::ShareDir, OptArgs2, Template::Tiny, Test2::V0, ...
+
+    Packaging:
+        - Migrate to ExtUtils::MakeMaker away from Module::Install.
+
+0.04 (2011-11-17)
+
+    API Changes:
+        - N/A
+
+    New Features:
+        - N/A
+
+    Enhancements:
+        - Perltidy and Podtidy all files with new .perltidyrc.
+
+    Bug Fixes:
+        - Correctly re-parent path columns on update.
+        - Correctly update path columns on 'path_from' update.
+
+0.03 (2010-08-03)
+
+    API Changes:
+        - Function 'generate' renamed to 'generate_sql_tree'.
+        - Option 'type' becomes 'pktype'.
+
+    New Features:
+        - N/A
+
+    Enhancements:
+        - Documentation & code cleanups.
+
+    Bug Fixes:
+        - $table_tree.depth should always be type INT.
+
+0.02 (2010-07-29)
+
+    API Changes:
+        - N/A
+
+    New Features:
+        - N/A
+
+    Enhancements:
+        - Compatible with Getop::Long::Descriptive 0.074.
+
+    Bug Fixes:
+        - N/A
+
+0.01 (2010-07-28)
+
+    Initial Release

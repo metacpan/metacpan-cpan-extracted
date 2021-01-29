@@ -1,0 +1,148 @@
+NAME
+    CSS::Struct::Output::Indent::AnsiColor - Indent printing 'CSS::Struct'
+    structure to CSS code with ansi color output.
+
+SYNOPSIS
+     use CSS::Struct::Output::Indent::AnsiColor;
+
+     my $css = CSS::Struct::Output::Indent::AnsiColor->new(%parameters);
+     my $ret_or_undef = $css->flush($reset_flag);
+     $css->put(@data);
+     $css->reset;
+
+METHODS
+  "new"
+     my $css = CSS::Struct::Output::Indent::AnsiColor->new(%parameters);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "auto_flush"
+
+             Auto flush flag.
+             Default is 0.
+
+    *       "comment_delimeters"
+
+             Reference to array with begin and end comment delimeter.
+             Default value is ['/*', '*/'].
+             Possible values are:
+             - ['/*', '*/']
+             - ['<!--', '-->'],
+
+    *       "next_indent"
+
+             Indent string.
+             Default value is TAB.
+
+    *       "output_handler"
+
+             Handler for print output strings.
+             Must be a GLOB.
+             Default is undef.
+
+    *       "skip_bad_types"
+
+             Flag, that means bad 'CSS::Struct' types skipping.
+             Default value is 0.
+
+    *       "skip_comments"
+
+             Flag, that means comment skipping.
+             Default value is 0.
+
+  "flush"
+     my $ret_or_undef = $css->flush($reset_flag);
+
+    Flush CSS structure in object. If defined 'output_handler' flush to its.
+    Or return CSS. If enabled $reset_flag, then resets internal variables
+    via reset method.
+
+    Returns output string or undef.
+
+  "put(@data)"
+     $css->put(@data);
+
+    Put CSS structure in format specified in CSS::Struct.
+
+    Returns undef.
+
+  "reset"
+     $css->reset;
+
+    Resets internal variables.
+
+    Returns undef.
+
+ERRORS
+     From CSS::Struct::Output:
+             Auto-flush can't use without output handler.
+             Bad comment delimeters.
+             Bad data.
+             Bad number of arguments.
+                     ('CSS::Struct' structure array),
+             Bad type of data.
+             Cannot write to output handler.
+             No opened selector.
+             Output handler is bad file handler.
+             Unknown parameter '%s'.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent::AnsiColor;
+
+     my $css = CSS::Struct::Output::Indent::AnsiColor->new(
+             'output_handler' => \*STDOUT,
+     );
+
+     $css->put(['c', 'Nice selector.']);
+     $css->put(['a', '@import', 'file.css']);
+     $css->put(['s', 'selector#id']);
+     $css->put(['s', 'div div']);
+     $css->put(['s', '.class']);
+     $css->put(['s', 'p.class']);
+     $css->put(['d', 'weight', '100px']);
+     $css->put(['d', 'font-size', '10em']);
+     $css->put(['d', '--border-color', 'hsl(0, 0%, 83%)']);
+     $css->put(['e']);
+     $css->flush;
+     print "\n";
+
+     # Output (in colors):
+
+DEPENDENCIES
+    CSS::Struct::Output, Indent, Readonly.
+
+SEE ALSO
+    CSS::Struct
+        Struct oriented CSS manipulation.
+
+    CSS::Struct::Output
+        Base class for CSS::Struct::Output::*.
+
+    CSS::Struct::Output::Raw
+        Raw printing 'CSS::Struct' structure to CSS code.
+
+    CSS::Struct::Output::Indent
+        Indent printing 'CSS::Struct' structure to CSS code.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/CSS-Struct-Output-Indent-AnsiCol
+    or>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

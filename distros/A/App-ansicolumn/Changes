@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ansicolumn
 
+1.05 2021-01-29T02:23:48Z
+
+    - Accept empty line with -t option.
+
 1.04 2020-12-29T02:13:32Z
 
     - Add --pagebreak option and form feed character handling.

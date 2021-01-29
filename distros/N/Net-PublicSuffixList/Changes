@@ -1,5 +1,8 @@
 # Changes for Net::PublicSuffixList
 
+0.501 2021-01-29T01:40:22Z
+	* Fix a problem with line-endings on Windows.
+
 0.500 2020-01-08T04:33:18Z
 	* Make this a user release
 

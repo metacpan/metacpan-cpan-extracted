@@ -1,3 +1,7 @@
+0.431     2021-01-28 17:04:25-06:00 America/Chicago
+    [ Other ]
+    - Fix the local/ directory being included in the distro
+
 0.430     2021-01-27 23:34:50-06:00 America/Chicago
 
     [ Bug Fixes ]

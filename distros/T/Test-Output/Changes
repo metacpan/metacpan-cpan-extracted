@@ -1,15 +1,9 @@
 Revision history for Perl module Test::Output
 
-1.031 2017-03-29T21:30:57Z
-	* Get rid of Sub::Exporter. That module has nice features that this
-	module doesn't use and the prereq is causing problems with CPAN
-	Testers. CPAN Grep didn't show anyone using advanced features for
-	exports.
+1.032 2021-01-28T22:15:07Z
+	* Fix cut-n-paste error in docs (Github #6, hexcoder)
 
 1.03 - 2014-01-03
-	* Get rid of MYMETA
-
-1.02_01 - 2013-12-17
 	* Get rid of MYMETA
 
 1.02 - 2013-07-08

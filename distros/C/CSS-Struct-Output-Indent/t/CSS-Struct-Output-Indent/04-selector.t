@@ -11,7 +11,7 @@ $obj->put(
 	['s', 'body'],
 );
 my $ret = $obj->flush;
-is($ret, '');
+is($ret, '', 'Nothing, not ended.');
 
 # Test.
 $obj->reset;
@@ -25,7 +25,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Blank selector.');
 
 # Test.
 $obj->reset;
@@ -40,4 +40,4 @@ body, div {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Two blank selectors.');

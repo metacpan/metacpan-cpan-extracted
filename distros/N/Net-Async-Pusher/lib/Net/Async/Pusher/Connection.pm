@@ -1,9 +1,10 @@
-package Net::Async::Pusher::Connection 0.004;
+package Net::Async::Pusher::Connection;
 
 use strict;
 use warnings;
 
-# VERSION
+our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(IO::Async::Notifier);
 
@@ -22,7 +23,10 @@ use Syntax::Keyword::Try;
 use Mixin::Event::Dispatch::Bus;
 use Net::Async::WebSocket::Client;
 use IO::Async::SSL;
+use URI;
+use HTML::Entities ();
 use JSON::MaybeXS;
+use JSON::MaybeUTF8 qw(:v1);
 use curry::weak;
 use Log::Any qw($log);
 use Variable::Disposition qw(retain_future);
@@ -46,11 +50,11 @@ Sends a ping request on this connection.
 sub send_ping {
     my ($self) = @_;
     $self->client->send_frame(
-        buffer => $self->json->encode({
+        buffer => encode_json_utf8({
             event => 'pusher:ping',
             data  => { }
         }),
-        masked => 1
+        masked => 1,
     );
     if(my $timer = $self->{inactivity_timer}) {
         $timer->stop if $timer->is_running;
@@ -92,11 +96,11 @@ sub incoming_frame {
             return $self->connected->done;
         } elsif($info->{event} eq 'pusher:ping') {
             return $self->client->send_frame(
-                buffer => $self->json->encode({
+                buffer => encode_json_utf8({
                     event => 'pusher:pong',
                     data  => { }
                 }),
-                masked => 1
+                masked => 1,
             );
         } elsif($info->{event} eq 'pusher:pong') {
             return $log->trace("Pong event received from pusher");
@@ -109,6 +113,15 @@ sub incoming_frame {
             error => $err, $frame
         );
     }
+}
+
+sub incoming_ping_frame {
+    my $self = shift;
+    my ($client, $frame) = @_;
+    $log->debugf('Received ping frame');
+    $self->client->send_pong_frame(
+        '',
+    );
 }
 
 sub socket_id { shift->{socket_id} }
@@ -141,7 +154,7 @@ sub open_channel {
             name => $name,
         );
         $self->add_child($ch);
-        my $frame = $self->json->encode({
+        my $frame = encode_json_utf8({
             event => 'pusher:subscribe',
             # double-encoded
             data  => {
@@ -174,23 +187,21 @@ sub connect {
     $self->add_child(
          $self->{client} = Net::Async::WebSocket::Client->new(
             on_frame => $self->curry::weak::incoming_frame,
+            on_ping_frame => $self->curry::weak::incoming_ping_frame,
         )
     );
-    retain_future(
-        $self->client->connect(
-            # all lovely hardcoded magic here
-            host    => 'ws.pusherapp.com',
-            service => 443,
-            url     => 'wss://ws.pusherapp.com/app/' . $self->key . '?protocol=7&client=perl-net-async-pusher&version=' . ($self->VERSION // '0.001'),
-            extensions => [ qw(SSL) ],
-        )->then(sub {
-            # don't seem to get any response until we send something first
-            $self->send_ping;
-            Future->done($self)
-        })->on_fail(sub {
-            $log->errorf('Failed to connect - %s', join ',', @_)
-        })
-    )
+    my $uri = URI->new('wss://ws-mt1.pusher.com/app/' . $self->key . '?protocol=7&client=perl-net-async-pusher&version=' . ($self->VERSION || '1.0'));
+    $log->tracef('Connecting to %s', $uri);
+    $self->client->connect(
+        url     => $uri,
+    )->then(sub {
+        $log->tracef('Connected to %s', $uri);
+        # don't seem to get any response until we send something first
+        $self->send_ping;
+        Future->done($self)
+    })->on_fail(sub {
+        $log->errorf('Failed to connect - %s', join ',', @_)
+    })->retain;
 }
 
 =head2 connected
@@ -227,5 +238,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2021. Licensed under the same terms as Perl itself.
 

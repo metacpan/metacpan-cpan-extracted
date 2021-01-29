@@ -2,38 +2,72 @@ use strictures;
 use 5.14.0;
 
 package WebService::GoogleAPI::Client;
-$WebService::GoogleAPI::Client::VERSION = '0.21';
+
+our $VERSION = '0.24';    # VERSION
+
 use Data::Dump qw/pp/;
 use Moo;
 use WebService::GoogleAPI::Client::UserAgent;
 use WebService::GoogleAPI::Client::Discovery;
+use WebService::GoogleAPI::Client::AuthStorage::GapiJSON;
+use WebService::GoogleAPI::Client::AuthStorage::ServiceAccount;
 use Carp;
 use CHI;
-use List::MoreUtils qw(uniq);
+use Mojo::Util;
 
+#TODO- batch requests. The only thing necessary is to send  a
+#multipart request as I wrote in that e-mail.
+#
+#TODO- implement auth for service accounts.
+#
+#TODO- allow using promises instead of just calling. Also allow
+#      for full access to the tx instead of assuming it's always
+#      returning the res. Perhaps mix in something that delegates the
+#      json method to the res?
 
 # ABSTRACT: Google API Discovery and SDK
 
 #   FROM MCE POD -- <p><img src="https://img.shields.io/cpan/v/WebService-GoogleAPI-Client.png" width="664" height="446" alt="Bank Queuing Model" /></p>
 
 
-has 'debug' => ( is => 'rw', default => 0, lazy => 1 );    ## NB - when udpated change doesn't propogate !
-has 'ua' => (
-  handles => [qw/access_token auth_storage  do_autorefresh get_scopes_as_array user /],
+has 'debug' => (is => 'rw', default => 0, lazy => 1);
+has 'ua'    => (
+  handles => [qw/do_autorefresh auth_storage get_access_token scopes user/],
   is      => 'ro',
-  default => sub { WebService::GoogleAPI::Client::UserAgent->new( debug => shift->debug ) },
-  lazy    => 1,
+  default =>
+    sub { WebService::GoogleAPI::Client::UserAgent->new(debug => shift->debug) }
+  ,
+  lazy => 1,
 );
-has 'chi' => ( is => 'rw', default => sub { CHI->new( driver => 'File', max_key_length => 512, namespace => __PACKAGE__ ) }, lazy => 1 );
+
+sub get_scopes_as_array {
+  carp 'get_scopes_as_array has deprecated in favor of the shorter "scopes"';
+  return $_[0]->scopes;
+}
+
+has 'chi' => (
+  is      => 'rw',
+  default => sub {
+    CHI->new(driver => 'File', max_key_length => 512, namespace => __PACKAGE__);
+  },
+  lazy => 1
+);
+
 has 'discovery' => (
   handles => [
-    qw/  discover_all extract_method_discovery_detail_from_api_spec get_api_discovery_for_api_id
-      methods_available_for_google_api_id list_of_available_google_api_ids  /    ## get_method_meta
+    qw/  discover_all
+      get_method_details
+      get_api_document service_exists
+      methods_available_for_google_api_id list_api_ids  /
   ],
   is      => 'ro',
   default => sub {
     my $self = shift;
-    return WebService::GoogleAPI::Client::Discovery->new( debug => $self->debug, ua => $self->ua, chi => $self->chi );
+    return WebService::GoogleAPI::Client::Discovery->new(
+      debug => $self->debug,
+      ua    => $self->ua,
+      chi   => $self->chi
+    );
   },
   lazy => 1,
 );
@@ -42,16 +76,34 @@ has 'discovery' => (
 ##  see https://metacpan.org/pod/distribution/Moose/lib/Moose/Manual/Construction.pod if like me you an new to Moose
 
 
-sub BUILD
-{
-  my ( $self, $params ) = @_;
+#NOTE- in terms of implementing google's ADC
+# (see https://cloud.google.com/docs/authentication/production and also
+#  https://github.com/googleapis/python-cloud-core/blob/master/google/cloud/client.py)
+# I looked into it and based on that, it seems that every environment has different reqs,
+#  so it's a maintenance liability
+sub BUILD {
+  my ($self, $params) = @_;
 
-  $self->auth_storage->setup( { type => 'jsonfile', path => $params->{ gapi_json } } ) if ( defined $params->{ gapi_json } );
-  $self->user( $params->{ user } ) if ( defined $params->{ user } );
+  my ($storage, $file);
+  if ($params->{auth_storage}) {
+    $storage = $params->{auth_storage};
+  } elsif ($file = $params->{gapi_json}) {
+    $storage =
+      WebService::GoogleAPI::Client::AuthStorage::GapiJSON->new(path => $file);
+  } elsif ($file = $params->{service_account}) {
+    $storage = WebService::GoogleAPI::Client::AuthStorage::ServiceAccount->new(
+      path   => $file,
+      scopes => $params->{scopes}
+    );
+  } elsif ($file = $ENV{GOOGLE_APPLICATION_CREDENTIALS}) {
+    $storage = WebService::GoogleAPI::Client::AuthStorage::ServiceAccount->new(
+      path   => $file,
+      scopes => $params->{scopes}
+    );
+  }
+  $self->auth_storage($storage) if $storage;
 
-  ## how to handle chi as a parameter
-  $self->discovery->chi( $self->chi );    ## is this redundant? set in default?
-  ## TODO - think about consequences of user not providing auth storage or user on instantiaton
+  $self->user($params->{user}) if (defined $params->{user});
 }
 
 
@@ -71,174 +123,253 @@ sub BUILD
 
 ## NB - uses the ua api_query to execute the server request
 ##################################################
-sub api_query
-{
-  my ( $self, @params_array ) = @_;
+sub api_query {
+  my ($self, @params_array) = @_;
 
   ## TODO - find a more elgant idiom to do this - pulled this off top of head for quick imeplementation
   my $params = {};
-  if ( scalar( @params_array ) == 1 && ref( $params_array[0] ) eq 'HASH' )
-  {
+  if (scalar(@params_array) == 1 && ref($params_array[0]) eq 'HASH') {
     $params = $params_array[0];
+  } else {
+    $params = {@params_array};    ## what happens if not even count
   }
-  else
-  {
-    $params = { @params_array };    ## what happens if not even count
-  }
-  carp( pp $params) if $self->debug > 10;
+  carp(pp $params) if $self->debug > 10;
 
+  croak "Missing neccessary scopes to access $params->{api_endpoint_id}"
+    unless $self->has_scope_to_access_api_endpoint($params->{api_endpoint_id});
 
-  my @teapot_errors = ();           ## used to collect pre-query validation errors - if set we return a response with 418 I'm a teapot
-  @teapot_errors = $self->_process_params_for_api_endpoint_and_return_errors( $params )
-    if ( defined $params->{ api_endpoint_id } );    ## ## pre-query validation if api_id parameter is included
+  ## used to collect pre-query validation errors - if set we return a response
+  #  with 418 I'm a teapot
+  my @teapot_errors = ();
+  ## pre-query validation if api_id parameter is included
+  @teapot_errors = $self->_process_params($params)
+    if (defined $params->{api_endpoint_id});
 
-
-  if ( not defined $params->{ path } )              ## either as param or from discovery
-  {
+  ## either as param or from discovery
+  if (not defined $params->{path}) {
     push @teapot_errors, 'path is a required parameter';
-    $params->{ path } = '';
+    $params->{path} = '';
   }
-  push @teapot_errors, "Path '$params->{path}' includes unfilled variable after processing" if ( $params->{ path } =~ /\{.+\}/xms );
-
-  if ( @teapot_errors > 0 )                         ## carp and include in 418 TEAPOT ERROR - response body with @teapot errors
-  {
-    carp( join( "\n", @teapot_errors ) ) if $self->debug;
+  push @teapot_errors,
+    "Path '$params->{path}' includes unfilled variable after processing"
+    if ($params->{path} =~ /\{.+\}/xms);
+  ## carp and include in 418 TEAPOT ERROR - response body with @teapot errors
+  if (@teapot_errors > 0) {
+    carp(join("\n", @teapot_errors)) if $self->debug;
     return Mojo::Message::Response->new(
       content_type => 'text/plain',
       code         => 418,
-      message      => 'Teapot Error - Reqeust blocked before submitting to server with pre-query validation errors',
-      body         => join( "\n", @teapot_errors )
+      message      =>
+'Teapot Error - Reqeust blocked before submitting to server with pre-query validation errors',
+      body => join("\n", @teapot_errors)
     );
-  }
-  else                                              ## query looks good - send to user agent to execute
-  {
-    #print pp $params;
-    return $self->ua->validated_api_query( $params );
+  } else {
+    ## query looks good - send to user agent to execute
+    return $self->ua->validated_api_query($params);
   }
 }
 ##################################################
 
 ##################################################
 ## _ensure_api_spec_has_defined_fields is really only used to allow carping without undef warnings if needed
-sub _ensure_api_spec_has_defined_fields
-{
-  my ( $self, $api_discovery_struct ) = @_;
+sub _ensure_api_spec_has_defined_fields {
+  my ($self, $api_discovery_struct) = @_;
   ## Ensure API Discovery has expected fields defined
-  foreach my $expected_key ( qw/path title ownerName version id discoveryVersion revision description documentationLink rest/ )
-  {
-    $api_discovery_struct->{ $expected_key } = '' unless defined $api_discovery_struct->{ $expected_key };
+  foreach my $expected_key (
+    qw/path title ownerName version id discoveryVersion
+    revision description documentationLink rest/
+  ) {
+    $api_discovery_struct->{$expected_key} = ''
+      unless defined $api_discovery_struct->{$expected_key};
   }
-  $api_discovery_struct->{ canonicalName } = $api_discovery_struct->{ title } unless defined $api_discovery_struct->{ canonicalName };
+  $api_discovery_struct->{canonicalName} = $api_discovery_struct->{title}
+    unless defined $api_discovery_struct->{canonicalName};
   return $api_discovery_struct;
 }
 ##################################################
 
 ##################################################
-sub _process_params_for_api_endpoint_and_return_errors
-{
-  my ( $self, $params ) = @_;    ## nb - api_endpoint is a param - param key values are modified through this sub
+sub _process_params_for_api_endpoint_and_return_errors {
+  warn
+'_process_params_for_api_endpoint_and_return_errors has been deprecated. Please use _process_params';
+  _process_params(@_);
+}
 
-  croak( 'this should never happen - this method is internal only!' ) unless defined $params->{ api_endpoint_id };
+sub _process_params {
+  ## nb - api_endpoint is a param - param key values are modified through this sub
+  my ($self, $params) = @_;
 
-  my $api_discovery_struct = $self->_ensure_api_spec_has_defined_fields( $self->discovery->get_api_discovery_for_api_id( $params->{ api_endpoint_id } ) )
-    ;                                                   ## $api_discovery_struct requried for service base URL
-  $api_discovery_struct->{ baseUrl } =~ s/\/$//sxmg;    ## remove trailing '/' from baseUrl
+  croak('this should never happen - this method is internal only!')
+    unless defined $params->{api_endpoint_id};
 
-  my $method_discovery_struct = $self->extract_method_discovery_detail_from_api_spec( $params->{ api_endpoint_id } )
-    ;                                                   ## if can get discovery data for google api endpoint then continue to perform detailed checks
+  ## $api_discovery_struct requried for service base URL
+  my $api_discovery_struct = $self->_ensure_api_spec_has_defined_fields(
+    $self->discovery->get_api_document($params->{api_endpoint_id}));
+  ## remove trailing '/' from baseUrl
+  $api_discovery_struct->{baseUrl} =~ s/\/$//sxmg;
+
+  ## if can get discovery data for google api endpoint then continue to perform
+  #  detailed checks
+  my $method_discovery_struct =
+    $self->get_method_details($params->{api_endpoint_id});
+
+  #save away original path so we can know if it's fiddled with
+  #later
+  $method_discovery_struct->{origPath} = $method_discovery_struct->{path};
 
   ## allow optional user callback pre-processing of method_discovery_struct
-  $method_discovery_struct = &{ $params->{ cb_method_discovery_modify } }( $method_discovery_struct )
-    if ( defined $params->{ cb_method_discovery_modify } && ref( $params->{ cb_method_discovery_modify } ) eq 'CODE' );
+  $method_discovery_struct =
+    &{ $params->{cb_method_discovery_modify} }($method_discovery_struct)
+    if (defined $params->{cb_method_discovery_modify}
+    && ref($params->{cb_method_discovery_modify}) eq 'CODE');
 
-  return ( "Checking discovery of $params->{api_endpoint_id} method data failed - is this a valid end point" ) unless ( keys %{ $method_discovery_struct } > 0 );
-  ## assertion: method discovery struct ok - or at least has keys
-  carp( "API Endpoint $params->{api_endpoint_id} discovered specification didn't include expected 'parameters' keyed HASH structure" )
-    unless ref( $method_discovery_struct->{ parameters } ) eq 'HASH';
+  my @teapot_errors = ();    ## errors are pushed into this as encountered
+  $params->{method} = $method_discovery_struct->{httpMethod} || 'GET'
+    if (not defined $params->{method});
+  push(@teapot_errors,
+"method mismatch - you requested a $params->{method} which conflicts with discovery spec requirement for $method_discovery_struct->{httpMethod}"
+  ) if ($params->{method} !~ /^$method_discovery_struct->{httpMethod}$/sxim);
 
-  my @teapot_errors = ();                               ## errors are pushed into this as encountered
-  $params->{ method } = $method_discovery_struct->{ httpMethod } || 'GET' if ( not defined $params->{ method } );
-  push( @teapot_errors, "method mismatch - you requested a $params->{method} which conflicts with discovery spec requirement for $method_discovery_struct->{httpMethod}" )
-    if ( $params->{ method } !~ /^$method_discovery_struct->{httpMethod}$/sxim );
-  push( @teapot_errors, "Client Credentials do not include required scope to access $params->{api_endpoint_id}" )
-    unless $self->has_scope_to_access_api_endpoint( $params->{ api_endpoint_id } );    ## ensure user has required scope access
-  $params->{ path } = $method_discovery_struct->{ path } unless $params->{ path };     ## Set default path iff not set by user - NB - will prepend baseUrl later
-  push @teapot_errors, 'path is a required parameter' unless $params->{ path };
+  ## Set default path iff not set by user - NB - will prepend baseUrl later
+  $params->{path} = $method_discovery_struct->{path} unless $params->{path};
+  push @teapot_errors, 'path is a required parameter' unless $params->{path};
 
-  push @teapot_errors, $self->_interpolate_path_parameters_append_query_params_and_return_errors( $params, $method_discovery_struct );
+  push @teapot_errors,
+    $self->_interpolate_path_parameters_append_query_params_and_return_errors(
+    $params, $method_discovery_struct);
 
-  $params->{ path } =~ s/^\///sxmg;                                                    ## remove leading '/'  from path
-  $params->{ path } = "$api_discovery_struct->{baseUrl}/$params->{path}" unless $params->{ path } =~ /^$api_discovery_struct->{baseUrl}/ixsmg;    ## prepend baseUrl if required
+  $params->{path} =~ s/^\///sxmg;    ## remove leading '/'  from path
+  $params->{path} = "$api_discovery_struct->{baseUrl}/$params->{path}"
+    unless $params->{path} =~
+    /^$api_discovery_struct->{baseUrl}/ixsmg;    ## prepend baseUrl if required
 
   ## if errors - add detail available in the discovery struct for the method and service to aid debugging
-  push( @teapot_errors,
-    qq{ $api_discovery_struct->{title} $api_discovery_struct->{rest} API into $api_discovery_struct->{ownerName} $api_discovery_struct->{canonicalName} $api_discovery_struct->{version} with id $method_discovery_struct->{id} as described by discovery document version $method_discovery_struct->{discoveryVersion} revision $method_discovery_struct->{revision} with documentation at $api_discovery_struct->{documentationLink} \nDescription $api_discovery_struct->{description}\n}
-  ) if ( @teapot_errors );
+  push @teapot_errors,
+qq{ $api_discovery_struct->{title} $api_discovery_struct->{rest} API into $api_discovery_struct->{ownerName} $api_discovery_struct->{canonicalName} $api_discovery_struct->{version} with id $method_discovery_struct->{id} as described by discovery document version $api_discovery_struct->{discoveryVersion} revision $api_discovery_struct->{revision} with documentation at $api_discovery_struct->{documentationLink} \nDescription: $method_discovery_struct->{description}\n}
+    if @teapot_errors;
 
   return @teapot_errors;
 }
 ##################################################
 
+#small subs to convert between these_types to theseTypes of params
+#TODO- should probs move this into a Util module
+sub camel { shift if @_ > 1; $_[0] =~ s/ _(\w) /\u$1/grx }
+sub snake { shift if @_ > 1; $_[0] =~ s/([[:upper:]])/_\l$1/grx }
 
 ##################################################
-sub _interpolate_path_parameters_append_query_params_and_return_errors
-{
-  my ( $self, $params, $method_discovery_struct ) = @_;
+sub _interpolate_path_parameters_append_query_params_and_return_errors {
+  my ($self, $params, $discovery_struct) = @_;
   my @teapot_errors = ();
 
   my @get_query_params = ();
-  my %path_params = map { $_ => 1 } ( $params->{ path } =~ /\{\+*([^\}]+)\}/xg );    ## the params embedded in the path as indexes of hash
 
-  foreach my $meth_param_spec ( uniq( keys %path_params, keys %{ $method_discovery_struct->{ parameters } } ) )
-  {
-    if ( ( defined $path_params{ $meth_param_spec } ) && ( defined $params->{ options }{ $meth_param_spec } ) )    ## if param option is in the path then interpolate and forget
-    {
-      $params->{ path } =~ s/\{\+*$meth_param_spec\}/$params->{options}{$meth_param_spec}/xsmg;
-      delete $params->{ options }{ $meth_param_spec };                                                             ## if a GET param should not also be a BODY param
+  #create a hash of whatever the expected params may be
+  my %path_params;
+  my $param_regex = qr/\{ \+? ([^\}]+) \}/x;
+  if ($params->{path} ne $discovery_struct->{origPath}) {
+
+    #check if the path was given as a custom path. If it is, just
+    #interpolate things directly, and assume the user is responsible
+    %path_params = map { $_ => 'custom' } ($params->{path} =~ /$param_regex/xg);
+  } else {
+
+    #label which param names are from the normal path and from the
+    #flat path
+    %path_params =
+      map { $_ => 'plain' } ($discovery_struct->{path} =~ /$param_regex/xg);
+    if ($discovery_struct->{flatPath}) {
+      %path_params = (
+        %path_params,
+        map { $_ => 'flat' } ($discovery_struct->{flatPath} =~ /$param_regex/xg)
+      );
     }
-    elsif ( $method_discovery_struct->{ parameters }{ $meth_param_spec }{ 'location' } eq 'path' )                 ## this is a path variable
-    {
-      ## interpolate variables into URI if available and not filled
-      if ( $params->{ path } =~ /\{.+\}/xms )    ## there are un-interpolated variables in the path - try to fill them for this param if reqd
-      {
-        #carp( "$params->{path} includes un-filled variables " ) if $self->debug > 10;
-        ## requires interpolations into the URI -- consider && into containing if
-        if ( $params->{ path } =~ /\{\+*$meth_param_spec\}/xg )    ## eg match {jobId} or {+jobId} in 'v1/jobs/{jobId}/reports/{reportId}'
-        {
-          ## if provided as an option
-          if ( defined $params->{ options }{ $meth_param_spec } )
-          {
-            carp( "DEBUG: $meth_param_spec is defined in param->{options}" ) if $self->{ debug } > 10;
-            $params->{ path } =~ s/\{\+*$meth_param_spec\}/$params->{options}{$meth_param_spec}/xsmg;
-            delete $params->{ options }{ $meth_param_spec };       ## if a GET param should not also be a BODY param
-          }
-          elsif (
-            defined $method_discovery_struct->{ parameters }{ $meth_param_spec }{ default }
-            )    ## not provided as an option but a default value is provided in the spec - should be assumed by server so could probbaly remove this
-          {
-            $params->{ path } =~ s/\{\+*$meth_param_spec\}/$method_discovery_struct->{parameters}{$meth_param_spec}{default}/xsmg;
-          }
-          else    ## otherwise flag as an error - unable to interpolate
-          {
-            push( @teapot_errors, "$params->{path} requires interpolation value for $meth_param_spec but none provided as option and no default value provided by specification" );
-          }
+  }
+
+
+  #switch the path we're dealing with to the flat path if any of
+  #the parameters match the flat path
+  $params->{path} = $discovery_struct->{flatPath}
+    if grep { $_ eq 'flat' }
+    map { $path_params{ camel $_} || () } keys %{ $params->{options} };
+
+
+  #loop through params given, placing them in the path or query,
+  #or leaving them for the request body
+  for my $param_name (keys %{ $params->{options} }) {
+
+    #first check if it needs to be interpolated into the path
+    if ($path_params{$param_name} || $path_params{ camel $param_name}) {
+
+      #pull out the value from the hash, and remove the key
+      my $param_value = delete $params->{options}{$param_name};
+
+      #Camelize the param name if not passed in customly, allowing
+      #the user to pass in camelCase or snake_case param names.
+      #This implictly allows for a non camelCased param to be left
+      #alone in a custom param.
+      $param_name = camel $param_name if $path_params{ camel $param_name};
+
+      #first deal with any param that doesn't have a plus, b/c
+      #those just get interpolated
+      $params->{path} =~ s/\{$param_name\}/$param_value/;
+
+      #if there's a plus in the path spec, we need more work
+      if ($params->{path} =~ /\{ \+ $param_name \}/x) {
+        my $pattern = $discovery_struct->{parameters}{$param_name}{pattern};
+
+        #if the given param matches google's pattern for the
+        #param, just interpolate it straight
+        if ($param_value =~ /$pattern/) {
+          $params->{path} =~ s/\{\+$param_name\}/$param_value/;
+        } else {
+
+          #N.B. perhaps support passing an arrayref or csv for those
+          #params such as jobs.projects.jobs.delete which have two
+          #dynamic parts. But for now, unnecessary
+
+          #remove the regexy parts of the pattern to interpolate it
+          #into the path, assuming the user has provided just the
+          #dynamic portion of the param.
+          $pattern =~ s/^\^ | \$$//gx;
+          my $placeholder = qr/ \[ \^ \/ \] \+ /x;
+          $params->{path} =~ s/\{\+$param_name\}/$pattern/x;
+          $params->{path} =~ s/$placeholder/$param_value/x;
+          push @teapot_errors, "Not enough parameters given for {+$param_name}."
+            if $params->{path} =~ /$placeholder/;
         }
       }
+
+      #skip to the next run, so I don't need an else clause later
+      next;    #I don't like nested if-elses
     }
-    elsif ( ( defined $params->{ options }{ $meth_param_spec } )
-      && ( $method_discovery_struct->{ parameters }{ $meth_param_spec }{ 'location' } eq 'query' ) )    ## check post form variables .. assume not get?
-    {
-      $params->{ options }{ $meth_param_spec } = $method_discovery_struct->{ parameters }{ $meth_param_spec }{ default }
-        if ( defined $method_discovery_struct->{ parameters }{ $meth_param_spec }{ default } );
-      push( @get_query_params, "$meth_param_spec=$params->{options}{$meth_param_spec}" ) if defined $params->{ options }{ $meth_param_spec };
-      delete $params->{ options }{ $meth_param_spec };
-    }
+
+    #if it's not in the list of params, then it goes in the
+    #request body, and our work here is done
+    next unless $discovery_struct->{parameters}{$param_name};
+
+    #it must be a GET type query param, so push the name and value
+    #on our param stack and take it off of the options list
+    push @get_query_params, $param_name, delete $params->{options}{$param_name};
   }
-  if ( scalar( @get_query_params ) > 0 )
-  {
-    #$params->{path} .= '/' unless $params->{path} =~ /\/$/mx;
-    $params->{ path } .= '?' . join( '&', @get_query_params );
+
+  #if there are any query params...
+  if (@get_query_params) {
+
+    #interpolate and escape the get query params built up in our
+    #former for loop
+    $params->{path} .= ($params->{path} =~ /\?/) ? '&' : '?';
+    $params->{path} .= Mojo::Parameters->new(@get_query_params);
   }
+
+  #interpolate default value for path params if not given. Needed
+  #for things like the gmail API, where userID is 'me' by default
+  for my $param_name ($params->{path} =~ /$param_regex/g) {
+    my $param_value = $discovery_struct->{parameters}{$param_name}{default};
+    $params->{path} =~ s/\{$param_name\}/$param_value/ if $param_value;
+  }
+  push @teapot_errors, "Missing a parameter for {$_}."
+    for $params->{path} =~ /$param_regex/g;
 
   #print pp $params;
   #exit;
@@ -247,38 +378,32 @@ sub _interpolate_path_parameters_append_query_params_and_return_errors
 ##################################################
 
 
-########################################################
-sub has_scope_to_access_api_endpoint
-{
-  my ( $self, $api_ep ) = @_;
-  return 0 unless defined $api_ep;
-  return 0 if $api_ep eq '';
-  my $method_spec = $self->extract_method_discovery_detail_from_api_spec( $api_ep );
+sub has_scope_to_access_api_endpoint {
+  my ($self, $api_ep) = @_;
+  my $method_spec = $self->get_method_details($api_ep);
 
-  if ( keys( %$method_spec ) > 0 )    ## empty hash indicates failure
-  {
-    my $configured_scopes = $self->ua->get_scopes_as_array();    ## get user scopes arrayref
+  if (keys %$method_spec) {
+    my $configured_scopes = $self->scopes;    ## get user scopes arrayref
     ## create a hashindex to facilitate quick lookups
-    my %configured_scopes_hash = map { s/\/$//xr, 1 } @$configured_scopes;    ## NB r switch as per https://www.perlmonks.org/?node_id=613280 to filter out any trailing '/'
-    my $granted                = 0;                                           ## assume permission not granted until we find a matching scope
-    my $required_scope_count   = 0
-      ; ## if the final count of scope constraints = 0 then we will assume permission is granted - this has proven necessary for the experimental Google My Business because scopes are not defined in the current discovery data as at 14/10/18
-    foreach my $method_scope ( map {s/\/$//xr} @{ $method_spec->{ scopes } } )
-    {
+    my %configured_scopes_hash = map { (s/\/$//xr, 1) } @$configured_scopes;
+    ## NB r switch as per https://www.perlmonks.org/?node_id=613280 to filter
+    #out any trailing '/'
+    my $granted = 0;
+    ## assume permission not granted until we find a matching scope
+    my $required_scope_count = 0;
+    ## if the final count of scope constraints = 0 then we will assume permission is granted - this has proven necessary for the experimental Google My Business because scopes are not defined in the current discovery data as at 14/10/18
+    for my $method_scope (map { s/\/$//xr } @{ $method_spec->{scopes} }) {
       $required_scope_count++;
-      $granted = 1 if defined $configured_scopes_hash{ $method_scope };
-      last if $granted;
+      $granted = 1 if defined $configured_scopes_hash{$method_scope};
+      last         if $granted;
     }
-    $granted = 1 if ( $required_scope_count == 0 );
+    $granted = 1 if $required_scope_count == 0;
     return $granted;
-  }
-  else
-  {
-    return 0;    ## cannot get method spec - warnings should have already been issued - returning - to indicate access denied
+  } else {
+    return 0;
   }
 
 }
-########################################################
 
 
 #TODO: Consider rename to return_fetched_google_v1_apis_discovery_structure
@@ -301,16 +426,16 @@ WebService::GoogleAPI::Client - Google API Discovery and SDK
 
 =head1 VERSION
 
-version 0.21
+version 0.24
 
 =head1 SYNOPSIS
 
-Access Google API Services Version 1 using an OAUTH2 User Agent.
+Access Google API Services using an OAUTH2 User Agent.
 
-Includes Discovery, validation authentication and API Access.
+Includes Discovery, validation, authentication and API Access.
 
-assumes gapi.json configuration in working directory with scoped Google project 
-redentials and user authorization created by _goauth_
+By default assumes gapi.json configuration in working directory with scoped Google project 
+credentials and user authorization created by L<goauth>.
 
     use WebService::GoogleAPI::Client;
     
@@ -324,9 +449,12 @@ redentials and user authorization created by _goauth_
       say 'User has Access to GMail Method End-Point gmail.users.settings.sendAs.get';
     }
 
-Internal User Agent provided be property WebService::GoogleAPI::Client::UserAgent dervied from Mojo::UserAgent
+Package includes L<goauth> CLI Script to collect initial end-user authorisation
+to scoped services.
 
-Package includes I<go_auth> CLI Script to collect initial end-user authorisation to scoped services
+Note to intrepid hackers: Any method that isn't documented is considered
+private, and subject to change in breaking ways without notice. (Although I'm a
+pretty nice guy, and probably will leave a warning or something).
 
 =begin html <a href="https://travis-ci.org/pscott-au//WebService-GoogleAPI-Client"><img alt="Build Status" src="https://api.travis-ci.org/pscott-au/WebService-GoogleAPI-Client.png?branch=master" /></a>
 <a href="https://metacpan.org/pod/WebService::GoogleAPI::Client"><img alt="CPAN version" src="https://img.shields.io/cpan/v/WebService-GoogleAPI-Client.png" /></a>
@@ -342,18 +470,21 @@ Package includes I<go_auth> CLI Script to collect initial end-user authorisation
     use MIME::Base64;
     my $my_email_address = 'peter@shotgundriver.com'
 
+    my $raw_email_payload = encode_base64(
+      Email::Simple->create(
+        header => [
+          To      => $my_email_address,
+          From    => $my_email_address,
+          Subject => "Test email from '$my_email_address' ",
+        ],
+        body => "This is the body of email to '$my_email_address'",
+      )->as_string
+    );
 
-    my $raw_email_payload = encode_base64( Email::Simple->create( header => [To => $my_email_address, 
-                                                                             From => $my_email_address, 
-                                                                             Subject =>"Test email from '$my_email_address' ",], 
-                                                                             body => "This is the body of email to '$my_email_address'", 
-                                                                )->as_string 
-                                        );
-
-    $gapi_client->api_query( 
-                            api_endpoint_id => 'gmail.users.messages.send',
-                            options    => { raw => $raw_email_payload },
-                        );
+    $gapi_client->api_query(
+      api_endpoint_id => 'gmail.users.messages.send',
+      options         => { raw => $raw_email_payload },
+    );
 
 =head2 MANUAL API REQUEST CONSTRUCTION - GET CALENDAR LIST
 
@@ -367,17 +498,72 @@ Package includes I<go_auth> CLI Script to collect initial end-user authorisation
 
 =head2 C<new>
 
-  WebService::GoogleAPI::Client->new( user => 'peter@pscott.com.au', gapi_json => '/fullpath/gapi.json' );
+  WebService::GoogleAPI::Client->new(
+     user => 'peter@pscott.com.au', gapi_json => '/fullpath/gapi.json' );
 
-=head3 PARAMETERS
+=head3 B<General parameters>
 
-=head4 user :: the email address that identifies key of credentials in the config file
+=over 4
 
-=head4 gapi_json :: Location of the configuration credentials - default gapi.json
+=item debug
 
-=head4 debug :: if '1' then diagnostics are send to STDERR - default false
+if truthy then diagnostics are send to STDERR - default false. Crank it up to 11
+for maximal debug output
 
-=head4 chi :: an instance to a CHI persistent storage case object - if none provided FILE is used
+=item chi
+
+an instance to a CHI persistent storage case object - if none provided FILE is used
+
+=back
+
+=head3 B<Login Parameters>
+
+You can use either gapi_json, which is the file you get from using the bundled
+goauth tool, or service_account which is the json file you can download from
+https://console.cloud.google.com/iam-admin/serviceaccounts.
+
+service_account and gapi_json are mutually exclusive, and gapi_json takes precedence.
+
+If nothing is passed, then we check the GOOGLE_APPLICATION_CREDENTIALS env
+variable for the location of a service account file. This matches the
+functionality of the Google Cloud libraries from other languages (well,
+somewhat. I haven't fully implemented ADC yet - see
+L<Google's Docs|https://cloud.google.com/docs/authentication/production> for some details. PRs
+are welcome!)
+
+If that doesn't exist, then we default to F<gapi.json> in the current directory.
+
+B<Be wary!> This default is subject to change as more storage backends are implemented.
+A deprecation warning will be emmitted when this is likely to start happening.
+
+For more advanced usage, you can supply your own auth storage instance, which is
+a consumer of the L<WebService::GoogleAPI::Client::AuthStorage> role. See the
+POD for that module for more information.
+
+=over 4
+
+=item user
+
+the email address that requests will be made for
+
+=item gapi_json
+
+Location of end user credentials
+
+=item service_account
+
+Location of service account credentials
+
+=item auth_storage
+
+An instance of a class consuming L<WebService::GoogleAPI::Client::AuthStorage>, already
+set up for returning access tokens (barring the ua).
+
+=back
+
+If you're using a service account, user represents the user that you're
+impersonating. Make sure you have domain-wide delegation set up, or else this
+won't work.
 
 =head2 C<api_query>
 
@@ -387,9 +573,9 @@ handles user auth token inclusion in request headers and refreshes token if requ
 
 Required params: method, route
 
-Optional params: api_endpoint_id  cb_method_discovery_modify
+Optional params: api_endpoint_id  cb_method_discovery_modify, options
 
-$self->access_token must be valid
+$self->get_access_token must return a valid token
 
   $gapi->api_query({
       method => 'get',
@@ -405,45 +591,110 @@ $self->access_token must be valid
   ## if provide the Google API Endpoint to inform pre-query validation
   say $gapi_agent->api_query(
       api_endpoint_id => 'gmail.users.messages.send',
-      options    => { raw => encode_base64( 
-                                            Email::Simple->create( header => [To => $user, From => $user, Subject =>"Test email from $user",], 
-                                                                    body   => "This is the body of email from $user to $user", )->as_string 
-                                          ), 
-                    },
-  )->to_string; ##
+      options    => 
+          { raw => encode_base64( Email::Simple->create( 
+                       header => [To => $user, From => $user, 
+                                  Subject =>"Test email from $user",], 
+		       body   => "This is the body of email from $user to $user", 
+                   )->as_string ), 
+          },
+      )->to_string; ##
 
   print  $gapi_agent->api_query(
-            api_endpoint_id => 'gmail.users.messages.list', ## auto sets method to GET, path to 'https://www.googleapis.com/calendar'
+            api_endpoint_id => 'gmail.users.messages.list', 
+            ## auto sets method to GET, and the path to 
+	    ## 'https://www.googleapis.com/gmail/v1/users/me/messages'
           )->to_string;
-  #print pp $r;
 
+If the pre-query validation fails then a 418 - I'm a Teapot error response is 
+returned with the body containing the specific description of the 
+errors ( Tea Leaves ;^) ).   
 
-  if the pre-query validation fails then a 418 - I'm a Teapot error response is returned with the 
-  body containing the specific description of the errors ( Tea Leaves ;^) ).   
+=head3 B<Dealing with inconsistencies>
 
-NB: If you pass a 'path' parameter this takes precendence over the API Discovery Spec. Any parameters defined in the path of the format {VARNAME} will be
-    filled in with values within the options=>{ VARNAME => 'value '} parameter structure. This is the simplest way of addressing issues where the API 
-    discovery spec is inaccurate. ( See dev_sheets_example.pl as at 14/11/18 for illustration )
+NB: If you pass a 'path' parameter this takes precendence over the
+API Discovery Spec.  Any parameters defined in the path of the
+format {VARNAME} will be filled in with values within the
+options=>{ VARNAME => 'value '} parameter structure. This is the
+simplest way of addressing issues where the API discovery spec is
+inaccurate. ( See dev_sheets_example.pl as at 14/11/18 for
+illustration ). This particular issue has been since solved, but
+you never know where else there are problems with the discovery spec.
 
-To allow the user to fix discrepencies in the Discovery Specification the cb_method_discovery_modify callback can be used which must accept the 
-method specification as a parameter and must return a (potentially modified) method spec.
+Sometimes, Google is slightly inconsistent about how to name the parameters. For example,
+error messages sent back to the user tend to have the param names in snake_case, whereas
+the discovery document always has them in camelCase. To address this issue, and in
+the DWIM spirit of perl, parameters may be passed in camelCase or snake_case. That
+means that 
+
+    $gapi_agent->api_query(
+        api_endpoint_id => 'gmail.users.messages.list',
+        options => { userId => 'foobar' });
+
+and
+
+    $gapi_agent->api_query(
+        api_endpoint_id => 'gmail.users.messages.list',
+        options => { user_id => 'foobar' });
+
+will produce the same result.
+
+Sometimes a param expects a dynamic part and a static part. The endpoint
+jobs.projects.jobs.list, for example, has a param called 'parent' which has a 
+format '^projects/[^/]+$'. In cases like this, you can just skip out the constant 
+part, making
+
+  $gapi_agent->api_query( api_endpoint_id => 'jobs.projects.jobs.list',
+    options => { parent => 'sner' } );
+
+and
+
+  $gapi_agent->api_query( api_endpoint_id => 'jobs.projects.jobs.list',
+    options => { parent => 'projects/sner' } );
+
+the same. How's that for DWIM?
+
+In addition, you can use different names to refer to multi-part
+parameters. For example, the endpoint jobs.projects.jobs.delete officially
+expects one parameter, 'name'. The description for the param tells you
+that you it expects it to contain 'projectsId' and 'jobsId'. For cases like this,
+
+  $gapi_agent->api_query( api_endpoint_id => 'jobs.projects.jobs.delete',
+    options => {name => 'projects/sner/jobs/bler'} );
+
+and
+
+  $gapi_agent->api_query( api_endpoint_id => 'jobs.projects.jobs.delete',
+    options => {projectsId => 'sner', jobsId => 'bler'} );
+
+will produce the same result. Note that for now, in this case you can't pass
+the official param name without the constant parts. That may change in the
+future.
+
+To further fix discrepencies in the Discovery Specification, the
+cb_method_discovery_modify callback can be used which must accept
+the method specification as a parameter and must return a
+(potentially modified) method spec.
 
 eg.
 
-    my $r = $gapi_client->api_query(  api_endpoint_id => "sheets:v4.spreadsheets.values.update",  
-                                    options => { 
-                                      spreadsheetId => '1111111111111111111',
-                                      valueInputOption => 'RAW',
-                                      range => 'Sheet1!A1:A2',
-                                      'values' => [[99],[98]]
-                                    },
-                                    cb_method_discovery_modify => sub { 
-                                      my  $meth_spec  = shift; 
-                                      $meth_spec->{parameters}{valueInputOption}{location} = 'path';
-                                      $meth_spec->{path} = "v4/spreadsheets/{spreadsheetId}/values/{range}?valueInputOption={valueInputOption}";
-                                      return $meth_spec;
-                                    }
-                                    );
+    my $r = $gapi_client->api_query(  
+                api_endpoint_id => "sheets:v4.spreadsheets.values.update",  
+                options => { 
+		   spreadsheetId => '1111111111111111111',
+                   valueInputOption => 'RAW',
+                   range => 'Sheet1!A1:A2',
+                   'values' => [[99],[98]]
+                },
+                cb_method_discovery_modify => sub { 
+                   my  $meth_spec  = shift; 
+                   $meth_spec->{parameters}{valueInputOption}{location} = 'path';
+                   $meth_spec->{path} .= "?valueInputOption={valueInputOption}";
+                   return $meth_spec;
+                 }
+            );
+
+Again, this specific issue has been fixed.
 
 Returns L<Mojo::Message::Response> object
 
@@ -509,13 +760,13 @@ warns and returns 0 on error ( eg user or config not specified etc )
     }
     print dump $new_hash->{gmail};
 
-=head2 C<get_api_discovery_for_api_id>
+=head2 C<get_api_document>
 
 returns the cached version if avaiable in CHI otherwise retrieves discovery data via HTTP, stores in CHI cache and returns as
 a Perl data structure.
 
-    my $hashref = $self->get_api_discovery_for_api_id( 'gmail' );
-    my $hashref = $self->get_api_discovery_for_api_id( 'gmail:v3' );
+    my $hashref = $self->get_api_document( 'gmail' );
+    my $hashref = $self->get_api_document( 'gmail:v3' );
 
 returns the api discovery specification structure ( cached by CHI ) for api id ( eg 'gmail ')
 
@@ -529,23 +780,25 @@ discovery specification for that method ( API Endpoint ).
 
     methods_available_for_google_api_id('gmail')
 
-=head2 C<extract_method_discovery_detail_from_api_spec>
+=head2 C<get_method_details>
 
-    $my $api_detail = $gapi->discovery->extract_method_discovery_detail_from_api_spec( 'gmail.users.settings' );
+    $my $api_detail = $gapi->discovery->get_method_details( 'gmail.users.settings' );
 
 returns a hashref representing the discovery specification for the method identified by $tree in dotted API format such as texttospeech.text.synthesize
 
 returns an empty hashref if not found
 
-=head2 C<list_of_available_google_api_ids>
+=head2 C<list_api_ids>
 
 Returns an array list of all the available API's described in the API Discovery Resource
 that is either fetched or cached in CHI locally for 30 days.
 
-    my $r = $agent->list_of_available_google_api_ids();
+    my $r = $agent->list_api_ids();
     print "List of API Services ( comma separated): $r\n";
 
-    my @list = $agent->list_of_available_google_api_ids();
+    my @list = $agent->list_api_ids();
+
+To check for just one service id, use C<service_exists> instead.
 
 =head1 FEATURES
 
@@ -563,13 +816,23 @@ that is either fetched or cached in CHI locally for 30 days.
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Veesh Goldman <veesh@cpan.org>
+
+=item *
 
 Peter Scott <localshop@cpan.org>
 
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Peter Scott and others.
+This software is Copyright (c) 2017-2021 by Peter Scott and others.
 
 This is free software, licensed under:
 

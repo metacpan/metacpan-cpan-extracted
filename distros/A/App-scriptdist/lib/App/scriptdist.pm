@@ -13,7 +13,7 @@ use vars qw(
 	$Quiet
 	);
 
-$VERSION = '0.242';
+$VERSION = '1.001';
 
 @EXPORT_OK = qw( prompt find_files copy gitify content );
 %EXPORT_TAGS = (
@@ -314,7 +314,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2004-2017, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2004-2021, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This code is available under the Artistic License 2.0.
 

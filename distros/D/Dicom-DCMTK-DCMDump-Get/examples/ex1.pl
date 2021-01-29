@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Dicom::DCMTK::DCMDump::Get;
 use File::Temp qw(tempfile);
 use IO::Barf qw(barf);

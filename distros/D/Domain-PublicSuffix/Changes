@@ -1,5 +1,8 @@
 Revision history for Domain-PublicSuffix
 
+0.19    2021-01-28 17:03 GMT
+  - Refresh PublicSuffix list
+
 0.17    2020-04-13 14:08 GMT
   - Refresh PublicSuffix list
   - Fix documentation regarding what tld() will return

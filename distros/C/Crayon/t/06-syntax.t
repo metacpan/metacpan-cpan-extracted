@@ -24,7 +24,8 @@ parse_test(
 			}
 		}
 	},
-	q|body #class:hover, body .other:hover {
+	q|body #class:hover,
+body .other:hover {
 	background: #000;
 	color: #fff;
 }
@@ -56,7 +57,8 @@ parse_test(
 			}
 		}
 	},
-	q|body .class:hover, body .other:hover {
+	q|body .class:hover,
+body .other:hover {
 	background: #000;
 	color: #fff;
 }

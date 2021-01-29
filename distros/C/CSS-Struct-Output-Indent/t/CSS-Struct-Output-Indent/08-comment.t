@@ -13,7 +13,7 @@ $obj->put(
 	['c', 'comment'],
 );
 my $ret = $obj->flush;
-is($ret, '');
+is($ret, '', 'Skip comment only.');
 
 # Test.
 $obj->reset;
@@ -28,7 +28,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Skip comment and blank selector.');
 
 # Test.
 $obj->reset;
@@ -48,7 +48,7 @@ div {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Skip comments and two blank selectors.');
 
 # Test.
 $obj->reset;
@@ -63,7 +63,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Skip comment inside selector.');
 
 # Test.
 $obj->reset;
@@ -79,7 +79,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Skip two comments in selector.');
 
 # Test.
 $obj->reset;
@@ -98,7 +98,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Skip comment between definitions.');
 
 # Test.
 $obj->reset;
@@ -118,7 +118,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Skip two comments between definitions.');
 
 # Test.
 $obj->reset;
@@ -135,7 +135,7 @@ body, div {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Skip comments, advanced version.');
 
 # Debug message.
 print "Testing: Comment.\n";
@@ -148,7 +148,7 @@ $obj->put(
 	['c', 'comment'],
 );
 $ret = $obj->flush;
-is($ret, "/* comment */");
+is($ret, "/* comment */", 'Simple comment without selector.');
 
 # Test.
 $obj->reset;
@@ -164,7 +164,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Comment before selector.');
 
 # Test.
 $obj->reset;
@@ -187,7 +187,7 @@ div {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Comments before selectors.');
 
 # Test.
 $obj->reset;
@@ -204,7 +204,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Comment inside selector.');
 
 # Test.
 $obj->reset;
@@ -223,7 +223,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Two comments inside selector.');
 
 # Test.
 $obj->reset;
@@ -244,7 +244,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Comment between definitions.');
 
 # Test.
 $obj->reset;
@@ -267,7 +267,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Two comments between definitions.');
 
 # Test.
 $obj->reset;
@@ -288,4 +288,4 @@ div {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Comments, advanced version.');

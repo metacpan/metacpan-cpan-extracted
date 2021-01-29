@@ -1,12 +1,12 @@
+use 5.008;
+
 package Log::Log4perl::Appender::ScreenColoredLevels::UsingMyColors;
 use strict;
 
 use warnings;
 no warnings;
 
-use subs qw();
-
-our $VERSION = '0.112';
+our $VERSION = '0.113';
 
 use Term::ANSIColor qw(:constants color colored);
 use Log::Log4perl::Level;
@@ -111,9 +111,9 @@ sub log {
 
 =head1 DESCRIPTION
 
-This appender acts like Log::Log4perl::Appender::ScreenColoredLevels, but
+This appender acts like L<Log::Log4perl::Appender::ScreenColoredLevels>, but
 you get to choose the colors. You can choose any of the constants from
-Term::ANSIColor.
+L<Term::ANSIColor>.
 
 =head1 TO DO
 
@@ -134,7 +134,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2008-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

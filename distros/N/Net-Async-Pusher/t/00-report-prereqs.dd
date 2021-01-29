@@ -1,20 +1,23 @@
 do { my $x = {
-       'build' => {
-                    'requires' => {
-                                    'perl' => '5.012000'
-                                  }
-                  },
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '6.48'
+                                        'ExtUtils::MakeMaker' => '0'
                                       }
                       },
        'develop' => {
                       'requires' => {
+                                      'Dist::Zilla' => '5',
+                                      'Dist::Zilla::PluginBundle::Author::TEAM' => '0',
+                                      'Software::License::Perl_5' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::MinimumVersion' => '0',
                                       'Test::Mojibake' => '0',
-                                      'Test::More' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
-                                      'Test::Synopsis' => '0',
+                                      'Test::Portability::Files' => '0',
                                       'Test::Version' => '1'
                                     }
                     },
@@ -23,11 +26,13 @@ do { my $x = {
                                       'Future' => '0.30',
                                       'IO::Async' => '0.64',
                                       'IO::Async::SSL' => '0',
+                                      'JSON::MaybeUTF8' => '0',
                                       'JSON::MaybeXS' => '0',
                                       'Log::Any' => '0',
                                       'Mixin::Event::Dispatch' => '1.006',
                                       'Net::Async::WebSocket::Client' => '0',
                                       'Ryu::Async' => '0.006',
+                                      'Syntax::Keyword::Try' => '0',
                                       'Variable::Disposition' => '0.004',
                                       'curry' => '0',
                                       'parent' => '0'

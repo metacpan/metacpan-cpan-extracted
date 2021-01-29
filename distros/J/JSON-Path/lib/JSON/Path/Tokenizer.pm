@@ -1,5 +1,5 @@
 package JSON::Path::Tokenizer;
-$JSON::Path::Tokenizer::VERSION = '0.430';
+$JSON::Path::Tokenizer::VERSION = '0.431';
 use strict;
 use warnings;
 use 5.008;
@@ -125,7 +125,7 @@ JSON::Path::Tokenizer - Helper class for JSON::Path::Evaluator. Do not call dire
 
 =head1 VERSION
 
-version 0.430
+version 0.431
 
 =head1 AUTHOR
 

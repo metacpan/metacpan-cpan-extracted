@@ -24,7 +24,8 @@ $crayon->parse(q|
 
 my $css = $crayon->compile();
 
-my $expected = q|body .class, body .other {
+my $expected = q|body .class,
+body .other {
 	background: #7f7f7f;
 	color: #7f7f7f;
 }

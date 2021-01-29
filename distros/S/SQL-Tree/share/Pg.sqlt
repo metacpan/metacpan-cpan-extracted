@@ -1,0 +1,193 @@
+DROP TABLE IF EXISTS [%- table_tree -%];
+
+DROP TRIGGER IF EXISTS [%- table_tree -%]_insert_trigger_1 ON [%- table -%];
+
+DROP TRIGGER IF EXISTS [%- table_tree -%]_before_update_trigger_1 ON [%- table -%];
+
+DROP TRIGGER IF EXISTS [%- table_tree -%]_after_update_trigger_1 ON [%- table -%];
+
+DROP TRIGGER IF EXISTS [%- table_tree -%]_path_before_update_trigger ON [%- table -%];
+
+CREATE OR REPLACE FUNCTION make_plpgsql()
+RETURNS VOID LANGUAGE SQL AS $$
+CREATE LANGUAGE plpgsql;
+$$;
+
+SELECT
+    CASE
+    WHEN EXISTS(
+        SELECT 1
+        FROM pg_catalog.pg_language
+        WHERE lanname='plpgsql'
+    )
+    THEN NULL
+    ELSE make_plpgsql()
+    END;
+ 
+DROP FUNCTION make_plpgsql();
+
+CREATE TABLE [%- table_tree -%] (
+    treeid    SERIAL PRIMARY KEY,
+    parent    [%- type -%] NOT NULL REFERENCES [%- table -%]([%- id -%]) ON DELETE CASCADE,
+    child     [%- type -%] NOT NULL REFERENCES [%- table -%]([%- id -%]) ON DELETE CASCADE,
+    depth     INTEGER NOT NULL,
+    UNIQUE (parent, child)
+);
+
+-- --------------------------------------------------------------------
+-- INSERT:
+-- 1. Insert a matching row in [%- table_tree -%] where both parent and child
+-- are set to the id of the newly inserted object. Depth is set to 0 as
+-- both child and parent are on the same level.
+--
+-- 2. Copy all rows that our parent had as its parents, but we modify
+-- the child id in these rows to be the id of currently inserted row,
+-- and increase depth by one.
+-- --------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION ai_[%- table -%]_tree_1()
+RETURNS TRIGGER AS
+$BODY$
+DECLARE
+BEGIN
+    INSERT INTO [%- table_tree -%] (parent, child, depth)
+        VALUES (NEW.[%- id -%], NEW.[%- id -%], 0);
+    INSERT INTO [%- table_tree -%] (parent, child, depth)
+        SELECT x.parent, NEW.[%- id -%], x.depth + 1
+            FROM [%- table_tree -%] x
+            WHERE x.child = NEW.[%- parent_id -%];
+    RETURN NEW;
+END;
+$BODY$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER ai_[%- table -%]_tree_1
+AFTER INSERT ON [%- table %]
+FOR EACH ROW EXECUTE PROCEDURE ai_[%- table -%]_tree_1();
+
+-- --------------------------------------------------------------------
+-- UPDATE:
+-- --------------------------------------------------------------------
+-- As for moving data around in [%- table -%] freely, we should forbid
+-- moves that would create loops:
+CREATE OR REPLACE FUNCTION bu_[%- table -%]_tree_1()
+RETURNS TRIGGER AS
+$BODY$
+DECLARE
+BEGIN
+    IF NEW.[%- id -%] <> OLD.[%- id -%] THEN
+        RAISE EXCEPTION 'Changing ids is forbidden.';
+    END IF;
+    IF OLD.[%- parent_id -%] IS NOT DISTINCT FROM NEW.[%- parent_id -%] THEN
+        RETURN NEW;
+    END IF;
+    IF NEW.[%- parent_id -%] IS NULL THEN
+        RETURN NEW;
+    END IF;
+    PERFORM 1 FROM [%- table_tree %]
+        WHERE ( parent, child ) = ( NEW.[%- id -%], NEW.[%- parent_id -%] );
+    IF FOUND THEN
+        RAISE EXCEPTION 'Update blocked, because it would create loop in tree.';
+    END IF;
+    RETURN NEW;
+END;
+$BODY$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER bu_[%- table -%]_tree_1
+BEFORE UPDATE ON [%- table %]
+FOR EACH ROW EXECUTE PROCEDURE bu_[%- table -%]_tree_1();
+
+CREATE OR REPLACE FUNCTION au_[%- table -%]_tree_1()
+RETURNS TRIGGER AS
+$BODY$
+DECLARE
+BEGIN
+    IF OLD.[%- parent_id -%] IS NOT DISTINCT FROM NEW.[%- parent_id -%] THEN
+        RETURN NEW;
+    END IF;
+    IF OLD.[%- parent_id -%] IS NOT NULL THEN
+        DELETE FROM [%- table_tree -%] WHERE treeid in (
+            SELECT r2.treeid
+            FROM [%- table_tree -%] r1
+            JOIN [%- table_tree -%] r2 ON r1.child = r2.child
+            WHERE r1.parent = NEW.[%- id -%] AND r2.depth > r1.depth
+        );
+    END IF;
+    IF NEW.[%- parent_id -%] IS NOT NULL THEN
+        INSERT INTO [%- table_tree -%] (parent, child, depth)
+            SELECT r1.parent, r2.child, r1.depth + r2.depth + 1
+            FROM
+                [% table_tree -%] r1,
+                [% table_tree -%] r2
+            WHERE
+                r1.child = NEW.[%- parent_id -%] AND
+                r2.parent = NEW.[%- id -%];
+    END IF;
+    RETURN NEW;
+END;
+$BODY$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER au_[%- table -%]_tree_1
+AFTER UPDATE ON [%- table %]
+FOR EACH ROW EXECUTE PROCEDURE au_[%- table -%]_tree_1();
+
+-- Generate path urls based on [%- name -%] and position in
+-- the tree. 
+CREATE OR REPLACE FUNCTION bi_[%- table -%]_path_1()
+RETURNS TRIGGER AS
+$BODY$
+DECLARE
+BEGIN
+    IF NEW.[%- parent_id -%] IS NULL THEN
+        NEW.[%- path -%] := NEW.[%- name -%];
+    ELSE
+        SELECT [%- path -%] || '/' || NEW.[%- name -%] INTO NEW.[%- path %]
+        FROM [%- table %]
+        WHERE [%- id -%] = NEW.[%- parent_id -%];
+    END IF;
+    RETURN NEW;
+END;
+$BODY$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER bi_[%- table -%]_path_1
+BEFORE INSERT ON [%- table %]
+FOR EACH ROW EXECUTE PROCEDURE bi_[%- table -%]_path_1();
+
+CREATE OR REPLACE FUNCTION bu_[%- table -%]_path_1()
+RETURNS TRIGGER AS
+$BODY$
+DECLARE
+    replace_from TEXT := '^';
+    replace_to   TEXT := '';
+BEGIN
+    IF OLD.[%- parent_id -%] IS NOT DISTINCT FROM NEW.[%- parent_id -%] THEN
+        RETURN NEW;
+    END IF;
+    IF OLD.[%- parent_id -%] IS NOT NULL THEN
+        SELECT '^' || [%- path -%] || '/' INTO replace_from
+        FROM [%- table %]
+        WHERE [%- id -%] = OLD.[%- parent_id -%];
+    END IF;
+    IF NEW.[%- parent_id -%] IS NOT NULL THEN
+        SELECT [%- path -%] || '/' INTO replace_to
+        FROM [%- table %]
+        WHERE [%- id -%] = NEW.[%- parent_id -%];
+    END IF;
+    NEW.[%- path -%] := regexp_replace( NEW.[%- path -%], replace_from, replace_to );
+    UPDATE [%- table %]
+    SET [%- path -%] = regexp_replace([%- path -%], replace_from, replace_to )
+    WHERE [%- id -%] in (
+        SELECT child
+        FROM [%- table_tree %]
+        WHERE parent = NEW.[%- id -%] AND depth > 0
+    );
+    RETURN NEW;
+END;
+$BODY$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER bu_[%- table -%]_path_1
+BEFORE UPDATE ON [%- table %]
+FOR EACH ROW EXECUTE PROCEDURE bu_[%- table -%]_path_1();

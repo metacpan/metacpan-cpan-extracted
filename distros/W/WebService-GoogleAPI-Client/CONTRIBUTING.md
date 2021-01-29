@@ -1,6 +1,24 @@
+# When hacking on this repo
+
+There are some live tests in `xt/` which require real user credentials. All they
+do is create a file in Google Drive, and then delete it, in order to make sure that 
+things are ACTUALLY running.
+
+If you don't trust me, then please don't run those tests. They're part of the
+release process, so I'll just run them before releasing.
+
+If you DO trust me (and I'm flattered), then you need to set the
+`GAPI_XT_USER_CREDS` environment variable to a string containing the gapi.json
+file, followed by `:` followed by the user to user. Like this:
+
+    /absolute/path/to/gapi.json:your_email@gmail.com
+
+And also set the `GAPI_XT_SERVICE_CREDS` to the service account file downloaded
+from Google.
+
 # Bug Reporting and General Help Requests
 
-- Use the [Github Issues Page](https://github.com/pscott-au/WebService-GoogleAPI-Client/issues) 
+- Use the [Github Issues Page](https://github.com/rabbiveesh/WebService-GoogleAPI-Client/issues) 
 
 ## Github Repo Management
 
@@ -10,8 +28,6 @@
 
 # CONTRIBUTING CODE
 
-- Use perlcritic and perltidy if my bracer style is offensive
-- This is my first module using dzilla to package a module - I'm not completely sold on it and may be using it incorrectly - advice on improving usage welcome
 - There remain a few architectural bad smells from the original source code this was based on - don't assume that the class structure is sane
 - Pull reqeusts preferred but whatever works for you I will try to work with
 
@@ -21,11 +37,11 @@
 - refactor to improve test coverage
 - clean up the test structure
 - survey other Google Perl modules
-- explore handling of batch requests
+- implement batch requests - really an interface question more than the
+  technicalities
 - API worked examples with help functions
 - ability to examine CHI cache and introspect on Client instance metrics ( number of HTTP calls, cache size, TTL data sent/received etc )
 - comparison with other language Client libraries
-- The structure under the AuthStorage is ugly and needs some love
 
 
 Github Repo: [https://github.com/pscott-au/WebService-GoogleAPI-Client]

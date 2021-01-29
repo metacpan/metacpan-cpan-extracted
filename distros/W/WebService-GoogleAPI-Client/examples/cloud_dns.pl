@@ -107,7 +107,7 @@ croak('must have environment variable GOOGLE_PROJECT_ID set to run') unless defi
 ## assumes gapi.json configuration in working directory with scoped project and user authorization
 ## manunally sets the client user email to be the first in the gapi.json file
 my $gapi_client = WebService::GoogleAPI::Client->new( debug => $config->{debug}, gapi_json => 'gapi.json' );
-my $aref_token_emails = $gapi_client->auth_storage->storage->get_token_emails_from_storage;
+my $aref_token_emails = $gapi_client->auth_storage->get_token_emails_from_storage;
 my $user              = $aref_token_emails->[0];                                                             ## default to the first user
 $gapi_client->user( $user );
 

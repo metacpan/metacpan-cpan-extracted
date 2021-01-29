@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package JSON::Path;
-$JSON::Path::VERSION = '0.430';
+$JSON::Path::VERSION = '0.431';
 # VERSION
 
 use Exporter::Tiny ();
@@ -138,7 +138,7 @@ JSON::Path
 
 =head1 VERSION
 
-version 0.430
+version 0.431
 
 =head1 SYNOPSIS
 

@@ -43,7 +43,8 @@ parse_test(
 			}
 		}
 	},
-	q|body .other, body .thing #other .class {
+	q|body .other,
+body .thing #other .class {
 	background: #0f0;
 	color: #fff;
 }
@@ -90,7 +91,8 @@ parse_test(
 			}
 		}
 	},
-	q|body .class, body .other {
+	q|body .class,
+body .other {
 	background: #0f0;
 	color: #fff;
 }
@@ -143,7 +145,8 @@ parse_test(
 			}
 		}
 	},
-	q|body .class, body .other {
+	q|body .class,
+body .other {
 	background: #0f0;
 	color: #fff;
 }
@@ -191,7 +194,8 @@ parse_test(
 			}
 		}
 	},
-	q|body .class, body .other {
+	q|body .class,
+body .other {
 	background: #0f0;
 	color: #fff;
 }
@@ -238,7 +242,8 @@ parse_test(
 			}
 		}
 	},
-	q|body .class, body .other {
+	q|body .class,
+body .other {
 	background: #0f0;
 	color: #fff;
 }

@@ -15,7 +15,8 @@ compile_test(
 			}
 		}
 	},
-	q|body .class, body .other {
+	q|body .class,
+body .other {
 	background: black;
 	color: white;
 }

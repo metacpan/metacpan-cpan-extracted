@@ -37,6 +37,8 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0,
+    "File::Spec" => 0,
     "JSON" => 0,
     "JSON::Parse" => 0,
     "Test2::V0" => 0,
@@ -45,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Tie::IxHash" => 0
   },
-  "VERSION" => "0.430",
+  "VERSION" => "0.431",
   "test" => {
     "TESTS" => "t/*.t t/evaluator/*.t"
   }
@@ -58,6 +60,8 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "Exporter::Easy" => 0,
   "Exporter::Tiny" => 0,
+  "ExtUtils::MakeMaker" => 0,
+  "File::Spec" => 0,
   "JSON" => 0,
   "JSON::MaybeXS" => 0,
   "JSON::Parse" => 0,

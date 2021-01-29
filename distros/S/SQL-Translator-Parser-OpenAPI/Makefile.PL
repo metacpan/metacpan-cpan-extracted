@@ -20,6 +20,7 @@ WriteMakefile(
   },
   PREREQ_PM => {
     'SQL::Translator' => '0.11024', # 0.11021 gives YAML diffs on "comments"
+    'JSON::Validator' => '4.13', # J:V:Ref with CLEAR method
     'JSON::Validator::OpenAPI::Mojolicious' => '0', # after pointless zapping of ::OpenAPI from J::V
     'String::CamelCase' => '0',
     'SQL::Translator::Schema::Constants' => 0,
@@ -47,7 +48,6 @@ WriteMakefile(
     prereqs => {
       develop => {
         requires => {
-          'Test::CheckManifest' => '0.9',
           'Test::Pod' => '1.22',
           'Pod::Markdown' => 0,
         },

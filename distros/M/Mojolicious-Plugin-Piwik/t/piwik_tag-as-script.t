@@ -41,9 +41,9 @@ get '/track' => sub {
 
 $t->get_ok('/track')
   ->status_is(200)
-  ->element_exists('script:nth-of-type(1)[src="http://sojolicio.us/piwik/piwik.js"]')
-  ->element_exists('script:nth-of-type(2)[src$=/piwik/tracker.js')
-  ->element_exists('script:nth-of-type(2)[src^=http://')
+  ->element_exists('script:nth-of-type(2)[src="http://sojolicio.us/piwik/piwik.js"]')
+  ->element_exists('script:nth-of-type(1)[src$=/piwik/tracker.js]')
+  ->element_exists('script:nth-of-type(1)[src^=http://]')
   ;
 
 done_testing;

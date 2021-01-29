@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use JSON::Validator::OpenAPI::Mojolicious;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 use constant DEBUG => $ENV{SQLTP_OPENAPI_DEBUG};
 use String::CamelCase qw(camelize decamelize);
 use Lingua::EN::Inflect::Number qw(to_PL to_S);
@@ -31,6 +31,7 @@ my %SQL2TYPE = reverse %TYPE2SQL; # unreliable order but ok as still reversible
 
 # from GraphQL::Debug
 sub _debug {
+  # uncoverable subroutine
   my $func = shift;
   require Data::Dumper;
   require Test::More;

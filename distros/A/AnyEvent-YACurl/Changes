@@ -1,5 +1,11 @@
 Revision history for Perl extension AnyEvent::YACurl.
 
+0.20  Fri Jan 29 2021
+    - curl 7.74.0 compatibility
+
+0.19  Fri Jan 29 2021
+    - stop shipping our own library versions
+
 0.18  Tue Oct 14 2020
     - bump curl to 7.73.0
     - remove libbrotli: users are encouraged to add it themselves, as well as libzstd

@@ -14,7 +14,8 @@ eval {
 		['e'],
 	);
 };
-is($EVAL_ERROR, "No opened selector.\n");
+is($EVAL_ERROR, "No opened selector.\n",
+	'No opened selector.');
 clean();
 
 # Test.
@@ -29,4 +30,4 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Blank selector.');

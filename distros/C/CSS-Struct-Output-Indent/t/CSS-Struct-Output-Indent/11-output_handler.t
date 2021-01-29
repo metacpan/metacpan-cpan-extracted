@@ -28,6 +28,7 @@ stdout_is(
 		return;
 	},
 	$right_ret,
+	'Flush to stdout.',
 );
 
 # Test.
@@ -45,4 +46,5 @@ stdout_is(
 		return;
 	},
 	$right_ret,
+	'Auto flush to stdout.',
 );

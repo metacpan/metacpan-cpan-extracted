@@ -11,13 +11,13 @@ use Readonly;
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Resets internal variables.
 sub reset {
 	my $self = shift;
 
-	# Reset internal variables from *::Core.
+	# Reset internal variables from *::Output.
 	$self->SUPER::reset;
 
 	# Comment after selector.
@@ -265,7 +265,7 @@ Returns undef.
 
 =head1 ERRORS
 
- From CSS::Struct::Core:
+ From CSS::Struct::Output:
          Auto-flush can't use without output handler.
          Bad comment delimeters.
          Bad data.
@@ -345,6 +345,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

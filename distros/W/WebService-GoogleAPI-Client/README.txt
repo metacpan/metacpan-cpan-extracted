@@ -4,16 +4,17 @@ NAME
 
 VERSION
 
-    version 0.21
+    version 0.24
 
 SYNOPSIS
 
-    Access Google API Services Version 1 using an OAUTH2 User Agent.
+    Access Google API Services using an OAUTH2 User Agent.
 
-    Includes Discovery, validation authentication and API Access.
+    Includes Discovery, validation, authentication and API Access.
 
-    assumes gapi.json configuration in working directory with scoped Google
-    project redentials and user authorization created by _goauth_
+    By default assumes gapi.json configuration in working directory with
+    scoped Google project credentials and user authorization created by
+    goauth.
 
         use WebService::GoogleAPI::Client;
         
@@ -27,11 +28,13 @@ SYNOPSIS
           say 'User has Access to GMail Method End-Point gmail.users.settings.sendAs.get';
         }
 
-    Internal User Agent provided be property
-    WebService::GoogleAPI::Client::UserAgent dervied from Mojo::UserAgent
+    Package includes goauth CLI Script to collect initial end-user
+    authorisation to scoped services.
 
-    Package includes go_auth CLI Script to collect initial end-user
-    authorisation to scoped services
+    Note to intrepid hackers: Any method that isn't documented is
+    considered private, and subject to change in breaking ways without
+    notice. (Although I'm a pretty nice guy, and probably will leave a
+    warning or something).
 
 EXAMPLES
 
@@ -42,18 +45,21 @@ EXAMPLES
         use MIME::Base64;
         my $my_email_address = 'peter@shotgundriver.com'
     
+        my $raw_email_payload = encode_base64(
+          Email::Simple->create(
+            header => [
+              To      => $my_email_address,
+              From    => $my_email_address,
+              Subject => "Test email from '$my_email_address' ",
+            ],
+            body => "This is the body of email to '$my_email_address'",
+          )->as_string
+        );
     
-        my $raw_email_payload = encode_base64( Email::Simple->create( header => [To => $my_email_address, 
-                                                                                 From => $my_email_address, 
-                                                                                 Subject =>"Test email from '$my_email_address' ",], 
-                                                                                 body => "This is the body of email to '$my_email_address'", 
-                                                                    )->as_string 
-                                            );
-    
-        $gapi_client->api_query( 
-                                api_endpoint_id => 'gmail.users.messages.send',
-                                options    => { raw => $raw_email_payload },
-                            );
+        $gapi_client->api_query(
+          api_endpoint_id => 'gmail.users.messages.send',
+          options         => { raw => $raw_email_payload },
+        );
 
  MANUAL API REQUEST CONSTRUCTION - GET CALENDAR LIST
 
@@ -67,20 +73,70 @@ METHODS
 
  new
 
-      WebService::GoogleAPI::Client->new( user => 'peter@pscott.com.au', gapi_json => '/fullpath/gapi.json' );
+      WebService::GoogleAPI::Client->new(
+         user => 'peter@pscott.com.au', gapi_json => '/fullpath/gapi.json' );
 
-  PARAMETERS
+  General parameters
 
-   user :: the email address that identifies key of credentials in the
-   config file
+    debug
 
-   gapi_json :: Location of the configuration credentials - default
-   gapi.json
+      if truthy then diagnostics are send to STDERR - default false. Crank
+      it up to 11 for maximal debug output
 
-   debug :: if '1' then diagnostics are send to STDERR - default false
+    chi
 
-   chi :: an instance to a CHI persistent storage case object - if none
-   provided FILE is used
+      an instance to a CHI persistent storage case object - if none
+      provided FILE is used
+
+  Login Parameters
+
+    You can use either gapi_json, which is the file you get from using the
+    bundled goauth tool, or service_account which is the json file you can
+    download from
+    https://console.cloud.google.com/iam-admin/serviceaccounts.
+
+    service_account and gapi_json are mutually exclusive, and gapi_json
+    takes precedence.
+
+    If nothing is passed, then we check the GOOGLE_APPLICATION_CREDENTIALS
+    env variable for the location of a service account file. This matches
+    the functionality of the Google Cloud libraries from other languages
+    (well, somewhat. I haven't fully implemented ADC yet - see Google's
+    Docs <https://cloud.google.com/docs/authentication/production> for some
+    details. PRs are welcome!)
+
+    If that doesn't exist, then we default to gapi.json in the current
+    directory.
+
+    Be wary! This default is subject to change as more storage backends are
+    implemented. A deprecation warning will be emmitted when this is likely
+    to start happening.
+
+    For more advanced usage, you can supply your own auth storage instance,
+    which is a consumer of the WebService::GoogleAPI::Client::AuthStorage
+    role. See the POD for that module for more information.
+
+    user
+
+      the email address that requests will be made for
+
+    gapi_json
+
+      Location of end user credentials
+
+    service_account
+
+      Location of service account credentials
+
+    auth_storage
+
+      An instance of a class consuming
+      WebService::GoogleAPI::Client::AuthStorage, already set up for
+      returning access tokens (barring the ua).
+
+    If you're using a service account, user represents the user that you're
+    impersonating. Make sure you have domain-wide delegation set up, or
+    else this won't work.
 
  api_query
 
@@ -91,9 +147,9 @@ METHODS
 
     Required params: method, route
 
-    Optional params: api_endpoint_id cb_method_discovery_modify
+    Optional params: api_endpoint_id cb_method_discovery_modify, options
 
-    $self->access_token must be valid
+    $self->get_access_token must return a valid token
 
       $gapi->api_query({
           method => 'get',
@@ -109,50 +165,112 @@ METHODS
       ## if provide the Google API Endpoint to inform pre-query validation
       say $gapi_agent->api_query(
           api_endpoint_id => 'gmail.users.messages.send',
-          options    => { raw => encode_base64( 
-                                                Email::Simple->create( header => [To => $user, From => $user, Subject =>"Test email from $user",], 
-                                                                        body   => "This is the body of email from $user to $user", )->as_string 
-                                              ), 
-                        },
-      )->to_string; ##
+          options    => 
+              { raw => encode_base64( Email::Simple->create( 
+                           header => [To => $user, From => $user, 
+                                      Subject =>"Test email from $user",], 
+                           body   => "This is the body of email from $user to $user", 
+                       )->as_string ), 
+              },
+          )->to_string; ##
     
       print  $gapi_agent->api_query(
-                api_endpoint_id => 'gmail.users.messages.list', ## auto sets method to GET, path to 'https://www.googleapis.com/calendar'
+                api_endpoint_id => 'gmail.users.messages.list', 
+                ## auto sets method to GET, and the path to 
+                ## 'https://www.googleapis.com/gmail/v1/users/me/messages'
               )->to_string;
-      #print pp $r;
-    
-    
-      if the pre-query validation fails then a 418 - I'm a Teapot error response is returned with the 
-      body containing the specific description of the errors ( Tea Leaves ;^) ).   
+
+    If the pre-query validation fails then a 418 - I'm a Teapot error
+    response is returned with the body containing the specific description
+    of the errors ( Tea Leaves ;^) ).
+
+  Dealing with inconsistencies
 
     NB: If you pass a 'path' parameter this takes precendence over the API
     Discovery Spec. Any parameters defined in the path of the format
     {VARNAME} will be filled in with values within the options=>{ VARNAME
     => 'value '} parameter structure. This is the simplest way of
     addressing issues where the API discovery spec is inaccurate. ( See
-    dev_sheets_example.pl as at 14/11/18 for illustration )
+    dev_sheets_example.pl as at 14/11/18 for illustration ). This
+    particular issue has been since solved, but you never know where else
+    there are problems with the discovery spec.
 
-    To allow the user to fix discrepencies in the Discovery Specification
-    the cb_method_discovery_modify callback can be used which must accept
-    the method specification as a parameter and must return a (potentially
+    Sometimes, Google is slightly inconsistent about how to name the
+    parameters. For example, error messages sent back to the user tend to
+    have the param names in snake_case, whereas the discovery document
+    always has them in camelCase. To address this issue, and in the DWIM
+    spirit of perl, parameters may be passed in camelCase or snake_case.
+    That means that
+
+        $gapi_agent->api_query(
+            api_endpoint_id => 'gmail.users.messages.list',
+            options => { userId => 'foobar' });
+
+    and
+
+        $gapi_agent->api_query(
+            api_endpoint_id => 'gmail.users.messages.list',
+            options => { user_id => 'foobar' });
+
+    will produce the same result.
+
+    Sometimes a param expects a dynamic part and a static part. The
+    endpoint jobs.projects.jobs.list, for example, has a param called
+    'parent' which has a format '^projects/[^/]+$'. In cases like this, you
+    can just skip out the constant part, making
+
+      $gapi_agent->api_query( api_endpoint_id => 'jobs.projects.jobs.list',
+        options => { parent => 'sner' } );
+
+    and
+
+      $gapi_agent->api_query( api_endpoint_id => 'jobs.projects.jobs.list',
+        options => { parent => 'projects/sner' } );
+
+    the same. How's that for DWIM?
+
+    In addition, you can use different names to refer to multi-part
+    parameters. For example, the endpoint jobs.projects.jobs.delete
+    officially expects one parameter, 'name'. The description for the param
+    tells you that you it expects it to contain 'projectsId' and 'jobsId'.
+    For cases like this,
+
+      $gapi_agent->api_query( api_endpoint_id => 'jobs.projects.jobs.delete',
+        options => {name => 'projects/sner/jobs/bler'} );
+
+    and
+
+      $gapi_agent->api_query( api_endpoint_id => 'jobs.projects.jobs.delete',
+        options => {projectsId => 'sner', jobsId => 'bler'} );
+
+    will produce the same result. Note that for now, in this case you can't
+    pass the official param name without the constant parts. That may
+    change in the future.
+
+    To further fix discrepencies in the Discovery Specification, the
+    cb_method_discovery_modify callback can be used which must accept the
+    method specification as a parameter and must return a (potentially
     modified) method spec.
 
     eg.
 
-        my $r = $gapi_client->api_query(  api_endpoint_id => "sheets:v4.spreadsheets.values.update",  
-                                        options => { 
-                                          spreadsheetId => '1111111111111111111',
-                                          valueInputOption => 'RAW',
-                                          range => 'Sheet1!A1:A2',
-                                          'values' => [[99],[98]]
-                                        },
-                                        cb_method_discovery_modify => sub { 
-                                          my  $meth_spec  = shift; 
-                                          $meth_spec->{parameters}{valueInputOption}{location} = 'path';
-                                          $meth_spec->{path} = "v4/spreadsheets/{spreadsheetId}/values/{range}?valueInputOption={valueInputOption}";
-                                          return $meth_spec;
-                                        }
-                                        );
+        my $r = $gapi_client->api_query(  
+                    api_endpoint_id => "sheets:v4.spreadsheets.values.update",  
+                    options => { 
+                       spreadsheetId => '1111111111111111111',
+                       valueInputOption => 'RAW',
+                       range => 'Sheet1!A1:A2',
+                       'values' => [[99],[98]]
+                    },
+                    cb_method_discovery_modify => sub { 
+                       my  $meth_spec  = shift; 
+                       $meth_spec->{parameters}{valueInputOption}{location} = 'path';
+                       $meth_spec->{path} .= "?valueInputOption={valueInputOption}";
+                       return $meth_spec;
+                     }
+                );
+
+    Again, this specific issue has been fixed.
 
     Returns Mojo::Message::Response object
 
@@ -219,14 +337,14 @@ METHODS DELEGATED TO WebService::GoogleAPI::Client::Discovery
         }
         print dump $new_hash->{gmail};
 
- get_api_discovery_for_api_id
+ get_api_document
 
     returns the cached version if avaiable in CHI otherwise retrieves
     discovery data via HTTP, stores in CHI cache and returns as a Perl data
     structure.
 
-        my $hashref = $self->get_api_discovery_for_api_id( 'gmail' );
-        my $hashref = $self->get_api_discovery_for_api_id( 'gmail:v3' );
+        my $hashref = $self->get_api_document( 'gmail' );
+        my $hashref = $self->get_api_document( 'gmail:v3' );
 
     returns the api discovery specification structure ( cached by CHI ) for
     api id ( eg 'gmail ')
@@ -242,9 +360,9 @@ METHODS DELEGATED TO WebService::GoogleAPI::Client::Discovery
 
         methods_available_for_google_api_id('gmail')
 
- extract_method_discovery_detail_from_api_spec
+ get_method_details
 
-        $my $api_detail = $gapi->discovery->extract_method_discovery_detail_from_api_spec( 'gmail.users.settings' );
+        $my $api_detail = $gapi->discovery->get_method_details( 'gmail.users.settings' );
 
     returns a hashref representing the discovery specification for the
     method identified by $tree in dotted API format such as
@@ -252,16 +370,18 @@ METHODS DELEGATED TO WebService::GoogleAPI::Client::Discovery
 
     returns an empty hashref if not found
 
- list_of_available_google_api_ids
+ list_api_ids
 
     Returns an array list of all the available API's described in the API
     Discovery Resource that is either fetched or cached in CHI locally for
     30 days.
 
-        my $r = $agent->list_of_available_google_api_ids();
+        my $r = $agent->list_api_ids();
         print "List of API Services ( comma separated): $r\n";
     
-        my @list = $agent->list_of_available_google_api_ids();
+        my @list = $agent->list_api_ids();
+
+    To check for just one service id, use service_exists instead.
 
 FEATURES
 
@@ -281,13 +401,15 @@ FEATURES
       OAuth2 configuration, sccoping, authorization and obtaining access_
       and refresh_ tokens from users
 
-AUTHOR
+AUTHORS
 
-    Peter Scott <localshop@cpan.org>
+      * Veesh Goldman <veesh@cpan.org>
+
+      * Peter Scott <localshop@cpan.org>
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2017-2018 by Peter Scott and others.
+    This software is Copyright (c) 2017-2021 by Peter Scott and others.
 
     This is free software, licensed under:
 

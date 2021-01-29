@@ -1,5 +1,5 @@
 package Domain::PublicSuffix;
-$Domain::PublicSuffix::VERSION = '0.17';
+$Domain::PublicSuffix::VERSION = '0.19';
 use strict;
 use warnings;
 use base 'Class::Accessor::Fast';

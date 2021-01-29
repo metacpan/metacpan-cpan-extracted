@@ -1,5 +1,5 @@
 package Crayon;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use 5.006;
 use strict;
 use warnings;
@@ -35,6 +35,14 @@ sub parse {
 	return $self->_parse_content($self->_strip_comments($string), $css);
 }
 
+sub parse_file {
+	my ($self, $file, $css) = @_;
+	open my $fh, '<', $file or die "cannot open file:$file $!";
+	my $string = do { local $/; <$fh> };
+	close $fh;
+	$self->parse($string, $css);
+}
+
 sub compile {
 	my ($self, $struct) = @_;
 	$struct ||= $self->{css};
@@ -43,7 +51,14 @@ sub compile {
 	);
 	$self->{pretty} ? $self->_pretty_compile($flat) : $self->_compile($flat);
 }
-	
+
+sub compile_file {
+	my ($self, $file, $struct) = @_;
+	my $string = $self->compile($struct);
+	open my $fh, '>', $file or die "cannot open file:$file $!";
+	print $fh $string;
+	close $fh;
+}
 
 sub _strip_comments {
 	my ($self, $string) = @_;
@@ -97,8 +112,8 @@ sub _parse_content {
 			for (@{$_}) {
 				$current = $current->{$_} ||= {};
 			}
-			%{$current} = (%{$current}, %{$nested}, %props);
-			$current->{VARIABLES} = $globals if keys %{$globals};
+			%{$current} = %{$self->bm->merge($current, $nested, \%props)};
+			$current->{VARIABLES} = $self->bm->merge($current->{VARIABLES} || {}, $globals) if keys %{$globals};
 		}
 
 		$string =~ s/\Q$match\E//;
@@ -142,14 +157,18 @@ sub _dedupe_struct {
 	for my $class (sort keys %{$struct}) {
 		next unless $struct->{$class};
 		my $new_class = $class;
-		for my $inner (keys %{$struct}) {
-			next if $class eq $inner;
-			if (match($struct->{$class}, $struct->{$inner})) {
-				delete $struct->{$inner};
-				$new_class .= ", $inner";
+		if ($class =~ m/^\@/) {
+			$struct->{$new_class} = $self->_dedupe_struct($struct->{$class});
+		} else {
+			for my $inner (sort keys %{$struct}) {
+				next if $class eq $inner;
+				if (match($struct->{$class}, $struct->{$inner})) {
+					delete $struct->{$inner};
+					$new_class .= ", $inner";
+				}
 			}
+			$struct->{$new_class} = delete $struct->{$class};
 		}
-		$struct->{$new_class} = delete $struct->{$class};
 	}
 	return $struct;
 }
@@ -245,10 +264,10 @@ sub _pretty_compile {
 		);
 		$flat->{$class} = $self->_expand_nested_variables($flat->{$class}, $variables);
 		next unless keys %{$flat->{$class}};
-		$string .= $class . " {\n";
+		$string .= join(",\n", split(", ", $class)) . " {\n";
 		for my $prop ( sort keys %{$flat->{$class}} ) {
 			if ( ref $flat->{$class}->{$prop} ) {
-				$string .= "\t" . $prop . " {\n";
+				$string .= "\t" . join(",\n\t", split(", ", $prop)) . " {\n";
 				for my $attr ( sort keys %{$flat->{$class}->{$prop}} ) {
 					$string .= sprintf(
 						"\t\t%s: %s;\n",
@@ -306,7 +325,7 @@ Crayon - dedupe, minify and extend CSS
 
 =head1 VERSION
 
-Version 0.04 
+Version 0.05 
 
 =cut
 
@@ -360,11 +379,23 @@ Parse css strings into Crayons internal struct.
 	|);
 
 
+=head2 parse_file
+
+Parse a file containing CSS/Crayon.
+
+	$crayon->parse_file($file_name);
+
 =head2 compile
 
 Compile the current Crayon struct into CSS.
 
 	$crayon->compile();
+
+=head2 compile_file
+
+Compile the current Crayon struct into the given file.
+
+	$crayon->compile_file($file_name);
 
 =head1 Crayon
 

@@ -1,6 +1,10 @@
 ######################################################################
 Revision history for Perl extension Net::Google::Drive::Simple
 
+0.19      2021-01-28
+
+- Don't use HTTP::Request::Common directly (Andy Baugh)
+
 0.18      2020-10-16
 
 - Escape single quotes in file and folder names

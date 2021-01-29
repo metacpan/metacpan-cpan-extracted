@@ -26,7 +26,8 @@ parse_test(
 			}
 		}
 	},
-	q|body .class, body .other {
+	q|body .class,
+body .other {
 	background: #000;
 	color: #fff;
 }

@@ -21,7 +21,7 @@ selector {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Flush selector with definition to string.');
 
 # Test.
 $obj->put(
@@ -39,7 +39,7 @@ selector {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Flush two selectors with definitions after one added.');
 
 # Test.
 $obj->put(
@@ -60,7 +60,7 @@ selector {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Flush three selectors with definitions after one added and reset.');
 
 # Test.
 $obj->put(
@@ -75,7 +75,7 @@ selector {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Flush next one after one added.');
 
 # Test.
 SKIP: {
@@ -98,6 +98,6 @@ SKIP: {
 	eval {
 		$ret = $obj->flush;
 	};
-	is($EVAL_ERROR, "Cannot write to output handler.\n");
+	is($EVAL_ERROR, "Cannot write to output handler.\n", 'Cannot write to output handler.');
 	clean();
 }

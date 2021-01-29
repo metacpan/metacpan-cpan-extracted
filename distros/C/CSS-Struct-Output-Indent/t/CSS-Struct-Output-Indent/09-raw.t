@@ -11,4 +11,4 @@ $obj->put(
 	['r', 'raw'],
 );
 my $ret = $obj->flush;
-is($ret, 'raw');
+is($ret, 'raw', 'Simple raw command.');

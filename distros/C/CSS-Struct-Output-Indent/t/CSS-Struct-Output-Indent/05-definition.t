@@ -19,7 +19,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Selector with one definition.');
 
 # Test.
 $obj->reset;
@@ -37,7 +37,7 @@ body {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Selector with two definitons.');
 
 # Test.
 $obj->reset;
@@ -56,4 +56,4 @@ body, div {
 }
 END
 chomp $right_ret;
-is($ret, $right_ret);
+is($ret, $right_ret, 'Two selectors with two definitions.');

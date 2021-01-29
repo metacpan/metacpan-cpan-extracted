@@ -67,9 +67,6 @@
 # Temp files for new META
 ^META_new\.(?:json|yml)
 
-# Avoid travis-ci.org file
-^\.travis\.yml
-
 # Avoid AppVeyor file
 ^\.?appveyor.yml
 #!end included /usr/local/perls/perl-5.30.1/lib/5.30.1/ExtUtils/MANIFEST.SKIP
@@ -78,3 +75,8 @@
 \.releaserc
 \.lwpcookies
 Net-.*
+\bMANIFEST\s\d
+\bChanges\s\d
+\.icloud$
+\A\.github\b
+

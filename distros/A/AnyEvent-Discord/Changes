@@ -1,0 +1,13 @@
+Revision history for perl module AnyEvent::Discord
+
+0.4 2021-01-28
+
+ - Back to Moops
+
+0.2 2021-01-28
+
+ - Fix indexing for Zydeco
+
+0.1 2021-01-28
+ 
+ - Initial release

@@ -1,7 +1,10 @@
-package Net::Async::Pusher 0.004;
+package Net::Async::Pusher;
 # ABSTRACT: use pusher.com with IO::Async
 use strict;
 use warnings;
+
+our $VERSION = '0.005';
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(IO::Async::Notifier);
 
@@ -15,15 +18,11 @@ Net::Async::Pusher - support for pusher.com streaming event API
  use strict;
  use warnings;
  use feature qw(say);
- 
  # For more details, enable this
  # use Log::Any::Adapter qw(Stdout);
- 
  use IO::Async::Loop;
  use Net::Async::Pusher;
- 
  my $loop = IO::Async::Loop->new;
- 
  $loop->add(
  	my $pusher = Net::Async::Pusher->new
  );
@@ -86,4 +85,4 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2021. Licensed under the same terms as Perl itself.

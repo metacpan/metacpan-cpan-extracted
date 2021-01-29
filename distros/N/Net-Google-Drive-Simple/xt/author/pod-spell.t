@@ -15,6 +15,7 @@ Andy
 Anwar
 Arhuman
 Arnaud
+Baugh
 Bircumshaw
 Bloch
 CPAN
@@ -32,6 +33,7 @@ Net
 Nicolas
 Peter
 Rinaldo
+Rochelemagne
 Rodriguez
 Schilli
 Scott
@@ -51,6 +53,8 @@ mohammad
 nicolas
 perlmeister
 peter
+rochelemagne
+thomas
 tim
 toddr
 wells

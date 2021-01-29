@@ -1,0 +1,81 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Pusher
+at lib/Net/Async/Pusher.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Pusher - support for pusher.com streaming event API
+
+=head1 SYNOPSIS
+
+ #!/usr/bin/env perl
+ use strict;
+ use warnings;
+ use feature qw(say);
+ # For more details, enable this
+ # use Log::Any::Adapter qw(Stdout);
+ use IO::Async::Loop;
+ use Net::Async::Pusher;
+ my $loop = IO::Async::Loop->new;
+ $loop->add(
+ 	my $pusher = Net::Async::Pusher->new
+ );
+ say "Connecting to pusher.com via websocket...";
+ my $sub = $pusher->connect(
+ 	key => 'de504dc5763aeef9ff52'
+ )->then(sub {
+ 	my ($conn) = @_;
+ 	say "Connection established. Opening channel.";
+ 	$conn->open_channel('live_trades')
+ })->then(sub {
+ 	my ($ch) = @_;
+ 	say "Have channel, setting up event handler for 'trade' event.";
+ 	$ch->subscribe(trade => sub {
+ 		my ($ev, $data) = @_;
+ 		say "New trade - price " . $data->{price} . ", amount " . $data->{amount};
+ 	});
+ })->get;
+ say "Subscribed and waiting for events...";
+ $loop->run;
+ $sub->()->get;
+
+=head1 DESCRIPTION
+
+Provides basic integration with the L<https://pusher.com|Pusher> API.
+
+=head2 connect
+
+Connects to a server using a key.
+
+ my $conn = $pusher->connect(
+  key => 'abc123'
+ )->get;
+
+Resolves to a L<Net::Async::Pusher::Connection>.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure|IO::Async::Notifier/configure>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2015-2021. Licensed under the same terms as Perl itself.
+

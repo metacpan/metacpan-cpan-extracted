@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::ansicolumn:
     file: lib/App/ansicolumn.pm
-    version: '1.04'
+    version: '1.05'
   App::ansicolumn::Border:
     file: lib/App/ansicolumn/Border.pm
   App::ansicolumn::default:
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/App-ansicolumn/issues
   homepage: https://github.com/kaz-utashiro/App-ansicolumn
   repository: git://github.com/kaz-utashiro/App-ansicolumn.git
-version: '1.04'
+version: '1.05'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

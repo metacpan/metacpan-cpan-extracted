@@ -12,7 +12,7 @@ my $obj = CSS::Struct::Output::Indent->new;
 eval {
 	$obj->put('String');
 };
-is($EVAL_ERROR, "Bad data.\n");
+is($EVAL_ERROR, "Bad data.\n", 'Bad data.');
 clean();
 
 # Test.
@@ -21,7 +21,8 @@ eval {
 		['s'],
 	);
 };
-is($EVAL_ERROR, "Bad number of arguments.\n");
+is($EVAL_ERROR, "Bad number of arguments.\n",
+	'Bad number of arguments (no selector name).');
 clean();
 
 # Test.
@@ -31,7 +32,8 @@ eval {
 		['s', 'selector', 'bad_selector'],
 	);
 };
-is($EVAL_ERROR, "Bad number of arguments.\n");
+is($EVAL_ERROR, "Bad number of arguments.\n",
+	'Bad number of arguments (bad format of selector).');
 clean();
 
 # Test.
@@ -43,5 +45,5 @@ eval {
 		['q', 'bad data'],
 	);
 };
-is($EVAL_ERROR, "Bad type of data.\n");
+is($EVAL_ERROR, "Bad type of data.\n", 'Bad type of data.');
 clean();

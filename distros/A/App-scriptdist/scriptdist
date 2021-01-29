@@ -17,7 +17,7 @@ use File::Spec;
 use File::Spec::Functions;
 use FindBin ();
 
-$VERSION = '0.241';
+$VERSION = '1.001';
 
 =encoding utf8
 
@@ -38,7 +38,7 @@ other files to the distribution once it is in place.
 This script is designed to be a stand-alone program.  You do not need
 any other files to use it.  However, you can create a directory named
 .scriptdist in your home directory, and scriptdist will look for local
-versions of template files there.  Any files in C<~/.scriptdist/t>
+versions of template files there.  Any files in F<~/.scriptdist/t>
 will show up as is in the script's t directory (until I code the parts
 to munge those files).  The script assumes you have specified your
 home directory in the environment variable HOME.
@@ -50,25 +50,25 @@ the environment variable SCRIPTDIST_DEBUG to a true value.
 
 =over 4
 
-=item Check for release information
+=item * Check for release information
 
 The first time the scriptdist is run, or any time the scriptdist cannot
 find the file C<.scriptdistrc>, it prompts for CPAN and SourceForge
-developer information that it can add to the .releaserc file. (NOT
+developer information that it can add to the F<.releaserc> file. (NOT
 YET IMPLEMENTED)
 
-=item Create a directory named after the script
+=item * Create a directory named after the script
 
 The distribution directory is named after the script name,
-with a <.d> attached.  The suffix is there only to avoid a
+with a F<.d> attached.  The suffix is there only to avoid a
 name conflict. You can rename it after the script is moved
 into the directory.  If the directory already exists, the
 script stops. You can either move or delete the directory
 and start again.
 
-=item Look for template files
+=item * Look for template files
 
-The program looks in C<.scriptdistrc> for files to copy into
+The program looks in F<.scriptdistrc> for files to copy into
 the target script distribution directory. After that, it
 adds more files unless they already exist (i.e. the script
 found them in the template directory).  The script replaces
@@ -80,23 +80,23 @@ currently hard-coded at '0.10'.
 While looking for files, scriptdist skips directories named
 F<CVS>, F<.git>, and F<.svn>.
 
-=item Add Changes
+=item * Add Changes
 
 A bare bones Changes file
 
-=item Create the Makefile.PL
+=item * Create the Makefile.PL
 
-=item Create the t directory
+=item * Create the t directory
 
-=item Add compile.t, pod.t, prereq.t
+=item * Add compile.t, pod.t, prereq.t
 
-=item Create test_manifest
+=item * Create test_manifest
 
-=item Copy the script into the directory
+=item * Copy the script into the directory
 
-=item Run make manifest
+=item * Run make manifest
 
-=item Create git repo
+=item * Create git repo
 
 Unless you set the C<SCRIPTDIST_SKIP_GIT>, C<scriptdist> creates
 a git repo, adds everything, and does an initial import.
@@ -105,28 +105,32 @@ a git repo, adds everything, and does an initial import.
 
 =head2 Creating the Makefile.PL
 
-A few things have to show up in the Makefile.PL---the name of
+A few things have to show up in the Makefile.PL—the name of
 the script and the prerequisites modules are the most important.
 Luckily, scriptdist can discover these things and fill them in
 automatically.
 
 =head1 TO DO
 
-* add support for Module::Build (command line switch)
+=over 4
 
-* Create Meta.yml file
+=item * Copy modules into lib directory (to create module dist)
 
-* Copy modules into lib directory (to create module dist)
+=item * Command line switches to turn things on and off
 
-* Command line switches to turn things on and off
+=back
 
 =head2 Maybe a good idea, maybe not
 
-* Add a cover.t and pod coverage test?
+=over 4
 
-* Interactive mode?
+=item * Add a cover.t and pod coverage test?
 
-* automatically import into Git?
+=item * Interactive mode?
+
+=item * automatically import into Git?
+
+=back
 
 =head1 SOURCE AVAILABILITY
 
@@ -145,7 +149,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2004-2017, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This code is available under the Artistic License 2.0.
 

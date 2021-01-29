@@ -1,4 +1,4 @@
-#!/usr/bin/env perl -w
+#!/usr/bin/perl -w
 
 use Test2::V0;
 use Test2::Tools::Explain;

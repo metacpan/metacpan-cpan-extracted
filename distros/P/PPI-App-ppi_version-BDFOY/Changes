@@ -1,5 +1,8 @@
 Revision history for Perl module PPI::App::ppi_version::BDFOY
 
+0.142 2021-01-28T22:49:08Z
+	* Freshen the distro, remove Travis CI, add Github Actions
+
 0.141 2018-05-23T14:57:36Z
 	* Change to Artistic License 2.0
 	* Several minor meta fixes to the distro

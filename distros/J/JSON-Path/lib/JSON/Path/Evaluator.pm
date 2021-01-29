@@ -1,5 +1,5 @@
 package JSON::Path::Evaluator;
-$JSON::Path::Evaluator::VERSION = '0.430';
+$JSON::Path::Evaluator::VERSION = '0.431';
 use strict;
 use warnings;
 use 5.008;
@@ -646,7 +646,7 @@ JSON::Path::Evaluator - A module that recursively evaluates JSONPath expressions
 
 =head1 VERSION
 
-version 0.430
+version 0.431
 
 =head1 SYNOPSIS
 
@@ -832,7 +832,7 @@ child operator
 
 recursive descent. JSONPath borrows this syntax from E4X.
 
-=item *
+=item '*' (literal asterisk)
 
 wildcard. All objects/elements regardless their names.
 
