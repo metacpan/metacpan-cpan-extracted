@@ -15,11 +15,9 @@ use File::Temp;
 
 use Test::More tests => 33;
 
-use UNIVERSAL ();
-
 # Warning: There is another version line, in lib/Config/Tiny.pm.
 
-our $VERSION = '2.24';
+our $VERSION = '2.26';
 
 # --------------------
 

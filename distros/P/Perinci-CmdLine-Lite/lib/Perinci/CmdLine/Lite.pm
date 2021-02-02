@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Lite;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-21'; # DATE
+our $DATE = '2021-01-30'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.900'; # VERSION
+our $VERSION = '1.903'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -450,10 +450,12 @@ sub hook_after_get_meta {
     );
 
     my $meta_uses_opt_n = 0;
+    my $meta_uses_opt_N = 0;
     {
         last unless $ggls_res->[0] == 200;
         my $opts = $ggls_res->[3]{'func.opts'};
         if (grep { $_ eq '-n' } @$opts) { $meta_uses_opt_n = 1 }
+        if (grep { $_ eq '-N' } @$opts) { $meta_uses_opt_N = 1 }
     }
 
     require Perinci::Object;
@@ -471,29 +473,35 @@ sub hook_after_get_meta {
 
     # add --dry-run (and -n shortcut, if no conflict)
     {
+        last if $copts->{dry_run} || $copts->{no_dry_run}; # sometimes we are run more than once?
         last unless $metao->can_dry_run;
         my $default_dry_run = $metao->default_dry_run // $self->default_dry_run;
         $r->{dry_run} = 1 if $default_dry_run;
         $r->{dry_run} = ($ENV{DRY_RUN} ? 1:0) if defined $ENV{DRY_RUN};
 
-        my $optname = 'dry-run' . ($meta_uses_opt_n ? '' : '|n');
-        $copts->{dry_run} = {
-            getopt  => $default_dry_run ? "$optname!" : $optname,
-            summary => "Run in simulation mode (also via DRY_RUN=1)",
-            "summary.alt.bool.not" =>
-                "Disable simulation mode (also via DRY_RUN=0)",
-            handler => sub {
-                my ($go, $val, $r) = @_;
-                if ($val) {
-                    log_debug("[pericmd] Dry-run mode is activated");
-                    $r->{dry_run} = 1;
-                } else {
+        if ($default_dry_run) {
+            my $optname = 'no-dry-run' . ($meta_uses_opt_N ? '' : '|N');
+            $copts->{no_dry_run} = {
+                getopt  => $optname,
+                summary => "Disable simulation mode (also via DRY_RUN=0)",
+                handler => sub {
+                    my ($go, $val, $r) = @_;
                     log_debug("[pericmd] Dry-run mode is deactivated");
                     $r->{dry_run} = 0;
+                },
+            };
+        } else {
+            my $optname = 'dry-run' . ($meta_uses_opt_n ? '' : '|n');
+            $copts->{dry_run} = {
+                getopt  => $optname,
+                summary => "Run in simulation mode (also via DRY_RUN=1)",
+                handler => sub {
+                    my ($go, $val, $r) = @_;
+                    log_debug("[pericmd] Dry-run mode is activated");
+                    $r->{dry_run} = 1;
                 }
-            },
-            default => $default_dry_run,
-        };
+            };
+        }
     }
 
     # check deps property. XXX this should be done only when we don't wrap
@@ -645,7 +653,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.900 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2020-10-21.
+This document describes version 1.903 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2021-01-30.
 
 =head1 SYNOPSIS
 
@@ -866,7 +874,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

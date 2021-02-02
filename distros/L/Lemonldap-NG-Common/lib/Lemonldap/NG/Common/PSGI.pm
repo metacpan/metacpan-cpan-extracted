@@ -258,7 +258,7 @@ sub sendJs {
     return [
         200,
         [
-            'Content-Type'   => 'application/json',
+            'Content-Type'   => 'application/javascript',
             'Content-Length' => length($s),
             'Cache-Control'  => 'public,max-age=2592000',
         ],

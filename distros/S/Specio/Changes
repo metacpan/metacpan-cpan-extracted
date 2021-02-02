@@ -1,7 +1,20 @@
+0.47     2021-01-29
+
+- Change Specio constraint object's stringification overloading to return the
+  type name rather than the default Perl object stringification, which gives
+  you something like
+  "Specio::Constraint::Parameterized=HASH(0x564d258efb48)". Anonymous are
+  special cased to return something you can print.
+
+- All types now overload the `eq` comparison operator. Moose expects types to
+  be comparable in this manner when doing role summation. This fixes a bug
+  reported by Martin Gruner. GH #18.
+
+
 0.46     2020-03-14
 
 - No code changes, just fixing a mistake in the POD. Reported by Petr
-  Pisar. Fixes #17.
+  Pisar. GH #17.
 
 
 0.45     2019-11-24

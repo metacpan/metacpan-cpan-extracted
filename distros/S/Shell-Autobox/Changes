@@ -1,13 +1,34 @@
 Revision history for Perl extension Shell::Autobox
 
-0.40.0 Sun 11 Mar 04:08:57 2018
-    - RT-38687: handle stdin correctly (thanks, Joerg Meltzer)
+2.0.1 - 2021-01-31
 
-0.03  Thu May 12 04:05:51 2005
-    - fixed documentation typo
+  - update the POD
 
-0.02  Thu May 12 03:53:12 2005
-    - added tests for warnings
+2.0.0 - 2021-01-31
 
-0.01  Thu May 12 03:15:24 2005
-    - original version; created by h2xs 1.23 with options -X -n Shell::Autobox
+  - process the command as a list rather than a string to handle shell quoting
+  - allow the input to be an arrayref of lines
+
+1.0.1 - 2021-01-30
+
+  - fix result when the command's output is "0" (don't default to "")
+
+1.0.0 - 2021-01-30
+
+  - portability fix
+
+0.40.0 - 2018-03-11
+
+  - RT-38687: handle stdin correctly (thanks, Joerg Meltzer)
+
+0.03 - 2005-05-12
+
+  - fix documentation typo
+
+0.02 - 2005-05-12
+
+  - add tests for warnings
+
+0.01 - 2005-05-12
+
+  - original version; created by h2xs 1.23 with options -X -n Shell::Autobox

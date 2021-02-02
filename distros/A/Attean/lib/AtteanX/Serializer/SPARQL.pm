@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQL - SPARQL Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQL version 0.028
+This document describes AtteanX::Serializer::SPARQL version 0.029
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ This document describes AtteanX::Serializer::SPARQL version 0.028
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQL 0.028 {
+package AtteanX::Serializer::SPARQL 0.029 {
 	use Moo;
 	use Data::Dumper;
 	use Encode qw(encode);
@@ -55,13 +55,19 @@ package AtteanX::Serializer::SPARQL 0.028 {
 	sub media_types {
 		return [qw(application/sparql-query)];
 	}
+
+=item C<< file_extensions >>
+
+Returns a list of file extensions associated with the serialized format.
+
+=cut
+
+	sub file_extensions { return [qw(rq ru)] };
 	
 	sub handled_type {
 		state $ITEM_TYPE = Type::Tiny::Role->new(role => 'AtteanX::SPARQL::Token');
 		return $ITEM_TYPE;
 	}
-
-	sub file_extensions { return [qw(rq)] }
 
 =item C<< serialize_iter_to_io( $fh, $iterator ) >>
 

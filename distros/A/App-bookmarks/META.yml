@@ -19,15 +19,14 @@ no_index:
     - t
     - inc
 requires:
-  Config::Any: '0'
-  DBI: '0'
   File::Basename: '0'
-  File::Find: '0'
+  File::Copy: '0'
+  File::Temp: '0'
   Getopt::Std: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/kal247/App-bookmarks/issues
   homepage: https://github.com/kal247/App-bookmarks
   repository: https://github.com/kal247/App-bookmarks.git
-version: '0.23'
+version: '0.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

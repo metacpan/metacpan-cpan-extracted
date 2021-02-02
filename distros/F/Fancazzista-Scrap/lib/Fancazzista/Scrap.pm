@@ -5,16 +5,19 @@ use strict;
 use warnings;
 use Fancazzista::Scrap::WebsiteScrapper;
 use Fancazzista::Scrap::RedditScrapper;
+use Fancazzista::Scrap::DevtoScrapper;
 
-our $VERSION = '0.01';
+our $VERSION = '1.00';
 
 sub scrapContent {
     my $config         = shift;
     my $scrapper       = new Fancazzista::Scrap::WebsiteScrapper();
     my $redditScrapper = new Fancazzista::Scrap::RedditScrapper();
+    my $devtoScrapper  = new Fancazzista::Scrap::DevtoScrapper();
     my @websites       = $scrapper->scrap($config);
     my @reddits        = $redditScrapper->scrap($config);
-    my @list           = ( @websites, @reddits );
+    my @posts          = $devtoScrapper->scrap($config);
+    my @list           = ( @websites, @reddits, @posts );
 
     return @list;
 }
@@ -25,7 +28,9 @@ __END__
 
 =head1 NAME
 
-Fancazzista::Scrap - Perl extension for scrap reddit or website content
+Fancazzista::Scrap - Perl module for scrap reddit post, dev.to post, website content.
+
+It only scrap article/post link and link text.
 
 =head1 SYNOPSIS
 
@@ -47,6 +52,12 @@ Fancazzista::Scrap - Perl extension for scrap reddit or website content
                 "name" => "javascript",
                 "limit" => 10 # optionnal 5 by default
             }
+        ],
+        'devto' => [
+            {
+                "tag" => "perl",
+                "limit" => 10 # optionnal 5 by default
+            }
         ]
     );
 
@@ -59,7 +70,10 @@ Fancazzista::Scrap - Perl extension for scrap reddit or website content
             url => '<url'>, 
             articles => [
                 { link => '<article-url>', text => '<article-title>' }
-            ]
+            ],
+            from_devto => 1 # if source is dev.to
+            from_website => 1 # if source if a website
+            from_reddit => 1 # if source if reddit
         }
     ]   
 

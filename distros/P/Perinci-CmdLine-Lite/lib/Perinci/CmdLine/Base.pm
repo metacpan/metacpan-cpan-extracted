@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Base;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-21'; # DATE
+our $DATE = '2021-01-30'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.900'; # VERSION
+our $VERSION = '1.903'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1724,7 +1724,7 @@ sub select_output_handle {
                 die [500, "Can't determine PAGER"];
             }
             last unless $pager; # ENV{PAGER} can be set 0/'' to disable paging
-            #log_trace("Paging output using %s", $pager);
+            log_trace("Paging output using %s", $pager);
             ## no critic (InputOutput::RequireBriefOpen)
             open $handle, "| $pager";
         }
@@ -2113,7 +2113,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.900 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2020-10-21.
+This document describes version 1.903 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-01-30.
 
 =head1 DESCRIPTION
 
@@ -2325,7 +2325,7 @@ For example:
  [plugin=DumpArgs]
 
  [plugin=DumpArgs]
- -event=before_validation
+ -event=before_validate_args
 
  [plugin=DisablePlugins]
  plugins = DumpArgs,DumpConfig
@@ -3258,7 +3258,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

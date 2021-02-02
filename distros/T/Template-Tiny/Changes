@@ -1,54 +1,57 @@
 Changes for Perl extension Template-Tiny
 
-1.12 Fri 17 Jun 2011
-	- Template::Tiny is unchanged for a year, moving to stable release
-	- Cleaning up POD grammar a bit (ADAMK)
-	- Removing test dependency on Capture::Tiny for tiny purity (ADAMK)
+1.13      2021-01-30 17:28:27Z
+          - distribution tooling updates
 
-0.11 Mon 22 Feb 2010
-	- Adding preparse-specific test script (ADAMK)
-	- Add compatibility with the horrible TT process() signature (MSTROUT)
+1.12      2011-06-17
+          - Template::Tiny is unchanged for a year, moving to stable release
+          - Cleaning up POD grammar a bit (ADAMK)
+          - Removing test dependency on Capture::Tiny for tiny purity (ADAMK)
 
-0.10 Sun 24 Jan 2010
-	- The use of the constructor is now compulsory, as per Template.pm
-	- Adding support for constructor params
-	- Adding support for constructor TRIM param
-	- The process method now works in both static and instance modes
+0.11      2010-02-22
+          - Adding preparse-specific test script (ADAMK)
+          - Add compatibility with the horrible TT process() signature (MSTROUT)
 
-0.09 Wed 16 Dec 2009
-	- Adding support for "private" _foo keys
+0.10      2010-01-24
+          - The use of the constructor is now compulsory, as per Template.pm
+          - Adding support for constructor params
+          - Adding support for constructor TRIM param
+          - The process method now works in both static and instance modes
 
-0.08 Sun 13 Dec 2009
-	- Removing some minor code no longer needed.
-	- Updating the POD documentation
+0.09      2009-12-16
+          - Adding support for "private" _foo keys
 
-0.07 Sun 13 Dec 2009
-	- Recursion is now processed top to bottom
-	- Added support for FOREACH
+0.08      2009-12-13
+          - Removing some minor code no longer needed.
+          - Updating the POD documentation
 
-0.06 Sun 13 Dec 2009
-	- Added support for nested [% IF %] and [% UNLESS %] conditions
+0.07      2009-12-13
+          - Recursion is now processed top to bottom
+          - Added support for FOREACH
 
-0.05 Thu 10 Dec 2009
-	- Expression chains in a condition that terminate in an object
-	  will boolify the object instead of stringifying it + tests for it
+0.06      2009-12-13
+          - Added support for nested [% IF %] and [% UNLESS %] conditions
 
-0.04 Thu 10 Dec 2009
-	- Reduced implementation by 8kb
-	- As a side effect of this, added support for UNLESS/ELSE
-	- Matching behaviour of TT to NOT chomp on -%](space)(EOF)
-	- Switch to Tiny-style Makefile.PL
+0.05      2009-12-10
+          - Expression chains in a condition that terminate in an object
+            will boolify the object instead of stringifying it + tests for it
 
-0.03 Thu 10 Dec 2009
-	- Bug fix for methods in expressions
-	- Added test case for method calls
+0.04      2009-12-10
+          - Reduced implementation by 8kb
+          - As a side effect of this, added support for UNLESS/ELSE
+          - Matching behaviour of TT to NOT chomp on -%](space)(EOF)
+          - Switch to Tiny-style Makefile.PL
 
-0.02 Tue  8 Dec 2009
-	- Added support for [%- -%]
-	- Added support for recursive simple expressions
-	- Added support for [% IF expr %]
-	- Added support for [% UNLESS expr %]
-	- Added support for [% ELSE %]
+0.03      2009-12-10
+          - Bug fix for methods in expressions
+          - Added test case for method calls
 
-0.01 Sun  6 Dec 2009
-	- Created initial release
+0.02      2009-12-08
+          - Added support for [%- -%]
+          - Added support for recursive simple expressions
+          - Added support for [% IF expr %]
+          - Added support for [% UNLESS expr %]
+          - Added support for [% ELSE %]
+
+0.01      2009-12-06
+          - Created initial release

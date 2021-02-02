@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Data::Xslate:
     file: lib/Data/Xslate.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Carp: '0'
   Storable: '0'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/bluefeet/Data-Xslate/issues
   homepage: https://github.com/bluefeet/Data-Xslate
   repository: git://github.com/bluefeet/Data-Xslate.git
-version: '0.08'
+version: '0.09'
 x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'

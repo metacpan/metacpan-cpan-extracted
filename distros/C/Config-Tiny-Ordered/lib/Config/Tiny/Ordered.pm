@@ -5,7 +5,7 @@ package Config::Tiny::Ordered;
 use base 'Config::Tiny';
 use strict;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 BEGIN
 {
@@ -232,11 +232,15 @@ Generates the file content for the object and returns it as a string.
 When an error occurs, you can retrieve the error message either from the
 C<$Config::Tiny::Ordered::errstr> variable, or using the C<errstr()> method.
 
+=head1 Repository
+
+L<https://github.com/ronsavage/Config-Tiny-Ordered.git>
+
 =head1 SUPPORT
 
 Bugs should be reported via the CPAN bug tracker at
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-Tiny-Ordered>
+L<https://github.com/ronsavage/Config-Tiny-Ordered/issues>
 
 For other issues, or commercial enhancement or support, contact the author.
 

@@ -4,7 +4,7 @@ package Tree::Simple::View::HTML;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use parent 'Tree::Simple::View';
 
@@ -622,10 +622,15 @@ welcome, of course, patches are even better.
 
 =back
 
-=head1 BUGS
+=head1 Repository
 
-None that I am aware of. Of course, if you find a bug, let me know, and I will be
-sure to fix it.
+L<https://github.com/ronsavage/Tree-Simple.git>
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple/issues>
 
 =head1 CODE COVERAGE
 

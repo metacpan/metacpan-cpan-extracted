@@ -1,9 +1,54 @@
+NAME
+    App::IndonesianFinanceUtils - CLIs related to Indonesian finance
+
+VERSION
+    This document describes version 0.080 of App::IndonesianFinanceUtils
+    (from Perl distribution App-IndonesianFinanceUtils), released on
+    2021-02-01.
+
 
     This distribution contains several CLI's related to Indonesian finance:
 
-    # INSERT_EXECS_LIST
+    *   convert-currency-using-bca
+
+    *   convert-currency-using-gmc
+
+    *   get-jisdor-rates
+
+    *   get-ksei-sec-ownership-url
+
+    *   get-usd-idr-rate-from-bca
+
+    *   get-usd-idr-rate-from-gmc
+
+    *   list-currency-exchange-rates-from-bca
+
+    *   list-currency-exchange-rates-from-gmc
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-IndonesianFinanceUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-IndonesianFinanceUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-App-IndonesianFinanceUtils/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     App::IndonesianBankingUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

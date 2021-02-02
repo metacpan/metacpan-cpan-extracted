@@ -522,7 +522,7 @@ m%<div class="alert alert-warning alert"><div class="text-center"><span trspan="
 count(2);
 
 # Request an unknown identity
-$query =~ s/user=msmith/user=dalek/;
+$query =~ s/user=msmith/user=spoke/;
 ok(
     $res = $client->_post(
         '/checkuser',

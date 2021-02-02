@@ -1,5 +1,9 @@
 Revision history for Perl extension Tree::DAG_Node::Persist.
 
+1.13  2021-02-02T11:16:00
+	- Reformat Makefile.PL.
+	- Update Makefile.PL and POD to change RT to github.
+
 1.12  2016-05-04T08;15:00
 	- Move DBD::SQLite from PREREQ_PM to TEST_REQUIRES.
 	- Correct physical address of Free Software Foundation in LICENSE file. See RT#114149.

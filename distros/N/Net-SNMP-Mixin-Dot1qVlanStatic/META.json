@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-SNMP-Mixin-Dot1qVlanStatic",
    "prereqs" : {
@@ -37,7 +37,7 @@
    "provides" : {
       "Net::SNMP::Mixin::Dot1qVlanStatic" : {
          "file" : "lib/Net/SNMP/Mixin/Dot1qVlanStatic.pm",
-         "version" : "0.05"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

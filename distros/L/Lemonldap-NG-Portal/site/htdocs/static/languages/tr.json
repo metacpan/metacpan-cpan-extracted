@@ -266,6 +266,7 @@
 "rightsReloadNeedsLogout":"Yetkiler yeniden yüklendiğinde çıkış yapıp tekrar giriş yapmanız gerekir",
 "scope":"Kapsam",
 "search":"Ara",
+"searchAccount":"Search for account",
 "seconds":"saniye",
 "selectIdP":"Kimlik Sağlayıcısını seç",
 "service":"Servis",

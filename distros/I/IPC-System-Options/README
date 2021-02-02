@@ -3,8 +3,8 @@ NAME
     start() (with more options)
 
 VERSION
-    This document describes version 0.339 of IPC::System::Options (from Perl
-    distribution IPC-System-Options), released on 2021-01-26.
+    This document describes version 0.340 of IPC::System::Options (from Perl
+    distribution IPC-System-Options), released on 2021-01-31.
 
 SYNOPSIS
      use IPC::System::Options qw(system readpipe run start);
@@ -360,7 +360,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-IPC-System-Options/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-System-Options>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

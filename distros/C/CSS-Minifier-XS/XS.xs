@@ -41,7 +41,6 @@ int charIsInfix(char ch) {
     if (ch == '{')  return 1;
     if (ch == '}')  return 1;
     if (ch == ';')  return 1;
-    if (ch == ':')  return 1;
     if (ch == ',')  return 1;
     if (ch == '~')  return 1;
     if (ch == '>')  return 1;
@@ -50,6 +49,7 @@ int charIsInfix(char ch) {
 int charIsPrefix(char ch) {
     /* WS after these characters can be removed */
     if (ch == '(')  return 1;   /* requires leading WS when used in @media */
+    if (ch == ':')  return 1;   /* requires leading WS when used in pseudo-selector */
     return charIsInfix(ch);
 }
 int charIsPostfix(char ch) {
@@ -224,11 +224,20 @@ void CssClearNodeContents(Node* node) {
 
 /* sets the contents of a node */
 void CssSetNodeContents(Node* node, const char* string, size_t len) {
-    CssClearNodeContents(node);
-    node->length = len;
-    /* allocate string, fill with NULLs, and copy */
-    Newz(0, node->contents, (len+1), char);
-    strncpy( node->contents, string, len );
+    /* if the buffer is already big enough, just overwrite it */
+    if (node->length >= len) {
+        memcpy( node->contents, string, len );
+        node->contents[len] = '\0';
+        node->length = len;
+    }
+    /* otherwise free the buffer, allocate a new one, and copy it in */
+    else {
+        CssClearNodeContents(node);
+        node->length = len;
+        /* allocate string, fill with NULLs, and copy */
+        Newz(0, node->contents, (len+1), char);
+        memcpy( node->contents, string, len );
+    }
 }
 
 /* removes the node from the list and discards it entirely */
@@ -253,6 +262,12 @@ void CssAppendNode(Node* element, Node* node) {
  * endspace characters, that is what we're collapsed to.
  */
 void CssCollapseNodeToWhitespace(Node* node) {
+    /* if we're already a single character, nothing to do; can't get any smaller */
+    if (node->length == 1) {
+        return;
+    }
+
+    /* if we've got a buffer with contents, reduce it */
     if (node->contents) {
         char ws = node->contents[0];
         size_t idx;
@@ -475,6 +490,19 @@ int CssIsZeroPercent(char* str) {
     return 0;
 }
 
+/* checks to see if the string contains "just zeros" (with no units or percentages) */
+int CssIsJustZeros(char* str) {
+    /* Does it start with a zero value? */
+    char* ptr = CssSkipZeroValue(str);
+    if (ptr == NULL) {
+        return 0;
+    }
+
+    /* And are we now at the end of the string? */
+    if (*ptr == '\0') { return 1; }
+    return 0;
+}
+
 /* collapses all of the nodes to their shortest possible representation */
 void CssCollapseNodes(Node* curr) {
     int inMacIeCommentHack = 0;
@@ -485,7 +513,7 @@ void CssCollapseNodes(Node* curr) {
             case NODE_WHITESPACE:
                 CssCollapseNodeToWhitespace(curr);
                 break;
-            case NODE_BLOCKCOMMENT: {
+            case NODE_BLOCKCOMMENT:
                 if (!inMacIeCommentHack && nodeIsMACIECOMMENTHACK(curr)) {
                     /* START of mac/ie hack */
                     CssSetNodeContents(curr, "/*\\*/", 5);
@@ -498,19 +526,47 @@ void CssCollapseNodes(Node* curr) {
                     curr->can_prune = 0;
                     inMacIeCommentHack = 0;
                 }
-                } break;
+                break;
             case NODE_IDENTIFIER:
-                if (CssIsZeroUnit(curr->contents) && !inFunction) {
-                    if (CssIsZeroPercent(curr->contents)) {
+                if (CssIsZeroUnit(curr->contents)) {
+                    /* Zeros can be minified, but have varying rules as to how */
+                    if (CssIsJustZeros(curr->contents)) {
+                        /* nothing but zeros, so truncate to "0" */
+                        CssSetNodeContents(curr, "0", 1);
+                    }
+                    else if (CssIsZeroPercent(curr->contents)) {
+                        /* a zero percentage; truncate to "0%" */
                         CssSetNodeContents(curr, "0%", 2);
                     }
+                    else if (inFunction) {
+                        /* inside a function, units need to be preserved */
+                        /* but we can reduce it to "0" units */
+
+                        /* ... find the first non-zero character in the buffer */
+                        char* zero = CssSkipZeroValue(curr->contents);
+                        /* ... back up one char; now pointing at "the last zero" */
+                        zero --;
+                        /* ... if that's not the start of the buffer ... */
+                        if (zero != curr->contents) {
+                            /* set the buffer to "0 + units", blowing away the earlier bits */
+                            char* buffer;
+                            int len = strlen(zero);
+                            Newz(0, buffer, (len+1), char);
+                            memcpy(buffer, zero, len);
+                            CssSetNodeContents(curr, buffer, len);
+                            Safefree(buffer);
+                        }
+                    }
                     else {
+                        /* not in a function, truncate to "0" and drop the units */
                         CssSetNodeContents(curr, "0", 1);
                     }
                 }
+                break;
             case NODE_SIGIL:
                 if (nodeIsCHAR(curr,'(')) { inFunction = 1; }
                 if (nodeIsCHAR(curr,')')) { inFunction = 0; }
+                break;
             default:
                 break;
         }

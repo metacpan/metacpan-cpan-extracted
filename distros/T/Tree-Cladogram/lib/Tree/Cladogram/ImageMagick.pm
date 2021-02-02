@@ -24,7 +24,7 @@ has title_y =>
 	required => 0,
 );
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 # ------------------------------------------------
 
@@ -313,11 +313,11 @@ Version numbers < 1.00 represent development versions. From 1.00 up, they are pr
 
 L<https://github.com/ronsavage/Tree-Cladogram>
 
-=head1 Support
+=head1 SUPPORT
 
-Email the author, or log a bug on RT:
+Bugs should be reported via the CPAN bug tracker at
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Tree::Cladogram>.
+L<https://github.com/ronsavage/Tree-Cladogram/issues>
 
 =head1 Author
 

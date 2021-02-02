@@ -4,7 +4,7 @@ Specio - Type constraints and coercions for Perl
 
 # VERSION
 
-version 0.46
+version 0.47
 
 # SYNOPSIS
 
@@ -63,22 +63,22 @@ distribution will magically make the Perl interpreter start checking a value's
 type on assignment to a variable. In fact, there's no built-in way to apply a
 type to a variable at all.
 
-Instead, you can explicitly check a value against a type, and optionally
-coerce values to that type.
+Instead, you can explicitly check a value against a type, and optionally coerce
+values to that type.
 
 My long-term goal is to replace Moose's built-in types and [MooseX::Types](https://metacpan.org/pod/MooseX%3A%3ATypes)
 with this module.
 
 # WHAT IS A TYPE?
 
-At it's core, a type is simply a constraint. A constraint is code that checks
-a value and returns true or false. Most constraints are represented by
-[Specio::Constraint::Simple](https://metacpan.org/pod/Specio%3A%3AConstraint%3A%3ASimple) objects. However, there are other type
-constraint classes for specialized kinds of constraints.
+At it's core, a type is simply a constraint. A constraint is code that checks a
+value and returns true or false. Most constraints are represented by
+[Specio::Constraint::Simple](https://metacpan.org/pod/Specio%3A%3AConstraint%3A%3ASimple) objects. However, there are other type constraint
+classes for specialized kinds of constraints.
 
-Types can be named or anonymous, and each type can have a parent type. A
-type's constraint is optional because sometimes you may want to create a named
-subtype of some existing type without adding additional constraints.
+Types can be named or anonymous, and each type can have a parent type. A type's
+constraint is optional because sometimes you may want to create a named subtype
+of some existing type without adding additional constraints.
 
 Constraints can be expressed either in terms of a simple subroutine reference
 or in terms of an inline generator subroutine reference. The former is easier
@@ -127,9 +127,9 @@ The `Undef` type only accepts `undef`.
 
 The `Defined` type accepts anything _except_ `undef`.
 
-The `Num` and `Int` types are stricter about numbers than Perl
-is. Specifically, they do not allow any sort of space in the number, nor do
-they accept "Nan", "Inf", or "Infinity".
+The `Num` and `Int` types are stricter about numbers than Perl is.
+Specifically, they do not allow any sort of space in the number, nor do they
+accept "Nan", "Inf", or "Infinity".
 
 The `ClassName` type constraint checks that the name is valid _and_ that the
 class is loaded.
@@ -144,8 +144,8 @@ below for details.
 
 Perl's overloading is horribly broken and doesn't make much sense at all.
 
-However, unlike Moose, all type constraints allow overloaded objects where
-they make sense.
+However, unlike Moose, all type constraints allow overloaded objects where they
+make sense.
 
 For types where overloading makes sense, we explicitly check that the object
 provides the type overloading we expect. We _do not_ simply try to use the
@@ -190,8 +190,8 @@ the parameter applies to the values (keys are never checked).
 
 The `Maybe` type is a special parameterized type. It allows for either
 `undef` or a value. All by itself, it is meaningless, since it is equivalent
-to "Maybe of Item", which is equivalent to Item. When parameterized, it
-accepts either an `undef` or the type of its parameter.
+to "Maybe of Item", which is equivalent to Item. When parameterized, it accepts
+either an `undef` or the type of its parameter.
 
 This is useful for optional attributes or parameters. However, you're probably
 better off making your code simply not pass the parameter at all This usually
@@ -212,8 +212,8 @@ not exposed to your code. To access a type, you always call `t('TypeName')`.
 
 This returns the named type or dies if no such type exists.
 
-Because types are always copied on import, it's safe to create coercions on
-any type. Your coercion from `Str` to `Int` will not be seen by any other
+Because types are always copied on import, it's safe to create coercions on any
+type. Your coercion from `Str` to `Int` will not be seen by any other
 package, unless that package explicitly imports your `Int` type.
 
 When you import types, you import every type defined in the package you import
@@ -222,8 +222,8 @@ definition. You _cannot_ define the same type twice internally.
 
 # CREATING A TYPE LIBRARY
 
-By default, all types created inside a package are invisible to other
-packages. If you want to create a type library, you need to inherit from
+By default, all types created inside a package are invisible to other packages.
+If you want to create a type library, you need to inherit from
 [Specio::Exporter](https://metacpan.org/pod/Specio%3A%3AExporter) package:
 
     package MyApp::Type::Library;
@@ -239,9 +239,8 @@ packages. If you want to create a type library, you need to inherit from
         where  => sub { $_[0] =~ /foo/i },
     );
 
-Now the MyApp::Type::Library package will export a single type named
-`Foo`. It _does not_ re-export the types provided by
-[Specio::Library::Builtins](https://metacpan.org/pod/Specio%3A%3ALibrary%3A%3ABuiltins).
+Now the MyApp::Type::Library package will export a single type named `Foo`. It
+_does not_ re-export the types provided by [Specio::Library::Builtins](https://metacpan.org/pod/Specio%3A%3ALibrary%3A%3ABuiltins).
 
 If you want to make your library re-export some other libraries types, you can
 ask for this explicitly:
@@ -270,8 +269,8 @@ This should just work. Use a Specio type anywhere you'd specify a type.
 
 # USING SPECIO WITH [Moo](https://metacpan.org/pod/Moo)
 
-Using Specio with Moo is easy. You can pass Specio constraint objects as
-`isa` parameters for attributes. For coercions, simply call `$type->coercion_sub`.
+Using Specio with Moo is easy. You can pass Specio constraint objects as `isa`
+parameters for attributes. For coercions, simply call `$type->coercion_sub`.
 
     package Foo;
 
@@ -337,18 +336,18 @@ Here are some of the salient differences:
 - Anon types are explicit
 
     With [Moose](https://metacpan.org/pod/Moose) and [MooseX::Types](https://metacpan.org/pod/MooseX%3A%3ATypes), you use the same subroutine, `subtype()`,
-    to declare both named and anonymous types. With Specio, you use `declare()` for
-    named types and `anon()` for anonymous types.
+    to declare both named and anonymous types. With Specio, you use `declare()`
+    for named types and `anon()` for anonymous types.
 
 - Class and object types are separate
 
     Moose and MooseX::Types have `class_type` and `duck_type`. The former type
     requires an object, while the latter accepts a class name or object.
 
-    With Specio, the distinction between accepting an object versus object or
-    class is explicit. There are six declaration helpers, `object_can_type`,
-    `object_does_type`, `object_isa_type`, `any_can_type`, `any_does_type`,
-    and `any_isa_type`.
+    With Specio, the distinction between accepting an object versus object or class
+    is explicit. There are six declaration helpers, `object_can_type`,
+    `object_does_type`, `object_isa_type`, `any_can_type`, `any_does_type`, and
+    `any_isa_type`.
 
 - Overloading support is baked in
 
@@ -357,8 +356,8 @@ Here are some of the salient differences:
 
 - Types can either have a constraint or inline generator, not both
 
-    Moose and MooseX::Types types can be defined with a subroutine reference as
-    the constraint, an inline generator subroutine, or both. This is purely for
+    Moose and MooseX::Types types can be defined with a subroutine reference as the
+    constraint, an inline generator subroutine, or both. This is purely for
     backwards compatibility, and it makes the internals more complicated than they
     need to be.
 
@@ -371,8 +370,8 @@ Here are some of the salient differences:
 
 - No crazy coercion features
 
-    Moose has some bizarre (and mostly) undocumented features relating to
-    coercions and parameterizable types. This is a misfeature.
+    Moose has some bizarre (and mostly) undocumented features relating to coercions
+    and parameterizable types. This is a misfeature.
 
 # OPTIONAL PREREQS
 
@@ -446,7 +445,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

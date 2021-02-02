@@ -46,9 +46,9 @@ double eraHd2pa (double ha, double dec, double phi)
 **
 **  Last revision:   2017 September 12
 **
-**  ERFA release 2018-01-30
+**  ERFA release 2020-07-21
 **
-**  Copyright (C) 2018 IAU ERFA Board.  See notes at end.
+**  Copyright (C) 2020 IAU ERFA Board.  See notes at end.
 */
 {
    double cp, cqsz, sqsz;
@@ -65,7 +65,7 @@ double eraHd2pa (double ha, double dec, double phi)
 /*----------------------------------------------------------------------
 **  
 **  
-**  Copyright (C) 2013-2019, NumFOCUS Foundation.
+**  Copyright (C) 2013-2020, NumFOCUS Foundation.
 **  All rights reserved.
 **  
 **  This library is derived, with permission, from the International

@@ -6,7 +6,7 @@ use base 'Tree::Fast';
 use strict;
 use warnings;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 use Scalar::Util qw( blessed refaddr weaken );
 
@@ -1035,8 +1035,9 @@ L<https://github.com/ronsavage/Tree>
 
 =head1 SUPPORT
 
-The mailing list is at L<TreeCPAN@googlegroups.com>. I also read
-L<http://www.perlmonks.com> on a daily basis.
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree/issues>
 
 =head1 AUTHORS
 

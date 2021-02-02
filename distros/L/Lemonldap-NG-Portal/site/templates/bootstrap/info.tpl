@@ -4,11 +4,11 @@
 
   <form id="form" action="<TMPL_VAR NAME="URL">" method="<TMPL_VAR NAME="FORM_METHOD">" class="info" role="form">
     <TMPL_VAR NAME="HIDDEN_INPUTS">
-    <TMPL_IF NAME="CHOICE_VALUE">
-      <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="CHOICE_VALUE">" />
-    </TMPL_IF>
     <TMPL_IF NAME="SEND_PARAMS">
       <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
+      <TMPL_IF NAME="CHOICE_VALUE">
+      <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="CHOICE_VALUE">" />
+      </TMPL_IF>
     </TMPL_IF>
     <div class="card border-info">
       <div class="card-header text-white bg-info">

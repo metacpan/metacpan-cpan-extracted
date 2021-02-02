@@ -1,0 +1,34 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Slack::Event::BlockActions
+at lib/Net/Async/Slack/Event/BlockActions.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Slack::Event::BlockActions - a block action was triggered
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Net::Async::Slack::EventType>
+
+L<from_json|Net::Async::Slack::EventType/from_json>, L<import|Net::Async::Slack::EventType/import>, L<new|Net::Async::Slack::EventType/new>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2016-2021. Licensed under the same terms as Perl itself.
+

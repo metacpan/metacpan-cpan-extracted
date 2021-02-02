@@ -37,7 +37,7 @@
    "provides" : {
       "Net::SNMP::Mixin::CiscoDot1qVlanStatic" : {
          "file" : "lib/Net/SNMP/Mixin/CiscoDot1qVlanStatic.pm",
-         "version" : "0.02"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -9,8 +9,8 @@ my(%params) =
 (
 	($] ge '5.005') ?
 	(
-		AUTHOR   => 'Stevan Little <stevan@cpan.org>',
-		ABSTRACT => 'A factory object for dispensing Visitor objects',
+		AUTHOR		=> 'Stevan Little <stevan@cpan.org>',
+		ABSTRACT	=> 'A factory object for dispensing Visitor objects',
 	) : (),
 	clean =>
 	{
@@ -18,13 +18,14 @@ my(%params) =
 	},
 	dist =>
 	{
-		COMPRESS => 'gzip',
-		SUFFIX   => 'gz'
+		COMPRESS	=> 'gzip',
+		SUFFIX		=> 'gz'
 	},
-	DISTNAME  => 'Tree-Simple-VisitorFactory',
-	NAME         => 'Tree::Simple::VisitorFactory',
-	PL_FILES  => {},
-	PREREQ_PM    =>
+	DISTNAME	=> 'Tree-Simple-VisitorFactory',
+	LICENSE		=> 'perl',
+	NAME		=> 'Tree::Simple::VisitorFactory',
+	PL_FILES	=> {},
+	PREREQ_PM	=>
 	{
 		'base'					=> 0,
 		'File::Spec'			=> 0.60,
@@ -57,7 +58,10 @@ if ($ExtUtils::MakeMaker::VERSION ge '6.46')
 		},
 		resources =>
 		{
-			bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-Simple-VisitorFactorye',
+			bugtracker =>
+			{
+				web => 'https://github.com/ronsavage/Tree-Simple-VisitorFactory/issues',
+			},
 			license    => 'http://dev.perl.org/licenses/',
 			repository =>
 			{

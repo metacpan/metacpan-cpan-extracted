@@ -1,3 +1,20 @@
+0.628   2021-01-31  Released-By: PERLANCAR; Urgency: high
+
+        - Merge two releases 0.627 & 0.627.1.
+
+
+0.627.1 2021-01-31  Released-By: PERLANCAR; Urgency: medium
+
+        - Add new subcommand: commit.
+
+	- [cli exec-bunch] Add option: command_opts.
+
+	- [ux] Add --recent & -r as shortcut for --min-repo-access-time='2 weeks
+	  ago'.
+
+        - UPDATE: Rename version to 0.627.1 due to duplicate.
+
+
 0.627   2020-10-30  Released-By: PERLANCAR; Urgency: medium
 
         [subcommand check]

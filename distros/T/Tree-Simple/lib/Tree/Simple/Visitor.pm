@@ -3,7 +3,7 @@ package Tree::Simple::Visitor;
 use strict;
 use warnings;
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 use Scalar::Util qw(blessed);
 
@@ -287,6 +287,10 @@ None that I am aware of. The code is pretty thoroughly tested (see B<CODE COVERA
 B<Tree::Simple>) and is based on an (non-publicly released) module which I had used in production
 systems for about 2 years without incident. Of course, if you find a bug, let me know, and I will
 be sure to fix it.
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple/issues>
 
 =head1 SEE ALSO
 

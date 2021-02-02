@@ -3,9 +3,9 @@ NAME
     Central Asia)
 
 VERSION
-    This document describes version 0.154 of Finance::Currency::Convert::BCA
+    This document describes version 0.155 of Finance::Currency::Convert::BCA
     (from Perl distribution Finance-Currency-Convert-BCA), released on
-    2018-07-15.
+    2021-02-01.
 
 SYNOPSIS
      use Finance::Currency::Convert::BCA qw(convert_currency);
@@ -64,7 +64,7 @@ FUNCTIONS
   get_currencies
     Usage:
 
-     get_currencies() -> [status, msg, result, meta]
+     get_currencies() -> [status, msg, payload, meta]
 
     Extract data from KlikBCA/BCA page.
 
@@ -77,7 +77,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -102,8 +102,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-Conv
-    ert-BCA>
+    <https://github.com/perlancar/perl-Finance-Currency-Convert-BCA/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -112,8 +111,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2012 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018, 2017, 2016, 2015, 2014, 2012
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

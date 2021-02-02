@@ -41,7 +41,9 @@ can_ok 'HR::Employee', "select";
 die_ok {HR::Employee->Table(Foo    => T_Foo => qw/foo_id/)};
 
 # primary_key method works
-is_deeply([HR::Employee->primary_key], ['emp_id'], 'primary_key');
+is_deeply([HR::Employee->primary_key], ['emp_id'], 'primary_key (perl class method)');
+is_deeply([HR->table('Employee')->primary_key], ['emp_id'], 'primary_key (DBIDM class method)');
+
 
 # path methods are present
 can_ok 'HR::Activity', "employee";
@@ -485,6 +487,60 @@ sqlLike(<<__EOSQL__, [qw/01.01.1950 01.01.1950/], "sql count from union");
     SELECT emp_id, firstname, lastname FROM T_Employee WHERE ( d_spouse = ? )
   ) AS count_wrapper
 __EOSQL__
+
+
+
+# -union_all
+HR->table('Employee')->select(
+  -columns   => [qw/emp_id firstname lastname/],
+  -where     => {d_birth => {'>=' => '01.01.1950'}},
+  -union_all => [-where  => {d_spouse => {'>=' => '02.02.1950'}}],
+ );
+sqlLike(<<__EOSQL__, [qw/01.01.1950 02.02.1950/], "sql union all");
+  SELECT emp_id, firstname, lastname FROM T_Employee WHERE ( d_birth >= ? ) 
+  UNION ALL
+  SELECT emp_id, firstname, lastname FROM T_Employee WHERE ( d_spouse >= ? )
+__EOSQL__
+
+
+# -intersect
+HR->table('Employee')->select(
+  -columns   => [qw/emp_id firstname lastname/],
+  -where     => {d_birth => {'>=' => '01.01.1950'}},
+  -intersect => [-where  => {d_spouse => {'>=' => '02.02.1950'}}],
+ );
+sqlLike(<<__EOSQL__, [qw/01.01.1950 02.02.1950/], "sql intersect");
+  SELECT emp_id, firstname, lastname FROM T_Employee WHERE ( d_birth >= ? ) 
+  INTERSECT
+  SELECT emp_id, firstname, lastname FROM T_Employee WHERE ( d_spouse >= ? )
+__EOSQL__
+
+
+# -except
+HR->table('Employee')->select(
+  -columns   => [qw/emp_id firstname lastname/],
+  -where     => {d_birth => {'>=' => '01.01.1950'}},
+  -except    => [-where  => {d_spouse => {'>=' => '02.02.1950'}}],
+ );
+sqlLike(<<__EOSQL__, [qw/01.01.1950 02.02.1950/], "sql except");
+  SELECT emp_id, firstname, lastname FROM T_Employee WHERE ( d_birth >= ? ) 
+  EXCEPT
+  SELECT emp_id, firstname, lastname FROM T_Employee WHERE ( d_spouse >= ? )
+__EOSQL__
+
+
+# -minus -- currently not supported by SQL::Abstract::Test in v2.0
+# HR->table('Employee')->select(
+#   -columns   => [qw/emp_id firstname lastname/],
+#   -where     => {d_birth => {'>=' => '01.01.1950'}},
+#   -minus     => [-where  => {d_spouse => {'>=' => '02.02.1950'}}],
+#  );
+# sqlLike(<<__EOSQL__, [qw/01.01.1950 02.02.1950/], "sql minus");
+#   SELECT emp_id, firstname, lastname FROM T_Employee WHERE ( d_birth >= ? )
+#   MINUS
+#   SELECT emp_id, firstname, lastname FROM T_Employee WHERE ( d_spouse >= ? )
+# __EOSQL__
+
 
 
 #----------------------------------------------------------------------

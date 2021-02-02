@@ -90,12 +90,17 @@ sub _dump_one_line {
 1;
 __END__
 
-=head1 AUTHOR
+=head1 SUPPORT
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+See L<GitLab::API::v3/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<GitLab::API::v3/AUTHORS>.
 
 =head1 LICENSE
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+See L<GitLab::API::v3/LICENSE>.
+
+=cut
 

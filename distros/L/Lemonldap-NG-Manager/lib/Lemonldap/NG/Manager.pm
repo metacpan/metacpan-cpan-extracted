@@ -17,7 +17,7 @@ use JSON;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 
 extends qw(
   Lemonldap::NG::Handler::PSGI::Router

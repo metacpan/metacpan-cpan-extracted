@@ -266,6 +266,7 @@
 "rightsReloadNeedsLogout":" إعادة تحميل الحقوق تحتاج إلى تسجيل الخروج وتسجيل الدخول مرة أخرى",
 "scope":"نطاق",
 "search":"Search",
+"searchAccount":"Search for account",
 "seconds":"seconds",
 "selectIdP":"اختر موفر الهوية الخاص بك",
 "service":"Service",

@@ -7,28 +7,32 @@ package Lemonldap::NG::Portal::UserDB::Demo;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_BADCREDENTIALS);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_USERNOTFOUND
+  PE_BADCREDENTIALS
+);
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.11';
 
 # Sample accounts from Doctor Who characters
 our %demoAccounts = (
+    'dwho' => {
+        uid  => 'dwho',
+        cn   => 'Doctor Who',
+        mail => 'dwho@badwolf.org',
+    },
     'rtyler' => {
-        'uid'  => 'rtyler',
-        'cn'   => 'Rose Tyler',
-        'mail' => 'rtyler@badwolf.org',
+        uid  => 'rtyler',
+        cn   => 'Rose Tyler',
+        mail => 'rtyler@badwolf.org',
     },
     'msmith' => {
-        'uid'  => 'msmith',
-        'cn'   => 'Mickey Smith',
-        'mail' => 'msmith@badwolf.org',
-    },
-    'dwho' => {
-        'uid'  => 'dwho',
-        'cn'   => 'Doctor Who',
-        'mail' => 'dwho@badwolf.org',
+        uid  => 'msmith',
+        cn   => 'Mickey Smith',
+        mail => 'msmith@badwolf.org',
     },
 );
 
@@ -66,7 +70,64 @@ sub getUser {
     }
 
     eval { $self->p->_authentication->setSecurity($req) };
-    PE_BADCREDENTIALS;
+
+    return PE_BADCREDENTIALS;
+}
+
+## @apmethod int findUser()
+# Search for accounts
+# @return Lemonldap::NG::Portal constant
+sub findUser {
+    my ( $self, $req, %args ) = @_;
+    my $plugin =
+      $self->p->loadedModules->{"Lemonldap::NG::Portal::Plugins::FindUser"};
+    my ( $searching, $excluding ) = $plugin->retreiveFindUserParams($req);
+    eval { $self->p->_authentication->setSecurity($req) };
+    return PE_OK unless scalar @$searching;
+
+    my $iswc;
+    my $cond     = '';
+    my $wildcard = $self->conf->{findUserWildcard};
+    $self->logger->info("Demo UserDB with wildcard ($wildcard)") if $wildcard;
+    foreach (@$searching) {
+        if ($wildcard) {
+            $iswc = $_->{value} =~ s/\Q$wildcard\E+//g;
+            $cond .=
+              $iswc
+              ? '($' . $_->{key} . " =~ /\Q$_->{value}\E/) && "
+              : '$' . $_->{key} . " eq '$_->{value}' && ";
+        }
+        else {
+            $cond .= '$' . $_->{key} . " eq '$_->{value}' && ";
+        }
+    }
+    $cond .= '$' . $_->{key} . " ne '$_->{value}' && " foreach (@$excluding);
+    $cond =~ s/&&\s$//;
+    $self->logger->debug("Demo UserDB built condition: $cond");
+
+    my @results = map {
+        my $uid  = $demoAccounts{$_}->{uid};
+        my $cn   = $demoAccounts{$_}->{cn};
+        my $mail = $demoAccounts{$_}->{mail};
+        my $guy  = $demoAccounts{$_}->{guy} // 'good';
+        my $type = $demoAccounts{$_}->{type} // 'character';
+        eval "($cond)"
+          ? $_
+          : ();
+    } keys %demoAccounts;
+
+    $self->logger->debug(
+        'Demo UserDB number of result(s): ' . scalar @results );
+    if ( scalar @results ) {
+        my $rank = int( rand( scalar @results ) );
+        $self->logger->debug("Demo UserDB random rank: $rank");
+        $self->userLogger->info(
+            "FindUser: Demo UserDB returns $results[$rank]");
+        $req->data->{findUser} = $results[$rank];
+        return PE_OK;
+    }
+
+    return PE_USERNOTFOUND;
 }
 
 ## @apmethod int setSessionInfo()
@@ -81,7 +142,7 @@ sub setSessionInfo {
         $req->{sessionInfo}->{$k} = $demoAccounts{ $req->{user} }->{$v};
     }
 
-    PE_OK;
+    return PE_OK;
 }
 
 ## @apmethod int setGroups()
@@ -103,7 +164,8 @@ sub setGroups {
     }
     $req->sessionInfo->{groups}  = $groups;
     $req->sessionInfo->{hGroups} = $hGroups;
-    PE_OK;
+
+    return PE_OK;
 }
 
 1;

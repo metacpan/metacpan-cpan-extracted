@@ -3,9 +3,8 @@ abstract: 'Искони бѣ Слово'
 author:
   - 'Красимир Беров (berov@cpan.org)'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.24'
+configure_requires: {}
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -32,11 +31,11 @@ requires:
   Mojolicious::Plugin::RoutesConfig: '0.06'
   Net::SMTP: '3.11'
   Role::Tiny: '2.001004'
-  perl: '5.020000'
+  perl: '5.026000'
 resources:
   bugtracker: https://github.com/kberov/Slovo/issues
   homepage: https://github.com/kberov/Slovo
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/kberov/Slovo.git
-version: v2021.01.11
+version: v2021.02.01
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,8 +1,15 @@
 Version History
 
-0.27
+0.28
+
+    No code changes just fix incorrect version in META.yml
 
     TBD     Update Version and Changes
+    e42edee Increment missing version in META.yml
+
+0.27
+
+    2bde4e1 (tag: 0.27) Update Version and Changes
     5b499ba Fix test error on OpenBSD 6.8
 
 0.26-TRIAL 25-Jan-2021

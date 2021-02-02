@@ -19,7 +19,7 @@ my %tests = (
                 strict
                 _Foo
                 A123::456
-                ),
+            ),
             "Has::Chinese::\x{3403}::In::It"
         ],
         reject => [
@@ -34,7 +34,7 @@ my %tests = (
                 Foo::Bar::
                 ::Foo
                 My-Distro
-                ),
+            ),
             'Has::Spaces In It',
         ],
     },
@@ -46,7 +46,7 @@ my %tests = (
                 strict
                 _Foo
                 A123-456
-                ),
+            ),
             "Has-Chinese-\x{3403}-In-It"
         ],
         reject => [
@@ -61,7 +61,7 @@ my %tests = (
                 Foo-Bar-
                 -Foo
                 My::Package
-                ),
+            ),
             'Has-Spaces In It',
         ],
     },
@@ -83,7 +83,7 @@ my %tests = (
                 foo_bar
                 f1234
                 f1j2_o1
-                ),
+            ),
             "\x{3403}",
             "has_\x{3403}",
             "has_\x{3403}_in_it",
@@ -110,7 +110,7 @@ my %tests = (
                 foo_bar
                 f1234
                 f1j2_o1
-                ),
+            ),
             "\x{3403}",
             "has_\x{3403}",
             "has_\x{3403}_in_it",
@@ -120,7 +120,7 @@ my %tests = (
                 _
                 a
                 b
-                ),
+            ),
             q{ },
             $EMPTY_STRING,
             'a b',
@@ -139,7 +139,7 @@ my %tests = (
                 1.2345_01
                 0.1
                 v0.1.2
-                )
+            )
         ],
         reject => [
             qw(
@@ -147,7 +147,7 @@ my %tests = (
                 42.a
                 a.b
                 vA.b
-                ),
+            ),
         ],
     },
     StrictVersionStr => {
@@ -158,7 +158,7 @@ my %tests = (
                 2.3456
                 0.1
                 v0.1.2
-                ),
+            ),
         ],
         reject => [
             qw(
@@ -166,7 +166,7 @@ my %tests = (
                 1.2345.6
                 v1.23_4
                 1.2345_01
-                )
+            )
         ],
     },
 );

@@ -1,5 +1,10 @@
 Revision history for Perl extension GIS-Distance.
 
+0.19 2021-01-30T06:07:58Z
+
+ - Changed licensing terms to be the same as Perl.
+ - Provide a .editorconfig instead of .lvimrc.
+
 0.18 2019-05-10T20:31:31Z
 
  - Switch to the GNU General Public License version 3.

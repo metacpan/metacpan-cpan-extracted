@@ -5,7 +5,6 @@ BEGIN
     use lib './lib';
     require( "./t/functions.pl" ) || BAIL_OUT( "Unable to find library \"functions.pl\"." );
     our $BASE_URI;
-    use Path::Tiny;
     use DateTime;
     use DateTime::Format::Strptime;
     use Nice::Try;
@@ -17,9 +16,9 @@ try
 {
     my $dt = DateTime->now( time_zone => 'local' );
     $year = $dt->year;
-    my $inc = Path::Tiny->new( "./t/htdocs${BASE_URI}/include.01.txt" );
+    my $inc_mtime = ( stat( "./t/htdocs${BASE_URI}/include.01.txt" ) )[9];
     ## diag( "File $inc last modified time is ", $inc->stat->mtime, " (", scalar( localtime( $inc->stat->mtime ) ), ")." );
-    $inc_ts = DateTime->from_epoch( epoch => $inc->stat->mtime, time_zone => 'local' );
+    $inc_ts = DateTime->from_epoch( epoch => $inc_mtime, time_zone => 'local' );
     my $params =
     {
         pattern => '%A %B %d, %Y',
@@ -28,8 +27,8 @@ try
     $params->{locale} = $ENV{lang} if( length( $ENV{lang} ) );
     my $fmt = DateTime::Format::Strptime->new( %$params );
     $inc_ts->set_formatter( $fmt );
-    my $me = Path::Tiny->new( "./t/htdocs${BASE_URI}/07.03.flastmod.html" );
-    $me_ts = DateTime->from_epoch( epoch => $me->stat->mtime, time_zone => 'local' );
+    my $me_mtime = ( stat( "./t/htdocs${BASE_URI}/07.03.flastmod.html" ) )[9];
+    $me_ts = DateTime->from_epoch( epoch => $me_mtime, time_zone => 'local' );
     my $fmt2 = DateTime::Format::Strptime->new(
         pattern => '%D',
         time_zone => 'local',

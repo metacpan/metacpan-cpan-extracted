@@ -2,11 +2,13 @@
 abstract: 'Backend for Business::OnlinePayment'
 author:
   - 'Jason Terry <oaxlin@cpan.org>'
-build_requires: {}
+build_requires:
+  Module::Runtime: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,12 +21,15 @@ requires:
   HTTP::Tiny: '0.022'
   IO::Socket::SSL: '1.56'
   IO::String: '0'
+  List::MoreUtils: '0'
   Log::Scrubber: '0.14'
   Net::SFTP::Foreign: '1.57'
   Net::SSLeay: '0'
-  Test::More: '0'
   Tie::IxHash: '0'
   XML::Simple: '0'
   XML::Writer: '0'
-version: '0.002'
+resources:
+  bugtracker: https://github.com/oaxlin/Business--OnlinePayment--Vindicia--Select/issues
+  repository: git://github.com/oaxlin/Business--OnlinePayment--Vindicia--Select.git
+version: '0.003'
 x_serialization_backend: 'YAML::Tiny version 1.64'

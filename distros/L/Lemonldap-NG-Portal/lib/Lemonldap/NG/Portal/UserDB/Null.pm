@@ -20,6 +20,10 @@ sub getUser {
     PE_OK;
 }
 
+sub findUser {
+    PE_OK;
+}
+
 sub setSessionInfo {
     PE_OK;
 }

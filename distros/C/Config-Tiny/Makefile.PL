@@ -14,8 +14,8 @@ my(%params) =
 (
 	($] ge '5.005') ?
 	(
-		AUTHOR   => 'Adam Kennedy <adamk@cpan.org>',
-		ABSTRACT => 'Read/Write .ini style files with as little code as possible',
+		AUTHOR		=> 'Adam Kennedy <adamk@cpan.org>',
+		ABSTRACT	=> 'Read/Write .ini style files with as little code as possible',
 	) : (),
 	clean =>
 	{
@@ -23,8 +23,8 @@ my(%params) =
 	},
 	dist =>
 	{
-		COMPRESS => 'gzip',
-		SUFFIX   => 'gz'
+		COMPRESS	=> 'gzip',
+		SUFFIX		=> 'gz'
 	},
 	BUILD_REQUIRES =>
 	{
@@ -32,26 +32,24 @@ my(%params) =
 		# 0.47 means 5.6.2 or newer, which everyone on Win32 has.
 		($^O eq 'MSWin32' ? () : ('Test::More' => '0.47') ),
 	},
-	DISTNAME     => 'Config-Tiny',
-	NAME         => 'Config::Tiny',
-	PL_FILES    => {},
-	LICENSE      => 'perl',
-	PREREQ_PM    =>
+	DISTNAME	=> 'Config-Tiny',
+	NAME		=> 'Config::Tiny',
+	PL_FILES	=> {},
+	LICENSE		=> 'perl',
+	PREREQ_PM	=>
 	{
-		'File::Spec' => 3.30,
-		'File::Temp' => 0.22,
-		'strict'     => 0,
-		'UNIVERSAL'  => 0,
-		'utf8'       => 0,
+		'File::Spec'	=> 3.30,
+		'File::Temp'	=> 0.22,
+		'strict'		=> 0,
+		'utf8'			=> 0,
 	},
 	TEST_REQUIRES =>
 	{
-		'Test::More'	=> 1.001002,
-		'Test::Pod'		=> 1.51,
+		'Test::More' => 1.001002,
 	},
-	VERSION_FROM => 'lib/Config/Tiny.pm',
-	INSTALLDIRS  => 'site',
-	EXE_FILES    => [],
+	VERSION_FROM	=> 'lib/Config/Tiny.pm',
+	INSTALLDIRS		=> 'site',
+	EXE_FILES		=> [],
 );
 
 if ( ($ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/) && ($ExtUtils::MakeMaker::VERSION > 6.30) )
@@ -69,13 +67,16 @@ if ($ExtUtils::MakeMaker::VERSION ge '6.46')
 		},
 		resources   =>
 		{
-			bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Tiny',
-			license    => 'http://opensource.org/licenses/Perl',
-			repository =>
+			bugtracker =>
 			{
-				type => 'git',
-				url  => 'https://github.com/ronsavage/Config-Tiny.git',
-				web  => 'https://github.com/ronsavage/Config-Tiny',
+				web => 'https://github.com/ronsavage/Config-Tiny/issues',
+			},
+			license		=> 'http://opensource.org/licenses/Perl',
+			repository	=>
+			{
+				type	=> 'git',
+				url		=> 'https://github.com/ronsavage/Config-Tiny.git',
+				web		=> 'https://github.com/ronsavage/Config-Tiny',
 			},
 		},
 	};

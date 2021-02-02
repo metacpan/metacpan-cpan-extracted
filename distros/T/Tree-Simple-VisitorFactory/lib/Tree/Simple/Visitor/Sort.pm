@@ -3,7 +3,7 @@ package Tree::Simple::Visitor::Sort;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Scalar::Util qw(blessed);
 
@@ -230,9 +230,15 @@ It should be noted that this is a I<destructive> action, since the sort happens 
 
 =back
 
-=head1 BUGS
+=head1 Repository
 
-None that I am aware of. Of course, if you find a bug, let me know, and I will be sure to fix it.
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory>
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory/issues>
 
 =head1 CODE COVERAGE
 

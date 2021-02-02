@@ -180,6 +180,11 @@ sub getUser {
     return $self->try( 1, 'getUser', @_ );
 }
 
+sub findUser {
+    my $self = shift;
+    return $self->try( 1, 'findUser', @_ );
+}
+
 sub setSessionInfo {
     my $self = shift;
     return $self->try( 1, 'setSessionInfo', @_ );

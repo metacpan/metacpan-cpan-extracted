@@ -53,7 +53,7 @@
          "web" : "https://github.com/perlancar/perl-WordList-EN-ColorName-WWW"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

@@ -1,6 +1,7 @@
 package Geo::Coordinates::GMap;
-
-$Geo::Coordinates::GMap::VERSION = '0.08';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -28,7 +29,6 @@ This module makes this process simple and accurate.
 
 =cut
 
-use strictures 2;
 use Math::Trig;
 
 use Exporter qw( import );
@@ -140,9 +140,16 @@ coordinates.
 
 =back
 
+=head1 SUPPORT
+
+Please submit bugs and feature requests to the
+Geo-Coordinates-GMap GitHub issue tracker:
+
+L<https://github.com/bluefeet/Geo-Coordinates-GMap/issues>
+
 =head1 AUTHOR
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+  Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 LICENSE
 

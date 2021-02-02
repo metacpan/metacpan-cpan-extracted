@@ -3,7 +3,7 @@ package Workflow;
 use warnings;
 use strict;
 use 5.006; # warnings
-use base qw( Workflow::Base Class::Observable );
+use base qw( Workflow::Base );
 use Log::Log4perl qw( get_logger );
 use Workflow::Context;
 use Workflow::Exception qw( workflow_error );
@@ -13,14 +13,37 @@ use Carp qw(croak carp);
 use English qw( -no_match_vars );
 
 my @FIELDS   = qw( id type description state last_update time_zone );
-my @INTERNAL = qw( _factory );
+my @INTERNAL = qw( _factory _observers );
 __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 
-$Workflow::VERSION = '1.50';
+$Workflow::VERSION = '1.51';
 
 use constant NO_CHANGE_VALUE => 'NOCHANGE';
 
 my ($log);
+
+########################################
+# INTERNAL METHODS
+
+sub add_observer {
+    my ($self, @observers) = @_;
+
+    if (not $self->_observers) {
+        $self->_observers( [] );
+    }
+    push @{$self->_observers}, @observers;
+
+    return;
+}
+
+sub notify_observers {
+    my ($self, @args) = @_;
+
+    return unless $self->_observers;
+    $_->($self, @args) for @{$self->_observers};
+
+    return;
+}
 
 ########################################
 # PUBLIC METHODS
@@ -350,19 +373,6 @@ sub _auto_execute_state {
     }
 }
 
-# This DESTROY method is a work-around for the problem with Class::Observable
-# that when an instance gets allocated in *exactly* the same address as an
-# earlier instance (which has since been destroyed), the observer registration
-# was actually *not* destroyed and the observers are applied to the new
-# instance. See gh issue #10.
-sub DESTROY {
-    my ($self) = @_;
-
-    # ignore all errors: during interpreter shutdown, none of the wrapped
-    # code is expected to work...
-    eval { $self->delete_all_observers() };
-}
-
 1;
 
 __END__
@@ -383,7 +393,7 @@ Workflow - Simple, flexible system to implement workflows
 
 =head1 VERSION
 
-This documentation describes version 1.50 of Workflow
+This documentation describes version 1.51 of Workflow
 
 =head1 SYNOPSIS
 
@@ -532,20 +542,20 @@ You can access the same data and logic in two ways:
 
 To initialize:
 
-	perl ticket.pl --db
+        perl ticket.pl --db
 
 To run the command-line application:
 
-	perl ticket.pl
+        perl ticket.pl
 
 To access the database and data from CGI, add the relevant
 configuration for your web server and call ticket.cgi:
 
-	http://www.mysite.com/workflow/ticket.cgi
+        http://www.mysite.com/workflow/ticket.cgi
 
 To start up the standalone web server:
 
-	perl ticket_web.pl
+        perl ticket_web.pl
 
 (Barring changes to HTTP::Daemon and forking the standalone server
 won't work on Win32; use CGI instead, although patches are always
@@ -935,8 +945,7 @@ method with the signature:
 
 We also issue a 'change state' observation if the executed action
 resulted in a new state. See L<WORKFLOWS ARE OBSERVABLE> above for how
-we use and register observers and L<Class::Observable> for more
-general information about observers as well as implementation details.
+we use and register observers.
 
 Returns: new state of workflow
 
@@ -1129,6 +1138,26 @@ Returns the name of the next state given the action
 C<$action_name>. Throws an exception if C<$action_name> not contained
 in the current state.
 
+=head3 add_observer( @observers )
+
+Adds one or more observers to a C<Workflow> instance. An observer is a
+function. See L</notify_observers> for its calling convention.
+
+This function is used internally by C<Workflow::Factory> to implement
+observability as documented in the section L</WORKFLOWS ARE OBSERVABLE>
+
+=head3 notify_observers( @arguments )
+
+Calls all observer functions registered through C<add_observer> with
+the workflow as the first argument and C<@arguments> as the remaining
+arguments:
+
+   $observer->( $wf, @arguments );
+
+Used by various parts of the library to notify observers of workflow
+instance related events.
+
+
 =head1 CONFIGURATION AND ENVIRONMENT
 
 The configuration of Workflow is done using the format of your choice, currently
@@ -1142,8 +1171,6 @@ to L<Workflow::Config>, for implementation details.
 =item L<Class::Accessor>
 
 =item L<Class::Factory>
-
-=item L<Class::Observable>
 
 =item L<DateTime>
 
@@ -1215,13 +1242,13 @@ observed with L<XML::SAX::RTF>.
 
 The following diagnostic points to the problem:
 
-	No _parse_* routine defined on this driver (If it is a filter, remember to
-	set the Parent property. If you call the parse() method, make sure to set a
-	Source. You may want to call parse_uri, parse_string or parse_file instead.)
+        No _parse_* routine defined on this driver (If it is a filter, remember to
+        set the Parent property. If you call the parse() method, make sure to set a
+        Source. You may want to call parse_uri, parse_string or parse_file instead.)
 
 Your L<XML::SAX> configuration is located in the file:
 
-	XML/SAX/ParserDetails.ini
+        XML/SAX/ParserDetails.ini
 
 =head1 BUGS AND LIMITATIONS
 
@@ -1241,7 +1268,7 @@ A list of currently known issues can be seen via the same URL.
 
 The test suite can be run using, L<Module::Build>
 
-	% ./Build test
+        % ./Build test
 
 Some of the tests are reserved for the developers and are only run of the
 environment variable TEST_AUTHOR is set to true.
@@ -1251,41 +1278,41 @@ environment variable TEST_AUTHOR is set to true.
 This is the current test coverage of Workflow version 1.32, with the TEST_AUTHOR
 flag enabled.
 
-	---------------------------- ------ ------ ------ ------ ------ ------ ------
-	File                           stmt   bran   cond    sub    pod   time  total
-	---------------------------- ------ ------ ------ ------ ------ ------ ------
-	blib/lib/Workflow.pm           79.8   50.0   50.0   87.5  100.0    9.9   71.6
-	blib/lib/Workflow/Action.pm    90.8   66.7    n/a   88.2  100.0    4.1   89.9
-	...flow/Action/InputField.pm   97.0   92.9   87.5  100.0  100.0    5.9   95.8
-	...Workflow/Action/Mailer.pm  100.0    n/a    n/a  100.0  100.0    0.1  100.0
-	...b/Workflow/Action/Null.pm  100.0    n/a    n/a  100.0  100.0    0.2  100.0
-	blib/lib/Workflow/Base.pm      96.6   86.4  100.0  100.0  100.0    9.6   95.0
-	...lib/Workflow/Condition.pm  100.0    n/a    n/a  100.0  100.0    0.8  100.0
-	...low/Condition/Evaluate.pm   59.0   16.7   33.3   87.5  100.0    0.9   53.0
-	...flow/Condition/HasUser.pm   57.7    0.0    0.0   71.4  100.0    0.1   51.2
-	blib/lib/Workflow/Config.pm    96.2   81.2   33.3  100.0  100.0    6.1   92.2
-	...b/Workflow/Config/Perl.pm   96.8   75.0   66.7  100.0  100.0    4.1   91.0
-	...ib/Workflow/Config/XML.pm   92.3   50.0   60.0  100.0  100.0    4.9   81.4
-	blib/lib/Workflow/Context.pm  100.0    n/a    n/a  100.0  100.0    0.4  100.0
-	...lib/Workflow/Exception.pm   89.2   50.0    n/a   91.7  100.0    3.1   89.5
-	blib/lib/Workflow/Factory.pm   86.3   61.2   37.5   92.3  100.0   19.6   75.4
-	blib/lib/Workflow/History.pm  100.0   87.5    n/a  100.0  100.0    1.8   98.1
-	...lib/Workflow/Persister.pm   90.5   75.0   57.1   88.9  100.0    1.9   87.5
-	...Workflow/Persister/DBI.pm   75.3   51.2   25.0   83.3  100.0    7.4   67.5
-	...er/DBI/AutoGeneratedId.pm   77.8   40.0    n/a  100.0  100.0    0.4   70.1
-	...ersister/DBI/ExtraData.pm   25.9    0.0    0.0   71.4  100.0    0.1   22.9
-	...rsister/DBI/SequenceId.pm   56.2    0.0    0.0   75.0  100.0    0.3   53.1
-	...orkflow/Persister/File.pm   94.4   48.0   33.3  100.0  100.0    2.1   83.1
-	...low/Persister/RandomId.pm  100.0    n/a  100.0  100.0  100.0    1.8  100.0
-	...rkflow/Persister/SPOPS.pm   89.6   50.0    n/a  100.0  100.0    0.3   85.0
-	...orkflow/Persister/UUID.pm  100.0    n/a    n/a  100.0  100.0    0.2  100.0
-	blib/lib/Workflow/State.pm     74.4   44.2   25.0   91.7  100.0   11.0   64.3
-	...lib/Workflow/Validator.pm  100.0  100.0    n/a  100.0  100.0    1.1  100.0
-	...dator/HasRequiredField.pm   90.0   50.0    n/a  100.0  100.0    0.6   86.7
-	...dator/InEnumeratedType.pm  100.0  100.0    n/a  100.0  100.0    0.4  100.0
-	...ator/MatchesDateFormat.pm   93.3   70.0   66.7  100.0  100.0    0.8   88.2
-	Total                          83.9   54.7   39.7   93.0  100.0  100.0   76.8
-	---------------------------- ------ ------ ------ ------ ------ ------ ------
+        ---------------------------- ------ ------ ------ ------ ------ ------ ------
+        File                           stmt   bran   cond    sub    pod   time  total
+        ---------------------------- ------ ------ ------ ------ ------ ------ ------
+        blib/lib/Workflow.pm           79.8   50.0   50.0   87.5  100.0    9.9   71.6
+        blib/lib/Workflow/Action.pm    90.8   66.7    n/a   88.2  100.0    4.1   89.9
+        ...flow/Action/InputField.pm   97.0   92.9   87.5  100.0  100.0    5.9   95.8
+        ...Workflow/Action/Mailer.pm  100.0    n/a    n/a  100.0  100.0    0.1  100.0
+        ...b/Workflow/Action/Null.pm  100.0    n/a    n/a  100.0  100.0    0.2  100.0
+        blib/lib/Workflow/Base.pm      96.6   86.4  100.0  100.0  100.0    9.6   95.0
+        ...lib/Workflow/Condition.pm  100.0    n/a    n/a  100.0  100.0    0.8  100.0
+        ...low/Condition/Evaluate.pm   59.0   16.7   33.3   87.5  100.0    0.9   53.0
+        ...flow/Condition/HasUser.pm   57.7    0.0    0.0   71.4  100.0    0.1   51.2
+        blib/lib/Workflow/Config.pm    96.2   81.2   33.3  100.0  100.0    6.1   92.2
+        ...b/Workflow/Config/Perl.pm   96.8   75.0   66.7  100.0  100.0    4.1   91.0
+        ...ib/Workflow/Config/XML.pm   92.3   50.0   60.0  100.0  100.0    4.9   81.4
+        blib/lib/Workflow/Context.pm  100.0    n/a    n/a  100.0  100.0    0.4  100.0
+        ...lib/Workflow/Exception.pm   89.2   50.0    n/a   91.7  100.0    3.1   89.5
+        blib/lib/Workflow/Factory.pm   86.3   61.2   37.5   92.3  100.0   19.6   75.4
+        blib/lib/Workflow/History.pm  100.0   87.5    n/a  100.0  100.0    1.8   98.1
+        ...lib/Workflow/Persister.pm   90.5   75.0   57.1   88.9  100.0    1.9   87.5
+        ...Workflow/Persister/DBI.pm   75.3   51.2   25.0   83.3  100.0    7.4   67.5
+        ...er/DBI/AutoGeneratedId.pm   77.8   40.0    n/a  100.0  100.0    0.4   70.1
+        ...ersister/DBI/ExtraData.pm   25.9    0.0    0.0   71.4  100.0    0.1   22.9
+        ...rsister/DBI/SequenceId.pm   56.2    0.0    0.0   75.0  100.0    0.3   53.1
+        ...orkflow/Persister/File.pm   94.4   48.0   33.3  100.0  100.0    2.1   83.1
+        ...low/Persister/RandomId.pm  100.0    n/a  100.0  100.0  100.0    1.8  100.0
+        ...rkflow/Persister/SPOPS.pm   89.6   50.0    n/a  100.0  100.0    0.3   85.0
+        ...orkflow/Persister/UUID.pm  100.0    n/a    n/a  100.0  100.0    0.2  100.0
+        blib/lib/Workflow/State.pm     74.4   44.2   25.0   91.7  100.0   11.0   64.3
+        ...lib/Workflow/Validator.pm  100.0  100.0    n/a  100.0  100.0    1.1  100.0
+        ...dator/HasRequiredField.pm   90.0   50.0    n/a  100.0  100.0    0.6   86.7
+        ...dator/InEnumeratedType.pm  100.0  100.0    n/a  100.0  100.0    0.4  100.0
+        ...ator/MatchesDateFormat.pm   93.3   70.0   66.7  100.0  100.0    0.8   88.2
+        Total                          83.9   54.7   39.7   93.0  100.0  100.0   76.8
+        ---------------------------- ------ ------ ------ ------ ------ ------ ------
 
 Activities to get improved coverage are ongoing.
 
@@ -1297,15 +1324,15 @@ pitfalls and programming mistakes.
 The static analysis performed by L<Perl::Critic> is integrated into the L</TEST>
 tool chain and is performed either by running the test suite.
 
-	% ./Build test
+        % ./Build test
 
 Or by running the test file containing the L<Perl::Critic> tests explicitly.
 
-	% ./Build test --verbose 1 --test_files t/04_critic.t
+        % ./Build test --verbose 1 --test_files t/04_critic.t
 
 Or
 
-	% perl t/critic.t
+        % perl t/critic.t
 
 The test does however require that the TEST_AUTHOR flag is set since this is
 regarded as a part of the developer tool chain and we do not want to disturb
@@ -1337,7 +1364,7 @@ L<Perl::Critic> perspective.
 Currently the code is formatted using L<Perl::Tidy>. The resource file can be
 downloaded from the central repository.
 
-	notes/perltidyrc
+        notes/perltidyrc
 
 =head1 PROJECT
 
@@ -1377,8 +1404,7 @@ L<https://metacpan.org/release/Workflow>
 
 =over
 
-=item * November 2010 talk 'Workflow' given at Nordic Perl Workshop 2010 in Reykjavik,
-Iceland by jonasbn
+=item * November 2010 talk 'Workflow' given at Nordic Perl Workshop 2010 in Reykjavik, Iceland by jonasbn
 L<http://www.slideshare.net/jonasbn/workflow-npw2010>
 
 =item * August 2010 talk 'Workflow' given at YAPC::Europe 2010 in Pisa, Italy by jonasbn
@@ -1406,6 +1432,8 @@ The following folks have also helped out (listed here in no particular order):
 
 Several PRs (13 to be exact) from Erik Huelsmann resulting in release 1.49. Yet another
 batch of PRs resulted in release 1.50
+
+PR from Mohammad S Anwar correcting some POD errors, included in release 1.49
 
 Bug report from Petr Pisar resulted in release 1.48
 

@@ -2,3 +2,10 @@ The following logs changes for the CPAN distribution Valiant
 
 0.001001  2021-01-27
           - First Post!
+
+0.001002  2021-01-27
+          - Fixed POD errors
+
+0.001003  2021-01-30
+          - Put ::Utils in more polite namespace
+          - Include exception classes for the lazy

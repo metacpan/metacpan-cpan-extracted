@@ -1,7 +1,15 @@
+0.038   2021-01-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename Log::ger::Plugin::MultilevelLog to the more appropriate
+	  Log::ger::Format::MultilevelLog, so use-ing it affects the current
+	  package only. The old name is still available but deprecated and will
+	  be removed in the future.
+
+
 0.037   2020-03-11  Released-By: PERLANCAR; Urgency: high
 
-	- [Incompatible change] Bump meta version to 2 to force all plugins
-	  to be upgraded to comply to Log::ger >0.032.
+        - [Incompatible change] Bump meta version to 2 to force all plugins
+          to be upgraded to comply to Log::ger >0.032.
 
 
 0.036   2020-03-10  Released-By: PERLANCAR; Urgency: medium

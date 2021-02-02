@@ -3,7 +3,7 @@ package Tree::Simple::Visitor::FromNestedArray;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Scalar::Util qw(blessed);
 
@@ -187,7 +187,9 @@ If there is a second element in the array tree, it is assumed to be the children
 
 =item B<visit ($tree)>
 
-This is the method that is used by Tree::Simple's C<accept> method. It can also be used on its own, it requires the C<$tree> argument to be a Tree::Simple object (or derived from a Tree::Simple object), and will throw and exception otherwise.
+This is the method that is used by the Tree::Simple C<accept> method. It can also be used on its
+own, it requires the C<$tree> argument to be a Tree::Simple object (or derived from a
+Tree::Simple object), and will throw and exception otherwise.
 
 =back
 
@@ -201,7 +203,8 @@ See the B<CODE COVERAGE> section in L<Tree::Simple::VisitorFactory> for more inf
 
 =head1 SEE ALSO
 
-These Visitor classes are all subclasses of B<Tree::Simple::Visitor>, which can be found in the B<Tree::Simple> module, you should refer to that module for more information.
+These Visitor classes are all subclasses of B<Tree::Simple::Visitor>, which can be found in the
+B<Tree::Simple> module, you should refer to that module for more information.
 
 =head1 AUTHOR
 

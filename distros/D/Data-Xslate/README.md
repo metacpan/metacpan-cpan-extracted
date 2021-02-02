@@ -61,7 +61,7 @@ This module provides a syntax for templatizing data structures.
 ## Templating
 
 The most powerful feature by far is templating, where you can
-use [Text::Xslate](https://metacpan.org/pod/Text::Xslate) in your values.
+use [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) in your values.
 
 ```perl
 {
@@ -241,8 +241,8 @@ But if you wanted to refer to an absolute key you'd have to do this:
 # ARGUMENTS
 
 Any arguments you pass to `new`, which this class does not directly
-handle, will be used when creating the underlying [Text::Xslate](https://metacpan.org/pod/Text::Xslate) object.
-So, any arguments which [Text::Xslate](https://metacpan.org/pod/Text::Xslate) supports may be set.  For example:
+handle, will be used when creating the underlying [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) object.
+So, any arguments which [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) supports may be set.  For example:
 
 ```perl
 my $xslate = Data::Xslate->new(

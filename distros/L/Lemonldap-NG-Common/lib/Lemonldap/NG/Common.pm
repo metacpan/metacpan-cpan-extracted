@@ -1,6 +1,6 @@
 package Lemonldap::NG::Common;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 
 1;
 __END__

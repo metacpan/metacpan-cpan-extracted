@@ -1,7 +1,7 @@
 package GIS::Distance::Formula;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Class::Measure::Length qw( length );
 use Carp qw( croak );
@@ -111,9 +111,9 @@ See L<GIS::Distance/SUPPORT>.
 
 See L<GIS::Distance/AUTHORS>.
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-See L<GIS::Distance/COPYRIGHT AND LICENSE>.
+See L<GIS::Distance/LICENSE>.
 
 =cut
 

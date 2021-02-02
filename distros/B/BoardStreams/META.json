@@ -1,10 +1,10 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "An easy way to use WebSockets on the browser and on the server",
    "author" : [
       "Alexander Karelas <karjala@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -43,18 +43,21 @@
       "runtime" : {
          "requires" : {
             "CryptX" : "0",
+            "Data::Dump" : "0",
+            "Data::GUID" : "0",
             "Future::AsyncAwait" : "0.36",
+            "List::AllUtils" : "0",
             "Mojo::Pg" : "4.12",
             "Mojolicious" : "8.32",
             "Moo" : "0",
-            "RxPerl" : "v6.2.0",
+            "RxPerl" : "v6.5.0",
             "RxPerl::Mojo" : "v6.0.0",
             "Safe::Isa" : "0",
             "Struct::Diff" : "0",
             "Syntax::Keyword::Try" : "0",
             "Throwable" : "0",
             "autovivification" : "0",
-            "perl" : "5.020"
+            "perl" : "5.026"
          }
       },
       "test" : {
@@ -66,42 +69,76 @@
    "provides" : {
       "BoardStreams" : {
          "file" : "lib/BoardStreams.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.9"
+      },
+      "BoardStreams::Client" : {
+         "file" : "lib/BoardStreams/Client.pm"
+      },
+      "BoardStreams::Client::Channel" : {
+         "file" : "lib/BoardStreams/Client/Channel.pm",
+         "version" : "v0.0.9"
+      },
+      "BoardStreams::Client::Manager" : {
+         "file" : "lib/BoardStreams/Client/Manager.pm",
+         "version" : "v0.0.9"
+      },
+      "BoardStreams::Client::StructDiff" : {
+         "file" : "lib/BoardStreams/Client/StructDiff.pm",
+         "version" : "v0.0.9"
+      },
+      "BoardStreams::Client::Utils" : {
+         "file" : "lib/BoardStreams/Client/Utils.pm",
+         "version" : "v0.0.9"
+      },
+      "BoardStreams::Client::WebSocket" : {
+         "file" : "lib/BoardStreams/Client/WebSocket.pm",
+         "version" : "v0.0.9"
+      },
+      "BoardStreams::DBMigrations" : {
+         "file" : "lib/BoardStreams/DBMigrations.pm",
+         "version" : "v0.0.9"
       },
       "BoardStreams::Exception" : {
-         "file" : "lib/BoardStreams/Exception.pm"
+         "file" : "lib/BoardStreams/Exception.pm",
+         "version" : "v0.0.9"
       },
       "BoardStreams::Exception::DbError" : {
-         "file" : "lib/BoardStreams/Exception.pm"
+         "file" : "lib/BoardStreams/Exception.pm",
+         "version" : "v0.0.9"
       },
       "BoardStreams::Exception::DbError::Duplicate" : {
-         "file" : "lib/BoardStreams/Exception.pm"
+         "file" : "lib/BoardStreams/Exception.pm",
+         "version" : "v0.0.9"
       },
       "BoardStreams::ListenerObservable" : {
-         "file" : "lib/BoardStreams/ListenerObservable.pm"
+         "file" : "lib/BoardStreams/ListenerObservable.pm",
+         "version" : "v0.0.9"
       },
       "BoardStreams::Registry" : {
-         "file" : "lib/BoardStreams/Registry.pm"
+         "file" : "lib/BoardStreams/Registry.pm",
+         "version" : "v0.0.9"
       },
       "BoardStreams::Util" : {
-         "file" : "lib/BoardStreams/Util.pm"
+         "file" : "lib/BoardStreams/Util.pm",
+         "version" : "v0.0.9"
       },
       "Mojolicious::Plugin::BoardStreams" : {
-         "file" : "lib/Mojolicious/Plugin/BoardStreams.pm"
+         "file" : "lib/Mojolicious/Plugin/BoardStreams.pm",
+         "version" : "v0.0.9"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://gitlab.com/karjala/boardstreams.pm-for-perl/issues"
+         "web" : "https://gitlab.com/karjala/boardstreams.pm/issues"
       },
-      "homepage" : "https://gitlab.com/karjala/boardstreams.pm-for-perl",
+      "homepage" : "https://gitlab.com/karjala/boardstreams.pm",
       "repository" : {
-         "url" : "git://gitlab.com/karjala/boardstreams.pm-for-perl.git",
-         "web" : "https://gitlab.com/karjala/boardstreams.pm-for-perl"
+         "url" : "git://gitlab.com/karjala/boardstreams.pm.git",
+         "web" : "https://gitlab.com/karjala/boardstreams.pm"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.9",
    "x_authority" : "cpan:KARJALA",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1

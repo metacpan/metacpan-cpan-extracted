@@ -523,7 +523,7 @@ Here is an example :
   sub insert_with_random_key {
     my ($self) = @_;
     my $class = ref $self;
-    my ($key_column) = $class->primKey;
+    my ($key_column) = $class->primary_key;
   
     for (1..$MAX_ATTEMPTS) {
       my $random_key = int(rand($MAX_RANDOM));

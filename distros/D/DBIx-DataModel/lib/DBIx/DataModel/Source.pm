@@ -37,7 +37,7 @@ sub primary_key {
   my @primary_key = $self->metadm->primary_key;
 
   # if called as instance method, get values in those columns
-  @primary_key = @{$self}{@primary_key} if ref $self;
+  @primary_key = @{$self}{@primary_key} if !$self->_is_called_as_class_method;
 
   # choose what to return depending on context
   if (wantarray) {
@@ -268,7 +268,7 @@ This module implements
 
 =item L<join|DBIx::DataModel::Doc::Reference/join>
 
-=item L<primKey|DBIx::DataModel::Doc::Reference/primKey>
+=item L<primary_key|DBIx::DataModel::Doc::Reference/primary_key>
 
 =back
 

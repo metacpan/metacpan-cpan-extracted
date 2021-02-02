@@ -1,14 +1,14 @@
 package Data::Serializer::JSON::MaybeXS;
-
-$Data::Serializer::JSON::MaybeXS::VERSION = '0.02';
+use 5.008001;
+use strict;
+use warnings;
+our $VERSION = '0.03';
 
 BEGIN { @Data::Serializer::JSON::MaybeXS::ISA = qw(Data::Serializer) }
 
 # This code was pretty much stolen and modified from:
 # Data::Serializer::JSON.
 
-use warnings;
-use strict;
 use JSON::MaybeXS qw();
 use vars qw(@ISA);
 
@@ -73,16 +73,16 @@ Data-Serializer-JSON-MaybeXS GitHub issue tracker:
 
 L<https://github.com/bluefeet/Data-Serializer-JSON-MaybeXS/issues>
 
-=head1 AUTHOR
-
-Aran Clary Deltac <bluefeetE<64>gmail.com>
-
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to L<ZipRecruiter|https://www.ziprecruiter.com/>
 for encouraging their employees to contribute back to the open
 source ecosystem.  Without their dedication to quality software
 development this distribution would not exist.
+
+=head1 AUTHORS
+
+  Aran Clary Deltac <bluefeetE<64>gmail.com>
 
 =head1 LICENSE
 

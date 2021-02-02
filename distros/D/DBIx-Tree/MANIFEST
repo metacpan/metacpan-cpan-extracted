@@ -1,5 +1,3 @@
-.gitignore
-Build.PL
 Changelog.ini
 Changes
 examples/tk-tree-example.pl
@@ -7,11 +5,14 @@ examples/tkexample.pl
 lib/DBIx/Tree.pm
 LICENSE
 Makefile.PL
-MANIFEST
-META.json
-META.yml
+MANIFEST			This list of files
+MANIFEST.SKIP
 README
 scripts/demo.pl
+t/00.versions.t
+t/00.versions.tx
 t/INSTALL.SQL
-t/pod.t
 t/test.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

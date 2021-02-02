@@ -25,6 +25,10 @@ sub getUser {
     PE_OK;
 }
 
+sub findUser {
+    PE_OK;
+}
+
 sub setSessionInfo {
     my ( $self, $req ) = @_;
     my %vars = (

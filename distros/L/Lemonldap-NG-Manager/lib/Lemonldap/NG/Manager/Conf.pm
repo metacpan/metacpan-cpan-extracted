@@ -14,6 +14,8 @@ use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::EmailTransport;
 use Crypt::OpenSSL::RSA;
 use Convert::PEM;
+use Digest::MD5 qw(md5_base64);
+
 use URI::URL;
 use Net::SSLeay;
 
@@ -121,6 +123,7 @@ sub newRSAKey {
     my $keys  = {
         'private' => $rsa->get_private_key_string(),
         'public'  => $rsa->get_public_key_x509_string(),
+        'hash' => md5_base64($rsa->get_public_key_string()),
     };
     if ( $query->{password} ) {
         my $pem = Convert::PEM->new(

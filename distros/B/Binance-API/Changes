@@ -1,3 +1,6 @@
+1.06 Sun Jan  31 17:46:41 UTC 2021
+    - Mock API responses for tests
+
 1.05 Thu Nov  25 23:56:56 UTC 2020
     - Refactor signature generation
     - Update order parameters and requirements

@@ -3,7 +3,7 @@ package Specio::Constraint::Role::CanType;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Scalar::Util qw( blessed );
 use Specio::PartialDump qw( partial_dump );
@@ -144,11 +144,12 @@ Specio::Constraint::Role::CanType - Provides a common implementation for Specio:
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 DESCRIPTION
 
-See L<Specio::Constraint::AnyCan> and L<Specio::Constraint::ObjectCan> for details.
+See L<Specio::Constraint::AnyCan> and L<Specio::Constraint::ObjectCan> for
+details.
 
 =head1 SUPPORT
 
@@ -166,7 +167,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

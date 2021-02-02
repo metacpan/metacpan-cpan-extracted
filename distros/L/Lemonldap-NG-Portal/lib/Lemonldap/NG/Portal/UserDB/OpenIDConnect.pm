@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.11';
 
 extends 'Lemonldap::NG::Common::Module',
   'Lemonldap::NG::Portal::Lib::OpenIDConnect';
@@ -54,6 +54,12 @@ sub getUser {
     }
 
     return PE_OK;
+}
+
+sub findUser {
+
+    # Nothing to do here
+    PE_OK;
 }
 
 # Get all required attributes

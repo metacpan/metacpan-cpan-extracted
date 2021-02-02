@@ -1,3 +1,9 @@
+0.004   2020-12-27  Released-By: PERLANCAR; Urgency: medium
+
+	- [doc] Mention WordList::EN::ColorName::X,
+	  WordList::ColorName::Any.
+
+
 0.003   2020-12-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename module WordList::EN::Color{,Name}::WWW.

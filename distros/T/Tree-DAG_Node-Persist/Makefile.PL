@@ -18,8 +18,8 @@ my(%params) =
 (
 	($] ge '5.005') ?
 	(
-		AUTHOR   => 'Ron Savage (ron@savage.net.au)',
-		ABSTRACT => 'Persist multiple trees in a single db table, preserving child order',
+		AUTHOR		=> 'Ron Savage (ron@savage.net.au)',
+		ABSTRACT	=> 'Persist multiple trees in a single db table, preserving child order',
 	) : (),
 	clean =>
 	{
@@ -27,13 +27,14 @@ my(%params) =
 	},
 	dist =>
 	{
-		COMPRESS => 'gzip',
-		SUFFIX   => 'gz'
+		COMPRESS	=> 'gzip',
+		SUFFIX		=> 'gz'
 	},
-	DISTNAME  => 'Tree-DAG_Node-Persist',
-	NAME      => 'Tree::DAG_Node::Persist',
-	PL_FILES  => {},
-	PREREQ_PM =>
+	DISTNAME	=> 'Tree-DAG_Node-Persist',
+	LICENSE		=> 'perl',
+	NAME		=> 'Tree::DAG_Node::Persist',
+	PL_FILES	=> {},
+	PREREQ_PM	=>
 	{
 		'DBI'						=> 1.633,
 		'DBIx::Admin::CreateTable'	=> 2.10,
@@ -73,7 +74,7 @@ if ($ExtUtils::MakeMaker::VERSION ge '6.46')
 		{
 			bugtracker =>
 			{
-				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-DAG_Node-Persist',
+				web => 'https://github.com/ronsavage/Tree-DAG_Node-Persist/issues',
 			},
 			license		=> 'http://dev.perl.org/licenses/',
 			repository	=>

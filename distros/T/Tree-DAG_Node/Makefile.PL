@@ -24,6 +24,7 @@ my(%params) =
 		SUFFIX		=> 'gz'
 	},
 	DISTNAME	=> 'Tree-DAG_Node',
+	LICENSE		=> 'perl',
 	NAME		=> 'Tree::DAG_Node',
 	PL_FILES	=> {},
 	PREREQ_PM	=>
@@ -68,7 +69,10 @@ if ($ExtUtils::MakeMaker::VERSION ge '6.46')
 		},
 		resources =>
 		{
-			bugtracker	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-DAG_Node',
+			bugtracker =>
+			{
+				web => 'https://github.com/ronsavage/Tree-DAG_Node/issues',
+			},
 			license		=> 'http://opensource.org/licenses/Artistic-2.0',
 			repository	=>
 			{

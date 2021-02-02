@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQLJSON - SPARQL Results JSON Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQLJSON version 0.028
+This document describes AtteanX::Serializer::SPARQLJSON version 0.029
 
 =head1 SYNOPSIS
 
@@ -22,6 +22,8 @@ This document describes AtteanX::Serializer::SPARQLJSON version 0.028
 
 =item C<< canonical_media_type >>
 
+=item C<< file_extensions >>
+
 =back
 
 =head1 METHODS
@@ -33,7 +35,7 @@ This document describes AtteanX::Serializer::SPARQLJSON version 0.028
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQLJSON 0.028 {
+package AtteanX::Serializer::SPARQLJSON 0.029 {
 	use Moo;
 	use Types::Standard qw(Str);
 	use Encode qw(encode);
@@ -53,6 +55,14 @@ Returns a list of media types that identify the format produced by this serializ
 	sub media_types {
 		return [qw(application/sparql-results+json)];
 	}
+
+=item C<< file_extensions >>
+
+Returns a list of file extensions associated with the serialized format.
+
+=cut
+
+	sub file_extensions { return [qw(srj json)] };
 
 =item C<< serialize_iter_to_io( $fh, $iterator ) >>
 

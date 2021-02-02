@@ -3,7 +3,7 @@ package Pod::ProjectDocs::Parser::XHTML;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';    # VERSION
+our $VERSION = '0.53';    # VERSION
 
 use base qw(Pod::Simple::XHTML);
 

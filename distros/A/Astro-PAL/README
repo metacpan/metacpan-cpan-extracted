@@ -70,32 +70,3 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place,Suite 330, Boston, MA  02111-1307, USA
 
 The array handling code was written by Karl Glazebrook.
-
-Version History
----------------
-
-1.00 Initial release
-
-1.01 Fix MANIFEST of distribution to include PAL and SOFA source code.
-
-1.02 Fix floating point comparisons in sun67.t
-
-1.03 Update PAL to v0.1.2. Avoid using the C99 copysign() function
-     on Solaris.
-
-1.04 Update PAL to v0.1.3. Use __STDC_VERSION__ test before using
-     copysign().
-
-1.05 Update PAL to v0.1.4. Use a private isblank() function and do
-     not attempt to use modern POSIX compiler settings.
-
-1.06 Update PAL to v0.5.0
-     - Now ships with ERFA v1.1.0 instead of SOFA, clarifying license anomalies.
-     Add support for palOap, palOapqk, palRefco, palRefcoq, palRefro,
-     palRefv, palRefz, palAop, palAoppa, palAoppat, palAopqk, palAtmdsp
-
-1.07 Fix build dependencies
-
-1.08 Update PAL to v0.9.9 and ERFA to v1.5.0
-     Add support for palAltaz, palDcmpf, palEcleq, palFitxy, palInvf,
-     palPcd, palPolmo, palPxy, palUnpcd and palXy2xy.

@@ -37,6 +37,9 @@
 #
 # - Since Firefox sets an EXCLUSIVE SQLite lock, a tmp DB file copy is used.
 #
+# 2021.01.31 v0.26 jul : improved handling of optional dependencies
+# 2021.01.31 v0.25 jul : skip bookmarks.t if URI::Find not installed
+# 2021.01.31 v0.24 jul : fixed missing prereq URI::Find in Makefile.PL
 # 2021.01.23 v0.23 jul : added tests and fixed firefox default location
 # 2021.01.20 v0.22 jul : fixed firefox query again
 # 2020.06.29 v0.21 jul : added markdown and text files support
@@ -59,10 +62,8 @@ use Getopt::Std;
 use File::Basename;
 use File::Temp qw(tempdir);
 use File::Copy qw(copy);
-use URI::Find;
-use URI::Find::Schemeless;
 
-our $VERSION = '0.23';
+our $VERSION = '0.26';
 my $program	 = basename($0);
 my $usage    = <<EOF;
 
@@ -191,7 +192,13 @@ sub _safari {
 
 sub _firefox {
 
-    require DBI;
+	eval {
+	    require DBI;
+	};
+	if ($@)
+	{
+		die "to process Chrome bookmarks, you need to install the DBI module\n";
+	}
 
     my $dbfile = shift // "";
     warn "\$dbfile: $dbfile\n" if $debug;
@@ -261,8 +268,14 @@ sub _firefox {
 
 sub _chrome {
 
-    require File::Slurper;
-    require JSON;
+	eval {
+	    require File::Slurper;
+	    require JSON;
+	};
+	if ($@)
+	{
+		die "to process Chrome bookmarks, you need to install the File::Slurper JSON modules\n";
+	}
 
     my $file = shift // "";
     warn "\$file: $file\n" if $debug;
@@ -287,10 +300,16 @@ sub _chrome {
 
 sub _iexplorer {
     
-    require Config::Any;
-    require Config::Tiny;   # for Config::Any::INI
-    require Win32;          # for windows rubbish
-    require File::Find;
+	eval {
+	    require Config::Any;
+	    require Config::Tiny;   # for Config::Any::INI
+	    require Win32;          # for windows rubbish
+	    require File::Find;
+	};
+	if ($@)
+	{
+		die "to process Internet Explorer favorites, you need to install the Config::Any Config::Tiny Win32 modules\n";
+	}
     
     my $favorites = shift // "";
     warn "\$favorites: $favorites\n" if $debug;
@@ -331,6 +350,15 @@ sub _iexplorer {
 
 sub _txt {
 
+	eval {
+		require URI::Find;
+		require URI::Find::Schemeless;
+	};
+	if ($@)
+	{
+		die "to process text files, you need to install the URI::Find module\n";
+	}
+
     my $file = shift // "";
     warn "\$file: $file\n" if $debug;
 
@@ -362,7 +390,7 @@ sub _txt {
 
 sub _md {
 
-    my $file = shift // "";
+	my $file = shift // "";
     warn "\$file: $file\n" if $debug;
 
     # read file as text

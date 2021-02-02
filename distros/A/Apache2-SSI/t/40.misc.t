@@ -30,8 +30,11 @@ ok( $enc_b64 eq 'VG91cyBsZXMgw6p0cmVzIGh1bWFpbnMgbmFpc3NlbnQgbGlicmVzIGV0IMOpZ2F
 my $enc_uri = $ssi->encode_uri( 'https://www.example.com/' );
 # diag( "Encoded uri is '$enc_uri'" );
 ok( $enc_uri eq 'https%3A%2F%2Fwww.example.com%2F', 'URI encode' );
-my $version = $ssi->server_version;
-ok( $version =~ /[\d\.]+/, 'server version' );
+if( $ssi->mod_perl )
+{
+    my $version = $ssi->server_version;
+    ok( $version =~ /[\d\.]+/, 'server version' );
+}
 $ssi->remote_ip( '192.168.1.10' ) if( !$ssi->mod_perl );
 my $remote_ip = $ssi->remote_ip;
 ok( $remote_ip =~ /^(\d{1,3}\.){3}\d{1,3}$/, 'remote ip' );

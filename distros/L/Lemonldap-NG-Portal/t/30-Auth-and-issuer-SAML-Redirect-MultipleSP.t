@@ -11,9 +11,9 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 23;
+my $maintests = 30;
 my $debug     = 'error';
-my ( $issuer, $sp, $sp2, $res );
+my ( $issuer, $sp, $sp2, $sp3, $res );
 
 # Redefine LWP methods for tests
 LWP::Protocol::PSGI->register(
@@ -37,6 +37,8 @@ SKIP: {
     $sp = register( 'sp', \&sp );
 
     $sp2 = register( 'sp2', \&sp2 );
+
+    $sp3 = register( 'sp3', \&sp3 );
 
     # Simple SP access
     my $res;
@@ -163,6 +165,52 @@ SKIP: {
     expectOK($res);
     expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
 
+    # Simple SP3 access
+    switch ('sp3');
+    ok(
+        $res = $sp3->_get(
+            '/',
+            accept => 'text/html',
+            query  => 'url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw=='
+        ),
+        'Unauth SP3 request'
+    );
+
+    ( $url, $query ) = expectRedirection( $res,
+        qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
+
+    # Push SAML request to IdP
+    switch ('issuer');
+    ok(
+        $res = $issuer->_get(
+            $url,
+            query  => $query,
+            accept => 'text/html',
+            cookie => "lemonldap=$idpId",
+        ),
+        'Launch SAML request to IdP'
+    );
+    ( $host, $url, $query ) =
+      expectForm( $res, 'auth.sp3.com', '/saml/proxySingleSignOnPost',
+        'SAMLResponse', 'RelayState' );
+
+    # Post SAML response to SP3
+    switch ('sp3');
+    ok(
+        $res = $sp3->_post(
+            $url, IO::String->new($query),
+            accept => 'text/html',
+            length => length($query),
+        ),
+        'Post SAML response to SP3'
+    );
+    my $sp3Id = expectCookie($res);
+    expectRedirection( $res, 'http://test1.example.com/' );
+
+    ok( $res = $sp3->_get( '/', cookie => "lemonldap=$spId" ), 'Get / on SP3' );
+    expectOK($res);
+    expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
+
     # Logout initiated by SP
     ok(
         $res = $sp->_get(
@@ -194,12 +242,14 @@ SKIP: {
 
     my $relaypage = $res;
 
-    ok( $res->[2]->[0] =~
-          m%<iframe src="http://auth.sp2.com/saml/proxySingleLogout\?([^"]*)"%
-    );
-    my $iframe = $1;
+    my %iframes = $res->[2]->[0] =~
+      m%<iframe src="http://([^/]+)/saml/proxySingleLogout\?([^"]*)"%g;
+    is( scalar keys %iframes, 2,
+        "Got one iframe for both additional services" );
 
+    # Logout from SP2
     # Load iframe
+    my $iframe = $iframes{'auth.sp2.com'};
     switch ('sp2');
     ok(
         $res = $sp2->_get(
@@ -209,6 +259,35 @@ SKIP: {
             accept => 'text/html',
         ),
         'Start logout from SP2'
+    );
+
+    ( $url, $query ) = expectRedirection( $res,
+        qr#^http://auth.idp.com(/saml/singleLogoutReturn)\?(SAMLResponse=.+)# );
+
+    # Get OK icon from IDP
+    switch ('issuer');
+    ok(
+        $res = $issuer->_get(
+            $url,
+            query  => $query,
+            accept => 'text/html',
+        ),
+        'get SAML response from IDP',
+    );
+    expectRedirection( $res, "http://auth.idp.com/static/common/icons/ok.png" );
+
+    # Logout from SP3
+    # Load iframe
+    $iframe = $iframes{'auth.sp3.com'};
+    switch ('sp3');
+    ok(
+        $res = $sp3->_get(
+            '/saml/proxySingleLogout',
+            query  => $iframe,
+            cookie => "lemonldap=$sp3Id",
+            accept => 'text/html',
+        ),
+        'Start logout from SP3'
     );
 
     ( $url, $query ) = expectRedirection( $res,
@@ -288,6 +367,18 @@ qr#^http://auth.sp.com(/saml/proxySingleLogoutReturn)\?(SAMLResponse=.+)#
     );
     expectRedirection( $res,
         qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
+
+    switch ('sp3');
+    ok(
+        $res = $sp3->_get(
+            '/',
+            accept => 'text/html',
+            cookie => "lemonldap=$sp3Id"
+        ),
+        'Test if user is reject on SP3'
+    );
+    expectRedirection( $res,
+        qr#^http://auth.idp.com(/saml/singleSignOn)\?(SAMLRequest=.+)# );
 }
 
 count($maintests);
@@ -318,6 +409,13 @@ sub issuer {
                         samlSPMetaDataOptionsSignSLOMessage           => 1,
                         samlSPMetaDataOptionsCheckSSOMessageSignature => 1,
                         samlSPMetaDataOptionsCheckSLOMessageSignature => 1,
+                    },
+                    'sp3.com' => {
+                        samlSPMetaDataOptionsEncryptionMode           => 'none',
+                        samlSPMetaDataOptionsSignSSOMessage           => 1,
+                        samlSPMetaDataOptionsSignSLOMessage           => 1,
+                        samlSPMetaDataOptionsCheckSSOMessageSignature => 1,
+                        samlSPMetaDataOptionsCheckSLOMessageSignature => 1,
                     }
                 },
                 samlSPMetaDataExportedAttributes => {
@@ -328,6 +426,12 @@ sub issuer {
 '1;uid;urn:oasis:names:tc:SAML:2.0:attrname-format:basic',
                     },
                     'sp2.com' => {
+                        cn =>
+'1;cn;urn:oasis:names:tc:SAML:2.0:attrname-format:basic',
+                        uid =>
+'1;uid;urn:oasis:names:tc:SAML:2.0:attrname-format:basic',
+                    },
+                    'sp3.com' => {
                         cn =>
 '1;cn;urn:oasis:names:tc:SAML:2.0:attrname-format:basic',
                         uid =>
@@ -349,6 +453,10 @@ sub issuer {
                     "sp2.com" => {
                         samlSPMetaDataXML =>
                           samlSPMetaDataXML( 'sp2', 'HTTP-Redirect' )
+                    },
+                    "sp3.com" => {
+                        samlSPMetaDataXML =>
+                          samlSPMetaDataXML( 'sp3', 'HTTP-Redirect' )
                     },
                 },
             }
@@ -455,6 +563,60 @@ sub sp2 {
                 samlOrganizationDisplayName => "SP",
                 samlOrganizationName        => "SP",
                 samlOrganizationURL         => "http://www.sp2.com",
+                samlServicePublicKeySig     => saml_key_sp_public_sig,
+                samlServicePrivateKeyEnc    => saml_key_sp_private_enc,
+                samlServicePrivateKeySig    => saml_key_sp_private_sig,
+                samlServicePublicKeyEnc     => saml_key_sp_public_enc,
+                samlSPSSODescriptorAuthnRequestsSigned => 1,
+            },
+        }
+    );
+}
+
+sub sp3 {
+    return LLNG::Manager::Test->new( {
+            ini => {
+                logLevel                          => $debug,
+                domain                            => 'sp3.com',
+                portal                            => 'http://auth.sp3.com',
+                authentication                    => 'SAML',
+                userDB                            => 'Same',
+                issuerDBSAMLActivation            => 0,
+                restSessionServer                 => 1,
+                samlIDPMetaDataExportedAttributes => {
+                    idp => {
+                        mail => "0;mail;;",
+                        uid  => "1;uid",
+                        cn   => "0;cn"
+                    }
+                },
+                samlIDPMetaDataOptions => {
+                    idp => {
+                        samlIDPMetaDataOptionsEncryptionMode => 'none',
+                        samlIDPMetaDataOptionsSSOBinding     => 'redirect',
+                        samlIDPMetaDataOptionsSLOBinding     => 'redirect',
+                        samlIDPMetaDataOptionsSignSSOMessage => 1,
+                        samlIDPMetaDataOptionsSignSLOMessage => 1,
+                        samlIDPMetaDataOptionsCheckSSOMessageSignature => 1,
+                        samlIDPMetaDataOptionsCheckSLOMessageSignature => 1,
+                        samlIDPMetaDataOptionsForceUTF8                => 1,
+                    }
+                },
+                samlIDPMetaDataExportedAttributes => {
+                    idp => {
+                        "uid" => "0;uid;;",
+                        "cn"  => "1;cn;;",
+                    },
+                },
+                samlIDPMetaDataXML => {
+                    idp => {
+                        samlIDPMetaDataXML =>
+                          samlIDPMetaDataXML( 'idp', 'HTTP-Redirect' )
+                    }
+                },
+                samlOrganizationDisplayName => "SP",
+                samlOrganizationName        => "SP",
+                samlOrganizationURL         => "http://www.sp3.com",
                 samlServicePublicKeySig     => saml_key_sp_public_sig,
                 samlServicePrivateKeyEnc    => saml_key_sp_private_enc,
                 samlServicePrivateKeySig    => saml_key_sp_private_sig,

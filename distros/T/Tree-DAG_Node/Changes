@@ -1,5 +1,8 @@
 Revision history for Perl module Tree::DAG_Node.
 
+1.32  2021-02-01T15:56:00
+	- Update Makefile.PL and POD to change RT to github.
+
 1.31  2018-02-14T09:08:00
 	- Clarify licence issue by changing the reference in the DAG_Node.pm file from Artistic V 2
 		to Perl, so it now matches what I preemptively put in Makefile.PL and the LICENSE file.

@@ -5,7 +5,8 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'File::LoadLines',
     AUTHOR              => 'Johan Vromans <jv@cpan.org>',
-    VERSION_FROM        => 'lib/File/LoadLines.pm',
+#    VERSION_FROM        => 'lib/File/LoadLines.pm',
+    VERSION             => '1.020.2',
     ABSTRACT_FROM       => 'lib/File/LoadLines.pm',
     LICENSE		=> 'perl_5',
     PL_FILES            => {},

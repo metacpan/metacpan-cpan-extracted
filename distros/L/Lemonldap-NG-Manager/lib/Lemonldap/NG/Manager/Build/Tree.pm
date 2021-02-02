@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 
 # TODO: Missing:
 #  * activeTimer
@@ -144,8 +144,8 @@ sub tree {
                             title => 'choiceParams',
                             help  => 'authchoice.html',
                             nodes => [
-                                'authChoiceParam', 'authChoiceModules',
-                                'authChoiceAuthBasic'
+                                'authChoiceParam',     'authChoiceModules',
+                                'authChoiceAuthBasic', 'authChoiceFindUser'
                             ]
                         },
                         {
@@ -393,9 +393,9 @@ sub tree {
                             help  => 'authrest.html',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'restAuthnLevel', 'restAuthUrl',
-                                'restUserDBUrl',  'restPwdConfirmUrl',
-                                'restPwdModifyUrl'
+                                'restAuthnLevel',   'restAuthUrl',
+                                'restUserDBUrl',    'restPwdConfirmUrl',
+                                'restPwdModifyUrl', 'restFindUserDBUrl'
                             ]
                         },
                         {
@@ -763,13 +763,21 @@ sub tree {
                                 'checkUser',
                                 'checkUserIdRule',
                                 'checkUserUnrestrictedUsersRule',
-                                'checkUserHiddenAttributes',
                                 'checkUserSearchAttributes',
-                                'checkUserDisplayComputedSession',
-                                'checkUserDisplayEmptyHeaders',
-                                'checkUserDisplayEmptyValues',
-                                'checkUserDisplayPersistentInfo',
-                                'checkUserHiddenHeaders'
+                                'checkUserHiddenAttributes',
+                                'checkUserHiddenHeaders',
+                                {
+                                    title => 'checkUserDisplay',
+                                    help  => 'checkuser.html#configuration',
+                                    form  => 'simpleInputContainer',
+                                    nodes => [
+                                        'checkUserDisplayComputedSession',
+                                        'checkUserDisplayPersistentInfo',
+                                        'checkUserDisplayNormalizedHeaders',
+                                        'checkUserDisplayEmptyHeaders',
+                                        'checkUserDisplayEmptyValues',
+                                    ]
+                                },
                             ]
                         },
                         {
@@ -782,7 +790,18 @@ sub tree {
                                 'impersonationUnrestrictedUsersRule',
                                 'impersonationHiddenAttributes',
                                 'impersonationSkipEmptyValues',
-                                'impersonationMergeSSOgroups',
+                                'impersonationMergeSSOgroups'
+                            ]
+                        },
+                        {
+                            title => 'findUsers',
+                            help  => 'finduser.html',
+                            nodes => [
+                                'findUser',
+                                'findUserWildcard',
+                                'findUserControl',
+                                'findUserSearchingAttributes',
+                                'findUserExcludingAttributes'
                             ]
                         },
                         {
@@ -1270,9 +1289,9 @@ sub tree {
                             group => [
                                 'oidcServicePrivateKeySig',
                                 'oidcServicePublicKeySig',
+                                'oidcServiceKeyIdSig',
                             ],
                         },
-                        'oidcServiceKeyIdSig',
                         'oidcServiceAllowDynamicRegistration',
                         'oidcServiceAllowAuthorizationCodeFlow',
                         'oidcServiceAllowImplicitFlow',

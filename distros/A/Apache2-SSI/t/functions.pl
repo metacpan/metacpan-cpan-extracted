@@ -66,7 +66,7 @@ sub run_tests
 sub execute_tests
 {
     my $tests = shift( @_ );
-    no warnings qw( experimental::vlb );
+    ## no warnings qw( experimental::vlb );
     my $opts  = {};
     $opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
     eval( "use warnings 'Apache2::SSI';" ) if( $opts->{debug} );

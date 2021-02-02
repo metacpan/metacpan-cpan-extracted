@@ -1,5 +1,17 @@
 Revision history for File-LoadLines
 
+1.020.2	2021-02-02
+
+	Fix test 29.
+
+1.020.1	2021-02-02
+
+	Fix test 29.
+
+1.02	2021-02-01
+
+	Improve handling of non-latin1 filenames on MS Windows.
+
 1.01	2020-12-10
 
 	Change README to README.md.

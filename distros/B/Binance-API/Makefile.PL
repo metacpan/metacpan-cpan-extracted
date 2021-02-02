@@ -33,6 +33,7 @@ use Binance::PerlDependencies;
 WriteMakefile(
     NAME            => 'Binance::API',
     VERSION_FROM    => 'lib/Binance/API.pm',
+    LICENSE         => 'mit',
     AUTHOR          => 'Lari Taskula <lari@taskula.fi>',
     ABSTRACT        => 'Perl module for interacting with the Binance API.',
     PREREQ_PM       => $Binance::PerlDependencies::required,

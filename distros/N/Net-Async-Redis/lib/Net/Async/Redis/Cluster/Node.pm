@@ -3,14 +3,16 @@ package Net::Async::Redis::Cluster::Node;
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
+our $VERSION = '3.010'; # VERSION
 
 use parent qw(IO::Async::Notifier);
 
+use Scalar::Util qw(refaddr);
 use Future::AsyncAwait;
 
 use overload
     '""' => sub { 'NaRedis::Cluster::Node[id=' . shift->id . ']' },
+    '0+' => sub { refaddr(shift) },
     bool => sub { 1 },
     fallback => 1;
 
@@ -28,6 +30,7 @@ sub from_arrayref {
     die 'invalid start' if $start > $end or $start < 0 or $start >= 16384;
     die 'invalid end' if $end >= 16384;
     die 'no primary found' unless $primary;
+    die 'invalid primary' unless $primary->[0] ne "" && $primary->[1] > 0;
     return $class->new(
         start    => $start,
         end      => $end,
@@ -35,6 +38,7 @@ sub from_arrayref {
         replicas => \@replicas,
     )
 }
+
 sub start { shift->{start} }
 sub end { shift->{end} }
 sub primary { shift->{primary} }
@@ -67,5 +71,5 @@ L<Net::Async::Redis/CONTRIBUTORS>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2021. Licensed under the same terms as Perl itself.
 

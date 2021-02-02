@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,34 +20,34 @@ name: Pod-ProjectDocs
 provides:
   Pod::ProjectDocs:
     file: lib/Pod/ProjectDocs.pm
-    version: '0.52'
+    version: '0.53'
   Pod::ProjectDocs::CSS:
     file: lib/Pod/ProjectDocs/CSS.pm
-    version: '0.52'
+    version: '0.53'
   Pod::ProjectDocs::Config:
     file: lib/Pod/ProjectDocs/Config.pm
-    version: '0.52'
+    version: '0.53'
   Pod::ProjectDocs::Doc:
     file: lib/Pod/ProjectDocs/Doc.pm
-    version: '0.52'
+    version: '0.53'
   Pod::ProjectDocs::DocManager:
     file: lib/Pod/ProjectDocs/DocManager.pm
-    version: '0.52'
+    version: '0.53'
   Pod::ProjectDocs::File:
     file: lib/Pod/ProjectDocs/File.pm
-    version: '0.52'
+    version: '0.53'
   Pod::ProjectDocs::IndexPage:
     file: lib/Pod/ProjectDocs/IndexPage.pm
-    version: '0.52'
+    version: '0.53'
   Pod::ProjectDocs::Parser:
     file: lib/Pod/ProjectDocs/Parser.pm
-    version: '0.52'
+    version: '0.53'
   Pod::ProjectDocs::Parser::XHTML:
     file: lib/Pod/ProjectDocs/Parser/XHTML.pm
-    version: '0.52'
+    version: '0.53'
   Pod::ProjectDocs::Template:
     file: lib/Pod/ProjectDocs/Template.pm
-    version: '0.52'
+    version: '0.53'
 requires:
   Carp: '0'
   File::Basename: '0'
@@ -66,5 +66,7 @@ requires:
 resources:
   bugtracker: https://github.com/mgruner/p5-pod-projectdocs/issues
   repository: git://github.com/mgruner/p5-pod-projectdocs.git
-version: '0.52'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.53'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

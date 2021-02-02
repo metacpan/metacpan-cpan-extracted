@@ -12,14 +12,14 @@ build_requires:
   File::Temp: '0.01'
   Test::File: '1.1'
   Test::File::Contents: '0.02'
-  Test::More: '1.001014'
+  Test::More: '1.001002'
   Test::Pod: '1.48'
   Test::Pod::Coverage: '1.1'
   Tree: '1.05'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,10 +34,11 @@ requires:
   Scalar::Util: '1.1'
   XML::Parser: '2.41'
   base: '0'
+  perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/Tree-Persist.git
-version: '1.13'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '1.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

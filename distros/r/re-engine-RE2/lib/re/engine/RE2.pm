@@ -2,7 +2,7 @@ package re::engine::RE2;
 use 5.012;
 
 BEGIN {
-  $re::engine::RE2::VERSION = "0.13";
+  $re::engine::RE2::VERSION = "0.14";
 }
 
 use XSLoader ();
@@ -97,6 +97,25 @@ Example:
     my($min, $max) = qr/^(a|b)/->possible_match_range;
     is $min, 'a';
     is $max, 'c';'
+
+=item * C<named_captures()>
+
+Returns a hash of the name captures and index.
+
+Example:
+
+    my $named_captures = qr/(?P<a>\w+) (?P<d>\w+)/->named_captures;
+    is $named_captures->{a}, 1;
+    is $named_captures->{d}, 2;
+
+=item * C<number_of_capture_groups()>
+
+Return number of capture groups
+
+Example:
+
+    my $captures = qr/(Hello), (world)/->number_of_capture_groups;
+    is $captures, 2;
 
 =back
 
@@ -225,8 +244,7 @@ C<\n?\z> when you mean Perl's C<$>.
 
 =back
 
-Please report bugs via RT in the normal way. (Or a patch at
-L<https://github.com/dgl/re-engine-RE2> would be most welcome.)
+Please report bugs or provide patches at <https://github.com/dgl/re-engine-RE2>.
 
 =head1 AUTHORS
 

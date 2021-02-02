@@ -3,7 +3,7 @@ package Pod::ProjectDocs;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';    # VERSION
+our $VERSION = '0.53';    # VERSION
 
 use Moose;
 
@@ -105,13 +105,11 @@ sub gen {
     my %local_modules;
 
     foreach my $manager ( @{ $self->managers } ) {
-        next if $manager->desc !~ /Perl Modules/;
+        next if $manager->desc !~ /^Perl/;
         for my $doc ( @{ $manager->docs() || [] } ) {
             my $name = $doc->name;
             my $path = $doc->get_output_path;
-            if ( $manager->desc eq 'Perl Modules' ) {
-                $local_modules{$name} = $path;
-            }
+            $local_modules{$name} = $path;
         }
     }
 
@@ -147,28 +145,28 @@ sub gen {
 sub get_managers_json {
     my $self    = shift;
     my $js      = JSON->new;
-    my $records = [];
+    my $entries = [];
     foreach my $manager ( @{ $self->managers } ) {
-        my $record = {
+        my $entry = {
             desc    => $manager->desc,
-            records => [],
+            entries => [],
         };
         foreach my $doc ( @{ $manager->docs } ) {
-            push @{ $record->{records} },
+            push @{ $entry->{entries} },
               {
                 path  => $doc->relpath,
                 name  => $doc->name,
                 title => $doc->title,
               };
         }
-        if ( scalar( @{ $record->{records} } ) > 0 ) {
-            push @$records, $record;
+        if ( scalar( @{ $entry->{entries} } ) > 0 ) {
+            push @$entries, $entry;
         }
     }
 
     # Use "canonical" to generate stable structures that can be added
     #   to version control systems without changing all the time.
-    return $js->canonical()->encode($records);
+    return $js->canonical()->encode($entries);
 }
 
 sub _croak {
@@ -177,6 +175,8 @@ sub _croak {
     Carp::croak($msg);
     return;
 }
+
+no Moose;
 
 1;
 __END__

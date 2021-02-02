@@ -166,7 +166,7 @@ sub configReload {
 
     foreach my $sub (
         qw( defaultValuesInit jailInit portalInit locationRulesInit
-        sessionStorageInit headersInit postUrlInit aliasInit )
+        sessionStorageInit headersInit postUrlInit aliasInit oauth2Init )
       )
     {
         $class->logger->debug("Process $$ calls $sub");
@@ -609,6 +609,25 @@ sub aliasInit {
 }
 
 # TODO: support wildcards in aliases
+
+## @method arrayref oauth2Init
+# @param options vhostOptions configuration item
+# @return arrayref of vhost and aliases
+sub oauth2Init {
+    my ( $class, $conf ) = @_;
+
+    foreach my $rp ( keys %{ $conf->{oidcRPMetaDataOptions} || {} } ) {
+        if (    $conf->{oidcRPMetaDataOptions}->{$rp}
+            and $conf->{oidcRPMetaDataOptions}->{$rp}
+            ->{oidcRPMetaDataOptionsClientID} )
+        {
+            $class->tsv->{oauth2Options}->{$rp}->{clientId} =
+              $conf->{oidcRPMetaDataOptions}->{$rp}
+              ->{oidcRPMetaDataOptionsClientID};
+        }
+    }
+    return 1;
+}
 
 sub substitute {
     my ( $class, $expr ) = @_;

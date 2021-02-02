@@ -4,9 +4,9 @@ package Net::Async::Slack;
 use strict;
 use warnings;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
-use parent qw(IO::Async::Notifier);
+use parent qw(IO::Async::Notifier Net::Async::Slack::Commands);
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ Net::Async::Slack - support for the L<https://slack.com> APIs with L<IO::Async>
  use Net::Async::Slack;
  my $loop = IO::Async::Loop->new;
  $loop->add(
-  my $gh = Net::Async::Slack->new(
+  my $slack = Net::Async::Slack->new(
    token => '...',
   )
  );
@@ -36,11 +36,12 @@ no indirect;
 use mro;
 
 use Future;
+use Future::AsyncAwait;
 use Dir::Self;
 use URI;
 use URI::QueryParam;
 use URI::Template;
-use JSON::MaybeXS;
+use JSON::MaybeUTF8 qw(:v1);
 use Time::Moment;
 use Syntax::Keyword::Try;
 use File::ShareDir ();
@@ -57,9 +58,8 @@ use Log::Any qw($log);
 use Net::Async::OAuth::Client;
 
 use Net::Async::Slack::RTM;
+use Net::Async::Slack::Socket;
 use Net::Async::Slack::Message;
-
-my $json = JSON::MaybeXS->new;
 
 =head1 METHODS
 
@@ -74,17 +74,19 @@ resolves to a L<Net::Async::Slack::RTM> instance.
 
 sub rtm {
     my ($self, %args) = @_;
+    warn "RTM is deprecated and will no longer be supported by slack.com, please use socket mode instead: https://slack.com/apis/connections/socket";
     $log->tracef('Endpoint is %s', $self->endpoint(
         'rtm_connect',
-        token => $self->token
     ));
     $self->{rtm} //= $self->http_get(
         uri => URI->new(
             $self->endpoint(
                 'rtm_connect',
-                token => $self->token
             )
-        )
+        ),
+        headers => {
+            Authorization => 'Bearer ' . $self->token
+        }
     )->then(sub {
         my $result = shift;
         return Future->done(URI->new($result->{url})) if exists $result->{url};
@@ -99,6 +101,19 @@ sub rtm {
         );
         $rtm->connect->transform(done => sub { $rtm })
     })
+}
+
+async sub socket_mode {
+    my ($self, %args) = @_;
+    my ($uri) = await $self->socket;
+    $self->add_child(
+        my $socket = Net::Async::Slack::Socket->new(
+            slack => $self,
+            wss_uri => $uri,
+        )
+    );
+    await $socket->connect;
+    return $socket;
 }
 
 =head2 send_message
@@ -139,32 +154,28 @@ Returns a L<Future>, although the content of the response is subject to change.
 
 =cut
 
-sub send_message {
+async sub send_message {
     my ($self, %args) = @_;
     die 'You need to pass either text or attachments' unless $args{text} || $args{attachments};
     my @content;
     push @content, token => $self->token;
     push @content, channel => $args{channel} || die 'need a channel';
     push @content, text => $args{text} if defined $args{text};
-    push @content, attachments => $json->encode($args{attachments}) if $args{attachments};
-    push @content, blocks => $json->encode($args{blocks}) if $args{blocks};
+    push @content, attachments => encode_json_text($args{attachments}) if $args{attachments};
+    push @content, blocks => encode_json_text($args{blocks}) if $args{blocks};
     push @content, $_ => $args{$_} for grep exists $args{$_}, qw(parse link_names unfurl_links unfurl_media as_user reply_broadcast thread_ts);
-    $self->http_post(
+    my ($data) = await $self->http_post(
         $self->endpoint(
             'chat.postMessage',
         ),
         \@content,
-    )->then(sub {
-        my ($data) = @_;
-        return Future->fail('send failed', slack => $data) unless $data->{ok};
-        Future->done(
-            Net::Async::Slack::Message->new(
-                slack => $self,
-                channel => $data->{channel},
-                thread_ts => $data->{ts},
-            )
-        )
-    })
+    );
+    Future::Exception->throw('send failed', slack => $data) unless $data->{ok};
+    return Net::Async::Slack::Message->new(
+        slack => $self,
+        channel => $data->{channel},
+        thread_ts => $data->{ts},
+    );
 }
 
 =head2 conversations_info
@@ -194,6 +205,16 @@ sub conversations_info {
             'conversations.info',
         ),
         \@content,
+    )
+}
+
+async sub conversations_history {
+    my ($self, %args) = @_;
+    return await $self->http_get(
+        uri => $self->endpoint(
+            'conversations.history',
+            %args
+        ),
     )
 }
 
@@ -243,7 +264,8 @@ sub endpoints {
                 'endpoints.json'
             )
         ) unless $path->exists;
-        $json->decode($path->slurp_utf8)
+        $log->tracef('Loading endpoints from %s', $path);
+        decode_json_text($path->slurp_utf8)
     };
 }
 
@@ -258,7 +280,7 @@ passed to the method.
 
 sub endpoint {
     my ($self, $endpoint, %args) = @_;
-    my $uri = URI::Template->new($self->endpoints->{$endpoint . '_url'})->process(%args);
+    my $uri = URI::Template->new($self->endpoints->{$endpoint})->process(%args);
     $uri->host($self->slack_host) if $self->slack_host;
     $uri
 }
@@ -308,6 +330,8 @@ API token.
 
 sub token { shift->{token} }
 
+sub app_token { shift->{app_token} }
+
 =head2 http
 
 Returns the HTTP instance used for communicating with the API.
@@ -356,7 +380,7 @@ sub http_get {
         return { } if 3 == ($resp->code / 100);
         try {
             $log->tracef('HTTP response for %s was %s', "$uri", $resp->as_string("\n"));
-            return Future->done($json->decode($resp->decoded_content))
+            return Future->done(decode_json_utf8($resp->content))
         } catch {
             $log->errorf("JSON decoding error %s from HTTP response %s", $@, $resp->as_string("\n"));
             return Future->fail($@ => json => $resp);
@@ -371,6 +395,14 @@ sub http_get {
         }
         Future->fail(@_);
     })
+}
+
+sub auth_headers {
+    my ($self) = @_;
+    return {} unless $self->token;
+    return {
+        Authorization => 'Bearer ' . $self->token
+    }
 }
 
 =head2 http_post
@@ -384,16 +416,22 @@ sub http_post {
 
     $log->tracef("POST %s { %s } <= %s", "$uri", \%args, $content);
 
+    $args{headers} ||= $self->auth_headers;
+    if(ref $content eq 'HASH') {
+        $content = encode_json_utf8($content);
+        $args{content_type} = 'application/json';
+    }
     $self->http->POST(
         $uri,
         $content,
+        %args,
     )->then(sub {
         my ($resp) = @_;
         return { } if $resp->code == 204;
         return { } if 3 == ($resp->code / 100);
         try {
             $log->tracef('HTTP response for %s was %s', "$uri", $resp->as_string("\n"));
-            return Future->done($json->decode($resp->decoded_content))
+            return Future->done(decode_json_utf8($resp->content))
         } catch {
             $log->errorf("JSON decoding error %s from HTTP response %s", $@, $resp->as_string("\n"));
             return Future->fail($@ => json => $resp);
@@ -410,9 +448,25 @@ sub http_post {
     })
 }
 
+async sub socket {
+    my ($self) = @_;
+    my $uri = $self->endpoint(
+        'apps_connections_open',
+    ) or die 'no endpoint';
+    my $res = await $self->http_post(
+        $uri,
+        [ ],
+        headers => {
+            Authorization => 'Bearer ' . $self->app_token
+        }
+    );
+    die 'failed to obtain socket-mode URL' unless $res->{ok};
+    return URI->new($res->{url});
+}
+
 sub configure {
     my ($self, %args) = @_;
-    for my $k (qw(client_id token slack_host)) {
+    for my $k (qw(client_id token app_token slack_host)) {
         $self->{$k} = delete $args{$k} if exists $args{$k};
     }
     $self->next::method(%args);
@@ -442,5 +496,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2016-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2016-2021. Licensed under the same terms as Perl itself.
 

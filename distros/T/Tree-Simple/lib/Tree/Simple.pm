@@ -3,7 +3,7 @@ package Tree::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 use Scalar::Util qw(blessed);
 
@@ -1282,7 +1282,7 @@ specialized in purpose.
 =item L<Tree::DAG_Node>
 
 This module seems pretty stable and very robust with a lot of functionality.
-But it> only comes with 1 sophisticated test, t/cut.and.paste.subtrees.t.
+But it only comes with 1 sophisticated test, t/cut.and.paste.subtrees.t.
 While I am sure the author tested his code, I would feel better if I was able
 to see that. The module is approx. 3000 lines with POD, and 1,500 without the
 POD. The shear depth and detail of the documentation and the ratio of code
@@ -1384,6 +1384,16 @@ and I<width> properties without unnecessary recursion.
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/ronsavage/Tree-Simple>.
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple/issues>
+
 =head1 AUTHOR
 
 Stevan Little, E<lt>stevan@iinteractive.comE<gt>
@@ -1391,10 +1401,6 @@ Stevan Little, E<lt>stevan@iinteractive.comE<gt>
 Rob Kinyon, E<lt>rob@iinteractive.comE<gt>
 
 Ron Savage E<lt>ron@savage.net.auE<gt> has taken over maintenance as of V 1.19.
-
-=head1 REPOSITORY
-
-L<https://github.com/ronsavage/Tree-Simple>.
 
 =head1 COPYRIGHT AND LICENSE
 

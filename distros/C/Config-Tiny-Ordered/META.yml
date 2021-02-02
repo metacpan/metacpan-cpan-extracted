@@ -1,24 +1,28 @@
 ---
 abstract: 'Read/Write ordered .ini style files with as little code as possible'
 author:
-  - 'Ron Savage <ron@savage.net.au>'
+  - 'Ron Savage (ron@savage.net.au)'
 build_requires:
-  Test::More: 0.47
-  Test::Pod: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
-license: artistic
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Config-Tiny-Ordered
-provides:
-  Config::Tiny::Ordered:
-    file: lib/Config/Tiny/Ordered.pm
-    version: 1.02
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Config::Tiny: 2.12
+  Config::Tiny: '2.12'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_1_0
-version: 1.02
+  bugtracker: https://github.com/ronsavage/Config-Tiny-Ordered/issues
+  license: http://opensource.org/licenses/Perl
+  repository: https://github.com/ronsavage/Config-Tiny-Ordered.git
+version: '1.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

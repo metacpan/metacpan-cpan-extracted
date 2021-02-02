@@ -7,8 +7,9 @@ use Carp;
 use File::Spec::Functions 'catfile';
 use Unicode::Normalize qw/NFC/;
 use Unicode::UCD 'charinfo';
+use JSON::Parse 'read_json';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # Maximum distance, used by __distance.
 
@@ -38,12 +39,32 @@ our @SINGLETONS = qw/Armenian Hebrew Bengali Gurumkhi Greek Gujarati
 		     Oriya Tamil Telugu Kannada Malayalam Sinhala
 		     Thai Lao Tibetan Burmese Georgian Mongolian/;
 
+my $dir = __FILE__;
+$dir =~ s!\.pm$!!;
+
+my $lang2codes = read_json ("$dir/lang.json");
+
+sub make_ret
+{
+    my ($lang, $score) = @_;
+    my %ret;
+    $lang = lc $lang;
+    my $codes = $lang2codes->{$lang};
+    if ($codes) {
+	$ret{code2} = $codes->[0]; 
+	$ret{code3} = $codes->[1];
+    } 
+    $ret{score} = $score;
+    $ret{name} = $lang;
+    return \%ret;
+}
+
+
 sub new
 {
     my ($class, %params) = @_;
     if (! $params{modeldir}) {
-	my $md = __FILE__;
-	$md =~ s!\.pm$!/train!;
+	my $md = "$dir/train";
 	$params{modeldir} = $md;
     }
     if (! -d $params{modeldir}) {
@@ -61,7 +82,6 @@ sub guess
         $self->load_models ();
     }
     my @runs = find_runs($string);
-    my @langs;
     my %scripts;
     for my $run (@runs) {
 	$scripts{$run->[1]}++;
@@ -212,6 +232,7 @@ sub has_latin_extended_additional
 }
 
 
+
 sub identify 
 {
     my ($self, $sample, %scripts) = @_;
@@ -222,24 +243,24 @@ sub identify
 	exists $scripts{'Hangul Jamo'} ||
 	exists $scripts{'Hangul Compatibility Jamo'} ||
 	exists $scripts{'Hangul'}) {
-	return [{ name =>'korean', score => 1 }];
+	return [make_ret ('korean', 1)];
     }
 
     if (exists $scripts{'Greek and Coptic'}) { 
-	return [{ name =>'greek', score => 1 }];
+	return [make_ret ('greek', 1)];
     }
 	
     if (exists $scripts{'Katakana'} || 
 	exists $scripts{'Hiragana'} ||
 	exists $scripts{'Katakana Phonetic Extensions'}) {
-	return [{ name =>'japanese', score => 1 }];
+	return [make_ret ('japanese', 1)];
     }
 	
     if (exists $scripts{'CJK Unified Ideographs'} ||
 	exists $scripts{'Bopomofo'} ||
 	exists $scripts{'Bopomofo Extended'} ||
 	exists $scripts{'KangXi Radicals'}) {
-	return [{ name => 'chinese', score => 1 }];		
+	return [make_ret ('chinese', 1)];		
     }
 	
     if (exists $scripts{'Cyrillic'}) {
@@ -260,12 +281,12 @@ sub identify
 
     for my $s (@SINGLETONS) {
 	if (exists $scripts{$s}) {
-	    return [{ name => lc ($s), score => 1 }];
+	    return [make_ret (lc ($s), 1)];
 	}
     }
 	
     if (exists $scripts{'Superfreak Latin'}) {
-	return [{ name => 'vietnamese', score => 1 }];
+	return [make_ret ('vietnamese', 1)];
     }
 	
     if (exists $scripts{'Exotic Latin'}) {
@@ -303,7 +324,7 @@ sub check
     $num_tri ||=1;
     for my $s (@sorted) {
 	my $norm = $scores{$s}/$num_tri;
-	push @out, { name => $s , score => $norm };
+	push @out, make_ret ($s, $norm);
     }
     my $total = 0.0;
     for (@out) {

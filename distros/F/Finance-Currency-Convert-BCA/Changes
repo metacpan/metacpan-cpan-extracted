@@ -1,59 +1,64 @@
-0.154   2018-07-15 (PERLANCAR)
+0.155   2021-02-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Avoid Mojo::UserAgent deprecation warning (success() is deprecated).
+
+
+0.154   2018-07-15  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Some fixes/tweaks.
 
 
-0.153   2018-07-10 (PERLANCAR)
+0.153   2018-07-10  Released-By: PERLANCAR
 
 	- Add prereq to IO::Socket::SSL 2.009 [CT].
 
 
-0.152   2018-06-27 (PERLANCAR)
+0.152   2018-06-27  Released-By: PERLANCAR
 
 	- Rename module/dist from Finance::Currency::Convert::{KlikBCA,BCA}.
 
 
-0.151   2018-06-24 (PERLANCAR)
+0.151   2018-06-24  Released-By: PERLANCAR
 
 	- Mojo's error doesn't give code, only message.
 
 
-0.150   2018-06-16 (PERLANCAR)
+0.150   2018-06-16  Released-By: PERLANCAR
 
 	- Extract last update time (mtime, mtime_er, mtime_ttc, mtime_bn)
 	  from the website.
 
 
-0.14    2017-07-11 (PERLANCAR)
+0.14    2017-07-11  Released-By: PERLANCAR
 
         - Update URL from http:// to https:// to re-pass the test.
 
 	- Remove dependency to Log::Any::IfLOG.
 
 
-0.13    2016-10-14 (PERLANCAR)
+0.13    2016-10-14  Released-By: PERLANCAR
 
 	- [ux] Bail earlier when to is not 'IDR' before actually retrieving
 	  the currencies.
 
 
-0.12    2016-07-22 (PERLANCAR)
+0.12    2016-07-22  Released-By: PERLANCAR
 
         - Update/unbreak (URL changed).
 
         - Switch to using Mojo::DOM and Mojo::UserAgent.
 
 
-0.11    2015-10-23 (PERLANCAR)
+0.11    2015-10-23  Released-By: PERLANCAR
 
 	- Add 'which' option for convert_currency().
 
 	- [doc] Add documentation for get_currencies.
 
 
-0.10    2015-09-03 (PERLANCAR)
+0.10    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -62,20 +67,20 @@
 	  requirement.
 
 
-0.09    2015-08-17 (PERLANCAR)
+0.09    2015-08-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.08    2015-07-10 (PERLANCAR)
+0.08    2015-07-10  Released-By: PERLANCAR
 
 	- Split pericmd CLI scripts to App-IndonesianFinanceUtils to reduce
 	  dependencies on our dist.
 
 
-0.07     2014-09-05 (PERLANCAR)
+0.07     2014-09-05  Released-By: PERLANCAR
 
          - No functional changes.
 
@@ -83,21 +88,21 @@
            release using 'dzil test --all'.
 
 
-0.06     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.06     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - Update URL (moved).
 
          - Add a CLI script.
 
 
-0.05    2014-05-17 (SHARYANTO)
+0.05    2014-05-17  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Replace File::Slurp with File::Slurp::Tiny.
 
 
-0.04    2014-03-12 (SHARYANTO)
+0.04    2014-03-12  Released-By: SHARYANTO
 
         [REMOVED FEATURES]
 
@@ -108,7 +113,7 @@
         - Use Perinci::Import (with exit_on_error=>1 property).
 
 
-0.03    2014-02-18 (SHARYANTO)
+0.03    2014-02-18  Released-By: SHARYANTO
 
         - Update against site changes.
 
@@ -121,11 +126,11 @@
         - Add unit tests as well as third party tests in xt-3rd/.
 
 
-0.02    2012-07-18 (SHARYANTO)
+0.02    2012-07-18  Released-By: SHARYANTO
 
         - No functional changes. Rebuild (error in weaver.ini).
 
 
-0.01    2012-07-17 (SHARYANTO)
+0.01    2012-07-17  Released-By: SHARYANTO
 
         - First release.

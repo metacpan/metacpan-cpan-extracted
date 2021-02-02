@@ -51,7 +51,7 @@ use Test::More 0.96;
         'Ucstr2',
         parent    => t('Str'),
         inline_as => sub {
-            my $type      = shift;
+            shift;
             my $value_var = shift;
 
             return $value_var . ' =~ /^[A-Z]+$/';
@@ -80,7 +80,7 @@ use Test::More 0.96;
         $ucstr3,
         from             => t('Str'),
         inline_generator => sub {
-            my $coercion  = shift;
+            shift;
             my $value_var = shift;
 
             return 'uc ' . $value_var;
@@ -97,7 +97,7 @@ use Test::More 0.96;
         'Ucstr4',
         parent    => t('Str'),
         inline_as => sub {
-            my $type      = shift;
+            shift;
             my $value_var = shift;
 
             return $value_var . ' =~ /^[A-Z]+$/';
@@ -108,7 +108,7 @@ use Test::More 0.96;
         $ucstr4,
         from             => t('Str'),
         inline_generator => sub {
-            my $coercion  = shift;
+            shift;
             my $value_var = shift;
 
             return 'uc ' . $value_var;
@@ -222,7 +222,7 @@ is(
         t('Str'),
         from             => t('ArrayRef'),
         inline_generator => sub {
-            my $coercion  = shift;
+            shift;
             my $value_var = shift;
 
             return "join q{}, \@{$value_var}";
@@ -233,7 +233,7 @@ is(
         t('Str'),
         from             => t('HashRef'),
         inline_generator => sub {
-            my $coercion  = shift;
+            shift;
             my $value_var = shift;
 
             return "join q{}, keys %{$value_var}";

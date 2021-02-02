@@ -266,6 +266,7 @@
 "rightsReloadNeedsLogout":"重新加载权限需要登出并且再次登录",
 "scope":"Scope",
 "search":"搜索",
+"searchAccount":"Search for account",
 "seconds":"seconds",
 "selectIdP":"Select your Identity Provider",
 "service":"服务",

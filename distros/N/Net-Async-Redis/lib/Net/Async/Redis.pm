@@ -9,7 +9,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.009';
+our $VERSION = '3.010';
 
 =head1 NAME
 
@@ -1264,5 +1264,5 @@ tests and feedback:
 
 =head1 LICENSE
 
-Copyright Tom Molesworth and others 2015-2020.
+Copyright Tom Molesworth and others 2015-2021.
 Licensed under the same terms as Perl itself.

@@ -125,6 +125,7 @@ sub print_fdb {
     printf "%12s %4d %17s %s\n", shorten($if_name), $vlan_id, $mac, $status_str;
 
   }
+  print '-' x 60, "\n";
 }
 
 # strip leading and trailing whitespace
@@ -138,6 +139,7 @@ sub shorten {
   $val =~ s/Interface/If/g;
   $val =~ s/Ethernet/Eth/ig;
   $val =~ s/Gigabit/Gig/g;
+  $val =~ s/port-channel/Po/ig;
   return $val;
 }
 

@@ -266,6 +266,7 @@
 "rightsReloadNeedsLogout":"La recarga de derechos necesita desconectarse y conectarse de nuevo",
 "scope":"Alcance",
 "search":"Buscar",
+"searchAccount":"Search for account",
 "seconds":"seconds",
 "selectIdP":"Seleccione su proveedor de identidad",
 "service":"Servicio",

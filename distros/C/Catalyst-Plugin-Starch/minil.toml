@@ -1,2 +1,4 @@
 name = "Catalyst-Plugin-Starch"
 authority="cpan:BLUEFEET"
+markdown_maker = "Pod::Markdown::Github"
+license = "perl_5"

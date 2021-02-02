@@ -3,7 +3,7 @@ package Pod::ProjectDocs::Template;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';    # VERSION
+our $VERSION = '0.53';    # VERSION
 
 use Moose::Role;
 
@@ -52,6 +52,8 @@ sub process {
     $self->_curpath('');
     return $text;
 }
+
+no Moose::Role;
 
 1;
 __END__

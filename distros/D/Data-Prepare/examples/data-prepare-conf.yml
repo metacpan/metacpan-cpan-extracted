@@ -37,11 +37,13 @@ merge:
         to: self
         tospec: index:0
 pk_insert:
-  - column_heading: ISO3CODE
-    files:
+  - files:
       - examples/CoreHouseholdIndicators.csv
-    local_column: Country
-    pk_column: official_name_en
+    spec:
+      column_heading: ISO3CODE
+      local_column: Country
+      pk_column: official_name_en
+      use_fallback: true
 pk_spec:
   file: examples/country-codes.csv
   primary_key: ISO3166-1-Alpha-3
@@ -51,3 +53,7 @@ pk_spec:
     - UNTERM English Formal
     - official_name_en
     - CLDR display name
+  stopwords:
+    - islands
+    - china
+    - northern

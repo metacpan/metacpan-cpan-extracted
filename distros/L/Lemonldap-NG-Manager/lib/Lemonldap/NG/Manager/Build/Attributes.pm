@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -29,7 +29,7 @@ sub perlExpr {
           split( /\n/, $@ ) );
     return ( -1, "__badExpression__: $err" )
       if ( $err && $conf->{useSafeJail} );
-    return ( $val =~ qr/(?<=[^=<!>\|\?])=(?![=~])/ && $conf->{avoidAssignment} )
+    return ( $val =~ qr/(?<=[^=<!>\|\?])=(?![>=~])/ && $conf->{avoidAssignment} )
       ? ( 1, "__badExpressionAssignment__" )
       : 1;
 }
@@ -511,6 +511,12 @@ sub attributes {
             documentation => 'Display empty headers rule',
             flags         => 'p',
         },
+        checkUserDisplayNormalizedHeaders => {
+            default       => 0,
+            type          => 'boolOrExpr',
+            documentation => 'Display normalized headers rule',
+            flags         => 'p',
+        },
         checkUserDisplayComputedSession => {
             default       => 1,
             type          => 'boolOrExpr',
@@ -527,6 +533,32 @@ sub attributes {
                 test       => sub { return perlExpr(@_) },
             },
             documentation => 'Header values to hide if not empty',
+        },
+        findUser => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Enable find user',
+            flags         => 'p',
+        },
+        findUserSearchingAttributes => {
+            type          => 'keyTextContainer',
+            keyTest       => qr/^\S+$/,
+            documentation => 'Attributes used for searching accounts',
+        },
+        findUserExcludingAttributes => {
+            type          => 'keyTextContainer',
+            keyTest       => qr/^\S+$/,
+            documentation => 'Attributes used for excluding accounts',
+        },
+        findUserWildcard => {
+            type          => 'text',
+            default       => '*',
+            documentation => 'Character used as wildcard',
+        },
+        findUserControl => {
+            type          => 'pcre',
+            default       => '^[*\w]+$',
+            documentation => 'Regular expression to validate parameters',
         },
         globalLogoutRule => {
             type          => 'boolOrExpr',
@@ -3510,8 +3542,9 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         radiusServer => { type => 'text', },
 
         # REST
-        restAuthUrl   => { type => 'url' },
-        restUserDBUrl => { type => 'url' },
+        restAuthUrl       => { type => 'url' },
+        restUserDBUrl     => { type => 'url' },
+        restFindUserDBUrl => { type => 'url' },
 
         restPwdConfirmUrl => { type => 'url' },
         restPwdModifyUrl  => { type => 'url' },
@@ -3757,6 +3790,10 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         authChoiceAuthBasic => {
             type          => 'text',
             documentation => 'Auth module used by AuthBasic handler',
+        },
+        authChoiceFindUser => {
+            type          => 'text',
+            documentation => 'Auth module used by FindUser plugin',
         },
         authChoiceModules => {
             type       => 'authChoiceContainer',
@@ -4216,6 +4253,11 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default => 0,
             documentation =>
               'Allow OAuth2 Resource Owner Password Credentials Grant',
+        },
+        oidcRPMetaDataOptionsAllowClientCredentialsGrant => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Allow OAuth2 Client Credentials Grant',
         },
         oidcRPMetaDataOptionsRefreshToken => {
             type          => 'bool',

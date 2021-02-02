@@ -1,5 +1,10 @@
 Revision history for Perl extension Config-Registry.
 
+0.04 2021-01-30T03:25:34Z
+
+ - Changed licensing terms to be the same as Perl.
+ - Provide a .editorconfig instead of .lvimrc.
+
 0.03 2020-01-27T22:24:14Z
 
  - Declare minimum version of dependencies.

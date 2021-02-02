@@ -52,6 +52,6 @@
          "web" : "https://github.com/gonzus/Devel-Probe.git"
       }
    },
-   "version" : "0.000005",
+   "version" : "0.000006",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

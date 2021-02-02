@@ -3,7 +3,7 @@ package Pod::ProjectDocs::File;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';    # VERSION
+our $VERSION = '0.53';    # VERSION
 
 use Moose::Role;
 use IO::File;
@@ -62,6 +62,8 @@ sub get_output_path {
     my $path    = File::Spec->catfile( $outroot, $relpath );
     return $path;
 }
+
+no Moose::Role;
 
 1;
 __END__

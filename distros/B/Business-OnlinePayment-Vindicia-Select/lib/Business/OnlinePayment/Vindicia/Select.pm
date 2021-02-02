@@ -1,20 +1,21 @@
 package Business::OnlinePayment::Vindicia::Select;
+
 use strict;
 use warnings;
 
-use Business::OnlinePayment;
-use vars qw(@ISA $me $DEBUG $VERSION);
+use base qw{Business::OnlinePayment};
+use vars qw($me $DEBUG $VERSION); ## no critic (Variables::ProhibitPackageVars)
 use HTTP::Tiny;
 use XML::Writer;
 use XML::Simple;
 use Business::CreditCard qw(cardtype);
 use Data::Dumper;
+use List::MoreUtils qw(any);
 use Log::Scrubber qw(disable $SCRUBBER scrubber :Carp scrubber_add_scrubber);
 
-@ISA     = qw(Business::OnlinePayment);
 $me      = 'Business::OnlinePayment::Vindicia::Select';
 $DEBUG   = 0;
-$VERSION = '0.002';
+$VERSION = '0.003';
 
 =head1 NAME
 
@@ -22,7 +23,7 @@ Business::OnlinePayment::Vindicia::Select - Backend for Business::OnlinePayment
 
 =head1 SYNOPSIS
 
-This is a plugin for the Business::OnlinePayment interface.  Please refer to that docuementation for general usage.
+This is a plugin for the Business::OnlinePayment interface.  Please refer to that documentation for general usage.
 
   use Business::OnlinePayment;
   my $tx = Business::OnlinePayment->new(
@@ -54,9 +55,13 @@ This is a plugin for the Business::OnlinePayment interface.  Please refer to tha
   );
   $tx->submit();
 
+=head1 DESCRIPTION
+
+Used via Business::OnlinePayment for processing payments through the Vindicia processor.
+
 =head1 METHODS AND FUNCTIONS
 
-See L<Business::OnlinePayment> for the complete list. The following methods either override the methods in L<Business::OnlinePayment> or provide additional functions.
+See Business::OnlinePayment for the complete list. The following methods either override the methods in Business::OnlinePayment or provide additional functions.
 
 =head2 result_code
 
@@ -196,8 +201,7 @@ Used by BOP to set default values during "new"
 =cut
 
 sub set_defaults {
-    my $self = shift;
-    my %opts = @_;
+    my ($self, %opts) = @_;
 
     $self->build_subs(
         qw( order_number md5 avs_code cvv2_response card_token cavv_response failure_status verify_SSL )
@@ -233,7 +237,7 @@ sub test_transaction {
     $self->port('443');
     $self->path('v1.1/soap.pl'); #https://soap.prodtest.sj.vindicia.com/v1.1/soap.pl
     if (lc($testMode) eq 'sandbox' || lc($testMode) eq 'test' || $testMode eq '1') {
-        $self->server('soap.prodtest.sj.vindicia.com');
+        $self->server('soap.staging.us-west.vindicia.com');
         $self->{'test_transaction'} = 1;
     } else {
         $self->server('soap.vindicia.com');
@@ -244,7 +248,7 @@ sub test_transaction {
 
 =head2 submit
 
-Do a bop-ish action on vindicia
+Do a Business::OnlinePayment style action on Vindicia
 
 =cut
 
@@ -256,13 +260,13 @@ sub submit {
 
     my %content = $self->content();
     my $action = $content{'action'};
-    die 'unsupported action' unless grep { $action eq $_ } @{$self->_info()->{'supported_actions'}->{'CC'}};
+    die 'unsupported action' unless any { $action eq $_ } @{$self->_info()->{'supported_actions'}->{'CC'}};
     $self->$action();
 }
 
 =head2 billTransactions
 
-Send a batch of transactions to vindica for collection
+Send a batch of transactions to Vindicia for collection
 
 is_success means the call was successful, it does NOT mean all of your transactions were accepted
 In order to verify your transaction you need to look at result->{'response'} for an ARRAY of potential
@@ -320,9 +324,9 @@ sub _add_trans {
         push @{$trans->{'nameValues'}}, {
             name => $_,
             value => $content->{'vindicia_nvp'}->{$_},
-        } foreach grep { !ref $content->{'vindicia_nvp'}->{$_} or die "Invalid vindicia_nvp format" } keys %{$content->{'vindicia_nvp'}};
+        } foreach grep { (!ref $content->{'vindicia_nvp'}->{$_}) or die "Invalid vindicia_nvp format" } keys %{$content->{'vindicia_nvp'}};
     }
-    push @$transactions, $trans;
+    push @{$transactions}, $trans;
 };
 
 =head2 fetchBillingResults
@@ -364,7 +368,7 @@ sub fetchBillingResults {
 
 =head2 fetchByMerchantTransactionId
 
-Lookup a specific transaction in vindicia
+Lookup a specific transaction in Vindicia
 
   $tx->content(
       login           => 'testdrive',
@@ -424,13 +428,11 @@ sub refundTransactions {
 }
 
 sub _call_soap {
-    my $self = shift;
-    my $action = shift;
-    my @pairs = @_;
+    my ($self, $action, @pairs) = @_;
     my %content = $self->content();
 
     my $post_data;
-    my $writer = new XML::Writer(
+    my $writer = XML::Writer->new(
         OUTPUT      => \$post_data,
         DATA_MODE   => 1,
         DATA_INDENT => 2,
@@ -492,7 +494,7 @@ sub _call_soap {
 sub _resp_simplify {
     my ($self,$resp) = @_;
     delete $resp->{'xmlns'};
-    foreach my $t (keys %$resp) {
+    foreach my $t (keys %{$resp}) {
         if (ref $resp->{$t} eq 'ARRAY') {
             $resp->{$t} = $self->_resp_simplify_array($resp->{$t});
         } elsif (ref $resp->{$t} eq 'HASH') {
@@ -504,7 +506,7 @@ sub _resp_simplify {
 
 sub _resp_simplify_array {
     my ($self,$resp) = @_;
-    foreach my $value (@$resp) {
+    foreach my $value (@{$resp}) {
         $self->_resp_simplify_hash($value);
     }
     $resp;
@@ -519,7 +521,7 @@ sub _resp_simplify_hash {
             my $arr = $resp->{$t};
             $arr = [$arr] unless ref $arr eq 'ARRAY';
             my $hash = {};
-            foreach my $t2 (@$arr) {
+            foreach my $t2 (@{$arr}) {
                 my $n = $t2->{'name'}->{'content'};
                 my $v = $t2->{'value'}->{'content'};
                 if (!exists $hash->{$n}) {
@@ -571,9 +573,11 @@ sub _tx_init {
     my %content = $self->content();
     foreach my $ptr (\%content,$opts) {
         next if ! $ptr;
+        my $passkey = quotemeta($ptr->{'password'}||'');
+        my $cvv2key = $ptr->{'cvv2'} ? '(?<=[^\d])'.quotemeta($ptr->{'cvv2'}).'(?=[^\d])' : '';
         scrubber_init({
-            quotemeta($ptr->{'password'}||'')=>'DELETED',
-            ($ptr->{'cvv2'} ? '(?<=[^\d])'.quotemeta($ptr->{'cvv2'}).'(?=[^\d])' : '')=>'DELETED',
+            $passkey => 'DELETED',
+            $cvv2key => 'DELETED',
             });
         $self->_scrubber_add_card($ptr->{'card_number'});
         $self->_scrubber_add_card($ptr->{'account_number'});
@@ -585,7 +589,7 @@ sub _xmlwrite {
     if ( ref($value) eq 'HASH' ) {
         my $attr = $value->{'attr'} ? $value->{'attr'} : {};
         $writer->startTag( $item, %{$attr} );
-        foreach ( keys(%$value) ) {
+        foreach ( keys(%{$value}) ) {
             next if $_ eq 'attr';
             $self->_xmlwrite( $writer, $_, $value->{$_} );
         }
@@ -601,7 +605,7 @@ sub _xmlwrite {
     }
 }
 
-our $common_mock = {
+my $common_mock = {
     billTransactions => {
         ok => {
               'return' => {

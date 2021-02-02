@@ -1,3 +1,9 @@
+0.098   2021-02-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Update Text::ANSITable's border style name (Text::ANSITable
+	  0.600+).
+
+
 0.097   2020-06-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Add backend: Text::Table::TinyBorderStyle.

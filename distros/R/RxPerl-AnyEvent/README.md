@@ -32,6 +32,10 @@ RxPerl::AnyEvent is a module that lets you use the [RxPerl](https://metacpan.org
 
 The documentation at [RxPerl](https://metacpan.org/pod/RxPerl) applies to this module too.
 
+# NOTIFICATIONS FOR NEW RELEASES
+
+You can start receiving emails for new releases of this, or other, modules, over at [https://perlmodules.net](https://perlmodules.net).
+
 # LICENSE
 
 Copyright (C) Karelcom OÜ.
@@ -41,4 +45,4 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-KARJALA <karjala@cpan.org>
+Alexander Karelas <karjala@cpan.org>

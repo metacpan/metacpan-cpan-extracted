@@ -3,7 +3,7 @@ NAME
     Graphics::ColorNames::WWW
 
 VERSION
-    This document describes version 0.003 of WordList::EN::ColorName::WWW
+    This document describes version 0.004 of WordList::EN::ColorName::WWW
     (from Perl distribution WordList-EN-ColorName-WWW), released on
     2020-12-27.
 
@@ -64,6 +64,11 @@ BUGS
 
 SEE ALSO
     Graphics::ColorNames::WWW
+
+    Other WordList::EN::ColorName::* modules like
+    WordList::EN::ColorName::X.
+
+    WordList::ColorName::Any
 
 AUTHOR
     perlancar <perlancar@cpan.org>

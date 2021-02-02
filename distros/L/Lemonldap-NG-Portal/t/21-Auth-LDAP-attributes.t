@@ -33,10 +33,10 @@ SKIP: {
             }
         }
     );
-    my $postString = 'user='
-      . ( $ENV{LDAPACCOUNT} || 'dwho' )
-      . '&password='
-      . ( $ENV{LDAPPWD} || 'dwho' );
+    # my $postString = 'user='
+    #   . ( $ENV{LDAPACCOUNT} || 'dwho' )
+    #   . '&password='
+    #   . ( $ENV{LDAPPWD} || 'dwho' );
 
     # Try yo authenticate
     # -------------------

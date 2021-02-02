@@ -74,13 +74,9 @@ use constant {
 
 Net::SNMP::Mixin::CiscoDot1qVlanStatic - mixin class for static Cisco vlan info
 
-=head1 VERSION
-
-Version 0.02
-
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -263,7 +259,14 @@ sub _fetch_vtp_vlan_tbl_entries {
     $session->version ? ( -maxrepetitions => 3 ) : (),
   );
 
-  return unless defined $result;
+  unless ( defined $result ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
+    return;
+  }
+
+  # in nonblocking mode the callback will be called asynchronously
   return 1 if $session->nonblocking;
 
   # call the callback function in blocking mode by hand
@@ -341,7 +344,14 @@ sub _fetch_vtp_vlan_trunk_port_tbl_entries {
     $session->version ? ( -maxrepetitions => 3 ) : (),
   );
 
-  return unless defined $result;
+  unless ( defined $result ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
+    return;
+  }
+
+  # in nonblocking mode the callback will be called asynchronously
   return 1 if $session->nonblocking;
 
   # call the callback function in blocking mode by hand
@@ -466,7 +476,14 @@ sub _fetch_vm_membership_tbl_entries {
     $session->version ? ( -maxrepetitions => 3 ) : (),
   );
 
-  return unless defined $result;
+  unless ( defined $result ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
+    return;
+  }
+
+  # in nonblocking mode the callback will be called asynchronously
   return 1 if $session->nonblocking;
 
   # call the callback function in blocking mode by hand
@@ -599,21 +616,13 @@ sub _get_if_idx2vlan_ids {
 
 L<< Net::SNMP >>, L<< Net::SNMP::Mixin >>
 
-=head1 BUGS, PATCHES & FIXES
-
-There are no known bugs at the time of this release. However, if you spot a bug or are experiencing difficulties that are not explained within the POD documentation, please submit a bug to the RT system (see link below). However, it would help greatly if you are able to pinpoint problems or even supply a patch. 
-
-Fixes are dependant upon their severity and my availablity. Should a fix not be forthcoming, please feel free to (politely) remind me by sending an email to gaissmai@cpan.org .
-
-  RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-CiscoDot1qVlanStatic
-
 =head1 AUTHOR
 
 Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2020 Karl Gaissmaier, all rights reserved.
+Copyright 2020-2021 Karl Gaissmaier, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

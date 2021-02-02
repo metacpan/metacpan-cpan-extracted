@@ -5,7 +5,7 @@ use Mouse;
 use SOAP::Lite;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_BADCREDENTIALS);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.11';
 
 # INITIALIZATION
 
@@ -32,7 +32,6 @@ sub init {
 # RUNNING METHODS
 
 no warnings 'once';
-
 *authenticate = *getUser;
 
 sub getUser {
@@ -62,6 +61,12 @@ sub getUser {
         return PE_ERROR;
     }
     $req->data->{_proxyQueryDone}++;
+    PE_OK;
+}
+
+sub findUser {
+
+    # Nothing to do here
     PE_OK;
 }
 

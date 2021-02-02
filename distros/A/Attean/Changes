@@ -4,6 +4,19 @@ Attean
 Created:      2014-09-27
 Home page:    <https://metacpan.org/release/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
+Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
+
+0.029  2021-02-01
+
+ - (Addition) Add Attean::API::MutableModel->load_triples_from_io (#157).
+ - (Addition) Added -n CLI argument to attean_parse to allow numbering of
+   results.
+ - (Update) Fix bug in Attean::API::ResultSerializer->serialize_list_to_io.
+ - (Update) Update Attean get_parser and get_serializer to allow searching
+   file extensions and media types for 1-arg calls.
+ - (Update) Updated Attean::API::Serializer to require file_extensions.
+ - (Update) Updated AtteanX::Serializer::TextTable to print table borders
+   and	rules.
 
 0.027  2020-11-06
 
@@ -17,6 +30,20 @@ Bug tracker:  <https://github.com/kasei/attean/issues>
  - (Update) Improve Test::Attean::SPARQLSuite.
  - (Update) Improve handling of XPath Constructor (casting) functions.
  - (Update) Update module metadata URLs (#155 from @szabgab).
+
+0.028  2020-11-02
+
+ - (Addition) Add uniq method on iterators over objects with an as_string
+   method.
+ - (Update) Added Attean::API::RepeatableIterator->size method (#89).
+ - (Update) Fix Attean::QuadModel->get_quads when called with an empty term
+   set in some position.
+ - (Update) Fix utf8 handling of syntax tests in dawg test harness.
+ - (Update) Improve documentation about statement projection accessors
+   (e.g. subjects) not being unique (#152).
+ - (Update) Remove AtteanX::Store::DBI which was not a real DBI store and
+   was accidentally checked-in (#134).
+ - (Update) Switch UUID dependency from Data::UUID to UUID::Tiny (#145).
 
 0.026  2020-02-20
 

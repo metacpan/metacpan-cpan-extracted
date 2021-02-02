@@ -13,6 +13,7 @@ SYNOPSIS
     -f format       any combination of letters t,u,d as title/url/description (default : tud)
     -s              find schemeless URLs in text files (default : no)
 
+
 DESCRIPTION
 -----------
 
@@ -109,10 +110,19 @@ To install this module manually, run the following commands :
     make test
     make install
 
+
 PREREQUISITES
 -------------
 
-DBI, Config::Any, Config::Tiny (optional, for IE only), Win32 (optional)
+All are optional.
+
+- Safari : macOS
+- Firefox : DBI
+- Chrome : File::Slurper, JSON
+- Internet Explorer : Config::Any, Config::Tiny, Win32
+- Plain text : URI::Find
+- Markdown : none
+
 
 SUPPORT AND DOCUMENTATION
 -------------------------
@@ -131,6 +141,7 @@ You can also look for information at :
 - GITHUB
 
     [https://github.com/kal247/App-bookmarks](https://github.com/kal247/App-bookmarks)
+
 
 LICENSE AND COPYRIGHT
 ---------------------

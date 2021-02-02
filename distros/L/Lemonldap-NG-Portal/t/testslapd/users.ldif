@@ -29,6 +29,16 @@ cn: Dr Who
 sn: Who
 mail: dwho@badwolf.org
 userPassword: dwho
+roomNumber: 0
+
+dn: uid=rtyler,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: rtyler
+cn: Rose Tyler
+sn: Rtyler
+mail: rtyler@badwolf.org
+userPassword: rtyler
+roomNumber: 1
 
 dn: uid=french,ou=users,dc=example,dc=com
 objectClass: inetOrgPerson
@@ -38,6 +48,7 @@ sn: Accents
 mail: french@badwolf.org
 userPassword: french
 displayName:: RnLDqWTDqXJpYyBBY2NlbnRz
+roomNumber: 0
 
 dn: uid=russian,ou=users,dc=example,dc=com
 objectClass: inetOrgPerson
@@ -57,6 +68,7 @@ mail: reset@badwolf.org
 userPassword: reset
 pwdPolicySubentry: cn=passwordreset,ou=ppolicies,dc=example,dc=com
 pwdReset: TRUE
+roomNumber: 0
 
 dn: uid=expire,ou=users,dc=example,dc=com
 objectClass: inetOrgPerson

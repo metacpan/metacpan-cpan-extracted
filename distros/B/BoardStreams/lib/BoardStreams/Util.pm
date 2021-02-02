@@ -3,6 +3,8 @@ package BoardStreams::Util;
 use Mojo::Base -strict, -signatures;
 
 use Mojo::JSON qw/ true false /;
+use Mojo::Promise;
+use Mojo::IOLoop;
 use Scalar::Util 'refaddr';
 use List::Util 'any';
 
@@ -14,7 +16,9 @@ our %EXPORT_TAGS = (
     bool => [qw/ true false to_bool /],
 );
 
-sub to_bool :prototype(_) ($x) { $x ? true : false }
+our $VERSION = "v0.0.9";
+
+sub to_bool :prototype(_) { $_[0] ? true : false }
 
 sub eqq ($x, $y) {
     return !defined $y unless defined $x;

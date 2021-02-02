@@ -10,7 +10,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.009'; # VERSION
+our $VERSION = '3.010'; # VERSION
 
 =encoding utf8
 
@@ -57,6 +57,7 @@ proxy routing dæmon, or a service mesh such as L<https://istio.io/|istio>.
 no indirect;
 use Syntax::Keyword::Try;
 use Future::AsyncAwait;
+use Future::Utils qw(fmap_void);
 use List::BinarySearch::XS qw(binsearch);
 use List::UtilsBy qw(nsort_by);
 use List::Util qw(first);
@@ -218,9 +219,29 @@ sub node_by_host_port {
     return $node;
 }
 
-sub register_moved_slot {
+async sub register_moved_slot {
     my ($self, $slot, $host_port) = @_;
-    my $node = $self->node_by_host_port(split /:/, $host_port);
+    my ($host, $port) = split /:/, $host_port;
+    my $node = $self->node_by_host_port($host, $port);
+    unless($node) {
+        $log->tracef("Failed to find node %s:%s in the original node list", $host, $port);
+        # Has a replica become a primary? Let's look for a valid node
+        await fmap_void(async sub {
+            my ($node) = @_;
+            try {
+                my $valid_connection = await $node->primary_connection;
+                die 'Cluster status changed and cannot find a valid information source' unless $valid_connection;
+                # We'll let *all* our nodes try to tell us about slots, the operation
+                # should be atomic so whichever one(s) succeed are hopefully consistent
+                await $self->apply_slots_from_instance($valid_connection);
+            } catch {
+                $log->tracef("Node at %s was invalid", $node->primary);
+            }
+        }, concurrent => 4, foreach => [ $self->{nodes}->@* ]);
+        # Try again else propgate failure
+        $node = $self->node_by_host_port($host, $port)
+            or die "Slot $slot has been moved to unknown node";
+    }
     $self->slot_cache->[$slot & (MAX_SLOTS - 1)] = $node;
     return $node;
 }
@@ -269,8 +290,16 @@ async sub execute_command {
     $log->tracef('Look up hash slot for %s - %d', $k, $slot);
     my $redis = await $self->connection_for_slot($slot);
     # Some commands have modifiers around them for RESP2/3 transparent support
-    my $command = lc(shift @cmd);
-    return await $redis->$command(@cmd);
+    my ($command, @args) = @cmd;
+    try {
+        $command = lc $command;
+        return await $redis->$command(@args);
+    } catch ($e) {
+        die $e unless $e =~ /MOVED/;
+        my ($moved, $slot, $host_port) = split ' ', $e;
+        await $self->register_moved_slot($slot => $host_port);
+        return await $self->execute_command(@cmd);
+    }
 }
 
 1;
@@ -282,6 +311,6 @@ L<Net::Async::Redis/CONTRIBUTORS>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth and others 2015-2020.
+Copyright Tom Molesworth and others 2015-2021.
 Licensed under the same terms as Perl itself.
 

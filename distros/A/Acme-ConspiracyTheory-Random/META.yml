@@ -1,0 +1,43 @@
+---
+abstract: 'random theories'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-ConspiracyTheory-Random
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Acme::ConspiracyTheory::Random:
+    file: lib/Acme/ConspiracyTheory/Random.pm
+    version: '0.007'
+requires:
+  Exporter::Shiny: '1.000000'
+  List::Util: '1.54'
+  perl: '5.012'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/project
+  bugtracker: https://github.com/tobyink/p5-acme-conspiracytheory-random/issues
+  homepage: https://metacpan.org/release/Acme-ConspiracyTheory-Random
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-acme-conspiracytheory-random.git
+version: '0.007'
+x_provides_scripts:
+  conspire:
+    file: bin/conspire
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

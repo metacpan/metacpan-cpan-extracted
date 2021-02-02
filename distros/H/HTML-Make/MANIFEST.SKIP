@@ -16,3 +16,4 @@ MYMETA\.
 ^examples/.*-out\.txt$
 ^copy\.pl$
 ^copied/.*$
+^\.travis\.yml$

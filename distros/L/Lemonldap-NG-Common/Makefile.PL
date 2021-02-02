@@ -79,6 +79,7 @@ WriteMakefile(
         'Digest::SHA'            => 0,
         'HTML::Template'         => 0,
         'JSON'                   => 0,
+        'JSON::XS'               => 0,
         'Mouse'                  => 0,
         'Plack'                  => 0,
         'Test::Pod'              => 1.00,

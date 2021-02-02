@@ -30,6 +30,10 @@ sub getUser {
     PE_OK;
 }
 
+sub findUser {
+    PE_OK;
+}
+
 # Search exportedVars values in HTTP headers.
 sub setSessionInfo {
     my ( $self, $req ) = @_;

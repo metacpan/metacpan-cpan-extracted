@@ -1,0 +1,8 @@
+{
+    "comment":"Cases where we want to force a new line",
+    "newline":{
+	"html":true,
+	"body":true,
+	"head":true
+    }
+}

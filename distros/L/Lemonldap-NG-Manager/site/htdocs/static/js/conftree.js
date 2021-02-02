@@ -554,6 +554,13 @@ function templates(tpl,key) {
                   "type" : "bool"
                },
                {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowClientCredentialsGrant",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowClientCredentialsGrant",
+                  "title" : "oidcRPMetaDataOptionsAllowClientCredentialsGrant",
+                  "type" : "bool"
+               },
+               {
                   "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthnLevel",
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthnLevel",
                   "title" : "oidcRPMetaDataOptionsAuthnLevel",

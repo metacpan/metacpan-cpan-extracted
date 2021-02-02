@@ -4,16 +4,18 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = '0.003';
+our $VERSION = '0.005';
 our @EXPORT_OK = qw(
   cols_non_empty
   non_unique_cols
   key_to_index
   make_pk_map
   pk_col_counts
+  pk_match
   chop_lines
   chop_cols
   header_merge
+  pk_insert
 );
 
 sub chop_lines {
@@ -61,6 +63,22 @@ sub header_merge {
         $to_row->[$i] = $what;
       }
     }
+  }
+}
+
+sub pk_insert {
+  my ($spec, $data, $pk_map, $stopwords) = @_;
+  my ($ch, $lc, $pkc, $fb) = (@$spec{qw(column_heading local_column pk_column use_fallback)});
+  my $key_index = key_to_index($data->[0])->{$lc};
+  die "undef index for key '$lc'" if !defined $key_index;
+  unshift @{ $data->[0] }, $ch;
+  my $exact_map = $pk_map->{$pkc};
+  for my $row (@$data[ 1..$#$data ]) {
+    my $key_val = $row->[ $key_index ];
+    my $pkv = $exact_map->{ $key_val };
+    unshift(@$row, $pkv), next if defined $pkv or !$fb;
+    ($pkv) = pk_match($key_val, $pk_map, $stopwords);
+    unshift(@$row, $pkv);
   }
 }
 
@@ -120,6 +138,62 @@ sub pk_col_counts {
     push @no_exact_match, $row if !$exact_match;
   }
   (\%col2code2exact, \@no_exact_match);
+}
+
+sub _match_register {
+  my ($matches, $code, $this_map, $pk_val2count, $pk_col2pk_value2count, $pk_val2from) = @_;
+  $pk_val2count->{$_}++,
+    $pk_col2pk_value2count->{$code}{$_}++
+      for map $this_map->{$_}, @$matches;
+  for (@$matches) {
+    # track longest matched-value per PK, to tie-break on shortest one
+    my $this_pk_val = $this_map->{$_};
+    $pk_val2from->{$this_pk_val} = $_ if
+      length($pk_val2from->{$this_pk_val}||'') < length;
+  }
+}
+
+sub pk_match {
+  my ($value, $pk_map, $stopwords) = @_;
+  my %stopword; @stopword{@$stopwords} = ();
+  my @val_words = grep length, split /[^A-Za-z]/, $value;
+  my $val_pat = join '.*', map +(/[A-Z]{2,}/ ? split //, $_ : $_), @val_words;
+  @val_words = grep !exists $stopword{$_}, map lc, grep length > 2, @val_words;
+  my (%pk_col2pk_value2count, %pk_val2count, %pk_val2from);
+  for my $code (keys %$pk_map) {
+    my $this_map = $pk_map->{$code};
+    my @matches = grep /$val_pat/i, keys %$this_map;
+    _match_register(\@matches, $code, $this_map, \%pk_val2count, \%pk_col2pk_value2count, \%pk_val2from);
+  }
+  if ((my @abbrev_parts = grep length, split /\s*[\(,]\s*/, $value) > 1) {
+    s/(.*?)[^A-Za-z]+(.*?)/$1.*$2/g for @abbrev_parts;
+    my $suff_pref_pat = join '.*', reverse @abbrev_parts;
+    for my $code (keys %$pk_map) {
+      my $this_map = $pk_map->{$code};
+      my @matches = grep /$suff_pref_pat/i, keys %$this_map;
+      _match_register(\@matches, $code, $this_map, \%pk_val2count, \%pk_col2pk_value2count);
+      @matches = grep /^$suff_pref_pat/i, keys %$this_map;
+      _match_register(\@matches, $code, $this_map, \%pk_val2count, \%pk_col2pk_value2count);
+    }
+  }
+  if (!keys %pk_col2pk_value2count) {
+    for my $code (keys %$pk_map) {
+      my $this_map = $pk_map->{$code};
+      for my $word (@val_words) {
+        my @matches = grep /\b\Q$word\E\b/i, keys %$this_map;
+        _match_register(\@matches, $code, $this_map, \%pk_val2count, \%pk_col2pk_value2count, \%pk_val2from);
+      }
+    }
+  }
+  my ($best) = sort {
+    $pk_val2count{$b} <=> $pk_val2count{$a}
+    ||
+    length($pk_val2from{$a}) <=> length($pk_val2from{$b})
+    ||
+    $a cmp $b
+  } keys %pk_val2count;
+  my @pk_cols_unique_best = sort grep keys %{ $pk_col2pk_value2count{$_} } == 1 && $pk_col2pk_value2count{$_}{$best}, keys %pk_col2pk_value2count;
+  ($best, \@pk_cols_unique_best);
 }
 
 1;
@@ -260,6 +334,32 @@ for readability:
 This achieves a single row of column-headings, with each column-heading
 being unique, and sufficiently meaningful.
 
+=head2 pk_insert
+
+  pk_insert({
+    column_heading => 'ISO3CODE',
+    local_column => 'Country',
+    pk_column => 'official_name_en',
+  }, $data, $pk_map, $stopwords);
+
+In YAML format, this is the same configuration:
+
+  pk_insert:
+    - files:
+        - examples/CoreHouseholdIndicators.csv
+      spec:
+        column_heading: ISO3CODE
+        local_column: Country
+        pk_column: official_name_en
+        use_fallback: true
+
+And the C<$pk_map> made with L</make_pk_map>, inserts the
+C<column_heading> in front of the current zero-th column, mapping the
+value of the C<Country> column as looked up from the specified column
+of the C<pk_spec> file, and if C<use_fallback> is true, also tries
+L</pk_match> if no exact match is found. In that case, C<stopwords>
+must be specified in the configuration
+
 =head2 cols_non_empty
 
   my @col_non_empty = cols_non_empty($data);
@@ -290,6 +390,22 @@ of headings of alternative key columns, returns a hash-ref mapping each
 of those alternative key columns (plus the C<$pk_colkey>) to a map from
 that column's value to the relevant row's primary-key value.
 
+This is most conveniently represented in YAML format:
+
+  pk_spec:
+    file: examples/country-codes.csv
+    primary_key: ISO3166-1-Alpha-3
+    alt_keys:
+      - ISO3166-1-Alpha-2
+      - UNTERM English Short
+      - UNTERM English Formal
+      - official_name_en
+      - CLDR display name
+    stopwords:
+      - islands
+      - china
+      - northern
+
 =head2 pk_col_counts
 
   my ($colname2potential_key2count, $no_exact_match) = pk_col_counts($data, $pk_map);
@@ -299,6 +415,50 @@ a tuple of a hash-ref mapping each column that gave any matches to a
 further hash-ref mapping each of the potential key columns given above
 to how many matches it gave, and an array-ref of rows that had no exact
 matches.
+
+=head2 pk_match
+
+  my ($best, $pk_cols_unique_best) = pk_match($value, $pk_map, $stopwords);
+
+Given a value, C<$pk_map>, and an array-ref of case-insensitive stopwords,
+returns its best match for the right primary-key value, and an array-ref
+of which primary-key columns in the C<$pk_map> matched the given value
+exactly once.
+
+The latter is useful for analysis purposes to select which primary-key
+column to use for this data-set.
+
+The algorithm used for this best-match:
+
+=over
+
+=item *
+
+Splits the value into words (or where a word is two or more capital
+letters, letters). The search allows any, or no, text, to occur between
+these entities. Each configured primary-key column's keys are searched
+for matches.
+
+=item *
+
+If there is a separating C<,> or C<(> (as commonly used for
+abbreviations), splits the value into chunks, reverses them, and then
+reassembles the chunks as above for a similar search.
+
+=item *
+
+Only if there were no matches from the previous steps, splits the value
+into words. Words that are shorter than three characters, or that occur in
+the stopword list, are omitted. Then each word is searched for as above.
+
+=item *
+
+"Votes" on which primary-key value got the most matches. Tie-breaks on
+which primary-key value matched on the shortest key in the relevant
+C<$pk_map> column, and then on the lexically lowest-valued primary-key
+value, to ensure stable return values.
+
+=back
 
 =head1 SEE ALSO
 

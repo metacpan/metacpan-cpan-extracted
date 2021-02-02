@@ -2,8 +2,8 @@ package Catalyst::View::Errors::Text;
 
 use Moose;
 use Text::Template;
-use Catalyst::Utils::ContentNegotiation;
-use Catalyst::Utils::ErrorMessages;
+use CatalystX::Utils::ContentNegotiation;
+use CatalystX::Utils::ErrorMessages;
 
 extends 'Catalyst::View';
 with 'Catalyst::Component::ApplicationAttribute';
@@ -45,7 +45,7 @@ has cn => (
   is => 'ro',
   init_arg => undef,
   required => 1, 
-  default => sub { Catalyst::Utils::ContentNegotiation::content_negotiator },
+  default => sub { CatalystX::Utils::ContentNegotiation::content_negotiator },
 );
 
 sub http_default {
@@ -70,7 +70,7 @@ sub get_language {
 
 sub available_languages {
   my ($self, $c) = @_;
-  return my @lang_tags = Catalyst::Utils::ErrorMessages::available_languages;
+  return my @lang_tags = CatalystX::Utils::ErrorMessages::available_languages;
 }
 
 sub finalize_message_info {
@@ -85,7 +85,7 @@ sub finalize_message_info {
 
 sub get_message_info {
   my ($self, $c, $lang, $code) = @_;
-  return my $message_info_hash = Catalyst::Utils::ErrorMessages::get_message_info($lang, $code);
+  return my $message_info_hash = CatalystX::Utils::ErrorMessages::get_message_info($lang, $code);
 }
 
 sub render_template {
@@ -126,13 +126,13 @@ a plain text error response.   This is used if there's no file at C<$APPHOME/roo
 =head2 available_languages
 
 An array of the languages available for serving error responses.   By default we use
-L<Catalyst::Utils::ErrorMessages> but if you have your own list of translations you can override
+L<CatalystX::Utils::ErrorMessages> but if you have your own list of translations you can override
 this.
 
 =head2 get_message_info
 
 Return error message info by code and language.  By default we use
-L<Catalyst::Utils::ErrorMessages> but if you have your own list of translations you can override
+L<CatalystX::Utils::ErrorMessages> but if you have your own list of translations you can override
 this.
 
 =head2 finalize_message_info

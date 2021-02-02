@@ -1,5 +1,14 @@
 Revision history for Net-Async-Redis
 
+3.010     2021-02-01 04:56:52+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - ->bootstrap will now fail if the cluster's nodes addresses are not initiated.
+    - cluster->execute_command will now redirect the command to the correct node 
+      if 'MOVED' error received.
+    - latest commands from 6.2
+    - this includes ->getdel, ->getex, ->zrandfield
+
 3.009     2021-01-27 06:33:18+08:00 Asia/Kuala_Lumpur
     No new features.
 

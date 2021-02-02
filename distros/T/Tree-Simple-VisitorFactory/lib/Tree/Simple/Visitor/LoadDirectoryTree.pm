@@ -3,7 +3,7 @@ package Tree::Simple::Visitor::LoadDirectoryTree;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use File::Spec;
 use Scalar::Util qw(blessed);
@@ -192,17 +192,31 @@ This sorting function will sort directories before files, so that directories ar
 
 =item B<visit ($tree)>
 
-This is the method that is used by Tree::Simple's C<accept> method. It can also be used on its own, it requires the C<$tree> argument to be a Tree::Simple object (or derived from a Tree::Simple object), and will throw and exception otherwise.
+This is the method that is used by the Tree::Simple C<accept> method. It can also be used on its
+own, it requires the C<$tree> argument to be a Tree::Simple object (or derived from a
+Tree::Simple object), and will throw and exception otherwise.
 
-The node value of the C<$tree> argument (gotten by calling C<getNodeValue>) is considered the root directory from which we begin our traversal. We use File::Spec to keep our paths cross-platform, but it is expected that you will feed in a valid path for your OS. If the path either does not exist, or is not a directory, then an exception is thrown.
+The node value of the C<$tree> argument (gotten by calling C<getNodeValue>) is considered the root
+directory from which we begin our traversal. We use File::Spec to keep our paths cross-platform,
+but it is expected that you will feed in a valid path for your OS. If the path either does not
+exist, or is not a directory, then an exception is thrown.
 
-The C<$tree> argument which is passed to C<visit> must be a leaf node. This is because this Visitor will create all the sub-nodes for this tree. If the tree is not a leaf, an exception is thrown. We do not require the tree to be a root though, and this Visitor will not affect any nodes above the C<$tree> argument.
+The C<$tree> argument which is passed to C<visit> must be a leaf node. This is because this Visitor
+will create all the sub-nodes for this tree. If the tree is not a leaf, an exception is thrown. We
+do not require the tree to be a root though, and this Visitor will not affect any nodes above the
+C<$tree> argument.
 
 =back
 
-=head1 BUGS
+=head1 Repository
 
-None that I am aware of. Of course, if you find a bug, let me know, and I will be sure to fix it.
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory>
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory/issues>
 
 =head1 CODE COVERAGE
 
@@ -210,7 +224,8 @@ See the B<CODE COVERAGE> section in L<Tree::Simple::VisitorFactory> for more inf
 
 =head1 SEE ALSO
 
-These Visitor classes are all subclasses of B<Tree::Simple::Visitor>, which can be found in the B<Tree::Simple> module, you should refer to that module for more information.
+These Visitor classes are all subclasses of B<Tree::Simple::Visitor>, which can be found in the
+B<Tree::Simple> module, you should refer to that module for more information.
 
 =head1 AUTHOR
 

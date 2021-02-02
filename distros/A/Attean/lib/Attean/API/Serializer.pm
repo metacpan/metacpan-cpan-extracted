@@ -7,7 +7,7 @@ Attean::API::Serializer - Serializer role
 
 =head1 VERSION
 
-This document describes Attean::API::Serializer version 0.028
+This document describes Attean::API::Serializer version 0.029
 
 =head1 DESCRIPTION
 
@@ -68,14 +68,15 @@ UTF-8 encoded byte string.
 
 use Type::Tiny;
 
-package Attean::API::Serializer 0.028 {
+package Attean::API::Serializer 0.029 {
 	use Moo::Role;
 	use Carp qw(confess);
 	
 	requires 'canonical_media_type'; # => (is => 'ro', isa => 'Str', init_arg => undef);
 	requires 'media_types'; # => (is => 'ro', isa => 'ArrayRef[Str]', init_arg => undef);
 	requires 'handled_type'; # => (is => 'ro', isa => 'Type::Tiny', init_arg => undef);
-	
+	requires 'file_extensions'; # => (is => 'ro', isa => 'ArrayRef[Str]', init_arg => undef);
+
 	requires 'serialize_iter_to_io';		# serialize_iter_to_io($io, $iter)
 	requires 'serialize_iter_to_bytes';		# $data = serialize_iter_to_bytes($iter)
 
@@ -105,7 +106,7 @@ package Attean::API::Serializer 0.028 {
 	}
 }
 
-package Attean::API::AbbreviatingSerializer 0.028 {
+package Attean::API::AbbreviatingSerializer 0.029 {
 	# Serializer that can make use of a base IRI and/or prefix IRI mappings
 	use Types::Standard qw(InstanceOf ConsumerOf Maybe Bool);
 	use Types::Namespace qw( NamespaceMap );
@@ -119,13 +120,13 @@ package Attean::API::AbbreviatingSerializer 0.028 {
 	has omit_base => (is => 'ro', isa => Bool, default => 0);
 }
 
-package Attean::API::AppendableSerializer 0.028 {
+package Attean::API::AppendableSerializer 0.029 {
 	# Serializer for a format that allows multiple serialization calls to be appended and remain syntactically valid
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 }
 
-package Attean::API::TermSerializer 0.028 {
+package Attean::API::TermSerializer 0.029 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	sub handled_type {
@@ -134,7 +135,7 @@ package Attean::API::TermSerializer 0.028 {
 	}
 }
 
-package Attean::API::TripleSerializer 0.028 {
+package Attean::API::TripleSerializer 0.029 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	sub handled_type {
@@ -143,7 +144,7 @@ package Attean::API::TripleSerializer 0.028 {
 	}
 }
 
-package Attean::API::QuadSerializer 0.028 {
+package Attean::API::QuadSerializer 0.029 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	
@@ -153,7 +154,7 @@ package Attean::API::QuadSerializer 0.028 {
 	}
 }
 
-package Attean::API::MixedStatementSerializer 0.028 {
+package Attean::API::MixedStatementSerializer 0.029 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	
@@ -163,7 +164,7 @@ package Attean::API::MixedStatementSerializer 0.028 {
 	}
 }
 
-package Attean::API::ResultSerializer 0.028 {
+package Attean::API::ResultSerializer 0.029 {
 	use Moo::Role;
 	with 'Attean::API::Serializer';
 	sub handled_type {
@@ -179,8 +180,9 @@ package Attean::API::ResultSerializer 0.028 {
 		if (scalar(@_)) {
 			@vars	= $_[0]->variables;
 		}
+		
 		my $iter	= Attean::ListIterator->new( values => [@_], item_type => $self->handled_type->role, variables => \@vars );
-		return $self->serialize_list_to_io($io, $iter);
+		return $self->serialize_iter_to_io($io, $iter);
 	};
 	
 	around 'serialize_list_to_bytes' => sub {

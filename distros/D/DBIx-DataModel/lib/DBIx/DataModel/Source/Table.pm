@@ -7,7 +7,6 @@ use warnings;
 no warnings 'uninitialized';
 use strict;
 use parent 'DBIx::DataModel::Source';
-use Acme::Damn                   qw/damn/;
 use Module::Load                 qw/load/;
 use List::MoreUtils              qw/none/;
 use Params::Validate             qw/validate_with HASHREF/;
@@ -499,7 +498,7 @@ sub _apply_handlers_for_update {
   bless $to_set, $class;
   $to_set->apply_column_handler('to_DB');
   delete $to_set->{__schema};
-  damn $to_set;
+  $schema->unbless($to_set);
 
 
   # detect references to foreign objects

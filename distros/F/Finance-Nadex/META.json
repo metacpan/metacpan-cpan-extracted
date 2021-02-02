@@ -4,13 +4,13 @@
       "Mtu Mzuri <mhandisi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Finance-Nadex",
    "no_index" : {
@@ -32,10 +32,13 @@
       },
       "runtime" : {
          "requires" : {
+            "JSON" : "4",
+            "Test::LWP::UserAgent" : "0.033",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.08"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

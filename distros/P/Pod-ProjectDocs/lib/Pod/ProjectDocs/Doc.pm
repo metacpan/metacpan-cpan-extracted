@@ -3,7 +3,7 @@ package Pod::ProjectDocs::Doc;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';    # VERSION
+our $VERSION = '0.53';    # VERSION
 
 use Moose;
 with 'Pod::ProjectDocs::File';
@@ -77,7 +77,7 @@ sub _set_relpath {
     my $relpath = File::Spec->catdir( $reldir, $name );
     $relpath =~ s:\\:/:g if $^O eq 'MSWin32';
 
-    if ( lc $suffix eq 'pm' ) {
+    if ( lc $suffix eq 'pm' || lc $suffix eq 'pod' ) {
         $self->name( join "::", File::Spec->splitdir($relpath) );
     }
     else {
@@ -132,5 +132,7 @@ sub is_modified {
     return 1 unless ( -e $newsrc );
     return ( -M $origin < -M $newsrc ) ? 1 : 0;
 }
+
+no Moose;
 
 1;

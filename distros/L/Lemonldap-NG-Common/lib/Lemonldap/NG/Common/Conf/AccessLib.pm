@@ -1,6 +1,6 @@
 package Lemonldap::NG::Common::Conf::AccessLib;
 
-use 5.10.0;
+use strict;
 use utf8;
 use Mouse;
 
@@ -11,7 +11,7 @@ has 'configStorage' => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
 has 'currentConf' => ( is => 'rw', required => 1, default => sub { {} } );
 has 'protection'  => ( is => 'rw', isa      => 'Str', default => 'manager' );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.11';
 
 ## @method Lemonldap::NG::Common::Conf confAcc()
 # Configuration access object

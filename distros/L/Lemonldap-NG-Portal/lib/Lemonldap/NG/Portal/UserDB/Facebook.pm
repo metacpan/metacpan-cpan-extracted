@@ -6,7 +6,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_MISSINGREQATTR);
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.11';
 
 has vars => (
     is      => 'rw',
@@ -30,6 +30,12 @@ sub init {
 sub getUser {
 
     # All is done by Auth::Facebook
+    PE_OK;
+}
+
+sub findUser {
+
+    # Nothing to do here
     PE_OK;
 }
 

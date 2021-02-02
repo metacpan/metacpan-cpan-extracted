@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Lingua::Guess - A statistical language guesser
+Lingua::Guess - Guess the language of text
 
 =head1 SYNOPSIS
 
@@ -29,14 +29,16 @@ produces output
     'Sprawdźmy, czy odgadywacz języków pracuje' was polish
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-Guess-0.02/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-Guess-0.03/examples/synopsis.pl> in the distribution.)
 
 
 =head1 DESCRIPTION
 
 This module attempts to guess what human language a piece of text is
-written in.  This is a fork of a module called Language::Guess, which
-was deleted from CPAN by its author.
+written in.  
+
+It is a fork of a module called Language::Guess, which was deleted
+from CPAN by its author.
 
 =head1 METHODS
 
@@ -57,16 +59,19 @@ training data supplied with the module is used.
 
 =head2 guess
 
-This method returns arrayref of hashes in the form 
+    my $guess = $lg->guess ($text);
 
-    [{name => NAME, score => SCORE}]
+This method returns an arrayref of hashes in the form 
+
+    [{name => NAME, score => SCORE, code2 => 'en', code3 => 'eng'}]
 
 where C<score> represents the likelihood of the language given by
-C<name> as a fractional probability.
+C<name> as a fractional probability, and C<code2> and C<code3> are the
+ISO language codes of the language.
 
 =head2 simple_guess
 
-    my $name = simple_guess ($text);
+    my $name = $lg->simple_guess ($text);
 
 This method returns a one-word string containing the English name of
 the guessed language.
@@ -82,6 +87,10 @@ L<Carp/croak> is used to report errors.
 =item File::Spec::Functions
 
 L<File::Spec::Functions/catfile> is used in reading the training data files.
+
+=item JSON::Parse
+
+L<JSON::Parse/read_json> is used to read in configuration information.
 
 =item Unicode::Normalize
 
@@ -103,6 +112,8 @@ L<Unicode::UCD/charinfo> is used to get information about characters
 
 =item L<Language::Guess|http://cpan.metacpan.org/authors/id/M/MC/MCEGLOWS/> at backpan.perl.org
 
+This is the module which Lingua::Guess was forked from.
+
 =back
 
 =head1 BUGS
@@ -120,11 +131,6 @@ for example, if you give it a Wikipedia page to guess the language, it
 will seize upon the text in the interlanguage link and instantly
 proclaim it to be in Korean or Japanese, regardless of how much other
 text there may be.
-
-=item
-
-The guessed language is returned as a lower-case English name of the
-language rather than an ISO language code.
 
 =back
 
@@ -180,13 +186,10 @@ removed from the module.
 
 =back
 
-I have made no attempt to contact the author of the software Maciej
-Ceglowski, nor have I applied for namespace permission before creating
-this fork, but simply renamed it.
-
 =head1 COPYRIGHT
 	
 (c) 2004 National Institute for Technology and Liberal Education
+(c) 2017-2021 Ben Bullock
 
 =head1 LICENSE
 

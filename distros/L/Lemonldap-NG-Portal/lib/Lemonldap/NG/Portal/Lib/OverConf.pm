@@ -1,5 +1,6 @@
 package Lemonldap::NG::Portal::Lib::OverConf;
 
+use strict;
 use Mouse::Role;
 
 # To avoid "tied" destroy, tied configurations are kept here

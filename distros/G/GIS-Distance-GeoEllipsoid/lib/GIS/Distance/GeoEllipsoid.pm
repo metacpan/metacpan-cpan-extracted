@@ -1,7 +1,7 @@
 package GIS::Distance::GeoEllipsoid;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use parent 'GIS::Distance::Formula';
 
@@ -99,7 +99,7 @@ L<https://github.com/bluefeet/GIS-Distance-GeoEllipsoid/issues>
 
 =head1 AUTHORS
 
-    Aran Clary Deltac <bluefeet@cpan.org>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 LICENSE
 

@@ -266,6 +266,7 @@
 "rightsReloadNeedsLogout":"重新載入權限需要登出然後再次登入",
 "scope":"範圍",
 "search":"搜尋",
+"searchAccount":"Search for account",
 "seconds":"秒",
 "selectIdP":"選取您的身份提供者",
 "service":"服務",

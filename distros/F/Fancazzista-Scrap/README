@@ -1,6 +1,12 @@
 Fancazzista::Scrap version 0.01
 ==============================
 
+This module only scrap :
+
+- website only "article" link and text
+- reddit posts link and text
+- dev.to posts link and text
+
 INSTALLATION
 
 To install this module type the following:

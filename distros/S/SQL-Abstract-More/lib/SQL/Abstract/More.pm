@@ -20,7 +20,7 @@ use namespace::clean;
 sub puke(@); sub belch(@);  # these will be defined later in import()
 
 
-our $VERSION = '1.36';
+our $VERSION = '1.37';
 our @ISA;
 
 sub import {
@@ -399,7 +399,7 @@ sub select {
     if ($args{-$set_op}) {
       my %sub_args = @{$args{-$set_op}};
       $sub_args{$_} ||= $args{$_} for qw/-columns -from/;
-      local $self->{WITH}; # temporarily enable the WITH part during the subquery
+      local $self->{WITH}; # temporarily disable the WITH part during the subquery
       my ($sql1, @bind1) = $self->select(%sub_args);
       (my $sql_op = uc($set_op)) =~ s/_/ /g;
       $sql .= " $sql_op $sql1";
@@ -595,13 +595,13 @@ sub insert {
       $old_API_args[1] = $args{-values};
     }
     elsif ($args{-select}) {
-      local $self->{WITH}; # temporarily enable the WITH part during the subquery
+      local $self->{WITH}; # temporarily disable the WITH part during the subquery
       my ($sql, @bind) = $self->select(%{$args{-select}});
       $old_API_args[1] = \ [$sql, @bind];
       if (my $cols = $args{-columns}) {
         $old_API_args[0] .= "(" . CORE::join(", ", @$cols) . ")";
       }
-      $fix_RT134127 = 1 if ($SQL::Abstract::VERSION // 0) >= 2.0;
+      $fix_RT134127 = 1 if ($SQL::Abstract::VERSION || 0) >= 2.0;
     }
     else {
       puke "insert(-into => ..) : need either -values arg or -select arg";

@@ -7,7 +7,7 @@ build_requires:
   Test::Snapshot: '0.06'
 configure_requires:
   ExtUtils::MakeMaker: '7.10'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -21,6 +21,7 @@ no_index:
 requires:
   Exporter: '5.57'
   Text::CSV: '2.00'
+  Text::CSV_XS: '1.45'
   YAML: '1.30'
   perl: '5.008003'
 resources:
@@ -28,5 +29,5 @@ resources:
   bugtracker: https://github.com/mohawk2/data-prepare/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/mohawk2/data-prepare
-version: '0.003'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

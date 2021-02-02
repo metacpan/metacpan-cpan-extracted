@@ -4,13 +4,19 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.11';
 
 extends 'Lemonldap::NG::Common::Module', 'Lemonldap::NG::Portal::Lib::Remote';
 
 # RUNNING METHODS
 
 *getUser = *Lemonldap::NG::Portal::Lib::Remote::checkRemoteId;
+
+sub findUser {
+
+    # Nothing to do here
+    PE_OK;
+}
 
 sub setSessionInfo {
     my ( $self, $req ) = @_;

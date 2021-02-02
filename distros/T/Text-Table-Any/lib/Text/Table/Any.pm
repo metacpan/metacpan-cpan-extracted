@@ -1,9 +1,9 @@
 package Text::Table::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2021-02-01'; # DATE
 our $DIST = 'Text-Table-Any'; # DIST
-our $VERSION = '0.097'; # VERSION
+our $VERSION = '0.098'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -110,7 +110,7 @@ sub table {
             use_utf8 => 0,
             use_box_chars => 0,
             use_color => 0,
-            border_style => 'Default::single_ascii',
+            border_style => 'ASCII::SingleLine',
         );
         # XXX pick an appropriate border style when header_row=0
         if ($header_row) {
@@ -196,7 +196,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.097 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2020-06-11.
+This document describes version 0.098 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2021-02-01.
 
 =head1 SYNOPSIS
 
@@ -393,7 +393,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-Table-Any>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-Any>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-Table-Any/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -409,7 +409,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,7 @@ use warnings;
 
 use Config::Plugin::TinyManifold;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # ------------------------------------------------
 

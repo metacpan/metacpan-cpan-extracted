@@ -1,5 +1,5 @@
 package Net::LastFM;
-$Net::LastFM::VERSION = '0.37';
+$Net::LastFM::VERSION = '0.38';
 use Moose;
 use MooseX::StrictConstructor;
 use Digest::MD5 qw(md5_hex);
@@ -25,7 +25,7 @@ has 'ua' => (
     required => 0,
     default  => sub {
         my $ua = LWP::UserAgent->new;
-        $ua->agent( 'Net::LastFM/' . $Net::LastFM::VERSION );
+        $ua->agent( 'Net::LastFM' );
         $ua->env_proxy;
         return $ua;
     }
@@ -45,7 +45,7 @@ sub create_http_request {
     }
     $uri->query_param( 'format', 'json' );
 
-    return HTTP::Request->new( 'POST', $uri );
+    return HTTP::Request->new( 'POST', $uri, [ 'Content-Length' => 0 ] );
 }
 
 sub create_http_request_signed {

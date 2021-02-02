@@ -22,11 +22,12 @@ WriteMakefile(
     'Exporter' => '5.57', # importable 'import'
     'Text::CSV' => '2.00',
     'YAML' => '1.30',
+    (eval {require Text::CSV_XS; 1} ? ('Text::CSV_XS' => '1.45') : ()),
   },
   EXE_FILES => [ glob 'scripts/*' ],
   META_MERGE => {
     "meta-spec" => { version => 2 },
-    dynamic_config => 0,
+    dynamic_config => 1,
     resources => {
       x_IRC => 'irc://irc.perl.org/#graphql-perl',
       repository => {

@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "v0.0.3";
+our $VERSION = "v0.0.9";
 
 
 
@@ -14,7 +14,7 @@ __END__
 
 =head1 NAME
 
-BoardStreams - It's new $module
+BoardStreams - An easy way to use WebSockets on the browser and on the server
 
 =head1 SYNOPSIS
 
@@ -22,11 +22,30 @@ BoardStreams - It's new $module
 
 =head1 DESCRIPTION
 
-BoardStreams is ...
+BoardStreams is an easy way to use WebSockets on the browser and on the server.
+
+=head1 DOCUMENTATION
+
+For now, the documentation can be found at: L<https://boardstreams.dev>.
+
+=head1 ASSOCIATION WITH JAVASCRIPT LIBRARIES
+
+This module release should be used in conjunction with npm package C<boardstreams> version
+L<0.0.8|https://www.npmjs.com/package/boardstreams/v/0.0.8>.
+
+    $ npm install boardstreams@0.0.8 --save
+
+Or:
+
+    <script src="https://unpkg.com/boardstreams@0.0.8"></script>
+
+=head1 NOTIFICATIONS FOR NEW RELEASES
+
+You can start receiving emails for new releases of this module, over at L<https://perlmodules.net>.
 
 =head1 LICENSE
 
-Copyright (C) Alexander Karelas.
+Copyright (C) Karelcom OÜ.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -36,4 +55,3 @@ it under the same terms as Perl itself.
 Alexander Karelas E<lt>karjala@cpan.orgE<gt>
 
 =cut
-

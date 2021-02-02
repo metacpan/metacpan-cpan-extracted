@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Config::Locale:
     file: lib/Config/Locale.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   Algorithm::Loops: '1.031'
   Carp: '0'
@@ -41,7 +41,8 @@ resources:
   bugtracker: https://github.com/bluefeet/Config-Locale/issues
   homepage: https://github.com/bluefeet/Config-Locale
   repository: git://github.com/bluefeet/Config-Locale.git
-version: '0.09'
+version: '0.10'
+x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,7 +8,7 @@ use Mojo::DOM;
 use JSON;
 use Encode qw(encode);
 
-our $VERSION = '0.01';
+our $VERSION = '1.00';
 
 sub new {
     my $class = shift;
@@ -31,9 +31,10 @@ sub scrap {
 
         push @websites,
           {
-            name     => $_->{name},
-            url      => $_->{url},
-            articles => \@resourceArticles
+            name         => $_->{name},
+            url          => $_->{url},
+            articles     => \@resourceArticles,
+            from_website => 1,
           };
     }
 
@@ -58,9 +59,9 @@ sub getWebsiteHtml {
 sub extractArticles {
     my $self     = shift;
     my $resource = shift;
-    my $content = $self->getWebsiteHtml( $resource->{url} );
-    my $dom     = Mojo::DOM->new($content);
-    my $found   = $dom->find( $resource->{selector} );
+    my $content  = $self->getWebsiteHtml( $resource->{url} );
+    my $dom      = Mojo::DOM->new($content);
+    my $found    = $dom->find( $resource->{selector} );
 
     my @articles = ();
 

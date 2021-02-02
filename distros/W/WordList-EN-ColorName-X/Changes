@@ -1,0 +1,8 @@
+0.002   2020-12-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module WordList::EN::Color{,Name}::X.
+
+
+0.001   2020-06-07  Released-By: PERLANCAR
+
+        - First release.

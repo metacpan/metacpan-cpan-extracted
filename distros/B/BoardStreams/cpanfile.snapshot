@@ -313,6 +313,18 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 6.64
       Scalar::Util 0
       perl 5.008001
+  Hash-Ordered-0.014
+    pathname: D/DA/DAGOLDEN/Hash-Ordered-0.014.tar.gz
+    provides:
+      Hash::Ordered 0.014
+    requirements:
+      Carp 0
+      ExtUtils::MakeMaker 6.17
+      constant 0
+      overload 0
+      perl 5.008
+      strict 0
+      warnings 0
   MRO-Compat-0.13
     pathname: H/HA/HAARG/MRO-Compat-0.13.tar.gz
     provides:
@@ -557,23 +569,24 @@ DISTRIBUTIONS
       RxPerl v0.28.0
       Sub::Util 1.41
       perl 5.010
-  RxPerl-v6.4.2
-    pathname: K/KA/KARJALA/RxPerl-v6.4.2.tar.gz
+  RxPerl-v6.5.0
+    pathname: K/KA/KARJALA/RxPerl-v6.5.0.tar.gz
     provides:
-      RxPerl v6.4.2
-      RxPerl::BehaviorSubject v6.4.2
-      RxPerl::ConnectableObservable v6.4.2
-      RxPerl::Observable v6.4.2
+      RxPerl v6.5.0
+      RxPerl::BehaviorSubject v6.5.0
+      RxPerl::ConnectableObservable v6.5.0
+      RxPerl::Observable v6.5.0
       RxPerl::Operators::Creation undef
       RxPerl::Operators::Pipeable undef
-      RxPerl::ReplaySubject v6.4.2
-      RxPerl::Subject v6.4.2
+      RxPerl::ReplaySubject v6.5.0
+      RxPerl::Subject v6.5.0
       RxPerl::Subscriber undef
-      RxPerl::Subscription v6.4.2
+      RxPerl::Subscription v6.5.0
       RxPerl::SyncTimers undef
       RxPerl::Test undef
-      RxPerl::Utils v6.4.2
+      RxPerl::Utils v6.5.0
     requirements:
+      Hash::Ordered 0.006
       Module::Build::Tiny 0.035
       Sub::Util 1.41
       perl 5.010

@@ -25,10 +25,21 @@
 use strict;
 use warnings;
 
+use Test::MockModule;
 use Test::More tests => 10;
 use Test::Warn;
 
 use Binance::API;
+
+# Mock Binance::API::Request::_exec in order to avoid executing a real http
+# request. Instead return whatever we pass to the api_result method.
+my $mock = Test::MockModule->new('Binance::API::Request');
+sub api_result {
+    my $expected_result = shift;
+    $mock->redefine('_exec', sub {
+        return $expected_result;
+    });
+}
 
 my $api = Binance::API->new();
 
@@ -56,6 +67,10 @@ subtest 'aggregate_trades() tests' => sub {
     ok(Binance::API->can('aggregate_trades'), 'method aggregate_trades() '.
        'available');
 
+    api_result([
+        { 'T' => 1 }
+    ]);
+
     eval { $api->aggregate_trades };
     is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
        .'when missing a parameter');
@@ -72,6 +87,10 @@ subtest 'all_book_tickers() tests' => sub {
     ok(Binance::API->can('all_book_tickers'), 'method all_book_tickers() '
        .'available');
 
+    api_result([
+        { 'symbol' => 'ETHBTC' }
+    ]);
+
     my $all_book_tickers = $api->all_book_tickers;
     ok(defined $all_book_tickers, 'Requested all_book_tickers');
     ok(defined $all_book_tickers->[0]->{'symbol'}, 'Got a successful response');
@@ -83,10 +102,18 @@ subtest 'ticker_price() tests' => sub {
     ok(Binance::API->can('ticker_price'), 'method ticker_price() '
        .'available');
 
+    api_result([
+        { 'symbol' => 'ETHBTC' }
+    ]);
+
     my $all_prices = $api->ticker_price;
     ok(defined $all_prices, 'Requested all ticker_price');
     ok(defined $all_prices->[0]->{'symbol'}, 'Got a successful response');
     ok($all_prices > 0, 'Got multiple ticker prices');
+
+    api_result(
+        { 'symbol' => 'ETHBTC' }
+    );
 
     my $one_price = $api->ticker_price( symbol => 'ETHBTC' );
     ok(defined $one_price, 'Requested one ticker_price');
@@ -98,10 +125,18 @@ subtest 'depth() tests' => sub {
 
     ok(Binance::API->can('depth'), 'method depth() available');
 
+    api_result([
+        { 'symbol' => 'ETHBTC' }
+    ]);
+
     eval { $api->depth };
     is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
        .'when missing a parameter');
     is($@->parameters->[0], 'symbol', 'Missing parameter "symbol"');
+
+    api_result(
+        { 'asks' => [0,1], 'bids' => [0,1] }
+    );
 
     my $depth = $api->depth( symbol => 'ETHBTC' );
     ok(defined $depth, 'Requested depth');
@@ -113,6 +148,10 @@ subtest 'klines() tests' => sub {
     plan tests => 7;
 
     ok(Binance::API->can('klines'), 'method klines() available');
+
+    api_result([
+        [ 1 ]
+    ]);
 
     eval { $api->klines };
     is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
@@ -133,6 +172,10 @@ subtest 'order() tests' => sub {
     plan tests => 13;
 
     ok(Binance::API->can('order'), 'method order() available');
+
+    api_result([
+        { 'symbol' => 'ETHBTC' }
+    ]);
 
     eval { $api->order_test( symbol => 'ETHBTC', side => 'SELL' ) };
     is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
@@ -363,6 +406,8 @@ subtest 'ping() tests' => sub {
 
     ok(Binance::API->can('ping'), 'method ping() available');
 
+    api_result({ });
+
     ok($api->ping('/api/v1/ping', 'get'), 'Pinging Binance server');
 };
 
@@ -370,6 +415,10 @@ subtest 'ticker() tests' => sub {
     plan tests => 5;
 
     ok(Binance::API->can('ticker'), 'method ticker() available');
+
+    api_result(
+        { 'openTime' => 1 }
+    );
 
     eval { $api->klines };
     is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
@@ -385,6 +434,8 @@ subtest 'time() tests' => sub {
     plan tests => 2;
 
     ok(Binance::API->can('time'), 'method time() available');
+
+    api_result({ 'serverTime' => 1513415733605 });
 
     ok($api->time() > 1513415733604, 'Binance server time');
 };

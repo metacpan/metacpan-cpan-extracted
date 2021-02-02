@@ -1,6 +1,5 @@
 .circleci/config.yml
 .perlcriticrc
-Build
 Build.PL
 CONTRIBUTING.md
 Changes
@@ -10,7 +9,6 @@ META.json
 META.yml
 README
 README.md
-_build_params
 cpanfile
 lib/App/Perlbrew/Path.pm
 lib/App/Perlbrew/Path/Installation.pm

@@ -97,7 +97,7 @@ without creating a custom perl script.
 
 # SEE ALSO
 
-[Pod::Simple::XHTML](https://metacpan.org/pod/Pod::Simple::XHTML)
+[Pod::Simple::XHTML](https://metacpan.org/pod/Pod%3A%3ASimple%3A%3AXHTML)
 
 # AUTHORS
 

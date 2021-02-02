@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,14 +26,15 @@ no_index:
 provides:
   Geo::Coordinates::GMap:
     file: lib/Geo/Coordinates/GMap.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Exporter: '0'
+  perl: '5.008001'
   strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/Geo-Coordinates-GMap/issues
   homepage: https://github.com/bluefeet/Geo-Coordinates-GMap
   repository: git://github.com/bluefeet/Geo-Coordinates-GMap.git
-version: '0.08'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -14,7 +14,7 @@ my $prefix = __PACKAGE__;
 # this module import config
 #
 use Carp ();
-use Net::SNMP::Mixin::Util qw/idx2val normalize_mac get_init_slot/;
+use Net::SNMP::Mixin::Util qw/idx2val normalize_mac push_error get_init_slot/;
 
 #
 # this module export config
@@ -51,13 +51,9 @@ use constant {
 
 Net::SNMP::Mixin::Dot1dBase - mixin class for the switch dot1d base values
 
-=head1 VERSION
-
-Version 0.06
-
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -154,9 +150,7 @@ sub map_bridge_ports2if_indexes {
 
   my $result = {};
 
-  while ( my ( $bridge_port, $if_index ) =
-    each %{ $session->{$prefix}{dot1dBasePortIfIndex} } )
-  {
+  while ( my ( $bridge_port, $if_index ) = each %{ $session->{$prefix}{dot1dBasePortIfIndex} } ) {
     $result->{$bridge_port} = $if_index;
   }
 
@@ -187,9 +181,7 @@ sub map_if_indexes2bridge_ports {
 
   my $result = {};
 
-  while ( my ( $bridge_port, $if_index ) =
-    each %{ $session->{$prefix}{dot1dBasePortIfIndex} } )
-  {
+  while ( my ( $bridge_port, $if_index ) = each %{ $session->{$prefix}{dot1dBasePortIfIndex} } ) {
     $result->{$if_index} = $bridge_port;
   }
 
@@ -218,8 +210,8 @@ sub _init {
 
   die "$agent: $prefix already initialized and reload not forced.\n"
     if exists get_init_slot($session)->{$prefix}
-      && get_init_slot($session)->{$prefix} == 0
-      && not $reload;
+    && get_init_slot($session)->{$prefix} == 0
+    && not $reload;
 
   # set number of async init jobs for proper initialization
   get_init_slot($session)->{$prefix} = THIS_INIT_JOBS;
@@ -265,7 +257,14 @@ sub _fetch_dot1d_base {
     $session->nonblocking ? ( -callback => \&_dot1d_base_cb ) : (),
   );
 
-  return unless defined $result;
+  unless ( defined $result ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
+    return;
+  }
+
+  # in nonblocking mode the callback will be called asynchronously
   return 1 if $session->nonblocking;
 
   # call the callback function in blocking mode by hand
@@ -283,7 +282,12 @@ sub _dot1d_base_cb {
   my $session = shift;
   my $vbl     = $session->var_bind_list;
 
-  return unless defined $vbl;
+  unless ( defined $vbl ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
+    return;
+  }
 
   $session->{$prefix}{dot1dBase}{dot1dBaseBridgeAddress} =
     $vbl->{ DOT1D_BASE_BRIDGE_ADDRESS() };
@@ -317,7 +321,14 @@ sub _fetch_dot1d_base_ports {
     $session->nonblocking ? ( -callback => \&_dot1d_base_ports_cb ) : (),
   );
 
-  return unless defined $result;
+  unless ( defined $result ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
+    return;
+  }
+
+  # in nonblocking mode the callback will be called asynchronously
   return 1 if $session->nonblocking;
 
   # call the callback funktion in blocking mode by hand
@@ -335,7 +346,12 @@ sub _dot1d_base_ports_cb {
   my $session = shift;
   my $vbl     = $session->var_bind_list;
 
-  return unless defined $vbl;
+  unless ( defined $vbl ) {
+    if ( my $err_msg = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
+    return;
+  }
 
   # mangle result table to get plain idx->value
 
@@ -352,21 +368,13 @@ sub _dot1d_base_ports_cb {
 
 L<< Net::SNMP >>, L<< Net::SNMP::Mixin >>
 
-=head1 BUGS, PATCHES & FIXES
-
-There are no known bugs at the time of this release. However, if you spot a bug or are experiencing difficulties that are not explained within the POD documentation, please submit a bug to the RT system (see link below). However, it would help greatly if you are able to pinpoint problems or even supply a patch. 
-
-Fixes are dependant upon their severity and my availablity. Should a fix not be forthcoming, please feel free to (politely) remind me by sending an email to gaissmai@cpan.org .
-
-  RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-Dot1dBase
-
 =head1 AUTHOR
 
 Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2016 Karl Gaissmaier, all rights reserved.
+Copyright 2008-2021 Karl Gaissmaier, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

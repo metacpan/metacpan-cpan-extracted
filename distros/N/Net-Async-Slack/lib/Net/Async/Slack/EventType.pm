@@ -3,7 +3,7 @@ package Net::Async::Slack::EventType;
 use strict;
 use warnings;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Log::Any qw($log);
 
@@ -33,7 +33,10 @@ sub from_json {
     $log->tracef('Looking for type %s with available %s', $data->{type}, join ',', sort keys %REGISTERED_TYPES);
     return undef unless my $class = $REGISTERED_TYPES{$data->{type}};
     for (qw(user channel team source_team)) {
-        $data->{$_ . '_id'} = delete $data->{$_} if exists $data->{$_};
+        if(my $item = delete $data->{$_}) {
+            $data->{$_ . '_id'} = ref($item) ? $item->{id} : $item;
+            $data->{$_} = $item if ref($item);
+        }
     }
     return $class->new(%$data);
 }

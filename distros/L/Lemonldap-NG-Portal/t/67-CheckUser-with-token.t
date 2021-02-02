@@ -10,19 +10,20 @@ my $res;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                        => 'error',
-            authentication                  => 'Demo',
-            userDB                          => 'Same',
-            loginHistoryEnabled             => 0,
-            brutForceProtection             => 0,
-            checkUser                       => 1,
-            requireToken                    => 1,
-            tokenUseGlobalStorage           => 0,
-            formTimeout                     => 120,
-            checkUserDisplayPersistentInfo  => 1,
-            checkUserDisplayEmptyValues     => 1,
-            impersonationMergeSSOgroups     => 1,
-            checkUserDisplayComputedSession => 1,
+            logLevel                          => 'error',
+            authentication                    => 'Demo',
+            userDB                            => 'Same',
+            loginHistoryEnabled               => 0,
+            brutForceProtection               => 0,
+            checkUser                         => 1,
+            requireToken                      => 1,
+            tokenUseGlobalStorage             => 0,
+            formTimeout                       => 120,
+            checkUserDisplayPersistentInfo    => 1,
+            checkUserDisplayEmptyValues       => 1,
+            impersonationMergeSSOgroups       => 1,
+            checkUserDisplayComputedSession   => 1,
+            checkUserDisplayNormalizedHeaders => '$uid eq "dwho"'
         }
     }
 );
@@ -48,6 +49,39 @@ count(1);
 
 my $id = expectCookie($res);
 expectRedirection( $res, 'http://auth.example.com/' );
+
+# CheckUser form
+# ------------------------
+ok(
+    $res = $client->_get(
+        '/checkuser',
+        cookie => "lemonldap=$id",
+        accept => 'text/html'
+    ),
+    'CheckUser form',
+);
+count(1);
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/checkuser', 'user', 'url', 'token' );
+ok( $res->[2]->[0] =~ m%<span trspan="checkUser">%, 'Found trspan="checkUser"' )
+  or explain( $res->[2]->[0], 'trspan="checkUser"' );
+count(1);
+$query = 'user=rtyler&url=http%3A%2F%2Ftest1.example.com';
+ok(
+    $res = $client->_post(
+        '/checkuser',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+        accept => 'text/html',
+    ),
+    'POST checkuser'
+);
+ok( $res->[2]->[0] =~ m%<span trspan="PE81"></span>%, 'Found PE_NOTOKEN' )
+  or explain( $res->[2]->[0], 'trspan="PE81"' );
+count(2);
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/checkuser', 'user', 'url', 'token' );
 
 # CheckUser form
 # ------------------------
@@ -124,12 +158,12 @@ ok( $res->[2]->[0] =~ m%<span trspan="attributes">%,
   or explain( $res->[2]->[0], 'trspan="attributes"' );
 ok( $res->[2]->[0] =~ m%<span trspan="macros">%, 'Found trspan="macros"' )
   or explain( $res->[2]->[0], 'trspan="macros"' );
-ok( $res->[2]->[0] =~ m%Auth-User: %, 'Found Auth-User' )
-  or explain( $res->[2]->[0], 'Header Key: Auth-User' );
-ok( $res->[2]->[0] =~ m%testHeader1: %, 'Found testHeader1' )
-  or explain( $res->[2]->[0], 'Header Key: testHeader1' );
-ok( $res->[2]->[0] =~ m%testHeader2: %, 'Found testHeader2' )
-  or explain( $res->[2]->[0], 'Header Key: testHeader2' );
+ok( $res->[2]->[0] =~ m%HTTP_AUTH_USER: %, 'Found HTTP_AUTH_USER' )
+  or explain( $res->[2]->[0], 'Header Key: HTTP_AUTH_USER' );
+ok( $res->[2]->[0] =~ m%HTTP_TESTHEADER1: %, 'Found HTTP_TESTHEADER1' )
+  or explain( $res->[2]->[0], 'Header Key: HTTP_TESTHEADER1' );
+ok( $res->[2]->[0] =~ m%HTTP_TESTHEADER2: %, 'Found HTTP_TESTHEADER2' )
+  or explain( $res->[2]->[0], 'Header Key: HTTP_TESTHEADER2' );
 ok( $res->[2]->[0] !~ m%emptyHeader: %, 'emptyHeader not found' )
   or explain( $res->[2]->[0], 'Header Key: emptyHeader' );
 ok( $res->[2]->[0] =~ m%: rtyler%, 'Found rtyler' )

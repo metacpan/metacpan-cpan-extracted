@@ -1,5 +1,9 @@
 Revision history for Perl extension Tree::Simple.
 
+1.34  2021-02-02T12:22:00
+	- Reformat Makefile.PL.
+	- Update Makefile.PL and POD to change RT to github.
+
 1.33  2018-01-06T16:57:00
 	- Fix traverse() so it does not assume user functions and traverse() itself return a defined
 		value. This stops undef warnings when the return value is tested for error propagation.

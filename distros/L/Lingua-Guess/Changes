@@ -1,8 +1,13 @@
 Revision history for Perl module Lingua::Guess
 
+0.03 2021-01-31
+
+- Add two letter and three letter codes to the return values
+
 0.02 2017-06-12
 
 - Language scores are now fractional probabilities
+- Documentation
 
 0.01 2017-04-16
 

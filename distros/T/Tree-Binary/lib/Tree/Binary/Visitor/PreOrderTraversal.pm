@@ -1,4 +1,3 @@
-
 package Tree::Binary::Visitor::PreOrderTraversal;
 
 use strict;
@@ -8,7 +7,7 @@ use Scalar::Util qw(blessed);
 
 use Tree::Binary::Visitor::Base;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 our @ISA = qw(Tree::Binary::Visitor::Base);
 

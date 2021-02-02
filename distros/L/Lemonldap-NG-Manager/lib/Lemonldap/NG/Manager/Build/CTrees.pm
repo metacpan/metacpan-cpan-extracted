@@ -224,6 +224,7 @@ sub cTrees {
                             'oidcRPMetaDataOptionsRequirePKCE',
                             'oidcRPMetaDataOptionsAllowOffline',
                             'oidcRPMetaDataOptionsAllowPasswordGrant',
+                            'oidcRPMetaDataOptionsAllowClientCredentialsGrant',
                             'oidcRPMetaDataOptionsAuthnLevel',
                             'oidcRPMetaDataOptionsRule',
                         ]

@@ -1,7 +1,8 @@
+package AnyEvent::Discord;
 use v5.14;
 use Moops;
 
-class AnyEvent::Discord {
+class AnyEvent::Discord 0.6 {
   use Algorithm::Backoff::Exponential;
   use AnyEvent::Discord::Payload;
   use AnyEvent::WebSocket::Client;
@@ -11,7 +12,7 @@ class AnyEvent::Discord {
   use HTTP::Request;
   use HTTP::Headers;
 
-  our $VERSION = '0.4';
+  our $VERSION = '0.6';
   has version => ( is => 'ro', isa => Str, default => $VERSION );
 
   has token => ( is => 'rw', isa => Str, required => 1 );

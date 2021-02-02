@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI.pm
-## Version v0.1.0
+## Version v0.1.3
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/17
-## Modified 2021/01/03
+## Modified 2021/02/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -73,7 +73,7 @@ BEGIN
     use URL::Encode ();
     use URI::Escape::XS ();
     use version;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.3';
     use constant PERLIO_IS_ENABLED => $Config{useperlio};
     ## As of Apache 2.4.41 and mod perl 2.0.11 Apache2::SubProcess::spawn_proc_prog() is not working
     use constant MOD_PERL_SPAWN_PROC_PROG_WORKING => 0;
@@ -2575,7 +2575,7 @@ Inside Apache, in the VirtualHost configuration, for example:
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.3
 
 =head1 DESCRIPTION
 
@@ -2624,11 +2624,11 @@ As pointed out by Ken Williams, the original author of L<Apache::SSI>, the benef
     make test
     sudo make install
 
-This will detect if you have Apache installed and run the Apache mod_perl2 tests by starting a separate instance of Apache on a non-standard port like 8123 under your username just for the purpose of testing. This is all handled automatically by L<Test::Apache>
+This will detect if you have Apache installed and run the Apache mod_perl2 tests by starting a separate instance of Apache on a non-standard port like 8123 under your username just for the purpose of testing. This is all handled automatically by L<Apache::Test>
 
 If you do not have Apache or mod_perl installed, it will still install, but obviously not start an instance of Apache/mod_perl, nor perform any of the Apache mod_perl tests.
 
-It tries hard to find the Apache configuration file. You can help it by providing comment line modifiers, such as:
+It tries hard to find the Apache configuration file. You can help it by providing command line modifiers, such as:
 
     perl Makefile.PL -apxs /usr/bin/apxs
 
@@ -2668,7 +2668,7 @@ This is the L<Apache2::RequestRec> object that is provided if running under mod_
 
 it can be retrieved from L<Apache2::RequestUtil/request> or via L<Apache2::Filter/r>
 
-You can get this L<Apache2::RequestRec> object by requiring L<Apache2::RequestUtil> and calling its class method L<Apache2::RequestUtil/request> such as C<Apache2::RequestUtil->request> and assuming you have set C<PerlOptions +GlobalRequest> in your Apache Virtual Host configuration.
+You can get this L<Apache2::RequestRec> object by requiring L<Apache2::RequestUtil> and calling its class method L<Apache2::RequestUtil/request> such as Apache2::RequestUtil->request and assuming you have set C<PerlOptions +GlobalRequest> in your Apache Virtual Host configuration.
 
 Note that there is a main request object and subprocess request object, so to find out which one you are dealing with, use L<Apache2::RequestUtil/is_initial_req>, such as:
 
@@ -2928,7 +2928,7 @@ It returns a L<Apache2::SSI::URI> object which is stringifyable and contain the 
 
 =head2 finfo
 
-Returns a L<Apache2::SSI::Finfo> object. This provides access to L<perlfunc/stat> information as method, taking advantage of L<APR::Finfo> when running under Apache, and L<File::stat>-like interface otherwise. See L<Apache2::SSI::Findo> for more information.
+Returns a L<Apache2::SSI::Finfo> object. This provides access to L<perlfunc/stat> information as method, taking advantage of L<APR::Finfo> when running under Apache, and L<File::stat>-like interface otherwise. See L<Apache2::SSI::Finfo> for more information.
 
 =head2 html
 
@@ -3480,7 +3480,7 @@ Under Apache mod_perl, this will call L<Apache2::Connection/remote_ip> for versi
 This value can also be overriden by being provided during object instantiation.
 
     # Pretend the ssi directives are accessed from this ip
-    $ssi->remote_ip( '192.1.68.2.20' );
+    $ssi->remote_ip( '192.168.2.20' );
 
 This is useful when one wants to check how the rendering will be when accessed from certain ip addresses.
 
@@ -3496,7 +3496,7 @@ or
     <!--#include file="/home/john/special_hidden_login_feature.html" -->
     <!--#endif -->
 
-L<Apache2::Connection> also has a L<Apache2::Connection/remote_addr> method, but this returns a L<APR::SockAddr> object that is used to get the binary version of the ip, but you can also get the string version like this:
+L<Apache2::Connection> also has a L<Apache2::Connection/remote_addr> method, but this returns a L<APR::SockAddr> object that is used to get the binary version of the ip. However you can also get the string version like this:
 
     use APR::SockAddr ();
     my $ip = $r->connection->remote_addr->ip_get();
@@ -3737,4 +3737,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

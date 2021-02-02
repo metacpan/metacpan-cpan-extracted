@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Net::Async::Slack::EventType;
 
@@ -41,4 +41,4 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2016-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2016-2021. Licensed under the same terms as Perl itself.

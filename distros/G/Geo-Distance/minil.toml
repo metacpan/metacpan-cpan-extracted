@@ -1,5 +1,6 @@
 name = "Geo-Distance"
 authority="cpan:BLUEFEET"
+markdown_maker = "Pod::Markdown::Github"
 
 [Metadata]
 x_deprecated = 1

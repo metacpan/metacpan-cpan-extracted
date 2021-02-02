@@ -23,13 +23,11 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.24"
          }
       },
       "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "runtime" : {
          "requires" : {
@@ -46,7 +44,7 @@
             "Mojolicious::Plugin::RoutesConfig" : "0.06",
             "Net::SMTP" : "3.11",
             "Role::Tiny" : "2.001004",
-            "perl" : "5.020000"
+            "perl" : "5.026000"
          }
       },
       "test" : {
@@ -68,6 +66,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2021.01.11",
+   "version" : "v2021.02.01",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

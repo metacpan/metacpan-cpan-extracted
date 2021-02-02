@@ -4,7 +4,6 @@ author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Import::Into: '0'
   Test::Deep: '1.127'
   Test::Exception: '0.42'
   Test::More: '0.88'
@@ -22,9 +21,12 @@ no_index:
     - t
     - inc
 requires:
+  Attribute::Handlers: '0'
   DateTime: '0'
   DateTime::Format::ISO8601: '0'
+  Devel::StrictMode: '0'
   Function::Parameters: '2.001001'
+  Import::Into: '0'
   JSON::MaybeXS: '1.003009'
   JSON::PP: '2.92'
   Module::Runtime: '0'
@@ -40,5 +42,5 @@ resources:
   bugtracker: https://github.com/graphql-perl/graphql-perl/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/graphql-perl
-version: '0.46'
+version: '0.47'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

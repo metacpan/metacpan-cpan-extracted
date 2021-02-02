@@ -18,11 +18,13 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use String::Random qw/random_string/;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 
-extends 'Lemonldap::NG::Portal::Main::Issuer',
-  'Lemonldap::NG::Portal::Lib::OpenIDConnect',
-  'Lemonldap::NG::Common::Conf::AccessLib';
+extends qw(
+  Lemonldap::NG::Portal::Main::Issuer
+  Lemonldap::NG::Common::Conf::AccessLib
+  Lemonldap::NG::Portal::Lib::OpenIDConnect
+);
 
 # INTERFACE
 
@@ -1009,7 +1011,7 @@ sub token {
     my $rp = $self->checkEndPointAuthenticationCredentials($req);
     return $self->p->sendError( $req, 'invalid_request', 400 ) unless ($rp);
 
-    my $grant_type = $req->param('grant_type');
+    my $grant_type = $req->param('grant_type') || '';
 
     # Autorization Code grant
     if ( $grant_type eq 'authorization_code' ) {
@@ -1034,6 +1036,18 @@ sub token {
         return $self->_handlePasswordGrant( $req, $rp );
     }
 
+    # Resource Owner Password Credenials
+    elsif ( $grant_type eq 'client_credentials' ) {
+        unless ( $self->oidcRPList->{$rp}
+            ->{oidcRPMetaDataOptionsAllowClientCredentialsGrant} )
+        {
+            $self->logger->warn(
+                "Access to Client Credentials grant is not allowed for RP $rp");
+            return $self->p->sendError( $req, 'unauthorized_client', 400 );
+        }
+        return $self->_handleClientCredentialsGrant( $req, $rp );
+    }
+
     # Unknown or unspecified grant type
     else {
         $self->userLogger->error(
@@ -1044,6 +1058,75 @@ sub token {
         return $self->p->sendError( $req, 'unsupported_grant_type', 400 );
     }
 
+}
+
+# RFC6749 section 4.4
+sub _handleClientCredentialsGrant {
+    my ( $self, $req, $rp ) = @_;
+
+    # The client credentials grant type MUST only be used by confidential
+    # clients.
+    if ( $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsPublic} ) {
+        $self->logger->error(
+            "Client Credentials grant cannot be used on public clients");
+        return $self->p->sendError( $req, 'invalid_client', 400 );
+    }
+    my $client_id = $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID};
+
+    # Populate minimal session info
+    my $scope = $req->param('scope') || '';
+    my $infos = {
+        $self->conf->{whatToTrace} => $client_id,
+        _clientId                  => $client_id,
+        _clientConfKey             => $rp,
+        _scope                     => $scope,
+    };
+
+    # Run rule against session info
+    if ( my $rule = $self->spRules->{$rp} ) {
+        unless ( $rule->( $req, $infos ) ) {
+            $self->userLogger->warn(
+                    "Relying party $rp did not validate the provided "
+                  . "Access Rule during Client Credentials Grant" );
+            return $self->p->sendError( $req, 'invalid_grant', 400 );
+        }
+    }
+
+    # Create access token
+    my $session = $self->p->getApacheSession( undef, info => $infos );
+    unless ($session) {
+        $self->logger->error("Unable to create session");
+        return $self->p->sendError( $req, 'server_error', 500 );
+    }
+
+    my $accessTokenSession = $self->newAccessToken(
+        $rp,
+        {
+            scope           => $scope,
+            rp              => $rp,
+            user_session_id => $session->id,
+        }
+    );
+    unless ($accessTokenSession) {
+        $self->logger->error("Unable to create Access Token session");
+        return $self->p->sendError( $req, 'server_error', 500 );
+    }
+
+    my $access_token = $accessTokenSession->id;
+
+    my $expires_in =
+      $self->conf->{oidcRPMetaDataOptions}->{$rp}
+      ->{oidcRPMetaDataOptionsAccessTokenExpiration}
+      || $self->conf->{oidcServiceAccessTokenExpiration};
+
+    my $token_response = {
+        access_token => $access_token,
+        token_type   => 'Bearer',
+        expires_in   => $expires_in,
+    };
+
+    $self->logger->debug("Send token response");
+    return $self->p->sendJSONresponse( $req, $token_response );
 }
 
 sub _handlePasswordGrant {
@@ -1100,9 +1183,11 @@ sub _handlePasswordGrant {
 
     my $user_id = $self->getUserIDForRP( $req, $rp, $req->sessionInfo );
 
-    $self->logger->debug( $user_id
+    $self->logger->debug(
+        $user_id
         ? "Found corresponding user: $user_id"
-        : 'Corresponding user not found' );
+        : 'Corresponding user not found'
+    );
 
     # Generate access_token
     my $accessTokenSession = $self->newAccessToken(
@@ -2043,6 +2128,17 @@ sub metadata {
       )
     {
         push( @$grant_types, "password" );
+    }
+
+    # If one of the RPs has client credentials grant enabled
+    if (
+        grep {
+            $self->oidcRPList->{$_}
+              ->{oidcRPMetaDataOptionsAllowClientCredentialsGrant}
+        } keys %{ $self->oidcRPList }
+      )
+    {
+        push( @$grant_types, "client_credentials" );
     }
 
     # If one of the RPs has refresh tokens enabled

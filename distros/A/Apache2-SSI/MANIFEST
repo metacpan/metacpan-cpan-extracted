@@ -39,7 +39,6 @@ t/90.manifest.t
 t/99.kwalitee.t
 t/conf/extra.conf.in
 t/functions.pl
-t/htdocs/cgi-bin/include.cgi
 t/htdocs/index.html
 t/htdocs/ssi/00.bare.html
 t/htdocs/ssi/01.file.html

@@ -3,7 +3,7 @@ package Specio::Constraint::Role::Interface;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Carp qw( confess );
 use Eval::Closure qw( eval_closure );
@@ -18,9 +18,10 @@ use Specio::Role::Inlinable;
 with 'Specio::Role::Inlinable';
 
 use overload(
-    q{""}  => sub { $_[0] },
+    q{""}  => '_stringify',
     '&{}'  => '_subification',
     'bool' => sub {1},
+    'eq'   => 'is_same_type_as',
 );
 
 {
@@ -442,7 +443,7 @@ sub _build_subification {
 }
 
 sub _inline_throw_exception {
-    my $self                       = shift;
+    shift;
     my $value_var                  = shift;
     my $message_generator_var_name = shift;
     my $type_var_name              = shift;
@@ -531,6 +532,14 @@ sub _clone_coercions {
 }
 ## use critic
 
+sub _stringify {
+    my $self = shift;
+
+    return $self->name unless $self->is_anon;
+
+    return sprintf( '__ANON__(%s)', $self->parent . q{} );
+}
+
 sub _build_signature {
     my $self = shift;
 
@@ -618,7 +627,7 @@ Specio::Constraint::Role::Interface - The interface all type constraints should 
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 DESCRIPTION
 
@@ -655,7 +664,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

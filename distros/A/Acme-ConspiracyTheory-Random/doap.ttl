@@ -1,0 +1,105 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.012"^^doap-deps:CpanId ], [ doap-deps:on "List::Util 1.54"^^doap-deps:CpanId ], [
+		doap-deps:on "Exporter::Shiny 1.000000"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/tobyink/p5-acme-conspiracytheory-random/issues>;
+	doap:created         "2021-01-31"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Acme-ConspiracyTheory-Random>;
+	doap:homepage        <https://metacpan.org/release/Acme-ConspiracyTheory-Random>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Acme-ConspiracyTheory-Random";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-007>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-acme-conspiracytheory-random>;
+	];
+	doap:shortdesc       "random theories".
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.001"^^xsd:string;
+	dc:issued            "2021-01-31"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "REDACTED";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.002"^^xsd:string;
+	dc:issued            "2021-01-31"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "REDACTED";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.003"^^xsd:string;
+	dc:issued            "2021-02-01"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-004>
+	a                    doap:Version;
+	rdfs:label           "REDACTED";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.004"^^xsd:string;
+	dc:issued            "2021-02-01"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-005>
+	a                    doap:Version;
+	rdfs:label           "REDACTED";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.005"^^xsd:string;
+	dc:issued            "2021-02-01"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-006>
+	a                    doap:Version;
+	rdfs:label           "REDACTED";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.006"^^xsd:string;
+	dc:issued            "2021-02-02"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-007>
+	a                    doap:Version;
+	rdfs:label           "REDACTED";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.007"^^xsd:string;
+	dc:issued            "2021-02-02"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

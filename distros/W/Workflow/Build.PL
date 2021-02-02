@@ -19,7 +19,7 @@ my %module_build_args = (
     "Chris Winters <chris\@cwinters.com>"
   ],
   "dist_name" => "Workflow",
-  "dist_version" => "1.50",
+  "dist_version" => "1.51",
   "license" => "perl",
   "module_name" => "Workflow",
   "recommends" => {
@@ -30,7 +30,6 @@ my %module_build_args = (
     "Carp" => 0,
     "Class::Accessor" => "0.18",
     "Class::Factory" => "1.00",
-    "Class::Observable" => "1.04",
     "DBI" => 0,
     "Data::Dumper" => 0,
     "Data::UUID" => 0,

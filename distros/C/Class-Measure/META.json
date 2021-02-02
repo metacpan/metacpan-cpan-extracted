@@ -4,7 +4,7 @@
       "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -57,11 +57,11 @@
    "provides" : {
       "Class::Measure" : {
          "file" : "lib/Class/Measure.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Class::Measure::Length" : {
          "file" : "lib/Class/Measure/Length.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -75,11 +75,11 @@
          "web" : "https://github.com/bluefeet/Class-Measure"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Roland van Ipenburg <roland@rolandvanipenburg.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

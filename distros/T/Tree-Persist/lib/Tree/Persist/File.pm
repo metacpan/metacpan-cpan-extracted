@@ -7,7 +7,7 @@ use base qw( Tree::Persist::Base );
 
 use Scalar::Util qw( blessed );
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 # ----------------------------------------------
 

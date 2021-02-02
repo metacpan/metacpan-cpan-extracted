@@ -4,7 +4,7 @@ AtteanX::Serializer::TextTable - SPARQL Results TSV Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::TextTable version 0.028
+This document describes AtteanX::Serializer::TextTable version 0.029
 
 =head1 SYNOPSIS
 
@@ -22,6 +22,8 @@ This document describes AtteanX::Serializer::TextTable version 0.028
 
 =item C<< canonical_media_type >>
 
+=item C<< file_extensions >>
+
 =back
 
 =head1 METHODS
@@ -33,9 +35,9 @@ This document describes AtteanX::Serializer::TextTable version 0.028
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::TextTable 0.028 {
+package AtteanX::Serializer::TextTable 0.029 {
 	use Moo;
-	use Types::Standard qw(Str ArrayRef);
+	use Types::Standard qw(Str Bool ArrayRef);
 	use Encode qw(encode);
 	use Scalar::Util qw(blessed);
 	use Attean::ListIterator;
@@ -43,7 +45,9 @@ package AtteanX::Serializer::TextTable 0.028 {
 	use Text::Table;
 	use namespace::clean;
 
+	my @rule			= qw(- +);
 	has 'canonical_media_type' => (is => 'ro', isa => Str, init_arg => undef, default => 'text/plain');
+	has 'number_rows' => (is => 'rw', isa => Bool, default => 0);
 
 =item C<< media_types >>
 
@@ -54,6 +58,14 @@ Returns a list of media types that identify the format produced by this serializ
 	sub media_types {
 		return [qw(text/plain)];
 	}
+
+=item C<< file_extensions >>
+
+Returns a list of file extensions associated with the serialized format.
+
+=cut
+
+	sub file_extensions { return [qw(txt)] };
 	
 =item C<< serialize_iter_to_io( $fh, $iterator ) >>
 
@@ -75,15 +87,38 @@ L<IO::Handle> object C<< $fh >>.
 		} else {
 			@vars	= qw(subject predicate object graph);
 		}
-		
-		my $tb = Text::Table->new(@vars);
+
+		my @header_names	= @vars;
+		if ($self->number_rows) {
+			unshift(@header_names, '#');
+		}
+
+		my @headers			= (\q"| ");
+		push(@headers, map { $_ => \q" | " } @header_names);
+		pop	@headers;
+		push @headers => (\q" |");
+
+		my $table = Text::Table->new(@headers);
+
+		my @rule			= qw(- +);
 		my @rows;
+		my $row	= 1;
 		while (my $t = $iter->next()) {
 			my @strings	= map { blessed($_) ? $_->as_string : '' } map { eval { $t->value($_) } } @vars;
+			if ($self->number_rows) {
+				unshift(@strings, $row++);
+			}
 			push(@rows, \@strings);
 		}
-		$tb->load(@rows);
-		print {$io} $tb;
+		$table->load(@rows);
+		
+		print {$io} join('',
+				$table->rule(@rule),
+				$table->title,
+				$table->rule(@rule),
+				map({ $table->body($_) } 0 .. @rows),
+				$table->rule(@rule)
+			);
 	}
 	
 =item C<< serialize_iter_to_bytes( $iterator ) >>
@@ -99,15 +134,36 @@ and returns the serialization as a UTF-8 encoded byte string.
 		my $iter	= shift;
 		
 		my @vars	= @{ $iter->variables };
-		my $tb = Text::Table->new(@vars);
+		my @header_names	= @vars;
+		if ($self->number_rows) {
+			unshift(@header_names, '#');
+		}
+
+		my @headers			= (\q"| ");
+		push(@headers, map { $_ => \q" | " } @header_names);
+		pop	@headers;
+		push @headers => (\q" |");
+
+		my $table = Text::Table->new(@headers);
 		
 		my @rows;
+		my $row	= 1;
 		while (my $t = $iter->next()) {
 			my @strings	= map { blessed($_) ? $_->ntriples_string : '' } map { $t->value($_) } @vars;
+			if ($self->number_rows) {
+				unshift(@strings, $row++);
+			}
 			push(@rows, \@strings);
 		}
-		$tb->load(@rows);
-		my $data	= $tb->table();
+		$table->load(@rows);
+
+		my $data	= join('',
+				$table->rule(@rule),
+				$table->title,
+				$table->rule(@rule),
+				map({ $table->body($_) } 0 .. @rows),
+				$table->rule(@rule)
+			);
 		return encode('UTF-8', $data);
 	}
 

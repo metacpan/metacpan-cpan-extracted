@@ -58,7 +58,7 @@ my %tests = (
             -1e10
             -1e+10
             1E20
-            ),
+        ),
         $ARRAY_REF,
         $ARRAY_OVERLOAD,
     ],
@@ -103,7 +103,7 @@ my %tests = (
             -1.23456e10
             -1.23456e-10
             -1.23456e+10
-            ),
+        ),
     ],
 );
 
@@ -171,6 +171,7 @@ subtest(
                             && !ref( $_[0] )
                             && (
                             do {
+                                ## no critic (Variables::ProhibitUnusedVarsStricter)
                                 ( my $val1 = $_[0] )
                                     =~ /\A-?[0-9]+(?:[Ee]\+?[0-9]+)?\z/;
                             }
@@ -181,6 +182,7 @@ subtest(
                         && overload::Overloaded( $_[0] )
                         && defined overload::Method( $_[0], '0+' )
                         && do {
+                            ## no critic (Variables::ProhibitUnusedVarsStricter)
                             ( my $val2 = $_[0] + 0 )
                                 =~ /\A-?[0-9]+(?:[Ee]\+?[0-9]+)?\z/;
                         }
@@ -230,6 +232,7 @@ subtest(
                             && !ref( $_[0] )
                             && (
                             do {
+                                ## no critic (Variables::ProhibitUnusedVarsStricter)
                                 ( my $val1 = $_[0] )
                                     =~ /\A-?[0-9]+(?:[Ee]\+?[0-9]+)?\z/;
                             }
@@ -240,6 +243,7 @@ subtest(
                         && overload::Overloaded( $_[0] )
                         && defined overload::Method( $_[0], '0+' )
                         && do {
+                            ## no critic (Variables::ProhibitUnusedVarsStricter)
                             ( my $val2 = $_[0] + 0 )
                                 =~ /\A-?[0-9]+(?:[Ee]\+?[0-9]+)?\z/;
                         }

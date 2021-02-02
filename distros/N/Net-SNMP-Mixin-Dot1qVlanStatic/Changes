@@ -1,6 +1,12 @@
 Revision history for Net-SNMP-Mixin-Dot1qVlanStatic
 
-0.05	Wed, 22 Jun 2016 14:18:13 +0200
+0.10	Mon, 01 Feb 2021 19:10:52 +0100
+	use push_error
+
+0.06	Tue, 08 Dec 2020 07:13:26 +0100
+	bump version
+
+0.05	Mo, 07 Dec 2020 22:15:26 +0100
 	use the BRIDGE-MIB::dot1dBasePortTable to count and enumerate the bridge ports
 
 	new methods, use if_idx as index instead of bridge-port:

@@ -10,7 +10,7 @@ use vars '$str';
 use Log::ger::Output 'String', string => \$str;
 
 package My::P1;
-use Log::ger::Plugin 'MultilevelLog';
+use Log::ger::Format 'MultilevelLog';
 use Log::ger;
 
 sub x {

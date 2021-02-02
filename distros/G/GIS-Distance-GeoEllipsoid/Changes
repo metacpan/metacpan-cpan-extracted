@@ -1,5 +1,9 @@
 Revision history for Perl extension GIS-Distance-GeoEllipsoid.
 
+0.13 2021-01-30T06:16:45Z
+
+ - Provide a .editorconfig instead of .lvimrc.
+
 0.12 2019-03-17T17:06:57Z
 
  - Use GIS::Distance's new interface.

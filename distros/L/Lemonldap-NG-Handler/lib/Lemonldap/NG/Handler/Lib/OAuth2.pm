@@ -10,8 +10,17 @@ sub retrieveSession {
 
     # Retrieve regular session if this is not an offline access token
     unless ($offlineId) {
-        return $class->Lemonldap::NG::Handler::Main::retrieveSession( $req,
-            $id );
+        my $data = {
+            %{
+                $class->Lemonldap::NG::Handler::Main::retrieveSession( $req,
+                    $id )
+            },
+            $class->_getTokenAttributes($req)
+        };
+
+        # Update cache
+        $class->data($data);
+        return $data;
     }
 
     # 2. Get the session from cache or backend
@@ -29,7 +38,10 @@ sub retrieveSession {
 
     unless ( $session->error ) {
 
-        $class->data( $session->data );
+        my $data = { %{ $session->data }, $class->_getTokenAttributes($req) };
+
+        $class->data($data);
+
         $class->logger->debug("Get session $offlineId from Handler::Main::Run");
 
         # Verify that session is valid
@@ -48,7 +60,7 @@ sub retrieveSession {
             return 0;
         }
 
-        return $session->data;
+        return $data;
     }
     else {
         $class->logger->info("Session $offlineId can't be retrieved");
@@ -75,6 +87,19 @@ sub fetchId {
 
     # Get access token session
     my $infos = $class->getOIDCInfos($access_token);
+
+    # Store scope and rpid for future session attributes
+    if ( $infos->{rp} ) {
+        my $rp = $infos->{rp};
+        $req->data->{_scope}         = $infos->{scope};
+        $req->data->{_clientConfKey} = $rp;
+        if (    $class->tsv->{oauth2Options}->{$rp}
+            and $class->tsv->{oauth2Options}->{$rp}->{clientId} )
+        {
+            $req->data->{_clientId} =
+              $class->tsv->{oauth2Options}->{$rp}->{clientId};
+        }
+    }
 
     # If this token is tied to a regular session ID
     if ( my $_session_id = $infos->{user_session_id} ) {
@@ -116,8 +141,7 @@ sub getOIDCInfos {
     unless ( $oidcSession->error ) {
         $class->logger->debug("Get OIDC session $id");
 
-        $infos->{user_session_id}    = $oidcSession->data->{user_session_id};
-        $infos->{offline_session_id} = $oidcSession->data->{offline_session_id};
+        $infos = { %{ $oidcSession->data } };
     }
     else {
         $class->logger->info("OIDC Session $id can't be retrieved");
@@ -139,6 +163,17 @@ sub goToPortal {
     $class->set_header_out( $req,
         'WWW-Authenticate' => "Bearer" . $oauth2_error );
     return $class->HTTP_UNAUTHORIZED;
+}
+
+sub _getTokenAttributes {
+    my ( $class, $req ) = @_;
+    my %res;
+    for my $attr (qw/_scope _clientConfKey _clientId/) {
+        if ( $req->data->{$attr} ) {
+            $res{$attr} = $req->data->{$attr};
+        }
+    }
+    return %res;
 }
 
 1;

@@ -4,7 +4,7 @@
       "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.4",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -69,7 +69,7 @@
    "provides" : {
       "GitLab::API::v3" : {
          "file" : "lib/GitLab/API/v3.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "GitLab::API::v3::Constants" : {
          "file" : "lib/GitLab/API/v3/Constants.pm"
@@ -92,7 +92,7 @@
          "web" : "https://github.com/bluefeet/GitLab-API-v3"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Dave Webb <github@d5ve.com>",
@@ -103,6 +103,6 @@
       "trunov-ms <trunov.ms@gmail.com>"
    ],
    "x_deprecated" : 1,
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

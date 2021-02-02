@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -28,14 +28,15 @@ has ott => (
         return $ott;
     }
 );
-has unrestrictedUsersRule      => ( is => 'rw', default => sub { 0 } );
-has displayEmptyValuesRule     => ( is => 'rw', default => sub { 0 } );
-has displayEmptyHeadersRule    => ( is => 'rw', default => sub { 0 } );
-has displayPersistentInfoRule  => ( is => 'rw', default => sub { 0 } );
-has displayComputedSessionRule => ( is => 'rw', default => sub { 0 } );
-has idRule                     => ( is => 'rw', default => sub { 1 } );
-has sorted                     => ( is => 'rw', default => sub { 0 } );
-has merged                     => ( is => 'rw', default => '' );
+has unrestrictedUsersRule        => ( is => 'rw', default => sub { 0 } );
+has displayEmptyValuesRule       => ( is => 'rw', default => sub { 0 } );
+has displayEmptyHeadersRule      => ( is => 'rw', default => sub { 0 } );
+has displayPersistentInfoRule    => ( is => 'rw', default => sub { 0 } );
+has displayComputedSessionRule   => ( is => 'rw', default => sub { 0 } );
+has displayNormalizedHeadersRule => ( is => 'rw', default => sub { 0 } );
+has idRule                       => ( is => 'rw', default => sub { 1 } );
+has sorted                       => ( is => 'rw', default => sub { 0 } );
+has merged                       => ( is => 'rw', default => '' );
 
 sub hAttr {
     $_[0]->{conf}->{checkUserHiddenAttributes} . ' '
@@ -96,6 +97,13 @@ sub init {
         )
     );
     return 0 unless $self->displayComputedSessionRule;
+    $self->displayNormalizedHeadersRule(
+        $self->p->buildRule(
+            $self->conf->{checkUserDisplayNormalizedHeaders},
+            'checkUserDisplayNormalizedHeaders'
+        )
+    );
+    return 0 unless $self->displayNormalizedHeadersRule;
 
     # Init. other options
     $self->sorted( $self->conf->{impersonationRule}
@@ -164,12 +172,13 @@ sub check {
             $msg   = PE_NOTOKEN;
             $token = $self->ott->createToken();
         }
-
-        unless ( $self->ott->getToken($token) ) {
-            $self->userLogger->warn(
-                'CheckUser called with an expired/bad token');
-            $msg   = PE_TOKENEXPIRED;
-            $token = $self->ott->createToken();
+        else {
+            unless ( $self->ott->getToken($token) ) {
+                $self->userLogger->warn(
+                    'CheckUser called with an expired/bad token');
+                $msg   = PE_TOKENEXPIRED;
+                $token = $self->ott->createToken();
+            }
         }
 
         my $params = {
@@ -488,13 +497,13 @@ sub _headers {
     # Remove hidden headers relative to VHost if required
     unless ( $self->unrestrictedUsersRule->( $req, $savedUserData ) ) {
         my $keysToRemove = '';
-        $keysToRemove = '__all__'
+        $keysToRemove = '__ALL__'
           if exists $self->conf->{checkUserHiddenHeaders}->{$vhost};
         $keysToRemove = $self->conf->{checkUserHiddenHeaders}->{$vhost}
           if ( $keysToRemove
             && $self->conf->{checkUserHiddenHeaders}->{$vhost} =~ /\w+/ );
 
-        if ( $keysToRemove eq '__all__' ) {
+        if ( $keysToRemove && $keysToRemove eq '__ALL__' ) {
             $self->logger->debug(
                 "Overwrite for VirtualHost: $vhost ALL valued header(s)...");
             @$headers = map {
@@ -503,7 +512,7 @@ sub _headers {
                   : $_
             } @$headers;
         }
-        else {
+        elsif ($keysToRemove) {
             $self->logger->debug(
                 "Mask hidden header(s) for VirtualHost: $vhost");
             my $hash = { map { $_->{key} => $_->{value} } @$headers };
@@ -521,9 +530,22 @@ sub _headers {
         $self->logger->debug("Remove empty headers...");
         @$headers = grep $_->{value} =~ /.+/, @$headers;
     }
+
+    # Normalize headers name if required
+    if ( $self->displayNormalizedHeadersRule->( $req, $savedUserData ) ) {
+        $self->logger->debug("Normalize headers...");
+        @$headers = map {
+            ;    # Prevent compilation error with old Perl versions
+            no strict 'refs';
+            {
+                key   => &{ $self->p->HANDLER . '::cgiName' }( $_->{key} ),
+                value => $_->{value}
+            }
+        } @$headers;
+    }
+
     $self->logger->debug(
         "Return \"$attrs->{ $self->{conf}->{whatToTrace} }\" headers");
-
     return $headers;
 }
 
@@ -532,7 +554,7 @@ sub _createArray {
     my $array_attrs = [];
 
     if ( $self->displayEmptyValuesRule->( $req, $userData ) ) {
-        $self->logger->debug("Delete hidden attributes");
+        $self->logger->debug("Delete hidden attributes...");
         foreach my $k ( sort keys %$attrs ) {
 
             # Ignore hidden attributes
@@ -541,7 +563,7 @@ sub _createArray {
         }
     }
     else {
-        $self->logger->debug("Delete hidden and empty attributes");
+        $self->logger->debug("Delete hidden and empty attributes...");
         foreach my $k ( sort keys %$attrs ) {
 
             # Ignore hidden attributes and empty values
@@ -609,18 +631,18 @@ sub _dispatchAttributes {
 
 sub _removeKeys {
     my ( $self, $attrs, $hidden, $msg, $mask ) = @_;
-    my $regex = join '|',      split /\s+/, $hidden;
+    my $regex = '^(?:' . join( '|', split( /\s+/, $hidden ) ) . ')';
     my @keys  = grep /$regex/, keys %$attrs;
 
     $self->logger->debug($msg);
     if ($mask) {
-        $self->userLogger->info('Hide some headers');
+        $self->userLogger->info('Hide some headers...');
         foreach (@keys) {
             $attrs->{$_} = '******' if $attrs->{$_} =~ /\w+/;
         }
     }
     else {
-        $self->userLogger->info('Remove some headers');
+        $self->userLogger->info('Remove some headers...');
         delete @$attrs{@keys};
     }
 

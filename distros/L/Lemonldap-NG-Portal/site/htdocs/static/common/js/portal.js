@@ -572,7 +572,7 @@ LemonLDAP::NG Portal jQuery scripts
     $('.oidcConsent').on('click', function() {
       return removeOidcConsent($(this).attr('partner'));
     });
-    return $('#show-hide-button').on('click', function() {
+    $('#show-hide-button').on('click', function() {
       if ($("#newpassword").attr('type') === 'password') {
         console.log('Show passwords');
         $("#newpassword").attr('type', 'input');
@@ -587,6 +587,12 @@ LemonLDAP::NG Portal jQuery scripts
         return $("#show-hide-icon-button").addClass('fa-eye');
       }
     });
+    if (window.location.href.match(/\/finduser/)) {
+      console.log('Set Portal URL: ' + portal);
+      return window.history.pushState({
+        page: 'Portal'
+      }, 'Portal', portal);
+    }
   });
 
 }).call(this);

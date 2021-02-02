@@ -125,6 +125,8 @@ sub init {
 
     # Purge loaded module list
     $self->loadedModules( {} );
+    $self->afterSub( {} );
+    $self->aroundSub( {} );
 
     # Insert `reloadConf` in handler reload stack
     Lemonldap::NG::Handler::Main->onReload( $self, 'reloadConf' );
@@ -164,24 +166,24 @@ sub setPortalRoutes {
 
       # psgi.js
       ->addUnauthRoute( 'psgi.js' => 'sendJs', ['GET'] )
-      ->addAuthRoute( 'psgi.js' => 'sendJs',   ['GET'] )
+      ->addAuthRoute( 'psgi.js' => 'sendJs', ['GET'] )
 
       # portal.css
       ->addUnauthRoute( 'portal.css' => 'sendCss', ['GET'] )
-      ->addAuthRoute( 'portal.css' => 'sendCss',   ['GET'] )
+      ->addAuthRoute( 'portal.css' => 'sendCss', ['GET'] )
 
       # lmerror
       ->addUnauthRoute( lmerror => { ':code' => 'lmError' }, ['GET'] )
-      ->addAuthRoute( lmerror => { ':code'   => 'lmError' }, ['GET'] )
+      ->addAuthRoute( lmerror => { ':code' => 'lmError' }, ['GET'] )
 
       # Core REST API
-      ->addUnauthRoute( ping => 'pleaseAuth',  ['GET'] )
+      ->addUnauthRoute( ping => 'pleaseAuth', ['GET'] )
       ->addAuthRoute( ping => 'authenticated', ['GET'] )
 
       # Refresh session
       ->addAuthRoute( refresh => 'refresh', ['GET'] )
 
-      ->addAuthRoute( '*' => 'corsPreflight',   ['OPTIONS'] )
+      ->addAuthRoute( '*' => 'corsPreflight', ['OPTIONS'] )
       ->addUnauthRoute( '*' => 'corsPreflight', ['OPTIONS'] )
 
       # Logout
@@ -208,6 +210,8 @@ sub reloadConf {
     foreach ( qw(_macros _groups), @entryPoints ) {
         $self->{$_} = [];
     }
+    $self->afterSub( {} );
+    $self->aroundSub( {} );
     $self->spRules( {} );
 
     # Load conf in portal object

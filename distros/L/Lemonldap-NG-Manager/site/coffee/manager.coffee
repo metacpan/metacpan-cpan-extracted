@@ -735,6 +735,7 @@ llapp.controller 'TreeCtrl', [
 			$http.post("#{window.confPrefix}/newRSAKey", {"password": ''}).then (response) ->
 				currentNode.data[0].data = response.data.private
 				currentNode.data[1].data = response.data.public
+				currentNode.data[2].data = response.data.hash
 				$scope.waiting = false
 			, readError
 

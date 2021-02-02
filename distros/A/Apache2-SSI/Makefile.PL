@@ -34,8 +34,8 @@ my %WriteMakefileArgs = (
         'Regexp::Common::net' => 0,
         ## 'POSIX'         => '1.53_01',
         'Scalar::Util'  => '1.50',
-        'URI'           => 0,
-        'URI::file'     => 0,
+        'URI'           => '5.05',
+        'URI::file'     => '5.05',
         'URI::Escape::XS' => 0,
         'URL::Encode::XS' => 0,
     },
@@ -261,6 +261,15 @@ if( !$@ )
     }
     Apache::TestMM::generate_script( 't/TEST' );
 }
+
+## Make sure the executable test cgi has the right path to the perl interpreter
+my $fh = IO::File->new( "+<./t/htdocs/ssi/include.cgi" ) || die( "Unable to open file \"./t/htdocs/ssi/include.cgi\": $!\n" );
+my @lines = $fh->getlines;
+$lines[0] = '#!' . $^X . "\n";
+$fh->seek(0, 0);
+$fh->print( @lines );
+$fh->truncate( $fh->tell );
+$fh->close;
 
 WriteMakefile(%WriteMakefileArgs);
 

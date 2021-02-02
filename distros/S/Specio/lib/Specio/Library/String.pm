@@ -3,7 +3,7 @@ package Specio::Library::String;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use parent 'Specio::Exporter';
 
@@ -79,7 +79,7 @@ Specio::Library::String - Implements type constraint objects for some common str
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 DESCRIPTION
 
@@ -91,8 +91,7 @@ A string which has at least one character.
 
 =head2 SimpleStr
 
-A string that is 255 characters or less with no vertical whitespace
-characters.
+A string that is 255 characters or less with no vertical whitespace characters.
 
 =head2 NonEmptySimpleStr
 
@@ -115,7 +114,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

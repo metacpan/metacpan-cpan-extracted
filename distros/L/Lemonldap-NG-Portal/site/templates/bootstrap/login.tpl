@@ -222,6 +222,8 @@
   </div>
   </TMPL_IF>
 
+  <TMPL_INCLUDE NAME="finduser.tpl">
+
   <TMPL_IF NAME="DISPLAY_PASSWORD">
     <div id="password" class="card">
     <TMPL_INCLUDE NAME="password.tpl">

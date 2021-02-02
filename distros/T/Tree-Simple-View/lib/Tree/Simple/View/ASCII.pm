@@ -6,7 +6,7 @@ use Tree::Simple::View::Exceptions;
 
 use parent 'Tree::Simple::View';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 sub expandPathSimple {
     my ( $self, $tree, @full_path ) = @_;
@@ -231,9 +231,15 @@ This currently is aliased to the C<expandPathSimple> since we don't have config 
 Config handling, allowing you to customize the drawing. Patches welcome, I just don't
 currently have the time to add it.
 
-=head1 BUGS
+=head1 Repository
 
-None that I am aware of. Of course, if you find a bug, let me know, and I will be sure to fix it.
+L<https://github.com/ronsavage/Tree-Simple.git>
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple/issues>
 
 =head1 AUTHOR
 

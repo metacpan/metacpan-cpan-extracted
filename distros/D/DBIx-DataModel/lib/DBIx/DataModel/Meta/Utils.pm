@@ -12,11 +12,12 @@ use Params::Validate           qw/validate_with SCALAR ARRAYREF CODEREF
 use List::MoreUtils            qw/any/;
 use mro                        qw/c3/;
 use DBIx::DataModel;
-use SQL::Abstract::More 1.33;
+use SQL::Abstract::More 1.37;
 use Carp::Clan                 qw[^(DBIx::DataModel::|SQL::Abstract)];
 use Exporter                   qw/import/;
 
-our @EXPORT = qw/define_class define_method define_readonly_accessors
+our @EXPORT = qw/define_class                define_method
+                 define_readonly_accessors   define_abstract_methods
                  does/;
 
 
@@ -138,6 +139,22 @@ sub define_readonly_accessors {
      );
   }
 }
+
+sub define_abstract_methods {
+  my ($target_class, @methods) = @_;
+
+  foreach my $method (@methods) {
+    define_method(
+      class => $target_class,
+      name  => $method, 
+      body  => sub { my $self     = shift;
+                     my $subclass = ref $self || $self;
+                     die "$subclass should implement a $method() method, as required by $target_class";
+                    },
+     );
+  }
+}
+
 
 
 1;

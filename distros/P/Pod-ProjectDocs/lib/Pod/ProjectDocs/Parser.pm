@@ -3,7 +3,7 @@ package Pod::ProjectDocs::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';    # VERSION
+our $VERSION = '0.53';    # VERSION
 
 use Moose;
 with 'Pod::ProjectDocs::Template';
@@ -86,5 +86,7 @@ sub _generate_header_box {
     }
     return $text;
 }
+
+no Moose;
 
 1;

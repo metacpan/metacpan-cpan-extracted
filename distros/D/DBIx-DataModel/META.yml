@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ name: DBIx-DataModel
 provides:
   DBIx::DataModel:
     file: lib/DBIx/DataModel.pm
-    version: '3.0'
+    version: '3.01'
   DBIx::DataModel::Compatibility::V0:
     file: lib/DBIx/DataModel/Compatibility/V0.pm
   DBIx::DataModel::Compatibility::V1:
@@ -107,15 +107,15 @@ recommends:
   List::Categorize: '0.04'
   YAML::XS: '0'
 requires:
-  Acme::Damn: '0'
   Carp::Clan: '0'
   Clone: '0'
   DBI: '0'
+  Data::Structure::Util: '0'
   MRO::Compat: '0'
   Module::Build: '0'
   Module::Load: '0'
   Params::Validate: '0'
-  SQL::Abstract::More: '1.33'
+  SQL::Abstract::More: '1.37'
   Scalar::Util: '1.07'
   Storable: '0'
   Try::Tiny: '0'
@@ -125,5 +125,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/DBIx-DataModel
-version: '3.0'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '3.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

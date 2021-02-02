@@ -1,6 +1,15 @@
 
 Revision history for Net-Async-Slack
 
+0.006     2021-02-02 05:18:17+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - support socket mode (https://api.slack.com/apis/connections/socket)
+    - deprecated RTM, since it's going away in February
+    - full set of Slack methods now supported, see Net::Async::Slack::Commands
+    - unfurl support via socket mode (register a domain and provide callbacks
+    for expanding URLs into blocks)
+
 0.005     2020-11-26 15:11:14+08:00 Asia/Kuala_Lumpur
     New features:
 

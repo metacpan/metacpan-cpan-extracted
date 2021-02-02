@@ -1,6 +1,14 @@
 Revision history for Perl extension DBIx::Tree
 
-1.97  Thu Dec 18 10:11:00 2014
+1.98  2021-02-02T15:57:00
+ 	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Reformat Makefile.PL.
+	- Change license from artistic_2 to perl.
+	- Add t/00.*.
+	- Update Makefile.PL and POD to change RT to github.
+
+1.97  2014-12-18T10:11:00
 	- Rename CHANGES back to Changes.
 	- Put methods into alphabetical order.
 	- Reformat the code slightly.
@@ -11,12 +19,12 @@ Revision history for Perl extension DBIx::Tree
 	- Change usage of new() from 'new DBI::Tree()' to DBIx::Tree -> new()'.
 	- Add scripts/demo.pl.
 
-1.96  Thu Nov  8 12:38:00 2012
+1.96  2012-11-08T12:38:00
 	- No code changes.
 	- For pre-reqs such as strict, warnings, etc, which ship with Perl, set the version # to 0.
 		Reported as RT#80663 by Father Chrysostomos for Tree::DAG_Node.
 
-1.95  Web Feb 16 11:52:00 2011
+1.95  2011-02-16T11:52:00
 	- Replace /usr/bin/perl with /usr/bin/env perl in examples/*.pl.
 	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
 	- Remove reference to AutoLoader when setting @ISA, to stop warnings on recent Perls.
@@ -29,7 +37,7 @@ Revision history for Perl extension DBIx::Tree
 	  (http://www.cpantesters.org/cpan/report/a402f106-c317-11df-bbe8-e11f06264d1f)
 	  so I've added it explicitly to Build.PL and Makefile.PL.
 
-1.93  Sat Sep 18 14:53:00 2010
+1.93  2010-09-18T14:53:00
 	- Use File::Temp to get a temp dir name, rather than using /tmp.
 	- Use File::Spec to combine that temp dir and the file name test.sqlite.
 	- Delete the file examples/textexample.pl, since it just duplicates the
@@ -37,14 +45,14 @@ Revision history for Perl extension DBIx::Tree
 	- Add 'use warnings' to t/test.t and examples/*.pl, which means vars are
 	  now all declared.
 
-1.92  Fri Sep 17 12:46:00 2010
+1.92  2010-09-17T12:46:00
 	- DBIx::Tree didn't 'use' DBI, but it did use $DBI::errstr.
 	  So I've added a 'use DBI' to Tree.pm.
 	- Add Carp and DBI to list of dependencies, in Build.PL and Makefile.PL.
 	- Specify recent version numbers for Carp, DBI, Test::More and Test::Pod.
 	- As always, thanx to CPAN testers.
 
-1.91  Wed Sep 15 14:08:00 2010
+1.91  2010-09-15T14:08:00
 	- Maintenance taken over by Ron Savage.
 	- Version numbering changed to x.xx format.
 	- Add Build.PL.
@@ -74,12 +82,12 @@ Revision history for Perl extension DBIx::Tree
 
 1.9   Sun Feb 14 12:00:00 2003
 
-0.91  Thu Aug 24 20:36:00 2000
+0.91  2000-08-24T20:36:00
     - added performance improvements, sorting, and bug fixes from
       Jan Mach <machj@ders.cz>
     - added limit and matching support from Ilia Lobsanov <ilia@lobsanov.com>
 
-0.90  Sun Aug 30 17:08:09 1998
+0.90  1998-08-30T17:08:09
     - original version; created by h2xs 1.18
 
 X.XX

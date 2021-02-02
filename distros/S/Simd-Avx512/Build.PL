@@ -5,7 +5,7 @@ use Module::Build;
 my $b = Module::Build->new
  (module_name   => 'Simd::Avx512',
   dist_author   => 'philiprbrenan@gmail.com',
-  dist_abstract => 'Simd::Avx512 - Emulate SIMD instructions',
+  dist_abstract => 'Simd::Avx512 - Emulate SIMD Avx512 instructions',
   license       => 'perl',
   requires      =>
    {'Carp'              =>0,

@@ -9,7 +9,7 @@ SYNOPSIS
      use Net::Async::Slack;
      my $loop = IO::Async::Loop->new;
      $loop->add(
-      my $gh = Net::Async::Slack->new(
+      my $slack = Net::Async::Slack->new(
        token => '...',
       )
      );
@@ -131,6 +131,6 @@ AUTHOR
 
 LICENSE
 
-    Copyright Tom Molesworth 2016-2020. Licensed under the same terms as
+    Copyright Tom Molesworth 2016-2021. Licensed under the same terms as
     Perl itself.
 

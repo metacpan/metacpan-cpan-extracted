@@ -7,7 +7,7 @@ use Lemonldap::NG::Common::Regexp;
 use Lemonldap::NG::Handler::Main;
 use Lemonldap::NG::Common::Util qw(getSameSite);
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -18,7 +18,7 @@ our $VERSION = '2.0.10';
 # -  (1,message) : OK with a warning
 # -  (0,message) : NOK
 # - (-1,message) : OK, but must be confirmed (ignored if confirm parameter is
-# set
+# set)
 #
 # Those subroutines can also modify configuration.
 #
@@ -434,9 +434,10 @@ sub tests {
         },
 
         samlSignatureUnsupportedAlg => sub {
+            return 1 unless $conf->{issuerDBSAMLActivation};
             return 1
               unless eval
-'use Lasso; Lasso::check_version( 2, 5, 1, Lasso::Constants::CHECK_VERSION_NUMERIC) ? 0:1';
+'use Lasso; Lasso::check_version( 2, 5, 1, Lasso::Constants::CHECK_VERSION_NUMERIC) ? 0 : 1';
 
             my $allsha1 = 1;
             undef $allsha1
@@ -693,7 +694,8 @@ sub tests {
               }
               grep { /\d+/ }
               split /\s*,\s*/, $conf->{bruteForceProtectionLockTimes};
-            $conf->{bruteForceProtectionLockTimes} = join ', ', @lockTimes if scalar @lockTimes;
+            $conf->{bruteForceProtectionLockTimes} = join ', ', @lockTimes
+              if scalar @lockTimes;
             return 1 unless ( $conf->{bruteForceProtection} );
             return ( 0,
 '"History" plugin is required to enable "BruteForceProtection" plugin'
@@ -936,6 +938,67 @@ sub tests {
                 and $conf->{passwordDB} eq 'Null' );
             return 1;
         },
+
+        # FindUser requires Impersonation and attributes
+        findUserWithoutImpersonationOrAttributes => sub {
+            return ( -1,
+                '"Impersonation" plugin is required to enable "FindUser" plugin'
+              )
+              if ( $conf->{findUser}
+                and !$conf->{impersonationRule} );
+            return ( 1,
+                '"FindUser" plugin enabled without searching attributes' )
+              if ( $conf->{findUser}
+                and scalar
+                keys %{ $conf->{findUserSearchingAttributes} } == 0 );
+            return 1;
+        },
+
+        # FindUser wildcard must be allowed
+        findUserWildcard => sub {
+            return 1
+              unless ( $conf->{findUser}
+                and $conf->{findUserWildcard}
+                and $conf->{findUserControl} );
+            return ( 1,
+                'FindUser wildcard should be allowed by parameters control' )
+              unless (
+                $conf->{findUserWildcard} =~ /$conf->{findUserControl}/o );
+            return 1;
+        },
+
+        # AuthChoice parameters must exist
+        AuthChoiceParams => sub {
+            return 1 unless %{ $conf->{authChoiceModules} };
+            foreach (qw(AuthBasic FindUser)) {
+                if ( $conf->{"authChoice$_"} ) {
+                    my $test  = $conf->{"authChoice$_"};
+                    my $param = grep /^$test$/,
+                      keys %{ $conf->{authChoiceModules} };
+                    return ( -1, "Choice $_ parameter does not exist" )
+                      unless $param;
+                }
+            }
+            return 1;
+        },
+
+        # FindUser authChoice parameter must be defined
+        findUserChoiceParam => sub {
+            return ( -1, 'FindUser choice parameter must be defined' )
+              if (  $conf->{findUser}
+                and $conf->{impersonationRule}
+                and $conf->{authentication} eq 'Choice'
+                and !$conf->{authChoiceFindUser} );
+            return 1;
+        },
+
+        # Chain must be defined with AuthChoice
+        authChoiceChains => sub {
+            return ( -1, 'Authentication choice enabled without chain' )
+              if ( $conf->{authentication} eq 'Choice'
+                and scalar keys %{ $conf->{authChoiceModules} } == 0 );
+            return 1;
+        }
     };
 }
 

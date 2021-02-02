@@ -1,4 +1,7 @@
-## 0.52 2018-??-??
+## 0.53 2021-02-01
+- Fixed linking to `.pod` files, thanks to Chris White (issue#10, pr#11).
+
+## 0.52 2018-07-21
 - Added missing style information for <h3> and <h4>.
 - Fixed: Overview page does not handle some package names correctly (#9).
 

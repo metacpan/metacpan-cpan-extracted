@@ -1,43 +1,50 @@
-Revision history for App-IndonesianFinanceUtils
+0.080   2021-02-01  Released-By: PERLANCAR; Urgency: medium
 
-0.07    2016-10-14 (PERLANCAR)
+        - Add script: get-ksei-sec-ownership-url.
+
+	- Rename scripts: convert-currency-using-{klik,}bca,
+	  get-usd-idr-rate-from-{klik,}bca,
+	  list-currency-exchange-rates-from-{klik,}bca.
+
+
+0.07    2016-10-14  Released-By: PERLANCAR
 
 	- Add utilities: get-usd-idr-rates-from-gmc,
 	  list-currency-exchange-rates-from-gmc,
-	  convert-currency-using-gmt.
+	  convert-currency-using-gmc.
 
 	- Make main module contain no code.
 
 
-0.06    2016-07-22 (PERLANCAR)
+0.06    2016-07-22  Released-By: PERLANCAR
 
 	- Add utility: list-currency-exchange-rates-from-klikbca.
 
 
-0.05    2016-01-18 (PERLANCAR)
+0.05    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.04    2015-10-23 (PERLANCAR)
+0.04    2015-10-23  Released-By: PERLANCAR
 
 	- Add script: get-jisdor-rates.
 
 
-0.03    2015-10-23 (PERLANCAR)
+0.03    2015-10-23  Released-By: PERLANCAR
 
         - Add script: get-usd-idr-rate-from-klikbca.
 
 
-0.02    2015-07-10 (PERLANCAR)
+0.02    2015-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dzil] Fix plugin ordering.
 
 
-0.01    2015-07-10 (PERLANCAR)
+0.01    2015-07-10  Released-By: PERLANCAR
 
         - First release.

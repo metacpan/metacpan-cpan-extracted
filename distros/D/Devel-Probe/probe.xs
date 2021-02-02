@@ -28,8 +28,8 @@ static SV* probe_trigger_cb = 0;
 static void probe_enable(void);
 static void probe_disable(void);
 static int probe_is_installed(void);
-static void probe_install(void);
-static void probe_remove(void);
+static void probe_install(pTHX);
+static void probe_remove(pTHX);
 
 #define DEBUG 0
 
@@ -44,7 +44,7 @@ void dbg_printf(const char *fmt, ...)
     va_end(args);
 }
 
-static void probe_invoke_callback(const char* file, int line, SV* user_arg, SV* callback)
+static void probe_invoke_callback(pTHX_ const char* file, int line, SV* user_arg, SV* callback)
 {
     int count;
 
@@ -71,7 +71,7 @@ static void probe_invoke_callback(const char* file, int line, SV* user_arg, SV* 
     LEAVE;
 }
 
-static bool probe_lookup(const char* file, int line, int action)
+static bool probe_lookup(pTHX_ const char* file, int line, int action)
 {
     U32 klen = strlen(file);
     char kstr[20];
@@ -102,7 +102,7 @@ static bool probe_lookup(const char* file, int line, int action)
     return false;
 }
 
-static AV* probe_settings(const char* file, int line)
+static AV* probe_settings(pTHX_ const char* file, int line)
 {
     U32 klen = strlen(file);
     char kstr[20];
@@ -153,11 +153,11 @@ static OP* probe_nextstate(pTHX)
         file = CopFILE(PL_curcop);
         line = CopLINE(PL_curcop);
         TRACE(("PROBE check [%s] [%d]\n", file, line));
-        if (!probe_lookup(file, line, PROBE_ACTION_LOOKUP)) {
+        if (!probe_lookup(aTHX_ file, line, PROBE_ACTION_LOOKUP)) {
             break;
         }
 
-        settings = probe_settings(file, line);
+        settings = probe_settings(aTHX_ file, line);
         if (!settings) {
             break;
         }
@@ -169,11 +169,11 @@ static OP* probe_nextstate(pTHX)
 
         INFO(("PROBE triggered [%s] [%d] [%d]\n", file, line, type));
         if (probe_trigger_cb) {
-            probe_invoke_callback(file, line, user_callback_arg, probe_trigger_cb);
+            probe_invoke_callback(aTHX_ file, line, user_callback_arg, probe_trigger_cb);
         }
 
         if (type == PROBE_TYPE_ONCE) {
-            probe_lookup(file, line, PROBE_ACTION_REMOVE);
+            probe_lookup(aTHX_ file, line, PROBE_ACTION_REMOVE);
         }
     } while (0);
 
@@ -189,7 +189,7 @@ static void probe_enable(void)
     probe_enabled = 1;
 }
 
-static void probe_clear(void)
+static void probe_clear(pTHX)
 {
     if (probe_hash) {
         hv_clear(probe_hash);
@@ -199,11 +199,11 @@ static void probe_clear(void)
     INFO(("PROBE cleared\n"));
 }
 
-static void probe_reset(int installed)
+static void probe_reset(pTHX_ int installed)
 {
     probe_installed = installed;
     probe_enabled = 0;
-    probe_clear();
+    probe_clear(aTHX);
     if (probe_trigger_cb) {
         SvREFCNT_dec(probe_trigger_cb);
     }
@@ -224,7 +224,7 @@ static int probe_is_installed(void)
     return probe_installed;
 }
 
-static void probe_install(void)
+static void probe_install(pTHX)
 {
     if (probe_is_installed()) {
         return;
@@ -236,11 +236,11 @@ static void probe_install(void)
         probe_nextstate_orig = PL_ppaddr[OP_NEXTSTATE];
     }
     PL_ppaddr[OP_NEXTSTATE] = probe_nextstate;
-    probe_reset(1);
-    probe_clear();
+    probe_reset(aTHX_ 1);
+    probe_clear(aTHX);
 }
 
-static void probe_remove(void)
+static void probe_remove(pTHX)
 {
     if (!probe_is_installed()) {
         return;
@@ -249,7 +249,7 @@ static void probe_remove(void)
     if (probe_nextstate_orig) {
         PL_ppaddr[OP_NEXTSTATE] = probe_nextstate_orig;
     }
-    probe_reset(0);
+    probe_reset(aTHX_ 0);
 }
 
 MODULE = Devel::Probe        PACKAGE = Devel::Probe
@@ -260,12 +260,12 @@ PROTOTYPES: DISABLE
 void
 install()
 CODE:
-    probe_install();
+    probe_install(aTHX);
 
 void
 remove()
 CODE:
-    probe_remove();
+    probe_remove(aTHX);
 
 int
 is_installed()
@@ -293,7 +293,7 @@ void
 clear()
 CODE:
     probe_disable();
-    probe_clear();
+    probe_clear(aTHX);
 
 HV *
 _internal_probe_state()

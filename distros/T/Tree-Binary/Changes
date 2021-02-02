@@ -1,5 +1,8 @@
 Revision history for Perl extension Tree-Binary.
 
+1.09  2017-07-28T17:29:00
+	- Pull patch to Makefile.PL which sets the minimun Perl version to 5.6.0. Thanx to Lisa Hare.
+
 1.08  2016-07-15T17:39:00
 	- No code changes.
 	- Adopt new repo structure. See

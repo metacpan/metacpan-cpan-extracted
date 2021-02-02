@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQLCSV - SPARQL Results CSV Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQLCSV version 0.028
+This document describes AtteanX::Serializer::SPARQLCSV version 0.029
 
 =head1 SYNOPSIS
 
@@ -22,6 +22,8 @@ This document describes AtteanX::Serializer::SPARQLCSV version 0.028
 
 =item C<< canonical_media_type >>
 
+=item C<< file_extensions >>
+
 =back
 
 =head1 METHODS
@@ -33,7 +35,7 @@ This document describes AtteanX::Serializer::SPARQLCSV version 0.028
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQLCSV 0.028 {
+package AtteanX::Serializer::SPARQLCSV 0.029 {
 	use Moo;
 	use Types::Standard qw(Str ArrayRef);
 	use Encode qw(encode);
@@ -54,6 +56,14 @@ Returns a list of media types that identify the format produced by this serializ
 	sub media_types {
 		return [qw(text/csv)];
 	}
+
+=item C<< file_extensions >>
+
+Returns a list of file extensions associated with the serialized format.
+
+=cut
+
+	sub file_extensions { return [qw(csv)] };
 	
 =item C<< serialize_iter_to_io( $fh, $iterator ) >>
 

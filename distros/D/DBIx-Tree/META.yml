@@ -1,22 +1,24 @@
 ---
 abstract: 'Generate a tree from a self-referential database table'
 author:
-  - 'Ron Savage <ron@savage.net.au>'
+  - 'B Jepson <bjepston@jepstone.net>'
 build_requires:
-  Test::More: '0.94'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
 configure_requires:
-  Module::Build: '0.38'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
-license: artistic_2
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: DBIx-Tree
-provides:
-  DBIx::Tree:
-    file: lib/DBIx/Tree.pm
-    version: '1.97'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Carp: '1.08'
   DBD::SQLite: '1.37'
@@ -27,6 +29,8 @@ requires:
   vars: '0'
   warnings: '0'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
-  repository: https://github.com/ronsavage/DBIx-Tree
-version: '1.97'
+  bugtracker: https://github.com/ronsavage/DBIx-Tree/issues
+  license: http://opensource.org/licenses/Perl
+  repository: https://github.com/ronsavage/DBIx-Tree.git
+version: '1.98'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

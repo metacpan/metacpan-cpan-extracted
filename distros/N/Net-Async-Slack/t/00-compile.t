@@ -6,15 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 101 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 105 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Net/Async/Slack.pm',
+    'Net/Async/Slack/Commands.pm',
     'Net/Async/Slack/Event/AccountsChanged.pm',
     'Net/Async/Slack/Event/AppHomeOpened.pm',
     'Net/Async/Slack/Event/AppMention.pm',
     'Net/Async/Slack/Event/AppRateLimited.pm',
     'Net/Async/Slack/Event/AppUninstalled.pm',
+    'Net/Async/Slack/Event/BlockActions.pm',
     'Net/Async/Slack/Event/Bot.pm',
     'Net/Async/Slack/Event/BotAdded.pm',
     'Net/Async/Slack/Event/BotChanged.pm',
@@ -66,6 +68,7 @@ my @module_files = (
     'Net/Async/Slack/Event/MemberJoinedChannel.pm',
     'Net/Async/Slack/Event/MemberLeftChannel.pm',
     'Net/Async/Slack/Event/Message.pm',
+    'Net/Async/Slack/Event/MessageAction.pm',
     'Net/Async/Slack/Event/MessageAppHome.pm',
     'Net/Async/Slack/Event/MessageChannels.pm',
     'Net/Async/Slack/Event/MessageGroups.pm',
@@ -109,7 +112,8 @@ my @module_files = (
     'Net/Async/Slack/Event/UserTyping.pm',
     'Net/Async/Slack/EventType.pm',
     'Net/Async/Slack/Message.pm',
-    'Net/Async/Slack/RTM.pm'
+    'Net/Async/Slack/RTM.pm',
+    'Net/Async/Slack/Socket.pm'
 );
 
 

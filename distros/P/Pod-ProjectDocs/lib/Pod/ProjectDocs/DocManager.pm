@@ -3,7 +3,7 @@ package Pod::ProjectDocs::DocManager;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';    # VERSION
+our $VERSION = '0.53';    # VERSION
 
 use Moose;
 use Carp();
@@ -12,7 +12,7 @@ use IO::File;
 use Pod::ProjectDocs::Doc;
 
 has 'config' => ( is => 'ro', );
-has 'desc' => (
+has 'desc'   => (
     is  => 'rw',
     isa => 'Str',
 );
@@ -42,7 +42,7 @@ sub _find_files {
     foreach my $dir ( @{ $self->config->libroot } ) {
         foreach my $suffix (@$suffixs) {
             my $wanted = sub {
-                return unless $File::Find::name =~ /\.$suffix$/;
+                return unless $File::Find::name  =~ /\.$suffix$/;
                 ( my $path = $File::Find::name ) =~ s#^\\.##;
                 my ( $fname, $fdir ) =
                   File::Basename::fileparse( $path, qr/\.$suffix/ );
@@ -82,6 +82,8 @@ sub _find_files {
     $self->docs( [ sort { $a->name cmp $b->name } @{ $self->docs } ] );
     return;
 }
+
+no Moose;
 
 1;
 __END__

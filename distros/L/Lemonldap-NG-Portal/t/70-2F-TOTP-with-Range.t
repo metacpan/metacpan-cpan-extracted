@@ -175,7 +175,7 @@ SKIP: {
 
     $query =~ s/user=/user=dwho/;
     $query =~ s/password=/password=dwho/;
-    Time::Fake->offset("+95");
+    Time::Fake->offset("+120");
     ok(
         $res = $client->_post(
             '/',
@@ -196,7 +196,7 @@ SKIP: {
         ),
         'Post code'
     );
-    ok( $res->[2]->[0] =~ /<span trmsg="96"><\/span>/, 'Bad TOTP' )
+    ok( $res->[2]->[0] =~ /<span trmsg="96"><\/span>/, 'Bad TOTP (backward)' )
       or print STDERR Dumper( $res->[2]->[0] );
     Time::Fake->reset;
 
@@ -207,7 +207,7 @@ SKIP: {
 
     $query =~ s/user=/user=dwho/;
     $query =~ s/password=/password=dwho/;
-    Time::Fake->offset("-90");
+    Time::Fake->offset("-120");
     ok(
         $res = $client->_post(
             '/',
@@ -228,7 +228,7 @@ SKIP: {
         ),
         'Post code'
     );
-    ok( $res->[2]->[0] =~ /<span trmsg="96"><\/span>/, 'Bad TOTP' )
+    ok( $res->[2]->[0] =~ /<span trmsg="96"><\/span>/, 'Bad TOTP (forward)' )
       or print STDERR Dumper( $res->[2]->[0] );
 }
 count($maintests);

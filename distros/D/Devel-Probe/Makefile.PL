@@ -21,7 +21,6 @@ WriteMakefile(
     ],
     INC            => '-I.',
     OBJECT         => '$(O_FILES)',
-    CCFLAGS        => ' -std=c89',
     META_MERGE     => {
         'meta-spec' => { version => 2 },
         resources   => {

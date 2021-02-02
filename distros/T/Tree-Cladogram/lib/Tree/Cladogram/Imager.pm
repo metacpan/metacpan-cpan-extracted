@@ -25,7 +25,7 @@ has title_font =>              # Internal.
 	required => 0,
 );
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 # ------------------------------------------------
 
@@ -323,9 +323,9 @@ L<https://github.com/ronsavage/Tree-Cladogram>
 
 =head1 Support
 
-Email the author, or log a bug on RT:
+Bugs should be reported via the CPAN bug tracker at
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Tree::Cladogram>.
+L<https://github.com/ronsavage/Tree-Cladogram/issues>
 
 =head1 Author
 

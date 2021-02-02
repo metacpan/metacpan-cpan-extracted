@@ -13,7 +13,7 @@ use Test::More tests => 24;
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.02';
+	$VERSION = '1.03';
 }
 
 
@@ -35,7 +35,7 @@ isa_ok( $Trivial, 'Config::Tiny::Ordered' );
 ok( scalar keys %$Trivial == 0, '->new returns an empty object' );
 
 # Try to read in a config
-my $Config = Config::Tiny::Ordered->read( 'test.conf' );
+my $Config = Config::Tiny::Ordered->read( 't/test.conf' );
 ok( $Config, '->read returns true' );
 ok( ref $Config, '->read returns a reference' );
 # Legitimate use of UNIVERSAL::isa

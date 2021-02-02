@@ -1,5 +1,14 @@
 Revision history for Finance-Nadex
 
+0.11    1/31/21 15:04
+        Declare additional dependencies
+
+0.10    1/31/21 08:11:59
+        Fix incorrect version in POD
+
+0.09    1/30/21 14:30:22
+        Update distribution to declare dependencies (https://rt.cpan.org/Public/Bug/Display.html?id=134068)
+
 0.08    1/18/21 20:29:10
         Removes the get_quote() method
         Updates internally used retrieval functions for recent Nadex API changes

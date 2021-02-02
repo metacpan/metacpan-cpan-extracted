@@ -1,0 +1,67 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Slack::Socket
+at lib/Net/Async/Slack/Socket.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Slack::Socket - socket-mode notifications for L<https://slack.com>
+
+=head1 DESCRIPTION
+
+This is a basic wrapper for Slack's socket-mode features.
+
+This provides an event stream using websockets.
+
+For a full list of events, see L<https://api.slack.com/events>.
+
+=head1 METHODS
+
+=head2 events
+
+This is the stream of events, as a L<Ryu::Source>.
+
+Example usage:
+
+ $rtm->events
+     ->filter(type => 'message')
+     ->sprintf_methods('> %s', $_->text)
+     ->say
+     ->await;
+
+=head1 METHODS - Internal
+
+You may not need to call these directly. If I'm wrong and you find yourself having
+to do that, please complain via the usual channels.
+
+=head2 connect
+
+Establishes the connection. Called by the top-level L<Net::Async::Slack> instance.
+
+=head2 handle_unfurl_domain
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2016-2021. Licensed under the same terms as Perl itself.
+

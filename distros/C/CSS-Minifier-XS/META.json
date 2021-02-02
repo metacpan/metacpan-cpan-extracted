@@ -29,15 +29,8 @@
          "requires" : {
             "CSS::Compressor" : "0",
             "CSS::Minifier" : "0",
-            "CSS::Packer" : "0",
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::FileFinder::ByName" : "0",
             "Dist::Zilla::PluginBundle::Author::GTERMARS" : "0",
-            "File::Slurp" : "0",
-            "File::Spec" : "0",
-            "File::Temp" : "0",
-            "IO::Handle" : "0",
-            "IPC::Open3" : "0",
             "IPC::Run" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Software::License::Perl_5" : "0",
@@ -48,7 +41,7 @@
             "Test::Kwalitee" : "1.21",
             "Test::LeakTrace" : "0",
             "Test::MinimumVersion" : "0",
-            "Test::More" : "0.94",
+            "Test::More" : "0.88",
             "Test::NoBreakpoints" : "0.15",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
@@ -69,6 +62,9 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::DiagINC" : "0.002",
             "Test::More" : "0.96"
          }
@@ -79,13 +75,14 @@
       "bugtracker" : {
          "web" : "https://github.com/bleargh45/CSS-Minifier-XS/issues"
       },
+      "homepage" : "http://metacpan.org/release/CSS-Minifier-XS/",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/bleargh45/CSS-Minifier-XS.git",
          "web" : "https://github.com/bleargh45/CSS-Minifier-XS"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",

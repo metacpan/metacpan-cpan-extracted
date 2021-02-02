@@ -43,11 +43,13 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::CheckDeps" => "0.010",
     "Test::Deep" => 0,
+    "Test::Fatal" => "0.016",
     "Test::HexString" => 0,
+    "Test::MockModule" => 0,
     "Test::More" => "0.98",
     "Variable::Disposition" => "0.004"
   },
-  "VERSION" => "3.009",
+  "VERSION" => "3.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -76,7 +78,9 @@ my %FallbackPrereqs = (
   "Syntax::Keyword::Try" => "0.21",
   "Test::CheckDeps" => "0.010",
   "Test::Deep" => 0,
+  "Test::Fatal" => "0.016",
   "Test::HexString" => 0,
+  "Test::MockModule" => 0,
   "Test::More" => "0.98",
   "URI" => 0,
   "URI::redis" => 0,

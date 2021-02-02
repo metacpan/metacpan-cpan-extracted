@@ -1,4 +1,3 @@
-
 package Tree::Binary::Search;
 
 use strict;
@@ -15,7 +14,7 @@ use constant EQUAL_TO     =>  0;
 use constant LESS_THAN    => -1;
 use constant GREATER_THAN =>  1;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 ## ----------------------------------------------------------------------------
 ## Tree::Binary::Search
@@ -729,9 +728,11 @@ This module is part of a larger group, which are listed below.
 
 =back
 
-=head1 BUGS
+=head1 SUPPORT
 
-None that I am aware of. Of course, if you find a bug, let me know, and I will be sure to fix it.
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Binary/issues>
 
 =head1 CODE COVERAGE
 

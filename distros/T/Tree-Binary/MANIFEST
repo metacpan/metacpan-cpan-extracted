@@ -17,6 +17,8 @@ README
 scripts/pod2html.sh
 scripts/search.1.pl
 scripts/traverse.1.pl
+t/00.versions.t
+t/00.versions.tx
 t/10_Tree_Binary_test.t
 t/11_Tree_Binary_exceptions_test.t
 t/12_Tree_Binary_clone_test.t

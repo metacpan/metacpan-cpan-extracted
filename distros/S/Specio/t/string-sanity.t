@@ -31,9 +31,6 @@ my $GLOB_OVERLOAD_FH = _T::GlobOverload->new( \*BAR );
 my $LONG_STR_255 = 'x' x 255;
 my $LONG_STR_256 = 'x' x 256;
 
-my $LONG_CODE_255 = '1' x 255;
-my $LONG_CODE_256 = '1' x 256;
-
 my @STRINGS_WITH_VSPACE = map { join $_, qw( foo bar ) } (
     "\n",
     "\r",
@@ -152,7 +149,7 @@ my %tests = (
                 strict
                 _Foo
                 A123::456
-                ),
+            ),
             "Has::Chinese::\x{3403}::In::It"
         ],
         reject => [
@@ -166,7 +163,7 @@ my %tests = (
                 Foo::
                 Foo::Bar::
                 ::Foo
-                ),
+            ),
             'Has::Spaces In It',
         ],
     },

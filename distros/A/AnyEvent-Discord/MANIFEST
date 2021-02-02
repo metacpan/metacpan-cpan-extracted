@@ -8,7 +8,6 @@ README
 README.md
 bin/pod2markdown.sh
 dist.ini
-dist_provides.ini
 doc/AnyEvent-Discord-Payload.md
 doc/AnyEvent-Discord.md
 lib/AnyEvent/Discord.pm

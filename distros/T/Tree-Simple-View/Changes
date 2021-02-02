@@ -1,5 +1,9 @@
 Revision history for Perl extension Tree-Simple-View.
 
+0.20  2021-02-02T12:32:00
+	- Add t/00.*.
+	- Update Makefile.PL and POD to change RT to github.
+
 0.19  2017-04-14:11:13:21
 	- Implement the new Boolean parameter to new, 'html5', to support HTML5 style nested-lists.
 			See https://www.w3.org/wiki/HTML_lists#Nesting_lists.

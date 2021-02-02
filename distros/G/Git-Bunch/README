@@ -3,8 +3,8 @@ NAME
     repos)
 
 VERSION
-    This document describes version 0.627 of Git::Bunch (from Perl
-    distribution Git-Bunch), released on 2020-10-30.
+    This document describes version 0.628 of Git::Bunch (from Perl
+    distribution Git-Bunch), released on 2021-01-31.
 
 SYNOPSIS
     See the included gitbunch script.
@@ -126,6 +126,104 @@ FUNCTIONS
 
     Return value: (any)
 
+  commit_bunch
+    Usage:
+
+     commit_bunch(%args) -> [status, msg, payload, meta]
+
+    Commit all uncommitted repos in the bunch.
+
+    For each git repository in the bunch, will first check whether the repo
+    is "uncommitted" state, which means either has the status of "Needs
+    commit" or "Has untracked files". The default mode is
+    dry-run/simulation. If the "--no-dry-run" flag is not specified, will
+    just show the status of these repos for you. If the "--no-dry-run" (can
+    be as short as "--no-d" or "-N") flag is specified, will 'git add'+'git
+    commit' all these repos with the same commit message for each, specified
+    in "--message" (or just "Committed using 'gitbunch commit'" as the
+    default message).
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   command_opts => *hash*
+
+        Options to pass to IPC::System::Options's system().
+
+    *   exclude_files => *bool*
+
+        Exclude files from processing.
+
+        This only applies to "sync_bunch" operations. Operations like
+        "check_bunch" and "exec_bunch" already ignore these and only operate
+        on git repos.
+
+    *   exclude_non_git_dirs => *bool*
+
+        Exclude non-git dirs from processing.
+
+        This only applies to and "sync_bunch" operations. Operations like
+        "check_bunch" and "exec_bunch" already ignore these and only operate
+        on git repos.
+
+    *   exclude_repos => *array[str]*
+
+        Exclude some repos from processing.
+
+    *   exclude_repos_pat => *str*
+
+        Specify regex pattern of repos to exclude.
+
+    *   include_repos => *array[str]*
+
+        Specific git repos to sync, if not specified all repos in the bunch
+        will be processed.
+
+    *   include_repos_pat => *str*
+
+        Specify regex pattern of repos to include.
+
+    *   message => *str* (default: "Committed using 'gitbunch commit'")
+
+        Commit message.
+
+    *   min_repo_access_time => *date*
+
+        Limit to repos that are accessed (mtime, committed, status-ed,
+        pushed) recently.
+
+        This can significantly reduce the time to process the bunch if you
+        are only interested in recent repos (which is most of the time
+        unless you are doing a full check/sync).
+
+    *   repo => *str*
+
+        Only process a single repo.
+
+    *   source* => *str*
+
+        Directory to check.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   exec_bunch
     Usage:
 
@@ -145,6 +243,10 @@ FUNCTIONS
     *   command* => *str*
 
         Command to execute.
+
+    *   command_opts => *hash*
+
+        Options to pass to IPC::System::Options's system().
 
     *   exclude_files => *bool*
 
@@ -495,8 +597,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014,
-    2013, 2012, 2011 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015,
+    2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

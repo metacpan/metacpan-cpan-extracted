@@ -3,7 +3,7 @@ package Tree::Simple::Visitor::FromNestedHash;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Scalar::Util qw(blessed);
 
@@ -150,21 +150,31 @@ It makes not sense to create a tree out of nothing, so it is assumed that this i
 
 =item The hash tree must be a single rooted tree.
 
-The hash tree should have only one key in it's first level, if it has more than one, then it is not a single rooted tree.
+The hash tree should have only one key in the first level. If it has more than one, then it is not a
+single rooted tree.
 
 =back
 
-B<NOTE:> Hash keys are sorted ascii-betically before being added to the tree, this results in a somewhat more predictable hierarchy.
+B<NOTE:> Hash keys are sorted ascii-betically before being added to the tree, this results in a
+somewhat more predictable hierarchy.
 
 =item B<visit ($tree)>
 
-This is the method that is used by Tree::Simple's C<accept> method. It can also be used on its own, it requires the C<$tree> argument to be a Tree::Simple object (or derived from a Tree::Simple object), and will throw and exception otherwise.
+This is the method that is used by the Tree::Simple C<accept> method. It can also be used on its
+own,  it requires the C<$tree> argument to be a Tree::Simple object (or derived from a
+Tree::Simple object), and will throw and exception otherwise.
 
 =back
 
-=head1 BUGS
+=head1 Repository
 
-None that I am aware of. Of course, if you find a bug, let me know, and I will be sure to fix it.
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory>
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory/issues>
 
 =head1 CODE COVERAGE
 

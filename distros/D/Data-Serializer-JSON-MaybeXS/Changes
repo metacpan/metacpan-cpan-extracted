@@ -1,5 +1,11 @@
 Revision history for Perl extension Data-Serializer-JSON-MaybeXS.
 
+0.03 2021-01-30T05:40:02Z
+
+ - Provide a .editorconfig instead of .lvimrc.
+ - Require perl 5.8.1.
+ - Simplify VERSION declarations.
+
 0.02 2019-02-18T06:23:46Z
 
  - Migrate all the tests from Test::More to Test2::V0.

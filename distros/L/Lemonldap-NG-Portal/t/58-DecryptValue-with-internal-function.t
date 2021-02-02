@@ -43,8 +43,8 @@ count(1);
 my $id = expectCookie($res);
 expectRedirection( $res, 'http://auth.example.com/' );
 
-# DecryptValue form for a foridden user
-# ------------------------
+# DecryptValue form for a forbidden user
+# --------------------------------------
 ok(
     $res = $client->_get(
         '/decryptvalue',
@@ -128,7 +128,7 @@ count(2);
 ( $host, $url, $query ) =
   expectForm( $res, undef, '/decryptvalue', 'cipheredValue', 'token' );
 
-# invalid ciphered value
+# Invalid ciphered value
 $query =~ s%cipheredValue=%cipheredValue=test%;
 ok(
     $res = $client->_post(
@@ -146,6 +146,41 @@ ok( $res->[2]->[0] =~ m%<span trspan="notAnEncryptedValue">%,
 count(2);
 ( $host, $url, $query ) =
   expectForm( $res, undef, '/decryptvalue', 'cipheredValue', 'token' );
+
+# No token
+$query = 'cipheredValue=test';
+ok(
+    $res = $client->_post(
+        '/decryptvalue',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+        accept => 'text/html',
+    ),
+    'POST decryptvalue without token'
+);
+ok( $res->[2]->[0] =~ m%<span trspan="PE81"></span>%, 'Found PE_NOTOKEN' )
+  or explain( $res->[2]->[0], 'trspan="PE81"' );
+count(2);
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/decryptvalue', 'cipheredValue', 'token' );
+
+# Expired token
+Time::Fake->offset("+5m");
+$query =~ s%cipheredValue=%cipheredValue=test%;
+ok(
+    $res = $client->_post(
+        '/decryptvalue',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+        accept => 'text/html',
+    ),
+    'POST decryptvalue with an expired token'
+);
+ok( $res->[2]->[0] =~ m%<span trspan="PE82"></span>%, 'Found PE_TOKENEXPIRED' )
+  or explain( $res->[2]->[0], 'trspan="PE82"' );
+count(2);
 
 $client->logout($id);
 clean_sessions();

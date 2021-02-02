@@ -1,5 +1,10 @@
 Revision history for Perl extension Config-Locale.
 
+0.10 2021-01-30T03:20:16Z
+
+ - Provide a .editorconfig instead of .lvimrc.
+ - Add SUPPORT section to the docs.
+
 0.09 2019-02-20T22:47:02Z
 
  - Remove strictures use entirely.

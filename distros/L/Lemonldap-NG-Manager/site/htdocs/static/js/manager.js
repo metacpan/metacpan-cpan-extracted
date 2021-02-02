@@ -898,6 +898,7 @@ This file contains:
         }).then(function(response) {
           currentNode.data[0].data = response.data["private"];
           currentNode.data[1].data = response.data["public"];
+          currentNode.data[2].data = response.data.hash;
           return $scope.waiting = false;
         }, readError);
       };

@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_DECRYPTVALUE_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -38,6 +38,10 @@ sub init {
         $self->p->buildRule( $self->conf->{decryptValueRule}, 'decryptValue' )
     );
     return 0 unless $self->rule;
+
+    # Add warning in log
+    $self->logger->warn(
+        "DecryptValue plugin is enabled. You are using a beta version!");
 
     return 1;
 }
@@ -92,11 +96,13 @@ sub run {
             $msg   = PE_NOTOKEN;
             $token = $self->ott->createToken();
         }
-
-        unless ( $self->ott->getToken($token) ) {
-            $self->userLogger->warn('decryptValue try with expired/bad token');
-            $msg   = PE_TOKENEXPIRED;
-            $token = $self->ott->createToken();
+        else {
+            unless ( $self->ott->getToken($token) ) {
+                $self->userLogger->warn(
+                    'decryptValue try with expired/bad token');
+                $msg   = PE_TOKENEXPIRED;
+                $token = $self->ott->createToken();
+            }
         }
 
         my $params = {

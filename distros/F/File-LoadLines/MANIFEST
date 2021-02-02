@@ -10,6 +10,7 @@ t/12-basic.t
 t/20-encoding.t
 t/21-encoding.t
 t/22-encoding.t
+t/29-encoding.t
 t/test_.dat
 t/test0.dat
 t/test1.dat
@@ -21,5 +22,6 @@ t/test6.dat
 t/test7.dat
 t/test8.dat
 t/test9.dat
+t/testW.dat
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -266,6 +266,7 @@
 "rightsReloadNeedsLogout": "Le rechargement des droits nécessite une déconnexion",
 "scope": "Informations",
 "search":"Chercher",
+"searchAccount":"Chercher un compte",
 "seconds":"secondes",
 "selectIdP":"Choisissez votre fournisseur d'identité",
 "service":"Service",

@@ -1,6 +1,13 @@
 Revision history for Perl extension Crypt::PasswdMD5.
 
-1.40  2013-09-30 15:32:00
+1.41  2021-02-01T15:56:00
+	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Reformat Makefile.PL.
+	- Add t/00.*.
+	- Update POD to change RT to github.
+
+1.40  2013-09-30T15:32:00
 	- No code changes.
 	- Maintenance by Ron Savage <rsavage@cpan.org>.
 	- Fabricate some version #s for this file.
@@ -18,12 +25,12 @@ Revision history for Perl extension Crypt::PasswdMD5.
 		With thanx. See RT#37036.
 	- Add xt/author/pod.t.
 
-1.30  2004-02-17 11:21:38
+1.30  2004-02-17T11:21:38
 	- luismunoz@cpan.org.
 	- Modified the POD so that ABSTRACT can work.
 	- Added usage example for apache_md5_crypt().
 
-1.20  2004-02-17 11:04:35
+1.20  2004-02-17T11:04:35
 	- luismunoz@cpan.org.
 	- Added patch for random salts from John Peacock (Thanks John!).
 	- De-MS-DOS-ified the file.
@@ -45,5 +52,5 @@ Revision history for Perl extension Crypt::PasswdMD5.
 	- Added apache_md5_crypt to create a valid hash for use in .htpasswd files.
 
 1.00  1998-07-10
-	- Luis E. Muñoz <luismunoz@cpan.org>.
+	- Luis E. Munoz <luismunoz@cpan.org>.
 	- Initial release.

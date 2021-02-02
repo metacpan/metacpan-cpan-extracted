@@ -3,7 +3,7 @@ package Tree::Simple::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Scalar::Util qw(blessed);
 
@@ -345,15 +345,21 @@ am not sure.
 
 =back
 
+=head1 Repository
+
+L<https://github.com/ronsavage/Tree-Simple.git>
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple/issues>
+
 =head1 AUTHOR
 
 stevan little, E<lt>stevan@iinteractive.comE<gt>
 
 Ron Savage E<lt>ron@savage.net.auE<gt> is co-maint as of V 0.19.
-
-=head1 REPOSITORY
-
-L<https://github.com/ronsavage/Tree-Simple-View>.
 
 =head1 COPYRIGHT AND LICENSE
 

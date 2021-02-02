@@ -5,7 +5,7 @@
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.3.9';
+our	$VERSION = '4.4.1';
 use	strict;
 use	warnings;
 use Encode;
@@ -197,8 +197,7 @@ closedir DIR;
 				}
 				else {
 				$plg->Format->{to}='json';
-				$plg->error("Format $_ ".$app->request->query_parameters->{$_}.' is not one of the supported : '. join(', ',keys %Formats));
-				$app->halt($plg->reply)
+				$app->halt($plg->reply('error'=>"Format parameter $_ ( ".$app->request->query_parameters->{$_}.' ) is not one of the :'. join(', ',keys %Formats)))
 				}
 			}
 			else {
@@ -248,13 +247,23 @@ closedir DIR;
 			}
 		}
 
-	# Delete not needed url parameters
+		# Do not proceed if the posted data are not hash
+		if ('HASH' ne ref $plg->{data}) {
+
+			if ('ARRAY' eq ref $plg->{data}) {
+			$plg->{data} = { data => $plg->{data} }
+			}
+			else {
+			$app->halt($plg->reply('error'=>'Posted data are not keys or list'))
+			}
+		}
+
+	# Delete not needed control url parameters
 	delete $app->request->query_parameters->{$_} foreach qw/from to sort pretty message/;
 
-	# We add to the data also any url parameter the user pass
+	# Use as data any url parameter
 	foreach (keys %{$app->request->query_parameters}) { $plg->data->{$_} = $app->request->query_parameters->{$_} }
 	}));
-
 
 
 
@@ -751,21 +760,22 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.3.9
+version 4.4.1
 
 =head2 SYNOPSIS
 
-The replies through this module have the extra key B<error> . At success B<error> is 0 , while at fail is the error description
+The replies have the extra key B<error> . At success B<error> is 0 , while at fail is the error message
+
+The posted keys can be placed as url parameters if wanted
 
 =head2 Routes
 
-  GET  WebService/about
-  GET  WebService/version
   POST ViewKeysAll
   POST ViewKeysSome    {"k1":"v1"}
   POST login           {"username":"joe", "password":"souvlaki"}
+  POST login?username=joe&password=souvlaki
   POST ProtectStore    {"token":"2d85b82b158e", "k1":"v1", "k2":"v2"}
-  POST ProtectdDelete  {"token":"2d85b82b158e"}
+  POST ProtectDelete   {"token":"2d85b82b158e"}
   POST ProtectRead     {"token":"2d85b82b158e"}
   POST logout          {"token":"2d85b82b158e"}
 
@@ -777,10 +787,10 @@ The replies through this module have the extra key B<error> . At success B<error
 
   post '/ViewKeysAll'    => sub { reply   PostData };
   post '/ViewKeysSome'   => sub { reply   PostData('k1','k2') };
-  get  '/data1'          => sub { reply  'k1'=>'v1','k2'=>'v2' };
-  get  '/data2'          => sub { reply {'k1'=>'v1','k2'=>'v2'}};
-  any  '/data3'          => sub { my %H = PostData('k1'); reply 'foo'=> $H{k1} };
-  get  '/error'          => sub { reply 'k1', 'v1', 'error', 'oups' };
+  any  '/r3'             => sub { my %H = PostData('k1'); reply 'foo'=> $H{k1} };
+  get  '/r1'             => sub { reply  'k1'=>'v1','k2'=>'v2' };
+  get  '/r2'             => sub { reply {'k1'=>'v1','k2'=>'v2'}};
+  get  '/error'          => sub { reply  'k1', 'v1', 'error', 'oups' };
   any  '/ProtectStore'   => sub { reply SessionSet('s1'=>'sv1', 's2'=>'v1') };
   post '/ProtectdDelete' => sub { reply SessionDel('s1', 's2') };
   any  '/ProtectRead'    => sub { reply SessionGet('s1', 's2') };
@@ -812,13 +822,12 @@ I<from> default is the I<config.yml> property
 
   GET  /SomeRoute?to=human&sort=true&pretty=true
   GET  /SomeRoute?to=perl&sort=true&pretty=false
-
-  POST /SomeRoute?to=xml&sort=true'       {"k1":"v1"}
-  POST /SomeRoute?to=yaml'                {"k1":"v1"}
-  POST /SomeRoute?to=perl'                {"k1":"v1"}
-  POST /SomeRoute?from=json;to=human'     {"k1":"v1"}
-  POST /SomeRoute?from=xml;to=human'      <Data><k1>v1</k1></Data>
-  POST /SomeRoute?from=xml;to=yaml'       <Data><k1>v1</k1></Data>
+  POST /SomeRoute?to=xml&sort=true'      {"k1":"v1"}
+  POST /SomeRoute?to=yaml'               {"k1":"v1"}
+  POST /SomeRoute?to=perl'               {"k1":"v1"}
+  POST /SomeRoute?from=json;to=human'    {"k1":"v1"}
+  POST /SomeRoute?from=xml;to=human'     <Data><k1>v1</k1></Data>
+  POST /SomeRoute?from=xml;to=yaml'      <Data><k1>v1</k1></Data>
 
 =head2 Built in routes
 
@@ -991,9 +1000,9 @@ At production enviroments, probably you want to use an external auth script e.g 
 
 The protected routes, at  config.yml  have   Protected:true and their required groups e.g.  Groups:[grp1,grp2 ...]
 
-The user must be member to all the route Groups otherelse the route will not run.
+The user must be member to all the route Groups
 
-If the route's Groups list is empty or missing, the route will run with any valid token ignoring the user's group membership.
+If the route's Groups list is empty or missing, the route will run with any valid token ignoring the group
 
 This is usefull because you can have role based access control at your routes.
 Every user with its token will be able to access only the routes is assigned to.

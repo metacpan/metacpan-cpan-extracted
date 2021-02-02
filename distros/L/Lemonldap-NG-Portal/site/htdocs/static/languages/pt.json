@@ -266,6 +266,7 @@
 "rightsReloadNeedsLogout":"Rights reloads need to logout and login again",
 "scope":"Scope",
 "search":"Search",
+"searchAccount":"Search for account",
 "seconds":"seconds",
 "selectIdP":"Select your Identity Provider",
 "service":"Service",

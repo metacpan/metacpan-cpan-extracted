@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -389,7 +389,7 @@ sub display {
             REGISTER_URL   => $self->conf->{registerUrl},
             HIDDEN_INPUTS  => $self->buildHiddenForm($req),
             STAYCONNECTED  => $self->conf->{stayConnected},
-            SPOOFID        => $self->conf->{impersonationRule},
+            IMPERSONATION  => $self->conf->{impersonationRule},
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -479,6 +479,18 @@ sub display {
 
         # Display authentication form
         else {
+            my $plugin =
+              $self->loadedModules->{
+                "Lemonldap::NG::Portal::Plugins::FindUser"};
+            my $fields = [];
+            if (   $plugin
+                && $self->conf->{findUser}
+                && $self->conf->{impersonationRule}
+                && $self->conf->{findUserSearchingAttributes} )
+            {
+                $login  = $req->data->{findUser};
+                $fields = $plugin->buildForm();
+            }
 
             # Authentication loop
             if ( $self->conf->{authentication} eq 'Choice'
@@ -493,6 +505,9 @@ sub display {
                     DISPLAY_FORM         => 0,
                     DISPLAY_OPENID_FORM  => 0,
                     DISPLAY_YUBIKEY_FORM => 0,
+                    FIELDS               => $fields,
+                    SPOOFID              => $login,
+                    FINDUSER             => scalar @$fields
                 );
             }
 
@@ -523,13 +538,13 @@ sub display {
                     AUTH_LOOP => [],
                     PORTAL_URL =>
                       ( $displayType eq "logo" ? $self->conf->{portal} : 0 ),
-                    MSG => $req->info(),
+                    MSG      => $req->info(),
+                    FIELDS   => $fields,
+                    SPOOFID  => $login,
+                    FINDUSER => scalar @$fields
                 );
-
             }
-
         }
-
     }
 
     if ( $req->data->{waitingMessage} ) {

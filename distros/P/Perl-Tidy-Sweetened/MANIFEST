@@ -6,6 +6,19 @@ META.json
 META.yml
 README
 TODO
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Algorithm-Diff-1.1903/MYMETA.json
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Capture-Tiny-0.36/MYMETA.json
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Class-Data-Inheritable-0.08/MYMETA.json
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Devel-StackTrace-2.01/MYMETA.json
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Exception-Class-1.40/MYMETA.json
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Perl-Tidy-20210111/MYMETA.json
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Sub-Uplevel-0.25/MYMETA.json
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Test-Deep-1.120/MYMETA.json
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Test-Differences-0.64/MYMETA.json
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Test-Exception-0.43/MYMETA.json
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Test-Most-0.34/MYMETA.json
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Test-Warn-0.30/MYMETA.json
+ci/local-docker/lib/perl5/x86_64-linux-gnu-thread-multi/.meta/Text-Diff-1.44/MYMETA.json
 cpanfile
 lib/Perl/Tidy/Sweet.pm
 lib/Perl/Tidy/Sweetened.pm
@@ -30,6 +43,7 @@ t/moosex-role-parameterized.t
 t/p5-mop.t
 t/perl-signatures.t
 test-all
+versions
 xt/check-changes.t
 xt/critic.t
 xt/fixme.t

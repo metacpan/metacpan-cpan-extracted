@@ -1,4 +1,0 @@
-/* "zero" should not have units dropped when used inside of a function */
-.foo { width:         calc(300px - 0px) }
-.bar { width:    -moz-calc(300px - 0px) }
-.baz { width: -webkit-calc(300px - 0px) }

@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2020-10-30'; # DATE
-our $VERSION = '0.627'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-31'; # DATE
+our $DIST = 'Git-Bunch'; # DIST
+our $VERSION = '0.628'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,10 +14,11 @@ use Perinci::CmdLine::Any;
 Perinci::CmdLine::Any->new(
     url => '/Git/Bunch/',
     subcommands => {
+        check  => { url => '/Git/Bunch/check_bunch' },
+        commit => { url => '/Git/Bunch/commit_bunch' },
+        exec   => { url => '/Git/Bunch/exec_bunch' },
         ls     => { url => '/Git/Bunch/list_bunch_contents' },
-        check  => { url => '/Git/Bunch/check_bunch'  },
-        sync   => { url => '/Git/Bunch/sync_bunch'   },
-        exec   => { url => '/Git/Bunch/exec_bunch'   },
+        sync   => { url => '/Git/Bunch/sync_bunch' },
     },
     log => 1,
 )->run;
@@ -36,7 +39,7 @@ gitbunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.627 of gitbunch (from Perl distribution Git-Bunch), released on 2020-10-30.
+This document describes version 0.628 of gitbunch (from Perl distribution Git-Bunch), released on 2021-01-31.
 
 =head1 SYNOPSIS
 
@@ -92,6 +95,20 @@ Will perform a 'git status' for each git repositories inside the bunch and
 report which repositories are clean/unclean.
 
 Will die if can't chdir into bunch or git repository.
+
+
+=head2 B<commit>
+
+Commit all uncommitted repos in the bunch.
+
+For each git repository in the bunch, will first check whether the repo is
+"uncommitted" state, which means either has the status of "Needs commit" or "Has
+untracked files". The default mode is dry-run/simulation. If the C<--no-dry-run>
+flag is not specified, will just show the status of these repos for you. If the
+C<--no-dry-run> (can be as short as C<--no-d> or C<-N>) flag is specified, will
+'git add'+'git commit' all these repos with the same commit message for each,
+specified in C<--message> (or just "Committed using 'gitbunch commit'" as the
+default message).
 
 
 =head2 B<exec>
@@ -284,6 +301,12 @@ interested in recent repos (which is most of the time unless you are doing a
 full check/sync).
 
 
+=item B<--recent>
+
+Shortcut for --min-repo-access-time="2 weeks ago".
+
+See C<--min-repo-access-time>.
+
 =item B<--repo>=I<s>
 
 Only process a single repo.
@@ -292,11 +315,128 @@ Only process a single repo.
 
 Directory to check.
 
+=item B<-r>
+
+Shortcut for --min-repo-access-time="2 weeks ago".
+
+See C<--min-repo-access-time>.
+
+=back
+
+=head2 Options for subcommand commit
+
+=over
+
+=item B<--command-opts-json>=I<s>
+
+Options to pass to IPC::System::Options's system() (JSON-encoded).
+
+See C<--command-opts>.
+
+=item B<--command-opts>=I<s>
+
+Options to pass to IPC::System::Options's system().
+
+=item B<--exclude-files>
+
+Exclude files from processing.
+
+This only applies to `sync_bunch` operations. Operations like `check_bunch` and
+`exec_bunch` already ignore these and only operate on git repos.
+
+
+=item B<--exclude-non-git-dirs>
+
+Exclude non-git dirs from processing.
+
+This only applies to and `sync_bunch` operations. Operations like `check_bunch`
+and `exec_bunch` already ignore these and only operate on git repos.
+
+
+=item B<--exclude-repos-json>=I<s>
+
+Exclude some repos from processing (JSON-encoded).
+
+See C<--exclude-repos>.
+
+=item B<--exclude-repos-pat>=I<s>
+
+Specify regex pattern of repos to exclude.
+
+=item B<--exclude-repos>=I<s@>
+
+Exclude some repos from processing.
+
+Can be specified multiple times.
+
+=item B<--include-repos-json>=I<s>
+
+Specific git repos to sync, if not specified all repos in the bunch will be processed (JSON-encoded).
+
+See C<--include-repos>.
+
+=item B<--include-repos-pat>=I<s>
+
+Specify regex pattern of repos to include.
+
+=item B<--include-repos>=I<s@>
+
+Specific git repos to sync, if not specified all repos in the bunch will be processed.
+
+Can be specified multiple times.
+
+=item B<--message>=I<s>, B<-m>
+
+Commit message.
+
+Default value:
+
+ "Committed using 'gitbunch commit'"
+
+=item B<--min-repo-access-time>=I<s>
+
+Limit to repos that are accessed (mtime, committed, status-ed, pushed) recently.
+
+This can significantly reduce the time to process the bunch if you are only
+interested in recent repos (which is most of the time unless you are doing a
+full check/sync).
+
+
+=item B<--recent>
+
+Shortcut for --min-repo-access-time="2 weeks ago".
+
+See C<--min-repo-access-time>.
+
+=item B<--repo>=I<s>
+
+Only process a single repo.
+
+=item B<--source>=I<s>*
+
+Directory to check.
+
+=item B<-r>
+
+Shortcut for --min-repo-access-time="2 weeks ago".
+
+See C<--min-repo-access-time>.
+
 =back
 
 =head2 Options for subcommand exec
 
 =over
+
+=item B<--command-opts-json>=I<s>
+
+Options to pass to IPC::System::Options's system() (JSON-encoded).
+
+See C<--command-opts>.
+
+=item B<--command-opts>=I<s>
+
+Options to pass to IPC::System::Options's system().
 
 =item B<--command>=I<s>*
 
@@ -359,6 +499,12 @@ interested in recent repos (which is most of the time unless you are doing a
 full check/sync).
 
 
+=item B<--recent>
+
+Shortcut for --min-repo-access-time="2 weeks ago".
+
+See C<--min-repo-access-time>.
+
 =item B<--repo>=I<s>
 
 Only process a single repo.
@@ -366,6 +512,12 @@ Only process a single repo.
 =item B<--source>=I<s>*
 
 Directory to check.
+
+=item B<-r>
+
+Shortcut for --min-repo-access-time="2 weeks ago".
+
+See C<--min-repo-access-time>.
 
 =back
 
@@ -434,6 +586,12 @@ interested in recent repos (which is most of the time unless you are doing a
 full check/sync).
 
 
+=item B<--recent>
+
+Shortcut for --min-repo-access-time="2 weeks ago".
+
+See C<--min-repo-access-time>.
+
 =item B<--repo>=I<s>
 
 Only process a single repo.
@@ -449,6 +607,12 @@ Valid values:
 =item B<--source>=I<s>*
 
 Directory to check.
+
+=item B<-r>
+
+Shortcut for --min-repo-access-time="2 weeks ago".
+
+See C<--min-repo-access-time>.
 
 =back
 
@@ -559,6 +723,12 @@ interested in recent repos (which is most of the time unless you are doing a
 full check/sync).
 
 
+=item B<--recent>
+
+Shortcut for --min-repo-access-time="2 weeks ago".
+
+See C<--min-repo-access-time>.
+
 =item B<--repo>=I<s>
 
 Only process a single repo.
@@ -600,6 +770,12 @@ Directory to check.
 =item B<--target>=I<s>*
 
 Destination bunch.
+
+=item B<-r>
+
+Shortcut for --min-repo-access-time="2 weeks ago".
+
+See C<--min-repo-access-time>.
 
 =back
 
@@ -653,22 +829,7 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
-
- [plugin=DumpArgs]
- -event=before_validate_args
- -prio=99
- 
- [plugin=Foo]
- -event=after_validate_args
- arg1=val1
- arg2=val2
-
- 
-
-which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
 
 List of available configuration parameters:
 
@@ -690,9 +851,24 @@ List of available configuration parameters:
  repo (see --repo)
  source (see --source)
 
+=head2 Configuration for subcommand commit
+
+ command_opts (see --command-opts)
+ exclude_files (see --exclude-files)
+ exclude_non_git_dirs (see --exclude-non-git-dirs)
+ exclude_repos (see --exclude-repos)
+ exclude_repos_pat (see --exclude-repos-pat)
+ include_repos (see --include-repos)
+ include_repos_pat (see --include-repos-pat)
+ message (see --message)
+ min_repo_access_time (see --min-repo-access-time)
+ repo (see --repo)
+ source (see --source)
+
 =head2 Configuration for subcommand exec
 
  command (see --command)
+ command_opts (see --command-opts)
  exclude_files (see --exclude-files)
  exclude_non_git_dirs (see --exclude-non-git-dirs)
  exclude_repos (see --exclude-repos)
@@ -788,7 +964,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

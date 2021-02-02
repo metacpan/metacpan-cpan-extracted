@@ -12,7 +12,7 @@ use vars qw(@EXPORT @ISA);
 @EXPORT = ('config_manifold');
 @ISA    = ('Exporter');
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # --------------------------------------------------
 
@@ -185,6 +185,10 @@ My paper dictionary lists 8 meanings. The first 2 are:
 
 So, rather like sections in a *.ini file...
 
+=head1 Repository
+
+L<https://github.com/ronsavage/Config-Plugin-TinyManifold.git>
+
 =head1 See Also
 
 L<CGI::Application>
@@ -228,9 +232,9 @@ L<CGI::Application::Plugin::Config::Simple>.
 
 =head1 Support
 
-Email the author, or log a bug on RT:
+Bugs should be reported via the CPAN bug tracker at
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config::Plugin::TinyManifold>.
+L<https://github.com/ronsavage/Config-Plugin-TinyManifold/issues>
 
 =head1 Author
 

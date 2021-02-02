@@ -7,8 +7,8 @@ use Moo;
 use Types::Standard -all;
 use GraphQL::Type::Library -all;
 use GraphQL::Debug qw(_debug);
-use Function::Parameters;
-use Return::Type;
+use GraphQL::MaybeTypeCheck;
+
 extends qw(GraphQL::Type);
 with qw(
   GraphQL::Role::Input
@@ -109,9 +109,10 @@ method is_valid(Any $item) :ReturnType(Bool) {
   !!$self->_value2name->{$item};
 }
 
-method graphql_to_perl(Maybe[Str] $item) {
+method graphql_to_perl(Maybe[Str | ScalarRef] $item) {
   DEBUG and _debug('graphql_to_perl', $item, $self->_name2value);
   return undef if !defined $item;
+  $item = $$$item if ref($item) eq 'REF'; # Handle unquoted enum values
   $self->_name2value->{$item} // die "Expected type '@{[$self->to_string]}', found $item.\n";
 }
 

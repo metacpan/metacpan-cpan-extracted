@@ -6,7 +6,7 @@ use strict;
 
 # Warning: There is another version line, in t/02.main.t.
 
-our $VERSION = '2.24';
+our $VERSION = '2.26';
 
 BEGIN {
 	require 5.008001; # For the utf8 stuff.
@@ -415,7 +415,7 @@ L<https://github.com/ronsavage/Config-Tiny.git>
 
 Bugs should be reported via the CPAN bug tracker at
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-Tiny>
+L<https://github.com/ronsavage/Config-Tiny/issues>
 
 For other issues, or commercial enhancement or support, contact the author.
 

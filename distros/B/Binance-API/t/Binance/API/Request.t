@@ -25,11 +25,23 @@
 use strict;
 use warnings;
 
+use Test::MockModule;
 use Test::More tests => 1;
 use Test::Warn;
 use Data::Dumper;
 use Binance::API::Logger;
 use Binance::API::Request;
+
+# Mock Binance::API::Request::_exec in order to avoid executing a real http
+# request. Instead return whatever we pass to the api_result method.
+my $mock = Test::MockModule->new('Binance::API::Request');
+sub api_result {
+    my $expected_result = shift;
+    $mock->redefine('_exec', sub {
+        return $expected_result;
+    });
+}
+api_result({ 1 => 2 });
 
 subtest '_init() tests' => sub {
     plan tests => 2;

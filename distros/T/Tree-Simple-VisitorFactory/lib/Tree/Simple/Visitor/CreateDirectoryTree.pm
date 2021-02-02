@@ -3,7 +3,7 @@ package Tree::Simple::Visitor::CreateDirectoryTree;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use File::Spec;
 use Scalar::Util qw(blessed);
@@ -91,7 +91,7 @@ Tree::Simple::Visitor::CreateDirectoryTree - A Visitor for create a set of direc
   use Tree::Simple::Visitor::CreateDirectoryTree;
 
   # create a Tree::Simple object which
-  # represents a directory heirarchy
+  # represents a directory hierarchy
   my $tree = Tree::Simple->new("www/")
                     ->addChildren(
                         Tree::Simple->new("conf/")
@@ -134,15 +134,26 @@ This method accepts a CODE reference as its C<$filter_function> argument and thr
 
 =item B<setFileHandler ($file_handler)>
 
-This method accepts a CODE reference as its C<$file_handler> argument and throws an exception if it is not a CODE reference. This method can be used to create custom file creation behavior. The default behavior is to just create the file and nothing else, but by using this method it is possible to implement some other custom behavior, such as creating a file based on a template. The function is passed the full path of the file to be created (as built by File::Spec).
+This method accepts a CODE reference as its C<$file_handler> argument and throws an exception
+if it is not a CODE reference. This method can be used to create custom file creation behavior.
+The default behavior is to just create the file and nothing else, but by using this method it
+is possible to implement some other custom behavior, such as creating a file based on a template.
+The function is passed the full path of the file to be created (as built by File::Spec).
 
 =item B<setDirectoryHandler ($dir_handler)>
 
-This method accepts a CODE reference as its C<$dir_handler> argument and throws an exception if it is not a CODE reference. This method can be used to create custom directory creation behavior. The default behavior is to just create the directory and nothing else, but by using this method it is possible to implement some other custom behavior, such as creating a directory on a remote server. The function is passed the full path of the directory to be created (as built by File::Spec).
+This method accepts a CODE reference as its C<$dir_handler> argument and throws an exception
+if it is not a CODE reference. This method can be used to create custom directory creation behavior.
+The default behavior is to just create the directory and nothing else, but by using this method it
+is possible to implement some other custom behavior, such as creating a directory on a remote
+server. The function is passed the full path of the directory to be created (as built by
+File::Spec).
 
 =item B<visit ($tree)>
 
-This is the method that is used by Tree::Simple's C<accept> method. It can also be used on its own, it requires the C<$tree> argument to be a Tree::Simple object (or derived from a Tree::Simple object), and will throw and exception otherwise.
+This is the method that is used by the Tree::Simple C<accept> method. It can also be used on its own,
+it requires the C<$tree> argument to be a Tree::Simple object (or derived from a Tree::Simple object),
+and will throw and exception otherwise.
 
 The tree is processed as follows:
 
@@ -152,9 +163,13 @@ The tree is processed as follows:
 
 Obviously since files themselves are leaf nodes, this makes sense that non-leaves will be directories.
 
-=item Any node (including leaf nodes) which ends in either the character C</> or C<\> is considered a directory.
+=item Any node (including leaf nodes) which ends in either the character C</> or C<\> is considered a
+directory.
 
-I think it is a pretty standard convention to have directory names ending in a separator. The separator itself is stripped off before the directory name is passed to File::Spec where the platform specific directory path is created. This means that it does not matter which one you use, it will be completely cross platform (at least as cross-platform as File::Spec is).
+I think it is a pretty standard convention to have directory names ending in a separator. The
+separator itself is stripped off before the directory name is passed to File::Spec where the
+platform specific directory path is created. This means that it does not matter which one you use,
+it will be completely cross platform (at least as cross-platform as File::Spec is).
 
 =item All other nodes are considered to be files.
 
@@ -162,9 +177,15 @@ I think it is a pretty standard convention to have directory names ending in a s
 
 =back
 
-=head1 BUGS
+=head1 Repository
 
-None that I am aware of. Of course, if you find a bug, let me know, and I will be sure to fix it.
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory>
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory/issues>
 
 =head1 CODE COVERAGE
 

@@ -1,5 +1,9 @@
 Changes for Perl::Tidy::Sweetend
 
+1.18 - Sun Jan 31 12:24:35 EST 2021
+    Fixes tests to handle more changes in spacing in Perl::Tidy versions
+    [Only changes tests. No need to upgrade.]
+
 1.17 - Sun Jan 24 11:36:21 EST 2021
     Handles errors in closing sub comments when there are 10+ subs.
     Fixes GH#20. Thanks to @fpostma72 for the bug report and PR.

@@ -4,7 +4,7 @@ AtteanX::Serializer::NTriples - N-Triples Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::NTriples version 0.028
+This document describes AtteanX::Serializer::NTriples version 0.029
 
 =head1 SYNOPSIS
 
@@ -22,6 +22,8 @@ Serializes triples into the RDF 1.1 N-Triples format.
 
 =item C<< canonical_media_type >>
 
+=item C<< file_extensions >>
+
 =back
 
 =head1 METHODS
@@ -37,7 +39,7 @@ Serializes triples into the RDF 1.1 N-Triples format.
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::NTriples 0.028 {
+package AtteanX::Serializer::NTriples 0.029 {
 	use Moo;
 	use Types::Standard qw(Str ArrayRef);
 	use Encode qw(encode);
@@ -58,6 +60,14 @@ Returns a list of media types that identify the format produced by this serializ
 		return [qw(application/n-triples text/plain)];
 	}
 
+=item C<< file_extensions >>
+
+Returns a list of file extensions associated with the serialized format.
+
+=cut
+
+	sub file_extensions { return [qw(nt)] };
+	
 	with 'Attean::API::TripleSerializer';
 	with 'Attean::API::AppendableSerializer';
 }

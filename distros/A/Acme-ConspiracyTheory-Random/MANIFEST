@@ -1,0 +1,16 @@
+COPYRIGHT
+CREDITS
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+bin/conspire
+dist.ini
+doap.ttl
+lib/Acme/ConspiracyTheory/Random.pm
+t/01basic.t

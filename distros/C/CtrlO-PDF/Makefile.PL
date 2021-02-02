@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
         'Moo' => 0,
         'MooX::Types::MooseLike::Base' => 0,
         'PDF::Table' => 0,
-        'PDF::TextBlock' => 0,
+        'PDF::TextBlock' => 0.13,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'CtrlO-PDF*' },

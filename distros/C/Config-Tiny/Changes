@@ -1,5 +1,14 @@
 ﻿Revision history for Perl extension Config-Tiny:
 
+2.26  2021-02-01T17:11:00
+	- Update POD to change RT to github.
+	- Reformat Makefile.PL.
+
+2.25  2021-01-31T20:29:00
+	- Merge in clean-up patches from Karen Etheridge, with thanx.
+	- Add back file t/0. Who deleted it? It is required for t/05.zero.t.
+	- Update Makefile.PL to switch issue tracker from rt.cpan.org to github.
+
 2.24  2019-06-11T15:30:00
 	- Delete from caveats in documentation where it used to say:
 		'Config::Tiny will only recognize the first time an option is set in a config file.'

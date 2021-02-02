@@ -119,15 +119,14 @@ sub display {
 
     # Display form
     my $params = {
-        PORTAL    => $self->conf->{portal},
-        MAIN_LOGO => $self->conf->{portalMainLogo},
-        SKIN      => $self->p->getSkin($req),
-        LANGS     => $self->conf->{showLanguages},
-        MSG       => 'contextSwitching_ON',
-        ALERTE    => 'alert-danger',
-        LOGIN     => '',
-        SPOOFID   => $self->conf->{contextSwitchingRule},
-        TOKEN     => (
+        PORTAL        => $self->conf->{portal},
+        MAIN_LOGO     => $self->conf->{portalMainLogo},
+        SKIN          => $self->p->getSkin($req),
+        LANGS         => $self->conf->{showLanguages},
+        MSG           => 'contextSwitching_ON',
+        ALERTE        => 'alert-danger',
+        IMPERSONATION => $self->conf->{contextSwitchingRule},
+        TOKEN         => (
               $self->ottRule->( $req, {} )
             ? $self->ott->createToken()
             : ''
@@ -139,8 +138,8 @@ sub display {
 
 sub run {
     my ( $self, $req ) = @_;
-    my $statut  = PE_OK;
-    my $realId  = $req->userData->{ $self->conf->{whatToTrace} };
+    my $statut = PE_OK;
+    my $realId = $req->userData->{ $self->conf->{whatToTrace} };
     my $spoofId = $req->param('spoofId') || '';    # ContextSwitching required ?
     my $unUser = $self->unrestrictedUsersRule->( $req, $req->userData ) || 0;
 

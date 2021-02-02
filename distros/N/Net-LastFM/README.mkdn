@@ -45,7 +45,7 @@ This makes a signed request:
 ## create\_http\_request
 
 If you want to integrate this module into another HTTP framework, this 
-method will simple create an unsigned [HTTP::Request](https://metacpan.org/pod/HTTP::Request) object:
+method will simple create an unsigned [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest) object:
 
     my $http_request = $lastfm->create_http_request(
         method => 'auth.gettoken'
@@ -54,7 +54,7 @@ method will simple create an unsigned [HTTP::Request](https://metacpan.org/pod/H
 ## create\_http\_request\_signed
 
 If you want to integrate this module into another HTTP framework, this 
-method will simple create a signed [HTTP::Request](https://metacpan.org/pod/HTTP::Request) object:
+method will simple create a signed [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest) object:
 
     my $http_request = $lastfm->create_http_request_signed(
         method => 'user.getRecentTracks',

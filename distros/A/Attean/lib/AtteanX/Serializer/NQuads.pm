@@ -4,7 +4,7 @@ AtteanX::Serializer::NQuads - N-Triples Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::NQuads version 0.028
+This document describes AtteanX::Serializer::NQuads version 0.029
 
 =head1 SYNOPSIS
 
@@ -22,6 +22,8 @@ Serializes triples and quads into the RDF 1.1 N-Quads format.
 
 =item C<< canonical_media_type >>
 
+=item C<< file_extensions >>
+
 =back
 
 =head1 METHODS
@@ -37,7 +39,7 @@ Serializes triples and quads into the RDF 1.1 N-Quads format.
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::NQuads 0.028 {
+package AtteanX::Serializer::NQuads 0.029 {
 	use Moo;
 	use Types::Standard qw(Str ArrayRef);
 	use Encode qw(encode);
@@ -57,6 +59,15 @@ Returns a list of media types that identify the format produced by this serializ
 	sub media_types {
 		return [qw(application/n-quads)];
 	}
+
+
+=item C<< file_extensions >>
+
+Returns a list of file extensions associated with the serialized format.
+
+=cut
+
+	sub file_extensions { return [qw(nq)] };
 
 	with 'Attean::API::MixedStatementSerializer';
 	with 'Attean::API::AppendableSerializer';

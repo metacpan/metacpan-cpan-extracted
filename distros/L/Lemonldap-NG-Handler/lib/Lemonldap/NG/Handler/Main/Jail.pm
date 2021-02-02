@@ -1,7 +1,6 @@
 package Lemonldap::NG::Handler::Main::Jail;
 
 use strict;
-
 use Safe;
 use Lemonldap::NG::Common::Safelib;    #link protected safe Safe object
 
@@ -27,7 +26,7 @@ has multiValuesSeparator => ( is => 'rw', isa => 'Maybe[Str]' );
 has jail                 => ( is => 'rw' );
 has error                => ( is => 'rw' );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.11';
 our @builtCustomFunctions;
 
 ## @imethod protected build_jail()

@@ -4,45 +4,51 @@ Config::Locale - Load and merge locale-specific configuration files.
 
 # SYNOPSIS
 
-    use Config::Locale;
-    
-    my $locale = Config::Locale->new(
-        identity => \@values,
-        directory => $config_dir,
-    );
-    
-    my $config = $locale->config();
+```perl
+use Config::Locale;
+
+my $locale = Config::Locale->new(
+    identity => \@values,
+    directory => $config_dir,
+);
+
+my $config = $locale->config();
+```
 
 # DESCRIPTION
 
 This module takes an identity array, determines the permutations of the identity using
-[Algorithm::Loops](https://metacpan.org/pod/Algorithm::Loops), loads configuration files using [Config::Any](https://metacpan.org/pod/Config::Any), and finally combines
-the configurations using [Hash::Merge](https://metacpan.org/pod/Hash::Merge).
+[Algorithm::Loops](https://metacpan.org/pod/Algorithm%3A%3ALoops), loads configuration files using [Config::Any](https://metacpan.org/pod/Config%3A%3AAny), and finally combines
+the configurations using [Hash::Merge](https://metacpan.org/pod/Hash%3A%3AMerge).
 
 So, given this setup:
 
-    Config::Locale->new(
-        identity => ['db', '1', 'qa'],
-    );
+```perl
+Config::Locale->new(
+    identity => ['db', '1', 'qa'],
+);
+```
 
 The following configuration stems will be looked for (listed from least specific to most):
 
-    default
-    all.all.qa
-    all.1.all
-    all.1.qa
-    db.all.all
-    db.all.qa
-    db.1.all
-    db.1.qa
-    override
+```
+default
+all.all.qa
+all.1.all
+all.1.qa
+db.all.all
+db.all.qa
+db.1.all
+db.1.qa
+override
+```
 
 For each file found the contents will be parsed and then merged together to produce the
 final configuration hash.  The hashes will be merged so that the most specific configuration
 file will take precedence over the least specific files.  So, in the example above,
 "db.1.qa" values will overwrite values from "db.1.all".
 
-The term `stem` comes from [Config::Any](https://metacpan.org/pod/Config::Any), and means a filename without an extension.
+The term `stem` comes from [Config::Any](https://metacpan.org/pod/Config%3A%3AAny), and means a filename without an extension.
 
 # ARGUMENTS
 
@@ -102,7 +108,7 @@ An optional prefix that will be prepended to the configuration filenames.
 
 An optional suffix that will be appended to the configuration filenames.
 While it may seem like the right place, you probably should not be using
-this to specify the extension of your configuration files.  [Config::Any](https://metacpan.org/pod/Config::Any)
+this to specify the extension of your configuration files.  [Config::Any](https://metacpan.org/pod/Config%3A%3AAny)
 automatically tries many various forms of extensions without the need
 to explicitly declare the extension that you are using.
 
@@ -123,7 +129,7 @@ identity and is very fast.
 
 ## merge\_behavior
 
-Specify a [Hash::Merge](https://metacpan.org/pod/Hash::Merge) merge behavior.  The default is `LEFT_PRECEDENT`.
+Specify a [Hash::Merge](https://metacpan.org/pod/Hash%3A%3AMerge) merge behavior.  The default is `LEFT_PRECEDENT`.
 
 # ATTRIBUTES
 
@@ -142,7 +148,7 @@ is set.
 ## default\_configs
 
 An array of hashrefs, each hashref containing a single key/value pair as returned
-by [Config::Any](https://metacpan.org/pod/Config::Any)->load\_stems() where the key is the filename found, and the value
+by [Config::Any](https://metacpan.org/pod/Config%3A%3AAny)->load\_stems() where the key is the filename found, and the value
 is the parsed configuration hash for any ["default\_stem"](#default_stem) configuration.
 
 ## stem\_configs
@@ -164,14 +170,23 @@ identity, per the specified ["algorithm"](#algorithm).
 
 ## merge\_object
 
-The [Hash::Merge](https://metacpan.org/pod/Hash::Merge) object that will be used to merge the configuration
+The [Hash::Merge](https://metacpan.org/pod/Hash%3A%3AMerge) object that will be used to merge the configuration
 hashes.
 
-# AUTHOR
+# SUPPORT
 
+Please submit bugs and feature requests to the
+Config-Locale GitHub issue tracker:
+
+[https://github.com/bluefeet/Config-Locale/issues](https://github.com/bluefeet/Config-Locale/issues)
+
+# AUTHORS
+
+```
 Aran Clary Deltac <bluefeet@gmail.com>
+```
 
 # LICENSE
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

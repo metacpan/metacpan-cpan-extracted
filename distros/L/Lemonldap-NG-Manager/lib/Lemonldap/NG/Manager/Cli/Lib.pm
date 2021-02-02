@@ -1,5 +1,6 @@
 package Lemonldap::NG::Manager::Cli::Lib;
 
+use strict;
 use Mouse;
 use Lemonldap::NG::Manager;
 

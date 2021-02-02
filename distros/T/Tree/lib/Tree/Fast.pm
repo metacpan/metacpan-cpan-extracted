@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 use Scalar::Util qw( blessed weaken );
 
@@ -270,7 +270,7 @@ sub _null {
 
 package Tree::Null;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 #XXX Add this in once it's been thought out
 #our @ISA = qw( Tree );

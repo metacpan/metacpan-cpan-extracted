@@ -142,8 +142,6 @@ convertConfig - A tool to migrate Lemonldap::NG configuration database to a new 
 [B<--overwrite>]
 [B<--force>]
 
-=back
-
 =item Convert from default B<File> backend to the currently configured backend
 
 B<convertConfig>
@@ -159,6 +157,8 @@ B<convertConfig> B<--current>S< >I<config> B<--new>S< >I<config>
 =item Continue even if an error occurs
 
 B<convertConfig> B<--force>
+
+=back
 
 =head1 DESCRIPTION
 

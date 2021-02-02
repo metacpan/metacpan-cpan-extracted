@@ -31,7 +31,6 @@ my(%params) =
 		'Class::Throwable'	=> 0.10,
 		'constant'			=> 0,
 		'parent'			=> 0,
-		'perl'				=> 5.6.0,
 		'Scalar::Util'		=> 1.18,
 		'strict'			=> 0,
 		'Tree::Simple'		=> 1.31,
@@ -62,7 +61,7 @@ if ($ExtUtils::MakeMaker::VERSION ge '6.46')
 		{
 			bugtracker =>
 			{
-				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-Simple-View',
+				web => 'https://github.com/ronsavage/Tree-Simple-View/issues',
 			},
 			license    => 'http://dev.perl.org/licenses/',
 			repository =>

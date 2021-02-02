@@ -266,6 +266,7 @@
 "rightsReloadNeedsLogout":"Przeładowania uprawnień wymaga wylogowania i ponownego zalogowania",
 "scope":"Zakres",
 "search":"Szukaj",
+"searchAccount":"Search for account",
 "seconds":"sekundy",
 "selectIdP":"Wybierz dostawcę tożsamości",
 "service":"Usługa",

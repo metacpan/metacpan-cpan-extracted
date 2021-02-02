@@ -77,6 +77,8 @@ my @files = (
     't/map.t',
     't/multiple-libraries.t',
     't/numeric-sanity.t',
+    't/overloading-moose-bug.t',
+    't/overloading.t',
     't/parameterized.t',
     't/perl-sanity.t',
     't/string-sanity.t',

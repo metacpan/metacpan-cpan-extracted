@@ -1,5 +1,8 @@
 Revision history for SQL-Abstract-More
 
+1.37 29.01.2021
+  - avoid defined-or operator (//), not admitted in perl 5.8
+
 1.36 28.01.2021
   - fix inheritance bug with SQL::Abstract v2.0 (RT#134151)
   - can inherit from SQL::Abstract::Classic through '-extends' arg to import()

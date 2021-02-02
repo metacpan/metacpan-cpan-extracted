@@ -35,7 +35,7 @@ BEGIN
     ## if( $^O =~ /^(?:Android|cygwin|dos|linux|MSWin32|os2|VMS|riscos)/ )
     ## Even better
     our $SUPPORTED_RE = qr/\bIPC\/SysV\b/m;
-    if( $Config{extensions} =~ m/$SUPPORTED_RE/ )
+    if( $Config{extensions} =~ m/$SUPPORTED_RE/ && $^O !~ /^(?:Android|cygwin|dos|linux|MSWin32|os2|VMS|riscos)/i )
     {
         require IPC::SysV;
         IPC::SysV->import( qw( IPC_RMID IPC_PRIVATE IPC_SET IPC_STAT IPC_CREAT IPC_EXCL IPC_NOWAIT

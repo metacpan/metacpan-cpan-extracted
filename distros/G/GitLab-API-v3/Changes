@@ -1,5 +1,10 @@
 Revision history for Perl extension GitLab-API-v3.
 
+1.06 2021-01-30T06:36:56Z
+
+ - Generate Github-flavored markdown.
+ - Provide a .editorconfig instead of .lvimrc.
+
 1.05 2019-03-06T06:09:39Z
 
  - Migrate build tooling from Dist::Zilla to Minilla.

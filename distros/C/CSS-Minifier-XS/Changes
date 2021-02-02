@@ -1,5 +1,17 @@
 Revision history for Perl extension CSS::Minifier::XS.
 
+0.12      2021-01-30 21:46:07-08:00 America/Vancouver
+    - rewrote test suite into a single ".t" test
+    - GH #1 / RT #97574; whitespace before a ":" in a pseudo-selector is
+      meaningful and needs to be preserved (e.g. "#link :visited")
+    - Further reductions of "zero values", when possible
+      - "00000px" and "0.0px" become "0px"
+      - "000%" and "0.0%" become "0%"
+      - units are preserved inside of functions, but eliminated otherwise, and
+        percentages are always left as a percentages
+    - Optimized whitespace collapsing
+    - Optimized memory usage and string copying
+
 0.11      2020-12-30 21:27:39-08:00 America/Vancouver
     - POD spelling fixes
     - Switch to DZil Author Bundle

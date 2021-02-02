@@ -1,3 +1,9 @@
+0.005 2020-02-01
+- work around Text::CSV not checking Text::CSV_XS version like it should
+
+0.004 2020-01-29
+- pk_match
+
 0.003 2020-01-27
 - key_to_index
 - fix the -s* docs as well

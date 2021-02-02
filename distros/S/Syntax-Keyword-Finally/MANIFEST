@@ -1,0 +1,15 @@
+Build.PL
+Changes
+hax/perl-additions.c.inc
+hax/perl-backcompat.c.inc
+hax/wrap_keyword_plugin.c.inc
+lib/Syntax/Keyword/Finally.pm
+lib/Syntax/Keyword/Finally.xs
+MANIFEST			This list of files
+t/00use.t
+t/01finally.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

@@ -7,7 +7,7 @@ use Config::Plugin::Tiny;
 
 use File::Spec;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # ------------------------------------------------
 

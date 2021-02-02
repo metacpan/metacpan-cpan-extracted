@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+# WARNING: this file is generated, do not edit
+# generated on Mon Feb  1 14:47:27 2021
+# 01: /usr/lib/x86_64-linux-gnu/perl5/5.30/Apache/TestConfig.pm:1003
+# 02: /usr/lib/x86_64-linux-gnu/perl5/5.30/Apache/TestConfig.pm:1095
+# 03: /usr/lib/x86_64-linux-gnu/perl5/5.30/Apache/TestMM.pm:142
+# 04: Makefile.PL:262
+
+BEGIN { eval { require blib && blib->import; } }
+
+$Apache::TestConfig::Argv{'_APACHE_RUN_USER'} = q|www-data|;
+
+$Apache::TestConfig::Argv{'httpd_conf'} = q|/tmp/httpd_for_apache_ssi.conf|;
+
+$Apache::TestConfig::Argv{'apxs'} = q|/usr/bin/apxs|;
+
+$Apache::TestConfig::Argv{'_APACHE_RUN_DIR'} = q|/var/run/apache2|;
+
+$Apache::TestConfig::Argv{'_APACHE_LOG_DIR'} = q|/var/log/apache2|;
+
+$Apache::TestConfig::Argv{'_APACHE_LOCK_DIR'} = q|/var/lock/apache2|;
+
+$Apache::TestConfig::Argv{'_APACHE_PID_FILE'} = q|/var/run/apache2/apache2.pid|;
+
+$Apache::TestConfig::Argv{'_APACHE_RUN_GROUP'} = q|www-data|;
+#!perl
+## See <http://perl.apache.org/docs/general/testing/testing.html>
+use strict;
+## use warnings FATAL => 'all';
+use warnings;
+use lib qw( lib );
+use Apache::TestRunPerl ();
+
+## Set the necessary environment variable we stored in Apache::TestConfig::Argv in our Makefile.PL
+## We had to do a round-about way to achieve this, because there is no clean easy way with current Apache::Test version to achieve this
+foreach my $k ( %Apache::TestConfig::Argv )
+{
+    if( substr( $k, 0, 1 ) eq '_' )
+    {
+        ## print( STDERR "Setting environment variable \"", substr( $k, 1 ), "\"\n" );
+        $ENV{ substr( $k, 1 ) } = $Apache::TestConfig::Argv{ $k };
+    }
+}
+
+Apache::TestRunPerl->new->run( @ARGV );
+
+package Apache::TestRun;

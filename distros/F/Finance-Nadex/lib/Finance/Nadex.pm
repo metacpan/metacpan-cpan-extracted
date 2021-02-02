@@ -2,7 +2,7 @@ package Finance::Nadex;
 
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 use LWP::UserAgent;
 use JSON;
@@ -906,7 +906,7 @@ Finance::Nadex - Interact with the North American Derivatives Exchange
 
 =head1 VERSION
 
-Version 0.07
+Version 0.11
 
 =head1 SYNOPSIS
 

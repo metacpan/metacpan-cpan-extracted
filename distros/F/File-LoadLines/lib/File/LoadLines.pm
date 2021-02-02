@@ -8,6 +8,7 @@ use base 'Exporter';
 our @EXPORT = qw( loadlines );
 use Encode;
 use Carp;
+use utf8;
 
 =head1 NAME
 
@@ -15,7 +16,7 @@ File::LoadLines - Load lines from file
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 SYNOPSIS
 
@@ -122,9 +123,24 @@ sub loadlines {
     else {
 	my $name = $filename;
 	$filename = decode_utf8($name);
-	open( my $fh, '<', $name)
-	  or croak("$filename: $!\n");
-	$data = do { local $/; <$fh> };
+	# On MS Windows, non-latin (wide) filenames need special treatment.
+	if ( $filename ne $name && $^O =~ /mswin/i ) {
+	    require Win32API::File;
+	    my $fn = encode('UTF-16LE', "$filename").chr(0).chr(0);
+	    my $fh = Win32API::File::CreateFileW
+	      ( $fn, Win32API::File::FILE_READ_DATA(), 0, [],
+		Win32API::File::OPEN_EXISTING(), 0, []);
+	    croak("$filename: $^E (Win32)\n") if $^E;
+	    Win32API::File::OsFHandleOpen( 'FILE', $fh, "r")
+	      or croak("$filename: $!\n");
+	    $data = do { local $/; readline(\*FILE) };
+	    # warn("$filename³: len=", length($data), "\n");
+	}
+	else {
+	    open( my $f, '<', $filename )
+	      or croak("$filename: $!\n");
+	    $data = do { local $/; <$f> };
+	}
     }
     $options->{_filesource} = $filename if $options;
 

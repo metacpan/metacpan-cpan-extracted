@@ -33,6 +33,10 @@ sub getUser {
     PE_OK;
 }
 
+sub findUser {
+    PE_OK;
+}
+
 # Get all required attributes
 sub setSessionInfo {
     my ( $self, $req ) = @_;

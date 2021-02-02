@@ -3,7 +3,7 @@ package Specio::Library::Structured::Dict;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Carp qw( confess );
 use List::Util ();
@@ -22,7 +22,7 @@ sub _inline {
 }
 
 sub _parameterization_args_builder {
-    my $self = shift;
+    shift;
     my $args = shift;
 
     for my $p ( ( $args->{slurpy} || () ), values %{ $args->{kv} } ) {
@@ -77,7 +77,7 @@ sub _name_builder {
 }
 
 sub _structured_inline_generator {
-    my $self = shift;
+    shift;
     my $val  = shift;
     my %args = @_;
 
@@ -132,7 +132,7 @@ Specio::Library::Structured::Dict - Guts of Dict structured type
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 DESCRIPTION
 
@@ -156,7 +156,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

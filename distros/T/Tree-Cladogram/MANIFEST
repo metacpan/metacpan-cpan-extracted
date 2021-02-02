@@ -23,6 +23,8 @@ scripts/imager.sh
 scripts/pod2html.sh
 scripts/test.image.magick.pl
 scripts/test.image.magick.sh
+t/00.versions.t
+t/00.versions.tx
 t/test.t
 xt/author/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

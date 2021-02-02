@@ -3,7 +3,7 @@ package Tree::Simple::Visitor::FindByUID;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Scalar::Util qw(blessed);
 
@@ -187,9 +187,15 @@ This method will return the tree found with the specified UID (set by the C<sear
 
 =back
 
-=head1 BUGS
+=head1 Repository
 
-None that I am aware of. Of course, if you find a bug, let me know, and I will be sure to fix it.
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory>
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory/issues>
 
 =head1 CODE COVERAGE
 

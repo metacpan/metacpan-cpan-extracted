@@ -7,9 +7,9 @@ use Digest::MD5;
 
 use Exporter 'import';
 
-our @EXPORT    = qw/unix_md5_crypt apache_md5_crypt/;
-our @EXPORT_OK = (@EXPORT, 'random_md5_salt');
-our $VERSION   ='1.40';
+our @EXPORT		= qw/unix_md5_crypt apache_md5_crypt/;
+our @EXPORT_OK	= (@EXPORT, 'random_md5_salt');
+our $VERSION	= '1.41';
 
 # ------------------------------------------------
 
@@ -267,11 +267,15 @@ Returns an encrypted version of the given password.
 
 Basically, it's a very poor choice for anything other than password authentication.
 
+=head1 Repository
+
+L<https://github.com/ronsavage/Crypt-PasswdMD5.git>
+
 =head1 SUPPORT
 
 Bugs should be reported via the CPAN bug tracker at
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Crypt-PasswdMD5>
+L<https://github.com/ronsavage/Crypt-PasswdMD5/issues>
 
 =head1 AUTHOR
 

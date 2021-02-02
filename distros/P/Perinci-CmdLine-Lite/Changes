@@ -1,3 +1,26 @@
+1.903   2021-01-30  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Edit Changes again.
+
+
+1.902   2021-01-30  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Edit Changes.
+
+
+1.901   2021-01-30  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Handle the missing assignment -n shortcut for --dry-run in
+	  the case of hook_after_get_meta() is run twice (probably since we
+	  added plugin support; haven't investigated yet)
+
+        - [ux] Add shortcut -N for --no-dry-run.
+
+
 1.900   2020-10-21  Released-By: PERLANCAR; Urgency: medium
 
         - Add plugin support, modeled after ScriptX.

@@ -1,5 +1,6 @@
 author = "Aran Deltac <bluefeet@gmail.com>"
 authority="cpan:BLUEFEET"
+markdown_maker = "Pod::Markdown::Github"
 tag_format="v%v"
 
 [Metadata]

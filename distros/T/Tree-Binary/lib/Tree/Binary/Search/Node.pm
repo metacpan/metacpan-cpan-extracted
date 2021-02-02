@@ -1,4 +1,3 @@
-
 package Tree::Binary::Search::Node;
 
 use strict;
@@ -6,7 +5,7 @@ use warnings;
 
 use Tree::Binary;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 our @ISA = qw(Tree::Binary);
 

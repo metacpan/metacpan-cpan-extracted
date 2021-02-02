@@ -3,7 +3,7 @@ package Pod::ProjectDocs::CSS;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';    # VERSION
+our $VERSION = '0.53';    # VERSION
 
 use Moose;
 with 'Pod::ProjectDocs::File';
@@ -394,5 +394,7 @@ sub relative_url {
     $relpath =~ s:\\:/:g if $^O eq 'MSWin32';
     return $relpath;
 }
+
+no Moose;
 
 1;

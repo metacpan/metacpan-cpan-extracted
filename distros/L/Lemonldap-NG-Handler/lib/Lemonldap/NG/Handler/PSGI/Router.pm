@@ -1,13 +1,13 @@
 package Lemonldap::NG::Handler::PSGI::Router;
 
-use 5.10.0;
+use strict;
 use Mouse;
 require Lemonldap::NG::Handler::PSGI::Main;
 
 extends 'Lemonldap::NG::Handler::Lib::PSGI',
   'Lemonldap::NG::Common::PSGI::Router';
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.11';
 
 sub init {
     $_[0]->api('Lemonldap::NG::Handler::PSGI::Main');

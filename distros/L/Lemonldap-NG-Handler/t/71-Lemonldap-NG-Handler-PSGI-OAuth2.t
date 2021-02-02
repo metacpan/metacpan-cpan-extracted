@@ -4,12 +4,20 @@ BEGIN {
     require 't/test-psgi-lib.pm';
 }
 
-my $maintests = 10;
+my $maintests = 18;
 
 init(
     'Lemonldap::NG::Handler::Server',
     {
-        logLevel     => 'error',
+        logLevel              => 'error',
+        oidcRPMetaDataOptions => {
+            "rp-example" => {
+                oidcRPMetaDataOptionsClientID => "example",
+            },
+            "rp-example2" => {
+                oidcRPMetaDataOptionsClientID => "example2",
+            },
+        },
         vhostOptions => {
             'test1.example.com' => {
                 vhostHttps           => 0,
@@ -20,9 +28,21 @@ init(
         },
         exportedHeaders => {
             'test1.example.com' => {
-                'Auth-User' => '$uid',
+                'Auth-User'          => '$uid',
+                'Auth-ClientID'      => '$_clientId',
+                'Auth-ClientConfKey' => '$_clientConfKey',
+                'Auth-Scope'         => '$_scope',
             },
-        }
+        },
+        locationRules => {
+            'test1.example.com' => {
+
+                # Basic rules
+                'default' => 'accept',
+                '^/write' => '$_scope =~ /(?<!\S)write(?!\S)/',
+                '^/read'  => '$_scope =~ /(?<!\S)read(?!\S)/',
+            },
+        },
     }
 );
 
@@ -39,7 +59,7 @@ Lemonldap::NG::Common::Session->new( {
             "_type"           => "access_token",
             "_utime"          => time,
             "rp"              => "rp-example2",
-            "scope"           => "openid email"
+            "scope"           => "openid email read"
         }
     }
 );
@@ -56,7 +76,7 @@ Lemonldap::NG::Common::Session->new( {
             "_type"              => "refresh_token",
             "_utime"             => time,
             "rp"                 => "rp-example",
-            "scope"              => "openid email"
+            "scope"              => "openid email read"
         }
     }
 );
@@ -90,7 +110,7 @@ Lemonldap::NG::Common::Session->new( {
 # Request without Access Token
 ok(
     $res = $client->_get(
-        '/test', undef, 'test1.example.com', '', VHOSTTYPE => 'OAuth2',
+        '/read', undef, 'test1.example.com', '', VHOSTTYPE => 'OAuth2',
     ),
     'Unauthenticated request to OAuth2 URL'
 );
@@ -102,7 +122,7 @@ is( $h{'WWW-Authenticate'}, 'Bearer', 'Got WWW-Authenticate: Bearer' );
 # Request with invalid Access Token
 ok(
     $res = $client->_get(
-        '/test',             undef,
+        '/read',             undef,
         'test1.example.com', '',
         VHOSTTYPE          => 'OAuth2',
         HTTP_AUTHORIZATION => 'Bearer 123',
@@ -121,7 +141,7 @@ like(
 # Request with valid Access Token
 ok(
     $res = $client->_get(
-        '/test',             undef,
+        '/read',             undef,
         'test1.example.com', '',
         VHOSTTYPE => 'OAuth2',
         HTTP_AUTHORIZATION =>
@@ -132,14 +152,30 @@ ok(
 
 # Check headers
 %h = @{ $res->[1] };
-is( $res->[0], 200, "Request accepted" );
-ok( $h{'Auth-User'} eq 'dwho', 'Header Auth-User is set to "dwho"' )
-  or explain( \%h, 'Auth-User => "dwho"' );
+is( $res->[0],           200,        "Request accepted" );
+is( $h{'Auth-User'},     'dwho',     'Header Auth-User is set to "dwho"' );
+is( $h{'Auth-ClientID'}, 'example2', 'Client ID correctly transmitted' );
+is( $h{'Auth-ClientConfKey'},
+    'rp-example2', 'Client confkey correctly transmitted' );
+like( $h{'Auth-Scope'}, qr/\bemail\b/, 'Scope correctly transmitted' );
+
+# Request with valid Access Token on unauthorized resource
+ok(
+    $res = $client->_get(
+        '/write',            undef,
+        'test1.example.com', '',
+        VHOSTTYPE => 'OAuth2',
+        HTTP_AUTHORIZATION =>
+'Bearer f0fd4e85000ce35d062f97f5b466fc00abc2fad0406e03e086605f929ec4a249',
+    ),
+    'Invalid access token'
+);
+is( $res->[0], 403, "Unauthorized because the write scope is not granted" );
 
 # Request with Access token from offline session
 ok(
     $res = $client->_get(
-        '/test',             undef,
+        '/read',             undef,
         'test1.example.com', '',
         VHOSTTYPE          => 'OAuth2',
         HTTP_AUTHORIZATION => 'Bearer 999888777',
@@ -149,9 +185,12 @@ ok(
 
 # Check headers
 %h = @{ $res->[1] };
-is( $res->[0], 200, "Request accepted" );
-ok( $h{'Auth-User'} eq 'dwho', 'Header Auth-User is set to "dwho"' )
-  or explain( \%h, 'Auth-User => "dwho"' );
+is( $res->[0],           200,       "Request accepted" );
+is( $h{'Auth-User'},     'dwho',    'Header Auth-User is set to "dwho"' );
+is( $h{'Auth-ClientID'}, 'example', 'Client ID correctly transmitted' );
+is( $h{'Auth-ClientConfKey'},
+    'rp-example', 'Client confkey correctly transmitted' );
+like( $h{'Auth-Scope'}, qr/\bemail\b/, 'Scope correctly transmitted' );
 
 count($maintests);
 done_testing( count() );

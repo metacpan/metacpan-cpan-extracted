@@ -14,7 +14,7 @@ my $prefix = __PACKAGE__;
 # this module import config
 #
 use Carp ();
-use Net::SNMP::Mixin::Util qw/idx2val normalize_mac get_init_slot/;
+use Net::SNMP::Mixin::Util qw/idx2val normalize_mac push_error get_init_slot/;
 
 #
 # this module export config
@@ -22,7 +22,7 @@ use Net::SNMP::Mixin::Util qw/idx2val normalize_mac get_init_slot/;
 my @mixin_methods;
 
 BEGIN {
-  @mixin_methods = ( qw/ get_dot1q_fdb_entries /);
+  @mixin_methods = (qw/ get_dot1q_fdb_entries /);
 }
 
 use Sub::Exporter -setup => {
@@ -34,9 +34,9 @@ use Sub::Exporter -setup => {
 # SNMP oid constants used in this module
 #
 use constant {
-  DOT1Q_TP_FDB_TABLE   => '1.3.6.1.2.1.17.7.1.2.2',
-  DOT1Q_TP_FDB_PORT    => '1.3.6.1.2.1.17.7.1.2.2.1.2',
-  DOT1Q_TP_FDB_STATUS  => '1.3.6.1.2.1.17.7.1.2.2.1.3',
+  DOT1Q_TP_FDB_TABLE  => '1.3.6.1.2.1.17.7.1.2.2',
+  DOT1Q_TP_FDB_PORT   => '1.3.6.1.2.1.17.7.1.2.2.1.2',
+  DOT1Q_TP_FDB_STATUS => '1.3.6.1.2.1.17.7.1.2.2.1.3',
 
 };
 
@@ -44,13 +44,9 @@ use constant {
 
 Net::SNMP::Mixin::NXOSDot1qFdb - mixin class for 802.1-Q switch forwarding databases
 
-=head1 VERSION
-
-Version 0.01
-
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -164,9 +160,9 @@ sub get_dot1q_fdb_entries {
     # index is VlanId.MacAddress, value is the bridge port
     @digits = split /\./, $idx;
 
-    $vlan_id  = $digits[0];
+    $vlan_id = $digits[0];
 
-    $mac = pack( 'C6', @digits[ 1 .. 6 ] );
+    $mac        = pack( 'C6', @digits[ 1 .. 6 ] );
     $mac_string = normalize_mac($mac);
 
     push @fdb_entries,
@@ -204,8 +200,8 @@ sub _init {
 
   die "$agent: $prefix already initialized and reload not forced.\n"
     if exists get_init_slot($session)->{$prefix}
-      && get_init_slot($session)->{$prefix} == 0
-      && not $reload;
+    && get_init_slot($session)->{$prefix} == 0
+    && not $reload;
 
   # set number of async init jobs for proper initialization
   get_init_slot($session)->{$prefix} = THIS_INIT_JOBS;
@@ -240,7 +236,12 @@ sub _fetch_dot1q_tp_fdb_entries() {
     : (),
   );
 
-  return unless defined $result;
+  unless ( defined $result ) {
+    my $err_msg = $session->{_error} = $session->error;
+    push_error( $session, "$prefix: $err_msg" ) if $err_msg;
+    return;
+  }
+
   return 1 if $session->nonblocking;
 
   # call the callback function in blocking mode by hand
@@ -252,7 +253,12 @@ sub _dot1q_tp_fdb_entries_cb {
   my $session = shift;
   my $vbl     = $session->var_bind_list;
 
-  return unless defined $vbl;
+  unless ( defined $vbl ) {
+    if ( my $err_msg = $session->{_error} = $session->error ) {
+      push_error( $session, "$prefix: $err_msg" );
+    }
+    return;
+  }
 
   # mangle result table to get plain idx->value
   # index is fdbId.MacAddress, value is the bridge port
@@ -270,19 +276,11 @@ sub _dot1q_tp_fdb_entries_cb {
 
 =head1 SEE ALSO
 
-L<< Net::SNMP::Mixin::Dot1dBase >> for a mapping between ifIndexes and dot1dBasePorts.
+L<< Net::SNMP::Mixin::NXOSDot1dBase >> for a mapping between ifIndexes and bridgePorts.
 
 =head1 REQUIREMENTS
 
 L<< Net::SNMP >>, L<< Net::SNMP::Mixin >>
-
-=head1 BUGS, PATCHES & FIXES
-
-There are no known bugs at the time of this release. However, if you spot a bug or are experiencing difficulties that are not explained within the POD documentation, please submit a bug to the RT system (see link below). However, it would help greatly if you are able to pinpoint problems or even supply a patch. 
-
-Fixes are dependant upon their severity and my availablity. Should a fix not be forthcoming, please feel free to (politely) remind me by sending an email to gaissmai@cpan.org .
-
-  RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-SNMP-Mixin-NXOSDot1qFdb
 
 =head1 AUTHOR
 
@@ -290,7 +288,7 @@ Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2020 Karl Gaissmaier, all rights reserved.
+Copyright 2020-2021 Karl Gaissmaier, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

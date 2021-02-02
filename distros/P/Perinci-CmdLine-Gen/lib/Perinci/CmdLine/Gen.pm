@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Gen;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-31'; # DATE
+our $DATE = '2021-02-01'; # DATE
 our $DIST = 'Perinci-CmdLine-Gen'; # DIST
-our $VERSION = '0.497'; # VERSION
+our $VERSION = '0.498'; # VERSION
 
 use 5.010001;
 use strict;
@@ -458,7 +458,7 @@ sub gen_pericmd_script {
             $extra_modules->{$_} = $res->[3]{'func.raw_result'}{req_modules}{$_};
         }
     } else {
-        $extra_modules->{'Log::ger'} = '0.037' if $args{log};
+        $extra_modules->{'Log::ger'} = '0.038' if $args{log};
         # determine minimum required version
         if ($cmdline_mod =~ /\APerinci::CmdLine::(Lite|Any)\z/) {
             if ($cmdline_mod eq 'Perinci::CmdLine::Lite') {
@@ -611,7 +611,7 @@ Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.497 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2020-07-31.
+This document describes version 0.498 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2021-02-01.
 
 =head1 FUNCTIONS
 
@@ -1076,7 +1076,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Gen>
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Gen>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-CmdLine-Gen/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1088,7 +1088,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

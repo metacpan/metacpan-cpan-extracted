@@ -3,7 +3,7 @@ package Tree::Simple::Visitor::FindByNodeValue;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Scalar::Util qw(blessed);
 
@@ -167,7 +167,11 @@ Based upon the value of C<$boolean>, this will tell the visitor to include the t
 
 =item B<setTraversalMethod ($visitor)>
 
-By default we will use Tree::Simple's built in depth-first (pre-order) traverse method. If however, you desire the tree to be search in a different ordering, this can be accomplished using a different traversal method, you can supply a C<$visitor> object implementing that traversal type to this method (See  B<Tree::Simple::Visitor::BreadthFirstTraversal>, B<Tree::Simple::Visitor::PreOrderTraversal> and B<Tree::Simple::Visitor::PostOrderTraversal>).
+By default we will use the Tree::Simple built in depth-first (pre-order) traverse method. If however,
+you desire the tree to be search in a different ordering, this can be accomplished using a different
+traversal method, you can supply a C<$visitor> object implementing that traversal type to this method
+(See  B<Tree::Simple::Visitor::BreadthFirstTraversal>, B<Tree::Simple::Visitor::PreOrderTraversal>
+and B<Tree::Simple::Visitor::PostOrderTraversal>).
 
 =item B<searchForNodeValue ($node_value)>
 
@@ -175,21 +179,35 @@ This is the node value we will attempt to find within the tree.
 
 =item B<setNodeFilter ($filter_function)>
 
-This method accepts a CODE reference as its C<$filter_function> argument and throws an exception if it is not a code reference. This code reference is used to further check the tree nodes as they are searched and so can be used to customize search behavior. For instance, you could to check against the node value as well as some other criteria. The filter function should accept a single argument, which is the current Tree::Simple object and return either true (C<1>) on success, or false (C<0>) on failure.
+This method accepts a CODE reference as its C<$filter_function> argument and throws an exception
+if it is not a code reference. This code reference is used to further check the tree nodes as they
+are searched and so can be used to customize search behavior. For instance, you could to check
+against the node value as well as some other criteria. The filter function should accept a single
+argument, which is the current Tree::Simple object and return either true (C<1>) on success, or
+false (C<0>) on failure.
 
 =item B<visit ($tree)>
 
-This is the method that is used by Tree::Simple's C<accept> method. It can also be used on its own, it requires the C<$tree> argument to be a Tree::Simple object (or derived from a Tree::Simple object), and will throw and exception otherwise.
+This is the method that is used by the Tree::Simple C<accept> method. It can also be used on its
+own, it requires the C<$tree> argument to be a Tree::Simple object (or derived from a Tree::Simple
+object), and will throw and exception otherwise.
 
 =item B<getResult>
 
-This method will return the tree found with the specified node value (set by the C<searchForNodeValue> method) or C<undef> if no tree is found.
+This method will return the tree found with the specified node value (set by the
+C<searchForNodeValue> method) or C<undef> if no tree is found.
 
 =back
 
-=head1 BUGS
+=head1 Repository
 
-None that I am aware of. Of course, if you find a bug, let me know, and I will be sure to fix it.
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory>
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory/issues>
 
 =head1 CODE COVERAGE
 
@@ -197,7 +215,8 @@ See the B<CODE COVERAGE> section in L<Tree::Simple::VisitorFactory> for more inf
 
 =head1 SEE ALSO
 
-These Visitor classes are all subclasses of B<Tree::Simple::Visitor>, which can be found in the B<Tree::Simple> module, you should refer to that module for more information.
+These Visitor classes are all subclasses of B<Tree::Simple::Visitor>, which can be found in the
+B<Tree::Simple> module, you should refer to that module for more information.
 
 =head1 AUTHOR
 

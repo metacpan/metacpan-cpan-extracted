@@ -1,7 +1,7 @@
 package Finance::Currency::Convert::BCA;
 
-our $DATE = '2018-07-15'; # DATE
-our $VERSION = '0.154'; # VERSION
+our $DATE = '2021-02-01'; # DATE
+our $VERSION = '0.155'; # VERSION
 
 use 5.010001;
 use strict;
@@ -65,12 +65,11 @@ sub get_currencies {
     } else {
         require Mojo::UserAgent;
         my $ua = Mojo::UserAgent->new;
-        my $tx = $ua->get($url);
-        unless ($tx->success) {
-            my $err = $tx->error;
-            return [500, "Can't retrieve URL $url: $err->{message}"];
+        my $res = $ua->get($url)->result;
+        unless ($res->is_success) {
+            return [500, "Can't retrieve URL $url: ".$res->code." - ".$res->message];
         }
-        $page = $tx->res->body;
+        $page = $res->body;
     }
 
     my $dom  = Mojo::DOM->new($page);
@@ -245,7 +244,7 @@ Finance::Currency::Convert::BCA - Convert currency using BCA (Bank Central Asia)
 
 =head1 VERSION
 
-This document describes version 0.154 of Finance::Currency::Convert::BCA (from Perl distribution Finance-Currency-Convert-BCA), released on 2018-07-15.
+This document describes version 0.155 of Finance::Currency::Convert::BCA (from Perl distribution Finance-Currency-Convert-BCA), released on 2021-02-01.
 
 =head1 SYNOPSIS
 
@@ -305,18 +304,20 @@ Select which rate to use (default is average buy+sell for e-Rate).
 
 {buy,sell,avg}_{bn,er,ttc}.
 
+
 =back
 
 Return value:  (any)
+
 
 
 =head2 get_currencies
 
 Usage:
 
- get_currencies() -> [status, msg, result, meta]
+ get_currencies() -> [status, msg, payload, meta]
 
-Extract data from KlikBCA/BCA page.
+Extract data from KlikBCAE<sol>BCA page.
 
 This function is not exported by default, but exportable.
 
@@ -327,7 +328,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -352,7 +353,7 @@ Source repository is at L<https://github.com/perlancar/perl-Finance-Currency-Con
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-Convert-BCA>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Finance-Currency-Convert-BCA/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -364,7 +365,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018, 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

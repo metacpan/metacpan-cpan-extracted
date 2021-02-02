@@ -3,7 +3,7 @@ package Pod::ProjectDocs::Config;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';    # VERSION
+our $VERSION = '0.53';    # VERSION
 
 use Moose;
 
@@ -59,6 +59,8 @@ has 'except' => (
     is  => 'ro',
     isa => 'ArrayRef[Str | RegexpRef]'
 );
+
+no Moose;
 
 1;
 __END__

@@ -3,7 +3,7 @@
    "author" : [
       "Ed J <etj@cpan.org>"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -42,6 +42,7 @@
          "requires" : {
             "Exporter" : "5.57",
             "Text::CSV" : "2.00",
+            "Text::CSV_XS" : "1.45",
             "YAML" : "1.30",
             "perl" : "5.008003"
          },
@@ -72,6 +73,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

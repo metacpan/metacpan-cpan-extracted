@@ -3,7 +3,7 @@ package Tree::Simple::VisitorFactory;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 sub new {
     my ($class) = @_;
@@ -211,15 +211,21 @@ I use B<Devel::Cover> to test the code coverage of my tests, below is the B<Deve
 
 These Visitor classes are meant to work with L<Tree::Simple> hierarchies, you should refer to that module for more information.
 
+=head1 Repository
+
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory>
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory/issues>
+
 =head1 AUTHOR
 
 stevan little, E<lt>stevan@iinteractive.comE<gt>
 
 Ron Savage E<lt>ron@savage.net.auE<gt> has taken over maintenance as of V 0.11.
-
-=head1 REPOSITORY
-
-L<https://github.com/ronsavage/Tree-Simple-VisitorFactory>.
 
 =head1 COPYRIGHT AND LICENSE
 

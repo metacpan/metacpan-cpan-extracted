@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Exporter';
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Carp qw( croak );
 use Specio::Coercion;
@@ -151,7 +151,7 @@ sub object_does_type {
 
     my $tc = _make_tc(
         ( defined $name ? ( name => $name ) : () ),
-        role       => ( defined $p{role} ? $p{role} : $name ),
+        role => ( defined $p{role} ? $p{role} : $name ),
         type_class => 'Specio::Constraint::ObjectDoes',
     );
 
@@ -224,7 +224,7 @@ sub any_does_type {
 
     my $tc = _make_tc(
         ( defined $name ? ( name => $name ) : () ),
-        role       => ( defined $p{role} ? $p{role} : $name ),
+        role => ( defined $p{role} ? $p{role} : $name ),
         type_class => 'Specio::Constraint::AnyDoes',
     );
 
@@ -345,7 +345,7 @@ Specio::Declare - Specio declaration subroutines
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 
@@ -468,11 +468,11 @@ argument is a I<string> containing the variable name to use in the generated
 code. Typically this is something like C<'$_[0]'> or C<'$value'>.
 
 The inline generator subroutine should return a I<string> of code representing
-a single term, and it I<should not> be terminated with a semicolon. This
-allows the inlined code to be safely included in an C<if> statement, for
-example. You can use C<do { }> blocks and ternaries to get everything into one
-term. Do not assign to the variable you are testing. This single term should
-evaluate to true or false.
+a single term, and it I<should not> be terminated with a semicolon. This allows
+the inlined code to be safely included in an C<if> statement, for example. You
+can use C<do { }> blocks and ternaries to get everything into one term. Do not
+assign to the variable you are testing. This single term should evaluate to
+true or false.
 
 The inline generator is expected to include code to implement both the current
 type and all its parents. Typically, the easiest way to do this is to write a
@@ -497,11 +497,11 @@ The C<inline> parameter is mutually exclusive with the C<where> parameter.
 A subroutine to generate an error message when the type check fails. The
 default message says something like "Validation failed for type named Int
 declared in package Specio::Library::Builtins
-(.../Specio/blib/lib/Specio/Library/Builtins.pm) at line 147 in sub named (eval)
-with value 1.1".
+(.../Specio/blib/lib/Specio/Library/Builtins.pm) at line 147 in sub named
+(eval) with value 1.1".
 
-You can override this to provide something more specific about the way the
-type failed.
+You can override this to provide something more specific about the way the type
+failed.
 
 The subroutine you provide will be called as a method on the type with two
 arguments. The first is the description of the type (the bit in the message
@@ -521,10 +521,10 @@ the first parameter.
 
 =head2 coerce(...)
 
-This declares a coercion from one type to another. The first argument should
-be an object which does the L<Specio::Constraint::Role::Interface> role. This
-can be either a named or anonymous type. This type is the type that the
-coercion is I<to>.
+This declares a coercion from one type to another. The first argument should be
+an object which does the L<Specio::Constraint::Role::Interface> role. This can
+be either a named or anonymous type. This type is the type that the coercion is
+I<to>.
 
 The remaining arguments are key/value parameters:
 
@@ -554,10 +554,10 @@ argument is a I<string> containing the variable name to use in the generated
 code. Typically this is something like C<'$_[0]'> or C<'$value'>.
 
 The inline generator subroutine should return a I<string> of code representing
-a single term, and it I<should not> be terminated with a semicolon. This
-allows the inlined code to be safely included in an C<if> statement, for
-example. You can use C<do { }> blocks and ternaries to get everything into one
-term. This single term should evaluate to the new value.
+a single term, and it I<should not> be terminated with a semicolon. This allows
+the inlined code to be safely included in an C<if> statement, for example. You
+can use C<do { }> blocks and ternaries to get everything into one term. This
+single term should evaluate to the new value.
 
 =back
 
@@ -567,9 +567,9 @@ This module also exports some helper subs for declaring certain kinds of types:
 
 =head2 any_isa_type, object_isa_type
 
-The C<any_isa_type> helper creates a type which accepts a class name or
-object of the given class. The C<object_isa_type> helper creates a type
-which only accepts an object of the given class.
+The C<any_isa_type> helper creates a type which accepts a class name or object
+of the given class. The C<object_isa_type> helper creates a type which only
+accepts an object of the given class.
 
 These subroutines take a type name as the first argument. The remaining
 arguments are key/value pairs. Currently this is just the C<class> key, which
@@ -582,9 +582,9 @@ both the type's name and the class for the constraint to check.
 
 =head2 any_does_type, object_does_type
 
-The C<any_does_type> helper creates a type which accepts a class name or
-object which does the given role. The C<object_does_type> helper creates a
-type which only accepts an object which does the given role.
+The C<any_does_type> helper creates a type which accepts a class name or object
+which does the given role. The C<object_does_type> helper creates a type which
+only accepts an object which does the given role.
 
 These subroutines take a type name as the first argument. The remaining
 arguments are key/value pairs. Currently this is just the C<role> key, which
@@ -600,14 +600,14 @@ both the type's name and the role for the constraint to check.
 
 =head2 any_can_type, object_can_type
 
-The C<any_can_type> helper creates a type which accepts a class name or
-object with the given methods. The C<object_can_type> helper creates a type
-which only accepts an object with the given methods.
+The C<any_can_type> helper creates a type which accepts a class name or object
+with the given methods. The C<object_can_type> helper creates a type which only
+accepts an object with the given methods.
 
 These subroutines take a type name as the first argument. The remaining
-arguments are key/value pairs. Currently this is just the C<methods> key,
-which can be either a string or array reference of strings. These strings are
-the required methods for the type.
+arguments are key/value pairs. Currently this is just the C<methods> key, which
+can be either a string or array reference of strings. These strings are the
+required methods for the type.
 
 The type name argument can be omitted to create an anonymous type.
 
@@ -617,8 +617,8 @@ This creates a type which accepts a string matching a given list of acceptable
 values.
 
 The first argument is the type name. The remaining arguments are key/value
-pairs. Currently this is just the C<values> key. This should an array
-reference of acceptable string values.
+pairs. Currently this is just the C<values> key. This should an array reference
+of acceptable string values.
 
 The type name argument can be omitted to create an anonymous type.
 
@@ -628,8 +628,8 @@ This creates a type which is the intersection of two or more other types. A
 union only accepts values which match all of its underlying types.
 
 The first argument is the type name. The remaining arguments are key/value
-pairs. Currently this is just the C<of> key. This should an array
-reference of types.
+pairs. Currently this is just the C<of> key. This should an array reference of
+types.
 
 The type name argument can be omitted to create an anonymous type.
 
@@ -639,15 +639,15 @@ This creates a type which is the union of two or more other types. A union
 accepts any of its underlying types.
 
 The first argument is the type name. The remaining arguments are key/value
-pairs. Currently this is just the C<of> key. This should an array
-reference of types.
+pairs. Currently this is just the C<of> key. This should an array reference of
+types.
 
 The type name argument can be omitted to create an anonymous type.
 
 =head1 PARAMETERIZED TYPES
 
-You can create a parameterized type by calling C<t> with additional
-parameters, like this:
+You can create a parameterized type by calling C<t> with additional parameters,
+like this:
 
   my $arrayref_of_int = t( 'ArrayRef', of => t('Int') );
 
@@ -660,8 +660,8 @@ parameters, like this:
   );
 
 The C<t> subroutine assumes that if it receives more than one argument, it
-should look up the named type and call C<< $type->parameterize(...) >> with
-the additional arguments.
+should look up the named type and call C<< $type->parameterize(...) >> with the
+additional arguments.
 
 If the named type cannot be parameterized, it throws an error.
 
@@ -684,7 +684,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -47,6 +47,6 @@
          "web" : "https://github.com/sciurius/perl-File-LoadLines"
       }
    },
-   "version" : "1.01",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v1.020.2",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -2,7 +2,7 @@ NAME
     Log::ger - A lightweight, flexible logging framework
 
 VERSION
-    version 0.037
+    version 0.038
 
 SYNOPSIS
   Producing logs
@@ -146,7 +146,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017 by
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

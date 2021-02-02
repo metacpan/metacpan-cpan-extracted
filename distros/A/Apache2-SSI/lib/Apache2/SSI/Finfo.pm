@@ -11,7 +11,6 @@
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
-## File::Stat via Path::Tiny
 package Apache2::SSI::Finfo;
 BEGIN
 {

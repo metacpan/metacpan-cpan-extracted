@@ -5,7 +5,7 @@ use warnings;
 
 use Scalar::Util 'blessed';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use base qw(Tree::Simple::Visitor);
 
@@ -122,7 +122,9 @@ This method accepts a CODE reference as its C<$filter_function> argument and thr
 
 =item B<visit ($tree)>
 
-This is the method that is used by Tree::Simple's C<accept> method. It can also be used on its own, it requires the C<$tree> argument to be a Tree::Simple object (or derived from a Tree::Simple object), and will throw and exception otherwise.
+This is the method that is used by the Tree::Simple C<accept> method. It can also be used on its
+own, it requires the C<$tree> argument to be a Tree::Simple object (or derived from a
+Tree::Simple object), and will throw and exception otherwise.
 
 =item B<getClone>
 
@@ -130,9 +132,15 @@ This method returns the cloned partial tree.
 
 =back
 
-=head1 BUGS
+=head1 Repository
 
-None that I am aware of. Of course, if you find a bug, let me know, and I will be sure to fix it.
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory>
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Tree-Simple-VisitorFactory/issues>
 
 =head1 CODE COVERAGE
 

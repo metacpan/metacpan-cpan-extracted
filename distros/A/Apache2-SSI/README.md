@@ -1,6 +1,8 @@
 SYNOPSIS
 ========
 
+Outside of Apache:
+
         use Apache2::SSI;
         my $ssi = Apache2::SSI->new(
             ## If running outside of Apache
@@ -21,10 +23,56 @@ SYNOPSIS
         };
         print( $result );
 
+Inside Apache, in the VirtualHost configuration, for example:
+
+        PerlModule Apache2::SSI
+        PerlOptions +GlobalRequest
+        PerlSetupEnv On
+        <Directory "/home/joe/www">
+            Options All +Includes +ExecCGI -Indexes -MultiViews
+            AllowOverride All
+            SetHandler modperl
+            # You can choose to set this as a response handler or a output filter, whichever works.
+            # PerlResponseHandler Apache2::SSI
+            PerlOutputFilterHandler Apache2::SSI
+            # If you do not set this to On, path info will not work, example:
+            # /path/to/file.html/path/info
+            # See: <https://httpd.apache.org/docs/current/en/mod/core.html#acceptpathinfo>
+            AcceptPathInfo On
+            # To enable no-caching (see no_cache() in Apache2::RequestUtil:
+            PerlSetVar Apache2_SSI_NO_CACHE On
+            # This is required for exec cgi to work:
+            # <https://httpd.apache.org/docs/current/en/mod/mod_include.html#element.exec>
+            <Files ~ "\.pl$">
+                SetHandler perl-script
+                AcceptPathInfo On
+                PerlResponseHandler ModPerl::PerlRun
+                ## Even better for stable cgi scripts:
+                ## PerlResponseHandler ModPerl::Registry
+                ## Change this in mod_perl1 PerlSendHeader On to the following:
+                ## <https://perl.apache.org/docs/2.0/user/porting/compat.html#C_PerlSendHeader_>
+                PerlOptions +ParseHeaders
+            </Files>
+            <Files ~ "\.cgi$">
+                SetHandler cgi-script
+                AcceptPathInfo On
+            </Files>
+            # To enable debugging output in the Apache error log
+            # PerlSetVar Apache2_SSI_DEBUG 3
+            # To set the default echo message
+            # PerlSetVar Apache2_SSI_Echomsg 
+            # To Set the default error message
+            # PerlSetVar Apache2_SSI_Errmsg "Oops, something went wrong"
+            # To Set the default size format: bytes or abbrev
+            # PerlSetVar Apache2_SSI_Sizefmt "bytes"
+            # To Set the default date time format
+            # PerlSetVar Apache2_SSI_Timefmt ""
+        </Directory>
+
 VERSION
 =======
 
-        v0.13.3
+        v0.1.1
 
 DESCRIPTION
 ===========
@@ -32,25 +80,32 @@ DESCRIPTION
 [Apache2::SSI](https://metacpan.org/pod/Apache2::SSI){.perl-module}
 implements [Apache Server Side
 Include](https://httpd.apache.org/docs/current/en/howto/ssi.html){.perl-module},
-a.k.a. SSI.
+a.k.a. SSI, within and outside of Apache2/mod\_perl2 framework.
 
 [Apache2::SSI](https://metacpan.org/pod/Apache2::SSI){.perl-module} is
 inspired from the original work of
 [Apache::SSI](https://metacpan.org/pod/Apache::SSI){.perl-module} with
-the difference that
+the main difference that
 [Apache2::SSI](https://metacpan.org/pod/Apache2::SSI){.perl-module}
-works well when called from within Apache mod\_perl as well as when
+works well when called from within Apache mod\_perl2 as well as when
 called outside of Apache if you want to simulate
 [SSI](https://httpd.apache.org/docs/current/en/howto/ssi.html){.perl-module}.
+
+[Apache2::SSI](https://metacpan.org/pod/Apache2::SSI){.perl-module} also
+implements all of Apache SSI features, including functions, encoding and
+decoding and old style variables such as `${QUERY_STRING}` as well as
+modern style such as `v('QUERY_STRING')` and variants such as
+`%{REQUEST_URI}`.
+
+See below details in this documentation and in the section on [\"SSI
+Directives\"](#ssi-directives){.perl-module}
 
 Under Apache mod\_perl, you would implement it like this in your
 `apache2.conf` or `httpd.conf`
 
         <Files *.phtml>
             SetHandler modperl
-            # Or if you are running mod_perl 1.0
-            # SetHandler perl-script
-            PerlHandler Apache2::SSI
+            PerlOutputFilterHandler Apache2::SSI
         </Files>
 
 This would enable
@@ -61,9 +116,13 @@ such as:
         <Location /some/web/path>
             <Files *.html>
                 SetHandler modperl
-                PerlHandler Apache2::SSI
+                PerlOutputFilterHandler Apache2::SSI
             </Files>
         </Location>
+
+In the example above, we enable it in files with extensions `.phtml`,
+but you can, of course, enable it for all html by setting extension
+`.html` or whatever extension you use for your html files.
 
 As pointed out by Ken Williams, the original author of
 [Apache::SSI](https://metacpan.org/pod/Apache::SSI){.perl-module}, the
@@ -78,9 +137,53 @@ benefit for using
 
 :   
 
-3. You want to mimick SSI without activating them or without using Apache (such as in command line)
+3. You want to imitate SSI without activating them or without using Apache (such as in command line) or within your perl/cgi script
 
 :   
+
+INSTALLATION
+------------
+
+        perl Makefile.PL
+        make
+        make test
+        sudo make install
+
+This will detect if you have Apache installed and run the Apache
+mod\_perl2 tests by starting a separate instance of Apache on a
+non-standard port like 8123 under your username just for the purpose of
+testing. This is all handled automatically by
+[Apache::Test](https://metacpan.org/pod/Apache::Test){.perl-module}
+
+If you do not have Apache or mod\_perl installed, it will still install,
+but obviously not start an instance of Apache/mod\_perl, nor perform any
+of the Apache mod\_perl tests.
+
+It tries hard to find the Apache configuration file. You can help it by
+providing command line modifiers, such as:
+
+        perl Makefile.PL -apxs /usr/bin/apxs
+
+or, even specify the Apache configuration file:
+
+        perl Makefile.PL -apxs /usr/bin/apxs -httpd_conf /home/john/etc/apache2/apache2.conf
+
+To run only some tests, for example:
+
+        make test TEST_FILES="./t/31.file.t"
+
+If you are on a Linux type system, you can install `apxs` by issuing on
+the command line:
+
+        apt install apache2-dev
+
+You can check if you have it installed with the following command:
+
+        dpkg -l | grep apache
+
+See
+[ExtUtils::MakeMaker](https://metacpan.org/pod/ExtUtils::MakeMaker){.perl-module}
+for more information.
 
 METHODS
 =======
@@ -91,11 +194,22 @@ new
 This instantiate an object that is used to access other key methods. It
 takes the following parameters:
 
+*apache\_filter*
+
+:   This is the
+    [Apache2::Filter](https://metacpan.org/pod/Apache2::Filter){.perl-module}
+    object object that is provided if running under mod\_perl.
+
 *apache\_request*
 
 :   This is the
     [Apache2::RequestRec](https://metacpan.org/pod/Apache2::RequestRec){.perl-module}
-    object that must be provided if running under mod\_perl.
+    object that is provided if running under mod\_perl.
+
+    it can be retrieved from [\"request\" in
+    Apache2::RequestUtil](https://metacpan.org/pod/Apache2::RequestUtil#request){.perl-module}
+    or via [\"r\" in
+    Apache2::Filter](https://metacpan.org/pod/Apache2::Filter#r){.perl-module}
 
     You can get this
     [Apache2::RequestRec](https://metacpan.org/pod/Apache2::RequestRec){.perl-module}
@@ -103,9 +217,23 @@ takes the following parameters:
     [Apache2::RequestUtil](https://metacpan.org/pod/Apache2::RequestUtil){.perl-module}
     and calling its class method [\"request\" in
     Apache2::RequestUtil](https://metacpan.org/pod/Apache2::RequestUtil#request){.perl-module}
-    such as `Apache2::RequestUtil-`request\> and assuming you have set
+    such as Apache2::RequestUtil-\>request and assuming you have set
     `PerlOptions +GlobalRequest` in your Apache Virtual Host
     configuration.
+
+    Note that there is a main request object and subprocess request
+    object, so to find out which one you are dealing with, use
+    [\"is\_initial\_req\" in
+    Apache2::RequestUtil](https://metacpan.org/pod/Apache2::RequestUtil#is_initial_req){.perl-module},
+    such as:
+
+            use Apache2::RequestUtil (); # extends Apache2::RequestRec objects
+            my $r = $r->is_initial_req ? $r : $r->main;
+
+*debug*
+
+:   Sets the debug level. Starting from 3, this will output on the
+    STDERR or in Apache error log a lot of debugging output.
 
 *document\_root*
 
@@ -137,12 +265,31 @@ takes the following parameters:
     now. You can provide it to [\"parse\"](#parse){.perl-module} as its
     first argument when you call it.
 
+*remote\_ip*
+
+:   This is used when you want to artificially set the remote ip
+    address, i.e. the address of the visitor accessing the page. This is
+    used essentially by the SSI directive:
+
+            my $ssi = Apache2::SSI->new( remote_ip => '192.168.2.10' ) ||
+                die( Apache2::SSI->error );
+
+            <!--#if expr="-R '192.168.2.0/24' || -R '127.0.0.1/24'" -->
+            Remote ip is part of my private network
+            <!--#else -->
+            Go away!
+            <!--#endif -->
+
 *sizefmt*
 
 :   The default way to format a file size. By default, this is `abbrev`,
     which means a human readable format such as `2.5M` for 2.5
     megabytes. Other possible value is `bytes` which would have the
     `fsize` ssi directive return the size in bytes.
+
+    See [Apache2
+    documentation](https://httpd.apache.org/docs/current/en/howto/ssi.html){.perl-module}
+    for more information on this.
 
 *timefmt*
 
@@ -151,6 +298,20 @@ takes the following parameters:
     `en_GB` for the United Kingdoms. The time zone can be specified in
     the format, or it will be set to the local time zone, whatever it
     is.
+
+    See [Apache2
+    documentation](https://httpd.apache.org/docs/current/en/howto/ssi.html){.perl-module}
+    for more information on this.
+
+apache\_filter
+--------------
+
+Set or get the
+[Apache2::Filter](https://metacpan.org/pod/Apache2::Filter){.perl-module}
+object.
+
+When running under Apache mod\_perl this is set automatically from the
+special [\"handler\"](#handler){.perl-module} method.
 
 apache\_request
 ---------------
@@ -164,6 +325,16 @@ and calling [\"request\" in
 Apache2::RequestUtil](https://metacpan.org/pod/Apache2::RequestUtil#request){.perl-module}
 such as `Apache2::RequestUtil-`request\> assuming you have set
 `PerlOptions +GlobalRequest` in your Apache Virtual Host configuration.
+
+When running under Apache mod\_perl this is set automatically from the
+special [\"handler\"](#handler){.perl-module} method, such as:
+
+        my $r = $f->r; # $f is the Apache2::Filter object provided by Apache
+
+clone
+-----
+
+Create a clone of the object and return it.
 
 decode\_base64
 --------------
@@ -217,31 +388,42 @@ decode\_url
 
 Decode x-www-form-urlencoded encoded data. When using Apache mod\_perl,
 this uses [\"decode\" in
-APR::Request](https://metacpan.org/pod/APR::Request#decode){.perl-module},
-otherwise it uses [\"url\_decode\_utf8\" in
+APR::Request](https://metacpan.org/pod/APR::Request#decode){.perl-module}
+and [\"decode\" in
+Encode](https://metacpan.org/pod/Encode#decode){.perl-module}, otherwise
+it uses [\"url\_decode\_utf8\" in
 URL::Encode](https://metacpan.org/pod/URL::Encode#url_decode_utf8){.perl-module}
-(its XS version)
+(its XS version) to achieve the same result.
 
 If an error occurred during decoding, it will return undef and set an
 [\"error\"](#error){.perl-module} object accordingly.
 
 Example:
 
-        $ssi->decode_url( 'Tous les &ecirc;tres humains naissent libres et &eacute;gaux en dignit&eacute; et en droits.' );
+        $ssi->decode_url( 'Tous+les+%C3%83%C2%AAtres+humains+naissent+libres+et+%C3%83%C2%A9gaux+en+dignit%C3%83%C2%A9+et+en+droits.' );
         # Tous les êtres humains naissent libres et égaux en dignité et en droits.
+
+document\_filename
+------------------
+
+This is an alias for [\"filename\" in
+Apache2::SSI::URI](https://metacpan.org/pod/Apache2::SSI::URI#filename){.perl-module}
 
 document\_directory
 -------------------
 
 Returns an
-[Apache2::SSIFile](https://metacpan.org/pod/Apache2::SSIFile){.perl-module}
+[Apache2::SSI::URI](https://metacpan.org/pod/Apache2::SSI::URI){.perl-module}
 object of the current directory of the
 [\"document\_uri\"](#document_uri){.perl-module} provided.
 
-document\_filename
-------------------
+document\_path
+--------------
 
-This returns the system file path to the document uri.
+Sets or gets the uri path to the document. This is the same as
+[\"document\_uri\"](#document_uri){.perl-module}, except it is striped
+from [\"query\_string\"](#query_string){.perl-module} and
+[\"path\_info\"](#path_info){.perl-module}.
 
 document\_root
 --------------
@@ -366,7 +548,37 @@ If an error occurred during decoding, it will return undef and set an
 Example:
 
         $ssi->encode_url( 'Tous les êtres humains naissent libres et égaux en dignité et en droits.' );
-        # Tous les &ecirc;tres humains naissent libres et &eacute;gaux en dignit&eacute; et en droits.
+        # Tous+les+%C3%83%C2%AAtres+humains+naissent+libres+et+%C3%83%C2%A9gaux+en+dignit%C3%83%C2%A9+et+en+droits.
+
+env
+---
+
+Sets or gets the value for an environment variable. Or, if no
+environment variable name is provided, it returns the entire hash
+reference. This method is intended to be used by users of this module,
+not by developers wanting to inherit from it.
+
+Note that the environment variable hash is unique for each new object,
+so it works like [\"subprocess\_env\" in
+Apache2::RequestRec](https://metacpan.org/pod/Apache2::RequestRec#subprocess_env){.perl-module},
+meaning each process has its set of environment variable.
+
+When a value is set for an environment variable that has an equivalent
+name, it will call the method as well with the new value provided. This
+is done to ensure data consistency and also additional processing if
+necessary.
+
+For example, let assume you set the environment variable `REQUEST_URI`
+or `DOCUMENT_URI` like this:
+
+        $ssi->env( REQUEST_URI => '/some/path/to/file.html?q=something&l=ja_JP' );
+
+This will, in turn, call [\"request\_uri\"](#request_uri){.perl-module},
+which is an alias for
+[document\_uri](https://metacpan.org/pod/document_uri){.perl-module} and
+this method will get the uri, path info and query string from the value
+provided and set those values accordingly, so they can be available when
+parsing.
 
 errmsg
 ------
@@ -384,6 +596,30 @@ object.
 This module does not die nor \"croak\", but instead returns undef when
 an error occurs and set the error object.
 
+It is up to you to check the return value of the method calls. If you do
+not, you will miss important information. If you really want your script
+to die, it is up to you to interrupt it:
+
+        if( !defined( $ssi->parse( $some_html_data ) ) )
+        {
+            die( $ssi->error );
+        }
+
+or maybe more simply, when you are sure you will not get a false, but
+defined value:
+
+        $ssi->parse( $some_html_data ) || die( $ssi->error );
+
+This example is dangerous, because [\"parse\"](#parse){.perl-module}
+might return an empty string which will be construed as a false value
+and will trigger the die statement, even though no error had occurred.
+
+filename
+--------
+
+This is an alias for [\"filename\" in
+Apache2::SSI::URI](https://metacpan.org/pod/Apache2::SSI::URI#filename){.perl-module}
+
 find\_file
 ----------
 
@@ -392,9 +628,28 @@ attempt to look it up as a file if the argument *file* is provided with
 a file path as a value, or as a URI if the argument `virtual` is
 provided as an argument.
 
+This will call [\"lookup\_file\"](#lookup_file){.perl-module} or
+[\"lookup\_uri\"](#lookup_uri){.perl-module} depending on whether it is
+dealing with a file or an uri.
+
 It returns a
-[Apache2::SSIFile](https://metacpan.org/pod/Apache2::SSIFile){.perl-module}
+[Apache2::SSI::URI](https://metacpan.org/pod/Apache2::SSI::URI){.perl-module}
 object which is stringifyable and contain the file path.
+
+finfo
+-----
+
+Returns a
+[Apache2::SSI::Finfo](https://metacpan.org/pod/Apache2::SSI::Finfo){.perl-module}
+object. This provides access to [\"stat\" in
+perlfunc](https://metacpan.org/pod/perlfunc#stat){.perl-module}
+information as method, taking advantage of
+[APR::Finfo](https://metacpan.org/pod/APR::Finfo){.perl-module} when
+running under Apache, and
+[File::stat](https://metacpan.org/pod/File::stat){.perl-module}-like
+interface otherwise. See
+[Apache2::SSI::Finfo](https://metacpan.org/pod/Apache2::SSI::Finfo){.perl-module}
+for more information.
 
 html
 ----
@@ -416,14 +671,14 @@ As per Apache SSI documentation, you cannot specify a path starting with
 `/` or `../`
 
 It returns a
-[Apache2::SSIFile](https://metacpan.org/pod/Apache2::SSIFile){.perl-module}
+[Apache2::SSI::File](https://metacpan.org/pod/Apache2::SSI::File){.perl-module}
 object.
 
 lookup\_uri
 -----------
 
 Provided with an uri, and this will loo it up and return a
-[Apache2::SSIFile](https://metacpan.org/pod/Apache2::SSIFile){.perl-module}
+[Apache2::SSI::URI](https://metacpan.org/pod/Apache2::SSI::URI){.perl-module}
 object.
 
 Under Apache mod\_perl, this uses [\"lookup\_uri\" in
@@ -431,6 +686,10 @@ Apache2::SubRequest](https://metacpan.org/pod/Apache2::SubRequest#lookup_uri){.p
 to achieve that. Outside of Apache it will attempt to lookup the uri
 relative to the document root if it is an absolute uri or to the current
 document uri.
+
+It returns a
+[Apache2::SSI::URI](https://metacpan.org/pod/Apache2::SSI::URI){.perl-module}
+object.
 
 mod\_perl
 ---------
@@ -452,7 +711,7 @@ parse\_config
 Provided with an hash reference of parameters and this sets three of the
 object parameters that can also be set during object instantiation:
 
-*errmsg*
+*echomsg*
 
 :   The value is a message that is sent back to the client if the echo
     element attempts to echo an undefined variable.
@@ -465,14 +724,14 @@ object parameters that can also be set during object instantiation:
 :   This is the default error message to be used as the result for a
     faulty ssi directive.
 
-    See the [\"errmsg\"](#errmsg){.perl-module} method.
+    See the [\"echomsg\"](#echomsg){.perl-module} method.
 
 *sizefmt*
 
 :   This is the format to be used to format the files size. Value can be
     either `bytes` or `abbrev`
 
-    See the [\"sizefmt\"](#sizefmt){.perl-module} method.
+    See also the [\"sizefmt\"](#sizefmt){.perl-module} method.
 
 *timefmt*
 
@@ -480,7 +739,7 @@ object parameters that can also be set during object instantiation:
     value is a date formatting based on [\"strftime\" in
     POSIX](https://metacpan.org/pod/POSIX#strftime){.perl-module}
 
-    See the [\"sizefmt\"](#sizefmt){.perl-module} method.
+    See also the [\"timefmt\"](#timefmt){.perl-module} method.
 
 parse\_echo
 -----------
@@ -494,7 +753,7 @@ For example:
 
 There are a number of standard environment variable accessible under SSI
 on top of other environment variables set. See [\"SSI
-Directives\"](#ssi-directives){.perl-module}
+Directives\"](#ssi-directives){.perl-module} section below.
 
 parse\_echo\_date\_gmt
 ----------------------
@@ -530,6 +789,9 @@ Example:
 
         <!--#echo var="DOCUMENT_NAME" -->
 
+If the uri were `/some/where/file.html`, this would return only
+`file.html`
+
 parse\_echo\_document\_uri
 --------------------------
 
@@ -538,6 +800,8 @@ Returns the value of [\"document\_uri\"](#document_uri){.perl-module}
 Example:
 
         <!--#echo var="DOCUMENT_URI" -->
+
+The document uri would include, if any, any path info and query string.
 
 parse\_echo\_last\_modified
 ---------------------------
@@ -706,6 +970,26 @@ Example:
         You're good to go.
         <!--#endif -->
 
+However, outside of an Apache environment this will return the value of
+the environment variable in the following order:
+
+X-API-ID (i.e. the name as-is)
+
+:   
+
+HTTP\_X\_API\_ID (i.e. adding `HTTP_` and replace `-` for `_`)
+
+:   
+
+X\_API\_ID (i.e. same as above, but without the `HTTP_` prefix)
+
+:   
+
+If none is found, it returns an empty string.
+
+For an equivalent function for response headers, see
+[\"parse\_func\_resp\"](#parse_func_resp){.perl-module}
+
 parse\_func\_ldap
 -----------------
 
@@ -749,6 +1033,50 @@ Lookup request note
         <!--#if expr="note('CUSTOMER_ID') == 1234567" -->
         Showing special message
         <!--#endif -->
+
+This uses
+[Apache2::SSI::Notes](https://metacpan.org/pod/Apache2::SSI::Notes){.perl-module}
+to enable notes to be shared on and off Apache2/mod\_perl2 environment.
+Thus, you could set a note from a command-line perl script, and then
+access it under Apache2/mod\_perl2 or just your regular script running
+under a web server.
+
+For example:
+
+In your perl script outside of Apache:
+
+        # Basic parameters to make Apache2::SSI happy
+        my $ssi = Apache2::SSI->new( document_root => '/home/john/www', document_uri => '/' ) ||
+            die( Apache2::SSI->error );
+        $ssi->notes( API_VERSION => 2 );
+
+Then, in your perl script running under the web server, be it
+Apache2/mod\_perl2 or not:
+
+        my $ssi = Apache2::SSI->new || die( Apache2::SSI->error );
+        my $api_version = $ssi->notes( 'API_VERSION' );
+
+To enable shareability of notes on and off Apache, this makes uses of
+shared memory segments. See
+[Apache2::SSI::Notes](https://metacpan.org/pod/Apache2::SSI::Notes){.perl-module}
+for more information on the notes api and
+[perlipc](https://metacpan.org/pod/perlipc){.perl-module} for more
+information on shared memory segments.
+
+Just keep in mind that the notes are **never** removed even when Apache
+shuts down, so it is your responsibility to remove them if you do not
+want them anymore. For example:
+
+        use Apache2::SSI::Notes;
+        my $notes = Apache2::SSI::Notes->new;
+        $notes->remove;
+
+be aware that shared notes might note be available for your platform.
+Check
+[Apache2::SSI::Notes](https://metacpan.org/pod/Apache2::SSI::Notes){.perl-module}
+for more information and also
+[perlport](https://metacpan.org/pod/perlport){.perl-module} on shared
+memory segments.
 
 parse\_func\_osenv
 ------------------
@@ -797,6 +1125,10 @@ Example:
         Nope, it failed.
         <!--#endif -->
 
+Or using the Apache SSI `v` shortcut:
+
+        <!--#if expr="v('ProcessId') == '$$'" -->
+
 parse\_func\_req\_novary
 ------------------------
 
@@ -815,6 +1147,24 @@ Example:
         <!--#else -->
         Nope, it failed.
         <!--#endif -->
+
+An important note here:
+
+First, there is obviously no response header available for perl scripts
+running outside of Apache2/mod\_perl2 framework.
+
+If the script runs under mod\_perl, not all response header will be
+available depending on whether you are using
+[Apache2::SSI](https://metacpan.org/pod/Apache2::SSI){.perl-module} in
+your Apache configuration as an output filter handler
+(`PerlOutputFilterHandler`) or a response handler
+(`PerlResponseHandler`).
+
+If it is running as an output filter handler, then some headers, such as
+`Content-Type` will not be available, unless they have been set by a
+script in a previous phase. Only basic headers will be available. For
+more information, check the Apache/mod\_perl2 documentation on each
+phase.
 
 parse\_func\_sha1
 -----------------
@@ -969,21 +1319,63 @@ ssi directives and return its output as a string.
 If it fails, it sets an [\"error\"](#error){.perl-module} and returns an
 empty string.
 
+path\_info
+----------
+
+Sets or gets the path info for the current uri.
+
+Example:
+
+        my $string = $ssi->path_info;
+        $ssi->path_info( '/my/path/info' );
+
+The path info value is also set automatically when
+[\"document\_uri\"](#document_uri){.perl-module} is called, such as:
+
+        $ssi->document_uri( '/some/path/to/file.html/my/path/info?q=something&l=ja_JP' );
+
+This will also set automatically the `PATH_INFO` environment variable.
+
+query\_string
+-------------
+
+Set or gets the query string for the current uri.
+
+Example:
+
+        my $string = $ssi->query_string;
+        $ssi->query_string( 'q=something&l=ja_JP' );
+
+or, using the [URI](https://metacpan.org/pod/URI){.perl-module} module:
+
+        $ssi->query_string( $uri->query );
+
+The query string value is set automatically when you provide an
+[document\_uri](https://metacpan.org/pod/document_uri){.perl-module}
+upon instantiation or after:
+
+        $ssi->document_uri( '/some/path/to/file.html?q=something&l=ja_JP' );
+
+This will also set automatically the `QUERY_STRING` environment
+variable.
+
 remote\_ip
 ----------
 
 Sets or gets the remote ip address of the visitor.
 
 Under Apache mod\_perl, this will call [\"remote\_ip\" in
-Apache2::Connection](https://metacpan.org/pod/Apache2::Connection#remote_ip){.perl-module},
-and otherwise this will get the value from the environment variable
-`REMOTE_ADDR`
+Apache2::Connection](https://metacpan.org/pod/Apache2::Connection#remote_ip){.perl-module}
+for version 2.2 or lower and will call [\"useragent\_ip\" in
+Apache2::Connection](https://metacpan.org/pod/Apache2::Connection#useragent_ip){.perl-module}
+for version above 2.2, and otherwise this will get the value from the
+environment variable `REMOTE_ADDR`
 
 This value can also be overriden by being provided during object
 instantiation.
 
         # Pretend the ssi directives are accessed from this ip
-        $ssi->remote_ip( '192.1.68.2.20' );
+        $ssi->remote_ip( '192.168.2.20' );
 
 This is useful when one wants to check how the rendering will be when
 accessed from certain ip addresses.
@@ -1000,6 +1392,40 @@ or
         <!--#include file="/home/john/special_hidden_login_feature.html" -->
         <!--#endif -->
 
+[Apache2::Connection](https://metacpan.org/pod/Apache2::Connection){.perl-module}
+also has a [\"remote\_addr\" in
+Apache2::Connection](https://metacpan.org/pod/Apache2::Connection#remote_addr){.perl-module}
+method, but this returns a
+[APR::SockAddr](https://metacpan.org/pod/APR::SockAddr){.perl-module}
+object that is used to get the binary version of the ip. However you can
+also get the string version like this:
+
+        use APR::SockAddr ();
+        my $ip = $r->connection->remote_addr->ip_get();
+
+Versions above 2.2 make a distinction between ip from direct connection,
+or the real ip behind a proxy, i.e. [\"useragent\_ip\" in
+Apache2::Connection](https://metacpan.org/pod/Apache2::Connection#useragent_ip){.perl-module}
+
+request\_uri
+------------
+
+This is an alias for [\"document\_uri\"](#document_uri){.perl-module}
+
+server\_version
+---------------
+
+Returns the server version as a
+[version](https://metacpan.org/pod/version){.perl-module} object can
+caches that value.
+
+Under mod\_perl2, it uses [\"get\_server\_description\" in
+Apache2::ServerUtil](https://metacpan.org/pod/Apache2::ServerUtil#get_server_description){.perl-module}
+and outside of mod\_perl, it tries to find `apxs` using
+[File::Which](https://metacpan.org/pod/File::Which){.perl-module} and in
+last resort, tries to find the `apache2` or `httpd` binary to get its
+version information.
+
 sizefmt
 -------
 
@@ -1013,8 +1439,19 @@ Sets or gets the formatting for date and time values. The format takes
 the same values as [\"strftime\" in
 POSIX](https://metacpan.org/pod/POSIX#strftime){.perl-module}
 
+Encoding
+========
+
+At present time, the html data are treated as utf8 data and decoded and
+encoded back as such.
+
+If there is a need to broaden support for other charsets, let me know.
+
 SSI Directives
 ==============
+
+This is taken from Apache documentation and summarised here for
+convenience and clarity to the perl community.
 
 config
 ------
@@ -1142,7 +1579,7 @@ implement those Apache functions.
 
 :   
 
-*basereq\_novary64*
+*req\_novary*
 
 :   
 
@@ -1227,8 +1664,9 @@ example, the followings are supported
 In the examples below, we use the variable `QUERY_STRING`, but you can
 use any other variable of course.
 
-The regular expression are the ones PCRE compliant, so your perl regular
-expressions should work.
+The regular expression are the ones
+[PCRE](http://www.pcre.org/){.perl-module} compliant, so your perl
+regular expressions should work.
 
         <!--#if expr="$QUERY_STRING = 'something'" -->
         <!--#if expr="v('QUERY_STRING') = 'something'" -->
@@ -1256,7 +1694,8 @@ expressions should work.
 For subnet checks, this uses
 [Net::Subnet](https://metacpan.org/pod/Net::Subnet){.perl-module}
 
-Expressions that would not work out side of Apache:
+Expressions that would not work outside of Apache, i.e. it will return
+an empty string:
 
         <!--#expr="%{HTTP:X-example-header} in { 'foo', 'bar', 'baz' }" -->
 
@@ -1269,12 +1708,12 @@ CREDITS
 
 Credits to Ken Williams for his implementation of
 [Apache::SSI](https://metacpan.org/pod/Apache::SSI){.perl-module} from
-which I borrowed code.
+which I borrowed some code.
 
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55ed2c5198a0)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x558359487e08)"}\>
 
 CPAN ID: jdeguest
 
@@ -1282,6 +1721,14 @@ CPAN ID: jdeguest
 
 SEE ALSO
 ========
+
+[Apache2::SSI::File](https://metacpan.org/pod/Apache2::SSI::File){.perl-module},
+[Apache2::SSI::Finfo](https://metacpan.org/pod/Apache2::SSI::Finfo){.perl-module},
+[Apache2::SSI::Notes](https://metacpan.org/pod/Apache2::SSI::Notes){.perl-module},
+[Apache2::SSI::URI](https://metacpan.org/pod/Apache2::SSI::URI){.perl-module},
+[Apache2::SSI::SharedMem](https://metacpan.org/pod/Apache2::SSI::SharedMem){.perl-module}
+and
+[Apache2::SSI::SemStat](https://metacpan.org/pod/Apache2::SSI::SemStat){.perl-module}
 
 mod\_include, mod\_perl(3),
 [Apache::SSI](https://metacpan.org/pod/Apache::SSI){.perl-module},
@@ -1293,7 +1740,7 @@ mod\_include, mod\_perl(3),
 COPYRIGHT & LICENSE
 ===================
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

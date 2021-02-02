@@ -1,9 +1,15 @@
 package HTML::Make;
 use warnings;
 use strict;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 use Carp;
 use HTML::Valid::Tagset ':all';
+use JSON::Parse '0.60', 'read_json';
+
+my $dir = __FILE__;
+$dir =~ s/Make\.pm/Make/;
+my $infofile = "$dir/info.json";
+my $info = read_json ($infofile);
 
 # This is a list of valid tags.
 
@@ -206,19 +212,36 @@ sub multiply
 sub opening_tag
 {
     my ($obj) = @_;
-    my $text = "<$obj->{type}";
+    my $text = '';
+    my $type = $obj->{type};
+    if ($type eq 'html') {
+	$text .= "<!DOCTYPE html>\n";
+    }
+    $text .= "<$type";
     if ($obj->{attr}) {
 	my @attr;
 	my %attr = %{$obj->{attr}};
 	for my $k (sort keys %attr) {
 	    my $v = $attr{$k};
+	    if (! defined $v) {
+		carp "Value of attribute '$k' in element of type '$type' is undefined";
+		$v = '';
+	    }
 	    $v =~ s/"/\\"/g;
-	    CORE::push @attr, "$k=\"$v\"";
+	    if ($type eq 'script' && ($k eq 'async' || $k eq 'defer')) {
+		CORE::push @attr, "$k";
+	    }
+	    else {
+		CORE::push @attr, "$k=\"$v\"";
+	    }
 	}
 	my $attr = join (' ', @attr);
 	$text .= " $attr";
     }
     $text .= ">";
+    if ($info->{newline}{$type}) {
+	$text .= "\n";
+    }
     return $text;
 }
 

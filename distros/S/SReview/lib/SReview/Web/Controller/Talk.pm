@@ -3,10 +3,22 @@ package SReview::Web::Controller::Talk;
 use Mojo::Base 'Mojolicious::Controller';
 use SReview::API::Helpers qw/db_query update_with_json add_with_json/;
 use Mojo::Util;
-use Mojo::JSON qw/encode_json/;
+use Mojo::JSON qw/encode_json decode_json/;
 use DateTime::Format::Pg;
 
 use SReview::Talk;
+
+sub format_talks {
+	my $talks = shift;
+	foreach my $talk(@$talks) {
+		$talk->{starttime} = DateTime::Format::Pg->parse_datetime($talk->{starttime})->iso8601();
+		$talk->{endtime} = DateTime::Format::Pg->parse_datetime($talk->{endtime})->iso8601();
+		if($talk->{flags}) {
+			$talk->{flags} = decode_json($talk->{flags});
+		}
+	}
+	return $talks;
+}
 
 sub listByEvent {
 	my $c = shift->openapi->valid_input or return;
@@ -22,10 +34,7 @@ sub listByEvent {
 	}
 
 	my $res = db_query($c->dbh, "SELECT talks.* FROM talks WHERE event = ?", $eventId);
-	foreach my $r(@$res) {
-		$r->{starttime} = DateTime::Format::Pg->parse_datetime($r->{starttime})->iso8601();
-		$r->{endtime} = DateTime::Format::Pg->parse_datetime($r->{endtime})->iso8601();
-	}
+	$res = format_talks($res);
 
 	$c->render(openapi => $res);
 }
@@ -55,11 +64,11 @@ sub update {
 	my $eventId = $c->param('eventId');
 	my $talkId = $c->param('talkId');
 
-	my $event = db_query($c->dbh, "SELECT id FROM events WHERE id = ?", $eventId);
+	my $talk_check = db_query($c->dbh, "SELECT id FROM talks WHERE id = ? AND event = ?", $talkId, $eventId);
 
-	if(scalar(@$event) < 1) {
+	if(scalar(@$talk_check) < 1) {
 		$c->res->code(404);
-		$c->render(text => 'Event not found');
+		$c->render(text => 'Talk not found in given event');
 		return;
 	}
 
@@ -207,7 +216,7 @@ sub getById {
 		return;
 	}
 
-	$c->render(openapi => $talk->[0]);
+	$c->render(openapi => format_talks($talk)->[0]);
 }
 
 sub getByNonce {

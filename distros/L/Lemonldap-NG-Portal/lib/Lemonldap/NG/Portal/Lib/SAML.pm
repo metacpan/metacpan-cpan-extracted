@@ -2595,26 +2595,19 @@ sub sendLogoutRequestToProvider {
         $self->logger->debug('Relay state set');
     }
 
-    # Build the request
-    unless ( $logout->request() ) {
-
-        $self->logger->debug("No logout request found, build it");
-
-        # Initiate the logout request
-        unless ( $self->initLogoutRequest( $logout, $providerID, $method ) ) {
-            $self->logger->error(
-                "Initiate logout request failed for $providerID");
-            return ( 0, $method, undef );
-        }
-
-        # Build request message
-        unless ( $self->buildLogoutRequestMsg($logout) ) {
-            $self->logger->error("Build logout request failed for $providerID");
-            return ( 0, $method, undef );
-        }
-
-        $self->logger->debug("Request built for $providerID");
+    # Initiate the logout request
+    unless ( $self->initLogoutRequest( $logout, $providerID, $method ) ) {
+        $self->logger->error("Initiate logout request failed for $providerID");
+        return ( 0, $method, undef );
     }
+
+    # Build request message
+    unless ( $self->buildLogoutRequestMsg($logout) ) {
+        $self->logger->error("Build logout request failed for $providerID");
+        return ( 0, $method, undef );
+    }
+
+    $self->logger->debug("Request built for $providerID");
 
     # Keep message ID in memory to prevent replay
     my $samlID = $logout->request()->ID;

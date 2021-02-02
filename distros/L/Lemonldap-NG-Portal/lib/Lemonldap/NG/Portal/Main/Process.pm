@@ -373,6 +373,12 @@ sub getUser {
     return $self->_userDB->getUser( $req, %args );
 }
 
+sub findUser {
+    my ( $self, $req, %args ) = @_;
+    return PE_ERROR unless ( $self->_userDB );
+    return $self->_userDB->findUser( $req, %args );
+}
+
 sub authenticate {
     my ( $self, $req ) = @_;
     my $ret = $req->authResult( $self->_authentication->authenticate($req) );

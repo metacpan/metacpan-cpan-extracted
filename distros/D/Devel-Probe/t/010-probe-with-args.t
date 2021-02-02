@@ -20,7 +20,7 @@ Devel::Probe::trigger(sub {
 my $actions = [
     { action => "enable" },
     map {
-        { action => "define", file => $file, lines => [$_], args => $expected->{$file}->{$_} }
+        { action => "define", file => $file, lines => [$_], argument => $expected->{$file}->{$_} }
     } sort keys %{ $expected->{$file} }
 ];
 

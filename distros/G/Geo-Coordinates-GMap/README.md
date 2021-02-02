@@ -56,9 +56,16 @@ the scale will default to `1`.
 - Implement a routine to convert tile coordinates back in to lat/lon decimal
 coordinates.
 
+# SUPPORT
+
+Please submit bugs and feature requests to the
+Geo-Coordinates-GMap GitHub issue tracker:
+
+[https://github.com/bluefeet/Geo-Coordinates-GMap/issues](https://github.com/bluefeet/Geo-Coordinates-GMap/issues)
+
 # AUTHOR
 
-Aran Clary Deltac <bluefeet@gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 # LICENSE
 

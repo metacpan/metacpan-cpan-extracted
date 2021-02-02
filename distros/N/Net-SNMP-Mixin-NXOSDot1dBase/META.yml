@@ -17,7 +17,7 @@ name: Net-SNMP-Mixin-NXOSDot1dBase
 provides:
   Net::SNMP::Mixin::NXOSDot1dBase:
     file: lib/Net/SNMP/Mixin/NXOSDot1dBase.pm
-    version: '0.01'
+    version: '0.10'
 requires:
   Net::SNMP: '0'
   Net::SNMP::Mixin: '0.13'
@@ -25,5 +25,5 @@ requires:
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

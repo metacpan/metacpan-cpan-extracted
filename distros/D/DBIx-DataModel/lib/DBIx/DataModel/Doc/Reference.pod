@@ -231,7 +231,7 @@ would be interpreted as
   T_Employee LEFT OUTER JOIN T_Activity ON ...
              LEFT OUTER JOIN T_Department ON ...
 
-even if the association betwen C<Activity> and C<Department> is 
+even if the association between C<Activity> and C<Department> is 
 many-to-one (which theoretically would result in a INNER JOIN by
 default).
 
@@ -257,15 +257,14 @@ this schema.
 =item table_metaclass, join_metaclass, association_metaclass, path_metaclass, type_metaclass
 
 Optional application-specific classes, to be used instead of the
-builtin metaclasses, for instanciating meta-objects declared in this schema, .
+builtin metaclasses, for instantiating meta-objects declared in this schema, .
 
 =item statement_class
 
 Optional application-specific class to be used instead of the
-builtin class L<DBIx::DataModel::Statement> for instanciating 
+builtin class L<DBIx::DataModel::Statement> for instantiating
 statements. For example you may want to set this option to
 L<DBIx::DataModel::Statement::Oracle> if you work with an Oracle database.
-
 
 =back
 
@@ -818,6 +817,7 @@ is more or less equivalent to
   $schema->View("Department=>activities=>employee", '*', $sql, 
                 qw/Department Activity Employee/);
 
+
 =head4 Join kinds (left or inner)
 
 Kinds of joins are chosen according to the
@@ -828,7 +828,7 @@ C<< $meta_schema->sql_no_inner_after_left_join >> is true, in which case
 a first left join forces all following joins to be also 'left',
 without considering the multiplicities any more).
 The default kind of join chosen by this rule may be
-overriden by inserting intermediate connectors in the list, namely 
+overridden by inserting intermediate connectors in the list, namely 
 C<< '<=>' >> for inner joins and C<< '=>' >> for left joins :
 compare the previous example with 
 
@@ -1158,7 +1158,7 @@ There is also another way to see the SQL code for one particular statement :
   my $sqlam = $schema->sql_abstract;                     # get
 
 Sets or retrieves the instance of L<SQL::Abstract::More> used 
-by this C<$schema>. If the client code does not set it explictly,
+by this C<$schema>. If the client code does not set it explicitly,
 an instance will be implicitly created. The reason for using
 something else than this default might be either 
 to control some specific parameters of C<SQL::Abstract::More>,
@@ -1449,7 +1449,7 @@ To understand why this method is useful, consider a situation like this
 
 Here the call to C<< publish_to_outer_world(@keys) >> is likely to
 fail, because this happens inside a nested transaction and therefore
-the keys returned by the previous line are not committed yed; as a
+the keys returned by the previous line are not committed yet; as a
 result, the "outer world" (especially if it is another process) cannot
 access those keys until the outer transaction is finished.
 
@@ -1476,9 +1476,9 @@ If the transaction is aborted, all coderefs are dismissed.
 
   $schema->unbless($obj1, $obj2, ...);
 
-Recursively applies L<Acme::Damn/damn> to remove all class information 
-from its arguments : these become plain Perl hashrefs, arrayrefs or scalars.
-Internal references to C<__schema> are also removed.
+Applies L<Data::Structure::Util/unbless> to the given objects, 
+recursively removing all class information : these become
+plain Perl hashrefs, arrayrefs or scalars.
 
 This may be useful if the datatree returned by a C<select(..) / expand(..) >
 needs to be exported through an external module that only considers
@@ -1572,6 +1572,9 @@ Proxy for C<< $self->source->schema >>.
        # OR : -fetch   => $key,
        # OR : -fetch   => \@key,
      -where_on        => \%where_on_criteria,
+     -union           => \%select_subargs, # OR : -union_all
+     -intersect       => \%select_subargs,
+     -except          => \%select_subargs, # OR : -minus
      -group_by        => \@groupings,
      -having          => \%having_criteria,
      -order_by        => \@order,
@@ -1740,6 +1743,25 @@ of the statement; if in doubt, read your vendor's manual and do
 experiments. 
 
 
+=item C<< -union => [ %select_subargs ] >>
+
+=item C<< -union_all => [ %select_subargs ] >>
+
+=item C<< -intersect => [ %select_subargs ] >>
+
+=item C<< -except => [ %select_subargs ] >>
+
+=item C<< -minus => [ %select_subargs ] >>
+
+these arguments are handled by L<SQL::Abstract::More>.
+They generate compound queries using set operators such as C<UNION>,
+C<INTERSECT>, etc. The hash C<%select_subargs> contains a nested
+set of parameters like for the main select (i.e. C<-columns>,
+C<-where>, etc.); however, arguments C<-columns> and
+C<-from> can be omitted, in which case they will be copied from the
+main select(). Several levels of set operators can be nested.
+
+
 =item C<< -group_by => "string" >>  or C<< -group_by => \@array >> 
 
 adds a C<GROUP BY> clause in the SQL statement. Grouping columns are
@@ -1751,7 +1773,7 @@ like for the C<-columns> argument.
 adds a C<HAVING> clause in the SQL statement (which only makes
 sense together with a C<GROUP BY> clause).
 This is like a C<-where> clause, except that the criteria
-are applied after grouping has occured.
+are applied after grouping has occurred.
 
 =item C<< -order_by => \@order >> 
 
@@ -1900,6 +1922,10 @@ In principle, columns in C<@cols> should contain unique values;
 nevertheless if it happens that multiple rows have the same
 values for C<@cols>, then later rows overwrite earlier ones.
 
+A C<sub> reference can be given instead of C<@cols>; that subroutine
+will be called for each row and should return a list of scalar values
+to be used as hash keys.
+
 
 =item L<flat_arrayref|DBIx::DataModel::Schema::ResultAs::Flat> (or just C<flat>)
 
@@ -2000,14 +2026,18 @@ of rows.
 
 =item L<categorize|DBIx::DataModel::Schema::ResultAs::Categorize>
 
-  my $tree = $source->select(..., $result_as => [categorize => ($key1, $key2)]);
+  my $tree = $source->select(..., $result_as => [categorize => ($column1, ...)]);
 
-Builds a tree of rows through module L<List::Categorize>, with
-C<$key1>, C<$key2>, etc. as categorization keys. This is quite similar
+Builds a tree of lists of rows through module L<List::Categorize>, with
+the content of C<$column1>, etc. as categorization keys. This is quite similar
 to the C<hashref> result kind, except that the categorization keys
 need not be unique : each leaf of the tree will contain I<lists>
 of rows matching those categories, while the C<hashref> result kind
 only keeps the I<last> row matching the given keys.
+
+Instead of a list of column names, the argument can be a reference
+to a subroutine. That subroutine will we called
+for each row and should return a list of scalar values to be used as categorization keys.
 
 =item L<table|DBIx::DataModel::Schema::ResultAs::Table>
 
@@ -2397,7 +2427,7 @@ we can write
 
 A join between several tables (see the L</join()> method) creates
 a new class that inherits all path methods from all tables participating
-in the join; in case of name conflics, the latest table takes precedence.
+in the join; in case of name conflicts, the latest table takes precedence.
 Again, it is possible to use fully qualified method names if necessary.
 
 
@@ -2815,7 +2845,7 @@ instead of C<< my ($k) = $obj->primary_key >>).
 As a class method, this returns a statement that will select a
 collection of data rows from tables associated with the current
 meta-source, performing the appropriate joins.  Internally this is
-implemented throught the C</define_join()> method, with an additional
+implemented through the C</define_join()> method, with an additional
 C<-where> criteria to constrain on the primary key(s) of the
 meta-source.  That statement cannot be executed yet, because the
 values of the primary key are not known until we have an row of that
@@ -2937,7 +2967,7 @@ with arguments, this is equivalent to
 
 in other words, the C<-where> part is taken from the 
 primary key of the invocant, and the updated fields are passed
-as an argument hashref. Primary key colums may appear in this 
+as an argument hashref. Primary key columns may appear in this 
 hashref, but this will result in I<changing the primary key> 
 for that record. Ex :
 

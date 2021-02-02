@@ -1,27 +1,33 @@
 {
    "abstract" : "Generate a tree from a self-referential database table",
    "author" : [
-      "Ron Savage <ron@savage.net.au>"
+      "B Jepson <bjepston@jepstone.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_2"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBIx-Tree",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.94"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -35,22 +41,28 @@
             "vars" : "0",
             "warnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "DBIx::Tree" : {
-         "file" : "lib/DBIx/Tree.pm",
-         "version" : "1.97"
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001014",
+            "Test::Pod" : "1.48"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ronsavage/DBIx-Tree/issues"
+      },
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
+         "http://opensource.org/licenses/Perl"
       ],
       "repository" : {
-         "url" : "https://github.com/ronsavage/DBIx-Tree"
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/DBIx-Tree.git",
+         "web" : "https://github.com/ronsavage/DBIx-Tree"
       }
    },
-   "version" : "1.97"
+   "version" : "1.98",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

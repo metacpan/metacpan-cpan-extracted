@@ -6,7 +6,7 @@
                                                           
 
 
-This is the README for HTML::Make version 0.14.
+This is the README for HTML::Make version 0.15.
 
 HTML::Make is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -59,11 +59,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm HTML::Make
 
-To install the module from the source file, HTML-Make-0.14.tar.gz, follow
+To install the module from the source file, HTML-Make-0.15.tar.gz, follow
 this sequence of commands:
 
-    tar xfz HTML-Make-0.14.tar.gz
-    cd HTML-Make-0.14
+    tar xfz HTML-Make-0.15.tar.gz
+    cd HTML-Make-0.15
     perl Makefile.PL
     make
     make install
@@ -88,6 +88,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Mon Jan 11 21:47:57 2021.
+This README was written on Sat Jan 30 16:37:29 2021.
 
 -----------------------------------------------------------------------------

@@ -26,5 +26,5 @@ requires:
   perl: '5.018'
 resources:
   repository: https://github.com/gonzus/Devel-Probe.git
-version: '0.000005'
+version: '0.000006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,7 +3,7 @@ package Pod::ProjectDocs::IndexPage;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';    # VERSION
+our $VERSION = '0.53';    # VERSION
 
 use Moose;
 with 'Pod::ProjectDocs::File', 'Pod::ProjectDocs::Template';
@@ -55,29 +55,29 @@ function get_rows_html (manager, pattern) {
     var html   = '';
     var regexp = new RegExp( "(" + pattern + ")", "gi");
     var seq    = 0;
-    for (var i = 0; i < manager.records.length; i++) {
-        var record = manager.records[i];
-        if ( record.name.match(regexp) ) {
-            var module_name = manager.records[i].name;
+    for (var i = 0; i < manager.entries.length; i++) {
+        var entry = manager.entries[i];
+        if ( entry.name.match(regexp) ) {
+            var module_name = manager.entries[i].name;
             if(pattern != '' ) {
                 var replace_text = "<span class='search_highlight'>$1</span>";
                 module_name = module_name.replace(regexp, replace_text);
             }
-            html += get_record_html(record, module_name, seq);
+            html += get_entry_html(entry, module_name, seq);
             seq++;
         }
     }
     return html;
 }
-function get_record_html (record, name, i) {
+function get_entry_html (entry, name, i) {
     var row_class  = ( i % 2 == 0 ) ? 'r' : 's';
     var row_html   = "<tr class='"
                    + row_class
                    + "'><td nowrap='nowrap'><a href='"
-                   + record.path
+                   + entry.path
                    + "'>"
                    + name + "</a></td><td width='99%'><small>"
-                   + (record.title || '')
+                   + (entry.title || '')
                    + "</small></td></tr>";
     return row_html;
 }
@@ -125,5 +125,7 @@ sub _get_data {
     my $text = $self->process( $self, $self->data, $params );
     return $text;
 }
+
+no Moose;
 
 1;

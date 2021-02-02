@@ -4,7 +4,7 @@ Attean::API::MutableModel - Role representing mutable models
 
 =head1 VERSION
 
-This document describes Attean::API::MutableModel version 0.028
+This document describes Attean::API::MutableModel version 0.029
 
 =head1 SYNOPSIS
 
@@ -62,6 +62,12 @@ This role provides default implementations of the following methods:
 =item C<< load_triples( $format, $graph => $data ) >>
 
 Parses the serialized triples contained in the string C<$data> using the
+C<$format> parser (see L<Attean/get_parser>). Triples resulting from parsing
+are turned into quads using the C<$graph> identifier, and added to the model.
+
+=item C<< load_triples_from_io( $format, $graph => $data ) >>
+
+Parses the serialized triples read from the filehandle C<$io> using the
 C<$format> parser (see L<Attean/get_parser>). Triples resulting from parsing
 are turned into quads using the C<$graph> identifier, and added to the model.
 

@@ -1,5 +1,10 @@
 Revision history for Perl extension Tree::Cladogram.
 
+1.04  2021-02-02T10:49:00
+	- Add t/00.*.
+	- Reformat Makefile.PL.
+	- Update Makefile.PL and POD to change RT to github.
+
 1.03  2016-08-14T11:33:00
 	- Stop using Test::Stream. Use Test::More shipped in the Test::Simple distro.
 		See RT#116931. Thanx to Chad Granum aka EXODIST.

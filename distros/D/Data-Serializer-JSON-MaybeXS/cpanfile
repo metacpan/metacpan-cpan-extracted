@@ -1,3 +1,4 @@
+requires 'perl' => '5.008001';
 requires 'Data::Serializer' => 0.60;
 requires 'JSON::MaybeXS' => 1.003003;
 

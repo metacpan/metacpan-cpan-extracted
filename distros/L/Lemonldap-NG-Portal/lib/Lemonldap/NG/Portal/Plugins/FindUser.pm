@@ -1,0 +1,213 @@
+package Lemonldap::NG::Portal::Plugins::FindUser;
+
+use strict;
+use Mouse;
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_NOTOKEN
+  PE_TOKENEXPIRED
+  PE_FIRSTACCESS
+);
+
+our $VERSION = '2.0.11';
+
+extends qw(
+  Lemonldap::NG::Portal::Main::Plugin
+  Lemonldap::NG::Portal::Lib::_tokenRule
+);
+
+# INITIALIZATION
+has ott => (
+    is      => 'rw',
+    lazy    => 1,
+    default => sub {
+        my $ott =
+          $_[0]->{p}->loadModule('Lemonldap::NG::Portal::Lib::OneTimeToken');
+        $ott->timeout( $_[0]->{conf}->{formTimeout} );
+        return $ott;
+    }
+);
+
+sub init {
+    my ($self) = @_;
+    ( my $imp = grep /::Plugins::Impersonation$/, $self->p->enabledPlugins )
+      ? $self->addUnauthRoute( finduser => 'provideUser', ['POST'] )
+      : $self->logger->warn('FindUser plugin enabled without Impersonation');
+    $self->logger->warn('FindUser plugin enabled without searching attribute')
+      unless keys %{ $self->conf->{findUserSearchingAttributes} };
+
+    # Add warning in log
+    $self->logger->warn(
+        "FindUser plugin is enabled. You are using a beta version!");
+
+    return 1;
+}
+
+# RUNNING METHOD
+sub provideUser {
+    my ( $self, $req ) = @_;
+    my $error;
+
+    # Check token
+    if ( $self->ottRule->( $req, {} ) ) {
+        my $token = $req->param('token');
+        unless ($token) {
+            $self->userLogger->warn('FindUser called without token');
+            $error = PE_NOTOKEN;
+        }
+        else {
+            unless ( $self->ott->getToken($token) ) {
+                $self->userLogger->warn(
+                    'FindUser called with an expired/bad token');
+                $error = PE_TOKENEXPIRED;
+            }
+        }
+    }
+    return $self->sendResult( $req, $error ) if $error;
+
+    $req->steps( ['findUser'] );
+    $req->data->{findUserChoice} = $self->conf->{authChoiceFindUser};
+    if ( $error = $self->p->process($req) ) {
+        $self->logger->debug("Process returned error: $error");
+        return $self->sendResult( $req, $error );
+    }
+    return $self->sendResult($req);
+}
+
+sub retreiveFindUserParams {
+    my ( $self, $req ) = @_;
+    my ( $searching, $excluding, @required ) = ( [], [], () );
+
+    $self->logger->debug("FindUser: reading parameters...");
+    @$searching = map {
+        my ( $key, $value, $null ) = split '#', $_;
+        my $param  = $req->params($key) // '';
+        my @values = split $self->conf->{multiValuesSeparator},
+          $self->conf->{findUserSearchingAttributes}->{$_} || '';
+        my $select  = scalar @values > 1 && not scalar @values % 2;
+        my %values  = @values if $select;
+        my $defined = length $param;
+        my $regex   = '^(?:' . join( '|', keys %values ) . ')$';
+        my $checked =
+            $select
+          ? $param =~ /$regex/o
+          : $param =~ /$self->{conf}->{findUserControl}/o;
+        push @required, $key if $select && !$null;
+
+        # For <select>, accept only set values or empty if allowed
+        if ( $defined && $checked ) {
+            $self->logger->debug("Append searching parameter: $key =>  $param");
+            { key => $key, value => $param };
+        }
+        else {
+            $self->logger->warn(
+                "Parameter $key has been reject by findUserControl")
+              if $defined;
+            ();
+        }
+    } sort keys %{ $self->conf->{findUserSearchingAttributes} };
+
+    if ( scalar @required ) {
+        my $test = 0;
+        foreach my $ref (@$searching) {
+            foreach (@required) {
+                $test++ if $ref->{key} eq $_;
+            }
+        }
+        unless ( scalar @required == $test ) {
+            $self->logger->warn( 'A required parameter is missing ('
+                  . join( '|', @required )
+                  . ')' );
+            $searching = [];
+        }
+    }
+
+    if ( scalar @$searching
+        && keys %{ $self->conf->{findUserExcludingAttributes} } )
+    {
+        $self->logger->debug("FindUser: reading excluding parameters...");
+        @$excluding = map {
+            my $key = $_;
+            map {
+                $self->logger->debug("Push excluding parameter: $key => $_");
+                {    # Allow multivalued excluding parameters
+                    key   => $key,
+                    value => $_
+                }
+              } split $self->conf->{multiValuesSeparator},
+              $self->conf->{findUserExcludingAttributes}->{$_};
+        } sort keys %{ $self->conf->{findUserExcludingAttributes} };
+    }
+
+    return ( $searching, $excluding );
+}
+
+sub buildForm {
+    my $self   = shift;
+    my $fields = [];
+    $self->logger->debug('Building array ref with searching fields...');
+    @$fields =
+      sort { $a->{select} <=> $b->{select} || $a->{value} cmp $b->{value} }
+      map {
+        my ( $key, $value, $null ) = split '#', $_;
+        my @values = split $self->conf->{multiValuesSeparator},
+          $self->conf->{findUserSearchingAttributes}->{$_} || $key;
+        my $nbr = scalar @values;
+        if ( $nbr > 1 ) {
+            if ( $nbr % 2 ) { () }
+            else {
+                my %hash    = @values;
+                my $choices = [];
+                $nbr /= 2;
+                $self->logger->debug(
+                    "Building $key with type 'select' and $nbr entries...");
+                @$choices = sort { $a->{value} cmp $b->{value} }
+                  map { { key => $_, value => $hash{$_} } } keys %hash;
+                {
+                    select  => 1,
+                    key     => $key,
+                    null    => $null,
+                    value   => $value ? $value : $key,
+                    choices => $choices
+                };
+            }
+        }
+        else {
+            {
+                select => 0,
+                key    => $key,
+                value  => $values[0]
+            };
+        }
+      } keys %{ $self->conf->{findUserSearchingAttributes} };
+
+    return $fields;
+}
+
+sub sendResult {
+    my ( $self, $req, $error ) = @_;
+
+    if ($error) {
+        eval { $self->p->_authentication->setSecurity($req) };
+        return $req->wantJSON
+          ? $self->p->sendJSONresponse(
+            $req,
+            {
+                user  => '',
+                error => $error
+            }
+          )
+          : $self->p->do( $req, [ sub { $error } ] );
+    }
+    return $req->wantJSON
+      ? $self->p->sendJSONresponse(
+        $req,
+        {
+            user   => ( $req->data->{findUser} ? $req->data->{findUser} : '' ),
+            result => 1
+        }
+      )
+      : $self->p->do( $req, [ sub { PE_FIRSTACCESS } ] );
+}
+
+1;

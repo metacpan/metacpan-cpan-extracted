@@ -1,11 +1,11 @@
 package Lemonldap::NG::Handler::Lib::PSGI;
 
-#use 5.10.0;
+use strict;
 use Mouse;
 
 #use Lemonldap::NG::Handler::Main qw(:jailSharedVars);
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.11';
 
 has protection => ( is => 'rw', isa => 'Str' );
 has rule       => ( is => 'rw', isa => 'Str' );

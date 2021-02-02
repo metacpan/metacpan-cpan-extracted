@@ -37,6 +37,8 @@ our $required = {
 };
 
 our $required_test = {
+    'Test::MockModule'
+        => '0.171.0',
     'Test::More'
         => '0.88',
     'Test::Warn'

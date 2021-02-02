@@ -3,7 +3,7 @@ package Specio::Constraint::Intersection;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use List::Util qw( all );
 use Role::Tiny::With;
@@ -133,7 +133,7 @@ Specio::Constraint::Intersection - A class for intersection constraints
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 
@@ -141,8 +141,8 @@ version 0.46
 
 =head1 DESCRIPTION
 
-This is a specialized type constraint class for intersections, which will
-allow a value which matches each one of several distinct types.
+This is a specialized type constraint class for intersections, which will allow
+a value which matches each one of several distinct types.
 
 =for Pod::Coverage parent
 
@@ -187,7 +187,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

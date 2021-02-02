@@ -68,7 +68,7 @@ my %tests = (
             -1e10
             -1e+10
             1E20
-            ),
+        ),
         $ARRAY_REF,
         $ARRAY_OVERLOAD,
         $BOOL_OVERLOAD_TRUE,
@@ -111,7 +111,7 @@ my %tests = (
             -1.23456e10
             -1.23456e-10
             -1.23456e+10
-            ),
+        ),
     ],
 );
 

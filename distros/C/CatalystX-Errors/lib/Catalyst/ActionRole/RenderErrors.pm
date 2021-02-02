@@ -9,7 +9,6 @@ my $dont_dispatch_error = sub {
   return 1 if $c->req->method eq 'HEAD';
   return 1 if defined $c->response->body;
   return 1 if $c->response->status =~ /^(?:204|3\d\d)$/;
-  return 1 if @{$c->error};
   return 0;
 };
 
@@ -35,12 +34,11 @@ my $finalize_args = sub {
 around 'execute', sub {
   my ($orig, $self, $controller, $c, @args) = @_;
   my $ret = $self->$orig($controller, $c, @args);
-  
+
   return $ret if $self->$dont_dispatch_error($controller, $c);
 
   my @errors = @{$c->error};
   $c->clear_errors;
-
   if($self->$looks_like_error_obj(my $first = $errors[0])) {
     my $code = $self->$normalize_code($first);
     my %args = $self->$finalize_args($first);      

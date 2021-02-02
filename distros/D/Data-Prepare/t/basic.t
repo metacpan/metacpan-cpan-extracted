@@ -5,8 +5,8 @@ use Test::Snapshot;
 use Text::CSV qw(csv);
 use Data::Prepare qw(
   cols_non_empty non_unique_cols
-  make_pk_map pk_col_counts
-  chop_lines chop_cols header_merge
+  make_pk_map pk_col_counts key_to_index pk_match
+  chop_lines chop_cols header_merge pk_insert
 );
 
 my $data = data("CoreHouseholdIndicators");
@@ -27,6 +27,33 @@ my $merge_spec = [
 header_merge($merge_spec, $data);
 chop_lines([0, 0], $data);
 is_deeply_snapshot $data, 'header_merge';
+
+my @alt_keys = (
+  'ISO3166-1-Alpha-2',
+  'UNTERM English Short',
+  'UNTERM English Formal',
+  'official_name_en',
+  'CLDR display name',
+);
+my $pk_data = data('country-codes');
+my $pk_map = make_pk_map($pk_data, 'ISO3166-1-Alpha-3', \@alt_keys);
+is_deeply_snapshot $pk_map, 'make_pk_map';
+
+is_deeply_snapshot [ pk_col_counts($data, $pk_map) ], 'pk_col_counts';
+
+my $key_index = key_to_index($data->[0])->{Country};
+my @stopwords = qw(islands china northern);
+is_deeply_snapshot [
+  map [ $_->[$key_index], pk_match($_->[$key_index], $pk_map, \@stopwords) ], @$data[1..$#$data]
+], 'pk_match';
+
+pk_insert({
+  column_heading => 'ISO3CODE',
+  local_column => 'Country',
+  pk_column => 'official_name_en',
+  use_fallback => 1,
+}, $data, $pk_map, \@stopwords);
+is_deeply_snapshot $data, 'pk_insert';
 
 my $small_data = [
   [ '', 'Proportion of households with', '', '', '' ],
@@ -60,19 +87,6 @@ is_deeply $small_data, [
 
 my $got = non_unique_cols([[qw(a b b)]]);
 is_deeply $got, { b => 2 };
-
-my @alt_keys = (
-  'ISO3166-1-Alpha-2',
-  'UNTERM English Short',
-  'UNTERM English Formal',
-  'official_name_en',
-  'CLDR display name',
-);
-my $pk_data = data('country-codes');
-my $pk_map = make_pk_map($pk_data, 'ISO3166-1-Alpha-3', \@alt_keys);
-is_deeply_snapshot $pk_map, 'make_pk_map';
-
-is_deeply_snapshot [ pk_col_counts($data, $pk_map) ], 'pk_col_counts';
 
 done_testing;
 

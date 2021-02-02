@@ -1,4 +1,3 @@
-.travis.yml
 Changes
 examples/json-to-html.pl
 examples/li-class-beano.pl
@@ -12,6 +11,7 @@ examples/synopsis.pl
 examples/table.pl
 lib/HTML/Make.pm
 lib/HTML/Make.pod
+lib/HTML/Make/info.json
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -20,7 +20,9 @@ t/add-class.t
 t/children.t
 t/examples.t
 t/href.t
+t/html-doctype.t
 t/HTML-Make.t
 t/push-element.t
+t/script.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

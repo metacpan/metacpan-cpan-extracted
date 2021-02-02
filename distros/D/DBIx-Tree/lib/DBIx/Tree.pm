@@ -8,7 +8,7 @@ use Carp;
 
 use DBI;
 
-our $VERSION = '1.97';
+our $VERSION = '1.98';
 
 # ------------------------------------------------
 
@@ -734,6 +734,8 @@ Separate data acquisition from data formatting.
 
 L<DBIx::Tree::Persist>.
 
+L<Parse::Taxonomy>.
+
 L<Tree>.
 
 L<Tree::Binary>.
@@ -758,9 +760,9 @@ L<https://github.com/ronsavage/DBIx-Tree>
 
 =head1 Support
 
-Email the author, or log a bug on RT:
+Bugs should be reported via the CPAN bug tracker at
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Tree>.
+L<https://github.com/ronsavage/DBIx-Tree/issues>
 
 =head1 Authors
 

@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_FIRSTACCESS);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.11';
 
 extends 'Lemonldap::NG::Portal::Lib::Choice';
 
@@ -20,6 +20,14 @@ sub getUser {
     my ( $self, $req, %args ) = @_;
     $self->checkChoice($req) or return PE_FIRSTACCESS;
     my $res = $req->data->{enabledMods1}->[0]->getUser( $req, %args );
+    delete $req->pdata->{_choice} if ( $res > 0 );
+    return $res;
+}
+
+sub findUser {
+    my ( $self, $req, %args ) = @_;
+    $self->checkChoice($req) or return PE_FIRSTACCESS;
+    my $res = $req->data->{enabledMods1}->[0]->findUser( $req, %args );
     delete $req->pdata->{_choice} if ( $res > 0 );
     return $res;
 }

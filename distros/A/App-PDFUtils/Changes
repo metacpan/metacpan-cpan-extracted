@@ -1,3 +1,11 @@
+0.004   2021-01-30  Released-By: PERLANCAR; Urgency: medium
+
+        [cli remove-pdf-password]
+
+	- [ux] Tweak log level to info (instead of the default error) when
+	  failing to try a password.
+
+
 0.003   2020-02-03  Released-By: PERLANCAR; Urgency: low
 
 	- [ux] Add logging to CLI scripts.

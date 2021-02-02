@@ -8,10 +8,15 @@ use Safe::Isa;
 use List::Util 'pairs', 'first';
 use Scalar::Util 'reftype';
 use Storable 'dclone';
+use Data::Dumper;
 
 no autovivification;
 
 use experimental 'postderef';
+
+our $VERSION = "v0.0.9";
+
+use constant SINGLE_VARS => qw/ join leave cleanup /;
 
 my %user_to_channels;
 my %channel_to_users;
@@ -24,16 +29,17 @@ sub create_empty_node {
         requests => {},
         join     => undef,
         leave    => undef,
+        cleanup  => undef,
     };
 }
 
-# registry for actions, requests and join handlers
+# registry for actions, requests and join/leave/cleanup handlers
 my $channels_info = create_empty_node;
 
 sub set_var ($class, $channel, $var, @args) {
     my @segments = ref($channel) eq 'ARRAY' ? @$channel : ($channel);
     my $sub = pop @args;
-    my $name; $name = pop @args unless $var eq 'join';
+    my $name; $name = pop @args unless belongs_to($var, [SINGLE_VARS]);
     my $cursor = $channels_info;
     SEGMENT: while (@segments) {
         my $segment = shift @segments;
@@ -52,7 +58,7 @@ sub set_var ($class, $channel, $var, @args) {
         }
     }
 
-    if (belongs_to($var, [qw/ join leave /])) {
+    if (belongs_to($var, [SINGLE_VARS])) {
         $cursor->{$var} = $sub;
     } elsif (belongs_to($var, [qw/ action request /])) {
         $cursor->{"${var}s"}{$name} = $sub;
@@ -81,7 +87,7 @@ sub get_var ($class, $channel, $var, $name = undef) {
         } @cursors;
     }
 
-    if (belongs_to($var, [qw/ join leave /])) {
+    if (belongs_to($var, [SINGLE_VARS])) {
         return first {defined} map $_->{$var}, @cursors;
     } elsif (belongs_to($var, [qw/ action request /])) {
         return first {defined} map $_->{"${var}s"}{$name}, @cursors;
@@ -91,7 +97,6 @@ sub get_var ($class, $channel, $var, $name = undef) {
 }
 
 sub debug_dump ($class) {
-    use Data::Dumper;
     my %channel_to_users_clone;
     foreach my $channel_name (keys %channel_to_users) {
         $channel_to_users_clone{$channel_name} //= {};
@@ -110,7 +115,7 @@ sub add_pair ($class, $c, $channel_name) {
 
     my $was_added = not exists $channel_to_users{$channel_name}{$c};
 
-    # user_to_channels (NOTE: not currently used anywhere)
+    # user_to_channels
     $user_to_channels{$c}{$channel_name} = $channel_name;
 
     # channel_to_users
@@ -195,6 +200,14 @@ sub add_leave ($class, $channel, $leave_sub) {
 
 sub get_leave ($class, $channel) {
     return $class->get_var($channel, 'leave');
+}
+
+sub add_cleanup ($class, $channel, $cleanup_sub) {
+    $class->set_var($channel, 'cleanup', $cleanup_sub);
+}
+
+sub get_cleanup ($class, $channel) {
+    return $class->get_var($channel, 'cleanup');
 }
 
 1;

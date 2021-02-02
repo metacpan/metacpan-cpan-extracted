@@ -9,8 +9,8 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
-license: gpl
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -28,31 +28,31 @@ no_index:
 provides:
   GitLab::API::v4:
     file: lib/GitLab/API/v4.pm
-    version: '0.25'
+    version: '0.26'
   GitLab::API::v4::Config:
     file: lib/GitLab/API/v4/Config.pm
-    version: '0.25'
+    version: '0.26'
   GitLab::API::v4::Constants:
     file: lib/GitLab/API/v4/Constants.pm
-    version: '0.25'
+    version: '0.26'
   GitLab::API::v4::Mock:
     file: lib/GitLab/API/v4/Mock.pm
-    version: '0.25'
+    version: '0.26'
   GitLab::API::v4::Mock::Engine:
     file: lib/GitLab/API/v4/Mock/Engine.pm
-    version: '0.25'
+    version: '0.26'
   GitLab::API::v4::Mock::RESTClient:
     file: lib/GitLab/API/v4/Mock/RESTClient.pm
-    version: '0.25'
+    version: '0.26'
   GitLab::API::v4::Paginator:
     file: lib/GitLab/API/v4/Paginator.pm
-    version: '0.25'
+    version: '0.26'
   GitLab::API::v4::RESTClient:
     file: lib/GitLab/API/v4/RESTClient.pm
-    version: '0.25'
+    version: '0.26'
   GitLab::API::v4::WWWClient:
     file: lib/GitLab/API/v4/WWWClient.pm
-    version: '0.25'
+    version: '0.26'
 requires:
   Carp: '0'
   Const::Fast: '0.014'
@@ -81,12 +81,13 @@ resources:
   bugtracker: https://github.com/bluefeet/GitLab-API-v4/issues
   homepage: https://github.com/bluefeet/GitLab-API-v4
   repository: git://github.com/bluefeet/GitLab-API-v4.git
-version: '0.25'
+version: '0.26'
 x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Dave Webb <github@d5ve.com>'
   - 'Dmitry Frolov <dmitry.frolov@gmail.com>'
   - 'Dotan Dimet <dotan@corky.net>'
+  - 'Graham Knop <haarg@haarg.org>'
   - 'José Joaquín Atria <jjatria@gmail.com>'
   - 'Kieren Diment <kieren.diment@staples.com.au>'
   - 'Luc Didry <luc@didry.org>'

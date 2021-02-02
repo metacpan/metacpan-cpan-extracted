@@ -1,14 +1,17 @@
-Build.PL
 Changelog.ini
-CHANGES
+Changes
 lib/Config/Tiny/Ordered.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.yml
+MANIFEST.SKIP
 README
+t/00.versions.t
+t/00.versions.tx
 t/01_compile.t
 t/02_main.t
-t/98_pod.t
 t/99_pmv.t
-test.conf
+t/test.conf
+xt/author/98_pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

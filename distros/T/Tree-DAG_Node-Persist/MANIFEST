@@ -8,6 +8,8 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 scripts/create.table.pl
+t/00.versions.t
+t/00.versions.tx
 t/test.t
 xt/author/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

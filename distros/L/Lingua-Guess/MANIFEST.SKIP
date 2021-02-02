@@ -9,3 +9,4 @@ Lingua-Guess-[0-9\.]+/.*
 ^(build|make-pod|clean)\.pl$
 ^MYMETA\..*$
 ^Makefile$
+^langs/.*$

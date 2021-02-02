@@ -1,9 +1,9 @@
 package IPC::System::Options;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-26'; # DATE
+our $DATE = '2021-01-31'; # DATE
 our $DIST = 'IPC-System-Options'; # DIST
-our $VERSION = '0.339'; # VERSION
+our $VERSION = '0.340'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -96,9 +96,9 @@ sub _system_or_readpipe_or_run_or_start {
     };
 
     if ($opts->{log}) {
-        require Log::ger::Plugin::MultilevelLog;
-        require Log::ger::Plugin;
-        Log::ger::Plugin->set(MultilevelLog => (sub_name => 'logger'));
+        require Log::ger::Format::MultilevelLog; # just so scan_prereqs can detect it
+        require Log::ger::Format;
+        Log::ger::Format->set_for_current_package(MultilevelLog => (sub_name => 'logger'));
         require Log::ger;
         Log::ger->import;
     }
@@ -484,7 +484,7 @@ IPC::System::Options - Perl's system(), readpipe()/qx, IPC::Run's run(), start()
 
 =head1 VERSION
 
-This document describes version 0.339 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2021-01-26.
+This document describes version 0.340 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2021-01-31.
 
 =head1 SYNOPSIS
 
@@ -851,7 +851,7 @@ Source repository is at L<https://github.com/perlancar/perl-IPC-System-Options>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-IPC-System-Options/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-System-Options>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

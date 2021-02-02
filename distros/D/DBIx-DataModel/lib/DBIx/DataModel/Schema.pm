@@ -10,14 +10,15 @@ use strict;
 use DBIx::DataModel::Meta::Utils qw/does/;
 use DBIx::DataModel::Source::Table;
 
-use Scalar::Util     qw/blessed/;
-use Module::Load     qw/load/;
-use Params::Validate qw/validate_with SCALAR ARRAYREF CODEREF UNDEF
-                                      OBJECT BOOLEAN/;
-use Acme::Damn       qw/damn/;
-use Carp::Clan       qw[^(DBIx::DataModel::|SQL::Abstract)];
+use Scalar::Util          qw/blessed/;
+use Data::Structure::Util;  # for calling unbless(), fully qualified
+use Module::Load          qw/load/;
+use Params::Validate      qw/validate_with SCALAR ARRAYREF CODEREF UNDEF
+                                           OBJECT BOOLEAN/;
 
-use SQL::Abstract::More 1.33;
+use Carp::Clan            qw[^(DBIx::DataModel::|SQL::Abstract)];
+
+use SQL::Abstract::More 1.37;
 use Try::Tiny;
 use mro              qw/c3/;
 
@@ -317,11 +318,9 @@ sub do_transaction {
 }
 
 
-
-
 sub unbless {
   my $class = shift;
-  _recursive_unbless($_) foreach @_;
+  Data::Structure::Util::unbless($_) foreach @_;
 
   return wantarray ? @_ : $_[0];
 }
@@ -348,18 +347,6 @@ while (my ($local, $remote) = each %accessor_map) {
 #----------------------------------------------------------------------
 # UTILITY FUNCTIONS (PRIVATE)
 #----------------------------------------------------------------------
-
-sub _recursive_unbless {
-  my $obj = shift;
-
-  damn $obj if blessed $obj;
-
-  for (ref $obj) {
-    /^HASH$/  and do {  delete $obj->{__schema};
-                        _recursive_unbless($_) foreach values %$obj;  };
-    /^ARRAY$/ and do {  _recursive_unbless($_) foreach @$obj;         };
-  }
-}
 
 
 sub _debug { # internal method to send debug messages

@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.90"
+            "Rinci" : "v1.1.96"
          }
       },
       "runtime" : {
@@ -39,7 +39,7 @@
             "Data::Dump" : "0",
             "Exporter" : "5.57",
             "File::Which" : "0",
-            "Log::ger" : "0.037",
+            "Log::ger" : "0.038",
             "Perinci::Access" : "0",
             "String::Indent" : "0.03",
             "perl" : "5.010001",
@@ -59,7 +59,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Gen"
+         "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Gen/issues"
       },
       "homepage" : "https://metacpan.org/release/Perinci-CmdLine-Gen",
       "repository" : {
@@ -68,12 +68,17 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Gen"
       }
    },
-   "version" : "0.497",
+   "version" : "0.498",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
+            "version" : "0.001"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
             "config" : {
@@ -163,7 +168,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.600"
+            "version" : "0.603"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -183,7 +188,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.040"
+            "version" : "0.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",
@@ -232,9 +237,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Author::PERLANCAR/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Author::PERLANCAR/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",

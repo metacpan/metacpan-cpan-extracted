@@ -1,5 +1,9 @@
 Revision history for Perl extension Tree::Simple::VisitorFactory:
 
+0.16  2021-02-02T13:00:00
+	- Add t/00.*.
+	- Update Makefile.PL and POD to change RT to github.
+
 0.15  2016-05-04T08;15:00
 	- Correct physical address of Free Software Foundation in LICENSE file. See RT#114149.
 		Thanx to Petr Pisar.

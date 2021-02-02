@@ -1,4 +1,0 @@
-#!/Users/gugod/perl5/perlbrew/perls/perl-5.32.0/bin/perl
-
-use Module::Build::Tiny;
-Build();

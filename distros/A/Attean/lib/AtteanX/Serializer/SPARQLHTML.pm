@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQLHTML - SPARQL Results HTML Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQLHTML version 0.028
+This document describes AtteanX::Serializer::SPARQLHTML version 0.029
 
 =head1 SYNOPSIS
 
@@ -22,6 +22,8 @@ This document describes AtteanX::Serializer::SPARQLHTML version 0.028
 
 =item C<< canonical_media_type >>
 
+=item C<< file_extensions >>
+
 =back
 
 =head1 METHODS
@@ -33,7 +35,7 @@ This document describes AtteanX::Serializer::SPARQLHTML version 0.028
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQLHTML 0.028 {
+package AtteanX::Serializer::SPARQLHTML 0.029 {
 	use Moo;
 	use Types::Standard qw(Str Bool ArrayRef);
 	use Encode qw(encode);
@@ -54,6 +56,14 @@ Returns a list of media types that identify the format produced by this serializ
 	sub media_types {
 		return [qw(text/html)];
 	}
+
+=item C<< file_extensions >>
+
+Returns a list of file extensions associated with the serialized format.
+
+=cut
+
+	sub file_extensions { return [qw(html)] };
 	
 =item C<< serialize_iter_to_io( $fh, $iterator ) >>
 

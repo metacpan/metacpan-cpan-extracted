@@ -1,22 +1,25 @@
 package Git::Bunch;
 
-our $DATE = '2020-10-30'; # DATE
-our $VERSION = '0.627'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-31'; # DATE
+our $DIST = 'Git-Bunch'; # DIST
+our $VERSION = '0.628'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger::Format 'MultilevelLog';
 use Log::ger;
 
-use IPC::System::Options 'system', 'readpipe', -log=>1, -lang=>'C';
 use Cwd ();
 use File::chdir;
 use File::Path qw(make_path);
+use IPC::System::Options 'system', 'readpipe', -log=>1, -lang=>'C';
 use List::Util qw(max);
 use POSIX qw(strftime);
 use String::ShellQuote;
 
-require Exporter;
+use Exporter qw(import);
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(check_bunch sync_bunch exec_bunch);
 
@@ -164,6 +167,10 @@ full check/sync).
 
 _
         schema => ['date*', 'x.perl.coerce_rules' => ['!From_float::epoch', 'From_float::epoch_always', 'From_str::natural']],
+        cmdline_aliases => {
+            recent => {is_flag=>1, summary=>'Shortcut for --min-repo-access-time="2 weeks ago"', code=>sub { $_[0]{min_repo_access_time} = time() - 14*86400} },
+            r      => {is_flag=>1, summary=>'Shortcut for --min-repo-access-time="2 weeks ago"', code=>sub { $_[0]{min_repo_access_time} = time() - 14*86400} },
+        },
         tags => ['filter'],
     },
 );
@@ -211,6 +218,13 @@ our %remote_ssh_args = (
         summary      => 'Remote host path to the bunch directory',
         schema       => ['pathname*'],
         default      => 22,
+    },
+);
+
+our %command_opts_args = (
+    command_opts   => {
+        summary  => "Options to pass to IPC::System::Options's system()",
+        schema   => ['hash*'],
     },
 );
 
@@ -442,7 +456,8 @@ sub check_bunch {
     return $res unless $res->[0] == 200;
     my $source = $args{source};
 
-    log_info("Checking bunch $source ...");
+    #log_info("Checking bunch $source ...");
+    log($args{_loglevel} // 'info', "Checking bunch $source ...");
 
     my $has_unclean;
     my %res;
@@ -465,27 +480,31 @@ sub check_bunch {
             if $progress;
 
         if ($args{-dry_run}) {
-            log_info("[DRY-RUN] checking status of repo %s", $repo);
+            #log_info("[DRY-RUN] checking status of repo %s", $repo);
+            log($args{_loglevel} // 'info', "[DRY-RUN] checking status of repo %s", $repo);
             next REPO;
         }
 
         my $output = readpipe("git status 2>&1");
         my $exit = $? >> 8;
         if ($exit == 0 && $output =~ /nothing to commit/) {
-            log_info("$repo is clean");
+            #log_info("$repo is clean");
+            log($args{_loglevel} // 'info', "$repo is clean");
             $res{$repo} = [200, "Clean"];
             next;
         }
 
         $has_unclean++;
         if ($exit == 0 && $output =~ /^\s*Unmerged paths:/m) {
-            log_warn("$repo needs merging");
+            #log_warn("$repo needs merging");
+            log($args{_loglevel} // 'warn', "$repo needs merging");
             $res{$repo} = [500, "Needs merging"];
         } elsif ($exit == 0 &&
                      $output =~ /(
                                      Untracked \s files
                                  )/x) {
-            log_warn("$repo has untracked files");
+            #log_warn("$repo has untracked files");
+            log($args{_loglevel} // 'warn', "$repo has untracked files");
             $res{$repo} = [500, "Has untracked files"];
         } elsif ($exit == 0 &&
                 $output =~ /(
@@ -493,14 +512,20 @@ sub check_bunch {
                                 Changes \s not \s staged \s for \s commit |
                                 Changed \s but
                             )/mx) {
-            log_warn("$repo needs commit");
+            #log_warn("$repo needs commit");
+            log($args{_loglevel} // 'warn', "$repo needs commit");
             $res{$repo} = [500, "Needs commit"];
         } elsif ($exit == 128 && $output =~ /Not a git repository/) {
-            log_warn("$repo is not a git repo (2)");
+            #log_warn("$repo is not a git repo (2)");
+            log($args{_loglevel} // 'warn', "$repo is not a git repo (2)");
             $res{$repo} = [500, "Not a git repo (2)"];
         } else {
-            log_error("Can't figure out result of 'git status' ".
-                            "for repo $repo: exit=$exit, output=$output");
+            #log_warn(
+            #    "Can't figure out result of 'git status' ".
+            #        "for repo $repo: exit=$exit, output=$output");
+            log($args{_loglevel} // 'error',
+                "Can't figure out result of 'git status' ".
+                    "for repo $repo: exit=$exit, output=$output");
             $res{$repo} = [500, "Unknown (exit=$exit, output=$output)"];
         }
     }
@@ -1102,6 +1127,7 @@ _
             pos      => 1,
             greedy   => 1,
         },
+        %command_opts_args,
     },
     features => {
         dry_run => 1,
@@ -1118,6 +1144,7 @@ sub exec_bunch {
     my $source  = $args{source};
     my $command = $args{command};
     defined($command) or return [400, "Please specify command"];
+    my $command_opts = $args{command_opts} // {};
 
     local $CWD = $source;
     my %res;
@@ -1131,11 +1158,11 @@ sub exec_bunch {
         my $repo = $e->{name};
         $CWD = $i++ ? "../$repo" : $repo;
         if ($args{-dry_run}) {
-            log_info("[DRY-RUN] Executing command on $repo ...");
+            log_info("[DRY-RUN] Executing command (%s, %s) on $repo ...", $command_opts, $command);
             next REPO;
         }
-        log_info("Executing command on $repo ...");
-        system($command);
+        log_info("Executing command (%s, %s) on $repo ...", $command_opts, $command);
+        system($command_opts, $command);
         $exit = $? >> 8;
         if ($exit) {
             log_warn("Command failed: $exit");
@@ -1150,6 +1177,75 @@ sub exec_bunch {
      "OK",
      \%res,
      {"cmdline.result" => ''}];
+}
+
+$SPEC{commit_bunch} = {
+    v => 1.1,
+    summary => 'Commit all uncommitted repos in the bunch',
+    description   => <<'_',
+
+For each git repository in the bunch, will first check whether the repo is
+"uncommitted" state, which means either has the status of "Needs commit" or "Has
+untracked files". The default mode is dry-run/simulation. If the `--no-dry-run`
+flag is not specified, will just show the status of these repos for you. If the
+`--no-dry-run` (can be as short as `--no-d` or `-N`) flag is specified, will
+'git add'+'git commit' all these repos with the same commit message for each,
+specified in `--message` (or just "Committed using 'gitbunch commit'" as the
+default message).
+
+_
+    args          => {
+        %common_args,
+        message => {
+            summary => 'Commit message',
+            schema => 'str*',
+            default => "Committed using 'gitbunch commit'",
+            cmdline_aliases => {m=>{}},
+        },
+        %command_opts_args,
+    },
+    features => {
+        dry_run => {default=>1},
+    },
+    deps => {
+        all => [
+            {prog => 'git'},
+            {prog => 'hr'},
+            {prog => 'pwd'},
+        ],
+    },
+};
+sub commit_bunch {
+    require String::ShellQuote;
+
+    my %args = @_;
+    my $message = delete $args{message};
+    my $command_opts = delete($args{command_opts}) // {};
+
+    my $check_res;
+    {
+        log_info("Checking status of repos");
+        $check_res = check_bunch(%args, _loglevel=>'trace', -dry_run=>0);
+        die "Can't check bunch: $check_res->[0] - $check_res->[1]"
+            unless $check_res->[0] == 200;
+    }
+
+    #my $exec_res;
+    {
+        my @repos;
+        for my $repo_name (keys %{ $check_res->[2] }) {
+            my $repo_res = $check_res->[2]{$repo_name};
+            next unless $repo_res->[1] =~ /^(Needs commit|Has untracked files)$/;
+            push @repos, $repo_name;
+        }
+
+        my $cmd = $args{-dry_run} ?
+            "pwd; git status; hr" :
+            "pwd; git add .;git commit -am ".String::ShellQuote::shell_quote($message)."; hr";
+        exec_bunch(%args, -dry_run=>0, include_repos=>\@repos, command=>$cmd, command_opts=>$command_opts);
+    }
+
+    [200];
 }
 
 1;
@@ -1167,7 +1263,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.627 of Git::Bunch (from Perl distribution Git-Bunch), released on 2020-10-30.
+This document describes version 0.628 of Git::Bunch (from Perl distribution Git-Bunch), released on 2021-01-31.
 
 =head1 SYNOPSIS
 
@@ -1302,6 +1398,112 @@ Return value:  (any)
 
 
 
+=head2 commit_bunch
+
+Usage:
+
+ commit_bunch(%args) -> [status, msg, payload, meta]
+
+Commit all uncommitted repos in the bunch.
+
+For each git repository in the bunch, will first check whether the repo is
+"uncommitted" state, which means either has the status of "Needs commit" or "Has
+untracked files". The default mode is dry-run/simulation. If the C<--no-dry-run>
+flag is not specified, will just show the status of these repos for you. If the
+C<--no-dry-run> (can be as short as C<--no-d> or C<-N>) flag is specified, will
+'git add'+'git commit' all these repos with the same commit message for each,
+specified in C<--message> (or just "Committed using 'gitbunch commit'" as the
+default message).
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<command_opts> => I<hash>
+
+Options to pass to IPC::System::Options's system().
+
+=item * B<exclude_files> => I<bool>
+
+Exclude files from processing.
+
+This only applies to C<sync_bunch> operations. Operations like C<check_bunch> and
+C<exec_bunch> already ignore these and only operate on git repos.
+
+=item * B<exclude_non_git_dirs> => I<bool>
+
+Exclude non-git dirs from processing.
+
+This only applies to and C<sync_bunch> operations. Operations like C<check_bunch>
+and C<exec_bunch> already ignore these and only operate on git repos.
+
+=item * B<exclude_repos> => I<array[str]>
+
+Exclude some repos from processing.
+
+=item * B<exclude_repos_pat> => I<str>
+
+Specify regex pattern of repos to exclude.
+
+=item * B<include_repos> => I<array[str]>
+
+Specific git repos to sync, if not specified all repos in the bunch will be processed.
+
+=item * B<include_repos_pat> => I<str>
+
+Specify regex pattern of repos to include.
+
+=item * B<message> => I<str> (default: "Committed using 'gitbunch commit'")
+
+Commit message.
+
+=item * B<min_repo_access_time> => I<date>
+
+Limit to repos that are accessed (mtime, committed, status-ed, pushed) recently.
+
+This can significantly reduce the time to process the bunch if you are only
+interested in recent repos (which is most of the time unless you are doing a
+full check/sync).
+
+=item * B<repo> => I<str>
+
+Only process a single repo.
+
+=item * B<source>* => I<str>
+
+Directory to check.
+
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=E<gt>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 exec_bunch
 
 Usage:
@@ -1325,6 +1527,10 @@ Arguments ('*' denotes required arguments):
 =item * B<command>* => I<str>
 
 Command to execute.
+
+=item * B<command_opts> => I<hash>
+
+Options to pass to IPC::System::Options's system().
 
 =item * B<exclude_files> => I<bool>
 
@@ -1689,7 +1895,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

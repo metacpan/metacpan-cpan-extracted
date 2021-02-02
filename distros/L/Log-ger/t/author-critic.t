@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.003
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Log/ger.pm','lib/Log/ger/Filter.pm','lib/Log/ger/Filter/Code.pm','lib/Log/ger/Format.pm','lib/Log/ger/Format/Default.pm','lib/Log/ger/Format/None.pm','lib/Log/ger/Heavy.pm','lib/Log/ger/Layout.pm','lib/Log/ger/Output.pm','lib/Log/ger/Output/Array.pm','lib/Log/ger/Output/Null.pm','lib/Log/ger/Output/String.pm','lib/Log/ger/Plugin.pm','lib/Log/ger/Plugin/MultilevelLog.pm','lib/Log/ger/Util.pm'];
+my $filenames = ['lib/Log/ger.pm','lib/Log/ger/Filter.pm','lib/Log/ger/Filter/Code.pm','lib/Log/ger/Format.pm','lib/Log/ger/Format/Default.pm','lib/Log/ger/Format/MultilevelLog.pm','lib/Log/ger/Format/None.pm','lib/Log/ger/Heavy.pm','lib/Log/ger/Layout.pm','lib/Log/ger/Output.pm','lib/Log/ger/Output/Array.pm','lib/Log/ger/Output/Null.pm','lib/Log/ger/Output/String.pm','lib/Log/ger/Plugin.pm','lib/Log/ger/Plugin/MultilevelLog.pm','lib/Log/ger/Util.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

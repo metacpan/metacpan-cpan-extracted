@@ -75,7 +75,7 @@ has unique_id_col =>
 	required => 0,
 );
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 # --------------------------------------------------
 
@@ -636,7 +636,7 @@ and http://www.gnu.org/licenses/gpl-2.0.html.
 
 Email the author, or log a bug on RT:
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-DAG_Node-Persist>.
+L<https://github.com/ronsavage/Tree-DAG_Node-Persist/issues>.
 
 =head1 Author
 

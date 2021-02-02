@@ -8,7 +8,7 @@ use Log::Log4perl qw( get_logger );
 use Workflow::Exception qw( configuration_error workflow_error );
 use Carp qw(croak);
 use English qw( -no_match_vars );
-$Workflow::Factory::VERSION = '1.50';
+$Workflow::Factory::VERSION = '1.51';
 
 # Extra action attribute validation is off by default for compatibility.
 our $VALIDATE_ACTION_CONFIG = 0;
@@ -281,7 +281,7 @@ sub _load_observers {
             $self->_load_class( $observer_class,
                       "Cannot require observer '%s' to watch observer "
                     . "of type '$wf_type': %s" );
-            push @observers, $observer_class;
+            push @observers, sub { $observer_class->update(@_) };
         } elsif ( my $observer_sub = $observer_info->{sub} ) {
             my ( $observer_class, $observer_sub )
                 = $observer_sub =~ /^(.*)::(.*)$/;
@@ -555,16 +555,16 @@ sub _add_action_config {
             $log->is_debug
                 && $log->debug(
                 "Included action '$name' class '$action_class' ok");
-	    if ($self->_validate_action_config) {
-		my $validate_name = $action_class . '::validate_config';
-		if (exists &$validate_name) {
-		    no strict 'refs';
-		    $log->is_debug
-			&& $log->debug(
-			"Validating configuration for action '$name'");
-		    $validate_name->($action_config);
-		}
-	    }
+            if ($self->_validate_action_config) {
+                my $validate_name = $action_class . '::validate_config';
+                if (exists &$validate_name) {
+                    no strict 'refs';
+                    $log->is_debug
+                        && $log->debug(
+                        "Validating configuration for action '$name'");
+                    $validate_name->($action_config);
+                }
+            }
         }    # End action for.
     }
 }
@@ -812,6 +812,7 @@ sub _validate_action_config {
 
 __END__
 
+=pod
 
 =head1 NAME
 
@@ -819,7 +820,7 @@ Workflow::Factory - Generates new workflow and supporting objects
 
 =head1 VERSION
 
-This documentation describes version 1.18 of this package
+This documentation describes version 1.51 of this package
 
 =head1 SYNOPSIS
 
@@ -1194,29 +1195,33 @@ of L<Workflow::Action> configs.  See L<Workflow::Action> for details.
 
 =head1 SEE ALSO
 
-L<Workflow>
+=over
 
-L<Workflow::Action>
+=item * L<Workflow>
 
-L<Workflow::Condition>
+=item * L<Workflow::Action>
 
-L<Workflow::Config>
+=item * L<Workflow::Condition>
 
-L<Workflow::Persister>
+=item * L<Workflow::Config>
 
-L<Workflow::Validator>
+=item * L<Workflow::Persister>
+
+=item * L<Workflow::Validator>
+
+=back
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2010 Chris Winters. All rights reserved.
+Copyright (c) 2003-2021 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
+Please see the F<LICENSE>
+
 =head1 AUTHORS
 
-Jonas B. Nielsen (jonasbn) E<lt>jonasbn@cpan.orgE<gt> is the current maintainer.
-
-Chris Winters E <lt> chris @cwinters . comE <gt>, original author .
+Please see L<Workflow>
 
 =cut

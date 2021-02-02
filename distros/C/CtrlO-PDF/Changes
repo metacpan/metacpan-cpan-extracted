@@ -1,8 +1,22 @@
 Revision history for CtrlO::PDF
 
+0.20 Mon Feb 1 2021
+
+    * Many minor tweaks to make default page layout better. This breaks
+      previous formatting, hence the version number, but means much
+      easier and tidier content layout by default.
+    * Fix first words being chopped when no room on page for para
+    * Add image alignment option
+    * Fix word spacing in headings
+
+0.10 Sat Jan 30 2021
+
+    * Fix problems with the color of text
+    * Require minimum PDF::TextBlock version
+
 0.09 Tue Jan 26 2021
 
-    * Further workdaround for words that are too long, when they don't have
+    * Further workaround for words that are too long, when they don't have
       any more words after them
 
 0.08 Wed Jan 06 2021

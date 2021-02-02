@@ -1,5 +1,5 @@
 package Config::Registry;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use strictures 2;
 
 use Carp qw( croak );
@@ -54,39 +54,39 @@ sub _get_class_data {
 }
 
 sub merge_schemas {
-        my $class = shift;
-        return $class->merge( @_ );
+    my $class = shift;
+    return $class->merge( @_ );
 }
 
 sub merge_documents {
-        my $class = shift;
-        return $class->merge( @_ );
+    my $class = shift;
+    return $class->merge( @_ );
 }
 
 sub merge {
-        my ($class, $l, $r) = @_;
+    my ($class, $l, $r) = @_;
 
-        return $r if ref($l) ne 'HASH';
-        return $r if ref($r) ne 'HASH';
+    return $r if ref($l) ne 'HASH';
+    return $r if ref($r) ne 'HASH';
 
-        $r = { %$r };
+    $r = { %$r };
 
-        foreach my $key (keys %$l) {
-                next if !exists $r->{$key};
-                $r->{$key} = $class->merge( $l->{$key}, $r->{$key} );
-        }
+    foreach my $key (keys %$l) {
+        next if !exists $r->{$key};
+        $r->{$key} = $class->merge( $l->{$key}, $r->{$key} );
+    }
 
-        return { %$l, %$r };
+    return { %$l, %$r };
 }
 
 sub render_schema {
-        my $class = shift;
-        return $class->render( @_ );
+    my $class = shift;
+    return $class->render( @_ );
 }
 
 sub render_document {
-        my $class = shift;
-        return $class->render( @_ );
+    my $class = shift;
+    return $class->render( @_ );
 }
 
 sub render {
@@ -338,26 +338,14 @@ encouraging their employees to contribute back to the open source
 ecosystem. Without their dedication to quality software development
 this distribution would not exist.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
     Aran Clary Deltac <bluefeet@gmail.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-Copyright (C) 2020 Aran Clary Deltac
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see L<http://www.gnu.org/licenses/>.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 

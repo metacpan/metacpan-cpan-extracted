@@ -72,13 +72,13 @@ produces output
 
 =end html
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/synopsis.pl> in the distribution.)  
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.15/examples/synopsis.pl> in the distribution.)  
 
 =head1 VERSION
 
-This documents HTML::Make version 0.14 corresponding to git
-commit L<0ecc92d13c748282b0d59e8a927871aef36255f8|https://github.com/benkasminbullock/HTML-Make/commit/0ecc92d13c748282b0d59e8a927871aef36255f8>
-released on Mon Jan 11 19:52:47 2021 +0900.
+This documents HTML::Make version 0.15 corresponding to git
+commit L<b2689d555b8e5277d991a7b1a145abba8ceb2209|https://github.com/benkasminbullock/HTML-Make/commit/b2689d555b8e5277d991a7b1a145abba8ceb2209>
+released on Sat Jan 30 16:36:59 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -108,7 +108,7 @@ produces output
     <li class="beano"></li>
 
 
-(This example is included as L<F<li-class-beano.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/li-class-beano.pl> in the distribution.)  
+(This example is included as L<F<li-class-beano.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.15/examples/li-class-beano.pl> in the distribution.)  
 
 This issues a warning of the form B<"Overwriting attribute 'class' for
 'p'"> if the object already contains an attribute of the specified
@@ -126,7 +126,7 @@ produces output
     Overwriting attribute 'class' for 'p' tag at /usr/home/ben/projects/html-make/examples/p-double-class.pl line 6.
 
 
-(This example is included as L<F<p-double-class.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/p-double-class.pl> in the distribution.)  
+(This example is included as L<F<p-double-class.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.15/examples/p-double-class.pl> in the distribution.)  
 
 This also issues a warning if the attribute is not valid for the tag,
 according to L<HTML::Valid::Tagset/tag_attr_ok>. This is restricted to
@@ -168,11 +168,18 @@ The text may contain HTML elements:
 
 The return value is the added text object.
 
+=head2 attr
+
+    my $attr = $element->attr ();
+
+This returns a hash reference, possibly empty, containing the
+attributes of C<$element>.
+
 =head2 children
 
     my $children = $obj->children ();
 
-Returns an array reference, possibly empty, containing the child
+This returns an array reference, possibly empty, containing the child
 elements of C<$obj>, in the order they were added to $obj.
 
 =head2 multiply
@@ -213,7 +220,7 @@ produces output
 
 =end html
 
-(This example is included as L<F<multiply.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/multiply.pl> in the distribution.)  
+(This example is included as L<F<multiply.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.15/examples/multiply.pl> in the distribution.)  
 
 =head2 new
 
@@ -252,7 +259,7 @@ produces output
     </freaky>
 
 
-(This example is included as L<F<nocheck.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/nocheck.pl> in the distribution.)  
+(This example is included as L<F<nocheck.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.15/examples/nocheck.pl> in the distribution.)  
 
 =head3 Allowed options
 
@@ -338,7 +345,7 @@ produces output
     </table>
 
 
-(This example is included as L<F<table.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/table.pl> in the distribution.)  
+(This example is included as L<F<table.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.15/examples/table.pl> in the distribution.)  
 
 It is also possible to push one HTML::Make object into another one.
 
@@ -377,7 +384,7 @@ link to example</a>
 
 =end html
 
-(This example is included as L<F<link-example.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/link-example.pl> in the distribution.)  
+(This example is included as L<F<link-example.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.15/examples/link-example.pl> in the distribution.)  
 
 =head3 Making a colourful list
 
@@ -435,7 +442,7 @@ produces output
 
 =end html
 
-(This example is included as L<F<push-new.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/push-new.pl> in the distribution.)  
+(This example is included as L<F<push-new.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.15/examples/push-new.pl> in the distribution.)  
 
 See also L<Make a list of colours with
 HTML::Make|https://www.lemoda.net/perl/colour-list/index.html>.
@@ -589,7 +596,7 @@ produces output
 
 =end html
 
-(This example is included as L<F<json-to-html.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/json-to-html.pl> in the distribution.)  
+(This example is included as L<F<json-to-html.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.15/examples/json-to-html.pl> in the distribution.)  
 
 See also L<Convert JSON to HTML with JSON::Parse and
 HTML::Make|https://www.lemoda.net/perl/json-to-html/index.html>.
@@ -611,7 +618,7 @@ produces output
     Pushing non-table element <li> to a table row at /usr/home/ben/projects/html-make/examples/push-li-to-tr.pl line 6.
 
 
-(This example is included as L<F<push-li-to-tr.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.14/examples/push-li-to-tr.pl> in the distribution.)  
+(This example is included as L<F<push-li-to-tr.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.15/examples/push-li-to-tr.pl> in the distribution.)  
 
 We've never received a single bug report for this module, and so these
 warnings are mostly added in an ad-hoc fashion as we've found
@@ -625,6 +632,9 @@ this module.
 
 This returns the element and its child elements as text, so usually
 this is called at the final stage.
+
+If C<$element>'s type is C<html>, a doctype declaration of the form
+C<< <!DOCTYPE html> >> is added before the opening tag.
 
 =head1 OUTPUT FORMAT
 
@@ -668,6 +678,11 @@ L<Carp> is used to report errors.
 =item HTML::Valid::Tagset
 
 L<HTML::Valid::Tagset> is used to validate tags and tag/attribute pairs.
+
+=item JSON::Parse
+
+L<JSON::Parse> is used to read an information file about HTML tags and
+attributes.
 
 =back
 

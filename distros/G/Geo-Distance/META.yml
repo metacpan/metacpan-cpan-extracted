@@ -1,13 +1,13 @@
 ---
 abstract: 'Calculate distances and closest locations. (DEPRECATED)'
 author:
-  - 'Aran Clary Deltac <bluefeet@cpan.org>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
   Test2::V0: '0.000094'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Geo::Distance:
     file: lib/Geo/Distance.pm
-    version: '0.24'
+    version: '0.25'
 requires:
   Carp: '0'
   Const::Fast: '0.014'
@@ -37,12 +37,10 @@ resources:
   bugtracker: https://github.com/bluefeet/Geo-Distance/issues
   homepage: https://github.com/bluefeet/Geo-Distance
   repository: git://github.com/bluefeet/Geo-Distance.git
-version: '0.24'
+version: '0.25'
 x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Anirvan Chatterjee <anirvan@base.mx.org>'
-  - 'Anirvan Chatterjee <anirvan@users.noreply.github.com>'
-  - 'Aran Clary Deltac <bluefeet@gmail.com>'
   - 'Niko Tyni <ntyni@debian.org>'
   - 'gray <gray@cpan.org>'
   - 'Ævar Arnfjörð Bjarmason <avarab@gmail.com>'

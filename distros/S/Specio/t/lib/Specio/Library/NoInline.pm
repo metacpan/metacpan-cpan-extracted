@@ -17,6 +17,7 @@ declare(
                 && !ref( $_[0] )
                 && (
                 do {
+                    ## no critic (Variables::ProhibitUnusedVarsStricter)
                     ( my $val1 = $_[0] ) =~ /\A-?[0-9]+(?:[Ee]\+?[0-9]+)?\z/;
                 }
                 )
@@ -26,6 +27,7 @@ declare(
             && overload::Overloaded( $_[0] )
             && defined overload::Method( $_[0], '0+' )
             && do {
+                ## no critic (Variables::ProhibitUnusedVarsStricter)
                 ( my $val2 = $_[0] + 0 ) =~ /\A-?[0-9]+(?:[Ee]\+?[0-9]+)?\z/;
             }
             );

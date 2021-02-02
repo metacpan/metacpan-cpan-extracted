@@ -19,7 +19,7 @@ use Mouse;
 
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_REDIRECT);
 
-our $VERSION = '2.0.9';
+our $VERSION = '2.0.11';
 
 # OpenID Connect standard claims
 use constant PROFILE => [
@@ -643,10 +643,7 @@ sub decodeJSON {
     my $json_hash;
 
     eval { $json_hash = from_json( $json, { allow_nonref => 1 } ); };
-
-    if ($@) {
-        $json_hash->{error} = "parse_error";
-    }
+    $json_hash->{error} = "parse_error" if ($@);
 
     return $json_hash;
 }
@@ -1336,7 +1333,13 @@ sub buildUserInfoResponse {
     my ( $self, $req, $scope, $rp, $session ) = @_;
     my $userinfo_response = {};
 
-    my $user_id = $self->getUserIDForRP( $req, $rp, $session->data );
+    my $data = {
+        %{ $session->data },
+        _clientId => $self->oidcRPList->{$rp}->{oidcRPMetaDataOptionsClientID},
+        _clientConfKey => $rp,
+        _scope         => $scope,
+    };
+    my $user_id = $self->getUserIDForRP( $req, $rp, $data );
 
     $self->logger->debug("Found corresponding user: $user_id");
 
@@ -1361,13 +1364,13 @@ sub buildUserInfoResponse {
 
                 # Lookup attribute in macros first
                 if ( $self->spMacros->{$rp}->{$session_key} ) {
-                    $session_value = $self->spMacros->{$rp}->{$session_key}
-                      ->( $req, $session->data );
+                    $session_value =
+                      $self->spMacros->{$rp}->{$session_key}->( $req, $data );
 
                     # If not found, search in session
                 }
                 else {
-                    $session_value = $session->data->{$session_key};
+                    $session_value = $data->{$session_key};
                 }
 
                 # Handle empty values, arrays, type, etc.
@@ -1432,8 +1435,10 @@ sub _applyType {
     # In auto array mode, split as array only if there are multiple values
     if ( $array eq "auto" ) {
         if ( $session_value and $session_value =~ /$separator/ ) {
-            $session_value = [ map { $self->_forceType( $_, $type ) }
-                  split( $separator, $session_value ) ];
+            $session_value = [
+                map { $self->_forceType( $_, $type ) }
+                  split( $separator, $session_value )
+            ];
         }
         else {
             $session_value = $self->_forceType( $session_value, $type );
@@ -1442,8 +1447,10 @@ sub _applyType {
         # In always array mode, always split (even on empty values)
     }
     elsif ( $array eq "always" ) {
-        $session_value = [ map { $self->_forceType( $_, $type ) }
-              split( $separator, $session_value ) ];
+        $session_value = [
+            map { $self->_forceType( $_, $type ) }
+              split( $separator, $session_value )
+        ];
     }
 
     # In never array mode, return the string as-is
@@ -1466,15 +1473,12 @@ sub _applyType {
 
 sub _forceType {
     my ( $self, $val, $type ) = @_;
-    if ( $type eq "bool" ) {
-        return ( $val ? JSON::true : JSON::false );
-    }
 
-    if ( $type eq "int" ) {
+    # Boolean
+    return ( $val ? JSON::true : JSON::false ) if ( $type eq "bool" );
 
-        # Coax into int
-        return ( $val + 0 );
-    }
+    # Coax into int
+    return ( $val + 0 ) if ( $type eq "int" );
 
     # Coax into string
     return ( $val . "" );

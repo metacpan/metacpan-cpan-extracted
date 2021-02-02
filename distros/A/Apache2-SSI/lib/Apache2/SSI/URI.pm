@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/URI.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/18
-## Modified 2021/01/13
+## Modified 2021/02/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,16 +23,8 @@ BEGIN
     use Nice::Try;
     use Scalar::Util ();
     require constant;
-    eval
-    {
-        require URI::XS;
-        constant->import( URI_CLASS => 'URI::XS' );
-    };
-    if( $@ )
-    {
-        require URI;
-        constant->import( URI_CLASS => 'URI' );
-    }
+    use URI;
+    use constant URI_CLASS => 'URI';
     use URI::file;
     if( $ENV{MOD_PERL} )
     {
@@ -50,7 +42,7 @@ BEGIN
         bool     => sub () { 1 },
         fallback => 1,
     );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 ## document_root = /home/joe/www
@@ -1090,7 +1082,7 @@ Apache2::SSI::URI - Apache2 Server Side Include URI Object Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -1365,4 +1357,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

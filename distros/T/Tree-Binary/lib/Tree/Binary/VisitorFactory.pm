@@ -1,10 +1,9 @@
-
 package Tree::Binary::VisitorFactory;
 
 use strict;
 use warnings;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 sub new {
     my ($class) = @_;
@@ -36,11 +35,11 @@ Tree::Binary::VisitorFactory - A factory object for dispensing Visitor objects
 
   my $tf = Tree::Binary::VisitorFactory->new();
 
-  my $visitor = $tf->get('InOrderTraveral');
+  my $visitor = $tf->get('InOrderTraversal');
 
   # Or call it as a class method:
 
-  my $visitor = Tree::Binary::VisitorFactory->getVisitor('PostOrderTraveral');
+  my $visitor = Tree::Binary::VisitorFactory->getVisitor('PostOrderTraversal');
 
 =head1 DESCRIPTION
 

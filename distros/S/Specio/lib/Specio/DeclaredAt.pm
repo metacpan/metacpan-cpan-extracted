@@ -3,7 +3,7 @@ package Specio::DeclaredAt;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Specio::OO;
 
@@ -79,7 +79,7 @@ Specio::DeclaredAt - A class to represent where a type or coercion was declared
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 
@@ -89,9 +89,9 @@ version 0.46
 
 =head1 DESCRIPTION
 
-This class provides a thin wrapper around some of the return values from
-Perl's C<caller> built-in. It's used internally to identify where types and
-coercions are being declared, which is useful when generating error messages.
+This class provides a thin wrapper around some of the return values from Perl's
+C<caller> built-in. It's used internally to identify where types and coercions
+are being declared, which is useful when generating error messages.
 
 =head1 API
 
@@ -136,7 +136,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

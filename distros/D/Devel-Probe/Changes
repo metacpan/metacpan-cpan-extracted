@@ -1,3 +1,9 @@
+0.000006    2021-02-02
+            * Support threaded Perls
+            * Improve CCFLAGS handling => alpine compilation fixed
+            * Improve examples
+            * Improve docs
+
 0.000005    2019-02-13
             * Support a custom argument to probe trigger.
             * Move more functionality from XS into Perl, simplifying the code

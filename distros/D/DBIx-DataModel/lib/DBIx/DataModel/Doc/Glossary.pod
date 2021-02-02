@@ -61,7 +61,7 @@ for this side of the association.
 
 Application Programming Interface, the set of public attributes,
 methods, arguments, return values for interacting with a software 
-compnent.
+component.
 
 =item association
 
@@ -69,7 +69,7 @@ Relationship between tables.
 In L</UML>, an association declaration states what are the 
 participating tables, what are the L<multiplicities|/multiplicity>,
 and optionally gives names to the association itself and to the
-roles of the partipating tables.
+roles of the participating tables.
 An association declaration in C<DBIx::DataModel> involves similar 
 information, except that no more than two tables can participate,
 and at least one role name is mandatory.
@@ -181,11 +181,11 @@ The generic database-independent interface for Perl -- see L<DBI>.
 
 =item DBIC
 
-Abreviation for L<DBIx::Class>, another L</ORM> for Perl.
+Abbreviation for L<DBIx::Class>, another L</ORM> for Perl.
 
 =item DBIDM
 
-Abreviation for C<DBIx::DataModel>.
+Abbreviation for C<DBIx::DataModel>.
 
 =item dbh
 
@@ -495,13 +495,13 @@ relational database system.
 
 =item SQLA
 
-Abreviation for L<SQL::Abstract>, a SQL generator module
+Abbreviation for L<SQL::Abstract>, a SQL generator module
 used by several L</ORM>s.
 
 
 =item SQLAM
 
-Abreviation for L<SQL::Abstract::More>, a subclass of
+Abbreviation for L<SQL::Abstract::More>, a subclass of
 L</SQLA> which is the SQL generator module
 used by C<DBIx::DataModel>.
 

@@ -12,7 +12,7 @@ use vars qw(@EXPORT @ISA);
 @EXPORT = ('config_tiny');
 @ISA    = ('Exporter');
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # --------------------------------------------------
 
@@ -141,6 +141,10 @@ For the record, Exporter V 5.567 ships with Perl 5.8.0. That's what I had in Bui
 
 Every message passed to croak matches /^Error/ and ends with "\n".
 
+=head1 Repository
+
+L<https://github.com/ronsavage/Config-Plugin-Tiny.git>
+
 =head1 See Also
 
 L<CGI::Application>
@@ -184,9 +188,9 @@ L<CGI::Application::Plugin::Config::Simple>.
 
 =head1 Support
 
-Email the author, or log a bug on RT:
+Bugs should be reported via the CPAN bug tracker at
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config::Plugin::Tiny>.
+L<https://github.com/ronsavage/Config-Plugin-Tiny/issues>.
 
 =head1 Author
 

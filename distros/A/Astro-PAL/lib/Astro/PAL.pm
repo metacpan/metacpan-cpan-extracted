@@ -38,7 +38,7 @@ use vars qw($VERSION %EXPORT_TAGS);
 use Exporter 'import';
 use base qw/ DynaLoader /;
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 %EXPORT_TAGS = (
                 'pal'=>[qw/

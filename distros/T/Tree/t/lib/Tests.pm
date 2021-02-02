@@ -9,7 +9,7 @@ use Test::More;
 my @stats = qw( height width depth size is_root is_leaf );
 
 our @EXPORT_OK = qw( %runs );
-our $VERSION   = '1.14';
+our $VERSION   = '1.15';
 
 our %runs = (
     stats => {

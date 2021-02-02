@@ -1,0 +1,11 @@
+package BoardStreams::Client;
+
+use Mojo::Base -strict, -signatures;
+
+use BoardStreams::Client::Manager;
+
+sub new ($class, @args) {
+    return BoardStreams::Client::Manager->new(@args);
+}
+
+1;

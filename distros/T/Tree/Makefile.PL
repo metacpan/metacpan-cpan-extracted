@@ -75,7 +75,7 @@ if ($ExtUtils::MakeMaker::VERSION ge '6.46')
 		{
 			bugtracker =>
 			{
-				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Tree',
+				web => 'https://github.com/ronsavage/Tree/issues',
 			},
 			license		=> 'http://dev.perl.org/licenses/',
 			repository	=>

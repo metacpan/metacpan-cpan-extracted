@@ -14,9 +14,9 @@ my $gis = GIS::Distance->new( 'GeoEllipsoid', 'NAD27' );
 
 # DESCRIPTION
 
-This module is a wrapper around [Geo::Ellipsoid](https://metacpan.org/pod/Geo::Ellipsoid) for [GIS::Distance](https://metacpan.org/pod/GIS::Distance).
+This module is a wrapper around [Geo::Ellipsoid](https://metacpan.org/pod/Geo%3A%3AEllipsoid) for [GIS::Distance](https://metacpan.org/pod/GIS%3A%3ADistance).
 
-Normally this module is not used directly.  Instead [GIS::Distance](https://metacpan.org/pod/GIS::Distance)
+Normally this module is not used directly.  Instead [GIS::Distance](https://metacpan.org/pod/GIS%3A%3ADistance)
 is used which in turn interfaces with the various formula classes.
 
 # OPTIONAL ARGUMENTS
@@ -27,7 +27,7 @@ is used which in turn interfaces with the various formula classes.
 my $gis = GIS::Distance->new( 'GeoEllipsoid', 'NAD27' );
 ```
 
-Pass the name of an ellipsoid, per ["DEFINED ELLIPSOIDS" in Geo::Ellipsoid](https://metacpan.org/pod/Geo::Ellipsoid#DEFINED-ELLIPSOIDS).
+Pass the name of an ellipsoid, per ["DEFINED ELLIPSOIDS" in Geo::Ellipsoid](https://metacpan.org/pod/Geo%3A%3AEllipsoid#DEFINED-ELLIPSOIDS).
 
 If not set the default ellipsoid, `WGS84`, will be used.
 
@@ -41,7 +41,7 @@ GIS-Distance-GeoEllipsoid GitHub issue tracker:
 # AUTHORS
 
 ```
-Aran Clary Deltac <bluefeet@cpan.org>
+Aran Clary Deltac <bluefeet@gmail.com>
 ```
 
 # LICENSE

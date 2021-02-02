@@ -111,6 +111,7 @@ lib/Lemonldap/NG/Portal/Plugins/CheckState.pm
 lib/Lemonldap/NG/Portal/Plugins/CheckUser.pm
 lib/Lemonldap/NG/Portal/Plugins/ContextSwitching.pm
 lib/Lemonldap/NG/Portal/Plugins/DecryptValue.pm
+lib/Lemonldap/NG/Portal/Plugins/FindUser.pm
 lib/Lemonldap/NG/Portal/Plugins/ForceAuthn.pm
 lib/Lemonldap/NG/Portal/Plugins/GlobalLogout.pm
 lib/Lemonldap/NG/Portal/Plugins/GrantSession.pm
@@ -401,6 +402,7 @@ site/templates/bootstrap/decryptvalue.tpl
 site/templates/bootstrap/error.tpl
 site/templates/bootstrap/errormsg.tpl
 site/templates/bootstrap/ext2fcheck.tpl
+site/templates/bootstrap/finduser.tpl
 site/templates/bootstrap/footer.tpl
 site/templates/bootstrap/globallogout.tpl
 site/templates/bootstrap/gpgform.tpl
@@ -503,6 +505,7 @@ t/26-AuthRemote.t
 t/27-AuthProxy.t
 t/28-AuthChoice-and-password.t
 t/28-AuthChoice-with-captcha.t
+t/28-AuthChoice-with-info.t
 t/28-AuthChoice-with-over.t
 t/28-AuthChoice-with-rules.t
 t/28-AuthChoice-with-token.t
@@ -557,6 +560,7 @@ t/32-CAS-10.t
 t/32-CAS-Macros.t
 t/32-CAS-Prefix.t
 t/32-OIDC-ClaimTypes.t
+t/32-OIDC-ClientCredentials-Grant.t
 t/32-OIDC-Code-Flow-with-2F-UpgradeOnly.t
 t/32-OIDC-Code-Flow-with-2F.t
 t/32-OIDC-Hooks.t
@@ -678,6 +682,17 @@ t/68-ContextSwitching-with-Logout.t
 t/68-ContextSwitching-with-TOTP-and-Notification.t
 t/68-ContextSwitching-with-UnrestrictedUser.t
 t/68-ContextSwitching.t
+t/68-FindUser-with-BadChoice-and-token.t
+t/68-FindUser-with-Choice-and-token.t
+t/68-FindUser-with-Combination.t
+t/68-FindUser-with-DBI.t
+t/68-FindUser-with-Demo-and-required-select.t
+t/68-FindUser-with-Demo-and-token.t
+t/68-FindUser-with-Demo.t
+t/68-FindUser-with-LDAP.t
+t/68-FindUser-with-REST.t
+t/68-FindUser-without-attribute.t
+t/68-FindUser-without-Impersonation.t
 t/68-Impersonation-with-2F.t
 t/68-Impersonation-with-doubleCookies.t
 t/68-Impersonation-with-filtered-merge.t

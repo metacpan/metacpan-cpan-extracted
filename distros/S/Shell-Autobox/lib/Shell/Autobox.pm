@@ -6,9 +6,11 @@ use warnings;
 use base qw(autobox);
 
 use Carp qw(confess);
-use File::Temp;
+use IPC::Run3 qw(run3);
 
-our $VERSION = '0.40.0';
+# XXX this declaration must be on a single line
+# https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
+use version; our $VERSION = version->declare('v2.0.1');
 
 sub import {
     my $class  = shift;
@@ -16,49 +18,25 @@ sub import {
 
     for my $program (@_) {
         my $sub = sub {
-            my $input = shift;
-            my $args = join ' ', @_;
-            my $maybe_args = length($args) ? " $args" : '';
-            my $maybe_stdin = '';
-            my $stdout = File::Temp->new();
-            my $stderr = File::Temp->new();
-            my $stdin;
+            my ($input, @args) = @_;
+            my @command = ($program, @args);
+            my $command = join(' ', @command);
+            my $stdin = (defined($input) && ref($input) eq '') ? \$input : $input;
 
-            if (defined($input) && length($input)) {
-                $stdin = File::Temp->new();
-                print $stdin $input;
-                $maybe_stdin = " < $stdin";
-            }
+            run3(\@command, $stdin, \my $stdout, \my $stderr, {
+                return_if_system_error => 1, # don't die on error
+            });
 
-            my $command = sprintf(
-                '%s%s%s 2> %s > %s',
-                $program,
-                $maybe_args,
-                $maybe_stdin,
-                $stderr,
-                $stdout
-            );
+            my $error = (defined($stderr) && $stderr =~ /\S/) ? ": $stderr" : '';
+            my $message = "$command$error";
 
-            my ($output, $error);
-
-            my $fail = system $command;
-
-            {
-                local $/ = undef;
-                $error  = <$stderr>;
-                $output = <$stdout>;
-            }
-
-            my $maybe_error = $error =~ /\S/ ? ": $error" : '';
-            my $message = "$program$maybe_args$maybe_error";
-
-            if ($fail) {
+            if ($?) {
                 confess "can't exec $message";
-            } elsif ($maybe_error) {
+            } elsif ($error) {
                 warn "error running $message";
             }
 
-            return $output;
+            return (defined($stdout) && length($stdout)) ? $stdout : '';
         };
 
         {
@@ -67,7 +45,7 @@ sub import {
         }
     }
 
-    $class->SUPER::import(SCALAR => $caller);
+    $class->SUPER::import(SCALAR => $caller, ARRAY => $caller);
 }
 
 1;
@@ -76,7 +54,7 @@ __END__
 
 =head1 NAME
 
-Shell::Autobox - pipe Perl strings through shell commands
+Shell::Autobox - pipe Perl values through shell commands
 
 =head1 SYNOPSIS
 
@@ -87,23 +65,29 @@ Shell::Autobox - pipe Perl strings through shell commands
 
 =head1 DESCRIPTION
 
-Shell::Autobox provides an easy way to pipe Perl strings through shell commands. Commands passed as arguments to the
-C<use Shell::Autobox> statement are installed as subroutines in the calling package, and that package is then
-registered as the handler for methods called on ordinary (i.e. non-reference) scalars.
+Shell::Autobox provides an easy way to pipe Perl values through shell commands.
+Commands passed as arguments to the C<use Shell::Autobox> statement are
+installed as subroutines in the calling package, and that package is then
+registered as the handler for methods called on strings, numbers or arrayrefs.
 
-When a method corresponding to a registered command is called on a scalar, the scalar is passed as the command's standard input;
-additional arguments are passed through as a space-delimited list of options, and - if no error occurs - the
-command's standard output is returned. This can then be piped into other commands.
+When a registered command is called as a method, the value is passed as the
+command's standard input, additional arguments are passed to the command, and -
+if no error occurs - the command's standard output is returned. This can then
+be piped into other commands.
 
-The registered methods can also be called as regular functions e.g.
+The registered methods can also be called as regular functions, e.g.:
 
     use Shell::Autobox qw(cut);
 
-    my $bar = cut("foo:bar:baz", "-d':' -f2");
+    my $bar = cut('foo:bar:baz', '-d:', '-f2');
 
 =head2 EXPORT
 
 None by default.
+
+=head1 VERSION
+
+2.0.1
 
 =head1 SEE ALSO
 
@@ -112,6 +96,10 @@ None by default.
 =item * L<autobox>
 
 =item * L<autobox::Core>
+
+=item * L<IPC::Run3::Shell>
+
+=item * L<System::Sub>
 
 =item * L<Shell>
 
@@ -123,14 +111,9 @@ chocolateboy <chocolate@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2018 by chocolateboy
+Copyright (c) 2005-2021 by chocolateboy.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.6 or,
-at your option, any later version of Perl 5 you may have available.
-
-=head1 VERSION
-
-0.40.0
+This library is free software; you can redistribute it and/or modify it under
+the terms of the L<Artistic License 2.0|https://www.opensource.org/licenses/artistic-license-2.0.php>.
 
 =cut

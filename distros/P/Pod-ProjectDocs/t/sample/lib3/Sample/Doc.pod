@@ -1,0 +1,7 @@
+=head1 NAME
+
+Sample::Doc - sample POD document
+
+=head1 DESCRIPTION
+
+Nothing to see here.

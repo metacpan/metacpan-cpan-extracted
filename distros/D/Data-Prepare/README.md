@@ -132,6 +132,32 @@ for readability:
 This achieves a single row of column-headings, with each column-heading
 being unique, and sufficiently meaningful.
 
+## pk\_insert
+
+    pk_insert({
+      column_heading => 'ISO3CODE',
+      local_column => 'Country',
+      pk_column => 'official_name_en',
+    }, $data, $pk_map, $stopwords);
+
+In YAML format, this is the same configuration:
+
+    pk_insert:
+      - files:
+          - examples/CoreHouseholdIndicators.csv
+        spec:
+          column_heading: ISO3CODE
+          local_column: Country
+          pk_column: official_name_en
+          use_fallback: true
+
+And the `$pk_map` made with ["make\_pk\_map"](#make_pk_map), inserts the
+`column_heading` in front of the current zero-th column, mapping the
+value of the `Country` column as looked up from the specified column
+of the `pk_spec` file, and if `use_fallback` is true, also tries
+["pk\_match"](#pk_match) if no exact match is found. In that case, `stopwords`
+must be specified in the configuration
+
 ## cols\_non\_empty
 
     my @col_non_empty = cols_non_empty($data);
@@ -162,6 +188,22 @@ of headings of alternative key columns, returns a hash-ref mapping each
 of those alternative key columns (plus the `$pk_colkey`) to a map from
 that column's value to the relevant row's primary-key value.
 
+This is most conveniently represented in YAML format:
+
+    pk_spec:
+      file: examples/country-codes.csv
+      primary_key: ISO3166-1-Alpha-3
+      alt_keys:
+        - ISO3166-1-Alpha-2
+        - UNTERM English Short
+        - UNTERM English Formal
+        - official_name_en
+        - CLDR display name
+      stopwords:
+        - islands
+        - china
+        - northern
+
 ## pk\_col\_counts
 
     my ($colname2potential_key2count, $no_exact_match) = pk_col_counts($data, $pk_map);
@@ -171,6 +213,35 @@ a tuple of a hash-ref mapping each column that gave any matches to a
 further hash-ref mapping each of the potential key columns given above
 to how many matches it gave, and an array-ref of rows that had no exact
 matches.
+
+## pk\_match
+
+    my ($best, $pk_cols_unique_best) = pk_match($value, $pk_map, $stopwords);
+
+Given a value, `$pk_map`, and an array-ref of case-insensitive stopwords,
+returns its best match for the right primary-key value, and an array-ref
+of which primary-key columns in the `$pk_map` matched the given value
+exactly once.
+
+The latter is useful for analysis purposes to select which primary-key
+column to use for this data-set.
+
+The algorithm used for this best-match:
+
+- Splits the value into words (or where a word is two or more capital
+letters, letters). The search allows any, or no, text, to occur between
+these entities. Each configured primary-key column's keys are searched
+for matches.
+- If there is a separating `,` or `(` (as commonly used for
+abbreviations), splits the value into chunks, reverses them, and then
+reassembles the chunks as above for a similar search.
+- Only if there were no matches from the previous steps, splits the value
+into words. Words that are shorter than three characters, or that occur in
+the stopword list, are omitted. Then each word is searched for as above.
+- "Votes" on which primary-key value got the most matches. Tie-breaks on
+which primary-key value matched on the shortest key in the relevant
+`$pk_map` column, and then on the lexically lowest-valued primary-key
+value, to ensure stable return values.
 
 # SEE ALSO
 

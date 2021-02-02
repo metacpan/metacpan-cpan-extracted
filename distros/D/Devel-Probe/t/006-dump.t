@@ -9,7 +9,7 @@ my $config = {
     actions => [
         { action => 'define', file => "foo", lines => [qw(4 5 6)] },
         { action => 'define', file => "bar", lines => [qw(7 8 9)], type => Devel::Probe::PERMANENT },
-        { action => 'define', file => "baz", lines => [10], args => { frobnicate => 'doubletime' }},
+        { action => 'define', file => "baz", lines => [10], argument => { frobnicate => 'doubletime' }},
     ],
 };
 Devel::Probe::config($config);

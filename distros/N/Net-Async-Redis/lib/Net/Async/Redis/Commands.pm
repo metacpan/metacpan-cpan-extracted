@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.009'; # VERSION
+our $VERSION = '3.010'; # VERSION
 
 =head1 NAME
 
@@ -56,6 +56,8 @@ our %KEY_FINDER = (
     'GEOSEARCH' => 1,
     'GET' => 1,
     'GETBIT' => 1,
+    'GETDEL' => 1,
+    'GETEX' => 1,
     'GETRANGE' => 1,
     'GETSET' => 1,
     'HDEL' => 1,
@@ -68,6 +70,7 @@ our %KEY_FINDER = (
     'HLEN' => 1,
     'HMGET' => 1,
     'HMSET' => 1,
+    'HRANDFIELD' => 1,
     'HSCAN' => 1,
     'HSET' => 1,
     'HSETNX' => 1,
@@ -161,6 +164,7 @@ our %KEY_FINDER = (
     'ZMSCORE' => 1,
     'ZPOPMAX' => 1,
     'ZPOPMIN' => 1,
+    'ZRANDMEMBER' => 1,
     'ZRANGE' => 1,
     'ZRANGEBYLEX' => 1,
     'ZRANGEBYSCORE' => 1,
@@ -1979,6 +1983,27 @@ sub hmset : method {
     $self->execute_command(qw(HMSET) => @args)
 }
 
+=head2 hrandfield
+
+Get one or multiple random fields from a hash.
+
+=over 4
+
+=item * key
+
+=item * [count [WITHVALUES]]
+
+=back
+
+L<https://redis.io/commands/hrandfield>
+
+=cut
+
+sub hrandfield : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(HRANDFIELD) => @args)
+}
+
 =head2 hscan
 
 Incrementally iterate hash fields and associated values.
@@ -2815,6 +2840,12 @@ sub script_exists : method {
 
 Remove all the scripts from the script cache.
 
+=over 4
+
+=item * [ASYNC|SYNC]
+
+=back
+
 L<https://redis.io/commands/script-flush>
 
 =cut
@@ -3259,7 +3290,7 @@ Remove all keys from all databases.
 
 =over 4
 
-=item * [ASYNC]
+=item * [ASYNC|SYNC]
 
 =back
 
@@ -3278,7 +3309,7 @@ Remove all keys from the current database.
 
 =over 4
 
-=item * [ASYNC]
+=item * [ASYNC|SYNC]
 
 =back
 
@@ -4424,6 +4455,27 @@ sub zpopmin : method {
     $self->execute_command(qw(ZPOPMIN) => @args)
 }
 
+=head2 zrandmember
+
+Get one or multiple random elements from a sorted set.
+
+=over 4
+
+=item * key
+
+=item * [count [WITHSCORES]]
+
+=back
+
+L<https://redis.io/commands/zrandmember>
+
+=cut
+
+sub zrandmember : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ZRANDMEMBER) => @args)
+}
+
 =head2 zrange
 
 Return a range of members in a sorted set.
@@ -5410,6 +5462,46 @@ sub getbit : method {
     $self->execute_command(qw(GETBIT) => @args)
 }
 
+=head2 getdel
+
+Get the value of a key and delete the key.
+
+=over 4
+
+=item * key
+
+=back
+
+L<https://redis.io/commands/getdel>
+
+=cut
+
+sub getdel : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(GETDEL) => @args)
+}
+
+=head2 getex
+
+Get the value of a key and optionally set its expiration.
+
+=over 4
+
+=item * key
+
+=item * [EX seconds|PX milliseconds|EXAT timestamp|PXAT milliseconds-timestamp|PERSIST]
+
+=back
+
+L<https://redis.io/commands/getex>
+
+=cut
+
+sub getex : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(GETEX) => @args)
+}
+
 =head2 getrange
 
 Get a substring of the string stored at a key.
@@ -5605,7 +5697,7 @@ Set the string value of a key.
 
 =item * value
 
-=item * [EX seconds|PX milliseconds|KEEPTTL]
+=item * [EX seconds|PX milliseconds|EXAT timestamp|PXAT milliseconds-timestamp|KEEPTTL]
 
 =item * [NX|XX]
 
@@ -5835,5 +5927,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2021. Licensed under the same terms as Perl itself.
 

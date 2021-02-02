@@ -2,6 +2,7 @@ Changes
 examples/synopsis.pl
 lib/Lingua/Guess.pm
 lib/Lingua/Guess.pod
+lib/Lingua/Guess/lang.json
 lib/Lingua/Guess/train/albanian.train
 lib/Lingua/Guess/train/arabic.train
 lib/Lingua/Guess/train/azeri.train
@@ -62,6 +63,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 script/linguaguess
+t/codes.t
 t/lingua-guess.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

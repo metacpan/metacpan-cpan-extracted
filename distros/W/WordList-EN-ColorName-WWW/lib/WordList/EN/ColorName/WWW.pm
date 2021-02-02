@@ -3,12 +3,12 @@ package WordList::EN::ColorName::WWW;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-12-27'; # DATE
 our $DIST = 'WordList-EN-ColorName-WWW'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("longest_word_len",20,"avg_word_len",8.88513513513514,"num_words_contains_unicode",0,"num_words_contain_unicode",0,"num_words_contain_nonword_chars",0,"num_words_contains_whitespace",0,"num_words",148,"shortest_word_len",3,"num_words_contains_nonword_chars",0,"num_words_contain_whitespace",0); # STATS
+our %STATS = ("num_words_contains_nonword_chars",0,"num_words_contains_unicode",0,"num_words_contain_nonword_chars",0,"avg_word_len",8.88513513513514,"num_words_contains_whitespace",0,"longest_word_len",20,"num_words_contain_whitespace",0,"num_words_contain_unicode",0,"shortest_word_len",3,"num_words",148); # STATS
 
 1;
 # ABSTRACT: Color names from Graphics::ColorNames::WWW
@@ -23,7 +23,7 @@ WordList::EN::ColorName::WWW - Color names from Graphics::ColorNames::WWW
 
 =head1 VERSION
 
-This document describes version 0.003 of WordList::EN::ColorName::WWW (from Perl distribution WordList-EN-ColorName-WWW), released on 2020-12-27.
+This document describes version 0.004 of WordList::EN::ColorName::WWW (from Perl distribution WordList-EN-ColorName-WWW), released on 2020-12-27.
 
 =head1 SYNOPSIS
 
@@ -86,6 +86,10 @@ feature.
 =head1 SEE ALSO
 
 L<Graphics::ColorNames::WWW>
+
+Other WordList::EN::ColorName::* modules like L<WordList::EN::ColorName::X>.
+
+L<WordList::ColorName::Any>
 
 =head1 AUTHOR
 

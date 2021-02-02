@@ -7,7 +7,7 @@ Attean::API::Model - RDF Model
 
 =head1 VERSION
 
-This document describes Attean::API::Model version 0.028
+This document describes Attean::API::Model version 0.029
 
 =head1 DESCRIPTION
 
@@ -166,7 +166,7 @@ in the model.
 
 use Attean::API::Binding;
 
-package Attean::API::Model 0.028 {
+package Attean::API::Model 0.029 {
 	use Sub::Install;
 	use Sub::Util qw(set_subname);
 	use URI::Namespace;
@@ -345,7 +345,7 @@ package Attean::API::Model 0.028 {
 }
 
 
-package Attean::API::MutableModel 0.028 {
+package Attean::API::MutableModel 0.029 {
 	use Attean::RDF;
 	use LWP::UserAgent;
 	use Encode qw(encode);
@@ -406,6 +406,19 @@ package Attean::API::MutableModel 0.028 {
 		}
 	}
 	
+	sub load_triples_from_io {
+		my $self	= shift;
+		my $format	= shift;
+		my $class	= Attean->get_parser($format) || die "Failed to load parser for '$format'";
+		my $parser	= $class->new() || die "Failed to construct parser for '$format'";
+		while (scalar(@_)) {
+			my ($graph, $fh)	= splice(@_, 0, 2);
+			my $iter	= $parser->parse_iter_from_io($fh);
+			my $quads	= $iter->as_quads($graph);
+			$self->add_iter($quads);
+		}
+	}
+	
 	sub add_iter {
 		my $self	= shift;
 		my $iter	= shift;
@@ -438,21 +451,21 @@ package Attean::API::MutableModel 0.028 {
 }
 
 
-package Attean::API::ETagCacheableModel 0.028 {
+package Attean::API::ETagCacheableModel 0.029 {
 	use Moo::Role;
 	
 	requires 'etag_value_for_quads';
 }
 
 
-package Attean::API::TimeCacheableModel 0.028 {
+package Attean::API::TimeCacheableModel 0.029 {
 	use Moo::Role;
 	
 	requires 'mtime_for_quads';
 }
 
 
-package Attean::API::BulkUpdatableModel 0.028 {
+package Attean::API::BulkUpdatableModel 0.029 {
 	use Moo::Role;
 	
 	with 'Attean::API::MutableModel';
@@ -460,7 +473,7 @@ package Attean::API::BulkUpdatableModel 0.028 {
 	requires 'begin_bulk_updates';
 	requires 'end_bulk_updates';
 	
-	around [qw(load_triples add_iter add_list)] => sub {
+	around [qw(load_triples load_triples_from_io add_iter add_list)] => sub {
 		my $orig	= shift;
 		my $self	= shift;
 		$self->begin_bulk_updates();

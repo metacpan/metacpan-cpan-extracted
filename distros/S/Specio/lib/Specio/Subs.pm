@@ -3,15 +3,13 @@ package Specio::Subs;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Carp qw( croak );
 use Eval::Closure qw( eval_closure );
 use Module::Runtime qw( use_package_optimistically );
 use Specio::Library::Perl;
 use Specio::Registry qw( exportable_types_for_package );
-
-my $counter = 0;
 
 sub import {
     shift;
@@ -188,7 +186,7 @@ Specio::Subs - Make validation and coercion subs from Specio types
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 
@@ -247,12 +245,12 @@ This is only created if the type has coercions.
 =for Pod::Coverage subs_installed_into
 
 This module has a subroutine named C<subs_installed_into>. It is not exported
-but it can be called by its fully qualified name. It accepts a single
-argument, a package name. It returns a list of subs that it generated and
-installed in the given package, if any.
+but it can be called by its fully qualified name. It accepts a single argument,
+a package name. It returns a list of subs that it generated and installed in
+the given package, if any.
 
-This exists to make it easy to write a type library that combines other
-library and generates helper subs for export all at once.
+This exists to make it easy to write a type library that combines other library
+and generates helper subs for export all at once.
 
 =head1 SUPPORT
 
@@ -270,7 +268,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2020 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

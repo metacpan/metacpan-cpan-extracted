@@ -267,8 +267,6 @@ for my $type_name (qw( Str Num Int ClassName )) {
 
     my $type = t($type_name);
 
-    my $name = $type->name;
-
     my $not_inlined = $type->_constraint_with_parents;
 
     my $inlined;

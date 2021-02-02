@@ -1,3 +1,4 @@
+requires 'perl' => '5.008001';
 requires 'strictures' => '2.000000';
 
 requires 'Exporter';

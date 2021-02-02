@@ -13,20 +13,34 @@ use namespace::clean;
 sub new {
   my $class = shift;
 
-  @_ or croak "-result_as => [categorize => ...] ... need field names ";
+  @_ or croak "-result_as => [categorize => ...] ... need field names or sub{} ";
 
-  my $self = {cols => \@_};
+  my $self;
+
+  if ((ref $_[0] || '') eq 'CODE') {
+    $self = {make_key => shift};
+    !@_ or croak "-result_as => [categorize => sub {...}] : improper other args after sub{}";
+  }
+  else {
+    $self = {cols => \@_};
+  }
+
   return bless $self, $class;
 }
 
 sub get_result {
   my ($self, $statement) = @_;
 
-  my @cols = @{$self->{cols}};
+
+  my $make_key = $self->{make_key} || do {
+    my @cols = @{$self->{cols}};
+    sub {my $row = shift; @{$row}{@cols}};
+  };
+
 
   $statement->execute;
   my $rows = $statement->all;
-  my %result = categorize {@{$_}{@cols}} @$rows;
+  my %result = categorize {$make_key->($_)} @$rows;
   $statement->finish;
 
   return \%result;
@@ -44,15 +58,22 @@ DBIx::DataModel::Schema::ResultAs::Categorize - tree of categorized lists of row
 
 =head1 SYNOPSIS
 
-  my $tree = $source->select(..., -result_as => [categorize => ($key1, $key2)]);
+  my $tree = $source->select(..., -result_as => [categorize => ($column1, ...)]);
+  # or
+  my $tree = $source->select(..., -result_as => [categorize => sub {...}]);
+
 
 =head1 DESCRIPTION
 
-Builds a tree of rows through module L<List::Categorize>, with
-C<$key1>, C<$key2>, etc. as categorization keys. This is quite similar
+Builds a tree of lists of rows through module L<List::Categorize>, with
+the content of C<$column1>, etc. as categorization keys. This is quite similar
 to the C<hashref> result kind, except that the categorization keys
 need not be unique : each leaf of the tree will contain I<lists>
 of rows matching those categories, while the C<hashref> result kind
 only keeps the I<last> row matching the given keys.
+
+Instead of a list of column names, the argument can be a reference
+to a subroutine. That subroutine will we called
+for each row and should return a list of scalar values to be used as categorization keys.
 
 

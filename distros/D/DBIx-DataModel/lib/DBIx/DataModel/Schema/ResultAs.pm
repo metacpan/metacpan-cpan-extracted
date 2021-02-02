@@ -3,19 +3,16 @@ package DBIx::DataModel::Schema::ResultAs;
 #----------------------------------------------------------------------
 use strict;
 use warnings;
+use DBIx::DataModel::Meta::Utils qw/define_abstract_methods/;
 
 use Carp::Clan       qw[^(DBIx::DataModel::|SQL::Abstract)];
+
+define_abstract_methods(__PACKAGE__, qw/get_result/);
 
 sub new {
   my $class = shift;
 
   return bless {@_}, $class;
-}
-
-sub get_result {
-  my $self  = shift;
-  my $class = ref $self || $self;
-  croak "$class should implement a get_result() method";
 }
 
 1;
@@ -38,10 +35,6 @@ See L<DBIx::DataModel::Doc::Reference/select()>.
 Subclasses should implement
 
 =over
-
-=item C<new()>
-
-The constructor
 
 =item C<get_result()>
 

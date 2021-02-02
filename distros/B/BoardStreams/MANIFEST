@@ -6,6 +6,13 @@ README.md
 cpanfile
 cpanfile.snapshot
 lib/BoardStreams.pm
+lib/BoardStreams/Client.pm
+lib/BoardStreams/Client/Channel.pm
+lib/BoardStreams/Client/Manager.pm
+lib/BoardStreams/Client/StructDiff.pm
+lib/BoardStreams/Client/Utils.pm
+lib/BoardStreams/Client/WebSocket.pm
+lib/BoardStreams/DBMigrations.pm
 lib/BoardStreams/Exception.pm
 lib/BoardStreams/ListenerObservable.pm
 lib/BoardStreams/Registry.pm

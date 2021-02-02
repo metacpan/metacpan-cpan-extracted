@@ -6,7 +6,7 @@ use Storable qw(dclone);
 use XSLoader;
 use Carp qw(croak);
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 XSLoader::load( 'Devel::Probe', $VERSION );
 
 sub import {
@@ -44,9 +44,9 @@ sub config {
             next unless $file;
 
             my $type = $action->{type} // ONCE;
-            my $args = $action->{args};
+            my $argument = $action->{argument};
             foreach my $line (@{ $action->{lines} // [] }) {
-                add_probe($file, $line, $type, $args);
+                add_probe($file, $line, $type, $argument);
             }
             next;
         }
@@ -54,13 +54,13 @@ sub config {
 }
 
 sub add_probe {
-    my ($file, $line, $type, $args) = @_;
+    my ($file, $line, $type, $argument) = @_;
     if ($type ne ONCE && $type ne PERMANENT) {
         croak sprintf("'%s' is not a valid probe type: try Devel::Probe::ONCE|PERMANENT", $type);
     }
 
     my $probes = Devel::Probe::_internal_probe_state();
-    $probes->{$file}->{$line} = [$type, defined $args ? $args : ()];
+    $probes->{$file}->{$line} = [$type, defined $argument ? $argument : ()];
 }
 
 sub dump {
@@ -80,17 +80,17 @@ Devel::Probe - Quick & dirty code probes for Perl
 
 =head1 VERSION
 
-Version 0.000005
+Version 0.000006
 
 =head1 SYNOPSIS
 
     use Devel::Probe;
     ...
     Devel::Probe::trigger(sub {
-        my ($file, $line) = @_;
+        my ($file, $line, $argument) = @_;
         # probe logic
     });
-    Devel::Probe::config(%config);
+    Devel::Probe::config(\%config);
     ...
     Devel::Probe::enable();
     ...
@@ -99,7 +99,8 @@ Version 0.000005
 =head1 DESCRIPTION
 
 Use this module to allow the possibility of creating probes for some lines in
-your code.
+your code.  These probes can be used to build things like debuggers, fault
+injection tests, or production observability tooling.
 
 The probing code is installed when you import the module, but it is disabled.
 In these conditions, the probe code is light enough that it should cause no
@@ -123,19 +124,25 @@ cause probes to be triggered.  This call will always disable the module as a
 first action, so you always need to explicitly enable it again, either from the
 configuration itself or in a further call to C<enable()>.
 
-=item * C<add_probe(file, line, type)>
+=item * C<add_probe($file, $line, $type, $callback_argument)>
 
 Manually add a probe.  This is what gets called from C<config()> when adding
 probes; please see the CONFIGURATION example for more information.
 
 =item * C<enable()> / C<disable()>  / C<is_enabled()>
 
-Dynamically activate and deactivate probing, and check this status.
+Dynamically activate and deactivate probing, and check this status.  When
+disabled, C<Devel::Probe> will have minimal overhead, and probes will fire
+again as soon as C<enable()> is called.
 
 =item * C<install()> / C<remove()> / C<is_installed()>
 
 Install or remove the probe handling code, and check this status.  When you
 import the module, C<install()> is called automatically for you.
+
+When uninstalled, C<Devel::Probe> will have zero overhead, and all probe state
+is cleared.  Probes will not fire again until C<install()> is called and both
+trigger and probes are redefined.
 
 =item * C<clear()>
 
@@ -143,7 +150,7 @@ Remove all probes.
 
 =item * C<dump()>
 
-Print all probes to stderr.
+Return all probes as a hash.
 
 =back
 
@@ -156,7 +163,6 @@ An example configuration hash looks like this:
             { action => 'disable' },
             { action => 'clear' },
             { action => 'define' ... },
-            { action => 'dump' },
             { action => 'enable' },
         ],
     );
@@ -169,8 +175,6 @@ Possible actions are:
 
 =item * C<clear>: clear current list of probes.
 
-=item * C<dump>: dump current list of probes to stderr.
-
 =item * C<enable>: enable probing.
 
 =item * C<define>: define a new probe.  A full define action looks like:
@@ -180,21 +184,26 @@ Possible actions are:
         type => PROBE_TYPE,
         file => 'file_name',
         lines => [ 10, 245, 333 ],
+        argument => $my_callback_argument,
     );
 
-The type field is optional and its default value is C<once>.  Possible values
+The type field is optional and its default value is C<Devel::Probe::ONCE>.  Possible values
 are:
 
 =over 4
 
-=item * C<once>: the probe will trigger once and then will be destroyed right
+=item * C<Devel::Probe::ONCE>: the probe will trigger once and then will be destroyed right
 after that.  This default makes it more difficult to overwhelm your system with
 too much probing, unless you explicitly request a different type of probe.
 
-=item * C<permanent>: the probe will trigger every time that line of code is
+=item * C<Devel::Probe::PERMANENT>: the probe will trigger every time that line of code is
 executed.
 
 =back
+
+The C<argument> field is optional and its default value is undefined. Possible
+values are any Perl scalar.  If present, it will be passed to the C<trigger>
+callback as the third argument.
 
 =back
 
@@ -206,7 +215,8 @@ variables.  After that first execution, that particular probe will not be
 triggered anymore.  For line 22, every time that line is executed the probe
 will be triggered.
 
-    # line 1 of s.pl
+    # line 1
+    use 5.18.0;
     use Data::Dumper qw(Dumper);
     use PadWalker qw(peek_my);
     use Devel::Probe;
@@ -218,19 +228,51 @@ will be triggered.
 
     my %config = (
         actions => [
-            { action => 'define', file => 's.pl', lines => [ 21 ] },
-            { action => 'define', file => 's.pl', type = 'permanent', lines => [ 22 ] },
+            { action => 'define', file => __FILE__, lines => [ 22 ] },
+            { action => 'define', file => __FILE__, type => Devel::Probe::PERMANENT, lines => [ 23 ] },
         ],
     );
     Devel::Probe::config(\%config);
     Devel::Probe::enable();
     my $count;
     while (1) {
-        $count++;                                   # line 21
-        my $something_inside_the_loop = $count * 2; # line 22
+        $count++;                                   # line 22
+        my $something_inside_the_loop = $count * 2; # line 23
         sleep 5;
     }
     Devel::Probe::disable();
+
+As another example, you can pass a custom argument to the trigger callback:
+
+    # line 1
+    use 5.18.0;
+    use PadWalker qw(peek_my);
+    use Devel::Probe;
+
+    Devel::Probe::trigger(sub {
+        my ($file, $line, $interesting_var_name) = @_;
+        say "$interesting_var_name: " . ${ peek_my(1)->{$interesting_var_name} };
+    });
+
+    my %config = (
+        actions => [
+            { action => 'enable' },
+            { action => 'define',
+              file => __FILE__,
+              type => Devel::Probe::PERMANENT,
+              lines => [ 26 ],
+              argument => '$squared'
+            },
+        ],
+    );
+    Devel::Probe::config(\%config);
+    my $count = 0;
+    my $squared = 0;
+    while (1) {
+        $count++;
+        $squared = $count * $count; # line 26
+        sleep 5;
+    }
 
 =head1 SUGGESTIONS
 

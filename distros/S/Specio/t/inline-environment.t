@@ -56,7 +56,7 @@ use Specio::Library::Builtins;
     $t->add_coercion($from_num);
     $t->add_coercion($from_ref);
 
-    my ( $code, $env ) = $t->inline_coercion_and_check('$var');
+    my ( undef, $env ) = $t->inline_coercion_and_check('$var');
 
     my %expect = (
         '$scalar'      => 42,

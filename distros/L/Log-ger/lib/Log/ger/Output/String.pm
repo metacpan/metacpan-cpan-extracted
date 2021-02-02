@@ -1,9 +1,9 @@
 package Log::ger::Output::String;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-11'; # DATE
+our $DATE = '2021-01-31'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.037'; # VERSION
+our $VERSION = '0.038'; # VERSION
 
 use strict;
 use warnings;
@@ -57,7 +57,7 @@ Log::ger::Output::String - Set output to a string
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

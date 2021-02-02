@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,10 +28,10 @@ no_index:
 provides:
   Catalyst::Plugin::Starch:
     file: lib/Catalyst/Plugin/Starch.pm
-    version: '0.06'
+    version: '0.08'
   Catalyst::Plugin::Starch::Cookie:
     file: lib/Catalyst/Plugin/Starch/Cookie.pm
-    version: '0.06'
+    version: '0.08'
 requires:
   Catalyst: '5.90001'
   Catalyst::Exception: '0'
@@ -49,9 +49,7 @@ resources:
   bugtracker: https://github.com/bluefeet/Catalyst-Plugin-Starch/issues
   homepage: https://github.com/bluefeet/Catalyst-Plugin-Starch
   repository: git://github.com/bluefeet/Catalyst-Plugin-Starch.git
-version: '0.06'
+version: '0.08'
 x_authority: cpan:BLUEFEET
-x_contributors:
-  - 'Aran Deltac <aran@ziprecruiter.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

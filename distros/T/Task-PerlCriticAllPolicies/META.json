@@ -1,0 +1,117 @@
+{
+   "abstract" : "A Task for installing all Perl::Critic policies at once.",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.028",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Task-PerlCriticAllPolicies",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.028"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic" : "0",
+            "Perl::Critic::Bangs" : "0",
+            "Perl::Critic::CognitiveComplexity" : "0",
+            "Perl::Critic::Compatibility" : "0",
+            "Perl::Critic::Deprecated" : "0",
+            "Perl::Critic::Dynamic" : "0",
+            "Perl::Critic::Freenode" : "0",
+            "Perl::Critic::Git" : "0",
+            "Perl::Critic::Itch" : "0",
+            "Perl::Critic::Lax" : "0",
+            "Perl::Critic::Lokku" : "0",
+            "Perl::Critic::MergeProfile" : "0",
+            "Perl::Critic::Moose" : "0",
+            "Perl::Critic::More" : "0",
+            "Perl::Critic::Nits" : "0",
+            "Perl::Critic::OTRS" : "0",
+            "Perl::Critic::PetPeeves::JTRAMMELL" : "0",
+            "Perl::Critic::Plicease" : "0",
+            "Perl::Critic::Policy::BadStrings" : "0",
+            "Perl::Critic::Policy::BuiltinFunctions::ProhibitDeleteOnArrays" : "0",
+            "Perl::Critic::Policy::BuiltinFunctions::ProhibitReturnOr" : "0",
+            "Perl::Critic::Policy::Catalyst::ProhibitUnreachableCode" : "0",
+            "Perl::Critic::Policy::CodeLayout::ProhibitSpaceIndentation" : "0",
+            "Perl::Critic::Policy::CodeLayout::TabIndentSpaceAlign" : "0",
+            "Perl::Critic::Policy::CompileTime" : "0",
+            "Perl::Critic::Policy::ControlStructures::ProhibitReturnInDoBlock" : "0",
+            "Perl::Critic::Policy::Documentation::RequirePod" : "0",
+            "Perl::Critic::Policy::Documentation::RequirePodLinksIncludeText" : "0",
+            "Perl::Critic::Policy::Dynamic::NoIndirect" : "0",
+            "Perl::Critic::Policy::HTTPCookies" : "0",
+            "Perl::Critic::Policy::Modules::ProhibitUseLib" : "0",
+            "Perl::Critic::Policy::Moo::ProhibitMakeImmutable" : "0",
+            "Perl::Critic::Policy::Perlsecret" : "0",
+            "Perl::Critic::Policy::ProhibitOrReturn" : "0",
+            "Perl::Critic::Policy::ProhibitSmartmatch" : "0",
+            "Perl::Critic::Policy::References::ProhibitComplexDoubleSigils" : "0",
+            "Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives" : "0",
+            "Perl::Critic::Policy::RegularExpressions::RequireDefault" : "0",
+            "Perl::Critic::Policy::TryTiny::RequireBlockTermination" : "0",
+            "Perl::Critic::Policy::TryTiny::RequireUse" : "0",
+            "Perl::Critic::Policy::ValuesAndExpressions::PreventSQLInjection" : "0",
+            "Perl::Critic::Policy::ValuesAndExpressions::ProhibitEmptyPostfixLoop" : "0",
+            "Perl::Critic::Policy::ValuesAndExpressions::ProhibitSingleArgArraySlice" : "0",
+            "Perl::Critic::Policy::Variables::NameReuse" : "0",
+            "Perl::Critic::Policy::Variables::ProhibitLoopOnHash" : "0",
+            "Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter" : "0",
+            "Perl::Critic::Policy::Variables::RequireHungarianNotation" : "0",
+            "Perl::Critic::Policy::logicLAB::ModuleBlacklist" : "0",
+            "Perl::Critic::Policy::logicLAB::ProhibitShellDispatch" : "0",
+            "Perl::Critic::Policy::logicLAB::ProhibitUseLib" : "0",
+            "Perl::Critic::Policy::logicLAB::RequirePackageNamePattern" : "0",
+            "Perl::Critic::Policy::logicLAB::RequireParamsValidate" : "0",
+            "Perl::Critic::Policy::logicLAB::RequireSheBang" : "0",
+            "Perl::Critic::Policy::logicLAB::RequireVersionFormat" : "0",
+            "Perl::Critic::PolicyBundle::PERLANCAR" : "0",
+            "Perl::Critic::PolicyBundle::SNEZ" : "0",
+            "Perl::Critic::Pulp" : "0",
+            "Perl::Critic::RENEEB" : "0",
+            "Perl::Critic::Storable" : "0",
+            "Perl::Critic::StricterSubs" : "0",
+            "Perl::Critic::Swift" : "0",
+            "Perl::Critic::Tics" : "0",
+            "Perl::Critic::TooMuchCode" : "0",
+            "Perl::Critic::logicLAB" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Task::PerlCriticAllPolicies" : {
+         "file" : "lib/Task/PerlCriticAllPolicies.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Task-PerlCriticAllPolicies/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gugod/Task-PerlCriticAllPolicies.git",
+         "web" : "https://github.com/gugod/Task-PerlCriticAllPolicies"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_spdx_expression" : "MIT",
+   "x_static_install" : "1"
+}

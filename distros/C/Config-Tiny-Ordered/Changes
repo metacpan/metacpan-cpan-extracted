@@ -1,0 +1,21 @@
+Revision history for Perl extension Config::Tiny::Ordered
+
+1.03  2021-02-01T18:04:00
+	- Rename CHANGES to Changes
+ 	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Reformat Makefile.PL.
+	- Add t/00.*.
+	- Update POD to change RT to github.
+
+1.02  2010-02-21T12:54:51
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.01  2010-02-10T14:01:38
+	- Add MYMETA.yml. Add MANIFEST.SKIP.
+
+1.00  2009-04-23T12:00:00
+	- Convert from Config::Tiny V 2.12 to preserve the order of keys within sections.
+	- Add Build.PL to the distro.
+	- Add MANIFEST.SKIP to the distro.

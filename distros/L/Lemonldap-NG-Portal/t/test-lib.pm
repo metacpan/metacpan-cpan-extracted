@@ -689,7 +689,7 @@ has ini => (
         main::ok( $self->{p} = $self->class->new(), 'Portal object' );
         main::count(1);
         unless ( $self->confFailure ) {
-            main::ok( $self->{p}->init($ini), 'Init' );
+            main::ok( $self->{p}->init($ini),           'Init' );
             main::ok( $self->{app} = $self->{p}->run(), 'Portal app' );
             main::count(2);
             no warnings 'redefine';
@@ -699,16 +699,29 @@ has ini => (
                 uid  => 'french',
                 cn   => 'Frédéric Accents',
                 mail => 'fa@badwolf.org',
-            };
-            $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{davros} = {
-                uid  => 'davros',
-                cn   => 'Bad Guy',
-                mail => 'davros@badguy.org',
+                guy  => '',
+                type => '',
             };
             $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{russian} = {
                 uid  => 'russian',
                 cn   => 'Русский',
                 mail => 'ru@badwolf.org',
+                guy  => '',
+                type => '',
+            };
+            $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{davros} = {
+                uid  => 'davros',
+                cn   => 'Bad Guy',
+                mail => 'davros@badguy.org',
+                guy  => 'bad',
+                type => 'character',
+            };
+            $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{dalek} = {
+                uid  => 'dalek',
+                cn   => 'The Daleks',
+                mail => 'dalek@badguy.org',
+                guy  => 'bad',
+                type => 'mutant',
             };
             push
               @{ $Lemonldap::NG::Portal::UserDB::Demo::demoGroups{earthlings} },

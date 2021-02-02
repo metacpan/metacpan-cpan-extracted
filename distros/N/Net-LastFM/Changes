@@ -1,6 +1,10 @@
 Revision history for Perl module Net::LastFM:
 
-0.37 2019-07-23T04:04:55
+0.38 2021-02-01T03:30:03
+ - remove VERSION from useragent (Andrew Baerg)
+ - Fix 411 problem (Dave Cross)
+
+0.37 2019-07-23T04:04:55Z
  - FIX: use $Net::LastFM::VERSION instead of $VERSION (Andrew Baerg)
  - update changelog (Andrew Baerg)
 

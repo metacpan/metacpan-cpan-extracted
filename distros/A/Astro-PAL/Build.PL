@@ -11,6 +11,7 @@ my $class = Module::Build->subclass(code => << 'EOF');
         my $self = shift;
         my %exclude = map {$_ => 1} qw[
             erfasrc/src/t_erfa_c.c
+            erfasrc/src/t_erfa_c_extra.c
             erfasrc/src/erfaversion.c
             palsrc/palVers.c
             palsrc/palTest.c

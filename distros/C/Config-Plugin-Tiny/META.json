@@ -1,28 +1,33 @@
 {
    "abstract" : "A plugin which uses Config::Tiny",
    "author" : [
-      "Ron Savage <ron@savage.net.au>"
+      "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_1"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Config-Plugin-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.94",
-            "Test::Pod" : "1.44"
+            "Test::More" : "0.47"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -33,19 +38,27 @@
             "vars" : "1.01",
             "warnings" : "1.03"
          }
-      }
-   },
-   "provides" : {
-      "Config::Plugin::Tiny" : {
-         "file" : "lib/Config/Plugin/Tiny.pm",
-         "version" : "1.01"
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001002"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ronsavage/Config-Plugin-Tiny/issues"
+      },
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_1_0"
-      ]
+         "http://opensource.org/licenses/Perl"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/Config-Plugin-Tiny.git",
+         "web" : "https://github.com/ronsavage/Config-Plugin-Tiny"
+      }
    },
-   "version" : "1.01"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

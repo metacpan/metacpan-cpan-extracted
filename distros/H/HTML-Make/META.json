@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "HTML::Valid::Tagset" : "0",
+            "JSON::Parse" : "0.60",
             "perl" : "5.006001"
          }
       }
@@ -46,6 +47,6 @@
          "url" : "https://github.com/benkasminbullock/HTML-Make"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

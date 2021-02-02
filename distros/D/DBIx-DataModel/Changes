@@ -1,5 +1,16 @@
 Revision history for Perl extension DBIx::DataModel.
 
+
+v3.01 02.02.2021
+  - upgrade dependency on SQL::Abstract::More v1.37
+  - internals: common infrastructure for abstract methods
+  - fix a very old bug : make class method primary_key() work in multi-schema mode.
+  - cleanup references to old method primKey() instead of primary_key()
+  - replace Acme::Damn by Data::Structure::Util
+  - documentation and tests for the set operators -union, -intersect, etc.
+  - -result_as => 'hashref' or 'categorize' can take a subroutine argument
+  - kwalitee improvements (Filippo Biondi++)
+
 v3.0 23.02.2018
   - bump to next major version
   - complete revision of documentation

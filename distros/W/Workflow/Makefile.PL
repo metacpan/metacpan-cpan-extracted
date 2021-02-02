@@ -24,7 +24,6 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Class::Accessor" => "0.18",
     "Class::Factory" => "1.00",
-    "Class::Observable" => "1.04",
     "DBI" => 0,
     "Data::Dumper" => 0,
     "Data::UUID" => 0,
@@ -49,7 +48,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.41",
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "1.50",
+  "VERSION" => "1.51",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,7 +59,6 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Class::Accessor" => "0.18",
   "Class::Factory" => "1.00",
-  "Class::Observable" => "1.04",
   "DBD::Mock" => "0.10",
   "DBI" => 0,
   "Data::Dumper" => 0,

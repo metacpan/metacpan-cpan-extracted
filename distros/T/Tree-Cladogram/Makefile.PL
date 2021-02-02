@@ -12,8 +12,8 @@ my(%params) =
 (
 	($] ge '5.005') ?
 	(
-		AUTHOR   => 'Ron Savage (ron@savage.net.au)',
-		ABSTRACT => 'Render a cladogram using Imager or Image::Magick',
+		AUTHOR		=> 'Ron Savage (ron@savage.net.au)',
+		ABSTRACT	=> 'Render a cladogram using Imager or Image::Magick',
 	) : (),
 	clean =>
 	{
@@ -21,13 +21,14 @@ my(%params) =
 	},
 	dist =>
 	{
-		COMPRESS => 'gzip',
-		SUFFIX   => 'gz'
+		COMPRESS	=> 'gzip',
+		SUFFIX		=> 'gz'
 	},
-	DISTNAME  => 'Tree-Cladogram',
-	NAME      => 'Tree::Cladogram',
-	PL_FILES  => {},
-	PREREQ_PM =>
+	DISTNAME	=> 'Tree-Cladogram',
+	LICENSE		=> 'perl',
+	NAME		=> 'Tree::Cladogram',
+	PL_FILES	=> {},
+	PREREQ_PM	=>
 	{
 		'File::Slurper'		=> 0.008,
 		'Getopt::Long'		=> 0,
@@ -69,7 +70,7 @@ if ($ExtUtils::MakeMaker::VERSION ge '6.46')
 		{
 			bugtracker =>
 			{
-				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-Cladogram',
+				web => 'https://github.com/ronsavage/Tree-Cladogram/issues',
 			},
 			license		=> 'http://dev.perl.org/licenses/',
 			repository	=>

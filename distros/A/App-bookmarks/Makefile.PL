@@ -19,10 +19,9 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         'Getopt::Std'    => '0',
-		'File::Basename' => '0',
-		'DBI'            => '0',
-		'Config::Any'    => '0',
-		'File::Find'     => '0'
+        'File::Basename' => '0',
+        'File::Copy'     => '0',
+        'File::Temp'     => '0'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'App-bookmarks-*' },

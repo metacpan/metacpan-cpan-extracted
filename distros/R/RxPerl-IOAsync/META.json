@@ -1,10 +1,10 @@
 {
    "abstract" : "IO::Async adapter for RxPerl",
    "author" : [
-      "KARJALA <karjala@cpan.org>"
+      "Alexander Karelas <karjala@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "IO::Async" : "0",
-            "RxPerl" : "v0.28.0",
+            "RxPerl" : "v6.0.0",
             "Sub::Util" : "1.41",
             "perl" : "5.010"
          }
@@ -57,7 +57,7 @@
    "provides" : {
       "RxPerl::IOAsync" : {
          "file" : "lib/RxPerl/IOAsync.pm",
-         "version" : "v6.0.0"
+         "version" : "v6.0.1"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://gitlab.com/karjala/rxperl-ioasync-for-perl"
       }
    },
-   "version" : "v6.0.0",
+   "version" : "v6.0.1",
    "x_authority" : "cpan:KARJALA",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1

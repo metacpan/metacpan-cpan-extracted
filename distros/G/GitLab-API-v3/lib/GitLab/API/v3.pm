@@ -1,6 +1,6 @@
 package GitLab::API::v3;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 =encoding utf8
 
@@ -3995,6 +3995,16 @@ L<Net::Gitlab> purports to provide an interface to the GitLab API, but
 it is hard to tell due to a complete lack of documentation via either
 POD or unit tests.
 
+=head1 SUPPORT
+
+Please submit bugs and feature requests to the
+GitLab-API-v3 GitHub issue tracker:
+
+L<https://github.com/bluefeet/GitLab-API-v3/issues>
+
+Note that, due to the L</DEPRECATED> nature of this distribution,
+new features and such may be denied.
+
 =head1 CONTRIBUTING
 
 This module is auto-generated from a set of YAML files defining the
@@ -4032,4 +4042,6 @@ development this distribution would not exist.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=cut
 

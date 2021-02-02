@@ -10,8 +10,8 @@ my(%params) =
 (
 	($] ge '5.005') ?
 	(
-		AUTHOR   => 'Stevan Little <stevan@cpan.org>',
-		ABSTRACT => 'A simple tree object',
+		AUTHOR		=> 'Stevan Little <stevan@cpan.org>',
+		ABSTRACT	=> 'A simple tree object',
 	) : (),
 	clean =>
 	{
@@ -19,13 +19,14 @@ my(%params) =
 	},
 	dist =>
 	{
-		COMPRESS => 'gzip',
-		SUFFIX   => 'gz'
+		COMPRESS	=> 'gzip',
+		SUFFIX		=> 'gz'
 	},
-	DISTNAME  => 'Tree-Simple',
-	NAME      => 'Tree::Simple',
-	PL_FILES  => {},
-	PREREQ_PM =>
+	DISTNAME	=> 'Tree-Simple',
+	LICENSE		=> 'perl',
+	NAME		=> 'Tree::Simple',
+	PL_FILES	=> {},
+	PREREQ_PM	=>
 	{
 		'constant'		=> 0,
 		'Scalar::Util'	=> '1.18',
@@ -57,7 +58,7 @@ if ($ExtUtils::MakeMaker::VERSION ge '6.46')
 		{
 			bugtracker =>
 			{
-				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-Simple',
+				web => 'https://github.com/ronsavage/Tree-Simple/issues',
 			},
 			license    => 'http://dev.perl.org/licenses/',
 			repository =>

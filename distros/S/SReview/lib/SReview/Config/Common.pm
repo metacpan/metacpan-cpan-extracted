@@ -44,6 +44,8 @@ sub setup {
 
 	$config->define("adminuser", 'email address for the initial admin user created. Note: if this user is removed and this configuration value continues to exist, then the user will be recreated upon the next database initialization (which might be rather quick).', undef);
 	$config->define('adminpw', 'password for the admin user. See under "adminuser" for details.', undef);
+	$config->define('review_template', 'The template name to be used for the review page. Can be one of "full" (full editing capabilities) or "confirm" (confirmation only)', 'full');
+	$config->define('inject_fatal_checks', 'Checks to be run on an uploaded video. When a check fails, the upload is rejected. Same syntax as for inject_transcode_skip_checks.', {});
 
 	# Values for encoder scripts
 	$config->define('pubdir', 'The directory on the file system where files served by the webinterface should be stored', '/srv/sreview/web/public');
@@ -108,6 +110,9 @@ sub setup {
 	# for sreview-import
 	$config->define('schedule_format', 'The format in which the schedule is set. Must be implemented as a child class of SReview::Schedule::Base', 'penta');
 	$config->define('schedule_options', 'The options to pass to the schedule parser as specified through schedule_format. See the documentation of your chosen parser for details.', {});
+
+	# for sreview-inject
+	$config->define('inject_transcode_skip_checks', "Minimums and maximums, or exact values, of video assets that cause sreview-inject to skip the transcode check if they are found in the video asset", {});
 
 	# for tuning command stuff
 	$config->define('command_tune', 'Some commands change incompatibly from one version to the next. This option exists to deal with such incompatibilities', {});

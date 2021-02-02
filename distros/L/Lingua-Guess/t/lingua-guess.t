@@ -10,7 +10,7 @@ my $guess = Lingua::Guess->new();
 ok ($guess, "Created language guesser object");
 
 my @text_lang = (
-["This is a test of the language checker", "english"],
+["This is a test of the language checker", "english", "en", "eng"],
 ["Verifions que le détecteur de langues marche", "french"],
 ["Sprawdźmy, czy odgadywacz języków pracuje", "polish"],
 ["авай проверить  узнает ли наш угадатель русски язык", "russian"],

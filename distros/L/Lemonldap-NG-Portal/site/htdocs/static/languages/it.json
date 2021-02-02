@@ -266,6 +266,7 @@
 "rightsReloadNeedsLogout":"Le ricariche dei diritti necessitano di disconnettersi e di riconnettersi",
 "scope":"Ambito",
 "search":"Ricerca",
+"searchAccount":"Search for account",
 "seconds":"seconds",
 "selectIdP":"Seleziona il tuo provider di identità",
 "service":"Servizio",

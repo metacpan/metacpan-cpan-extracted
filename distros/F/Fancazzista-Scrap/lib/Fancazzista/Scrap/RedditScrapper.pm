@@ -6,9 +6,8 @@ use LWP::UserAgent;
 use HTTP::Request;
 use JSON;
 use Encode qw(encode);
-use Data::Dumper;
 
-our $VERSION = '0.01';
+our $VERSION = '1.00';
 
 sub new {
     my $class = shift;
@@ -31,9 +30,10 @@ sub scrap {
 
         push @subreddits,
           {
-            name     => $_->{name},
-            url      => "https://www.reddit.com/r/" . $_->{name},
-            articles => \@posts
+            name        => $_->{name},
+            url         => "https://www.reddit.com/r/" . $_->{name},
+            articles    => \@posts,
+            from_reddit => 1,
           };
     }
 
@@ -44,12 +44,8 @@ sub getPosts {
     my $self      = shift;
     my $subreddit = shift;
 
-    my $base = "https://www.reddit.com/r/";
-    my $url =
-        $base
-      . $subreddit->{name}
-      . "/new.json?limit="
-      . ( $subreddit->{limit} || 5 );
+    my $base     = "https://www.reddit.com/r/";
+    my $url      = $base . $subreddit->{name} . "/new.json?limit=" . ( $subreddit->{limit} || 5 );
     my $r        = HTTP::Request->new( 'GET', $url );
     my $ua       = LWP::UserAgent->new();
     my $response = $ua->request($r);

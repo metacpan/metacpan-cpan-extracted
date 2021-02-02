@@ -1,4 +1,3 @@
 name = "Config-Registry"
 authority="cpan:BLUEFEET"
 markdown_maker = "Pod::Markdown::Github"
-license = "gpl_3"

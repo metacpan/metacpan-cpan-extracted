@@ -1,5 +1,14 @@
 Revision history for Perl extension Catalyst-Plugin-Starch.
 
+0.08 2021-01-30T19:49:31Z
+
+ - Minor build update.
+
+0.07 2021-01-30T03:15:29Z
+
+ - Generate Github-flavored markdown.
+ - Provide a .editorconfig instead of .lvimrc.
+
 0.06 2019-03-06T07:39:48Z
 
  - Hopefully fix an odd, test-only, module load issue:
