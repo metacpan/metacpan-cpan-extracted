@@ -13,18 +13,18 @@ use mro 'c3';
 
 use namespace::clean;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # root grammar (will be inherited by subclasses)
 my $root_grammar = do {
-  use Regexp::Grammars 1.038;
+  use Regexp::Grammars 1.048;
   qr{
     # <logfile: - >
 
     <grammar: SQL::Abstract::FromQuery>
 
     <rule: standard>
-     \A (?: 
+     \A (?:
            <MATCH=between>
          | <MATCH=op_and_value>
          | <MATCH=negated_values>
@@ -38,8 +38,8 @@ my $root_grammar = do {
     <rule: op_and_value>
       <compare> (*COMMIT) (?: <value> | <error:> )
 
-    <rule: values>
-        <[value]>+ % ,
+    <rule: values> 
+        <[value]>+ % , # list of scalars separated by ','
 
     <rule: between>
       BETWEEN (*COMMIT) (?: <min=value> AND <max=value> | <error:> )
@@ -52,8 +52,10 @@ my $root_grammar = do {
 
     <rule: value>
         <MATCH=null>
+      | <MATCH=datetime>
       | <MATCH=date>
       | <MATCH=time>
+      | <MATCH=regexp>
       | <MATCH=string>
       # | <MATCH=bool> # removed from "standard" value because it might
                        # interfere with other codes like gender M/F
@@ -61,12 +63,18 @@ my $root_grammar = do {
     <rule: null>
       NULL
 
+    <rule: datetime>
+      <date> T? <time>
+
     <rule: date>
         <day=(\d\d?)>\.<month=(\d\d?)>\.<year=(\d\d\d?\d?)>
       | <year=(\d\d\d?\d?)>-<month=(\d\d?)>-<day=(\d\d?)>
 
     <rule: time>
       <hour=(\d\d?)>:<minutes=(\d\d)>(?::<seconds=(\d\d)>)?
+
+    <rule: regexp>
+       /<regexp=(.+?)>/<flags=([a-z]*)>
 
     <rule: bool>
        Y(?:ES)?     (?{ $MATCH = 1 })
@@ -95,7 +103,7 @@ my $root_grammar = do {
 #======================================================================
 sub sub_grammar {
   my $class = shift;
-  return; # should redefine method in subclasses that refine the root grammar
+  return; # subclasses that refine the root grammar should override this method
 }
 
 my %params_for_new = (
@@ -175,7 +183,6 @@ sub _error_handler {
 # INSTANCE METHODS
 #======================================================================
 
-
 sub _grammar {
   my ($self, $rule) = @_;
 
@@ -192,9 +199,6 @@ sub _grammar {
 
   return $compiled_grammar;
 }
-
-
-
 
 sub parse {
   my ($self, $data) = @_;
@@ -233,7 +237,13 @@ sub parse {
   # report errors, if any
   SQL::Abstract::FromQuery::_Exception->throw($err_msg, %errors) if %errors;
 
-  return \%result;
+  return $self->finalize(\%result);
+}
+
+
+sub finalize { # subclasses may override this to modify the result
+  my ($self, $result) = @_;
+  return $result;
 }
 
 
@@ -247,8 +257,6 @@ sub _flatten_into_hashref {
   }
   return \%h;
 }
-
-
 
 #======================================================================
 # ACTIONS HOOKED TO THE GRAMMAR
@@ -270,27 +278,22 @@ sub negated_values {
   }
 }
 
-
 sub null {
   my ($self, $h) = @_;
   return {'=' => undef};
   # Note: unfortunately, we can't return just undef at this stage,
-  # because Regex::Grammars would interpret it as a parse failure.
+  # because Regexp::Grammars would interpret it as a parse failure.
 }
-
 
 sub op_and_value {
   my ($self, $h) = @_;
   return {$h->{compare} => $h->{value}};
 }
 
-
 sub between {
   my ($self, $h) = @_;
   return {-between => [$h->{min}, $h->{max}]};
 }
-
-
 
 sub values {
   my ($self, $h) = @_;
@@ -299,6 +302,10 @@ sub values {
                        : $h->{value}[0];
 }
 
+sub datetime {
+  my ($self, $h) = @_;
+  return join "T", $h->{date}, $h->{time};
+}
 
 sub date {
   my ($self, $h) = @_;
@@ -306,20 +313,34 @@ sub date {
   return sprintf "%04d-%02d-%02d", @{$h}{qw/year month day/};
 }
 
-
 sub time {
   my ($self, $h) = @_;
   $h->{seconds} ||= 0;
   return sprintf "%02d:%02d:%02d", @{$h}{qw/hour minutes seconds/};
 }
 
+sub regexp {
+  my ($self, $h) = @_;
+
+  # There is no standard SQL syntax for regexp matching. So here we
+  # just return a datastructure for the SQL::Abstract instance, assuming
+  # that this instance will have a 'special operator' implementing regexp
+  # behaviour. If the special operator is not present, an error will be
+  # generated
+  return {-regexp => [$h->{regexp}, $h->{flags}]};
+
+  # die "this grammar has no regexp() method; need a DBMS-specific component "
+  #   . "to implement this behaviour";
+}
+
 
 sub string {
   my ($self, $s) = @_;
 
-  # if any '*', substitute by '%' and make it a "-like" operator
+  # if the string contains any '*', substitute by '%' and make it a
+  # "-like" operator
   my $is_pattern = $s =~ tr/*/%/;
-    # NOTE : a reentrant =~ s/../../ would core dump, but tr/../../ is OK
+    # NOTE : a reentrant =~ s/../../ would segfault, but tr/../../ is OK
 
   return $is_pattern ? {-like => $s} : $s;
 }
@@ -347,7 +368,6 @@ use overload
   },
   fallback => 1,
   ;
-
 
 sub throw {
   my ($class, $err_msg, %errors) = @_;
@@ -449,17 +469,22 @@ which accepts
 
 =item *
 
-a plain value (number, string, date or time).
+a plain value (number, string, date or time or datetime).
 
 Strings may be optionally included in single or double quotes;
 such quotes are mandatory if you want to include spaces or commas
 within the string.
-Characters C<'*'> are translated into C<'%'> because this is the 
+Characters C<'*'> are translated into C<'%'> because this is the
 wildcard character for SQL queries with 'LIKE'.
 
 Dates may be entered either as C<yyyy-mm-dd> or C<dd.mm.yyyy>;
-two-digit years are automatically added to 2000. The returned
-date is always in C<yyyy-mm-dd> format.
+two-digit years are automatically added to 2000.  Times may be entered
+as C<hh:mm> or C<hh:mm:ss>. Datetimes may be entered as a date
+followed by a time, separated by spaces or separated by a 'T',
+according to the ISO format.  Returned values from dates, times or
+datetimes are in ISO format, i.e.  C<yyyy-mm-dd>, C<hh:mm:ss> or
+C<yyyy-mm-ddThh:mm:ss>.
+
 
 =item *
 
@@ -468,7 +493,7 @@ This will generate a SQL clause of the form C<IN (val1, val2, ...)>.
 
 =item *
 
-a negated value or list of values; 
+a negated value or list of values;
 negation is expressed by C<!> or C<!=> or C<-> or C<< <> >>
 
 =item *
@@ -551,7 +576,7 @@ L</new> method. Fields without any explicit grammar rule are
 parsed through the C<standard> rule.
 
 In case of parse errors, an exception is raised, which stringifies
-to a list of faulty fields and their asoociated errors. Internally
+to a list of faulty fields and their associated errors. Internally
 this is an object with an arrayref of arrayrefs of error messages
 -- see the source code if you need to walk through that structure.
 

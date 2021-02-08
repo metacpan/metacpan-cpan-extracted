@@ -13,7 +13,6 @@ use Mojo::JSON 'to_json', 'from_json', 'encode_json', 'decode_json';
 use Mojo::WebSocket 'WS_PING';
 use Mojo::IOLoop;
 use RxPerl::Mojo ':all';
-use Crypt::PRNG 'rand';
 use Safe::Isa;
 use Syntax::Keyword::Try;
 use Struct::Diff 'diff';
@@ -27,7 +26,7 @@ use Encode 'encode_utf8';
 
 use experimental 'postderef';
 
-our $VERSION = "v0.0.9";
+our $VERSION = "v0.0.11";
 
 use constant {
     DEFAULT_HEARTBEAT_INTERVAL        => 5,
@@ -73,12 +72,14 @@ sub register ($self, $app, $config) {
     my $last_heartbeat_dt;
 
     my sub calculate_hb_expiry_dur () {
-        return $heartbeat_interval + max($heartbeat_interval * 0.5, 10);
+        state $hb_e_d = $heartbeat_interval + max($heartbeat_interval * 0.5, 10);
     }
 
     # on workers startup:
     my $ping_o;
     Mojo::IOLoop->next_tick(sub {
+        srand();
+
         # ping every 15 seconds
         $ping_o = rx_defer(sub {
             rx_timer(rand($ping_interval), $ping_interval);
@@ -98,40 +99,52 @@ sub register ($self, $app, $config) {
 
         # remove any heartbeat record
         $graceful_stop_o->subscribe(sub {
-            $app->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
-                delete $state->{$worker_uuid};
-
-                return undef, $state;
-            }, no_ban => 1);
+            # don't prevent other callbacks if this dies
+            eval {
+                $app->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
+                    delete $state->{$worker_uuid};
+                    return undef, $state;
+                }, no_ban => 1);
+            };
         });
 
-        # register heartbeat
-        $app->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
-            $last_heartbeat_dt = int get_time;
-            $state->{$worker_uuid} = {
-                uuid      => $worker_uuid,
-                pid       => $$,
-                heartbeat => $last_heartbeat_dt,
-                hostname  => hostname,
-                banned    => false,
-            };
-            return undef, $state;
-        }, no_ban => 1);
+        # register heartbeat at start, or gracefully stop
+        try {
+            $app->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
+                $last_heartbeat_dt = int get_time;
+                $state->{$worker_uuid} = {
+                    uuid      => $worker_uuid,
+                    pid       => $$,
+                    heartbeat => $last_heartbeat_dt,
+                    hostname  => hostname,
+                    banned    => false,
+                };
+                return undef, $state;
+            }, no_ban => 1);
+        } catch {
+            Mojo::IOLoop->stop_gracefully;
+        };
+
+        # register heartbeat every X seconds, or gracefully stop
         rx_merge(
             rx_timer(rand($heartbeat_interval), $heartbeat_interval),
         )->pipe(
             op_take_until($graceful_stop_o),
         )->subscribe(sub {
-            $app->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
-                my $me = $state->{$worker_uuid};
-                if (! $me or $me->{banned}) {
-                    Mojo::IOLoop->stop_gracefully;
-                    return undef, undef;
-                }
-                $last_heartbeat_dt = int get_time;
-                $me->{heartbeat} = $last_heartbeat_dt;
-                return undef, $state;
-            }, no_ban => 1);
+            try {
+                $app->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
+                    my $me = $state->{$worker_uuid};
+                    if (! $me or $me->{banned}) {
+                        Mojo::IOLoop->stop_gracefully;
+                        return undef, undef;
+                    }
+                    $last_heartbeat_dt = int get_time;
+                    $me->{heartbeat} = $last_heartbeat_dt;
+                    return undef, $state;
+                }, no_ban => 1);
+            } catch {
+                Mojo::IOLoop->stop_gracefully;
+            };
         });
 
         $pubsub_connected_o->subscribe(sub {
@@ -164,8 +177,22 @@ sub register ($self, $app, $config) {
             ),
         )->subscribe(sub { Mojo::IOLoop->stop_gracefully });
 
-        # detect disconnects by opening a permanent dummy listen
-        $pg->pubsub->listen('!system' => sub ($pubsub, $payload) {});
+        # if no notifications from _bs:workers in a while, stop gracefully
+        rx_observable->new(sub ($subscriber) {
+            try {
+                $pg->pubsub->listen($WORKERS_CHANNEL => sub ($pubsub, $payload) {
+                    $subscriber->next();
+                });
+            } catch {
+                Mojo::IOLoop->stop_gracefully;
+            };
+        })->pipe(
+            op_switch_map(sub {
+                return rx_timer(calculate_hb_expiry_dur());
+            }),
+        )->subscribe(sub {
+            Mojo::IOLoop->stop_gracefully;
+        });
     });
 
     $app->helper("$bs_prefix.add_action", sub ($c, $channel_name, $action_name, $action_sub) {
@@ -176,11 +203,15 @@ sub register ($self, $app, $config) {
         BoardStreams::Registry->add_request($channel_name, $request_name, $request_sub);
     });
 
-    $app->helper("$bs_prefix.create_channel_or_die", sub ($c, $channel_name, $state = undef, $type = '') {
+    $app->helper("$bs_prefix.create_channel_or_die", sub ($c, $channel_name, $state = undef, $attrs = {}) {
+        my $type = $attrs->{type} // '';
+        my $keep_events = exists $attrs->{keep_events} ? to_bool $attrs->{keep_events} : true;
         my $sth;
         try {
-            $sth = $c->$bs_prefix->db->dbh->prepare('INSERT INTO "channel" (name, type, state) VALUES (?, ?, ?)');
-            $sth->execute($channel_name, $type, to_json($state));
+            $sth = $c->$bs_prefix->db->dbh->prepare('
+                INSERT INTO "channel" (name, type, state, keep_events) VALUES (?, ?, ?, ?)
+            ');
+            $sth->execute($channel_name, $type, to_json($state), $keep_events);
         } catch {
             my $err = $@;
             # look up 23505 in: https://www.postgresql.org/docs/current/errcodes-appendix.html
@@ -192,7 +223,9 @@ sub register ($self, $app, $config) {
         }
     });
 
-    $app->helper("$bs_prefix.create_channel", sub ($c, $channel_name, $state = undef, $type = '') {
+    $app->helper("$bs_prefix.create_channel", sub ($c, $channel_name, $state = undef, $attrs = {}) {
+        my $type = $attrs->{type} // '';
+        my $keep_events = exists $attrs->{keep_events} ? to_bool $attrs->{keep_events} : true;
         my $db = $c->$bs_prefix->db;
         ! $db->select('channel',
             ['id'],
@@ -200,9 +233,10 @@ sub register ($self, $app, $config) {
         )->hash or return;
         $db->insert('channel',
             {
-                name  => $channel_name,
-                type  => $type,
-                state => to_json($state),
+                name        => $channel_name,
+                type        => $type,
+                state       => to_json($state),
+                keep_events => $keep_events,
             },
             { on_conflict => undef },
         );
@@ -215,7 +249,7 @@ sub register ($self, $app, $config) {
         my $db = $c->$bs_prefix->db;
         my $tx; $tx = $db->begin unless $opts{no_txn};
         my $rows = $db->select('channel',
-            [qw/ id name state /],
+            [qw/ id name state keep_events /],
             { name => {-in => $channel_names} },
             { for => 'update' },
         )->hashes;
@@ -287,7 +321,7 @@ sub register ($self, $app, $config) {
         while( my ($row, $answer, $orig_state) = $ea->() ) {
 
             my ($event, $new_state, $guard_inc) = @$answer;
-            my ($channel_id, $channel_name) = $row->@{qw/ id name /};
+            my ($channel_id, $channel_name, $keep_events) = $row->@{qw/ id name keep_events /};
 
             {
                 my @events = ref($event) eq 'REF' ? @$$event : ($event);
@@ -296,13 +330,22 @@ sub register ($self, $app, $config) {
 
                 # for all but last event
                 foreach my $event (@events) {
-                    my ($event_id, $dt) = $db->insert('event_patch',
-                        {
-                            channel_id => $channel_id,
-                            event      => to_json($event),
-                        },
-                        { returning => ['id', 'datetime'] },
-                    )->hash->@{qw/ id datetime /};
+                    my ($event_id, $dt);
+                    if ($keep_events) {
+                        ($event_id, $dt) = $db->insert('event_patch',
+                            {
+                                channel_id => $channel_id,
+                                event      => to_json($event),
+                            },
+                            { returning => ['id', 'datetime'] },
+                        )->hash->@{qw/ id datetime /};
+                    } else {
+                        ($event_id, $dt) =
+                            $db->query(
+                                "SELECT nextval(?), current_timestamp",
+                                $event_patch_sequence_name
+                            )->array->@*;
+                    }
 
                     do_notifications($channel_name, $event_id, $event, undef);
                 }
@@ -313,7 +356,7 @@ sub register ($self, $app, $config) {
             $diff = undef if $diff and ! %$diff;
             next ANSWER unless defined $event or defined $diff;
             my ($event_id, $dt);
-            if (defined $event) {
+            if ($keep_events and defined $event) {
                 ($event_id, $dt) = $db->insert('event_patch',
                     {
                         channel_id => $channel_id,
@@ -706,6 +749,59 @@ sub register ($self, $app, $config) {
         my $duration = get_time() - $time;
         $c->app->log->warn('Channels cleanup took ' . (0 + sprintf("%.2f", $duration)) . ' seconds')
             if $duration > 1;
+    });
+
+    $app->helper("$bs_prefix.delete_events", sub ($c, $channel_name, %opts) {
+        # opts can be: keep_num and/or keep_dur
+        my @until_ids;
+
+        my $channel_id = $c->$bs_prefix->db->select('channel',
+            ['id'],
+            { name => $channel_name },
+        )->hash->{id} or return;
+
+        if (defined $opts{keep_num}) {
+            my $until_hash = $c->$bs_prefix->db->select('event_patch',
+                ['id'],
+                {
+                    channel_id => $channel_id,
+                },
+                {
+                    order_by => { -desc => 'id' },
+                    offset   => $opts{keep_num},
+                    limit    => 1,
+                },
+            )->hash;
+            my $until_id = $until_hash ? $until_hash->{id} : 0;
+            push @until_ids, $until_id;
+        }
+
+        if (defined $opts{keep_dur}) {
+            $opts{keep_dur} .= ' SECOND' if $opts{keep_dur} =~ /^\d+\z/;
+            my $interval = $c->$bs_prefix->db->dbh->quote( $opts{keep_dur} );
+            my $until_hash = $c->$bs_prefix->db->select('event_patch',
+                ['id'],
+                {
+                    channel_id => $channel_id,
+                    datetime   => { '<', \"current_timestamp - INTERVAL $interval" },
+                },
+                {
+                    order_by => { -desc => 'datetime' },
+                    limit    => 1,
+                },
+            )->hash;
+            my $until_id = $until_hash ? $until_hash->{id} : 0;
+            push @until_ids, $until_id;
+        }
+
+        my $until_id = min @until_ids;
+
+        $c->$bs_prefix->db->delete('event_patch',
+            {
+                channel_id => $channel_id,
+                defined($until_id) ? (id => { '<=', $until_id }) : (),
+            }
+        );
     });
 
     # system channels

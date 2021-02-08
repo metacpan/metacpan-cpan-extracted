@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-01'; # DATE
+our $DATE = '2021-01-02'; # DATE
 our $DIST = 'App-MetaCPANUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ list-recent-metacpan-releases - list-recent-metacpan-releases
 
 =head1 VERSION
 
-This document describes version 0.003 of list-recent-metacpan-releases (from Perl distribution App-MetaCPANUtils), released on 2020-01-01.
+This document describes version 0.004 of list-recent-metacpan-releases (from Perl distribution App-MetaCPANUtils), released on 2020-01-02.
 
 =head1 SYNOPSIS
 
@@ -154,7 +154,7 @@ See C<--fields>.
 
 Default value:
 
- ["release","date","author","maturity","version","distribution","abstract"]
+ ["release","date","author","status","maturity","version","first","distribution","abstract"]
 
 Can be specified multiple times.
 

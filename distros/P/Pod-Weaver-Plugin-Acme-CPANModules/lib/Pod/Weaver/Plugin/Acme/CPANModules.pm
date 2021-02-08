@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-10'; # DATE
+our $DATE = '2020-12-27'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Acme-CPANModules'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -71,7 +71,13 @@ sub _process_module {
     {
         my @pod;
         push @pod,
-q(=head2 What are ways to use this Acme::CPANModules module?
+q(=head2 What is an Acme::CPANModules::* module?
+
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
 
 Aside from reading this Acme::CPANModules module's POD documentation, you can
 install all the listed modules (entries) using L<cpanmodules> CLI (from
@@ -144,7 +150,7 @@ Pod::Weaver::Plugin::Acme::CPANModules - Plugin to use when building Acme::CPANM
 
 =head1 VERSION
 
-This document describes version 0.005 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2020-10-10.
+This document describes version 0.006 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2020-12-27.
 
 =head1 SYNOPSIS
 
@@ -180,7 +186,7 @@ Source repository is at L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-Ac
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Acme-CPANModules>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-Acme-CPANModules/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

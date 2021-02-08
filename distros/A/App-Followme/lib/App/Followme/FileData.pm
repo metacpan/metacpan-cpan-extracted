@@ -6,13 +6,13 @@ use warnings;
 use integer;
 use lib '../..';
 
-use YAML::Tiny;
 
 use base qw(App::Followme::FolderData);
 use App::Followme::FIO;
+use App::Followme::NestedText;
 use App::Followme::Web;
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -137,14 +137,7 @@ sub fetch_from_file {
 sub fetch_metadata {
     my ($self, $metadata_block) = @_;
 
-    my %metadata;
-    if ($metadata_block) {
-        my $yaml = YAML::Tiny->read_string($metadata_block);
-        %metadata = %{$yaml->[0]};
-   } else {
-        %metadata = ();
-    }
-
+    my %metadata = nt_parse_almost_yaml_string($metadata_block);
     return %metadata;
 }
 
@@ -155,14 +148,16 @@ sub fetch_sections {
     my ($self, $text) = @_;
 
     my %section;
-    my @sections = split(/-{3,}\s*\n/, $text, 3);
+    my $divider = qr(-{3,}\s*\n);
 
-    if ($sections[0] =~ /\S/) {
-        $section{metadata} = '';
-        $section{body} = $text;
-    } else {
-        $section{metadata} = $sections[1];
+    if ($text =~ /^$divider/) {
+        my @sections = split($divider, $text, 3);
         $section{body} = $sections[2];
+        $section{metadata} = $sections[1];
+
+    } else {
+        $section{body} = $text;
+        $section{metadata} = '';
     }
 
     $section{body} = $self->fetch_as_html($section{body});
@@ -234,11 +229,13 @@ App::Followme::FileData
 
 =head1 DESCRIPTION
 
-This module extracts data from a file. It assumes the file is a text file
-with the metadata in a YAML block preceding a content block that is in html
-format or convertible to html format. These asumptions can be overriden by
-overriding the methods in the class. Like the other data classes, this
-class is normally called by the Template class and not directly by user code.
+This module extracts data from a file. It assumes the file is a text 
+file with the metadata in a nested text block preceding a content block 
+that is in html format or convertible to html format. The two sections 
+are separated by a line of three or more dots. These asumptions can be 
+overriden by overriding the methods in the class. Like the other data 
+classes, this class is normally called by the Template class and not 
+directly by user code.
 
 =head1 METHODS
 

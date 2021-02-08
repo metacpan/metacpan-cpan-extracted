@@ -1,9 +1,7 @@
 package StateTesters;
 
-use v5.28;
+use v5.24;
 use warnings;
-use feature qw(signatures);
-no warnings qw(experimental::signatures);
 
 use Exporter qw(import);
 use Test::More;

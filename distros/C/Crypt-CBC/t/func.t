@@ -1,17 +1,17 @@
-#!/usr/local/bin/perl -Tw
+#!/usr/local/bin/perl
 
-use strict;
-use lib '..','../blib/lib','.','./blib/lib';
+use lib '../lib','./lib','./blib/lib';
 
-sub test;
+# using globals and uninit variables here for convenience
+no warnings;
 
-my (@mods,@pads,@in,$pad,$test_data,$mod,$tnum,$c,$i,$p);
-
-@mods = qw/Rijndael
-           Blowfish
-           Blowfish_PP
-           IDEA
-           DES
+@mods = qw/
+    Cipher::AES
+    Rijndael
+    Blowfish
+    Blowfish_PP
+    IDEA
+    DES
           /;
 @pads = qw/standard oneandzeroes space null/;
 
@@ -26,17 +26,10 @@ unless ($#in > -1) {
 
 # ($#in + 1): number of installed modules
 # ($#pads + 1): number of padding methods
-# 32: number of per-module, per-pad tests
+# 64: number of per-module, per-pad tests
 # 1: the first test -- loading Crypt::CBC module
 
-print '1..', ($#in + 1) * ($#pads + 1) * 32 + 1, "\n";
-
-sub test {
-    local($^W) = 0;
-    my($num, $true,$msg) = @_;
-    $$num++;
-    print($true ? "ok $$num\n" : "not ok $$num $msg\n");
-}
+print '1..', ($#in + 1) * ($#pads + 1) * 64 + 1, "\n";
 
 $tnum = 0;
 
@@ -62,7 +55,7 @@ END
 
       test(\$tnum,$c = $i->encrypt($test_data),"Couldn't encrypt");
       test(\$tnum,$p = $i->decrypt($c),"Couldn't decrypt");
-      test(\$tnum,$p eq $test_data,"Decrypted ciphertext doesn't match plaintext");
+      test(\$tnum,$p eq $test_data,"Decrypted ciphertext doesn't match plaintext with cipher=$mod, pad=$pad and plaintext size=".length $test_data);
 
 # now try various truncations of the whole string.
 # iteration 3 ends in ' ' so 'space should fail
@@ -83,6 +76,13 @@ END
       for ($c=0;$c<=18;$c++) {
         $test_data = 'i' x $c;
         test(\$tnum,$i->decrypt($i->encrypt($test_data)) eq $test_data);
+      }
+
+# try adding a "\001" to the end of the string
+      for ($c=0;$c<=31;$c++) {
+	  $test_data = 'i' x $c;
+	  $test_data .= "\001";
+	  test(\$tnum,$i->decrypt($i->encrypt($test_data)) eq $test_data,"failed to decrypt with cipher=$mod, padding=$pad, and plaintext length=".($c+1));
       }
 
 # 'space' should fail. others should succeed.
@@ -106,3 +106,11 @@ END
       }
    }
 }
+
+sub test {
+    my($num, $true, $msg) = @_;
+    $msg ||= "cipher=$mod, padding=$pad, plaintext length=$c";
+    $$num++;
+    print($true ? "ok $$num\n" : "not ok $$num $msg\n");
+}
+

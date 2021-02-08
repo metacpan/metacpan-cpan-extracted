@@ -1,5 +1,8 @@
 Revision history for Perl module RT::Extension::ResetPassword
 
+1.08 2021-02-08
+ - Document new $PasswordChangeLinkExpirySeconds option added previously
+
 1.07 2020-12-17
  - Update styles for RT 5
  - Use SHA256 instead of MD5 to generate the token

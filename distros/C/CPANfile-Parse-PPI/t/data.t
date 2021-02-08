@@ -21,7 +21,7 @@ for my $test ( @{ $test_data || [] } ) {
     );
 
     my $modules = $cpanfile->modules;
-    is_deeply $modules, $test->{results};
+    is_deeply $modules, $test->{results}, $json_file;
 }
 
 done_testing();

@@ -3,8 +3,8 @@ NAME
     code
 
 VERSION
-    This document describes version 0.001 of ColorThemeUtil::ANSI (from Perl
-    distribution ColorThemeUtil-ANSI), released on 2020-06-09.
+    This document describes version 0.002 of ColorThemeUtil::ANSI (from Perl
+    distribution ColorThemeUtil-ANSI), released on 2021-02-06.
 
 FUNCTIONS
   item_color_to_ansi
@@ -30,7 +30,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=ColorThemeUtil-ANSI>
+    <https://github.com/perlancar/perl-ColorThemeUtil-ANSI/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -42,7 +42,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

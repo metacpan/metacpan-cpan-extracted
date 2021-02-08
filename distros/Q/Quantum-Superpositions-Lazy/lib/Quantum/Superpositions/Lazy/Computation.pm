@@ -1,14 +1,10 @@
 package Quantum::Superpositions::Lazy::Computation;
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
-use v5.28;
+use v5.24;
 use warnings;
 use Moo;
-
-use feature qw(signatures);
-no warnings qw(experimental::signatures);
-
 use Quantum::Superpositions::Lazy::Operation::Computational;
 use Quantum::Superpositions::Lazy::ComputedState;
 use Quantum::Superpositions::Lazy::Util qw(is_collapsible);
@@ -37,8 +33,10 @@ has "values" => (
 
 sub weight_sum { 1 }
 
-sub collapse ($self)
+sub collapse
 {
+	my ($self) = @_;
+
 	my @members = map {
 		(is_collapsible $_) ? $_->collapse : $_
 	} $self->values->@*;
@@ -46,8 +44,10 @@ sub collapse ($self)
 	return $self->operation->run(@members);
 }
 
-sub is_collapsed ($self)
+sub is_collapsed
 {
+	my ($self) = @_;
+
 	# a single uncollapsed state means that the computation
 	# is not fully collapsed
 	foreach my $member ($self->values->@*) {
@@ -58,8 +58,10 @@ sub is_collapsed ($self)
 	return 1;
 }
 
-sub reset ($self)
+sub reset
 {
+	my ($self) = @_;
+
 	foreach my $member ($self->values->@*) {
 		if (is_collapsible $member) {
 			$member->reset;
@@ -67,9 +69,11 @@ sub reset ($self)
 	}
 }
 
-sub _cartesian_product ($self, $values1, $values2, $sourced)
+sub _cartesian_product
 {
+	my ($self, $values1, $values2, $sourced) = @_;
 	my %states;
+
 	for my $val1 ($values1->@*) {
 		for my $val2 ($values2->@*) {
 			my $result = $self->operation->run($val1->[1], $val2->[1]);
@@ -95,8 +99,9 @@ sub _cartesian_product ($self, $values1, $values2, $sourced)
 	return [values %states];
 }
 
-sub _build_complete_states ($self)
+sub _build_complete_states
 {
+	my ($self) = @_;
 	my $states;
 	my $sourced = $Quantum::Superpositions::Lazy::global_sourced_calculations;
 

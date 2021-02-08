@@ -153,7 +153,7 @@ following predefined regexes are available (assuming a leading '>'):
 =item --outdir=<dir>
 
 Optional output dir that will contain the abbreviated FASTA files (will be
-created if needed) [default: none]. Otherwise, output file are in the same
+created if needed) [default: none]. Otherwise, output files are in the same
 directory as input files.
 
 =for Euclid:

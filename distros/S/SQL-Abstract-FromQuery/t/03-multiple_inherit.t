@@ -2,8 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 
-use Module::Load;
-load 'SQL::Abstract::FromQuery';
+use SQL::Abstract::FromQuery;
+use SQL::Abstract::FromQuery::Oracle;
+
+
+my $dt_fmt = $SQL::Abstract::FromQuery::Oracle::datetime_fmt_ISO;
 
 my $parser = SQL::Abstract::FromQuery->new(
   -components => [qw/FR Oracle/],
@@ -17,7 +20,7 @@ my %tests = (
 # =========         ===================
 
   date           => ['1.2.03',
-                     \ ["to_date(?, 'YYYY-MM-DD')", '2003-02-01']
+                     \ ["= TO_DATE(?, '$dt_fmt')", '2003-02-01']
                     ],
   bool_oui       => ['OUI',
                      1],

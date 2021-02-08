@@ -16,6 +16,8 @@ use Tie::File;
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
+    check_skip
+
     copy_changes
     copy_makefile
     copy_module_files
@@ -54,6 +56,12 @@ my $tpl_dir         = 't/data/template/module_template';
 my $unwanted_dir    = 't/data/work/unwanted';
 my $init_dir        = 't/data/work/init';
 my $ci_dir          = 't/data/work/ci';
+
+sub check_skip {
+    if ($^O =~ /win32/i) {
+        plan skip_all => "Skipping on Windows platform";
+    }
+}
 
 sub copy_changes {
     copy "$orig_dir/Changes", $work_dir or die "can't copy $orig_dir/Changes: $!";
@@ -185,7 +193,11 @@ sub file_compare {
     close $orig_fh or die $!;
 
     for (0..$#new) {
-        is $new[$_], $orig[$_], "Updated Changes file line $_ matches template custom ok";
+        $new[$_] =~ s/[\r\n]//g;
+        $orig[$_] =~ s/[\r\n]//g;
+        chomp $orig;
+
+        like $new[$_], qr/^$orig[$_]/, "Updated Changes file line $_ matches template custom ok";
     }
 }
 sub file_scalar {

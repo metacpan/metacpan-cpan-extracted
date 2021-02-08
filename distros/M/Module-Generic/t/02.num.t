@@ -8,6 +8,7 @@ BEGIN
     use strict;
     use warnings;
     use utf8;
+    use lib './lib';
     use File::Which;
     use POSIX ();
     use open ':std' => ':utf8';

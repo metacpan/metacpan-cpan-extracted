@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent 'Router::Simple';
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 sub path_for {
     my ($self, $dest, $args) = @_;
@@ -30,7 +30,7 @@ ROUTE:
             !
                 if ($1) {
                     my ($name) = split /:/, $1, 2;
-                    $args->{$name};
+                    defined $args->{$name} ? $args->{$name} : '';
                 } elsif ($2) {
                     $args->{$2};
                 } elsif ($3) {

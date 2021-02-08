@@ -12,7 +12,7 @@ use PPIx::QuoteLike::Constant qw{ @CARP_NOT };
 use PPIx::QuoteLike::Utils qw{ __instance };
 use Scalar::Util ();
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use constant SCALAR_REF	=> ref \0;
 
@@ -100,7 +100,8 @@ sub list {
 	    qw{ type start finish };
 	push @rslt,
 	    join "\t", $self->_class_name( $obj ), $string,
-	    _format_attr( $obj, qw{ encoding failures interpolates } ),
+	    _format_attr( $obj, qw{ encoding failures interpolates
+		indentation } ),
 	    $self->_perl_version( $obj ),
 	    $self->_variables( $obj ),
 	    ;
@@ -205,10 +206,11 @@ sub _format_attr {
 
 sub _format_content {
     my ( $obj, $method, @arg ) = @_;
-    my $val = $obj->$method( @arg );
-    ref $val
-	and $val = $val->content();
-    return defined $val ? $val : '?';
+    my @val = map { $_->content() }
+	    grep { $_->significant() }
+	    $obj->$method( @arg )
+	or return '?';
+    return join '', @val;
 }
 
 sub _isa {

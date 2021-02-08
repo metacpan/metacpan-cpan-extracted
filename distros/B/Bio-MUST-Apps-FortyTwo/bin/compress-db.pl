@@ -130,7 +130,7 @@ compress-db.pl - Post-process assembler for transcript enrichment using 42
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =head1 USAGE
 
@@ -142,7 +142,7 @@ version 0.202160
 
 =item --config=<file>
 
-Path to YAML config file for 42.
+Path to YAML C<config> file for 42.
 
 =for Euclid: file.type: string
 

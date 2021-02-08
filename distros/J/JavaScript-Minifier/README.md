@@ -47,7 +47,7 @@ Exported by default: `minifiy()`
 This module is inspired by Douglas Crockford's JSMin:
 [http://www.crockford.com/javascript/jsmin.html](http://www.crockford.com/javascript/jsmin.html)
 
-You may also be interested in the [CSS::Minifier](https://metacpan.org/pod/CSS::Minifier) module also
+You may also be interested in the [CSS::Minifier](https://metacpan.org/pod/CSS%3A%3AMinifier) module also
 available on CPAN.
 
 # REPOSITORY
@@ -71,6 +71,8 @@ Eric Herrera, <herrera@10east.com>
 Miller 'tmhall' Hall
 
 Вячеслав 'vti' Тихановский
+
+Fedor A. 'faf' Fetisov
 
 # COPYRIGHT AND LICENSE
 

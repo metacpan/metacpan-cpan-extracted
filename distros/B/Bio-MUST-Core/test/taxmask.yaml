@@ -1,0 +1,11 @@
+categories:
+- label: opisthokonts
+  description: opisthokonts
+  criteria:
+  - tax_filter: [ +Opisthokonta ]
+    min_org_count: 4
+- label: metazoans
+  description: metazoans
+  criteria:
+  - tax_filter: [ +Metazoa ]
+    min_org_count: 2

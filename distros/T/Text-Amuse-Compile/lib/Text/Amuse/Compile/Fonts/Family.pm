@@ -55,6 +55,11 @@ Return true if the family is a mono font
 
 Return true if the family is a serif font
 
+=head2 font_files
+
+Return an arrayref with the four L<Text::Amuse::Compile::Fonts::File>
+objects.
+
 =cut
 
 
@@ -96,6 +101,11 @@ sub is_mono {
 
 sub is_sans {
     return shift->type eq 'sans';
+}
+
+sub font_files {
+    my $self = shift;
+    return [ $self->regular, $self->italic, $self->bold, $self->bolditalic ];
 }
 
 1;

@@ -3,7 +3,6 @@ abstract: 'a simple wrapper for Slack Web API'
 author:
   - 'Mihyaeru/mihyaeru21 <mihyaeru21@gmail.com>'
 build_requires:
-  Devel::Cover::Report::Coveralls: '0'
   Furl: '0'
   Test::Exception: '0'
   Test::More: '0'
@@ -29,7 +28,7 @@ no_index:
 provides:
   WebService::Slack::WebApi:
     file: lib/WebService/Slack/WebApi.pm
-    version: '0.17'
+    version: '0.18'
   WebService::Slack::WebApi::Api:
     file: lib/WebService/Slack/WebApi/Api.pm
   WebService::Slack::WebApi::Auth:
@@ -70,6 +69,8 @@ provides:
     file: lib/WebService/Slack/WebApi/Migration.pm
   WebService::Slack::WebApi::Oauth:
     file: lib/WebService/Slack/WebApi/Oauth.pm
+  WebService::Slack::WebApi::Oauth::V2:
+    file: lib/WebService/Slack/WebApi/Oauth/V2.pm
   WebService::Slack::WebApi::Pins:
     file: lib/WebService/Slack/WebApi/Pins.pm
   WebService::Slack::WebApi::Reactions:
@@ -103,7 +104,7 @@ resources:
   bugtracker: https://github.com/mihyaeru21/p5-WebService-Slack-WebApi/issues
   homepage: https://github.com/mihyaeru21/p5-WebService-Slack-WebApi
   repository: git://github.com/mihyaeru21/p5-WebService-Slack-WebApi.git
-version: '0.17'
+version: '0.18'
 x_contributors:
   - 'Askar Timirgazin <anotheroneackap@gmail.com>'
   - 'Ivan Wills <Ivan.Wills2@optus.com.au>'

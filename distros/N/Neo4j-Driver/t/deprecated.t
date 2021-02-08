@@ -83,10 +83,9 @@ subtest 'close()' => sub {
 
 
 subtest 'die_on_error = 0' => sub {
-	# die_on_error only ever affected upstream errors via HTTP, 
-	# never any errors issued via Bolt or by this driver itself.
-	plan skip_all => "(test requires HTTP)" if $Neo4j::Test::bolt;
-	plan tests => 6;
+	# die_on_error only ever affected upstream errors via HTTP JSON, 
+	# never any errors issued via Bolt/Jolt or by this driver itself.
+	plan tests => 7;
 	# init
 	my $d = Neo4j::Test->driver;
 	$d->{die_on_error} = 0;
@@ -95,11 +94,14 @@ subtest 'die_on_error = 0' => sub {
 	lives_ok { @w = warnings { $t = $d->session->begin_transaction; }; } 'Tx open';
 	(like $w[0], qr/\bdeprecate/, 'die_on_error deprecated') or diag 'got warning(s): ', explain(\@w);
 	# successful statement
-	lives_and { is $t->run('RETURN 42, "live on error"')->single->get(0), 42 } 'no error';
+	lives_ok { $r = 0; $r = $t->run('RETURN 42, "live on error"') } 'live no error';
+	lives_and { is $r->single->get(0), 42 } 'no error';
 	# failing statement
+	SKIP: { skip '(test requires JSON)', 3 unless ref $r eq 'Neo4j::Driver::Result::JSON';
 	$w = '';
 	lives_ok { $w = warning { is $t->run('iced manifolds.')->size, 0 }; } 'execute cypher syntax error';
 	(like $w, qr/\bStatement\b.*Syntax/i, 'cypher syntax error') or diag 'got warning(s): ', explain($w);
+	}
 };
 
 

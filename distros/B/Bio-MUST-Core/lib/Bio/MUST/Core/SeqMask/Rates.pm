@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqMask::Rates;
 # ABSTRACT: Evolutionary rates for sequence sites
-$Bio::MUST::Core::SeqMask::Rates::VERSION = '0.210230';
+$Bio::MUST::Core::SeqMask::Rates::VERSION = '0.210380';
 use Moose;
 use namespace::autoclean;
 
@@ -175,6 +175,50 @@ sub rates_mask {
 
 # TODO: avoid duplicating code with SeqMask class
 
+# TIGER format:
+# 0.651325757576
+# 0.633143939394
+# 0.488257575758
+# 1.0
+# ...
+
+# PhyloBayes (MPI) format:
+# 0   15.5174
+# 1   16.4429
+# 2   18.664
+# 3   30.1682
+# ...
+
+# PhyloBayes (serial) format:
+# site  rate    std error
+#
+# 1   5.86191 0.207244
+# 2   7.35053 0.350185
+# 3   6.09158 0.24426
+# ...
+
+# IQ-TREE format:
+# # Site-specific subtitution rates determined by empirical Bayesian method
+# # This file can be read in MS Excel or in R with command:
+# #   tab=read.table('replica-3-concat-modified.fasta.rate',header=TRUE)
+# # Columns are tab-separated with following meaning:
+# #   Site:   Alignment site ID
+# #   Rate:   Posterior mean site rate weighted by posterior probability
+# #   Cat:    Category with highest posterior (0=invariable, 1=slow, etc)
+# #   C_Rate: Corresponding rate of highest category
+# Site    Rate    Cat C_Rate
+# 1   0.31154 1   0.30935
+# 2   1.03326 4   1.91612
+# 3   1.39822 4   1.91612
+# ...
+
+const my %COLUMN_FOR => (
+    1 => 0,     # TIGER
+    2 => 1,     # PhyloBayes (MPI)
+    3 => 1,     # PhyloBayes (serial)
+    4 => 1,     # IQ-TREE
+);
+
 sub load {
     my $class  = shift;
     my $infile = shift;
@@ -182,6 +226,7 @@ sub load {
     open my $in, '<', $infile;
 
     my $mask = $class->new();
+    my $col;
 
     LINE:
     while (my $line = <$in>) {
@@ -189,36 +234,16 @@ sub load {
 
         # skip empty lines, header line and process comment lines
         next LINE if $line =~ $EMPTY_LINE
-                  || $line =~ m/^site/xms           # in PhyloBayes rates
+                  || $line =~ m/^site/xmsi          # PhyloBayes/IQ-TREE
                   || $mask->is_comment($line);
 
         # try to split line on whitespace
         my @fields = split /\s+/xms, $line;
+        $col //= $COLUMN_FOR{ scalar @fields };
 
-        # TIGER format:
-        # 0.651325757576
-        # 0.633143939394
-        # 0.488257575758
-        # 1.0
-        # ...
-
-        # PhyloBayes (serial) format:
-        # site	rate	std error
-        #
-        # 1	5.86191	0.207244
-        # 2	7.35053	0.350185
-        # 3	6.09158	0.24426
-        # ...
-
-        # PhyoBayes (MPI) format:
-        # 0       15.5174
-        # 1       16.4429
-        # 2       18.664
-        # 3       30.1682
-        # ...
-
-        # store either first or second field depending on split success
-        $mask->add_state( $fields[ @fields >= 2 && @fields <= 3 ? 1 : 0 ] );
+        # store either first or second field depending on split outcome
+        # Note: we check this outcome only once for efficiency
+        $mask->add_state( $fields[$col] );
     }
 
     return $mask;
@@ -237,7 +262,7 @@ Bio::MUST::Core::SeqMask::Rates - Evolutionary rates for sequence sites
 
 =head1 VERSION
 
-version 0.210230
+version 0.210380
 
 =head1 SYNOPSIS
 

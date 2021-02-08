@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use Data::Dumper;
 use Test::Most tests => 3;
 
 NOBUGS: {

@@ -286,7 +286,7 @@ will be '/All/Hail/Ginger'.
 
 The plain request and response Plack objects will be available at $pepper->{plack\_handler}->{request}
 and $pepper->{plack\_handler}->{response} respectively.  Please only use these if you absolutely must,
-and please see [Plack::Request](https://metacpan.org/pod/Plack::Request) and [Plack::Response](https://metacpan.org/pod/Plack::Response) before working with these.
+and please see [Plack::Request](https://metacpan.org/pod/Plack%3A%3ARequest) and [Plack::Response](https://metacpan.org/pod/Plack%3A%3AResponse) before working with these.
 
 # RESPONSE / LOGGING / TEMPLATE METHODS
 
@@ -534,7 +534,7 @@ If a request fails before completely, commit() is not called and the changes sho
 
 # JSON METHODS
 
-These methods provide default/basic functions of the excellent [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel::JSON::XS) library.
+These methods provide default/basic functions of the excellent [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel%3A%3AJSON%3A%3AXS) library.
 
 ## json\_from\_perl
 
@@ -813,11 +813,11 @@ and hard to disappoint, just like Perl.
 
 [DateTime](https://metacpan.org/pod/DateTime)
 
-[Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel::JSON::XS)
+[Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel%3A%3AJSON%3A%3AXS)
 
 [Mojolicious](https://metacpan.org/pod/Mojolicious)
 
-[Mojolicious::Lite](https://metacpan.org/pod/Mojolicious::Lite)
+[Mojolicious::Lite](https://metacpan.org/pod/Mojolicious%3A%3ALite)
 
 [Dancer2](https://metacpan.org/pod/Dancer2)
 

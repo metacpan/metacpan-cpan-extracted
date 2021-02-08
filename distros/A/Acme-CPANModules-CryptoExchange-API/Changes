@@ -1,15 +1,22 @@
-0.003   2018-09-22 (PERLANCAR)
+0.004   2020-12-27  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+        - [build] Rebuild to add FAQ item.
+
+
+0.003   2018-09-22  Released-By: PERLANCAR
 
 	- Fix entry.
 
 
-0.002   2018-09-22 (PERLANCAR)
+0.002   2018-09-22  Released-By: PERLANCAR
 
 	- Add Finance::GDAX::Lite.
 
 	- Update Finance::BTCIndo -> Finance::Indodax.
 
 
-0.001   2018-01-09 (PERLANCAR)
+0.001   2018-01-09  Released-By: PERLANCAR
 
         - First release.

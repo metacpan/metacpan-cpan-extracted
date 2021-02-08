@@ -1,10 +1,10 @@
 package Pithub::Repos;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 Repos API
 
 use Moo;
-use Carp qw(croak);
+use Carp qw( croak );
 use Pithub::Issues;
 use Pithub::Markdown;
 use Pithub::PullRequests;
@@ -265,7 +265,7 @@ Pithub::Repos - Github v3 Repos API
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 METHODS
 

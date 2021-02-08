@@ -3,7 +3,7 @@ package Test::Class::Moose::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Test2::API qw( context );
 
@@ -36,7 +36,7 @@ sub context_do (&;@) {
 
     die $err unless $ok;
 
-    return @out if $want;
+    return @out    if $want;
     return $out[0] if defined $want;
     return;
 }
@@ -57,7 +57,7 @@ Test::Class::Moose::Util - Internal utilities
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =for Pod::Coverage context_do
 
@@ -87,7 +87,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

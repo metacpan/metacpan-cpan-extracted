@@ -4,7 +4,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::URL;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # Cache for generated CSS and JavaScript
 has [qw/js css pattern_rotate/];
@@ -567,7 +567,10 @@ including obfuscated C<to>, C<cc> and C<bcc> addresses.
 Please be aware of the environment you use email obfuscation in and
 make sure your human visitors will always be able to deobfuscate your address!
 And please keep in mind that it's arguable if email obfuscation is
-L<useful at all|http://www.theguardian.com/technology/2010/dec/21/keeping-email-address-secret-spambots>.
+useful at all
+(see L<pro|https://utkusen.com/blog/security-by-obscurity-is-underrated.html>
+and
+L<contra|http://www.theguardian.com/technology/2010/dec/21/keeping-email-address-secret-spambots>).
 
 
 =head2 Mailto Obfuscation
@@ -723,7 +726,7 @@ L<Mojolicious::Plugin::Util::RandomString>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2019, Nils Diewald.
+Copyright (C) 2014-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

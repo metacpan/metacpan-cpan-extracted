@@ -10,6 +10,17 @@
 #  define PadnameIsNULL(pn)  (!(pn) || (pn) == &PL_sv_undef)
 #endif
 
+#ifndef hv_deletes
+#  define hv_deletes(hv, skey, flags)  hv_delete((hv), ("" skey ""), (sizeof(skey) - 1), flags)
+#endif
+
+#if HAVE_PERL_VERSION(5, 22, 0)
+#  define PadnameOUTER_off(pn)  (PadnameFLAGS(pn) &= ~PADNAMEt_OUTER)
+#else
+   /* PadnameOUTER is really the SvFAKE flag */
+#  define PadnameOUTER_off(pn)  SvFAKE_off(pn)
+#endif
+
 #define save_strndup(s, l)  S_save_strndup(aTHX_ s, l)
 static char *S_save_strndup(pTHX_ char *s, STRLEN l)
 {
@@ -42,23 +53,79 @@ static OP *newPADxVOP(I32 type, PADOFFSET padix, I32 flags, U32 private)
  *   https://rt.cpan.org/Ticket/Display.html?id=128562
  */
 
-#if HAVE_PERL_VERSION(5,22,0)
-#  define newLOGOP_CUSTOM(flags, first, other)  newLOGOP(OP_CUSTOM, flags, first, other)
-#  define newSVOP_CUSTOM(flags, sv)             newSVOP(OP_CUSTOM, flags, sv)
-#  define newUNOP_CUSTOM(flags, first)          newUNOP(OP_CUSTOM, flags, first)
-#  define newBINOP_CUSTOM(flags, first, last)  newBINOP(OP_CUSTOM, flags, first, last)
-#else
-#  define newLOGOP_CUSTOM(flags, first, other)  S_newLOGOP_CUSTOM(aTHX_ flags, first, other)
-#  define newSVOP_CUSTOM(flags, sv)             S_newSVOP_CUSTOM(aTHX_ flags, sv)
-#  define newUNOP_CUSTOM(flags, first)          S_newUNOP_CUSTOM(aTHX_ flags, first)
-#  define newBINOP_CUSTOM(flags, first, last)  S_newBINOP_CUSTOM(aTHX_ flags, first, last)
+#define newOP_CUSTOM(func, flags)                   S_newOP_CUSTOM(aTHX_ func, flags)
+#define newUNOP_CUSTOM(func, flags, first)          S_newUNOP_CUSTOM(aTHX_ func, flags, first)
+#define newSVOP_CUSTOM(func, flags, sv)             S_newSVOP_CUSTOM(aTHX_ func, flags, sv)
+#define newBINOP_CUSTOM(func, flags, first, last)   S_newBINOP_CUSTOM(aTHX_ func, flags, first, last)
+#define newLOGOP_CUSTOM(func, flags, first, other)  S_newLOGOP_CUSTOM(aTHX_ func, flags, first, other)
 
-static OP *S_newLOGOP_CUSTOM(pTHX_ U32 flags, OP *first, OP *other)
+static OP *S_newOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags)
 {
+  OP *op = newOP(OP_CUSTOM, flags);
+  op->op_ppaddr = func;
+  return op;
+}
+
+static OP *S_newUNOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first)
+{
+  UNOP *unop;
+#if HAVE_PERL_VERSION(5,22,0)
+  unop = (UNOP *)newUNOP(OP_CUSTOM, flags, first);
+#else
+  NewOp(1101, unop, 1, UNOP);
+  unop->op_type = (OPCODE)OP_CUSTOM;
+  unop->op_first = first;
+  unop->op_flags = (U8)(flags | OPf_KIDS);
+  unop->op_private = (U8)(1 | (flags >> 8));
+#endif
+  unop->op_ppaddr = func;
+  return (OP *)unop;
+}
+
+static OP *S_newSVOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, SV *sv)
+{
+  SVOP *svop;
+#if HAVE_PERL_VERSION(5,22,0)
+  svop = (SVOP *)newSVOP(OP_CUSTOM, flags, sv);
+#else
+  NewOp(1101, svop, 1, SVOP);
+  svop->op_type = (OPCODE)OP_CUSTOM;
+  svop->op_sv = sv;
+  svop->op_next = (OP *)svop;
+  svop->op_flags = 0;
+  svop->op_private = 0;
+#endif
+  svop->op_ppaddr = func;
+  return (OP *)svop;
+}
+
+static OP *S_newBINOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, OP *last)
+{
+  BINOP *binop;
+#if HAVE_PERL_VERSION(5,22,0)
+  binop = (BINOP *)newBINOP(OP_CUSTOM, flags, first, last);
+#else
+  NewOp(1101, binop, 1, BINOP);
+  binop->op_type = (OPCODE)OP_CUSTOM;
+  binop->op_first = first;
+  first->op_sibling = last;
+  binop->op_last = last;
+  binop->op_flags = (U8)(flags | OPf_KIDS);
+  binop->op_private = (U8)(2 | (flags >> 8));
+#endif
+  binop->op_ppaddr = func;
+  return (OP *)binop;
+}
+
+static OP *S_newLOGOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, OP *other)
+{
+  OP *o;
+#if HAVE_PERL_VERSION(5,22,0)
+  o = newLOGOP(OP_CUSTOM, flags, first, other);
+#else
   /* Parts of this code copypasted from perl 5.20.0's op.c S_new_logop()
    */
   LOGOP *logop;
-  OP *o;
 
   first = op_contextualize(first, G_SCALAR);
 
@@ -79,46 +146,12 @@ static OP *S_newLOGOP_CUSTOM(pTHX_ U32 flags, OP *first, OP *other)
   /* No CHECKOP for OP_CUSTOM */
   o = newUNOP(OP_NULL, 0, (OP *)logop);
   other->op_next = o;
+#endif
+
+  /* the returned op is actually an UNOP that's either NULL or NOT; the real
+   * logop is the op_next of it
+   */
+  cUNOPx(o)->op_first->op_ppaddr = func;
 
   return o;
 }
-
-static OP *S_newSVOP_CUSTOM(pTHX_ U32 flags, SV *sv)
-{
-  SVOP *svop;
-  NewOp(1101, svop, 1, SVOP);
-  svop->op_type = (OPCODE)OP_CUSTOM;
-  svop->op_ppaddr = NULL; /* Because caller only overrides it anyway */
-  svop->op_sv = sv;
-  svop->op_next = (OP *)svop;
-  svop->op_flags = 0;
-  svop->op_private = 0;
-  return (OP *)svop;
-}
-
-static OP *S_newUNOP_CUSTOM(pTHX_ U32 flags, OP *first)
-{
-  UNOP *unop;
-  NewOp(1101, unop, 1, UNOP);
-  unop->op_type = (OPCODE)OP_CUSTOM;
-  unop->op_ppaddr = NULL; /* Because caller only overrides it anyway */
-  unop->op_first = first;
-  unop->op_flags = (U8)(flags | OPf_KIDS);
-  unop->op_private = (U8)(1 | (flags >> 8));
-  return (OP *)unop;
-}
-
-static OP *S_newBINOP_CUSTOM(pTHX_ U32 flags, OP *first, OP *last)
-{
-  BINOP *binop;
-  NewOp(1101, binop, 1, BINOP);
-  binop->op_type = (OPCODE)OP_CUSTOM;
-  binop->op_ppaddr = NULL; /* Because caller only overrides it anyway */
-  binop->op_first = first;
-  first->op_sibling = last;
-  binop->op_last = last;
-  binop->op_flags = (U8)(flags | OPf_KIDS);
-  binop->op_private = (U8)(2 | (flags >> 8));
-  return (OP *)binop;
-}
-#endif

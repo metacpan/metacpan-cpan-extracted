@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.016;
 
 use ExtUtils::MakeMaker;
 
@@ -14,13 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "JIRA-REST",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "JIRA::REST",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Config::Identity" => "0.0019",
     "Encode" => 0,
     "HTML::TreeBuilder" => 0,
+    "HTTP::CookieJar::LWP" => 0,
     "HTTP::Status" => 0,
     "JSON" => "2.23",
     "MIME::Base64" => 0,
@@ -28,7 +29,6 @@ my %WriteMakefileArgs = (
     "REST::Client" => 0,
     "URI" => 0,
     "URI::Escape" => 0,
-    "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.020",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +48,7 @@ my %FallbackPrereqs = (
   "Config::Identity" => "0.0019",
   "Encode" => 0,
   "HTML::TreeBuilder" => 0,
+  "HTTP::CookieJar::LWP" => 0,
   "HTTP::Status" => 0,
   "JSON" => "2.23",
   "MIME::Base64" => 0,
@@ -57,7 +58,6 @@ my %FallbackPrereqs = (
   "URI" => 0,
   "URI::Escape" => 0,
   "lib" => 0,
-  "strict" => 0,
   "utf8" => 0,
   "warnings" => 0
 );

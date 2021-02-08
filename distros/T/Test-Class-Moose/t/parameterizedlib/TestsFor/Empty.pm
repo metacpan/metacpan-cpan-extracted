@@ -1,5 +1,9 @@
 package TestsFor::Empty;
 
+use strict;
+use warnings;
+use namespace::autoclean;
+
 use Test::Class::Moose bare => 1;
 
 use Test2::Tools::Basic qw( fail );
@@ -7,6 +11,7 @@ use Test2::Tools::Compare qw( array call end event filter_items F T );
 
 with 'Test::Class::Moose::Role::ParameterizedInstances';
 
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _constructor_parameter_sets {
 
     # dynamically decided that there is nothing to do (e.g., because
@@ -32,7 +37,7 @@ sub expected_test_events {
             };
             event Plan => sub {
                 call directive => 'SKIP';
-                call reason =>
+                call reason    =>
                   q{Skipping 'TestsFor::Empty': no test instances found};
                 call max => 0;
             };

@@ -1,13 +1,10 @@
 package Quantum::Superpositions::Lazy::Role::Operation;
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
-use v5.28;
+use v5.24;
 use warnings;
 use Moo::Role;
-
-use feature qw(signatures);
-no warnings qw(experimental::signatures);
 
 use Carp qw(croak);
 
@@ -20,8 +17,9 @@ has "sign" => (
 	is => "ro",
 );
 
-sub _clear_parameters : prototype($$@) ($self, $param_num, @parameters)
+sub _clear_parameters
 {
+	my ($self, $param_num, @parameters) = @_;
 	@parameters = grep defined, @parameters;
 	croak "invalid number of parameters to " . $self->sign
 		unless @parameters == $param_num;

@@ -49,7 +49,7 @@ WriteMakefile(
         dynamic_config  => 0,
         resources       => {
             bugtracker      => {
-                web => "https://rt.cpan.org/Public/Dist/Display.html?Name=$DN",
+                web => "https://github.com/mhasch/perl-$DN/issues",
             },
             homepage        => 'https://vera.in-ulm.de/planar-diffsets/',
             license         => ['https://dev.perl.org/licenses/'],

@@ -71,9 +71,8 @@ EOQ
         my $filename = "$count.html";
         fio_write_page($filename, $output);
 
-        my $absolute_url = $map->{data}->build('absolute_url', $filename);
-        my $webpage = $configuration{remote_url} . $$absolute_url;
-        push(@webpages, $webpage);
+        my $remote_url = $map->{data}->build('remote_url', $filename);
+        push(@webpages, $$remote_url);
     }
 
     @webpages = sort @webpages;

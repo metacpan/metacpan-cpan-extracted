@@ -27,7 +27,6 @@ my $config = Config::Any->load_files( {
     flatten_to_hash => 1,
     use_ext         => 1,
 } );
-# config: $config->{$ARGV_config}
 
 # build ft object
 # Note: default args are propagated to all orgs
@@ -40,6 +39,7 @@ my $ft = FortyTwo->new(
 # Note: CLI parameters are introduced here
 my %args;
 $args{debug_mode} = $ARGV_verbosity > 5 ? 1 : 0;
+$args{out_dir}    = $ARGV_outdir if $ARGV_outdir;
 $args{threads}    = $ARGV_threads;
 my $rp = $ft->run_proc(\%args);
 
@@ -53,7 +53,7 @@ forty-two.pl - The Answer to the Ultimate Question of Phylogenomics
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =head1 USAGE
 
@@ -108,6 +108,14 @@ number of input ALI files.
 
 =for Euclid: n.type: +int
     n.default: 1
+
+=item --outdir=<dir>
+
+Optional output dir that will contain the enriched ALI files and/or taxonomic
+reports (will be created if needed) [default: none]. Otherwise, output files
+are in the same directory as input files.
+
+=for Euclid: dir.type: writable
 
 =item --verbosity=<level>
 

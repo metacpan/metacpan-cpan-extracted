@@ -1587,16 +1587,10 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   
   package->module_file = compiler->cur_file;
   package->module_rel_file = compiler->cur_rel_file;
-
   
-  int32_t is_anon;
-  if (op_type) {
-    is_anon = 0;
-  }
-  // Anon
-  else  {
+  if (!op_type) {
     // Package is anon
-    is_anon = 1;
+    package->is_anon = 1;
     
     SPVM_OP* op_sub = op_block->first->last;
     assert(op_sub);
@@ -1606,25 +1600,19 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     int32_t int32_max_length = 10;
     
     // Create anon sub package name
-    // If Foo::Bar anon sub is defined line 123, keyword start pos 32, the anon sub package name become anon_Foo__Bar_123_32. This is uniqe in whole program.
+    // If Foo::Bar anon sub is defined line 123, sub keyword start pos 32, the anon sub package name become Foo::Bar::anon::123::32. This is uniqe in whole program.
     const char* anon_sub_defined_rel_file_package_name = compiler->cur_rel_file_package_name;
     int32_t anon_sub_defined_line = op_sub->line;
     int32_t anon_sub_defined_keyword_start_pos = op_sub->keyword_start_pos;
-    int32_t anon_sub_package_name_length = 5 + strlen(anon_sub_defined_rel_file_package_name) + 1 + int32_max_length + 1 + int32_max_length;
-    
-    // warn("AAAAA %s %d %d", anon_sub_defined_rel_file_package_name, anon_sub_defined_line, anon_sub_defined_keyword_start_pos);
+    int32_t anon_sub_package_name_length = 6 + strlen(anon_sub_defined_rel_file_package_name) + 2 + int32_max_length + 2 + int32_max_length;
     
     // Anon package name
     char* name_package = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, anon_sub_package_name_length + 1);
-    sprintf(name_package, "anon_%s_%d_%d", anon_sub_defined_rel_file_package_name, anon_sub_defined_line, anon_sub_defined_keyword_start_pos);
-    for (int32_t i = 0; i < anon_sub_package_name_length; i++) {
-      if (name_package[i] == ':') {
-        name_package[i] = '_';
-      }
-    }
-    
+    sprintf(name_package, "%s::anon::%d::%d", anon_sub_defined_rel_file_package_name, anon_sub_defined_line, anon_sub_defined_keyword_start_pos);
     SPVM_OP* op_name_package = SPVM_OP_new_op_name(compiler, name_package, op_package->file, op_package->line);
     op_type = SPVM_OP_build_basic_type(compiler, op_name_package);
+    
+    op_sub->uv.sub->anon_sub_defined_package_name = anon_sub_defined_rel_file_package_name;
   }
   
   const char* package_name = op_type->uv.type->basic_type->name;
@@ -1633,13 +1621,30 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   // Add addede package names in this compile
   SPVM_LIST_push(compiler->tmp_added_package_names, (void*)package_name);
   
-  if (!is_anon) {
+  if (!package->is_anon) {
     // If package name start with lower case, compile error occur.
+    // (Invalid example) foo::Bar
     if (islower(package_name[0])) {
       SPVM_COMPILER_error(compiler, "Package name \"%s\" must start with upper case at %s line %d\n", package_name, op_package->file, op_package->line);
     }
+    
+    // If package part name start with lower case, compiler error occur.
+    // (Invalid example) Foo::bar
+    int32_t package_part_name_is_invalid = 0;
+    int32_t package_name_length = strlen(package_name);
+    for (int32_t i = 0; i < package_name_length; i++) {
+      if (i > 1) {
+        if (package_name[i - 2] == ':' && package_name[i - 1] == ':') {
+          if (islower(package_name[i])) {
+            SPVM_COMPILER_error(compiler, "Part name of package \"%s\" must start with lower case at %s line %d\n", package_name, op_package->file, op_package->line);
+            break;
+          }
+        }
+      }
+    }
+    
     // If package name is different from the package name corresponding to the module file, compile error occur.
-    else if (strcmp(package_name, compiler->cur_rel_file_package_name) != 0) {
+    if (strcmp(package_name, compiler->cur_rel_file_package_name) != 0) {
       // If package fail load by if (require xxx) syntax, that is ok
       if (!op_type->uv.type->basic_type->fail_load) {
         SPVM_COMPILER_error(compiler, "Package name \"%s\" is different from the package name corresponding to the module file at %s line %d\n", package_name, op_package->file, op_package->line);
@@ -1668,7 +1673,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   // Package is callback
   int32_t category_descriptors_count = 0;
   int32_t access_control_descriptors_count = 0;
-  int32_t package_has_precompile_descriptor = 0;
   if (op_list_descriptors) {
     SPVM_OP* op_descriptor = op_list_descriptors->first;
     while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
@@ -1696,7 +1700,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
           access_control_descriptors_count++;
           break;
         case SPVM_DESCRIPTOR_C_ID_PRECOMPILE:
-          package_has_precompile_descriptor = 1;
+          package->has_precompile_descriptor = 1;
           break;
         default:
           SPVM_COMPILER_error(compiler, "Invalid package descriptor %s at %s line %d\n", SPVM_DESCRIPTOR_C_ID_NAMES[descriptor->id], op_package->file, op_package->line);
@@ -1957,10 +1961,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       else if (op_decl->id == SPVM_OP_C_ID_SUB) {
         SPVM_LIST_push(package->subs, op_decl->uv.sub);
         
-        if (op_decl->uv.sub->can_precompile && package_has_precompile_descriptor) {
-          op_decl->uv.sub->flag |= SPVM_SUB_C_FLAG_PRECOMPILE;
-        }
-        
         // Captures is added to field
         SPVM_LIST* captures = op_decl->uv.sub->captures;
         for (int32_t i = 0; i < captures->length; i++) {
@@ -2049,7 +2049,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         if (sub->flag & SPVM_SUB_C_FLAG_ANON) {
           package->flag |= SPVM_PACKAGE_C_FLAG_ANON_SUB_PACKAGE;
           assert(package->subs->length == 1);
-          assert(is_anon);
+          assert(package->is_anon);
         }
 
         sub->rel_id = i;

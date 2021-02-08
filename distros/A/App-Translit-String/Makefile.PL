@@ -23,8 +23,7 @@ requires 'Error::Pure' => 0.16;
 requires 'Getopt::Std' => 0;
 requires 'Lingua::Translit' => 0;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=App-Translit-String';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-Translit-String/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-Translit-String';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-Translit-String';
 test_requires 'English' => 0;
@@ -32,9 +31,10 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
+test_requires 'Test::Warnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.06';
+version '0.07';
 
 # Run.
 WriteAll();

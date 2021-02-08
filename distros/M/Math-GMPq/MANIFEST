@@ -1,6 +1,7 @@
 MANIFEST
 CHANGES
 Makefile.PL
+math_gmpq_include.h
 GMPq.pm
 GMPq.pod
 GMPq.xs

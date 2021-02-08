@@ -13,7 +13,6 @@ use File::Find;
 use File::Spec;
 
 use Text::Amuse::Functions qw/muse_fast_scan_header/;
-use Text::Amuse::Compile::Webfonts;
 use Text::Amuse::Compile::File;
 use Text::Amuse::Compile::Merged;
 use Text::Amuse::Compile::MuseHeader;
@@ -32,11 +31,11 @@ Text::Amuse::Compile - Compiler for Text::Amuse
 
 =head1 VERSION
 
-Version 1.52
+Version 1.60
 
 =cut
 
-our $VERSION = '1.52';
+our $VERSION = '1.60';
 
 =head1 SYNOPSIS
 
@@ -60,18 +59,11 @@ Format options (by default all of them are activated);
 
 Remove auxiliary files after compilation (.status)
 
-=item webfontsdir
-
-If you want to embed fonts in the EPUB, pass the directory with the
-fonts and the specification file (see
-L<Text::Amuse::Compile::Webfonts>) in this option.
-
 =item fontspec
 
 Argument for L<Text::Amuse::Compile::Fonts> constructor. Passing these
 triggers a new way to select fonts. The validation happens against a
-list of font you can provide and you don't need the Webfonts mess
-above.
+list of font you can provide.
 
 =item epub_embed_fonts
 
@@ -231,9 +223,6 @@ has cleanup   => (is => 'ro', isa => Bool, default => sub { 0 });
 has ttdir     => (is => 'ro',   isa => Maybe[Str]);
 has templates => (is => 'lazy', isa => Object);
 
-has webfontsdir => (is => 'ro', isa => Maybe[Str]);
-has webfonts  => (is => 'lazy', isa => Maybe[Object]);
-
 has fontspec => (is => 'ro');
 has fonts => (is => 'lazy', isa => InstanceOf['Text::Amuse::Compile::Fonts::Selected']);
 has epub_embed_fonts => (is => 'ro', isa => Bool, default => sub { 1 });
@@ -309,7 +298,7 @@ sub BUILDARGS {
             $params{$format} = 1;
         }
     }
-    foreach my $dir (qw/ttdir webfontsdir/) {
+    foreach my $dir (qw/ttdir/) {
         if (exists $params{$dir} and defined $params{$dir} and -d $params{$dir}) {
             my $abs = File::Spec->rel2abs($params{$dir});
             $params{$dir} = $abs;
@@ -358,11 +347,6 @@ sub _build_standalone {
     }
 }
 
-sub _build_webfonts {
-    my $self = shift;
-    return Text::Amuse::Compile::Webfonts->new(webfontsdir => $self->webfontsdir);
-}
-
 has logger => (is => 'rw',
                isa => CodeRef,
                default => sub { return sub { print @_ }; });
@@ -386,11 +370,6 @@ true.
 =cut
 
 =head2 METHODS
-
-=head3 webfonts
-
-The L<Text::Amuse::Compile::Webfonts> object, constructed from the the
-C<webfontsdir> option.
 
 =head3 fonts
 
@@ -613,7 +592,6 @@ sub _compile_virtual_file {
                                                logger => $self->logger,
                                                virtual => 1,
                                                standalone => $self->standalone,
-                                               webfonts => $self->webfonts,
                                                fonts => $self->fonts,
                                                epub_embed_fonts => $self->epub_embed_fonts,
                                                include_paths => [ @{$self->include_paths} ],
@@ -641,7 +619,6 @@ sub _compile_file {
                 options => { $self->extra },
                 logger => $self->logger,
                 standalone => $self->standalone,
-                webfonts => $self->webfonts,
                 fonts => $self->fonts,
                 epub_embed_fonts => $self->epub_embed_fonts,
                 luatex => $self->luatex,

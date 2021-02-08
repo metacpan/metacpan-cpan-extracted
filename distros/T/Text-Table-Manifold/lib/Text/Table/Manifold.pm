@@ -194,7 +194,7 @@ has widths =>
 	required => 0,
 );
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 # ------------------------------------------------
 
@@ -1797,9 +1797,9 @@ L<https://github.com/ronsavage/Text-Table-Manifold>
 
 =head1 Support
 
-Email the author, or log a bug on RT:
+Bugs should be reported via the CPAN bug tracker at
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text::Table::Manifold>.
+L<https://github.com/ronsavage/Text-Table-Manifold/issues>
 
 =head1 Author
 

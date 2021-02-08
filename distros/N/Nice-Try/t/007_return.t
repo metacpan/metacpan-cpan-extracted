@@ -76,4 +76,20 @@ use Nice::Try;
     );
 }
 
+# return hash from try
+{
+    is(
+        ref( sub
+        {
+            try
+            {
+                return( {} );
+            }
+            catch{ return( 'nope' ) }
+        }->()),
+        'HASH',
+        'returning an hash'
+    );
+}
+
 done_testing;

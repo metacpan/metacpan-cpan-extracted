@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ServerInfo;
 # ABSTRACT: Provides Neo4j server address and version
-$Neo4j::Driver::ServerInfo::VERSION = '0.20';
+$Neo4j::Driver::ServerInfo::VERSION = '0.21';
 
 use URI 1.25;
 
@@ -39,7 +39,7 @@ Neo4j::Driver::ServerInfo - Provides Neo4j server address and version
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

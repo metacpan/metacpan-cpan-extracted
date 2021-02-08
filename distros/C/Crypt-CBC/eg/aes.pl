@@ -8,17 +8,19 @@ use strict vars;
 
 my %options;
 
-getopts('edk:i:o:',\%options) || die <<USAGE;
+getopts('edk:p:i:o:',\%options) || die <<USAGE;
 Usage: aes.pl [options] file1 file2 file3...
-   AES encrypt/decrypt files using Cipher Block Chaining mode.
+    AES encrypt/decrypt files using Cipher Block Chaining mode, and
+    the PBKDF2 key derivation function.
+    
+    It is compatible with files encrypted using 
+    "openssl enc -pbkdf2 -aes-256-cbc".
 Options:
-       -e        encrypt (default)
-       -d        decrypt
-       -k 'key'  provide key on command line
-       -i file   input file
-       -o file   output file
-
-(NB: The Rijndael cipher is the basis for AES)
+       -e                  encrypt (default)
+       -d                  decrypt
+       -p,-k 'passphrase'  provide passphrase on command line
+       -i file             input file
+       -o file             output file
 USAGE
     ;
 
@@ -27,12 +29,12 @@ push(@ARGV,'-') unless @ARGV;
 open(STDOUT,">$options{'o'}") or die "$options{'o'}: $!"
     if $options{'o'};
 
-my $key = $options{'k'} || get_key();
-my $cipher = Crypt::CBC->new(-key    =>  $key,
-			     -cipher => 'Rijndael',
-			     -salt   => 1,
-			    ) || die "Couldn't create CBC object";
 my $decrypt = $options{'d'} and !$options{'e'};
+my $key = $options{'k'} || $options{'p'} || get_key(!$decrypt);
+my $cipher = Crypt::CBC->new(-pass   =>  $key,
+			     -cipher => 'Crypt::Cipher::AES',
+			     -pbkdf  => 'pbkdf2',
+			    ) || die "Couldn't create CBC object";
 $cipher->start($decrypt ? 'decrypt' : 'encrypt');
 
 my $in;
@@ -45,6 +47,8 @@ while (@ARGV) {
 print $cipher->finish;
 
 sub get_key {
+    my $verify = shift;
+    
     local($|) = 1;
     local(*TTY);
     open(TTY,"/dev/tty");
@@ -53,11 +57,15 @@ sub get_key {
     do {
 	print STDERR "AES key: ";
         chomp($key1 = <TTY>);
-	print STDERR "\r\nRe-type key: ";
-        chomp($key2 = <TTY>);
-        print STDERR "\r\n";
-        print STDERR "The two keys don't match. Try again.\r\n"
-            unless $key1 eq $key2;
+	if ($verify) {
+	    print STDERR "\r\nRe-type key: ";
+	    chomp($key2 = <TTY>);
+	    print STDERR "\r\n";
+	    print STDERR "The two keys don't match. Try again.\r\n"
+		unless $key1 eq $key2;
+	} else {
+	    $key2 = $key1;
+	}
     } until $key1 eq $key2;
     system "stty echo </dev/tty";
     close(TTY);

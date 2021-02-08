@@ -6,6 +6,7 @@ lib/CGI/Info.pm
 LICENCE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README
 README.md
 t/00-load.t
@@ -21,7 +22,10 @@ t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
+t/eof.t
+t/eol.t
 t/expect.t
+t/fixme.t
 t/gv.t
 t/is_mobile.t
 t/is_robot.t
@@ -34,6 +38,7 @@ t/links.t
 t/logdir.t
 t/manifest.t
 t/metrics.t
+t/minimum.t
 t/namespaces.t
 t/no404s.t
 t/noopentickets.t
@@ -50,6 +55,7 @@ t/script.t
 t/site.t
 t/snippets.t
 t/spelling.t
+t/status.t
 t/strict.t
 t/taint.t
 t/tmpdir.t

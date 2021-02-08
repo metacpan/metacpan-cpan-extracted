@@ -1,3 +1,14 @@
+0.210380  2021-02-07 12:29:46+01:00 Europe/Brussels
+    - Additions
+      - binaries: new script tax-mask-ali.pl
+      - SeqMask::Rates: added support for IQ-TREE rate files
+      - Taxonomy::Classifier: added method tax_masks
+      - Types: reintroduced unused type coercions for IdList
+    - Changes
+      - Tree: modified store_itol_datasets to allow coloring leaf labels
+    - Fixes
+      - binaries: fixed incorrect outfile names for iTOL output in format-tree.pl
+
 0.210230  2021-01-23 14:01:23+01:00 Europe/Brussels
     - Additions
       - binaries: new script export-itol.pl
@@ -25,7 +36,7 @@
       - binaries: moved 'inst' executables to 'instant' dir (no default install)
       - binaries: moved specialized and obsolete executables to 'private' dir (no default install)
       - Constants: expanded suffix list for Ali files
-      - ColorScheme and Tree: refactored iTOL coloring and collapsing for robustness
+      - Taxonomy::ColorScheme and Tree: refactored iTOL coloring and collapsing for robustness
 
 0.202310  2020-08-18 12:59:49+02:00 Europe/Brussels
     - Fixes
@@ -37,7 +48,7 @@
       - binaries: added support for iTOL coloring and collapsing to format-tree.pl
       - binaries: new script upload2itol.pl
       - binaries: new scripts inst-abbr-ids.pl, inst-qual-filter.pl and inst-tax-filter.pl
-      - ColorScheme: added method store_itol_colors
+      - Taxonomy::ColorScheme: added method store_itol_colors
       - Tree: added method store_itol_collapse
     - Fixes
       - Taxonomy: fixed bug when trying to recover unknown lineages (visible in fetch-tax.pl)
@@ -66,7 +77,7 @@
     - Changes
       - Listable: improved regex to capture multiple chunks (as in abbr-id-fas.pl)
     - Fixes
-      - ColorScheme: fixed loophole in dependency resolution for Graphics::ColorNames::WWW
+      - Taxonomy::ColorScheme: fixed loophole in dependency resolution for Graphics::ColorNames::WWW
       - Tree: temporarily disabled tests relying on phyml
 
 0.190900  2019-03-31 22:19:09+02:00 Europe/Brussels
@@ -84,7 +95,7 @@
     - Additions
       - binaries: added --item-type 'strain' to fetch-tax.pl
     - Fixes
-      - ColorScheme: fixed incompatibility with recent Graphics::ColorNames
+      - Taxonomy::ColorScheme: fixed incompatibility with recent Graphics::ColorNames
 
 0.182420  2018-08-30 15:45:19+02:00 Europe/Brussels
     - Additions
@@ -100,11 +111,11 @@
 
 0.181180  2018-04-28 13:43:41+02:00 Europe/Brussels
     - Fixes
-      - ColorScheme: fixed bug #125225 (rt.cpan.org): depends on module not on CPAN
+      - Taxonomy::ColorScheme: fixed bug #125225 (rt.cpan.org): depends on module not on CPAN
 
 0.181170  2018-04-27 14:19:02+02:00 Europe/Brussels
     - Additions
-      - ColorScheme: improved delegation to internal classifier (and tests)
+      - Taxonomy::ColorScheme: improved delegation to internal classifier (and tests)
       - Trees: switch_branch_lengths_and_labels_for_entities method is now compatible with treeplot
       
 0.181120  2018-04-23 00:34:53+02:00 Europe/Brussels
@@ -169,7 +180,7 @@
     - Changes
       - Tree: shorten_ids/restore_ids now ignore missing ids in IdMapper
     - Fixes
-      - Rates: tests should now pass on more platforms
+      - SeqMask::Rates: tests should now pass on more platforms
       - Taxonomy: GCA-based taxon ids now retain their true taxonomic rank
 
 0.173500  2017-12-17 00:35:51+01:00 Europe/Brussels

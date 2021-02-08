@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,15 +25,16 @@ no_index:
 provides:
   Text::Hyphen::DE:
     file: lib/Text/Hyphen/DE.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   Text::Hyphen: '0'
 resources:
   bugtracker: https://github.com/mdom/Text-Hyphen-DE/issues
   homepage: https://github.com/mdom/Text-Hyphen-DE
   repository: git://github.com/mdom/Text-Hyphen-DE.git
-version: '1.01'
+version: '1.02'
 x_contributors:
+  - 'Mario Domgoergen <mario@domgoergen.com>'
   - 'Mario Domgoergen <mdom@taz.de>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

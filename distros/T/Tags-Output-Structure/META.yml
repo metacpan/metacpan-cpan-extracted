@@ -28,8 +28,8 @@ requires:
   Tags::Output: 0.03
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Tags-Output-Structure
+  bugtracker: https://github.com/michal-josef-spacek/Tags-Output-Structure/issues
   homepage: https://github.com/michal-josef-spacek/Tags-Output-Structure
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-Output-Structure
-version: '0.05'
+version: '0.06'

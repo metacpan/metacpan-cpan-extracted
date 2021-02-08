@@ -1,3 +1,24 @@
+2021-02-06   Christopher A. Chavez <chrischavez@gmx.us>
+
+     Release 1.10
+
+     Mark failing test in t/tcl.t as TODO: likely caused by newer Tcl.pm,
+     not a reason to prevent users from installing Tkx. [RT#115662]
+
+     Typo/spelling fixes contributed by David Steinbrunner; includes
+     those suggested by Gregor Hermann (Debian Perl Group) [RT#96304]
+
+     Remove tclCarbonProcesses usage from tkx-ed: modern Tcl/Tk for macOS Aqua
+     uses Cocoa rather than Carbon, so CarbonCritLib is no longer usable.
+
+     README renamed to README.md, minor improvements
+
+     Remove undesirable shebangs, use warnings pramga instead of #!perl -w
+
+     Repository and bugtracker now at https://github.com/chrstphrchvz/tkx
+
+
+
 2010-11-24   Gisle Aas <gisle@ActiveState.com>
 
      Release 1.09

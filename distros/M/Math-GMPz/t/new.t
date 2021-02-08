@@ -117,7 +117,7 @@ else {warn "\n3h:\nExpected: ", int($d), "\nGot: $f26\n"}
 my $f27 = Math::GMPz->new(36028797018964023);
 my $f28 = Math::GMPz->new('36028797018964023');
 
-if($Config{ivsize} > 4 || Math::GMPz::_has_longdouble()) {
+if($Config{ivsize} > 4 || $Config{nvsize} > 8) {
   if($f27 == $f28) {$ok .= 'i'}
   else {warn "\n3i:\nShould have got $f27 == $f28\n"}
 }

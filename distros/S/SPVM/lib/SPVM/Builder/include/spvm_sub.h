@@ -1,7 +1,7 @@
 #ifndef SPVM_SUB_H
 #define SPVM_SUB_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
 enum {
   SPVM_SUB_C_CALL_TYPE_ID_STATIC_METHOD,
@@ -20,7 +20,7 @@ enum {
 };
 
 // Method information
-struct SPVM_sub {
+struct spvm_sub {
   SPVM_OP* op_sub;
   SPVM_OP* op_name;
   SPVM_OP* op_block;
@@ -68,6 +68,7 @@ struct SPVM_sub {
   int32_t tmp_vars_length;
   SPVM_OP* op_my_condition_flag;
   int32_t can_precompile;
+  const char* anon_sub_defined_package_name;
 };
 
 SPVM_SUB* SPVM_SUB_new(SPVM_COMPILER* compiler);

@@ -1,5 +1,11 @@
 Revision history for Perl extension DBIx::Admin::TableInfo.
 
+3.04  2021-02-04T15:45:00
+	- Reformat Makefile.PL.
+	- Change license from artistic_2 to perl.
+	- Add t/00.*.
+	- Update Makefile.PL and POD to change RT to github.
+
 3.03  2016-09-04T11:17:00
 	- Add scripts/foreign.keys.pl.
 	- Adopt new repo structure. This includes changing the licence from Artistic to Perl. See

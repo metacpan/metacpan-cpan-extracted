@@ -9,6 +9,8 @@ use Dist::Mgr qw(:all);
 use lib 't/lib';
 use Helper qw(:all);
 
+check_skip();
+
 my $d = 't/data/work';
 my $f = 't/data/orig/Copyright.pm';
 my @files = (

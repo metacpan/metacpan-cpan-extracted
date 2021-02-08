@@ -2,13 +2,16 @@ package Test::Class::Moose::Executor::Sequential;
 
 # ABSTRACT: Execute tests sequentially
 
+use strict;
+use warnings;
+use namespace::autoclean;
+
 use 5.010000;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Moose 2.0000;
 use Carp;
-use namespace::autoclean;
 with 'Test::Class::Moose::Role::Executor';
 
 __PACKAGE__->meta->make_immutable;
@@ -27,7 +30,7 @@ Test::Class::Moose::Executor::Sequential - Execute tests sequentially
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =for Pod::Coverage Tags Tests runtests
 
@@ -57,7 +60,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

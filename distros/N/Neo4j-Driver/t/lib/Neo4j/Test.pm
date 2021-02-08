@@ -33,9 +33,13 @@ sub driver_maybe {
 	$bolt = $driver->{uri} && $driver->{uri}->scheme eq 'bolt';
 	if (! $ENV{TEST_NEO4J_PASSWORD} && ! $bolt) {
 		# without a password, we use the REST simulator instead
-		$driver->{client_factory} = Neo4j::Sim->factory;
-		$driver->config(cypher_filter => 'params');  # sim uses modern param syntax
+		$driver->config(net_module => 'Neo4j::Sim');
 		$sim = 1;
+	}
+	
+	if ($ENV{TEST_NEO4J_NETMODULE}) {
+		eval "require $ENV{TEST_NEO4J_NETMODULE}; 1" or die $@;
+		$driver->config(net_module => $ENV{TEST_NEO4J_NETMODULE});
 	}
 	
 	return $driver;
@@ -73,7 +77,7 @@ sub driver_no_connect {
 sub driver_no_auth {
 	my $driver = driver_maybe;
 	$driver->{auth} = { scheme => 'basic', principal => "no\tuser", credentials => "no\tpass" };
-	$driver->{client_factory} = Neo4j::Sim->factory(auth => 0) if $sim;
+	$driver->config(net_module => Neo4j::Sim->new({auth => 0})) if $sim;
 	return $driver;
 }
 
@@ -107,8 +111,9 @@ export/setenv) or in dist.ini (when using `dzil test`). The driver
 does support connecting to a Neo4j server with authentication disabled.
 However, without a password, these tests will never attempt a server
 connection, instead relying on the REST simulator (Neo4j::Sim).
-To execute these tests on a real Neo4j server, at the very least
-the password is required. If the password is the only available setting,
+To execute these tests on a real Neo4j server, you need to either specify
+a password or explicitly ask for a net_module other than Neo4j::Sim using
+TEST_NEO4J_NETMODULE. If the password is the only available setting,
 default values will be used for the server URI and user name.
 
 Examples:
@@ -119,6 +124,10 @@ Examples:
 export TEST_NEO4J_SERVER=http://127.0.0.1:7474
 export TEST_NEO4J_USERNAME=neo4j
 export TEST_NEO4J_PASSWORD=neo4j
+
+# server with auth disabled
+export TEST_NEO4J_SERVER=http://127.0.0.1:7474
+export TEST_NEO4J_NETMODULE=Neo4j::Driver::Net::HTTP::LWP
 
 
 #! csh

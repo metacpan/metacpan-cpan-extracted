@@ -165,7 +165,7 @@ merge_orthologues: off
 # in exonerate executable. This causes new seqs to be lost. To automatically
 # retry aligning them with BLAST in case of failure, use the 'exoblast' mode.
 # When not specified, 'aligner_mode' internally defaults to 'blast'.
-aligner_mode: exoblast
+aligner_mode: blast
 
 
 # ===Self-template selection switch for aligning new seqs===
@@ -260,7 +260,7 @@ orgs:
 #--ref_org_mul=0.66 --ref_score_mul=0.99 \
 #--trim_homologues=on --trim_max_shift=20000 --trim_extra_margin=15 \
 #--merge_orthologues=off \
-#--aligner_mode=exoblast --ali_skip_self=off --ali_cover_mul=1.1 --ali_keep_old_new_tags=off --ali_keep_lengthened_seqs=on \
+#--aligner_mode=blast --ali_skip_self=off --ali_cover_mul=1.1 --ali_keep_old_new_tags=off --ali_keep_lengthened_seqs=on \
 #--tax_reports=on \
 #--tax_min_score=0 --tax_score_mul=0 --tax_min_ident=0 --tax_min_len=0 \
 #--tol_check=off

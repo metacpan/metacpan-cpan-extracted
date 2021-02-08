@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Perl extension for computing the sunrise/sunset on a given day
-#     Copyright (C) 1999-2003, 2013, 2015, 2017, 2019 Ron Hill and Jean Forget
+#     Copyright (C) 1999-2003, 2013, 2015, 2017, 2019, 2021 Ron Hill and Jean Forget
 #
 #     See the license in the embedded documentation below.
 #
@@ -24,7 +24,7 @@ require Exporter;
         trig      => [ qw/sind cosd tand asind acosd atand atan2d equal/ ],
         );
 
-$VERSION =  '0.98';
+$VERSION =  '0.99';
 $RADEG   = ( 180 / pi );
 $DEGRAD  = ( pi / 180 );
 my $INV360     = ( 1.0 / 360.0 );
@@ -125,65 +125,92 @@ sub sunrise  {
   croak "Wrong value of the 'polar' argument: should be either 'warn' or 'retval'"
       if $arg{polar} ne 'warn' and $arg{polar} ne 'retval';
 
-  if ($arg{precise})   {
-    # This is the initial start
-    my $d = days_since_2000_Jan_0($year, $month, $day) - $lon / 360.0;
-
+  if (! $arg{precise})   {
+    my $revsub = \&rev180; # normalizing angles around 0 degrees
     if ($trace) {
-      print $trace "Precise computation of sunrise for $year-$month-$day, lon $lon, lat $lat, altitude $altit, upper limb $arg{upper_limb}\n";
-    }
-    my $h1 = 12; # noon, then sunrise
-    for my $counter (1..9) {
-      # 9 is a failsafe precaution against a possibly runaway loop
-      # but hopefully, we will leave the loop long before, with "last"
-      my $h2;
-      ($h2, undef) = sun_rise_set($d + $h1 / 24, $lon, $lat, $altit, 15.04107, $arg{upper_limb}, $arg{polar}, $trace);
-      if ($h2 eq 'day' or $h2 eq 'night') {
-        $h1 = $h2;
-        last;
-      }
-      if (equal($h1, $h2, 5)) {
-        # equal within 1e-5 hour, a little less than a second
-        $h1 = $h2;
-        last;
-      }
-      $h1 = $h2;
-    }
-
-    if ($trace) {
-      print $trace "Precise computation of sunset for $year-$month-$day, lon $lon, lat $lat, altitude $altit, upper limb $arg{upper_limb}\n";
-    }
-    my $h3 = 12; # noon at first, then sunset
-    for my $counter (1..9) {
-      # 9 is a failsafe precaution against a possibly runaway loop
-      # but hopefully, we will leave the loop long before, with "last"
-      my $h4;
-      (undef, $h4) = sun_rise_set($d + $h3 / 24, $lon, $lat, $altit, 15.04107, $arg{upper_limb}, $arg{polar}, $trace);
-      if ($h4 eq 'day' or $h4 eq 'night') {
-        $h3 = $h4;
-        last;
-      }
-      if (equal($h3, $h4, 5)) {
-        # equal within 1e-5 hour, a little less than a second
-        $h3 = $h4;
-        last;
-      }
-      $h3 = $h4;
-    }
-
-    return convert_hour($h1, $h3, $TZ, $isdst);
-
-  }
-  else {
-    if ($trace) {
-      print $trace "Basic computation of sunrise and sunset for $year-$month-$day, lon $lon, lat $lat, altitude $altit, upper limb $arg{upper_limb}\n";
+      printf $trace "\nBasic computation for %04d-%02d-%02d, lon %.3f, lat %.3f, altitude %.3f, upper limb %d\n"
+                                           , $year, $month, $day
+                                           , $lon
+                                           , $lat
+                                           , $altit
+                                           , $arg{upper_limb};
     }
     my $d = days_since_2000_Jan_0( $year, $month, $day ) + 0.5 - $lon / 360.0;
-    my ($h1, $h2) = sun_rise_set($d, $lon, $lat, $altit, 15.0, $arg{upper_limb}, $arg{polar}, $trace);
+    my ($h1, $h2) = sun_rise_set($d, $lon, $lat, $altit, 15.0, $arg{upper_limb}, $arg{polar}, $trace, $revsub);
     if ($h1 eq 'day' or $h1 eq 'night' or $h2 eq 'day' or $h2 eq 'night') {
       return ($h1, $h2);
     }
     return convert_hour($h1, $h2, $TZ, $isdst);
+  }
+  else {
+    my $revsub = sub { _rev_lon($_[0], $lon) }; # normalizing angles around the local longitude
+    my $ang_speed = 15.0;
+
+    # This is the initial start
+    my $d = days_since_2000_Jan_0($year, $month, $day) - $lon / 360.0;
+
+    if ($trace) {
+      printf $trace "\nPrecise sunrise computation for %04d-%02d-%02d, lon %.3f, lat %.3f, altitude %.3f, upper limb %d angular speed %.5f\n"
+                   , $year, $month, $day
+                   , $lon,
+                   , $lat,
+                   , $altit
+                   , $arg{upper_limb}
+                   , $ang_speed;
+    }
+    my $h1_lmt = 12; # LMT decimal hours, noon then the successive values of sunrise
+    my $h1_utc;      # UTC decimal hours, noon LMT then the successive values of sunrise
+    for my $counter (1..9) {
+      # 9 is a failsafe precaution against a possibly runaway loop
+      # but hopefully, we will leave the loop long before, with "last"
+      my $h2_utc;
+      ($h2_utc, undef) = sun_rise_set($d + $h1_lmt / 24, $lon, $lat, $altit, $ang_speed, $arg{upper_limb}, $arg{polar}, $trace, $revsub);
+      if ($h2_utc eq 'day' or $h2_utc eq 'night') {
+        $h1_utc = $h2_utc;
+        last;
+      }
+      $h1_utc = $h1_lmt - $lon / 15;
+      if (equal($h1_utc, $h2_utc, 5)) {
+        # equal within 1e-5 hour, a little less than a second
+        $h1_utc = $h2_utc;
+        last;
+      }
+      $h1_utc = $h2_utc;
+      $h1_lmt = $h1_utc + $lon / 15;
+    }
+
+    if ($trace) {
+      printf $trace "\nPrecise sunset computation for %04d-%02d-%02d, lon %.3f, lat %.3f, altitude %.3f, upper limb %d angular speed %.5f\n"
+                   , $year, $month, $day
+                   , $lon,
+                   , $lat,
+                   , $altit
+                   , $arg{upper_limb}
+                   , $ang_speed;
+    }
+    my $h3_lmt = 12; # LMT decimal hours, noon then the successive values of sunset
+    my $h3_utc;      # UTC decimal hours, noon LMT then the successive values of sunset
+    for my $counter (1..9) {
+      # 9 is a failsafe precaution against a possibly runaway loop
+      # but hopefully, we will leave the loop long before, with "last"
+      my $h4_utc;
+      (undef, $h4_utc) = sun_rise_set($d + $h3_lmt / 24, $lon, $lat, $altit, $ang_speed, $arg{upper_limb}, $arg{polar}, $trace, $revsub);
+      if ($h4_utc eq 'day' or $h4_utc eq 'night') {
+        $h3_utc = $h4_utc;
+        last;
+      }
+      $h3_utc = $h3_lmt - $lon / 15;
+      if (equal($h3_utc, $h4_utc, 5)) {
+        # equal within 1e-5 hour, a little less than a second
+        $h3_utc = $h4_utc;
+        last;
+      }
+      $h3_utc = $h4_utc;
+      $h3_lmt = $h3_utc + $lon / 15;
+    }
+
+    return convert_hour($h1_utc, $h3_utc, $TZ, $isdst);
+
   }
 }
 #######################################################################################
@@ -192,7 +219,7 @@ sub sunrise  {
 
 #
 #
-# FUNCTIONAL SEQUENCE for days_since_2000_Jan_0 
+# FUNCTIONAL SEQUENCE for days_since_2000_Jan_0
 #
 # _GIVEN
 # year, month, day
@@ -222,7 +249,7 @@ sub days_since_2000_Jan_0 {
 
 #
 #
-# FUNCTIONAL SEQUENCE for convert_hour 
+# FUNCTIONAL SEQUENCE for convert_hour
 #
 # _GIVEN
 # Hour_rise, Hour_set, Time zone offset, DST setting
@@ -231,11 +258,11 @@ sub days_since_2000_Jan_0 {
 # _THEN
 #
 # convert to local time
-# 
+#
 #
 # _RETURN
 #
-# hour:min rise and set 
+# hour:min rise and set
 #
 
 sub convert_hour {
@@ -296,19 +323,29 @@ sub convert_1_hour {
 
 
 sub sun_rise_set {
-    my ($d, $lon, $lat,$altit, $h, $upper_limb, $polar, $trace) = @_;
+    my ($d, $lon, $lat, $altit, $ang_spd, $upper_limb, $polar, $trace, $revsub) = @_;
+
+    if ($trace) {
+      printf $trace "\n";
+    }
 
     # Compute local sidereal time of this moment
-    my $sidtime = revolution( GMST0($d) + 180.0 + $lon );
+    my $gmst0   = GMST0($d);
+    my $sidtime = revolution( $gmst0 + 180.0 );
 
     # Compute Sun's RA + Decl + distance at this moment
     my ( $sRA, $sdec, $sr ) = sun_RA_dec($d, $lon, $trace);
 
-    # Compute time when Sun is at south - in hours UT
-    my $tsouth  = 12.0 - rev180( $sidtime - $sRA ) / 15.0;
+    # Compute time when Sun is at south - in hours (LMT then UTC)
+    my $tsouth_lmt  = 12.0 - $revsub->( $sidtime - $sRA ) / 15;
+    my $tsouth      = $tsouth_lmt - $lon / 15;
+
     if ($trace) {
-      printf $trace "For day $d (%s), sidereal time $sidtime, right asc $sRA\n", _fmt_hr(24 * ($d - int($d)), $lon);
-      printf $trace "For day $d (%s), solar noon at $tsouth (%s)\n", _fmt_hr(24 * ($d - int($d)), $lon), _fmt_hr($tsouth, $lon);
+      printf $trace "For day $d (%s), GMST0 $gmst0 %s %s\n",            _fmt_hr(24 * ($d - int($d)), $lon, 0), _fmt_angle($gmst0  ), _fmt_dur($gmst0   / 15);
+      printf $trace "For day $d (%s), sidereal time $sidtime, %s %s\n", _fmt_hr(24 * ($d - int($d)), $lon, 0), _fmt_angle($sidtime), _fmt_dur($sidtime / 15);
+      printf $trace "For day $d (%s), right asc $sRA %s %s\n",          _fmt_hr(24 * ($d - int($d)), $lon, 0), _fmt_angle($sRA    ), _fmt_dur($sRA     / 15);
+      printf $trace "For day $d (%s), declination $sdec %s %s\n",       _fmt_hr(24 * ($d - int($d)), $lon, 0), _fmt_angle($sdec   ), _fmt_dur($sdec    / 15);
+      printf $trace "For day $d (%s), solar noon at $tsouth (%s)\n",    _fmt_hr(24 * ($d - int($d)), $lon, 0), _fmt_hr($tsouth, $lon, 0);
     }
 
     if ($upper_limb) {
@@ -321,6 +358,12 @@ sub sun_rise_set {
     # the specified altitude altit:
     my $cost =   ( sind($altit) - sind($lat) * sind($sdec) )
                / ( cosd($lat) * cosd($sdec) );
+
+    if ($trace) {
+      print $trace "altit = $altit, sind(altit) = ", sind($altit), ", lat = $lat, sind(lat) = ", sind($lat), "\n";
+      print $trace "sdec = $sdec, sind(sdec) = ", sind($sdec), ", lat = $lat, cosd(lat) = ", cosd($lat), "\n";
+      print $trace "sdec = $sdec, cosd(sdec) = ", cosd($sdec), ", cost = $cost\n";
+    }
 
     my $t;
     if ( $cost >= 1.0 ) {
@@ -339,7 +382,7 @@ sub sun_rise_set {
     }
     else {
       my $arc = acosd($cost);    # The diurnal arc
-      $t = $arc / $h;            # Time to traverse the diurnal arc, hours
+      $t = $arc / $ang_spd;      # Time to traverse the diurnal arc, hours
       if ($trace) {
         printf $trace "Diurnal arc $arc -> $t hours (%s)\n", _fmt_dur($t);
       }
@@ -397,34 +440,34 @@ sub GMST0 {
 # _THEN
 #
 # compute RA and dec
-# 
+#
 #
 # _RETURN
 #
 # Sun's Right Ascension (RA), Declination (dec) and distance (r)
-# 
+#
 #
 sub sun_RA_dec {
     my ($d, $lon_noon, $trace) = @_;
 
-    # Compute Sun's ecliptical coordinates 
+    # Compute Sun's ecliptical coordinates
     my ( $r, $lon ) = sunpos($d);
     if ($trace) {
-      printf $trace "For day $d (%s), solar noon at ecliptic longitude $lon\n", _fmt_hr(24 * ($d - int($d)), $lon_noon),;
+      printf $trace "For day $d (%s), solar noon at ecliptic longitude $lon %s\n", _fmt_hr(24 * ($d - int($d)), $lon_noon), _fmt_angle($lon);
     }
 
-    # Compute ecliptic rectangular coordinates (z=0) 
+    # Compute ecliptic rectangular coordinates (z=0)
     my $x = $r * cosd($lon);
     my $y = $r * sind($lon);
 
-    # Compute obliquity of ecliptic (inclination of Earth's axis) 
+    # Compute obliquity of ecliptic (inclination of Earth's axis)
     my $obl_ecl = 23.4393 - 3.563E-7 * $d;
 
-    # Convert to equatorial rectangular coordinates - x is unchanged 
+    # Convert to equatorial rectangular coordinates - x is unchanged
     my $z = $y * sind($obl_ecl);
     $y    = $y * cosd($obl_ecl);
 
-    # Convert to spherical coordinates 
+    # Convert to spherical coordinates
     my $RA  = atan2d( $y, $x );
     my $dec = atan2d( $z, sqrt( $x * $x + $y * $y ) );
 
@@ -530,9 +573,9 @@ sub atan2d {
 #
 # _THEN
 #
-# reduces any angle to within the first revolution 
+# reduces any angle to within the first revolution
 # by subtracting or adding even multiples of 360.0
-# 
+#
 #
 # _RETURN
 #
@@ -543,19 +586,40 @@ sub revolution {
     my $x = $_[0];
     return ( $x - 360.0 * floor( $x * $INV360 ) );
 }
+#
+#
+# FUNCTIONAL SEQUENCE for _rev_lon
+#
+# _GIVEN
+#
+# two angles in degrees, the variable angle and the reference angle (longitude)
+#
+# _THEN
+#
+# Reduce input variable angle  to within reference-180 .. reference+180 degrees
+#
+#
+# _RETURN
+#
+# angle that was reduced
+#
+sub _rev_lon {
+    my ($x, $lon) = @_;
+    return $lon + rev180($x - $lon);
+}
 
 #
 #
 # FUNCTIONAL SEQUENCE for rev180
 #
 # _GIVEN
-# 
+#
 # any angle
 #
 # _THEN
 #
 # Reduce input to within -180..+180 degrees
-# 
+#
 #
 # _RETURN
 #
@@ -563,7 +627,7 @@ sub revolution {
 #
 sub rev180 {
     my ($x) = @_;
-    
+
     return ( $x - 360.0 * floor( $x * $INV360 + 0.5 ) );
 }
 
@@ -574,27 +638,36 @@ sub equal {
 }
 
 sub _fmt_hr {
-  my ($utc, $lon) = @_;
-  my $lmt = $utc + $lon / 15;
-  my $hr_utc = floor($utc);
-  $utc      -= $hr_utc;
-  $utc      *= 60;
-  my $mn_utc = floor($utc);
-  $utc      -= $mn_utc;
-  $utc      *= 60;
-  my $sc_utc = floor($utc);
-  my $hr_lmt = floor($lmt);
-  $lmt      -= $hr_lmt;
-  $lmt      *= 60;
-  my $mn_lmt = floor($lmt);
-  $lmt      -= $mn_lmt;
-  $lmt      *= 60;
-  my $sc_lmt = floor($lmt);
-  return sprintf("%02d:%02d:%02d UTC %02d:%02d:%02d LMT", $hr_utc, $mn_utc, $sc_utc, $hr_lmt, $mn_lmt, $sc_lmt);
+  my ($hr, $lon, $is_lmt) = @_;
+  my ($lmt, $utc);
+  if ($is_lmt) {
+    $lmt = $hr;
+    $utc = $lmt - $lon / 15;
+  }
+  else {
+    $utc = $hr;
+    $lmt = $utc + $lon / 15;
+  }
+  my $hr_h_utc = $utc;         my $hr_h_lmt = $lmt;
+  my $hr_d_utc = $utc / 24;    my $hr_d_lmt = $lmt / 24;
+  my $hr_utc   = floor($utc);  my $hr_lmt   = floor($lmt);
+  $utc        -= $hr_utc;      $lmt        -= $hr_lmt;
+  $utc        *= 60;           $lmt        *= 60;
+  my $mn_utc   = floor($utc);  my $mn_lmt   = floor($lmt);
+  $utc        -= $mn_utc;      $lmt        -= $mn_lmt;
+  $utc        *= 60;           $lmt        *= 60;
+  my $sc_utc   = floor($utc);  my $sc_lmt   = floor($lmt);
+  return sprintf("UTC: %02d:%02d:%02d %f h %f d, LMT: %02d:%02d:%02d %f h %f d", $hr_utc, $mn_utc, $sc_utc, $hr_h_utc, $hr_d_utc
+                                                                               , $hr_lmt, $mn_lmt, $sc_lmt, $hr_h_lmt, $hr_d_lmt);
 }
 
 sub _fmt_dur {
   my ($dur) = @_;
+  my $sign = '';
+  if ($dur < 0) {
+    $sign = '-';
+    $dur *= -1;
+  }
   my $hr = floor($dur);
   $dur  -= $hr;
   $dur  *= 60;
@@ -602,9 +675,25 @@ sub _fmt_dur {
   $dur  -= $mn;
   $dur  *= 60;
   my $sc = floor($dur);
-  return sprintf("%02d h %02d mn %02d s", $hr, $mn, $sc);
+  return sprintf("%s%02d h %02d mn %02d s", $sign, $hr, $mn, $sc);
 }
 
+sub _fmt_angle {
+  my ($angle) = @_;
+  my $sign = '';
+  if ($angle < 0) {
+    $sign = '-';
+    $angle *= -1;
+  }
+  my $hr = floor($angle);
+  $angle  -= $hr;
+  $angle  *= 60;
+  my $mn = floor($angle);
+  $angle  -= $mn;
+  $angle  *= 60;
+  my $sc = floor($angle);
+  return sprintf(q<%s%02d°%02d'%02d">, $sign, $hr, $mn, $sc);
+}
 
 sub DEFAULT      () { -0.833 }
 sub CIVIL        () { - 6 }
@@ -627,7 +716,7 @@ Astro::Sunrise - Perl extension for computing the sunrise/sunset on a given day
 
 =head1 VERSION
 
-This documentation refers to C<Astro::Sunrise> version 0.98.
+This documentation refers to C<Astro::Sunrise> version 0.99.
 
 =head1 SYNOPSIS
 
@@ -1059,6 +1148,44 @@ This module requires only core modules: L<POSIX>, L<Math::Trig> and L<Carp>.
 
 If you use the C<sun_rise> and C<sun_set> functions, you will need also L<DateTime>.
 
+=head1 BUGS AND ISSUES
+
+Before reporting a bug, please read the text
+F<doc/astronomical-notes.pod> because the strange behavior you observed
+may be a correct one, or it may be a corner case already known and
+already mentioned in the text.
+
+Nevertheless, patches and (justified) bug reports are welcome.
+
+See L<https://github.com/jforget/Astro-Sunrise/issues>
+and L<https://github.com/jforget/Astro-Sunrise/pulls>.
+
+=head2 Precise Algorithm
+
+The explanations for  the precise algorithm give a  pretty good reason
+for  using  an   angular  speed  of  15.04107  instead   of  15.  Yet,
+computations with 15.04107 do not  give results conforming to what the
+NOAA  website and  Stellarium give,  while computations  with 15  give
+conforming results. The implementation of the precise algorithm should
+be analysed and checked to find  the reason why 15.04107 does not give
+the proper results.
+
+=head2 Kwalitee
+
+The CPANTS tools do not recognize the LICENSE POD paragraph. But any
+human reader will admit that this LICENSE paragraph exists and is valid.
+
+=head2 Haiku-OS CPAN Tester
+
+The built-in test F<t/06datetime.t> fails on Haiku-OS because there is
+no way to  extract the timezone name from the  system parameters. This
+failure does not affect the core functions of L<Astro::Sunrise>.
+
+Also reported from a user working on a partially configured FreeBSD machine, see
+L<https://github.com/jforget/Astro-Sunrise/issues/16>.
+
+Hopefully, this will be fixed in the current version.
+
 =head1 AUTHOR
 
 Ron Hill
@@ -1116,8 +1243,10 @@ In addition, checked to be compatible with a C implementation of Paul Schlyter's
 
 =head2 Perl Module
 
-This program is distributed under the same terms as Perl 5.16.3:
-GNU Public License version 1 or later and Perl Artistic License
+Copyright (C)  1999-2003, 2013,  2015, 2017, 2019,  2021 Ron  Hill and
+Jean Forget,  all rights reserved.  This program is  distributed under
+the same terms  as Perl 5.16.3: GNU Public License  version 1 or later
+and Perl Artistic License
 
 You can find the text of the licenses in the F<LICENSE> file or at
 L<https://dev.perl.org/licenses/artistic.html>
@@ -1169,36 +1298,6 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
 OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-=head1 BUGS
-
-Before reporting a bug, please read the text
-F<doc/astronomical-notes.pod> because the strange behavior you observed
-may be a correct one, or it may be a corner case already known and
-already mentioned in the text.
-
-Nevertheless, patches and (justified) bug reports are welcome.
-
-See L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Sunrise>.
-
-=head2 Astro::Sunrise Bug
-
-Ticket #109992 has not been solved properly. For some combinations
-of longitude and date, the precise algorithm does not converge.
-As a stopgap measure, the loop is exited after 10 iterations, so
-your program will not run amok. But the bug will be considered as fixed
-only when we find a way to converge toward a single value.
-
-=head2 Kwalitee
-
-The CPANTS tools do not recognize the LICENSE POD paragraph. But any
-human reader will admit that this LICENSE paragraph exists and is valid.
-
-=head2 Haiku-OS CPAN Tester
-
-The built-in test F<t/06datetime.t> fails on Haiku-OS because there is no
-way to extract the timezone name from the system parameters. This failure does
-not affect the core functions of L<Astro::Sunrise>.
-
 =head1 SEE ALSO
 
 perl(1).
@@ -1210,6 +1309,6 @@ L<DateTime::Event::Jewish::Sunrise>
 The text F<doc/astronomical-notes.pod> (or its original French version
 F<doc/notes-astronomiques>) in this distribution.
 
-L<https://stjarnhimlen.se/comp/riset.html> 
+L<https://stjarnhimlen.se/comp/riset.html>
 
 =cut

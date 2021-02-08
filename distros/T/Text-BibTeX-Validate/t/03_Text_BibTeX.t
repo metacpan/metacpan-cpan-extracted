@@ -1,10 +1,15 @@
 use strict;
 use warnings;
 
+use Test::More;
+
+eval 'use Text::BibTeX';
+plan skip_all => 'Text::BibTeX required' if $@;
+
 use File::Temp;
-use Test::More tests => 2;
-use Text::BibTeX;
 use Text::BibTeX::Validate qw( validate_BibTeX );
+
+plan tests => 2;
 
 my $tmp = File::Temp->new();
 my $fh;

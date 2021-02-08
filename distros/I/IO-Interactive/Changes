@@ -1,5 +1,9 @@
 Revision history for Perl module IO::Interactive
 
+1.023 2021-02-03T22:37:57Z
+	* Explain why ARGV is a problem (Github #9)
+	* Freshen distro, remove Travis CI, add Github Actions
+
 1.022 2016-09-04T05:31:39Z
 	* Stable release with some performance enhancements
 

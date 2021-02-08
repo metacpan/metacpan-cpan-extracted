@@ -39,8 +39,10 @@ is($me->signature_base,
    'UlNBLVNIQTI1Ng==', 'Base String');
 
 ok(!$me->signed, 'Envelope not signed');
+ok(!$me->signature, 'Envelope has no signature');
 
 $me->sign($mkey_string);
+ok($me->signature, 'Envelope has signatures');
 
 ok($me->signed, 'Envelope signed');
 

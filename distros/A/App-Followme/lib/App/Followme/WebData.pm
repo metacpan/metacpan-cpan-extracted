@@ -10,7 +10,7 @@ use base qw(App::Followme::FileData);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -21,7 +21,7 @@ sub parameters {
     return (
             body_tag => 'primary',
             metadata_tag => 'meta',
-            web_extension => 'html',
+            extension => '',
            );
 }
 
@@ -70,12 +70,20 @@ sub fetch_sections {
     my %section;
     foreach my $section_name (qw(metadata body)) {
         my $tag = $self->{$section_name . '_tag'};
-        die "Couldn't find $section_name\n" unless exists $section->{$tag};
-
-        $section{$section_name} = $section->{$tag};
+        $section{$section_name} = $section->{$tag} || '';
     }
 
     return \%section;
+}
+
+#----------------------------------------------------------------------
+# Initialize the extension if unset
+
+sub setup {
+    my ($self, %configuration) = @_;
+
+    $self->{extension} ||= $self->{web_extension};
+    return;
 }
 
 1;
@@ -127,7 +135,7 @@ The name of the section containing the body text. The default value is
 The name of the section containing the metadata tags. The default value is
 'meta'.
 
-=item web_extension
+=item extension
 
 The file extension of web pages. The default value is 'html'.
 

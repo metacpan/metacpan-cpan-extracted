@@ -1,9 +1,9 @@
 package ColorThemeUtil::ANSI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2021-02-06'; # DATE
 our $DIST = 'ColorThemeUtil-ANSI'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -20,6 +20,11 @@ sub item_color_to_ansi {
     my ($color, $is_bg) = @_;
 
     return unless defined $color && length($color);
+
+    # force color depth detection
+    Color::ANSI::Util::_color_depth();
+
+    return "" if !$Color::ANSI::Util::_color_depth;
 
     my $ansi;
     if (ref $color eq 'HASH') {
@@ -56,7 +61,7 @@ ColorThemeUtil::ANSI - Utility routines related to color themes and ANSI code
 
 =head1 VERSION
 
-This document describes version 0.001 of ColorThemeUtil::ANSI (from Perl distribution ColorThemeUtil-ANSI), released on 2020-06-09.
+This document describes version 0.002 of ColorThemeUtil::ANSI (from Perl distribution ColorThemeUtil-ANSI), released on 2021-02-06.
 
 =head1 FUNCTIONS
 
@@ -83,7 +88,7 @@ Source repository is at L<https://github.com/perlancar/perl-ColorThemeUtil-ANSI>
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ColorThemeUtil-ANSI>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-ColorThemeUtil-ANSI/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -99,7 +104,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

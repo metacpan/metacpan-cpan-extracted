@@ -1,3 +1,16 @@
+0.004   2021-01-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: list-metacpan-distributions (not much filtering or fields
+          BTW, since what the API offers is not much).
+
+	[cli list-metacpan-releases]
+
+        - Add filtering options --status (--latest, --cpan, --backpan) &
+	  --first.
+
+        - Return 'status' and 'first' fields.
+
+
 0.003   2021-01-01  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

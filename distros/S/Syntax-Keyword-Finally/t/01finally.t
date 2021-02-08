@@ -222,18 +222,20 @@ use Syntax::Keyword::Finally;
     is($e, "Oopsie\n", 'Thrown exception still occurs after FINALLY');
 }
 
-# {
-#     my $sub = sub {
-#         FINALLY { die "Oopsie\n"; }
-#         return "retval";
-#     };
-# 
-#     my $e = defined eval { $sub->(); 1 } ? undef : $@;
-# 
-#     is($e, "Oopsie\n", 'FINALLY block can throw exception');
-# }
-
 {
+    my $sub = sub {
+        FINALLY { die "Oopsie\n"; }
+        return "retval";
+    };
+
+    my $e = defined eval { $sub->(); 1 } ? undef : $@;
+
+    is($e, "Oopsie\n", 'FINALLY block can throw exception');
+}
+
+SKIP: {
+   skip "Double exceptions break eval {} on older perls", 1 if $] < 5.020;
+
     my $sub = sub {
         FINALLY { die "Oopsie 1\n"; }
         die "Oopsie 2\n";

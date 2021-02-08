@@ -2,13 +2,16 @@ package Test::Class::Moose::Runner;
 
 # ABSTRACT: Runner for Test::Class::Moose tests
 
+use strict;
+use warnings;
+use namespace::autoclean;
+
 use 5.010000;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Moose 2.0000;
 use Carp;
-use namespace::autoclean;
 
 use Test::Class::Moose::Config;
 
@@ -54,6 +57,7 @@ has '_executor' => (
 
 my %config_attrs = map { $_->init_arg => 1 }
   Test::Class::Moose::Config->meta->get_all_attributes;
+
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
@@ -95,6 +99,8 @@ sub _build__executor {
     return $executor;
 }
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__
@@ -109,7 +115,7 @@ Test::Class::Moose::Runner - Runner for Test::Class::Moose tests
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -166,8 +172,8 @@ when running C<prove -v ...>, for example.
 
 =item * C<jobs>
 
-This defaults to 1. If you set this to a larger number than test instances
-will be run in parallel. See the L</PARALLEL RUNNING> section below for more
+This defaults to 1. If you set this to a larger number than test instances will
+be run in parallel. See the L</PARALLEL RUNNING> section below for more
 details.
 
 =item * C<show_parallel_progress>
@@ -198,8 +204,8 @@ order you specify.
 
 =item * C<test_classes>
 
-Takes a class name or an array reference of class names. If it is present,
-only these test classes will be run. This is very useful if you wish to run an
+Takes a class name or an array reference of class names. If it is present, only
+these test classes will be run. This is very useful if you wish to run an
 individual class as a test:
 
     My::Base::Class->new(
@@ -249,9 +255,9 @@ included. B<However>, they must still start with C<test_>. See C<include>.
 =item * C<include_tags>
 
 Array ref of strings matching method tags (a single string is also ok). If
-present, only test methods whose tags match C<include_tags> or whose tags
-don't match C<exclude_tags> will be included. B<However>, they must still
-start with C<test_>.
+present, only test methods whose tags match C<include_tags> or whose tags don't
+match C<exclude_tags> will be included. B<However>, they must still start with
+C<test_>.
 
 For example:
 
@@ -299,8 +305,8 @@ This method runs your tests. It accepts no arguments.
 This returns a L<Test::Class::Moose::Config> for the runner.
 
 Most of the attributes passed to the runner are actually available in a
-L<Test::Class::Moose::Config> rather than the runner itself. This may change
-in a future release, in which case this method will simply return the runner
+L<Test::Class::Moose::Config> rather than the runner itself. This may change in
+a future release, in which case this method will simply return the runner
 itself for backwards compatibility.
 
 =head2 C<< $runner->test_report >>
@@ -320,9 +326,9 @@ parameter when creating a runner object:
   Test::Class::Moose::Runner->new( jobs => 4 )->runtests;
 
 Your test classes will be run in parallel in separate child processes. Test
-classes are parallelized on a B<per instance basis>. This means that each
-child process constructs a single instance of a test class and runs all of
-the methods belonging to that class.
+classes are parallelized on a B<per instance basis>. This means that each child
+process constructs a single instance of a test class and runs all of the
+methods belonging to that class.
 
 If you are using parameterized test instances (see the L<Test::Class::Moose>
 docs for details) then the same class may have instances running in different
@@ -359,7 +365,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

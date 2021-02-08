@@ -28,4 +28,7 @@ is $router->path_for({ controller => 'Download', action => 'file' }, { splat => 
 is $router->path_for({ controller => 'NoSuchController', action => 'show' }),
    undef;
 
+is $router->path_for({ controller => 'Blog', action => 'monthly' }, { year => 2015 }),
+   '/blog/2015/';
+
 done_testing;

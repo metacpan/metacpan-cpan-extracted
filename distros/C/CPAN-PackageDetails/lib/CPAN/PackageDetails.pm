@@ -1,17 +1,18 @@
+use 5.008;
+
 package CPAN::PackageDetails;
 use strict;
 use warnings;
-
-use subs qw();
 
 use Carp qw(carp croak cluck confess);
 use Cwd;
 use File::Basename;
 use File::Spec::Functions;
 
-our $VERSION;
-
-BEGIN { $VERSION = '0.262' }
+use vars qw( $VERSION );
+BEGIN { # needed later in another BEGIN
+	$VERSION = '0.263';
+	}
 
 =encoding utf8
 
@@ -424,7 +425,7 @@ sub write_fh {
 =item check_file( FILE, CPAN_PATH )
 
 This method takes an existing F<02packages.details.txt.gz> named in FILE and
-the the CPAN root at CPAN_PATH (to append to the relative paths in the
+the CPAN root at CPAN_PATH (to append to the relative paths in the
 index), then checks the file for several things:
 
 	1. That there are entries in the file
@@ -838,7 +839,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2009-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2009-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

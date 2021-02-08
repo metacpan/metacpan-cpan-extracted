@@ -24,7 +24,7 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 );
 
 use vars qw($VERSION $PKTSIZE);
-$VERSION = '1.176';
+$VERSION = '1.177';
 $PKTSIZE = $^O eq 'linux' ? 3_000 : 100;
 
 use Carp qw(croak);
@@ -83,7 +83,10 @@ sub spawn {
   croak "$type requires an even number of parameters" if @_ % 2;
   my %params = @_;
 
-  croak "$type requires root privilege" unless can_open_socket();
+  my $socket        = delete $params{Socket};
+  croak "$type requires root privilege" unless (
+    defined $socket or can_open_socket()
+  );
 
   my $alias         = delete $params{Alias};
   $alias            = "pinger" unless defined $alias and length $alias;
@@ -92,7 +95,6 @@ sub spawn {
   $timeout          = 1 unless defined $timeout and $timeout >= 0;
 
   my $onereply      = delete $params{OneReply};
-  my $socket        = delete $params{Socket};
   my $parallelism   = delete $params{Parallelism} || -1;
   my $rcvbuf        = delete $params{BufferSize};
   my $always_decode = delete $params{AlwaysDecodeAddress};

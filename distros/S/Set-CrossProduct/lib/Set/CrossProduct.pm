@@ -2,12 +2,9 @@ package Set::CrossProduct;
 use strict;
 
 use warnings;
-no warnings;
+use warnings::register;
 
-use subs qw();
-use vars qw( $VERSION );
-
-$VERSION = '2.004';
+our $VERSION = '2.006';
 
 =encoding utf8
 
@@ -136,7 +133,7 @@ With this module I take all of the values for each test and
 create every possibility in the hopes of exercising all of the
 code. Of course, your use is probably more interesting. :)
 
-=head1 METHODS
+=head2 Class Methods
 
 =over 4
 
@@ -145,7 +142,9 @@ code. Of course, your use is probably more interesting. :)
 =item * new( { LABEL => [ ... ], LABEL2 => [ ... ] } )
 
 Given arrays that represent some sets, return a C<Set::CrossProduct>
-instance that represents the cross product of those sets.
+instance that represents the cross product of those sets. If you don't
+provide at least two sets, C<new> returns undef and will emit a warning
+if warnings are enabled.
 
 You can create the sets in two different ways: unlabeled and labeled sets.
 
@@ -207,14 +206,21 @@ sub new {
 		$self->{arrays}  = $constructor_ref;
 		}
 	else {
+		warnings::warn( "Set::Crossproduct->new takes an array or hash reference" ) if warnings::enabled();
 		return;
 		}
 
 	my $array_ref = $self->{arrays};
-	return unless @$array_ref > 1;
+	unless( @$array_ref > 1 ) {
+		warnings::warn( "You need at least two sets for Set::CrossProduct to work" ) if warnings::enabled();
+		return;
+		}
 
 	foreach my $array ( @$array_ref ) {
-		return unless ref $array eq ref [];
+		unless( ref $array eq ref [] ) {
+			warnings::warn( "Each array element or hash value needs to be an array reference" ) if warnings::enabled();
+			return;
+			}
 		}
 
 	$self->{counters} = [ map { 0 }      @$array_ref ];
@@ -228,6 +234,46 @@ sub new {
 	bless $self, $class;
 
 	return $self;
+	}
+
+=back
+
+=head2 Instance methods
+
+=over 4
+
+=cut
+
+
+sub _decrement {
+	my $self = shift;
+
+	my $tail = $#{ $self->{counters} };
+
+	$self->{counters} = $self->_previous( $self->{counters} );
+	$self->{previous} = $self->_previous( $self->{counters} );
+
+	return 1;
+	}
+
+sub _find_ref {
+	my ($self, $which) = @_;
+
+	my $place_func =
+		  ($which eq 'next') ? sub { $self->{counters}[shift] }
+		: ($which eq 'prev') ? sub { $self->{previous}[shift] }
+		: ($which eq 'rand') ? sub { rand(1 + $self->{lengths}[shift]) }
+		:                      undef;
+
+	return unless $place_func;
+
+	my @indices = (0 .. $#{ $self->{arrays} });
+
+	if ($self->{labels}) {
+		 return +{ map {  $self->{labels}[$_] => ${ $self->{arrays}[$_] }[ $place_func->($_) ]  } @indices } }
+	else {
+		return [ map {  ${ $self->{arrays}[$_] }[ $place_func->($_) ]  } @indices ]
+		}
 	}
 
 sub _increment {
@@ -253,17 +299,6 @@ sub _increment {
 
 		$self->{counters}[$tail]++;
 		}
-
-	return 1;
-	}
-
-sub _decrement {
-	my $self = shift;
-
-	my $tail = $#{ $self->{counters} };
-
-	$self->{counters} = $self->_previous( $self->{counters} );
-	$self->{previous} = $self->_previous( $self->{counters} );
 
 	return 1;
 	}
@@ -296,16 +331,6 @@ sub _previous {
 	return $counters;
 	}
 
-=item * labeled()
-
-Return true if the sets are labeled (i.e. you made the object from
-a hash ref). Returns false otherwise. You might use this to figure out
-what sort of value C<get> will return.
-
-=cut
-
-sub labeled { !! $_[0]->{labeled} }
-
 =item * cardinality()
 
 Return the carnality of the cross product.  This is the number
@@ -330,22 +355,42 @@ sub cardinality {
 	return $product;
 	}
 
-=item * reset_cursor()
+=item * combinations()
 
-Return the pointer to the first element of the cross product.
+In scalar context, returns a reference to an array that contains all
+of the tuples of the cross product. In list context, it returns the
+list of all tuples. You should probably always use this in scalar
+context except for very low cardinalities to avoid huge return values.
+
+This can be quite large, so you might want to check the cardinality
+first. The array elements are the return values for C<get>.
 
 =cut
 
-sub reset_cursor {
+sub combinations {
 	my $self = shift;
 
-	$self->{counters} = [ map { 0 } @{ $self->{counters} } ];
-	$self->{previous} = [];
-	$self->{ungot}    = 1;
-	$self->{done}     = 0;
+	my @array = ();
 
-	return 1;
+	while( my $ref = $self->get ) {
+		push @array, $ref;
+		}
+
+	if( wantarray ) { return  @array }
+	else            { return \@array }
 	}
+
+=item * done()
+
+Without an argument, C<done> returns true if there are no more
+combinations to fetch with C<get> and returns false otherwise.
+
+With an argument, it acts as if there are no more arguments to fetch, no
+matter the value. If you want to start over, use C<reset_cursor> instead.
+
+=cut
+
+sub done { $_[0]->{done} = 1 if @_ > 1; $_[0]->{done} }
 
 =item * get()
 
@@ -378,52 +423,15 @@ sub get {
 	else            { return $next_ref }
 	}
 
-sub _find_ref {
-	my ($self, $which) = @_;
+=item * labeled()
 
-	my $place_func =
-		  ($which eq 'next') ? sub { $self->{counters}[shift] }
-		: ($which eq 'prev') ? sub { $self->{previous}[shift] }
-		: ($which eq 'rand') ? sub { rand(1 + $self->{lengths}[shift]) }
-		:                      undef;
-
-	return unless $place_func;
-
-	my @indices = (0 .. $#{ $self->{arrays} });
-
-	if ($self->{labels}) {
-		 return +{ map {  $self->{labels}[$_] => ${ $self->{arrays}[$_] }[ $place_func->($_) ]  } @indices } }
-	else {
-		return [ map {  ${ $self->{arrays}[$_] }[ $place_func->($_) ]  } @indices ]
-		}
-	}
-
-=item * unget()
-
-Pretend we did not get the tuple we just got.  The next time we get a
-tuple, we will get the same thing.  You can use this to peek at the
-next value and put it back if you do not like it.
-
-You can only do this for the previous tuple.  C<unget> does not do
-multiple levels of unget.
+Return true if the sets are labeled (i.e. you made the object from
+a hash ref). Returns false otherwise. You might use this to figure out
+what sort of value C<get> will return.
 
 =cut
 
-sub unget {
-	my $self = shift;
-
-	return if $self->{ungot};
-
-	$self->{counters} = $self->{previous};
-
-	$self->{ungot} = 1;
-
-	# if we just got the last element, we had set the done flag,
-	# so unset it.
-	$self->{done}  = 0;
-
-	return 1;
-	}
+sub labeled { !! $_[0]->{labeled} }
 
 =item * next()
 
@@ -459,18 +467,6 @@ sub previous {
 	else            { return $prev_ref }
 	}
 
-=item * done()
-
-Without an argument, C<done> returns true if there are no more
-combinations to fetch with C<get> and returns false otherwise.
-
-With an argument, it acts as if there are no more arguments to fetch, no
-matter the value. If you want to start over, use C<reset_cursor> instead.
-
-=cut
-
-sub done { $_[0]->{done} = 1 if @_ > 1; $_[0]->{done} }
-
 =item * random()
 
 Return a random tuple from the cross product. The return value is the
@@ -487,32 +483,51 @@ sub random {
 	else            { return $rand_ref }
 	}
 
-=item * combinations()
+=item * reset_cursor()
 
-Returns a reference to an array that contains all of the tuples
-of the cross product.  This can be quite large, so you might
-want to check the cardinality first. The array elements are the
-return values for C<get>.
-
-You should probably always use this in scalar context except for
-very low cardinalities to avoid huge return values.
-
-=back
+Return the pointer to the first element of the cross product.
 
 =cut
 
-sub combinations {
+sub reset_cursor {
 	my $self = shift;
 
-	my @array = ();
+	$self->{counters} = [ map { 0 } @{ $self->{counters} } ];
+	$self->{previous} = [];
+	$self->{ungot}    = 1;
+	$self->{done}     = 0;
 
-	while( my $ref = $self->get ) {
-		push @array, $ref;
-		}
-
-	if( wantarray ) { return  @array }
-	else            { return \@array }
+	return 1;
 	}
+
+=item * unget()
+
+Pretend we did not get the tuple we just got.  The next time we get a
+tuple, we will get the same thing.  You can use this to peek at the
+next value and put it back if you do not like it.
+
+You can only do this for the previous tuple.  C<unget> does not do
+multiple levels of unget.
+
+=cut
+
+sub unget {
+	my $self = shift;
+
+	return if $self->{ungot};
+
+	$self->{counters} = $self->{previous};
+
+	$self->{ungot} = 1;
+
+	# if we just got the last element, we had set the done flag,
+	# so unset it.
+	$self->{done}  = 0;
+
+	return 1;
+	}
+
+=back
 
 =head1 TO DO
 

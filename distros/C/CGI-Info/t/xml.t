@@ -27,13 +27,13 @@ XML: {
 	my $i = new_ok('CGI::Info');
 	my %p = %{$i->params({expect => \@expect})};
 	ok(exists($p{XML}));
-	ok($p{XML} eq $xml);	# Fails on Perl 5.6.2
-	ok($i->as_string() eq "XML=$xml");
+	is($p{XML}, $xml);	# Fails on Perl 5.6.2
+	is($i->as_string(), "XML=$xml");
 
 	$i = $i->new();	# A second instantiation should get the same data
 	isa_ok($i, 'CGI::Info');
 	my $p = $i->params();
 	ok(exists($p->{XML}));
-	ok($p{XML} eq $xml);	# Fails on Perl 5.6.2
-	ok($i->as_string() eq "XML=$xml");
+	is($p{XML}, $xml);	# Fails on Perl 5.6.2
+	is($i->as_string(), "XML=$xml");
 }

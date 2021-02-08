@@ -9,6 +9,7 @@ LinkEmbedder->new->test_ok(
   'https://travis-ci.org/Nordaaker/convos/builds/47421379' => {
     isa              => 'LinkEmbedder::Link::Travis',
     cache_age        => 0,
+    class            => 'le-rich le-card le-image-card le-provider-travis',
     html             => html(),
     provider_name    => 'Travis',
     provider_url     => 'https://travis-ci.org',
@@ -26,7 +27,7 @@ done_testing;
 
 sub html {
   return <<'HERE';
-<div class="le-card le-image-card le-rich le-provider-travis">
+<div class="le-rich le-card le-image-card le-provider-travis">
     <a href="https://travis-ci.org/Nordaaker/convos/builds/47421379" class="le-thumbnail">
       <img src="https://cdn.travis-ci.org/images/logos/TravisCI-Mascot-1-20feeadb48fc2492ba741d89cb5a5c8a.png" alt="Placeholder">
     </a>

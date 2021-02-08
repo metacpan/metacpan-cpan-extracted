@@ -1,5 +1,8 @@
 Revision history for Perl extension Config-PL
 
+0.03 2021-02-08T06:01:09Z
+    - Fix $! missing from an error message (ybrliiu++)
+
 0.02 2013-05-26T14:57:09Z
     - narrow localize scope to prevent intended behavior. (Thanks gSVubG)
 

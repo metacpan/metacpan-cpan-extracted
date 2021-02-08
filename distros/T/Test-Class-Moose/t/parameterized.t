@@ -1,18 +1,20 @@
 use strict;
 use warnings;
 
-use lib 't/lib';
+use FindBin qw( $Bin );
+use lib "$Bin/lib";
 
 use Test2::API qw( intercept );
 use Test2::V0;
 use Test::Events;
 use Test::Reporting qw( test_report );
 
-use Test::Class::Moose::Load qw(t/parameterizedlib);
+use Test::Class::Moose::Load "$Bin/parameterizedlib";
 use Test::Class::Moose::Runner;
 
 my $runner = Test::Class::Moose::Runner->new;
 
+## no critic (Subroutines::ProtectPrivateSubs)
 is( [   sort  { $a cmp $b }
           map { $_->test_instance_name }
           TestsFor::Parameterized->_tcm_make_test_class_instances

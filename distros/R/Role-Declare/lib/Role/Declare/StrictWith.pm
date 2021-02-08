@@ -35,6 +35,8 @@ Which is equivalent to:
 
 =head1 DESCRIPTION
 
+B<WARNING:> This module is deprecated in favour of L<Role::Declare::Should>.
+
 This module provides B<with_strict> - a version of L<Role::Tiny::With>'s
 L<with> which only works when L<Devel::StrictMode> is on.
 If B<STRICT> is not enabled, B<with_strict> is a no-op.

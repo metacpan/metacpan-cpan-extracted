@@ -1,5 +1,9 @@
 Revision history for Perl extension WebService-Slack-WebApi
 
+0.18 2021-02-06T13:56:26Z
+    - add oauth.v2.access method (thx mikkoi)
+    - pass token by HTTP header instead of POST body (thx mikkoi)
+
 0.17 2020-12-12T10:48:35Z
     - allow user to decide the HTTP user agent (thx mikkoi)
     - correct parameter for conversations.open (thx mikkoi)

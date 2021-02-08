@@ -1,7 +1,7 @@
 #ifndef SPVM_PACKAGE_H
 #define SPVM_PACKAGE_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
 enum {
   SPVM_PACKAGE_C_CATEGORY_CLASS,
@@ -17,7 +17,7 @@ enum {
 
 extern const char* const SPVM_PACKAGE_C_CATEGORY_NAMES[];
 
-struct SPVM_package {
+struct spvm_package {
   SPVM_OP* op_package;
   SPVM_OP* op_name;
   SPVM_LIST* package_vars;
@@ -51,6 +51,9 @@ struct SPVM_package {
   const char* name;
   SPVM_OP* op_begin_sub;
   int32_t fail_load;
+  int32_t has_precompile_descriptor;
+  SPVM_LIST* anon_subs;
+  int8_t is_anon;
 };
 
 SPVM_PACKAGE* SPVM_PACKAGE_new(SPVM_COMPILER* compiler);

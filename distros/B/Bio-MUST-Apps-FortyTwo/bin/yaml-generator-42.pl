@@ -3,8 +3,6 @@
 # ABSTRACT: Interactive or batch generator for 42 YAML config files
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
 
-# TODO: fix empty --tax_score_mul in recall command: how?
-
 use autodie;
 use Modern::Perl '2011';
 
@@ -215,6 +213,7 @@ trim_extra_margin: [% trim_extra_margin %][%- END %]
 # The details of this merging step can be fine-tuned by editing the other
 # merge_* parameters of this configuration file.
 # When not specified, 'merge_orthologues' internally defaults to 'off'.
+# The YAML wizard automatically sets it to 'off' if 'run_mode' is 'metagenomic'.
 merge_orthologues: [% merge_orthologues %]
 
 [% IF merge_orthologues == 'on' -%]
@@ -242,6 +241,7 @@ merge_min_len: [% merge_min_len %][%- END %]
 # in exonerate executable. This causes new seqs to be lost. To automatically
 # retry aligning them with BLAST in case of failure, use the 'exoblast' mode.
 # When not specified, 'aligner_mode' internally defaults to 'blast'.
+# The YAML wizard automatically sets it to 'off' if 'run_mode' is 'metagenomic'.
 aligner_mode: [% aligner_mode %]
 
 [% UNLESS aligner_mode == 'off' %]
@@ -292,7 +292,7 @@ ali_keep_lengthened_seqs: [% ali_keep_lengthened_seqs %]
 # The details of this taxonomic analysis can be fine-tuned by editing the
 # other tax_* parameters of this configuration file.
 # When not specified, 'tax_reports' internally defaults to 'off'. Yet, the
-# YAML generator automatically sets it to 'on' if 'run_mode' is 'metagenomic'.
+# The YAML wizard automatically sets it to 'on' if 'run_mode' is 'metagenomic'.
 [% IF tax_reports %]tax_reports: [% tax_reports %][% ELSE %]tax_reports: on[% END -%]
 
 [% IF tax_dir %]
@@ -380,7 +380,7 @@ orgs: [% FOREACH bank IN org_for.keys.sort %]
 #yaml-generator-42.pl --run_mode=[% run_mode %][% IF SSUrRNA %] --SSUrRNA[% END %] --out_suffix=[% out_suffix %] \
 #--queries [% queries %] \
 #--evalue=[% evalue %][% UNLESS SSUrRNA %] --homologues_seg=[% homologues_seg %][% END %] --max_target_seqs=[% max_target_seqs %][% UNLESS SSUrRNA %] --templates_seg=[% templates_seg %][% END %] \
-#--bank_dir [% bank_dir %] --bank_suffix=[% bank_suffix %] --bank_mapper [% bank_mapper %] \
+#--bank_dir [% bank_dir %] --bank_suffix=[% bank_suffix %] --bank_mapper [% bank_mapper %] --code=[% code %]\
 #--ref_brh=[% ref_brh -%][% IF ref_brh == 'on' %] --ref_bank_dir [% ref_bank_dir %] --ref_bank_suffix=[% ref_bank_suffix %] --ref_bank_mapper [% ref_bank_mapper %] \
 #--ref_org_mul=[% ref_org_mul %] --ref_score_mul=[% ref_score_mul %][%- END %] \
 #--trim_homologues=[% trim_homologues %][% IF trim_homologues == 'on' %] --trim_max_shift=[% trim_max_shift %] --trim_extra_margin=[% trim_extra_margin %][%- END %] \
@@ -402,7 +402,7 @@ my $tt_cmd = <<'EOT';
 yaml-generator-42.pl --run_mode=[% run_mode %][% IF SSUrRNA %] --SSUrRNA[% END %] --out_suffix=[% out_suffix %] \
 --queries [% queries %] \
 --evalue=[% evalue %][% UNLESS SSUrRNA %] --homologues_seg=[% homologues_seg %][% END %] --max_target_seqs=[% max_target_seqs %][% UNLESS SSUrRNA %] --templates_seg=[% templates_seg %][% END %] \
---bank_dir [% bank_dir %] --bank_suffix=[% bank_suffix %] --bank_mapper [% bank_mapper %] \
+--bank_dir [% bank_dir %] --bank_suffix=[% bank_suffix %] --bank_mapper [% bank_mapper %] --code=[% code %]\
 --ref_brh=[% ref_brh -%][% IF ref_brh == 'on' %] --ref_bank_dir [% ref_bank_dir %] --ref_bank_suffix=[% ref_bank_suffix %] --ref_bank_mapper [% ref_bank_mapper %] \
 --ref_org_mul=[% ref_org_mul %] --ref_score_mul=[% ref_score_mul %][%- END %] \
 --trim_homologues=[% trim_homologues %][% IF trim_homologues == 'on' %] --trim_max_shift=[% trim_max_shift %] --trim_extra_margin=[% trim_extra_margin %][%- END %] \
@@ -574,9 +574,11 @@ if ( $ARGV{'--wizard'} ) {
                 $tax_filter = prompt "\nIs taxonomic classification needed?", -menu => { Yes => 1, no => 0 };
             }
         }
+
         else {
-            $ARGV{'--aligner_mode'} = 'off';
             $ARGV{'--tax_reports'} = 'on';
+            $ARGV{'--aligner_mode'} = 'off';
+            $ARGV{'--merge_orthologues'} = 'off';
         }
 
         if ($ARGV{'--run_mode'} eq 'metagenomic' || $tax_filter) {
@@ -897,7 +899,7 @@ yaml-generator-42.pl - Interactive or batch generator for 42 YAML config files
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =head1 USAGE
 
@@ -1178,6 +1180,7 @@ MEGAN-like mode i.e. based on bitscore.
 =item --tax_score_mul=<n>
 
 =for Euclid: n.type: number, n >= 0 && n <= 1
+    n.default: 0
 
 =item --ali_keep_lengthened_seqs=<str>
 

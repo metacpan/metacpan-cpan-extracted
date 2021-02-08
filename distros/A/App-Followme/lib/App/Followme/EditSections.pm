@@ -11,7 +11,7 @@ use base qw(App::Followme::Module);
 use File::Spec::Functions qw(catfile);
 use App::Followme::FIO;
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -155,7 +155,7 @@ sub update_folder {
     my ($self, $folder, $prototype_file, $prototype) = @_;
 
     my $index_file = $self->to_file($folder);
-    my $files = $self->{data}->build('files', $index_file);
+    my $files = $self->{data}->build('files_by_mdate_reversed', $index_file);
 
     unless (defined $prototype_file) {
         if (@$files) {

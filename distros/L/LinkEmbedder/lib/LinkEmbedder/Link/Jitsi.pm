@@ -22,4 +22,4 @@ sub learn_p {
 
 __DATA__
 @@ jitsi.html.ep
-<iframe allow="camera;microphone" class="le-rich le-provider-jitsi" width="<%= $l->width || 600 %>" height="<%= $l->height || 400 %>" style="border:0;width:100%" frameborder="0" allowfullscreen src="<%= $l->{iframe_src} %>"></iframe>
+<iframe allow="camera;microphone" class="le-rich le-video-chat le-provider-jitsi" width="<%= $l->width || 600 %>" height="<%= $l->height || 400 %>" style="border:0;width:100%" frameborder="0" allowfullscreen src="<%= $l->{iframe_src} %>"></iframe>

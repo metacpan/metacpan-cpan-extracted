@@ -26,50 +26,50 @@ no_index:
 provides:
   BoardStreams:
     file: lib/BoardStreams.pm
-    version: v0.0.9
+    version: v0.0.11
   BoardStreams::Client:
     file: lib/BoardStreams/Client.pm
+    version: v0.0.11
   BoardStreams::Client::Channel:
     file: lib/BoardStreams/Client/Channel.pm
-    version: v0.0.9
+    version: v0.0.11
   BoardStreams::Client::Manager:
     file: lib/BoardStreams/Client/Manager.pm
-    version: v0.0.9
+    version: v0.0.11
   BoardStreams::Client::StructDiff:
     file: lib/BoardStreams/Client/StructDiff.pm
-    version: v0.0.9
+    version: v0.0.11
   BoardStreams::Client::Utils:
     file: lib/BoardStreams/Client/Utils.pm
-    version: v0.0.9
+    version: v0.0.11
   BoardStreams::Client::WebSocket:
     file: lib/BoardStreams/Client/WebSocket.pm
-    version: v0.0.9
+    version: v0.0.11
   BoardStreams::DBMigrations:
     file: lib/BoardStreams/DBMigrations.pm
-    version: v0.0.9
+    version: v0.0.11
   BoardStreams::Exception:
     file: lib/BoardStreams/Exception.pm
-    version: v0.0.9
+    version: v0.0.11
   BoardStreams::Exception::DbError:
     file: lib/BoardStreams/Exception.pm
-    version: v0.0.9
+    version: v0.0.11
   BoardStreams::Exception::DbError::Duplicate:
     file: lib/BoardStreams/Exception.pm
-    version: v0.0.9
+    version: v0.0.11
   BoardStreams::ListenerObservable:
     file: lib/BoardStreams/ListenerObservable.pm
-    version: v0.0.9
+    version: v0.0.11
   BoardStreams::Registry:
     file: lib/BoardStreams/Registry.pm
-    version: v0.0.9
+    version: v0.0.11
   BoardStreams::Util:
     file: lib/BoardStreams/Util.pm
-    version: v0.0.9
+    version: v0.0.11
   Mojolicious::Plugin::BoardStreams:
     file: lib/Mojolicious/Plugin/BoardStreams.pm
-    version: v0.0.9
+    version: v0.0.11
 requires:
-  CryptX: '0'
   Data::Dump: '0'
   Data::GUID: '0'
   Future::AsyncAwait: '0.36'
@@ -89,7 +89,7 @@ resources:
   bugtracker: https://gitlab.com/karjala/boardstreams.pm/issues
   homepage: https://gitlab.com/karjala/boardstreams.pm
   repository: git://gitlab.com/karjala/boardstreams.pm.git
-version: v0.0.9
+version: v0.0.11
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

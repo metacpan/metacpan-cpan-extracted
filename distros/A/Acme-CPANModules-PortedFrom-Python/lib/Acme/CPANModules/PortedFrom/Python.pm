@@ -1,7 +1,7 @@
 package Acme::CPANModules::PortedFrom::Python;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-02-05'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => "Modules/applications that are ported from (or inspired by) ".
@@ -22,6 +22,20 @@ _
             python_package => 'argparse',
             tags => ['cli'],
         },
+        {
+            module => 'PSGI',
+            python_package => undef,
+            python_url => 'https://www.python.org/dev/peps/pep-3333/',
+            tags => ['web'],
+            description => <<'_',
+
+From Plack's documentation: "Plack is like Ruby's Rack or Python's Paste for
+WSGI." Plack and PSGI was created by MIYAGAWA in 2009 and is inspired by both
+Python's WSGI specification (hence the dual specification-implementation split)
+and Plack (hence the name).
+
+_
+        },
     ],
 };
 
@@ -40,15 +54,18 @@ Acme::CPANModules::PortedFrom::Python - Modules/applications that are ported fro
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::PortedFrom::Python (from Perl distribution Acme-CPANModules-PortedFrom-Python), released on 2020-02-07.
+This document describes version 0.003 of Acme::CPANModules::PortedFrom::Python (from Perl distribution Acme-CPANModules-PortedFrom-Python), released on 2021-02-05.
 
 =head1 DESCRIPTION
 
-Modules/applications that are ported from (or inspired by) Python libraries.
+=head2 SEE ALSO
+
+L<Acme::CPANModules::PortedFrom::Python> and other
+C<Acme::CPANModules::PortedFrom::*> modules.
 
 If you know of others, please drop me a message.
 
-=head1 INCLUDED MODULES
+=head1 ACME::MODULES ENTRIES
 
 =over
 
@@ -56,14 +73,29 @@ If you know of others, please drop me a message.
 
 =item * L<Getopt::ArgParse>
 
+=item * L<PSGI>
+
+From Plack's documentation: "Plack is like Ruby's Rack or Python's Paste for
+WSGI." Plack and PSGI was created by MIYAGAWA in 2009 and is inspired by both
+Python's WSGI specification (hence the dual specification-implementation split)
+and Plack (hence the name).
+
+
 =back
 
 =head1 FAQ
 
-=head2 What are ways to use this module?
+=head2 What is an Acme::CPANModules::* module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanmodules> CLI (from
+L<App::cpanmodules> distribution):
 
     % cpanmodules ls-entries PortedFrom::Python | cpanm -n
 
@@ -71,9 +103,13 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=PortedFrom::Python -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+or directly:
+
+    % perl -MAcme::CPANModules::PortedFrom::Python -E'say $_->{module} for @{ $Acme::CPANModules::PortedFrom::Python::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
 
 =head1 HOMEPAGE
 
@@ -85,7 +121,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Por
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-PortedFrom-Python>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Python/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -103,7 +139,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

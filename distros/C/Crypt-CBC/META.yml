@@ -3,20 +3,24 @@ abstract: unknown
 author:
   - unknown
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.112621'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Crypt-CBC
 no_index:
   directory:
     - t
     - inc
 requires:
-  Digest::MD5: 2.00
-version: 2.33
+  Crypt::Cipher::AES: '0'
+  Crypt::PBKDF2: '0'
+  Digest::MD5: '0'
+  Digest::SHA: '0'
+version: '3.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

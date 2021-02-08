@@ -1,0 +1,12 @@
+id: moo
+en: moo
+ja: モー
+
+id: moo
+en: fruit
+ja: 果物
+
+id: moo
+en: Cola
+ja: コーラ
+

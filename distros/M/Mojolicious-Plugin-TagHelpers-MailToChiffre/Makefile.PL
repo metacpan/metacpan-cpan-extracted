@@ -19,9 +19,17 @@ WriteMakefile(
     },
   META_MERGE   => {
     requires  => { perl => '5.010001' },
+    'meta-spec' => { version => 2 },
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/Akron/Mojolicious-Plugin-TagHelpers-MailToChiffre'
+      repository  => {
+        type => 'git',
+        url => 'https://github.com/Akron/Mojolicious-Plugin-TagHelpers-MailToChiffre.git',
+        web => 'https://github.com/Akron/Mojolicious-Plugin-TagHelpers-MailToChiffre',
+      },
+      bugtracker => {
+        web => 'https://github.com/Akron/Mojolicious-Plugin-TagHelpers-MailToChiffre/issues'
+      }
     }
   },
   MIN_PERL_VERSION => '5.010001',

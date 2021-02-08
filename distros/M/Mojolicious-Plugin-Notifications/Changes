@@ -1,3 +1,6 @@
+1.06 2021-02-08
+        - Move bugtracker to GitHub.
+
 1.05 2020-03-31
         - Fixed a bug using $c->b() in HTML engine,
           I wasn't able to test.

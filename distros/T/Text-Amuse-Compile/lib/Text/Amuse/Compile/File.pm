@@ -80,10 +80,6 @@ An hashref with the options to pass to the templates.
 
 Include paths arrayref.
 
-=item webfonts
-
-The L<Text::Amuse::Compile::Webfonts> object (or undef).
-
 =back
 
 =head1 INTERNALS
@@ -162,7 +158,6 @@ has standalone => (is => 'ro', isa => Bool, default => sub { 0 });
 has tt => (is => 'ro', isa => Object, default => sub { Template::Tiny->new });
 has logger => (is => 'ro', isa => Maybe[CodeRef]);
 has fileobj => (is => 'ro', isa => Maybe[Object]);
-has webfonts => (is => 'ro', isa => Maybe[Object]);
 has document => (is => 'lazy', isa => Object);
 has options => (is => 'ro', isa => HashRef, default => sub { +{} });
 has full_options => (is => 'lazy', isa => HashRef);
@@ -861,42 +856,30 @@ sub epub {
     my $epub = EBook::EPUB::Lite->new;
 
     # embedded CSS
-    my $webfonts;
     if ($self->epub_embed_fonts) {
-        if (my $legacy = $self->webfonts) {
-            $webfonts = $legacy;
-            foreach my $style (qw/regular italic bold bolditalic/) {
-                $epub->copy_file(File::Spec->catfile($legacy->srcdir,
-                                                     $legacy->$style),
-                                 $legacy->$style,
-                                 $legacy->mimetype);
-            }
-        }
+        # pass all
         if (my $fonts = $self->fonts) {
-            my $main = $fonts->main;
-            if ($main->has_files) {
-                # this is not 100% accurate, to be fixed when webfonts
-                # will be deprecated.
-                $webfonts = {
-                             family => $main->name,
-                             regular => $main->regular->basename,
-                             bold => $main->bold->basename,
-                             italic => $main->italic->basename,
-                             bolditalic => $main->bolditalic->basename,
-                             format => $main->regular->format,
-                             size => $fonts->size,
-                            };
-                foreach my $shape (qw/bold italic bolditalic regular/) {
-                    my $fontfile = $main->$shape;
-                    $epub->copy_file($fontfile->file,
-                                     $fontfile->basename,
-                                     $fontfile->mimetype);
+            my %done;
+            foreach my $family (@{ $fonts->families }) {
+                if ($family->has_files) {
+                    foreach my $ff (@{ $family->font_files }) {
+                        # do not produce duplicate entries when using
+                        # the same file
+                        unless ($done{$ff->basename}) {
+                            $epub->copy_file($ff->file,
+                                             $ff->basename,
+                                             $ff->mimetype);
+                            $done{$ff->basename}++;
+                        }
+                    }
                 }
             }
         }
     }
-    my $css = $self->_render_css(epub => 1,
-                                 webfonts => $webfonts );
+    my $css = $self->_render_css(
+                                 epub => 1,
+                                 epub_embed_fonts => $self->epub_embed_fonts,
+                                );
     $epub->add_stylesheet("stylesheet.css" => $css);
 
     # build the title page and some metadata

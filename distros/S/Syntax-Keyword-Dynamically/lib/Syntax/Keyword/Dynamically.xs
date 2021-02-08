@@ -380,14 +380,6 @@ static OP *pp_startdyn(pTHX)
   return cUNOP->op_next;
 }
 
-#define newSTARTDYNOP(flags, expr)  MY_newSTARTDYNOP(aTHX_ flags, expr)
-static OP *MY_newSTARTDYNOP(pTHX_ I32 flags, OP *expr)
-{
-  OP *ret = newUNOP_CUSTOM(flags, expr);
-  cUNOPx(ret)->op_ppaddr = &pp_startdyn;
-  return ret;
-}
-
 /* HELEMDYN is a variant of core's HELEM op which arranges for the existing
  * value (or absence of) the key in the hash to be restored again on scope
  * exit. It copes with missing keys by deleting them again to "restore".
@@ -473,7 +465,7 @@ static int dynamically_keyword(pTHX_ OP **op)
      * and set the same targ on it, then perform that just before the
      * otherwise-unmodified op
      */
-    OP *dynop = newSTARTDYNOP(0, newOP(OP_NULL, 0));
+    OP *dynop = newUNOP_CUSTOM(&pp_startdyn, 0, newOP(OP_NULL, 0));
     dynop->op_targ = aop->op_targ;
 
     *op = op_prepend_elem(OP_LINESEQ,
@@ -509,7 +501,7 @@ static int dynamically_keyword(pTHX_ OP **op)
     /* Rather than splicing in STARTDYN op, we'll just make a new optree */
     *op = newBINOP(aop->op_type, aop->op_flags,
       rvalop,
-      newSTARTDYNOP(aop->op_flags & OPf_STACKED, lvalop));
+      newUNOP_CUSTOM(&pp_startdyn, aop->op_flags & OPf_STACKED, lvalop));
 
     /* op_free will destroy the entire optree so replace the child ops first */
     cBINOPx(aop)->op_first = NULL;
@@ -538,19 +530,24 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op)
   return (*next_keyword_plugin)(aTHX_ kw, kwlen, op);
 }
 
+static void enable_async_mode(pTHX_ void *_unused)
+{
+  if(is_async)
+    return;
+
+  is_async = TRUE;
+  dynamicstack = newAV();
+  av_extend(dynamicstack, 50);
+
+  future_asyncawait_wrap_suspendhook(&S_suspendhook, &nexthook);
+}
+
 MODULE = Syntax::Keyword::Dynamically    PACKAGE = Syntax::Keyword::Dynamically
 
 void
 _enable_async_mode()
   CODE:
-    if(is_async)
-      XSRETURN(0);
-
-    is_async = TRUE;
-    dynamicstack = newAV();
-    av_extend(dynamicstack, 50);
-
-    future_asyncawait_wrap_suspendhook(&S_suspendhook, &nexthook);
+    enable_async_mode(aTHX_ NULL);
 
 BOOT:
   XopENTRY_set(&xop_startdyn, xop_name, "startdyn");
@@ -564,3 +561,5 @@ BOOT:
   DMD_SET_PACKAGE_HELPER("Syntax::Keyword::Dynamically::_DynamicVar", &dmd_help_dynamicvar);
   DMD_SET_PACKAGE_HELPER("Syntax::Keyword::Dynamically::_SuspendedDynamicVar", &dmd_help_suspendeddynamicvar);
 #endif
+
+  future_asyncawait_on_activate(&enable_async_mode, NULL);

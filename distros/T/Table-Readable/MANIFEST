@@ -4,22 +4,29 @@ examples/file.txt
 examples/slash.pl
 examples/synopsis.pl
 examples/whitespace.pl
-go/write.go
-go/write_test.go
 lib/Table/Readable.pm
 lib/Table/Readable.pod
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README
+t/bad-format.t
+t/bad-format.txt
+t/read-table-hash.t
 t/scalar.t
 t/slashes.t
 t/Table-Readable.t
 t/test-duplicates.txt
+t/test-hash-collide.txt
+t/test-hash-missing.txt
+t/test-hash.txt
 t/test-multiline.txt
 t/test-table-1.txt
 t/test-table-comments.txt
 t/test-table-whitespace.txt
+t/TRTest.pm
 t/write-table.t
+table-readable-mode.el
+versionup.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

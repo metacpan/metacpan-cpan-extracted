@@ -4,11 +4,12 @@ package JSON::Schema::Draft201909::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.020';
+our $VERSION = '0.022';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Moo;
 use strictures 2;
 use MooX::TypeTiny;
@@ -40,6 +41,7 @@ has keyword => (
 sub TO_JSON {
   my $self = shift;
   return +{
+    # note that locations are json pointers, not uri fragments!
     instanceLocation => $self->instance_location,
     keywordLocation => $self->keyword_location,
     !defined($self->absolute_keyword_location) ? ()
@@ -64,7 +66,7 @@ JSON::Schema::Draft201909::Error - Contains a single error from a JSON Schema ev
 
 =head1 VERSION
 
-version 0.020
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -117,7 +119,10 @@ The actual error string.
 
 Returns a data structure suitable for serialization. Corresponds to one output unit as specified in
 L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10.4.2> and
-L<https://json-schema.org/draft/2019-09/output/schema>.
+L<https://json-schema.org/draft/2019-09/output/schema>, except that C<instanceLocation> and
+C<keywordLocation> are json pointers, B<not> URI fragments. (See the
+C<strict_basic> L<JSON::Schema::Draft201909/output_format>
+if the distinction is important to you.)
 
 =head1 SUPPORT
 

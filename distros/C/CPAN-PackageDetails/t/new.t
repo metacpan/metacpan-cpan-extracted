@@ -1,4 +1,4 @@
-use Test::More 'no_plan';
+use Test::More;
 
 my $class  = 'CPAN::PackageDetails';
 my $method = 'new';
@@ -6,7 +6,7 @@ my $method = 'new';
 use_ok( $class );
 can_ok( $class, $method );
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Test with no arguments to new
 {
 my $package_details = $class->$method();
@@ -25,15 +25,14 @@ isa_ok( $package_details->entries, $package_details->entries_class );
 # should be able to see the defaults
 can_ok( $package_details, 'default_headers' );
 my %hash = $package_details->default_headers;
-foreach my $default ( keys %hash )
-	{
+foreach my $default ( keys %hash ) {
 	can_ok( $package_details, $default );
-	is( $package_details->$default(), $hash{$default}, 
+	is( $package_details->$default(), $hash{$default},
 		"Right default value for $default" );
 	}
 }
-	
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Test with some arguments to new
 {
 my $url   = 'http://localhost:8088/index.html';
@@ -47,3 +46,5 @@ isa_ok( $package_details, $class );
 can_ok( $package_details, $param );
 is( $package_details->$param(), $url );
 }
+
+done_testing();

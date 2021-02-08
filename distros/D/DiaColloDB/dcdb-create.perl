@@ -264,6 +264,10 @@ dcdb-create.perl - create a DiaColloDB diachronic collocation database
    -[no]times           ##-- do/don't report operating timing (default=do)
    -output OUT          ##-- output directory or client configuration file (required)
 
+ Environment Variables:
+   DIACOLLO_SORT        ##-- system sort command prefix
+   SORT                 ##-- fallback for DIACOLLO_SORT
+
 =cut
 
 ###############################################################

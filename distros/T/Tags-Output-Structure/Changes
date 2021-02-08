@@ -1,3 +1,8 @@
+0.06 2021-02-03T23:10:07+01:00
+ - Fix bugtracker.
+ - Rewrite doc to use =head2 in METHODS section.
+ - Update copyright years.
+
 0.05 2020-08-11T22:32:43+02:00
  - Add REPOSITORY section to doc.
  - Improve LICENSE AND COPYRIGHT section in doc.

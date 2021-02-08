@@ -12,7 +12,7 @@ configure_requires:
   Module::Install: 0
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: artistic2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,6 +23,7 @@ no_index:
     - examples
     - inc
     - t
+    - xt
 requires:
   Alien::GvaScript: 1.43
   Archive::Zip: 0
@@ -58,10 +59,10 @@ requires:
   YAML::Any: 0
   namespace::clean: 0
   parent: 0
-  perl: '5.01'
+  perl: 5.01
 resources:
-  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-AutoCRUD
-  homepage: https://metacpan.org/author/DAMI
+  bugtracker: https://github.com/damil/App-AutoCRUD/issues
+  homepage: https://metacpan.org/pod/App::AutoCRUD
   license: http://www.perlfoundation.org/artistic_license_2_0
-  repository: git://github.com/damil/App-AutoCRUD.git
-version: '0.13'
+  repository: https://github.com/damil/App-AutoCRUD
+version: '0.14'

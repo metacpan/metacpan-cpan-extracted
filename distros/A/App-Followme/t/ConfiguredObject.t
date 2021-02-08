@@ -5,7 +5,7 @@ use Cwd;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 #----------------------------------------------------------------------
 # Load package
@@ -28,7 +28,7 @@ chdir $test_dir or die $!;
 $test_dir = cwd();
 
 #----------------------------------------------------------------------
-# Test simple object creation
+# Test object creation
 
 do {
     my $top_dir = $test_dir;
@@ -49,22 +49,23 @@ do {
 };
 
 #----------------------------------------------------------------------
-# Test compound object creation
+# Test fields with qualified names
 
 do {
+
     my $top_dir = $test_dir;
     my $base_dir = catfile($test_dir, 'subdir');
     my %configuration = (
-                         base_directory => $base_dir,
-                         top_directory => $top_dir,
-                         '' => {quick_update => 1},
-                         'App::Followme::ConfiguredObject' => {quick_update => 2},
-                         'App::Followme::Foobar' => {quick_update => 3},
+                         'ConfiguredObject::quick_update' => 1,
+                         'Followme::ConfiguredObject::base_directory' => $base_dir,
+                         'App::Followme::ConfiguredObject::top_directory' => $top_dir,
+                         'ConfiguredObject::extra' => 'foobar',
                     );
 
     my $co = App::Followme::ConfiguredObject->new(%configuration);
 
-    is($co->{base_directory}, $base_dir, 'Set first field'); # test 5
-    is($co->{top_directory}, $top_dir, 'Set second field'); # test 6
-    is($co->{quick_update}, 2, 'Set segment field'); # test 7
+    is($co->{quick_update}, 1, 'Set quick update'); # test 5
+    is($co->{base_directory}, $base_dir, 'Set base directory'); # test 6
+    is($co->{top_directory}, $top_dir, 'Set top directory'); # test 7
+    is($co->{extra}, undef, 'Nothing extra'); # test 8
 };

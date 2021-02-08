@@ -4,7 +4,7 @@
       "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,6 +55,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-Manifold"
+      },
       "license" : [
          "https://perldoc.perl.org/perlartistic.html"
       ],
@@ -64,6 +67,6 @@
          "web" : "https://github.com/ronsavage/Text-Table-Manifold"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -20,7 +20,7 @@ use Data::Reach       qw/reach/;
 use namespace::clean -except => 'meta';
 
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 has 'config'      => (is => 'bare', isa => 'HashRef', required => 1);
 has 'dir'         => (is => 'ro',   isa => 'Str',
@@ -386,13 +386,6 @@ Extensibility through inheritance
 This application is also meant as an example for showing the
 power of "Modern Perl", assembling several advanced frameworks
 such as L<Moose>, L<Plack> and L<DBIx::DataModel>.
-
-
-B<Disclaimer> : this application is already usable, but is still at an
-early design stage; many improvements need to be made, as can be seen from
-the long L</TODO> section at the bottom. The global architecture and URL
-space is unlikely to change, but many presentation details will probably
-different in future versions.
 
 
 =head1 CONFIGURATION
@@ -816,12 +809,6 @@ Some design aspects were borrowed from
 
 Laurent Dami, C<< <dami at cpan.org> >>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-app-autocrud at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-AutoCRUD>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
 
 =head1 SUPPORT
 
@@ -834,21 +821,13 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * github's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-AutoCRUD>
+L<https://github.com/damil/App-AutoCRUD/issues>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * MetaCPAN
 
-L<http://annocpan.org/dist/App-AutoCRUD>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/App-AutoCRUD>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/App-AutoCRUD/>
+L<https://metacpan.org/pod/App::AutoCRUD>
 
 =back
 
@@ -860,6 +839,7 @@ L<https://github.com/damil/App-AutoCRUD>.
 =head1 SEE ALSO
 
 L<Catalyst::Plugin::AutoCRUD>,
+L<WebAPI::DBIC>,
 L<Plack>,
 L<http://www.codeplex.com/ChinookDatabase>.
 
@@ -903,7 +883,7 @@ L<http://www.codeplex.com/ChinookDatabase>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2016 Laurent Dami.
+Copyright 2014-2021 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

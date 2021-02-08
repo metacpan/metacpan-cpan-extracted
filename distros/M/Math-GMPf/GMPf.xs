@@ -654,41 +654,11 @@ respective doubles.
 
 int _rndaz(char *a, IV exponent, UV prec, int display) {
   size_t len;
-  int i, min_prec, low_subnormal_exp, high_subnormal_exp, ulp_pos;
+  int i, ulp_pos = ULP_INDEX;
 
-#if defined(NV_IS_DOUBLE) || (defined(NV_IS_LONG_DOUBLE) && (REQUIRED_LDBL_MANT_DIG == 2098 || REQUIRED_LDBL_MANT_DIG == 53))
-  ulp_pos = 52;
-  min_prec = 64;
-  low_subnormal_exp = -1074;
-  high_subnormal_exp = -1021;
+  if(exponent < LOW_SUBNORMAL_EXP) return 0;
 
-#elif defined(NV_IS_LONG_DOUBLE)
-  ulp_pos = REQUIRED_LDBL_MANT_DIG - 1;
-  if(ulp_pos == 63) {
-    min_prec = 96;
-    low_subnormal_exp = -16445 ;
-    high_subnormal_exp = -16381 ;
-  }
-  else {
-    if(ulp_pos != 112) croak("In _rndaz, ulp_pos has been set to an insane value (%d)", ulp_pos);
-    min_prec = 128;
-    low_subnormal_exp = -16494 ;
-    high_subnormal_exp = -16381 ;
-  }
-
-#elif defined(NV_IS_FLOAT128)
-    ulp_pos = 112;
-    min_prec = 128;
-    low_subnormal_exp = -16494 ;
-    high_subnormal_exp = -16381 ;
-
-#else
-  croak("In _rndaz, cannot determine the NV type");
-#endif
-
-  if(exponent < low_subnormal_exp) return 0;
-
-  if(exponent < high_subnormal_exp) ulp_pos -= high_subnormal_exp - exponent;
+  if(exponent < HIGH_SUBNORMAL_EXP) ulp_pos -= HIGH_SUBNORMAL_EXP - exponent;
 
   len = strlen(a);
 
@@ -812,15 +782,7 @@ SV * _Rmpf_get_ld(pTHX_ mpf_t * x) {
      return newSVnv(ret);
 
 #else
-#if REQUIRED_LDBL_MANT_DIG == 53
-     int low_subnormal_exp = -1074, high_subnormal_exp = -1021;
-#elif REQUIRED_LDBL_MANT_DIG == 64
-     int low_subnormal_exp = -16445, high_subnormal_exp = -16381;
-#elif REQUIRED_LDBL_MANT_DIG == 113
-     int low_subnormal_exp = -16494, high_subnormal_exp = -16381;
-#else
-     croak("Unknown long double type in _Rmpf_get_ld");
-#endif
+
      mpf_t t;
      long i, exp, retract = 0, bits = REQUIRED_LDBL_MANT_DIG;;
      char *out;
@@ -863,7 +825,7 @@ SV * _Rmpf_get_ld(pTHX_ mpf_t * x) {
 
      mpf_get_str(out, &exp, 2, mpf_get_prec(t), t);
 
-     if(exp < low_subnormal_exp + 1) {
+     if(exp < LOW_SUBNORMAL_EXP + 1) {
        Safefree(out);
        return newSVnv(0.0L);
      }
@@ -882,8 +844,8 @@ SV * _Rmpf_get_ld(pTHX_ mpf_t * x) {
        }
      }
 
-     if(exp > low_subnormal_exp && exp < high_subnormal_exp)
-       bits = exp - low_subnormal_exp;
+     if(exp > LOW_SUBNORMAL_EXP && exp < HIGH_SUBNORMAL_EXP)
+       bits = exp - LOW_SUBNORMAL_EXP;
 
      for(i = 0; i < bits; i++) {
        if(out[i] == '1') ret += add_on[i];
@@ -893,7 +855,7 @@ SV * _Rmpf_get_ld(pTHX_ mpf_t * x) {
      if(retract) out--;
      Safefree(out);
 
-     i = high_subnormal_exp + 113 - REQUIRED_LDBL_MANT_DIG;
+     i = HIGH_SUBNORMAL_EXP + 113 - REQUIRED_LDBL_MANT_DIG;
 
      /* re-using the 'bits' variable */
      bits = exp < i ? exp - i : 0;	/* function has already returned if exp < low_subnormal_exp */
@@ -948,15 +910,7 @@ SV * _Rmpf_get_ld_rndn(pTHX_ mpf_t * x) {
      return newSVnv(ret);
 
 #else
-#if REQUIRED_LDBL_MANT_DIG == 53
-     int low_subnormal_exp = -1074, high_subnormal_exp = -1021;
-#elif REQUIRED_LDBL_MANT_DIG == 64
-     int low_subnormal_exp = -16445, high_subnormal_exp = -16381;
-#elif REQUIRED_LDBL_MANT_DIG == 113
-     int low_subnormal_exp = -16494, high_subnormal_exp = -16381;
-#else
-     croak("Unknown long double type in _Rmpf_get_ld_rndn");
-#endif
+
      mpf_t t, ldbl_min;
      size_t n_digits;
      long i, exp, retract = 0, bits = REQUIRED_LDBL_MANT_DIG;
@@ -1006,17 +960,17 @@ SV * _Rmpf_get_ld_rndn(pTHX_ mpf_t * x) {
 
      mpf_get_str(out, &exp, 2, n_digits, t);
 
-     if(exp < low_subnormal_exp) {
+     if(exp < LOW_SUBNORMAL_EXP) {
        Safefree(out);
        return newSVnv(0.0L);
      }
 
      if(_rndaz(out, (IV)exp, (UV)n_digits, 0)) {
 
-       if(exp < high_subnormal_exp && exp > low_subnormal_exp - 1) { /* handle subnormal values */
+       if(exp < HIGH_SUBNORMAL_EXP && exp > LOW_SUBNORMAL_EXP - 1) { /* handle subnormal values */
          mpf_init2(ldbl_min, 64);
          mpf_set_ui(ldbl_min, 1);
-         mpf_div_2exp(ldbl_min, ldbl_min, (low_subnormal_exp - 1)  * -1);
+         mpf_div_2exp(ldbl_min, ldbl_min, (LOW_SUBNORMAL_EXP - 1)  * -1);
 
          if(mpf_sgn(*x) > 0) mpf_add(t, *x, ldbl_min);
          else mpf_sub(t, *x, ldbl_min);
@@ -1048,8 +1002,8 @@ SV * _Rmpf_get_ld_rndn(pTHX_ mpf_t * x) {
        }
      }
 
-     if(exp > low_subnormal_exp && exp < high_subnormal_exp)
-       bits = exp - low_subnormal_exp;
+     if(exp > LOW_SUBNORMAL_EXP && exp < HIGH_SUBNORMAL_EXP)
+       bits = exp - LOW_SUBNORMAL_EXP;
 
      for(i = 0; i < bits; i++) {
        if(out[i] == '1') ret += add_on[i];
@@ -1060,7 +1014,7 @@ SV * _Rmpf_get_ld_rndn(pTHX_ mpf_t * x) {
      if(retract) out--;
      Safefree(out);
 
-     i = high_subnormal_exp + 113 - REQUIRED_LDBL_MANT_DIG;
+     i = HIGH_SUBNORMAL_EXP + 113 - REQUIRED_LDBL_MANT_DIG;
 
      /* re-using the 'bits' variable */
      bits = exp < i ? exp - i : 0;	/* function has already returned if exp < low_subnormal_exp */

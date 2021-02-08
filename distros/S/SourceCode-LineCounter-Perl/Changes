@@ -1,5 +1,8 @@
 Revision history for Perl module Sourcecode::LineCounter::Perl
 
+1.022 2021-02-06T00:46:04Z
+	* freshen distro, remove Travis CI, add Github Actions
+
 1.021 2018-06-17T12:58:40Z
 	* Clarify that it's the Artistic License 2.0.
 

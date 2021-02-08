@@ -1,5 +1,15 @@
 Revision history for Perl extension JavaScript::Minifier::XS.
 
+0.14      2021-02-06 23:36:36-08:00 America/Vancouver
+    - rewrote test suite into a single ".t" test
+    - optimized memory allocations, by allocating Nodes in bulk, and being
+      smarter about when we need to free/reallocate content buffers in Nodes
+    - optimize whitespace collapsing
+    - GH#3 / RT#108682; fix whitespace reduction at end of preserved line
+      comment.  Thanks to Dan Goodliffe
+    - GH#6; fix unescaped slash in character set, inside of a regex, with thanks
+      to @faf
+
 0.13      2020-12-30 21:46:29-08:00 America/Vancouver
     - POD cleanups; spelling, SYNOPSIS
     - Switch to DZil Author Bundle

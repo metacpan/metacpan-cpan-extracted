@@ -21,5 +21,5 @@ requires:
   Exporter: '5.58'
 resources:
   repository: https://github.com/sisyphus/math-gmpq.git
-version: '0.45'
+version: '0.46'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

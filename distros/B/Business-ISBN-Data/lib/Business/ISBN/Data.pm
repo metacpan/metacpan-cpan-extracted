@@ -3,11 +3,11 @@ use 5.008;
 package Business::ISBN::Data;
 use strict;
 
-use Carp qw(carp);
-use File::Basename qw(dirname);
+use Carp                  qw(carp);
+use File::Basename        qw(dirname);
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '20210112.001';
+our $VERSION = '20210112.002';
 
 =encoding utf8
 
@@ -351,6 +351,7 @@ sub _get_data {
 	if( defined $ENV{ISBN_RANGE_MESSAGE} and ! -e $ENV{ISBN_RANGE_MESSAGE} ) {
 		carp "ISBN_RANGE_MESSAGE is set to [$ENV{ISBN_RANGE_MESSAGE}] but that file does not exist!\nTrying to use the default locations\n";
 		}
+
 	my $file = 'RangeMessage.xml';
 	no warnings 'uninitialized';
 	my @candidates = grep { -e } (
@@ -359,7 +360,9 @@ sub _get_data {
 		$file,                                 # current directory
 		);
 
-	my $hash = _parse_range_message( $candidates[0] );
+	my $hash;
+
+	$hash = _parse_range_message( $candidates[0] ) if @candidates;
 
 	if( defined $hash ) { return %$hash   }
 	else                { _default_data() }

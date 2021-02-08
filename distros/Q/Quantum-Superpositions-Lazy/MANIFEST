@@ -4,14 +4,14 @@ examples/factors.pl
 examples/prime.pl
 examples/sourcing.pl
 examples/statistics.pl
+lib/Q/S/L.pm
 lib/Quantum/Superpositions/Lazy.pm
 lib/Quantum/Superpositions/Lazy/Computation.pm
 lib/Quantum/Superpositions/Lazy/ComputedState.pm
 lib/Quantum/Superpositions/Lazy/Manual.pod
+lib/Quantum/Superpositions/Lazy/Manual/Comparisons.pod
 lib/Quantum/Superpositions/Lazy/Operation/Computational.pm
-lib/Quantum/Superpositions/Lazy/Operation/ComputationalOp.pm
 lib/Quantum/Superpositions/Lazy/Operation/Logical.pm
-lib/Quantum/Superpositions/Lazy/Operation/LogicOp.pm
 lib/Quantum/Superpositions/Lazy/Role/Collapsible.pm
 lib/Quantum/Superpositions/Lazy/Role/Operation.pm
 lib/Quantum/Superpositions/Lazy/State.pm
@@ -32,6 +32,9 @@ t/08-statistics.t
 t/09-sourcing.t
 t/10-transformations.t
 t/11-stats-implementations.t
+t/12-qsl.t
+t/13-empty.t
+t/14-comparisons.t
 t/99-examples.t
 t/lib/AlternativeStatistics.pm
 t/lib/StateTesters.pm

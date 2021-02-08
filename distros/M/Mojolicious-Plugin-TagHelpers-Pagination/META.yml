@@ -23,7 +23,8 @@ requires:
   Scalar::Util: '0'
   perl: '5.010001'
 resources:
+  bugtracker: https://github.com/Akron/Mojolicious-Plugin-TagHelpers-Pagination/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: https://github.com/Akron/Mojolicious-Plugin-TagHelpers-Pagination
-version: 0.07
+  repository: https://github.com/Akron/Mojolicious-Plugin-TagHelpers-Pagination.git
+version: 0.08
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

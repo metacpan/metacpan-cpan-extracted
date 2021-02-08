@@ -5,17 +5,18 @@ use 5.014;
 use strict;
 use warnings;
 use namespace::autoclean;
-use Try::Tiny;
-use Sub::Util 'set_subname';
 use Import::Into;
+use Sub::Util 'set_subname';
+use Syntax::Keyword::Try;
 
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.16'; # VERSION
 
 use feature    ();
 use utf8       ();
 use mro        ();
 use IO::File   ();
 use IO::Handle ();
+use Try::Tiny  ();
 use Carp       qw( croak carp confess cluck );
 
 my %features = (
@@ -38,7 +39,8 @@ my %experiments = (
 );
 
 my @function_list = qw(
-    nostrict nowarnings noutf8 noc3 nobundle noexperiments noskipexperimentalwarnings noautoclean nocarp notry
+    nostrict nowarnings noutf8 noc3 nobundle noexperiments noskipexperimentalwarnings noautoclean nocarp
+    notry trytiny
 );
 
 my @feature_list   = map { @$_ } values %features, values %deprecated, values %experiments;
@@ -91,20 +93,24 @@ sub import {
         my @experiments = map { @{ $experiments{$_} } } grep { $_ <= $perl_version } keys %experiments;
         feature->import(@experiments) unless ( not @experiments or grep { $_ eq 'noexperiments' } @functions );
     }
-    catch {
-        my $err = $_;
+    catch ($err) {
         $err =~ s/\s*at .+? line \d+\.\s+//;
         croak("$err via use of exact");
-    };
+    }
 
     monkey_patch( $self, $caller, ( map { $_ => \&{ 'Carp::' . $_ } } qw( croak carp confess cluck ) ) )
         unless ( grep { $_ eq 'nocarp' } @functions );
+
+    my $trytiny = ( grep { $_ eq 'trytiny' } @functions ) ? 1 : 0;
+    my $notry   = ( grep { $_ eq 'notry'   } @functions ) ? 1 : 0;
+
+    Syntax::Keyword::Try->import_into($caller) unless ( $trytiny or $notry );
 
     eval qq{
         package $caller {
             use Try::Tiny;
         };
-    } unless ( grep { $_ eq 'notry' } @functions );
+    } if ( $trytiny and not $notry );
 
     my @late_parents = ();
 
@@ -120,10 +126,9 @@ sub import {
             } );
         }
         catch {
-            croak($_) unless ( index( $_, q{Can't locate } ) == 0 );
-            $failed_require = 1;
-        };
-        return 0 if $failed_require;
+            croak($@) unless ( index( $@, q{Can't locate } ) == 0 );
+            return 0;
+        }
 
         ( $no_parent, $late_parent ) = ( undef, undef );
 
@@ -198,6 +203,59 @@ sub late_parent {
     return;
 }
 
+sub _patch_import {
+    my ( $type, $self, @names ) = @_;
+
+    my $target          = ( caller(1) )[0];
+    my $original_import = $target->can('import');
+
+    my %groups;
+    if ( $type eq 'provide' ) {
+        %groups = map { %$_ } grep { ref $_ eq 'HASH' } @names;
+        @names = grep { not ref $_ } @names;
+    }
+
+    monkey_patch(
+        $self,
+        $target,
+        import => sub {
+            my ( $package, @exports ) = @_;
+
+            $original_import->(@_) if ($original_import);
+
+            if ( $type eq 'force' ) {
+                @exports = @names;
+            }
+            elsif ( $type eq 'provide' ) {
+                @exports = grep { defined } map {
+                    my $name = $_;
+
+                    ( grep { $name eq $_ } @names ) ? $name                   :
+                    ( exists $groups{$name}       ) ? ( @{ $groups{$name} } ) : undef;
+                } @exports;
+            }
+
+            monkey_patch(
+                $package,
+                ( caller(0) )[0],
+                map { $_ => \&{ $package . '::' . $_ } } @exports
+            );
+
+            return;
+        },
+    );
+}
+
+sub export {
+    _patch_import( 'force', @_ );
+    return;
+}
+
+sub exportable {
+    _patch_import( 'provide', @_ );
+    return;
+}
+
 1;
 
 __END__
@@ -212,7 +270,7 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.14
+version 1.16
 
 =for markdown [![test](https://github.com/gryphonshafer/exact/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact)
@@ -232,7 +290,7 @@ Instead of this:
     use IO::Handle;
     use namespace::autoclean;
     use Carp qw( croak carp confess cluck );
-    use Try::Tiny;
+    use Syntax::Keyword::Try;
 
     no warnings "experimental::signatures";
     no warnings "experimental::refaliasing";
@@ -289,7 +347,7 @@ import L<Carp>'s 4 methods
 
 =item *
 
-import L<Try::Tiny> (kinda)
+cause L<Syntax::Keyword::Try> to import its methods
 
 =back
 
@@ -340,7 +398,12 @@ C<cluck>.
 
 =head2 C<notry>
 
-This skips importing the functionality of L<Try::Tiny>.
+This skips importing the functionality of L<Syntax::Keyword::Try>.
+
+=head2 C<trytiny>
+
+If you want to use L<Try::Tiny> instead of L<Syntax::Keyword::Try>, this is how.
+Note that if you specify both C<trytiny> and C<notry>, the latter will win.
 
 =head1 BUNDLES
 
@@ -464,6 +527,38 @@ be delayed in C<@INC> inclusion.
     sub import {
         exact->late_parent;
     }
+
+=head2 C<export>
+
+This method performs work similar to using L<Exporter>'s C<@EXPORT>, but only
+for methods. For a given method within your package, it will be exported to the
+namespace that uses your package.
+
+    exact->export( 'method', 'other_method' );
+
+=head2 C<exportable>
+
+This method performs work similar to using L<Exporter>'s C<@EXPORT_OK>, but only
+for methods. For a given method within your package, it will be exported to the
+namespace that uses your package.
+
+    exact->exportable( 'method', 'other_method' );
+
+It's possible to provide hashrefs as input to this method, and doing so provides
+the means to setup groups of methods a consuming namespace can import.
+
+    exact->exportable(
+        'method',
+        'other_method',
+        {
+            ':stuff' => [ qw( method other_method ) ],
+            ':all'   => [ qw( method other_method some_additional_method ) ],
+        }
+    );
+
+In the consuming namespace, you can then write:
+
+    use YourPackage ':stuff'; # imports both "method" and "other_method"
 
 =head1 SEE ALSO
 

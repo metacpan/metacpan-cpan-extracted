@@ -1,10 +1,10 @@
 package Pithub::GitData;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 Git Data API
 
 use Moo;
-use Carp qw(croak);
+use Carp ();
 use Pithub::GitData::Blobs;
 use Pithub::GitData::Commits;
 use Pithub::GitData::References;
@@ -51,7 +51,7 @@ Pithub::GitData - Github v3 Git Data API
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 METHODS
 

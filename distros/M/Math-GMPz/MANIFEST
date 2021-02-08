@@ -13,7 +13,8 @@ Random/Random.pm
 Random/Makefile.PL
 Random/t/gmp_random.t
 README
-demos/dec2rat.pl
+demos/dec2rat.p
+demos/solitaire.p
 t/_1aaa_v.t
 t/_1basic.t
 t/aliases.t
@@ -23,6 +24,7 @@ t/bits.t
 t/bitwise.t
 t/cmp.t
 t/cmp_q.t
+t/constants.t
 t/fac.t
 t/imp_exp.t
 t/index_bug.t
@@ -42,6 +44,7 @@ t/io_raw.t
 t/IV_UV_NV.t
 t/longdouble.t
 t/NOK_and_POK.t
+t/NV_overloading.t
 t/out_str.t
 t/overload.t
 t/overload_cross_class.t

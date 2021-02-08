@@ -1,4 +1,7 @@
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
+
 my %options = %{
 {
   'NAME' => 'Math::GMPf::V',

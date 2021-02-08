@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "Import::Into" => 0,
     "Sub::Util" => 0,
+    "Syntax::Keyword::Try" => "0.18",
     "Try::Tiny" => 0,
     "feature" => 0,
     "mro" => 0,
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.14",
+  "VERSION" => "1.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,6 +53,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Import::Into" => 0,
   "Sub::Util" => 0,
+  "Syntax::Keyword::Try" => "0.18",
   "Test2::V0" => 0,
   "Test::More" => 0,
   "Try::Tiny" => 0,

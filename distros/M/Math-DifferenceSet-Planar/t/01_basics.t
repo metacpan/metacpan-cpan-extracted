@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use File::Spec;
 
-use Test::More tests => 135;
+use Test::More tests => 137;
 BEGIN { use_ok('Math::DifferenceSet::Planar') };
 
 #########################
@@ -205,6 +205,10 @@ like($@, qr/^PDS\(4, 1\) not available/);
 $ds3 = eval { Math::DifferenceSet::Planar->new(0, 2) };
 is($ds3, undef);
 like($@, qr/^PDS\(0, 2\) not available/);
+
+$ds3 = eval { Math::DifferenceSet::Planar->new(73, 5) };
+is($ds3, undef);
+like($@, qr/^PDS\(73, 5\) not available/);
 
 $ds3 = eval { Math::DifferenceSet::Planar->from_elements(
     1, 2, 4, 10, 28, 50, 57, 62, 78, 82,

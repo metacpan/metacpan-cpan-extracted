@@ -1,14 +1,14 @@
 #ifndef SPVM_FIELD_H
 #define SPVM_FIELD_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
 enum {
   SPVM_FIELD_C_FLAG_PRIVATE = 1,
   SPVM_FIELD_C_FLAG_PUBLIC = 2,
 };
 
-struct SPVM_field {
+struct spvm_field {
   const char* name;
   const char* signature;
   SPVM_TYPE* type;

@@ -14,7 +14,7 @@ use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 use constant SEED => 96;
 
@@ -235,7 +235,7 @@ sub rewrite_base_tag {
 }
 
 #----------------------------------------------------------------------
-# Load the modules that will upload the file and convert the filename
+# Initialize the configuration parameters
 
 sub setup {
     my ($self, %configuration) = @_;
@@ -246,6 +246,11 @@ sub setup {
     # The target date is the date of the hash file, used in quick mode
     # to select which files to test
     $self->{target_date} = 0;
+
+    # Remove any trailing slash from url
+    if ($self->{remote_url}) {
+        $self->{remote_url} =~ s/\/$//;
+    }
 
     return;
 }
@@ -449,6 +454,10 @@ default name is 'upload.hash'.
 
 The number of upload errors the module tolerate before quitting. The default
 value is 5.
+
+=item remote_url
+
+The url of the remote website, e.g. http://www.cloudhost.com.
 
 =item state_directory
 

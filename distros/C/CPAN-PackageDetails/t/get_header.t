@@ -1,4 +1,4 @@
-use Test::More 'no_plan';
+use Test::More;
 use Test::Output;
 
 my $class  = 'CPAN::PackageDetails';
@@ -7,7 +7,7 @@ my $method = 'get_header';
 use_ok( $class );
 can_ok( $class, $method );
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Test with no arguments to new
 {
 my $package_details = $class->new();
@@ -28,8 +28,8 @@ stderr_like
 	qr/No such header/,
 	"My private CPAN";
 }
-	
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Test with some arguments to new
 {
 my $param = 'Cat';
@@ -46,3 +46,5 @@ can_ok( $package_details->header, $method );
 is( $package_details->$method($param), $value );
 is( $package_details->header->$method($param), $value );
 }
+
+done_testing();

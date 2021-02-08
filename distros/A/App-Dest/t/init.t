@@ -31,7 +31,8 @@ stderr_is( sub {
         App::Dest->init;
     }
     catch {
-        warn $_;
+        my $e = $_ || $@;
+        warn $e;
     };
 }, "Project already initialized\n", 'init again fails' );
 
@@ -40,7 +41,8 @@ stderr_is( sub {
         App::Dest->add('actions');
     }
     catch {
-        warn $_;
+        my $e = $_ || $@;
+        warn $e;
     };
 }, "Directory actions already added\n", 'no re-add actions' );
 
@@ -53,7 +55,8 @@ stderr_is( sub {
         App::Dest->add('not_exists');
     }
     catch {
-        warn $_;
+        my $e = $_ || $@;
+        warn $e;
     };
 }, "Directory specified does not exist\n", 'no add not exists' );
 

@@ -1,16 +1,16 @@
 package Pithub::Base;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 base class for all Pithub modules
 
 use Moo;
-use Carp qw(croak);
+use Carp qw( croak );
 use HTTP::Headers;
 use HTTP::Request;
-use JSON::MaybeXS;
-use LWP::UserAgent;
+use JSON::MaybeXS qw( JSON );
+use LWP::UserAgent ();
 use Pithub::Result;
-use URI;
+use URI ();
 
 with 'Pithub::Result::SharedCache';
 
@@ -178,6 +178,7 @@ my @TOKEN_REQUIRED_REGEXP = (
     qr{^POST /repos/[^/]+/[^/]+/pulls$},
     qr{^POST /repos/[^/]+/[^/]+/releases$},
     qr{^POST /repos/[^/]+/[^/]+/pulls/[^/]+/comments$},
+    qr{^POST /repos/[^/]+/[^/]+/pulls/[^/]+/requested_reviewers$},
     qr{^PUT /gists/[^/]+/star$},
     qr{^PUT /orgs/[^/]+/public_members/.*$},
     qr{^PUT /repos/[^/]+/[^/]+/collaborators/.*$},
@@ -417,7 +418,7 @@ Pithub::Base - Github v3 base class for all Pithub modules
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 DESCRIPTION
 

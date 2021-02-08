@@ -4,17 +4,26 @@ use v5.12;
 use strict;
 use warnings;
 
-use Acme::ConspiracyTheory::Random 'theory';
+use Acme::ConspiracyTheory::Random qw( theory bad_punctuation );
 
 my $count   = 1;
 my $divider = '';
+my $bad     = 0;
 
-if ( @ARGV and $ARGV[0] =~ /^([0-9]+)$/ ) {
-	$count   = $1;
-	$divider = "\n";
+foreach ( @ARGV ) {
+	if ( /--space-?comma/ ) {
+		$bad = 1;
+	}
+	elsif ( /^([0-9]+)$/ ) {
+		$count = $1;
+		$divider = ( $count > 1 ) ? "\n" : "";
+	}
+	else {
+		warn "Unknown argument: $_\n";
+	}
 }
 
-say theory() . $divider
+say bad_punctuation( theory(), !$bad ) . $divider
 	for 1 .. $count;
 
 

@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
+0.030  2021-02-06
+
+ - (Update) Fix bug in attean_parse for parsers that are not either pull or
+   push parsers.
+
 0.029  2021-02-01
 
  - (Addition) Add Attean::API::MutableModel->load_triples_from_io (#157).

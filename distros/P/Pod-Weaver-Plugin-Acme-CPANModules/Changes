@@ -1,3 +1,9 @@
+0.006   2020-12-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Generate FAQ item that describes what an Acme::CPANModules::*
+	  module is.
+
+
 0.005   2020-10-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Tweak/add generated POD.

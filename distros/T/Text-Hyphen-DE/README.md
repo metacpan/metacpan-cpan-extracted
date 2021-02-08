@@ -11,7 +11,7 @@ for german text using patterns from groff package.
     my $hyphenator = Text::Hyphen::DE->new;
     print $hyphenator->hyphenate($word, '-');
 
-See [Text::Hyphen](https://metacpan.org/pod/Text::Hyphen) for the interface documentation. This module only
+See [Text::Hyphen](https://metacpan.org/pod/Text%3A%3AHyphen) for the interface documentation. This module only
 provides german patterns.
 
 # COPYRIGHT AND LICENSE 

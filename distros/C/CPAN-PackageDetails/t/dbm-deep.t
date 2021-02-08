@@ -1,9 +1,8 @@
-#!perl
 use Test::More;
 use strict;
 use warnings;
 
-plan eval "require DBM::Deep; 1" ? 
+plan eval "require DBM::Deep; 1" ?
 	(tests => 19) : (skip_all => 'You need DBM::Deep');
 
 use File::Spec::Functions;
@@ -18,7 +17,7 @@ use_ok( $class );
 
 my $dbmfile = catfile( qw(t packages.dbm) );
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Test with nothing given to new, and some entries added
 {
 unlink $dbmfile;
@@ -30,13 +29,13 @@ can_ok( $package_details, $method );
 ok( -e $dbmfile, 'The dbm file shows up on object creation' );
 
 can_ok( $package_details->entries, $method );
-	
+
 my $rc = eval { $package_details->add_entry(
 	'package name' => 'Buster::Bean',
 	version        => 1.02,
 	path           => 'B/BU/BUSTER/Bean-1.23.tgz',
 	) };
-	
+
 ok( $rc, "Added entry for Buster::Bean" );
 
 is( $package_details->count, 1, "Count is the same number as added entries" );
@@ -50,7 +49,7 @@ is( scalar @distributions, 1, "Found 1 distribution entry" );
 is( $distributions[0]{'path'}, 'B/BU/BUSTER/Bean-1.23.tgz', 'Got same distro' );
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Test with existing file
 {
 ok( -e $dbmfile, "DBM::Deep file is not there at the start" );
@@ -68,14 +67,13 @@ is( scalar @distributions, 1, "Found 1 distribution entry" );
 is( $distributions[0]{'path'}, 'B/BU/BUSTER/Bean-1.23.tgz', 'Got same distro' );
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Test with existing file
-unless( $ENV{DEBUG} )
-	{
+unless( $ENV{DEBUG} ) {
 	unlink $dbmfile;
 	}
-else
-	{
+else {
 	print "Keeping file $dbmfile for debugging";
 	}
 
+done_testing();

@@ -8,7 +8,7 @@ use 5.022001;
 use strict;
 use warnings;
 
-our $VERSION = "1.3";
+our $VERSION = "1.4";
 
 # just need to be an object
 sub new {

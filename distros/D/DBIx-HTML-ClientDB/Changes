@@ -1,0 +1,51 @@
+Revision history for Perl extension DBIx::HTML::ClientDB.
+
+1.09  2021-02-02T15:57:00
+	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Reformat Makefile.PL.
+	- Rename CHANGES to Changes.
+	- Make license explicitly perl.
+	- Add t/00.*.
+	- Update Makefile.PL and POD to change RT to github.
+
+1.08  2010-02-21T12:54:57
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.07  2010-02-10T14:01:45
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+1.06  2009-11-13T13:20:00
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.05  2005-10-27T19:40:00
+	- Simplify code in new() to no longer check if caller is an object
+		as per the new standard on such matters
+	- Regenerate META.yml with Module::Build V 0.2611 to correct a faulty
+		META.yml output by V 0.24 which falsely said 'provides: {}',
+		which in turn stopped the PAUSE indexer from finding the module file,
+		which in turn meant this module might be omitted from the master index:
+		ftp://pause.perl.org/pub/PAUSE/modules/01modules.index.html
+
+1.04  2004-07-19T14:43:00
+	- Change Makefile.PL to coexist with Module::Build
+	- Delete ./test.pl
+	- Add t/pod.t to test all PODs
+
+1.03  2003-03-23T11:29:00
+	- No source code changes in this version
+	- Patch to stop shipping blib/ directory in Unix distros, because the
+		PAUSE indexer takes this directory to indicate a binary distro,
+		which means it does not index the module, and this in turn means
+		the module is not listed in the CPAN daily update list, etc.
+
+1.02  Wed Dec 11 14:29:00
+	- Minor documentation changes. No need to upgrade
+
+1.01  Sat Oct 26 14:29:00
+	- Minor documentation changes. No need to upgrade
+
+1.00  2002-10-15T12:37:29
+	- original version

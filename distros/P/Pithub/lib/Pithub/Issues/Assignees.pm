@@ -1,10 +1,10 @@
 package Pithub::Issues::Assignees;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 Issue Assignees API
 
 use Moo;
-use Carp qw(croak);
+use Carp qw( croak );
 extends 'Pithub::Base';
 
 
@@ -44,7 +44,7 @@ Pithub::Issues::Assignees - Github v3 Issue Assignees API
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 METHODS
 

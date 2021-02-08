@@ -9,12 +9,10 @@ use File::Spec;
 use Path::Tiny;
 use JSON::MaybeXS;
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
-use Test::More tests => 155;
+use Test::More tests => 299;
 use Data::Dumper;
 
 my $wd = File::Temp->newdir;
-my %fontfiles = map { $_ => File::Spec->catfile($wd, $_ . '.otf') } (qw/regular italic
-                                                                        bold bolditalic/);
 
 my $inopt_re =  qr{[^]]*?};
 
@@ -24,33 +22,39 @@ unless ($wd =~ m/\A([A-Za-z0-9\.\/_-]+)\z/) {
     $pathre = $inopt_re;
 }
 
-my $font_re = qr{\{regular\.otf\}\[
+my $font_re = qr{\{(serif|sans|mono)-regular\.otf\}\[
                  $pathre
-                 BoldFont=bold\.otf $inopt_re
-                 BoldItalicFont=bolditalic\.otf $inopt_re
-                 ItalicFont=italic\.otf $inopt_re
+                 BoldFont=(serif|sans|mono)-bold\.otf $inopt_re
+                 BoldItalicFont=(serif|sans|mono)-bolditalic\.otf $inopt_re
+                 ItalicFont=(serif|sans|mono)-italic\.otf $inopt_re
                  \]}sx;
 
 my $font_size_in_pt = qr{font-size:.*pt};
 
-foreach my $file (keys %fontfiles) {
-    path(qw/t fonts/, $file  . '.otf')->copy($fontfiles{$file});
+foreach my $base (qw/regular italic bold bolditalic/) {
+    foreach my $family (qw/mono sans serif/) {
+        path(qw/t fonts/, $base  . '.otf')->copy(path($wd, "$family-$base.otf"));
+    }
 }
+
 my @fonts = (
              {
               name => 'DejaVuSerif',
               type => 'serif',
-              %fontfiles,
+              map { $_ => File::Spec->catfile($wd, 'serif-' . $_ . '.otf') } (qw/regular italic
+                                                                                 bold bolditalic/)
              },
              {
               name => 'DejaVuSans',
               type => 'sans',
-              %fontfiles,
+              map { $_ => File::Spec->catfile($wd, 'sans-' . $_ . '.otf') } (qw/regular italic
+                                                                                 bold bolditalic/)
              },
              {
               name => 'DejaVuSansMono',
               type => 'mono',
-              %fontfiles,
+              map { $_ => File::Spec->catfile($wd, 'mono-' . $_ . '.otf') } (qw/regular italic
+                                                                                bold bolditalic/)
              },
             );
 
@@ -82,7 +86,7 @@ foreach my $fs ($file, \@fonts) {
                                       pdf => $xelatex);
     ok $c->fonts, "Font accessor built";
     foreach my $family (qw/mono sans main/) {
-        ok $c->fonts->$family->has_files, "$family has files";
+        ok $c->fonts->$family->has_files, "$family has files" or die;
     }
     $c->compile($muse_file);
     {
@@ -106,17 +110,20 @@ foreach my $fs ($file, \@fonts) {
         my $css = read_file(File::Spec->catfile($tmpdir->dirname, "stylesheet.css"));
         my $html_body = read_file($html);
         foreach my $tcss ($css, $html_body) {
-            like $tcss, qr/font-family: "DejaVuSerif"/, "Found font-family";
+            like $tcss, qr/font-family: "DejaVuSerif"/, "Found font-family" or die;
             unlike $tcss, $font_size_in_pt;
         }
         my $manifest = read_file(File::Spec->catfile($tmpdir, "content.opf"));
-        foreach my $file (qw/regular.otf bold.otf italic.otf bolditalic.otf/) {
-            my $epubfile = File::Spec->catfile($tmpdir, $file);
-            ok (-f $epubfile, "$epubfile embedded");
-            like $css, qr/src: url\("\Q$file\E"\)/, "Found the css rules for $file";
-            like $manifest, qr/href="\Q$file\E"/, "Found the font in the manifest";
+        diag $manifest;
+        foreach my $family (qw/serif sans mono/) {
+            foreach my $file (qw/regular.otf bold.otf italic.otf bolditalic.otf/) {
+                my $epubfile = File::Spec->catfile($tmpdir, "$family-$file");
+                ok (-f $epubfile, "$epubfile embedded");
+                like $css, qr/src: url\("\Q$family-$file\E"\) format\(.+\)/, "Found the css rules for $file" or die;
+                like $manifest, qr/href="\Q$family-$file\E"/, "Found the font in the manifest" or die;
+            }
         }
-        like $manifest, qr{(application/x-font.*){4}}s;
+        like $manifest, qr{(application/x-font.*){12}}s;
     }
 }
 
@@ -159,11 +166,13 @@ foreach my $fs ($file, \@fonts) {
             unlike $tcss, $font_size_in_pt;
         }
         my $manifest = read_file(File::Spec->catfile($tmpdir, "content.opf"));
-        foreach my $file (qw/regular.otf bold.otf italic.otf bolditalic.otf/) {
-            my $epubfile = File::Spec->catfile($tmpdir, $file);
-            ok (! -f $epubfile, "$epubfile not embedded");
-            unlike $css, qr/src: url\("\Q$file\E"\)/, "No css rules for $file";
-            unlike $manifest, qr/href="\Q$file\E"/, "The fonts are not in the manifest";
+        foreach my $family (qw/serif sans mono/) {
+            foreach my $file (qw/regular.otf bold.otf italic.otf bolditalic.otf/) {
+                my $epubfile = File::Spec->catfile($tmpdir, "$family-$file");
+                ok (! -f $epubfile, "$epubfile embedded");
+                unlike $css, qr/src: url\("\Q$family-$file\E"\) format\(.+\)/, "Found the css rules for $file" or die;
+                unlike $manifest, qr/href="\Q$family-$file\E"/, "Found the font in the manifest" or die;
+            }
         }
         unlike $manifest, qr{(application/x-font.*){4}}s;
     }
@@ -268,11 +277,13 @@ ok ($@, "bad specification: $@");
             unlike $tcss, $font_size_in_pt;
         }
         my $manifest = read_file(File::Spec->catfile($tmpdir, "content.opf"));
-        foreach my $file (qw/regular.otf bold.otf italic.otf bolditalic.otf/) {
-            my $epubfile = File::Spec->catfile($tmpdir, $file);
-            ok (! -f $epubfile, "$epubfile not embedded");
-            unlike $css, qr/src: url\("\Q$file\E"\)/, "Found the css rules for $file";
-            unlike $manifest, qr/href="\Q$file\E"/, "Found the font in the manifest";
+        foreach my $family (qw/serif sans mono/) {
+            foreach my $file (qw/regular.otf bold.otf italic.otf bolditalic.otf/) {
+                my $epubfile = File::Spec->catfile($tmpdir, "$family-$file");
+                ok (! -f $epubfile, "$epubfile embedded");
+                unlike $css, qr/src: url\("\Q$family-$file\E"\) format\(.+\)/, "Found the css rules for $file" or die;
+                unlike $manifest, qr/href="\Q$family-$file\E"/, "Found the font in the manifest" or die;
+            }
         }
         unlike $manifest, qr{(application/x-font.*){4}}s;
     }
@@ -321,11 +332,13 @@ ok ($@, "bad specification: $@");
             unlike $tcss, $font_size_in_pt;
         }
         my $manifest = read_file(File::Spec->catfile($tmpdir, "content.opf"));
-        foreach my $file (qw/regular.otf bold.otf italic.otf bolditalic.otf/) {
-            my $epubfile = File::Spec->catfile($tmpdir, $file);
-            ok (-f $epubfile, "$epubfile embedded");
-            like $css, qr/src: url\("\Q$file\E"\)/, "Found the css rules for $file";
-            like $manifest, qr/href="\Q$file\E"/, "Found the font in the manifest";
+        foreach my $family (qw/serif sans mono/) {
+            foreach my $file (qw/regular.otf bold.otf italic.otf bolditalic.otf/) {
+                my $epubfile = File::Spec->catfile($tmpdir, "$family-$file");
+                ok (-f $epubfile, "$epubfile embedded");
+                like $css, qr/src: url\("\Q$family-$file\E"\) format\(.+\)/, "Found the css rules for $file" or die;
+                like $manifest, qr/href="\Q$family-$file\E"/, "Found the font in the manifest" or die;
+            }
         }
         like $manifest, qr{(application/x-font.*){4}}s;
     }

@@ -1,3 +1,14 @@
+0.06 2021-02-05T12:20:42+01:00
+ - Update README.
+ - Update examples/ dir.
+
+0.05 2021-02-05T12:19:16+01:00
+ - Add -s option to script.
+ - Add tests for SGML and not ended element.
+ - Fix bugtracker.
+ - Fix exit code.
+ - Update copyright years.
+
 0.04 2020-04-26T22:52:34+02:00
  - Fix test dependencies.
  - Remove obsolete ERRORS section in doc.

@@ -1,4 +1,4 @@
-use v5.28;
+use v5.24;
 use warnings;
 use Test::More;
 use Mock::Sub;
@@ -36,7 +36,7 @@ for (keys @data) {
 	ok $superpos->is_collapsed, "superposition collapsed ok";
 
 	note Quantum::Superpositions::Lazy::Util::get_rand . " - $collapsed";
-	delete %wanted{$collapsed};
+	delete $wanted{$collapsed};
 
 	$superpos->reset;
 	ok !$superpos->is_collapsed, "superposition reset ok";

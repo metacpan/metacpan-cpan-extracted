@@ -3,7 +3,7 @@ abstract: 'Frontend Event Notifications'
 author:
   - 'Nils Diewald'
 build_requires:
-  Test::Mojo::Session: '1.05'
+  Test::Mojo::Session: '1.06'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -22,7 +22,8 @@ requires:
   Mojolicious: '7.24'
   perl: '5.010001'
 resources:
+  bugtracker: https://github.com/Akron/Mojolicious-Plugin-Notifications/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: https://github.com/Akron/Mojolicious-Plugin-Notifications
-version: '1.05'
+  repository: https://github.com/Akron/Mojolicious-Plugin-Notifications.git
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

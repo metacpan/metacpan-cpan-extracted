@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -22,20 +22,24 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Digest::MD5" : "2.00"
+            "Crypt::Cipher::AES" : "0",
+            "Crypt::PBKDF2" : "0",
+            "Digest::MD5" : "0",
+            "Digest::SHA" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "2.33"
+   "version" : "3.00",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

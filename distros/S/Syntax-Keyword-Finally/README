@@ -93,6 +93,26 @@ KEYWORDS
        my $resource = Resource->open( ... );
        FINALLY { $resource->close; }
 
+    Unlike as would happen with e.g. a DESTROY method on a guard object,
+    any exceptions thrown from a FINALLY block are still propagated up to
+    the caller in the usual way.
+
+       use Syntax::Keyword::Finally;
+    
+       sub f
+       {
+          my $count = 0;
+          FINALLY { $count or die "Failed to increment count"; }
+    
+          # some code here
+       }
+    
+       f();
+
+
+       $ perl example.pl
+       Failed to increment count at examples.pl line 6.
+
 TODO
 
     This module contains a unit test file copied and edited from my core
@@ -100,7 +120,8 @@ TODO
     currently commented out because this implementation does not yet handle
     them:
 
-      * Ensure that FINALLY blocks can throw exceptions.
+      * Try to fix the double-exception test failure on Perl versions
+      before v5.20. (Test currently skipped on those versions)
 
       * Complain on attempts to return, goto, or next/last/redo out of a
       FINALLY block.

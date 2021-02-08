@@ -1,0 +1,56 @@
+{
+   "abstract" : "Allow other classes and objects to respond to events in yours",
+   "author" : [
+      "Chris Winters <chris@cwinters.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Observable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "runtime" : {
+         "requires" : {
+            "Class::ISA" : "0.32",
+            "Config" : "0",
+            "Scalar::Util" : "1.14",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ap/Class-Observable/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ap/Class-Observable.git",
+         "web" : "https://github.com/ap/Class-Observable"
+      }
+   },
+   "version" : "2.000",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2021
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

@@ -14,6 +14,10 @@
 #  include "wrap_keyword_plugin.c.inc"
 #endif
 
+#ifndef cx_pushblock
+#  include "cx_pushblock.c.inc"
+#endif
+
 #include "perl-backcompat.c.inc"
 
 #include "perl-additions.c.inc"
@@ -22,33 +26,38 @@ static XOP xop_pushfinally;
 
 static void invoke_finally(pTHX_ void *arg)
 {
-  CV *finally = arg;
-  dSP;
+  OP *start = (OP *)arg;
+  I32 was_cxstack_ix = cxstack_ix;
 
-  PUSHMARK(SP);
-  call_sv((SV *)finally, G_DISCARD|G_EVAL|G_KEEPERR);
+  cx_pushblock(CXt_BLOCK, G_VOID, PL_stack_sp, PL_savestack_ix);
+  ENTER;
+  SAVETMPS;
 
-  SvREFCNT_dec(finally);
+  SAVEOP();
+  PL_op = start;
+
+  CALLRUNOPS(aTHX);
+
+  FREETMPS;
+  LEAVE;
+
+  {
+    PERL_CONTEXT *cx = CX_CUR();
+
+    /* restore stack height */
+    PL_stack_sp = PL_stack_base + cx->blk_oldsp;
+  }
+
+  dounwind(was_cxstack_ix);
 }
 
 static OP *pp_pushfinally(pTHX)
 {
-  CV *finally = (CV *)cSVOP->op_sv;
+  OP *finally = cLOGOP->op_other;
 
-  /* finally is a closure protosub; we have to clone it into a real sub.
-   * If we do this now then captured lexicals still work even around
-   * Future::AsyncAwait (see RT122796)
-   * */
-  SAVEDESTRUCTOR_X(&invoke_finally, (SV *)cv_clone(finally));
+  SAVEDESTRUCTOR_X(&invoke_finally, finally);
+
   return PL_op->op_next;
-}
-
-#define newPUSHFINALLYOP(finally)  MY_newPUSHFINALLYOP(aTHX_ finally)
-static OP *MY_newPUSHFINALLYOP(pTHX_ CV *finally)
-{
-  OP *op = newSVOP_CUSTOM(0, (SV *)finally);
-  op->op_ppaddr = &pp_pushfinally;
-  return (OP *)op;
 }
 
 static int finally_keyword(pTHX_ OP **op)
@@ -56,19 +65,19 @@ static int finally_keyword(pTHX_ OP **op)
   lex_read_space(0);
 
   if(lex_peek_unichar(0) != '{')
-    croak("Expected try to be followed by '{'");
-
-  I32 floor_ix = start_subparse(FALSE, CVf_ANON);
-  SAVEFREESV(PL_compcv);
+    croak("Expected FINALLY to be followed by '{'");
 
   I32 save_ix = block_start(0);
   OP *body = parse_block(0);
-  SvREFCNT_inc(PL_compcv);
   body = block_end(save_ix, body);
 
   lex_read_space(0);
 
-  *op = newPUSHFINALLYOP(newATTRSUB(floor_ix, NULL, NULL, NULL, body));
+  *op = newLOGOP_CUSTOM(&pp_pushfinally, 0,
+    newOP(OP_NULL, 0), body);
+
+  /* unlink the terminating condition of 'body' */
+  body->op_next = NULL;
 
   return KEYWORD_PLUGIN_STMT;
 }
@@ -97,7 +106,7 @@ BOOT:
   XopENTRY_set(&xop_pushfinally, xop_name, "pushfinally");
   XopENTRY_set(&xop_pushfinally, xop_desc,
     "arrange for a CV to be invoked at scope exit");
-  XopENTRY_set(&xop_pushfinally, xop_class, OA_SVOP);
+  XopENTRY_set(&xop_pushfinally, xop_class, OA_LOGOP);
   Perl_custom_op_register(aTHX_ &pp_pushfinally, &xop_pushfinally);
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);

@@ -25,3 +25,4 @@ t/App-Video-Generator/02-version.t
 t/App-Video-Generator/03-new.t
 xt/App-Video-Generator/01-pod_coverage.t
 xt/App-Video-Generator/02-pod.t
+xt/script/01-pod.t

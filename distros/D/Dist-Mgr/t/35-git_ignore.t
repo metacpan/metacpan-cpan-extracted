@@ -18,15 +18,17 @@ unlink_git_ignore();
 my @c = git_ignore($dir);
 
 open my $o_fh, '<', $orig or die $!;
-open my $w_fh, '<', $work or die $!;
-
 my @o = <$o_fh>;
-my @w = <$w_fh>;
-
 close $o_fh;
+
+open my $w_fh, '<', $work or die $!;
+my @w = <$w_fh>;
 close $w_fh;
 
 for (0..$#w) {
+    $o[$_] =~ s/[\r\n]//g;
+    $w[$_] =~ s/[\r\n]//g;
+    $c[$_] =~ s/[\r\n]//g;
     chomp $w[$_];
     chomp $o[$_];
     chomp $c[$_];

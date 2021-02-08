@@ -1,8 +1,6 @@
 # map8.t - tests for Unicode::Map8 functionality of I18N::Charset
 
-# $Id: map8.t,v 1.12 2005-11-12 14:45:09 Daddy Exp $
-
-use Test::More no_plan;
+use Test::More;
 
 use IO::Capture::Stderr;
 my $oICE =  IO::Capture::Stderr->new;
@@ -56,7 +54,7 @@ SKIP:
   ok(map8_charset_name("cp278")          eq "IBM278", '');
   } # end of SKIP block
 
-exit 0;
+done_testing();
 
 __END__
 

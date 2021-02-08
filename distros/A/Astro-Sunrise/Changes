@@ -2,7 +2,12 @@
 
 Revision history for Perl extension sunrise.
 
-0.98   Wednesday 16 January 2019
+0.99  Friday 5 February 2021
+      - Overhaul the precise algorithm to follow the algorithm in DateTime::Event::Sunrise
+      - Bugtracking is done in Github instead of rt.cpan.org.
+      - Skip tests using the local timezone if the system does not provide it.
+
+0.98  Wednesday 16 January 2019
       - Add stuff in the text documenting the astronomical background of the module
       - Fix POD typos
       - Automatic testing of POD files with Test::Pod

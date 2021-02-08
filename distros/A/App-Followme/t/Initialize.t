@@ -6,7 +6,7 @@ use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catfile catdir rel2abs splitdir);
 
-use Test::More tests => 9;
+use Test::More tests => 6;
 
 #----------------------------------------------------------------------
 # Load package
@@ -18,6 +18,7 @@ pop(@path);
 my $lib = catdir(@path, 'lib');
 unshift(@INC, $lib);
 
+eval "use App::Followme::FIO";
 require App::Followme::Initialize;
 
 my $test_dir = catdir(@path, 'test');
@@ -40,41 +41,6 @@ do {
     $line = "run_before = App::Followme::FormatPage";
     $is = App::Followme::Initialize::is_command($line);
     is($is, undef, "is not command line"); # test 2
-
-    my $data_ok = {one => 1, two=> 2, three => 3, four => 4};
-    while (my ($name, $value) = each %$data_ok) {
-        App::Followme::Initialize::write_var($name, $value);
-    }
-
-    my $data = {};
-    foreach my $name (keys %$data_ok) {
-        $data->{$name} = App::Followme::Initialize::read_var($name);
-    }
-
-    is_deeply($data, $data_ok, "read and write vars"); # test 3
-
-    my $config_lines = <<'EOQ';
-# modules
-run_before = App::Followme::FormatPage
-run_before = App::Followme::ConvertPage
-# test data
-one = 1
-two = 2
-three = 3
-four = 4
-EOQ
-
-    $data = {};
-    my @lines = map {"$_\n"} split("\n", $config_lines);
-    my $parser = App::Followme::Initialize::parse_configuration(\@lines);
-    while (my ($name, $value) = &$parser()) {
-        $data->{$name} = $value;
-    }
-
-    is_deeply($data, $data_ok, "parse configuration"); # test 4
-
-    my $val = App::Followme::Initialize::read_configuration(\@lines, 'three');
-    is($val, 3, "read configuration"); # test 5
 };
 
 #----------------------------------------------------------------------
@@ -91,34 +57,35 @@ EOQ
     my $file = 'license.txt';
 
     App::Followme::Initialize::write_file(\@ok_lines, $type, $file);
-    my $lines = App::Followme::Initialize::read_file($file);
-    is_deeply($lines, \@ok_lines, "write text file"); # test 6
+    my $page = fio_read_page($file);
+    my @lines = map {"$_\n"} split("\n", $text);
+    is_deeply(\@lines, \@ok_lines, "write text file"); # test 3
 
     $text = <<'EOQ';
 # modules
-run_before = App::Followme::FormatPage
-run_before = App::Followme::ConvertPage
-# version
-version = 1
+run_before:
+    - App::Followme::FormatPage
+    - App::Followme::ConvertPage
 # test data
-one = 1
-two = 2
-three = 3
-four = 4
+one: 1
+two: 2
+three: 3
+four: 4
 EOQ
 
     @ok_lines = map {"$_\n"} split("\n", $text);
     $type = 'configuration';
     $file = 'followme.cfg';
-    my $version = 1;
 
-    App::Followme::Initialize::write_file(\@ok_lines, $type, $file, $version);
-    $lines = App::Followme::Initialize::read_file($file);
-    is_deeply($lines, \@ok_lines, "write configuration file"); # test 7
+    App::Followme::Initialize::write_file(\@ok_lines, $type, $file);
+    my $page = fio_read_page($file);
+    @lines = map {"$_\n"} split("\n", $text);
+    is_deeply(\@lines, \@ok_lines, "write configuration file"); # test 4
 
-    App::Followme::Initialize::write_file(\@ok_lines, $type, $file, $version);
-    $lines = App::Followme::Initialize::read_file($file);
-    is_deeply($lines, \@ok_lines, "rewrite configuration file"); # test 8
+    App::Followme::Initialize::write_file(\@ok_lines, $type, $file);
+    $page = fio_read_page($file);
+    @lines = map {"$_\n"} split("\n", $text);
+    is_deeply(\@lines, \@ok_lines, "rewrite configuration file"); # test 5
 
     $text = <<'EOQ';
 R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7
@@ -129,5 +96,5 @@ EOQ
     $file = 'transparent.gif';
     App::Followme::Initialize::write_file(\@lines, $type, $file);
 
-    ok(-e $file, 'write binary file'); # test 9
+    ok(-e $file, 'write binary file'); # test 6
 };

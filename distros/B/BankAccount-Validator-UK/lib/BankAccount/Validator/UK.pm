@@ -1,6 +1,6 @@
 package BankAccount::Validator::UK;
 
-$BankAccount::Validator::UK::VERSION   = '0.56';
+$BankAccount::Validator::UK::VERSION   = '0.57';
 $BankAccount::Validator::UK::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ BankAccount::Validator::UK - Interface to validate UK bank account.
 
 =head1 VERSION
 
-Version 0.56
+Version 0.57
 
 =cut
 
@@ -36,7 +36,7 @@ has sort_code  => (is => 'ro', default => sub { BankAccount::Validator::UK::Rule
 The module uses the algorithm provided by VOCALINK to validate the bank sort code
 and account number.  It is  done by modulus  checking  method as specified in the
 document which is available on their website L<VOCALINK|https://www.vocalink.com/tools/modulus-checking/>
-It currently supports the document L<v6.40|https://www.vocalink.com/media/4749/vocalink-validating-account-numbers-v640.pdf> drafted 22nd Sep 2020.
+It currently supports the document L<v6.50|https://www.vocalink.com/media/4890/vocalink-validating-account-numbers-v650.pdf> drafted 18th Jan 2021.
 
 Institutions covered by this document are below:
 

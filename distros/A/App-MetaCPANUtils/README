@@ -2,17 +2,79 @@ NAME
     App::MetaCPANUtils - CLI utilities related to MetaCPAN
 
 VERSION
-    This document describes version 0.003 of App::MetaCPANUtils (from Perl
-    distribution App-MetaCPANUtils), released on 2020-01-01.
+    This document describes version 0.004 of App::MetaCPANUtils (from Perl
+    distribution App-MetaCPANUtils), released on 2020-01-02.
 
 DESCRIPTION
     This distribution contains CLI utilities related to MetaCPAN:
+
+    *   list-metacpan-distributions
 
     *   list-metacpan-releases
 
     *   list-recent-metacpan-releases
 
 FUNCTIONS
+  list_metacpan_distributions
+    Usage:
+
+     list_metacpan_distributions(%args) -> [status, msg, payload, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   author => *cpan::pause_id*
+
+    *   fields => *array[str]* (default: ["distribution"])
+
+    *   sort => *str* (default: "distribution")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_metacpan_modules
+    Usage:
+
+     list_metacpan_modules(%args) -> [status, msg, payload, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   author => *cpan::pause_id*
+
+    *   fields => *array[str]* (default:
+        ["module","date","author","status","maturity","version","release","a
+        bstract"])
+
+    *   from_date => *date*
+
+    *   sort => *str* (default: "module")
+
+    *   status => *str* (default: "latest")
+
+    *   to_date => *date*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   list_metacpan_releases
     Usage:
 
@@ -27,12 +89,16 @@ FUNCTIONS
     *   distribution => *cpan::distname*
 
     *   fields => *array[str]* (default:
-        ["release","date","author","maturity","version","distribution","abst
-        ract"])
+        ["release","date","author","status","maturity","version","first","di
+        stribution","abstract"])
+
+    *   first => *bool*
 
     *   from_date => *date*
 
     *   sort => *str* (default: "-date")
+
+    *   status => *str*
 
     *   to_date => *date*
 
@@ -57,8 +123,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   fields => *array[str]* (default:
-        ["release","date","author","maturity","version","distribution","abst
-        ract"])
+        ["release","date","author","status","maturity","version","first","di
+        stribution","abstract"])
 
     *   n => *posint*
 

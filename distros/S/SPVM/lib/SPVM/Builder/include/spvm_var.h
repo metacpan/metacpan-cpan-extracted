@@ -1,9 +1,9 @@
 #ifndef SPVM_VAR_H
 #define SPVM_VAR_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
-struct SPVM_var {
+struct spvm_var {
   SPVM_OP* op_name;
   SPVM_MY* my;
   int8_t is_declaration;

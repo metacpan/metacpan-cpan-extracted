@@ -1,10 +1,10 @@
 #ifndef SPVM_HASH_H
 #define SPVM_HASH_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
 // Hash table
-struct SPVM_hash {
+struct spvm_hash {
   int32_t* table;
   char* key_buffer;
   SPVM_HASH_ENTRY* entries;

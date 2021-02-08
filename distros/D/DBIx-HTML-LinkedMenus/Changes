@@ -1,0 +1,60 @@
+Revision history for Perl extension DBIx::HTML::LinkedMenus.
+
+1.11  2021-02-04T17:08:00
+	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Reformat Makefile.PL.
+	- Change license from artistic_2 to perl.
+	- Add t/00.*.
+	- Update Makefile.PL and POD to change RT to github.
+
+1.10  Sun Feb 21 12:54:58 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.09  Wed Feb 10 14:01:47 2010
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+1.08  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.07  Tue Jan 18 22:14:00 2005
+	- Add new parameters to new(): base_prompt, base_value, linked_prompt and linked_value
+		which allow you to specify strings, and their corresponding values, to be output
+		at the top of the 2 menus. The default behaviour is identical to the previous version.
+		See examples/test-linked-menus.cgi. Original patch by Sean McKenna
+	- Update docs
+	- Update examples/test-linked-menus.cgi
+	- Note: Originally I omitted such options because I thought these values should always come
+		from the database, but this change just gives you another way to do it. In fact, this
+		way is neater since you can supply strings which you would not normally have in the
+		database in the first place
+
+1.06  Mon Jul 19 14:43:00 2004
+	- Change Makefile.PL to coexist with Module::Build
+	- Delete ./test.pl
+	- Add t/pod.t to test all PODs
+
+1.05  Tue Jun  3 18:44:00 2003
+	- No source code changes in this version
+	- Clarify the docs as to what linked menus are
+
+1.04  Sun Mar 23 11:29:00 2003
+	- No source code changes in this version
+	- Patch to stop shipping blib/ directory in Unix distros, because the
+		PAUSE indexer takes this directory to indicate a binary distro,
+		which means it does not index the module, and this in turn means
+		the module is not listed in the CPAN daily update list, etc.
+
+1.03  Wed Dec 11 11:41:13 2002
+	- Minor documentation changes - no need to upgrade
+
+1.02  Tue Nov  5 11:44:20 2002
+	- Make new() return undef if the base menu's SQL returns 0 rows
+
+1.01  Tue Oct 15 11:41:13 2002
+	- Minor documentation changes
+
+1.00  Sat Oct 08 12:37:29 2002
+	- original version

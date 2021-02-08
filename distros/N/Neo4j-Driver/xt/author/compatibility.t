@@ -18,20 +18,25 @@ my $s = $driver->session;
 # compatibility with related modules like REST::Neo4p works as it should.
 # (So far, we provide very little.)
 
-use Test::More 0.96 tests => 1 + 1;
+use Test::More 0.96 tests => 2 + 1;
 use Test::Exception;
 use Test::Warnings;
-use REST::Neo4p;
-use Neo4j::Cypher::Abstract;
 
 
 my ($q);
 
 
-subtest 'query acceptance' => sub {
-	plan tests => 2;
+subtest 'query acceptance REST::Neo4p' => sub {
+	plan skip_all => "(REST::Neo4p unavailable)" unless eval "require REST::Neo4p; 1";
+	plan tests => 1;
 	$q = REST::Neo4p::Query->new('RETURN 42');
 	lives_and { is $s->run($q)->single->get, 42 } 'REST::Neo4p::Query';
+};
+
+
+subtest 'query acceptance Neo4j::Cypher::Abstract' => sub {
+	plan skip_all => "(Neo4j::Cypher::Abstract unavailable)" unless eval "require Neo4j::Cypher::Abstract; 1";
+	plan tests => 1;
 	$q = Neo4j::Cypher::Abstract->new->return(42);
 	lives_and { is $s->run($q)->single->get, 42 } 'Neo4j::Cypher::Abstract';
 };

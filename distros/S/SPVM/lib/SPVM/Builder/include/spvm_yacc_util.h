@@ -1,9 +1,9 @@
 #ifndef SPVM_YACC_UTIL_H
 #define SPVM_YACC_UTIL_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
-union SPVM_yystype
+union spvm_yystype
 {
   SPVM_OP* opval;
 };

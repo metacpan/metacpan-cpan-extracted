@@ -2,6 +2,7 @@ MANIFEST
 CHANGES
 Makefile.PL
 GMPf.pm
+GMPf.pod
 GMPf.xs
 math_gmpf_include.h
 V/V.xs

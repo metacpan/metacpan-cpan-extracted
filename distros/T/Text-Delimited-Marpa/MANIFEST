@@ -1,18 +1,17 @@
-.gitignore
-Build.PL
 Changelog.ini
 Changes
 lib/Text/Delimited/Marpa.pm
 LICENSE
 Makefile.PL
-MANIFEST
-META.json
-META.yml
+MANIFEST			This list of files
+MANIFEST.SKIP
 README
 scripts/pod2html.sh
 scripts/synopsis.pl
 scripts/tiny.pl
 scripts/traverse.pl
+t/00.versions.t
+t/00.versions.tx
 t/angle.brackets.t
 t/braces.t
 t/brackets.t
@@ -29,3 +28,5 @@ t/skip.prefix.t
 t/utf8.t
 xt/author/changes.t
 xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

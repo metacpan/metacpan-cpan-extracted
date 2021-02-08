@@ -26,7 +26,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Acme-ConspiracyTheory-Random";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-007>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-013>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-acme-conspiracytheory-random>;
@@ -95,6 +95,60 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.007.tar.gz>;
 	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-008>
+	a                    doap:Version;
+	rdfs:label           "REDACTED";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.008"^^xsd:string;
+	dc:issued            "2021-02-02"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-009>
+	a                    doap:Version;
+	rdfs:label           "REDACTED";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.009"^^xsd:string;
+	dc:issued            "2021-02-02"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-010>
+	a                    doap:Version;
+	rdfs:label           "Pepe Silvia";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.010"^^xsd:string;
+	dc:issued            "2021-02-02"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-011>
+	a                    doap:Version;
+	rdfs:label           "space comma";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.011"^^xsd:string;
+	dc:issued            "2021-02-03"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-012>
+	a                    doap:Version;
+	rdfs:label           "REDACTED";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.012"^^xsd:string;
+	dc:issued            "2021-02-05"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/v_0-013>
+	a                    doap:Version;
+	rdfs:label           "REDACTED";
+	dc:identifier        "Acme-ConspiracyTheory-Random-0.013"^^xsd:string;
+	dc:issued            "2021-02-07"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-ConspiracyTheory-Random-0.013.tar.gz>;
+	doap:revision        "0.013"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -22,7 +22,7 @@ no_index:
 provides:
   Astro::Sunrise:
     file: lib/Astro/Sunrise.pm
-    version: '0.98'
+    version: '0.99'
 recommends:
   DateTime: '0.16'
 requires:
@@ -33,6 +33,7 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
+  bugtracker: https://github.com/jforget/Astro-Sunrise/issues
   repository: https://github.com/jforget/Astro-Sunrise.git
-version: '0.98'
+version: '0.99'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

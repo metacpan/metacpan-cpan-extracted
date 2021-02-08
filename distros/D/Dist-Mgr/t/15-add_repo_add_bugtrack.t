@@ -10,6 +10,7 @@ use lib 't/lib';
 use Helper qw(:all);
 
 # Prepare for the tests
+check_skip();
 unlink_makefile();
 copy_makefile();
 

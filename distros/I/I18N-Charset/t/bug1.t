@@ -1,6 +1,4 @@
 
-# $Id: bug1.t,v 1.5 2005-11-12 14:36:17 Daddy Exp $
-
 use ExtUtils::testlib;
 use Test::More;
 unless (eval "require Encode")
@@ -8,7 +6,7 @@ unless (eval "require Encode")
   plan skip_all => 'Encode is not installed';
   } # unless
 plan tests => 3;
-&use_ok('I18N::Charset', 'enco_charset_name');
+use_ok('I18N::Charset', 'enco_charset_name');
 # There once was a bug in Charset.pm Where add_enco_alias() silently
 # failed if it was called before enco_charset_name() was ever called.
 ok(I18N::Charset::add_enco_alias('gb2312' => 'euc-cn'));

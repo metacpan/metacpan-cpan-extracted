@@ -1,15 +1,6 @@
-use warnings;
-use strict;
-use utf8;
 use FindBin '$Bin';
-use Test::More;
-my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
-binmode STDOUT, ":encoding(utf8)";
-binmode STDERR, ":encoding(utf8)";
-use Table::Readable ':all';
+use lib "$Bin";
+use TRTest;
 
 my $table = [
 {
@@ -63,12 +54,25 @@ unlink $file or die $!;
     local $SIG{__WARN__} = sub {$warning = "@_";};
     write_table ();
     like ($warning,
-	  qr!First argument to 'write_table' must be array reference!);
+	  qr!First argument to 'write_table' must be array reference!,
+      "Got correct warning writing non-array reference");
     write_table ([qw!a b c!]);
     like ($warning, 
-	  qr!Elements of first argument to 'write_table' must be hash references!);
+	  qr!Elements of first argument to 'write_table' must be hash references!, "Got correct warning writing non-hash references");
     write_table ([{x => \my %nonsense}]);
-    like ($warning, qr!Non-scalar value in key!);
+    like ($warning, qr!Non-scalar value in key!,
+	  "Got correct warning with non-scalar reference");
+}
+
+{
+    my $out;
+    open my $fh, ">>", \$out or die $!;
+    select $fh;
+    write_table ([{a => 'b'}]);
+    select STDOUT;
+    ok (length ($out) > 0, "Wrote to STDOUT");
+    like ($out, qr!a: b!, "Got right values in STDOUT");
+    note $out;
 }
 
 done_testing ();

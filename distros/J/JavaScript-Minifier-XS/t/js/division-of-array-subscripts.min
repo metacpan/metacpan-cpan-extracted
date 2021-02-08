@@ -1,2 +1,0 @@
-function foo(){var bar=someArray[2]/2;}
-function bar(){foo();}

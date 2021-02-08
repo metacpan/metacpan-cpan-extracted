@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20201204215954;
+our $VERSION = 1.20210204173824;
 
 my $formatters = [
                 {
@@ -32,17 +32,25 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '[2-6]',
+                  'leading_digits' => '
+            [24-6]|
+            3[15-79]
+          ',
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '7',
+                  'leading_digits' => '[37]',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 },
                 {
                   'format' => '$1 $2 $3',
                   'pattern' => '(\\d{4})(\\d{3})(\\d{3})'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '8',
+                  'pattern' => '(\\d{3})(\\d{4})(\\d{3})'
                 }
               ];
 
@@ -113,15 +121,24 @@ my $validators = {
         ',
                 'mobile' => '
           77200\\d{3}|
-          7(?:
-            [1-6]\\d|
-            7[013-9]
+          (?:
+            321|
+            7(?:
+              [1-6]\\d|
+              7[013-9]|
+              8[01]
+            )
           )\\d{5}
         ',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '(90\\d{5})',
-                'toll_free' => '0800\\d{6}',
+                'toll_free' => '
+          (?:
+            0800|
+            800\\d
+          )\\d{6}
+        ',
                 'voip' => '
           79(?:
             1(?:
@@ -133,44 +150,44 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"26746", "Serowe",
-"26735", "Gaborone",
-"267397", "Gaborone",
-"267312", "Gaborone",
-"267392", "Gaborone",
-"267317", "Gaborone",
-"267319", "Gaborone",
-"267316", "Gaborone",
-"267659", "Gantsi",
-"267391", "Gaborone",
-"26754", "Barolong\/Ngwaketse",
-"26724", "Francistown",
-"267651", "Kgalagadi",
-"267315", "Gaborone",
-"267394", "Gaborone",
-"26747", "Mahalapye",
-"267539", "Ramotswa",
-"26729", "Letlhakane\/Orapa",
-"267370", "Gaborone",
-"267395", "Gaborone",
-"26759", "Molepolole",
-"267654", "Kgalagadi",
-"26726", "Selebi\-Phikwe",
-"267533", "Lobatse",
-"26768", "Maun",
-"267530", "Lobatse",
-"267318", "Gaborone",
-"26736", "Gaborone",
-"267393", "Gaborone",
-"267371", "Gaborone",
-"267313", "Gaborone",
-"26762", "Kasane",
-"267310", "Gaborone\ \(outer\)",
-"267390", "Gaborone",
+$areanames{en} = {"267312", "Gaborone",
 "267538", "Ramotswa",
+"267394", "Gaborone",
+"267315", "Gaborone",
+"267539", "Ramotswa",
+"267533", "Lobatse",
+"267371", "Gaborone",
+"267397", "Gaborone",
+"26768", "Maun",
+"267654", "Kgalagadi",
+"26746", "Serowe",
+"26724", "Francistown",
+"267316", "Gaborone",
+"267390", "Gaborone",
+"26736", "Gaborone",
+"26747", "Mahalapye",
+"267392", "Gaborone",
+"267395", "Gaborone",
+"267317", "Gaborone",
+"26762", "Kasane",
+"26726", "Selebi\-Phikwe",
+"267310", "Gaborone\ \(outer\)",
+"26759", "Molepolole",
+"267651", "Kgalagadi",
+"267313", "Gaborone",
+"267391", "Gaborone",
+"267318", "Gaborone",
+"26754", "Barolong\/Ngwaketse",
+"267370", "Gaborone",
+"267319", "Gaborone",
+"26735", "Gaborone",
 "26749", "Palapye",
-"26757", "Mochudi",
-"26758", "Jwaneng",};
+"267393", "Gaborone",
+"26758", "Jwaneng",
+"267659", "Gantsi",
+"267530", "Lobatse",
+"26729", "Letlhakane\/Orapa",
+"26757", "Mochudi",};
 
     sub new {
       my $class = shift;

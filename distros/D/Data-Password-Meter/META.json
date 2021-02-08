@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-Password-Meter",
    "no_index" : {
@@ -42,13 +42,18 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Akron/Data-Password-Meter/issues"
+      },
       "license" : [
-         "http://www.opensource.org/licenses/MIT"
+         "https://opensource.org/licenses/MIT"
       ],
       "repository" : {
-         "url" : "https://github.com/Akron/Data-Password-Meter"
+         "type" : "git",
+         "url" : "https://github.com/Akron/Data-Password-Meter.git",
+         "web" : "https://github.com/Akron/Data-Password-Meter"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

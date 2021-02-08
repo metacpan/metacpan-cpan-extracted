@@ -3,15 +3,18 @@ use warnings;
 
 use Test2::V0;
 
+use FindBin qw( $Bin );
 use File::Spec;
 use File::Temp qw( tempdir );
 use JSON::MaybeXS qw( decode_json );
 use Test2::API qw( intercept );
 use Test::Class::Moose::CLI;
 
+## no critic (Modules::ProhibitMultiplePackages)
 {
-
     package FakeRunner;
+
+    use namespace::autoclean;
 
     use Moose;
 
@@ -27,11 +30,14 @@ use Test::Class::Moose::CLI;
     sub runtests { }
 
     sub test_report { FakeReport->new }
+
+    __PACKAGE__->meta->make_immutable;
 }
 
 {
-
     package FakeReport;
+
+    use namespace::autoclean;
 
     use Moose;
 
@@ -40,6 +46,8 @@ use Test::Class::Moose::CLI;
             timing => 'data',
         };
     }
+
+    __PACKAGE__->meta->make_immutable;
 }
 
 {
@@ -114,14 +122,14 @@ subtest 'timing data file' => sub {
     );
     open my $fh, '<', $file or die $!;
     my $data = decode_json(
-        do { local $/; <$fh> }
+        do { local $/ = undef; <$fh> }
     );
     close $fh or die $!;
 
     is( $data,
         hash {
             field process_name => $0;
-            field start_time =>
+            field start_time   =>
               validator( sub { defined $_ && $_ >= $time } );
             field timing => { timing => 'data' };
         },
@@ -132,7 +140,7 @@ subtest 'timing data file' => sub {
 subtest 'classes as paths' => sub {
     local @ARGV = (
         '--classes', 't/lib/TestFor/MyApp/Model.pm',
-        '--classes', 't/lib/TestFor/MyApp/Controller.pm'
+        '--classes', 't/lib/TestFor/MyApp/Controller.pm',
     );
     my $runner = Test::Class::Moose::CLI->new_with_options(
         runner_class => 'FakeRunner' )->run;
@@ -143,35 +151,40 @@ subtest 'classes as paths' => sub {
 };
 
 {
-
     package Test::CLI;
+
+    use namespace::autoclean;
 
     use Moose;
 
     with 'Test::Class::Moose::Role::CLI';
 
+    ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
     sub _load_classes { }
 
     # Ensure that we can still use a hook for _test_lib_dirs
     sub _test_lib_dirs {
         't/clilib';
     }
+
+    __PACKAGE__->meta->make_immutable;
 }
 
 subtest 'classes from CLI are loaded' => sub {
     local @ARGV = ( '--classes', 'Foo', );
+    ## no critic (Subroutines::ProtectPrivateSubs)
     is( [ sort @{ Test::CLI->new_with_options->_class_names } ],
         ['Foo'],
         'Foo class is found by class name'
     );
 
-    local @ARGV = ( '--classes', 't/clilib/Bar.pm', );
+    local @ARGV = ( '--classes', "$Bin/clilib/Bar.pm", );
     is( [ sort @{ Test::CLI->new_with_options->_class_names } ],
         ['Bar'],
         'Bar class is found by file path'
     );
 
-    local @ARGV = ( '--classes', 't/clilib', );
+    local @ARGV = ( '--classes', "$Bin/clilib", );
     is( [ sort @{ Test::CLI->new_with_options->_class_names } ],
         [ 'Bar', 'Foo' ],
         'Bar and Foo class are found in a directory'
@@ -179,8 +192,9 @@ subtest 'classes from CLI are loaded' => sub {
 };
 
 {
-
     package My::CLI;
+
+    use namespace::autoclean;
 
     use Moose;
 
@@ -190,6 +204,7 @@ subtest 'classes from CLI are loaded' => sub {
     has load_classes_count => ( is => 'rw' );
     has after_count        => ( is => 'rw' );
 
+    ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
     sub _munge_class { 'FR::' . $_[1] }
 
     sub _load_classes {
@@ -212,7 +227,7 @@ subtest 'role extension methods' => sub {
           --classes t/testlib/Quux.pm
           --test-lib-dirs t/lib
           --test-lib-dirs t/testlib
-          )
+        )
     );
     my $cli    = My::CLI->new_with_options( runner_class => 'FakeRunner' );
     my $runner = $cli->run;

@@ -1,0 +1,66 @@
+{
+   "abstract" : "Provide fetchrow_hashref() for CSV files",
+   "author" : [
+      "Ron Savage (ron@savage.net.au)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-CSV_PP-Iterator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exception::Class" : "0",
+            "Iterator" : "0",
+            "Iterator::IO" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Text::CSV_PP" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ronsavage/Text-CSV_PP-Iterator/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/Perl"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/Text-CSV_PP-Iterator.git",
+         "web" : "https://github.com/ronsavage/Text-CSV_PP-Iterator"
+      }
+   },
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

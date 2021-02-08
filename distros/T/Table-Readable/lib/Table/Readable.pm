@@ -3,20 +3,20 @@ use warnings;
 use strict;
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw/read_table write_table/;
+our @EXPORT_OK = qw/read_table write_table read_table_hash/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 use Carp;
 
 sub read_file
 {
     my ($file) = @_;
     my @rv;
-    open my $in, "<:encoding(utf8)", $file or die "Error opening '$file': $!";
+    open my $in, "<:encoding(utf8)", $file or croak "Error opening '$file': $!";
     while (<$in>) {
 	push @rv, $_;
     }
-    close $in or die $!;
+    close $in or croak $!;
     return @rv;
 }
 
@@ -45,14 +45,17 @@ sub read_table
 
         $count++;
 
-        # Detect the first line of a cell of the table whose
-        # information spans several lines of the input file.
+	if ($mode ne 'multi-line') {
 
-        if (/^%%\s*([^:]+):\s*$/) {
-            $mode = "multi-line";
-            $mkey = $1;
-            next;
-        }
+	    # Detect the first line of a cell of the table whose
+	    # information spans several lines of the input file.
+
+	    if (/^%%\s*([^:]+):\s*$/) {
+		$mode = "multi-line";
+		$mkey = $1;
+		next;
+	    }
+	}
 
         # Continue to process a table cell whose information spans
         # several lines of the input file.
@@ -67,10 +70,9 @@ sub read_table
 		    $row->{$mkey} =~ s/^\\|\\$//g;
 		}
                 $mkey = undef;
+		next;
             }
-            else {
-                $row->{$mkey} .= $_;
-            }
+	    $row->{$mkey} .= $_;
             next;
         }
         if (/^\s*#.*/) {
@@ -79,7 +81,7 @@ sub read_table
 
             next;
         }
-        elsif (/([^:]+):\s*(.*?)\s*$/) {
+        if (/([^:]+):\s*(.*?)\s*$/) {
 
             # Key / value pair on a single line.
 
@@ -96,8 +98,9 @@ sub read_table
 	    # Strip leading and trailing slashes
 	    $value =~ s/^\\|\\$//g;
             $row->{$key} = $value;
+	    next;
         }
-        elsif (/^\s*$/) {
+        if (/^\s*$/) {
 
             # A blank line signifies the end of a row.
 
@@ -107,13 +110,11 @@ sub read_table
             }
             next;
         }
-        else {
-	    my $file_line = "$list_file:$count:";
-	    if ($options{scalar}) {
-		$file_line = "$count:";
-	    }
-            warn "$file_line unmatched line '$_'\n";
-        }
+	my $file_line = "$list_file:$count:";
+	if ($options{scalar}) {
+	    $file_line = "$count:";
+	}
+	warn "$file_line unmatched line '$_'\n";
     }
     # Deal with the case of whitespace at the end of the file.
     my $last_row = $table[-1];
@@ -122,6 +123,35 @@ sub read_table
     }
     croak "read_table returns an array" unless wantarray ();
     return @table;
+}
+
+sub read_table_hash
+{
+    my ($list_file, $key, %options) = @_;
+    my @table = read_table ($list_file, %options);
+    my %hash;
+    my $i = -1;
+    my @order;
+    for my $entry (@table) {
+	$i++;
+	my $ekey = $entry->{$key};
+	push @order, $ekey;
+	if (! $ekey) {
+	    carp "No $key entry for element $i of $list_file";
+	    next;
+	}
+	if ($hash{$ekey}) {
+	    carp "Table entries for $key are not unique, duplicate at $i";
+	    next;
+	}
+	$hash{$ekey} = $entry;
+    }
+    if (wantarray) {
+	return \%hash, \@order;
+    }
+    else {
+	return \%hash;
+    }
 }
 
 # Maximum length of a single-line entry.
@@ -166,7 +196,7 @@ sub write_table
     if ($file) {
 	open my $out, ">:encoding(utf8)", $file or croak "Can't open $file for writing: $!";
 	print $out $text;
-	close $out or die $!;
+	close $out or croak $!;
     }
     elsif (defined (wantarray ())) {
 	return $text;

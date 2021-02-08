@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test that Acme::ConspiracyTheory::Random compiles.
+Test that Acme::ConspiracyTheory::Random works.
 
 =head1 AUTHOR
 
@@ -26,7 +26,14 @@ use Test::More;
 
 use Acme::ConspiracyTheory::Random 'theory';
 
-diag theory() for 0 .. 9;
+diag theory();
+
+if ( $ENV{EXTENDED_TESTING} ) {
+	theory() for 0 .. 19_999;
+}
+else {
+	theory() for 0 .. 99;
+}
 
 ok 1;
 

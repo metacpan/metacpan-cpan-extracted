@@ -5,8 +5,9 @@ use utf8;
 
 package Neo4j::Driver::Type::Node;
 # ABSTRACT: Describes a node from a Neo4j graph
-$Neo4j::Driver::Type::Node::VERSION = '0.20';
+$Neo4j::Driver::Type::Node::VERSION = '0.21';
 
+use parent 'Neo4j::Types::Node';
 use overload '%{}' => \&_hash, fallback => 1;
 
 use Carp qw(croak);
@@ -23,6 +24,7 @@ sub labels {
 	my ($self) = @_;
 	
 	croak 'labels() in scalar context not supported' unless wantarray;
+	return unless defined $$self->{_meta}->{labels};
 	return @{ $$self->{_meta}->{labels} };
 }
 
@@ -80,7 +82,7 @@ Neo4j::Driver::Type::Node - Describes a node from a Neo4j graph
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 
@@ -110,41 +112,33 @@ IDs.
 
 =head1 METHODS
 
-L<Neo4j::Driver::Type::Node> implements the following methods.
+L<Neo4j::Driver::Type::Node> inherits all methods from
+L<Neo4j::Types::Node>.
 
 =head2 get
 
  $value = $node->get('property_key');
 
-Retrieve the value of this node's property with the given key.
-If no such key exists, return C<undef>.
+See L<Neo4j::Types::Node/"get">.
 
 =head2 id
 
  $id = $node->id;
 
-Return a unique ID for this node.
-
-In the Neo4j Driver API, entity IDs are only guaranteed to remain
-stable for the duration of the current session. Although in practice
-server versions at least up to and including Neo4j 3.5 may appear
-to use persistent IDs, your code should not depend upon that.
-
-A node with the ID C<0> may exist.
-Nodes and relationships do not share the same ID space.
+See L<Neo4j::Types::Node/"id">.
 
 =head2 labels
 
  @labels = $node->labels;
 
-Return all labels of this node.
+See L<Neo4j::Types::Node/"labels">.
 
 =head2 properties
 
  $hashref = $node->properties;
  $value = $hashref->{property_key};
 
-Return all properties of this node as a hash reference.
+See L<Neo4j::Types::Node/"properties">.
 
 =head1 EXPERIMENTAL FEATURES
 
@@ -179,7 +173,7 @@ returned by this method.
 The value of properties named C<_meta>, C<_node>, or C<_labels> may
 not be returned correctly.
 
-When using HTTP, the C<labels> of nodes that are returned as
+When using HTTP JSON, the C<labels> of nodes that are returned as
 part of a L<Neo4j::Driver::Type::Path> are unavailable, because that
 information is not currently reported by the Neo4j server. C<undef>
 is returned instead.
@@ -189,6 +183,8 @@ is returned instead.
 =over
 
 =item * L<Neo4j::Driver>
+
+=item * L<Neo4j::Types::Node>
 
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Node (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/types/Node.html>,

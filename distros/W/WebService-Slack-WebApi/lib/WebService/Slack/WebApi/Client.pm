@@ -48,12 +48,26 @@ sub base_url {
 sub request {
     my ($self, $path, $params) = @_;
 
+    my %headers;
+    if( $self->token && $params->{'http_auth'} ) {
+        my $msg = 'Illegal parameters. You have defined \'token\' but the '
+                . ' method you are using defines its own HTTP Authorization header.';
+        WebService::Slack::WebApi::Exception::IllegalParameters->throw(
+            message  => $msg,
+        );
+    }
+    if( $self->token ) {
+        $headers{ 'Authorization' } = 'Bearer ' . $self->token;
+    } elsif( $params->{'http_auth'} ) {
+        $headers{ 'Authorization' } = $params->{'http_auth'};
+    }
+    my %options = ( headers => \%headers );
     my $response = $self->ua->post_form(
         $self->base_url . $path,
         [
-            $self->token ? (token => $self->token) : (),
             %{ $params },
         ],
+        \%options,
     );
     return decode_json $response->{content} if $response->{success};
 

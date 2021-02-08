@@ -1,24 +1,30 @@
 ---
-abstract: 'Convert SQL to 2 linked HTML popup menus.'
+abstract: 'Convert SQL to 2 linked HTML popup menus'
 author:
-  - 'Ron Savage <ron@savage.net.au>'
+  - 'Ron Savage (ron@savage.net.au)'
 build_requires:
-  Test::More: 0
-  Test::Pod: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
-license: artistic
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-HTML-LinkedMenus
-provides:
-  DBIx::HTML::LinkedMenus:
-    file: lib/DBIx/HTML/LinkedMenus.pm
-    version: 1.10
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Carp: 0
+  strict: '0'
+  warnings: '0'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_1_0
-version: 1.10
+  bugtracker: https://github.com/ronsavage/DBIx-HTML-LinkedMenus/issues
+  license: http://opensource.org/licenses/Perl
+  repository: https://github.com/ronsavage/DBIx-HTML-LinkedMenus.git
+version: '1.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

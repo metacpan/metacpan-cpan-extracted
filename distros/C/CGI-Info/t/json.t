@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 5;
+use Test::Most tests => 6;
 use Test::NoWarnings;
 use lib 't/lib';
 use MyLogger;
@@ -21,7 +21,7 @@ JSON: {
 	$ENV{'CONTENT_TYPE'} = 'application/json; charset=utf-8';
 	$ENV{'CONTENT_LENGTH'} = length($json);
 
-	my $allowed = { 'first' => undef, 'last' => undef };
+	my $allowed = { 'first' => undef, 'last' => undef, 'foo' => undef };
 
 	open (my $fin, '<', \$json);
 	local *STDIN = $fin;
@@ -29,4 +29,5 @@ JSON: {
 	my $i = new_ok('CGI::Info' => [ logger => MyLogger->new() ]);
 	ok(defined($i->params(allow => $allowed)));
 	ok($i->first() eq 'Nigel');
+	ok(!defined($i->foo()));
 }

@@ -12,3 +12,5 @@ Table-Readable-[0-9\.]+/.*
 ^PRIVATE$
 ^t/write-test\.txt$
 ^examples/.*-out\.txt$
+# These don't need to go to CPAN
+^go/.*$

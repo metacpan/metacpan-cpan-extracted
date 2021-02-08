@@ -1,14 +1,27 @@
-Pod-POM-Web
+Pod-POM-Web - an HTML Perldoc server
 
 
 INSTALLATION
 
-To install this module, run the following commands:
+The simplest way to install the module is with cpanm:
+
+    cpanm Pod::POM::Web
+
+If you want to build and install the module from source, first clone the
+repository
+
+    git clone git@github.com:damil/Pod-POM-Web.git
+
+then run the following commands:
 
     perl Build.PL
     ./Build
     ./Build test
     ./Build install
+
+One of the module's dependencies requires the BerkeleyDB development packages
+to be installed, so it might be necessary to install the relevant operating
+system packages before the build and test steps can run successfully.
 
 
 SUPPORT AND DOCUMENTATION
@@ -22,18 +35,19 @@ You can also look for information at:
     Search CPAN
         http://search.cpan.org/dist/Pod-POM-Web
 
+    MetaCPAN
+        https://metacpan.org/pod/Pod::POM::Web
+
     CPAN Request Tracker:
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-POM-Web
-
-    AnnoCPAN, annotated CPAN documentation:
-        http://annocpan.org/dist/Pod-POM-Web
 
     CPAN Ratings:
         http://cpanratings.perl.org/d/Pod-POM-Web
 
+
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2007 Laurent Dami
+Copyright (C) 2007-2017 Laurent Dami
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

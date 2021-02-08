@@ -23,7 +23,8 @@ requires:
   Session::Token: '1.502'
   perl: '5.010001'
 resources:
+  bugtracker: https://github.com/Akron/Mojolicious-Plugin-Util-RandomString/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: https://github.com/Akron/Mojolicious-Plugin-Util-RandomString
-version: '0.08'
+  repository: https://github.com/Akron/Mojolicious-Plugin-Util-RandomString.git
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

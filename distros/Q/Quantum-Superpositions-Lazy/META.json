@@ -32,12 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Entropy" : "0",
-            "Moo" : "0",
+            "Moo" : "2.000000",
+            "Random::Any" : "0",
             "Sort::Key" : "0",
-            "Type::Tiny" : "0",
+            "Type::Tiny" : "1.002000",
             "namespace::clean" : "0",
-            "perl" : "5.028"
+            "perl" : "5.024"
          }
       },
       "test" : {
@@ -60,6 +60,6 @@
          "url" : "https://github.com/brtastic/perl-quantum-superpositions-lazy"
       }
    },
-   "version" : "1.05",
+   "version" : "1.07",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

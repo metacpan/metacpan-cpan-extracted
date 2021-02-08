@@ -1,9 +1,8 @@
-#!perl -w
-
+use warnings;
 use strict;
 use Test qw(plan ok);
 
-plan tests => 18;
+plan tests => 18, todo => [18];
 
 use Tkx qw(expr list lindex error);
 
@@ -36,6 +35,10 @@ eval { @list = Tkx::SplitList("a {") };
 ok($@ && $@ =~ /valid Tcl list/);
 
 eval { error("Foo") };
+# TODO: broken by recent Tcl.pm?
+# https://rt.cpan.org/Ticket/Display.html?id=115662
+# https://github.com/gisle/tkx/issues/4
+# https://github.com/gisle/tkx/issues/7
 ok($@, "Foo at @{[__FILE__]} line @{[__LINE__ - 1]}.\n");
 
 sub j { join(":", @_) }

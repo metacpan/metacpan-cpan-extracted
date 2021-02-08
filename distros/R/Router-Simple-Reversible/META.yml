@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Router::Simple::Reversible:
     file: lib/Router/Simple/Reversible.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Router::Simple: '0'
   parent: '0'
@@ -35,6 +35,9 @@ resources:
   bugtracker: https://github.com/motemen/perl5-Router-Simple-Reversible/issues
   homepage: https://github.com/motemen/perl5-Router-Simple-Reversible
   repository: git://github.com/motemen/perl5-Router-Simple-Reversible.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:MOTEMEN
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_contributors:
+  - 'papix <papix@hatena.ne.jp>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -14,6 +14,7 @@ t/00use.t
 t/01dynamically.t
 t/02tiescalar.t
 t/03lost-values.t
+t/04scopes.t
 t/80await+dynamically.t
 t/80dynamically+Object-Pad.t
 t/80dynamically+Sentinel.t

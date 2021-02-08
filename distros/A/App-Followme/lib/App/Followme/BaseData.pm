@@ -7,6 +7,7 @@ use integer;
 use lib '../..';
 
 use base qw(App::Followme::ConfiguredObject);
+use App::Followme::FIO;
 
 #----------------------------------------------------------------------
 # Default values of parameters
@@ -15,7 +16,8 @@ sub parameters {
     my ($pkg) = @_;
 
     return (
-            labels => 'previous,next',
+            list_length => 5,
+            target_prefix => 'target',
             );
 }
 
@@ -27,6 +29,17 @@ sub build {
 
     # Extract the sigil from the variable name, if present
     my ($sigil, $name) = $self->split_name($variable_name);
+
+    # Extract the sort field from the variable name
+    my ($data_field, $sort_field, $sort_reverse);
+    ($data_field, $sort_field) = split('_by_', $name);
+    if (defined $sort_field) {
+        if ($sort_field =~ s/_reversed$//) {
+            $sort_reverse = 1;
+        } else {
+            $sort_reverse = 0;
+        }
+    }
 
     my %cache = ();
     if ($sigil eq '$') {
@@ -40,16 +53,18 @@ sub build {
     }
 
     # Build the value associated with a name if it is not in the cache
-    unless (exists $cache{$name}) {
-        my $sorted_order = $sigil eq '';
-        my %data = $self->fetch_data($name, $item, $loop);
-        %data = $self->format($sorted_order, %data);
+    unless (exists $cache{$data_field}) {
+        my %data = $self->fetch_data($data_field, $item, $loop);
 
-        %cache = (%cache, %data);
+        my $sorted_order = 0;
+        my $sorted_data = $self->sort(\%data, $sort_field, $sort_reverse);
+        $sorted_data = $self->format($sorted_order, $sorted_data);
+
+        %cache = (%cache, %$sorted_data);
     }
 
     # Check the value for agreement with the sigil and return reference
-    my $ref_value = $self->ref_value($cache{$name}, $sigil, $name);
+    my $ref_value = $self->ref_value($cache{$data_field}, $sigil, $data_field);
     $self->{cache} = \%cache if $sigil eq '$';
     return $ref_value;
 }
@@ -83,22 +98,130 @@ sub coerce_data {
 
 sub fetch_data {
     my ($self, $name, $item, $loop) = @_;
-    return $self->gather_data('get', $name, $item, $loop);
+
+    my %data = $self->gather_data('get', $name, $item, $loop);
+    return %data;
+}
+
+#----------------------------------------------------------------------
+# Choose the file comparison routine that matches the configuration
+
+sub file_comparer {
+    my ($self, $sort_reverse) = @_;
+
+    my $comparer;
+    if ($sort_reverse) {
+        $comparer = sub ($$) {$_[1]->[0] cmp $_[0]->[0]};
+    } else {
+        $comparer = sub ($$) {$_[0]->[0] cmp $_[1]->[0]};
+    }
+
+    return $comparer;
+}
+
+#----------------------------------------------------------------------
+# If there is omly a single field containing data, return its name
+
+sub find_data_field {
+    my ($self, $data) = @_;
+
+    my @keys = keys %$data;
+
+    my $field;
+    if (@keys == 1 ) {
+        my $key = $keys[0];
+        if (ref $data->{$key} eq 'ARRAY') {
+            $field = $key;
+        }
+    }
+
+    return $field;
+}
+
+#----------------------------------------------------------------------
+# Find the values to sort by and format them so they are in sort order
+
+sub find_sort_column {
+    my ($self, $data_column, $sort_field) = @_;
+    
+    my $formatter = "format_$sort_field";
+    $formatter = "format_nothing" unless $self->can($formatter);
+
+    my @sort_column;
+    my $sorted_order = 1;
+
+    for my $data_item (@$data_column) {
+        my %data = $self->fetch_data($sort_field, $data_item, $data_column);
+
+        if (exists $data{$sort_field}) {
+            push(@sort_column, $self->$formatter($sorted_order, 
+                                                 $data{$sort_field}));
+        } else {
+            warn "Sort field not found: $sort_field";
+            push(@sort_column, $data_item);
+        }
+        
+    }
+
+    return \@sort_column;
+}
+
+#----------------------------------------------------------------------
+# Find the target, return the target plus an offset
+
+sub find_target {
+    my ($self, $offset, $item, $loop) = @_;
+    die "Can't use \$target_* outside of for\n"  unless $loop;
+
+    my $match = -999;
+    foreach my $i (0 .. @$loop) {
+        if ($loop->[$i] eq $item) {
+            $match = $i;
+            last;
+        }
+    }
+
+    my $index = $match + $offset + 1;
+    $index = 0 if $index < 1 || $index > @$loop;
+    return $index ? $self->{target_prefix} . $index : '';
 }
 
 #----------------------------------------------------------------------
 # Apply an optional format to the data
 
 sub format {
-    my ($self, $sorted_order, %data) = @_;
+    my ($self, $sorted_order, $sorted_data) = @_;
 
-    foreach my $name (keys %data) {
-        my $method = join('_', 'format', $name);
-        $data{$name} = $self->$method($sorted_order, $data{$name})
-                       if $self->can($method);
+    foreach my $name (keys %$sorted_data) {
+        next unless $sorted_data->{$name};
+
+        my $formatter = join('_', 'format', $name);
+        if ($self->can($formatter)) {
+            if (ref $sorted_data->{$name} eq 'ARRAY') {
+                for my $value (@{$sorted_data->{$name}}) {
+                    $value = $self->$formatter($sorted_order,
+                                               $value);
+                }
+
+            } elsif (ref $sorted_data->{$name} eq 'HASH') {
+                die("Illegal data format for build: $name");
+
+            } else {
+                $sorted_data->{$name} =
+                    $self->$formatter($sorted_order, $sorted_data->{$name});
+            }
+        }
     }
 
-    return %data;
+    return $sorted_data;
+}
+
+#----------------------------------------------------------------------
+# Don't format anything
+
+sub format_nothing {
+    my ($self, $sorted_order, $value) = @_;
+    return $value;
 }
 
 #----------------------------------------------------------------------
@@ -159,28 +282,6 @@ sub get_is_last {
 }
 
 #----------------------------------------------------------------------
-# Return the label for the current list item
-
-sub get_label {
-    my ($self, $item, $loop) = @_;
-
-    die "Can't use \$label outside of for\n" unless $loop;
-
-    my $count = $self->get_count($item, $loop);
-    my @labels = split(/\s*,\s*/, $self->{labels});
-
-    my $label;
-    if (defined $count && $count <= @labels) {
-        my @words = map {ucfirst $_} split(/\s+/, $labels[$count-1]);
-        $label = join(' ', @words);
-    } else {
-        $label = '';
-    }
-
-    return $label;
-}
-
-#----------------------------------------------------------------------
 # Return the current list of loop items
 
 sub get_loop {
@@ -191,46 +292,99 @@ sub get_loop {
 }
 
 #----------------------------------------------------------------------
-# Return previous and next loop items
+# Return the name of the current item in a loop
 
-sub get_sequence {
+sub get_name {
+    my ($self, $item) = @_;
+    return $item;
+}
+
+#----------------------------------------------------------------------
+# Get the current target
+
+sub get_target {
     my ($self, $item, $loop) = @_;
-    die "Can't use \@sequence outside of for\n"  unless $loop;
+    return $self->find_target(0, $item, $loop);
+}
 
-    my $match;
-    foreach my $i (0 .. @$loop) {
-        if ($loop->[$i] eq $item) {
-            $match = $i;
-            last;
+#----------------------------------------------------------------------
+# Get the next target
+
+sub get_target_next {
+    my ($self, $item, $loop) = @_;
+    return $self->find_target(1, $item, $loop);
+}
+
+#----------------------------------------------------------------------
+# Get the previous target
+
+sub get_target_previous {
+    my ($self, $item, $loop) = @_;
+    return $self->find_target(-1, $item, $loop);
+}
+
+
+#----------------------------------------------------------------------
+# Augment the array to be sorted with the column to sort it by
+sub make_augmented {
+    my ($self, $sort_column, $data_column) = @_;
+
+    my @augmented_list;
+    for (my $i = 0; $i < @$sort_column; $i++) {
+        push(@augmented_list, [$sort_column->[$i], $data_column->[$i]]);
+    }
+
+    return @augmented_list;
+}
+
+#----------------------------------------------------------------------
+# Merge two sorted lists of augmented filenames
+
+sub merge_augmented {
+    my ($self, $list1, $list2) = @_;
+
+    my @merged_list = ();
+    my $sort_reverse = 1;
+    my $comparer = $self->file_comparer($sort_reverse);
+
+    while(@$list1 && @$list2) {
+        last if @merged_list == $self->{list_length};
+        if ($comparer->($list1->[0], $list2->[0]) > 0) {
+            push(@merged_list, shift @$list2);
+        } else {
+            push(@merged_list, shift @$list1);
         }
     }
 
-    my @sequence;
-    if (defined $match && $match > 0) {
-        $sequence[0] = $loop->[$match-1];
-    } else {
-        $sequence[0] = '';
+    while (@$list1) {
+        last if @merged_list == $self->{list_length}; 
+        push(@merged_list, shift @$list1);
     }
 
-    if (defined $match && $match < @$loop-1) {
-        $sequence[1] = $loop->[$match+1];
-    } else {
-        $sequence[1] = '';
+    while (@$list2) {
+        last if @merged_list == $self->{list_length};
+        push(@merged_list, shift @$list2);
     }
 
-    return \@sequence;
+     return \@merged_list;
 }
 
 #----------------------------------------------------------------------
 # Get a reference value and check it for agreement with the sigil
 
 sub ref_value {
-    my ($self, $value, $sigil, $name) = @_;
+    my ($self, $value, $sigil, $data_field) = @_;
 
     my ($check, $ref_value);
     if ($sigil eq '$'){
         $value = '' unless defined $value;
-        $ref_value = ref $value ? $value : \$value;
+        if (ref $value ne 'SCALAR') {
+			# Convert data structures for inclusion in template
+			$value = fio_flatten($value);
+			$ref_value = \$value;
+		} else {
+			$ref_value = $value;
+		}
         $check = ref $ref_value eq 'SCALAR';
 
     } elsif ($sigil eq '@') {
@@ -242,7 +396,7 @@ sub ref_value {
         $check = 1;
     }
 
-    die "Unknown variable: $sigil$name\n" unless $check;
+    die "Unknown variable: $sigil$data_field\n" unless $check;
     return $ref_value;
 }
 
@@ -253,6 +407,63 @@ sub setup {
     my ($self, %configuration) = @_;
 
     $self->{cache} = {};
+}
+
+#----------------------------------------------------------------------
+# Sort the data if it is in an array
+
+sub sort {
+    my ($self, $data, $sort_field, $sort_reverse) = @_;
+
+    my $sorted_data;
+    my $data_field = $self->find_data_field($data);
+
+    if ($data_field) {
+        my @augmented_data = $self->sort_with_field($data->{$data_field},
+                                                    $sort_field, 
+                                                    $sort_reverse);
+
+        my @stripped_data = $self->strip_augmented(@augmented_data);
+        $sorted_data = {$data_field => \@stripped_data};
+
+    } else {
+        $sorted_data = $data;
+    }
+
+    return $sorted_data;
+}
+
+#----------------------------------------------------------------------
+# Sort augmented list by swartzian transform
+
+sub sort_augmented {
+    my ($self, $sort_reverse, @augmented_data) = @_;
+
+    my $comparer = $self->file_comparer($sort_reverse);
+    @augmented_data = sort $comparer @augmented_data;
+    return @augmented_data;
+}
+
+#----------------------------------------------------------------------
+# Sort data retaining the field you sort with
+
+sub sort_with_field {
+    my ($self, $data_column, $sort_field, $sort_reverse) = @_;
+    $sort_field = 'name' unless defined $sort_field;
+    $sort_reverse = 0 unless defined $sort_reverse;
+
+    my $sort_column = $self->find_sort_column($data_column, $sort_field);
+
+    return $self->sort_augmented($sort_reverse,
+           $self->make_augmented($sort_column, $data_column));
+}
+
+#----------------------------------------------------------------------
+# Return the filenames from an augmented set of files
+
+sub strip_augmented {
+    my $self = shift @_;
+    return map {$_->[1]} @_;
 }
 
 #----------------------------------------------------------------------
@@ -325,12 +536,6 @@ can only be used inside a for block.
 
 A list with all the loop items from the immediately enclosing for block.
 
-=item @sequence
-
-A two item list containing the previous and next items in the for block. If the
-current item is first or last, the corrsponding item in the sequence list will
-be the empty string.
-
 =item $count
 
 The count of the current item in the for block.The count starts at one.
@@ -343,28 +548,41 @@ One if this is the first item in the for block, zero otherwise.
 
 One if this is the last item in the for block, zero otherwise
 
-=item $item
+=item $name
 
-The current item in the for block.
+The name of the current item in the for block.
 
-=item $label
+=item $target
 
-The string from the comma separated list of labels that corresponds to the
-current item in a list.
+A string that can be used as a target for the location of the current item
+in the page.
+
+=item $target_next
+
+A string that can be used as a target for the location of the next item
+in the page. Empty if there is no next item.
+
+=item $target_previous
+
+A string that can be used as a target for the location of the previous item
+in the page. Empty if there is no previous item.
 
 =back
 
 =head1 CONFIGURATION
 
-There is one parameter:
+There are two parameters:
 
 =over 4
 
-=item labels
+=item list_length
 
-A comma separated list of strings containing a list of labels to apply
-to the values in a loop. The default value is "previous,next" and is
-meant to be used with @sequence.
+This determines the number of filenames in a merged list. The default
+value of this parameter is 5
+
+=item target_prefix
+
+The prefix used to build the target names. The default value is 'target'.
 
 =back
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: validator for BibTeX format
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.1.1'; # VERSION
 
 use Algorithm::CheckDigits;
 use Data::Validate::Email qw( is_email_rfc822 );
@@ -67,7 +67,7 @@ sub validate_BibTeX
         }
     }
 
-    # Both keys are non-standard
+    # Both keys are nonstandard
     for my $key ('isbn', 'issn') {
         next if !exists $entry->{$key};
         my $check = CheckDigits( $key );
@@ -85,7 +85,7 @@ sub validate_BibTeX
                      uc $key;
     }
 
-    # Both keys are non-standard
+    # Both keys are nonstandard
     for my $key ('eprint', 'url') {
         next if !exists $entry->{$key};
         next if defined is_uri $entry->{$key};
@@ -94,7 +94,7 @@ sub validate_BibTeX
                      $entry->{$key};
     }
 
-    # Non-standard
+    # Nonstandard
     if( exists $entry->{pmid} ) {
         if( $entry->{pmid} !~ /^[1-9][0-9]*$/ ) {
             warn sprintf 'pmid: value \'%s\' does not look like valid PMID' . "\n",
@@ -104,3 +104,44 @@ sub validate_BibTeX
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Text::BibTeX::Validate - validator for BibTeX format
+
+=head1 SYNOPSIS
+
+    use Text::BibTeX;
+    use Text::BibTeX::Validate qw( validate_BibTeX );
+
+    my $bibfile = Text::BibTeX::File->new( 'bibliography.bib' );
+    while( my $entry = Text::BibTeX::Entry->new( $bibfile ) ) {
+        validate_BibTeX( $entry );
+    }
+
+=head1 DESCRIPTION
+
+Text::BibTeX::Validate checks the standard fields of BibTeX entries for
+their compliance with their format. In particular, value of C<email> is
+checked against RFC 822 mandated email address syntax, value of C<doi>
+is checked to start with C<10.> and contain at least one C</> and so on.
+Some nonstandard fields as C<isbn>, C<issn> and C<url> are also checked.
+Failures of checks are raised as Perl warnings.
+
+Subroutine C<validate_BibTeX> currently accepts plain Perl hash
+references containing BibTeX fields and their values, as well as
+L<Text::BibTeX::Entry|Text::BibTeX::Entry> objects.
+
+=head1 SEE ALSO
+
+perl(1)
+
+=head1 AUTHORS
+
+Andrius Merkys, E<lt>merkys@cpan.orgE<gt>
+
+=cut

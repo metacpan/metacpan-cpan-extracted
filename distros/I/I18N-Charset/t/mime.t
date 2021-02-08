@@ -1,7 +1,7 @@
-# $Id: mime.t,v 1.5 2005-09-01 03:09:45 Daddy Exp $
+
 # mime.t - tests for "preferred MIME name" functionality of I18N::Charset
 
-use Test::More tests => 14;
+use Test::More;
 
 BEGIN { use_ok('I18N::Charset') };
 
@@ -28,7 +28,7 @@ ok(mime_charset_name("US-ASCII") eq "US-ASCII", 'Alias is preferred, try preferr
 ok(mime_charset_name("ms_kanji_") eq "Shift_JIS", 'Name is preferred, try Alias');
 ok(mime_charset_name("Big5") eq "Big5", 'Name is preferred, try Name');
 
-exit 0;
+done_testing();
 
 __END__
 

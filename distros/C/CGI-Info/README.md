@@ -1,9 +1,11 @@
-[![Linux Build Status](https://travis-ci.org/nigelhorne/CGI-Info.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Info)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
-[![Dependency Status](https://dependencyci.com/github/nigelhorne/CGI-Info/badge)](https://dependencyci.com/github/nigelhorne/CGI-Info)
-[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/CGI-Info/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Info?branch=master)
+[![Actions Status](https://github.com/nigelhorne/CGI-Info/workflows/.github/workflows/all.yml/badge.svg)](https://github.com/nigelhorne/CGI-Info/actions)
+[![Travis Status](https://travis-ci.org/nigelhorne/CGI-Info.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Info)
+[![Appveyor Status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
+[![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/CGI-Info/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Info?branch=master)
 [![CPAN](https://img.shields.io/cpan/v/CGI-Info.svg)](http://search.cpan.org/~nhorne/CGI-Info/)
 [![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/)
+[![Kwalitee](https://cpants.cpanauthors.org/dist/CGI-Info.png)](http://cpants.cpanauthors.org/dist/CGI-Info)
+[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Information+about+the+CGI+Environment+#perl+#CGI&url=https://github.com/nigelhorne/cgi-info&via=nigelhorne)
 
 # NAME
 
@@ -11,7 +13,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.70
+Version 0.71
 
 # SYNOPSIS
 
@@ -38,7 +40,7 @@ It takes four optional arguments allow, logger, expect and upload\_dir,
 which are documented in the params() method.
 
 Takes an optional parameter syslog, to log messages to
-[Sys::Syslog](https://metacpan.org/pod/Sys::Syslog).
+[Sys::Syslog](https://metacpan.org/pod/Sys%3A%3ASyslog).
 It can be a boolean to enable/disable logging to syslog, or a reference
 to a hash to be given to Sys::Syslog::setlogsock.
 
@@ -90,7 +92,7 @@ Returns the file system directory containing the script.
 
         my $info = CGI::Info->new();
 
-        print 'HTML files are normally stored in ' .  $info->script_dir() . '/' . File::Spec->updir() . "\n";
+        print 'HTML files are normally stored in ', $info->script_dir(), '/', File::Spec->updir(), "\n";
 
 ## host\_name
 
@@ -138,7 +140,7 @@ Returns undef if the parameters can't be determined or if none were given.
 If an argument is given twice or more, then the values are put in a comma
 separated string.
 
-The returned hash value can be passed into [CGI::Untaint](https://metacpan.org/pod/CGI::Untaint).
+The returned hash value can be passed into [CGI::Untaint](https://metacpan.org/pod/CGI%3A%3AUntaint).
 
 Takes four optional parameters: allow, expect, logger and upload\_dir.
 The parameters are passed in a hash, or a reference to a hash.
@@ -163,7 +165,7 @@ be stored.
 Takes optional parameter logger, an object which is used for warnings and
 traces.
 This logger object is an object that understands warn() and trace() messages,
-such as a [Log::Log4perl](https://metacpan.org/pod/Log::Log4perl) or [Log::Any](https://metacpan.org/pod/Log::Any) object.
+such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object.
 
 The allow, expect, logger and upload\_dir arguments can also be passed to the
 constructor.
@@ -266,7 +268,7 @@ it can't be determined.
 Returns the name of a directory that you can use to create temporary files
 in.
 
-The routine is preferable to ["tmpdir" in File::Spec](https://metacpan.org/pod/File::Spec#tmpdir) since CGI programs are
+The routine is preferable to ["tmpdir" in File::Spec](https://metacpan.org/pod/File%3A%3ASpec#tmpdir) since CGI programs are
 often running on shared servers.  Having said that, tmpdir will fall back
 to File::Spec->tmpdir() if it can't find somewhere better.
 
@@ -281,7 +283,7 @@ Tmpdir allows a reference of the options to be passed.
 
         my $info = CGI::Info->new();
         my $dir = $info->tmpdir(default => '/var/tmp');
-        my $dir = $info->tmpdir({ default => '/var/tmp' });
+        $dir = $info->tmpdir({ default => '/var/tmp' });
 
         # or
 
@@ -311,7 +313,7 @@ Is the visitor a real person or a robot?
 
         my $info = CGI::Info->new();
         unless($info->is_robot()) {
-          # update site visitor statistics
+         # update site visitor statistics
         }
 
 ## is\_search\_engine
@@ -371,12 +373,12 @@ API is the same as "param", it will replace the "get\_cookie" method in the futu
 
         use CGI::Info;
 
-        my $name = CGI::Info->new()->get_cookie(name);
+        my $name = CGI::Info->new()->cookie(name);
         print "Your name is $name\n";
 
 ## status
 
-Returns the status of the object, 200 for OK, otherwise an HTTP error code
+Sets or returns the status of the object, 200 for OK, otherwise an HTTP error code
 
 ## set\_logger
 
@@ -410,7 +412,7 @@ things to happen.
 
 # SEE ALSO
 
-[HTTP::BrowserDetect](https://metacpan.org/pod/HTTP::BrowserDetect)
+[HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
 
 # SUPPORT
 
@@ -420,20 +422,32 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
+- MetaCPAN
+
+    [https://metacpan.org/release/CGI-Info](https://metacpan.org/release/CGI-Info)
+
 - RT: CPAN's request tracker
 
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info](http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info)
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info](https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info)
+
+- CPANTS
+
+    [http://cpants.cpanauthors.org/dist/CGI-Info](http://cpants.cpanauthors.org/dist/CGI-Info)
+
+- CPAN Testers' Matrix
+
+    [http://matrix.cpantesters.org/?dist=CGI-Info](http://matrix.cpantesters.org/?dist=CGI-Info)
 
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/CGI-Info](http://cpanratings.perl.org/d/CGI-Info)
 
-- Search CPAN
+- CPAN Testers Dependencies
 
-    [http://search.cpan.org/dist/CGI-Info/](http://search.cpan.org/dist/CGI-Info/)
+    [http://deps.cpantesters.org/?module=CGI::Info](http://deps.cpantesters.org/?module=CGI::Info)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2019 Nigel Horne.
+Copyright 2010-2021 Nigel Horne.
 
 This program is released under the following licence: GPL2

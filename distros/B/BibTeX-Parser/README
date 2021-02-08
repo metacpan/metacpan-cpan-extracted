@@ -1,9 +1,9 @@
 This archive contains the distribution BibTeX-Parser,
-version 1.02:
+version 1.03:
 
   A pure perl BibTeX parser
 
-This software is copyright (c) 2013--2017 by Gerhard Gossen and Boris Veytsman
+This software is copyright (c) 2013--2021 by Gerhard Gossen and Boris Veytsman
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

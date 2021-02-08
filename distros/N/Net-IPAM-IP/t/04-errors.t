@@ -25,16 +25,6 @@ $bytes = substr( $ip->bytes, 1 );
 eval { Net::IPAM::IP->new_from_bytes($bytes) };
 like( $@, qr/illegal input/i, 'new_from_bytes: wrong number of bytes' );
 
-$ip = Net::IPAM::IP->new('fe80::1');
-$ip->{binary} = substr( $ip->{binary}, 1 );
-eval { $ip->expand };
-like( $@, qr/logic error/i, 'expand: logic error' );
-
-$ip = Net::IPAM::IP->new('0.0.0.0');
-$ip->{binary} = substr( $ip->{binary}, 1 );
-eval { $ip->reverse };
-like( $@, qr/logic error/i, 'expand: logic error' );
-
 {
   local $SIG{__WARN__} = sub { die @_ };
   eval { Net::IPAM::IP->getaddrs() };

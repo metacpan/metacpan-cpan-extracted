@@ -4,13 +4,13 @@
       "Laurent Dami <laurent.dami AT justice.ge.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "SQL-Abstract-FromQuery",
    "prereqs" : {
@@ -30,7 +30,7 @@
             "List::MoreUtils" : "0",
             "Module::Load" : "0",
             "Params::Validate" : "0",
-            "Regexp::Grammars" : "1.038",
+            "Regexp::Grammars" : "1.048",
             "Scalar::Util" : "0",
             "UNIVERSAL::DOES" : "0",
             "namespace::clean" : "0",
@@ -42,7 +42,7 @@
    "provides" : {
       "SQL::Abstract::FromQuery" : {
          "file" : "lib/SQL/Abstract/FromQuery.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "SQL::Abstract::FromQuery::Contains" : {
          "file" : "lib/SQL/Abstract/FromQuery/Contains.pm"
@@ -63,5 +63,6 @@
          "url" : "https://github.com/damil/SQL-Abstract-FromQuery"
       }
    },
-   "version" : "0.10"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

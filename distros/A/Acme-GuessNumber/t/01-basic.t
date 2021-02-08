@@ -10,7 +10,7 @@ use Test;
 
 BEGIN { plan tests => 1 }
 
-use vars qw($r);
+our $r;
 
 $r = eval {
     use Acme::GuessNumber;

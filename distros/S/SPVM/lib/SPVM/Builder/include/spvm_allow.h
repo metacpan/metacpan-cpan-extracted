@@ -1,9 +1,9 @@
 #ifndef SPVM_ALLOW_H
 #define SPVM_ALLOW_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
-struct SPVM_allow {
+struct spvm_allow {
   SPVM_OP* op_type;
 };
 

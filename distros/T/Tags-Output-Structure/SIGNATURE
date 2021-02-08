@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,15 +12,15 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: RIPEMD160
 
-SHA256 ebc4efa397b0d9a4e558257474425e895f2edda681743a83798dd495f0098908 Changes
-SHA256 1ae39daee8ea9b57b471d2c15aae3939c74e92af2daced627a4abf8866cdd546 LICENSE
+SHA256 9f615a876039796811b80b106df51f82dd2dfd5fb551ea2678c60841290c9cc4 Changes
+SHA256 add03f140951476fdc6385312dd86b09384db6bf5f9064a862c4b97105e6412a LICENSE
 SHA256 5b76c060014b48ccd8635438140a5b228484c78c91f84292fdf51310780fdd36 MANIFEST
-SHA256 93a80f82b5bc035deda74326704e0c9321a21f21676f6edb6766be617b814c7f META.yml
-SHA256 9bc4f9019a7de982d803b0af461e6ff55ca73f1415b4d435ad65c8b450e9cf6a Makefile.PL
-SHA256 c0bb920dcdf90b85040bdfb34993c88dfdee26c3e64503490a4c794975f2be24 README
-SHA256 b60c7abbf3a797f6d7a34ea46efa08ff69434f774f4a463b68c0a60cff6172f8 Structure.pm
+SHA256 1fbbfbdbaa9257242edbafc510234b1e20bbcd37692433d882eed2b9c3260101 META.yml
+SHA256 494fb5ef9c4672dd6670b09e8131c6d75afce1e8aa3c2db442eedb9ca866f2f0 Makefile.PL
+SHA256 884a135dfa3539e9f0a6e1d8eac760a0d1bdbc52baae322a28892164121253d9 README
+SHA256 e6dcc97b70be632221ffef324b5b75db3ea39a06194d0c31e2fcc3fb7f3e5277 Structure.pm
 SHA256 22cadbf9615a17f0c3126af2426dcc3289c8aa36162350593dd7d6bdb14f16e0 examples/ex1.pl
 SHA256 6dfc00504f53309ab8fb5e2b29dafce6e897ded530f6a3df995c6d8caa896c32 examples/ex2.pl
 SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
@@ -35,7 +35,7 @@ SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Modu
 SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
 SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
 SHA256 591d956fc82122e3aaf263d032bd9de0fe3628137d5b9dd46b1f49b70eaad60c t/Tags-Output-Structure/01-use.t
-SHA256 af0dc8a17c100370aea20a9a5a4ccb78937506a499c979752d78dedef196ba39 t/Tags-Output-Structure/02-version.t
+SHA256 ee0c652b5f6988d7fcfc2c49dd2a611ac9cefbb176723dd20f30b05b568d27a3 t/Tags-Output-Structure/02-version.t
 SHA256 e6ffef764d018500c75781f7df27da110d198d4758cf34794dfc8e4a56b8bb3c t/Tags-Output-Structure/03-new.t
 SHA256 7f778b58d1fca70b88aac2b28a08655def08f072ab2feb127e4c242f04401851 t/Tags-Output-Structure/04-put-comment.t
 SHA256 df6ca15bda0306a5eeeb34b2327956625ad51ed75ed93988dd9bd7994ebc4e5e t/Tags-Output-Structure/05-put-simple_tag.t
@@ -47,12 +47,15 @@ SHA256 603acf89f673d0c7ab75a0bb43a31c4034fb046152dda68a4cd5121b599cbb0b xt/Tags-
 SHA256 33273f5d67e4b354d02a3b4c381586984090719c98394926c6cf4b18bc692930 xt/Tags-Output-Structure/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl8zAGwACgkQKyiOZjWe
-rHYJHgf8CTP0MQNVlxaemrZcV7HR9utw1DForrS9HVmxn804wdoF9zr2LjVWA1um
-GAJUUvVCFgYjARtBMclG5XDR3fH0Yng/klSHSPOQ/ctONOsw2fU+S+eluA7AUizD
-R+HY7rXUg2lFyFaTL3loWbVxwBS5C9g0lRcHDrUc2kmnn8rMqfxvX5ghg4BY+3wB
-/hR3UOc7l/91XMAkC8mNf8eN3Zn/XuNt7VPfcq4m9SakwQ04Q8Wnezh4kg7C9R34
-Aky+nHwzKd45vJ3LzLHBxwGvwoSjLin2ZLohQkEhDkmasP4esgbMRw2WrX1BAHex
-TZdL4B/9/rHiJZJuouCqqMBba6LTSw==
-=bjCV
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmAbH0YACgkQgmqNLzlX
+aRegagwAlTByg33TmeV6RynopjktVDN3IjZwcYVsiJ+bAEII0D09hBqQev5pHavV
+954G6nVh0fx7d/htGRZJd6wiLe/ywpVxepuoIb7qN3J2k+/P6sQujBwMPKt1UbrG
+PIH4AoB19ljbEHQBt0uY7MtCp9rFo8uOuWeqMlzGMDZd6FQu8aAOuwEujk5KrOds
+LN9uLRIeDukYGL07qJsCMSFXKjA2jWB6VFgoaHggGnueeE3E0tkv9raaRn+di2fY
+AV2zePIUnd9VD4p9o2uKo4rz2lEiBZoCaMUSYaa01wT7vcaADFhjC+73LGWCSb1Q
+umreMV/RwdgI7HvdOlV21JvIxzq3w5PmxWRMbTT2QNttmzNjMNRQ5ndG4Xdic3nx
+uYaRENhv4bzsujOYM0/kHeA5L06+3a7suFYnxagCI/870HLAiVQAJXuUV/XV00VT
+T8djwMomAX6En9bRBa7T8h2TAfQ3mRbeoRihs+VE5uPgfLheTm7a08FpOyQdFF5W
+5LKIDD9k
+=zEF8
 -----END PGP SIGNATURE-----

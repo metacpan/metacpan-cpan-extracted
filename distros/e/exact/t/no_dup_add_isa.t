@@ -10,7 +10,7 @@ package Child {
 }
 
 BEGIN {
-    $INC{ $_ . '.pm'} = 1 for qw( Parent Child );
+    $INC{ $_ . '.pm' } = 1 for qw( Parent Child );
 }
 
 sub child_parents {

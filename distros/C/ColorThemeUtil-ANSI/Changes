@@ -1,3 +1,9 @@
+0.002   2021-02-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] In cases where item's ansi_fg or ansi_bg is declared,
+	  color depth detection was not performed.
+
+
 0.001   2020-06-09  Released-By: PERLANCAR
 
         - First release, modified from Color-Theme-Util-ANSI.

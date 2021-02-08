@@ -1,16 +1,22 @@
 package Pithub::PullRequests;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 Pull Requests API
 
 use Moo;
-use Carp qw(croak);
+use Carp qw( croak );
 use Pithub::PullRequests::Comments;
+use Pithub::PullRequests::Reviewers;
 extends 'Pithub::Base';
 
 
 sub comments {
     return shift->_create_instance('Pithub::PullRequests::Comments', @_);
+}
+
+
+sub reviewers {
+    return shift->_create_instance('Pithub::PullRequests::Reviewers', @_);
 }
 
 
@@ -123,13 +129,17 @@ Pithub::PullRequests - Github v3 Pull Requests API
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 METHODS
 
 =head2 comments
 
 Provides access to L<Pithub::PullRequests::Comments>.
+
+=head2 reviewers
+
+Provides access to L<Pithub::PullRequests::Reviewers>.
 
 =head2 commits
 

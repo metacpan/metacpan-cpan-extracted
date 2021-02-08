@@ -1,12 +1,24 @@
 Acme-GuessNumber change log
 
-2013-05-10
+2021-02-08	version 0.05
+
+2021-02-07
+	Acme-GuessNumber is now hosted on GitHub.
+	 1. Added MANIFEST.SKIP.
+	 2. COPYING: Removed the redundant and irrelevant GPL license copy.
+	 3. INSTALL, README, TODO, README.md: Replaced the messy
+	    GNU-styled documents with a single Markdown README.md.
+	 4. Revised the URL in README.
+	 5. Added the CPAN distribution metadata to Makefile.PL and
+	    Build.PL.
+
+2013-05-10	version 0.04
 	 1. lib/Acme/GuessNumber.pm: Applied the patch from Mark A. Smith
-        <jprogrammer082@gmail.com>, in order to fix the English errors
-        in the POD.  Thank you, Mark, although I will not share my
-        jackpot with you.  You have to win your own. ^_^
-     2. lib/Acme/GuessNumber.pm: Fixed several other English mistakes
-        in the POD.
+            <jprogrammer082@gmail.com>, in order to fix the English errors
+            in the POD.  Thank you, Mark, although I will not share my
+            jackpot with you.  You have to win your own. ^_^
+	 2. lib/Acme/GuessNumber.pm: Fixed several other English mistakes
+            in the POD.
 
 2008-04-22
 	 1. Found the LICENSE in question is the work of

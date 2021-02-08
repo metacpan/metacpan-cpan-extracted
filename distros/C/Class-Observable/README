@@ -1,94 +1,42 @@
-Class::Observable - Base class for observable classes/objects
-=============================
+Class::Observable
 
-  # Define an observable class
+If you have ever used Java, you may have run across the
+"java.util.Observable" class and the "java.util.Observer" interface. With
+them you can decouple an object from the one or more objects that wish to
+be notified whenever particular events occur.
 
-  package My::Object;
+These events occur based on a contract with the observed item. They may
+occur at the beginning, in the middle or end of a method. In addition,
+the object knows that it is being observed. It just does not know how
+many or what types of objects are doing the observing. It can therefore
+control when the messages get sent to the obsevers.
 
-  use base qw( Class::Observable );
-
-  # Tell all classes/objects observing this object that a state-change
-  # has occurred
-
-  sub create {
-     my ( $self ) = @_;
-     eval { $self->_perform_save() };
-     if ( $@ ) {
-         My::Exception->throw( "Error saving: $@" );
-     }
-     $self->notify_observers( 'create' );
-  }
-
-  # Define an observer
-
-  package My::Observer;
-
-  sub update {
-     my ( $class, $object, $action ) = @_;
-     unless ( $action ) {
-         warn "Cannot operation on [", $object->id, "] without action";
-         return;
-     }
-     $class->_on_create( $object ) if ( $action eq 'create' );
-     $class->_on_update( $object ) if ( $action eq 'update' );
-  }
-
-  # Register the observer class with all instances of the observable
-  # class
-
-  My::Object->add_observer( 'My::Observer' );
-
-  # Register the observer class with a single instance of the
-  # observable class
-
-  my $object = My::Object->new( 'foo' );
-  $object->add_observer( 'My::Observer' );
-
-  # Register an observer object the same way
-
-  my $observer = My::Observer->new( 'bar' );
-  My::Object->add_observer( $observer );
-  my $object = My::Object->new( 'foo' );
-  $object->add_observer( $observer );
-
-  # Register an observer using a subroutine
-
-  sub catch_observation { ... }
-
-  My::Object->add_observer( \&catch_observation );
-  my $object = My::Object->new( 'foo' );
-  $object->add_observer( \&catch_observation );
-
-  # Delete a single observer; delete all observers
-
-  My::Object->delete_observer( $observer );
-  My::Object->delete_observers();
-
-  # More... see the docs
+The behavior of the observers is up to you. However, be aware that we do
+not do any error handling from calls to the observers. If an observer
+throws a "die", it will bubble up to the observed item and require
+handling there. So be careful.
 
 INSTALLATION
 
-To install this module perform the typical four-part Perl salute:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-DEPENDENCIES
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-This module requires these other modules and libraries:
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-  Class::ISA
-  Scalar::Util
+COPYRIGHT AND LICENSE
 
-COPYRIGHT AND LICENCE
+This software is copyright (c) 2002-2004 Chris Winters. This software is
+copyright (c) 2021 by Aristotle Pagaltzis.
 
-Copyright (c) 2002-2004 Chris Winters. All rights reserved.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-AUTHOR
-
-Chris Winters <chris@cwinters.com>
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

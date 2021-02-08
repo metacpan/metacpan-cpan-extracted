@@ -1,4 +1,4 @@
-use v5.28;
+use v5.24;
 use warnings;
 use Test::More;
 use Mock::Sub;
@@ -31,12 +31,19 @@ for my $state ($superpos->_states->@*) {
 }
 
 for my $num (0 .. 10) {
-	$rand->return_value($num / 10);
+
+	# add just a little to the denominator to avoid returning 1
+	$rand->return_value($num / (10.000000001));
 	my $collapsed = $superpos->collapse;
 	note Quantum::Superpositions::Lazy::Util::get_rand . " - $collapsed";
 
 	is $collapsed, ($num <= 2 ? 1 : 2), "value weight ok";
 	$superpos->reset;
 }
+
+my $pos_with_zero_weights = superpos([0 => 0], [1 => 1], [0 => 2]);
+$rand->return_value(0);
+my $collapsed = $pos_with_zero_weights->collapse;
+is $collapsed, 1, 'collapse with zero weight ok';
 
 done_testing;

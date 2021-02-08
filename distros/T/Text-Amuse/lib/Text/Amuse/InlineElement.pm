@@ -348,6 +348,26 @@ sub _markup_table {
                                ltx => '}',
                               }
                     },
+            sf => {
+                   open => {
+                            html => '<span class="muse-sf">',
+                            ltx => "\\textsf{"
+                           },
+                   close => {
+                             html => '</span>',
+                             ltx => '}',
+                            }
+                  },
+            sc => {
+                   open => {
+                            html => '<span class="muse-sc" style="font-variant: small-caps">',
+                            ltx => "\\textsc{"
+                           },
+                   close => {
+                             html => '</span>',
+                             ltx => '}',
+                            }
+                  },
            };
 }
 

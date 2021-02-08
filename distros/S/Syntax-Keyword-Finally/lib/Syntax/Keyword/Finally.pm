@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Finally 0.01;
+package Syntax::Keyword::Finally 0.02;
 
 use v5.14;
 use warnings;
@@ -119,6 +119,27 @@ the C<FINALLY> statement, the code body does not need to run.
    my $resource = Resource->open( ... );
    FINALLY { $resource->close; }
 
+Unlike as would happen with e.g. a C<DESTROY> method on a guard object, any
+exceptions thrown from a C<FINALLY> block are still propagated up to the
+caller in the usual way.
+
+   use Syntax::Keyword::Finally;
+
+   sub f
+   {
+      my $count = 0;
+      FINALLY { $count or die "Failed to increment count"; }
+
+      # some code here
+   }
+
+   f();
+
+Z<>
+
+   $ perl example.pl
+   Failed to increment count at examples.pl line 6.
+
 =cut
 
 sub import
@@ -152,7 +173,8 @@ out because this implementation does not yet handle them:
 
 =item *
 
-Ensure that C<FINALLY> blocks can throw exceptions.
+Try to fix the double-exception test failure on Perl versions before v5.20.
+(Test currently skipped on those versions)
 
 =item *
 

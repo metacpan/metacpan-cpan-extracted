@@ -8,7 +8,7 @@ use DBI;
 use DBD::SQLite;
 use JSON::XS;
 
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.35'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -55,7 +55,8 @@ sub get {
         $sth->finish;
     }
     catch {
-        warn "Store get error with $namespace (likely an IRC::Store::SQLite issue); key = $key; error = $_\n";
+        my $e = $_ || $@;
+        warn "Store get error with $namespace (likely an IRC::Store::SQLite issue); key = $key; error = $e\n";
     };
 
     if ($value) {
@@ -84,7 +85,8 @@ sub set {
         ) or die $self->{dbh}->errstr;
     }
     catch {
-        warn "Store set error with $namespace (likely an IRC::Store::SQLite issue); key = $key; error = $_\n";
+        my $e = $_ || $@;
+        warn "Store set error with $namespace (likely an IRC::Store::SQLite issue); key = $key; error = $e\n";
     };
 
     return $self;
@@ -104,7 +106,7 @@ Bot::IRC::Store::SQLite - Bot::IRC persistent data storage with SQLite
 
 =head1 VERSION
 
-version 1.32
+version 1.35
 
 =head1 SYNOPSIS
 

@@ -63,10 +63,10 @@ WriteMakefile(
     'Test::utf8'             => 0,
   },
   dist => {
-    PREOP => "./build-data.sh --previoustag"
+    PREOP => "./build-data.sh --previouslibphonenumbertag"
   },
   realclean => {
-    FILES => "*.xlsx sabc.txt COCodeStatus_ALL.* AllBlocksAugmentedReport.* cover_db"
+    FILES => "cover_db"
   },
   PM => PM_from_manifest()
 );

@@ -4,16 +4,21 @@ package CGI::Info;
 
 use warnings;
 use strict;
-use Class::Autouse qw{Carp File::Spec};
+use Carp;
+use File::Spec;
 use Socket;	# For AF_INET
-use 5.006_001;
+use 5.008;
 use Log::Any qw($log);
 # use Cwd;
-use JSON::Parse;
+# use JSON::Parse;
+use JSON;
 use List::MoreUtils;	# Can go when expect goes
+# use Sub::Private;
 use Sys::Path;
 
 use namespace::clean;
+
+sub _sanitise_input($);
 
 =head1 NAME
 
@@ -21,11 +26,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.70
+Version 0.71
 
 =cut
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 =head1 SYNOPSIS
 
@@ -74,7 +79,11 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	return unless(defined($class));
+	# Use CGI::Info->new(), not CGI::Info::new()
+	if(!defined($class)) {
+		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		return;
+	}
 
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
@@ -124,52 +133,52 @@ sub script_name {
 }
 
 sub _find_paths {
-        my $self = shift;
+	my $self = shift;
 
 	require File::Basename;
 	File::Basename->import();
 
-        if($ENV{'SCRIPT_NAME'}) {
-                $self->{_script_name} = File::Basename::basename($ENV{'SCRIPT_NAME'});
-        } else {
-                $self->{_script_name} = File::Basename::basename($0);
-        }
+	if($ENV{'SCRIPT_NAME'}) {
+		$self->{_script_name} = File::Basename::basename($ENV{'SCRIPT_NAME'});
+	} else {
+		$self->{_script_name} = File::Basename::basename($0);
+	}
 	$self->{_script_name} = $self->_untaint_filename({
 		filename => $self->{_script_name}
 	});
 
-        if($ENV{'SCRIPT_FILENAME'}) {
-                $self->{_script_path} = $ENV{'SCRIPT_FILENAME'};
-        } elsif($ENV{'SCRIPT_NAME'} && $ENV{'DOCUMENT_ROOT'}) {
-                my $script_name = $ENV{'SCRIPT_NAME'};
-                if(substr($script_name, 0, 1) eq '/') {
-                        # It's usually the case, e.g. /cgi-bin/foo.pl
-                        $script_name = substr($script_name, 1);
-                }
-                $self->{_script_path} = File::Spec->catfile($ENV{'DOCUMENT_ROOT' }, $script_name);
-        } elsif($ENV{'SCRIPT_NAME'} && !$ENV{'DOCUMENT_ROOT'}) {
-                if(File::Spec->file_name_is_absolute($ENV{'SCRIPT_NAME'}) &&
-                   (-r $ENV{'SCRIPT_NAME'})) {
-                        # Called from a command line with a full path
-                        $self->{_script_path} = $ENV{'SCRIPT_NAME'};
-                } else {
-                        require Cwd;
-                        Cwd->import;
+	if($ENV{'SCRIPT_FILENAME'}) {
+		$self->{_script_path} = $ENV{'SCRIPT_FILENAME'};
+	} elsif($ENV{'SCRIPT_NAME'} && $ENV{'DOCUMENT_ROOT'}) {
+		my $script_name = $ENV{'SCRIPT_NAME'};
+		if(substr($script_name, 0, 1) eq '/') {
+			# It's usually the case, e.g. /cgi-bin/foo.pl
+			$script_name = substr($script_name, 1);
+		}
+		$self->{_script_path} = File::Spec->catfile($ENV{'DOCUMENT_ROOT' }, $script_name);
+	} elsif($ENV{'SCRIPT_NAME'} && !$ENV{'DOCUMENT_ROOT'}) {
+		if(File::Spec->file_name_is_absolute($ENV{'SCRIPT_NAME'}) &&
+		   (-r $ENV{'SCRIPT_NAME'})) {
+			# Called from a command line with a full path
+			$self->{_script_path} = $ENV{'SCRIPT_NAME'};
+		} else {
+			require Cwd;
+			Cwd->import;
 
-                        my $script_name = $ENV{'SCRIPT_NAME'};
-                        if(substr($script_name, 0, 1) eq '/') {
-                                # It's usually the case, e.g. /cgi-bin/foo.pl
-                                $script_name = substr($script_name, 1);
-                        }
+			my $script_name = $ENV{'SCRIPT_NAME'};
+			if(substr($script_name, 0, 1) eq '/') {
+				# It's usually the case, e.g. /cgi-bin/foo.pl
+				$script_name = substr($script_name, 1);
+			}
 
-                        $self->{_script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
-                }
-        } elsif(File::Spec->file_name_is_absolute($0)) {
+			$self->{_script_path} = File::Spec->catfile(Cwd::abs_path(), $script_name);
+		}
+	} elsif(File::Spec->file_name_is_absolute($0)) {
 		# Called from a command line with a full path
 		$self->{_script_path} = $0;
 	} else {
 		$self->{_script_path} = File::Spec->rel2abs($0);
-        }
+	}
 
 	$self->{_script_path} = $self->_untaint_filename({
 		filename => $self->{_script_path}
@@ -213,7 +222,7 @@ Returns the file system directory containing the script.
 
 	my $info = CGI::Info->new();
 
-	print 'HTML files are normally stored in ' .  $info->script_dir() . '/' . File::Spec->updir() . "\n";
+	print 'HTML files are normally stored in ', $info->script_dir(), '/', File::Spec->updir(), "\n";
 
 =cut
 
@@ -583,14 +592,14 @@ sub params {
 			}
 			if(!File::Spec->file_name_is_absolute($self->{_upload_dir})) {
 				$self->_warn({
-					warning => "upload_dir $self->{_upload_dir} isn\'t a full pathname"
+					warning => "upload_dir $self->{_upload_dir} isn't a full pathname"
 				});
 				delete $self->{_upload_dir};
 				return;
 			}
 			if(!-d $self->{_upload_dir}) {
 				$self->_warn({
-					warning => "upload_dir $self->{_upload_dir} isn\'t a directory"
+					warning => "upload_dir $self->{_upload_dir} isn't a directory"
 				});
 				delete $self->{_upload_dir};
 				return;
@@ -598,7 +607,7 @@ sub params {
 			if(!-w $self->{_upload_dir}) {
 				delete $self->{_paramref};
 				$self->_warn({
-					warning => "upload_dir $self->{_upload_dir} isn\'t writeable"
+					warning => "upload_dir $self->{_upload_dir} isn't writeable"
 				});
 				delete $self->{_upload_dir};
 				return;
@@ -638,8 +647,9 @@ sub params {
 					});
 				}
 				$stdin_data = $buffer;
-				JSON::Parse::assert_valid_json($buffer);
-				my $paramref = JSON::Parse::parse_json($buffer);
+				# JSON::Parse::assert_valid_json($buffer);
+				# my $paramref = JSON::Parse::parse_json($buffer);
+				my $paramref = decode_json($buffer);
 				foreach my $key(keys(%{$paramref})) {
 					push @pairs, "$key=" . $paramref->{$key};
 				}
@@ -699,7 +709,7 @@ sub params {
 			$value = '';
 		}
 
-		$key = $self->_sanitise_input($key);
+		$key = _sanitise_input($key);
 
 		if($self->{_allow}) {
 			# Is this a permitted argument?
@@ -724,7 +734,7 @@ sub params {
 		if($self->{_expect} && (List::MoreUtils::none { $_ eq $key } @{$self->{_expect}})) {
 			next;
 		}
-		$value = $self->_sanitise_input($value);
+		$value = _sanitise_input($value);
 
 		if((!defined($ENV{'REQUEST_METHOD'})) || ($ENV{'REQUEST_METHOD'} eq 'GET')) {
 			# From http://www.symantec.com/connect/articles/detection-sql-injection-and-cross-site-scripting-attacks
@@ -840,7 +850,7 @@ sub _warn {
 	return unless($warning);
 	if($self eq __PACKAGE__) {
 		# Called from class method
-		Carp::carp($warning);
+		carp($warning);
 		return;
 	}
 	# return if($self eq __PACKAGE__);  # Called from class method
@@ -860,12 +870,11 @@ sub _warn {
 	if($self->{_logger}) {
 		$self->{_logger}->warn($warning);
 	} elsif(!defined($self->{_syslog})) {
-		Carp::carp($warning);
+		carp($warning);
 	}
 }
 
-sub _sanitise_input {
-	my $self = shift;
+sub _sanitise_input($) {
 	my $arg = shift;
 
 	# Remove hacking attempts and spaces
@@ -978,16 +987,14 @@ sub _multipart_data {
 	return @pairs;
 }
 
-sub _create_file_name
-{
+sub _create_file_name {
 	my ($self, $args) = @_;
 
 	return $$args{filename} . '_' . time;
 }
 
 # Untaint a filename. Regex from CGI::Untaint::Filenames
-sub _untaint_filename
-{
+sub _untaint_filename {
 	my ($self, $args) = @_;
 
 	if($$args{filename} =~ /(^[\w\+_\040\#\(\)\{\}\[\]\/\-\^,\.:;&%@\\~]+\$?$)/) {
@@ -1005,7 +1012,7 @@ All tablets are mobile, but not all mobile devices are tablets.
 =cut
 
 sub is_mobile {
-        my $self = shift;
+	my $self = shift;
 
 	if(defined($self->{_is_mobile})) {
 		return $self->{_is_mobile};
@@ -1073,10 +1080,10 @@ sub is_tablet {
 		return $self->{_is_tablet};
 	}
 
-        if($ENV{'HTTP_USER_AGENT'} && ($ENV{'HTTP_USER_AGENT'} =~ /.+(iPad|TabletPC).+/)) {
+	if($ENV{'HTTP_USER_AGENT'} && ($ENV{'HTTP_USER_AGENT'} =~ /.+(iPad|TabletPC).+/)) {
 		# TODO: add others when I see some nice user_agents
 		$self->{_is_tablet} = 1;
-        } else {
+	} else {
 		$self->{_is_tablet} = 0;
 	}
 
@@ -1180,7 +1187,7 @@ Tmpdir allows a reference of the options to be passed.
 
 	my $info = CGI::Info->new();
 	my $dir = $info->tmpdir(default => '/var/tmp');
-	my $dir = $info->tmpdir({ default => '/var/tmp' });
+	$dir = $info->tmpdir({ default => '/var/tmp' });
 
 	# or
 
@@ -1288,7 +1295,7 @@ sub logdir {
 			last;
 		}
 	}
-	Carp::carp("Can't determine logdir") if((!defined($dir)) || (length($dir) == 0));
+	carp("Can't determine logdir") if((!defined($dir)) || (length($dir) == 0));
 	$self->{_logdir} ||= $dir;
 
 	return $dir;
@@ -1302,7 +1309,7 @@ Is the visitor a real person or a robot?
 
 	my $info = CGI::Info->new();
 	unless($info->is_robot()) {
-	  # update site visitor statistics
+	 # update site visitor statistics
 	}
 
 =cut
@@ -1490,7 +1497,7 @@ sub is_search_engine {
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 
-	if(($hostname =~ /google|msnbot|bingbot/) && ($hostname !~ /^google-proxy/)) {
+	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot/) && ($hostname !~ /^google-proxy/)) {
 		if($self->{_cache}) {
 			$self->{_cache}->set($key, 1, '1 day');
 		}
@@ -1566,7 +1573,7 @@ sub get_cookie {
 
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
-	} elsif(@_ % 2 == 0) {
+	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
 	} else {
 		$params{'cookie_name'} = shift;
@@ -1603,7 +1610,7 @@ API is the same as "param", it will replace the "get_cookie" method in the futur
 
 	use CGI::Info;
 
-	my $name = CGI::Info->new()->get_cookie(name);
+	my $name = CGI::Info->new()->cookie(name);
 	print "Your name is $name\n";
 =cut
 
@@ -1635,12 +1642,16 @@ sub cookie {
 
 =head2 status
 
-Returns the status of the object, 200 for OK, otherwise an HTTP error code
+Sets or returns the status of the object, 200 for OK, otherwise an HTTP error code
 
 =cut
 
 sub status {
 	my $self = shift;
+
+	if(my $status = shift) {
+		$self->{_status} = $status;
+	}
 
 	return $self->{_status} || 200;
 }
@@ -1658,7 +1669,7 @@ sub set_logger {
 
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
-	} elsif(@_ % 2 == 0) {
+	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
 	} else {
 		$params{'logger'} = shift;
@@ -1678,7 +1689,7 @@ sub reset {
 	my $class = shift;
 
 	unless($class eq __PACKAGE__) {
-		Carp::carp 'Reset is a class method';
+		carp('Reset is a class method');
 		return;
 	}
 
@@ -1694,6 +1705,8 @@ sub AUTOLOAD {
 	return if($param eq 'DESTROY');
 
 	my $self = shift;
+
+	return if(ref($self) ne __PACKAGE__);
 
 	return $self->param($param);
 }
@@ -1732,23 +1745,35 @@ You can also look for information at:
 
 =over 4
 
+=item * MetaCPAN
+
+L<https://metacpan.org/release/CGI-Info>
+
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info>
+
+=item * CPANTS
+
+L<http://cpants.cpanauthors.org/dist/CGI-Info>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=CGI-Info>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-Info>
 
-=item * Search CPAN
+=item * CPAN Testers Dependencies
 
-L<http://search.cpan.org/dist/CGI-Info/>
+L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2019 Nigel Horne.
+Copyright 2010-2021 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Networking delegate for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.20';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.21';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction Neo4j::Driver::Transaction::Bolt);
@@ -26,8 +26,11 @@ my %BOLT_ERROR = (
 	-22 => "Statement evaluation failed",
 );
 
+my $RESULT_MODULE = 'Neo4j::Driver::Result::Bolt';
+
 
 sub new {
+	# uncoverable pod
 	my ($class, $driver) = @_;
 	
 	my $uri = $driver->{uri};
@@ -38,7 +41,7 @@ sub new {
 	}
 	
 	my $protocol = "Bolt";
-	my $net_module = $driver->{net_module} // 'Neo4j::Bolt';
+	my $net_module = $driver->{net_module} || 'Neo4j::Bolt';
 	if ($net_module eq 'Neo4j::Bolt') {
 		croak $@ . "URI scheme 'bolt' requires Neo4j::Bolt"
 			unless eval { require Neo4j::Bolt; 1 };
@@ -61,6 +64,7 @@ sub new {
 	return bless {
 		net_module => $net_module,
 		connection => $cxn,
+		result_module => $net_module->can('result_handlers') ? ($net_module->result_handlers)[0] : $RESULT_MODULE,
 		server_info => Neo4j::Driver::ServerInfo->new({
 			uri => $uri,
 			version => $cxn->server_id,
@@ -148,7 +152,7 @@ sub _run {
 			croak sprintf "%s:\n%s\n%s", $stream->server_errcode, $stream->server_errmsg, $self->_bolt_error( $stream );
 		}
 		
-		$result = Neo4j::Driver::Result::Bolt->new({
+		$result = $self->{result_module}->new({
 			bolt_stream => $stream,
 			bolt_connection => $self->{connection},
 			statement => $statement_json,
@@ -184,7 +188,7 @@ Neo4j::Driver::Net::Bolt - Networking delegate for Neo4j Bolt
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 DESCRIPTION
 

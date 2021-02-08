@@ -10,4 +10,4 @@ BEGIN {
 
 require_ok('CGI::Info') || print 'Bail out!';
 
-diag( "Testing CGI::Info $CGI::Info::VERSION, Perl $], $^X" );
+diag("Testing CGI::Info $CGI::Info::VERSION, Perl $], $^X");

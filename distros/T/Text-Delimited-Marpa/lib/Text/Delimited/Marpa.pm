@@ -195,7 +195,7 @@ has uid =>
 	required => 0,
 );
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 # ------------------------------------------------
 
@@ -1044,7 +1044,7 @@ Default: None.
 
 =item o length => $integer
 
-The maxiumum length of the input string to process.
+The maximum length of the input string to process.
 
 This parameter works in conjunction with the C<pos> parameter.
 
@@ -1156,7 +1156,7 @@ This is the default value.
 
 =item o 1/-1 => "The # of open delimiters ($lexeme) does not match the # of close delimiters. Left over: $integer"
 
-If L</error_number()> returns 1, it's an error, and if it returns -1 it's a warning.
+If L</error_number()> returns 1 it's an error, and if it returns -1 it's a warning.
 
 You can set the option C<overlap_is_fatal> to make it fatal.
 
@@ -1166,26 +1166,26 @@ You can set the option C<overlap_is_fatal> to make it fatal.
 
 This message is only produced when the parse is ambiguous.
 
-If L</error_number()> returns 3, it's an error, and if it returns -3 it's a warning.
+If L</error_number()> returns 3 it's an error, and if it returns -3 it's a warning.
 
 You can set the option C<ambiguity_is_fatal> to make it fatal.
 
 =item o 4 => "Backslash is forbidden as a delimiter character"
 
-This preempts some types of sabotage.
+The check which triggers this preempts some types of sabotage.
 
-This message can never be just a warning message.
+This message always indicates an error, never a warning.
 
 =item o 5 => "Single-quotes are forbidden in multi-character delimiters"
 
 This limitation is due to the syntax of
 L<Marpa's DSL|https://metacpan.org/pod/distribution/Marpa-R2/pod/Scanless/DSL.pod>.
 
-This message can never be just a warning message.
+This message always indicates an error, never a warning.
 
 =item o 6/-6 => "Parse exhausted"
 
-If L</error_number()> returns 6, it's an error, and if it returns -6 it's a warning.
+If L</error_number()> returns 6 it's an error, and if it returns -6 it's a warning.
 
 You can set the option C<exhaustion_is_fatal> to make it fatal.
 
@@ -1194,24 +1194,24 @@ You can set the option C<exhaustion_is_fatal> to make it fatal.
 This limitation is due to the syntax of
 L<Marpa's DSL|https://metacpan.org/pod/distribution/Marpa-R2/pod/Scanless/DSL.pod>.
 
-This message can never be just a warning message.
+This message always indicates an error, never a warning.
 
 =item o 8 => "There must be at least 1 pair of open/close delimiters"
 
-This message can never be just a warning message.
+This message always indicates an error, never a warning.
 
 =item o 10 => "Unexpected event name 'xyz'"
 
-Marpa has trigged an event and it's name is not in the hash of event names derived from the BNF.
+Marpa has triggered an event and it's name is not in the hash of event names derived from the BNF.
 
-This message can never be just a warning message.
+This message always indicates an error, never a warning.
 
 =item o 11 => "The code does not handle these events simultaneously: a, b, ..."
 
 The code is written to handle single events at a time, or in rare cases, 2 events at the same time.
 But here, multiple events have been triggered and the code cannot handle the given combination.
 
-This message can never be just a warning message.
+This message always indicates an error, never a warning.
 
 =back
 
@@ -1584,7 +1584,7 @@ See scripts/traverse.pl.
 The parsed output is held in a tree managed by L<Tree>.
 
 The tree always has a root node, which has nothing to do with the input data. So, even an empty
-imput string will produce a tree with 1 node. This root has an empty hashref associated with it.
+input string will produce a tree with 1 node. This root has an empty hashref associated with it.
 
 Nodes have a name and a hashref of attributes.
 

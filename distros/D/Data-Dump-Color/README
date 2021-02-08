@@ -2,8 +2,8 @@ NAME
     Data::Dump::Color - Like Data::Dump, but with color
 
 VERSION
-    This document describes version 0.241 of Data::Dump::Color (from Perl
-    distribution Data-Dump-Color), released on 2018-12-02.
+    This document describes version 0.242 of Data::Dump::Color (from Perl
+    distribution Data-Dump-Color), released on 2021-02-06.
 
 SYNOPSIS
     Use it like you would Data::Dump, e.g.:
@@ -73,8 +73,11 @@ VARIABLES
         will be determined from $ENV{COLOR} or when in interactive terminal
         (when "-t STDOUT" is true).
 
-    %COLORS => HASH (default: default colors)
-        Define colors.
+    $COLOR_THEME => str
+        Select a color theme, which is a module under
+        "ColorTheme::Data::Dump::Color::" or "ColorTheme::" namespace
+        (with/without the namespace prefix). For example: "Default256",
+        "Bright".
 
     $INDEX => BOOL (default: 1)
         Whether to add array/hash index visual aid.
@@ -83,6 +86,12 @@ VARIABLES
         Add string length visual aid for hash key/hash value/array element
         if length is at least this value.
 
+FUNCTIONS
+    Only "dd" and "ddx" are exported by default.
+
+  dd
+  ddx
+  dump
 FAQ
   How do I turn off index comments?
     Set $Data::Dump::Color::INDEX to 0.
@@ -98,6 +107,11 @@ FAQ
     SHARYANTO::Role::ColorTheme.
 
 ENVIRONMENT
+    *   DATA_DUMP_COLOR_THEME
+
+        Set color theme. Name will be searched under
+        "ColorTheme::Data::Dump::Color::*" or "ColorTheme::*".
+
     *   NO_COLOR
 
         Can be used to disable color. Takes precedence over the "COLOR"
@@ -119,7 +133,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-Color>
+    <https://github.com/perlancar/perl-Data-Dump-Color/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -131,7 +145,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2014, 2013, 2012 by
+    This software is copyright (c) 2021, 2018, 2014, 2013, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

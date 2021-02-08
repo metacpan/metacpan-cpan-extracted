@@ -6,6 +6,9 @@ t/04-hjfreyer.t
 t/05-identica.t
 t/06-magicsig-spec.t
 t/07-minime.t
+t/09-magicenvelope-object.t
+t/10-magicenvelope-fail.t
+Readme.pod
 Changes
 MANIFEST
 LICENSE

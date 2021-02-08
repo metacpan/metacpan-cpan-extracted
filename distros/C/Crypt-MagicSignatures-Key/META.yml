@@ -19,10 +19,6 @@ no_index:
   directory:
     - t
     - inc
-recommends:
-  Math::BigInt::GMP: '1.44'
-  Math::Prime::Util::GMP: '0.34'
-  Math::Random::ISAAC::XS: '1.004'
 requires:
   Carp: '0'
   Digest::SHA: '0'
@@ -32,7 +28,8 @@ requires:
   Math::Prime::Util: '0.65'
   perl: '5.010001'
 resources:
+  bugtracker: https://github.com/Akron/Crypt-MagicSignatures-Key/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: https://github.com/Akron/Crypt-MagicSignatures-Key
-version: '0.21'
+  repository: https://github.com/Akron/Crypt-MagicSignatures-Key.git
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

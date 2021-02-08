@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Quantum::Superpositions::Lazy::Manual - reference to get you started
+Quantum::Superpositions::Lazy::Manual - Reference to get you started
 
 =head1 SYNOPSIS
 
@@ -133,6 +133,8 @@ The last line prints the list of names that we can get from the random
 generator, so that we can check if the unwanted name was indeed removed.
 
 =head1 FURTHER READING
+
+L<Quantum::Superpositions::Lazy::Manual::Comparisons> provides info on logical operations.
 
 Refer to the examples directory for more code examples or to each individual
 package for more in-depth information. A good place to start would be

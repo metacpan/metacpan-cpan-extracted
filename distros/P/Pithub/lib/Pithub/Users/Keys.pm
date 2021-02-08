@@ -1,10 +1,10 @@
 package Pithub::Users::Keys;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 User Keys API
 
 use Moo;
-use Carp qw(croak);
+use Carp qw( croak );
 extends 'Pithub::Base';
 
 
@@ -64,7 +64,7 @@ Pithub::Users::Keys - Github v3 User Keys API
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 METHODS
 

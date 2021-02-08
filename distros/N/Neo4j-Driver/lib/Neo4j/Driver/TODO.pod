@@ -69,9 +69,6 @@ context would: It should return the number of items in the list.
 =item * Test roundtrip of special numeric values
 (very large integers, -0.0, ±Inf, ±NaN).
 
-=item * Convert tests in C<xt/compatibility> to use L<Module::Load>, so that
-testing/dev dependencies are fewer.
-
 =item * Improve test coverage:
 
 =over
@@ -99,9 +96,6 @@ methods might be a quick way to bring up the B<pod> coverage stats a bit.
 =item * Neo4j::Test should auto-detect the Neo4j server version and
 set the C<cypher_filter> config option accordingly.
 
-=item * Neo4j::Sim should implement the driver HTTP net module API instead
-of the L<REST::Client> API, so that we can eventually replace REST::Client.
-
 =item * Write new unit tests for all modules.
 
 =item * Optimise the simulator for C<$hash = 0>.
@@ -110,20 +104,9 @@ could filter out.
 The internals test "transaction: REST 404 error handling" should run a distinct
 statement.
 
-=item * Try to change "no connection" tests such that no C<NXDOMAIN> responses
-are required by (ab)using a particular port number on localhost; the port could
-be checked beforehand and the test skipped if it happens to be open for some
-reason. Alternatively, the tests in question could be changed to a simulated
-connection failure.
-
 =item * Verify that L<Neo4j::Driver::Type::Node/"get"> and
 L<Neo4j::Driver::Type::Relationship/"get"> really do return undef
 (as documented), even when called in list context.
-
-=item * Add test for byte arrays (C<RETURN apoc.text.bytes("DATA") AS x>).
-
-=item * Check that nodes without labels and nodes without properties are
-handled correctly in all aspects (there I<might> be issues with perlbolt).
 
 =item * Check that after a server error, the next statement will succeed
 (there I<might> be issues with perlbolt; see
@@ -170,11 +153,6 @@ default URL scheme, just so that C<neo4j://...> URLs will kind of work.
 re-blessing the structural types into custom types from the business logic
 using C<< $cypher_types->{init} >>. (For example, check for Neo4j nodes that
 are labelled C<:Person> and re-bless those as C<Local::Person> or whatever.)
-
-=item * Consider adding a config option like C<tls_options> to be
-used as input to L<IO::Socket::SSL> by the default C<net_module>.
-While this avoids the need to create a new module in simple cases,
-it does introduce a potential security risk.
 
 =back
 
@@ -332,18 +310,6 @@ i. e. the resource has been created at the default transaction endpoint.
 That should never happen; in fact, it should only ever happen for a PUT
 request, but we don't use those here. So ignoring this is probably the right
 choice. But it may still be useful to revisit this logic later on.
-
-=back
-
-=head2 Neo4j::Driver::Net::HTTP::*
-
-=over
-
-=item * Profile whether C<X-Stream> has any performance impact. Remove if
-in doubt, as we don't implement streaming (and have no plans to in the
-future, considering that Bolt should be used when speed is important).
-
-=item * Remove the L<REST::Client> dependency and use <LWP::UserAgent> directly.
 
 =back
 

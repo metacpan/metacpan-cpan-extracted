@@ -7,7 +7,7 @@
 =head1 DEPENDENCIES
 
    This module needs the GMP C library - available from:
-   http://gmplib.org.
+   https://gmplib.org.
 
 =head1 DESCRIPTION
 
@@ -486,7 +486,13 @@
     += -= *= /= ++ --
     == != !
     < <= > >= <=>
-    = "" abs
+    "" abs
+    =
+
+    NOTE: Making use of the '=' overloading is not recommended unless
+          you understand its caveats. See 'perldoc overload' and
+          read it thoroughly, including the documentation regarding
+          'copy constructors'.
 
     Atempting to use the overloaded operators with objects that
     have been blessed into some package other than 'Math::GMPq'
@@ -666,7 +672,7 @@
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-2011, 2013-17, Sisyphus
+    Copyright 2006-2011, 2013-21, Sisyphus
 
 =head1 AUTHOR
 

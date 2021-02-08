@@ -1,21 +1,23 @@
 {
    "abstract" : "HTML Perldoc server",
    "author" : [
-      "Laurent Dami <laurent.d...@justice.ge.ch>"
+      "Laurent Dami <dami AT cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Pod-POM-Web",
    "prereqs" : {
       "build" : {
          "requires" : {
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
             "Test::More" : "0"
          }
       },
@@ -26,14 +28,14 @@
       },
       "runtime" : {
          "recommends" : {
-            "AnnoCPAN::Perldoc::Filter" : "0",
             "PPI::HTML" : "0",
             "Search::Indexer" : "0.75"
          },
          "requires" : {
             "Alien::GvaScript" : "1.021",
             "Config" : "0",
-            "Encode::Guess" : "0",
+            "Encode" : "0",
+            "Encode::Detect" : "0",
             "HTTP::Daemon" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
@@ -46,14 +48,15 @@
             "Time::HiRes" : "0",
             "URI" : "0",
             "URI::QueryParam" : "0",
-            "parent" : "0"
+            "parent" : "0",
+            "perl" : "5.008"
          }
       }
    },
    "provides" : {
       "Pod::POM::Web" : {
          "file" : "lib/Pod/POM/Web.pm",
-         "version" : "1.23"
+         "version" : "1.24"
       },
       "Pod::POM::Web::Indexer" : {
          "file" : "lib/Pod/POM/Web/Indexer.pm",
@@ -69,5 +72,6 @@
          "url" : "https://github.com/damil/Pod-POM-Web"
       }
    },
-   "version" : "1.23"
+   "version" : "1.24",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

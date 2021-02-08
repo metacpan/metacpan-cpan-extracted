@@ -4,13 +4,13 @@
       "Damian Conway <DCONWAY@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "IO-Interactive",
    "no_index" : {
@@ -36,7 +36,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94"
+            "Test::More" : "1"
          }
       }
    },
@@ -52,5 +52,6 @@
          "web" : "https://github.com/briandfoy/io-interactive"
       }
    },
-   "version" : "1.022"
+   "version" : "1.023",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

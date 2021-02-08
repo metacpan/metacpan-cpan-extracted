@@ -22,5 +22,5 @@ resources:
   homepage: https://metacpan.org/module/String::CRC32
   license: https://wiki.creativecommons.org/wiki/Public_domain
   repository: https://github.com/leejo/string-crc32
-version: 2
+version: '2.100'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

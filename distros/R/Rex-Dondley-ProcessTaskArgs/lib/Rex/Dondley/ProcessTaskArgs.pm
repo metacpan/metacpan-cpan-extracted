@@ -1,11 +1,12 @@
 package Rex::Dondley::ProcessTaskArgs ;
-$Rex::Dondley::ProcessTaskArgs::VERSION = '0.012';
+$Rex::Dondley::ProcessTaskArgs::VERSION = '0.013';
 use strict;
 use warnings;
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = 'process_task_args';
+use Log::Log4perl::Shortcuts qw(:all);
 
 # checks validity of args passed to functions and assigns them to appropriate keys
 # Accept 3 sets of args:
@@ -101,7 +102,7 @@ sub process_task_args {
 
   # handle edge case when user passes key without value
   foreach my $key (keys %passed_params) {
-    if ($passed_params{$key} eq '1' && $valid_keys{$key}) {
+    if ($passed_params{$key} && $passed_params{$key} eq '1' && $valid_keys{$key}) {
       delete $passed_params{$key};
     }
   }
@@ -131,7 +132,7 @@ Rex::Dondley::ProcessTaskArgs - easier Rex task argument handling
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

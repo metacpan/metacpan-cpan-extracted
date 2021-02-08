@@ -377,6 +377,12 @@ if($@) {
   print "ok 37\n";
   print "ok 38\n";
 }
+elsif($Math::GMPq::VERSION < 0.45) {
+  warn "Skipping tests 37 & 38 - Math::GMPq-$Math::GMPq::VERSION is buggy re these divby0 tests.\n",
+       "Please consider updating Math::GMPq to latest stable version \n";
+  print "ok 37\n";
+  print "ok 38\n";
+}
 else {
   eval{my $x = Math::GMPz->new(10) / Math::GMPq->new(0);};
 

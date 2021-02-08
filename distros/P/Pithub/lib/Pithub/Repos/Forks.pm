@@ -1,10 +1,10 @@
 package Pithub::Repos::Forks;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 Repo Forks API
 
 use Moo;
-use Carp qw(croak);
+use Carp ();
 extends 'Pithub::Base';
 
 
@@ -51,7 +51,7 @@ Pithub::Repos::Forks - Github v3 Repo Forks API
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 METHODS
 

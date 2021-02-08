@@ -1,16 +1,12 @@
 package Quantum::Superpositions::Lazy::State;
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
-use v5.28;
+use v5.24;
 use warnings;
 use Moo;
-
-use feature qw(signatures);
-no warnings qw(experimental::signatures);
-
 use Quantum::Superpositions::Lazy::Util qw(is_collapsible);
-use Types::Common::Numeric qw(PositiveNum);
+use Types::Common::Numeric qw(PositiveOrZeroNum);
 use Types::Standard qw(Defined);
 use Carp qw(croak);
 
@@ -18,7 +14,7 @@ use namespace::clean;
 
 has "weight" => (
 	is => "ro",
-	isa => PositiveNum,
+	isa => PositiveOrZeroNum,
 	default => sub { 1 },
 );
 
@@ -29,22 +25,28 @@ has "value" => (
 	required => 1,
 );
 
-sub reset ($self)
+sub reset
 {
+	my ($self) = @_;
+
 	if (is_collapsible $self->value) {
 		$self->value->reset;
 	}
 }
 
-sub clone ($self)
+sub clone
 {
+	my ($self) = @_;
+
 	return $self->new(
 		$self->%{qw(value weight)}
 	);
 }
 
-sub merge ($self, $with)
+sub merge
 {
+	my ($self, $with) = @_;
+
 	croak "cannot merge a state: values mismatch"
 		if $self->value ne $with->value;
 
@@ -54,8 +56,10 @@ sub merge ($self, $with)
 	);
 }
 
-sub clone_with ($self, %transformers)
+sub clone_with
 {
+	my ($self, %transformers) = @_;
+
 	my $cloned = $self->clone;
 	for my $to_transform (keys %transformers) {
 		if ($self->can($to_transform) && exists $cloned->{$to_transform}) {

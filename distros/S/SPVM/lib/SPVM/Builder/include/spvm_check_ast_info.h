@@ -1,9 +1,9 @@
 #ifndef SPVM_CHECK_AST_INFO_H
 #define SPVM_CHECK_AST_INFO_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
-struct SPVM_check_ast_info {
+struct spvm_check_ast_info {
   // Package
   SPVM_PACKAGE* package;
   

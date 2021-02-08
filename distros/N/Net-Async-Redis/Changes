@@ -1,5 +1,10 @@
 Revision history for Net-Async-Redis
 
+3.011     2021-02-03 03:43:05+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - ->failover added from latest commands list
+
 3.010     2021-02-01 04:56:52+08:00 Asia/Kuala_Lumpur
     New features:
 

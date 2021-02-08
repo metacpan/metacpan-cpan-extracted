@@ -1,0 +1,65 @@
+{
+   "abstract" : "Back-up all tables in a db to XML, and restore them",
+   "author" : [
+      "Ron Savage (ron@savage.net.au)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Admin-BackupRestore",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "XML::Parser" : "0",
+            "XML::Records" : "0",
+            "XML::TokeParser" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Error" : "0",
+            "Test::More" : "1.001014",
+            "boolean" : "0.46"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ronsavage/DBIx-Admin-BackupRestore/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/Perl"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/DBIx-Admin-BackupRestore.git",
+         "web" : "https://github.com/ronsavage/DBIx-Admin-BackupRestore"
+      }
+   },
+   "version" : "1.20",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

@@ -1,5 +1,9 @@
 Revision history for SQL-Abstract-FromQuery
 
+0.11 03.02.2021
+  - upgraded dependency to Regexp::Grammars 1.048 (because tests break with 1.042)
+  - Extend tests to cover passing an object to parse() (openstrike++)
+  - new base type 'datetime'
 
 0.10  06.04.2015
   - INCOMPATIBLE CHANGE:

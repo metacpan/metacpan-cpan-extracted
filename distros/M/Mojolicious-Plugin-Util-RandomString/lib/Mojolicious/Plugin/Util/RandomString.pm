@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Util::RandomString;
 use Mojo::Base 'Mojolicious::Plugin';
 use Session::Token;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our (%generator, %setting, %default, %param);
 our $read_config;
@@ -97,15 +97,26 @@ sub register {
         return $generator{$gen || 'default'}->get;
       };
 
-      # Overwrite default configuration
-      return Session::Token->new(%default, @_)->get unless @_ % 2;
+      $gen = @_ % 2 ? shift : 'default';
 
-      $gen = shift;
-      return Session::Token->new(%default, @_)->get if $gen eq 'default';
+      # Overwrite configuration
+      my %overwrite = @_;
+
+      if (exists $overwrite{entropy}) {
+        $overwrite{length} //= undef;
+      }
+      elsif (exists $overwrite{length}) {
+        $overwrite{entropy} //= undef;
+      };
+
+      # Take default configuration
+      if ($gen eq 'default') {
+        return Session::Token->new(%default, %overwrite)->get;
+      }
 
       # Overwrite specific configuration
-      if ($setting{ $gen }) {
-        return Session::Token->new( %{ $setting{ $gen } } , @_)->get;
+      elsif ($setting{ $gen }) {
+        return Session::Token->new( %{ $setting{ $gen } }, %overwrite)->get;
       };
 
       # Generator is unknown
@@ -204,7 +215,7 @@ Expects a hash reference containing parameters as defined in
 L<Session::Token> for the default generator.
 To specify named generators, use a name key (other than C<alphabet>,
 C<length>, and C<entropy>) and specify the parameters as a hash reference.
-The name key 'default' can overwrite the default configuration.
+The name key C<default> can overwrite the default configuration.
 
 All parameters can be set either on registration or
 as part of the configuration file with the key C<Util-RandomString>.
@@ -256,7 +267,7 @@ L<Session::Token>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2013-2021, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

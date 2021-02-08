@@ -71,6 +71,7 @@ subtest 'query error handling' => sub {
 
 subtest 'transaction status on error (HTTP)' => sub {
 	plan skip_all => '(currently testing Bolt)' if $Neo4j::Test::bolt;
+	plan skip_all => 'requires REST::Client with AND without Sim';  # TODO
 	plan tests => 5;
 	my $session = $driver->session; 
 	my $good_uri = $session->{net}->{http_agent}->{client}->getHost;

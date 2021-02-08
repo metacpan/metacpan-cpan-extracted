@@ -4,7 +4,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -26,7 +26,6 @@
          },
          "requires" : {
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::PluginBundle::Author::WATERKIP" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Software::License::BSD" : "0",
@@ -62,10 +61,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Import::Into" : "1.002003",
-            "Sub::Override" : "0",
             "Test::More" : "0.96",
-            "Test::Most" : "0",
             "perl" : "5.010"
          }
       }
@@ -73,7 +69,7 @@
    "provides" : {
       "Date::Holidays::NL" : {
          "file" : "lib/Date/Holidays/NL.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -84,12 +80,12 @@
          "web" : "https://gitlab.com/waterkip/p5-date-holidays-nl"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_contributors" : [
       "Wesley Schwengle <wesley@opndev.io>"
    ],
-   "x_generated_by_perl" : "v5.30.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "BSD"
 }
 

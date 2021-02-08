@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-MetaCPANUtils",
   "EXE_FILES" => [
+    "script/list-metacpan-distributions",
     "script/list-metacpan-releases",
     "script/list-recent-metacpan-releases"
   ],
@@ -28,6 +29,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname" => 0,
     "Data::Sah::Coerce::perl::To_str::From_str::to_upper" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
+    "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::date" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
@@ -47,7 +49,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +64,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname" => 0,
   "Data::Sah::Coerce::perl::To_str::From_str::to_upper" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
+  "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::date" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,

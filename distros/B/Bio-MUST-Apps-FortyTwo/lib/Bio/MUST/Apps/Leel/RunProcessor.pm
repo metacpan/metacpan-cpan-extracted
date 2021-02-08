@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Leel::RunProcessor;
 # ABSTRACT: Internal class for leel tool
-$Bio::MUST::Apps::Leel::RunProcessor::VERSION = '0.202160';
+$Bio::MUST::Apps::Leel::RunProcessor::VERSION = '0.210370';
 use Moose;
 use namespace::autoclean;
 
@@ -8,6 +8,10 @@ use autodie;
 use feature qw(say);
 
 use Smart::Comments;                    # logging always enabled here
+
+use Path::Class qw(dir);
+
+use Parallel::Batch;
 
 use aliased 'Bio::MUST::Apps::Leel::AliProcessor';
 
@@ -56,19 +60,45 @@ has 'round_trip_mode' => (
 
 # infiles
 
+# out_dir
+
 # debug_mode
+
+# threads?
 
 
 sub BUILD {
     my $self = shift;
 
-    for my $infile ($self->all_infiles) {
-        ### [RUN] Processing ALI: $infile
-        AliProcessor->new(
-            run_proc => $self,
-            ali      => $infile,
-        );
+    # TODO: avoid duplicate code wrt Forty-Two::RunProcessor
+
+    # build optional output dir
+    if ($self->out_dir) {
+        my $dir = dir($self->out_dir)->relative;
+        $dir->mkpath();
     }
+
+    if ($self->threads > 1) {
+        ### [RUN] Multithreading is on: $self->threads
+        ### [RUN] Logging data will be mixed-up!
+    }
+
+    # create job queue
+    my $batch = Parallel::Batch->new( {
+        maxprocs => $self->threads,
+        jobs     => [ $self->all_infiles ],
+        code     => sub {                       # closure (providing $self)
+                        my $infile = shift;
+                        ### [RUN] Processing ALI: $infile
+                        return AliProcessor->new(
+                            run_proc => $self,
+                            ali      => $infile,
+                        );
+                    },
+    } );
+
+    # launch jobs
+    $batch->run();
 
     return;
 }
@@ -87,7 +117,7 @@ Bio::MUST::Apps::Leel::RunProcessor - Internal class for leel tool
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =head1 AUTHOR
 

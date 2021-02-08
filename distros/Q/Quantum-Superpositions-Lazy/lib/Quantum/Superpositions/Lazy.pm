@@ -1,12 +1,9 @@
 package Quantum::Superpositions::Lazy;
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
-use v5.28;
+use v5.24;
 use warnings;
-use feature qw(signatures);
-no warnings qw(experimental::signatures);
-
 use Carp qw(croak);
 use Quantum::Superpositions::Lazy::Superposition;
 use Quantum::Superpositions::Lazy::Operation::Logical;
@@ -26,20 +23,27 @@ our @EXPORT_OK = qw(
 	with_sources
 );
 
+our %EXPORT_TAGS = (
+	all => [@EXPORT, @EXPORT_OK],
+);
+
 our $global_reducer_type = "any";
 our $global_compare_bool = 1;
 our $global_sourced_calculations = 0;
 
-sub run_sub_as ($sub, %env)
+sub run_sub_as
 {
+	my ($sub, %env) = @_;
+
 	local $global_reducer_type = $env{reducer_type} // $global_reducer_type;
 	local $global_compare_bool = $env{compare_bool} // $global_compare_bool;
 	local $global_sourced_calculations = $env{sourced_calculations} // $global_sourced_calculations;
 	return $sub->();
 }
 
-sub superpos (@positions)
+sub superpos
 {
+	my (@positions) = @_;
 	my $positions_ref;
 
 	if (@positions == 1 && ref $positions[0] eq ref []) {
@@ -54,8 +58,10 @@ sub superpos (@positions)
 	);
 }
 
-sub collapse (@superpositions)
+sub collapse
 {
+	my (@superpositions) = @_;
+
 	return map {
 		croak "Element not collapsible"
 			unless is_collapsible($_);
@@ -63,28 +69,38 @@ sub collapse (@superpositions)
 	} @superpositions;
 }
 
-sub any_state : prototype(&) ($sub)
+sub any_state(&)
 {
+	my ($sub) = @_;
+
 	return run_sub_as $sub, reducer_type => "any";
 }
 
-sub every_state : prototype(&) ($sub)
+sub every_state(&)
 {
+	my ($sub) = @_;
+
 	return run_sub_as $sub, reducer_type => "all";
 }
 
-sub one_state : prototype(&) ($sub)
+sub one_state(&)
 {
+	my ($sub) = @_;
+
 	return run_sub_as $sub, reducer_type => "one";
 }
 
-sub fetch_matches : prototype(&) ($sub)
+sub fetch_matches(&)
 {
+	my ($sub) = @_;
+
 	return run_sub_as $sub, compare_bool => 0;
 }
 
-sub with_sources : prototype(&) ($sub)
+sub with_sources(&)
 {
+	my ($sub) = @_;
+
 	return run_sub_as $sub, sourced_calculations => 1;
 }
 
@@ -178,6 +194,8 @@ Refer to L<Quantum::Superpositions::Lazy::Manual> for a quick tutorial.
 
 =head1 FUNCTIONS
 
+C<superpos> is exported by default. C<:all> tag can be used to import everything.
+
 =head2 superpos
 
 	superpos(@data)
@@ -228,6 +246,8 @@ behavior is I<any>. Returns the value returned by the BLOCK.
 	every_state { $pos == 1 }; # false
 	one_state { $pos == 1 }; # true
 
+See L<Quantum::Superpositions::Lazy::Manual::Comparisons> for more details.
+
 =head2 fetch_matches
 
 	fetch_matches BLOCK
@@ -243,6 +263,8 @@ criteria at all. Returns the value returned by the BLOCK.
 	$pos == 2; # true
 	fetch_matches { $pos == 2 }; # a superposition: 1|2>
 
+See L<Quantum::Superpositions::Lazy::Manual::Comparisons> for more details.
+
 =head2 with_sources
 
 	with_sources BLOCK
@@ -250,7 +272,8 @@ criteria at all. Returns the value returned by the BLOCK.
 Changes the behavior of superposition mathematical operations inside the block
 to also contain the sources of the calculations made. This can be helpful to
 determine how the value was calculated. This is disabled by default due to the
-amount of extra memory needed by the states that are created this way. Returns the value returned by the BLOCK.
+amount of extra memory needed by the states that are created this way. Returns
+the value returned by the BLOCK.
 
 	my $calc = superpos(2, 3) * superpos(1, 2);
 
@@ -260,6 +283,12 @@ amount of extra memory needed by the states that are created this way. Returns t
 	# and contain source and operation fields which will hold:
 	# source - an array reference of array references in form [$val1, $val2, ... $valn]
 	# operation - instance of Quantum::Superpositions::Lazy::Operation::Computational
+
+=head1 RANDOM NUMBER GENERATION
+
+This module uses L<Random::Any> to generate random numbers. It is recommended
+that you also install L<Data::Entropy> if you're going to use the random
+features of the module.
 
 =head1 DEVELOPMENT AND CONTRIBUTIONS
 
@@ -283,10 +312,6 @@ Math::BigRat could be harder to handle, so this could be done by an option or
 even simply allow the user to specify either float or Math::BigRat and
 calculate accordingly.
 
-=item * add a shorter module name as an alias
-
-Need input on possible names which are short enough and won't colide with anything else on CPAN.
-
 =back
 
 =head1 AUTHOR
@@ -298,7 +323,7 @@ Bartosz Jarzyna, E<lt>brtastic.dev@gmail.comE<gt>
 Copyright (C) 2020 by Bartosz Jarzyna
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.28.0 or,
+it under the same terms as Perl itself, either Perl version 5.24.0 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut

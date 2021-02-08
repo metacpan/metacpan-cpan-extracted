@@ -10,7 +10,7 @@ use base qw(App::Followme::Module);
 use File::Spec::Functions qw(abs2rel catfile rel2abs);
 use App::Followme::FIO;
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -31,6 +31,16 @@ sub run {
     my ($self, $folder) = @_;
 
     $self->update_folder($folder);
+    return;
+}
+
+#----------------------------------------------------------------------
+# Set the date format to iso date format, overriding user
+
+sub setup {
+    my ($self, %configuration) = @_;
+
+    $self->{data}{date_format} = 'yyyy-mm-ddThh:mm:ss';
     return;
 }
 
@@ -86,7 +96,8 @@ sub update_folder {
 
     my $index_file = $self->to_file($folder);
     my $base_directory = ${$self->{data}->build('base_directory', $index_file)};
-    my $same_directory = fio_same_file($base_directory, $self->{base_directory});
+    my $same_directory = fio_same_file($base_directory, $self->{base_directory},
+                                        $self->{case_sensitivity});
 
     my $source_directory;
     if ($same_directory) {
@@ -127,12 +138,18 @@ sub write_file {
     my ($self, $filename, $page, $binmode) = @_;
 
     $filename = rel2abs($filename);
-    my $date = ${$self->{data}->build('$mdate', $filename)};
+    my $time = ${$self->{data}->build('mdate', $filename)};
     my $new_filename = $self->title_to_filename($filename);
 
+    $new_filename = fio_make_dir($new_filename);
+    die "Couldn't create directory for $new_filename" unless $new_filename;
+
     fio_write_page($new_filename, $page, $binmode);
-    unlink($filename) if -e $filename && $filename ne $new_filename;
-    fio_set_date($new_filename, $date);
+
+    unlink($filename) if -e $filename && 
+        ! fio_same_file($filename, $new_filename, $self->{case_sensitivity});
+
+    fio_set_date($new_filename, $time);
 
     return;
 }

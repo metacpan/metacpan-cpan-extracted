@@ -8,6 +8,7 @@ use CSS::Minifier qw();
 use CSS::Minifier::XS qw();
 use File::Which qw(which);
 use IO::File;
+use Number::Format qw(format_bytes);
 use Benchmark qw(countit);
 
 ###############################################################################
@@ -30,10 +31,10 @@ unless ($curl) {
 ###############################################################################
 # What CSS docs do we want to try compressing?
 my @libs = (
-    'https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.css',
-    'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.css',
-    'https://cdn.jsdelivr.net/npm/water.css@2/out/water.css',
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/fontawesome.css',
+    'http://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.css',
+    'http://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.css',
+    'http://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover.css',
+    'http://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/fontawesome.css',
 );
 
 ###############################################################################
@@ -94,8 +95,8 @@ sub do_compress {
     my $rate     = sprintf('%ld', ($count->iters / $time) * $before);
     my $savings  = sprintf('%0.2f%%', (($before - $after) / $before) * 100);
 
-    my $results  = sprintf("%20s before[%7d] after[%7d] savings[%6s] rate[%8d Bytes/sec]",
-      $name, $before, $after, $savings, $rate,
+    my $results  = sprintf("%20s before[%7d] after[%7d] savings[%6s] rate[%8s/sec]",
+      $name, $before, $after, $savings, format_bytes($rate, unit => 'K', precision => 0),
     );
     pass $results;
 }

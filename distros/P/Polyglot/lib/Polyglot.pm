@@ -1,3 +1,5 @@
+use 5.008;
+
 package Polyglot;
 use strict;
 use vars qw($VERSION);
@@ -60,7 +62,7 @@ use autouse 'Data::Dumper' => 'Dumper';
 use Carp qw(carp);
 use Text::ParseWords qw( quotewords );
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 my $Debug = $ENV{DEBUG} || 0;
 
@@ -331,7 +333,7 @@ Displays the help message for DIRECTIVE
 
 =head1 TO DO
 
-* i should really make all of these methods class methods that
+* I should really make all of these methods class methods that
 access a Singleton object stored as class data.
 
 =head1 SOURCE AVAILABILITY
@@ -346,7 +348,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

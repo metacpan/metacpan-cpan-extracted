@@ -25,6 +25,7 @@ my(%params) =
 		SUFFIX		=> 'gz'
 	},
 	DISTNAME	=> 'DBIx-Admin-TableInfo',
+	LICENSE		=> 'perl',
 	NAME		=> 'DBIx::Admin::TableInfo',
 	PL_FILES	=> {},
 	PREREQ_PM	=>
@@ -44,7 +45,9 @@ my(%params) =
 		'Test::More'	=> 1.302052,
 		'Test::Pod'		=> 1.51,
 	},
-	VERSION_FROM => 'lib/DBIx/Admin/TableInfo.pm',
+	VERSION_FROM	=> 'lib/DBIx/Admin/TableInfo.pm',
+	INSTALLDIRS		=> 'site',
+	EXE_FILES		=> [],
 );
 
 if ( ($ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/) && ($ExtUtils::MakeMaker::VERSION > 6.30) )
@@ -62,8 +65,11 @@ if ($ExtUtils::MakeMaker::VERSION ge '6.46')
 		},
 		resources   =>
 		{
-			bugtracker	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Admin-TableInfo',
-			license		=> 'http://dev.perl.org/licenses/',
+			bugtracker =>
+			{
+				web => 'https://github.com/ronsavage/DBIx-Tree/issues',
+			},
+			license		=> 'http://opensource.org/licenses/Perl',
 			repository	=>
 			{
 				type	=> 'git',

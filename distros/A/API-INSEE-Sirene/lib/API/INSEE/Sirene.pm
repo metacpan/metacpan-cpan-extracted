@@ -5,50 +5,47 @@ use warnings;
 
 use Carp 'croak';
 use JSON;
+use HTTP::Request::Common qw/ GET POST /;
+use HTTP::Status ':constants';
+use List::Util 'any';
 use LWP::UserAgent;
 use POSIX 'strftime';
+use Switch;
 
-use Exporter 'import';
-our @EXPORT = qw/ &getLegalUnitBySIREN &getEstablishmentBySIRET &getEstablishmentsBySIREN &getEstablishmentsByName &getEstablishmentsByUsualName /;
-our @EXPORT_OK = qw/ &getEstablishmentsByCriteria &getLegalUnitsByCriteria &getLegalUnitsByName &getLegalUnitsByUsualName &getUserAgentInitialized /;
+our $VERSION = 4.01;
 
-my $API_VERSION = 3;
-# API version . API revision + package revision
-our $VERSION = 3.506;
+use constant {
+    API_AUTH_URL          => 'https://api.insee.fr/token',
+    API_BASE_URL          => 'https://api.insee.fr/entreprises/sirene/V3',
+    DEFAULT_MAX_RESULTS   => 20, # from documentation
+    DEFAULT_TIMEOUT       => 20,
+    HARD_MAX_RESULTS      => 1_000, # from documentation
+    MAX_SIREN_LENGHT      => 9,
+    MAX_SIRET_LENGHT      => 14,
+    MIN_LENGHT            => 3,
+    USE_HISTORIZED_FIELDS => 1,
+};
 
-my $EMPTY = q{};
-my $API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V$API_VERSION";
-our $CLIENT_AUTH = undef;
+my $EMPTY = q//;
 
-my $user_agent = undef;
-our $proxy = undef;
-our $timeout = 20;
+my @historized_fields = qw/
+    dateFin dateDebut
+    etatAdministratifUniteLegale
+    changementEtatAdministratifUniteLegale
+    nomUniteLegale changementNomUniteLegale
+    nomUsageUniteLegale changementNomUsageUniteLegale
+    denominationUniteLegale changementDenominationUniteLegale
+    denominationUsuelle1UniteLegale denominationUsuelle2UniteLegale denominationUsuelle3UniteLegale
+    changementDenominationUsuelleUniteLegale
+    categorieJuridiqueUniteLegale changementCategorieJuridiqueUniteLegale
+    activitePrincipaleUniteLegale nomenclatureActivitePrincipaleUniteLegale changementActivitePrincipaleUniteLegale
+    nicSiegeUniteLegale changementNicSiegeUniteLegale economieSocialeSolidaireUniteLegale
+    changementEconomieSocialeSolidaireUniteLegale
+    caractereEmployeurUniteLegale changementCaractereEmployeurUniteLegale
+/;
 
-our $default_max_results = 20; # from documentation
-my $HARD_MAX_RESULTS = 1_000; # from documentation
-
-my $historized_fields = [
-
-    qw(
-        dateFin dateDebut
-        etatAdministratifUniteLegale
-        changementEtatAdministratifUniteLegale
-        nomUniteLegale changementNomUniteLegale
-        nomUsageUniteLegale changementNomUsageUniteLegale
-        denominationUniteLegale changementDenominationUniteLegale
-        denominationUsuelle1UniteLegale denominationUsuelle2UniteLegale denominationUsuelle3UniteLegale
-        changementDenominationUsuelleUniteLegale
-        categorieJuridiqueUniteLegale changementCategorieJuridiqueUniteLegale
-        activitePrincipaleUniteLegale nomenclatureActivitePrincipaleUniteLegale changementActivitePrincipaleUniteLegale
-        nicSiegeUniteLegale changementNicSiegeUniteLegale economieSocialeSolidaireUniteLegale
-        changementEconomieSocialeSolidaireUniteLegale
-        caractereEmployeurUniteLegale changementCaractereEmployeurUniteLegale
-    )
-];
-
-my $useful_fields_unite_legale = [
-
-    qw(
+my $useful_fields_legal_unit = [
+    qw/
         siren
         dateCreationUniteLegale
         sigleUniteLegale
@@ -57,270 +54,353 @@ my $useful_fields_unite_legale = [
         categorieJuridiqueUniteLegale
         activitePrincipaleUniteLegale nomenclatureActivitePrincipaleUniteLegale
         nicSiegeUniteLegale
-    )
+    /
 ];
 
-my $useful_fields_etablissement = [
-
-    qw(
+my $useful_fields_establishment = [
+    qw/
         siren siret
         denominationUsuelleEtablissement denominationUniteLegale denominationUsuelle1UniteLegale nomUniteLegale
         activitePrincipaleUniteLegale
         numeroVoieEtablissement typeVoieEtablissement libelleVoieEtablissement
         codePostalEtablissement libelleCommuneEtablissement
-    )
+    /
 ];
 
 my $useful_fields_aliases = {
-
-    'nicSiege'                        => 'nicSiegeUniteLegale',
-    'nom'                             => 'denominationUniteLegale',
-    'dateCreation'                    => 'dateCreationUniteLegale',
-    'sigle'                           => 'sigleUniteLegale',
-    'categorieJuridique'              => 'categorieJuridiqueUniteLegale',
-    'nomenclatureActivitePrincipale'  => 'nomenclatureActivitePrincipaleUniteLegale',
-    'activitePrincipale'              => 'activitePrincipaleUniteLegale',
-    'numvoie'                         => 'numeroVoieEtablissement',
-    'typevoie'                        => 'typeVoieEtablissement',
-    'nomvoie'                         => 'libelleVoieEtablissement',
-    'codePostal'                      => 'codePostalEtablissement',
-    'nomCommune'                      => 'libelleCommuneEtablissement'
+    nicSiege                        => 'nicSiegeUniteLegale',
+    nom                             => 'denominationUniteLegale',
+    dateCreation                    => 'dateCreationUniteLegale',
+    sigle                           => 'sigleUniteLegale',
+    categorieJuridique              => 'categorieJuridiqueUniteLegale',
+    nomenclatureActivitePrincipale  => 'nomenclatureActivitePrincipaleUniteLegale',
+    activitePrincipale              => 'activitePrincipaleUniteLegale',
+    numvoie                         => 'numeroVoieEtablissement',
+    typevoie                        => 'typeVoieEtablissement',
+    nomvoie                         => 'libelleVoieEtablissement',
+    codePostal                      => 'codePostalEtablissement',
+    nomCommune                      => 'libelleCommuneEtablissement'
 };
 
-sub initUserAgent {
+sub new {
+    my $class = shift;
+    my ($credentials, $timeout, $max_results, $proxy) = @_;
 
-    croak "No credentials" if (not $CLIENT_AUTH);
-    $user_agent = LWP::UserAgent->new();
+    my $self = bless {
+        credentials      => $credentials,
+        user_agent       => undef,
+        token_expiration => undef,
+        max_results      => undef,
+        debug_mode       => 0,
+    }, $class;
 
-    $user_agent->agent("Perl API::INSEE::Sirene V$VERSION");
-    $user_agent->timeout($timeout);
-    $proxy ? $user_agent->proxy([ 'https', 'http' ], $proxy) : $user_agent->env_proxy;
+    $self->_initUserAgent();
+    $self->setProxy($proxy);
+    $self->setMaxResults($max_results);
+    $self->setTimeout($timeout);
 
-    my ($err, $token) = getToken();
-    croak "Unable to get token.\n$token" if ($err);
-
-    $user_agent->default_header('Authorization' => "Bearer $token");
-    $user_agent->default_header('Accept' => 'application/json');
+    return $self;
 }
 
-sub getUserAgentInitialized {
+sub setCredentials {
+    my ($self, $credentials) = @_;
 
-    initUserAgent() if (not defined $user_agent);
-    return $user_agent;
+    $self->{'credentials'} = $credentials;
 }
 
-sub getToken {
+sub setMaxResults {
+    my ($self, $max_results) = @_;
 
-    my $url = 'https://api.insee.fr/token?grant_type=client_credentials';
-    my $header = [ 'Authorization' => "Basic $CLIENT_AUTH" ];
-
-    my $request = HTTP::Request->new('POST', $url, $header);
-    my $response = $user_agent->request($request);
-
-    if ($response->is_success && $response->header('Content-Type') =~ qr{application/json}i) {
-
-        my $json_obj = decode_json($response->content);
-        return (0, $json_obj->{'access_token'});
-    }
-
-    return (1, sprintf "Sent request:\n%s\nReceived response:\n%s\n", $request->as_string, $response->as_string);
+    $max_results //= DEFAULT_MAX_RESULTS;
+    $self->{'max_results'} = $max_results > HARD_MAX_RESULTS ? HARD_MAX_RESULTS : $max_results;
 }
 
-sub _checkResponse {
+sub setDebugMode {
+    my ($self, $debug_value) = @_;
 
-    my ($endpoint, $parameters, $flag) = @_;
+    $self->{'debug_mode'} = $debug_value;
+}
 
-    my $request = HTTP::Request->new('GET', "$API_BASE_URL/$endpoint?$parameters");
-    my $response = $user_agent->request($request);
+sub setProxy {
+    my ($self, $proxy) = @_;
 
-    if ($response->is_success && $response->header('Content-Type') =~ qr{application/json}i) {
+    defined $proxy ? $self->{'user_agent'}->proxy([ 'http', 'https' ], $proxy) : $self->{'user_agent'}->env_proxy;
+}
 
-        return (0, $response->content);
+sub setTimeout {
+    my ($self, $timeout) = @_;
+
+    $timeout //= DEFAULT_TIMEOUT;
+    $self->{'user_agent'}->timeout($timeout);
+}
+
+sub _dumpRequest {
+    my ($self, $request, $response) = @_;
+
+    my $dump = sprintf "Sent request:\n%s\n", $request->as_string;
+    $dump .= sprintf "Received response:\n%s\n", $response->as_string if defined $response;
+
+    return $dump;
+}
+
+sub _initUserAgent {
+    my $self = shift;
+
+    $self->{'user_agent'} = LWP::UserAgent->new( protocols_allowed => [ 'http', 'https' ] );
+
+    $self->{'user_agent'}->agent("Perl API::INSEE::Sirene V$VERSION");
+    $self->{'user_agent'}->default_header('Accept' => 'application/json');
+}
+
+sub _getToken {
+    my $self = shift;
+
+    croak "Please provide your credentials." if !defined $self->{'credentials'};
+
+    my $request = POST API_AUTH_URL,
+        Authorization => "Basic $self->{'credentials'}",
+        Content       => [ grant_type => 'client_credentials' ];
+
+    my $response = $self->{'user_agent'}->request($request);
+    my $json_obj = decode_json($response->content);
+
+    switch ($response->code) {
+        case HTTP_OK {
+            $self->{'token_expiration'} = time + $json_obj->{'expires_in'};
+            $self->{'user_agent'}->default_header( Authorization => "Bearer $json_obj->{'access_token'}" );
+            return 0;
+        }
+        case HTTP_UNAUTHORIZED { # wrong credentials
+            return 1 , $json_obj->{'error_description'};
+        }
+        else { # oh dear we are in trouble
+            return 1, $self->_dumpRequest($request, $response);
+        }
+    }
+}
+
+sub _sendRequest {
+    my ($self, $endpoint, $parameters) = @_;
+
+    my $request;
+    if (!exists $parameters->{'q'}) {
+        my @url_parameters;
+
+        foreach my $key (keys %{ $parameters }) {
+            push @url_parameters, join '=', $key, $parameters->{$key};
+        }
+
+        $endpoint = join '?', $endpoint, join '&', @url_parameters;
+        $request = GET join '/', API_BASE_URL, $endpoint;
+    }
+    else {
+        $request = POST join('/', API_BASE_URL, $endpoint),
+            Content => [ %{ $parameters } ];
     }
 
-    # This is used when the token has expired
-    my $error_message = decode_json($response->content);
-    if (!$flag && ($error_message->{'fault'}->{'message'} =~ qr{Invalid Credentials})) {
-
-        # Trying to reinitialize the user agent with the new token
-        $user_agent = undef;
-        initUserAgent();
-
-        # Resend request with the new token, only once, set flag to not retrying any more
-        return _checkResponse($endpoint, $parameters, 1);
+    if ($self->{'debug_mode'}) { # Requests will not be sent in debug mode
+        return 0, $self->_dumpRequest($request);
     }
 
-    return (1, sprintf "Sent request:\n%s\nReceived response:\n%s\n", $request->as_string, $response->as_string);
+    if (!defined $self->{'token_expiration'} || $self->{'token_expiration'} < time) {
+        my ($err, $msg) = $self->_getToken();
+        croak $msg if $err;
+    }
+
+    my $response = $self->{'user_agent'}->request($request);
+
+    switch ($response->code) {
+        case HTTP_OK
+          || HTTP_NOT_FOUND {
+            return 0, $response->content;
+        }
+        case HTTP_MOVED_PERMANENTLY { # duplicated legal unit/ establishment
+            return 1, sprintf "%s\n%s", $response->message, $response->header('Location');
+        }
+        case HTTP_REQUEST_URI_TOO_LARGE
+          || HTTP_TOO_MANY_REQUESTS
+          || HTTP_UNAUTHORIZED
+          || HTTP_FORBIDDEN
+          || HTTP_SERVICE_UNAVAILABLE {
+# There is no syntax error in request, the http message should be sufficient to understand the problem
+            return 1, $response->message;
+        }
+        else { # case HTTP_BAD_REQUEST || HTTP_INTERNAL_SERVER_ERROR
+            return 1, $self->_dumpRequest($request, $response);
+        }
+    }
 }
 
 sub _buildParameters {
+    my ($self, $usefull_fields, $desired_fields, $criteria) = @_;
 
-    my ($usefull_fields, $use_historized_fields, $fields, $criteria) = @_;
+# Parameters names come from the documentation
+    my $parameters = {
+        date   => strftime('%Y-%m-%d', localtime),
+        nombre => $self->{'max_results'},
+    };
+    $parameters->{'champs'} = $self->_buildFields($usefull_fields, $desired_fields) if (defined $desired_fields && $desired_fields ne 'all');
+    $parameters->{'q'}      = sprintf('(%s)', $criteria) if defined $criteria;
 
-    my $date = strftime('%Y-%m-%d', localtime);
-    $fields = _buildFields($usefull_fields, $fields);
-    $criteria = $criteria ? _buildQuery($criteria, $use_historized_fields) : $EMPTY;
-
-    $default_max_results = $HARD_MAX_RESULTS if ($default_max_results > $HARD_MAX_RESULTS);
-    return "q=($criteria)&champs=$fields&date=$date&nombre=$default_max_results";
-}
-
-sub _buildQuery {
-
-    my ($criteria, $use_historized_fields) = @_;
-    my @query;
-
-    foreach my $key (keys %$criteria) {
-
-        my $field_name = exists $useful_fields_aliases->{$key} ? $useful_fields_aliases->{$key} : $key;
-        my @words = split /[ ?'\/-]/, $criteria->{$key};
-
-        foreach my $word (@words) {
-
-            if ($field_name eq 'codePostalEtablissement') {
-
-                push @query, "$field_name:$word*";
-                next;
-            }
-
-            $word =~ s/&/%26/ig;
-            my $query = sprintf '(%s:"%s"~ OR %s:*%s*)', $field_name, $word, $field_name, $word;
-            $query = "periode$query" if ($use_historized_fields && _isInArray($field_name, $historized_fields));
-
-            push @query, $query;
-        }
-    }
-
-    return join ' AND ', @query;
+    return $parameters;
 }
 
 sub _buildFields {
+    my ($self, $usefull_fields, $desired_fields) = @_;
 
-    my ($usefull_fields, $fields) = @_;
-
-    return join ',', @{$usefull_fields} if (not defined $fields);
-
-    if (ref $fields eq 'ARRAY') {
-
-        map { $_ = $useful_fields_aliases->{$_} if (exists $useful_fields_aliases->{$_}); } @{$fields};
-        return join ',', @{$fields};
+    if (!defined $desired_fields) {
+        return join ',', @{ $usefull_fields };
+    }
+    elsif (ref $desired_fields eq 'ARRAY') {
+        map { $_ = $useful_fields_aliases->{$_} if (exists $useful_fields_aliases->{$_}); } @{ $desired_fields };
+        return join ',', @{ $desired_fields };
     }
     else {
-
-        $fields = $useful_fields_aliases->{$fields} if (exists $useful_fields_aliases->{$fields});
-        return $fields eq 'all' ? $EMPTY : $fields;
+        return exists $useful_fields_aliases->{$desired_fields} ? $useful_fields_aliases->{$desired_fields} : $desired_fields;
     }
 }
 
-# 1 = true, 0 = false
-sub _isInArray {
+sub getCustomCriteria {
+    my ($self, $field_name, $value, $use_historized_fields, $search_mode) = @_;
 
-    my ($element, $array) = @_;
+    $search_mode //= 'aproximate';
+    $field_name = $useful_fields_aliases->{$field_name} if exists $useful_fields_aliases->{$field_name};
 
-    foreach (@{$array}) {
+    if ($search_mode eq 'aproximate') {
+        my @criteria;
+        my @words = split /[ \/-]/, $value;
 
-        return 1 if ($_ eq $element);
+        foreach my $word (@words) {
+            $word =~ s/&/%26/ig;
+            $word = sprintf '(%s:"%s"~ OR %s:*%s*)', $field_name, $word, $field_name, $word;
+            $word = "periode$word" if ($use_historized_fields && any { $_ eq $field_name } @historized_fields);
+            push @criteria, $word;
+        }
+
+        return join ' AND ', @criteria;
     }
 
-    return 0;
+    my $criteria;
+    $value =~ s/&/%26/ig;
+
+    if ($search_mode eq 'exact') {
+        $criteria = sprintf '%s:%s', $field_name, $value;
+    }
+    elsif ($search_mode eq 'begin') {
+        $criteria = sprintf '%s:%s*', $field_name, $value;
+    }
+
+    $criteria = "periode($criteria)" if ($use_historized_fields && any { $_ eq $field_name } @historized_fields);
+
+    return $criteria;
+}
+
+sub searchByCustomCriteria {
+    my ($self, $endpoint, $criteria, $desired_fields) = @_;
+
+    my $parameters;
+    switch ($endpoint) {
+        case 'siren' { $parameters = $self->_buildParameters($useful_fields_legal_unit, $desired_fields, $criteria) }
+        case 'siret' { $parameters = $self->_buildParameters($useful_fields_establishment, $desired_fields, $criteria) }
+        else { croak 'Bad endpoint specified.' }
+    }
+
+    return $self->_sendRequest($endpoint, $parameters);
 }
 
 sub getLegalUnitBySIREN {
+    my ($self, $siren_number, $desired_fields) = @_;
 
-    my ($siren, $fields) = @_;
+    return 1, "Invalid SIREN $siren_number -> Must be a ${ \MAX_SIREN_LENGHT } digits number."
+        if $siren_number !~ m/^\d{${ \MAX_SIREN_LENGHT }}$/;
 
-    return (1, "Invalid SIREN $siren -> Must be a 9 digits number") if ($siren !~ m/\d{9}/);
+    my $parameters = $self->_buildParameters($useful_fields_legal_unit, $desired_fields);
 
-    my $parameters = _buildParameters($useful_fields_unite_legale, 0, $fields);
-    initUserAgent() if (not defined $user_agent);
+    return $self->_sendRequest("siren/$siren_number", $parameters);
+}
 
-    return _checkResponse("siren/$siren", $parameters);
+sub searchLegalUnitBySIREN {
+    my ($self, $siren_number, $desired_fields) = @_;
+
+    return 1, "Invalid SIREN $siren_number -> Must be a ${ \MIN_LENGHT } digits min and ${ \MAX_SIREN_LENGHT } digits number max."
+        if $siren_number !~ m/^\d{${ \MIN_LENGHT },${ \MAX_SIREN_LENGHT }}$/;
+
+    my $criteria = $self->getCustomCriteria('siren', $siren_number, 0, 'begin');
+    my $parameters = $self->_buildParameters($useful_fields_legal_unit, $desired_fields, $criteria);
+
+    return $self->_sendRequest('siren', $parameters);
 }
 
 sub getEstablishmentBySIRET {
+    my ($self, $siret_number, $desired_fields) = @_;
 
-    my ($siret, $fields) = @_;
+    return 1, "Invalid SIRET $siret_number -> Must be a ${ \MAX_SIRET_LENGHT } digits number."
+        if $siret_number !~ m/^\d{${ \MAX_SIRET_LENGHT }}$/;
 
-    return (1, "Invalid SIRET $siret -> Must be a 14 digits number") if ($siret !~ m/\d{14}/);
+    my $parameters = $self->_buildParameters($useful_fields_establishment, $desired_fields);
 
-    my $parameters = _buildParameters($useful_fields_etablissement, 0, $fields);
-    initUserAgent() if (not defined $user_agent);
-
-    return _checkResponse("siret/$siret", $parameters);
+    return $self->_sendRequest("siret/$siret_number", $parameters);
 }
 
 sub getEstablishmentsBySIREN {
+    my ($self, $siren_number, $desired_fields) = @_;
 
-    my ($siren, $fields) = @_;
+    return (1, "Invalid SIREN $siren_number -> Must be a ${ \MAX_SIREN_LENGHT } digits number.")
+        if $siren_number !~ m/^\d{${ \MAX_SIREN_LENGHT }}$/;
 
-    return (1, "Invalid SIREN $siren -> Must be a 9 digits number.") if ($siren !~ m/\d{9}/);
+    my $criteria = $self->getCustomCriteria('siren', $siren_number, USE_HISTORIZED_FIELDS);
+    my $parameters = $self->_buildParameters($useful_fields_establishment, $desired_fields, $criteria);
 
-    my $parameters = _buildParameters($useful_fields_etablissement, 0, $fields, {siren => $siren});
-    initUserAgent() if (not defined $user_agent);
-
-    return _checkResponse('siret', $parameters);
+    return $self->_sendRequest('siret', $parameters);
 }
 
-sub getLegalUnitsByCriteria {
+sub searchEstablishmentBySIRET {
+    my ($self, $siret_number, $desired_fields) = @_;
 
-    my ($criteria, $fields) = @_;
+    return 1, "Invalid SIRET $siret_number -> Must be a ${ \MIN_LENGHT } digits min and a ${ \MAX_SIRET_LENGHT } digits number max."
+        if $siret_number !~ m/^\d{${ \MIN_LENGHT },${ \MAX_SIRET_LENGHT }}$/;
 
-    my $parameters = _buildParameters($useful_fields_unite_legale, 1, $fields, $criteria);
-    initUserAgent() if (not defined $user_agent);
+    my $criteria = $self->getCustomCriteria('siret', $siret_number, USE_HISTORIZED_FIELDS);
+    my $parameters = $self->_buildParameters($useful_fields_establishment, $desired_fields, $criteria);
 
-    return _checkResponse('siren', $parameters);
-}
-
-sub getEstablishmentsByCriteria {
-
-    my ($criteria, $fields) = @_;
-
-    my $parameters = _buildParameters($useful_fields_etablissement, 0, $fields, $criteria);
-    initUserAgent() if (not defined $user_agent);
-
-    return _checkResponse('siret', $parameters);
+    return $self->_sendRequest('siret', $parameters);
 }
 
 sub getLegalUnitsByName {
+    my ($self, $name, $desired_fields) = @_;
 
-    my ($nom, $fields) = @_;
+    my $criteria = $self->getCustomCriteria('denominationUniteLegale', $name, USE_HISTORIZED_FIELDS);
+    my $parameters = $self->_buildParameters($useful_fields_legal_unit, $desired_fields, $criteria);
 
-    my $parameters = _buildParameters($useful_fields_unite_legale, 1, $fields, {denominationUniteLegale => $nom});
-    initUserAgent() if (not defined $user_agent);
-
-    return _checkResponse('siren', $parameters);
+    return $self->_sendRequest('siren', $parameters);
 }
 
 sub getEstablishmentsByName {
+    my ($self, $name, $desired_fields) = @_;
 
-    my ($nom, $fields) = @_;
+    my $criteria = $self->getCustomCriteria('denominationUniteLegale', $name);
+    my $parameters = $self->_buildParameters($useful_fields_establishment, $desired_fields, $criteria);
 
-    my $parameters = _buildParameters($useful_fields_etablissement, 0, $fields, {denominationUniteLegale => $nom});
-    initUserAgent() if (not defined $user_agent);
-
-    return _checkResponse('siret', $parameters);
+    return $self->_sendRequest('siret', $parameters);
 }
 
 sub getLegalUnitsByUsualName {
+    my ($self, $name, $desired_fields) = @_;
 
-    my ($nom, $fields) = @_;
+    my $criteria = $self->getCustomCriteria('denominationUsuelle1UniteLegale', $name, USE_HISTORIZED_FIELDS);
+    my $parameters = $self->_buildParameters($useful_fields_legal_unit, $desired_fields, $criteria);
 
-    my $parameters = _buildParameters($useful_fields_unite_legale, 1, $fields, {denominationUsuelle1UniteLegale => $nom});
-    initUserAgent() if (not defined $user_agent);
-
-    return _checkResponse('siren', $parameters);
+    return $self->_sendRequest('siren', $parameters);
 }
 
 sub getEstablishmentsByUsualName {
+    my ($self, $name, $desired_fields) = @_;
 
-    my ($nom, $fields) = @_;
+    my $criteria = $self->getCustomCriteria('denominationUsuelle1UniteLegale', $name);
+    my $parameters = $self->_buildParameters($useful_fields_establishment, $desired_fields, $criteria);
 
-    my $parameters = _buildParameters($useful_fields_etablissement, 0, $fields, {denominationUsuelle1UniteLegale => $nom});
-    initUserAgent() if (not defined $user_agent);
-
-    return _checkResponse('siret', $parameters);
+    return $self->_sendRequest('siret', $parameters);
 }
-
 
 1;
 
@@ -336,30 +416,32 @@ API::INSEE::Sirene - An interface for the Sirene API of INSEE
 
 =head1 VERSION
 
-Version 3.506
+Version 4.01
 
 =head1 SYNOPSIS
 
   use API::INSEE::Sirene;
 
-  ${API::INSEE::Sirene::CLIENT_AUTH} = 'Y2xpZW50X2tleTpjbGllbnRfc2VjcmV0'; # required: your base64 encoded credentials
-  ${API::INSEE::Sirene::default_max_results} = 30; # optional
-  ${API::INSEE::Sirene::proxy} = 'http://example.com:80'; # optional: if your connection require proxy, enter it here
-  ${API::INSEE::Sirene::timeout} = 40; # optional
+  my $sirene = API::INSEE::Sirene->new('Y29uc3VtZXIta2V5OmNvbnN1bWVyLXNlY3JldA=='); # your base64 encoded credentials
+  $sirene->setMaxResults(30);
 
-  # Examples to get informations about an establishment with SIRET number '12345678987654'
-  getEstablishmentBySIRET(12345678987654, 'all');
+  # Examples to get information about an establishment with SIRET number '12345678987654'
+  $sirene->getEstablishmentBySIRET(12345678987654, 'all');
 
   # or
-  my $fields_that_interest_me = ['numeroVoieEtablissement', 'typeVoieEtablissement', 'libelleVoieEtablissement', 
+  my $fields_that_interest_me = ['numeroVoieEtablissement', 'typeVoieEtablissement', 'libelleVoieEtablissement',
                                  'codePostalEtablissement', 'libelleCommuneEtablissement'];
-  getEstablishmentBySIRET(12345678987654, $fields_that_interest_me);
+  $sirene->getEstablishmentBySIRET(12345678987654, $fields_that_interest_me);
 
   # or
-  getEstablishmentBySIRET(12345678987654, 'denominationUniteLegale');
+  $sirene->getEstablishmentBySIRET(12345678987654, 'denominationUniteLegale');
 
   # or simply
-  getEstablishmentBySIRET(12345678987654);
+  $sirene->getEstablishmentBySIRET(12345678987654);
+
+  # you can also perform searches whith a partial SIREN/SIRET number using search functions:
+  $sirene->searchEstablishmentBySIRET(1234567898);
+  $sirene->searchLegalUnitBySIREN(123456);
 
 =head1 DESCRIPTION
 
@@ -371,21 +453,15 @@ The terms "enterprise", "legal unit" and "establishment" used in this documentat
 
 =over 4
 
-=item *
-
-B<Enterprise definition:>
+=item * B<Enterprise definition:>
 
 L<< https://www.insee.fr/en/metadonnees/definition/c1496 >>
 
-=item *
-
-B<Legal unit definition:>
+=item * B<Legal unit definition:>
 
 L<< https://www.insee.fr/en/metadonnees/definition/c1044 >>
 
-=item *
-
-B<Establishment definition:>
+=item * B<Establishment definition:>
 
 L<< https://www.insee.fr/en/metadonnees/definition/c1377 >>
 
@@ -403,226 +479,179 @@ L<< https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/pages/item-i
 
 B<Please note that this API is french so all fields names used in function calls are in french, including the aliases.>
 
-=head1 REQUIRED MODULES
+This module has been tested with 3.9 INSEE API version.
+
+=head1 DEPENDENCIES
 
 =over 4
 
-=item *
+=item * L<< Carp|https://perldoc.perl.org/Carp >>
 
-L<< JSON|https://metacpan.org/pod/JSON >>
+=item * L<< JSON|https://metacpan.org/pod/JSON >>
 
-=item *
+=item * L<< List::Util|https://perldoc.perl.org/List::Util >>
 
-L<< LWP::UserAgent|https://metacpan.org/pod/LWP::UserAgent >>
+=item * L<< HTTP::Request::Common|https://metacpan.org/pod/HTTP::Request::Common >>
 
-=item *
+=item * L<< HTTP::Status|https://metacpan.org/pod/HTTP::Status >> B<< version < 6.26 >>
 
-L<< POSIX::strftime|https://metacpan.org/pod/POSIX#strftime >>
+=item * L<< LWP::UserAgent|https://metacpan.org/pod/LWP::UserAgent >>
+
+=item * L<< POSIX::strftime|https://metacpan.org/pod/POSIX#strftime >>
+
+=item * L<< Switch|https://metacpan.org/pod/Switch >>
 
 =back
 
-This module makes use of the LWP library to send HTTP requests and JSON library to decode JSON when getting the token. Also, this module gives you responses in JSON format so you may need this library to decode responses.
+=head1 CONSTANTS
 
-=head1 EXPORT
+=head2 DEFAULT_MAX_RESULTS
 
-These following functions are exported by default:
+The API's default number of results for each request. You can override it with the L<< setMaxResults|https://metacpan.org/pod/API::INSEE::Sirene#setMaxResults >> method. A too big value may impact response time and general performances.
 
-=over 4
+This constant is set to 20 results.
 
-=item * L<< getLegalUnitBySIREN|https://metacpan.org/pod/API::INSEE::Sirene#getLegalUnitBySIREN >>
+=head2 DEFAULT_TIMEOUT
 
-=item * L<< getEstablishmentsBySIREN|https://metacpan.org/pod/API::INSEE::Sirene#getEstablishmentsBySIREN >>
+This constant specifies how many seconds the client module has to wait for server response before giving up. You can override it with the L<< setTimeout|https://metacpan.org/pod/API::INSEE::Sirene#setTimeout >> method.
 
-=item * L<< getEstablishmentBySIRET|https://metacpan.org/pod/API::INSEE::Sirene#getEstablishmentBySIRET >>
+This constant is set to 20 seconds.
 
-=item * L<< getEstablishmentsByName|https://metacpan.org/pod/API::INSEE::Sirene#getEstablishmentsByName >>
+=head2 HARD_MAX_RESULTS
 
-=item * L<< getEstablishmentsByUsualName|https://metacpan.org/pod/API::INSEE::Sirene#getEstablishmentsByUsualName >>
+The maximum number of results that you can get. This value can't be increased (restricted by API). If you try to send a request with a higher value, the C<nombre> parameter will be forced to HARD_MAX_RESULTS value.
 
-=back
+This constant is set to 1000 results.
 
-These following functions are available by manual import:
+=head2 MAX_SIREN_LENGHT
 
-=over 4
+A SIREN number has a maximum length of 9 digits.
 
-=item * L<< getEstablishmentsByCriteria|https://metacpan.org/pod/API::INSEE::Sirene#getEstablishmentsByCriteria >>
+=head2 MAX_SIRET_LENGHT
 
-=item * L<< getLegalUnitsByCriteria|https://metacpan.org/pod/API::INSEE::Sirene#getLegalUnitsByCriteria >>
+A SIREN number has a maximum length of 14 digits.
 
-=item * L<< getLegalUnitsByName|https://metacpan.org/pod/API::INSEE::Sirene#getLegalUnitsByName >>
+=head2 MIN_LENGHT
 
-=item * L<< getLegalUnitsByUsualName|https://metacpan.org/pod/API::INSEE::Sirene#getLegalUnitsByUsualName >>
+In order to avoid useless requests with too short SIREN/SIRET numbers, the module requires at least 3 digits to allow you performing a search.
 
-=item * L<< getUserAgentInitialized|https://metacpan.org/pod/API::INSEE::Sirene#getUserAgentInitialized >>
+=head1 METHODS
 
-=back
+=head2 getLegalUnitBySIREN
 
-=head1 FUNCTIONAL INTERFACE
+Search a legal unit by its SIREN number.
 
-This section describes all available features in this module.
+=head2 getEstablishmentBySIRET
 
-=head2 VARIABLES
+Search an establishment by its SIRET number.
 
-=over 4
+=head2 getEstablishmentsBySIREN
 
-=item B<CLIENT_AUTH>
+Search all the establishments attached to a legal unit identified by a SIREN number.
 
-Required constant so the module can connect to your INSEE account and obtain a token that allows him to send requests thereafter. The value must be your base64 encoded credentials.
+=head2 searchLegalUnitBySIREN
 
-The token has a limited lifetime (7 days by default but you can change it) and it is automatically renewed by the API.
-The module gets the new token automatically from the API.
+Search all legal units which SIREN number is begining by the number given in parameter.
 
-=item B<default_max_results>
+=head2 searchEstablishmentBySIRET
 
-Optional variable that specifies how many results the API must return to the module. A too big value may impact response time and general performances.
+Search all establishments which SIRET number is begining by the number given in parameter.
 
-This variable is set to 20 results by default.
-
-=item B<HARD_MAX_RESULTS>
-
-Constant that specifies the max results number you can get. This value can't be increased (restricted by API). If you try to send a request with a higher value, the C<nombre> parameter will be forced to HARD_MAX_RESULTS value.
-
-=item B<proxy>
-
-Optional variable that specifies which proxy server must be used to send requests.
-
-This variable is set to undef by default. If this variable is not set, the module uses system proxy settings.
-
-=item B<timeout>
-
-An optional variable that specify how many seconds the client module waits for server response before giving up.
-
-This variable is set to 20 seconds by default.
-
-=back
-
-=head2 FUNCTIONS
-
-=over 4
-
-=item B<getLegalUnitBySIREN>
-
-Search a legal unit by her SIREN number.
-
-=item B<getEstablishmentBySIRET>
-
-Search an establishment by his SIRET number.
-
-=item B<getEstablishmentsBySIREN>
-
-Search all establishments that are attached to the legal unit identified by this SIREN number.
-
-=item B<getLegalUnitsByCriteria>
-
-Search all legal units matching the specified criteria.
-
-=item B<getEstablishmentsByCriteria>
-
-Search all establishments matching the specified criteria.
-
-=item B<getLegalUnitsByName>
+=head2 getLegalUnitsByName
 
 Search all legal units matching the specified name. (denominationUniteLegale field)
 
-=item B<getEstablishmentsByName>
+=head2 getEstablishmentsByName
 
 Search all establishments matching the specified name. (denominationUniteLegale field)
 
-=item B<getLegalUnitsByUsualName>
+=head2 getLegalUnitsByUsualName
 
 Search all legal units matching the specified name. (denominationUsuelle1UniteLegale field)
 
-=item B<getEstablishmentsByUsualName>
+=head2 getEstablishmentsByUsualName
 
 Search all establishments matching the specified name. (denominationUsuelle1UniteLegale field)
 
-=item B<getUserAgentInitialized>
+=head2 getCustomCriteria
 
-Return the user agent initialized with the token. Allows advanced users to make their own requests.
+You can use this method to build more specific criteria:
 
-=back
+  my $criteria1 = $sirene->getCustomCriteria('numeroVoieEtablissement', 42);
 
-B<Note:> All functions search and return values that are in the most recent legal unit period.
+If your search is based on an historized field, you can search on all historized periods like this:
 
-=head2 PARAMETERS
+  my $criteria2 = $sirene->getCustomCriteria('denominationUniteLegale', 'abc', 1);
 
-=over 4
+You can choose between three search modes: 'exact', 'begin' or 'approximate' match. Default is 'approximate'.
 
-=item B<siren> and B<siret>
+  my $criteria3 = $sirene->getCustomCriteria('libelleVoieEtablissement', 'avenue', undef, 'exact');
 
-In the B<getEstablishmentBySIRET>, B<getEstablishmentsBySIREN> and B<getLegalUnitBySIREN> functions, you must give a SIREN or a SIRET number:
+=head2 searchByCustomCriteria
 
-  my $response_json = getLegalUnitBySIREN(123456789);
-  my $response_json = getEstablishmentBySIRET(12345678987654);
-  my $response_json = getEstablishmentsBySIREN(123456789);
+This method is used to perform a search with a custom criteria built using the L<< getCustomCriteria|https://metacpan.org/pod/API::INSEE::Sirene#getCustomCriteri >> method.
 
-B<Note:> A SIREN number must be 9 digits long and a SIRET number must be 14 digits long.
+You have to specify the endpoint of your request.
 
-=item B<criteria>
+  my $final_criteria = "$criteria1 OR ($criteria2 AND $criteria3)";
+  my ($err, $result) = $sirene->$sirene->searchByCustomCriteria('siren', $final_criteria);
 
-In the B<getLegalUnitsByCriteria> and B<getEstablishmentsByCriteria> functions, you must give a hash reference of search criteria:
+=head2 setCredentials
 
-  # search all legal units whose acronym like 'ABC' AND whose category like 'ETI'
-  my %criteria = (
-    sigleUniteLegale => 'ABC',
-    categorieEntreprise => 'ETI'
-  );
+You can set your credentials separately from the instantiation if you need to (but this must be done before any call to the search methods).
 
-  my $response_json = getLegalUnitsByCriteria(\%criteria);
+  $sirene->setCredentials('Y29uc3VtZXIta2V5OmNvbnN1bWVyLXNlY3JldA==');
 
-B<Note:> Criteria are concatened with an AND in query search. A criteria is a couple of field:value, you can use aliases defined below.
+=head2 setMaxResults
 
-=item B<name>
+Used to override the B<< DEFAULT_MAX_RESULTS >> value to get more results, within the limit of B<< HARD_MAX_RESULTS >> value.
 
-In the B<getLegalUnitsByName>, B<getEstablishmentsByName>, B<getLegalUnitsByUsualName> and B<getEstablishmentsByUsualName> functions, you must give a string:
+  $sirene->setMaxResults(30);
 
-    my $response_json = getLegalUnitsByName('EnterpriseName');
+=head2 setDebugMode
 
-B<Note:> You can enter a part or the complete name of an enterprise.
+Enables the debug mode. When enabled, all the requests built by the module are displayed instead of being sent.
 
-=item B<fields>
+  $sirene->setDebugMode(1);
 
-All functions are taking two parameters including an optional one. The second parameter, if present, can be presented in three forms:
+=head2 setProxy
+
+You can define which proxy server must be used to send requests. The system's proxy settings are used by default.
+
+  $sirene->setProxy('https://myproxy.com:1234');
+
+=head2 setTimeout
+
+Used to override the B<< DEFAULT_TIMEOUT >> value.
+
+  $sirene->setTimeout(40);
+
+=head1 PARAMETERS
+
+All search methods take an optional C<< $desired_fields >> parameter that comes in three differents flavours:
 
   my $fields_that_interest_me = ['dateCreationUniteLegale', 'sigleUniteLegale'];
-  my $response_json = getLegalUnitBySIREN(123456789, $fields_that_interest_me);
+  my $response_json = $sirene->getLegalUnitBySIREN(123456789, $fields_that_interest_me);
 
   # or
-  my $response_json = getLegalUnitBySIREN(123456789, 'dateCreationUniteLegale');
+  my $response_json = $sirene->getLegalUnitBySIREN(123456789, 'dateCreationUniteLegale');
 
   # or
-  my $response_json = getLegalUnitBySIREN(123456789, 'all');
+  my $response_json = $sirene->getLegalUnitBySIREN(123456789, 'all');
 
-You can specify an array of fields that interest you in order that the module returns to you only these fields. If you want to get only one field, you do not have to give it as an array.
+When you don't specify any desired field, the module returns a selection of fields that are most likely to interest you. (see C<$useful_fields_legal_unit> and C<$useful_fields_establishment> in source code to find out which ones)
 
-When you don't specify fields like this:
+If you want all fields, you have to specify it explicitly by passing the value 'all' as parameter.
 
-  my $response_json = getLegalUnitBySIREN(123456789);
+=head1 RETURN VALUES
 
-The module will not return to you all fields by default because there are too many. Instead, it returns a selection of fields that are most likely of interest to you. (see C<$useful_fields_unite_legale> and C<$useful_fields_etablissement> in code to find out which ones)
+Each method returns a list of two elements: a return code, which is 0 in case of success, or something else in case of failure; and the result of the request (some json or an error message). In case of problem when calling API (malformed request for example), the complete sent request and the response received with headers are returned in the error message.
 
-If you want all fields, you have to specify it explicitly by passing the 'all' parameter.
+The module may launch a croak if the crendentials are not initialized or if the SIREN/SIRET numbers are not given in a correct format.
 
-=back
+=head1 ALIAS
 
-=head2 RETURN VALUES
-
-Each function returns a list of two elements. The first is the return code, which is 0 in case of success, or something else in case of failure. The second is the result of the request (some json or an error message). In case of problem when call the API (malformed request for example), the complete sent request and the response received with headers will be returned in the error message.
-To handling the return of these function, you can do somethink like this:
-
-  my ($err, $result) = getLegalUnitBySIREN(123456789, 'dateCreationUniteLegale');
-  print $result if ($err);
-
-The getUserAgentInitialized function may launch a croak when the getToken internal function fails to get the token used to call the API, so to handle this error, you should use it in an eval.
-
-    eval { my $user_agent = getUserAgentInitialized() };
-    print $@ if ($@);
-
-Moreover, it is possible that your request fail because of the token has expired, in this case, try to recall the function before throw an error (the module will reinitialize the user agent with the new token after he failed to send a request).
-
-=head2 ALIAS
-
-Some fields have an alias to be more user-friendly, here is the list of available aliases:
+Some fields have more user-friendly aliases:
 
   my %useful_fields_aliases = (
     'nicSiege'                       => 'nicSiegeUniteLegale',
@@ -641,11 +670,11 @@ Some fields have an alias to be more user-friendly, here is the list of availabl
 
 B<Usage:>
 
-  my $response_json = getLegalUnitBySIREN(123456789, 'nom');
+  my $response_json = $sirene->getLegalUnitBySIREN(123456789, 'nom');
 
 is equivalent to
 
-  my $response_json = getLegalUnitBySIREN(123456789, 'denominationUniteLegale');
+  my $response_json = $sirene->getLegalUnitBySIREN(123456789, 'denominationUniteLegale');
 
 =head1 AUTHOR
 
@@ -653,7 +682,7 @@ Justin Fouquet <jfouquet at lncsa dot fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2018-2020 by Les Nouveaux Constructeurs
+Copyright 2018-2021 by Les Nouveaux Constructeurs
 
 This library is free software; You can redistribute it and/or modify it under the same terms as Perl itself.
 

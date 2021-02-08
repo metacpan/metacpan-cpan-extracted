@@ -1,6 +1,6 @@
 package Net::IPAM::Block;
 
-our $VERSION = '3.00';
+our $VERSION = '4.00';
 
 use 5.10.0;
 use strict;
@@ -118,7 +118,7 @@ Returns 4 or 6.
 
 # just return the version from the base IP
 sub version {
-  return $_[0]->{base}{version};
+  return $_[0]->base->version;
 }
 
 =head2 to_string
@@ -486,13 +486,8 @@ cmp() returns -1, 0, +1:
 
 =cut
 
-#  ( $_[0]->{base}{binary} cmp $_[1]->{base}{binary} )
-#    ||
-#	( $_[1]->{last}{binary} cmp $_[0]->{last}{binary} ); <<<< ATTENTION: last cmp is reversed!
-
 sub cmp {
-  return ( $_[0]->{base}{binary} cmp $_[1]->{base}{binary} )
-    || ( $_[1]->{last}{binary} cmp $_[0]->{last}{binary} );
+  return ( $_[0]->base->cmp( $_[1]->base ) ) || ( $_[1]->last->cmp( $_[0]->last ) );
 }
 
 =head2 is_disjunct_with
@@ -695,8 +690,8 @@ Faster sort implemention (Schwartzian transform) as explcit sort function:
 
 sub sort_block {
   return map { $_->[0] }
-    sort     { ( $a->[1] cmp $b->[1] ) || ( $b->[2] cmp $a->[2] ) }
-    map      { [ $_, $_->{base}{binary}, $_->{last}{binary} ] } @_;
+    sort     { $a->[1]->cmp( $b->[1] ) || $b->[2]->cmp( $a->[2] ) }
+    map      { [ $_, $_->base, $_->last ] } @_;
 }
 
 =head2 aggregate

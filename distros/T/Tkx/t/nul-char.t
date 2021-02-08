@@ -1,5 +1,3 @@
-#!perl -w
-
 # This test is more useful as an interactive test where you can
 # verify that what is displayed look right.  The \x{2030} is the
 # permille sign.
@@ -7,6 +5,7 @@
 # On Unix this progam shows different wrong behaviour depending
 # on what kind of locale it runs under.
 
+use warnings;
 use strict;
 use Test qw(plan ok);
 

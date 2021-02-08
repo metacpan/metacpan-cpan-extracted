@@ -1,9 +1,9 @@
 #ifndef SPVM_FIELD_ACCESS_H
 #define SPVM_FIELD_ACCESS_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
-struct SPVM_field_access {
+struct spvm_field_access {
   SPVM_OP* op_term;
   SPVM_OP* op_name;
   SPVM_FIELD* field;

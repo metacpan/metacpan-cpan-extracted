@@ -2,12 +2,14 @@ use 5.012;
 use strict;
 use warnings;
 
+# Artificial stupidity is easier to develop than artificial intelligence. 
+
 package Acme::ConspiracyTheory::Random;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007';
+our $VERSION   = '0.013';
 
-use Exporter::Shiny qw( theory );
+use Exporter::Shiny qw( theory bad_punctuation );
 use List::Util 1.54 ();
 
 sub _RANDOM_ {
@@ -16,18 +18,18 @@ sub _RANDOM_ {
 }
 
 sub _MERGE_ {
-	my ( $orig_meta, %new ) = @_;
-	%$orig_meta = ( %$orig_meta, %new );
+	my ( $redstring, %new ) = @_;
+	%$redstring = ( %$redstring, %new );
 }
 
-sub _UCFIRST_ ($) {
+sub _UCFIRST_ ($) { # Some sentences start with a non-word character like a quote mark
 	( my $str = shift )
 		=~ s/ (\w) / uc($1) /xe;
 	$str;
 }
 
 sub celebrity {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	my $celeb = _RANDOM_(
 		{ female => 0, name => 'Bill Gates' },
 		{ female => 0, name => 'Jeff Bezos' },
@@ -47,13 +49,14 @@ sub celebrity {
 		{ female => 0, name => 'George Soros' },
 		{ female => 1, name => 'Beyonce' },
 		{ female => 1, name => 'Whitney Houston' },
+		{ female => 0, name => 'Joe Rogan' },
 	);
-	_MERGE_( $orig_meta, celebrity => $celeb );
+	_MERGE_( $redstring, celebrity => $celeb );
 	return $celeb->{name};
 }
 
 sub shady_group {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $xx;
 	PICK: {
@@ -64,7 +67,7 @@ sub shady_group {
 			{ plural => 0, name => 'the Ordo Templi Orientis' },
 			{ plural => 1, name => 'the Cabalists' },
 			{ plural => 1, name => 'the Followers of the Temple Of The Vampire', shortname => 'the Vampires' },
-			{ plural => 0, name => 'the Secret Order of the Knights of the Round Table', shortname => 'the Knights' },
+			{ plural => 0, splural => 1, name => 'the Secret Order of the Knights of the Round Table', shortname => 'the Knights' },
 			{ plural => 1, name => 'the Cardinals of the Catholic Church', shortname => 'the Cardinals' },
 			{ plural => 0, name => 'the Church of Satan', shortname => 'the Church' },
 			{ plural => 1, name => 'the Gnostics' },
@@ -75,13 +78,13 @@ sub shady_group {
 			{ plural => 0, name => 'Opus Dei' },
 			{ plural => 0, name => 'the Priory of Sion', shortname => 'the Priory' },
 			{ plural => 0, name => 'GameStop' },
-			{ plural => 0, name => 'the British Royal Family', shortname => 'the Royals' },
+			{ plural => 0, splural => 1, name => 'the British Royal Family', shortname => 'the Royals' },
 			{ plural => 0, name => 'NASA' },
 			{ plural => 1, name => 'the Zionists' },
 			{ plural => 0, name => 'the Trump administration' },
 			{ plural => 0, name => 'the Biden administration' },
-			{ plural => 0, name => 'the Republican party', shortname => 'the Republicans' },
-			{ plural => 0, name => 'the Democrat party', shortname => 'the Democrats' },
+			{ plural => 0, splural => 1, name => 'the Republican party', shortname => 'the Republicans' },
+			{ plural => 0, splural => 1, name => 'the Democrat party', shortname => 'the Democrats' },
 			{ plural => 0, name => 'the New World Order' },
 			{ plural => 1, name => 'the Communists' },
 			{ plural => 0, name => 'the Shadow Government' },
@@ -89,7 +92,7 @@ sub shady_group {
 			{ plural => 0, name => 'the global scientific elite' },
 			{ plural => 0, name => 'Big Pharma' },
 			{ plural => 0, name => 'Big Tobacco' },
-			{ plural => 1, name => 'the lizard people', shortname => 'the lizardmen' },
+			{ plural => 1, splural => 1, name => 'the lizard people', shortname => 'the lizardmen' },
 			{ plural => 1, name => 'the grey aliens', shortname => 'the aliens' },
 			{ plural => 1, name => 'the big Hollywood studios', shortname => 'Hollywood' },
 			{ plural => 0, name => 'the music industry' },
@@ -128,16 +131,16 @@ sub shady_group {
 		
 		no warnings;
 		redo PICK
-			if ( $orig_meta->{protagonists} and $orig_meta->{protagonists}{name} eq $xx->{name} )
-			|| ( $orig_meta->{antagonists}  and $orig_meta->{antagonists}{name}  eq $xx->{name} );
+			if ( $redstring->{protagonists} and $redstring->{protagonists}{name} eq $xx->{name} )
+			|| ( $redstring->{antagonists}  and $redstring->{antagonists}{name}  eq $xx->{name} );
 	};
 	
-	_MERGE_( $orig_meta, shady_group => $xx );
+	_MERGE_( $redstring, shady_group => $xx );
 	return $xx->{name};
 }
 
 sub real_animal {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $animal = _RANDOM_(
 		'cat',
@@ -152,12 +155,12 @@ sub real_animal {
 		'fish',
 	);
 	
-	_MERGE_( $orig_meta, real_animal => $animal );
+	_MERGE_( $redstring, real_animal => $animal );
 	return $animal;
 }
 
 sub fake_animal {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $animal = _RANDOM_(
 		'unicorn',
@@ -167,14 +170,15 @@ sub fake_animal {
 		'dragon',
 		'wyvern',
 		'yeti',
+		'Loch Ness monster',
 	);
 	
-	_MERGE_( $orig_meta, fake_animal => $animal );
+	_MERGE_( $redstring, fake_animal => $animal );
 	return $animal;
 }
 
 sub objects {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $objects = _RANDOM_(
 		'cars',
@@ -185,12 +189,27 @@ sub objects {
 		'clothes',
 	);
 	
-	_MERGE_( $orig_meta, objects => $objects );
+	_MERGE_( $redstring, objects => $objects );
 	return $objects;
 }
 
+sub invention {
+	my $redstring = shift // {};
+	
+	my $invention = _RANDOM_(
+		['the internet', 0],
+		['cryptocurrencies', 1],
+		['smartphones', 1],
+		['bitcoin', 0],
+	);
+	
+	_MERGE_( $redstring, invention => $invention->[0],
+		 invention_plural => $invention->[1], );
+	return $invention->[0];
+}
+
 sub shady_project {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $x = _RANDOM_(
 		'Project Blue Beam',
@@ -201,14 +220,15 @@ sub shady_project {
 		'the LGBT Agenda',
 		'the Kalergi Plan',
 		'Eurabia',
+		'the moon-landing hoax',
 	);
 	
-	_MERGE_( $orig_meta, shady_project => $x );
+	_MERGE_( $redstring, shady_project => $x );
 	return $x;
 }
 
 sub authority {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $x = _RANDOM_(
 		'the Supreme Court',
@@ -218,12 +238,12 @@ sub authority {
 		'NATO',
 	);
 	
-	_MERGE_( $orig_meta, authority => $x );
+	_MERGE_( $redstring, authority => $x );
 	return $x;
 }
 
 sub dark_lord {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $x = _RANDOM_(
 		'the dark lord',
@@ -236,12 +256,12 @@ sub dark_lord {
 		'the almighty',
 	);
 	
-	_MERGE_( $orig_meta, dark_lord => $x );
+	_MERGE_( $redstring, dark_lord => $x );
 	return $x;
 }
 
 sub disease {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $disease = _RANDOM_(
 		'cancer',
@@ -250,14 +270,38 @@ sub disease {
 		'the common cold',
 		'diabetes',
 		'obesity',
+		'autism',
+		'Ebola',
 	);
 	
-	_MERGE_( $orig_meta, disease => $disease );
+	_MERGE_( $redstring, disease => $disease );
 	return $disease;
 }
 
+sub disease_cause {
+	my $redstring = shift // {};
+	
+	my $cause = _RANDOM_(
+		sub {
+			my $food = food( $redstring );
+			( $food =~ /wine/ ) ? "drinking $food" : "eating $food";
+		},
+		sub {
+			chemicals( $redstring );
+		},
+		'non-vegan food',
+		'vegan food',
+		'socialism',
+		'electromagnetic radiation (WiFi!)',
+		'radon gas',
+	);
+	
+	_MERGE_( $redstring, disease_cause => $cause );
+	return $cause;
+}
+
 sub chemicals {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $chemicals = _RANDOM_(
 		'oestrogen',
@@ -272,12 +316,12 @@ sub chemicals {
 		'dark matter',
 	);
 	
-	_MERGE_( $orig_meta, chemicals => $chemicals );
+	_MERGE_( $redstring, chemicals => $chemicals );
 	return $chemicals;
 }
 
 sub food {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $food = _RANDOM_(
 		'apples',
@@ -288,12 +332,12 @@ sub food {
 		'bananas',
 	);
 	
-	_MERGE_( $orig_meta, food => $food );
+	_MERGE_( $redstring, food => $food );
 	return $food;
 }
 
 sub attribute {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $attr = _RANDOM_(
 		'gay',
@@ -303,15 +347,15 @@ sub attribute {
 		'horny',
 		'female',
 		'fat',
-		'flourescent',
+		'fluorescent',
 	);
 	
-	_MERGE_( $orig_meta, attribute => $attr );
+	_MERGE_( $redstring, attribute => $attr );
 	return $attr;
 }
 
 sub artifact {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $artifact = _RANDOM_(
 		'the holy grail',
@@ -324,15 +368,15 @@ sub artifact {
 		'the Necronomicon',
 		"the Philosopher's Stone",
 		"a fragment of the true cross",
-		"the seal of Soloman",
+		"the seal of Solomon",
 	);
 	
-	_MERGE_( $orig_meta, artifact => $artifact );
+	_MERGE_( $redstring, artifact => $artifact );
 	return $artifact;
 }
 
 sub bad_place {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $bad_place = _RANDOM_(
 		'a secret Antarctic base',
@@ -343,23 +387,24 @@ sub bad_place {
 		'The Pentagon',
 		'Denver International Airport',
 		'the basement of the Vatican',
-		sub { myth_place( $orig_meta ) },
+		sub { myth_place( $redstring ) },
 		sub {
-			my $p = random_place( $orig_meta );
+			my $p = random_place( $redstring );
 			"a series of tunnels underneath $p";
 		},
 		sub {
-			my $p = random_place( $orig_meta );
+			my $p = random_place( $redstring );
 			"a secret base in $p";
 		},
+		'a facility inside the hollow Earth', 
 	);
 	
-	_MERGE_( $orig_meta, bad_place => $bad_place );
+	_MERGE_( $redstring, bad_place => $bad_place );
 	return $bad_place;
 }
 
 sub random_place {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $random_place = _RANDOM_(
 		'the USA',
@@ -384,12 +429,12 @@ sub random_place {
 		'New Zealand',
 	);
 	
-	_MERGE_( $orig_meta, random_place => $random_place );
+	_MERGE_( $redstring, random_place => $random_place );
 	return $random_place;
 }
 
 sub myth_place {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $place = _RANDOM_(
 		'the Garden of Eden',
@@ -401,14 +446,15 @@ sub myth_place {
 		"Jesus's grave",
 		"Jesus's true birthplace",
 		'the entrance to the hollow Earth',
+		'the REAL Stonehenge',
 	);
 	
-	_MERGE_( $orig_meta, myth_place => $place );
+	_MERGE_( $redstring, myth_place => $place );
 	return $place;
 }
 
 sub cryptids {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $cryptids = _RANDOM_(
 		'vampires',
@@ -422,12 +468,12 @@ sub cryptids {
 		'mermaids',
 	);
 	
-	_MERGE_( $orig_meta, cryptids => $cryptids );
+	_MERGE_( $redstring, cryptids => $cryptids );
 	return $cryptids;
 }
 
 sub fiction {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $fiction = _RANDOM_(
 		{ title => 'Harry Potter', author => 'J K Rowling' },
@@ -441,12 +487,12 @@ sub fiction {
 		{ title => 'Spider-Man', author => 'Stan Lee' },
 	);
 	
-	_MERGE_( $orig_meta, fiction => $fiction );
+	_MERGE_( $redstring, fiction => $fiction );
 	return $fiction->{title};
 }
 
 sub precious_resource {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $resource = _RANDOM_(
 		'pineapple',
@@ -463,13 +509,13 @@ sub precious_resource {
 		'crystals',
 	);
 	
-	_MERGE_( $orig_meta, precious_resource => $resource );
+	_MERGE_( $redstring, precious_resource => $resource );
 	return $resource;
 }
 
 sub precious_resource_with_quantity {
-	my $orig_meta = shift // {};
-	my $resource = precious_resource( $orig_meta );
+	my $redstring = shift // {};
+	my $resource = precious_resource( $redstring );
 	my $quantity = _RANDOM_(
 		'a warehouse full',
 		'a lot',
@@ -485,29 +531,32 @@ sub precious_resource_with_quantity {
 }
 
 sub mind_control_device {
-	my $orig_meta = shift // {};
-	
-	my $mc = _RANDOM_(
-		'chemtrails',
-		'mind control drugs in the water',
-		'5G',
-		'WiFi',
-		'microchips implanted at birth',
-		'vaccines',
-		'childhood indoctrination',
-		'neurolinguistic programming',
-		'video games',
-		'mass media',
-		'space lasers',
-		'hypnotism',
+	my $redstring = shift // {};
+
+	my @mc = (
+		['chemtrails', 1],
+		['mind control drugs in the water', 1],
+		['5G', 0],
+		['WiFi', 0],
+		['microchips implanted at birth', 1],
+		['vaccines', 1],
+		['childhood indoctrination', 0],
+		['neurolinguistic programming', 0],
+		['video games', 1],
+		['mass media', 1],
+		['space lasers', 1],
+		['hypnotism', 0],
 	);
 	
-	_MERGE_( $orig_meta, mind_control_device => $mc );
-	return $mc;
+	my $mc = _RANDOM_(@mc);
+	
+	_MERGE_( $redstring, mind_control_device => $mc->[0] );
+	_MERGE_( $redstring, mind_control_device_plural => $mc->[1] );
+	return $mc->[0];
 }
 
 sub future_time {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $time = _RANDOM_(
 		'in 2030',
@@ -518,19 +567,27 @@ sub future_time {
 		'next Christmas',
 	);
 	
-	_MERGE_( $orig_meta, future_time => $time );
+	_MERGE_( $redstring, future_time => $time );
 	return $time;
 }
 
+sub splural {
+	my $a = shift;
+	if (defined $a->{splural}) {
+		return $a->{splural};
+	}
+	return $a->{plural};
+}
+
 sub a_long_time {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my @extras = ();
 	for my $actor ( qw/ protagonists antagonists / ) {
 		push @extras, sub {
-			my $have = $orig_meta->{$actor}{plural} ? 'have' : 'has';
-			"for as long as " . ($orig_meta->{$actor}{shortname}//$orig_meta->{$actor}{name}) . " $have existed";
-		} if $orig_meta->{$actor}{name};
+			my $have = splural( $redstring->{$actor} ) ? 'have' : 'has';
+			"for as long as " . ($redstring->{$actor}{shortname}//$redstring->{$actor}{name}) . " $have existed";
+		} if $redstring->{$actor}{name};
 	}
 	
 	my $time = _RANDOM_(
@@ -541,16 +598,16 @@ sub a_long_time {
 		'since time immemorial',
 		'since the dawn of time',
 		'for hundreds of years',
-		'for millenia',
+		'for millennia',
 		@extras,
 	);
 	
-	_MERGE_( $orig_meta, a_long_time => $time );
+	_MERGE_( $redstring, a_long_time => $time );
 	return $time;
 }
 
 sub misinformation {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $info = _RANDOM_(
 		'the Earth is round',
@@ -558,65 +615,65 @@ sub misinformation {
 		'humans are animals',
 		'birds are dinosaurs',
 		sub {
-			$orig_meta->{topic} = { name => 'the moon', plural => 0 };
+			$redstring->{topic} = { name => 'the moon', plural => 0 };
 			'men have walked on the moon';
 		},
 		sub {
-			$orig_meta->{topic} = { name => 'electricity', plural => 0 };
+			$redstring->{topic} = { name => 'electricity', plural => 0 };
 			'electricity exists';
 		},
 		sub {
-			$orig_meta->{topic} = { name => 'magnetism', plural => 0 };
+			$redstring->{topic} = { name => 'magnetism', plural => 0 };
 			'magnetism is real';
 		},
 		sub {
-			$orig_meta->{topic} = { name => 'gravity', plural => 0 };
+			$redstring->{topic} = { name => 'gravity', plural => 0 };
 			'gravity is real';
 		},
 		sub {
-			$orig_meta->{topic} = { name => 'outer space', plural => 0 };
+			$redstring->{topic} = { name => 'outer space', plural => 0 };
 			'space is real';
 		},
 		sub {
-			$orig_meta->{topic} = { name => 'viruses', plural => 1 };
+			$redstring->{topic} = { name => 'viruses', plural => 1 };
 			'viruses are real';
 		},
 		sub {
-			$orig_meta->{topic} = { name => 'vaccines', plural => 1 };
+			$redstring->{topic} = { name => 'vaccines', plural => 1 };
 			'vaccines are safe';
 		},
 		sub {
-			my $animal = real_animal( $orig_meta );
+			my $animal = real_animal( $redstring );
 			"the $animal is real";
 		},
 		sub {
-			my $place = random_place( $orig_meta );
+			my $place = random_place( $redstring );
 			"$place is real";
 		},
 		sub {
-			$orig_meta->{topic} = { name => 'carbon dating', plural => 0 };
+			$redstring->{topic} = { name => 'carbon dating', plural => 0 };
 			'the Earth is 4.5 billion years old';
 		},
 		sub {
-			$orig_meta->{topic} = { name => 'radiocarbon dating', plural => 0 };
+			$redstring->{topic} = { name => 'radiocarbon dating', plural => 0 };
 			'the universe is 14 billion years old';
 		},
 		sub {
-			$orig_meta->{topic} = { name => 'pigeons', plural => 1 };
+			$redstring->{topic} = { name => 'pigeons', plural => 1 };
 			'dinosaurs are real';
 		},
 		sub {
-			$orig_meta->{topic} = { name => 'surveillance drones', plural => 1 };
+			$redstring->{topic} = { name => 'surveillance drones', plural => 1 };
 			'birds are real';
 		},
 	);
 	
-	_MERGE_( $orig_meta, misinformation => $info );
+	_MERGE_( $redstring, misinformation => $info );
 	return $info;
 }
 
 sub victim {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $victim = _RANDOM_(
 		'Elvis Presley',
@@ -641,12 +698,12 @@ sub victim {
 		'Michael Jackson',
 	);
 	
-	_MERGE_( $orig_meta, victim => $victim );
+	_MERGE_( $redstring, victim => $victim );
 	return $victim;
 }
 
 sub physicist {  # and chemists
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $x = _RANDOM_(
 		'Nikola Tesla',
@@ -657,28 +714,65 @@ sub physicist {  # and chemists
 		'Henry Cavendish',
 	);
 	
-	_MERGE_( $orig_meta, physicist => $x );
+	_MERGE_( $redstring, physicist => $x );
 	return $x;
 }
 
 sub biologist {  # and medics
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $x = _RANDOM_(
 		'Charles Darwin',
 		'Edward Jenner',
 		'Robert Koch',
-		'Edward Jenner',
 		'Carl Linneaus',
 		'Alexander Fleming',
 	);
 	
-	_MERGE_( $orig_meta, biologist => $x );
+	_MERGE_( $redstring, biologist => $x );
+	return $x;
+}
+
+sub website {
+	my $redstring = shift // {};
+
+	my $x = _RANDOM_(
+		'Tumblr',
+		'Pinterest',
+		'Youtube',
+		'Facebook',
+		'Wikipedia',
+		'Twitter',
+		'Instagram',
+		'Geocities',
+		'Parler',
+	);
+
+	_MERGE_( $redstring, website => $x );
+	return $x;
+}
+
+sub fatuous {
+	my $redstring = shift // {};
+
+	my $x = _RANDOM_(
+		"We all know what's going on here.",
+		"It's plain and simple common sense.",
+		'Most people are in denial.',
+		"Isn't it obvious?",
+		"Wake up, sheeple!",
+		"It's obvious if you connect the dots.",
+		"They leave clues to mock us.",
+		"It's not funny!",
+		"There are too many coincidences to ignore.",
+	);
+
+	_MERGE_( $redstring, clone => $x );
 	return $x;
 }
 
 sub clone {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 
 	my $x = _RANDOM_(
 		'an alien',
@@ -689,33 +783,54 @@ sub clone {
 		'a hologram',
 		'a look-alike',
 		'a robot',
+		'a shapeshifter',
 	);
 
-	_MERGE_( $orig_meta, clone => $x );
+	_MERGE_( $redstring, clone => $x );
 	return $x;
 }
 
+sub lies {
+	my $redstring = shift // {};
+
+	my $x = _RANDOM_(
+		'obvious lies',
+		'a big coverup',
+		'a fairy tale',
+		'disinformation',
+	);
+	
+	_MERGE_( $redstring, lies => $x );
+	return $x;
+}
 
 sub evidence {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my @x = (
 		"there's a video about it on YouTube",
-		"there was something about it on Facebook",
+		sub { 'there was something about it on ' . website() },
 		"the voices told me",
 		"I had a dream",
-		'Pinterest is censoring me',
-		'Reddit was down this morning',
+		sub { website() . ' is censoring me' },
+		sub { website() . ' was down this morning' },
 	);
 
-	if ( my $m = $orig_meta->{misinformation} ) {
+	if ( my $c = $redstring->{disease_cause} ) {
 		push @x, (
-			"they indoctrinate people about '$m' at schools and if it were the truth they wouldn't need to",
-			"'$m' gets pushed down our throats by mass media",
+			"$c is addictive",
 		);
 	}
 	
-	if ( my $auth = $orig_meta->{authority} ) {
+	if ( my $m = $redstring->{misinformation} ) {
+		push @x, (
+			"they indoctrinate people about '$m' at schools and if it were the truth they wouldn't need to",
+			"'$m' gets pushed down our throats by mass media",
+			"'$m' is a false-flag operation",
+		);
+	}
+	
+	if ( my $auth = $redstring->{authority} ) {
 		push @x, (
 			"$auth are the obvious people to go to",
 			"$auth are the only ones with the power to stop them",
@@ -723,15 +838,16 @@ sub evidence {
 		);
 	}
 
-	if ( my $p = $orig_meta->{myth_place} ) {
+	if ( my $p = $redstring->{myth_place} ) {
 		push @x, (
 			"there are clues about $p in the Bible",
+			"there are clues about $p in the Voynich manuscript",
 			"$p is on some old maps",
 			"$p is on Google Maps",
 		);
 	}
 
-	if ( my $art = $orig_meta->{artifact} ) {
+	if ( my $art = $redstring->{artifact} ) {
 		push @x, (
 			"$art isn't in any museum",
 			"$art must be somewhere",
@@ -740,7 +856,7 @@ sub evidence {
 		);
 	}
 
-	if ( my $proj = $orig_meta->{shady_project} ) {
+	if ( my $proj = $redstring->{shady_project} ) {
 		push @x, (
 			"everybody knows $proj is happening soon",
 			"$proj is well-funded",
@@ -749,7 +865,7 @@ sub evidence {
 		);
 	}
 	
-	if ( my $dl = $orig_meta->{dark_lord} ) {
+	if ( my $dl = $redstring->{dark_lord} ) {
 		push @x, (
 			"$dl is known to be growing in power",
 			"$dl has never seemed more powerful",
@@ -759,28 +875,28 @@ sub evidence {
 		);
 	}
 	
-	if ( my $v = $orig_meta->{victim} // $orig_meta->{physicist} // $orig_meta->{biologist} ) {
+	if ( my $v = $redstring->{victim} // $redstring->{physicist} // $redstring->{biologist} ) {
 		push @x, (
 			"$v died too young",
 			"$v sent a letter containing the truth before dying",
 			sub {
-				my $clone = clone( $orig_meta );
+				my $clone = clone( $redstring );
 				"when they did an autopsy on $v it turned out it was $clone",
 			},
 			"they never did an autopsy on $v",
 			"$v wrote a will",
 			sub {
-				my $g = shady_group( $orig_meta );
+				my $g = shady_group( $redstring );
 				"$v was secretly one of $g";
 			},
 			sub {
-				my $animal = real_animal( $orig_meta );
+				my $animal = real_animal( $redstring );
 				"when they did an autopsy on $v it turned out they were secretly a $animal in a human suit";
 			},
 		);
 	}
 
-	if ( my $v = $orig_meta->{physicist} // $orig_meta->{biologist} ) {
+	if ( my $v = $redstring->{physicist} // $redstring->{biologist} ) {
 		push @x, (
 			"$v isn't mentioned in Aristotle's writing",
 			"$v hasn't given a lecture in months",
@@ -788,7 +904,7 @@ sub evidence {
 		);
 	}
 
-	if ( my $c = $orig_meta->{celebrity} ) {
+	if ( my $c = $redstring->{celebrity} ) {
 		if ( $c->{female} ) {
 			push @x, (
 				"you can't trust women",
@@ -803,22 +919,23 @@ sub evidence {
 		}
 	}
 
-	if ( my $f = $orig_meta->{fiction} ) {
+	if ( my $f = $redstring->{fiction} ) {
 		
 		push @x, (
 			$f->{title} . " has secret messages encoded in it with numerology",
 			$f->{title} . " is satanic",
 			sub {
-				my $g = shady_group( $orig_meta );
-				$f->{author} . " has ties to $g";
+				my $g = shady_group( $redstring );
+				my $has = splural( $redstring->{shady_group} ) ? 'have' : 'has';
+				$f->{author} . " $has ties to $g";
 			},
 			sub {
-				my $b = bad_place( $orig_meta );
+				my $b = bad_place( $redstring );
 				$f->{author} . " got taken to $b for questioning";
 			},
 		);
 		
-		if ( my $p = $orig_meta->{random_place} ) {
+		if ( my $p = $redstring->{random_place} ) {
 			push @x, (
 				$f->{author} . " had a secret home in $p",
 				$f->{author} . " was secretly born in $p",
@@ -826,31 +943,40 @@ sub evidence {
 		}
 	}
 	
-	if ( my $animal = $orig_meta->{real_animal} // $orig_meta->{fake_animal} ) {
+	if ( my $animal = $redstring->{real_animal} // $redstring->{fake_animal} ) {
 		push @x, (
 			"the $animal wasn't mentioned in the Bible",
 			"the $animal was mentioned in the Satanic Verses",
 			"the $animal looks kind of weird",
 			"nobody has ever seen a $animal in real life",
 			"the $animal obviously isn't native to this planet",
-			sub {	"${ \ shady_group($orig_meta) } sacrifice $animal${\'s'} to ${ \ dark_lord($orig_meta) }" },
+			sub { "${ \ shady_group($redstring) } sacrifice $animal${\'s'} to ${ \ dark_lord($redstring) }" },
 			"the $animal looks bigger in real life",
 			"the $animal makes a funny noise",
 			"Alex Jones did a podcast about the $animal",
 		);
 	}
 	
-	if ( my $mc = $orig_meta->{mind_control_device} ) {
+	if ( my $mc = $redstring->{mind_control_device} ) {
 		my $time = a_long_time();
+		my $mcp = $redstring->{mind_control_device_plural};
+		my $is = 'is';
+		my $has = 'has';
+		my $was = 'was';
+		if ($mcp) {
+			$is = 'are';
+			$has = 'have';
+			$was = 'were';
+		}
 		push @x, (
-			"everybody knows $mc is real",
-			sub { "$mc has been researched by ${ \ shady_group($orig_meta) } $time" },
-			sub { "$mc was used to conceal ${ \ shady_group($orig_meta) } $time" },
-			sub { "$mc was used to infiltrate ${ \ shady_group($orig_meta) }" },
+			"everybody knows $mc $is real",
+			sub { "$mc $has been researched by ${ \ shady_group($redstring) } $time" },
+			sub { "$mc $was used to conceal ${ \ shady_group($redstring) } $time" },
+			sub { "$mc $was used to infiltrate ${ \ shady_group($redstring) }" },
 		);
 	}
 
-	if ( my $ft = $orig_meta->{future_time} ) {
+	if ( my $ft = $redstring->{future_time} ) {
 		push @x, (
 			"some of the few people still alive $ft time-travelled back to tell us",
 			"the people still alive $ft sent us hidden messages in ${ \ fiction() }",
@@ -858,7 +984,7 @@ sub evidence {
 		);
 	}
 
-	if ( my $d = $orig_meta->{disease} ) {
+	if ( my $d = $redstring->{disease} ) {
 		push @x, (
 			"patients with $d keep disappearing from hospitals",
 			"patients with $d are being silenced by the government",
@@ -868,7 +994,7 @@ sub evidence {
 		);
 	}
 
-	if ( my $f = $orig_meta->{food} ) {
+	if ( my $f = $redstring->{food} ) {
 		push @x, (
 			"$f don't taste like they used to",
 			"$f smell funny",
@@ -877,7 +1003,7 @@ sub evidence {
 		);
 	}
 
-	if ( my $chem = $orig_meta->{chemicals} ) {
+	if ( my $chem = $redstring->{chemicals} ) {
 		push @x, (
 			"$chem isn't on the periodic table",
 			"$chem isn't real",
@@ -886,13 +1012,14 @@ sub evidence {
 		);
 	}
 
-	if ( my $r = $orig_meta->{precious_resource} ) {
-		my ( $bad, $are );
-		$orig_meta->{shady_group}{name} or shady_group( $orig_meta );
+	if ( my $r = $redstring->{precious_resource} ) {
+		my ( $bad, $are, $r_are );
+		$redstring->{shady_group}{name} or shady_group( $redstring );
 		foreach ( qw/ antagonist protagonist shady_group / ) {
-			if ( $orig_meta->{$_}{name} ) {
-				$bad = $orig_meta->{$_}{name};
-				$are = $orig_meta->{$_}{plural} ? 'are' : 'is';
+			if ( $redstring->{$_}{name} ) {
+				$bad = $redstring->{$_}{name};
+				$are = $redstring->{$_}{plural} ? 'are' : 'is';
+				$r_are = ($r =~ /s$/) ? 'are' : 'is';
 			}
 		}
 		push @x, (
@@ -900,19 +1027,20 @@ sub evidence {
 			"$bad keeps buying $r secretly on the stock market",
 			"the global supply of $r is at an all time low",
 			"have you ever seen $r for real with your own eyes",
-			"$r is so damn expensive",
-			"$r is really rare",
+			"$r $r_are so damn expensive",
+			"$r $r_are really rare",
 			"Alex Jones says $bad $are linked to $r",
 		);
 	}
 
-	if ( my $topic = $orig_meta->{topic} ) {
+	if ( my $topic = $redstring->{topic} ) {
 		my $topicname = $topic->{name};
 		my $have      = $topic->{plural} ? 'have' : 'has';
 		push @x, (
 			"there's hidden clues in the Wikipedia page about $topicname",
 			"THEY let it slip during an edit war in a Wikipedia page about $topicname",
 			"Bible numerology has clues about $topicname",
+			"the Voynich manuscript has clues about $topicname",
 			"$topicname $have always been suspicious",
 			"$topicname $have connections to THEM",
 			"nobody really understands $topicname",
@@ -920,28 +1048,32 @@ sub evidence {
 		);
 	}
 
-	if ( my $p = $orig_meta->{random_place} // $orig_meta->{bad_place} ) {
-		my $bad = $orig_meta->{antagonist}{name}
-			// $orig_meta->{protagonist}{name}
-			// $orig_meta->{shady_group}{name}
-			// shady_group( $orig_meta );
+	if ( my $p = $redstring->{random_place} // $redstring->{bad_place} ) {
+		my $bad = $redstring->{antagonist}{name}
+			// $redstring->{protagonist}{name}
+			// $redstring->{shady_group}{name}
+			// shady_group( $redstring );
 		push @x, (
 			"the Wikipedia entry for $p keeps getting edited by $bad",
+			# This has singular/plural problems - how to solve?
 			"$bad has ties to $p",
 			"$p probably isn't a real place anyway",
 		);
 	}
 
 	for my $actor ( qw/ protagonists antagonists / ) {
-		next unless $orig_meta->{$actor}{name};
+		next unless $redstring->{$actor}{name};
 		
-		my $name   = $orig_meta->{$actor}{shortname} // $orig_meta->{$actor}{name};
-		my $have   = $orig_meta->{$actor}{plural} ? 'have' : 'has';
-		my $are    = $orig_meta->{$actor}{plural} ? 'are'  : 'is';
-		my $s      = $orig_meta->{$actor}{plural} ? ''     : 's';
+		my $name   = $redstring->{$actor}{shortname} // $redstring->{$actor}{name};
+		my $have   = splural( $redstring->{$actor} ) ? 'have' : 'has';
+		my $are    = splural( $redstring->{$actor} ) ? 'are'  : 'is';
+		my $s      = splural( $redstring->{$actor} ) ? ''     : 's';
+		my $ies    = splural( $redstring->{$actor} ) ? 'y'    : 'ies';
 		
 		( my $fbname = $name ) =~ s/^the //i;
 		$fbname = _UCFIRST_ $fbname;
+
+		my $lies = lies();
 		
 		push @x, (
 			"$name $have included it in their manifesto",
@@ -952,21 +1084,21 @@ sub evidence {
 			"the '$fbname Truth' Facebook page says so",
 			"the '$fbname Exposed' website says so",
 			"$name even admit$s it",
-			"$name deny$s it but that is obvious lies",
+			"$name den$ies it but that is $lies",
 		);
 		
-		if ( my $animal = $orig_meta->{real_animal} // $orig_meta->{fake_animal} ) {
+		if ( my $animal = $redstring->{real_animal} // $redstring->{fake_animal} ) {
 			push @x, "$name $have a picture of the $animal on their Wikipedia entry";
 		}
 		
-		if ( my $place  = $orig_meta->{random_place} ) {
+		if ( my $place  = $redstring->{random_place} ) {
 			push @x, "$name $have a secret base in $place";
 		}
 		
-		if ( my $topic = $orig_meta->{topic} ) {
+		if ( my $topic = $redstring->{topic} ) {
 			my $topicname = $topic->{name};
 			push @x, (
-				"$name ${( $orig_meta->{$actor}{plural} ? \'keep' : \'keeps' )} editing the Wikipedia page about $topicname",
+				"$name ${( $redstring->{$actor}{plural} ? \'keep' : \'keeps' )} editing the Wikipedia page about $topicname",
 				"$name $are known to have ties to $topicname",
 				"'$name' is almost an anagram of '$topicname'",
 				"'$name' is the Hebrew word for '$topicname'",
@@ -980,28 +1112,26 @@ sub evidence {
 	if ( @evidences == 2 ) {
 		my ( $e1, $e2 ) = @evidences;
 		return _RANDOM_(
-			"You can tell this is the truth because $e1 and $e2.",
-			"I know because $e1 and $e2.",
+			"You can tell this is the truth because $e1, and $e2.",
+			( ( "I know because $e1, and $e2." ) x 6 ),
 			"You just need to connect the dots. " . _UCFIRST_( "$e1 and $e2." ),
-			"I used to be asleep like you, but then I saw the clues. " . _UCFIRST_( "$e1 and $e2. WAKE UP!" ),
-			"THEY HIDE THE TRUTH IN PLAIN SIGHT. " . _UCFIRST_( "$e1 and $e2." ),
-			"You won't believe how deep the rabbit hole goes. " . _UCFIRST_( "$e1 and $e2." ),
-			_UCFIRST_( "$e1 and $e2. It's obvious if you connect the dots." ),
-			_UCFIRST_( "$e1 and $e2. They leave clues to mock us." ),
-			_UCFIRST_( "$e1 and $e2. Isn't it obvious?" ),
-			_UCFIRST_( "$e1 and $e2. Wake up, sheeple!" ),
+			"I used to be asleep like you, but then I saw the clues. " . _UCFIRST_( "$e1, and $e2. WAKE UP!" ),
+			"THEY HIDE THE TRUTH IN PLAIN SIGHT. " . _UCFIRST_( "$e1, and $e2." ),
+			"You won't believe how deep the rabbit hole goes. " . _UCFIRST_( "$e1, and $e2." ),
+			sub { _UCFIRST_("$e1, and $e2. " . fatuous()) },
 			sub {
 				my $e3 = uc _RANDOM_(@x);
-				_UCFIRST_( "$e1 and $e2. Isn't it obvious? $e3!" );
+				my $fatuous = fatuous();
+				_UCFIRST_( "$e1, and $e2. $fatuous $e3!" );
 			},
 			sub {
 				my $e3 = uc _RANDOM_(@x);
-				_UCFIRST_( "$e1 and $e2. They leave clues to mock us! $e3! MOCK! MOCK!" );
+				_UCFIRST_( "$e1, and $e2. They leave clues to mock us! $e3! MOCK! MOCK!" );
 			},
 			sub {
 				my $t = {};
 				theory($t);
-				_UCFIRST_( "$e1 and $e2. Isn't it obvious? Also: " . $t->{base_theory} );
+				_UCFIRST_( "$e1, and $e2. Isn't it obvious? Also: " . $t->{base_theory} );
 			},
 		);
 	}
@@ -1010,7 +1140,7 @@ sub evidence {
 		return _RANDOM_(
 			"You can tell the truth because $e1.",
 			_UCFIRST_("$e1 and that reveals the truth."),
-			"The truth is obvious if you're not a sheep - $e1.",
+			"The truth is obvious if you're not a sheep, $e1.",
 		);
 	}
 	
@@ -1022,111 +1152,164 @@ sub evidence {
 }
 
 sub hidden_truth {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $truth = _RANDOM_(
 		sub { # wrap classics in a sub so they don't come up too often
 			_RANDOM_(
 				sub {
-					$orig_meta->{topic} = { name => 'geology', plural => 0 };
+					$redstring->{topic} = { name => 'geology', plural => 0 };
 					'the Earth is flat';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'Inner Space (1987)', plural => 0 };
+					$redstring->{topic} = { name => 'Inner Space (1987)', plural => 0 };
 					'space is fake';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'theology', plural => 0 };
+					$redstring->{topic} = { name => 'theology', plural => 0 };
 					'God is real';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'Buddhism', plural => 0 };
+					$redstring->{topic} = { name => 'Buddhism', plural => 0 };
 					'reincarnation is true';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'germs', plural => 1 };
+					$redstring->{topic} = { name => 'germs', plural => 1 };
 					"germs aren't real";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'viruses', plural => 1 };
+					$redstring->{topic} = { name => 'viruses', plural => 1 };
 					"viruses aren't real";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'MKUltra', plural => 1 };
+					$redstring->{topic} = { name => 'MKUltra', plural => 0 };
 					"MKUltra is still happening";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'Jeffrey Epstein', plural => 1 };
+					$redstring->{topic} = { name => 'Jeffrey Epstein', plural => 0 };
 					"Epstein didn't kill himself";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'Stonehenge', plural => 0 };
-					$orig_meta->{random_place} //= 'Somerset';
+					$redstring->{topic} = { name => "Sgt Pepper's Lonely Hearts Club Band", plural => 0 };
+					"Paul McCartney died in a car crash in 1966";
+				},
+				sub {
+					$redstring->{topic} = { name => 'Stonehenge', plural => 0 };
+					$redstring->{random_place} //= 'Somerset';
 					"the aliens built Stonehenge";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'the Sphinx', plural => 0 };
-					$orig_meta->{random_place} //= 'Egypt';
+					$redstring->{topic} = { name => 'the Sphinx', plural => 0 };
+					$redstring->{random_place} //= 'Egypt';
 					"the aliens built the Pyramids";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'Loch Ness', plural => 0 };
-					$orig_meta->{random_place} //= 'Scotland';
+					$redstring->{topic} = { name => 'Loch Ness', plural => 0 };
+					$redstring->{random_place} //= 'Scotland';
 					"the Loch Ness monster is real";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'grain farming', plural => 0 };
-					$orig_meta->{random_place} //= 'Alabama';
+					$redstring->{topic} = { name => 'grain farming', plural => 0 };
+					$redstring->{random_place} //= 'Alabama';
 					"crop circles are caused by aliens";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'kidnapping', plural => 0 };
-					$orig_meta->{random_place} //= 'Alabama';
+					$redstring->{topic} = { name => 'kidnapping', plural => 0 };
+					$redstring->{random_place} //= 'Alabama';
 					"aliens abduct people for probing";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'steal beams', plural => 1 };
-					$orig_meta->{random_place} //= 'New York';
+					$redstring->{topic} = { name => 'steal beams', plural => 1 };
+					$redstring->{random_place} //= 'New York';
 					"9/11 was an inside job";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'glaciers', plural => 1 };
-					$orig_meta->{random_place} //= 'Greenland';
+					my $badevent = _RANDOM_(
+						'Columbine',
+						'Sandy Hook',
+						'the Boston Marathon Bombing',
+						'Malaysia Airlines Flight 370',
+						'the JFK assassination',
+					);
+					$redstring->{topic} = { name => 'false flag operations', plural => 1 };
+					"$badevent was orchestrated by the US government";
+				},
+				sub {
+					$redstring->{topic} = { name => 'glaciers', plural => 1 };
+					$redstring->{random_place} //= 'Greenland';
 					"global warming is a hoax";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'gas chambers', plural => 1 };
-					$orig_meta->{random_place} //= 'Germany';
+					$redstring->{topic} = { name => 'geology', plural => 0 };
+					'the US government knows exactly when Yellowstone will erupt';
+				},
+				sub {
+					$redstring->{topic} = { name => 'cloud seeding', plural => 0 };
+					"the government controls the weather";
+				},
+				sub {
+					$redstring->{topic} = { name => 'Snapple', plural => 0 };
+					"Snapple is owned by the KKK";
+				},
+				sub {
+					my $disease = disease( $redstring );
+					$redstring->{topic} = { name => 'biological warfare', plural => 0 };
+					"$disease was developed as a bioweapon";
+				},
+				sub {
+					$redstring->{topic} = { name => 'gas chambers', plural => 1 };
+					$redstring->{random_place} //= 'Germany';
 					"the holocaust never happened";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'fascism', plural => 0 };
-					$orig_meta->{random_place} //= 'Australia';
+					$redstring->{topic} = { name => 'fascism', plural => 0 };
+					$redstring->{random_place} //= 'Australia';
 					"Antifa International have been starting wildfires";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'phantom time', plural => 0 };
+					$redstring->{topic} = { name => 'phantom time', plural => 0 };
 					"the years between 614 and 911 never happened";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'Nazis', plural => 1 };
+					$redstring->{topic} = { name => 'Nazis', plural => 1 };
 					"there is a Nazi base on the moon";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'Nazis', plural => 1 };
+					$redstring->{topic} = { name => 'Nazis', plural => 1 };
 					"there is a Nazi base in Antarctica";
+				},
+				sub {
+					$redstring->{topic} = { name => 'wrestling', plural => 0 };
+					"all professional sports are scripted";
+				},
+				sub {
+					my $website = website( $redstring );
+					my $spies   = _RANDOM_(
+						'spies',
+						'the CIA',
+						'GCHQ',
+						'the NSA',
+						'the Kremlin',
+						'Ipsos MORI',
+						sub {
+							my $g = shady_group( $redstring );
+							$redstring->{shady_group}{plural} ? $g : "spies from $g";
+						}
+					);
+					$redstring->{topic} = { name => 'biscuits', plural => 1 };
+					"$spies are using cookies to see everything you look at on $website";
 				},
 			);
 		},
 		sub {
-			$orig_meta->{topic} = { name => 'the Mandela effect', plural => 0 };
+			$redstring->{topic} = { name => 'the Mandela effect', plural => 0 };
 			_RANDOM_(
 				'Looney Tunes used to be Looney Toons',
 				'the Berenstain Bears used to be spelled Berenstein',
 				'Curious George used to have a tail',
 				'Febreze used to have another E in it',
 				'Froot Loops used to be Fruit Loops',
-				'the Monopoly man is supposed to have a monacle',
+				'the Monopoly man is supposed to have a monocle',
 				'Kitkat used to have a hyphen',
 				'the Mona Lisa used to smile more',
 				'C-3PO never used to have a silver leg',
@@ -1136,7 +1319,7 @@ sub hidden_truth {
 			);
 		},
 		sub {
-			$orig_meta->{topic} = { name => 'the crusades', plural => 1 };
+			$redstring->{topic} = { name => 'the crusades', plural => 1 };
 			my $subst = _RANDOM_(
 				'TikTok',
 				'Twitter',
@@ -1149,93 +1332,101 @@ sub hidden_truth {
 			"the crusades never stopped, they were just replaced with $subst";
 		},
 		sub {
-			my $cryptids = cryptids( $orig_meta );
+			my $cryptids = cryptids( $redstring );
 			"$cryptids are real";
 		},
 		sub {
-			my $cryptids = cryptids( $orig_meta );
-			my $group    = shady_group( $orig_meta );
+			my $cause   = disease_cause( $redstring );
+			my $disease = disease( $redstring );
+			$redstring->{topic} = { name => 'western medicine', plural => 0 };
+			"$cause causes $disease";
+		},
+		sub {
+			my $cryptids = cryptids( $redstring );
+			my $group    = shady_group( $redstring );
 			"$group are $cryptids";
 		},
 		sub {
-			my $objects = objects( $orig_meta );
+			my $objects = objects( $redstring );
 			"$objects are sentient";
 		},
 		sub {
-			my $celebrity = celebrity( $orig_meta );
-			my $long_time = a_long_time( $orig_meta );
+			my $celebrity = celebrity( $redstring );
+			my $long_time = a_long_time( $redstring );
 			"$celebrity has been drinking the blood of infants $long_time to stay looking young";
 		},
 		sub {
-			my $celebrity = celebrity( $orig_meta );
-			$orig_meta->{topic} = { name => 'cross-dressing', plural => 0 };
+			my $celebrity = celebrity( $redstring );
+			$redstring->{topic} = { name => 'cross-dressing', plural => 0 };
+			$redstring->{celebrity}{female} = ! $redstring->{celebrity}{female};
 			"$celebrity is transsexual";
 		},
 		sub {
-			my $celebrity = celebrity( $orig_meta );
+			my $celebrity = celebrity( $redstring );
 			my $consequence = _RANDOM_(
 				sub {
-					$orig_meta->{topic} = { name => 'robotics', plural => 0 };
+					$redstring->{topic} = { name => 'robotics', plural => 0 };
 					'replaced by a robot';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'impersonation', plural => 0 };
+					$redstring->{topic} = { name => 'impersonation', plural => 0 };
 					'replaced by a look-alike';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'blackmail', plural => 0 };
+					$redstring->{topic} = { name => 'blackmail', plural => 0 };
 					'blackmailed into silence';
 				},
 			);
 			"$celebrity has been $consequence";
 		},
 		sub {
-			my $objects = objects( $orig_meta );
-			my $group   = shady_group( $orig_meta );
+			my $objects = objects( $redstring );
+			my $group   = shady_group( $redstring );
 			"$objects were invented by $group";
 		},
 		sub {
-			my $resource = precious_resource( $orig_meta );
+			my $resource = precious_resource( $redstring );
 			"$resource is a source of free energy";
 		},
 		sub {
-			my $mythplace  = myth_place( $orig_meta );
-			my $place      = random_place( $orig_meta );
+			my $mythplace  = myth_place( $redstring );
+			my $place      = random_place( $redstring );
 			"$mythplace is in $place";
 		},
 		sub {
-			my $victim     = victim( $orig_meta );
-			my $mythplace  = myth_place( $orig_meta );
+			my $victim     = victim( $redstring );
+			my $mythplace  = myth_place( $redstring );
 			"$victim discovered $mythplace and was killed to keep it a secret";
 		},
 		sub {
-			my $resource = precious_resource( $orig_meta );
-			my $disease  = disease( $orig_meta );
+			my $resource = precious_resource( $redstring );
+			my $disease  = disease( $redstring );
 			"$resource can cure $disease";
 		},
 		sub {
-			my $animal = real_animal( $orig_meta );
-			my $group  = shady_group( $orig_meta );
+			my $animal = real_animal( $redstring );
+			my $group  = shady_group( $redstring );
 			"the $animal is a fake animal, engineered by $group";
 		},
 		sub {
-			my $chemicals = chemicals( $orig_meta );
-			my $animal    = real_animal( $orig_meta );
-			my $attribute = attribute( $orig_meta );
-			"the $chemicals in the water is turning the $animal" . "s $attribute";
+			my $chemicals = chemicals( $redstring );
+			my $animal    = real_animal( $redstring );
+			my $s         = ($animal ne 'fish') ? 's' : '';
+			my $attribute = attribute( $redstring );
+			"the $chemicals in the water is turning the $animal$s $attribute";
 		},
 		sub {
-			my $chemicals = chemicals( $orig_meta );
-			my $food      = food( $orig_meta );
+			my $chemicals = chemicals( $redstring );
+			my $food      = food( $redstring );
 			"$food are full of $chemicals";
 		},
 		sub {
-			my $animal = real_animal( $orig_meta );
+			my $animal = real_animal( $redstring );
 			"the $animal originally comes from another planet";
 		},
 		sub {
-			my $animal = real_animal( $orig_meta );
-			my $group  = shady_group( $orig_meta );
+			my $animal = real_animal( $redstring );
+			my $group  = shady_group( $redstring );
 			my $stupid = _RANDOM_(
 				'people in costumes',
 				'animatronics',
@@ -1247,69 +1438,69 @@ sub hidden_truth {
 			"the $animal is a fake animal and is just $stupid";
 		},
 		sub {
-			my $animal = fake_animal( $orig_meta );
+			my $animal = fake_animal( $redstring );
 			"the $animal is a real animal";
 		},
 		sub {
-			my $time = future_time( $orig_meta );
+			my $time = future_time( $redstring );
 			"the world will end $time";
 		},
 		sub {
-			my $time = future_time( $orig_meta );
-			$orig_meta->{topic} = { name => 'comets', plural => 1 };
+			my $time = future_time( $redstring );
+			$redstring->{topic} = { name => 'comets', plural => 1 };
 			"the comet will hit us $time";
 		},
 		sub {
-			my $place = random_place( $orig_meta );
-			$orig_meta->{topic} = { name => 'flooding', plural => 1 };
+			my $place = random_place( $redstring );
+			$redstring->{topic} = { name => 'flooding', plural => 1 };
 			"$place was destroyed by floods";
 		},
 		sub {
-			my $place = random_place( $orig_meta );
-			my $group = $orig_meta->{shady_group}{name} // shady_group( $orig_meta );
-			$orig_meta->{topic} = { name => 'coup d\'etats', plural => 1 };
+			my $place = random_place( $redstring );
+			my $group = $redstring->{shady_group}{name} // shady_group( $redstring );
+			$redstring->{topic} = { name => 'coup d\'etats', plural => 1 };
 			"$place is ruled by $group";
 		},
 		sub {
-			my $time = future_time( $orig_meta );
-			$orig_meta->{topic} = { name => 'zombies', plural => 1 };
+			my $time = future_time( $redstring );
+			$redstring->{topic} = { name => 'zombies', plural => 1 };
 			"the zombie apocalypse will start $time";
 		},
 		sub {
-			my $time = future_time( $orig_meta );
-			$orig_meta->{topic} = { name => 'Jesus', plural => 0 };
+			my $time = future_time( $redstring );
+			$redstring->{topic} = { name => 'Jesus', plural => 0 };
 			"Jesus will return $time";
 		},
 		sub {
-			my $mc    = mind_control_device( $orig_meta );
-			my $group = $orig_meta->{shady_group}{name} // shady_group( $orig_meta );
+			my $mc    = mind_control_device( $redstring );
+			my $group = $redstring->{shady_group}{name} // shady_group( $redstring );
 			"THEY ($group) are using $mc";
 		},
 		sub {
-			my $victim = victim( $orig_meta );
-			my $place  = bad_place( $orig_meta );
+			my $victim = victim( $redstring );
+			my $place  = bad_place( $redstring );
 			"$victim is alive and kept at $place";
 		},
 		sub {
-			my $artifact = artifact( $orig_meta );
-			my $p = random_place( $orig_meta );
+			my $artifact = artifact( $redstring );
+			my $p = random_place( $redstring );
 			"$artifact is in $p";
 		},
 		sub {
-			my $victim = victim( $orig_meta );
-			$orig_meta->{topic} = { name => 'the antichrist', plural => 0 };
+			my $victim = victim( $redstring );
+			$redstring->{topic} = { name => 'the antichrist', plural => 0 };
 			"$victim was the antichrist";
 		},
 		sub {
-			my $victim = victim( $orig_meta );
+			my $victim = victim( $redstring );
 			"$victim was a time-traveller";
 		},
 		sub {
-			my $victim = victim( $orig_meta );
+			my $victim = victim( $redstring );
 			"$victim was an inter-dimensional being";
 		},
 		sub {
-			my $chem = chemicals( $orig_meta );
+			my $chem = chemicals( $redstring );
 			my $stupid = _RANDOM_(
 				'water mixed with food-colouring',
 				'water that they put in the microwave',
@@ -1321,16 +1512,16 @@ sub hidden_truth {
 			"$chem is really just $stupid";
 		},
 		sub {
-			my $fiction = fiction( $orig_meta );
+			my $fiction = fiction( $redstring );
 			"$fiction is historically accurate";
 		},
 		sub {
-			my $fiction = fiction( $orig_meta );
-			my $victim = $orig_meta->{victim} // victim( $orig_meta );
+			my $fiction = fiction( $redstring );
+			my $victim = $redstring->{victim} // victim( $redstring );
 			"$fiction was really written by $victim";
 		},
 		sub {
-			my $p = random_place( $orig_meta );
+			my $p = random_place( $redstring );
 			my $extinct = _RANDOM_(
 				'dinosaur',
 				'mammoth',
@@ -1338,50 +1529,65 @@ sub hidden_truth {
 				'Tasmanian tiger',
 				'pterodactyl',
 			);
-			$orig_meta->{real_animal} //= $extinct;
+			$redstring->{real_animal} //= $extinct;
 			"the $extinct is not extinct and there is a colony in $p";
+		},
+		sub {
+			my $group   = shady_group( $redstring );
+			my $invention = invention( $redstring );
+			my $are = $redstring->{shady_group}{plural} ? 'are' : 'is';
+			my $was = $redstring->{invention_plural} ? 'were' : 'was';
+			my $invented = _RANDOM_(
+				'invented',
+				'cooked up',
+				'fabricated',
+			);
+			_RANDOM_(
+				"$group $are behind $invention",
+				"$group $invented $invention",
+				"$invention $was $invented by $group",
+			);
 		},
 	);
 	
-	_MERGE_( $orig_meta, hidden_truth => $truth );
+	_MERGE_( $redstring, hidden_truth => $truth );
 	return $truth;
 }
 
 sub theory {
-	my $orig_meta = shift // {};
+	my $redstring = shift // {};
 	
 	my $theory = _RANDOM_(
 		sub {
-			my $group = shady_group( $orig_meta );
-			$orig_meta->{protagonists} = $orig_meta->{shady_group};
-			my $is = $orig_meta->{protagonists}->{plural} ? 'are' : 'is';
+			my $group = shady_group( $redstring );
+			$redstring->{protagonists} = $redstring->{shady_group};
+			my $is = $redstring->{protagonists}->{plural} ? 'are' : 'is';
 			
-			my $misinfo = misinformation( $orig_meta );
+			my $misinfo = misinformation( $redstring );
 			
-			my $truth = hidden_truth( $orig_meta );
+			my $truth = hidden_truth( $redstring );
 			
 			my $exclaim = _RANDOM_(
-				'',
-				'',
+				'', '', '', '', '', '',
 				" But the truth shall not be buried!",
 				" Don't let yourself be deceived!",
 				" Take the red pill!",
 				" Believing $misinfo is taking the blue pill!",
 				" Take the red pill - $truth!",
-				" Believing $misinfo is for blue pill sheeple!",
+				" Believing $misinfo is for blue-pilled sheeple!",
 				" Open your mind!",
 			);
 			
 			_UCFIRST_ "$group $is spreading the lie that $misinfo to distract the public from the truth that $truth.$exclaim";
 		},
 		sub {
-			my $protagonists = shady_group( $orig_meta );
-			$orig_meta->{protagonists} = $orig_meta->{shady_group};
+			my $protagonists = shady_group( $redstring );
+			$redstring->{protagonists} = $redstring->{shady_group};
 			
-			my $antagonists = shady_group( $orig_meta );
-			$orig_meta->{antagonists} = $orig_meta->{shady_group};
+			my $antagonists = shady_group( $redstring );
+			$redstring->{antagonists} = $redstring->{shady_group};
 			
-			my $time = a_long_time( $orig_meta );
+			my $time = a_long_time( $redstring );
 			
 			my $war_reason = _RANDOM_(
 				'Nobody knows why',
@@ -1391,11 +1597,11 @@ sub theory {
 						'disappears',
 						'is assassinated',
 						sub {
-							my $badplace = bad_place( $orig_meta );
+							my $badplace = bad_place( $redstring );
 							"is taken away to $badplace";
 						},
 						sub {
-							my $badplace = bad_place( $orig_meta );
+							my $badplace = bad_place( $redstring );
 							"has their mind wiped at $badplace";
 						},
 						'is given a blue pill',
@@ -1404,26 +1610,27 @@ sub theory {
 				},
 				sub {
 					my $truth = hidden_truth();
-					my $pro   = $orig_meta->{protagonists}{shortname} // $protagonists;
-					my $ant   = $orig_meta->{antagonists}{shortname} // $antagonists;
-					_UCFIRST_ "$pro want to expose the truth that $truth and $ant will do whatever they can to stop them";
+					my $pro   = $redstring->{protagonists}{shortname} // $protagonists;
+					my $ant   = $redstring->{antagonists}{shortname} // $antagonists;
+					my $want = splural( $redstring->{protagonists} ) ? 'want' : 'wants';
+					_UCFIRST_ "$pro $want to expose the truth that $truth and $ant will do whatever they can to stop them";
 				},
 			);
 			
 			_UCFIRST_ "$protagonists and $antagonists have been in a secret war with each other $time. $war_reason."
 		},
 		sub {
-			my $group = shady_group( $orig_meta );
-			$orig_meta->{protagonists} = $orig_meta->{shady_group};
+			my $group = shady_group( $redstring );
+			$redstring->{protagonists} = $redstring->{shady_group};
 			
-			my $victim = victim( $orig_meta );
+			my $victim = victim( $redstring );
 			
-			my $truth = hidden_truth( $orig_meta );
+			my $truth = hidden_truth( $redstring );
 			
 			my $explanation = _UCFIRST_ _RANDOM_(
 				sub {
-					my $group2 = shady_group( $orig_meta );
-					$orig_meta->{antagonists} = $orig_meta->{shady_group};
+					my $group2 = shady_group( $redstring );
+					$redstring->{antagonists} = $redstring->{shady_group};
 					
 					"$victim learnt the truth from $group2";
 				},
@@ -1437,30 +1644,30 @@ sub theory {
 			_UCFIRST_ "$group killed $victim to hide the truth that $truth. $explanation.";
 		},
 		sub {
-			my $truth = hidden_truth( $orig_meta );
+			my $truth = hidden_truth( $redstring );
 			
 			my $sheeple = _RANDOM_(
 				'people are sheeple',
 				'they refuse to see the truth',
 				'the mass media refuse to report it',
 				sub {
-					my $group = shady_group( $orig_meta );
-					$orig_meta->{protagonists} = $orig_meta->{shady_group};
-					my $is = $orig_meta->{protagonists}->{plural} ? 'are' : 'is';
-					my $mc = mind_control_device( $orig_meta );
+					my $group = shady_group( $redstring );
+					$redstring->{protagonists} = $redstring->{shady_group};
+					my $is = $redstring->{protagonists}->{plural} ? 'are' : 'is';
+					my $mc = mind_control_device( $redstring );
 					"$group $is controlling people's minds with $mc";
 				},
 				sub {
-					my $group = shady_group( $orig_meta );
-					$orig_meta->{protagonists} = $orig_meta->{shady_group};
-					my $have = $orig_meta->{protagonists}->{plural} ? 'have' : 'has';
-					my $long_time = a_long_time( $orig_meta );
+					my $group = shady_group( $redstring );
+					$redstring->{protagonists} = $redstring->{shady_group};
+					my $have = $redstring->{protagonists}->{plural} ? 'have' : 'has';
+					my $long_time = a_long_time( $redstring );
 					"$group $have been hiding it $long_time";
 				},
 				sub {
-					my $group = shady_group( $orig_meta );
-					$orig_meta->{protagonists} = $orig_meta->{shady_group};
-					my $is = $orig_meta->{protagonists}->{plural} ? 'are' : 'is';
+					my $group = shady_group( $redstring );
+					$redstring->{protagonists} = $redstring->{shady_group};
+					my $is = $redstring->{protagonists}->{plural} ? 'are' : 'is';
 					my $medium = _RANDOM_(
 						'the Internet',
 						'Twitter',
@@ -1483,26 +1690,26 @@ sub theory {
 			);
 		},
 		sub {
-			my $fiction = fiction( $orig_meta );
-			my $truth = hidden_truth( $orig_meta );
+			my $fiction = fiction( $redstring );
+			my $truth = hidden_truth( $redstring );
 			
 			_UCFIRST_ _RANDOM_(
 				"$fiction has a hidden message that $truth.",
 				"$fiction is just an allegory which shows that $truth.",
 				sub {
-					my $group = shady_group( $orig_meta );
-					$orig_meta->{protagonists} //= $orig_meta->{shady_group};
+					my $group = shady_group( $redstring );
+					$redstring->{protagonists} //= $redstring->{shady_group};
 					"$fiction was analysed with a computer by $group and it revealed $truth.",
 				},
 			);
 		},
 		sub {
-			my $group = shady_group( $orig_meta );
-			$orig_meta->{protagonists} = $orig_meta->{shady_group};
-			my $are = $orig_meta->{protagonists}->{plural} ? 'are' : 'is';
+			my $group = shady_group( $redstring );
+			$redstring->{protagonists} = $redstring->{shady_group};
+			my $are = $redstring->{protagonists}->{plural} ? 'are' : 'is';
 			
-			my $place    = random_place( $orig_meta );
-			my $darklord = dark_lord( $orig_meta );
+			my $place    = random_place( $redstring );
+			my $darklord = dark_lord( $redstring );
 			
 			my $getting_kids = _RANDOM_(
 				'abducting orphan children',
@@ -1513,11 +1720,11 @@ sub theory {
 				'buying kids from poor families',
 				'stealing babies',
 				sub {
-					$orig_meta->{topic} //= { name => 'adoption', plural => 0 };
+					$redstring->{topic} //= { name => 'adoption', plural => 0 };
 					'adopting babies';
 				},
 				sub {
-					$orig_meta->{topic} //= { name => 'adoption', plural => 0 };
+					$redstring->{topic} //= { name => 'adoption', plural => 0 };
 					'adopting kids';
 				},
 			);
@@ -1537,12 +1744,12 @@ sub theory {
 			_UCFIRST_ "$group $are $getting_kids in $place to $sacrifice to $darklord.";
 		},
 		sub {
-			my $group = shady_group( $orig_meta );
-			$orig_meta->{protagonists} = $orig_meta->{shady_group};
-			my $have = $orig_meta->{protagonists}->{plural} ? 'have' : 'has';
-			my $are  = $orig_meta->{protagonists}->{plural} ? 'are'  : 'is';
+			my $group = shady_group( $redstring );
+			$redstring->{protagonists} = $redstring->{shady_group};
+			my $have = $redstring->{protagonists}->{plural} ? 'have' : 'has';
+			my $are  = $redstring->{protagonists}->{plural} ? 'are'  : 'is';
 			
-			my $resource = precious_resource_with_quantity( $orig_meta );
+			my $resource = precious_resource_with_quantity( $redstring );
 			
 			_UCFIRST_ _RANDOM_(
 				"$group $have $resource.",
@@ -1552,89 +1759,89 @@ sub theory {
 			);
 		},
 		sub {
-			my $group = shady_group( $orig_meta );
-			$orig_meta->{protagonists} = $orig_meta->{shady_group};
-			my $are  = $orig_meta->{protagonists}->{plural} ? 'are'  : 'is';
+			my $group = shady_group( $redstring );
+			$redstring->{protagonists} = $redstring->{shady_group};
+			my $are  = $redstring->{protagonists}->{plural} ? 'are'  : 'is';
 			
-			my $project = shady_project( $orig_meta );
+			my $project = shady_project( $redstring );
 			
 			_UCFIRST_ _RANDOM_(
 				"$group $are running $project.",
 				"$group $are in charge of $project.",
 				"$group $are working against $project.",
 				sub {
-					my $auth = authority( $orig_meta );
+					my $auth = authority( $redstring );
 					"$group $are investigating $project. They will soon have enough evidence to go to $auth.",
 				},
 			);
 		},
 		sub {
-			my $group = shady_group( $orig_meta );
-			$orig_meta->{protagonists} = $orig_meta->{shady_group};
+			my $group = shady_group( $redstring );
+			$redstring->{protagonists} = $redstring->{shady_group};
 			
-			my $physicist = physicist( $orig_meta );
+			my $physicist = physicist( $redstring );
 			
 			my $fact = _RANDOM_(
 				sub {
-					$orig_meta->{topic} = { name => 'bathroom scales', plural => 1 };
+					$redstring->{topic} = { name => 'bathroom scales', plural => 1 };
 					'electrons have more mass than protons';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'weighing scales', plural => 1 };
+					$redstring->{topic} = { name => 'weighing scales', plural => 1 };
 					"protons don't have mass";
 				},
 				sub {
 					my $things = _RANDOM_( 'electrons', 'protons' );
-					$orig_meta->{topic} = { name => $things, plural => 1 };
-					"$things are not real particles, they are just the terminal lines of a dieletric pulse";
+					$redstring->{topic} = { name => $things, plural => 1 };
+					"$things are not real particles, they are just the terminal lines of a dielectric pulse";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'water', plural => 0 };
+					$redstring->{topic} = { name => 'water', plural => 0 };
 					'water is its own element';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'geocentrism', plural => 0 };
+					$redstring->{topic} = { name => 'geocentrism', plural => 0 };
 					'the sun goes round the Earth';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'the moon', plural => 0 };
+					$redstring->{topic} = { name => 'the moon', plural => 0 };
 					'the moon is a hologram';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'camembert', plural => 0 };
+					$redstring->{topic} = { name => 'camembert', plural => 0 };
 					'the moon is made of cheese';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'the man in the moon', plural => 0 };
+					$redstring->{topic} = { name => 'the man in the moon', plural => 0 };
 					'the man in the moon is a real man';
 				},
 				sub {
-					my $chem = chemicals( $orig_meta );
-					$orig_meta->{topic} = { name => 'the periodic table', plural => 0 };
+					my $chem = chemicals( $redstring );
+					$redstring->{topic} = { name => 'the periodic table', plural => 0 };
 					"element 119 is $chem";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'air', plural => 0 };
+					$redstring->{topic} = { name => 'air', plural => 0 };
 					"air isn't real";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'vacuum cleaners', plural => 0 };
+					$redstring->{topic} = { name => 'vacuum cleaners', plural => 0 };
 					"space isn't a vacuum because then it would suck all the air";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'the firmament', plural => 0 };
+					$redstring->{topic} = { name => 'the firmament', plural => 0 };
 					"there is a dome over the flat Earth";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'Satan', plural => 0 };
+					$redstring->{topic} = { name => 'Satan', plural => 0 };
 					'the axis of evil in the cosmic microwave background was put there by Satan';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'the zodiac', plural => 0 };
+					$redstring->{topic} = { name => 'the zodiac', plural => 0 };
 					'astrology has been scientifically verified';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'the year of the dragon', plural => 0 };
+					$redstring->{topic} = { name => 'the year of the dragon', plural => 0 };
 					'the Chinese zodiac can predict the future';
 				},
 			);
@@ -1644,64 +1851,71 @@ sub theory {
 				"$group helped cover up the truth.",
 				"$group threatened to kill him to keep him quiet.",
 				"He was a member of $group so they knew he would keep quiet.",
+				"$group arranged a convenient \"accident\".",
 			);
 			
 			my $destruction = _RANDOM_(
 				"all of modern physics",
 				'our understanding of the universe',
 				"the Big Bang 'theory'",
+				"Einstein's theory of relativity",
 			);
 			
 			_UCFIRST_ "$physicist discovered that $fact but the scientific establishment is suppressing it because it would destroy $destruction. $solution";
 		},
 		sub {
-			my $group = shady_group( $orig_meta );
-			$orig_meta->{protagonists} = $orig_meta->{shady_group};
+			my $group = shady_group( $redstring );
+			$redstring->{protagonists} = $redstring->{shady_group};
 			
-			my $biologist = biologist( $orig_meta );
+			my $biologist = biologist( $redstring );
 			
 			my $fact = _RANDOM_(
 				sub {
-					$orig_meta->{topic} = { name => 'pandas', plural => 1 };
-					'pandas are really just fat racoons';
+					$redstring->{topic} = { name => 'pandas', plural => 1 };
+					'pandas are really just fat raccoons';
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'spaghetti', plural => 1 };
+					$redstring->{topic} = { name => 'spaghetti', plural => 1 };
 					"spaghetti is a type of worm";
 				},
 				sub {
-					$orig_meta->{celebrity} //= { name => 'Louis Armstrong', female => 0 };
-					$orig_meta->{topic} = { name => 'snakes', plural => 1 };
+					$redstring->{celebrity} //= { name => 'Louis Armstrong', female => 0 };
+					$redstring->{topic} = { name => 'snakes', plural => 1 };
 					"snakes like jazz music";
 				},
 				sub {
-					$orig_meta->{real_place} //= 'Antarctica';
-					$orig_meta->{topic} = { name => 'penguins', plural => 1 };
+					$redstring->{real_place} //= 'Antarctica';
+					$redstring->{topic} = { name => 'penguins', plural => 1 };
 					"penguins can fly but they get nervous when people are watching";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'DNA', plural => 0 };
+					$redstring->{topic} = { name => 'DNA', plural => 0 };
 					"the 10 commandments are encoded in human DNA";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'essential oils', plural => 1 };
+					$redstring->{topic} = { name => 'essential oils', plural => 1 };
 					"essential oils cure all diseases";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'vaccines', plural => 1 };
+					$redstring->{topic} = { name => 'vaccines', plural => 1 };
 					"essential oils cure autism";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'anger managemment', plural => 0 };
+					$redstring->{topic} = { name => 'anger management', plural => 0 };
 					"wasps are just angry bees";
 				},
 				sub {
-					$orig_meta->{topic} = { name => 'oncology', plural => 0 };
+					$redstring->{topic} = { name => 'oncology', plural => 0 };
 					"windmills cause cancer";
 				},
 				sub {
-					my $animal = real_animal( $orig_meta );
-					$orig_meta->{topic} = { name => 'space flight', plural => 0 };
+					my $chem = chemicals( $redstring );
+					$redstring->{topic} = { name => 'honey', plural => 0 };
+					"$chem is killing all the bees";
+				},
+				sub {
+					my $animal = real_animal( $redstring );
+					$redstring->{topic} = { name => 'space flight', plural => 0 };
 					"$animal DNA comes from space";
 				},
 			);
@@ -1711,6 +1925,7 @@ sub theory {
 				"$group helped cover up the truth.",
 				"$group threatened to kill him to keep him quiet.",
 				"He was a member of $group so they knew he would keep quiet.",
+				"$group arranged a convenient \"accident\".",
 			);
 			
 			my $destruction = _RANDOM_(
@@ -1724,11 +1939,11 @@ sub theory {
 			_UCFIRST_ "$biologist discovered that $fact but the scientific establishment is suppressing it because it would destroy $destruction. $solution";
 		},
 		sub {
-			my $group = shady_group( $orig_meta );
-			$orig_meta->{protagonists} = $orig_meta->{shady_group};
-			my $have = $orig_meta->{protagonists}->{plural} ? 'have' : 'has';
+			my $group = shady_group( $redstring );
+			$redstring->{protagonists} = $redstring->{shady_group};
+			my $have = $redstring->{protagonists}->{plural} ? 'have' : 'has';
 			
-			my $place = random_place( $orig_meta );
+			my $place = random_place( $redstring );
 			
 			my $how = _RANDOM_(
 				"by diverting flights to $place to a Hollywood studio",
@@ -1741,8 +1956,8 @@ sub theory {
 			_UCFIRST_ "$place is just a hologram created by $group who $have been hiding it for years $how.";
 		},
 		sub {
-			my $place  = random_place( $orig_meta );
-			my $truth1 = hidden_truth( $orig_meta );
+			my $place  = random_place( $redstring );
+			my $truth1 = hidden_truth( $redstring );
 			
 			_UCFIRST_ _RANDOM_(
 				"It is common knowledge in $place that $truth1.",
@@ -1752,23 +1967,24 @@ sub theory {
 			);
 		},
 		sub {
-			my $celeb  = celebrity( $orig_meta );
-			my $pronoun = $orig_meta->{celebrity}{female} ? 'she' : 'he';
-			my $truth1 = hidden_truth( $orig_meta );
-			my $group = shady_group( $orig_meta );
-			$orig_meta->{protagonists} = $orig_meta->{shady_group};
-			my $are = $orig_meta->{protagonists}->{plural} ? 'are' : 'is';
+			my $celeb  = celebrity( $redstring );
+			my $pronoun = $redstring->{celebrity}{female} ? 'she' : 'he';
+			my $truth1 = hidden_truth( $redstring );
+			my $group = shady_group( $redstring );
+			$redstring->{protagonists} = $redstring->{shady_group};
+			my $are = $redstring->{protagonists}->{plural} ? 'are' : 'is';
 			
 			my $silence = _RANDOM_(
 				"$pronoun will probably have to be eliminated",
 				"$pronoun is going to be killed if $pronoun isn't dead already",
 				"$pronoun is being paid to stay quiet",
+				"$pronoun will meet a convenient \"accident\"",
 				sub {
-					my $clone = clone( $orig_meta );
+					my $clone = clone( $redstring );
 					"$pronoun has been replaced by $clone";
 				},
 				sub {
-					my $place = bad_place( $orig_meta );
+					my $place = bad_place( $redstring );
 					"$pronoun has been imprisoned in $place";
 				},
 			);
@@ -1776,10 +1992,10 @@ sub theory {
 			_UCFIRST_ "$celeb found out that $truth1 and $silence. " . _UCFIRST_ "$group $are protecting this secret.";
 		},
 		sub {
-			my $celeb  = celebrity( $orig_meta );
-			my $pronoun = $orig_meta->{celebrity}{female} ? 'she' : 'he';
-			my $group = shady_group( $orig_meta );
-			$orig_meta->{protagonists} = $orig_meta->{shady_group};
+			my $celeb  = celebrity( $redstring );
+			my $pronoun = $redstring->{celebrity}{female} ? 'she' : 'he';
+			my $group = shady_group( $redstring );
+			$redstring->{protagonists} = $redstring->{shady_group};
 			
 			_UCFIRST_ _RANDOM_(
 				"$celeb is a member of $group.",
@@ -1792,14 +2008,14 @@ sub theory {
 		},
 	);
 
-	if ( $orig_meta->{protagonists} and not $orig_meta->{antagonists} and _RANDOM_(0..1) ) {
-		my $group1 = $orig_meta->{protagonists}{shortname} // $orig_meta->{protagonists}{name};
-		my $group2 = shady_group( $orig_meta );
-		$orig_meta->{antagonists} = $orig_meta->{shady_group};
-		my $know = $orig_meta->{antagonists}->{plural} ? 'know' : 'knows';
+	if ( $redstring->{protagonists} and not $redstring->{antagonists} and _RANDOM_(0..1) ) {
+		my $group1 = $redstring->{protagonists}{shortname} // $redstring->{protagonists}{name};
+		my $group2 = shady_group( $redstring );
+		$redstring->{antagonists} = $redstring->{shady_group};
+		my $know = splural ($redstring->{antagonists}) ? 'know' : 'knows';
 		$theory .= " " . _UCFIRST_ _RANDOM_(
 			sub {
-				my $bribe = precious_resource_with_quantity( $orig_meta );
+				my $bribe = precious_resource_with_quantity( $redstring );
 				"$group2 $know the truth but $group1 have paid them off with $bribe.";
 			},
 			"$group2 $know the truth but $group1 have threatened them to keep them silent.",
@@ -1810,15 +2026,113 @@ sub theory {
 		);
 	}
 
-	_MERGE_( $orig_meta, base_theory => $theory );
+	_MERGE_( $redstring, base_theory => $theory );
 	
-	my $evidence = evidence( $orig_meta );
-	
+	my $evidence = evidence( $redstring );
 	$theory .= " $evidence" if $evidence;
 
-	_MERGE_( $orig_meta, theory => $theory );
+	my $numerology = numerology( $redstring );
+	$theory .= " $numerology" if $numerology;
+
+	_MERGE_( $redstring, theory => $theory );
 
 	return $theory;
+}
+
+my %special_numbers = (
+	19   => [ qr/COVID/,             '19 is the coronavirus number' ],
+	24   => [ qr/TINTIN/,            'There are 24 Tintin comics' ],
+	33   => [ qr/MASON/,             '33 is associated with the masons' ],
+	35   => [ qr/ELVIS/,             'Elvis was born in 1935' ],
+	44   => [ qr/OBAMA/,             'Barack Obama was the 44th President of the USA' ],
+	45   => [ qr/TRUMP|QANON|USA/,   'Donald Trump was the 45th President of the USA',
+	          qr/UNITEDNATIONS/,     'The United Nations was founded in 1945' ],
+	46   => [ qr/BIDEN/,             'Joe Biden was the 46th President of the USA' ],
+	47   => [ qr/THECIA/,            'The CIA was founded in 1947',
+	          qr/SILVER/,            'Silver has atomic number 47' ],
+	49   => [ qr/NATO/,              'NATO was founded in 1949' ],
+	51   => [ qr/KFC/,               'Area 51 is the fifty-first area' ],
+	52   => [ qr/KFC/,               'KFC was founded in 1952' ],
+	55   => [ qr/BIGMAC|MCDONALDS/,  'McDonalds was founded in 1955' ],
+	63   => [ qr/JFK|OSWALD/,        'JFK was shot in 1963' ],
+	79   => [ qr/GOLD/,              'Gold has the atomic number 79' ],
+	81   => [ qr/HIV/,               'AIDS was discovered in 1981' ],
+	82   => [ qr/COKE/,              'Diet Coke first came out in 1982' ],
+	86   => [ qr/RADON/,             'The atomic number for radon is 86' ],
+	92   => [ qr/URANIUM/,           'The atomic number for uranium is 92' ],
+	322  => [ qr/SKULL/,             'Skull and Bones is Order 322' ],
+	666  => [ qr/DEVIL|DEMON|SATAN/, '666 is the number of the beast' ],
+);
+
+sub numerology {
+	my $redstring = shift // {};
+	
+	my @strings = List::Util::uniq(
+		grep { length }
+		map { my $letters = uc( $_ ); $letters =~ s/[^A-Z0-9]//g; $letters }
+		map {
+			/^(the )(.+)$/i ? $2 : $_
+		}
+		map {
+			ref( $_ ) ? grep( defined, $_->{name}, $_->{shortname}, $_->{title}, $_->{author} ) : $_
+		}
+		values( %$redstring )
+	);
+	
+	my %calcs;
+	foreach my $string ( @strings ) {
+		next if length($string) >= 20;
+		my @letters = split //, $string;
+		my @numbers = map /[A-Z]/ ? ( ord($_) - 0x40 ) : $_, @letters;
+		my $sum     = List::Util::sum( @numbers );
+		
+		push @{ $calcs{$sum} ||= [] }, sprintf(
+			'%s = %s = %s',
+			join( '+', @letters ),
+			join( '+', @numbers ),
+			$sum,
+		);
+	}
+	
+	foreach my $key ( %special_numbers ) {
+		if ( $calcs{$key} ) {
+			my @copy = @{ $special_numbers{$key} };
+			while ( @copy ) {
+				my ( $test, $statement ) = splice( @copy, 0 , 2 );
+				next unless "@strings" =~ $test;
+				push @{ $calcs{$key} }, "And guess what? " . $statement;
+			}
+		}
+	}
+	
+	my @wow = map { @$_ > 1 ? @$_ : () } values %calcs;
+	
+	if ( @wow ) {
+		return sprintf(
+			"%s %s",
+			_RANDOM_(
+				'The numbers never lie.',
+				'Trust the numbers.',
+				'You can see the truth in the numbers.',
+			),
+			join(
+				'',
+				map( "$_. ", @wow ),
+			)
+		);
+	}
+	
+	return '';
+}
+
+sub bad_punctuation {
+	my ( $string, $cancel ) = @_;
+	unless ( $cancel ) {
+		$string =~ s/ ([A-Za-z]) ([,!?]) / $1 . _RANDOM_(    $2, " $2", " $2", " $2$2") /exg;
+		$string =~ s/ ([A-Za-z]) ([.])   / $1 . _RANDOM_($2, $2, " $2", " ", " $2$2$2") /exg;
+		$string =~ s/\!/_RANDOM_('!', '!', '!!',  "!!!!")/ex;
+	}
+	return $string;
 }
 
 1;
@@ -1836,13 +2150,18 @@ Acme::ConspiracyTheory::Random - random theories
 =head1 SYNOPSIS
 
   use feature 'say';
-  use Acme::ConspiracyTheory::Random 'theory';
+  use Acme::ConspiracyTheory::Random -all;
   
-  say theory();
+  say bad_punctuation( theory() );
 
 =head1 DESCRIPTION
 
-This module exports one function, C<< theory() >> which returns a string.
+This module exports a function, C<< theory() >> which returns a string.
+
+=for html <p><img src="https://raw.githubusercontent.com/tobyink/p5-acme-conspiracytheory-random/master/assets/pepe-silvia.jpeg" alt=""></p>
+
+There is also a function C<< bad_punctuation >> which, given a string, might
+make the punctuation worse.
 
 =head1 BUGS
 
@@ -1856,6 +2175,14 @@ REDACTED
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 CONTRIBUTORS
+
+Alex Jones discovered that there are secretly other people who have contributed
+to this module but Toby Inkster is working with Microsoft and the Illuminati to
+cover it up. I tried to blog about it but all my posts keep getting taken down
+from Tumblr. There are hidden clues on L<GitHub|https://github.com/tobyink/p5-acme-conspiracytheory-random/graphs/contributors>.
+You don't want to know how deep this rabbit hole goes!
 
 =head1 COPYRIGHT AND LICENCE
 

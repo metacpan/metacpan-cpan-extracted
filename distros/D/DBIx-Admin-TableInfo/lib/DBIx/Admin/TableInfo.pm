@@ -48,7 +48,7 @@ has type =>
 	required => 0,
 );
 
-our $VERSION = '3.03';
+our $VERSION = '3.04';
 
 # -----------------------------------------------
 
@@ -836,10 +836,22 @@ Here is the code which skips some tables:
 
 =head2 How do I identify foreign keys?
 
+=over 4
+
+=item o See scripts/foreign.keys.pl
+
+First set the environment variables DBI_DSN, DBI_USER and DBI_PASS.
+
+Then, it writes in CSV format to STDOUT, which you can redirect to, say, foreign.keys.csv.
+
+=item o Take a very simplistic and brute-force approach
+
 Note: The table names here come from xt/author/person.spouse.t.
 
 See L<DBIx::Admin::CreateTable/FAQ> for database server-specific create statements to activate
 foreign keys.
+
+First set the environment variables DBI_DSN, DBI_USER and DBI_PASS.
 
 Then try:
 
@@ -847,10 +859,13 @@ Then try:
 
 	print Data::Dumper::Concise::Dumper($$info{people}{foreign_keys}), "\n";
 
-Output follows.
+Sample output follows below.
 
-But beware slightly differing spellings depending on the database server. This is documented in
-L<https://metacpan.org/pod/DBI#foreign_key_info>. Look closely at the usage of the '_' character.
+=back
+
+Beware: Slightly differing spellings depending on the database server. This is documented in
+L<https://metacpan.org/pod/DBI#foreign_key_info>. Look closely at the presence or absence of the
+'_' character.
 
 =over 4
 
@@ -1032,7 +1047,7 @@ The hashref returned for foreign keys contains these key-value pairs:
 
 This list of keys matches what is returned when processing a Postgres database.
 
-=head2 Have you got FK and PK backwards?
+=head2 Have you gotten FK and PK backwards?
 
 I certainly hope not. To me the FK_TABLE_NAME points to the UK_TABLE_NAME.
 
@@ -1142,7 +1157,9 @@ L<https://github.com/ronsavage/DBIx-Admin-TableInfo>
 
 =head1 Support
 
-Log a bug on RT: L<https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Admin-TableInfo>.
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/DBIx-Admin-TableInfo/issues>
 
 =head1 Author
 

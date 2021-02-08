@@ -1,3 +1,8 @@
+0.1.1 2021-02-03
+
+    - Adding POD.
+    - Skipping t/03_Text_BibTeX.t if Text::BibTeX cannot be used.
+
 0.1.0 2021-01-29
 
     - Initial release.

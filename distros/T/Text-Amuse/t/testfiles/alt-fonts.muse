@@ -1,0 +1,9 @@
+#title Fonts
+#lang en
+
+Test <sc>Small *caps*</sc> Test <sc>Small *caps*</sc>
+
+Test <sf>San *serif* **serif**</sf> Here. Test <sf>San *serif* **serif** ***bold***</sf> Here.
+
+
+***Bold <sf>sans</sf> <sc>small caps</sc> here***

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Text;
 # ABSTRACT: Fallback handler for result errors
-$Neo4j::Driver::Result::Text::VERSION = '0.20';
+$Neo4j::Driver::Result::Text::VERSION = '0.21';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -23,7 +23,8 @@ sub new {
 	my @errors = ();
 	
 	if (! $header->{success}) {
-		push @errors, "HTTP error: $header->{status} $header->{reason} on $params->{http_method} to $params->{http_path}";
+		my $reason_phrase = $params->{http_agent}->http_reason;
+		push @errors, "HTTP error: $header->{status} $reason_phrase on $params->{http_method} to $params->{http_path}";
 	}
 	
 	my $content_type = $header->{content_type};
@@ -71,12 +72,16 @@ Neo4j::Driver::Result::Text - Fallback handler for result errors
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 DESCRIPTION
 
 The L<Neo4j::Driver::Result::Text> package is not part of the
 public L<Neo4j::Driver> API.
+
+=head1 SEE ALSO
+
+L<Neo4j::Driver::Net>
 
 =head1 AUTHOR
 

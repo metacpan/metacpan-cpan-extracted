@@ -82,6 +82,11 @@ subtest load_module_with_optional_args => sub {
         ok(!defined(&{"foo6"}));
     };
 
+    subtest "opt:ns_prefixes" => sub {
+        load_module_with_optional_args({ns_prefixes=>["Module::Load::Util::Test", "Module::Load::Util::Test2"]}, "Module2=foo6");
+        ok( defined(&{"foo6"}));
+    };
+
     subtest "opt:target_package" => sub {
         load_module_with_optional_args({target_package=>"Module::Load::Util::Test::Target"}, "Module::Load::Util::Test::Module=foo5");
         ok( defined(&{"Module::Load::Util::Test::Target::foo5"}));

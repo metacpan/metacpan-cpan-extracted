@@ -1,14 +1,17 @@
-Build.PL
 Changelog.ini
 Changes
 lib/DBIx/Admin/CreateTable.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
+MANIFEST.SKIP
 README
 scripts/pod2html.sh
+t/00.versions.t
+t/00.versions.tx
 t/load.t
 t/syntax.error.t
 t/version.t
 xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

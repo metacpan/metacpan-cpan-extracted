@@ -69,10 +69,10 @@ qgmp_randinit_set qgmp_randinit_default_nobless qgmp_randinit_mt_nobless
 qgmp_randinit_lc_2exp_nobless qgmp_randinit_lc_2exp_size_nobless qgmp_randinit_set_nobless
 qgmp_urandomb_ui qgmp_urandomm_ui
     );
-    our $VERSION = '0.45';
+    our $VERSION = '0.46';
     #$VERSION = eval $VERSION;
 
-    DynaLoader::bootstrap Math::GMPq $VERSION;
+    Math::GMPq->DynaLoader::bootstrap($VERSION);
 
     %Math::GMPq::EXPORT_TAGS =(mpq => [qw(
 Rmpq_abs Rmpq_add Rmpq_canonicalize Rmpq_clear Rmpq_cmp Rmpq_cmp_si Rmpq_cmp_ui
@@ -268,14 +268,14 @@ sub Rmpq_snprintf {
     return $len;
 }
 
-sub __GNU_MP_VERSION {return ___GNU_MP_VERSION()}
-sub __GNU_MP_VERSION_MINOR {return ___GNU_MP_VERSION_MINOR()}
-sub __GNU_MP_VERSION_PATCHLEVEL {return ___GNU_MP_VERSION_PATCHLEVEL()}
-sub __GNU_MP_RELEASE {return ___GNU_MP_RELEASE()}
-sub __GMP_CC {return ___GMP_CC()}
-sub __GMP_CFLAGS {return ___GMP_CFLAGS()}
-sub GMP_LIMB_BITS {return _GMP_LIMB_BITS()}
-sub GMP_NAIL_BITS {return _GMP_NAIL_BITS()}
+sub __GNU_MP_VERSION            () {return ___GNU_MP_VERSION()}
+sub __GNU_MP_VERSION_MINOR      () {return ___GNU_MP_VERSION_MINOR()}
+sub __GNU_MP_VERSION_PATCHLEVEL () {return ___GNU_MP_VERSION_PATCHLEVEL()}
+sub __GNU_MP_RELEASE            () {return ___GNU_MP_RELEASE()}
+sub __GMP_CC                    () {return ___GMP_CC()}
+sub __GMP_CFLAGS                () {return ___GMP_CFLAGS()}
+sub GMP_LIMB_BITS               () {return _GMP_LIMB_BITS()}
+sub GMP_NAIL_BITS               () {return _GMP_NAIL_BITS()}
 
 *qgmp_randseed =                      \&Math::GMPq::Random::Rgmp_randseed;
 *qgmp_randseed_ui =                   \&Math::GMPq::Random::Rgmp_randseed_ui;

@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Taxonomy::ColorScheme;
 # ABSTRACT: Helper class providing color scheme for taxonomic annotations
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.210230';
+$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.210380';
 use Moose;
 use namespace::autoclean;
 
@@ -248,7 +248,7 @@ Bio::MUST::Core::Taxonomy::ColorScheme - Helper class providing color scheme for
 
 =head1 VERSION
 
-version 0.210230
+version 0.210380
 
 =head1 SYNOPSIS
 

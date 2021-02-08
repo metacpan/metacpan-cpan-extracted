@@ -34,8 +34,8 @@ requires:
   Tags::Output::Raw: 0.04
   perl: 5.6.2
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PYX2XML
+  bugtracker: https://github.com/michal-josef-spacek/App-PYX2XML/issues
   homepage: https://github.com/michal-josef-spacek/App-PYX2XML
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-PYX2XML
-version: '0.04'
+version: '0.06'

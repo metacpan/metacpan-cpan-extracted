@@ -6,7 +6,7 @@ use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 #----------------------------------------------------------------------
 # Load package
@@ -27,13 +27,11 @@ rmtree($test_dir);
 mkdir $test_dir  or die $!;
 chmod 0755, $test_dir;
 
-my $archive_dir = catfile(@path, 'test', 'archive');
-mkdir($archive_dir)  or die $!;
-chmod 0755, $archive_dir;
-
 chdir $test_dir or die $!;
 $test_dir = cwd();
 
+my $archive_dir = catfile(@path, 'test', 'archive');
+	
 #----------------------------------------------------------------------
 # Create object
 
@@ -41,6 +39,8 @@ my $template_file = 'template.htm';
 my $prototype_file = 'index.html';
 
 my %configuration = (
+        top_directory => $test_dir,
+        base__directory => $test_dir,
         template_directory => $test_dir,
         template_file => $template_file,
         web_extension => 'html',
@@ -76,12 +76,38 @@ do {
 </html>
 EOQ
 
+   my $index_page = <<'EOQ';
+<html>
+<head>
+<meta name="robots" content="noarchive,follow">
+<!-- section meta -->
+<title>Stuff</title>
+<meta name="date" content="2012-12-12T12:12:12" />
+<meta name="description" content="All my thoughts about stuff." />
+<meta name="keywords" content="stuff, thoughts" />
+<meta name="author" content="Anna Blogger" />
+<!-- endsection meta -->
+</head>
+<body>
+<!-- section primary -->
+<p>All my thoughts about stuff</p>
+<!-- endsection primary -->
+<!-- section secondary -->
+<!-- endsection secondary -->
+</body>
+</html>
+EOQ
+
    my $index_template = <<'EOQ';
 <html>
 <head>
 <meta name="robots" content="noarchive,follow">
 <!-- section meta -->
 <title>$title</title>
+<meta name="date" content="$date" />
+<meta name="description" content="$description" />
+<meta name="keywords" content="$keywords" />
+<meta name="author" content="$author" />
 <!-- endsection meta -->
 </head>
 <body>
@@ -107,10 +133,15 @@ EOQ
 
     fio_write_page($template_file, $index_template);
 
+    mkdir($archive_dir) unless -e $archive_dir;
     chdir($archive_dir) or die $!;
-    $archive_dir = cwd();
-    my @archived_files;
 
+    $archive_dir = cwd();
+
+    my ($index_name) = fio_to_file($archive_dir, $configuration{web_extension});
+    fio_write_page($index_name, $index_page);
+
+    my @archived_files;
     foreach my $count (qw(four three two one)) {
         my $output = $page;
         $output =~ s/%%/$count/g;
@@ -120,21 +151,24 @@ EOQ
         push(@archived_files, $filename);
     }
 
-    chdir($test_dir) or die $!;
+    chdir($archive_dir) or die $!;
 
+    my $idx = App::Followme::CreateIndex->new(%configuration);
     $idx->run($archive_dir);
-    my ($index_name) = fio_to_file($archive_dir, $configuration{web_extension});
 
     $page = fio_read_page($index_name);
     ok($page, 'Write index page'); # test 3
 
-    like($page, qr/Post four/, 'Index first page title'); # test 4
-    like($page, qr/Post two/, 'Index last page title'); # test 5
+    my $filled = $idx->sections_are_filled($index_name);
+    ok($filled, 'Test if sections are filled'); # test 4
 
-    like($page, qr/<title>Archive<\/title>/, 'Write index title'); # test 6
+    like($page, qr/Post four/, 'Index first page title'); # test 5
+    like($page, qr/Post two/, 'Index last page title'); # test 6
+
+    like($page, qr/<title>Stuff<\/title>/, 'Write index title'); # test 7
     like($page, qr/<li><a href="archive\/two.html">Post two<\/a><\/li>/,
-       'Write index link'); #test 7
+       'Write index link'); #test 8
 
     my $pos = index($page, $index_name);
-    is($pos, -1, 'Exclude index file'); # test 8
+    is($pos, -1, 'Exclude index file'); # test 9
 };

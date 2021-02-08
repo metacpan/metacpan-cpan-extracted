@@ -1,4 +1,0 @@
-Locale-Maketext-Gettext TODO list
-
-- Design a way for MO file installation through ExtUtils::MakeMaker
-  and Module::Build.

@@ -1,9 +1,9 @@
 #ifndef SPVM_ENUMERATION_H
 #define SPVM_ENUMERATION_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
-struct SPVM_enumeration {
+struct spvm_enumeration {
   SPVM_LIST* enumeration_values;
 };
 

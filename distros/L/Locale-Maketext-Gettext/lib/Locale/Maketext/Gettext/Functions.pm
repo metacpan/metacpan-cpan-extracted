@@ -1,22 +1,22 @@
 # Locale::Maketext::Gettext::Functions - Functional interface to Locale::Maketext::Gettext
 
-# Copyright (c) 2003-2008 imacat. All rights reserved. This program is free
+# Copyright (c) 2003-2021 imacat. All rights reserved. This program is free
 # software; you can redistribute it and/or modify it under the same terms
 # as Perl itself.
-# First written: 2003-04-28
+# First written: 2003/4/28
 
 package Locale::Maketext::Gettext::Functions;
 use 5.008;
 use strict;
 use warnings;
 use base qw(Exporter);
-use vars qw($VERSION @EXPORT @EXPORT_OK);
-$VERSION = 0.13;
-@EXPORT = qw();
-push @EXPORT, qw(bindtextdomain textdomain get_handle maketext __ N_);
-push @EXPORT, qw(dmaketext pmaketext dpmaketext);
-push @EXPORT, qw(reload_text read_mo encoding key_encoding encode_failure);
-push @EXPORT, qw(die_for_lookup_failures);
+our ($VERSION, @EXPORT, @EXPORT_OK);
+$VERSION = 0.14;
+@EXPORT = qw(
+bindtextdomain textdomain get_handle maketext __ N_
+dmaketext pmaketext dpmaketext
+reload_text read_mo encoding key_encoding encode_failure
+die_for_lookup_failures);
 @EXPORT_OK = @EXPORT;
 # Prototype declaration
 sub bindtextdomain($;$);
@@ -34,7 +34,7 @@ sub key_encoding(;$);
 sub encode_failure(;$);
 sub die_for_lookup_failures(;$);
 sub _declare_class($);
-sub _catclass(@);
+sub _cat_class(@);
 sub _init_textdomain($);
 sub _get_langs($$);
 sub _get_handle();
@@ -47,13 +47,13 @@ sub _lang($);
 use Encode qw(encode decode from_to FB_DEFAULT);
 use File::Spec::Functions qw(catdir catfile);
 use Locale::Maketext::Gettext qw(read_mo);
-use vars qw(%LOCALEDIRS %RIDS %CLASSES %LANGS);
-use vars qw(%LHS $_EMPTY $LH $DOMAIN $CATEGORY $CLASSBASE @LANGS %PARAMS);
-use vars qw(@SYSTEM_LOCALEDIRS);
+our (%LOCALEDIRS, %RIDS, %CLASSES, %LANGS);
+our (%LHS, $_EMPTY, $LH, $DOMAIN, $CATEGORY, $BASE_CLASS, @LANGS, %PARAMS);
+our (@SYSTEM_LOCALEDIRS);
 %LHS = qw();
 # The category is always LC_MESSAGES
 $CATEGORY = "LC_MESSAGES";
-$CLASSBASE = "Locale::Maketext::Gettext::_runtime";
+$BASE_CLASS = "Locale::Maketext::Gettext::_runtime";
 # Current language parameters
 @LANGS = qw();
 @SYSTEM_LOCALEDIRS = @Locale::Maketext::Gettext::SYSTEM_LOCALEDIRS;
@@ -62,12 +62,12 @@ $PARAMS{"KEY_ENCODING"} = "US-ASCII";
 $PARAMS{"ENCODE_FAILURE"} = FB_DEFAULT;
 $PARAMS{"DIE_FOR_LOOKUP_FAILURES"} = 0;
 # Parameters for random class IDs
-use vars qw($RID_LEN @RID_CHARS);
+our ($RID_LEN, @RID_CHARS);
 $RID_LEN = 8;
 @RID_CHARS = split //,
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-# bindtextdomain: Bind a text domain to a locale directory
+# Bind a text domain to a locale directory
 sub bindtextdomain($;$) {
     local ($_, %_);
     my ($domain, $LOCALEDIR);
@@ -85,7 +85,7 @@ sub bindtextdomain($;$) {
     return $LOCALEDIR;
 }
 
-# textdomain: Set the current text domain
+# Set the current text domain
 sub textdomain(;$) {
     local ($_, %_);
     my ($new_domain);
@@ -101,7 +101,7 @@ sub textdomain(;$) {
     return $DOMAIN;
 }
 
-# get_handle: Get a language handle
+# Get a language handle
 sub get_handle(@) {
     local ($_, %_);
     # Register the current get_handle arguments
@@ -110,13 +110,13 @@ sub get_handle(@) {
     return _get_handle();
 }
 
-# maketext: Maketext, in its long name
+# Maketext, in its long name
 #   Use @ instead of $@ in prototype, so that we can pass @_ to it.
 sub maketext(@) {
     return __($_[0], @_[1..$#_]);
 }
 
-# __: Maketext, in its shortcut name
+# Maketext, in its shortcut name
 #   Use @ instead of $@ in prototype, so that we can pass @_ to it.
 sub __(@) {
     local ($_, %_);
@@ -144,8 +144,8 @@ sub __(@) {
     return $_;
 }
 
-# N_: Return the original text untouched, so that it can be catched
-#     with xgettext
+# Return the original text untouched, so that it can be cached
+#   with xgettext
 #   Use @ instead of $@ in prototype, so that we can pass @_ to it.
 sub N_(@) {
     # Watch out for this Perl magic! :p
@@ -153,8 +153,8 @@ sub N_(@) {
     return @_;
 }
 
-# dmaketext: Maketext in another text domain temporarily,
-#            an equivalent to dgettext().
+# Maketext in another text domain temporarily,
+#   an equivalent to dgettext().
 sub dmaketext($$@) {
     local ($_, %_);
     my ($domain, $key, @param, $lh0, $domain0, $text);
@@ -171,33 +171,33 @@ sub dmaketext($$@) {
     return $text;
 }
 
-# pmaketext: Maketext with context,
-#            an equivalent to pgettext().
+# Maketext with context,
+#   an equivalent to pgettext().
 sub pmaketext($$@) {
     local ($_, %_);
-    my ($ctxt, $key, @param);
-    ($ctxt, $key, @param) = @_;
+    my ($context, $key, @param);
+    ($context, $key, @param) = @_;
     # This is actually a wrapper to the maketext() function
-    return maketext("$ctxt\x04$key", @param);
+    return maketext("$context\x04$key", @param);
 }
 
-# dpmaketext: Maketext with context in another text domain temporarily,
-#             an equivalent to dpgettext().
+# Maketext with context in another text domain temporarily,
+#   an equivalent to dpgettext().
 sub dpmaketext($$$@) {
     local ($_, %_);
-    my ($domain, $ctxt, $key, @param);
-    ($domain, $ctxt, $key, @param) = @_;
+    my ($domain, $context, $key, @param);
+    ($domain, $context, $key, @param) = @_;
     # This is actually a wrapper to the dmaketext() function
-    return dmaketext($domain, "$ctxt\x04$key", @param);
+    return dmaketext($domain, "$context\x04$key", @param);
 }
 
-# reload_text: Purge the lexicon cache
+# Purge the lexicon cache
 sub reload_text() {
     # reload_text is static.
     Locale::Maketext::Gettext->reload_text;
 }
 
-# encoding: Set the output encoding
+# Set the output encoding
 sub encoding(;$) {
     local ($_, %_);
     $_ = $_[0];
@@ -216,7 +216,7 @@ sub encoding(;$) {
     return exists $PARAMS{"ENCODING"}? $PARAMS{"ENCODING"}: undef;
 }
 
-# key_encoding: Set the encoding of the original text
+# Set the encoding of the original text
 sub key_encoding(;$) {
     local ($_, %_);
     $_ = $_[0];
@@ -234,7 +234,7 @@ sub key_encoding(;$) {
     return exists $PARAMS{"KEY_ENCODING"}? $PARAMS{"KEY_ENCODING"}: undef;
 }
 
-# encode_failure: What to do if the text is out of your output encoding
+# What to do if the text is out of your output encoding
 #   Refer to Encode on possible values of this check
 sub encode_failure(;$) {
     local ($_, %_);
@@ -245,7 +245,7 @@ sub encode_failure(;$) {
     return $PARAMS{"ENCODE_FAILURE"};
 }
 
-# die_for_lookup_failures: Whether we should die for lookup failure
+# Whether we should die for lookup failure
 #   The default is no.  GNU gettext never fails.
 sub die_for_lookup_failures(;$) {
     local ($_, %_);
@@ -261,23 +261,23 @@ sub die_for_lookup_failures(;$) {
     return $PARAMS{"DIE_FOR_LOOKUP_FAILURES"};
 }
 
-# _declare_class: Declare a class
+# Declare a class
 sub _declare_class($) {
     local ($_, %_);
     $_ = $_[0];
     eval << "EOT";
 package $_[0];
 use base qw(Locale::Maketext::Gettext);
-use vars qw(\@ISA %Lexicon);
+our (\@ISA, %Lexicon);
 EOT
 }
 
-# _catclass: Catenate the class name
-sub _catclass(@) {
+# Concatenate the class name
+sub _cat_class(@) {
     return join("::", @_);;
 }
 
-# _init_textdomain: Initialize a text domain
+# Initialize a text domain
 sub _init_textdomain($) {
     local ($_, %_);
     my ($domain, $k, @langs, $langs);
@@ -287,10 +287,10 @@ sub _init_textdomain($) {
     return if !defined $domain;
     
     # Obtain the available locales
-    # A binded domain
+    # A bound domain
     if (exists $LOCALEDIRS{$domain}) {
         @langs = _get_langs($LOCALEDIRS{$domain}, $domain);
-    # Not binded
+    # Not bound
     } else {
         @langs = qw();
         # Search the system locale directories
@@ -322,22 +322,22 @@ sub _init_textdomain($) {
     # Get a new class ID
     $rid = _new_rid();
     # Obtain the class name
-    $class = _catclass($CLASSBASE, $rid);
+    $class = _cat_class($BASE_CLASS, $rid);
     # Register the domain with this class
     $CLASSES{$k} = $class;
     # Declare this class
     _declare_class($class);
     # Declare its language subclasses
-    _declare_class(_catclass($class, $_))
+    _declare_class(_cat_class($class, $_))
         foreach @langs;
     
     return;
 }
 
-# _get_langs: Search a locale directory and return the available languages
+# Search a locale directory and return the available languages
 sub _get_langs($$) {
     local ($_, %_);
-    my ($dir, $domain, $DH, $entry, $MOfile);
+    my ($dir, $domain, $DH, $entry, $MO_file);
     ($dir, $domain) = @_;
     
     @_ = qw();
@@ -351,9 +351,9 @@ sub _get_langs($$) {
             # Skip locales with dot "." (trailing encoding)
             next if $entry =~ /\./;
             # Get the MO file name
-            $MOfile = catfile($dir, $entry, $CATEGORY, "$domain.mo");
+            $MO_file = catfile($dir, $entry, $CATEGORY, "$domain.mo");
             # Skip if MO file is not available for this locale
-            next if ! -f $MOfile && ! -r $MOfile;
+            next if ! -f $MO_file && ! -r $MO_file;
             # Map C to i_default
             $entry = "i_default" if $entry eq "C";
             # Add this language
@@ -364,12 +364,12 @@ sub _get_langs($$) {
     return @_;
 }
 
-# _get_handle: Set the language handle with the current DOMAIN and @LANGS
+# Set the language handle with the current DOMAIN and @LANGS
 sub _get_handle() {
     local ($_, %_);
     my ($k, $class, $subclass);
     
-    # Lexicon empty if text domain not specified, or not binded yet
+    # Lexicon empty if text domain not specified, or not bound yet
     return _get_empty_handle if !defined $DOMAIN || !exists $LOCALEDIRS{$DOMAIN};
     # Obtain the registry key
     $k = _k($DOMAIN);
@@ -402,7 +402,7 @@ sub _get_handle() {
     # Initialize it
     $LH->bindtextdomain($DOMAIN, $LOCALEDIRS{$DOMAIN});
     $LH->textdomain($DOMAIN);
-    # Respect the MO file encoding unless there is a user preferrence
+    # Respect the MO file encoding unless there is a user preference
     if (!exists $PARAMS{"USERSET_ENCODING"}) {
         if (exists $LH->{"MO_ENCODING"}) {
             $PARAMS{"ENCODING"} = $LH->{"MO_ENCODING"};
@@ -419,7 +419,7 @@ sub _get_handle() {
     return _lang($LH);
 }
 
-# _get_empty_handle: Obtain the empty language handle
+# Obtain the empty language handle
 sub _get_empty_handle() {
     local ($_, %_);
     if (!defined $_EMPTY) {
@@ -432,7 +432,7 @@ sub _get_empty_handle() {
     return _lang($LH);
 }
 
-# _reset: Initialize everything
+# Initialize everything
 sub _reset() {
     local ($_, %_);
     
@@ -448,7 +448,7 @@ sub _reset() {
     return;
 }
 
-# _new_rid: Generate a new random ID
+# Generate a new random ID
 sub _new_rid() {
     local ($_, %_);
     my ($id);
@@ -463,12 +463,12 @@ sub _new_rid() {
     return $id;
 }
 
-# _k: Build the key for the domain registry
+# Build the key for the domain registry
 sub _k($) {
     return join "\n", $LOCALEDIRS{$_[0]}, $CATEGORY, $_[0];
 }
 
-# _lang: The langage from a language handle.  language_tag is not quite sane.
+# The language from a language handle.  language_tag is not quite sane.
 sub _lang($) {
     local ($_, %_);
     $_ = $_[0];
@@ -484,16 +484,14 @@ use 5.008;
 use strict;
 use warnings;
 use base qw(Locale::Maketext::Gettext);
-use vars qw($VERSION @ISA %Lexicon);
-$VERSION = 0.01;
+our $VERSION = 0.01;
 
 package Locale::Maketext::Gettext::Functions::_EMPTY::i_default;
 use 5.008;
 use strict;
 use warnings;
 use base qw(Locale::Maketext::Gettext);
-use vars qw($VERSION @ISA %Lexicon);
-$VERSION = 0.01;
+our $VERSION = 0.01;
 
 return 1;
 
@@ -557,7 +555,7 @@ C<get_handle>.
 Attempts to translate a text message into the native language of the
 user, by looking up the translation in an MO lexicon file.  Refer to
 L<Locale::Maketext(3)|Locale::Maketext/3> for the C<maketext> plural
-grammer.
+grammar.
 
 =item $message = __($key, @param...)
 
@@ -567,7 +565,7 @@ that it is cleaner when you employ maketext to your existing project.
 =item ($key, @param...) = N_($key, @param...)
 
 Returns the original text untouched.  This is to enable the text be
-catched with xgettext.
+caught with xgettext.
 
 =item $message = dmaketext($domain, $key, @param...)
 
@@ -575,13 +573,13 @@ Temporarily switch to another text domain and attempts to translate
 a text message into the native language of the user in that text
 domain.  Use "--keyword=dmaketext:2" for the xgettext utility.
 
-=item $message = pmaketext($ctxt, $key, @param...)
+=item $message = pmaketext($context, $key, @param...)
 
 Attempts to translate a text message in a particular context into the
 native language of the user.  Use "--keyword=pmaketext:1c,2" for
 the xgettext utility.
 
-=item $message = dpmaketext($domain, $ctxt, $key, @param...)
+=item $message = dpmaketext($domain, $context, $key, @param...)
 
 Temporarily switch to another text domain and attempts to translate
 a text message in a particular context into the native language of
@@ -613,7 +611,7 @@ be working.
 =item encode_failure(CHECK)
 
 Set the action when encode fails.  This happens when the output text
-is out of the scope of your output encoding.  For exmaple, output
+is out of the scope of your output encoding.  For example, output
 Chinese into US-ASCII.  Refer to L<Encode(3)|Encode/3> for the
 possible values of this C<CHECK>.  The default is C<FB_DEFAULT>,
 which is a safe choice that never fails.  But part of your text may
@@ -635,17 +633,17 @@ are read and parsed from the disk, to reduce I/O and parsing overhead
 on busy sites.  reload_text() purges this cache, so that updated MO
 files can take effect at run-time.  This is used when your MO file is
 updated, but you cannot shutdown and restart the application.  for
-example, when you are a co-hoster on a mod_perl-enabled Apache, or
+example, when you are a virtual host on a mod_perl-enabled Apache, or
 when your mod_perl-enabled Apache is too vital to be restarted for
 every update of your MO file, or if you are running a vital daemon,
 such as an X display server.
 
-=item %Lexicon = read_mo($MOfile)
+=item %Lexicon = read_mo($MO_file)
 
 Read and parse the MO file.  Returns the read %Lexicon.  The returned
 lexicon is in its original encoding.
 
-If you need the meta infomation of your MO file, parse the entry
+If you need the meta information of your MO file, parse the entry
 C<$Lexicon{""}>.  For example:
 
   /^Content-Type: text\/plain; charset=(.*)$/im;
@@ -766,7 +764,7 @@ L<Locale::Maketext::TPJ13(3)|Locale::Maketext::TPJ13/3>,
 L<Locale::Maketext::Gettext(3)|Locale::Maketext::Gettext/3>,
 L<bindtextdomain(3)|bindtextdomain/3>, L<textdomain(3)|textdomain/3>.
 Also, please refer to the official GNU gettext manual at
-L<http://www.gnu.org/software/gettext/manual/>.
+L<https://www.gnu.org/software/gettext/manual/>.
 
 =head1 AUTHOR
 
@@ -774,7 +772,7 @@ imacat <imacat@mail.imacat.idv.tw>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2008 imacat. All rights reserved. This program is free
+Copyright (c) 2003-2021 imacat. All rights reserved. This program is free
 software; you can redistribute it and/or modify it under the same terms
 as Perl itself.
 

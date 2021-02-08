@@ -1,5 +1,9 @@
 Revision history for Perl module 
 
+20210112.002 2021-02-07T05:46:20Z
+	* Don't try to load a data file if there are no data files
+	(Github #6)
+
 20210112.001 2021-01-19T14:48:12Z
 	* freshen distro, dump Travis CI, add Github Actions
 	* Update to latest Business::ISBN::Data

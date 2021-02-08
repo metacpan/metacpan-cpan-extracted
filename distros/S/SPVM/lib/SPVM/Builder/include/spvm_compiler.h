@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 #include "spvm_native.h"
 
 enum {
@@ -15,7 +15,7 @@ enum {
 };
 
 // Parser information
-struct SPVM_compiler {
+struct spvm_compiler {
   // Current parsed file name
   const char* cur_file;
   
@@ -70,8 +70,8 @@ struct SPVM_compiler {
   // Syntax error count
   int32_t error_count;
   
-  // Include pathes
-  SPVM_LIST* module_include_dirs;
+  // Module searching directories
+  SPVM_LIST* module_dirs;
 
   // OP name symtable
   SPVM_HASH* name_symtable;
@@ -99,9 +99,6 @@ struct SPVM_compiler {
 
   // module file symtable
   SPVM_HASH* loaded_module_file_symtable;
-
-  // module relative file symtable
-  SPVM_HASH* module_rel_file_symtable;
 
   // module source symtable
   SPVM_HASH* module_source_symtable;

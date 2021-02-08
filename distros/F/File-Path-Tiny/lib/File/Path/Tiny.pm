@@ -5,7 +5,7 @@ use warnings;
 use Cwd qw(cwd chdir);
 use Carp ();
 
-$File::Path::Tiny::VERSION = 0.9;
+$File::Path::Tiny::VERSION = "1.0";
 
 sub mk {
     my ( $path, $mask ) = @_;
@@ -57,9 +57,9 @@ sub empty_dir {
         _bail_if_changed( $path, $orig_dev, $orig_ino );
     }
 
-    opendir( DIR, $path ) or return;
-    my @contents = grep { $_ ne '.' && $_ ne '..' } readdir(DIR);
-    closedir DIR;
+    opendir( my $dh, $path ) or return;
+    my @contents = grep { $_ ne '.' && $_ ne '..' } readdir($dh);
+    closedir $dh;
     _bail_if_changed( $path, $orig_dev, $orig_ino );
 
     require File::Spec if @contents;
@@ -67,7 +67,7 @@ sub empty_dir {
         my $long = File::Spec->catdir( $path, $thing );
         if ( !-l $long && -d _ ) {
             _bail_if_changed( $path, $orig_dev, $orig_ino );
-            rm($long) or !-e $long or return;
+            rm( $long, $fast ) or !-e $long or return;
         }
         else {
             _bail_if_changed( $path, $orig_dev, $orig_ino );

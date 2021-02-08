@@ -16,7 +16,7 @@ Router::Simple::Reversible - Router::Simple equipped with reverse routing
 
 # DESCRIPTION
 
-Router::Simple::Reversible inherits [Router::Simple](https://metacpan.org/pod/Router::Simple)
+Router::Simple::Reversible inherits [Router::Simple](https://metacpan.org/pod/Router%3A%3ASimple)
 and provides `path_for` method which produces a string from
 routing destination and path parameters given.
 

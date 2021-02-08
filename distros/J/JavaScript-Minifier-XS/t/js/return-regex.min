@@ -1,1 +1,0 @@
-function foo(){return/\d{1,2}/;}

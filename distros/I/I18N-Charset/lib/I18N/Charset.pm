@@ -68,7 +68,7 @@ functions will always return undef.
 #-----------------------------------------------------------------------
 
 our
-$VERSION = 1.418;
+$VERSION = 1.419;
 
 our @EXPORT = qw( iana_charset_name
 map8_charset_name
@@ -1297,19 +1297,22 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 sub _init_data
   {
   # This big piece of data is the original document from
-  # http://www.iana.org/assignments/character-sets.xml
+  # http://www.iana.org/assignments/character-sets
   return <<'EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE';
 <?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="character-sets.xsl"?>
 <?oxygen RNGSchema="character-sets.rng" type="xml"?>
 <registry xmlns="http://www.iana.org/assignments" id="character-sets">
-  <updated>2018-11-21</updated>
+  <updated>2021-01-04</updated>
   <title>Character Sets</title>
   <category>Character Sets</category>
-  <xref type="rfc" data="rfc2978"/>
-  <registration_rule>Expert Review</registration_rule>
-  <expert>Primary Expert Ned Freed and Secondary Expert Martin Dürst</expert>
-  <note>These are the official names for character sets that may be used in
+
+  <registry id="character-sets-1">
+    <title>Character Sets</title>
+    <xref type="rfc" data="rfc2978"/>
+    <registration_rule>Expert Review</registration_rule>
+    <expert>Ned Freed (primary), Martin Dürst (secondary)</expert>
+    <note>These are the official names for character sets that may be used in
 the Internet and may be referred to in Internet documentation.  These
 names are expressed in ANSI_X3.4-1968 which is commonly called
 US-ASCII or simply ASCII.  The character set most commonly use in the
@@ -1359,8 +1362,9 @@ ISOnnn followed by letters suggestive of the name or standards number
 of the code set.  When a national or international standard is
 revised, the year of revision is added to the cs alias of the new
 character set entry in the IANA Registry in order to distinguish the
-revised character set from the original character set.</note>
-  <registry id="character-sets-1">
+revised character set from the original character set.
+</note>
+
     <record>
       <name>US-ASCII</name>
       <xref type="rfc" data="rfc2046"/>
@@ -2349,9 +2353,8 @@ ordering issues.</description>
     <record>
       <name>ECMA-cyrillic</name>
       <value>77</value>
-      <description><xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/111.pdf">ISO registry</xref>
-        (formerly <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ECMA
-          registry</xref>)</description>
+      <description><xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO registry</xref>
+       </description>
       <alias>iso-ir-111</alias>
       <alias>KOI8-E</alias>
       <alias>csISO111ECMACyrillic</alias>
@@ -2952,6 +2955,16 @@ Appendix A.  See <xref type="rfc" data="rfc1815"/>.</description>
       </description>
       <alias>csBOCU1</alias>
       <alias>csBOCU-1</alias>
+    </record>
+    <record date="2021-01-04">
+      <name>UTF-7-IMAP</name>
+      <xref type="person" data="Florian_Weimer"/>
+      <value>1021</value>
+      <description>Note: This charset is used to encode Unicode in IMAP mailbox names; 
+see section 5.1.3 of <xref type="rfc" data="rfc3501"/>. It should never be used 
+outside this context. A name has been assigned so that charset processing 
+implementations can refer to it in a consistent way.</description>
+      <alias>csUTF7IMAP</alias>
     </record>
     <record>
       <name>ISO-8859-1-Windows-3.0-Latin-1</name>
@@ -4056,6 +4069,11 @@ INIS-Cyrillic, ISO-5427.</description>
       <name>Chris Wendt</name>
       <uri>mailto:christw&amp;microsoft.com</uri>
       <updated>1999-12</updated>
+    </person>
+    <person id="Florian_Weimer">
+      <name>Florian Weimer</name>
+      <uri>mailto:fw&amp;deneb.enyo.de</uri>
+      <updated>2021-01-04</updated>
     </person>
     <person id="Hank_Nussbacher">
       <name>Hank Nussbacher</name>

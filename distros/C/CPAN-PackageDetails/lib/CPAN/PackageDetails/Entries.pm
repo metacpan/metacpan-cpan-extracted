@@ -1,8 +1,10 @@
+use 5.008;
+
 package CPAN::PackageDetails::Entries;
 use strict;
-use warnings;
+use warnings::register;
 
-our $VERSION = '0.261';
+our $VERSION = '0.263';
 
 use Carp;
 use version;
@@ -123,6 +125,7 @@ sub entries  {
 	carp "entries is deprecated. Use get_hash instead";
 	&get_hash;
 	}
+
 sub get_hash { $_[0]->{entries} }
 
 =item allow_packages_only_once( [ARG] )
@@ -194,6 +197,7 @@ sub _parse_version {
 		no warnings 'uninitialized';
 		my $at = $@;
 		chomp, s/\s+at\s+.*// for ( $at, $warning );
+		$warning = undef if $warning =~ m/numify\(\) is lossy/i;
 		   if( $at )              { ( 0,       $alpha, $at      ) }
 		elsif( defined $warning ) { ( $parsed, $alpha, $warning ) }
 		else                      { ( $parsed, $alpha, undef    ) }
@@ -215,9 +219,9 @@ sub add_entry {
 
 	my( $parsed, $alpha, $warning ) = $self->_parse_version( $args{'version'} );
 
-	if( defined $warning ) {
-		$warning = "add_entry has a problem parsing [$args{'version'}] for package [$args{'package name'}]: [$warning] I'm using [$parsed] as the version for [$args{'package name'}].";
-		carp( $warning );
+	if( defined $warning and warnings::enabled() ) {
+		$warning = "add_entry has a problem parsing [$args{'version'}] for package [$args{'package name'}]: [$warning] I'm using [$parsed] as the version for [$args{'package name'}].\n";
+		warnings::warn( $warning );
 		}
 
 	if( $self->disallow_alpha_versions && $alpha ) {
@@ -314,7 +318,7 @@ sub as_unique_sorted_list {
 
 		my( $k1, $k2 ) = ( $self->columns )[0,1];
 
-		my $e = $self->entries;
+		my $e = $self->get_hash;
 
 		# We only want the latest versions of everything:
 		foreach my $package ( sort keys %$e ) {
@@ -363,21 +367,6 @@ sub as_unique_sorted_list {
 	return $return;
 	}
 
-=item get_entries_by_package( PACKAGE )
-
-Returns the entry objects for the named PACKAGE.
-
-=cut
-
-sub get_entries_by_package {
-	my( $self, $package ) = @_;
-
-	my @entries =
-		map   { values %{$self->{entries}{$package}} }
-		grep  { $_ eq $package }
-		keys %{ $self->{entries} };
-	}
-
 =item get_entries_by_distribution( DISTRIBUTION )
 
 Returns the entry objects for the named DISTRIBUTION.
@@ -400,18 +389,18 @@ sub get_entries_by_distribution {
 		keys %{ $self->{entries} };
 	}
 
-=item get_entries_by_version( VERSION )
+=item get_entries_by_package( PACKAGE )
 
-Returns the entry objects for any entries with VERSION.
+Returns the entry objects for the named PACKAGE.
 
 =cut
 
-sub get_entries_by_version {
-	my( $self, $version ) = @_;
+sub get_entries_by_package {
+	my( $self, $package ) = @_;
 
 	my @entries =
-		map   { $self->{entries}{$_}{$version} }
-		grep  { exists $self->{entries}{$_}{$version} }
+		map   { values %{$self->{entries}{$package}} }
+		grep  { $_ eq $package }
 		keys %{ $self->{entries} };
 	}
 
@@ -427,6 +416,21 @@ sub get_entries_by_path {
 	my @entries =
 		map   { $self->{entries}{$_}{$path} }
 		grep  { exists $self->{entries}{$_}{$path} }
+		keys %{ $self->{entries} };
+	}
+
+=item get_entries_by_version( VERSION )
+
+Returns the entry objects for any entries with VERSION.
+
+=cut
+
+sub get_entries_by_version {
+	my( $self, $version ) = @_;
+
+	my @entries =
+		map   { $self->{entries}{$_}{$version} }
+		grep  { exists $self->{entries}{$_}{$version} }
 		keys %{ $self->{entries} };
 	}
 
@@ -449,7 +453,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2009-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2009-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

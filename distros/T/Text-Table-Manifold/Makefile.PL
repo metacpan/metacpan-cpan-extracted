@@ -65,7 +65,10 @@ if ($ExtUtils::MakeMaker::VERSION ge '6.46')
 		},
 		resources =>
 		{
-			bugtracker	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-Manifold',
+			bugtracker =>
+			{
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-Manifold',
+			},
 			license		=> 'https://perldoc.perl.org/perlartistic.html',
 			repository	=>
 			{

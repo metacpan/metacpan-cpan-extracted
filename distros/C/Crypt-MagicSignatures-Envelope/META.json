@@ -4,13 +4,13 @@
       "Nils Diewald"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Crypt-MagicSignatures-Envelope",
    "no_index" : {
@@ -31,14 +31,9 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Math::BigInt::GMP" : "0",
-            "Math::Prime::Util::GMP" : "0.18",
-            "Math::Random::ISAAC::XS" : "1.004"
-         },
          "requires" : {
             "Carp" : "0",
-            "Crypt::MagicSignatures::Key" : "0.14",
+            "Crypt::MagicSignatures::Key" : "0.22",
             "Mojolicious" : "4.82",
             "perl" : "5.010001"
          }
@@ -46,13 +41,18 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Akron/Crypt-MagicSignatures-Envelope/issues"
+      },
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ],
       "repository" : {
-         "url" : "https://github.com/Akron/Crypt-MagicSignatures-Envelope"
+         "type" : "git",
+         "url" : "https://github.com/Akron/Crypt-MagicSignatures-Envelope.git",
+         "web" : "https://github.com/Akron/Crypt-MagicSignatures-Envelope"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

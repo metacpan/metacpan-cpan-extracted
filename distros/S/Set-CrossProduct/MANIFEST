@@ -16,6 +16,7 @@ t/named_sets.t
 t/next.t
 t/pod.t
 t/pod_coverage.t
+t/single.t
 t/test_manifest
 t/tuple.t
 xt/changes.t

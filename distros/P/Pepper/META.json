@@ -75,26 +75,26 @@
    "provides" : {
       "Pepper" : {
          "file" : "lib/Pepper.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "Pepper::Commander" : {
          "file" : "lib/Pepper/Commander.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "Pepper::DB" : {
          "file" : "lib/Pepper/DB.pm"
       },
       "Pepper::PlackHandler" : {
          "file" : "lib/Pepper/PlackHandler.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "Pepper::Templates" : {
          "file" : "lib/Pepper/Templates.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       },
       "Pepper::Utilities" : {
          "file" : "lib/Pepper/Utilities.pm",
-         "version" : "1.3"
+         "version" : "1.4"
       }
    },
    "release_status" : "stable",
@@ -108,10 +108,13 @@
          "web" : "https://github.com/ericschernoff/Pepper"
       }
    },
-   "version" : "1.3",
+   "version" : "1.4",
    "x_contributors" : [
-      "Eric Chernoff <ericschernoff@gmail.com>"
+      "Eric Chernoff <eric@pepper.weaverstreet.net>",
+      "Eric Chernoff <ericschernoff@gmail.com>",
+      "root <root@majestica-dev.weaverstreet.net>",
+      "root <root@pepper.weaverstreet.net>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

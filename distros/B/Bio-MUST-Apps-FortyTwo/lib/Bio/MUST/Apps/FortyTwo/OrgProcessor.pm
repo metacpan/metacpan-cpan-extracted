@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::FortyTwo::OrgProcessor;
 # ABSTRACT: Internal class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::OrgProcessor::VERSION = '0.202160';
+$Bio::MUST::Apps::FortyTwo::OrgProcessor::VERSION = '0.210370';
 use Moose;
 use namespace::autoclean;
 
@@ -203,9 +203,12 @@ sub _build_orthologous_seqs {
     my $seqs = $orthologues->filtered_ali( $self->homologous_seqs );
 
     # optionally merge orthologues before aligning
-    if ($rp->merge_orthologues eq 'on') {
-        ##### [ORG] pre-merge orthologues: display( map { $_->full_id } $seqs->all_seq_ids )
-        $self->_compress_seqs($seqs);
+    # Note: this is always disabled in metagenomic mode
+    unless ($rp->run_mode eq 'metagenomic') {       # TODO: warn user?
+        if ($rp->merge_orthologues eq 'on') {
+            ##### [ORG] pre-merge orthologues: display( map { $_->full_id } $seqs->all_seq_ids )
+            $self->_compress_seqs($seqs);
+        }
     }
 
     # build BLAST query file from orthologous seqs
@@ -864,7 +867,7 @@ Bio::MUST::Apps::FortyTwo::OrgProcessor - Internal class for forty-two tool
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =head1 AUTHOR
 

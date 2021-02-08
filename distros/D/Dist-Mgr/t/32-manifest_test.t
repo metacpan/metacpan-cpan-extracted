@@ -27,6 +27,9 @@ close $o_fh;
 close $w_fh;
 
 for (0..$#w) {
+    $w[$_] =~ s/[\r\n]//g;
+    $o[$_] =~ s/[\r\n]//g;
+    $c[$_] =~ s/[\r\n]//g;
     chomp $w[$_];
     chomp $o[$_];
     chomp $c[$_];

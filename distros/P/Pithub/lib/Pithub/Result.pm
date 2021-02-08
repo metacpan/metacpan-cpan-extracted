@@ -1,13 +1,13 @@
 package Pithub::Result;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 result object
 
 use Moo;
 use Array::Iterator;
-use JSON::MaybeXS;
-use URI;
-use Carp;
+use JSON::MaybeXS qw( JSON );
+use URI ();
+use Carp qw( confess croak );
 
 sub _isa_isa_maker {
     my $class = shift;
@@ -317,7 +317,7 @@ Pithub::Result - Github v3 result object
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,10 @@
 #ifndef SPVM_COMPILER_ALLOCATOR_H
 #define SPVM_COMPILER_ALLOCATOR_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
 // Parser information
-struct SPVM_compiler_allocator {
+struct spvm_compiler_allocator {
   // Blocks
   SPVM_LIST* blocks;
 

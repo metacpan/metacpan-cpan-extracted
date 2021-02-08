@@ -1,3 +1,10 @@
+0.49
+ - skip tests 37 & 38 in t/divby0.t if Math::GMPq version is less than 0.45.
+ - Have t/_basic.t print out the Math::GMPq version (iff Math::GMPq is loadable).
+ - Prototype the subroutines listed in 'use subs()'.
+ - Catch the case (gmp-6 and earlier only) where the UV arg passed to the *_2exp
+   functions will overflow the mp_bitcnt_t.
+
 0.48
  - Fix coding error in overload_not_equiv. (Affected older gmp versions only).
    Thanks chargr.
@@ -27,7 +34,8 @@
    unsigned long int.
  - Add documentation of Rmpz_rootrem. (Thanks trizen.)
  - Catch the case (gmp-6 and earlier only) where the index passed to mpz_clrbit, mpz_setbit
-   mpz_combit, mpz_tstbit, mpz_scan0 or mpz_scan1 is greater than ULONG_MAX.
+   mpz_combit, mpz_tstbit, mpz_scan0 or mpz_scan1 overflows the mp_bitcnt_t. (The code detecting
+   this was subsequentky tidied up for 0.49, when coverage of the *_2exp functions was also added.)
  - Create separate GMPz.pod
 
 

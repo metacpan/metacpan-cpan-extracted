@@ -7,6 +7,8 @@ has provider_url  => sub { Mojo::URL->new('https://google.com') };
 sub learn_p {
   my $self = shift;
   my $url  = $self->url;
+  return $self->_learn_from_meet_p if $url->host eq 'meet.google.com';
+
   my @path = @{$url->path};
   my ($iframe_src, @query);
 
@@ -48,4 +50,21 @@ sub _learn {
   return $self->SUPER::_learn($tx);
 }
 
+sub _learn_from_meet_p {
+  my $self = shift;
+  my $url  = $self->url;
+  return $self->SUPER::learn_p unless @{$url->path} == 1;
+
+  $self->provider_url($url->clone->path('')->query(Mojo::Parameters->new));
+  $self->template([__PACKAGE__, 'google-meet.html.ep']);
+  $self->title("Join the room @{[$url->path->[0]]}");
+  $self->type('rich');
+
+  return Mojo::Promise->new->resolve($self);
+}
+
 1;
+
+__DATA__
+@@ google-meet.html.ep
+<iframe allow="camera;microphone" class="le-rich le-video-chat le-provider-google" width="<%= $l->width || 600 %>" height="<%= $l->height || 400 %>" style="border:0;width:100%" frameborder="0" allowfullscreen src="<%= $l->url %>"></iframe>

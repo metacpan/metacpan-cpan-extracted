@@ -20,7 +20,7 @@ BEGIN {
 # see also:
 # https://github.com/majensen/rest-neo4p/pull/19/commits/227b94048a1d0277f1d5700c6934ba26fe7bfc1e
 
-use Test::More 0.96 tests => 7 + 2;
+use Test::More 0.96 tests => 8 + 2;
 use Test::Exception;
 use Test::Warnings;
 my $transaction = $driver->session->begin_transaction;
@@ -92,6 +92,20 @@ subtest 'read full property list' => sub {
 	is ref $node, 'Neo4j::Driver::Type::Node', '$node is blessed node';
 	foreach my $key (@keys) {
 		is to_hex $node->get($key), to_hex $props{$key}, "prop: $key";
+	}
+};
+
+
+subtest 'no utf8' => sub {
+	plan tests => 3;
+	TODO: { local $TODO = 'no utf8 unsupported by Neo4j::Bolt 0.4201 (perlbolt#38)' if $Neo4j::Test::bolt;
+	no utf8;
+	my $smp = "😀";  # 0xf09f9880 = LATIN SMALL LETTER ETH + APPLICATION PROGRAM COMMAND + START OF STRING + PADDING CHARACTER (Latin-1)
+	lives_ok {
+		$smp_r = $driver->session->run('RETURN {smpbytes}', smpbytes => $smp)->single->get;
+	} 'get bytes smp';
+	is to_hex $smp_r, to_hex $smp, 'bytes smp';
+	ok utf8::is_utf8($smp_r), 'bytes smp flag';  # Neo4j always returns strings as UTF-8 rather than Latin-1
 	}
 };
 

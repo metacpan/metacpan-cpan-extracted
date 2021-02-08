@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-xp
 
+0.03 2021-02-03T07:29:14Z
+
+    - Update test code to get greple script path.
+
 0.02 2021-01-27T09:11:04Z
 
     - change option names

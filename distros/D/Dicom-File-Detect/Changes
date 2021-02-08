@@ -1,3 +1,7 @@
+0.05 2021-02-07T20:28:21+01:00
+ - Fix bugtracker.
+ - Update copyright years.
+
 0.04 2020-04-05T16:59:39+02:00
  - Fix Makefile.PL fails with no '.' in @INC.
  - Improve LICENSE AND COPYRIGHT section in doc.

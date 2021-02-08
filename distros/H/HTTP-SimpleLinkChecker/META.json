@@ -4,13 +4,13 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HTTP-SimpleLinkChecker",
    "no_index" : {
@@ -40,22 +40,22 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test::More" : "1"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/briandfoy/http-simplelinkchecker/issues"
+         "web" : "https://github.com/CPAN-Adoptable-Modules/http-simplelinkchecker/issues"
       },
-      "homepage" : "https://github.com/briandfoy/http-simplelinkchecker",
+      "homepage" : "https://github.com/CPAN-Adoptable-Modules/http-simplelinkchecker",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/http-simplelinkchecker.git",
-         "web" : "https://github.com/briandfoy/http-simplelinkchecker"
+         "url" : "https://github.com/CPAN-Adoptable-Modules/http-simplelinkchecker.git",
+         "web" : "https://github.com/CPAN-Adoptable-Modules/http-simplelinkchecker"
       }
    },
-   "version" : "1.167",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.168",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

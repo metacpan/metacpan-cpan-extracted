@@ -660,6 +660,40 @@ SKIP: {
 }
 
 
+# tax_mask
+
+{
+    # read configuration file
+    my $cfgfile = file('test', 'taxmask.yaml');
+    my $config = Config::Any->load_files( {
+        files           => [ $cfgfile->stringify ],
+        flatten_to_hash => 1,
+        use_ext         => 1,
+    } );
+    explain $config->{$cfgfile};
+
+    # build classifier
+    my $classifier = $tax->tax_classifier( $config->{$cfgfile} );
+
+    # build masks for Ali file
+    my $alifile = file('test', "taxmask.ali");
+    my $ali = Bio::MUST::Core::Ali->load($alifile);
+    my $mask_for = $classifier->tax_masks($ali);
+
+    # apply masks
+    my $ali_opis = $mask_for->{opisthokonts}->filtered_ali($ali);
+    cmp_store(
+        obj => $ali_opis, method => 'store_fasta',
+        file => 'taxmask_opisthokonts.fasta',
+        test => 'wrote expected filtered Ali based on opisthokonts mask',
+    );
+    my $ali_meta = $mask_for->{metazoans}->filtered_ali($ali);
+    cmp_store(
+        obj => $ali_meta, method => 'store_fasta',
+        file => 'taxmask_metazoans.fasta',
+        test => 'wrote expected filtered Ali based on metazoans mask',
+    );
+}
 
 {
     my $frfile = file('test', 'lifemrch.fra');
@@ -1030,13 +1064,15 @@ my @html_colors = qw( ff6347 6a5acd 228b22 228b22 228b22 a0522d b22222 ffd700 );
 {
     my $infile   = file('test', 'PBP3.tre');
 
-    my $outfile  = file('test', "my_PBP3.tre");
+    my $outfile  = file('test', 'my_PBP3.tre');
     my $outfile1 = file('test', 'my_PBP3-color.txt');
-    my $outfile2 = file('test', 'my_PBP3-range.txt');
-    my $outfile3 = file('test', 'my_PBP3-label.txt');
-    my $outfile4 = file('test', 'my_PBP3-collapse.txt');
+    my $outfile2 = file('test', 'my_PBP3-clade.txt');
+    my $outfile3 = file('test', 'my_PBP3-range.txt');
+    my $outfile4 = file('test', 'my_PBP3-label.txt');
+    my $outfile5 = file('test', 'my_PBP3-collapse.txt');
 
     my $color_file = file('test', 'PBP3-color.txt');
+    my $clade_file = file('test', 'PBP3-clade.txt');
     my $range_file = file('test', 'PBP3-range.txt');
     my $label_file = file('test', 'PBP3-label.txt');
     my $colps_file = file('test', 'PBP3-collapse.txt');
@@ -1055,15 +1091,18 @@ my @html_colors = qw( ff6347 6a5acd 228b22 228b22 228b22 a0522d b22222 ffd700 );
     $outfile2->remove;
     $outfile3->remove;
     $outfile4->remove;
+    $outfile5->remove;
 
     $tree->store_itol_datasets($outfile);
      compare_ok($outfile1, $color_file,
          "wrote expected iTOL color file: $color_file");
-     compare_ok($outfile2, $range_file,
+     compare_ok($outfile2, $clade_file,
+         "wrote expected iTOL clade file: $clade_file");
+     compare_ok($outfile3, $range_file,
          "wrote expected iTOL range file: $range_file");
-     compare_ok($outfile3, $label_file,
+     compare_ok($outfile4, $label_file,
          "wrote expected iTOL label file: $label_file");
-     compare_ok($outfile4, $colps_file,
+     compare_ok($outfile5, $colps_file,
          "wrote expected iTOL collapse file: $colps_file");
 }
 
@@ -1072,11 +1111,13 @@ my @html_colors = qw( ff6347 6a5acd 228b22 228b22 228b22 a0522d b22222 ffd700 );
 
     my $outfile  = file('test', 'my_OG0000464-edit-MMETSP172.tre');
     my $outfile1 = file('test', 'my_OG0000464-edit-MMETSP172-color.txt');
-    my $outfile2 = file('test', 'my_OG0000464-edit-MMETSP172-range.txt');
-    my $outfile3 = file('test', 'my_OG0000464-edit-MMETSP172-label.txt');
-    my $outfile4 = file('test', 'my_OG0000464-edit-MMETSP172-collapse.txt');
+    my $outfile2 = file('test', 'my_OG0000464-edit-MMETSP172-clade.txt');
+    my $outfile3 = file('test', 'my_OG0000464-edit-MMETSP172-range.txt');
+    my $outfile4 = file('test', 'my_OG0000464-edit-MMETSP172-label.txt');
+    my $outfile5 = file('test', 'my_OG0000464-edit-MMETSP172-collapse.txt');
 
     my $color_file = file('test', 'OG0000464-edit-MMETSP172-color.txt');
+    my $clade_file = file('test', 'OG0000464-edit-MMETSP172-clade.txt');
     my $range_file = file('test', 'OG0000464-edit-MMETSP172-range.txt');
     my $label_file = file('test', 'OG0000464-edit-MMETSP172-label.txt');
     my $colps_file = file('test', 'OG0000464-edit-MMETSP172-collapse.txt');
@@ -1097,15 +1138,18 @@ my @html_colors = qw( ff6347 6a5acd 228b22 228b22 228b22 a0522d b22222 ffd700 );
     $outfile2->remove;
     $outfile3->remove;
     $outfile4->remove;
+    $outfile5->remove;
 
     $tree->store_itol_datasets($outfile, $annotate_key);
      compare_ok($outfile1, $color_file,
          "wrote expected iTOL color file: $color_file");
-     compare_ok($outfile2, $range_file,
+     compare_ok($outfile2, $clade_file,
+         "wrote expected iTOL clade file: $clade_file");
+     compare_ok($outfile3, $range_file,
          "wrote expected iTOL range file: $range_file");
-     compare_ok($outfile3, $label_file,
+     compare_ok($outfile4, $label_file,
          "wrote expected iTOL label file: $label_file");
-     compare_ok($outfile4, $colps_file,
+     compare_ok($outfile5, $colps_file,
          "wrote expected iTOL collapse file: $colps_file");
 }
 

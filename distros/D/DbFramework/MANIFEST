@@ -1,8 +1,6 @@
 Artistic
-AUTHORS
 Build.PL
 Changes
-COPYING
 forms/dbforms.cgi
 lib/DbFramework/Attribute.pm
 lib/DbFramework/Catalog.pm
@@ -21,9 +19,9 @@ lib/DbFramework/Template.pm
 lib/DbFramework/Util.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json
 META.yml
-README
-SIGNATURE
+README.md
 t/10base.t
 t/15catalog.t
 t/17datatype.t
@@ -33,4 +31,4 @@ t/40template.t
 t/template
 t/test/foo/foo.form
 t/util.pl
-TODO
+SIGNATURE    Added here by Module::Build

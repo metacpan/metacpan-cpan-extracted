@@ -1,9 +1,9 @@
 #ifndef SPVM_MY_H
 #define SPVM_MY_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
-struct SPVM_my {
+struct spvm_my {
   SPVM_OP* op_my;
   SPVM_TYPE* type;
   SPVM_OP* op_name;

@@ -24,7 +24,7 @@ PROTOCOL: {
 
 	$ENV{'SCRIPT_URI'} = 'xyzzy';
 	$i = new_ok('CGI::Info' => [ logger => MyLogger->new() ]);
-	diag('Ignore messages about not being able to determind the calling protocol');
+	diag('Ignore messages about not being able to determine the calling protocol');
 	ok(!defined($i->protocol()));
 
 	$ENV{'SCRIPT_URI'} = 'https://www.example.com';

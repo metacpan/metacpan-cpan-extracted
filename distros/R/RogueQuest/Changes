@@ -1,5 +1,8 @@
 Revision history for Perl extension RogueQuest.
 
+0.0.4 Wed Feb 3 2021
+	- clean up, init main.pm
+
 0.0.3 Mon Dec 7 
   	- added graphics copyright RPGrevolution, CC license
 	

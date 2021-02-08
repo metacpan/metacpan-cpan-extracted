@@ -2,7 +2,7 @@ NAME
     pod2xml - Script to convert PYX to XML.
 
 SYNOPSIS
-     pyx2xml [-e in_enc] [-h] [-i] [--version] [filename] [-]
+     pyx2xml [-e in_enc] [-h] [-i] [-s no_simple] [--version] [filename] [-]
 
 DESCRIPTION
      pyx2xml script uses PYX::SGML::Tags class to create XML output of PYX.
@@ -20,6 +20,11 @@ ARGUMENTS
     *       "-i"
 
              Indent output.
+
+    *       "-s no_simple"
+
+             List of element, which cannot be a simple like <element/>.
+             Separator is comma.
 
     *       "--version"
 
@@ -55,6 +60,19 @@ EXAMPLE2
      # Output:
      # <element>foo</element>
 
+EXAMPLE3
+     cat <<END | pyx2xml -s foo,baz -
+     (foo
+     )foo
+     (bar
+     )bar
+     (baz
+     )baz
+     END
+
+     # Output:
+     # <foo></foo><bar /><baz></baz>
+
 REPOSITORY
     <https://github.com/michal-josef-spacek/App-PYX2XML>
 
@@ -64,10 +82,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2015-2020 Michal Josef Špaček
+    © 2015-2021 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.06
 

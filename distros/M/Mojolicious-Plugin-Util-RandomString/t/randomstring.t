@@ -166,6 +166,32 @@ $r = $app->random_string('base50');
 ok(!$r, 'base50 string is not fine');
 is(length($r), 0, 'Base50 string as correct length');
 
+$r = $app->random_string(alphabet => 'abc');
+ok($r, 'Default length');
+is(length($r), 15, 'Default length');
+
+$r = $app->random_string(entropy => 100, alphabet => 'abc');
+ok($r, 'Entropy overrides length');
+is(length($r), 64, 'Entropy overrides length');
+
+eval {
+  $r = $app->random_string(entropy => 100, length => 14);
+};
+like($@, qr!specify both length and entropy!);
+
+$r = $app->random_string('entropy_test');
+ok($r, 'Default length');
+is(length($r), 23, 'Default length');
+
+$r = $app->random_string('entropy_test', length => 20);
+ok($r, 'Length overrides entropy');
+is(length($r), 20, 'Length overrides entropy');
+
+eval {
+  $r = $app->random_string('entropy_test', length => 20, entropy => 100);
+};
+like($@, qr!specify both length and entropy!);
+
 foreach (0..20) {
   $r = $app->random_string('hexa');
   ok($r, 'Hexa string is fine');

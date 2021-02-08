@@ -1,3 +1,7 @@
+1.8 2021-02-04
+
+    Allow customising the content-type header
+
 1.7	2015-10-30
 
 	Include MYMETA.* in MANIFEST.SKIP (requested by CHORNY)

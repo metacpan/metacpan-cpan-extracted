@@ -1,5 +1,14 @@
 Revision history for Future-AsyncAwait
 
+0.48    2021-02-02
+        [CHANGES]
+         * Explicitly document that `async sub` works on anon subs too
+         * Update to latest hax/ files
+
+        [BUGFIXES]
+         * t/80await+try.t requires Syntax::Keyword::Try version >= 0.18
+           (RT134250)
+
 0.47    2020-11-29
         [CHANGES]
          * Allow `await` expressions at toplevel of main script, for

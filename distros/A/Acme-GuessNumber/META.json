@@ -4,36 +4,49 @@
       "imacat <imacat@mail.imacat.idv.tw>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-GuessNumber",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Signature" : "0",
+            "Test::Pod" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.42"
          }
-      },
-      "runtime" : {
-         "requires" : {}
+      }
+   },
+   "provides" : {
+      "Acme::GuessNumber" : {
+         "file" : "lib/Acme/GuessNumber.pm",
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
-   "version" : "0.04"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/imacat/Acme-GuessNumber/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Acme-GuessNumber",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/imacat/Acme-GuessNumber.git",
+         "web" : "https://github.com/imacat/Acme-GuessNumber"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

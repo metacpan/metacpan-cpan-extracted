@@ -3,14 +3,11 @@ NAME
     cryptocurrency exchanges
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     Acme::CPANModules::CryptoExchange::API (from Perl distribution
-    Acme-CPANModules-CryptoExchange-API), released on 2018-09-22.
+    Acme-CPANModules-CryptoExchange-API), released on 2020-12-27.
 
-DESCRIPTION
-    Modules that interface to cryptocurrency exchanges.
-
-INCLUDED MODULES
+ACME::MODULES ENTRIES
     *   WebService::Cryptopia
 
     *   WebService::Binance
@@ -36,6 +33,32 @@ INCLUDED MODULES
 
     *   Finance::LocalBitcoins::API
 
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanmodules CLI
+    (from App::cpanmodules distribution):
+
+        % cpanmodules ls-entries CryptoExchange::API | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=CryptoExchange::API -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::CryptoExchange::API -E'say $_->{module} for @{ $Acme::CPANModules::CryptoExchange::API::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Acme-CPANModules-CryptoExchange-API>.
@@ -46,8 +69,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Cryp
-    toExchange-API>
+    <https://github.com/perlancar/perl-Acme-CPANModules-CryptoExchange-API/i
+    ssues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -61,7 +84,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

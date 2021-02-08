@@ -180,6 +180,13 @@ subtest 'zero without units' => sub {
     is $got, $expect;
   };
 
+  subtest 'no units' => sub {
+    my $given  = 'p { width: 0 }';
+    my $expect = 'p{width:0}';
+    my $got    = minify($given);
+    is $got, $expect;
+  };
+
   # Percent is special, and may need to be preserved for CSS animations
   subtest 'percent' => sub {
     my $given  = 'p { width: 0% }';
@@ -207,6 +214,13 @@ subtest 'point-zero without units' => sub {
     is $got, $expect;
   };
 
+  subtest 'no units' => sub {
+    my $given  = 'p { width: .0 }';
+    my $expect = 'p{width:0}';
+    my $got    = minify($given);
+    is $got, $expect;
+  };
+
   # Percent is special, and may need to be preserved for CSS animations,
   # but will be minified from "point-zero" to just "zero".
   subtest 'percent' => sub {
@@ -220,6 +234,40 @@ subtest 'point-zero without units' => sub {
   subtest 'inside a function' => sub {
     my $given  = 'p { width: calc(300px - .0px) }';
     my $expect = 'p{width:calc(300px - 0px)}';
+    my $got    = minify($given);
+    is $got, $expect;
+  };
+};
+
+###############################################################################
+# "point zero something" requires preservation
+subtest 'point-zero without units' => sub {
+  subtest 'px' => sub {
+    my $given  = 'p { width: .001px }';
+    my $expect = 'p{width:.001px}';
+    my $got    = minify($given);
+    is $got, $expect;
+  };
+
+  subtest 'no units' => sub {
+    my $given  = 'p { width: .001 }';
+    my $expect = 'p{width:.001}';
+    my $got    = minify($given);
+    is $got, $expect;
+  };
+
+  # Percent is special, and may need to be preserved for CSS animations
+  subtest 'percent' => sub {
+    my $given  = 'p { width: .001% }';
+    my $expect = 'p{width:.001%}';
+    my $got    = minify($given);
+    is $got, $expect;
+  };
+
+  # Inside of a function, units/zeros are preserved.
+  subtest 'inside a function' => sub {
+    my $given  = 'p { width: calc(300px - .001px) }';
+    my $expect = 'p{width:calc(300px - .001px)}';
     my $got    = minify($given);
     is $got, $expect;
   };
@@ -262,6 +310,13 @@ subtest 'zero-point-zero without units' => sub {
     is $got, $expect;
   };
 
+  subtest 'no units' => sub {
+    my $given  = 'p { width: 0.0 }';
+    my $expect = 'p{width:0}';
+    my $got    = minify($given);
+    is $got, $expect;
+  };
+
   # Percent is special, and may need to be preserved for CSS animations,
   # but will be minified from "zero-point-zero" to just "zero".
   subtest 'percent' => sub {
@@ -281,10 +336,53 @@ subtest 'zero-point-zero without units' => sub {
 };
 
 ###############################################################################
+# "zero point zero somethihg" requires preservation
+subtest 'zero-point-zero without units' => sub {
+  subtest 'px' => sub {
+    my $given  = 'p { width: 0.001px }';
+    my $expect = 'p{width:.001px}';
+    my $got    = minify($given);
+    is $got, $expect;
+  };
+
+  subtest 'no units' => sub {
+    my $given  = 'p { width: 0.001 }';
+    my $expect = 'p{width:.001}';
+    my $got    = minify($given);
+    is $got, $expect;
+  };
+
+  # Percent is special, and may need to be preserved for CSS animations,
+  # but will be minified from "zero-point-zero-something" to just
+  # "point-zero-something"
+  subtest 'percent' => sub {
+    my $given  = 'p { width: 0.001% }';
+    my $expect = 'p{width:.001%}';
+    my $got    = minify($given);
+    is $got, $expect;
+  };
+
+  # Inside of a function, units/zeros are preserved.
+  subtest 'inside a function' => sub {
+    my $given  = 'p { width: calc(300px - 0.001px) }';
+    my $expect = 'p{width:calc(300px - .001px)}';
+    my $got    = minify($given);
+    is $got, $expect;
+  };
+};
+
+###############################################################################
 # "zerooooooo" can be expressed without a unit, in *MOST* cases.
 subtest 'zerooooooo without units' => sub {
   subtest 'px' => sub {
     my $given  = 'p { width: 0000px }';
+    my $expect = 'p{width:0}';
+    my $got    = minify($given);
+    is $got, $expect;
+  };
+
+  subtest 'no units' => sub {
+    my $given  = 'p { width: 0000 }';
     my $expect = 'p{width:0}';
     my $got    = minify($given);
     is $got, $expect;
@@ -396,7 +494,7 @@ subtest 'general/broad test' => sub {
     . "body,td,th{font-family:Verdana,'Bitstream Vera Sans'}"
     . ".nav{margin-left:20%}"
     . "#main-nav{background-color:red;border:1px solid yellow}"
-    . "div#content h1 + p{padding-top:000}";
+    . "div#content h1 + p{padding-top:0}";
   my $got = minify($given);
   is $got, $expect;
 };

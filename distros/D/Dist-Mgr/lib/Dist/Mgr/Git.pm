@@ -36,7 +36,7 @@ our %EXPORT_TAGS = (
     all     => [@EXPORT_OK],
 );
 
-our $VERSION = '1.06';
+our $VERSION = '1.09';
 
 my $spinner_count;
 
@@ -147,16 +147,17 @@ sub _git_release {
 
     croak("git_release() requires a version sent in") if ! defined $version;
 
+    my $git_status_differs = _git_status_differs();
     $wait_for_ci //= 1;
     my $verbose = 0;
 
-    if (_git_status_differs()) {
+    if ($git_status_differs) {
         _git_pull();
         _git_commit($version, $verbose);
         _git_push($verbose);
     }
 
-    if ($wait_for_ci && _git_status_differs()) {
+    if ($wait_for_ci && $git_status_differs) {
         `clear`;
 
         print "\n\nWaiting for CI tests to complete.\n\n";

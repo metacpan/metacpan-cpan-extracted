@@ -1,20 +1,20 @@
+use 5.008;
+
 package File::Find::Closures;
 use strict;
 
 use warnings;
 no warnings;
 
-use vars qw( $VERSION @EXPORT_OK %EXPORT_TAGS );
-
-use Carp qw(carp croak);
-use Exporter qw(import);
-use File::Basename qw(dirname);
+use Carp                  qw(carp croak);
+use Exporter              qw(import);
+use File::Basename        qw(dirname);
 use File::Spec::Functions qw(canonpath no_upwards);
 use UNIVERSAL;
 
-$VERSION = '1.112';
+our $VERSION = '1.113';
 
-@EXPORT_OK   = qw(
+our @EXPORT_OK   = qw(
 	find_regular_files
 	find_by_min_size
 	find_by_max_size
@@ -33,7 +33,7 @@ $VERSION = '1.112';
 	find_by_created_after
 	);
 
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
 	all => \@EXPORT_OK
 	);
 
@@ -434,7 +434,7 @@ differently.
 
 This module is in Github:
 
-	git://github.com/briandfoy/file-find-closures.git
+	https://github.com/briandfoy/file-find-closures.git
 
 =head1 AUTHOR
 
@@ -444,7 +444,7 @@ Some functions implemented by Nathan Wagner, C<< <nw@hydaspes.if.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the same terms as the Artistic License
 2.0.

@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::FortyTwo::AliProcessor;
 # ABSTRACT: Internal class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::AliProcessor::VERSION = '0.202160';
+$Bio::MUST::Apps::FortyTwo::AliProcessor::VERSION = '0.210370';
 use Moose;
 use namespace::autoclean;
 
@@ -11,7 +11,9 @@ use Smart::Comments -ENV;
 
 use Carp;
 use Const::Fast;
+use File::Basename;
 use List::AllUtils qw(first part partition_by pairmap);
+use Path::Class qw(file);
 use POSIX;
 use Sort::Naturally;
 use Tie::IxHash;
@@ -640,8 +642,9 @@ sub BUILD {
         OrgProcessor->new( ali_proc => $self, %{$org} );
     }
 
-    my $filename = $ali->filename;
-    my $suffix = $rp->out_suffix;
+    # build ALI outfile honoring out_dir and out_suffix
+    my $outfile = insert_suffix($ali->filename, $rp->out_suffix);
+       $outfile = file( $rp->out_dir, basename($outfile) ) if $rp->out_dir;
 
     unless ( $rp->run_mode eq 'metagenomic' ) {
 
@@ -667,16 +670,15 @@ sub BUILD {
         $self->reorder_new_seqs;
 
         #### [ALI] Writing updated file...
-        my $outfile = secure_outfile($filename, $suffix);
-        $ali->store($outfile);
+        $ali->store( secure_outfile($outfile) );        # note the secure...
     }
 
     if ($rp->tax_reports eq 'on') {
         # TODO: consider moving this in TaxReport-like class
 
         #### [ALI] Writing taxonomic report...
-        my $tax_report = secure_outfile(
-            change_suffix($filename, '.tax-report'), $suffix
+        my $tax_report = secure_outfile(                # note the secure...
+            change_suffix($outfile, '.tax-report')
         );
 
         open my $fh, '>', $tax_report;
@@ -709,7 +711,7 @@ Bio::MUST::Apps::FortyTwo::AliProcessor - Internal class for forty-two tool
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =head1 AUTHOR
 

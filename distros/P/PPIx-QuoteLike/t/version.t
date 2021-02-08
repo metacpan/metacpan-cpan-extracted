@@ -106,6 +106,16 @@ is $obj->perl_version_introduced(), '5.015008',
     'Case-folded string was introduced in 5.15.8';
 is $obj->perl_version_removed(), undef, 'Case-folded string is still here';
 
+$obj = PPIx::QuoteLike->new( <<HERE_DOC );
+<<~'EOD'
+    How doth the little crocodile
+    Improve its shining tail
+    EOD
+HERE_DOC
+is $obj->perl_version_introduced(), '5.025007',
+    'Indented here-doc was introduced in 5.25.7';
+is $obj->perl_version_removed(), undef, 'Indented here-doc is still here';
+
 done_testing;
 
 1;

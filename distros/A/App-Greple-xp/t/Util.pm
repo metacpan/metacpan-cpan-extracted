@@ -13,6 +13,17 @@ sub greple {
     Greple->new(@_)->run;
 }
 
+my $greple_path = sub {
+    use App::Greple;
+    my $install =
+	($INC{"App/Greple.pm"} =~ m{(^.*) /lib (?:/[^/]+){0,2} /App/Greple\.pm$}x)[0]
+	    or die;
+    for my $dir (qw(bin script)) {
+	my $file = "$install/$dir/greple";
+	return $file if -f $file;
+    }
+}->() or die Dumper \%INC;
+
 package Greple {
     use strict;
     use warnings;
@@ -63,7 +74,7 @@ package Greple {
 	$obj->{RESULT};
     }
     sub greple {
-	exec $^X, "-I$lib", "-S", "greple", @_;
+	exec $^X, "-I$lib", $greple_path, @_;
     }
 }
 

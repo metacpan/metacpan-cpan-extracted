@@ -1,5 +1,15 @@
 Revision history for Perl extension BoardStreams
 
+v0.0.11 2021-02-06T13:53:03Z
+
+    - added channel option to not store events in db
+    - added bs.delete_events helper
+
+v0.0.10 2021-02-05T14:52:54Z
+
+    - more resilient handling of disconnect from Pg
+    - removed dependency to CryptX
+
 v0.0.9 2021-02-02T08:09:17Z
 
     - allow multiple events per lock_state

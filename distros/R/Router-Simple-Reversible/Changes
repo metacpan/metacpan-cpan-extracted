@@ -1,5 +1,9 @@
 Revision history for Perl extension Router-Simple-Reversible
 
+0.02 2021-02-05T03:35:02Z
+
+    - prevent warning message
+
 0.01 2016-09-21T07:58:55Z
 
     - original version

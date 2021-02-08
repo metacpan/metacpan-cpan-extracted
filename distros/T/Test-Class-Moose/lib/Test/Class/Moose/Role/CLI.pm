@@ -2,13 +2,16 @@ package Test::Class::Moose::Role::CLI;
 
 # ABSTRACT: Role for command line argument handling and extra CLI features
 
+use strict;
+use warnings;
+use namespace::autoclean;
+
 use 5.010000;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Moose::Role 2.0000;
 use Carp;
-use namespace::autoclean;
 
 use File::Find qw( find );
 use JSON::MaybeXS qw( encode_json );
@@ -335,7 +338,7 @@ Test::Class::Moose::Role::CLI - Role for command line argument handling and extr
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -366,8 +369,8 @@ options that this role handles.
 =head1 HOOKS
 
 This role has several hook methods that it calls. The role provides no-op or
-default implementations of these hooks but you can provide an implementation
-in your class that does something.
+default implementations of these hooks but you can provide an implementation in
+your class that does something.
 
 =head2 _munge_class
 
@@ -401,8 +404,7 @@ L<Test::Class::Moose::CLI/--test_lib_dirs>.
 This method will try to load all the classes passed on the command line if any
 were passed. If the value that was passed is a path rather than a class name,
 any leading part matching a value in the list from C<_test_lib_dirs> will be
-stripped, and the rest will be transformed from a path to a module
-name.
+stripped, and the rest will be transformed from a path to a module name.
 
 Otherwise it invokes L<Test::Class::Moose::Load> with the value returned by
 C<_test_lib_dirs> as its argument.
@@ -439,7 +441,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

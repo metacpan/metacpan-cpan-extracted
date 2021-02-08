@@ -20,7 +20,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0930';
+our $VERSION = '0.0932';
 
 my $SPVM_INITED;
 my $BUILDER;
@@ -35,7 +35,7 @@ sub import {
 
   unless ($BUILDER) {
     my $build_dir = $ENV{SPVM_BUILD_DIR};
-    $BUILDER = SPVM::Builder->new(build_dir => $build_dir);
+    $BUILDER = SPVM::Builder->new(build_dir => $build_dir, include_dirs => [@INC]);
   }
 
   # Add package informations
@@ -50,11 +50,13 @@ sub import {
     if ($compile_success) {
       my $added_package_names = $BUILDER->get_added_package_names;
 
-      # Build Precompile packages - Compile C source codes and link them to SPVM precompile subroutine
-      $BUILDER->build_precompile($added_package_names);
+      for my $added_package_name (@$added_package_names) {
+        # Build Precompile packages - Compile C source codes and link them to SPVM precompile subroutine
+        $BUILDER->build_and_bind_shared_lib($added_package_name, 'precompile');
 
-      # Build native packages - Compile C source codes and link them to SPVM native subroutine
-      $BUILDER->build_native($added_package_names);
+        # Build native packages - Compile C source codes and link them to SPVM native subroutine
+        $BUILDER->build_and_bind_shared_lib($added_package_name, 'native');
+      }
 
       # Bind SPVM subroutine to Perl
       bind_to_perl($BUILDER, $added_package_names);

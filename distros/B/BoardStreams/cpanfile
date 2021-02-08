@@ -2,7 +2,6 @@ requires 'perl', '5.026';
 
 requires 'RxPerl::Mojo', 'v6.0.0';
 requires 'RxPerl', 'v6.5.0';
-requires 'CryptX';
 requires 'Safe::Isa';
 requires 'Syntax::Keyword::Try';
 requires 'Struct::Diff';

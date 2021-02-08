@@ -1,17 +1,18 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.019-12-g3184c99
+package JSON::Schema::Draft201909; # git description: v0.021-2-g4cb3030
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.020';
+our $VERSION = '0.022';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use JSON::MaybeXS;
-use Syntax::Keyword::Try 0.11;
+use Feature::Compat::Try;
 use Carp qw(croak carp);
 use List::Util 1.55 qw(pairs first uniqint);
 use Ref::Util 0.100 qw(is_ref is_plain_hashref is_plain_coderef);
@@ -76,7 +77,7 @@ has _format_validations => (
   init_arg => 'format_validations',
   handles_via => 'Hash',
   handles => {
-    _format_validations => 'elements',
+    _get_format_validation => 'get',
   },
   lazy => 1,
   default => sub { {} },
@@ -102,7 +103,7 @@ sub add_schema {
     : JSON::Schema::Draft201909::Document->new(
       schema => shift,
       $uri ? (canonical_uri => $uri) : (),
-      _evaluator => $self,
+      _evaluator => $self,  # used only for traversal during document construction
     );
 
   die JSON::Schema::Draft201909::Result->new(
@@ -144,7 +145,7 @@ sub evaluate_json_string {
   try {
     $data = $self->_json_decoder->decode($json_data)
   }
-  catch {
+  catch ($e) {
     return JSON::Schema::Draft201909::Result->new(
       output_format => $self->output_format,
       result => 0,
@@ -153,7 +154,7 @@ sub evaluate_json_string {
           keyword => undef,
           instance_location => '',
           keyword_location => '',
-          error => $@,
+          error => $e,
         )
       ],
     );
@@ -183,25 +184,25 @@ sub traverse {
     # just with the Core vocabulary and then determine the actual vocabularies from the '$schema'
     # keyword in the schema and the '$vocabulary' keyword in the metaschema.
     vocabularies => [
-      (map use_module($_)->new(evaluator => $self),
-        map 'JSON::Schema::Draft201909::Vocabulary::'.$_,
-          qw(Core Validation Applicator Format Content MetaData)),
+      (map use_module('JSON::Schema::Draft201909::Vocabulary::'.$_)->new,
+        qw(Core Validation Applicator Format Content MetaData)),
       $self,  # for discontinued keywords defined in the base schema
     ],
     identifiers => [],
     configs => {},
     callbacks => $config_override->{callbacks} // {},
+    evaluator => $self,
   };
 
   try {
     $self->_traverse($schema_reference, $state);
   }
-  catch {
-    if ($@->$_isa('JSON::Schema::Draft201909::Error')) {
-      push @{$state->{errors}}, $@;
+  catch ($e) {
+    if ($e->$_isa('JSON::Schema::Draft201909::Error')) {
+      push @{$state->{errors}}, $e;
     }
     else {
-      E($state, 'EXCEPTION: '.$@);
+      E($state, 'EXCEPTION: '.$e);
     }
   }
 
@@ -228,11 +229,11 @@ sub evaluate {
     # for now, this is hardcoded, but in the future the dialect will be determined by the
     # traverse() pass on the schema and examination of the referenced metaschema.
     vocabularies => [
-      (map use_module($_)->new(evaluator => $self),
-        map 'JSON::Schema::Draft201909::Vocabulary::'.$_,
-          qw(Core Validation Applicator Format Content MetaData)),
+      (map use_module('JSON::Schema::Draft201909::Vocabulary::'.$_)->new,
+        qw(Core Validation Applicator Format Content MetaData)),
       $self,  # for discontinued keywords defined in the base schema
     ],
+    evaluator => $self,
   };
 
   my $result;
@@ -252,7 +253,7 @@ sub evaluate {
     abort($state, 'unable to find resource %s', $schema_reference) if not defined $schema;
 
     $state = +{
-      %{$document->evaluator_configs},
+      %{$document->evaluation_configs},
       (map {
         my $val = $config_override->{$_} // $self->$_;
         defined $val ? ( $_ => $val ) : ()
@@ -264,15 +265,15 @@ sub evaluate {
 
     $result = $self->_eval($data, $schema, $state);
   }
-  catch {
-    if ($@->$_isa('JSON::Schema::Draft201909::Result')) {
-      return $@;
+  catch ($e) {
+    if ($e->$_isa('JSON::Schema::Draft201909::Result')) {
+      return $e;
     }
-    elsif ($@->$_isa('JSON::Schema::Draft201909::Error')) {
-      push @{$state->{errors}}, $@;
+    elsif ($e->$_isa('JSON::Schema::Draft201909::Error')) {
+      push @{$state->{errors}}, $e;
     }
     else {
-      E($state, 'EXCEPTION: '.$@);
+      E($state, 'EXCEPTION: '.$e);
     }
 
     $result = 0;
@@ -546,7 +547,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.020
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -569,8 +570,8 @@ version of the specification.
 
 =head2 output_format
 
-One of: C<flag>, C<basic>, C<detailed>, C<verbose>, C<terse>. Defaults to C<basic>. Passed to
-L<JSON::Schema::Draft201909::Result/output_format>.
+One of: C<flag>, C<basic>, C<strict_basic>, C<detailed>, C<verbose>, C<terse>. Defaults to C<basic>.
+Passed to L<JSON::Schema::Draft201909::Result/output_format>.
 
 =head2 short_circuit
 
@@ -885,7 +886,7 @@ loading schema documents from a local web application (e.g. L<Mojolicious>)
 
 =item *
 
-additional output formats beyond C<flag>, C<basic> and C<terse> (L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>)
+additional output formats beyond C<flag>, C<basic>, C<strict_basic>, and C<terse> (L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>)
 
 =item *
 
@@ -896,7 +897,8 @@ examination of the C<$schema> keyword for deviation from the standard metaschema
 Additionally, some small errors in the specification (which have been fixed in the next draft
 specification version) are fixed here rather than implementing the precise but unintended behaviour,
 most notably in the use of json pointers rather than fragment-only URIs in C<instanceLocation> and
-C<keywordLocation> in annotations and errors.
+C<keywordLocation> in annotations and errors. (Use the C<strict_basic>
+L<JSON::Schema::Draft201909/output_format> to revert this change.)
 
 =head1 SECURITY CONSIDERATIONS
 

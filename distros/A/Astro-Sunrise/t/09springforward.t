@@ -3,7 +3,7 @@
 #
 #     Test script for Astro::Sunrise
 #     Author: Jean Forget, based on another test script by Slaven Rezic
-#     Copyright (C) 2015, 2017 Slaven Rezic, Ron Hill and Jean Forget
+#     Copyright (C) 2015, 2017, 2021 Slaven Rezic, Ron Hill and Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License

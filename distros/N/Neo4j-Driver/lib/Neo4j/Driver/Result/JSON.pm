@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::JSON;
 # ABSTRACT: JSON/REST result handler
-$Neo4j::Driver::Result::JSON::VERSION = '0.20';
+$Neo4j::Driver::Result::JSON::VERSION = '0.21';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -78,7 +78,8 @@ sub _parse_json {
 	
 	my @errors = ();
 	if (! $params->{http_header}->{success}) {
-		push @errors, "HTTP error: $params->{http_header}->{status} $params->{http_header}->{reason} on $params->{http_method} to $params->{http_path}";
+		my $reason_phrase = $params->{http_agent}->http_reason;
+		push @errors, "HTTP error: $params->{http_header}->{status} $reason_phrase on $params->{http_method} to $params->{http_path}";
 	}
 	
 	my $json;
@@ -262,12 +263,22 @@ Neo4j::Driver::Result::JSON - JSON/REST result handler
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 DESCRIPTION
 
 The L<Neo4j::Driver::Result::JSON> package is not part of the
 public L<Neo4j::Driver> API.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Neo4j::Driver::Net>
+
+=item * L<Neo4j::Driver::Result>
+
+=back
 
 =head1 AUTHOR
 

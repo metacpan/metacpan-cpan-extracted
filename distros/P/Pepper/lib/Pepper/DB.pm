@@ -1,10 +1,12 @@
 package Pepper::DB;
 
-$Pepper::VERSION = '1.3';
+$Pepper::VERSION = '1.4';
 
 # load needed third-part modules
 use DBI; # tim bounce, where would the world be without you? nowhere.
 use Try::Tiny;
+
+use Pepper::Utilities; # for error-logging
 
 # for checking the status of the DBI reference
 use Scalar::Util qw(blessed);
@@ -18,7 +20,6 @@ sub new {
 	my ($class,$args) = @_;
 	# $args should have:
 	#	'config' => the system configuration from Pepper::Utilities,
-	#	'utils' => an Pepper::Utilities object,
 
 	my $config = $$args{config};
 
@@ -39,7 +40,6 @@ sub new {
 		'database_server' => $$config{database_server},
 		'current_database' => $$config{connect_to_database},
 		'created' => time(),
-		'utils' => $$args{utils},
 		'connect_time' => 1,
 	}, $class;
 
@@ -65,10 +65,12 @@ sub connect_to_database {
 	$dsn = 'DBI:mysql:database='.$self->{current_database}.';host='.$self->{database_server}.';port=3306';
 	$self->{dbh} = DBI->connect($dsn, $self->{config}{database_username}, $self->{config}{database_password},{ 
 		PrintError => 0, 
-		RaiseError => 1, 
+		RaiseError => 0, 
 		AutoCommit => 0,
+		ShowErrorStatement => 1,
+		HandleError => \&dbi_error_handler,
 		mysql_enable_utf8 => 8
-	}) or $self->log_errors('Cannot connect to '.$self->{database_server}.': '.$DBI::errstr);
+	});
 
 	# let's automatically reconnect if the connection is timed out
 	$self->{dbh}->{mysql_auto_reconnect} = 1;
@@ -131,6 +133,22 @@ sub commit {
 	$self->do_sql('commit');
 }
 
+# subroutine to use the Pepper::Utilities's logging and return functions to capture errors and return a proper message
+sub dbi_error_handler {
+	 my ( $message, $handle, $first_value ) = @_;
+
+	my $utils = Pepper::Utilities->new();
+
+	# log and then send the message
+	my $error_message = 'DBI Error: '.$message;
+	$utils->logger($error_message, 'database_errors');
+	
+	die $error_message;
+	
+	return 1;
+}
+
+
 # do_sql: our most flexible way to execute SQL statements
 sub do_sql {
 	# grab args
@@ -144,13 +162,8 @@ sub do_sql {
 	# make sure we are connected to the DB
 	$self->connect_to_database();
 
-	# i shouldn't need this, but just in case
-	if (!$self->{dbh}) {
-		$self->log_errors(qq{Missing DB Connection for $sql.});
-	}
-
 	# prepare the SQL
-	$sth = $self->{dbh}->prepare($sql) or $self->log_errors(qq{Error preparing $sql: }.$self->{dbh}->errstr());
+	$sth = $self->{dbh}->prepare($sql);
 	
 	# ready to execute, but we want to plan for some possible deadlocks, since InnoDB is still not perfect
 	$cleared_deadlocks = 0;
@@ -173,7 +186,6 @@ sub do_sql {
 			} else { # regular error: rollback, log error, and die
 				$self->{dbh}->rollback;
 				$$bind_values[0] = 'No values';
-				$self->log_errors(qq{Error executing $sql (@$bind_values): }.$_);
 				$cleared_deadlocks = 1;
 			}
 		}
@@ -217,19 +229,14 @@ sub list_select {
 	# make sure we are connected to the DB
 	$self->connect_to_database();
 
-	# we should never have this error condition, but just in case
-	if (!$self->{dbh}) {
-		$self->log_errors(qq{Missing DB Connection for $sql.});
-	}
-
 	# prep & execute the sql
 	$sth = $self->{dbh}->prepare($sql);
 	# use $@values if has placeholders
 	if ($bind_values) {
-		$sth->execute(@$bind_values) or $self->log_errors(qq{Error executing $sql: }.$self->{dbh}->errstr);
+		$sth->execute(@$bind_values); 
 
 	} else { # place-jane
-		$sth->execute or $self->log_errors(qq{Error executing $sql: }.$self->{dbh}->errstr);
+		$sth->execute;
 	}
 	
 	# grab the data & toss it into an array
@@ -239,18 +246,6 @@ sub list_select {
 
 	# send back the arrayref
 	return \@sendBack;
-}
-
-# subroutine to use the Pepper::Utilities's logging and return functions to capture errors and return a proper message
-sub log_errors {
-	my ($self,$error_message) = @_;
-
-	# default message in cause of blank
-	$error_message ||= 'Database error.';
-
-	# log and then send the message
-	$self->{utils}->logger($error_message,'database_errors');
-	$self->{utils}->send_response($error_message,1);
 }
 
 # quick_select: easily execute sql SELECTs that will return one row; returns live array
@@ -265,19 +260,14 @@ sub quick_select {
 	# make sure we are connected to the DB
 	$self->connect_to_database();
 
-	# we should never have this error condition, but just in case
-	if (!$self->{dbh}) {
-		$self->log_errors(qq{Missing DB Connection for $sql.});
-	}
-
 	# prep & execute the sql
 	$sth = $self->{dbh}->prepare($sql);
 
 	# use $@values if has placeholders
 	if ($$bind_values[0]) {
-		$sth->execute(@$bind_values) or die $sth->errstr; # or $self->log_errors(qq{Error executing $sql (@$bind_values): }.$self->{dbh}->errstr);
+		$sth->execute(@$bind_values);
 	} else { # plain-jane
-		$sth->execute or die $sth->errstr; # or $self->log_errors(qq{Error executing $sql: }.$self->{dbh}->errstr);
+		$sth->execute;
 	}
 
 	# grab the data
@@ -314,27 +304,23 @@ sub sql_hash {
 	# this is easy: run the command, and build a hash keyed by the first column, with the column names as sub-keys
 	# note that this works best if there are at least two columns listed
 	$num = 0;
-	if (!$self->{dbh}) {
-		$self->log_errors(qq{Missing DB Connection for $sql.});
-	}
 	
 	# prep & execute the sql
 	$sth = $self->{dbh}->prepare($sql);
 
 	# placeholders?
 	if ($$bind_values[0]) {
-		$sth->execute(@$bind_values) or $self->log_errors(qq{Error executing $sql: }.$self->{dbh}->errstr);
+		$sth->execute(@$bind_values);
 	} else {
-		$sth->execute or $self->log_errors(qq{Error executing $sql: }.$self->{dbh}->errstr);
+		$sth->execute;
 	}
 
 	# this does not seem any faster, oddly:
 	# my ($results_arrays, $result_array);
-	#$results_arrays = $self->{dbh}->selectall_arrayref($sql, {}, @$bind_values) 
-	#	or $self->log_errors(qq{Error executing $sql: }.$self->{dbh}->errstr);
+	#$results_arrays = $self->{dbh}->selectall_arrayref($sql, {}, @$bind_values);
 
 	# foreach $result_array (@$results_arrays) {
-	while(($key,@data)=$sth->fetchrow_array) {
+	while( ($key,@data) = $sth->fetchrow_array ) {
 		# $key = shift @$result_array;
 		$cnum = 0;
 		foreach $c (@$names) {

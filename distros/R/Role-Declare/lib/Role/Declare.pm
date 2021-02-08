@@ -1,7 +1,7 @@
 package Role::Declare;
 use strict;
 use warnings;
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 use Attribute::Handlers;
 use Carp qw[ croak ];
@@ -164,14 +164,17 @@ sub _build_validator {
 }
 
 sub import {
-    my ($class, $mode) = @_;
+    my $class = shift;
     my $package = scalar caller;
     return if $class ne __PACKAGE__;    # don't let this import spread around
 
-    my $lax;
-    if (defined $mode) {
+    my ($lax, $skip_typecheck);
+    foreach my $mode (@_) {
         if ($mode eq '-lax') {
             $lax = 1;
+        }
+        elsif ($mode eq '-no_type_check') {
+            $skip_typecheck = 1;
         }
         else {
             croak "Unsupported mode: $mode";
@@ -188,7 +191,7 @@ sub import {
         $before->($name, $coderef);
 
         my $hooks = delete $return_hooks{ refaddr($coderef) };
-        if (defined $hooks) {
+        if (defined $hooks and not $skip_typecheck) {
             my $return_validator = _build_validator($hooks);
             $around->($name, $return_validator);
         }
@@ -201,6 +204,7 @@ sub import {
         install_sub => $installer,
     );
     $common_args{check_argument_count} = 0 if $lax;
+    $common_args{check_argument_types} = 0 if $skip_typecheck;
     Function::Parameters->import(
         {
             class_method => {

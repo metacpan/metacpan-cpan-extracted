@@ -14,7 +14,7 @@ use IPC::Run 'run';
 use Path::Tiny 'path';
 use Text::Diff ();
 
-our $VERSION = '1.29'; # VERSION
+our $VERSION = '1.30'; # VERSION
 
 sub init {
     my $self = _new( shift, 'expect_no_root_dir' );
@@ -35,7 +35,8 @@ sub init {
                 $self->add($watch);
             }
             catch {
-                push( @errors, $watch . ': ' . $_ );
+                my $e = $_ || $@;
+                push( @errors, $watch . ': ' . $e );
             };
         }
 
@@ -580,7 +581,8 @@ sub _status_data {
             )
         }
         catch {
-            $data->{state} = '?' if ( /Not a directory/ );
+            my $e = $_ || $@;
+            $data->{state} = '?' if ( $e =~ /Not a directory/ );
         }
         finally {
             $data->{state} = 'ok' unless $printed_path;
@@ -707,7 +709,7 @@ sub _execute_action {
             ) or $died = 1;
         }
         catch {
-            $err = $_;
+            $err = $_ || $@;
         };
 
         if ($err) {
@@ -761,7 +763,7 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.29
+version 1.30
 
 =for markdown [![test](https://github.com/gryphonshafer/dest/workflows/test/badge.svg)](https://github.com/gryphonshafer/dest/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/dest/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/dest)

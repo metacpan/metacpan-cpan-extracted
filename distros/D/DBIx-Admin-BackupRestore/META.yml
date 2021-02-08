@@ -1,27 +1,33 @@
 ---
 abstract: 'Back-up all tables in a db to XML, and restore them'
 author:
-  - 'Ron Savage <ron@savage.net.au>'
+  - 'Ron Savage (ron@savage.net.au)'
 build_requires:
-  Test::More: 0
+  Error: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001014'
+  boolean: '0.46'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
-license: artistic
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-Admin-BackupRestore
-provides:
-  DBIx::Admin::BackupRestore:
-    file: lib/DBIx/Admin/BackupRestore.pm
-    version: 1.17
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Carp: 0
-  XML::Parser: 0
-  XML::Records: 0
-  XML::TokeParser: 0
-  perl: 5.005_62
+  Carp: '0'
+  XML::Parser: '0'
+  XML::Records: '0'
+  XML::TokeParser: '0'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_1_0
-version: 1.17
+  bugtracker: https://github.com/ronsavage/DBIx-Admin-BackupRestore/issues
+  license: http://opensource.org/licenses/Perl
+  repository: https://github.com/ronsavage/DBIx-Admin-BackupRestore.git
+version: '1.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

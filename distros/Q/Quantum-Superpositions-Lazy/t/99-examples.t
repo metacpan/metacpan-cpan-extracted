@@ -1,4 +1,4 @@
-use v5.28;
+use v5.24;
 use warnings;
 use Test::More;
 use Test::Exception;

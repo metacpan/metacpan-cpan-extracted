@@ -50,6 +50,10 @@ Boolean if for beamer
 
 =back
 
+=head2 families
+
+Return an arrayref with the C<mono>, C<sans> and C<main> objects.
+
 =cut
 
 has mono => (is => 'ro', required => 1, isa => InstanceOf['Text::Amuse::Compile::Fonts::Family']);
@@ -213,6 +217,11 @@ sub _fontspec_args {
         }
     }
     return sprintf('{%s}[%s]', $def->{name}, join(",%\n ", @list));
+}
+
+sub families {
+    my $self = shift;
+    return [ $self->main, $self->mono, $self->sans ];
 }
 
 1;

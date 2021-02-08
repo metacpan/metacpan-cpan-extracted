@@ -8,7 +8,7 @@
 package DiaColloDB::Relation::TDF;
 use DiaColloDB::Relation;
 use DiaColloDB::Relation::TDF::Query;
-use DiaColloDB::Utils qw(:pack :fcntl :file :math :json :list :pdl :temp :env :run :jobs);
+use DiaColloDB::Utils qw(:pack :fcntl :file :math :json :list :pdl :temp :env :run :jobs :sort);
 use DiaColloDB::PackedFile;
 #use DiaColloDB::Temp::Hash;
 #use DiaColloDB::Temp::Array;
@@ -489,7 +489,7 @@ sub create {
 
   ##-- v0.12.012_03: sort tdm0file.tmp -> tdm0file
   if (!$wdmfile) {
-    runcmd('sort', (map {"-nk$_"} (1..($NA+1))), sortJobs(), "$tdm0file.tmp", "-o", $tdm0file)==0
+    runcmd(join(' ', sortCmd(), (map {"-nk$_"} (1..($NA+1))), "$tdm0file.tmp", "-o", $tdm0file))==0
       or $vs->logconfess("$logas: failed to sort for $tdm0file.tmp: $!");
     CORE::unlink("$tdm0file.tmp")
       or $vs->logconfess("$logas: failed to unlink $tdm0file.tmp: $!");
@@ -540,7 +540,7 @@ sub create {
   if ($vs->{minDocFreq} > 0) {
     $vs->vlog($logCreate, "$logas: filter: by doc-frequency (minDocFreq=$vs->{minDocFreq})");
     my $cmdfh = opencmd("cut -d\" \" -f-$NA $tdm0file | uniq -c |")
-      or $vs->logconfess("$logas: failed to open pipe from sort for doc-frequency filter");
+      or $vs->logconfess("$logas: failed to open pipe from uniq for doc-frequency filter");
     $wbad //= tmphash("$vsdir/wbad", %tmpargs);
     my $fmin = $vs->{minDocFreq};
     my $NT0  = 0;
@@ -568,7 +568,7 @@ sub create {
   my $NT   = 0;
   my $NT0  = 0;
   my $ttxtfh = opencmd("cut -d\" \" -f-$NA $tdm0file | uniq |")
-    or $vs->logconfess("$logas: open failed for pipe from sort for term-values: $!");
+    or $vs->logconfess("$logas: open failed for pipe from uniq for term-values: $!");
   my $tvalsfile = "$vsdir/tvals.pdl";
   CORE::open(my $tvalsfh, ">:raw", $tvalsfile)
     or $vs->logconfess("$logas: open failed for term-values piddle $tvalsfile: $!");
@@ -839,7 +839,7 @@ sub union {
   my $NA       = scalar @{$vs->{attrs}};
   my $tdm0file = "$vsdir/utdm0.dat";
   $vs->vlog($logCreate, "union(): extracting attribute-document data to $tdm0file");
-  my $tdm0fh   = opencmd("|-:raw", 'sort', (map {"-nk$_"} (1..($NA+1))), sortJobs(), "-o", $tdm0file)
+  my $tdm0fh   = opencmd("|-:raw", join(' ', sortCmd(), (map {"-nk$_"} (1..($NA+1))), "-o", $tdm0file))
     or $vs->logconfess("union(): failed to create pipe to sort for tempfile $tdm0file: $!");
   my $Doff = 0;
   foreach my $dbai (grep {$dbargs->[$_]{tdf}} (0..$#$dbargs)) {

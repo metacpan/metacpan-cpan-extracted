@@ -1,5 +1,19 @@
 Revision history for Dist-Mgr
 
+1.09    2021-02-03
+    - Skip failing tests on Windows due to line-ending issues when
+      uploaded to CPAN. Windows CI tests pass just fine
+
+1.07    2021-02-02
+    - For some reason, CPAN installs were breaking due to an unknown reason
+      on Windows. After a dev release, the problem seems resolved    
+    - Updated _dist_dir_re() so it includes development versions
+
+1.06_01    2021-02-02
+    - In _git_release(), put output of _git_status_differs() into variable,
+      otherwise the second check for CI has already been set to false after the
+      previous commit/push
+
 1.06    2021-01-15
     - Bump prereq version of File::Copy::Recursive, as older versions of perl
       came with v0.38 which didn't export rmove_glob(), which would cause tests

@@ -1,3 +1,6 @@
+0.22 2021-02-07
+        - Move bugtracker to GitHub.
+
 0.21 2018-03-06
         - Removed deprecated key generation in constructor.
 

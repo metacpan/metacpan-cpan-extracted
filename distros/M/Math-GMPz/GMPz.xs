@@ -735,11 +735,17 @@ void Rmpz_submul_ui(mpz_t * dest, mpz_t * src, unsigned long num) {
 }
 
 void Rmpz_mul_2exp(pTHX_ mpz_t * dest, mpz_t * src1, SV * b) {
-     mpz_mul_2exp(*dest, *src1, SvUV(b));
+
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
+     mpz_mul_2exp(*dest, *src1, (mp_bitcnt_t)SvUVX(b));
 }
 
 void Rmpz_div_2exp(pTHX_ mpz_t * dest, mpz_t * src1, SV * b) {
-     mpz_div_2exp(*dest, *src1, SvUV(b));
+
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
+     mpz_div_2exp(*dest, *src1, (mp_bitcnt_t)SvUVX(b));
 }
 
 void Rmpz_neg(mpz_t * dest, mpz_t * src) {
@@ -793,11 +799,17 @@ unsigned long Rmpz_cdiv_ui( mpz_t *  n, unsigned long d) {
 }
 
 void Rmpz_cdiv_q_2exp(pTHX_  mpz_t * q, mpz_t *  n, SV * b) {
-     mpz_cdiv_q_2exp(*q, *n, (mp_bitcnt_t)SvUV(b));
+
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
+     mpz_cdiv_q_2exp(*q, *n, (mp_bitcnt_t)SvUVX(b));
 }
 
 void Rmpz_cdiv_r_2exp(pTHX_  mpz_t * r, mpz_t *  n, SV * b) {
-     mpz_cdiv_r_2exp(*r, *n, (mp_bitcnt_t)SvUV(b));
+
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
+     mpz_cdiv_r_2exp(*r, *n, (mp_bitcnt_t)SvUVX(b));
 }
 
 void Rmpz_fdiv_q( mpz_t * q, mpz_t *  n, mpz_t * d) {
@@ -869,15 +881,24 @@ unsigned long Rmpz_fdiv_ui( mpz_t *  n, unsigned long d) {
 }
 
 void Rmpz_fdiv_q_2exp(pTHX_  mpz_t * q, mpz_t *  n, SV * b) {
-     mpz_fdiv_q_2exp(*q, *n, SvUV(b));
+
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
+     mpz_fdiv_q_2exp(*q, *n, (mp_bitcnt_t)SvUVX(b));
 }
 
 void Rmpz_fdiv_r_2exp(pTHX_  mpz_t * r, mpz_t *  n, SV * b) {
-     mpz_fdiv_r_2exp(*r, *n, SvUV(b));
+
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
+     mpz_fdiv_r_2exp(*r, *n, (mp_bitcnt_t)SvUVX(b));
 }
 
 void Rmpz_mod_2exp(pTHX_  mpz_t * r, mpz_t *  n, SV * b) {
-     mpz_mod_2exp(*r, *n, SvUV(b));
+
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
+     mpz_mod_2exp(*r, *n, (mp_bitcnt_t)SvUVX(b));
 }
 
 void Rmpz_tdiv_q( mpz_t * q, mpz_t *  n, mpz_t * d) {
@@ -925,11 +946,17 @@ unsigned long Rmpz_tdiv_ui( mpz_t *  n, unsigned long d) {
 }
 
 void Rmpz_tdiv_q_2exp(pTHX_  mpz_t * q, mpz_t *  n, SV * b) {
-     mpz_tdiv_q_2exp(*q, *n, SvUV(b));
+
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
+     mpz_tdiv_q_2exp(*q, *n, (mp_bitcnt_t)SvUVX(b));
 }
 
 void Rmpz_tdiv_r_2exp(pTHX_  mpz_t * r, mpz_t *  n, SV * b) {
-     mpz_tdiv_r_2exp(*r, *n, SvUV(b));
+
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
+     mpz_tdiv_r_2exp(*r, *n, (mp_bitcnt_t)SvUVX(b));
 }
 
 void Rmpz_mod( mpz_t * r, mpz_t *  n, mpz_t * d) {
@@ -965,7 +992,10 @@ int Rmpz_divisible_ui_p(mpz_t * n, unsigned long d) {
 }
 
 int Rmpz_divisible_2exp_p(pTHX_ mpz_t * n, SV * b) {
-     return mpz_divisible_2exp_p(*n, SvUV(b));
+
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
+     return mpz_divisible_2exp_p(*n, SvUVX(b));
 }
 
 int Rmpz_congruent_p(mpz_t * n, mpz_t * c, mpz_t * d) {
@@ -977,7 +1007,10 @@ int Rmpz_congruent_ui_p(mpz_t * n, unsigned long c, unsigned long d) {
 }
 
 SV * Rmpz_congruent_2exp_p(pTHX_ mpz_t * n, mpz_t * c, SV * d) {
-     return newSViv(mpz_congruent_2exp_p(*n, *c, SvUV(d)));
+
+     CHECK_MP_BITCNT_T_OVERFLOW(d)
+
+     return newSViv(mpz_congruent_2exp_p(*n, *c, SvUVX(d)));
 }
 
 void Rmpz_powm(mpz_t * dest, mpz_t * base, mpz_t * exp, mpz_t * mod) {
@@ -1291,42 +1324,37 @@ SV * Rmpz_hamdist(pTHX_ mpz_t * dest, mpz_t * src) {
 }
 
 SV * Rmpz_scan0(pTHX_ mpz_t * n, SV * start_bit) {
-#if defined(_GMP_INDEX_OVERFLOW) && __GNU_MP_VERSION < 7
-     if(SvUV(start_bit) > 4294967295UL && sizeof(mp_bitcnt_t) == 4)
-       croak("Bit index (%llu) passed to Rmpz_scan0 is greater than maximum allowed value (4294967295)", SvUV(start_bit));
-#endif
+
+     CHECK_MP_BITCNT_T_OVERFLOW(start_bit)
+
     return newSVuv(mpz_scan0(*n, (mp_bitcnt_t)SvUV(start_bit)));
 }
 
 SV * Rmpz_scan1(pTHX_ mpz_t * n, SV * start_bit) {
-#if defined(_GMP_INDEX_OVERFLOW) && __GNU_MP_VERSION < 7
-     if(SvUV(start_bit) > 4294967295UL && sizeof(mp_bitcnt_t) == 4)
-       croak("Bit index (%llu) passed to Rmpz_scan1 is greater than maximum allowed value (4294967295)", SvUV(start_bit));
-#endif
+
+     CHECK_MP_BITCNT_T_OVERFLOW(start_bit)
+
     return newSVuv(mpz_scan1(*n, (mp_bitcnt_t)SvUV(start_bit)));
 }
 
 void Rmpz_setbit(pTHX_ mpz_t * num, SV * bit_index) {
-#if defined(_GMP_INDEX_OVERFLOW) && __GNU_MP_VERSION < 7
-     if(SvUV(bit_index) > 4294967295UL && sizeof(mp_bitcnt_t) == 4)
-       croak("Bit index (%llu) passed to Rmpz_setbit is greater than maximum allowed value (4294967295)", SvUV(bit_index));
-#endif
+
+     CHECK_MP_BITCNT_T_OVERFLOW(bit_index)
+
      mpz_setbit(*num, (mp_bitcnt_t)SvUV(bit_index));
 }
 
 void Rmpz_clrbit(pTHX_ mpz_t * num, SV * bit_index) {
-#if defined(_GMP_INDEX_OVERFLOW) && __GNU_MP_VERSION < 7
-     if(SvUV(bit_index) > 4294967295UL && sizeof(mp_bitcnt_t) == 4)
-       croak("Bit index (%llu) passed to Rmpz_clrbit is greater than maximum allowed value (4294967295)", SvUV(bit_index));
-#endif
+
+     CHECK_MP_BITCNT_T_OVERFLOW(bit_index)
+
      mpz_clrbit(*num, (mp_bitcnt_t)SvUV(bit_index));
 }
 
 SV * Rmpz_tstbit(pTHX_ mpz_t * num, SV * bit_index) {
-#if defined(_GMP_INDEX_OVERFLOW) && __GNU_MP_VERSION < 7
-     if(SvUV(bit_index) > 4294967295UL && sizeof(mp_bitcnt_t) == 4)
-       croak("Bit index (%llu) passed to Rmpz_tstbit is greater than maximum allowed value (4294967295)", SvUV(bit_index));
-#endif
+
+     CHECK_MP_BITCNT_T_OVERFLOW(bit_index)
+
      return newSViv(mpz_tstbit(*num, (mp_bitcnt_t)SvUV(bit_index)));
 }
 
@@ -1747,10 +1775,9 @@ void Rmpz_rootrem(mpz_t * root, mpz_t * rem, mpz_t * u, unsigned long d) {
 }
 
 void Rmpz_combit(pTHX_ mpz_t * num, SV * bitpos) {
-#if defined(_GMP_INDEX_OVERFLOW) && __GNU_MP_VERSION < 7
-     if(SvUV(bitpos) > 4294967295UL && sizeof(mp_bitcnt_t) == 4)
-       croak("Bit index (%llu) passed to Rmpz_combit is greater than maximum allowed value (4294967295)", SvUV(bitpos));
-#endif
+
+     CHECK_MP_BITCNT_T_OVERFLOW(bitpos)
+
      mpz_combit(*num, (mp_bitcnt_t)SvUV(bitpos));
 }
 
@@ -2566,6 +2593,8 @@ SV * overload_lshift(pTHX_ mpz_t * a, SV * b, SV * third) {
      mpz_t * mpz_t_obj;
      SV * obj_ref, * obj;
 
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
      New(1, mpz_t_obj, 1, mpz_t);
      if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_lshift function");
      obj_ref = newSV(0);
@@ -2573,7 +2602,7 @@ SV * overload_lshift(pTHX_ mpz_t * a, SV * b, SV * third) {
      mpz_init(*mpz_t_obj);
 
      if(SvUOK(b)) {
-       mpz_mul_2exp(*mpz_t_obj, *a, SvUV(b));
+       mpz_mul_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUV(b));
        sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
        SvREADONLY_on(obj);
        return obj_ref;
@@ -2594,6 +2623,8 @@ SV * overload_rshift(pTHX_ mpz_t * a, SV * b, SV * third) {
      mpz_t * mpz_t_obj;
      SV * obj_ref, * obj;
 
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
      New(1, mpz_t_obj, 1, mpz_t);
      if(mpz_t_obj == NULL) croak("Failed to allocate memory in overload_rshift function");
      obj_ref = newSV(0);
@@ -2601,7 +2632,7 @@ SV * overload_rshift(pTHX_ mpz_t * a, SV * b, SV * third) {
      mpz_init(*mpz_t_obj);
 
      if(SvUOK(b)) {
-       mpz_tdiv_q_2exp(*mpz_t_obj, *a, SvUV(b));
+       mpz_tdiv_q_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUVX(b));
        sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
        SvREADONLY_on(obj);
        return obj_ref;
@@ -2609,7 +2640,7 @@ SV * overload_rshift(pTHX_ mpz_t * a, SV * b, SV * third) {
 
      if(SvIOK(b)) {
        if(SvIV(b) < 0) croak("Invalid argument supplied to Math::GMPz::overload_rshift");
-       mpz_tdiv_q_2exp(*mpz_t_obj, *a, SvUV(b));
+       mpz_tdiv_q_2exp(*mpz_t_obj, *a, (mp_bitcnt_t)SvUVX(b));
        sv_setiv(obj, INT2PTR(IV, mpz_t_obj));
        SvREADONLY_on(obj);
        return obj_ref;
@@ -4512,10 +4543,12 @@ SV * overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
 
 SV * overload_rshift_eq(pTHX_ SV * a, SV * b, SV * third) {
 
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
      SvREFCNT_inc(a);
 
      if(SvUOK(b)) {
-       mpz_tdiv_q_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUV(b));
+       mpz_tdiv_q_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUVX(b));
        return a;
        }
 
@@ -4524,7 +4557,7 @@ SV * overload_rshift_eq(pTHX_ SV * a, SV * b, SV * third) {
          SvREFCNT_dec(a);
          croak("Invalid argument supplied to Math::GMPz::overload_rshift_eq");
        }
-       mpz_tdiv_q_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvIV(b));
+       mpz_tdiv_q_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUVX(b));
        return a;
        }
 
@@ -4534,10 +4567,12 @@ SV * overload_rshift_eq(pTHX_ SV * a, SV * b, SV * third) {
 
 SV * overload_lshift_eq(pTHX_ SV * a, SV * b, SV * third) {
 
+     CHECK_MP_BITCNT_T_OVERFLOW(b)
+
      SvREFCNT_inc(a);
 
      if(SvUOK(b)) {
-       mpz_mul_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvUV(b));
+       mpz_mul_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUV(b));
        return a;
        }
 
@@ -4546,7 +4581,7 @@ SV * overload_lshift_eq(pTHX_ SV * a, SV * b, SV * third) {
          SvREFCNT_dec(a);
          croak("Invalid argument supplied to Math::GMPz::overload_lshift_eq");
        }
-       mpz_mul_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), SvIV(b));
+       mpz_mul_2exp(*(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (mp_bitcnt_t)SvUV(b));
        return a;
        }
 
@@ -6361,7 +6396,7 @@ int _gmp_index_overflow(void) {
 
 MODULE = Math::GMPz  PACKAGE = Math::GMPz
 
-PROTOTYPES: DISABLE
+PROTOTYPES: ENABLE
 
 
 SV *
@@ -6384,6 +6419,7 @@ CODE:
   RETVAL = MATH_GMPz_UV_MAX (aTHX);
 OUTPUT:  RETVAL
 
+PROTOTYPES: DISABLE
 
 int
 _is_infstring (s)

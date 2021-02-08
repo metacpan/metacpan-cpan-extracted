@@ -3,6 +3,7 @@ use warnings;
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
@@ -48,7 +49,7 @@ is($result->output_format, 'basic', 'Result object gets the output_format from t
 cmp_deeply(
   $result->TO_JSON,
   {
-    valid => bool(0),
+    valid => false,
     errors => [
       {
         instanceLocation => '',
@@ -209,7 +210,7 @@ $result->output_format('flag');
 cmp_deeply(
   $result->TO_JSON,
   {
-    valid => bool(0),
+    valid => false,
   },
   'flag format only includes the valid property',
 );
@@ -218,7 +219,7 @@ $result->output_format('terse');
 cmp_deeply(
   $result->TO_JSON,
   {
-    valid => bool(0),
+    valid => false,
     errors => [
       {
         instanceLocation => '',
@@ -331,7 +332,7 @@ foreach my $keyword (qw(unevaluatedItems unevaluatedProperties)) {
   cmp_deeply(
     $result->TO_JSON,
     {
-      valid => bool(0),
+      valid => false,
       errors => my $errors = [
         {
           instanceLocation => '',
@@ -347,11 +348,91 @@ foreach my $keyword (qw(unevaluatedItems unevaluatedProperties)) {
   cmp_deeply(
     $result->TO_JSON,
     {
-      valid => bool(0),
+      valid => false,
       errors => $errors,
     },
     'terse format does not omit these crucial errors',
   );
 }
+
+subtest 'strict_basic' => sub {
+  # see "JSON pointer escaping" in t/errors.t
+
+  cmp_deeply(
+    JSON::Schema::Draft201909->new(output_format => 'strict_basic')->evaluate(
+      { '{}' => { 'my~tilde/slash-property' => 1 } },
+      {
+        '$id' => 'foo.json',
+        properties => {
+          '{}' => {
+            properties => {
+              'my~tilde/slash-property' => false,
+            },
+            patternProperties => {
+              '/' => { minimum => 6 },
+              '[~/]' => { minimum => 7 },
+              '~' => { minimum => 5 },
+              '~.*/' => false,
+            },
+          },
+        },
+      },
+    )->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '#/%7B%7D/my~0tilde~1slash-property',
+          keywordLocation => '#/properties/%7B%7D/properties/my~0tilde~1slash-property',
+          absoluteKeywordLocation => 'foo.json#/properties/%7B%7D/properties/my~0tilde~1slash-property',
+          error => 'property not permitted',
+        },
+        {
+          instanceLocation => '#/%7B%7D',
+          keywordLocation => '#/properties/%7B%7D/properties',
+          absoluteKeywordLocation => 'foo.json#/properties/%7B%7D/properties',
+          error => 'not all properties are valid',
+        },
+        {
+          instanceLocation => '#/%7B%7D/my~0tilde~1slash-property',
+          keywordLocation => '#/properties/%7B%7D/patternProperties/~1/minimum',  # /
+          absoluteKeywordLocation => 'foo.json#/properties/%7B%7D/patternProperties/~1/minimum',  # /
+          error => 'value is smaller than 6',
+        },
+        {
+          instanceLocation => '#/%7B%7D/my~0tilde~1slash-property',
+          keywordLocation => '#/properties/%7B%7D/patternProperties/%5B~0~1%5D/minimum',  # [~/]
+          absoluteKeywordLocation => 'foo.json#/properties/%7B%7D/patternProperties/%5B~0~1%5D/minimum',  # [~/]
+          error => 'value is smaller than 7',
+        },
+        {
+          instanceLocation => '#/%7B%7D/my~0tilde~1slash-property',
+          keywordLocation => '#/properties/%7B%7D/patternProperties/~0/minimum',  # ~
+          absoluteKeywordLocation => 'foo.json#/properties/%7B%7D/patternProperties/~0/minimum',  # ~
+          error => 'value is smaller than 5',
+        },
+        {
+          instanceLocation => '#/%7B%7D/my~0tilde~1slash-property',
+          keywordLocation => '#/properties/%7B%7D/patternProperties/~0.*~1', # ~.*/
+          absoluteKeywordLocation => 'foo.json#/properties/%7B%7D/patternProperties/~0.*~1', # ~.*/
+          error => 'property not permitted',
+        },
+        {
+          instanceLocation => '#/%7B%7D',
+          keywordLocation => '#/properties/%7B%7D/patternProperties',
+          absoluteKeywordLocation => 'foo.json#/properties/%7B%7D/patternProperties',
+          error => 'not all properties are valid',
+        },
+        {
+          instanceLocation => '#',
+          keywordLocation => '#/properties',
+          absoluteKeywordLocation => 'foo.json#/properties',
+          error => 'not all properties are valid',
+        },
+      ],
+    },
+    'strict_basic turns json pointers into URIs, including uri escapes',
+  );
+};
 
 done_testing;

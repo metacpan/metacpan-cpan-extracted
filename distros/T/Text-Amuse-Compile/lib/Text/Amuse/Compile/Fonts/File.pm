@@ -48,6 +48,14 @@ The file extension, including the dot.
 
 The directory, including the trailing slash.
 
+=head2 css_font_weight
+
+C<bold> or C<normal> depending on the shape
+
+=head2 css_font_style
+
+C<italic> or C<normal> depending on the shape
+
 =cut
 
 has file => (is => 'ro',
@@ -128,5 +136,26 @@ sub _build_mimetype {
     return;
 }
 
+sub css_font_weight {
+    my $self = shift;
+    my %map = (
+               regular => "normal",
+               bold => "bold",
+               italic => "normal",
+               bolditalic => "bold",
+              );
+    return $map{$self->shape};
+}
+
+sub css_font_style {
+    my $self = shift;
+    my %map = (
+               regular => "normal",
+               bold => "normal",
+               italic => "italic",
+               bolditalic => "italic",
+              );
+    return $map{$self->shape};
+}
 
 1;

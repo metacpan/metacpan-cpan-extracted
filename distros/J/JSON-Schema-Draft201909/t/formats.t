@@ -3,6 +3,7 @@ use warnings;
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
@@ -11,13 +12,16 @@ use Test::Deep;
 use Test::Fatal;
 use JSON::Schema::Draft201909;
 
+use lib 't/lib';
+use Helper;
+
 my ($annotation_result, $validation_result);
 subtest 'no validation' => sub {
   cmp_deeply(
     JSON::Schema::Draft201909->new(collect_annotations => 1, validate_formats => 0)
       ->evaluate('abc', { format => 'uuid' })->TO_JSON,
     $annotation_result = {
-      valid => bool(1),
+      valid => true,
       annotations => [
         {
           instanceLocation => '',
@@ -58,7 +62,7 @@ subtest 'simple validation' => sub {
   cmp_deeply(
     $js->evaluate('123', { format => 'uuid' })->TO_JSON,
     $validation_result = {
-      valid => bool(0),
+      valid => false,
       errors => [
         {
           instanceLocation => '',
@@ -89,7 +93,7 @@ subtest 'unknown format attribute' => sub {
   cmp_deeply(
     $js->evaluate('hello', { format => 'whargarbl' })->TO_JSON,
     {
-      valid => bool(1),
+      valid => true,
       annotations => [
         {
           instanceLocation => '',
@@ -145,7 +149,7 @@ subtest 'override a format sub' => sub {
       },
     )->TO_JSON,
     {
-      valid => bool(0),
+      valid => false,
       errors => [
         {
           instanceLocation => '/mult_5',
@@ -165,6 +169,56 @@ subtest 'override a format sub' => sub {
       ],
     },
     'swapping out format implementation turns success into failure',
+  );
+};
+
+subtest 'different formats after document creation' => sub {
+  # the default evaluator does not know the mult_5 format
+  my $document = JSON::Schema::Draft201909::Document->new(schema => { format => 'mult_5' });
+
+  my $js1 = JSON::Schema::Draft201909->new(validate_formats => 1, collect_annotations => 0);
+  cmp_deeply(
+    $js1->evaluate(3, $document)->TO_JSON,
+    {
+      valid => true,
+    },
+    'the default evaluator does not know the mult_5 format',
+  );
+
+  my $js2 = JSON::Schema::Draft201909->new(
+    collect_annotations => 1,
+    validate_formats => 1,
+    format_validations => +{ mult_5 => +{ type => 'integer', sub => sub { ($_[0] % 5) == 0 } } },
+  );
+
+  cmp_deeply(
+    $js2->evaluate(5, $document)->TO_JSON,
+    {
+      valid => true,
+      annotations => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/format',
+          annotation => 'mult_5',
+        },
+      ],
+    },
+    'the runtime evaluator is used for annotation configs',
+  );
+
+  cmp_deeply(
+    $js2->evaluate(3, $document)->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/format',
+          error => 'not a mult_5',
+        },
+      ],
+    },
+    'the runtime evaluator is used to fetch the format implementations',
   );
 };
 

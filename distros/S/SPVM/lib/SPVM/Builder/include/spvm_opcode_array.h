@@ -1,10 +1,10 @@
 #ifndef SPVM_OPCODE_ARRAY_H
 #define SPVM_OPCODE_ARRAY_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
 // Array
-struct SPVM_opcode_array {
+struct spvm_opcode_array {
   SPVM_OPCODE* values;
   int32_t length;
   int32_t capacity;

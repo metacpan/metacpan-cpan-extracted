@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-TagHelpers-MailToChiffre",
    "no_index" : {
@@ -40,13 +40,18 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Akron/Mojolicious-Plugin-TagHelpers-MailToChiffre/issues"
+      },
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ],
       "repository" : {
-         "url" : "https://github.com/Akron/Mojolicious-Plugin-TagHelpers-MailToChiffre"
+         "type" : "git",
+         "url" : "https://github.com/Akron/Mojolicious-Plugin-TagHelpers-MailToChiffre.git",
+         "web" : "https://github.com/Akron/Mojolicious-Plugin-TagHelpers-MailToChiffre"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

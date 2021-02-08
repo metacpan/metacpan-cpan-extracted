@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v0.1.7
+## Version v0.1.8
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2020/12/30
+## Modified 2021/02/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,7 +21,7 @@ BEGIN
     use Scalar::Util;
     use List::Util ();
     # use Devel::Confess;
-    our $VERSION = 'v0.1.7';
+    our $VERSION = 'v0.1.8';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -861,7 +861,7 @@ EOT
         my $last_return_block = <<EOT;
 if( CORE::defined( \$Nice::Try::WANTARRAY ) and 
     (
-      !CORE::ref( \$Nice::Try::RETVAL[0] ) or 
+      !Scalar::Util::blessed( \$Nice::Try::RETVAL[0] ) or 
       ( Scalar::Util::blessed( \$Nice::Try::RETVAL[0] ) && !\$Nice::Try::RETVAL[0]->isa( 'Nice::Try::SENTINEL' ) ) 
     ) ) 
 {
@@ -1126,7 +1126,7 @@ When run, this would produce, as one would expect:
 
 =head1 VERSION
 
-    v0.1.7
+    v0.1.8
 
 =head1 DESCRIPTION
 

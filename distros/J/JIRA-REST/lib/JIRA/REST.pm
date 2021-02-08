@@ -1,9 +1,8 @@
 package JIRA::REST;
 # ABSTRACT: Thin wrapper around Jira's REST API
-$JIRA::REST::VERSION = '0.020';
-use 5.010;
+$JIRA::REST::VERSION = '0.021';
+use 5.016;
 use utf8;
-use strict;
 use warnings;
 
 use Carp;
@@ -13,6 +12,7 @@ use MIME::Base64;
 use URI::Escape;
 use JSON 2.23;
 use REST::Client;
+use HTTP::CookieJar::LWP;
 
 sub new {
     my $class = shift; # this always has to come first!
@@ -62,7 +62,7 @@ sub new {
 
         foreach (qw/username password/) {
             croak __PACKAGE__ . "::new: '$_' argument must be a non-empty string.\n"
-                unless defined $args{$_} && ! ref $args{$_} && length $args{$_};
+                if ! defined $args{$_} || ref $args{$_} || length $args{$_} == 0;
         }
     }
 
@@ -101,13 +101,33 @@ sub new {
 
         # Turn off SSL verification if requested
         $ua->ssl_opts(SSL_verify_mode => 0, verify_hostname => 0) if $args{ssl_verify_none};
+
+        # Configure a cookie_jar so that we can send Cookie headers
+        $ua->cookie_jar(HTTP::CookieJar::LWP->new());
     }
 
     return bless {
         rest => $rest,
         json => JSON->new->utf8->allow_nonref,
         api  => $api,
+        args => \%args,
     } => $class;
+}
+
+sub new_session {
+    my ($class, @args) = @_;
+    my $jira = $class->new(@args);
+    $jira->{_session} = $jira->POST('/rest/auth/1/session', undef, {
+        username => $jira->{args}{username},
+        password => $jira->{args}{password},
+    });
+    return $jira;
+}
+
+sub DESTROY {
+    my $self = shift;
+    $self->DELETE('/rest/auth/1/session') if exists $self->{_session};
+    return;
 }
 
 sub _search_for_credentials {
@@ -363,6 +383,8 @@ sub attach_files {
         $response->is_success
             or croak $self->_error("attach_files($file): " . $response->status_line);
     }
+
+    return;
 }
 
 1;
@@ -379,7 +401,7 @@ JIRA::REST - Thin wrapper around Jira's REST API
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -459,17 +481,17 @@ endpoints have a path prefix of C</rest/agile/VERSION>.
 
 =back
 
-=head1 CONSTRUCTOR
+=head1 CONSTRUCTORS
 
 =head2 new HASHREF
 
 =head2 new URL, USERNAME, PASSWORD, REST_CLIENT_CONFIG, ANONYMOUS, PROXY, SSL_VERIFY_NONE
 
-The constructor can take its arguments from a single hash reference or from
-a list of positional parameters. The first form is preferred because it lets
-you specify only the arguments you need. The second form forces you to pass
-undefined values if you need to pass a specific value to an argument further
-to the right.
+The default constructor can take its arguments from a single hash reference or
+from a list of positional parameters. The first form is preferred because it
+lets you specify only the arguments you need. The second form forces you to pass
+undefined values if you need to pass a specific value to an argument further to
+the right.
 
 The arguments are described below with the names which must be used as the
 hash keys:
@@ -548,6 +570,19 @@ no username or password.  This way you can access public Jira servers
 without needing to authenticate.
 
 =back
+
+=head2 new_session OPTIONS
+
+This 'session' constructor first invokes the default constructor, passing to it
+all the options it receives. Then it makes a C<POST /rest/auth/1/session> to
+login to Jira, creating a user session.
+
+This is particularly useful when interacting with Jira Data Center, because it
+can use the session cookie to maintain affinity with one of the redundant
+servers.
+
+When created with this constructor, upon destruction the object makes a C<DELETE
+/rest/auth/1/session> to logout from Jira.
 
 =head1 REST METHODS
 
@@ -695,22 +730,22 @@ interface to attach files to issues.
 
 =head1 PERL AND JIRA COMPATIBILITY POLICY
 
-Currently L<JIRA::REST> requires Perl 5.10 and supports Jira 7.0.
+Currently L<JIRA::REST> requires Perl 5.16 and supports Jira 7.0.
 
 We try to be compatible with the Perl native packages of the oldest L<Ubuntu
 LTS|https://www.ubuntu.com/info/release-end-of-life> and
 L<CentOS|https://wiki.centos.org/About/Product> Linux distributions still
 getting maintainance updates.
 
-  +-----------------------+------+-------------+
-  | Distro                | Perl | End of Life |
-  +-----------------------+------+-------------+
-  | Ubuntu 14.04 (trusty) | 5.18 |   2019-04   |
-  | Ubuntu 16.04 (xenial) | 5.22 |   2021-04   |
-  | Ubuntu 18.04 (bionic) | 5.26 |   2023-04   |
-  | CentOS 6              | 5.10 |   2020-12   |
-  | CentOS 7              | 5.16 |   2024-07   |
-  +-----------------------+------+-------------+
+  +-------------+-----------------------+------+
+  | End of Life | Distro                | Perl |
+  +-------------+-----------------------+------+
+  |   2021-04   | Ubuntu 16.04 (xenial) | 5.22 |
+  |   2023-04   | Ubuntu 18.04 (bionic) | 5.26 |
+  |   2024-07   | CentOS 7              | 5.16 |
+  |   2025-04   | Ubuntu 20.04 (focal ) | 5.30 |
+  |   2029-05   | CentOS 8              | 5.26 |
+  +-------------+-----------------------+------+
 
 As you can see, we're kept behind mostly by the slow pace of CentOS (actually,
 RHEL) releases.
@@ -751,7 +786,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2021 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -87,6 +87,11 @@ Set to C<undef> to prevent any manipulation of the filename suffix.
 The character set stated in the MIME type of the downloaded CSV file.
 Defaults to C<utf-8>.
 
+=head2 content_type
+
+The Content-Type header to be set for the downloaded file.
+Defaults to C<text/csv>.
+
 =head2 eol, quote_char, sep_char, etc.
 
 Any remaining configuration parameters are passed directly to
@@ -198,9 +203,9 @@ use strict;
 use warnings;
 
 use 5.009_005;
-our $VERSION = "1.7";
+our $VERSION = "1.8";
 
-__PACKAGE__->mk_accessors ( qw ( csv charset suffix ) );
+__PACKAGE__->mk_accessors ( qw ( csv charset suffix content_type ) );
 
 sub new {
   ( my $self, my $app, my $arguments ) = @_;
@@ -210,6 +215,7 @@ sub new {
     eol => "\r\n",
     charset => "utf-8",
     suffix => "csv",
+    content_type => "text/csv",
     %{ $self->config },
     %$arguments,
   };
@@ -222,6 +228,10 @@ sub new {
   # Record suffix
   $self->suffix ( $config->{suffix} );
   delete $config->{suffix};
+
+  # Record content-type
+  $self->content_type( $config->{content_type} );
+  delete $config->{content_type};
 
   # Create underlying Text::CSV object
   delete $config->{catalyst_component_name};
@@ -239,6 +249,7 @@ sub process {
   my $charset = $self->charset;
   my $suffix = $self->suffix;
   my $csv = $self->csv;
+  my $content_type = $self->content_type;
 
   # Extract stash parameters
   my $columns = $c->stash->{columns};
@@ -261,7 +272,7 @@ sub process {
   # Set HTTP headers
   my $response = $c->response;
   my $headers = $response->headers;
-  my @content_type = ( "text/csv",
+  my @content_type = ( $content_type,
 		       "header=".( $columns ? "present" : "absent" ),
 		       "charset=".$charset );
   $headers->content_type ( join ( "; ", @content_type ) );

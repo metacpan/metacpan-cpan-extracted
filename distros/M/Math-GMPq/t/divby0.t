@@ -276,11 +276,11 @@ if($@) {
   for(21..24) {print "ok $_\n"}
 }
 
-#elsif($Math::MPFR::VERSION < 3.36) {
-#  warn "Skipping tests 21 to 24 - need Math-MPFR-3.36 or later\n";
-#  warn "We have only version $Math::MPFR::VERSION\n";
-#  for(21..24) {print "ok $_\n"}
-#}
+elsif($Math::MPFR::VERSION < 3.13) {
+  warn "Skipping tests 21 to 24 - need Math-MPFR-3.13 or later\n";
+  warn "We have only version $Math::MPFR::VERSION\n";
+  for(21..24) {print "ok $_\n"}
+}
 
 else {
 

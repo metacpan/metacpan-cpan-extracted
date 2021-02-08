@@ -1,5 +1,12 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.07    2021-02-02
+        [CHANGES]
+         * Use the proper future_asyncawait_on_loaded() mechanism to enable
+           async mode
+         * Update to latest hax/ files
+         * Added some more unit tests for multiple nested scopes
+
 0.06    2020-11-01
         [BUGFIXES]
          * When restoring an HELEM we should sv_setsv() on it rather than

@@ -1,7 +1,7 @@
-use v5.28;
+use v5.24;
 use warnings;
 use Test::More;
-use Quantum::Superpositions::Lazy qw(superpos fetch_matches);
+use Q::S::L qw(superpos fetch_matches);
 
 sub get_factors
 {

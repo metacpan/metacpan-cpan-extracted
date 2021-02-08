@@ -12,7 +12,7 @@ use Image::Size;
 use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile);
 use App::Followme::FIO;
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -22,6 +22,7 @@ sub parameters {
 
     return (
             extension => 'jpg',
+            target_prefix => 'img',
             thumb_suffix => '-thumb',
            );
 }
@@ -61,7 +62,7 @@ sub get_thumb_file {
 sub get_url {
     my ($self, $filename) = @_;
 
-    return $self->filename_to_url($self->{base_directory},
+    return $self->filename_to_url($self->{top_directory},
                                   $filename);
 }
 
@@ -135,6 +136,10 @@ class based on it:
 =item extension
 
 The extension used by jpeg files.
+
+=item target_prefix
+
+The prefix used to build the target names. The default value is 'img'.
 
 =item thumb_suffix
 

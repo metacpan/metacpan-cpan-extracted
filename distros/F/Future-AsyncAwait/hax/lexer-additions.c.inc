@@ -71,18 +71,30 @@ static SV *MY_lex_scan_ident(pTHX_ int flags)
   return ret;
 }
 
-#define lex_scan_attr()  MY_lex_scan_attr(aTHX)
-static SV *MY_lex_scan_attr(pTHX)
+#define lex_scan_attrval_into(name, val)  MY_lex_scan_attrval_into(aTHX_ name, val)
+static bool MY_lex_scan_attrval_into(pTHX_ SV *name, SV *val)
 {
-  SV *ret = lex_scan_ident();
-  if(!ret)
-    return ret;
+  /* TODO: really want  lex_scan_ident_into() */
+  SV *n = lex_scan_ident();
+  if(!n)
+    return false;
+
+  sv_setsv(name, n);
+  SvREFCNT_dec(n);
+
+  if(name != val)
+    SvPOK_off(val);
 
   /* Do not read space here as space is not allowed between NAME(ARGS) */
 
   if(lex_peek_unichar(0) != '(')
-    return ret;
-  sv_cat_c(ret, lex_read_unichar(0));
+    return true;
+
+  lex_read_unichar(0);
+  if(name == val)
+    sv_cat_c(val, '(');
+  else
+    sv_setpvs(val, "");
 
   int count = 1;
   I32 c = lex_peek_unichar(0);
@@ -95,21 +107,38 @@ static SV *MY_lex_scan_attr(pTHX)
       /* The next char does not bump count even if it is ( or );
        * the \\ is still captured
        */
-      sv_cat_c(ret, lex_read_unichar(0));
+      sv_cat_c(val, lex_read_unichar(0));
       c = lex_peek_unichar(0);
       if(c == -1)
         goto unterminated;
     }
 
-    sv_cat_c(ret, lex_read_unichar(0));
+    /* Don't append final closing ')' on split name/val */
+    if(count || (name == val))
+      sv_cat_c(val, c);
+    lex_read_unichar(0);
+
     c = lex_peek_unichar(0);
   }
 
-  if(c != -1)
-    return ret;
+  if(c == -1)
+    return false;
+
+  return true;
 
 unterminated:
   croak("Unterminated attribute parameter in attribute list");
+}
+
+#define lex_scan_attr()  MY_lex_scan_attr(aTHX)
+static SV *MY_lex_scan_attr(pTHX)
+{
+  SV *ret = newSV(0);
+  if(MY_lex_scan_attrval_into(aTHX_ ret, ret))
+    return ret;
+
+  SvREFCNT_dec(ret);
+  return NULL;
 }
 
 #define lex_scan_attrs(compcv)  MY_lex_scan_attrs(aTHX_ compcv)
@@ -135,6 +164,12 @@ static OP *MY_lex_scan_attrs(pTHX_ CV *compcv)
       attrs = newLISTOP(OP_LIST, 0, NULL, NULL);
 
     attrs = op_append_elem(OP_LIST, attrs, newSVOP(OP_CONST, 0, attr));
+
+    /* Accept additional colons to prefix additional attrs */
+    if(lex_peek_unichar(0) == ':') {
+      lex_read_unichar(0);
+      lex_read_space(0);
+    }
   }
 
   return attrs;
@@ -204,16 +239,28 @@ static SV *MY_lex_scan_parenthesized(pTHX)
 #define lex_scan_version(flags)  MY_lex_scan_version(aTHX_ flags)
 static SV *MY_lex_scan_version(pTHX_ int flags)
 {
-  const char *err = NULL;
-  const char *endp = prescan_version(PL_parser->bufptr, FALSE, &err, NULL, NULL, NULL, NULL);
+  I32 c;
+  SV *tmpsv = sv_2mortal(newSVpvs(""));
 
-  if(endp == PL_parser->bufptr && (flags & PARSE_OPTIONAL))
+  /* scan_version() expects a version to end in linefeed, semicolon or
+   * openbrace; gets confused if other keywords are fine. We'll have to
+   * extract it first.
+   *   https://rt.cpan.org/Ticket/Display.html?id=132903
+   */
+
+  while((c = lex_peek_unichar(0))) {
+    /* Allow a single leading v before accepting only digits, dot, underscore */
+    if((!SvCUR(tmpsv) && (c == 'v')) || strchr("0123456789._", c))
+      sv_cat_c(tmpsv, lex_read_unichar(0));
+    else
+      break;
+  }
+
+  if(!SvCUR(tmpsv) && (flags & PARSE_OPTIONAL))
     return NULL;
 
   SV *ret = newSV(0);
-  endp = scan_version(PL_parser->bufptr, ret, FALSE);
-
-  lex_read_to((char *)endp);
+  scan_version(SvPVX(tmpsv), ret, FALSE);
 
   return ret;
 }
@@ -239,4 +286,13 @@ static PADOFFSET MY_parse_lexvar(pTHX)
     croak("Can't use global $_ in \"my\"");
 
   return pad_add_name_pvn(lexname, PL_parser->bufptr - lexname, 0, NULL, NULL);
+}
+
+#define parse_scoped_block(flags)  MY_parse_scoped_block(aTHX_ flags)
+static OP *MY_parse_scoped_block(pTHX_ int flags)
+{
+  OP *ret;
+  I32 save_ix = block_start(TRUE);
+  ret = parse_block(flags);
+  return block_end(save_ix, ret);
 }

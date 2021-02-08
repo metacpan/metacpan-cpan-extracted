@@ -2,13 +2,16 @@ package Test::Class::Moose::Report::Instance;
 
 # ABSTRACT: Reporting on test classes
 
+use strict;
+use warnings;
+use namespace::autoclean;
+
 use 5.010000;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Moose;
 use Carp;
-use namespace::autoclean;
 
 with qw(
   Test::Class::Moose::Role::Reporting
@@ -59,7 +62,7 @@ Test::Class::Moose::Report::Instance - Reporting on test classes
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 
@@ -83,8 +86,8 @@ Returns an array of L<Test::Class::Moose::Report::Method> objects.
 
 =head2 C<current_method>
 
-Returns the current (really, most recent)
-L<Test::Class::Moose::Report::Method> object that is being run.
+Returns the current (really, most recent) L<Test::Class::Moose::Report::Method>
+object that is being run.
 
 =head1 SUPPORT
 
@@ -112,7 +115,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

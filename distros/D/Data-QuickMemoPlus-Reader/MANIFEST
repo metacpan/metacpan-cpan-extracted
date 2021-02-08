@@ -12,6 +12,7 @@ minil.toml
 t/00_compile.t
 t/01_warnings.t
 t/02_main.t
+t/data/QuickMemo _191208_220400(6).lqm
 t/data/QuickMemo+_191208_220400(5).lqm
 t/data/garbled.lqm
 t/data/good_file.lqm

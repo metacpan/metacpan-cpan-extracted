@@ -3,6 +3,7 @@ use warnings;
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
@@ -10,6 +11,9 @@ use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
 use JSON::Schema::Draft201909;
+
+use lib 't/lib';
+use Helper;
 
 my $js = JSON::Schema::Draft201909->new;
 
@@ -19,7 +23,7 @@ my $tests = sub {
   cmp_deeply(
     $js->evaluate($char, { pattern => '[a-z]' })->TO_JSON,
     {
-      valid => bool(0),
+      valid => false,
       errors => [
         {
           instanceLocation => '',
@@ -34,7 +38,7 @@ my $tests = sub {
   cmp_deeply(
     $js->evaluate($char, { pattern => '\w' })->TO_JSON,
     {
-      valid => bool(1),
+      valid => true,
     },
     $test_substr.' LATIN SMALL LETTER E WITH ACUTE does match the "word" character class, because unicode semantics are used for matching',
   );

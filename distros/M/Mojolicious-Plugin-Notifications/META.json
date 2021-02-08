@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Mojo::Session" : "1.05",
+            "Test::Mojo::Session" : "1.06",
             "Test::More" : "0"
          }
       },
@@ -40,13 +40,18 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Akron/Mojolicious-Plugin-Notifications/issues"
+      },
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ],
       "repository" : {
-         "url" : "https://github.com/Akron/Mojolicious-Plugin-Notifications"
+         "type" : "git",
+         "url" : "https://github.com/Akron/Mojolicious-Plugin-Notifications.git",
+         "web" : "https://github.com/Akron/Mojolicious-Plugin-Notifications"
       }
    },
-   "version" : "1.05",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

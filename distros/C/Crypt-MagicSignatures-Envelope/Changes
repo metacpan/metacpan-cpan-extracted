@@ -1,6 +1,37 @@
-0.10 2015-11-05
+0.15 2021-02-07
+        - Move bugtracker to GitHub.
+
+0.14 2018-03-18
+        - Updated dependency for C::MS::Key.
+        - Improve treatment of failing envelopes.
+
+0.13 2017-07-02
+        - Updated dependency for C::MS::Key.
+
+0.12 2016-10-30
+        - Improved code coverage
+                 stmt   bran   cond    sub   time  total
+               ------ ------ ------ ------ ------ ------
+          From:  96.5   78.6   87.8  100.0  100.0   89.9
+          To :   96.6   80.4   87.8  100.0  100.0   90.6
+               ------ ------ ------ ------ ------ ------
+
+0.11 2016-10-03
+        - Updated to recent version of C::MS::Key.
+        - Made access rights Kwalitee compliant.
+        - Added Readme.
+        - Improved code coverage
+                 stmt   bran   cond    sub   time  total
+               ------ ------ ------ ------ ------ ------
+          From:  86.9   59.8   63.4  100.0  100.0   76.1
+          To:    96.5   78.6   87.8  100.0  100.0   89.9
+               ------ ------ ------ ------ ------ ------
+        - Fixed error handling.
+        - Improved Makefile with meta_merge.
+
+0.10 2015-05-11
         - Warn on signing with public key.
-	- Fixed minimum dependency.
+        - Fixed minimum dependency.
 
 0.09 2015-02-21
         - Fixed padding removal in to_json.
@@ -13,29 +44,29 @@
 
 0.06 2013-08-06
         - Disabled smartmatch.
-	- Updated test suite.
+        - Updated test suite.
         - Small improvements of the documentation.
-	- Update for Mojolicious 4.23.
+        - Update for Mojolicious 4.23.
 
 0.05 2013-03-04
         - Update C::MS::Key dependency.
-	- Add recommendations for speed improvement.
-	- Update Makefile.
-	- Some improvements based on perlcritic.
-	- Improvements of documentation.
+        - Add recommendations for speed improvement.
+        - Update Makefile.
+        - Some improvements based on perlcritic.
+        - Improvements of documentation.
 
 0.04 2013-02-14
         - Small code improvements.
-	- Update C::MS::Key dependency.
+        - Update C::MS::Key dependency.
 
 0.03 2013-02-08
-	- Fix documentation bug.
-	- Lots of small code improvements.
+        - Fix documentation bug.
+        - Lots of small code improvements.
 
 0.02 2013-02-06
         - Documentation tweaks.
-	- Fix documentation bug.
-	- Update C::MS::Key dependency.
+        - Fix documentation bug.
+        - Update C::MS::Key dependency.
 
 0.01 2013-02-04
         - Initial submission to GitHub.

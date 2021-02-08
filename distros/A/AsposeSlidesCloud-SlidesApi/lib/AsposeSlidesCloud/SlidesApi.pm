@@ -442,11 +442,6 @@ sub delete_chart_category {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -454,6 +449,11 @@ sub delete_chart_category {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -610,11 +610,6 @@ sub delete_chart_data_point {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -622,6 +617,11 @@ sub delete_chart_data_point {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -774,11 +774,6 @@ sub delete_chart_series {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -786,6 +781,11 @@ sub delete_chart_series {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -1085,11 +1085,6 @@ sub delete_notes_slide {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -1097,6 +1092,11 @@ sub delete_notes_slide {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -1228,11 +1228,6 @@ sub delete_notes_slide_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -1240,6 +1235,11 @@ sub delete_notes_slide_paragraph {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -1385,11 +1385,6 @@ sub delete_notes_slide_paragraphs {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -1397,6 +1392,11 @@ sub delete_notes_slide_paragraphs {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -1546,11 +1546,6 @@ sub delete_notes_slide_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -1558,6 +1553,11 @@ sub delete_notes_slide_portion {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -1721,11 +1721,6 @@ sub delete_notes_slide_portions {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -1733,6 +1728,11 @@ sub delete_notes_slide_portions {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -1867,11 +1867,6 @@ sub delete_notes_slide_shape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -1879,6 +1874,11 @@ sub delete_notes_slide_shape {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -2006,11 +2006,6 @@ sub delete_notes_slide_shapes {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -2018,6 +2013,11 @@ sub delete_notes_slide_shapes {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -2149,11 +2149,6 @@ sub delete_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -2161,6 +2156,11 @@ sub delete_paragraph {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -2306,11 +2306,6 @@ sub delete_paragraphs {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -2318,6 +2313,11 @@ sub delete_paragraphs {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -2467,11 +2467,6 @@ sub delete_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -2479,6 +2474,11 @@ sub delete_portion {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -2642,11 +2642,6 @@ sub delete_portions {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -2654,6 +2649,11 @@ sub delete_portions {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -2788,11 +2788,6 @@ sub delete_section {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -2800,6 +2795,11 @@ sub delete_section {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -2920,11 +2920,6 @@ sub delete_sections {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -2932,6 +2927,11 @@ sub delete_sections {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -3034,11 +3034,6 @@ sub delete_slide_animation {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -3046,6 +3041,11 @@ sub delete_slide_animation {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -3166,11 +3166,6 @@ sub delete_slide_animation_effect {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -3178,6 +3173,11 @@ sub delete_slide_animation_effect {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -3305,11 +3305,6 @@ sub delete_slide_animation_interactive_sequence {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -3317,6 +3312,11 @@ sub delete_slide_animation_interactive_sequence {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -3455,11 +3455,6 @@ sub delete_slide_animation_interactive_sequence_effect {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -3467,6 +3462,11 @@ sub delete_slide_animation_interactive_sequence_effect {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -3590,11 +3590,6 @@ sub delete_slide_animation_interactive_sequences {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -3602,6 +3597,11 @@ sub delete_slide_animation_interactive_sequences {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -3711,11 +3711,6 @@ sub delete_slide_animation_main_sequence {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -3723,6 +3718,11 @@ sub delete_slide_animation_main_sequence {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -3832,11 +3832,6 @@ sub delete_slide_by_index {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -3844,6 +3839,11 @@ sub delete_slide_by_index {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -3964,11 +3964,6 @@ sub delete_slide_shape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -3976,6 +3971,11 @@ sub delete_slide_shape {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -4103,11 +4103,6 @@ sub delete_slide_shapes {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -4115,6 +4110,11 @@ sub delete_slide_shapes {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -4246,11 +4246,6 @@ sub delete_slide_subshape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -4258,6 +4253,11 @@ sub delete_slide_subshape {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -4403,11 +4403,6 @@ sub delete_slide_subshapes {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -4415,6 +4410,11 @@ sub delete_slide_subshapes {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -4531,11 +4531,6 @@ sub delete_slides_clean_slides_list {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -4543,6 +4538,11 @@ sub delete_slides_clean_slides_list {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -4634,11 +4634,6 @@ sub delete_slides_document_properties {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -4646,6 +4641,11 @@ sub delete_slides_document_properties {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -4748,11 +4748,6 @@ sub delete_slides_document_property {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -4760,6 +4755,11 @@ sub delete_slides_document_property {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -4869,11 +4869,6 @@ sub delete_slides_slide_background {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -4881,6 +4876,11 @@ sub delete_slides_slide_background {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -5023,11 +5023,6 @@ sub delete_subshape_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -5035,6 +5030,11 @@ sub delete_subshape_paragraph {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -5198,11 +5198,6 @@ sub delete_subshape_paragraphs {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -5210,6 +5205,11 @@ sub delete_subshape_paragraphs {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -5377,11 +5377,6 @@ sub delete_subshape_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -5389,6 +5384,11 @@ sub delete_subshape_portion {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -5570,11 +5570,6 @@ sub delete_subshape_portions {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -5582,6 +5577,11 @@ sub delete_subshape_portions {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -6029,11 +6029,6 @@ sub get_layout_slide {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -6041,6 +6036,11 @@ sub get_layout_slide {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -6139,11 +6139,6 @@ sub get_layout_slides_list {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -6151,6 +6146,11 @@ sub get_layout_slides_list {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -6253,11 +6253,6 @@ sub get_master_slide {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -6265,6 +6260,11 @@ sub get_master_slide {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -6363,11 +6363,6 @@ sub get_master_slides_list {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -6375,6 +6370,11 @@ sub get_master_slides_list {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -6477,11 +6477,6 @@ sub get_notes_slide {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -6489,6 +6484,11 @@ sub get_notes_slide {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -6598,11 +6598,6 @@ sub get_notes_slide_exists {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -6610,6 +6605,11 @@ sub get_notes_slide_exists {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -6719,11 +6719,6 @@ sub get_notes_slide_header_footer {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -6731,6 +6726,11 @@ sub get_notes_slide_header_footer {
     # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -6851,11 +6851,6 @@ sub get_notes_slide_shape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -6863,6 +6858,11 @@ sub get_notes_slide_shape {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -7001,11 +7001,6 @@ sub get_notes_slide_shape_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -7013,6 +7008,11 @@ sub get_notes_slide_shape_paragraph {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -7147,11 +7147,6 @@ sub get_notes_slide_shape_paragraphs {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -7159,6 +7154,11 @@ sub get_notes_slide_shape_paragraphs {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -7308,11 +7308,6 @@ sub get_notes_slide_shape_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -7320,6 +7315,11 @@ sub get_notes_slide_shape_portion {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -7472,11 +7472,6 @@ sub get_notes_slide_shape_portions {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -7484,6 +7479,11 @@ sub get_notes_slide_shape_portions {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -7607,11 +7607,6 @@ sub get_notes_slide_shapes {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -7619,6 +7614,11 @@ sub get_notes_slide_shapes {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -7767,11 +7767,6 @@ sub get_notes_slide_with_format {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -7784,6 +7779,11 @@ sub get_notes_slide_with_format {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -7933,11 +7933,6 @@ sub get_paragraph_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -7945,6 +7940,11 @@ sub get_paragraph_portion {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -8097,11 +8097,6 @@ sub get_paragraph_portions {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -8109,6 +8104,11 @@ sub get_paragraph_portions {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -8221,11 +8221,6 @@ sub get_sections {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -8233,6 +8228,11 @@ sub get_sections {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -8346,11 +8346,6 @@ sub get_slide_animation {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -8358,6 +8353,11 @@ sub get_slide_animation {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -8467,11 +8467,6 @@ sub get_slide_header_footer {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -8479,6 +8474,11 @@ sub get_slide_header_footer {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -8599,11 +8599,6 @@ sub get_slide_shape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -8611,6 +8606,11 @@ sub get_slide_shape {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -8749,11 +8749,6 @@ sub get_slide_shape_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -8761,6 +8756,11 @@ sub get_slide_shape_paragraph {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -8895,11 +8895,6 @@ sub get_slide_shape_paragraphs {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -8907,6 +8902,11 @@ sub get_slide_shape_paragraphs {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -9023,11 +9023,6 @@ sub get_slide_shapes {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -9035,6 +9030,11 @@ sub get_slide_shapes {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -9166,11 +9166,6 @@ sub get_slide_subshape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -9178,6 +9173,11 @@ sub get_slide_subshape {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -9334,11 +9334,6 @@ sub get_slide_subshape_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -9346,6 +9341,11 @@ sub get_slide_subshape_paragraph {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -9498,11 +9498,6 @@ sub get_slide_subshape_paragraphs {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -9510,6 +9505,11 @@ sub get_slide_subshape_paragraphs {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -9644,11 +9644,6 @@ sub get_slide_subshapes {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -9656,6 +9651,11 @@ sub get_slide_subshapes {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -9813,11 +9813,6 @@ sub get_slides_document {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -9825,6 +9820,11 @@ sub get_slides_document {
     # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -9916,11 +9916,6 @@ sub get_slides_document_properties {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -9928,6 +9923,11 @@ sub get_slides_document_properties {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -10030,11 +10030,6 @@ sub get_slides_document_property {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -10042,6 +10037,11 @@ sub get_slides_document_property {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -10151,11 +10151,6 @@ sub get_slides_image_with_default_format {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -10163,6 +10158,11 @@ sub get_slides_image_with_default_format {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -10283,11 +10283,6 @@ sub get_slides_image_with_format {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -10295,6 +10290,11 @@ sub get_slides_image_with_format {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -10400,11 +10400,6 @@ sub get_slides_images {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -10412,6 +10407,11 @@ sub get_slides_images {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -10525,11 +10525,6 @@ sub get_slides_placeholder {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -10537,6 +10532,11 @@ sub get_slides_placeholder {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -10653,11 +10653,6 @@ sub get_slides_placeholders {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -10665,6 +10660,11 @@ sub get_slides_placeholders {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -10774,11 +10774,6 @@ sub get_slides_presentation_text_items {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -10786,6 +10781,11 @@ sub get_slides_presentation_text_items {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -10810,6 +10810,109 @@ sub get_slides_presentation_text_items {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('TextItems', $response);
+    return $_response_object;
+}
+
+#
+# get_slides_protection_properties
+#
+# Read presentation protection properties.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_protection_properties' } = { 
+    	summary => 'Read presentation protection properties.',
+        params => $params,
+        returns => 'ProtectionProperties',
+        };
+}
+# @return ProtectionProperties
+#
+sub get_slides_protection_properties {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_slides_protection_properties");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/protectionProperties';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ProtectionProperties', $response);
     return $_response_object;
 }
 
@@ -10888,11 +10991,6 @@ sub get_slides_slide {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -10900,6 +10998,11 @@ sub get_slides_slide {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -11009,11 +11112,6 @@ sub get_slides_slide_background {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -11021,6 +11119,11 @@ sub get_slides_slide_background {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -11130,11 +11233,6 @@ sub get_slides_slide_comments {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -11142,6 +11240,11 @@ sub get_slides_slide_comments {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -11251,11 +11354,6 @@ sub get_slides_slide_images {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -11263,6 +11361,11 @@ sub get_slides_slide_images {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -11294,6 +11397,109 @@ sub get_slides_slide_images {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('Images', $response);
+    return $_response_object;
+}
+
+#
+# get_slides_slide_properties
+#
+# Read presentation slide properties.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_slide_properties' } = { 
+    	summary => 'Read presentation slide properties.',
+        params => $params,
+        returns => 'SlideProperties',
+        };
+}
+# @return SlideProperties
+#
+sub get_slides_slide_properties {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_slides_slide_properties");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slideProperties';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SlideProperties', $response);
     return $_response_object;
 }
 
@@ -11383,11 +11589,6 @@ sub get_slides_slide_text_items {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -11395,6 +11596,11 @@ sub get_slides_slide_text_items {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -11493,11 +11699,6 @@ sub get_slides_slides_list {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -11505,6 +11706,11 @@ sub get_slides_slides_list {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -11607,11 +11813,6 @@ sub get_slides_theme {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -11619,6 +11820,11 @@ sub get_slides_theme {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -11728,11 +11934,6 @@ sub get_slides_theme_color_scheme {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -11740,6 +11941,11 @@ sub get_slides_theme_color_scheme {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -11849,11 +12055,6 @@ sub get_slides_theme_font_scheme {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -11861,6 +12062,11 @@ sub get_slides_theme_font_scheme {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -11970,11 +12176,6 @@ sub get_slides_theme_format_scheme {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -11982,6 +12183,11 @@ sub get_slides_theme_format_scheme {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -12080,11 +12286,6 @@ sub get_slides_view_properties {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -12092,6 +12293,11 @@ sub get_slides_view_properties {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -12238,11 +12444,6 @@ sub get_subshape_paragraph_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -12250,6 +12451,11 @@ sub get_subshape_paragraph_portion {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -12420,11 +12626,6 @@ sub get_subshape_paragraph_portions {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -12432,6 +12633,11 @@ sub get_subshape_paragraph_portions {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -12901,11 +13107,6 @@ sub post_add_new_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -12918,6 +13119,11 @@ sub post_add_new_paragraph {
     # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -13078,11 +13284,6 @@ sub post_add_new_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -13095,6 +13296,11 @@ sub post_add_new_portion {
     # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -13241,11 +13447,6 @@ sub post_add_new_shape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -13263,6 +13464,11 @@ sub post_add_new_shape {
     # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -13406,11 +13612,6 @@ sub post_add_new_subshape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -13428,6 +13629,11 @@ sub post_add_new_subshape {
     # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -13588,11 +13794,6 @@ sub post_add_new_subshape_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -13605,6 +13806,11 @@ sub post_add_new_subshape_paragraph {
     # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -13783,11 +13989,6 @@ sub post_add_new_subshape_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -13800,6 +14001,11 @@ sub post_add_new_subshape_portion {
     # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -13946,11 +14152,6 @@ sub post_add_notes_slide {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -13958,6 +14159,11 @@ sub post_add_notes_slide {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -14094,11 +14300,6 @@ sub post_chart_category {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -14106,6 +14307,11 @@ sub post_chart_category {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -14260,11 +14466,6 @@ sub post_chart_data_point {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -14272,6 +14473,11 @@ sub post_chart_data_point {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -14422,11 +14628,6 @@ sub post_chart_series {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -14434,6 +14635,11 @@ sub post_chart_series {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -14588,18 +14794,8 @@ sub post_copy_layout_slide_from_source_presentation {
     }
 
     # query params
-    if (exists $args{'clone_from_password'} && defined $args{'clone_from_password'}) {
-        $query_params->{'cloneFromPassword'} = $self->{api_client}->to_query_value($args{'clone_from_password'});
-    }
-
-    # query params
     if (exists $args{'clone_from_storage'} && defined $args{'clone_from_storage'}) {
         $query_params->{'cloneFromStorage'} = $self->{api_client}->to_query_value($args{'clone_from_storage'});
-    }
-
-    # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
     }
 
     # query params
@@ -14610,6 +14806,16 @@ sub post_copy_layout_slide_from_source_presentation {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'clone_from_password'}) {
+        $header_params->{':cloneFromPassword'} = $self->{api_client}->to_header_value($args{'clone_from_password'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -14751,11 +14957,6 @@ sub post_copy_master_slide_from_source_presentation {
     }
 
     # query params
-    if (exists $args{'clone_from_password'} && defined $args{'clone_from_password'}) {
-        $query_params->{'cloneFromPassword'} = $self->{api_client}->to_query_value($args{'clone_from_password'});
-    }
-
-    # query params
     if (exists $args{'clone_from_storage'} && defined $args{'clone_from_storage'}) {
         $query_params->{'cloneFromStorage'} = $self->{api_client}->to_query_value($args{'clone_from_storage'});
     }
@@ -14766,11 +14967,6 @@ sub post_copy_master_slide_from_source_presentation {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -14778,6 +14974,16 @@ sub post_copy_master_slide_from_source_presentation {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'clone_from_password'}) {
+        $header_params->{':cloneFromPassword'} = $self->{api_client}->to_header_value($args{'clone_from_password'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -14867,9 +15073,9 @@ sub post_get_notes_slide {
     }
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream', 'multipart/form-data');
 
-    # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -14964,9 +15170,9 @@ sub post_get_notes_slide_exists {
     }
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream');
 
-    # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -15101,13 +15307,13 @@ sub post_get_notes_slide_with_format {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -15250,11 +15456,6 @@ sub post_notes_slide_add_new_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -15267,6 +15468,11 @@ sub post_notes_slide_add_new_paragraph {
     # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -15427,11 +15633,6 @@ sub post_notes_slide_add_new_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -15444,6 +15645,11 @@ sub post_notes_slide_add_new_portion {
     # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -15595,11 +15801,6 @@ sub post_notes_slide_add_new_shape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -15617,6 +15818,11 @@ sub post_notes_slide_add_new_shape {
     # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -15783,11 +15989,6 @@ sub post_notes_slide_shape_save_as {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -15815,6 +16016,11 @@ sub post_notes_slide_shape_save_as {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -15943,11 +16149,6 @@ sub post_presentation_merge {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -15955,6 +16156,11 @@ sub post_presentation_merge {
     # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -16083,11 +16289,6 @@ sub post_section {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -16095,6 +16296,11 @@ sub post_section {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -16213,11 +16419,6 @@ sub post_section_move {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -16225,6 +16426,11 @@ sub post_section_move {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -16386,11 +16592,6 @@ sub post_shape_save_as {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -16418,6 +16619,11 @@ sub post_shape_save_as {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -16557,11 +16763,6 @@ sub post_slide_animation_effect {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -16569,6 +16770,11 @@ sub post_slide_animation_effect {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -16694,11 +16900,6 @@ sub post_slide_animation_interactive_sequence {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -16706,6 +16907,11 @@ sub post_slide_animation_interactive_sequence {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -16842,11 +17048,6 @@ sub post_slide_animation_interactive_sequence_effect {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -16854,6 +17055,11 @@ sub post_slide_animation_interactive_sequence_effect {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -17020,11 +17226,6 @@ sub post_slide_save_as {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -17037,6 +17238,11 @@ sub post_slide_save_as {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -17164,11 +17370,6 @@ sub post_slides_add {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -17181,6 +17382,11 @@ sub post_slides_add {
     # query params
     if (exists $args{'layout_alias'} && defined $args{'layout_alias'}) {
         $query_params->{'layoutAlias'} = $self->{api_client}->to_query_value($args{'layout_alias'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -17277,13 +17483,13 @@ sub post_slides_convert {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream', 'multipart/form-data');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -17430,18 +17636,8 @@ sub post_slides_copy {
     }
 
     # query params
-    if (exists $args{'source_password'} && defined $args{'source_password'}) {
-        $query_params->{'sourcePassword'} = $self->{api_client}->to_query_value($args{'source_password'});
-    }
-
-    # query params
     if (exists $args{'source_storage'} && defined $args{'source_storage'}) {
         $query_params->{'sourceStorage'} = $self->{api_client}->to_query_value($args{'source_storage'});
-    }
-
-    # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
     }
 
     # query params
@@ -17452,6 +17648,16 @@ sub post_slides_copy {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'source_password'}) {
+        $header_params->{':sourcePassword'} = $self->{api_client}->to_header_value($args{'source_password'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -17555,16 +17761,6 @@ sub post_slides_document {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream', 'multipart/form-data');
 
     # query params
-    if (exists $args{'input_password'} && defined $args{'input_password'}) {
-        $query_params->{'inputPassword'} = $self->{api_client}->to_query_value($args{'input_password'});
-    }
-
-    # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -17572,6 +17768,16 @@ sub post_slides_document {
     # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # header params
+    if ( exists $args{'input_password'}) {
+        $header_params->{':inputPassword'} = $self->{api_client}->to_header_value($args{'input_password'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -17674,11 +17880,6 @@ sub post_slides_document_from_html {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -17686,6 +17887,11 @@ sub post_slides_document_from_html {
     # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -17699,6 +17905,120 @@ sub post_slides_document_from_html {
     # body params
     if ( exists $args{'html'}) {
         $_body_data = $args{'html'};
+    }
+
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Document', $response);
+    return $_response_object;
+}
+
+#
+# post_slides_document_from_pdf
+#
+# Create presentation document from pdf or append pdf to an existing presentation.
+# 
+# @param string $name Document name. (required)
+# @param File $pdf PDF data. (optional)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $folder Document folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'pdf' => {
+        data_type => 'File',
+        description => 'PDF data.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_document_from_pdf' } = { 
+    	summary => 'Create presentation document from pdf or append pdf to an existing presentation.',
+        params => $params,
+        returns => 'Document',
+        };
+}
+# @return Document
+#
+sub post_slides_document_from_pdf {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_slides_document_from_pdf");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/fromPdf';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream');
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'pdf'}) {
+        $_body_data = $args{'pdf'};
     }
 
     my $files;
@@ -17805,18 +18125,8 @@ sub post_slides_document_from_source {
     }
 
     # query params
-    if (exists $args{'source_password'} && defined $args{'source_password'}) {
-        $query_params->{'sourcePassword'} = $self->{api_client}->to_query_value($args{'source_password'});
-    }
-
-    # query params
     if (exists $args{'source_storage'} && defined $args{'source_storage'}) {
         $query_params->{'sourceStorage'} = $self->{api_client}->to_query_value($args{'source_storage'});
-    }
-
-    # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
     }
 
     # query params
@@ -17827,6 +18137,16 @@ sub post_slides_document_from_source {
     # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # header params
+    if ( exists $args{'source_password'}) {
+        $header_params->{':sourcePassword'} = $self->{api_client}->to_header_value($args{'source_password'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -17958,11 +18278,6 @@ sub post_slides_document_from_template {
     }
 
     # query params
-    if (exists $args{'template_password'} && defined $args{'template_password'}) {
-        $query_params->{'templatePassword'} = $self->{api_client}->to_query_value($args{'template_password'});
-    }
-
-    # query params
     if (exists $args{'template_storage'} && defined $args{'template_storage'}) {
         $query_params->{'templateStorage'} = $self->{api_client}->to_query_value($args{'template_storage'});
     }
@@ -17973,11 +18288,6 @@ sub post_slides_document_from_template {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -17985,6 +18295,16 @@ sub post_slides_document_from_template {
     # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # header params
+    if ( exists $args{'template_password'}) {
+        $header_params->{':templatePassword'} = $self->{api_client}->to_header_value($args{'template_password'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -18192,11 +18512,6 @@ sub post_slides_presentation_replace_text {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -18204,6 +18519,11 @@ sub post_slides_presentation_replace_text {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -18322,11 +18642,6 @@ sub post_slides_reorder {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -18334,6 +18649,11 @@ sub post_slides_reorder {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -18454,11 +18774,6 @@ sub post_slides_reorder_many {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -18466,6 +18781,11 @@ sub post_slides_reorder_many {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -18580,11 +18900,6 @@ sub post_slides_save_as {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -18597,6 +18912,11 @@ sub post_slides_save_as {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -18711,11 +19031,6 @@ sub post_slides_set_document_properties {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -18723,6 +19038,11 @@ sub post_slides_set_document_properties {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -18873,11 +19193,6 @@ sub post_slides_slide_replace_text {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -18885,6 +19200,11 @@ sub post_slides_slide_replace_text {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -19061,11 +19381,6 @@ sub post_slides_split {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -19078,6 +19393,11 @@ sub post_slides_split {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -19248,11 +19568,6 @@ sub post_subshape_save_as {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -19280,6 +19595,11 @@ sub post_subshape_save_as {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -19448,11 +19768,6 @@ sub put_chart_category {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -19460,6 +19775,11 @@ sub put_chart_category {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -19632,11 +19952,6 @@ sub put_chart_data_point {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -19644,6 +19959,11 @@ sub put_chart_data_point {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -19812,11 +20132,6 @@ sub put_chart_series {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -19824,6 +20139,11 @@ sub put_chart_series {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -19963,11 +20283,6 @@ sub put_layout_slide {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -19975,6 +20290,11 @@ sub put_layout_slide {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -20100,11 +20420,6 @@ sub put_notes_slide_header_footer {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -20112,6 +20427,11 @@ sub put_notes_slide_header_footer {
     # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -20294,11 +20614,6 @@ sub put_notes_slide_shape_save_as {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -20326,6 +20641,11 @@ sub put_notes_slide_shape_save_as {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -20450,11 +20770,6 @@ sub put_presentation_merge {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -20462,6 +20777,11 @@ sub put_presentation_merge {
     # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -20585,11 +20905,6 @@ sub put_section {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -20597,6 +20912,11 @@ sub put_section {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -20706,11 +21026,6 @@ sub put_sections {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -20718,6 +21033,11 @@ sub put_sections {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -20869,11 +21189,6 @@ sub put_set_paragraph_portion_properties {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -20881,6 +21196,11 @@ sub put_set_paragraph_portion_properties {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -21049,11 +21369,6 @@ sub put_set_paragraph_properties {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -21061,6 +21376,11 @@ sub put_set_paragraph_properties {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -21244,11 +21564,6 @@ sub put_set_subshape_paragraph_portion_properties {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -21256,6 +21571,11 @@ sub put_set_subshape_paragraph_portion_properties {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -21442,11 +21762,6 @@ sub put_set_subshape_paragraph_properties {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -21454,6 +21769,11 @@ sub put_set_subshape_paragraph_properties {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -21657,11 +21977,6 @@ sub put_shape_save_as {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -21689,6 +22004,11 @@ sub put_shape_save_as {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -21824,11 +22144,6 @@ sub put_slide_animation {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -21836,6 +22151,11 @@ sub put_slide_animation {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -21972,11 +22292,6 @@ sub put_slide_animation_effect {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -21984,6 +22299,11 @@ sub put_slide_animation_effect {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -22138,11 +22458,6 @@ sub put_slide_animation_interactive_sequence_effect {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -22150,6 +22465,11 @@ sub put_slide_animation_interactive_sequence_effect {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -22289,11 +22609,6 @@ sub put_slide_header_footer {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -22301,6 +22616,11 @@ sub put_slide_header_footer {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -22476,11 +22796,6 @@ sub put_slide_save_as {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -22493,6 +22808,11 @@ sub put_slide_save_as {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -22632,11 +22952,6 @@ sub put_slide_shape_info {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -22644,6 +22959,11 @@ sub put_slide_shape_info {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -22798,11 +23118,6 @@ sub put_slide_subshape_info {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -22810,6 +23125,11 @@ sub put_slide_subshape_info {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -22948,13 +23268,13 @@ sub put_slides_convert {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -23053,11 +23373,6 @@ sub put_slides_document_from_html {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -23065,6 +23380,11 @@ sub put_slides_document_from_html {
     # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -23172,11 +23492,6 @@ sub put_slides_header_footer {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -23184,6 +23499,11 @@ sub put_slides_header_footer {
     # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -23213,6 +23533,125 @@ sub put_slides_header_footer {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('Document', $response);
+    return $_response_object;
+}
+
+#
+# put_slides_protection_properties
+#
+# Update presentation protection properties.
+# 
+# @param string $name Document name. (required)
+# @param ProtectionProperties $dto The view properties data. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ProtectionProperties',
+        description => 'The view properties data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_protection_properties' } = { 
+    	summary => 'Update presentation protection properties.',
+        params => $params,
+        returns => 'ProtectionProperties',
+        };
+}
+# @return ProtectionProperties
+#
+sub put_slides_protection_properties {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_slides_protection_properties");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_slides_protection_properties");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/protectionProperties';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ProtectionProperties', $response);
     return $_response_object;
 }
 
@@ -23319,11 +23758,6 @@ sub put_slides_save_as {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -23336,6 +23770,11 @@ sub put_slides_save_as {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -23457,11 +23896,6 @@ sub put_slides_set_document_property {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -23469,6 +23903,11 @@ sub put_slides_set_document_property {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -23594,11 +24033,6 @@ sub put_slides_slide {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -23606,6 +24040,11 @@ sub put_slides_slide {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -23736,13 +24175,13 @@ sub put_slides_slide_background {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -23878,13 +24317,13 @@ sub put_slides_slide_background_color {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -23916,6 +24355,125 @@ sub put_slides_slide_background_color {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('SlideBackground', $response);
+    return $_response_object;
+}
+
+#
+# put_slides_slide_properties
+#
+# Update presentation slide properties.
+# 
+# @param string $name Document name. (required)
+# @param SlideProperties $dto The view properties data. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'SlideProperties',
+        description => 'The view properties data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_slide_properties' } = { 
+    	summary => 'Update presentation slide properties.',
+        params => $params,
+        returns => 'SlideProperties',
+        };
+}
+# @return SlideProperties
+#
+sub put_slides_slide_properties {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_slides_slide_properties");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_slides_slide_properties");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slideProperties';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SlideProperties', $response);
     return $_response_object;
 }
 
@@ -24007,11 +24565,6 @@ sub put_slides_slide_size {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
@@ -24039,6 +24592,11 @@ sub put_slides_slide_size {
     # query params
     if (exists $args{'scale_type'} && defined $args{'scale_type'}) {
         $query_params->{'scaleType'} = $self->{api_client}->to_query_value($args{'scale_type'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -24141,11 +24699,6 @@ sub put_slides_view_properties {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -24153,6 +24706,11 @@ sub put_slides_view_properties {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -24339,11 +24897,6 @@ sub put_subshape_save_as {
     }
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -24371,6 +24924,11 @@ sub put_subshape_save_as {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -24513,11 +25071,6 @@ sub put_update_notes_slide {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -24525,6 +25078,11 @@ sub put_update_notes_slide {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -24661,11 +25219,6 @@ sub put_update_notes_slide_shape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -24673,6 +25226,11 @@ sub put_update_notes_slide_shape {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -24827,11 +25385,6 @@ sub put_update_notes_slide_shape_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -24839,6 +25392,11 @@ sub put_update_notes_slide_shape_paragraph {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params
@@ -25011,11 +25569,6 @@ sub put_update_notes_slide_shape_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -25023,6 +25576,11 @@ sub put_update_notes_slide_shape_portion {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
     }
 
     # path params

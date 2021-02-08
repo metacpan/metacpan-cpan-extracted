@@ -1,15 +1,14 @@
+use v5.10;
+
 package SourceCode::LineCounter::Perl;
 use strict;
 
 use warnings;
 no warnings;
 
-use subs qw();
-use vars qw($VERSION);
-
 use Carp qw(carp);
 
-$VERSION = '1.021';
+our $VERSION = '1.022';
 
 =encoding utf8
 
@@ -334,7 +333,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2008-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

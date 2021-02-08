@@ -1,19 +1,61 @@
---- #YAML:1.0
-name:                DbFramework
-version:             1.12
-abstract:            Classes for Manipulating DBI Databases, Based on the CDIF Data Model Subject Area
-license:             perl
-author:              
-    - imacat <imacat@mail.imacat.idv.tw>
-generated_by:        ExtUtils::MakeMaker version 6.44
-distribution_type:   module
-requires:     
-    Alias:                         0
-    CGI:                           0
-    DBI:                           1.06
-    Term::ReadKey:                 0
-    Text::FillIn:                  0
-    URI::Escape:                   0
+---
+abstract: 'Classes for Manipulating DBI Databases, Based on the CDIF Data Model Subject Area'
+author:
+  - 'imacat <imacat@mail.imacat.idv.tw>'
+build_requires:
+  Module::Signature: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DbFramework
+provides:
+  DbFramework::Attribute:
+    file: lib/DbFramework/Attribute.pm
+  DbFramework::Catalog:
+    file: lib/DbFramework/Catalog.pm
+  DbFramework::DataModel:
+    file: lib/DbFramework/DataModel.pm
+  DbFramework::DataModelObject:
+    file: lib/DbFramework/DataModelObject.pm
+  DbFramework::DataType::ANSII:
+    file: lib/DbFramework/DataType/ANSII.pm
+  DbFramework::DataType::Mysql:
+    file: lib/DbFramework/DataType/Mysql.pm
+  DbFramework::DefinitionObject:
+    file: lib/DbFramework/DefinitionObject.pm
+  DbFramework::ForeignKey:
+    file: lib/DbFramework/ForeignKey.pm
+  DbFramework::Key:
+    file: lib/DbFramework/Key.pm
+  DbFramework::Persistent:
+    file: lib/DbFramework/Persistent.pm
+    version: '1.10'
+  DbFramework::PrimaryKey:
+    file: lib/DbFramework/PrimaryKey.pm
+  DbFramework::Relationship:
+    file: lib/DbFramework/Relationship.pm
+  DbFramework::Table:
+    file: lib/DbFramework/Table.pm
+  DbFramework::Template:
+    file: lib/DbFramework/Template.pm
+  DbFramework::Util:
+    file: lib/DbFramework/Util.pm
+requires:
+  Alias: '0'
+  CGI: '0'
+  DBI: '1.06'
+  Term::ReadKey: '0'
+  Text::FillIn: '0'
+  URI::Escape: '0'
+resources:
+  bugtracker: https://github.com/imacat/DbFramework/issues
+  homepage: https://metacpan.org/release/DbFramework
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/imacat/DbFramework.git
+version: '1.13'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

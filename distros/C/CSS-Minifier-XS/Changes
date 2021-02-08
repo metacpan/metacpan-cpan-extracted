@@ -1,5 +1,13 @@
 Revision history for Perl extension CSS::Minifier::XS.
 
+0.13      2021-02-06 17:26:39-08:00 America/Vancouver
+    - Internals; avoid allocating memory for each node as we tokenize the
+      document, and simply use pointers back into original string.
+      - Dramatically improves performance; local testing shows boost from
+        ~25/s to ~85MB/s
+    - Improve zero value minification further
+    - Simplified whitespace compaction
+
 0.12      2021-01-30 21:46:07-08:00 America/Vancouver
     - rewrote test suite into a single ".t" test
     - GH #1 / RT #97574; whitespace before a ":" in a pseudo-selector is

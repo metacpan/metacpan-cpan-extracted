@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use File::Find;
 use File::Spec;
@@ -31,7 +31,7 @@ sub _load {
     $file =~ s{\\}{/}g;       # to make win32 happy
     $dir  =~ s{\\}{/}g;       # to make win32 happy
     $file =~ s/^\Q$dir\E//;
-    my $_package = join '::' => grep $_ => File::Spec->splitdir($file);
+    my $_package = join '::', grep {$_} File::Spec->splitdir($file);
 
     # untaint that puppy!
     my ($package) = $_package =~ /^([[:word:]]+(?:::[[:word:]]+)*)$/;
@@ -51,7 +51,9 @@ sub _load {
 
         # either "require" it or "use" it with no import list. Otherwise, this
         # module will inherit from Test::Class::Moose and break everything.
-        eval "use $package ()";    ## no critic
+
+        ## no critic (BuiltinFunctions::ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval)
+        eval "use $package ()";
     }
     die $@ if $@;
 }
@@ -60,7 +62,7 @@ sub import {
     my ( $class, @directories ) = @_;
 
     foreach my $dir (@directories) {
-        $dir = File::Spec->catdir( split '/', $dir );
+        $dir = File::Spec->catdir( split /\//, $dir );
         find(
             {   no_chdir => 1,
                 wanted   => sub {
@@ -89,7 +91,7 @@ Test::Class::Moose::Load - Load L<Test::Class::Moose> classes automatically.
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -126,8 +128,8 @@ see that all tests pass, even though you don't notice that it didn't run your
 new test class.  Or you delete a test class and you forget to remove it from
 the helper script.
 
-L<Test::Class::Moose::Load> automatically finds and loads your test classes
-for you. There is no longer a need to list them individually.
+L<Test::Class::Moose::Load> automatically finds and loads your test classes for
+you. There is no longer a need to list them individually.
 
 =head1 EXPORT
 
@@ -169,9 +171,9 @@ Here's some examples of advanced usage of L<Test::Class::Moose::Load>.
 
 You can redefine the filtering criteria, that is, decide what classes are
 picked up and what others are not. You do this simply by subclassing
-L<Test::Class::Moose::Load> overriding the C<is_test_class()> method. You
-might want to do this to only load modules which inherit from
-L<Test::Class::Moose>, or anything else for that matter.
+L<Test::Class::Moose::Load> overriding the C<is_test_class()> method. You might
+want to do this to only load modules which inherit from L<Test::Class::Moose>,
+or anything else for that matter.
 
 =over 4
 
@@ -179,9 +181,9 @@ L<Test::Class::Moose>, or anything else for that matter.
 
   $is_test_class = $class->is_test_class( $file, $directory )
 
-Returns true if C<$file> in C<$directory> should be considered a test class
-and be loaded by L<Test::Class::Moose::Load>. The default filter simply
-returns true if C<$file> ends with C<.pm>
+Returns true if C<$file> in C<$directory> should be considered a test class and
+be loaded by L<Test::Class::Moose::Load>. The default filter simply returns
+true if C<$file> ends with C<.pm>
 
 =back
 
@@ -210,9 +212,9 @@ For example:
 =head2 CUSTOMIZING TEST RUNS
 
 One problem with this style of testing is that you run I<all> of the tests
-every time you need to test something.  If you want to run only one test
-class, it's problematic.  The easy way to do this is to change your helper
-script by deleting the C<runtests> call:
+every time you need to test something.  If you want to run only one test class,
+it's problematic.  The easy way to do this is to change your helper script by
+deleting the C<runtests> call:
 
  #!/usr/bin/perl -T
 
@@ -303,7 +305,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

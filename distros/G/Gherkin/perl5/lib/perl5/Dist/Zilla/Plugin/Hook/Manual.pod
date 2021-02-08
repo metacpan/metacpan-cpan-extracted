@@ -1,0 +1,1375 @@
+#   ---------------------------------------------------------------------- copyright and license ---
+#
+#   file: lib/Dist/Zilla/Plugin/Hook/Manual.pod
+#
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
+#
+#   This file is part of perl-Dist-Zilla-Plugin-Hook.
+#
+#   perl-Dist-Zilla-Plugin-Hook is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU General Public License as published by the Free Software Foundation,
+#   either version 3 of the License, or (at your option) any later version.
+#
+#   perl-Dist-Zilla-Plugin-Hook is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#   PURPOSE. See the GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along with
+#   perl-Dist-Zilla-Plugin-Hook. If not, see <http://www.gnu.org/licenses/>.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
+#
+#   ---------------------------------------------------------------------- copyright and license ---
+
+# PODNAME: Dist::Zilla::Plugin::Hook::Manual
+# ABSTRACT: C<Hook> plugin user manual
+
+#pod =for :this This is C<Hook> user manual. Read this if you want to write C<Dist::Zilla> plugin directly in F<dist.ini>.
+#pod
+#pod =for :those If you are going to hack or extend C<Dist-Zilla-Plugin-Hook>, read the
+#pod L<C<Dist::Zilla::Role::Hooker> module documentation|Dist::Zilla::Role::Hooker>. General topics like
+#pod getting source, building, installing, bug reporting and some others are covered in the F<README>.
+#pod
+#pod =for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod In your F<dist.ini>:
+#pod
+#pod     [Hook/prologue]
+#pod         . = # Code to be executed before every hook.
+#pod         . = use autodie ':all';
+#pod         . = use Path::Tiny;
+#pod     [Hook::Role]
+#pod         . = # Code of your inline plugin:
+#pod         . = $self->log( 'Starting…' );
+#pod         . = # …arbitrary Perl code…
+#pod         . = …
+#pod
+#pod where I<Role> is one of C<Hook> submodules/C<Dist::Zilla> roles, like C<BeforeBuild>,
+#pod C<AfterBuild>, C<FileGatherer>, C<MetaProvider> etc. See complete list of supported roles in
+#pod L</"List of Modules">.
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod C<Hook> is a set of plugins, like C<Hook::BeforeBuild> and C<Hook::AfterBuild>.
+#pod
+#pod Every C<Hook> plugin (except C<Hook::Init>, which is a bit special, see below) consumes a role with
+#pod the same name, and implements the method required by the consumed role. When C<Dist::Zilla> invokes
+#pod the method, it executes the code specified in the plugin's section of F<dist.ini>.
+#pod
+#pod An example: C<Hook::BeforeBuild> plugin consumes C<BeforeBuild> role, this role requires
+#pod C<before_build> method, which is implemented by the plugin. When C<Dist::Zilla> invokes
+#pod C<Hook::BeforeBuild>'s C<before_build> method, it executes the code from the plugin's section of
+#pod F<dist.ini>, e. g.:
+#pod
+#pod     name    = Assa
+#pod     version = 0.001
+#pod     [Hook::BeforeBuild]
+#pod         . = $self->log( [ "Building v%s", $dist->version ] );
+#pod     ...
+#pod
+#pod and Perl code inlined into C<[Hook::BeforeBuild]> section of F<dist.ini> prints message "Building
+#pod v0.001" to the log. Such inlined Perl code is called "hook" below.
+#pod
+#pod The same for all other C<Hook> plugins. Only C<Hook::Init> plugin is a bit special: it implements
+#pod C<BUILD> method. It has two subsequences. First: there is no need in consuming a role to implement
+#pod C<BUILD> method (and actually there is no role C<Dist::Zilla::Role::Init>). Second, more important:
+#pod C<BUILD> method is called at very early stage of the build, immediately after reading
+#pod C<[Hook::Init]> section of F<dist.ini>. This is useful in some circumstances.
+#pod
+#pod =head2 Predefined Variables
+#pod
+#pod Inlined Perl code can use following predefined variables:
+#pod
+#pod =begin :list
+#pod
+#pod = C<@_>
+#pod Arguments of the method, as provided by C<Dist::Zilla>. Self-reference is already shifted to
+#pod C<$self> (but the first argument is not)!
+#pod
+#pod = C<$arg>
+#pod The first argument of the method, the same as C<$_[ 0 ]>. If C<Dist::Zilla> does not provide
+#pod argument, the variable will be set to C<undef>.
+#pod
+#pod = C<$plugin>
+#pod = C<$self>
+#pod Reference to the plugin object executing the code.
+#pod
+#pod = C<$dist>
+#pod = C<$zilla>
+#pod Reference to C<Dist::Zilla> object, the same as C<< $self->zilla >>.
+#pod
+#pod =end :list
+#pod
+#pod C<$self> and C<$zilla> are "standard" variables frequently used in plugin source code. C<$plugin>
+#pod and C<$dist> variables are defined for conformance with template processing plugins
+#pod (C<GenerateFile>, C<Templates>, C<TemplateFiles>, C<MetaResources::Template>, etc.). C<$arg> is
+#pod defined for convenience: in many cases C<Dist::Zilla> passes the only argument to the method (which
+#pod usually is a C<HashRef>).
+#pod
+#pod =head2 Arguments and Return Value
+#pod
+#pod As described in the previous section, arguments provided by C<Dist::Zilla> are passed to the hook
+#pod (through C<$self>, C<$arg>, and C<@_> variables).
+#pod
+#pod Return value of the hook code is not ignored but passed back to C<Dist::Zilla>. C<Dist::Zilla>, in
+#pod turn, often ignores it, but sometimes return value is important, for example, for "provider"
+#pod plugins: C<Hook::VersionProvider>, C<Hook::MetaProvider>, etc. See documentation on corresponding
+#pod roles (e. g. L<Dist::Zilla::Role::VersionProvider>, L<Dist::Zilla::Role::MetaProvider>, etc) for
+#pod description of expected method result.
+#pod
+#pod Passing arguments and return values actually means you can write your own C<Dist::Zilla> plugin
+#pod which code is not in an external C<.pm> file but inlined directly to F<dist.ini>. Of course, such
+#pod approach is limited. For example, "inline plugin" cannot define attributes and methods. Anyway the
+#pod approach is quite convenient for small hacks and prototyping which do not require much coding. See
+#pod L</"EXAMPLES"> section.
+#pod
+#pod =head2 Prologue
+#pod
+#pod If F<dist.ini> contains section C<[Hook/prologue]>, the code from this section is executed before
+#pod every hook. All the predefined variables are available in prologue code too.
+#pod
+#pod Prologue may be used for loading frequently used modules, or for debugging:
+#pod
+#pod     [Hook/prologue]
+#pod         . = use autodie ':all';
+#pod         . = use Path::Tiny;
+#pod         . = use IPC::System::Simple qw{ capture };
+#pod         . = $self->log_debug( 'begins' );
+#pod     [Hook::BeforeBuild]
+#pod         . = # No need in "use autodie" because
+#pod         . = # it is specified in prologue.
+#pod         . = system( … );
+#pod
+#pod =head2 C<ErrorLogger> Role
+#pod
+#pod Every C<Hook> plugin executes Perl code with help from the C<Hooker> role. The latter uses
+#pod C<ErrorLogger> role internally. As a side effect, C<ErrorLogger> methods are also available to use
+#pod in hooks:
+#pod
+#pod     [Hook::Role]
+#pod         . = $self->log_error( … );
+#pod         . = $self->abort_if_error( … );
+#pod         . = $self->abort( … );
+#pod
+#pod =head2 Multiple Hooks of the Same Role
+#pod
+#pod Use explicit plugin names if you want to have multiple hooks of the same role, e. g.:
+#pod
+#pod     [Hook::AfterRelease/bump version]
+#pod         . = my $version = Perl::Version->new( $dist->version );
+#pod         . = $version->inc_alpha;
+#pod         . = path( $dist->root )->child( 'VERSION' )->spew( $version );
+#pod
+#pod     [Hook::AfterRelease/post-release commit]
+#pod         . = system( qw{ hg commit -m Post-release VERSION Changes } );
+#pod
+#pod     [Hook::AfterRelease/push]
+#pod         . = system( qw{ hg push } );
+#pod
+#pod     [Hook::AfterRelease/clean]
+#pod         . = $zilla->clean();
+#pod
+#pod =head2 List of Modules
+#pod
+#pod This is the complete list of C<Hook> modules/roles and methods:
+#pod
+#pod     --------------------- + ----------------------
+#pod     Module/Role           | Method
+#pod     --------------------- + ----------------------
+#pod     AfterBuild            | after_build
+#pod     AfterMint             | after_mint
+#pod     AfterRelease          | after_release
+#pod     BeforeArchive         | before_archive
+#pod     BeforeBuild           | before_build
+#pod     BeforeMint            | before_mint
+#pod     BeforeRelease         | before_release
+#pod     FileGatherer          | gather_files
+#pod     FileMunger            | munge_files
+#pod     FilePruner            | prune_files
+#pod     Init                  | BUILD
+#pod     InstallTool           | setup_installer
+#pod     LicenseProvider       | provide_license
+#pod     MetaProvider          | metadata
+#pod     ModuleMaker           | make_module
+#pod     NameProvider          | provide_name
+#pod     PrereqSource          | register_prereqs
+#pod     ReleaseStatusProvider | provide_release_status
+#pod     Releaser              | release
+#pod     VersionProvider       | provide_version
+#pod     --------------------- + ----------------------
+#pod
+#pod =option .
+#pod
+#pod Yes, the only option recognized by C<Hook> modules is C<.> (dot).
+#pod
+#pod This is multi-value option, i. e. it may be specified multiple time. Each value is a distinct line
+#pod of Perl code, e. g.:
+#pod
+#pod     . = if ( $dist->is_trial ) {
+#pod     . =     $self->log( 'Building trial version' );
+#pod     . = };
+#pod
+#pod Beware of caveats, see L</"dist.ini Parsing">.
+#pod
+#pod =caveat F<dist.ini> Parsing
+#pod
+#pod Before code reaches a C<Hook> plugin, it is parsed by C<Dist::Zilla> config file reader (probably,
+#pod by C<Config::INI::Reader>). Config file reader seems to strip leading and trailing spaces from each
+#pod value, and treat semicolon preceded by a space as a comment starter. Usually it is not a problem,
+#pod just put semicolon immediately after statement:
+#pod
+#pod     . = foo(); bar();       # Ok
+#pod     . = foo() ; bar() ;     # NOT OK: bar will not be called.
+#pod
+#pod Note that semicolon starts a F<dist.ini> comment even within Perl string:
+#pod
+#pod     . = $str = "one; two";  # Ok
+#pod     . = $str = "one ; two"; # NOT OK
+#pod
+#pod And be careful with multi-line strings:
+#pod
+#pod     . = $str = "first line
+#pod     . =     indented line"; # Leading spaces will be lost.
+#pod
+#pod =head1 EXAMPLES
+#pod
+#pod Examples below are focused on using C<Hook>, so F<dist.ini> is a primary file in all the examples,
+#pod and sometimes is the only file of an example. Example module contains single line C<package Assa;
+#pod 1;> and generated on-the-fly with C<GenerateFile> plugin.
+#pod
+#pod =encoding UTF-8
+#pod
+#pod =head2 I<Description> Meta Resource
+#pod
+#pod Distribution meta information contains such items as I<name>, I<version>, I<abstract> and many
+#pod others. All named items are written to F<META.json> (and maybe to F<META.yml>) automatically, all
+#pod you need is just using C<MetaJSON> and/or C<MetaYAML> plugin(s) in your F<dist.ini> file.
+#pod
+#pod Meta information may also include I<description> — a longer, more complete description of the
+#pod distribution. However, C<Dist::Zilla> does not provide option to specify I<description>. It could
+#pod be easily fixed with C<Hook>, though.
+#pod
+#pod F<dist.ini> file:
+#pod
+#pod     name     = Description
+#pod     abstract = Hook demo: Set "description" meta info
+#pod     version  = v0.0.1
+#pod     [Hook::MetaProvider/description]    ; <<<=== Look at this
+#pod         ;   MetaProvider's metadata method must return HashRef (or undef).
+#pod         ;   Multiple MetaProviders are allowed. Metainfo received from
+#pod         ;   all providers will be merged by Dist::Zilla. This
+#pod         ;   MetaProvider provides only description.
+#pod         ;   See Dist::Zilla::Role::MetaProvider.
+#pod         . = { description =>
+#pod         . =     "This is not short one-line abstract,
+#pod         . =     but more detailed description,
+#pod         . =     which spans several lines."
+#pod         . = }
+#pod     [GenerateFile/Assa.pm]
+#pod         filename = lib/Assa.pm
+#pod         content  = package Assa; 1;
+#pod     [MetaJSON]
+#pod     [FakeRelease]
+#pod
+#pod =encoding UTF-8
+#pod
+#pod =head2 C<Test::Version> adaptive strictness
+#pod
+#pod C<Test::Version> is a great plugin. It creates a test which checks modules in distribution: every
+#pod module must have C<$VERSION> variable defined, and its value must be a valid version string.
+#pod There are two notion of "validity": I<lax> and I<strict>. (See L<version::Internals/"Regular
+#pod Expressions for Version Parsing"> for definitions of lax and strict).
+#pod
+#pod I want to use strict check:
+#pod
+#pod     [Test::Version]
+#pod         is_strict = 1
+#pod
+#pod Unfortunately, this does not work for trial releases: any trial release definitely fails the test,
+#pod because strict check does not allow underscore in version string. Thus, before every trial release
+#pod I have to reset C<is_strict> option to zero, and return it back to one after release. This is
+#pod boring and error-prone. I want to have "adaptive strictness": use lax check in case of trial
+#pod release and strict check otherwise.
+#pod
+#pod C<Test::Version> maintainer Graham Ollis said: L<This is a good idea! I'll see if I can implement
+#pod it.|https://github.com/plicease/Dist-Zilla-Plugin-Test-Version/issues/5> However, implementation
+#pod may take some time. With a little help from C<Hook>, I can easily get achieve adaptive strictness
+#pod right now.
+#pod
+#pod F<dist.ini> file:
+#pod
+#pod     name     = AdaptiveTestVersion
+#pod     abstract = Hook demo: Test::Version adaptive strictness
+#pod     version  = 0.001
+#pod     [GenerateFile/Assa.pm]
+#pod         filename = lib/Assa.pm
+#pod         content  = package Assa; 1;
+#pod     [Test::Version]                         ; <<<=== Look at this
+#pod         is_strict = 0
+#pod     [Hook::BeforeBuild/AdaptiveStrictness]  ; <<<=== Look at this
+#pod         . = my $tv = $zilla->plugin_named( 'Test::Version' );
+#pod         . = $tv->{ is_strict } = $dist->is_trial ? '0' : '1';
+#pod     [MetaJSON]
+#pod     [FakeRelease]
+#pod
+#pod =encoding UTF-8
+#pod
+#pod =head2 Template Variables
+#pod
+#pod In a distribution, I have to duplicate the same pieces of information again and again. For example,
+#pod bug report email and web URLs should be written in C<[MetaResources]> section of F<dist.ini> and in
+#pod the documentation, like F<BUGS.pod>.
+#pod
+#pod With a help from C<Templates> plugin I can eliminate duplication. If F<BUGS.pod> is a template,
+#pod I can use email and web URLs defined in F<dist.ini>, e. g.:
+#pod
+#pod     {{$dist->distmeta->{resources}->{bugtracker}->{mailto};}}
+#pod
+#pod Err… This works but requires a lot of typing (so it is typo-prone), and looks ugly. With C<Hook> I
+#pod can make it not only working, but also elegant. C<[Hook::Init]> section defines few variables in
+#pod C<MY> package, which can be used in various templates, including documentation and meta resources.
+#pod
+#pod F<dist.ini> file:
+#pod
+#pod     name     = TemplateVariables
+#pod     abstract = Hook demo: Define variables for later use in templates.
+#pod     version  = v0.0.1
+#pod     [Hook::Init/my vars]                ; <<<=== Look at this
+#pod         . = package MY;
+#pod         . = our $name    = $dist->name;
+#pod         . = our $bt_mail = "mailto:bug-$name\@bt.example.org";
+#pod         . = our $bt_web  = "https://bt.example.org/display.html?name=$name";
+#pod         ;   BTW, Hook::BeforeBuild cannot be used here: it works too late,
+#pod         ;   MetaResources::Template will not see the variables.
+#pod     [GenerateFile/Assa.pm]
+#pod         filename = lib/Assa.pm
+#pod         content  = package Assa; 1;
+#pod     [GatherDir]
+#pod     [PruneCruft]
+#pod     [FileFinder::ByName/BUGS.pod]       ; <<<=== Look at this
+#pod         file = BUGS.pod
+#pod     [Templates]                         ; <<<=== Look at this
+#pod         templates = BUGS.pod
+#pod     [MetaResources::Template]           ; <<<=== Look at this
+#pod         bugtracker.mailto = {{$MY::bt_mail}}
+#pod         bugtracker.web    = {{$MY::bt_web}}
+#pod         license           = {{$dist->license->url}}
+#pod     [MetaJSON]
+#pod     [FakeRelease]
+#pod
+#pod F<BUGS.pod> file:
+#pod
+#pod     =head2 Bugs
+#pod
+#pod     The quickest way to report a bug in C<{{$MY::name}}>
+#pod     is by sending email to {{$MY::bt_mail}}.
+#pod
+#pod     Bug tracker can be used via
+#pod     L<web interface|{{$MY::bt_web}}>.
+#pod
+#pod =encoding UTF-8
+#pod
+#pod =head2 Version Bumping
+#pod
+#pod I want the version of my distribution is bumped automatically after each release, and automatically
+#pod assigned version should be trial.
+#pod
+#pod For example: If I released version C<v0.0.1>, the version of the next release should be C<v0.0.1.1>
+#pod (see C<Version::Dotted::Semantic>). When I release C<v0.0.1.1>, the next should be C<v0.0.1.2>, the
+#pod next one — C<v0.0.1.3> and so on. When I decide it is time to non-trial release, I will set the
+#pod version to C<v0.0.2> manually, release it, and will have automatically bumped version C<v0.0.2.1>
+#pod for the next release.
+#pod
+#pod This is implemented with three plugins: C<Hook:VersionProvider>, C<Hook::ReleaseStatusProvider>,
+#pod and C<Hook::AfterRelease>. The first one reads version from external file F<VERSION> which contains
+#pod only version and nothing more (ok, trailing whitespace is allowed) — it simplifies implementation,
+#pod because there is no need in parsing F<dist.ini> file. The second plugin lets C<Dist::Zilla> know
+#pod release status (trial or stable). The third plugin bumps the version after release, and writes
+#pod bumped version back to the F<VERSION> file.
+#pod
+#pod F<dist.ini> file:
+#pod
+#pod     name     = VersionBumping
+#pod     abstract = Hook demo: Bump version after release
+#pod     [Hook/prologue]                     ; <<<=== Look at this
+#pod         . = use Version::Dotted::Semantic 'qv';
+#pod     [Hook::VersionProvider]             ; <<<=== Look at this
+#pod         . = $zilla->root->child( 'VERSION' )->slurp =~ s{\s*\z}{}r;
+#pod     [Hook::ReleaseStatusProvider]       ; <<<=== Look at this
+#pod         . = qv( $zilla->version )->is_trial ? "testing" : "stable";
+#pod     [GenerateFile/Assa.pm]
+#pod         filename = lib/Assa.pm
+#pod         content  = package Assa; 1;
+#pod     [MetaJSON]
+#pod     [FakeRelease]
+#pod     [Hook::AfterRelease/bump version]   ; <<<=== Look at this
+#pod         . = my $ver = qv( $dist->version )->bump( 3 );
+#pod         . = $zilla->root->child( 'VERSION' )->spew( $ver );
+#pod         . = $self->log( [ 'The next release will be %s', "$ver" ] );
+#pod
+#pod F<VERSION> file:
+#pod
+#pod     v0.0.1
+#pod
+#pod =head2 Unwanted Dependencies
+#pod
+#pod C<Data::Printer> is a great module, I often use it for debugging. However, sometimes I forget to
+#pod remove
+#pod
+#pod     use DDP;
+#pod
+#pod from the code and make a release with this unwanted dependency. C<Hook::BeforeRelease> checks the
+#pod distribution does not have unwanted dependencies. If it does, release will be aborted.
+#pod
+#pod F<dist.ini> file:
+#pod
+#pod     name     = UnwantedDependencies
+#pod     abstract = Hook demo: Check the distro does not have unwanted dependencies
+#pod     version  = v0.0.1
+#pod     [GenerateFile/Assa.pm]
+#pod         filename = lib/Assa.pm
+#pod         content  = package Assa; use DDP; 1;
+#pod     [AutoPrereqs]
+#pod     [MetaJSON]
+#pod     [Hook::BeforeRelease/unwanted deps] ; <<<=== Look at this
+#pod         . = my @modules = qw{ DDP Data::Printer };  # Unwanted modules.
+#pod         . = my $prereqs = $dist->distmeta->{ prereqs };
+#pod         . = for my $m ( @modules ) {
+#pod         . =     for my $s ( qw{ configure develop runtime test } ) {
+#pod         . =         if ( exists( $prereqs->{ $s }->{ requires }->{ $m } ) ) {
+#pod         . =             $self->log_error( [ '%s found in %s prereqs', $m, $s ] );
+#pod         . =         };
+#pod         . =     };
+#pod         . = };
+#pod         . = $self->abort_if_error( 'unwanted dependencies found' );
+#pod     [FakeRelease]
+#pod
+#pod =encoding UTF-8
+#pod
+#pod =head2 Let C<[=inc::Foo]> work in Perl v5.26+.
+#pod
+#pod Starting from Perl v26.0, C<.> is not included into C<@INC> anymore. This breaks C<Dist::Zilla>
+#pod syntax for plugins which are located in the distribution source tree, e. g.:
+#pod
+#pod     [=inc::Foo]
+#pod
+#pod Being run with Perl v5.26+, C<dzil> complains:
+#pod
+#pod     Required plugin inc::Foo isn't installed.
+#pod
+#pod C<Dist::Zilla::Plugin::lib> was created specially for workarounding this issue. (I said
+#pod "workarounding" not "solving" because C<Dist::Zilla::Plugin::lib> does not help C<dzil authordeps
+#pod --missing> to work.)
+#pod
+#pod The same effect can be achieved with C<Hook::Init> one-liner.
+#pod
+#pod F<dist.ini> file:
+#pod
+#pod     name     = NoDotInInc
+#pod     abstract = Hook demo: Let [=inc::Foo] work in Perl v5.26+.
+#pod     version  = v0.0.1
+#pod     [Hook::Init]    ; <<<=== Look at this
+#pod         . = use lib $zilla->root->absolute->stringify;
+#pod     [=inc::Foo]
+#pod     [MetaJSON]
+#pod     [FakeRelease]
+#pod
+#pod
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod =for :list
+#pod = L<Dist::Zilla>
+#pod = L<Dist::Zilla::Plugin::Run>
+#pod = L<Dist::Zilla::Role::Hooker>
+#pod = L<Dist::Zilla::Role::ErrorLogger>
+#pod = L<Dist::Zilla::Plugin::Hook>
+#pod
+#pod =head1 COPYRIGHT AND LICENSE
+#pod
+#pod Copyright (C) 2015, 2016, 2018 Van de Bugger
+#pod
+#pod License GPLv3+: The GNU General Public License version 3 or later
+#pod <http://www.gnu.org/licenses/gpl-3.0.txt>.
+#pod
+#pod This is free software: you are free to change and redistribute it. There is
+#pod NO WARRANTY, to the extent permitted by law.
+#pod
+#pod
+#pod =cut
+
+#   ------------------------------------------------------------------------------------------------
+#
+#   file: doc/what.pod
+#
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
+#
+#   This file is part of perl-Dist-Zilla-Plugin-Hook.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
+#
+#   ------------------------------------------------------------------------------------------------
+
+#pod =encoding UTF-8
+#pod
+#pod =head1 WHAT?
+#pod
+#pod C<Dist-Zilla-Plugin-Hook> (or just C<Hook>) is a set of C<Dist-Zilla> plugins. Every plugin executes Perl
+#pod code inlined into F<dist.ini> at particular stage of build process.
+#pod
+#pod =cut
+
+# end of file #
+#   ------------------------------------------------------------------------------------------------
+#
+#   file: doc/why.pod
+#
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
+#
+#   This file is part of perl-Dist-Zilla-Plugin-Hook.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
+#
+#   ------------------------------------------------------------------------------------------------
+
+#pod =encoding UTF-8
+#pod
+#pod =head1 WHY?
+#pod
+#pod There is C<Dist::Zilla::Plugin::Run> on CPAN which allows to run Perl code from within
+#pod F<dist.ini>, why I wrote one more? Let us consider two examples.
+#pod
+#pod The first one executes external commands:
+#pod
+#pod     $cat dist.ini
+#pod     name     = RunShell
+#pod     abstract = RunShell demo
+#pod     version  = 0.001_001
+#pod     [Run::BeforeBuild]
+#pod         run            = echo "1. begin"
+#pod         run_if_release = echo "2. release"
+#pod         run_no_release = echo "3. not release"
+#pod         run_if_trial   = echo "4. trial"
+#pod         run_no_trial   = echo "5. not trial"
+#pod         run            = echo "6. end"
+#pod     [GenerateFile/Assa.pm]
+#pod         filename = lib/Assa.pm
+#pod         content  = package Assa; 1;
+#pod     [FakeRelease]
+#pod
+#pod     $ dzil build
+#pod     [Run::BeforeBuild] executing: echo "1. begin"
+#pod     [Run::BeforeBuild] 1. begin
+#pod     [Run::BeforeBuild] executing: echo "6. end"
+#pod     [Run::BeforeBuild] 6. end
+#pod     [Run::BeforeBuild] executing: echo "5. not trial"
+#pod     [Run::BeforeBuild] 5. not trial
+#pod     [Run::BeforeBuild] executing: echo "3. not release"
+#pod     [Run::BeforeBuild] 3. not release
+#pod     [DZ] beginning to build RunShell
+#pod     [DZ] writing RunShell in RunShell-0.001_001
+#pod     [DZ] building archive with Archive::Tar::Wrapper
+#pod     [DZ] writing archive to RunShell-0.001_001-TRIAL.tar.gz
+#pod     [DZ] built in RunShell-0.001_001
+#pod
+#pod
+#pod Execution order is err… non-linear. Of course there is an explanation why command were executed in
+#pod this particular order, but when you are looking at F<dist.ini> it is not obvious. (It is also
+#pod unclear why C<Run> consider the build is I<not> trial, but it may be just a bug.)
+#pod
+#pod Another example executes Perl code:
+#pod
+#pod     $cat dist.ini
+#pod     name     = RunPerl
+#pod     abstract = RunPerl demo
+#pod     version  = 0.001_001
+#pod     [Run::BeforeBuild]
+#pod         eval = my $self = shift( @_ );
+#pod         eval = my $dist = $self->zilla;
+#pod         eval = $self->log( [ '%s v%s', $dist->name, $dist->version ] );
+#pod     [GenerateFile/Assa.pm]
+#pod         filename = lib/Assa.pm
+#pod         content  = package Assa; 1;
+#pod     [FakeRelease]
+#pod
+#pod     $ dzil build
+#pod     [Run::BeforeBuild] evaluating: my $self = shift( @_ );
+#pod     [Run::BeforeBuild] my $dist = $self->zilla;
+#pod     [Run::BeforeBuild] $self->log( [ '0.001_001 v', $dist->name, $dist->version ] );
+#pod     [Run::BeforeBuild] 0.001_001 v
+#pod     [DZ] beginning to build RunPerl
+#pod     [DZ] writing RunPerl in RunPerl-0.001_001
+#pod     [DZ] building archive with Archive::Tar::Wrapper
+#pod     [DZ] writing archive to RunPerl-0.001_001-TRIAL.tar.gz
+#pod     [DZ] built in RunPerl-0.001_001
+#pod
+#pod
+#pod Look at the last message from C<Run::BeforeBuild> plugin. Surprising? Where is the distribution
+#pod name? Why is the character "v" printed after version number? Ah! C<%s> is a special conversion
+#pod specifier which was replaced with "something retained for backward compatibility". There is a bunch
+#pod of other conversion specifiers: C<%a>, C<%d>, C<%n>,C<%p>, C<%t>, C<%v>, C<%x>,… That effectively
+#pod means I cannot use printf-like functions and hashes, because every percent will be replaced with
+#pod something or cause error "unknown conversion".
+#pod
+#pod Ok, I can. There is (undocumented!) method to avoid it — every percent sign should be doubled:
+#pod
+#pod     eval = $self->log( [ '%%s v%%s', $dist->name, $dist->version ] );
+#pod
+#pod or
+#pod
+#pod     eval = my %%meta = %%{ $dist->distmeta };
+#pod
+#pod It is simple, but… this is err… not quite Perl. I cannot just cut-n-paste code from a plugin to
+#pod F<dist.ini> and back.
+#pod
+#pod Let me cite a part of "Philosophy" section of the great C<Text::Template> module:
+#pod
+#pod =over
+#pod
+#pod When people make a template module like this one, they almost always start by inventing a special
+#pod syntax for substitutions. For example, they build it so that a string like C<%%VAR%%> is replaced
+#pod with the value of C<$VAR>. Then they realize the need extra formatting, so they put in some special
+#pod syntax for formatting. Then they need a loop, so they invent a loop syntax. Pretty soon they have a
+#pod new little template language.
+#pod
+#pod This approach has two problems: First, their little language is crippled. If you need to do
+#pod something the author hasn't thought of, you lose. Second: Who wants to learn another language? You
+#pod already know Perl, so why not use it?
+#pod
+#pod =back
+#pod
+#pod Look: C<Run> plugin introduced a bunch of F<dist.ini> options: C<run_if_trial>, C<run_no_trial>
+#pod (BTW, why not C<run_if_not_trial>?), C<run_if_release>, C<run_no_release>, C<eval>,
+#pod C<censor_commands>, C<fatal_errors>, C<quiet>; a bunch of "conversion specifiers": C<%a>, C<%d>,
+#pod C<%n>, C<%p>, C<%v>, C<%t>, C<%x>, C<%s>; and bunch of poorly documented rules. It's "a little
+#pod crippled language", isn't it?
+#pod
+#pod Compared to C<Run>, C<Hook> is designed to be minimalistic: It provides only one option, and it
+#pod executes only Perl. Of course, when writing a hook you have to keep in mind many rules, but these
+#pod are well documented Perl rules and (not so well) C<Dist::Zilla> rules, not rules introduced by
+#pod C<Hook>.
+#pod
+#pod All C<Run> features can be easily implemented with hooks in Perl, for example:
+#pod
+#pod Running external commands:
+#pod
+#pod     . = system( … );
+#pod
+#pod Making errors in external commands fatal:
+#pod
+#pod     . = use autodie ':all';
+#pod     . = system( … );
+#pod
+#pod Making errors in Perl code non-fatal:
+#pod
+#pod     . = use Try::Tiny;
+#pod     . = try { … };
+#pod
+#pod Checking trial status:
+#pod
+#pod     . = if ( $dist->is_trial ) { … };
+#pod
+#pod Checking release build:
+#pod
+#pod     . = if ( $ENV{ DZIL_RELEASING } ) { … };
+#pod
+#pod The code is a little bit longer than C<Run> counterparts, but it is well-known full-featured Perl.
+#pod
+#pod What if you need to pass to an external command something the C<Run> authors have not thought of?
+#pod For example, abstract or licence name. There are no conversion specifiers for it, so you lose. But
+#pod with C<Hook> it is trivial:
+#pod
+#pod     . = system( …, $dist->abstract, …, $dist->license->name, … );
+#pod
+#pod BTW, there are two minor (at the first look) C<Hook> features:
+#pod
+#pod =for :list
+#pod 1. Arguments provided by C<Dist::Zilla> are passes to the hook.
+#pod 2. Hook return value is passed back to C<Dist::Zilla>.
+#pod
+#pod These bring a new quality: with C<Hook> you can write inline plugins. For example, a plugin which
+#pod reads distribution version from an external file:
+#pod
+#pod     [Hook::VersionProvider]
+#pod         . = use Path::Tiny; path( 'VERSION' )->slurp;
+#pod
+#pod (Actually, every hook is an inline plugin.) See more in L<Dist::Zilla::Plugin::Hook::Manual/"EXAMPLES">.
+#pod
+#pod =cut
+
+# end of file #
+
+
+# end of file #
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Dist::Zilla::Plugin::Hook::Manual - C<Hook> plugin user manual
+
+=head1 VERSION
+
+Version v0.8.4, released on 2018-03-15 21:44 UTC.
+
+=head1 WHAT?
+
+C<Dist-Zilla-Plugin-Hook> (or just C<Hook>) is a set of C<Dist-Zilla> plugins. Every plugin executes Perl
+code inlined into F<dist.ini> at particular stage of build process.
+
+This is C<Hook> user manual. Read this if you want to write C<Dist::Zilla> plugin directly in F<dist.ini>.
+
+If you are going to hack or extend C<Dist-Zilla-Plugin-Hook>, read the
+L<C<Dist::Zilla::Role::Hooker> module documentation|Dist::Zilla::Role::Hooker>. General topics like
+getting source, building, installing, bug reporting and some others are covered in the F<README>.
+
+=for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
+
+=head1 SYNOPSIS
+
+In your F<dist.ini>:
+
+    [Hook/prologue]
+        . = # Code to be executed before every hook.
+        . = use autodie ':all';
+        . = use Path::Tiny;
+    [Hook::Role]
+        . = # Code of your inline plugin:
+        . = $self->log( 'Starting…' );
+        . = # …arbitrary Perl code…
+        . = …
+
+where I<Role> is one of C<Hook> submodules/C<Dist::Zilla> roles, like C<BeforeBuild>,
+C<AfterBuild>, C<FileGatherer>, C<MetaProvider> etc. See complete list of supported roles in
+L</"List of Modules">.
+
+=head1 DESCRIPTION
+
+C<Hook> is a set of plugins, like C<Hook::BeforeBuild> and C<Hook::AfterBuild>.
+
+Every C<Hook> plugin (except C<Hook::Init>, which is a bit special, see below) consumes a role with
+the same name, and implements the method required by the consumed role. When C<Dist::Zilla> invokes
+the method, it executes the code specified in the plugin's section of F<dist.ini>.
+
+An example: C<Hook::BeforeBuild> plugin consumes C<BeforeBuild> role, this role requires
+C<before_build> method, which is implemented by the plugin. When C<Dist::Zilla> invokes
+C<Hook::BeforeBuild>'s C<before_build> method, it executes the code from the plugin's section of
+F<dist.ini>, e. g.:
+
+    name    = Assa
+    version = 0.001
+    [Hook::BeforeBuild]
+        . = $self->log( [ "Building v%s", $dist->version ] );
+    ...
+
+and Perl code inlined into C<[Hook::BeforeBuild]> section of F<dist.ini> prints message "Building
+v0.001" to the log. Such inlined Perl code is called "hook" below.
+
+The same for all other C<Hook> plugins. Only C<Hook::Init> plugin is a bit special: it implements
+C<BUILD> method. It has two subsequences. First: there is no need in consuming a role to implement
+C<BUILD> method (and actually there is no role C<Dist::Zilla::Role::Init>). Second, more important:
+C<BUILD> method is called at very early stage of the build, immediately after reading
+C<[Hook::Init]> section of F<dist.ini>. This is useful in some circumstances.
+
+=head2 Predefined Variables
+
+Inlined Perl code can use following predefined variables:
+
+=over 4
+
+=item C<@_>
+
+Arguments of the method, as provided by C<Dist::Zilla>. Self-reference is already shifted to
+C<$self> (but the first argument is not)!
+
+=item C<$arg>
+
+The first argument of the method, the same as C<$_[ 0 ]>. If C<Dist::Zilla> does not provide
+argument, the variable will be set to C<undef>.
+
+=item C<$plugin>
+
+=item C<$self>
+
+Reference to the plugin object executing the code.
+
+=item C<$dist>
+
+=item C<$zilla>
+
+Reference to C<Dist::Zilla> object, the same as C<< $self->zilla >>.
+
+=back
+
+C<$self> and C<$zilla> are "standard" variables frequently used in plugin source code. C<$plugin>
+and C<$dist> variables are defined for conformance with template processing plugins
+(C<GenerateFile>, C<Templates>, C<TemplateFiles>, C<MetaResources::Template>, etc.). C<$arg> is
+defined for convenience: in many cases C<Dist::Zilla> passes the only argument to the method (which
+usually is a C<HashRef>).
+
+=head2 Arguments and Return Value
+
+As described in the previous section, arguments provided by C<Dist::Zilla> are passed to the hook
+(through C<$self>, C<$arg>, and C<@_> variables).
+
+Return value of the hook code is not ignored but passed back to C<Dist::Zilla>. C<Dist::Zilla>, in
+turn, often ignores it, but sometimes return value is important, for example, for "provider"
+plugins: C<Hook::VersionProvider>, C<Hook::MetaProvider>, etc. See documentation on corresponding
+roles (e. g. L<Dist::Zilla::Role::VersionProvider>, L<Dist::Zilla::Role::MetaProvider>, etc) for
+description of expected method result.
+
+Passing arguments and return values actually means you can write your own C<Dist::Zilla> plugin
+which code is not in an external C<.pm> file but inlined directly to F<dist.ini>. Of course, such
+approach is limited. For example, "inline plugin" cannot define attributes and methods. Anyway the
+approach is quite convenient for small hacks and prototyping which do not require much coding. See
+L</"EXAMPLES"> section.
+
+=head2 Prologue
+
+If F<dist.ini> contains section C<[Hook/prologue]>, the code from this section is executed before
+every hook. All the predefined variables are available in prologue code too.
+
+Prologue may be used for loading frequently used modules, or for debugging:
+
+    [Hook/prologue]
+        . = use autodie ':all';
+        . = use Path::Tiny;
+        . = use IPC::System::Simple qw{ capture };
+        . = $self->log_debug( 'begins' );
+    [Hook::BeforeBuild]
+        . = # No need in "use autodie" because
+        . = # it is specified in prologue.
+        . = system( … );
+
+=head2 C<ErrorLogger> Role
+
+Every C<Hook> plugin executes Perl code with help from the C<Hooker> role. The latter uses
+C<ErrorLogger> role internally. As a side effect, C<ErrorLogger> methods are also available to use
+in hooks:
+
+    [Hook::Role]
+        . = $self->log_error( … );
+        . = $self->abort_if_error( … );
+        . = $self->abort( … );
+
+=head2 Multiple Hooks of the Same Role
+
+Use explicit plugin names if you want to have multiple hooks of the same role, e. g.:
+
+    [Hook::AfterRelease/bump version]
+        . = my $version = Perl::Version->new( $dist->version );
+        . = $version->inc_alpha;
+        . = path( $dist->root )->child( 'VERSION' )->spew( $version );
+
+    [Hook::AfterRelease/post-release commit]
+        . = system( qw{ hg commit -m Post-release VERSION Changes } );
+
+    [Hook::AfterRelease/push]
+        . = system( qw{ hg push } );
+
+    [Hook::AfterRelease/clean]
+        . = $zilla->clean();
+
+=head2 List of Modules
+
+This is the complete list of C<Hook> modules/roles and methods:
+
+    --------------------- + ----------------------
+    Module/Role           | Method
+    --------------------- + ----------------------
+    AfterBuild            | after_build
+    AfterMint             | after_mint
+    AfterRelease          | after_release
+    BeforeArchive         | before_archive
+    BeforeBuild           | before_build
+    BeforeMint            | before_mint
+    BeforeRelease         | before_release
+    FileGatherer          | gather_files
+    FileMunger            | munge_files
+    FilePruner            | prune_files
+    Init                  | BUILD
+    InstallTool           | setup_installer
+    LicenseProvider       | provide_license
+    MetaProvider          | metadata
+    ModuleMaker           | make_module
+    NameProvider          | provide_name
+    PrereqSource          | register_prereqs
+    ReleaseStatusProvider | provide_release_status
+    Releaser              | release
+    VersionProvider       | provide_version
+    --------------------- + ----------------------
+
+=head1 OPTIONS
+
+=head2 .
+
+Yes, the only option recognized by C<Hook> modules is C<.> (dot).
+
+This is multi-value option, i. e. it may be specified multiple time. Each value is a distinct line
+of Perl code, e. g.:
+
+    . = if ( $dist->is_trial ) {
+    . =     $self->log( 'Building trial version' );
+    . = };
+
+Beware of caveats, see L</"dist.ini Parsing">.
+
+=head1 CAVEATS
+
+=head2 F<dist.ini> Parsing
+
+Before code reaches a C<Hook> plugin, it is parsed by C<Dist::Zilla> config file reader (probably,
+by C<Config::INI::Reader>). Config file reader seems to strip leading and trailing spaces from each
+value, and treat semicolon preceded by a space as a comment starter. Usually it is not a problem,
+just put semicolon immediately after statement:
+
+    . = foo(); bar();       # Ok
+    . = foo() ; bar() ;     # NOT OK: bar will not be called.
+
+Note that semicolon starts a F<dist.ini> comment even within Perl string:
+
+    . = $str = "one; two";  # Ok
+    . = $str = "one ; two"; # NOT OK
+
+And be careful with multi-line strings:
+
+    . = $str = "first line
+    . =     indented line"; # Leading spaces will be lost.
+
+=head1 WHY?
+
+There is C<Dist::Zilla::Plugin::Run> on CPAN which allows to run Perl code from within
+F<dist.ini>, why I wrote one more? Let us consider two examples.
+
+The first one executes external commands:
+
+    $cat dist.ini
+    name     = RunShell
+    abstract = RunShell demo
+    version  = 0.001_001
+    [Run::BeforeBuild]
+        run            = echo "1. begin"
+        run_if_release = echo "2. release"
+        run_no_release = echo "3. not release"
+        run_if_trial   = echo "4. trial"
+        run_no_trial   = echo "5. not trial"
+        run            = echo "6. end"
+    [GenerateFile/Assa.pm]
+        filename = lib/Assa.pm
+        content  = package Assa; 1;
+    [FakeRelease]
+
+    $ dzil build
+    [Run::BeforeBuild] executing: echo "1. begin"
+    [Run::BeforeBuild] 1. begin
+    [Run::BeforeBuild] executing: echo "6. end"
+    [Run::BeforeBuild] 6. end
+    [Run::BeforeBuild] executing: echo "5. not trial"
+    [Run::BeforeBuild] 5. not trial
+    [Run::BeforeBuild] executing: echo "3. not release"
+    [Run::BeforeBuild] 3. not release
+    [DZ] beginning to build RunShell
+    [DZ] writing RunShell in RunShell-0.001_001
+    [DZ] building archive with Archive::Tar::Wrapper
+    [DZ] writing archive to RunShell-0.001_001-TRIAL.tar.gz
+    [DZ] built in RunShell-0.001_001
+
+Execution order is err… non-linear. Of course there is an explanation why command were executed in
+this particular order, but when you are looking at F<dist.ini> it is not obvious. (It is also
+unclear why C<Run> consider the build is I<not> trial, but it may be just a bug.)
+
+Another example executes Perl code:
+
+    $cat dist.ini
+    name     = RunPerl
+    abstract = RunPerl demo
+    version  = 0.001_001
+    [Run::BeforeBuild]
+        eval = my $self = shift( @_ );
+        eval = my $dist = $self->zilla;
+        eval = $self->log( [ '%s v%s', $dist->name, $dist->version ] );
+    [GenerateFile/Assa.pm]
+        filename = lib/Assa.pm
+        content  = package Assa; 1;
+    [FakeRelease]
+
+    $ dzil build
+    [Run::BeforeBuild] evaluating: my $self = shift( @_ );
+    [Run::BeforeBuild] my $dist = $self->zilla;
+    [Run::BeforeBuild] $self->log( [ '0.001_001 v', $dist->name, $dist->version ] );
+    [Run::BeforeBuild] 0.001_001 v
+    [DZ] beginning to build RunPerl
+    [DZ] writing RunPerl in RunPerl-0.001_001
+    [DZ] building archive with Archive::Tar::Wrapper
+    [DZ] writing archive to RunPerl-0.001_001-TRIAL.tar.gz
+    [DZ] built in RunPerl-0.001_001
+
+Look at the last message from C<Run::BeforeBuild> plugin. Surprising? Where is the distribution
+name? Why is the character "v" printed after version number? Ah! C<%s> is a special conversion
+specifier which was replaced with "something retained for backward compatibility". There is a bunch
+of other conversion specifiers: C<%a>, C<%d>, C<%n>,C<%p>, C<%t>, C<%v>, C<%x>,… That effectively
+means I cannot use printf-like functions and hashes, because every percent will be replaced with
+something or cause error "unknown conversion".
+
+Ok, I can. There is (undocumented!) method to avoid it — every percent sign should be doubled:
+
+    eval = $self->log( [ '%%s v%%s', $dist->name, $dist->version ] );
+
+or
+
+    eval = my %%meta = %%{ $dist->distmeta };
+
+It is simple, but… this is err… not quite Perl. I cannot just cut-n-paste code from a plugin to
+F<dist.ini> and back.
+
+Let me cite a part of "Philosophy" section of the great C<Text::Template> module:
+
+=over
+
+When people make a template module like this one, they almost always start by inventing a special
+syntax for substitutions. For example, they build it so that a string like C<%%VAR%%> is replaced
+with the value of C<$VAR>. Then they realize the need extra formatting, so they put in some special
+syntax for formatting. Then they need a loop, so they invent a loop syntax. Pretty soon they have a
+new little template language.
+
+This approach has two problems: First, their little language is crippled. If you need to do
+something the author hasn't thought of, you lose. Second: Who wants to learn another language? You
+already know Perl, so why not use it?
+
+=back
+
+Look: C<Run> plugin introduced a bunch of F<dist.ini> options: C<run_if_trial>, C<run_no_trial>
+(BTW, why not C<run_if_not_trial>?), C<run_if_release>, C<run_no_release>, C<eval>,
+C<censor_commands>, C<fatal_errors>, C<quiet>; a bunch of "conversion specifiers": C<%a>, C<%d>,
+C<%n>, C<%p>, C<%v>, C<%t>, C<%x>, C<%s>; and bunch of poorly documented rules. It's "a little
+crippled language", isn't it?
+
+Compared to C<Run>, C<Hook> is designed to be minimalistic: It provides only one option, and it
+executes only Perl. Of course, when writing a hook you have to keep in mind many rules, but these
+are well documented Perl rules and (not so well) C<Dist::Zilla> rules, not rules introduced by
+C<Hook>.
+
+All C<Run> features can be easily implemented with hooks in Perl, for example:
+
+Running external commands:
+
+    . = system( … );
+
+Making errors in external commands fatal:
+
+    . = use autodie ':all';
+    . = system( … );
+
+Making errors in Perl code non-fatal:
+
+    . = use Try::Tiny;
+    . = try { … };
+
+Checking trial status:
+
+    . = if ( $dist->is_trial ) { … };
+
+Checking release build:
+
+    . = if ( $ENV{ DZIL_RELEASING } ) { … };
+
+The code is a little bit longer than C<Run> counterparts, but it is well-known full-featured Perl.
+
+What if you need to pass to an external command something the C<Run> authors have not thought of?
+For example, abstract or licence name. There are no conversion specifiers for it, so you lose. But
+with C<Hook> it is trivial:
+
+    . = system( …, $dist->abstract, …, $dist->license->name, … );
+
+BTW, there are two minor (at the first look) C<Hook> features:
+
+=over 4
+
+=item 1
+
+Arguments provided by C<Dist::Zilla> are passes to the hook.
+
+=item 2
+
+Hook return value is passed back to C<Dist::Zilla>.
+
+=back
+
+These bring a new quality: with C<Hook> you can write inline plugins. For example, a plugin which
+reads distribution version from an external file:
+
+    [Hook::VersionProvider]
+        . = use Path::Tiny; path( 'VERSION' )->slurp;
+
+(Actually, every hook is an inline plugin.) See more in L<Dist::Zilla::Plugin::Hook::Manual/"EXAMPLES">.
+
+=head1 EXAMPLES
+
+Examples below are focused on using C<Hook>, so F<dist.ini> is a primary file in all the examples,
+and sometimes is the only file of an example. Example module contains single line C<package Assa;
+1;> and generated on-the-fly with C<GenerateFile> plugin.
+
+=head2 I<Description> Meta Resource
+
+Distribution meta information contains such items as I<name>, I<version>, I<abstract> and many
+others. All named items are written to F<META.json> (and maybe to F<META.yml>) automatically, all
+you need is just using C<MetaJSON> and/or C<MetaYAML> plugin(s) in your F<dist.ini> file.
+
+Meta information may also include I<description> — a longer, more complete description of the
+distribution. However, C<Dist::Zilla> does not provide option to specify I<description>. It could
+be easily fixed with C<Hook>, though.
+
+F<dist.ini> file:
+
+    name     = Description
+    abstract = Hook demo: Set "description" meta info
+    version  = v0.0.1
+    [Hook::MetaProvider/description]    ; <<<=== Look at this
+        ;   MetaProvider's metadata method must return HashRef (or undef).
+        ;   Multiple MetaProviders are allowed. Metainfo received from
+        ;   all providers will be merged by Dist::Zilla. This
+        ;   MetaProvider provides only description.
+        ;   See Dist::Zilla::Role::MetaProvider.
+        . = { description =>
+        . =     "This is not short one-line abstract,
+        . =     but more detailed description,
+        . =     which spans several lines."
+        . = }
+    [GenerateFile/Assa.pm]
+        filename = lib/Assa.pm
+        content  = package Assa; 1;
+    [MetaJSON]
+    [FakeRelease]
+
+=head2 C<Test::Version> adaptive strictness
+
+C<Test::Version> is a great plugin. It creates a test which checks modules in distribution: every
+module must have C<$VERSION> variable defined, and its value must be a valid version string.
+There are two notion of "validity": I<lax> and I<strict>. (See L<version::Internals/"Regular
+Expressions for Version Parsing"> for definitions of lax and strict).
+
+I want to use strict check:
+
+    [Test::Version]
+        is_strict = 1
+
+Unfortunately, this does not work for trial releases: any trial release definitely fails the test,
+because strict check does not allow underscore in version string. Thus, before every trial release
+I have to reset C<is_strict> option to zero, and return it back to one after release. This is
+boring and error-prone. I want to have "adaptive strictness": use lax check in case of trial
+release and strict check otherwise.
+
+C<Test::Version> maintainer Graham Ollis said: L<This is a good idea! I'll see if I can implement
+it.|https://github.com/plicease/Dist-Zilla-Plugin-Test-Version/issues/5> However, implementation
+may take some time. With a little help from C<Hook>, I can easily get achieve adaptive strictness
+right now.
+
+F<dist.ini> file:
+
+    name     = AdaptiveTestVersion
+    abstract = Hook demo: Test::Version adaptive strictness
+    version  = 0.001
+    [GenerateFile/Assa.pm]
+        filename = lib/Assa.pm
+        content  = package Assa; 1;
+    [Test::Version]                         ; <<<=== Look at this
+        is_strict = 0
+    [Hook::BeforeBuild/AdaptiveStrictness]  ; <<<=== Look at this
+        . = my $tv = $zilla->plugin_named( 'Test::Version' );
+        . = $tv->{ is_strict } = $dist->is_trial ? '0' : '1';
+    [MetaJSON]
+    [FakeRelease]
+
+=head2 Template Variables
+
+In a distribution, I have to duplicate the same pieces of information again and again. For example,
+bug report email and web URLs should be written in C<[MetaResources]> section of F<dist.ini> and in
+the documentation, like F<BUGS.pod>.
+
+With a help from C<Templates> plugin I can eliminate duplication. If F<BUGS.pod> is a template,
+I can use email and web URLs defined in F<dist.ini>, e. g.:
+
+    {{$dist->distmeta->{resources}->{bugtracker}->{mailto};}}
+
+Err… This works but requires a lot of typing (so it is typo-prone), and looks ugly. With C<Hook> I
+can make it not only working, but also elegant. C<[Hook::Init]> section defines few variables in
+C<MY> package, which can be used in various templates, including documentation and meta resources.
+
+F<dist.ini> file:
+
+    name     = TemplateVariables
+    abstract = Hook demo: Define variables for later use in templates.
+    version  = v0.0.1
+    [Hook::Init/my vars]                ; <<<=== Look at this
+        . = package MY;
+        . = our $name    = $dist->name;
+        . = our $bt_mail = "mailto:bug-$name\@bt.example.org";
+        . = our $bt_web  = "https://bt.example.org/display.html?name=$name";
+        ;   BTW, Hook::BeforeBuild cannot be used here: it works too late,
+        ;   MetaResources::Template will not see the variables.
+    [GenerateFile/Assa.pm]
+        filename = lib/Assa.pm
+        content  = package Assa; 1;
+    [GatherDir]
+    [PruneCruft]
+    [FileFinder::ByName/BUGS.pod]       ; <<<=== Look at this
+        file = BUGS.pod
+    [Templates]                         ; <<<=== Look at this
+        templates = BUGS.pod
+    [MetaResources::Template]           ; <<<=== Look at this
+        bugtracker.mailto = {{$MY::bt_mail}}
+        bugtracker.web    = {{$MY::bt_web}}
+        license           = {{$dist->license->url}}
+    [MetaJSON]
+    [FakeRelease]
+
+F<BUGS.pod> file:
+
+    =head2 Bugs
+
+    The quickest way to report a bug in C<{{$MY::name}}>
+    is by sending email to {{$MY::bt_mail}}.
+
+    Bug tracker can be used via
+    L<web interface|{{$MY::bt_web}}>.
+
+=head2 Version Bumping
+
+I want the version of my distribution is bumped automatically after each release, and automatically
+assigned version should be trial.
+
+For example: If I released version C<v0.0.1>, the version of the next release should be C<v0.0.1.1>
+(see C<Version::Dotted::Semantic>). When I release C<v0.0.1.1>, the next should be C<v0.0.1.2>, the
+next one — C<v0.0.1.3> and so on. When I decide it is time to non-trial release, I will set the
+version to C<v0.0.2> manually, release it, and will have automatically bumped version C<v0.0.2.1>
+for the next release.
+
+This is implemented with three plugins: C<Hook:VersionProvider>, C<Hook::ReleaseStatusProvider>,
+and C<Hook::AfterRelease>. The first one reads version from external file F<VERSION> which contains
+only version and nothing more (ok, trailing whitespace is allowed) — it simplifies implementation,
+because there is no need in parsing F<dist.ini> file. The second plugin lets C<Dist::Zilla> know
+release status (trial or stable). The third plugin bumps the version after release, and writes
+bumped version back to the F<VERSION> file.
+
+F<dist.ini> file:
+
+    name     = VersionBumping
+    abstract = Hook demo: Bump version after release
+    [Hook/prologue]                     ; <<<=== Look at this
+        . = use Version::Dotted::Semantic 'qv';
+    [Hook::VersionProvider]             ; <<<=== Look at this
+        . = $zilla->root->child( 'VERSION' )->slurp =~ s{\s*\z}{}r;
+    [Hook::ReleaseStatusProvider]       ; <<<=== Look at this
+        . = qv( $zilla->version )->is_trial ? "testing" : "stable";
+    [GenerateFile/Assa.pm]
+        filename = lib/Assa.pm
+        content  = package Assa; 1;
+    [MetaJSON]
+    [FakeRelease]
+    [Hook::AfterRelease/bump version]   ; <<<=== Look at this
+        . = my $ver = qv( $dist->version )->bump( 3 );
+        . = $zilla->root->child( 'VERSION' )->spew( $ver );
+        . = $self->log( [ 'The next release will be %s', "$ver" ] );
+
+F<VERSION> file:
+
+    v0.0.1
+
+=head2 Unwanted Dependencies
+
+C<Data::Printer> is a great module, I often use it for debugging. However, sometimes I forget to
+remove
+
+    use DDP;
+
+from the code and make a release with this unwanted dependency. C<Hook::BeforeRelease> checks the
+distribution does not have unwanted dependencies. If it does, release will be aborted.
+
+F<dist.ini> file:
+
+    name     = UnwantedDependencies
+    abstract = Hook demo: Check the distro does not have unwanted dependencies
+    version  = v0.0.1
+    [GenerateFile/Assa.pm]
+        filename = lib/Assa.pm
+        content  = package Assa; use DDP; 1;
+    [AutoPrereqs]
+    [MetaJSON]
+    [Hook::BeforeRelease/unwanted deps] ; <<<=== Look at this
+        . = my @modules = qw{ DDP Data::Printer };  # Unwanted modules.
+        . = my $prereqs = $dist->distmeta->{ prereqs };
+        . = for my $m ( @modules ) {
+        . =     for my $s ( qw{ configure develop runtime test } ) {
+        . =         if ( exists( $prereqs->{ $s }->{ requires }->{ $m } ) ) {
+        . =             $self->log_error( [ '%s found in %s prereqs', $m, $s ] );
+        . =         };
+        . =     };
+        . = };
+        . = $self->abort_if_error( 'unwanted dependencies found' );
+    [FakeRelease]
+
+=head2 Let C<[=inc::Foo]> work in Perl v5.26+.
+
+Starting from Perl v26.0, C<.> is not included into C<@INC> anymore. This breaks C<Dist::Zilla>
+syntax for plugins which are located in the distribution source tree, e. g.:
+
+    [=inc::Foo]
+
+Being run with Perl v5.26+, C<dzil> complains:
+
+    Required plugin inc::Foo isn't installed.
+
+C<Dist::Zilla::Plugin::lib> was created specially for workarounding this issue. (I said
+"workarounding" not "solving" because C<Dist::Zilla::Plugin::lib> does not help C<dzil authordeps
+--missing> to work.)
+
+The same effect can be achieved with C<Hook::Init> one-liner.
+
+F<dist.ini> file:
+
+    name     = NoDotInInc
+    abstract = Hook demo: Let [=inc::Foo] work in Perl v5.26+.
+    version  = v0.0.1
+    [Hook::Init]    ; <<<=== Look at this
+        . = use lib $zilla->root->absolute->stringify;
+    [=inc::Foo]
+    [MetaJSON]
+    [FakeRelease]
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Dist::Zilla>
+
+=item L<Dist::Zilla::Plugin::Run>
+
+=item L<Dist::Zilla::Role::Hooker>
+
+=item L<Dist::Zilla::Role::ErrorLogger>
+
+=item L<Dist::Zilla::Plugin::Hook>
+
+=back
+
+=head1 AUTHOR
+
+Van de Bugger <van.de.bugger@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015, 2016, 2018 Van de Bugger
+
+License GPLv3+: The GNU General Public License version 3 or later
+<http://www.gnu.org/licenses/gpl-3.0.txt>.
+
+This is free software: you are free to change and redistribute it. There is
+NO WARRANTY, to the extent permitted by law.
+
+=cut

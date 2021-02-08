@@ -3,12 +3,12 @@ abstract: 'Check the HTTP response code for a link'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-  Test::More: '0.98'
+  Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,8 +25,8 @@ requires:
   Mojolicious: '4.50'
   perl: '5.010'
 resources:
-  bugtracker: https://github.com/briandfoy/http-simplelinkchecker/issues
-  homepage: https://github.com/briandfoy/http-simplelinkchecker
-  repository: https://github.com/briandfoy/http-simplelinkchecker.git
-version: '1.167'
+  bugtracker: https://github.com/CPAN-Adoptable-Modules/http-simplelinkchecker/issues
+  homepage: https://github.com/CPAN-Adoptable-Modules/http-simplelinkchecker
+  repository: https://github.com/CPAN-Adoptable-Modules/http-simplelinkchecker.git
+version: '1.168'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

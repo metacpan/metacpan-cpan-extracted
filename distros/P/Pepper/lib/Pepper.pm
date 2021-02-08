@@ -1,6 +1,6 @@
 package Pepper;
 
-$Pepper::VERSION = '1.3';
+$Pepper::VERSION = '1.4';
 
 use Pepper::DB;
 use Pepper::PlackHandler;
@@ -34,7 +34,6 @@ sub new {
 	if (!$args{skip_db} && $self->{config}{use_database} eq 'Y') {
 		$self->{db} = Pepper::DB->new({
 			'config' => $self->{config},
-			'utils' => $self->{utils},
 		});
 		
 		# let the Utilities have this db object for use in send_response()

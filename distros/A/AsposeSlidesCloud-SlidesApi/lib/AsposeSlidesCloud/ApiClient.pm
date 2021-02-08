@@ -352,7 +352,7 @@ sub select_header_content_type
     } elsif (grep(/^application\/json$/i, @header)) {
         return 'application/json';
     } elsif ($header[0] eq 'multipart/form-data') {
-        return 'application/json';
+        return 'application/octet-stream';
     } else {
         return $header[0]
     }

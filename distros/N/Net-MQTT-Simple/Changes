@@ -3,6 +3,12 @@ Revision history for Perl extension Net::MQTT::Simple.
 Incompatible changes are marked with "!!". Incompatibility with and changes in
 "undocumented features" are not always specifically mentioned here.
 
+1.25  2021-02-04 19:30
+        - Fix: Remove callbacks on unsubscribe. (Contributed by marcbradshaw
+          via GitHub)
+        - Fix: Separate client ID per instance. (Contributed by hollie via
+          GitHub)
+
 1.24  2019-07-22 16:47
         - Fix: Unsubscribe didn't work with newer mosquitto.
         - Fix: The procedural interface broke in 1.23 (use strict related).
@@ -13,7 +19,8 @@ Incompatible changes are marked with "!!". Incompatibility with and changes in
 
 1.23  2019-04-29 18:18
         - New: env variables MQTT_SIMPLE_USERNAME and MQTT_SIMPLE_PASSWORD
-        - New: undocumented global $Net::MQTT::Simple::PROTOCOL_LEVEL
+        - New: undocumented global $Net::MQTT::Simple::PROTOCOL_LEVEL.
+          (Contributed by mnoorenberghe via GitHub)
         - Fix: will no longer send invalid SUBSCRIBE message with a packet
           identifier of 0. (See change note in 1.24)
     !!  - Now depends on a sane Perl installation with strict and warnings

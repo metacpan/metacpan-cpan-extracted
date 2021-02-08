@@ -1,5 +1,14 @@
 Revision history for JSON-Schema-Draft201909
 
+0.022     2021-02-07 17:33:14Z
+          - fix erroneous use of postfix dereference (closes #42).
+
+0.021     2021-02-06 18:50:42Z
+          - [Pp]roperties$ keywords now always produce annotations when
+            evaluating successfully, even if there were no matching properties
+          - added the "strict_basic" output format, for strict (but incorrect)
+            adherence to the draft 2019-09 specification
+
 0.020     2021-01-02 17:12:09Z
           - the default value for "validate_formats" is now true, to reflect
             the most typical usecase.

@@ -14,7 +14,7 @@ use File::Spec::Functions qw(abs2rel catfile rel2abs splitdir);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -23,11 +23,50 @@ sub parameters {
     my ($self) = @_;
 
     return (
-            extension => 'pm,pod',
-            title_template => '<h2></h2>',
             package => '',
             pod_directory => '',
+            final_directory => '',
+            extension => 'pm,pod',
+            title_template => '<h2></h2>',
            );
+}
+
+#----------------------------------------------------------------------
+# Alter urls in body of pod file to corect final location
+
+sub alter_url {
+    my ($self, $url) = @_;
+
+    my $site_url = $self->get_site_url();
+    $url =~ s/^$site_url//;
+
+    my @podfile_path = split(/::/, $url);
+    my $podfile = pop(@podfile_path);
+
+    my $filename = catfile($self->{pod_directory}, 
+                           @podfile_path, $podfile);
+
+    my $found;
+    foreach my $ext ('pod', 'pm', 'pl') {
+        if (-e "$filename.$ext") {
+            $podfile = lc("$podfile.$ext");
+            $found = 1;
+            last;
+        }
+    }
+
+    if ($found) {
+        $filename = catfile($self->{pod_directory}, 
+                           @podfile_path, $podfile);
+
+        $url = $self->filename_to_url($self->{top_directory}, 
+                                      $filename,
+                                      $self->{web_extension});
+    } else {
+        $url = '';
+    }
+
+    return $url;
 }
 
 #----------------------------------------------------------------------
@@ -38,8 +77,13 @@ sub extract_body {
 
     my @section = split(/<\s*\/?body[^>]*>/i, $html);
     s/^\s+// foreach @section;
+    
+    my $body = $section[1];
 
-    return $section[1];
+    $body =~ s/src="([^"]*)"/'src="' . $self->alter_url($1) . '"'/ge;
+    $body =~ s/href="([^"]*)"/'href="' . $self->alter_url($1) . '"'/ge;
+
+    return $body;
 }
 
 #----------------------------------------------------------------------
@@ -63,20 +107,19 @@ sub fetch_content {
                                           $title_parser);
 
         my %mapping = ('title' => 'name',
-                       'description' => 'description',
                        'summary' => 'description',
+                       'author' => 'author',
                        );
 
         while (my ($cname, $sname) = each %mapping) {
             $content{$cname} = $section->{$sname};
         }
 
-        foreach my $cname (qw(title)) {
+        foreach my $cname (qw(author title)) {
             my @tokens = web_split_at_tags($content{$cname});
             $content{$cname} = web_only_text(@tokens);
         }
     }
-
 
     return %content;
 }
@@ -109,6 +152,20 @@ sub fetch_sections {
 }
 
 #----------------------------------------------------------------------
+# Convert filename to url
+
+sub filename_to_url {
+    my ($self, $directory, $filename, $ext) = @_;
+
+    $filename = rel2abs($filename);
+    $filename = lc(abs2rel($filename, $self->{base_directory}));
+    $filename = catfile($self->{final_directory}, $filename);
+    $filename = fio_shorten_path($filename) if $filename =~ /\.\./;
+
+    return $self->SUPER::filename_to_url($directory, $filename, $ext);
+}
+
+#----------------------------------------------------------------------
 # Find the directory containing the pod files
 
 sub find_pod_directory {
@@ -116,14 +173,17 @@ sub find_pod_directory {
 
     my @package_path = split(/::/, $self->{package});
     pop(@package_path);
-
     my $package_folder = catfile(@package_path);
-    my @folders = (split(/\s*,\s*/, $self->{pod_directory}), @INC);
 
-    for my $folder (@folders) {
-        my $pod_folder = catfile($folder, $package_folder);
-        if (-e $pod_folder) {
-            return $pod_folder;
+    my @folders;
+    push(@folders, split(/\s*,\s*/, $self->{pod_directory}))
+        if $self->{pod_directory};
+    push(@folders, @INC);
+
+    for my $pod_folder (@folders) {
+        my $base_folder = catfile($pod_folder, $package_folder);
+        if (-e $base_folder) {
+            return ($pod_folder, $base_folder);
         }
     }
 
@@ -156,10 +216,14 @@ sub initialize_parser {
 sub setup {
     my ($self, %configuration) = @_;
 
-    my $directory = $self->find_pod_directory();
-    die "Couldn't find folder for $self->{package}" unless defined $directory;
-    $self->{base_directory} = $directory;
+    my ($pod_folder, $base_folder) = $self->find_pod_directory();
+    die "Couldn't find folder for $self->{package}" 
+        unless defined $pod_folder;
 
+    $self->{final_directory} = $self->{base_directory};
+    $self->{base_directory} = $base_folder;
+    $self->{pod_directory} = $pod_folder;
+    
     return;
 }
 
@@ -226,10 +290,10 @@ The following parameters are used from the configuration:
 
 =over 4
 
-=item extension
+=item pod_extension
 
-The extension of files that are converted to web pages. The default value
-is pod.
+The extension of files that contain pod documentation. The default value
+is pm,pod.
 
 =item pod_directory
 

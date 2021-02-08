@@ -5,11 +5,14 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name         => 'Pod::POM::Web',
     license             => 'perl',
-    dist_author         => 'Laurent Dami <laurent.d...@justice.ge.ch>',
+    dist_author         => 'Laurent Dami <dami AT cpan.org>',
     dist_version_from   => 'lib/Pod/POM/Web.pm',
     requires => {
+      'perl'                 => 5.008,
       'parent'               => 0,
       'Alien::GvaScript'     => 1.021000,
+      'Encode'               => 0,
+      'Encode::Detect'       => 0,
       'Pod::POM'             => 0.25,
       'Pod::POM::View::HTML' => 0,
       'List::Util'           => 0,
@@ -21,17 +24,17 @@ my $builder = Module::Build->new(
       'MIME::Types'          => 0,
       'URI'                  => 0,
       'URI::QueryParam'      => 0,
-      'Encode::Guess'        => 0,
       'Config'               => 0,
       'POSIX'                => 0,
       },
     recommends => {
       'Search::Indexer'           => 0.75,
       'PPI::HTML'                 => 0,
-      'AnnoCPAN::Perldoc::Filter' => 0,
     },
     build_requires => {
-      'Test::More' => 0,
+      'Test::More'     => 0,
+      'HTTP::Request'  => 0,
+      'HTTP::Response' => 0,
     },
     add_to_cleanup      => [ 'Pod-POM-Web-*' ],
     meta_merge => {

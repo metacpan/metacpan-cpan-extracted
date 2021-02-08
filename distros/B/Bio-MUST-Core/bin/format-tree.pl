@@ -52,7 +52,7 @@ if ($ARGV_collapse && ($ARGV_collapse =~ m/label|color/xms)) {
     $collapse_key  = '!color'      if $ARGV_collapse eq 'color';
     $ARGV_collapse = 'no rank';
 }
-$ARGV_annotate = 'no rank' if $ARGV_annotate eq 'missing';
+$ARGV_annotate = 'no rank' if $ARGV_annotate && $ARGV_annotate eq 'missing';
 my %opts = (name  => $ARGV_annotate);
 $opts{  collapse} =  $ARGV_collapse if $ARGV_collapse;
 
@@ -117,7 +117,9 @@ for my $infile (@ARGV_infiles) {
 
         # iTOL output
         if ($ARGV_itol) {
-            $tree->store_itol_datasets($infile, $annotate_key);
+            $tree->store_itol_datasets(
+                insert_suffix($infile, $ARGV_out_suffix), $annotate_key
+            );
         }
 
         # TRE or ARB output
@@ -167,8 +169,6 @@ for my $infile (@ARGV_infiles) {
     }
 }
 
-# TODO: set `no rank` by default for annotate
-
 __END__
 
 =pod
@@ -179,7 +179,7 @@ format-tree.pl - Format (and annotate) trees for printing
 
 =head1 VERSION
 
-version 0.210230
+version 0.210380
 
 =head1 USAGE
 

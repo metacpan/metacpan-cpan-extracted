@@ -159,6 +159,9 @@ remove_init();
     close $new_fh;
 
     for (0..$#new_tpl) {
+        $new_tpl[$_] =~ s/[\r\n]//g;
+        $orig_tpl[$_] =~ s/[\r\n]//g;
+
         if ($_ == 0) {
             is "#$new_tpl[$_]", "$orig_tpl[$_]", "module template line $_ matches ok";
             next;

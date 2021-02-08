@@ -13,23 +13,32 @@ WriteMakefile(
     'Test::More' => 0
   },
   PREREQ_PM => {
-    'Crypt::MagicSignatures::Key' => '0.14',
-    'Mojolicious' => 4.82,
+    'Crypt::MagicSignatures::Key' => '0.22',
+    'Mojolicious' => '4.82',
     'Carp' => 0,
   },
   LICENSE => 'artistic_2',
-  META_MERGE   => {
+  (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+    'meta-spec' => { version => 2 },
     requires  => { perl => '5.010001' },
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/Akron/Crypt-MagicSignatures-Envelope'
+      repository  => {
+        type => 'git',
+        web => 'https://github.com/Akron/Crypt-MagicSignatures-Envelope',
+        url => 'https://github.com/Akron/Crypt-MagicSignatures-Envelope.git'
+      },
+      bugtracker  => {
+        web => 'https://github.com/Akron/Crypt-MagicSignatures-Envelope/issues'
+      }
     },
     recommends => {
       'Math::Prime::Util::GMP'  => 0.18,
       'Math::BigInt::GMP'       => 0,
       'Math::Random::ISAAC::XS' => 1.004,
     }
-  },
+  }) : (),
+  ),
   MIN_PERL_VERSION => '5.010001',
   test => {TESTS => 't/*.t'}
 );

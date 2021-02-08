@@ -1,7 +1,7 @@
-#!/usr/local/bin/perl -Tw
+#!/usr/bin/perl
 
 use strict;
-use lib '..','../blib/lib','.','./blib/lib';
+use lib '../lib','./lib','./blib/lib';
 
 my ($i, $j, $test_data);
 
@@ -46,7 +46,7 @@ test(1,!$@,"Couldn't load module");
 test(2,$i = Crypt::CBC->new(-key         => 'a' x $ks,
 			    -cipher      => 'Rijndael',
 			    -iv          => 'f' x $bs,
-			    -literal_key => 1,
+			    -pbkdf       => 'none',
 			    -header      => 'none',
 			    -padding     => 'rijndael_compat',
                            ),

@@ -30,6 +30,7 @@ my @files = (
     'lib/Pithub/Orgs/Teams.pm',
     'lib/Pithub/PullRequests.pm',
     'lib/Pithub/PullRequests/Comments.pm',
+    'lib/Pithub/PullRequests/Reviewers.pm',
     'lib/Pithub/Repos.pm',
     'lib/Pithub/Repos/Collaborators.pm',
     'lib/Pithub/Repos/Commits.pm',

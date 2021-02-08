@@ -40,13 +40,13 @@ use File::Spec::Functions qw(catfile);
 my $module    = __PACKAGE__;
 ( my $dist = $module ) =~ s/::/-/g;
 
-my $github    = 'https://github.com/briandfoy/http-size';
+my $github    = 'https://github.com/CPAN-Adoptable-Modules/http-size';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
 	'MIN_PERL_VERSION' => '5.008',
 
-	'NAME'	        => $module,
+	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
 	'LICENSE'       => 'artistic_2',
@@ -61,7 +61,7 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::More' => '0.94',
+		'Test::More' => '1',
 		},
 
 	'PREREQ_PM'     => {

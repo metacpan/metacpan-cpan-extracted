@@ -23,14 +23,13 @@ requires 'Image::Select' => 0.03;
 requires 'Readonly' => 0;
 requires 'Video::Generator' => 0.06;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=App-Video-Generator';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-Video-Generator/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-Video-Generator';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-Video-Generator';
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.08';
+version '0.09';
 
 # Run.
 WriteAll();

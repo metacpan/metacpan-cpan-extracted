@@ -58,7 +58,8 @@ DiaColloDB::Utils - diachronic collocation database, generic utilities
  $bool = crun(@IPC_Run_args);
  $bool = csort_to(\@sortargs, \&catcher);
  $bool = csortuc_to(\@sortargs, \&catcher);
- 
+ $cmd = sortCmd();
+
  ##========================================================================
  ## Functions: pack filters
  
@@ -189,7 +190,7 @@ Exportable tags:
 
  fcntl => [qw(fcflags fcgetfl fcread fcwrite fctrunc fccreat fcperl fcopen)],
  json  => [qw(loadJsonString loadJsonFile saveJsonString saveJsonFile)],
- sort  => [qw(csort_to csortuc_to)],
+ sort  => [qw(csort_to csortuc_to sortCmd)],
  run   => [qw(crun opencmd)],
  env   => [qw(env_set env_push env_pop)],
  pack  => [qw(packsize packsingle packFilterFetch packFilterStore)],
@@ -403,6 +404,23 @@ runs system sort and feeds resulting lines to \&catcher
  $bool = csortuc_to(\@sortargs, \&catcher);
 
 runs system sort | uniq -c and feeds resulting lines to \&catcher
+
+=item sortCmd
+
+ $cmd = sortCmd();
+ $cmd = sortCmd($nJobs);
+
+Returns command-line prefix (command and initial optopins) for GNU-like B<sort> command.
+This method just returns the value of the C<DIACOLLO_SORT> environment variable if it is set,
+otherwise the value of the C<SORT> environment variable if that is set.  If neither
+C<DIACOLLO_SORT> nor C<SORT> are set, it returns the string B<sort> with the parallelization
+options returned by L</sortJobs> appended.  You can use the environment variable hooks e.g. to
+reduce the amount of RAM and/or CPU cores used by subordinate system sort calls by setting
+them appropriately, e.g.
+
+ env SORT="/bin/sort --parallel=4 --buffer-size=1G"
+
+to request that GNU sort use at most 4 CPU cores and a maximum RAM buffer size of 1GB.
 
 =back
 

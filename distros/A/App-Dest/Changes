@@ -1,5 +1,8 @@
 Revision history for App::Dest
 
+1.30      2021-02-04 14:50:52-08:00 America/Los_Angeles
+        - Pre-support for exact v1.15 try implementation switch
+
 1.29      2021-01-13 11:13:11-08:00 America/Los_Angeles
         - Override some minimum version reqs in dist.ini
 

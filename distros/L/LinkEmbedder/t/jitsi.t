@@ -11,6 +11,7 @@ my $provider_url = Mojo::URL->new($ENV{TEST_JITSI_URL})->path('')->to_string;
 LinkEmbedder->new->test_ok(
   $ENV{TEST_JITSI_URL} => {
     html          => qr{allow="camera;microphone".*src="$provider_url[^"]+"},
+    class         => 'le-rich le-video-chat le-provider-jitsi',
     isa           => 'LinkEmbedder::Link::Jitsi',
     provider_name => 'Jitsi',
     provider_url  => $provider_url,
@@ -24,6 +25,7 @@ LinkEmbedder->new->test_ok(
 LinkEmbedder->new->test_ok(
   $provider_url => {
     html          => qr{le-provider-jitsi.*<a href}s,
+    class         => 'le-rich le-card le-image-card le-provider-jitsi',
     isa           => 'LinkEmbedder::Link::Jitsi',
     provider_name => 'Jitsi',
     provider_url  => $provider_url,

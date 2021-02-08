@@ -1781,13 +1781,6 @@ static OP *pp_enterasync(pTHX)
   return PL_op->op_next;
 }
 
-static OP *newENTERASYNCOP(I32 flags)
-{
-  OP *op = newOP(OP_CUSTOM, flags);
-  op->op_ppaddr = &pp_enterasync;
-  return op;
-}
-
 static XOP xop_leaveasync;
 static OP *pp_leaveasync(pTHX)
 {
@@ -1827,14 +1820,6 @@ static OP *pp_leaveasync(pTHX)
     SvREFCNT_dec(f);
 
   return PL_op->op_next;
-}
-
-static OP *newLEAVEASYNCOP(I32 flags)
-{
-  OP *op = newOP(OP_CUSTOM, flags);
-  op->op_ppaddr = &pp_leaveasync;
-
-  return op;
 }
 
 static XOP xop_await;
@@ -2029,14 +2014,6 @@ static OP *pp_await(pTHX)
   return PL_ppaddr[OP_RETURN](aTHX);
 }
 
-static OP *newAWAITOP(I32 flags, OP *expr)
-{
-  OP *op = newUNOP_CUSTOM(flags, expr);
-  op->op_ppaddr = &pp_await;
-
-  return op;
-}
-
 static OP *newAWAITOP_toplevel(I32 flags, OP *expr)
 {
   /* A toplevel await should just look like a ->get method call */
@@ -2070,14 +2047,6 @@ static OP *pp_pushcancel(pTHX)
   }
 
   return PL_op->op_next;
-}
-
-#define newPUSHCANCELOP(on_cancel)  MY_newPUSHCANCELOP(aTHX_ on_cancel)
-static OP *MY_newPUSHCANCELOP(pTHX_ CV *on_cancel)
-{
-  OP *op = newSVOP_CUSTOM(0, (SV *)on_cancel);
-  op->op_ppaddr = &pp_pushcancel;
-  return (OP *)op;
 }
 
 enum {
@@ -2192,7 +2161,7 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
   if(precancel_padix) {
     OP *enterasync;
     op = op_append_elem(OP_LINESEQ, op,
-      enterasync = newENTERASYNCOP(0));
+      enterasync = newOP_CUSTOM(&pp_enterasync, 0));
 
     enterasync->op_targ = precancel_padix;
   }
@@ -2203,7 +2172,7 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
   op = op_append_elem(OP_LINESEQ, op, try = newUNOP(OP_ENTERTRY, 0, ctx->body));
   op_contextualize(try, G_ARRAY);
 
-  op = op_append_elem(OP_LINESEQ, op, newLEAVEASYNCOP(OPf_WANT_SCALAR));
+  op = op_append_elem(OP_LINESEQ, op, newOP_CUSTOM(&pp_leaveasync, OPf_WANT_SCALAR));
   ctx->body = op;
 }
 
@@ -2262,7 +2231,7 @@ static int await_keyword_plugin(pTHX_ OP **op_ptr)
   if(PL_compcv == PL_main_cv)
     *op_ptr = newAWAITOP_toplevel(0, expr);
   else {
-    *op_ptr = newAWAITOP(0, expr);
+    *op_ptr = newUNOP_CUSTOM(&pp_await, 0, expr);
 
     PADOFFSET precancel_padix = SvUV(SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", 0)));
     if(precancel_padix)
@@ -2304,7 +2273,7 @@ static int cancel_phaser_keyword_plugin(pTHX_ OP **op_ptr)
   OP *pushcancel;
 
   *op_ptr = op_prepend_elem(OP_LINESEQ,
-    (pushcancel = newPUSHCANCELOP(on_cancel)), NULL);
+    (pushcancel = newSVOP_CUSTOM(&pp_pushcancel, 0, (SV *)on_cancel)), NULL);
 
   SV *sv;
   PADOFFSET precancel_padix = SvUV(sv = SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", 0)));

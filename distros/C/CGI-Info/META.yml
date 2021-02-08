@@ -5,10 +5,12 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   IPC::System::Simple: '0'
+  Test::Carp: '0'
   Test::CleanNamespaces: '0'
   Test::Exception: '0.42'
   Test::Most: '0'
   Test::NoWarnings: '0'
+  Test::Requires: '0'
   Test::Script: '1.12'
   Test::Warn: '0'
   Tie::Filehandle::Preempt::Stdin: '0'
@@ -16,7 +18,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,19 +35,20 @@ requires:
   File::Basename: '0'
   File::Spec: '0'
   HTTP::BrowserDetect: '3.1'
+  JSON: '0'
   JSON::PP: '4.02'
-  JSON::Parse: '0'
   List::MoreUtils: '0'
   Log::Any: '0'
   Socket: '0'
   String::Clean::XSS: '0'
+  Sub::Private: '0'
   Sys::Hostname: '0'
   Sys::Path: '0'
   URI::Heuristic: '0'
   namespace::clean: '0'
-  perl: '5.006002'
+  perl: '5.008'
 resources:
   bugtracker: https://github.com/nigelhorne/CGI-Info/issues
   repository: git://github.com/nigelhorne/CGI-Info.git
-version: '0.70'
+version: '0.71'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

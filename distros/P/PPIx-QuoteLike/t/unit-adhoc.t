@@ -30,6 +30,36 @@ use Test::More 0.88;	# Because of done_testing();
 
 }
 
+{
+    my $code = <<'END_OF_DOCUMENT';
+<<\EOD
+$foo
+EOD
+END_OF_DOCUMENT
+
+    my $pql = PPIx::QuoteLike->new( $code );
+
+    cmp_ok $pql->failures(), '==', 0, '<<\\EOD here doc parses';
+
+    ok ! $pql->interpolates(), '<<\\EOD here doc does not interpolate';
+
+}
+
+{
+    my $code = <<'END_OF_DOCUMENT';
+<<~\EOD
+    $foo
+    EOD
+END_OF_DOCUMENT
+
+    my $pql = PPIx::QuoteLike->new( $code );
+
+    cmp_ok $pql->failures(), '==', 0, '<<~\\EOD here doc parses';
+
+    ok ! $pql->interpolates(), '<<~\\EOD here doc does not interpolate';
+
+}
+
 done_testing;
 
 1;

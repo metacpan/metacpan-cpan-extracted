@@ -1,7 +1,7 @@
 #ifndef SPVM_SWITCH_INFO_H
 #define SPVM_SWITCH_INFO_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
 enum {
   SPVM_SWITCH_INFO_C_ID_TABLE_SWITCH,
@@ -9,7 +9,7 @@ enum {
 };
 
 // Parser information
-struct SPVM_switch_info {
+struct spvm_switch_info {
   SPVM_LIST* case_infos;
   SPVM_OP* op_default;
   int32_t id;

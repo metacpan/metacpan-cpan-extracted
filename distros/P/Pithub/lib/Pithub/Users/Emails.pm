@@ -1,10 +1,10 @@
 package Pithub::Users::Emails;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 User Emails API
 
 use Moo;
-use Carp qw(croak);
+use Carp qw( croak );
 extends 'Pithub::Base';
 
 
@@ -53,7 +53,7 @@ Pithub::Users::Emails - Github v3 User Emails API
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 METHODS
 

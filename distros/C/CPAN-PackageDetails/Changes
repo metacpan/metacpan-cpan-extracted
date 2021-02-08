@@ -1,5 +1,10 @@
 Revision history for Perl module CPAN::PackageDetails
 
+0.262 2018-10-16T22:46:12Z
+	* Fix a problem where $VERSION isn't initialized soon enough.
+	This caused warnings that made other modules fail their "no
+	warnings" tests.
+
 0.261 2018-06-12T13:48:14Z
 	* Change to Artistic License 2.0
 

@@ -6,6 +6,8 @@ use_ok( $class );
 my @apples  = ('Granny Smith', 'Washington', 'Red Delicious');
 my @oranges = ('Navel', 'Florida');
 
+no warnings;
+
 my $cross = Set::CrossProduct->new( [ \@apples ] );
 ok( !( defined $cross ), 'Single array returns undef' );
 

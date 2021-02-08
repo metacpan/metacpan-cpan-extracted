@@ -1,27 +1,33 @@
 {
    "abstract" : "Extract delimited text sequences from strings",
    "author" : [
-      "Ron Savage <ron@savage.net.au>"
+      "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-Balanced-Marpa",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "1.001006"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.421"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -37,22 +43,25 @@
             "utf8" : "0",
             "warnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Text::Balanced::Marpa" : {
-         "file" : "lib/Text/Balanced/Marpa.pm",
-         "version" : "1.07"
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
+         "http://opensource.org/licenses/Artistic-2.0"
       ],
       "repository" : {
-         "url" : "https://github.com/ronsavage/Text-Balanced-Marpa"
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/Text-Balanced-Marpa.git",
+         "web" : "https://github.com/ronsavage/Text-Balanced-Marpa"
       }
    },
-   "version" : "1.07"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

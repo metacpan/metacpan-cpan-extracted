@@ -14,21 +14,21 @@
  * CHARACTER CLASS METHODS
  * ****************************************************************************
  */
-int charIsSpace(char ch) {
+bool charIsSpace(char ch) {
     if (ch == ' ')  return 1;
     if (ch == '\t') return 1;
     return 0;
 }
-int charIsEndspace(char ch) {
+bool charIsEndspace(char ch) {
     if (ch == '\n') return 1;
     if (ch == '\r') return 1;
     if (ch == '\f') return 1;
     return 0;
 }
-int charIsWhitespace(char ch) {
+bool charIsWhitespace(char ch) {
     return charIsSpace(ch) || charIsEndspace(ch);
 }
-int charIsIdentifier(char ch) {
+bool charIsIdentifier(char ch) {
     if ((ch >= 'a') && (ch <= 'z')) return 1;
     if ((ch >= 'A') && (ch <= 'Z')) return 1;
     if ((ch >= '0') && (ch <= '9')) return 1;
@@ -38,7 +38,7 @@ int charIsIdentifier(char ch) {
     if (ch > 126)   return 1;
     return 0;
 }
-int charIsInfix(char ch) {
+bool charIsInfix(char ch) {
     /* EOL characters before+after these characters can be removed */
     if (ch == ',')  return 1;
     if (ch == ';')  return 1;
@@ -54,7 +54,7 @@ int charIsInfix(char ch) {
     if (ch == '\n') return 1;
     return 0;
 }
-int charIsPrefix(char ch) {
+bool charIsPrefix(char ch) {
     /* EOL characters after these characters can be removed */
     if (ch == '{')  return 1;
     if (ch == '(')  return 1;
@@ -62,7 +62,7 @@ int charIsPrefix(char ch) {
     if (ch == '!')  return 1;
     return charIsInfix(ch);
 }
-int charIsPostfix(char ch) {
+bool charIsPostfix(char ch) {
     /* EOL characters before these characters can be removed */
     if (ch == '}')  return 1;
     if (ch == ')')  return 1;
@@ -107,7 +107,22 @@ struct _Node {
     NodeType    type;
 };
 
+#define NODE_SET_SIZE 50000
+
+struct _NodeSet;
+typedef struct _NodeSet NodeSet;
+struct _NodeSet {
+    /* link to next NodeSet */
+    NodeSet*    next;
+    /* Nodes in this Set */
+    Node        nodes[NODE_SET_SIZE];
+    size_t      next_node;
+};
+
 typedef struct {
+    /* singly linked list of NodeSets */
+    NodeSet*    head_set;
+    NodeSet*    tail_set;
     /* linked list pointers */
     Node*       head;
     Node*       tail;
@@ -124,12 +139,12 @@ typedef struct {
  */
 
 /* checks to see if the node is the given string, case INSENSITIVELY */
-int nodeEquals(Node* node, const char* string) {
+bool nodeEquals(Node* node, const char* string) {
     return (strcasecmp(node->contents, string) == 0);
 }
 
 /* checks to see if the node contains the given string, case INSENSITIVELY */
-int nodeContains(Node* node, const char* string) {
+bool nodeContains(Node* node, const char* string) {
     const char* haystack = node->contents;
     size_t len = strlen(string);
     char ul_start[2] = { tolower(*string), toupper(*string) };
@@ -154,9 +169,10 @@ int nodeContains(Node* node, const char* string) {
     /* no match */
     return 0;
 }
+
 /* checks to see if the node begins with the given string, case INSENSITIVELY
  */
-int nodeBeginsWith(Node* node, const char* string) {
+bool nodeBeginsWith(Node* node, const char* string) {
     size_t len = strlen(string);
     if (len > node->length)
         return 0;
@@ -164,7 +180,7 @@ int nodeBeginsWith(Node* node, const char* string) {
 }
 
 /* checks to see if the node ends with the given string, case INSENSITIVELY */
-int nodeEndsWith(Node* node, const char* string) {
+bool nodeEndsWith(Node* node, const char* string) {
     size_t len = strlen(string);
     size_t off = node->length - len;
     if (len > node->length)
@@ -195,29 +211,30 @@ int nodeEndsWith(Node* node, const char* string) {
  * ****************************************************************************
  */
 /* allocates a new node */
-Node* JsAllocNode() {
+Node* JsAllocNode(JsDoc* doc) {
     Node* node;
-    Newz(0, node, 1, Node);
+    NodeSet* set = doc->tail_set;
+
+    /* if our current NodeSet is full, allocate a new NodeSet */
+    if (set->next_node >= NODE_SET_SIZE) {
+        NodeSet* next_set;
+        Newz(0, next_set, 1, NodeSet);
+        set->next = next_set;
+        doc->tail_set = next_set;
+        set = next_set;
+    }
+
+    /* grab the next Node out of the NodeSet */
+    node = set->nodes + set->next_node;
+    set->next_node ++;
+
+    /* initialize the node */
     node->prev = NULL;
     node->next = NULL;
     node->contents = NULL;
     node->length = 0;
     node->type = NODE_EMPTY;
     return node;
-}
-
-/* frees the memory used by a node */
-void JsFreeNode(Node* node) {
-    if (node->contents)
-        Safefree(node->contents);
-    Safefree(node);
-}
-void JsFreeNodeList(Node* head) {
-    while (head) {
-        Node* tmp = head->next;
-        JsFreeNode(head);
-        head = tmp;
-    }
 }
 
 /* clears the contents of a node */
@@ -230,13 +247,20 @@ void JsClearNodeContents(Node* node) {
 
 /* sets the contents of a node */
 void JsSetNodeContents(Node* node, const char* string, size_t len) {
-    size_t bufSize = len + 1;
-    /* clear node, set new length */
-    JsClearNodeContents(node);
-    node->length = len;
-    /* allocate string, fill with NULLs, and copy */
-    Newz(0, node->contents, bufSize, char);
-    strncpy( node->contents, string, len );
+    /* if the buffer is already big enough, just overwrite it */
+    if (node->length >= len) {
+        memcpy( node->contents, string, len );
+        node->contents[len] = '\0';
+        node->length = len;
+    }
+    /* otherwise free the buffer, allocate a new one, and copy it in */
+    else {
+        JsClearNodeContents(node);
+        node->length = len;
+        /* allocate string, fill with NULLs, and copy */
+        Newz(0, node->contents, (len+1), char);
+        memcpy( node->contents, string, len );
+    }
 }
 
 /* removes the node from the list and discards it entirely */
@@ -245,7 +269,6 @@ void JsDiscardNode(Node* node) {
         node->prev->next = node->next;
     if (node->next)
         node->next->prev = node->prev;
-    JsFreeNode(node);
 }
 
 /* appends the node to the given element */
@@ -257,42 +280,13 @@ void JsAppendNode(Node* element, Node* node) {
     element->next = node;
 }
 
-/* collapses a node to a single whitespace character.  If the node contains any
- * endspace characters, that is what we're collapsed to.
- */
+/* collapses a node to a single whitespace character */
 void JsCollapseNodeToWhitespace(Node* node) {
     if (node->contents) {
-        char ws = node->contents[0];
-        size_t idx;
-        for (idx=0; idx<node->length; idx++) {
-            if (charIsEndspace(node->contents[idx])) {
-                ws = node->contents[idx];
-                break;
-            }
-        }
-        JsSetNodeContents(node, &ws, 1);
+        node->length = 1;
+        node->contents[1] = '\0';
     }
 }
-
-/* collapses a node to a single endspace character.  If the node doesn't
- * contain any endspace characters, the node is collapsed to an empty string.
- */
-void JsCollapseNodeToEndspace(Node* node) {
-    if (node->contents) {
-        char ws = 0;
-        size_t idx;
-        for (idx=0; idx<node->length; idx++) {
-            if (charIsEndspace(node->contents[idx])) {
-                ws = node->contents[idx];
-                break;
-            }
-        }
-        JsClearNodeContents(node);
-        if (ws)
-            JsSetNodeContents(node, &ws, 1);
-    }
-}
-
 
 /* ****************************************************************************
  * TOKENIZING FUNCTIONS
@@ -304,6 +298,7 @@ void _JsExtractLiteral(JsDoc* doc, Node* node) {
     const char* buf = doc->buffer;
     size_t offset   = doc->offset;
     char delimiter  = buf[offset];
+    bool in_char_class = 0;
     /* skip start of literal */
     offset ++;
     /* search for end of literal */
@@ -312,12 +307,24 @@ void _JsExtractLiteral(JsDoc* doc, Node* node) {
             /* escaped character; skip */
             offset ++;
         }
-        else if (buf[offset] == delimiter) {
-            const char* start = buf + doc->offset;
-            size_t length     = offset - doc->offset + 1;
-            JsSetNodeContents(node, start, length);
-            node->type = NODE_LITERAL;
-            return;
+        else {
+            /* if in a regex, track if we're in a character class */
+            if (delimiter == '/') {
+                if ((buf[offset] == '[') && !in_char_class) {
+                    in_char_class = 1;
+                }
+                if ((buf[offset] == ']') && in_char_class) {
+                    in_char_class = 0;
+                }
+            }
+            /* if we have found the end of the literal, store it */
+            if ((buf[offset] == delimiter) && !in_char_class) {
+                const char* start = buf + doc->offset;
+                size_t length     = offset - doc->offset + 1;
+                JsSetNodeContents(node, start, length);
+                node->type = NODE_LITERAL;
+                return;
+            }
         }
         /* move onto next character */
         offset ++;
@@ -401,36 +408,27 @@ void _JsExtractSigil(JsDoc* doc, Node* node) {
 }
 
 /* tokenizes the given string and returns the list of nodes */
-Node* JsTokenizeString(const char* string) {
-    JsDoc doc;
-
-    /* initialize our JS document object */
-    doc.head = NULL;
-    doc.tail = NULL;
-    doc.buffer = string;
-    doc.length = strlen(string);
-    doc.offset = 0;
-
+Node* JsTokenizeString(JsDoc* doc, const char* string) {
     /* parse the JS */
-    while ((doc.offset < doc.length) && (doc.buffer[doc.offset])) {
+    while ((doc->offset < doc->length) && (doc->buffer[doc->offset])) {
         /* allocate a new node */
-        Node* node = JsAllocNode();
-        if (!doc.head)
-            doc.head = node;
-        if (!doc.tail)
-            doc.tail = node;
+        Node* node = JsAllocNode(doc);
+        if (!doc->head)
+            doc->head = node;
+        if (!doc->tail)
+            doc->tail = node;
 
         /* parse the next node out of the JS */
-        if (doc.buffer[doc.offset] == '/') {
-            if (doc.buffer[doc.offset+1] == '*')
-                _JsExtractBlockComment(&doc, node);
-            else if (doc.buffer[doc.offset+1] == '/')
-                _JsExtractLineComment(&doc, node);
+        if (doc->buffer[doc->offset] == '/') {
+            if (doc->buffer[doc->offset+1] == '*')
+                _JsExtractBlockComment(doc, node);
+            else if (doc->buffer[doc->offset+1] == '/')
+                _JsExtractLineComment(doc, node);
             else {
                 /* could be "division" or "regexp", but need to know more about
                  * our context...
                  */
-                Node* last = doc.tail;
+                Node* last = doc->tail;
                 char ch = 0;
 
                 /* find last non-whitespace, non-comment node */
@@ -442,54 +440,54 @@ Node* JsTokenizeString(const char* string) {
                 /* see if we're "division" or "regexp" */
                 if (nodeIsIDENTIFIER(last) && nodeEquals(last, "return")) {
                     /* returning a regexp from a function */
-                    _JsExtractLiteral(&doc, node);
+                    _JsExtractLiteral(doc, node);
                 }
                 else if (ch && ((ch == ')') || (ch == '.') || (ch == ']') || (charIsIdentifier(ch)))) {
                     /* looks like an identifier; guess its division */
-                    _JsExtractSigil(&doc, node);
+                    _JsExtractSigil(doc, node);
                 }
                 else {
                     /* presume its a regexp */
-                    _JsExtractLiteral(&doc, node);
+                    _JsExtractLiteral(doc, node);
                 }
             }
         }
-        else if ((doc.buffer[doc.offset] == '"') || (doc.buffer[doc.offset] == '\'')  || (doc.buffer[doc.offset] == '`'))
-            _JsExtractLiteral(&doc, node);
-        else if (charIsWhitespace(doc.buffer[doc.offset]))
-            _JsExtractWhitespace(&doc, node);
-        else if (charIsIdentifier(doc.buffer[doc.offset]))
-            _JsExtractIdentifier(&doc, node);
+        else if ((doc->buffer[doc->offset] == '"') || (doc->buffer[doc->offset] == '\'')  || (doc->buffer[doc->offset] == '`'))
+            _JsExtractLiteral(doc, node);
+        else if (charIsWhitespace(doc->buffer[doc->offset]))
+            _JsExtractWhitespace(doc, node);
+        else if (charIsIdentifier(doc->buffer[doc->offset]))
+            _JsExtractIdentifier(doc, node);
         else
-            _JsExtractSigil(&doc, node);
+            _JsExtractSigil(doc, node);
 
         /* move ahead to the end of the parsed node */
-        doc.offset += node->length;
+        doc->offset += node->length;
 
         /* add the node to our list of nodes */
-        if (node != doc.tail)
-            JsAppendNode(doc.tail, node);
-        doc.tail = node;
+        if (node != doc->tail)
+            JsAppendNode(doc->tail, node);
+        doc->tail = node;
 
         /* some debugging info */
 #ifdef DEBUG
         {
             int idx;
             printf("----------------------------------------------------------------\n");
-            printf("%s: %s\n", strNodeTypes[node->type], node->contents);
-            printf("next: '");
+            printf("%s: [%s]\n", strNodeTypes[node->type], node->contents);
+            printf("next: [");
             for (idx=0; idx<=10; idx++) {
-                if ((doc.offset+idx) >= doc.length) break;
-                if (!doc.buffer[doc.offset+idx])    break;
-                printf("%c", doc.buffer[doc.offset+idx]);
+                if ((doc->offset+idx) >= doc->length) break;
+                if (!doc->buffer[doc->offset+idx])    break;
+                printf("%c", doc->buffer[doc->offset+idx]);
             }
-            printf("'\n");
+            printf("]\n");
         }
 #endif
     }
 
     /* return the node list */
-    return doc.head;
+    return doc->head;
 }
 
 /* ****************************************************************************
@@ -507,11 +505,15 @@ void JsCollapseNodes(Node* curr) {
                 JsCollapseNodeToWhitespace(curr);
                 break;
             case NODE_BLOCKCOMMENT:
+                /* IE Conditional Compilation comments do not get collapsed */
+                if (nodeIsIECONDITIONALBLOCKCOMMENT(curr)) {
+                  break;
+                }
                 /* block comments get collapsed to WS if that's a side-affect
                  * of their placement in the JS document.
                  */
-                if (!nodeIsIECONDITIONALBLOCKCOMMENT(curr)) {
-                    int convert_to_ws = 0;
+                {
+                    bool convert_to_ws = 0;
                     /* find surrounding non-WS nodes */
                     Node* nonws_prev = curr->prev;
                     Node* nonws_next = curr->next;
@@ -610,7 +612,7 @@ int JsCanPrune(Node* node) {
             if (nodeIsPREFIXSIGIL(node) && next && nodeIsWHITESPACE(next))
                 return PRUNE_NEXT;
             /* remove whitespace before "postfix" sigils */
-            if (nodeIsPOSTFIXSIGIL(node) && prev && nodeIsWHITESPACE(prev))
+            if (nodeIsPOSTFIXSIGIL(node) && prev && nodeIsWHITESPACE(prev) && prev->prev && !nodeIsLINECOMMENT(prev->prev))
                 return PRUNE_PREVIOUS;
             /* remove whitespace (but NOT endspace) after closing brackets */
             if (next && nodeIsWHITESPACE(next) && !nodeIsENDSPACE(next) && (nodeIsCHAR(node,')') || nodeIsCHAR(node,'}') || nodeIsCHAR(node,']')))
@@ -686,8 +688,19 @@ Node* JsPruneNodes(Node *head) {
  */
 char* JsMinify(const char* string) {
     char* results;
+    JsDoc doc;
+
+    /* initialize our JS document object */
+    doc.head = NULL;
+    doc.tail = NULL;
+    doc.buffer = string;
+    doc.length = strlen(string);
+    doc.offset = 0;
+    Newz(0, doc.head_set, 1, NodeSet);
+    doc.tail_set = doc.head_set;
+
     /* PASS 1: tokenize JS into a list of nodes */
-    Node* head = JsTokenizeString(string);
+    Node* head = JsTokenizeString(&doc, string);
     if (!head) return NULL;
     /* PASS 2: collapse nodes */
     JsCollapseNodes(head);
@@ -712,8 +725,15 @@ char* JsMinify(const char* string) {
         }
         *ptr = 0;
     }
-    /* free memory used by node list */
-    JsFreeNodeList(head);
+    /* free memory used by the NodeSets */
+    {
+        NodeSet* curr = doc.head_set;
+        while (curr) {
+            NodeSet* next = curr->next;
+            Safefree(curr);
+            curr = next;
+        }
+    }
     /* return resulting minified JS back to caller */
     return results;
 }

@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.257    2021-02-04
+        - Check regex after user input.
+
 2.256    2021-01-01
         - Add bugracker info to the Makefile.PL.
         - Update year copyright.

@@ -1,5 +1,9 @@
 Revision history for Net-Connection-ncnetstat
 
+0.6.0	 2021-02-08/08:00
+		 - Now uses sockstat on FreeBSD.
+		 - Make --pct, -C, --Cl, and -W XORable via $ENV
+
 0.5.0	 2019-09-03/03:30
 		 - Add the arg no_pid_user.
 

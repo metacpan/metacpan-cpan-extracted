@@ -5,11 +5,11 @@ use Test::Most;
 use autodie;
 use feature qw(say);
 
-use List::AllUtils;
+use List::AllUtils qw(sum);
 use Path::Class qw(file);
 
 use Bio::MUST::Core;
-use Bio::MUST::Core::Utils qw(cmp_store);
+use Bio::MUST::Core::Utils qw(:tests);
 
 my $class = 'Bio::MUST::Core::SeqMask::Rates';
 
@@ -129,6 +129,23 @@ for my $data (@exp_data) {
         file   => 'test-delta.rates',
         test   => 'wrote expected delta-rates file',
     );
+}
+
+{
+    my $infile = file('test', 'rg-supermatrix-IQTREE.rate');
+    my $rates = $class->load($infile);
+    isa_ok $rates, $class, $infile;
+    cmp_ok $rates->mask_len, '==', 1000,
+        'read expected number of site rates for IQ-TREE .rate file';
+
+    my $epsilon = 1e-12;
+
+    cmp_float $rates->min_rate, 0.30935, $epsilon,
+        'got expected min rate';
+    cmp_float $rates->max_rate, 1.91612, $epsilon,
+        'got expected max rate';
+    cmp_float sum($rates->all_states) / $rates->mask_len, 0.77959709, $epsilon,
+        'got expected mean rate';
 }
 
 done_testing;

@@ -1,4 +1,4 @@
-use v5.28;
+use v5.24;
 use warnings;
 use Test::More;
 use Quantum::Superpositions::Lazy qw(superpos every_state any_state one_state);
@@ -31,20 +31,23 @@ ok !!$pos1, "negation ok";
 ok !superpos(0), "negation ok";
 ok !!superpos(0, 1), "negation ok";
 
-ok any_state { $pos1 == 1 };
-ok any_state { $pos1 != 2.5 };
-ok any_state { $pos1 != 0 };
+ok any_state { $pos1 == 1 }, 'any state == ok';
+ok any_state { $pos1 != 2.5 }, 'any state != ok';
+ok any_state { $pos1 != 0 }, 'any state != 2 ok';
+ok any_state { $pos1 != 1 }, 'any state != 3 ok';
 
-ok every_state { $pos1 != 20 };
-ok !every_state { $pos1 == 2 };
-ok every_state { $pos1 != $pos3 };
+ok every_state { $pos1 != 20 }, 'every state != ok';
+ok !every_state { $pos1 != 2 }, '!every state != ok';
+ok !every_state { $pos1 == 2 }, '!every state == ok';
+ok every_state { $pos1 != $pos3 }, 'every state != superpos ok';
+ok !every_state { $pos2 != $pos3 }, '!every state != superpos ok';
 
-ok one_state { $pos1 == $pos2 };
-ok !one_state { $pos1 != $pos2 };
-ok one_state { $pos1 == 2 };
-ok !one_state { $pos1 != 2 };
-ok !one_state { $pos2 == $pos3 };
-ok !one_state { $pos1 == $pos3 };
-ok !one_state { $pos2 != $pos3 };
+ok one_state { $pos1 == $pos2 }, 'one state == superpos ok';
+ok !one_state { $pos1 != $pos2 }, '!one state != superpos ok';
+ok one_state { $pos1 == 2 }, 'one state == ok';
+ok !one_state { $pos1 != 2 }, '!one state != ok';
+ok !one_state { $pos2 == $pos3 }, '!one state == superpos ok';
+ok !one_state { $pos1 == $pos3 }, '!one state == superpos 2 ok';
+ok !one_state { $pos2 != $pos3 }, '!one state != superpos 2 ok';
 
 done_testing;

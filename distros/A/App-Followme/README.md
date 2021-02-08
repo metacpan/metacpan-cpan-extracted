@@ -9,8 +9,8 @@ App::Followme::Guide - How to install, configure, and run followme
 # DESCRIPTION
 
 Updates a static website after changes. Constant portions of each page are
-updated to match, text files are converted to html, and indexes are created
-for files in the archive.
+updated to match, text files are converted to html, indexes are created
+for files in the archive, and changed files are uploaded to the remote server.
 
 The followme script is run on the directory or file passed as its argument. If
 no argument is given, it is run on the current directory.
@@ -22,9 +22,7 @@ all directories below it are checked.
 
 # CHANGES
 
-This version is the first beta release for version two of followme. The code
-changes have been made and pass test, but I need to update the documentation to
-match the code changes. The major changes are all internal. In the past the code
+This version is a beta release for version two of followme. In the past the code
 constructed a hash and passed it to the template, which used the values in the
 hash to produce the web page. In version two the code passes an object to the
 template, which calls the build method for each variable in the template, passing
@@ -32,13 +30,14 @@ the name of the variable and a filename to retrieve it from as arguments. The
 module then returns the value, which is used to fill in the template. The major
 user visible change is that the template syntax has changed, the new syntax is a
 subset of the previous syntax. Please see [App::Followme::Template](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ATemplate) for a
-description of the template syntax. The other change is that the configuration
+description of the template syntax. The second change is that the configuration
 parameters of some of the modules has changed. The new configuration parameters
 are described in each module. The motivation for the change is that placing the
 variable building in a separate class allows more than one type of file to be
 handled by modules placed in the configurarion file. Each class handles a type
 of file and the name of the class which builds the variables is a configuration
-parameter.
+parameter. The third change is that the configuration file format has changed
+to use a subset of yaml. The new configuration file format is decribed below.
 
 The beta release will be used to build a website documenting followme and the
 process of building the site will be used to debug any remaining problems.
@@ -46,7 +45,7 @@ When this process is finished, the version will be bumped to 2.00.
 
 # INSTALLATION
 
-First, install the App::Followme module from CPAN. It will copy the
+First, install the [App::Followme](https://metacpan.org/pod/App%3A%3AFollowme) module from CPAN. It will copy the
 followme script to /usr/local/bin, so it will be on your search path.
 
     sudo cpanm App::Followme
@@ -83,10 +82,10 @@ You can also use followme on an existing site. Run the command
     followme --init
 
 in the top directory of your site. The init option will not overwrite any
-existing files in your site. Then look at the page template it has
+existing files in your site. Then look at the convert page template it has
 created:
 
-    cat templates/page.htm
+    cat _templates/convert_page.htm
 
 Edit an existing page on your site to have all the section comments in this
 template. In the template shipped with this package there are three section
@@ -98,19 +97,35 @@ secondary section contains content that is updated by the modules in this
 package and you will not normally change it.
 
 After you edit a single page, you can place the App::Followme::EditSections
-module in the configuration file, as described in the next section. If
-you then run followme, it will modify the other pages on your website to
+module in the configuration file, after the run\_efore line:
+
+    run_before:
+        - App::Followme::EditSections
+        - App::Followme::FormatPage
+        - App::Followme::ConvertPage
+
+If you then run followme, it will modify the other pages on your website to
 match the page you have edited. Then remove the EditSections module from
 the configuration file.
 
 # CONFIGURATION
 
 The configuration file for followme is followme.cfg in the top directory of
-your site. Configuration file lines are organized as lines containing
+your site. Configuration file lines are in a subset of yaml format. The format
+is described in [App::Followme::NestedText](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ANestedText). Briefy, the top level is a hash,
+with name-value pairs in the format
 
-    NAME = VALUE
+    name: value
 
-pairs. Configuration files may also contain blank lines or comment lines
+There should be no space between the name and the colon and one space between
+the colon and value. The value may also be an array. The array elements are listed
+one per line preceded by a dash:
+
+    name:
+        - first value
+        - second value
+
+Configuration files may also contain blank lines or comment lines
 starting with a `#`. Subdirectories of the top directory may also contain
 configuration files. Values in these configuration files are combined with those
 set in the configuration files in directories above it, If it has a parameter of
@@ -118,11 +133,15 @@ the same name as a configuration file in a higher directory, it overrides it for
 that directory and its subdirectories.
 
 Configuration files contain the names of the Perl modules to be run by followme
-in the parameters named run\_before and run\_after
+in the parameters named run\_before and run\_after. These parameters should be 
+arrays, and thus are listed one per line indented from the field name and preceded
+by a dash: 
 
-    run_before = App::Followme::FormatPage
-    run_before = App::Followme::ConvertPage
-    run_after = App::Followme::CreateSitemap
+    run_before:
+        - App::Followme::FormatPage
+        - App::Followme::ConvertPage
+    run_after:
+        - App::Followme::CreateSitemap
 
 Perl modules are run in the order they appear in the configuration file. If they
 are named run\_before then they are run before modules in any configuration files
@@ -131,16 +150,6 @@ modules which are named in the configuration files in subdirectories. Other
 parameters in the configuration files are written to a hash. This hash is passed
 to the new method of each module as it loaded, overriding the default values of
 the parameters when creating the new object.
-
-Configuration files may also contain module names between square brackets, like
-this:
-
-    [App::Followme::ConvertPage]
-
-Values after a bracketed module name will only apply to that module. Values at
-the top of the file, before any bracketed module name, will apply to all modules.
-The run\_before and run\_after parameters should always be placed before any
-bracketed section names.
 
 These modules are distributed with followme:
 
@@ -187,7 +196,8 @@ These modules are distributed with followme:
     capitalizing each word, The url and absolute\_url are built from the html file
     name. To change the look of the html page, edit the page template. Only blocks
     inside the section comments will be in the resulting page, editing the text
-    outside it will have no effect on the resulting page.
+    outside it will have no effect on the resulting page. A complete listing of the
+    variables is given in the variables section.
 
 - [App::Followme::CreateIndex](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ACreateIndex)
 
@@ -195,19 +205,25 @@ These modules are distributed with followme:
     with the specified extension contained in it. The same variables mentioned above
     are calculated for each file, with the exception of body. Comments that look like
 
-        <!-- for @filenames -->
+        <!-- for @files -->
         <!-- endfor -->
 
     indicate the section of the template that is repeated for each file contained
     in the index.
 
-- [App::Followme::CreateNews](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ACreateNews)
+- [App::Followme::CreateGallery](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ACreateGallery)
 
-    This module generates an html file from the most recently updated files in the
-    news directory. It also creates index files in each directory and
-    subdirectory in the news directory. The same variables mentioned under
-    [App::Followme::ConvertPages](https://metacpan.org/pod/App%3A%3AFollowme%3A%3AConvertPages) are calculated for each file included in the
-    indexes.
+    Create a photo gallery for images in a directory. Each image must have a 
+    thumbnail image whose name has the suffix "-thumb". The suffix name is a 
+    configuration parameter. The code is very similar to 
+    [App::Followme::CreateIndex](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ACreateIndex), but the template is more complex, so it is a 
+    separate module.
+
+- [App::Followme::CreateRss](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ACreateRss)
+
+    This module creates an rss file from the metadata of the most recently updated 
+    files in a directory. It is a companion to App::Followme::CreateIndex and should
+    be used if you also want an rss file.
 
 - [App::Followme::CreateSitemap](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ACreateSitemap)
 
@@ -231,7 +247,7 @@ The followme script is run on the directory or file passed as its argument. If
 no argument is given, it is run on the current directory. If a file is passed,
 the script is run on the directory the file is in and followme is run in
 quick mode. Quick mode is an implicit promise that only the named file has
-been changed since last time. Each module can make up this assumption what it
+been changed since last time. Each module can make of this assumption what it
 will, but it is supposed to shorten the list of files examined.
 
 Followme looks for its configuration files in all the directories above the
@@ -268,7 +284,25 @@ a string of word characters starting with a sigil character. for example,
 
     $body @files
 
-are examples of variables. The following commands are supported in templates:
+are examples of variables. Array variable names (variable names starting with 
+a `@`) may have a suffix that indicates how the array is sorted. You can add
+a suffix to a scalar variable (variable names strting with a `$`) but it
+will have no effect. The format for the name is:
+
+    @data_field[_by_$sort_field][_reversed]
+
+the brackets are not part of the variable name. They are there to indicate that 
+these sections are optional. Two examples of variables with sort suffixes are
+
+    @files_by_size
+    @all_files_by_mdate_reversed
+
+The second suffix, \_reversed, indicates that the variable is sorted from 
+largest to smallest instead of the usual format, from smallest to largest.
+When used with date fields \_reversed indicates the variable is sorted from 
+most recent to oldest.
+
+The following commands are supported in templates:
 
 - do
 
@@ -313,7 +347,193 @@ are examples of variables. The following commands are supported in templates:
 
 Templates are read either from the same directory as the configuration file
 containing the name of the module being run or from the \_templates subdirectory
-of the top directory of the site.
+of the top directory of the site. For more information about the use of 
+templates, see [App::Followme::Template](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ATemplate).
+
+# VARIABLES
+
+Templates contain if commands, for loops and variables. The following variables 
+are arrays that can be used as arguments to for loops:
+
+- @files
+
+    An array of files in a directory. The files in the list are controlled by the 
+    configuration variables extension, exclude, and exclude\_index.
+
+- @all\_files
+
+    An array of all files in a directory and its subdirectories. The files are 
+    controlled by the same configuration variables as @files.
+
+- @top\_files
+
+    An array of the most recently modified files in a directory and its 
+    subdirectories. The number of files in the array is controlled by configuration
+    variable list\_length. The files in the list are controlled by the same
+    configuration variables as used by @files.
+
+- @folders
+
+    An array of subdirectories in a directory. The subdirectories in the list are
+    controlled by the configuration parameter exclude\_dirs.
+
+- @breadcrumbs
+
+    An array of index file urls of the directories above the directory containing
+    the current file.
+
+- @related\_files
+
+    A list of files with the same file root name as a specified file. This
+    list is not filtered by the configuration variables extension and exclude.
+
+- @newest\_file
+
+    An array with one element, the most recently modified file in a directory
+    or its subdirectories. It is an array so that other variables can be used
+    inside its for loop.
+
+The following variables can only be used inside of loops:
+
+- @loop
+
+    A copy of the array in the enclosing for loop. This is used to build double
+    for loops over the same array.
+
+- @thumb\_file
+
+    An array with only one element, the name of the thumbnail file for an image file.
+    It is an array so that other variables that are functions of the name can be used
+    inside its for loop.
+
+- $is\_first
+
+    True for the first pass through the for loop, false for all following passes. Used
+    in if statements.
+
+- $is\_last
+
+    True for the last pass through the for loop, false for all previous passes. Used in 
+    if statements.
+
+- $count
+
+    The count of the pass through the loop. Starts at one and goes up to the number of 
+    elements in the array.
+
+- $target
+
+    The count prefixed by a string, which is set by the configuration variable 
+    target\_prefix. It is used to construct tatgets for links within a web page.
+
+- $target\_previous
+
+    The count of the previous pass through the for loop, prefixed by the configuration
+    variable target\_prefix. It is a zero length string for the first pass through the 
+    loop.
+
+- $target\_next
+
+    The count of the next pass through the for loop, prefixed by the configuration
+    variable target\_prefix. It is a zero length string for the last pass through the 
+    loop.
+
+- $url\_previous
+
+    The relative url of the previous file processed by the for loop. It is a zero 
+    length string for the first pass through the for loop.
+
+- $url\_next
+
+    The relative url of the next file to be processed by the for loop. It is a zero 
+    length string for the last pass through the for loop.
+
+The following variables can be used inside or outside of for loop. If used inside,
+the refer to the filename of the current iteration of the loop. If outside, they 
+refer to the current file being processed.
+
+- $remote\_url
+
+    The absolute url of the top folder on the site on the remote system. Set by the 
+    configuration variable of the same name.
+
+- $site\_url
+
+    The absolute url of the top folder on the site on the local system. Set by the 
+    configuration variable of the same name. If the configuration variable is not
+    set, it is constructed from the name of the top folder of the site.
+
+- $url
+
+    The url of a file, relative to the url of the top folder.
+
+- $index\_url
+
+    The relative url of the index file in the same folder
+
+- $absolute\_url
+
+    The relative url of a file prefixed by the site url.
+
+- $url\_base
+
+    The relative url of a file without any file extension. Used to create the urls of
+    any related files.
+
+- $name
+
+    The name of a file.
+
+- $extension
+
+    The extension of a filename.
+
+- $is\_index
+
+    True if a file is an index file, that is, its name minus the extension is "index".
+    Used in if statements.
+
+- $date
+
+    The creation date of a file, if available, the date of last modification, if not.
+    The format of this variable is set by the configuration variable date\_format.
+
+- $mdate
+
+    The date of last modification of a file. The format of this variable is set by 
+    the configuration variable date\_format.
+
+- $size
+
+    The size of the file in bytes.
+
+- $title
+
+    The title of a file. Constructed from the filename if it is not otherwise 
+    available.
+
+- $body
+
+    The body text of a file.
+
+- $summary
+
+    A summary of the file, constructed from the first paragraph of the body.
+
+- $description
+
+    A description of the contents of the file, constructed from the first sentence
+    of the body if it is not otherwise available.
+
+- $keywords
+
+    A comma separated list of keywords describing a file. Constructed from the name
+    of the folder containing the file if it is not otherwise available.
+
+- $author
+
+    The name of the author of a file. Taken from the configuration variable of the
+    same name if it is not otherwise available.
 
 # MODULES
 
@@ -345,9 +565,9 @@ where $obj is the object created by the new method and $directory is the name
 of the directory the module is being run on. All modules included in
 App::Followme use [App::Followme::Module](https://metacpan.org/pod/App%3A%3AFollowme%3A%3AModule) as a base class, so they can use its
 methods, such as visiting all files in a directory and compiling a template. If
-you wish to write your own module, you can use [App::Followme::Sitemap](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ASitemap) as a
-guide. If you use App::Followme::Module as a base class, you should not supply
-your own new method, but rely on the new method in
+you wish to write your own module, you can use [App::Followme::CreateSitemap](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ACreateSitemap) 
+as a guide. If you use App::Followme::Module as a base class, you should not 
+supply your own new method, but rely on the new method in
 [App::Followme::ConfiguredObject](https://metacpan.org/pod/App%3A%3AFollowme%3A%3AConfiguredObject), which you will inherit.
 
 # LICENSE

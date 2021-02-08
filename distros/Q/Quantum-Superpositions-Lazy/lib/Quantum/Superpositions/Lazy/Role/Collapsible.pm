@@ -1,14 +1,9 @@
 package Quantum::Superpositions::Lazy::Role::Collapsible;
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
-use v5.28;
+use v5.24;
 use warnings;
-use Moo::Role;
-
-use feature qw(signatures);
-no warnings qw(experimental::signatures);
-
 use Quantum::Superpositions::Lazy::Operation::Computational;
 use Quantum::Superpositions::Lazy::Operation::Logical;
 use Quantum::Superpositions::Lazy::Computation;
@@ -18,22 +13,28 @@ use Types::Standard qw(ArrayRef InstanceOf);
 use List::Util qw(reduce);
 use Carp qw(croak);
 
+use Moo::Role;
+
 my %mathematical = map { $_ => 1 }
 	Quantum::Superpositions::Lazy::Operation::Computational->supported_types;
 
 my %logical = map { $_ => 1 }
 	Quantum::Superpositions::Lazy::Operation::Logical->supported_types;
 
-sub create_computation ($type, @args)
+sub create_computation
 {
+	my ($type, @args) = @_;
+
 	return Quantum::Superpositions::Lazy::Computation->new(
 		operation => $type,
 		values => [@args],
 	);
 }
 
-sub create_logic ($type, @args)
+sub create_logic
 {
+	my ($type, @args) = @_;
+
 	my $op = Quantum::Superpositions::Lazy::Operation::Logical->new(
 		sign => $type,
 	);
@@ -46,8 +47,10 @@ sub create_logic ($type, @args)
 	}
 }
 
-sub _operate (@args)
+sub _operate
 {
+	my (@args) = @_;
+
 	my $type = pop @args;
 
 	my $self = shift @args;
@@ -84,23 +87,28 @@ has "stats" => (
 	is => "ro",
 	isa => InstanceOf ["Quantum::Superpositions::Lazy::Statistics"],
 	lazy => 1,
-	default => sub ($self) { $Quantum::Superpositions::Lazy::Statistics::implementation->new(parent => $self) },
+	default => sub { $Quantum::Superpositions::Lazy::Statistics::implementation->new(parent => shift) },
 	init_arg => undef,
 	clearer => "_clear_stats",
 );
 
-sub states ($self)
+sub states
 {
+	my ($self) = @_;
+
 	return $self->_complete_states;
 }
 
-sub stringify ($self, @)
+sub stringify
 {
+	my ($self) = @_;
 	return $self->collapse;
 }
 
-sub operate ($self, $type, @args)
+sub operate
 {
+	my ($self, $type, @args) = @_;
+
 	unshift @args, $self;
 	my $order = pop @args;
 	@args = reverse @args
@@ -119,13 +127,24 @@ sub operate ($self, $type, @args)
 	}
 }
 
-sub transform ($self, $coderef)
+sub transform
 {
+	my ($self, $coderef) = @_;
+
 	return $self->operate("_transform", $coderef, undef);
 }
 
-sub to_ket_notation ($self)
+sub compare
 {
+	my ($self, $coderef) = @_;
+
+	return $self->operate("_compare", $coderef, undef);
+}
+
+sub to_ket_notation
+{
+	my ($self) = @_;
+
 	return join " + ", map {
 		($_->weight / $self->weight_sum) . "|" .
 			$_->value . ">"

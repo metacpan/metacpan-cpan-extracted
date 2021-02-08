@@ -1,3 +1,9 @@
+0.07 2021-02-02T23:11:00+01:00
+ - Add test for script POD.
+ - Add test for unknown option.
+ - Fix bugtracker.
+ - Update copyright years.
+
 0.06 2020-04-05T16:04:58+02:00
  - Add example to doc.
  - Add test for error in reverese transliteration.

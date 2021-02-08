@@ -6,13 +6,14 @@ use Getopt::Long;
 use Net::Connection::ncnetstat;
 
 sub version{
-	print "ncnetstat v. 0.2.0\n";
+	print "ncnetstat v. 0.3.0\n";
 }
 
 sub help{
 	print '
 -a         Show all connections.
 --drp      Do not resolve port names.
+--dump     Show the Net::Connection::Match filter and exit.
 -i         Invert the sort.
 -l         Show the listening ports.
 -n         Do not resolve the PTRs.
@@ -154,6 +155,7 @@ my $cpu_string;
 my $cpu_invert=0;
 my $mem_string;
 my $mem_invert=0;
+my $dump=0;
 
 # get the commandline options
 Getopt::Long::Configure ('no_ignore_case');
@@ -214,6 +216,7 @@ GetOptions(
 		   'cpui' => \$cpu_invert,
 		   'mem=s' => \$mem_string,
 		   'memi' => \$mem_invert,
+		   'dump' => \$dump,
 		   );
 
 my @filters;
@@ -230,28 +233,46 @@ if ( $help ){
 	exit;
 }
 
+#
+# XOR various command line options
+#
+if (defined( $ENV{'ncnetstat_pct'} )) {
+	$pct_show= $pct_show ^ $ENV{'ncnetstat_pct'};
+}
+if (defined( $ENV{'ncnetstat_C'} )) {
+	$command = $command ^ $ENV{'ncnetstat_C'};
+}
+if (defined( $ENV{'ncnetstat_Cl'} )) {
+	$command_long = $command_long ^ $ENV{'ncnetstat_Cl'};
+}
+if (defined( $ENV{'ncnetstat_W'} )) {
+	$wchan_show = $wchan_show ^ $ENV{'ncnetstat_W'};
+}
+
+
 # add the filters for the -l and -a option
 if (
 	( ! $all ) &&
 	( ! $listening )
 	){
 	# If -a is not given, we don't want the listen ports
-	push( @filters, {
+	push( @filters,
+		  {
+		   type=>'Ports',
+		   invert=>1,
+		   args=>{
+				  ports=>[
+						   '*',
+						   ],
+				  }
+		   },
+		   {
 					 type=>'States',
 					 invert=>1,
 					 args=>{
 							states=>['LISTEN']
 							}
-					 },
-		  {
-		   type=>'Ports',
-		   invert=>1,
-		   args=>{
-				  fports=>[
-						   '*',
-						   ],
-				  }
-		   }
+					 }
 		 );
 }elsif(
 	   $listening &&
@@ -608,6 +629,13 @@ if ( $command_long && ! $command ){
 	$command=1;
 }
 
+#dump the filters if asked
+if ($dump) {
+	use Data::Dumper;
+	print Dumper( \@filters );
+	exit;
+}
+
 my $ncnetstat=Net::Connection::ncnetstat->new(
 											  {
 											   ptr=>$ptr,
@@ -886,6 +914,30 @@ A space-separated list of nameservers to query used by L<Net::DNS::Resolver>.
 
 There are a few more possible ones, but this is the most useful one and that documentation
 really belongs to that module.
+
+=head2 ncnetstat_C
+
+Used to xor the -C switch.
+
+Set to either 0 or 1, boolean, for setting the default.
+
+=head2 ncnetstat_Cl
+
+Used to xor the --Cl switch.
+
+Set to either 0 or 1, boolean, for setting the default.
+
+=head2 ncnetstat_W
+
+Used to xor the -W switch.
+
+Set to either 0 or 1, boolean, for setting the default.
+
+=head2 ncnetstat_pct
+
+Used to xor the --pct switch.
+
+Set to either 0 or 1, boolean, for setting the default.
 
 =head1 EXAMPLES
 

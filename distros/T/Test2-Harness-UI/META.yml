@@ -7,7 +7,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,6 @@ name: Test2-Harness-UI
 requires:
   Carp: '0'
   Crypt::Eksblowfish::Bcrypt: '0'
-  DBD::Pg: '0'
   DBI: '0'
   DBIx::Class::InflateColumn::DateTime: '0'
   DBIx::Class::InflateColumn::Serializer: '0'
@@ -24,10 +23,9 @@ requires:
   DBIx::Class::Schema::Loader: '0'
   DBIx::Class::Tree::AdjacencyList: '0'
   DBIx::Class::UUIDColumns: '0'
-  DBIx::QuickDB: '0.000008'
+  DBIx::QuickDB: '0.000020'
   Data::GUID: '0'
   DateTime: '0'
-  DateTime::Format::Pg: '0'
   Email::Sender::Simple: '0'
   Email::Simple: '0'
   Email::Simple::Creator: '0'
@@ -69,7 +67,7 @@ requires:
 resources:
   bugtracker: http://github.com/Test-More/Test2-Harness-UI/issues
   repository: http://github.com/Test-More/Test2-Harness-UI/
-version: '0.000028'
-x_generated_by_perl: v5.30.2
+version: '0.000029'
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,13 +1,15 @@
 ---
 abstract: 'HTML Perldoc server'
 author:
-  - 'Laurent Dami <laurent.d...@justice.ge.ch>'
+  - 'Laurent Dami <dami AT cpan.org>'
 build_requires:
+  HTTP::Request: '0'
+  HTTP::Response: '0'
   Test::More: '0'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,18 +18,18 @@ name: Pod-POM-Web
 provides:
   Pod::POM::Web:
     file: lib/Pod/POM/Web.pm
-    version: '1.23'
+    version: '1.24'
   Pod::POM::Web::Indexer:
     file: lib/Pod/POM/Web/Indexer.pm
     version: '1.23'
 recommends:
-  AnnoCPAN::Perldoc::Filter: '0'
   PPI::HTML: '0'
   Search::Indexer: '0.75'
 requires:
   Alien::GvaScript: '1.021'
   Config: '0'
-  Encode::Guess: '0'
+  Encode: '0'
+  Encode::Detect: '0'
   HTTP::Daemon: '0'
   List::MoreUtils: '0'
   List::Util: '0'
@@ -41,7 +43,9 @@ requires:
   URI: '0'
   URI::QueryParam: '0'
   parent: '0'
+  perl: '5.008'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Pod-POM-Web
-version: '1.23'
+version: '1.24'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -26,6 +26,7 @@ my @files = (
     't/bundle.t',
     't/carp.t',
     't/control.t',
+    't/export.t',
     't/extension.t',
     't/features.t',
     't/no_dup_add_isa.t',

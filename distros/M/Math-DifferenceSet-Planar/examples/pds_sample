@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar;
+
+use constant PDS => Math::DifferenceSet::Planar::;
+
+$| = 1;
+
+if (@ARGV < 1 || 2 < @ARGV  || grep {!/^[1-9][0-9]*\z/} @ARGV) {
+    die "usage: pds_sample (p n|q)\n";
+}
+
+if (!PDS->available(@ARGV)) {
+    my $order = join q[^], @ARGV;
+    die "$order: no set of this order available\n";
+}
+
+my $s = PDS->new(@ARGV);
+my @e = $s->elements;
+print "@e\n";
+
+__END__
+=head1 NAME
+
+pds_sample - print a planar difference set sample of a given order
+
+=head1 SYNOPSIS
+
+  pds_sample p n
+  pds_sample order
+
+=head1 DESCRIPTION
+
+This example program writes one planar difference set of a given order
+to standard output.  The order can be specified as a prime number and
+an exponent, or as a prime power.  The output will be a line with one
+representative difference set of the given order.  If the order is not
+a prime power or exceeds an implementation specific size restriction,
+the program fails with an error message.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2020-2021 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

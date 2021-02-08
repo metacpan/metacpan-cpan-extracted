@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Roles::Configable;
 # ABSTRACT: Attributes and methods common to Leel and FortyTwo objects
-$Bio::MUST::Apps::Roles::Configable::VERSION = '0.202160';
+$Bio::MUST::Apps::Roles::Configable::VERSION = '0.210370';
 use Moose::Role;
 
 use autodie;
@@ -48,9 +48,9 @@ sub inject_args {
         $org_args = { %def_args, %{ $org_args } };
     }
 
-    # same check for query_orgs
+    # same check for query_orgs (42)
     _check_org_format($_)
-        for @{ $self->args_for('query_orgs') };
+        for @{ $self->args_for('query_orgs') // [] };
 
     # combine YAML and CLI parameters (e.g., debug_mode)
     # Note: CLI take precedences over YAML (in case of duplicates)
@@ -94,7 +94,7 @@ Bio::MUST::Apps::Roles::Configable - Attributes and methods common to Leel and F
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =head1 SYNOPSIS
 

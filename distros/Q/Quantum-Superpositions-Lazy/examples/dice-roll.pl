@@ -1,7 +1,7 @@
-use v5.28;
+use v5.24;
 use warnings;
 use Test::More;
-use Quantum::Superpositions::Lazy;
+use Q::S::L;
 use List::Util qw(sum0);
 
 sub roll_dice

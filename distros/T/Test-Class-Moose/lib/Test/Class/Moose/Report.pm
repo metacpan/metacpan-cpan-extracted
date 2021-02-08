@@ -2,13 +2,16 @@ package Test::Class::Moose::Report;
 
 # ABSTRACT: Test information for Test::Class::Moose
 
+use strict;
+use warnings;
+use namespace::autoclean;
+
 use 5.010000;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Carp;
 use Moose;
-use namespace::autoclean;
 with 'Test::Class::Moose::Role::HasTimeReport';
 
 use List::Util qw( first sum0 );
@@ -70,7 +73,7 @@ sub current_method {
 sub plan {
     my ( $self, $plan ) = @_;
     my $current_method = $self->current_method
-      or croak("You tried to plan but we don't have a test method yet!");
+      or croak(q{You tried to plan but we don't have a test method yet!});
     $current_method->plan($plan);
 }
 
@@ -138,7 +141,7 @@ Test::Class::Moose::Report - Test information for Test::Class::Moose
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -152,9 +155,9 @@ version 0.98
 
 When working with larger test suites, it's useful to have full reporting
 information available about the test suite. The reporting features of
-L<Test::Class::Moose> allow you to report on the number of test class instances and
-methods run (and number of tests), along with timing information to help you
-track down which tests are running slowly. You can even run tests on your
+L<Test::Class::Moose> allow you to report on the number of test class instances
+and methods run (and number of tests), along with timing information to help
+you track down which tests are running slowly. You can even run tests on your
 report information:
 
     #!/usr/bin/env perl
@@ -215,17 +218,17 @@ Reporting is currently in alpha. The interface is not guaranteed to be stable.
 =begin comment
 
 This is the code I used to generate the example in this module (plus a little
-manual editing to move the time key to the top of each nested hashref). This
-is based on the timing data from running basic.t.
+manual editing to move the time key to the top of each nested hashref). This is
+based on the timing data from running basic.t.
 
-my $t = $report->timing_data;
-delete $t->{class}{'TestsFor::Basic::Subclass'};
-delete $t->{class}{'TestsFor::Basic'}{instance}{'TestsFor::Basic'}{method}{test_reporting};
-delete $t->{class}{'TestsFor::Basic'}{instance}{'TestsFor::Basic'}{method}{test_this_baby};
+my $t = $report->timing_data; delete $t->{class}{'TestsFor::Basic::Subclass'};
+delete
+$t->{class}{'TestsFor::Basic'}{instance}{'TestsFor::Basic'}{method}{test_reporting};
+delete
+$t->{class}{'TestsFor::Basic'}{instance}{'TestsFor::Basic'}{method}{test_this_baby};
 use Devel::Dwarn; Dwarn _fudge($t);
 
-sub _fudge {
-    my $t = shift;
+sub _fudge {     my $t = shift;
 
     use Data::Visitor::Callback;
 
@@ -286,25 +289,25 @@ being run, if it exists. This may return C<undef>.
 
 =head2 C<current_instance>
 
-Returns the L<Test::Class::Moose::Report::Instance> for the test class
-instance currently being run, if it exists. This may return C<undef>.
+Returns the L<Test::Class::Moose::Report::Instance> for the test class instance
+currently being run, if it exists. This may return C<undef>.
 
 =head2 C<current_method>
 
-Returns the L<Test::Class::Moose::Report::Method> for the test method
-currently being run, if one exists. This may return C<undef>.
+Returns the L<Test::Class::Moose::Report::Method> for the test method currently
+being run, if one exists. This may return C<undef>.
 
 =head2 C<time>
 
-Returns a L<Test::Class::Moose::Report::Time> object. This object
-represents the duration of the entire test suite.
+Returns a L<Test::Class::Moose::Report::Time> object. This object represents
+the duration of the entire test suite.
 
 =head2 C<timing_data>
 
 Returns a complex nested hashref containing timing data for the entire test
 run. This is primarily intended for serialization or shipping the data to code
-in other languages. If you want to analyze timing data from the same process
-as the test report, you might as well just use the Perl API.
+in other languages. If you want to analyze timing data from the same process as
+the test report, you might as well just use the Perl API.
 
 See L</TIMING DATA STRUCTURE> for an example of the full structure.
 
@@ -329,8 +332,8 @@ containing C<time> key.
 
 The C<method> keys are the names of the methods that were run for that test
 instance. Each of those keys is in turn a hashref containing C<control> and
-C<time> keys. The C<control> key contains a hashref keyed on the control
-method names, C<test_setup> and C<test_teardown>.
+C<time> keys. The C<control> key contains a hashref keyed on the control method
+names, C<test_setup> and C<test_teardown>.
 
 =head1 TRUSTED METHODS
 
@@ -444,7 +447,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

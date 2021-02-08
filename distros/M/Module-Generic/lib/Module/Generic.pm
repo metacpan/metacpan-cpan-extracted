@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.13.3
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v0.13.5
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2020/12/08
+## Modified 2021/02/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -34,12 +34,26 @@ BEGIN
     our( $VERSION, $ERROR, $SILENT_AUTOLOAD, $VERBOSE, $DEBUG, $MOD_PERL );
     our( $PARAM_CHECKER_LOAD_ERROR, $PARAM_CHECKER_LOADED, $CALLER_LEVEL );
     our( $COLOUR_NAME_TO_RGB );
+    ## mod_perl/2.0.10
+    if( exists( $ENV{MOD_PERL} )
+        &&
+        ( $MOD_PERL = $ENV{MOD_PERL} =~ /^mod_perl\/(\d+\.[\d\.]+)/ ) )
+    {
+        select( ( select( STDOUT ), $| = 1 )[ 0 ] );
+        require Apache2::Log;
+        require Apache2::ServerUtil;
+        require Apache2::RequestUtil;
+        require Apache2::ServerRec;
+        require ModPerl::Util;
+        require Apache2::Const;
+        Apache2::Const->import( compile => qw( :log OK ) );
+    }
     use Exporter ();
     @ISA         = qw( Exporter );
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.13.3';
+    $VERSION     = 'v0.13.5';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -59,19 +73,6 @@ INIT
 };
 
 {
-    ## mod_perl/2.0.10
-    if( exists( $ENV{MOD_PERL} )
-        &&
-        ( $MOD_PERL = $ENV{MOD_PERL} =~ /^mod_perl\/(\d+\.[\d\.]+)/ ) )
-    {
-        select( ( select( STDOUT ), $| = 1 )[ 0 ] );
-        require Apache2::Log;
-        require Apache2::ServerUtil;
-        require Apache2::RequestUtil;
-        require Apache2::ServerRec;
-        require ModPerl::Util;
-    }
-    
     our $DEBUG_LOG_IO = undef();
     
     our $DB_NAME = $DATABASE;
@@ -2683,6 +2684,7 @@ sub _set_get_datetime
                     time_zone => 'local',
                 );
             }
+            require DateTime::Format::Strptime;
             my $strp = DateTime::Format::Strptime->new(
                 pattern => '%s',
                 locale => 'en_GB',
@@ -3427,7 +3429,11 @@ sub _to_array_object
     return( $self->new_array( $data ) );
 }
 
-sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) ); }
+sub _warnings_is_enabled
+{
+    return( 0 ) if( !defined( $warnings::Bits{ ref( $_[0] ) || $_[0] } ) );
+    return( warnings::enabled( ref( $_[0] ) || $_[0] ) );
+}
 
 sub __dbh
 {
@@ -7404,7 +7410,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.13.3
+    v0.13.5
 
 =head1 DESCRIPTION
 

@@ -4,13 +4,13 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HTTP-Size",
    "no_index" : {
@@ -42,22 +42,22 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94"
+            "Test::More" : "1"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/briandfoy/http-size/issues"
+         "web" : "https://github.com/CPAN-Adoptable-Modules/http-size/issues"
       },
-      "homepage" : "https://github.com/briandfoy/http-size",
+      "homepage" : "https://github.com/CPAN-Adoptable-Modules/http-size",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/http-size.git",
-         "web" : "https://github.com/briandfoy/http-size"
+         "url" : "https://github.com/CPAN-Adoptable-Modules/http-size.git",
+         "web" : "https://github.com/CPAN-Adoptable-Modules/http-size"
       }
    },
-   "version" : "1.151",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.153",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

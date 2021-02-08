@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::Debrief42::TaxReport;
 # ABSTRACT: Front-end class for tabular tax-report parser
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Apps::Debrief42::TaxReport::VERSION = '0.202160';
+$Bio::MUST::Apps::Debrief42::TaxReport::VERSION = '0.210370';
 use Moose;
 use namespace::autoclean;
 
@@ -67,6 +67,8 @@ sub next_seq {
         my $outfile = change_suffix( $self->filename, '.ali' );
         my @fields = ( split(/\t/xms, $line), $outfile );
 
+        # TODO: store top_ident? (Hervé)
+
         # Fields for tax-report file:
         #   0.  seq_id
         #   1.  contam_org
@@ -110,7 +112,7 @@ Bio::MUST::Apps::Debrief42::TaxReport - Front-end class for tabular tax-report p
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =head1 SYNOPSIS
 

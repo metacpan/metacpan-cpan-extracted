@@ -1,0 +1,216 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Test2::V0;
+
+#XXX Test2 Knows Better TM
+no warnings 'experimental';
+use feature qw/signatures/;
+
+use Test::Fatal;
+use FindBin;
+use Cwd qw{abs_path};
+use JSON;
+use Data::Dumper;
+
+use Selenium::Client;
+
+my $extra = '';
+$extra = '/' if grep { $^O eq $_ } qw{msys MSWin32};
+
+my $sut  = 'file://' . $extra . abs_path("$FindBin::Bin/test.html");
+my $sut2 = 'file://' . $extra . abs_path("$FindBin::Bin/other.html");
+
+my @browsers = qw{firefox chrome};
+push(@browsers, 'MicrosoftEdge') if grep { $^O eq $_ } qw{MSWin32 msys};
+push(@browsers, 'safari') if $^O eq 'darwin';
+foreach my $browser (@browsers) {
+    my @drivers = qw{Gecko Auto SeleniumHQ::Jar};
+    @drivers = qw{Chrome Auto SeleniumHQ::Jar} if $browser eq 'chrome';
+    @drivers = qw{Edge Auto SeleniumHQ::Jar}   if $browser eq 'MicrosoftEdge';
+    @drivers = qw{Safari Auto SeleniumHQ::Jar} if $browser eq 'safari';
+
+    foreach my $driver (@drivers) {
+        subtest "$browser (using $driver): Spec compliance" => sub {
+            my %options = ( driver => $driver, browser => $browser,);# debug => 1 );
+
+            # TODO remove when it goes public
+            $options{driver_version} = '4.0.0-alpha-7' if $driver eq 'SeleniumHQ::Jar';
+
+            my $driver = Selenium::Client->new( %options );
+
+            my $status = $driver->Status();
+            ok($status->{ready}, "Driver up and running");
+
+            my ($capabilities,$session) = $driver->NewSession(
+                capabilities => {
+                    alwaysMatch => {
+                        browserName  => $browser,
+                    },
+                }
+            );
+            isa_ok($capabilities,"Selenium::Capabilities");
+            isa_ok($session, "Selenium::Session");
+
+            is( exception { $session->SetTimeouts( script => 1000, implicit => 1000, pageLoad => 1000 ) }, undef, "Can set timeouts");
+
+            #XXX GetTimeouts like every other thing *chokes* on data not being *just right* despite spec having undefined behavior here
+            my $expected = { script => 1000, implicit => 1000, pageLoad => 1000 };
+
+            SKIP: {
+                skip("Selenium 4.0 GetTimeouts is broken, and as we know all broken things HANG 30 SECONDS!!!",1);
+                my $t = $session->GetTimeouts( script => undef, implicit => undef, pageLoad => undef );
+                is($t,$expected, "GetTimeouts works");
+            }
+
+            is( exception { $session->NavigateTo( url => $sut ) }, undef, "Can open page");
+
+            #Alerts
+            alertify($session);
+
+            is($session->GetCurrentURL(), $sut, "Can get current URL");
+            is($session->GetTitle(), 'Test Page', "Can get page title");
+            is(exception { $session->NavigateTo( 'url' => $sut2 ) }, undef, "Can open other page");
+            is($session->GetPageSource(),"<html><head></head><body>ZIPPY\n</body></html>","Can get page source");
+            is(exception { $session->Back() }, undef, "Can navigate to the last page visited with back()");
+
+            alertify($session) unless $browser eq 'safari';
+            is(exception { $session->Forward() }, undef, "Can navigate back to previously visited page with forward()");
+
+            $session->Back();
+
+            #XXX webkit re-issues alerts on back()
+            alertify($session) if grep { $browser eq $_ } qw{chrome MicrosoftEdge};
+
+            is(exception { $session->Refresh() }, undef, "Can refresh the page");
+            alertify($session);
+
+            my $handle = "".$session->GetWindowHandle();
+            ok($handle,"Can get window handle");
+            my $link = $session->FindElement( using => 'css selector', value => '#linky' );
+            $link->ElementClick();
+
+            my @newhandles = map { "".$_ } $session->GetWindowHandles();
+
+            my ($newhandle) = grep { $_ ne $handle } @newhandles;
+            die("Could not get existing handle from getwindowhandles") unless $newhandle;
+            is( exception { $session->SwitchToWindow( handle => $newhandle ) }, undef, "Can switch to new window");
+            like($session->GetPageSource(), qr/ZIPPY/i, "Got right window");
+            is( exception { $session->SwitchToWindow( handle => $handle ) }, undef, "Can switch to old window");
+
+            like($session->GetPageSource(), qr/Howdy/i, "Switched window correctly");
+            $session->SwitchToWindow( handle => $newhandle );
+            is( exception { $session->CloseWindow() }, undef, "CloseWindow closes current window context");
+            $session->SwitchToWindow( handle => $handle );
+
+            #move it around
+            my %erekt = ( height => 100, width => 500, x => 50, y => 50);
+            is( exception { $session->SetWindowRect(%erekt) }, undef, "Can set window rect");
+            my $rekt = $session->GetWindowRect();
+
+            SKIP: {
+                skip("Window rect set is basically never correctly obeyed",1);
+                is($rekt, \%erekt, "Can get window rect");
+            }
+            #Frames
+            my $frame = $session->FindElement( using => 'css selector', value => '#frame' );
+            is( exception { $session->SwitchToFrame( id => $frame->{elementid} ) }, undef, "Can switch into frame");
+            is( exception { $session->SwitchToParentFrame() }, undef, "Can travel up the frame stack");
+
+            #Maximize etc
+            is( exception { $session->MaximizeWindow() }, undef, "Can maximize window");
+            is( exception { $session->MinimizeWindow() }, undef, "Can minimize window");
+            is( exception { $session->FullscreenWindow() }, undef, "Can Fullscreen window");
+
+            #Element Method Testing
+            my $element = $session->FindElement( using => 'css selector', value => 'input[name=text]' );
+            isa_ok($element,'Selenium::Element');
+            my $prop = $element->GetElementProperty( name => 'title' );
+            is($prop,'default', "Can get element properties");
+
+            my @inputs = $session->FindElements( using => 'css selector', value => 'input' );
+            is( scalar(@inputs), 5, "Can find multiple elements correctly");
+
+            my $finder = $session->FindElement( using => 'css selector', value => 'form' );
+            my $found  = $finder->FindElementFromElement( using => 'css selector', 'value' => 'label' );
+            todo "Property/Attribute get is broken in Selenium" => sub {
+                is($found->GetElementAttribute( name => 'for' ), 'text', "Can find child properly");
+            };
+
+            my @radios = $finder->FindElementsFromElement( using => 'css selector', 'value' => 'input[type=radio]' );
+            is(scalar(@radios), 2, "Can find child elements properly");
+
+            my ($unselected, $selected) = @radios;
+            ok(!$unselected->IsElementSelected(),"IsElementSelected works");
+            todo "IsElementSelected appears to always return false, lol" => sub {
+                ok($selected->IsElementSelected(), "IsElementSelected works");
+            };
+            my @checked = $session->FindElements( using => 'css selector', value => 'input:checked');
+            is(scalar(@checked),1,"But we can at least work around that using css :checked pseudoselector");
+
+            is(exception { $session->GetActiveElement() }, undef, "Can get active element");
+
+            my $invisible = $session->FindElement( using => 'css selector', value => '#no-see-em' );
+            is($invisible->GetElementCSSValue( propertyname => 'display' ),'none',"Can get CSS values for elements");
+            is(lc($invisible->GetElementTagName()),'button', "Can get element tag name");
+
+            my $hammertime = $session->FindElement( using => 'css selector', value => '#hammertime' );
+            ok(!$hammertime->IsElementEnabled(),"IsElementEnabled works");
+
+            my $clickme = $session->FindElement( using => 'css selector', value => '#clickme' );
+            is($clickme->GetElementText(),'PARTY HARD', "Can get element text");
+
+            my $rkt = $clickme->GetElementRect();
+            ok(defined $rkt->{x},"GetElementRect appears to function");
+
+            my $input = $session->FindElement( using => 'css selector', value => 'input[name=text]' );
+            $input->ElementClear();
+            $input->ElementSendKeys( text => "tickle" );
+            is($input->GetElementProperty( name => 'value' ), 'tickle', "Can clear and send keys to a text input");
+
+            is($session->ExecuteScript( script => qq/ return document.querySelector('input').value /, args => [] ),'tickle',"ExecuteScript works");
+            is($session->ExecuteAsyncScript( script => qq/ return arguments[arguments.length - 1](document.querySelector('input').value) /, args => [] ),'tickle',"ExecuteAsyncScript works");
+
+            # Screenshots
+            ok($session->TakeScreenshot(),"Can take screenshot");
+            ok($input->TakeElementScreenshot(), "Can take element screenshot");
+
+            # Perform / Release Actions
+            is( exception {
+                $session->PerformActions( actions => [ { type => 'key', id => 'key', actions => [ { type => 'keyDown', value => 'a' } ] } ] )
+            }, undef, "Can perform general actions");
+            is( exception { $session->ReleaseActions() }, undef, "Can release general actions");
+            is($input->GetElementProperty( name => 'value' ), 'ticklea', "Key sent worked");
+
+            # Cookies -- Browsers don't allow cookies for local stuff, so let's do it against CPAN
+            # XXX lol this site is slow
+            $session->SetTimeouts( script => 1000, implicit => 1000, pageLoad => 10000 );
+
+            $session->NavigateTo( url => 'http://cpan.org' );
+            $session->AddCookie( cookie => { name => 'tickle', value => 'hug' } );
+            my @jar = $session->GetAllCookies();
+            ok(scalar(grep { $_->{name} eq 'tickle' } @jar), "Can set cookies and read them");
+            ok($session->GetNamedCookie( name => 'tickle' ),"Can GetNamedCookie");
+            $session->DeleteCookie( name => 'tickle' );
+            isnt(exception { $session->GetNamedCookie( name => 'tickle') }, undef, "DeleteCookie works");
+            $session->AddCookie( cookie => { name => 'tickle', value => 'hug' } );
+            $session->DeleteAllCookies();
+            isnt( exception { $session->GetNamedCookie( name => 'tickle' ) }, undef, "DeleteAllCookies works");
+
+#        is( exception { $session->DeleteSession() }, undef, "Can delete session");
+
+        };
+    }
+}
+
+sub alertify ($session) {
+    is(eval { $session->GetAlertText() } // $@,'BEEE DOOO', "Can get alert text");
+    is( exception { $session->AcceptAlert() }, undef, "Can dismiss alert");
+    is(eval { $session->GetAlertText() } // $@,'Are you a fugitive from Justice?', "Can get alert text on subsequent alert");
+    is( exception { $session->SendAlertText( text => "HORGLE") }, undef,"send_keys_to_prompt works");
+    is( exception { $session->DismissAlert() }, undef, "Can accept alert");
+}
+
+done_testing();

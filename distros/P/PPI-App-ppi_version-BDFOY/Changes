@@ -1,5 +1,9 @@
 Revision history for Perl module PPI::App::ppi_version::BDFOY
 
+1.001 2021-02-07T06:32:15Z
+	* Don't warn if the version is a semantic version like 'v1.2.3'
+	(Github #1)
+
 0.142 2021-01-28T22:49:08Z
 	* Freshen the distro, remove Travis CI, add Github Actions
 

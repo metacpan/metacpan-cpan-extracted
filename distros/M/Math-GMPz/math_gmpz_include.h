@@ -99,7 +99,7 @@
 
 #endif						/* end ENABLE_MATH_BIGINT_GMP_OVERLOAD */
 
-#define _overload_callback(_1st_arg,_2nd_arg,_3rd_arg)						\
+#define _overload_callback(_1st_arg,_2nd_arg,_3rd_arg)					\
   dSP;											\
   SV * ret;										\
   int count;										\
@@ -108,7 +108,7 @@
   PUSHMARK(SP);										\
   XPUSHs(b);										\
   XPUSHs(a);										\
-  XPUSHs(sv_2mortal(_3rd_arg));							\
+  XPUSHs(sv_2mortal(_3rd_arg));								\
   PUTBACK;										\
   sprintf(buf, "%s", _1st_arg);								\
   count = call_pv(buf, G_SCALAR);							\
@@ -121,3 +121,10 @@
   return ret
 
 
+#if defined(_GMP_INDEX_OVERFLOW) && __GNU_MP_VERSION < 7
+#define CHECK_MP_BITCNT_T_OVERFLOW(x)							\
+     if((mp_bitcnt_t)SvUVX(x) < SvUVX(x))						\
+       croak("Magnitude of UV argument overflows mp_bitcnt_t");
+#else
+#define CHECK_MP_BITCNT_T_OVERFLOW(x)
+#endif

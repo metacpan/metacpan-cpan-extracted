@@ -1,5 +1,13 @@
 Revision history for Perl extension DBIx::Admin::DSNManager.
 
+2.02  2021-02-04T15:56:00
+	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Reformat Makefile.PL.
+	- Change license from artistic_2 to perl.
+	- Add t/00.*.
+	- Update Makefile.PL and POD to change RT to github.
+
 2.01  Mon Mar 10 13:30:55 2014
 	- Add Test::Version to the pre-reqs.
 	- Remove FindBin from pre-reqs.

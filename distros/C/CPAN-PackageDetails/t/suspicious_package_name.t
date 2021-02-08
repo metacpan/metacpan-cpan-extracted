@@ -1,4 +1,4 @@
-use Test::More 'no_plan';
+use Test::More;
 
 use strict;
 use warnings;
@@ -27,3 +27,5 @@ my $at = $@;
 ok( ! defined $rc, "Carped for suspicious package name [$bad_package] " );
 like( $at, qr/suspicious/, "Error message notes that [$bad_package] is suspicious" );
 }
+
+done_testing();

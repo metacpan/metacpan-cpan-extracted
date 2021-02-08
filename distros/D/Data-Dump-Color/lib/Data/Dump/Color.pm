@@ -4,8 +4,10 @@
 
 package Data::Dump::Color;
 
-our $DATE = '2018-12-02'; # DATE
-our $VERSION = '0.241'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-02-06'; # DATE
+our $DIST = 'Data-Dump-Color'; # DIST
+our $VERSION = '0.242'; # VERSION
 
 use 5.010001;
 use strict;
@@ -21,9 +23,8 @@ $DEBUG = $ENV{DEBUG};
 
 use overload ();
 use vars qw(%seen %refcnt @fixup @cfixup %require $TRY_BASE64 @FILTERS $INDENT);
-use vars qw(%COLOR_THEMES %COLORS $COLOR $COLOR_THEME $COLOR_DEPTH $INDEX $LENTHRESHOLD);
+use vars qw($COLOR $COLOR_THEME $INDEX $LENTHRESHOLD);
 
-use Term::ANSIColor;
 require Win32::Console::ANSI if $^O =~ /Win/;
 use Scalar::Util::LooksLikeNumber qw(looks_like_number);
 
@@ -31,81 +32,41 @@ $TRY_BASE64 = 50 unless defined $TRY_BASE64;
 $INDENT = "  " unless defined $INDENT;
 $INDEX = 1 unless defined $INDEX;
 $LENTHRESHOLD = 500 unless defined $LENTHRESHOLD;
+$COLOR = $ENV{COLOR} // (-t STDOUT) // 1;
+$COLOR_THEME = $ENV{DATA_DUMP_COLOR_THEME} //
+    (($ENV{TERM} // "") =~ /256/ ? 'Default256' : 'Default16');
+our $ct_obj;
 
-%COLOR_THEMES = (
-    default16 => {
-        colors => {
-            Regexp  => 'yellow',
-            undef   => 'bright_red',
-            number  => 'bright_blue', # floats can have different color
-            float   => 'cyan',
-            string  => 'bright_yellow',
-            object  => 'bright_green',
-            glob    => 'bright_cyan',
-            key     => 'magenta',
-            comment => 'green',
-            keyword => 'blue',
-            symbol  => 'cyan',
-            linum   => 'black on_white', # file:line number
-        },
-    },
-    default256 => {
-        color_depth => 256,
-        colors => {
-            Regexp  => 135,
-            undef   => 124,
-            number  => 27,
-            float   => 51,
-            string  => 226,
-            object  => 10,
-            glob    => 10,
-            key     => 202,
-            comment => 34,
-            keyword => 21,
-            symbol  => 51,
-            linum   => 10,
-        },
-    },
-);
-
-$COLOR_THEME = ($ENV{TERM} // "") =~ /256/ ? 'default256' : 'default16';
-$COLOR_DEPTH = $COLOR_THEMES{$COLOR_THEME}{color_depth} // 16;
-%COLORS      = %{ $COLOR_THEMES{$COLOR_THEME}{colors} };
-
-my $_colreset = color('reset');
 sub _col {
-    my ($col, $str) = @_;
-    my $colval = $COLORS{$col};
-    my $enable_color = do {
-        if (defined $COLOR) {
-            $COLOR;
-        } elsif (exists $ENV{NO_COLOR}) {
-            0;
-        } else {
-            $ENV{COLOR} // (-t STDOUT) // 0;
-        }
-    };
+    require ColorThemeUtil::ANSI;
+    my ($item, $str) = @_;
 
-    if ($enable_color) {
-        #say "D:col=$col, COLOR_DEPTH=$COLOR_DEPTH";
-        if ($COLOR_DEPTH >= 256 && $colval =~ /^\d+$/) {
-            return "\e[38;5;${colval}m" . $str . $_colreset;
-        } else {
-            return color($colval) . $str . $_colreset;
-        }
+    return $str unless $COLOR;
+
+    my $ansi = '';
+    my $item = $ct_obj->get_item_color($item);
+    if (defined $item) {
+        $ansi = ColorThemeUtil::ANSI::item_color_to_ansi($item);
+    }
+    if (length $ansi) {
+        $ansi . $str . "\e[0m";
     } else {
-        return $str;
+        $str;
     }
 }
 
 sub dump
 {
+    require Module::Load::Util;
+
     local %seen;
     local %refcnt;
     local %require;
     local @fixup;
     local @cfixup;
 
+    local $ct_obj = Module::Load::Util::instantiate_class_with_optional_args(
+        {ns_prefixes=>['ColorTheme::Data::Dump::Color','ColorTheme','']}, $COLOR_THEME);
     require Data::Dump::FilterContext if @FILTERS;
 
     my $name = "a";
@@ -177,6 +138,7 @@ sub dump
 
 sub dd {
     print dump(@_), "\n";
+    @_;
 }
 
 sub ddx {
@@ -522,8 +484,6 @@ sub _dump
 	    $val  =~ s/\n/\n$vpad/gm;
 	    $cval =~ s/\n/\n$vpad/gm;
 	    my $kpad = $nl ? $INDENT : " ";
-	    $key .= " " x ($klen_pad - length($key)) if $nl;
-
 	    my $pad_len = ($klen_pad - length($key));
 	    if ($pad_len < 0) { $pad_len = 0; }
 	    $key .= " " x $pad_len if $nl;
@@ -785,7 +745,7 @@ Data::Dump::Color - Like Data::Dump, but with color
 
 =head1 VERSION
 
-This document describes version 0.241 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2018-12-02.
+This document describes version 0.242 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2021-02-06.
 
 =head1 SYNOPSIS
 
@@ -802,7 +762,7 @@ index, depth indicator, and so on.
 For more information, see Data::Dump. This documentation explains what's
 different between this module and Data::Dump.
 
-=for Pod::Coverage .+
+=for Pod::Coverage ^(dumpf|pp|quote|tied_str|fullname|format_list|str)$
 
 =head1 RESULTS
 
@@ -864,9 +824,11 @@ Whether to force-enable or disable color. If unset, color output will be
 determined from C<$ENV{COLOR}> or when in interactive terminal (when C<-t
 STDOUT> is true).
 
-=item %COLORS => HASH (default: default colors)
+=item $COLOR_THEME => str
 
-Define colors.
+Select a color theme, which is a module under C<ColorTheme::Data::Dump::Color::>
+or C<ColorTheme::> namespace (with/without the namespace prefix). For example:
+C<Default256>, C<Bright>.
 
 =item $INDEX => BOOL (default: 1)
 
@@ -878,6 +840,16 @@ Add string length visual aid for hash key/hash value/array element if length
 is at least this value.
 
 =back
+
+=head1 FUNCTIONS
+
+Only L</dd> and L</ddx> are exported by default.
+
+=head2 dd
+
+=head2 ddx
+
+=head2 dump
 
 =head1 FAQ
 
@@ -899,6 +871,11 @@ L<SHARYANTO::Role::ColorTheme>.
 =head1 ENVIRONMENT
 
 =over
+
+=item * DATA_DUMP_COLOR_THEME
+
+Set color theme. Name will be searched under C<ColorTheme::Data::Dump::Color::*>
+or C<ColorTheme::*>.
 
 =item * NO_COLOR
 
@@ -922,7 +899,7 @@ Source repository is at L<https://github.com/perlancar/perl-Data-Dump-Color>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-Color>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Data-Dump-Color/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -938,7 +915,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

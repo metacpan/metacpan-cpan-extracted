@@ -1,6 +1,6 @@
 package BibTeX::Parser::Entry;
 {
-  $BibTeX::Parser::Entry::VERSION = '1.02';
+  $BibTeX::Parser::Entry::VERSION = '1.03';
 }
 
 use warnings;
@@ -248,6 +248,7 @@ sub to_string {
 	    $type = ucfirst lc $type;
 	}
     }
+    print STDERR $self->key, "\n";
     $result .= '@'.$type."{".$self->key.",\n";    
     foreach my $field (@fields) {
 	my $value = $self->field($field);

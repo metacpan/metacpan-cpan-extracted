@@ -12,6 +12,8 @@ use version;
 use lib 't/lib';
 use Helper qw(:all);
 
+check_skip();
+
 my $cwd = getcwd();
 like $cwd, _dist_dir_re(), "in root dir ok";
 die "not in the root dir" if $cwd !~ _dist_dir_re();
@@ -37,13 +39,13 @@ unlink_changes();
             "on Windows, results are ok";
     }
     else {
-        is $d[0], 'Revision history for Acme-STEVEB', "line 0 ok";
-        is $d[1], '', "line 1 ok";
-        is $d[2], '5.55 UNREL', "line 2 ok";
-        is $d[3], '    -', "line 3 ok";
-        is $d[4], '', "line 4 ok";
+        like $d[0], qr/Revision history for Acme-STEVEB/, "line 0 ok";
+        like $d[1], qr/^$/, "line 1 ok";
+        like $d[2], qr/^5.55 UNREL$/, "line 2 ok";
+        like $d[3], qr/^    -$/, "line 3 ok";
+        like $d[4], qr/^$/, "line 4 ok";
         like $d[5], qr/0.01    \d{4}-\d{2}-\d{2}/, "line 5 ok";
-        is $d[6], '    - Auto generated distribution with Dist::Mgr', "line 6 ok";
+        like $d[6], qr/^    - Auto generated distribution with Dist::Mgr/, "line 6 ok";
     }
 }
 

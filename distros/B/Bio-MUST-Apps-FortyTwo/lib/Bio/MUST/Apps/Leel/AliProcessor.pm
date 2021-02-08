@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Leel::AliProcessor;
 # ABSTRACT: Internal class for leel tool
-$Bio::MUST::Apps::Leel::AliProcessor::VERSION = '0.202160';
+$Bio::MUST::Apps::Leel::AliProcessor::VERSION = '0.210370';
 use Moose;
 use namespace::autoclean;
 
@@ -10,11 +10,13 @@ use feature qw(say);
 use Smart::Comments -ENV;
 
 use Carp;
+use File::Basename;
 use List::AllUtils 'uniq';
+use Path::Class qw(file);
 use Test::Deep::NoTest 'eq_deeply';
 
 use Bio::MUST::Core;
-use Bio::MUST::Core::Utils qw(secure_outfile);
+use Bio::MUST::Core::Utils qw(:filenames secure_outfile);
 use aliased 'Bio::MUST::Core::Ali';
 use aliased 'Bio::MUST::Core::GeneticCode::Factory';
 use aliased 'Bio::MUST::Apps::SlaveAligner::Local';
@@ -97,8 +99,14 @@ sub _check_ali_by_translation {
         carp '[ALI] Warning: round-trip check failed;'
             . ' writing -got and -exp files!';
 
-        $got_ali->store( secure_outfile($cds_ali->filename, '-got') );
-        $exp_ali->store( secure_outfile($cds_ali->filename, '-exp') );
+        # build ALI outfile honoring out_dir and out_suffix
+        # TODO: try to avoid code duplication here?
+        my $cds_ali = $self->cds_ali;
+        my $outfile = $cds_ali->filename;
+           $outfile = file( $rp->out_dir, basename($outfile) ) if $rp->out_dir;
+
+        $got_ali->store( secure_outfile($outfile, '-got') );
+        $exp_ali->store( secure_outfile($outfile, '-exp') );
     }
 
     return;
@@ -132,10 +140,13 @@ sub BUILD {
         }
     }
 
-    #### [ALI] Writing nucleotide file...
+    # build ALI outfile honoring out_dir and out_suffix
     my $cds_ali = $self->cds_ali;
-    my $outfile = secure_outfile($cds_ali->filename, $rp->out_suffix);
-    $cds_ali->store($outfile);
+    my $outfile = insert_suffix($cds_ali->filename, $rp->out_suffix);
+       $outfile = file( $rp->out_dir, basename($outfile) ) if $rp->out_dir;
+
+    #### [ALI] Writing nucleotide file...
+    $cds_ali->store( secure_outfile($outfile) );
 
     return;
 }
@@ -154,7 +165,7 @@ Bio::MUST::Apps::Leel::AliProcessor - Internal class for leel tool
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =head1 AUTHOR
 

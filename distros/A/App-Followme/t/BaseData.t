@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 
-use Test::More tests => 37;
+use Test::More tests => 38;
 
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -30,7 +30,7 @@ chmod 0755, $test_dir;
 #----------------------------------------------------------------------
 # Create object
 
-my $obj = App::Followme::BaseData->new(labels => 'one,two,three');
+my $obj = App::Followme::BaseData->new();
 isa_ok($obj, "App::Followme::BaseData"); # test 1
 can_ok($obj, qw(new build)); # test 2
 
@@ -42,13 +42,13 @@ do {
     is($sigil, '$', 'split scalar variable sigil'); # test 3
     is($name, 'is_first', 'split scalar variable name'); # test 4
 
-    ($sigil, $name) = $obj->split_name('@sequence');
+    ($sigil, $name) = $obj->split_name('@loop');
     is($sigil, '@', 'split array variable sigil'); # test 5
-    is($name, 'sequence', 'split array variable name'); # test 6
+    is($name, 'loop', 'split array variable name'); # test 6
 
-    ($sigil, $name) = $obj->split_name('sequence');
+    ($sigil, $name) = $obj->split_name('loop');
     is($sigil, '', 'split module variable sigil'); # test 7
-    is($name, 'sequence', 'split module variable name'); # test 8
+    is($name, 'loop', 'split module variable name'); # test 8
 
 };
 
@@ -70,25 +70,6 @@ do {
     $ok_value = $value;
     $ref_value = $obj->ref_value($value, '$', 'is_first');
     is ($ref_value, $ok_value, 'ref value of scalar reference'); # test 11
-
-    undef $value;
-    eval {$ref_value = $obj->ref_value($value, '@', 'sequence')};
-    ok($@, 'ref value of array undef'); # test 12
-
-    $value =  [qw(first.html last.html)];
-    $ok_value = $value;
-    $ref_value = $obj->ref_value($value, '@', 'sequence');
-    is_deeply($ref_value, $ok_value, 'ref value of array value'); # test 13
-
-    undef $value;
-    eval {$ref_value = $obj->ref_value($value, '', 'sequence')};
-    ok($@, 'ref value of module undef'); # test 14
-
-    $value =  [qw(first.html last.html)];
-    $ok_value = $value;
-    $ref_value = $obj->ref_value($value, '', 'sequence');
-    is_deeply($ref_value, $ok_value, 'ref value of module value'); # test 15
-
 };
 
 #----------------------------------------------------------------------
@@ -99,15 +80,35 @@ do {
     my @data = ();
 
     my %data = $obj->coerce_data($name, @data);
-    is_deeply(\%data, {}, "Coerce data with no argument"); # test 16
+    is_deeply(\%data, {}, "Coerce data with no argument"); # test 12
 
    push(@data, 'foo');
    %data = $obj->coerce_data($name, @data);
-   is_deeply(\%data, {test => 'foo'}, "Coerce data with one argument"); # test 17
+   is_deeply(\%data, {test => 'foo'}, "Coerce data with one argument"); # test 13
 
    push(@data, 'bar');
    %data = $obj->coerce_data($name, @data);
-   is_deeply(\%data, {'foo' => 'bar'}, "Coerce data with two arguments"); # test 18
+   is_deeply(\%data, {'foo' => 'bar'}, "Coerce data with two arguments"); # test 14
+};
+
+#----------------------------------------------------------------------
+# Check sort and format
+
+do {
+
+    my $data = {
+        name => [qw(one two three four)],
+    };
+
+    my $sorted_ok = {
+        name => [qw(four one three two)],
+    };
+
+    my $sorted_data = $obj->sort($data, 'name');
+    is_deeply($sorted_data, $sorted_ok, "Sort data by name"); # test 15
+
+    my $formatted_data = $obj->format(0, $data);
+    is_deeply($formatted_data, $data, "Format data (noop)") # test 16
 };
 
 #----------------------------------------------------------------------
@@ -118,7 +119,7 @@ do {
                                  second => 2,
                                  third => 3,
                                 },
-                    '$item' => {first => 'first',
+                    '$name' => {first => 'first',
                                 second => 'second',
                                 third => 'third',
                                },
@@ -130,29 +131,36 @@ do {
                                    second => 0,
                                    third => 1,
                                   },
-                    '@sequence' => {first => ['', 'second'],
-                                    second => ['first', 'third'],
-                                    third => ['second', ''],
-                                   },
-                    '$label' =>  {first => 'One',
-                                  second => 'Two',
-                                  third => 'Three',
-                                  },
+                    '$target' => {first => 'target1',
+                                  second => 'target2',
+                                  third => 'target3',
+                                 }, 
+                    '$target_previous' => {first => '',
+                                           second => 'target1',
+                                           third => 'target2',
+                                          }, 
+                    '$target_next' => {first => 'target2',
+                                       second => 'target3',
+                                       third => '',
+                                      }, 
                      );
 
     my $item;
     my @loop = qw(first second third);
 
-    my $data = $obj->build('loop', $item, \@loop);
-    is_deeply($data, \@loop, 'Build loop'); # test 19
+    my $data = $obj->build('loop_by_name', $item, \@loop);
+    is_deeply($data, \@loop, 'Build loop'); # test 17
 
     foreach my $item (@loop) {
-        foreach my $name (qw($count $item $is_first $is_last @sequence $label)) {
-            my $data = $obj->build($name, $item, \@loop);
+        foreach my $name (qw($count $name $is_first $is_last $target 
+                             $target_previous $target_next)) {
+                                 
+            my $by_name = $name . '_by_name';
+            my $data = $obj->build($by_name, $item, \@loop);
             my $data_ok = $data_ok{$name}{$item};
             my $ref_ok = ref $data_ok ? $data_ok : \$data_ok;
 
-            is_deeply($data, $ref_ok, "Build $name for $item"); #test 19-37
+            is_deeply($data, $ref_ok, "Build $name for $item"); #test 18-38
         }
     }
 }

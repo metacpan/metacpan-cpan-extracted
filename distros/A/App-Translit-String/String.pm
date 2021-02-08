@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use Getopt::Std;
 use Lingua::Translit;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -168,12 +168,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2020 Michal Josef Špaček
+© 2015-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

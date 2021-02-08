@@ -19,13 +19,6 @@ CODE {
      padding: 1px; */
 }
 
-.AnnoCPAN { 
-  margin-left: 20%;
-  background: blanchedalmond;
-  border: 1px solid pink;
-  font-size: 85%;
- }
-
 /* classes for syntax highlighting. */
 
 /* copied from Adam Kennedy's PPI examples. */
@@ -105,35 +98,35 @@ CODE {
 
 .SCINEPLEX span.default {
 }
-  
+
 .SCINEPLEX span.keyword {
   color:#0099ff;
 }
-  
+
 .SCINEPLEX span.here_document {
   color:#009933;
-  font-weight: bold;	
+  font-weight: bold;
 }
 
 .SCINEPLEX span.number {
   color:#8b0000;
-  font-weight: bold;	
+  font-weight: bold;
 }
-  
+
 .SCINEPLEX span.operator {
   color:#0000ff;
-  font-weight: bold;	
+  font-weight: bold;
 }
-  
+
 .SCINEPLEX span.regex {
   color:#c86400;
 }
-  
+
 .SCINEPLEX span.string {
   color:#009933;
-  font-weight: bold;	
+  font-weight: bold;
 }
-  
+
 .SCINEPLEX span.variable {
   color:0;
 }

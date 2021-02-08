@@ -33,7 +33,6 @@ GetOptions (\%options,
                zip
                ttdir=s
                fontspec=s
-               webfontsdir=s
                output-templates
                log=s
                extra=s%
@@ -147,34 +146,6 @@ fontspec file (because the location of the fonts is unknown) and that
 you will be bypassing any font name validation, so there is no
 guarantee that they are valid. Here the script assumes that you know
 what you are doing when setting a font name.
-
-=item --webfontsdir
-
-For EPUB output, embed the fonts in that directory.
-
-This option is DEPRECATED now. The preferred way is to pass a fontspec
-file and pass --extra mainfont "Font Name", which ensure the
-consistency between the EPUB and the PDF.
-
-In this directory the program expects to find 4 fonts, a regular, an
-italic, a bold and a bold italic one. Given that the names are
-arbitrary, we need an hint. For this you have to provide a file, in
-the very same directory, with the specifications. The file B<must> be
-named C<spec.txt> and need the following content:
-
-E.g., for Droid fonts:
-
-  family Droid Serif
-  regular DroidSerif-Regular.ttf
-  italic DroidSerif-Italic.ttf
-  bold DroidSerif-Bold.ttf
-  bolditalic DroidSerif-Bold.ttf
-  size 10
-
-The four TTF files must be placed in this directory as well. The
-formats supported are TTF, OTF and WOFF.
-
-The C<family> and C<size> specs are optional.
 
 =item --output-templates
 
@@ -316,7 +287,10 @@ if ($output_templates and exists $options{ttdir}) {
 # passed. However, epub will not be able to embed the fonts, as their
 # location is unknown and for that you do need a fontspec file.
 
-unless ($args{fontspec}) {
+if ($args{fontspec}) {
+    $args{fontspec} = path($args{fontspec})->absolute->stringify;
+}
+else {
     my @list = @{Text::Amuse::Compile::Fonts->default_font_list};
     my %map = (
                mainfont => 'serif',

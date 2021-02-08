@@ -8,8 +8,9 @@ plan skip_all => 'cpanm IO::Socket::SSL' unless LinkEmbedder::TLS;
 LinkEmbedder->new->test_ok(
   'https://www.greatcirclemapper.net/en/great-circle-mapper.html?route=KJFK-VHHH&aircraft=&speed=' => {
     isa           => 'LinkEmbedder::Link::Basic',
+    class         => 'le-rich le-card le-image-card le-provider-greatcirclemapper',
     provider_name => 'Greatcirclemapper',
-    html          => qr{class="le-card le-image-card le-rich le-provider-greatcirclemapper"},
+    html          => qr{<h3>Great Circle Mapper},
   }
 );
 

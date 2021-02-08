@@ -253,7 +253,7 @@ END
 
 
 subtest 'graph queries' => sub {
-	plan tests => 7;
+	plan tests => 8;
 	TODO: { local $TODO = 'graph response not yet implemented for Bolt' if $Neo4j::Test::bolt;
 	my $t = $driver->session->begin_transaction;
 	$t->{return_graph} = 1;
@@ -264,7 +264,9 @@ END
 	$q = <<END;
 MATCH (a)-[b:KNOWS]->(c) WHERE id(b) = {id} RETURN a, b, c LIMIT 1
 END
-	lives_and { ok $r = $t->run($q, id => $r)->single; } 'match graph';
+	lives_and { ok $r = $t->run($q, id => $r); } 'match graph';
+	local $TODO = 'graph response not yet implemented for Jolt' if ref $r eq 'Neo4j::Driver::Result::Jolt';
+	lives_ok { $r = $r->single; } 'single';
 	my ($n, $e);
 	lives_ok { $n = $r->{graph}->{nodes}; } 'got nodes';
 	lives_ok { $e = $r->{graph}->{relationships}; } 'got rels';

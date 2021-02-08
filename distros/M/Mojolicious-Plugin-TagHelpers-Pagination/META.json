@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-TagHelpers-Pagination",
    "no_index" : {
@@ -41,13 +41,18 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Akron/Mojolicious-Plugin-TagHelpers-Pagination/issues"
+      },
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ],
       "repository" : {
-         "url" : "https://github.com/Akron/Mojolicious-Plugin-TagHelpers-Pagination"
+         "type" : "git",
+         "url" : "https://github.com/Akron/Mojolicious-Plugin-TagHelpers-Pagination.git",
+         "web" : "https://github.com/Akron/Mojolicious-Plugin-TagHelpers-Pagination"
       }
    },
-   "version" : 0.07,
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : 0.08,
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

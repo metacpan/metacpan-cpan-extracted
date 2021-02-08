@@ -31,8 +31,8 @@ requires:
   Video::Generator: 0.06
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Video-Generator
+  bugtracker: https://github.com/michal-josef-spacek/App-Video-Generator/issues
   homepage: https://github.com/michal-josef-spacek/App-Video-Generator
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Video-Generator
-version: '0.08'
+version: '0.09'

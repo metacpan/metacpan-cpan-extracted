@@ -24,6 +24,7 @@ requires:
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname: '0'
   Data::Sah::Coerce::perl::To_str::From_str::to_upper: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
+  Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::date: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
@@ -41,18 +42,22 @@ resources:
   bugtracker: https://github.com/perlancar/perl-App-MetaCPANUtils/issues
   homepage: https://metacpan.org/release/App-MetaCPANUtils
   repository: git://github.com/perlancar/perl-App-MetaCPANUtils.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript list-recent-metacpan-releases'
+      name: 'GenPericmdScript list-metacpan-distributions'
       version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript list-metacpan-releases'
+      version: '0.423'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript list-recent-metacpan-releases'
       version: '0.423'
     -
       class: Dist::Zilla::Plugin::InsertExecsList

@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -Tw
 
-use lib '..','../blib/lib','.','./blib/lib';
+use lib './lib','./blib/lib';
 
 eval "use Crypt::IDEA()";
 if ($@) {

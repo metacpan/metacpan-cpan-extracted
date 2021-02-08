@@ -1,0 +1,56 @@
+Net-Connection-FreeBSD_sockstat
+
+Creates Net::Connection objects using sockstat on FreeBSD.
+
+    use Net::Connection::FreeBSD_sockstat;
+    
+    my @objects;
+    eval{ @objects=&sockstat_to_nc_objects; };
+
+    # this time don't resolve ports, ptrs, or usernames
+    my $args={
+         ports=>0,
+         ptrs=>0,
+    };
+    eval{ @objects=&sockstat_to_nc_objects( $args )); };
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Connection::FreeBSD_sockstat
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Connection-FreeBSD_sockstat
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Net-Connection-FreeBSD_sockstat
+
+    Search CPAN
+        https://metacpan.org/release/Net-Connection-FreeBSD_sockstat
+
+    Git Repo
+        https://gitea.eesdp.org/vvelox/Net-Connection-FreeBSD_sockstat
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2021 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

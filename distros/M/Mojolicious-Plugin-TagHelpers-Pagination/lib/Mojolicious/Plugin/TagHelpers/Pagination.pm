@@ -4,7 +4,7 @@ use Mojo::ByteStream 'b';
 use Scalar::Util 'blessed';
 use POSIX 'ceil';
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 our @value_list =
   qw/prev
@@ -454,7 +454,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2012-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

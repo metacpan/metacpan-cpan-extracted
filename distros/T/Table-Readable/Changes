@@ -1,3 +1,11 @@
+0.05 2021-02-07
+
+- Allow read_table_hash to return the order of keys too
+
+0.04 2021-02-05
+
+- Add function read_table_hash
+
 0.03 2018-11-19
 
 - Implement leading/trailing whitespace preservation

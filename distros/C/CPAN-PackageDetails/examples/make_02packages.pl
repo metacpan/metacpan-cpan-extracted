@@ -1,5 +1,6 @@
 #!/usr/local/bin/perl
 
+use strict;
 use CPAN::PackageDetails;
 
 my $package_details = CPAN::PackageDetails->new( 

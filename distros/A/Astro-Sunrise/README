@@ -1,45 +1,9 @@
 -*- encoding: utf-8; indent-tabs-mode: nil -*-
 
-Astro::Sunrise version 0.98
+Astro::Sunrise version 0.99
 ===========================
 
 This module commpute the sunrise and sunset for a given day.
-
-The simplest way to install the module is by using your favorite
-utility: CPAN shell, cpanplus, cpanminus, dist-zilla, etc.
-
-To install this module from a cloned git repository or from a tarball
-type the following:
-
-   perl Makefile.PL
-   make
-   make test
-   make install
-
-
-DEPENDENCIES
-
-This module requires these other modules and libraries:
-  Math::Trig
-  POSIX
-  Carp
-
-The following module is recommended:
-  DateTime.pm
-
-COPYRIGHT AND LICENCE
-
-Copyright (C) 2000, 2001, 2002, 2003, 2013, 2015, 2017, 2018, 2019 Ron Hill and Jean Forget
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl 5.16.3. For more details, see the full
-text of the licenses in the LICENSE file.
-
-This program is distributed in the hope that it will be useful, but it
-is provided “as is” and without any express or implied warranties. For
-details, see the full text of the licenses in the file LICENSE.
-
-Based on a public domain C program sunriset.c (c) Paul Schlyter, 1989, 1992
 
 NAME
 
@@ -65,6 +29,44 @@ SYNOPSIS
                                 lon => -111.88,  # 111°53'W
                                 alt => -0.833,   # standard value for the sun altitude at sunset
                                 offset => 1 } ); # day offset up to tomorrow
+
+INSTALLATION
+
+The simplest way to install the module is by using your favorite
+utility: CPAN shell, cpanplus, cpanminus, dist-zilla, etc.
+
+To install this module from a cloned git repository or from a tarball
+type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+  Math::Trig
+  POSIX
+  Carp
+
+The following module is recommended:
+  DateTime.pm
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2000--2003, 2013, 2015, 2017--2019, 2021 Ron Hill and Jean Forget
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5.16.3. For more details, see the full
+text of the licenses in the LICENSE file.
+
+This program is distributed in the hope that it will be useful, but it
+is provided “as is” and without any express or implied warranties. For
+details, see the full text of the licenses in the file LICENSE.
+
+Based on a public domain C program sunriset.c (c) Paul Schlyter, 1989, 1992
 
 FURTHER DOCUMENTATION
 

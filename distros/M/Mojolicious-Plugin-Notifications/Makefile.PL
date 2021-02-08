@@ -11,19 +11,27 @@ WriteMakefile(
   AUTHOR       => 'Nils Diewald',
   BUILD_REQUIRES => {
     'Test::More' => 0,
-    'Test::Mojo::Session' => 1.05
+    'Test::Mojo::Session' => 1.06
   },
   PREREQ_PM => {
     'Mojolicious' => 7.24
   },
   LICENSE      => 'artistic_2',
   META_MERGE   => {
+    'meta-spec' => { version => 2 },
     requires  => {
       perl => '5.010001'
     },
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/Akron/Mojolicious-Plugin-Notifications'
+      repository  => {
+        type => 'git',
+        url => 'https://github.com/Akron/Mojolicious-Plugin-Notifications.git',
+        web => 'https://github.com/Akron/Mojolicious-Plugin-Notifications',
+      },
+      bugtracker => {
+        web => 'https://github.com/Akron/Mojolicious-Plugin-Notifications/issues'
+      }
     }
   },
   MIN_PERL_VERSION => '5.010001',

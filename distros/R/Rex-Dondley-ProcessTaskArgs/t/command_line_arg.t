@@ -67,6 +67,12 @@ is_deeply get_params( [ qw /bah boo/ ],
           { one => 'bah', two => 'boo', three => undef, four => undef, five => undef, six => undef },
           'test 9';
 
+#is_deeply get_params( [ "--key='dingaling kjsdf'", "--key='kjssd kjkjsdf'" ],
+#                      [ qw /key 0/ ]
+#                    ),
+#          { key => [ 'one', 'two' ] },
+#          'test 10';
+
 done_testing();
 
 sub get_params {

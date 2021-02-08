@@ -2,6 +2,19 @@
 9999-99-99 99:99:99 +0000 HEAD
 ==============================
 
+  commit 29a14156a0c45806728dce6d724ef4f8b5e0d0d7
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu Feb 4 12:30:26 2021 -0500
+  
+    Bump the version for release.
+
+  commit 0dd7d80c19efee664f5b92f9d01b9d4da2c0c351
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu Feb 4 12:26:36 2021 -0500
+  
+    Don't check can_open_socket() if the caller provides their own
+    socket.
+
   commit 7b6b7e26c0004e269c72e4686c06925362181ac8
   Merge: 1341bd5 7969589
   Author: Rocco Caputo <rcaputo@cpan.org>

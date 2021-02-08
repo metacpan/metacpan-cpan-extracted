@@ -19,12 +19,6 @@ sub new {
   
   $self->{quiet} = 1;
 
-  $self->{extra_compiler_flags} = '';
-  
-  $self->{extra_linker_flags} = '';
-  
-  $self->{quiet} = 1;
-  
   bless $self, $class;
 
   # Use default config
@@ -265,42 +259,6 @@ sub set_optimize {
   return $self->set_config(optimize => $optimize);
 }
 
-sub get_extra_compiler_flags {
-  my ($self) = @_;
-  
-  return $self->{extra_compiler_flags};
-}
-
-sub set_extra_compiler_flags {
-  my ($self, $extra_compiler_flags) = @_;
-  
-  $self->{extra_compiler_flags} = $extra_compiler_flags;
-  
-  return $self;
-}
-
-sub append_extra_compiler_flags {
-  my ($self, $new_extra_compiler_flags) = @_;
-  
-  my $extra_compiler_flags = $self->{extra_compiler_flags};
-  $extra_compiler_flags = '' unless defined $extra_compiler_flags;
-  
-  $extra_compiler_flags .= " $new_extra_compiler_flags";
-  
-  $self->{extra_compiler_flags} = $extra_compiler_flags;
-}
-
-sub prepend_extra_compiler_flags {
-  my ($self, $new_extra_compiler_flags) = @_;
-  
-  my $extra_compiler_flags = $self->{extra_compiler_flags};
-  $extra_compiler_flags = '' unless defined $extra_compiler_flags;
-  
-  $extra_compiler_flags = "$new_extra_compiler_flags $extra_compiler_flags";
-  
-  $self->{extra_compiler_flags} = $extra_compiler_flags;
-}
-
 sub get_include_dirs {
   my ($self, $include_dirs) = @_;
   
@@ -330,16 +288,16 @@ sub push_include_dirs {
 sub set_std {
   my ($self, $spec) = @_;
   
-  my $extra_compiler_flags = $self->get_extra_compiler_flags;
-  $extra_compiler_flags = '' unless defined $extra_compiler_flags;
+  my $ccflags = $self->get_ccflags;
+  $ccflags = '' unless defined $ccflags;
   
   # Remove -std=foo section
-  $extra_compiler_flags =~ s/-std=[^ ]+//g;
+  $ccflags =~ s/-std=[^ ]+//g;
   
-  $extra_compiler_flags .= " -std=$spec";
+  $ccflags .= " -std=$spec";
   
   # Add -std=foo section
-  $self->set_extra_compiler_flags($extra_compiler_flags);
+  $self->set_ccflags($ccflags);
   
   return $self;
 }
@@ -347,13 +305,13 @@ sub set_std {
 sub delete_std {
   my ($self) = @_;
   
-  my $extra_compiler_flags = $self->get_extra_compiler_flags;
+  my $ccflags = $self->get_ccflags;
   
   # Remove -std=foo section
-  $extra_compiler_flags =~ s/-std=[^ ]+//g;
+  $ccflags =~ s/-std=[^ ]+//g;
   
   # Add -std=foo section
-  $self->set_extra_compiler_flags($extra_compiler_flags);
+  $self->set_ccflags($ccflags);
   
   return $self;
 }
@@ -466,42 +424,6 @@ sub push_libs {
   my ($self, @libs) = @_;
   
   push @{$self->{libs}}, @libs;
-}
-
-sub get_extra_linker_flags {
-  my ($self) = @_;
-  
-  return $self->{extra_linker_flags};
-}
-
-sub set_extra_linker_flags {
-  my ($self, $extra_linker_flags) = @_;
-  
-  $self->{extra_linker_flags} = $extra_linker_flags;
-  
-  return $self;
-}
-
-sub append_extra_linker_flags {
-  my ($self, $new_extra_linker_flags) = @_;
-  
-  my $extra_linker_flags = $self->{extra_linker_flags};
-  $extra_linker_flags = '' unless defined $extra_linker_flags;
-  
-  $extra_linker_flags .= " $new_extra_linker_flags";
-  
-  $self->{extra_linker_flags} = $extra_linker_flags;
-}
-
-sub prepend_extra_linker_flags {
-  my ($self, $new_extra_linker_flags) = @_;
-  
-  my $extra_linker_flags = $self->{extra_linker_flags};
-  $extra_linker_flags = '' unless defined $extra_linker_flags;
-  
-  $extra_linker_flags = "$new_extra_linker_flags $extra_linker_flags";
-  
-  $self->{extra_linker_flags} = $extra_linker_flags;
 }
 
 sub get_force_compile {
@@ -667,7 +589,7 @@ Set a config value.
 
 Set C<std>.
 
-Internally, remove C<-std=old> if exists and add C<-std=new> after C<extra_compiler_flags>.
+Internally, remove C<-std=old> if exists and add C<-std=new> after C<ccflags>.
 
 =head2 delete_std
 
@@ -675,7 +597,7 @@ Internally, remove C<-std=old> if exists and add C<-std=new> after C<extra_compi
 
 Delete C<std>.
 
-Internally, remove C<-std=old> if exists from C<extra_compiler_flags>.
+Internally, remove C<-std=old> if exists from C<ccflags>.
 
 =head2 set_cc
 
@@ -805,40 +727,6 @@ Set C<optimize> using C<set_config> method.
 
 See C<get_optimize> method about C<optimize> option.
 
-=head2 get_extra_compiler_flags
-
-  my $extra_compiler_flags = $bconf->get_extra_compiler_flags;
-
-Get C<extra_compiler_flags>.
-
-C<extra_compiler_flags> is passed to C<extra_compiler_flags> option of L<ExtUtils::CBuilder> C<compile> method.
-
-Default is empty string.
-
-=head2 set_extra_compiler_flags
-
-  $bconf->set_extra_compiler_flags($extra_compiler_flags);
-
-Set C<extra_compiler_flags>.
-
-See C<get_extra_compiler_flags> method about C<extra_compiler_flags> option.
-
-=head2 append_extra_compiler_flags
-
-  $bconf->append_extra_compiler_flags($extra_compiler_flags);
-
-Add new C<extra_compiler_flags> after current C<extra_compiler_flags>.
-
-See C<get_extra_compiler_flags> method about C<extra_compiler_flags> option.
-
-=head2 prepend_extra_compiler_flags
-
-  $bconf->prepend_extra_compiler_flags($extra_compiler_flags);
-
-Add new C<extra_compiler_flags> before current C<extra_compiler_flags>.
-
-See C<get_extra_compiler_flags> method about C<extra_compiler_flags> option.
-
 =head2 set_ld
 
   $bconf->set_ld($ld);
@@ -902,40 +790,6 @@ Default is copied from $Config{shrpenv}.
 Set C<shrpenv> using C<set_config> method.
 
 See C<get_shrpenv> method about C<shrpenv> option.
-
-=head2 get_extra_linker_flags
-
-  my $extra_linker_flags = $bconf->get_extra_linker_flags;
-
-Get C<extra_linker_flags> option.
-
-C<extra_linker_flags> option is passed to C<extra_compiler_flags> option of L<ExtUtils::CBuilder> C<link> method.
-
-Default is emtpy string.
-
-=head2 set_extra_linker_flags
-
-  $bconf->set_extra_linker_flags($extra_linker_flags);
-
-Set C<extra_linker_flags> option.
-
-See C<get_extra_linker_flags> method about C<extra_linker_flags> option.
-
-=head2 append_extra_linker_flags
-
-  $bconf->append_extra_linker_flags($extra_linker_flags);
-
-Add new C<extra_linker_flags> option after current C<extra_linker_flags> option.
-
-See C<get_extra_linker_flags> method about C<extra_linker_flags> option.
-
-=head2 prepend_extra_linker_flags
-
-  $bconf->prepend_extra_linker_flags($extra_linker_flags);
-
-Add new C<extra_linker_flags> option before current C<extra_linker_flags> option.
-
-See C<get_extra_linker_flags> method about C<extra_linker_flags> option.
 
 =head2 get_include_dirs
 

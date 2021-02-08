@@ -1,28 +1,28 @@
 # Acme::GuessNumber - Number guessing game robot
 
-# Copyright (c) 2007-2008 imacat. All rights reserved. This program is free
+# Copyright (c) 2007-2021 imacat. All rights reserved. This program is free
 # software; you can redistribute it and/or modify it under the same terms
 # as Perl itself.
-# First written: 2007-05-19
+# First written: 2007/5/19
 
 package Acme::GuessNumber;
 use strict;
 use warnings;
 use base qw(Exporter);
-use vars qw($VERSION @EXPORT @EXPORT_OK);
-$VERSION = 0.04;
+our ($VERSION, @EXPORT, @EXPORT_OK);
+$VERSION = 0.05;
 @EXPORT = qw(guess_number HURRY_UP);
 @EXPORT_OK = @EXPORT;
 # Prototype declaration
 sub guess_number($;$);
 
-use vars qw(@GUESSMSGS @RESTMSGS);
-@GUESSMSGS = split /\n/, << "EOT";
+our (@GUESS_MSGS, @RESULT_MSGS);
+@GUESS_MSGS = split /\n/, << "EOT";
 %d?
 Is it %d?
 It must be %d!
 EOT
-@RESTMSGS = split /\n/, << "EOT";
+@RESULT_MSGS = split /\n/, << "EOT";
 Any cigarette?
 I'm feeling lucky tonight
 I'm getting a little tired
@@ -49,7 +49,7 @@ sub guess_number($;$) {
         # Generate the guess
         $guess = 1 + int rand $max;
         # Output our guess
-        $_ = sprintf $GUESSMSGS[int rand scalar @GUESSMSGS], $guess;
+        $_ = sprintf $GUESS_MSGS[int rand scalar @GUESS_MSGS], $guess;
         printf "%-40s", "<Player>: $_";
         # Hit?
         if ($guess == $num) {
@@ -65,7 +65,7 @@ sub guess_number($;$) {
             $flush = $|;
             $| = 1;
             # Yell something
-            print "  *" . $RESTMSGS[int rand scalar @RESTMSGS] . "* ";
+            print "  *" . $RESULT_MSGS[int rand scalar @RESULT_MSGS] . "* ";
             $rest = 3 + int rand 4;
             while ($rest-- > 0) {
                 print ".";
@@ -101,28 +101,30 @@ Acme::GuessNumber - An automatic number guessing game robot
 
 =head1 DESCRIPTION
 
-Many people have this experience:  You sit before a gambling table.  You
-keep placing the bet.  You know the Goddess will finally smile at you.
-You just don't know when.  You have only to wait.  As the time goes by,
-the bets in your hand become fewer and fewer.  You feel the time goes
-slower and slower.  This lengthy waiting process become painfully long,
-like a train running straightforwardly into hell.  You start feeling
-your whole life is a misery, as the jackpot never comes...
+Many people have this experience:  You sit before a gambling table.
+You keep placing the bet.  You know the Goddess will finally smile at
+you.  You just don't know when.  You have only to wait.  As the time
+goes by, the bets in your hand become fewer and fewer.  You feel the
+time goes slower and slower.  This lengthy waiting process become
+painfully long, like a train running straightforwardly into hell.  You
+start feeling your whole life is a failure, as the jackpot never
+comes...
 
-But, hey, why so painfully waiting?  The Goddess will finally smile at
-you, right?  So, why not put this painly waiting process to a computer
-program?  Yes.  That is the whole idea, the greatest invention in the
-century:  An automatic gambler!  There is no secret.  It is simple
-brute-force.  It never-endingly runs toward your final jackpot.  You can
-go for your life: sleep, eat, work.  When you finally came back you
-win.  With it, the hell of gambling is history!
+Hey, why so painfully waiting?  The Goddess always smile at you in the
+end, right?  So, why not put this painfully waiting process to a
+computer program?  Yes.  This is the whole idea, the greatest
+invention in the century::  An automatic gambler!  There is no secret.
+It is simple brute force.  It endlessly runs toward the final prize.
+You can go for other business: sleep, eat, work.  When you finally
+came back, you wins.  With it, the hell of gambling is history!
 
-Remember, that the computer is never affected by emotions, luck,
-everything.  It never feel anxious or depressed.  It simply, faithfully,
+Remember, that the computer is never affected by emotion, luck,
+everything.  It never gets anxious or depress.  It simply, faithfully,
 determinedly runs the probability until the jackpot.  As you know,
-the anxiety and depression are the enemy of the games, while a
-simple, faithful, and determined mind is the only path to the jackpot.
-This makes a computer a perfect gambler than an ordinary human being.
+the anxiety and depression is the enemy of the games, while a
+simple, faithful and determined mind is the only path to the jackpot.
+This makes computer a perfect candidate as a gambler than an ordinary
+human being.
 
 =head1 FUNCTIONS
 
@@ -149,9 +151,9 @@ anything.  It just guesses, precisely.  Nothing more.
 
 =head1 BUGS
 
-No.  This can't possiblely be wrong.  This is brute-force.  It will try
+No.  This can't possibly be wrong.  This is brute-force.  It will try
 until it succeeds.  Nothing can stop it from success.  You always win!
-You will always win!  The Goddess will always smile at you!
+You will always win!  The Goddess of fortune will always smile at you!
 
 =head1 SEE ALSO
 

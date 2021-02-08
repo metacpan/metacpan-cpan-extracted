@@ -11,7 +11,7 @@ use Digest::MD5 qw(md5_hex);
 use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile);
 use App::Followme::FIO;
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -209,7 +209,7 @@ sub update_folder {
     my ($prototype_path, $prototype);
     my $modtime = fio_get_date($folder);
 
-    my $files = $self->{data}->build('files', $index_file);
+    my $files = $self->{data}->build('files_by_mdate_reversed', $index_file);
     my $file = shift(@$files);
 
     if ($file) {

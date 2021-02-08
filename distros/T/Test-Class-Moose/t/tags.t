@@ -5,7 +5,8 @@ use Test2::V0;
 use Test::Class::Moose ();    # prevents us from inheriting from it
 sub registry () {'Test::Class::Moose::AttributeRegistry'}
 
-use Test::Class::Moose::Load qw(t/taglib);
+use FindBin qw( $Bin );
+use Test::Class::Moose::Load "$Bin/taglib";
 use Test::Class::Moose::Runner;
 
 subtest 'Multiple included tags' => sub {
@@ -112,12 +113,29 @@ sub _run_tests {
     my @test_classes = sort $runner->test_classes;
 
     foreach my $class (@test_classes) {
+        ## no critic (Subroutines::ProtectPrivateSubs)
         is( [ $runner->_executor->_test_methods_for( $class->new ) ],
             $methods_for->{$class},
             "$class should have the correct test methods"
         );
     }
 }
+
+subtest 'Verify report' => sub {
+    my $instance = Test::Class::Moose::Report::Instance->new(
+        { name => 'TestsFor::Basic' } );
+    my $method = Test::Class::Moose::Report::Method->new(
+        { name => 'test_me', instance => $instance } );
+
+    ok lives {
+        ok $method->has_tag('first'),
+          'has_tag() should tell us if we have a given tag'
+    }, 'and not die';
+    ok lives {
+        ok !$method->has_tag('no_such_tag'),
+          'has_tag() should tell us if we do not have a given tag'
+    }, 'and not die';
+};
 
 subtest 'Verify registry' => sub {
     ok registry->method_has_tag(
@@ -138,6 +156,7 @@ subtest 'Verify registry' => sub {
       '... or if it does not';
 };
 
+## no critic (BuiltinFunctions::ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval)
 eval <<'END';
     package TestsFor::Bad::Example;
     use Test::Class::Moose;

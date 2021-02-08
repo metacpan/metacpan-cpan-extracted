@@ -4,11 +4,12 @@ package JSON::Schema::Draft201909::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Core vocabulary
 
-our $VERSION = '0.020';
+our $VERSION = '0.022';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use JSON::Schema::Draft201909::Utilities qw(is_type abort assert_keyword_type canonical_schema_uri E assert_uri_ref);
 use Moo;
 use strictures 2;
@@ -70,7 +71,7 @@ sub _traverse_keyword_schema {
   return if not assert_keyword_type($state, $schema, 'string');
 
   return E($state, '$schema can only appear at the schema resource root')
-    if length(canonical_schema_uri($state)->fragment);
+    if length($state->{schema_path});
 
   return E($state, 'custom $schema references are not yet supported')
     if $schema->{'$schema'} ne 'https://json-schema.org/draft/2019-09/schema';
@@ -111,8 +112,10 @@ sub _traverse_keyword_recursiveAnchor {
 
   return if not $schema->{'$recursiveAnchor'};
 
+  # this is required because the location is used as the base URI for future resolution
+  # of $recursiveRef, and the fragment would be disregarded in the base
   return E($state, '"$recursiveAnchor" keyword used without "$id"')
-    if length canonical_schema_uri($state)->fragment;
+    if length($state->{schema_path});
 }
 
 sub _eval_keyword_recursiveAnchor {
@@ -136,12 +139,12 @@ sub _eval_keyword_ref {
   my ($self, $data, $schema, $state) = @_;
 
   my $uri = Mojo::URL->new($schema->{'$ref'})->to_abs($state->{canonical_schema_uri});
-  my ($subschema, $canonical_uri, $document, $document_path) = $self->evaluator->_fetch_schema_from_uri($uri);
+  my ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($uri);
   abort($state, 'unable to find resource %s', $uri) if not defined $subschema;
 
-  return $self->evaluator->_eval($data, $subschema,
+  return $self->eval($data, $subschema,
     +{
-      %{$document->evaluator_configs},
+      %{$document->evaluation_configs},
       %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$ref',
       canonical_schema_uri => $canonical_uri, # note: maybe not canonical yet until $id is processed
@@ -161,19 +164,19 @@ sub _eval_keyword_recursiveRef {
   my ($self, $data, $schema, $state) = @_;
 
   my $target_uri = Mojo::URL->new($schema->{'$recursiveRef'})->to_abs($state->{canonical_schema_uri});
-  my ($subschema, $canonical_uri, $document, $document_path) = $self->evaluator->_fetch_schema_from_uri($target_uri);
+  my ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($target_uri);
   abort($state, 'unable to find resource %s', $target_uri) if not defined $subschema;
 
   if (is_type('boolean', $subschema->{'$recursiveAnchor'}) and $subschema->{'$recursiveAnchor'}) {
     my $uri = Mojo::URL->new($schema->{'$recursiveRef'})
       ->to_abs($state->{recursive_anchor_uri} // $state->{canonical_schema_uri});
-    ($subschema, $canonical_uri, $document, $document_path) = $self->evaluator->_fetch_schema_from_uri($uri);
+    ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($uri);
     abort($state, 'unable to find resource %s', $uri) if not defined $subschema;
   }
 
-  return $self->evaluator->_eval($data, $subschema,
+  return $self->eval($data, $subschema,
     +{
-      %{$document->evaluator_configs},
+      %{$document->evaluation_configs},
       %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$recursiveRef',
       canonical_schema_uri => $canonical_uri, # note: maybe not canonical yet until $id is processed
@@ -193,7 +196,10 @@ sub _traverse_keyword_vocabulary {
   }
 
   return E($state, '$vocabulary can only appear at the schema resource root')
-    if length(canonical_schema_uri($state)->fragment);
+    if length($state->{schema_path});
+
+  return E($state, '$vocabulary can only appear at the document root')
+    if length($state->{traversed_schema_path}.$state->{schema_path});
 }
 
 # we do nothing with $vocabulary yet at evaluation time. When we know we are in a metaschema,
@@ -227,7 +233,7 @@ JSON::Schema::Draft201909::Vocabulary::Core - Implementation of the JSON Schema 
 
 =head1 VERSION
 
-version 0.020
+version 0.022
 
 =head1 DESCRIPTION
 

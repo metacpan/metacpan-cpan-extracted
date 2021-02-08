@@ -1,10 +1,10 @@
 package Pithub::Orgs;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 Orgs API
 
 use Moo;
-use Carp qw(croak);
+use Carp qw( croak );
 use Pithub::Orgs::Members;
 use Pithub::Orgs::Teams;
 extends 'Pithub::Base';
@@ -73,7 +73,7 @@ Pithub::Orgs - Github v3 Orgs API
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 METHODS
 

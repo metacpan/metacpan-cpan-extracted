@@ -7,7 +7,7 @@ use Carp 'carp';
 use v5.10.1;
 
 our @CARP_NOT;
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 our $DEFAULT_KEY_SIZE = 512;
 our $MAX_GEN_ROUNDS = 100;
@@ -26,6 +26,7 @@ our $MAX_GEN_ROUNDS = 100;
 #       hex2b64url, b64url2hex
 # TODO: Add some notes regarding
 #       http://www.daemonology.net/blog/2009-06-11-cryptographic-right-answers.html
+# TODO: use Encode for utf8 in Crypt::Key
 
 use overload '""' => sub { $_[0]->to_string }, fallback => 1;
 use Digest::SHA qw/sha256 sha256_hex/;
@@ -864,7 +865,7 @@ L<https://github.com/sivy/Salmon>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2012-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

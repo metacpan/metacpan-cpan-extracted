@@ -1,5 +1,9 @@
 Revision history for Rex-Dondley-ProcessTaskArgs
 
+0.013     2021-02-08 00:32:02-05:00 America/New_York
+- Added test
+- Fix warning received when undefined value is passed
+
 0.012     2020-05-25 15:13:27-04:00 America/New_York
 - Update docs to reflect new wantarray feature
 

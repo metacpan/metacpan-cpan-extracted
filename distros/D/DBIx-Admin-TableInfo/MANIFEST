@@ -12,6 +12,8 @@ scripts/foreign.keys.pl
 scripts/output2github.pl
 scripts/pod2html.sh
 scripts/synopsis.pl
+t/00.versions.t
+t/00.versions.tx
 t/load.t
 xt/author/dsn.ini
 xt/author/fk.t

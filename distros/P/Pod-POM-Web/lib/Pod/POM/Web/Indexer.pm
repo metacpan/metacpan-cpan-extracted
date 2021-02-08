@@ -2,6 +2,7 @@ package Pod::POM::Web::Indexer;
 
 use strict;
 use warnings;
+use 5.008;
 no warnings 'uninitialized';
 
 use Pod::POM;
@@ -32,7 +33,7 @@ my $ignore_headings = qr[
 my $id_regex = qr/(?![0-9])       # don't start with a digit
                   \w\w+           # start with 2 or more word chars ..
                   (?:::\w+)*      # .. and  possibly ::some::more::components
-                 /x; 
+                 /x;
 
 my $wregex   = qr/(?:                  # either a Perl variable:
                     (?:\$\#?|\@|\%)    #   initial sigil
@@ -85,7 +86,7 @@ my @stopwords = (
 #----------------------------------------------------------------------
 
 
-sub fulltext {
+sub full_text {
   my ($self, $search_string) = @_;
 
   my $indexer = eval {
@@ -94,10 +95,10 @@ sub fulltext {
                         preMatch  => '[[',
                         postMatch => ']]');
   } or die <<__EOHTML__;
-No fulltext index found ($@). 
+No full-text index found ($@).
 <p>
-Please ask your system administrator to run the 
-command 
+Please ask your system administrator to run the
+command
 </p>
 <pre>
   perl -MPod::POM::Web::Indexer -e "Pod::POM::Web::Indexer->new->index"
@@ -126,7 +127,7 @@ __EOHTML__
 __EOHTML__
 
 
-  # force Some::Module::Name into "Some::Module::Name" to prevent 
+  # force Some::Module::Name into "Some::Module::Name" to prevent
   # interpretation of ':' as a field name by Query::Parser
   $search_string =~ s/(^|\s)([\w]+(?:::\w+)+)(\s|$)/$1"$2"$3/g;
 
@@ -141,7 +142,7 @@ __EOHTML__
 
   my $nav_links = $self->paginate_results(\@doc_ids);
 
-  $html .= "<b>Fulltext search</b> for '$search_string'$killedWords<br>"
+  $html .= "<b>Full-text search</b> for '$search_string'$killedWords<br>"
          . "$nav_links<hr>\n";
 
   $self->_tie_docs(DB_RDONLY);
@@ -185,7 +186,7 @@ sub paginate_results {
   @$doc_ids_ref    = @$doc_ids_ref[$start_record ... $end_record];
   my $prev_idx     = max($start_record - $count, 0);
   my $next_idx     = $start_record + $count;
-  my $base_url     = "?source=fulltext&search=$self->{params}{search}";
+  my $base_url     = "?source=full_text&search=$self->{params}{search}";
   my $prev_link
     = $start_record > 0 ? uri_escape("$base_url&start=$prev_idx") : "";
   my $next_link
@@ -227,10 +228,10 @@ sub modlist { # called by Ajax
 sub get_abstract {  # override from Web.pm
   my ($self, $path) = @_;
   if (!$self->{_path_to_descr}) {
-    eval {$self->_tie_docs(DB_RDONLY); 1} 
+    eval {$self->_tie_docs(DB_RDONLY); 1}
       or return; # database not found
-    $self->{_path_to_descr} = { 
-      map {(split /\t/, $_)[1,2]} values %{$self->{_docs}} 
+    $self->{_path_to_descr} = {
+      map {(split /\t/, $_)[1,2]} values %{$self->{_docs}}
      };
   }
   my $description = $self->{_path_to_descr}->{$path} or return;
@@ -248,7 +249,7 @@ sub import { # export the "index" function if called from command-line
   my ($package, $filename) = caller;
 
   no strict 'refs';
-  *{'main::index'} = sub {$class->new->index(@_)} 
+  *{'main::index'} = sub {$class->new->index(@_)}
     if $package eq 'main' and $filename eq '-e';
 }
 
@@ -257,13 +258,13 @@ sub index {
   my ($self, %options) = @_;
 
   # check invalid options
-  die "invalid option : $_" 
+  die "invalid option : $_"
     if grep {!/^-(from_scratch|max_size|positions)$/} keys %options;
 
   # make sure index dir exists
   -d $index_dir or mkdir $index_dir or die "mkdir $index_dir: $!";
 
-  # if -from_scratch, throw away old index 
+  # if -from_scratch, throw away old index
   if ($options{-from_scratch}) {
     unlink $_ or die "unlink $_ : $!" foreach glob("$index_dir/*.bdb");
   }
@@ -295,7 +296,7 @@ sub index {
                                           stopwords => \@stopwords);
 
   # main indexing loop
-  $self->index_dir($_) foreach @Pod::POM::Web::search_dirs; 
+  $self->index_dir($_) foreach @Pod::POM::Web::search_dirs;
 
   $self->{_indexer} = $self->{_docs} = undef;
 }
@@ -322,7 +323,7 @@ sub index_dir {
 
   my %extensions;
   foreach my $file (sort @$files) {
-    next unless $file =~ s/\.(pm|pod)$//; 
+    next unless $file =~ s/\.(pm|pod)$//;
     $extensions{$file}{$1} = 1;
   }
 
@@ -346,11 +347,11 @@ sub index_file {
   my $max_mtime = 0;
   my ($size, $mtime, @filenames);
  EXT:
-  foreach my $ext (qw/pm pod/) { 
+  foreach my $ext (qw/pm pod/) {
     next EXT unless $has_ext->{$ext};
     my $filename = "$file.$ext";
     ($size, $mtime) = (stat $filename)[7, 9] or die "stat $filename: $!";
-    $size < $self->{_max_size_for_indexing} or 
+    $size < $self->{_max_size_for_indexing} or
       print STDERR "$filename too big ($size bytes), skipped " and next EXT;
     $mtime   = max($max_mtime, $mtime);
     push @filenames, $filename;
@@ -373,7 +374,7 @@ sub index_file {
     $description =~ s/\t/ /g;
     $buf =~ s/^=head1\s+($ignore_headings).*$//m; # remove full line of those
     $buf =~ s/^=(head\d|item)//mg; # just remove command of =head* or =item
-    $buf =~ s/^=\w.*//mg;          # remove full line of all other commands 
+    $buf =~ s/^=\w.*//mg;          # remove full line of all other commands
 
     if ($old_doc_id) {
       # Here we should remove the old document from the index. But
@@ -404,15 +405,15 @@ sub _tie_docs {
   my ($self, $mode) = @_;
 
   # tie to docs.bdb, storing {$doc_id => "$mtime\t$pathname\t$description"}
-  tie %{$self->{_docs}}, 'BerkeleyDB::Hash', 
-      -Filename => "$index_dir/docs.bdb", 
+  tie %{$self->{_docs}}, 'BerkeleyDB::Hash',
+      -Filename => "$index_dir/docs.bdb",
       -Flags    => $mode
 	or die "open $index_dir/docs.bdb : $^E $BerkeleyDB::Error";
 }
 
 
 
-sub uri_escape { 
+sub uri_escape {
   my $uri = shift;
   $uri =~ s{([^;\/?:@&=\$,A-Za-z0-9\-_.!~*'()])}
            {sprintf("%%%02X", ord($1))         }ge;
@@ -426,7 +427,7 @@ __END__
 
 =head1 NAME
 
-Pod::POM::Web::Indexer - fulltext search for Pod::POM::Web
+Pod::POM::Web::Indexer - full-text search for Pod::POM::Web
 
 =head1 SYNOPSIS
 
@@ -434,12 +435,12 @@ Pod::POM::Web::Indexer - fulltext search for Pod::POM::Web
 
 =head1 DESCRIPTION
 
-Adds fulltext search capabilities to the 
+Adds full-text search capabilities to the
 L<Pod::POM::Web|Pod::POM::Web> application.
 This requires L<Search::Indexer|Search::Indexer> to be installed.
 
-Queries may include plain terms, "exact phrases", 
-'+' or '-' prefixes, boolean operators and parentheses.
+Queries may include plain terms, "exact phrases",
+'+' or '-' prefixes, Boolean operators and parentheses.
 See L<Search::QueryParser|Search::QueryParser> for details.
 
 
@@ -449,7 +450,7 @@ See L<Search::QueryParser|Search::QueryParser> for details.
 
     Pod::POM::Web::Indexer->new->index(%options)
 
-Walks through directories in C<@INC> and indexes 
+Walks through directories in C<@INC> and indexes
 all C<*.pm> and C<*.pod> files, skipping shadowed files
 (files for which a similar loading path was already
 found in previous C<@INC> directories), and skipping
@@ -459,14 +460,14 @@ Default indexing is incremental : files whose modification
 time has not changed since the last indexing operation will
 not be indexed again.
 
-Options can be 
+Options can be
 
 =over
 
 =item -max_size
 
 Size limit (in bytes) above which files will not be indexed.
-The default value is 300K. 
+The default value is 300K.
 Files of size above this limit are usually not worth
 indexing because they only contain big configuration tables
 (like for example C<Module::CoreList> or C<Unicode::Charname>).
@@ -480,7 +481,7 @@ whose modification time has not changed will not be re-indexed.
 =item -positions
 
 If true, the indexer will also store word positions in documents, so
-that it can later answer to "exact phrase" queries. 
+that it can later answer to "exact phrase" queries.
 
 So if C<-positions> are on, a search for C<"more than one way"> will
 only return documents which contain that exact sequence of contiguous
@@ -502,7 +503,7 @@ is called with the C<-e> flag, so that you can write
 
 =head1 PERFORMANCES
 
-On my machine, indexing a module takes an average of 0.2 seconds, 
+On my machine, indexing a module takes an average of 0.2 seconds,
 except for some long and complex sources (this is why sources
 above 300K are ignored by default, see options above).
 Here are the worst figures (in seconds) :
@@ -522,9 +523,9 @@ Here are the worst figures (in seconds) :
   Parse/RecDescent       5.405
   Bit/Vector             4.768
 
-The index will be stored in an F<index> subdirectory 
+The index will be stored in an F<index> subdirectory
 under the module installation directory.
-The total index size should be around 10MB if C<-positions> are off, 
+The total index size should be around 10MB if C<-positions> are off,
 and between 30MB and 50MB if C<-positions> are on, depending on
 how many modules are installed.
 

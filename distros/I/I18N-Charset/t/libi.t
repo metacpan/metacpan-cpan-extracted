@@ -3,7 +3,7 @@
 # $Id: libi.t,v 1.14 2008-07-12 03:27:12 Martin Exp $
 
 use blib;
-use Test::More tests => 25;
+use Test::More;
 
 use IO::Capture::Stderr;
 my $oICE =  IO::Capture::Stderr->new;
@@ -88,7 +88,7 @@ SKIP:
   } # end of SKIP block
 pass;
 
-exit 0;
+done_testing();
 
 __END__
 

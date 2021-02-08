@@ -1,59 +1,9 @@
 package DBIx::HTML::ClientDB;
 
-# Name:
-#	DBIx::HTML::ClientDB.
-#
-# Purpose:
-#	Allow caller to specify a database handle, an sql statement,
-#	and a name for the menu, and from that build the HTML for the menu,
-#	and the JavaScript so the menu can search the client-side database.
-#
-# Documentation:
-#	POD-style documentation is at the end. Extract it with pod2html.*.
-#
-# Note:
-#	o tab = 4 spaces || die
-#
-# V 1.00 1-Oct-2002
-# -----------------
-# o Original version
-#
-# Author:
-#	Ron Savage <rons@deakin.edu.au>
-#	Home page: http://www.deakin.edu.au/~rons
-
 use strict;
 use warnings;
 
-require 5.005_62;
-
-require Exporter;
-
-use Carp;
-
-our @ISA = qw(Exporter);
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use Image::MagickWrapper ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-
-) ] );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-
-);
-our $VERSION = '1.08';
-
-# -----------------------------------------------
-
-# Preloaded methods go here.
+our $VERSION = '1.09';
 
 # -----------------------------------------------
 
@@ -669,6 +619,16 @@ modules, so don't be too keen on changing it :-).
 	CGI::Explorer
 	DBIx::HTML::LinkedMenus
 	DBIx::HTML::PopupRadio
+
+=head1 Repository
+
+L<https://github.com/ronsavage/DBIx-HTML-ClientDB>
+
+=head1 Support
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/DBIx-HTML-ClientDB/issues>
 
 =head1 Author
 

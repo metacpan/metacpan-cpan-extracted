@@ -598,6 +598,7 @@ __END_OF_HERE_DOCUMENT
     if ( ok $obj, q{Able to parse HERE_DOCUMENT} ) {
 	cmp_ok $obj->failures(), '==', 0, q{Failures parsing HERE_DOCUMENT};
 	cmp_ok $obj->interpolates(), '==', 1, q{Does HERE_DOCUMENT interpolate};
+	is $obj->indentation(), undef, 'HERE_DOCUMENT indentation';
 	is $obj->content(), $here_doc, q{Can recover HERE_DOCUMENT};
 	is $obj->__get_value( 'type' ), '<<', q{Type of HERE_DOCUMENT};
 	is $obj->delimiters(), q{"EOD"EOD}, q{Delimiters of HERE_DOCUMENT};
@@ -1219,6 +1220,191 @@ SKIP: {
 	}
     }
 
+}
+
+{
+    my $here_doc = <<'__END_OF_HERE_DOCUMENT';
+<< ~'EOD'
+    The $1,000,000 Bank-Note
+    EOD
+__END_OF_HERE_DOCUMENT
+
+    $obj = PPIx::QuoteLike->new( $here_doc );
+    if ( ok $obj, q{Able to parse HERE_DOCUMENT} ) {
+	cmp_ok $obj->failures(), '==', 0, q{Failures parsing HERE_DOCUMENT};
+	cmp_ok $obj->interpolates(), '==', 0, q{Does HERE_DOCUMENT interpolate};
+	is $obj->indentation(), ' ' x 4, 'HERE_DOCUMENT indentation';
+	is $obj->content(), $here_doc, q{Can recover HERE_DOCUMENT};
+	is $obj->__get_value( 'type' ), '<<', q{Type of HERE_DOCUMENT};
+	is $obj->delimiters(), q{'EOD'EOD}, q{Delimiters of HERE_DOCUMENT};
+	is $obj->__get_value( 'start' ), q{'EOD'},
+	    q{Start delimiter of HERE_DOCUMENT};
+	is $obj->__get_value( 'finish' ), q{EOD},
+	    q{Finish delimiter of HERE_DOCUMENT};
+	is $obj->encoding(), undef, q{Encoding of HERE_DOCUMENT};
+	is_deeply [ sort $obj->variables() ],
+	    [ ],
+	    q{HERE_DOCUMENT interpolated variables};
+
+	cmp_ok scalar $obj->elements(), '==', 10,
+	    q{Number of elements of HERE_DOCUMENT};
+	cmp_ok scalar $obj->children(), '==', 3,
+	    q{Number of children of HERE_DOCUMENT};
+
+	if ( my $kid = $obj->child( 0 ) ) {
+	    ok $kid->isa( 'PPIx::QuoteLike::Token::Whitespace' ),
+		q{HERE_DOCUMENT child 0 class};
+	    is $kid->content(), ' ' x 4,
+		q{HERE_DOCUMENT child 0 content};
+	    is $kid->error(), undef,
+		q{HERE_DOCUMENT child 0 error};
+	    cmp_ok $kid->parent(), '==', $obj,
+		q{HERE_DOCUMENT child 0 parent};
+	    cmp_ok $kid->previous_sibling() || 0, '==', $obj->__kid( 0 - 1 ),
+		q{HERE_DOCUMENT child 0 previous sibling};
+	    cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 0 + 1 ),
+		q{HERE_DOCUMENT child 0 next sibling};
+	}
+
+	if ( my $kid = $obj->child( 1 ) ) {
+	    ok $kid->isa( 'PPIx::QuoteLike::Token::String' ),
+		q{HERE_DOCUMENT child 1 class};
+	    is $kid->content(), "The \$1,000,000 Bank-Note\n",
+		q{HERE_DOCUMENT child 1 content};
+	    is $kid->error(), undef,
+		q{HERE_DOCUMENT child 1 error};
+	    cmp_ok $kid->parent(), '==', $obj,
+		q{HERE_DOCUMENT child 1 parent};
+	    cmp_ok $kid->previous_sibling() || 0, '==', $obj->__kid( 1 - 1 ),
+		q{HERE_DOCUMENT child 1 previous sibling};
+	    cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 1 + 1 ),
+		q{HERE_DOCUMENT child 1 next sibling};
+	}
+
+	if ( my $kid = $obj->child( 2 ) ) {
+	    ok $kid->isa( 'PPIx::QuoteLike::Token::Whitespace' ),
+	    q{HERE_DOCUMENT child 2 class};
+	    is $kid->content(), ' ' x 4,
+		q{HERE_DOCUMENT child 2 content};
+	    is $kid->error(), undef,
+		q{HERE_DOCUMENT child 2 error};
+	    cmp_ok $kid->parent(), '==', $obj,
+		q{HERE_DOCUMENT child 2 parent};
+	    cmp_ok $kid->previous_sibling() || 2, '==', $obj->__kid( 2 - 1 ),
+		q{HERE_DOCUMENT child 2 previous sibling};
+	    cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 2 + 1 ),
+		q{HERE_DOCUMENT child 2 next sibling};
+	}
+
+    }
+}
+
+{
+    my $here_doc = <<'__END_OF_HERE_DOCUMENT';
+<< ~"EOD"
+    The $1,000,000 Bank-Note
+
+    EOD
+__END_OF_HERE_DOCUMENT
+
+    $obj = PPIx::QuoteLike->new( $here_doc );
+    if ( ok $obj, q{Able to parse HERE_DOCUMENT} ) {
+	cmp_ok $obj->failures(), '==', 0, q{Failures parsing HERE_DOCUMENT};
+	cmp_ok $obj->interpolates(), '==', 1, q{Does HERE_DOCUMENT interpolate};
+	is $obj->indentation(), ' ' x 4, 'HERE_DOCUMENT indentation';
+	is $obj->content(), $here_doc, q{Can recover HERE_DOCUMENT};
+	is $obj->__get_value( 'type' ), '<<', q{Type of HERE_DOCUMENT};
+	is $obj->delimiters(), q{"EOD"EOD}, q{Delimiters of HERE_DOCUMENT};
+	is $obj->__get_value( 'start' ), q{"EOD"},
+	    q{Start delimiter of HERE_DOCUMENT};
+	is $obj->__get_value( 'finish' ), q{EOD},
+	    q{Finish delimiter of HERE_DOCUMENT};
+	is $obj->encoding(), undef, q{Encoding of HERE_DOCUMENT};
+	is_deeply [ sort $obj->variables() ],
+	    [ qw{ $1 } ],
+	    q{HERE_DOCUMENT interpolated variables};
+
+	cmp_ok scalar $obj->elements(), '==', 12,
+	    q{Number of elements of HERE_DOCUMENT};
+	cmp_ok scalar $obj->children(), '==', 5,
+	    q{Number of children of HERE_DOCUMENT};
+
+	if ( my $kid = $obj->child( 0 ) ) {
+	    ok $kid->isa( 'PPIx::QuoteLike::Token::Whitespace' ),
+		q{HERE_DOCUMENT child 0 class};
+	    is $kid->content(), ' ' x 4,
+		q{HERE_DOCUMENT child 0 content};
+	    is $kid->error(), undef,
+		q{HERE_DOCUMENT child 0 error};
+	    cmp_ok $kid->parent(), '==', $obj,
+		q{HERE_DOCUMENT child 0 parent};
+	    cmp_ok $kid->previous_sibling() || 0, '==', $obj->__kid( 0 - 1 ),
+		q{HERE_DOCUMENT child 0 previous sibling};
+	    cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 0 + 1 ),
+		q{HERE_DOCUMENT child 0 next sibling};
+	}
+
+	if ( my $kid = $obj->child( 1 ) ) {
+	    ok $kid->isa( 'PPIx::QuoteLike::Token::String' ),
+		q{HERE_DOCUMENT child 1 class};
+	    is $kid->content(), 'The ',
+		q{HERE_DOCUMENT child 1 content};
+	    is $kid->error(), undef,
+		q{HERE_DOCUMENT child 1 error};
+	    cmp_ok $kid->parent(), '==', $obj,
+		q{HERE_DOCUMENT child 1 parent};
+	    cmp_ok $kid->previous_sibling() || 0, '==', $obj->__kid( 1 - 1 ),
+		q{HERE_DOCUMENT child 1 previous sibling};
+	    cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 1 + 1 ),
+		q{HERE_DOCUMENT child 1 next sibling};
+	}
+
+	if ( my $kid = $obj->child( 2 ) ) {
+	    ok $kid->isa( 'PPIx::QuoteLike::Token::Interpolation' ),
+	    q{HERE_DOCUMENT child 2 class};
+	    is $kid->content(), '$1',
+		q{HERE_DOCUMENT child 2 content};
+	    is $kid->error(), undef,
+		q{HERE_DOCUMENT child 2 error};
+	    cmp_ok $kid->parent(), '==', $obj,
+		q{HERE_DOCUMENT child 2 parent};
+	    cmp_ok $kid->previous_sibling() || 2, '==', $obj->__kid( 2 - 1 ),
+		q{HERE_DOCUMENT child 2 previous sibling};
+	    cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 2 + 1 ),
+		q{HERE_DOCUMENT child 2 next sibling};
+	}
+
+	if ( my $kid = $obj->child( 3 ) ) {
+	    ok $kid->isa( 'PPIx::QuoteLike::Token::String' ),
+	    q{HERE_DOCUMENT child 3 class};
+	    is $kid->content(), ",000,000 Bank-Note\n\n",
+		q{HERE_DOCUMENT child 3 content};
+	    is $kid->error(), undef,
+		q{HERE_DOCUMENT child 3 error};
+	    cmp_ok $kid->parent(), '==', $obj,
+		q{HERE_DOCUMENT child 3 parent};
+	    cmp_ok $kid->previous_sibling() || 3, '==', $obj->__kid( 3 - 1 ),
+		q{HERE_DOCUMENT child 3 previous sibling};
+	    cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 3 + 1 ),
+		q{HERE_DOCUMENT child 3 next sibling};
+	}
+
+	if ( my $kid = $obj->child( 4 ) ) {
+	    ok $kid->isa( 'PPIx::QuoteLike::Token::Whitespace' ),
+	    q{HERE_DOCUMENT child 4 class};
+	    is $kid->content(), ' ' x 4,
+		q{HERE_DOCUMENT child 4 content};
+	    is $kid->error(), undef,
+		q{HERE_DOCUMENT child 4 error};
+	    cmp_ok $kid->parent(), '==', $obj,
+		q{HERE_DOCUMENT child 4 parent};
+	    cmp_ok $kid->previous_sibling() || 4, '==', $obj->__kid( 4 - 1 ),
+		q{HERE_DOCUMENT child 4 previous sibling};
+	    cmp_ok $kid->next_sibling() || 0, '==', $obj->__kid( 4 + 1 ),
+		q{HERE_DOCUMENT child 4 next sibling};
+	}
+
+    }
 }
 
 done_testing;

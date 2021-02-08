@@ -24,7 +24,8 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  license: http://www.opensource.org/licenses/MIT
-  repository: https://github.com/Akron/Data-Password-Meter
-version: '0.09'
+  bugtracker: https://github.com/Akron/Data-Password-Meter/issues
+  license: https://opensource.org/licenses/MIT
+  repository: https://github.com/Akron/Data-Password-Meter.git
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,26 +1,39 @@
-0.241   2018-12-02 (PERLANCAR)
+0.242   2021-02-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Make dd() return the original arguments, like in Data::Dmp
+	  and XXX.
+
+	- Support color themes using ColorTheme specification. This eliminates
+          %COLORS.
+
+	- Add color theme: Light.
+
+        - Add demo script.
+
+
+0.241   2018-12-02  Released-By: PERLANCAR
 
 	- Observe NO_COLOR (see https://no-color.org).
 
 
-0.240   2018-01-17 (PERLANCAR)
+0.240   2018-01-17  Released-By: PERLANCAR
 
         - Avoid "Negative repeat count does nothing" warning (thanks Scott
           Baker).
 
 
-0.23    2014-10-29 (PERLANCAR)
+0.23    2014-10-29  Released-By: PERLANCAR
 
 	- [Bugfix] Use length of original strings (not dumped results) when
 	  printing string length hints.
 
 
-0.22    2014-10-20 (PERLANCAR)
+0.22    2014-10-20  Released-By: PERLANCAR
 
 	- Add visual aid string length for long strings.
 
 
-0.21     2014-06-30 (SHARYANTO)
+0.21     2014-06-30  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -29,29 +42,29 @@
            Scalar::Util::LooksLikeNumber.
 
 
-0.20     2013-11-13 (SHARYANTO)
+0.20     2013-11-13  Released-By: SHARYANTO
 
          - Remove debug statement (steven--).
 
 
-0.19     2013-11-13 (SHARYANTO)
+0.19     2013-11-13  Released-By: SHARYANTO
 
          - Last fix broke other alignment, second try [reported by Scott Baker].
 
 
-0.18     2013-11-13 (SHARYANTO)
+0.18     2013-11-13  Released-By: SHARYANTO
 
          - Fix another index comment alignment bug: multiline vs singleline
            [spotted by Scott Baker].
 
 
-0.17     2013-10-31 (SHARYANTO)
+0.17     2013-10-31  Released-By: SHARYANTO
 
          - Add color theme support (currently undocumented) and 256-color theme
            from Scott Baker.
 
 
-0.16     2013-10-18 (SHARYANTO)
+0.16     2013-10-18  Released-By: SHARYANTO
 
          - Colorize float differently, quote stringy numbers [suggested by Scott
            Baker].
@@ -61,37 +74,37 @@
          - Add some FAQ items.
 
 
-0.15     2013-09-20 (SHARYANTO)
+0.15     2013-09-20  Released-By: SHARYANTO
 
          - A couple of fixes and tweaks for index comment.
 
 
-0.14     2013-09-14 (SHARYANTO)
+0.14     2013-09-14  Released-By: SHARYANTO
 
          - Sigh, another fix in alignment of index comment for hash.
 
 
-0.13     2013-09-14 (SHARYANTO)
+0.13     2013-09-14  Released-By: SHARYANTO
 
          - A couple more tweaks/fixes for index comment.
 
 
-0.12     2013-09-11 (SHARYANTO)
+0.12     2013-09-11  Released-By: SHARYANTO
 
          - Remove debugging statement (me--).
 
 
-0.11     2013-09-11 (SHARYANTO)
+0.11     2013-09-11  Released-By: SHARYANTO
 
          - A couple of fixes for index comment alignment.
 
 
-0.10     2013-09-10 (SHARYANTO)
+0.10     2013-09-10  Released-By: SHARYANTO
 
          - A couple of fixes for index comment.
 
 
-0.09     2013-09-10 (SHARYANTO)
+0.09     2013-09-10  Released-By: SHARYANTO
 
          - Remove original Data::Dump documentation. This module's docs now only
            explains what's different from Data::Dump.
@@ -109,7 +122,7 @@
          - Add option to turn off array/hash index comment ($INDEX=0).
 
 
-0.08     2013-09-10 (SHARYANTO)
+0.08     2013-09-10  Released-By: SHARYANTO
 
          - Fix minor color bug.
 
@@ -117,7 +130,7 @@
            deprecated in Perl 5.19.
 
 
-0.07     2013-09-10 (SHARYANTO)
+0.07     2013-09-10  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -125,7 +138,7 @@
            Scott Baker).
 
 
-0.06     2013-09-08 (SHARYANTO)
+0.06     2013-09-08  Released-By: SHARYANTO
 
          [BUG FIXES]
 
@@ -133,27 +146,27 @@
            (reported by Scott Baker).
 
 
-0.05     2012-10-23 (SHARYANTO)
+0.05     2012-10-23  Released-By: SHARYANTO
 
          - Allow turning color output on/off via $COLOR configuration or COLOR
            environment.
 
 
-0.04     2012-08-08 (SHARYANTO)
+0.04     2012-08-08  Released-By: SHARYANTO
 
          - No functional changes. Fix Abstract.
 
 
-0.03     2012-07-10 (SHARYANTO)
+0.03     2012-07-10  Released-By: SHARYANTO
 
          - Reimplement from using filter to using a modified Data::Dump 1.21.
 
 
-0.02     2012-07-03 (SHARYANTO)
+0.02     2012-07-03  Released-By: SHARYANTO
 
          - No functional changes. Add missing dep to Exporter-Lite.
 
 
-0.01     2012-06-27 (SHARYANTO)
+0.01     2012-06-27  Released-By: SHARYANTO
 
          - First release.

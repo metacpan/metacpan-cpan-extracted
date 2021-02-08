@@ -48,6 +48,7 @@ HasTimeReport
 Haye
 Heady
 Humphrey
+Iain
 Instance
 Jack
 Jeremy
@@ -59,6 +60,7 @@ Larry
 Layne
 Leszczynski
 Load
+Loasby
 MetaCPAN
 Method
 Moose
@@ -116,6 +118,7 @@ github
 goschwald
 hardcode
 hashrefs
+iain
 invocant
 jjrs
 jns

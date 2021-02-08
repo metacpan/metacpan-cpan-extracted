@@ -53,6 +53,13 @@ DESCRIPTION
        my $f = myfunc();
        my $result = $f->get;
 
+    As well as named function declarations it is also supported on
+    anonymous function expressions.
+
+       my $code = async sub { return 456 };
+       my $f = $code->();
+       my $result = $f->get;
+
     This async-declared function always returns a Future instance when
     invoked. The returned future instance will eventually complete when the
     function returns, either by the return keyword or by falling off the

@@ -2,8 +2,9 @@ package Text::Hyphen::DE;
 use strict;
 use warnings;
 use parent 'Text::Hyphen';
+use utf8;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub _PATTERNS {
 	return [qw[

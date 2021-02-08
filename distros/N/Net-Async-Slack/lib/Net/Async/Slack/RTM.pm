@@ -3,7 +3,7 @@ package Net::Async::Slack::RTM;
 use strict;
 use warnings;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use parent qw(IO::Async::Notifier);
 

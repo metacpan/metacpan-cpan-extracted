@@ -46,6 +46,7 @@ my @files = (
     't/annotations.t',
     't/booleans.t',
     't/cached-metaschemas.t',
+    't/dialects.t',
     't/document.t',
     't/equality.t',
     't/errors.t',

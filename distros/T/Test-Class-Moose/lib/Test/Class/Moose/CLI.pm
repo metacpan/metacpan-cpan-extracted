@@ -2,13 +2,16 @@ package Test::Class::Moose::CLI;
 
 # ABSTRACT: Use this in your tcm.t script for a drop-in runner tool
 
-use 5.010000;
+use strict;
+use warnings;
+use namespace::autoclean;
 
-our $VERSION = '0.98';
+use 5.01000;
+
+our $VERSION = '0.99';
 
 use Moose 2.0000;
 use Carp;
-use namespace::autoclean;
 
 with 'Test::Class::Moose::Role::CLI';
 
@@ -28,7 +31,7 @@ Test::Class::Moose::CLI - Use this in your tcm.t script for a drop-in runner too
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -58,8 +61,8 @@ This should be the full name of one a class that you want to run (rather than
 running classes).
 
 You can also pass a path to a single class. Any leading C<t/lib/> part of the
-path will be stripped, and the rest will be transformed from a path to a
-module name.
+path will be stripped, and the rest will be transformed from a path to a module
+name.
 
 Finally, you can pass a path to a directory. It will be searched for F<.pm>
 files and each of those files will be loaded as a test class.
@@ -71,13 +74,13 @@ You can pass this option more than once.
 The name of a method that you want to run. You can pass this option more than
 once.
 
-This will actually be turned into a regex like C<qr/^(?:foo|bar)$/>. It will
-be matched against all classes that are being run.
+This will actually be turned into a regex like C<qr/^(?:foo|bar)$/>. It will be
+matched against all classes that are being run.
 
 =head2 --exclude-methods
 
-The name of a method that you do not want to run. You can pass this option
-more than once. This is turned into a regex just like C<--methods>.
+The name of a method that you do not want to run. You can pass this option more
+than once. This is turned into a regex just like C<--methods>.
 
 =head2 --tags
 
@@ -129,15 +132,14 @@ C<HARNESS_IS_VERBOSE> environment variable is also true.
 
 =head2 --runner-class
 
-The name of the runner class to use. Defaults to
-L<Test::Class::Moose::Runner>. This class will be loaded when creating the
-runner if it is not already loaded.
+The name of the runner class to use. Defaults to L<Test::Class::Moose::Runner>.
+This class will be loaded when creating the runner if it is not already loaded.
 
 =head2 --test-lib-dirs
 
-This should be the path to a directory containing test classes. The path can
-be relative to the project root (F<t/lib>) or absolute. If you do not pass
-this argument it will default to F<t/lib>.
+This should be the path to a directory containing test classes. The path can be
+relative to the project root (F<t/lib>) or absolute. If you do not pass this
+argument it will default to F<t/lib>.
 
 You can pass this option more than once if you'd like to include multiple test
 directories.
@@ -185,7 +187,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

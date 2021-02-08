@@ -1,5 +1,6 @@
 package Polyglot::iTunes;
 
+use strict;
 use vars qw($VERSION);
 
 $VERSION = 0.10;
@@ -8,6 +9,7 @@ print "Loaded " . __PACKAGE__ . " $VERSION\n";
 
 package Polyglot;
 
+use strict;
 use Mac::iTunes;
 
 my $iTunes = Mac::iTunes->controller;

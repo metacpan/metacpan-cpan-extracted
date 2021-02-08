@@ -1,11 +1,11 @@
 package Pithub::Gists;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 Gists API
 
 use Moo;
-use Carp qw(croak);
-use Pithub::Gists::Comments
+use Carp qw( croak );
+use Pithub::Gists::Comments;
 extends 'Pithub::Base';
 
 
@@ -147,7 +147,7 @@ Pithub::Gists - Github v3 Gists API
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 METHODS
 

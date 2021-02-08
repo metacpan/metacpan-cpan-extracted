@@ -10,7 +10,7 @@ use IO::Socket::IP -register;
 use IO::Socket::SSL;
 use Time::Crontab;
 
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.35'; # VERSION
 
 sub new {
     my $class = shift;
@@ -84,7 +84,8 @@ sub run {
         );
     }
     catch {
-        croak("Daemon device instantiation failure: $_");
+        my $e = $_ || $@;
+        croak("Daemon device instantiation failure: $e");
     };
 
     $self->{device}->run;
@@ -134,7 +135,8 @@ sub _parent {
                 $_->{code}->($self);
             }
             catch {
-                warn "Tick execution failure: $_\n";
+                my $e = $_ || $@;
+                warn "Tick execution failure: $e\n";
             };
         }
     };
@@ -159,17 +161,7 @@ sub _parent {
             chomp($line);
 
             if ( not $session->{established} ) {
-                if ( $line =~ /^ERROR.+onnect\w+ too fast/ ) {
-                    warn "$line\n";
-                    warn "Sleeping 20 and retrying...\n";
-                    sleep 20;
-                    $device->daemon->do_restart;
-                }
-                elsif ( $line =~ /^ERROR\s/ ) {
-                    warn "$line\n";
-                    $device->daemon->do_stop;
-                }
-                elsif ( not $session->{user} ) {
+                if ( not $session->{user} ) {
                     if ( $self->{send_user_nick} eq 'on_reply' ) {
                         $self->say("USER $self->{nick} 0 * :$self->{connect}{name}");
                         $self->say("NICK $self->{nick}");
@@ -179,6 +171,16 @@ sub _parent {
                         $self->note("<<< NICK $self->{nick}\r\n");
                     }
                     $session->{user} = 1;
+                }
+                if ( $line =~ /^ERROR.+onnect\w+ too fast/ ) {
+                    warn "$line\n";
+                    warn "Sleeping 20 and retrying...\n";
+                    sleep 20;
+                    $device->daemon->do_restart;
+                }
+                elsif ( $line =~ /^ERROR\s/ ) {
+                    warn "$line\n";
+                    $device->daemon->do_stop;
                 }
                 elsif ( $line =~ /^:\S+\s433\s/ ) {
                     $self->nick( $self->{nick} . '_' );
@@ -211,7 +213,8 @@ sub _parent {
         }
     }
     catch {
-        warn "Daemon parent loop failure: $_\n";
+        my $e = $_ || $@;
+        warn "Daemon parent loop failure: $e\n";
         kill( 'KILL', $_ ) for ( @{ $device->children } );
     };
 }
@@ -398,7 +401,8 @@ sub _on_message {
                 );
             }
             catch {
-                warn "Plugin hook execution failure: $_\n";
+                my $e = $_ || $@;
+                warn "Plugin hook execution failure: $e\n";
             };
 
             last if ($rv);
@@ -583,7 +587,7 @@ sub reply_to {
 
 sub msg {
     my ( $self, $target, $message ) = @_;
-    $self->say("PRIVMSG $target :$message");
+    $self->say( "PRIVMSG $target :" . ( ( $message =~ s/^\/me\s+// ) ? "\001ACTION $message\001" : $message ) );
     return $self;
 }
 
@@ -676,7 +680,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.32
+version 1.35
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC)

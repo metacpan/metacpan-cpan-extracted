@@ -10,7 +10,10 @@ my %options;
 
 getopts('edk:i:o:',\%options) || die <<USAGE;
 Usage: des.pl [options] file1 file2 file3...
-   DES encrypt/decrypt files using Cipher Block Chaining mode.
+    DES encrypt/decrypt files using Cipher Block Chaining mode.
+
+     It is compatible with files encrypted using 
+    "openssl enc -des-cbc -md md5".
 Options:
        -e        encrypt (default)
        -d        decrypt

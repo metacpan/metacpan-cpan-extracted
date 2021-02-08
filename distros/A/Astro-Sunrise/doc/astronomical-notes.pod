@@ -7,7 +7,7 @@
 This text is published under the I<Creative Commons> license
 CC-BY-ND.
 
-Copyright (c) 2017, 2018, 2019 Jean Forget. All rights reserved.
+Copyright (c) 2017-2021 Jean Forget. All rights reserved.
 
 I must precise that I am not a professional astronomer. The text
 below may contain errors, be aware of this. I will not be held
@@ -26,6 +26,13 @@ So you can read it on web pages generated from CPAN
 (for example L<https://metacpan.org>).
 But it is not used during the module installation process.
 So, I guess it will not appear in C<.deb> or C<.rpm> packages.
+
+Although this text  is stored in the  L<Astro::Sunrise> repository, it
+also  documents the  L<DateTime::Event::Sunrise> module,  which has  a
+very  similar core  (astronomical computations)  and a  different API.
+Since both  modules move at different  speeds, it may happen  that the
+text you  are reading is  not synchronised with  the L<Astro::Sunrise>
+module.
 
 =head1 Why This Text? For Whom?
 
@@ -177,7 +184,7 @@ L<C program|https://stjarnhimlen.se/comp/sunriset.c>
 ready to compile and use, giving the 
 L<sunrise and sunset|https://stjarnhimlen.se/comp/riset.html> 
 times. This is the basis of the simple algorithm used in
-C<Astro::Sunrise>. Its precision, as stated by the author,
+L<Astro::Sunrise>. Its precision, as stated by the author,
 is one or two minutes, but it can be much less precise depending
 on the location and date, especially when we are close to the
 beginning or the end of the period when the midnight sun is visible.
@@ -203,6 +210,13 @@ L<very interesting informations|http://aa.usno.navy.mil/faq/index.php>
 about celestial computations, but without restricting itself to the sun,
 like I am doing here.
 
+=item The NOAA solar calculator
+
+L<The NOAA's Earth System Research Laboratories|https://www.esrl.noaa.gov/>
+provide a
+L<solar calculator|https://www.esrl.noaa.gov/gmd/grad/solcalc/>
+similar to the USNO.
+
 =item Stellarium
 
 Stellarium is a PC app to simulate a night sky. If you do not bother with
@@ -216,7 +230,7 @@ of sunrise, sunset or true solar noon (version 0.18.0).
 =item *
 
 Choose an approximate value for the requested time: 12:00 for
-the true solar noon or use C<Astro::Sunrise> (basic mode) for
+the true solar noon or use L<Astro::Sunrise> (basic mode) for
 sunrise or sunset.
 
 =item *
@@ -224,11 +238,11 @@ sunrise or sunset.
 Choose the search criterion: azimuth equal to 180° for true
 solar noon or real altitude equal to 0 degrees and I<xx>
 minutes below the horizon. I<xx> must be compatible with the
-C<altitude> parameter of C<Astro::Sunrise>'s functions.
+C<altitude> parameter of L<Astro::Sunrise>'s functions.
 
 Note: we do not use the I<apparent> altitude given by Stellarium.
 For the deviation angle of sun rays near the horizon, we use
-C<Astro::Sunrise>'s value, which is 35' or 0.583 degree and
+L<Astro::Sunrise>'s value, which is 35' or 0.583 degree and
 we aim at this value in Stellarium. And if we want to take into
 account the radius of the sun's disk, we will use the average value 15'
 instead of recomputing the precise value depending on the
@@ -413,6 +427,10 @@ UTC time is equal to GMT time
 
 =item *
 
+the Earth's surface is a perfect sphere, without any polar flattening and without any equatorial bulge,
+
+=item *
+
 the Earth's surface is a perfect sphere, without any mountains, valleys or molehills,
 
 =item *
@@ -452,12 +470,14 @@ by people who believe that heliocentrism is the one and only truth.
 
 =head2 Basic Movements
 
-In an heliocentric system pointing at fixed stars, Earth orbits around the
-Sun in one year. In other words, in a geocentric system, the Sun orbits around
-the Earth in one year, with an average speed of 0.9856 degrees per day.
+In an heliocentric system pointing at fixed stars, Earth orbits around
+the Sun in one  year. In other words, in a  geocentric system, the Sun
+orbits around the  Earth in one year, with an  average speed of 0.9856
+degrees per day or 0.04107 degrees per hour.
 
-Also, the Earth spins around itself, making one turn in 23h 56mn 4s,
-with a speed of 4.178e-3 degrees per second, that is, 360.9856 degrees per day.
+Also, the Earth  spins around itself, making one turn  in 23h 56mn 4s,
+with a speed of 4.178e-3 degrees per second, that is, 360.9856 degrees
+per day or 15.04107 degrees per hour.
 
 Q: I thought that the Earth was spinning in 24h!
 
@@ -496,7 +516,8 @@ first angle is counted from the line of nodes instead of the Gulf
 of Guinea and is called I<right ascension>; the second angle is called I<declination>.
 Because of tradition, an old charter or something,
 the right ascension is usually expressed as hours, minutes and seconds instead of
-degrees. The declination still uses degrees.
+degrees. The declination still uses degrees. And Paul Schlyter's program uses
+decimal degrees for the right ascension, like any other angle.
 
 I<Ecliptic coordinates> follow the same principle, but the first arc is drawn
 along the ecliptic instead of the equator. Likewise, the second arc is perpendicular
@@ -515,6 +536,58 @@ project its location to the ground, or rather to the plane that is tangent to
 the ground. The angle between the North and this location on the tangent plane
 is called I<azimuth> and the angle between the tangent plane and the line to the 
 celestial body is called I<altitude>.
+
+=head3 Sidereal Time
+
+The sidereal time is an ambivalent notion.
+People are divided into two categories, those
+who describe it as an angle,
+and those who describe it as a time. Strangely,
+there is no flame war about these diverging
+attitudes, each category of people seeming to ignore
+"the other side".
+
+In the first category, people consider that despite its name, the
+sidereal time is an angle. See these French webpages:
+L<https://fr.wikipedia.org/wiki/Temps_sid%C3%A9ral>
+L<https://www.futura-sciences.com/sciences/definitions/univers-temps-sideral-960/>
+L<http://users.skynet.be/zmn/docs/temps/TempsSideral2.html>
+L<https://astrochinon.fr/index.php/documents/nos-dossiers/95-le-temps-sideral-de-greenwich>.
+Even if this notion is measured with hours, minutes
+and seconds, this is an angle. After all, the right ascension
+also is measured with hours, minutes and seconds and it is
+still an angle.
+
+Paul Schlyter is definetely in this category. He even
+defines the sidereal time as the right ascension of an
+earth-bound location and in his programs, he measures sidereal
+times in decimal degrees instead of hms values, just like
+he does for right ascensions.
+
+The second category considers that the sidereal time
+is a measure of time. See
+L<https://www.localsiderealtime.com/whatissiderealtime.html>
+and L<https://en.wikipedia.org/wiki/Sidereal_time>,
+as well as
+L<https://sites.google.com/site/astronomievouteceleste/5---temps-sideral>
+L<http://www.astrosurf.com/toussaint/dossiers/heuredetoiles/heuredetoiles.htm>
+L<http://dictionnaire.sensagent.leparisien.fr/Temps%20sid%C3%A9ral/fr-fr/>
+in French.
+
+But these descriptions seem to never mention issues linked
+with the measure of time: How is sidereal time influenced by
+timezones and daylight-saving time? What about leap seconds?
+With sidereal time as an angle, we can see that if you take two points
+on the surface of Earth within a few kilometers from each
+other in the E → W direction, these points have a different sidereal
+time. With sidereal time as a time, that would translate as saying
+that sidereal time and the principle of timezones are incompatible.
+Am I right or am I wrong? I found nothing about that in the 
+"sidereal time as a time" explanations.
+
+So, between a simple and comprehensive definition on one side
+and a convoluted and incomplete definition on the other side, 
+I will stick with "sidereal time as an angle" definition.
 
 =head2 Other Movements
 
@@ -570,7 +643,8 @@ the Earth.
 The formulas computing the positions of celestial bodies
 use some constants. But these values are constant only
 on a short timespan (astronomically speaking; or, with the
-metaphor above, on a meteorological timespan). For example,
+metaphor above, on a "meteorological" timespan). But they are
+variable on a longer timespan (or a "climatic" timespan) For example,
 everybody knows that the day lasts 24 hours (the mean
 solar day, not the sidereal day). Yet, as I have read it
 somewhere, in paleontological times, it used to last
@@ -645,13 +719,14 @@ gives the equatorial coordinates and I translate them  into ecliptic coordinates
 
 This translates as a speed of 1.0166 degree per day in January at perigee (when
 in a geocentric model, that is perihelion in an heliocentric model) and a speed
-of 0.9552 degree per day in July at apogee (or aphelion).
+of 0.9552 degree per day in July at apogee (or aphelion). Values are respectively
+0.0423°/h and 0.0398°/h.
 
 =head4 Equation of Time
 
 The Earth's spin velocity is constant, that is 360.9856 degrees per day
 but the Sun's orbital speed around the Earth is not. The combination of
-both speed is variable and it is I<not> 360 degrees per day. The crossing
+both speeds is variable and it is I<not> 360 degrees per day. The crossing
 of the meridian by the Sun is not exactly every 86400 seconds.
 There is a difference between the Solar I<Mean> Time, where noon occurs
 every 86400 seconds, no more, no less, and the Solar I<Real> Time, in which
@@ -864,6 +939,57 @@ the Sun's real orbital speed and 9 milliseconds when we use an obviously wrong o
 speed. In the end, it is better than the basic algorithm, which uses an approximate
 but still wrong orbital speed, but for the whole span of 3 h, 59 mn and 57 s.
 
+=head2 What Happened in Spring 2020?
+
+Let us look a bit farther into  the past. In January 2019, I published
+version  0.98   of  L<Astro::Sunrise>,  with  the   precise  algorithm
+implemented as explained in the  preceding paragraph. For test data, I
+did not know how to cross-check  with authoritative sources, so I just
+checked  they  looked plausible  and  that  the iterative  computation
+stopped after  a few iterations. At  this time, I did  not synchronise
+L<DateTime::Event::Sunrise> with L<Astro::Sunrise>, because it was not
+the proper time yet.
+
+Then in  April 2020, a user  created an RT ticket,  explaining that he
+had   compared  the   results   of  L<DateTime::Event::Sunrise>   with
+authoritative websites and  that the results were  not precise enough.
+Of course  the results were  not precise,  I had not  yet synchronised
+L<DateTime::Event::Sunrise>  with L<Astro::Sunrise>.  Yet this  ticket
+gave  me two  things: first,  a  website which  would provide  precise
+day-after-day computations of sunrise, sunset and real solar noon, and
+second a few round tuits to upgrade L<DateTime::Event::Sunrise> to the
+same level as L<Astro::Sunrise>, with real tests values.
+
+There   was   a   glitch.    The   precise   algorithm   copied   from
+L<Astro::Sunrise> and  the test  data from the  NOAA website  were not
+matching. After  tweaking the algorithm  and asking for advice  on the
+DateTime mailing-list
+(L<https://www.nntp.perl.org/group/perl.datetime/2020/06/msg8241.html>),
+I had to  admit that using a 15-degree-per-hour spin  speed was giving
+better results  than the  normal 15.04107-degree-per-hour value.  So I
+coded the  C<15> value in L<DateTime::Event::Sunrise>  and I published
+the module.
+
+=head3 What Went Wrong?
+
+I still think my explanations of  the precise algorithm are correct. I
+think that  the error  lies in the  implementation of  this algorithm.
+Using as an example the values above, during iteration 2 we should use
+the  Sun  at its  16:04:11  position  and  not moving.  Without  being
+certain, I think that actually, the program computes the virtual solar
+noon for 16:04:11,  which is 12:05:01 and that after  that it uses the
+Sun at its 12:05:01 position.
+
+How can I check  this hypothesis? I need to "create"  a new fixed star
+at the 16:04:11 position of the Sun. And  I do not know how to do that
+in  Stellarium. A  few  months  later, I  read  the documentation  for
+Stellarium 0.20.1-1.  In chapter  13, I  found that  the user  can add
+unofficial  novas  to   the  novas  coming  from   the  official  star
+catalogues. This  would answer  my need.  The problem  is that  I have
+Stellarium 0.18.0 and that I did  not succeed in creating "my" nova in
+this  version. So  for  the  moment, it  is  impossible  to check  the
+implementation of the precise algorithm.
+
 =head1 More About The Parameters
 
 Below, I give some detailed explanations about the parameter used when
@@ -989,15 +1115,111 @@ transition.
 A: Why do you compute twilight times? Because you want a low enough light
 level and good enough conditions to observe celestial bodies.
 Do you think there is a big difference between a night when the Sun is
-at its lowest at 23°57' below the horizon and a night when it is at its
-lowest at 24°3' below? In some circumstances, you'd better begin your observations
-when the Sun is at, say, -15° than to wait for the -24° twilight if you know
+at its lowest at 17°57' below the horizon and a night when it is at its
+lowest at 18°3' below? In some circumstances, you'd better begin your observations
+when the Sun is at, say, -15° than to wait for the -18° twilight if you know
 that the Moon will rise at the same time or if a weather report gives a warning
 about an incoming overcast layer.
 
+=head2 C<alt> Parameter (Altitude) and C<upper_limb> Parameter
+
+Parameter C<alt>, in decimal degrees, allows you to specify the altitude
+of the sun corresponding to the event you are looking for: sun rise, sun
+set or a twilight of some degree.
+
+First, the various twilight values: they are arbitrary values. Nothing
+to add.
+
+For sunrise and sunset, the usual value is -0.833°, that is, -50'.
+It comes from two values:
+
+=over 4
+
+=item * -0.583° or -35' for the refraction,
+
+=item * -0.25° or -15' for the radius of the solar disk.
+
+=back
+
+Actually, in both cases, these are approximate values for variable phenomena.
+The radius of the sun disk varies between 0.271° (or 16'16") on 3rd January, when
+the sun is closest from the Earth, and 0.262° (or 15'44") on 3rd July, when it is
+farthest from the Earth.
+
+And the deviation caused by refraction is highly dependent on the temperature
+profile in the atmosphere, therefore dependent on the current weather.
+
+You can refine the computation by using value -0.583 for the C<alt> parameter and
+giving a true value to the C<upper_limb>) parameter (usually 1). In this case, the
+radius of the sun disk is computed anew for each day. On the other hand, there is
+no way within the module to refine the computation of the refraction. The answer
+can only come from outside the module computing sunrises and sunsets.
+
+Q: So using a parameter C<alt> with -0.583 and a parameter C<upper_limb> with 0 is stupid?
+
+A: No, it is just unusual. As stated by Paul Schlyter
+L<in his website|http://www.stjarnhimlen.se/comp/riset.html#2>, 
+the Swedish national almanacs define sunrise and sunset as the instants when the I<centre>
+of the sun disk reaches the optical horizon, not the instants when the I<upper limb> of
+the sun disk reaches the optical horizon.
+
+Q: On the other hand, using a parameter C<alt> with -0.833 and a parameter C<upper_limb> with 1 is stupid?
+
+A: I would say neither "stupid" nor "unusual", but "suspicious". Actually, the usual -0.833 value comes from
+three elements:
+
+=over 4
+
+=item * 0 for the position of the observer relative to the surrounding landscape,
+
+=item * -0.583° or -35' for the refraction,
+
+=item * -0.25° or -15' for the radius of the solar disk, or 0 if you give a true value to C<upper_limb>.
+
+=back
+
+But if you are at the top of a 60-meter tower, the horizon line no longer
+coincides with the horizontal plane, but with a cone making a 0.25° angle with the
+horizontal direction. In this case, we have:
+
+=over 4
+
+=item * -0.25° for the position of the observer relative to the surrounding landscape,
+
+=item * -0.583° for the refraction,
+
+=item * 0° for the radius of the solar disk if you give a true value to C<upper_limb>, or -0.25° for a false value.
+
+=back
+
+So this parameter combination is valid, but it is suspicious because it does not correspond
+to a usual and mundane situation.
+
+Q: After your explanation about the C<precise> parameter, is there a significant
+difference between C<< alt => -0.833, upper_limb => 0 >> and
+C<< alt => -0.583, upper_limb => 1 >>?
+
+A: You guessed, it, there is nearly no difference. The example I will take is sunset
+at Fairbanks on 3rd January 2020. I take 3rd January because it is the time of the year
+when the sun is at its largest. According to Stellarium, the diameter is 32'32", so the
+radius is 16'16". And I take Fairbanks, because near a polar circle, the course of the sun
+at sunset is much shallower than near the equator. So, for 
+C<< alt => -0.833, upper_limb => 0 >> the sunset occurs when the
+center of the sun dist is at -50' and for 
+C<< alt => -0.583, upper_limb => 1 >> it occurs when the center of the sun disk is at -51'16".
+Stellarium gives 15:59:12 in the first case and 15:59:37 in the second case.
+A meagre 25-second difference.
+
+On the other hand, let us move a few hundred kilometers to the North,
+to 68°01'46" N, 147°42'59" W, beyond the polar circle. The computation with 
+C<< alt => -0.833, upper_limb => 0 >> shows that the sun
+stays below the horizon and neither rises nor sets, while the computation with
+C<< alt => -0.583, upper_limb => 1 >> gives a sunrise at 12:45:11 and a
+sunset at 13:05:53.
+
 =head2 C<year> Parameter
 
-Q: Why does C<Astro::Sunrise> need the year to compute sunrise and sunset?
+Q: Why does L<Astro::Sunrise> need the year to compute sunrise and sunset?
 I have seen an algorithm which only needs the month and the day.
 
 A: Let us compute the sunset at the Greenwich observatory at the end
@@ -1040,20 +1262,20 @@ algorithm would be redundant. Then because I do not know which licenses
 apply to these yearless algorithms, while at the same time, Paul Schlyter's
 algorithm is in the public domain.
 
-Q: Another thing, how did you get the seconds in the table? C<Astro::Sunrise>
+Q: Another thing, how did you get the seconds in the table? L<Astro::Sunrise>
 does not provide the seconds.
 
-A: Because I have used C<DateTime::Event::Sunrise> instead of C<Astro::Sunrise>,
-which produces C<DateTime> objects, complete with seconds.
+A: Because I have used L<DateTime::Event::Sunrise> instead of L<Astro::Sunrise>,
+which produces L<DateTime> objects, complete with seconds.
 
-Q: Could we modify C<Astro::Sunrise> to give C<"hh:mm:ss"> results instead
+Q: Could we modify L<Astro::Sunrise> to give C<"hh:mm:ss"> results instead
 of C<"hh:mm">?
 
 A: We could. But would this precision be meaningful? According to Paul 
 Schlyter, the algorithm precision is about 1 or 2 minutes, except at the
 beginning and the end of the Polar Day period when the precision is much
 worse. So it is not worth adding the seconds to the results produced by
-C<Astro::Sunrise>.
+L<Astro::Sunrise>.
 
 Q: And in the discussion above, why did you keep the seconds, if they
 are not significant?

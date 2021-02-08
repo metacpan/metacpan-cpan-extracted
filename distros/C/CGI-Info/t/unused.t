@@ -4,17 +4,32 @@ use strict;
 use warnings;
 use Test::Most;
 
-unless($ENV{RELEASE_TESTING}) {
-	plan(skip_all => "Author tests not required for installation");
+my $can_test = 1;
+
+if($ENV{AUTHOR_TESTING}) {
+	eval {
+		use Test::Requires {
+			'warnings::unused' => 0.04
+		};
+	};
+	if($@) {
+		plan(skip_all => 'Test::Requires needed for test');
+		$can_test = 0;
+	}
 }
 
-# eval 'use warnings::unused -global';
-eval 'use warnings::unused';
+if($can_test) {
+	BEGIN {
+		if($ENV{AUTHOR_TESTING}) {
+			use_ok('CGI::Info');
+			use warnings::unused -global;
+		}
+	}
 
-if($@ || ($warnings::unused::VERSION < 0.04)) {
-	plan(skip_all => 'warnings::unused >= 0.04 needed for testing');
-} else {
-	use_ok('CGI::Info');
-	new_ok('CGI::Info');
-	plan tests => 2;
+	if($ENV{AUTHOR_TESTING}) {
+		new_ok('CGI::Info');
+		plan(tests => 2);
+	} else {
+		plan(skip_all => 'Author tests not required for installation');
+	}
 }

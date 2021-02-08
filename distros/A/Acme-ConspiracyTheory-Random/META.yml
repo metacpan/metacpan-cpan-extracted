@@ -25,7 +25,7 @@ optional_features: {}
 provides:
   Acme::ConspiracyTheory::Random:
     file: lib/Acme/ConspiracyTheory/Random.pm
-    version: '0.007'
+    version: '0.013'
 requires:
   Exporter::Shiny: '1.000000'
   List::Util: '1.54'
@@ -36,7 +36,7 @@ resources:
   homepage: https://metacpan.org/release/Acme-ConspiracyTheory-Random
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-acme-conspiracytheory-random.git
-version: '0.007'
+version: '0.013'
 x_provides_scripts:
   conspire:
     file: bin/conspire

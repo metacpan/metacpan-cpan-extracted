@@ -2,8 +2,8 @@ NAME
     Module::Load::Util - Some utility routines related to module loading
 
 VERSION
-    This document describes version 0.003 of Module::Load::Util (from Perl
-    distribution Module-Load-Util), released on 2020-06-16.
+    This document describes version 0.004 of Module::Load::Util (from Perl
+    distribution Module-Load-Util), released on 2021-02-06.
 
 SYNOPSIS
 DESCRIPTION
@@ -61,6 +61,11 @@ FUNCTIONS
         then with $module_with_optional_args set to "ID::KBBI", the module
         WordList::ID::KBBI will be loaded.
 
+    *   ns_prefixes
+
+        Array of str. Like "ns_prefix" but will attempt all prefixes and
+        will fail if all prefixes fail.
+
     *   target_package
 
         Str. Target package to import() to. Default is caller(0).
@@ -107,6 +112,10 @@ FUNCTIONS
 
         Str. Like in "load_module_with_optional_args".
 
+    *   ns_prefixes
+
+        Array of str. Like in "load_module_with_optional_args".
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Module-Load-Util>.
@@ -117,7 +126,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Load-Util>
+    <https://github.com/perlancar/perl-Module-Load-Util/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -133,7 +142,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

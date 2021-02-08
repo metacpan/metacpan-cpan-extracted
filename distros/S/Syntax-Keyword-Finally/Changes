@@ -1,4 +1,9 @@
 Revision history for Syntax-Keyword-Finally
 
+0.02    2021-02-03
+        [CHANGES]
+         * Implement FINALLY blocks as basic blocks, not full anonymous subs
+         * Test and document that exceptions can now be thrown from them
+
 0.01    2021-01-31
         First version, released on an unsuspecting world.

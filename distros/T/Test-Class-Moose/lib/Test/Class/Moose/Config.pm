@@ -2,13 +2,16 @@ package Test::Class::Moose::Config;
 
 # ABSTRACT: Configuration information for Test::Class::Moose
 
+use strict;
+use warnings;
+use namespace::autoclean;
+
 use 5.010000;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Moose;
 use Moose::Util::TypeConstraints;
-use namespace::autoclean;
 
 use Test::Class::Moose::Deprecated;
 
@@ -123,7 +126,7 @@ Test::Class::Moose::Config - Configuration information for Test::Class::Moose
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -155,7 +158,8 @@ Boolean. Will display number of classes, test methods and tests run.
 
 =head2 C<use_environment>
 
-Boolean.  Sets show_timing and statistics to true if your test harness is running verbosely, false otherwise.
+Boolean.  Sets show_timing and statistics to true if your test harness is
+running verbosely, false otherwise.
 
 =head2 C<test_classes>
 
@@ -170,9 +174,9 @@ you wish to run an individual class as a test:
 =head2 C<include_tags>
 
 Array ref of strings matching method tags (a single string is also ok). If
-present, only test methods whose tags match C<include_tags> or whose tags
-don't match C<exclude_tags> will be included. B<However>, they must still
-start with C<test_>.
+present, only test methods whose tags match C<include_tags> or whose tags don't
+match C<exclude_tags> will be included. B<However>, they must still start with
+C<test_>.
 
 For example:
 
@@ -238,7 +242,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

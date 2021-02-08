@@ -65,6 +65,9 @@ t/tables.t
 t/testfiles/10_theses.exp.html
 t/testfiles/10_theses.exp.ltx
 t/testfiles/10_theses.muse
+t/testfiles/alt-fonts.exp.html
+t/testfiles/alt-fonts.exp.ltx
+t/testfiles/alt-fonts.muse
 t/testfiles/anchors-2.exp.html
 t/testfiles/anchors-2.exp.ltx
 t/testfiles/anchors-2.muse

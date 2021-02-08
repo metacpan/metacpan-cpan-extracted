@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Bolt;
 # ABSTRACT: Bolt result handler
-$Neo4j::Driver::Result::Bolt::VERSION = '0.20';
+$Neo4j::Driver::Result::Bolt::VERSION = '0.21';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -203,12 +203,22 @@ Neo4j::Driver::Result::Bolt - Bolt result handler
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 DESCRIPTION
 
 The L<Neo4j::Driver::Result::Bolt> package is not part of the
 public L<Neo4j::Driver> API.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Neo4j::Driver::Net>
+
+=item * L<Neo4j::Driver::Result>
+
+=back
 
 =head1 AUTHOR
 

@@ -65,7 +65,7 @@ has verbose =>
 	required => 0,
 );
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 # -----------------------------------------------
 
@@ -673,9 +673,15 @@ L<DBIx::Admin::TableInfo>.
 
 Version numbers < 1.00 represent development versions. From 1.00 up, they are production versions.
 
+=head1 Repository
+
+L<https://github.com/ronsavage/DBIx-Admin-DSNManager>
+
 =head1 Support
 
-Log a bug on RT: L<https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Admin-DSNManager>.
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/DBIx-Admin-DSNManager/issues>
 
 =head1 Author
 

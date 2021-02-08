@@ -5,13 +5,13 @@ use warnings;
 
 use lib '../..';
 
-use base qw(App::Followme::Module);
+use base qw(App::Followme::CreateIndex);
 
 use IO::File;
 use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile);
 use App::Followme::FIO;
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -20,61 +20,9 @@ sub parameters {
     my ($pkg) = @_;
 
     return (
-            thumb_suffix => '-thumb',
             template_file => 'create_gallery.htm',
             data_pkg => 'App::Followme::JpegData',
             );
-}
-
-#----------------------------------------------------------------------
-# Build a photo gallery
-
-sub run {
-    my ($self, $directory) = @_;
-
-    eval {$self->update_folder($directory)};
-    $self->check_error($@, $directory);
-
-    return;
-}
-
-#----------------------------------------------------------------------
-# Update the index files in each directory
-
-sub update_folder {
-    my ($self, $folder) = @_;
-
-    my $index_file = $self->to_file($folder);
-    my $newest_file = $self->{data}->build('newest_file', $index_file);
-    my $template_file = $self->get_template_name($self->{template_file});
-
-    unless (fio_is_newer($index_file, $template_file, @$newest_file)) {
-        my $page = $self->render_file($template_file, $index_file);
-        my $prototype_file = $self->find_prototype();
-
-        $page = $self->reformat_file($prototype_file, $index_file, $page);
-        fio_write_page($index_file, $page);
-    }
-
-    return;
-}
-
-#----------------------------------------------------------------------
-# Save a photo
-
-sub write_photo {
-    my ($self, $photoname, $photo) = @_;
-
-    my $fd = IO::File->new($photoname, 'w');
-    die "Couldn't write $photoname" unless $fd;
-
-    my $data = $photo->jpeg();
-
-    binmode($fd);
-    print $fd $data;
-    close($fd);
-
-    return;
 }
 
 1;
@@ -108,11 +56,6 @@ The following fields in the configuration file are used:
 
 The name of the template used to produce the photo gallery. The default is
 'create_gallery.htm'.
-
-=item thumb_suffix
-
-The suffix added to the photo name to produce the thumb photo name. The default
-is '-thumb'.
 
 =item data_pkg
 

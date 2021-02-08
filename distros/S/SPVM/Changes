@@ -1,4 +1,23 @@
-0.0930 2020-1-28
+0.0932 2021-02-08
+  - spvmcc -I option module path order become top
+0.0931 2021-02-06
+  - SPVM::Config extra_compiler_flag related methods is removed
+    because I want to use extra_compiler_flag for spvmcc --ccflags option for future
+  - SPVM::Config extra_linker_flag related methods is removed
+    because I want to use extra_linker_flag for spvmcc --lddlflags option for future
+  - implement spvmcc -O option
+  - add --ccflags option to spvmcc
+  - add --lddlflags option to spvmcc
+  - add -f or --force option to spvmcc to compile and link force
+  - package part name must be start with lower case
+    (Invalid package name example) Foo::bar
+    because I want to use internal anon sub package name for this. Foo::anonsub_11_23
+  - fix bug anon sub code is not precompile if package have precompile descriptor
+  - exception message become more perlish
+    (Exception Message Example)
+    TestCase::OArray->basic called at t/default/lib/TestCase/OArray.spvm line 54
+  - add [CompileError] to compile error message
+0.0930 2021-01-28
   - remove subroutine precompile descriptor. SPVM become only support whole package precompile.
   - add SPVM::Builder::Exe again. This is more stable before SPVM::Builder::Exe because compiler and runtime and SPVM module sources is embeded to exe files directry.
   - add spvmcc again

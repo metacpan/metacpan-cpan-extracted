@@ -49,17 +49,20 @@
    "provides" : {
       "Astro::Sunrise" : {
          "file" : "lib/Astro/Sunrise.pm",
-         "version" : "0.98"
+         "version" : "0.99"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jforget/Astro-Sunrise/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/jforget/Astro-Sunrise.git",
          "web" : "https://github.com/jforget/Astro-Sunrise"
       }
    },
-   "version" : "0.98",
+   "version" : "0.99",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

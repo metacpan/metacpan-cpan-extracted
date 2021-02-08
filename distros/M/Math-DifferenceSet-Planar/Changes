@@ -1,5 +1,11 @@
 Revision history for Perl extension Math::DifferenceSet::Planar.
 
+0.011   Mon, 01 Feb 2021 19:42:50 +0100
+        - fixed DBIx::Class warning with huge orders
+        - added yet more example scripts
+        - moved bugtracker to github
+        - slightly revised documentation
+
 0.009   Fri, 01 Jan 2021 22:19:25 +0100
         - added methods:
           - check_elements

@@ -1,27 +1,34 @@
 ---
 abstract: 'Provide fetchrow_hashref() for CSV files'
 author:
-  - 'Ron Savage <ron@savage.net.au>'
+  - 'Ron Savage (ron@savage.net.au)'
 build_requires:
-  Test::More: 0
-  Test::Pod: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  Test::Pod: '0'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
-license: artistic
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Text-CSV_PP-Iterator
-provides:
-  Text::CSV_PP::Iterator:
-    file: lib/Text/CSV_PP/Iterator.pm
-    version: 1.03
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Exception::Class: 0
-  Iterator: 0
-  Iterator::IO: 0
-  Text::CSV_PP: 0
+  Exception::Class: '0'
+  Iterator: '0'
+  Iterator::IO: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Text::CSV_PP: '0'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_1_0
-version: 1.03
+  bugtracker: https://github.com/ronsavage/Text-CSV_PP-Iterator/issues
+  license: http://opensource.org/licenses/Perl
+  repository: https://github.com/ronsavage/Text-CSV_PP-Iterator.git
+version: '1.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

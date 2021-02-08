@@ -93,4 +93,28 @@ static void S_future_asyncawait_wrap_suspendhook(pTHX_ SuspendHookFunc *newfunc,
   OP_CHECK_MUTEX_UNLOCK;
 }
 
+#define future_asyncawait_on_activate(func, data) S_future_asyncawait_on_activate(aTHX_ func, data)
+static void S_future_asyncawait_on_activate(pTHX_ void (*func)(pTHX_ void *data), void *data)
+{
+  SV **svp;
+
+  if((svp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/loaded", FALSE)) && SvOK(*svp)) {
+    (*func)(aTHX_ data);
+  }
+  else {
+    AV *av;
+
+    svp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/on_loaded", FALSE);
+    if(svp)
+      av = (AV *)*svp;
+    else {
+      av = newAV();
+      hv_stores(PL_modglobal, "Future::AsyncAwait/on_loaded", (SV *)av);
+    }
+
+    av_push(av, newSVuv(PTR2UV(func)));
+    av_push(av, newSVuv(PTR2UV(data)));
+  }
+}
+
 #endif

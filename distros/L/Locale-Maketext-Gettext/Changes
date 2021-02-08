@@ -1,7 +1,25 @@
 Locale-Maketext-Gettext change log
 
+2021-02-08	version 1.32
+	 1. Makefile.PL, Build.PL: Added the CPAN distribution metadata.
+
+2021-02-07
+	 1. maketext: Fixed the version number.
+
+2021-02-07	version 1.31
+	 1. Updated .gitignore.
+	 2. Added MANIFEST.SKIP.
+	 3. MANIFEST, META.json, META.yml, SIGNATURE: Generated files
+	    removed from the Git repository.
+	 4. COPYING: Removed the redundant and irrelevant GPL license.
+	 5. BUGS, INSTALL, README, THANKS, TODO, README.md: Replaced the
+	    messy GNU-styled documents with a single Markdown README.md,
+	    and updated the URLs.
+	 6. Gettext.pm, Functions.pm, maketext, 11-command-line.t,
+	    12-cache.t, Changes: Various fixes to avoid JetBrains IDE
+	    problem detection.
+
 2019-09-17	version 1.30
-	 Fix after 10 years.
 	 1. 12-cache.t: Fixed so that it works on MS-Win32.  I forgot to
 	    issue binmode when copying the MO files.
 	 2. 00-signature.t: Removed TEST_SIGNATURE, as this does not work
@@ -13,7 +31,7 @@ Locale-Maketext-Gettext change log
 	 1. Gettext.pm: Added support to purge the lexicon cache and
 	    reread the MO file on calling textdomain() when MO file is
 	    updated automatically.  This enables MO file live update with
-	    persistant applications like Mojolicious or mod_perl.
+	    persistent applications like Mojolicious or mod_perl.
 	 2. Source is now on Github.  See:
 	    https://github.com/imacat/Locale-Maketext-Gettext
 
@@ -38,7 +56,7 @@ Locale-Maketext-Gettext change log
 	    the test is skipped on the target test system.
 
 2008-11-11
-	 1. INSTALL: Fixed the grammer, changed "none" to "None.".
+	 1. INSTALL: Fixed the grammar, changed "none" to "None.".
 
 2008-04-22	version 1.26
 	Documentation fix.  No code changes.
@@ -69,7 +87,7 @@ Locale-Maketext-Gettext change log
 	    test_native.po and test_native.mo.
 	 5. Build.PL: Added "build_requires".
 	 6. t/08-f-errors.t: Fixed so that it finds the newest MO file
-	    found on the system, in order to avoid lagacy MO files.
+	    found on the system, in order to avoid legacy MO files.
 	    (gettext 0.10 in 1995?)
 	 7. t/08-f-errors.t: Fixed test 38 so that it skips in the eval()
 	    block, and dumps the error on failure.
@@ -153,7 +171,7 @@ Locale-Maketext-Gettext change log
 	    preference.
 	13. Gettext.pm and Functions.pm: In maketext(), check if the key is
 	    Perl utf8 text with Encode::is_utf8() first before decode() the
-	    key, so that user can safely run a multibyte-awared script.
+	    key, so that user can safely run a multibyte-aware script.
 	14. Gettext.pm and Functions.pm: In maketext(), check if the key is
 	    Perl utf8 text with Encode::is_utf8() first before encode(), for
 	    empty/invalid lexicon with key_encoding() set but no output
@@ -164,7 +182,7 @@ Locale-Maketext-Gettext change log
 	15. Functions.pm: In __(), removed unused variables $encoding,
 	    $lh_encoding and $key_encoding.
 	16. maketext: In parse_args(), check the return value of the eval { }
-	    block instead of $@, and remove the extra new line when outputing
+	    block instead of $@, and remove the extra new line when writing
 	    the error in $@.
 	17. maketext: Added an example at the DESCRIPTION chapter of the
 	    POD documentation.
@@ -179,7 +197,7 @@ Locale-Maketext-Gettext change log
 	the fail_with() method, instead of our own.
 	Clean up encoding mess.  You may need to check if your application
 	was depending on the previous wrong, hard-to-handle behavior on look
-	up failurs.  The new behavior should be easier to deal with.
+	up failures.  The new behavior should be easier to deal with.
 	 1. Gettext.pm: In the textdomain() function, make sure {"ENCODING"}
 	    is not set to undef when MO file does not exists.
 	 2. Functions.pm: In the encoding() function, removed a piece of long
@@ -250,7 +268,7 @@ Locale-Maketext-Gettext change log
 	as its error message.  Tests replying on $@ may fail for this.  But
 	I should check the return value of the eval{} block rather than	$@
 	anyway.
-	 1. t/*.t: Adition of $r as the return value of the eval{} blocks.
+	 1. t/*.t: Addition of $r as the return value of the eval{} blocks.
 	    Addition of "return 1;" to the eval{} blocks to specify the return
 	    values.  Changing tests "ok($@, "");" to "ok($r, 1);".  Changing
 	    tests "ok($@, qr/maketext doesn't know how to say/);" and
@@ -334,7 +352,7 @@ Locale-Maketext-Gettext change log
 	14. Functions.pm: Warning is added to the use of key_encoding().
 
 2005-04-05
-	 1. Gettext.pm: Subroutine attribute "method" is taged on the
+	 1. Gettext.pm: Subroutine attribute "method" is tagged on the
 	    following methods: encoding(), key_encoding(), new(),
 	    subclass_init(), bindtextdomain(), textdomain(), maketext(),
 	    reload_text(), die_for_lookup_failures() and encode_failure().
@@ -413,7 +431,7 @@ Locale-Maketext-Gettext change log
 	 1. Support for MO files without encoding specified was added.  I
 	    don't know there are MO files born without its encoding. ^^;
 	 2. L::M::G::F: textdomain() now works for default system locale
-	    directories, too.  For domains that are not binded with
+	    directories, too.  For domains that are not bound with
 	    bindtextdomain(), it searches the system locale directories to
 	    find the domain MO files.  Unlike textdomain() in L::M::G, it
 	    remembers the search result in order to build the index key.
@@ -421,7 +439,7 @@ Locale-Maketext-Gettext change log
 	    may be skipped, though.
 
 2003-05-02	version 1.03
-	 1. L::M::G: A algorism bug about key_encoding with auto-lexicon was
+	 1. L::M::G: A algorithm bug about key_encoding with auto-lexicon was
 	    fixed.
 	 2. L::M::G::F: I decide to give up mod_perl safety for encoding,
 	    key_encoding, encode_failure and die_for_lookup_failures().
@@ -505,13 +523,13 @@ Locale-Maketext-Gettext change log
 2003-04-27	version 0.06
 	Improvements.
 	 1. textdomain() works for default system locale directories now.  For
-	    domains that are not binded with bindtextdomain(), it searches the
+	    domains that are not bound with bindtextdomain(), it searches the
 	    system locale directories to find the MO file.  No test suite is
 	    available for this functionality.  I cannot predict what MO files
 	    are available in your system locale directories. ^^;  Please
 	    report bugs if it does not work.
 	 2. Slave package Locale::Maketext::Gettext::_AUTO::L10N is added, in
-	    order to process the _AUTO Lexicon seperately.  This saves
+	    order to process the _AUTO Lexicon separately.  This saves
 	    resources when user change the die_for_lookup_failures() setting.
 	    Changing die_for_lookup_failures() setting won't trigger copying
 	    and replacing your whole %Lexicon anymore.  As an effect, the
@@ -520,7 +538,7 @@ Locale-Maketext-Gettext change log
 	 3. read_mo() is added to retire the readmo().  Use of readmo() is
 	    deprecated.  This idea is inspired by the implementation of
 	    readmo() as "parse_mo" in Locale::Maketext::Lexicon by Autrijus.
-	    There is far too much meta infomation to be returned other than
+	    There is far too much meta information to be returned other than
 	    its encoding.  It's not possible to change the API for each new
 	    requirement.  To enable sharing of the algorithm used in read_mo()
 	    with whoever need it, it's necessary to limit its function to read

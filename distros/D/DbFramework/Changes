@@ -1,5 +1,18 @@
 DbFramework change log
 
+2021-02-08	version 1.13
+	 1. The DbFramework is hosted on GitHub now.
+	 2. MANIFEST.SKIP: Added.
+	 3. Makefile, MANIFEST, META.yml, SIGNATURE, t/Config.pm: Removed
+	    the generated files.
+	 4. COPYING: Removed the redundant and irrelevant GPL license copy.
+	 5. AUTHORS, TODO, README, README.md: Replaced the messy
+	    GNU-styled documents with a single Markdown README.md.
+
+2008-05-03
+	 1. Makefile.PL and Build.PL: Automatic checks and lists only
+	    the available DBD drivers for tests.
+
 2008-05-03	version 1.12
 	 1. Makefile.PL and Build.PL: Provide a valid default DSN for
 	    DBD::mysql, DBD::mSQL and DBD::Pg.
@@ -38,7 +51,7 @@ DbFramework change log
 	    This is to adapt the Perl module convention.
 
 2008-04-19	version 1.11
-	Maintainance taken over by imacat.
+	Maintenance taken over by imacat.
 	 1. Makefile.PL: Updated to use prompt() from ExtUtils::MakeMaker
 	    instead of reading STDIN directly, in order to prevent infinite
 	    loop with automated CPAN testers.  (RT#34538)
@@ -49,7 +62,7 @@ DbFramework change log
 	    WriteMakefile() arguments.  VERSION is added in replace of
 	    VERSION_FROM.
 	 5. SIGNATURE: Digital signature added.
-	 6. META.yml: YAML distribution meta-nformation added.
+	 6. META.yml: YAML distribution meta-information added.
 	 7. Build.PL: Module::Build build support added.
 
 Original change log by Paul Sharpe follows.
@@ -146,7 +159,7 @@ Highlights
   Catalog.pm (NEW CLASS)
   DataModel::
     - new() now takes data source name to move away from dependence on Mysql.
-    - init_db_metadata() now needs to be called explicity (not called in
+    - init_db_metadata() now needs to be called explicitly (not called in
       new()).
     - New methods driver() and db().
   DataType::ANSII:: (NEW CLASS)

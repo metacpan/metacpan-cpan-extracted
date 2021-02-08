@@ -44,6 +44,6 @@
          "web" : "https://github.com/sisyphus/math-gmpf"
       }
    },
-   "version" : "0.43",
+   "version" : "0.44",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

@@ -1,13 +1,17 @@
-Build.PL
 Changelog.ini
-CHANGES
+Changes
 examples/industry.txt
 examples/test-table2hash.pl
 examples/test-table2tree.pl
 lib/DBIx/Table2Hash.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.yml
+MANIFEST.SKIP
 README
-t/pod.t
+t/00.versions.t
+t/00.versions.tx
 t/test.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

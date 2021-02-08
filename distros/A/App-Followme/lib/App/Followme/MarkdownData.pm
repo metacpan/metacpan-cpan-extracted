@@ -11,7 +11,7 @@ use Text::Markdown;
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -127,7 +127,7 @@ The following parameters are used from the configuration:
 The extension of files that are converted to web pages. The default value
 is md.
 
-The remaining parameters are passed unchanged to L<Text::Markdown>. You
+The remaining parameters are passed unchanged to Text::Markdown. You
 should not need to change them.
 
 =back

@@ -56,10 +56,10 @@
          "web" : "https://github.com/mojolicious/mojo-pg"
       },
       "x_IRC" : {
-         "url" : "irc://irc.freenode.net/#mojo",
+         "url" : "irc://chat.freenode.net/#mojo",
          "web" : "https://webchat.freenode.net/#mojo"
       }
    },
-   "version" : "4.23",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "4.24",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

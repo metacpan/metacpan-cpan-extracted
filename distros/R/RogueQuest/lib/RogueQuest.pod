@@ -1,0 +1,30 @@
+=head1 NAME
+
+RogueQuest - Rogue like Adventure/RPG game
+
+=head1 SYNOPSIS
+
+  use RogueQuest;
+
+  init main.pm to play it. 
+
+=head1 DESCRIPTION
+
+uses the rogue system from the RogueCurses module + extensions
+
+=head2 EXPORT
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+Kobold Wizard Johan, E<lt>koboldwiz@yahoo.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by Kobold Wizard Johan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.32.0 or,
+at your option, any later version of Perl 5 you may have available.
+

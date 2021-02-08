@@ -66,14 +66,24 @@ Return type validation will never be triggered in void context.
 Even if a method unconditionally returns a value and a L<:Return> attribute
 is used, void context calls will not be validated.
 
-=head2 Lax mode
+=head1 Import arguments
 
-L<Role::Declare> can be imported in lax mode:
+=head2 -lax
 
   use Role::Declare -lax;
 
-this will disable argument count checks, similar to L<Function::Parameters>
+Will disable argument count checks, similar to L<Function::Parameters>
 C<:lax> tag. It will affect all exported keywords.
+
+B<WARNING>: This functionality is experimental and subject to abrupt changes.
+
+=head2 -no_type_check
+
+  use Role::Declare -no_type_check;
+
+Will disable type checks (both for arguments and return values).
+Specifying types in argument lists and return type constraints will still
+be valid syntax, albeit noop. Custom checks in code blocks are not affected by this.
 
 B<WARNING>: This functionality is experimental and subject to abrupt changes.
 

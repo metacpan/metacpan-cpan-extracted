@@ -47,6 +47,45 @@ BEGIN {
    is( $var, 1, '$var is 1 after finish' );
 }
 
+# multiple nested scopes
+{
+   my $var = 1;
+
+   my @f;
+   sub tick { push @f, my $f = Future->new; return $f }
+
+   async sub with_dynamically_nested
+   {
+      dynamically $var = 2;
+
+      {
+         dynamically $var = 3;
+
+         await tick();
+
+         is( $var, 3, '$var is 3 in inner scope' );
+      }
+
+      is( $var, 2, '$var is 2 in outer scope' );
+
+      await tick();
+
+      is( $var, 2, '$var is still 2 in outer scope' );
+   }
+
+   my $fret = with_dynamically_nested();
+
+   is( $var, 1, '$var is 1 while suspended' );
+
+   while( @f ) {
+      ( shift @f )->done;
+      is( $var, 1, '$var is still 1' );
+   }
+
+   $fret->get;
+   is( $var, 1, '$var is 1 after finish' );
+}
+
 # OP_HELEM_DYN is totally different in async mode
 {
    my %hash = my %orig = (

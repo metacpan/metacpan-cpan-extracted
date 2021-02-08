@@ -1,4 +1,9 @@
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
+
+our $LIBS;
+
 my %options = %{
 {
   'TYPEMAPS' => [
@@ -13,4 +18,4 @@ my %options = %{
 WriteMakefile(%options);
 
 # Remove the Makefile dependency. Causes problems on a few systems.
-sub MY::makefile { '' }
+# sub MY::makefile { '' }

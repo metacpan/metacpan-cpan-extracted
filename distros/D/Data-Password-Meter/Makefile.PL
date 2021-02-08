@@ -20,10 +20,18 @@ WriteMakefile(
   },
   LICENSE      => 'mit',
   META_MERGE   => {
+    'meta-spec' => { version => 2 },
     requires  => { perl => '5.010001' },
     resources => {
-      license     => 'http://www.opensource.org/licenses/MIT',
-      repository  => 'https://github.com/Akron/Data-Password-Meter'
+      license     => 'https://opensource.org/licenses/MIT',
+      repository  => {
+        type => 'git',
+        url => 'https://github.com/Akron/Data-Password-Meter.git',
+        web => 'https://github.com/Akron/Data-Password-Meter',
+      },
+      bugtracker => {
+        web => 'https://github.com/Akron/Data-Password-Meter/issues'
+      }
     }
   },
   MIN_PERL_VERSION => '5.010001',

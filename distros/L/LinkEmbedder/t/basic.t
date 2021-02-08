@@ -45,9 +45,9 @@ LinkEmbedder->new->test_ok(
 LinkEmbedder->new->test_ok(
   'https://www.aftenposten.no/kultur/i/lo5X7/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker' => {
     isa              => 'LinkEmbedder::Link::Basic',
-    author_name      => qr{Per Kristian},
+    class            => 'le-rich le-card le-image-card le-provider-aftenposten',
     cache_age        => 0,
-    html             => qr{class="le-card le-image-card le-rich le-provider-aftenposten".*Google har}s,
+    html             => qr{Google har}s,
     provider_name    => 'Aftenposten',
     provider_url     => 'https://www.aftenposten.no/',
     thumbnail_height => 1047,
@@ -72,7 +72,7 @@ HERE
 
 sub thorsen_html {
   return <<'HERE';
-<div class="le-card le-image-card le-rich le-provider-thorsen">
+<div class="le-rich le-card le-image-card le-provider-thorsen">
     <a href="https://thorsen.pm/blog/" class="le-thumbnail">
       <img src="https://www.thorsen.pm/editor/wp-content/uploads/2019/03/jhthorsen-face-1300.jpg" alt="Placeholder">
     </a>

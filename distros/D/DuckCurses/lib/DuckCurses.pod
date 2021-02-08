@@ -1,0 +1,30 @@
+=head1 NAME
+
+DuckCurses - Duck Tales game using curses library
+
+=head1 SYNOPSIS
+
+  use DuckCurses;
+
+  init DuckCursesMain.pm to play it. 
+
+=head1 DESCRIPTION
+
+Dagobert Duck jumping around on his (pogo)stick killing baddies :-)
+
+=head2 EXPORT
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+Kobold Wizard Johan, E<lt>koboldwiz@yahoo.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by Kobold Wizard Johan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.32.0 or,
+at your option, any later version of Perl 5 you may have available.
+

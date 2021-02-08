@@ -8,7 +8,7 @@ Ce texte est diffusé sous la licence I<Creative Commons>
 S<CC-BY-ND :> avec attribution et me demander avant de modifier
 le contenu.
 
-Copyright (c) 2017, 2018, 2019 Jean Forget, tous droits réservés.
+Copyright (c) 2017--2021 Jean Forget, tous droits réservés.
 
 Je tiens à signaler que je ne suis pas un astronome professionnel.
 Il est possible que le texte ci-dessous contienne des erreurs.
@@ -29,6 +29,13 @@ Il est donc visible sur les sites web de CPAN
 Mais il ne donne lieu à aucune installation.
 Du coup, je pense qu'il est absent des paquets C<.deb>
 et C<.rpm> qui pourraient être construits pour ce module.
+
+Bien  que  ce  texte  fasse   partie  de  la  distribution  du  module
+L<Astro::Sunrise>,     il     documente    également     le     module
+L<DateTime::Event::Sunrise>, dont le noyau (calculs astronomiques) est
+très semblable  et dont l'API  est différente. Comme les  deux modules
+évoluent à des vitesses différentes,  le présent texte peut se révéler
+en déphasage avec le module L<Astro::Sunrise>.
 
 =head1 Pourquoi ce texte, et pour qui
 
@@ -216,6 +223,13 @@ L<informations très intéressantes|http://aa.usno.navy.mil/faq/index.php>
 (en anglais) sur le calcul de la position des corps célestes, mais sans se focaliser sur
 la position du Soleil comme je le fais ici.
 
+=item Le calculateur solaire de la NOAA
+
+L<Les laboratoires de recherche sur la Terre de la NOAA|https://www.esrl.noaa.gov/>
+proposent un
+L<calculateur solaire|https://www.esrl.noaa.gov/gmd/grad/solcalc/>
+similaire à celui de l'observatoire de l'US Navy.
+
 =item Stellarium
 
 Stellarium est un planétarium pour PC. Si l'on ne se préoccupe pas de la visualisation en temps
@@ -229,17 +243,17 @@ obtenir le lever du Soleil, son coucher ou le midi vrai (version 0.18.0).
 =item *
 
 Déterminer une valeur approximative de l'heure S<recherchée :> 12:00 pour le midi vrai,
-ou bien utiliser C<Astro::Sunrise> en mode simple pour le lever ou le coucher.
+ou bien utiliser L<Astro::Sunrise> en mode simple pour le lever ou le coucher.
 
 =item *
 
 Déterminer le critère de S<recherche :> azimuth à 180 degrés pour le midi vrai, ou
 bien hauteur réelle à 0 degré et I<xx> minutes sous l'horizon. I<xx> est choisi pour
-être compatible avec le paramètre C<alt> (hauteur) des fonctions de C<Astro::Sunrise>.
+être compatible avec le paramètre C<alt> (hauteur) des fonctions de L<Astro::Sunrise>.
 
 S<Note :> on ne tient pas compte de la hauteur apparente fournie par Stellarium.
 Pour la déviation des rayons lumineux au voisinage de l'horizon, on adopte le
-point de vue de C<Astro::Sunrise>, utiliser une valeur conventionnelle de 35'
+point de vue de L<Astro::Sunrise>, utiliser une valeur conventionnelle de 35'
 ou 0,583 degré et on tente d'obtenir cette valeur dans Stellarium.
 Et si on veut en plus tenir compte du rayon du disque solaire, on prendra la
 valeur moyenne 15' au lieu de la recalculer en fonction de la distance Terre-Soleil.
@@ -431,6 +445,10 @@ le temps UTC et le temps GMT sont identiques
 
 =item *
 
+la Terre est parfaitement sphérique, sans le moindre aplatissement aux pôles ni le moindre renflement à l'équateur.
+
+=item *
+
 la Terre est parfaitement sphérique, sans la moindre montagne, la moindre vallée et la moindre taupinière,
 
 =item *
@@ -472,14 +490,15 @@ inconditionnels de l'héliocentrisme.
 
 =head2 Les mouvements de base
 
-Dans un repère héliocentrique axé sur les étoiles fixes, la Terre
-tourne autour du Soleil en un an. Ou, ce qui revient au même, dans un
-repère géocentrique, le Soleil tourne autour de la Terre en un an
-avec une vitesse angulaire moyenne de 0,9856 degré par jour.
+Dans  un repère  héliocentrique axé  sur les  étoiles fixes,  la Terre
+tourne autour du Soleil en un an.  Ou, ce qui revient au même, dans un
+repère géocentrique, le Soleil tourne autour de la Terre en un an avec
+une  vitesse angulaire  moyenne de  0,9856 degré  par jour  ou 0,04107
+degré par heure.
 
-D'autre part, la Terre tourne sur elle-même en 23h 56mn 4s,
-avec une vitesse de rotation de 4,178e-3 degré par seconde,
-soit 360,9856 degrés par jour.
+D'autre part, la  Terre tourne sur elle-même en 23h  56mn 4s, avec une
+vitesse  de rotation  de  4,178e-3 degré  par  seconde, soit  360,9856
+degrés par jour ou 15,04107 degrés par heure.
 
 Q: Je croyais que la Terre tournait sur elle-même en 24h !
 
@@ -526,7 +545,8 @@ et que les angles s'appellent
 S<« ascension> S<droite »> et S<« déclinaison »>.
 À cause d'une tradition, d'une charte ancienne ou de quelque chose comme ça,
 l'ascension droite est exprimée en heures, minutes et secondes
-et non pas en degrés. J'essaierai de donner les valeurs dans les deux
+et non pas en degrés. Cela dit, Paul Schlyter utilise des degrés décimaux pour
+l'ascension droite. J'essaierai de donner les valeurs dans les deux
 systèmes d'unités chaque fois que j'en aurai besoin.
 
 Les I<coordonnées écliptiques> suivent le même principe,
@@ -548,6 +568,51 @@ ciel, on cherche la projection sur le sol ou plus exactement sur le plan tangent
 au sol. L'angle entre le nord et cette projection est appelé S<« azimut »>
 (ou S<« azimuth »>)
 et l'angle entre la projection et l'astre lui-même est appelé S<« hauteur »>.
+
+=head3 Le temps sidéral
+
+Le temps sidéral est une notion ambivalente. Il existe deux écoles
+de pensée pour définir cette notion. Curieusement, alors que les deux classes de
+définition sont très divergentes, je n'ai pas rencontré de controverse
+entre les partisans de ces deux écoles de pensée, chacun semblant ignorer "ceux d'en face".
+
+La première école de pensée considère que le temps sidéral, malgré le terme utilisé,
+désigne un angle. Voir
+L<https://fr.wikipedia.org/wiki/Temps_sid%C3%A9ral>
+L<https://www.futura-sciences.com/sciences/definitions/univers-temps-sideral-960/>
+L<http://users.skynet.be/zmn/docs/temps/TempsSideral2.html>
+L<https://astrochinon.fr/index.php/documents/nos-dossiers/95-le-temps-sideral-de-greenwich>.
+Certes, cette notion est exprimée en heures, minutes et secondes, mais c'est déjà le
+cas pour l'ascension droite dont tout le monde s'accorde à dire que c'est un angle.
+Paul Schlyter appartient à cette école de pensée. Il déclare carrément que le
+temps sidéral est l'ascension droite du méridien local. Il va même jusqu'à
+calculer le temps sidéral en degrés décimaux, comme il le fait pour l'ascension droite. 
+
+La deuxième école de pensée considère que le temps sidéral est bel et bien une
+mesure du temps. Voir
+L<https://sites.google.com/site/astronomievouteceleste/5---temps-sideral>
+L<http://www.astrosurf.com/toussaint/dossiers/heuredetoiles/heuredetoiles.htm>
+L<http://dictionnaire.sensagent.leparisien.fr/Temps%20sid%C3%A9ral/fr-fr/>
+et en anglais
+L<https://www.localsiderealtime.com/whatissiderealtime.html>
+et L<https://en.wikipedia.org/wiki/Sidereal_time>.
+Mais jamais ces descriptions n'abordent les questions qui
+reviennent toujours à propos du temps : quelle est l'influence
+des fuseaux horaires et de l'heure d'été sur le temps sidéral ?
+Et les secondes intercalaires ?
+
+En revenant à la définition "temps sidéral = angle", on constate
+que si l'on prend deux points à la surface de la Terre, éloignés l'un
+de l'autre dans la direction est → ouest  de quelques kilomètres, ces deux
+points ont des temps sidéraux légèrement différents
+Donc, en revenant à la définition "temps sidéral = temps", on en déduit
+que la notion de temps sidéral est incompatible avec le principe des
+fuseaux horaires. Ai-je raison ou tort ? Je n'ai rien lu dans les descriptions
+du "temps sidéral = temps" à ce sujet.
+
+Entre une définition simple et exhaustive d'un côté et une définition floue et incomplète
+de l'autre côté, j'opte pour la simplicité et je considère que le
+temps sidéral est un angle.
 
 =head2 Les autres mouvements
 
@@ -594,8 +659,10 @@ les planètes du système solaire subissent une avance de leur périhélie, y co
 =head3 Autres dérives et fluctuations
 
 Les formules donnant les positions des astres reposent sur des constantes.
-Mais ces valeurs sont constantes sur une échelle de temps brève (à l'échelle
-astronomique, ou pour reprendre la métaphore ci-dessus, à l'échelle climatique).
+Mais ces valeurs sont constantes sur un intervalle de temps bref (à l'échelle
+astronomique, ou pour reprendre la métaphore ci-dessus, sur un intervalle de
+temps « plutôt météorologique »). Mais elles varient sur un intervalle de
+temps nettement plus long (ou un intervalle « plutôt climatique »).
 Par exemple, il est acquis que le jour dure 24 h (le jour solaire moyen, pas le jour
 sidéral). J'ai lu quelque part qu'aux temps paléontologiques, le jour durait
 22 heures environ.
@@ -668,7 +735,7 @@ puis converties en coordonnées écliptiques.
 
 Soit une vitesse angulaire de 1,0166 degré par jour en longitude écliptique au périgée (dans un
 modèle géocentrique, c'est-à-dire périhélie dans un modèle héliocentrique) et de 0,9552 degré
-par jour à l'apogée (ou aphélie).
+par jour à l'apogée (ou aphélie). Autre expression pour ces vitesses : 0,0423°/h et 0,0398°/h.
 
 =head4 Équation du temps
 
@@ -887,6 +954,59 @@ la vitesse réelle du Soleil et 9 millisecondes où l'on utilise une vitesse fra
 On y gagne par rapport au calcul simple qui utilise une vitesse légèrement erronée pendant toute
 la période de 3 h, 59 mn et 57 s.
 
+=head2 Que s'est-il passé au printemps 2020 ?
+
+Remontons un  peu plus loin. En  janvier 2019, j'ai publié  la version
+0.98 de  L<Astro::Sunrise>, avec l'implémentation du  calcul itératif.
+Pour  les  données   de  test,  je  n'ai  pas  cherché   à  faire  des
+vérifications croisées  avec d'autres sources, j'ai  juste vérifié que
+le calcul  itératif aboutissait et  que le  résultat était à  peu près
+correct.    Je    n'ai    pas    cherché    à    mettre    à    niveau
+L<DateTime::Event::Sunrise>, j'estimais  que ce n'était pas  encore le
+moment.
+
+Puis, en avril 2020, un utilisateur  a créé un ticket expliquant qu'il
+avait comparé  les résultats  de L<DateTime::Event::Sunrise>  avec des
+sites web de référence et que les résultats n'étaient pas très précis.
+Certes, le module L<DateTime::Event::Sunrise> n'était pas au niveau de
+L<Astro::Sunrise>, donc  la remarque  était justifiée. Cela  m'a donné
+deux choses : tout d'abord une source de référence pour le calcul jour
+après jour du lever du Soleil, de son coucher et du midi solaire réel.
+D'autre    part,   cela    m'a   donné    l'impulsion   pour    mettre
+L<DateTime::Event::Sunrise>  au même  niveau que  L<Astro::Sunrise> et
+pour utiliser des données de tests correctes, issues des sites web que
+l'utilisateur avait pris pour références.
+
+Seulement voilà,  l'algorithme précis  hérité de  L<Astro::Sunrise> et
+les données  de tests extraites du  site de la NOAA  ne collaient pas.
+Après avoir  trituré l'algorithme  dans tous les  sens et  après avoir
+demandé conseil sur la liste DateTime
+(L<https://www.nntp.perl.org/group/perl.datetime/2020/06/msg8241.html>),
+je me  suis rendu à  l'évidence que l'algorithme donnait  de meilleurs
+résultats avec une  vitesse de 15 degrés par heure  qu'avec la vitesse
+normale  de 15,04107  degrés par  heure.  J'ai donc  publié le  module
+L<DateTime::Event::Sunrise>  avec   la  valeur   15,  alors   que  mes
+explications  donnaient  une  bonne  raison pour  utiliser  la  valeur
+15,04107.
+
+=head3 Qu'est-ce qui cloche ?
+
+Je pense que mes explications sur l'algorithme précis proposé par Paul
+Schlyter  sont   correctes  et  que  c'est   l'implémentation  de  cet
+algorithme qui  cloche. En reprenant  les valeurs données  ci-dessus à
+titre d'exemple,  lors de  la deuxième  itération, nous  sommes censés
+utiliser le Soleil tel qu'il est positionné à 16:04:11. Je pense qu'en
+réalité, le programme  calcule le midi solaire  virtuel pour 16:04:11,
+qui donne 12:05:01 et qu'ensuite il utilise le Soleil à sa position de
+12:05:01.
+
+Comment le vérifier ?  Pour cela, il faudrait que je  puisse S<« créer »>
+une étoile fixe au point occupé par  le Soleil à 16:04:11. Et ça, je n'ai
+pas  trouvé  comment  faire.  Quelques  mois  plus  tard,  en  lisant  la
+documentation de Stellarium version 0.20.1-1, chapitre 13, j'ai découvert
+que l'on pouvait ajouter des  novas aux catalogues officiels. J'ai essayé
+avec Stellarium 0.18.0 et je n'ai pas réussi. Impossible donc de vérifier
+l'implémentation de l'algorithme itératif.
 
 =head1 Examen détaillé des paramètres
 
@@ -1020,15 +1140,106 @@ avec la nuit polaire.
 R : Qu'est-ce qui t'intéresse lorsque tu calcules les heures de crépuscule ?
 C'est d'avoir une luminosité la plus faible possible et les meilleures conditions
 possibles pour l'observation des astres. Crois-tu qu'il y a une nette différence entre
-une nuit où le point le plus bas du Soleil est 23°57' sous l'horizon et une nuit où ce même
-point est à 24°3' ? Et il vaut mieux commencer à observer les astres lorsque
+une nuit où le point le plus bas du Soleil est 17°57' sous l'horizon et une nuit où ce même
+point est à 18°3' ? Et il vaut mieux commencer à observer les astres lorsque
 le Soleil est à, disons, -15° si tu sais que la Lune va se lever lorsque l'on
 atteindra le crépuscule astronomique pour le Soleil ou si la météo annonce l'arrivée d'une
 épaisse couche de nuages à ce moment.
 
+=head2 Hauteur, paramètre C<alt> et paramètre C<upper_limb>
+
+Le paramètre C<alt>, exprimé en degrés décimaux, permet de spécifier la hauteur
+du soleil recherchée pour le lever ou le coucher du soleil ou le crépuscule.
+
+Tout d'abord, les valeurs  recommandées pour les différents crépuscules sont
+des valeurs purement conventionnelles. Il n'y a pas grand chose à dire à ce sujet.
+
+Pour le lever et le coucher du soleil, la valeur habituelle est -0,833° (ou -50').
+Elle se décompose en deux parties :
+
+=over 4
+
+=item * -0,583° ou -35' pour la réfraction,
+
+=item * -0,25° ou -15' pour le rayon du disque solaire
+
+=back
+
+En fait, dans les deux cas il s'agit de valeurs approchées pour des grandeurs variables.
+Le rayon du disque solaire varie entre 0,271° (ou 16'16") le 3 janvier,
+lorsque la distance Terre-Soleil est minimale et 0,262° (ou 15'44") lorsque
+la distance est maximale, le 3 juillet.
+
+Quant à la déviation due à la réfraction, elle est fortement dépendante
+du profil de température dans l'atmosphère, donc de la météo.
+
+Vous pouvez affiner le calcul en fournissant un paramètre C<alt> à -0,583 et en alimentant
+le paramètre C<upper_limb> à une valeur vraie (habituellement 1). Dans ce
+cas, le rayon du disque solaire est recalculé pour chaque jour. En revanche,
+pour la réfraction, vous devrez trouver la valeur réelle par un autre moyen que
+le module Perl de calcul des levers et couchers du soleil.
+
+Q: Donc, utiliser un paramètre C<alt> à -0,583 et un paramètre C<upper_limb> à 0 est stupide ?
+
+A: Non, je dirais que c'est juste inhabituel.  Comme le signale Paul Schlyter
+L<dans son site web|http://www.stjarnhimlen.se/comp/riset.html#2>, 
+les almanachs nationaux de Suède définissent le lever et le coucher du soleil comme
+l'instant où le I<centre> du disque solaire atteint l'horizon optique, alors que le consensus
+international les définit comme étant l'instant où le I<sommet> du disque solaire atteint l'horizon
+optique.
+
+Q: En revanche, utiliser un paramètre C<alt> à -0,833 et un paramètre C<upper_limb> à 1 est stupide, n'est-ce pas ?
+
+A: Je ne dirais pas que c'est stupide, ni inhabituel, je dirais plutôt que c'est douteux. En fait, la valeur
+du paramètre se décompose en trois parties et non pas simplement deux :
+
+=over 4
+
+=item * 0 pour la position du point d'observation par rapport au paysage environnant,
+
+=item * -0,583° ou -35' pour la réfraction,
+
+=item * -0,25° ou -15' pour le rayon du disque solaire, ou 0 si l'on alimente C<upper_limb> à 1.
+
+=back
+
+Mais si vous vous trouvez au sommet d'une tour de 60 mètres, la ligne d'horizon ne correspond plus
+au plan horizontal, mais à un cône faisant un angle de 0,25° avec l'horizontale. Ainsi, nous avons :
+
+=over 4
+
+=item * -0,25° (-15') pour la position du point d'observation par rapport au paysage environnant,
+
+=item * -0,583° ou -35' pour la réfraction,
+
+=item * pour le rayon du disque solaire, 0 si l'on alimente C<upper_limb> à 1, ou bien -0,25° (-15') si C<upper_limb> vaut 0.
+
+=back
+
+C'est donc parfaitement valide, mais douteux parce que cela ne correspond pas à une situation habituelle.
+
+Q: Compte tenu de ce que tu as dit pour le paramètre C<precise>, est-ce que la différence entre 
+C<< alt => -0.833, upper_limb => 0 >> et C<< alt => -0.583, upper_limb => 1 >> est sensible ?
+
+R: Tu t'en doutes, quasiment pas. Prenons comme exemple le coucher du soleil à Fairbanks le 3 janvier 2020.
+Je prends le 3 janvier, parce que c'est le jour où le diamètre apparent est le plus grand, soit 32'32" 
+selon Stellarium, ce qui donne un rayon de 16'16". Et je prends Fairbanks, car au voisinage d'un cercle polaire,
+la courbe du Soleil est moins pentue qu'au voisinage de l'équateur. Ainsi donc, pour 
+C<< alt => -0.833, upper_limb => 0 >>, le coucher du soleil se produit lorsque
+le centre du disque solaire se situe à une hauteur de -50', tandis que pour
+C<< alt => -0.583, upper_limb => 1 >> 
+il a lieu lorsque le centre du disque solaire est à une hauteur de -51'16".
+Cela correspond aux heures 14:59:12 et 14:59:37 respectivement. À peine 25 secondes de différence.
+
+D'un autre côté, si l'on se déplace de quelques centaines de kilomètres vers le nord,
+au-delà du cercle polaire, jusqu'au point 68°01'46" N, 147°42'59" W, le calcul avec 
+C<< alt => -0.833, upper_limb => 0 >> indique que le soleil reste en-dessous de l'horizon,
+tandis que le calcul avec C<< alt => -0.583, upper_limb => 1 >> 
+indique un lever du soleil à 12:45:11 et le coucher à 13:05:53.
+
 =head2 Année, paramètre C<year>
 
-Q : Pourquoi C<Astro::Sunrise> a-t-il besoin de l'année pour calculer le lever
+Q : Pourquoi L<Astro::Sunrise> a-t-il besoin de l'année pour calculer le lever
 et le coucher du S<soleil ?> J'ai vu un algorihme qui ne demandait
 que le mois et le jour.
 
@@ -1065,7 +1276,7 @@ d'éclairage dans son salon. Dans ce cas, allumer à 17:37:03 ou à 17:38:26
 n'a pas tellement d'importance. Sous nos latitudes, la variation de luminosité
 due à la variation de la position du Soleil
 en deux minutes est négligeable. En fait, la météo a plus d'importance. Selon
-que le ciel sera dégagé ou bien bouché par de gros nuages orageux, il faudra 
+que le ciel sera dégagé ou bien bouché par de gros nuages pluvieux ou orageux, il faudra 
 attendre l'heure dite ou allumer plus tôt.
 
 Q : Tu sembles dire qu'un algorithme sans année aurait suffi pour calculer les
@@ -1098,7 +1309,7 @@ résultat C<"hh:mm:ss"> au lieu de simplement C<"hh:mm"> ?
 R : Si, on pourrait. Mais cela a-t-il un S<sens ?> D'après Paul Schlyter, l'algorithme
 est précis à une ou deux minutes près, sauf dans les cas limites associés au début
 et à la fin de la période du Soleil de minuit. Donc cela ne vaut pas la peine de
-modifier C<Astro::Sunrise> pour afficher les secondes.
+modifier L<Astro::Sunrise> pour afficher les secondes.
 
 Q : Et dans la discussion ci-dessus, pourquoi avoir tenu compte des secondes, si elles
 ne sont pas S<significatives ?>

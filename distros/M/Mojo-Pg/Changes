@@ -1,4 +1,7 @@
 
+4.24  2021-01-27
+  - Fixed Mojolicious 8.72 support.
+
 4.23  2020-12-20
   - Updated examples to use signatures.
   - Improved Mojo::Pg::PubSub to handle unknown notifications more gracefully.

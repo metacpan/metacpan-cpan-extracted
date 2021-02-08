@@ -31,7 +31,7 @@ our %EXPORT_TAGS =
     (
      fcntl => [qw(fcflags fcread fcwrite fctrunc fccreat fcperl fcopen fcgetfl)],
      json  => [qw(jsonxs loadJsonString loadJsonFile saveJsonString saveJsonFile)],
-     sort  => [qw(csort_to csortuc_to)],
+     sort  => [qw(sortCmd csort_to csortuc_to)],
      run   => [qw(crun opencmd runcmd)],
      env   => [qw(env_set env_push env_pop)],
      pack  => [qw(packsize packsingle packeq packFilterFetch packFilterStore)],
@@ -319,12 +319,21 @@ sub crun {
   return $rc;
 }
 
+## $cmd_prefix = sortCmd($njobs=$DiaColloDB::NJOBS)
+##  + returns command-prefix for UNIX sort
+##  + uses environment variable $DIACOLLO_SORT if present, otherwise $SORT if set
+##  + defualts to system 'sort' command from PATH with appended sortJobs() options
+sub sortCmd {
+  my $that = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+  return $ENV{DIACOLLO_SORT} || $ENV{SORT} || ('sort '.$that->sortJobs(@_));
+}
+
 ## $bool = csort_to(\@sortargs, \&catcher)
 ##  + runs system sort and feeds resulting lines to \&catcher
 sub csort_to {
   my $that = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
   my ($sortargs,$catcher) = @_;
-  return crun(['sort',@$sortargs], '>', IPC::Run::new_chunker("\n"), $catcher);
+  return crun([$that->sortCmd(),@$sortargs], '>', IPC::Run::new_chunker("\n"), $catcher);
 }
 
 ## $bool = csortuc_to(\@sortargs, \&catcher)
@@ -332,7 +341,7 @@ sub csort_to {
 sub csortuc_to {
   my $that = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
   my ($sortargs,$catcher) = @_;
-  return crun(['sort',@$sortargs], '|', [qw(uniq -c)], '>', IPC::Run::new_chunker("\n"), $catcher);
+  return crun([$that->sortCmd(),@$sortargs], '|', [qw(uniq -c)], '>', IPC::Run::new_chunker("\n"), $catcher);
 }
 
 

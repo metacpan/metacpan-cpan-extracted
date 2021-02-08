@@ -1,10 +1,10 @@
-# $Id: utf8.t,v 1.11 2008-05-24 18:57:39 Martin Exp $
+
 # utf8.t - tests for Unicode::MapUTF8 functionality of I18N::Charset
 
 use strict;
 
 use IO::Capture::Stderr;
-use Test::More 'no_plan';
+use Test::More;
 
 BEGIN
   {
@@ -85,7 +85,7 @@ SKIP:
     } # SKIP block for VERSION of Unicode::MapUTF8 module
   } # SKIP block for existence of Unicode::MapUTF8 module
 
-exit 0;
+done_testing();
 
 __END__
 

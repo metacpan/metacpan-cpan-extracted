@@ -2,7 +2,7 @@
 # -*- perl -*-
 #
 #     Test script for Astro::Sunrise
-#     Copyright (C) 2015, 2017, 2019 Ron Hill and Jean Forget
+#     Copyright (C) 2015, 2017, 2019, 2021 Ron Hill and Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
@@ -202,14 +202,14 @@ sub load_data {
 2013  1  1 Halley_Base          75 35 S  26 39 W -12        1 0 0 1 sunrise: 01:50 sunset: 25:50
 2013  1  1 Halley_Base          75 35 S  26 39 W -18        0 0 0 1 sunrise: 01:50 sunset: 25:50
 2013  1  1 Halley_Base          75 35 S  26 39 W -18        1 0 0 1 sunrise: 01:50 sunset: 25:50
-2013  3 21 Halley_Base          75 35 S  26 39 W 0          0 0 1 0 sunrise: 08:00 sunset: 19:44
-2013  3 21 Halley_Base          75 35 S  26 39 W 0          1 0 1 0 sunrise: 07:56 sunset: 19:48
-2013  3 21 Halley_Base          75 35 S  26 39 W -0.583     0 0 1 0 sunrise: 07:51 sunset: 19:53
-2013  3 21 Halley_Base          75 35 S  26 39 W -0.583     1 0 1 0 sunrise: 07:46 sunset: 19:57
-2013  3 21 Halley_Base          75 35 S  26 39 W -0.833     0 0 1 0 sunrise: 07:47 sunset: 19:57
-2013  3 21 Halley_Base          75 35 S  26 39 W -0.833     1 0 1 0 sunrise: 07:42 sunset: 20:01
-2013  3 21 Halley_Base          75 35 S  26 39 W -12        0 0 1 0 sunrise: 04:19 sunset: 23:22
-2013  3 21 Halley_Base          75 35 S  26 39 W -12        1 0 1 0 sunrise: 04:11 sunset: 23:29
+2013  3 21 Halley_Base          75 35 S  26 39 W 0          0 0 1 0 sunrise: 08:00 sunset: 19:45
+2013  3 21 Halley_Base          75 35 S  26 39 W 0          1 0 1 0 sunrise: 07:56 sunset: 19:49
+2013  3 21 Halley_Base          75 35 S  26 39 W -0.583     0 0 1 0 sunrise: 07:51 sunset: 19:54
+2013  3 21 Halley_Base          75 35 S  26 39 W -0.583     1 0 1 0 sunrise: 07:46 sunset: 19:59
+2013  3 21 Halley_Base          75 35 S  26 39 W -0.833     0 0 1 0 sunrise: 07:47 sunset: 19:59
+2013  3 21 Halley_Base          75 35 S  26 39 W -0.833     1 0 1 0 sunrise: 07:42 sunset: 20:03
+2013  3 21 Halley_Base          75 35 S  26 39 W -12        0 0 1 0 sunrise: 04:15 sunset: 23:24
+2013  3 21 Halley_Base          75 35 S  26 39 W -12        1 0 1 0 sunrise: 04:08 sunset: 23:31
 2013  3 21 Halley_Base          75 35 S  26 39 W -18        0 0 0 1 sunrise: 01:53 sunset: 25:53
 2013  3 21 Halley_Base          75 35 S  26 39 W -18        1 0 0 1 sunrise: 01:53 sunset: 25:53
 2013  6 21 Halley_Base          75 35 S  26 39 W 0          0 1 0 0 sunrise: 13:48 sunset: 13:48
@@ -228,17 +228,17 @@ sub load_data {
 2013  8 31 Halley_Base          75 35 S  26 39 W -0.583     1 0 1 0 sunrise: 09:53 sunset: 17:42
 2013  8 31 Halley_Base          75 35 S  26 39 W -0.833     0 0 1 0 sunrise: 09:53 sunset: 17:43
 2013  8 31 Halley_Base          75 35 S  26 39 W -0.833     1 0 1 0 sunrise: 09:49 sunset: 17:48
-2013  8 31 Halley_Base          75 35 S  26 39 W -12        0 0 1 0 sunrise: 06:47 sunset: 20:49
-2013  8 31 Halley_Base          75 35 S  26 39 W -12        1 0 1 0 sunrise: 06:43 sunset: 20:53
+2013  8 31 Halley_Base          75 35 S  26 39 W -12        0 0 1 0 sunrise: 06:47 sunset: 20:50
+2013  8 31 Halley_Base          75 35 S  26 39 W -12        1 0 1 0 sunrise: 06:43 sunset: 20:54
 2013  8 31 Halley_Base          75 35 S  26 39 W -18        0 0 1 0 sunrise: 04:59 sunset: 22:39
 2013  8 31 Halley_Base          75 35 S  26 39 W -18        1 0 1 0 sunrise: 04:55 sunset: 22:45
 2013  9 21 Halley_Base          75 35 S  26 39 W 0          0 0 1 0 sunrise: 07:49 sunset: 19:33
-2013  9 21 Halley_Base          75 35 S  26 39 W 0          1 0 1 0 sunrise: 07:45 sunset: 19:36
-2013  9 21 Halley_Base          75 35 S  26 39 W -0.583     0 0 1 0 sunrise: 07:40 sunset: 19:41
-2013  9 21 Halley_Base          75 35 S  26 39 W -0.583     1 0 1 0 sunrise: 07:36 sunset: 19:45
-2013  9 21 Halley_Base          75 35 S  26 39 W -0.833     0 0 1 0 sunrise: 07:36 sunset: 19:45
-2013  9 21 Halley_Base          75 35 S  26 39 W -0.833     1 0 1 0 sunrise: 07:32 sunset: 19:49
-2013  9 21 Halley_Base          75 35 S  26 39 W -12        0 0 1 0 sunrise: 04:12 sunset: 23:15
+2013  9 21 Halley_Base          75 35 S  26 39 W 0          1 0 1 0 sunrise: 07:45 sunset: 19:37
+2013  9 21 Halley_Base          75 35 S  26 39 W -0.583     0 0 1 0 sunrise: 07:40 sunset: 19:42
+2013  9 21 Halley_Base          75 35 S  26 39 W -0.583     1 0 1 0 sunrise: 07:36 sunset: 19:46
+2013  9 21 Halley_Base          75 35 S  26 39 W -0.833     0 0 1 0 sunrise: 07:36 sunset: 19:46
+2013  9 21 Halley_Base          75 35 S  26 39 W -0.833     1 0 1 0 sunrise: 07:32 sunset: 19:51
+2013  9 21 Halley_Base          75 35 S  26 39 W -12        0 0 1 0 sunrise: 04:12 sunset: 23:16
 2013  9 21 Halley_Base          75 35 S  26 39 W -12        1 0 1 0 sunrise: 04:05 sunset: 23:23
 2013  9 21 Halley_Base          75 35 S  26 39 W -18        0 0 0 1 sunrise: 01:39 sunset: 25:39
 2013  9 21 Halley_Base          75 35 S  26 39 W -18        1 0 0 1 sunrise: 01:39 sunset: 25:39

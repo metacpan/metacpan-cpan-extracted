@@ -1,0 +1,350 @@
+=pod
+
+=head1 NAME
+
+Crypt::MagicSignatures::Envelope - MagicEnvelopes for the Salmon Protocol
+
+
+=head1 SYNOPSIS
+
+  use Crypt::MagicSignatures::Key;
+  use Crypt::MagicSignatures::Envelope;
+
+  # Generate a new MagicKey for signing messages
+  my $mkey = Crypt::MagicSignatures::Key->generate(size => 1024);
+
+  # Fold a new envelope
+  my $me = Crypt::MagicSignatures::Envelope->new(
+    data => 'Some arbitrary string.'
+  );
+
+  # Sign magic envelope
+  $me->sign($mkey);
+
+  # Extract the public key
+  my $mkey_public = $mkey->to_string;
+
+  # Verify the signature of the envelope
+  if ($me->verify($mkey_public)) {
+    print 'Signature is verified!';
+  };
+
+
+=head1 DESCRIPTION
+
+L<Crypt::MagicSignatures::Envelope> implements MagicEnvelopes
+with MagicSignatures as described in the
+L<MagicSignatures Specification|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html>
+to sign messages of the
+L<Salmon Protocol|http://www.salmon-protocol.org/>.
+MagicSignatures is a
+"robust mechanism for digitally signing nearly arbitrary messages".
+
+B<This module is an early release! There may be significant changes in the future.>
+
+
+=head1 ATTRIBUTES
+
+=head2 alg
+
+  my $alg = $me->alg;
+
+The algorithm used for signing the MagicEnvelope.
+Defaults to C<RSA-SHA256>, which is the only supported algorithm.
+
+
+=head2 data
+
+  my $data = $me->data;
+  $me->data('Hello world!');
+
+The decoded data folded in the MagicEnvelope.
+
+
+=head2 data_type
+
+  my $data_type = $me->data_type;
+  $me->data_type('text/plain');
+
+The Mime type of the data folded in the MagicEnvelope.
+Defaults to C<text/plain>.
+
+
+=head2 dom
+
+  # Fold an xml message
+  my $me = Crypt::MagicSignatures::Envelope->new( data => <<'XML' );
+  <?xml version='1.0' encoding='UTF-8'?>
+  <entry xmlns='http://www.w3.org/2005/Atom'>
+    <author><uri>alice@example.com</uri></author>
+  </entry>
+  XML
+
+  # Define an xml mime type
+  $me->data_type('application/atom+xml');
+
+  print $me->dom->at('author > uri')->text;
+  # alice@example.com
+
+The L<Mojo::DOM> object of the decoded data,
+in the case the MagicEnvelope contains XML.
+
+B<This attribute is experimental and may change without warnings!>
+
+
+=head2 encoding
+
+  my $encoding = $me->encoding;
+
+The encoding of the MagicEnvelope.
+Defaults to C<base64url>, which is the only encoding supported.
+
+
+=head2 signature
+
+  my $sig = $me->signature;
+  my $sig = $me->signature('key-01');
+
+A signature of the MagicEnvelope.
+For retrieving a specific signature, pass a key id,
+otherwise a default signature will be returned.
+
+If a matching signature is found, the signature
+is returned as a hash reference,
+containing base64url encoded data for C<value>
+and possibly a C<key_id>.
+If no matching signature is found, a C<false> value is returned.
+
+
+=head2 signature_base
+
+  my $base = $me->signature_base;
+
+The L<signature base string|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html#sbs>
+of the MagicEnvelope.
+
+
+=head2 signed
+
+  # With key id
+  if ($me->signed('key-01')) {
+    print 'MagicEnvelope is signed with key-01.';
+  }
+
+  # Without key id
+  elsif ($me->signed) {
+    print 'MagicEnvelope is signed.';
+  }
+
+  else {
+    print 'MagicEnvelope is not signed.';
+  };
+
+Returns a C<true> value in case the MagicEnvelope is signed at least once.
+Accepts optionally a C<key_id> and returns a C<true> value, if the
+MagicEnvelope was signed with this specific key.
+
+
+=head1 METHODS
+
+=head2 new
+
+  $me = Crypt::MagicSignatures::Envelope->new(<<'MEXML');
+  <?xml version="1.0" encoding="UTF-8"?>
+  <me:env xmlns:me="http://salmon-protocol.org/ns/magic-env">
+    <me:data type="text/plain">
+      U29tZSBhcmJpdHJhcnkgc3RyaW5nLg==
+    </me:data>
+    <me:encoding>base64url</me:encoding>
+    <me:alg>RSA-SHA256</me:alg>
+    <me:sig key_id="my-01">
+      S1VqYVlIWFpuRGVTX3l4S09CcWdjRVFDYVluZkI5Ulh4dmRFSnFhQW5XUmpB
+      UEJqZUM0b0lReER4d0IwWGVQZDhzWHAxN3oybWhpTk1vNHViNGNVOVE9PQ==
+    </me:sig>
+  </me:env>
+  MEXML
+
+The constructor accepts MagicEnvelope data in various formats.
+It accepts MagicEnvelopes in the
+L<XML format|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html#anchor4>
+or an XML document including a
+L<MagicEnvelope provenance|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html#anchor7>
+element.
+
+Additionally it accepts MagicEnvelopes in the
+L<JSON notation|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html#anchor5>
+or defined by the same attributes as the JSON notation
+(but with the data not encoded).
+The latter is the common way to fold new envelopes.
+
+  $me = Crypt::MagicSignatures::Envelope->new(<<'MEJSON');
+  {
+    "data_type": "text\/plain",
+    "data":"U29tZSBhcmJpdHJhcnkgc3RyaW5nLg==",
+    "alg":"RSA-SHA256",
+    "encoding":"base64url",
+    "sigs": [
+      { "key_id": "my-01",
+        "value":"S1VqYVlIWFpuRGVTX3l4S09CcWdjRV..."
+      }
+    ]
+  }
+  MEJSON
+
+  $me = Crypt::MagicSignatures::Envelope->new(
+    data      => 'Some arbitrary string.',
+    data_type => 'text/plain',
+    alg       => 'RSA-SHA256',
+    encoding  => 'base64url',
+    sigs => [
+      {
+        key_id => 'my-01',
+        value  => 'S1VqYVlIWFpuRGVTX3l4S09CcWdjRV...'
+      }
+    ]
+  );
+
+Finally the constructor accepts MagicEnvelopes in the
+L<compact notation|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html#compact>.
+
+  $me = Crypt::MagicSignatures::Envelope->new(<<'MECOMPACT');
+    bXktMDE=.S1VqYVlIWFpuRGVTX3l4S09CcWdjRVFDYVlu
+    ZkI5Ulh4dmRFSnFhQW5XUmpBUEJqZUM0b0lReER4d0IwW
+    GVQZDhzWHAxN3oybWhpTk1vNHViNGNVOVE9PQ==.U29tZ
+    SBhcmJpdHJhcnkgc3RyaW5nLg.dGV4dC9wbGFpbg.YmFz
+    ZTY0dXJs.UlNBLVNIQTI1Ng
+  MECOMPACT
+
+
+=head2 sign
+
+  $me->sign('key-01' => 'RSA.hgfrhvb ...')
+     ->sign('RSA.hgfrhvb ...')
+     ->sign('RSA.hgfrhvb ...', -data)
+     ->sign('key-02' => 'RSA.hgfrhvb ...', -data);
+
+  my $mkey = Crypt::MagicSignatures::Key->new('RSA.hgfrhvb ...');
+  $me->sign($mkey);
+
+Adds a signature to the MagicEnvelope.
+
+For adding a signature, the private key with an optional prepended
+key id has to be given.
+The private key can be a
+L<Crypt::MagicSignatures::Key> object,
+a MagicKey in
+L<compact notation|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html#rfc.section.8.1>
+or a hash reference
+containing the non-generation parameters accepted by the
+L<Crypt::MagicSignatures::Key> constructor.
+Optionally a flag C<-data> can be passed,
+that will sign the data payload instead of the
+L<signature base string|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html#rfc.section.3.2>
+(this is implemented for compatibility with non-standard implementations).
+
+On success, the method returns the MagicEnvelope,
+otherwise it returns a C<false> value.
+
+A MagicEnvelope can be signed multiple times.
+
+B<This method is experimental and may change without warnings!>
+
+
+=head2 verify
+
+  my $mkey = Crypt::MagicSignatures::Key->new( 'RSA.hgfrhvb ...' );
+
+  $me->verify(
+    'RSA.vsd...',
+    $mkey,
+    ['key-01' => 'RSA.hgfrhvb...', -data]
+  );
+
+Verifies a signed envelope against a bunch of given public MagicKeys.
+Returns a C<true> value on success, otherwise C<false>.
+If one key succeeds, the envelope is verified.
+
+An element can be a L<Crypt::MagicSignatures::Key> object,
+a MagicKey in
+L<compact notation|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html#rfc.section.8.1>
+or a hash reference
+containing the non-generation parameters accepted by the
+L<Crypt::MagicSignatures::Key> constructor.
+
+For referring to a certain key, an array reference
+can be passed, containing the key (defined as described above)
+with an optional prepended key id and an optional flag appended,
+referring to the data to be verified.
+Conforming with the specification the default value is C<-base>,
+referring to the
+L<signature base string|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html#rfc.section.3.2>
+of the MagicEnvelope.
+C<-data> will verify against the data only, C<-compatible> will first try to
+verify against the base signature string and then will
+verify against the data on failure
+(this is implemented for compatibility with non-standard implementations).
+
+B<This method is experimental and may change without warnings!>
+
+
+=head2 to_compact
+
+  my $compact_string = $me->to_compact;
+
+Returns the MagicEnvelope in
+L<compact notation|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html#compact>.
+
+
+=head2 to_json
+
+  my $json_string = $me->to_json;
+
+Returns the MagicEnvelope as a stringified
+L<JSON representation|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html#anchor5>.
+
+
+=head2 to_xml
+
+  my $xml_string = $me->to_xml;
+  my $xml_provenance_string = $me->to_xml(1);
+
+Returns the MagicEnvelope as a stringified
+L<xml representation|http://salmon-protocol.googlecode.com/svn/trunk/draft-panzer-magicsig-01.html#anchor4>.
+If a C<true> value is passed, a provenance fragment will be returned instead
+of a valid xml document.
+
+
+=head1 DEPENDENCIES
+
+L<Crypt::MagicSignatures::Key>,
+L<Mojolicious>.
+For speed improvements, see the recommendations in
+L<Crypt::MagicSignatures::Key|Crypt::MagicSignatures::Key/DEPENDENCIES>.
+
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+The signing and verification is not guaranteed to be
+compatible with other implementations, due to different
+versions of the specification.
+Implementations like L<StatusNet|http://status.net/> (L<Identi.ca|http://identi.ca/>),
+L<MiniMe|https://code.google.com/p/minime-microblogger/>, and examples from the
+L<reference implementation|https://code.google.com/p/salmon-protocol/source/browse/>
+are tested.
+
+See the test suite for further information.
+
+
+=head1 AVAILABILITY
+
+  https://github.com/Akron/Crypt-MagicSignatures-Envelope
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
+
+This program is free software, you can redistribute it
+and/or modify it under the terms of the Artistic License version 2.0.
+
+=cut

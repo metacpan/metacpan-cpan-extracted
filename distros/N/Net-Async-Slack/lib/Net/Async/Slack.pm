@@ -4,7 +4,7 @@ package Net::Async::Slack;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use parent qw(IO::Async::Notifier Net::Async::Slack::Commands);
 
@@ -166,7 +166,7 @@ async sub send_message {
     push @content, $_ => $args{$_} for grep exists $args{$_}, qw(parse link_names unfurl_links unfurl_media as_user reply_broadcast thread_ts);
     my ($data) = await $self->http_post(
         $self->endpoint(
-            'chat.postMessage',
+            'chat_post_message',
         ),
         \@content,
     );
@@ -202,7 +202,7 @@ sub conversations_info {
     push @content, channel => $args{channel} || die 'need a channel';
     return $self->http_post(
         $self->endpoint(
-            'conversations.info',
+            'conversations_info',
         ),
         \@content,
     )
@@ -212,7 +212,7 @@ async sub conversations_history {
     my ($self, %args) = @_;
     return await $self->http_get(
         uri => $self->endpoint(
-            'conversations.history',
+            'conversations_history',
             %args
         ),
     )
@@ -240,7 +240,7 @@ sub join_channel {
     push @content, name => $args{channel};
     $self->http_post(
         $self->endpoint(
-            'channels.join',
+            'conversations_join',
         ),
         \@content,
     )

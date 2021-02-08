@@ -2,21 +2,29 @@
 abstract: 'Joins gettext and Maketext frameworks'
 author:
   - 'imacat <imacat@mail.imacat.idv.tw>'
-build_requires:
-  ExtUtils::MakeMaker: '0'
+build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Locale-Maketext-Gettext
-no_index:
-  directory:
-    - t
-    - inc
-requires: {}
-version: '1.30'
+provides:
+  Locale::Maketext::Gettext:
+    file: lib/Locale/Maketext/Gettext.pm
+    version: '1.32'
+  Locale::Maketext::Gettext::Functions:
+    file: lib/Locale/Maketext/Gettext/Functions.pm
+    version: '0.14'
+requires:
+  perl: v5.8.0
+resources:
+  bugtracker: https://github.com/imacat/Locale-Maketext-Gettext/issues
+  homepage: https://metacpan.org/release/Locale-Maketext-Gettext
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/imacat/Locale-Maketext-Gettext.git
+version: '1.32'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

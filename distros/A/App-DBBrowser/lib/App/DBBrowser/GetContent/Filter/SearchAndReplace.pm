@@ -119,19 +119,31 @@ sub __search_and_replace {
                 [ '  Modifiers', ]
             ];
             my $count_static_rows = @info + 3 + @$fields; # info, prompt, back, confirm and fields
-            $cf->__print_filter_info( $sql, $count_static_rows, undef );
-            # Fill_form
-            my $form = $tf->fill_form(
-                $fields,
-                { info => join( "\n", @info ), prompt => $prompt, auto_up => 2, confirm => '  ' . $sf->{i}{confirm},
-                back => '  ' . $sf->{i}{back} . '   ' }
-            );
-            if ( ! defined $form ) {
-                next MENU;
+
+            SUBSTITUTION: while ( 1 ) {
+                $cf->__print_filter_info( $sql, $count_static_rows, undef );
+                # Fill_form
+                my $form = $tf->fill_form(
+                    $fields,
+                    { info => join( "\n", @info ), prompt => $prompt, auto_up => 2, confirm => '  ' . $sf->{i}{confirm},
+                    back => '  ' . $sf->{i}{back} . '   ' }
+                );
+                if ( ! defined $form ) {
+                    next MENU;
+                }
+                my ( $pattern, $replacement, $modifiers ) = map { $_->[1] // '' } @$form;
+                $modifiers = $sf->__filter_modifiers( $modifiers );
+                $sr_group = [ [ $pattern, $replacement, $modifiers ] ];
+                if ( ! eval {
+                    $sf->__execute_substitutions( [ [ 'test_string' ] ], [ 0 ], [ $sr_group ] );
+                    1 }
+                ) {
+                    $ax->print_error_message( $@ );
+                    $fields = $form;
+                    next SUBSTITUTION;
+                }
+                last SUBSTITUTION;
             }
-            my ( $pattern, $replacement, $modifiers ) = map { $_->[1] // '' } @$form;
-            $modifiers = $sf->__filter_modifiers( $modifiers );
-            $sr_group = [ [ $pattern, $replacement, $modifiers ] ];
         }
         else {
             my $name = $available->[$idx-@pre];
@@ -175,20 +187,26 @@ sub __apply_to_cols {
         $mark = undef if @$mark != @$prev_chosen;
     }
     # Choose
-    my $col_idx = $tu->choose_a_subset(
+    my $col_idxs = $tu->choose_a_subset(
         $header,
         { cs_label => 'Columns: ', info => join( "\n", @$info ), layout => 0, all_by_default => 1, index => 1,
         confirm => $sf->{i}{ok}, back => '<<', busy_string => $sf->{i}{working}, mark => $mark }
     );
-    if ( ! defined $col_idx ) {
+    if ( ! defined $col_idxs ) {
         return;
     }
-    $sf->{i}{prev_chosen_cols}{$key_1}{$key_2} = [ @{$header}[@$col_idx] ];
+    $sf->{i}{prev_chosen_cols}{$key_1}{$key_2} = [ @{$header}[@$col_idxs] ];
     $cf->__print_filter_info( $sql, $count_static_rows, [ '<<', $sf->{i}{ok}, @$header ] ); #
+    $sf->__execute_substitutions( $aoa, $col_idxs, $all_sr_groups );
+    $sql->{insert_into_args} = $aoa;
+    return 1;
+}
 
+sub __execute_substitutions {
+    my ( $sf, $aoa, $col_idxs, $all_sr_groups ) = @_;
     my $c;
     for my $row ( @$aoa ) { # modifies $aoa
-        for my $i ( @$col_idx ) {
+        for my $i ( @$col_idxs ) {
             for my $sr_group ( @$all_sr_groups ) {
                 for my $sr_single ( @$sr_group ) {
                     my ( $pattern, $replacement, $modifiers ) = @$sr_single;
@@ -222,8 +240,6 @@ sub __apply_to_cols {
             }
         }
     }
-    $sql->{insert_into_args} = $aoa;
-    return 1;
 }
 
 
@@ -327,17 +343,30 @@ sub __history {
                         [ '  Replacement', ],
                         [ '  Modifiers',   ],
                     ];
-                    # Fill_form
-                    my $form = $tf->fill_form(
-                        $fields,
-                        { info => $info . $info_add, prompt => $add_s_and_r, auto_up => 2, clear_screen => 1,
-                            confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
-                    );
-                    if ( ! defined $form ) {
-                        next ADD_MENU;
+
+                    SUBSTITUTION: while ( 1 ) {
+                        # Fill_form
+                        my $form = $tf->fill_form(
+                            $fields,
+                            { info => $info . $info_add, prompt => $add_s_and_r, auto_up => 2, clear_screen => 1,
+                                confirm => '  ' . $sf->{i}{confirm}, back => '  ' . $sf->{i}{back} . '   ' }
+                        );
+                        if ( ! defined $form ) {
+                            next ADD_MENU;
+                        }
+                        push @bu, [ @$sr_group ];
+                        push @$sr_group, $sf->__from_form_to_sr_group_data( $form );
+                        if ( ! eval {
+                            $sf->__execute_substitutions( [ [ 'test_string' ] ], [ 0 ], [ $sr_group ] );
+                            1 }
+                        ) {
+                            $ax->print_error_message( $@ );
+                            $fields = $form;
+                            $sr_group = pop @bu;
+                            next SUBSTITUTION;
+                        }
+                        last SUBSTITUTION;
                     }
-                    push @bu, [ @$sr_group ];
-                    push @$sr_group, $sf->__from_form_to_sr_group_data( $form );
                 }
             }
         }
@@ -428,8 +457,9 @@ sub __history {
 sub __from_form_to_sr_group_data {
     my ( $sf, $form ) = @_;
     my @sr_group_data;
-    while ( @$form ) {
-        my ( $pattern, $replacement, $modifiers ) = map { $_->[1] // '' } splice @$form, 0, 3;
+    my @copy = @$form;
+    while ( @copy ) {
+        my ( $pattern, $replacement, $modifiers ) = map { $_->[1] // '' } splice @copy, 0, 3;
         if ( length $pattern ) {
             $modifiers = $sf->__filter_modifiers( $modifiers );
             push @sr_group_data, [ $pattern, $replacement, $modifiers ];

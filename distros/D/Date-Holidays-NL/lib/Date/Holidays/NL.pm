@@ -1,7 +1,7 @@
 use utf8;
 
 package Date::Holidays::NL;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -176,9 +176,9 @@ sub holidays {
         my $holiday = $EASTER_BASED{$_};
         my $easter  = DateTime::Event::Easter->new(
             easter => 'western',
-            day => $holiday->{d}
+            day    => $holiday->{d}
         );
-        my $dt      = $easter->following($dt);
+        my $dt = $easter->following($dt);
         _to_holidays(\%h, $dt, $holiday);
     }
 
@@ -229,7 +229,7 @@ Date::Holidays::NL - The Netherlands official holidays
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

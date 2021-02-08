@@ -3,6 +3,7 @@ use warnings;
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
@@ -26,6 +27,7 @@ my $initial_state = {
     (map use_module($_)->new(evaluator => $js),
       map 'JSON::Schema::Draft201909::Vocabulary::'.$_, qw(Applicator MetaData)),
   ],
+  evaluator => $js,
 };
 
 subtest 'allOf' => sub {
@@ -93,7 +95,7 @@ subtest 'allOf' => sub {
 
   cmp_deeply(
     $js->evaluate(1, $pass_schema, { collect_annotations => 0 })->TO_JSON,
-    { valid => bool(1) },
+    { valid => true },
     'annotation collection can be turned off in evaluate()',
   );
 
@@ -105,7 +107,7 @@ subtest 'allOf' => sub {
     cmp_deeply(
       $js->evaluate(1, $pass_schema, { collect_annotations => 1 })->TO_JSON,
       {
-        valid => bool(1),
+        valid => true,
         annotations => [
           {
             instanceLocation => '',
@@ -250,7 +252,7 @@ subtest 'not' => sub {
       },
     )->TO_JSON,
     {
-      valid => bool(1),
+      valid => true,
     },
     'annotations are still collected inside a "not", otherwise the unevaluatedProperties would have returned false',
   );
@@ -269,7 +271,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
       },
     )->TO_JSON,
     {
-      valid => bool(0),
+      valid => false,
       errors => [
         {
           instanceLocation => '',
@@ -292,7 +294,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
       },
     )->TO_JSON,
     {
-      valid => bool(0),
+      valid => false,
       errors => [
         {
           instanceLocation => '',
@@ -319,7 +321,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
       },
     )->TO_JSON,
     {
-      valid => bool(0),
+      valid => false,
       errors => [
         {
           instanceLocation => '/item',
@@ -343,7 +345,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
       },
     )->TO_JSON,
     {
-      valid => bool(1),
+      valid => true,
       annotations => [
         {
           instanceLocation => '',
@@ -364,16 +366,21 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
       },
     )->TO_JSON,
     {
-      valid => bool(1),
+      valid => true,
       annotations => [
         {
           instanceLocation => '',
           keywordLocation => '/properties',
           annotation => [ 'foo' ],
         },
+        {
+          instanceLocation => '',
+          keywordLocation => '/unevaluatedProperties',
+          annotation => [],
+        },
       ],
     },
-    'when "collect_annotations" is set to true, unevaluatedProperties works, and annotations are returned',
+    'when "collect_annotations" is set to true, unevaluatedProperties passes, and annotations are returned',
   );
 
   $js = JSON::Schema::Draft201909->new();
@@ -388,7 +395,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
       },
     )->TO_JSON,
     {
-      valid => bool(1),
+      valid => true,
     },
     'when "collect_annotations" is not set, unevaluatedItems still works, but annotations are not returned',
   );
@@ -403,7 +410,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
       },
     )->TO_JSON,
     {
-      valid => bool(1),
+      valid => true,
     },
     'when "collect_annotations" is not set, unevaluatedProperties still works, but annotations are not returned',
   );
@@ -422,7 +429,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
       },
     )->TO_JSON,
     {
-      valid => bool(1),
+      valid => true,
     },
     '... still works when unevaluated keywords are in a separate document',
   );
@@ -431,13 +438,13 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
   my $doc_properties = $js->add_schema('properties.json', { properties => { foo => true } });
 
   cmp_deeply(
-    $doc_items->evaluator_configs,
+    $doc_items->evaluation_configs,
     {},
     'items.json does not need collect_annotations => 1 to evaluate itself',
   );
 
   cmp_deeply(
-    $doc_properties->evaluator_configs,
+    $doc_properties->evaluation_configs,
     {},
     'properties.json does not need collect_annotations => 1 to evaluate itself',
   );
@@ -462,7 +469,7 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
       },
     )->TO_JSON,
     {
-      valid => bool(1),
+      valid => true,
     },
     'referenced schemas still produce annotations internally when needed, even when not required to evaluate themselves in isolation',
   );
@@ -495,7 +502,7 @@ subtest 'annotate_unknown_keywords' => sub {
       $schema,
     )->TO_JSON,
     {
-      valid => bool(1),
+      valid => true,
     },
     'no annotations even when config value is true but collect_annotations is false',
   );
@@ -506,7 +513,7 @@ subtest 'annotate_unknown_keywords' => sub {
       $schema,
     )->TO_JSON,
     {
-      valid => bool(1),
+      valid => true,
       annotations => [
         {
           instanceLocation => '/item',
@@ -522,6 +529,11 @@ subtest 'annotate_unknown_keywords' => sub {
           instanceLocation => '/property',
           keywordLocation => '/properties/property/properties',
           annotation => [ 'foo' ],
+        },
+        {
+          instanceLocation => '/property',
+          keywordLocation => '/properties/property/unevaluatedProperties',
+          annotation => [],
         },
         {
           instanceLocation => '/property',

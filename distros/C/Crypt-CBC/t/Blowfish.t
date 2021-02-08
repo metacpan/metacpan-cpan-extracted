@@ -1,6 +1,6 @@
-#!/usr/local/bin/perl -Tw
+#!/usr/local/bin/perl
 
-use lib '..','../blib/lib','.','./blib/lib';
+use lib './lib','../lib','./blib/lib';
 
 eval "use Crypt::Blowfish()";
 if ($@) {
@@ -50,3 +50,4 @@ test (32,$i->decrypt($i->encrypt($test_data)) eq $test_data);
 
 $test_data = "This string ends in some spaces  ";
 test (33,$i->decrypt($i->encrypt($test_data)) eq $test_data);
+

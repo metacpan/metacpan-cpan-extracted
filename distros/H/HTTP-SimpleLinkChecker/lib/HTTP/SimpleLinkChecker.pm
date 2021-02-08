@@ -17,7 +17,7 @@ my $UA = Mojo::UserAgent->new();
 $UA->proxy->detect;
 $UA->max_redirects(3);
 
-our $VERSION = '1.167';
+our $VERSION = '1.168';
 
 sub check_link {
 	my( $link ) = @_;
@@ -54,6 +54,9 @@ sub user_agent { $UA }
 HTTP::SimpleLinkChecker - Check the HTTP response code for a link
 
 =head1 SYNOPSIS
+
+THIS MODULE HAS BEEN ABANDONED. YOU CAN ADOPT IT
+https://pause.perl.org/pause/authenquery?ACTION=pause_04about#takeover
 
 	use HTTP::SimpleLinkChecker;
 
@@ -137,7 +140,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

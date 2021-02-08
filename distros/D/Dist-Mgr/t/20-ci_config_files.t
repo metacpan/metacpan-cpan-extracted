@@ -129,6 +129,7 @@ sub compare_contents {
     for my $i (0..$#orig) {
         chomp $orig[$i];
         chomp $new[$i];
+        $orig[$i] =~ s/[\r\n]//g;
         $orig[$i] =~ s/^"//;
         $orig[$i] =~ s/",$//;
 

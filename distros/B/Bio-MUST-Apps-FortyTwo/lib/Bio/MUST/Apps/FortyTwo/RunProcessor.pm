@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::FortyTwo::RunProcessor;
 # ABSTRACT: Internal class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::RunProcessor::VERSION = '0.202160';
+$Bio::MUST::Apps::FortyTwo::RunProcessor::VERSION = '0.210370';
 use Moose;
 use namespace::autoclean;
 
@@ -11,7 +11,7 @@ use Smart::Comments;                    # logging always enabled here
 
 use Carp;
 use List::AllUtils;
-use Path::Class qw(file);
+use Path::Class qw(dir file);
 
 use Parallel::Batch;
 
@@ -313,6 +313,12 @@ sub BUILD {
 #         ;
 #     }
 
+    # build optional output dir
+    if ($self->out_dir) {
+        my $dir = dir($self->out_dir)->relative;
+        $dir->mkpath();
+    }
+
     if ($self->threads > 1) {
         ### [RUN] Multithreading is on: $self->threads
         ### [RUN] Logging data will be mixed-up!
@@ -352,7 +358,7 @@ Bio::MUST::Apps::FortyTwo::RunProcessor - Internal class for forty-two tool
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =head1 AUTHOR
 

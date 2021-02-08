@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+
+use 5.022;
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar;
+
+$| = 1;
+
+die "usage: pds_find_delta delta [file]...\n"
+    if @ARGV < 1 || $ARGV[0] !~ /^(?:0|-?[1-9][0-9]*)\z/;
+
+my $delta = shift @ARGV;
+
+while (<<>>) {
+    s/^\s+//;
+    my @e = split /\s+/;
+    next if !@e;
+
+    die "integer numbers separated by whitespace expected\n"
+        if grep { !/^(?:0|[1-9][0-9]*)\z/ } @e;
+
+    my $s = Math::DifferenceSet::Planar->from_elements(@e);
+
+    my ($e1, $e2) = $s->find_delta($delta);
+
+    print "$e1 $e2\n";
+}
+
+__END__
+=head1 NAME
+
+pds_find_delta - find pairs of difference set elements with given difference
+
+=head1 SYNOPSIS
+
+  pds_find_delta delta [file]...
+
+=head1 DESCRIPTION
+
+This example program reads planar difference sets, one per line, as
+integer numbers separated by whitespace, finds in each set the pair of
+elements with the difference specified on the command line, and writes
+those elements to standard output.
+
+Note that the difference is taken modulo the modulus of each set.
+
+The program will fail with an error message if an input line is not a set
+containing such a pair, which also indicates it is not a difference set.
+Searching for a zero difference will yield a random element twice.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2020-2021 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

@@ -4,7 +4,7 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -29,6 +29,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "List::Util" : "0",
             "Moo" : "2.003",
             "PPI" : "1.270"
          }
@@ -48,7 +49,7 @@
    "provides" : {
       "CPANfile::Parse::PPI" : {
          "file" : "lib/CPANfile/Parse/PPI.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -56,17 +57,19 @@
       "bugtracker" : {
          "web" : "https://github.com/perlservices/CPANfile-Parse-PPI/issues"
       },
-      "homepage" : "http://github.com/perlservices/CPANfile-Parse-PPI",
+      "homepage" : "https://github.com/perlservices/CPANfile-Parse-PPI",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/perlservices/CPANfile-Parse-PPI.git",
          "web" : "https://github.com/perlservices/CPANfile-Parse-PPI"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

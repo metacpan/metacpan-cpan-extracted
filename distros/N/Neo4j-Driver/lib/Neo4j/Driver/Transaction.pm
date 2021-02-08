@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.20';
+$Neo4j::Driver::Transaction::VERSION = '0.21';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -266,7 +266,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 
@@ -399,6 +399,12 @@ converted to strings before they are sent to the Neo4j server.
 
 This driver always reports all errors using C<die()>. Error messages
 received from the Neo4j server are passed on as-is.
+
+Statement errors occur when the statement is executed on the server.
+This may not necessarily have happened by the time C<run()> returns.
+If you use C<try> to handle errors, make sure you use the
+L<Result|Neo4j::Driver::Result> within the C<try> block, for example
+by calling one of the methods C<fetch()>, C<list()> or C<summary()>.
 
 Transactions are rolled back and closed automatically if the Neo4j
 server encounters an error when running a query. However, if an

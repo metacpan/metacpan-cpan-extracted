@@ -31,7 +31,6 @@ lib/App/AutoCRUD/Controller/Static.pm
 lib/App/AutoCRUD/Controller/Table.pm
 lib/App/AutoCRUD/DataSource.pm
 lib/App/AutoCRUD/share/static/css/styles.css
-lib/App/AutoCRUD/share/static/js/autocrud_utils.js
 lib/App/AutoCRUD/share/templates/lib/config
 lib/App/AutoCRUD/share/templates/lib/site/footer
 lib/App/AutoCRUD/share/templates/lib/site/header
@@ -66,6 +65,5 @@ MANIFEST			This list of files
 META.yml
 README
 t/00_autocrud.t
-t/01_readonly.t
 t/data/Chinook_Sqlite_AutoIncrementPKs_empty_tables.tst_sqlite
-t/pod.t
+xt/pod.t

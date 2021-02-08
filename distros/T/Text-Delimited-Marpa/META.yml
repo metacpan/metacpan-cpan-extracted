@@ -1,22 +1,24 @@
 ---
 abstract: 'Extract delimited text sequences from strings'
 author:
-  - 'Ron Savage <ron@savage.net.au>'
+  - 'Ron Savage (ron@savage.net.au)'
 build_requires:
-  Test::More: '1.001006'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  Test::Pod: '0'
 configure_requires:
-  Module::Build: '0.421'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Text-Delimited-Marpa
-provides:
-  Text::Delimited::Marpa:
-    file: lib/Text/Delimited/Marpa.pm
-    version: '1.00'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Const::Exporter: v0.2.3
   Marpa::R2: '2.096'
@@ -29,6 +31,8 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
-  repository: https://github.com/ronsavage/Text-Delimited-Marpa
-version: '1.00'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Delimited-Marpa
+  license: http://opensource.org/licenses/Artistic-2.0
+  repository: https://github.com/ronsavage/Text-Delimited-Marpa.git
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

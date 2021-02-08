@@ -101,6 +101,7 @@ lib/AsposeSlidesCloud/Object/PptxExportOptions.pm
 lib/AsposeSlidesCloud/Object/PresentationsMergeRequest.pm
 lib/AsposeSlidesCloud/Object/PresentationToMerge.pm
 lib/AsposeSlidesCloud/Object/PresetShadowEffect.pm
+lib/AsposeSlidesCloud/Object/ProtectionProperties.pm
 lib/AsposeSlidesCloud/Object/ReflectionEffect.pm
 lib/AsposeSlidesCloud/Object/RemoveShape.pm
 lib/AsposeSlidesCloud/Object/RemoveSlide.pm
@@ -134,6 +135,7 @@ lib/AsposeSlidesCloud/Object/SlideBackground.pm
 lib/AsposeSlidesCloud/Object/SlideComment.pm
 lib/AsposeSlidesCloud/Object/SlideComments.pm
 lib/AsposeSlidesCloud/Object/SlideExportFormat.pm
+lib/AsposeSlidesCloud/Object/SlideProperties.pm
 lib/AsposeSlidesCloud/Object/SlideReplaceResult.pm
 lib/AsposeSlidesCloud/Object/Slides.pm
 lib/AsposeSlidesCloud/Object/SmartArt.pm

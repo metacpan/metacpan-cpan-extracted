@@ -15,4 +15,4 @@ t/02-Oracle.t
 t/03-multiple_inherit.t
 t/04-parse_errors.t
 t/05-Contains.t
-t/pod.t
+xt/pod.t

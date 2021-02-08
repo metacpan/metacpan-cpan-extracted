@@ -24,10 +24,18 @@ WriteMakefile(
   },
   LICENSE => 'artistic_2',
   META_MERGE   => {
+    'meta-spec' => { version => 2 },
     requires  => { perl => '5.010001' },
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/Akron/Crypt-MagicSignatures-Key'
+      repository  => {
+        type => 'git',
+        url => 'https://github.com/Akron/Crypt-MagicSignatures-Key.git',
+        web => 'https://github.com/Akron/Crypt-MagicSignatures-Key',
+      },
+      bugtracker => {
+        web => 'https://github.com/Akron/Crypt-MagicSignatures-Key/issues'
+      }
     },
     recommends => {
       'Math::Prime::Util::GMP'  => 0.34,

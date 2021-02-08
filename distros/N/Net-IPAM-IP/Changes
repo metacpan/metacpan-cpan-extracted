@@ -1,5 +1,8 @@
 Revision history for Net-IPAM-IP
 
+2.10    Sun, 07 Feb 2021 14:33:55 +0100
+        * less complex version handling, maybe even faster
+
 2.01    Fri, 22 Jan 2021 08:10:31 +0100
         * remove false comment in cmp()
 

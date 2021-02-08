@@ -1,5 +1,9 @@
 Revision history for Text::Hyphen::DE
 
+1.02 2021-02-08T11:30:28Z
+
+  - Declare source files as utf8
+
 1.01 2019-12-19T08:55:26Z
 
   - Add strict and warnings

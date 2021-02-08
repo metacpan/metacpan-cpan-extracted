@@ -1,5 +1,37 @@
 Revision history for Perl extension API::INSEE::Sirene.
 
+4.01
+        - Updated dependencies in Makefile.PL
+
+4.00
+        - Major internal restructuration
+        - The module version number is no longer depending on the INSEE's API version number
+        - The module is now using POO
+        - This module will now send requests using POST method when possible.
+            This is allowed by the INSEE's API since version 3.6.0 in order to avoid too long requests in the URL.
+        - The API returns HTTP_NOT_FOUND code when no results have been found, even if the request was correct.
+            The module now handles this case correctly and returns the json body instead of dumping the request.
+        - In general way, the module now correctly handles the different HTTP response codes given by the API
+        - Better handling of tokens renewal
+        - Added searchLegalUnitBySIREN method
+        - Added searchEstablishmentBySIRET method
+        - Added getCustomCriteria method
+        - Added searchByCustomCriteria method
+        - Added setMaxResults method
+        - Added setDebugMode method
+        - Added setProxy method
+        - Added setTimeout method
+        - Added setCredentials method
+        - Added MIN_DIGIT constant 
+        - Removed CLIENT_AUTH constant
+        - Removed getEstablishmentsByCriteria function
+        - Removed getLegalUnitsByCriteria function
+        - Removed getUserAgentInitialized function
+        - Updated documentation
+
+3.507
+        - Updated documentation
+
 3.506
         - Fixed badly named variables
 
@@ -7,7 +39,7 @@ Revision history for Perl extension API::INSEE::Sirene.
         - Updated documentation
         - Fixed errors in documentation from the previous version
         - Fixed regression about automatic token renewal
-        - Fixed some return values, now all the functions returns in first the error and in second the result
+        - Fixed some return values, now all the functions return the error first and the result second
 
 3.504
         - Added automatic token renewal
@@ -21,11 +53,10 @@ Revision history for Perl extension API::INSEE::Sirene.
         - Documentation standardization
         - Minor code improvements
         - Errors handling improvement. The module will now display better errors
-        - Added checkResponse() method
+        - Added checkResponse() function
         - Moved getEstablishmentsByCriteria() to @EXPORT_OK
         - Moved getLegalUnitBySIREN() to @EXPORT
 
 3.501  Mon Jul  8 12:40:26 2019
         - original version; created by h2xs 1.23 with options
             -AX -n API::INSEE::Sirene -v 3.501
-

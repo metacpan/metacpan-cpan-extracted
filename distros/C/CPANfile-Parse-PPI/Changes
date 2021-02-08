@@ -1,6 +1,12 @@
 Revision history for CPANfile::Parse::PPI
 =========================================
 
+0.05  2021-02-08  14:42:00
+
+  * add more unittests for types 'requires' and 'recommends'
+  * update tests
+  * support more bindings (other than 'requires' and 'recommends'), and support some attributes for the bindings
+
 0.04  2021-01-04  07:09:00
 
   * Fix list of prereqs (Thanks to CPANtesters)

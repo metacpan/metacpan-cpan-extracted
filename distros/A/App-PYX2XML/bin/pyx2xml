@@ -5,10 +5,10 @@ use warnings;
 
 use App::PYX2XML;
 
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 
 # Run.
-App::PYX2XML->new->run;
+exit App::PYX2XML->new->run;
 
 # Print version.
 sub VERSION_MESSAGE {
@@ -28,7 +28,7 @@ pod2xml - Script to convert PYX to XML.
 
 =head1 SYNOPSIS
 
- pyx2xml [-e in_enc] [-h] [-i] [--version] [filename] [-]
+ pyx2xml [-e in_enc] [-h] [-i] [-s no_simple] [--version] [filename] [-]
 
 =head1 DESCRIPTION
 
@@ -50,6 +50,11 @@ pod2xml - Script to convert PYX to XML.
 =item * C<-i>
 
  Indent output.
+
+=item * C<-s no_simple>
+
+ List of element, which cannot be a simple like <element/>.
+ Separator is comma.
 
 =item * C<--version>
 
@@ -89,6 +94,20 @@ pod2xml - Script to convert PYX to XML.
  # Output:
  # <element>foo</element>
 
+=head1 EXAMPLE3
+
+ cat <<END | pyx2xml -s foo,baz -
+ (foo
+ )foo
+ (bar
+ )bar
+ (baz
+ )baz
+ END
+
+ # Output:
+ # <foo></foo><bar /><baz></baz>
+
 =head1 REPOSITORY
 
 L<https://github.com/michal-josef-spacek/App-PYX2XML>
@@ -101,12 +120,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2020 Michal Josef Špaček
+© 2015-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.06
 
 =cut

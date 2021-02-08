@@ -4,7 +4,7 @@ use 5.022001;
 use strict;
 use warnings;
 
-our $VERSION = "1.3";
+our $VERSION = "1.4";
 
 # for accepting options
 use IO::Prompter;

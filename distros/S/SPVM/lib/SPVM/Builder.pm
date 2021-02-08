@@ -12,7 +12,24 @@ use SPVM::Builder::CC;
 # because SPVM::Builder XS method is loaded when SPVM is loaded
 use SPVM();
 
+# Accessors
 sub build_dir { shift->{build_dir} }
+sub module_dirs { shift->{module_dirs} }
+
+sub new {
+  my $class = shift;
+  
+  my $self = {
+    module_dirs => [@INC],
+    @_
+  };
+  
+  bless $self, ref $class || $class;
+  
+  $self->create_compiler;
+  
+  return $self;
+}
 
 sub create_build_src_path {
   my ($self, $rel_file) = @_;
@@ -62,100 +79,186 @@ sub create_build_lib_path {
   return $build_lib_path;
 }
 
-sub new {
-  my $class = shift;
+sub get_shared_lib_file_dist {
+  my ($self, $package_name, $category) = @_;
   
-  my $self = {
-    include_dirs => \@INC,
-    @_
-  };
+  my @package_name_parts = split(/::/, $package_name);
+  my $module_module_file = $self->get_module_file($package_name);
   
-  bless $self, ref $class || $class;
+  my $shared_lib_file = SPVM::Builder::Util::convert_module_file_to_shared_lib_file($module_module_file, $category);
   
-  $self->create_compiler;
-  
-  return $self;
+  return $shared_lib_file;
 }
 
-sub get_config_file {
-  my ($self, $package_name) = @_;
+sub build_shared_lib_dist {
+  my ($self, $package_name, $category) = @_;
+  
+  $self->compile_spvm($package_name, '(build_shared_lib_dist)', 0);
+
+  my $cc_native = SPVM::Builder::CC->new(
+    build_dir => $self->{build_dir},
+    category => $category,
+    builder => $self,
+    quiet => 0,
+  );
+  
+  my $sub_names = $self->get_sub_names($package_name, $category);
+  $cc_native->build_shared_lib_dist($package_name);
+}
+
+sub build_and_bind_shared_lib {
+  my ($self, $package_name, $category) = @_;
+  
+  my $cc = SPVM::Builder::CC->new(
+    build_dir => $self->{build_dir},
+    category => $category,
+    builder => $self,
+    quiet => 1,
+  );
+  
+  my $sub_names = $self->get_sub_names($package_name, $category);
+  
+  if (@$sub_names) {
+    # Shared library which is already installed in distribution directory
+    my $shared_lib_file = $self->get_shared_lib_file_dist($package_name, $category);
+    
+    # Try runtime compile if shared library is not found
+    unless (-f $shared_lib_file) {
+      $shared_lib_file = $cc->build_shared_lib_runtime($package_name);
+    }
+    $self->bind_subs($cc, $shared_lib_file, $package_name, $category);
+  }
+}
+
+sub bind_subs {
+  my ($self, $cc, $shared_lib_file, $package_name, $category) = @_;
+  
+  # m library is maybe not dynamic link library
+  my %must_not_load_libs = map { $_ => 1 } ('m');
+  
+  # Load pre-required dynamic library
+  my $bconf = $self->get_config($package_name, $category);
+  my $lib_dirs = $bconf->get_lib_dirs;
+  {
+    local @DynaLoader::dl_library_path = (@$lib_dirs, @DynaLoader::dl_library_path);
+    my $libs = $bconf->get_libs;
+    for my $lib (@$libs) {
+      unless ($must_not_load_libs{$lib}) {
+        my ($lib_file) = DynaLoader::dl_findfile("-l$lib");
+        my $shared_lib_libref = DynaLoader::dl_load_file($lib_file);
+        unless ($shared_lib_libref) {
+          my $dl_error = DynaLoader::dl_error();
+          confess "Can't load shared_lib file \"$shared_lib_file\": $dl_error";
+        }
+      }
+    }
+  }
+  
+  my $sub_names = $self->get_sub_names($package_name, $category);
+  my $sub_infos = [];
+  for my $sub_name (@$sub_names) {
+    my $sub_info = {};
+    $sub_info->{package_name} = $package_name;
+    $sub_info->{sub_name} = $sub_name;
+    push @$sub_infos, $sub_info;
+  }
+  
+  # Add anon package sub names if precompile
+  if ($category eq 'precompile') {
+    my $anon_package_names = $self->get_anon_package_names_by_parent_package_name($package_name);
+    for my $anon_package_name (@$anon_package_names) {
+      my $sub_info = {};
+      $sub_info->{package_name} = $anon_package_name;
+      $sub_info->{sub_name} = "";
+      push @$sub_infos, $sub_info;
+    }
+  }
+  
+  for my $sub_info (@$sub_infos) {
+    my $package_name = $sub_info->{package_name};
+    my $sub_name = $sub_info->{sub_name};
+    
+    my $sub_abs_name = "${package_name}::$sub_name";
+
+    my $cfunc_name = SPVM::Builder::Util::create_cfunc_name($package_name, $sub_name, $category);
+    my $cfunc_address;
+    if ($shared_lib_file) {
+      my $shared_lib_libref = DynaLoader::dl_load_file($shared_lib_file);
+      if ($shared_lib_libref) {
+        $cfunc_address = DynaLoader::dl_find_symbol($shared_lib_libref, $cfunc_name);
+        unless ($cfunc_address) {
+          my $dl_error = DynaLoader::dl_error();
+          my $error = <<"EOS";
+Can't find native function \"$cfunc_name\" corresponding to $sub_abs_name in \"$shared_lib_file\"
+
+You must write the following definition.
+--------------------------------------------------
+#include <spvm_native.h>
+
+int32_t $cfunc_name(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  return SPVM_SUCCESS;
+}
+--------------------------------------------------
+
+$dl_error
+EOS
+          confess $error;
+        }
+      }
+      else {
+        my $dl_error = DynaLoader::dl_error();
+        confess "Can't load shared_lib file \"$shared_lib_file\": $dl_error";
+      }
+    }
+    else {
+      confess "DLL file is not specified";
+    }
+    
+    $self->bind_sub($package_name, $sub_name, $cfunc_address, $category);
+  }
+}
+
+sub get_config {
+  my ($self, $package_name, $category) = @_;
   
   my $module_file = $self->get_module_file($package_name);
+  my $src_dir = SPVM::Builder::Util::remove_package_part_from_file($module_file, $package_name);
+
+  # Config file
+  my $config_rel_file = SPVM::Builder::Util::convert_package_name_to_category_rel_file($package_name, $category, 'config');
+  my $config_file = "$src_dir/$config_rel_file";
   
-  my $config_file;
-  if (defined $module_file) {
-    $config_file = $module_file;
-    $config_file =~ s/\.spvm$/.config/;
+  # Config
+  my $bconf;
+  if (-f $config_file) {
+    $bconf = SPVM::Builder::Util::load_config($config_file);
+  }
+  else {
+    if ($category eq 'native') {
+      my $error = <<"EOS";
+Can't find $config_file.
+
+Config file must contains at least the following code
+----------------------------------------------
+use strict;
+use warnings;
+
+use SPVM::Builder::Config;
+my \$bconf = SPVM::Builder::Config->new_c99;
+
+\$bconf;
+----------------------------------------------
+$@
+EOS
+      confess $error;
+    }
+    else {
+      $bconf = SPVM::Builder::Config->new_c99;
+    }
   }
   
-  return $config_file;
-}
-
-sub build_dll_native_dist {
-  my ($self, $package_name) = @_;
-  
-  $self->compile_spvm($package_name, '(build_dll_native_dist)', 0);
-
-  my $sub_names = $self->get_native_sub_names($package_name);
-
-  my $cc_native = SPVM::Builder::CC->new(
-    build_dir => $self->{build_dir},
-    category => 'native',
-    builder => $self,
-    quiet => 0,
-  );
-  
-  $cc_native->build_dll_native_dist($package_name, $sub_names);
-}
-
-sub build_dll_precompile_dist {
-  my ($self, $package_name) = @_;
-  
-  my $compile_success = $self->compile_spvm($package_name, '(build_dll_precompile_dist)', 0);
-  unless ($compile_success) {
-    die "Compile error";
-  }
-  
-  my $sub_names = $self->get_precompile_sub_names($package_name);
-
-  my $cc_precompile = SPVM::Builder::CC->new(
-    build_dir => $self->{build_dir},
-    category => 'precompile',
-    builder => $self,
-    quiet => 0,
-  );
-  
-  $cc_precompile->build_dll_precompile_dist($package_name, $sub_names);
-}
-
-sub build_precompile {
-  my ($self, $package_names) = @_;
-  
-  my $cc_precompile = SPVM::Builder::CC->new(
-    build_dir => $self->{build_dir},
-    category => 'precompile',
-    builder => $self,
-    quiet => 1,
-  );
-  
-  for my $package_name (@$package_names) {
-    $cc_precompile->build($package_name);
-  }
-}
-
-sub build_native {
-  my ($self, $package_names) = @_;
-
-  my $cc_native = SPVM::Builder::CC->new(
-    build_dir => $self->{build_dir},
-    category => 'native',
-    builder => $self,
-    quiet => 1,
-  );
-  
-  for my $package_name (@$package_names) {
-    $cc_native->build($package_name);
-  }
+  return $bconf;
 }
 
 1;
@@ -164,4 +267,8 @@ sub build_native {
 
 =head1 NAME
 
-SPVM::Builder - Compile SPVM program, bind native and precompile subroutines, generate Perl subrotuines correspoing to SPVM subroutines.
+SPVM::Builder - Build SPVM program
+
+=head1 DESCRIPTION
+
+Build SPVM program. Compile SPVM source codes. Bind native and precompile subroutines. Generate Perl subrotuines correspoing to SPVM subroutines. After that, run SPVM program.

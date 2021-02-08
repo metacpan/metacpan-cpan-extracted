@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Table::Readable - minimalistic human-editable tables of data
+Table::Readable - Simple-to-edit tables of data
 
 =head1 SYNOPSIS
 
@@ -25,13 +25,13 @@ produces output
     de Fehlerstrom-Schutzschalter
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.03/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.05/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Table::Readable version 0.03
-corresponding to git commit L<f3df88e9d66f7cbfb70c8d1c4aced75db03cfe84|https://github.com/benkasminbullock/Table-Readable/commit/f3df88e9d66f7cbfb70c8d1c4aced75db03cfe84> released on Mon Nov 19 14:50:42 2018 +0900.
+This documents Table::Readable version 0.05
+corresponding to git commit L<c5bf0b4cfb273eaa66a9d14c56a59527a86c3e11|https://github.com/benkasminbullock/Table-Readable/commit/c5bf0b4cfb273eaa66a9d14c56a59527a86c3e11> released on Sun Feb 7 09:47:05 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -113,6 +113,20 @@ The file is assumed to be in the UTF-8 encoding.
 
 Read from a scalar in C<$stuff>.
 
+=head2 read_table_hash
+
+    my $hash = read_table_hash ('table.txt', 'id');
+
+    my ($hash, $order) = read_table_hash ('table.txt', 'id');
+    for (@$order) {
+        print $hash->{$_}{value}, "\n";
+    }
+
+This reads the table specified in the first argument, then creates a
+hash reference using the key specified as the second argument. If some
+entries of the table do not have the specified key, or if some entries
+have the same value for the key, warnings are printed.
+
 =head2 write_table
 
     write_table (\@table, 'file.txt');
@@ -122,6 +136,20 @@ reference containing hash references, each of which has simple scalars
 as values.
 
 This does not convert underscores in the keys into spaces.
+
+If the name of the file is omitted, it prints to STDOUT.
+
+    write_table (\@table);
+
+If the caller asks for a return value, it returns the table as a
+string rather than printing it.
+
+    my $table = write_table (\@table);
+
+If the width of an output line exceeds a maximum length, the entry is
+written using the L<multiline format|/Multiline values>. This maximum length is
+available as the global variable C<$Table::Readable::maxlen>. The
+default value is 75.
 
 =head1 TABLE FORMAT
 
@@ -173,7 +201,7 @@ produces output
     2
 
 
-(This example is included as L<F<comment-not-row.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.03/examples/comment-not-row.pl> in the distribution.)
+(This example is included as L<F<comment-not-row.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.05/examples/comment-not-row.pl> in the distribution.)
 
 
 =head2 Encoding
@@ -208,48 +236,8 @@ your syntax to double percent characters.
 =head3 Whitespace
 
 Whitespace (anything matching C<\s>) is stripped from the beginning
-and end of the value. To preserve whitespace, use your own syntax such
-as the following.
-
-    
-    use Table::Readable 'read_table';
-    my $table =<<EOF;
-    a: b     
-    %%c:
-    
-    d
-    
-    %%
-    %%e:
-    
-    f
-    
-    !
-    %%
-    EOF
-    my @entries = read_table ($table, scalar => 1);
-    for my $k (keys %{$entries[0]}) {
-        my $v = $entries[0]{$k};
-        $v =~ s/!$//;
-        print "'$k' = '$v'\n";
-    }
-    
-
-
-produces output
-
-    'e' = 'f
-    
-    '
-    'c' = 'd'
-    'a' = 'b'
-
-
-(This example is included as L<F<whitespace.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.03/examples/whitespace.pl> in the distribution.)
-
-
-Leading and trailing whitespace can be preserved by preceding it with
-a backslash character:
+and end of the value.  Leading and trailing whitespace can be preserved by preceding it
+with a backslash character:
 
     
     use utf8;
@@ -295,13 +283,53 @@ produces output
     d'
 
 
-(This example is included as L<F<slash.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.03/examples/slash.pl> in the distribution.)
+(This example is included as L<F<slash.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.05/examples/slash.pl> in the distribution.)
 
 
 If you actually need a backslash at the start or end of your string,
 use a double backslash, C<\\>. In parts of the string other than the
 first or the last position, double backslashes are not treated
 specially.
+
+Alternatively you could use your own syntax such
+as the following.
+
+    
+    use Table::Readable 'read_table';
+    my $table =<<EOF;
+    a: b     
+    %%c:
+    
+    d
+    
+    %%
+    %%e:
+    
+    f
+    
+    !
+    %%
+    EOF
+    my @entries = read_table ($table, scalar => 1);
+    for my $k (keys %{$entries[0]}) {
+        my $v = $entries[0]{$k};
+        $v =~ s/!$//;
+        print "'$k' = '$v'\n";
+    }
+    
+
+
+produces output
+
+    'e' = 'f
+    
+    '
+    'c' = 'd'
+    'a' = 'b'
+
+
+(This example is included as L<F<whitespace.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.05/examples/whitespace.pl> in the distribution.)
+
 
 =head3 Empty values
 
@@ -386,6 +414,34 @@ complexity, the more the bugs, the more the workarounds, the more the
 fixes, and the more the number of things to remember, and the more the
 headaches. No thanks!
 
+=head1 OTHER
+
+There is a Go mode and an Emacs mode for this format as well as the
+CPAN Perl distribution. They are all part of the same github
+repository, so you can report issues or make pull requests at the same
+place as this.
+
+=head2 Emacs mode
+
+There is an Emacs mode for the format called F<table-readable-mode.el>
+in the top directory of the CPAN distribution or L<in the github
+repository|https://github.com/benkasminbullock/Table-Readable/blob/master/table-readable-mode.el>.
+
+This includes highlighting of comments and makes it easier to format
+paragraphs of multiline text.
+
+At the moment it is restricted to lower-case alphabetical keys,
+although that is not part of the format specification.
+
+=head2 Go mode
+
+There is L<a reader and writer of the format in Go in the github
+repository|https://github.com/benkasminbullock/Table-Readable/blob/master/go> including tests. I'm not
+currently making that much use of this code at the moment, since
+string manipulation in Go is a nuisance compared to Perl, and I've
+found it's usually easier to convert the tables to JSON in Perl then
+read the JSON into a C<map[string]string> in Go.
+
 =head1 DEPENDENCIES
 
 =over
@@ -412,7 +468,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2010-2018
+2010-2021
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

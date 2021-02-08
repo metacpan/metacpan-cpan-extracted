@@ -6,9 +6,9 @@ use Test::Most;
 
 eval 'use Test::Taint';
 if($@) {
-	plan skip_all => 'Test::Taint required for testing untainting';
+	plan(skip_all => 'Test::Taint required for testing untainting');
 } else {
-	plan tests => 7;
+	plan(tests => 7);
 
 	taint_checking_ok();
 	require_ok('CGI::Info');

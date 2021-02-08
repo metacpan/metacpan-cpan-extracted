@@ -11,6 +11,13 @@ use Term::ANSIColor;
 use Proc::ProcessTable;
 use Text::ANSITable;
 
+# use Net::Connection::FreeBSD_sockstat if possible
+if ( $^O =~ /freebsd/ ) {
+	use Net::Connection::FreeBSD_sockstat;
+}
+else {
+	use Net::Connection::lsof;
+}
 
 =head1 NAME
 
@@ -18,11 +25,11 @@ Net::Connection::ncnetstat - The backend for ncnetstat, the colorized and enhanc
 
 =head1 VERSION
 
-Version 0.5.0
+Version 0.6.0
 
 =cut
 
-our $VERSION = '0.5.0';
+our $VERSION = '0.6.0';
 
 
 =head1 SYNOPSIS
@@ -102,57 +109,57 @@ The default is as below.
 
 =cut
 
-sub new{
+sub new {
 	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
+	if ( defined( $_[1] ) ) {
+		%args = %{ $_[1] };
+	}
 
-	if (! defined( $args{sorter} ) ){
-		$args{sorter}={
-					   type=>'host_fl',
-					   invert=>0,
-					   };
+	if ( !defined( $args{sorter} ) ) {
+		$args{sorter} = {
+			type   => 'host_fl',
+			invert => 0,
+		};
 	}
 
 	my $self = {
-				invert=>0,
-				sorter=>Net::Connection::Sort->new( $args{sorter} ),
-				ptr=>1,
-				command=>0,
-				command_long=>0,
-				wchan=>0,
-				pct=>0,
-				no_pid_user=>0,
-				};
-    bless $self;
+		invert       => 0,
+		sorter       => Net::Connection::Sort->new( $args{sorter} ),
+		ptr          => 1,
+		command      => 0,
+		command_long => 0,
+		wchan        => 0,
+		pct          => 0,
+		no_pid_user  => 0,
+	};
+	bless $self;
 
-	if ( defined( $args{match} ) ){
-		$self->{match}=Net::Connection::Match->new( $args{match} );
+	if ( defined( $args{match} ) ) {
+		$self->{match} = Net::Connection::Match->new( $args{match} );
 	}
 
-	if ( defined( $args{ptr} )){
-		$self->{ptr}=$args{ptr};
+	if ( defined( $args{ptr} ) ) {
+		$self->{ptr} = $args{ptr};
 	}
 
-	if ( defined( $args{command} ) ){
-		$self->{command}=$args{command};
+	if ( defined( $args{command} ) ) {
+		$self->{command} = $args{command};
 	}
 
-	if ( defined( $args{pct} ) ){
-		$self->{pct}=$args{pct};
+	if ( defined( $args{pct} ) ) {
+		$self->{pct} = $args{pct};
 	}
 
-	if ( defined( $args{wchan} ) ){
-		$self->{wchan}=$args{wchan};
+	if ( defined( $args{wchan} ) ) {
+		$self->{wchan} = $args{wchan};
 	}
 
-	if ( defined( $args{command_long} ) ){
-		$self->{command_long}=$args{command_long};
+	if ( defined( $args{command_long} ) ) {
+		$self->{command_long} = $args{command_long};
 	}
 
-	if ( defined( $args{no_pid_user} ) ){
-		$self->{no_pid_user}=$args{no_pid_user};
+	if ( defined( $args{no_pid_user} ) ) {
+		$self->{no_pid_user} = $args{no_pid_user};
 	}
 
 	return $self;
@@ -166,95 +173,117 @@ This runs it and returns a string.
 
 =cut
 
-sub run{
-	my $self=$_[0];
-	
-	my @objects = &lsof_to_nc_objects;
+sub run {
+	my $self = $_[0];
+
+	my @objects;
+	if ( $^O !~ /freebsd/ ) {
+		@objects = &lsof_to_nc_objects;
+	}
+	else {
+		@objects = &sockstat_to_nc_objects;
+	}
 
 	my @found;
-	if (defined( $self->{match} )){
-		foreach my $conn (@objects){
-			if( $self->{match}->match( $conn ) ){
+	if ( defined( $self->{match} ) ) {
+		foreach my $conn (@objects) {
+			if ( $self->{match}->match($conn) ) {
 				push( @found, $conn );
 			}
 		}
-	}else{
-		@found=@objects;
+	}
+	else {
+		@found = @objects;
 	}
 
-	@found=$self->{sorter}->sorter( \@found );
+	@found = $self->{sorter}->sorter( \@found );
 
 	my $tb = Text::ANSITable->new;
-	$tb->border_style('Default::none_ascii');  # if not, a nice default is picked
-	$tb->color_theme('Default::no_color');  # if not, a nice default is picked
+	$tb->border_style('ASCII::None');
+	$tb->color_theme('NoColor');
 
 	my @headers;
-	my $header_int=0;
+	my $header_int = 0;
 	push( @headers, 'Proto' );
-	$tb->set_column_style($header_int, pad => 0); $header_int++;
-	if (! $self->{no_pid_user} ){
+	$tb->set_column_style( $header_int, pad => 0 );
+	$header_int++;
+	if ( !$self->{no_pid_user} ) {
 		push( @headers, 'User' );
-		$tb->set_column_style($header_int, pad => 1); $header_int++;
+		$tb->set_column_style( $header_int, pad => 1 );
+		$header_int++;
 		push( @headers, 'PID' );
-		$tb->set_column_style($header_int, pad => 0); $header_int++;
+		$tb->set_column_style( $header_int, pad => 0 );
+		$header_int++;
 	}
 	push( @headers, 'Local Host' );
-	$tb->set_column_style($header_int, pad => 1, formats=>[[wrap => {ansi=>1, mb=>1}]]); $header_int++;
-	push( @headers, 'Port' );
-	$tb->set_column_style($header_int, pad => 0); $header_int++;
+	$tb->set_column_style( $header_int, pad => 1, formats => [ [ wrap => { ansi => 1, mb => 1 } ] ] );
+	$header_int++;
+	push( @headers, 'L Port' );
+	$tb->set_column_style( $header_int, pad => 0 );
+	$header_int++;
 	push( @headers, 'Remote Host' );
-	$tb->set_column_style($header_int, pad => 1, formats=>[[wrap => {ansi=>1, mb=>1}]]); $header_int++;
-	push( @headers, 'Prt' );
-	$tb->set_column_style($header_int, pad => 0); $header_int++;
+	$tb->set_column_style( $header_int, pad => 1, formats => [ [ wrap => { ansi => 1, mb => 1 } ] ] );
+	$header_int++;
+	push( @headers, 'R Port' );
+	$tb->set_column_style( $header_int, pad => 0 );
+	$header_int++;
 	push( @headers, 'State' );
-	$tb->set_column_style($header_int, pad => 1); $header_int++;
+	$tb->set_column_style( $header_int, pad => 1 );
+	$header_int++;
 
-	my $padding=0;
-	if ( $self->{wchan} ){
-		if (( $header_int % 2 ) != 0){
-			$padding=1;
+	my $padding = 0;
+	if ( $self->{wchan} ) {
+		if ( ( $header_int % 2 ) != 0 ) {
+			$padding = 1;
 		}
-	 	push( @headers, 'WChan' );
-		$tb->set_column_style($header_int, pad => $padding); $header_int++;
+		push( @headers, 'WChan' );
+		$tb->set_column_style( $header_int, pad => $padding );
+		$header_int++;
 	}
 
-	if ( $self->{pct} ){
-		if (( $header_int % 2 ) != 0){
-			$padding=1;
-		}else{
-			$padding=0;
+	if ( $self->{pct} ) {
+		if ( ( $header_int % 2 ) != 0 ) {
+			$padding = 1;
 		}
-	 	push( @headers, 'CPU%' );
-		$tb->set_column_style($header_int, pad => $padding); $header_int++;
-		if (( $header_int % 2 ) != 0){
-			$padding=1;
-		}else{
-			$padding=0;
+		else {
+			$padding = 0;
 		}
-	 	push( @headers, 'Mem%' );
-		$tb->set_column_style($header_int, pad => $padding); $header_int++;
-	 }
+		push( @headers, 'CPU%' );
+		$tb->set_column_style( $header_int, pad => $padding );
+		$header_int++;
+		if ( ( $header_int % 2 ) != 0 ) {
+			$padding = 1;
+		}
+		else {
+			$padding = 0;
+		}
+		push( @headers, 'Mem%' );
+		$tb->set_column_style( $header_int, pad => $padding );
+		$header_int++;
+	}
 
-	if ( $self->{command} ){
-		if (( $header_int % 2 ) != 0){
-			$padding=1;
-		}else{
-			$padding=0;
+	if ( $self->{command} ) {
+		if ( ( $header_int % 2 ) != 0 ) {
+			$padding = 1;
 		}
-	 	push( @headers, 'Command' );
-		$tb->set_column_style($header_int, pad => $padding, formats=>[[wrap => {ansi=>1, mb=>1}]]); $header_int++;
-	 }
+		else {
+			$padding = 0;
+		}
+		push( @headers, 'Command' );
+		$tb->set_column_style( $header_int, pad => $padding, formats => [ [ wrap => { ansi => 1, mb => 1 } ] ] );
+		$header_int++;
+	}
 
-	$tb->set_column_style(4, pad => 0);
-	$tb->set_column_style(5, pad => 1, formats=>[[wrap => {ansi=>1, mb=>1}]]);
-	$tb->set_column_style(6, pad => 0);
-	$tb->set_column_style(7, pad => 1);
-	$tb->set_column_style(8, pad => 0);
-	$tb->set_column_style(9, pad => 1);
-	$tb->set_column_style(10, pad => 0);
-	$tb->set_column_style(11, pad => 1, formats=>[[wrap => {ansi=>1, mb=>1}]]);
-	$tb->set_column_style(12, pad => 0);
-	$tb->set_column_style(13, pad => 1 );
+	$tb->set_column_style( 4,  pad => 0 );
+	$tb->set_column_style( 5,  pad => 1, formats => [ [ wrap => { ansi => 1, mb => 1 } ] ] );
+	$tb->set_column_style( 6,  pad => 0 );
+	$tb->set_column_style( 7,  pad => 1 );
+	$tb->set_column_style( 8,  pad => 0 );
+	$tb->set_column_style( 9,  pad => 1 );
+	$tb->set_column_style( 10, pad => 0 );
+	$tb->set_column_style( 11, pad => 1, formats => [ [ wrap => { ansi => 1, mb => 1 } ] ] );
+	$tb->set_column_style( 12, pad => 0 );
+	$tb->set_column_style( 13, pad => 1 );
 
 	$tb->columns( \@headers );
 
@@ -262,159 +291,167 @@ sub run{
 	my $ppt;
 	my $proctable;
 	my %cmd_cache;
-	if ( $self->{command} ){
-		$ppt=Proc::ProcessTable->new;
-		$proctable=$ppt->table;
+	if ( $self->{command} ) {
+		$ppt       = Proc::ProcessTable->new;
+		$proctable = $ppt->table;
 	}
 
 	my @td;
-	foreach my $conn ( @found ){
-		my @new_line=(
-					  color('bright_yellow').$conn->proto.color('reset'),
-					  );
+	foreach my $conn (@found) {
+		my @new_line = ( color('bright_yellow') . $conn->proto . color('reset'), );
 
 		# don't add the PID or user if requested to
-		if ( ! $self->{no_pid_user} ){
+		if ( !$self->{no_pid_user} ) {
+
 			# handle adding the username or UID if we have one
-			if ( defined( $conn->username ) ){
-				push( @new_line,  color('bright_cyan').$conn->username.color('reset'));
-			}else{
-				if ( defined( $conn->uid ) ){
-					push( @new_line,  color('bright_cyan').$conn->uid.color('reset'));
-				}else{
-					push( @new_line, '');
+			if ( defined( $conn->username ) ) {
+				push( @new_line, color('bright_cyan') . $conn->username . color('reset') );
+			}
+			else {
+				if ( defined( $conn->uid ) ) {
+					push( @new_line, color('bright_cyan') . $conn->uid . color('reset') );
+				}
+				else {
+					push( @new_line, '' );
 				}
 			}
 
 			# handle adding the PID if we have one
-			if ( defined( $conn->pid ) ){
-				push( @new_line,  color('bright_red').$conn->pid.color('reset'));
+			if ( defined( $conn->pid ) ) {
+				push( @new_line, color('bright_red') . $conn->pid . color('reset') );
 				$conn->pid;
-			}else{
-				push( @new_line, '');
+			}
+			else {
+				push( @new_line, '' );
 			}
 		}
 
 		# Figure out what we are using for the local host
 		my $local;
-		if ( defined( $conn->local_ptr ) && $self->{ptr} ){
-			$local=$conn->local_ptr;
-		}else{
-			$local=$conn->local_host;
+		if ( defined( $conn->local_ptr ) && $self->{ptr} ) {
+			$local = $conn->local_ptr;
+		}
+		else {
+			$local = $conn->local_host;
 		}
 
 		# Figure out what we are using for the foriegn host
 		my $foreign;
-		if ( defined( $conn->foreign_ptr ) && $self->{ptr} ){
-			$foreign=$conn->foreign_ptr;
-		}else{
-			$foreign=$conn->foreign_host;
+		if ( defined( $conn->foreign_ptr ) && $self->{ptr} ) {
+			$foreign = $conn->foreign_ptr;
+		}
+		else {
+			$foreign = $conn->foreign_host;
 		}
 
 		# Figure out what we are using for the local port
 		my $lport;
-		if ( defined( $conn->local_port_name ) ){
-			$lport=$conn->local_port_name;
-		}else{
-			$lport=$conn->local_port;
+		if ( defined( $conn->local_port_name ) ) {
+			$lport = $conn->local_port_name;
+		}
+		else {
+			$lport = $conn->local_port;
 		}
 
 		# Figure out what we are using for the foreign port
 		my $fport;
-		if ( defined( $conn->foreign_port_name ) ){
-			$fport=$conn->foreign_port_name;
-		}else{
-			$fport=$conn->foreign_port;
+		if ( defined( $conn->foreign_port_name ) ) {
+			$fport = $conn->foreign_port_name;
+		}
+		else {
+			$fport = $conn->foreign_port;
 		}
 
-		push(
-			 @new_line,
-			 color('bright_green').$local.color('reset'),
-			 color('green').$lport.color('reset'),
-			 color('bright_magenta').$foreign.color('reset'),
-			 color('magenta').$fport.color('reset'),
-			 color('bright_blue').$conn->state.color('reset'),
-			 );
+		push( @new_line,
+			color('bright_green') . $local . color('reset'),
+			color('green') . $lport . color('reset'),
+			color('bright_magenta') . $foreign . color('reset'),
+			color('magenta') . $fport . color('reset'),
+			color('bright_blue') . $conn->state . color('reset'),
+		);
 
 		# handle the wchan bit if needed
-		if (
-			$self->{wchan} &&
-			defined( $conn->wchan )
-			){
-			push( @new_line, color('bright_yellow').$conn->wchan.color('reset') );
+		if ( $self->{wchan}
+			&& defined( $conn->wchan ) )
+		{
+			push( @new_line, color('bright_yellow') . $conn->wchan . color('reset') );
 		}
 
 		# handle the percent stuff if needed
-		if (
-			$self->{pct} &&
-			defined( $conn->pctcpu )
-			){
-			push( @new_line, color('bright_cyan').sprintf('%.2f',$conn->pctcpu).color('reset') );
+		if ( $self->{pct}
+			&& defined( $conn->pctcpu ) )
+		{
+			push( @new_line, color('bright_cyan') . sprintf( '%.2f', $conn->pctcpu ) . color('reset') );
 		}
 
 		# handle the percent stuff if needed
-		if (
-			$self->{pct} &&
-			defined( $conn->pctmem )
-			){
-			push( @new_line, color('bright_green').sprintf('%.2f', $conn->pctmem).color('reset') );
+		if ( $self->{pct}
+			&& defined( $conn->pctmem ) )
+		{
+			push( @new_line, color('bright_green') . sprintf( '%.2f', $conn->pctmem ) . color('reset') );
 		}
 
 		# handle the command portion if needed
-		if (
-			defined( $conn->pid ) &&
-			$self->{command}
-			){
+		if ( defined( $conn->pid )
+			&& $self->{command} )
+		{
 
-			my $loop=1;
-			my $proc=0;
-			while (
-				   defined( $proctable->[ $proc ] ) &&
-				   $loop
-				   ){
+			my $loop = 1;
+			my $proc = 0;
+			while ( defined( $proctable->[$proc] )
+				&& $loop )
+			{
 				my $command;
-				if (defined( $cmd_cache{$conn->pid} ) ){
-					push( @new_line, color('bright_red').$cmd_cache{$conn->pid}.color('reset') );
-					$loop=0;
-				}elsif(
-					   defined( $conn->proc )
-					   ){
-					my $command=$conn->proc;
-					if ( ! $self->{command_long} ){
-						$command=~s/\ .*//;
+				if ( defined( $cmd_cache{ $conn->pid } ) ) {
+					push( @new_line, color('bright_red') . $cmd_cache{ $conn->pid } . color('reset') );
+					$loop = 0;
+				}
+				elsif ( defined( $conn->proc ) ) {
+					my $command = $conn->proc;
+					if ( !$self->{command_long} ) {
+						$command =~ s/\ .*//;
 					}
-					$cmd_cache{$conn->pid}=$command;
-					push( @new_line, color('bright_red').$cmd_cache{$conn->pid}.color('reset') );
-					$loop=0,
-				}elsif( $proctable->[ $proc ]->pid eq $conn->pid ){
-					if ( $proctable->[ $proc ]->{'cmndline'} =~ /^$/ ){
+					$cmd_cache{ $conn->pid } = $command;
+					push( @new_line, color('bright_red') . $cmd_cache{ $conn->pid } . color('reset') );
+					$loop = 0,;
+				}
+				elsif ( $proctable->[$proc]->pid eq $conn->pid ) {
+					if ( $proctable->[$proc]->{'cmndline'} =~ /^$/ ) {
+
 						#kernel process
-						$cmd_cache{$conn->pid}=color('bright_red').'['.$proctable->[ $proc ]->{'fname'}.']'.color('reset');
-					}elsif( $self->{command_long} ){
-						$cmd_cache{$conn->pid}=color('bright_red').$proctable->[ $proc ]->{'cmndline'}.color('reset');
-					}elsif( $proctable->[ $proc ]->{'cmndline'} =~ /^\//){
+						$cmd_cache{ $conn->pid }
+							= color('bright_red') . '[' . $proctable->[$proc]->{'fname'} . ']' . color('reset');
+					}
+					elsif ( $self->{command_long} ) {
+						$cmd_cache{ $conn->pid }
+							= color('bright_red') . $proctable->[$proc]->{'cmndline'} . color('reset');
+					}
+					elsif ( $proctable->[$proc]->{'cmndline'} =~ /^\// ) {
+
 						# something ran with a complete path
-						$cmd_cache{$conn->pid}=color('bright_red').$proctable->[ $proc ]->{'fname'}.color('reset');
-					}else{
+						$cmd_cache{ $conn->pid }
+							= color('bright_red') . $proctable->[$proc]->{'fname'} . color('reset');
+					}
+					else {
 						# likely a thread or the like... such as dovecot/auth
 						# just trunkcat everything after the space
-						my $cmd=$proctable->[ $proc ]->{'cmndline'};
-						$cmd=~s/\ +.*//g;
-						$cmd_cache{$conn->pid}=color('bright_red').$cmd.color('reset');
+						my $cmd = $proctable->[$proc]->{'cmndline'};
+						$cmd =~ s/\ +.*//g;
+						$cmd_cache{ $conn->pid } = color('bright_red') . $cmd . color('reset');
 					}
 
-					push( @new_line, $cmd_cache{$conn->pid} );
-					$loop=0;
+					push( @new_line, $cmd_cache{ $conn->pid } );
+					$loop = 0;
 				}
 
 				$proc++;
 			}
 
-		}elsif(
-			   ( !defined( $conn->pid ) ) &&
-			   $self->{command}
-			   ){
-			push( @new_line, '');
+		}
+		elsif ( ( !defined( $conn->pid ) )
+			&& $self->{command} )
+		{
+			push( @new_line, '' );
 		}
 
 		$tb->add_row( \@new_line );

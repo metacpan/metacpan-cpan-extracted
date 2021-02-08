@@ -22,7 +22,7 @@ my $config = 't/Config.pm';
 
 unless ( -f $config && Module::Build->prompt("$config exists, use it?", "Y") =~ /^y/i ) {
   # select drivers to test
-  my @drivers = qw/mysql mSQL Pg/;
+  my @drivers = grep eval "require DBD::$_; 1;", qw/mysql mSQL Pg/;
   my $drivers = Module::Build->prompt("Enter (space seperated) DBI drivers to test:", join(" ", @drivers));
   @drivers = split /\s/,$drivers;
   $test_db = 'test';
@@ -284,7 +284,7 @@ CREATE TABLE c_table (
 
 my $build = Module::Build->new(
     dist_name       => "DbFramework",
-    dist_version    => "1.12",
+    dist_version    => "1.13",
     dist_abstract   => "Classes for Manipulating DBI Databases, Based on the CDIF Data Model Subject Area",
     dist_author     => "imacat <imacat\@mail.imacat.idv.tw>",
     license         => "perl",
@@ -302,6 +302,21 @@ my $build = Module::Build->new(
         "Module::Signature"	=> 0,
     },
     add_to_cleanup	=> [ "t/Config.pm", "TAGS" ],
+
+    meta_merge  => {
+        "meta-spec" => { version => 2 },
+        resources   => {
+            homepage    => "https://metacpan.org/release/DbFramework",
+            repository  => {
+                type    => "git",
+                url     => "git://github.com/imacat/DbFramework.git",
+                web     => "https://github.com/imacat/DbFramework",
+            },
+            bugtracker  => {
+                "web"   => "https://github.com/imacat/DbFramework/issues"
+            }
+        },
+    },
 );
 
 $build->create_build_script;

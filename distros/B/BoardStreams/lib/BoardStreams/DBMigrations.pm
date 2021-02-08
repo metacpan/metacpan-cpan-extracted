@@ -2,7 +2,7 @@ package BoardStreams::DBMigrations;
 
 use Mojo::Base -strict, -signatures;
 
-our $VERSION = "v0.0.9";
+our $VERSION = "v0.0.11";
 
 my $string = <<'SQL';
 -- 1 up
@@ -53,6 +53,13 @@ CREATE TABLE IF NOT EXISTS "guards" (
 DROP TABLE "guards";
 DROP TABLE "event_patch";
 DROP TABLE "channel";
+
+-- 2 up
+ALTER TABLE "channel" ADD COLUMN keep_events BOOLEAN NOT NULL DEFAULT true;
+
+-- 2 down
+ALTER TABLE "channel" DROP COLUMN keep_events;
+
 SQL
 
 sub apply_migrations ($class, $pg) {

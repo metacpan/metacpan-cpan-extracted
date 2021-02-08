@@ -41,7 +41,7 @@ has verbose =>
 	required => 0,
 );
 
-our $VERSION = '2.10';
+our $VERSION = '2.11';
 
 # -----------------------------------------------
 
@@ -857,15 +857,21 @@ L<DBIx::Admin::TableInfo>.
 
 Version numbers < 1.00 represent development versions. From 1.00 up, they are production versions.
 
+=head1 Repository
+
+L<https://github.com/ronsavage/DBIx-Admin-CreateTable>
+
 =head1 Support
 
-Log a bug on RT: L<https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Admin-CreateTable>.
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/DBIx-Admin-CreateTable/issues>
 
 =head1 Author
 
 C<DBIx::Admin::CreateTable> was written by Ron Savage I<E<lt>ron@savage.net.auE<gt>> in 2006.
 
-Home page: http://savage.net.au/index.html
+L<http://savage.net.au/>
 
 =head1 Copyright
 

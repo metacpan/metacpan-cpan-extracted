@@ -1,5 +1,12 @@
 Revision history for perl distribution LinkEmbedder
 
+1.17 2021-02-03T10:35:43+0900
+ - Add support for https://www.webex.com/
+ - Add support for https://meet.google.com/
+ - Add "le-video-chat" class to video chat resources
+ - Removed embed support for Instagram, since it does not work without a key
+ - Renamed "AppearIn" to "Whereby"
+
 1.16 2021-01-05T08:15:56+0900
  - Fix handling pastebin with child nodes
 

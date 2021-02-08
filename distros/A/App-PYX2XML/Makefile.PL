@@ -22,8 +22,7 @@ requires 'PYX::SGML::Tags' => 0.02;
 requires 'Tags::Output::Indent' => 0.04;
 requires 'Tags::Output::Raw' => 0.04;
 requires 'perl' => '5.6.2';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=App-PYX2XML';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-PYX2XML/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-PYX2XML';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-PYX2XML';
 test_requires 'English' => 0;
@@ -34,7 +33,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 tests_recursive;
-version '0.04';
+version '0.06';
 
 # Run.
 WriteAll();

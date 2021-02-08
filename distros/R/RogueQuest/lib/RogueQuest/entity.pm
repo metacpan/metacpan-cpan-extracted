@@ -24,32 +24,32 @@ sub update {
 }
 
 sub blit {
-	my ($self, $screen_surface) = shift;
+	my ($self, $roomx, $roomy, $screen_surface) = shift;
 	my $image = $self->{imagestates}->get;
 
-	SDL::Video::blit_surface( $image, SDL::Rect->new($self->{x}, $self->{y}, $image->w, $image->h), 	$screen_surface,  SDL::Rect->new($self->{x}, $self->{y}, $screen_surface->w,  $screen_surface->h) ); 
-	SDL::Video::update_rect( $screen_surface, $x, $y, $screen_width, $screen_height );
+	SDL::Video::blit_surface( $image, SDL::Rect->new($self->{x}+$roomx, $self->{y}+$roomy, $image->w, $image->h), 	$screen_surface,  SDL::Rect->new($self->{x}+$roomx, $self->{y}+$roomy, $screen_surface->w,  $screen_surface->h) ); 
+	SDL::Video::update_rect( $screen_surface, $self->{x}+$roomx, $self->{y}+$roomy, $screen_width, $screen_height );
 }
 
-sub moveleft {
+sub move_left {
 	my ($self) = shift;
 
 	$self->{x}--;
 }
 
-sub moveright {
+sub move_right {
 	my ($self) = shift;
 
 	$self->{x}++;
 }
 
-sub moveup {
+sub move_up {
 	my ($self) = shift;
 
 	$self->{y}--;
 }
 
-sub movedown {
+sub move_down {
 	my ($self) = shift;
 
 	$self->{y}++;

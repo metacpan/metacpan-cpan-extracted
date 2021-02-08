@@ -356,7 +356,7 @@ sub create {
       or $ug->logconfess("create(): failed to open unigrams database: $!");
 
   env_push(LC_ALL=>'C');
-  my $cmdfh = opencmd("sort -nk1 -nk2 ".sortJobs()." $datfile | uniq -c |")
+  my $cmdfh = opencmd(sortCmd()." -nk1 -nk2 $datfile | uniq -c |")
     or $ug->logconfess("create(): failed to open pipe from sort: $!");
   $ug->loadTextFh($cmdfh)
     or $ug->logconfess("create(): failed to load unigram data: $!");
@@ -412,7 +412,7 @@ sub union {
   ##-- stage2: sort & load tempfile
   env_push(LC_ALL=>'C');
   $ug->vlog('trace', "union(): stage2: load unigram frequencies");
-  my $sortfh = opencmd("sort -n -k2 -k3 ".sortJobs()." $tmpfile |")
+  my $sortfh = opencmd(sortCmd()." -n -k2 -k3 $tmpfile |")
     or $ug->logconfess("union(): open failed for pipe from sort: $!");
   binmode($sortfh,':raw');
   $ug->loadTextFh($sortfh)

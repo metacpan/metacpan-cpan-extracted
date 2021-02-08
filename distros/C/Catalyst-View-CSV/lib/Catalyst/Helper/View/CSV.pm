@@ -3,7 +3,7 @@ package Catalyst::Helper::View::CSV;
 use strict;
 use warnings;
 
-our $VERSION = "1.6";
+our $VERSION = "1.8";
 
 =head1 NAME
 

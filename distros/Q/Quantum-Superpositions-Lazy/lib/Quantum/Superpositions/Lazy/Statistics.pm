@@ -1,26 +1,23 @@
 package Quantum::Superpositions::Lazy::Statistics;
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
-use v5.28;
+use v5.24;
 use warnings;
 use Moo;
-
-use feature qw(signatures);
-no warnings qw(experimental::signatures);
-
 use Quantum::Superpositions::Lazy::Role::Collapsible;
 use Quantum::Superpositions::Lazy::State;
 use Types::Standard qw(ArrayRef ConsumerOf InstanceOf);
 use Sort::Key qw(keysort nkeysort);
-use List::Util qw(sum);
+use List::Util qw(sum0);
 
 # This approximation should be well within the range of 32 bit
 # floating point values - 6 digits (IEEE 754)
 use constant HALF_APPROX => "0.500000";
 
-sub transform_states ($items, $transformer)
+sub transform_states
 {
+	my ($items, $transformer) = @_;
 	my @transformed = map {
 		$_->clone_with(value => $transformer)
 	} @$items;
@@ -28,29 +25,39 @@ sub transform_states ($items, $transformer)
 	return \@transformed;
 }
 
-sub weight_to_probability ($item, $weight_sum)
+sub weight_to_probability
 {
+	my ($item, $weight_sum) = @_;
 	return $item->clone_with(
-		weight => sub ($weight) { $weight / $weight_sum }
+		weight => sub { shift() / $weight_sum }
 	) if defined $item;
 
 	return $item;
 }
 
-sub weighted_mean ($list_ref, $weight_sum = undef)
+sub weighted_mean
 {
-	$weight_sum = sum map { $_->weight }
+	my ($list_ref, $weight_sum) = @_;
+	$weight_sum = sum0 map { $_->weight }
 	$list_ref->@*
 		unless defined $weight_sum;
 
-	my @values = map { $_->value * $_->weight / $weight_sum } $list_ref->@*;
-	return sum @values;
+	if ($weight_sum > 0) {
+		my @values = map { $_->value * $_->weight / $weight_sum } $list_ref->@*;
+		return sum0 @values;
+	}
+	return undef;
 }
 
 # The sorting order is irrelevant here
-sub weighted_median ($sorted_list_ref, $average = 0)
+sub weighted_median
 {
-	my $approx_half = sub ($value) {
+	my ($sorted_list_ref, $average) = @_;
+	$average //= 0;
+
+	my $approx_half = sub {
+		my ($value) = @_;
+
 		return HALF_APPROX eq substr(($value . (0 x length HALF_APPROX)), 0, length HALF_APPROX);
 	};
 
@@ -58,7 +65,7 @@ sub weighted_median ($sorted_list_ref, $average = 0)
 	my $last_el;
 	my @found;
 
-	for my $el ($sorted_list_ref->@*) {
+	for my $el (@{$sorted_list_ref}) {
 		$running_sum += $el->weight;
 
 		if ($running_sum > 0.5) {
@@ -84,8 +91,9 @@ sub weighted_median ($sorted_list_ref, $average = 0)
 
 # CAUTION: float == comparison inside. Will only work for elements
 # that were obtained in a similar fasion
-sub find_border_elements ($sorted)
+sub find_border_elements
 {
+	my ($sorted) = @_;
 	my @found;
 	for my $state (@$sorted) {
 		push @found, $state
@@ -115,7 +123,9 @@ has "parent" => (
 has "sorted_by_probability" => (
 	%options,
 	isa => ArrayRef [InstanceOf ["Quantum::Superpositions::Lazy::State"]],
-	default => sub ($self) {
+	default => sub {
+		my ($self) = @_;
+
 		[
 			map {
 				weight_to_probability($_, $self->parent->weight_sum)
@@ -124,7 +134,7 @@ has "sorted_by_probability" => (
 				$_->weight
 			}
 			$self->parent->states->@*
-		]
+		];
 	},
 );
 
@@ -133,22 +143,26 @@ has "sorted_by_probability" => (
 has "sorted_by_value_str" => (
 	%options,
 	isa => ArrayRef [InstanceOf ["Quantum::Superpositions::Lazy::State"]],
-	default => sub ($self) {
+	default => sub {
+		my ($self) = @_;
+
 		[
 			keysort { $_->value }
 			$self->sorted_by_probability->@*
-		]
+		];
 	},
 );
 
 has "sorted_by_value_num" => (
 	%options,
 	isa => ArrayRef [InstanceOf ["Quantum::Superpositions::Lazy::State"]],
-	default => sub ($self) {
+	default => sub {
+		my ($self) = @_;
+
 		[
 			nkeysort { $_->value }
 			$self->sorted_by_probability->@*
-		]
+		];
 	},
 );
 
@@ -156,7 +170,9 @@ has "sorted_by_value_num" => (
 has "most_probable" => (
 	%options,
 	isa => InstanceOf ["Quantum::Superpositions::Lazy::Superposition"],
-	default => sub ($self) {
+	default => sub {
+		my ($self) = @_;
+
 		my @sorted = reverse $self->sorted_by_probability->@*;
 		return Quantum::Superpositions::Lazy::Superposition->new(
 			states => find_border_elements(\@sorted)
@@ -167,7 +183,9 @@ has "most_probable" => (
 has "least_probable" => (
 	%options,
 	isa => InstanceOf ["Quantum::Superpositions::Lazy::Superposition"],
-	default => sub ($self) {
+	default => sub {
+		my ($self) = @_;
+
 		my $sorted = $self->sorted_by_probability;
 		return Quantum::Superpositions::Lazy::Superposition->new(
 			states => find_border_elements($sorted)
@@ -177,21 +195,26 @@ has "least_probable" => (
 
 has "median_str" => (
 	%options,
-	default => sub ($self) {
+	default => sub {
+		my ($self) = @_;
+
 		weighted_median($self->sorted_by_value_str);
 	},
 );
 
 has "median_num" => (
 	%options,
-	default => sub ($self) {
+	default => sub {
+		my ($self) = @_;
+
 		weighted_median($self->sorted_by_value_num, 1);
 	},
 );
 
 has "mean" => (
 	%options,
-	default => sub ($self) {
+	default => sub {
+		my ($self) = @_;
 
 		# since the mean won't return a state, we're free not
 		# to make copies of the states.
@@ -201,7 +224,8 @@ has "mean" => (
 
 has "variance" => (
 	%options,
-	default => sub ($self) {
+	default => sub {
+		my ($self) = @_;
 
 		# transform_states is required here so that we don't modify existing states
 		weighted_mean(
@@ -213,23 +237,27 @@ has "variance" => (
 	},
 );
 
-sub sorted_by_value ($self)
+sub sorted_by_value
 {
+	my ($self) = @_;
 	return $self->sorted_by_value_str;
 }
 
-sub median ($self)
+sub median
 {
+	my ($self) = @_;
 	return $self->median_str;
 }
 
-sub expected_value ($self)
+sub expected_value
 {
+	my ($self) = @_;
 	return $self->mean;
 }
 
-sub standard_deviation ($self)
+sub standard_deviation
 {
+	my ($self) = @_;
 	return sqrt $self->variance;
 }
 

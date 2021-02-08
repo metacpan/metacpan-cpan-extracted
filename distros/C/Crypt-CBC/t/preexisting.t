@@ -1,17 +1,19 @@
 #!/usr/local/bin/perl -Tw
 
 use strict;
-use lib '..','../blib/lib','.','./blib/lib';
+use lib './lib','./blib/lib';
 
 my (@mods,$cipherclass,$i,$c,$p,$test_data);
 
-@mods = qw/Eksblowfish
-	   Rijndael
-           Blowfish
-           Blowfish_PP
-           IDEA
-           DES
-          /;
+@mods = qw/
+    Cipher::AES
+    Eksblowfish
+    Rijndael
+    Blowfish
+    Blowfish_PP
+    IDEA
+    DES
+    /;
 
 for my $mod (@mods) {
   if (eval "use Crypt::$mod(); 1") {
@@ -26,7 +28,7 @@ unless ($cipherclass) {
     exit;
 }
 
-print "1..33\n";
+print "1..34\n";
 
 sub test {
     local($^W) = 0;
@@ -76,3 +78,15 @@ test (32,$i->decrypt($i->encrypt($test_data)) eq $test_data);
 
 $test_data = "This string ends in some spaces  ";
 test (33,$i->decrypt($i->encrypt($test_data)) eq $test_data);
+
+# test that we can change the hasher
+if (eval "use Crypt::PBKDF2::Hash::HMACSHA1; 1") {
+    my $hasher = Crypt::PBKDF2::Hash::HMACSHA1->new;
+    $i = Crypt::CBC->new(-cipher     => $cipher,
+			 -hasher     => $hasher);
+    test(34,$i->decrypt($i->encrypt($test_data)) eq $test_data);
+} else {
+    print "ok 34 # skip Crypt::PBKDF2::Hash::HMACSHA1 not found\n";
+}
+
+		    

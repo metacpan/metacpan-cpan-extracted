@@ -52,6 +52,7 @@ subtest 'types' => sub {
     }
 
     isa_ok $obj->users->profile, 'WebService::Slack::WebApi::Users::Profile';
+    isa_ok $obj->oauth->v2, 'WebService::Slack::WebApi::Oauth::V2';
 };
 
 subtest 'opts' => sub {

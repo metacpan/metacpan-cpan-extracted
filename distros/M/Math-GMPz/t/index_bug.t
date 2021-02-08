@@ -7,9 +7,9 @@
 use strict;
 use warnings;
 use Config;
-use Math::GMPz qw(:mpz);
+use Math::GMPz qw(:mpz __GNU_MP_VERSION);
 
-if($Config{longsize} < $Config{ivsize} && 6 >= Math::GMPz::__GNU_MP_VERSION) {
+if($Config{longsize} < $Config{ivsize} && __GNU_MP_VERSION < 7) {
 
   print "1..7\n";
 
@@ -23,7 +23,7 @@ if($Config{longsize} < $Config{ivsize} && 6 >= Math::GMPz::__GNU_MP_VERSION) {
 
   eval{my $bit = Rmpz_tstbit($z, 4294967296);};
 
-  if($@ =~ /is greater than maximum allowed value \(4294967295\)/) {print "ok 2\n"}
+  if($@ =~ /Magnitude of UV argument overflows mp_bitcnt_t/) {print "ok 2\n"}
   else {
     warn "\n \$\@: $@\n";
     print "not ok 2\n";
@@ -31,7 +31,7 @@ if($Config{longsize} < $Config{ivsize} && 6 >= Math::GMPz::__GNU_MP_VERSION) {
 
   eval{my $bit = Rmpz_scan0($z, 4294967296);};
 
-  if($@ =~ /is greater than maximum allowed value \(4294967295\)/) {print "ok 3\n"}
+  if($@ =~ /Magnitude of UV argument overflows mp_bitcnt_t/) {print "ok 3\n"}
   else {
     warn "\n \$\@: $@\n";
     print "not ok 3\n";
@@ -39,7 +39,7 @@ if($Config{longsize} < $Config{ivsize} && 6 >= Math::GMPz::__GNU_MP_VERSION) {
 
   eval{my $bit = Rmpz_scan1($z, 4294967296);};
 
-  if($@ =~ /is greater than maximum allowed value \(4294967295\)/) {print "ok 4\n"}
+  if($@ =~ /Magnitude of UV argument overflows mp_bitcnt_t/) {print "ok 4\n"}
   else {
     warn "\n \$\@: $@\n";
     print "not ok 4\n";
@@ -47,7 +47,7 @@ if($Config{longsize} < $Config{ivsize} && 6 >= Math::GMPz::__GNU_MP_VERSION) {
 
   eval{Rmpz_setbit($z, 4294967296);};
 
-  if($@ =~ /is greater than maximum allowed value \(4294967295\)/) {print "ok 5\n"}
+  if($@ =~ /Magnitude of UV argument overflows mp_bitcnt_t/) {print "ok 5\n"}
   else {
     warn "\n \$\@: $@\n";
     print "not ok 5\n";
@@ -55,7 +55,7 @@ if($Config{longsize} < $Config{ivsize} && 6 >= Math::GMPz::__GNU_MP_VERSION) {
 
   eval{Rmpz_clrbit($z, 4294967296);};
 
-  if($@ =~ /is greater than maximum allowed value \(4294967295\)/) {print "ok 6\n"}
+  if($@ =~ /Magnitude of UV argument overflows mp_bitcnt_t/) {print "ok 6\n"}
   else {
     warn "\n \$\@: $@\n";
     print "not ok 6\n";
@@ -63,7 +63,7 @@ if($Config{longsize} < $Config{ivsize} && 6 >= Math::GMPz::__GNU_MP_VERSION) {
 
   eval{Rmpz_combit($z, 4294967296);};
 
-  if($@ =~ /is greater than maximum allowed value \(4294967295\)/) {print "ok 7\n"}
+  if($@ =~ /Magnitude of UV argument overflows mp_bitcnt_t/) {print "ok 7\n"}
   else {
     warn "\n \$\@: $@\n";
     print "not ok 7\n";

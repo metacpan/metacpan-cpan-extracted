@@ -382,7 +382,7 @@ sub create {
     ##-- filter: by attribute frequency: populate $ac->{i2j} and update $ac->{s2i}
     env_push(LC_ALL=>'C');
     my $ai1   = $ac->{i}+1;
-    my $cmdfh = opencmd("sort -nk$ai1 $atokfile ".sortJobs()." | cut -d\" \" -f $ai1 | uniq -c |")
+    my $cmdfh = opencmd(sortCmd()." -nk$ai1 $atokfile | cut -d\" \" -f $ai1 | uniq -c |")
       or $coldb->logconfess("create(): failed to open pipe from sort for attribute frequency filter (fmin_$ac->{a}=$afmin)");
     my ($f,$i);
     my $nj   = 0;
@@ -427,7 +427,7 @@ sub create {
     my ($f);
     env_push(LC_ALL=>'C');
     my $cmdfh =
-      opencmd("sort ".join(' ', map {"-nk$_"} (1..$na))." ".sortJobs()." $atokfile | cut -d\" \" -f -$na | uniq -c |")
+      opencmd("sort ".join(' ', map {"-nk$_"} (1..$na))." $atokfile | cut -d\" \" -f -$na | uniq -c |")
       or $coldb->logconfess("create(): failed to open pipe from sort for global term filter");
   FILTER_WTUPLES:
     while (defined($_=<$cmdfh>)) {

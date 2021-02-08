@@ -1,5 +1,20 @@
 Revision history for Perl extension Quantum::Superpositions::Lazy.
 
+1.07 Thu Feb 4 2021
+	- Fix fetch_matches to honor reduction strategies
+	- Add Q::S::L::Superposition->compare (custom comparisons)
+	- Allow for zero weights and fix problems with rand range
+	- Add Manual::Comparisons
+	- Fix dependencies
+
+1.06 Wed Feb 3 2021
+	- Remove experimental Perl features from the module
+	- Reduce version requirement to 5.24
+	- Add Q::S::L alias
+	- Replace Data::Entropy dependency with Random::Any
+	- Add :all tag to export
+	- Remove deprecated packages
+
 1.05 Tue Jan 19 2021
 	- add collapse function to Q::S::L
 	- remove superpos function from export when use argument is specified (minor breakage)

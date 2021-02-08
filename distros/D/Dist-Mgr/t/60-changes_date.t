@@ -12,6 +12,8 @@ use version;
 use lib 't/lib';
 use Helper qw(:all);
 
+check_skip();
+
 my $cwd = getcwd();
 like $cwd, _dist_dir_re(), "in root dir ok";
 die "not in the root dir" if $cwd !~ _dist_dir_re();

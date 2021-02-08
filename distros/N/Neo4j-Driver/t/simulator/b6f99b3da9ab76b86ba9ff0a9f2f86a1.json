@@ -1,6 +1,0 @@
-{
-  "errors" : [ {
-    "code" : "Neo.ClientError.Security.Unauthorized",
-    "message" : "Invalid username or password."
-  } ]
-}

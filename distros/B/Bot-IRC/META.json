@@ -86,7 +86,7 @@
          "web" : "https://github.com/gryphonshafer/Bot-IRC"
       }
    },
-   "version" : "1.32",
+   "version" : "1.35",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-2.0"

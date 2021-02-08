@@ -302,33 +302,19 @@ sub css {
 @page { margin: 5pt; }
 [% END %]
 
-[% IF webfonts %]
-
+[% IF epub_embed_fonts %]
+  [% FOREACH family IN fonts.families %]
+     [% IF family.has_files %]
+       [% FOREACH ff IN family.font_files %]
 @font-face {
-  font-family: "[% webfonts.family %]";
-  font-weight: normal;
-  font-style: normal;
-  src: url("[% webfonts.regular %]") format("[% webfonts.format %]");
+  font-family: "[% family.name %]";
+  font-weight: [% ff.css_font_weight %];
+  font-style:  [% ff.css_font_style %];
+  src: url("[% ff.basename %]") format("[% ff.format %]");
 }
-@font-face {
-  font-family: "[% webfonts.family %]";
-  font-weight: normal;
-  font-style: italic;
-  src: url("[% webfonts.italic %]") format("[% webfonts.format %]");
-}
-@font-face {
-  font-family: "[% webfonts.family %]";
-  font-weight: bold;
-  font-style: normal;
-  src: url("[% webfonts.bold %]") format("[% webfonts.format %]");
-}
-@font-face {
-  font-family: "[% webfonts.family %]";
-  font-weight: bold;
-  font-style: italic;
-  src: url("[% webfonts.bolditalic %]") format("[% webfonts.format %]");
-}
-
+       [% END %]
+     [% END %]
+  [% END %]
 [% END %]
 
 html,body {
@@ -387,6 +373,14 @@ div#page {
    padding:20px;
 }
 [% END %]
+
+.muse-sc {
+   font-variant: small-caps;
+}
+
+.muse-sf {
+   font-family: [% IF fonts %]"[% fonts.sans.name %]",[% END %]Helvetica,Arial, sans-serif;
+}
 
 pre, code {
     font-family: [% IF fonts %]"[% fonts.mono.name %]",[% END %]Consolas, courier, monospace;

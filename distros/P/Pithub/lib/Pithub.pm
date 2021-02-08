@@ -1,6 +1,6 @@
 package Pithub;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 API
 
 use Moo;
@@ -14,7 +14,7 @@ use Pithub::Repos;
 use Pithub::Search;
 use Pithub::SearchV3;
 use Pithub::Users;
-use Carp 'croak';
+use Carp qw( croak );
 extends 'Pithub::Base';
 
 
@@ -112,7 +112,7 @@ Pithub - Github v3 API
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 SYNOPSIS
 
@@ -507,6 +507,16 @@ See also: L<http://developer.github.com/v3/pulls/comments/>
     my $comments = Pithub->new->pull_requests->comments;
     my $comments = Pithub::PullRequests->new->comments;
     my $comments = Pithub::PullRequests::Comments->new;
+
+=item *
+
+L<Pithub::PullRequests::Reviewers>
+
+See also: L<https://docs.github.com/en/rest/reference/pulls#review-requests>
+
+    my $reviewers = Pithub->new->pull_requests->reviewers;
+    my $reviewers = Pithub::PullRequests->new->reviewers;
+    my $reviewers = Pithub::PullRequests::Reviewers->new;
 
 =back
 

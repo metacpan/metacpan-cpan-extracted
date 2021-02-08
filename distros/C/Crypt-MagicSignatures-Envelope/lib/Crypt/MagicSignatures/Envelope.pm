@@ -1,15 +1,15 @@
 package Crypt::MagicSignatures::Envelope;
+use Crypt::MagicSignatures::Key qw/b64url_encode b64url_decode/;
+use Carp 'carp';
 use strict;
 use warnings;
-use Carp 'carp';
-use Crypt::MagicSignatures::Key qw/b64url_encode b64url_decode/;
 use Mojo::DOM;
 use Mojo::JSON qw/encode_json decode_json/;
 use Mojo::Util qw/trim/;
 
 use v5.10.1;
 
-our $VERSION = '0.10';
+our $VERSION = '0.15';
 
 our @CARP_NOT;
 
@@ -25,39 +25,47 @@ sub new {
   my $self;
 
   # Bless object with parameters
-  if (@_ > 1 && !(@_ % 2)) {
+  if (@_ > 1) {
 
-    my %self = @_;
+    if (@_ % 2) {
+      carp 'Wrong number of arguments';
+      return;
+    };
+
+    my %param = @_;
 
     # Given algorithm is wrong
-    if ($self{alg} &&
-	  uc $self{alg} ne 'RSA-SHA256') {
-      carp 'Algorithm is not supported' and return;
+    if ($param{alg} &&
+          uc($param{alg}) ne 'RSA-SHA256') {
+      carp 'Algorithm is not supported';
+      return;
     };
 
     # Given encoding is wrong
-    if ($self{encoding} &&
-	  lc $self{encoding} ne 'base64url') {
-      carp 'Encoding is not supported' and return;
+    if ($param{encoding} &&
+          lc($param{encoding}) ne 'base64url') {
+      carp 'Encoding is not supported';
+      return;
     };
 
     # No payload is given
-    unless (defined $self{data}) {
-      carp 'No data payload defined' and return;
+    unless (defined $param{data}) {
+      carp 'No data payload defined';
+      return;
     };
 
     # Create object
     $self = bless {}, $class;
 
     # Set data
-    $self->data( delete $self{data} );
+    $self->data( delete $param{data} ) if $param{data};
 
     # Set data type if defined
-    $self->data_type( delete $self{data_type} )
-      if $self{data_type};
+    $self->data_type( delete $param{data_type} )
+      if $param{data_type};
 
     # Append all defined signatures
-    foreach ( @{$self{sigs}} ) {
+    foreach ( @{$param{sigs}} ) {
 
       # No value is given
       next unless $_->{value};
@@ -76,10 +84,15 @@ sub new {
 
   # Envelope is defined as a string
   else {
-    my $string = trim shift;
+    my $string = shift;
 
     # Construct object
     $self = bless { sigs => [] }, $class;
+
+    # Create empty object
+    return $self unless $string;
+
+    $string = trim $string;
 
     # Message is me-xml
     if (index($string, '<') == 0) {
@@ -92,13 +105,19 @@ sub new {
       $env = $dom->at('provenance') unless $env;
 
       # Envelope doesn't exist or is in wrong namespace
-      return if !$env || $env->namespace ne $ME_NS;
+      if (!$env || $env->namespace ne $ME_NS) {
+        carp 'Invalid envelope data';
+        return;
+      };
 
       # Retrieve and edit data
       my $data = $env->at('data');
 
       # The envelope is empty
-      return unless $data;
+      unless (defined $data) {
+        carp 'No data payload defined';
+        return;
+      };
 
       my $temp;
 
@@ -108,35 +127,39 @@ sub new {
       # Add decoded data
       $self->data( b64url_decode( $data->text ) );
 
-      # Envelope is empty
-      return unless $self->data;
+      # The envelope is empty
+      unless ($self->data) {
+        carp 'No data payload defined';
+        return;
+      };
 
       # Check algorithm
       if (($temp = $env->at('alg')) &&
-	    (uc $temp->text ne 'RSA-SHA256')) {
-	carp 'Algorithm is not supported' and return;
+            (uc $temp->text ne 'RSA-SHA256')) {
+        carp 'Algorithm is not supported';
+        return;
       };
 
       # Check encoding
       if (($temp = $env->at('encoding')) &&
-	    (lc $temp->text ne 'base64url')) {
-	carp 'Encoding is not supported' and return;
+            (lc $temp->text ne 'base64url')) {
+        carp 'Encoding is not supported' and return;
       };
 
       # Find signatures
       $env->find('sig')->each(
-	sub {
-	  my $sig_text = $_->text or return;
+        sub {
+          my $sig_text = $_->text or return;
 
-	  my %sig = ( value => _trim_all $sig_text );
+          my %sig = ( value => _trim_all $sig_text );
 
-	  if ($temp = $_->attr->{key_id}) {
-	    $sig{key_id} = $temp;
-	  };
+          if ($temp = $_->attr->{key_id}) {
+            $sig{key_id} = $temp;
+          };
 
-	  # Add sig to array
-	  push( @{ $self->{sigs} }, \%sig );
-	});
+          # Add sig to array
+          push( @{ $self->{sigs} }, \%sig );
+        });
     }
 
     # Message is me-json
@@ -147,12 +170,12 @@ sub new {
       $env = decode_json $string;
 
       unless (defined $env) {
-	return;
+        return;
       };
 
       # Clone datastructure
       foreach (qw/data data_type encoding alg sigs/) {
-	$self->{$_} = delete $env->{$_} if exists $env->{$_};
+        $self->{$_} = delete $env->{$_} if exists $env->{$_};
       };
 
       $self->data( b64url_decode( $self->data ));
@@ -162,7 +185,7 @@ sub new {
 
       # Unknown parameters
       carp 'Unknown parameters: ' . join(',', %$env)
-	if keys %$env;
+        if keys %$env;
     }
 
     # Message is me as a compact string
@@ -171,30 +194,36 @@ sub new {
       # Parse me compact string
       my $value = [];
       foreach (@$value = split(/\./, $me_c) ) {
-	$_ = b64url_decode( $_ ) if $_;
+        $_ = b64url_decode( $_ ) if $_;
       };
 
       # Given encoding is wrong
       unless (lc $value->[4] eq 'base64url') {
-	carp 'Encoding is not supported' and return;
+        carp 'Encoding is not supported' and return;
       };
 
       # Given algorithm is wrong
       unless (uc $value->[5] eq 'RSA-SHA256') {
-	carp 'Algorithm is not supported' and return;
+        carp 'Algorithm is not supported' and return;
       };
 
       # Store sig to data structure
       for ($self->{sigs}->[0]) {
-	next unless $value->[1];
-	$_->{key_id} = $value->[0] if defined $value->[0];
-	$_->{value}  = $value->[1];
+        next unless $value->[1];
+        $_->{key_id} = $value->[0] if defined $value->[0];
+        $_->{value}  = $value->[1];
       };
 
       # ME is empty
       return unless $value->[2];
       $self->data( $value->[2] );
       $self->data_type( $value->[3] ) if $value->[3];
+    }
+
+    # String is no valid envelope
+    else {
+      carp 'Invalid envelope data';
+      return;
     };
   };
 
@@ -255,13 +284,15 @@ sub sign {
 
   return unless @_;
 
+  return unless $self->data;
+
   # Get key and signature information
   my ($key_id, $mkey, $flag) = _key_array(@_);
 
   # Choose data to sign
   my $data = $flag eq '-data' ?
     b64url_encode($self->data) :
-      $self->signature_base;
+    $self->signature_base;
 
   # Regarding key id:
   # "If the signer does not maintain individual key_ids,
@@ -269,35 +300,32 @@ sub sign {
   #  of the SHA-256 hash of public key's application/magic-key
   #  representation."
 
-  # A valid key is given
-  if ($mkey) {
+  # A valid key needs to be available
+  return unless $mkey;
 
-    # No valid private key
-    unless ($mkey->d) {
-      carp 'Unable to sign without private exponent' and return;
-    };
-
-    # Compute signature for base string
-    my $msig = $mkey->sign( $data );
-
-    # No valid signature
-    return unless $msig;
-
-    # Sign envelope
-    my %msig = ( value => $msig );
-    $msig{key_id} = $key_id if defined $key_id;
-
-    # Push signature
-    push( @{ $self->{sigs} }, \%msig );
-
-    # Declare envelope as signed
-    $self->{signed} = 1;
-
-    # Return envelope for piping
-    return $self;
+  # No valid private key
+  unless ($mkey->d) {
+    carp 'Unable to sign without private exponent' and return;
   };
 
-  return;
+  # Compute signature for base string
+  my $msig = $mkey->sign( $data );
+
+  # No valid signature
+  return unless $msig;
+
+  # Sign envelope
+  my %msig = ( value => $msig );
+  $msig{key_id} = $key_id if defined $key_id;
+
+  # Push signature
+  push( @{ $self->{sigs} }, \%msig );
+
+  # Declare envelope as signed
+  $self->{signed} = 1;
+
+  # Return envelope for piping
+  return $self;
 };
 
 
@@ -331,16 +359,16 @@ sub verify {
     if ($sig) {
 
       if ($flag ne '-data') {
-	$verified = $mkey->verify($self->signature_base => $sig->{value});
-	last if $verified;
+        $verified = $mkey->verify($self->signature_base => $sig->{value});
+        last if $verified;
       };
 
       # Verify against data
       if ($flag eq '-data' || $flag eq '-compatible') {
 
-	# Verify with b64url data
-	$verified = $mkey->verify(b64url_encode($self->data) => $sig->{value});
-	last if $verified;
+        # Verify with b64url data
+        $verified = $mkey->verify(b64url_encode($self->data) => $sig->{value});
+        last if $verified;
       };
     };
   };
@@ -381,13 +409,13 @@ sub signature {
       # sig specifies key
       if (defined $_->{key_id}) {
 
-	# Found wanted key
-	return $_ if $_->{key_id} eq $key_id;
+        # Found wanted key
+        return $_ if $_->{key_id} eq $key_id;
       }
 
       # sig needs default key
       else {
-	$default = $_;
+        $default = $_;
       };
     };
 
@@ -408,7 +436,7 @@ sub signed {
 
   # Check for specific key_id
   foreach my $sig (@{ $_[0]->{sigs} }) {
-    return 1 if $sig->{key_id} eq $_[1];
+    return 1 if $sig->{key_id} && $sig->{key_id} eq $_[1];
   };
 
   # Envelope is not signed
@@ -420,15 +448,15 @@ sub signed {
 sub signature_base {
   my $self = shift;
 
-  $self->{sig_base} ||=
-    join('.',
-	 b64url_encode( $self->data, 0 ),
-	 b64url_encode( $self->data_type ),
-	 b64url_encode( $self->encoding ),
-	 b64url_encode( $self->alg )
-       );
+  return $self->{sig_base} if $self->{sig_base};
 
-  return $self->{sig_base};
+  return $self->{sig_base} =
+    join('.',
+         b64url_encode( $self->data, 0 ),
+         b64url_encode( $self->data_type ),
+         b64url_encode( $self->encoding ),
+         b64url_encode( $self->alg )
+       );
 };
 
 
@@ -438,6 +466,9 @@ sub dom {
 
   # Already computed
   return $self->{dom} if $self->{dom};
+
+  # No data defined to parse
+  return unless $self->{data};
 
   # Create new DOM instantiation
   if (index($self->data_type, 'xml') >= 0) {
@@ -535,7 +566,7 @@ sub to_json {
     sigs      => []
   );
 
-  # loop through signatures
+  # Loop through signatures
   foreach my $sig ( @{ $self->{sigs} } ) {
     my %msig = ( value => b64url_encode( $sig->{value} ) );
     $msig{key_id} = $sig->{key_id} if defined $sig->{key_id};
@@ -553,6 +584,7 @@ sub _trim_all {
   $string =~ tr{\t-\x0d }{}d;
   $string;
 };
+
 
 sub _key_array {
   return () unless @_;
@@ -605,8 +637,8 @@ Crypt::MagicSignatures::Envelope - MagicEnvelopes for the Salmon Protocol
   use Crypt::MagicSignatures::Key;
   use Crypt::MagicSignatures::Envelope;
 
-  # Create a new MagicKey for signing messages
-  my $mkey = Crypt::MagicSignatures::Key->new(size => 1024);
+  # Generate a new MagicKey for signing messages
+  my $mkey = Crypt::MagicSignatures::Key->generate(size => 1024);
 
   # Fold a new envelope
   my $me = Crypt::MagicSignatures::Envelope->new(
@@ -920,7 +952,8 @@ L<Crypt::MagicSignatures::Key|Crypt::MagicSignatures::Key/DEPENDENCIES>.
 =head1 KNOWN BUGS AND LIMITATIONS
 
 The signing and verification is not guaranteed to be
-compatible with other implementations!
+compatible with other implementations, due to different
+versions of the specification.
 Implementations like L<StatusNet|http://status.net/> (L<Identi.ca|http://identi.ca/>),
 L<MiniMe|https://code.google.com/p/minime-microblogger/>, and examples from the
 L<reference implementation|https://code.google.com/p/salmon-protocol/source/browse/>
@@ -936,7 +969,7 @@ See the test suite for further information.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2015, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2012-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

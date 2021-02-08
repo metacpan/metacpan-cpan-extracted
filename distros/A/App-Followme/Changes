@@ -1,5 +1,13 @@
 Revision history for Perl extension App::Followme
 
+1.96 2021-02-04T13:55:26Z
+    - Rewrote sort code
+    - Added variables $extension and @related_files
+    - Rewrote gallery template to use new css
+    - Added CreateRss.pm
+    - Configuration files now use yaml format
+    - Added code to read and write yaml and xml
+
 1.95 2020-08-04T15:32:22Z
 	- more changes to tests to make them portable
 	- redid style sheets, templates, and index.html file

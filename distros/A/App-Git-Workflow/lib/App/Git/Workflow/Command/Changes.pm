@@ -15,7 +15,7 @@ use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 use utf8;
 
-our $VERSION  = version->new(1.1.3);
+our $VERSION  = version->new(1.1.13);
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -271,7 +271,7 @@ git-changes - Stats on the number of commits by committer
 
 =head1 VERSION
 
-This documentation refers to git-changes version 1.1.3
+This documentation refers to git-changes version 1.1.13
 
 =head1 SYNOPSIS
 

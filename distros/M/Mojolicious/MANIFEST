@@ -6,6 +6,14 @@ examples/entities.pl
 examples/fast.pl
 examples/hello-template.pl
 examples/hello.pl
+examples/login/lib/LoginApp.pm
+examples/login/lib/LoginApp/Controller/Login.pm
+examples/login/lib/LoginApp/Model/Users.pm
+examples/login/script/login_app
+examples/login/t/login.t
+examples/login/templates/layouts/default.html.ep
+examples/login/templates/login/index.html.ep
+examples/login/templates/login/protected.html.ep
 examples/microhttpd.pl
 examples/proxy.pl
 examples/responses.pl

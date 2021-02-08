@@ -32,7 +32,7 @@ use Exception::Class
 	},
 );
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 # -----------------------------------------------
 
@@ -357,6 +357,16 @@ not set $self->{header}. Rather C<read_header()> is aliased to C<bind_header()>,
 which does not set $self->{header} either. It sets $self->{field_pos}. Oh, dear. Forget it.
 
 =back
+
+=head1 Repository
+
+L<https://github.com/ronsavage/Text-CSV_PP-Iterator>
+
+=head1 Support
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/Text-CSV_PP-Iterator/issues>
 
 =head1 Author
 

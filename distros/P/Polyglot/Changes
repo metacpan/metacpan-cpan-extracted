@@ -1,5 +1,8 @@
 Revision history for Perl module Polyglot
 
+1.004 2021-02-06T01:15:11Z
+	* Freshen distro, remove Travis, add Github Actions
+
 1.003 2018-07-03T01:17:37Z
 	* Update for the Artistic License 2.0
 

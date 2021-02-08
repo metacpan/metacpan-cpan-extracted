@@ -98,7 +98,8 @@ stderr_is( sub {
         App::Dest->deploy('actions/004');
     }
     catch {
-        warn $_;
+        my $e = $_ || $@;
+        warn $e;
     };
 }, "Action already deployed\n", 'deploy again fails' );
 

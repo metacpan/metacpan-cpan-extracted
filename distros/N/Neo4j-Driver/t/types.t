@@ -139,7 +139,7 @@ lives_ok { $r0 = 0; $r0 = $transaction->run($q)->single; } 'run query (structura
 
 subtest 'Structural types: node meta data and props' => sub {
 	plan skip_all => '(query failed)' if ! $r0;
-	plan tests => 10 if $r0;
+	plan tests => 13;
 	ok my $n1 = $r0->get('n1'), 'get node 1';
 	ok my $n2 = $r0->get('n2'), 'get node 2';
 	ok defined($id = $r0->get('id(n1)')), 'get node 1 id';
@@ -150,6 +150,10 @@ subtest 'Structural types: node meta data and props' => sub {
 	is $n1->get('test'), 'node1', 'node 1 get';
 	is $n2->properties->{test}, 'node2', 'node 2 properties';
 	ok grep(m/^Test$/, $n1->labels), 'node 1 label';
+	ok my $n4 = $r0->get('n4'), 'get node 4';
+	my @l;
+	lives_ok { @l = $n4->labels } 'node 4 labels';
+	ok ! @l, 'no node 4 labels';
 };
 
 

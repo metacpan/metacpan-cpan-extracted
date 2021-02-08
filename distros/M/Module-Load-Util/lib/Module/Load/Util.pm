@@ -1,9 +1,9 @@
 package Module::Load::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-16'; # DATE
+our $DATE = '2021-02-06'; # DATE
 our $DIST = 'Module-Load-Util'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict 'subs', 'vars';
 use Regexp::Pattern::Perl::Module ();
@@ -46,15 +46,31 @@ sub load_module_with_optional_args {
         $args = [];
     }
 
-    if (defined $opts->{ns_prefix}) {
-        $module =
-            $opts->{ns_prefix} . ($opts->{ns_prefix} =~ /::\z/ ? '':'::') .
-            $module;
-    }
+    my @ns_prefixes = $opts->{ns_prefixes} ? @{$opts->{ns_prefixes}} :
+        defined($opts->{ns_prefix}) ? ($opts->{ns_prefix}) : ('');
+    my $try_all = $opts->{ns_prefixes} ? 1:0;
+    my $module_with_prefix;
+    for my $i (0 .. $#ns_prefixes) {
+        my $ns_prefix = $ns_prefixes[$i];
+        if (length $ns_prefix) {
+            $module_with_prefix =
+                $ns_prefix . ($ns_prefix =~ /::\z/ ? '':'::') . $module;
+        } else {
+            $module_with_prefix = $module;
+        }
 
-    # XXX option load=0?
-    (my $modulepm = "$module.pm") =~ s!::!/!g;
-    require $modulepm;
+        # XXX option load=0?
+        (my $module_with_prefix_pm = "$module_with_prefix.pm") =~ s!::!/!g;
+        if ($try_all) {
+            eval { require $module_with_prefix_pm }; last unless $@;
+        } else {
+            require $module_with_prefix_pm;
+        }
+    }
+    if ($@) {
+        die "load_module_with_optional_args(): Failed to load module '$module' (all prefixes tried: ".join(", ", @ns_prefixes).")";
+    }
+    $module = $module_with_prefix;
 
     my $do_import = defined $opts->{import} ? $opts->{import} : 1;
     if ($do_import) {
@@ -101,7 +117,7 @@ Module::Load::Util - Some utility routines related to module loading
 
 =head1 VERSION
 
-This document describes version 0.003 of Module::Load::Util (from Perl distribution Module-Load-Util), released on 2020-06-16.
+This document describes version 0.004 of Module::Load::Util (from Perl distribution Module-Load-Util), released on 2021-02-06.
 
 =head1 SYNOPSIS
 
@@ -165,6 +181,11 @@ Str. Namespace to use. For example, if you set this to C<WordList> then with
 C<$module_with_optional_args> set to C<ID::KBBI>, the module
 L<WordList::ID::KBBI> will be loaded.
 
+=item * ns_prefixes
+
+Array of str. Like L</ns_prefix> but will attempt all prefixes and will fail if
+all prefixes fail.
+
 =item * target_package
 
 Str. Target package to import() to. Default is caller(0).
@@ -215,6 +236,10 @@ Str. Select constructor name. Defaults to C<new>.
 
 Str. Like in L</load_module_with_optional_args>.
 
+=item * ns_prefixes
+
+Array of str. Like in L</load_module_with_optional_args>.
+
 =back
 
 =head1 HOMEPAGE
@@ -227,7 +252,7 @@ Source repository is at L<https://github.com/perlancar/perl-Module-Load-Util>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Load-Util>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Module-Load-Util/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -247,7 +272,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

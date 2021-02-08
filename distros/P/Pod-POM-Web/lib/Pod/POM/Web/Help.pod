@@ -6,12 +6,12 @@ Pod::POM::Web::Help - How to use this Perl documentation
 
 L<Pod::POM::Web> is a Web application for browsing
 the documentation of Perl components installed
-on your local machine. Since pages are dynamically 
+on your local machine. Since pages are dynamically
 generated, they are always in sync with code actually
-installed. 
+installed.
 
 This application makes heavy use of dynamic HTML techniques
-like Ajax calls, autocompletion of search fields, etc., so 
+like Ajax calls, autocompletion of search fields, etc., so
 it requires a modern browser. It has been tested on Firefox 3.5.6
 and MSIE 8, but should also work more or less correctly in other browsers
 like Safari, Konqueror or Google Chrome.
@@ -19,7 +19,7 @@ like Safari, Konqueror or Google Chrome.
 =head2 Searching
 
 Users can type search criteria in the single search input field
-and then hit C<RETURN>. The behaviour depends on which 
+and then hit C<RETURN>. The behaviour depends on which
 search category was chosen in the search menu :
 
 =over
@@ -45,16 +45,16 @@ The input field should contain a module name.
 The answer will be the documentation for that module.
 If the local Perl installation was indexed (see below), then
 an autocompleter is automatically activated
-to help choose a proper module name. 
+to help choose a proper module name.
 
 
 =item fulltext
 
 This only works if the local Perl installation was indexed
 (see L<Pod::POM::Web::Indexer> on how to do it).
-In that case, the input field can contain 
+In that case, the input field can contain
 one or several words, possibly connected
-by boolean operators (L<Search::QueryParser>).
+by Boolean operators (L<Search::QueryParser>).
 The answer will be a list of modules that
 match that query, either in the documentation
 or in the source code. Each module is presented
@@ -66,12 +66,12 @@ with some contextual excerpts of the matching words.
 =head2 Browsing
 
 The browsing tree starts with two sections B<Perl docs> and
-B<Pragmas>, containg core Perl documentation. The third section
-B<Scripts> reflects the structure of Perl scripts installed in 
-C<perl/bin>. The fourth section 
+B<Pragmas>, containing core Perl documentation. The third section
+B<Scripts> reflects the structure of Perl scripts installed in
+C<perl/bin>. The fourth section
 B<Modules> reflects the structure of installed modules on the local
 machine (the various C<@INC> directories such as C<lib>, C<vendor/lib>,
-C<site/lib>, etc. are collapsed into a single tree). 
+C<site/lib>, etc. are collapsed into a single tree).
 Only top-level nodes are loaded initially; subnodes are
 fetched dynamically through Ajax calls when opening the nodes.
 
@@ -112,7 +112,7 @@ close the node
 
 =item C<keypad *>
 
-open the node and all its subnodes 
+open the node and all its subnodes
 
 =item C<keypad />
 
@@ -177,11 +177,11 @@ above
 
 =head1 SEE ALSO
 
-L<Pod::Webserver> is another, earlier implementation of a Perl documentation 
+L<Pod::Webserver> is another, earlier implementation of a Perl documentation
 server.
 
 L<Pod::Browser> is a L<Catalyst> application serving local POD modules.
-L<Pod::Server> is yet another 
+L<Pod::Server> is yet another
 
 
 

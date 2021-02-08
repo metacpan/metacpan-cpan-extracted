@@ -1,9 +1,7 @@
 # umap.t - tests for Unicode::Map functionality of I18N::Charset
 
-# $Id: umap.t,v 1.8 2005-11-12 14:45:09 Daddy Exp $
-
 use I18N::Charset;
-use Test::More no_plan;
+use Test::More;
 
 use IO::Capture::Stderr;
 my $oICE =  IO::Capture::Stderr->new;
@@ -45,7 +43,7 @@ SKIP:
   ok(umap_charset_name("alias3") eq "CP775", '=alias3');
   } # end of SKIP block
 
-exit 0;
+done_testing();
 
 __END__
 

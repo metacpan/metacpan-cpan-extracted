@@ -1,15 +1,16 @@
 Build.PL
 Changes
+hax/cx_pushblock.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
 hax/wrap_keyword_plugin.c.inc
 lib/Syntax/Keyword/Finally.pm
 lib/Syntax/Keyword/Finally.xs
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01finally.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

@@ -18,9 +18,12 @@ no_index:
     - t
     - inc
 requires:
+  HTTP::Request::Common: '6.18'
+  HTTP::Status: '6.18'
   JSON: '2.9'
   LWP::UserAgent: '6.15'
   POSIX: '1.65'
+  Switch: '2.17'
   perl: '5.024001'
-version: 3.506
+version: 4.01
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

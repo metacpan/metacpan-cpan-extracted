@@ -37,6 +37,7 @@
             "Config::Identity" : "0.0019",
             "Encode" : "0",
             "HTML::TreeBuilder" : "0",
+            "HTTP::CookieJar::LWP" : "0",
             "HTTP::Status" : "0",
             "JSON" : "2.23",
             "MIME::Base64" : "0",
@@ -44,8 +45,7 @@
             "REST::Client" : "0",
             "URI" : "0",
             "URI::Escape" : "0",
-            "perl" : "5.010",
-            "strict" : "0",
+            "perl" : "5.016",
             "utf8" : "0",
             "warnings" : "0"
          }
@@ -66,8 +66,8 @@
          "web" : "https://github.com/gnustavo/jira-rest"
       }
    },
-   "version" : "0.020",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "version" : "0.021",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

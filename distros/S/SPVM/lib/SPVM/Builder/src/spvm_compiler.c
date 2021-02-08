@@ -51,10 +51,9 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->package_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
   compiler->package_vars = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->module_include_dirs = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
+  compiler->module_dirs = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->opcode_array = SPVM_OPCODE_ARRAY_new(compiler);
   compiler->loaded_module_file_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
-  compiler->module_rel_file_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
   compiler->module_source_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
   compiler->added_packages = SPVM_LIST_new(0);
 
@@ -403,7 +402,7 @@ void SPVM_COMPILER_error(SPVM_COMPILER* compiler, const char* message_template, 
 
   compiler->error_count++;
   
-  fprintf(stderr, "%s", message);
+  fprintf(stderr, "[CompileError]%s", message);
 }
 
 const char* SPVM_COMPILER_create_sub_signature(SPVM_COMPILER* compiler, SPVM_SUB* sub) {

@@ -12,59 +12,78 @@ SYNOPSYS
      $obj->reset;
 
 METHODS
-    "new(%parameters)"
-             Constructor.
+  "new"
+     my $obj = Tags::Output::Structure->new(%parameters);
 
-            *       "auto_flush"
+    Constructor.
 
-                     Auto flush flag.
-                     Default value is 0.
+    Returns instance of object.
 
-            *       "output_callback"
+    *       "auto_flush"
 
-                     Output callback.
-                     Default value is undef.
+             Auto flush flag.
+             Default value is 0.
 
-            *       "output_handler"
+    *       "output_callback"
 
-                     Set output handler.
-                     Default value is undef.
+             Output callback.
+             Default value is undef.
 
-            *       "output_sep"
+    *       "output_handler"
 
-                     Output separator.
-                     Default value is newline.
+             Set output handler.
+             Default value is undef.
 
-            *       "skip_bad_data"
+    *       "output_sep"
 
-                     Skip bad tags.
-                     Default value is 0.
+             Output separator.
+             Default value is newline.
 
-            *       "strict_instruction"
+    *       "skip_bad_data"
 
-                     Strict instruction.
-                     Default value is 1.
+             Skip bad tags.
+             Default value is 0.
 
-    "finalize()"
-             Finalize Tags output.
-             Automaticly puts end of all opened tags.
-             Returns undef.
+    *       "strict_instruction"
 
-    "flush($reset_flag)"
-             Flush tags in object.
-             Or returns code.
-             If enabled $reset_flag, then resets internal variables via reset method.
+             Strict instruction.
+             Default value is 1.
 
-    "open_tags()"
-             Returns array of opened tags.
+  "finalize"
+     $obj->finalize;
 
-    "put(@data)"
-             Put tags code in tags format.
-             Returns undef.
+    Finalize Tags output. Automaticly puts end of all opened tags.
 
-    "reset()"
-             Resets internal variables.
-             Returns undef.
+    Returns undef.
+
+  "flush"
+     my $ret_ar = $obj->flush($reset_flag);
+
+    Flush tags in object. Or returns code. If enabled $reset_flag, then
+    resets internal variables via reset method.
+
+    Returns undef or code.
+
+  "open_tags"
+     my @tags = $obj->open_tags;
+
+    Get list of opened tags.
+
+    Returns array of opened tags.
+
+  "put"
+     $obj->put(@data);
+
+    Put tags code in tags format.
+
+    Returns undef.
+
+  "reset"
+     $obj->reset;
+
+    Resets internal variables.
+
+    Returns undef.
 
 ERRORS
      new():
@@ -205,10 +224,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2012-2020 Michal Josef Špaček
+    © 2012-2021 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

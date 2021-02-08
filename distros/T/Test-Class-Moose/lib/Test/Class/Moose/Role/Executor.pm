@@ -2,13 +2,16 @@ package Test::Class::Moose::Role::Executor;
 
 # ABSTRACT: Common code for Runner classes
 
+use strict;
+use warnings;
+use namespace::autoclean;
+
 use 5.010000;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Moose::Role 2.0000;
 use Carp;
-use namespace::autoclean;
 
 use List::SomeUtils qw(uniq);
 use List::Util qw(shuffle);
@@ -515,7 +518,9 @@ sub test_classes {
     if ( $self->test_configuration->randomize_classes ) {
         return shuffle(@classes);
     }
-    return sort @classes;
+
+    @classes = sort @classes;
+    return @classes;
 }
 
 1;
@@ -532,7 +537,7 @@ Test::Class::Moose::Role::Executor - Common code for Runner classes
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 
@@ -546,10 +551,10 @@ C<Test::Class::Moose::Executor::Parallel>.
 
 =head1 API
 
-This role provides the following public methods for extensions. If you wrap
-any of the methods related to test execution you are strongly encouraged to
-make sure that the original method is called, as these methods implement the
-core functionality of TCM.
+This role provides the following public methods for extensions. If you wrap any
+of the methods related to test execution you are strongly encouraged to make
+sure that the original method is called, as these methods implement the core
+functionality of TCM.
 
 =head2 $executor->is_parallel
 
@@ -577,8 +582,8 @@ configuration.
 
 =head2 $executor->run_test_class($test_class)
 
-This method is called once for each test class to be run. It is passed a
-single argument, the I<name> of the test class to be run.
+This method is called once for each test class to be run. It is passed a single
+argument, the I<name> of the test class to be run.
 
 =head2 $executor->run_test_instance($test_instance, $class_report)
 
@@ -632,7 +637,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,28 +1,33 @@
 {
    "abstract" : "Manage a file of DSNs, for both testing and production",
    "author" : [
-      "Ron Savage <ron@savage.net.au>"
+      "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4204",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_2"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBIx-Admin-DSNManager",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.96",
-            "Test::Version" : "1.002003"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -36,19 +41,28 @@
             "strict" : "0",
             "warnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "DBIx::Admin::DSNManager" : {
-         "file" : "lib/DBIx/Admin/DSNManager.pm",
-         "version" : "2.01"
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001014",
+            "Test::Version" : "1.002003"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ronsavage/DBIx-Admin-DSNManager/issues"
+      },
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+         "http://opensource.org/licenses/Perl"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/DBIx-Admin-DSNManager.git",
+         "web" : "https://github.com/ronsavage/DBIx-Admin-DSNManager"
+      }
    },
-   "version" : "2.01"
+   "version" : "2.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

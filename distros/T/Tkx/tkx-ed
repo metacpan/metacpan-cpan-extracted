@@ -1,7 +1,8 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # tkx-ed - Simple text editor
 
+use warnings;
 use strict;
 
 use Tkx;
@@ -19,16 +20,6 @@ if ($IS_AQUA) {
 
     # The console can pop up unexpectedly from the tkkit
     Tkx::catch("console hide");
-
-    # Set the process name that is displayed in the Activity Monitor
-    # and the Force Quit dialog
-    eval {
-        Tkx::package_require('tclCarbonProcesses');
-        my $psn = Tkx::carbon__getCurrentProcess();
-        Tkx::carbon__setFrontProcess($psn);
-        Tkx::carbon__setProcessName($psn, $PROGNAME);
-    };
-    warn $@ if $@;
 
     Tkx::interp_alias("", "::tk::mac::OpenDocument", "", [\&load]);
 }

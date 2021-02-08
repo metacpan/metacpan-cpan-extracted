@@ -1,3 +1,6 @@
+0.10 2021-02-07
+        - Move bugtracker to GitHub.
+
 0.09 2018-11-01
         - Change permission of non-executable files.
 

@@ -1,13 +1,17 @@
-Build.PL
 Changelog.ini
-CHANGES
+Changes
 examples/bootstrap-menus.pl
 examples/test-complex-popup-radio.cgi
 examples/test-simple-popup-radio.cgi
 lib/DBIx/HTML/PopupRadio.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.yml
+MANIFEST.SKIP
 README
-t/pod.t
+t/00.versions.t
+t/00.versions.tx
 t/test.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

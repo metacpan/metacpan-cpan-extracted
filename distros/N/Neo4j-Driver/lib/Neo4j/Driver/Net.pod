@@ -1,0 +1,504 @@
+# PODNAME: Neo4j::Driver::Net
+# ABSTRACT: Explains the design of the networking modules
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Neo4j::Driver::Net - Explains the design of the networking modules
+
+=head1 VERSION
+
+version 0.21
+
+=head1 OVERVIEW
+
+Each L<Neo4j::Driver::Session> has exactly one networking helper
+instance that is used by the session and all of its transactions
+to communicate with the Neo4j server. This document discusses the
+features and known limitations of the networking helpers.
+
+B<Unless you're planning to develop custom networking modules
+for the driver, you probably don't need to read this document.>
+
+The helpers don't communicate with the server directly. Instead,
+they control another module that has responsibility for the actual
+network transmissions. This module can be customised by using the
+driver's C<net_module> config option. The API that custom networking
+modules need to implement is described in L</"EXTENSIONS"> below.
+
+Network responses received from the server will be parsed for Neo4j
+statement results by the appropriate result handler for the response
+format used by the server. A custom networking module can also
+provide custom response parsers, for example implemented in XS code.
+
+Please note that the division of labour between sessions or
+transactions on the one hand and networking helpers on the other
+hand is an internal implementation detail of the driver and as such
+is B<subject to unannounced change.> While some of those details are
+explained in this document, this is done only to help contributors
+and users of I<public> APIs better understand the driver's design.
+See L</"USE OF INTERNAL APIS"> for more information on this topic.
+
+=head1 SYNPOSIS
+
+ $helper = Neo4j::Driver::Net::HTTP->new({
+   net_module => 'Local::Neo4jUserAgentHTTP',
+ });
+ 
+ $helper->_set_database($db_name);
+ $helper->{active_tx} = ...;
+ @results = $helper->_run($tx, @statements);
+ 
+ # Parsing a JSON result
+ die unless $helper->{http_agent}->http_headers->{success};
+ $json_coder = $helper->{http_agent}->json_coder;
+ $json_coder->decode( $helper->{http_agent}->fetch_all );
+
+B<WARNING:> Some of these calls are private APIs.
+See L</"USE OF INTERNAL APIS">.
+
+=head1 WARNING: EXPERIMENTAL
+
+The design of the networking helper APIs is not entirely finalised.
+While no further I<major> changes are expected, you should probably
+let me know if you already are creating networking extensions, so
+that I can try to accommodate your use case and give you advance
+notice of changes.
+
+The driver's C<net_module> config option is
+L<experimental|Neo4j::Driver/"Custom networking modules"> as well.
+
+=head1 FEATURES
+
+The networking helpers primarily deal with the following tasks:
+
+=over
+
+=item * Establish a database connection.
+
+=item * Provide L<Neo4j::Driver::ServerInfo>.
+
+=item * Handle certain generic protocol requirements
+(such as HTTP content negotiation).
+
+=item * Sync state between server transactions and
+driver transaction objects.
+
+=item * Control the translation of Cypher statements
+to network transmissions, and of network transmissions
+to statement results.
+
+=back
+
+HTTP connections use proactive content negotiation
+(L<RFC 7231|https://tools.ietf.org/html/rfc7231#section-3.4.1>)
+to obtain a suitable response from the Neo4j server. The driver
+supports both Jolt and JSON as result formats. There is also
+a fallback result handler, which is used to parse error
+messages out of C<text/*> responses. The HTTP result handlers
+are individually queried for the media types they support.
+This information is cached by the networking helper.
+
+All result handlers inherit a common interface from
+L<Neo4j::Driver::Result>. They provide methods to initialise and
+bless result data records as L<Neo4j::Driver::Record> objects.
+Result handlers are also responsible that all values returned
+from Neo4j are provided to users in the format that is documented
+for L<Neo4j::Driver::Record/"get">. For backwards compatibility,
+a lot of the internal data structures currently match the format
+of Neo4j JSON responses.
+
+The first HTTP connection to a Neo4j server is always made to the
+L<Discovery API|https://neo4j.com/docs/http-api/4.2/discovery/>,
+which is used to obtain L<Neo4j::Driver::ServerInfo> and the
+transaction endpoint URI template. These are the only GET
+requests made by the driver.
+Because of a known issue with Neo4j, the C<Accept> request
+header field needs to be varied by HTTP request method
+(L<#12644|https://github.com/neo4j/neo4j/issues/12644>).
+
+With HTTP being a stateless protocol, Neo4j supports multiple
+concurrent transactions by using a different URL for each one
+in a REST-like fashion. For requests made to such explicit
+transaction endpoints, the Neo4j
+L<Transactional HTTP API|https://neo4j.com/docs/http-api/4.2/actions/>
+always provides transaction status information in the response.
+Transactions that remain open include an expiration time. The
+networking helper parses and stores this timestamp and uses it to
+track which transactions are still open and which have timed out.
+The origination C<Date> field is used to synchronise the clocks
+of the driver and the Neo4j server
+(L<RFC 7231|https://tools.ietf.org/html/rfc7231#section-7.1.1.2>).
+
+Bolt, on the other hand, currently only supports a single open
+transaction per connection. While a Bolt connection can be viewed
+as a simple state machine in the backend Bolt library (see
+L<Bolt Protocol Server State Spec|https://7687.org/bolt/bolt-protocol-server-state-specification-4.html#appendix---bolt-message-state-transitions>),
+L<Neo4j::Bolt> currently doesn't allow users to directly observe
+state changes, so it is currently somewhat difficult to determine
+the Bolt connection state. The driver attempts to infer it based
+on the behaviour of L<Neo4j::Bolt>, and mostly gets it right, but
+there may be some as-yet-unknown issues. Bug reports are welcome.
+
+One key difference between HTTP and Bolt is the handling of
+transaction state in case of Neo4j errors. According to
+L<Neo4j Status Codes|https://neo4j.com/docs/status-codes/4.2/>,
+the effect of errors is always a transaction rollback. On HTTP,
+these rollbacks take place immediately. On Bolt, however, the
+transaction is typically only marked as uncommittable on the Neo4j
+server, but the Bolt connection is not actually put into the
+C<FAILED> state immediately. To try and work around this difference
+between HTTP and Bolt, this driver's Bolt networking handler always
+attempts an explicit transaction rollback if faced with any error
+condition. Again, this approach mostly gets it right, but there
+may be some remaining issues, particularly when network errors and
+server errors happen simultaneously.
+
+=head1 COMPATIBILITY
+
+L<Neo4j::Driver> S<version 0.21> is compatible with
+S<L<Neo4j::Bolt> 0.01> or later.
+
+When using HTTP, S<L<Neo4j::Driver> 0.21> supports determining the
+version of any Neo4j server via L<Neo4j::Driver::Session/"server">.
+This even works on S<Neo4j 1.x>, but running statements on
+S<Neo4j 1.x> will fail, because it lacks the transactional API.
+
+S<L<Neo4j::Driver> 0.21> is compatible with Neo4j S<versions 2.x>,
+S<3.x, and 4.x>. It supports HTTP responses in the
+L<formats|https://neo4j.com/docs/http-api/4.2/actions/result-format/>
+JSON and Jolt (both strict mode and sparse mode).
+
+For Bolt as well as HTTP, future versions of the driver will tend
+to implement new requirements in order to stay compatible with
+newer versions of Neo4j. Support for old Neo4j or library versions
+is likely to only be dropped with major updates to the driver
+(such as S<0.x to 1.x>).
+
+=head1 BUGS AND LIMITATIONS
+
+As described above, there may be cases in which the state of a
+Bolt connection is not determined correctly, leading to unexpected
+failures. If such bugs do exist, they are expected to mostly happen
+in rare edge cases, but please be sure to report any problems.
+
+Clock synchronisation using the HTTP C<Date> header does not take
+into account network delays. In case of high network latency, the
+driver may treat transactions as open even though they have already
+expired on the server. To address this, you could either increase
+the transaction idle timeout in F<neo4j.conf> or manipulate the
+return value of C<date_header()> in a custom networking module.
+
+The metadata in HTTP JSON responses is often insufficient to fully
+describe the response data. In particular:
+
+=over
+
+=item * Path metadata doesn't include node labels or relationship
+type (L<#12613|https://github.com/neo4j/neo4j/issues/12613>).
+
+=item * Records with fields that are maps or lists have unparsable
+metadata (L<#12306|https://github.com/neo4j/neo4j/issues/12306>).
+
+=item * Byte arrays are coded as lists of integers in JSON results.
+
+=back
+
+As of S<Neo4j 4.2>, the Jolt documentation for byte arrays
+doesn't match the implementation
+(L<#12660|https://github.com/neo4j/neo4j/issues/12660>). Future
+Neo4j versions might fix the implementation to match the docs.
+
+Future versions of Neo4j are likely to use a different media
+type for Jolt responses
+(L<#12663|https://github.com/neo4j/neo4j/issues/12663>).
+
+Neo4j spatial and temporal types are not currently implemented
+in all response format parsers.
+
+=head1 EXTENSIONS
+
+=head2 Custom Bolt networking modules
+
+By default, Bolt networking uses the amazing XS module
+L<Neo4j::Bolt> by Mark A. Jensen (MAJENSEN), which in turn uses the
+S<C library> L<libneo4j-client|https://neo4j-client.net/>
+to actually connect to the Neo4j server. Updates and improvements
+are quite possibly best made directly in those libraries, so that
+not only L<Neo4j::Driver>, but also other users benefit from them.
+
+If the driver's C<net_module> config option is used with a Bolt
+connection, the module name provided will be used in place of
+L<Neo4j::Bolt> and will have to match its API I<exactly.>
+It is possible to provide a factory object instead.
+
+Results will be handled by L<Neo4j::Driver::Result::Bolt>, unless a
+custom C<net_module> provides a method named C<result_handlers()>.
+If it does, it's expected to return a list containing a single
+module name, which will be used as a result handler instead.
+See L</"Custom result handlers"> below.
+
+=head2 Custom HTTP networking modules
+
+L<Neo4j::Driver> includes a single HTTP networking module that will
+be used if the C<net_module> config option is set to C<""> or
+C<undef> (the default). If another module name is given as
+C<net_module>, that module will be used instead of the included
+module. Make sure you always C<use> a custom networking module.
+If you extend the included module through inheritance, you also
+must C<use parent>.
+
+The included module may change in future. As of S<version 0.21>,
+the default module uses L<LWP> directly. Earlier versions used
+L<REST::Client>.
+
+It is possible to set a factory object as C<net_module> instead of
+providing a module name. The factory object must have a C<new()>
+method returning an object that implements the interface described
+in the following section.
+
+If you look at the source of existing networking modules for
+inspiration, please note that they may use internal APIs.
+Please make sure you read L</"USE OF INTERNAL APIS"> before you
+start copying existing code.
+
+=head3 API of an HTTP networking module
+
+The driver primarily uses HTTP networking modules by first calling
+the C<request()> method, which initiates a request on the network,
+and then calling other methods to obtain information about the
+response.
+
+ $net_module = $driver->config('net_module');
+ $agent = $net_module->new($driver);
+ 
+ $agent->request('GET', '/', undef, 'application/json');
+ $status  = $agent->http_header->{status};
+ $type    = $agent->http_header->{content_type};
+ $content = $agent->fetch_all;
+
+HTTP networking modules must implement the following methods.
+
+The driver will make all method calls using the arrow operator
+(C<< -> >>). The method descriptions below use a syntax similar to
+that of C<use feature 'signatures'>; however, the first argument
+(C<$class> or C<$self>) is omitted from the signatures for clarity.
+
+=over
+
+=item date_header
+
+ sub date_header () { $date }
+
+Return the HTTP C<Date:> header from the last response as string.
+If the server doesn't have a clock, the header will be missing;
+in this case, the value returned must be either the empty
+string or (optionally) the current time in non-obsolete
+L<RFC5322:3.3|https://tools.ietf.org/html/rfc5322#section-3.3>
+format.
+May block until the response headers have been fully received.
+
+=item fetch_all
+
+ sub fetch_all () { $response_content }
+
+Block until the response to the last network request has been fully
+received, then return the entire content of the response buffer.
+
+This method must generally be idempotent, but the behaviour of this
+method if called after C<fetch_event()> has already been called for
+the same request is undefined.
+
+=item fetch_event
+
+ sub fetch_event () { $next_event }
+
+Return the next Jolt event from the response to the last network
+request as a string. When there are no further Jolt events, this
+method returns an undefined value. If the response hasn't been
+fully received at the time this method is called and the internal
+response buffer does not contain at least one event, this method
+will block until at least one event is available.
+
+The behaviour of this method is undefined for responses that
+are not in Jolt format. The behaviour is also undefined if
+C<fetch_all()> has already been called for the same request.
+
+=item http_header
+
+ sub http_header () { \%headers }
+
+Return a hashref with the following entries, representing
+headers and status of the last response.
+
+=over
+
+=item * C<content_type> – S<e. g.> C<"application/json">
+
+=item * C<location> – URI reference
+
+=item * C<status> – status code, S<e. g.> C<"404">
+
+=item * C<success> – truthy for 2xx status codes
+
+=back
+
+All of these entries must exist and be defined scalars.
+Unavailable values must use the empty string.
+Blocks until the response headers have been fully received.
+
+=item http_reason
+
+ sub http_reason () { $reason_phrase }
+
+Return the HTTP reason phrase (S<e. g.> C<"Not Found"> for
+status 404). If unavailable, C<""> is returned instead.
+May block until the response headers have been fully received.
+
+=item json_coder
+
+ sub json_coder () { $json_coder }
+
+Return a L<JSON::XS>-compatible coder object (for result parsers).
+It must offer a method C<decode()> that can handle the return
+values of C<fetch_event()> and C<fetch_all()> (which may be
+expected to be a byte sequence that is valid UTF-8) and should
+produce C<$JSON::PP::true> and C<$JSON::PP::false> for booleans.
+
+The default module included with the driver returns an instance
+of L<JSON::MaybeXS>.
+
+=item new
+
+ sub new ($driver) { $self }
+
+Initialises the object. May or may not establish a network
+connection. May access C<$driver> config options using the
+method L<Neo4j::Driver/"config"> only.
+
+As of S<version 0.21>, not all aspects of the configuration of
+L<Neo4j::Driver> instances can be queried using C<config()>.
+This issue will be addressed soon.
+
+=item protocol
+
+ sub protocol () { $http_version }
+
+Return the HTTP version (S<e. g.> C<"HTTP/1.1">) from the last
+response, or just C<"HTTP"> if the version can't be determined.
+May block until the response headers have been fully received.
+
+=item request
+
+ sub request ($method, $url, $json, $accept) { }
+
+Start an HTTP request on the network. The following positional
+parameters are given:
+
+=over
+
+=item * C<$method> – HTTP method, S<e. g.> C<"POST">
+
+=item * C<$url> – string with request URL
+
+=item * C<$json> – reference to hash of JSON object
+
+=item * C<$accept> – string with value for the C<Accept:> header
+
+=back
+
+The request C<$url> is to be interpreted relative to the server
+base URL given in the driver config.
+
+The C<$json> hashref must be serialised before transmission.
+It may include booleans encoded as the values C<\1> and C<\0>.
+For requests to be made without request content, the value
+of C<$json> will be C<undef>.
+
+C<$accept> will have different values depending on C<$method>;
+this is a workaround for a known issue in the Neo4j server
+(L<#12644|https://github.com/neo4j/neo4j/issues/12644>).
+
+The C<request()> method may or may not block until the response
+has been received.
+
+=item result_handlers
+
+ sub result_handlers () { @module_names }
+
+Return a list of result handler modules to be used to parse
+Neo4j statement results delivered through this module.
+The module names returned will be used in preference to the
+result handlers built into the driver.
+
+See L</"Custom result handlers"> below.
+
+=item uri
+
+ sub uri () { $uri }
+
+Return the server base URL as string or L<URI> object
+(for L<Neo4j::Driver::ServerInfo>).
+At least scheme, host, and port must be included.
+
+=back
+
+=head2 Custom result handlers
+
+The result handler API is currently not formally specified.
+It is an internal API that is still evolving and may be subject
+to unannounced change.
+
+Even so, it's fully possible to implement a custom result handler.
+You should probably drop me a line when you begin work on one;
+see L</"USE OF INTERNAL APIS">.
+
+=head1 USE OF INTERNAL APIS
+
+B<Public APIs> generally include everything that is documented
+in POD. However, I<this> document may contain some mentions of
+I<private> APIs (where it does, it tries to be explicit about it).
+The section L</"Custom HTTP networking modules"> describes a
+public API.
+
+B<Private internals,> on the other hand, include all package-global
+variables (C<our ...>), all methods with names that begin with an
+underscore (C<_>) and I<all> cases of accessing the data structures
+of blessed objects directly (S<e. g.> C<< $session->{net} >>).
+Additionally, the C<new()> methods of packages without POD
+documentation of their own are to be considered private internals.
+
+You are of course free to use any driver internals in your own code,
+but if you do so, you also bear the sole responsibility for keeping
+it working after updates to the driver. Changes to internals are
+usually not announced in the F<Changes> list, so you should consider
+watching GitHub commits. It is discouraged to try this approach if
+your code is used in production.
+
+If you have difficulties achieving your goals without the use of
+driver internals or private APIs, you are most welcome to file a
+GitHub issue about that (or write to my CPAN email address with
+your concerns; make sure you mention Neo4j in the subject to beat
+the spam filters).
+
+I can't I<promise> that I'll be able to accommodate your use case,
+but I am going to try.
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016-2021 by Arne Johannessen.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

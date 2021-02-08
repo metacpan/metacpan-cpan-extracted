@@ -38,7 +38,7 @@
    "provides" : {
       "Syntax::Keyword::Finally" : {
          "file" : "lib/Syntax/Keyword/Finally.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

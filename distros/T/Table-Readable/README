@@ -6,7 +6,7 @@
                                                                            
 
 
-This is the README for Table::Readable version 0.03.
+This is the README for Table::Readable version 0.05.
 
 Table::Readable is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -24,7 +24,7 @@ four sections:
 
 1. ABOUT
 
-Table::Readable - minimalistic human-editable tables of data
+Table::Readable - Simple-to-edit tables of data
 
 Table::Readable provides a format for human-editable tables of
 information which a computer can read. By design, the format does not
@@ -60,11 +60,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Table::Readable
 
-To install the module from the source file, Table-Readable-0.03.tar.gz,
+To install the module from the source file, Table-Readable-0.05.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Table-Readable-0.03.tar.gz
-    cd Table-Readable-0.03
+    tar xfz Table-Readable-0.05.tar.gz
+    cd Table-Readable-0.05
     perl Makefile.PL
     make
     make install
@@ -89,6 +89,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Mon Nov 19 14:51:08 2018.
+This README was written on Sun Feb  7 09:57:20 2021.
 
 -----------------------------------------------------------------------------

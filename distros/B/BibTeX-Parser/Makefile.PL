@@ -23,13 +23,13 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::File" => 0,
     "IO::String" => 0,
-    "LaTeX::ToUnicode" => "0.02",
+    "LaTeX::ToUnicode" => "0.11",
     "Test::More" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => "0.88"
   },
-  "VERSION" => "1.02",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }

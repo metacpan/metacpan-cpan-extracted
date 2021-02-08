@@ -1,14 +1,10 @@
 package Quantum::Superpositions::Lazy::Operation::Logical;
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
-use v5.28;
+use v5.24;
 use warnings;
 use Moo;
-
-use feature qw(signatures);
-no warnings qw(experimental::signatures);
-
 use Quantum::Superpositions::Lazy::Superposition;
 use Quantum::Superpositions::Lazy::Util qw(is_collapsible is_state);
 use Types::Standard qw(Enum);
@@ -32,6 +28,8 @@ my %types = (
 	q{ge} => [2, sub { $a ge $b }],
 	q{lt} => [2, sub { $a lt $b }],
 	q{le} => [2, sub { $a le $b }],
+
+	q{_compare} => [2, sub { local $_ = $a; $b->($a) }],
 );
 
 # TODO: should "one" reducer run after every iterator pair
@@ -45,29 +43,34 @@ my %reducer_types = (
 		undef,
 		sub {
 			my $val = $a // ($b ? 1 : undef);
-			$val -= 0 + $b if defined $a && $val;
+			$val -= ($b ? 1 : 0) if defined $a && $val;
 			return $val;
 		}
 	],
 );
 
-sub extract_state ($ref, $index = undef)
+sub extract_state
 {
+	my ($ref, $index) = @_;
+
 	my $values = is_collapsible($ref) ? $ref->states : [$ref];
 
 	return $values unless defined $index;
 	return $values->[$index];
 }
 
-sub get_iterator (@parameters)
+sub get_iterator
 {
+	my (@parameters) = @_;
+
 	my @states = map { extract_state($_) } @parameters;
 	my @indexes = map { 0 } @parameters;
 	my @max_indexes = map { $#$_ } @states;
 
 	# we can't iterate if one of the elements do not exist
 	my $finished = scalar grep { $_ < 0 } @max_indexes;
-	return sub ($with_indexes = 0) {
+	return sub {
+		my ($with_indexes) = @_;
 		return if $finished;
 
 		my $i = 0;
@@ -108,13 +111,16 @@ has "reducer" => (
 	default => sub { $Quantum::Superpositions::Lazy::global_reducer_type },
 );
 
-sub supported_types ($self)
+sub supported_types
 {
+	my ($self) = @_;
 	return keys %types;
 }
 
-sub run ($self, @parameters)
+sub run
 {
+	my ($self, @parameters) = @_;
+
 	my ($param_num, $code, $forced_reducer) = $types{$self->sign}->@*;
 	@parameters = $self->_clear_parameters($param_num, @parameters);
 
@@ -133,28 +139,39 @@ sub run ($self, @parameters)
 		$carry = $reducer->[1]();
 
 		# short circuit if possible
-		return $carry if defined $reducer->[0] && !!$carry eq !!$reducer->[0];
+		return $carry if defined $reducer->[0] && !$carry eq !$reducer->[0];
 	}
 
 	return !!$carry;
 }
 
-sub valid_states ($self, @parameters)
+sub valid_states
 {
-	my ($param_num, $code) = $types{$self->sign}->@*;
+	my ($self, @parameters) = @_;
+
+	my ($param_num, $code, $forced_reducer) = $types{$self->sign}->@*;
 	@parameters = $self->_clear_parameters($param_num, @parameters);
 
-	my @carry;
+	my %results;
+	my $reducer = $reducer_types{$forced_reducer // $self->reducer};
 	my $iterator = get_iterator @parameters;
 
 	local ($a, $b);
-	my ($key_a, $key_b);
-	while (($key_a, $a, $key_b, $b) = $iterator->(1)) {
+	while ((my $key_a, $a, my $key_b, $b) = $iterator->(1)) {
+		if (!defined $reducer->[0] || !defined $results{$key_a} || !$results{$key_a} ne !$reducer->[0]) {
 
-		# $a and $b are set up for type sub
-		my $result = $code->();
+			# $a and $b are set up for type sub
+			$b = $code->();
+			$a = $results{$key_a};
 
-		if ($result) {
+			# $a and $b are set up for reducer sub
+			$results{$key_a} = $reducer->[1]();
+		}
+	}
+
+	my @carry;
+	for my $key_a (keys %results) {
+		if ($results{$key_a}) {
 			push @carry, extract_state($parameters[0], $key_a);
 		}
 	}

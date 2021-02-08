@@ -19,8 +19,7 @@ requires 'Readonly' => 0;
 requires 'perl' => '5.8.0';
 readme_from 'Detect.pm';
 recursive_author_tests('xt');
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Dicom-File-Detect';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Dicom-File-Detect/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Dicom-File-Detect';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Dicom-File-Detect';
 test_requires 'English' => 0;
@@ -29,7 +28,7 @@ test_requires 'File::Object' => 0.05;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

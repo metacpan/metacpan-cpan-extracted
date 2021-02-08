@@ -90,16 +90,16 @@ do {
            "Convert Text $count"); # test 3, 8, 13, 18
 
         my $title = $obj->build('title', $file,);
-        is($$title, "page $count", "get title $count"); # test 4, 9. 14, 19
+        is($$title, "Page $count", "get title $count"); # test 4, 9. 14, 19
 
         my $description = $obj->build('description', $file);
         is($$description, 'This is a paragraph',
            "get description $count"); # test 5, 10, 15, 20
 
         my $date = $obj->build('date', $file);
-        is($$date, '2015-11-22T20:23:13', "get date $count"); # test 6, 11, 16, 21
+        is($$date, 'Nov 22, 2015 20:23', "get date $count"); # test 6, 11, 16, 21
 
         my $author = $obj->build('author', $file);
-        is($$author, 'simon bernie', "get author $count"); # test 7, 12, 17, 22
+        is($$author, 'Bernie Simon', "get author $count"); # test 7, 12, 17, 22
     }
 };

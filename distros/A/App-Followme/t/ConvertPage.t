@@ -49,13 +49,18 @@ my $sub = catfile(@path, 'test', 'sub');
 mkdir $sub  or die $!;
 chmod 0755, $sub;
 
+my $template_directory = $sub;
+mkdir($template_directory) unless -e $template_directory;
+chmod 0755, $template_directory;
+chdir $template_directory or die $!;
+$template_directory = cwd();
+	
 chdir $test_dir or die $!;
 $test_dir = cwd();
 
 #----------------------------------------------------------------------
 # Create object
 
-my $template_directory = $sub;
 my $template_file = 'template.htm';
 my $prototype_file = rel2abs('index.html');
 
@@ -121,7 +126,7 @@ This is a paragraph
 * third %%
 EOQ
 
-    my %configuration = (template_dile => 'template.htm');
+    my %configuration = (template_file => 'template.htm');
     my $cvt = App::Followme::ConvertPage->new(%configuration);
 
     fio_write_page($prototype_file, $index);

@@ -1,6 +1,6 @@
 package Net::IPAM::IP;
 
-our $VERSION = '2.01';
+our $VERSION = '3.00';
 
 use 5.10.0;
 use strict;
@@ -77,7 +77,7 @@ sub new {
     return unless defined $n;
 
     $self->{version} = 4;
-    $self->{binary}  = chr(Socket::AF_INET) . $n;
+    $self->{binary}  = 4 . $n;
     return $self;
   }
 
@@ -92,7 +92,8 @@ sub new {
     return unless defined $n;
 
     $self->{version} = 4;
-    $self->{binary}  = chr(Socket::AF_INET) . $n;
+    $self->{ip4in6}  = 1;
+    $self->{binary}  = 4 . $n;
     return $self;
   }
 
@@ -101,7 +102,7 @@ sub new {
   return unless defined $n;
 
   $self->{version} = 6;
-  $self->{binary}  = chr(Socket::AF_INET6) . $n;
+  $self->{binary}  = 6 . $n;
   return $self;
 }
 
@@ -126,21 +127,21 @@ sub new_from_bytes {
 
   if ( length($n) == 4 ) {
     $self->{version} = 4;
-    $self->{binary}  = chr(Socket::AF_INET) . $n;
+    $self->{binary}  = 4 . $n;
     return $self;
   }
   elsif ( length($n) == 16 ) {
 
     # check for IPv4-mapped IPv6 address ::ffff:1.2.3.4
     if ( index( $n, "\x00" x 10 . "\xff\xff" ) == 0 ) {
-      my $ipv4 = substr( $n, 12 );
       $self->{version} = 4;
-      $self->{binary}  = chr(Socket::AF_INET) . $ipv4;
+      $self->{ip4in6}  = 1;
+      $self->{binary}  = 4 . substr( $n, 12 );
       return $self;
     }
 
     $self->{version} = 6;
-    $self->{binary}  = chr(Socket::AF_INET6) . $n;
+    $self->{binary}  = 6 . $n;
     return $self;
   }
 
@@ -291,27 +292,27 @@ Stringification is overloaded with L</"to_string">
 sub to_string {
   return $_[0]->{as_string} if exists $_[0]->{as_string};
 
-  # unpack to version and network byte order (from Socket::inet_pton), 20% faster with substr()
-  # my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
-
-  my ( $v, $n ) = ( ord( substr( $_[0]->{binary}, 0, 1 ) ), substr( $_[0]->{binary}, 1, ) );
-
-  my $str = Socket::inet_ntop( $v, $n );
+  my $n = substr( $_[0]->{binary}, 1, );
 
   # no bug in Socket::inet_ntop for IPv4, just return
-  return $_[0]->{as_string} = $str if $v == Socket::AF_INET;
+  if ( $_[0]->{version} == 4 ) {
+    return $_[0]->{as_string} = Socket::inet_ntop( Socket::AF_INET, $n );
+  }
 
+  # IPv6 case
   # handle bug in Socket::inet_ntop for deprecated IPv4-compatible-IPv6 addresses
   # ::aaaa:bbbb are returned as ::hex(aa).hex(aa).hex(bb).hex(bb) = ::170.170.187.187
   # e.g: ::cafe:affe => ::202.254.175.254
+
+  my $str = Socket::inet_ntop( Socket::AF_INET6, $n );
 
   # first handle normal case, no dot '.'
   if ( index( $str, '.' ) < 0 ) {
     return $_[0]->{as_string} = $str;
   }
 
-  # handle the bug, use our pure perl inet_ntop
-  return $_[0]->{as_string} = Net::IPAM::Util::inet_ntop_pp( $v, $n );
+  # handle the bug, use our pure perl inet_ntop_pp
+  return $_[0]->{as_string} = Net::IPAM::Util::inet_ntop_pp( Socket::AF_INET6, $n );
 }
 
 =head2 incr
@@ -364,24 +365,20 @@ Expand IP address into canonical form, useful for C<< grep >>, aligned output an
 sub expand {
   return $_[0]->{expand} if exists $_[0]->{expand};
 
-  # unpack to version and network byte order (from Socket::inet_pton), substr() ist faster than unpack
-  # my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
+  my $n = substr( $_[0]->{binary}, 1, );
 
-  my ( $v, $n ) = ( ord( substr( $_[0]->{binary}, 0, 1 ) ), substr( $_[0]->{binary}, 1, ) );
-
-  if ( $v == Socket::AF_INET6 ) {
+  if ( $_[0]->{version} == 6 ) {
     my @hextets = unpack( 'H4' x 8, $n );
 
     # cache it and return
     return $_[0]->{expand} = join( ':', @hextets );
   }
-  elsif ( $v == Socket::AF_INET ) {
-    my @octets = unpack( 'C4', $n );
 
-    # cache it and return
-    return $_[0]->{expand} = sprintf( "%03d.%03d.%03d.%03d", @octets );
-  }
-  die 'logic error,';
+  # IPv4
+  my @octets = unpack( 'C4', $n );
+
+  # cache it and return
+  return $_[0]->{expand} = sprintf( "%03d.%03d.%03d.%03d", @octets );
 }
 
 =head2 reverse
@@ -399,22 +396,21 @@ sub reverse {
   # unpack to version and network byte order (from Socket::inet_pton)
   # my ( $v, $n ) = unpack( 'C a*', $_[0]->{binary} );
   # substr() ist faster
-  my ( $v, $n ) = ( ord( substr( $_[0]->{binary}, 0, 1 ) ), substr( $_[0]->{binary}, 1, ) );
+  my $n = substr( $_[0]->{binary}, 1, );
 
-  if ( $v == Socket::AF_INET6 ) {
+  if ( $_[0]->{version} == 6 ) {
     my $hex_str = unpack( 'H*',     $n );
     my @nibbles = unpack( 'A' x 32, $hex_str );
 
     # cache it and return
     return $_[0]->{reverse} = join( '.', reverse @nibbles );
   }
-  elsif ( $v == Socket::AF_INET ) {
-    my @octets = unpack( 'C4', $n );
 
-    # cache it and return
-    return $_[0]->{reverse} = join( '.', reverse @octets );
-  }
-  die 'logic error,';
+  # IPv4
+  my @octets = unpack( 'C4', $n );
+
+  # cache it and return
+  return $_[0]->{reverse} = join( '.', reverse @octets );
 }
 
 =head2 getname([$error_cb])

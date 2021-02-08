@@ -27,7 +27,7 @@
             "Test::Pod::Coverage" : "1.08"
          },
          "x_spec" : {
-            "Acme::CPANModules" : "v0.1.0"
+            "Acme::CPANModules" : "v0.1.7"
          }
       },
       "test" : {
@@ -42,6 +42,7 @@
          "x_mentions" : {
             "App::Sass" : "0",
             "HTTP::Server::Brick" : "0",
+            "Plack" : "0",
             "Scientist" : "0"
          }
       }
@@ -49,7 +50,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-PortedFrom-Ruby"
+         "web" : "https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Ruby/issues"
       },
       "homepage" : "https://metacpan.org/release/Acme-CPANModules-PortedFrom-Ruby",
       "repository" : {
@@ -58,7 +59,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Ruby"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -163,7 +164,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.602"
+            "version" : "0.603"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -183,7 +184,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.040"
+            "version" : "0.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",
@@ -393,7 +394,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Acme::CPANModules",
                         "name" : "-Acme::CPANModules",
-                        "version" : "0.004"
+                        "version" : "0.006"
                      }
                   ]
                }

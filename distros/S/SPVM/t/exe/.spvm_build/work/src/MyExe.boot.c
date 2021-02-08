@@ -27,7 +27,12 @@ const char* SPMODSRC__MyExe__get_module_source();
 const char* SPMODSRC__MyExe__Precompile__get_module_source();
 const char* SPMODSRC__TestCase__NativeAPI2__get_module_source();
 // precompile functions declaration
+int32_t SPPRECOMPILE__MyExe__Precompile__anon__15__13__(SPVM_ENV* env, SPVM_VALUE* stack);
+int32_t SPPRECOMPILE__MyExe__Precompile__anon__22__13__(SPVM_ENV* env, SPVM_VALUE* stack);
 int32_t SPPRECOMPILE__MyExe__Precompile__sum(SPVM_ENV* env, SPVM_VALUE* stack);
+int32_t SPPRECOMPILE__MyExe__Precompile__anon_sub_sum(SPVM_ENV* env, SPVM_VALUE* stack);
+int32_t SPPRECOMPILE__MyExe__Precompile__anon_sub0(SPVM_ENV* env, SPVM_VALUE* stack);
+int32_t SPPRECOMPILE__MyExe__Precompile__anon_sub1(SPVM_ENV* env, SPVM_VALUE* stack);
 // native functions declaration
 int32_t SPNATIVE__TestCase__NativeAPI2__mul(SPVM_ENV* env, SPVM_VALUE* stack);
 int32_t SPNATIVE__TestCase__NativeAPI2__src_foo(SPVM_ENV* env, SPVM_VALUE* stack);
@@ -93,6 +98,28 @@ int32_t main(int32_t argc, const char *argv[]) {
     exit(1);
   }
   { 
+    const char* package_name = "MyExe::Precompile::anon::15::13";
+    const char* sub_name = "";
+    SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, package_name, strlen(package_name));
+    assert(basic_type);
+    SPVM_PACKAGE* package = basic_type->package;
+    assert(package);
+    SPVM_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
+    assert(sub);
+    sub->precompile_address = SPPRECOMPILE__MyExe__Precompile__anon__15__13__;
+  }
+  { 
+    const char* package_name = "MyExe::Precompile::anon::22::13";
+    const char* sub_name = "";
+    SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, package_name, strlen(package_name));
+    assert(basic_type);
+    SPVM_PACKAGE* package = basic_type->package;
+    assert(package);
+    SPVM_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
+    assert(sub);
+    sub->precompile_address = SPPRECOMPILE__MyExe__Precompile__anon__22__13__;
+  }
+  { 
     const char* package_name = "MyExe::Precompile";
     const char* sub_name = "sum";
     SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, package_name, strlen(package_name));
@@ -102,6 +129,39 @@ int32_t main(int32_t argc, const char *argv[]) {
     SPVM_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
     assert(sub);
     sub->precompile_address = SPPRECOMPILE__MyExe__Precompile__sum;
+  }
+  { 
+    const char* package_name = "MyExe::Precompile";
+    const char* sub_name = "anon_sub_sum";
+    SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, package_name, strlen(package_name));
+    assert(basic_type);
+    SPVM_PACKAGE* package = basic_type->package;
+    assert(package);
+    SPVM_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
+    assert(sub);
+    sub->precompile_address = SPPRECOMPILE__MyExe__Precompile__anon_sub_sum;
+  }
+  { 
+    const char* package_name = "MyExe::Precompile";
+    const char* sub_name = "anon_sub0";
+    SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, package_name, strlen(package_name));
+    assert(basic_type);
+    SPVM_PACKAGE* package = basic_type->package;
+    assert(package);
+    SPVM_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
+    assert(sub);
+    sub->precompile_address = SPPRECOMPILE__MyExe__Precompile__anon_sub0;
+  }
+  { 
+    const char* package_name = "MyExe::Precompile";
+    const char* sub_name = "anon_sub1";
+    SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, package_name, strlen(package_name));
+    assert(basic_type);
+    SPVM_PACKAGE* package = basic_type->package;
+    assert(package);
+    SPVM_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
+    assert(sub);
+    sub->precompile_address = SPPRECOMPILE__MyExe__Precompile__anon_sub1;
   }
   { 
     const char* package_name = "TestCase::NativeAPI2";

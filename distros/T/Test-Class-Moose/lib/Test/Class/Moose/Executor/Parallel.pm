@@ -2,13 +2,16 @@ package Test::Class::Moose::Executor::Parallel;
 
 # ABSTRACT: Execute tests in parallel (parallelized by instance)
 
+use strict;
+use warnings;
+use namespace::autoclean;
+
 use 5.010000;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Moose 2.0000;
 use Carp;
-use namespace::autoclean;
 with 'Test::Class::Moose::Role::Executor';
 
 # Needs to come before we load other test tools
@@ -178,13 +181,23 @@ around run_test_method => sub {
     # The set_color() method from TAP::Formatter::Color is just ugly.
     if ( $self->color_output ) {
         $self->_color->set_color(
-            sub { print STDERR shift, $text },
+            sub {
+                print STDERR shift, $text
+                  or die $!;
+            },
             $color,
         );
-        $self->_color->set_color( sub { print STDERR shift }, 'reset' );
+        $self->_color->set_color(
+            sub {
+                print STDERR shift
+                  or die $!;
+            },
+            'reset'
+        );
     }
     else {
-        print STDERR $text;
+        print STDERR $text
+          or die $!;
     }
 
     return $method_report;
@@ -193,6 +206,8 @@ around run_test_method => sub {
 sub _build_color {
     return TAP::Formatter::Color->new;
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -208,7 +223,7 @@ Test::Class::Moose::Executor::Parallel - Execute tests in parallel (parallelized
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =for Pod::Coverage Tags Tests runtests
 
@@ -238,7 +253,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

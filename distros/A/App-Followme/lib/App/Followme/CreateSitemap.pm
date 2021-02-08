@@ -11,7 +11,7 @@ use base qw(App::Followme::Module);
 use File::Spec::Functions qw(catfile);
 use App::Followme::FIO;
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -20,8 +20,8 @@ sub parameters {
     my ($pkg) = @_;
 
     return (
-            remote_url => '',
             sitemap => 'sitemap.txt',
+            include_index => 1,
             data_pkg => 'App::Followme::WebData',
            );
 }
@@ -49,13 +49,12 @@ sub list_urls {
 
     my @urls;
     my $index_file = $self->to_file($folder);
-    my $files = $self->{data}->build('files', $index_file);
+    my $files = $self->{data}->build('files_by_name', $index_file);
 
     foreach my $file (@$files) {
         # build returns a reference, so must dereference
-        my $url = $self->{data}->build('absolute_url', $file);
-        my $page_url = $self->{remote_url} . $$url;
-        push(@urls, $page_url);
+        my $url = $self->{data}->build('remote_url', $file);
+        push(@urls, $$url);
     }
 
     my $folders = $self->{data}->build('folders', $index_file);
@@ -65,17 +64,6 @@ sub list_urls {
     }
 
     return @urls;
-}
-
-#----------------------------------------------------------------------
-# Clean up parameters passed to this object
-
-sub setup {
-    my ($self, %configuration) = @_;
-
-    # Remove any trailing slash
-    $self->{remote_url} =~ s/\/$//;
-    return;
 }
 
 1;
@@ -110,10 +98,6 @@ The following field in the configuration file are used:
 The name of the sitemap file. It is written to the directory this module is
 invoked from. Typically this is the top folder of a site. The default value is
 sitemap.txt.
-
-=item remote_url
-
-The url of the website, e.g. http://www.example.com.
 
 =item data_pkg
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Cwd;
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Create object that returns files in a directory tree
@@ -28,24 +28,17 @@ sub parameters {
 
     return (
             quick_update => 0,
+            case_sensitivity => 0,
             top_directory => getcwd(),
             base_directory => getcwd(),
            );
 }
 
 #----------------------------------------------------------------------
-# Update an object's fields from all the configuration hashes
+# Update an object's fields from the configuration hash
 
 sub add_configurations {
     my ($self, $pkg, %configuration) = @_;
-
-    foreach my $field ($self->all_fields($configuration{''})) {
-        $self->{$field} = $configuration{''}->{$field};
-    }
-
-    foreach my $field ($self->all_fields($configuration{$pkg})) {
-        $self->{$field} = $configuration{$pkg}->{$field};
-    }
 
     foreach my $field ($self->all_fields(\%configuration)) {
         $self->{$field} = $configuration{$field};
@@ -91,13 +84,56 @@ sub all_fields {
 
         foreach my $field (keys %$configuration) {
             next if ref $configuration->{$field};
-            next unless exists $parameters{$field};
-
-            push(@fields, $field);
+            push(@fields, $field) if exists $parameters{$field};;
         }
     }
 
     return @fields;
+}
+
+#----------------------------------------------------------------------
+# Remove prefixes from config fields that match the package name
+
+sub filter_configuration {
+    my ($pkg, %configuration) = @_;
+
+    my %parameters = $pkg->parameters();
+    my @config_keys = keys %configuration;
+
+    for my $field (@config_keys) {
+        my @configuration_fields = split('::', $field);
+        my $config_field = pop(@configuration_fields);
+        next unless @configuration_fields;
+
+        my @pkg_fields = split('::', $pkg);
+
+        my $match = 1;
+        while (@configuration_fields) {
+            my $subfield = pop(@configuration_fields);
+            my $pkg_field = pop(@pkg_fields);
+
+            if ($pkg_field ne $subfield) {
+                $match = 0;
+                last;
+            }
+        }
+
+        if ($match) {
+            $configuration{$config_field} = $configuration{$field};
+            delete $configuration{$field};
+        }
+    }
+
+    return %configuration;
+}
+
+#----------------------------------------------------------------------
+# Extract the package field name from the configuration field name
+
+sub get_pkg_field {
+    my ($self, $field) = @_;
+    my @configuration_fields = split('::', $field);
+    return pop(@configuration_fields);
 }
 
 #----------------------------------------------------------------------
@@ -109,6 +145,7 @@ sub initialize {
     return if $cycle->{$pkg};
 
     no strict 'refs';
+    %configuration = $pkg->filter_configuration(%configuration);
     initialize($_, $self, $cycle, %configuration) foreach @{"${pkg}::ISA"};
     $cycle->{$pkg} = 1;
 
@@ -187,6 +224,11 @@ class based on it:
 
 The directory containing the configuration file that loads the class. The
 default value is the current directory.
+
+=item case_sensitvity
+
+Boolean flag that indicates if filenames on this operating system 
+are case sensitive. The default value is false.
 
 =item quick_mode
 

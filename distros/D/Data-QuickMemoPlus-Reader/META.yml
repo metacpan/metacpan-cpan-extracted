@@ -27,12 +27,16 @@ no_index:
 provides:
   Data::QuickMemoPlus::Reader:
     file: lib/Data\QuickMemoPlus\Reader.pm
-    version: '0.01'
+    version: '0.04'
 requires:
   Archive::Zip: '0'
   Carp: '0'
   JSON: '0'
   perl: '5.010'
-version: '0.01'
+resources:
+  bugtracker: https://github.com/FractalLotus/Data-QuickMemoPlus-Reader/issues
+  homepage: https://github.com/FractalLotus/Data-QuickMemoPlus-Reader
+  repository: git://github.com/FractalLotus/Data-QuickMemoPlus-Reader.git
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

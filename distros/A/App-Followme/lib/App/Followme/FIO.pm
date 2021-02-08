@@ -11,18 +11,41 @@ use IO::Dir;
 use IO::File;
 use Time::Local;
 use Time::Format;
-use File::Spec::Functions qw(abs2rel catfile file_name_is_absolute
-                             no_upwards rel2abs splitdir);
+use File::Spec::Functions qw(abs2rel catfile curdir file_name_is_absolute
+                             no_upwards rel2abs splitdir updir);
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(fio_filename_to_url fio_full_file_name fio_format_date
-                 fio_get_date fio_get_size fio_glob_patterns fio_is_newer
-                 fio_match_patterns fio_most_recent_file fio_read_page
-                 fio_same_file fio_set_date fio_split_filename
-                 fio_to_file fio_visit fio_write_page);
+our @EXPORT = qw(fio_filename_to_url fio_flatten 
+                 fio_full_file_name fio_format_date fio_get_date 
+                 fio_get_size fio_glob_patterns fio_is_newer 
+                 fio_make_dir fio_match_patterns fio_most_recent_file 
+                 fio_read_page fio_same_file fio_set_date 
+                 fio_shorten_path fio_split_filename fio_to_file 
+                 fio_visit fio_write_page);
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
+
+#----------------------------------------------------------------------
+# Calculate the check sum for a file
+
+sub fio_calculate_checksum {
+    my ($filename) = @_;
+
+    my $checksum;
+    my $page = fio_read_page($filename, ':raw');
+
+    if ($page) {
+        my $md5 = Digest::MD5->new;
+        $md5->add($page);
+        $checksum = $md5->hexdigest;
+        
+    } else {
+        $checksum = '';
+    }
+
+    return $checksum;
+}
 
 #----------------------------------------------------------------------
 # Convert filename to url
@@ -43,14 +66,42 @@ sub fio_filename_to_url {
 }
 
 #----------------------------------------------------------------------
+# Flatten a data structure to a string
+
+sub fio_flatten {
+	my ($data) = @_;
+
+	if (ref($data) eq 'HASH') {
+		my @buffer;
+		foreach my $key (sort keys %$data) {
+			my $value = fio_flatten($data->{$key});
+			push(@buffer, "$key: $value");
+		}
+		
+		$data = \@buffer;
+	}
+	
+	if (ref($data) eq 'ARRAY') {
+		my @buffer;
+		foreach my $value (@$data) {
+			push(@buffer, fio_flatten($value));
+		}
+		
+		$data = join(", ", @buffer);
+	}
+	
+	return $data;
+}
+
+#----------------------------------------------------------------------
 # Format a date string
 
 sub fio_format_date {
     my ($date, $format) = @_;
-
-    # Default format is iso date format
+    
     $format = 'yyyy-mm-ddThh:mm:ss' unless defined $format;
-    return time_format($format, $date);
+    $date = time_format($format, $date);
+    return $date;
 }
 
 #----------------------------------------------------------------------
@@ -89,7 +140,7 @@ sub fio_get_date {
         my @stats = stat($filename);
         $date = $stats[9];
     } else {
-        $date =time();
+        $date = time();
     }
 
     return $date;
@@ -175,6 +226,27 @@ sub fio_is_newer {
 }
 
 #----------------------------------------------------------------------
+# Create a new directory to write a file in if it doesn't exist
+
+sub fio_make_dir {
+    my ($filename) = @_;
+
+    my $flag = 1;
+    my ($dir, $file) = fio_split_filename($filename);
+
+    if (! -e $dir) {
+        my @dirs = splitdir($dir);
+        my $last_dir = lc(pop(@dirs));
+        $dir = catfile(@dirs, $last_dir);
+
+        $flag = mkdir($dir);
+    }
+
+    $filename = catfile($dir, $file);
+    return $flag ? $filename : '';
+}
+
+#----------------------------------------------------------------------
 # Return true if filename matches pattern
 
 sub fio_match_patterns {
@@ -236,8 +308,8 @@ sub fio_read_page {
 # Check if two filenames are the same in an os independent way
 
 sub fio_same_file {
-    my ($filename1, $filename2) = @_;
-
+    my ($filename1, $filename2, $case_sensitivity) = @_;
+    $case_sensitivity = 0 unless defined $case_sensitivity;
     return unless defined $filename1 && defined $filename2;
 
     my @path1 = splitdir(rel2abs($filename1));
@@ -245,7 +317,15 @@ sub fio_same_file {
     return unless @path1 == @path2;
 
     while(@path1) {
-        return unless shift(@path1) eq shift(@path2);
+        my $part1 = shift(@path1);
+        my $part2 = shift(@path2);
+
+        unless ($case_sensitivity) {
+            $part1 = lc($part1);
+            $part2 = lc($part2);
+        }
+
+        return unless $part1 eq $part2;
     }
 
     return 1;
@@ -266,6 +346,29 @@ sub fio_set_date {
     }
 
     return utime($date, $date, $filename);
+}
+
+#----------------------------------------------------------------------
+# Remove dotted directories from directory path
+
+sub fio_shorten_path {
+    my ($filename) = @_;
+    
+    my @path = splitdir($filename);
+    my $file = pop(@path);
+
+    my @newpath;
+    foreach my $dir (@path) {
+        if ($dir eq curdir()) {
+            ;
+        } elsif ($dir eq updir()) {
+            pop(@newpath);
+        } else {
+            push(@newpath, $dir);
+        }
+    }
+
+    return catfile(@newpath, $file);
 }
 
 #----------------------------------------------------------------------
@@ -338,10 +441,13 @@ sub fio_write_page {
     my ($filename, $page, $binmode) = @_;
 
 	my ($dir, $base) = fio_split_filename($filename);
-	die "Couldn't write $filename, no directory" unless -e $dir;
+	if (! -e $dir) {
+		$dir = rel2abs($dir);
+		die "Couldn't write $filename, no directory $dir\n";
+	}
 	
     my $fd = IO::File->new($filename, 'w');
-    die "Couldn't write $filename: $!" unless $fd;
+    die "Couldn't write $filename: $!\n" unless $fd;
 
     binmode($fd, $binmode) if defined $binmode;
     print $fd $page;
@@ -377,6 +483,13 @@ This module contains the subroutines followme uses to access the file system
 Convert a filename into a url. The directory is the top directory of the
 website. The optional extension, if passed, replaces the extension on the file.
 
+=item $str = fio_flatten($data);
+
+Converted a nested data sructure containing hashes, arrays, and strings 
+to a string by representing hash key value pairs as a colon separated 
+pairs and then joining the pairs with commas and also joining array
+elements with commas.  
+
 =item $date_string = fio_format_date($date, $format);
 
 Convert a date to a new format. If the format is omitted, the ISO format is used.
@@ -404,6 +517,12 @@ Compare the modification date of the target file to the modification dates of
 the source files. If the target file is newer than all of the sources, return
 1 (true).
 
+=item $filename = fio_make_dir($filename);
+
+Make a new directory for a file to live in if the directory does not already
+exist. Return the filename if the directory already existed or was created 
+and the empty string if the directory could not be created.
+
 =item $flag = fio_match_patterns($filename, $patterns);
 
 Return 1 (Perl true) if a filename matches a Perl pattern in a list of
@@ -426,6 +545,10 @@ type if it is not a plain text file.
 
 Set the modification date of a file. Date is either in seconds or
 is in ISO format.
+
+=item $filename = fio_shorten_path($filename);
+
+Remove dotted directories ('.' and '..') from filename path.
 
 =item ($directory, $filename) = fio_split_filename($filename);
 

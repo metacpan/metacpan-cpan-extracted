@@ -4,16 +4,22 @@ use Math::GMPf qw(:mpf);
 
 print "1..18\n";
 
-print "# Using gmp version ", Math::GMPf::gmp_v(), "\n";
+warn "# Using gmp version ", Math::GMPf::gmp_v(), "\n";
 
 my $ui = 12345679;
 my $mpz;
 eval {require Math::GMPz;};
-if(!$@) {$mpz = Math::GMPz->new($ui)}
+if(!$@) {
+  warn "Math-GMPz-$Math::GMPz::VERSION loaded\n";
+  $mpz = Math::GMPz->new($ui);
+}
 
 if(!$mpz) {
   eval {require Math::GMP;};
-  if(!$@) {$mpz = Math::GMP->new($ui)}
+  if(!$@) {
+    warn "Math-GMP-$Math::GMP::VERSION loaded\n";
+    $mpz = Math::GMP->new($ui);
+  }
 }
 
 my @s;

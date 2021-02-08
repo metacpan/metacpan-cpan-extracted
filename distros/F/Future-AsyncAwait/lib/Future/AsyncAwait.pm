@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.47;
+package Future::AsyncAwait 0.48;
 
 use v5.14;
 use warnings;
@@ -65,6 +65,13 @@ the return value of the function in a L<Future> instance.
    }
 
    my $f = myfunc();
+   my $result = $f->get;
+
+As well as named function declarations it is also supported on anonymous
+function expressions.
+
+   my $code = async sub { return 456 };
+   my $f = $code->();
    my $result = $f->get;
 
 This C<async>-declared function always returns a C<Future> instance when

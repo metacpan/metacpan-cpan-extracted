@@ -5,7 +5,7 @@ use warnings;
 
 use Digest::SHA qw(sha256_hex);
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 RT->AddStyleSheets("resetpassword.css");
 
@@ -191,6 +191,12 @@ to display on the login page.
 
 This is useful if you want only the password reset email option on the RT
 user admin page, but no self-service options.
+
+=item C<$PasswordChangeLinkExpirySeconds>
+
+Set this config value to the time in seconds before a password-change
+link expires.  The default value is 4*60*60, meaning that password-change
+links expire after four hours by default.
 
 =back
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.70.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,25 +14,22 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 be0627fff2e8aef3d2a14d5d7486babc8a4873ba Artistic
-SHA1 d117308a9f5dcdc8fe8894adaba4c2f810d59e7c Build.PL
-SHA1 8624bcdae55baeef00cd11d5dfcfa60f68710a02 COPYING
-SHA1 b4847c5c927898aa7a2bacf5dc3f67c7a533ecbf Changes
-SHA1 32ef45b43fdaac94b23f0cd3728e6a093baf86e9 INSTALL
-SHA1 364cd00228c739ba196c0a1345bb0578568cd753 MANIFEST
-SHA1 707611f6bcf5a0a3bc480583b56fbef33abaddf4 META.json
-SHA1 2212fadc25eb040133f70e46bffc05b89d60ca9f META.yml
-SHA1 6f8287182e21f89edcd80bcf4d2dc55dcc3b6001 Makefile.PL
-SHA1 305c643be06fa1ecf2c753bbb59e3f0076f9af69 README
-SHA1 70bf2351d9e5f66b43ba4fa4701f161286e11b3e TODO
-SHA1 d5c5540d71ffd2b2b8c8c8e9d8cb8bc6630d7d31 lib/Acme/GuessNumber.pm
-SHA1 525f414c7a0aadc61240a4b0959ca2cda7514c75 t/00-signature.t
-SHA1 43166ff7bf57d5c5b62efa507296f680a8aff524 t/01-basic.t
-SHA1 b85626024d610808bd0909989dcfb9fb20a40485 t/99-pod.t
+SHA256 b7fd9b73ea99602016a326e0b62e6646060d18febdd065ceca8bb482208c3d88 Artistic
+SHA256 0ec19b6bafdbfd981628ecdb45acb0a5db6015e1ffe7cc523ab7574d022a8848 Build.PL
+SHA256 74617d92d6cc2ecae4e31401c3a3ff1a78580c6a9dcee415ee9eb36e3d11e1a9 Changes
+SHA256 298cf415aeb8db69e530a707e3a19c2cf9f6108962d5c8f1bf1cd6bf84cb4684 MANIFEST
+SHA256 c957c3df311e2b98908c3f4c2d6967eb1eaa05a011af5dfe70a1be57c46f7504 MANIFEST.SKIP
+SHA256 1e6b9646d64942d40fda8c71aaf540fde328f0a3dded91dfcda376f8aceb8478 META.json
+SHA256 b7ed93a65112669c1be9a011df413275717bc4b220e4efc4dcdfd0aeecb4f720 META.yml
+SHA256 aa4cce5ecd9995044bf1f902df4bd7595ae645c9aff174425cf88153545afa58 Makefile.PL
+SHA256 21d8c38e08db1dcd88b9c804ee5ba89b06e480ba6ece4cd596e37a366b6b6a1d README.md
+SHA256 06102fee40fae381f7387fe06af77f92fd725ed432d7d625c319a1ae1288817c lib/Acme/GuessNumber.pm
+SHA256 1153bcbc36976012b03dfc052bc26d7f8cb4ad8968434ef54139c06f48dad7f4 t/00-signature.t
+SHA256 abc54d61c2916b9b1b6581d2a7c8bdd3d22f0bd8b131d5d6e774526d9d8339d3 t/01-basic.t
+SHA256 199347e5b382ea991a32513cdef2b45887ae3f3cd6610a2e7976e9a678423b04 t/99-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
 
-iEYEARECAAYFAlGL/mkACgkQi9gubzC5S1x/aQCfeUQ95UaJINBGXm10wBVBmTHS
-C10AmwSLVwpsLiAi3h4x+cLEdH+JU/kL
-=Jf4r
+iF0EARECAB0WIQSBin4eTeP7OclnnAOL2C5vMLlLXAUCYCAO/QAKCRCL2C5vMLlL
+XDW0AJ90J4I5sxfob3qEy/zu4ItZBLGWvACaAzfapeMOSy+MvJNAfzI7MEf+DcE=
+=Necy
 -----END PGP SIGNATURE-----

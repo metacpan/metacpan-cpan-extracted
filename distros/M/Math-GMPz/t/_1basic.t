@@ -7,6 +7,11 @@ use Math::GMPz::V;
 print "1..9\n";
 
 warn "\n# Using Math::GMPz version ", $Math::GMPz::VERSION, "\n";
+
+eval {require Math::GMPq;};
+if(!$@) {warn "# Using Math::GMPq version ", $Math::GMPq::VERSION, "\n"}
+else {warn "# Math::GMPq unloadable\n"}
+
 warn "# Using gmp library version ", Math::GMPz::gmp_v(), "\n";
 warn "# CC is ", Math::GMPz::__GMP_CC, "\n" if defined Math::GMPz::__GMP_CC;
 warn "# CFLAGS are ", Math::GMPz::__GMP_CFLAGS, "\n" if defined Math::GMPz::__GMP_CFLAGS;
@@ -17,10 +22,13 @@ warn "# MATH_GMPz_IV_MAX is ", MATH_GMPz_IV_MAX(), "\n";
 warn "# MATH_GMPz_IV_MIN is ", MATH_GMPz_IV_MIN(), "\n";
 warn "# MATH_GMPz_UV_MAX is ", MATH_GMPz_UV_MAX(), "\n";
 
-if($Math::GMPz::VERSION eq '0.48' && $Math::GMPz::Random::VERSION eq '0.48' &&
-   $Math::GMPz::V::VERSION eq '0.48' &&
+if($Math::GMPz::VERSION eq '0.49' && $Math::GMPz::Random::VERSION eq '0.49' &&
+   $Math::GMPz::V::VERSION eq '0.49' &&
    Math::GMPz::_get_xs_version() eq $Math::GMPz::VERSION) {print "ok 1\n"}
-else {print "not ok 1 $Math::GMPz::VERSION $Math::GMPz::Random::VERSION ", Math::GMPz::_get_xs_version(), "\n"}
+else {
+  print "not ok 1\n";
+  warn "$Math::GMPz::VERSION $Math::GMPz::Random::VERSION ", Math::GMPz::_get_xs_version(), "\n"
+}
 
 my @version = split /\./, Math::GMPz::gmp_v();
 

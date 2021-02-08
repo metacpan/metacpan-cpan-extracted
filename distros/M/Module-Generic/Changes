@@ -1,5 +1,12 @@
 Revision history for Perl module Module::Generic
 
+0.13.5 2021-02-06T11:46:18+0900
+    - Corrected a mising require for DateTime::Format::Strptime
+    - Improved the _warnings_is_enabled helper method
+
+0.13.4 2021-01-25T18:47:55+0900
+    - Moved the requirement on Apache module to the BEGIN block as it should.
+
 0.13.3 2020-12-08T11:12:15+0900
     - Removed method message_switch
     - Added method _set_get_object_without_init for object that cannot just simply be initiated without specific parameters, such as Apache2::RequestRec.

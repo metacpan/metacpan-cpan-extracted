@@ -154,6 +154,5 @@ t/titlepages/title-subtitle-date.muse
 t/titlepages/title-subtitle.muse
 t/titlepages/title.muse
 t/utils.t
-t/webfonts.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

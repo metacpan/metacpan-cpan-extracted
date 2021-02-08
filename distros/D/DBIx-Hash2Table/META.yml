@@ -1,24 +1,31 @@
 ---
 abstract: 'Save a hash into a database table'
 author:
-  - 'Ron Savage <ron@savage.net.au>'
+  - 'Ron Savage (ron@savage.net.au)'
 build_requires:
-  Test::More: 0
-  Test::Pod: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  Test::Pod: '0'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
-license: artistic
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-Hash2Table
-provides:
-  DBIx::Hash2Table:
-    file: lib/DBIx/Hash2Table.pm
-    version: 2.04
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Carp: 0
+  Carp: '0'
+  strict: '0'
+  warnings: '0'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_1_0
-version: 2.04
+  bugtracker: https://github.com/ronsavage/DBIx-Hash2Table/issues
+  license: http://opensource.org/licenses/Perl
+  repository: https://github.com/ronsavage/DBIx-Hash2Table.git
+version: '2.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

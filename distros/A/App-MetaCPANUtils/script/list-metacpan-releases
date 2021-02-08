@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-01'; # DATE
+our $DATE = '2021-01-02'; # DATE
 our $DIST = 'App-MetaCPANUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,17 +40,18 @@ list-metacpan-releases - list-metacpan-releases
 
 =head1 VERSION
 
-This document describes version 0.003 of list-metacpan-releases (from Perl distribution App-MetaCPANUtils), released on 2020-01-01.
+This document describes version 0.004 of list-metacpan-releases (from Perl distribution App-MetaCPANUtils), released on 2020-01-02.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-metacpan-releases [--author=s] [--debug] [--distribution=s] [-f=s+]
-     [--fields-json=s] [--fields=s+] [--format=name] [--from-date=s]
-     [--json] [--log-level=level] [--(no)naked-res]
-     [--page-result[=program]] [--quiet] [--sort=s] [--to-date=s] [--trace]
-     [--verbose] [--view-result[=program]]
+ % list-metacpan-releases [--author=s] [--backpan] [--cpan] [--debug]
+     [--distribution=s] [-f=s+] [--fields-json=s] [--fields=s+] [--first]
+     [--format=name] [--from-date=s] [--json] [--latest]
+     [--log-level=level] [--(no)naked-res] [--no-first] [--nofirst]
+     [--page-result[=program]] [--quiet] [--sort=s] [--status=s]
+     [--to-date=s] [--trace] [--verbose] [--view-result[=program]]
 
 Examples:
 
@@ -88,9 +89,35 @@ Valid values:
 
 =item B<--author>=I<s>
 
+=item B<--backpan>
+
+Shortcut for --status=backpan.
+
+See C<--status>.
+
+=item B<--cpan>
+
+Shortcut for --status=cpan.
+
+See C<--status>.
+
 =item B<--distribution>=I<s>
 
+=item B<--first>
+
 =item B<--from-date>=I<s>
+
+=item B<--latest>
+
+Shortcut for --status=latest.
+
+See C<--status>.
+
+=item B<--status>=I<s>
+
+Valid values:
+
+ ["latest","cpan","backpan"]
 
 =item B<--to-date>=I<s>
 
@@ -181,7 +208,7 @@ See C<--fields>.
 
 Default value:
 
- ["release","date","author","maturity","version","distribution","abstract"]
+ ["release","date","author","status","maturity","version","first","distribution","abstract"]
 
 Can be specified multiple times.
 

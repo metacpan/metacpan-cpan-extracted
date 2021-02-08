@@ -121,7 +121,7 @@ else{warn "3h: Expected $d\n    Got $f26\n"}
 my $f27 = Math::GMPq->new(36028797018964023);
 my $f28 = Math::GMPq->new('36028797018964023');
 
-if($Config{ivsize} > 4 || Math::GMPq::_has_longdouble()) {
+if($Config{ivsize} > 4 || $Config{nvsize} > 8) {
   if($f27 == $f28) {$ok .= 'i'}
   else{warn "3i: Should have $f27 == $f28\n"}
 }

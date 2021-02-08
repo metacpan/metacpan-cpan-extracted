@@ -1,17 +1,17 @@
 # Locale::Maketext::Gettext - Joins the gettext and Maketext frameworks
 
-# Copyright (c) 2003-2019 imacat. All rights reserved. This program is free
+# Copyright (c) 2003-2021 imacat. All rights reserved. This program is free
 # software; you can redistribute it and/or modify it under the same terms
 # as Perl itself.
-# First written: 2003-04-23
+# First written: 2003/4/23
 
 package Locale::Maketext::Gettext;
 use 5.008;
 use strict;
 use warnings;
 use base qw(Locale::Maketext Exporter);
-use vars qw($VERSION @ISA %Lexicon @EXPORT @EXPORT_OK);
-$VERSION = 1.30;
+our ($VERSION, @EXPORT, @EXPORT_OK);
+$VERSION = 1.32;
 @EXPORT = qw(read_mo);
 @EXPORT_OK = @EXPORT;
 # Prototype declaration
@@ -21,15 +21,15 @@ use Encode qw(encode decode FB_DEFAULT);
 use File::Spec::Functions qw(catfile);
 no strict qw(refs);
 
-use vars qw(%CACHE $REREAD_MO $MO_FILE);
+our (%CACHE, $REREAD_MO, $MO_FILE);
 %CACHE = qw();
 $REREAD_MO = 0;
 $MO_FILE = "";
-use vars qw(@SYSTEM_LOCALEDIRS);
+our (@SYSTEM_LOCALEDIRS);
 @SYSTEM_LOCALEDIRS = qw(/usr/share/locale /usr/lib/locale
     /usr/local/share/locale /usr/local/lib/locale);
 
-# encoding: Set or retrieve the output encoding
+# Set or retrieve the output encoding
 sub encoding : method {
     local ($_, %_);
     my $self;
@@ -52,7 +52,7 @@ sub encoding : method {
     return exists $self->{"ENCODING"}? $self->{"ENCODING"}: undef;
 }
 
-# key_encoding: Specify the encoding used in the keys
+# Specify the encoding used in the keys
 sub key_encoding : method {
     local ($_, %_);
     my $self;
@@ -74,7 +74,7 @@ sub key_encoding : method {
     return exists $self->{"KEY_ENCODING"}? $self->{"KEY_ENCODING"}: undef;
 }
 
-# new: Initialize the language handler
+# Initialize the language handler
 sub new : method {
     local ($_, %_);
     my ($self, $class);
@@ -85,8 +85,8 @@ sub new : method {
     return $self;
 }
 
-# subclass_init: Initialize at the subclass level, so that it can be
-#                inherited by calling $self->SUPER:subclass_init
+# Initialize at the subclass level, so that it can be
+#   inherited by calling $self->SUPER:subclass_init
 sub subclass_init : method {
     local ($_, %_);
     my ($self, $class);
@@ -119,7 +119,7 @@ sub subclass_init : method {
     return;
 }
 
-# bindtextdomain: Bind a text domain to a locale directory
+# Bind a text domain to a locale directory
 sub bindtextdomain : method {
     local ($_, %_);
     my ($self, $DOMAIN, $LOCALEDIR);
@@ -139,7 +139,7 @@ sub bindtextdomain : method {
     return ${$self->{"LOCALEDIRS"}}{$DOMAIN};
 }
 
-# textdomain: Set the current text domain
+# Set the current text domain
 sub textdomain : method {
     local ($_, %_);
     my ($self, $class, $DOMAIN, $LOCALEDIR, $mo_file);
@@ -232,7 +232,7 @@ sub textdomain : method {
     } else {
         delete $self->{"MO_ENCODING"};
     }
-    # Respect the MO file encoding unless there is a user preferrence
+    # Respect the MO file encoding unless there is a user preference
     if (!exists $self->{"USERSET_ENCODING"}) {
         if (exists $self->{"MO_ENCODING"}) {
             $self->{"ENCODING"} = $self->{"MO_ENCODING"};
@@ -247,7 +247,7 @@ sub textdomain : method {
     return $DOMAIN;
 }
 
-# _is_using_cache: Return whether we are using our cache.
+# Return whether we are using our cache.
 sub _is_using_cache : method {
     local ($_, %_);
     my ($self, $mo_file, @stats, $mtime, $size);
@@ -272,7 +272,7 @@ sub _is_using_cache : method {
     }
 }
 
-# maketext: Encode after maketext
+# Encode after maketext
 sub maketext : method {
     local ($_, %_);
     my ($self, $key, @param, $class, $keyd);
@@ -320,25 +320,25 @@ sub maketext : method {
     return $_;
 }
 
-# pmaketext: Maketext with context
+# Maketext with context
 sub pmaketext : method {
     local ($_, %_);
-    my ($self, $ctxt, $key, @param);
-    ($self, $ctxt, $key, @param) = @_;
+    my ($self, $context, $key, @param);
+    ($self, $context, $key, @param) = @_;
     # This is not a static method - NOW
     return if ref($self) eq "";
     # This is actually a wrapper to the maketext() method
-    return $self->maketext("$ctxt\x04$key", @param);
+    return $self->maketext("$context\x04$key", @param);
 }
 
-# read_mo: Subroutine to read and parse the MO file
-#          Refer to gettext documentation section 8.3
+# Subroutine to read and parse the MO file
+#   Refer to gettext documentation section 8.3
 sub read_mo($) {
     local ($_, %_);
     my ($mo_file, $len, $FH, $content, $tmpl);
     $mo_file = $_[0];
     
-    # Avild being stupid
+    # Avoid being stupid
     return unless -f $mo_file && -r $mo_file;
     # Read the MO file
     $len = (stat $mo_file)[7];
@@ -397,7 +397,7 @@ sub read_mo($) {
     return %_;
 }
 
-# reload_text: Method to purge the lexicon cache
+# Method to purge the lexicon cache
 sub reload_text : method {
     local ($_, %_);
     
@@ -408,7 +408,7 @@ sub reload_text : method {
     return;
 }
 
-# fail_with: A wrapper to the fail_with() of Locale::Maketext, in order
+# A wrapper to the fail_with() of Locale::Maketext, in order
 #   to record the preferred failure handler of the user, so that
 #   die_for_lookup_failures() knows where to return to.
 sub fail_with : method {
@@ -434,7 +434,7 @@ sub fail_with : method {
     return exists $self->{"USERSET_FAIL"}? $self->{"USERSET_FAIL"}: undef;
 }
 
-# die_for_lookup_failures: Whether we should die for lookup failure
+# Whether we should die for lookup failure
 #   The default is no.  GNU gettext never fails.
 sub die_for_lookup_failures : method {
     local ($_, %_);
@@ -464,7 +464,7 @@ sub die_for_lookup_failures : method {
         $self->{"DIE_FOR_LOOKUP_FAILURES"}: undef;
 }
 
-# encode_failure: What to do if the text is out of your output encoding
+# What to do if the text is out of your output encoding
 #   Refer to Encode on possible values of this check
 sub encode_failure : method {
     local ($_, %_);
@@ -482,9 +482,9 @@ sub encode_failure : method {
     return undef;
 }
 
-# failure_handler_auto: Our local version of failure_handler_auto(),
+# Our local version of failure_handler_auto(),
 #   Copied and rewritten from Locale::Maketext, with bug#33938 patch applied.
-#   See http://rt.perl.org/rt3//Public/Bug/Display.html?id=33938
+#   See https://github.com/Perl/perl5/issues/7767
 sub failure_handler_auto : method {
     local ($_, %_);
     my ($self, $key, @param, $r);
@@ -523,7 +523,6 @@ sub failure_handler_auto : method {
         s<\s+at\s+\(eval\s+\d+\)\s+line\s+(\d+)\.?\n?>
             <\n in bracket code [compiled line $1],>s;
         Carp::croak "Error in maketexting \"$key\":\n$_ as used";
-        return;
     }
     
     # OK
@@ -580,7 +579,7 @@ that follows the way GNU gettext works.  It works seamlessly, I<both
 in the sense of GNU gettext and Maketext>.  As a result, you I<enjoy
 both their advantages, and get rid of both their problems, too.>
 
-You start as an usual GNU gettext localization project:  Work on
+You start as a usual GNU gettext localization project:  Work on
 PO files with the help of translators, reviewers and Emacs.  Turn
 them into MO files with F<msgfmt>.  Copy them into the appropriate
 locale directory, such as
@@ -615,7 +614,7 @@ returns the text message C<encode>d according to the current
 C<encoding>.  Refer to L<Locale::Maketext(3)|Locale::Maketext/3> for
 the maketext plural notation.
 
-=item $text = $LH->pmaketext($ctxt, $key, @param...)
+=item $text = $LH->pmaketext($context, $key, @param...)
 
 Lookup the $key in a particular context in the current lexicon and
 return a translated message in the language of the user.   Use
@@ -651,7 +650,7 @@ be working.
 =item $LH->encode_failure(CHECK)
 
 Set the action when encode fails.  This happens when the output text
-is out of the scope of your output encoding.  For exmaple, output
+is out of the scope of your output encoding.  For example, output
 Chinese into US-ASCII.  Refer to L<Encode(3)|Encode/3> for the
 possible values of this C<CHECK>.  The default is C<FB_DEFAULT>,
 which is a safe choice that never fails.  But part of your text may
@@ -677,8 +676,8 @@ Purge the MO text cache.  It purges the MO text cache from the base
 class Locale::Maketext::Gettext.  The next time C<maketext> is
 called, the MO file will be read and parse from the disk again.  This
 is used when your MO file is updated, but you cannot shutdown and
-restart the application.  For example, when you are a co-hoster on a
-mod_perl-enabled Apache, or when your mod_perl-enabled Apache is too
+restart the application.  For example, when you are a virtual host on
+a mod_perl-enabled Apache, or when your mod_perl-enabled Apache is too
 vital to be restarted for every update of your MO file, or if you
 are running a vital daemon, such as an X display server.
 
@@ -693,7 +692,7 @@ are running a vital daemon, such as an X display server.
 Read and parse the MO file.  Returns the read %Lexicon.  The returned
 lexicon is in its original encoding.
 
-If you need the meta infomation of your MO file, parse the entry
+If you need the meta information of your MO file, parse the entry
 C<$Lexicon{""}>.  For example:
 
   /^Content-Type: text\/plain; charset=(.*)$/im;
@@ -729,7 +728,7 @@ But, well, here comes Locale::Maketext::Gettext to rescue.  With
 Locale::Maketext::Gettext, you can sit back and relax now, leaving
 all this mess to the excellent GNU gettext framework.
 
-The idea of Locale::Maketext::Getttext came from
+The idea of Locale::Maketext::Gettext came from
 L<Locale::Maketext::Lexicon(3)|Locale::Maketext::Lexicon/3>, a great
 work by Autrijus.  But it has several problems at that time (version
 0.16).  I was first trying to write a wrapper to fix it, but finally
@@ -760,7 +759,7 @@ text may be lost, as C<FB_DEFAULT> does.  If you do not like this
 C<FB_DEFAULT>, change the failure behavior with the method
 C<encode_failure>.
 
-If you need the behavior of auto Traditional Chinese/Simplfied
+If you need the behavior of auto Traditional Chinese/Simplified
 Chinese conversion, as GNU gettext smartly does, do it yourself with
 L<Encode::HanExtra(3)|Encode::HanExtra/3>, too.  There may be a
 solution for this in the future, but not now.
@@ -802,7 +801,7 @@ this problem by saving a copy of the current lexicon as an instance
 variable, and replacing the class lexicon with the current instance
 lexicon whenever it is changed by another language handle instance.
 But this involves large scaled memory copy, which affects the
-proformance seriously.  This is discouraged.  You are adviced to use
+performance seriously.  This is discouraged.  You are advised to use
 a single textdomain for a single localization class.
 
 The C<key_encoding> is a workaround, not a solution.  There is no
@@ -834,7 +833,7 @@ L<Locale::Maketext::TPJ13(3)|Locale::Maketext::TPJ13/3>,
 L<Locale::Maketext::Lexicon(3)|Locale::Maketext::Lexicon/3>,
 L<Encode(3)|Encode/3>, L<bindtextdomain(3)|bindtextdomain/3>,
 L<textdomain(3)|textdomain/3>.  Also, please refer to the official GNU
-gettext manual at L<http://www.gnu.org/software/gettext/manual/>.
+gettext manual at L<https://www.gnu.org/software/gettext/manual/>.
 
 =head1 AUTHOR
 
@@ -842,7 +841,7 @@ imacat <imacat@mail.imacat.idv.tw>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2019 imacat. All rights reserved. This program is free
+Copyright (c) 2003-2021 imacat. All rights reserved. This program is free
 software; you can redistribute it and/or modify it under the same terms
 as Perl itself.
 

@@ -1,0 +1,43 @@
+---
+abstract: 'client for the Google Civic Information API'
+author:
+  - 'Nick Tonkin <tonkin@cpan.org>'
+build_requires:
+  Test::Most: '0'
+  Test::Pod::Coverage: '0'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Google-CivicInformation
+provides:
+  Net::Google::CivicInformation:
+    file: lib/Net/Google/CivicInformation.pm
+    version: '1.01'
+  Net::Google::CivicInformation::Representatives:
+    file: lib/Net/Google/CivicInformation/Representatives.pm
+    version: '1.01'
+requires:
+  Carp: '0'
+  Function::Parameters: '0'
+  HTTP::Tiny: '0'
+  JSON::MaybeXS: '0'
+  Moo: '0'
+  Try::Tiny: '0'
+  Types::Common::String: '0'
+  URI: '0'
+  namespace::clean: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/1nickt/p5-Net-Google-CivicInformation/issues
+  repository: git://github.com/1nickt/p5-Net-Google-CivicInformation.git
+version: '1.01'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

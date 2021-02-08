@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 
-use Test::More tests => 26;
+use Test::More tests => 35;
 
 use Cwd;
 use IO::File;
@@ -50,11 +50,14 @@ $test_dir = cwd();
 # Test same file
 
 do {
-    my $same = fio_same_file('first.txt', 'first.txt');
+    my $same = fio_same_file('first.txt', 'first.txt', 0);
     is($same, 1, 'Same file'); # test 1
 
-    $same = fio_same_file('first.txt', 'second.txt');
-    is($same, undef, 'Not same file'); # test 2
+    my $same = fio_same_file('first.txt', 'First.txt', 0);
+    is($same, 1, 'Same file, different case'); # test 2
+
+    $same = fio_same_file('first.txt', 'second.txt', 0);
+    is($same, undef, 'Not same file'); # test 3
 
 };
 
@@ -66,7 +69,7 @@ do {
     my $excluded_files_ok = ['\.htm$', '^template_'];
 
     my $excluded_files = fio_glob_patterns($exclude_files);
-    is_deeply($excluded_files, $excluded_files_ok, 'Glob patterns'); # test 3
+    is_deeply($excluded_files, $excluded_files_ok, 'Glob patterns'); # test 4
 };
 
 #----------------------------------------------------------------------
@@ -80,8 +83,8 @@ do {
 
     my @dir = splitdir($dir);
     my @dir_ok = splitdir($dir_ok);
-    is_deeply(\@dir, \@dir_ok, 'Split directory'); # test 4
-    is($file, $file_ok, 'Split filename'); # test 5
+    is_deeply(\@dir, \@dir_ok, 'Split directory'); # test 5
+    is($file, $file_ok, 'Split filename'); # test 6
 };
 
 #----------------------------------------------------------------------
@@ -92,7 +95,7 @@ do {
     my $ok_date = $date - 100;
     fio_set_date($test_dir, $ok_date);
     $date = fio_get_date($test_dir);
-    is($date, $ok_date, "set and get date"); # test 6
+    is($date, $ok_date, "set and get date"); # test 7
 };
 
 #----------------------------------------------------------------------
@@ -143,13 +146,13 @@ EOQ
             fio_write_page($filename, $output);
 
             my $input = fio_read_page($filename);
-            is($input, $output, "Read and write page $filename"); #tests 7-15
+            is($input, $output, "Read and write page $filename"); #tests 8-16
         }
     }
 
     my ($files, $folders) = fio_visit($test_dir);
-    is_deeply($folders, \@ok_folders, 'get list of folders'); # test 16
-    is_deeply($files, \@ok_filenames, 'get list of files'); # test 17
+    is_deeply($folders, \@ok_folders, 'get list of folders'); # test 17
+    is_deeply($files, \@ok_filenames, 'get list of files'); # test 18
 };
 
 #----------------------------------------------------------------------
@@ -159,11 +162,11 @@ do {
     my $filename = 'foobar.txt';
     my $filename_ok = catfile($test_dir, $filename);
     my $test_filename = fio_full_file_name($test_dir, $filename);
-    is($test_filename, $filename_ok, 'Full file name relative path'); # test 18
+    is($test_filename, $filename_ok, 'Full file name relative path'); # test 19
 
     $filename = $filename_ok;
     $test_filename = fio_full_file_name($test_dir, $filename);
-    is($test_filename, $filename_ok, 'Full file name absolute path'); # test 19
+    is($test_filename, $filename_ok, 'Full file name absolute path'); # test 20
 };
 
 #----------------------------------------------------------------------
@@ -209,35 +212,96 @@ EOQ
     }
 
     my $newer = fio_is_newer('three.html', 'two.html', 'one.html');
-    is($newer, undef, 'Source is  newer'); # test 20
+    is($newer, undef, 'Source is  newer'); # test 21
 
     $newer = fio_is_newer('one.html', 'two.html', 'three.html');
-    is($newer, 1, "Target is newer"); # test 21
+    is($newer, 1, "Target is newer"); # test 22
 
     $newer = fio_is_newer('five.html', 'one.html');
-    is($newer, undef, 'Target is undefined'); # test 22
+    is($newer, undef, 'Target is undefined'); # test 23
 
     $newer = fio_is_newer('six.html', 'five.html');
-    is($newer, 1, 'Source and target undefined'); # test 23
+    is($newer, 1, 'Source and target undefined'); # test 24
 };
 
 #----------------------------------------------------------------------
-# Test filename  to url
+# Test shorten path
+
+do {
+    my @path = ('help', 'followme', '..', '..');
+    my $file = "poddata.html";
+    
+    my $url = catfile($test_dir, @path, $file);
+    my $url_ok = catfile($test_dir, $file);
+
+    my $short_url = fio_shorten_path($url);
+    is($short_url, $url_ok, "Shorten path"); # test 25
+};
+
+#----------------------------------------------------------------------
+# Test filename to url
 
 do {
     my $url_ok = 'index.html';
     my $filename = catfile($test_dir, $url_ok);
     my $url = fio_filename_to_url($test_dir, $filename);
-    is($url, $url_ok, 'Simple url'); # test 24
+    is($url, $url_ok, 'Simple url'); # test 26
 
     $filename = catfile($test_dir, 'index.md');
     $url = fio_filename_to_url($test_dir, $filename, 'html');
-    is($url, $url_ok, 'Url from filename'); # test 25
+    is($url, $url_ok, 'Url from filename'); # test 27
 
     $url_ok = 'subdir/foobar.html';
     my @path = split(/\//, $url_ok);
     $filename = catfile($test_dir, @path);
     $url = fio_filename_to_url($test_dir, $filename, 'html');
-    is($url, $url_ok, 'Url in subdirectory'); # test 26
+    is($url, $url_ok, 'Url in subdirectory'); # test 28
 
+};
+
+#----------------------------------------------------------------------
+# Create a new directory
+
+do {
+    my $filename = catfile($test_dir, 'subspace/index.html');
+    my ($dir_ok, $file_ok) = fio_split_filename($filename);
+    my $new_filename = fio_make_dir($filename);
+
+    is($new_filename, $filename, "Get filename from make_dir"); # test 29
+    ok(-e $dir_ok, "Make directory"); # test 30
+};
+
+#----------------------------------------------------------------------
+# Flatten a data structure into a string
+
+do {
+	my $data = {
+				name1 => 'value1',
+				name2 => 'value2',
+				name3 => {subname1 => 'subvalue1',
+						  subname2 => 'subvalue2'},
+				name4 => ['subvalue3',
+						  'subvalue4',
+						 ],
+		};
+
+	my $str1 = fio_flatten($data->{name1});
+	my $val1 = 'value1'; 
+	is($str1, $val1, "flatten a string"); # test 31
+
+	my $str2 = fio_flatten($data->{name2});
+	my $val2 = 'value2'; 
+	is($str2, $val2, "flatten another string"); # test 32
+		
+	my $str4 = fio_flatten($data->{name4});
+	my $val4 = 'subvalue3, subvalue4'; 
+	is($str4, $val4, "flatten an array"); # test33
+	
+	my $str3 = fio_flatten($data->{name3});
+	my $val3 = 'subname1: subvalue1, subname2: subvalue2';
+	is($str3, $val3, "flatten a hash"); # test34
+	
+	my $total = "name1: $val1, name2: $val2, name3: $val3, name4: $val4";
+	my $str = fio_flatten($data);
+	is($str, $total, "flatten a complex structure"); # test35
 };

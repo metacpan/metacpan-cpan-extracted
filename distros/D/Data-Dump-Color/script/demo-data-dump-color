@@ -1,0 +1,88 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-02-06'; # DATE
+our $DIST = 'Data-Dump-Color'; # DIST
+our $VERSION = '0.242'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Data::Dump::Color;
+
+my $data = {
+    undef => undef,
+    int => 2,
+    int2 => -3,
+    float => 1.234,
+    Regexp => qr/^(foo)bar.+?\z/,
+    str => "A string with \n newlines",
+    array => [
+        [],
+        [1,2,3,4,5],
+        [6,7,8,9,10],
+        ["foo", "bar", "baz", "qux", "quux", "long"x20],
+    ],
+    hash => {
+        key1 => {},
+        key2 => [""],
+        key3 => undef,
+    },
+};
+
+dd $data;
+
+say '';
+say "# To set color theme, you can set DATA_DUMP_COLOR_THEME environment. To list color themes, use list-color-theme-modules utility.";
+say "# To disable color, set environment COLOR=0 or NO_COLOR=1 (which defeats the purpose of this module but migh tbe useful at times.";
+say "# To disable color, you can also use the NoColor color theme.";
+say "# To dump JSON/YAML data using this module, use the json2dd or yaml2dd script.";
+say "# To convert data dump to JSON/YAML, use the dd2json or dd2haml script.";
+say "# For more examples, see share/examples/ directory in the distribution.";
+
+# ABSTRACT: Demo for Data::Dump::Color
+# PODNAME: demo-data-dump-color
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+demo-data-dump-color - Demo for Data::Dump::Color
+
+=head1 VERSION
+
+This document describes version 0.242 of demo-data-dump-color (from Perl distribution Data-Dump-Color), released on 2021-02-06.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Data-Dump-Color>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Data-Dump-Color>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Data-Dump-Color/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2018, 2014, 2013, 2012 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -15,8 +15,9 @@ use Term::ANSIColor qw/colored/;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 use DateTime::Format::HTTP;
+use Data::Dumper qw/Dumper/;
 
-our $VERSION  = version->new(1.1.13);
+our $VERSION  = version->new(1.1.14);
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option = (
@@ -33,6 +34,7 @@ sub run {
         'master|m=s',
         'limit|n=i',
         'format|f=s',
+        'files|F!',
     );
     my $fmt = join "-%09-%09-", qw/
         %(authordate)
@@ -63,7 +65,16 @@ sub run {
     if ( $option{remote} ) {
         $arg .= ' -r';
     }
-    my $match = @ARGV ? shift @ARGV : '';
+    my $match = '';
+    my $files;
+    if (@ARGV) {
+        if ($option{files}) {
+            $files = join ' ', @ARGV;
+        }
+        else {
+            $match = @ARGV ? shift @ARGV : '';
+        }
+    }
 
     my @branches = `git branch $arg --format='$fmt'`;
     my $i = 0;
@@ -88,6 +99,15 @@ sub run {
         next if !$branch->{HEAD};
         if ( defined $option{unmerged} ) {
             next if unmerged($branch->{short}, $option{master});
+        }
+
+        if ($files) {
+            my $date = `git log -n 1 --format=format:%ai $branch->{short} -- $files`;
+            chomp $date;
+
+            if ($date) {
+                $date = $branch->{authordate};
+            }
         }
 
         my ($date, $tz) = $branch->{authordate} =~ /^(.*)\s+([+-]\d{4})$/;
@@ -115,9 +135,9 @@ sub run {
     }
 
     my $count = 1;
-    my $fmt_out = $option{verbose} ? "%-(age) %-(authorname) %-(short)"
+    my $fmt_out = $option{verbose} ? "%-age\t%-authorname\t%-short"
         : $option{format}      ? $option{format}
-        :                        "%(age)\t%(short)";
+        :                        "%age\t%short";
     my ($format, @fields) = formatted($fmt_out, \%max);
 
     for my $branch (@data) {
@@ -130,11 +150,12 @@ sub formatted {
     my ($format, $max) = @_;
     my @fields;
     my $fmt = '';
-    my @fmt_parts = split /%([+-]?)\(([^)]+)\)/, $format;
+    my @fmt_parts = split /%([+-]?)(\((?:[a-z]+)\)|[a-z]+)/, $format;
 
     while (defined (my $fixed = shift @fmt_parts)) {
         my $align = shift @fmt_parts;
         my $name = shift @fmt_parts;
+        $name =~ s/^[(]|[)]$//g;
         push @fields, $name;
         $fmt .= $fixed . ( $align ? "%$align$max->{$name}s" : "%s" );
     }
@@ -167,7 +188,7 @@ git-branch-age - grep tags
 
 =head1 VERSION
 
-This documentation refers to git-branch-age version 1.1.13
+This documentation refers to git-branch-age version 1.1.14
 
 =head1 SYNOPSIS
 
@@ -189,6 +210,19 @@ This documentation refers to git-branch-age version 1.1.13
                 Limit the out put to this number
   -f --format[=]str
                 Specify a format for the output
+                eg normal format would be --format="%age %short"
+                   verbose format would be --format="%age %authorname $short"
+                format keys:
+                  - authordate
+                  - authoremail
+                  - authorname
+                  - body
+                  - HEAD
+                  - objectname
+                  - objecttype
+                  - refname
+                  - short
+                  - subject
 
   -v --verbose  Show more detailed option
      --version  Prints the version information

@@ -3,12 +3,15 @@ NAME
 
 SYNOPSIS
       use feature 'say';
-      use Acme::ConspiracyTheory::Random 'theory';
+      use Acme::ConspiracyTheory::Random -all;
   
-      say theory();
+      say bad_punctuation( theory() );
 
 DESCRIPTION
-    This module exports one function, `theory()` which returns a string.
+    This module exports a function, `theory()` which returns a string.
+
+    There is also a function `bad_punctuation` which, given a string, might
+    make the punctuation worse.
 
 BUGS
     Please report any bugs to
@@ -19,6 +22,14 @@ SEE ALSO
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.
+
+CONTRIBUTORS
+    Alex Jones discovered that there are secretly other people who have
+    contributed to this module but Toby Inkster is working with Microsoft and
+    the Illuminati to cover it up. I tried to blog about it but all my posts
+    keep getting taken down from Tumblr. There are hidden clues on GitHub
+    <https://github.com/tobyink/p5-acme-conspiracytheory-random/graphs/contrib
+    utors>. You don't want to know how deep this rabbit hole goes!
 
 COPYRIGHT AND LICENCE
     This software is copyright (c) 2021 by Toby Inkster.

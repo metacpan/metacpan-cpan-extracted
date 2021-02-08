@@ -38,6 +38,8 @@ my $leel = Leel->new(
 # Note: CLI parameters are introduced here
 my %args;
 $args{debug_mode} = $ARGV_verbosity > 5 ? 1 : 0;
+$args{out_dir}    = $ARGV_outdir if $ARGV_outdir;
+$args{threads}    = $ARGV_threads;
 my $rp = $leel->run_proc(\%args);
 
 __END__
@@ -50,7 +52,7 @@ leel.pl - The Elite of the Phylogenomic Back-Translators
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =head1 USAGE
 
@@ -83,10 +85,28 @@ of the distribution for annotated examples of YAML files.
 
 =over
 
+=item --threads=<n>
+
+Number of threads to run in parallel [default: n.default]. Parallelization is
+achieved by processing several ALI files in parallel using an internal queue.
+Therefore, the specified number of threads should not be larger than the
+number of input ALI files.
+
+=for Euclid: n.type: +int
+    n.default: 1
+
+=item --outdir=<dir>
+
+Optional output dir that will contain the back-translated ALI files (will be
+created if needed) [default: none]. Otherwise, output files are in the same
+directory as input files.
+
+=for Euclid: dir.type: writable
+
 =item --verbosity=<level>
 
-Verbosity level for logging to STDERR [default: 0]. Available levels range from
-0 to 6. Level 6 corresponds to debugging mode.
+Verbosity level for logging to STDERR [default: level.default]. Available
+levels range from 0 to 6. Level 6 corresponds to debugging mode.
 
 =for Euclid: level.type: int, level >= 0 && level <= 6
     level.default: 0

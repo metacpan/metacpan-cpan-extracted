@@ -10,11 +10,12 @@ use Carp;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(web_match_tags web_parse_sections web_parse_tag web_only_tags
-                 web_only_text web_split_at_tags web_substitute_sections
-                 web_substitute_tags web_titled_sections);
+our @EXPORT = qw(web_has_variables web_match_tags web_parse_sections 
+                 web_parse_tag web_only_tags web_only_text web_split_at_tags 
+                 web_substitute_sections web_substitute_tags 
+                 web_titled_sections);
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Extract a list of parsed tags from a text
@@ -25,6 +26,22 @@ sub web_extract_tags {
     my @tokens = web_split_at_tags($text);
     return web_only_tags(@tokens);
 }
+
+#----------------------------------------------------------------------
+# Return true if any of a list of variables is present in a template
+
+sub web_has_variables {
+    my ($text, @search_variables) = @_;
+
+    my @template_variables = $text =~ /([\$\@]\w+)/g; 
+    my %template_variables = map {$_ => 1} @template_variables;
+
+    for my $variable (@search_variables) {
+        return 1 if $template_variables{$variable};
+    }
+
+    return 0;
+} 
 
 #----------------------------------------------------------------------
 # Is the token an html tag?
@@ -209,8 +226,11 @@ sub web_same_tag {
 sub web_split_at_tags {
     my ($text) = @_;
 
-    my @tokens = split(/(<!--.*?-->|<[^">]*(?:"[^"]*")*[^>]*>)/s, $text);
-    @tokens = grep {length} @tokens;
+    my @tokens;
+    if ($text) {
+        @tokens = split(/(<!--.*?-->|<[^">]*(?:"[^"]*")*[^>]*>)/s, $text);
+        @tokens = grep {length} @tokens;
+    }
 
     return @tokens;
 }
@@ -350,7 +370,7 @@ sub web_titled_sections {
 
 =head1 NAME
 
-App::Followme::Web-
+App::Followme::Web - Functions to parse html
 
 =head1 SYNOPSIS
 
@@ -365,6 +385,11 @@ module.
 =head1 SUBROUTINES
 
 =over 4
+
+=item $flag = web_has_variables($text, @search_variables);
+
+Return true if any of a list of variables is present in a template. The
+variable names must include the sigil.
 
 =item $match_count = web_match_tags($pattern, $text, $matcher,
                                     $metadata, $global);

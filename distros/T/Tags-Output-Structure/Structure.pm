@@ -6,7 +6,7 @@ use warnings;
 
 use Error::Pure qw(err);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Flush.
 sub flush {
@@ -135,11 +135,13 @@ __END__
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = Tags::Output::Structure->new(%parameters);
 
- Constructor.
+Constructor.
+
+Returns instance of object.
 
 =over 8
 
@@ -175,33 +177,48 @@ __END__
 
 =back
 
-=item C<finalize()>
+=head2 C<finalize>
 
- Finalize Tags output.
- Automaticly puts end of all opened tags.
- Returns undef.
+ $obj->finalize;
 
-=item C<flush($reset_flag)>
+Finalize Tags output.
+Automaticly puts end of all opened tags.
 
- Flush tags in object.
- Or returns code.
- If enabled $reset_flag, then resets internal variables via reset method.
+Returns undef.
 
-=item C<open_tags()>
+=head2 C<flush>
 
- Returns array of opened tags.
+ my $ret_ar = $obj->flush($reset_flag);
 
-=item C<put(@data)>
+Flush tags in object.
+Or returns code.
+If enabled $reset_flag, then resets internal variables via reset method.
 
- Put tags code in tags format.
- Returns undef.
+Returns undef or code.
 
-=item C<reset()>
+=head2 C<open_tags>
 
- Resets internal variables.
- Returns undef.
+ my @tags = $obj->open_tags;
 
-=back
+Get list of opened tags.
+
+Returns array of opened tags.
+
+=head2 C<put>
+
+ $obj->put(@data);
+
+Put tags code in tags format.
+
+Returns undef.
+
+=head2 C<reset>
+
+ $obj->reset;
+
+Resets internal variables.
+
+Returns undef.
 
 =head1 ERRORS
 
@@ -358,12 +375,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2012-2020 Michal Josef Špaček
+© 2012-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

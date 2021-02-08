@@ -14,13 +14,15 @@ use namespace::clean -except => 'meta';
 
 has 'xml_options' => ( is => 'bare', isa => 'HashRef',
                        default => sub {{
-   KeepRoot => 1,
-   XMLDecl  => "<?xml version='1.0' encoding='UTF-8'?>",
+   KeepRoot      => 1,
+   SuppressEmpty => 1,
+   XMLDecl       => "<?xml version='1.0' encoding='UTF-8'?>",
  }} );
 
 sub render {
   my ($self, $data, $context) = @_;
 
+  no warnings 'uninitialized';
   my $xml = XMLout({data => $data}, %{$self->{xml_options}});
 
   return [200, ['Content-type' => 'text/xml'], [encode_utf8($xml)] ];

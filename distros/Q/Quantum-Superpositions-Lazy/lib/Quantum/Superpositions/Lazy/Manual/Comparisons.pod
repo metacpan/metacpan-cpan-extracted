@@ -1,0 +1,119 @@
+=pod
+
+=head1 NAME
+
+Quantum::Superpositions::Lazy::Manual::Comparisons - How to compare superpositons
+
+=head1 DESCRIPTION
+
+=head2 Comparison reducers
+
+Since superpositions have multiple values, a reduction strategy needs to be
+introduced in order to obtain a single result of the operation. Lets look at
+some plain array examples first:
+
+	my @array = qw(a b c);
+
+	# EVERY state needs to meet the condition
+	# (the number of elements found is equal to the length of an array)
+	if (@array == grep { $_ eq 'a' } @array) { ... }
+
+	# ANY state needs to meet the condition
+	# (the number of elements found is greater than zero)
+	if (0 < grep { $_ eq 'a' } @array) { ... }
+
+	# ONE state needs to meet the condition
+	# (the number of elements found is 1)
+	if (1 == grep { $_ eq 'a' } @array) { ... }
+
+These reduction strategies are implemented in superpositions with
+L<Quantum::Superpositions::Lazy/every_state>,
+L<Quantum::Superpositions::Lazy/any_state> and
+L<Quantum::Superpositions::Lazy/one_state>. Every time you execute a logical
+operation on a superposition, one of the reduction strategies is chosen under
+the hood. You can force a strategy by using one of the functions as a wrapper:
+
+	if (every_state { $pos eq 'a' }) { ... }
+	if (any_state { $pos eq 'a' }) { ... }
+	if (one_state { $pos eq 'a' }) { ... }
+
+By default (without any wrapper), superpositions are compared with C<any>
+result reduction type, meaning that any state that meet the check will cause
+the entire operation to return a true value. This may not always be the best
+strategy:
+
+	my $pos = superpos(qw(a b c));
+
+	# Likely an error, since both 'b' and 'c' meet the condition
+	if ($pos ne 'a') { ... }
+
+	# Correct
+	if (every_state { $pos ne 'a' }) { ... }
+
+=head2 Boolean comparisons
+
+	my $pos = superpos(qw(a b c));
+	my $boolean = $pos gt 'a';  # true
+
+Boolean comparisons should be pretty straightforward. By default, boolean
+comparisons should work the same as with regular Perl scalars. A tricky part
+can be comparing two superpositions:
+
+	my $pos1 = superpos(qw(a b c));
+	my $pos2 = superpos(qw(d e f));
+
+	$pos1 eq $pos2;
+
+The code above performs all the possible checks, and since there's no wrapper,
+chooses the C<any> strategy (which can be pictured with C<||>):
+
+	'a' eq 'd' ||
+	'a' eq 'e' ||
+	'a' eq 'f' ||
+	'b' eq 'd' ||
+	'b' eq 'e' ||
+	'b' eq 'f' ||
+	'c' eq 'd' ||
+	'c' eq 'e' ||
+	'c' eq 'f'
+
+=head2 Comparing for results (fetching matches)
+
+Another way of utilizing the comparisons is fetching all of the matches of an
+operation. This can be done by using the
+L<Quantum::Superpositions::Lazy/fetch_matches> wrapper, just like the wrappers
+above:
+
+	my $pos = superpos(qw(a b c));
+	my $result = fetch_matches { $pos gt 'a'; }  # superpos(qw(b c))
+
+This works by returning every state of B<the first> superposition that meets
+the condition with the chosen reduction strategy. When the other argument is
+just a scalar value, the strategy B<does not matter>. When comparing two
+superpositions for values however, it is crucial:
+
+	my $pos1 = superpos(qw(a b c));
+	my $pos2 = superpos(qw(d e f));
+
+	fetch_matches { $pos1 eq $pos2 };
+
+C<a> will only be returned if it meets the condition:
+
+	'a' eq 'd' ||
+	'a' eq 'e' ||
+	'a' eq 'f'
+
+As you can see, the reduction strategy only applies to a single item. Changing
+the strategy in this scenario can be done by nesting the wrappers:
+
+	my $matches = fetch_matches { every_state { $pos1 ne $pos2 } };
+
+=head2 Custom comparisons
+
+A custom check can be performed with the help of C<compare> method:
+
+	$pos->compare(sub { $_ > 2 && $_ < 5 });
+
+=head1 FURTHER READING
+
+L<Quantum::Superpositions::Lazy::Manual> provides a general introduction to the module.

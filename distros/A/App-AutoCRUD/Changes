@@ -1,5 +1,10 @@
 Revision history for Plack-App-AutoCRUD
 
+0.14 03.02.2021
+  - pod documentation updated
+  - fixed failing pod test
+  - prevent warnings 'uninitialized' in XML view
+
 0.13 08.06.2016
   - Added a readonly mode
 

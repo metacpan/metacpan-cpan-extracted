@@ -1,7 +1,7 @@
-# $Revision: 1.5 $
+
 # mib.t - Tests for converting mib numbers back to charset names
 
-use Test::More tests => 25;
+use Test::More;
 BEGIN { use_ok('I18N::Charset') };
 
 #================================================
@@ -44,6 +44,6 @@ ok(charset_name_to_mib("ANSI_X3.4-1968") eq '3', q{first entry});
 # This is the LAST entry in the IANA list:
 ok(charset_name_to_mib('CP50220') == 2260, q{last entry});
 
-exit 0;
+done_testing();
 
 __END__

@@ -1,3 +1,7 @@
+0.09 2021-02-07
+        - Catch overwritten entropy or length (hughbarnard++).
+        - Move bugtracker to GitHub.
+
 0.08 2018-11-01
         - Change permissions for files (manwar++).
 

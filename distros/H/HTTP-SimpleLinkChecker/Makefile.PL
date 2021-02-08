@@ -35,12 +35,22 @@ Perl.
 
 =cut
 
+print <<"HERE";
+======================================================================
+THIS IS AN ABANDONED MODULE
+
+You can adopt it if you like
+https://pause.perl.org/pause/authenquery?ACTION=pause_04about#takeover
+
+======================================================================
+HERE
+
 use File::Spec::Functions qw(catfile);
 
 my $module    = __PACKAGE__;
 ( my $dist = $module ) =~ s/::/-/g;
 
-my $github    = 'https://github.com/briandfoy/http-simplelinkchecker';
+my $github    = 'https://github.com/CPAN-Adoptable-Modules/http-simplelinkchecker';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
@@ -63,7 +73,7 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::More' => '0.98',
+		'Test::More' => '1',
 		},
 
 	'PREREQ_PM'     => {

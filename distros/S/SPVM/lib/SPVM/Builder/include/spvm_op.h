@@ -1,7 +1,7 @@
 #ifndef SPVM_OP_H
 #define SPVM_OP_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 
 
 
@@ -234,7 +234,7 @@ enum {
 };
 
 /* Binary operation */
-struct SPVM_op {
+struct spvm_op {
   SPVM_OP* first;
   SPVM_OP* last;
   SPVM_OP* sibparent;

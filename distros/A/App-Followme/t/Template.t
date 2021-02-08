@@ -75,7 +75,8 @@ $item
 EOQ
 
     my $render = App::Followme::Template->compile($template);
-    my $data = {list => [qw(first second third)]};
+    my $numbers = [qw(first second third)];
+    my $data = {list => $numbers, name => $numbers};
 
     my $meta = MockData->new($data);
     my $text = $render->($meta);
@@ -88,7 +89,7 @@ EOQ
 
     is($text, $text_ok, "For loop"); # test 5
 
-    $data = {list => []};
+    $data = {list => [], name => []};
     $meta = MockData->new($data);
     $text = $render->($meta);
 

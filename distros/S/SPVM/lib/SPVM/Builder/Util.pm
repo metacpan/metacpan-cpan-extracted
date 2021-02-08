@@ -10,10 +10,21 @@ use Getopt::Long 'GetOptionsFromArray';
 use List::Util 'min';
 use File::Basename 'dirname';
 
-use SPVM::Builder::Config;
-
 # SPVM::Builder::Util is used from Makefile.PL
-# so this module must be wrote as pure per script, not contain XS and don't use any other SPVM modules except for SPVM::Builder::Config.
+# so this module must be wrote as pure perl script, not contain XS functions and don't use any other SPVM modules.
+
+sub create_cfunc_name {
+  my ($package_name, $sub_name, $category) = @_;
+  
+  my $prefix = 'SP' . uc($category) . '__';
+  
+  # Precompile Subroutine names
+  my $sub_abs_name_under_score = "${package_name}::$sub_name";
+  $sub_abs_name_under_score =~ s/:/_/g;
+  my $cfunc_name = "$prefix$sub_abs_name_under_score";
+  
+  return $cfunc_name;
+}
 
 sub load_config {
   my ($config_file) = @_;
@@ -55,43 +66,36 @@ sub getopt {
   Getopt::Long::Configure($save);
 }
 
-sub convert_module_file_to_dll_category_file {
+sub convert_module_file_to_shared_lib_file {
   my ($module_file, $category) = @_;
   
   my $dlext = $Config{dlext};
   $module_file =~ s/\.[^.]+$//;
-  my $dll_category_file = $module_file;
-  $dll_category_file .= $category eq 'native' ? ".$dlext" : ".$category.$dlext";
+  my $shared_lib_category_file = $module_file;
+  $shared_lib_category_file .= $category eq 'native' ? ".$dlext" : ".$category.$dlext";
   
-  return $dll_category_file;
+  return $shared_lib_category_file;
 }
 
-sub convert_package_name_to_dll_category_rel_file {
+sub convert_package_name_to_shared_lib_rel_file {
   my ($package_name, $category) = @_;
   
   my $dlext = $Config{dlext};
-  my $dll_category_rel_file = convert_package_name_to_rel_file($package_name);
-  $dll_category_rel_file .= $category eq 'native' ? ".$dlext" : ".$category.$dlext";
+  my $shared_lib_category_rel_file = convert_package_name_to_rel_file($package_name);
+  $shared_lib_category_rel_file .= $category eq 'native' ? ".$dlext" : ".$category.$dlext";
   
-  return $dll_category_rel_file;
+  return $shared_lib_category_rel_file;
 }
 
-sub convert_package_name_to_category_rel_file_with_ext {
-  my ($package_name, $category, $ext) = @_;
-  
-  my $rel_file_with_ext = $package_name;
-  $rel_file_with_ext =~ s/::/\//g;
-  $rel_file_with_ext .= $category eq 'native' ? ".$ext" : ".$category.$ext";
-  
-  return $rel_file_with_ext;
-}
-
-sub convert_package_name_to_category_rel_file_without_ext {
+sub convert_package_name_to_category_rel_file {
   my ($package_name, $category, $ext) = @_;
   
   my $rel_file_with_ext = $package_name;
   $rel_file_with_ext =~ s/::/\//g;
   $rel_file_with_ext .= $category eq 'native' ? "" : ".$category";
+  if (defined $ext) {
+    $rel_file_with_ext .= ".$ext";
+  }
   
   return $rel_file_with_ext;
 }
@@ -203,16 +207,16 @@ sub create_package_make_rule {
   }
   
   # Shared library file
-  my $dll_rel_file = convert_package_name_to_dll_category_rel_file($package_name, $category);
-  my $dll_file = "blib/lib/$dll_rel_file";
+  my $shared_lib_rel_file = convert_package_name_to_shared_lib_rel_file($package_name, $category);
+  my $shared_lib_file = "blib/lib/$shared_lib_rel_file";
   
   # Get source files
   $make_rule
-    .= "$target_name :: $dll_file\n\n";
+    .= "$target_name :: $shared_lib_file\n\n";
   $make_rule
-    .= "$dll_file :: @deps\n\n";
+    .= "$shared_lib_file :: @deps\n\n";
   $make_rule
-    .= "\t$^X -Mblib -MSPVM::Builder -e \"SPVM::Builder->new(build_dir => '.spvm_build')->build_dll_${category}_dist('$package_name')\"\n\n";
+    .= "\t$^X -Mblib -MSPVM::Builder -e \"SPVM::Builder->new(build_dir => '.spvm_build')->build_shared_lib_dist('$package_name', '$category')\"\n\n";
   
   return $make_rule;
 }

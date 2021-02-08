@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Tree::VERSION = '0.210230';
+$Bio::MUST::Core::Tree::VERSION = '0.210380';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -332,6 +332,7 @@ sub store_itol_datasets {
     # name dataset files
     my $outbase    = change_suffix($outfile, '.txt');
     my $color_file = insert_suffix($outbase, '-color');
+    my $clade_file = insert_suffix($outbase, '-clade');
     my $range_file = insert_suffix($outbase, '-range');
     my $label_file = insert_suffix($outbase, '-label');
     my $colps_file = insert_suffix($outbase, '-collapse');
@@ -339,6 +340,8 @@ sub store_itol_datasets {
     # open and setup dataset files
     open my $color_out, '>', $color_file;
     say {$color_out} join "\n", 'TREE_COLORS', 'SEPARATOR COMMA', 'DATA';
+    open my $clade_out, '>', $clade_file;
+    say {$clade_out} join "\n", 'TREE_COLORS', 'SEPARATOR COMMA', 'DATA';
     open my $range_out, '>', $range_file;
     say {$range_out} join "\n", 'TREE_COLORS', 'SEPARATOR COMMA', 'DATA';
     open my $label_out, '>', $label_file;
@@ -360,7 +363,8 @@ sub store_itol_datasets {
             next NODE if $color eq $BLACK;
 
             my $id = SeqId->new( full_id => $node->get_name )->foreign_id;
-            say {$color_out} join q{,}, $id, 'clade', $color, $type, $size;
+            say {$color_out} join q{,}, $id, 'label', $color, $type, $size;
+            say {$clade_out} join q{,}, $id, 'clade', $color, $type, $size;
             say {$range_out} join q{,}, $id, 'range', $color, $type, $size;
 
             next NODE;
@@ -387,7 +391,8 @@ sub store_itol_datasets {
 
         next NODE if $color eq $BLACK;
 
-        say {$color_out} join q{,}, $id, 'clade', $color, $type, $size;
+        say {$color_out} join q{,}, $id, 'label', $color, $type, $size;
+        say {$clade_out} join q{,}, $id, 'clade', $color, $type, $size;
         say {$range_out} join q{,}, $id, 'range', $color, $type, $size;
     }
 
@@ -552,7 +557,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.210230
+version 0.210380
 
 =head1 SYNOPSIS
 

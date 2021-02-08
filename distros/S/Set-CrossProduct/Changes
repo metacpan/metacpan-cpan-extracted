@@ -1,5 +1,13 @@
 Revision history for Perl module Set::CrossProduct
 
+2.006 2021-02-03T16:11:31Z
+	* Note that combinations() has a scalar and list context.
+	* Re-order the method names to be alphabetical.
+
+2.005 2021-02-03T01:29:11Z
+	* Note that an error in arguments returns undef (Github #5)
+	* Warn in odd cases in new() if warnings are enabled
+
 2.004 2021-01-17T11:09:59Z
 	* fixed bug with labeled() always returning 1 (Github #4, arhimed2t)
 	* freshen distro, remove Travis CI, add Github Actions

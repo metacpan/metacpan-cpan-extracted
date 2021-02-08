@@ -1,16 +1,14 @@
 # enco.t - tests for "preferred ENCO name" functionality of I18N::Charset
 
-# $Id: enco.t,v 1.5 2005-11-12 14:45:08 Daddy Exp $
-
 use ExtUtils::testlib;
-use Test::More no_plan;
+use Test::More;
 
 use IO::Capture::Stderr;
 my $oICE =  IO::Capture::Stderr->new;
 
 use strict;
 
-BEGIN { &use_ok('I18N::Charset') };
+BEGIN { use_ok('I18N::Charset') };
 
 #================================================
 # TESTS FOR enco routines
@@ -67,7 +65,7 @@ SKIP:
      'jis0201-raw', 'alias equal -- my-japanese4');
   } # end of SKIP block
 
-exit 0;
+done_testing();
 
 __END__
 

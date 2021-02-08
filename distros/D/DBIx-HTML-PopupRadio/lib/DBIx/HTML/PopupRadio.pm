@@ -1,60 +1,11 @@
 package DBIx::HTML::PopupRadio;
 
-# Name:
-#	DBIx::HTML::PopupRadio.
-#
-# Purpose:
-#	Allow caller to specify a database handle, an sql statement,
-#	and a name for the menu, and from that build the HTML for the menu.
-#	Menu here means either popup menu or radio group.
-#
-# Documentation:
-#	POD-style documentation is at the end. Extract it with pod2html.*.
-#
-# Note:
-#	o tab = 4 spaces || die
-#
-# V 1.00 1-Oct-2002
-# -----------------
-# o Original version
-#
-# Author:
-#	Ron Savage <rons@deakin.edu.au>
-#	Home page: http://www.deakin.edu.au/~rons
-
 use strict;
 use warnings;
 
-require 5.005_62;
-
-require Exporter;
-
-use Carp;
 use HTML::Entities::Interpolate;
 
-our @ISA = qw(Exporter);
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use Image::MagickWrapper ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-
-) ] );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-
-);
-our $VERSION = '1.16';
-
-# -----------------------------------------------
-
-# Preloaded methods go here.
+our $VERSION = '1.17';
 
 # -----------------------------------------------
 
@@ -404,21 +355,22 @@ Here is a real sample of such a JavaScript function, which would be output elsew
 	}
 	</script>
 
-You can see what's happening: The menu item, both visible text and corresponding value returned to your CGI script,
-are being copied from the popup menu to 2 other fields in the form.
+You can see what is happening: The menu item, both visible text and corresponding value returned
+to your CGI script, are being copied from the popup menu to 2 other fields in the form.
 
 Obviously you would replace the body of this function with code of your own choosing.
 
 Q: Since this is an onChange handler, the 2 other fields will not be initialized until
-the default menu selection is changed. So, how do you initialize them before the user selects a new menu item?
+the default menu selection is changed. So, how do you initialize them before the user selects a
+new menu item?
 
-A: By outputting the following Javascript further down the form, after the function, menu and other 2 fields have
-been defined:
+A: By outputting the following Javascript further down the form, after the function, menu and
+other 2 fields have been defined:
 
 	<script language="JavaScript">replicate();</script>
 
-What's important to note here is that no function is declared, but one is called. The JavaScript is simple executed
-inline, at the time it is parsed by the browser.
+What is important to note here is that no function is declared, but one is called. The JavaScript
+is simple executed inline, at the time it is parsed by the browser.
 
 This option is not mandatory.
 
@@ -438,7 +390,7 @@ and then reset, but must have a value by the time you call popup_menu or
 radio_group.
 
 The value of this parameter is what you will pass into a CGI object when you
-call its param() method to retrieve the user's selection.
+call its param() method to retrieve the user selection.
 
 Hence you would do something like:
 
@@ -575,11 +527,11 @@ See examples/*.cgi for complete programs, both simple and complex.
 You will need to run examples/bootstrap-menus.pl to load the 'test'
 database, 'campus' and 'unit' tables, with sample data.
 
-You'll have to patch these 2 programs vis-a-vis the db vendor, username
+You will have to patch these 2 programs vis-a-vis the db vendor, username
 and password.
 
 The sample data in bootstrap-menus.pl is simple, but is used by several
-modules, so don't be too keen on changing it :-).
+modules, so do not be too keen on changing it :-).
 
 =head1 See Also
 
@@ -588,6 +540,16 @@ modules, so don't be too keen on changing it :-).
 	DBIx::HTML::LinkedMenus
 
 The latter 2 modules will be released after the current one.
+
+=head1 Repository
+
+L<https://github.com/ronsavage/DBIx-HTML-PopupRadio>
+
+=head1 Support
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<https://github.com/ronsavage/DBIx-HTML-PopupRadio/issues>
 
 =head1 Author
 

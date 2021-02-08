@@ -1,13 +1,14 @@
 use strict;
 use warnings;
 
-use lib 't/lib';
+use FindBin qw( $Bin );
+use lib "$Bin/lib";
 
 use Test2::API qw( intercept );
 use Test2::V0;
 use Test::Events;
 
-use Test::Class::Moose::Load qw(t/basiclib);
+use Test::Class::Moose::Load "$Bin/basiclib";
 use Test::Class::Moose::Runner;
 
 my $runner = Test::Class::Moose::Runner->new(
@@ -24,6 +25,7 @@ my %methods_for = (
 my @test_classes = sort $runner->test_classes;
 
 foreach my $class (@test_classes) {
+    ## no critic (Subroutines::ProtectPrivateSubs)
     is
       [ $runner->_executor->_test_methods_for( $class->new ) ],
       $methods_for{$class},
@@ -149,6 +151,7 @@ $runner = Test::Class::Moose::Runner->new(
 );
 
 foreach my $class (@test_classes) {
+    ## no critic (Subroutines::ProtectPrivateSubs)
     is
       [ $runner->_executor->_test_methods_for( $class->new ) ],
       $methods_for{$class},

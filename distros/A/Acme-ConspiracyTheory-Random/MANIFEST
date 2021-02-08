@@ -9,6 +9,7 @@ META.yml
 Makefile.PL
 README
 SIGNATURE
+assets/pepe-silvia.jpeg
 bin/conspire
 dist.ini
 doap.ttl

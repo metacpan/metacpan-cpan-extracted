@@ -3,25 +3,40 @@ NAME
     ported from (or inspired by) Python libraries
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Acme::CPANModules::PortedFrom::Python (from Perl distribution
-    Acme-CPANModules-PortedFrom-Python), released on 2020-02-07.
+    Acme-CPANModules-PortedFrom-Python), released on 2021-02-05.
 
 DESCRIPTION
-    Modules/applications that are ported from (or inspired by) Python
-    libraries.
+  SEE ALSO
+    Acme::CPANModules::PortedFrom::Python and other
+    "Acme::CPANModules::PortedFrom::*" modules.
 
     If you know of others, please drop me a message.
 
-INCLUDED MODULES
+ACME::MODULES ENTRIES
     *   Docopt
 
     *   Getopt::ArgParse
 
+    *   PSGI
+
+        From Plack's documentation: "Plack is like Ruby's Rack or Python's
+        Paste for WSGI." Plack and PSGI was created by MIYAGAWA in 2009 and
+        is inspired by both Python's WSGI specification (hence the dual
+        specification-implementation split) and Plack (hence the name).
+
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanmodules CLI
+    (from App::cpanmodules distribution):
 
         % cpanmodules ls-entries PortedFrom::Python | cpanm -n
 
@@ -29,9 +44,13 @@ FAQ
 
         % perl -MAcme::CM::Get=PortedFrom::Python -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::PortedFrom::Python -E'say $_->{module} for @{ $Acme::CPANModules::PortedFrom::Python::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -43,8 +62,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Port
-    edFrom-Python>
+    <https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Python/is
+    sues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -58,7 +77,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -458,7 +458,7 @@ sub inline_elements {
                             (?<sec_footnote> \s*\{[1-9][0-9]*\}) |
                             (?<tag> \<
                                 (?<close>\/?)
-                                (?<tag_name> strong | em |  strike | del | sup |  sub )
+                                (?<tag_name> strong | em |  strike | del | sup |  sub  | sf | sc )
                                 \>
                             ) |
                             (?<nobreakspace>  \~\~         ) |

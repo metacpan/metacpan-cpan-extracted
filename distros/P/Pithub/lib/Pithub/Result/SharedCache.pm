@@ -1,6 +1,6 @@
 package Pithub::Result::SharedCache;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: A role to share the LRU cache with all Pithub objects
 
 use Moo::Role;
@@ -38,7 +38,7 @@ Pithub::Result::SharedCache - A role to share the LRU cache with all Pithub obje
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 DESCRIPTION
 

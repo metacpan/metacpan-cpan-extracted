@@ -1,10 +1,10 @@
 package Pithub::Issues;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01035';
+our $VERSION = '0.01036';
 # ABSTRACT: Github v3 Issues API
 
 use Moo;
-use Carp qw(croak);
+use Carp qw( croak );
 use Pithub::Issues::Assignees;
 use Pithub::Issues::Comments;
 use Pithub::Issues::Events;
@@ -106,7 +106,7 @@ Pithub::Issues - Github v3 Issues API
 
 =head1 VERSION
 
-version 0.01035
+version 0.01036
 
 =head1 METHODS
 

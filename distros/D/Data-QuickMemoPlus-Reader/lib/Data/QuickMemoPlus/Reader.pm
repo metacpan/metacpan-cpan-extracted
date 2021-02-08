@@ -6,15 +6,45 @@ use Carp;
 use JSON;
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 
-our $VERSION = "0.01";
+our $VERSION = "0.04";
 
 use Exporter qw(import);
  
-our @EXPORT_OK = qw( lqm_to_str );
-our $suppress_header = 0;
+our @EXPORT_OK = qw( lqm_to_str lqm_to_txt );
+our $IncludeHeader = 1;
+
+sub lqm_to_txt {
+    my ( $lqm ) = @_;
+    my $files_converted = 0;
+    if (-d $lqm){
+        $lqm =~ s![/\\]+$!!;
+        foreach(glob qq("$lqm/*.lqm")){
+            $files_converted += _lqm_file_to_txt($_);
+        }
+    } else {
+        $files_converted = _lqm_file_to_txt($lqm);
+    }
+    return $files_converted;
+}
+sub _lqm_file_to_txt {
+    my ( $lqm_file ) = @_;
+    my $text = lqm_to_str($lqm_file);
+    
+    return 0 if not length($text);
+    
+    my $outfile = $lqm_file;
+    $outfile =~ s/lqm$/txt/i;
+    open my $fh, ">", $outfile or do {
+        carp "couldn't open $outfile\n";
+        
+        return 0;
+    };
+    print $fh $text;
+    
+    return 1;
+}
 
 sub lqm_to_str {
-    ## pass an lqm file exported from QuickMemo+
     my ( $lqm_file ) = @_;
     if (not -f $lqm_file){
         carp "$lqm_file is not a file";
@@ -33,7 +63,7 @@ sub lqm_to_str {
     my $header = "Created date: $note_created_time\n";
     $header .= "Category:   $note_category\n";
     $header .= "-"x79 . "\n";
-    $header = '' if $suppress_header;
+    $header = '' if not $IncludeHeader;
     
     return $header . $extracted_text;
 }
@@ -100,22 +130,38 @@ Data::QuickMemoPlus::Reader - Extract text from QuickMemo+ LQM export files.
 
     use Data::QuickMemoPlus::Reader qw(lqm_to_str);
     my $memo_text = lqm_to_str('QuickMemo+_191208_220400.lqm');
+
+    use Data::QuickMemoPlus::Reader qw(lqm_to_txt);
+    my $files_converted1 = lqm_to_txt('QuickMemo+_191208_220400.lqm');
+    my $files_converted2 = lqm_to_txt('path/to/lqm_files');
     
-    ## Supress the header text like this:
-    $Data::QuickMemoPlus::Reader::suppress_header = 1;
+    ## Omit the header text by setting setting this package variable to false:
+    local $Data::QuickMemoPlus::Reader::IncludeHeader;
 
 =head1 DESCRIPTION
 
 C<Data::QuickMemoPlus::Reader> is a module that will extract the 
-text contents from archived QuickMemo+ memos.
+text contents from archived QuickMemo+ memos. QuickMemo+ is a memo 
+application that comes with LG smartphones.
 
-QuickMemo+ F<lqm> files are in Zip format. This program unzips them, 
+QuickMemo+ F<lqm> files are in Zip format. This module unzips them, 
 parses the json file inside, then extracts the category and memo text 
 from the Json file.
 
 If the filename of the lqm file contains the original timestamp then that
-is placed in the header of the text along with the category name. The header
-can be disabled by setting the package variable C<$suppress_header> to 1.
+is placed in a text header in the text along with the category name. The header
+can be disabled by setting the package variable C<$IncludeHeader> to false.
+
+The following functions are available:
+
+=head2 lqm_to_txt('directory or filename')
+
+Creates a text file with the same name as each original lqm file but with a txt extension.
+Return value is the number of files successfully converted.
+
+=head2 lqm_to_str('filename')
+
+Returns the text extracted from the lqm file.
 
 =head1 LICENSE
 

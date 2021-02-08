@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20201204215957;
+our $VERSION = 1.20210204173827;
 
 my $formatters = [
                 {
@@ -66,6 +66,7 @@ my $validators = {
           )\\d{6}
         ',
                 'mobile' => '
+          671[0-3]\\d{5}|
           (?:
             14|
             6[1-6]|
@@ -79,60 +80,60 @@ my $validators = {
                 'voip' => '6[08]\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"6673", "Narathiwat\/Pattani\/Yala",
-"662", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
-"6675", "Krabi\/Nakhon\ Si\ Thammarat\/Trang",
-"6644", "Buri\ Ram\/Chaiyaphum\/Nakhon\ Ratchasima\/Surin",
-"6634", "Kanchanaburi\/Nakhon\ Pathom\/Samut\ Sakhon\/Samut\ Songkhram",
-"6677", "Chumphon\/Ranong\/Surat\ Thani",
-"6676", "Phang\ Nga\/Phuket",
+$areanames{th} = {"6673", "นราธิวาส\/ปัตตานี\/ยะลา",
+"6639", "จันทบุรี\/ตราด",
+"6632", "เพชรบุรี\/ประจวบคีรีขันธ์\/ราชบุรี",
+"6652", "เชียงใหม่\/เชียงราย\/ลำพูน\/แม่ฮ่องสอน",
+"6674", "พัทลุง\/สตูล\/สงขลา",
+"6637", "นครนายก\/ปราจีนบุรี\/สระแก้ว",
+"6676", "พังงา\/ภูเก็ต",
+"6642", "เลย\/มุกดาหาร\/นครพนม\/หนองคาย\/สกลนคร\/อุดรธานี",
+"6653", "เชียงใหม่\/เชียงราย\/ลำพูน\/แม่ฮ่องสอน",
+"6633", "ฉะเชิงเทรา\/ชลบุรี\/ระยอง",
+"6634", "กาญจนบุรี\/นครปฐม\/สมุทรสาคร\/สมุทรสงคราม",
+"6654", "ลำปาง\/น่าน\/พะเยา\/แพร่",
+"6677", "ชุมพร\/ระนอง\/สุราษฎร์ธานี",
+"6643", "กาฬสินธุ์\/ขอนแก่น\/มหาสารคาม\/ร้อยเอ็ด",
+"6638", "ฉะเชิงเทรา\/ชลบุรี\/ระยอง",
+"6644", "บุรีรัมย์\/ชัยภูมิ\/นครราชสีมา\/สุรินทร์",
+"6656", "ชัยนาท\/นครสวรรค์\/เพชรบูรณ์\/พิจิตร\/อุทัยธานี",
+"6636", "ลพบุรี\/สระบุรี\/สิงห์บุรี",
+"6619", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"6635", "อ่างทอง\/พระนครศรีอยุธยา\/สุพรรณบุรี",
+"6655", "กำแพงเพชร\/พิษณุโลก\/สุโขทัย\/ตาก\/อุตรดิตถ์",
+"6645", "อำนาจเจริญ\/ศรีสะเกษ\/อุบลราชธานี\/ยโสธร",
+"6610", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"662", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"6675", "กระบี่\/นครศรีธรรมราช\/ตรัง",
+"6618", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"6616", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",};
+$areanames{en} = {"6610", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
+"6645", "Amnat\ Charoen\/Si\ Sa\ Ket\/Ubon\ Ratchathani\/Yasothon",
 "6619", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
-"6610", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
+"6655", "Kamphaeng\ Phet\/Phitsanulok\/Sukhothai\/Tak\/Uttaradit",
+"6635", "Ang\ Thong\/Phra\ Nakhon\ Si\ Ayutthaya\/Suphan\ Buri",
+"6616", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
+"6618", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
+"6675", "Krabi\/Nakhon\ Si\ Thammarat\/Trang",
+"662", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
+"6637", "Nakhon\ Nayok\/Prachin\ Buri\/Sa\ Kaeo",
+"6676", "Phang\ Nga\/Phuket",
+"6642", "Loei\/Mukdahan\/Nakhon\ Phanom\/Nong\ Khai\/Sakon\ Nakhon\/Udon\ Thani",
+"6673", "Narathiwat\/Pattani\/Yala",
 "6639", "Chanthaburi\/Trat",
-"6654", "Lampang\/Nan\/Phayao\/Phrae",
+"6674", "Phatthalung\/Satun\/Songkhla",
+"6652", "Chiang\ Mai\/Chiang\ Rai\/Lamphun\/Mae\ Hong\ Son",
+"6632", "Phetchaburi\/Prachuap\ Khiri\ Khan\/Ratchaburi",
+"6677", "Chumphon\/Ranong\/Surat\ Thani",
+"6643", "Kalasin\/Khon\ Kaen\/Maha\ Sarakham\/Roi\ Et",
+"6636", "Lop\ Buri\/Saraburi\/Sing\ Buri",
+"6638", "Chachoengsao\/Chon\ Buri\/Rayong",
+"6644", "Buri\ Ram\/Chaiyaphum\/Nakhon\ Ratchasima\/Surin",
 "6656", "Chai\ Nat\/Nakhon\ Sawan\/Phetchabun\/Phichit\/Uthai\ Thani",
 "6633", "Chachoengsao\/Chon\ Buri\/Rayong",
-"6643", "Kalasin\/Khon\ Kaen\/Maha\ Sarakham\/Roi\ Et",
-"6642", "Loei\/Mukdahan\/Nakhon\ Phanom\/Nong\ Khai\/Sakon\ Nakhon\/Udon\ Thani",
-"6618", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
-"6632", "Phetchaburi\/Prachuap\ Khiri\ Khan\/Ratchaburi",
-"6638", "Chachoengsao\/Chon\ Buri\/Rayong",
-"6635", "Ang\ Thong\/Phra\ Nakhon\ Si\ Ayutthaya\/Suphan\ Buri",
-"6674", "Phatthalung\/Satun\/Songkhla",
-"6645", "Amnat\ Charoen\/Si\ Sa\ Ket\/Ubon\ Ratchathani\/Yasothon",
-"6637", "Nakhon\ Nayok\/Prachin\ Buri\/Sa\ Kaeo",
 "6653", "Chiang\ Mai\/Chiang\ Rai\/Lamphun\/Mae\ Hong\ Son",
-"6616", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
-"6636", "Lop\ Buri\/Saraburi\/Sing\ Buri",
-"6655", "Kamphaeng\ Phet\/Phitsanulok\/Sukhothai\/Tak\/Uttaradit",
-"6652", "Chiang\ Mai\/Chiang\ Rai\/Lamphun\/Mae\ Hong\ Son",};
-$areanames{th} = {"6654", "ลำปาง\/น่าน\/พะเยา\/แพร่",
-"6619", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6610", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6676", "พังงา\/ภูเก็ต",
-"6639", "จันทบุรี\/ตราด",
-"6634", "กาญจนบุรี\/นครปฐม\/สมุทรสาคร\/สมุทรสงคราม",
-"6677", "ชุมพร\/ระนอง\/สุราษฎร์ธานี",
-"6675", "กระบี่\/นครศรีธรรมราช\/ตรัง",
-"6644", "บุรีรัมย์\/ชัยภูมิ\/นครราชสีมา\/สุรินทร์",
-"662", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6673", "นราธิวาส\/ปัตตานี\/ยะลา",
-"6655", "กำแพงเพชร\/พิษณุโลก\/สุโขทัย\/ตาก\/อุตรดิตถ์",
-"6652", "เชียงใหม่\/เชียงราย\/ลำพูน\/แม่ฮ่องสอน",
-"6653", "เชียงใหม่\/เชียงราย\/ลำพูน\/แม่ฮ่องสอน",
-"6616", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6636", "ลพบุรี\/สระบุรี\/สิงห์บุรี",
-"6618", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6632", "เพชรบุรี\/ประจวบคีรีขันธ์\/ราชบุรี",
-"6642", "เลย\/มุกดาหาร\/นครพนม\/หนองคาย\/สกลนคร\/อุดรธานี",
-"6674", "พัทลุง\/สตูล\/สงขลา",
-"6645", "อำนาจเจริญ\/ศรีสะเกษ\/อุบลราชธานี\/ยโสธร",
-"6637", "นครนายก\/ปราจีนบุรี\/สระแก้ว",
-"6635", "อ่างทอง\/พระนครศรีอยุธยา\/สุพรรณบุรี",
-"6638", "ฉะเชิงเทรา\/ชลบุรี\/ระยอง",
-"6656", "ชัยนาท\/นครสวรรค์\/เพชรบูรณ์\/พิจิตร\/อุทัยธานี",
-"6643", "กาฬสินธุ์\/ขอนแก่น\/มหาสารคาม\/ร้อยเอ็ด",
-"6633", "ฉะเชิงเทรา\/ชลบุรี\/ระยอง",};
+"6654", "Lampang\/Nan\/Phayao\/Phrae",
+"6634", "Kanchanaburi\/Nakhon\ Pathom\/Samut\ Sakhon\/Samut\ Songkhram",};
 
     sub new {
       my $class = shift;

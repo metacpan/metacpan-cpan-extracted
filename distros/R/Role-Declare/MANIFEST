@@ -6,8 +6,12 @@ README.md
 cpanfile
 lib/Role/Declare.pm
 lib/Role/Declare.pod
+lib/Role/Declare/Should.pm
 lib/Role/Declare/StrictWith.pm
 t/lax-mode.t
+t/no-type-check-mode.t
+t/role-declare-should-strict-off.t
+t/role-declare-should-strict-on.t
 t/role-declare.t
 t/shorthands.t
 xt/changelog.t

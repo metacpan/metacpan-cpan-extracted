@@ -1,17 +1,24 @@
 package CPANfile::Parse::PPI;
-
+$CPANfile::Parse::PPI::VERSION = '0.05';
 # ABSTRACT: Parse I<cpanfile>s with PPI
 
 use strict;
 use warnings;
 
-use PPI;
-use Moo;
 use Carp qw(carp croak);
-
-our $VERSION = '0.04';
+use List::Util qw(first);
+use Moo;
+use PPI;
 
 my $strict;
+
+has meta => (
+    is      => 'ro',
+    default => sub { +{} },
+    isa     => sub {
+        die if 'HASH' ne ref $_[0];
+    }
+);
 
 has modules => (
     is  => 'ro',
@@ -24,10 +31,11 @@ has modules => (
 sub BUILDARGS {
     my ($class, $file_or_code) = @_;
 
-    my @modules = _parse( $file_or_code );
+    my ($meta, @modules) = _parse( $file_or_code );
 
     return {
         modules => \@modules,
+        meta    => $meta,
     };
 }
 
@@ -39,31 +47,59 @@ sub _parse {
     my ($file_or_code) = @_;
 
     my $doc = PPI::Document->new( $file_or_code );
+
+    # 'feature' and 'on' are handled separately
+    my @bindings = qw(
+        mirror osname
+        requires recommends conflicts suggests
+        test_requires author_requires configure_requires build_requires
+    );
+
     my $requires = $doc->find(
         sub { 
-            $_[1]->isa('PPI::Token::Word') and (
-                $_[1]->content eq 'requires' ||
-                $_[1]->content eq 'recommends'
-             )
+            $_[1]->isa('PPI::Token::Word') and do {
+                my $content = $_[1]->content;
+                first { $content eq $_ } @bindings;
+             }
         }
     );
 
     return if !$requires;
 
     my @modules;
+    my $meta = {};
 
     REQUIRED:
     for my $required ( @{ $requires || [] } ) {
+        # 'mirror' can be an attribute for "requires" as well as a keyword
+        # _scan_attrs should have removed all 'mirrors' that are used as
+        # an attribute for 'requires'. So skip those PPI nodes...
+        next REQUIRED if !$required;
+
         my $value = $required->snext_sibling;
 
-        my $type = $required->content;
+        my $stage = '';
+        my $type  = $required->content;
+
+        if ( $type eq 'mirror' or $type eq 'osname' ) {
+            push @{ $meta->{$type} }, $value->content if $value;
+        }
+
+        if ( -1 != index $type, '_' ) {
+            ($stage, $type) = split /_/, $type, 2;
+            $stage = 'develop' if $stage eq 'author';
+        }
+
+        my %attr = _scan_attrs( $required, $type );
+
+        next REQUIRED if !$value;
 
         my $can_string = $value->can('string') ? 1 : 0;
         my $prereq     = $can_string ?
             $value->string :
             $value->content;
 
-        next REQUIRED if $prereq eq 'perl';
+        #next REQUIRED if $prereq eq 'perl';
 
         if (
             $value->isa('PPI::Token::Symbol') ||
@@ -74,8 +110,6 @@ sub _parse {
 
             next REQUIRED;
         }
-
-        my $stage = '';
 
         my $parent_node = $value;
 
@@ -91,6 +125,8 @@ sub _parse {
                 my ($on) = $parent_node->find_first( sub { $_[1]->isa('PPI::Token::Word') && $_[1]->content eq 'on' } );
 
                 next PARENT if !$on;
+
+                # TODO: Check for "feature"
 
                 my $word = $on->snext_sibling; 
                 $stage = $word->can('string') ? $word->string : $word->content;
@@ -108,6 +144,8 @@ sub _parse {
             do { $sibling = $sibling->snext_sibling; next SIBLING } if !$sibling->isa('PPI::Token::Operator');
 
             my $value = $sibling->snext_sibling;
+            last SIBLING if !$value;
+
             $version = $value->can('string') ? $value->string : $value->content;
 
             last SIBLING;
@@ -118,10 +156,41 @@ sub _parse {
             version => $version,
             type    => $type,
             stage   => $stage,
+            %attr,
         };
     }
 
-    return @modules;
+    return $meta, @modules;
+}
+
+sub _scan_attrs {
+    my ($required, $type) = @_;
+
+    return if $type ne 'requires' && $type ne 'recommends';
+
+    my $sibling = $required->snext_sibling;
+
+    my %attr;
+    my @to_delete;
+    my $delete;
+
+    while ( $sibling ) {
+        my $content = $sibling->content;
+        if ( $content eq 'mirror' or $content eq 'dist' ) {
+            $delete = 1;
+            my $value_node = $sibling->snext_sibling->snext_sibling;
+            $attr{$content} = $value_node->can('string') ?
+                $value_node->string :
+                $value_node->content;
+        }
+
+        push @to_delete, $sibling if $delete;
+        $sibling = $sibling->snext_sibling;
+    }
+
+    $_->remove for @to_delete;
+
+    return %attr;
 }
 
 1;
@@ -138,7 +207,7 @@ CPANfile::Parse::PPI - Parse I<cpanfile>s with PPI
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -184,6 +253,10 @@ version 0.04
     my $cpanfile = CPANfile::Parse::PPI->new( \$content );
 
 =head1 ATTRIBUTES
+
+=head2 meta
+
+Returns information about mirrors and OS name - if given in the cpanfile
 
 =head2 modules
 

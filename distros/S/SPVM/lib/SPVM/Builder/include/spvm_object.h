@@ -1,11 +1,11 @@
 #ifndef SPVM_OBJECT_H
 #define SPVM_OBJECT_H
 
-#include "spvm_base.h"
+#include "spvm_typedecl.h"
 #include "spvm_native.h"
 
 // SPVM_OBJECT
-struct SPVM_object {
+struct spvm_object {
   SPVM_WEAKEN_BACKREF* weaken_backref_head;
   int32_t ref_count;
   int32_t basic_type_id;

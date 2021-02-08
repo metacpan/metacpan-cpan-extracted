@@ -72,11 +72,12 @@ _write(striper, soid, data, len, off)
     RETVAL
 
 uint64_t
-_write_from_fh(striper, soid, fh, psize)
+_write_from_fh(striper, soid, fh, psize, debug=false)
     rados_striper_t  striper
     const char *     soid
     SV *             fh
-    int              psize
+    uint64_t         psize
+    bool             debug
   PREINIT:
     char *           buf;
     size_t           len;
@@ -84,23 +85,27 @@ _write_from_fh(striper, soid, fh, psize)
     uint64_t         off;
   INIT:
     PerlIO *  io     = IoIFP(sv_2io(fh));
-    int       retlen = 0;
+    uint64_t  retlen = 0;
     int       chk_sz = 1024 * 1024;
     Newx(buf, chk_sz, char);
   CODE:
-    //printf("preparing to write from FH to %s\n", soid);
+    printf("debug is %i\n", debug);
+    if (debug)
+        printf("preparing to write from FH to %s\n", soid);
     for (off=0; off<psize; off+=chk_sz) {
         len = psize < off + chk_sz ? psize % chk_sz : chk_sz;
         err = PerlIO_read(io, buf, len);
         if (err < 0)
             croak("cannot read from filehandle: %s", strerror(-err));
-        //printf("writing %i bytes from FH to %s\n", len, soid);
-        err = rados_striper_read(striper, soid, buf, len, off);
+        if (debug)
+            printf("writing %" PRIu64 "-%" PRIu64 " / %" PRIu64 " bytes from FH to %s\n", off, off+len, psize, soid);
+        err = rados_striper_write(striper, soid, buf, len, off);
         if (err < 0)
             croak("cannot write striped object '%s': %s", soid, strerror(-err));
         retlen += len;
     }
-    //printf("wrote %i bytes from FH to %s\n", retlen, soid);
+    if (debug)
+        printf("wrote %" PRIu64 " bytes from FH to %s\n", retlen, soid);
     RETVAL = retlen;
   OUTPUT:
     RETVAL
@@ -146,7 +151,7 @@ _read(striper, soid, len, off = 0)
     uint64_t         off
   PREINIT:
     char *           buf;
-    int              retlen;
+    uint64_t         retlen;
   INIT:
     Newx(buf, len, char);
   CODE:
@@ -165,7 +170,7 @@ _read_to_fh(striper, soid, fh)
   PREINIT:
     char *           buf;
     size_t           len;
-    size_t           psize;
+    uint64_t         psize;
     time_t           pmtime;
     int              err;
     uint64_t         off;
@@ -198,12 +203,13 @@ _read_to_fh(striper, soid, fh)
 
 
 int
-remove(striper, soid)
+_remove(striper, soid)
     rados_striper_t  striper
     const char *     soid
   PREINIT:
     int              err;
   CODE:
+    printf("Removing striped object %s\n", soid);
     err = rados_striper_remove(striper, soid);
     if (err < 0)
         croak("cannot remove striped object '%s': %s", soid, strerror(-err));

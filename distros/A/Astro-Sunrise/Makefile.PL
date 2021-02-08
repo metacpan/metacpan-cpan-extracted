@@ -1,6 +1,6 @@
 #
 #     Configuration script for Astro::Sunrise
-#     Copyright (C) 2001, 2002, 2003, 2013, 2015, 2017, 2019 Ron Hill and Jean Forget
+#     Copyright (C) 2001--2003, 2013, 2015, 2017, 2019, 2021 Ron Hill and Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
@@ -57,7 +57,7 @@ WriteMakefile(
        provides       => {
            'Astro::Sunrise' => {
                 file => 'lib/Astro/Sunrise.pm',
-                version => '0.98',
+                version => '0.99',
            },
        },
        'meta-spec' => { version => 2 },
@@ -67,6 +67,9 @@ WriteMakefile(
                url  => 'https://github.com/jforget/Astro-Sunrise.git',
                web  => 'https://github.com/jforget/Astro-Sunrise',
            },
+	   bugtracker => {
+               web  => 'https://github.com/jforget/Astro-Sunrise/issues',
+	   },
        },
     },
 );

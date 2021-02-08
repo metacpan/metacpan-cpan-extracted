@@ -40,7 +40,7 @@ use PPIx::QuoteLike::Utils qw{
 use Scalar::Util ();
 use Text::Tabs ();
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use constant CLASS_CONTROL       => 'PPIx::QuoteLike::Token::Control';
 use constant CLASS_DELIMITER     => 'PPIx::QuoteLike::Token::Delimiter';
@@ -56,6 +56,8 @@ use constant ILLEGAL_FIRST	=>
     'Tokenizer found illegal first characters';
 use constant MISMATCHED_DELIM	=>
     'Tokenizer found mismatched delimiters';
+use constant NO_INDENTATION	=>
+    'No indentation string found';
 
 {
     my $match_sq = __match_enclosed( qw< ' > );
@@ -102,7 +104,7 @@ use constant MISMATCHED_DELIM	=>
 	defined( my $string = $self->_stringify_source( $source ) )
 	    or return;
 
-	my ( $type, $gap, $content, $end_delim, $start_delim );
+	my ( $type, $gap, $gap2, $content, $end_delim, $indented, $start_delim );
 
 	$arg{trace}
 	    and warn "Initial match of $string\n";
@@ -130,15 +132,28 @@ use constant MISMATCHED_DELIM	=>
 	# Note that the regexp used here is slightly wrong in that white
 	# space between the '<<' and the termination string is not
 	# allowed if the termination string is not quoted in some way.
-	} elsif ( $string =~ m/ \A \s* ( << ) ( \s* )
-	    ( \w+ | $match_sq | $match_dq | $match_bt ) \n /smxgc ) {
-	    ( $type, $gap, $start_delim ) = ( $1, $2, $3 );
+	} elsif ( $string =~ m/ \A \s* ( << ) ( \s* ) ( ~? ) ( \s* )
+	    ( [\\]? \w+ | $match_sq | $match_dq | $match_bt ) \n /smxgc ) {
+	    ( $type, $gap, $indented, $gap2, $start_delim ) = (
+		$1, $2, $3, $4, $5 );
 	    $arg{trace}
-		and warn "Initial match '$type$start_delim$gap'\n";
-	    $self->{interpolates} = $start_delim !~ m/ \A ' /smx;
+		and warn "Initial match '$type$start_delim$gap$indented'\n";
+	    $self->{interpolates} = $start_delim !~ m/ \A [\\'] /smx;
 	    $content = substr $string, ( pos $string || 0 );
 	    $end_delim = _unquote( $start_delim );
-	    if ( $content =~ s/ ^ \Q$end_delim\E \n? \z //smx ) {
+	    # NOTE that the indentation is specifically space or tab
+	    # only.
+	    if ( $content =~ s/ ^ ( [ \t]* ) \Q$end_delim\E \n? \z //smx ) {
+		# NOTE PPI::Token::HereDoc does not preserve the
+		# indentation of an indented here document, so the
+		# indentation will appear to be '' if we came from PPI.
+		if ( $indented ) {
+		    # Version per perldelta.pod for that release.
+		    $self->{perl_version_introduced} = '5.025007';
+		    $self->{indentation} = "$1";
+		    $self->{_indentation_re} = qr/
+			^ \Q$self->{indentation}\E /smx;
+		}
 	    } else {
 		$end_delim = '';
 	    }
@@ -182,6 +197,12 @@ use constant MISMATCHED_DELIM	=>
 	    length $gap ?
 		$self->_make_token( CLASS_WHITESPACE, $gap ) :
 		(),
+	    length $indented ?
+	        $self->_make_token( CLASS_STRUCTURE, $indented ) :
+		(),
+	    length $gap2 ?
+		$self->_make_token( CLASS_WHITESPACE, $gap2 ) :
+		(),
 	];
 	$self->{start} ||= [
 	    $self->_make_token( CLASS_DELIMITER, $start_delim ),
@@ -198,7 +219,9 @@ use constant MISMATCHED_DELIM	=>
 
 		if ( $content =~ m/ \G ( \\ [ULulQEF] ) /smxgc ) {
 		    push @children, [ CLASS_CONTROL, "$1" ];
-		} elsif ( $content =~ m/ \G ( \\ N [{] ( [^}]+ ) [}] ) /smxgc ) {
+		} elsif (
+		    $content =~ m/ \G ( \\ N [{] ( [^}]+ ) [}] ) /smxgc
+		) {
 		    # Handle \N{...} separately because it can not
 		    # contain an interpolation even inside of an
 		    # otherwise-interpolating string. That is to say,
@@ -220,19 +243,16 @@ use constant MISMATCHED_DELIM	=>
 		} elsif ( $content =~ m/ \G ( [\$\@] \#? \$* ) /smxgc ) {
 		    push @children, $self->_interpolation( "$1", $content );
 		} elsif ( $content =~ m/ \G ( \\ . | [^\\\$\@]+ ) /smxgc ) {
-		    push @children, [ CLASS_STRING, "$1" ];
+		    push @children, $self->_remove_here_doc_indentation(
+			"$1",
+			sibling	=> \@children,
+		    );
 		} else {
 		    last;
 		}
-	    } continue {
-		# We might have consecutive strings for various reasons.
-		# Merge these.
-		if ( CLASS_STRING eq $children[-1][0] &&
-		    CLASS_STRING eq $children[-2][0] ) {
-		    my $merge = pop @children;
-		    $children[-1][1] .= $merge->[1];
-		}
 	    }
+
+	    @children = _merge_strings( @children );
 	    shift @children;	# remove the priming
 
 	    # Make the tokens, at long last.
@@ -243,10 +263,17 @@ use constant MISMATCHED_DELIM	=>
 	} else {
 
 	    length $content
-		and push @children, $self->_make_token(
-		    CLASS_STRING, $content );
+		and push @children, map { $self->_make_token( @{ $_ } ) }
+		    _merge_strings(
+			$self->_remove_here_doc_indentation( $content )
+			);
 
 	}
+
+	# Add the indentation before the end marker, if needed
+	$self->{indentation}
+	    and push @children, $self->_make_token(
+	    CLASS_WHITESPACE, $self->{indentation} );
 
 	if ( $self->{finish} ) {
 	    # If we already have something here it is data, not objects.
@@ -384,6 +411,11 @@ sub finish {
 sub handles {
     my ( $self, $string ) = @_;
     return $self->_stringify_source( $string, test => 1 );
+}
+
+sub indentation {
+    my ( $self ) = @_;
+    return $self->{indentation};
 }
 
 sub interpolates {
@@ -753,6 +785,89 @@ sub _link_elems {
     }
 }
 
+# For various reasons we may get consecutive literals -- typically
+# strings. We want to merge these. The arguments are array refs, with
+# the class name of the token in [0] and the content in [1]. I know of
+# no way we can generate consecutive white space tokens, but if I did I
+# would want them merged.
+#
+# NOTE that merger loses all attributes of the second token, so we MUST
+# NOT merge CLASS_UNKNOWN tokens, or any class that might have
+# attributes other than content.
+{
+    my %can_merge = map { $_ => 1 } CLASS_STRING, CLASS_WHITESPACE;
+
+    sub _merge_strings {
+	my @arg = @_;
+	my @rslt;
+	foreach my $elem ( @arg ) {
+	    if ( @rslt && $can_merge{$elem->[0]}
+		&& $elem->[0] eq $rslt[-1][0]
+	    ) {
+		$rslt[-1][1] .= $elem->[1];
+	    } else {
+		push @rslt, $elem;
+	    }
+	}
+	return @rslt;
+    }
+}
+
+# If we're processing an indented here document, strings must be split
+# on new lines and un-indented. We return array refs rather than
+# objects because we may be called before we're ready to build the
+# objects.
+sub _remove_here_doc_indentation {
+    my ( $self, $string, %arg ) = @_;
+
+    # NOTE that we rely on the fact that both undef (not indented) and
+    # '' (indented by zero characters) evaluate false.
+    $self->{indentation}
+	or return [ CLASS_STRING, $string ];
+
+    my $ignore_first;
+    if ( $arg{sibling} ) {
+	# Because the calling code primes the pump, @sibling will never
+	# be empty, even when processing the first token. So:
+	# * The pump-priming specifies class '', so if that is what we
+	#   see we must process the first line; otherwise
+	# * If the previous token is a string ending in "\n", we must
+	#   process the first line.
+	$ignore_first = '' ne $arg{sibling}[-1][0] && (
+	    CLASS_STRING ne $arg{sibling}[-1][0] ||
+	    $arg{sibling}[-1][1] !~ m/ \n \z /smx );
+    } else {
+	# Without @sibling, we unconditionally process the first line.
+	$ignore_first = 0;
+    }
+
+    my @rslt;
+
+    foreach ( split qr/ (?<= \n ) /smx, $string ) {
+	if ( $ignore_first ) {
+	    push @rslt, [ CLASS_STRING, "$_" ];
+	    $ignore_first = 0;
+	} else {
+	    if ( "\n" eq $_ ) {
+		push @rslt,
+		    [ CLASS_STRING, "$_" ],
+		    ;
+	    } elsif ( s/ ( $self->{_indentation_re} ) //smx ) {
+		push @rslt,
+		    [ CLASS_WHITESPACE, "$1" ],
+		    [ CLASS_STRING, "$_" ],
+		    ;
+	    } else {
+		push @rslt,
+		    [ CLASS_UNKNOWN, "$_", error => NO_INDENTATION ],
+		    ;
+	    }
+	}
+    }
+
+    return @rslt;
+}
+
 sub _stringify_source {
     my ( $self, $string, %opt ) = @_;
 
@@ -836,6 +951,46 @@ reasonably like string literals. Its real reason for being is to find
 interpolated variables for L<Perl::Critic|Perl::Critic> policies and
 similar code.
 
+The parse is fairly straightforward, and a little poking around with
+F<eg/pqldump> should show how it normally goes.
+
+But there is at least one quote-like thing that probably needs some
+explanation.
+
+=head2 Indented Here Documents
+
+These were introduced in Perl 5.25.7 (November 2016) but not recognized
+by this module until its version 0.015 (February 2021). The indentation
+is parsed as
+L<PPIx::QuoteLike::Token::Whitespace|PPIx::Regexp::Token::Whitespace>
+objects, provided it is at least one character wide, otherwise it is not
+represented in the parse. That is to say,
+
+ <<~EOD
+     How doth the little crocodile
+     Improve his shining tail
+     EOD
+
+will have the three indentations represented by whitespace objects and
+each line of the literal represented by its own string object, but
+
+ <<~EOD
+ How doth the little crocodile
+ Improve his shining tail
+ EOD
+
+will parse the same as the non-indented version, except for the addition
+of the token representing the C<'~'>.
+
+L<PPI|PPI> is ahead of this module, and recognized indented here
+documents as of its version 1.246 (May 2019). Unfortunately, as of
+version 1.270 the indent gets lost in the parse, so a C<PPIx::QuoteLike>
+object initialized from such a
+L<PPI::Token::HereDoc|PPI::Token::HereDoc> will be seen as having an
+indentation of C<''> regardless of the actual indentation in the source.
+I believe this restriction will go away when
+L<https://github.com/adamkennedy/PPI/issues/251> is resolved.
+
 =head1 DEPRECATION NOTICE
 
 The L<postderef|/postderef> argument to L<new()|/new> is being put
@@ -870,7 +1025,8 @@ quote-like literal of some sort, provided it begins like one. Otherwise
 this method will return nothing. The scalar representation of a here
 document is a multi-line string whose first line consists of the leading
 C< << > and the start delimiter, and whose subsequent lines consist of
-the content of the here document and the end delimiter.
+the content of the here document and the end delimiter. Indented here
+documents were not supported by this class until version C<0.015>.
 
 C<PPI> classes that can be handled are
 L<PPI::Token::Quote|PPI::Token::Quote>,
@@ -1030,6 +1186,15 @@ element zero if no argument is specified.
 This convenience static method returns a true value if this package can
 be expected to handle the content of C<$string> (be it scalar or
 object), and a false value otherwise.
+
+=head2 indentation
+
+This method returns the indentation string if the object represents an
+indented here document, or C<undef> if it represents anything else,
+including an unindented here document.
+
+B<Note> that if indented syntax is used but the here document is not in
+fact indented, this will return C<''>, which evaluates to false.
 
 =head2 interpolates
 
@@ -1216,6 +1381,12 @@ Nevertheless, this class is trying to statically parse quote-like
 things. I do not have any examples of where the parse of a quote-like
 thing would change based on what is interpolated, but neither can I rule
 it out. I<Caveat user>.
+
+=head2 PPI Restrictions
+
+As of version 0.015 of this module, the only known instance of this is
+the handling of indented here documents, as discussed above under
+L<Indented Here Documents|/Indented Here Documents>.
 
 =head2 Non-Standard Syntax
 

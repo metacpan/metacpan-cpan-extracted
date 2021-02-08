@@ -4,8 +4,9 @@ use utf8;
 use feature qw/state/;
 
 use Test::More;
+use Test::Exception;
 use lib '.';
-use t::Util qw/ any_mocked_slack /;
+use t::Util qw/ any_mocked_slack mocked_slack_without_token /;
 
 my %tests = (
     auth => {
@@ -555,6 +556,28 @@ subtest 'users.profile' => sub {
         user    => 'hoge',
         value   => 'fuga',
     ), 'HASH';
+};
+
+subtest 'oauth.v2' => sub {
+    throws_ok {
+        $slack->oauth->v2->access(
+            code          => 'ccdaa72ad',
+            client_id     => '4b39e9-752c4',
+            client_secret => '33fea0113f5b1',
+            redirect_uri  => 'http://example.com',
+        );
+    } 'WebService::Slack::WebApi::Exception::IllegalParameters',
+    'Illegal parameters: defined token when calling oath.v2.access';
+
+    my $sl = mocked_slack_without_token();
+    isa_ok $sl->oauth->v2->access(
+        code          => 'ccdaa72ad',
+        client_id     => '4b39e9-752c4',
+        client_secret => '33fea0113f5b1',
+        redirect_uri  => 'http://example.com',
+    ), 'HASH';
+
+    done_testing;
 };
 
 done_testing;

@@ -1,14 +1,10 @@
 package Quantum::Superpositions::Lazy::ComputedState;
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
-use v5.28;
+use v5.24;
 use warnings;
 use Moo;
-
-use feature qw(signatures);
-no warnings qw(experimental::signatures);
-
 use Quantum::Superpositions::Lazy::Role::Operation;
 use Types::Standard qw(ConsumerOf ArrayRef);
 use Carp qw(croak);
@@ -29,16 +25,20 @@ has "operation" => (
 	required => 1,
 );
 
-sub clone ($self)
+sub clone
 {
+	my ($self) = @_;
+
 	return $self->new(
 		$self->%{qw(value weight source operation)}
 	);
 }
 
 # TODO: allow merging with regular states
-sub merge ($self, $with)
+sub merge
 {
+	my ($self, $with) = @_;
+
 	croak "cannot merge a state: values mismatch"
 		if $self->value ne $with->value;
 	croak "cannot merge a state: operation mismatch"

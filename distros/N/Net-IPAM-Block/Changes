@@ -1,5 +1,9 @@
 Revision history for Net-IPAM-Block
 
+4.00    Sat, 06 Feb 2021 23:03:36 +0100
+        * revert using internals from Net::IPAM::IP
+        * maybe a little bit slower in sorting, but better module decoupling!
+
 3.00    Tue, 19 Jan 2021 08:12:14 +0100
         * faster sorting
         * remove deprecated find_free_cidrs()

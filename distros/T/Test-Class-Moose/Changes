@@ -1,5 +1,17 @@
 Revision history for Perl distribution Test-Class-Moose
 
+0.99     2021-02-07
+
+  [ENHANCEMENTS]
+
+  * Greatly expanded documentation for the test control methods.
+
+  [BUG FIXES]
+
+  * Fixed a bug in the method report's `has_tag` method. This would die no
+    matter how it was called. Fixed by Iain Loasby. Fixes GH #109. GH #110.
+
+
 0.98     2019-10-26
 
   [BUG FIXES]

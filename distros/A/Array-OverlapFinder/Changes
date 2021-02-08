@@ -1,3 +1,18 @@
+0.004   2021-01-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Explain the use cases of the module.
+
+
+0.003   2020-12-26  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [incompatible change] Change interface (specify option as
+	  optional first-argument hashref).
+
+        - Accept more than two sequences.
+
+
 0.002   2020-12-25  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

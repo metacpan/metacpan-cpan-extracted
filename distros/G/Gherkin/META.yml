@@ -1,7 +1,10 @@
 ---
 abstract: 'A parser and compiler for the Gherkin language'
 author:
-  - "['Peter Sergeant <pete@clueball.com>', 'Cucumber Ltd', 'Gaspar Nagy']"
+  - "'Erik Huelsmann <ehuels@gmail.com>'"
+  - "'Peter Sergeant <pete@clueball.com>'"
+  - "'Cucumber Ltd'"
+  - "'Gaspar Nagy'"
 build_requires:
   Path::Class: '0'
   Test::Differences: '0'
@@ -10,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +24,9 @@ requires:
   Cpanel::JSON::XS: '0'
   IO::Scalar: '0'
 resources:
-  bugtracker: https://github.com/pjlsergeant/gherkin/issues
-  repository: https://github.com/pjlsergeant/gherkin.git
-version: 4.0.0
+  bugtracker: https://github.com/cucumber/cucumber/issues
+  repository: https://github.com/cucumber/gherkin-perl.git
+version: 17.0.1
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

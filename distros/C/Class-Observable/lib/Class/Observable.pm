@@ -1,57 +1,85 @@
+use strict; use warnings;
+
 package Class::Observable;
 
-# $Id: Observable.pm,v 1.11 2004/10/16 16:48:50 cwinters Exp $
+our $VERSION = '2.000';
 
-use strict;
+use Scalar::Util 'refaddr';
 use Class::ISA;
-use Scalar::Util qw( weaken );
 
-$Class::Observable::VERSION = '1.04';
+# Unused; kept for backward compatibility only
+my ( $DEBUG );
+sub DEBUG     { return $DEBUG; }
+sub SET_DEBUG { $DEBUG = $_[0] }
+sub observer_log   { shift; $DEBUG && warn @_, "\n" }
+sub observer_error { shift; die @_, "\n" }
+
 
 my %O = ();
-my %P = ();
+
+my %registry;
+
+BEGIN {
+	require Config;
+	if ( $^O eq 'Win32' or $Config::Config{'useithreads'} ) {
+		*NEEDS_REGISTRY = sub () { 1 };
+		*CLONE = sub {
+			my $have_warned;
+			foreach my $oldaddr ( keys %registry ) {
+				my $invocant  = delete $registry{ $oldaddr };
+				my $observers = delete $O{ $oldaddr };
+				if ( defined $invocant ) {
+					my  $addr   = refaddr $invocant;
+					$O{ $addr } = $observers;
+					Scalar::Util::weaken( $registry{ $addr } = $invocant );
+				}
+				else {
+					$have_warned++ or warn
+						"*** Inconsistent state ***\n",
+						"Observed instances have gone away " .
+						"without invoking Class::Observable::DESTROY\n";
+				}
+			}
+		};
+	}
+	else {
+		*NEEDS_REGISTRY = sub () { 0 };
+	}
+}
+
+sub DESTROY {
+	my $invocant = shift;
+	my $addr = refaddr $invocant;
+	delete $registry{ $addr } if NEEDS_REGISTRY and $addr;
+	delete $O{ $addr || "::$invocant" };
+}
 
 
 # Add one or more observers (class name, object or subroutine) to an
 # observable thingy (class or object). Return new number of observers.
 
 sub add_observer {
-    my ( $item, @observers ) = @_;
-    $O{ $item } ||= [];
-    foreach my $observer ( @observers ) {
-        $item->observer_log( "Adding observer '$observer' to ",
-                             "'", _describe_item( $item ), "'" );
-        my $num_items = scalar @{ $O{ $item } };
-        $O{ $item }->[ $num_items ] = $observer;
-        if ( ref( $observer ) ) {
-            weaken( $O{ $item }->[ $num_items ] );
-        }
-    }
-    return scalar @{ $O{ $item } };
+	my $invocant = shift;
+	my $addr = refaddr $invocant;
+	Scalar::Util::weaken( $registry{ $addr } = $invocant ) if NEEDS_REGISTRY and $addr;
+	push @{ $O{ $addr || "::$invocant" } }, @_;
 }
 
 
 # Remove one or more observers from an observable thingy. Return new
 # number of observers.
-# TODO: Will this work with subroutines?
 
 sub delete_observer {
-    my ( $item, @observers_to_remove ) = @_;
-    unless ( ref $O{ $item } eq 'ARRAY' ) {
-        return 0;
-    }
-    my %ok_observers = map { $_ => 1 } @{ $O{ $item } };
-    foreach my $observer_to_remove ( @observers_to_remove ) {
-        $item->observer_log( "Removing observer '$observer_to_remove' from ",
-                             "'", _describe_item( $item ), "'" );
-        my $removed = delete $ok_observers{ $observer_to_remove };
-        if ( $removed ) {
-            $item->observer_log( "Found observer '$observer_to_remove'; ",
-                                 "removing..." );
-        }
-    }
-    $O{ $item } = [ keys %ok_observers ];
-    return scalar keys %ok_observers;
+	my $invocant = shift;
+	my $addr = refaddr $invocant;
+	my $observers = $O{ $addr || "::$invocant" } or return 0;
+	my %removal = map +( refaddr( $_ ) || "::$_" => 1 ), @_;
+	@$observers = grep !$removal{ refaddr( $_ ) || "::$_" }, @$observers;
+	if ( ! @$observers ) {
+		delete $registry{ $addr } if NEEDS_REGISTRY and $addr;
+		delete $O{ $addr || "::$invocant" };
+	}
+	scalar @$observers;
 }
 
 
@@ -59,74 +87,50 @@ sub delete_observer {
 # observers removed.
 
 sub delete_all_observers {
-    my ( $item ) = @_;
-    $item->observer_log( "Removing all observers from ",
-                         "'", _describe_item( $item ), "'" );
-    my $num_removed = 0;
-    return $num_removed unless ( ref $O{ $item } eq 'ARRAY' );
-    $num_removed = scalar @{ $O{ $item } };
-    $O{ $item } = [];
-    return $num_removed;
+	my $invocant = shift;
+	my $addr = refaddr $invocant;
+	delete $registry{ $addr } if NEEDS_REGISTRY and $addr;
+	my $removed = delete $O{ $addr || "::$invocant" };
+	$removed ? scalar @$removed : 0;
 }
 
 
 # Backward compatibility
 
-sub delete_observers {
-    goto \&delete_all_observers;
-}
+*delete_observers = \&delete_all_observers;
 
 
 # Tell all observers that a state-change has occurred. No return
 # value.
 
 sub notify_observers {
-    my ( $item, $action, @params ) = @_;
-    $action ||= '';
-    $item->observer_log( "Notification from '", _describe_item( $item ), "'",
-                         "with '$action'" );
-    my @observers = $item->get_observers;
-    foreach my $o ( @observers ) {
-        $item->observer_log( "Notifying observer '$o'" );
-        eval {
-            if ( ref $o eq 'CODE' ) {
-                $o->( $item, $action, @params );
-            }
-            else {
-                $o->update( $item, $action, @params );
-            }
-        };
-        if ( $@ ) {
-            $item->observer_error(
-                "Failed to send observation from '$item' to '$o': $@" );
-        }
-    }
+	for ( $_[0]->get_observers ) {
+		ref eq 'CODE' ? $_->( @_ ) : $_->update( @_ );
+	}
 }
 
 
 # Retrieve *all* observers for a particular thingy. (See docs for what
 # *all* means.) Returns a list of observers
 
+my %supers;
 sub get_observers {
-    my ( $item ) = @_;
-    $item->observer_log( "Retrieving observers using ",
-                         "'", _describe_item( $item ), "'" );
-    my @observers = ();
-    my $class = ref $item;
-    if ( $class ) {
-        $item->observer_log( "Retrieving object-specific observers from ",
-                             "'", _describe_item( $item ), "'" );
-        push @observers, $item->_obs_get_observers_scoped;
-    }
-    else {
-        $class = $item;
-    }
-    $item->observer_log( "Retrieving class-specific observers from '$class' ",
-                         "and its parents" );
-    push @observers, $class->_obs_get_observers_scoped,
-                     $class->_obs_get_parent_observers;
-    $item->observer_log( "Found observers '", join( "', '", @observers ), "'" );
-    return @observers;
+	my ( @self, $class );
+	if ( my $pkg = ref $_[0] ) {
+		@self  = $_[0];
+		$class = $pkg;
+	}
+	else {
+		$class = $_[0];
+	}
+
+	# We only find the parents the first time, so if you muck with
+	# @ISA you'll get unexpected behavior...
+	my $cached_supers = $supers{ $class } ||= [
+		grep $_->isa( 'Class::Observable' ), Class::ISA::super_path( $class )
+	];
+
+	map $_->get_direct_observers, @self, $class, @$cached_supers;
 }
 
 
@@ -134,95 +138,33 @@ sub get_observers {
 # observers from parents.
 
 sub copy_observers {
-    my ( $item_from, $item_to ) = @_;
-    my @from_observers = $item_from->get_observers;
-    foreach my $observer ( @from_observers ) {
-        $item_to->add_observer( $observer );
-    }
-    return scalar @from_observers;
+	my ( $src, $dst ) = @_;
+	my @observer = $src->get_observers;
+	$dst->add_observer( @observer );
+	scalar @observer;
 }
 
 
-sub count_observers {
-    my ( $item ) = @_;
-    $item->observer_log( "Counting observers using ",
-                         "'", _describe_item( $item ), "'" );
-    my @observers = $item->get_observers;
-    return scalar @observers;
-}
-
-
-# Find observers from parents
-
-sub _obs_get_parent_observers {
-    my ( $item ) = @_;
-    my $class = ref $item || $item;
-
-    # We only find the parents the first time, so if you muck with
-    # @ISA you'll get unexpected behavior...
-
-    unless ( ref $P{ $class } eq 'ARRAY' ) {
-        my @parent_path = Class::ISA::super_path( $class );
-        $item->observer_log( "Finding observers from parent classes ",
-                             "'", join( "', '", @parent_path ), "'" );
-        my @observable_parents = ();
-        foreach my $parent ( @parent_path ) {
-            next if ( $parent eq 'Class::Observable' );
-            if ( $parent->isa( 'Class::Observable' ) ) {
-                push @observable_parents, $parent;
-            }
-        }
-        $P{ $class } = \@observable_parents;
-        $item->observer_log( "Found observable parents for '$class': ",
-                             "'", join( "', '", @observable_parents ), "'" );
-    }
-
-    my @parent_observers = ();
-    foreach my $parent ( @{ $P{ $class } } ) {
-        push @parent_observers, $parent->_obs_get_observers_scoped;
-    }
-    return @parent_observers;
-}
+sub count_observers { scalar $_[0]->get_observers }
 
 
 # Return observers ONLY for the specified item
 
-sub _obs_get_observers_scoped {
-    my ( $item ) = @_;
-    return () unless ( ref $O{ $item } eq 'ARRAY' );
-    return @{ $O{ $item } };
+sub get_direct_observers {
+	my $invocant = shift;
+	my $addr = refaddr $invocant;
+	my $observers = $O{ $addr || "::$invocant" } or return wantarray ? () : 0;
+	@$observers;
 }
 
-
-# Used in debugging
-
-sub _describe_item {
-    my ( $item ) = @_;
-    return "Class $item" unless ( ref $item );
-    my $item_class = ref $item;
-    if ( $item->can( 'id' ) ) {
-        return "Object of class $item_class with ID ", $item->id();
-    }
-    return "Instance of class $item_class";
-}
-
-
-my ( $DEBUG );
-sub DEBUG     { return $DEBUG; }
-sub SET_DEBUG { $DEBUG = $_[0] }
-
-
-sub observer_log {
-    shift; $DEBUG && warn @_, "\n";
-}
-
-sub observer_error {
-    shift; die @_, "\n";
-}
 
 1;
 
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -234,7 +176,7 @@ Class::Observable - Allow other classes and objects to respond to events in your
  
   package My::Object;
  
-  use base qw( Class::Observable );
+  use parent qw( Class::Observable );
  
   # Tell all classes/objects observing this object that a state-change
   # has occurred
@@ -307,7 +249,7 @@ Class::Observable - Allow other classes and objects to respond to events in your
   package My::Parent;
  
   use strict;
-  use base qw( Class::Observable );
+  use parent qw( Class::Observable );
  
   sub prepare_for_bed {
       my ( $self ) = @_;
@@ -327,7 +269,7 @@ Class::Observable - Allow other classes and objects to respond to events in your
   package My::Child;
  
   use strict;
-  use base qw( My::Parent );
+  use parent qw( My::Parent );
  
   sub brush_teeth {
       my ( $self ) = @_;
@@ -371,6 +313,8 @@ do not do any error handling from calls to the observers. If an
 observer throws a C<die>, it will bubble up to the observed item and
 require handling there. So be careful.
 
+=head1 USER GUIDE
+
 Throughout this documentation we refer to an 'observed item' or
 'observable item'. This ambiguity refers to the fact that both a class
 and an object can be observed. The behavior when notifying observers
@@ -412,12 +356,12 @@ So given the following example:
 
  BEGIN {
      package Foo;
-     use base qw( Class::Observable );
+     use parent qw( Class::Observable );
      sub new { return bless( {}, $_[0] ) }
      sub yodel { $_[0]->notify_observers }
  
      package Baz;
-     use base qw( Foo );
+     use parent qw( Foo );
      sub yell { $_[0]->notify_observers }
  }
  
@@ -539,14 +483,47 @@ B<Object observer>:
 
 =head2 Observable Objects and DESTROY
 
-Previous versions of this module had a problem with maintaining
-references to observable objects/coderefs. As a result they'd never be
-destroyed. As of 1.04 we're using weak references with C<weaken> in
-L<Scalar::Util> so this shouldn't be a problem any longer.
+This class has a C<DESTROY> method which B<must> run
+when an instance of an observable class goes out of scope
+in order to clean up the observers added to that instance.
+
+If there is no other destructor in the inheritance tree,
+this will end up happening naturally and everything will be fine.
+
+If it does not get called, then the list of observers B<will leak>
+(which also prevents the observers in it from being garbage-collected)
+and B<may become associated with a different instance>
+created later at the same memory address as a previous instance.
+
+This may happen if a class needs its own C<DESTROY> method
+when it also wants to inherit from Class::Observer (even indirectly!),
+because perl only invokes the single nearest inherited C<DESTROY>.
+
+The most straightforward (but maybe not best) way to ensure that
+the destructor is called is to do something like this:
+
+  # in My::Class
+  sub DESTROY {
+      # ...
+      $self->Class::Observable::DESTROY;
+      # ...
+  }
+
+A better way may be to to write all destructors in your class hierarchy
+with the expectation that all of them will be called
+(which would usually be preferred anyway)
+and then enforcing that expectation by writing all of them as follows:
+
+  use mro;
+  sub DESTROY {
+      # ...
+      $self->maybe::next::method;
+      # ...
+  }
+
+(Perl being Perl, of course, there are many other ways to go about this.)
 
 =head1 METHODS
-
-=head2 Observed Item Methods
 
 B<notify_observers( [ $action, @params ] )>
 
@@ -685,33 +662,6 @@ Counts the number of observers for an observed item, including ones
 inherited from its class and/or parent classes. See L<Observable
 Classes and Objects> for more information.
 
-=head2 Debugging Methods
-
-Note that the debugging messages will try to get information about the
-observed item if called from an object. If you have an C<id()> method
-in the object its value will be used in the message, otherwise it will
-be described as "an instance of class Foo".
-
-B<SET_DEBUG( $bool )>
-
-Turn debugging on or off. If set the built-in implementation of
-C<observer_log()> will issue a warn at appropriate times during the
-process.
-
-B<observer_log( @message )>
-
-Issues a C<warn> if C<SET_DEBUG> hsa been called with a true
-value. This gets called multiple times during the registration and
-notification process.
-
-To catch the C<warn> calls just override this method.
-
-B<observer_error( @message )>
-
-Issues a C<die> if we catch an exception when notifying observers. To
-catch the C<die> and do something else with it just override this
-method.
-
 =head1 RESOURCES
 
 APIs for C<java.util.Observable> and C<java.util.Observer>. (Docs
@@ -736,13 +686,16 @@ L<Class::Trigger|Class::Trigger>
 
 L<Aspect|Aspect>
 
-=head1 COPYRIGHT
-
-Copyright (c) 2002-2004 Chris Winters. All rights reserved.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
 =head1 AUTHOR
 
-Chris Winters E<lt>chris@cwinters.comE<gt>
+Chris Winters <chris@cwinters.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2002-2004 Chris Winters.
+This software is copyright (c) 2021 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=pod

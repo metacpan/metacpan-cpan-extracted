@@ -4,8 +4,9 @@ use warnings;
 use App::Translit::String;
 use English qw(-no_match_vars);
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 7;
 use Test::NoWarnings;
+use Test::Warnings qw(warning :no_end_test);
 use Test::Output;
 use Unicode::UTF8 qw(decode_utf8);
 
@@ -76,3 +77,29 @@ stderr_is(
 	$right_ret,
 	'Run help.',
 );
+
+# Test.
+@ARGV = (
+	'-q',
+);
+$right_ret = <<'END';
+Usage: t/App-Translit-String/04-run.t [-h] [-r] [-t table] [--version]
+	string
+
+	-h		Print help.
+	-r		Reverse transliteration.
+	-t table	Transliteration table (default value is 'ISO/R 9').
+	--version	Print version.
+END
+my $warning;
+stderr_is(
+	sub {
+		$warning = warning {
+			App::Translit::String->new->run;
+		};
+		return;
+	},
+	$right_ret,
+	'Run help with bad option (-q).',
+);
+is($warning, "Unknown option: q\n", 'Warning for unknown option.');

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 
-use Test::More tests => 24;
+use Test::More tests => 27;
 
 use Cwd;
 use IO::File;
@@ -215,3 +215,28 @@ EOQ
     like($text, qr/<!-- endsection header -->/, "keep sections end tag"); # test 23
     like($text, qr/Another Header/, "keep subsection text"); # test 24
 };
+
+#----------------------------------------------------------------------
+# Test has variables
+
+do {
+    my $template = <<'EOQ';
+<!-- section header -->
+<title>$title</title>
+<!-- set $i = 0 -->
+<!-- for @metadata -->
+  <!-- set $i = $i + 1 -->
+  <meta name="metadata$i" content="$name" />
+<!-- endfor -->
+<!-- endsection header -->
+EOQ
+
+    my $has_i = web_has_variables($template, '$i');
+    is($has_i, 1, "test for variable \$i"); # test 25
+
+    my $no_j = web_has_variables($template, '$j');
+    is($no_j, 0, "test for variable \$j"); # test 26
+
+    my $has_meta = web_has_variables($template, '@metadata');
+    is($has_meta, 1, "test for variable \@metadata"); # test 27
+}

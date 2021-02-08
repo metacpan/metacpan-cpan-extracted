@@ -56,12 +56,11 @@ FortyTwo::Manual - User Guide for Forty-Two
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =encoding UTF-8
 
-=for todo TODO: try to include a description for CPAN (ABSTRACT does not work here)
-    TODO: devise a way to get correct internal links in .md doc
+=for todo TODO: devise a way to get correct internal links in .md doc
 
 =head1 Background
 
@@ -84,7 +83,7 @@ including terminally duplicated genes (in-paralogues) and/or corresponding to
 multigenic families featuring different out-paralogues of different ages.
 Preliminary tests on a broadly sampled eukaryotic data set suggest that the
 orthology relationships enforced by C<42> are in good agreement with those
-inferred with I<OrthoFinder> software [Emms and Kelly (2015) I<Genome Biol>
+inferred with C<OrthoFinder> software [Emms and Kelly (2015) I<Genome Biol>
 16:157]. To this end, it relies on complete proteomes of reference organisms.
 
 C<42> is also able to enrich MSAs resulting from the split of complex multigenic
@@ -440,9 +439,10 @@ parameter set to its default value.
 
 =head2 Installation and dependencies
 
-C<42> is written in I<Modern Perl> but relies on two external dependencies:
-I<NCBI-BLAST+> and I<Exonerate>. You should download and install the
-corresponding binaries the way you feel the most appropriate for your system.
+C<42> is written in I<Modern Perl> but relies on 1 to 3 external dependencies:
+C<NCBI-BLAST+>, C<Exonerate> and C<CAP3>. However only BLAST is really required.
+You should download and install the corresponding binaries the way you feel the
+most appropriate for your system. (Alas this can be tricky.)
 
 =over
 
@@ -451,15 +451,45 @@ corresponding binaries the way you feel the most appropriate for your system.
 =item L<https://www.ebi.ac.uk/about/vertebrate-genomics/software/exonerate>
 (use classical v2.2.0 not newer v2.4.0)
 
+=item L<http://seq.cs.iastate.edu/cap3.html>
+
 =back
 
-Most other dependencies can be handled automatically by using C<cpanm> in a
-I<Perlbrew> environment (L<https://perlbrew.pl/>). Below are a set of commands to
-setup such an environment on I<Ubuntu>.
+Most other dependencies can be handled automatically by C<cpanm>. If you cannot
+(or do not want to) modify your system Perl install, you will need to setup a
+C<Perlbrew> environment (L<https://perlbrew.pl/>). Below are two distinct sets
+of commands that should work on C<Ubuntu> 20.04.
 
+=head3 System Perl install
+
+Obviously, this requires admin rights on your system:
+
+    $ sudo su
+    $ apt install ncbi-blast+
+    $ apt install cpanminus
+    $ cpanm Bio::FastParsers
+    $ cpanm Bio::MUST::Core
+    $ cpanm Bio::MUST::Drivers
+    $ cpanm Bio::MUST::Apps::FortyTwo
+    $ exit
+
+If a C<cpanm> command fails, retype it with the C<--force> option:
+
+    $ cpanm --force Bio::MUST::Drivers
+
+Finally install a local mirror of the I<NCBI Taxonomy>:
+
+    $ setup-taxdir.pl --taxdir=taxdump/
+
+=head3 Perlbrew install
+
+    Depending on how pristine your system is, some of the commands below might
+    be unnecessary. However they should do no harm.
+    
     # install development tools
-    $ sudo apt-get update
-    $ sudo apt-get install build-essential
+    $ sudo apt update
+    $ sudo apt install build-essential
+    $ sudo apt install ncbi-blast+
 
     # download the perlbrew installer...
     $ wget -O - http://install.perlbrew.pl | bash
@@ -516,7 +546,7 @@ To help with the configuration of the numerous parameters of the software, we
 designed a C<config> file generator: C<yaml-generator-42.pl>. When run with the
 C<--wizard> option, it will guide you through the configuration by prompting for
 all required parameters (pressing C<ENTER> selects the default value). At the
-end of process, it will produce a YAML C<config> file named
+end of process, it will produce a C<YAML> C<config> file named
 C<config-$out_suffix.yaml> and a file (C<build-$out_suffix.sh>) providing the
 command to reproduce the exact same configuration without using the wizard.
 
@@ -563,7 +593,8 @@ within each MSA. See examples below:
 
 The reference proteome set must be described in the C<config> file. Firstly,
 each of the reference proteomes must be in C<FASTA> format in order to be
-formatted as a C<BLAST> database with the C<makeblastdb> command.
+formatted as a C<BLAST> database with the C<makeblastdb> command. For
+robustness, it is advised to use simple (one-word) sequence identifiers here.
 
     $ for REFORG in *.faa; do makeblastdb -in $REFORG -dbtype prot \
         -out `basename $REFORG .faa` -parse_seqids; done
@@ -739,7 +770,7 @@ C<phylogenomic>.
 
 B<Note:> the C<phylogenomic> mode also produces taxonomic reports but deprived
 of taxonomic affiliations for the purpose of C<one-on-one.pl> (not currently
-distributed on I<CPAN>).
+distributed on C<CPAN>).
 
 The wizard does its best to assist you in building your C<config> file. In
 particular, it scans the directories you specify for relevant files. Hence, to

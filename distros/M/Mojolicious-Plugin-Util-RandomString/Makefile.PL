@@ -19,10 +19,18 @@ WriteMakefile(
   },
   LICENSE      => 'artistic_2',
   META_MERGE   => {
+    'meta-spec' => { version => 2 },
     requires  => { perl => '5.010001' },
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/Akron/Mojolicious-Plugin-Util-RandomString'
+      repository  => {
+        type => 'git',
+        url => 'https://github.com/Akron/Mojolicious-Plugin-Util-RandomString.git',
+        web => 'https://github.com/Akron/Mojolicious-Plugin-Util-RandomString',
+      },
+      bugtracker => {
+        web => 'https://github.com/Akron/Mojolicious-Plugin-Util-RandomString/issues'
+      }
     }
   },
   MIN_PERL_VERSION => '5.010001',

@@ -1,5 +1,9 @@
 package TestsFor::SkipSomeMethods;
 
+use strict;
+use warnings;
+use namespace::autoclean;
+
 use Test::Class::Moose bare => 1;
 
 use Test2::Tools::Basic qw( diag ok );
@@ -69,7 +73,7 @@ sub expected_test_events {
                 call subevents => array {
                     event Plan => sub {
                         call directive => 'SKIP';
-                        call reason =>
+                        call reason    =>
                           'only methods listed as skipped should be skipped';
                         call max => 0;
                     };

@@ -1,0 +1,6 @@
+id: date_title
+%%en:
+Convert Western and Japanese years
+%%ja:
+西暦/年号簡単変換
+%%

@@ -20,16 +20,16 @@ no_index:
     - t
     - inc
 requires:
-  Data::Entropy: '0'
-  Moo: '0'
+  Moo: '2.000000'
+  Random::Any: '0'
   Sort::Key: '0'
-  Type::Tiny: '0'
+  Type::Tiny: '1.002000'
   namespace::clean: '0'
-  perl: '5.028'
+  perl: '5.024'
 resources:
   bugtracker: https://github.com/brtastic/perl-quantum-superpositions-lazy/issues
   homepage: https://brtastic.xyz/project/quantum-superpositions-lazy
   license: https://dev.perl.org/licenses
   repository: https://github.com/brtastic/perl-quantum-superpositions-lazy
-version: '1.05'
+version: '1.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

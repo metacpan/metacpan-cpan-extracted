@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 # Basic test suite
-# Copyright (c) 2019 imacat. All rights reserved. This program is free
+# Copyright (c) 2019-2021 imacat. All rights reserved. This program is free
 # software; you can redistribute it and/or modify it under the same terms
 # as Perl itself.
 
@@ -14,7 +14,7 @@ BEGIN { plan tests => 4 }
 use FindBin;
 use File::Spec::Functions qw(catdir catfile);
 use lib $FindBin::Bin;
-use vars qw($LOCALEDIR $r);
+our ($LOCALEDIR, $r);
 $LOCALEDIR = catdir($FindBin::Bin, "locale");
 
 # bindtextdomain
@@ -42,7 +42,6 @@ $r = eval {
     $_->bindtextdomain("test-cache", $LOCALEDIR);
     $_->textdomain("test-cache");
     $_[0] = $_->maketext("Hello, world!");
-    my %Lexicon = %{$_->{"Lexicon"}};
     
     # Update the file but keep the size and mtime
     open $FH, "+<$mo_file1"             or die "$mo_file1: $!";

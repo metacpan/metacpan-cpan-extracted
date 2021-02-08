@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Dynamically 0.06;
+package Syntax::Keyword::Dynamically 0.07;
 
 use v5.14;
 use warnings;

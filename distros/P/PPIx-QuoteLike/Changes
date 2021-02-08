@@ -1,3 +1,10 @@
+0.015		2021-02-05	T. R. Wyant
+    Handle <<\EOD and <<~\EOD, which are equivalent to <<'EOD' and
+    <<~'EOD', respectively.
+
+    Recognize indented here documents. Thanks to Olaf Alders (oalders)
+    for alerting me to this omission.
+
 0.014		2021-01-14	T. R. Wyant
     Add Travis CI testing.
 

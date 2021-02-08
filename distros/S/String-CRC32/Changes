@@ -1,5 +1,9 @@
 Revision history for String::CRC32
 
+2.100     2021-02-04
+        - Declare vars with our instead of use vars (GH #7, thanks to Grinnz)
+        - Quote $VERSION to preserve formatting (GH #6, thanks to Grinnz)
+
 2.000     2020-11-09
         - Switch to XSLoader rather than DynaLoader (GH #5, thanks to atoomic)
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.04
+    version 0.05
 
 SYNOPSIS
 
@@ -42,6 +42,11 @@ METHODS
         my $cpanfile = CPANfile::Parse::PPI->new( \$content );
 
 ATTRIBUTES
+
+ meta
+
+    Returns information about mirrors and OS name - if given in the
+    cpanfile
 
  modules
 

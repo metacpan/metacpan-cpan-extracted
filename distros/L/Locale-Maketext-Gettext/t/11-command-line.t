@@ -14,7 +14,7 @@ BEGIN { plan tests => 10 }
 use FindBin;
 use File::Spec::Functions qw(catdir catfile updir);
 use lib $FindBin::Bin;
-use vars qw($LOCALEDIR $r $maketext);
+our ($LOCALEDIR, $r, $maketext);
 $LOCALEDIR = catdir($FindBin::Bin, "locale");
 $maketext = catdir($FindBin::Bin, updir, "blib", "script", "maketext");
 

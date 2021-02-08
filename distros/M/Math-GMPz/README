@@ -2,7 +2,7 @@ This module wraps all of the 'mpz' (integer) functions that
 the Gnu MP (GMP) library provides. Requires gmp-4.2.0 or later.
 
 You therefore need the GMP library installed on your computer. See:
-http://gmplib.org/
+https://gmplib.org/
 
 To build this module you need perl 5.6.0 or later. I'm not sure of all
 the requirements to get it to build with earlier versions of perl, but

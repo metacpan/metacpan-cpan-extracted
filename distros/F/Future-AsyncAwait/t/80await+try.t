@@ -11,9 +11,9 @@ BEGIN {
    plan skip_all => "Future::AsyncAwait >= 0.10 is not available"
       unless eval { require Future::AsyncAwait;
                     Future::AsyncAwait->VERSION( '0.10' ) };
-   plan skip_all => "Syntax::Keyword::Try >= 0.07 is not available"
+   plan skip_all => "Syntax::Keyword::Try >= 0.18 is not available"
       unless eval { require Syntax::Keyword::Try;
-                    Syntax::Keyword::Try->VERSION( '0.07' ) };
+                    Syntax::Keyword::Try->VERSION( '0.18' ) };
 
    Future::AsyncAwait->import;
    Syntax::Keyword::Try->import;
@@ -34,7 +34,7 @@ BEGIN {
          await $f;
          $ret = "result";
       }
-      catch {
+      catch ($e) {
          $ret = "oopsie";
       }
       return $ret;
@@ -65,7 +65,7 @@ BEGIN {
          await $f;
          return "result";
       }
-      catch {}
+      catch ($e) {}
       $fellthrough++;
       return "fallthrough";
    }

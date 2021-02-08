@@ -60,12 +60,12 @@ is($me->data_type, 'text/plain', 'Data type');
 is($me->alg, 'RSA-SHA256', 'Algorithm');
 is($me->encoding, 'base64url', 'Encoding');
 
-# Ignore pading!
+# Ignore padding!
 ok($me = Crypt::MagicSignatures::Envelope->new(<<'MEXML'), 'Constructor (XML)');
 
   <?xml version="1.0" encoding="UTF-8"?>
   <me:env xmlns:me="http://salmon-protocol.org/ns/magic-env">
-    <me:data type="text/plain">
+    <me:data>
       U29tZSBhcmJpdHJhcnkgc3RyaW5nLg==
     </me:data>
     <me:encoding>base64url</me:encoding>
@@ -81,6 +81,32 @@ is($me->data, 'Some arbitrary string.', 'Data');
 is($me->data_type, 'text/plain', 'Data type');
 is($me->alg, 'RSA-SHA256', 'Algorithm');
 is($me->encoding, 'base64url', 'Encoding');
+
+
+# Test provenance
+ok($me = Crypt::MagicSignatures::Envelope->new(<<'MEXML'), 'Constructor (XML)');
+  <?xml version="1.0" encoding="UTF-8"?>
+  <myEnvelope>
+    <me:provenance xmlns:me="http://salmon-protocol.org/ns/magic-env">
+      <me:data type="text/plain">
+        U29tZSBhcmJpdHJhcnkgc3RyaW5nLg==
+      </me:data>
+      <me:encoding>base64url</me:encoding>
+      <me:alg>RSA-SHA256</me:alg>
+      <me:sig key_id="my-01">
+        S1VqYVlIWFpuRGVTX3l4S09CcWdjRVFDYVluZkI5Ulh4dmRFSnFhQW5XUmpB
+        UEJqZUM0b0lReER4d0IwWGVQZDhzWHAxN3oybWhpTk1vNHViNGNVOVE9PQ==
+      </me:sig>
+    </me:provenance>
+  </myEnvelope>
+MEXML
+
+is($me->data, 'Some arbitrary string.', 'Data');
+is($me->data_type, 'text/plain', 'Data type');
+is($me->alg, 'RSA-SHA256', 'Algorithm');
+is($me->encoding, 'base64url', 'Encoding');
+
+
 
 ok(my $sig = $me->signature, 'Signature');
 is($sig->{key_id}, 'my-01', 'Signature Key id');
@@ -106,6 +132,7 @@ ok(my $mkey = Crypt::MagicSignatures::Key->new(
 # Unable to sign
 {
   local $SIG{__WARN__} = sub {};
+  ok(!$me->sign(), 'Unable to sign without parameters');
   ok(!$me->sign($mkey->to_string), 'Unable to sign without private exponent');
 };
 
@@ -122,6 +149,10 @@ ok(!$me->verify([my_second_key => $mkey->to_string]), 'Verify me base (fail)');
 is($me->signature_base,
    'U29tZSBhcmJpdHJhcnkgc3RyaW5nLg.dGV4dC9wbGFpbg==.YmFzZTY0dXJs.UlNBLVNIQTI1Ng==',
    'Base signature');
+
+is($me->signature_base,
+   'U29tZSBhcmJpdHJhcnkgc3RyaW5nLg.dGV4dC9wbGFpbg==.YmFzZTY0dXJs.UlNBLVNIQTI1Ng==',
+   'Base signature (from cache)');
 
 is_deeply($me->signature, {
   key_id => 'my_key',
@@ -247,10 +278,46 @@ ok($me = Crypt::MagicSignatures::Envelope->new(<<'MEXML'), 'Constructor (XML) Fu
     </me:sig>
   </me:env>
 MEXML
-
-
-
 };
+
+ok($me = Crypt::MagicSignatures::Envelope->new(
+  data => 'U29tZSBhcmJpdHJhcnkgc3RyaW5nLg',
+  alg => 'RSA-SHA256',
+  encoding => 'base64url',
+  sigs => [
+    {
+      key_id => 'my-01',
+      value => 'S1VqYVlIWFpuRGVTX3l4S09CcWdjRVFDYVluZkI5Ulh4dmRFSnFhQW5XUmpBUEJqZUM0b0lReER4d0IwWGVQZDhzWHAxN3oybWhpTk1vNHViNGNVOVE9PQ=='
+    },
+    {
+      key_id => 'my-02'
+    },
+    {
+      key_id => 'my-03',
+      value => ''
+    },
+    {
+      value => 'S1VqYVlIWFpuRGVTX3l4S09CcWdjRVFDYVluZkI5Ulh4dmRFSnFhQW5XUmpBUEJqZUM0b0lReER4d0IwWGVQZDhzWHAxN3oybWhpTk1vNHViNGNVOVE9PQ=='
+    },
+  ]
+), 'Parameter constructor');
+
+ok($me->signed, 'Is signed');
+ok($me->signed('my-01'), 'Signed by specific key');
+ok(!$me->signed('my-03'), 'Not signed by specific key');
+
+like($me->to_xml, qr/<me:env\s+/, 'Envelope');
+like($me->to_xml(1), qr/^<me:provenance/, 'Provenance');
+
+my $json = $me->to_json;
+like($json,qr/^{/, 'JSON serialization');
+like($json, qr/\"sigs\":\[\{/, 'signature');
+
+# Reset data
+$me->data('');
+$json = $me->to_json;
+like($json,qr/\{\}/, 'JSON serialization');
+
 
 done_testing;
 

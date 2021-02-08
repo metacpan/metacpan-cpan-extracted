@@ -50,7 +50,7 @@ subtest 'invalid config' => sub {
     eval {
         config_do 'config/ng.pl';
     };
-    ok $@;
+    like $@, qr!^\Qconfig/ng.pl does not return HashRef.\E!;
 };
 
 subtest 'file not found' => sub {
@@ -58,7 +58,7 @@ subtest 'file not found' => sub {
     eval {
         config_do 'config/blahblah.pl';
     };
-    ok $@;
+    like $@, qr/^No such file or directory/;
 };
 
 done_testing;

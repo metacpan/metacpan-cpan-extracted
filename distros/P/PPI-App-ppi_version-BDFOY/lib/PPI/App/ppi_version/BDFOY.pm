@@ -42,7 +42,7 @@ use File::Find::Rule       ();
 use File::Find::Rule::Perl ();
 use Term::ANSIColor;
 
-our $VERSION = '0.142';
+our $VERSION = '1.001';
 
 #####################################################################
 # Main Methods
@@ -64,7 +64,6 @@ sub main {
 		else                               { 'change' }
 		};
 
-
 	$class->$command( @args );
 	}
 }
@@ -74,7 +73,7 @@ sub main {
 =cut
 
 sub print_my_version {
-	print "brian's ppi_version $VERSION - Copright 2009 brian d foy\n";
+	print "brian's ppi_version $VERSION - Copright 2009-2021 brian d foy\n";
 	}
 
 =item print_file_report
@@ -211,13 +210,13 @@ sub change {
 
 	my $from = shift @_;
 
-	unless ( $from and $from =~ /^[\d\._]+$/ ) {
-		$class->error("From version is not a number [$from]");
+	unless ( $from and $from =~ /^v?[\d\._]+$/ ) {
+		$class->error("From is not a version [$from]");
 		}
 
 	my $to = shift @_;
-	unless ( $to and $to =~ /^[\d\._]+$/ ) {
-		$class->error("Target to version is not a number [$to]");
+	unless ( $to and $to =~ /^v?[\d\._]+$/ ) {
+		$class->error("Target is not a version [$to]");
 		}
 
 	# Find all modules and scripts below the current directory

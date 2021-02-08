@@ -40,6 +40,7 @@ my %WriteMakefileArgs = (
     "bin/subs-forest.pl",
     "bin/tab2mapper.pl",
     "bin/tax-filter-ali.pl",
+    "bin/tax-mask-ali.pl",
     "bin/tree2list.pl",
     "bin/tree2tpl.pl"
   ],
@@ -102,7 +103,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Deep" => 0
   },
-  "VERSION" => "0.210230",
+  "VERSION" => "0.210380",
   "test" => {
     "TESTS" => "t/*.t"
   }

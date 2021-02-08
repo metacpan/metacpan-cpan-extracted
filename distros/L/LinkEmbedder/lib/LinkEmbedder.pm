@@ -11,7 +11,7 @@ use constant TLS => eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -42,7 +42,8 @@ has url_to_link => sub {
     'twitter.com'        => 'LinkEmbedder::Link::Twitter',
     'vimeo.com'          => 'LinkEmbedder::Link::oEmbed',
     'xkcd.com'           => 'LinkEmbedder::Link::Xkcd',
-    'whereby.com'        => 'LinkEmbedder::Link::AppearIn',
+    'webex.com'          => 'LinkEmbedder::Link::Webex',
+    'whereby.com'        => 'LinkEmbedder::Link::Whereby',
     'youtube.com'        => 'LinkEmbedder::Link::oEmbed',
   };
 };
@@ -121,9 +122,11 @@ sub test_ok {
     my $link = shift;
     my $json = $link->TO_JSON;
     Test::More::isa_ok($link, $expect->{isa}) if $expect->{isa};
+    Test::More::is(Mojo::DOM->new($json->{html})->children->first->{class}, $expect->{class}, 'class')
+      if $expect->{class};
 
     for my $key (sort keys %$expect) {
-      next if $key eq 'isa';
+      next if $key eq 'isa' or $key eq 'class';
       for my $exp (ref $expect->{$key} eq 'ARRAY' ? @{$expect->{$key}} : ($expect->{$key})) {
         my $test_name = ref $exp eq 'Regexp' ? 'like' : 'is';
         Test::More->can($test_name)->($json->{$key}, $exp, $key);
@@ -148,7 +151,7 @@ sub _host_in_hash {
   my ($host, $hash) = @_;
   return $hash->{$host} if $hash->{$host};
 
-  $host = $1 if $host =~ m!([^\.]+\.\w+)$!;
+  $host = $1            if $host =~ m!([^\.]+\.\w+)$!;
   return $hash->{$host} if $hash->{$host};
 
   $host = $1 if $host =~ m!([^\.]+)\.\w+$!;

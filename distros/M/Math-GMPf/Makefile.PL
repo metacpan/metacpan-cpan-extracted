@@ -1,5 +1,8 @@
-use ExtUtils::MakeMaker;
+use strict;
+use warnings;
 use Config;
+use ExtUtils::MakeMaker;
+
 require 5.006;
 
 $| = 1;
@@ -10,8 +13,8 @@ our $INC = $args{ INC };
 
 print "\nThis module requires gmp-4.2.0 (or later)\n\n";
 
-$use_64_bit_int = 0; # Let perl decide whether to include 64-bit 'long long' support
-$use_long_double = 0;# Let perl decide whether to include 'long double' support
+my $use_64_bit_int = 0; # Let perl decide whether to include 64-bit 'long long' support
+my $use_long_double = 0;# Let perl decide whether to include 'long double' support
 
 #$use_64_bit_int = -1; # Force exclusion of 64-bit 'long long' support
 #$use_long_double = -1;# Force exclusion of 'long double' support
@@ -53,9 +56,7 @@ $defines =~ /-DNV_IS_FLOAT128/ ? print "Building with '__float128' support\n" :
 
 print "If this is wrong, see the \"64-bit support\" section in the README\n\n";
 
-if($^O =~ /MSWin32/i && $] < 5.022) {
-  $defines .= " -D_WIN32_BIZARRE_INFNAN";
-}
+if($^O =~ /MSWin32/i && $] < 5.022) {$defines .= " -D_WIN32_BIZARRE_INFNAN"}
 
 my %options = (
   NAME => 'Math::GMPf',
@@ -84,5 +85,5 @@ my %options = (
 WriteMakefile(%options);
 
 # Remove the Makefile dependency. Causes problems on a few systems.
-sub MY::makefile { '' }
+# sub MY::makefile { '' }
 

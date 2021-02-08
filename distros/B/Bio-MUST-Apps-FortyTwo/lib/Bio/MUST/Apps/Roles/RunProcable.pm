@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Roles::RunProcable;
 # ABSTRACT: Attributes and methods common to RunProcessor objects
-$Bio::MUST::Apps::Roles::RunProcable::VERSION = '0.202160';
+$Bio::MUST::Apps::Roles::RunProcable::VERSION = '0.210370';
 use Moose::Role;
 
 use autodie;
@@ -74,6 +74,13 @@ has 'out_suffix' => (
 );
 
 
+has 'out_dir' => (
+    is       => 'ro',
+    isa      => 'Str',
+    default  => q{},
+);
+
+
 has 'debug_mode' => (
     is       => 'ro',
     isa      => 'Bool',
@@ -101,7 +108,7 @@ Bio::MUST::Apps::Roles::RunProcable - Attributes and methods common to RunProces
 
 =head1 VERSION
 
-version 0.202160
+version 0.210370
 
 =head1 SYNOPSIS
 

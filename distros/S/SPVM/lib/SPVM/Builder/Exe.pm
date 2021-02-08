@@ -23,57 +23,28 @@ use Scalar::Util 'weaken';
 
 use File::Basename 'dirname', 'basename';
 
-# SPVM runtime source files
-my @SPVM_RUNTIME_SRC_BASE_NAMES = qw(
-  spvm_allow.c
-  spvm_api.c
-  spvm_array_field_access.c
-  spvm_basic_type.c
-  spvm_block.c
-  spvm_call_sub.c
-  spvm_case_info.c
-  spvm_compiler_allocator.c
-  spvm_compiler.c
-  spvm_constant.c
-  spvm_csource_builder_precompile.c
-  spvm_descriptor.c
-  spvm_dumper.c
-  spvm_enumeration.c
-  spvm_enumeration_value.c
-  spvm_field_access.c
-  spvm_field.c
-  spvm_hash.c
-  spvm_hash_func.c
-  spvm_list.c
-  spvm_my.c
-  spvm_op.c
-  spvm_op_checker.c
-  spvm_opcode_array.c
-  spvm_opcode_builder.c
-  spvm_opcode.c
-  spvm_package.c
-  spvm_package_var_access.c
-  spvm_package_var.c
-  spvm_string_buffer.c
-  spvm_sub.c
-  spvm_switch_info.c
-  spvm_toke.c
-  spvm_type.c
-  spvm_use.c
-  spvm_util_allocator.c
-  spvm_var.c
-  spvm_yacc.c
-  spvm_yacc_util.c
-);
-
+# Accessors
 sub builder { shift->{builder} }
-
+sub build_dir { shift->builder->build_dir }
 sub target_package_name { shift->{target_package_name} }
+sub output_file { shift->{output_file} }
+sub quiet { shift->{quiet} }
+sub module_dirs { shift->{module_dirs} }
+sub optimize { shift->{optimize} }
+sub extra_compiler_flags { shift->{extra_compiler_flags} }
+sub extra_linker_flags { shift->{extra_linker_flags} }
+sub force { shift->{force} }
 
 sub new {
   my $class = shift;
   
   my $self = {@_};
+  
+  # Include directries
+  my $module_dirs = $self->{module_dirs};
+  unless (exists $self->{module_dirs}) {
+    $self->{module_dirs} = [];
+  }
 
   # Target package name
   my $target_package_name = $self->{target_package_name};
@@ -94,16 +65,6 @@ sub new {
     $self->{quiet} = 0;
   }
   
-  # Library paths
-  unless (exists $self->{library_path}) {
-    $self->{library_path} = [];
-  }
-
-  # Library
-  unless (exists $self->{library}) {
-    $self->{library} = [];
-  }
-
   # Build directory
   my $build_dir = delete $self->{build_dir};
   unless (defined $build_dir) {
@@ -111,7 +72,10 @@ sub new {
   }
   
   # New SPVM::Builder object
-  my $builder = SPVM::Builder->new(build_dir => $build_dir);
+  my $builder = SPVM::Builder->new(
+    build_dir => $build_dir,
+    module_dirs => $module_dirs
+  );
   
   $self->{builder} = $builder;
   
@@ -134,9 +98,7 @@ sub build_exe_file {
   mkpath $build_dir;
   
   # Compile SPVM
-  my $file = 'internal';
-  my $line = 0;
-  my $compile_success = $builder->compile_spvm($target_package_name, $file, $line);
+  my $compile_success = $builder->compile_spvm($target_package_name, __FILE__, __LINE__);
   unless ($compile_success) {
     exit(255);
   }
@@ -183,19 +145,20 @@ sub create_precompile_csources {
     build_dir => $build_dir,
     category => 'precompile',
     builder => $builder,
-    quiet => 0,
+    quiet => $self->quiet,
+    force => $self->force,
   );
 
   my $package_names = $builder->get_package_names;
-  for my $precompile_package_name (@$package_names) {
+  for my $package_name (@$package_names) {
+    next if $package_name =~ /::anon/;
     
-    my $precompile_sub_names = $builder->get_precompile_sub_names($precompile_package_name);
+    my $precompile_sub_names = $builder->get_sub_names($package_name, 'precompile');
     if (@$precompile_sub_names) {
       my $src_dir = $self->builder->create_build_src_path;
       mkpath $src_dir;
-      $builder_c_precompile->create_source_precompile(
-        $precompile_package_name,
-        [],
+      $builder_c_precompile->create_precompile_csource(
+        $package_name,
         {
           src_dir => $src_dir,
         }
@@ -218,13 +181,17 @@ sub compile_precompile_csources {
     build_dir => $build_dir,
     category => 'precompile',
     builder => $builder,
-    quiet => 0,
+    quiet => $self->quiet,
+    optimize => $self->optimize,
+    extra_compiler_flags => $self->extra_compiler_flags,
+    force => $self->force,
   );
   
   my $package_names = $builder->get_package_names;
-  for my $precompile_package_name (@$package_names) {
+  for my $package_name (@$package_names) {
+    next if $package_name =~ /::anon/;
     
-    my $precompile_sub_names = $builder->get_precompile_sub_names($precompile_package_name);
+    my $precompile_sub_names = $builder->get_sub_names($package_name, 'precompile');
     if (@$precompile_sub_names) {
       my $src_dir = $self->builder->create_build_src_path;
       mkpath $src_dir;
@@ -233,7 +200,7 @@ sub compile_precompile_csources {
       mkpath $object_dir;
       
       $builder_c_precompile->compile(
-        $precompile_package_name,
+        $package_name,
         {
           src_dir => $src_dir,
           object_dir => $object_dir,
@@ -257,30 +224,32 @@ sub compile_native_csources {
     build_dir => $build_dir,
     category => 'native',
     builder => $builder,
-    quiet => 0,
+    quiet => $self->quiet,
+    optimize => $self->optimize,
+    extra_compiler_flags => $self->extra_compiler_flags,
+    force => $self->force,
   );
   
   my $package_names = $builder->get_package_names;
   my $all_libs = [];
   my $all_object_files = [];
-  for my $native_package_name (@$package_names) {
+  for my $package_name (@$package_names) {
     
-    my $native_sub_names = $builder->get_native_sub_names($native_package_name);
+    my $native_sub_names = $builder->get_sub_names($package_name, 'native');
     if (@$native_sub_names) {
-      my $native_module_file = $builder->get_module_file($native_package_name);
+      my $native_module_file = $builder->get_module_file($package_name);
       my $native_dir = $native_module_file;
       
-      my $native_config_file = $builder->get_config_file($native_package_name);
-      my $bconf = SPVM::Builder::Util::load_config($native_config_file);
+      my $bconf = $builder->get_config($package_name, 'native');
       push @$all_libs, $bconf->get_libs;
       
       $native_dir =~ s/\.spvm$//;
       $native_dir .= 'native';
-      my $src_dir = SPVM::Builder::Util::remove_package_part_from_file($native_module_file, $native_package_name);
+      my $src_dir = SPVM::Builder::Util::remove_package_part_from_file($native_module_file, $package_name);
       my $object_dir = $self->builder->create_build_object_path;
       mkpath $object_dir;
       my $object_files = $builder_c_native->compile(
-        $native_package_name,
+        $package_name,
         {
           src_dir => $src_dir,
           object_dir => $object_dir,
@@ -314,23 +283,27 @@ sub create_spvm_module_csources {
     my $module_source_csource_file = "$build_src_dir/$module_source_base.modsrc.c";
     
     my $do_create;
-    
-    if (!-f $module_source_csource_file) {
+    if ($self->force) {
       $do_create = 1;
     }
     else {
-      my $loaded_module_file_mtime;
-      if (defined $loaded_module_file) {
-        $loaded_module_file_mtime = (stat($loaded_module_file))[9];
+      if (!-f $module_source_csource_file) {
+        $do_create = 1;
       }
       else {
-        $loaded_module_file_mtime = 0;
-      }
-      
-      my $module_source_csource_file_mtime = (stat($module_source_csource_file))[9];
-      
-      if ($loaded_module_file_mtime > $module_source_csource_file_mtime) {
-        $do_create = 1;
+        my $loaded_module_file_mtime;
+        if (defined $loaded_module_file) {
+          $loaded_module_file_mtime = (stat($loaded_module_file))[9];
+        }
+        else {
+          $loaded_module_file_mtime = 0;
+        }
+        
+        my $module_source_csource_file_mtime = (stat($module_source_csource_file))[9];
+        
+        if ($loaded_module_file_mtime > $module_source_csource_file_mtime) {
+          $do_create = 1;
+        }
       }
     }
     
@@ -341,12 +314,12 @@ sub create_spvm_module_csources {
       $module_source_c_hex =~ s/(.)/$_ = sprintf("\\x%02X", ord($1));$_/ges;
       
       # native package name
-      my $native_package_cname = $package_name;
-      $native_package_cname =~ s/::/__/g;
+      my $package_cname = $package_name;
+      $package_cname =~ s/::/__/g;
 
       my $get_module_source_csource = <<"EOS";
 static const char* module_source = "$module_source_c_hex";
-const char* SPMODSRC__${native_package_cname}__get_module_source() {
+const char* SPMODSRC__${package_cname}__get_module_source() {
   return module_source;
 }
 EOS
@@ -371,11 +344,21 @@ sub compile_spvm_module_csources {
   
   # Compiled package names
   my $package_names = $builder->get_package_names;
-
+  
+  # Config
   my $bconf = SPVM::Builder::Config->new_c99;
+
+  # Optimize
+  my $optimize = $self->optimize;
+  if (defined $optimize) {
+    $bconf->set_optimize($optimize);
+  }
+  
+  # ExtUtils::CBuilder config
   my $config = $bconf->to_hash;
-  my $quiet = 0;
-  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $config);
+  
+  # ExtUtils::CBuilder object
+  my $cbuilder = ExtUtils::CBuilder->new(quiet => $self->quiet, config => $config);
   
   for my $package_name (@$package_names) {
     
@@ -393,14 +376,19 @@ sub compile_spvm_module_csources {
     mkpath dirname $module_source_object_file;
     
     my $do_compile;
-    if (!-f $module_source_object_file) {
+    if ($self->force) {
       $do_compile = 1;
     }
     else {
-      my $module_source_csource_file_mtime = (stat($module_source_csource_file))[9];
-      my $module_source_object_file_mtime = (stat($module_source_object_file))[9];
-      if ($module_source_csource_file_mtime > $module_source_object_file_mtime) {
+      if (!-f $module_source_object_file) {
         $do_compile = 1;
+      }
+      else {
+        my $module_source_csource_file_mtime = (stat($module_source_csource_file))[9];
+        my $module_source_object_file_mtime = (stat($module_source_object_file))[9];
+        if ($module_source_csource_file_mtime > $module_source_object_file_mtime) {
+          $do_compile = 1;
+        }
       }
     }
     
@@ -410,7 +398,8 @@ sub compile_spvm_module_csources {
         source => $module_source_csource_file,
         object_file => $module_source_object_file,
         include_dirs => $bconf->get_include_dirs,
-        extra_compiler_flags => $bconf->get_extra_compiler_flags,
+        extra_compiler_flags => $self->extra_compiler_flags,
+        force => $self->force,
       );
     }
   }
@@ -451,33 +440,34 @@ EOS
   
   $boot_csource .= "// module source get functions declaration\n";
   for my $package_name (@$package_names) {
-    my $native_package_cname = $package_name;
-    $native_package_cname =~ s/::/__/g;
+    my $package_cname = $package_name;
+    $package_cname =~ s/::/__/g;
     $boot_csource .= <<"EOS";
-const char* SPMODSRC__${native_package_cname}__get_module_source();
+const char* SPMODSRC__${package_cname}__get_module_source();
 EOS
   }
 
+  my $package_names_including_anon = $self->builder->get_package_names_including_anon;
   $boot_csource .= "// precompile functions declaration\n";
-  for my $precompile_package_name (@$package_names) {
-    my $precompile_sub_names = $builder->get_precompile_sub_names($precompile_package_name);
+  for my $package_name (@$package_names_including_anon) {
+    my $precompile_sub_names = $builder->get_sub_names($package_name, 'precompile');
     for my $sub_name (@$precompile_sub_names) {
-      my $native_package_name = $precompile_package_name;
-      $native_package_name =~ s/::/__/g;
+      my $package_cname = $package_name;
+      $package_cname =~ s/::/__/g;
       $boot_csource .= <<"EOS";
-int32_t SPPRECOMPILE__${native_package_name}__$sub_name(SPVM_ENV* env, SPVM_VALUE* stack);
+int32_t SPPRECOMPILE__${package_cname}__$sub_name(SPVM_ENV* env, SPVM_VALUE* stack);
 EOS
     }
   }
 
   $boot_csource .= "// native functions declaration\n";
-  for my $native_package_name (@$package_names) {
-    my $native_sub_names = $builder->get_native_sub_names($native_package_name);
+  for my $package_cname (@$package_names) {
+    my $native_sub_names = $builder->get_sub_names($package_cname, 'native');
     for my $sub_name (@$native_sub_names) {
-      my $native_package_name = $native_package_name;
-      $native_package_name =~ s/::/__/g;
+      my $package_cname = $package_cname;
+      $package_cname =~ s/::/__/g;
       $boot_csource .= <<"EOS";
-int32_t SPNATIVE__${native_package_name}__$sub_name(SPVM_ENV* env, SPVM_VALUE* stack);
+int32_t SPNATIVE__${package_cname}__$sub_name(SPVM_ENV* env, SPVM_VALUE* stack);
 EOS
     }
   }
@@ -509,11 +499,11 @@ EOS
 EOS
   
   for my $package_name (@$package_names) {
-    my $native_package_name = $package_name;
-    $native_package_name =~ s/::/__/g;
+    my $package_cname = $package_name;
+    $package_cname =~ s/::/__/g;
     
     $boot_csource .= "  {\n";
-    $boot_csource .= "    const char* module_source = SPMODSRC__${native_package_name}__get_module_source();\n";
+    $boot_csource .= "    const char* module_source = SPMODSRC__${package_cname}__get_module_source();\n";
     $boot_csource .= qq(    SPVM_HASH_insert(compiler->module_source_symtable, "$package_name", strlen("$package_name"), (void*)module_source);\n);
     $boot_csource .= "  }\n";
   }
@@ -528,16 +518,16 @@ EOS
   }
 EOS
   
-  for my $precompile_package_name (@$package_names) {
-    my $native_package_name = $precompile_package_name;
-    $native_package_name =~ s/::/__/g;
+  for my $package_name (@$package_names_including_anon) {
+    my $package_cname = $package_name;
+    $package_cname =~ s/::/__/g;
     
-    my $precompile_sub_names = $builder->get_precompile_sub_names($precompile_package_name);
+    my $precompile_sub_names = $builder->get_sub_names($package_name, 'precompile');
     
     for my $precompile_sub_name (@$precompile_sub_names) {
       $boot_csource .= <<"EOS";
   { 
-    const char* package_name = "$precompile_package_name";
+    const char* package_name = "$package_name";
     const char* sub_name = "$precompile_sub_name";
     SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, package_name, strlen(package_name));
     assert(basic_type);
@@ -545,22 +535,22 @@ EOS
     assert(package);
     SPVM_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
     assert(sub);
-    sub->precompile_address = SPPRECOMPILE__${native_package_name}__$precompile_sub_name;
+    sub->precompile_address = SPPRECOMPILE__${package_cname}__$precompile_sub_name;
   }
 EOS
     }
   }
 
-  for my $native_package_name (@$package_names) {
-    my $native_package_cname = $native_package_name;
-    $native_package_cname =~ s/::/__/g;
+  for my $package_name (@$package_names) {
+    my $package_cname = $package_name;
+    $package_cname =~ s/::/__/g;
     
-    my $native_sub_names = $builder->get_native_sub_names($native_package_name);
+    my $native_sub_names = $builder->get_sub_names($package_name, 'native');
     
     for my $native_sub_name (@$native_sub_names) {
       $boot_csource .= <<"EOS";
   { 
-    const char* package_name = "$native_package_name";
+    const char* package_name = "$package_name";
     const char* sub_name = "$native_sub_name";
     SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, package_name, strlen(package_name));
     assert(basic_type);
@@ -568,7 +558,7 @@ EOS
     assert(package);
     SPVM_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
     assert(sub);
-    sub->native_address = SPNATIVE__${native_package_cname}__$native_sub_name;
+    sub->native_address = SPNATIVE__${package_cname}__$native_sub_name;
   }
 EOS
     }
@@ -652,21 +642,31 @@ EOS
 sub compile_bootstrap_csource {
   my ($self) = @_;
   
+  # Target package name
   my $target_package_name = $self->target_package_name;
   
+  # Build directory
   my $build_dir = $self->builder->build_dir;
-
+  
+  # Config
   my $bconf = SPVM::Builder::Config->new_c99;
+  
+  # Optimize
+  my $optimize = $self->optimize;
+  if (defined $optimize) {
+    $bconf->set_optimize($optimize);
+  }
+  
+  # ExtUtils::CBuilder config
   my $config = $bconf->to_hash;
   
   # Compile source files
-  my $quiet = $self->{quiet};
-  $quiet = 0;
-  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $config);
+  my $cbuilder = ExtUtils::CBuilder->new(quiet => $self->quiet, config => $config);
   my $package_name_rel_file = SPVM::Builder::Util::convert_package_name_to_rel_file($target_package_name);
   my $object_file = $self->builder->create_build_object_path("$package_name_rel_file.boot.o");
   my $src_file = $self->builder->create_build_src_path("$package_name_rel_file.boot.c");
   
+  # Create directory for object file output
   mkdir dirname $object_file;
   
   # Compile source file
@@ -674,11 +674,55 @@ sub compile_bootstrap_csource {
     source => $src_file,
     object_file => $object_file,
     include_dirs => $bconf->get_include_dirs,
-    extra_compiler_flags => $bconf->get_extra_compiler_flags,
+    extra_compiler_flags => $self->extra_compiler_flags,
+    force => $self->force,
   );
   
   return $object_file;
 }
+
+# SPVM runtime source files
+my @SPVM_RUNTIME_SRC_BASE_NAMES = qw(
+  spvm_allow.c
+  spvm_api.c
+  spvm_array_field_access.c
+  spvm_basic_type.c
+  spvm_block.c
+  spvm_call_sub.c
+  spvm_case_info.c
+  spvm_compiler_allocator.c
+  spvm_compiler.c
+  spvm_constant.c
+  spvm_csource_builder_precompile.c
+  spvm_descriptor.c
+  spvm_dumper.c
+  spvm_enumeration.c
+  spvm_enumeration_value.c
+  spvm_field_access.c
+  spvm_field.c
+  spvm_hash.c
+  spvm_hash_func.c
+  spvm_list.c
+  spvm_my.c
+  spvm_op.c
+  spvm_op_checker.c
+  spvm_opcode_array.c
+  spvm_opcode_builder.c
+  spvm_opcode.c
+  spvm_package.c
+  spvm_package_var_access.c
+  spvm_package_var.c
+  spvm_string_buffer.c
+  spvm_sub.c
+  spvm_switch_info.c
+  spvm_toke.c
+  spvm_type.c
+  spvm_use.c
+  spvm_util_allocator.c
+  spvm_var.c
+  spvm_yacc.c
+  spvm_yacc_util.c
+);
 
 sub compile_spvm_compiler_and_runtime_csources {
   my ($self) = @_;
@@ -703,10 +747,14 @@ sub compile_spvm_compiler_and_runtime_csources {
   my $bconf = SPVM::Builder::Config->new_c99;;
   
   # Default include path
-  $bconf->append_extra_compiler_flags("-Iblib/lib/SPVM/Builder/include");
+  $bconf->append_ccflags("-Iblib/lib/SPVM/Builder/include");
   
-  $bconf->set_quiet(0);
-
+  # Optimize
+  my $optimize = $self->optimize;
+  if (defined $optimize) {
+    $bconf->set_optimize($optimize);
+  }
+  
   # Use all of default %Config not to use %Config directory by ExtUtils::CBuilder
   # and overwrite user configs
   my $config = $bconf->to_hash;
@@ -719,9 +767,7 @@ sub compile_spvm_compiler_and_runtime_csources {
   mkpath $object_dir;
   
   # Compile source files
-  my $quiet = $self->{quiet};
-  $quiet = 0;
-  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $config);
+  my $cbuilder = ExtUtils::CBuilder->new(quiet => $self->quiet, config => $config);
   my $object_files = [];
   for my $src_file (@spvm_compiler_and_runtime_src_files) {
     # Object file
@@ -732,24 +778,30 @@ sub compile_spvm_compiler_and_runtime_csources {
     # Do compile
     my $do_compile;
     
-    if (!-f $object_file) {
+    if ($self->force) {
       $do_compile = 1;
     }
     else {
-      my $mod_time_src_file = (stat($src_file))[9];
-      my $mod_time_object_file = (stat($object_file))[9];
-      if ($mod_time_src_file > $mod_time_object_file) {
+      if (!-f $object_file) {
         $do_compile = 1;
       }
+      else {
+        my $mod_time_src_file = (stat($src_file))[9];
+        my $mod_time_object_file = (stat($object_file))[9];
+        if ($mod_time_src_file > $mod_time_object_file) {
+          $do_compile = 1;
+        }
+      }
     }
-    
+      
     if ($do_compile) {
+      
       # Compile source file
       $cbuilder->compile(
         source => $src_file,
         object_file => $object_file,
         include_dirs => $bconf->get_include_dirs,
-        extra_compiler_flags => $bconf->get_extra_compiler_flags,
+        extra_compiler_flags => $self->extra_compiler_flags,
       );
       push @$object_files, $object_file;
     }
@@ -780,9 +832,7 @@ sub link {
 
   my $lib_dirs_str = join(' ', map { "-L$_" } @{$bconf->get_lib_dirs});
   my $libs_str = join(' ', map { "-l$_" } @{$bconf->get_libs});
-  my $extra_linker_flag = $bconf->get_extra_linker_flags;
-  
-  $extra_linker_flag = "$lib_dirs_str $libs_str $extra_linker_flag";
+  $bconf->append_lddlflags("$lib_dirs_str $libs_str");
   
   # SPVM runtime object files
   my @spvm_compiler_and_runtime_object_files = map { my $tmp = "$build_work_object_dir/$_"; $tmp =~ s/\.c$/.o/; $tmp} @SPVM_RUNTIME_SRC_BASE_NAMES;
@@ -800,12 +850,13 @@ sub link {
   
   # SPVM precompile object files
   my $precompile_object_files = [];
-  for my $precompile_package_name (@$package_names) {
+  for my $package_name (@$package_names) {
+    next if $package_name =~ /::anon/;
     
-    my $precompile_sub_names = $builder->get_precompile_sub_names($precompile_package_name);
+    my $precompile_sub_names = $builder->get_sub_names($package_name, 'precompile');
     if (@$precompile_sub_names) {
       my $category = 'precompile';
-      my $precompile_object_rel_file = SPVM::Builder::Util::convert_package_name_to_category_rel_file_with_ext($precompile_package_name, $category, 'o');
+      my $precompile_object_rel_file = SPVM::Builder::Util::convert_package_name_to_category_rel_file($package_name, $category, 'o');
       my $precompile_object_file = $self->builder->create_build_object_path($precompile_object_rel_file);
       push @$precompile_object_files, $precompile_object_file;
     }
@@ -818,15 +869,13 @@ sub link {
   # ExeUtils::CBuilder config
   my $config = $bconf->to_hash;
   
-  my $quiet = $self->{quiet};
-  $quiet = 0;
   my $exe_file = $output_file;
-  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $config);
-  my $tmp_dll_file = $cbuilder->link_executable(
+  my $cbuilder = ExtUtils::CBuilder->new(quiet => $self->quiet, config => $config);
+  my $tmp_shared_lib_file = $cbuilder->link_executable(
     objects => $object_files,
     module_name => $target_package_name,
     exe_file => $exe_file,
-    extra_linker_flags => $extra_linker_flag,
+    extra_linker_flags => $self->extra_linker_flags,
   );
 }
 

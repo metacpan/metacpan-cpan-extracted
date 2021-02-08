@@ -16,7 +16,6 @@ t/pod.t
 t/pod_coverage.t
 t/test_manifest
 t/user_agent.t
-t/www.perl6.org.t
 xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

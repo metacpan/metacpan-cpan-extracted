@@ -1,5 +1,11 @@
 Revision history for Perl module HTTP::Size
 
+1.153 2021-02-04T00:25:06Z
+	* I'm abandoning this module. Feel free to take it over
+	https://pause.perl.org/pause/authenquery?ACTION=pause_04about#takeover
+	* But, this is trivial with Mojolicious now, so don't start using
+	this module
+
 1.151 2018-06-06T14:36:21Z
 	* Change to Artistic License 2.0.
 	* Fix a test that needs a domain that even harder to access

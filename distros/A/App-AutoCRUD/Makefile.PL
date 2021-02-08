@@ -13,11 +13,10 @@ perl_version 5.010;
 tests_recursive('t');
 
 resources (
-   homepage   => 'https://metacpan.org/author/DAMI',
-   #IRC        => 'irc://irc.perl.org/#App-AutoCRUD',
+   homepage   => 'https://metacpan.org/pod/App::AutoCRUD',
    license    => 'http://www.perlfoundation.org/artistic_license_2_0',
-   repository => 'git://github.com/damil/App-AutoCRUD.git',
-   bugtracker => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-AutoCRUD',
+   repository => 'https://github.com/damil/App-AutoCRUD',
+   bugtracker => 'https://github.com/damil/App-AutoCRUD/issues',
 );
 
 configure_requires (

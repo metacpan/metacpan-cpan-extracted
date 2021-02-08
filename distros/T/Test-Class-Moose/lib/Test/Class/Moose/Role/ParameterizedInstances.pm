@@ -8,12 +8,13 @@ use namespace::autoclean;
 
 use 5.010000;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Moose::Role;
 
 requires '_constructor_parameter_sets';
 
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _tcm_make_test_class_instances {
     my $class     = shift;
     my %base_args = @_;
@@ -44,7 +45,7 @@ Test::Class::Moose::Role::ParameterizedInstances - run tests against multiple in
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SUPPORT
 
@@ -72,7 +73,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

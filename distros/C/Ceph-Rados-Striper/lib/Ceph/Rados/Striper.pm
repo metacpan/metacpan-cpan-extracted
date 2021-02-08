@@ -67,17 +67,25 @@ sub write_handle_perl {
 }
 
 sub write_handle {
-    my ($self, $soid, $handle) = @_;
+    my ($self, $soid, $handle, $debug) = @_;
     Carp::confess "Called with not an open handle"
         unless openhandle $handle;
     my $length = -s $handle
         or Carp::confess "Could not get size for filehandle $handle";
     $self->object_layout();
-    $self->_write_from_fh($soid, $handle, $length);
+    my $wrotelen = $self->_write_from_fh($soid, $handle, $length, $debug);
+    if ($length != $wrotelen) {
+        Carp::cluck "Expected to write $length bytes from handle, actually wrote $wrotelen bytes";
+    }
+    my $storedlen = $self->size($soid);
+    if ($length != $storedlen) {
+        Carp::cluck "Expected to write $length bytes from handle, stored object contains $storedlen bytes";
+    }
+    return $wrotelen;
 }
 
 sub write_data {
-    my ($self, $oid, $data) = @_;
+    my ($self, $soid, $data) = @_;
     my $length = length($data);
     $self->object_layout();
     my $retval;
@@ -89,20 +97,20 @@ sub write_data {
             $chunk = $CHUNK_SIZE;
         }
         #printf "Writing bytes %i to %i\n", $offset, $offset+$chunk;
-        $retval = $self->_write($oid, substr($data, $offset, $chunk), $chunk, $offset)
+        $retval = $self->_write($soid, substr($data, $offset, $chunk), $chunk, $offset)
             or last;
     }
     return $retval;
 }
 
 sub append {
-    my ($self, $oid, $data) = @_;
-    $self->_append($oid, $data, length($data));
+    my ($self, $soid, $data) = @_;
+    $self->_append($soid, $data, length($data));
 }
 
 sub read_handle_perl {
-    my ($self, $oid, $handle) = @_;
-    (my $length, undef) = $self->_stat($oid);
+    my ($self, $soid, $handle) = @_;
+    (my $length, undef) = $self->_stat($soid);
     #
     for (my $offset = 0; $offset <= $length; $offset += $CHUNK_SIZE) {
         my $chunk;
@@ -112,44 +120,50 @@ sub read_handle_perl {
             $chunk = $CHUNK_SIZE;
         }
         printf "writing %i - %i of %i\n", $offset, $offset+$chunk, $length;
-        my $data = $self->_read($oid, $chunk, $offset);
+        my $data = $self->_read($soid, $chunk, $offset);
         syswrite $handle, $data;
     }
     return 1;
 }
 
 sub read_handle {
-    my ($self, $oid, $handle) = @_;
+    my ($self, $soid, $handle) = @_;
     Carp::confess "Called with not an open handle"
         unless openhandle $handle;
     &_read_to_fh
 }
 
 sub read {
-    my ($self, $oid, $len, $off) = @_;
+    my ($self, $soid, $len, $off) = @_;
     # if undefined is passed as len, we stat the obj first to get the correct len
     if (!defined($len)) {
-        ($len, undef) = $self->stat($oid);
+        ($len, undef) = $self->stat($soid);
     }
     $off ||= 0;
-    $self->_read($oid, $len, $off);
+    $self->_read($soid, $len, $off);
 }
 
 sub stat {
-    my ($self, $oid) = @_;
-    $self->_stat($oid);
+    my ($self, $soid) = @_;
+    $self->_stat($soid);
 }
 
 sub mtime {
-    my ($self, $oid) = @_;
-    my (undef, $mtime) = $self->stat($oid);
+    my ($self, $soid) = @_;
+    my (undef, $mtime) = $self->stat($soid);
     $mtime;
 }
 
 sub size {
-    my ($self, $oid) = @_;
-    my ($size, undef) = $self->stat($oid);
+    my ($self, $soid) = @_;
+    my ($size, undef) = $self->stat($soid);
     $size;
+}
+
+sub remove  {
+    my ($self, $soid) = @_;
+    $self->object_layout();
+    $self->_remove($soid);
 }
 
 # Items to export into callers namespace by default. Note: do not export
@@ -175,7 +189,7 @@ our @EXPORT = qw(
 	LIBRADOSSTRIPER_VER_MINOR
 );
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

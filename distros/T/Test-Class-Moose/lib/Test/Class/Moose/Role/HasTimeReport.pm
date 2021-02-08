@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use 5.010000;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Moose::Role;
 use Benchmark qw(timediff timestr :hireswallclock);
@@ -81,7 +81,7 @@ Test::Class::Moose::Role::HasTimeReport - Report timing role
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 DESCRIPTION
 
@@ -97,9 +97,9 @@ None.
 
 =head2 C<time>
 
-Returns a L<Test::Class::Moose::Report::Time> object. This object
-represents the duration of this class or method. The duration may be "0" if
-it's an abstract class with no tests run.
+Returns a L<Test::Class::Moose::Report::Time> object. This object represents
+the duration of this class or method. The duration may be "0" if it's an
+abstract class with no tests run.
 
 =head2 C<start_time>
 
@@ -135,7 +135,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 - 2019 by Curtis "Ovid" Poe.
+This software is copyright (c) 2012 - 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

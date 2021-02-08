@@ -50,7 +50,7 @@ my %WriteMakefile = (
     'AUTHOR'              => 'Damian Conway <DCONWAY@cpan.org>',
     'VERSION_FROM'        => $main_file,
     'ABSTRACT_FROM'       => $main_file,
-    'LICENSE'             => 'perl',
+    'LICENSE'             => 'artistic_2',
 
 	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
@@ -61,7 +61,7 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::More' => '0.94',
+		'Test::More' => '1',
 		},
 
 	'PREREQ_PM'     => {

@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.72 2021-02-06
+
+ - Support <sc> (small caps) and <sf> (sans-serif) inline tags. GH#65
+
 1.71 2021-01-23
 
  - EXPERIMENTAL feature: table specification with widths

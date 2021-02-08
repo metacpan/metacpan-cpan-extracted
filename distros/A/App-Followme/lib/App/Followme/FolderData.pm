@@ -12,7 +12,7 @@ use File::Spec::Functions qw(abs2rel catfile rel2abs splitdir);
 use base qw(App::Followme::BaseData);
 use App::Followme::FIO;
 
-our $VERSION = "1.95";
+our $VERSION = "1.96";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -23,12 +23,11 @@ sub parameters {
     return (
             extension => '',
             site_url => '',
+            remote_url => '',
             author => '',
             size_format => 'kb',
             date_format => 'Mon d, yyyy h:mm',
-            sort_field => '',
-            sort_reverse => 0,
-            sort_cutoff => 5,
+            exclude_index => 0,
             exclude => '',
             exclude_dirs => '.*,_*',
             web_extension => 'html',
@@ -56,12 +55,13 @@ sub calculate_date {
 
 sub calculate_keywords {
     my ($self, $filename) = @_;
+    $filename = $self->dir_to_filename($filename);
 
     $filename = abs2rel($filename);
     my @path = splitdir($filename);
     pop(@path);
 
-    my $keywords = @path ? join(', ', @path) : '';
+    my $keywords = pop(@path) || '';
     return $keywords;
 }
 
@@ -70,6 +70,7 @@ sub calculate_keywords {
 
 sub calculate_title {
     my ($self, $filename) = @_;
+    $filename = $self->dir_to_filename($filename);
 
     my ($dir, $file) = fio_split_filename($filename);
     my ($root, $ext) = split(/\./, $file);
@@ -130,22 +131,6 @@ sub fetch_data {
 }
 
 #----------------------------------------------------------------------
-# Choose the file comparison routine that matches the configuration
-
-sub file_comparer {
-    my ($self, $sort_reverse) = @_;
-
-    my $comparer;
-    if ($sort_reverse) {
-        $comparer = sub ($$) {$_[1]->[0] cmp $_[0]->[0]};
-    } else {
-        $comparer = sub ($$) {$_[0]->[0] cmp $_[1]->[0]};
-    }
-
-    return $comparer;
-}
-
-#----------------------------------------------------------------------
 # Convert filename to url
 
 sub filename_to_url {
@@ -162,6 +147,31 @@ sub filename_to_url {
     $url =~ s/\.[^\.]*$/.$ext/ if defined $ext;
 
     return $url;
+}
+
+#----------------------------------------------------------------------
+# Find the filename at an offset to the current filename
+
+sub find_filename {
+    my ($self, $offset, $filename, $loop) = @_;
+    die "Can't use \$url_* outside of for\n"  unless $loop;
+
+    my $match = -999;
+    foreach my $i (0 .. @$loop) {
+        if ($loop->[$i] eq $filename) {
+            $match = $i;
+            last;
+        }
+    }
+
+    my $index = $match + $offset;
+    if ($index < 0 || $index > @$loop-1) {
+        $filename = '';
+    } else {
+        $filename = $loop->[$index];
+    }
+
+    return $filename;
 }
 
 #----------------------------------------------------------------------
@@ -230,27 +240,16 @@ sub find_newest_file {
 # Get the more recently changed files
 
 sub find_top_files {
-    my ($self, $folder, $sort_field, $sort_reverse, @augmented_files) = @_;
+    my ($self, $folder, $augmented_files) = @_;
 
-    my @filenames = $self->sort_augmented($sort_reverse,
-                    $self->make_augmented($sort_field,
-                    $self->find_matching_files($folder)));
+    my @files = $self->find_matching_files($folder);
+    my @sorted_files = $self->sort_with_field(\@files, 'mdate', 1);
 
-    return $self->merge_augmented($sort_reverse,
-                                  \@augmented_files,
-                                  \@filenames);
+    return $self->merge_augmented($augmented_files, \@sorted_files);
 }
 
 #----------------------------------------------------------------------
-# Change the sort order of the files to reverse mdate
-
-sub format_all_files {
-    my ($self, $sorted_order, $all_files) = @_;
-    return $self->format_files($sorted_order, $all_files);
-}
-
-#----------------------------------------------------------------------
-# Format the file date
+# Format the file creation date
 
 sub format_date {
     my ($self, $sorted_order, $date) = @_;
@@ -265,37 +264,21 @@ sub format_date {
 }
 
 #----------------------------------------------------------------------
-# Change the sort order of the files to reverse mdate
+# Format the file modification date
 
-sub format_files {
-    my ($self, $sorted_order, $files) = @_;
-    my ($sort_field, $sort_reverse);
-
-    if ($sorted_order) {
-        $sort_field = 'mdate';
-        $sort_reverse = 1;
-    } else {
-        $sort_field = $self->{sort_field};
-        $sort_reverse = $self->{sort_reverse};
-    }
-
-    @$files = $self->sort_files($sort_field, $sort_reverse, @$files);
-    return $files;
+sub format_mdate {
+    my ($self, $sorted_order, $date) = @_;
+    return fio_format_date($date);
 }
 
 #----------------------------------------------------------------------
-# Change the sort order of the files to reverse mdate
+# Make filenames sortable in a cross-os manner
 
-sub format_folders {
-    my ($self, $sorted_order, $folders) = @_;
+sub format_name {
+    my ($self, $sorted_order, $filename) = @_;
 
-    $folders = $self->format_files($sorted_order, $folders);
-    return $folders if $sorted_order;
-
-    my @folders = map {fio_to_file($_, $self->{web_extension})}
-                  @$folders;
-
-    return \@folders;
+    $filename = join(' ', fio_split_filename($filename)) if $sorted_order;
+    return $filename;
 }
 
 #----------------------------------------------------------------------
@@ -329,15 +312,15 @@ sub format_size {
 }
 
 #----------------------------------------------------------------------
-# Get the url from a filename
+# Get the  absolute url from a filename and the site url
 
 sub get_absolute_url {
     my ($self, $filename) = @_;
+    $filename = $self->dir_to_filename($filename);
 
-    my $absolute_url = '/' . $self->filename_to_url($self->{top_directory},
-                                                    $filename,
-                                                    $self->{web_extension}
-                                                   );
+    my $site_url = $self->get_site_url($filename);
+    my $relative_url =  $self->get_url($filename);
+    my $absolute_url = "$site_url/$relative_url";
 
     return $absolute_url;
 }
@@ -385,6 +368,19 @@ sub get_breadcrumbs {
 }
 
 #----------------------------------------------------------------------
+# Get the extension from a filename
+
+sub get_extension {
+    my ($self, $filename) = @_;
+
+    my ($folder, $file) = fio_split_filename($filename);
+    my ($extension) = ($file =~ /\.([^\.]*)$/);
+
+    return $extension;
+}
+
+
+#----------------------------------------------------------------------
 # Get a list of matching files in a folder
 
 sub get_files {
@@ -413,6 +409,19 @@ sub get_folders {
     return \@folders;
 }
 
+#-----------------------------------------------------------------------
+# Get the url of the index page in the same folder as a file
+
+sub get_index_url {
+    my ($self, $filename) = @_;
+
+    my ($dir, $file) = fio_split_filename($filename);
+    my $index_page = "index.$self->{web_extension}";
+    $index_page = catfile($dir, $index_page);
+
+    return $self->get_url($index_page);
+}
+
 #----------------------------------------------------------------------
 # Set a flag indicating if the the filename is the index file
 
@@ -427,13 +436,12 @@ sub get_is_index {
 }
 
 #----------------------------------------------------------------------
-# Get the modification date in epoch seconds
+# Get the modification time in epoch seconds
 
 sub get_mdate {
     my ($self, $filename) = @_;
 
-    my $date = fio_get_date($filename);
-    return fio_format_date($date);
+    return fio_get_date($filename);
 }
 
 #----------------------------------------------------------------------
@@ -453,7 +461,48 @@ sub get_newest_file {
         $newest_file = $self->find_newest_file($newest_file, @files);
     }
 
-    return [$newest_file];
+    return defined $newest_file ? [$newest_file] : [];
+}
+
+#----------------------------------------------------------------------
+# Get a list of files with the same rootname as another filename
+
+sub get_related_files {
+    my ($self, $filename) = @_;
+    my ($folder, $file) = fio_split_filename($filename);
+
+    my $root;
+    ($root = $file) =~ s/\.[^\.]*$//;
+
+    my @related_files;
+    my ($filenames, $folders) = fio_visit($folder);
+    foreach my $filename (@$filenames) {
+        my ($folder, $file) = fio_split_filename($filename);
+
+        my $rootname;
+        ($rootname = $file) =~ s/\.[^\.]*$//;
+        push(@related_files, $filename) if $root eq $rootname;
+    }
+
+    return \@related_files;
+}
+
+#----------------------------------------------------------------------
+# Get the remote url from a filename and the remote url
+
+sub get_remote_url {
+    my ($self, $filename) = @_;
+
+    my $remote_url;
+    if ($self->{remote_url}) {
+        my $relative_url =  $self->get_url($filename);
+        $remote_url = "$self->{remote_url}/$relative_url";
+
+    } else {
+        $remote_url = $self->get_absolute_url($filename);
+    }
+
+    return $remote_url;
 }
 
 #----------------------------------------------------------------------
@@ -489,23 +538,18 @@ sub get_size {
 sub get_top_files {
     my ($self, $filename) = @_;
 
-    my @augmented_files = ();
+    my $augmented_files = [];
     my ($folder) = fio_split_filename($filename);
-    @augmented_files = $self->find_top_files($folder,
-                                             $self->{sort_field},
-                                             $self->{sort_reverse},
-                                             @augmented_files);
+    $augmented_files = $self->find_top_files($folder, $augmented_files);
 
     my @directories = $self->find_matching_directories($folder);
 
     foreach my $subfolder (@directories) {
-        @augmented_files = $self->find_top_files($subfolder,
-                                                $self->{sort_field},
-                                                $self->{sort_reverse},
-                                                @augmented_files);
+        $augmented_files = $self->find_top_files($subfolder,
+                                                 $augmented_files);
     }
 
-    my @top_files = $self->strip_augmented(@augmented_files);
+    my @top_files = $self->strip_augmented(@$augmented_files);
     return \@top_files;
 }
 
@@ -514,6 +558,7 @@ sub get_top_files {
 
 sub get_url {
     my ($self, $filename) = @_;
+    $filename = $self->dir_to_filename($filename);
 
     return $self->filename_to_url($self->{top_directory},
                                   $filename,
@@ -521,22 +566,36 @@ sub get_url {
 }
 
 #----------------------------------------------------------------------
-# Augment the list of filenames with the sort field
+# Get a url with no extension from a filename
 
-sub make_augmented {
-    my $self = shift @_;
-    my $sort_field = shift @_;
+sub get_url_base {
+    my ($self, $filename) = @_;
+    $filename = $self->dir_to_filename($filename);
 
-    my @augmented_files;
+    my $url_base =  $self->filename_to_url($self->{top_directory},
+										   $filename, '');
+	chop($url_base); # remove trailing dot
+	return $url_base;
+}
 
-    if ($sort_field) {
-        @augmented_files =  map {[$self->sort_value($sort_field, $_), $_]}
-                            @_;
-    } else {
-        @augmented_files = map {[$_, $_]} @_;
-    }
+#----------------------------------------------------------------------
+# Get a url from the next filename in the loop
 
-    return @augmented_files;
+sub get_url_next {
+    my ($self, $filename, $loop) = @_;
+
+    $filename = $self->find_filename(1, $filename, $loop);
+    return $filename ? $self->get_url($filename) : '';
+}
+
+#----------------------------------------------------------------------
+# Get a url from the previous filename in the loop
+
+sub get_url_previous {
+    my ($self, $filename, $loop) = @_;
+
+    $filename = $self->find_filename(-1, $filename, $loop);
+    return $filename ? $self->get_url($filename) : '';
 }
 
 #----------------------------------------------------------------------
@@ -557,13 +616,18 @@ sub match_directory {
 sub match_file {
     my ($self, $filename) = @_;
 
+    my ($dir, $file) = fio_split_filename($filename);
+
+    if ($self->{exclude_index}) {
+        my $index_file = join('.', 'index', $self->{web_extension});
+        return if $file eq $index_file;
+    }
+
     my @patterns = map {"*.$_"} split(/\s*,\s*/, $self->{extension});
     my $patterns = join(',', @patterns);
 
     $self->{include_file_patterns} ||= fio_glob_patterns($patterns);
     $self->{exclude_file_patterns} ||= fio_glob_patterns($self->{exclude});
-
-    my ($dir, $file) = fio_split_filename($filename);
 
     return if $self->match_patterns($file, $self->{exclude_file_patterns});
     return unless $self->match_patterns($file, $self->{include_file_patterns});
@@ -587,92 +651,21 @@ sub match_patterns {
 }
 
 #----------------------------------------------------------------------
-# Merge two sorted lists of augmented filenames
-
-sub merge_augmented {
-    my ($self, $sort_reverse, $list1, $list2) = @_;
-
-    my @merged_list = ();
-    my $comparer = $self->file_comparer($sort_reverse);
-
-    while(@$list1 && @$list2) {
-        if ($comparer->($list1->[0], $list2->[0]) > 0) {
-            push(@merged_list, shift @$list2);
-        } else {
-            push(@merged_list, shift @$list1);
-        }
-        return @merged_list if @merged_list == $self->{sort_cutoff};
-    }
-
-    while (@$list1) {
-        push(@merged_list, shift @$list1);
-        return @merged_list if @merged_list == $self->{sort_cutoff};
-    }
-
-    while (@$list2) {
-        push(@merged_list, shift @$list2);
-        return @merged_list if @merged_list == $self->{sort_cutoff};
-    }
-
-     return @merged_list;
-}
-
-#----------------------------------------------------------------------
-# Set the directory if not passed as an argument
+# Initialize the configuration parameters
 
 sub setup {
     my ($self, %configuration) = @_;
 
+    # Set filename extension if unset
     $self->{extension} ||= $self->{web_extension};
-    return;
-}
 
-#----------------------------------------------------------------------
-# Sort a list of files augmented by their sort field
-
-sub sort_augmented {
-    my $self = shift @_;
-    my $sort_reverse = shift @_;
-
-    my $comparer = $self->file_comparer($sort_reverse);
-    return sort $comparer @_;
-}
-
-#----------------------------------------------------------------------
-# Sort a list of filenames by metadata field
-
-sub sort_files {
-    my $self = shift @_;
-    my $sort_field = shift @_;
-    my $sort_reverse = shift @_;
-
-    return $self->strip_augmented(
-           $self->sort_augmented($sort_reverse,
-           $self->make_augmented($sort_field, @_)));
-}
-
-#----------------------------------------------------------------------
-# Get value to sort on from the the field name
-
-sub sort_value {
-    my ($self, $sort_field, $filename) = @_;
-
-    my $value;
-    if ($sort_field) {
-        $value = ${$self->build($sort_field, $filename)};
-    } else {
-        $value = join(' ', fio_split_filename($filename));
+    # Remove any trailing slash from urls
+    foreach my $url (qw(remote_url site_url)) {
+        next unless $self->{$url};
+        $self->{$url} =~ s/\/$//;
     }
 
-    return $value;
-}
-
-#----------------------------------------------------------------------
-# Return the filenames from an augmented set of files
-
-sub strip_augmented {
-    my $self = shift @_;
-    return map {$_->[1]} @_;
+    return;
 }
 
 1;
@@ -684,8 +677,6 @@ sub strip_augmented {
 =head1 NAME
 
 App::Followme::FolderData - Build metadata from folder information
-
-TODO rewrite
 
 =head1 SYNOPSIS
 
@@ -731,10 +722,21 @@ a name to the build method, the sigil should not be used.
 
 A list of matching files in a directory and its subdirectories.
 
+=item @top_files
+
+A list of the most recently created files in a directory and its
+subdirectory. The length of the list is determined by the 
+configuration parameter list_length. 
+
 =item @breadcrumbs
 
 A list of breadcrumb filenames, which are the names of the index files
 above the filename passed as the argument.
+
+=item @related_files
+
+A list of files with the same file root name as a specified file. This
+list is not filtered by the configuration variables extension and exclude.
 
 =item @files
 
@@ -754,13 +756,15 @@ The absolute url of a web page from a filename.
 
 =item $date
 
-A date string built from the modification date of the file. The date is
+A date string built from the creation date of the file. The date is
 built using the template in date_format which contains the fields:
 C<weekday, month,day, year, hour,  minute,> and C<second.>
 
 =item $mdate
 
-The epoch is modification date of a file in the number of seconds since 1970
+A date string built from the modification date of the file. The date is
+built using the template in date_format which contains the fields:
+C<weekday, month,day, year, hour,  minute,> and C<second.>
 
 =item $is_current
 
@@ -774,9 +778,17 @@ One of the filename is an index file and zero if it is not.
 
 A list of keywords describing the file from the filename path.
 
+=item $remote_url
+
+The remote url of a web page from a filename.
+
 =item $site_url
 
 The url of the website. Does not have a trailing slash
+
+=item $index_url
+
+The url of the index page in the same folder as a file.
 
 =item $title
 
@@ -787,6 +799,24 @@ capitalizing the first character of each word.
 =item $url
 
 Build the relative url of a web page from a filename.
+
+=item $url_base
+
+Build the relative url of a filename minus any extension and trailing dot
+
+=item $extension
+
+The extension of a filename.
+
+=item $url_next
+
+Build the relative url of a web page from the next filename in the loop 
+sequence. Empty string if there is no next filename.
+
+=item $url_previous
+
+Build the relative url of a web page from the previous filename in the loop 
+sequence. Empty string if there is no previous filename.
 
 =back
 
@@ -808,34 +838,31 @@ The directory used to retrieve metadata. This is used by list valued variables.
 
 =item extension
 
-The extension of the files metadata is retrieved from. This is used by list
-valued metadata. The default value is the same as the web extension.
+A comma separated list of extensions of files to include in a list of files.
+If it is left empty, it is set to the web extension.
 
 =item date_format
 
 The format used to produce date strings. The format is described in the
-POD for L<Time::Format>.
+POD for Time::Format.
 
-=item sort_field
+=item remote_url
 
-The metatdata field to sort list valued variables. The default value is the
-empty string, which means files are sorted on their filenames.
+The url of the remote website, e.g. http://www.cloudhost.com.
+
+=item site_url
+
+The url of the local website, e.g. http://www.example.com.
 
 =item sort_numeric
 
 If one, use numeric comparisons when sorting. If zero, use string comparisons
 when sorting.
 
-=item sort_reverse
+=item exclude_index
 
-If this field is 0, the data are sorted the first filename has the smallest
-metadata value. If the field is 1, it has the largest. The default value of the
-parameter is 0.
-
-=item sort_cutoff
-
-This determons the number of filenames returned by @top_files. The default
-value of this parameter is 5
+If the value of this variable is true (1) exclude the index page in the list
+of files. If it is false (0) include the index page. The default value is 0.
 
 =item exclude
 

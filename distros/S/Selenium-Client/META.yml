@@ -1,0 +1,88 @@
+---
+abstract: 'Module for communicating with WC3 standard selenium servers'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.020'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Selenium-Client
+provides:
+  Selenium::Capabilities:
+    file: lib/Selenium/Client.pm
+    version: '1.0'
+  Selenium::Client:
+    file: lib/Selenium/Client.pm
+    version: '1.0'
+  Selenium::Driver::Auto:
+    file: lib/Selenium/Driver/Auto.pm
+    version: '1.0'
+  Selenium::Driver::Chrome:
+    file: lib/Selenium/Driver/Chrome.pm
+    version: '1.0'
+  Selenium::Driver::Edge:
+    file: lib/Selenium/Driver/Edge.pm
+    version: '1.0'
+  Selenium::Driver::Gecko:
+    file: lib/Selenium/Driver/Gecko.pm
+    version: '1.0'
+  Selenium::Driver::Safari:
+    file: lib/Selenium/Driver/Safari.pm
+    version: '1.0'
+  Selenium::Driver::SeleniumHQ::Jar:
+    file: lib/Selenium/Driver/SeleniumHQ/Jar.pm
+    version: '1.0'
+  Selenium::Element:
+    file: lib/Selenium/Client.pm
+    version: '1.0'
+  Selenium::Session:
+    file: lib/Selenium/Client.pm
+    version: '1.0'
+  Selenium::Specification:
+    file: lib/Selenium/Specification.pm
+    version: '1.0'
+  Selenium::Subclass:
+    file: lib/Selenium/Subclass.pm
+    version: '1.0'
+requires:
+  Capture::Tiny: '0'
+  Carp: '0'
+  DateTime::Format::HTTP: '0'
+  File::Basename: '0'
+  File::HomeDir: '0'
+  File::Path: '0'
+  File::Slurper: '0'
+  File::Spec: '0'
+  File::Which: '0'
+  Getopt::Long: '0'
+  HTML::Parser: '0'
+  HTTP::Tiny: '0'
+  JSON::MaybeXS: '0'
+  List::Util: '1.33'
+  Moo: '1.005'
+  Net::EmptyPort: '0'
+  Pod::Usage: '0'
+  Sub::Install: '0'
+  XML::LibXML: '0'
+  feature: '0'
+  parent: '0'
+  perl: '5.020'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/troglodyne-internet-widgets/seleinum-specification-perl/issues
+  homepage: https://github.com/troglodyne-internet-widgets/seleinum-specification-perl
+  repository: https://github.com/troglodyne-internet-widgets/seleinum-specification-perl.git
+version: '1.0'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

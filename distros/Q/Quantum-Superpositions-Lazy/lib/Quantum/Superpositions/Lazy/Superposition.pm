@@ -1,19 +1,15 @@
 package Quantum::Superpositions::Lazy::Superposition;
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
-use v5.28;
+use v5.24;
 use warnings;
 use Moo;
-
-use feature qw(signatures);
-no warnings qw(experimental::signatures);
-
 use Quantum::Superpositions::Lazy::State;
 use Quantum::Superpositions::Lazy::Computation;
 use Quantum::Superpositions::Lazy::Util qw(get_rand is_collapsible);
 use Types::Standard qw(ArrayRef InstanceOf);
-use List::Util qw(sum);
+use List::Util qw(sum0);
 
 use namespace::clean;
 
@@ -47,31 +43,39 @@ has "_states" => (
 has "_weight_sum" => (
 	is => "ro",
 	lazy => 1,
-	default => sub ($self) {
-		sum map { $_->weight }
-		$self->_states->@*;
+	default => sub {
+		sum0 map { $_->weight }
+		shift->_states->@*;
 	},
 	init_arg => undef,
 	clearer => 1,
 );
 
-sub collapse ($self)
+sub collapse
 {
+	my ($self) = @_;
+
 	return $self->_collapsed_state;
 }
 
-sub is_collapsed ($self)
+sub is_collapsed
 {
+	my ($self) = @_;
+
 	return $self->_is_collapsed;
 }
 
-sub weight_sum ($self)
+sub weight_sum
 {
+	my ($self) = @_;
+
 	return $self->_weight_sum;
 }
 
-sub reset ($self)
+sub reset
 {
+	my ($self) = @_;
+
 	foreach my $state ($self->_states->@*) {
 		$state->reset;
 	}
@@ -80,24 +84,30 @@ sub reset ($self)
 	return $self;
 }
 
-sub _observe ($self)
+sub _observe
 {
+	my ($self) = @_;
+
 	my @positions = $self->_states->@*;
 	my $sum = $self->weight_sum;
 	my $prob = get_rand;
 
 	foreach my $state (@positions) {
 		$prob -= $state->weight / $sum;
-		if ($prob <= 0) {
+		if ($prob < 0) {
 			return is_collapsible($state->value)
 				? $state->value->collapse
 				: $state->value;
 		}
 	}
+
+	return undef;
 }
 
-sub _build_complete_states ($self)
+sub _build_complete_states
 {
+	my ($self) = @_;
+
 	my %states;
 	for my $state ($self->_states->@*) {
 		my @local_states;
@@ -117,7 +127,7 @@ sub _build_complete_states ($self)
 
 		foreach my $value (@local_states) {
 			my $result = $value->value;
-			my $copied = $value->clone_with(weight => sub ($input) { $input * $coeff });
+			my $copied = $value->clone_with(weight => sub { shift() * $coeff });
 
 			if (exists $states{$result}) {
 				$states{$result} = $states{$result}->merge($copied);
@@ -245,12 +255,21 @@ An alias to I<collapse> method. Also invoked with overloaded C<"">.
 =head2 transform
 
 	# will double every element, same as * 2
-	my $transformed = $superposition->transform(sub { shift() * 2 });
+	my $transformed1 = $superposition->transform(sub { shift() * 2 });
+	my $transformed2 = $superposition->transform(sub { $_ * 2 });
 
-Enables creating a new superposition from an existing one using
-complex logic passed as a subroutine reference in the argument.
-Works just like the regular computations but with a custom
-function.
+Enables creating a new superposition from an existing one using complex logic
+passed as a subroutine reference in the argument. This argument is also passed
+as a localized C<$_>.  Works just like the regular computations but with a
+custom function.
+
+=head2 compare
+
+	# will perform a custom comparison
+	my $boolean = $superposition->compare(sub { shift() =~ /regexp/ });
+	my $matches = fetch_matches { $superposition->compare(sub { /regexp/ }) };
+
+Like </transform>, but performs a logical comparison instead of a state mutation.
 
 =head1 OVERLOADING
 

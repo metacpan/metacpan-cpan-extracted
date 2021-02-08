@@ -7,17 +7,15 @@ use warnings;
 require Exporter;
 use XSLoader ();
 
-use vars qw/ @ISA $VERSION @EXPORT_OK @EXPORT /;
+our @ISA = qw(Exporter);
 
-@ISA = qw(Exporter);
-
-$VERSION = 2.000;
+our $VERSION = '2.100';
 
 # Items to export into caller's namespace by default
-@EXPORT = qw(crc32);
+our @EXPORT = qw(crc32);
 
 # Other items we are prepared to export if requested
-@EXPORT_OK = qw();
+our @EXPORT_OK = qw();
 
 XSLoader::load( 'String::CRC32', $VERSION );
 

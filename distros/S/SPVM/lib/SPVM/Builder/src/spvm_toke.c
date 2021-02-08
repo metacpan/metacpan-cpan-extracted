@@ -210,9 +210,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             if (do_directry_module_search) {
               // Search module file
               FILE* fh = NULL;
-              int32_t module_include_dirs_length = compiler->module_include_dirs->length;
-              for (int32_t i = 0; i < module_include_dirs_length; i++) {
-                const char* include_dir = (const char*) SPVM_LIST_fetch(compiler->module_include_dirs, i);
+              int32_t module_dirs_length = compiler->module_dirs->length;
+              for (int32_t i = 0; i < module_dirs_length; i++) {
+                const char* include_dir = (const char*) SPVM_LIST_fetch(compiler->module_dirs, i);
                 
                 // File name
                 int32_t file_name_length = (int32_t)(strlen(include_dir) + 1 + strlen(cur_rel_file));
@@ -241,9 +241,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               // Module not found
               if (!fh) {
                 if (!op_use->uv.use->is_require) {
-                  fprintf(stderr, "Can't locate %s in @INC (@INC contains:", cur_rel_file);
-                  for (int32_t i = 0; i < module_include_dirs_length; i++) {
-                    const char* include_dir = (const char*) SPVM_LIST_fetch(compiler->module_include_dirs, i);
+                  fprintf(stderr, "[CompileError]Can't locate %s in @INC (@INC contains:", cur_rel_file);
+                  for (int32_t i = 0; i < module_dirs_length; i++) {
+                    const char* include_dir = (const char*) SPVM_LIST_fetch(compiler->module_dirs, i);
                     fprintf(stderr, " %s", include_dir);
                   }
                   fprintf(stderr, ") at %s line %d\n", op_use->file, op_use->line);
@@ -2038,14 +2038,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             SPVM_COMPILER_error(compiler, "Symbol name \"%s\" must not contains __ at %s line %d\n", keyword, compiler->cur_file, compiler->cur_line);
           }
 
-          // Symbol name can't 
-          if (strlen(keyword) >= 9
-            && keyword[0] == 'A' && keyword[1] == 'N' && keyword[2] == 'O' && keyword[3] == 'N' && keyword[4] == '_'
-            && keyword[5] == 'S' && keyword[6] == 'U' && keyword[7] == 'B' && keyword[8] == '_')
-          {
-            SPVM_COMPILER_error(compiler, "Symbol name \"%s\" can't start with ANON_SUB_. This is preserved for anon subroutine at %s line %d\n", keyword, compiler->cur_file, compiler->cur_line);
-          }
-          
           SPVM_OP* op_name = SPVM_OP_new_op_name(compiler, keyword, compiler->cur_file, compiler->cur_line);
           yylvalp->opval = op_name;
           
