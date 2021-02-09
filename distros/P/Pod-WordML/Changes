@@ -1,5 +1,9 @@
 Revision history for Perl module Pod::WordML
 
+0.165 2021-02-09T00:19:18Z
+	* I'm abandoning this module. You can adopt it if you like:
+	https://pause.perl.org/pause/authenquery?ACTION=pause_04about#takeover
+
 0.164 2017-04-22T21:11:22Z
 	* Adjust a prerequisite for testing.
 

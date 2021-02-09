@@ -3,11 +3,10 @@ use utf8;
 use Moo::Role;
 
 use Types::Standard qw(Str Maybe);
-use NewsExtractor::Types qw(is_NewspaperName);
 use List::Util qw(max);
 use HTML::ExtractContent;
 
-use Importer 'NewsExtractor::TextUtil'  => qw( normalize_whitespace html2text );
+use Importer 'NewsExtractor::TextUtil'  => qw( html2text );
 use Importer 'NewsExtractor::Constants' => qw( %RE );
 
 has site_name => (

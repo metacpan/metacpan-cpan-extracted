@@ -59,6 +59,6 @@
          "web" : "https://git.deguest.jp/jack/Nice-Try"
       }
    },
-   "version" : "v0.1.8",
+   "version" : "v0.1.9",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -38,20 +38,20 @@ EXAMPLE1
      # 
      #         -h              Print help.
      #         -r              Reverse transliteration.
-     #         -t table        Transliteration table (default value is 'ISO/R 9').
+     #         -t table        Transliteration table (default value is 'ISO 9').
      #         --version       Print version.
 
 EXAMPLE2
      translit-string 'Российская Федерация'
 
      # Output:
-     # Rossijskaja Federacija
+     # Rossijskaâ Federaciâ
 
 EXAMPLE3
-     translit-string -r 'Rossijskaja Federacija'
+     translit-string -r 'Rossijskaâ Federaciâ'
 
      # Output:
-     # Российскайа Федерацийа
+     # Российская Федерация
 
 EXAMPLE4
      translit-string -t 'ISO 843' Ελλάδα
@@ -83,5 +83,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

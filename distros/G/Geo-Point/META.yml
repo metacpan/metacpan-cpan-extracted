@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  Geo::Distance: '0.06'
+  GIS::Distance: '0.14'
   Geo::Proj4: '1.01'
   Math::Polygon: '1.01'
   Math::Trig: '1'
@@ -27,5 +27,5 @@ resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Geo-Point.git
-version: '0.98'
+version: '0.99'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

@@ -1,5 +1,8 @@
 Revision history for Net-Connection-ncnetstat
 
+0.6.1	 2021-02-08/20:00
+		 - Accidentally inverted the OS check for FreeBSD in Makefile.PL.
+
 0.6.0	 2021-02-08/08:00
 		 - Now uses sockstat on FreeBSD.
 		 - Make --pct, -C, --Cl, and -W XORable via $ENV

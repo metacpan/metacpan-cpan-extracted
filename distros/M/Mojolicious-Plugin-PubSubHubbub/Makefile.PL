@@ -14,16 +14,24 @@ WriteMakefile(
   },
   PREREQ_PM => {
     'Mojolicious' => 7.13,
-    'Mojolicious::Plugin::Util::Endpoint' => 0.19,
-    'Mojolicious::Plugin::Util::Callback' => 0.02,
-    'Mojolicious::Plugin::Util::RandomString' => 0.05
+    'Mojolicious::Plugin::Util::Endpoint' => 0.22,
+    'Mojolicious::Plugin::Util::Callback' => 0.07,
+    'Mojolicious::Plugin::Util::RandomString' => 0.09
   },
   LICENSE      => 'artistic_2',
   META_MERGE   => {
+    'meta-spec' => { version => 2 },
     requires  => {perl => '5.010001'},
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/Akron/Mojolicious-Plugin-PubSubHubbub'
+      repository  => {
+        type => 'git',
+        url => 'https://github.com/Akron/Mojolicious-Plugin-PubSubHubbub.git',
+        web => 'https://github.com/Akron/Mojolicious-Plugin-PubSubHubbub',
+      },
+      bugtracker => {
+        web => 'https://github.com/Akron/Mojolicious-Plugin-PubSubHubbub/issues'
+      }
     }
   },
   MIN_PERL_VERSION => '5.010001',

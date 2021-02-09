@@ -21,12 +21,16 @@ do { my $x = {
                                       'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::Code::TidyAll' => '0.50',
+                                      'Test::EOL' => '0',
+                                      'Test::Mojibake' => '0',
                                       'Test::More' => '0.96',
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
+                                      'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.12',
                                       'Test::Synopsis' => '0',
-                                      'Test::Vars' => '0.014'
+                                      'Test::Vars' => '0.014',
+                                      'Test::Version' => '1'
                                     }
                     },
        'runtime' => {

@@ -1,7 +1,7 @@
 package DBIx::Class::InflateColumn::JSON2Object::Role::Storable;
 
 # ABSTRACT: simplified MooseX::Storage clone with enhanced JSON boolean handling
-our $VERSION = '0.906'; # VERSION
+our $VERSION = '0.907'; # VERSION
 
 use 5.014;
 
@@ -55,7 +55,7 @@ sub pack {
         next unless defined $val;
 
         my $type = $attribute->type_constraint;
-        if ($type eq 'Int' || $type eq 'Num') {
+        if ($type && ($type eq 'Int' || $type eq 'Num')) {
             $val = 1 * $val;
         }
         $payload->{ $attribute->name } = $val;
@@ -94,7 +94,7 @@ DBIx::Class::InflateColumn::JSON2Object::Role::Storable - simplified MooseX::Sto
 
 =head1 VERSION
 
-version 0.906
+version 0.907
 
 =head1 NAME
 

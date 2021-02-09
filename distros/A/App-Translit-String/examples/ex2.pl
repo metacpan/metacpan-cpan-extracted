@@ -10,4 +10,4 @@ use App::Translit::String;
 exit App::Translit::String->new->run;
 
 # Output:
-# Rossijskaja Federacija
+# Rossijskaâ Federaciâ

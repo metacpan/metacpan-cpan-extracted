@@ -1,6 +1,6 @@
 package Lab::Connection::DEBUG;
 #ABSTRACT: Connection to the DEBUG bus
-$Lab::Connection::DEBUG::VERSION = '3.740';
+$Lab::Connection::DEBUG::VERSION = '3.741';
 use v5.20;
 
 use strict;
@@ -48,7 +48,7 @@ Lab::Connection::DEBUG - Connection to the DEBUG bus
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 COPYRIGHT AND LICENSE
 

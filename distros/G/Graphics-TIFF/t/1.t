@@ -3,6 +3,8 @@ use strict;
 use Graphics::TIFF ':all';
 use Test::More tests => 49;
 use Test::Deep;
+use IPC::Cmd qw(can_run);
+use Test::Requires qw( Image::Magick );
 BEGIN { use_ok('Graphics::TIFF') }
 
 #########################
@@ -20,111 +22,102 @@ if ( $version < 4.000003 ) {
 ok( Graphics::TIFF->IsCODECConfigured(COMPRESSION_DEFLATE),
     'IsCODECConfigured' );
 
-eval "use Image::Magick";
-SKIP: {
-    skip 'Image::Magick not installed', 36 if $@;
+my $image = Image::Magick->new;
+$image->Read('rose:');
+$image->Set( density => '72x72' );
+$image->Write('test.tif');
 
-    my $image = Image::Magick->new;
-    $image->Read('rose:');
-    $image->Set( density => '72x72' );
-    $image->Write('test.tif');
+my $tif = Graphics::TIFF->Open( 'test.tif', 'r' );
+is( $tif->FileName, 'test.tif', 'FileName' );
+isa_ok $tif, 'Graphics::TIFF';
+can_ok $tif, qw(Close ReadDirectory GetField);
 
-    my $tif = Graphics::TIFF->Open( 'test.tif', 'r' );
-    is( $tif->FileName, 'test.tif', 'FileName' );
-    isa_ok $tif, 'Graphics::TIFF';
-    can_ok $tif, qw(Close ReadDirectory GetField);
+is( $tif->ReadDirectory, 0, 'ReadDirectory' );
 
-    is( $tif->ReadDirectory, 0, 'ReadDirectory' );
+is( $tif->ReadEXIFDirectory(0), 0, 'ReadEXIFDirectory' );
 
-    is( $tif->ReadEXIFDirectory(0), 0, 'ReadEXIFDirectory' );
+is( $tif->NumberOfDirectories, 1, 'NumberOfDirectories' );
 
-    is( $tif->NumberOfDirectories, 1, 'NumberOfDirectories' );
+is( $tif->SetDirectory(0), 1, 'SetDirectory' );
 
-    is( $tif->SetDirectory(0), 1, 'SetDirectory' );
+is( $tif->SetSubDirectory(0), 0, 'SetSubDirectory' );
 
-    is( $tif->SetSubDirectory(0), 0, 'SetSubDirectory' );
+is( $tif->GetField(TIFFTAG_FILLORDER),   FILLORDER_MSB2LSB, 'GetField uint16' );
+is( $tif->GetField(TIFFTAG_XRESOLUTION), 72,                'GetField float' );
+my @counts = $tif->GetField(TIFFTAG_PAGENUMBER);
+is_deeply( \@counts, [ 0, 1 ], 'GetField 2 uint16' );
+@counts = $tif->GetField(TIFFTAG_STRIPBYTECOUNTS);
+is_deeply( \@counts, [ 8190, 1470 ], 'GetField array of uint64' );
+is( $tif->GetField(TIFFTAG_IMAGEWIDTH), 70, 'GetField uint32' );
 
-    is( $tif->GetField(TIFFTAG_FILLORDER),
-        FILLORDER_MSB2LSB, 'GetField uint16' );
-    is( $tif->GetField(TIFFTAG_XRESOLUTION), 72, 'GetField float' );
-    my @counts = $tif->GetField(TIFFTAG_PAGENUMBER);
-    is_deeply( \@counts, [ 0, 1 ], 'GetField 2 uint16' );
-    @counts = $tif->GetField(TIFFTAG_STRIPBYTECOUNTS);
-    is_deeply( \@counts, [ 8190, 1470 ], 'GetField array of uint64' );
-    is( $tif->GetField(TIFFTAG_IMAGEWIDTH), 70, 'GetField uint32' );
-
-    @counts = $tif->GetField(TIFFTAG_PRIMARYCHROMATICITIES);
-    my @expected = (
-        0.639999985694885, 0.330000013113022,
-        0.300000011920929, 0.600000023841858,
-        0.150000005960464, 0.0599999986588955
+@counts = $tif->GetField(TIFFTAG_PRIMARYCHROMATICITIES);
+my @expected = (
+    0.639999985694885, 0.330000013113022,
+    0.300000011920929, 0.600000023841858,
+    0.150000005960464, 0.0599999986588955
+);
+for my $i ( 0 .. $#expected ) {
+    cmp_deeply(
+        $counts[$i],
+        num( $expected[$i], 0.0001 ),
+        'GetField TIFFTAG_PRIMARYCHROMATICITIES (array of float)'
     );
-    for my $i ( 0 .. $#expected ) {
-        cmp_deeply(
-            $counts[$i],
-            num( $expected[$i], 0.0001 ),
-            'GetField TIFFTAG_PRIMARYCHROMATICITIES (array of float)'
-        );
-    }
-
-    @counts = $tif->GetField(TIFFTAG_WHITEPOINT);
-    @expected = ( 0.312700003385544, 0.328999996185303 );
-    for my $i ( 0 .. $#expected ) {
-        cmp_deeply(
-            $counts[$i],
-            num( $expected[$i], 0.0001 ),
-            'GetField TIFFTAG_WHITEPOINT (array of float)'
-        );
-    }
-
-    is( $tif->GetFieldDefaulted(TIFFTAG_FILLORDER),
-        FILLORDER_MSB2LSB, 'GetFieldDefaulted uint16' );
-
-    is( $tif->SetField( TIFFTAG_FILLORDER, FILLORDER_LSB2MSB ),
-        1, 'SetField status' );
-    is( $tif->GetField(TIFFTAG_FILLORDER),
-        FILLORDER_LSB2MSB, 'SetField result' );
-    $tif->SetField( TIFFTAG_FILLORDER, FILLORDER_MSB2LSB );    # reset
-
-    is( $tif->IsTiled, 0, 'IsTiled' );
-
-    is( $tif->ScanlineSize, 210, 'ScanlineSize' );
-
-    is( $tif->StripSize, 8190, 'StripSize' );
-
-    is( $tif->NumberOfStrips, 2, 'NumberOfStrips' );
-
-    is( $tif->TileSize, 8190, 'TileSize' );
-
-    is( $tif->TileRowSize, 210, 'TileRowSize' );
-
-    is( $tif->ComputeStrip( 16, 0 ), 0, 'ComputeStrip' );
-
-    is( length( $tif->ReadEncodedStrip( 0, 8190 ) ),
-        8190, 'ReadEncodedStrip full strip' );
-
-    is( length( $tif->ReadEncodedStrip( 1, 8190 ) ),
-        1470, 'ReadEncodedStrip part strip' );
-
-    is( length( $tif->ReadRawStrip( 1, 20 ) ), 20, 'ReadRawStrip' );
-
-    is( $tif->ReadTile( 0, 0, 0, 0 ), undef, 'ReadTile' );
-
-    my $filename = 'out.txt';
-    open my $fh, '>', $filename;
-    $tif->PrintDirectory( $fh, 0 );
-    $tif->Close;
-    close $fh;
-    is( -s $filename, 449, 'PrintDirectory' );
-    unlink $filename;
 }
+
+@counts   = $tif->GetField(TIFFTAG_WHITEPOINT);
+@expected = ( 0.312700003385544, 0.328999996185303 );
+for my $i ( 0 .. $#expected ) {
+    cmp_deeply(
+        $counts[$i],
+        num( $expected[$i], 0.0001 ),
+        'GetField TIFFTAG_WHITEPOINT (array of float)'
+    );
+}
+
+is( $tif->GetFieldDefaulted(TIFFTAG_FILLORDER),
+    FILLORDER_MSB2LSB, 'GetFieldDefaulted uint16' );
+
+is( $tif->SetField( TIFFTAG_FILLORDER, FILLORDER_LSB2MSB ),
+    1, 'SetField status' );
+is( $tif->GetField(TIFFTAG_FILLORDER), FILLORDER_LSB2MSB, 'SetField result' );
+$tif->SetField( TIFFTAG_FILLORDER, FILLORDER_MSB2LSB );    # reset
+
+is( $tif->IsTiled, 0, 'IsTiled' );
+
+is( $tif->ScanlineSize, 210, 'ScanlineSize' );
+
+is( $tif->StripSize, 8190, 'StripSize' );
+
+is( $tif->NumberOfStrips, 2, 'NumberOfStrips' );
+
+is( $tif->TileSize, 8190, 'TileSize' );
+
+is( $tif->TileRowSize, 210, 'TileRowSize' );
+
+is( $tif->ComputeStrip( 16, 0 ), 0, 'ComputeStrip' );
+
+is( length( $tif->ReadEncodedStrip( 0, 8190 ) ),
+    8190, 'ReadEncodedStrip full strip' );
+
+is( length( $tif->ReadEncodedStrip( 1, 8190 ) ),
+    1470, 'ReadEncodedStrip part strip' );
+
+is( length( $tif->ReadRawStrip( 1, 20 ) ), 20, 'ReadRawStrip' );
+
+is( $tif->ReadTile( 0, 0, 0, 0 ), undef, 'ReadTile' );
+
+my $filename = 'out.txt';
+open my $fh, '>', $filename;
+$tif->PrintDirectory( $fh, 0 );
+$tif->Close;
+close $fh;
+is( -s $filename, 449, 'PrintDirectory' );
+unlink $filename;
 
 #########################
 
-eval "use Image::Magick";
 SKIP: {
-    skip 'Image::Magick or tiffcmp not installed', 1
-      if ( $@ or system("which tiffinfo > /dev/null 2> /dev/null") != 0 );
+    skip 'tiffcmp not installed', 1 if ( not can_run('tiffcmp') );
 
     my $tif = Graphics::TIFF->Open( 'test.tif',  'r' );
     my $out = Graphics::TIFF->Open( 'test2.tif', 'w' );
@@ -157,51 +150,41 @@ SKIP: {
 
 #########################
 
-eval "use Image::Magick";
-SKIP: {
-    skip 'Image::Magick not installed', 2 if $@;
+$image = Image::Magick->new;
+$image->Read('rose:');
+$image->Set( density => '72x72', alpha => 'Set' );
+$image->Write('test.tif');
+$tif = Graphics::TIFF->Open( 'test.tif', 'r' );
 
-    my $image = Image::Magick->new;
-    $image->Read('rose:');
-    $image->Set( density => '72x72', alpha => 'Set' );
-    $image->Write('test.tif');
-    my $tif = Graphics::TIFF->Open( 'test.tif', 'r' );
+my @values = $tif->GetField(TIFFTAG_EXTRASAMPLES);
+is_deeply( \@values, [EXTRASAMPLE_UNASSALPHA],
+    'GetField TIFFTAG_EXTRASAMPLES' );
 
-    my @values = $tif->GetField(TIFFTAG_EXTRASAMPLES);
-    is_deeply( \@values, [EXTRASAMPLE_UNASSALPHA],
-        'GetField TIFFTAG_EXTRASAMPLES' );
+@values = $tif->GetFieldDefaulted(TIFFTAG_EXTRASAMPLES);
+is_deeply( \@values, [EXTRASAMPLE_UNASSALPHA],
+    'GetFieldDefaulted TIFFTAG_EXTRASAMPLES' );
 
-    @values = $tif->GetFieldDefaulted(TIFFTAG_EXTRASAMPLES);
-    is_deeply( \@values, [EXTRASAMPLE_UNASSALPHA],
-        'GetFieldDefaulted TIFFTAG_EXTRASAMPLES' );
-
-    $tif->Close;
-}
+$tif->Close;
 
 #########################
 
-eval "use Image::Magick";
-SKIP: {
-    skip 'Image::Magick not installed', 6 if $@;
+$image = Image::Magick->new;
+$image->Read('rose:');
+$image->Set( density => '72x72', type => 'palette', depth => 2 );
+$image->Write('test.tif');
+$tif = Graphics::TIFF->Open( 'test.tif', 'r' );
 
-    my $image = Image::Magick->new;
-    $image->Read('rose:');
-    $image->Set( density => '72x72', type => 'palette', depth => 2 );
-    $image->Write('test.tif');
-    my $tif = Graphics::TIFF->Open( 'test.tif', 'r' );
+@values = $tif->GetField(TIFFTAG_COLORMAP);
+is $#{ $values[0] }, 255, 'GetField TIFFTAG_COLORMAP r';
+is $#{ $values[1] }, 255, 'GetField TIFFTAG_COLORMAP g';
+is $#{ $values[2] }, 255, 'GetField TIFFTAG_COLORMAP b';
 
-    my @values = $tif->GetField(TIFFTAG_COLORMAP);
-    is $#{ $values[0] }, 255, 'GetField TIFFTAG_COLORMAP r';
-    is $#{ $values[1] }, 255, 'GetField TIFFTAG_COLORMAP g';
-    is $#{ $values[2] }, 255, 'GetField TIFFTAG_COLORMAP b';
+@values = $tif->GetFieldDefaulted(TIFFTAG_COLORMAP);
+is $#{ $values[0] }, 255, 'GetFieldDefaulted TIFFTAG_COLORMAP r';
+is $#{ $values[1] }, 255, 'GetFieldDefaulted TIFFTAG_COLORMAP g';
+is $#{ $values[2] }, 255, 'GetFieldDefaulted TIFFTAG_COLORMAP b';
 
-    @values = $tif->GetFieldDefaulted(TIFFTAG_COLORMAP);
-    is $#{ $values[0] }, 255, 'GetFieldDefaulted TIFFTAG_COLORMAP r';
-    is $#{ $values[1] }, 255, 'GetFieldDefaulted TIFFTAG_COLORMAP g';
-    is $#{ $values[2] }, 255, 'GetFieldDefaulted TIFFTAG_COLORMAP b';
-
-    $tif->Close;
-}
+$tif->Close;
 
 #########################
 

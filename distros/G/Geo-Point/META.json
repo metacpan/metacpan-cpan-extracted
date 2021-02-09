@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Geo::Distance" : "0.06",
+            "GIS::Distance" : "0.14",
             "Geo::Proj4" : "1.01",
             "Math::Polygon" : "1.01",
             "Math::Trig" : "1",
@@ -52,6 +52,6 @@
          "web" : "https://github.com/markov2/perl5-Geo-Point"
       }
    },
-   "version" : "0.98",
+   "version" : "0.99",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -10,7 +10,8 @@ WriteMakefile(
   NAME         => 'Mojolicious::Plugin::BlogSpam',
   AUTHOR       => 'Nils Diewald',
   BUILD_REQUIRES => {
-    'Test::More' => 0
+    'Test::More' => 0,
+    'Test::Memory::Cycle' => 1.06
   },
   PREREQ_PM => {
     'Mojolicious' => 4.88,
@@ -18,10 +19,18 @@ WriteMakefile(
   },
   LICENSE      => 'artistic_2',
   META_MERGE   => {
-    requires  => {perl => '5.010001'},
+    'meta-spec' => { version => 2 },
+    requires  => { perl => '5.010001' },
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/Akron/Mojolicious-Plugin-BlogSpam'
+      repository  => {
+        type => 'git',
+        url => 'https://github.com/Akron/Mojolicious-Plugin-BlogSpam.git',
+        web => 'https://github.com/Akron/Mojolicious-Plugin-BlogSpam',
+      },
+      bugtracker => {
+        web => 'https://github.com/Akron/Mojolicious-Plugin-BlogSpam/issues'
+      }
     }
   },
   MIN_PERL_VERSION => '5.010001',

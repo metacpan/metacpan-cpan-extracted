@@ -453,16 +453,16 @@ sub t2p_read_tiff_init {
                 $t2p->{tiff_pages}[ $t2p->{tiff_pagecount} ]{page_number} =
                   $pagen;
             }
-            goto ispage2;
+            goto ISPAGE2;
         }
         if ( $subfiletype = $input->GetField(TIFFTAG_SUBFILETYPE) ) {
             if (   ( ( $subfiletype & FILETYPE_PAGE ) != 0 )
                 || ( $subfiletype == 0 ) )
             {
-                goto ispage;
+                goto ISPAGE;
             }
             else {
-                goto isnotpage;
+                goto ISNOTPAGE;
             }
         }
         if ( $subfiletype = $input->GetField(TIFFTAG_OSUBFILETYPE) ) {
@@ -470,16 +470,16 @@ sub t2p_read_tiff_init {
                 || ( $subfiletype == OFILETYPE_PAGE )
                 || ( $subfiletype == 0 ) )
             {
-                goto ispage;
+                goto ISPAGE;
             }
             else {
-                goto isnotpage;
+                goto ISNOTPAGE;
             }
         }
-      ispage:
+      ISPAGE:
         $t2p->{tiff_pages}[ $t2p->{tiff_pagecount} ]{page_number} =
           $t2p->{tiff_pagecount};
-      ispage2:
+      ISPAGE2:
         $t2p->{tiff_pages}[ $t2p->{tiff_pagecount} ]{page_extra}     = 0;
         $t2p->{tiff_pages}[ $t2p->{tiff_pagecount} ]{page_directory} = $i;
         if ( $input->IsTiled() ) {
@@ -490,7 +490,7 @@ sub t2p_read_tiff_init {
             $t2p->{tiff_pages}[ $t2p->{tiff_pagecount} ]{page_tilecount} = 0;
         }
         $t2p->{tiff_pagecount}++;
-      isnotpage:
+      ISNOTPAGE:
         0;
     }
 
@@ -720,7 +720,7 @@ sub t2p_read_tiff_data {
                 break;
             }
             if ( $xuint16 = $input->GetField(TIFFTAG_INDEXED) ) {
-                if ( $xuint16 == 1 ) { goto photometric_palette }
+                if ( $xuint16 == 1 ) { goto PHOTOMETRIC_PALETTE }
             }
             if ( $t2p->{tiff_samplesperpixel} > 3 ) {
                 if ( $t2p->{tiff_samplesperpixel} == 4 ) {
@@ -772,7 +772,7 @@ sub t2p_read_tiff_data {
             }
         }
         when (PHOTOMETRIC_PALETTE) {
-          photometric_palette:
+          PHOTOMETRIC_PALETTE:
             if ( $t2p->{tiff_samplesperpixel} != 1 ) {
                 my $msg =
                   sprintf
@@ -804,7 +804,7 @@ sub t2p_read_tiff_data {
         }
         when (PHOTOMETRIC_SEPARATED) {
             if ( $xuint16 = $input->GetField(TIFFTAG_INDEXED) ) {
-                if ( $xuint16 == 1 ) { goto photometric_palette_cmyk }
+                if ( $xuint16 == 1 ) { goto PHOTOMETRIC_PALETTE_CMYK }
             }
             if ( $xuint16 = $input->GetField(TIFFTAG_INKSET) ) {
                 if ( $xuint16 != INKSET_CMYK ) {
@@ -830,7 +830,7 @@ sub t2p_read_tiff_data {
                 return;
             }
             break;
-          photometric_palette_cmyk:
+          PHOTOMETRIC_PALETTE_CMYK:
             if ( $t2p->{tiff_samplesperpixel} != 1 ) {
                 my $msg =
                   sprintf
@@ -1486,7 +1486,7 @@ sub t2p_readwrite_pdf_image {
                   t2p_sample_planar_separate_to_contig( $t2p, $samplebuffer,
                     length $samplebuffer );
             }
-            goto dataready;
+            goto DATAREADY;
         }
 
         $stripsize  = $input->StripSize();
@@ -1546,7 +1546,7 @@ sub t2p_readwrite_pdf_image {
         }
     }
 
-  dataready:
+  DATAREADY:
 
 # use TIFFStreamOpen instead, as in
 # https://stackoverflow.com/questions/4624144/c-libtiff-read-and-save-file-from-and-to-memory

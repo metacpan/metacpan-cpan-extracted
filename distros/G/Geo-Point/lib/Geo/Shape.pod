@@ -137,9 +137,9 @@ Calculate the distance between this object and some other object.
 For many combinations of objects this is not supported or only
 partially supported.
 
-This calculation is performed with L<Geo::Distance> in accurate mode.
+This calculation is performed with L<GIS::Distance> in accurate mode.
 The default $unit is kilometers.  Other units are provided in the manual
-page of L<Geo::Distance>.  As extra unit, C<degrees> and C<radians> are
+page of L<GIS::Distance>.  As extra unit, C<degrees> and C<radians> are
 added as well as the C<km> alias for kilometer.
 
 =item $obj-E<gt>B<perimeter>()
@@ -215,12 +215,12 @@ The limitation is purely caused by lack of time to implement this.
 
 =head1 SEE ALSO
 
-This module is part of Geo-Point distribution version 0.98,
-built on February 01, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Geo-Point distribution version 0.99,
+built on February 09, 2021. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2005-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2005-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

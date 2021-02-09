@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Git::Helpers;
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 use Carp qw( croak );
 use Capture::Tiny 'capture_stderr';
 use File::pushd qw( pushd );
@@ -146,7 +146,7 @@ Git::Helpers - Shortcuts for common Git commands
 
 =head1 VERSION
 
-version 0.000020
+version 0.000021
 
 =head1 SYNOPSIS
 

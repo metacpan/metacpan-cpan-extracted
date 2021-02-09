@@ -25,7 +25,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Array-OverlapFinder/issues
   homepage: https://metacpan.org/release/Array-OverlapFinder
   repository: git://github.com/perlancar/perl-Array-OverlapFinder.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

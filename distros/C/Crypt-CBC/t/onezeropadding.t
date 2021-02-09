@@ -39,9 +39,10 @@ test(\$tnum,!$@,"Couldn't load module");
 
 
 my $cipher = Crypt::CBC->new(
-			     -key    => 'aaab',
-			     -cipher => $in[0],
-			     -padding => "oneandzeroes",
+    -key    => 'aaab',
+    -cipher => $in[0],
+    -padding => "oneandzeroes",
+    -pbkdf   => 'opensslv2',
 );
 my $string = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAX';
 

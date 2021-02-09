@@ -34,10 +34,10 @@
       "runtime" : {
          "requires" : {
             "BSD::Resource" : "0",
-            "Cpanel::JSON::XS" : "4.09",
             "File::Map" : "0",
             "File::Temp" : "0.2308",
             "Mojolicious" : "8.50",
+            "Sereal" : "0",
             "perl" : "5.016"
          }
       }
@@ -61,6 +61,6 @@
          "web" : "https://webchat.freenode.net/#mojo"
       }
    },
-   "version" : "1.13",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "1.14",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

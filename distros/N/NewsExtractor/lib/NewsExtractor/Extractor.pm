@@ -85,6 +85,7 @@ use constant {
         'www.ntdtv.com' => 'NewsExtractor::SiteSpecificExtractor::www_ntdtv_com',
         'www.ksnews.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_ksnews_com_tw',
         'news.tvbs.com.tw' => 'NewsExtractor::SiteSpecificExtractor::news_tvbs_com_tw',
+        'udn.com' => 'NewsExtractor::SiteSpecificExtractor::UDN',
         'stars.udn.com' => 'NewsExtractor::SiteSpecificExtractor::UDN',
         'money.udn.com' => 'NewsExtractor::SiteSpecificExtractor::UDN',
         'house.udn.com' => 'NewsExtractor::SiteSpecificExtractor::UDN',
@@ -148,12 +149,6 @@ use constant {
             dateline => 'div.article-date',
             journalist => 'div.article-author',
             content_text => 'article.article',
-        },
-        'udn.com' => {
-            headline   => 'h1.article-content__title',
-            dateline   => '.authors time.article-content__time',
-            journalist => '.authors span.article-content__author',
-            content_text => 'div.article-content__paragraph section.article-content__editor',
         },
         'www.enewstw.com' =>  {
             headline     => 'td.blog_title > strong',

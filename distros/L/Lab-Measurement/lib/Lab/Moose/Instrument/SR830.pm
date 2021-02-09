@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SR830;
-$Lab::Moose::Instrument::SR830::VERSION = '3.740';
+$Lab::Moose::Instrument::SR830::VERSION = '3.741';
 #ABSTRACT: Stanford Research SR830 Lock-In Amplifier
 
 use v5.20;
@@ -292,14 +292,14 @@ sub set_auto_sens {
         }
 
         my $upper_sens = $self->_int_to_sens( $current_sens_int + 1 );
-        if ( $upper_sens < $max_sens ) {
+        if ( $upper_sens <= $max_sens ) {
             return $self->set_sens( value => $upper_sens );
         }
     }
     elsif ( $current_sens_int > 0 ) {
         my $lower_sens = $self->_int_to_sens( $current_sens_int - 1 );
         if ( $r < $lower_sens * $down_at ) {
-            if ( $lower_sens > $min_sens ) {
+            if ( $lower_sens >= $min_sens ) {
                 return $self->set_sens( value => $lower_sens );
             }
         }
@@ -457,7 +457,7 @@ Lab::Moose::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 SYNOPSIS
 
@@ -610,17 +610,17 @@ Same rounding as for C<set_tc>.
   my $r = $rphi->{r};
   $lia->set_auto_sens(
       r => $r,
-      min_sens => 100e-9, # Smallest allowed range is 100nV
-      max_sens => 1e6   , # Largest allowed range is 1μV
+      min_sens => 10e-6, # Smallest allowed range is 10μV (default: 2nV range)
+      max_sens => 2e-3   , # Largest allowed range is 2mV (default: 1V range)
       up_at    => 0.8   , # Go to next higher sens if $r is above 80%
                           # of current range (default: 90%)
       down_at => 0.8    , # Go to next lower sens if $r is below 80% of
-                          # next lower sens    
+                          # next lower sens (default: 90%)
       
  );
 
 Set optimal sensitvity for current input signal, determined from the C<r> attribute.
-The attributes C<min_sens> and C<max_sens> are optional.
+Except for C<r>, all attributes are optional. For stable operation, 1 > C<up_at> >= C<down_at> is required.
 
 If the sensitvity is changed, return the new value. Otherwise return nothing.
 
@@ -797,6 +797,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
             2017       Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt
+            2021       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

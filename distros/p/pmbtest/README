@@ -1,0 +1,27 @@
+NAME
+
+    pmbtest - Blah blah blah
+
+SYNOPSIS
+
+      use pmbtest;
+
+DESCRIPTION
+
+    pmbtest is
+
+AUTHOR
+
+    Philipp Busse <philipp.busse@gmx.net>
+
+COPYRIGHT
+
+    Copyright 2021- Philipp Busse
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+

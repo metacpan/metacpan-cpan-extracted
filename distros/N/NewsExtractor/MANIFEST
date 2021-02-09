@@ -1,6 +1,6 @@
 .drone.yml
+.github/workflows/test.yml
 .perlcriticrc
-.travis.yml
 Build.PL
 Changes
 LICENSE

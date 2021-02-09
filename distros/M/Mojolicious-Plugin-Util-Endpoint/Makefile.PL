@@ -18,10 +18,18 @@ WriteMakefile(
   },
   LICENSE      => 'perl',
   META_MERGE   => {
+    'meta-spec' => { version => 2 },
     requires  => { perl => '5.010001' },
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/Akron/Mojolicious-Plugin-Util-Endpoint'
+      repository  => {
+        type => 'git',
+        url => 'https://github.com/Akron/Mojolicious-Plugin-Util-Endpoint.git',
+        web => 'https://github.com/Akron/Mojolicious-Plugin-Util-Endpoint',
+      },
+      bugtracker => {
+        web => 'https://github.com/Akron/Mojolicious-Plugin-Util-Endpoint/issues'
+      }
     }
   },
   MIN_PERL_VERSION => '5.010001',

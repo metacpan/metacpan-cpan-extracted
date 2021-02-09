@@ -50,6 +50,7 @@ END
       test(\$tnum,$i = Crypt::CBC->new(-key => 'secret',
 				       -cipher => $mod,
 				       -padding => $pad,
+				       -pbkdf   => 'opensslv2',
                                       ),
                                       "Couldn't create new object");
 

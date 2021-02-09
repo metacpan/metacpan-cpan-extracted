@@ -1,4 +1,4 @@
-# Copyrights 2005-2019 by [Mark Overmeer].
+# Copyrights 2005-2021 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Geo::Point;
 use vars '$VERSION';
-$VERSION = '0.98';
+$VERSION = '0.99';
 
 use base 'Geo::Shape';
 
@@ -16,7 +16,9 @@ use strict;
 use warnings;
 
 use Geo::Proj;
-use Carp        qw/confess croak/;
+use Math::Trig                  qw/deg2rad/;
+use GIS::Distance::Constants    qw/$KILOMETER_RHO/;
+use Carp                        qw/confess croak/;
 
 
 sub init($)
@@ -232,11 +234,20 @@ sub perimeter() { 0 }
 # easier...
 
 sub distancePointPoint($$$)
-{   my ($self, $geodist, $units, $other) = @_;
+{   my ($self, $gisdist, $units, $other) = @_;
 
     my $here  = $self->in('wgs84');
     my $there = $other->in('wgs84');
-    $geodist->distance($units, $here->latlong, $there->latlong);
+    my $distance = $gisdist->distance($here->latlong, $there->latlong);
+
+    if ($units eq 'degrees') {
+        return( ($distance->km() / $KILOMETER_RHO) * 360 );
+    }
+    elsif ($units eq 'radians') {
+        return deg2rad( ($distance->km() / $KILOMETER_RHO) * 360 );
+    }
+
+    return $distance->$units();
 }
 
 

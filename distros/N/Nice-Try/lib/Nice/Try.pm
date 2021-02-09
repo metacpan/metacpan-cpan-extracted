@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v0.1.8
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v0.1.9
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2021/02/06
+## Modified 2021/02/09
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,7 +21,7 @@ BEGIN
     use Scalar::Util;
     use List::Util ();
     # use Devel::Confess;
-    our $VERSION = 'v0.1.8';
+    our $VERSION = 'v0.1.9';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -139,7 +139,7 @@ sub _error
     if( @_ )
     {
         my $txt = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
-        $txt =~ s/\v+$//g;
+        $txt =~ s/[\015\012]+$//g;
         $ERROR = $txt;
         CORE::warn( "$txt\n" ) if( warnings::enabled );
         return;
@@ -392,7 +392,7 @@ sub _parse
                     }
                     push( @$nodes_to_replace, $sib );
                 }
-                elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /\v+/ )
+                elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
                 {
                     ## $self->_messagef( 4, "\tTry -> Found open new line at line %d", $sib->line_number );
                     $temp->{open_curly_nl}++;
@@ -442,7 +442,7 @@ sub _parse
                     $inside_catch = 0;
                     push( @$nodes_to_replace, $sib );
                 }
-                elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /\v+/ )
+                elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
                 {
                     ## $self->_messagef( 4, "\tCatch -> Found open new line at line %d", $sib->line_number );
                     $temp->{open_curly_nl}++;
@@ -492,7 +492,7 @@ sub _parse
                     $inside_finally = 0;
                     push( @$nodes_to_replace, $sib );
                 }
-                elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /\v+/ )
+                elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
                 {
                     ## $self->_messagef( 4, "\tFinally -> Found open new line at line %d", $sib->line_number );
                     $temp->{open_curly_nl}++;
@@ -510,7 +510,7 @@ sub _parse
             ## catch {
             ## etc.
             ## This could also be new lines following the last catch block
-            elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /\v+/ )
+            elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
             {
                 ## $self->_messagef( 4, "Between -> Found closing new line at line %d", $sib->line_number );
                 $nl_counter++;
@@ -608,7 +608,7 @@ CORE::local \$Nice::Try::WANTARRAY = CORE::wantarray;
         }
     };
     \$Nice::Try::DIED = CORE::length( \$\@ ) ? 1 : 0;
-    \$\@ =~ s/\\v+\$//g;
+    \$\@ =~ s/[\\015\\012]+\$//g;
     \$Nice::Try::EXCEPTION = \$\@;
 };
 
@@ -1126,7 +1126,7 @@ When run, this would produce, as one would expect:
 
 =head1 VERSION
 
-    v0.1.8
+    v0.1.9
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,4 @@
-# Copyrights 2005-2019 by [Mark Overmeer].
+# Copyrights 2005-2021 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Geo::Shape;
 use vars '$VERSION';
-$VERSION = '0.98';
+$VERSION = '0.99';
 
 
 use strict;
@@ -20,8 +20,7 @@ use Geo::Line       ();
 use Geo::Surface    ();
 use Geo::Space      ();
 
-use Geo::Distance   ();
-use Math::Trig      qw/deg2rad/;
+use GIS::Distance   ();
 use Carp            qw/croak confess/;
 
 
@@ -82,25 +81,19 @@ sub projectOn($@)
 
 #---------------------------
 
-my $geodist;
+my $gisdist;
 sub distance($;$)
 {   my ($self, $other, $unit) = (shift, shift, shift);
     $unit ||= 'kilometer';
 
-    unless($geodist)
-    {   $geodist = Geo::Distance->new;
-        $geodist->formula('hsin');
-        $geodist->reg_unit(1 => 'radians');
-        $geodist->reg_unit(deg2rad(1) => 'degrees');
-        $geodist->reg_unit(km => 1, 'kilometer');
-    }
+    $gisdist ||= GIS::Distance->new('Haversine');
 
     my $proj = $self->proj;
     $other = $other->in($proj)
         if $other->proj ne $proj;
 
     if($self->isa('Geo::Point') && $other->isa('Geo::Point'))
-    {   return $self->distancePointPoint($geodist, $unit, $other);
+    {   return $self->distancePointPoint($gisdist, $unit, $other);
     }
 
     die "ERROR: distance calculation not implemented between a "

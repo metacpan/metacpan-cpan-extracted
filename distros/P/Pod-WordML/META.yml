@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,8 @@ requires:
   Tie::Cycle: '0'
   perl: '5.010'
 resources:
-  bugtracker: https://github.com/briandfoy/pod-wordml/issues
-  homepage: https://github.com/briandfoy/pod-wordml
-  repository: https://github.com/briandfoy/pod-wordml.git
-version: '0.164'
+  bugtracker: https://github.com/CPAN-Adoptable-Modules/pod-wordml/issues
+  homepage: https://github.com/CPAN-Adoptable-Modules/pod-wordml
+  repository: https://github.com/CPAN-Adoptable-Modules/pod-wordml.git
+version: '0.165'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

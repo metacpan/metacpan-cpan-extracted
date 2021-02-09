@@ -5,12 +5,9 @@ use base 'Pod::PseudoPod';
 use warnings;
 no warnings;
 
-use subs qw();
-use vars qw($VERSION);
-
 use Carp;
 
-$VERSION = '0.164';
+our $VERSION = '0.165';
 
 =encoding utf8
 
@@ -24,7 +21,8 @@ Pod::WordML - Turn Pod into Microsoft Word's WordML
 
 =head1 DESCRIPTION
 
-***THIS IS ALPHA SOFTWARE. MAJOR PARTS WILL CHANGE***
+***THIS IS AN ABANDONED MODULE. YOU CAN ADOPT IT ***
+*** https://pause.perl.org/pause/authenquery?ACTION=pause_04about#takeover ***
 
 I wrote just enough of this module to get my job done, and I skipped every
 part of the specification I didn't need while still making it flexible enough
@@ -205,6 +203,8 @@ sub end_Document
         <w:t>This is an h1</w:t>
       </w:r>
     </w:p>
+
+=end comment
 
 =cut
 
@@ -717,9 +717,13 @@ L<Pod::PseudoPod>, L<Pod::Simple>
 
 =head1 SOURCE AVAILABILITY
 
+This is an abandoned module. You can adopt it if you like:
+
+	https://pause.perl.org/pause/authenquery?ACTION=pause_04about#takeover
+
 This source is in Github:
 
-	http://github.com/briandfoy/pod-wordml
+	https://github.com/CPAN-Adoptable-Modules/pod-wordml.git
 
 If, for some reason, I disappear from the world, one of the other
 members of the project can shepherd this module appropriately.
@@ -730,10 +734,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2009-2017, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2009-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the Artistic License 2.0.
-
 
 =cut
 

@@ -13,7 +13,7 @@
 
 package Lab::Connection::RS232;
 #ABSTRACT: RS232 Connection base class
-$Lab::Connection::RS232::VERSION = '3.740';
+$Lab::Connection::RS232::VERSION = '3.741';
 use v5.20;
 
 use Lab::Connection;
@@ -87,7 +87,7 @@ Lab::Connection::RS232 - RS232 Connection base class
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 SYNOPSIS
 

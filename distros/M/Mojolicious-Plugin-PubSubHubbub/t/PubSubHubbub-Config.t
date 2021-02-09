@@ -33,7 +33,7 @@ $app->plugin('PubSubHubbub' => {
 is($app->pubsub->_plugin->hub, 'https://myhub.example.com/', 'get plugin');
 is($app->pubsub->_plugin->lease_seconds, 2000, 'get plugin');
 
-ok(!$app->routes->route->pubsub('hub'), 'Hub is currently not supported');
+ok(!$app->routes->any->pubsub('hub'), 'Hub is currently not supported');
 
 
 

@@ -44,6 +44,16 @@ WriteMakefile(
         'Test::Requires' => 0,
         'Test::Deep'     => 0,
     },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/carygravel/graphics-tiff.git',
+                web  => 'https://github.com/carygravel/graphics-tiff',
+            },
+        },
+    },
     clean => { FILES => '$(SOURCE_TIDY)' },
 
     # CPAN does not recognise .xz encoded files
@@ -78,7 +88,6 @@ SOURCE_TIDY = $(foreach file,$(SOURCE),$(file).tdy)
 
 MANIFEST : $(SOURCE)
 	git ls-files | egrep -v '^\.(git|be)' > $@
-	echo README >> $@
 
 tardist : README
 

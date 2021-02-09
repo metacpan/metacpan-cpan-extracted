@@ -15,6 +15,9 @@ my $app = $t->app;
 $app->plugin('Util::Endpoint');
 
 my ($level, $msg);
+
+$app->log->handle(*STDOUT);
+
 $app->log->on(
   message => sub {
     (my $l2, $level, $msg) = @_;
@@ -23,7 +26,7 @@ $app->log->on(
 my $endpoint_host = 'endpoi.nt';
 
 # Set endpoint
-my $r_test = $app->routes->route('/test');
+my $r_test = $app->routes->any('/test');
 $r_test->endpoint(
   'test1' =>
     {
@@ -31,13 +34,13 @@ $r_test->endpoint(
       scheme => 'https'
     });
 
-$r_test->route('/fun')->name('fun');
+$r_test->any('/fun')->name('fun');
 
 
 # Test redefinition
 my $lev = $app->log->level;
 $app->log->level('debug');
-ok($app->routes->route('/nothing')->endpoint('test1'), 'Route is returned');
+ok($app->routes->any('/nothing')->endpoint('test1'), 'Route is returned');
 is($msg, 'Route endpoint "test1" already defined', 'Log level correct');
 $app->log->level($lev);
 
@@ -77,7 +80,7 @@ is($app->endpoint('test3', {var1 => 'c', var2 => 'd'}),
    'endpoint 6');
 
 
-$app->routes->route('/define')->endpoint('testport' => {
+$app->routes->any('/define')->endpoint('testport' => {
   port => '6666',
   host   => $endpoint_host,
 });
@@ -86,7 +89,7 @@ is($app->endpoint('testport'),
    "http://endpoi.nt:6666/define",
    'endpoint 1');
 
-$r_test = $app->routes->route('/suggest');
+$r_test = $app->routes->any('/suggest');
 $r_test->endpoint(test4 => {
 		      host => $endpoint_host,
 		      query => [ q => '{searchTerms}',
@@ -239,14 +242,14 @@ is($app->endpoint('test10' => { try => 'Akron', '?' => undef}),
 
 
 # Test with placeholders
-my $r_test_2 = $app->routes->route('/:placeholder');
+my $r_test_2 = $app->routes->any('/:placeholder');
 $r_test_2->endpoint('check');
 is($app->endpoint('check'), '/{placeholder}', 'Check path placeholder');
 is($app->endpoint('check' => {
   placeholder => 'try'
 }), '/try', 'Check path placeholder');
 
-my $r_test_3 = $app->routes->route('/:placeholder/:try');
+my $r_test_3 = $app->routes->any('/:placeholder/:try');
 $r_test_3->endpoint('check2');
 is($app->endpoint('check2'), '/{placeholder}/{try}',
    'Check path placeholder 2');
@@ -258,7 +261,7 @@ is($app->endpoint('check2' => {
   try => 'try2'
 }), '/try1/try2', 'Check path placeholder 2');
 
-my $r_test_4 = $app->routes->route('/:placeholder/:try');
+my $r_test_4 = $app->routes->any('/:placeholder/:try');
 $r_test_4->endpoint('check3' => {
   query => [ q => '{test}' ]
 });
@@ -277,7 +280,7 @@ is($app->endpoint('check3' => {
   test => 'try3'
 }), '/try1/try2?q=try3', 'Check path placeholder 3');
 
-my $r_test_5 = $app->routes->route('/opensearch.xml');
+my $r_test_5 = $app->routes->any('/opensearch.xml');
 
 ok($r_test_5->endpoint(
   opensearch => {
@@ -324,11 +327,11 @@ is($c->endpoint('test9'), 'http://grimms-abenteuer.de/test?q={try}',
    'Test9 with port');
 
 # Wildcards
-$r_test = $app->routes->route('/test2');
-my $r_test2 = $r_test->route('/:fine');
-my $r_test3 = $r_test2->route('/peter-*huhu');
-my $r_test4 = $r_test3->route('/#all');
-my $r_test5 = $r_test4->route('/*hui', hui => qr{\d+});
+$r_test = $app->routes->any('/test2');
+my $r_test2 = $r_test->any('/:fine');
+my $r_test3 = $r_test2->any('/peter-*huhu');
+my $r_test4 = $r_test3->any('/#all');
+my $r_test5 = $r_test4->any('/*hui', hui => qr{\d+});
 
 $r_test5->endpoint('test-wildcards' =>
 		    {

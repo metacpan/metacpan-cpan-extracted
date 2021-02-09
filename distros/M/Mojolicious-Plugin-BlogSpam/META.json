@@ -4,13 +4,13 @@
       "Nils Diewald"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.141170",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-BlogSpam",
    "no_index" : {
@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Test::Memory::Cycle" : "1.06",
             "Test::More" : "0"
          }
       },
@@ -40,12 +41,18 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Akron/Mojolicious-Plugin-BlogSpam/issues"
+      },
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ],
       "repository" : {
-         "url" : "https://github.com/Akron/Mojolicious-Plugin-BlogSpam"
+         "type" : "git",
+         "url" : "https://github.com/Akron/Mojolicious-Plugin-BlogSpam.git",
+         "web" : "https://github.com/Akron/Mojolicious-Plugin-BlogSpam"
       }
    },
-   "version" : "0.09"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

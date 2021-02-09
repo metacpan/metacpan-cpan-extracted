@@ -7,7 +7,7 @@ use Mojo::UserAgent;
 use Mojo::IOLoop;
 use Scalar::Util 'weaken';
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 # TODO: X-Forwarded-For in Config per index steuern
 # TODO: - Check for blacklist/whitelist/max words etc. yourself.
@@ -69,13 +69,13 @@ sub register {
 
       # Create new BlogSpam::Comment object
       my $obj = Mojolicious::Plugin::BlogSpam::Comment->new(
-	url     => $url->to_string,
-	log     => $log,
-	site    => $site,
-	app_log => $app_log_clone,
-	client  => __PACKAGE__ . ' v' . $VERSION,
-	base_options => $base_options,
-	@_
+        url     => $url->to_string,
+        log     => $log,
+        site    => $site,
+        app_log => $app_log_clone,
+        client  => __PACKAGE__ . ' v' . $VERSION,
+        base_options => $base_options,
+        @_
       );
 
       # Get request headers
@@ -87,15 +87,15 @@ sub register {
       # No ip manually given
       unless ($obj->ip) {
 
-	# Get forwarded ip
-	if (my $ip = $headers->to_hash->{'X-Forwarded-For'}) {
-	  $obj->ip( split(/\s*,\s*/, $ip) );
-	};
+        # Get forwarded ip
+        if (my $ip = $headers->to_hash->{'X-Forwarded-For'}) {
+          $obj->ip( split(/\s*,\s*/, $ip) );
+        };
 
-	# Get host ip, because X-Forwarded-For wasn't set
-	unless ($obj->ip) {
-	  $obj->ip( split(/\s*:\s*/, ($headers->host || '')) );
-	};
+        # Get host ip, because X-Forwarded-For wasn't set
+        unless ($obj->ip) {
+          $obj->ip( split(/\s*:\s*/, ($headers->host || '')) );
+        };
       };
 
       # Return blogspam object
@@ -132,7 +132,7 @@ sub test_comment {
 
   # Check for mandatory parameters
   while ($option_string &&
-	   $option_string =~ m/(?:^|,)mandatory=([^,]+?)(?:,|$)/g) {
+     $option_string =~ m/(?:^|,)mandatory=([^,]+?)(?:,|$)/g) {
     return unless $self->{$1};
   };
 
@@ -148,12 +148,12 @@ sub test_comment {
     # Make call non-blocking
     $self->_xml_rpc_call(
       testComment => (
-	%{$self->hash},
-	@options
+        %{$self->hash},
+        @options
       ) => sub {
 
-	# Analyze response
-	return $cb->( $self->_handle_test_response( shift ) );
+        # Analyze response
+        return $cb->( $self->_handle_test_response( shift ) );
       }
     );
 
@@ -200,8 +200,8 @@ sub classify_comment {
       train => $train,
       @site,
       sub {
-	my $res = shift;
-	$cb->($res ? 1 : 0);
+        my $res = shift;
+        $cb->($res ? 1 : 0);
       }
     ));
 
@@ -232,10 +232,10 @@ sub get_plugins {
     # Non-blocking request
     $self->_xml_rpc_call(
       getPlugins => sub {
-	my $res = shift;
+        my $res = shift;
 
-	# Analyze response in callback
-	return $cb->($self->_handle_plugins_response($res));
+        # Analyze response in callback
+        return $cb->($self->_handle_plugins_response($res));
       });
 
     return ();
@@ -267,8 +267,8 @@ sub get_stats {
     # Send non-blocking request
     my $res = $self->_xml_rpc_call(
       'getStats', $site => sub {
-	my $res = shift;
-	return $cb->($self->_handle_stats_response($res));
+        my $res = shift;
+        return $cb->($self->_handle_stats_response($res));
       });
 
     return;
@@ -407,13 +407,13 @@ sub _options {
 
       # Base options
       my $opt = [
-	$base->{$n} ? (ref $base->{$n} ? @{$base->{$n}} : $base->{$n}) : ()
+        $base->{$n} ? (ref $base->{$n} ? @{$base->{$n}} : $base->{$n}) : ()
       ];
 
       # Push new options
       push(
-	@$opt,
-	$options{$n} ? (ref $options{$n} ? @{$options{$_}} : $options{$n}) : ()
+        @$opt,
+        $options{$n} ? (ref $options{$n} ? @{$options{$_}} : $options{$n}) : ()
       );
 
       # Option flag is set as an array
@@ -456,9 +456,9 @@ sub _xml_rpc_call {
 
       # Create struct object
       foreach (keys %$param) {
-	$xml .= "<member><name>$_</name><value>" .
-	        '<string>' . $param->{$_} . '</string>' .
-	        "</value></member>\n" if $param->{$_};
+        $xml .= "<member><name>$_</name><value>" .
+          '<string>' . $param->{$_} . '</string>' .
+          "</value></member>\n" if $param->{$_};
       };
 
       # End struct
@@ -483,19 +483,19 @@ sub _xml_rpc_call {
     # Create delay object
     my $delay = Mojo::IOLoop->delay(
       sub {
-	my $tx = pop;
+        my $tx = pop;
 
-	my $res = $tx->success;
+        my $res = $tx->success;
 
-	# Connection failure - accept comment
-	unless ($res) {
-	  # Maybe there needs something to be weakened
-	  $self->_log_error($tx);
-	  return;
-	};
+        # Connection failure - accept comment
+        unless ($res) {
+          # Maybe there needs something to be weakened
+          $self->_log_error($tx);
+          return;
+        };
 
-	# Send response to callback
-	$cb->($res);
+        # Send response to callback
+        $cb->($res);
       }
     );
 
@@ -868,6 +868,7 @@ return values in blocking requests.
   my $stats = $bs->get_stats('http://sojolicio.us/');
   $bs->get_stats(sub {
     my $stats = shift;
+    ...
   });
 
 Requests a hash reference of statistics for your site
@@ -896,19 +897,23 @@ L<http://blogspam.net/>.
   https://github.com/Akron/Mojolicious-Plugin-BlogSpam
 
 
+=head1 PRIVACY NOTE
+
+Be aware that information of your users may be send
+to a third party.
+This may need to be noted in your privacy policy if you
+use a foreign BlogSpam instance, especially if you
+are located in the European Union.
+
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2015, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2012-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.
 
 The API definition as well as the BlogSpam API code were
 written and defined by Steve Kemp.
-
-Be aware that information of your users may be send
-to a third party.
-This should be noted in your privacy policy if you
-use a foreign BlogSpam instance.
 
 =cut

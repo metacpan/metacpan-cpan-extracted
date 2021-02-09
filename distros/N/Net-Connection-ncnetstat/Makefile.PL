@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
 	clean => { FILES    => 'Net-Connection-ncnetstat-*' },
 );
 
-if ( $^O !~ /freebsd/ ) {
+if ( $^O =~ /freebsd/ ) {
 	$WriteMakefileArgs{PREREQ_PM}{'Net::Connection::FreeBSD_sockstat'} = '0.0.1';
 }
 else {

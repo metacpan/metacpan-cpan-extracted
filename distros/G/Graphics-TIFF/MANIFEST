@@ -1,6 +1,7 @@
 Changes
 MANIFEST
 Makefile.PL
+README
 TIFF.xs
 examples/tiff2pdf.pl
 examples/tiffinfo.pl
@@ -15,6 +16,5 @@ t/93_tiff2pdf.t
 t/perlcriticrc
 tiffperl.h
 typemap
-README
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

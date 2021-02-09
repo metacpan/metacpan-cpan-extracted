@@ -2,8 +2,7 @@
 use Test::Mojo;
 use Test::More;
 use Mojolicious::Lite;
-$|++;
-use lib '../lib';
+use Test::Memory::Cycle;
 
 my $t = Test::Mojo->new;
 
@@ -84,6 +83,8 @@ like($opt, qr/exclude=badip/,     'Option String 1');
 like($opt, qr/mandatory=subject/, 'Option String 2');
 like($opt, qr/mandatory=name/,    'Option String 3');
 like($opt, qr/mandatory=email/,   'Option String 4');
+
+memory_cycle_ok($app);
 
 done_testing;
 

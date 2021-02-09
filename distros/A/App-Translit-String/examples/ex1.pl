@@ -20,5 +20,5 @@ sub VERSION_MESSAGE {
 # 
 #         -h              Print help.
 #         -r              Reverse transliteration.
-#         -t table        Transliteration table (default value is 'ISO/R 9').
+#         -t table        Transliteration table (default value is 'ISO 9').
 #         --version       Print version.

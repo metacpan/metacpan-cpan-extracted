@@ -3,7 +3,7 @@ package Array::OverlapFinder;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-02'; # DATE
 our $DIST = 'Array-OverlapFinder'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -96,7 +96,7 @@ Array::OverlapFinder - Find/remove overlapping items among ordered sequences
 
 =head1 VERSION
 
-This document describes version 0.004 of Array::OverlapFinder (from Perl distribution Array-OverlapFinder), released on 2020-01-02.
+This document describes version 0.005 of Array::OverlapFinder (from Perl distribution Array-OverlapFinder), released on 2020-01-02.
 
 =head1 SYNOPSIS
 
@@ -216,6 +216,9 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<nauniq> from L<App::nauniq> can also sometimes be used, if you know the items
+in the sequence are unique.
 
 L<Algorithm::Diff>
 

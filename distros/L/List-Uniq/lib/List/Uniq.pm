@@ -1,5 +1,5 @@
 #
-# $Id: Uniq.pm 4496 2010-06-18 15:19:43Z james $
+# $Id$
 #
 
 =head1 NAME
@@ -28,7 +28,7 @@ use base 'Exporter';
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 # set up exports
 our @EXPORT;

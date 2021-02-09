@@ -208,7 +208,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = 7;
+our $VERSION = 8;
 
 require XSLoader;
 XSLoader::load( 'Graphics::TIFF', $VERSION );
@@ -246,7 +246,7 @@ Graphics::TIFF - Perl extension for the libtiff library
 
 =head1 VERSION
 
-7
+8
 
 =head1 SYNOPSIS
 
@@ -692,7 +692,7 @@ Jeffrey Ratcliffe, E<lt>jffry@posteo.netE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 by Jeffrey Ratcliffe
+Copyright (C) 2017--2021 by Jeffrey Ratcliffe
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.5 or,

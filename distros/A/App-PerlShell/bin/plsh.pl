@@ -76,7 +76,7 @@ if ( defined $opt{execute} ) {
     }
 }
 
-$params{execute} .= 'exit;' if defined $opt{exit};
+$params{execute} .= 'exit;'      if defined $opt{exit};
 $params{lexical} = 1             if defined $opt{lexical};
 $params{prompt}  = $opt{prompt}  if defined $opt{prompt};
 $params{session} = $opt{session} if defined $opt{session};

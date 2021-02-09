@@ -5,10 +5,7 @@ use base 'Pod::WordML';
 use warnings;
 no warnings;
 
-use subs qw();
-use vars qw($VERSION);
-
-$VERSION = '0.164';
+our $VERSION = '0.165';
 
 =encoding utf8
 
@@ -2627,6 +2624,10 @@ L<Pod::PseudoPod>, L<Pod::Simple>
 
 =head1 SOURCE AVAILABILITY
 
+This is an abandoned module. You can adopt it if you like:
+
+	https://pause.perl.org/pause/authenquery?ACTION=pause_04about#takeover
+
 This source is in Github:
 
 	http://github.com/briandfoy/pod-wordml
@@ -2640,7 +2641,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2009-2017, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2009-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the Artistic License 2.0.
 

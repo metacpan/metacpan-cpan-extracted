@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "1.06";
+our $VERSION = "1.07";
 
 use Cwd;
 use Term::ReadLine;
@@ -29,29 +29,33 @@ if ( !$@ ) {
     $HAVE_ModRefresh = 1;
 }
 
-use Exporter;
-our @EXPORT = qw (cd cls clear commands dir dumper help
-  ls modules pwd session variables);
+my %COMMANDS_INT = (
+    debug     => 'print command',
+    exit      => 'exit shell'
+);
 
+my %COMMANDS = (
+    cd        => 'change directory',
+    cls       => 'clear screen',
+    clear     => 'clear screen',
+    commands  => 'print available "commands" (sub)',
+    dir       => 'directory listing',
+    dumper    => 'use Data::Dumper to display variable',
+    help      => 'shell help - print this',
+    ls        => 'directory listing',
+    modules   => 'list used modules',
+    perldoc   => 'perldoc for current package',
+    pwd       => 'print working directory',
+    session   => 'start / stop logging session',
+    variables => 'list defined variables'
+);
+
+use Exporter;
+our @EXPORT = sort ( keys ( %COMMANDS ) );
 our @ISA = qw ( Exporter );
 
 sub _shellCommands {
-    return (
-        cd        => 'change directory',
-        cls       => 'clear screen',
-        clear     => 'clear screen',
-        commands  => 'print available "commands" (sub)',
-        debug     => 'print command',
-        dir       => 'directory listing',
-        dumper    => 'use Data::Dumper to display variable',
-        exit      => 'exit shell',
-        help      => 'shell help - print this',
-        ls        => 'directory listing',
-        modules   => 'list used modules',
-        pwd       => 'print working directory',
-        session   => 'start / stop logging session',
-        variables => 'list defined variables'
-    );
+    return ( %COMMANDS, %COMMANDS_INT );
 }
 
 sub new {
@@ -422,19 +426,26 @@ sub dir {
 }
 
 sub ls {
-    my (@arg) = @_;
+    my (@args) = @_;
 
     my $dircmd = 'ls';
     if ( $^O eq "MSWin32" ) {
         $dircmd = 'dir';
     }
 
+    my @allArgs;
+    for my $arg ( @args ) {
+        my @temp = split /\s+/, $arg;
+        push @allArgs, @temp;
+    }
+    @args = @allArgs;
+
     my @ret;
     my $retType = wantarray;
     if ( not defined $retType ) {
-        system( $dircmd, @arg );
+        system( $dircmd, @args );
     } else {
-        @ret = `$dircmd @arg`;
+        @ret = `$dircmd @args`;
         if ($retType) {
             return @ret;
         } else {
@@ -481,6 +492,27 @@ sub modules {
     } else {
         return \%rets;
     }
+}
+
+sub perldoc {
+    my (@args) = @_;
+
+    if ( $#args == -1 ) {
+        push @args, $ENV{PERLSHELL_PACKAGE};
+    }
+
+    my @allArgs;
+    for my $arg ( @args ) {
+        my @temp = split /\s+/, $arg;
+        push @allArgs, @temp;
+    }
+    @args = @allArgs;
+
+    if ( $args[0] =~ /^::/ ) {
+        $args[0] = $ENV{PERLSHELL_PACKAGE} . $args[0];
+    }
+
+    system( "perldoc", @args );
 }
 
 sub pwd {
@@ -756,6 +788,12 @@ Displays used modules.  With 'SEARCH', displays matching used modules.
 Optional return value is hash with module names as keys and file 
 locations as values.
 
+=item B<perldoc> [('OPTIONS')]
+
+Open `perldoc` for current PACKAGE.  'OPTIONS' can start with '::' to 
+append to current PACKAGE, be a full Package name or use `perldoc` 
+command line options (e.g., "-f pack").
+
 =item B<pwd>
 
 Print working directory.  Optional return value is result.
@@ -773,7 +811,7 @@ List user defined variables currently active in current package in shell.
 
 =head1 EXPORT
 
-cd, cls, clear, dir, help, ls, modules, pwd, session, variables
+This module exports the COMMANDS into each Package namespace.
 
 =head1 EXAMPLES
 

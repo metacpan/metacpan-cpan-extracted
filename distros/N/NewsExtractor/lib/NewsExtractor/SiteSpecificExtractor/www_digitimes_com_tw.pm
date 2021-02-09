@@ -3,7 +3,7 @@ use utf8;
 use Moo;
 extends 'NewsExtractor::GenericExtractor';
 
-use Importer 'NewsExtractor::TextUtil'  => qw(u normalize_whitespace);
+use Importer 'NewsExtractor::TextUtil'  => qw(u);
 
 sub journalist {
     my ($self) = @_;

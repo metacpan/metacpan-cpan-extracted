@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Geo-Point>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Geo-Point/>
-    and <https://metacpan.org/release/Geo-Point>
+  * Indexed from CPAN: <https://metacpan.org/release/Geo-Point>
 
 Geo::Point tries to abstract coordinate systems.  It does not try to
 solve all the problems itself, but will call-out for helper modules when

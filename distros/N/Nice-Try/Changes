@@ -1,5 +1,8 @@
 Revision history for Perl module Nice::Try
 
+0.1.9 2021-02-09T20:27:15+0900
+    - Updated to use whitespace regular expression more friendly with older versions of perl
+
 0.1.8 2021-02-06T10:56:05+0900
     - Improved try-catch block return value management by taking under account caller context outside of the try-catch block since often try-catch is used in void context but their enclosing subroutine is not
     - Corrected a bug in tr-catch return value when try-catch block returned a reference

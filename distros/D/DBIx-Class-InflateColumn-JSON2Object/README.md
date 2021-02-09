@@ -4,7 +4,7 @@ DBIx::Class::InflateColumn::JSON2Object - convert JSON columns to Perl objects
 
 # VERSION
 
-version 0.906
+version 0.907
 
 # SYNOPSIS
 

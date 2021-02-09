@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -Tw
+#!/usr/bin/perl -w
 
 use lib './lib','./blib/lib';
 
@@ -27,7 +27,7 @@ END
 eval "use Crypt::CBC";
 
 test(1,!$@,"Couldn't load module");
-test(2,$i = Crypt::CBC->new({key=>'secret',cipher=>'CAST5'}),"Couldn't create new object");
+test(2,$i = Crypt::CBC->new({key=>'secret',cipher=>'CAST5',nodeprecate=>1}),"Couldn't create new object");
 test(3,$c = $i->encrypt($test_data),"Couldn't encrypt");
 test(4,$p = $i->decrypt($c),"Couldn't decrypt");
 test(5,$p eq $test_data,"Decrypted ciphertext doesn't match plaintext");

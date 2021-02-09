@@ -1,6 +1,6 @@
 package Lab::Instrument::MG369xB;
 #ABSTRACT: Anritsu MG369xB series signal generator
-$Lab::Instrument::MG369xB::VERSION = '3.740';
+$Lab::Instrument::MG369xB::VERSION = '3.741';
 use v5.20;
 
 use strict;
@@ -184,7 +184,7 @@ Lab::Instrument::MG369xB - Anritsu MG369xB series signal generator
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 CAVEATS/BUGS
 

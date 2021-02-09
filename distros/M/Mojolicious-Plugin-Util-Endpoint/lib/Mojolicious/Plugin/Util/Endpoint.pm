@@ -4,7 +4,7 @@ use Mojo::ByteStream 'b';
 use Scalar::Util qw/blessed/;
 use Mojo::URL;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 # Todo: Support alternative bases for https-paths
 # Todo: Update to https://tools.ietf.org/html/rfc6570
@@ -448,7 +448,7 @@ L<Viacheslav Tykhanovskyi|https://github.com/vti>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

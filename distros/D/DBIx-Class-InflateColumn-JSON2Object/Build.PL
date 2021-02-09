@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "DBIx-Class-InflateColumn-JSON2Object",
-  "dist_version" => "0.906",
+  "dist_version" => "0.907",
   "license" => "perl",
   "module_name" => "DBIx::Class::InflateColumn::JSON2Object",
   "recursive_test_files" => 1,

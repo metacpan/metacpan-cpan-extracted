@@ -45,6 +45,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : 7,
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/carygravel/graphics-tiff.git",
+         "web" : "https://github.com/carygravel/graphics-tiff"
+      }
+   },
+   "version" : 8,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -1,4 +1,4 @@
-# Copyrights 2005-2019 by [Mark Overmeer].
+# Copyrights 2005-2021 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Geo::Proj;
 use vars '$VERSION';
-$VERSION = '0.98';
+$VERSION = '0.99';
 
 
 use strict;
@@ -30,6 +30,7 @@ sub import()
    );
 }
 
+#-----------------------
 
 my %projections;
 my $defproj;
@@ -71,6 +72,7 @@ sub init($)
     $self;
 }
 
+#-----------------------
 
 sub nick() {shift->{GP_nick}}
 
@@ -100,6 +102,7 @@ sub proj4(;$)
 
 sub srid() {shift->{GP_srid}}
 
+#-----------------------
 
 sub projection($)
 {   my $which = $_[1];
@@ -144,6 +147,7 @@ sub to($@)
     $myproj4->transform($toproj4, shift);
 }
 
+#-----------------------
 
 # These methods may have been implemented in Geo::Point, however may get
 # supported by any external library later.  Knowledge about projections
@@ -190,6 +194,7 @@ sub bestUTMprojection($;$)
     my ($zone, $letter, $meridian) = $thing->zoneForUTM($point);
     $thing->UTMprojection($proj, $zone);
 }
+
 
 
 sub UTMprojection($$)

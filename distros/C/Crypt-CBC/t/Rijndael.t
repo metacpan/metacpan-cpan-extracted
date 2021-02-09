@@ -27,7 +27,7 @@ END
 eval "use Crypt::CBC";
 
 test(1,!$@,"Couldn't load module");
-test(2,$i = Crypt::CBC->new('secret','Rijndael'),"Couldn't create new object");
+test(2,$i = Crypt::CBC->new(-pass=>'secret',-cipher=>'Rijndael',-pbkdf=>'opensslv2'),"Couldn't create new object");
 test(3,$c = $i->encrypt($test_data),"Couldn't encrypt");
 test(4,$p = $i->decrypt($c),"Couldn't decrypt");
 test(5,$p eq $test_data,"Decrypted ciphertext doesn't match plaintext");

@@ -1,5 +1,10 @@
 Revision history for Perl extension Graphics::TIFF.
 
+8   Tue, 09 Feb 2021 22:30 +0100
+        - Adapt tests to tiff-4.2.0.
+          Closes RT 134344 (t/93_tiff2pdf.t fails with tiff-4.2.0)
+          Thanks to Petr Pisar for the patch.
+
 7   Thu, 27 Oct 2020 19:30 +0100
         - Fix TIFFGetField for TIFFTAG_COLORMAP
 

@@ -1,5 +1,5 @@
 #
-# $Id: 03_pod_coverage.t 4496 2010-06-18 15:19:43Z james $
+# $Id$
 #
 
 use strict;

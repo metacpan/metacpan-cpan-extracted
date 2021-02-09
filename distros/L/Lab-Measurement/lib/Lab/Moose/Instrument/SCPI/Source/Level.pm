@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Source::Level;
-$Lab::Moose::Instrument::SCPI::Source::Level::VERSION = '3.740';
+$Lab::Moose::Instrument::SCPI::Source::Level::VERSION = '3.741';
 #ABSTRACT: Role for the SCPI SOURce:(CURRent|VOLTage):Level commands
 
 use v5.20;
@@ -53,7 +53,7 @@ Lab::Moose::Instrument::SCPI::Source::Level - Role for the SCPI SOURce:(CURRent|
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 METHODS
 

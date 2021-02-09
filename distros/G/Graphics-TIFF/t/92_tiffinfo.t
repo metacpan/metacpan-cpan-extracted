@@ -1,17 +1,17 @@
 use warnings;
 use strict;
 use English;
+use IPC::Cmd qw(can_run);
 use Test::More;
-use Test::Requires qw( v5.10 );
+use Test::Requires qw( v5.10 Image::Magick );
 
 #########################
 
-eval "use Image::Magick";
-if ( not $@ and system("which tiffinfo > /dev/null 2> /dev/null") == 0 ) {
+if ( can_run('tiffinfo') ) {
     plan tests => 15;
 }
 else {
-    plan skip_all => 'Image::Magick or tiffinfo not installed';
+    plan skip_all => 'tiffinfo not installed';
     exit;
 }
 

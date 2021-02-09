@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
 	},
 	PREREQ_PM => {
 		'Net::Connection' => '0.2.0',
+		'Proc::ProcessTable' => '0.59',
 	},
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES    => 'Net-Connection-FreeBSD_sockstat-*' },

@@ -1,5 +1,9 @@
 Revision history for Net-Connection-FreeBSD_sockstat
 
+0.0.2	 2021-02-08/20:00
+		 - Add missing depend of Proc::ProcessTable.
+
+
 0.0.1	 2021-02-08/08:00
 		 - Initial release.
 

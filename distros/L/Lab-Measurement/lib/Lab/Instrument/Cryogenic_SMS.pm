@@ -1,6 +1,6 @@
 package Lab::Instrument::Cryogenic_SMS;
 #ABSTRACT: Cryogenic SMS magnet power supply
-$Lab::Instrument::Cryogenic_SMS::VERSION = '3.740';
+$Lab::Instrument::Cryogenic_SMS::VERSION = '3.741';
 use v5.20;
 
 use strict;
@@ -198,7 +198,7 @@ Lab::Instrument::Cryogenic_SMS - Cryogenic SMS magnet power supply
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 COPYRIGHT AND LICENSE
 

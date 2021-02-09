@@ -1,0 +1,50 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Erich Strelow <estrelow@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Request-Webpush",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.00",
+            "Crypt::AuthEnc::GCM" : "0.049",
+            "Crypt::JWT" : "0.013",
+            "Crypt::PK::ECC" : "0.042",
+            "Crypt::PRNG" : "0.048",
+            "Digest::SHA" : "5.83",
+            "JSON" : "2.00",
+            "MIME::Base64" : "3.11",
+            "URI" : "1.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

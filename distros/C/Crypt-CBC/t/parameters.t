@@ -13,7 +13,7 @@ That lamb would dig a hole.
 END
     ;
 
-print "1..81\n";
+print "1..82\n";
 
 eval "use Crypt::CBC";
 test(!$@,"Couldn't load module");
@@ -25,8 +25,11 @@ $crypt = eval {Crypt::CBC->new(-bad_parm=>1,-pass=>'test')};
 test(!$crypt,"new() accepted an unknown parameter");
 test($@ =~ /not a recognized argument/,"bad parameter error message not emitted");
 
-$crypt = eval {Crypt::CBC->new(-cipher => 'Crypt::Crypt8',
-			       -key    => 'test key') };
+$crypt = eval {Crypt::CBC->new(
+		   -cipher => 'Crypt::Crypt8',
+		   -key    => 'test key',
+		   -nodeprecate=>1)
+    };
 test(defined $crypt,"$@Can't continue!");
 test($crypt->header_mode eq 'salt',"Default header mode is not 'salt'");
 exit 0 unless $crypt;
@@ -35,7 +38,9 @@ exit 0 unless $crypt;
 # tests for the salt header
 $crypt = eval {Crypt::CBC->new(-cipher => 'Crypt::Crypt8',
 			       -key    => 'test key',
-			       -header => 'salt') };
+			       -header => 'salt',
+			       -nodeprecate=>1,
+		   ) };
 test(defined $crypt,"$@Can't continue!");
 exit 0 unless $crypt;
 
@@ -70,7 +75,9 @@ test(length($crypt->random_bytes(20)) == 20,"get_random_bytes()");
 # tests for the randomiv header
 $crypt = eval {Crypt::CBC->new(-cipher => 'Crypt::Crypt8',
 			       -key    => 'test key',
-			       -header => 'randomiv') };
+			       -header => 'randomiv',
+			       -nodeprecate=>1,
+		   ) };
 test(defined $crypt,"$@\nCan't continue!");
 exit 0 unless $crypt;
 
@@ -99,6 +106,7 @@ test($old_iv   eq $crypt->iv,    "original IV wasn't restored after decryption")
 $crypt = eval {Crypt::CBC->new(-cipher => 'Crypt::Crypt8',
 			       -key    => 'test key',
 			       -iv     => '01234567',
+			       -nodeprecate=>1,
 			       -header => 'none') };
 test(defined $crypt,"$@Can't continue!");
 exit 0 unless $crypt;
@@ -112,11 +120,13 @@ my $crypt2 = Crypt::CBC->new(-cipher => 'Crypt::Crypt8',
 			     -salt   => $crypt->salt,
 			     -key    => 'test key',
 			     -iv     => '01234567',
+			     -nodeprecate=>1,
 			     -header => 'none');
 test($crypt2->decrypt($ciphertext1) eq $plaintext,"decrypted ciphertext doesn't match plaintext");
 $crypt2 = Crypt::CBC->new(-cipher => 'Crypt::Crypt8',
 			  -key    => 'test key',
 			  -iv     => '76543210',
+			  -nodeprecate=>1,
 			  -header => 'none');
 test($crypt2->decrypt($ciphertext1) ne $plaintext,"decrypted ciphertext matches plaintext but shouldn't");
 test($crypt->iv  eq '01234567',"iv changed and it shouldn't have");
@@ -128,6 +138,7 @@ my $bad_key  = 'foo';
 $crypt = eval {Crypt::CBC->new(-cipher => 'Crypt::Crypt8',
 			       -key    => $good_key,
 			       -iv     => '01234567',
+			       -nodeprecate=>1,
 			       -pbkdf  => 'none'
 		   )};
 test(defined $crypt,"$@Can't continue!");
@@ -141,6 +152,7 @@ test(
 		       -header => 'randomiv',
 		       -key    => $bad_key,
 		       -iv     => '01234567',
+		       -nodeprecate=>1,
 		       -pbkdf  => 'none',
 	   )
        },
@@ -151,6 +163,7 @@ test(
 		       -header => 'randomiv',
 		       -key    => $good_key,
 		       -iv     => '01234567',
+		       -nodeprecate=>1,
 		       -pbkdf  => 'none',
 	   )
        },
@@ -161,6 +174,7 @@ test(
 		       -header => 'randomiv',
 		       -key    => $good_key,
 		       -iv     => '01234567891',
+		       -nodeprecate=>1,
 		       -pbkdf  => 'none'
 	   )
        },
@@ -170,6 +184,7 @@ test(
      !eval{
        Crypt::CBC->new(-cipher => 'Crypt::Crypt16',
 		       -header => 'randomiv',
+		       -nodeprecate=>1,
 		       -key    => 'test key')
        },
      "module allowed randomiv headers with a 16-bit blocksize cipher");
@@ -178,6 +193,7 @@ if (0) {
     $crypt =  Crypt::CBC->new(-cipher                  => 'Crypt::Crypt16',
 			      -header                  => 'randomiv',
 			      -key                     => 'test key',
+			      -nodeprecate             => 1,
 			      -insecure_legacy_decrypt => 1);
     test(defined $crypt,"module didn't honor the -insecure_legacy_decrypt flag:$@Can't continue!");
     exit 0 unless $crypt;
@@ -191,6 +207,7 @@ test(
      !defined eval {Crypt::CBC->new(-cipher                  => 'Crypt::Crypt16',
 				    -header                  => 'salt',
 				    -key                     => 'test key',
+				    -nodeprecate             => 1,
 				    -salt                    => 'bad bad salt!');
 		  },
      "module allowed setting of a bad salt");
@@ -199,6 +216,7 @@ test(
      defined eval {Crypt::CBC->new(-cipher                  => 'Crypt::Crypt16',
 				   -header                  => 'salt',
 				   -key                     => 'test key',
+				   -nodeprecate             => 1,
 				   -salt                    => 'goodsalt');
 		 },
      "module did not allow setting of a good salt");
@@ -207,12 +225,14 @@ test(
      Crypt::CBC->new(-cipher                  => 'Crypt::Crypt16',
 		     -header                  => 'salt',
 		     -key                     => 'test key',
+		     -nodeprecate             => 1,
 		     -salt                    => 'goodsalt')->salt eq 'goodsalt',
      "module did not allow setting and retrieval of a good salt");
 
 test(
      !defined eval {Crypt::CBC->new(-cipher                  => 'Crypt::Crypt16',
 				    -header                  => 'badheadermethod',
+				    -nodeprecate             => 1,
 				    -key                     => 'test key')},
      "module allowed setting of an invalid header method, and shouldn't have");
 
@@ -227,6 +247,7 @@ test(
 test(
      !defined eval {Crypt::CBC->new(-cipher                  => 'Crypt::Crypt16',
 				    -header                  => 'none',
+				    -nodeprecate             => 1,
 				    -iv                      => 'a'x16)
      },
      "module allowed initialization of header_mode 'none' without a key");
@@ -236,6 +257,7 @@ $crypt = eval {Crypt::CBC->new(-cipher         => 'Crypt::Crypt8',
 			       -header         => 'none',
 			       -key            => 'a'x56,
 			       -iv             => 'b'x8,
+			       -nodeprecate             => 1,
 			      ) };
 test(defined $crypt,"unable to create a Crypt::CBC object with the -literal_key option: $@");
 test($plaintext eq $crypt->decrypt($crypt->encrypt($plaintext)),'cannot decrypt encrypted data using -literal_key');
@@ -245,7 +267,7 @@ test($crypt->key eq 'a'x56,'key should match provided -key argument when -litera
 # test behavior of pbkdf option
 test($crypt->pbkdf eq 'none','PBKDF should default to "none" when -literal_key provided, but got '.$crypt->pbkdf);
 
-$crypt = eval {Crypt::CBC->new(-cipher  => 'Crypt::Crypt8',-pass=>'very secret')} or warn $@;
+$crypt = eval {Crypt::CBC->new(-cipher  => 'Crypt::Crypt8',-pass=>'very secret',-nodeprecate=>1)} or warn $@;
 test($crypt->pbkdf eq 'opensslv1','PBKDF should default to "opensslv1", but got '.$crypt->pbkdf);
 
 $crypt = eval {Crypt::CBC->new(-cipher  => 'Crypt::Crypt8',-pass=>'very secret',-pbkdf=>'pbkdf2')} or warn $@;
@@ -300,6 +322,14 @@ $crypt = eval {Crypt::CBC->new(-cipher => 'Crypt::Crypt8',
 			       -salt   => '76543210')} or warn $@;
 $crypt->set_key_and_iv();
 test($crypt->key ne $key,"key didn't change when salt was changed");
+$crypt = eval {
+    Crypt::CBC->new(-cipher => 'Crypt::Crypt8',
+		    -key    => 'xyz',
+		    -header => 'salt',
+		    -salt   => 1);
+};
+test($crypt,"-salt=>1 is generating an exception: $@");
+
 exit 0;
 
 my $number = 1;

@@ -1,13 +1,12 @@
 package Crypt::CBC;
 
 use strict;
-use Carp;
-use Math::BigInt;
+use Carp 'croak','carp';
 use Crypt::CBC::PBKDF;
 use bytes;
 use vars qw($VERSION);
 no warnings 'uninitialized';
-$VERSION = '3.00';
+$VERSION = '3.01';
 
 use constant RANDOM_DEVICE      => '/dev/urandom';
 use constant DEFAULT_PBKDF      => 'opensslv1';
@@ -20,6 +19,7 @@ my @valid_options = qw(
     keysize
     chain_mode
     pbkdf
+    nodeprecate
     iter
     hasher
     header
@@ -47,7 +47,8 @@ sub new {
     my ($pass,$iv,$salt,$key,
 	$random_salt,$random_iv) = $class->_get_key_materials($options);
     my $padding                  = $class->_get_padding_mode($bs,$options);
-    my ($pbkdf,$iter,$hc)        = $class->_get_key_derivation_options($options,$header_mode);
+    my ($pbkdf,$iter,
+	$hc,$nodeprecate)        = $class->_get_key_derivation_options($options,$header_mode);
     my $chain_mode               = $class->_get_chain_mode($options);
 
     ### CONSISTENCY CHECKS ####
@@ -60,10 +61,7 @@ sub new {
     croak "Initialization vector must be exactly $bs bytes long when using the $cipher cipher" 
 	if defined $iv and length($iv) != $bs;
 
-    croak "Salt must be exactly 8 bytes long"
-	if defined $salt && length $salt != 8;
-    
-    # chaing mode check
+    # chaining mode check
     croak "invalid cipher block chain mode: $chain_mode"
 	unless $class->can("_${chain_mode}_encrypt");
 
@@ -88,23 +86,25 @@ sub new {
     croak "If a -header mode of 'randomiv' is provided, then the -pbkdf key derivation function must be 'randomiv' or undefined"
 	if $header_mode eq 'randomiv' and $pbkdf ne 'randomiv';
 
-    return bless {'cipher'      => $cipher,
-		  'passphrase'  => $pass,
-		  'key'         => $key,
-		  'iv'          => $iv,
-		  'salt'        => $salt,
-		  'padding'     => $padding,
-		  'blocksize'   => $bs,
-		  'keysize'     => $ks,
-                  'header_mode' => $header_mode,
-		  'literal_key' => $literal_key,
-		  'chain_mode'  => $chain_mode,    
-		  'make_random_salt' => $random_salt,
-  	          'make_random_iv'   => $random_iv,
-		  'pbkdf'       => $pbkdf,
-	          'iter'        => $iter,
-		  'hasher'      => $hc,
-		  },$class;
+    return bless {
+	'cipher'      => $cipher,
+	    'passphrase'  => $pass,
+	    'key'         => $key,
+	    'iv'          => $iv,
+	    'salt'        => $salt,
+	    'padding'     => $padding,
+	    'blocksize'   => $bs,
+	    'keysize'     => $ks,
+	    'header_mode' => $header_mode,
+	    'literal_key' => $literal_key,
+	    'chain_mode'  => $chain_mode,    
+	    'make_random_salt' => $random_salt,
+	    'make_random_iv'   => $random_iv,
+	    'pbkdf'        => $pbkdf,
+	    'iter'         => $iter,
+	    'hasher'       => $hc,
+	    'nodeprecate'  => $nodeprecate,
+    },$class;
 }
 
 sub filehandle {
@@ -152,8 +152,10 @@ sub start (\$$) {
     my $operation = shift;
     croak "Specify <e>ncryption or <d>ecryption" unless $operation=~/^[ed]/i;
 
-    $self->{'buffer'}  = '';
+    delete $self->{'civ'};
+    $self->{'buffer'} = '';
     $self->{'decrypt'} = $operation=~/^d/i;
+    $self->_deprecation_warning;
 }
 
 sub chain_mode { shift->{chain_mode} || 'cbc' }
@@ -425,8 +427,9 @@ sub _get_key_derivation_options {
 
     # hasher
     my $hc = $options->{hasher};
+    my $nodeprecate = $options->{nodeprecate};
     
-    return ($pbkdf,$iter,$hc);
+    return ($pbkdf,$iter,$hc,$nodeprecate);
 }
 
 sub _get_chain_mode {
@@ -439,9 +442,22 @@ sub _get_chain_mode {
 
 sub _load_module {
     my $self   = shift;
-    my $module = shift;
-    return 1 if eval "defined \$$a\:\:VERSION";
-    return eval "use $module; 1";
+    my ($module,$args) = @_;
+    return 1 if eval "\$$module\:\:VERSION";
+    return eval "use $module $args; 1;";
+}
+
+sub _deprecation_warning {
+    my $self = shift;
+    return if $self->nodeprecate;
+    return if $self->{decrypt};
+    my $pbkdf = $self->pbkdf;
+    carp <<END if $pbkdf =~ /^(opensslv1|randomiv)$/;
+WARNING: The key derivation method "$pbkdf" is deprecated. Using -pbkdf=>'pbkdf2' would be better.
+Pass -nodeprecate=>1 to inhibit this message.
+END
+
+
 }
 
 ######################################### chaining mode methods ################################3
@@ -525,14 +541,22 @@ sub _ctr_encrypt {
     my ($crypt,$iv,$result,$blocks) = @_;
 
     $self->_upgrade_iv_to_ctr($iv);
+    my $bs    = $self->blocksize;
 
     foreach my $plaintext (@$blocks) {
-	my $ciphertext = $plaintext ^ ($crypt->encrypt(($$iv++)->as_bytes));
+	my $bytes = ($$iv++)->as_bytes;
+	
+	# pad with leading nulls if there are insufficient bytes
+	# (there's gotta be a better way to do this)
+	if ($bs > length $bytes) {
+	    substr($bytes,0,0) = "\000"x($bs-length $bytes) ;
+	}
+
+	my $ciphertext = $plaintext ^ ($crypt->encrypt($bytes));
 	substr($ciphertext,length $plaintext) = '';  # truncate
 	$$result      .= $ciphertext;
     }
 }
-
 
 *_ctr_decrypt = \&_ctr_encrypt; # same code
 
@@ -542,7 +566,7 @@ sub _upgrade_iv_to_ctr {
     my $self = shift;
     my $iv   = shift;  # this is a scalar reference
 
-    $self->_load_module('Math::BigInt')
+    $self->_load_module('Math::BigInt',"lib => 'GMP'")
 	or croak "Optional Math::BigInt module must be installed to use the CTR chaining method";
     
     # convert IV into a Math::BigInt object if it is not already
@@ -854,7 +878,8 @@ sub blocksize { shift->{blocksize} }
 sub pcbc      { shift->{pcbc}      }
 sub header_mode {shift->{header_mode} }
 sub literal_key {shift->{literal_key}}
-
+sub nodeprecate {shift->{nodeprecate}}
+		
 1;
 __END__
 
@@ -901,9 +926,9 @@ Crypt::CBC - Encrypt Data with Cipher Block Chaining Mode
 
 This module is a Perl-only implementation of the cryptographic cipher
 block chaining mode (CBC).  In combination with a block cipher such as
-DES or IDEA, you can encrypt and decrypt messages of arbitrarily long
-length.  The encrypted messages are compatible with the encryption
-format used by the B<OpenSSL> package.
+AES or Blowfish, you can encrypt and decrypt messages of arbitrarily
+long length.  The encrypted messages are compatible with the
+encryption format used by the B<OpenSSL> package.
 
 To use this module, you will first create a Crypt::CBC cipher object
 with new().  At the time of cipher creation, you specify an encryption
@@ -919,14 +944,6 @@ operate on a whole data value at once.
   $cipher = Crypt::CBC->new( -pass   => 'my secret key',
 			     -cipher => 'Cipher::AES',
 			   );
-
-  # or (for compatibility with versions prior to 2.13)
-  $cipher = Crypt::CBC->new( {
-                              pass   => 'my secret key',
-			      cipher => 'Cipher::AES'
-                             }
-			   );
-
 
   # or (for compatibility with versions prior to 2.0)
   $cipher = new Crypt::CBC('my secret key' => 'Cipher::AES');
@@ -1091,15 +1108,16 @@ warning.
 
 The B<-pbkdf> argument specifies the algorithm used to derive the true
 key and IV from the provided passphrase (PBKDF stands for
-"passphrase-based key derivation function"). The default option is
-"opensslv1", which derives the key by combining a random salt values
-with the passphrase via a series of MD5 hashes. This is was OpenSSL's
-default key derivation algorithm through version 1.0.2. Other options
-are:
+"passphrase-based key derivation function"). Valid values are:
 
-   "opensslv2" -- a slightly improved version that uses SHA-256 rather
-                  than MD5, and has been OpenSSL's default since v1.1.0. It has
-                  been deprecated since OpenSSL v1.1.1.
+   "opensslv1" -- [default] A fast algorithm that derives the key by 
+                  combining a random salt values with the passphrase via
+                  a series of MD5 hashes.
+
+   "opensslv2" -- an improved version that uses SHA-256 rather
+                  than MD5, and has been OpenSSL's default since v1.1.0. 
+                  However, it has been deprecated in favor of pbkdf2 
+                  since OpenSSL v1.1.1.
 
    "pbkdf2"    -- a better algorithm implemented in OpenSSL v1.1.1,
                   described in RFC 2898 L<https://tools.ietf.org/html/rfc2898>
@@ -1108,7 +1126,22 @@ are:
                   as the literal key. This is the same as B<-literal_key> true.
 
    "nosalt"    -- an insecure key derivation method used by prehistoric versions
-                  of OpenSSL, provided for backward compatibility.
+                  of OpenSSL, provided for backward compatibility. Don't use.
+
+"opensslv1" was OpenSSL's default key derivation algorithm through
+version 1.0.2, but is susceptible to dictionary attacks and is no
+longer supported. It remains the default for Crypt::CBC in order to
+avoid breaking compatibility with previously-encrypted messages. Using
+this option will issue a deprecation warning when initiating
+encryption. You can suppress the warning by passing a true value to
+the B<-nodeprecate> option.
+
+It is recommended to specify the "pbkdf2" key derivation algorithm
+when compatibility with older versions of Crypt::CBC is not
+needed. This algorithm is deliberately computationally expensive in
+order to make dictionary-based attacks harder. As a result, it
+introduces a slight delay before an encryption or decryption
+operation starts.
 
 The B<-iter> argument is used in conjunction with the "pbkdf2" key
 derivation option. Its value indicates the number of hashing cycles
@@ -1188,12 +1221,15 @@ block chaining modes. Values are:
               plaintext, and error correction algorithms can be used to reconstruct
               the damaged part.
 
-   'ctr'  -- Counter Mode. This mode uses a one-time "nonce" instead of an IV. The
-              nonce is incremented by one for each block of plain or ciphertext,
-              encrypted using the chosen algorithm, and then applied to the block
-              of text. If one bit of the input text is damaged,
-              it only affects 1 bit of the output text. To use CTR mode you will
-              need to install the Perl Math::BigInt module.
+   'ctr' -- Counter Mode. This mode uses a one-time "nonce" instead of
+              an IV. The nonce is incremented by one for each block of
+              plain or ciphertext, encrypted using the chosen
+              algorithm, and then applied to the block of text. If one
+              bit of the input text is damaged, it only affects 1 bit
+              of the output text. To use CTR mode you will need to
+              install the Perl Math::BigInt module. I recommend
+              installing Math::BigInt::GMP as well in order to avoid a
+              large performance hit.
 
 Passing a B<-pcbc> argument of true will have the same effect as
 -chaining_mode=>'pcbc', and is included for backward
@@ -1448,6 +1484,23 @@ _null_padding(), or _oneandzeroes_padding() in the source for examples.
 Standard and oneandzeroes padding are recommended, as both space and
 null padding can potentially truncate more characters than they should. 
 
+=head1 Comparison to Crypt::Mode::CBC
+
+The L<CryptX> modules L<Crypt::Mode::CBC>, L<Crypt::Mode::OFB>,
+L<Crypt::Mode::CFB>, and L<Crypt::Mode::CTR> provide fast
+implementations of the respective cipherblock chaining modes (roughly
+5x the speed of Crypt::CBC). Crypt::CBC was designed to encrypt and
+decrypt messages in a manner compatible with OpenSSL's "enc"
+function. Hence it handles the derivation of the key and IV from a
+passphrase using the same conventions as OpenSSL, and it writes out an
+OpenSSL-compatible header in the encrypted message in a manner that
+allows the key and IV to be regenerated during decryption.
+
+In contrast, the CryptX modules do not automatically derive the key
+and IV from a passphrase or write out an encrypted header. You will
+need to derive and store the key and IV by other means (e.g. with
+CryptX's Crypt::KeyDerivation module, or with Crypt::PBKDF2).
+
 =head1 EXAMPLES
 
 Three examples, aes.pl, des.pl and idea.pl can be found in the eg/
@@ -1461,9 +1514,8 @@ versions of Crypt::CBC, and use the older "opensslv1" algorithm.
 =head1 LIMITATIONS
 
 The encryption and decryption process is about a tenth the speed of
-the equivalent SSLeay programs (compiled C).  This could be improved
-by implementing this module in C.  It may also be worthwhile to
-optimize the DES and IDEA block algorithms further.
+the equivalent OpenSSL tool and about a fifth of the Crypt::Mode::CBC
+module (both which use compiled C).
 
 =head1 BUGS
 
@@ -1478,6 +1530,8 @@ same terms as Perl itself.
 
 =head1 SEE ALSO
 
-perl(1), Crypt::Cipher(3), Crypt::FileHandle, Crypt::Blowfish(3)
+perl(1), CryptX, Crypt::FileHandle, Crypt::Cipher::AES,
+Crypt::Blowfish, Crypt::CAST5, Crypt::DES, Crypt::IDEA,
+Crypt::Rijndael
 
 =cut

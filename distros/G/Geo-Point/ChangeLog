@@ -1,5 +1,13 @@
 Revision history for Perl extension Geo::Point
 
+version 0.99: Tue Feb  9 20:46:26 CET 2021
+
+	Changes:
+	- use GIS::Distance to replace deprecated Geo::Distance [Aran Deltac]
+
+	Fixes:
+	- distance computation reversed coordinates [Aran Deltac]
+
 version 0.98: Fri Feb  1 23:31:14 CET 2019
 
 	Fixes:

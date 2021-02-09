@@ -2,17 +2,11 @@
 
 =encoding utf8
 
-=for HTML <a href="https://travis-ci.org/briandfoy/pod-wordml"><img src="https://travis-ci.org/briandfoy/pod-wordml.svg?branch=master" /></a>
-
-=for HTML <a href='https://ci.appveyor.com/project/briandfoy/pod-wordml'><img src='https://ci.appveyor.com/api/projects/status/dbgen56rlgilgma5'></a>
-
-=for HTML <a href='https://coveralls.io/github/briandfoy/pod-wordml?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/pod-wordml/badge.svg?branch=master' alt='Coverage Status' /></a>
-
-=for HTML <a href="https://github.com/briandfoy/pod-wordml/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/pod-wordml.svg" /></a>
-
-=for HTML <a href="http://www.metacpan.org/module/Pod::WordML"><img src="https://img.shields.io/cpan/v/pod-wordml.svg" /></A>
-
 =head1 The Pod::WordML module
+
+This is an abandoned module. You can adopt it if you like:
+
+	https://pause.perl.org/pause/authenquery?ACTION=pause_04about#takeover
 
 This is the I<README> for the L<Pod::WordML> Perl module. I created
 this module to help write L<Effective Perl Programming|https://www.effectiveperlprogramming.com>
@@ -40,16 +34,8 @@ name instead of the file location:
 	% perldoc Pod::WordML
 
 You can read the documentation and inspect the meta data on one of the
-CPAN web interfaces, such as L<CPAN Search|http://search.cpan.org/dist/Pod-WordML> or
-L<MetaCPAN|http://www.metacpan.org/module/Pod::WordML>:
-
-=over 4
-
-=item *	L<http://search.cpan.org/dist/Pod-WordML>
-
-=item *	L<http://www.metacpan.org/module/Pod::WordML>
-
-=back
+CPAN web interfaces, such as
+L<MetaCPAN|http://www.metacpan.org/module/Pod::WordML>.
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's
@@ -88,33 +74,9 @@ the source repository:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/pod-wordml>
+=item *	L<https://github.com/CPAN-Adoptable-Modules/pod-wordml>
 
 =back
-
-If you find a problem, file a ticket in the L<issue
-tracker|https://github.com/briandfoy/pod-wordml/issues>:
-
-=over 4
-
-=item *	L<https://github.com/briandfoy/pod-wordml/issues>
-
-=back
-
-=head2 Getting help
-
-Although I'm happy to hear from module users in private email,
-that's the best way for me to forget to do something.
-
-Besides the issue trackers, you can find help at
-L<Perlmonks|http://www.perlmonks.org> or
-L<Stackoverflow|http://www.stackoverflow.com>, both of which have many
-competent Perlers who can answer your question, almost in real time.
-They might not know the particulars of this module, but they can help
-you diagnose your problem.
-
-You might like to read L<brian's Guide to Solving Any Perl
-Problem|http://archive.oreilly.com/pub/a/perl/excerpts/9780596527242/brians-guide.html>.
 
 =head2 Copyright and License
 

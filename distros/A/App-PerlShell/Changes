@@ -1,5 +1,9 @@
 Revision history for Perl Shell.
 
+1.07  Thu Mar 26 10:05:00 2020
+    - `perldoc` command added and `ls` updated for multiple options
+    - Better COMMAND definition in hash for EXPORT and `help`
+
 1.06  Tue Mar 10 23:05:00 2020
     - Unbalanced ({[]}) can now execute with single semicolon ";" at 
       "More?" prompt

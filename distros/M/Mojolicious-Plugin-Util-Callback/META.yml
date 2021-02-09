@@ -22,7 +22,8 @@ requires:
   Mojolicious: '3.43'
   perl: '5.010001'
 resources:
+  bugtracker: https://github.com/Akron/Mojolicious-Plugin-Util-Callback/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: https://github.com/Akron/Mojolicious-Plugin-Util-Callback
-version: '0.06'
+  repository: https://github.com/Akron/Mojolicious-Plugin-Util-Callback.git
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

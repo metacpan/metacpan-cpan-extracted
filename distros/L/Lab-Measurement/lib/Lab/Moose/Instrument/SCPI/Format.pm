@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Format;
-$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.740';
+$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.741';
 #ABSTRACT: Role for SCPI FORMat subsystem.
 
 use v5.20;
@@ -76,7 +76,7 @@ Lab::Moose::Instrument::SCPI::Format - Role for SCPI FORMat subsystem.
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 METHODS
 

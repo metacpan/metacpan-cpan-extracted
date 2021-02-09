@@ -1,0 +1,21 @@
+# Bundled in other distros
+DBIx::Class::Core
+DBIx::Class::ResultSet
+DBIx::Class::Schema
+DBIx::Class::Storage::DBI::mysql
+Path::Class::File
+Test2::Bundle::More
+Test2::Tools::Compare
+Test2::Tools::Exception
+Test2::Tools::Explain
+
+# Indirect requirements
+DBD::mysql
+DBI
+DBIx::Class
+Path::Class
+Test2::Suite
+
+# Part of t/lib
+CDTest
+CDTest::Schema

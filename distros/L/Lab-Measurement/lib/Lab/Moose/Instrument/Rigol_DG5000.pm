@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Rigol_DG5000;
-$Lab::Moose::Instrument::Rigol_DG5000::VERSION = '3.740';
+$Lab::Moose::Instrument::Rigol_DG5000::VERSION = '3.741';
 #ABSTRACT: Rigol DG5000 series Function/Arbitrary Waveform Generator
 
 use v5.20;
@@ -366,7 +366,7 @@ Lab::Moose::Instrument::Rigol_DG5000 - Rigol DG5000 series Function/Arbitrary Wa
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 SYNOPSIS
 

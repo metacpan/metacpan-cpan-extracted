@@ -22,7 +22,8 @@ requires:
   Mojolicious: '4.88'
   perl: '5.010001'
 resources:
+  bugtracker: https://github.com/Akron/Mojolicious-Plugin-Util-Endpoint/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: https://github.com/Akron/Mojolicious-Plugin-Util-Endpoint
-version: '0.21'
+  repository: https://github.com/Akron/Mojolicious-Plugin-Util-Endpoint.git
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

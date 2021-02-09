@@ -1,9 +1,8 @@
-Build.PL
 CHANGES
-coverage.txt
 lib/List/Uniq.pm
 Makefile.PL
 MANIFEST
+META.json
 META.yml
 README
 t/01_use.t

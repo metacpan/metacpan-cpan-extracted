@@ -1,0 +1,63 @@
+Changelog for DBIx-Class-Helper-ResultSet-MySQLHacks
+
+v1.0.0 2021-02-09T19:42:26
+ - No changes found
+
+v0.0.6 2020-05-15T15:45:54
+ - PEX-15723: Fix bug in is_dbi_error_retryable that mutated the exception
+   object (Brendan Byrd)
+
+v0.0.5 2020-03-13T15:08:10
+ - PEX-12534c: DRY out the target running code in _blockrunner_do (Brendan
+   Byrd)
+ - PEX-12534c: Protect any _connect calls, including the initial
+   connection, with a retry cycle (Brendan Byrd)
+ - PEX-12534c: Protect ensure_connected call with an eval inside the retry
+   handler (Brendan Byrd)
+
+v0.0.4 2020-02-27T20:15:20
+ - PEX-12534b: Use $storage->dbh in unit test to ensure we always get a
+   live $dbh (Brendan Byrd)
+ - PEX-12534b: Add DRY code for timeout string sets (Brendan Byrd)
+ - PEX-12534b: Make sure the coderef arguments are the same ones documented
+   in DBIC (Brendan Byrd)
+ - PEX-12534b: Move certain aggressive timeouts to a new
+   aggressive_timeouts boolean (Brendan Byrd)
+
+v0.0.3 2020-02-20T16:54:25
+ - TS-57605: Account for TCB's quote_names while removing the "UPDATE DUAL"
+   piece (Brendan Byrd)
+
+v0.0.2 2020-02-14T00:35:29
+ - PEX-12534a: Move stub module to match the distro name (Brendan Byrd)
+
+v0.0.1 2020-02-06T21:57:52
+ - PEX-12534: Fix the max_attempts exception check to be a tad looser
+   (Brendan Byrd)
+ - PEX-12534: Make Retryable.t pass against a (default) SQLite DB (Brendan
+   Byrd)
+ - Update dist files (Andrew Hewus Fresh)
+ - PEX-12534: Add Test2::Tools::Explain to test requires (Brendan Byrd)
+ - PEX-12534: Add in some missing POD sections (Brendan Byrd)
+ - PEX-12534: Factor in the exponential backoff when figuring out if sleep
+   gets called (Brendan Byrd)
+ - PEX-12534: Add large warning for coderef-based connect_info (Brendan
+   Byrd)
+ - PEX_12534: Add extra comments for MySQLHacks (Brendan Byrd)
+ - PEX-12534: Switch to ABSTRACT/VERSION comments for DZIL in MySQLHacks
+   (Brendan Byrd)
+ - PEX-12534: Add the usual localization of $@ and __DIE__ (Brendan Byrd)
+ - PEX-12534: Fix cpanfile deps (Brendan Byrd)
+ - PEX-12534: Create dummy DBIx::Class::MySQL module (Brendan Byrd)
+ - PEX-12534: Add unit tests for Retryable (Brendan Byrd)
+ - PEX-12534: Add DBIx::Class::Storage::DBI::mysql::Retryable (Brendan
+   Byrd)
+ - PEX-12534: Add new unit test for MySQLHacks (Brendan Byrd)
+ - PEX-12534: Import the DBIx::* CDTest test files including Helper
+   additions (Brendan Byrd)
+ - PEX-12534: Use a more accurate column_info hash in multi_table_update
+   (Brendan Byrd)
+ - PEX-12534: Fix crashes from multi_table_update for users of
+   prune_unused_joins (Brendan Byrd)
+ - PEX-12534: Port MySQLHacks from gsg-epay to dbic-mysql (Brendan Byrd)
+ - Initial commit (Brendan Byrd)

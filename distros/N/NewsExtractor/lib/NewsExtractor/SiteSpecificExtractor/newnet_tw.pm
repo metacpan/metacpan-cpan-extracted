@@ -3,7 +3,7 @@ use utf8;
 use Moo;
 extends 'NewsExtractor::GenericExtractor';
 
-use Importer 'NewsExtractor::TextUtil' => qw( reformat_dateline u );
+use Importer 'NewsExtractor::TextUtil' => qw( reformat_dateline );
 
 sub headline {
     my ($self) = @_;

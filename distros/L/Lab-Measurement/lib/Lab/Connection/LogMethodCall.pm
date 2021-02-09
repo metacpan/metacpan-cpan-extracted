@@ -1,6 +1,6 @@
 package Lab::Connection::LogMethodCall;
 #ABSTRACT: ???
-$Lab::Connection::LogMethodCall::VERSION = '3.740';
+$Lab::Connection::LogMethodCall::VERSION = '3.741';
 use v5.20;
 
 use warnings;
@@ -76,7 +76,7 @@ Lab::Connection::LogMethodCall - ???
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 COPYRIGHT AND LICENSE
 

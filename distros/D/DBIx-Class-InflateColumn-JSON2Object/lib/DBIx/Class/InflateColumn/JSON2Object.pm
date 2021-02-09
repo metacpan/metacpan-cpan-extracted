@@ -1,7 +1,7 @@
 package DBIx::Class::InflateColumn::JSON2Object;
 
 # ABSTRACT: convert JSON columns to Perl objects
-our $VERSION = '0.906'; # VERSION
+our $VERSION = '0.907'; # VERSION
 
 use strict;
 use warnings;
@@ -183,7 +183,7 @@ DBIx::Class::InflateColumn::JSON2Object - convert JSON columns to Perl objects
 
 =head1 VERSION
 
-version 0.906
+version 0.907
 
 =head1 SYNOPSIS
 

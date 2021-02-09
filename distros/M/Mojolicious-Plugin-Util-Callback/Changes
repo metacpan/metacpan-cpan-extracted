@@ -1,3 +1,6 @@
+0.07 2021-02-09
+        - Move bugtracker to GitHub.
+
 0.06 2018-11-01
         - Changed permission of non-executable files.
         - Fix memory leak in callback helper.

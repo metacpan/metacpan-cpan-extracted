@@ -1,5 +1,10 @@
 Revision history for DBIx-Class-InflateColumn-JSON2Object
 
+0.907     2021-02-09 15:43:25+01:00
+    - seems that type_contraint can be empty, so check for that to
+      prevent warnings(Thomas Klausner)
+
+
 0.906     2021-01-08 22:56:45+01:00
     - dist housekeeping, Dist::Zilla::PluginBundle::Author::DOMM
 

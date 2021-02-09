@@ -10,7 +10,7 @@ use Wikibase::Datatype::Value::Property;
 
 Readonly::Array our @EXPORT_OK => qw(obj2struct struct2obj);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 sub obj2struct {
 	my $obj = shift;
@@ -26,7 +26,7 @@ sub obj2struct {
 	$numeric_id =~ s/^P//ms;
 	my $struct_hr = {
 		'value' => {
-			'entity-type' => 'property',
+			'entity-type' => $obj->type,
 			'id' => $obj->value,
 			'numeric-id' => $numeric_id,
 		},
@@ -40,8 +40,11 @@ sub struct2obj {
 	my $struct_hr = shift;
 
 	if (! exists $struct_hr->{'type'}
+		|| ! defined $struct_hr->{'type'}
 		|| $struct_hr->{'type'} ne 'wikibase-entityid'
+		|| ! exists $struct_hr->{'value'}
 		|| ! exists $struct_hr->{'value'}->{'entity-type'}
+		|| ! defined $struct_hr->{'value'}->{'entity-type'}
 		|| $struct_hr->{'value'}->{'entity-type'} ne 'property') {
 
 		err "Structure isn't for 'property' datatype.";
@@ -208,6 +211,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

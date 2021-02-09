@@ -183,7 +183,7 @@ sub readcontigstripdata {
     my $rowsperstrip = $tif->GetField(TIFFTAG_ROWSPERSTRIP);
     for ( my $row = 0 ; $row < $h ; $row += $rowsperstrip )
     {    ## no critic (ProhibitCStyleForLoops)
-        my $nrow = ( $row + $rowsperstrip > $h ? $h - $row : $rowsperstrip );
+        my $nrow  = ( $row + $rowsperstrip > $h ? $h - $row : $rowsperstrip );
         my $strip = $tif->ComputeStrip( $row, 0 );
         if (
             not( my $buf = $tif->ReadEncodedStrip( $strip, $nrow * $scanline ) )
@@ -252,7 +252,7 @@ sub readrawdata {
     my ( $tif, $bitrev ) = @_;
 
     my $nstrips = $tif->NumberOfStrips();
-    my $what = $tif->IsTiled() ? 'Tile' : 'Strip';
+    my $what    = $tif->IsTiled() ? 'Tile' : 'Strip';
 
     my @stripbc = $tif->GetField(TIFFTAG_STRIPBYTECOUNTS);
     if ( $nstrips > 0 ) {

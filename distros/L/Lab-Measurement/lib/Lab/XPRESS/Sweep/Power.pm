@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Power;
 #ABSTRACT: Signal generator power sweep
-$Lab::XPRESS::Sweep::Power::VERSION = '3.740';
+$Lab::XPRESS::Sweep::Power::VERSION = '3.741';
 use v5.20;
 
 use Lab::XPRESS::Sweep;
@@ -97,7 +97,7 @@ Lab::XPRESS::Sweep::Power - Signal generator power sweep
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 SYNOPSIS
 

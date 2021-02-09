@@ -20,10 +20,10 @@ no_index:
     - t
 requires:
   BSD::Resource: '0'
-  Cpanel::JSON::XS: '4.09'
   File::Map: '0'
   File::Temp: '0.2308'
   Mojolicious: '8.50'
+  Sereal: '0'
   perl: '5.016'
 resources:
   IRC:
@@ -33,5 +33,5 @@ resources:
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/mojo-status.git
-version: '1.13'
+version: '1.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

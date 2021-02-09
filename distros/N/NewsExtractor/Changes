@@ -1,3 +1,6 @@
+v0.40.0 2021-02-09T09:55:29+0900
+  - Improve UDN extractor and let paragraphs be split correctly
+
 v0.39.0 2020-08-23T22:19:18+0900
   - Improve the extraction of dateline of www.idn.com.tw
   - Add a site-specific extractor for www.bbc.com

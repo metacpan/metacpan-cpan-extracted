@@ -1,5 +1,5 @@
 package Lab::Measurement;
-$Lab::Measurement::VERSION = '3.740';
+$Lab::Measurement::VERSION = '3.741';
 #ABSTRACT: Log, describe and plot data on the fly
 
 use v5.20;
@@ -32,7 +32,7 @@ Lab::Measurement - Log, describe and plot data on the fly
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 SYNOPSIS
 

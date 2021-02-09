@@ -1,4 +1,10 @@
 Revision history for Perl extension Crypt::CBC.
+3.01
+	- Warn when the deprecated opensslv1 PBKDF (key derivation function) is used
+	  for encryption. Turn off with -nodeprecate=>1 or by choosing a different
+	  PBKDF, such as -pbkdf=>'pbkdf2'.
+	- Fix a regression when passing the legacy -salt=>1 argument.
+	
 3.00    Sun Feb  7 10:28:08 EST 2021
         - Released version 3.00 in recognition of multiple new features
 	  and cleanups.

@@ -8,7 +8,7 @@ use warnings;
 
 use lib qw(. lib tests ../MathPolygon/lib ../../MathPolygon/lib);
 
-use Test::More tests => 43;
+use Test::More tests => 44;
 
 use Geo::Point;
 use Geo::Proj;
@@ -99,7 +99,13 @@ is_deeply([$p->bbox], [ 5,4, 5,4 ]);
 
 my $p1 = $gp->latlong(0, 1);
 my $p2 = $gp->latlong(1, 1);
-cmp_ok(abs($p1->distance($p2, 'nautical mile') - 60), '<', 0.1);
+cmp_ok(abs($p1->distance($p2, 'nautical_mile') - 60), '<', 0.1);
+
+cmp_ok(
+  $p1->distance($p2, 'degrees'),
+  '>',
+  $p1->distance($p2, 'radians'),
+);
 
 isnt($p1->distance($p2, 'degrees'), 0);
 isnt($p1->distance($p2, 'radians'), 0);

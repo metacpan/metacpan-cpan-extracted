@@ -1,6 +1,6 @@
 package Lab::MultiChannelInstrument::DeviceCache;
 #ABSTRACT: Multi-channel instrument device cache
-$Lab::MultiChannelInstrument::DeviceCache::VERSION = '3.740';
+$Lab::MultiChannelInstrument::DeviceCache::VERSION = '3.741';
 use v5.20;
 
 use warnings;
@@ -56,7 +56,7 @@ Lab::MultiChannelInstrument::DeviceCache - Multi-channel instrument device cache
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 COPYRIGHT AND LICENSE
 

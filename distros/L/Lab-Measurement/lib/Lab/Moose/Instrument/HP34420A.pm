@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP34420A;
-$Lab::Moose::Instrument::HP34420A::VERSION = '3.740';
+$Lab::Moose::Instrument::HP34420A::VERSION = '3.741';
 #ABSTRACT: HP 34420A nanovolt meter.
 
 use v5.20;
@@ -89,7 +89,7 @@ Lab::Moose::Instrument::HP34420A - HP 34420A nanovolt meter.
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 SYNOPSIS
 

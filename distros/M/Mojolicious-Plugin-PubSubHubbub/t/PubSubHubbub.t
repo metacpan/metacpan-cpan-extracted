@@ -220,6 +220,7 @@ is($topics->[0], 'http://sojolicio.us/2/blog',
    'Filtered topics in RSS 3');
 is($dom->find('item')->size, 1, 'Filtered topics in RSS 4');
 
+
 # find topics in atom
 $dom = $dom->parse($atom);
 $topics = Mojolicious::Plugin::PubSubHubbub::_find_topics('atom', $dom);
@@ -266,7 +267,7 @@ my $app = $t->app;
 $app->plugin('PubSubHubbub', { hub => '/hub'});
 
 
-$app->routes->route('/push')->pubsub;
+$app->routes->any('/push')->pubsub;
 
 $t->get_ok('/push')
   ->content_type_like(qr{^text/html})
@@ -360,7 +361,6 @@ $t->post_ok('/push' => {'Content-Type' => 'application/rss+xml'} => $rss)
   ->content_type_like(qr{^text/plain})
   ->status_is(204);
 
-
 # Next request
 $request_count++;
 
@@ -414,7 +414,7 @@ $t->post_ok('/push' => {'Content-Type' => 'application/atom+xml',
 # Test subscribing
 $request_count = 1;
 
-$app->routes->route('/hub')
+$app->routes->any('/hub')
   ->to(
     cb => sub {
       my $c = shift;
@@ -679,8 +679,8 @@ ok($app->pubsub->publish('http://sojolicio.us/blog.xml'),
 
 $request_count = 6;
 
-$app->routes->route('/blog.xml')->name('blog_route');
-$app->routes->route('/comments.xml')->endpoint('comment_route');
+$app->routes->any('/blog.xml')->name('blog_route');
+$app->routes->any('/comments.xml')->endpoint('comment_route');
 
 ok($app->pubsub->publish('blog_route','comment_route'),
    'Publication set');

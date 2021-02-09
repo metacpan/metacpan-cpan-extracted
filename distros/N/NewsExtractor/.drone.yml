@@ -40,6 +40,15 @@ steps:
       - ls -l
 
   - &install_with_cpanm
+    name: Install (perl 5.32)
+    depends_on:
+      - Build
+    image: perl:5.32
+    commands:
+      - echo *.tar.gz
+      - cpanm -q *.tar.gz
+
+  - &install_with_cpanm
     name: Install (perl 5.30)
     depends_on:
       - Build

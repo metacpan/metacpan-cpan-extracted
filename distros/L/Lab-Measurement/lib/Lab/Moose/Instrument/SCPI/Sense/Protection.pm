@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Protection;
-$Lab::Moose::Instrument::SCPI::Sense::Protection::VERSION = '3.740';
+$Lab::Moose::Instrument::SCPI::Sense::Protection::VERSION = '3.741';
 #ABSTRACT: Role for the SCPI SENSe:$function:Protection subsystem
 
 use v5.20;
@@ -79,7 +79,7 @@ Lab::Moose::Instrument::SCPI::Sense::Protection - Role for the SCPI SENSe:$funct
 
 =head1 VERSION
 
-version 3.740
+version 3.741
 
 =head1 METHODS
 

@@ -3,7 +3,7 @@ NAME
     sequences
 
 VERSION
-    This document describes version 0.004 of Array::OverlapFinder (from Perl
+    This document describes version 0.005 of Array::OverlapFinder (from Perl
     distribution Array-OverlapFinder), released on 2020-01-02.
 
 SYNOPSIS
@@ -119,6 +119,9 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    nauniq from App::nauniq can also sometimes be used, if you know the
+    items in the sequence are unique.
+
     Algorithm::Diff
 
     Text::OverlapFinder has a similar name, but the two modules are not that

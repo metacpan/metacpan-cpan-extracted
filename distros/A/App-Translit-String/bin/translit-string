@@ -5,7 +5,7 @@ use warnings;
 
 use App::Translit::String;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Run.
 exit App::Translit::String->new->run;
@@ -71,7 +71,7 @@ translit-string - Script to transliterate string.
  # 
  #         -h              Print help.
  #         -r              Reverse transliteration.
- #         -t table        Transliteration table (default value is 'ISO/R 9').
+ #         -t table        Transliteration table (default value is 'ISO 9').
  #         --version       Print version.
 
 =head1 EXAMPLE2
@@ -79,14 +79,14 @@ translit-string - Script to transliterate string.
  translit-string 'Российская Федерация'
 
  # Output:
- # Rossijskaja Federacija
+ # Rossijskaâ Federaciâ
 
 =head1 EXAMPLE3
 
- translit-string -r 'Rossijskaja Federacija'
+ translit-string -r 'Rossijskaâ Federaciâ'
 
  # Output:
- # Российскайа Федерацийа
+ # Российская Федерация
 
 =head1 EXAMPLE4
 
@@ -131,6 +131,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

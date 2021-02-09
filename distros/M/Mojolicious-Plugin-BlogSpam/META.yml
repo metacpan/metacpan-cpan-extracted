@@ -3,11 +3,12 @@ abstract: 'Check your Comments using BlogSpam'
 author:
   - 'Nils Diewald'
 build_requires:
+  Test::Memory::Cycle: '1.06'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.141170'
+generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,6 +23,8 @@ requires:
   Scalar::Util: '1.2'
   perl: '5.010001'
 resources:
+  bugtracker: https://github.com/Akron/Mojolicious-Plugin-BlogSpam/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: https://github.com/Akron/Mojolicious-Plugin-BlogSpam
-version: '0.09'
+  repository: https://github.com/Akron/Mojolicious-Plugin-BlogSpam.git
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

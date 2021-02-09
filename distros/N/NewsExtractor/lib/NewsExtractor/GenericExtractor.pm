@@ -5,13 +5,11 @@ use utf8;
 use Moo;
 extends 'NewsExtractor::TXExtractor';
 
-use List::Util qw(max);
 use HTML::ExtractContent;
 use Mojo::DOM;
-use Types::Standard qw(Str Maybe);
 use NewsExtractor::Types qw(is_NewspaperName);
 
-use Importer 'NewsExtractor::TextUtil'  => qw( u normalize_whitespace html2text parse_dateline_ymdhms );
+use Importer 'NewsExtractor::TextUtil'  => qw( u normalize_whitespace parse_dateline_ymdhms );
 use Importer 'NewsExtractor::Constants' => qw( %RE );
 
 with 'NewsExtractor::Role::ContentTextExtractor';

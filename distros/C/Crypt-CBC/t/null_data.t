@@ -45,6 +45,7 @@ for my $mod (@in) {
     my $cipher = Crypt::CBC->new(-key     => 'secret',
 				 -cipher  => $mod,
 				 -padding => $pad,
+				 -pbkdf  => 'opensslv2',
 				);
     for my $length (1..128) {
       my $test_data = 'a'x$length . '0';

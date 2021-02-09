@@ -9,6 +9,7 @@ use warnings;
 use Browser::Open qw( open_browser );
 use Git::Helpers::CPAN ();
 use Try::Tiny qw( catch try );
+use URI ();
 
 my $search = shift @ARGV;
 die "usage: cpan-gh [module or distribution name]" unless $search;
@@ -16,14 +17,26 @@ die "usage: cpan-gh [module or distribution name]" unless $search;
 my $helper = Git::Helpers::CPAN->new( name => $search );
 
 my $repo = $helper->repository;
-my $url = $repo->{web} || $repo->{url};
+my $url  = $repo->{web} || $repo->{url};
 
 unless ($url) {
     print q{Couldn't find repo URL for } . $helper->release_name;
     exit;
 }
 
-open_browser($url);
+my $uri = URI->new($url);
+
+if ( $uri->scheme && $uri->scheme eq 'git' ) {
+
+    # Turn git://github.com/Perl-Critic/Perl-Critic.git into
+    # https://github.com/Perl-Critic/Perl-Critic
+    $uri->scheme('https');
+    my $path = $uri->path;
+    $path =~ s{\.git$}{};
+    $uri->path($path);
+}
+
+open_browser($uri);
 
 __END__
 
@@ -37,7 +50,7 @@ cpan-repo - Open a browser window with the URL of a CPAN module's repository
 
 =head1 VERSION
 
-version 0.000020
+version 0.000021
 
 =head1 SYNOPSIS
 
