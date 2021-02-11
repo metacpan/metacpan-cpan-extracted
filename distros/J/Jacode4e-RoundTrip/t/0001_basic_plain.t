@@ -2,7 +2,7 @@
 #
 # 0001_basic_test_plain.t
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
@@ -15,6 +15,8 @@ use Jacode4e::RoundTrip;
 
 my $return = 0;
 my $line = '';
+@_ = ();
+%_ = ();
 
 $line = "\x81\x40";
 $return = Jacode4e::RoundTrip::convert(\$line,'jef','cp932');

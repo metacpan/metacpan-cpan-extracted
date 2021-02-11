@@ -1,11 +1,13 @@
 #!/usr/bin/perl
 
 package Bin::build_selenium_spec;
-$Bin::build_selenium_spec::VERSION = '1.0';
+$Bin::build_selenium_spec::VERSION = '1.02';
 #ABSTRACT: Convenience script to fetch the selenium specification from WC3
 
 use strict;
 use warnings;
+
+use v5.28;
 
 no warnings 'experimental';
 use feature qw/signatures/;
@@ -43,7 +45,7 @@ Bin::build_selenium_spec - Convenience script to fetch the selenium specificatio
 
 =head1 VERSION
 
-version 1.0
+version 1.02
 
 =head1 build_selenium_spec.pl
 

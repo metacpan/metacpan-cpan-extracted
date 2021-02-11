@@ -42,7 +42,7 @@ if ($quicky) {
 
 print "Versions used:\n";
 
-my @modules = qw/Cpanel::JSON::XS JSON::XS JSON::Create/;
+my @modules = qw/Cpanel::JSON::XS JSON::Create JSON::XS/;
 my @mvp;
 for my $module (@modules) {
     my $abbrev = $module;
@@ -53,9 +53,9 @@ for my $module (@modules) {
 print generate_table (rows => \@mvp, separate_rows => 1);
 
 my %these = (
-    'JC' => 'JSON::Create::create_json ($stuff)',
-    'JX' => 'JSON::XS::encode_json ($stuff)',
-    'CJX' => 'Cpanel::JSON::XS::encode_json ($stuff)',
+    'JSON::Create' => 'JSON::Create::create_json ($stuff)',
+    'JSON::XS' => 'JSON::XS::encode_json ($stuff)',
+    'Cpanel::JSON::XS' => 'Cpanel::JSON::XS::encode_json ($stuff)',
 );
 
 # ASCII string test

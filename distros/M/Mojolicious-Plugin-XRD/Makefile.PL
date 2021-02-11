@@ -14,15 +14,23 @@ WriteMakefile(
   },
   PREREQ_PM => {
     'Mojolicious' => 7.13,
-    'Mojolicious::Plugin::XML::Loy' => 0.13,
-    'XML::Loy' => 0.47
+    'Mojolicious::Plugin::XML::Loy' => 0.15,
+    'XML::Loy' => 0.49
   },
   LICENSE      => 'artistic_2',
   META_MERGE   => {
+    'meta-spec' => { version => 2 },
     requires  => { perl => '5.010001' },
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/Akron/Mojolicious-Plugin-XRD'
+      repository  => {
+        type => 'git',
+        url => 'https://github.com/Akron/Mojolicious-Plugin-XRD.git',
+        web => 'https://github.com/Akron/Mojolicious-Plugin-XRD',
+      },
+      bugtracker => {
+        web => 'https://github.com/Akron/Mojolicious-Plugin-XRD/issues'
+      }
     }
   },
   MIN_PERL_VERSION => '5.010001',

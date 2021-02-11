@@ -5,7 +5,7 @@ use Mojo::DOM;
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/secure_compare hmac_sha1_sum/;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 # Todo:
 # - Be compliant with https://www.w3.org/TR/websub/
@@ -951,26 +951,26 @@ Mojolicious::Plugin::PubSubHubbub - Publish and Subscribe with PubSubHubbub
   # In Controllers:
   # Publish feeds to subscribers
   $c->pubsub->publish(
-    'https://sojolicio.us/blog.atom',
-    'https://sojolicio.us/activity.atom'
+    'https://sojolicious.example/blog.atom',
+    'https://sojolicious.example/activity.atom'
   );
 
   # Subscribe to a feed
   $c->pubsub->subscribe(
-    topic => 'https://sojolicio.us/feed.atom',
-    hub   => 'https://hub.sojolicio.us'
+    topic => 'https://sojolicious.example/feed.atom',
+    hub   => 'https://hub.sojolicious.example'
   );
 
   # Discover a resource
-  my ($topic, $hub) = $c->pubsub->discover('http://sojolicio.us/');
+  my ($topic, $hub) = $c->pubsub->discover('http://sojolicious.example/');
   if ($topic && $hub) {
     $c->pubsub->subscribe( topic => $topic, hub   => $hub );
   };
 
   # Unsubscribe from a feed
   $c->pubsub->unsubscribe(
-    topic => 'https://sojolicio.us/feed.atom',
-    hub   => 'https://hub.sojolicio.us'
+    topic => 'https://sojolicious.example/feed.atom',
+    hub   => 'https://hub.sojolicious.example'
   );
 
 
@@ -1070,7 +1070,7 @@ called C<pubsub-callback>.
 =head2 pubsub->discover
 
   # In Controllers
-  my ($topic, $hub) = $c->pubsub->discover('http://sojolicio.us/');
+  my ($topic, $hub) = $c->pubsub->discover('http://sojolicious.example/');
 
 Discover a topic feed and a hub based on a URI.
 The discovery heuristics may change without notification.
@@ -1082,7 +1082,7 @@ The discovery heuristics may change without notification.
   my $success = $c->pubsub->publish(
     'my_feed',                       # named route
     '/feed.atom',                    # relative paths
-    'https://sojolicio.us/feed.atom' # absolute URIs
+    'https://sojolicious.example/feed.atom' # absolute URIs
   );
 
 Publish a list of feeds in terms of a notification to the hub.
@@ -1094,8 +1094,8 @@ Returns a true value on success.
 
   # In Controllers
   if ($c->pubsub->subscribe(
-    topic => 'https://sojolicio.us/feed.atom',
-    hub   => 'https://hub.sojolicio.us',
+    topic => 'https://sojolicious.example/feed.atom',
+    hub   => 'https://hub.sojolicious.example',
     lease_seconds => 123456
   )) {
     print 'You successfully subscribed!';
@@ -1122,8 +1122,8 @@ hub's response message body is returned additionally.
 
   # In Controllers
   if ($c->pubsub->unsubscribe(
-    topic => 'https://sojolicio.us/feed.atom',
-    hub   => 'https://hub.sojolicio.us'
+    topic => 'https://sojolicious.example/feed.atom',
+    hub   => 'https://hub.sojolicious.example'
   )) {
     print 'You successfully unsubscribed!';
   };
@@ -1325,7 +1325,7 @@ and needs to be accessible from the web.
 
   $ perl examples/pubsubapp daemon
 
-=for HTML <br /><div style="text-align: center;"><img src="http://sojolicio.us/images/pubsubhubbub-screenshot.png" alt="PubSubHubbub Example Application" /></div>
+=for HTML <br /><div style="text-align: center;"><img src="http://sojolicious.example/images/pubsubhubbub-screenshot.png" alt="PubSubHubbub Example Application" /></div>
 
 This example may be a good starting point for your own implementation, especially,
 if you deal with the subscriber part.
@@ -1347,8 +1347,6 @@ L<Mojolicious::Plugin::Util::RandomString>.
 =head1 AVAILABILITY
 
   https://github.com/Akron/Mojolicious-Plugin-PubSubHubbub
-
-This plugin is part of the L<Sojolicious|http://sojolicio.us> project.
 
 
 =head1 COPYRIGHT AND LICENSE

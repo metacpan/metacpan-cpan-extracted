@@ -6,7 +6,7 @@ use Mojo::Base 'Sentry::Tracing::Span', -signatures;
 use Mojo::Util 'dumper';
 
 has _hub        => undef;
-has sampled     => 1;
+has sampled     => undef;
 has context     => undef;
 has name        => '<unlabeled transaction>';
 has spans       => sub { [] };

@@ -132,6 +132,18 @@ json_create_t;
 	CALL (json_create_buffer_fill (jc));	\
     }
 
+/* Debug the internal handling of types. */
+
+//#define JCDEBUGTYPES
+#ifdef JCDEBUGTYPES
+#define MSG(format, args...) \
+    fprintf (stderr, "%s:%d: ", __FILE__, __LINE__);\
+    fprintf (stderr, format, ## args);\
+    fprintf (stderr, "\n");
+#else
+#define MSG(format, args...)
+#endif /* def JCDEBUGTYPES */
+
 /* Print an error to stderr. */
 
 static int
@@ -454,61 +466,61 @@ static jump_t jump[0x100] = {
 /* Need this twice, once within the ASCII handler and once within the
    Unicode handler. */
 
-#define ASCII \
-	case CTL:\
-	    CALL (add_one_u (jc, (unsigned int) c));\
-	    i++;\
-	    break;\
-\
-	case BSX:\
-	    ADD ("\\b");\
-	    i++;\
-	    break;\
-\
-	case HTX:\
-	    ADD ("\\t");\
-	    i++;\
-	    break;\
-\
-	case NLX:\
-	    ADD ("\\n");\
-	    i++;\
-	    break;\
-\
-	case NPX:\
-	    ADD ("\\f");\
-	    i++;\
-	    break;\
-\
-	case CRX:\
-	    ADD ("\\r");\
-	    i++;\
-	    break;\
-\
-	case ASC:\
-	    CALL (add_char (jc, c));\
-	    i++;\
-	    break;\
-\
-	case QUO:\
-	    ADD ("\\\"");\
-	    i++;\
-	    break;\
-\
-	case FSL:\
-	    if (jc->escape_slash) {\
-		ADD ("\\/");\
-	    }\
-	    else {\
-		CALL (add_char (jc, c));\
-	    }\
-	    i++;\
-	    break;\
-\
-	case BSL:\
-	    ADD ("\\\\");\
-	    i++;\
-	    break;
+#define ASCII					\
+    case CTL:					\
+    CALL (add_one_u (jc, (unsigned int) c));	\
+    i++;					\
+    break;					\
+						\
+    case BSX:					\
+    ADD ("\\b");				\
+    i++;					\
+    break;					\
+						\
+    case HTX:					\
+    ADD ("\\t");				\
+    i++;					\
+    break;					\
+						\
+    case NLX:					\
+    ADD ("\\n");				\
+    i++;					\
+    break;					\
+						\
+    case NPX:					\
+    ADD ("\\f");				\
+    i++;					\
+    break;					\
+						\
+    case CRX:					\
+    ADD ("\\r");				\
+    i++;					\
+    break;					\
+						\
+    case ASC:					\
+    CALL (add_char (jc, c));			\
+    i++;					\
+    break;					\
+						\
+    case QUO:					\
+    ADD ("\\\"");				\
+    i++;					\
+    break;					\
+						\
+    case FSL:					\
+    if (jc->escape_slash) {			\
+	ADD ("\\/");				\
+    }						\
+    else {					\
+	CALL (add_char (jc, c));		\
+    }						\
+    i++;					\
+    break;					\
+						\
+    case BSL:					\
+    ADD ("\\\\");				\
+    i++;					\
+    break;
 
 
 static INLINE json_create_status_t
@@ -1132,11 +1144,7 @@ json_create_add_object_sorted (json_create_t * jc, HV * input_hv)
 	CALL (add_str_len (jc, "{}", strlen ("{}")));
 	return json_create_ok;
     }
-#if 1
     CALL (add_open (jc, '{'));
-#else
-    CALL (add_char (jc, '{'));
-#endif
     Newxz (keys, n_keys, SV *);
     jc->n_mallocs++;
     for (i = 0; i < n_keys; i++) {
@@ -1178,11 +1186,7 @@ json_create_add_object_sorted (json_create_t * jc, HV * input_hv)
     Safefree (keys);
     jc->n_mallocs--;
 
-#if 1
     CALL (add_close (jc, '}'));
-#else
-    CALL (add_char (jc, '}'));
-#endif
 
     return json_create_ok;
 }
@@ -1237,9 +1241,7 @@ json_create_add_object (json_create_t * jc, HV * input_hv)
 					   (STRLEN) keylen));
 	}
 	CALL (add_char (jc, ':'));
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: Creating value of hash.\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+	MSG ("Creating value of hash");
 	CALL (json_create_recursively (jc, value));
     }
     CALL (add_close (jc, '}'));
@@ -1257,40 +1259,29 @@ json_create_add_array (json_create_t * jc, AV * av)
     SV * value;
     SV ** avv;
 
-#ifdef JCDEBUGTYPES
-    fprintf (stderr, "%s:%d: Adding first char [.\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+    MSG ("Adding first char [");
     CALL (add_open (jc, '['));
     n_keys = av_len (av) + 1;
-#ifdef JCDEBUGTYPES
-    fprintf (stderr, "%s:%d: n_keys = %ld.\n", __FILE__, __LINE__, n_keys);
-#endif /* JCDEBUGTYPES */
+    MSG ("n_keys = %ld", n_keys);
+
     /* This deals correctly with empty arrays, since av_len is -1 if
        the array is empty, so we do not test for a valid n_keys value
        before entering the loop. */
     for (i = 0; i < n_keys; i++) {
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: i = %d.\n", __FILE__, __LINE__, i);
-#endif /* JCDEBUGTYPES */
+	MSG ("i = %d", i);
 	COMMA;
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: i = %d.\n", __FILE__, __LINE__, i);
-#endif /* JCDEBUGTYPES */
+
 	avv = av_fetch (av, i, 0 /* don't delete the array value */);
 	if (avv) {
 	    value = * avv;
 	}
 	else {
-#ifdef JCDEBUGTYPES
-	    fprintf (stderr, "%s:%d: null value returned by av_fetch.\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+	    MSG ("null value returned by av_fetch");
 	    value = & PL_sv_undef;
 	}
 	CALL (json_create_recursively (jc, value));
     }
-#ifdef JCDEBUGTYPES
-    fprintf (stderr, "%s:%d: Adding last char ].\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+    MSG ("Adding last char ]");
     CALL (add_close (jc, ']'));
     return json_create_ok;
 }
@@ -1301,76 +1292,57 @@ json_create_handle_unknown_type (json_create_t * jc, SV * r)
 {
     if (jc->type_handler) {
 	CALL (json_create_call_to_json (jc, jc->type_handler, r));
+	return json_create_ok;
     }
-    else {
-	json_create_user_message (jc, json_create_unknown_type,
-				  "Input's type cannot be serialized to JSON");
-	return json_create_unknown_type;
-    }
-    return json_create_ok;
+    json_create_user_message (jc, json_create_unknown_type,
+			      "Input's type cannot be serialized to JSON");
+    return json_create_unknown_type;
 }
 
 #define STRICT_NO_SCALAR						\
     if (jc->strict) {							\
 	goto handle_type;						\
     }
-//#define JCDEBUGTYPES
+
 static INLINE json_create_status_t
-json_create_handle_ref (json_create_t * jc, SV * input)
+json_create_handle_ref (json_create_t * jc, SV * r)
 {
     svtype t;
-    SV * r;
-    r = SvRV (input);
     t = SvTYPE (r);
-#ifdef JCDEBUGTYPES
-    fprintf (stderr, "%s:%d: type is %d\n", __FILE__, 
-	     __LINE__, t);
-#endif /* JCDEBUGTYPES */
+    MSG ("Type is %d", t);
     switch (t) {
     case SVt_PVAV:
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: Array\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+	MSG("Array");
 	CALL (json_create_add_array (jc, (AV *) r));
 	break;
 
     case SVt_PVHV:
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: Hash.\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+	MSG("Hash");
 	CALL (json_create_add_object (jc, (HV *) r));
 	break;
 
     case SVt_NV:
     case SVt_PVNV:
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: NV/PVNV\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+	MSG("NV/PVNV");
 	STRICT_NO_SCALAR;
 	CALL (json_create_add_float (jc, r));
 	break;
 
     case SVt_IV:
     case SVt_PVIV:
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: IV/PVIV\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+	MSG("IV/PVIV");
 	STRICT_NO_SCALAR;
 	CALL (json_create_add_integer (jc, r));
 	break;
 
     case SVt_PV:
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: PV\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+	MSG("PV");
 	STRICT_NO_SCALAR;
 	CALL (json_create_add_string (jc, r));
 	break;
 
     case SVt_PVMG:
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: PVMG\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+	MSG("PVMG");
 	STRICT_NO_SCALAR;
 	/* There are some edge cases with blessed references
 	   containing numbers which we need to handle correctly. */
@@ -1391,7 +1363,6 @@ json_create_handle_ref (json_create_t * jc, SV * input)
     }
     return json_create_ok;
 }
-#undef JCDEBUGTYPES
 
 /* In strict mode, if no object handlers exist, then we reject the
    object. */
@@ -1405,95 +1376,197 @@ json_create_handle_ref (json_create_t * jc, SV * input)
 
 
 static INLINE json_create_status_t
-json_create_handle_object (json_create_t * jc, SV * input)
+json_create_handle_object (json_create_t * jc, SV * r,
+			   const char * objtype, I32 olen)
 {
-    const char * objtype;
-    SV * r;
-
-    r = SvRV (input);
-    /* The second argument to sv_reftype is true if we
-       look it up in the object table, false
-       otherwise. Undocumented, reported as
-       https://rt.perl.org/Ticket/Display.html?id=126469. */
-    objtype = sv_reftype (r, 1);
-    if (objtype) {
-	if (jc->obj_handler) {
-	    CALL (json_create_call_to_json (jc, jc->obj_handler, r));
-	}
-	else {
-	    SV ** sv_ptr;
-	    I32 olen;
+    SV ** sv_ptr;
 #ifdef DEBUGOBJ
-	    fprintf (stderr, "Have found an object of type %s.\n", objtype);
+    fprintf (stderr, "Have found an object of type %s.\n", objtype);
 #endif
-	    olen = strlen (objtype);
-	    sv_ptr = hv_fetch (jc->handlers, objtype, olen, 0);
-	    if (sv_ptr) {
-		char * pv;
-		STRLEN pvlen;
-		pv = SvPV (*sv_ptr, pvlen);
+    sv_ptr = hv_fetch (jc->handlers, objtype, olen, 0);
+    if (sv_ptr) {
+	char * pv;
+	STRLEN pvlen;
+	pv = SvPV (*sv_ptr, pvlen);
 #ifdef DEBUGOBJ
-		fprintf (stderr, "Have found a handler %s for %s.\n", pv, objtype);
+	fprintf (stderr, "Have found a handler %s for %s.\n", pv, objtype);
 #endif
-		if (pvlen == strlen ("bool") &&
-		    strncmp (pv, "bool", 4) == 0) {
-		    if (SvTRUE (r)) {
-			ADD ("true");
-		    }
-		    else {
-			ADD ("false");
-		    }
-		}
-		else if (SvROK (*sv_ptr)) {
-		    SV * what;
-		    what = SvRV (*sv_ptr);
-		    switch (SvTYPE (what)) {
-		    case SVt_PVCV:
-			CALL (json_create_call_to_json (jc, what, r));
-			break;
-		    default:
-			/* Weird handler, not a code reference. */
-			goto nothandled;
-		    }
-		}
-		else {
-		    /* It's an object, it's in our handlers, but we don't
-		       have any code to deal with it, so we'll print an
-		       error and then stringify it. */
-		    if (JCEH) {
-			(*JCEH) (__FILE__, __LINE__, "Unhandled handler %s.\n",
-				 pv);
-			goto nothandled;
-		    }
-		}
+	if (pvlen == strlen ("bool") &&
+	    strncmp (pv, "bool", 4) == 0) {
+	    if (SvTRUE (r)) {
+		ADD ("true");
 	    }
 	    else {
-#ifdef DEBUGOBJ
-		/* Leaving this debugging code here since this is liable
-		   to change a lot. */
-		I32 hvnum;
-		SV * s;
-		char * key;
-		I32 retlen;
-		fprintf (stderr, "Nothing in handlers for %s.\n", objtype);
-		hvnum = hv_iterinit (jc->handlers);
-
-		fprintf (stderr, "There are %ld keys in handlers.\n", hvnum);
-		while (1) {
-		    s = hv_iternextsv (jc->handlers, & key, & retlen);
-		    if (! s) {
-			break;
-		    }
-		    fprintf (stderr, "%s: %s\n", key, SvPV_nolen (s));
-		}
-#endif /* 0 */
-	    nothandled:
-		if (jc->strict) {
-		    REJECT_OBJECT(objtype);
-		}
-		CALL (json_create_handle_ref (jc, input));
+		ADD ("false");
 	    }
 	}
+	else if (SvROK (*sv_ptr)) {
+	    SV * what;
+	    what = SvRV (*sv_ptr);
+	    switch (SvTYPE (what)) {
+	    case SVt_PVCV:
+		CALL (json_create_call_to_json (jc, what, r));
+		break;
+	    default:
+		/* Weird handler, not a code reference. */
+		goto nothandled;
+	    }
+	}
+	else {
+	    /* It's an object, it's in our handlers, but we don't
+	       have any code to deal with it, so we'll print an
+	       error and then stringify it. */
+	    if (JCEH) {
+		(*JCEH) (__FILE__, __LINE__, "Unhandled handler %s.\n",
+			 pv);
+		goto nothandled;
+	    }
+	}
+    }
+    else {
+#ifdef DEBUGOBJ
+	/* Leaving this debugging code here since this is liable
+	   to change a lot. */
+	I32 hvnum;
+	SV * s;
+	char * key;
+	I32 retlen;
+	fprintf (stderr, "Nothing in handlers for %s.\n", objtype);
+	hvnum = hv_iterinit (jc->handlers);
+
+	fprintf (stderr, "There are %ld keys in handlers.\n", hvnum);
+	while (1) {
+	    s = hv_iternextsv (jc->handlers, & key, & retlen);
+	    if (! s) {
+		break;
+	    }
+	    fprintf (stderr, "%s: %s\n", key, SvPV_nolen (s));
+	}
+#endif /* 0 */
+    nothandled:
+	if (jc->strict) {
+	    REJECT_OBJECT(objtype);
+	}
+	CALL (json_create_handle_ref (jc, r));
+    }
+    return json_create_ok;
+}
+
+#define JCBOOL "JSON::Create::Bool"
+
+static json_create_status_t
+json_create_refobj (json_create_t * jc, SV * input)
+{
+    SV * r;
+    r = SvRV (input);
+
+    MSG("A reference");
+    /* We have a reference, so decide what to do with it. */
+    if (sv_isobject (input)) {
+	const char * objtype;
+	I32 olen;
+	objtype = sv_reftype (r, 1);
+	olen = (I32) strlen (objtype);
+	if (olen == strlen (JCBOOL) &&
+	    strncmp (objtype, JCBOOL, strlen (JCBOOL)) == 0) {
+	    if (SvTRUE (r)) {
+		ADD("true");
+	    }
+	    else {
+		ADD("false");
+	    }
+	    return json_create_ok;
+	}
+	if (jc->obj_handler) {
+	    CALL (json_create_call_to_json (jc, jc->obj_handler, r));
+	    return json_create_ok;
+	}
+	if (jc->handlers) {
+	    CALL (json_create_handle_object (jc, r, objtype, olen));
+	    return json_create_ok;
+	}
+	if (jc->strict) {
+	    REJECT_OBJECT (objtype);
+	    return json_create_ok;
+	}
+    }
+
+    MSG ("create handle references");
+
+    CALL (json_create_handle_ref (jc, r));
+    return json_create_ok;
+}
+
+static json_create_status_t
+json_create_not_ref (json_create_t * jc, SV * r)
+{
+    svtype t;
+
+    MSG("Not a reference.");
+
+    t = SvTYPE (r);
+    switch (t) {
+
+    case SVt_NULL:
+	ADD ("null");
+	break;
+
+    case SVt_PVMG:
+    case SVt_PV:
+	MSG ("SVt_PV/PVMG %s", SvPV_nolen (r));
+	CALL (json_create_add_string (jc, r));
+	break;
+
+    case SVt_IV:
+	MSG ("SVt_IV %ld\n", SvIV (r));
+	CALL (json_create_add_integer (jc, r));
+	break;
+
+    case SVt_NV:
+	MSG ("SVt_NV %g", SvNV (r));
+	CALL (json_create_add_float (jc, r));
+	break;
+
+    case SVt_PVNV:
+	if (SvNOK (r)) {
+	    MSG ("SVt_PVNV %s/%g", SvPV_nolen (r), SvNV (r));
+
+	    /* We need to handle non-finite numbers without using
+	       Perl's stringified forms, because we need to put quotes
+	       around them, whereas Perl will just print 'nan' the
+	       same way it will print '0.01'. 'nan' is not valid JSON,
+	       so we have to convert to '"nan"'. */
+	    CALL (json_create_add_float (jc, r));
+	}
+	else {
+	    MSG ("SVt_PVNV without valid NV %s", SvPV_nolen (r));
+	    CALL (json_create_add_string (jc, r));
+	}
+	break;
+
+    case SVt_PVIV:
+	/* Add numbers with a string version using the strings
+	   which Perl contains. */
+	if (SvIOK (r)) {
+	    MSG ("SVt_PVIV %s/%ld", SvPV_nolen (r), SvIV (r));
+	    CALL (json_create_add_integer (jc, r));
+	}
+	else {
+
+	    /* This combination of things happens e.g. with the
+	       value returned under "script" by charinfo of
+	       Unicode::UCD. If we don't catch it with SvIOK as
+	       above, we get an error of the form 'Argument
+	       "Latin" isn't numeric in subroutine entry' */
+	    fprintf (stderr, "%s:%d: SVt_PVIV without valid IV %s\n", 
+		     __FILE__, __LINE__, SvPV_nolen (r));
+
+	    CALL (json_create_add_string (jc, r));
+	}
+	break;
+	    
+    default:
+	CALL (json_create_handle_unknown_type (jc, r));
     }
     return json_create_ok;
 }
@@ -1505,150 +1578,33 @@ json_create_handle_object (json_create_t * jc, SV * input)
 static json_create_status_t
 json_create_recursively (json_create_t * jc, SV * input)
 {
-#ifdef JCDEBUGTYPES
-    fprintf (stderr, "%s:%d: sv = %p.\n", __FILE__, __LINE__, input);
-#endif /* JCDEBUGTYPES */
+
+    MSG("sv = %p.", input);
+
     if (! SvOK (input)) {
 	/* We were told to add an undefined value, so put the literal
 	   'null' (without quotes) at the end of "jc" then return. */
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: adding 'null'.\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+	MSG("Adding 'null'");
 	ADD ("null");
 	return json_create_ok;
     }
     /* JSON::Parse inserts pointers to &PL_sv_yes and no as literal
        "true" and "false" markers. */
     if (input == &PL_sv_yes) {
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: adding 'true'.\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+	MSG("Adding 'true'");
 	ADD ("true");
 	return json_create_ok;
     }
     if (input == &PL_sv_no) {
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: adding 'false'.\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
+	MSG("Adding 'false'");
 	ADD ("false");
 	return json_create_ok;
     }
     if (SvROK (input)) {
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: A reference.\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
-
-	/* We have a reference, so decide what to do with it. */
-	if (sv_isobject (input)) {
-	    if (jc->handlers || jc->obj_handler) {
-		CALL (json_create_handle_object (jc, input));
-	    }
-	    else if (jc->strict) {
-		REJECT_OBJECT (sv_reftype (SvRV (input), 1));
-	    }
-	    else {
-#ifdef JCDEBUGTYPES
-		fprintf (stderr, "create handle references\n");
-#endif /* JCDEBUGTYPES */
-		CALL (json_create_handle_ref (jc, input));
-	    }
-	}
-	else {
-#ifdef JCDEBUGTYPES
-	    fprintf (stderr, "create handle references\n");
-#endif /* JCDEBUGTYPES */
-	    CALL (json_create_handle_ref (jc, input));
-	}
+	CALL (json_create_refobj (jc, input));
+	return json_create_ok;
     }
-    else {
-	/* Not a reference, think about what to do. */
-	SV * r = input;
-	svtype t;
-#ifdef JCDEBUGTYPES
-	fprintf (stderr, "%s:%d: Not a reference.\n", __FILE__, __LINE__);
-#endif /* JCDEBUGTYPES */
-	t = SvTYPE (r);
-	switch (t) {
-
-	case SVt_NULL:
-	    ADD ("null");
-	    break;
-
-	case SVt_PVMG:
-	case SVt_PV:
-#ifdef JCDEBUGTYPES
-	    fprintf (stderr, "%s:%d: SVt_PV/PVMG %s\n",
-		     __FILE__, __LINE__, SvPV_nolen (r));
-#endif /* JCDEBUGTYPES */
-	    CALL (json_create_add_string (jc, r));
-	    break;
-
-	case SVt_IV:
-#ifdef JCDEBUGTYPES
-	    fprintf (stderr, "%s:%d: SVt_IV %ld\n",
-		     __FILE__, __LINE__, SvIV (r));
-#endif /* JCDEBUGTYPES */
-	    CALL (json_create_add_integer (jc, r));
-	    break;
-
-	case SVt_NV:
-#ifdef JCDEBUGTYPES
-	    fprintf (stderr, "%s:%d: SVt_NV %g\n",
-		     __FILE__, __LINE__, SvNV (r));
-#endif /* JCDEBUGTYPES */
-	    CALL (json_create_add_float (jc, r));
-	    break;
-
-	case SVt_PVNV:
-	    if (SvNOK (r)) {
-#ifdef JCDEBUGTYPES
-		fprintf (stderr, "%s:%d: SVt_PVNV %s/%g\n",
-			 __FILE__, __LINE__, SvPV_nolen (r), SvNV (r));
-#endif /* JCDEBUGTYPES */
-		/* We need to handle non-finite numbers without using
-		   Perl's stringified forms, because we need to put quotes
-		   around them, whereas Perl will just print 'nan' the
-		   same way it will print '0.01'. 'nan' is not valid JSON,
-		   so we have to convert to '"nan"'. */
-		CALL (json_create_add_float (jc, r));
-	    }
-	    else {
-#ifdef JCDEBUGTYPES
-		fprintf (stderr, "%s:%d: SVt_PVNV without valid NV %s\n", 
-			 __FILE__, __LINE__, SvPV_nolen (r));
-#endif /* JCDEBUGTYPES */
-		CALL (json_create_add_string (jc, r));
-	    }
-	    break;
-
-	case SVt_PVIV:
-	    /* Add numbers with a string version using the strings
-	       which Perl contains. */
-	    if (SvIOK (r)) {
-#ifdef JCDEBUGTYPES
-		fprintf (stderr, "%s:%d: SVt_PVIV %s/%ld\n", 
-			 __FILE__, __LINE__, SvPV_nolen (r), SvIV (r));
-#endif /* JCDEBUGTYPES */
-		CALL (json_create_add_integer (jc, r));
-	    }
-	    else {
-#ifdef JCDEBUGTYPES
-		/* This combination of things happens e.g. with the
-		   value returned under "script" by charinfo of
-		   Unicode::UCD. If we don't catch it with SvIOK as
-		   above, we get an error of the form 'Argument
-		   "Latin" isn't numeric in subroutine entry' */
-		fprintf (stderr, "%s:%d: SVt_PVIV without valid IV %s\n", 
-			 __FILE__, __LINE__, SvPV_nolen (r));
-#endif /* JCDEBUGTYPES */
-		CALL (json_create_add_string (jc, r));
-	    }
-	    break;
-	    
-	default:
-	    CALL (json_create_handle_unknown_type (jc, r));
-	}
-    }
+    CALL (json_create_not_ref (jc, input));
     return json_create_ok;
 }
 
@@ -1672,20 +1628,17 @@ json_create_recursively (json_create_t * jc, SV * input)
 	}							\
     }
 
-/* Dog run. */
+/* This is the main routine of JSON::Create, where the JSON is
+   produced from the Perl structure in "input". */
 
 static INLINE SV *
-json_create_run (json_create_t * jc, SV * input)
+json_create_create (json_create_t * jc, SV * input)
 {
     unsigned char buffer[BUFSIZE];
 
     /* Set up all the transient variables for reading. */
 
-    /* "jc.buffer" is dirty here, we have not initialized it, we are
-       just writing to uninitialized stack memory. "jc.length" is the
-       only thing we know is OK at this point. */
     jc->buffer = buffer;
-
     jc->length = 0;
     /* Tell json_create_buffer_fill that it needs to allocate an
        SV. */
@@ -1693,14 +1646,13 @@ json_create_run (json_create_t * jc, SV * input)
     /* Not Unicode. */
     jc->unicode = 0;
 
-    /* Unleash the dogs. */
     FINALCALL (json_create_recursively (jc, input));
-    /* Copy the remaining text in jc's buffer into "jc->output". */
     FINALCALL (json_create_buffer_fill (jc));
 
     if (jc->unicode && ! jc->downgrade_utf8) {
 	if (jc->utf8_dangerous) {
-	    if (is_utf8_string ((U8 *) SvPV_nolen (jc->output), SvCUR (jc->output))) {
+	    if (is_utf8_string ((U8 *) SvPV_nolen (jc->output),
+				SvCUR (jc->output))) {
 		SvUTF8_on (jc->output);
 	    }
 	    else {
@@ -1883,10 +1835,11 @@ set_type_handler (json_create_t * jc, SV * th)
     bump (jc, th);
 }
 
-/* Save time and money by using strlen. This is known as "premature
-   optimization". */
+/* Use the length of the string to eliminate impossible matches before
+   looking at the string's bytes. */
 
-#define CMP(x) (strlen(#x) == (size_t) key_len && strncmp(#x, key, key_len) == 0)
+#define CMP(x) (strlen(#x) == (size_t) key_len && \
+		strncmp(#x, key, key_len) == 0)
 
 #define BOOL(x)								\
     if (CMP(x)) {							\

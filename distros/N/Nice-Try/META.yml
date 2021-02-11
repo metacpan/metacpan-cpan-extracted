@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/NoAuth/Bugs.html?Dist=Nice-Try
   repository: https://git.deguest.jp/jack/Nice-Try
-version: v0.1.9
+version: v0.1.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

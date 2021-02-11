@@ -16,6 +16,7 @@ lib/BoardStreams/DBMigrations.pm
 lib/BoardStreams/Exception.pm
 lib/BoardStreams/ListenerObservable.pm
 lib/BoardStreams/Registry.pm
+lib/BoardStreams/Transaction.pm
 lib/BoardStreams/Util.pm
 lib/Mojolicious/Plugin/BoardStreams.pm
 minil.toml

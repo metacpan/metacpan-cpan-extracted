@@ -1,5 +1,9 @@
 Revision history for Perl extension CGI::Application::Plugin::TT::LastModified:
 
+1.03      2021-02-09 22:59:06-08:00 America/Vancouver
+    - Switch to Dist::Zilla for release management.
+    - POD fixups; typo corrections, SYNOPSIS updates
+
 1.02    Fri Apr 23 22:26 PDT 2010
     - Switch to Git
 

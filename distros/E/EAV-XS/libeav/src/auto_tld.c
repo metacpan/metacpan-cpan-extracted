@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2020-11-26 09:13:13 */
+/* this file was auto-generated at 2021-02-11 09:22:26 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -238,7 +238,7 @@ const tld_t tld_list[] = {
     { "cbs", 4, TLD_TYPE_GENERIC },
     { "cc", 3, TLD_TYPE_COUNTRY_CODE },
     { "cd", 3, TLD_TYPE_COUNTRY_CODE },
-    { "ceb", 4, TLD_TYPE_GENERIC },
+    { "ceb", 4, TLD_TYPE_NOT_ASSIGNED },
     { "center", 7, TLD_TYPE_GENERIC },
     { "ceo", 4, TLD_TYPE_GENERIC },
     { "cern", 5, TLD_TYPE_GENERIC },
@@ -784,7 +784,7 @@ const tld_t tld_list[] = {
     { "ltda", 5, TLD_TYPE_GENERIC },
     { "lu", 3, TLD_TYPE_COUNTRY_CODE },
     { "lundbeck", 9, TLD_TYPE_GENERIC },
-    { "lupin", 6, TLD_TYPE_GENERIC },
+    { "lupin", 6, TLD_TYPE_NOT_ASSIGNED },
     { "luxe", 5, TLD_TYPE_GENERIC },
     { "luxury", 7, TLD_TYPE_GENERIC },
     { "lv", 3, TLD_TYPE_COUNTRY_CODE },
@@ -932,7 +932,7 @@ const tld_t tld_list[] = {
     { "nyc", 4, TLD_TYPE_GENERIC },
     { "nz", 3, TLD_TYPE_COUNTRY_CODE },
     { "obi", 4, TLD_TYPE_GENERIC },
-    { "observer", 9, TLD_TYPE_GENERIC },
+    { "observer", 9, TLD_TYPE_NOT_ASSIGNED },
     { "off", 4, TLD_TYPE_GENERIC },
     { "office", 7, TLD_TYPE_GENERIC },
     { "okinawa", 8, TLD_TYPE_GENERIC },
@@ -1045,7 +1045,7 @@ const tld_t tld_list[] = {
     { "read", 5, TLD_TYPE_GENERIC },
     { "realestate", 11, TLD_TYPE_GENERIC },
     { "realtor", 8, TLD_TYPE_GENERIC },
-    { "realty", 7, TLD_TYPE_GENERIC },
+    { "realty", 7, TLD_TYPE_NOT_ASSIGNED },
     { "recipes", 8, TLD_TYPE_GENERIC },
     { "red", 4, TLD_TYPE_GENERIC },
     { "redstone", 9, TLD_TYPE_GENERIC },
@@ -1416,7 +1416,7 @@ const tld_t tld_list[] = {
     { "xn--45br5cyl", 13, TLD_TYPE_COUNTRY_CODE },
     { "xn--45brj9c", 12, TLD_TYPE_COUNTRY_CODE },
     { "xn--45q11c", 11, TLD_TYPE_GENERIC },
-    { "xn--4dbrk0ce", 13, TLD_TYPE_NOT_ASSIGNED },
+    { "xn--4dbrk0ce", 13, TLD_TYPE_COUNTRY_CODE },
     { "xn--4gbrim", 11, TLD_TYPE_GENERIC },
     { "xn--54b7fta0cc", 15, TLD_TYPE_COUNTRY_CODE },
     { "xn--55qw42g", 12, TLD_TYPE_GENERIC },

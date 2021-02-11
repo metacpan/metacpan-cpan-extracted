@@ -459,7 +459,7 @@ Opposite of L</"text_like">.
 
 Copyright (c) 2008-2020 Sebastian Riedel and others.
 
-Copyright (C) 2020, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (c) 2020-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

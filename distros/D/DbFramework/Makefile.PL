@@ -1,13 +1,16 @@
 #! /usr/bin/perl -w
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
+use strict;
 use ExtUtils::MakeMaker;
 use lib qw(lib);
 use DbFramework::Util;
-require 't/util.pl';
+require './t/util.pl';
 
-$catalog_db = 'dbframework_catalog';
-%keytypes   = (primary => 0, foreign => 1, index => 2);
+exit 0 if $ENV{AUTOMATED_TESTING};
+
+my $catalog_db = 'dbframework_catalog';
+my %keytypes   = (primary => 0, foreign => 1, index => 2);
 
 prompt(<<EOF);
 
@@ -27,7 +30,7 @@ unless ( -f $config && prompt("$config exists, use it?", "Y") =~ /^y/i ) {
   my @drivers = grep eval "require DBD::$_; 1;", qw/mysql mSQL Pg/;
   my $drivers = prompt("Enter (space seperated) DBI drivers to test:", join(" ", @drivers));
   @drivers = split /\s/,$drivers;
-  $test_db = 'test';
+  my $test_db = 'test';
 
   my %driver;
   for my $driver ( @drivers ) {
@@ -55,10 +58,10 @@ to $db i.e. 'DBI:$driver:[dsn_string]':}, $dsn);
 	  # create catalog schema
 	  my %sql = %{catalog_schema()};
 	  # default to mysql DDL syntax
-	  $ddl = (exists $sql{$driver}) ? $driver : 'mysql';
-	  $dsn = $driver{$driver}->{$db}->{dsn};
-	  $u   = $driver{$driver}->{$db}->{u};
-	  $p   = $driver{$driver}->{$db}->{p};
+	  my $ddl = (exists $sql{$driver}) ? $driver : 'mysql';
+	  $dsn    = $driver{$driver}->{$db}->{dsn};
+	  my $u   = $driver{$driver}->{$db}->{u};
+	  my $p   = $driver{$driver}->{$db}->{p};
 	  my $dbh = DbFramework::Util::get_dbh($dsn,$u,$p);
 	  $dbh->{PrintError} = 0;
 	  for my $table ( qw/c_db c_key c_relationship c_table/ ) {
@@ -286,7 +289,7 @@ CREATE TABLE c_table (
 
 WriteMakefile(
     NAME		=> "DbFramework",
-    VERSION		=> "1.13",
+    VERSION		=> "1.14",
     ABSTRACT		=> "Classes for Manipulating DBI Databases, Based on the CDIF Data Model Subject Area",
     AUTHOR		=> "imacat <imacat\@mail.imacat.idv.tw>",
 	LICENSE 	=> "perl",

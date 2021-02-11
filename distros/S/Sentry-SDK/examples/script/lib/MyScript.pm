@@ -4,12 +4,12 @@ use Mojo::Base -base, -signatures;
 use Mojo::Util 'dumper';
 use MyIntegration;
 use MyLib;
-use Sentry;
+use Sentry::SDK;
 use Sentry::Hub;
 use Sentry::Severity;
 use Try::Tiny;
 
-Sentry->init({
+Sentry::SDK->init({
   dsn          => 'http://b61a335479ff48529d773343287bcdad@localhost:9000/2',
   environment  => 'my environment',
   release      => '1.0.0',
@@ -19,13 +19,13 @@ Sentry->init({
 });
 
 sub main {
-  Sentry->configure_scope(sub ($scope) {
+  Sentry::SDK->configure_scope(sub ($scope) {
     $scope->set_tag(foo => 'bar');
   });
-  Sentry->configure_scope(sub ($scope) {
+  Sentry::SDK->configure_scope(sub ($scope) {
     $scope->set_tag(bar => 'baz');
   });
-  Sentry->add_breadcrumb({
+  Sentry::SDK->add_breadcrumb({
     message => 'my breadcrumb (warning)',
     level   => Sentry::Severity->Warning,
   });
@@ -43,19 +43,20 @@ sub main {
   #   $hub->capture_message('ich bin eine SDK integration message');
   # });
 
-  # Sentry->capture_message('ich bin eine separate message');
+  # Sentry::SDK->capture_message('ich bin eine separate message');
 
   my $transaction
-    = Sentry->start_transaction({ name => 'MyScript', op => 'http.server', },
+    = Sentry::SDK->start_transaction(
+      { name    => 'MyScript', op => 'http.server', },
       { request => { url => '/foo/bar', query => { bla => 'blubb' } } });
-  Sentry->configure_scope(sub ($scope) {
+  Sentry::SDK->configure_scope(sub ($scope) {
     $scope->set_span($transaction);
   });
   try {
     my $s = MyLib->new(foo => 'my foo');
     $s->foo1('foo1 value');
   } catch {
-    Sentry->capture_exception($_);
+    Sentry::SDK->capture_exception($_);
   };
 
   $transaction->set_http_status(200);

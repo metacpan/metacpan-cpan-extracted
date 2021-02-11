@@ -114,7 +114,7 @@
          "web" : "https://github.com/oalders/git-helpers"
       }
    },
-   "version" : "0.000021",
+   "version" : "1.000000",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030003"
@@ -678,7 +678,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000021",
+                  "tag" : "v1.000000",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

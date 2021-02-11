@@ -1,7 +1,9 @@
 package Playwright;
-$Playwright::VERSION = '0.001';
+$Playwright::VERSION = '0.002';
 use strict;
 use warnings;
+
+use v5.28;
 
 use sigtrap qw/die normal-signals/;
 
@@ -299,7 +301,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

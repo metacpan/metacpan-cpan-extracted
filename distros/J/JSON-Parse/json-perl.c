@@ -558,7 +558,7 @@ PREFIX (string) (json_parse_t * parser)
  string_done:
 
 #ifdef PERLING
-    if (parser->unicode || parser->force_unicode) {
+    if (parser->unicode || parser->force_unicode || parser->upgrade_utf8) {
 	SvUTF8_on (string);
 	parser->force_unicode = 0;
     }
@@ -869,7 +869,7 @@ PREFIX (object) (json_parse_t * parser)
     start = parser->end - 1;
 
 #ifdef PERLING
-    if (parser->unicode) {
+    if (parser->unicode || parser->upgrade_utf8) {
 	/* Keys are unicode. */
 	uniflag = -1;
     }

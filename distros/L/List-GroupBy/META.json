@@ -56,18 +56,21 @@
    "provides" : {
       "List::GroupBy" : {
          "file" : "lib/List/GroupBy.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/scrapheap/list-groupby/issues"
+      },
       "homepage" : "https://gitlab.com/scrapheap/list-groupby",
       "repository" : {
          "url" : "git://gitlab.com/scrapheap/list-groupby.git",
          "web" : "https://gitlab.com/scrapheap/list-groupby"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:JLCOOPER",
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1

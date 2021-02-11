@@ -47,3 +47,17 @@ Mon Dec 11 13:37:12 EST 2000
 
     - Fixed release numbering
       (thanks Alexandr!)
+
+
+0.602  Thu Feb 11 00:59:17 2021
+
+    - Corrected grammatical discussion of 'sic' and 'cis'
+      (thanks, Mathieu!)
+
+    - Added 'legatarius' for OO inheritance.
+
+    - Added 'sicut' to quote type name components
+      (thanks, Chris!)
+
+    - Added string literals 'guttam' ('.') and 'comma' (',')
+      (thanks, Chris!)

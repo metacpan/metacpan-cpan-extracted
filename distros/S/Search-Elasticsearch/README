@@ -2,7 +2,7 @@ NAME
     Search::Elasticsearch - The official client for Elasticsearch
 
 VERSION
-    version 7.30
+    version 7.711
 
 SYNOPSIS
         use Search::Elasticsearch;
@@ -414,7 +414,7 @@ AUTHOR
     Enrico Zimuel <enrico.zimuel@elastic.co>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2020 by Elasticsearch BV.
+    This software is Copyright (c) 2021 by Elasticsearch BV.
 
     This is free software, licensed under:
 

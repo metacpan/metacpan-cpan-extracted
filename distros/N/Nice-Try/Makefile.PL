@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
         'Test::Pod'     => '1.52',
     },
     LICENSE				=> 'perl_5',
-    MIN_PERL_VERSION	=> 5.16.0,
+    MIN_PERL_VERSION	=> 'v5.16.0',
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Nice-Try-*' },
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {

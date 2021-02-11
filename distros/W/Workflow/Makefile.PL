@@ -9,12 +9,8 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Simple, flexible system to implement workflows",
   "AUTHOR" => "Chris Winters <chris\@cwinters.com>",
-  "BUILD_REQUIRES" => {
-    "Module::Build" => "0.30"
-  },
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
-    "Module::Build" => "0.30"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Workflow",
   "LICENSE" => "perl",
@@ -48,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.41",
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "1.51",
+  "VERSION" => "1.52",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -72,7 +68,6 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "List::MoreUtils" => 0,
   "Log::Log4perl" => "0.34",
-  "Module::Build" => "0.30",
   "Pod::Coverage::TrustPod" => 0,
   "Safe" => 0,
   "Test::Exception" => 0,

@@ -19,5 +19,7 @@ WriteMakefile(
        "Crypt::PK::ECC" => "0.042",
        "Digest::SHA" => "5.83",
        "Carp"=> "1.00",
-       "URI"  =>"1.00"   }
+       "URI"  =>"1.00" ,
+       "perl" => "5.004",
+       "HTTP::Request" => "6.10"   }
 );

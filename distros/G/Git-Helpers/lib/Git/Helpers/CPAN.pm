@@ -1,5 +1,5 @@
 package Git::Helpers::CPAN;
-our $VERSION = '0.000021';
+our $VERSION = '1.000000';
 use Moo;
 
 use MetaCPAN::Client ();
@@ -97,7 +97,7 @@ Git::Helpers::CPAN - Get repository information for a CPAN module or release
 
 =head1 VERSION
 
-version 0.000021
+version 1.000000
 
 =head1 SYNOPSIS
 
@@ -148,7 +148,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2019 by Olaf Alders.
+This software is copyright (c) 2015 by Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

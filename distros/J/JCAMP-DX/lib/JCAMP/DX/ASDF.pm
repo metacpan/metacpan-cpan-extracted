@@ -1,8 +1,8 @@
 #------------------------------------------------------------------------------
 #$Author: andrius $
-#$Date: 2018-11-21 09:40:40 +0200 (Tr, 21 lapkr. 2018) $
-#$Revision: 32 $
-#$URL: svn+ssh://www.crystallography.net/home/coder/svn-repositories/jcamp-dx/tags/v0.02/lib/JCAMP/DX/ASDF.pm $
+#$Date: 2021-02-10 13:44:25 +0200 (Tr, 10 vas. 2021) $
+#$Revision: 94 $
+#$URL: svn+ssh://www.crystallography.net/home/coder/svn-repositories/JCAMP-DX/tags/v0.03/lib/JCAMP/DX/ASDF.pm $
 #------------------------------------------------------------------------------
 #*
 #  Encoder/decoder for ASDF formats.
@@ -12,6 +12,9 @@ package JCAMP::DX::ASDF;
 
 use strict;
 use warnings;
+
+# ABSTRACT: encoder/decoder for ASDF formats
+our $VERSION = '0.03'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );

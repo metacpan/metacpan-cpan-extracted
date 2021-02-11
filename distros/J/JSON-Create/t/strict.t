@@ -16,7 +16,7 @@ $jc->fatal_errors (1);
 no utf8;
 my $input = 'かきくけこ';
 eval {
-    $jc->run ($input);
+    $jc->create ($input);
 };
 ok ($@, "Got error running in strict on non-utf8 data");
 like ($@, qr/Non-ASCII byte in non-utf8 string/, "Got correct diagnostic");

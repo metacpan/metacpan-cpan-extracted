@@ -40,8 +40,13 @@
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/renderorange/List-Uniq/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/renderorange/List-Uniq.git",
+         "web" : "https://github.com/renderorange/List-Uniq"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

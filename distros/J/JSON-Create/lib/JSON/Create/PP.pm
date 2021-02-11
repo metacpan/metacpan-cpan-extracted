@@ -4,9 +4,9 @@ JSON::Create::PP - Pure-Perl version of JSON::Create
 
 =head1 DESCRIPTION
 
-This is a reference and backup module for JSON::Create. It is meant to
-do exactly the same things as JSON::Create, but there are a few
-discrepancies, which should be treated as bugs.
+This is a backup module for JSON::Create. JSON::Create is written
+using Perl XS, but JSON::Create::PP offers the same functionality
+without the XS.
 
 =head1 DEPENDENCIES
 
@@ -25,23 +25,14 @@ objects, and break encapsulation.
 
 =item L<Unicode::UTF8>
 
-This is used to do the validation of UTF-8.
+This is used to handle conversion to and from character strings.
 
 =back
 
 =head1 BUGS
 
-Floating point printing cannot be made to work like the XS version.
-
-The XS version tests for NV or IV directly, but it is next to
-impossible to get this information from Perl without XS.
-
-=head1 TESTING
-
-To test this module, do
-
-    make
-    JSONCreatePP=1 make test
+Printing of floating point numbers cannot be made to work exactly like
+the XS version.
 
 =cut
 
@@ -54,9 +45,9 @@ use strict;
 use utf8;
 use Carp qw/croak carp confess cluck/;
 use Scalar::Util qw/looks_like_number blessed reftype/;
-use Unicode::UTF8 qw/decode_utf8 valid_utf8/;
+use Unicode::UTF8 qw/decode_utf8 valid_utf8 encode_utf8/;
 use B;
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 sub create_json
 {
@@ -117,11 +108,12 @@ sub isfloat
     return $isfloat;
 }
 
-# This is for compatibility with JSON::Parse.
+# Built in booleans. The nasty PL_sv_(yes|no) stuff comes from
+# JSON::Parse. The JSON::Create::Bool is from our own nice module.
 
 sub isbool
 {
-    my ($ref) = @_;
+    my ($input, $ref) = @_;
     my $poo = B::svref_2object ($ref);
     if (ref $poo eq 'B::SPECIAL') {
 	# Leave the following commented-out code as reference for what
@@ -160,9 +152,10 @@ sub escape_all_unicode
 	$format = "\\u%04X";
     }
     $input =~ s/([\x{007f}-\x{ffff}])/sprintf ($format, ord ($1))/ge;
+    # Convert U+10000 to U+10FFFF into surrogate pairs
     $input =~ s/([\x{10000}-\x{10ffff}])/
-    sprintf ($format, 0xD800 | (((ord ($1)-0x10000) >>10) & 0x3ff)) .
-    sprintf ($format, 0xDC00 |  ((ord ($1)) & 0x3ff))
+	sprintf ($format, 0xD800 | (((ord ($1)-0x10000) >>10) & 0x3ff)) .
+	sprintf ($format, 0xDC00 |  ((ord ($1)) & 0x3ff))
     /gex;
     return $input;
 }
@@ -326,23 +319,88 @@ sub comma
     }
 }
 
-sub create_json_recursively
+sub array
 {
     my ($jc, $input) = @_;
+    $jc->openB ('[');
+    my $i = 0;
+    for my $k (@$input) {
+	if ($i != 0) {
+	    $jc->comma ();
+	}
+	$i++;
+	my $error = create_json_recursively ($jc, $k, \$k);
+	if ($error) {
+	    return $error;
+	}
+    }
+    $jc->closeB (']');
+    return undef;
+}
+
+sub object
+{
+    my ($jc, $input) = @_;
+    $jc->openB ('{');
+    my @keys = keys %$input;
+    if ($jc->{_sort}) {
+	if ($jc->{cmp}) {
+	    @keys = sort {&{$jc->{cmp}} ($a, $b)} @keys;
+	}
+	else {
+	    @keys = sort @keys;
+	}
+    }
+    my $i = 0;
+    for my $k (@keys) {
+	if ($i != 0) {
+	    $jc->comma ();
+	}
+	$i++;
+	my $error;
+	$error = stringify ($jc, $k);
+	if ($error) {
+	    return $error;
+	}
+	$jc->{output} .= ':';
+	$error = create_json_recursively ($jc, $input->{$k}, \$input->{$k});
+	if ($error) {
+	    return $error;
+	}
+    }
+    $jc->closeB ('}');
+    return undef;
+}
+
+sub create_json_recursively
+{
+    my ($jc, $input, $input_ref) = @_;
+    if ($input_ref) {
+	my $bool = isbool ($input, $input_ref);
+	if ($bool) {
+	    $jc->{output} .= $bool;
+	    return undef;
+	}
+    }
     if (! defined $input) {
 	$jc->{output} .= 'null';
 	return undef;
     }
-    my $ref;
-    my $error;
-    if (keys %{$jc->{_handlers}} || $jc->{_obj_handler}) {
-	$ref = ref ($input);
+    my $ref = ref ($input);
+    if ($ref eq 'JSON::Create::Bool') {
+	if ($$input) {
+	    $jc->{output} .=  'true';
+	}
+	else {
+	     $jc->{output} .= 'false';
+	}
+	return undef;
     }
-    else {
+    if (! keys %{$jc->{_handlers}} && ! $jc->{_obj_handler}) {
+	my $origref = $ref;
 	# Break encapsulation if the user has not supplied handlers.
 	$ref = reftype ($input);
 	if ($ref && $jc->{_strict}) {
-	    my $origref = ref ($input);
 	    if ($ref ne $origref) {
 		return "Object cannot be serialized to JSON: $origref";
 	    }
@@ -350,68 +408,22 @@ sub create_json_recursively
     }
     if ($ref) {
 	if ($ref eq 'HASH') {
-	    $jc->openB ('{');
-	    my @keys = keys %$input;
-	    if ($jc->{_sort}) {
-		if ($jc->{cmp}) {
-		    @keys = sort {&{$jc->{cmp}} ($a, $b)} @keys;
-		}
-		else {
-		    @keys = sort @keys;
-		}
+	    my $error = $jc->object ($input);
+	    if ($error) {
+		return $error;
 	    }
-	    my $i = 0;
-	    my $n = scalar (@keys);
-	    for my $k (@keys) {
-		my $error = stringify ($jc, $k);
-		if ($error) {
-		    return $error;
-		}
-		$jc->{output} .= ':';
-		my $bool = isbool (\$input->{$k});
-		if ($bool) {
-		    $jc->{output} .= $bool;
-		}
-		else {
-		    $error = create_json_recursively ($jc, $input->{$k});
-		    if ($error) {
-			return $error;
-		    }
-		}
-		$i++;
-		if ($i < $n) {
-		    $jc->comma ();
-		}
-	    }
-	    $jc->closeB ('}');
 	}
 	elsif ($ref eq 'ARRAY') {
-	    $jc->openB ('[');
-	    my $i = 0;
-	    my $n = scalar (@$input);
-	    for my $k (@$input) {
-		my $bool = isbool (\$k);
-		if ($bool) {
-		    $jc->{output} .= $bool;
-		}
-		else {
-		    $error = create_json_recursively ($jc, $k);
-		    if ($error) {
-			return $error;
-		    }
-		}
-		$i++;
-		if ($i < $n) {
-		    $jc->comma ();
-		}
+	    my $error = $jc->array ($input);
+	    if ($error) {
+		return $error;
 	    }
-	    $jc->closeB (']');
 	}
 	elsif ($ref eq 'SCALAR') {
 	    if ($jc->{_strict}) {
 		return "Input's type cannot be serialized to JSON";
 	    }
-	    $error = $jc->create_json_recursively ($$input);
+	    my $error = $jc->create_json_recursively ($$input);
 	    if ($error) {
 		return $error;
 	    }
@@ -436,7 +448,7 @@ sub create_json_recursively
 			    }
 			}
 			elsif (ref ($handler) eq 'CODE') {
-			    $error = $jc->call_to_json ($handler, $input);
+			    my $error = $jc->call_to_json ($handler, $input);
 			    if ($error) {
 				return $error;
 			    }
@@ -577,6 +589,11 @@ sub replace_bad_utf8
 
 sub run
 {
+    goto &create;
+}
+
+sub create
+{
     my ($jc, $input) = @_;
     $jc->{output} = '';
     my $error = create_json_recursively ($jc, $input);
@@ -584,6 +601,9 @@ sub run
 	$jc->user_error ($error);
 	delete $jc->{output};
 	return undef;
+    }
+    if ($jc->{_downgrade_utf8}) {
+	$jc->{output} = encode_utf8 ($jc->{output});
     }
     return $jc->{output};
 }
@@ -615,6 +635,12 @@ sub JSON::Create::PP::sort
 {
     my ($jc, $onoff) = @_;
     $jc->{_sort} = !! $onoff;
+}
+
+sub downgrade_utf8
+{
+    my ($jc, $onoff) = @_;
+    $jc->{_downgrade_utf8} = !! $onoff;
 }
 
 sub set

@@ -4,6 +4,8 @@ author:
   - 'Philipp Busse <pmb@heise.de>'
 build_requires:
   Perl::Critic: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
   Test::Spec: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
@@ -23,17 +25,21 @@ no_index:
     - t
     - xt
 requires:
-  Cpanel::JSON::XS: '0'
-  IO::Socket::SSL: '0'
-  IO::Socket::Socks: '0'
+  Clone: '0'
+  HTTP::Status: '0'
+  List::Util: '0'
   Mojolicious: '0'
-  Net::DNS::Native: '0'
   Readonly: '0'
-  Role::Tiny: '0'
+  Time::HiRes: '0'
   Try::Tiny: '0'
   UUID::Tiny: '0'
-version: 0.10.3
-x_generated_by_perl: v5.33.6
+  perl: v5.24.0
+resources:
+  bugtracker: https://github.com/heiseonline/perl-sentry-sdk/issues
+  homepage: https://github.com/heiseonline/perl-sentry-sdk
+  repository: https://github.com/heiseonline/perl-sentry-sdk.git
+version: v1.0.2
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

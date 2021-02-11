@@ -3,6 +3,8 @@ use strict;
 use Graphics::TIFF ':all';
 use Test::More tests => 12;
 use Test::Deep;
+use File::Temp;
+use File::Spec;
 BEGIN { use_ok('Graphics::TIFF') }
 
 #########################
@@ -19,6 +21,7 @@ if ( $version < 4.000003 ) {
 
 ok( Graphics::TIFF->IsCODECConfigured(COMPRESSION_DEFLATE),
     'IsCODECConfigured' );
+my $directory = File::Temp->newdir;
 
 #########################
 
@@ -38,7 +41,8 @@ for my $i ( 0 .. $buffer_size - 1 ) {
 my $expected = pack "C*", @buffer;
 
 # write TIFF
-my $tif = Graphics::TIFF->Open( 'test.tif', 'w' );
+my $file = File::Spec->catfile( $directory, 'test.tif' );
+my $tif = Graphics::TIFF->Open( $file, 'w' );
 $tif->SetField( TIFFTAG_IMAGEWIDTH,      $width );
 $tif->SetField( TIFFTAG_IMAGELENGTH,     $height );
 $tif->SetField( TIFFTAG_SAMPLESPERPIXEL, $depth );
@@ -51,7 +55,7 @@ $tif->WriteDirectory;
 $tif->Close;
 
 # read TIFF
-$tif = Graphics::TIFF->Open( 'test.tif', 'r' );
+$tif = Graphics::TIFF->Open( $file, 'r' );
 my $stripsize = $tif->StripSize;
 my $example   = '';
 for my $i ( 0 .. $tif->NumberOfStrips - 1 ) {
@@ -71,4 +75,3 @@ $tif->Close;
 
 #########################
 
-unlink 'test.tif';

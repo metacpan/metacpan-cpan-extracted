@@ -1,6 +1,10 @@
 ##-*- Mode: ChangeLog; coding: utf-8; -*-
 
-UNRELEASED Mon, 15 Jun 2020 08:04:33 +0200 moocow
+v0.97 Wed, 10 Feb 2021 14:39:05 +0100 moocow
+	* dtatw-sanitize-header.perl: add https variants for //classCode[@scheme="http://..."] attributes
+	  - ddcTextClassDWDS, ddcTextClassDTA, ddcTextClassCorpus
+
+v0.96 Mon, 15 Jun 2020 08:04:33 +0200 moocow
 	* dtatw-trim-encode.perl: added default U+FDD3 (fixes mantis #728)
 
 v0.95 Thu, 11 Jun 2020 09:07:46 +0200 moocow

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,15 +12,15 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
 SHA256 b7fd9b73ea99602016a326e0b62e6646060d18febdd065ceca8bb482208c3d88 Artistic
-SHA256 8d47b146fecaf5d8ae66ef6a2c9bedd2ea489d3ea7fe8167e8a11347951c2a75 Build.PL
-SHA256 d543dfbfe5bcff5e2f03652036c82096bd63dca77f3d0265ec0daa6d8a737fac Changes
+SHA256 137ce8292cf3c5517989f318a5900360bfde74c33e7676f484860d21b055132d Build.PL
+SHA256 d43a71a1107e282da867a92f19c4f1e1d24022f9044108fdb0343d6ef8fd67db Changes
 SHA256 759169399b4a423c61efa8fe877a3aa9253aff5a7f6a9eed6d4f74bdeaa53fc2 MANIFEST
-SHA256 45752056069f9373b627e7757145aea49a185f99d809c3564ac85fd8327cc9b0 META.json
-SHA256 3d68ad64cb02822eda38efa88b17269fba3ae51d0c96fb9753053e8c7e640881 META.yml
-SHA256 a084c37d8fa9089b8a265493603f80bad679d8ddceffc5dd16f76468473288da Makefile.PL
+SHA256 3db1c5b8c72c5479d7b45b38807afff4b9f98cdb58814d1b3f11120c6c5720fc META.json
+SHA256 57533584a5a9969033065a453a89cedc154e288c14ad1d646383bd63075f8dc0 META.yml
+SHA256 a15f785b049a116050fc6531269151adf78b1cf3f2fd3899656d99a5f90c3c67 Makefile.PL
 SHA256 4f23d003ced1c18f3dfa99cac21e336a802f8b7a0274b0a58e52ab766d7451de README.md
 SHA256 9abbf89b5d8ea154f5490bed8cb75413af4ec654b22f2756459e4731526c0622 forms/dbforms.cgi
 SHA256 0179d26ab21ab56635ef3b17404ff4819fc81d04a04c824f66bafe407b68192d lib/DbFramework/Attribute.pm
@@ -49,7 +49,7 @@ SHA256 817e2fbfbcf273441a48e729c12d97d56f7373d0f3431e99503a5a29ee91084e t/test/f
 SHA256 bb8e3a38a53ee8f3910a1b9d2045bd2758d33b3b0a7ba2660364dde720b14d4e t/util.pl
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQSBin4eTeP7OclnnAOL2C5vMLlLXAUCYCCoUwAKCRCL2C5vMLlL
-XPeeAKCQtpUTG6DXpVQp4+FkIFe7GxLJTACdGCmddV95UUZQVjXvSot3iFCj8g0=
-=AR9I
+iF0EAREDAB0WIQSBin4eTeP7OclnnAOL2C5vMLlLXAUCYCQLOgAKCRCL2C5vMLlL
+XE9TAJ9JYb40v0byMnMPFV4r1w7Gq5Wn2ACgh201Stad/V74zPr9uorfV82Nj48=
+=Ac9x
 -----END PGP SIGNATURE-----

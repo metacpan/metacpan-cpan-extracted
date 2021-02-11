@@ -2,12 +2,13 @@ use Lingua::Romana::Perligata;
 
                       maximum tum val inquementum
                 tum biguttam tum stadium egresso scribe.
-                             da meo maximo
-                        vestibulo perlegementum.
+                             meo maximo
+                        vestibulo perlegementum
+                             da.
 
             maximum comementum tum novumversum egresso scribe.
-                              meis listis
-                   conscribementa II tum maximum da.
+                              da meis listis
+                   conscribementa II tum maximum.
                        dum damentum nexto listis
                            decapitamentum fac
 

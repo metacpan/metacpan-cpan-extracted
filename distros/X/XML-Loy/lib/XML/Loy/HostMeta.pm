@@ -48,8 +48,8 @@ XML::Loy::HostMeta - HostMeta Extension for XRD
   my $xrd = XML::Loy::XRD->new;
   $xrd->extension(-HostMeta);
 
-  $xrd->subject('http://sojolicio.us/');
-  $xrd->host('sojolicio.us');
+  $xrd->subject('http://sojolicious.example/');
+  $xrd->host('sojolicious.example');
 
   print $xrd->to_pretty_xml;
 
@@ -57,8 +57,8 @@ XML::Loy::HostMeta - HostMeta Extension for XRD
   # <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0"
   #      xmlns:hm="http://host-meta.net/xrd/1.0"
   #      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  #   <Subject>http://sojolicio.us/</Subject>
-  #   <hm:Host>sojolicio.us</hm:Host>
+  #   <Subject>http://sojolicious.example/</Subject>
+  #   <hm:Host>sojolicious.example</hm:Host>
   # </XRD>
 
 
@@ -79,7 +79,7 @@ from L<XML::Loy> and implements the following new ones.
 
 =head2 host
 
-  $xrd->host('sojolicio.us');
+  $xrd->host('sojolicious.example');
   print $xrd->host;
 
 Sets or returns host information of the xrd.
@@ -99,7 +99,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2016, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

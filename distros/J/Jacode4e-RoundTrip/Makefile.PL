@@ -1,10 +1,10 @@
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Jacode4e::RoundTrip},
-    'VERSION'   => q{2.13.81.10},
+    'VERSION'   => q{2.13.81.11},
     'ABSTRACT'  => q{Jacode4e for round-trip conversion in JIS X 0213},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',

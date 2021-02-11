@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Git::Helpers;
-our $VERSION = '0.000021';
+our $VERSION = '1.000000';
 use Carp qw( croak );
 use Capture::Tiny 'capture_stderr';
 use File::pushd qw( pushd );
@@ -15,7 +15,6 @@ use Sub::Exporter -setup => {
         'ignored_files',
         'is_inside_work_tree',
         'remote_url',
-        'travis_url',
     ]
 };
 use Try::Tiny qw( catch try );
@@ -120,16 +119,6 @@ sub remote_url {
     return $url;
 }
 
-sub travis_url {
-    my $remote_url = https_remote_url(shift);
-    my $url        = URI->new($remote_url);
-    return uri(
-        scheme => 'https',
-        host   => 'travis-ci.org',
-        path   => $url->path,
-    );
-}
-
 1;
 
 #ABSTRACT: Shortcuts for common Git commands
@@ -146,7 +135,7 @@ Git::Helpers - Shortcuts for common Git commands
 
 =head1 VERSION
 
-version 0.000021
+version 1.000000
 
 =head1 SYNOPSIS
 
@@ -156,7 +145,6 @@ version 0.000021
         https_remote_url
         is_inside_work_tree
         remote_url
-        travis_url
     );
 
     my $dir              = '/path/to/folder/in/git/checkout';
@@ -165,7 +153,6 @@ version 0.000021
     my $https_remote_url = https_remote_url();
     my $inside_work_tree = is_inside_work_tree();
     my $remote_url       = remote_url('upstream');
-    my $travis_url       = travis_url();
 
 =head2 checkout_root( $dir )
 
@@ -224,24 +211,13 @@ Provides you with the exact URL which git returns. Nothing is fixed up for you.
     # get URL for upstream remote
     my $upstream_url = remote_url('upstream');
 
-=head2 travis_url( $remote_name )
-
-Returns a L<travis-ci.org> URL for the remote you've requested by name.
-Defaults to 'origin'.
-
-    # get Travis URL for remote named "origin"
-    my $origin_travis_url = travis_url();
-
-    # get Travis URL for remote named "upstream"
-    my $upstream_travis_url = travis_url('upstream');
-
 =head1 AUTHOR
 
 Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2019 by Olaf Alders.
+This software is copyright (c) 2015 by Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

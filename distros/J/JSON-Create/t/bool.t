@@ -37,7 +37,7 @@ my $z80 = Ba::Bi::Bu::Be::Bo->false ();
 my $jc = JSON::Create->new ();
 $jc->bool (qw/Ba::Bi::Bu::Be::Bo/);
 my $thing = {monkey => $babibubebo, zilog => $z80,};
-my $stuff = $jc->run ($thing);
+my $stuff = $jc->create ($thing);
 
 like ($stuff, qr/"monkey":true\b/, "Self-created true");
 like ($stuff, qr/"zilog":false\b/, "Self-created false");
@@ -62,7 +62,7 @@ SKIP: {
 	'Peter' => boolean::false(),
 	'Falk' => boolean::true(),
     };
-    my $ingyout = $ingy->run ($dotnet);
+    my $ingyout = $ingy->create ($dotnet);
     like ($ingyout, qr/"Peter":false\b/, "boolean false");
     like ($ingyout, qr/"Falk":true\b/, "boolean true");
 };
@@ -84,11 +84,11 @@ SKIP: {
 	'salt' => JSON::Tiny::true(),
 	'lake' => JSON::Tiny::false(),
     };
-    my $saltlake = $davido->run ($minij);
+    my $saltlake = $davido->create ($minij);
     like ($saltlake, qr/"salt":true/, "JSON::Tiny true");
     like ($saltlake, qr/"lake":false/, "JSON::Tiny false");
     # Test round-trip
-    my $jthp = $davido->run (JSON::Tiny::decode_json ($jsonin));
+    my $jthp = $davido->create (JSON::Tiny::decode_json ($jsonin));
     like ($jthp, qr/"hocus":true/);
     like ($jthp, qr/"pocus":false/);
 };
@@ -108,11 +108,11 @@ SKIP: {
 	'don' => $JSON::PP::true,
 	'zoko' => $JSON::PP::false,
     };
-    my $ppout = $makamaka->run ($pp);
+    my $ppout = $makamaka->create ($pp);
     like ($ppout, qr/"don":true/, "JSON::PP true");
     like ($ppout, qr/"zoko":false/, "JSON::PP false");
     # Test round trip
-    my $jphp = $makamaka->run (JSON::PP::decode_json ($jsonin));
+    my $jphp = $makamaka->create (JSON::PP::decode_json ($jsonin));
     like ($jphp, qr/"hocus":true/);
     like ($jphp, qr/"pocus":false/);
 };
@@ -137,7 +137,7 @@ SKIP: {
 	'any' => Types::Serialiser::true (),
 	'event' => Types::Serialiser::false (),
     };
-    my $schplog = $schmorp->run ($lehmann);
+    my $schplog = $schmorp->create ($lehmann);
     like ($schplog, qr/"any":true/, "Types::Serialiser::true");
     like ($schplog, qr/"event":false/, "Types::Serialiser::false");
 };

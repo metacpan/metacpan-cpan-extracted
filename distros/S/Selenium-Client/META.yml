@@ -7,7 +7,6 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  perl: '5.020'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -20,40 +19,40 @@ name: Selenium-Client
 provides:
   Selenium::Capabilities:
     file: lib/Selenium/Client.pm
-    version: '1.0'
+    version: '1.02'
   Selenium::Client:
     file: lib/Selenium/Client.pm
-    version: '1.0'
+    version: '1.02'
   Selenium::Driver::Auto:
     file: lib/Selenium/Driver/Auto.pm
-    version: '1.0'
+    version: '1.02'
   Selenium::Driver::Chrome:
     file: lib/Selenium/Driver/Chrome.pm
-    version: '1.0'
+    version: '1.02'
   Selenium::Driver::Edge:
     file: lib/Selenium/Driver/Edge.pm
-    version: '1.0'
+    version: '1.02'
   Selenium::Driver::Gecko:
     file: lib/Selenium/Driver/Gecko.pm
-    version: '1.0'
+    version: '1.02'
   Selenium::Driver::Safari:
     file: lib/Selenium/Driver/Safari.pm
-    version: '1.0'
+    version: '1.02'
   Selenium::Driver::SeleniumHQ::Jar:
     file: lib/Selenium/Driver/SeleniumHQ/Jar.pm
-    version: '1.0'
+    version: '1.02'
   Selenium::Element:
     file: lib/Selenium/Client.pm
-    version: '1.0'
+    version: '1.02'
   Selenium::Session:
     file: lib/Selenium/Client.pm
-    version: '1.0'
+    version: '1.02'
   Selenium::Specification:
     file: lib/Selenium/Specification.pm
-    version: '1.0'
+    version: '1.02'
   Selenium::Subclass:
     file: lib/Selenium/Subclass.pm
-    version: '1.0'
+    version: '1.02'
 requires:
   Capture::Tiny: '0'
   Carp: '0'
@@ -76,13 +75,15 @@ requires:
   XML::LibXML: '0'
   feature: '0'
   parent: '0'
-  perl: '5.020'
+  perl: v5.28.0
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/troglodyne-internet-widgets/seleinum-specification-perl/issues
   homepage: https://github.com/troglodyne-internet-widgets/seleinum-specification-perl
   repository: https://github.com/troglodyne-internet-widgets/seleinum-specification-perl.git
-version: '1.0'
+version: '1.02'
+x_contributors:
+  - 'Manni Heumann <heumann@strato.de>'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

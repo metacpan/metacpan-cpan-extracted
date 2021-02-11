@@ -18,17 +18,17 @@ ok(my $xrd = XML::Loy::XRD->new, 'Constructor');
 
 ok($xrd->extension('XML::Loy::HostMeta'), 'Extend with hostmeta');
 
-ok($xrd->subject('http://sojolicio.us/'), 'Add subject');
+ok($xrd->subject('http://sojolicious.example/'), 'Add subject');
 
 ok(!$xrd->host, 'No host');
 
-ok($xrd->host('sojolicio.us'), 'Add host');
+ok($xrd->host('sojolicious.example'), 'Add host');
 
-is($xrd->host, 'sojolicio.us', 'Get host');
+is($xrd->host, 'sojolicious.example', 'Get host');
 
 is($xrd->at('*')->namespace, 'http://docs.oasis-open.org/ns/xri/xrd-1.0', 'Namespace');
 
 is($xrd->at('Host')->namespace, 'http://host-meta.net/xrd/1.0', 'Namespace');
-is($xrd->at('Host')->text, 'sojolicio.us', 'Host');
+is($xrd->at('Host')->text, 'sojolicious.example', 'Host');
 
 __END__

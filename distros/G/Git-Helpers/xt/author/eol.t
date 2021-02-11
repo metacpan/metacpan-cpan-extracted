@@ -12,7 +12,6 @@ my @files = (
     'script/cpan-repo',
     'script/delete-git-branches',
     'script/gh-open',
-    'script/travis-open',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/01-diag.t',

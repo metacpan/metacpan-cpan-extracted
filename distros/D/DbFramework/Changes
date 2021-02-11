@@ -1,5 +1,9 @@
 DbFramework change log
 
+2021-02-10	version 1.14
+	 1. Build.PL, Makefile.PL: Added variable declaration, fixed the
+	    required file path, and prevented the automated tests.
+
 2021-02-08	version 1.13
 	 1. The DbFramework is hosted on GitHub now.
 	 2. MANIFEST.SKIP: Added.
@@ -8,6 +12,7 @@ DbFramework change log
 	 4. COPYING: Removed the redundant and irrelevant GPL license copy.
 	 5. AUTHORS, TODO, README, README.md: Replaced the messy
 	    GNU-styled documents with a single Markdown README.md.
+	 6. Makefile.PL, Build.PL: Added the CPAN distribution metadata.
 
 2008-05-03
 	 1. Makefile.PL and Build.PL: Automatic checks and lists only

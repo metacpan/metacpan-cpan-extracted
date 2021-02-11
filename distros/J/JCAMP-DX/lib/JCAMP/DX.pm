@@ -1,8 +1,8 @@
 #------------------------------------------------------------------------------
 #$Author: andrius $
-#$Date: 2018-12-20 11:24:42 +0200 (Kt, 20 gruod. 2018) $
-#$Revision: 78 $
-#$URL: svn+ssh://www.crystallography.net/home/coder/svn-repositories/jcamp-dx/tags/v0.02/lib/JCAMP/DX.pm $
+#$Date: 2021-02-10 13:41:55 +0200 (Tr, 10 vas. 2021) $
+#$Revision: 91 $
+#$URL: svn+ssh://www.crystallography.net/home/coder/svn-repositories/JCAMP-DX/tags/v0.03/lib/JCAMP/DX.pm $
 #------------------------------------------------------------------------------
 #*
 #  Parser for JCAMP-DX format.
@@ -12,9 +12,11 @@ package JCAMP::DX;
 
 use strict;
 use warnings;
-use JCAMP::DX::LabelDataRecord;
 
-our $VERSION = '0.02';
+# ABSTRACT: parser for JCAMP-DX format
+our $VERSION = '0.03'; # VERSION
+
+use JCAMP::DX::LabelDataRecord;
 
 sub new
 {

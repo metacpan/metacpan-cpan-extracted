@@ -4,7 +4,7 @@
       "Ed J <etj@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -70,6 +70,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.18",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

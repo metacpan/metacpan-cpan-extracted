@@ -15,7 +15,7 @@ package API::GitForge;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$API::GitForge::VERSION = '0.005';
+$API::GitForge::VERSION = '0.006';
 
 use 5.028;
 use strict;
@@ -79,7 +79,7 @@ API::GitForge - generic interface to APIs of sites like GitHub, GitLab etc.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

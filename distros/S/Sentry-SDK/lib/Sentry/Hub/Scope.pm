@@ -42,7 +42,7 @@ sub set_tag ($self, $key, $value) {
 }
 
 sub set_tags ($self, $tags) {
-  $self->tags = { %{ $self->tags }, %{$tags} };
+  $self->tags({ $self->tags->%*, $tags->%* });
 }
 
 sub set_context ($self, $key, $context = undef) {

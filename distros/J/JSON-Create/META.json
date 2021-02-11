@@ -17,6 +17,9 @@
       "directory" : [
          "t",
          "inc"
+      ],
+      "file" : [
+         "t/JCT.pm"
       ]
    },
    "prereqs" : {
@@ -34,16 +37,11 @@
          "requires" : {
             "B" : "0",
             "Carp" : "0",
+            "JSON::Parse" : "0.60",
             "POSIX" : "0",
             "Scalar::Util" : "0",
             "Unicode::UTF8" : "0.62",
             "perl" : "5.006001"
-         }
-      },
-      "test" : {
-         "requires" : {
-            "JSON::Parse" : "0.58",
-            "Test::More" : "0"
          }
       }
    },
@@ -58,6 +56,6 @@
          "web" : "https://github.com/benkasminbullock/json-create"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

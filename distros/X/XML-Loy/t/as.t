@@ -22,7 +22,7 @@ package Fun;
 use lib '../lib';
 
 use XML::Loy with => (
-  namespace => 'http://sojolicio.us/ns/fun',
+  namespace => 'http://sojolicious.example/ns/fun',
   prefix => 'fun'
 );
 
@@ -42,7 +42,7 @@ package Animal;
 use lib '../lib';
 
 use XML::Loy with => (
-  namespace => 'http://sojolicio.us/ns/animal',
+  namespace => 'http://sojolicious.example/ns/animal',
   prefix => 'anim'
 );
 
@@ -72,14 +72,14 @@ is($animal->at('entry id')->text, 5, 'Correct id');
 
 my $xml = XML::Loy->new('<XRD><Subject>akron</Subject></XRD>');
 
-warning_is { $xml->alias('acct:akron@sojolicio.us') }
+warning_is { $xml->alias('acct:akron@sojolicious.example') }
 q{Can't locate "alias" in "XML::Loy"},
   'Warning';
 
 my $xrd = $xml->as(-XRD, -HostMeta);
 
-ok($xrd->alias('acct:akron@sojolicio.us'), 'Set alias');
+ok($xrd->alias('acct:akron@sojolicious.example'), 'Set alias');
 
 my ($alias) = $xrd->alias;
 
-is($alias, 'acct:akron@sojolicio.us', 'Alias is correct');
+is($alias, 'acct:akron@sojolicious.example', 'Alias is correct');

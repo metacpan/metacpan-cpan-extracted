@@ -1,5 +1,13 @@
 Revision history for Perl module 
 
+20210112.004 2021-02-10T04:29:32Z
+	* Test the default data.
+	* Add a note about packaging RangeMessage.xml (adapted from gwyn17)
+
+20210112.003 2021-02-09T22:42:53Z
+	* The default data had a problem because I used the same hash key
+	twice in the default data (Github #7). Found by gwyn17.
+
 20210112.002 2021-02-07T05:46:20Z
 	* Don't try to load a data file if there are no data files
 	(Github #6)

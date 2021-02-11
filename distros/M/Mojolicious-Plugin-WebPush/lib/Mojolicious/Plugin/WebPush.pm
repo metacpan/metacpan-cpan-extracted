@@ -6,7 +6,7 @@ use MIME::Base64 qw(encode_base64url decode_base64url);
 use Crypt::JWT qw(encode_jwt decode_jwt);
 use Crypt::RFC8188 qw(ece_encrypt_aes128gcm);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my @MANDATORY_CONF = qw(
   subs_session2user_p
@@ -46,8 +46,8 @@ sub _make_route_handler {
     return _error($c, $body) if !$decode_ok;
     eval { validate_subs_info($body) };
     return _error($c, $@) if $@;
-    return $subs_session2user_p->($c->session)->then(
-      sub { $subs_create_p->($_[0], $body) },
+    return $subs_session2user_p->($c, $c->session)->then(
+      sub { $subs_create_p->($c, $_[0], $body) },
     )->then(
       sub { $c->render(json => { data => { success => \1 } }) },
       sub { _error($c, @_) },
@@ -135,10 +135,10 @@ sub register {
   $app->helper('webpush.create_p' => sub {
     eval { validate_subs_info($_[2]) };
     return Mojo::Promise->reject($@) if $@;
-    $conf->{subs_create_p}->(@_[1,2]);
+    $conf->{subs_create_p}->(@_);
   });
-  $app->helper('webpush.read_p' => sub { $conf->{subs_read_p}->($_[1]) });
-  $app->helper('webpush.delete_p' => sub { $conf->{subs_delete_p}->($_[1]) });
+  $app->helper('webpush.read_p' => sub { $conf->{subs_read_p}->(@_) });
+  $app->helper('webpush.delete_p' => sub { $conf->{subs_delete_p}->(@_) });
   $app->helper('webpush.aud' => \&_aud_helper);
   $app->helper('webpush.authorization' => (grep !$conf->{$_}, @AUTH_CONF)
     ? sub { die "Must provide @AUTH_CONF\n" }
@@ -190,23 +190,23 @@ Mojolicious::Plugin::WebPush - plugin to aid real-time web push
   };
 
   sub subs_session2user_p {
-    my ($session) = @_;
+    my ($c, $session) = @_;
     return Mojo::Promise->reject("Session not logged in") if !$session->{user_id};
     Mojo::Promise->resolve($session->{user_id});
   }
 
   sub subs_create_p {
-    my ($session, $subs_info) = @_;
+    my ($c, $session, $subs_info) = @_;
     app->db->save_subs_p($session->{user_id}, $subs_info);
   }
 
   sub subs_read_p {
-    my ($user_id) = @_;
+    my ($c, $user_id) = @_;
     app->db->lookup_subs_p($user_id);
   }
 
   sub subs_delete_p {
-    my ($user_id) = @_;
+    my ($c, $user_id) = @_;
     app->db->delete_subs_p($user_id);
   }
 

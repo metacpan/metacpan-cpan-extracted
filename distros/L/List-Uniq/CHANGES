@@ -1,43 +1,47 @@
-#
-# $Id$
-#
-
 Changelog for List::Uniq
 ------------------------
 
 0.10    September 29th 2004
 
-        Initial release to CPAN
+	- Initial release to CPAN
 
 0.11	July 22nd 2008
 
-	Fixed rt.cpan.org #37837: suppress uninitalized value warnings 
+	- Fixed rt.cpan.org #37837: suppress uninitalized value warnings
 
 0.12	July 22nd 2008
 
-	Fixed 5.10 incompatibility regarding warnings/croak
+	- Fixed 5.10 incompatibility regarding warnings/croak
 
 0.13    June 15th 2010
 
-	Fixed rt.cpan.org #58389: array refs following empty array refs
-	weren't being flattened properly
+	- Fixed rt.cpan.org #58389: array refs following empty array refs weren't being flattened properly
 
 0.20    June 18th 2010
 
-	Added recursive flattening of list references by default with
-	an option to disable this behaviour
+	- Added recursive flattening of list references by default with an option to disable this behaviour
 
 0.21.0  April 6th 2014
 
-	Version bump to add CPAN metadata courtesy of David Steinbrunner
-	(github.com/dsteinbrunner).  Change to semver-compliant version number
+	- Version bump to add CPAN metadata courtesy of David Steinbrunner (github.com/dsteinbrunner).
+	- Change to semver-compliant version number
 
 0.22	February 8th 2021
 
-	Convert build to ExtUtils::MakeMaker
-	Fix use and breakpoints tests
-	Remove coverage.txt
-	Update git and MANIFEST ignore lists
+	- Convert build to ExtUtils::MakeMaker
+	- Fix use and breakpoints tests
+	- Remove coverage.txt
+	- Update git and MANIFEST ignore lists
 
-#
-# EOF
+0.23	February 10th 2021
+
+	- Add modules in SEE ALSO
+	- Fix excessive memory growth
+	- Add test to detect excessive memory growth
+	- Remove Id and EOF tags
+	- Update formatting for perltidy
+	- Consolidate flatten tests
+	- Clean up pod
+	- Add travis testing targets
+	- Rename 10_rt_58389.t
+	- Add back git repo information to Makefile.PL

@@ -15,22 +15,74 @@ my $have_decimal64  = undef; # Default value
 my $have_decimal128 = undef; # Default value
 my $have_float128   = undef; # Default value
 my $want_float128   = undef; # Default value
+my $checklib        = 1;     # Check for availability of mpfr and gmp libraries.
 
+#$checklib = 0;         # Uncomment to skip check of availability of mpfr and gmp libraries.
 #$use_64_bit_int  = -1; # Uncomment to Force exclusion of 64-bit 'long long' support
 #$use_long_double = -1; # Uncomment to Force exclusion of 'long double' support
 #$have_decimal64  = -1; # Uncomment to Force exclusion of _Decimal64 support
-#$have_decimal128  = -1; # Uncomment to Force exclusion of _Decimal128 support
+#$have_decimal128 = -1; # Uncomment to Force exclusion of _Decimal128 support
 #$have_float128   = -1; # Uncomment to Force exclusion of __float128/_Float128 support
 
 #$use_64_bit_int  = 1; # Uncomment to Force inclusion of 64-bit 'long long' support
 #$use_long_double = 1; # Uncomment to Force inclusion of 'long double' support
 #$have_decimal64  = 1; # Uncomment to Force inclusion of _Decimal64 support
-#$have_decimal128  = 1; # Uncomment to Force inclusion of _Decimal128 support
+#$have_decimal128 = 1; # Uncomment to Force inclusion of _Decimal128 support
 #$have_float128   = 1; # Uncomment to Force inclusion of __float128/_Float128 support
 
-my $save = open SAVE, '>', 'save_config.txt';
+my $SAVE;
+my $save = open $SAVE, '>', 'save_config.txt';
 
 warn "Couldn't open save_config.txt for writing: $!" unless $save;
+
+my($mycc, $mklib, $mkinc, $mylibpth) = ('', '', '', '') ;
+
+
+if(@ARGV) {
+  for my $arg(@ARGV) {
+    $mycc   = (split /=/, $arg)[1] if $arg =~ /^cc=/i;
+    $mklib = (split /=/, $arg)[1] if $arg =~ /^libs=/i;
+    $mkinc  = (split /=/, $arg)[1] if $arg =~ /^inc=/i;
+    $checklib = 0 if $arg =~ /^check=0/i;
+  }
+}
+
+unless($mycc) {
+  $mycc = defined($Config{cc}) ? $Config{cc} : 'cc';
+}
+
+my @libpth = split /\s+/, $Config{libpth};
+for(@libpth) { $mylibpth .= " -L$_" }
+$mylibpth .= " -lmpfr -lgmp";
+
+###############################################################
+# Check that -lmpfr and -lgmp can be found. Don't worry about #
+# checking for mpfr.h and gmp.h - if they can't be found when #
+# needed by a smoker then it won't be reported as a FAIL      #
+###############################################################
+
+if($checklib) {
+
+  my $mylibs = $mklib . " " . $mylibpth;
+
+  my $out = `$mycc -o checklib.exe -x c checklib.in $mylibs 2>&1`;
+
+  if($out) {
+    print "$out\n";
+    if($save) {print $SAVE "checklib build: $out\n"}
+  }
+
+  if(-e 'checklib.exe') {
+    $out = $^O =~ /MSWin32/i ? `checklib.exe` : `./checklib.exe`;
+    if($save) {print $SAVE "checklib.exe: $out\n"}
+  }
+  else {
+    warn "\n  Could not resolve '-lmpfr' and/or '-lgmp'\n",
+         "  If this is incorrect please see the 'Checklib' section in the README\n",
+         "  Aborting the build of Math::MPFR\n";
+    exit 0;
+  }
+}
 
 ############################################
 # Whether to build with _Decimal64 support #
@@ -47,44 +99,31 @@ else { # we still need to determine whether_Decimal64 should be supported
   }
 
   if(!defined($have_decimal64)) { # _Decimal64 support still undetermined
-    my($mycc, $mylibs, $myinc) = ('', '', '');
 
-    if(@ARGV) {
-      for my $arg(@ARGV) {
-        $mycc   = (split /=/, $arg)[1] if $arg =~ /^cc=/i;
-        $mylibs = (split /=/, $arg)[1] if $arg =~ /^libs=/i;
-        $myinc  = (split /=/, $arg)[1] if $arg =~ /^inc=/i;
-      }
-    }
-
-    unless($mycc) {
-      $mycc = defined($Config{cc}) ? $Config{cc} : 'cc';
-    }
-
-    $mylibs = '-lmpfr -lgmp' unless $mylibs;
+    my $mylibs = $mklib . " " . $mylibpth;
 
     my $out = `$mycc -o have_d64.exe -x c have_d64.in 2>&1`;
 
     if($out) {
       print "$out\n";
-      if($save) {print SAVE "try_64 build: $out\n"}
+      if($save) {print $SAVE "try_64 build: $out\n"}
     }
 
     unless(-e 'have_d64.exe') {$have_decimal64 = 0}
 
     else { # _Decimal64 support still undetermined
 
-      my $out = `$mycc -o try_dec64.exe -x c try_dec64.in $myinc $mylibs 2>&1`;
+      my $out = `$mycc -o try_dec64.exe -x c try_dec64.in $mkinc $mylibs 2>&1`;
 
       if($out) {
         print "$out\n";
-        if($save) {print SAVE "try_dec64 build: $out\n"}
+        if($save) {print $SAVE "try_dec64 build: $out\n"}
       }
 
       if(-e 'try_dec64.exe') {
         $out = $^O =~ /MSWin32/i ? `try_dec64.exe` : `./try_dec64.exe`;
         if($out == 42) {$have_decimal64 = 1}
-        if($save) {print SAVE "try_dec64.exe: $out\n"}
+        if($save) {print $SAVE "try_dec64.exe: $out\n"}
       }
     }
   }
@@ -112,44 +151,31 @@ else { # we still need to determine whether_Decimal128 should be supported
   }
 
   if(!defined($have_decimal128)) { # _Decimal128 support still undetermined
-    my($mycc, $mylibs, $myinc) = ('', '', '');
 
-    if(@ARGV) {
-      for my $arg(@ARGV) {
-        $mycc   = (split /=/, $arg)[1] if $arg =~ /^cc=/i;
-        $mylibs = (split /=/, $arg)[1] if $arg =~ /^libs=/i;
-        $myinc  = (split /=/, $arg)[1] if $arg =~ /^inc=/i;
-      }
-    }
-
-    unless($mycc) {
-      $mycc = defined($Config{cc}) ? $Config{cc} : 'cc';
-    }
-
-    $mylibs = '-lmpfr -lgmp' unless $mylibs;
+    my $mylibs = $mklib . " " . $mylibpth;
 
     my $out = `$mycc -o have_d128.exe -x c have_d128.in 2>&1`;
 
     if($out) {
       print "$out\n";
-      if($save) {print SAVE "try_128 build: $out\n"}
+      if($save) {print $SAVE "try_128 build: $out\n"}
     }
 
     unless(-e 'have_d128.exe') {$have_decimal128 = 0}
 
     else { # _Decimal128 support still undetermined
 
-      my $out = `$mycc -o try_dec128.exe -x c try_dec128.in $myinc $mylibs 2>&1`;
+      my $out = `$mycc -o try_dec128.exe -x c try_dec128.in $mkinc $mylibs 2>&1`;
 
       if($out) {
         print "$out\n";
-        if($save) {print SAVE "try_dec128 build: $out\n"}
+        if($save) {print $SAVE "try_dec128 build: $out\n"}
       }
 
       if(-e 'try_dec128.exe') {
         $out = $^O =~ /MSWin32/i ? `try_dec128.exe` : `./try_dec128.exe`;
         if($out == 128) {$have_decimal128 = 1}
-        if($save) {print SAVE "try_dec128.exe: $out\n"}
+        if($save) {print $SAVE "try_dec128.exe: $out\n"}
       }
     }
   }
@@ -178,45 +204,31 @@ else { # we still need to determine whether__float128 should be supported.
 
   if(!defined($have_float128)) { # __float128 support still undetermined
 
-    print SAVE "\n\n" if $save;
-    my($mycc, $mylibs, $myinc) = ('', '', '');
+    print $SAVE "\n\n" if $save;
 
-    if(@ARGV) {
-      for my $arg(@ARGV) {
-        $mycc   = (split /=/, $arg)[1] if $arg =~ /^cc=/i;
-        $mylibs = (split /=/, $arg)[1] if $arg =~ /^libs=/i;
-        $myinc  = (split /=/, $arg)[1] if $arg =~ /^inc=/i;
-      }
-    }
+    my $mylibs = $mklib . " " . $mylibpth . " -lquadmath";
 
-    unless($mycc) {
-      $mycc = defined($Config{cc}) ? $Config{cc} : 'cc';
-    }
-
-    $mylibs = '-lmpfr -lgmp -lquadmath' unless $mylibs;
-
-    # Include $mylibs to ensure that -lquadmath is locatable.
-    my $out = `$mycc -o have_f128.exe -x c have_f128.in $mylibs 2>&1`;
+    my $out = `$mycc -o have_f128.exe -x c have_f128.in 2>&1`;
 
     if($out) {
       print "$out\n";
-      if($save) {print SAVE "have_f128 build: $out\n"}
+      if($save) {print $SAVE "have_f128 build: $out\n"}
     }
 
     unless(-e 'have_f128.exe') {$have_float128 = 0}
 
     else {
-      my $out = `$mycc -o try_flt128.exe -x c try_flt128.in $myinc $mylibs 2>&1`;
+      my $out = `$mycc -o try_flt128.exe -x c try_flt128.in $mkinc $mylibs 2>&1`;
 
       if($out) {
         print "$out\n";
-        if($save) {print SAVE "try_flt128 build: $out\n"}
+        if($save) {print $SAVE "try_flt128 build: $out\n"}
       }
 
       if(-e 'try_flt128.exe') {
         $out = $^O =~ /MSWin32/i ? `try_flt128.exe` : `./try_flt128.exe`;
         if($out == 42) {$have_float128 = 1}
-        if($save) {print SAVE "try_flt128.exe: $out\n"}
+        if($save) {print $SAVE "try_flt128.exe: $out\n"}
       }
     }
   }
@@ -227,7 +239,7 @@ my $float128_message = $have_float128 ? "Attempting to build with Math::Float128
 
 ####################################
 
-close SAVE or warn "Couldn't close save_config.txt";
+close $SAVE or warn "Couldn't close save_config.txt";
 
 my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
@@ -331,30 +343,33 @@ for(@ARGV) {
 #             Jan 8 2018.
 
 my %options = (
-  NAME => 'Math::MPFR',
-  AUTHOR => 'Sisyphus (sisyphus at (@) cpan dot (.) org)',
-  ABSTRACT => 'Perl interface to the MPFR (floating point) library',
-  DEFINE   => $defines,
-  LIBS => [
-    '-lmpfr -lgmp -lquadmath'
-  ],
-  PREREQ_PM => {
-                'Test::More' => '0.88',
-  },
-  LICENSE  => 'perl',
+  NAME         => 'Math::MPFR',
+  AUTHOR       => 'Sisyphus (sisyphus at (@) cpan dot (.) org)',
+  ABSTRACT     => 'Perl interface to the MPFR (floating point) library',
+  DEFINE       => $defines,
+  LIBS         => [ '-lmpfr -lgmp -lquadmath' ],
+  PREREQ_PM    => { 'Test::More' => '0.88', },
+  #OBJECT       => '$(O_FILES)', # set below if $Config{nvsize} == 8
+  LICENSE      => 'perl',
   VERSION_FROM => 'MPFR.pm',
-  clean   => { FILES => '*.exe *.txt' },
-  META_MERGE => {
-   'meta-spec' => { version => 2 },
-    resources => {
-      repository => {
-        type => 'git',
-        url => 'https://github.com/sisyphus/math-mpfr.git',
-        web => 'https://github.com/sisyphus/math-mpfr',
+  clean        => { FILES => '*.exe *.txt' },
+  META_MERGE   => {
+    'meta-spec'  => { version => 2 },
+    resources    => {
+      repository   => {
+        type         => 'git',
+        url          => 'https://github.com/sisyphus/math-mpfr.git',
+        web          => 'https://github.com/sisyphus/math-mpfr',
       },
     },
   },
 );
+
+# Invlolve grisu3.h and grisu3.c if $Config{nvsize} == 8.
+# Otherwise they're not needed :
+
+$options{OBJECT} = '$(O_FILES)'
+  if $Config{nvsize} == 8;
 
 WriteMakefile(%options);
 

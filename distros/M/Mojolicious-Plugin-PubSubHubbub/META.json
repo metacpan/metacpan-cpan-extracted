@@ -54,6 +54,6 @@
          "web" : "https://github.com/Akron/Mojolicious-Plugin-PubSubHubbub"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

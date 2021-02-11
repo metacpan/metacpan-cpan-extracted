@@ -11,7 +11,7 @@ use Data::Dump 'dump';
 use Storable 'dclone';
 use Scalar::Util 'weaken';
 
-our $VERSION = "v0.0.11";
+our $VERSION = "v0.0.13";
 
 has 'name';
 has 'events_patches_o';

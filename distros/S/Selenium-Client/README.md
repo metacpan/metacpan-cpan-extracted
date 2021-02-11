@@ -22,6 +22,8 @@ Module to turn the Online specification documents for Selenium into JSON specifi
 
 Soon to come:
 
+- BrowserMob Proxy integration
+
 - Selenium::Server
 
 Pure perl selenium server (that proxies commands to browser drivers, much like the SeleniumHQ Jar)
@@ -29,6 +31,10 @@ Pure perl selenium server (that proxies commands to browser drivers, much like t
 - Selenium::Grid
 
 Pure perl selenium grid API server
+
+- Selenium::Driver::Playwright
+
+Selenium implemented in playwright (so that it no longer is crippled by inability to access some attrs/props)
 
 - Selenium::Client::SRD
 
@@ -39,11 +45,25 @@ Drop-in replacement for Selenium::Remote::Driver
 This module stores a number of things in your homedirectory's .selenium folder.
 You may want to clear this out periodically, as various log files and configuration data becomes stale.
 
+## BUILDING
+
+This is a Dist::Zilla CPAN module.  To build this project, do the following:
+
+* Install Dist::Zilla either via cpan or your favorite package manager
+
+* `dzil authordeps --missing | sudo cpanm`
+* `dzil listdeps   --missing | sudo cpanm`
+* `dzil build`
+
 ## TESTING
 
 To check how this works with your setup, install Selenium::Client from CPAN (or just clone this repo), and then run:
 
 `prove -vm -Ilib at/sanity.test`
+
+If you encounter problems, you can get extra debugging output (which would be very much appreciated in any issues you file):
+
+`NO_HEADLESS=1 DEBUG=1 prove -vm -Ilib at/sanity.test`
 
 This runs through 100% of the WC3 selenium API.
 At release it passed on all of the supported browsers on:

@@ -59,16 +59,16 @@
 #define PACKAGE_NAME "dta-tokwrap"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "dta-tokwrap 0.96"
+#define PACKAGE_STRING "dta-tokwrap 0.97"
 
 /* Subversion identifier for package sources */
-#define PACKAGE_SVNID "svn+ssh://odo.dwds.de/home/svn/dev/dta-tokwrap/trunk @ 32979"
+#define PACKAGE_SVNID "svn+ssh://svn.dwds.de/home/svn/dev/dta-tokwrap/trunk @ 34043M"
 
 /* Current SVN revision of package sources */
-#define PACKAGE_SVNREV "32979"
+#define PACKAGE_SVNREV "34043M"
 
 /* Subversion HeadURL of package sources */
-#define PACKAGE_SVNURL "svn+ssh://odo.dwds.de/home/svn/dev/dta-tokwrap/trunk"
+#define PACKAGE_SVNURL "svn+ssh://svn.dwds.de/home/svn/dev/dta-tokwrap/trunk"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "dta-tokwrap"
@@ -77,13 +77,13 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.96"
+#define PACKAGE_VERSION "0.97"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.96"
+#define VERSION "0.97"
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */

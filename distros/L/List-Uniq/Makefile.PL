@@ -18,6 +18,11 @@ WriteMakefile(
             bugtracker => {
                 web => 'https://github.com/renderorange/List-Uniq/issues',
             },
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/renderorange/List-Uniq.git',
+                web  => 'https://github.com/renderorange/List-Uniq',
+            },
         },
     },
     LICENSE => 'perl_5',

@@ -3,13 +3,13 @@ NAME
     ported from (or inspired by) Python libraries
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     Acme::CPANModules::PortedFrom::Python (from Perl distribution
     Acme-CPANModules-PortedFrom-Python), released on 2021-02-05.
 
 DESCRIPTION
   SEE ALSO
-    Acme::CPANModules::PortedFrom::Python and other
+    Acme::CPANModules::PortedFrom::Ruby and other
     "Acme::CPANModules::PortedFrom::*" modules.
 
     If you know of others, please drop me a message.

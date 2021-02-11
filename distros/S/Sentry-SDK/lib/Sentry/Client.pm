@@ -78,8 +78,10 @@ sub event_from_exception ($self, $exception, $hint = undef, $scope = undef) {
   return {
     exception => {
       values => [{
-        type       => ref($exception),
-        value      => $exception->to_string,
+        type  => ref($exception),
+        value => $exception->can('to_string')
+        ? $exception->to_string
+        : $exception,
         module     => ref($exception),
         stacktrace => $stacktrace,
       }]
@@ -141,6 +143,10 @@ sub _apply_client_options ($self, $event) {
     if $event->{message};
 
   return;
+}
+
+sub get_options ($self) {
+  return $self->_options;
 }
 
 sub _apply_integrations_metadata ($self, $event) {

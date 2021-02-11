@@ -3,8 +3,9 @@ use Mojo::Base -base, -signatures;
 
 use Mojo::Util 'dumper';
 use Sentry::Hub::Scope;
-use Sentry::Logger;
+use Sentry::Logger 'logger';
 use Sentry::Severity;
+use Sentry::Tracing::SamplingMethod;
 use Sentry::Tracing::Transaction;
 use Sentry::Util qw(uuid4);
 use Time::HiRes qw(time);
@@ -15,7 +16,6 @@ my $Instance;
 has _last_event_id => undef;
 has _stack         => sub { [{}] };
 has client         => undef;
-has logger         => sub { Sentry::Logger->new };
 has scopes         => sub { [Sentry::Hub::Scope->new] };
 
 # has _root_scope =>
@@ -27,10 +27,6 @@ sub init ($package, $options) {
 sub bind_client ($self, $client) {
   $self->client($client);
   $client->setup_integrations();
-}
-
-sub _get_top_scope ($self) {
-  return @{ $self->scopes }[0];
 }
 
 sub get_current_scope ($package) {
@@ -119,9 +115,90 @@ sub run ($self, $cb) {
   $cb->($self);
 }
 
-sub start_transaction ($self, $context, $custom_sampling_context = undef) {
-  return Sentry::Tracing::Transaction->new(
+sub sample ($self, $transaction, $sampling_context) {
+  my $client  = $self->client;
+  my $options = ($client && $client->get_options) // {};
+
+  #  nothing to do if there's no client or if tracing is disabled
+  if (!$client || !$options->{traces_sample_rate}) {
+    $transaction->sampled(0);
+    return $transaction;
+  }
+
+  # if the user has forced a sampling decision by passing a `sampled` value in
+  # their transaction context, go with that
+  if (defined $transaction->sampled) {
+    $transaction->tags({
+      $transaction->tags->%*,
+      __sentry_samplingMethod => Sentry::Tracing::SamplingMethod->Explicit,
+    });
+
+    return $transaction;
+  }
+
+  my $sample_rate;
+
+  if (defined $sampling_context->{parent_sampled}) {
+    $sample_rate = $sampling_context->{parent_sampled};
+    $transaction->tags({
+      $transaction->tags->%*,
+      __sentry_samplingMethod => Sentry::Tracing::SamplingMethod->Inheritance,
+    });
+  } else {
+    $sample_rate = $options->{traces_sample_rate};
+    $transaction->tags({
+      $transaction->tags->%*,
+      __sentry_samplingMethod => Sentry::Tracing::SamplingMethod->Rate,
+      __sentry_sampleRate     => $sample_rate,
+    });
+  }
+
+  if (!$sample_rate) {
+    logger->log(
+      'Discarding transaction because a negative sampling decision was inherited or tracesSampleRate is set to 0',
+      'Tracing'
+    );
+    $transaction->sampled(0);
+    return $transaction;
+  }
+
+  # Now we roll the dice. Math.random is inclusive of 0, but not of 1, so
+  # strict < is safe here. In case sampleRate is a boolean, the < comparison
+  # will cause it to be automatically cast to 1 if it's true and 0 if it's
+  # false.
+  $transaction->sampled(rand() < $sample_rate);
+
+  # if we're not going to keep it, we're done
+  if (!$transaction->sampled) {
+    logger->log(
+      "Discarding transaction because it's not included in the random sample (sampling rate = $sample_rate)",
+      'Tracing',
+    );
+    return $transaction;
+  }
+
+  logger->log(
+    sprintf(
+      'Starting %s transaction - %s',
+      $transaction->op // '(unknown op)',
+      $transaction->name
+    ),
+    'Tracing',
+  );
+  return $transaction;
+}
+
+sub start_transaction ($self, $context, $custom_sampling_context = {}) {
+  my $transaction = Sentry::Tracing::Transaction->new(
     { $context->%*, _hub => $self, start_timestamp => time });
+
+  return $self->sample(
+    $transaction,
+    {
+      parent_sampled => $context->{parent_sampled},
+      $custom_sampling_context->%*,
+    }
+  );
 }
 
 1;

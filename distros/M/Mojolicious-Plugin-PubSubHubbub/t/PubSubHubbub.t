@@ -22,31 +22,31 @@ our $rss =<<'EORSS';
 <rss version="2.0">
   <channel>
     <title>My Blog</title>
-    <link>http://sojolicio.us/blog</link>
+    <link>http://sojolicious.example/blog</link>
     <atom10:link type="application/rss+xml"
-                 href="http://sojolicio.us/blog.rss"
+                 href="http://sojolicious.example/blog.rss"
                  xmlns:atom10="http://www.w3.org/2005/Atom"
                  rel="self" />
     <description>Blog for Sojolicious</description>
     <language>en</language>
     <lastBuildDate>Sun, 02 Oct 2011 15:17:30 PDT</lastBuildDate>
-    <generator>http://sojolicio.us/</generator>
+    <generator>http://sojolicious.example/</generator>
     <atom10:link href="http://pubsubhubbub.appspot.com/"
                  xmlns:atom10="http://www.w3.org/2005/Atom"
                  rel="hub"/>
     <image>
-      <link>http://sojolicio.us</link>
-      <url>http://sojolicio.us/favicon.ico</url>
+      <link>http://sojolicious.example</link>
+      <url>http://sojolicious.example/favicon.ico</url>
       <title>Sojolicious</title>
     </image>
     <item>
       <title>First Post</title>
-      <link>http://sojolicio.us/blog/first_post.html</link>
+      <link>http://sojolicious.example/blog/first_post.html</link>
       <category>Post</category>
       <category>sojolicious</category>
       <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Akron</dc:creator>
       <pubDate>Sun, 02 Oct 2011 15:15:50 PDT</pubDate>
-      <guid isPermaLink="false">http://sojolicio.us/blog/1</guid>
+      <guid isPermaLink="false">http://sojolicious.example/blog/1</guid>
       <content:encoded xmlns:content="http://purl.org/rss/1.0/modules/content/">&lt;p&gt; &lt;em&gt;My first blog post&lt;/em&gt; - content</content:encoded>
       <description>My first blog post - description</description>
     </item>
@@ -55,7 +55,7 @@ our $rss =<<'EORSS';
     </item>
     <item xml:id="third_item">
       <source xmlns="http://www.w3.org/2005/Atom">
-        <link rel="self" href="http://sojolicio.us/2/blog" />
+        <link rel="self" href="http://sojolicious.example/2/blog" />
       </source>
     </item>
   </channel>
@@ -65,25 +65,25 @@ EORSS
   our $atom =<<'EOATOM';
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <id>http://sojolicio.us/blog.atom</id>
+  <id>http://sojolicious.example/blog.atom</id>
   <title>My Blog</title>
   <subtitle>Blog about sojolicious</subtitle>
   <updated>2011-10-06T14:00:13+00:00</updated>
   <author>
-    <uri>acct:akron@sojolicio.us</uri>
+    <uri>acct:akron@sojolicious.example</uri>
     <name>Akron</name>
-    <link rel="alternate" type="text/html" href="http://sojolicio.us/akron"/>
+    <link rel="alternate" type="text/html" href="http://sojolicious.example/akron"/>
   </author>
-  <link href="http://sojolicio.us/blog"
+  <link href="http://sojolicious.example/blog"
         rel="alternate"
         type="text/html"/>
   <link href="http://pubsubhubbub.appspot.com/"
         rel="hub"/>
-  <link href="http://sojolicio.us/blog.atom"
+  <link href="http://sojolicious.example/blog.atom"
         rel="self"
         type="application/atom+xml"/>
   <entry>
-    <id>http://sojolicio.us/blog/1</id>
+    <id>http://sojolicious.example/blog/1</id>
     <title>first post</title>
     <content type="html">This is my first post</content>
     <link rel="alternate"
@@ -93,14 +93,14 @@ EORSS
     <updated>2011-10-06T14:00:11+00:00</updated>
     <link rel="self"
           type="application/atom+xml"
-          href="http://sojolicio.us/blog/1.atom"/>
+          href="http://sojolicious.example/blog/1.atom"/>
   </entry>
   <entry xml:id="second_item">
     <source xmlns="http://www.w3.org/2005/Atom" />
   </entry>
   <entry xml:id="third_item">
     <source xmlns="http://www.w3.org/2005/Atom">
-      <link rel="self" href="http://sojolicio.us/2/blog" />
+      <link rel="self" href="http://sojolicious.example/2/blog" />
     </source>
   </entry>
 </feed>
@@ -110,11 +110,11 @@ our $rdf =<< 'EORDF';
 <?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
          xmlns="http://purl.org/rss/1.0/">
-  <channel rdf:about="http://sojolicio.us/blog">
+  <channel rdf:about="http://sojolicious.example/blog">
     <title>Blog about Sojolicious</title>
-    <link>http://sojolicio.us/blog</link>
+    <link>http://sojolicious.example/blog</link>
     <atom10:link type="application/rdf+xml"
-                 href="http://sojolicio.us/blog.rss"
+                 href="http://sojolicious.example/blog.rss"
                  xmlns:atom10="http://www.w3.org/2005/Atom"
                  rel="self"/>
     <description/>
@@ -131,8 +131,8 @@ our $rdf =<< 'EORDF';
   </channel>
   <item rdf:about="tag:blogger.com,1999:blog-001.post-001a">
     <title>My Blog</title>
-    <link>http://sojolicio.us/blog/1</link>
-    <dc:creator>akron@sojolicio.us (Akron)</dc:creator>
+    <link>http://sojolicious.example/blog/1</link>
+    <dc:creator>akron@sojolicious.example (Akron)</dc:creator>
     <dc:date>2011-10-04T03:03:49-07:00</dc:date>
     <description>My first blog post - description</description>
   </item>
@@ -141,7 +141,7 @@ our $rdf =<< 'EORDF';
   </item>
   <item xml:id="third_item">
     <source xmlns="http://www.w3.org/2005/Atom">
-      <link rel="self" href="http://sojolicio.us/2/blog" />
+      <link rel="self" href="http://sojolicious.example/2/blog" />
     </source>
   </item>
 </rdf:RDF>
@@ -152,7 +152,7 @@ EORDF
 use_ok('Mojolicious::Plugin::PubSubHubbub');
 use_ok('Mojo::DOM');
 
-my $self_href = 'http://sojolicio.us/blog';
+my $self_href = 'http://sojolicious.example/blog';
 
 # Add topics in RSS
 my $dom = Mojo::DOM->new;
@@ -167,9 +167,9 @@ is($dom->find('item')->size,
    $dom->find('item > source > link[rel="self"]')->size,
    'Add topics to RSS');
 
-is($dom->find('link[rel="self"][href="http://sojolicio.us/2/blog"]')->size,
+is($dom->find('link[rel="self"][href="http://sojolicious.example/2/blog"]')->size,
    1, 'Add topics to RSS 2' );
-is($dom->find('link[rel="self"][href="http://sojolicio.us/blog"]')->size,
+is($dom->find('link[rel="self"][href="http://sojolicious.example/blog"]')->size,
    2, 'Add topics to RSS 3' );
 
 # Add topics in atom
@@ -182,9 +182,9 @@ ok(Mojolicious::Plugin::PubSubHubbub::_add_topics(
 is($dom->find('entry')->size,
    $dom->find('entry > source > link[rel="self"]')->size,
    'Add topics to Atom');
-is($dom->find('link[rel="self"][href="http://sojolicio.us/2/blog"]')->size,
+is($dom->find('link[rel="self"][href="http://sojolicious.example/2/blog"]')->size,
    1, 'Add topics to Atom 2' );
-is($dom->find('link[rel="self"][href="http://sojolicio.us/blog"]')->size,
+is($dom->find('link[rel="self"][href="http://sojolicious.example/blog"]')->size,
    2, 'Add topics to Atom 3' );
 
 # Add topics in RDF/RSS
@@ -198,25 +198,25 @@ Mojolicious::Plugin::PubSubHubbub::_add_topics(
 is($dom->find('item')->size,
    $dom->find('item > source > link[rel="self"]')->size,
    'Add topics to RDF/RSS');
-is($dom->find('link[rel="self"][href="http://sojolicio.us/2/blog"]')->size,
+is($dom->find('link[rel="self"][href="http://sojolicious.example/2/blog"]')->size,
    1, 'Add topics to RDF/RSS 2' );
-is($dom->find('link[rel="self"][href="http://sojolicio.us/blog"]')->size,
+is($dom->find('link[rel="self"][href="http://sojolicious.example/blog"]')->size,
    2, 'Add topics to RDF/RSS 3' );
 
 # find topics in rss
 $dom = $dom->parse($rss);
 my $topics = Mojolicious::Plugin::PubSubHubbub::_find_topics('rss',$dom);
 is(@$topics, 2, 'Topics in RSS');
-is($topics->[0], 'http://sojolicio.us/2/blog', 'Topics in RSS 2');
-is($topics->[1], 'http://sojolicio.us/blog.rss', 'Topics in RSS 3');
+is($topics->[0], 'http://sojolicious.example/2/blog', 'Topics in RSS 2');
+is($topics->[1], 'http://sojolicious.example/blog.rss', 'Topics in RSS 3');
 
 
 # filter topics in rss
 $topics = Mojolicious::Plugin::PubSubHubbub::_filter_topics(
-  $dom, ['http://sojolicio.us/2/blog'] );
+  $dom, ['http://sojolicious.example/2/blog'] );
 is($dom->find('item')->size, 1, 'Filtered topics in RSS');
 is(@$topics, 1, 'Filtered topics in RSS 2');
-is($topics->[0], 'http://sojolicio.us/2/blog',
+is($topics->[0], 'http://sojolicious.example/2/blog',
    'Filtered topics in RSS 3');
 is($dom->find('item')->size, 1, 'Filtered topics in RSS 4');
 
@@ -229,16 +229,16 @@ ok($topics, 'Topics in Atom exists');
 is($#$topics, 1, 'Topics in Atom last element');
 is(scalar @$topics, 2, 'Topics in Atom - explicit scalar');
 is(@$topics, 2, 'Topics in Atom - implicit scalar');
-is($topics->[0], 'http://sojolicio.us/2/blog', 'Topics in Atom 2');
-is($topics->[1], 'http://sojolicio.us/blog.atom', 'Topics in Atom 3');
+is($topics->[0], 'http://sojolicious.example/2/blog', 'Topics in Atom 2');
+is($topics->[1], 'http://sojolicious.example/blog.atom', 'Topics in Atom 3');
 
 
 # filter topics in atom
 $topics = Mojolicious::Plugin::PubSubHubbub::_filter_topics(
-  $dom, ['http://sojolicio.us/2/blog'] );
+  $dom, ['http://sojolicious.example/2/blog'] );
 is($dom->find('entry')->size, 1, 'Filtered topics in Atom');
 is(@$topics, 1, 'Filtered topics in Atom 2');
-is($topics->[0], 'http://sojolicio.us/2/blog',
+is($topics->[0], 'http://sojolicious.example/2/blog',
    'Filtered topics in Atom 3');
 is($dom->find('entry')->size, 1, 'Filtered topics in Atom 4');
 
@@ -248,15 +248,15 @@ is($dom->find('entry')->size, 1, 'Filtered topics in Atom 4');
 $dom = $dom->parse($rdf);
 $topics = Mojolicious::Plugin::PubSubHubbub::_find_topics('rss',$dom);
 is(@$topics, 2, 'Topics in RDF/RSS');
-is($topics->[0], 'http://sojolicio.us/2/blog', 'Topics in RDF/RSS 2');
-is($topics->[1], 'http://sojolicio.us/blog.rss', 'Topics in RDF/RSS 3');
+is($topics->[0], 'http://sojolicious.example/2/blog', 'Topics in RDF/RSS 2');
+is($topics->[1], 'http://sojolicious.example/blog.rss', 'Topics in RDF/RSS 3');
 
 # filter topics in rdf
 $topics = Mojolicious::Plugin::PubSubHubbub::_filter_topics(
-  $dom, ['http://sojolicio.us/2/blog'] );
+  $dom, ['http://sojolicious.example/2/blog'] );
 is($dom->find('item')->size, 1, 'Filtered topics in RDF/RSS');
 is(@$topics, 1, 'Filtered topics in RDF/RSS 2');
-is($topics->[0],'http://sojolicio.us/2/blog', 'Filtered topics in RDF/RSS 3');
+is($topics->[0],'http://sojolicious.example/2/blog', 'Filtered topics in RDF/RSS 3');
 is($dom->find('item')->size, 1, 'Filtered topics in RDF/RSS 4');
 
 
@@ -293,8 +293,8 @@ $app->callback(
     if ($request_count == 1) {
       is($type, 'rss', 'on_ps_a (0) - RSS type');
       is(@$topics, 2, "on_ps_a (0) - Topics in RSS");
-      is($topics->[0],'http://sojolicio.us/2/blog', "on_ps_a (0) - Topics in RSS 2");
-      is($topics->[1],'http://sojolicio.us/blog.rss', "on_ps_a (0) - Topics in RSS 3");
+      is($topics->[0],'http://sojolicious.example/2/blog', "on_ps_a (0) - Topics in RSS 2");
+      is($topics->[1],'http://sojolicious.example/blog.rss', "on_ps_a (0) - Topics in RSS 3");
     }
 
     # Second request
@@ -311,22 +311,22 @@ $app->callback(
 
       is(@$topics, 2, $info);
       is(@$topics, 2, "on_ps_a ($request_count) - Topics in RSS/Atom/RDF");
-      ok($topics->[0] eq 'http://sojolicio.us/2/blog' && (
-        $topics->[1] eq 'http://sojolicio.us/blog.rss' ||
-          $topics->[1] eq 'http://sojolicio.us/blog.atom'),
+      ok($topics->[0] eq 'http://sojolicious.example/2/blog' && (
+        $topics->[1] eq 'http://sojolicious.example/blog.rss' ||
+          $topics->[1] eq 'http://sojolicious.example/blog.atom'),
          "on_ps_a ($request_count) - Topics in RSS/Atom/RDF 2");
-      @$topics = ('http://sojolicio.us/2/blog');
+      @$topics = ('http://sojolicious.example/2/blog');
     }
 
     # Third request
     elsif ($request_count >= 3 && $request_count <= 5) {
-      @$topics = ('http://sojolicio.us/2/blog');
+      @$topics = ('http://sojolicious.example/2/blog');
       $secret = 'zoidberg';
     }
 
     # Fourth request
     elsif ($request_count == 4) {
-      @$topics = ('http://sojolicio.us/2/blog');
+      @$topics = ('http://sojolicious.example/2/blog');
       $secret = 'zoidberg';
     };
     return ($topics, $secret, $on_behalf_of);
@@ -425,7 +425,7 @@ $app->routes->any('/hub')
   is ($c->param('hub.mode'), 'subscribe', 'Subscription mode');
 
   is ($c->param('hub.topic'),
-      'http://sojolicio.us/blog.xml',
+      'http://sojolicious.example/blog.xml',
       'Topic correct');
 
   like($c->param('hub.verify_token'),
@@ -446,7 +446,7 @@ $app->routes->any('/hub')
   is ($c->param('hub.mode'), 'subscribe', 'Subscription mode');
 
   isnt ($c->param('hub.topic'),
-        'http://sojolicio.us/blog.xml',
+        'http://sojolicious.example/blog.xml',
         'Topic correct');
 
   return $c->render(text => 'not_okay', status => 404);
@@ -458,7 +458,7 @@ $app->routes->any('/hub')
   is ($c->param('hub.mode'), 'unsubscribe', 'Unsubscription mode');
 
   is ($c->param('hub.topic'),
-      'http://sojolicio.us/blog.xml',
+      'http://sojolicious.example/blog.xml',
       'Topic correct');
 
   like($c->param('hub.verify_token'),
@@ -478,7 +478,7 @@ $app->routes->any('/hub')
   is ($c->param('hub.mode'), 'unsubscribe', 'Unsubscription mode');
 
   isnt ($c->param('hub.topic'),
-        'http://sojolicio.us/blog.xml',
+        'http://sojolicious.example/blog.xml',
         'Topic correct');
 
   return $c->render(text => 'not_okay', status => 404);
@@ -491,7 +491,7 @@ $app->routes->any('/hub')
   my $test = join(',',@topics);
 
   if ($request_count == 5) {
-    if ($test eq 'http://sojolicio.us/blog.xml') {
+    if ($test eq 'http://sojolicious.example/blog.xml') {
       return $c->render(text => 'okay');
     };
   }
@@ -513,7 +513,7 @@ $app->hook(
 
     if ($request_count == 1) {
       my $topic = $params->{topic};
-      is($topic, 'http://sojolicio.us/blog.xml', 'Topic to subscribe A');
+      is($topic, 'http://sojolicious.example/blog.xml', 'Topic to subscribe A');
     };
   });
 
@@ -524,14 +524,14 @@ $app->hook(
     # First request
     if ($request_count == 1) {
       my $topic = $params->{'hub.topic'};
-      is($topic, 'http://sojolicio.us/blog.xml', 'Topic to subscribe B');
+      is($topic, 'http://sojolicious.example/blog.xml', 'Topic to subscribe B');
       is($body, 'okay', 'Response body');
     }
 
     # Second request
     elsif ($request_count == 2) {
       my $topic = $params->{'hub.topic'};
-      is($topic, 'http://sojolicio.us/blog/unknown.xml', 'Topic to subscribe C');
+      is($topic, 'http://sojolicious.example/blog/unknown.xml', 'Topic to subscribe C');
       is($body, 'not_okay', 'Response body');
     };
   });
@@ -542,7 +542,7 @@ $app->hook(
 
     if ($request_count == 3) {
       my $topic = $params->{topic};
-      is($topic, 'http://sojolicio.us/blog.xml', 'Topic to unsubscribe D');
+      is($topic, 'http://sojolicious.example/blog.xml', 'Topic to unsubscribe D');
     };
   }
 );
@@ -554,31 +554,31 @@ $app->hook(
     # Third request
     if ($request_count == 3) {
       my $topic = $params->{'hub.topic'};
-      is($topic, 'http://sojolicio.us/blog.xml', 'Topic to unsubscribe');
+      is($topic, 'http://sojolicious.example/blog.xml', 'Topic to unsubscribe');
       is($body, 'okay', 'Response body');
     }
 
     # Second request
     elsif ($request_count == 4) {
       my $topic = $params->{'hub.topic'};
-      is($topic, 'http://sojolicio.us/blog/unknown.xml', 'Topic to subscribe');
+      is($topic, 'http://sojolicious.example/blog/unknown.xml', 'Topic to subscribe');
       is($body, 'not_okay', 'Response body');
     };
   });
 
 ok(!$app->pubsub->subscribe, 'Subscription empty');
-ok(!$app->pubsub->subscribe(topic => 'http://sojolicio.us/'),
+ok(!$app->pubsub->subscribe(topic => 'http://sojolicious.example/'),
    'Subscription invalid');
 ok(!$app->pubsub->subscribe(hub => '/hub'),
    'Subscription invalid');
 
 ok(!$app->pubsub->subscribe(
-  topic => 'sojolicio.us',
+  topic => 'sojolicious.example',
   hub => '/hub'),
    'Subscription invalid');
 
 ok($app->pubsub->subscribe(
-  topic => 'http://sojolicio.us/blog.xml',
+  topic => 'http://sojolicious.example/blog.xml',
   hub   => '/hub'
 ), 'Subscribe');
 
@@ -586,14 +586,14 @@ $request_count++;
 
 ok(
   !$app->pubsub->subscribe(
-    topic => 'http://sojolicio.us/blog/unknown.xml',
+    topic => 'http://sojolicious.example/blog/unknown.xml',
     hub   => '/hub'
   ), 'Subscribe');
 
 $request_count++;
 
 ok($app->pubsub->unsubscribe(
-  topic => 'http://sojolicio.us/blog.xml',
+  topic => 'http://sojolicious.example/blog.xml',
   hub   => '/hub'
 ), 'Unsubscribe');
 
@@ -601,7 +601,7 @@ $request_count++;
 
 ok(
   !$app->pubsub->unsubscribe(
-    topic => 'http://sojolicio.us/blog/unknown.xml',
+    topic => 'http://sojolicious.example/blog/unknown.xml',
     hub   => '/hub'
   ), 'Unsubscribe');
 
@@ -610,18 +610,18 @@ $request_count = 1;
 $t->get_ok('/push?hub.mode=subscribe')
   ->content_type_like(qr{^text/html})
   ->status_is(404);
-$t->get_ok('/push?hub.mode=subscribe&hub.topic=http://sojolicio.us/blog.xml')
+$t->get_ok('/push?hub.mode=subscribe&hub.topic=http://sojolicious.example/blog.xml')
   ->content_type_like(qr{^text/html})
   ->status_is(404);
 $t->get_ok('/push?hub.mode=subscribe&hub.challenge=4567')
   ->content_type_like(qr{^text/html})
   ->status_is(404);
-$t->get_ok('/push?hub.mode=foobar&hub.topic=http://sojolicio.us/blog.xml'.
+$t->get_ok('/push?hub.mode=foobar&hub.topic=http://sojolicious.example/blog.xml'.
        '&hub.challenge=4567')
   ->content_type_like(qr{^text/html})
   ->status_is(404);
 $t->post_ok('/push' => form => { 'hub.mode' => 'foobar',
-            'hub.topic' => 'http://sojolicio.us/blog.xml',
+            'hub.topic' => 'http://sojolicious.example/blog.xml',
             'hub.challenge' => 4567 })
   ->content_type_like(qr{^text/html})
   ->status_is(404);
@@ -631,14 +631,14 @@ $app->callback(
     my ($c, $params) = @_;
 
     my $topic = $params->{topic};
-    is($topic, 'http://sojolicio.us/blog.xml', 'Topic to verify subscription');
+    is($topic, 'http://sojolicious.example/blog.xml', 'Topic to verify subscription');
 
     return 1 if $request_count == 2;
     return;
   });
 
 $t->post_ok('/push' => form => { 'hub.mode' => 'subscribe',
-            'hub.topic' => 'http://sojolicio.us/blog.xml',
+            'hub.topic' => 'http://sojolicious.example/blog.xml',
             'hub.challenge' => 4567 })
   ->content_type_like(qr{^text/html})
   ->status_is(404);
@@ -646,7 +646,7 @@ $t->post_ok('/push' => form => { 'hub.mode' => 'subscribe',
 $request_count = 2;
 
 $t->post_ok('/push' => form => { 'hub.mode' => 'subscribe',
-            'hub.topic' => 'http://sojolicio.us/blog.xml',
+            'hub.topic' => 'http://sojolicious.example/blog.xml',
             'hub.challenge' => 4567 })
   ->content_type_like(qr{^text/plain})
   ->status_is(200)
@@ -655,7 +655,7 @@ $t->post_ok('/push' => form => { 'hub.mode' => 'subscribe',
 $request_count = 1;
 
 $t->post_ok('/push' => form => { 'hub.mode' => 'unsubscribe',
-            'hub.topic' => 'http://sojolicio.us/blog.xml',
+            'hub.topic' => 'http://sojolicious.example/blog.xml',
             'hub.challenge' => 4567 })
   ->content_type_like(qr{^text/html})
   ->status_is(404);
@@ -663,7 +663,7 @@ $t->post_ok('/push' => form => { 'hub.mode' => 'unsubscribe',
 $request_count = 2;
 
 $t->post_ok('/push' => form => { 'hub.mode' => 'unsubscribe',
-            'hub.topic' => 'http://sojolicio.us/blog.xml',
+            'hub.topic' => 'http://sojolicious.example/blog.xml',
             'hub.challenge' => 4567 })
   ->content_type_like(qr{^text/plain})
   ->status_is(200)
@@ -674,7 +674,7 @@ $request_count = 5;
 # Publish
 ok(!$app->pubsub->publish, 'Publication empty');
 
-ok($app->pubsub->publish('http://sojolicio.us/blog.xml'),
+ok($app->pubsub->publish('http://sojolicious.example/blog.xml'),
    'Publication set');
 
 $request_count = 6;

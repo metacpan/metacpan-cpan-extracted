@@ -1,7 +1,9 @@
 package Acme::CPANModules::PortedFrom::Python;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-02-05'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DIST = 'Acme-CPANModules-PortedFrom-Python'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 our $LIST = {
     summary => "Modules/applications that are ported from (or inspired by) ".
@@ -54,13 +56,13 @@ Acme::CPANModules::PortedFrom::Python - Modules/applications that are ported fro
 
 =head1 VERSION
 
-This document describes version 0.003 of Acme::CPANModules::PortedFrom::Python (from Perl distribution Acme-CPANModules-PortedFrom-Python), released on 2021-02-05.
+This document describes version 0.004 of Acme::CPANModules::PortedFrom::Python (from Perl distribution Acme-CPANModules-PortedFrom-Python), released on 2021-02-05.
 
 =head1 DESCRIPTION
 
 =head2 SEE ALSO
 
-L<Acme::CPANModules::PortedFrom::Python> and other
+L<Acme::CPANModules::PortedFrom::Ruby> and other
 C<Acme::CPANModules::PortedFrom::*> modules.
 
 If you know of others, please drop me a message.

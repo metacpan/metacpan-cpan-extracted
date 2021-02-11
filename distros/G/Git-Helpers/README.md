@@ -4,7 +4,7 @@ Git::Helpers - Shortcuts for common Git commands
 
 # VERSION
 
-version 0.000021
+version 1.000000
 
 # SYNOPSIS
 
@@ -14,7 +14,6 @@ version 0.000021
         https_remote_url
         is_inside_work_tree
         remote_url
-        travis_url
     );
 
     my $dir              = '/path/to/folder/in/git/checkout';
@@ -23,7 +22,6 @@ version 0.000021
     my $https_remote_url = https_remote_url();
     my $inside_work_tree = is_inside_work_tree();
     my $remote_url       = remote_url('upstream');
-    my $travis_url       = travis_url();
 
 ## checkout\_root( $dir )
 
@@ -82,24 +80,13 @@ Provides you with the exact URL which git returns. Nothing is fixed up for you.
     # get URL for upstream remote
     my $upstream_url = remote_url('upstream');
 
-## travis\_url( $remote\_name )
-
-Returns a [travis-ci.org](https://metacpan.org/pod/travis-ci.org) URL for the remote you've requested by name.
-Defaults to 'origin'.
-
-    # get Travis URL for remote named "origin"
-    my $origin_travis_url = travis_url();
-
-    # get Travis URL for remote named "upstream"
-    my $upstream_travis_url = travis_url('upstream');
-
 # AUTHOR
 
 Olaf Alders <olaf@wundercounter.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2019 by Olaf Alders.
+This software is copyright (c) 2015 by Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

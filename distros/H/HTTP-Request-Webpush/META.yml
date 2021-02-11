@@ -1,31 +1,33 @@
----
-abstract: unknown
-author:
-  - 'Erich Strelow <estrelow@cpan.org'
-build_requires:
-  ExtUtils::MakeMaker: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
-license: apache
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
-name: HTTP-Request-Webpush
-no_index:
-  directory:
-    - t
-    - inc
-requires:
-  Carp: '1.00'
-  Crypt::AuthEnc::GCM: '0.049'
-  Crypt::JWT: '0.013'
-  Crypt::PK::ECC: '0.042'
-  Crypt::PRNG: '0.048'
-  Digest::SHA: '5.83'
-  JSON: '2.00'
-  MIME::Base64: '3.11'
-  URI: '1.00'
-version: '0.11'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+{---}
+{abstract: unknown}
+{author:}
+{  - 'Erich Strelow <estrelow@cpan.org'}
+{build_requires:}
+{  ExtUtils::MakeMaker: '0'}
+{configure_requires:}
+{  ExtUtils::MakeMaker: '0'}
+{dynamic_config: 1}
+{generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'}
+{license: apache}
+{meta-spec:}
+{  url: http://module-build.sourceforge.net/META-spec-v1.4.html}
+{  version: '1.4'}
+{name: HTTP-Request-Webpush}
+{no_index:}
+{  directory:}
+{    - t}
+{    - inc}
+{requires:}
+{  Carp: '1.00'}
+{  Crypt::AuthEnc::GCM: '0.049'}
+{  Crypt::JWT: '0.013'}
+{  Crypt::PK::ECC: '0.042'}
+{  Crypt::PRNG: '0.048'}
+{  Digest::SHA: '5.83'}
+{  HTTP::Request: '6.10'}
+{  JSON: '2.00'}
+{  MIME::Base64: '3.11'}
+{  URI: '1.00'}
+{  perl: '5.004'}
+{version: '0.14'}
+{x_serialization_backend: 'CPAN::Meta::YAML version 0.018'}

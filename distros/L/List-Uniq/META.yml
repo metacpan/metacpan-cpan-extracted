@@ -20,5 +20,6 @@ no_index:
     - inc
 resources:
   bugtracker: https://github.com/renderorange/List-Uniq/issues
-version: '0.22'
+  repository: https://github.com/renderorange/List-Uniq.git
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

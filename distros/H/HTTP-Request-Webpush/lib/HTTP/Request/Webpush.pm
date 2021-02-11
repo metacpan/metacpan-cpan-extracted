@@ -17,9 +17,9 @@ package HTTP::Request::Webpush;
 use strict 'vars';
 use warnings;
 
-our $VERSION='0.11';
+our $VERSION='0.14';
 
-use base 'HTTP::Request';
+use parent 'HTTP::Request';
 
 use JSON;
 use Crypt::JWT qw(encode_jwt);
@@ -29,7 +29,7 @@ use Crypt::AuthEnc::GCM 'gcm_encrypt_authenticate';
 use Crypt::PK::ECC 'ecc_shared_secret';
 use Digest::SHA 'hmac_sha256';
 use Carp;
-
+use URI;
 
 #================================================================
 # hkdf()
@@ -182,7 +182,6 @@ sub encode($$) {
 
    $self->content($body);
    $self->remove_header('Content-Length', 'Content-MD5','Content-Encoding','Content-Type','Encryption','Crypto-Key');
-   #$self->header('Encryption' => "salt=".encode_base64url($salt));
    $self->header('Crypto-Key' => "p256ecdsa=". encode_base64url($self->{'app-pub'}) );
    $self->header('Content-Length' => length($body));
    $self->header('Content-Type' => 'application/octet-stream');
@@ -210,7 +209,7 @@ sub new($%) {
 
    my ($class, %opts)=@_;
 
-   my $self= $class->SUPER::new();
+   my $self= HTTP::Request->new();
    $self->method('POST');
 
    bless $self, $class;
@@ -236,16 +235,16 @@ HTTP::Request::Webpush - HTTP Request for web push notifications
 
 =head1 VERSION
 
-version 0.01
+version 0.14
 
 =head1 SYNOPSIS
 
  use HTTP::Request::Webpush;
 
- #This should be the application wide key
+ #This should be the application-wide VAPID key pair
  #The APP_PUB part must be the same used by the user UA when requesting the subscription
- use constant APP_PUB => 'BCAI00zPAbxEVU5w8D1kZXVs2Ro--FmpQNMOd0S0w1_5naTLZTGTYNqIt7d97c2mUDstAWOCXkNKecqgS4jARA8';
- use constant APP_KEY => 'M6xy5prDBhJNlOGnOkMekyAQnQSWKuJj1cD06SUQTow';
+ use constant APP_PUB => 'BCAI...RA8';
+ use constant APP_KEY => 'M6x...UQTow';
  
  #This should be previously collected from an already subscribed user UA
  my $subscription='{"endpoint":"https://foo/fooer","expirationTime":null,"keys":{"p256dh":"BCNS...","auth":"dZ..."}}';
@@ -281,83 +280,97 @@ version 0.01
 
 C<HTTP::Request::Webpush> produces an HTTP::Request for Application-side Webpush
 notifications as described on L<RFC8291|https://tools.ietf.org/html/rfc8291>.
+Such requests can then be submitted to the push message channel so they will
+pop-up in the corresponding end user host.
 In this scheme, an Application is a 
 server-side component that sends push notification to previously subscribed
 browser worker(s). This class only covers the Application role. A lot must 
 be done on the browser side to setup a full working push notification system.
 
 In practical terms, this class is a glue for all the encryption steps involved
-in setting up a RFC8291 message, along with the <RFC8292|https://tools.ietf.org/html/rfc8291> VAPID scheme.
+in setting up a RFC8291 message, along with the L<RFC8292|https://tools.ietf.org/html/rfc8291> VAPID scheme.
 
 =over 4
 
-=item $r=HTTP::Request::Webpush->new()
+=item C<$r=HTTP::Request::Webpush-E<gt>new()>
 
-=item $r=HTTP::Request::Webpush-new(auth => $my_key, subscription => $my_subs, content='New lager batch arrived')
+=item C<$r=HTTP::Request::Webpush-E<gt>new(auth =E<gt> $my_key, subscription =E<gt> $my_subs, content='New lager batch arrived')>
 
 The following options can be supplied in the constructor: subscription, auth, reuseecc, subject, content.
 
-=item $r->subscription($hash_reference)
+=item C<$r-E<gt>subscription($hash_reference)>
 
-=item $r->subscription('{"endpoint":"https://foo/fooer","expirationTime":null,"keys":{"p256dh":"BCNS...","auth":"dZ..."}}');
+=item C<$r-E<gt>subscription('{"endpoint":"https://foo/fooer","expirationTime":null,"keys":{"p256dh":"BCNS...","auth":"dZ..."}}');>
 
 This sets the subscription object related to this notification service. This should be the same object
-returned inside the browser environment using the PushManager.subscribe() method. The argument can
-be either a JSON string or a previously setup hash reference.
+returned inside the browser environment using the browser's Push API C<PushManager.subscribe()> method. The argument can
+be either a JSON string or a previously setup hash reference. The HTTP::Request uri is taken verbatim from the endpoint
+of the subscription object.
 
-=item $r->auth($pk) #pk being a Crypt::PK::ECC ref
+=item C<$r-E<gt>auth($pk) #pk being a Crypt::PK::ECC ref>
 
-=item $r->auth($pub_bin, $priv_bin)
+=item C<$r-E<gt>auth($pub_bin, $priv_bin)>
 
-=item $r->authbase64('BCAI00zPAbxEVU5w8D1kZXVs2Ro--FmpQNMOd0S0w1_5naTLZTGTYNqIt7d97c2mUDstAWOCXkNKecqgS4jARA8','M6xy5prDBhJNlOGnOkMekyAQnQSWKuJj1cD06SUQTow')
+=item C<$r-E<gt>authbase64('BCAI...jARA8','M6...Tow')>
 
 This sets the authentication key for the VAPID authentication scheme related to this push service.
-This can either be a (public, private) pair or an already setup Crypt::PK::ECC object. The public part
-must be the same used earlier in the browser environment in the PushManager.subscribe() applicationServerKey option.
-The key pair can be passed as URL safe base64 strings using the authbase64() variant.
+This can either be a (public, private) pair or an already setup L<Crypt::PK::ECC> object. The public part
+must be the same used earlier in the browser environment in the C<PushManager.subscribe() applicationServerKey> option.
+The key pair can be passed as URL safe base64 strings using the C<authbase64()> variant.
 
-=item $r->reuseecc($ecc) #ecc being a Crypt::PK::ECC ref
+=item C<$r-E<gt>reuseecc($ecc) #ecc being a Crypt::PK::ECC ref>
 
 By default, HTTP::Request::Webpush creates a new P-256 key pair for the encryption
 step each time. In large push batches this can be time consuming. You can
 reuse the same previously setup key pair in repeated messages using this method.
 
-=item $r->subject('mailto:jdoe@some.com')
+=item C<$r-E<gt>subject('mailto:jdoe@some.com')>
 
 This establish the contact information related to the origin of the push service. This method
 isn't enforced since RFC8292 mentions this as a SHOULD practice. But, if a valid contact information
 is not included, the browser push service is likely to bounce the message. The URI passed is 
 used as the 'sub' claim in the authentication JWT.
 
-=item $r->content('Try our new draft beer')
+=item C<$r-E<gt>content('Try our new draft beer')>
 
-This sets the unencripted message content, or the payload in terms of rfc8291.
+This sets the unencripted message content, or the payload in terms of RFC8291.
 This is actually inherited from L<HTTP::Message>,
 as well as other methods that can be used to set the message content.
 
-=item $r->encode('aes128gcm')
+=item C<$r-E<gt>encode('aes128gcm')>
 
 This does the encryption process, as well as setting the headers expected by the push service.
 aes128gcm is the only acceptable argument. Before calling this, the subscription and auth must
-be supplied. You must call this method before submitting the message, otherwise the encryption
+be supplied. B<You must call this method before submitting the message>, otherwise the encryption
 process won't happen.
 
-Please note that encode() and content() are inherited from L<HTTP::Message>. No backward decryption
-is provided by this class, so the decoded_content() and decode() methods will fail. After you
-encode(), the content can still be accessed through HTTP::Message standard methods and it
-will be the binary body of the encrypted message.
+Please note that B<encode()> and B<content()> are inherited from L<HTTP::Message>. 
 
 =back
+
+=head1 REMARKS
+
+No backward decryption is provided by this class, so the decoded_content() and decode() methods will fail. 
+
+After you encode(), the content can still be accessed through HTTP::Message standard methods and it
+will be the binary body of the encrypted message.
+
+This class sets the following headers: I<Authorization>, I<Crypto-Key>, I<Content-Length>, I<Content-Type>, I<Content-Encoding>.
+Additional headers might be added using the C<HTTP::Message::header()> method. Please note that the browser push
+service will likely bounce the message if I<TTL> is missing. The standard also states that an I<Urgency> header might apply.
+
 
 =head1 REFERENCES
 
 This class relies on L<Digest::SHA> for the HKDF derivation, 
-L<Crypt::AuthEnc::GCM> for the encryption intself, L<Crypt::PK::ECC> for key management and
+L<Crypt::AuthEnc::GCM> for the encryption itself, L<Crypt::PK::ECC> for key management and
 L<Crypt::PRNG> for the salt.
 
 RFC8291 establish the encription steps: L<https://tools.ietf.org/html/rfc8291>
 
-RFC8291 establish the VAPID scheme: L<https://tools.ietf.org/html/rfc8292>
+RFC8292 establish the VAPID scheme: L<https://tools.ietf.org/html/rfc8292>
+
+RFC8030 covers the whole HTTP push life cycle L<https://tools.ietf.org/html/rfc8030>
 
 The following code samples and tutorials were very useful:
 

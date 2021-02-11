@@ -5,6 +5,8 @@ use Test::More tests => 49;
 use Test::Deep;
 use IPC::Cmd qw(can_run);
 use Test::Requires qw( Image::Magick );
+use File::Temp;
+use File::Spec;
 BEGIN { use_ok('Graphics::TIFF') }
 
 #########################
@@ -21,14 +23,16 @@ if ( $version < 4.000003 ) {
 
 ok( Graphics::TIFF->IsCODECConfigured(COMPRESSION_DEFLATE),
     'IsCODECConfigured' );
+my $directory = File::Temp->newdir;
 
 my $image = Image::Magick->new;
+my $file = File::Spec->catfile( $directory, 'test.tif' );
 $image->Read('rose:');
 $image->Set( density => '72x72' );
-$image->Write('test.tif');
+$image->Write($file);
 
-my $tif = Graphics::TIFF->Open( 'test.tif', 'r' );
-is( $tif->FileName, 'test.tif', 'FileName' );
+my $tif = Graphics::TIFF->Open( $file, 'r' );
+is( $tif->FileName, $file, 'FileName' );
 isa_ok $tif, 'Graphics::TIFF';
 can_ok $tif, qw(Close ReadDirectory GetField);
 
@@ -106,7 +110,7 @@ is( length( $tif->ReadRawStrip( 1, 20 ) ), 20, 'ReadRawStrip' );
 
 is( $tif->ReadTile( 0, 0, 0, 0 ), undef, 'ReadTile' );
 
-my $filename = 'out.txt';
+my $filename = File::Spec->catfile( $directory, 'out.txt' );
 open my $fh, '>', $filename;
 $tif->PrintDirectory( $fh, 0 );
 $tif->Close;
@@ -119,8 +123,9 @@ unlink $filename;
 SKIP: {
     skip 'tiffcmp not installed', 1 if ( not can_run('tiffcmp') );
 
-    my $tif = Graphics::TIFF->Open( 'test.tif',  'r' );
-    my $out = Graphics::TIFF->Open( 'test2.tif', 'w' );
+    my $tif = Graphics::TIFF->Open( $file,  'r' );
+    my $file2 = File::Spec->catfile($directory, 'test2.tif');
+    my $out = Graphics::TIFF->Open( $file2, 'w' );
     for my $tag (
         ( TIFFTAG_IMAGEWIDTH, TIFFTAG_IMAGELENGTH,
             TIFFTAG_SAMPLESPERPIXEL, TIFFTAG_BITSPERSAMPLE,
@@ -145,7 +150,7 @@ SKIP: {
     $tif->Close;
     $out->Close;
 
-    is( `tiffcmp test.tif test2.tif`, '', 'tiffcmp' );
+    is( `tiffcmp $file $file2`, '', 'tiffcmp' );
 }
 
 #########################
@@ -153,8 +158,8 @@ SKIP: {
 $image = Image::Magick->new;
 $image->Read('rose:');
 $image->Set( density => '72x72', alpha => 'Set' );
-$image->Write('test.tif');
-$tif = Graphics::TIFF->Open( 'test.tif', 'r' );
+$image->Write($file);
+$tif = Graphics::TIFF->Open( $file, 'r' );
 
 my @values = $tif->GetField(TIFFTAG_EXTRASAMPLES);
 is_deeply( \@values, [EXTRASAMPLE_UNASSALPHA],
@@ -171,8 +176,8 @@ $tif->Close;
 $image = Image::Magick->new;
 $image->Read('rose:');
 $image->Set( density => '72x72', type => 'palette', depth => 2 );
-$image->Write('test.tif');
-$tif = Graphics::TIFF->Open( 'test.tif', 'r' );
+$image->Write($file);
+$tif = Graphics::TIFF->Open( $file, 'r' );
 
 @values = $tif->GetField(TIFFTAG_COLORMAP);
 is $#{ $values[0] }, 255, 'GetField TIFFTAG_COLORMAP r';
@@ -188,4 +193,3 @@ $tif->Close;
 
 #########################
 
-unlink 'test.tif', 'test2.tif';

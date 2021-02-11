@@ -93,7 +93,7 @@ SKIP: {
 	return 'null';
     });
     for my $thing ($bread, $rice, $lice) {
-	my $jcout = $jcnfh->run ($thing);
+	my $jcout = $jcnfh->create ($thing);
 	ok (valid_json ($jcout), "output using non-finite handler OK");
 	like ($jcout, qr/{"(?:curry|rice|lice)":null\}/, "get null in output");
     }

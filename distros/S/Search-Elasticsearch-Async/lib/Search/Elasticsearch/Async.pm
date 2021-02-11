@@ -17,7 +17,7 @@
 
 package Search::Elasticsearch::Async;
 
-our $VERSION = '7.30';
+our $VERSION = '7.711';
 use Search::Elasticsearch 7.00;
 use Promises 0.93 ();
 use parent 'Search::Elasticsearch';
@@ -64,7 +64,7 @@ Search::Elasticsearch::Async - Async API for Elasticsearch using Promises
 
 =head1 VERSION
 
-version 7.30
+version 7.711
 
 =head1 SYNOPSIS
 
@@ -665,7 +665,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Elasticsearch BV.
+This software is Copyright (c) 2021 by Elasticsearch BV.
 
 This is free software, licensed under:
 

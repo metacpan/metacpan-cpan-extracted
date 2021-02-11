@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 2;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More tests => 2;
 use lib 't/lib';
 BEGIN {
     use_ok( 'TestApp::LastModified' );

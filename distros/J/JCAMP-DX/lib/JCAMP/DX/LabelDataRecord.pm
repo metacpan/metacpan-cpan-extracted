@@ -1,8 +1,8 @@
 #------------------------------------------------------------------------------
 #$Author: andrius $
-#$Date: 2018-12-20 10:45:10 +0200 (Kt, 20 gruod. 2018) $
-#$Revision: 77 $
-#$URL: svn+ssh://www.crystallography.net/home/coder/svn-repositories/jcamp-dx/tags/v0.02/lib/JCAMP/DX/LabelDataRecord.pm $
+#$Date: 2021-02-10 13:44:25 +0200 (Tr, 10 vas. 2021) $
+#$Revision: 94 $
+#$URL: svn+ssh://www.crystallography.net/home/coder/svn-repositories/JCAMP-DX/tags/v0.03/lib/JCAMP/DX/LabelDataRecord.pm $
 #------------------------------------------------------------------------------
 #*
 #  Label Data Record object
@@ -12,6 +12,10 @@ package JCAMP::DX::LabelDataRecord;
 
 use strict;
 use warnings;
+
+# ABSTRACT: Label Data Record object
+our $VERSION = '0.03'; # VERSION
+
 use JCAMP::DX::ASDF qw(decode);
 
 our $max_line_length = 80;

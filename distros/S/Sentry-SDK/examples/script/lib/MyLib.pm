@@ -7,7 +7,7 @@ use Mojo::Exception;
 use Mojo::UserAgent;
 use Mojo::Util 'dumper';
 use MyDB;
-use Sentry;
+use Sentry::SDK;
 use Sentry::Severity;
 
 has _db => sub { MyDB->new };
@@ -29,7 +29,7 @@ sub foo2 ($self, $value, $x = undef) {
   $self->ua->get('https://www.heise.de/does-not-exist');
   my $tx = $self->ua->get($url);
 
-  Sentry->add_breadcrumb({
+  Sentry::SDK->add_breadcrumb({
     message  => 'breadcrumb in foo2',
     type     => 'debug',
     category => 'ui.click',
@@ -44,7 +44,7 @@ sub foo2 ($self, $value, $x = undef) {
 }
 
 sub foo3 {
-  Sentry->add_breadcrumb({
+  Sentry::SDK->add_breadcrumb({
     type     => 'http',
     category => 'xhr',
     level    => Sentry::Severity->Debug,

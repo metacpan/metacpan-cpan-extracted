@@ -41,9 +41,9 @@ sub actor {
 
       # Prepend namespace if not defined
       if (index($object_type->text, '/') == -1) {
-	$object_type->content(
-	  __PACKAGE__->_namespace . lc $object_type->text
-	);
+        $object_type->content(
+          __PACKAGE__->_namespace . lc $object_type->text
+        );
       };
 
       return $actor;
@@ -130,7 +130,7 @@ sub _target_object {
     # Prepend namespace if not defined
     if (index($object_type->text, '/') == -1) {
       $object_type->content(
-	__PACKAGE__->_namespace . lc($object_type->text)
+        __PACKAGE__->_namespace . lc($object_type->text)
       );
     };
 
@@ -318,7 +318,7 @@ JSON serialization, neither on reading nor writing.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2016, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

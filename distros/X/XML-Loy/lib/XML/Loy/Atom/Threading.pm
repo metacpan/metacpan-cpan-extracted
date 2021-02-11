@@ -149,15 +149,15 @@ XML::Loy::Atom::Threading - Threading Extension for Atom
 
   # Add Atom author and id
   $entry->author(name => 'Zoidberg');
-  $entry->id('http://sojolicio.us/blog/2');
+  $entry->id('http://sojolicious.example/blog/2');
 
   # Add threading information
   $entry->in_reply_to('urn:entry:1' => {
-    href => 'http://sojolicio.us/blog/1'
+    href => 'http://sojolicious.example/blog/1'
   });
 
   # Add replies information
-  $entry->replies('http://sojolicio.us/blog/1/replies' => {
+  $entry->replies('http://sojolicious.example/blog/1/replies' => {
     count => 7,
     updated => time
   });
@@ -169,18 +169,18 @@ XML::Loy::Atom::Threading - Threading Extension for Atom
   print $entry->to_pretty_xml;
 
   # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-  # <entry xml:id="http://sojolicio.us/blog/2"
+  # <entry xml:id="http://sojolicious.example/blog/2"
   #        xmlns="http://www.w3.org/2005/Atom"
   #        xmlns:thr="http://purl.org/syndication/thread/1.0">
   #   <author>
   #     <name>Zoidberg</name>
   #   </author>
-  #   <id>http://sojolicio.us/blog/2</id>
-  #   <link href="http://sojolicio.us/blog/1"
+  #   <id>http://sojolicious.example/blog/2</id>
+  #   <link href="http://sojolicious.example/blog/1"
   #         rel="related" />
-  #   <thr:in-reply-to href="http://sojolicio.us/blog/1"
+  #   <thr:in-reply-to href="http://sojolicious.example/blog/1"
   #                    ref="urn:entry:1" />
-  #   <link href="http://sojolicio.us/blog/1/replies"
+  #   <link href="http://sojolicious.example/blog/1/replies"
   #         rel="replies"
   #         thr:count="7"
   #         thr:updated="2013-03-10T09:55:13Z"
@@ -204,7 +204,7 @@ from L<XML::Loy> and implements the following new ones.
 =head2 in_reply_to
 
   $entry->in_reply_to('urn:entry:1' => {
-    href => 'http://sojolicio.us/blog/1.html',
+    href => 'http://sojolicious.example/blog/1.html',
     type => 'application/xhtml+xml'
   });
 
@@ -221,7 +221,7 @@ On retrieval, returns the first C<in-reply-to> element.
 
 =head2 replies
 
-  $entry->replies('http://sojolicio.us/entry/1/replies' => {
+  $entry->replies('http://sojolicious.example/entry/1/replies' => {
     count   => 5,
     updated => '2011-08-30T16:16:40Z'
   });
@@ -263,7 +263,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2016, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

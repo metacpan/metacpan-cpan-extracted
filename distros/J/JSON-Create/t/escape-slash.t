@@ -20,7 +20,7 @@ my $esc = qr!"\\/.*?\\/"!;
 
 # Test that the default is not to escape.
 
-my $out = $jc->run ($input);
+my $out = $jc->create ($input);
 note ($out);
 like ($out, $notesc, "default is no escape");
 unlike ($out, $esc, "default is no escape");
@@ -28,7 +28,7 @@ unlike ($out, $esc, "default is no escape");
 # Test that the escaping works.
 
 $jc->escape_slash (1);
-my $outesc = $jc->run ($input);
+my $outesc = $jc->create ($input);
 note ($outesc);
 unlike ($outesc, $notesc, "escaping works OK");
 like ($outesc, $esc, "escaping works OK");
@@ -36,7 +36,7 @@ like ($outesc, $esc, "escaping works OK");
 # Test that the escaping can be switched off again.
 
 $jc->escape_slash (0);
-my $outunesc = $jc->run ($input);
+my $outunesc = $jc->create ($input);
 note ($outunesc);
 like ($outunesc, $notesc, "switching off escaping works OK");
 unlike ($outunesc, $esc, "switching off escaping works OK");

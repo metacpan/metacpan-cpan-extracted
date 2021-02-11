@@ -16,7 +16,7 @@ use Mojo::URL;
 #     }
 #   };
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 
 my $WK_PATH = '/.well-known/webfinger';
@@ -54,15 +54,15 @@ sub register {
   };
 
   # Establish WebFinger Route
-  my $wfr = $mojo->routes->route($WK_PATH);
+  my $wfr = $mojo->routes->any($WK_PATH);
 
   # Establish endpoint
   $wfr->endpoint(
     webfinger => {
       query => [
-	'resource' => '{uri}',
-	'rel'      => '{rel?}',
-	'format'   => '{format?}'
+        'resource' => '{uri}',
+        'rel'      => '{rel?}',
+        'format'   => '{format?}'
       ]
     });
 
@@ -74,8 +74,8 @@ sub register {
       # Check for security
       if ($param->{secure} && !$c->req->is_secure) {
 
-	# Bad request - only https allowed!
-	return $c->render(status => 400);
+        # Bad request - only https allowed!
+        return $c->render(status => 400);
       };
 
       # Get resource parameter
@@ -84,13 +84,13 @@ sub register {
       # Delete invalid parameters
       if (!$res || $res eq '{uri}') {
 
-	# Bad request - no resource defined
-	return $c->render(status => 400);
+        # Bad request - no resource defined
+        return $c->render(status => 400);
       };
 
       # Set standard format
       unless ($c->stash('format') || scalar $c->param('format')) {
-	$c->stash(format => 'jrd');
+        $c->stash(format => 'jrd');
       };
 
       # Normalize the resource
@@ -105,36 +105,36 @@ sub register {
       # Check for 'prepare_webfinger' callback
       if ($c->callback(prepare_webfinger => $nres)) {
 
-	# The response body is already rendered
-	return if $c->res->body;
+        # The response body is already rendered
+        return if $c->res->body;
 
-	# Create new xrd document
-	my $xrd = _serve_webfinger($c, $acct, $nres, $res);
+        # Create new xrd document
+        my $xrd = _serve_webfinger($c, $acct, $nres, $res);
 
-	# Seconds given
-	if ($xrd) {
+        # Seconds given
+        if ($xrd) {
 
-	  my $expires;
-	  unless ($expires = $xrd->expires && $seconds) {
-	    $expires = $xrd->expires( time + $seconds);
-	  };
+          my $expires;
+          unless ($expires = $xrd->expires && $seconds) {
+            $expires = $xrd->expires( time + $seconds);
+          };
 
-	  # Expires set
-	  if ($expires) {
+          # Expires set
+          if ($expires) {
 
-	    # Set cache control
-	    my $headers = $c->res->headers;
-	    $headers->cache_control(
-	      "public, max-age=$seconds"
-	    );
+            # Set cache control
+            my $headers = $c->res->headers;
+            $headers->cache_control(
+              "public, max-age=$seconds"
+            );
 
-	    # Set expires header
-	    $headers->expires( $xrd->expires );
-	  };
-	};
+            # Set expires header
+            $headers->expires( $xrd->expires );
+          };
+        };
 
-	# Server xrd document
-	return $c->reply->xrd($xrd, $res);
+        # Server xrd document
+        return $c->reply->xrd($xrd, $res);
       };
 
       # No valid xrd document is existing for this resource
@@ -149,23 +149,23 @@ sub register {
 
       # Add JRD link
       $hostmeta->link(lrdd => {
-	type     => 'application/jrd+json',
-	template => $c->endpoint(
-	  webfinger => {
-	    '?' => undef
-	  }
-	)
+        type     => 'application/jrd+json',
+        template => $c->endpoint(
+          webfinger => {
+            '?' => undef
+          }
+        )
       });
 
       # Add XRD link
       $hostmeta->link(lrdd => {
-	type     => 'application/xrd+xml',
-	template => $c->endpoint(
-	  webfinger => {
-	    format => 'xrd',
-	    '?' => undef
-	  }
-	)
+        type     => 'application/xrd+xml',
+        template => $c->endpoint(
+          webfinger => {
+            format => 'xrd',
+            '?' => undef
+          }
+        )
       });
     });
 
@@ -223,17 +223,16 @@ sub _fetch_webfinger {
 
   # If local, serve local
   if (!$host ||
-	($host eq ($c->req->url->base->host || 'localhost'))) {
+        ($host eq ($c->req->url->base->host || 'localhost'))) {
 
     if ($c->callback(prepare_webfinger => $nres)) {
-
 
       # Serve local xrd document
       my $xrd = _serve_webfinger($c, $acct, $nres, $res);
 
       # Return values
       return $cb ? $cb->($xrd, Mojo::Headers->new) : (
-	wantarray ? ($xrd, Mojo::Headers->new) : $xrd
+        wantarray ? ($xrd, Mojo::Headers->new) : $xrd
       );
     }
     else {
@@ -292,44 +291,44 @@ sub _fetch_webfinger {
 
       # push to delay array
       push(
-	@delay,
+        @delay,
 
-	# Step 1
-	sub {
-	  my $delay = shift;
+        # Step 1
+        sub {
+          my $delay = shift;
 
-	  # Retrieve from modern path
-	  $c->get_xrd(
-	    $path => $header => $delay->begin
-	  );
-	},
+          # Retrieve from modern path
+          $c->get_xrd(
+            $path => $header => $delay->begin
+          );
+        },
 
-	# Step 2
-	sub {
-	  my ($delay, $xrd, $headers) = @_;
+        # Step 2
+        sub {
+          my ($delay, $xrd, $headers) = @_;
 
-	  # Document found
-	  if ($xrd) {
+          # Document found
+          if ($xrd) {
 
-	    # Hook for caching
-	    $c->app->plugins->emit_hook(
-	      after_fetching_webfinger => (
-		$c, $host, $res, $xrd, $headers
-	      ));
+            # Hook for caching
+            $c->app->plugins->emit_hook(
+              after_fetching_webfinger => (
+                $c, $host, $res, $xrd, $headers
+              ));
 
-	    # Filter based on relations
-	    $xrd = $xrd->filter_rel($rel) if $rel;
+            # Filter based on relations
+            $xrd = $xrd->filter_rel($rel) if $rel;
 
-	    # Successful
-	    return $cb->($xrd, $headers);
-	  };
+            # Successful
+            return $cb->($xrd, $headers);
+          };
 
-	  # No more discovery
-	  return $cb->() if exists $flag{-modern};
+          # No more discovery
+          return $cb->() if exists $flag{-modern};
 
-	  # Next step
-	  $delay->begin->();
-	});
+          # Next step
+          $delay->begin->();
+        });
     };
 
     # Old Host-Meta discovery
@@ -338,61 +337,61 @@ sub _fetch_webfinger {
 
       # Step 3
       sub {
-	my $delay = shift;
+        my $delay = shift;
 
-	my @param = (
-	  $host,
-	  $header,
-	  ['lrdd'],
-	  $delay->begin(0,1)
-	);
+        my @param = (
+          $host,
+          $header,
+          ['lrdd'],
+          $delay->begin(0,1)
+        );
 
-	push @param, '-secure' if $secure;
+        push @param, '-secure' if $secure;
 
-	# Host-Meta with lrdd
-	$c->hostmeta( @param );
+        # Host-Meta with lrdd
+        $c->hostmeta( @param );
       },
 
       # Step 4
       sub {
         # Host-Meta document
-	my ($delay, $xrd) = @_;
+        my ($delay, $xrd) = @_;
 
-	# Host-Meta is expired
-	return $cb->() if !$xrd || $xrd->expired;
+        # Host-Meta is expired
+        return $cb->() if !$xrd || $xrd->expired;
 
-	# Prepare lrdd
-	my $template = _get_lrdd($xrd) or return $cb->();
+        # Prepare lrdd
+        my $template = _get_lrdd($xrd) or return $cb->();
 
-	# Interpolate template
-	my $lrdd = $c->endpoint($template => {
-	  uri => $nres,
-	  '?' => undef
-	});
+        # Interpolate template
+        my $lrdd = $c->endpoint($template => {
+          uri => $nres,
+          '?' => undef
+        });
 
-	# Get lrdd
-	$c->get_xrd($lrdd => $header => $delay->begin(0,1))
+        # Get lrdd
+        $c->get_xrd($lrdd => $header => $delay->begin(0,1))
       },
 
       # Step 5
       sub {
-	my $delay = shift;
-	my ($xrd, $headers) = @_;
+        my $delay = shift;
+        my ($xrd, $headers) = @_;
 
-	# No lrdd xrd document found
-	return $cb->() unless $xrd;
+        # No lrdd xrd document found
+        return $cb->() unless $xrd;
 
-	# Hook for caching
-	$c->app->plugins->emit_hook(
-	  after_fetching_webfinger => (
-	    $c, $host, $res, $xrd, $headers
-	  ));
+        # Hook for caching
+        $c->app->plugins->emit_hook(
+          after_fetching_webfinger => (
+            $c, $host, $res, $xrd, $headers
+          ));
 
-	# Filter based on relations
-	$xrd = $xrd->filter_rel($rel) if $rel;
+        # Filter based on relations
+        $xrd = $xrd->filter_rel($rel) if $rel;
 
-	# Successful
-	return $cb->($xrd, $headers);
+        # Successful
+        return $cb->($xrd, $headers);
       });
 
     # Create delay
@@ -435,8 +434,8 @@ sub _fetch_webfinger {
     # Interpolate template
     my $lrdd = $c->endpoint(
       $template => {
-	uri => $nres,
-	'?' => undef
+        uri => $nres,
+        '?' => undef
       });
 
     # Retrieve based on lrdd
@@ -792,7 +791,7 @@ This plugin is part of the L<Sojolicious|http://sojolicio.us> project.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

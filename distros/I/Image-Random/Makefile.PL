@@ -23,8 +23,7 @@ requires 'Imager' => 0;
 requires 'Imager::Color' => 0;
 requires 'List::MoreUtils' => 0;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Image-Random';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Image-Random/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Image-Random';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Image-Random';
 test_requires 'English' => 0;
@@ -35,7 +34,7 @@ test_requires 'Imager::File::JPEG' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.09';
+version '0.10';
 
 # Run.
 WriteAll();

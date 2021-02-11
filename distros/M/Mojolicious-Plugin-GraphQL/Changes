@@ -1,3 +1,6 @@
+0.19 2021-02-10
+- fix websocket URL so wss only if https - thanks @TFBW
+
 0.18 2020-07-14
 - add doc helping use subscriptions
 

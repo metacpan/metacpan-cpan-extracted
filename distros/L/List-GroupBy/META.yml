@@ -28,13 +28,14 @@ no_index:
 provides:
   List::GroupBy:
     file: lib/List/GroupBy.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   perl: '5.010001'
 resources:
+  bugtracker: https://gitlab.com/scrapheap/list-groupby/issues
   homepage: https://gitlab.com/scrapheap/list-groupby
   repository: git://gitlab.com/scrapheap/list-groupby.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:JLCOOPER
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

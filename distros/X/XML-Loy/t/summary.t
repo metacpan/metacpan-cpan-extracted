@@ -82,7 +82,7 @@ is($xml->at('*')->attr('xmlns:my'), $my_ns, 'Namespace-Declaration');
 
 # Example from documentation
 $xml = XML::Loy->new('entry');
-$xml->namespace('fun' => 'http://sojolicio.us/ns/fun');
+$xml->namespace('fun' => 'http://sojolicious.example/ns/fun');
 my $env = $xml->add('fun:env' => { foo => 'bar' });
 my $data = $env->add('data' => { type => 'base64',
 				 -type => 'armour:30'

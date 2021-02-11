@@ -66,7 +66,6 @@ my %WriteMakefile = (
 		},
 
 	'PREREQ_PM'     => {
-		'Sub::Exporter' => '0',
 		'File::Temp'    => '0.17', # needs :seekable
 		'Capture::Tiny' => '0.17',
 		},

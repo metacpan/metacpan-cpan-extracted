@@ -141,7 +141,7 @@ t2hui.dashboard.tool_builder = function(item, tools, data) {
     var pintool = $('<a class="tool etoggle"></a>');
 
     var pinstate;
-    if (item.pinned) {
+    if (item.pinned == true) {
         pintool.prop('title', 'unpin');
         pinstate = true;
         pin.attr('src', '/img/locked.png');
@@ -190,7 +190,7 @@ t2hui.dashboard.redraw_fetch = function(item) {
     return base_uri + 'run/' + item.run_id;
 };
 
-t2hui.dashboard.field_fetch = function(field_data) {
+t2hui.dashboard.field_fetch = function(field_data, item) {
     return base_uri + 'run/' + field_data.run_id;
 };
 
@@ -207,10 +207,10 @@ t2hui.dashboard.field_builder = function(data, name) {
 };
 
 t2hui.dashboard.modify_row = function(row, item) {
-    if (item.failed) {
+    if (item.failed == true) {
         row.addClass('error_set');
     }
-    else if(item.passed) {
+    else if(item.passed == true) {
         row.addClass('success_set');
     }
 

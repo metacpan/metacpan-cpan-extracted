@@ -1,26 +1,24 @@
 ---
-abstract: unknown
+abstract: 'parser for JCAMP-DX format'
 author:
-  - 'Andrius Merkys <andrius.merkys@gmail.com>'
+  - 'Andrius Merkys <merkys@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
   Test::More: '0'
   Test::Warn: '0'
   Text::Diff: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: gpl
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: JCAMP-DX
-no_index:
-  directory:
-    - t
-    - inc
-requires:
-  Data::Dumper: '0'
-version: '0.02'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+resources:
+  bugtracker: https://projects.ibt.lt/repositories/projects/jcamp-dx/issues
+  homepage: https://projects.ibt.lt/repositories/projects/jcamp-dx
+  repository: svn://www.crystallography.net/JCAMP-DX
+version: '0.03'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

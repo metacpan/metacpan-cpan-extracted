@@ -64,7 +64,7 @@ GraphQL endpoint, including a websocket for subscriptions following
 Apollo's `subscriptions-transport-ws` protocol.
 
 As of version 0.09, it will supply the necessary `promise_code`
-parameter to ["execute" in GraphQL::Execution](https://metacpan.org/pod/GraphQL::Execution#execute). This means your resolvers
+parameter to ["execute" in GraphQL::Execution](https://metacpan.org/pod/GraphQL%3A%3AExecution#execute). This means your resolvers
 can (and indeed should) return Promise objects to function
 asynchronously. As of 0.15 these must be "Promises/A+" as subscriptions
 require `resolve` and `reject` methods.
@@ -74,19 +74,19 @@ The route handler code will be compiled to behave like the following:
 - Passes to the [GraphQL](https://metacpan.org/pod/GraphQL) execute, possibly via your supplied handler,
 the given schema, `$root_value` and `$field_resolver`. Note as above
 that the wrapper used in this plugin will supply the hash-ref matching
-["PromiseCode" in GraphQL::Type::Library](https://metacpan.org/pod/GraphQL::Type::Library#PromiseCode).
+["PromiseCode" in GraphQL::Type::Library](https://metacpan.org/pod/GraphQL%3A%3AType%3A%3ALibrary#PromiseCode).
 - The action built matches POST / GET requests.
 - Returns GraphQL results in JSON form.
 
 # OPTIONS
 
-[Mojolicious::Plugin::GraphQL](https://metacpan.org/pod/Mojolicious::Plugin::GraphQL) supports the following options.
+[Mojolicious::Plugin::GraphQL](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AGraphQL) supports the following options.
 
 ## convert
 
 Array-ref. First element is a classname-part, which will be prepended with
-"[GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert)::". The other values will be passed
-to that class's ["to\_graphql" in GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert#to_graphql) method. The
+"[GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL%3A%3APlugin%3A%3AConvert)::". The other values will be passed
+to that class's ["to\_graphql" in GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL%3A%3APlugin%3A%3AConvert#to_graphql) method. The
 returned hash-ref will be used to set options, particularly `schema`,
 and probably at least one of `resolver` and `root_value`.
 
@@ -96,7 +96,7 @@ String. Defaults to `/graphql`.
 
 ## schema
 
-A [GraphQL::Schema](https://metacpan.org/pod/GraphQL::Schema) object. As of 0.15, must be supplied.
+A [GraphQL::Schema](https://metacpan.org/pod/GraphQL%3A%3ASchema) object. As of 0.15, must be supplied.
 
 ## root\_value
 
@@ -136,8 +136,8 @@ packet over websocket every specified number of seconds.
 
 # METHODS
 
-[Mojolicious::Plugin::GraphQL](https://metacpan.org/pod/Mojolicious::Plugin::GraphQL) inherits all methods from
-[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin) and implements the following new ones.
+[Mojolicious::Plugin::GraphQL](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AGraphQL) inherits all methods from
+[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious%3A%3APlugin) and implements the following new ones.
 
 ## register
 
@@ -148,7 +148,7 @@ Register renderer in [Mojolicious](https://metacpan.org/pod/Mojolicious) applica
 # EXPORTS
 
 Exportable is the function `promise_code`, which returns a hash-ref
-suitable for passing as the 8th argument to ["execute" in GraphQL::Execution](https://metacpan.org/pod/GraphQL::Execution#execute).
+suitable for passing as the 8th argument to ["execute" in GraphQL::Execution](https://metacpan.org/pod/GraphQL%3A%3AExecution#execute).
 
 # SUBSCRIPTIONS
 
@@ -178,7 +178,7 @@ the `variables` parameter. The above is adapted from the sample app,
 
 [GraphQL](https://metacpan.org/pod/GraphQL)
 
-[GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert)
+[GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL%3A%3APlugin%3A%3AConvert)
 
 [https://github.com/apollographql/subscriptions-transport-ws#client-browser](https://github.com/apollographql/subscriptions-transport-ws#client-browser)
 \- Apollo documentation
@@ -187,7 +187,7 @@ the `variables` parameter. The above is adapted from the sample app,
 
 Ed J
 
-Based heavily on [Mojolicious::Plugin::PODRenderer](https://metacpan.org/pod/Mojolicious::Plugin::PODRenderer).
+Based heavily on [Mojolicious::Plugin::PODRenderer](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3APODRenderer).
 
 # COPYRIGHT AND LICENSE
 

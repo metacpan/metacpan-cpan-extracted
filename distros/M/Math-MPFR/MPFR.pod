@@ -303,7 +303,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    These next 3 functions are demonstrated above (in SYNOPSIS):
    $rop = Rmpfr_init();
    $rop = Rmpfr_init2($p);
-   $str = Rmpfr_get_str($op, $base, $digits, $rnd); # 1 < $base < 37
+   $str = Rmpfr_get_str($op, $base, $digits, $rnd); # mpfr version >= 4.1.0 ? 1 < abs($base) < 63
+                                                    #                       : 1 < abs($base) < 3
    The third argument to Rmpfr_get_str() specifies the number of digits
    required to be output in the mantissa. (Trailing zeroes are removed.)
    If $digits is 0, the number of digits of the mantissa is chosen
@@ -614,7 +615,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     But the following assignment won't do what you want:
      Rmpfr_set_str($rop, ".1234@-5", 10, GMP_RNDN);
 
-   Rmpfr_strtofr($rop, $str, $base, $rnd);
+   $si = Rmpfr_strtofr($rop, $str, $base, $rnd);
     Read a floating point number from a string $str in base $base,
     rounded in the direction $rnd. If successful, the result is
     stored in $rop. If $str doesn't start with a valid number then
@@ -1226,6 +1227,27 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     with their corresponding precisions.  Return 0 if both
     results are exact.
 
+   $si = Rmpfr_cosu($rop, $op, $ui, $rnd); # mpfr-4.2.0 and later only
+   $si = Rmpfr_sinu($rop, $op, $ui, $rnd); # mpfr-4.2.0 and later only
+   $si = Rmpfr_tanu($rop, $op, $ui, $rnd); # mpfr-4.2.0 and later only
+    Set $rop to the cosine (resp. sine and tangent) of $op multiplied by
+    2*Pi and divided by $ui.  For example, if $ui equals 360, one gets
+    the cosine (resp. sine and tangent) for $op in degrees.  For
+    'Rmpfr_cosu', when $op multiplied by 2 and divided by $ui is a
+    half-integer, the result is +0, following IEEE 754-2019 (cosPi), so
+    that the function is even.  For 'Rmpfr_sinu', when $op multiplied by
+    2 and divided by $ui is an integer, the result is zero with the same
+    sign as $op, following IEEE 754-2019 (sinPi), so that the function
+    is odd.  Similarly, the function 'Rmpfr_tanu' follows IEEE 754-2019
+    (tanPi).
+
+   $si = Rmpfr_cospi($rop, $op, $rnd); # mpfr-4.2.0 and later only
+   $si = Rmpfr_sinpi($rop, $op, $rnd); # mpfr-4.2.0 and later only
+   $si = Rmpfr_tanpi($rop, $op, $rnd); # mpfr-4.2.0 and later only
+    Set $rop to the cosine (resp. sine and tangent) of $op multiplied by
+    Pi.  See the description of 'Rmpfr_sinu', 'Rmpfr_cosu' and
+    'Rmpfr_tanu' for special values.
+
    $si = Rmpfr_sinh_cosh($rop1, $rop2, $op, $rnd);
     Set simultaneously $rop1 to the hyperbolic sine of $op and
     $rop2 to the hyperbolic cosine of $op, rounded in the direction
@@ -1786,6 +1808,15 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     If $str numifies to an IV, return that IV.
     Else return the NV that is returned by atonv($str).
 
+   $str = decimalize($op);
+    Return an exact base 10 representation of the value held in $op.
+
+   $bool = check_exact_decimal($str, $op);
+    Can be used to verify the string returned by decimalize().
+    Return 1 if $str is an exact decimal representation of the value
+    held in $op.
+    Else return 0.
+
    $MPFR_version = Rmpfr_get_version();
     Returns the version of the MPFR library (eg 4.0.2) being used by
     Math::MPFR.
@@ -1941,6 +1972,12 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     magnitude relative to $op2 that an exact representation of the
     quotient is not practical. 'Rmpfr_remainder' and Rmpfr_remquo'
     functions are useful for additive argument reduction.
+
+   $si = Rmpfr_fmod_ui($rop, $op1, $ui, $rnd);
+    As for Rmpfr_fmod(), above, except that the 3rd arg is an
+    unsigned long int instead of a Math::MPFR object. This function
+    was introduced in mpfr-4.2.0-dev, but is implemented (suboptimally)
+    in Math::MPFR built against older versions of the mpfr library.
 
    $si = Rmpfr_integer_p($op);
     Return non-zero if $op is an integer.
@@ -2219,33 +2256,36 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      abs atan2 cos sin log exp (Return object has default precision)
      int (On perl 5.8 only, NA on perl 5.6. The return object
           has default precision)
-     = (The copy has the same precision as the copied object.)
      ""
+     = (The copy has the same precision as the copied object.)
 
-    All overloaded comparisons ( < <= > >= == != <=> ) between
-    Math::MPFR and Math::GMPz objects or between Math::MPFR and
-    Math::GMPq objects are now also permitted.
-   . allowed
+    NOTE: Making use of the '=' overloading is not recommended unless
+          you understand its caveats. See 'perldoc overload' and
+          read it thoroughly, including the documentation regarding
+          'copy constructors'.
 
-    As of version 3.13 of Math::MPFR, some cross-class overloading
-    is allowed.
+    Furthermore, all overloaded comparisons ( < <= > >= == != <=> )
+    between Math::MPFR and Math::GMPz objects or between Math::MPFR
+    and Math::GMPq objects are permitted.
+
+    Some additional cross-class overloading is also allowed.
     Let $M be a Math::MPFR object, and $G be any one of a Math::GMPz,
     Math::GMPq or Math::GMPf object. Then it is now permissible to
     do:
 
      $M + $G;
-     $M - $G;
-     $M * $G;
-     $M / $G;
-     $M ** $G;
-
-    In each of the above, a Math::MPFR object containing the result
-    of the operation is returned. It is also now permissible to do:
-
      $M += $G;
+
+     $M - $G;
      $M -= $G;
+
+     $M * $G;
      $M *= $G;
+
+     $M / $G;
      $M /= $G;
+
+     $M ** $G;
      $M **= $G;
 
     If you have version 0.35 (or later) of Math::GMPz, Math::GMPq

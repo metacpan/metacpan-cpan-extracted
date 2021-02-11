@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::CxnPool::Static::NoPing;
-$Search::Elasticsearch::Role::CxnPool::Static::NoPing::VERSION = '7.30';
+$Search::Elasticsearch::Role::CxnPool::Static::NoPing::VERSION = '7.711';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::CxnPool';
 
@@ -96,7 +96,7 @@ Search::Elasticsearch::Role::CxnPool::Static::NoPing - A CxnPool for connecting 
 
 =head1 VERSION
 
-version 7.30
+version 7.711
 
 =head1 AUTHOR
 
@@ -104,7 +104,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Elasticsearch BV.
+This software is Copyright (c) 2021 by Elasticsearch BV.
 
 This is free software, licensed under:
 

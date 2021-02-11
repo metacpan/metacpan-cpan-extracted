@@ -455,8 +455,8 @@ XML::Loy::XRD - Extensible Resource Descriptor Extension
   my $xrd = XML::Loy::XRD->new;
 
   # Set subject and add alias
-  $xrd->subject('http://sojolicio.us/');
-  $xrd->alias('https://sojolicio.us/');
+  $xrd->subject('http://sojolicious.example/');
+  $xrd->alias('https://sojolicious.example/');
 
   # Add properties
   $xrd->property(describedBy => '/me.foaf' );
@@ -472,8 +472,8 @@ XML::Loy::XRD - Extensible Resource Descriptor Extension
   # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
   # <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0"
   #      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  #   <Subject>http://sojolicio.us/</Subject>
-  #   <Alias>https://sojolicio.us/</Alias>
+  #   <Subject>http://sojolicious.example/</Subject>
+  #   <Alias>https://sojolicious.example/</Alias>
   #   <Link rel="lrdd"
   #         template="/.well-known/webfinger?resource={uri}" />
   #   <Property type="describedby">/me.foaf</Property>
@@ -483,8 +483,8 @@ XML::Loy::XRD - Extensible Resource Descriptor Extension
 
   print $xrd->to_json;
 
-  # {"subject":"http:\/\/sojolicio.us\/",
-  # "aliases":["https:\/\/sojolicio.us\/"],
+  # {"subject":"http:\/\/sojolicious.example\/",
+  # "aliases":["https:\/\/sojolicious.example\/"],
   # "links":[{"rel":"lrdd",
   # "template":"\/.well-known\/webfinger?resource={uri}"}],
   # "properties":{"private":null,"describedby":"\/me.foaf"}}
@@ -515,8 +515,8 @@ from L<XML::Loy> and implements the following new ones.
   <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
   <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Subject>http://sojolicio.us/</Subject>
-    <Alias>https://sojolicio.us/</Alias>
+    <Subject>http://sojolicious.example/</Subject>
+    <Alias>https://sojolicious.example/</Alias>
     <Link rel="lrdd"
           template="/.well-known/webfinger?resource={uri}" />
     <Property type="describedby">/me.foaf</Property>
@@ -529,8 +529,8 @@ from L<XML::Loy> and implements the following new ones.
 
   # New document by JRD
   my $jrd = XML::Loy::XRD->new(<<'JRD');
-  {"subject":"http:\/\/sojolicio.us\/",
-  "aliases":["https:\/\/sojolicio.us\/"],
+  {"subject":"http:\/\/sojolicious.example\/",
+  "aliases":["https:\/\/sojolicious.example\/"],
   "links":[{"rel":"lrdd",
   "template":"\/.well-known\/webfinger?resource={uri}"}],
   "properties":{"private":null,"describedby":"\/me.foaf"}}
@@ -547,8 +547,8 @@ it can also parse L<JRD|https://tools.ietf.org/html/rfc6415> input.
 =head2 alias
 
   $xrd->alias(
-    'https://sojolicio.us/',
-    'https://sojolicio.us'
+    'https://sojolicious.example/',
+    'https://sojolicious.example'
   );
   my @aliases = $xrd->alias;
 
@@ -646,7 +646,7 @@ as the property's value.
 
 =head2 subject
 
-  $xrd->subject('http://sojolicio.us/');
+  $xrd->subject('http://sojolicious.example/');
   my $subject = $xrd->subject;
 
 Sets the subject of the xrd document
@@ -680,7 +680,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::CxnPool::Async::Static;
-$Search::Elasticsearch::CxnPool::Async::Static::VERSION = '7.30';
+$Search::Elasticsearch::CxnPool::Async::Static::VERSION = '7.711';
 use Moo;
 with 'Search::Elasticsearch::Role::CxnPool::Static',
     'Search::Elasticsearch::Role::Is_Async';
@@ -98,7 +98,7 @@ Search::Elasticsearch::CxnPool::Async::Static - An async CxnPool for connecting 
 
 =head1 VERSION
 
-version 7.30
+version 7.711
 
 =head1 SYNOPSIS
 
@@ -230,7 +230,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Elasticsearch BV.
+This software is Copyright (c) 2021 by Elasticsearch BV.
 
 This is free software, licensed under:
 

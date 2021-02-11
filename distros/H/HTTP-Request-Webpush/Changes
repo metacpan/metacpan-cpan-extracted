@@ -1,3 +1,15 @@
+0.14 2020-02-11 09:12:00 America/Santiago
+
+   -Fixed yet another misplaced requirement
+
+0.13 2020-02-10 15:51:00 America/Santiago
+
+   -Changed the inheritance perl artifact
+
+0.12 2020-02-09 18:02:00 America/Santiago
+
+   -Fixed some POD typos
+
 0.11 2020-02-09 17:13:00 America/Santiago
 
    -Changed CRLF mode in the push.cgi example

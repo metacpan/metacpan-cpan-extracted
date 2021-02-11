@@ -1,8 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use lib ('lib', '../lib');
-
 use Test::More tests => 88;
 use Test::Mojo;
 use Mojo::JSON qw(decode_json);

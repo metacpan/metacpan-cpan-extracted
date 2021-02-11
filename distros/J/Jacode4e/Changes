@@ -1,5 +1,9 @@
 Revision history for this software.
 
+2.13.6.17 2021-02-11 00:00:00
+  - rewrote global "%_" to "my %x"
+  - created by INABA Hitoshi
+
 2.13.6.16 2019-09-30 00:00:00
   - supports optimized RFC3629 for ja_JP
   - created by INABA Hitoshi

@@ -7,17 +7,11 @@ use strict;
 
 use Test::Builder;
 use Capture::Tiny qw/capture capture_stdout capture_stderr capture_merged/;
-use Sub::Exporter -setup => {
-  exports => [
-    qw(output_is output_isnt output_like output_unlike
-      stderr_is stderr_isnt stderr_like stderr_unlike
-      stdout_is stdout_isnt stdout_like stdout_unlike
-      combined_is combined_isnt combined_like combined_unlike
-      output_from stderr_from stdout_from combined_from
-      )
-  ],
-  groups => {
-    stdout => [
+
+use Exporter qw(import);
+
+our %EXPORT_TAGS = (
+	stdout => [
       qw(
         stdout_is stdout_isnt stdout_like stdout_unlike
         )
@@ -50,9 +44,26 @@ use Sub::Exporter -setup => {
         combined_is combined_isnt combined_like combined_unlike
         )
     ],
-    default => [ '-tests' ],
-  },
-};
+    all => [
+      qw(
+        output_is output_isnt output_like output_unlike
+        stderr_is stderr_isnt stderr_like stderr_unlike
+        stdout_is stdout_isnt stdout_like stdout_unlike
+        combined_is combined_isnt combined_like combined_unlike
+        output_from stderr_from stdout_from combined_from
+        )
+    ],
+	);
+
+our @EXPORT = keys %{
+		{
+		map { $_ => 1 }
+		map {
+			@{ $EXPORT_TAGS{$_} }
+			}
+		keys %EXPORT_TAGS
+		}
+	};
 
 my $Test = Test::Builder->new;
 
@@ -62,13 +73,9 @@ my $Test = Test::Builder->new;
 
 Test::Output - Utilities to test STDOUT and STDERR messages.
 
-=head1 VERSION
-
-Version 0.16
-
 =cut
 
-our $VERSION = '1.032';
+our $VERSION = '1.033';
 
 =head1 SYNOPSIS
 
@@ -106,16 +113,12 @@ our $VERSION = '1.032';
 
 =head1 DESCRIPTION
 
-Test::Output provides a simple interface for testing output sent to STDOUT
-or STDERR. A number of different utilities are included to try and be as
+Test::Output provides a simple interface for testing output sent to C<STDOUT>
+or C<STDERR>. A number of different utilities are included to try and be as
 flexible as possible to the tester.
 
-Originally this module was designed not to have external requirements,
-however, the features provided by L<Sub::Exporter> over what L<Exporter>
-provides is just to great to pass up.
-
-Likewise, Capture::Tiny provides a much more robust capture mechanism without
-than the original Test::Output::Tie.
+Likewise, L<Capture::Tiny> provides a much more robust capture mechanism without
+than the original L<Test::Output::Tie>.
 
 =cut
 
@@ -136,10 +139,10 @@ than the original Test::Output::Tie.
    stdout_isnt( $coderef, $expected, 'description' );
    stdout_isnt  { ... } $expected, 'description';
 
-stdout_is() captures output sent to STDOUT from $coderef and compares
-it against $expected. The test passes if equal.
+C<stdout_is()> captures output sent to C<STDOUT> from C<$coderef> and compares
+it against C<$expected>. The test passes if equal.
 
-stdout_isnt() passes if STDOUT is not equal to $expected.
+C<stdout_isnt()> passes if C<STDOUT> is not equal to C<$expected>.
 
 =cut
 
@@ -184,10 +187,10 @@ sub stdout_isnt (&$;$$) {
    stdout_unlike( $coderef, qr/$expected/, 'description' );
    stdout_unlike  { ... } qr/$expected/, 'description';
 
-stdout_like() captures the output sent to STDOUT from $coderef and compares
-it to the regex in $expected. The test passes if the regex matches.
+C<stdout_like()> captures the output sent to C<STDOUT> from C<$coderef> and compares
+it to the regex in C<$expected>. The test passes if the regex matches.
 
-stdout_unlike() passes if STDOUT does not match the regex.
+C<stdout_unlike()> passes if STDOUT does not match the regex.
 
 =back
 
@@ -247,10 +250,10 @@ sub stdout_unlike (&$;$$) {
    stderr_isnt( $coderef, $expected, 'description' );
    stderr_isnt  {... } $expected, 'description';
 
-stderr_is() is similar to stdout_is, except that it captures STDERR. The
-test passes if STDERR from $coderef equals $expected.
+C<stderr_is()> is similar to C<stdout_is>, except that it captures C<STDERR>. The
+test passes if C<STDERR> from C<$coderef> equals C<$expected>.
 
-stderr_isnt() passes if STDERR is not equal to $expected.
+C<stderr_isnt()> passes if C<STDERR> is not equal to C<$expected>.
 
 =cut
 
@@ -295,11 +298,11 @@ sub stderr_isnt (&$;$$) {
    stderr_unlike( $coderef, qr/$expected/, 'description' );
    stderr_unlike  { ...} qr/$expected/, 'description';
 
-stderr_like() is similar to stdout_like() except that it compares the regex
-$expected to STDERR captured from $codref. The test passes if the regex
+C<stderr_like()> is similar to C<stdout_like()> except that it compares the regex
+C<$expected> to C<STDERR> captured from C<$codref>. The test passes if the regex
 matches.
 
-stderr_unlike() passes if STDERR does not match the regex.
+C<stderr_unlike()> passes if C<STDERR> does not match the regex.
 
 =back
 
@@ -358,12 +361,12 @@ sub stderr_unlike (&$;$$) {
    combined_isnt ( $coderef, $expected, 'description' );
    combined_isnt {... } $expected, 'description';
 
-combined_is() directs STDERR to STDOUT then captures STDOUT. This is
-equivalent to UNIXs 2>&1. The test passes if the combined STDOUT
-and STDERR from $coderef equals $expected.
+C<combined_is()> directs C<STDERR> to C<STDOUT> then captures C<STDOUT>. This is
+equivalent to UNIXs C<< 2>&1 >>. The test passes if the combined C<STDOUT>
+and C<STDERR> from $coderef equals $expected.
 
-combined_isnt() passes if combined STDOUT and STDERR are not equal
-to $expected.
+C<combined_isnt()> passes if combined C<STDOUT> and C<STDERR> are not equal
+to C<$expected>.
 
 =cut
 
@@ -410,11 +413,11 @@ sub combined_isnt (&$;$$) {
    combined_unlike ( $coderef, qr/$expected/, 'description' );
    combined_unlike { ...} qr/$expected/, 'description';
 
-combined_like() is similar to combined_is() except that it compares a regex
-($expected) to STDOUT and STDERR captured from $codref. The test passes if
+C<combined_like()> is similar to C<combined_is()> except that it compares a regex
+(C<$expected)> to C<STDOUT> and C<STDERR> captured from C<$codref>. The test passes if
 the regex matches.
 
-combined_unlike() passes if the combined STDOUT and STDERR does not match
+C<combined_unlike()> passes if the combined C<STDOUT> and C<STDERR> does not match
 the regex.
 
 =back
@@ -476,7 +479,7 @@ sub combined_unlike (&$;$$) {
    output_isnt( $coderef, $expected_stdout, $expected_stderr, 'description' );
    output_isnt  {... } $expected_stdout, $expected_stderr, 'description';
 
-The output_is() function is a combination of the stdout_is() and stderr_is()
+The C<output_is()> function is a combination of the C<stdout_is()> and C<stderr_is()>
 functions. For example:
 
   output_is(sub {print "foo"; print STDERR "bar";},'foo','bar');
@@ -486,12 +489,12 @@ is functionally equivalent to
   stdout_is(sub {print "foo";},'foo')
     && stderr_is(sub {print STDERR "bar";},'bar');
 
-except that $coderef is only executed once.
+except that C<$coderef> is only executed once.
 
-Unlike, stdout_is() and stderr_is() which ignore STDERR and STDOUT
-respectively, output_is() requires both STDOUT and STDERR to match in order
-to pass. Setting either $expected_stdout or $expected_stderr to C<undef>
-ignores STDOUT or STDERR respectively.
+Unlike C<stdout_is()> and C<stderr_is()> which ignore STDERR and STDOUT
+respectively, C<output_is()> requires both C<STDOUT> and C<STDERR> to match in order
+to pass. Setting either C<$expected_stdout> or C<$expected_stderr> to C<undef>
+ignores C<STDOUT> or C<STDERR> respectively.
 
   output_is(sub {print "foo"; print STDERR "bar";},'foo',undef);
 
@@ -499,8 +502,8 @@ is the same as
 
   stdout_is(sub {print "foo";},'foo')
 
-output_isnt() provides the opposite function of output_is(). It is a
-combination of stdout_isnt() and stderr_isnt().
+C<output_isnt()> provides the opposite function of C<output_is()>. It is a
+combination of C<stdout_isnt()> and C<stderr_isnt()>.
 
   output_isnt(sub {print "foo"; print STDERR "bar";},'bar','foo');
 
@@ -509,7 +512,7 @@ is functionally equivalent to
   stdout_isnt(sub {print "foo";},'bar')
     && stderr_isnt(sub {print STDERR "bar";},'foo');
 
-As with output_is(), setting either $expected_stdout or $expected_stderr to
+As with C<output_is()>, setting either C<$expected_stdout> or C<$expected_stderr> to
 C<undef> ignores the output to that facility.
 
   output_isnt(sub {print "foo"; print STDERR "bar";},undef,'foo');
@@ -625,17 +628,17 @@ sub output_isnt (&$$;$$) {
   output_unlike( $coderef, $regex_stdout, $regex_stderr, 'description' );
   output_unlike { ... } $regex_stdout, $regex_stderr, 'description';
 
-output_like() and output_unlike() follow the same principles as output_is()
-and output_isnt() except they use a regular expression for matching.
+C<output_like()> and C<output_unlike()> follow the same principles as C<output_is()>
+and C<output_isnt()> except they use a regular expression for matching.
 
-output_like() attempts to match $regex_stdout and $regex_stderr against
-STDOUT and STDERR produced by $coderef. The test passes if both match.
+C<output_like()> attempts to match C<$regex_stdout> and C<$regex_stderr> against
+C<STDOUT> and C<STDERR> produced by $coderef. The test passes if both match.
 
   output_like(sub {print "foo"; print STDERR "bar";},qr/foo/,qr/bar/);
 
 The above test is successful.
 
-Like output_is(), setting either $regex_stdout or $regex_stderr to
+Like C<output_is()>, setting either C<$regex_stdout> or C<$regex_stderr> to
 C<undef> ignores the output to that facility.
 
   output_like(sub {print "foo"; print STDERR "bar";},qr/foo/,undef);
@@ -644,8 +647,8 @@ is the same as
 
   stdout_like(sub {print "foo"; print STDERR "bar";},qr/foo/);
 
-output_unlike() test pass if output from $coderef doesn't match
-$regex_stdout and $regex_stderr.
+C<output_unlike()> test pass if output from C<$coderef> doesn't match
+C<$regex_stdout> and C<$regex_stderr>.
 
 =back
 
@@ -758,55 +761,25 @@ sub output_unlike (&$$;$$) {
 
 =head1 EXPORTS
 
-By default, all tests are exported, however with the switch to L<Sub::Exporter>
-export groups are now available to better limit imports.
-
-To import tests for STDOUT:
-
-  use Test::Output qw(:stdout);
-
-To import tests STDERR:
-
-  use Test::Output qw(:stderr);
-
-To import just the functions:
-
-  use Test::Output qw(:functions);
-
-And to import all tests:
-
-  use Test::Output;
-
-The following is a list of group names and which functions are exported:
+By default, all subroutines are exported by default.
 
 =over 4
 
-=item stdout
+=item * :stdout - the subs with C<stdout> in the name.
 
-stdout_is stdout_isnt stdout_like stdout_unlike
+=item * :stderr - the subs with C<stderr> in the name.
 
-=item stderr
+=item * :functions - the subs with C<_from> at the end.
 
-stderr_is stderr_isnt stderr_like stderr_unlike
+=item * :output - the subs with C<output> in the name.
 
-=item output
+=item * :combined - the subs with C<combined> in the name.
 
-output_is output_isnt output_like output_unlike
+=item * :tests - everything that outputs TAP
 
-=item combined
-
-combined_is combined_isnt combined_like combined_unlike
-
-=item tests
-
-All of the above, this is the default when no options are given.
+=item * :all - everything (which is the same as the default)
 
 =back
-
-L<Sub::Exporter> allows for many other options, I encourage reading its
-documentation.
-
-=cut
 
 =head1 FUNCTIONS
 
@@ -837,7 +810,7 @@ sub stdout_from (&) {
   my $stderr = stderr_from($coderef)
   my $stderr = stderr_from { ... };
 
-stderr_from() executes $coderef and captures STDERR.
+C<stderr_from()> executes C<$coderef> and captures C<STDERR>.
 
 =cut
 
@@ -861,7 +834,7 @@ sub stderr_from (&) {
   my ($stdout, $stderr) = output_from($coderef)
   my ($stdout, $stderr) = output_from {...};
 
-output_from() executes $coderef one time capturing both STDOUT and STDERR.
+C<output_from()> executes C<$coderef> one time capturing both C<STDOUT> and C<STDERR>.
 
 =cut
 
@@ -882,8 +855,8 @@ sub output_from (&) {
   my $combined = combined_from($coderef);
   my $combined = combined_from {...};
 
-combined_from() executes $coderef one time combines STDOUT and STDERR, and
-captures them. combined_from() is equivalent to using 2>&1 in UNIX.
+C<combined_from()> executes C<$coderef> one time combines C<STDOUT> and C<STDERR>, and
+captures them. C<combined_from()> is equivalent to using C<< 2>&1 >> in UNIX.
 
 =cut
 
@@ -942,11 +915,12 @@ be notified of progress on your bug as I make changes.
 Thanks to chromatic whose TieOut.pm was the basis for capturing output.
 
 Also thanks to rjbs for his help cleaning the documentation, and pushing me to
-L<Sub::Exporter>.
+L<Sub::Exporter>. (This feature has been removed since it uses none of
+L<Sub::Exporter>'s strengths).
 
 Thanks to David Wheeler for providing code block support and tests.
 
-Thanks to Michael G Schwern for the solution to combining STDOUT and STDERR.
+Thanks to Michael G Schwern for the solution to combining C<STDOUT> and C<STDERR>.
 
 =head1 COPYRIGHT & LICENSE
 

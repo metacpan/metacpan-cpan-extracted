@@ -155,8 +155,10 @@ Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_ui Rmpfr_set_ui_2exp
 Rmpfr_set_uj Rmpfr_set_uj_2exp
 Rmpfr_set_DECIMAL64 Rmpfr_get_DECIMAL64 Rmpfr_set_float128 Rmpfr_get_float128
 Rmpfr_set_FLOAT128 Rmpfr_get_FLOAT128 Rmpfr_set_DECIMAL128 Rmpfr_get_DECIMAL128
+decimalize check_exact_decimal
 Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin
-Rmpfr_sin_cos Rmpfr_sinh_cosh
+Rmpfr_sin_cos Rmpfr_sinu Rmpfr_cosu Rmpfr_tanu Rmpfr_sinpi Rmpfr_cospi Rmpfr_tanpi
+Rmpfr_sinh_cosh
 Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub
 Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize
 Rmpfr_sum Rmpfr_swap
@@ -167,7 +169,7 @@ Rmpfr_j0 Rmpfr_j1 Rmpfr_jn Rmpfr_y0 Rmpfr_y1 Rmpfr_yn Rmpfr_lgamma
 Rmpfr_signbit Rmpfr_setsign Rmpfr_copysign Rmpfr_get_patches
 Rmpfr_remainder Rmpfr_remquo Rmpfr_fms Rmpfr_init_set_ld
 Rmpfr_add_d Rmpfr_sub_d Rmpfr_d_sub Rmpfr_mul_d Rmpfr_div_d Rmpfr_d_div
-Rmpfr_rec_sqrt Rmpfr_rec_root Rmpfr_li2 Rmpfr_modf Rmpfr_fmod
+Rmpfr_rec_sqrt Rmpfr_rec_root Rmpfr_li2 Rmpfr_modf Rmpfr_fmod Rmpfr_fmod_ui
 Rmpfr_printf Rmpfr_fprintf Rmpfr_sprintf Rmpfr_snprintf
 Rmpfr_buildopt_tls_p Rmpfr_buildopt_decimal_p Rmpfr_regular_p Rmpfr_set_zero Rmpfr_digamma
 Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
@@ -183,7 +185,7 @@ Rmpfr_round_nearest_away rndna
 atonv nvtoa atodouble doubletoa numtoa atonum Rmpfr_dot Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt
 );
 
-    our $VERSION = '4.14';
+    our $VERSION = '4.15';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -261,8 +263,10 @@ Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_ui Rmpfr_set_ui_2exp
 Rmpfr_set_uj Rmpfr_set_uj_2exp
 Rmpfr_set_DECIMAL64 Rmpfr_get_DECIMAL64 Rmpfr_set_float128 Rmpfr_get_float128
 Rmpfr_set_FLOAT128 Rmpfr_get_FLOAT128 Rmpfr_set_DECIMAL128 Rmpfr_get_DECIMAL128
+decimalize check_exact_decimal
 Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin
-Rmpfr_sin_cos Rmpfr_sinh_cosh
+Rmpfr_sin_cos Rmpfr_sinu Rmpfr_cosu Rmpfr_tanu Rmpfr_sinpi Rmpfr_cospi Rmpfr_tanpi
+Rmpfr_sinh_cosh
 Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub
 Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize
 Rmpfr_sum Rmpfr_swap
@@ -273,7 +277,7 @@ Rmpfr_j0 Rmpfr_j1 Rmpfr_jn Rmpfr_y0 Rmpfr_y1 Rmpfr_yn Rmpfr_lgamma
 Rmpfr_signbit Rmpfr_setsign Rmpfr_copysign Rmpfr_get_patches
 Rmpfr_remainder Rmpfr_remquo Rmpfr_fms Rmpfr_init_set_ld
 Rmpfr_add_d Rmpfr_sub_d Rmpfr_d_sub Rmpfr_mul_d Rmpfr_div_d Rmpfr_d_div
-Rmpfr_rec_sqrt Rmpfr_rec_root Rmpfr_li2 Rmpfr_modf Rmpfr_fmod
+Rmpfr_rec_sqrt Rmpfr_rec_root Rmpfr_li2 Rmpfr_modf Rmpfr_fmod Rmpfr_fmod_ui
 Rmpfr_printf Rmpfr_fprintf Rmpfr_sprintf Rmpfr_snprintf
 Rmpfr_buildopt_tls_p Rmpfr_buildopt_decimal_p Rmpfr_regular_p Rmpfr_set_zero Rmpfr_digamma
 Rmpfr_ai Rmpfr_set_flt Rmpfr_get_flt Rmpfr_urandom Rmpfr_set_z_2exp
@@ -598,6 +602,35 @@ sub atonum {
       return atonv($_[0]);            # NV
     }
     die("atonum needs atonv, but atonv is not available with this version (", MPFR_VERSION_STRING, ") of the mpfr library");
+}
+
+sub check_exact_decimal {
+  unless( MPFR_3_1_6_OR_LATER ) {
+    warn "check_exact_decimal() requires mpfr-3.1.6 or later\n";
+    die "Math::MPFR was built against mpfr-", MPFR_VERSION_STRING;
+  }
+  my($str, $op) = (shift, shift);
+
+  if( !Rmpfr_regular_p($op) ) {  # $op is either zero, inf, or nan.
+    if( Rmpfr_nan_p($op)    && $str =~ /^nan$/i )  { return 1 }
+    if( Rmpfr_signbit($op) ) {
+      if( Rmpfr_zero_p($op) && $str eq '-0' )     { return 1 }
+      if( Rmpfr_inf_p($op)  && $str =~ /^\-inf$/i ) { return 1 }
+    }
+    else {
+      if( Rmpfr_zero_p($op) && $str eq '0' )      { return 1 }
+      if( Rmpfr_inf_p($op)  && $str =~ '^inf$/i' )  { return 1 }
+    }
+
+    return 0;
+  }
+
+  my $check = Rmpfr_init2(Rmpfr_get_prec($op));
+
+  my $inex = Rmpfr_strtofr($check, $str, 10, MPFR_RNDN);
+
+  if($inex == 0 && $op == $check) { return 1 }
+  return 0;
 }
 
 sub mpfr_min_inter_prec {

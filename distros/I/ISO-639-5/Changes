@@ -10,3 +10,8 @@ Revision history for ISO-639-5
 0.04	Tue Jan 19 23:43:56 EET 2021
 	- added missing language groups
 	- fixed ISO639-5 hierarchy
+
+0.05	Wed Feb 10 15:46:45 EET 2021
+	- removed glottolog IDs in cai
+	- added language lists via glottolog IDs
+	- added conversion to Glottolog IDs

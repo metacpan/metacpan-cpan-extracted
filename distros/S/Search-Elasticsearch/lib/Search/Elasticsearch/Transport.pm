@@ -3,7 +3,7 @@
 # See the LICENSE file in the project root for more information
 
 package Search::Elasticsearch::Transport;
-$Search::Elasticsearch::Transport::VERSION = '7.30';
+$Search::Elasticsearch::Transport::VERSION = '7.711';
 use Moo;
 
 use URI();
@@ -76,7 +76,7 @@ Search::Elasticsearch::Transport - Provides interface between the client class a
 
 =head1 VERSION
 
-version 7.30
+version 7.711
 
 =head1 DESCRIPTION
 
@@ -168,7 +168,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Elasticsearch BV.
+This software is Copyright (c) 2021 by Elasticsearch BV.
 
 This is free software, licensed under:
 

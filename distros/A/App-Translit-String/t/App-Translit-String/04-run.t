@@ -14,8 +14,8 @@ use Unicode::UTF8 qw(decode_utf8);
 @ARGV = (
 	decode_utf8('Российская Федерация'),
 );
-my $right_ret = <<'END';
-Rossijskaja Federacija
+my $right_ret = decode_utf8(<<'END');
+Rossijskaâ Federaciâ
 END
 stdout_is(
 	sub {
@@ -29,10 +29,10 @@ stdout_is(
 # Test.
 @ARGV = (
 	'-r',
-	'Rossijskaja Federacija',
+	'Rossijskaâ Federaciâ',
 );
 $right_ret = <<'END';
-Российскайа Федерацийа
+Российская Федерация
 END
 stdout_is(
 	sub {
@@ -66,7 +66,7 @@ Usage: t/App-Translit-String/04-run.t [-h] [-r] [-t table] [--version]
 
 	-h		Print help.
 	-r		Reverse transliteration.
-	-t table	Transliteration table (default value is 'ISO/R 9').
+	-t table	Transliteration table (default value is 'ISO 9').
 	--version	Print version.
 END
 stderr_is(
@@ -88,7 +88,7 @@ Usage: t/App-Translit-String/04-run.t [-h] [-r] [-t table] [--version]
 
 	-h		Print help.
 	-r		Reverse transliteration.
-	-t table	Transliteration table (default value is 'ISO/R 9').
+	-t table	Transliteration table (default value is 'ISO 9').
 	--version	Print version.
 END
 my $warning;

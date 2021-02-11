@@ -58,9 +58,9 @@ is($text->at('text')->text,
 
 # New Person
 my $person = $atom->new_person(name => 'Bender',
-			       uri => 'http://sojolicio.us/bender');
+			       uri => 'http://sojolicious.example/bender');
 is($person->at('name')->text, 'Bender', 'Person1');
-is($person->at('uri')->text, 'http://sojolicio.us/bender', 'Person2');
+is($person->at('uri')->text, 'http://sojolicious.example/bender', 'Person2');
 
 # Add entry
 ok(my $entry = $atom->entry(id => '#Test1'), 'Add entry with hash');
@@ -130,7 +130,7 @@ is($atom->at('feed > entry > author > name')->text,
    'Bender',
     'Add author 2');
 is($atom->at('feed > entry > author > uri')->text,
-   'http://sojolicio.us/bender',
+   'http://sojolicious.example/bender',
     'Add author 3');
 
 ok($atom->author(name => 'Leela'), 'Add another author');
@@ -164,7 +164,7 @@ is($atom->at('feed > entry > contributor > name')->text,
    'Bender',
     'Add contributor 2');
 is($atom->at('feed > entry > contributor > uri')->text,
-   'http://sojolicio.us/bender',
+   'http://sojolicious.example/bender',
     'Add contributor 3');
 
 ok($atom->contributor(name => 'Fry'), 'Add another author');
@@ -183,13 +183,13 @@ ok(my $c = $atom->new_text('Fun'), 'New text');
 ok(!$c->generator('Sojolicious'), 'New Generator fails');
 
 # Set icon
-$entry->icon('http://sojolicio.us/favicon.ico');
-is($atom->at('icon')->text, 'http://sojolicio.us/favicon.ico',
+$entry->icon('http://sojolicious.example/favicon.ico');
+is($atom->at('icon')->text, 'http://sojolicious.example/favicon.ico',
    'Add icon');
-$entry->icon('http://sojolicio.us/favicon2.ico');
-is($atom->at('icon')->text, 'http://sojolicio.us/favicon2.ico',
+$entry->icon('http://sojolicious.example/favicon2.ico');
+is($atom->at('icon')->text, 'http://sojolicious.example/favicon2.ico',
    'Add icon');
-ok(!$c->icon('http://sojolicio.us/favicon3.ico'), 'New Icon fails');
+ok(!$c->icon('http://sojolicious.example/favicon3.ico'), 'New Icon fails');
 
 
 # Add id
@@ -202,16 +202,16 @@ is($atom->id, 'Test3', 'Get id');
 
 
 # Add link
-$entry->link(related => 'http://sojolicio.us/alternative');
+$entry->link(related => 'http://sojolicious.example/alternative');
 is($entry->at('link')->text, '', 'Add link 1');
 is($entry->at('link')->attr('href'),
-   'http://sojolicio.us/alternative',
+   'http://sojolicious.example/alternative',
    'Add link 2');
 
 is($entry->at('link')->attr('rel'), 'related', 'Add link 3');
 $entry->link(
   rel => 'self',
-  href => 'http://sojolicio.us/entry',
+  href => 'http://sojolicious.example/entry',
   title => 'Self-Link'
 );
 
@@ -221,19 +221,19 @@ is($entry->at('link[title]')->attr('title'),
  );
 
 is($entry->link('related')->[0]->attr('href'),
-   'http://sojolicio.us/alternative',
+   'http://sojolicious.example/alternative',
    'related link'
  );
 
 
 # Add logo
-$entry->logo('http://sojolicio.us/logo.png');
-is($atom->at('logo')->text, 'http://sojolicio.us/logo.png',
+$entry->logo('http://sojolicious.example/logo.png');
+is($atom->at('logo')->text, 'http://sojolicious.example/logo.png',
    'Add logo');
-$entry->logo('http://sojolicio.us/logo2.png');
-is($atom->at('logo')->text, 'http://sojolicio.us/logo2.png',
+$entry->logo('http://sojolicious.example/logo2.png');
+is($atom->at('logo')->text, 'http://sojolicious.example/logo2.png',
    'Add logo');
-ok(!$c->logo('http://sojolicio.us/favicon3.png'), 'New logo fails');
+ok(!$c->logo('http://sojolicious.example/favicon3.png'), 'New logo fails');
 
 my $date = '2011-07-30T16:30:00Z';
 
@@ -274,11 +274,11 @@ is($entry->rights->all_text, 'Creative Commons', 'Get rights');
 
 # Add source
 ok(my $source = $entry->source(
-  {'xml:base' => 'http://source.sojolicio.us/'}
+  {'xml:base' => 'http://source.sojolicious.example/'}
 ), 'Add source');
 
 ok($source->author(name => 'Zoidberg'), 'Add author');
-is($source->attr('xml:base'), 'http://source.sojolicio.us/',
+is($source->attr('xml:base'), 'http://source.sojolicious.example/',
    'Check Source');
 
 is($atom->at('source > author > name')->text,
@@ -290,7 +290,7 @@ is($entry->source->author->[0]->at('name')->all_text,
    'Name');
 
 is($entry->source->attr('xml:base'),
-   'http://source.sojolicio.us/',
+   'http://source.sojolicious.example/',
    'Check Source');
 
 
@@ -466,11 +466,11 @@ $poco_ns = 'http://www.w3.org/TR/2011/WD-contacts-api-20110616/';
 # Person constructs
 $person = $atom->new_person('name' => 'Fry');
 $person->namespace('poco' => $poco_ns);
-$person->add('uri', 'http://sojolicio.us/fry');
+$person->add('uri', 'http://sojolicious.example/fry');
 $person->add('poco:birthday' => '1/1/1970');
 
 is($person->at('person name')->text, 'Fry', 'Person-Name');
-is($person->at('person uri')->text, 'http://sojolicio.us/fry', 'Person-URI');
+is($person->at('person uri')->text, 'http://sojolicious.example/fry', 'Person-URI');
 is($person->at('person birthday')->text, '1/1/1970', 'Person-Poco-Birthday');
 is($person->at('person birthday')->namespace, $poco_ns, 'Person-Poco-NS');
 

@@ -16,8 +16,7 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "script/cpan-repo",
     "script/delete-git-branches",
-    "script/gh-open",
-    "script/travis-open"
+    "script/gh-open"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.006",
@@ -59,7 +58,7 @@ my %WriteMakefileArgs = (
     "Test::Requires::Git" => "1.005",
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "0.000021",
+  "VERSION" => "1.000000",
   "test" => {
     "TESTS" => "t/*.t"
   }

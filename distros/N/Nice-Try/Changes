@@ -1,5 +1,8 @@
 Revision history for Perl module Nice::Try
 
+0.1.10 2021-02-11T16:07:50+0900
+    - Corrected perl minimum version requirement
+
 0.1.9 2021-02-09T20:27:15+0900
     - Updated to use whitespace regular expression more friendly with older versions of perl
 

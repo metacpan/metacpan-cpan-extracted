@@ -18,8 +18,8 @@
 # For debugging, please set mode and logging level below
 #
 # -------------------------------------
-# Copyright (C) 2011-2016, Nils Diewald
-# http://nils-diewald.de/
+# Copyright (C) 2011-2021, Nils Diewald
+# https://www.nils-diewald.de/
 # -------------------------------------
 #
 # Todo: Implement auto-refresh function
@@ -1067,10 +1067,10 @@ __DATA__
   <head>
 %= stylesheet "https://fonts.googleapis.com/css?family=Chivo:900"
 %= stylesheet "https://fonts.googleapis.com/css?family=Inconsolata:400"
-%= stylesheet "http://sojolicio.us/stylesheets/styles.css", media => "screen"
-%= stylesheet "http://sojolicio.us/stylesheets/prettify-mojo.css", media => "screen"
+%= stylesheet "http://sojolicious.example/stylesheets/styles.css", media => "screen"
+%= stylesheet "http://sojolicious.example/stylesheets/prettify-mojo.css", media => "screen"
 %= stylesheet url_for 'styles', format => 'css'
-    <link rel="icon" href="http://sojolicio.us/images/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="http://sojolicious.example/images/favicon.ico" type="image/x-icon" />
 % if (stash('is_blog')) {
     <link rel="alternate" type="application/atom+xml" href="<%= endpoint 'atom' %>" />
     <link rel="hub" href="<%= endpoint 'pubsub-hub' %>" />

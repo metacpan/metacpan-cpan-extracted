@@ -22,10 +22,9 @@ else {
   print "ok 1\n";
 }
 
-my($h_major, $h_minor) = (Math::MPFR::V::_MPFR_VERSION_MAJOR(), Math::MPFR::V::_MPFR_VERSION_MINOR());
+my $h_major = Math::MPFR::V::_MPFR_VERSION_MAJOR();
 
-if(($h_major < 2) ||
-   ($h_major == 2 && $h_minor < 4)) {
+if($h_major < 3) {
    warn "\n\n      Your MPFR Header version is outdated and unsupported.\n",
         "      REMAINING TEST SUITE WILL POSSIBLY FAIL !!!!\n";
 }

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.020;
+use 5.028000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "bin/build_selenium_spec.pl"
   ],
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.020",
+  "MIN_PERL_VERSION" => "5.028000",
   "NAME" => "Selenium::Client",
   "PREREQ_PM" => {
     "Capture::Tiny" => 0,
@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.0",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }

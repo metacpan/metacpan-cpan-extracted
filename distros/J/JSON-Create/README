@@ -6,7 +6,7 @@
                                                                 
 
 
-This is the README for JSON::Create version 0.30.
+This is the README for JSON::Create version 0.31.
 
 JSON::Create is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -29,7 +29,7 @@ JSON::Create - Create JSON
 JSON::Create encodes Perl variables into JSON. The basic routine
 "create_json" gives common defaults. The stricter version
 "create_json_strict" accepts only unambiguous inputs. For more
-customization, an object created with "new" and run with "run"
+customization, an object created with "new" and run with "create"
 allows specifying behaviour in more detail.
 
 JSON::Create handles no string encoding except UTF-8. It supports
@@ -69,11 +69,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm JSON::Create
 
-To install the module from the source file, JSON-Create-0.30.tar.gz, follow
+To install the module from the source file, JSON-Create-0.31.tar.gz, follow
 this sequence of commands:
 
-    tar xfz JSON-Create-0.30.tar.gz
-    cd JSON-Create-0.30
+    tar xfz JSON-Create-0.31.tar.gz
+    cd JSON-Create-0.31
     perl Makefile.PL
     make
     make install
@@ -98,6 +98,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Mon Jan  4 08:55:48 2021.
+This README was written on Thu Feb 11 18:07:55 2021.
 
 -----------------------------------------------------------------------------

@@ -1,7 +1,9 @@
 package Selenium::Driver::Safari;
-$Selenium::Driver::Safari::VERSION = '1.0';
+$Selenium::Driver::Safari::VERSION = '1.02';
 use strict;
 use warnings;
+
+use v5.28;
 
 no warnings 'experimental';
 use feature qw/signatures/;
@@ -42,7 +44,7 @@ Selenium::Driver::Safari - Tell Selenium::Client how to spawn safaridriver
 
 =head1 VERSION
 
-version 1.0
+version 1.02
 
 =head1 Mode of Operation
 

@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Role::Bulk;
-$Search::Elasticsearch::Client::7_0::Role::Bulk::VERSION = '7.30';
+$Search::Elasticsearch::Client::7_0::Role::Bulk::VERSION = '7.711';
 use Moo::Role;
 requires 'add_action', 'flush';
 
@@ -291,7 +291,7 @@ Search::Elasticsearch::Client::7_0::Role::Bulk - Provides common functionality t
 
 =head1 VERSION
 
-version 7.30
+version 7.711
 
 =head1 AUTHOR
 
@@ -299,7 +299,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Elasticsearch BV.
+This software is Copyright (c) 2021 by Elasticsearch BV.
 
 This is free software, licensed under:
 

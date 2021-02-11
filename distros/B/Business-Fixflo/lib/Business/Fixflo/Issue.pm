@@ -56,6 +56,7 @@ use Business::Fixflo::Property;
     PropertyAddressId
     Quotes
     QuoteEndTime
+    QuoteRequests
     Salutation
     SearchStatus
     Status
@@ -107,6 +108,7 @@ has [ qw/
     PropertyAddressId
     Quotes
     QuoteEndTime
+    QuoteRequests
     Salutation
     SearchStatus
     Status

@@ -34,24 +34,26 @@ sub webpush_config {
 }
 
 sub subs_session2user_p {
-  return Mojo::Promise->reject("Session not logged in") if !$_[0]{user_id};
-  Mojo::Promise->resolve($_[0]{user_id});
+  my($c, $session) = @_;
+  my $user_id = $session->{user_id}
+    or return Mojo::Promise->reject("Session not logged in");
+  Mojo::Promise->resolve($user_id);
 }
 
 sub subs_create_p {
-  my ($user_id, $subs_info) = @_;
+  my ($c, $user_id, $subs_info) = @_;
   $userdb{$user_id} = $subs_info;
   Mojo::Promise->resolve(1);
 }
 
 sub subs_read_p {
-  my ($user_id) = @_;
+  my ($c, $user_id) = @_;
   return Mojo::Promise->reject("Not found: '$user_id'") if !$userdb{$user_id};
   Mojo::Promise->resolve($userdb{$user_id});
 }
 
 sub subs_delete_p {
-  my ($user_id) = @_;
+  my ($c, $user_id) = @_;
   return Mojo::Promise->reject("Not found: '$user_id'") if !$userdb{$user_id};
   Mojo::Promise->resolve(delete $userdb{$user_id});
 }

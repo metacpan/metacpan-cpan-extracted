@@ -130,7 +130,7 @@ else {
 
   eval{atonv('1234.5');};
 
-  if($@ =~ /^The atonv function requires mpfr-3.1.6 or later/) {print "ok 1\n"}
+  if($@ =~ /^The atonv function requires mpfr\-3\.1\.6 or later/) {print "ok 1\n"}
   else {
     warn "\n \$\@: $@\n";
     print "not ok 1\n";

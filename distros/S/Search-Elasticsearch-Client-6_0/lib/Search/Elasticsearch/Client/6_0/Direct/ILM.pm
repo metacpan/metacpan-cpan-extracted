@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::6_0::Direct::ILM;
-$Search::Elasticsearch::Client::6_0::Direct::ILM::VERSION = '7.30';
+$Search::Elasticsearch::Client::6_0::Direct::ILM::VERSION = '7.711';
 use Moo;
 with 'Search::Elasticsearch::Client::6_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -36,7 +36,7 @@ Search::Elasticsearch::Client::6_0::Direct::ILM - Plugin providing index lifecyc
 
 =head1 VERSION
 
-version 7.30
+version 7.711
 
 =head2 DESCRIPTION
 
@@ -230,7 +230,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Elasticsearch BV.
+This software is Copyright (c) 2021 by Elasticsearch BV.
 
 This is free software, licensed under:
 

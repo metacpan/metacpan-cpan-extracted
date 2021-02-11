@@ -7,7 +7,7 @@
 	http://www.cs.tufts.edu/~nr/cs257/archive/florian-loitsch/printf.pdf */
 
 #include <inttypes.h>
-#include <assert.h> /* assert */
+/* #include <assert.h> */ /* not wanted in Math::MPFR */
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4204) /* nonstandard extension used : non-constant aggregate initializer */
@@ -40,4 +40,9 @@ typedef struct power {
   uint64_t fract;
   int16_t b_exp, d_exp;
 } power;
+
+
+int grisu3(double, char*, int*, int*);
+int i_to_str(int, char*);
+
 

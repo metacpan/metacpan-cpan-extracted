@@ -35,8 +35,9 @@ has _sentry_url => sub ($self) {
   my $dsn = $self->dsn;
   die 'DSN missing' unless $dsn;
 
-  return sprintf('%s://%s:%d/api/%d',
-    $dsn->protocol, $dsn->host, $dsn->port, $dsn->project_id);
+  return
+    sprintf('%s://%s/api/%d', $dsn->protocol, $dsn->host_port,
+      $dsn->project_id);
 };
 has dsn => undef;
 

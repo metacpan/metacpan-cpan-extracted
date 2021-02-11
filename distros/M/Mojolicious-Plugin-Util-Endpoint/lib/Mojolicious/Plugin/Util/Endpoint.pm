@@ -4,7 +4,7 @@ use Mojo::ByteStream 'b';
 use Scalar::Util qw/blessed/;
 use Mojo::URL;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 # Todo: Support alternative bases for https-paths
 # Todo: Update to https://tools.ietf.org/html/rfc6570
@@ -292,17 +292,17 @@ Mojolicious::Plugin::Util::Endpoint - Use Template URIs in Mojolicious
     });
 
   return $self->endpoint('webfinger');
-  # https://sojolicio.us/{user}?q={uri}
+  # https://sojolicious.example/{user}?q={uri}
 
   $self->stash(user => 'Akron');
 
   return $self->endpoint('webfinger');
-  # https://sojolicio.us/Akron?q={uri}
+  # https://sojolicious.example/Akron?q={uri}
 
   return $self->endpoint(webfinger => {
-    uri => 'acct:akron@sojolicio.us'
+    uri => 'acct:akron@sojolicious.example'
   });
-  # https://sojolicio.us/Akron?q=acct%3Aakron%40sojolicio.us
+  # https://sojolicious.example/Akron?q=acct%3Aakron%40sojolicious.example
 
 
 =head1 DESCRIPTION
@@ -336,7 +336,7 @@ Called when registering the plugin.
   my $r = $rs->route('/suggest')->endpoint(
     opensearch => {
       scheme => 'https',
-      host   => 'sojolicio.us',
+      host   => 'sojolicious.example',
       port   => 3000,
       query  => [
         q     => '{searchTerms}',
@@ -363,7 +363,7 @@ C<url_for> was dropped in v0.19.
 
   # In Controller:
   #   Set endpoints:
-  $self->endpoint(hub => 'http://sojolicio.us/search?q={searchTerm}');
+  $self->endpoint(hub => 'http://sojolicious.example/search?q={searchTerm}');
   $self->endpoint(hub => Mojo::URL->new('http://pubsubhubbub.appspot.com/'));
 
   #   Get endpoints:
@@ -372,8 +372,8 @@ C<url_for> was dropped in v0.19.
 
   # Interpolate arbitrary template URIs
   return $self->endpoint(
-    'http://sojolicio.us/.well-known/webfinger?resource={uri}&rel={rel?}' => {
-      'uri' => 'acct:akron@sojolicio.us',
+    'http://sojolicious.example/.well-known/webfinger?resource={uri}&rel={rel?}' => {
+      'uri' => 'acct:akron@sojolicious.example',
       '?'   => undef
     });
 
@@ -392,13 +392,13 @@ the controller and fill the template variables.
 
   # In Controller:
   return $self->endpoint('opensearch');
-  # https://sojolicio.us/suggest?q={searchTerms}&start={startIndex?}
+  # https://sojolicious.example/suggest?q={searchTerms}&start={startIndex?}
 
   return $self->endpoint(opensearch => {
     searchTerms => 'simpson',
     '?' => undef
   });
-  # https://sojolicio.us/suggest?q=simpson
+  # https://sojolicious.example/suggest?q=simpson
 
 The special parameter C<?> can be set to C<undef> to ignore
 all undefined optional template parameters.

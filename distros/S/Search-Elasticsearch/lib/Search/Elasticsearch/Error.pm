@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Error;
-$Search::Elasticsearch::Error::VERSION = '7.30';
+$Search::Elasticsearch::Error::VERSION = '7.711';
 our $DEBUG = 0;
 
 @Search::Elasticsearch::Error::Internal::ISA     = __PACKAGE__;
@@ -196,7 +196,7 @@ Search::Elasticsearch::Error - Errors thrown by Search::Elasticsearch
 
 =head1 VERSION
 
-version 7.30
+version 7.711
 
 =head1 DESCRIPTION
 
@@ -333,7 +333,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Elasticsearch BV.
+This software is Copyright (c) 2021 by Elasticsearch BV.
 
 This is free software, licensed under:
 

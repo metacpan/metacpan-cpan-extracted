@@ -9,5 +9,3 @@ t/http-request-webpush.t
 t/http-request-webpush-long.t
 t/http-request-webpush-reuse.t
 Changes
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

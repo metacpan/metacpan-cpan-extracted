@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Util;
-$Search::Elasticsearch::Util::VERSION = '7.30';
+$Search::Elasticsearch::Util::VERSION = '7.711';
 use Moo;
 use Search::Elasticsearch::Error();
 use Scalar::Util qw(blessed);
@@ -136,7 +136,7 @@ Search::Elasticsearch::Util - A utility class for internal use by Search::Elasti
 
 =head1 VERSION
 
-version 7.30
+version 7.711
 
 =head1 AUTHOR
 
@@ -144,7 +144,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Elasticsearch BV.
+This software is Copyright (c) 2021 by Elasticsearch BV.
 
 This is free software, licensed under:
 

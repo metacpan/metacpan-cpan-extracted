@@ -45,7 +45,7 @@ note ($warning);
     };
     my $jc = JSON::Create->new ();
     $jc->type_handler (\& coderef);
-    my $outcode2 = $jc->run ($hascoderef1);
+    my $outcode2 = $jc->create ($hascoderef1);
     ok (defined $outcode2, "output is defined");
     ok (valid_json ($outcode2), "output is valid");
     note ($outcode2);

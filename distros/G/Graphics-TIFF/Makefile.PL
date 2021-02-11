@@ -40,6 +40,8 @@ WriteMakefile(
         'ExtUtils::PkgConfig' => 0
     },
     TEST_REQUIRES => {
+        'File::Spec'     => 0,
+        'File::Temp'     => 0.19,
         'Test::More'     => 0,
         'Test::Requires' => 0,
         'Test::Deep'     => 0,

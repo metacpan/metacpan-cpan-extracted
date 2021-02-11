@@ -7,7 +7,7 @@ use Carp                  qw(carp);
 use File::Basename        qw(dirname);
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '20210112.002';
+our $VERSION = '20210112.004';
 
 =encoding utf8
 
@@ -25,7 +25,8 @@ You don't need to load this module yourself in most cases. L<Business::ISBN>
 will load it when it loads.
 
 These data are generated from the F<RangeMessage.xml> file provided by
-the ISBN Agency. You can retrieve this yourself at L<https://www.isbn-international.org/range_file_generation>.
+the ISBN Agency. The distributed version matches the date in the version
+for this module. You can retrieve this yourself at L<https://www.isbn-international.org/range_file_generation>.
 This file is included as part of the distribution and should be installed
 at F<~lib/Business/ISBN/Data/RangeMessage.xml>.
 
@@ -37,12 +38,25 @@ an update to this module.
 
 If the default F<RangeMessage.xml> or your alternate one is not available,
 the module falls back to data included in F<Data.pm>. However, that data
-is likely to be older data. If it does not find that file, it looks
+are likely to be older. If it does not find that file, it looks
 for F<RangeMessage.xml> in the current directory.
 
 The data are in C<%Business::ISBN::country_data> (although the "country"
 part is historical). If you want to see where the data are from, check
 C<$Business::ISBN::country_data{_source}>.
+
+=head2 Packaging this module
+
+The included F<RangeMessage.xml> is in under F<lib/> at the same level
+as F<Data.pm>. The same data exist as the default data in the code, so
+you don't need to pass along the distributed F<RangeMessage.xml>.
+However, you can include a newer F<RangeMessage.xml>.
+
+With PAR, you can add extra files to the archive with C<-a>. Put the
+new file somewhere the module will find it (or use C<ISBN_RANGE_MESSAGE>
+to lead it there):
+
+	pp ... -a '..../RangeMessage.xml;RangeMessage.xml'
 
 =head1 SOURCE AVAILABILITY
 
@@ -335,7 +349,7 @@ sub _default_data {
 		99986 => [ 'Myanmar'                      => [ '0', '0', '50', '69', '950', '999' ] ],
 		99987 => [ 'Luxembourg'                   => [ '850', '999' ] ],
 	},
-	978 => {
+	979 => {
 		8     => [ 'United States'                => [ '200', '219', '5500', '7499', '9850000', '9850009' ] ],
 		10    => [ 'France'                       => [ '00', '19', '200', '699', '7000', '8999', '90000', '97599', '976000', '999999' ] ],
 		11    => [ 'Korea, Republic'              => [ '00', '24', '250', '549', '5500', '8499', '85000', '94999', '950000', '999999' ] ],

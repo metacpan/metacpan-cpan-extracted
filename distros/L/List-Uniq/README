@@ -62,7 +62,6 @@ FUNCTIONS
     context or a reference to a list of unique elements if called in scalar
     context.
 
-EXAMPLES
 EXPORTS
     Nothing by default.
 
@@ -71,11 +70,12 @@ EXPORTS
     Everything with the :all tag.
 
 SEE ALSO
-    If you want to unique a list as you insert into it, see Array::Unique by
-    Gabor Szabo.
+    Array::Unique
+        If you want to unique a list as you insert into it, see
+        Array::Unique.
 
-    This module was written out of a need to unique an array that was
-    auto-vivified and thus not easily tied to Array::Unique.
+    "uniq" in List::Util
+    "uniq" in PerlPowerTools
 
 AUTHOR
     James FitzGibbon <james+perl@nadt.net>

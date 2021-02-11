@@ -1,5 +1,17 @@
 Revision history for Perl extension BoardStreams
 
+v0.0.13 2021-02-10T17:41:31Z
+
+    - added begin and $tx->lock_state methods
+    - removed no_txn option from lock_state
+    - fixed bug that could cause incosistency
+
+v0.0.12 2021-02-10T12:04:27Z
+
+    - get_state returns undef if channel does not exist
+    - renamed add_action, add_request helper methods to on_action and on_request
+    - removed warning when attempting to join a channel that does not exist
+
 v0.0.11 2021-02-06T13:53:03Z
 
     - added channel option to not store events in db

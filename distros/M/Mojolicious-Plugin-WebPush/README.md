@@ -17,36 +17,36 @@ Mojolicious::Plugin::WebPush - plugin to aid real-time web push
     };
 
     sub subs_session2user_p {
-      my ($session) = @_;
+      my ($c, $session) = @_;
       return Mojo::Promise->reject("Session not logged in") if !$session->{user_id};
       Mojo::Promise->resolve($session->{user_id});
     }
 
     sub subs_create_p {
-      my ($session, $subs_info) = @_;
+      my ($c, $session, $subs_info) = @_;
       app->db->save_subs_p($session->{user_id}, $subs_info);
     }
 
     sub subs_read_p {
-      my ($user_id) = @_;
+      my ($c, $user_id) = @_;
       app->db->lookup_subs_p($user_id);
     }
 
     sub subs_delete_p {
-      my ($user_id) = @_;
+      my ($c, $user_id) = @_;
       app->db->delete_subs_p($user_id);
     }
 
 # DESCRIPTION
 
-[Mojolicious::Plugin::WebPush](https://metacpan.org/pod/Mojolicious::Plugin::WebPush) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin. In
+[Mojolicious::Plugin::WebPush](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AWebPush) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin. In
 order to function, your app needs to have first installed
-[Mojolicious::Plugin::ServiceWorker](https://metacpan.org/pod/Mojolicious::Plugin::ServiceWorker) as shown in the synopsis above.
+[Mojolicious::Plugin::ServiceWorker](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AServiceWorker) as shown in the synopsis above.
 
 # METHODS
 
-[Mojolicious::Plugin::WebPush](https://metacpan.org/pod/Mojolicious::Plugin::WebPush) inherits all methods from
-[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin) and implements the following new ones.
+[Mojolicious::Plugin::WebPush](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AWebPush) inherits all methods from
+[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious%3A%3APlugin) and implements the following new ones.
 
 ## register
 
@@ -78,7 +78,7 @@ Required. The code to be called to look up the user currently identified
 by this session, which returns a promise of the user ID. Must reject
 if no user logged in and that matters. It will be passed parameters:
 
-- The ["session" in Mojolicious::Controller](https://metacpan.org/pod/Mojolicious::Controller#session) object, to correctly identify
+- The ["session" in Mojolicious::Controller](https://metacpan.org/pod/Mojolicious%3A%3AController#session) object, to correctly identify
 the user.
 
 ## subs\_create\_p
@@ -113,7 +113,7 @@ Returns a promise of the deletion result. Must reject if not found.
 
 ## ecc\_private\_key
 
-A value to be passed to ["new" in Crypt::PK::ECC](https://metacpan.org/pod/Crypt::PK::ECC#new): a simple scalar is a
+A value to be passed to ["new" in Crypt::PK::ECC](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AECC#new): a simple scalar is a
 filename, a scalar-ref is the actual key. If not provided,
 ["webpush.authorization"](#webpush-authorization) will (obviously) not be able to function.
 
@@ -131,7 +131,7 @@ valid value in RFC 8292 is 86400.
 ## push\_handler
 
 Override the default push-event handler supplied to
-["add\_event\_listener" in Mojolicious::Plugin::ServiceWorker](https://metacpan.org/pod/Mojolicious::Plugin::ServiceWorker#add_event_listener). The default
+["add\_event\_listener" in Mojolicious::Plugin::ServiceWorker](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AServiceWorker#add_event_listener). The default
 will interpret the message as a JSON object. The key `title` will be
 the notification title, deleted from that object, then the object will be
 the options passed to `<ServiceWorkerRegistration>.showNotification`.
@@ -251,13 +251,13 @@ application, registering the needed information needed to web-push.
 
 # SEE ALSO
 
-[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious::Guides), [https://mojolicious.org](https://mojolicious.org).
+[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious%3A%3AGuides), [https://mojolicious.org](https://mojolicious.org).
 
-[Mojolicious::Command::webpush](https://metacpan.org/pod/Mojolicious::Command::webpush) - command-line control of web-push.
+[Mojolicious::Command::webpush](https://metacpan.org/pod/Mojolicious%3A%3ACommand%3A%3Awebpush) - command-line control of web-push.
 
 RFC 8292 - Voluntary Application Server Identification (for web push).
 
-[Crypt::RFC8188](https://metacpan.org/pod/Crypt::RFC8188) - Encrypted Content-Encoding for HTTP (using `aes128gcm`).
+[Crypt::RFC8188](https://metacpan.org/pod/Crypt%3A%3ARFC8188) - Encrypted Content-Encoding for HTTP (using `aes128gcm`).
 
 [https://developers.google.com/web/fundamentals/push-notifications](https://developers.google.com/web/fundamentals/push-notifications)
 

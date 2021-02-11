@@ -2,10 +2,13 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+our $LIBS;
+
 my %options = %{
 {
   'NAME' => 'Math::MPFR::Prec',
-  'LIBS' => '-lmpfr -lgmp',
+  'LIBS' => $LIBS,
+  'INC' => $INC,
   'VERSION_FROM' => 'Prec.pm'
 }
 };
@@ -13,4 +16,4 @@ my %options = %{
 WriteMakefile(%options);
 
 # Remove the Makefile dependency. Causes problems on a few systems.
-sub MY::makefile { '' }
+# sub MY::makefile { '' }

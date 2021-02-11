@@ -11,7 +11,6 @@ use Git::Helpers qw(
     ignored_files
     is_inside_work_tree
     remote_url
-    travis_url
 );
 use Git::Version ();
 use Git::Sub;
@@ -57,11 +56,6 @@ SKIP: {
             https_remote_url('foobar'),
             undef,
             'https_remote_url with remote which does not exist'
-        );
-        is(
-            travis_url($remote_name),
-            'https://travis-ci.org/oalders/git-helpers',
-            'travis_url'
         );
     }
 

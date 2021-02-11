@@ -4,7 +4,7 @@ use Mojo::Base -base, -signatures;
 use DBI;
 use Mojo::Util 'dumper';
 
-has dsn  => 'dbi:SQLite:dbname=my.db';
+has dsn  => 'dbi:SQLite:dbname=/tmp/my.db';
 has _dbh => sub ($self) {
   DBI->connect($self->dsn, '', '', { AutoCommit => 1, RaiseError => 1 });
 };

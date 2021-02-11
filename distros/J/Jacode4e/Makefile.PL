@@ -1,10 +1,10 @@
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Jacode4e},
-    'VERSION'   => q{2.13.6.16},
+    'VERSION'   => q{2.13.6.17},
     'ABSTRACT'  => q{jacode.pl-like program for enterprise},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',

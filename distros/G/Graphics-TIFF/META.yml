@@ -4,6 +4,8 @@ author:
   - 'Jeffrey Ratcliffe'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0.19'
   Test::Deep: '0'
   Test::More: '0'
   Test::Requires: '0'
@@ -11,7 +13,7 @@ configure_requires:
   ExtUtils::Depends: '0'
   ExtUtils::PkgConfig: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,5 +27,5 @@ requires:
   Readonly: '0'
 resources:
   repository: https://github.com/carygravel/graphics-tiff.git
-version: '8'
+version: '9'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

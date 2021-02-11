@@ -33,4 +33,3 @@ lib
 olaf
 phair
 script
-travis

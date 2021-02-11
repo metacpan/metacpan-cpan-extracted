@@ -1,6 +1,9 @@
 Revision history for Perl extension EAV::XS.
 
-0.5.3  Thu Nov 26 06:16:52 UTC 2020
+0.5.4  Thu Feb 11 06:29:13 UTC 2021
+	- update IANA database
+
+0.5.3  Sat Nov 28 10:33:03 UTC 2020
 	- update IANA database
 	- added the test "20-dots.t" of dots checking
 	- renamed t/11-rfc5322.t -> t/12-rfc5322.t

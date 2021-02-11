@@ -29,25 +29,25 @@ Link: <http://example.org/>;
              rel="start http://example.net/relation/other"
 Link: <http://pubsubhubbub.appspot.com/>;
              rel="hub"
-Link: <http://sojolicio.us/feed.xml>;
+Link: <http://sojolicious.example/feed.xml>;
              rel="self"
-Link: <http://sojolicio.us/feed/comment.atom>;
+Link: <http://sojolicious.example/feed/comment.atom>;
              rel="alternate";
              type="application/atom+xml";
              title="Feed Comments"
-Link: <http://sojolicio.us/feed.rss>;
+Link: <http://sojolicious.example/feed.rss>;
              rel="alternate";
              type="application/rss+xml";
              title="Feeds"
-Link: <http://sojolicio.us/feed.rdf>;
+Link: <http://sojolicious.example/feed.rdf>;
              rel="alternate";
              type="application/rdf+xml";
              title="Feeds"
-Link: <http://sojolicio.us/feed.atom>;
+Link: <http://sojolicious.example/feed.atom>;
              rel="alternate";
              type="application/atom+xml";
              title="Feeds"
-Link: <http://sojolicio.us/feed/comments.rss>;
+Link: <http://sojolicious.example/feed/comments.rss>;
              rel="alternate";
              title="Feeds Comments"
 
@@ -56,37 +56,37 @@ LINKS
 ok(my $links = Mojolicious::Plugin::PubSubHubbub::_discover_header_links($headers), 'Discover from head');
 
 is($links->{hub}->[0]->{href}, 'http://pubsubhubbub.appspot.com/', 'Found hub');
-is($links->{self}->[0]->{href}, 'http://sojolicio.us/feed.xml', 'Found feed');
+is($links->{self}->[0]->{href}, 'http://sojolicious.example/feed.xml', 'Found feed');
 
 my $alt = $links->{alternate};
-is($alt->[0]->{href}, 'http://sojolicio.us/feed/comment.atom', 'Found alternate');
+is($alt->[0]->{href}, 'http://sojolicious.example/feed/comment.atom', 'Found alternate');
 is($alt->[0]->{short_type}, 'atom', 'Found alternate');
 is($alt->[0]->{title}, 'Feed Comments', 'Found alternate');
 is($alt->[0]->{type}, 'application/atom+xml', 'Found alternate');
 
-is($alt->[1]->{href}, 'http://sojolicio.us/feed.rss', 'Found alternate');
+is($alt->[1]->{href}, 'http://sojolicious.example/feed.rss', 'Found alternate');
 is($alt->[1]->{short_type}, 'rss', 'Found alternate');
 is($alt->[1]->{title}, 'Feeds', 'Found alternate');
 is($alt->[1]->{type}, 'application/rss+xml', 'Found alternate');
 
-is($alt->[2]->{href}, 'http://sojolicio.us/feed.rdf', 'Found alternate');
+is($alt->[2]->{href}, 'http://sojolicious.example/feed.rdf', 'Found alternate');
 is($alt->[2]->{short_type}, 'rdf', 'Found alternate');
 is($alt->[2]->{title}, 'Feeds', 'Found alternate');
 is($alt->[2]->{type}, 'application/rdf+xml', 'Found alternate');
 
-is($alt->[3]->{href}, 'http://sojolicio.us/feed.atom', 'Found alternate');
+is($alt->[3]->{href}, 'http://sojolicious.example/feed.atom', 'Found alternate');
 is($alt->[3]->{short_type}, 'atom', 'Found alternate');
 is($alt->[3]->{title}, 'Feeds', 'Found alternate');
 is($alt->[3]->{type}, 'application/atom+xml', 'Found alternate');
 
-is($alt->[4]->{href}, 'http://sojolicio.us/feed/comments.rss', 'Found alternate');
+is($alt->[4]->{href}, 'http://sojolicious.example/feed/comments.rss', 'Found alternate');
 is($alt->[4]->{short_type}, 'rss', 'Found alternate');
 is($alt->[4]->{title}, 'Feeds Comments', 'Found alternate');
 ok(!$alt->[4]->{type}, 'Found alternate');
 
 my ($topic, $hub) = Mojolicious::Plugin::PubSubHubbub::_discover_sort_links($links);
 
-is($topic->{href}, 'http://sojolicio.us/feed.xml', 'Found topic');
+is($topic->{href}, 'http://sojolicious.example/feed.xml', 'Found topic');
 is($hub->{href}, 'http://pubsubhubbub.appspot.com/', 'Found hub');
 
 
@@ -104,26 +104,26 @@ my $dom = Mojo::DOM->new(<<'DOM');
              rel="start http://example.net/relation/other" />
   <link href="http://pubsubhubbub.appspot.com/"
              rel="hub">
-  <link href="http://sojolicio.us/feed.xml"
+  <link href="http://sojolicious.example/feed.xml"
              rel="self" />
   <title>Versuch</title>
-  <link href="http://sojolicio.us/feed/comment.atom"
+  <link href="http://sojolicious.example/feed/comment.atom"
              rel="alternate"
              type="application/atom+xml"
              title="Feed Comments">
-  <link href="http://sojolicio.us/feed.rss"
+  <link href="http://sojolicious.example/feed.rss"
              rel="alternate"
              type="application/rss+xml"
              title="Feeds">
-  <link href="http://sojolicio.us/feed.rdf"
+  <link href="http://sojolicious.example/feed.rdf"
              rel="alternate"
              type="application/rdf+xml"
              title="Feeds" />
-  <link href="http://sojolicio.us/feed.atom"
+  <link href="http://sojolicious.example/feed.atom"
              rel="alternate"
              type="application/atom+xml"
              title="Feeds">
-  <link href="http://sojolicio.us/feed/comments.rss"
+  <link href="http://sojolicious.example/feed/comments.rss"
              rel="alternate"
              title="Feeds Comments">
 </head>
@@ -135,37 +135,37 @@ DOM
 ok($links = Mojolicious::Plugin::PubSubHubbub::_discover_dom_links($dom), 'Discover from dom');
 
 is($links->{hub}->[0]->{href}, 'http://pubsubhubbub.appspot.com/', 'Found hub');
-is($links->{self}->[0]->{href}, 'http://sojolicio.us/feed.xml', 'Found feed');
+is($links->{self}->[0]->{href}, 'http://sojolicious.example/feed.xml', 'Found feed');
 
 $alt = $links->{alternate};
-is($alt->[0]->{href}, 'http://sojolicio.us/feed/comment.atom', 'Found alternate');
+is($alt->[0]->{href}, 'http://sojolicious.example/feed/comment.atom', 'Found alternate');
 is($alt->[0]->{short_type}, 'atom', 'Found alternate');
 is($alt->[0]->{title}, 'Feed Comments', 'Found alternate');
 is($alt->[0]->{type}, 'application/atom+xml', 'Found alternate');
 
-is($alt->[1]->{href}, 'http://sojolicio.us/feed.rss', 'Found alternate');
+is($alt->[1]->{href}, 'http://sojolicious.example/feed.rss', 'Found alternate');
 is($alt->[1]->{short_type}, 'rss', 'Found alternate');
 is($alt->[1]->{title}, 'Feeds', 'Found alternate');
 is($alt->[1]->{type}, 'application/rss+xml', 'Found alternate');
 
-is($alt->[2]->{href}, 'http://sojolicio.us/feed.rdf', 'Found alternate');
+is($alt->[2]->{href}, 'http://sojolicious.example/feed.rdf', 'Found alternate');
 is($alt->[2]->{short_type}, 'rdf', 'Found alternate');
 is($alt->[2]->{title}, 'Feeds', 'Found alternate');
 is($alt->[2]->{type}, 'application/rdf+xml', 'Found alternate');
 
-is($alt->[3]->{href}, 'http://sojolicio.us/feed.atom', 'Found alternate');
+is($alt->[3]->{href}, 'http://sojolicious.example/feed.atom', 'Found alternate');
 is($alt->[3]->{short_type}, 'atom', 'Found alternate');
 is($alt->[3]->{title}, 'Feeds', 'Found alternate');
 is($alt->[3]->{type}, 'application/atom+xml', 'Found alternate');
 
-is($alt->[4]->{href}, 'http://sojolicio.us/feed/comments.rss', 'Found alternate');
+is($alt->[4]->{href}, 'http://sojolicious.example/feed/comments.rss', 'Found alternate');
 is($alt->[4]->{short_type}, 'rss', 'Found alternate');
 is($alt->[4]->{title}, 'Feeds Comments', 'Found alternate');
 ok(!$alt->[4]->{type}, 'Found alternate');
 
 ($topic, $hub) = Mojolicious::Plugin::PubSubHubbub::_discover_sort_links($links);
 
-is($topic->{href}, 'http://sojolicio.us/feed.xml', 'Found topic');
+is($topic->{href}, 'http://sojolicious.example/feed.xml', 'Found topic');
 is($hub->{href}, 'http://pubsubhubbub.appspot.com/', 'Found hub');
 
 
@@ -184,23 +184,23 @@ $dom = Mojo::DOM->new(<<'DOM');
   <link href="http://pubsubhubbub.appspot.com/"
              rel="hub">
   <title>Versuch</title>
-  <link href="http://sojolicio.us/feed/comment.atom"
+  <link href="http://sojolicious.example/feed/comment.atom"
              rel="alternate"
              type="application/atom+xml"
              title="Feed Comments">
-  <link href="http://sojolicio.us/feed.rss"
+  <link href="http://sojolicious.example/feed.rss"
              rel="alternate"
              type="application/rss+xml"
              title="Feeds">
-  <link href="http://sojolicio.us/feed.rdf"
+  <link href="http://sojolicious.example/feed.rdf"
              rel="alternate"
              type="application/rdf+xml"
              title="Feeds" />
-  <link href="http://sojolicio.us/feed.atom"
+  <link href="http://sojolicious.example/feed.atom"
              rel="alternate"
              type="application/atom+xml"
              title="Feeds">
-  <link href="http://sojolicio.us/feed/comments.rss"
+  <link href="http://sojolicious.example/feed/comments.rss"
              rel="alternate"
              title="Feeds Comments">
 </head>
@@ -213,7 +213,7 @@ ok($links = Mojolicious::Plugin::PubSubHubbub::_discover_dom_links($dom), 'Disco
 
 ($topic, $hub) = Mojolicious::Plugin::PubSubHubbub::_discover_sort_links($links);
 
-is($topic->{href}, 'http://sojolicio.us/feed.atom', 'Found topic');
+is($topic->{href}, 'http://sojolicious.example/feed.atom', 'Found topic');
 is($hub->{href}, 'http://pubsubhubbub.appspot.com/', 'Found hub');
 
 # No test

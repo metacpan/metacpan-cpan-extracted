@@ -1,9 +1,11 @@
 package Selenium::Client;
-$Selenium::Client::VERSION = '1.0';
+$Selenium::Client::VERSION = '1.02';
 # ABSTRACT: Module for communicating with WC3 standard selenium servers
 
 use strict;
 use warnings;
+
+use v5.28;
 
 no warnings 'experimental';
 use feature qw/signatures/;
@@ -14,6 +16,7 @@ use Carp qw{confess};
 use File::Path qw{make_path};
 use File::HomeDir();
 use File::Slurper();
+use File::Spec();
 use Sub::Install();
 use Net::EmptyPort();
 use Capture::Tiny qw{capture_merged};
@@ -38,9 +41,13 @@ sub new($class,%options) {
     $options{post_callbacks} //= [];
     $options{auto_close} //= 1;
     $options{browser}    //= '';
+    $options{headless}   //= 1;
 
+    #create client_dir and log-dir
+    my $dir = File::Spec->catdir( $options{client_dir},"perl-client" );
+    make_path($dir);
     #Grab the spec
-    $options{spec}       = Selenium::Specification::read($options{version},$options{nofetch});
+    $options{spec}= Selenium::Specification::read($options{client_dir},$options{version},$options{nofetch});
 
     my $self = bless(\%options, $class);
     $self->{sessions} = [];
@@ -57,6 +64,55 @@ sub catalog($self,$printed=0) {
         print "$method: $self->{spec}{$method}{href}\n";
     }
     return $self->{spec};
+}
+
+my %browser_opts = (
+    firefox       => {
+        name => 'moz:firefoxOptions',
+        headless => sub ($c) {
+            $c->{args} //= [];
+            push(@{$c->{args}}, '-headless');
+        },
+    },
+    chrome        => {
+        name => 'goog:chromeOptions',
+        headless => sub ($c) {
+            $c->{args} //= [];
+            push(@{$c->{args}}, 'headless');
+        },
+    },
+    MicrosoftEdge => {
+        name =>'ms:EdgeOptions',
+        headless => sub ($c) {
+            $c->{args} //= [];
+            push(@{$c->{args}}, 'headless');
+        },
+    },
+);
+
+sub _build_caps($self,%options) {
+    $options{browser}  = $self->{browser}  if $self->{browser};
+    $options{headless} = $self->{headless} if $self->{headless};
+
+    my $c = {
+        browserName  => $options{browser},
+    };
+    my $browser = $browser_opts{$options{browser}};
+
+    if ($browser) {
+        my $browseropts = {};
+        foreach my $k (keys %$browser) {
+            next if $k eq 'name';
+            $browser->{$k}->($browseropts) if $options{$k};
+        }
+        $c->{$browser->{name}} = $browseropts;
+    }
+
+    return (
+        capabilities => {
+            alwaysMatch => $c,
+        },
+    );
 }
 
 sub _build_subs($self) {
@@ -96,7 +152,13 @@ sub _do_spawn($self) {
     #XXX so we have to just bg & ignore, unfortunately (also have to system())
     if (_is_windows()) {
         $self->{pid} = qq/$self->{driver}:$self->{port}/;
-        my $cmdstring = join(' ', "start /MIN", qq{"$self->{pid}"}, @{$self->{command}}, '>', $self->{log_file}, '2>&1');
+        my @cmdprefix = ("start /MIN", qq{"$self->{pid}"});
+
+        # Selenium JAR controls it's own logging because Java
+        my @cmdsuffix;
+        @cmdsuffix = ('>', $self->{log_file}, '2>&1') unless $self->{driver_class} eq 'Selenium::Driver::SeleniumHQ::Jar';
+
+        my $cmdstring = join(' ', @cmdprefix, @{$self->{command}}, @cmdsuffix );
         print "$cmdstring\n" if $self->{debug};
         system($cmdstring);
         return $self->_wait();
@@ -184,6 +246,9 @@ sub _request($self, $method, %params) {
 
     # Keep sessions for passing to grandchildren
     $inject->{to_inject}{sessionid} = $params{sessionid} if exists $params{sessionid};
+
+    #If we have no extra params, and this is getSession, simplify
+    %params = $self->_build_caps() if $method eq 'NewSession' && !%params;
 
     foreach my $param (keys(%params)) {
         confess "$param is required for $method" unless exists $params{$param};
@@ -279,15 +344,15 @@ sub _objectify($self,$result,$inject) {
 
 
 package Selenium::Capabilities;
-$Selenium::Capabilities::VERSION = '1.0';
+$Selenium::Capabilities::VERSION = '1.02';
 use parent qw{Selenium::Subclass};
 1;
 package Selenium::Session;
-$Selenium::Session::VERSION = '1.0';
+$Selenium::Session::VERSION = '1.02';
 use parent qw{Selenium::Subclass};
 1;
 package Selenium::Element;
-$Selenium::Element::VERSION = '1.0';
+$Selenium::Element::VERSION = '1.02';
 use parent qw{Selenium::Subclass};
 1;
 
@@ -303,7 +368,7 @@ Selenium::Client - Module for communicating with WC3 standard selenium servers
 
 =head1 VERSION
 
-version 1.0
+version 1.02
 
 =head1 CONSTRUCTOR
 
@@ -389,6 +454,10 @@ If we can't find one, we'll fall back to SeleniumHQ::Jar.
 
 Default: Blank
 
+=item C<headless> BOOL - Whether to run the browser headless.  Ignored by 'Safari' Driver.
+
+Default: True
+
 =item C<driver_version> STRING - Version of your driver software you wish to download and run.
 
 Blank and Partial versions will return the latest sub-version available.
@@ -428,6 +497,28 @@ The options passed in are basically JSON serialized and passed directly as a POS
 We return a list of items which are a hashref per item in the result (some of them blessed).
 For example, NewSession will return a Selenium::Capabilities and Selenium::Session object.
 The order in which they are returned will be ordered alphabetically.
+
+=head2 Passing Capabilities to NewSession()
+
+By default, we will pass a set of capabilities that satisfy the options passed to new().
+
+If you want *other* capabilities, pass them directly to NewSession as documented in the WC3 spec.
+
+However, this will ignore what you passed to new().  Caveat emptor.
+
+For the general list of options supported by each browser, see here:
+
+=over 4
+
+=item C<Firefox> - https://developer.mozilla.org/en-US/docs/Web/WebDriver/Capabilities/firefoxOptions
+
+=item C<Chrome> - https://sites.google.com/a/chromium.org/chromedriver/capabilities
+
+=item C<Edge> - https://docs.microsoft.com/en-us/microsoft-edge/webdriver-chromium/capabilities-edge-options
+
+=item C<Safari> - https://developer.apple.com/documentation/webkit/about_webdriver_for_safari
+
+=back
 
 =head2 catalog(BOOL verbose=0) = HASHREF
 

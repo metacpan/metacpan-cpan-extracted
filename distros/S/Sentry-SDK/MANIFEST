@@ -10,6 +10,9 @@ cpanfile
 dist.ini
 docs/schema.ts
 docs/unified-api.png
+examples/cgi-app/lib/WebApp.pm
+examples/cgi-app/my-app.cgi
+examples/cgi-app/start.sh
 examples/mojo/lib/mojo.pm
 examples/mojo/lib/mojo/Controller/Example.pm
 examples/mojo/mojo.yml
@@ -44,6 +47,7 @@ lib/Sentry/SourceFileRegistry.pm
 lib/Sentry/SourceFileRegistry/ContextLine.pm
 lib/Sentry/Stacktrace.pm
 lib/Sentry/Stacktrace/Frame.pm
+lib/Sentry/Tracing/SamplingMethod.pm
 lib/Sentry/Tracing/Span.pm
 lib/Sentry/Tracing/Status.pm
 lib/Sentry/Tracing/Transaction.pm
@@ -52,4 +56,7 @@ lib/Sentry/Util.pm
 t/author-pod-syntax.t
 t/context-line.t
 t/dsn.t
+t/pod-coverage.t
+t/pod.t
 t/sentry-status.t
+t/util.t

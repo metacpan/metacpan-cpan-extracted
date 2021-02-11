@@ -15,11 +15,13 @@ my @tbl_def = (
     [ "name", "CHAR",    64, 0 ],
     );
 
+my $nano_msg = "SQL::Nano does not support count (*)";
 sub RowCount {
     my ($dbh, $tbl) = @_;
 
     if ($nano) {
-	diag ("SQL::Nano does not support count (*)");
+	$nano_msg and diag ($nano_msg);
+	$nano_msg = "";
 	return 0;
 	}
 

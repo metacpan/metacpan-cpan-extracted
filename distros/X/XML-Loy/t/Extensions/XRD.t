@@ -13,8 +13,8 @@ use_ok('XML::Loy::XRD');
 # Synopsis
 
 ok(my $xrd = XML::Loy::XRD->new, 'Empty Constructor');
-ok($xrd->subject('http://sojolicio.us/'), 'Add subject');
-ok($xrd->alias('https://sojolicio.us/'), 'Add alias');
+ok($xrd->subject('http://sojolicious.example/'), 'Add subject');
+ok($xrd->alias('https://sojolicious.example/'), 'Add alias');
 ok($xrd->link('lrdd' => { template => '/.well-known/webfinger?resource={uri}'}),
      'Add link');
 ok($xrd->property('describedby' => '/me.foaf'), 'Add property');
@@ -24,8 +24,8 @@ is($xrd->to_pretty_xml, << 'XRD', 'Pretty Print');
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Subject>http://sojolicio.us/</Subject>
-  <Alias>https://sojolicio.us/</Alias>
+  <Subject>http://sojolicious.example/</Subject>
+  <Alias>https://sojolicious.example/</Alias>
   <Link rel="lrdd"
         template="/.well-known/webfinger?resource={uri}" />
   <Property type="describedby">/me.foaf</Property>
@@ -37,26 +37,26 @@ XRD
 
 is($xrd->at('*')->attr('xmlns:xsi'), 'http://www.w3.org/2001/XMLSchema-instance', 'xsi');
 
-is($xrd->subject, 'http://sojolicio.us/', 'Get subject');
+is($xrd->subject, 'http://sojolicious.example/', 'Get subject');
 
 ok($xrd->subject('blabla'), 'Set subject');
 
 is($xrd->subject, 'blabla', 'Get subject');
 
-ok($xrd->subject('http://sojolicio.us/'), 'Set subject');
+ok($xrd->subject('http://sojolicious.example/'), 'Set subject');
 
 my @array = $xrd->alias;
-is($array[0], 'https://sojolicio.us/', 'Get alias');
+is($array[0], 'https://sojolicious.example/', 'Get alias');
 
-ok($xrd->alias('http://sojolicio.us'), 'Add alias');
+ok($xrd->alias('http://sojolicious.example'), 'Add alias');
 @array = $xrd->alias;
-is($array[0], 'https://sojolicio.us/', 'Get alias');
-is($array[1], 'http://sojolicio.us', 'Get alias');
+is($array[0], 'https://sojolicious.example/', 'Get alias');
+is($array[1], 'http://sojolicious.example', 'Get alias');
 
 my $jrd = decode_json($xrd->to_json);
 
-is($jrd->{subject}, 'http://sojolicio.us/', 'JRD Subject');
-is($jrd->{aliases}->[0], 'https://sojolicio.us/', 'JRD Alias');
+is($jrd->{subject}, 'http://sojolicious.example/', 'JRD Subject');
+is($jrd->{aliases}->[0], 'https://sojolicious.example/', 'JRD Alias');
 ok($jrd->{aliases}->[1], 'JRD Alias');
 is($jrd->{links}->[0]->{rel}, 'lrdd', 'JRD link 1');
 is($jrd->{links}->[0]->{template}, '/.well-known/webfinger?resource={uri}', 'JRD link 1');
@@ -116,8 +116,8 @@ $xrd = XML::Loy::XRD->new(<<XRD);
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Subject>http://sojolicio.us/</Subject>
-  <Alias>https://sojolicio.us/</Alias>
+  <Subject>http://sojolicious.example/</Subject>
+  <Alias>https://sojolicious.example/</Alias>
   <Link rel="lrdd"
         template="/.well-known/webfinger?resource={uri}" />
   <Property type="describedby">/me.foaf</Property>
@@ -129,17 +129,17 @@ XRD
 is($xrd->link('lrdd')->attr('template'), '/.well-known/webfinger?resource={uri}', 'Get link');
 
 is($xrd->property('private')->attr('xsi:nil'), 'true', 'Get property');
-is($xrd->subject, 'http://sojolicio.us/', 'Get subject');
+is($xrd->subject, 'http://sojolicious.example/', 'Get subject');
 
 $xrd = XML::Loy::XRD->new(<<'JRD');
-  {"subject":"http:\/\/sojolicio.us\/",
-"aliases":["https:\/\/sojolicio.us\/"],
+  {"subject":"http:\/\/sojolicious.example\/",
+"aliases":["https:\/\/sojolicious.example\/"],
 "links":[{"rel":"lrdd",
 "template":"\/.well-known\/webfinger?resource={uri}"}],
 "properties":{"private":null,"describedby":"\/me.foaf"}}
 JRD
 
-is($xrd->at('Alias')->text, 'https://sojolicio.us/', 'Get Alias');
+is($xrd->at('Alias')->text, 'https://sojolicious.example/', 'Get Alias');
 
 is($xrd->property('private')->attr('xsi:nil'), 'true', 'nil attribute');
 
@@ -299,7 +299,7 @@ $xrd_doc = <<'XRD';
   <Property type="permanentcheck">1</Property>
   <Property type="foo">bar</Property>
   <Property type="check">4</Property>
-  <Link href="http://www.sojolicio.us/"
+  <Link href="http://www.sojolicious.example/"
         rel="salmon">
     <Title>Salmon</Title>
   </Link>
@@ -314,34 +314,34 @@ is($prop[0]->attr('type'), 'permanentcheck', 'Found prop 1');
 is($prop[1]->attr('type'), 'foo', 'Found prop 2');
 is($prop[2]->attr('type'), 'check', 'Found prop 3');
 
-ok($xrd->link(author => { href => 'http://sojolicio.us/author'}), 'Add link');
-ok($xrd->link(hub => { href => 'http://sojolicio.us/hub'}), 'Add link');
+ok($xrd->link(author => { href => 'http://sojolicious.example/author'}), 'Add link');
+ok($xrd->link(hub => { href => 'http://sojolicious.example/hub'}), 'Add link');
 
 my $xrd2 = $xrd->filter_rel('salmon hub');
 
 is($xrd->property('permanentcheck')->text, 1, 'Found prop 1');
 is($xrd->property('foo')->text, 'bar', 'Found prop 2');
 is($xrd->property('check')->text, 4, 'Found prop 3');
-is($xrd->link('salmon')->attr('href'), 'http://www.sojolicio.us/', 'Link 1');
-is($xrd->link('author')->attr('href'), 'http://sojolicio.us/author', 'Link 2');
-is($xrd->link('hub')->attr('href'), 'http://sojolicio.us/hub', 'Link 3');
+is($xrd->link('salmon')->attr('href'), 'http://www.sojolicious.example/', 'Link 1');
+is($xrd->link('author')->attr('href'), 'http://sojolicious.example/author', 'Link 2');
+is($xrd->link('hub')->attr('href'), 'http://sojolicious.example/hub', 'Link 3');
 
 my $xrd3 = $xrd->filter_rel(['salmon', 'author']);
 
 is($xrd2->property('permanentcheck')->text, 1, 'Found prop 1');
 is($xrd2->property('foo')->text, 'bar', 'Found prop 2');
 is($xrd2->property('check')->text, 4, 'Found prop 3');
-is($xrd2->link('salmon')->attr('href'), 'http://www.sojolicio.us/', 'Link 1');
+is($xrd2->link('salmon')->attr('href'), 'http://www.sojolicious.example/', 'Link 1');
 ok(!$xrd2->link('author'), 'Link 2');
-is($xrd2->link('hub')->attr('href'), 'http://sojolicio.us/hub', 'Link 3');
+is($xrd2->link('hub')->attr('href'), 'http://sojolicious.example/hub', 'Link 3');
 
 my $xrd4 = $xrd->filter_rel('hub', 'author');
 
 is($xrd3->property('permanentcheck')->text, 1, 'Found prop 1');
 is($xrd3->property('foo')->text, 'bar', 'Found prop 2');
 is($xrd3->property('check')->text, 4, 'Found prop 3');
-is($xrd3->link('salmon')->attr('href'), 'http://www.sojolicio.us/', 'Link 1');
-is($xrd3->link('author')->attr('href'), 'http://sojolicio.us/author', 'Link 2');
+is($xrd3->link('salmon')->attr('href'), 'http://www.sojolicious.example/', 'Link 1');
+is($xrd3->link('author')->attr('href'), 'http://sojolicious.example/author', 'Link 2');
 ok(!$xrd3->link('hub'), 'Link 3');
 
 my $xrd5 = $xrd->filter_rel;
@@ -350,8 +350,8 @@ is($xrd4->property('permanentcheck')->text, 1, 'Found prop 1');
 is($xrd4->property('foo')->text, 'bar', 'Found prop 2');
 is($xrd4->property('check')->text, 4, 'Found prop 3');
 ok(!$xrd4->link('salmon'), 'Link 1');
-is($xrd4->link('author')->attr('href'), 'http://sojolicio.us/author', 'Link 2');
-is($xrd4->link('hub')->attr('href'), 'http://sojolicio.us/hub', 'Link 3');
+is($xrd4->link('author')->attr('href'), 'http://sojolicious.example/author', 'Link 2');
+is($xrd4->link('hub')->attr('href'), 'http://sojolicious.example/hub', 'Link 3');
 
 is($xrd5->property('permanentcheck')->text, 1, 'Found prop 1');
 is($xrd5->property('foo')->text, 'bar', 'Found prop 2');

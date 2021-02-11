@@ -137,12 +137,6 @@ CODE:
 	json_parse_delete_false (parser);
 
 void
-delete_null (parser)
-	JSON::Parse parser;
-CODE:
-	json_parse_delete_null (parser);
-
-void
 copy_literals (parser, onoff)
 	JSON::Parse parser;
 	SV * onoff;
@@ -150,11 +144,24 @@ CODE:
 	json_parse_copy_literals (parser, onoff);
 
 void
+delete_null (parser)
+	JSON::Parse parser;
+CODE:
+	json_parse_delete_null (parser);
+
+void
 no_warn_literals (parser, onoff)
 	JSON::Parse parser;
 	SV * onoff;
 CODE:
 	parser->no_warn_literals = SvTRUE (onoff) ? 1 : 0;
+
+void
+detect_collisions (parser, onoff)
+	JSON::Parse parser;
+	SV * onoff;
+CODE:
+	parser->detect_collisions = SvTRUE (onoff) ? 1 : 0;
 
 void
 diagnostics_hash (parser, onoff)
@@ -190,13 +197,6 @@ OUTPUT:
 
 
 void
-detect_collisions (parser, onoff)
-	JSON::Parse parser;
-	SV * onoff;
-CODE:
-	parser->detect_collisions = SvTRUE (onoff) ? 1 : 0;
-
-void
 set_max_depth (json, max_depth)
 	JSON::Parse json;
 	int max_depth;
@@ -226,6 +226,13 @@ OUTPUT:
 	RETVAL
 
 #endif /* def TESTRANDOM */
+
+void
+upgrade_utf8 (parser, onoff)
+	JSON::Parse parser;
+	SV * onoff;
+CODE:
+	parser->upgrade_utf8 = SvTRUE (onoff) ? 1 : 0;
 
 MODULE=JSON::Parse PACKAGE=JSON::Tokenize
 

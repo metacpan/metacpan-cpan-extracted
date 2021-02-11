@@ -12,7 +12,7 @@ use Mojo::Promise;
 use curry;
 use Exporter 'import';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 our @EXPORT_OK = qw(promise_code);
 
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
@@ -86,6 +86,7 @@ sub _graphiql_wrap {
       !defined $c->req->query_params->param('raw')
     ) {
       my $p = $c->req->query_params;
+      my $https = $c->req->is_secure;
       return $c->render(
         template => 'graphiql',
         layout => undef,
@@ -98,7 +99,7 @@ sub _graphiql_wrap {
         subscriptionEndpoint => to_json(
           # if serialises to true (which empty-string will), turns on subs code
           $use_subscription
-            ? $c->url_for->to_abs->scheme('ws')
+            ? $c->url_for->to_abs->scheme($https ? 'wss' : 'ws')
             : 0
         ),
       );

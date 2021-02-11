@@ -36,8 +36,8 @@ requires:
   List::MoreUtils: 0
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Image-Random
+  bugtracker: https://github.com/michal-josef-spacek/Image-Random/issues
   homepage: https://github.com/michal-josef-spacek/Image-Random
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Image-Random
-version: '0.09'
+version: '0.10'

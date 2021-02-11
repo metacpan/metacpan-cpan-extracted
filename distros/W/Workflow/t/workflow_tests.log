@@ -1,0 +1,23 @@
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (27) Trying to import 'FACTORY' of type 'Workflow::Factory' to 'Workflow' 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (83) Creating empty instance of 'Workflow::Factory' factory for singleton use 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (36) Target 'Workflow::FACTORY' not yet defined, creating subroutine on the fly 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (27) Trying to import 'FACTORY' of type 'Workflow::Factory' to 'Workflow::Action' 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (36) Target 'Workflow::Action::FACTORY' not yet defined, creating subroutine on the fly 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (27) Trying to import 'FACTORY' of type 'Workflow::Factory' to 'Workflow::State' 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (36) Target 'Workflow::State::FACTORY' not yet defined, creating subroutine on the fly 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (686) Adding configuration for condition 'HasUser' 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (695) Trying to include condition class 'Workflow::Condition::HasUser' 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (703) Included condition 'HasUser' class 'Workflow::Condition::HasUser' ok; now try to instantiate condition... 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (712) Instantiated condition 'HasUser' ok 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (686) Adding configuration for condition 'HasUserType' 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (695) Trying to include condition class 'TestApp::Condition::HasUserType' 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (703) Included condition 'HasUserType' class 'TestApp::Condition::HasUserType' ok; now try to instantiate condition... 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (712) Instantiated condition 'HasUserType' ok 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (537) Adding configuration for type 'default', action 'TIX_NEW' 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (548) Trying to include action class 'TestApp::Action::TicketCreate'... 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (27) Trying to import 'FACTORY' of type 'Workflow::Factory' to 'TestApp::Ticket' 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (36) Target 'TestApp::Ticket::FACTORY' not yet defined, creating subroutine on the fly 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (27) Trying to import 'FACTORY' of type 'Workflow::Factory' to 'TestApp::Action::TicketCreate' 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (36) Target 'TestApp::Action::TicketCreate::FACTORY' not yet defined, creating subroutine on the fly 
+18:00:10 DEBUG Workflow.Factory Workflow::Factory (556) Included action 'TIX_NEW' class 'TestApp::Action::TicketCreate' ok 
+18:00:10 ERROR Workflow.Exception Workflow::Exception (53) workflow_error exception thrown from [Workflow::Factory: 332; before: main: 39]: No workflow of type 'TIX_NEW' available 

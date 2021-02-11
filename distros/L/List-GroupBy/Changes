@@ -1,5 +1,9 @@
 Revision history for Perl extension List-GroupBy
 
+0.02 2021-02-10T13:27:45Z
+
+    - switched issue reporting to be via GitLab repository
+
 0.01 2020-08-03T12:44:24Z
 
     - original version

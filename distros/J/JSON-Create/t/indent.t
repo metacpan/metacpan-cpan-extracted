@@ -18,7 +18,7 @@ my %thing = ("it's your thing" => [qw! do what you wanna do!],
 	     "I can't tell you" => [qw! who to sock it to !]);
 my $jc = JSON::Create->new ();
 $jc->indent (1);
-my $out = $jc->run (\%thing);
+my $out = $jc->create (\%thing);
 #print "$out\n";
 like ($out, qr!^\t"I!sm, "indentation of object key");
 like ($out, qr!^\t\t"sock!sm, "indentation of array element");

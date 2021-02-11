@@ -10,7 +10,7 @@ use RxPerl::Mojo ':all';
 use Exporter 'import';
 our @EXPORT_OK = qw/ get_listener_observable /;
 
-our $VERSION = "v0.0.11";
+our $VERSION = "v0.0.13";
 
 my %listener_observables;
 

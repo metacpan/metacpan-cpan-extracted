@@ -6,7 +6,7 @@ use B::Hooks::EndOfScope 'on_scope_end';
 use Carp;
 
 # ABSTRACT: Sugar methods for declaring DBIx::Class::Result data definitions
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '1.00'; # VERSION
 
 
 our $CALLER; # can be used localized to wrap caller context into an anonymous sub
@@ -15,41 +15,117 @@ sub swp :Export(-) {
 	my $self= shift;
 	require strict; strict->import if $^H == $DBIx::Class::ResultDDL::_default_h;
 	require warnings; warnings->import if $^W == $DBIx::Class::ResultDDL::_default_w;
-	unless ($self->{into}->can('add_column')) {
+	$self->_inherit_dbic;
+}
+sub _inherit_dbic {
+	my $self= shift;
+	my $pkg= $self->{into};
+	unless ($pkg->can('load_components') && $pkg->can('add_column')) {
 		require DBIx::Class::Core;
 		no strict 'refs';
-		push @{ $self->{into} . '::ISA' }, 'DBIx::Class::Core';
+		push @{ $pkg . '::ISA' }, 'DBIx::Class::Core';
 	}
 }
 
 
 sub autoclean :Export(-) {
-	my $x;
-	shift->{scope} ||= \$x;
-	on_scope_end { undef $x };
+	my $self= shift;
+	my $sref= $self->exporter_config_scope;
+	$self->exporter_config_scope($sref= \my $x) unless $sref;
+	on_scope_end { $$sref->clean };
 }
 
 
-sub V0 :Export(-) {
-	shift->exporter_also_import('-swp',':V0','-autoclean');
+sub V1 :Export(-) {
+	shift->exporter_also_import('-swp',':V1','-autoclean');
+}
+sub exporter_autoload_symbol {
+	my ($self, $sym)= @_;
+	if ($sym =~ /^-V([0-9]+)$/) {
+		my $tag= ":V$1";
+		my $method= sub { shift->exporter_also_import('-swp',$tag,'-autoclean') };
+		return $self->exporter_register_option("V$1", $method);
+	}
+	return shift->next::method(@_);
+}
+
+# The functions and tag list for previous versions are not loaded by default.
+# They are contained in a separate package ::V$N, which inherits many methods
+# from this one but then overrides all the ones whose API were different in
+# the past version.
+# In order to make those versions exportable, they have to be loaded into
+# the cache or symbol table of this package before they can be added to a tag
+# to get exported.  This also requires that they be given a different name
+# The pattern used here is to prefix "v0_" and so on to the methods which
+# are re-defined in the subclass.
+sub exporter_autoload_tag {
+	my ($self, $name)= @_;
+	my $class= ref $self || $self;
+	if ($name =~ /^V([0-9]+)$/) {
+		my $v_pkg= "DBIx::Class::ResultDDL::$name";
+		my $v= $1;
+		eval "require $v_pkg"
+			or croak "Can't load package $v_pkg: $@";
+		my $ver_exports= $v_pkg->exporter_get_tag($name);
+		# For each tag member, see if it is the same as the method in this class.
+		# If not, bring it in as v${X}_${name} and then export { -as => $name }
+		my @tag;
+		for (@$ver_exports) {
+			if ($class->can($_) == $v_pkg->can($_)) {
+				push @tag, $_;
+			}
+			else {
+				my $install_as= "v${v}_$_";
+				$class->exporter_export($install_as => $v_pkg->can($_));
+				push @tag, $install_as, { -as => $_ };
+			}
+		}
+		return \@tag;
+	}
+	return shift->next::method(@_);
 }
 
 
-my @V0= qw(
-	table
-	col
-	  null default auto_inc fk
-	  integer unsigned tinyint smallint bigint decimal numeric
-	  char varchar nchar nvarchar binary varbinary blob text ntext
-	  date datetime timestamp enum bool boolean
-	  inflate_json
-	primary_key
-	rel_one rel_many has_one might_have has_many belongs_to many_to_many
-	  ddl_cascade dbic_cascade
+our %_settings_for_package;
+sub _settings_for_package {
+	return $_settings_for_package{shift()} ||= {};
+}
+
+sub enable_inflate_datetime :Export(-inflate_datetime) {
+	my $self= shift;
+	$self->_inherit_dbic;
+	$self->{into}->load_components('InflateColumn::DateTime')
+		unless $self->{into}->isa('DBIx::Class::InflateColumn::DateTime');
+}
+
+sub enable_inflate_json :Export(-inflate_json) {
+	my $self= shift;
+	$self->_inherit_dbic;
+	my $pkg= $self->{into};
+	$pkg->load_components('InflateColumn::Serializer')
+		unless $pkg->isa('DBIx::Class::InflateColumn::Serializer');
+	_settings_for_package($pkg)->{json_defaults}{serializer_class}= 'JSON';
+}
+
+
+my @V1= qw(
+  table view
+  col
+    null default auto_inc fk
+    integer unsigned tinyint smallint bigint decimal numeric money
+    float float4 float8 double real
+    char varchar nchar nvarchar MAX binary varbinary bit varbit
+    blob tinyblob mediumblob longblob text tinytext mediumtext longtext ntext bytea
+    date datetime timestamp enum bool boolean
+    uuid json jsonb inflate_json array
+  primary_key idx create_index unique sqlt_add_index sqlt_add_constraint
+  rel_one rel_many has_one might_have has_many belongs_to many_to_many
+    ddl_cascade dbic_cascade
 );
+
 our %EXPORT_TAGS;
-$EXPORT_TAGS{V0}= \@V0;
-export @V0;
+$EXPORT_TAGS{V1}= \@V1;
+export @V1;
 
 
 sub table {
@@ -76,69 +152,150 @@ sub col {
 		$dest= ($dest->{$_} ||= {}) for @path;
 		$dest->{$k}= $v;
 	}
-	($CALLER||caller)->add_column($name, $opts);
+	my $pkg= $CALLER || caller;
+	$pkg->add_column($name, $opts);
+	1;
+}
+
+sub _maybe_array {
+	my @dims;
+	while (@_ && ref $_[0] eq 'ARRAY') {
+		my $array= shift @_;
+		push @dims, @$array? @$array : '';
+	}
+	join '', map "[$_]", @dims
+}
+sub _maybe_size {
+	return shift if @_ && Scalar::Util::looks_like_number($_[0]);
+	return undef;
+}
+sub _maybe_size_or_max {
+	return shift if @_ && (Scalar::Util::looks_like_number($_[0]) || uc($_[0]) eq 'MAX');
+	return undef;
+}
+sub _maybe_timezone {
+	# This is a weak check, but assume the timezone will have at least one capital letter,
+	# and that DBIC column attribute names will not.
+	return shift if @_ && !ref $_[0] && $_[0] =~ /(^floating$|^local$|[A-Z])/;
+	return undef;
 }
 
 
-sub null       { is_nullable => 1 }
-sub auto_inc   { is_auto_increment => 1 }
-sub fk         { is_foreign_key => 1 }
-#sub pk        { is_primary_key => 1 }
-sub default    { default_value => (@_ > 1? [ @_ ] : $_[0]) }
+sub null        { is_nullable => 1, @_ }
+sub auto_inc    { is_auto_increment => 1, 'extra.auto_increment_type' => 'monotonic', @_ }
+sub fk          { is_foreign_key => 1, @_ }
+sub default     { default_value => (@_ > 1? [ @_ ] : $_[0]) }
 
 
-sub integer     { data_type => 'integer',   size => (defined $_[0]? $_[0] : 11) }
-sub unsigned    { 'extra.unsigned' => 1 }
-sub tinyint     { data_type => 'tinyint',   size => 4 }
-sub smallint    { data_type => 'smallint',  size => 6 }
-sub bigint      { data_type => 'bigint',    size => 22 }
-sub decimal     {
-	croak "2 size parameters are required" unless scalar(@_) == 2;
-	return data_type => 'decimal',   size => [ @_ ];
+sub integer     {
+	my $size= shift if @_ && Scalar::Util::looks_like_number($_[0]);
+	data_type => 'integer'.&_maybe_array, size => $size || 11, @_
 }
-sub numeric     { &decimal, data_type => 'numeric' }
+sub unsigned    { 'extra.unsigned' => 1, @_ }
+sub tinyint     { data_type => 'tinyint',   size =>  4, @_ }
+sub smallint    { data_type => 'smallint',  size =>  6, @_ }
+sub bigint      { data_type => 'bigint',    size => 22, @_ }
+sub decimal     { _numeric(decimal => @_) }
+sub numeric     { _numeric(numeric => @_) }
+sub _numeric    {
+	my $type= shift;
+	my $precision= &_maybe_size;
+	my $size;
+	if (defined $precision) {
+		my $scale= &_maybe_size;
+		$size= defined $scale? [ $precision, $scale ] : [ $precision ];
+	}
+	return data_type => $type.&_maybe_array, ($size? ( size => $size ) : ()), @_;
+}
+sub money       { data_type => 'money'.&_maybe_array, @_ }
+sub double      { data_type => 'double precision'.&_maybe_array, @_ }
+sub float8      { data_type => 'float8'.&_maybe_array, @_ }
+sub real        { data_type => 'real'.&_maybe_array, @_ }
+sub float4      { data_type => 'float4'.&_maybe_array, @_ }
+# the float used by SQL Server allows variable size spec as number of bits of mantissa
+sub float       { my $size= &_maybe_size; data_type => 'float'.&_maybe_array, (defined $size? (size => $size) : ()), @_ }
 
 
-sub char        { data_type => 'char',      size => (defined $_[0]? $_[0] : 1) }
-sub nchar       { data_type => 'nchar',     size => (defined $_[0]? $_[0] : 1) }
-sub varchar     { data_type => 'varchar',   size => (defined $_[0]? $_[0] : 255) }
-sub nvarchar    { data_type => 'nvarchar',  size => (defined $_[0]? $_[0] : 255) }
+sub char        { my $size= &_maybe_size;  data_type => 'char'.&_maybe_array, size => $size || 1, @_ }
+sub nchar       { my $size= &_maybe_size;  data_type => 'nchar'.&_maybe_array, size => $size || 1, @_ }
+sub varchar     { my $size= &_maybe_size_or_max;  data_type => 'varchar'.&_maybe_array, size => $size, @_ }
+sub nvarchar    { my $size= &_maybe_size_or_max;  data_type => 'nvarchar'.&_maybe_array, size => $size, @_ }
+sub binary      { my $size= &_maybe_size_or_max;  data_type => 'binary'.&_maybe_array, size => $size, @_ }
+sub varbinary   { my $size= &_maybe_size_or_max;  data_type => 'varbinary'.&_maybe_array, size => $size, @_ }
+sub bit         { my $size= &_maybe_size; data_type => 'bit'.&_maybe_array, size => (defined $size? $size : 1), @_ }
+sub varbit      { my $size= &_maybe_size; data_type => 'varbit'.&_maybe_array, (defined $size? (size => $size) : ()), @_ }
 sub MAX         { 'MAX' }
-sub binary      { data_type => 'binary',    size => (defined $_[0]? $_[0] : 255) }
-sub varbinary   { data_type => 'varbinary', size => (defined $_[0]? $_[0] : 255) }
 
-sub blob        { data_type => 'blob',      (defined $_[0]? (size => $_[0]) : ()) }
-sub tinyblob    { data_type => 'tinyblob',  size => 0xFF }
-sub mediumblob  { data_type => 'mediumblob',size => 0xFFFFFF }
-sub longblob    { data_type => 'longblob',  size => 0xFFFFFFFF }
+# postgres blob type
+sub bytea       { data_type => 'bytea'.&_maybe_array, @_ }
 
-sub text        { data_type => 'text',      (defined $_[0]? (size => $_[0]) : ()) }
-sub ntext       { data_type => 'ntext',     size => (defined $_[0]? $_[0] : 0x3FFFFFFF) }
-sub tinytext    { data_type => 'tinytext',  size => 0xFF }
-sub mediumtext  { data_type => 'mediumtext',size => 0xFFFFFF }
-sub longtext    { data_type => 'longtext',  size => 0xFFFFFFFF }
+# These aren't valid for Postgres, so no array notation needed
+sub blob          { my $size= &_maybe_size;  data_type => 'blob', (defined $size? (size => $size) : ()), @_ }
+sub tinyblob      { data_type => 'tinyblob',  size => 0xFF, @_ }
+sub mediumblob    { data_type => 'mediumblob',size => 0xFFFFFF, @_ }
+sub longblob      { data_type => 'longblob',  size => 0xFFFFFFFF, @_ }
+
+sub text          { my $size= &_maybe_size_or_max;  data_type => 'text'.&_maybe_array, (defined $size? (size => $size) : ()), @_ }
+sub ntext         { my $size= &_maybe_size_or_max;  data_type => 'ntext', size => ($size || 0x3FFFFFFF), @_ }
+sub tinytext      { data_type => 'tinytext',  size => 0xFF, @_ }
+sub mediumtext    { data_type => 'mediumtext',size => 0xFFFFFF, @_ }
+sub longtext      { data_type => 'longtext',  size => 0xFFFFFFFF, @_ }
 
 
 sub enum        { data_type => 'enum', 'extra.list' => [ @_ ]}
-sub boolean     { data_type => 'boolean' }
-sub bool        { data_type => 'boolean' }
-sub bit         { data_type => 'bit',  size => (defined $_[0]? $_[0] : 1) }
+sub boolean     { data_type => 'boolean'.&_maybe_array, @_ }
+sub bool        { data_type => 'boolean'.&_maybe_array, @_ }
 
 
-sub date        { data_type => 'date',     (@_? (time_zone => $_[0]) : ()) }
-sub datetime    { data_type => 'datetime', (@_? (time_zone => $_[0]) : ()) }
-sub timestamp   { data_type => 'timestamp',(@_? (time_zone => $_[0]) : ()) }
+sub date        { data_type => 'date'.&_maybe_array, @_ }
+sub datetime    { my $tz= &_maybe_timezone; data_type => 'datetime'.&_maybe_array, ($tz? (time_zone => $tz) : ()), @_ }
+sub timestamp   { my $tz= &_maybe_timezone; data_type => 'timestamp'.&_maybe_array,($tz? (time_zone => $tz) : ()), @_ }
 
+
+sub array {
+	# If one argument and the argument is a string, then it is a type name
+	if (@_ == 1 && $_[0] && !ref $_[0]) {
+		return data_type => $_[0] . '[]';
+	}
+	# Else, scan through argument list looking for data_type, and append [] to following item.
+	my $data_type_idx;
+	for (my $i= 0; $i < @_; $i++) {
+		$data_type_idx= $i+1 if $_[$i] eq 'data_type'
+	}
+	$data_type_idx && $_[$data_type_idx] && !ref $_[$data_type_idx]
+		or die 'array needs a type';
+	$_[$data_type_idx] .= '[]';
+	return @_;
+}
+
+
+sub uuid          { data_type => 'uuid'.&_maybe_array, @_ }
+
+
+# This is a generator that includes the json_args into the installed method.
+sub json {
+	my $pkg= ($CALLER||caller);
+	my $defaults= _settings_for_package($pkg)->{json_defaults};
+	return data_type => 'json'.&_maybe_array, ($defaults? %$defaults : ()), @_
+}
+sub jsonb {
+	my $pkg= ($CALLER||caller);
+	my $defaults= _settings_for_package($pkg)->{json_defaults};
+	return data_type => 'jsonb'.&_maybe_array, ($defaults? %$defaults : ()), @_
+}
 
 sub inflate_json {
 	my $pkg= ($CALLER||caller);
 	$pkg->load_components('InflateColumn::Serializer')
 		unless $pkg->isa('DBIx::Class::InflateColumn::Serializer');
-	return serializer_class => 'JSON';
+	return serializer_class => 'JSON', @_;
 }
 
 
 sub primary_key { ($CALLER||caller)->set_primary_key(@_); }
+
+
+sub unique { ($CALLER||caller)->add_unique_constraint(@_) }
 
 
 sub rel_one {
@@ -282,6 +439,83 @@ sub dbic_cascade {
 		cascade_delete => $mode;
 }
 
+sub view {
+        my ($name, $definition, %opts) = @_;
+        my $pkg= $CALLER || caller;
+        DBIx::Class::Core->can('table_class')->($pkg, 'DBIx::Class::ResultSource::View');
+        DBIx::Class::Core->can('table')->($pkg, $name);
+
+        my $rsi = $pkg->result_source_instance;
+        $rsi->view_definition($definition);
+
+        $rsi->deploy_depends_on($opts{depends}) if $opts{depends};
+        $rsi->is_virtual($opts{virtual});
+        
+        return $rsi
+}
+
+
+
+our %_installed_sqlt_hook_functions;
+sub _get_sqlt_hook_method_array {
+	my $pkg= shift;
+	$_installed_sqlt_hook_functions{$pkg} ||= do {
+		# $pkg->can("sqlt_deploy_hook") is insufficient, because it might be declared
+		# in a parent class, and that is not an error.  It is only an error if it was
+		# already declared in this package.
+		no strict 'refs';
+		my $stash= %{$pkg.'::'};
+		croak "${pkg}::sqlt_deploy_hook already exists; DBIx::Class::ResultDDL won't overwrite it."
+			." (but you can use Moo(se) or Class::Method::Modifiers to apply your own wrapper to this generated method)"
+			if $stash->{sqlt_deploy_hook} && $stash->{sqlt_deploy_hook}{CODE};
+
+		# Create the sub once, bound to this array.  The array can then be extended without
+		# needing to re-declare the sub.
+		no warnings 'closure';
+		my @methods;
+		eval 'sub '.$pkg.'::sqlt_deploy_hook {
+			my $self= shift;
+			$self->maybe::next::method(@_);
+			for (@methods) {
+				my ($m, @args)= @$_;
+				$_[0]->$m(@args);
+			}
+		} 1' or die "failed to generate sqlt_deploy_hook: $@";
+		\@methods;
+	};
+}
+sub sqlt_add_index {
+	my $pkg= $CALLER || caller;
+	my $methods= _get_sqlt_hook_method_array($pkg);
+	push @$methods, [ add_index => @_ ];
+}
+
+sub sqlt_add_constraint {
+	my $pkg= $CALLER || caller;
+	my $methods= _get_sqlt_hook_method_array($pkg);
+	push @$methods, [ add_constraint => @_ ];
+}
+
+sub create_index {
+	my $pkg= $CALLER || caller;
+	my $name= ref $_[0]? undef : shift;
+	my $fields= shift;
+	ref $fields eq 'ARRAY'
+		or croak((defined $name? 'Second':'First').' argument must be arrayref of index fields');
+	my %options= @_;
+	my $type= delete $options{type};  # this is an attribute of Index, not a member of %options
+	my $methods= _get_sqlt_hook_method_array($pkg);
+	push @$methods, [
+		add_index =>
+			(defined $name? (name => $name) : ()),
+			fields => $fields,
+			(keys %options? (options => \%options) : ()),
+			(defined $type? (type => $type) : ())
+	];
+}
+
+BEGIN { *idx= *create_index; }
+
 
 1;
 
@@ -297,16 +531,23 @@ DBIx::Class::ResultDDL - Sugar methods for declaring DBIx::Class::Result data de
 
 =head1 VERSION
 
-version 0.01
+version 1.00
 
 =head1 SYNOPSIS
 
   package MyApp::Schema::Result::Artist;
-  use DBIx::Class::ResultDDL -V0;
+  use DBIx::Class::ResultDDL qw/ -V1 -inflate_datetime -inflate_json /;
+  
   table 'artist';
-  col id   => integer, unsigned, auto_inc;
-  col name => varchar(25), null;
+  col id           => integer unsigned auto_inc;
+  col name         => varchar(25), null;
+  col formed       => date;
+  col disbanded    => date, null;
+  col general_info => json null;
+  col last_update  => datetime('UTC');
   primary_key 'id';
+  
+  idx artist_by_name => [ 'name' ];
   
   has_many albums => { id => 'Album.artist_id' };
   rel_many impersonators => { name => 'Artist.name' };
@@ -317,10 +558,10 @@ This is Yet Another Sugar Module for building DBIC result classes.  It provides 
 domain-specific-language that feels almost like writing DDL.
 
 This module heavily pollutes your symbol table in the name of extreme convenience, so the
-C<-V0> option has the added feature of automatically removing those symbols at end-of-scope
+C<-Vx> option has the added feature of automatically removing those symbols at end-of-scope
 as if you had said C<use namespace::clean;>.
 
-This module has a versioned API, to help prevent name collisions.  If you request the C<-v0>
+This module has a versioned API, to help prevent name collisions.  If you request the C<-Vx>
 behavior, you can rely on that to remain the same across upgrades.
 
 =head1 EXPORTED FEATURES
@@ -331,37 +572,66 @@ simple export of symbols.
 
 =head2 C<-swp>
 
-Enable C<use strict> and C<use warnings> (unless those flags have been changed from the default
-via other means), and C<< use parent "DBIx::Class::Core" >> unless
-C<< __PACKAGE__->can('add_column') >>.
+"Strict, Warnings, Parent".
+
+Enable C<use strict> and C<use warnings> unless those flags have been changed from the default
+via other means.  In other words, you can still C<< use Moo >> or C<< use common::sense >>
+without this option overriding your choice.
+
+Then, C<< use parent "DBIx::Class::Core" >> unless the class already has an C<add_column>
+method.  If C<add_column> exists it is presumably because you already declared a parent class.
+Note that this check happens at BEGIN-time, so if you use Moo and C<< extends 'SomeClass'; >>
+you need to wrap that in a begin block before the C<< use DBIx::Class::ResultDDL -V1 >> line.
 
 =head2 C<-autoclean>
 
 Remove all added symbols at the end of current scope.
 
+=head2 C<-V1>
+
+Implies C<-swp>, C<:V1>, and C<-autoclean>.
+
 =head2 C<-V0>
 
 Implies C<-swp>, C<:V0>, and C<-autoclean>.
 
+=head2 C<-inflate_datetime>
+
+Inflate all date columns to DateTime objects, by adding the DBIC component
+L<DBIx::Class::InflateColumn::DateTime>.
+
+=head2 C<-inflate_json>
+
+Causes all columns declared with C<json> or C<jsonb> sugar methods to also
+declare L</inflate_json>.  This requires L<DBIx::Class::InflateColumn::Serializer>
+to be installed (which is not an official dependency of this module).
+
 =head1 EXPORTED COLLECTIONS
 
-=head2 C<:V0>
+=head2 C<:V1>
 
 This tag selects the following symbols:
 
-  table
+  table view
   col
     null default auto_inc fk
-    integer unsigned tinyint smallint bigint decimal numeric
-    char varchar nchar nvarchar binary varbinary blob text ntext
-    tinyblob mediumblob longblob tinytext mediumtext longtext
+    integer unsigned tinyint smallint bigint decimal numeric money
+    float float4 float8 double real
+    char varchar nchar nvarchar MAX binary varbinary bit varbit
+    blob tinyblob mediumblob longblob text tinytext mediumtext longtext ntext bytea
     date datetime timestamp enum bool boolean
-    inflate_json
-  primary_key
+    uuid json jsonb inflate_json array
+  primary_key idx create_index unique sqlt_add_index sqlt_add_constraint
   rel_one rel_many has_one might_have has_many belongs_to many_to_many
     ddl_cascade dbic_cascade
 
-=head1 EXPORTED METHODS
+=head2 C<:V0>
+
+See L<DBIx::Class::ResultDDL::V0>.  The primary difference from V1 is lack of array
+column support, lack of index declaration support, and sugar methods do not pass
+through leftover unknown arguments.  Also new Postgres column types were added in V1.
+
+=head1 EXPORTED FUNCTIONS
 
 =head2 table
 
@@ -380,89 +650,135 @@ It defaults the column to not-null for you, but you can override that by saying
 C<null> in your options.
 You will probably use many of the methods below to build the options for the column:
 
-=over
-
-=item null
+=head3 null
 
   is_nullable => 1
 
-=item auto_inc
+=head3 auto_inc
 
-  is_auto_increment => 1
+  is_auto_increment => 1, 'extra.auto_increment_type' => 'monotonic'
 
-=item fk
+(The 'monotonic' bit is required to correctly deploy on SQLite.  You can read the
+L<gory details|https://github.com/dbsrgits/sql-translator/pull/26> but the short
+version is that SQLite gives you "fake" autoincrement by default, and you only get
+real ANSI-style autoincrement if you ask for it.  SQL::Translator doesn't ask for
+the extra work by default, but if you're declaring columns by hand expecting it to
+be platform-neutral, then you probably want this.  SQLite also requires data_type
+"integer", and for it to be the primary key.)
+
+=head3 fk
 
   is_foreign_key => 1
 
-=item default($value | @value)
+=head3 default
 
-  default_value => $value
-  default_value => [ @value ] # if more than one param
+  # Call:                       Becomes:
+  default($value)               default_value => $value
+  default(@value)               default_value => [ @value ]
 
-=item integer, integer($size)
+=head3 integer, tinyint, smallint, bigint, unsigned
 
-  data_type => 'integer', size => $size // 11
+  integer                       data_type => 'integer',   size => 11
+  integer($size)                data_type => 'integer',   size => $size
+  integer[]                     data_type => 'integer[]', size => 11
+  integer $size,[]              data_type => 'integer[]', size => $size
+  
+  # MySQL variants
+  tinyint                       data_type => 'tinyint',   size => 4
+  smallint                      data_type => 'smallint',  size => 6
+  bigint                        data_type => 'bigint',    size => 22
+  # MySQL specific flag which can be combined with int types
+  unsigned                      extra => { unsigned => 1 }
 
-=item unsigned
+=head3 numeric, decimal
 
-  extra => { unsigned => 1 }
+  numeric                       data_type => 'numeric'
+  numeric($p)                   data_type => 'numeric', size => [ $p ]
+  numeric($p,$s)                data_type => 'numeric', size => [ $p, $s ]
+  numeric[]                     data_type => 'numeric[]'
+  numeric $p,$s,[]              data_type => 'numeric[]', size => [ $p, $s ]
 
-MySQL specific flag to be combined with C<integer>
+  # Same API for decimal
+  decimal ...                   data_type => 'decimal' ...
 
-=item tinyint
+=head3 money
 
-  data_type => 'tinyint', size => 4
+  money                         data_type => 'money'
+  money[]                       data_type => 'money[]'
 
-=item smallint
+=head3 real, float4, double, float8
 
-  data_type => 'smallint', size => 6
+  real                          data_type => 'real'
+  rea[]                         data_type => 'real[]'
+  float4                        data_type => 'float4'
+  float4[]                      data_type => 'float4[]'
+  double                        data_type => 'double precision'
+  double[]                      data_type => 'double precision[]'
+  float8                        data_type => 'float8'
+  float8[]                      data_type => 'float8[]'
 
-=item bigint
+=head3 float
 
-  data_type => 'bigint', size => 22
+  # Call:                       Becomes:
+  float                         data_type => 'float'
+  float($bits)                  data_type => 'float', size => $bits
+  float[]                       data_type => 'float[]'
+  float $bits,[]                data_type => 'float[]', size => $bits
 
-=item decimal( $whole, $deci )
+SQLServer and Postgres offer this, where C<$bits> is the number of bits of precision
+of the mantissa.  Array notation is supported for Postgres.
 
-  data_type => 'decimal', size => [ $whole, $deci ]
+=head3 char, nchar, bit
 
-=item numeric( $whole, $deci )
+  # Call:                       Becomes:
+  char                          data_type => 'char', size => 1
+  char($size)                   data_type => 'char', size => $size
+  char[]                        data_type => 'char[]', size => 1
+  char $size,[]                 data_type => 'char[]', size => $size
+  
+  # Same API for the others
+  nchar ...                     data_type => 'nchar' ...
+  bit ...                       data_type => 'bit' ...
 
-  data_type => 'numeric', size => [ $whole, $deci ]
+C<nchar> (SQL Server unicode char array) has an identical API but
+returns C<< data_type => 'nchar' >>
 
-=item char, char($size)
+Note that Postgres allows C<"bit"> to have a size, like C<char($size)> but SQL Server
+uses C<"bit"> only to represent a single bit.
 
-  data_type => 'char', size => $size // 1
+=head3 varchar, nvarchar, binary, varbinary, varbit
 
-=item varchar, varchar($size), varchar(MAX)
+  varchar                       data_type => 'varchar'
+  varchar($size)                data_type => 'varchar', size => $size
+  varchar(MAX)                  data_type => 'varchar', size => "MAX"
+  varchar[]                     data_type => 'varchar[]'
+  varchar $size,[]              data_type => 'varchar[]', size => $size
+  
+  # Same API for the others
+  nvarchar ...                  data_type => 'nvarchar' ...
+  binary ...                    data_type => 'binary' ...
+  varbinary ...                 data_type => 'varbinary' ...
+  varbit ...                    data_type => 'varbit' ...
 
-  data_type => 'varchar', size => $size // 255
+Unlike char/varchar relation, C<binary> does not default the size to 1.
 
-=item nchar
+=head3 MAX
 
-SQL Server specific type for unicode char
+Constant for C<"MAX">, used by SQL Server for C<< varchar(MAX) >>.
 
-=item nvarchar, nvarchar($size), nvarchar(MAX)
+=head3 blob, tinyblob, mediumblob, longblob, bytea
 
-SQL Server specific type for unicode character data.
+  blob                          data_type => 'blob',
+  blob($size)                   data_type => 'blob', size => $size
+  
+  # MySQL specific variants:
+  tinyblob                      data_type => 'tinyblob', size => 0xFF
+  mediumblob                    data_type => 'mediumblob', size => 0xFFFFFF
+  longblob                      data_type => 'longblob', size => 0xFFFFFFFF
 
-  data_type => 'nvarchar', size => $size // 255
-
-=item MAX
-
-Constant for 'MAX', used by SQL Server for C<< varchar(MAX) >>.
-
-=item binary, binary($size)
-
-  data_type => 'binary', size => $size // 255
-
-=item varbinary, varbinary($size)
-
-  data_type => 'varbinary', size => $size // 255
-
-=item blob, blob($size)
-
-  data_type => 'blob',
-  size => $size if defined $size
+  # Postgres blob type is 'bytea'
+  bytea                         data_type => 'bytea'
+  bytea[]                       data_type => 'bytea[]'
 
 Note: For MySQL, you need to change the type according to '$size'.  A MySQL blob is C<< 2^16 >>
 max length, and probably none of your binary data would be that small.  Consider C<mediumblob>
@@ -472,95 +788,102 @@ conversion automatically according to which DBMS you are connected to.
 For SQL Server, newer versions deprecate C<blob> in favor of C<VARCHAR(MAX)>.  This is another
 detail you might take care of in sqlt_deploy_hook.
 
-=item tinyblob
+=head3 text, tinytext, mediumtext, longtext, ntext
 
-MySQL-specific type for small blobs
+  text                          data_type => 'text',
+  text($size)                   data_type => 'text', size => $size
+  text[]                        data_type => 'text[]'
+  
+  # MySQL specific variants:
+  tinytext                      data_type => 'tinytext', size => 0xFF
+  mediumtext                    data_type => 'mediumtext', size => 0xFFFFFF
+  longtext                      data_type => 'longtext', size => 0xFFFFFFFF
+  
+  # SQL Server unicode variant:
+  ntext                         data_type => 'ntext', size => 0x3FFFFFFF
+  ntext($size)                  data_type => 'ntext', size => $size
 
-  data_type => 'tinyblob', size => 0xFF
+See MySQL notes in C<blob>.  For SQL Server, you might want C<ntext> or C<< nvarchar(MAX) >>
+instead.  Postgres does not use a size, and allows arrays of this type.
 
-=item mediumblob
+Newer versions of SQL-Server prefer C<< nvarchar(MAX) >> instead of C<ntext>.
 
-MySQL-specific type for larger blobs
+=head3 enum
 
-  data_type => 'mediumblob', size => 0xFFFFFF
+  enum(@values)                 data_type => 'enum', extra => { list => [ @values ] }
 
-=item longblob
+This function cannot take pass-through arguments, since every argument is an enum value.
 
-MySQL-specific type for the longest supported blob type
+=head3 bool, boolean
 
-  data_type => 'longblob', size => 0xFFFFFFFF
+  bool                          data_type => 'boolean'
+  bool[]                        data_type => 'boolean[]'
+  boolean                       data_type => 'boolean'
+  boolean[]                     data_type => 'boolean[]'
 
-=item text, text($size)
+Note that SQL Server doesn't support 'boolean', the closest being 'bit',
+though in postgres 'bit' is used for bitstrings.
 
-  data_type => 'text',
-  size => $size if defined $size
+=head3 date
 
-See MySQL notes in C<blob>.  For SQL Server, you might want C<ntext> or C<< varchar(MAX) >> instead.
+  date                          data_type => 'date'
+  date[]                        data_type => 'date[]'
 
-=item tinytext
+=head3 datetime, timestamp
 
-  data_type => 'tinytext', size => 0xFF
+  datetime                      data_type => 'datetime'
+  datetime($tz)                 data_type => 'datetime', time_zone => $tz
+  datetime[]                    data_type => 'datetime[]'
+  datetime $tz, []              data_type => 'datetime[]', time_zone => $tz
+  
+  # Same API
+  timestamp ...                 data_type => 'timestamp', ...
 
-=item mediumtext
+=head3 array
 
-  data_type => 'mediumtext', size => 0xFFFFFF
+  array($type)                  data_type => $type.'[]'
+  array(@dbic_attrs)            data_type => $type.'[]', @other_attrs
+  # i.e.
+  array numeric(10,3)           data_type => 'numeric[]', size => [10,3]
 
-=item longtext
+Declares a postgres array type by appending C<"[]"> to a type name.
+The type name can be given as a single string, or as any sugar function that
+returns a C<< data_type => $type >> pair of elements.
 
-  data_type => 'longtext', size => 0xFFFFFFFF
+=head3 uuid
 
-=item ntext
+  uuid                          data_type => 'uuid'
+  uuid[]                        data_type => 'uuid[]'
 
-SQL-Server specific type for unicode C<text>.  Note that newer versions prefer C<< nvarchar(MAX) >>.
+=head3 json, jsonb
 
-  data_type => 'ntext', size => 0x3FFFFFFF
+  json                          data_type => 'json'
+  json[]                        data_type => 'json[]'
+  jsonb                         data_type => 'jsonb'
+  jsonb[]                       data_type => 'jsonb[]'
 
-=item enum( @values )
+If C<< -inflate_json >> use-line option was given, this will additionally imply
+L</inflate_json>.
 
-  data_type => 'enum', extra => { list => [ @values ] }
+=head3 inflate_json
 
-=item bool, boolean
+  inflate_json                  serializer_class => 'JSON'
 
-  data_type => 'boolean'
-
-Note that SQL Server has 'bit' instead.
-
-=item bit, bit($size)
-
-  data_type => 'bit', size => $size // 1
-
-To be database agnostic, consider using 'bool' and override C<< My::Scema::sqlt_deploy_hook >>
-to rewrite it to 'bit' when deployed to SQL Server.
-
-=item date, date($timezone)
-
-  data_type => 'date'
-  time_zone => $timezone if defined $timezone
-
-=item datetime, datetime($timezone)
-
-  data_type => 'datetime'
-  time_zone => $timezone if defined $timezone
-
-=item timestamp, timestamp($timezone)
-
-  date_type => 'timestamp'
-  time_zone => $timezone if defined $timezone
-
-=item inflate_json
-
-  serializer_class => 'JSON'
-
-Also adds the component 'InflateColumn::Serializer' to the current package if it wasn't
-added already.
-
-=back
+This first loads the DBIC component L<DBIx::Class::InflateColumn::Serializer>
+into the current package if it wasn't added already.  Note that that module is
+not a dependency of this one and needs to be installed separately.
 
 =head2 primary_key
 
   primary_key(@cols)
 
 Shortcut for __PACKAGE__->set_primary_key(@cols)
+
+=head2 unique
+
+  unique($name?, \@cols)
+
+Shortucut for __PACKAGE__->add_unique_constraint($name? \@cols)
 
 =head2 belongs_to
 
@@ -595,7 +918,7 @@ name in place of "foreign.".
   has_many $rel_name, $peer_class, $condition, @attr_list;
   has_many $rel_name, { colname => "$ResultClass.$colname" }, @attr_list;
   # becomes...
-  __PACKAGE__->has_one($rel_name, $peer_class, $condition, { @attr_list });
+  __PACKAGE__->has_many($rel_name, $peer_class, $condition, { @attr_list });
 
 =head2 many_to_many
 
@@ -659,6 +982,64 @@ Helper method to generate C<@options> for above.  It generates
 
 This re-enables the dbic-side cascading that was disabled by default in the C<rel_> functions.
 
+=head2 view
+
+  view $view_name, $view_sql, %options;
+
+Makes the current resultsource into a view. This is used instead of
+'table'. Takes two options, 'is_virtual', to make this into a
+virtual view, and  'depends' to list tables this view depends on.
+
+Is the equivalent of
+
+  __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
+  __PACKAGE__->table($view_name);
+
+  __PACKAGE__->result_source_instance->view_definition($view_sql);
+  __PACKAGE__->result_source_instance->deploy_depends_on($options{depends});
+  __PACKAGE__->result_source_instance->is_virtual($options{is_virtual});
+
+=head1 INDEXES AND CONSTRAINTS
+
+DBIx::Class doesn't actually track the indexes or constraints on a table.  If you want to add
+these to be automatically deployed with your schema, you need an C<sqlt_deploy_hook> function.
+This module can create one for you, but does not yet attempt to wrap one that you provide.
+(You can of course wrap the one generated by this module using a method modifier from
+L<Class::Method::Modifiers>)
+The method C<sqlt_deploy_hook> is created in the current package the first time one of these
+functions are called.  If it already exists and wasn't created by DBIx::Class::ResultDDL, it
+will throw an exception.  The generated method does call C<maybe::next::method> for you.
+
+=head2 sqlt_add_index
+
+This is a direct passthrough to the function L<SQL::Translator::Schema::Table/add_index>,
+without any magic.
+
+See notes above about the generated C<sqlt_deploy_hook>.
+
+=head2 sqlt_add_constraint
+
+This is a direct passthrough to the function L<SQL::Translator::Schema::Table/add_constraint>,
+without any magic.
+
+See notes above about the generated C<sqlt_deploy_hook>.
+
+=head2 create_index
+
+  create_index $index_name => \@fields, %options;
+
+This is sugar for sqlt_add_index.  It translates to
+
+  sqlt_add_index( name => $index_name, fields => \@fields, options => \%options, (type => ?) );
+
+where the C<%options> are the L<SQL::Translator::Schema::Index/options>, except if
+one of the keys is C<type>, then that key/value gets pulled out and used as
+L<SQL::Translator::Schema::Index/type>.
+
+=head2 idx
+
+Alias for L</create_index>; lines up nicely with 'col'.
+
 =head1 MISSING FUNCTIONALITY
 
 The methods above in most cases allow you to insert plain-old-DBIC notation
@@ -666,13 +1047,25 @@ where appropriate, instead of relying purely on sugar methods.
 If you are missing your favorite column flag or something, feel free to
 contribute a patch.
 
+=head1 THANKS
+
+Thanks to L<Clippard Instrument Laboratory Inc.|http://www.clippard.com/> and
+L<Ellis, Partners in Management Solutions|http://www.epmsonline.com/> for
+supporting open source, including portions of this module.
+
 =head1 AUTHOR
 
 Michael Conrad <mconrad@intellitree.com>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Veesh Goldman
+
+Veesh Goldman <rabbiveesh@gmail.com>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad, IntelliTree Solutions llc.
+This software is copyright (c) 2021 by Michael Conrad, IntelliTree Solutions llc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

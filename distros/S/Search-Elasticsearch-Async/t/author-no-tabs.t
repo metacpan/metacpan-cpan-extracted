@@ -20,6 +20,7 @@ my @files = (
     'lib/Search/Elasticsearch/Client/7_0/Async.pm',
     'lib/Search/Elasticsearch/Client/7_0/Async/Bulk.pm',
     'lib/Search/Elasticsearch/Client/7_0/Async/Scroll.pm',
+    'lib/Search/Elasticsearch/Client/7_0/Direct/AsyncSearch.pm',
     'lib/Search/Elasticsearch/Cxn/AEHTTP.pm',
     'lib/Search/Elasticsearch/Cxn/Mojo.pm',
     'lib/Search/Elasticsearch/CxnPool/Async/Sniff.pm',

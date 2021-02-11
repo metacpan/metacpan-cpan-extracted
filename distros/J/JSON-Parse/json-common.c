@@ -277,6 +277,10 @@ typedef struct parser {
 
     unsigned int force_unicode : 1;
 
+    /* Upgrade the input from bytes to characters. */
+
+    unsigned int upgrade_utf8 : 1;
+
     /* Top-level value? We need to know this for the case when we are
        parsing a number and suddenly meet a '\0' byte. If it's a top
        level value then we can assume that is just the end of the

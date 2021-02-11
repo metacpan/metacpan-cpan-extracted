@@ -229,14 +229,14 @@ typedef _Decimal128 D128;
 #endif
 
 #define FAILS_CHECK_INPUT_BASE \
-     SvIV(base) < 0 || SvIV(base) > 62 || SvIV(base) == 1
+     !SvIOK(base) || SvIVX(base) < 0 || SvIVX(base) > 62 || SvIVX(base) == 1
 
 #if MPFR_VERSION >= 262400 /* Allowable range of base has been expanded */
 #define FAILS_CHECK_OUTPUT_BASE \
-     SvIV(base) < -36 || SvIV(base) > 62 || abs(SvIV(base)) < 2
+     !(SvIOK(base) && ((SvIVX(base) >= 2 && SvIVX(base) <= 62) || (SvIVX(base) >= -36 && SvIVX(base) <= -2)))
 #else
 #define FAILS_CHECK_OUTPUT_BASE \
-     SvIV(base) < 2 || SvIV(base) > 62
+     !(SvIOK(base) && SvIVX(base) >= 2 && SvIVX(base) <= 62)
 #endif
 
 /* Don't use CHECK_ROUNDING_VALUE macro with Rmpfr_set_NV      *
@@ -379,6 +379,12 @@ typedef _Decimal128 D128;
 #endif
 
 /* For nvtoa() */
+#if defined(MPFR_HAVE_BENDIAN)			/* big endian architecture - defined by Makefile.PL */
+#define INC_OR_DEC(p) p++
+#else						/* little endian */
+#define INC_OR_DEC(p) p--
+#endif
+
 #if defined(NV_IS_53_BIT)
 #define MATH_MPFR_MAX_DIG 17
 #define NVSIZE_BITS 53
@@ -387,17 +393,17 @@ typedef _Decimal128 D128;
 
 # if defined(MPFR_HAVE_BENDIAN)                /* big endian architecture - defined by Makefile.PL */
 
-# define D_CONDITION_1 i<=7
-# define D_INC_OR_DEC i++;
+# define D_CONDITION_1(p) p<=7
 # define DIND_0 0
 # define DIND_1 1
+# define DIND_2 2
 
 # else						/* little endian architecture */
 
-# define D_CONDITION_1 i>=0
-# define D_INC_OR_DEC i--;
+# define D_CONDITION_1(p) p>=0
 # define DIND_0 7
 # define DIND_1 6
+# define DIND_2 5
 
 # endif
 
@@ -409,16 +415,14 @@ typedef _Decimal128 D128;
 
 # if defined(MPFR_HAVE_BENDIAN)                /* big endian architecture - defined by Makefile.PL */
 
-# define LD_CONDITION_1 i<=9
-# define LD_INC_OR_DEC i++;
+# define LD_CONDITION_1(p) p<=9
 # define LDIND_0 0
 # define LDIND_1 1
 # define LDIND_2 2
 
 # else						/* little endian architecture */
 
-# define LD_CONDITION_1 i>=0
-# define LD_INC_OR_DEC i--;
+# define LD_CONDITION_1(p) p>=0
 # define LDIND_0 9
 # define LDIND_1 8
 # define LDIND_2 7
@@ -432,35 +436,33 @@ typedef _Decimal128 D128;
 #define MATH_MPFR_NORMAL_MIN 2.2250738585072014e-308
 
 # if defined(MPFR_HAVE_BENDIAN)                /* big endian architecture - defined by Makefile.PL */
-# define DD_CONDITION_1 i<=7
-# define DD_CONDITION_2 i=2;i<8;i++
-# define DD_INC_OR_DEC i++;
-# define IND_0 0
-# define IND_1 1
-# define LSD_BYTE_1 8
-# define LSD_BYTE_2 9
-# define LSD_BYTE_3 10
-# define LSD_BYTE_4 11
-# define LSD_BYTE_5 12
-# define LSD_BYTE_6 13
-# define LSD_BYTE_7 14
-# define LSD_BYTE_8 15
+# define DD_CONDITION_1(p) p<=7
+# define DD_CONDITION_2(p) p=2;p<8;p++
+# define MSD_IND_0 0
+# define MSD_IND_1 1
+# define LSD_IND_0 8
+# define LSD_IND_1 9
+# define LSD_IND_2 10
+# define LSD_IND_3 11
+# define LSD_IND_4 12
+# define LSD_IND_5 13
+# define LSD_IND_6 14
+# define LSD_IND_7 15
 
 # else                                        /* little endian architecture */
 
 # define DD_CONDITION_1 i>=0
 # define DD_CONDITION_2 i=13;i>7;i--
-# define DD_INC_OR_DEC i--;
-# define IND_0 15
-# define IND_1 14
-# define LSD_BYTE_1 7
-# define LSD_BYTE_2 6
-# define LSD_BYTE_3 5
-# define LSD_BYTE_4 4
-# define LSD_BYTE_5 3
-# define LSD_BYTE_6 2
-# define LSD_BYTE_7 1
-# define LSD_BYTE_8 0
+# define MSD_IND_0 15
+# define MSD_IND_1 14
+# define LSD_IND_0 7
+# define LSD_IND_1 6
+# define LSD_IND_2 5
+# define LSD_IND_3 4
+# define LSD_IND_4 3
+# define LSD_IND_5 2
+# define LSD_IND_6 1
+# define LSD_IND_7 0
 
 # endif /* MPFR_HAVE_BENDIAN */
 
@@ -472,16 +474,14 @@ typedef _Decimal128 D128;
 
 # if defined(MPFR_HAVE_BENDIAN)                /* big endian architecture - defined by Makefile.PL */
 
-# define Q_CONDITION_1 i<=15
-# define Q_INC_OR_DEC i++;
+# define Q_CONDITION_1(p) p<=15
 # define QIND_0 0
 # define QIND_1 1
 # define QIND_2 2
 
 # else						/* little endian architecture */
 
-# define Q_CONDITION_1 i>=0
-# define Q_INC_OR_DEC i--;
+# define Q_CONDITION_1(p) p>=0
 # define QIND_0 15
 # define QIND_1 14
 # define QIND_2 13

@@ -58,6 +58,7 @@ t/syntax.t
 t/test-empty-string.t
 t/test.json
 t/unicode.t
+t/upgrade-utf8.t
 t/utf8.t
 t/valid-json.t
 t/whitespace.t

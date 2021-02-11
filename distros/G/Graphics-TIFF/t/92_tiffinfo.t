@@ -4,6 +4,8 @@ use English;
 use IPC::Cmd qw(can_run);
 use Test::More;
 use Test::Requires qw( v5.10 Image::Magick );
+use File::Temp;
+use File::Spec;
 
 #########################
 
@@ -15,59 +17,60 @@ else {
     exit;
 }
 
+my $directory = File::Temp->newdir;
+my $file = File::Spec->catfile( $directory, 'test.tif' );
 my $image = Image::Magick->new;
 $image->Read( 'rose:', 'rose:' );
 $image->Set( density => '72x72' );
-$image->Write('test.tif');
+$image->Write($file);
 my $cmd = 'PERL5LIB="blib:blib/arch:lib:$PERL5LIB" '
   . "$EXECUTABLE_NAME examples/tiffinfo.pl";
 
-is( `$cmd test.tif`, `tiffinfo test.tif`, 'basic multi-directory' );
+is( `$cmd $file`, `tiffinfo $file`, 'basic multi-directory' );
 
-is( `$cmd -2 test.tif`, `tiffinfo -2 test.tif`, 'dirnum' );
+is( `$cmd -2 $file`, `tiffinfo -2 $file`, 'dirnum' );
 
 $image = Image::Magick->new;
 $image->Read('rose:');
 $image->Set( density => '72x72' );
-$image->Write('test.tif');
+$image->Write($file);
 
-is( `$cmd -d test.tif`, `tiffinfo -d test.tif`, '-d' );
+is( `$cmd -d $file`, `tiffinfo -d $file`, '-d' );
 
-is( `$cmd -D test.tif`, `tiffinfo -D test.tif`, '-D' );
+is( `$cmd -D $file`, `tiffinfo -D $file`, '-D' );
 
 is(
-    `$cmd -d -f lsb2msb test.tif`,
-    `tiffinfo -d -f lsb2msb test.tif`,
+    `$cmd -d -f lsb2msb $file`,
+    `tiffinfo -d -f lsb2msb $file`,
     '-f lsb2msb'
 );
 
 is(
-    `$cmd -d -f msb2lsb test.tif`,
-    `tiffinfo -d -f msb2lsb test.tif`,
+    `$cmd -d -f msb2lsb $file`,
+    `tiffinfo -d -f msb2lsb $file`,
     '-f msb2lsb'
 );
 
-is( `$cmd -c test.tif`, `tiffinfo -c test.tif`, '-c' );
+is( `$cmd -c $file`, `tiffinfo -c $file`, '-c' );
 
-is( `$cmd -i test.tif`, `tiffinfo -i test.tif`, '-i' );
+is( `$cmd -i $file`, `tiffinfo -i $file`, '-i' );
 
-is( `$cmd -o 2 test.tif 2>&1`, `tiffinfo -o 2 test.tif 2>&1`, '-o' );
+is( `$cmd -o 2 $file 2>&1`, `tiffinfo -o 2 $file 2>&1`, '-o' );
 
-is( `$cmd -j test.tif`, `tiffinfo -j test.tif`, '-j' );
+is( `$cmd -j $file`, `tiffinfo -j $file`, '-j' );
 
-is( `$cmd -r -d test.tif`, `tiffinfo -r -d test.tif`, '-r -d' );
+is( `$cmd -r -d $file`, `tiffinfo -r -d $file`, '-r -d' );
 
-is( `$cmd -s -d test.tif`, `tiffinfo -s -d test.tif`, '-s -d' );
+is( `$cmd -s -d $file`, `tiffinfo -s -d $file`, '-s -d' );
 
-is( `$cmd -w -d test.tif`, `tiffinfo -w -d test.tif`, '-w -d' );
+is( `$cmd -w -d $file`, `tiffinfo -w -d $file`, '-w -d' );
 
-is( `$cmd -z -d test.tif`, `tiffinfo -z -d test.tif`, '-z -d' );
+is( `$cmd -z -d $file`, `tiffinfo -z -d $file`, '-z -d' );
 
 # strip '' from around ?, which newer glibc libraries seem to have added
-my $expected = `tiffinfo -? test.tif 2>&1`;
+my $expected = `tiffinfo -? $file 2>&1`;
 $expected =~ s/'\?'/?/xsm;
-is( `$cmd -? test.tif 2>&1`, $expected, '-?' );
+is( `$cmd -? $file 2>&1`, $expected, '-?' );
 
 #########################
 
-unlink 'test.tif';

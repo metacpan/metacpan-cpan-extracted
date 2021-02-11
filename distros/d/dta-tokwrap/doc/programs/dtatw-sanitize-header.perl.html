@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title></title>
+<title>dtatw-sanitize-header.perl - make DDC/DTA-friendly TEI-headers</title>
 <link rel="stylesheet" href="dtatw.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
@@ -198,7 +198,7 @@
 
 <p>The metadata attributes currently supported are listed below; Source XPaths in the list are specified relative to the root <code>&lt;teiHeader&gt;</code> element, and unless otherwise noted, the first source XPath listed is also the target XPath, guaranteed to be exist in the output header on successful script completion.</p>
 
-<p>See <a href="http://kaskade.dwds.de/dstar/doc/README.html#bibliographic_metadata_attributes">http://kaskade.dwds.de/dstar/doc/README.html#bibliographic_metadata_attributes</a> for details on D* metadata attribute conventions.</p>
+<p>See <a href="https://kaskade.dwds.de/dstar/doc/README.html#bibliographic_metadata_attributes">https://kaskade.dwds.de/dstar/doc/README.html#bibliographic_metadata_attributes</a> for details on D* metadata attribute conventions.</p>
 
 <h2 id="author">author</h2>
 
@@ -338,7 +338,11 @@
 
 <p>Source XPath(s):</p>
 
-<pre><code> profileDesc/textClass/classCode[@scheme=&quot;http://www.deutschestextarchiv.de/doku/klassifikation#dwds1main&quot;]
+<pre><code> profileDesc/textClass/classCode[@scheme=&quot;https://www.deutschestextarchiv.de/doku/klassifikation#dwds1main&quot;]
+ profileDesc/textClass/classCode[@scheme=&quot;https://www.deutschestextarchiv.de/doku/klassifikation#dwds1sub&quot;]
+ profileDesc/textClass/classCode[@scheme=&quot;https://www.deutschestextarchiv.de/doku/klassifikation#dwds2main&quot;]
+ profileDesc/textClass/classCode[@scheme=&quot;https://www.deutschestextarchiv.de/doku/klassifikation#dwds2sub&quot;]
+ profileDesc/textClass/classCode[@scheme=&quot;http://www.deutschestextarchiv.de/doku/klassifikation#dwds1main&quot;]
  profileDesc/textClass/classCode[@scheme=&quot;http://www.deutschestextarchiv.de/doku/klassifikation#dwds1sub&quot;]
  profileDesc/textClass/classCode[@scheme=&quot;http://www.deutschestextarchiv.de/doku/klassifikation#dwds2main&quot;]
  profileDesc/textClass/classCode[@scheme=&quot;http://www.deutschestextarchiv.de/doku/klassifikation#dwds2sub&quot;]
@@ -352,7 +356,9 @@
 
 <p>Source XPath(s):</p>
 
-<pre><code> profileDesc/textClass/classCode[@scheme=&quot;http://www.deutschestextarchiv.de/doku/klassifikation#dtamain&quot;]
+<pre><code> profileDesc/textClass/classCode[@scheme=&quot;https://www.deutschestextarchiv.de/doku/klassifikation#dtamain&quot;]
+ profileDesc/textClass/classCode[@scheme=&quot;https://www.deutschestextarchiv.de/doku/klassifikation#dtasub&quot;]
+ profileDesc/textClass/classCode[@scheme=&quot;http://www.deutschestextarchiv.de/doku/klassifikation#dtamain&quot;]
  profileDesc/textClass/classCode[@scheme=&quot;http://www.deutschestextarchiv.de/doku/klassifikation#dtasub&quot;]</code></pre>
 
 <p>Target XPath:</p>
@@ -363,7 +369,8 @@
 
 <p>Source XPath(s):</p>
 
-<pre><code> profileDesc/textClass/classCode[@scheme=&quot;http://www.deutschestextarchiv.de/doku/klassifikation#DTACorpus&quot;]</code></pre>
+<pre><code> profileDesc/textClass/classCode[@scheme=&quot;https://www.deutschestextarchiv.de/doku/klassifikation#DTACorpus&quot;]
+ profileDesc/textClass/classCode[@scheme=&quot;http://www.deutschestextarchiv.de/doku/klassifikation#DTACorpus&quot;]</code></pre>
 
 <p>Target XPath:</p>
 

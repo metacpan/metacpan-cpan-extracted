@@ -5,8 +5,9 @@ use version 0.77;
 use Mojo::Util 'dumper';
 use Sentry::Client;
 use Sentry::Hub;
+use Sentry::Logger 'logger';
 
-our $VERSION = version->declare('0.10.3');
+our $VERSION = version->declare('v1.0.2');
 
 sub _call_on_hub ($method, @args) {
   my $hub = Sentry::Hub->get_current_hub();
@@ -33,7 +34,9 @@ sub init ($package, $options = {}) {
   $options->{environment}          //= $ENV{SENTRY_ENVIRONMENT};
   $options->{_metadata}            //= {};
   $options->{_metadata}{sdk}
-    = { name => 'sentry.perl', packages => [], version => 'fixme' };
+    = { name => 'sentry.perl', packages => [], version => $VERSION };
+
+  logger->active_contexts(['.*']) if $options->{debug};
 
   _init_and_bind($options);
 }
@@ -85,7 +88,116 @@ Sentry::SDK - sentry.io integration
 
   use Sentry::SDK;
 
+  Sentry::SDK->init({
+    dsn => "https://examplePublicKey@o0.ingest.sentry.io/0",
+
+    # Adjusting this value in production
+    traces_sample_rate => 1.0,
+  });
+
 =head1 DESCRIPTION
+
+=head1 FUNCTIONS
+
+=head2 init
+
+  Sentry::SDK->init(\%options);
+
+Initializes the Sentry SDK in your app. The following options are provided:
+
+=head3 dsn
+
+The DSN tells the SDK where to send the events. If this value is not provided, the SDK will try to read it from the C<SENTRY_DSN> environment variable. If that variable also does not exist, the SDK will just not send any events.
+
+=head3 release
+
+Sets the release. Defaults to the C<SENTRY_RELEASE> environment variable.
+
+=head3 environment
+
+Sets the environment. This string is freeform and not set by default. A release can be associated with more than one environment to separate them in the UI (think staging vs prod or similar).
+
+By default the SDK will try to read this value from the C<SENTRY_ENVIRONMENT> environment variable.
+
+=head3 traces_sample_rate
+
+A number between 0 and 1, controlling the percentage chance a given transaction will be sent to Sentry. (0 represents 0% while 1 represents 100%.) Applies equally to all transactions created in the app. This must be defined to enable tracing.
+
+=head3 integrations
+
+  Sentry::SDK->init({
+    integrations => [My::Integration->new],
+  });
+
+Enables your custom integration. Optional.
+
+=head3 default_integrations
+
+This can be used to disable integrations that are added by default. When set to a falsy value, no default integrations are added.
+
+=head3 debug
+
+Enables debug printing.
+
+=head2 add_breadcrumb
+
+  Sentry::SDK->add_breadcrumb({
+    category => "auth",
+    message => "Authenticated user " . user->{email},
+    level => Sentry::Severity->Info,
+  });
+
+You can manually add breadcrumbs whenever something interesting happens. For example, you might manually record a breadcrumb if the user authenticates or another state change happens.
+
+=head2 capture_exception
+
+  eval {
+    $app->run();
+  };
+  if ($@) {
+    Sentry::SDK->capture_exception($@);
+  }
+
+You can pass an error object to capture_exception() to get it captured as event. It's possible to throw strings as errors.
+
+=head2 capture_message
+
+  Sentry::SDK->capture_message("Something went wrong");
+
+Another common operation is to capture a bare message. A message is textual information that should be sent to Sentry. Typically messages are not emitted, but they can be useful for some teams.
+
+=head2 capture_event
+
+  Sentry::SDK->capture_event(\%data);
+
+Captures a manually created event and sends it to Sentry.
+
+=head2 configure_scope
+
+  Sentry::SDK->configure_scope(sub ($scope) {
+    $scope->set_tag(foo => "bar");
+    $scope->set-user({id => 1, email => "john.doe@example.com"});
+  });
+
+When an event is captured and sent to Sentry, event data with extra information will be merged from the current scope. The C<configure_scope> function can be used to reconfigure the current scope. This for instance can be used to add custom tags or to inform sentry about the currently authenticated user. See L<Sentry::Hub::Scope> for further information.
+
+=head2 start_transaction
+
+  my $transaction = Sentry::SDK->start_transaction({
+    name => 'MyScript',
+    op => 'http.server',
+  });
+
+  Sentry::SDK->configure_scope(sub ($scope) {
+    $scope->set_span($transaction);
+  });
+
+  # ...
+
+  $transaction->set_http_status(200);
+  $transaction->finish();
+
+Is needed for recording tracing information. Transactions are usually handled by the respective framework integration. See L<Sentry::Tracing::Transaction>.
 
 =head1 AUTHOR
 

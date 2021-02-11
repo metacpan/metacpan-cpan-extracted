@@ -54,3 +54,28 @@ sub register ($self, $app, $conf) {
 }
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Mojolicious::Plugin::SentrySDK - Sentry plugin for Mojolicious
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+=head2 register
+
+  my $config = $plugin->register(Mojolicious->new);
+  my $config = $plugin->register(Mojolicious->new, \%options);
+
+Register Sentry in L<Mojolicious> application.
+
+=head1 SEE ALSO
+
+L<Sentry::SDK>.
+
+=cut

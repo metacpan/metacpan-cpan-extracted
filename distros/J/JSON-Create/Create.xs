@@ -47,7 +47,7 @@ PREINIT:
 	json_create_t * jc = & jc_stack;
 CODE:
 	JCSET;
-	RETVAL = json_create_run (jc, input);
+	RETVAL = json_create_create (jc, input);
 OUTPUT:
 	RETVAL
 
@@ -60,7 +60,7 @@ PREINIT:
 CODE:
 	JCSET;
 	jc_stack.strict = 1;
-	RETVAL = json_create_run (jc, input);
+	RETVAL = json_create_create (jc, input);
 OUTPUT:
 	RETVAL
 
@@ -78,11 +78,11 @@ OUTPUT:
 	RETVAL
 
 SV *
-run (jc, input)
+create (jc, input)
 	JSON::Create jc;
 	SV * input
 CODE:
-	RETVAL = json_create_run (jc, input);
+	RETVAL = json_create_create (jc, input);
 OUTPUT:
 	RETVAL
 

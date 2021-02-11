@@ -2,7 +2,7 @@
 #
 # 0002_basic_test.t
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
@@ -30,6 +30,8 @@ BEGIN {
 
 use Jacode4e::RoundTrip;
 
+@_ = ();
+%_ = ();
 for my $test (@test) {
     my($give,$OUTPUT_encoding,$INPUT_encoding,$option,$want) = @{$test};
     my $got = $give;

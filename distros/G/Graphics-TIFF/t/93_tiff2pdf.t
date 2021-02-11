@@ -4,6 +4,8 @@ use English;
 use IPC::Cmd qw(can_run);
 use Test::More;
 use Test::Requires qw( v5.10 Image::Magick );
+use File::Temp;
+use File::Spec;
 
 #########################
 
@@ -15,11 +17,12 @@ else {
     exit;
 }
 
+my $directory = File::Temp->newdir;
 my $cmd = 'PERL5LIB="blib:blib/arch:lib:$PERL5LIB" '
   . "$EXECUTABLE_NAME examples/tiff2pdf.pl";
-my $tif            = 'test.tif';
-my $pdf            = 'C.pdf';
-my $compressed_tif = 'comp.tif';
+my $tif            = File::Spec->catfile( $directory, 'test.tif' );
+my $pdf            = File::Spec->catfile( $directory, 'C.pdf' );
+my $compressed_tif = File::Spec->catfile( $directory, 'comp.tif' );
 my $make_reproducible =
 'grep --binary-files=text -v "/ID" | grep --binary-files=text -v "/CreationDate" | grep --binary-files=text -v "/ModDate" | grep --binary-files=text -v "/Producer"';
 
@@ -35,7 +38,7 @@ is( `$cmd -? $tif 2>&1`, $expected, '-?' );
 my $image = Image::Magick->new;
 $image->Read('rose:');
 $image->Set( density => '72x72' );
-$image->Write('test.tif');
+$image->Write($tif);
 system("tiff2pdf -d -o $pdf $tif");
 
 $expected = `cat $pdf | $make_reproducible | hexdump`;
@@ -77,4 +80,3 @@ SKIP: {
 
 #########################
 
-unlink $tif, $compressed_tif, $pdf;

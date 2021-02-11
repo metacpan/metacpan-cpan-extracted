@@ -18,20 +18,20 @@ produces output
 
     {"c":"d","a":"b"}
 
-(This example is included as L<F<examples/synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<examples/synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This document describes JSON::Create version 0.30,
-corresponding to L<git commit bab30b64e7903fd89cb46e60815dfd18971da1af|https://github.com/benkasminbullock/json-create/commit/bab30b64e7903fd89cb46e60815dfd18971da1af> at Mon Jan 4 08:53:12 2021 +0900.
+This document describes JSON::Create version 0.31,
+corresponding to L<git commit 410edf6d0cefd3b9b9e7f8b25b0f3943a8e023e5|https://github.com/benkasminbullock/json-create/commit/410edf6d0cefd3b9b9e7f8b25b0f3943a8e023e5> at Thu Feb 11 18:06:40 2021 +0900.
 
 =head1 DESCRIPTION
 
 JSON::Create encodes Perl variables into JSON. The basic routine
 L</create_json> gives common defaults. The stricter version
 L</create_json_strict> accepts only unambiguous inputs. For more
-customization, an object created with L</new> and run with L</run>
+customization, an object created with L</new> and run with L</create>
 allows specifying behaviour in more detail.
 
 JSON::Create handles no string encoding except UTF-8. It supports
@@ -63,6 +63,9 @@ inputs. See L</strict> for details. It is effectively identical to
 
     my $json = create_json (\%hash, %args, strict => 1);
 
+The "strict" option can be set in C<%args> without producing an error,
+but it will be overridden.
+
 This function was added in version 0.20 of the module.
 
 =head2 write_json
@@ -75,394 +78,20 @@ arguments as L</create_json>, L</new> and L</set>.
 
 This function was added in version 0.30 of the module.
 
-=head1 CONVERSIONS
-
-This section details what conversions are applied to the various
-inputs to produce outputs.
-
-=head2 Hashes
-
-JSON::Create turns associative arrays into JSON objects. The keys are
-written into JSON as strings, with control characters escaped. The
-order of the keys is as they are supplied by Perl.
-
-    
-    use JSON::Create 'create_json';
-    my %example = (
-        x => 1,
-        y => 2,
-        z => 3,
-    );
-    print create_json (\%example);
-
-
-produces output
-
-    {"y":2,"x":1,"z":3}
-
-(This example is included as L<F<examples/hash.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/hash.pl> in the distribution.)
-
-
-Nested hashes are recursively followed:
-
-    
-    use JSON::Create 'create_json';
-    my %example = (
-        x => {
-            y => 2,
-            z => 3,
-        },
-        a => {
-            b => 4,
-            c => 5,
-        },
-    );
-    print create_json (\%example);
-
-
-produces output
-
-    {"x":{"z":3,"y":2},"a":{"b":4,"c":5}}
-
-(This example is included as L<F<examples/nested-hash.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/nested-hash.pl> in the distribution.)
-
-
-=head2 Arrays
-
-Arrays are converted to JSON arrays. The order of elements of the
-array is left unchanged.
-
-    
-    use JSON::Create 'create_json';
-    my @array = (1, 2, 2.5, qw/mocha dusty milky/, qw/Tico Rocky Pinky/);
-    print create_json (\@array);
-
-
-produces output
-
-    [1,2,2.5,"mocha","dusty","milky","Tico","Rocky","Pinky"]
-
-(This example is included as L<F<examples/array.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/array.pl> in the distribution.)
-
-
-Nested arrays are recursively followed:
-
-    
-    use JSON::Create 'create_json';
-    my @array = ([1, 2, 2.5], [qw/mocha dusty milky/], [qw/Tico Rocky Pinky/]);
-    print create_json (\@array);
-
-
-produces output
-
-    [[1,2,2.5],["mocha","dusty","milky"],["Tico","Rocky","Pinky"]]
-
-(This example is included as L<F<examples/nested-array.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/nested-array.pl> in the distribution.)
-
-
-Nested hashes and arrays are converted similarly:
-
-    
-    use JSON::Create 'create_json';
-    my $nested = {
-        numbers => [1, 2, 2.5, 99.99],
-        cats => [qw/mocha dusty milky/],
-        dogs => [qw/Tico Rocky Pinky/],
-        fruit => {
-            thai => 'pineapple',
-            japan => 'persimmon',
-            australia => 'orange',
-        },
-    };
-    print create_json ($nested, sort => 1, indent => 1);
-
-
-produces output
-
-    {
-            "cats":[
-                    "mocha",
-                    "dusty",
-                    "milky"
-            ],
-            "dogs":[
-                    "Tico",
-                    "Rocky",
-                    "Pinky"
-            ],
-            "fruit":{
-                    "australia":"orange",
-                    "japan":"persimmon",
-                    "thai":"pineapple"
-            },
-            "numbers":[
-                    1,
-                    2,
-                    2.5,
-                    99.99
-            ]
-    }
-
-
-(This example is included as L<F<examples/nested.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/nested.pl> in the distribution.)
-
-
-=head2 Scalars
-
-Non-reference Perl scalars are converted to JSON strings or numbers,
-depending on what Perl thinks they contain.
-
-=head3 Strings
-
-As far as possible, strings are written as they are to the JSON. 
-
-JSON is Unicode, so all output is checked for Unicode
-validity. Further, this module insists on UTF-8. (See L</Input strings
-must be UTF-8>.) Invalid UTF-8 within input strings produces the error
-L</Invalid UTF-8> and the undefined value is returned. This behaviour can be altered with the method L</replace_bad_utf8>. (For full details of the corner cases, see
-L</UNICODE HANDLING>.)
-
-Some whitespace and control characters must be also escaped for the
-output to be valid JSON. (See L</RFC 8259>.) 
-
-In addition to this, L</create_json_strict> or the L</strict> option
-reject inputs containing non-ASCII bytes (bytes with values of from
-128 to 255) which are not marked as character strings.
-
-=head4 Control characters and whitespace
-
-To form valid JSON, bytes of value less than 0x20 in a Perl string
-must be converted into JSON escapes, either the whitespace escapes \b
-(backspace) \r, \t, \n, and \f, or the form \u0001 for other control
-characters. Further, the backslash must be written as C<\\> and double
-quotes must be written as C<\">.
-
-This example demonstrates some of the necessary escaping:
-
-    
-    use JSON::Create 'create_json';
-    # An example string containing various things.
-    my $weirdstring = {weird => "\t\r\n\x00 " . '"' . '\\' . '/' };
-    print create_json ($weirdstring);
-    
-
-
-produces output
-
-    {"weird":"\t\r\n\u0000 \"\\/"}
-
-(This example is included as L<F<examples/weirdstring.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/weirdstring.pl> in the distribution.)
-
-
-=head4 U+2028 and U+2029 (JavaScript clashes)
-
-    my $out = create_json (["\x{2028}"]);
-    # $out = '["\u2028"]'
-
-Although it is not required by the JSON standard, JSON::Create by
-default escapes Unicode code points U+2028 and U+2029 as C<\u2028> and
-C<\u2029> for JavaScript compatibility. This behaviour can be altered with the method L</no_javascript_safe>.
-
-This escaping is necessary for JavaScript because of a clash between
-the JSON standard and the JavaScript (ECMAScript) standard. The
-characters U+2028 ("LINE SEPARATOR" in the Unicode standard) and
-U+2029 ("PARAGRAPH SEPARATOR" in the Unicode standard) are valid
-within JSON, as defined by L</RFC 8259>, but invalid within JavaScript
-strings, as defined by the ECMA standard (See ECMA Standard ECMA-262,
-"ECMAScript Language Specification", 3rd Edition, section 7.3 "Line
-Terminators").
-
-=head4 Other escapes
-
-The forward slash, /, known as "solidus" in the JSON specification,
-does not have to be escaped, and JSON::Create's default is not to
-escape it. This behaviour can be altered with the method L</escape_slash>.
-
-Other Unicode values are not escaped.  This behaviour can be altered with the method L</unicode_escape_all>.
-
-=head3 Integers
-
-Integers are printed in the usual way. Perl may interpret an integer
-with a very large absolute value to be a floating point number, and
-this module will print it out as such. See also L</Context-dependent
-variables> for the handling of variables with both string and integer
-values.
-
-=head3 Floating point numbers
-
-Finite floating point numbers are printed using printf formatting via
-C<"%g">, like
-
-    printf ("%g", $number);
-
-This behaviour can be altered with the method L</set_fformat>
-
-JSON does not allow NaN or infinity as bare values. From page 6 of
-L</RFC 8259>:
-
-=over
-
-Numeric values that cannot be represented in the grammar below (such
-as Infinity and NaN) are not permitted.
-
-=back
-
-L</create_json> converts NaN (not a number) values to
-C<"nan"> (the letters C<nan> surrounded by double quotes), and
-positive and negative infinity to C<"inf"> and C<"-inf">
-respectively.
-
-L</create_json_strict> disallows non-finite numbers. If a non-finite
-number appears within its input, it prints a warning L</Non-finite
-number in input> and returns the undefined value:
-
-    
-    use JSON::Create 'create_json_strict';
-    print create_json_strict (9**9**9);
-    
-
-
-produces output
-
-    Non-finite number in input at /usr/home/ben/projects/json-create/blib/lib/JSON/Create.pm line 200.
-    Use of uninitialized value in print at /usr/home/ben/projects/json-create/examples/strict-non-finite.pl line 5.
-
-
-(This example is included as L<F<examples/strict-non-finite.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/strict-non-finite.pl> in the distribution.)
-
-
-A JSON::Create object created with L</new> converts in the same way as
-L</create_json>.  This behaviour can be altered with the method L</non_finite_handler>. If L</strict> is
-specified, non-finite numbers are passed to L</non_finite_handler> if
-it is set, and if not, it prints a warning L</Non-finite number in
-input> and returns the undefined value.
-
-=head3 The undefined value
-
-Undefined values in the input are mapped to the JSON literal "null".
-
-    
-    use JSON::Create 'create_json';
-    print create_json ({a => undef, b => [undef, undef]}), "\n";
-    
-
-
-produces output
-
-    {"a":null,"b":[null,null]}
-
-
-(This example is included as L<F<examples/undef.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/undef.pl> in the distribution.)
-
-
-=head3 Booleans
-
-Booleans (C<true> and C<false>) from input via JSON::Parse version
-0.37 or later will be turned into the outputs C<true> and
-C<false>:
-
-    
-    use JSON::Parse '0.38', 'parse_json';
-    use JSON::Create 'create_json';
-    my $in = parse_json ('[true,false,"boo"]');
-    print create_json ($in);
-
-
-produces output
-
-    [true,false,"boo"]
-
-(This example is included as L<F<examples/json-parse-bool.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/json-parse-bool.pl> in the distribution.)
-
-
-Other kinds of object can be converted to booleans using the method
-L</bool> (see below).
-
-=head3 Context-dependent variables
-
-A context-dependent variable is a variable which may contain a string
-and a numerical value. Usually the string value is just a
-representation of the number, but it may not be. The behaviour in the
-case of a context-dependent variable is as follows.
-
-If the variable contains a valid numerical value, the numerical value
-is used in the output JSON, rather than the string value. However,
-some modules, like L<Unicode::UCD/charinfo>, return context-dependent
-hash values which have a non-number-like string under the key
-C<script> with values such as C<Latin> or C<Common> but no valid
-numerical value, despite being marked as context-dependent
-variables. In such cases, the string value is used. (In terms of XS,
-if the scalar is marked as C<SVt_PVIV> or C<SVt_PVNV>, the scalar is
-tested with C<SvIOK> or C<SvNOK> respectively, and if this is true the
-numerical value is used, if false the string value is used.)
-
-Up to version 0.25, this module wrongly assumed that the string part
-of a context-dependent variable would always be a valid representation
-of a number, and the string was added to the output without quote
-marks. In version 0.26, checking was done to see if the string
-actually was a number. In version 0.27 this approach was abandoned and
-the numerical value was given precedence. In version 0.28 this was
-again altered for the sake of unusual cases like the C<script> key
-returned by L<Unicode::UCD/charinfo>, where the scalar is marked as
-having a numerical value but does not in fact contain a valid
-numerical value.
-
-=head2 Other types
-
-JSON::Create is meant to provide serialization of data types. It does
-not provide built-in serialization of Perl objects and other non-data
-types, such as code references or regular expressions, beyond a few
-basic defaults. How to handle non-data types is left completely up to
-users. These basic defaults, and how to set up more extensive
-handling, are described in the following subsections.
-
-=head3 Scalar references
-
-L</create_json> dereferences scalar references, then treats them as
-scalars in the way described in L</Scalars>. 
-
-L</create_json_strict> rejects scalar references. Input containing a
-scalar reference causes a warning L</Input's type cannot be serialized
-to JSON> and the undefined value to be returned.
-
-A JSON::Create object created with L</new> behaves as L</create_json>
-unless the L</strict> option is specified. If the strict option is
-specified, scalar references are passed through to L</type_handler> if
-it is set, otherwise input containing a scalar reference causes a
-warning L</Input's type cannot be serialized to JSON> and the
-undefined value to be returned.
-
-=head3 Objects
-
-L</create_json> handles Perl objects as if non-object
-types. In other words, unless you specify object handling, it breaks
-encapsulation. 
-
-L</create_json_strict> rejects input containing Perl objects. If the
-input contains an object (a blessed reference), a warning L</Object
-cannot be serialized to JSON> is printed and the undefined value
-returned.
-
-A JSON::Create object created with L</new> can handle specified types
-of object with method L</obj>, or with a general object handler
-supplied via L</obj_handler>. By default it behaves like
-L</create_json>. If L</strict> is chosen, it rejects input containing
-Perl objects unless the user sets a handler for them with L</obj> or
-L</obj_handler>.
-
-=head3 Code, regexes, and other references
-
-A code or other reference (regexes, globs, etc.) in the input of
-L</create_json> or L</create_json_strict> prints a warning L</Input's
-type cannot be serialized to JSON> and causes the entire return value
-to be the undefined value. This behaviour can be altered with the method L</type_handler>.
-
 =head1 METHODS
 
 If you need to alter the format of the output from the defaults of
 L</create_json> or L</create_json_strict>, create an object with
 L</new> and then set preferences on that object before producing
-output with L</run>.
+output with L</create>.
+
+=head2 create
+
+    my $json = $jc->create ($input);
+
+This does exactly the same thing as L</create_json>, unless the output
+format associated with C<$jc> has been altered using L</Methods for
+formatting the output>. The return value is the output JSON.
 
 =head2 fatal_errors
 
@@ -490,7 +119,7 @@ produces output
     
 
 
-(This example is included as L<F<examples/fatal-errors.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/fatal-errors.pl> in the distribution.)
+(This example is included as L<F<examples/fatal-errors.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/fatal-errors.pl> in the distribution.)
 
 
 This method was added in version 0.10 of the module.
@@ -499,20 +128,12 @@ This method was added in version 0.10 of the module.
 
     my $jc = JSON::Create->new ();
 
-Create a new "JSON::Create" object. Use L</run> to generate JSON with
+Create a new "JSON::Create" object. Use L</create> to generate JSON with
 it. It is possible to supply arguments with new:
 
     my $jc = JSON::Create->new (%args);
 
 All of the same values as L</set> may be used.
-
-=head2 run
-
-    my $json = $jc->run ($input);
-
-This does exactly the same thing as L</create_json>, unless the output
-format associated with C<$jc> has been altered using L</Methods for
-formatting the output>. The return value is the output JSON.
 
 =head2 set
 
@@ -626,7 +247,7 @@ This switches on rejection of ambiguous inputs, which means
 
 =back
 
-Calling L</run> with such inputs results in a return value of C<undef>
+Calling L</create> with such inputs results in a return value of C<undef>
 (the undefined value) and a warning being printed. You can override
 the behaviour for objects with L</obj>, L</obj_handler>, for non-data
 types and scalar references with L</type_handler>, and for non-finite
@@ -642,7 +263,7 @@ This method was added in version 0.20 of the module.
 
 These methods work on the object created with L</new> to format the
 output JSON in a different way from the default when operating
-L</run>. 
+L</create>. 
 
 These methods do not affect the behaviour of L</create_json> or
 L</create_json_strict>.
@@ -676,7 +297,7 @@ produces output
     {"Yes":true,"No":false}
 
 
-(This example is included as L<F<examples/boolean.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/boolean.pl> in the distribution.)
+(This example is included as L<F<examples/boolean.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/boolean.pl> in the distribution.)
 
 
 If you prefer to take over all object handling yourself, there is also
@@ -796,7 +417,7 @@ produces output
     }
 
 
-(This example is included as L<F<examples/cmp.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/cmp.pl> in the distribution.)
+(This example is included as L<F<examples/cmp.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/cmp.pl> in the distribution.)
 
 
 This method was added in version 0.29 of the module.
@@ -806,15 +427,13 @@ This method was added in version 0.29 of the module.
     $jc->downgrade_utf8 (1);
 
 If this is set to a true value, the return value of L</create_json> or
-L</run> is never upgraded to character strings, or C<utf8>. This
+L</create> is never upgraded to character strings, or C<utf8>. This
 overrides the default behaviour, which is to upgrade the output to
 C<utf8> if any part of the input is C<utf8>, or if the user has
 requested replacement with L</replace_bad_utf8> and there are bad
 characters in the user's input. See L</UNICODE HANDLING> for
 details. All output of JSON::Create is valid UTF-8, regardless of what
 this flag is set to. See L</Output is valid UTF-8>.
-
-This method should be considered experimental.
 
 This method was added in version 0.18 of the module.
 
@@ -847,7 +466,7 @@ produces output
     {"/dog/":"/run/"}
 
 
-(This example is included as L<F<examples/escape-slash.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/escape-slash.pl> in the distribution.)
+(This example is included as L<F<examples/escape-slash.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/escape-slash.pl> in the distribution.)
 
 
 See also L</Other escapes>.
@@ -897,7 +516,7 @@ produces output
     }
 
 
-(This example is included as L<F<examples/indent.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/indent.pl> in the distribution.)
+(This example is included as L<F<examples/indent.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/indent.pl> in the distribution.)
 
 
 =head3 Reformatting the indentation
@@ -940,7 +559,7 @@ produces output
     }
 
 
-(This example is included as L<F<examples/indent-format.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/indent-format.pl> in the distribution.)
+(This example is included as L<F<examples/indent-format.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/indent-format.pl> in the distribution.)
 
 
 This method was added in version 0.27 of the module.
@@ -970,7 +589,7 @@ produces output
     [" "]
 
 
-(This example is included as L<F<examples/js-safe.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/js-safe.pl> in the distribution.)
+(This example is included as L<F<examples/js-safe.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/js-safe.pl> in the distribution.)
 
 
 See also L</U+2028 and U+2029 (JavaScript clashes)>.
@@ -1007,7 +626,7 @@ produces output
     {"curry":null}
 
 
-(This example is included as L<F<examples/non-finite-handler.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/non-finite-handler.pl> in the distribution.)
+(This example is included as L<F<examples/non-finite-handler.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/non-finite-handler.pl> in the distribution.)
 
 
 =over
@@ -1026,7 +645,7 @@ use a closure. See the discussion at L</obj> for an example.
 =item * Returning undef halts processing
 
 
-If your handler returns the undefined value, L</run> prints a warning
+If your handler returns the undefined value, L</create> prints a warning
 L</Undefined value from user routine>, halts further processing of the
 input, and returns the undefined value.
 
@@ -1054,7 +673,7 @@ validation of user-supplied JSON> for more about this error.
 =item * Exception handling
 
 Exceptions (C<die>) thrown within C<non_finite_handler> callbacks are not
-caught by L</run> but passed through to the parent. Please see the
+caught by L</create> but passed through to the parent. Please see the
 discussion at L</obj> for an example.
 
 =back
@@ -1117,7 +736,7 @@ produces output
     {"zilog":"I can address as many as 64 kbytes of memory"}
 
 
-(This example is included as L<F<examples/zilog.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/zilog.pl> in the distribution.)
+(This example is included as L<F<examples/zilog.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/zilog.pl> in the distribution.)
 
 
 The function is called "in scalar context", so
@@ -1137,7 +756,7 @@ produces output
 
     {"x":"c"}
 
-(This example is included as L<F<examples/too-many-values.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/too-many-values.pl> in the distribution.)
+(This example is included as L<F<examples/too-many-values.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/too-many-values.pl> in the distribution.)
 
 
 If you need to pass or return more than a single argument, use a
@@ -1167,7 +786,7 @@ produces output
 
     {"cool":false}
 
-(This example is included as L<F<examples/closure.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/closure.pl> in the distribution.)
+(This example is included as L<F<examples/closure.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/closure.pl> in the distribution.)
 
 
 =head3 Throwing an exception in your callback
@@ -1200,14 +819,14 @@ produces output
     
 
 
-(This example is included as L<F<examples/exception.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/exception.pl> in the distribution.)
+(This example is included as L<F<examples/exception.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/exception.pl> in the distribution.)
 
 
 If you prefer to take over all object handling yourself, there is also
 L</obj_handler>.
 
 
-If your handler returns the undefined value, L</run> prints a warning
+If your handler returns the undefined value, L</create> prints a warning
 L</Undefined value from user routine>, halts further processing of the
 input, and returns the undefined value.
 
@@ -1236,7 +855,7 @@ use a closure. See the discussion at L</obj> for an example.
 =item * Returning undef halts processing
 
 
-If your handler returns the undefined value, L</run> prints a warning
+If your handler returns the undefined value, L</create> prints a warning
 L</Undefined value from user routine>, halts further processing of the
 input, and returns the undefined value.
 
@@ -1264,7 +883,7 @@ validation of user-supplied JSON> for more about this error.
 =item * Exception handling
 
 Exceptions (C<die>) thrown within C<obj_handler> callbacks are not
-caught by L</run> but passed through to the parent. Please see the
+caught by L</create> but passed through to the parent. Please see the
 discussion at L</obj> for an example.
 
 =back
@@ -1335,7 +954,7 @@ produces output
     
 
 
-(This example is included as L<F<examples/obj-handler.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/obj-handler.pl> in the distribution.)
+(This example is included as L<F<examples/obj-handler.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/obj-handler.pl> in the distribution.)
 
 
 =head3 Turning everything into JSON
@@ -1390,7 +1009,7 @@ produces output
     
 
 
-(This example is included as L<F<examples/try-harder.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/try-harder.pl> in the distribution.)
+(This example is included as L<F<examples/try-harder.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/try-harder.pl> in the distribution.)
 
 
 This C<obj_handler> overrides whatever you have set with L</bool> or
@@ -1448,7 +1067,7 @@ produces output
     [1e+09,3.14159,1e-09]
 
 
-(This example is included as L<F<examples/set-fformat.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/set-fformat.pl> in the distribution.)
+(This example is included as L<F<examples/set-fformat.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/set-fformat.pl> in the distribution.)
 
 
 This method was added in version 0.07 of the module.
@@ -1529,7 +1148,7 @@ produces output
     }
 
 
-(This example is included as L<F<examples/sort.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/sort.pl> in the distribution.)
+(This example is included as L<F<examples/sort.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/sort.pl> in the distribution.)
 
 
 This method was added in version 0.29 of the module.
@@ -1563,7 +1182,7 @@ use a closure. See the discussion at L</obj> for an example.
 =item * Returning undef halts processing
 
 
-If your handler returns the undefined value, L</run> prints a warning
+If your handler returns the undefined value, L</create> prints a warning
 L</Undefined value from user routine>, halts further processing of the
 input, and returns the undefined value.
 
@@ -1591,7 +1210,7 @@ validation of user-supplied JSON> for more about this error.
 =item * Exception handling
 
 Exceptions (C<die>) thrown within C<type_handler> callbacks are not
-caught by L</run> but passed through to the parent. Please see the
+caught by L</create> but passed through to the parent. Please see the
 discussion at L</obj> for an example.
 
 =back
@@ -1650,7 +1269,7 @@ produces output
     
 
 
-(This example is included as L<F<examples/type-handler.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/type-handler.pl> in the distribution.)
+(This example is included as L<F<examples/type-handler.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/type-handler.pl> in the distribution.)
 
 
 If the L</strict> option is chosen, this method is also passed scalar
@@ -1679,7 +1298,7 @@ produces output
     After: 1
 
 
-(This example is included as L<F<examples/type-handler-scalar.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/type-handler-scalar.pl> in the distribution.)
+(This example is included as L<F<examples/type-handler-scalar.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/type-handler-scalar.pl> in the distribution.)
 
 
 This method was added in version 0.10 of the module.
@@ -1715,7 +1334,7 @@ produces output
     "赤ブöＡↂϪ"
 
 
-(This example is included as L<F<examples/escape-all.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/escape-all.pl> in the distribution.)
+(This example is included as L<F<examples/escape-all.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/escape-all.pl> in the distribution.)
 
 
 =head3 Output is always UTF-8
@@ -1746,7 +1365,7 @@ produces output
     "赤ブöＡↂϪ"
 
 
-(This example is included as L<F<examples/escape-all-no-utf8.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/escape-all-no-utf8.pl> in the distribution.)
+(This example is included as L<F<examples/escape-all-no-utf8.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/escape-all-no-utf8.pl> in the distribution.)
 
 
 See also L</Input strings must be UTF-8>.
@@ -1777,6 +1396,388 @@ produced by C<assert_valid_json>, and the return value will be
 undefined.
 
 This method was added in version 0.07 of the module.
+
+=head1 CONVERSIONS
+
+This section details what conversions are applied to the various
+inputs to produce outputs.
+
+=head2 Hashes
+
+JSON::Create turns associative arrays into JSON objects. The keys are
+written into JSON as strings, with control characters escaped. The
+order of the keys is as they are supplied by Perl.
+
+    
+    use JSON::Create 'create_json';
+    my %example = (
+        x => 1,
+        y => 2,
+        z => 3,
+    );
+    print create_json (\%example);
+
+
+produces output
+
+    {"y":2,"x":1,"z":3}
+
+(This example is included as L<F<examples/hash.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/hash.pl> in the distribution.)
+
+
+Nested hashes are recursively followed:
+
+    
+    use JSON::Create 'create_json';
+    my %example = (
+        x => {
+            y => 2,
+            z => 3,
+        },
+        a => {
+            b => 4,
+            c => 5,
+        },
+    );
+    print create_json (\%example);
+
+
+produces output
+
+    {"x":{"z":3,"y":2},"a":{"b":4,"c":5}}
+
+(This example is included as L<F<examples/nested-hash.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/nested-hash.pl> in the distribution.)
+
+
+=head2 Arrays
+
+Arrays are converted to JSON arrays. The order of elements of the
+array is left unchanged.
+
+    
+    use JSON::Create 'create_json';
+    my @array = (1, 2, 2.5, qw/mocha dusty milky/, qw/Tico Rocky Pinky/);
+    print create_json (\@array);
+
+
+produces output
+
+    [1,2,2.5,"mocha","dusty","milky","Tico","Rocky","Pinky"]
+
+(This example is included as L<F<examples/array.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/array.pl> in the distribution.)
+
+
+Nested arrays are recursively followed:
+
+    
+    use JSON::Create 'create_json';
+    my @array = ([1, 2, 2.5], [qw/mocha dusty milky/], [qw/Tico Rocky Pinky/]);
+    print create_json (\@array);
+
+
+produces output
+
+    [[1,2,2.5],["mocha","dusty","milky"],["Tico","Rocky","Pinky"]]
+
+(This example is included as L<F<examples/nested-array.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/nested-array.pl> in the distribution.)
+
+
+Nested hashes and arrays are converted similarly:
+
+    
+    use JSON::Create 'create_json';
+    my $nested = {
+        numbers => [1, 2, 2.5, 99.99],
+        cats => [qw/mocha dusty milky/],
+        dogs => [qw/Tico Rocky Pinky/],
+        fruit => {
+            thai => 'pineapple',
+            japan => 'persimmon',
+            australia => 'orange',
+        },
+    };
+    print create_json ($nested, sort => 1, indent => 1);
+
+
+produces output
+
+    {
+            "cats":[
+                    "mocha",
+                    "dusty",
+                    "milky"
+            ],
+            "dogs":[
+                    "Tico",
+                    "Rocky",
+                    "Pinky"
+            ],
+            "fruit":{
+                    "australia":"orange",
+                    "japan":"persimmon",
+                    "thai":"pineapple"
+            },
+            "numbers":[
+                    1,
+                    2,
+                    2.5,
+                    99.99
+            ]
+    }
+
+
+(This example is included as L<F<examples/nested.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/nested.pl> in the distribution.)
+
+
+=head2 Scalars
+
+Non-reference Perl scalars are converted to JSON strings or numbers,
+depending on what Perl thinks they contain.
+
+=head3 Strings
+
+As far as possible, strings are written as they are to the JSON. 
+
+JSON is Unicode, so all output is checked for Unicode
+validity. Further, this module insists on UTF-8. (See L</Input strings
+must be UTF-8>.) Invalid UTF-8 within input strings produces the error
+L</Invalid UTF-8> and the undefined value is returned. This behaviour can be altered with the method L</replace_bad_utf8>. (For full details of the corner cases, see
+L</UNICODE HANDLING>.)
+
+Some whitespace and control characters must be also escaped for the
+output to be valid JSON. (See L</RFC 8259>.) 
+
+In addition to this, L</create_json_strict> or the L</strict> option
+reject inputs containing non-ASCII bytes (bytes with values of from
+128 to 255) which are not marked as character strings.
+
+=head4 Control characters and whitespace
+
+To form valid JSON, bytes of value less than 0x20 in a Perl string
+must be converted into JSON escapes, either the whitespace escapes \b
+(backspace) \r, \t, \n, and \f, or the form \u0001 for other control
+characters. Further, the backslash must be written as C<\\> and double
+quotes must be written as C<\">.
+
+This example demonstrates some of the necessary escaping:
+
+    
+    use JSON::Create 'create_json';
+    # An example string containing various things.
+    my $weirdstring = {weird => "\t\r\n\x00 " . '"' . '\\' . '/' };
+    print create_json ($weirdstring);
+    
+
+
+produces output
+
+    {"weird":"\t\r\n\u0000 \"\\/"}
+
+(This example is included as L<F<examples/weirdstring.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/weirdstring.pl> in the distribution.)
+
+
+=head4 U+2028 and U+2029 (JavaScript clashes)
+
+    my $out = create_json (["\x{2028}"]);
+    # $out = '["\u2028"]'
+
+Although it is not required by the JSON standard, JSON::Create by
+default escapes Unicode code points U+2028 and U+2029 as C<\u2028> and
+C<\u2029> for JavaScript compatibility. This behaviour can be altered with the method L</no_javascript_safe>.
+
+This escaping is necessary for JavaScript because of a clash between
+the JSON standard and the JavaScript (ECMAScript) standard. The
+characters U+2028 ("LINE SEPARATOR" in the Unicode standard) and
+U+2029 ("PARAGRAPH SEPARATOR" in the Unicode standard) are valid
+within JSON, as defined by L</RFC 8259>, but invalid within JavaScript
+strings, as defined by the ECMA standard (See ECMA Standard ECMA-262,
+"ECMAScript Language Specification", 3rd Edition, section 7.3 "Line
+Terminators").
+
+=head4 Other escapes
+
+The forward slash, /, known as "solidus" in the JSON specification,
+does not have to be escaped, and JSON::Create's default is not to
+escape it. This behaviour can be altered with the method L</escape_slash>.
+
+Other Unicode values are not escaped.  This behaviour can be altered with the method L</unicode_escape_all>.
+
+=head3 Integers
+
+Integers are printed in the usual way. Perl may interpret an integer
+with a very large absolute value to be a floating point number, and
+this module will print it out as such. See also L</Context-dependent
+variables> for the handling of variables with both string and integer
+values.
+
+=head3 Floating point numbers
+
+Finite floating point numbers are printed using printf formatting via
+C<"%g">, like
+
+    printf ("%g", $number);
+
+This behaviour can be altered with the method L</set_fformat>
+
+JSON does not allow NaN or infinity as bare values. From page 6 of
+L</RFC 8259>:
+
+=over
+
+Numeric values that cannot be represented in the grammar below (such
+as Infinity and NaN) are not permitted.
+
+=back
+
+L</create_json> converts NaN (not a number) values to
+C<"nan"> (the letters C<nan> surrounded by double quotes), and
+positive and negative infinity to C<"inf"> and C<"-inf">
+respectively.
+
+L</create_json_strict> disallows non-finite numbers. If a non-finite
+number appears within its input, it prints a warning L</Non-finite
+number in input> and returns the undefined value:
+
+    
+    use JSON::Create 'create_json_strict';
+    print create_json_strict (9**9**9);
+    
+
+
+produces output
+
+    Non-finite number in input at /usr/home/ben/projects/json-create/blib/lib/JSON/Create.pm line 200.
+    Use of uninitialized value in print at /usr/home/ben/projects/json-create/examples/strict-non-finite.pl line 5.
+
+
+(This example is included as L<F<examples/strict-non-finite.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/strict-non-finite.pl> in the distribution.)
+
+
+A JSON::Create object created with L</new> converts in the same way as
+L</create_json>.  This behaviour can be altered with the method L</non_finite_handler>. If L</strict> is
+specified, non-finite numbers are passed to L</non_finite_handler> if
+it is set, and if not, it prints a warning L</Non-finite number in
+input> and returns the undefined value.
+
+=head3 The undefined value
+
+Undefined values in the input are mapped to the JSON literal "null".
+
+    
+    use JSON::Create 'create_json';
+    print create_json ({a => undef, b => [undef, undef]}), "\n";
+    
+
+
+produces output
+
+    {"a":null,"b":[null,null]}
+
+
+(This example is included as L<F<examples/undef.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/undef.pl> in the distribution.)
+
+
+=head3 Booleans
+
+Booleans (C<true> and C<false>) from input via JSON::Parse version
+0.37 or later will be turned into the outputs C<true> and
+C<false>:
+
+    
+    use JSON::Parse '0.38', 'parse_json';
+    use JSON::Create 'create_json';
+    my $in = parse_json ('[true,false,"boo"]');
+    print create_json ($in);
+
+
+produces output
+
+    [true,false,"boo"]
+
+(This example is included as L<F<examples/json-parse-bool.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/json-parse-bool.pl> in the distribution.)
+
+
+Other kinds of object can be converted to booleans using the method
+L</bool> (see below).
+
+=head3 Context-dependent variables
+
+A context-dependent variable is a variable which may contain a string
+and a numerical value. Usually the string value is just a
+representation of the number, but it may not be. The behaviour in the
+case of a context-dependent variable is as follows.
+
+If the variable contains a valid numerical value, the numerical value
+is used in the output JSON, rather than the string value. However,
+some modules, like L<Unicode::UCD/charinfo>, return context-dependent
+hash values which have a non-number-like string under the key
+C<script> with values such as C<Latin> or C<Common> but no valid
+numerical value, despite being marked as context-dependent
+variables. In such cases, the string value is used. (In terms of XS,
+if the scalar is marked as C<SVt_PVIV> or C<SVt_PVNV>, the scalar is
+tested with C<SvIOK> or C<SvNOK> respectively, and if this is true the
+numerical value is used, if false the string value is used.)
+
+Up to version 0.25, this module wrongly assumed that the string part
+of a context-dependent variable would always be a valid representation
+of a number, and the string was added to the output without quote
+marks. In version 0.26, checking was done to see if the string
+actually was a number. In version 0.27 this approach was abandoned and
+the numerical value was given precedence. In version 0.28 this was
+again altered for the sake of unusual cases like the C<script> key
+returned by L<Unicode::UCD/charinfo>, where the scalar is marked as
+having a numerical value but does not in fact contain a valid
+numerical value.
+
+=head2 Other types
+
+JSON::Create is meant to provide serialization of data types. It does
+not provide built-in serialization of Perl objects and other non-data
+types, such as code references or regular expressions, beyond a few
+basic defaults. How to handle non-data types is left completely up to
+users. These basic defaults, and how to set up more extensive
+handling, are described in the following subsections.
+
+=head3 Scalar references
+
+L</create_json> dereferences scalar references, then treats them as
+scalars in the way described in L</Scalars>. 
+
+L</create_json_strict> rejects scalar references. Input containing a
+scalar reference causes a warning L</Input's type cannot be serialized
+to JSON> and the undefined value to be returned.
+
+A JSON::Create object created with L</new> behaves as L</create_json>
+unless the L</strict> option is specified. If the strict option is
+specified, scalar references are passed through to L</type_handler> if
+it is set, otherwise input containing a scalar reference causes a
+warning L</Input's type cannot be serialized to JSON> and the
+undefined value to be returned.
+
+=head3 Objects
+
+L</create_json> handles Perl objects as if non-object
+types. In other words, unless you specify object handling, it breaks
+encapsulation. 
+
+L</create_json_strict> rejects input containing Perl objects. If the
+input contains an object (a blessed reference), a warning L</Object
+cannot be serialized to JSON> is printed and the undefined value
+returned.
+
+A JSON::Create object created with L</new> can handle specified types
+of object with method L</obj>, or with a general object handler
+supplied via L</obj_handler>. By default it behaves like
+L</create_json>. If L</strict> is chosen, it rejects input containing
+Perl objects unless the user sets a handler for them with L</obj> or
+L</obj_handler>.
+
+=head3 Code, regexes, and other references
+
+A code or other reference (regexes, globs, etc.) in the input of
+L</create_json> or L</create_json_strict> prints a warning L</Input's
+type cannot be serialized to JSON> and causes the entire return value
+to be the undefined value. This behaviour can be altered with the method L</type_handler>.
 
 =head1 EXPORTS
 
@@ -1838,7 +1839,7 @@ produces output
     
 
 
-(This example is included as L<F<examples/valid-chars.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/valid-chars.pl> in the distribution.)
+(This example is included as L<F<examples/valid-chars.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/valid-chars.pl> in the distribution.)
 
 
 The point here is that the UTF-8 validation is carried out regardless
@@ -1852,7 +1853,7 @@ L</Unicode upgrades are not done according to Perl conventions>.
 =item Output is valid UTF-8
 
 All of the output of either the function L</create_json> or the method
-L</run> is valid UTF-8. This does not mean that output strings are
+L</create> is valid UTF-8. This does not mean that output strings are
 marked as Perl character strings (C<utf8>), it means that the output
 has been validated as UTF-8. 
 
@@ -1901,7 +1902,7 @@ produces output
     {"x":"かきくけこ","y":"さしすせそ"}
 
 
-(This example is included as L<F<examples/json-unicode.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/json-unicode.pl> in the distribution.)
+(This example is included as L<F<examples/json-unicode.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/json-unicode.pl> in the distribution.)
 
 
 The Perl convention is that if a non-utf8 string and a utf8 string are
@@ -1937,7 +1938,7 @@ produces output
     
 
 
-(This example is included as L<F<examples/json-unicode-gzip-bytes.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/json-unicode-gzip-bytes.pl> in the distribution.)
+(This example is included as L<F<examples/json-unicode-gzip-bytes.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/json-unicode-gzip-bytes.pl> in the distribution.)
 
 
 =item Using replace_bad_utf8 may cause a utf8 upgrade
@@ -1978,7 +1979,7 @@ produces output
     Use of uninitialized value in print at /usr/home/ben/projects/json-create/examples/user-bad-utf8.pl line 11.
 
 
-(This example is included as L<F<examples/user-bad-utf8.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.30/examples/user-bad-utf8.pl> in the distribution.)
+(This example is included as L<F<examples/user-bad-utf8.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Create-0.31/examples/user-bad-utf8.pl> in the distribution.)
 
 
 =back
@@ -2166,7 +2167,20 @@ Arguments to L</create_json> and L</create_json_strict>, and the
 methods L</set>, L</sort> and L</cmp> were added in version 0.29.
 
 Version 0.30 rewrote L</set> and related routines in XS and increased
-the speed of the module.
+the speed of the module, and added L</write_json>.
+
+In version 0.31, the method L</run> was renamed L</create>.
+
+=head2 Old names
+
+=over
+
+=item run
+
+The method C<run> was renamed L</create> in version 0.31. The old name
+is not deprecated and will continue to work indefinitely.
+
+=back
 
 =head1 SEE ALSO
 

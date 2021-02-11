@@ -42,4 +42,31 @@ $ret= eval q{
 $err= $@;
 ok( $ret, 'eval Table3: column conflicts with sugar function' ) or diag $err;
 
+$ret= eval q{
+  package MyApp::Schema::Result::Album;
+  use DBIx::Class::ResultDDL qw/ -V1 /;
+  table 'album';
+  col artist_id => integer;
+
+  package MyApp::Schema::Result::Artist;
+  use DBIx::Class::ResultDDL qw/ -V1 -inflate_datetime /;
+  
+  table 'artist';
+  col id           => integer unsigned auto_inc;
+  col name         => varchar(25), null;
+  col formed       => date;
+  col disbanded    => date null;
+  col general_info => json null;
+  col last_update  => datetime('UTC');
+  primary_key 'id';
+  
+  idx artist_by_name => [ 'name' ];
+  
+  has_many albums => { id => 'Album.artist_id' };
+  rel_many impersonators => { name => 'Artist.name' };
+  1;
+};
+$err= $@;
+ok( $ret, 'Make sure the example in the Synopsis works, excluding inflate_json' ) or diag $err;
+
 done_testing;

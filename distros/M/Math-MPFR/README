@@ -54,8 +54,23 @@ perl Makefile.pl INC="-I/path/to/gmp_includes -I/path/to/mpfr_includes"
  LIBS="-L/path/to/mpfr_lib -lmpfr -L/path/to/gmp_lib -lgmp"
 
 Other commandline args you may want to provide to 'perl Makefile.PL' are
-D64=1 (for _Decimal64 support) and F128=1 (for __float128 support).
-See the Decimal64 and Float128 sections (below).
+D64=1 (for _Decimal64 support), D128=1 (for _Decimal128 support) and
+F128=1 (for __float128 support).
+See the Decimal64/128 and Float128 sections (below).
+There are also some commandline args that provide some debugging of nvtoa() and doubletoa().
+See the Debug section below.
+
+========
+Checklib
+========
+
+During the running of the Makefile.PL a check is run to ensure that the
+gmp and mpfr libraries can be found when needed.
+This check can be skipped by:
+a) providing CHECK=0 as a Makefile.PL commmand line argument
+or
+b) by uncommenting the line (about line 20) that begins with:
+#$checklib = 0;
 
 ==================================
 64-bit-int and long double support
@@ -63,14 +78,14 @@ See the Decimal64 and Float128 sections (below).
 
 If your perl's Config reports that 'ivsize' is greater than or
 equal to 8 && 'ivtype' is not 'long', then Math::MPFR will, by default,
-be built with access to the mpfr_*_uj and mpfr_*_sj functions. Else,
+be built with access to the Rmpfr_*_uj and Rmpfr_*_sj functions. Else,
 access to those functions is, by default, denied. You can override the
 default by opening up the Makefile.PL and uncommenting the appropriate
 line (just a few lines down from the top of the file ... the comments
 in that file should make it clear).
 
 Similarly, if your perl's Config reports that 'nvsize' is greater than
-8 then Math::MPFR will be built with access to the mpfr_*_ld functions.
+8 then Math::MPFR will be built with access to the Rmpfr_*_ld functions.
 Else, access to those functions is, by default, denied. Again, you can
 override the default by opening up the Makefile.PL and uncommenting the
 appropriate line.
@@ -209,4 +224,25 @@ of what's required for this.)
 
 Note that forcing inclusion of __float128 support will not work
 unless the conditions mentioned earlier in this section are met.
+
+=====
+Debug
+=====
+
+If the Makefile.PL is given an argument that matches /NVTOA_DEBUG/i
+then intermediate values in nvtoa() will be printed to STDERR.
+In general, this will produce unwelcome clutter, but the option to
+build Math::MPFR with -DNVTOA_DEBUG is there, if it's ever useful.
+
+If the Makefile.PL is given an argument that matches /DTOA_ASSERT/i
+then some assertion checks are run at various points in doubletoa().
+If the assertion fails, then the program croaks with the relevant
+diagnostic  message.
+
+When doubletoa() fails to determine the value of $nv, and falls
+back to returning sprintf("%.16e", $nv), then the default
+behaviour is to increase $Math::MPFR::doubletoa_fallback by 1.
+If you wish to ignore such events, simply provide the Makefie.PL
+with the argument FB=0 .
+See the doubletoa() documentation in MPFR.pod.
 

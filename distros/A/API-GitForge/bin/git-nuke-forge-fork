@@ -33,7 +33,7 @@ git-nuke-forge-fork - delete forks created by git-clean-forge-fork(1)
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

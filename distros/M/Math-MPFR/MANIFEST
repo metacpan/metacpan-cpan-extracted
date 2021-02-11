@@ -2,11 +2,13 @@ MANIFEST
 Makefile.PL
 MPFR.pm
 MPFR.pod
+grisu3.c
 grisu3.h
 math_mpfr_include.h
 MPFR.xs
 README
 CHANGES
+checklib.in
 have_d64.in
 have_d128.in
 have_f128.in
@@ -37,6 +39,7 @@ t/constants.t
 t/D64_LD.t
 t/decimal64_conv.t
 t/decimal128_conv.t
+t/decimalize.t
 t/div_by_zero.t
 t/DoubleDouble.t
 t/DoubleDouble2.t
@@ -76,10 +79,12 @@ t/P_specifier.t
 t/pod.t
 t/printf.t
 t/remainder.t
+t/Rmpfr_fmod_ui.t
 t/Rmpfr_get_q.t
 t/Rmpfr_q_div_and_Rmpfr_z_div.t
 t/Rmpfr_rec_root.t
 t/Rmpfr_rootn_ui.t
+t/Rmpfr_sinu.t
 t/rndna.t
 t/rndna2.t
 t/set_NV.t

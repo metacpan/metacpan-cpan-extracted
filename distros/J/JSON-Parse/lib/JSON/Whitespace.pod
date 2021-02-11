@@ -35,8 +35,8 @@ This outputs
 
 =head1 VERSION
 
-This documents version 0.60 of JSON::Whitespace corresponding to
-L<git commit 27b70e98176290ddd145cadfe8aa6ff43bb71703|https://github.com/benkasminbullock/JSON-Parse/commit/27b70e98176290ddd145cadfe8aa6ff43bb71703> released on Tue Jan 26 08:51:47 2021 +0900.
+This documents version 0.61 of JSON::Whitespace corresponding to
+L<git commit 033269fa8972fdce8626aa65cd11a5394ab50492|https://github.com/benkasminbullock/JSON-Parse/commit/033269fa8972fdce8626aa65cd11a5394ab50492> released on Thu Feb 11 09:14:04 2021 +0900.
 
 
 
@@ -47,9 +47,15 @@ whitespace" part of a JSON string (the whitespace which is not inside
 strings). According to L<the JSON specification|JSON::Parse/SEE ALSO>
 "insignificant whitespace" consists of space (C<%x20>), horizontal tab
 (C<%x09>), line feed or new line (C<%x0A>) and carriage return
-(C<%x0D).
+(C<%x0D>).
 
 =head1 FUNCTIONS
+
+=head2 json_indent
+
+    my $indented = json_indent ($json);
+
+Add indentation to C<$json>.
 
 =head2 json_minify
 

@@ -22,7 +22,7 @@ use Moo 2.001000 ();
 use Search::Elasticsearch::Util qw(parse_params load_plugin);
 use namespace::clean;
 
-our $VERSION = '7.30';
+our $VERSION = '7.711';
 
 my %Default_Plugins = (
     client      => [ 'Search::Elasticsearch::Client',       '7_0::Direct' ],
@@ -79,7 +79,7 @@ Search::Elasticsearch - The official client for Elasticsearch
 
 =head1 VERSION
 
-version 7.30
+version 7.711
 
 =head1 SYNOPSIS
 
@@ -582,7 +582,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Elasticsearch BV.
+This software is Copyright (c) 2021 by Elasticsearch BV.
 
 This is free software, licensed under:
 

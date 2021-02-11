@@ -3,7 +3,7 @@
 # See the LICENSE file in the project root for more information
 
 package Search::Elasticsearch::Role::Transport;
-$Search::Elasticsearch::Role::Transport::VERSION = '7.30';
+$Search::Elasticsearch::Role::Transport::VERSION = '7.711';
 use Moo::Role;
 
 requires qw(perform_request);
@@ -76,7 +76,7 @@ Search::Elasticsearch::Role::Transport - Transport role providing interface betw
 
 =head1 VERSION
 
-version 7.30
+version 7.711
 
 =head1 AUTHOR
 
@@ -84,7 +84,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Elasticsearch BV.
+This software is Copyright (c) 2021 by Elasticsearch BV.
 
 This is free software, licensed under:
 

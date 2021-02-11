@@ -53,6 +53,6 @@
          "web" : "https://github.com/benkasminbullock/JSON-Parse"
       }
    },
-   "version" : "0.60",
+   "version" : "0.61",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

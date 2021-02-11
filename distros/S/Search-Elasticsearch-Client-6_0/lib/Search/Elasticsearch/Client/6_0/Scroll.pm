@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::6_0::Scroll;
-$Search::Elasticsearch::Client::6_0::Scroll::VERSION = '7.30';
+$Search::Elasticsearch::Client::6_0::Scroll::VERSION = '7.711';
 use Moo;
 use Search::Elasticsearch::Util qw(parse_params throw);
 use namespace::clean;
@@ -146,7 +146,7 @@ Search::Elasticsearch::Client::6_0::Scroll - A helper module for scrolled search
 
 =head1 VERSION
 
-version 7.30
+version 7.711
 
 =head1 SYNOPSIS
 
@@ -393,7 +393,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Elasticsearch BV.
+This software is Copyright (c) 2021 by Elasticsearch BV.
 
 This is free software, licensed under:
 

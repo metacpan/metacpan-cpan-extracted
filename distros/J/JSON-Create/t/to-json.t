@@ -39,7 +39,7 @@ my $thing = {
 
 # Test the vanilla behaviour with no funky objects.
 
-my $outnoobj = $jc->run ($thing);
+my $outnoobj = $jc->create ($thing);
 like ($outnoobj, qr/"zilog":\{\}/);
 
 # Now we're going to funky on down with some funky objects.
@@ -61,7 +61,7 @@ $jc->obj (
 	return '"A knife cannot cut itself"',
     },
 );
-my $outobj = $jc->run ($thing);
+my $outobj = $jc->create ($thing);
 like ($outobj, qr/"zilog":"passive-aggressive-programmer"/);
 note ($outobj);
 
@@ -69,13 +69,13 @@ note ($outobj);
 
 # Give me that jive Clive.
 $zilog->{jive} = 'clive';
-my $outobjvalue = $jc->run ($thing);
+my $outobjvalue = $jc->create ($thing);
 like ($outobjvalue, qr/"zilog":"clive"/);
 note ($outobjvalue);
 
 # Same thing as above.
 my $jf = JSON::Free->new ();
-my $selfjson = $jc->run ({self => $jf});
+my $selfjson = $jc->create ({self => $jf});
 like ($selfjson, qr/"self":"A knife cannot cut itself"/);
 note ($selfjson);
 
@@ -87,7 +87,7 @@ my $monkey = {
     masako => $zilog,
     yoshiyuki => $buggles,
 };
-my $outbool = $jc->run ($monkey);
+my $outbool = $jc->create ($monkey);
 like ($outbool, qr/"yoshiyuki":true/);
 # If it comes out like jive:clive, we've deleted the object handler.
 like ($outbool, qr/"masako":"clive"/);
@@ -107,7 +107,7 @@ $newjc->obj (
 	}
     },
 );
-my $outbool2 = $newjc->run ($monkey);
+my $outbool2 = $newjc->create ($monkey);
 like ($outbool2, qr/"yoshiyuki":true/, "boolean handler OK");
 # If it comes out like jive:clive, we've deleted the object handler.
 like ($outbool2, qr/"masako":"clive"/, "object handler OK");
@@ -115,7 +115,7 @@ like ($outbool2, qr/"masako":"clive"/, "object handler OK");
 $newjc->validate (1);
 $newjc->fatal_errors (1);
 eval {
-    my $outbool3 = $newjc->run ($monkey);
+    my $outbool3 = $newjc->create ($monkey);
 };
 ok (! $@, "no errors in user-generated JSON");
 note ($@);
@@ -130,7 +130,7 @@ my $mn = Masako::Natsume->new ();
 $newjc->obj ('Masako::Natsume' => \&Masako::Natsume::to_json);
 my $warning;
 $SIG{__WARN__} = sub {$warning = "@_";};
-my $mnj = $newjc->run ({tripitaka => $mn});
+my $mnj = $newjc->create ({tripitaka => $mn});
 ok (! defined $mnj, "Undefined return value with bad routine");
 note ($mnj);
 ok ($warning, "Got warning with invalid JSON");

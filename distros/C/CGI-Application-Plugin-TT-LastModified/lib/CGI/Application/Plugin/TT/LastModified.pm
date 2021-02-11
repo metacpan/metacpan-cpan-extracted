@@ -7,11 +7,12 @@ use strict;
 use warnings;
 use CGI::Util qw(expires);
 use List::Util qw(max);
+use namespace::clean;
 
 ###############################################################################
 # Version numbering.
 ###############################################################################
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 ###############################################################################
 # Export our methods.
@@ -28,8 +29,6 @@ our @EXPORT = qw(
 # auto-added in as a TT post process hook.
 ###############################################################################
 sub import {
-    my $pkg = shift;
-    my $auto = shift;
     my $caller = scalar caller;
 
     # manually export our symbols
@@ -45,7 +44,7 @@ sub import {
     elsif (not UNIVERSAL::can($caller, 'tt_obj')) {
         warn "Calling package hasn't imported CGI::Application::Plugin::TT.\n";
     }
-    elsif ($auto and ($auto eq ':auto')) {
+    elsif ($_[1] and ($_[1] eq ':auto')) {
         $caller->add_callback( tt_post_process => \&tt_set_last_modified_header );
     }
 }
@@ -102,7 +101,7 @@ CGI::Application::Plugin::TT::LastModified - Set "Last-Modified" header based on
     sub my_runmode {
         my $self = shift;
         my %params = (
-            ...
+            # ...
             );
         my $html = $self->tt_process( 'template.html', \%params );
         $self->tt_set_last_modified_header();
@@ -117,7 +116,7 @@ CGI::Application::Plugin::TT::LastModified - Set "Last-Modified" header based on
     sub my_runmode {
         my $self = shift;
         my %params = (
-            ...
+            # ...
             );
         return $self->tt_process( 'template.html', \%params );
     }
@@ -139,7 +138,7 @@ B<If> you have a desire to have the "Last-Modified" header set automatically
 for you, though, C<CGI::Application::Plugin::TT::LastModified> does have an
 C<:auto> import tag which auto-registers L</tt_set_last_modified_header()> as a
 "tt_post_process" hook for you.  If you've got an app that just processes
-static TT pages and generates output, this'll be useful for you.
+static TT pages and generates output, this will be useful for you.
 
 =head1 METHODS
 
@@ -148,19 +147,19 @@ static TT pages and generates output, this'll be useful for you.
 =item import()
 
 Custom import routine, which allows for C<tt_set_last_modified_header()> to
-be auto-added in as a TT post process hook. 
+be auto-added in as a TT post process hook.
 
 =item tt_last_modified()
 
 Returns the most recent modification time for any component of the most
 recently processed template (via C<tt_process()>). Time is returned back to
-the caller as "the number of seconds since the epoch". 
+the caller as "the number of seconds since the epoch".
 
 =item tt_set_last_modified_header()
 
 Sets a "Last-Modified" header in the HTTP response, equivalent to the last
 modification time of the template components as returned by
-C<tt_last_modified()>. 
+C<tt_last_modified()>.
 
 =back
 
@@ -177,8 +176,14 @@ terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<CGI::Application::Plugin::TT>,
-L<CGI::Application>,
-L<Template>.
+=over
+
+=item L<CGI::Application::Plugin::TT>
+
+=item L<CGI::Application>
+
+=item L<Template>
+
+=back
 
 =cut

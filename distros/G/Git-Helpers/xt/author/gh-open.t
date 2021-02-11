@@ -9,7 +9,7 @@ use Test::More;
 ## no critic (InputOutput::RequireCheckedSyscalls)
 {
     my $stdout = capture_stdout {
-        system('perl script/gh-open -e');
+        system('perl -Ilib script/gh-open -e');
     };
     chomp $stdout;
 
@@ -18,7 +18,7 @@ use Test::More;
 
 {
     my $stdout = capture_stdout {
-        system('perl script/gh-open -b -e');
+        system('perl -Ilib script/gh-open -b -e');
     };
     chomp $stdout;
 

@@ -20,16 +20,16 @@ my $bs;
 ok($bs = $app->blogspam(
   comment => 'This is a test post',
   ip => '192.168.0.20',
-  email => 'akron@sojolicio.us',
-  link => 'http://sojolicio.us',
+  email => 'akron@sojolicious.example',
+  link => 'http://sojolicious.example',
   name => 'Akron',
   subject => 'Test-Post',
   agent => 'mOJO-bOt'
 ), 'Blogspam');
 
 is_deeply($bs->hash, {
-  'email' => 'akron@sojolicio.us',
-  'link' => 'http://sojolicio.us',
+  'email' => 'akron@sojolicious.example',
+  'link' => 'http://sojolicious.example',
   'comment' => 'This is a test post',
   'subject' => 'Test-Post',
   'ip' => '192.168.0.20',
@@ -38,8 +38,8 @@ is_deeply($bs->hash, {
 }, 'hash'
 );
 
-is($bs->email, 'akron@sojolicio.us', 'email');
-is($bs->link, 'http://sojolicio.us', 'link');
+is($bs->email, 'akron@sojolicious.example', 'email');
+is($bs->link, 'http://sojolicious.example', 'link');
 is($bs->comment, 'This is a test post', 'comment');
 is($bs->subject, 'Test-Post', 'subject');
 is($bs->ip, '192.168.0.20', 'ip');
@@ -50,8 +50,8 @@ my $c = $app->build_controller;
 
 ok($bs = $app->blogspam(
   comment => 'This is a test post',
-  email => 'akron@sojolicio.us',
-  link => 'http://sojolicio.us',
+  email => 'akron@sojolicious.example',
+  link => 'http://sojolicious.example',
   name => 'Akron',
   subject => 'Test-Post'
 ), 'Blogspam');

@@ -14,6 +14,8 @@ script/srtrenumber
 script/srtscale
 script/srtshift
 script/srtsplit
+script/subscale
+script/subshift
 script/vtt2srt
 t/00-compile.t
 t/author-critic.t

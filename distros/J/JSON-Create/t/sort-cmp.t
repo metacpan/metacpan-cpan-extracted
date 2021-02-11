@@ -28,7 +28,7 @@ my %emojis = (
 );
 my $out;
 my $ok = eval {
-    $out = $jc->run (\%emojis);
+    $out = $jc->create (\%emojis);
     1;
 };
 print "$@\n";

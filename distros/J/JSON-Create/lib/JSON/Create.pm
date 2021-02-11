@@ -1,13 +1,13 @@
 package JSON::Create;
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw/create_json create_json_strict write_json/;
-%EXPORT_TAGS = (
-    all => \@EXPORT_OK,
-);
 use warnings;
 use strict;
-our $VERSION = '0.30';
+require Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw/create_json create_json_strict write_json/;
+our %EXPORT_TAGS = (
+    all => \@EXPORT_OK,
+);
+our $VERSION = '0.31';
 
 # Are we running as XS?
 
@@ -130,5 +130,9 @@ sub write_json
     close $out or die $!;
 }
 
-1;
+sub run
+{
+    goto &create;
+}
 
+1;

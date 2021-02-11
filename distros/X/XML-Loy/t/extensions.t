@@ -22,7 +22,7 @@ package Fun;
 use lib '../lib';
 
 use XML::Loy with => (
-  namespace => 'http://sojolicio.us/ns/fun',
+  namespace => 'http://sojolicious.example/ns/fun',
   prefix => 'fun'
 );
 
@@ -42,7 +42,7 @@ package Animal;
 use lib '../lib';
 
 use XML::Loy with => (
-  namespace => 'http://sojolicio.us/ns/animal',
+  namespace => 'http://sojolicious.example/ns/animal',
   prefix => 'anim'
 );
 
@@ -61,7 +61,7 @@ use Test::Warn;
 
 use_ok('XML::Loy::Atom');
 
-my $fun_ns  = 'http://sojolicio.us/ns/fun';
+my $fun_ns  = 'http://sojolicious.example/ns/fun';
 my $atom_ns = 'http://www.w3.org/2005/Atom';
 
 ok(my $node = Fun->new('Fun'), 'Constructor');

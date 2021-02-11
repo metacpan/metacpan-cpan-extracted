@@ -201,7 +201,7 @@ my $configure_emailserver=sub {
          ' libcurl libcurl-devel libicu libicu-devel re2c'.
          ' libpng-devel.x86_64 freetype-devel.x86_64 cmake'.
          ' oniguruma oniguruma-devel tcl tcl-devel git-all'.
-         ' libffi-devel libc-client-devel',
+         ' lzip libffi-devel libc-client-devel'.
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'yum -y update','__display__');
@@ -379,7 +379,8 @@ if ($do==1) {
          'https://dl.fedoraproject.org/pub/epel/'.
          'epel-release-latest-7.noarch.rpm','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'yum -y install uuid-devel '.
-         'pkgconfig libtool gcc-c++','__display__');
+         'pkgconfig libtool gcc-c++ gmp-devel '.
+         'mpfr-devel libmpc-devel','__display__');
    }
    ($stdout,$stderr)=$handle->cmd($sudo.
       'firewall-cmd --zone=public --permanent --add-port=25/tcp',
@@ -412,6 +413,27 @@ if ($do==1) {
       '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://ftp.gnu.org/gnu/make/');
+   $stdout=~s/^.*href=["]([^"]+)["].*$/$1/s;
+   $stdout=~s/.sig$//;
+   my $mktarfil=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      "https://ftp.gnu.org/gnu/make/$stdout",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar xvf $mktarfil",'__display__');
+   $mktarfil=~s/.tar.lz$//;
+   ($stdout,$stderr)=$handle->cwd($mktarfil);
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "./configure",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "make install",'__display__');
+   ($stdout,$stderr)=$handle->cwd('/usr/local/bin');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "ln -s /usr/local/bin/make gmake");
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone git://sourceware.org/git/bzip2.git',
       '__display__');
    ($stdout,$stderr)=$handle->cwd('bzip2');
@@ -421,6 +443,21 @@ if ($do==1) {
       'cp -v libbz2.so* /usr/local/lib','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone git://gcc.gnu.org/git/gcc.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('gcc');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp build','__display__');
+   ($stdout,$stderr)=$handle->cwd('build');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '../configure --enable-languages=c,c++ --disable-multilib',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make -j2','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');

@@ -10,11 +10,6 @@ SYNOPSIS
     $return =
     Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
 
-ATTENTION
-
-    This software IS NOT "jacode.pl"!
-    If you want "jacode.pl", search it on CPAN again.
-
 RAISON D'ETRE
 
     This software has been developed for use promotion of JIS X 0213.
@@ -74,17 +69,9 @@ WHAT IS "CP932X"?
     * You can use your operating system, network, and database.
     * In most cases, application programs can be used as it is.
 
-INSTALLATION
+SUPPORTED PERL VERSIONS
 
-   To test this software, type the following:
-
-   make test
-
-   To install this software, copy 'Jacode4e.pm' to any directory of @INC.
-
-DEPENDENCIES
-
-    This software requires perl 5.00503 or later.
+  perl version 5.005_03 to newest perl
 
 SEE ALSO
 
@@ -96,14 +83,20 @@ SEE ALSO
     https://twitter.com/uta46/status/11578906320
 
     jacode - Perl program for Japanese character code conversion
-    https://metacpan.org/search?q=jacode.pl
+    https://metacpan.org/release/Jacode
 
     Jacode4e - jacode.pl-like program for enterprise
-    https://metacpan.org/pod/Jacode4e
+    https://metacpan.org/release/Jacode4e
 
     Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
-    https://metacpan.org/pod/Jacode4e::RoundTrip
+    https://metacpan.org/release/Jacode4e-RoundTrip
 
-    Modern::Open - Autovivification, Autodie, and 3-args open support
-    https://metacpan.org/pod/Modern::Open
+    mb - run Perl script in MBCS encoding (not only CJK ;-)
+    https://metacpan.org/release/mb
+
+    UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
+    https://metacpan.org/release/UTF8-R2
+
+    Perl7::Handy - Handy Perl7 scripting environment on Perl5
+    https://metacpan.org/release/Perl7-Handy
 

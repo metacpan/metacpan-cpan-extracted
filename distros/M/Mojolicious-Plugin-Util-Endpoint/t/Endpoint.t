@@ -116,7 +116,7 @@ is($app->endpoint('test4' => {
    'endpoint 10');
 
 
-my $acct    = 'acct:akron@sojolicio.us';
+my $acct    = 'acct:akron@sojolicious.example';
 my $btables = 'hmm&bobby=tables';
 is($app->endpoint('test4' => {
                      searchTerms => $acct,
@@ -344,52 +344,52 @@ is($app->endpoint('test-wildcards' => { 'fine' => 'jai' }),
    'Correct placeholder interpolation');
 
 is($app->endpoint(
-  'http://sojolicio.us/.well-known/webfinger?resource={uri}' => {
-    uri => 'acct:akron@sojolicio.us'
+  'http://sojolicious.example/.well-known/webfinger?resource={uri}' => {
+    uri => 'acct:akron@sojolicious.example'
   }),
-  'http://sojolicio.us/.well-known/webfinger?resource=acct%3Aakron%40sojolicio.us',
+  'http://sojolicious.example/.well-known/webfinger?resource=acct%3Aakron%40sojolicious.example',
   'Arbitrary template url'
 );
 
 is($app->endpoint(
-  'http://sojolicio.us/.well-known/webfinger?resource={uri}&res={uri}' => {
-    uri => 'acct:akron@sojolicio.us'
+  'http://sojolicious.example/.well-known/webfinger?resource={uri}&res={uri}' => {
+    uri => 'acct:akron@sojolicious.example'
   }),
-  'http://sojolicio.us/.well-known/webfinger?resource=acct%3Aakron%40sojolicio.us&res=acct%3Aakron%40sojolicio.us',
+  'http://sojolicious.example/.well-known/webfinger?resource=acct%3Aakron%40sojolicious.example&res=acct%3Aakron%40sojolicious.example',
   'Arbitrary template url'
 );
 
 is($app->endpoint(
-  'http://sojolicio.us/.well-known/webfinger?resource={uri}&rel={rel?}' => {
-    uri => 'acct:akron@sojolicio.us'
+  'http://sojolicious.example/.well-known/webfinger?resource={uri}&rel={rel?}' => {
+    uri => 'acct:akron@sojolicious.example'
   }),
-  'http://sojolicio.us/.well-known/webfinger?resource=acct%3Aakron%40sojolicio.us&rel={rel?}',
+  'http://sojolicious.example/.well-known/webfinger?resource=acct%3Aakron%40sojolicious.example&rel={rel?}',
   'Arbitrary template url'
 );
 
 is($app->endpoint(
-  'http://sojolicio.us/.well-known/webfinger?resource={uri}&rel={rel?}' => {
-    uri => 'acct:akron@sojolicio.us',
+  'http://sojolicious.example/.well-known/webfinger?resource={uri}&rel={rel?}' => {
+    uri => 'acct:akron@sojolicious.example',
     '?' => undef
   }),
-  'http://sojolicio.us/.well-known/webfinger?resource=acct%3Aakron%40sojolicio.us',
+  'http://sojolicious.example/.well-known/webfinger?resource=acct%3Aakron%40sojolicious.example',
   'Arbitrary template url'
 );
 
 is($app->endpoint(
-  'http://sojolicio.us/{user}/webfinger?resource={uri}&rel={rel?}' => {
+  'http://sojolicious.example/{user}/webfinger?resource={uri}&rel={rel?}' => {
     uri => undef
   }),
-  'http://sojolicio.us/{user}/webfinger?rel={rel?}',
+  'http://sojolicious.example/{user}/webfinger?rel={rel?}',
   'Arbitrary template url'
 );
 
 is($app->endpoint(
-  'http://sojolicio.us/{user?}/webfinger?resource={uri}&rel={rel?}' => {
+  'http://sojolicious.example/{user?}/webfinger?resource={uri}&rel={rel?}' => {
     uri => undef,
     user => undef
   }),
-  'http://sojolicio.us/webfinger?rel={rel?}',
+  'http://sojolicious.example/webfinger?rel={rel?}',
   'Arbitrary template url'
 );
 

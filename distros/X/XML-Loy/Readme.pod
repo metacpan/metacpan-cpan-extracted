@@ -275,7 +275,7 @@ and may change without warnings.
   my $xml = XML::Loy->new('<XRD><Subject>akron</Subject></XRD>');
   my $xrd = $xml->as(-XRD, -HostMeta);
 
-  $xrd->alias('acct:akron@sojolicio.us');
+  $xrd->alias('acct:akron@sojolicious.example');
 
   print $xrd->to_pretty_xml;
 
@@ -283,7 +283,7 @@ and may change without warnings.
   #      xmlns:hm="http://host-meta.net/xrd/1.0"
   #      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   #   <Subject>akron</Subject>
-  #   <Alias>acct:akron@sojolicio.us</Alias>
+  #   <Alias>acct:akron@sojolicious.example</Alias>
   # </XRD>
 
 Convert an L<XML::Loy> based object to another object.
@@ -307,16 +307,16 @@ See L<Extensions|/EXTENSIONS> for further information.
 =head2 namespace
 
   my $xml = XML::Loy->new('doc');
-  $xml->namespace('http://sojolicio.us/ns/global');
-  $xml->namespace(fun => 'http://sojolicio.us/ns/fun');
+  $xml->namespace('http://sojolicious.example/ns/global');
+  $xml->namespace(fun => 'http://sojolicious.example/ns/fun');
   $xml->add('fun:test' => { foo => 'bar' }, 'Works!');
   print $xml->namespace;
 
   print $xml->to_pretty_xml;
 
   # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-  # <doc xmlns="http://sojolicio.us/global"
-  #      xmlns:fun="http://sojolicio.us/fun">
+  # <doc xmlns="http://sojolicious.example/global"
+  #      xmlns:fun="http://sojolicious.example/fun">
   #   <fun:test foo="bar">Works!</fun:test>
   # </doc>
 
@@ -344,7 +344,7 @@ defining the start of indentation (defaults to C<0>).
   package Fun;
   use XML::Loy with => (
     prefix    => 'fun',
-    namespace => 'http://sojolicio.us/ns/fun',
+    namespace => 'http://sojolicious.example/ns/fun',
     mime      => 'application/fun+xml'
   );
 
@@ -401,7 +401,7 @@ would do with any other object class.
   print $obj->to_pretty_xml;
 
   # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-  # <Fun xmlns="http://sojolicio.us/ns/fun">
+  # <Fun xmlns="http://sojolicious.example/ns/fun">
   #   <Cool>
   #     <Happy foo="bar">YEAH!!!! \o/ </Happy>
   #   </Cool>
@@ -427,7 +427,7 @@ extension to another L<XML::Loy> based document as well.
   print $obj->to_pretty_xml;
 
   # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-  # <object xmlns:fun="http://sojolicio.us/ns/fun">
+  # <object xmlns:fun="http://sojolicious.example/ns/fun">
   #   <Cool>
   #     <fun:Happy foo="bar">YEAH!!!! \o/ </fun:Happy>
   #   </Cool>
@@ -480,7 +480,7 @@ L<Renée Bäcker|https://github.com/reneeb>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2020, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

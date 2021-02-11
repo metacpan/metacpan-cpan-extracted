@@ -48,7 +48,7 @@ my $trim_re_str = join('|',
 		       '(?i:\&\#0{0,4}(?:'.join('|',@trim_dec).');)',	##-- XML character entities: decimal
 		      );
 
-print STDERR "$0: trim_re = qr{$trim_re_str}\n";##-- DEBUG
+#print STDERR "$0: trim_re = qr{$trim_re_str}\n";##-- DEBUG
 my $trim_re = qr{$trim_re_str}
   or die("$0: failed to compile trim regex qr{$trim_re_str}: $!");
 

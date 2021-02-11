@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::Serializer;
-$Search::Elasticsearch::Role::Serializer::VERSION = '7.30';
+$Search::Elasticsearch::Role::Serializer::VERSION = '7.711';
 use Moo::Role;
 
 requires qw(encode decode encode_pretty encode_bulk mime_type);
@@ -37,7 +37,7 @@ Search::Elasticsearch::Role::Serializer - An interface for Serializer modules
 
 =head1 VERSION
 
-version 7.30
+version 7.711
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,7 @@ Enrico Zimuel <enrico.zimuel@elastic.co>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Elasticsearch BV.
+This software is Copyright (c) 2021 by Elasticsearch BV.
 
 This is free software, licensed under:
 

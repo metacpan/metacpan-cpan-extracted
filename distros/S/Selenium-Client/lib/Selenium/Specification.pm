@@ -1,9 +1,11 @@
 package Selenium::Specification;
-$Selenium::Specification::VERSION = '1.0';
+$Selenium::Specification::VERSION = '1.02';
 # ABSTRACT: Module for building a machine readable specification for Selenium
 
 use strict;
 use warnings;
+
+use v5.28;
 
 no warnings 'experimental';
 use feature qw/signatures/;
@@ -39,13 +41,13 @@ our %spec_urls = (
 our $browser = HTTP::Tiny->new();
 my %state;
 my $parse = [];
-my $dir = File::Spec->catdir( File::HomeDir::my_home(),".selenium","specs" );
 our $method = {};
 
 
-sub read($type='stable', $nofetch=1) {
+sub read($client_dir, $type='stable', $nofetch=1) {
+    my $dir = File::Spec->catdir( $client_dir,"specs" );
     my $file =  File::Spec->catfile( "$dir","$type.json");
-    fetch( once => $nofetch );
+    fetch( once => $nofetch, dir => $dir );
     die "could not write $file: $@" unless -f $file;
     my $buf = File::Slurper::read_text($file);
     my $array = JSON::MaybeXS::decode_json($buf);
@@ -57,7 +59,7 @@ sub read($type='stable', $nofetch=1) {
 
 #TODO needs to grab args and argtypes still
 sub fetch (%options) {
-    $dir = $options{dir} if $options{dir};
+    my $dir = $options{dir};
 
     my $rc = 0;
     foreach my $spec ( sort keys(%spec_urls) ) {
@@ -254,7 +256,7 @@ Selenium::Specification - Module for building a machine readable specification f
 
 =head1 VERSION
 
-version 1.0
+version 1.02
 
 =head1 SUBROUTINES
 

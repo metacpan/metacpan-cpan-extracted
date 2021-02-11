@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.028000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "bin/playwright_server"
   ],
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.028000",
   "NAME" => "Playwright",
   "PREREQ_PM" => {
     "Async" => 0,
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
     "Test::MockFile" => 0,
     "Test::MockModule" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }

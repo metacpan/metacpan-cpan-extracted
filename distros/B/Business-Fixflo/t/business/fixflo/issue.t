@@ -40,6 +40,7 @@ can_ok(
         CostCode
         Quotes
         QuoteEndTime
+        QuoteRequests
 		FaultTitle
 		TermsAccepted
 		TenantNotes

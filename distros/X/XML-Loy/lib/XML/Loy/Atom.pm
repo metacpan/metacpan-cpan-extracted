@@ -808,7 +808,7 @@ as a text string.
 
 =head2 icon
 
-  $atom->icon('http://sojolicio.us/favicon.ico');
+  $atom->icon('http://sojolicious.example/favicon.ico');
   print $atom->icon;
 
 Sets icon url of the feed or returns it as a text string.
@@ -818,7 +818,7 @@ and have an aspect ratio of 1:1.
 
 =head2 id
 
-  $atom->id('http://sojolicio.us/#12345');
+  $atom->id('http://sojolicious.example/#12345');
   print $atom->id;
 
 Sets or returns the unique identifier of the Atom object.
@@ -826,10 +826,10 @@ Sets or returns the unique identifier of the Atom object.
 
 =head2 link
 
-  $atom->link(related => 'http://sojolicio.us/#12345');
+  $atom->link(related => 'http://sojolicious.example/#12345');
   $atom->link(
     rel  => 'self',
-    href => 'http://sojolicio.us/#12345'
+    href => 'http://sojolicious.example/#12345'
   );
 
   # Get link elements
@@ -849,7 +849,7 @@ a collection of matching link elements on retrieval.
 
 =head2 logo
 
-  $atom->logo('http://sojolicio.us/sojolicious.png');
+  $atom->logo('http://sojolicious.example/sojolicious.png');
   print $atom->logo;
 
 Sets logo url of the feed or returns it as a text string.
@@ -893,7 +893,7 @@ the wrapped div node.
 =head2 source
 
   my $source = $atom->entry('my_id')->source({
-    'xml:base' => 'http://source.sojolicio.us/'
+    'xml:base' => 'http://source.sojolicious.example/'
   });
   $source->author(name => 'Zoidberg');
 
@@ -1010,7 +1010,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2016, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

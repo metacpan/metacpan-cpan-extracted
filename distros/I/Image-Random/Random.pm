@@ -10,7 +10,7 @@ use Imager;
 use Imager::Color;
 use List::MoreUtils qw(none);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -21,6 +21,9 @@ sub new {
 
 	# Background color.
 	$self->{'color'} = undef;
+
+	# Debug.
+	$self->{'debug'} = 0;
 
 	# Image type.
 	$self->{'type'} = 'bmp';
@@ -91,6 +94,9 @@ sub create {
 	}
 
 	# Save.
+	if ($self->{'debug'}) {
+		print "Path: $path\n";
+	}
 	my $ret = $self->{'i'}->write(
 		'file' => $path,
 		'type' => $suffix,
@@ -184,6 +190,11 @@ Constructor.
  Color of image.
  Default value is undef.
  Undefined value means random color.
+
+=item * C<debug>
+
+ Debug mode.
+ Default value is 0.
 
 =item * C<height>
 
@@ -305,12 +316,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2013-2020 Michal Josef Špaček
+© 2013-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

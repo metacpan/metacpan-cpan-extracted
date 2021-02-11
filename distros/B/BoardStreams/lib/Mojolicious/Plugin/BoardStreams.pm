@@ -4,6 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin', -signatures, -async_await;
 
 use BoardStreams::Registry;
 use BoardStreams::ListenerObservable 'get_listener_observable';
+use BoardStreams::Transaction;
 use BoardStreams::Exception 'db_duplicate_error';
 use BoardStreams::Util 'string', ':bool';
 use BoardStreams::DBMigrations;
@@ -15,18 +16,16 @@ use Mojo::IOLoop;
 use RxPerl::Mojo ':all';
 use Safe::Isa;
 use Syntax::Keyword::Try;
-use Struct::Diff 'diff';
 use Data::GUID;
-use List::AllUtils qw/ each_array indexes max min /;
+use List::AllUtils qw/ max min /;
 use Time::HiRes ();
-use Storable 'dclone';
 use Sys::Hostname; # exports 'hostname' function
 use Carp 'croak';
 use Encode 'encode_utf8';
 
 use experimental 'postderef';
 
-our $VERSION = "v0.0.11";
+our $VERSION = "v0.0.13";
 
 use constant {
     DEFAULT_HEARTBEAT_INTERVAL        => 5,
@@ -195,11 +194,11 @@ sub register ($self, $app, $config) {
         });
     });
 
-    $app->helper("$bs_prefix.add_action", sub ($c, $channel_name, $action_name, $action_sub) {
+    $app->helper("$bs_prefix.on_action", sub ($c, $channel_name, $action_name, $action_sub) {
         BoardStreams::Registry->add_action($channel_name, $action_name, $action_sub);
     });
 
-    $app->helper("$bs_prefix.add_request", sub ($c, $channel_name, $request_name, $request_sub) {
+    $app->helper("$bs_prefix.on_request", sub ($c, $channel_name, $request_name, $request_sub) {
         BoardStreams::Registry->add_request($channel_name, $request_name, $request_sub);
     });
 
@@ -242,187 +241,22 @@ sub register ($self, $app, $config) {
         );
     });
 
-    $app->helper("$bs_prefix.lock_state", sub ($c, $channel_names, $sub, %opts) {
-        # opts can be: no_txn, no_ban
-        my $multi_mode = length ref $channel_names;
-        $channel_names = [$channel_names] if not $multi_mode;
+    $app->helper("$bs_prefix.begin", sub ($c) {
         my $db = $c->$bs_prefix->db;
-        my $tx; $tx = $db->begin unless $opts{no_txn};
-        my $rows = $db->select('channel',
-            [qw/ id name state keep_events /],
-            { name => {-in => $channel_names} },
-            { for => 'update' },
-        )->hashes;
 
-        if (! $opts{no_ban}) {
-            my $workers_state = $c->$bs_prefix->get_state($WORKERS_CHANNEL);
-            $workers_state->{$worker_uuid}
-                and ! $workers_state->{$worker_uuid}{banned}
-                or die "worker is banned from lock_state";
-        }
+        return BoardStreams::Transaction->new(
+            bs_prefix                 => $bs_prefix,
+            c                         => $c,
+            notify_payload_size_limit => $notify_payload_size_limit,
+            event_patch_sequence_name => $event_patch_sequence_name,
+        );
+    });
 
-        my %rows = map {( $_->{name}, $_ )} @$rows;
-        my @rows = @rows{@$channel_names};
-        # TODO: IMPORTANT! throw a machine-readable, JSON-able exception if any of the @rows are undef.
-        {
-            my @indexes = indexes { ! defined $_ } @rows;
-            @indexes or last;
-            my @missing_names = @$channel_names[@indexes];
-            local $" = ', ';
-            my $error = "lock_state error: Channel(s) @missing_names do not exist";
-            $c->app->log->error($error);
-            croak $error;
-        }
-        my @orig_states = map { from_json $_->{state} } @rows;
-        my @clone_states = map { dclone([$_])->[0] } @orig_states;
-
-        my @answers = $sub->($multi_mode ? \@clone_states : $clone_states[0]);
-        @answers = ([@answers]) if not $multi_mode;
-
-        my sub do_notifications ($channel_name, $event_id, $event, $diff) {
-            my $bytes = encode_json({
-                id   => int $event_id,
-                data => {
-                    event => $event,
-                    patch => $diff,
-                },
-            });
-            my $bytes_length = length($bytes);
-
-            if ($bytes_length <= $notify_payload_size_limit) {
-                $db->notify($channel_name, $bytes);
-                return;
-            }
-
-            # my $i = 0;
-            my $ending_bytes_prefix = ":$event_id end: ";
-            my $sent_ending = 0;
-            for (my ($i, $cursor) = (0, 0); ! $sent_ending; $i++) {
-                my $remaining_length = $bytes_length - $cursor;
-                my $bytes_prefix;
-                if (length($ending_bytes_prefix) + $remaining_length <= $notify_payload_size_limit) {
-                    $bytes_prefix = $ending_bytes_prefix;
-                    $sent_ending = 1;
-                } else {
-                    $bytes_prefix = ":$event_id $i: ";
-                }
-
-                my $sublength = $notify_payload_size_limit - length $bytes_prefix;
-                my $substring = $remaining_length >= 0 ? substr($bytes, $cursor, $sublength) : '';
-                $cursor += $sublength;
-
-                my $piece = $bytes_prefix . $substring;
-                $db->notify($channel_name, $piece);
-            }
-        }
-
-        my $ea = each_array(@rows, @answers, @orig_states);
-        ANSWER:
-        while( my ($row, $answer, $orig_state) = $ea->() ) {
-
-            my ($event, $new_state, $guard_inc) = @$answer;
-            my ($channel_id, $channel_name, $keep_events) = $row->@{qw/ id name keep_events /};
-
-            {
-                my @events = ref($event) eq 'REF' ? @$$event : ($event);
-                @events = grep defined, @events;
-                $event = pop @events;
-
-                # for all but last event
-                foreach my $event (@events) {
-                    my ($event_id, $dt);
-                    if ($keep_events) {
-                        ($event_id, $dt) = $db->insert('event_patch',
-                            {
-                                channel_id => $channel_id,
-                                event      => to_json($event),
-                            },
-                            { returning => ['id', 'datetime'] },
-                        )->hash->@{qw/ id datetime /};
-                    } else {
-                        ($event_id, $dt) =
-                            $db->query(
-                                "SELECT nextval(?), current_timestamp",
-                                $event_patch_sequence_name
-                            )->array->@*;
-                    }
-
-                    do_notifications($channel_name, $event_id, $event, undef);
-                }
-            }
-
-            next ANSWER unless defined $event or defined $new_state;
-            my $diff = defined $new_state ? diff($orig_state, $new_state, noO => 1, noU => 1) : undef;
-            $diff = undef if $diff and ! %$diff;
-            next ANSWER unless defined $event or defined $diff;
-            my ($event_id, $dt);
-            if ($keep_events and defined $event) {
-                ($event_id, $dt) = $db->insert('event_patch',
-                    {
-                        channel_id => $channel_id,
-                        event      => to_json($event),
-                    },
-                    { returning => ['id', 'datetime'] },
-                )->hash->@{qw/ id datetime /};
-            } else {
-                ($event_id, $dt) =
-                    $db->query(
-                        "SELECT nextval(?), current_timestamp",
-                        $event_patch_sequence_name
-                    )->array->@*;
-            }
-            $db->update('channel',
-                {
-                    event_id => $event_id,
-                    last_dt  => $dt,
-                    defined $new_state ? (state => to_json $new_state) : (),
-                },
-                { id => $channel_id },
-            );
-
-            # update guards
-            {
-                $guard_inc = int($guard_inc // 0);
-                if ($guard_inc > 0) {
-                    $db->insert('guards',
-                        {
-                            worker_uuid => $worker_uuid,
-                            channel_id  => $channel_id,
-                            counter     => $guard_inc,
-                        },
-                        {
-                            on_conflict => [
-                                [qw/ worker_uuid channel_id /],
-                                { counter => \"guards.counter + $guard_inc" },
-                            ],
-                        },
-                    );
-                } elsif ($guard_inc < 0) {
-                    $db->update('guards',
-                        { counter => \"counter $guard_inc" }, # impl. minus
-                        {
-                            worker_uuid => $worker_uuid,
-                            channel_id  => $channel_id,
-                        },
-                    );
-                    $db->delete('guards',
-                        {
-                            worker_uuid => $worker_uuid,
-                            channel_id  => $channel_id,
-                            counter     => {'<=', 0},
-                        },
-                    );
-                }
-            }
-
-            do_notifications($channel_name, $event_id, $event, $diff);
-        }
-
-        $tx->commit unless $opts{no_txn};
-
-        # return
-        my @new_states = map $_->[1], @answers;
-        return $multi_mode ? \@new_states : $new_states[0];
+    $app->helper("$bs_prefix.lock_state", sub ($c, $channel_names, $sub, %opts) {
+        my $txn = $c->$bs_prefix->begin;
+        my $ret = $txn->lock_state($channel_names, $sub, %opts);
+        $txn->commit;
+        return $ret;
     });
 
     $app->helper("$bs_prefix.on_join", sub ($c, $channel_name, $join_sub) {
@@ -506,6 +340,7 @@ sub register ($self, $app, $config) {
 
                 # join handler
                 my $join_handler = BoardStreams::Registry->get_join($channel_name) or return;
+                $c->$bs_prefix->channel_exists($channel_name) or return;
                 my $attrs = { since_id => $since_id, is_reconnect => int(defined $since_id) };
                 my $join_ret = eval { $join_handler->($channel_name, $c, $attrs) };
                 if ($join_ret->$_can('then')) {
@@ -660,10 +495,12 @@ sub register ($self, $app, $config) {
 
     $app->helper("$bs_prefix.get_state", sub ($c, $channel_name) {
         my $db = $c->$bs_prefix->db;
-        my $state = from_json $db->select('channel',
+        my $hash = $db->select('channel',
             ['state'],
             { name => $channel_name },
-        )->hash->{state};
+        )->hash;
+
+        return $hash ? from_json($hash->{state}) : undef;
     });
 
     $app->helper("$bs_prefix.alive_workers", sub ($c) {
@@ -700,7 +537,8 @@ sub register ($self, $app, $config) {
                 # 2. call cleanup subs (deleting guards rows in the process)
                 CHANNEL:
                 foreach my $channel (@channels) {
-                    my $tx = $db->begin;
+                    my $txn = $c->$bs_prefix->begin;
+                    my $db = $txn->db;
                     my $guards_counter = $db->select('guards',
                         ['counter'],
                         {
@@ -719,7 +557,7 @@ sub register ($self, $app, $config) {
                             my $new_state = $cleanup_sub->($channel_name, $state, $alive_workers);
 
                             return undef, $new_state;
-                        }, no_txn => 1, no_ban => 1);
+                        }, no_ban => 1);
                     }
 
                     $db->update('guards',
@@ -736,7 +574,7 @@ sub register ($self, $app, $config) {
                             counter     => {'<=', 0},
                         },
                     );
-                    $tx->commit;
+                    $txn->commit;
                 }
 
                 # 3. delete worker from :heartbeats
@@ -802,6 +640,11 @@ sub register ($self, $app, $config) {
                 defined($until_id) ? (id => { '<=', $until_id }) : (),
             }
         );
+    });
+
+    $app->helper("$bs_prefix.channel_exists", sub ($c, $channel_name) {
+        my $hash = $c->$bs_prefix->db->select('channel', 'id', { name => $channel_name })->hash;
+        return !! $hash;
     });
 
     # system channels

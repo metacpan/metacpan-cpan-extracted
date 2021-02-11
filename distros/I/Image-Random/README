@@ -21,6 +21,11 @@ METHODS
              Default value is undef.
              Undefined value means random color.
 
+    *       "debug"
+
+             Debug mode.
+             Default value is 0.
+
     *       "height"
 
              Height of image.
@@ -119,10 +124,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2013-2020 Michal Josef Špaček
+    © 2013-2021 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.09
+    0.10
 

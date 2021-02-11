@@ -1,10 +1,10 @@
 package Jacode4e::RoundTrip;
-$VERSION = '2.13.81.10';
+$VERSION = '2.13.81.11';
 ######################################################################
 #
 # Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
 #
-# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 #
 # SYNOPSIS
@@ -82,7 +82,7 @@ $VERSION = '2.13.81.10';
 #   use FindBin;
 #   use lib "$FindBin::Bin/lib";
 #   use Jacode4e::RoundTrip;
-#   Jacode4e::RoundTrip::VERSION('2.13.81.10');
+#   Jacode4e::RoundTrip::VERSION('2.13.81.11');
 #
 #   while (<>) {
 #       $return =
@@ -635,7 +635,7 @@ END
     }
 }
 
-%_ = (
+my %x = (
 
     # utf8jp(UTF-8-SPUA-JP) is best choice as internal encoding, because it
     # makes one character by one code point on fixed length without grapheme
@@ -875,10 +875,10 @@ sub convert {
     if (ref($_[0]) ne 'SCALAR') {
         die "@{[__FILE__]} \$_[0] isn't scalar reference\n";
     }
-    if (not exists $_{$OUTPUT_encoding}) {
+    if (not exists $x{$OUTPUT_encoding}) {
         die "@{[__FILE__]} unknown OUTPUT encoding '$OUTPUT_encoding'\n";
     }
-    if (not exists $_{$INPUT_encoding}) {
+    if (not exists $x{$INPUT_encoding}) {
         die "@{[__FILE__]} unknown INPUT encoding '$INPUT_encoding'\n";
     }
 
@@ -903,29 +903,29 @@ sub convert {
             $ctype = (shift(@ctype) || 'SBCS');
         }
         else {
-            $ctype = ($_{$INPUT_encoding}{'get_ctype'}->() || $last_ctype || 'SBCS');
+            $ctype = ($x{$INPUT_encoding}{'get_ctype'}->() || $last_ctype || 'SBCS');
         }
 
         if (not defined($last_ctype) or ($ctype ne $last_ctype)) {
             if ($option->{'OUTPUT_SHIFTING'}) {
-                $output .= $_{$OUTPUT_encoding}{'set_ctype'}->($ctype);
+                $output .= $x{$OUTPUT_encoding}{'set_ctype'}->($ctype);
             }
             $last_ctype = $ctype;
         }
 
-        my $input_octets = $_{$INPUT_encoding}{'getoct'}->($ctype);
+        my $input_octets = $x{$INPUT_encoding}{'getoct'}->($ctype);
         if (defined $input_octets) {
             if (defined $option->{'OVERRIDE_MAPPING'}{$input_octets}) {
                 $output .= $option->{'OVERRIDE_MAPPING'}{$input_octets};
             }
             else {
-                my $char = $_{$INPUT_encoding}{'getc'}->($input_octets);
+                my $char = $x{$INPUT_encoding}{'getc'}->($input_octets);
                 if (not defined $char) {
                     if (defined $option->{'GETA'}) {
                         $output .= $option->{'GETA'};
                     }
                     else {
-                        $output .= $_{$OUTPUT_encoding}{'putc'}->("\xF3\xB0\x85\xAB");
+                        $output .= $x{$OUTPUT_encoding}{'putc'}->("\xF3\xB0\x85\xAB");
                     }
                 }
                 elsif ($char eq "\xF3\xB0\x84\x80") {
@@ -933,17 +933,17 @@ sub convert {
                         $output .= $option->{'SPACE'};
                     }
                     else {
-                        $output .= $_{$OUTPUT_encoding}{'putc'}->($char);
+                        $output .= $x{$OUTPUT_encoding}{'putc'}->($char);
                     }
                 }
                 else {
-                    my $output_octets = $_{$OUTPUT_encoding}{'putc'}->($char);
+                    my $output_octets = $x{$OUTPUT_encoding}{'putc'}->($char);
                     if (not defined ($output_octets) or ($output_octets eq '')) {
                         if (defined $option->{'GETA'}) {
                             $output .= $option->{'GETA'};
                         }
                         else {
-                            $output .= $_{$OUTPUT_encoding}{'putc'}->("\xF3\xB0\x85\xAB");
+                            $output .= $x{$OUTPUT_encoding}{'putc'}->("\xF3\xB0\x85\xAB");
                         }
                     }
                     else {
@@ -1050,7 +1050,7 @@ Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode4e::RoundTrip;
-  Jacode4e::RoundTrip::VERSION('2.13.81.10');
+  Jacode4e::RoundTrip::VERSION('2.13.81.11');
   
   while (<>) {
       $return =
@@ -1825,16 +1825,7 @@ This software requires perl version 5.00503 or later to run.
   2018 Perl5.28                   |          |        Born            Born        
   2019 Perl5.30                   |          |         |               |          
   2020 Perl5.32                   :          :         :               :          
-  2030 Perl5.52                   :          :         :               :          
-  2040 Perl5.72                   :          :         :               :          
-  2050 Perl5.92                   :          :         :               :          
-  2060 Perl5.112                  :          :         :               :          
-  2070 Perl5.132                  :          :         :               :          
-  2080 Perl5.152                  :          :         :               :          
-  2090 Perl5.172                  :          :         :               :          
-  2100 Perl5.192                  :          :         :               :          
-  2110 Perl5.212                  :          :         :               :          
-  2120 Perl5.232                  :          :         :               :          
+  2021 Perl7.xx                   :          :         :               :          
     :     :                       V          V         V               V          
   --------------------------------------------------------------------------------
 
@@ -1851,7 +1842,7 @@ When you lost your way, you can see this matrix and find your way.
   Beginner   jacode.pl  jacode.pl  jacode.pl  Jacode4e    Jacode4e::RoundTrip
   -------------------------------------------------------------------------------
 
-=head1 Why CP932X born?
+=head1 Why CP932X Born?
 
 In order to know why CP932X exists the way it is(or isn't), one must first know why CP932X born. #'
 

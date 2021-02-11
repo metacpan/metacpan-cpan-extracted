@@ -18,6 +18,7 @@ my @files = (
     'lib/Search/Elasticsearch/Client/7_0/Async.pm',
     'lib/Search/Elasticsearch/Client/7_0/Async/Bulk.pm',
     'lib/Search/Elasticsearch/Client/7_0/Async/Scroll.pm',
+    'lib/Search/Elasticsearch/Client/7_0/Direct/AsyncSearch.pm',
     't/Client_7_0_Async/00_print_version.t',
     't/Client_7_0_Async/10_live.t',
     't/Client_7_0_Async/20_fork_aehttp.t',

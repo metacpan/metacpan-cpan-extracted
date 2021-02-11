@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [dta-tokwrap])
-define([THE_PACKAGE_VERSION], [0.96])
+define([THE_PACKAGE_VERSION], [0.97])
 define([THE_PACKAGE_MAINTAINER],  [moocow@cpan.org])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -57,7 +57,7 @@ dnl AC_PROG_RANLIB
 AC_PATH_PROG([SVNVERSION],[svnversion],[no])
 
 AC_MSG_CHECKING([for SVN HeadURL])
-SVNURL=`echo '$HeadURL: svn+ssh://odo.dwds.de/home/svn/dev/dta-tokwrap/trunk/configure.ac $' \
+SVNURL=`echo '$HeadURL: svn+ssh://svn.dwds.de/home/svn/dev/dta-tokwrap/trunk/configure.ac $' \
   | sed -e's/^\$HeadURL:[ ]*//1' -e's/\/configure.ac[ ]*\$$//1'`
 AC_MSG_RESULT([$SVNURL])
 

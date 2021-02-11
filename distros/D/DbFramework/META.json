@@ -4,7 +4,7 @@
       "imacat <imacat@mail.imacat.idv.tw>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -98,6 +98,6 @@
          "web" : "https://github.com/imacat/DbFramework"
       }
    },
-   "version" : "1.13",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.14",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

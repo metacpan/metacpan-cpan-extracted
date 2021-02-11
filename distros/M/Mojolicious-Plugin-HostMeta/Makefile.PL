@@ -14,11 +14,11 @@ WriteMakefile(
   },
   PREREQ_PM => {
     'Mojolicious' => 6.08,
-    'XML::Loy' => 0.43,
-    'Mojolicious::Plugin::XML::Loy' => 0.13,
-    'Mojolicious::Plugin::XRD' => 0.17,
-    'Mojolicious::Plugin::Util::Endpoint' => 0.13,
-    'Mojolicious::Plugin::Util::Callback' => 0.02
+    'XML::Loy' => 0.49,
+    'Mojolicious::Plugin::XML::Loy' => 0.15,
+    'Mojolicious::Plugin::XRD' => 0.21,
+    'Mojolicious::Plugin::Util::Endpoint' => 0.22,
+    'Mojolicious::Plugin::Util::Callback' => 0.07
   },
   LICENSE      => 'artistic_2',
   (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {

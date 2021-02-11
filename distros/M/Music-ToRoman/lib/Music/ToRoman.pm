@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.1800';
+our $VERSION = '0.1900';
 
 use List::MoreUtils qw/ any first_index /;
 use Moo;
@@ -248,6 +248,24 @@ sub get_scale_mode {
     return @scale;
 }
 
+
+sub get_scale_chords {
+    my ($self) = @_;
+
+    my %diminished = (
+      ionian     => 'vii',
+      dorian     => 'vi',
+      phrygian   => 'v',
+      lydian     => 'iv',
+      mixolydian => 'iii',
+      aeolian    => 'ii',
+      locrian    => 'i',
+    );
+    my @chords = map { m/^$diminished{ $self->scale_name }$/ ? 'dim' : m/^[A-Z]+$/ ? '' : 'm' } $self->get_scale_mode;
+
+    return @chords;
+}
+
 sub _up_to_flat {
     my ($numeral, $roman) = @_;
 
@@ -345,7 +363,7 @@ Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.1800
+version 0.1900
 
 =head1 SYNOPSIS
 
@@ -395,6 +413,7 @@ version 0.1800
   $roman = $mtr->parse('Em');     # v
 
   my @mode = $mtr->get_scale_mode;
+  my @chords = $mtr->get_scale_chords;
 
 =head1 DESCRIPTION
 
@@ -501,6 +520,12 @@ Parsing a double flatted chord will only work in select cases.
   @mode = $mtr->get_scale_mode;
 
 Return the Roman representation of the mode.
+
+=head2 get_scale_chords
+
+  @mode = $mtr->get_scale_chords;
+
+Return the chords of the mode.
 
 =head1 SEE ALSO
 

@@ -29,7 +29,7 @@ is($as->at('feed > author > name')->text,
 # New actor
 my $person = $as_entry->new_person(
   name => 'Bender',
-  uri => 'http://sojolicio.us/bender'
+  uri => 'http://sojolicious.example/bender'
 );
 $as_entry->actor($person);
 
@@ -37,7 +37,7 @@ is($as->at('entry > author > name')->text,
    'Bender',
     'Add author 2');
 is($as->at('entry > author > uri')->text,
-   'http://sojolicio.us/bender',
+   'http://sojolicious.example/bender',
     'Add author 3');
 is($as_entry->actor->at('name')->text, 'Bender', 'Bender Name');
 is($as->actor->at('name')->text, 'Fry', 'Fry Name');

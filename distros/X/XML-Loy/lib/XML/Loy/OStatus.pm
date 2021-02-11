@@ -87,8 +87,8 @@ XML::Loy::OStatus - OStatus Format Extension
   $atom->extension(-OStatus);
 
   $atom->author(name => 'Akron');
-  $atom->attention('http://sojolicio.us/user/peter');
-  $atom->conversation('http://sojolicio.us/conv/34');
+  $atom->attention('http://sojolicious.example/user/peter');
+  $atom->conversation('http://sojolicious.example/conv/34');
 
   say $atom->to_pretty_xml;
   # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -97,9 +97,9 @@ XML::Loy::OStatus - OStatus Format Extension
   #   <author>
   #     <name>Akron</name>
   #   </author>
-  #   <link href="http://sojolicio.us/user/peter"
+  #   <link href="http://sojolicious.example/user/peter"
   #         rel="ostatus:attention" />
-  #   <link href="http://sojolicio.us/conv/34"
+  #   <link href="http://sojolicious.example/conv/34"
   #         rel="ostatus:conversation" />
   # </entry>
 
@@ -123,7 +123,7 @@ following new ones.
 
 =head2 C<attention>
 
-  $entry->attention('http://sojolicio.us/user/peter');
+  $entry->attention('http://sojolicious.example/user/peter');
 
   say $entry->attention;
 
@@ -132,7 +132,7 @@ Add or get attention link.
 
 =head2 C<conversation>
 
-  $entry->conversation('http://sojolicio.us/conv/34');
+  $entry->conversation('http://sojolicious.example/conv/34');
 
   say $entry->conversation;
 
@@ -174,7 +174,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2016, Nils Diewald.
+Copyright (C) 2011-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

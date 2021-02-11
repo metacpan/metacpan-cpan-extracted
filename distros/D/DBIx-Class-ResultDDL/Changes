@@ -1,0 +1,18 @@
+1.00 - 2021-02-09
+  - All new features added under ':V1' tag, with new mechanissm to
+    preserve ':V0' API
+  - All column declaration sugar functions pass-through the unused
+    arguments, allowing fewer commas between sugar functions.
+  - All postgres types support [] array notation
+  - 'array' helper function for declaring postgres arrays
+  - New types: money float float4 float8 double real uuid json jsonb
+    MAX bit varbit tinyblob mediumblob longblob tinytext mediumtext
+	longtext bytea
+  - View declarations with 'view'
+  - Index declarations: create_index, idx, sqlt_add_index,
+    unique, sqlt_add_constraint
+  - auto_inc now sets 'monotonic' flag (for sqlite)
+  - New use options "-inflate_json" and "-inflate_datetime"
+
+0.01 - 2019-05-05
+  - Initial version, with :V0 tag

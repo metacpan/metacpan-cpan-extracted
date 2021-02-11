@@ -1,6 +1,6 @@
 package Lingua::Romana::Perligata;
 
-our $VERSION = '0.601';
+our $VERSION = '0.602';
 
 use Filter::Util::Call;
 use IO::Handle;
@@ -42,7 +42,7 @@ sub filter {
     push @commands, conn_command($tokens,'END') while @$tokens;
     $_ = join ";\n", map { $_->translate } @commands;
 
-    if ($translate) { print and exit }
+    if ($translate) { print "$_;\n" and exit }
     elsif ($debug && /\S/) {
         print "=" x 72,
               "\nTranslated to:\n\n$_\n",
@@ -167,6 +167,8 @@ my %literals =
 (
     'novumversum'   => { perl => '"\n"' },
     'biguttam'  => { perl => '":"' },
+    'guttam'    => { perl => '"."' },
+    'comma'     => { perl => '","' },
     'lacunam'   => { perl => '" "' },
     'stadium'   => { perl => '"\t"' },
     'parprimum' => { perl => '$1' },
@@ -184,6 +186,8 @@ my %literals =
 
 multibless %literals, 'Literal', 'ACCUSATIVE';
 add_genitives %literals, 'Literal', 'um' => 'i';
+add_genitives %literals, 'Literal', 'am' => 'ae';
+add_genitives %literals, 'Literal', 'ma' => 'matis';
 
 
 my %numerals =
@@ -560,10 +564,11 @@ $funcs_d{'arcessementuum'}  = { %{$funcs_d{'arcessementus'}},
 
 my %funcs_dl =
 (
-    'adi'       => { perl => 'goto' },
-    'confectus' => { perl => 'continue' },
-    'domus'     => { perl => 'package' },
-    'ute'       => { perl => 'use' },
+    'adi'        => { perl => 'goto' },
+    'confectus'  => { perl => 'continue' },
+    'domus'      => { perl => 'package' },
+    'legatarius' => { perl => 'use base' },
+    'ute'        => { perl => 'use' },
 );
 
 multibless %funcs_dl, 'Function_Lit', 'SUBNAME_A';
@@ -571,9 +576,9 @@ addres %funcs_dl, 'Function_Lit', 'SUBNAME_A';
 
 my %funcs_dlo =
 (
-    'ultimus'   => { perl => 'last' },
-    'posterus'  => { perl => 'next' },
-    'reconnatus'    => { perl => 'redo' },
+    'ultimus'    => { perl => 'last' },
+    'posterus'   => { perl => 'next' },
+    'reconnatus' => { perl => 'redo' },
 );
 
 multibless %funcs_dlo, 'Function_Lit', 'SUBNAME_OA';
@@ -704,108 +709,252 @@ sub tokenize
         {
             push @tokens, tokdup $tokens{lc $1};
         }
-            elsif ($text =~ s/\A(([a-z]+?)(um|)ementum)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*?)(um|)ementum)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $4} if $4;
-            my $perl = $3 ? "\$$2->" : $2;
-            push @tokens, token($1,'SUBNAME_OA_ACCUSATIVE',$perl,'Literal');
+            if ($5)
+            {
+                my $token = $4 ? $1.$4 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $4} if $4;
+                my $perl = $3 ? "\$$2->" : $2;
+                push @tokens, token($1,'SUBNAME_OA_ACCUSATIVE',$perl,'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+?)(um|)ementa)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*?)(um|)ementa)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $4} if $4;
-            my $perl = $3 ? "\$$2->" : $2;
-            push @tokens, token($1,'SUBNAME_OA_ACCUSATIVE',$perl,'Literal');
+            if ($5)
+            {
+                my $token = $4 ? $1.$4 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $4} if $4;
+                my $perl = $3 ? "\$$2->" : $2;
+                push @tokens, token($1,'SUBNAME_OA_ACCUSATIVE',$perl,'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+?)(um|)emento)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*?)(um|)emento)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $4} if $4;
-            my $perl = $3 ? "\$$2->" : $2;
-            push @tokens, token($1,'SUBNAME_OA_DATIVE',$perl,'Literal');
+            if ($5)
+            {
+                my $token = $4 ? $1.$4 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $4} if $4;
+                my $perl = $3 ? "\$$2->" : $2;
+                push @tokens, token($1,'SUBNAME_OA_DATIVE',$perl,'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+?)(um|)ementis)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*?)(um|)ementis)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            $bad .= "'-mentis' illicitum: '$1'"
-                  . adversum({line=>$line});
-            # One day this may be:
-            #
-            # push @tokens, tokdup $connectives{lc $4} if $4;
-            # my $perl = $3 ? "\$$2->" : $2;
-            # push @tokens, token($1,'SUBNAME_OA_DATIVE',$perl,'Literal');
+            if ($5)
+            {
+                my $token = $4 ? $1.$4 : $1;
+                push @tokens, token($token,'NAME',"$perl",'Name');
+            }
+            else
+            {
+                $bad .= "'-mentis' illicitum: '$1'"
+                      . adversum({line=>$line});
+                # One day this may be:
+                #
+                # push @tokens, tokdup $connectives{lc $4} if $4;
+                # my $perl = $3 ? "\$$2->" : $2;
+                # push @tokens, token($1,'SUBNAME_OA_DATIVE',$perl,'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+)orum)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*)orum)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $3} if $3;
-            push @tokens, token($1,'GENITIVE',"\@$2",'Literal');
+            if ($4)
+            {
+                my $token = $3 ? $1.$3 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $3} if $3;
+                push @tokens, token($1,'GENITIVE',"\@$2",'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+)uum)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*)uum)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $3} if $3;
-            push @tokens, token($1,'GENITIVE',"\%$2",'Literal');
+            if ($4)
+            {
+                my $token = $3 ? $1.$3 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $3} if $3;
+                push @tokens, token($1,'GENITIVE',"\%$2",'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+)um)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*)um)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $3} if $3;
-            push @tokens, token($1,'ACCUSATIVE',"\$$2",'Literal');
+            if ($4)
+            {
+                my $token = $3 ? $1.$3 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $3} if $3;
+                push @tokens, token($1,'ACCUSATIVE',"\$$2",'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+)a)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*)a)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $3} if $3;
-            push @tokens, token($1,'ACCUSATIVE',"\@$2",'Literal');
+            if ($4)
+            {
+                my $token = $3 ? $1.$3 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $3} if $3;
+                push @tokens, token($1,'ACCUSATIVE',"\@$2",'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+)ibus)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*)ibus)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $3} if $3;
-            push @tokens, token($1,'DATIVE',"\%$2",'Literal');
+            if ($4)
+            {
+                my $token = $3 ? $1.$3 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $3} if $3;
+                push @tokens, token($1,'DATIVE',"\%$2",'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+)us)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*)us)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $3} if $3;
-            push @tokens, token($1,'ACCUSATIVE',"\%$2",'Literal');
+            if ($4)
+            {
+                my $token = $3 ? $1.$3 : $1;
+                push @tokens, token($token,'Name',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $3} if $3;
+                push @tokens, token($1,'ACCUSATIVE',"\%$2",'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+)o)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*)o)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $3} if $3;
-            push @tokens, token($1,'DATIVE',"\$$2",'Literal');
+            if ($4)
+            {
+                my $token = $3 ? $1.$3 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $3} if $3;
+                push @tokens, token($1,'DATIVE',"\$$2",'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+)is)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*)is)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $3} if $3;
-            push @tokens, token($1,'DATIVE',"\@$2",'Literal');
+            if ($4)
+            {
+                my $token = $3 ? $1.$3 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $3} if $3;
+                push @tokens, token($1,'DATIVE',"\@$2",'Literal');
+            }
         }
-        elsif ($text =~ s/\A(([a-z]+)tori)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*)tori)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $3} if $3;
-            push @tokens, token($1,'DATIVE',"\\&$2",'Literal');
+            if ($4)
+            {
+                my $token = $3 ? $1.$3 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $3} if $3;
+                push @tokens, token($1,'DATIVE',"\\&$2",'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+)i)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*)i)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $3} if $3;
-            push @tokens, token($1,'GENITIVE',"\$$2",'Literal');
+            if ($4)
+            {
+                my $token = $3 ? $1.$3 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $3} if $3;
+                push @tokens, token($1,'GENITIVE',"\$$2",'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+)ere)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*)ere)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $3} if $3;
-            push @tokens, token($1,'INFINITIVE',"$2",'Literal');
+            if ($4)
+            {
+                my $token = $3 ? $1.$3 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $3} if $3;
+                push @tokens, token($1,'INFINITIVE',"$2",'Literal');
+            }
         }
-            elsif ($text =~ s/\A(([a-z]+?)(um|)e)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*?)(um|)e)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $4} if $4;
-            my $perl = $3 ? "\$$2->" : $2;
-            push @tokens, token($1,'SUBNAME',$perl,'Literal');
+            if ($5)
+            {
+                my $token = $4 ? $1.$4 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $4} if $4;
+                my $perl = $3 ? "\$$2->" : $2;
+                push @tokens, token($1,'SUBNAME',$perl,'Literal');
+            }
         }
-        elsif ($text =~ s/\A(([a-z]+)torem)(que|ve|)\b//i)
+        elsif ($text =~ s/\A(([a-z_][0-9a-z_]*)torem)(que|ve|)((?:\s+)sicut)?\b//i)
         {
-            push @tokens, tokdup $connectives{lc $3} if $3;
-            push @tokens, token($1,'ACCUSATIVE',"\\&$2",'Literal');
+            if ($4)
+            {
+                my $token = $3 ? $1.$3 : $1;
+                push @tokens, token($token,'NAME',$token,'Name');
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $3} if $3;
+                push @tokens, token($1,'ACCUSATIVE',"\\&$2",'Literal');
+            }
         }
         elsif ($text =~ s/\A([.])//)
         {
             push @tokens, token($1,'PERIOD',";",'Separator');
         }
-        elsif ($text =~ s/\A(\S+)(que|ve|)\b//)
+        elsif ($text =~ s/\A(\S+)(que|ve|)((?:\s+)sicut)?\b//)
         {
-            push @tokens, tokdup $connectives{lc $2} if $2;
-            push @tokens, token($1,'NAME',"$1",'Name') if $1;
+            if ($3)
+            {
+                my $token = $2 ? $1.$2 : $1;
+                push @tokens, token($token,'NAME',$token,'Name') if $token;
+            }
+            else
+            {
+                push @tokens, tokdup $connectives{lc $2} if $2;
+                push @tokens, token($1,'NAME',"$1",'Name') if $1;
+            }
         }
         else
         {
@@ -1487,7 +1636,7 @@ Lingua::Romana::Perligata -- Perl in Latin
 
 =head1 EDITIO
 
-This document describes version 0.601 of Lingua::Romana::Perligata
+This document describes version 0.602 of Lingua::Romana::Perligata
 released May  3, 2001.
 
 =head1 SUMMARIUM
@@ -1574,8 +1723,8 @@ The rules for specifying variables may be summarized as follows:
 
 In other words, scalars are always singular nouns, arrays and hashes are
 always plural (but of different declensions), and the case of the noun
-specifies its syntactic role in a statement : accusative for an rvalue,
-dative for an lvalue, genitive when being index. Of course, because the
+specifies its syntactic role in a statement: accusative for an rvalue,
+dative for an lvalue, genitive when being an index. Of course, because the
 inflection determines the syntactic role, the various components of a
 statement can be given in any order. For example, the Perl statement:
 
@@ -1851,10 +2000,11 @@ properties: they are individually short, and collectively symmetrical.
 It was considered important to retain those characteristics in Perligata.
 
 In Latin, the word I<sic> has a sense that means "as follows".
-Happily, its contranym, I<cis>, has the meaning (among others)
-"to here". The allure of this kind of wordplay being impossible to
-resist, Perligata delimits blocks of statements with these two words. For
-example:
+Happily, its heteropalindrome, I<cis>, has the meaning (among others)
+"to here", making these two words perfect heteroantigrams (just like C<{> and C<}>).
+The allure of this kind of wordplay being impossible to
+resist, Perligata delimits blocks of statements with these two words.
+For example:
 
         sic                                     # {
             loco ianitori.                      #   local $/;
@@ -1956,16 +2106,16 @@ The digits are:
 
            Roman            Arabic
            =====            ======
-         I                   1
-         V                   5
-         X                  10
-         L                      50
-         C                 100
-         D                 500
+             I                       1
+             V                       5
+             X                      10
+             L                      50
+             C                     100
+             D                     500
              M                   1,000
-             I))                     5,000
-           ((I))                    10,000
-             I)))                   50,000
+             I))                 5,000
+           ((I))                10,000
+             I)))               50,000
           (((I)))              100,000
              I))))             500,000
          ((((I))))           1,000,000
@@ -2028,8 +2178,8 @@ Note that the order of the genitives is significant here, and is the
 reverse of that required in Perl.
 
 As mentioned in L<"Variables">, Perligata currently only supports homogeneous
-multi-level indexing. If the final genitive indicates
-an array (e.g. I<unimatrixorum> in the previous example), then preceding index
+multi-level indexing. If the final genitive indicates an array
+(e.g. I<unimatrixorum> in the previous example), then the preceding index
 is assumed to be an array index. If the final genitive indicates a hash,
 every preceding genitive, and the original ordinal are presumed to be
 keys.  For example:
@@ -2082,7 +2232,8 @@ becomes:
 Note that the arguments to I<inquementum> are special, in that they are
 treated as literals. Punctuation strings have special names, such as
 I<lacunam> ("a hole") for space, I<stadium> ("a stride") for tabspace,
-I<novumversum> ("new verse") for newline, or I<biguttam> ("two spots")
+I<novumversum> ("new verse") for newline, I<comma> ("comma")
+for comma, I<guttam> ("a spot") for period, or I<biguttam> ("two spots")
 for colon.
 
 It is also possible to directly quote a series of characters (as if they
@@ -2115,7 +2266,7 @@ B<I<[Perligata's regular expression mechanism is not yet implemented. This secti
 outlines how it will work in a future release.]>>
 
 In Perligata, patterns will be specified in a constructive syntax (as
-opposed to Perl's declarative approach). Literals will regular
+opposed to Perl's declarative approach). Literals will be regular
 strings and other components of a pattern will be adjectives, verbs,
 nouns, or a connective:
 
@@ -2304,7 +2455,7 @@ I<non>:
         si valum non praestantias datum       # if $val ge $dat
 
 
-=head2 Packages and classes
+=head2 Packages, classes, and modules
 
 The Perligata keyword to declare a package is I<domus>, literally
 "the house of". In this context, the name of the class follows the keyword
@@ -2315,7 +2466,11 @@ To explicitly specify a variable or subroutine as belonging to a
 package, the preposition I<intra> ("within") is used. To call a
 subroutine as a method of a particular package (or of an object), the
 preposition I<apud> ("of the house of") is used. Thus I<intra> is
-Perligata's C<::> and I<apud> is it's C<-E<gt>>.
+Perligata's C<::> and I<apud> is its C<-E<gt>>.
+
+Inheritance is specified by the I<legatarius> statement, within a C<domus>.
+The name of the base class follows the keyword and is treated as a literal.
+This is equivalent to Perl's C<use base> pragma.
 
 The Perl C<bless> function is I<benedice> in Perligata, but almost invariably
 used in the scalar accusative form I<benedicementum>. Perligata also
@@ -2323,20 +2478,30 @@ understands the correct (contracted) Latin form of this verb: I<benedictum>.
 
 Thus:
 
-        domus Specimen.                             # package Specimen;
-
-        newere                                      # sub new
-        sic                                         # {
-            meis datibus.                           #   my %data;
-            counto intra Specimen
-                postincresce.                       #   $Specimen::count++;
-            datibus primum horum benedictum.        #   bless \%data, $_[0];
-        cis                                         # }
+        domus Exemplar intra Simplicio.             # package Simplicio::Exemplar;
 
         printere                                    # sub print
         sic                                         # {
             modus tum indefinitus inquementum mori. #   die 'method undefined';
         cis                                         # }
+
+
+        domus Specimen.                             # package Specimen;
+        legatarius Exemplar intra Simplicio.        # use base 'Simplicio::Exemplar';
+
+        newere                                      # sub new
+        sic                                         # {
+            meis datibus.                           #   my %data;
+            counto intra Specimen postincresce.     #   $Specimen::count++;
+            datibus primum horum benedictum.        #   bless \%data, $_[0];
+        cis                                         # }
+
+        printere                                    # sub print
+        sic                                         # {
+            meo selfo his decapitamentum da.        #     my $self = shift @_;
+            haec inquementum carpe.                 #     carp "@_";
+        cis                                         # }
+
 
         domus princeps.                             # package main;
 
@@ -2344,6 +2509,31 @@ Thus:
                 newementum apud Specimen.           #       Specimen->new;
 
         printe apud objectum;                       # $object->print;
+
+To import semantics from external modules, the Perl C<use> function is I<ute>
+("use") in Perligata. Note that many module name components end in character
+patterns that match Perligata syntactic suffixes; e.g. the "Type"
+in "File::Type" ends with an "e", and "e" is used as a suffix to represent
+a subroutine call in void context. To prevent Perligata from misinterpreting
+such name components, the keyword I<sicut> ("as it certainly is") is used to
+tell Perligata to not interpret the suffix as being syntactically significant.
+
+For example:
+
+        strict ute.                                 # use strict;
+        warnings ute.                               # use warnings;
+
+        Type sicut intra File ute.                  # use File::Type;
+
+        meo specio da                               # my $type =
+            newementum apud Type intra File.        #     File::Type->new();
+
+Without the I<sicut> keyword in the I<ute> line, the "e" in "Type" would be
+interpreted as being syntactically significant, and an error would be
+reported on that line. (Note that the "e" in "File" on the I<ute> line
+and those in "Type" and "File" on the I<da> line do not require their own
+I<sicut> keywords, since there is no ambiguity as to whether they might
+represent subroutine calls in void context.)
 
 
 =head1 THESAURUS PERLIGATUS
@@ -2396,7 +2586,9 @@ and only the imperative for verbs.
         $#var        admeta varum     "measure out"
         $_           hoc/huic         "this thing"
         @_           his/horum        "these things"
-    $<           nomen            "name"
+        $<           nomen            "a name"
+        ","          comma            "a comma"
+        "."          guttam           "a spot"
         ":"          biguttam         "two spots"
         " "          lacunam          "a gap"
         "\t"         stadium          "a stride"
@@ -2561,7 +2753,7 @@ and only the imperative for verbs.
         ::           intra        "within"
         bless        benedice     "bless"
         caller       memora       "recount a history"
-        package      domus        "house of "
+        package      domus        "house of"
         ref          agnosce      "identify"
         tie          liga         "tie"
         tied         exhibe       "display something"
@@ -2760,7 +2952,9 @@ Corrections to my very poor Latin are doubly welcome.
 
 =head1 IUS TRANSCRIBENDI
 
-Copyright (c) 2000-2016, Damian Conway. All Rights Reserved.
+Copyright (c) 2000-2020, Damian Conway. All Rights Reserved.
 This module is free software. It may be used, redistributed
 and/or modified under the terms of the Perl Artistic License
   (see http://www.perl.com/perl/misc/Artistic.html)
+
+=cut

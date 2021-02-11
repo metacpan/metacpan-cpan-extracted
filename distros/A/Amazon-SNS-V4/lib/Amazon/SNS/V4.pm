@@ -14,8 +14,9 @@ use AWS::Signature4;
 use HTTP::Request::Common;
 use Amazon::SNS::V4::Target;
 use Amazon::SNS::V4::Topic;
+use Amazon::SNS::V4::FifoTopic;
 
-our $VERSION = '1.9';
+our $VERSION = '1.11';
 
 
 sub CreateTopic
@@ -35,8 +36,21 @@ sub CreateTopic
 sub GetTopic
 {
 	my ($self, $arn) = @_;
+	if ($arn =~ m{\.fifo$}) {
+		return GetFifoTopic( @_ );
+	}
 
 	return Amazon::SNS::V4::Topic->new({
+		'sns' => $self,
+		'arn' => $arn,
+	});
+}
+
+sub GetFifoTopic
+{
+	my ($self, $arn) = @_;
+
+	return Amazon::SNS::V4::FifoTopic->new({
 		'sns' => $self,
 		'arn' => $arn,
 	});
@@ -143,7 +157,7 @@ sub dispatch
 				'ForceArray' => [ qw/ Topics member / ],
 		);
 	} else {
-		$self->error_response( $response_content );
+		$self->error_response( $response->content );
 		$self->error(
 			($response->content =~ /^<.+>/)
 				? eval { XMLin($response->content)->{'Error'}{'Message'} || $response->status_line }
@@ -199,6 +213,11 @@ Amazon::SNS::V4 - Amazon Simple Notification Service with v4 Signatures
 
   $topic->Publish('My test message', 'My Subject');
 
+  # publish to a known ARN (FIFO)
+
+  my $topic = $sns->GetTopic('arn:aws:sns:eu-west-1:123456789099:MyTopic.fifo');
+
+  $topic->Publish('My test message', 'My Subject', 'group-id', 'dedupe-id');
 
   # get all topics
 
@@ -206,11 +225,9 @@ Amazon::SNS::V4 - Amazon Simple Notification Service with v4 Signatures
 
   print $_->arn, "\n" for @topics;
 
-
-
   # change region
 
-  $sns->service('http://sns.us-east-1.amazonaws.com');
+  $sns->service('https://sns.us-east-1.amazonaws.com');
 
 =head1 DESCRIPTION
 
@@ -237,8 +254,7 @@ Sorry for not providing a better documentation, patches are always accepted. ;)
 
 =item $sns->Publish($message, $subject, $attributes) (Amazon::SNS::V4::Target)
 
-	When used with Amazon::SNS::V4::Target object (see GetTarget), additional parameter $attributes is used to pass 
-	MessageAttributes.entry.N attributes with message.
+	Additional parameter $attributes is used to pass MessageAttributes.entry.N attributes with message.
 	An example of MobilePush TTL: $attributes = {"AWS.SNS.MOBILE.APNS.TTL" => {"Type" => "String", "Value" => 3600}};
 	More information can be found on Amazon web site: http://docs.aws.amazon.com/sns/latest/dg/sns-ttl.html
 

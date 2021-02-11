@@ -8,7 +8,7 @@ use RxPerl::Mojo ':all';
 use Exporter 'import';
 our @EXPORT_OK = qw/ make_websocket_observable /;
 
-our $VERSION = "v0.0.11";
+our $VERSION = "v0.0.13";
 
 sub _ua {
     state $ua = Mojo::UserAgent->new;

@@ -7,7 +7,7 @@ use Mojo::UserAgent;
 use Mojo::IOLoop;
 use Scalar::Util 'weaken';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # TODO: X-Forwarded-For in Config per index steuern
 # TODO: - Check for blacklist/whitelist/max words etc. yourself.
@@ -597,7 +597,7 @@ from L<Mojolicious::Plugin> and implements the following new ones.
 
   # Mojolicious
   $app->plugin(Blogspam => {
-    url  => 'blogspam.sojolicio.us',
+    url  => 'blogspam.sojolicious.example',
     port => '8888',
     site => 'http://grimms-abenteuer.de/',
     log  => '/spam.log',
@@ -614,7 +614,7 @@ from L<Mojolicious::Plugin> and implements the following new ones.
   # Or in your config file
   {
     BlogSpam => {
-      url => 'blogspam.sojolicio.us',
+      url => 'blogspam.sojolicious.example',
       site => 'http://grimms-abenteuer.de/',
       port => '8888'
     }
@@ -693,7 +693,7 @@ The comment text.
 
 =head2 email
 
-  $bs->email('spammer@sojolicio.us');
+  $bs->email('spammer@sojolicious.example');
   my $email = $bs->email;
 
 The email address of the commenter.
@@ -865,7 +865,7 @@ return values in blocking requests.
 =head2 get_stats
 
   my $stats = $bs->get_stats;
-  my $stats = $bs->get_stats('http://sojolicio.us/');
+  my $stats = $bs->get_stats('http://sojolicious.example/');
   $bs->get_stats(sub {
     my $stats = shift;
     ...

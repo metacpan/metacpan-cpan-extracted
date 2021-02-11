@@ -12,6 +12,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
 t/check_data_structure.t
+t/default_data.t
 t/load.t
 t/pod.t
 t/pod_coverage.t

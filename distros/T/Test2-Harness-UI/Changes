@@ -1,3 +1,24 @@
+0.000034  2021-02-11 10:15:50-08:00 America/Los_Angeles
+
+    - Add table compression for mysql schemas
+
+0.000033  2021-02-11 09:32:27-08:00 America/Los_Angeles
+
+    - Fix more JS issues where "0" is true in some cases
+
+0.000032  2021-02-11 08:54:03-08:00 America/Los_Angeles
+
+    - Fix bug where sometimes jobs would show as retried
+    - Fix bug where external data for jobs could not be loaded
+
+0.000031  2021-02-10 16:34:16-08:00 America/Los_Angeles
+
+    - Add custom port capabilities to `yath ui`
+
+0.000030  2021-02-10 16:11:52-08:00 America/Los_Angeles
+
+    - Add override stubs
+
 0.000029  2021-02-05 14:37:41-08:00 America/Los_Angeles
 
     - Add initial MySQL (and MySQL 5.6) support

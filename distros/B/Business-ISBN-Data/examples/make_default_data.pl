@@ -20,7 +20,7 @@ foreach my $key ( sort grep /^_/, keys %$data ) {
 	$string .= sprintf "\t%-10s => %s,\n", $key, $value;
 	}
 
-$string .= "\t978 => \{\n%%978%%\n\t\},\n\t978 => \{\n%%979%%\n\t\},\n\t);";
+$string .= "\t978 => \{\n%%978%%\n\t\},\n\t979 => \{\n%%979%%\n\t\},\n\t);";
 
 foreach my $k ( qw(978 979) ) {
 	my $s = "\t\t" . join "\n\t\t",

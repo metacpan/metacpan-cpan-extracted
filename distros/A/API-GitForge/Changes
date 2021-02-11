@@ -1,5 +1,9 @@
 Revision history for API::GitForge
 
+0.006     2021-02-09 15:10:36-07:00 America/Phoenix
+    - API::GitForge::Role::GitForge::clean_fork(): fix checking the exit
+      status of the push of the gitforge branch.
+
 0.005     2020-05-24 08:04:55-07:00 America/Phoenix
     - API::GitForge::Role::GitForge::clean_repo(): don't continue if
       fail to push the gitforge branch.

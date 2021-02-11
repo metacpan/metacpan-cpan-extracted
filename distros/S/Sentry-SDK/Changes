@@ -1,5 +1,41 @@
 Revision history for Sentry-SDK
 
+v1.0.2  2021-02-11 15:38:56 CET
+
+  - fix(CGI::Application::Plugin::Sentry): handle scope end in prerun stage
+  - fix: fix exception handling when the exception object does not have a `to_string` method
+  - fix(dsn): fix URL building when standard ports are used
+  - feat(sdk): add `debug` option
+
+v1.0.1  2021-02-11 09:42:35 CET
+
+  - fix(deps): add missing `List::Util` (for a newer release ccontaining `uniq()`)
+
+v1.0.0  2021-02-11 00:10:25 CET
+
+  - Configure the packages main module
+
+0.11.2  2021-02-11 00:01:05 CET
+
+  - Moved to https://github.com/heiseonline/perl-sentry-sdk
+
+0.11.1  2021-02-10 23:43:09 CET
+
+  - feat: improve the `CGI::Application` plugin
+  - fix(hub): fix error in `set_tags()`
+
+0.11.0  2021-02-10 22:27:39 CET
+
+  - feat(tracing): support the `traces_sample_rate` option
+
+0.10.5  2021-02-10 11:18:15 CET
+
+  - docs: add POD
+
+0.10.4  2021-02-10 10:28:34 CET
+
+  - fix: add missing requirements (Perl v5.24.0)
+
 0.10.3  2021-02-09 00:28:01 CET
 
   - fix: use new Sentry module name in framework integrations

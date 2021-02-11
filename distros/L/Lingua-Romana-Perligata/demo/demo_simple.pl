@@ -4,7 +4,7 @@ use Lingua::Romana::Perligata
 # 'investiga',
 ;
 
-ute Tabs intra Text.
+ute Tabs sicut intra Text.
 
 inscribe label.
 dum nexto preincrescementum tum XCIX praestantiam fac sic

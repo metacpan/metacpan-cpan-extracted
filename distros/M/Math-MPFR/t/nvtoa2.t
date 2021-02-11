@@ -36,7 +36,8 @@ use Test::More;
 # is prone to mis-assignment and $reliable is set to false, irrespective of the value of $].
 #
 # All perl's whose nvtype is __float128 (except those running on Cygwin) assign correctly and
-# $reliable is set to true for them, irrespective of the value of $].
+# $reliable is set to true for them, irrespective of the value of $] ... except that on MS
+# Windows, assignment of subnormal values (within a specific range) is unreliable.
 #
 # For all other builds of perl, $reliable will be set to true if and only if:
 # 1) $] >= 5.03 && $Config{nvtype} eq 'double' && defined($Config{d_strtod})
@@ -81,6 +82,9 @@ else                                           { $MAX_DIG = 34;   # NV is Double
 
 my $reliable = 0;
 
+my $win_subnormal_issue = 0;
+$win_subnormal_issue = 1 if ($^O =~/MSWin/ && $Config{nvtype} eq '__float128');
+
 if(
    $^O !~/cygwin/i
    && (
@@ -92,7 +96,18 @@ if(
       )
   ) {
 
-  warn "Using perl for string to NV assignment. (Perl deemed reliable)\n";
+  if( $win_subnormal_issue ) {
+    warn "\n Using perl for string to NV assignment ... unless the NV's\n",
+         " absolute value is in the range:\n",
+         "  0x1p-16414 .. 0x1.ffffffffffffffffffffp-16414\n",
+         "  or\n",
+         "  0x1.00000318p-16446 to 0x1.ffffffffffffp-16446\n",
+         " See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94756\n";
+  }
+  else {
+    warn "Using perl for string to NV assignment. (Perl deemed reliable)\n";
+  }
+
   $reliable = 1;
 }
 else {
@@ -120,10 +135,14 @@ while(1) {
   $mantissa .= 1 +int(rand(9)) if $len;
 
   my $str = $mantissa_sign . $mantissa . 'e' . $exponent;
-
+  my $s_copy = $mantissa_sign . $mantissa . 'e' . $exponent;
+  my $float128_subnormal_issue = 0;
+  if($win_subnormal_issue) {
+    $float128_subnormal_issue = float128_subnormal_problem($s_copy * 1.0);
+  }
   my $nv;
 
-  if($reliable) {
+  if($reliable && !$float128_subnormal_issue) {
     $nv = $str * 1.0;
   }
   else {
@@ -134,7 +153,7 @@ while(1) {
 
   # Now check that $nvtoa == $nv
 
-  if($reliable) { # perl can assign the string directly
+  if($reliable && !$float128_subnormal_issue) { # perl can assign the string directly
     my $nvtoa_num = $nvtoa; # Avoid numifying $nvtoa
 
     if($nvtoa_num != $nv) {
@@ -183,7 +202,7 @@ while(1) {
 
   my $new_str = $mantissa_sign . $significand . 'e' . $new_exponent;
 
-  if($reliable) {
+  if($reliable && !$float128_subnormal_issue) {
     my $new_str_num = $new_str; # Avoid numifying $new_str
     if($nv < 0) {               # $new_str_num  should be greater than $nv
       unless($new_str_num > $nv) {
@@ -227,7 +246,7 @@ while(1) {
 
   #print "$new_str\n\n";
 
-  if($reliable) {
+  if($reliable && !$float128_subnormal_issue) {
     my $new_str_num = $new_str; # Avoid numifying $new_str
     if($nv < 0) {               # $new_str_num  should be less than $nv
       unless($new_str_num < $nv) {
@@ -273,6 +292,17 @@ while(1) {
       ok($ok == 1, 'test 1');
     }
 
+sub float128_subnormal_problem {
+
+  # Values inside these ranges are not assigned correctly on MS Windows.
+  # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94756
+  if( (abs($_[0]) <= 1.56560127768297377334100959207326356e-4941 && abs($_[0]) >= 2 ** -16414)
+        ||
+      (abs($_[0]) <= 3.64519953188246812735328649559430889e-4951 && abs($_[0]) >= 1.82260010203204199023661059308858291e-4951  )
+ ) {
+  return 1; # problem exists
+  }
+return 0;   # no problem
+}
 
 __END__
-

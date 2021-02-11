@@ -1,3 +1,9 @@
+0.03
+
+        - Relicensing as LGPLv3.
+        - Using Dist::Zilla to prepare the distribution.
+        - Adding links to homepage and issue tracker.
+
 0.02
 
         - Switched from functional style to object-oriented style.

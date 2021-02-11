@@ -1,6 +1,3 @@
-#
-# $Id$
-#
 
 =head1 NAME
 
@@ -28,13 +25,13 @@ use base 'Exporter';
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 # set up exports
 our @EXPORT;
 our @EXPORT_OK;
 our %EXPORT_TAGS;
-$EXPORT_TAGS{all} = [ qw|uniq| ];
+$EXPORT_TAGS{all} = [qw|uniq|];
 Exporter::export_ok_tags('all');
 
 =head1 FUNCTIONS
@@ -96,62 +93,62 @@ or a reference to a list of unique elements if called in scalar context.
 
 my %default_opts = ( sort => 0, flatten => 1 );
 
-sub uniq
-{
+sub uniq {
 
     # pull options off the front of the list
     my $opts;
-    if( ref $_[0] eq 'HASH' ) {
+    if ( ref $_[0] eq 'HASH' ) {
         $opts = shift @_;
     }
-    for my $opt( keys %default_opts ) {
-      unless( defined $opts->{$opt} ) {
-        $opts->{$opt} = $default_opts{$opt};
-      }
+    for my $opt ( keys %default_opts ) {
+        unless ( defined $opts->{$opt} ) {
+            $opts->{$opt} = $default_opts{$opt};
+        }
     }
-    
+
+    my @list = @_;
+
     # flatten list references
-    if( $opts->{flatten} ) {
-      my $unwrap;
-      $unwrap = sub { map { 'ARRAY' eq ref $_ ? $unwrap->( @$_ ) : $_ } @_ };
-      @_ = $unwrap->( \@_ );
+    if ( $opts->{flatten} ) {
+        @list = _unwrap( \@list );
     }
-    
+
     # uniq the elements
     my @elements;
     my %seen;
     {
         no warnings 'uninitialized';
-        @elements = grep { ! $seen{$_} ++ } @_;
+        @elements = grep { !$seen{$_}++ } @list;
     }
-    
+
     # sort before returning if so desired
-    if( $opts->{sort} ) {
-        if( $opts->{compare} ) {
-            unless( 'CODE' eq ref $opts->{compare} ) {
+    if ( $opts->{sort} ) {
+        if ( $opts->{compare} ) {
+            unless ( 'CODE' eq ref $opts->{compare} ) {
                 require Carp;
                 Carp::croak("compare option is not a CODEREF");
             }
-            @elements = sort { $opts->{compare}->($a,$b) } @elements;
+            @elements = sort { $opts->{compare}->( $a, $b ) } @elements;
         }
         else {
             @elements = sort @elements;
         }
     }
-    
+
     # return a list or list ref
     return wantarray ? @elements : \@elements;
+}
 
+sub _unwrap {
+    my @list = @_;
+
+    return map { 'ARRAY' eq ref $_ ? _unwrap(@$_) : $_ } @list;
 }
 
 # keep require happy
 1;
 
-
 __END__
-
-
-=head1 EXAMPLES
 
 =head1 EXPORTS
 
@@ -163,11 +160,17 @@ Everything with the B<:all> tag.
 
 =head1 SEE ALSO
 
-If you want to unique a list as you insert into it, see L<Array::Unique> by
-Gabor Szabo.
+=over
 
-This module was written out of a need to unique an array that was
-auto-vivified and thus not easily tied to Array::Unique.
+=item L<Array::Unique>
+
+If you want to unique a list as you insert into it, see L<Array::Unique>.
+
+=item L<List::Util/uniq>
+
+=item L<PerlPowerTools/uniq>
+
+=back
 
 =head1 AUTHOR
 
@@ -195,6 +198,3 @@ This library is free software; you may use it under the same
 terms as perl itself.
 
 =cut
-
-#
-# EOF

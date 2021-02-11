@@ -8,6 +8,7 @@ META.yml
 README
 cpanfile
 lib/Amazon/SNS/V4.pm
+lib/Amazon/SNS/V4/FifoTopic.pm
 lib/Amazon/SNS/V4/Target.pm
 lib/Amazon/SNS/V4/Topic.pm
 metamerge.yml

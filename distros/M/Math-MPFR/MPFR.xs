@@ -13,7 +13,10 @@
 
 
 #include "math_mpfr_include.h"
-#include "grisu3.h"
+
+#if NVSIZE == 8
+#  include "grisu3.h"
+#endif
 
 int nnum = 0; /* flag that is incremented whenever a string containing
                  non-numeric characters is treated as a number */
@@ -483,7 +486,7 @@ void Rmpfr_deref2(pTHX_ mpfr_t * p, SV * base, SV * n_digits, SV * round) {
 
      out = mpfr_get_str(0, &ptr, SvIV(base), (unsigned long)SvUV(n_digits), *p, (mpfr_rnd_t)SvUV(round));
 
-     if(out == NULL) croak("An error occurred in mpfr_get_str\n");
+     if(out == NULL) croak("An error occurred in memory allocation in mpfr_get_str\n");
 
      ST(0) = sv_2mortal(newSVpv(out, 0));
      mpfr_free_str(out);
@@ -1260,14 +1263,62 @@ SV * Rmpfr_sin(pTHX_ mpfr_t * a, mpfr_t * b, SV * round) {
      return newSViv(mpfr_sin(*a, *b, (mpfr_rnd_t)SvUV(round)));
 }
 
+SV * Rmpfr_sinu(pTHX_ mpfr_t *a, mpfr_t *b, unsigned long c, SV *round) {
+#if MPFR_VERSION >= 262656
+     return newSViv(mpfr_sinu(*a, *b, c, (mpfr_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_sinu function not implemented until mpfr-4.2.0. (You have only version %s) ", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_sinpi(pTHX_ mpfr_t *a, mpfr_t *b, SV *round) {
+#if MPFR_VERSION >= 262656
+     return newSViv(mpfr_sinpi(*a, *b, (mpfr_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_sinpi function not implemented until mpfr-4.2.0. (You have only version %s) ", MPFR_VERSION_STRING);
+#endif
+}
+
 SV * Rmpfr_cos(pTHX_ mpfr_t * a, mpfr_t * b, SV * round) {
      CHECK_ROUNDING_VALUE
      return newSViv(mpfr_cos(*a, *b, (mpfr_rnd_t)SvUV(round)));
 }
 
+SV * Rmpfr_cosu(pTHX_ mpfr_t *a, mpfr_t *b, unsigned long c, SV *round) {
+#if MPFR_VERSION >= 262656
+     return newSViv(mpfr_cosu(*a, *b, c, (mpfr_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_cosu function not implemented until mpfr-4.2.0. (You have only version %s) ", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_cospi(pTHX_ mpfr_t *a, mpfr_t *b, SV *round) {
+#if MPFR_VERSION >= 262656
+     return newSViv(mpfr_cospi(*a, *b, (mpfr_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_cospi function not implemented until mpfr-4.2.0. (You have only version %s) ", MPFR_VERSION_STRING);
+#endif
+}
+
 SV * Rmpfr_tan(pTHX_ mpfr_t * a, mpfr_t * b, SV * round) {
      CHECK_ROUNDING_VALUE
      return newSViv(mpfr_tan(*a, *b, (mpfr_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_tanu(pTHX_ mpfr_t *a, mpfr_t *b, unsigned long c, SV *round) {
+#if MPFR_VERSION >= 262656
+     return newSViv(mpfr_tanu(*a, *b, c, (mpfr_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_tanu function not implemented until mpfr-4.2.0. (You have only version %s) ", MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_tanpi(pTHX_ mpfr_t *a, mpfr_t *b, SV *round) {
+#if MPFR_VERSION >= 262656
+     return newSViv(mpfr_tanpi(*a, *b, (mpfr_rnd_t)SvUV(round)));
+#else
+     croak("Rmpfr_tanpi function not implemented until mpfr-4.2.0. (You have only version %s) ", MPFR_VERSION_STRING);
+#endif
 }
 
 SV * Rmpfr_asin(pTHX_ mpfr_t * a, mpfr_t * b, SV * round) {
@@ -1715,6 +1766,21 @@ SV * Rmpfr_modf(pTHX_ mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
 SV * Rmpfr_fmod(pTHX_ mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
      CHECK_ROUNDING_VALUE
      return newSViv(mpfr_fmod(*a, *b, *c, (mpfr_rnd_t)SvUV(round)));
+}
+
+SV * Rmpfr_fmod_ui(pTHX_ mpfr_t * a, mpfr_t * b, unsigned long c, SV * round) {
+#if MPFR_VERSION >= 262656
+     return newSViv(mpfr_fmod_ui(*a, *b, c, (mpfr_rnd_t)SvUV(round)));
+#else
+     mpfr_t temp;
+     int ret;
+     CHECK_ROUNDING_VALUE
+     mpfr_init2(temp, LONGSIZE * 8);
+     mpfr_set_ui(temp, c, GMP_RNDN);
+     ret = mpfr_fmod(*a, *b, temp, (mpfr_rnd_t)SvUV(round));
+     mpfr_clear(temp);
+     return newSViv(ret);
+#endif
 }
 
 void Rmpfr_remquo(pTHX_ mpfr_t * a, mpfr_t * b, mpfr_t * c, SV * round) {
@@ -7733,7 +7799,7 @@ void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
   *exp += tmp - 16382;
 
   if(*exp == -16382) {
-    while(Q_CONDITION_1) {	/* big endian:    (i <= 15) */
+    while(Q_CONDITION_1(i)) {	/* big endian:    (i <= 15) */
 				/* little endian: (i >= 0 ) */
       tmp = ((unsigned char *)nvptr)[i];
       if(tmp) {
@@ -7743,7 +7809,7 @@ void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
 
       subnormal_prec_adjustment += 8;
 
-      Q_INC_OR_DEC		/* big endian:    i++; */
+      INC_OR_DEC(i);		/* big endian:    i++; */
 				/* little endian: i--; */
 
     }			/* close while loop */
@@ -7785,11 +7851,11 @@ void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
    * If so, set lsd_is_zero to 1 and set *bits to 53.    *
    *******************************************************/
 
-  if( (128 == ((unsigned char *)nvptr)[LSD_BYTE_1] || 0 == ((unsigned char *)nvptr)[LSD_BYTE_1])  &&
-         0 == ((unsigned char *)nvptr)[LSD_BYTE_2] && 0 == ((unsigned char *)nvptr)[LSD_BYTE_3]   &&
-         0 == ((unsigned char *)nvptr)[LSD_BYTE_4] && 0 == ((unsigned char *)nvptr)[LSD_BYTE_5]   &&
-         0 == ((unsigned char *)nvptr)[LSD_BYTE_6] && 0 == ((unsigned char *)nvptr)[LSD_BYTE_7]   &&
-         0 == ((unsigned char *)nvptr)[LSD_BYTE_8]
+  if( (128 == ((unsigned char *)nvptr)[LSD_IND_0] || 0 == ((unsigned char *)nvptr)[LSD_IND_0])  &&
+         0 == ((unsigned char *)nvptr)[LSD_IND_1] && 0 == ((unsigned char *)nvptr)[LSD_IND_2]   &&
+         0 == ((unsigned char *)nvptr)[LSD_IND_3] && 0 == ((unsigned char *)nvptr)[LSD_IND_4]   &&
+         0 == ((unsigned char *)nvptr)[LSD_IND_5] && 0 == ((unsigned char *)nvptr)[LSD_IND_6]   &&
+         0 == ((unsigned char *)nvptr)[LSD_IND_7]
       ) {
     lsd_is_zero = 1;
     *bits = 53;
@@ -7797,22 +7863,22 @@ void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
 
   /* else *bits is currently still set at its initial value of 2098 */
 
-  int i = IND_1;
+  int i = MSD_IND_1;
 
   if(*bits == 53) { /* if the NV is subnormal, *bits need to be reduced accordingly */
-    *exp = ((unsigned char *)nvptr)[IND_0];
+    *exp = ((unsigned char *)nvptr)[MSD_IND_0];
     *exp <<= 4;
-    tmp = ((unsigned char *)nvptr)[IND_1];
+    tmp = ((unsigned char *)nvptr)[MSD_IND_1];
     *exp += (tmp >> 4) - 1022;
 
     if(*exp == -1022) {
 
-      while(DD_CONDITION_1) {			/* big endian:    (i <= 7) */
+      while(DD_CONDITION_1(i)) {			/* big endian:    (i <= 7) */
 						/* little endian: (i >= 0) */
 
         tmp = ((unsigned char *)nvptr)[i];
         if(tmp) {
-          if(i == IND_1) {
+          if(i == MSD_IND_1) {
             BITSEARCH_4				/* defined in math_mpfr_include.h */
             break;
           }
@@ -7822,10 +7888,10 @@ void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
           }
         }
 
-        if(i == IND_1) subnormal_prec_adjustment += 4;
+        if(i == MSD_IND_1) subnormal_prec_adjustment += 4;
         else subnormal_prec_adjustment += 8;
 
-        DD_INC_OR_DEC				/* big endian:    i++ */
+        INC_OR_DEC(i);				/* big endian:    i++ */
 						/* little endian: i-- */
       }
     }
@@ -7850,16 +7916,16 @@ void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
   }
 
   else {
-    msd_exp = ((unsigned char *)nvptr)[IND_0];
+    msd_exp = ((unsigned char *)nvptr)[MSD_IND_0];
     msd_exp <<= 4;
-    tmp = ((unsigned char *)nvptr)[IND_1];
+    tmp = ((unsigned char *)nvptr)[MSD_IND_1];
     msd_exp += (tmp >> 4) - 1022;
 
-    lsd_exp = ((unsigned char *)nvptr)[LSD_BYTE_1];
+    lsd_exp = ((unsigned char *)nvptr)[LSD_IND_0];
 
 
     lsd_exp <<= 4;
-    tmp = ((unsigned char *)nvptr)[LSD_BYTE_2];
+    tmp = ((unsigned char *)nvptr)[LSD_IND_1];
     lsd_exp += tmp >> 4;
     if(lsd_exp > 2047) {
       lsd_exp -= 2048;
@@ -7879,7 +7945,7 @@ void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
  *   if(lsd_is_negative_reduction) {		*//* lsd is negative and not zero *//*               *
  *     if(msd_exp - lsd_exp > 53) {		*//* need to check that msd is not a power of 2 *//* *
  *                                                                                                   *
- *       for(DD_CONDITION_2) {			*//* big endian:    (i=2 ;i<8;i++) *//*              *
+ *       for(DD_CONDITION_2(i)) {			*//* big endian:    (i=2 ;i<8;i++) *//*              *
  *						*//* little endian: (i=13;i>7;i--) *//*              *
  *                                                                                                   *
  *         t = ((unsigned char *)nvptr)[i];                                                          *
@@ -7890,7 +7956,7 @@ void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
  *       }                                                                                           *
  *                                                                                                   *
  *       if(lsd_is_negative_reduction) {                                                             *
- *         t = ((unsigned char *)nvptr)[IND_1];                                                      *
+ *         t = ((unsigned char *)nvptr)[MSD_IND_1];                                                      *
  *         if(t & 15) {                                                                              *
  *           lsd_is_negative_reduction = 0;                                                          *
  *         }                                                                                         *
@@ -7925,7 +7991,7 @@ void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
 
   if(*exp == -16382) {
 
-    while(LD_CONDITION_1) {			/* big endian:    (i <= 9) */
+    while(LD_CONDITION_1(i)) {			/* big endian:    (i <= 9) */
 						/* little endian: (i >= 0) */
       tmp = ((unsigned char *)nvptr)[i];
       if(tmp) {
@@ -7935,7 +8001,7 @@ void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
 
       subnormal_prec_adjustment += 8;
 
-      LD_INC_OR_DEC		/* big endian: i++; */
+      INC_OR_DEC(i);		/* big endian: i++; */
                                 /* little endian: i--; */
 
     }			/* close while loop */
@@ -7960,7 +8026,7 @@ void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
 
   if(*exp == -1022) {
 
-    while(D_CONDITION_1) {	/* big endian:   (i <= 7) */
+    while(D_CONDITION_1(i)) {	/* big endian:   (i <= 7) */
 				/* little endan: (i >= 0) */
       tmp = ((unsigned char *)nvptr)[i];
       if(tmp) {
@@ -7977,7 +8043,7 @@ void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
       if(i == 1) subnormal_prec_adjustment += 4;
       else subnormal_prec_adjustment += 8;
 
-      D_INC_OR_DEC		/* big endian:    i++; */
+      INC_OR_DEC(i);		/* big endian:    i++; */
 				/* little endian: i--; */
     }
   }
@@ -8114,11 +8180,10 @@ SV * nvtoa(pTHX_ NV pnv) {
     f[0] = is_subnormal ? c[0] : c[1];
     k++;
 
-#  if defined(MPFR_HAVE_BENDIAN)
-    for(skip = 2; skip <= 15; skip++) {
-#  else
-    for(skip = 13; skip >= 0; skip--) {
-#  endif
+   for(skip = QIND_2; Q_CONDITION_1(skip); INC_OR_DEC(skip)) { /* big endian:
+                                                                *   skip=2;skip<=15;skip++ */
+                                                               /* little endian:
+                                                                *   skip=13;skip>=0;skip-- */
       low = ((unsigned char *)nvptr)[skip];
       f[k] = c[low >> 4];
       f[k + 1] = c[low & 15];
@@ -8142,11 +8207,11 @@ SV * nvtoa(pTHX_ NV pnv) {
 
 #elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64	/* 64 bit prec */
 
-#  if defined(MPFR_HAVE_BENDIAN)
-    for(skip = 2; skip <= 9; skip++) {
-#  else
-    for(skip = 7; skip >= 0; skip--) {
-#  endif
+    for(skip = LDIND_2; LD_CONDITION_1(skip); INC_OR_DEC(skip)) { /* big endian:             *
+                                                                   *   skip=2;skip<=9;skip++ */
+                                                                  /* little endian:          *
+                                                                   *   skip=7;skip>=0;skip-- */
+
       low = ((unsigned char *)nvptr)[skip];
       f[k] = c[low >> 4];
       f[k + 1] = c[low & 15];
@@ -8155,11 +8220,10 @@ SV * nvtoa(pTHX_ NV pnv) {
 
 #else									/* 53 bit prec */
 
-#  if defined(MPFR_HAVE_BENDIAN)
-    for(skip = 1; skip <= 7; skip++) {
-#  else
-    for(skip = 6; skip >= 0; skip--) {
-#  endif
+    for(skip = DIND_1; D_CONDITION_1(skip); INC_OR_DEC(skip)) { /* big endian:             *
+                                                                 *   skip=1;skip<=7;skip++ */
+                                                                /* little endian:          *
+                                                                 *   skip=6;skip>=0;skip-- */
       low = ((unsigned char *)nvptr)[skip];
       if(!k) {
         f[0] = is_subnormal ? c[0] : c[1];
@@ -8532,285 +8596,6 @@ SV * nvtoa(pTHX_ NV pnv) {
  * BEGIN doubletoa          *
  ****************************/
 
-/* This code is part of an implementation of the "grisu3" double to string
-	conversion algorithm described in the research paper
-
-	"Printing Floating-Point Numbers Quickly And Accurately with Integers"
-	by Florian Loitsch, available at
-	http://www.cs.tufts.edu/~nr/cs257/archive/florian-loitsch/printf.pdf */
-
-/* See grisu3.h for definition of symbols and types                          */
-
-static const power pow_cache[] =
-{
-  { 0xfa8fd5a0081c0288ULL, -1220, -348 },
-  { 0xbaaee17fa23ebf76ULL, -1193, -340 },
-  { 0x8b16fb203055ac76ULL, -1166, -332 },
-  { 0xcf42894a5dce35eaULL, -1140, -324 },
-  { 0x9a6bb0aa55653b2dULL, -1113, -316 },
-  { 0xe61acf033d1a45dfULL, -1087, -308 },
-  { 0xab70fe17c79ac6caULL, -1060, -300 },
-  { 0xff77b1fcbebcdc4fULL, -1034, -292 },
-  { 0xbe5691ef416bd60cULL, -1007, -284 },
-  { 0x8dd01fad907ffc3cULL,  -980, -276 },
-  { 0xd3515c2831559a83ULL,  -954, -268 },
-  { 0x9d71ac8fada6c9b5ULL,  -927, -260 },
-  { 0xea9c227723ee8bcbULL,  -901, -252 },
-  { 0xaecc49914078536dULL,  -874, -244 },
-  { 0x823c12795db6ce57ULL,  -847, -236 },
-  { 0xc21094364dfb5637ULL,  -821, -228 },
-  { 0x9096ea6f3848984fULL,  -794, -220 },
-  { 0xd77485cb25823ac7ULL,  -768, -212 },
-  { 0xa086cfcd97bf97f4ULL,  -741, -204 },
-  { 0xef340a98172aace5ULL,  -715, -196 },
-  { 0xb23867fb2a35b28eULL,  -688, -188 },
-  { 0x84c8d4dfd2c63f3bULL,  -661, -180 },
-  { 0xc5dd44271ad3cdbaULL,  -635, -172 },
-  { 0x936b9fcebb25c996ULL,  -608, -164 },
-  { 0xdbac6c247d62a584ULL,  -582, -156 },
-  { 0xa3ab66580d5fdaf6ULL,  -555, -148 },
-  { 0xf3e2f893dec3f126ULL,  -529, -140 },
-  { 0xb5b5ada8aaff80b8ULL,  -502, -132 },
-  { 0x87625f056c7c4a8bULL,  -475, -124 },
-  { 0xc9bcff6034c13053ULL,  -449, -116 },
-  { 0x964e858c91ba2655ULL,  -422, -108 },
-  { 0xdff9772470297ebdULL,  -396, -100 },
-  { 0xa6dfbd9fb8e5b88fULL,  -369,  -92 },
-  { 0xf8a95fcf88747d94ULL,  -343,  -84 },
-  { 0xb94470938fa89bcfULL,  -316,  -76 },
-  { 0x8a08f0f8bf0f156bULL,  -289,  -68 },
-  { 0xcdb02555653131b6ULL,  -263,  -60 },
-  { 0x993fe2c6d07b7facULL,  -236,  -52 },
-  { 0xe45c10c42a2b3b06ULL,  -210,  -44 },
-  { 0xaa242499697392d3ULL,  -183,  -36 },
-  { 0xfd87b5f28300ca0eULL,  -157,  -28 },
-  { 0xbce5086492111aebULL,  -130,  -20 },
-  { 0x8cbccc096f5088ccULL,  -103,  -12 },
-  { 0xd1b71758e219652cULL,   -77,   -4 },
-  { 0x9c40000000000000ULL,   -50,    4 },
-  { 0xe8d4a51000000000ULL,   -24,   12 },
-  { 0xad78ebc5ac620000ULL,     3,   20 },
-  { 0x813f3978f8940984ULL,    30,   28 },
-  { 0xc097ce7bc90715b3ULL,    56,   36 },
-  { 0x8f7e32ce7bea5c70ULL,    83,   44 },
-  { 0xd5d238a4abe98068ULL,   109,   52 },
-  { 0x9f4f2726179a2245ULL,   136,   60 },
-  { 0xed63a231d4c4fb27ULL,   162,   68 },
-  { 0xb0de65388cc8ada8ULL,   189,   76 },
-  { 0x83c7088e1aab65dbULL,   216,   84 },
-  { 0xc45d1df942711d9aULL,   242,   92 },
-  { 0x924d692ca61be758ULL,   269,  100 },
-  { 0xda01ee641a708deaULL,   295,  108 },
-  { 0xa26da3999aef774aULL,   322,  116 },
-  { 0xf209787bb47d6b85ULL,   348,  124 },
-  { 0xb454e4a179dd1877ULL,   375,  132 },
-  { 0x865b86925b9bc5c2ULL,   402,  140 },
-  { 0xc83553c5c8965d3dULL,   428,  148 },
-  { 0x952ab45cfa97a0b3ULL,   455,  156 },
-  { 0xde469fbd99a05fe3ULL,   481,  164 },
-  { 0xa59bc234db398c25ULL,   508,  172 },
-  { 0xf6c69a72a3989f5cULL,   534,  180 },
-  { 0xb7dcbf5354e9beceULL,   561,  188 },
-  { 0x88fcf317f22241e2ULL,   588,  196 },
-  { 0xcc20ce9bd35c78a5ULL,   614,  204 },
-  { 0x98165af37b2153dfULL,   641,  212 },
-  { 0xe2a0b5dc971f303aULL,   667,  220 },
-  { 0xa8d9d1535ce3b396ULL,   694,  228 },
-  { 0xfb9b7cd9a4a7443cULL,   720,  236 },
-  { 0xbb764c4ca7a44410ULL,   747,  244 },
-  { 0x8bab8eefb6409c1aULL,   774,  252 },
-  { 0xd01fef10a657842cULL,   800,  260 },
-  { 0x9b10a4e5e9913129ULL,   827,  268 },
-  { 0xe7109bfba19c0c9dULL,   853,  276 },
-  { 0xac2820d9623bf429ULL,   880,  284 },
-  { 0x80444b5e7aa7cf85ULL,   907,  292 },
-  { 0xbf21e44003acdd2dULL,   933,  300 },
-  { 0x8e679c2f5e44ff8fULL,   960,  308 },
-  { 0xd433179d9c8cb841ULL,   986,  316 },
-  { 0x9e19db92b4e31ba9ULL,  1013,  324 },
-  { 0xeb96bf6ebadf77d9ULL,  1039,  332 },
-  { 0xaf87023b9bf0ee6bULL,  1066,  340 }
-};
-
-/* pow10_cache[i] = 10^(i-1) */
-static const unsigned int pow10_cache[] =
-{ 0, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000 };
-
-static int cached_pow(int exp, diy_fp *p) {
-  int k = (int)ceil((exp+DIYFP_FRACT_SIZE-1) * D_1_LOG2_10);
-  int i = (k-MIN_CACHED_EXP-1) / CACHED_EXP_STEP + 1;
-  p->f = pow_cache[i].fract;
-  p->e = pow_cache[i].b_exp;
-  return pow_cache[i].d_exp;
-}
-
-static diy_fp minus(diy_fp x, diy_fp y) {
-  diy_fp d; d.f = x.f - y.f; d.e = x.e;
-#ifdef DTOA_ASSERT
-  if(x.e != y.e) croak("x.e != y.e");
-  if(x.f < y.f) croak("x.f < y.f");
-  /* assert(x.e == y.e && x.f >= y.f); */
-#endif
-  return d;
-}
-
-static diy_fp multiply(diy_fp x, diy_fp y) {
-  uint64_t a, b, c, d, ac, bc, ad, bd, tmp;
-  diy_fp r;
-  a = x.f >> 32; b = x.f & MASK32;
-  c = y.f >> 32; d = y.f & MASK32;
-  ac = a*c; bc = b*c;
-  ad = a*d; bd = b*d;
-  tmp = (bd >> 32) + (ad & MASK32) + (bc & MASK32);
-  tmp += 1U << 31; /* round */
-  r.f = ac + (ad >> 32) + (bc >> 32) + (tmp >> 32);
-  r.e = x.e + y.e + 64;
-  return r;
-}
-
-static diy_fp normalize_diy_fp(diy_fp n) {
-#ifdef DTOA_ASSERT
-  if(n.f == 0) croak("n.f == 0");
-  /* assert(n.f != 0); */
-#endif
-  while(!(n.f & 0xFFC0000000000000ULL)) { n.f <<= 10; n.e -= 10; }
-  while(!(n.f & D64_SIGN)) { n.f <<= 1; --n.e; }
-  return n;
-}
-
-static diy_fp double2diy_fp(double d) {
-  diy_fp fp;
-  uint64_t u64 = CAST_U64(d);
-  if(!(u64 & D64_EXP_MASK)) { fp.f = u64 & D64_FRACT_MASK; fp.e = 1 - D64_EXP_BIAS; }
-  else { fp.f = (u64 & D64_FRACT_MASK) + D64_IMPLICIT_ONE; fp.e = (int)((u64 & D64_EXP_MASK) >> D64_EXP_POS) - D64_EXP_BIAS; }
-  return fp;
-}
-
-static int largest_pow10(uint32_t n, int n_bits, uint32_t *power) {
-  int guess = ((n_bits + 1) * 1233 >> 12) + 1/*skip first entry*/;
-  if(n < pow10_cache[guess]) --guess; /* We don't have any guarantees that 2^n_bits <= n. */
-  *power = pow10_cache[guess];
-  return guess;
-}
-
-static int round_weed(char *buffer, int len, uint64_t wp_W, uint64_t delta, uint64_t rest, uint64_t ten_kappa, uint64_t ulp) {
-  uint64_t wp_Wup = wp_W - ulp;
-  uint64_t wp_Wdown = wp_W + ulp;
-  while(rest < wp_Wup && delta - rest >= ten_kappa && (rest + ten_kappa < wp_Wup || wp_Wup - rest >= rest + ten_kappa - wp_Wup)) {
-    --buffer[len-1];
-    rest += ten_kappa;
-  }
-  if(rest < wp_Wdown && delta - rest >= ten_kappa && (rest + ten_kappa < wp_Wdown || wp_Wdown - rest > rest + ten_kappa - wp_Wdown))
-    return 0;
-
-  return 2*ulp <= rest && rest <= delta - 4*ulp;
-}
-
-static int digit_gen(diy_fp low, diy_fp w, diy_fp high, char *buffer, int *length, int *kappa) {
-  uint64_t unit = 1;
-  diy_fp too_low = { low.f - unit, low.e };
-  diy_fp too_high = { high.f + unit, high.e };
-  diy_fp unsafe_interval = minus(too_high, too_low);
-  diy_fp one = { 1ULL << -w.e, w.e };
-  uint32_t p1 = (uint32_t)(too_high.f >> -one.e);
-  uint64_t p2 = too_high.f & (one.f - 1);
-  uint32_t div;
-  *kappa = largest_pow10(p1, DIYFP_FRACT_SIZE + one.e, &div);
-  *length = 0;
-
-  while(*kappa > 0) {
-    uint64_t rest;
-    int digit = p1 / div;
-    buffer[*length] = (char)('0' + digit);
-    ++*length;
-    p1 %= div;
-    --*kappa;
-    rest = ((uint64_t)p1 << -one.e) + p2;
-    if (rest < unsafe_interval.f) return round_weed(buffer, *length, minus(too_high, w).f, unsafe_interval.f, rest, (uint64_t)div << -one.e, unit);
-    div /= 10;
-  }
-
-  for(;;) {
-    int digit;
-    p2 *= 10;
-    unit *= 10;
-    unsafe_interval.f *= 10;
-    /* Integer division by one. */
-    digit = (int)(p2 >> -one.e);
-    buffer[*length] = (char)('0' + digit);
-    ++*length;
-    p2 &= one.f - 1;  /* Modulo by one. */
-    --*kappa;
-    if (p2 < unsafe_interval.f) return round_weed(buffer, *length, minus(too_high, w).f * unit, unsafe_interval.f, p2, one.f, unit);
-  }
-}
-
-static int grisu3(double v, char *buffer, int *length, int *d_exp) {
-  int mk, kappa, success;
-  diy_fp dfp = double2diy_fp(v);
-  diy_fp w = normalize_diy_fp(dfp);
-
-  /* normalize boundaries */
-  diy_fp t = { (dfp.f << 1) + 1, dfp.e - 1 };
-  diy_fp b_plus = normalize_diy_fp(t);
-  diy_fp b_minus;
-  diy_fp c_mk; /* Cached power of ten: 10^-k */
-  uint64_t u64 = CAST_U64(v);
-#ifdef DTOA_ASSERT
-  if(v <= 0)
-    croak("v <= 0, but Grisu only handles strictly positive finite numbers");
-  if(v > 1.7976931348623157e308)
-    croak("v > 1.7976931348623157e308, but Grisu only handles strictly positive finite numbers");
-  /* assert(v > 0 && v <= 1.7976931348623157e308); *//* Grisu only handles strictly positive finite numbers. */
-#endif
-  if (!(u64 & D64_FRACT_MASK) && (u64 & D64_EXP_MASK) != 0) { b_minus.f = (dfp.f << 2) - 1; b_minus.e =  dfp.e - 2;} /* lower boundary is closer? */
-  else { b_minus.f = (dfp.f << 1) - 1; b_minus.e = dfp.e - 1; }
-  b_minus.f = b_minus.f << (b_minus.e - b_plus.e);
-  b_minus.e = b_plus.e;
-
-  mk = cached_pow(MIN_TARGET_EXP - DIYFP_FRACT_SIZE - w.e, &c_mk);
-
-  w = multiply(w, c_mk);
-  b_minus = multiply(b_minus, c_mk);
-  b_plus  = multiply(b_plus,  c_mk);
-
-  success = digit_gen(b_minus, w, b_plus, buffer, length, &kappa);
-  *d_exp = kappa - mk;
-  return success;
-}
-
-static int i_to_str(int val, char *str) {
-  int len, i;
-  char *s;
-  char *begin = str;
-
-  if(val < 0) {
-    *str++ = '-';
-    val = -val;
-    if(val < 10) *str++ = '0';
-  }
-  else { if (val) *str++ = '+'; }
-  s = str;
-
-  for(;;) {
-    int ni = val / 10;
-    int digit = val - ni*10;
-    *s++ = (char)('0' + digit);
-    if(ni == 0) break;
-    val = ni;
-  }
-
-  *s = '\0';
-  len = (int)(s - str);
-  for(i = 0; i < len/2; ++i) {
-    char ch = str[i];
-    str[i] = str[len-1-i];
-    str[len-1-i] = ch;
-  }
-
-  return (int)(s - begin);
-}
-
 void set_fallback_flag(pTHX) {
  dSP;
 
@@ -8819,6 +8604,8 @@ void set_fallback_flag(pTHX) {
 }
 
 SV * doubletoa(pTHX_ SV * sv, ...) {
+
+  /* calls functions contained in grisu3.c */
 
 #if defined(NV_IS_53_BIT)
 
@@ -8997,6 +8784,108 @@ SV * numtoa(pTHX_ SV * in) {
   }
 
   croak("Not a numeric argument given to numtoa function");
+}
+
+void decimalize(pTHX_ mpfr_t * x) {
+  dXSARGS;
+  mpfr_prec_t prec, i;
+  mpfr_exp_t exp, high_exp, low_exp;
+  char * buff;
+  char * dec_buff;
+  int is_neg = 0;
+  double digits = 0;
+  double div = 3.32192809488736;	/* log2(10) */
+  double mul = 0.698970004336019;	/* log10(5) */
+
+  if(!mpfr_regular_p(*x)) {
+    Newxz(buff, 8, char);
+    mpfr_sprintf(buff, "%Rg", *x);
+    ST(0) = sv_2mortal(newSVpv(buff, 0));
+    Safefree(buff);
+    XSRETURN(1);
+  }
+
+  prec = mpfr_get_prec(*x);
+
+  Newxz(buff, prec + 2, char);
+
+  mpfr_get_str(buff, &exp, 2, prec, *x, GMP_RNDN);
+
+  /* The decimal point is implicitly located at the very *
+   * beginning of the string. Therefore, the power of 2  *
+   * to which the highest set bit is raised is exp - 1   */
+
+  high_exp = exp - 1;
+
+  if(high_exp >= prec - 1) low_exp = 0; /* No need to locate the lowest set bit */
+
+  else {
+
+    /* We do need to locate the lowest set bit */
+
+    if(buff[0] == '-') {
+      buff++;
+      is_neg = -1;
+    }
+
+    /* The power to which the lowest set bit is raised is  *
+     * calculated in the following for{} loop:             */
+
+    for(i = prec - 1; i >= 0; i--) {
+      if(buff[i] == '1') {
+        low_exp = high_exp - i;
+        break;
+      }
+    }
+
+    if(is_neg) buff--;
+  }
+
+  Safefree(buff);
+
+  /* Next determine the number of decimal digits that are needed to   *
+   * exactly express the function's argument in base 10               */
+
+  if(low_exp >= 0) {
+    /* Both low_exp and high_exp are >= 0.                            *
+     * The number of digits is calculated solely from high_exp.       *
+     * We add on "1" to allow for cases where the value of high_exp   *
+     * does not alone determine how many siginificant digits are      *
+     * required - eg the value 2 ** 13 (8192) requires 4 decimal      *
+     * digits, but if the second highest bit is also set, then 5      *
+     * decimal digits are needed because (2**13) + (2**12) == 12288   */
+
+    digits = 1 + ceil( high_exp / div );
+  }
+
+  else if(high_exp < 0) {
+    /* Both low_exp and high_exp are < 0 */
+
+    digits = ceil( -low_exp * mul ) + ceil( -low_exp / div ) - floor( -high_exp / div );
+  }
+
+  else {
+    /* low_exp < 0, high_exp >= 0        *
+     * Add 1, as in the above if{} block */
+
+    digits = 1 + ceil( high_exp / div ) + ceil( -low_exp * mul ) + floor( -low_exp / div );
+  }
+
+  if(digits > INT_MAX - 30)
+    croak("Too many digits (%.0f) requested in decimalize function", digits);
+
+  Newxz(dec_buff, (int)digits + 30, char); /* allow for a 20-digit exponent, a radix point, *
+                                            * a leading '-', an 'e-', a terminating NULL,   *
+                                            * and a saftety net of 5 bytes (== 30, total)   */
+  if(dec_buff == NULL)
+    croak("Unable to allocate %.0f bytes of memory in decimalize function",
+          digits + 30.0);
+
+  mpfr_sprintf(dec_buff, "%.*Rg", (int)digits, *x);
+  ST(0) = sv_2mortal(newSVpv(dec_buff, 0));
+  Safefree(dec_buff);
+  XSRETURN(1);
+
 }
 
 MODULE = Math::MPFR  PACKAGE = Math::MPFR
@@ -10365,6 +10254,25 @@ CODE:
 OUTPUT:  RETVAL
 
 SV *
+Rmpfr_sinu (a, b, c, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	unsigned long	c
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_sinu (aTHX_ a, b, c, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpfr_sinpi (a, b, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_sinpi (aTHX_ a, b, round);
+OUTPUT:  RETVAL
+
+SV *
 Rmpfr_cos (a, b, round)
 	mpfr_t *	a
 	mpfr_t *	b
@@ -10374,12 +10282,50 @@ CODE:
 OUTPUT:  RETVAL
 
 SV *
+Rmpfr_cosu (a, b, c, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	unsigned long	c
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_cosu (aTHX_ a, b, c, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpfr_cospi (a, b, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_cospi (aTHX_ a, b, round);
+OUTPUT:  RETVAL
+
+SV *
 Rmpfr_tan (a, b, round)
 	mpfr_t *	a
 	mpfr_t *	b
 	SV *	round
 CODE:
   RETVAL = Rmpfr_tan (aTHX_ a, b, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpfr_tanu (a, b, c, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	unsigned long	c
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_tanu (aTHX_ a, b, c, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpfr_tanpi (a, b, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_tanpi (aTHX_ a, b, round);
 OUTPUT:  RETVAL
 
 SV *
@@ -11008,6 +10954,16 @@ Rmpfr_fmod (a, b, c, round)
 	SV *	round
 CODE:
   RETVAL = Rmpfr_fmod (aTHX_ a, b, c, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpfr_fmod_ui (a, b, c, round)
+	mpfr_t *	a
+	mpfr_t *	b
+	unsigned long	c
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_fmod_ui (aTHX_ a, b, c, round);
 OUTPUT:  RETVAL
 
 void
@@ -13365,4 +13321,20 @@ numtoa (in)
 CODE:
   RETVAL = numtoa (aTHX_ in);
 OUTPUT:  RETVAL
+
+void
+decimalize (x)
+	mpfr_t *	x
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        decimalize(aTHX_ x);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 

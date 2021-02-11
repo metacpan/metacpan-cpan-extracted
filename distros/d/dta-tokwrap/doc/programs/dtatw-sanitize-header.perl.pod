@@ -417,7 +417,7 @@ my @bibl_xpaths = (
 		   'fileDesc/sourceDesc/bibl', ##-- new|old:generic
 		   './/idno[@type="bibl"]',    ##-- flat fallback
 		  );
-push(@{$user_xpaths{'bibl'}}, '"foo"');
+#push(@{$user_xpaths{'bibl'}}, '"foo"');
 my $bibl = xpgrepval($hroot,user_xpaths('bibl'),@bibl_xpaths);
 if (!defined($bibl)) {
   $bibl = "$author: $title. $date0";
@@ -503,6 +503,9 @@ my $tcdta = join('::',
 		 @{xpnods($hroot,join('|',
 				      (@uxp_tcdta ? @uxp_tcdta
 				       : (
+					  'profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#dtamain"]',
+					  'profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#dtasub"]',
+					  ##
 					  'profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#dtamain"]',
 					  'profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#dtasub"]',
 					 ))
@@ -517,10 +520,16 @@ my $tcdwds = join('::',
 		  @{xpnods($hroot,join('|',
 				       (@uxp_tcdwds ? @uxp_tcdwds
 					: (
+					   'profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#dwds1main"]',
+					   'profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#dwds1sub"]',
+					   'profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#dwds2main"]',
+					   'profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#dwds2sub"]',
+					   ##
 					   'profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#dwds1main"]',
 					   'profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#dwds1sub"]',
 					   'profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#dwds2main"]',
 					   'profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#dwds2sub"]',
+					   ##
 					   'profileDesc/textClass/keywords/term', ##-- dwds keywords
 					  ))
 				      ))}
@@ -534,6 +543,7 @@ my $tccorpus = join('::',
 		    @{xpnods($hroot,join('|',
 					 (@uxp_corpus ? @uxp_corpus
 					  : (
+					     'profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#DTACorpus"]',
 					     'profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#DTACorpus"]',
 					    ))
 					))}
@@ -751,7 +761,7 @@ root C<E<lt>teiHeaderE<gt>> element, and unless otherwise noted,
 the first source XPath listed is also the target XPath,
 guaranteed to be exist in the output header on successful script completion.
 
-See L<http://kaskade.dwds.de/dstar/doc/README.html#bibliographic_metadata_attributes>
+See L<https://kaskade.dwds.de/dstar/doc/README.html#bibliographic_metadata_attributes>
 for details on D* metadata attribute conventions.
 
 =head2 author
@@ -898,6 +908,10 @@ Defaults to "-" if unset.
 
 Source XPath(s):
 
+ profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#dwds1main"]
+ profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#dwds1sub"]
+ profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#dwds2main"]
+ profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#dwds2sub"]
  profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#dwds1main"]
  profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#dwds1sub"]
  profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#dwds2main"]
@@ -913,6 +927,8 @@ Target XPath:
 
 Source XPath(s):
 
+ profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#dtamain"]
+ profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#dtasub"]
  profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#dtamain"]
  profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#dtasub"]
 
@@ -924,6 +940,7 @@ Target XPath:
 
 Source XPath(s):
 
+ profileDesc/textClass/classCode[@scheme="https://www.deutschestextarchiv.de/doku/klassifikation#DTACorpus"]
  profileDesc/textClass/classCode[@scheme="http://www.deutschestextarchiv.de/doku/klassifikation#DTACorpus"]
 
 Target XPath:
