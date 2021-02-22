@@ -1,3 +1,14 @@
+1.27 2021-02-15
+
+  [DOCUMENTATION]
+  - Document existing behavior of using sql() in combination with sql_interp_strict().
+  - Remove references to outstanding issues.
+  - Point to the gitea-based bug tracker instead of rt.cpan.org.
+
+  [INTERNALS]
+  - Add test case for non-recursive behavior of sql_interp_strict().
+  - Removed some unused code.
+
 1.26 2020-04-15
 
   [THINGS THAT MIGHT BREAK YOUR CODE]

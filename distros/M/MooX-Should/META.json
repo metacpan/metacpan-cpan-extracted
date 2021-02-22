@@ -1,10 +1,10 @@
 {
    "abstract" : "optional type restrictions for Moo attributes",
    "author" : [
-      "Robert Rothenberg <rrwo@cpan.org>"
+      "Theo van Hoesel <vanhoesel@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Moo",
       "types"
@@ -43,7 +43,8 @@
       "runtime" : {
          "requires" : {
             "Devel::StrictMode" : "0",
-            "Moo" : "0"
+            "Moo" : "0",
+            "version" : "0.77"
          }
       },
       "test" : {
@@ -64,7 +65,7 @@
    "provides" : {
       "MooX::Should" : {
          "file" : "lib/MooX/Should.pm",
-         "version" : "v0.1.2"
+         "version" : "v0.1.4"
       }
    },
    "release_status" : "stable",
@@ -78,11 +79,16 @@
          "web" : "https://github.com/robrwo/MooX-Should"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.1.4",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
-      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Robert Rothenberg <rrwo@cpan.org>",
+      "Theo van Hoesel <tvanhoesel@perceptyx.com>",
+      "Zakariyya Mughal <zaki.mughal@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

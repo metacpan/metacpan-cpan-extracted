@@ -1,5 +1,5 @@
 # p5-PHP-Functions-Password
-Perl **PHP::Functions::Password** module/class that contains Perl ports of PHP [password_*](https://www.php.net/manual/en/ref.password.php) functions.
+Perl **PHP::Functions::Password** module/class that contains Perl ports of PHP [password_*](https://www.php.net/manual/en/ref.password.php) functions.\
 See https://metacpan.org/pod/PHP::Functions::Password for more documentation and examples.
 
 Installation

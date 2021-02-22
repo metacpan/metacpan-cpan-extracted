@@ -25,7 +25,8 @@ $parser->add_row_event_handler(sub {
     push @$cells, $row;
 });
 
-$parser->sheet(1);
+my $rid = $parser->workbook->sheet_rid( $sheets[0] );
+$parser->sheet_by_rid($rid);
 
 is $cells->[1][1], 1;
 is $cells->[2][1], -3;

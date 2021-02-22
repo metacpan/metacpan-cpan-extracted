@@ -3,14 +3,14 @@ package TestClass;
 use Moo;
 use MooX::Should;
 
-use Types::Common::Numeric qw/ PositiveNum /;
+use Types::Common::Numeric qw/ PositiveInt /;
 use Types::Standard qw/ Int /;
 
 use namespace::autoclean;
 
 has a => (
     is     => 'ro',
-    should => PositiveNum,
+    should => PositiveInt,
     isa    => Int,
 );
 

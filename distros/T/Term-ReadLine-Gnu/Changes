@@ -1,5 +1,24 @@
 	-*- Indented-text -*-
-	$Id: Changes 576 2020-12-27 03:21:45Z hayashi $
+	$Id: Changes 586 2021-02-22 14:34:38Z hayashi $
+
+1.39  2021-02-22
+        - Makefile.PL
+            - some more fix for Homebrew on macOS [rt.cpan.org #133846]
+
+1.38  2021-02-22
+        - Makefile.PL
+            - run 'brew --prefix ncurses' internally to detect ncurses installed
+              by Homebrew on macOS [rt.cpan.org #133846]
+            - utilize ExtUtils::Liblist::ext() [rt.cpan.org #134408]
+              On macOS Big Sur or later 'perl Makefile.PL' may warn as
+                "Could not find neither libtermcap, libtinfo, libncurses, or libcurses."
+              You should be able to ignore this warning if you have Xcode installed. See
+                https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/381
+              for details. To suppress this message, use ExtUtils::MakeMaker 7.58 or later.
+            - can specify multiple directories on --prefix, --libdir, and
+              --includedir options by separating them with colons
+        - INSTALL
+            - update for changes above and so on.
 
 1.37  2020-12-27
 	- readline-8.1 support
@@ -58,7 +77,7 @@
 	- Gnu.pm, t/utf8_text.t: fix version checks for perl 5.10.0.
 	- t/utf8_text.t: fix the number of skip for systems which do
 	  not support en_US.UTF-8 locale.
-	- Gnu.pm: delete old formated 'use VERSION'
+	- Gnu.pm: delete old formatted 'use VERSION'
 
 1.32  2016-06-06
 	- improve UTF-8 handling
@@ -76,10 +95,10 @@
           history_get_history_state(), and history_set_history_state()
           are finally implemented.
 	- update RL_STATE_* definitions
-	- fix rl_readline_state and history_legnth variable to be
+	- fix rl_readline_state and history_length variable to be
           writable
 	- fix rl_completion_quote_character and
-          rl_completion_found_quate variable to be read only
+          rl_completion_found_quote variable to be read only
 	- update POD document
 	- t/*.t: use Test::More and improved
 	  - t/utf8_binary.t, t/utf8_text.t:
@@ -144,7 +163,7 @@
 
 1.26  2015-01-31
 	- call ornaments() after rl_initialize() to set tty before
-          calling rl_initialize() not to output some charactores to
+          calling rl_initialize() not to output some characters to
           STDIO. [rt.cpan.org #96569, #101196]
 	- make handling of iostreams simple (make _rl_store_iostream()
           return void and remove _rl_fetch_iostream()) [rt.cpan.org #101078]
@@ -172,7 +191,7 @@
 
 1.23  2014-03-20
 	- add description of the pager command bug in Perl debugger
-	  which causes segementation fault [rt.perl.org #121456]
+	  which causes segmentation fault [rt.perl.org #121456]
 	- fix not to clobber binmode layer (utf-8) on filehandles [rt.cpan.org #59832]
 	- support UTF-8 input as compatible with Term::ReadLine
 	  - Now Term::ReadLine::Gnu requires perl 5.8.0 or above
@@ -214,7 +233,7 @@
 	- make the following variables read-only.: rl_executing_macro,
           history_length, rl_readline_state, rl_explicit_arg,
 	  rl_numeric_arg, rl_editing_mode
-	- Improve backward compatiblity variable and function definitions.
+	- Improve backward compatibility variable and function definitions.
 	- Fix Term::ReadLine::Gnu::XS::_trp_completion_function not to
 	  perform a case-sensitive filter. [rt.cpan.org #72378]
 	- fix Gnu.xs:rl_initialize to be compiled with Perl 5.8.5 or
@@ -228,7 +247,7 @@
 	- eg/perlsh makes use of the deferred signal (safe signal)
           feature.
 
-	- Maefile.PL checks whether the xmalloc exported by readline
+	- Makefile.PL checks whether the xmalloc exported by readline
 	  is indeed called 'xmalloc' or whether it has been renamed to
 	  '_rl_malloc'. [rt.cpan.org #65973]
 	- Makefile.PL: add -DTRL_READLINE_VERSION to show GNU Readline
@@ -264,7 +283,7 @@
 
 1.18  2009-02-27
 	- better error checking of Makefile.PL for automatic testing
-	  on non-supported platfrom (for example one without GNU
+	  on non-supported platform (for example one without GNU
 	  Readline Library).
 	- readline-6.0 support
 	    new function

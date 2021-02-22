@@ -1,5 +1,5 @@
 package Util::Medley::Hostname;
-$Util::Medley::Hostname::VERSION = '0.055';
+$Util::Medley::Hostname::VERSION = '0.058';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -12,7 +12,7 @@ Util::Medley::Hostname - Utilities for dealing with hostnames.
 
 =head1 VERSION
 
-version 0.055
+version 0.058
 
 =cut
 

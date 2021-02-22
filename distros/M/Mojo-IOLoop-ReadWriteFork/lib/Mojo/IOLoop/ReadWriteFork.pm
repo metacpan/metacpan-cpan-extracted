@@ -1,9 +1,10 @@
 package Mojo::IOLoop::ReadWriteFork;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Errno qw(EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK);
+use Errno qw(EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK EIO);
 use IO::Pty;
 use Mojo::IOLoop;
+use Mojo::Promise;
 use Mojo::Util;
 use POSIX ':sys_wait_h';
 use Scalar::Util ();
@@ -20,7 +21,7 @@ sub ESC {
   $_;
 }
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 our @SAFE_SIG = grep {
   not /^(
@@ -43,10 +44,20 @@ sub close {
   $self;
 }
 
+sub run_p {
+  my $self = shift;
+  my $p    = Mojo::Promise->new;
+  my @cb;
+  push @cb, $self->once(close => sub { shift->unsubscribe(error => $cb[1]); $p->resolve(@_) });
+  push @cb, $self->once(error => sub { shift->unsubscribe(close => $cb[0]); $p->reject(@_) });
+  $self->run(@_);
+  return $p;
+}
+
 sub run {
   my $args = ref $_[-1] eq 'HASH' ? pop : {};
   my ($self, $program, @program_args) = @_;
-  $self->start({%$args, program => $program, program_args => \@program_args});
+  return $self->start({%$args, program => $program, program_args => \@program_args});
 }
 
 sub start {
@@ -56,19 +67,19 @@ sub start {
 
   $args->{$_} //= $conduit->{$_} for keys %$conduit;
   $args->{conduit} ||= delete $args->{type};
-  $args->{env} ||= {%ENV};
+  $args->{env}     ||= {%ENV};
   $self->{errno} = 0;
   $args->{program} or die 'program is required input';
   $args->{program_args} ||= [];
   ref $args->{program_args} eq 'ARRAY' or die 'program_args need to be an array';
   Scalar::Util::weaken($self);
   $self->{delay} = $self->ioloop->timer(0 => sub { $self->_start($args) });
-  $self;
+  return $self;
 }
 
 sub _start {
   local ($?, $!);
-  my ($self, $args) = @_;
+  my ($self,        $args) = @_;
   my ($stdout_read, $stdout_write);
   my ($stdin_read,  $stdin_write);
   my ($errno,       $pid);
@@ -104,23 +115,14 @@ sub _start {
     $self->ioloop->reactor->io(
       $stdout_read => sub {
         local ($?, $!);
-        my $reactor = shift;
-
         $self->_read;
-
-        # 5 = Input/output error
-        if ($self->{errno} == 5) {
-          if (my $handle = delete $self->{stdout_read}) {
-            warn "[$pid] Ignoring child after $self->{errno}\n" if DEBUG;
-            $reactor->watch($handle, 0, 0);
-          }
-        }
-        elsif ($self->{errno}) {
-          warn "[$pid] Child $self->{errno}\n" if DEBUG;
-          $self->emit(error => "Read error: $self->{errno}");
-        }
+        return unless $self->{errno};
+        warn "[$pid] Child $self->{errno}\n" if DEBUG;
+        $self->emit(error => "Read error: $self->{errno}");
       }
     );
+
+    @$self{qw(wait_eof wait_sigchld)} = (1, 1);
     $self->ioloop->reactor->watch($stdout_read, 1, 0);
     $self->_watch_pid($pid);
     $self->_write;
@@ -130,7 +132,7 @@ sub _start {
     if ($args->{conduit} eq 'pty') {
       $stdin_write->make_slave_controlling_terminal;
       $stdin_read = $stdout_write = $stdin_write->slave;
-      $stdin_read->set_raw if $args->{raw};
+      $stdin_read->set_raw                                         if $args->{raw};
       $stdin_read->clone_winsize_from($args->{clone_winsize_from}) if $args->{clone_winsize_from};
     }
 
@@ -188,12 +190,20 @@ sub _error {
 }
 
 sub _cleanup {
-  my $self = shift;
+  my $self    = shift;
   my $reactor = $self->{ioloop}{reactor} or return;
 
   delete $self->{stdin_write};
+  $reactor->remove(delete $self->{stdin_write}) if $self->{stdin_write};
   $reactor->remove(delete $self->{stdout_read}) if $self->{stdout_read};
   $reactor->remove(delete $self->{delay})       if $self->{delay};
+}
+
+sub _maybe_terminate {
+  my ($self, $pending_event) = @_;
+  delete $self->{$pending_event};
+  $self->emit(close => $self->{exit_value}, $self->{signal})->_cleanup
+    unless $self->{wait_eof} or $self->{wait_sigchld};
 }
 
 sub _read {
@@ -201,10 +211,9 @@ sub _read {
   my $stdout_read = $self->{stdout_read} or return;
   my $read        = $stdout_read->sysread(my $buffer, CHUNK_SIZE, 0);
 
-  $self->{errno} = $! // 0;
-
-  return unless defined $read;
-  return unless $read;
+  # EOF on PTY raises EIO when slave devices has closed all file descriptors
+  return $self->_maybe_terminate('wait_eof') if (!defined $read and $! == EIO) or $read == 0;
+  return $self->{errno} = $! // 0 unless defined $read;
   warn "[$self->{pid}] >>> @{[ESC($buffer)]}\n" if DEBUG;
   $self->emit(read => $buffer);
 }
@@ -213,10 +222,8 @@ sub _sigchld {
   my $self = shift;
   my ($exit_value, $signal) = ($_[1] >> 8, $_[1] & 127);
   warn "[$_[0]] Child is dead ($?/$!) $exit_value/$signal\n" if DEBUG;
-  $self or return;    # maybe $self has already gone out of scope
-  $self->_read;       # flush the rest
-  $self->_cleanup;
-  $self->emit(close => $exit_value, $signal);
+  @$self{qw(exit_value signal)} = ($exit_value, $signal);
+  $self->_maybe_terminate('wait_sigchld');
 }
 
 sub _watch_pid {
@@ -284,7 +291,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 =head1 VERSION
 
-0.37
+0.38
 
 =head1 SYNOPSIS
 
@@ -307,6 +314,9 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
   # Start the application
   $fork->run("bash", -c => q(echo $YIKES foo bar baz));
+
+  # Using promises
+  $fork->on(read => sub { ... })->run_p("bash", -c => q(echo $YIKES foo bar baz))->wait;
 
 See also
 L<https://github.com/jhthorsen/mojo-ioloop-readwritefork/tree/master/example/tail.pl>
@@ -417,6 +427,14 @@ Close STDIN stream to the child process immediately.
 
 Simpler version of L</start>. Can either start an application or run a perl
 function.
+
+=head2 run_p
+
+  $p = $self->run_p($program, @program_args);
+  $p = $self->run_p(\&Some::Perl::function, @function_args);
+
+Promise based version of L</run>. The L<Mojo::Promise> will be resolved on
+L</close> and rejected on L</error>.
 
 =head2 start
 

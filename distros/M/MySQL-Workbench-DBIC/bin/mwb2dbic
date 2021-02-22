@@ -1,0 +1,94 @@
+#!/usr/bin/perl
+
+# PODNAME: mwb2dbic - create DBIx::Class classes from MySQL Workbench file
+
+use strict;
+use warnings;
+
+use File::Basename;
+use File::Spec;
+use Getopt::Long;
+use MySQL::Workbench::DBIC;
+
+my %opts;
+GetOptions(
+    'file=s'           => \$opts{file},
+    'output_path=s'    => \$opts{output_path},
+    'namespace=s'      => \$opts{namespace},
+    'version_add=s'    => \$opts{version_add},
+    'column_details=s' => \$opts{column_details},
+    'schema_name=s'    => \$opts{schema_name},
+    'config=s'         => \my $config_file,
+);
+
+if ( $config_file ) {
+    die 'Config file does not exist!' if !-f $config_file;
+
+    _read_config( $config_file, \%opts );
+
+    for my $key ( qw/file output_path/ ) {
+        next if !$opts{$key};
+
+        if ('/' ne substr $opts{$key}, 0, 1 ) {
+            $opts{$key} = File::Spec->catfile( dirname( $config_file ), $opts{$key} );
+        }
+    }
+}
+
+for my $needed ( qw/file output_path/ ) {
+    if ( !$opts{$needed} ) {
+        print "Need $needed!\n";
+        print_usage();
+    }
+}
+
+my $foo = MySQL::Workbench::DBIC->new(
+    %opts,
+);
+ 
+$foo->create_schema;
+
+sub _read_config {
+    my ($file, $opts) = @_;
+
+    open my $fh, '<', $file or die $!;
+    while ( my $line = <$fh> ) {
+        chomp $line;
+        my ($key,$value) = split /\s*=\s*/, $line, 2;
+        $opts->{$key} = $value;
+    }
+    close $fh;
+}
+
+sub print_usage {
+    print "$0 --file <path_to_mwb> --output_path <path_to_lib>";
+    exit;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mwb2dbic - create DBIx::Class classes from MySQL Workbench file
+
+=head1 VERSION
+
+version 1.21
+
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

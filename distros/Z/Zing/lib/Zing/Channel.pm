@@ -12,7 +12,7 @@ use Data::Object::Class;
 
 extends 'Zing::PubSub';
 
-our $VERSION = '0.26'; # VERSION
+our $VERSION = '0.27'; # VERSION
 
 # BUILDERS
 
@@ -53,6 +53,8 @@ method term() {
 }
 
 1;
+
+
 
 =encoding utf8
 
@@ -275,20 +277,20 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 
 This is free software; you can redistribute it and/or modify it under the terms
 of the The Apache License, Version 2.0, as elucidated in the L<"license
-file"|https://github.com/iamalnewkirk/zing/blob/master/LICENSE>.
+file"|https://github.com/cpanery/zing/blob/master/LICENSE>.
 
 =head1 PROJECT
 
-L<Wiki|https://github.com/iamalnewkirk/zing/wiki>
+L<Wiki|https://github.com/cpanery/zing/wiki>
 
-L<Project|https://github.com/iamalnewkirk/zing>
+L<Project|https://github.com/cpanery/zing>
 
-L<Initiatives|https://github.com/iamalnewkirk/zing/projects>
+L<Initiatives|https://github.com/cpanery/zing/projects>
 
-L<Milestones|https://github.com/iamalnewkirk/zing/milestones>
+L<Milestones|https://github.com/cpanery/zing/milestones>
 
-L<Contributing|https://github.com/iamalnewkirk/zing/blob/master/CONTRIBUTE.md>
+L<Contributing|https://github.com/cpanery/zing/blob/master/CONTRIBUTE.md>
 
-L<Issues|https://github.com/iamalnewkirk/zing/issues>
+L<Issues|https://github.com/cpanery/zing/issues>
 
 =cut

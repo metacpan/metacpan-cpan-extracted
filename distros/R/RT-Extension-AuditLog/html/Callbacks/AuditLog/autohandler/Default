@@ -1,5 +1,5 @@
 %#
-%# 2020/07/23 Otmar Lendl <lendl@cert.ar>
+%# 2020/07/23 Otmar Lendl <lendl@cert.at>
 %#
 %# Licensed under 
 %#  The GNU General Public License, Version 2, June 1991
@@ -18,7 +18,7 @@ my $q = $r->query();
 my @addinfo = ();
 
 if ($method eq 'POST') {        # we need to fetch parameters from body
-	$RT::Logger->warn(
+	$RT::Logger->debug(
 		"AuditLogDbg: we got parameters ". join(' ', $q->param)
 	);
 
@@ -37,9 +37,8 @@ $RT::AuditLogger->info(
 		$r->query->env->{'REQUEST_URI'},
 #               $ARGS{'Title'},
 		@addinfo,
+#		Dumper($r->query->env->{'REQUEST_URI'}),
 		)
-#        '  "' . $ARGS{'Title'} . '"'
-#        ' ' . Dumper($r->query->env->{'REQUEST_URI'})
 );
 
 </%INIT>

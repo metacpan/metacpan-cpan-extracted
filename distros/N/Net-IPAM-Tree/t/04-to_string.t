@@ -6,7 +6,7 @@ use utf8;
 use Test::More;
 
 BEGIN {
-  use_ok('Net::IPAM::Tree')       || print "Bail out!\n";
+  use_ok('Net::IPAM::Tree')  || print "Bail out!\n";
   use_ok('Net::IPAM::Block') || print "Bail out!\n";
 }
 
@@ -30,7 +30,7 @@ foreach my $b ( keys %$blocks ) {
 }
 
 my $t = Net::IPAM::Tree->new;
-ok( !$t->to_string, '$tree->to_string s undef if $t is empty' );
+ok( !$t->to_string, '$tree->to_string is undef if $t is empty' );
 
 $t->insert(@items);
 
@@ -58,6 +58,6 @@ my $expect = <<EOT;
 └─ 6000::/3 ................................ Reserved by IETF     [RFC3513][RFC4291]
 EOT
 
-ok( $t->to_string($decorate_cb) eq $expect, '$tree->to_string($decorator_cb)' );
+is( $t->to_string($decorate_cb), $expect, '$tree->to_string($decorator_cb)' );
 
 done_testing();

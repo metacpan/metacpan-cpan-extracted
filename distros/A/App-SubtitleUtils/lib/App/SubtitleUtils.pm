@@ -3,7 +3,7 @@ package App::SubtitleUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-08'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Utilities related to video subtitles
@@ -20,7 +20,7 @@ App::SubtitleUtils - Utilities related to video subtitles
 
 =head1 VERSION
 
-This document describes version 0.004 of App::SubtitleUtils (from Perl distribution App-SubtitleUtils), released on 2021-01-08.
+This document describes version 0.005 of App::SubtitleUtils (from Perl distribution App-SubtitleUtils), released on 2021-01-08.
 
 =head1 DESCRIPTION
 
@@ -47,6 +47,12 @@ This distributions provides the following command-line utilities:
 =item * L<vtt2srt>
 
 =back
+
+=head1 HISTORY
+
+Most of them are scripts I first wrote in 2003 and first packaged as CPAN
+distribution in late 2020. They need to be rewritten to properly use
+L<Getopt::Long> etc; someday.
 
 =head1 HOMEPAGE
 

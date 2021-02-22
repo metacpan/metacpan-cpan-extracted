@@ -1,19 +1,44 @@
+NAME
+
+Mojolicious::Plugin::Mobi - Mojolicious Plugin
+
+DESCRIPTION
+
+Mojolicious::Plugin::Mobi is a Mojolicious plugin. It provides a helper
+method is_mobile and route condition so it is easier to use in a dispatcher.
+
 Mobile device detection plugin
  - provides helper method is_mobile()
  - provides condition mobile=>1 for controller's method over
 
+SYNOPSIS
+
+  # Mojolicious
+
+  # Register plugin Mobi and its helper to your application
+  $self->plugin('Mobi');
+
+  # One way of how to use it
+  $self->routes->route("/")->requires(mobile=>1)->to("Mobile#index");
+
+  # or another
+  $self->render(text=>"You are mobile.") if $self->is_mobile;
 
 
-# Mojolicious
-$self->plugin('Mobi');
-$self->routes->route("/")->over(mobile=>1)->to("Mobile#index");
+  # Mojolicious::Lite
 
+  # Register plugin Mobi and its helper to your application
+  plugin 'Mobi';
 
+  # Use the helper anywhere within your app
+  get '/' => sub {
+    if (is_mobile()) {
+      redirect_to("http://m.example.com");
+    }
+  }
 
-# Mojolicious::Lite
-plugin 'Mobi';
-get '/' => (mobile=>1) => sub {
-  my $self = shift;
-  $self->render(text=>"This is a mobile version of this site.");
-};
-
+  # or hook it up in the route as a requirement
+  get '/' => (mobile => 1) => sub {
+    my $self = shift;
+    $self->render(text => "This is a mobile version of this site.");
+  };

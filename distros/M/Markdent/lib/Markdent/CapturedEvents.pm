@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Markdent::Types;
 use Params::ValidationCompiler qw( validation_for );
@@ -21,7 +21,7 @@ has _events => (
 );
 
 sub events {
-    @{ $_[0]->_events() };
+    @{ $_[0]->_events };
 }
 
 {
@@ -34,7 +34,7 @@ sub events {
         my $self   = shift;
         my @events = $validator->(@_);
 
-        push @{ $self->_events() }, @events;
+        push @{ $self->_events }, @events;
     }
 }
 
@@ -47,11 +47,11 @@ sub events {
         my $self = shift;
         my ($handler) = $validator->(@_);
 
-        $handler->handle_event($_) for $self->events();
+        $handler->handle_event($_) for $self->events;
     }
 }
 
-__PACKAGE__->meta()->make_immutable();
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -69,7 +69,7 @@ Markdent::CapturedEvents - Represents a series of captured events
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 DESCRIPTION
 
@@ -84,7 +84,7 @@ This class provides the following methods:
 
 Creates a new Markdent::CapturedEvents object.
 
-=head2 $captured->events()
+=head2 $captured->events
 
 Returns the captured events as an array.
 
@@ -115,7 +115,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

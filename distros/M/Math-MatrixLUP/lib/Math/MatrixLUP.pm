@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use overload
   '""'  => \&stringify,
@@ -512,10 +512,14 @@ sub horizontal_flip {
     __PACKAGE__->new([map { [reverse(@$_)] } @{$self->{matrix}}]);
 }
 
+*hflip = \&horizontal_flip;
+
 sub vertical_flip {
     my ($self) = @_;
     __PACKAGE__->new([reverse @{$self->{matrix}}]);
 }
+
+*vflip = \&vertical_flip;
 
 sub flip {
     my ($self) = @_;
@@ -1026,7 +1030,11 @@ sub powmod {
     my ($A, $pow, $mod) = @_;
 
     $pow = CORE::int($pow);
-    $pow < 0 and _croak("powmod(): negative exponents are not supported yet");
+
+    if ($pow < 0) {
+        $A   = $A->invmod($mod);
+        $pow = CORE::abs($pow);
+    }
 
     my $B = Math::MatrixLUP::identity($A->{rows} + 1);
 
@@ -1103,6 +1111,20 @@ sub invert {
 }
 
 *inv = \&invert;
+
+sub invmod {
+    my ($self, $mod) = @_;
+
+    my $A = $self->invert->clone;
+
+    foreach my $row (@$A) {
+        foreach my $i (0 .. $#{$row}) {
+            $row->[$i] %= $mod;
+        }
+    }
+
+    return $A;
+}
 
 sub determinant {
     my ($self) = @_;

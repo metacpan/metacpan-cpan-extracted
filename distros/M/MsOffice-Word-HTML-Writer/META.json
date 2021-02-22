@@ -1,10 +1,10 @@
 {
    "abstract" : "Writing documents for MsWord in HTML format",
    "author" : [
-      "Laurent Dami <laurent.dami AT etat.ge.ch>"
+      "Laurent Dami <dami AT cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -28,6 +28,7 @@
             "MIME::Types" : "0",
             "Module::Build" : "0",
             "Params::Validate" : "0",
+            "Scalar::Util" : "0",
             "Test::More" : "0",
             "utf8" : "0"
          }
@@ -36,7 +37,7 @@
    "provides" : {
       "MsOffice::Word::HTML::Writer" : {
          "file" : "lib/MsOffice/Word/HTML/Writer.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -45,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

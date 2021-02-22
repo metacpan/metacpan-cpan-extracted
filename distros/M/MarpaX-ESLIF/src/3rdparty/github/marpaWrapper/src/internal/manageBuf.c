@@ -26,20 +26,20 @@ void *manageBuf_createp(genericLogger_t *genericLoggerp, void **pp, size_t *size
 	/* Let's start at arbitrary number of elements of 100 */
 	sizel = 100;
 	p = malloc(sizel * elementSizel);
-	if (p == NULL) {
+	if (MARPAWRAPPER_UNLIKELY(p == NULL)) {
 	  MARPAWRAPPER_ERRORF(genericLoggerp, "malloc failure: %s", strerror(errno));
 	  return NULL;
 	}
       } else {
 	sizel *= 2;
-	if (sizel < prevSizel) {
+	if (MARPAWRAPPER_UNLIKELY(sizel < prevSizel)) {
 	  /* Turnaround */
 	  errno = ERANGE;
 	  MARPAWRAPPER_ERRORF(genericLoggerp, "Turnaround detection: %s", strerror(errno));
 	  return NULL;
 	}
 	p = realloc(p, sizel * elementSizel);
-	if (p == NULL) {
+	if (MARPAWRAPPER_UNLIKELY(p == NULL)) {
 	  MARPAWRAPPER_ERRORF(genericLoggerp, "realloc failure: %s", strerror(errno));
 	  return NULL;
 	}

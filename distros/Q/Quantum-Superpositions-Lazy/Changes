@@ -1,5 +1,8 @@
 Revision history for Perl extension Quantum::Superpositions::Lazy.
 
+1.08 Sat Feb 13 2021
+	- Allow for additional parameters to transform and compare (more complex operations)
+
 1.07 Thu Feb 4 2021
 	- Fix fetch_matches to honor reduction strategies
 	- Add Q::S::L::Superposition->compare (custom comparisons)

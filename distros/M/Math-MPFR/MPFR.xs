@@ -495,6 +495,9 @@ void Rmpfr_deref2(pTHX_ mpfr_t * p, SV * base, SV * n_digits, SV * round) {
 }
 
 void Rmpfr_set_default_prec(pTHX_ SV * prec) {
+#if MPFR_VERSION < 262144      /* earlier than version 4.0.0 */
+     if(SvUV(prec) < 2) croak("Precision must be set to at least 2 for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
      mpfr_set_default_prec((mpfr_prec_t)SvIV(prec));
 }
 
@@ -8806,6 +8809,10 @@ void decimalize(pTHX_ mpfr_t * x) {
   }
 
   prec = mpfr_get_prec(*x);
+
+#if 262146 > MPFR_VERSION
+  if(prec < 2) croak("Precision of 1 not allowed in decimalize function until mpfr-4.0.2");
+#endif
 
   Newxz(buff, prec + 2, char);
 

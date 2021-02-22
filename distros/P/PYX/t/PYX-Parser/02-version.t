@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($PYX::Parser::VERSION, 0.07, 'Version.');
+is($PYX::Parser::VERSION, 0.08, 'Version.');

@@ -7,6 +7,7 @@ use XML::Parser::Expat;
 use Archive::Zip ();
 use Time::Piece ();
 use Scalar::Util ();
+use Carp;
 
 use constant {
     STYLE_IDX          => 'i',
@@ -43,13 +44,13 @@ sub new {
 
     }, $class;
 
-    my $fh = File::Temp->new( SUFFIX => '.xml' );
+    my $fh = File::Temp->new( SUFFIX => '.xml' ) or confess "couldn't create tempfile: $!";
 
-    my $handle = $archive->sheet($filepath);
-    die 'Failed to write temporally file: ', $fh->filename
+    my $handle = $archive->sheet($filepath) or confess "couldn't get handle to sheet archive $filepath: $!";
+    confess 'Failed to write temporary file: ', $fh->filename
         unless $handle->extractToFileNamed($fh->filename) == Archive::Zip::AZ_OK;
 
-    my $parser = XML::Parser::Expat->new;
+    my $parser = XML::Parser::Expat->new(Namespaces=>1);
     $parser->setHandlers(
         Start => sub { $self->_start(@_) },
         End   => sub { $self->_end(@_) },
@@ -65,19 +66,16 @@ sub _start {
 
     if ($name eq 'sheetData') {
         $self->{_is_sheetdata} = 1;
-    }
-    elsif ($self->{_is_sheetdata} and $name eq 'row') {
+    } elsif ($self->{_is_sheetdata} and $name eq 'row') {
         $self->{_current_row} = [];
-    }
-    elsif ($name eq 'c') {
+    } elsif ($name eq 'c') {
         $self->{_cell} = {
             STYLE_IDX() => $attrs{ STYLE() },
             TYPE()      => $attrs{ TYPE() },
             REF()       => $attrs{ REF() },
             COLUMN()    => scalar(@{ $self->{_current_row} }) + 1,
         };
-    }
-    elsif ($name eq 'v') {
+    } elsif ($name eq 'v') {
         $self->{_is_value} = 1;
     }
 }
@@ -87,26 +85,22 @@ sub _end {
 
     if ($name eq 'sheetData') {
         $self->{_is_sheetdata} = 0;
-    }
-    elsif ($self->{_is_sheetdata} and $name eq 'row') {
+    } elsif ($self->{_is_sheetdata} and $name eq 'row') {
         $self->{_row_count}++;
         $self->{_document}->_row_event( delete $self->{_current_row} );
-    }
-    elsif ($name eq 'c') {
+    } elsif ($name eq 'c') {
         my $c = $self->{_cell};
         $self->_parse_rel($c);
 
         if (($c->{ TYPE() } || '') eq TYPE_SHARED_STRING()) {
             my $idx = int($self->{_data});
             $c->{ VALUE() } = $self->{_shared_strings}->get($idx);
-        }
-        else {
+        } else {
             $c->{ VALUE() } = $self->{_data};
         }
 
         $c->{ STYLE() } = $self->{_styles}->cell_style( $c->{ STYLE_IDX() } );
-        $c->{ FMT() }   = my $cell_type =
-            $self->{_styles}->cell_type_from_style($c->{ STYLE() });
+        $c->{ FMT() }   = my $cell_type = $self->{_styles}->cell_type_from_style($c->{ STYLE() });
 
         my $v = $c->{ VALUE() };
 
@@ -123,8 +117,7 @@ sub _end {
         } else {
             if (!defined $v) {
                 $c->{ VALUE() } = '';
-            }
-            elsif ($cell_type ne 'unicode') {
+            } elsif ($cell_type ne 'unicode') {
                 # warn 'not unicode: ' . $cell_type;
                 $c->{ VALUE() } = $v;
             }
@@ -134,8 +127,7 @@ sub _end {
 
         $self->{_data} = '';
         $self->{_cell} = undef;
-    }
-    elsif ($name eq 'v') {
+    } elsif ($name eq 'v') {
         $self->{_is_value} = 0;
     }
 }
@@ -145,6 +137,8 @@ sub _convert_serial_time {
 
     # UNIX Epoch(1970/1/1 00:00:00) is 25569.0
     my $epoch = ($serial_time - 25569) * 24 * 60 * 60;
+    # round to nearest second to compensate for floating point errors
+    $epoch = $epoch > 0 ? int( $epoch + 0.5) : int( $epoch - 0.5);
     return Time::Piece::gmtime($epoch);
 }
 
@@ -159,22 +153,28 @@ sub _char {
 sub _parse_rel {
     my ($self, $cell) = @_;
 
-    my ($column, $row) = $cell->{ REF() } =~ /([A-Z]+)(\d+)/;
-
-    my $v = 0;
-    my $i = 0;
-    for my $ch (split '', $column) {
-        my $s = length($column) - $i++ - 1;
-        $v += (ord($ch) - ord('A') + 1) * (26**$s);
+    my ($column, $row);
+    my $v;
+    if ($cell->{ REF() }) {
+        ($column, $row) = $cell->{ REF() } =~ /([A-Z]+)(\d+)/;
+        $v = 0;
+        my $i = 0;
+        for my $ch (split '', $column) {
+            my $s = length($column) - $i++ - 1;
+            $v += (ord($ch) - ord('A') + 1) * (26**$s);
+        }
+        $cell->{ row } = $row + 0;
+        if ($cell->{ COLUMN() } > $v) {
+            carp sprintf 'Detected smaller index than current cell, something is wrong! (row %s): %s <> %s', $row, $v, $cell->{ COLUMN() };
+        }
+    } else {
+        # fallback if REF() not defined
+        $v = $cell->{ COLUMN() };
+        $row = $self->{_row_count}+1;
+        $cell->{ row } = $row;
     }
 
-    $cell->{ REF() } = [$v, $row];
-
-    if ($cell->{ COLUMN() } > $v) {
-        die sprintf 'Detected smaller index than current cell, something is wrong! (row %s): %s <> %s', $row, $v, $cell->{ COLUMN() };
-    }
-
-    # add omitted cells
+    # add omitted cells as empty...
     for ($cell->{ COLUMN() } .. $v-1) {
         push @{ $self->{_current_row} }, {
             GENERATED_CELL() => 1,
@@ -189,5 +189,18 @@ sub _parse_rel {
 }
 
 1;
+__END__
 
+=head1 NAME
 
+Data::XLSX::Parser::Sheet - Sheet class of Data::XLSX::Parser
+
+=head1 DESCRIPTION
+
+Data::XLSX::Parser::Sheet parses the cells in a sheet and invokes the _row_event method from the main parser object to return the processed row.
+
+=head1 AUTHOR
+
+Daisuke Murase <typester@cpan.org>
+
+=cut

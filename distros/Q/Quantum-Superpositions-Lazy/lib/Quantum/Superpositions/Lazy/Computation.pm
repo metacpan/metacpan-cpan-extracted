@@ -1,15 +1,16 @@
 package Quantum::Superpositions::Lazy::Computation;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use v5.24;
 use warnings;
 use Moo;
 use Quantum::Superpositions::Lazy::Operation::Computational;
 use Quantum::Superpositions::Lazy::ComputedState;
-use Quantum::Superpositions::Lazy::Util qw(is_collapsible);
+use Quantum::Superpositions::Lazy::Util qw(is_collapsible get_iterator);
 use Types::Common::Numeric qw(PositiveNum);
 use Types::Standard qw(ConsumerOf ArrayRef Str);
+use List::Util qw(product);
 
 use namespace::clean;
 
@@ -71,28 +72,28 @@ sub reset
 
 sub _cartesian_product
 {
-	my ($self, $values1, $values2, $sourced) = @_;
+	my ($self, $input_states, $sourced) = @_;
+
 	my %states;
+	my $iterator = get_iterator $input_states->@*;
 
-	for my $val1 ($values1->@*) {
-		for my $val2 ($values2->@*) {
-			my $result = $self->operation->run($val1->[1], $val2->[1]);
-			my $probability = $val1->[0] * $val2->[0];
+	while (my @params = $iterator->()) {
+		my @source = map { $_->[1] } @params;
+		my $result = $self->operation->run(@source);
+		my $probability = product map { $_->[0] } @params;
 
-			if (exists $states{$result}) {
-				$states{$result}[0] += $probability;
-			}
-			else {
-				$states{$result} = [
-					$probability,
-					$result,
-				];
-			}
+		if (exists $states{$result}) {
+			$states{$result}[0] += $probability;
+		}
+		else {
+			$states{$result} = [
+				$probability,
+				$result,
+			];
+		}
 
-			if ($sourced) {
-				my $source = [@{$val1->[2] // [$val1->[1]]}, $val2->[1]];
-				push $states{$result}[2]->@*, $source;
-			}
+		if ($sourced) {
+			push $states{$result}[2]->@*, \@source;
 		}
 	}
 
@@ -102,9 +103,8 @@ sub _cartesian_product
 sub _build_complete_states
 {
 	my ($self) = @_;
-	my $states;
-	my $sourced = $Quantum::Superpositions::Lazy::global_sourced_calculations;
 
+	my @input_states;
 	for my $value ($self->values->@*) {
 		my $local_states;
 
@@ -120,13 +120,11 @@ sub _build_complete_states
 			$local_states = [[1, $value]];
 		}
 
-		if (defined $states) {
-			$states = $self->_cartesian_product($states, $local_states, $sourced);
-		}
-		else {
-			$states = $local_states;
-		}
+		push @input_states, $local_states;
 	}
+
+	my $sourced = $Quantum::Superpositions::Lazy::global_sourced_calculations;
+	my $states = $self->_cartesian_product(\@input_states, $sourced);
 
 	if ($sourced) {
 		return [

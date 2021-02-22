@@ -1,0 +1,10 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    Exporter: 0
+    Mojolicious: '7.59'
+    Role::Tiny: '2.000001'
+    Sereal: '3.001'
+test:
+  requires:
+    Test::More: '0.88'

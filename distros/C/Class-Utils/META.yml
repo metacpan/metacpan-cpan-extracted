@@ -29,8 +29,8 @@ requires:
   Readonly: 0
   perl: 5.8.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Utils
-  homepage: https://github.com/tupinek/Class-Utils
+  bugtracker: https://github.com/michal-josef-spacek/Class-Utils/issues
+  homepage: https://github.com/michal-josef-spacek/Class-Utils
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/tupinek/Class-Utils
-version: '0.08'
+  repository: git://github.com/michal-josef-spacek/Class-Utils
+version: '0.09'

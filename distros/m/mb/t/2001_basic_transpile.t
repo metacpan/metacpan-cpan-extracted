@@ -2377,186 +2377,206 @@ lstat(y/a/b/)
 END1
 mb::_lstat(s{(\G${mb::_anchor})((?:(?=[a])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
 END2
-    sub { return 'SKIP' if $] < 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 454
+    sub { return 'SKIP' if $] < 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 456
 lstat(tr/a/b/)
 END1
 mb::_lstat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
 END2
-    sub { return 'SKIP' if $] < 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 455
+    sub { return 'SKIP' if $] < 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 457
 lstat(y/a/b/)
 END1
 mb::_lstat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 456
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 458
 lstat($fh)
 END1
 mb::_lstat($fh)
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 457
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 459
 lstat(FILE)
 END1
 mb::_lstat(\*FILE)
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 458
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 460
 lstat(_)
 END1
 mb::_lstat(\*_)
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 459
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 461
 lstat $fh
 END1
 mb::_lstat $fh
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 460
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 462
 lstat FILE
 END1
 mb::_lstat \*FILE
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 461
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 463
 lstat _
 END1
 mb::_lstat \*_
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 462
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 464
 lstat
 END1
 mb::_lstat
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 463
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 465
 opendir
 END1
 mb::_opendir
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 464
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 466
 stat()
 END1
 mb::_stat()
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 465
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 467
 stat('a')
 END1
 mb::_stat('a')
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 466
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 468
 stat("a")
 END1
 mb::_stat("a")
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 467
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 469
 stat(`a`)
 END1
 mb::_stat(`a`)
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 468
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 470
 stat(m/a/)
 END1
 mb::_stat(m{\G${mb::_anchor}@{[qr/a/ ]}@{[mb::_m_passed()]}})
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 469
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 471
 stat(q/a/)
 END1
 mb::_stat(q/a/)
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 470
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 472
 stat(qq/a/)
 END1
 mb::_stat(qq/a/)
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 471
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 473
 stat(qr/a/)
 END1
 mb::_stat(qr{\G${mb::_anchor}@{[qr/a/ ]}@{[mb::_m_passed()]}})
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 472
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 474
 stat(qw/a/)
 END1
 mb::_stat(qw/a/)
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 473
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 475
 stat(qx/a/)
 END1
 mb::_stat(qx/a/)
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 474
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 476
 stat(s/a/b/)
 END1
 mb::_stat(s{(\G${mb::_anchor})@{[qr/a/ ]}@{[mb::_s_passed()]}}{$1 . qq /b/}e)
 END2
-    sub { return 'SKIP' if $] >= 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 475
+    sub { return 'SKIP' if $] >= 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 477
 stat(tr/a/b/)
 END1
 mb::_stat(s{(\G${mb::_anchor})((?:(?=[a])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
 END2
-    sub { return 'SKIP' if $] >= 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 476
+    sub { return 'SKIP' if $] >= 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 478
 stat(y/a/b/)
 END1
 mb::_stat(s{(\G${mb::_anchor})((?:(?=[a])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
 END2
-    sub { return 'SKIP' if $] < 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 475
+    sub { return 'SKIP' if $] < 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 479
 stat(tr/a/b/)
 END1
 mb::_stat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
 END2
-    sub { return 'SKIP' if $] < 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 476
+    sub { return 'SKIP' if $] < 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 480
 stat(y/a/b/)
 END1
 mb::_stat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
 END2
 
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 477
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 481
 stat($fh)
 END1
 mb::_stat($fh)
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 478
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 482
 stat(FILE)
 END1
 mb::_stat(\*FILE)
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 479
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 483
 stat(_)
 END1
 mb::_stat(\*_)
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 480
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 484
 stat $fh
 END1
 mb::_stat $fh
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 481
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 485
 stat FILE
 END1
 mb::_stat \*FILE
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 482
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 486
 stat _
 END1
 mb::_stat \*_
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 483
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 487
 stat
 END1
 mb::_stat
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 484
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 488
 unlink
 END1
 mb::_unlink
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 485
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 489
 A
 END1
 A
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 486
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 490
 A'B
 END1
 A'B
 END2
-    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 487
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 491
 A::B
 END1
 A::B
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 492
+v1.20.300.4000
+END1
+mb::chr(1).mb::chr(20).mb::chr(300).mb::chr(4000)
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 493
+1.20.300.4000
+END1
+mb::chr(1).mb::chr(20).mb::chr(300).mb::chr(4000)
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 494
+v1234 => ''
+END1
+v1234 => ''
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 495
+v1234
+END1
+mb::chr(1234)
 END2
 );
 

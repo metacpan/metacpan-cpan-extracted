@@ -1,5 +1,5 @@
 # This file is part of Config::Parser::ldap                   -*- perl -*-
-# Copyright (C) 2019 Sergey Poznyakoff <gray@gnu.org>
+# Copyright (C) 2019-2021 Sergey Poznyakoff <gray@gnu.org>
 #
 # Config::Parser::ldap is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ use warnings;
 use parent 'Config::Parser';
 use Carp;
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 =head1 NAME
 

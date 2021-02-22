@@ -1,6 +1,6 @@
 # ABSTRACT: A simple interface to ArangoDB REST API
 package Arango::Tango;
-$Arango::Tango::VERSION = '0.013';
+$Arango::Tango::VERSION = '0.015';
 use base 'Arango::Tango::API';
 use Arango::Tango::Database;
 use Arango::Tango::Collection;
@@ -11,6 +11,7 @@ use HTTP::Tiny;
 use JSON;
 use MIME::Base64 3.11 'encode_base64url';
 use URI::Encode qw(uri_encode);
+
 
 BEGIN {
 Arango::Tango::API::_install_methods "Arango::Tango" => {
@@ -127,12 +128,16 @@ Arango::Tango::API::_install_methods "Arango::Tango" => {
 
 }
 
+
+
 sub new {
     my ($package, %opts) = @_;
     my $self = bless { %opts } => $package;
 
     $self->{host} ||= $ENV{ARANGO_DB_HOST} || "localhost";
     $self->{port} ||= $ENV{ARANGO_DB_PORT} || 8529;
+
+    $self->{scheme} ||= $ENV{ARANGO_DB_SCHEME} || 'http';
 
     $self->{username} ||= $ENV{ARANGO_DB_USERNAME} || "root";
     $self->{password} ||= $ENV{ARANGO_DB_PASSWORD} || "";
@@ -145,6 +150,8 @@ sub new {
 
     return $self;
 }
+
+
 
 
 sub _auth {
@@ -168,7 +175,10 @@ sub list_databases {
 }
 
 
-
+sub http_status {
+    my $self = shift;
+    return exists($self->{last_error}) ? $self->{last_error} : 0;
+}
 
 1;
 
@@ -184,7 +194,7 @@ Arango::Tango - A simple interface to ArangoDB REST API
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 SYNOPSYS
 
@@ -260,7 +270,21 @@ Username to be used to connect to ArangoDB. Defaults to C<root>.
 
 Password to be used to connect to ArangoDB. Default to the empty string.
 
+=item C<scheme>
+
+HTTP scheme to use. Defaults to C<http>.
+
 =back
+
+=back
+
+=head2 Error Checking
+
+=over 4
+
+=item C<http_status>
+
+Returns the last HTTP status code.
 
 =back
 
@@ -507,7 +531,7 @@ Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Alberto Simões.
+This software is copyright (c) 2019-2021 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

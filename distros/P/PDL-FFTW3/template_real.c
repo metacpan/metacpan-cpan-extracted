@@ -25,16 +25,16 @@
   if( !INVERSE )
     $TFD(fftwf_,fftw_)execute_dft_r2c( plan,
                                        ($TFD(float,double)*)$P(real),
-                                       ($TFD(fftwf_,fftw_)complex*)$P(complex) );
+                                       ($TFD(fftwf_,fftw_)complex*)$P(complexv) );
   else
   {
     // FFTW inverse real transforms clobber their input. I thus make a new
     // buffer and transform from there
     unsigned long nelem = 1;
     for( int i=0; i<=RANK; i++ )
-      nelem *= $PDL(complex)->dims[i];
+      nelem *= $PDL(complexv)->dims[i];
     $GENERIC()* input_copy = $TFD(fftwf_,fftw_)alloc_real( nelem );
-    memcpy( input_copy, $P(complex), sizeof($GENERIC()) * nelem );
+    memcpy( input_copy, $P(complexv), sizeof($GENERIC()) * nelem );
 
     $TFD(fftwf_,fftw_)execute_dft_c2r( plan,
                                        ($TFD(fftwf_,fftw_)complex*)input_copy,

@@ -1,5 +1,8 @@
 Revision history for MsOffice-Word-HTML-Writer
 
+1.05 21.02.2021
+  - fix RT #107457 and #104205; wrong behaviour and wrong documentation about page breaks
+
 1.04 11.02.2020
   - support for UTF8 contents
 

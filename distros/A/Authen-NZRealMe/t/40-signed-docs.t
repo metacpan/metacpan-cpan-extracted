@@ -56,6 +56,12 @@ my @test_docs = (
         xpath_query => '//saml:Assertion/saml:Subject',
         corrupter   => sub { s/PD94bWwgdmVyc/PD94bWwgdmVyC/; },
     },
+    {
+        xml_file    => '30-encrypted-assertion-and-flt-json.xml',
+        sign_cert   => $idp_sign_cert,
+        xpath_query => '//saml:Assertion/saml:Subject',
+        corrupter   => sub { s/eyJUcmFuc2F/eyJUcmFuc2f/; },
+    },
 );
 
 foreach my $test (@test_docs) {

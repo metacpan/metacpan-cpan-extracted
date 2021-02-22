@@ -3,8 +3,8 @@ NAME
     ANSI colors
 
 VERSION
-    This document describes version 0.601 of Text::ANSITable (from Perl
-    distribution Text-ANSITable), released on 2020-10-05.
+    This document describes version 0.602 of Text::ANSITable (from Perl
+    distribution Text-ANSITable), released on 2021-02-19.
 
 SYNOPSIS
      use 5.010;
@@ -58,6 +58,34 @@ DESCRIPTION
     instead of "CamelCase", and it uses arrayref for "columns" and
     "add_row". When specifying border styles, the order of characters are
     slightly different. More fine-grained options to customize appearance.
+
+REFERRING TO COLUMNS
+    Columns can be referred to be integer number (0-based) or name (string).
+    You should not have integer numbers as column names because that will be
+    confusing. Example:
+
+     $t->columns(["col1", "col2", "col3"]); # col1=0, col2=1, col3=2
+     $t->add_row([...]);
+     ...
+
+     # set visible columns
+     $t->column_filter([1,2,1]); # col2, col3, col2
+     $t->column_filter(["col2","col3","col2"]); # same thing
+
+    See also: "REFERRING TO ROWS".
+
+REFERRING TO ROWS
+    Rows are referred to by integer number (0-based).
+
+     $t->columns(["name", "age", "gender"]);
+     $t->add_row(["marty", ...]); # first row (0)
+     $t->add_row(["wendy", ...]); # second row (1)
+     $t->add_row(["charlotte", ...]); # third row (2)
+
+     # set visible rows
+     $t->row_filter([0,2]); # marty & charlotte
+
+    See also: "REFERRING TO COLUMNS".
 
 BORDER STYLES
     To list available border styles, just list the "BorderStyle::*" modules.
@@ -228,8 +256,8 @@ ROW VERTICAL PADDING
 
         Example:
 
-         $t->set_row_style($row_num, tpad => 1);
-         $t->set_row_style($row_num, bpad => 2);
+         $t->set_row_style($rownum, tpad => 1);
+         $t->set_row_style($rownum, bpad => 2);
 
         When adding row:
 
@@ -452,7 +480,7 @@ ATTRIBUTES
   row_filter => CODE|ARRAY OF INT
     When drawing, only show rows that match this. Can be an array containing
     indices of rows which should be shown, or a coderef which will be called
-    for each row with arguments "($row, $row_num)" and should return a bool
+    for each row with arguments "($row, $rownum)" and should return a bool
     value indicating whether that row should be displayed.
 
     Internal note: During drawing, rows will be filtered and put into
@@ -463,7 +491,7 @@ ATTRIBUTES
     containing names of columns that should be displayed (column names can
     be in different order or duplicate, column can also be referred to with
     its numeric index). Can also be a coderef which will be called with
-    "($col_name, $col_num)" for every column and should return a bool value
+    "($colname, $colnum)" for every column and should return a bool value
     indicating whether that column should be displayed. The coderef version
     is more limited in that it cannot reorder the columns or instruct for
     the same column to be displayed more than once.
@@ -574,8 +602,8 @@ ATTRIBUTES
 
   cell_fgcolor => RGB|CODE
     Set foreground color for all cells. Value should be 6-hexdigit RGB. Can
-    also be a coderef that will receive %args (e.g. row_num, col_name,
-    col_num) and should return an RGB color. Can be overriden by per-cell
+    also be a coderef that will receive %args (e.g. rownum, col_name,
+    colnum) and should return an RGB color. Can be overriden by per-cell
     "fgcolor" style.
 
   cell_bgcolor => RGB|CODE
@@ -584,7 +612,7 @@ ATTRIBUTES
   header_fgcolor => RGB|CODE
     Set foreground color for all headers. Overrides "cell_fgcolor" for
     headers. Value should be a 6-hexdigit RGB. Can also be a coderef that
-    will receive %args (e.g. col_name, col_num) and should return an RGB
+    will receive %args (e.g. col_name, colnum) and should return an RGB
     color.
 
   header_bgcolor => RGB|CODE
@@ -634,12 +662,12 @@ METHODS
   $t->add_row_separator() => OBJ
     Add a row separator line.
 
-  $t->get_cell($row_num, $col) => VAL
-    Get cell value at row #$row_num (starts from zero) and column
+  $t->get_cell($rownum, $col) => VAL
+    Get cell value at row #$rownum (starts from zero) and column
     named/numbered $col.
 
-  $t->set_cell($row_num, $col, $newval) => VAL
-    Set cell value at row #$row_num (starts from zero) and column
+  $t->set_cell($rownum, $col, $newval) => VAL
+    Set cell value at row #$rownum (starts from zero) and column
     named/numbered $col. Return old value.
 
   $t->get_column_style($col, $style) => VAL
@@ -663,11 +691,11 @@ METHODS
     styles and the per-column styles then merged together. This is the
     per-column style actually applied.
 
-  $t->get_row_style($row_num) => VAL
-    Get per-row style for row numbered $row_num.
+  $t->get_row_style($rownum) => VAL
+    Get per-row style for row numbered $rownum.
 
-  $t->set_row_style($row_num, $style=>$newval[, $style2=>$newval2, ...])
-    Set per-row style(s) for row numbered $row_num. Available values for
+  $t->set_row_style($rownum, $style=>$newval[, $style2=>$newval2, ...])
+    Set per-row style(s) for row numbered $rownum. Available values for
     $style: "align", "valign", "height", "vpad", "tpad", "bpad", "fgcolor",
     "bgcolor".
 
@@ -678,17 +706,17 @@ METHODS
     Add a new conditional row style. See "CONDITIONAL STYLES" for more
     details on conditional style.
 
-  $t->get_eff_row_style($row_num, $style) => VAL
+  $t->get_eff_row_style($rownum, $style) => VAL
     Get "effective" row style named $style for a particular row. Effective
     row style is calculated from all the conditional row styles and the
     per-row styles then merged together. This is the per-row style actually
     applied.
 
-  $t->get_cell_style($row_num, $col, $style) => VAL
+  $t->get_cell_style($rownum, $col, $style) => VAL
     Get per-cell style named $style for a particular cell. Return undef if
     there is no per-cell style with that name.
 
-  $t->set_cell_style($row_num, $col, $style=>$newval[, $style2=>$newval2, ...])
+  $t->set_cell_style($rownum, $col, $style=>$newval[, $style2=>$newval2, ...])
     Set per-cell style(s). Available values for $style: "align", "valign",
     "formats", "fgcolor", "bgcolor".
 
@@ -699,7 +727,7 @@ METHODS
     Add a new conditional cell style. See "CONDITIONAL STYLES" for more
     details on conditional style.
 
-  $t->get_eff_cell_style($row_num, $col, $style) => VAL
+  $t->get_eff_cell_style($rownum, $col, $style) => VAL
     Get "effective" cell style named $style for a particular cell. Effective
     cell style is calculated from all the conditional cell styles and the
     per-cell styles then merged together. This is the per-cell style
@@ -1007,10 +1035,10 @@ FAQ
     terminal emulators with black background.
 
    How to set different background colors for odd/even rows?
-    Aside from doing "$t->set_row_style($row_num, bgcolor=>...)" for each
+    Aside from doing "$t->set_row_style($rownum, bgcolor=>...)" for each
     row, you can also do this:
 
-     $t->cell_bgcolor(sub { my ($self, %args) = @_; $args{row_num} % 2 ? '202020' : undef });
+     $t->cell_bgcolor(sub { my ($self, %args) = @_; $args{rownum} % 2 ? '202020' : undef });
 
     Or, you can use conditional row styles:
 
@@ -1064,8 +1092,8 @@ ENVIRONMENT
 
   ANSITABLE_ROW_STYLES => str(json)
     Can be used to set per-row styles. Interpreted right before draw().
-    Value should be a JSON-encoded a hash of "row_num => {style => val,
-    ...}" pairs. Example:
+    Value should be a JSON-encoded a hash of "rownum => {style => val, ...}"
+    pairs. Example:
 
      % ANSITABLE_ROW_STYLES='{"0":{"bgcolor":"000080","vpad":1}}' ansitable-list-border-styles
 
@@ -1073,8 +1101,8 @@ ENVIRONMENT
 
   ANSITABLE_CELL_STYLES => str(json)
     Can be used to set per-cell styles. Interpreted right before draw().
-    Value should be a JSON-encoded a hash of ""row_num,col" => {style =>
-    val, ...}" pairs. Example:
+    Value should be a JSON-encoded a hash of ""rownum,col" => {style => val,
+    ...}" pairs. Example:
 
      % ANSITABLE_CELL_STYLES='{"1,1":{"bgcolor":"008000"}}' ansitable-list-border-styles
 
@@ -1100,7 +1128,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSITable>
+    <https://github.com/perlancar/perl-Text-ANSITable/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -1147,8 +1175,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014, 2013
-    by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014,
+    2013 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

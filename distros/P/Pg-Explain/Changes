@@ -1,5 +1,8 @@
 Revision history for Pg-Explain
 
+1.05    2021/02/18
+        - Add parsing of JIT information from plans in all four formats (text, json, yaml, xml)
+
 1.04    2020/12/21
         - Add handling of autoexplain plans in non-text formats.
         Apparently autoexplain logs plans that are different from normal

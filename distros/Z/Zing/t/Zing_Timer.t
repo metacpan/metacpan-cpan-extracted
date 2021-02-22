@@ -29,6 +29,12 @@ Timer Process
 
 =cut
 
+=includes
+
+method: schedules
+
+=cut
+
 =synopsis
 
   package MyApp;
@@ -62,6 +68,12 @@ Zing::Process
 
 =cut
 
+=attributes
+
+on_schedules: ro, opt, Maybe[CodeRef]
+
+=cut
+
 =description
 
 This package provides a L<Zing::Process> which places pre-defined messages into
@@ -88,7 +100,7 @@ C<@weekly>, C<@weekend>, C<@daily>, C<@hourly>, or C<@minute>.
   # schedule structure
   # [$interval, $queues, $message, $adjustment]
 
-  # predefined schedules
+  # predefined intervals
 
   # @annually is at 00:00 on day-of-month 1 in january
   # @daily is at 00:00 every day
@@ -110,6 +122,26 @@ C<@weekly>, C<@weekend>, C<@daily>, C<@hourly>, or C<@minute>.
   # every 15th minute
   # ['*/15 * * * *', ['tasks'], { do => 1 }]
 
+=method schedules
+
+The schedules method, when not overloaded, executes the callback in the
+L</on_schedules> attribute and expects a list of crontab schedules to be
+processed.
+
+=signature schedules
+
+schedules(Any @args) : ArrayRef[Schedule]
+
+=example-1 schedules
+
+  my $timer = Zing::Timer->new(
+    on_schedules => sub {
+      [['@hourly', ['tasks'], { do => 1 }]]
+    },
+  );
+
+  $timer->schedules;
+
 =cut
 
 package main;
@@ -126,6 +158,13 @@ $subs->synopsis(fun($tryable) {
 
 $subs->scenario('schedules', fun($tryable) {
   ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'schedules', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, [['@hourly', ['tasks'], { do => 1 }]];
 
   $result
 });

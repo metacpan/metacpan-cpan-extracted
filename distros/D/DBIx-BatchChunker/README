@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.940.2
+    version v0.940.4
 
 SYNOPSIS
 
@@ -389,9 +389,9 @@ ATTRIBUTES
 
     Turned off by default.
 
-    NOTE: If your RDBMS has a problem with a number as high as whatever
-    max_integer reports, you may want to set the $DB_MAX_ID global variable
-    in this module to something lower.
+    NOTE: If your RDBMS has a problem with a number as high as whatever ~0
+    reports, you may want to set the $DB_MAX_ID global variable in this
+    module to something lower.
 
   single_rows
 
@@ -610,7 +610,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+    This software is Copyright (c) 2018 - 2021 by Grant Street Group.
 
     This is free software, licensed under:
 

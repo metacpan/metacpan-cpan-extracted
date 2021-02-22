@@ -6,7 +6,7 @@ use BoardStreams::Registry;
 use BoardStreams::ListenerObservable 'get_listener_observable';
 use BoardStreams::Transaction;
 use BoardStreams::Exception 'db_duplicate_error';
-use BoardStreams::Util 'string', ':bool';
+use BoardStreams::Util 'string', ':bool', 'next_tick_p';
 use BoardStreams::DBMigrations;
 
 use Mojo::Pg;
@@ -25,11 +25,12 @@ use Encode 'encode_utf8';
 
 use experimental 'postderef';
 
-our $VERSION = "v0.0.13";
+our $VERSION = "v0.0.21";
 
 use constant {
+    DEFAULT_CLEANUP_INTERVAL          => 5,
     DEFAULT_HEARTBEAT_INTERVAL        => 5,
-    DEFAULT_HEARTBEAT_TIMEOUT         => 10,
+    DEFAULT_HEARTBEAT_TIMEOUT         => 5,
     DEFAULT_PREFIX                    => 'bs',
     DEFAULT_PING_INTERVAL             => 15,
     DEFAULT_NOTIFY_PAYLOAD_SIZE_LIMIT => 8000,
@@ -37,11 +38,13 @@ use constant {
 };
 
 my $WORKERS_CHANNEL = '_bs:workers';
+my $CLEANUP_CHANNEL = '_bs:cleanup';
 
 sub register ($self, $app, $config) {
     my $worker_uuid = Data::GUID->new->as_base64;
 
     # config params
+    my $cleanup_interval = $config->{cleanup_interval} // DEFAULT_CLEANUP_INTERVAL;
     my $heartbeat_interval = $config->{heartbeat_interval} // DEFAULT_HEARTBEAT_INTERVAL;
     my $heartbeat_timeout = $config->{heartbeat_timeout} // DEFAULT_HEARTBEAT_TIMEOUT;
     my $bs_prefix = $config->{prefix} // DEFAULT_PREFIX;
@@ -52,9 +55,9 @@ sub register ($self, $app, $config) {
     my $db_string = $config->{'db_string'} or die "missing db_string configuration option";
     my $pg = Mojo::Pg->new($db_string);
     BoardStreams::DBMigrations->apply_migrations($pg);
+    $app->helper("$bs_prefix.pg" => sub { $pg });
     $app->helper("$bs_prefix.db" => sub { $pg->db });
     $app->helper("$bs_prefix.pubsub" => sub { $pg->pubsub });
-    $app->helper("$bs_prefix.pubsub_db" => sub { $pg->pubsub->db });
     my $event_patch_sequence_name = $app->$bs_prefix->db->query("
         SELECT pg_get_serial_sequence('event_patch', 'id')
     ")->array->[0];
@@ -71,22 +74,16 @@ sub register ($self, $app, $config) {
     my $last_heartbeat_dt;
 
     my sub calculate_hb_expiry_dur () {
-        state $hb_e_d = $heartbeat_interval + max($heartbeat_interval * 0.5, 10);
+        state $hb_e_d = $heartbeat_interval + $heartbeat_timeout;
     }
 
     # on workers startup:
-    my $ping_o;
     Mojo::IOLoop->next_tick(sub {
         srand();
 
-        # ping every 15 seconds
-        $ping_o = rx_defer(sub {
-            rx_timer(rand($ping_interval), $ping_interval);
-        })->pipe(
+        my $graceful_stop_o = rx_from_event(Mojo::IOLoop->singleton, 'finish')->pipe(
             op_share(),
         );
-
-        my $graceful_stop_o = rx_from_event(Mojo::IOLoop->singleton, 'finish');
 
         # on graceful stop, boot all clients
         for my $i (1 .. 10) {
@@ -125,9 +122,7 @@ sub register ($self, $app, $config) {
         };
 
         # register heartbeat every X seconds, or gracefully stop
-        rx_merge(
-            rx_timer(rand($heartbeat_interval), $heartbeat_interval),
-        )->pipe(
+        rx_timer(rand($heartbeat_interval), $heartbeat_interval)->pipe(
             op_take_until($graceful_stop_o),
         )->subscribe(sub {
             try {
@@ -192,6 +187,49 @@ sub register ($self, $app, $config) {
         )->subscribe(sub {
             Mojo::IOLoop->stop_gracefully;
         });
+
+        # one process needs to call "global_cleanup" every "cleanup_interval" seconds:
+        if ($cleanup_interval) {
+            rx_defer(sub {
+                return rx_timer($cleanup_interval * 0.5 + rand($cleanup_interval));
+            })->pipe(
+                op_repeat(),
+                op_take_until($graceful_stop_o),
+            )->subscribe(async sub {
+                my $t0 = Time::HiRes::time();
+                my $cleanup_state = $app->$bs_prefix->get_state($CLEANUP_CHANNEL);
+                return unless $t0 >= $cleanup_state->{last_cleanup} + $cleanup_interval;
+
+                my $me_is_cleanup_executor = 0;
+
+                my $txn = $app->$bs_prefix->begin;
+                $txn->db->select('channel',
+                    'id',
+                    { name => $CLEANUP_CHANNEL },
+                    { for => \'update skip locked' },
+                )->hash or return;
+                $txn->lock_state($CLEANUP_CHANNEL, sub ($state) {
+                    return undef, undef if Time::HiRes::time() < $state->{last_cleanup} + $cleanup_interval;
+
+                    $state->{last_cleanup} = $t0;
+                    $me_is_cleanup_executor = 1;
+
+                    return undef, $state;
+                });
+                return unless $me_is_cleanup_executor;
+                await $app->$bs_prefix->global_cleanup;
+                $txn->commit;
+            });
+        }
+
+        # Remove this code when this issue has been addressed:
+        #  https://github.com/mojolicious/mojo-pg/issues/77
+        $app->$bs_prefix->pubsub->listen('dummy_notification' => sub {});
+        rx_timer(rand(0.5), 0.5)->pipe(
+            op_take_until($graceful_stop_o),
+        )->subscribe(sub {
+            $app->$bs_prefix->pubsub->notify('dummy_notification' => '{}');
+        });
     });
 
     $app->helper("$bs_prefix.on_action", sub ($c, $channel_name, $action_name, $action_sub) {
@@ -203,6 +241,10 @@ sub register ($self, $app, $config) {
     });
 
     $app->helper("$bs_prefix.create_channel_or_die", sub ($c, $channel_name, $state = undef, $attrs = {}) {
+        ! $c->$bs_prefix->db->select('channel',
+            'id',
+            { name => $channel_name },
+        )->hash or db_duplicate_error;
         my $type = $attrs->{type} // '';
         my $keep_events = exists $attrs->{keep_events} ? to_bool $attrs->{keep_events} : true;
         my $sth;
@@ -223,22 +265,16 @@ sub register ($self, $app, $config) {
     });
 
     $app->helper("$bs_prefix.create_channel", sub ($c, $channel_name, $state = undef, $attrs = {}) {
-        my $type = $attrs->{type} // '';
-        my $keep_events = exists $attrs->{keep_events} ? to_bool $attrs->{keep_events} : true;
-        my $db = $c->$bs_prefix->db;
-        ! $db->select('channel',
-            ['id'],
-            { name => $channel_name },
-        )->hash or return;
-        $db->insert('channel',
-            {
-                name        => $channel_name,
-                type        => $type,
-                state       => to_json($state),
-                keep_events => $keep_events,
-            },
-            { on_conflict => undef },
-        );
+        try {
+            $c->$bs_prefix->create_channel_or_die($channel_name, $state, $attrs);
+            return 1;
+        } catch {
+            my $e = $@;
+            if ($e->$_isa('BoardStreams::Exception::DbError::Duplicate')) {
+                return !!0;
+            }
+            die $e;
+        };
     });
 
     $app->helper("$bs_prefix.begin", sub ($c) {
@@ -313,14 +349,11 @@ sub register ($self, $app, $config) {
         # reject connection, if pubsub is not active
         return $self->rendered(500) if not $pubsub_connected;
 
-        # ping client at regular intervals, until client disconnects
-        $ping_o->pipe(
-            op_take_until(
-                rx_from_event($self->tx, 'finish'),
-            ),
-        )->subscribe(sub {
-            $self->send([1, 0, 0, 0, WS_PING, 'Hello World!']);
-        });
+        # send initial configuration
+        $self->send({binary => encode_json({
+            type => 'configuration',
+            pingInterval => $ping_interval,
+        })});
 
         # disconnect soon if worker stops gracefully
         $boot_emitters[int rand @boot_emitters]->subscribe(sub {
@@ -340,20 +373,33 @@ sub register ($self, $app, $config) {
 
                 # join handler
                 my $join_handler = BoardStreams::Registry->get_join($channel_name) or return;
+                if (BoardStreams::Registry->has_pair($c, $channel_name)) {
+                    # not first join, so use a join handler that does nothing
+                    $join_handler = sub {
+                        return { limit => 0 };
+                    };
+                }
                 $c->$bs_prefix->channel_exists($channel_name) or return;
                 my $attrs = { since_id => $since_id, is_reconnect => int(defined $since_id) };
+
+                my $o = get_listener_observable($c, $channel_name, $bs_prefix);
+                my $s = $o->subscribe();
+
                 my $join_ret = eval { $join_handler->($channel_name, $c, $attrs) };
                 if ($join_ret->$_can('then')) {
                     $join_ret = eval { await $join_ret };
                 }
-                $join_ret or return;
-                my $limit = $join_ret->{limit} // 0;
+                if (! $join_ret) {
+                    $s->unsubscribe();
+                    return;
+                }
+                my $limit = eval { $join_ret->{limit} } // 0;
 
                 my $was_added = BoardStreams::Registry->add_pair($c, $channel_name);
                 if ($was_added) {
-                    my $o = get_listener_observable($c, $channel_name, $bs_prefix);
-                    my $s = $o->subscribe();
                     $c->stash->{subscriptions}{channels}{$channel_name} = $s;
+                } else {
+                    $s->unsubscribe();
                 }
 
                 # NOTE: in the async case in the future, make sure the subscription is still there
@@ -393,7 +439,7 @@ sub register ($self, $app, $config) {
                             data        => {
                                 event => from_json($event_row->{event}),
                             },
-                        }, "event_patch-$channel_name");
+                        }, "imm-event_patch-$channel_name-$channel_uuid");
                     }
                 }
 
@@ -403,12 +449,13 @@ sub register ($self, $app, $config) {
                     channelUUID => $channel_uuid,
                     id          => int $event_id,
                     data        => from_json($state),
-                }, "state-$channel_name");
+                }, "state-$channel_name-$channel_uuid");
             }
 
             # leave
             if ($hash->{type} eq 'leave') {
                 my $channel_name = string $hash->{channel};
+                return unless $c->$bs_prefix->joined($channel_name);
                 BoardStreams::Registry->remove_pair($c, $channel_name);
                 my $s = delete $c->stash->{subscriptions}{channels}{$channel_name};
                 $s->unsubscribe() if defined $s;
@@ -419,6 +466,7 @@ sub register ($self, $app, $config) {
             # action
             if ($hash->{type} eq 'action') {
                 my $channel_name = string $hash->{channel};
+                return unless $c->$bs_prefix->joined($channel_name);
                 my ($action_name, $payload) = $hash->{data}->@*;
                 my $action_sub = BoardStreams::Registry->get_action($channel_name, $action_name);
                 $action_sub->($channel_name, $c, $payload);
@@ -429,9 +477,13 @@ sub register ($self, $app, $config) {
                 my $channel_name = string $hash->{channel};
                 my ($request_name, $payload) = $hash->{data}->@*;
                 my $request_id = string $hash->{requestId};
-                my $request_sub = BoardStreams::Registry->get_request($channel_name, $request_name);
+                my $request_sub;
+                $c->$bs_prefix->joined($channel_name) or $request_sub //= sub {
+                    die { 'system' => 'not_joined' };
+                };
+                $request_sub //= BoardStreams::Registry->get_request($channel_name, $request_name);
                 $request_sub //= sub {
-                    die { system => 'invalid_request_name' };
+                    die { 'system' => 'invalid_request_name' };
                 };
                 my $t0 = Time::HiRes::time();
                 my $return_value;
@@ -465,6 +517,8 @@ sub register ($self, $app, $config) {
                     }, "response-$channel_name-$request_id");
                 }
             }
+
+            # on $hash->{type} eq 'ping', do nothing
         });
 
         # on finish, leave all channels
@@ -512,77 +566,81 @@ sub register ($self, $app, $config) {
         };
     });
 
-    $app->helper("$bs_prefix.global_cleanup", sub ($c) {
+    $app->helper("$bs_prefix.global_cleanup", async sub ($c) {
         my $workers_state = $c->$bs_prefix->get_state($WORKERS_CHANNEL);
         my $time = get_time;
         foreach my $worker (values %$workers_state) {
-            if ($time > $worker->{heartbeat} + calculate_hb_expiry_dur()) {
-                my $db = $c->$bs_prefix->db;
+            next if $time <= $worker->{heartbeat} + calculate_hb_expiry_dur();
 
-                # 0. set 'banned' property of worker to true
-                $c->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
-                    $state->{$worker->{uuid}}{banned} = true
-                        if exists $state->{$worker->{uuid}};
-                    return undef, $state;
-                }, no_ban => 1);
+            my $db = $c->$bs_prefix->db;
 
-                # 1. find channel names from "guards" table
-                my $worker_uuid = $worker->{uuid};
-                my @channels = $db->query(q{
-                    SELECT c.*
-                        FROM guards g JOIN channel c ON (c.id = g.channel_id)
-                        WHERE g.worker_uuid = ?
-                }, $worker_uuid)->hashes->@*;
+            # 0. set 'banned' property of worker to true
+            $c->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
+                $state->{$worker->{uuid}}{banned} = true
+                    if exists $state->{$worker->{uuid}};
+                return undef, $state;
+            }, no_ban => 1);
 
-                # 2. call cleanup subs (deleting guards rows in the process)
-                CHANNEL:
-                foreach my $channel (@channels) {
-                    my $txn = $c->$bs_prefix->begin;
-                    my $db = $txn->db;
-                    my $guards_counter = $db->select('guards',
-                        ['counter'],
-                        {
-                            worker_uuid => $worker_uuid,
-                            channel_id  => $channel->{id},
-                        },
-                        { for => 'update' },
-                    )->hash->{counter};
-                    defined $guards_counter or next CHANNEL;
+            # 1. find channel names from "guards" table
+            my $worker_uuid = $worker->{uuid};
+            my @channels = $db->query(q{
+                SELECT c.id, c.name
+                    FROM guards g JOIN channel c ON (c.id = g.channel_id)
+                    WHERE g.worker_uuid = ?
+            }, $worker_uuid)->hashes->@*;
 
-                    # call cleanup sub
-                    my $channel_name = $channel->{name};
-                    if (my $cleanup_sub = BoardStreams::Registry->get_cleanup($channel_name)) {
-                        $c->$bs_prefix->lock_state($channel_name, sub ($state) {
-                            my $alive_workers = $c->$bs_prefix->alive_workers;
-                            my $new_state = $cleanup_sub->($channel_name, $state, $alive_workers);
+            # 2. call cleanup subs (deleting guards rows in the process)
+            CHANNEL:
+            foreach my $channel (@channels) {
+                await next_tick_p();
+                my $txn = $c->$bs_prefix->begin;
+                my $db = $txn->db;
+                my $channel_name = $channel->{name};
 
-                            return undef, $new_state;
-                        }, no_ban => 1);
-                    }
+                # lock channel to prevent lock_state from modifying guard counts
+                $db->select('channel',
+                    'id',
+                    { name => $channel_name },
+                    { for => 'update' },
+                )->hash or next CHANNEL;
+                my $guard_row = $db->select('guards',
+                    ['counter'],
+                    {
+                        worker_uuid => $worker_uuid,
+                        channel_id  => $channel->{id},
+                    },
+                    { for => 'update' },
+                )->hash or next CHANNEL;
+                my $guards_counter = $guard_row->{counter};
 
-                    $db->update('guards',
-                        { counter => \"counter - $guards_counter" },
-                        {
-                            worker_uuid => $worker_uuid,
-                            channel_id => $channel->{id},
-                        },
-                    );
-                    $db->delete('guards',
-                        {
-                            worker_uuid => $worker_uuid,
-                            channel_id  => $channel->{id},
-                            counter     => {'<=', 0},
-                        },
-                    );
-                    $txn->commit;
+                # call cleanup sub
+                if (my $cleanup_sub = BoardStreams::Registry->get_cleanup($channel_name)) {
+                    my $alive_workers = $c->$bs_prefix->alive_workers;
+                    $cleanup_sub->($channel_name, $txn, $alive_workers);
                 }
 
-                # 3. delete worker from :heartbeats
-                $c->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
-                    delete $state->{$worker->{uuid}};
-                    return undef, $state;
-                }, no_ban => 1);
+                $db->update('guards',
+                    { counter => \"counter - $guards_counter" },
+                    {
+                        worker_uuid => $worker_uuid,
+                        channel_id => $channel->{id},
+                    },
+                );
+                $db->delete('guards',
+                    {
+                        worker_uuid => $worker_uuid,
+                        channel_id  => $channel->{id},
+                        counter     => {'<=', 0},
+                    },
+                );
+                $txn->commit;
             }
+
+            # 3. delete worker from :heartbeats
+            $c->$bs_prefix->lock_state($WORKERS_CHANNEL, sub ($state) {
+                delete $state->{$worker->{uuid}};
+                return undef, $state;
+            }, no_ban => 1);
         }
         my $duration = get_time() - $time;
         $c->app->log->warn('Channels cleanup took ' . (0 + sprintf("%.2f", $duration)) . ' seconds')
@@ -649,8 +707,8 @@ sub register ($self, $app, $config) {
 
     # system channels
     {
-        $app->$bs_prefix->create_channel($WORKERS_CHANNEL, {});
-        $app->$bs_prefix->global_cleanup();
+        $app->$bs_prefix->create_channel($WORKERS_CHANNEL, {}, { keep_events => 0 });
+        $app->$bs_prefix->create_channel($CLEANUP_CHANNEL, { last_cleanup => 0 }, { keep_events => 0 });
     }
 }
 

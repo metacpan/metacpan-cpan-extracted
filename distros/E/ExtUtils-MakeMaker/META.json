@@ -4,7 +4,7 @@
       "Michael G Schwern <schwern@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -61,5 +61,5 @@
       },
       "x_MailingList" : "makemaker@perl.org"
    },
-   "version" : "7.58"
+   "version" : "7.60"
 }

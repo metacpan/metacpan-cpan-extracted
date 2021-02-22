@@ -26,6 +26,7 @@
             "Data::Table::Text" : "20201029",
             "Date::Manip" : "0",
             "Digest::SHA1" : "0",
+            "Scalar::Util" : "0",
             "Storable" : "0",
             "Test2::API" : "0",
             "Test::More" : "0",
@@ -37,7 +38,7 @@
    "provides" : {
       "GitHub::Crud" : {
          "file" : "lib/GitHub/Crud.pm",
-         "version" : "20210212"
+         "version" : "202102121"
       }
    },
    "release_status" : "stable",
@@ -52,6 +53,6 @@
          "url" : "https://github.com/philiprbrenan/GitHubCrud"
       }
    },
-   "version" : "20210212",
+   "version" : "202102121",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,0 +1,33 @@
+Changes
+CONTRIBUTING.md
+lib/Regexp/Common/Apache2.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+t/001.load.t
+t/002.regex.t
+t/003.variables.t
+t/004.word.t
+t/005.listfunc.t
+t/006.string.t
+t/007.cond.t
+t/008.function.t
+t/100.variables.t
+t/101.word.t
+t/102.listfunc.t
+t/103.reany.t
+t/104.sub.t
+t/105.list.t
+t/106.split.t
+t/107.join.t
+t/108.substitution.t
+t/109.string.t
+t/110.cond.t
+t/111.function.t
+t/900.pod.t
+t/901.kwalitee.t
+t/functions.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

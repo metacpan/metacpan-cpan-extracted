@@ -30,7 +30,7 @@ use Test::Builder;
 	file_mtime_gt_ok file_mtime_lt_ok file_mtime_age_ok
 	);
 
-$VERSION = '1.444';
+$VERSION = '1.446';
 
 my $Test = Test::Builder->new();
 
@@ -152,11 +152,11 @@ sub file_not_exists_ok {
 
 =item file_empty_ok( FILENAME [, NAME ] )
 
-Ok if the file exists and has empty size, not ok if the
-file does not exist or exists with non-zero size.
+Ok if the file exists and has empty size, not ok if the file does not
+exist or exists with non-zero size.
 
 Previously this tried to test any sort of file. Sometime in the future
-this will fail if the argument is not a plain file.
+this will fail if the argument is not a plain file or is a directory.
 
 =cut
 
@@ -171,6 +171,10 @@ sub file_empty_ok {
 
 	unless( -f $filename ) {
 		$Test->diag( "File [$filename] is not a plain file, which is deprecated for file_empty_ok" );
+		}
+
+	if( -d $filename ) {
+		$Test->diag( "File [$filename] is a directory, which is deprecated for file_empty_ok" );
 		}
 
 	my $ok = -z $filename;
@@ -190,7 +194,7 @@ Ok if the file exists and has non-zero size, not ok if the file does
 not exist or exists with zero size.
 
 Previously this tried to test any sort of file. Sometime in the future
-this will fail if the argument is not a plain file.
+this will fail if the argument is not a plain file or is a directory.
 
 =cut
 
@@ -204,6 +208,10 @@ sub file_not_empty_ok {
 		}
 
 	unless( -f $filename ) {
+		$Test->diag( "File [$filename] is a directory, which is deprecated for file_not_empty_ok" );
+		}
+
+	if( -d $filename ) {
 		$Test->diag( "File [$filename] is a directory, which is deprecated for file_not_empty_ok" );
 		}
 
@@ -224,7 +232,7 @@ Ok if the file exists and has SIZE size in bytes (exactly), not ok if
 the file does not exist or exists with size other than SIZE.
 
 Previously this tried to test any sort of file. Sometime in the future
-this will fail if the argument is not a plain file.
+this will fail if the argument is not a plain file or is a directory.
 
 =cut
 
@@ -239,6 +247,10 @@ sub file_size_ok {
 		}
 
 	unless( -f $filename ) {
+		$Test->diag( "File [$filename] is a directory, which is deprecated for file_size_ok" );
+		}
+
+	if( -d $filename ) {
 		$Test->diag( "File [$filename] is a directory, which is deprecated for file_size_ok" );
 		}
 
@@ -263,7 +275,7 @@ ok if the file does not exist or exists with size greater than MAX
 bytes.
 
 Previously this tried to test any sort of file. Sometime in the future
-this will fail if the argument is not a plain file.
+this will fail if the argument is not a plain file or is a directory.
 
 =cut
 
@@ -278,6 +290,10 @@ sub file_max_size_ok {
 		}
 
 	unless( -f $filename ) {
+		$Test->diag( "File [$filename] is a directory, which is deprecated for file_max_size_ok" );
+		}
+
+	if( -d $filename ) {
 		$Test->diag( "File [$filename] is a directory, which is deprecated for file_max_size_ok" );
 		}
 
@@ -304,7 +320,7 @@ not ok if the file does not exist or exists with size less than MIN
 bytes.
 
 Previously this tried to test any sort of file. Sometime in the future
-this will fail if the argument is not a plain file.
+this will fail if the argument is not a plain file or is a directory.
 
 =cut
 
@@ -319,6 +335,10 @@ sub file_min_size_ok {
 		}
 
 	unless( -f $filename ) {
+		$Test->diag( "File [$filename] is a directory, which is deprecated for file_min_size_ok" );
+		}
+
+	if( -d $filename ) {
 		$Test->diag( "File [$filename] is a directory, which is deprecated for file_min_size_ok" );
 		}
 
@@ -347,7 +367,7 @@ This function uses the current value of C<$/> as the line ending and
 counts the lines by reading them and counting how many it read.
 
 Previously this tried to test any sort of file. Sometime in the future
-this will fail if the argument is not a plain file.
+this will fail if the argument is not a plain file or is a directory.
 
 =cut
 
@@ -377,6 +397,14 @@ sub file_line_count_is {
 		no warnings 'uninitialized';
 		shift || "$filename line count is $expected lines";
 		};
+
+	unless( ! -e $filename or -f $filename ) {
+		$Test->diag( "File [$filename] is not a plain file, which is deprecated for file_line_count_is" );
+		}
+
+	if( -d $filename ) {
+		$Test->diag( "File [$filename] is a directory, which is deprecated for file_line_count_is" );
+		}
 
 	unless( defined $expected && int( $expected ) == $expected ) {
 		no warnings 'uninitialized';
@@ -420,7 +448,7 @@ This function uses the current value of C<$/> as the line ending and
 counts the lines by reading them and counting how many it read.
 
 Previously this tried to test any sort of file. Sometime in the future
-this will fail if the argument is not a plain file.
+this will fail if the argument is not a plain file or is a directory.
 
 =cut
 
@@ -431,6 +459,14 @@ sub file_line_count_isnt {
 		no warnings 'uninitialized';
 		shift || "$filename line count is not $expected lines";
 		};
+
+	unless( ! -e $filename or -f $filename ) {
+		$Test->diag( "File [$filename] is not a plain file, which is deprecated for file_line_count_isnt" );
+		}
+
+	if( -d $filename ) {
+		$Test->diag( "File [$filename] is a directory, which is deprecated for file_line_count_isnt" );
+		}
 
 	unless( defined $expected && int( $expected ) == $expected ) {
 		no warnings 'uninitialized';
@@ -473,7 +509,7 @@ This function uses the current value of C<$/> as the line ending and
 counts the lines by reading them and counting how many it read.
 
 Previously this tried to test any sort of file. Sometime in the future
-this will fail if the argument is not a plain file.
+this will fail if the argument is not a plain file or is a directory.
 
 =cut
 
@@ -481,6 +517,14 @@ sub file_line_count_between {
 	my $filename = _normalize( shift );
 	my $min      = shift;
 	my $max      = shift;
+
+	unless( ! -e $filename or -f $filename ) {
+		$Test->diag( "File [$filename] is not a plain file, which is deprecated for file_line_count_between" );
+		}
+
+	if( -d $filename ) {
+		$Test->diag( "File [$filename] is a directory, which is deprecated for file_line_count_between" );
+		}
 
 	my $name = do {
 		no warnings 'uninitialized';
@@ -657,7 +701,7 @@ sub _file_contains {
 		return $Test->ok(0, $name);
 		}
 
-	unless( -f $filename ) {
+	if( -d $filename ) {
 		my $caller = ( caller(0) )[3];
 		$Test->diag( "File [$filename] is a directory, which is deprecated for $caller" );
 		}
@@ -1708,7 +1752,7 @@ If you are using the new C<Test2> stuff, see L<Test2::Tool::File>.
 
 This module is in Github:
 
-	git://github.com/briandfoy/test-file.git
+	https://github.com/briandfoy/test-file.git
 
 =head1 AUTHOR
 

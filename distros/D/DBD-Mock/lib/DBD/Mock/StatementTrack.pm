@@ -3,6 +3,8 @@ package DBD::Mock::StatementTrack;
 use strict;
 use warnings;
 
+use List::Util qw( reduce );
+
 sub new {
     my ( $class, %params ) = @_;
 
@@ -143,6 +145,7 @@ sub mark_executed {
         }
 
         if (ref $recordSet{rows} eq "ARRAY") {
+            die "DBD::Mock error - a resultset's callback should return rows as an arrayref of arrayrefs" if reduce { ref $b ne "ARRAY" ? 1 : $a } 0, @{ $recordSet{rows} };
             $self->{return_data} = $recordSet{rows};
         }
 

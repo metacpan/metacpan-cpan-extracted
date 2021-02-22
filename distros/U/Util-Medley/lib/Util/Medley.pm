@@ -1,5 +1,5 @@
 package Util::Medley;
-$Util::Medley::VERSION = '0.055';
+$Util::Medley::VERSION = '0.058';
 use Modern::Perl;
 use Moose;
 
@@ -15,7 +15,9 @@ with
   'Util::Medley::Roles::Attributes::Logger',
   'Util::Medley::Roles::Attributes::Spawn',
   'Util::Medley::Roles::Attributes::String',
-  'Util::Medley::Roles::Attributes::XML';
+  'Util::Medley::Roles::Attributes::XML',
+  'Util::Medley::Roles::Attributes::YAML',
+  ;
 
 =head1 NAME
 
@@ -23,7 +25,7 @@ Util::Medley - A collection of commonly used utilities.
 
 =head1 VERSION
 
-version 0.055
+version 0.058
 
 =head1 SYNOPSIS
 

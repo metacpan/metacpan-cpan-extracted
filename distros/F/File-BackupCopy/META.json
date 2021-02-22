@@ -4,7 +4,7 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "gpl_3"
    ],
@@ -45,17 +45,20 @@
    "provides" : {
       "File::BackupCopy" : {
          "file" : "lib/File/BackupCopy.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "gray+file-backup@gnu.org.ua",
+         "web" : "https://puszcza.gnu.org.ua/bugs/?group=file-backup"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://git.gnu.org.ua/file-backup.git",
          "web" : "http://git.gnu.org.ua/cgit/file-backup.git/"
       }
    },
-   "version" : "1.01",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.02"
 }

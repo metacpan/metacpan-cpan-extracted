@@ -14,7 +14,7 @@ use SQL::Abstract;
 use URI;
 use URI::db;
 
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 has abstract => sub { SQL::Abstract->new(name_sep => '.', quote_char => '"') };
 has 'auto_migrate';
@@ -206,8 +206,7 @@ gracefully by holding on to them only for short amounts of time.
 
   helper sqlite => sub { state $sql = Mojo::SQLite->new('sqlite:test.db') };
 
-  get '/' => sub {
-    my $c  = shift;
+  get '/' => sub ($c) {
     my $db = $c->sqlite->db;
     $c->render(json => $db->query(q{select datetime('now','localtime') as now})->hash);
   };
@@ -271,7 +270,7 @@ query methods in L<Mojo::SQLite::Database>. The C<on_conflict> and C<for>
 features are not applicable to SQLite queries.
 
   use SQL::Abstract::Pg;
-  my $sql = Mojo::SQLite->new(abstract => SQL::Abstract::Pg->new(name_sep => '.', quote_char => '"'));
+  my $sql = Mojo::SQLite->new->abstract(SQL::Abstract::Pg->new(name_sep => '.', quote_char => '"'));
   $sql->db->select(['some_table', ['other_table', foo_id => 'id']],
     ['foo', [bar => 'baz'], \q{datetime('now') as dt}],
     {foo => 'value'},
@@ -291,8 +290,7 @@ following new ones.
 
 =head2 connection
 
-  $sql->on(connection => sub {
-    my ($sql, $dbh) = @_;
+  $sql->on(connection => sub ($sql, $dbh) {
     $dbh->do('pragma journal_size_limit=1000000');
   });
 

@@ -28,10 +28,11 @@ constant()
     CS_COMPUTE_RESULT       = CS_COMPUTE_RESULT
     CODE:
     if (!ix) {
-	char *what = GvNAME(CvGV(cv));
-	croak("Unknown DBD::Sybase constant '%s'", what);
+      char *what = GvNAME(CvGV(cv));
+      croak("Unknown DBD::Sybase constant '%s'", what);
+    } else {
+      RETVAL = ix;
     }
-    else RETVAL = ix;
     OUTPUT:
     RETVAL
 
@@ -122,9 +123,9 @@ ct_data_info(sth, action, column, attr=&PL_sv_undef)
     D_imp_sth(sth);
     int sybaction;
     if(strEQ(action, "CS_SET")) {
-	sybaction = CS_SET;
+        sybaction = CS_SET;
     } else if (strEQ(action, "CS_GET")) {
-	sybaction = CS_GET;
+        sybaction = CS_GET;
     }
     ST(0) = syb_ct_data_info(sth, imp_sth, sybaction, column, attr) ? &PL_sv_yes : &PL_sv_no;
     }
@@ -160,8 +161,8 @@ ct_finish_send(sth)
 
 void
 syb_describe(sth, doAssoc = 0)
-	SV *	sth
-	int	doAssoc
+    SV *	sth
+    int	doAssoc
   PPCODE:
 {
     D_imp_sth(sth);
@@ -170,45 +171,45 @@ syb_describe(sth, doAssoc = 0)
     SV *sv;
     char statbuff[255];
     struct {
-	int stat;
-	char name[30];
+    int stat;
+    char name[30];
     } stat[] = { { CS_CANBENULL, "CS_CANBENULL" }, 
-		 { CS_HIDDEN, "CS_HIDDEN" },
-		 { CS_IDENTITY, "CS_IDENTITY" },
-		 { CS_KEY, "CS_KEY" },
-		 { CS_VERSION_KEY, "CS_VERSION_KEY" },
-		 { CS_TIMESTAMP, "CS_TIMESTAMP" },
-		 { CS_UPDATABLE, "CS_UPDATABLE" },
-		 { CS_UPDATECOL, "CS_UPDATECOL" },
-		 { CS_RETURN, "CS_RETURN" },
-		 { 0, "" }
+         { CS_HIDDEN, "CS_HIDDEN" },
+         { CS_IDENTITY, "CS_IDENTITY" },
+         { CS_KEY, "CS_KEY" },
+         { CS_VERSION_KEY, "CS_VERSION_KEY" },
+         { CS_TIMESTAMP, "CS_TIMESTAMP" },
+         { CS_UPDATABLE, "CS_UPDATABLE" },
+         { CS_UPDATECOL, "CS_UPDATECOL" },
+         { CS_RETURN, "CS_RETURN" },
+         { 0, "" }
     };
 
     /* lifted almost verbatim from Sybase::CTlib's CTlib.xs file... */
     for(i = 0; i < imp_sth->numCols; ++i)
     {
-	hv = newHV();
+    hv = newHV();
 
-	hv_store(hv, "NAME", 4, newSVpv(imp_sth->datafmt[i].name,0), 0);
-	hv_store(hv, "TYPE", 4, newSViv(imp_sth->datafmt[i].datatype), 0);
-	hv_store(hv, "MAXLENGTH", 9, newSViv(imp_sth->datafmt[i].maxlength), 0);
-	hv_store(hv, "SYBMAXLENGTH", 12, newSViv(imp_sth->coldata[i].realLength), 0);
-	hv_store(hv, "SYBTYPE", 7, newSViv(imp_sth->coldata[i].realType), 0);
-	hv_store(hv, "SCALE", 5, newSViv(imp_sth->datafmt[i].scale), 0);
-	hv_store(hv, "PRECISION", 9, newSViv(imp_sth->datafmt[i].precision), 0);
-	statbuff[0] = 0;
-	for(k = 0; stat[k].stat > 0; ++k) {
-	    if(imp_sth->datafmt[i].status & stat[k].stat) {
-		strcat(statbuff, stat[k].name);
-		strcat(statbuff, " ");
-	    }
-	}
-	hv_store(hv, "STATUS", 6, newSVpv(statbuff, 0), 0);
-	sv = newRV_noinc((SV*)hv);
+    hv_store(hv, "NAME", 4, newSVpv(imp_sth->datafmt[i].name,0), 0);
+    hv_store(hv, "TYPE", 4, newSViv(imp_sth->datafmt[i].datatype), 0);
+    hv_store(hv, "MAXLENGTH", 9, newSViv(imp_sth->datafmt[i].maxlength), 0);
+    hv_store(hv, "SYBMAXLENGTH", 12, newSViv(imp_sth->coldata[i].realLength), 0);
+    hv_store(hv, "SYBTYPE", 7, newSViv(imp_sth->coldata[i].realType), 0);
+    hv_store(hv, "SCALE", 5, newSViv(imp_sth->datafmt[i].scale), 0);
+    hv_store(hv, "PRECISION", 9, newSViv(imp_sth->datafmt[i].precision), 0);
+    statbuff[0] = 0;
+    for(k = 0; stat[k].stat > 0; ++k) {
+        if(imp_sth->datafmt[i].status & stat[k].stat) {
+        strcat(statbuff, stat[k].name);
+        strcat(statbuff, " ");
+        }
+    }
+    hv_store(hv, "STATUS", 6, newSVpv(statbuff, 0), 0);
+    sv = newRV_noinc((SV*)hv);
 
-	if(doAssoc)
-	    XPUSHs(sv_2mortal(newSVpv(imp_sth->datafmt[i].name, 0)));
-	XPUSHs(sv_2mortal(sv));
+    if(doAssoc)
+        XPUSHs(sv_2mortal(newSVpv(imp_sth->datafmt[i].name, 0)));
+    XPUSHs(sv_2mortal(sv));
     }
 }
 

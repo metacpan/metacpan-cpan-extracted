@@ -1,5 +1,9 @@
 Revision history for Perl extension List-GroupBy
 
+0.03 2021-02-19T07:29:52Z
+    - fixed typo in SYNOPSIS
+    - calling in a scalar context now returns a hashref
+
 0.02 2021-02-10T13:27:45Z
 
     - switched issue reporting to be via GitLab repository

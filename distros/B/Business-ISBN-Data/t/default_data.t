@@ -12,10 +12,19 @@ my @isbns_from_issues = qw(
 
 use Test::More;
 
+use Data::Dumper;
 use File::Spec::Functions qw(catfile);
 
 SKIP: {
-	skip "Need Business::ISBN to run this test", 2 unless eval { require Business::ISBN };
+	my $tests = @isbns_from_issues + 3;
+	skip "Need Business::ISBN 3.006 to run this test", $tests unless eval {
+		require Business::ISBN;
+		# 3.005 fixed a major problem with 979 numbers and the data
+		# structure changed.
+		Business::ISBN->VERSION('3.006');
+		};
+
+	diag( "Business::ISBN is " . Business::ISBN->VERSION );
 
 	my $file = catfile( qw(blib lib Business ISBN RangeMessage.xml) );
 	my $out_of_the_way = $file . '.hidden';
@@ -33,9 +42,9 @@ SKIP: {
 	like( $Business::ISBN::country_data{_source}, qr/\bData\.pm/, 'Data source is the default data structure' );
 
 	subtest 'check_isbns' => sub {
-		foreach my $isbn ( @{ $_[0] } ) {
+		foreach my $isbn ( @isbns_from_issues ) {
 			my $i = Business::ISBN->new( $isbn );
-			ok( $i->is_valid, "$isbn is valid" );
+			ok( $i->is_valid, "<$isbn> is valid" );
 			}
 		};
 

@@ -1,5 +1,8 @@
 Revision history for Perl module WWW::Mechanize::Cached
 
+1.55      2021-02-16 02:40:00Z
+     - remove plan declared before Test::RequiresInternet (GH#26) (Dan Book)
+
 1.54      2020-08-10 22:37:25Z
     - Don't poke at HTTP::Header internals (GH#24) (Olaf Alders)
 

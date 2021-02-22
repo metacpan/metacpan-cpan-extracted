@@ -12,6 +12,7 @@ my $builder = Module::Build->new(
     dist_version_from   => 'lib/Math/MatrixLUP.pm',
     release_status      => 'stable',
 
+    dynamic_config    => 0,
     extra_manify_args => { utf8 => 1 },
 
     meta_merge => {
@@ -33,7 +34,7 @@ my $builder = Module::Build->new(
         Carp => 0,
     },
     recommends => {
-        'Math::AnyNum' => '0.31',
+        'Math::AnyNum' => '0.38',
     },
     add_to_cleanup     => [ 'Math-MatrixLUP-*' ],
     create_makefile_pl => 'traditional',

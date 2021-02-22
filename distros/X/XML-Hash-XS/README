@@ -150,12 +150,12 @@ OPTIONS
         use_attr=1).
 
     force_array => [ = undef ] *# xml2hash*
-        This option is similar to "ForceArray" from XMl::Simple module:
+        This option is similar to "ForceArray" from XML::Simple module:
         <https://metacpan.org/pod/XML::Simple#ForceArray-=%3E-1-%23-in-impor
         tant>.
 
     force_content => [ = 0 ] *# xml2hash*
-        This option is similar to "ForceContent" from XMl::Simple module:
+        This option is similar to "ForceContent" from XML::Simple module:
         <https://metacpan.org/pod/XML::Simple#ForceContent-=%3E-1-%23-in-sel
         dom-used>.
 
@@ -324,7 +324,7 @@ AUTHOR
     Yuriy Ustushenko, <yoreek@yahoo.com>
 
 COPYRIGHT AND LICENSE
-    Copyright (C) 2012-2020 Yuriy Ustushenko
+    Copyright (C) 2012-2021 Yuriy Ustushenko
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

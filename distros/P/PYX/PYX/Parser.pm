@@ -11,7 +11,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -38,11 +38,14 @@ sub new {
 	# Non parser options.
 	$self->{'non_parser_options'} = {};
 
-	# Output rewrite.
-	$self->{'output_rewrite'} = 0;
+	# Output encoding.
+	$self->{'output_encoding'} = 'utf-8';
 
 	# Output handler.
 	$self->{'output_handler'} = \*STDOUT;
+
+	# Output rewrite.
+	$self->{'output_rewrite'} = 0;
 
 	# Process params.
 	set_params($self, @params);
@@ -64,12 +67,14 @@ sub new {
 # Get actual parsing line.
 sub line {
 	my $self = shift;
+
 	return $self->{'_line'};
 }
 
 # Parse PYX text or array of PYX text.
 sub parse {
 	my ($self, $pyx, $out) = @_;
+
 	if (! defined $out) {
 		$out = $self->{'output_handler'};
 	}
@@ -92,21 +97,25 @@ sub parse {
 	if ($self->{'callbacks'}->{'final'}) {
 		&{$self->{'callbacks'}->{'final'}}($self);
 	}
+
 	return;
 }
 
 # Parse file with PYX data.
 sub parse_file {
 	my ($self, $input_file, $out) = @_;
+
 	open my $inf, '<', $input_file;
 	$self->parse_handler($inf, $out);
 	close $inf;
+
 	return;
 }
 
 # Parse PYX handler.
 sub parse_handler {
 	my ($self, $input_file_handler, $out) = @_;
+
 	if (! $input_file_handler || ref $input_file_handler ne 'GLOB') {
 		err 'No input handler.';
 	}
@@ -118,18 +127,20 @@ sub parse_handler {
 	}
 	while (my $line = <$input_file_handler>) {
 		chomp $line;
+		$line = decode($self->{'input_encoding'}, $line);
 		$self->_parse($line, $out);
 	}
 	if ($self->{'callbacks'}->{'final'}) {
 		&{$self->{'callbacks'}->{'final'}}($self);
 	}
+
 	return;
 }
 
 # Parse text string.
 sub _parse {
 	my ($self, $line, $out) = @_;
-	$line = decode($self->{'input_encoding'}, $line);
+
 	$self->{'_line'} = $line;
 	my ($type, $value) = $line =~ m/\A([A()\?\-_])(.*)\Z/;
 	if (! $type) {
@@ -170,6 +181,7 @@ sub _parse {
 			err "Bad PYX line '$line'.";
 		}
 	}
+
 	return;
 }
 
@@ -191,8 +203,13 @@ sub _is_sub {
 
 	# Raw output to output file handler.
 	} elsif ($self->{'output_rewrite'}) {
-		print {$out} $self->{'_line'}, "\n";
+		my $encoded_line = Encode::encode(
+			$self->{'output_encoding'},
+			$self->{'_line'},
+		);
+		print {$out} $encoded_line, "\n";
 	}
+
 	return;
 }
 
@@ -289,7 +306,7 @@ Constructor.
 
 =item * C<input_encoding>
 
- Input encoding.
+ Input encoding for parse_file() and parse_handler() usage.
  Default value is 'utf-8'.
 
 =item * C<non_parser_options>
@@ -297,15 +314,20 @@ Constructor.
  Non parser options.
  Default value is blank reference to hash.
 
-=item * C<output_rewrite>
+=item * C<output_encoding>
 
- Output rewrite.
- Default value is 0.
+ Output encoding.
+ Default value is 'utf-8'.
 
 =item * C<output_handler>
 
  Output handler.
  Default value is \*STDOUT.
+
+=item * C<output_rewrite>
+
+ Output rewrite.
+ Default value is 0.
 
 =back
 
@@ -322,7 +344,7 @@ Returns string.
  $obj->parse($pyx, $out);
 
 Parse PYX text or array of PYX text.
-If $out not present, use 'output_handler'.
+If C<$out> not present, use 'output_handler'.
 
 Returns undef.
 
@@ -331,7 +353,8 @@ Returns undef.
  $obj->parse_file($input_file, $out);
 
 Parse file with PYX data.
-If $out not present, use 'output_handler'.
+C<$input_file> file is decoded by 'input_encoding'.
+If C<$out> not present, use 'output_handler'.
 
 Returns undef.
 
@@ -340,7 +363,8 @@ Returns undef.
  $obj->parse_handle($input_file_handler, $out);
 
 Parse PYX handler.
-If $out not present, use 'output_handler'.
+C<$input_file_handler> handler is decoded by 'input_encoding'.
+If C<$out> not present, use 'output_handler'.
 
 Returns undef.
 
@@ -436,12 +460,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2020 Michal Josef Špaček
+© 2005-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

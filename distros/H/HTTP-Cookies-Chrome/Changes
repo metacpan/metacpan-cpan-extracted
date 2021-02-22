@@ -1,5 +1,12 @@
 Revision history for Perl module HTTP::Cookies::Chrome
 
+2.002 2021-02-19T20:30:09Z
+	* Fix some testing issues.
+
+2.001 2021-02-19T18:09:07Z
+	* Handle the encrypted cookies for Chrome 80 and beyond. This does
+	not work for earlier Cookie formats. (Github #1)
+
 1.002 2018-06-11T13:11:26Z
 	* Change to Artistic License 2.0
 

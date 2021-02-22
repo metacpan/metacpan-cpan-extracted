@@ -473,6 +473,7 @@ PPCAT(loop, _FINISH):
 #define SEARCH_NODE_ATTRIBUTE_VALUE(loop, top_loop, quot)               \
     EXPECT_CHAR("start attr value", quot)                               \
         content = NULL;                                                 \
+        end_of_attr_value = NULL;                                       \
         flags &= ~(XH_X2H_NEED_NORMALIZE | XH_X2H_IS_NOT_BLANK);        \
         DO(PPCAT(loop, _END_ATTR_VALUE))                                \
             EXPECT_CHAR("attr value end", quot)                         \
@@ -944,19 +945,20 @@ xh_x2h_parse_chunk(xh_x2h_ctx_t *ctx, xh_char_t **buf, size_t *bytesleft, xh_boo
     AV                *av;
     size_t             enc_len, content_key_len;
 
-    cur            = *buf;
-    eof            = cur + *bytesleft;
-    nodes          = ctx->nodes;
-    depth          = ctx->depth;
-    real_depth     = ctx->real_depth;
-    flags          = ctx->flags;
-    node           = ctx->node;
-    end            = ctx->end;
-    content        = ctx->content;
-    code           = ctx->code;
-    lval           = ctx->lval;
-    enc            = enc_cur = old_eof = old_cur = NULL;
-    c              = '\0';
+    cur               = *buf;
+    eof               = cur + *bytesleft;
+    nodes             = ctx->nodes;
+    depth             = ctx->depth;
+    real_depth        = ctx->real_depth;
+    flags             = ctx->flags;
+    node              = ctx->node;
+    end               = ctx->end;
+    end_of_attr_value = ctx->end_of_attr_value;
+    content           = ctx->content;
+    code              = ctx->code;
+    lval              = ctx->lval;
+    enc               = enc_cur = old_eof = old_cur = NULL;
+    c                 = '\0';
 
     if (ctx->opts.content[0] == '\0') {
         content_key = (xh_char_t *) DEF_CONTENT_KEY;
@@ -1154,18 +1156,19 @@ PARSE_DOCTYPE_INTSUBSET_START:
     goto INVALID_XML;
 
 XML_DECL_FOUND:
-    ctx->state          = XML_DECL_FOUND;
+    ctx->state = XML_DECL_FOUND;
 CHUNK_FINISH:
-    ctx->content        = content;
-    ctx->node           = node;
-    ctx->end            = end;
-    ctx->depth          = depth;
-    ctx->real_depth     = real_depth;
-    ctx->flags          = flags;
-    ctx->code           = code;
-    ctx->lval           = lval;
-    *bytesleft          = eof - cur;
-    *buf                = cur;
+    ctx->content = content;
+    ctx->node = node;
+    ctx->end = end;
+    ctx->end_of_attr_value = end_of_attr_value;
+    ctx->depth = depth;
+    ctx->real_depth = real_depth;
+    ctx->flags = flags;
+    ctx->code = code;
+    ctx->lval = lval;
+    *bytesleft = eof - cur;
+    *buf = cur;
     return;
 
 MAX_DEPTH_EXCEEDED:
@@ -1193,9 +1196,10 @@ xh_x2h_parse(xh_x2h_ctx_t *ctx, xh_reader_t *reader)
         len = reader->read(reader, &buf, preserve, &off);
         eof = (len == 0);
         if (off) {
-            if (ctx->node    != NULL) ctx->node    -= off;
+            if (ctx->node != NULL) ctx->node -= off;
             if (ctx->content != NULL) ctx->content -= off;
-            if (ctx->end     != NULL) ctx->end     -= off;
+            if (ctx->end != NULL) ctx->end -= off;
+            if (ctx->end_of_attr_value != NULL) ctx->end_of_attr_value -= off;
         }
 
         xh_log_trace2("read buf: %.*s", len, buf);

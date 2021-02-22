@@ -4,7 +4,7 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "gpl_3"
    ],
@@ -42,17 +42,20 @@
    "provides" : {
       "NetSNMP::Sendmail" : {
          "file" : "lib/Sendmail.pm",
-         "version" : "0.95"
+         "version" : "0.96"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "gray+netsnmp-sendmail@gnu.org.ua",
+         "web" : "https://puszcza.gnu.org.ua/bugs/?group=netsnmp-sendmail"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://git.gnu.org.ua/netsnmp-sendmail.git",
          "web" : "http://git.gnu.org.ua/cgit/netsnmp-sendmail.git/"
       }
    },
-   "version" : "0.95",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.96"
 }

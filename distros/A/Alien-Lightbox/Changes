@@ -1,5 +1,9 @@
 Revision history for Perl extension Alien::Lightbox.
 
+2.03.3.4    Mon Feb 15, 12:14 PST 2021
+    - DEPRECATED; DO NOT USE
+    - Move to GitHub
+
 2.03.3.3    Fri Apr 23 22:20 PDT 2010
     - Switch to Git
 

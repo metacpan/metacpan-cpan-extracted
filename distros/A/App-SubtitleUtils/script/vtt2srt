@@ -3,7 +3,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-08'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,7 +42,7 @@ vtt2srt - Convert .vtt to .srt
 
 =head1 VERSION
 
-This document describes version 0.004 of vtt2srt (from Perl distribution App-SubtitleUtils), released on 2021-01-08.
+This document describes version 0.005 of vtt2srt (from Perl distribution App-SubtitleUtils), released on 2021-01-08.
 
 =head1 SYNOPSIS
 

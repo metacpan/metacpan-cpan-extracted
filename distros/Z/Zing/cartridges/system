@@ -1,0 +1,3 @@
+my $command = "perl -v | head -n 2 | tail -n 1";
+
+['Zing::System', [command => [$command]], 1]

@@ -4,7 +4,7 @@ package HTTP::OAI::Identify;
 
 use strict;
 
-our $VERSION = '4.10';
+our $VERSION = '4.11';
 
 use HTTP::OAI::SAXHandler qw( :SAX );
 

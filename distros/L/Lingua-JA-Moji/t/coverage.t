@@ -1,10 +1,6 @@
-use warnings;
-use strict;
-use Test::More;
-use Lingua::JA::Moji ':all';
-use utf8;
-
-eval {
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;eval {
     Lingua::JA::Moji::load_convertor ('guff', 'bucket');
 };
 ok ($@ =~ /guff2bucket/, "Test load failure message for non-existing file");
@@ -38,4 +34,4 @@ my $nr = normalize_romaji ('syuutsuju');
 my $nr2 = normalize_romaji ('しゅうつじゅ');
 is ($nr, $nr2, "normalise romaji ok");
 done_testing ();
-exit;
+

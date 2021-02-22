@@ -44,8 +44,7 @@ typedef struct tconv_charset_plugin {
 /* ------------------------------- */
 /* Global charset option structure */
 /* ------------------------------- */
-typedef struct tconv_charset {
-  enum {
+typedef enum tconv_charset_enum {
     /* Default:
        TCONV_CHARSET_ICU if found, else
        TCONV_CHARSET_CCHARDET
@@ -53,8 +52,11 @@ typedef struct tconv_charset {
     TCONV_CHARSET_EXTERNAL = 0,
     TCONV_CHARSET_PLUGIN,
     TCONV_CHARSET_ICU,
-    TCONV_CHARSET_CCHARDET,
-  } charseti;
+    TCONV_CHARSET_CCHARDET
+} tconv_charset_enum_t;
+
+typedef struct tconv_charset {
+  tconv_charset_enum_t charseti;
   union {
     tconv_charset_external_t         external;
     tconv_charset_plugin_t           plugin;
@@ -101,13 +103,16 @@ typedef struct tconv_convert_plugin {
 /* --------------------------------- */
 /* Global converter option structure */
 /* --------------------------------- */
-typedef struct tconv_convert {
-  enum { /* Default: ICU if found, else ICONV if found, else -1 */
+typedef enum tconv_convert_enum {
+	/* Default: ICU if found, else ICONV if found, else -1 */
     TCONV_CONVERT_EXTERNAL = 0,
     TCONV_CONVERT_PLUGIN,
     TCONV_CONVERT_ICU,
     TCONV_CONVERT_ICONV
-  } converti;
+} tconv_convert_enum_t;
+
+typedef struct tconv_convert {
+  tconv_convert_enum_t converti;
   union {
     tconv_convert_external_t      external;
     tconv_convert_plugin_t        plugin;

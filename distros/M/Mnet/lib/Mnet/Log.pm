@@ -80,6 +80,7 @@ use strict;
 use 5.008;
 use Carp;
 use Exporter qw( import );
+use Mnet;
 use Mnet::Opts;
 use Mnet::Opts::Cli::Cache;
 use Mnet::Version;
@@ -299,7 +300,7 @@ sub error {
     $error = Mnet::Log::error();
 
 This function returns the first line of error text from the perl warn or die
-commands or Mnet::Log warn or fatal outputs.
+commands or Mnet::Log warn or fatal outputs, prefixed by the calling module.
 
 A value of undefined is returned if there have not yet been any errors.
 
@@ -354,7 +355,7 @@ sub output {
        and not defined $Mnet::Log::debug_error;
 
     # update global error flag with first line of first error entry
-    $Mnet::Log::error = "$caller ".(split(/\n/, $text))[0]
+    $Mnet::Log::error = "$caller, ".(split(/\n/, $text))[0]
         if $severity < 5 and not defined $Mnet::Log::error;
 
     # set hh:mm:ss timestamp for entries as long as --test is not set
@@ -617,7 +618,7 @@ END {
     my $debug_error_file = Mnet::Opts::Cli::Cache::debug_error();
     if (defined $debug_error_file) {
         my ($sec, $min, $hr, $mday, $mon, $yr) = localtime();
-        $yr += 1900; $mday += 1;
+        $yr += 1900; $mon += 1;
         my $date_stamp = sprintf("%02s-%02s-%02s", $yr, $mon, $mday);
         my $time_stamp = sprintf("%02s:%02s:%02s", $hr, $min, $sec);
         $debug_error_file =~ s/\*/${date_stamp}_${time_stamp}_pid-$$/;
@@ -636,7 +637,7 @@ END {
     #   only if first line was output, meaning logging was enabled/used
     #   only if Mnet::Log::Test was not used to filter varying log outputs
     #   Mnet::Opts::Cli->new loads Mnet::Log::Test if --test/record/replay set
-    NOTICE("detected at least one error, $Mnet::Log::error")
+    NOTICE("detected at least one error, in $Mnet::Log::error")
         if defined $Mnet::Log::error
         and $Mnet::Log::first
         and not $INC{"Mnet/Log/Test.pm"};

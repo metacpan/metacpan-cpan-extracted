@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use File::Find 'find';
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 sub register {
   my ($self, $app, $conf) = @_;
@@ -43,8 +43,17 @@ sub register {
   for my $template (@templates) {
     my $route_path = $template eq 'index' ? '/' : $template;
     
+    # Mojolicious compatibility
+    my $any_method_name;
+    if ($Mojolicious::VERSION >= '8.67') {
+      $any_method_name = 'any'
+    }
+    else {
+      $any_method_name = 'route'
+    }
+    
     # Route
-    $r->route("/$route_path")
+    $r->$any_method_name("/$route_path")
       ->to(cb => sub { shift->render("/$top_dir/$template", 'mojo.maybe' => 1) });
   }
 }

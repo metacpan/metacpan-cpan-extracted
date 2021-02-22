@@ -10,24 +10,24 @@
 # - Firefox (Mac/Linux/Windows)
 # - Chrome (Mac/Linux/Windows)
 # - Internet Explorer (Windows)
+# - Edge (Windows)
 # - Plain text (.txt)
 # - Markdown (.md)
 #
 # Files named *.plist, *.sqlite and *Bookmarks are processed as Safari, Firefox
-# and Chrome bookmarks, respectively. Directories named *Favorites" are processed
+# and Chrome bookmarks, respectively. Directories named *Favorites are processed
 # as Internet Explorer favorites.
 #
-# The fields <title>, <url> and <description> are retrieved (when existing) and
-# are available for exporting (in the desired format), by default :
-# <title> <url> <description>
+# Fields <title>, <url> and <description> are retrieved (when existing) and
+# exported in the desired format, by default : <title> <url> <description>
 #
-# The same format is used for plain text and markdown files :
+# That same format is used for plain text and markdown files :
 #
-# 	plain text example http://example.txt #tag1 #tag2
-# 	[markdown example](http://example.md) #tag1 #tag2
+#   plain text example http://example.txt with a description
+#   [markdown example](http://example.md) with a description
 #
-# The <description> field is filled with Safari 'Description', Firefox 'Tags' or
-# empty for Chrome and Internet Explorer.
+# The <description> field contains Safari 'Description' or Firefox 'Tags' but is
+# empty for Chrome, Internet Explorer and Edge.
 #
 # Implementation Notes :
 #
@@ -37,6 +37,8 @@
 #
 # - Since Firefox sets an EXCLUSIVE SQLite lock, a tmp DB file copy is used.
 #
+# 2021.02.17 v0.28 jul : fixed missing require DBD::SQLite (firefox)
+# 2021.02.16 v0.27 jul : added win32 Edge support, fixed Chrome bug (localappdata), fixed win32 bug (find), more tests (firefox)
 # 2021.01.31 v0.26 jul : improved handling of optional dependencies
 # 2021.01.31 v0.25 jul : skip bookmarks.t if URI::Find not installed
 # 2021.01.31 v0.24 jul : fixed missing prereq URI::Find in Makefile.PL
@@ -63,8 +65,8 @@ use File::Basename;
 use File::Temp qw(tempdir);
 use File::Copy qw(copy);
 
-our $VERSION = '0.26';
-my $program	 = basename($0);
+our $VERSION = '0.28';
+my $program  = basename($0);
 my $usage    = <<EOF;
 
 Usage: $program [-hVdas] [-f format] [file ...]
@@ -112,8 +114,9 @@ if (!@ARGV or $all)
     elsif ($^O eq "MSWin32")
     {
         push @ARGV, $ENV{APPDATA} . '\Mozilla\Firefox\Profiles\*.default\places.sqlite';
-        push @ARGV, $ENV{APPDATA} . '\Google\Chrome\User Data\Default\Bookmarks';
+        push @ARGV, $ENV{LOCALAPPDATA} . '\Google\Chrome\User Data\Default\Bookmarks';
         push @ARGV, $ENV{USERPROFILE} . '\Favorites';
+        push @ARGV, $ENV{LOCALAPPDATA} . '\Microsoft\Edge\User Data\Default\Bookmarks';
     }
     else
     {
@@ -192,13 +195,14 @@ sub _safari {
 
 sub _firefox {
 
-	eval {
-	    require DBI;
-	};
-	if ($@)
-	{
-		die "to process Chrome bookmarks, you need to install the DBI module\n";
-	}
+    eval {
+        require DBI;
+        require DBD::SQLite;
+    };
+    if ($@)
+    {
+        die "to process Firefox bookmarks, you need to install modules DBI DBD::SQLite\n";
+    }
 
     my $dbfile = shift // "";
     warn "\$dbfile: $dbfile\n" if $debug;
@@ -218,28 +222,28 @@ sub _firefox {
 
     # build sql statement
     my $sql =  "
-	select b.title, p.url, t.tags as description
-	from moz_bookmarks b
-	left join 
-	(
-		select fk, group_concat(tag, ' ') as tags
-		from
-		(
-			select distinct
-			b1.fk as fk,
-			b3.title as tag
-			from moz_bookmarks b1
-			left join moz_bookmarks b2 on b2.fk = b1.fk and b2.type = 1 and b2.title is null
-			left join moz_bookmarks b3 on b3.id = b2.parent 
-			where b1.type = 1 and b1.title is not null
-		)
-		group by fk
-	) t on t.fk = b.fk
-	left join moz_places p on p.id = b.fk
-	left join moz_origins o on o.id = p.origin_id
-	where b.title is not null
-	and o.prefix != 'place:'
-	";
+    select b.title, p.url, t.tags as description
+    from moz_bookmarks b
+    left join 
+    (
+        select fk, group_concat(tag, ' ') as tags
+        from
+        (
+            select distinct
+            b1.fk as fk,
+            b3.title as tag
+            from moz_bookmarks b1
+            left join moz_bookmarks b2 on b2.fk = b1.fk and b2.type = 1 and b2.title is null
+            left join moz_bookmarks b3 on b3.id = b2.parent 
+            where b1.type = 1 and b1.title is not null
+        )
+        group by fk
+    ) t on t.fk = b.fk
+    left join moz_places p on p.id = b.fk
+    left join moz_origins o on o.id = p.origin_id
+    where b.title is not null
+    and o.prefix != 'place:'
+    ";
     warn "\$sql: $sql\n" if $debug;
 
     # prepare and execute transaction
@@ -268,14 +272,14 @@ sub _firefox {
 
 sub _chrome {
 
-	eval {
-	    require File::Slurper;
-	    require JSON;
-	};
-	if ($@)
-	{
-		die "to process Chrome bookmarks, you need to install the File::Slurper JSON modules\n";
-	}
+    eval {
+        require File::Slurper;
+        require JSON;
+    };
+    if ($@)
+    {
+        die "to process Chrome bookmarks, you need to install modules File::Slurper JSON\n";
+    }
 
     my $file = shift // "";
     warn "\$file: $file\n" if $debug;
@@ -300,23 +304,23 @@ sub _chrome {
 
 sub _iexplorer {
     
-	eval {
-	    require Config::Any;
-	    require Config::Tiny;   # for Config::Any::INI
-	    require Win32;          # for windows rubbish
-	    require File::Find;
-	};
-	if ($@)
-	{
-		die "to process Internet Explorer favorites, you need to install the Config::Any Config::Tiny Win32 modules\n";
-	}
+    eval {
+        require Config::Any;
+        require Config::Tiny;   # for Config::Any::INI
+        require Win32;          # for windows rubbish
+        require File::Find;
+    };
+    if ($@)
+    {
+        die "to process Internet Explorer favorites, you need to install modules Config::Any Config::Tiny Win32 File::Find\n";
+    }
     
     my $favorites = shift // "";
     warn "\$favorites: $favorites\n" if $debug;
 
     # search in favorites and subfolders
     my @files;
-    find( { wanted => sub { push @files, $_ }, no_chdir => 1 }, $favorites );
+    File::Find::find( { wanted => sub { push @files, $_ }, no_chdir => 1 }, $favorites );
 
     foreach my $file (@files)
     {
@@ -337,8 +341,8 @@ sub _iexplorer {
         {
             my ($filename, $config) = %$_;
 
-            my $title	= substr(basename($filename), 0, -4); # chop ".url"
-            my $url 	= $config->{'InternetShortcut'}->{'URL'} // "";
+            my $title   = substr(basename($filename), 0, -4); # chop ".url"
+            my $url     = $config->{'InternetShortcut'}->{'URL'} // "";
 
             $print_bookmark->($title, $url);
         }
@@ -350,63 +354,63 @@ sub _iexplorer {
 
 sub _txt {
 
-	eval {
-		require URI::Find;
-		require URI::Find::Schemeless;
-	};
-	if ($@)
-	{
-		die "to process text files, you need to install the URI::Find module\n";
-	}
+    eval {
+        require URI::Find;
+        require URI::Find::Schemeless;
+    };
+    if ($@)
+    {
+        die "to process text files, you need to install module URI::Find\n";
+    }
 
     my $file = shift // "";
     warn "\$file: $file\n" if $debug;
 
-	# get uri regex
-	my $class = $schemeless ? "URI::Find::Schemeless" : "URI::Find";	# copy-paste from urifind
-	my $finder = $class->new( sub {
-		my ($uri, $orig_uri) = @_;
-		return $orig_uri;
-	});
+    # get uri regex
+    my $class = $schemeless ? "URI::Find::Schemeless" : "URI::Find";    # copy-paste from urifind
+    my $finder = $class->new( sub {
+        my ($uri, $orig_uri) = @_;
+        return $orig_uri;
+    });
 
-	my $regex = $finder->uri_re;
-	$regex = $regex . '|' . $finder->schemeless_uri_re if $schemeless;
+    my $regex = $finder->uri_re;
+    $regex = $regex . '|' . $finder->schemeless_uri_re if $schemeless;
 
     # read file as text
-	open(my $fh, '<:encoding(UTF-8)', $file) or die "unable to read file : $file";
+    open(my $fh, '<:encoding(UTF-8)', $file) or die "unable to read file : $file";
  
-	while (my $line = <$fh>)
-	{
-		if ( $line =~ /(.*)\s+($regex)\s+(.*)/ )	# match title url desc
-		{
-	        my $title       = $1;
-	        my $url         = $2;
-	        my $description = $3;
+    while (my $line = <$fh>)
+    {
+        if ( $line =~ /(.*)\s+($regex)\s+(.*)/ )    # match title url desc
+        {
+            my $title       = $1;
+            my $url         = $2;
+            my $description = $3;
 
-	        $print_bookmark->($title, $url, $description);
-		}	
-	}
+            $print_bookmark->($title, $url, $description);
+        }   
+    }
 }
 
 sub _md {
 
-	my $file = shift // "";
+    my $file = shift // "";
     warn "\$file: $file\n" if $debug;
 
     # read file as text
-	open(my $fh, '<:encoding(UTF-8)', $file) or die "unable to read file : $file";
+    open(my $fh, '<:encoding(UTF-8)', $file) or die "unable to read file : $file";
 
-	while (my $line = <$fh>)
-	{
-		if ( $line =~ /\s*\[(.*)\]\((.*)\)\s*(.*)/ )	# match [title](url) desc
-		{
-	        my $title       = $1;
-	        my $url         = $2;
-	        my $description = $3;
+    while (my $line = <$fh>)
+    {
+        if ( $line =~ /\s*\[(.*)\]\((.*)\)\s*(.*)/ )    # match [title](url) desc
+        {
+            my $title       = $1;
+            my $url         = $2;
+            my $description = $3;
         
-	        $print_bookmark->($title, $url, $description);
-		}
-	}
+            $print_bookmark->($title, $url, $description);
+        }
+    }
 }
 
 
@@ -450,23 +454,40 @@ bookmarks - Export browser bookmarks as plain text.
 
 bookmarks is a tool to export bookmarks from files supplied as arguments, or
 from browsers default locations (when called without arguments). The following
-sources are supported : Safari (Mac), Firefox (Mac/Linux/Windows),
-Chrome (Mac/Linux/Windows), Internet Explorer (Windows), plain text (.txt) and
-markdown (.md). Files named *.plist, *.sqlite and *Bookmarks are processed as
-Safari, Firefox and Chrome bookmarks, respectively. Directories named
-*Favorites are processed as Internet Explorer favorites.
+sources are supported :
 
-The fields <title>, <url> and <description> are retrieved (when existing) and
-are available for exporting (in the desired format), by default :
-<title> <url> <description>
+=over
 
-The same format is used for plain text and markdown files :
+=item - Safari (Mac)
 
-	plain text example http://example.txt #tag1 #tag2
-	[markdown example](http://example.md) #tag1 #tag2
+=item - Firefox (Mac/Linux/Windows)
 
-The <description> field is filled with Safari 'Description', Firefox 'Tags' or
-empty for Chrome and Internet Explorer.
+=item - Chrome (Mac/Linux/Windows)
+
+=item - Internet Explorer (Windows)
+
+=item - Edge (Windows)
+
+=item - Plain text (.txt)
+
+=item - Markdown (.md)
+
+=back
+
+Files named *.plist, *.sqlite and *Bookmarks are processed as Safari, Firefox
+and Chrome bookmarks, respectively. Directories named *Favorites are processed
+as Internet Explorer favorites.
+
+Fields <title>, <url> and <description> are retrieved (when existing) and
+exported in the desired format, by default : <title> <url> <description>
+
+That same format is used for plain text and markdown files :
+
+    plain text example http://example.txt with a description
+    [markdown example](http://example.md) with a description
+
+The <description> field contains Safari 'Description' or Firefox 'Tags' but is
+empty for Chrome, Internet Explorer and Edge.
 
 =head1 BUGS
 

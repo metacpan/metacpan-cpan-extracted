@@ -14,6 +14,7 @@ my $b = Module::Build->new
     'Data::Table::Text'              => 20201029,
     Date::Manip =>0,
     Digest::SHA1=>0,
+    Scalar::Util=>0,
     Storable    =>0,
     Test::More  =>0,
     Test2::API  =>0,

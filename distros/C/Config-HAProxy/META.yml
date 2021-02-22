@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ no_index:
 provides:
   Config::HAProxy:
     file: lib/Config/HAProxy.pm
-    version: '1.05'
+    version: '1.06'
   Config::HAProxy::Iterator:
     file: lib/Config/HAProxy/Iterator.pm
   Config::HAProxy::Node:
@@ -47,5 +47,6 @@ requires:
   Text::ParseWords: '0'
   perl: '5.01'
 resources:
+  bugtracker: https://puszcza.gnu.org.ua/bugs/?group=config-haproxy
   repository: git://git.gnu.org.ua/config-haproxy.git
-version: '1.05'
+version: '1.06'

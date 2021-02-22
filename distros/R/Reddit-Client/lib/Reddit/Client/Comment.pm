@@ -5,20 +5,50 @@ use warnings;
 use Carp;
 
 require Reddit::Client::VotableThing;
-
-# removed 4/18: media, url, ilink_flair_text, link_flair_css_class
-#
-# were these fields ever part of any comment, or were they copied form Link?
+# comments don't have over_18 and is_self, do they?
 use base   qw/Reddit::Client::VotableThing/;
 use fields qw/ 
-	  num_reports created_utc
-	  banned_by subreddit title author_flair_text is_self author media_embed
-	  permalink author_flair_css_class selftext domain num_comments clicked
-	  saved thumbnail subreddit_id approved_by selftext_html created hidden
-	  over_18 parent_id replies body body_html
-	  user_reports mod_reports
-	  link_author link_id link_permalink link_title link_url 
-	  more
+approved_by
+author
+author_flair_css_class
+author_flair_text
+banned_by
+body
+body_html
+can_mod_post
+clicked
+created
+created_utc
+domain
+hidden
+is_self
+link_author
+link_id
+link_permalink
+link_title
+link_url
+locked
+media_embed
+mod_reports
+more
+num_comments
+num_reports
+over_18
+parent_id
+permalink
+quarantine
+removed
+replies
+saved
+selftext
+selftext_html
+spam
+stickied
+subreddit
+subreddit_id
+thumbnail
+title
+user_reports
 /;
 
 use constant type => "t1";

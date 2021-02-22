@@ -10,7 +10,7 @@ will create a git clone of the repository in your local $HOME/Mnet directory:
     cd $HOME/Mnet
 
 Tests for the Mnet lib code are contained in the t directory, these commands
-will run all of the tests:
+will run all of the tests and cleanup afterwards:
 
     perl Makefile.PL
     make test realclean

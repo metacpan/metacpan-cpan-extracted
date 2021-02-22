@@ -13,11 +13,12 @@ Readonly::Array our @EXPORT_OK => qw(set_params set_params_pub set_split_params
 	split_params);
 
 # Version.
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Set parameters to user values.
 sub set_params {
 	my ($self, @params) = @_;
+
 	while (@params) {
 		my $key = shift @params;
 		my $val = shift @params;
@@ -26,12 +27,14 @@ sub set_params {
 		}
 		$self->{$key} = $val;
 	}
+
 	return;
 }
 
 # Set parameters to user values - public variables.
 sub set_params_pub {
 	my ($self, @params) = @_;
+
 	while (@params) {
 		my $key = shift @params;
 		my $val = shift @params;
@@ -43,12 +46,14 @@ sub set_params_pub {
 		}
 		$self->{$key} = $val;
 	}
+
 	return;
 }
 
 # Set params for object and other returns.
 sub set_split_params {
 	my ($self, @params) = @_;
+
 	my @other_params;	
 	while (@params) {
 		my $key = shift @params;
@@ -59,12 +64,14 @@ sub set_split_params {
 			$self->{$key} = $val;
 		}
 	}
+
 	return @other_params;
 }
 
 # Split params to object and others.
 sub split_params {
 	my ($object_keys_ar, @params) = @_;
+
 	my @object_params;
 	my @other_params;
 	while (@params) {
@@ -76,6 +83,7 @@ sub split_params {
 			push @other_params, $key, $val;
 		}
 	}
+
 	return (\@object_params, \@other_params);
 }
 
@@ -94,6 +102,7 @@ Class::Utils - Class utilities.
 =head1 SYNOPSIS
 
  use Class::Utils qw(set_params set_split_params);
+
  set_params($self, @params);
  set_params_pub($self, @params);
  my @other_params = set_split_params($self, @params);
@@ -265,7 +274,7 @@ L<Readonly>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Class-Utils>
+L<https://github.com/michal-josef-spacek/Class-Utils>
 
 =head1 AUTHOR
 
@@ -275,11 +284,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Josef Špaček 2011-2018
- BSD 2-Clause License
+© Michal Josef Špaček 2011-2021
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

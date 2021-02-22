@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Log::FreeSWITCH::Line qw(parse serialize);
+
      my $data_o = parse($data);
      my $data = serialize($data_o);
 
@@ -24,11 +25,9 @@ ERRORS
              Serialize object must be 'Log::FreeSWITCH::Line::Data' object.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Module.
      use Data::Printer;
      use Log::FreeSWITCH::Line qw(parse);
 
@@ -58,11 +57,9 @@ EXAMPLE1
      # }
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Module.
      use Log::FreeSWITCH::Line qw(serialize);
      use Log::FreeSWITCH::Line::Data;
 
@@ -91,17 +88,18 @@ SEE ALSO
         Data object which represents FreeSWITCH log line.
 
 REPOSITORY
-    <https://github.com/tupinek/Log-FreeSWITCH-Line>
+    <https://github.com/michal-josef-spacek/Log-FreeSWITCH-Line>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2014-2021 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

@@ -22,6 +22,7 @@ lib/Power/Outlet/WeMo.pm
 lib/Power/Outlet/Virtual.pm
 lib/Power/Outlet/Config.pm
 t/001_load.t
+t/002_action.t
 t/002_http.t
 t/002_ip.t
 t/002_iBoot_live.t

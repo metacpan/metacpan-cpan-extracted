@@ -63,10 +63,12 @@ is GraphViz2::escape_some_chars(q{\\\\"}, '\\{\\}\\|<>\\s"'), '\\\\\\"', 'quotin
 
 for ([0,0], [0,1], [1,0], [1,1]) {
   my ($is_multiv, $is_multie) = @$_;
-  my ($v_attr, $e_attr) = qw(set_vertex_attribute set_edge_attribute);
+  my ($v_add, $v_attr, $e_attr) = qw(add_vertex set_vertex_attribute set_edge_attribute);
+  $v_add .= '_by_id' if $is_multiv;
   $v_attr .= '_by_id' if $is_multiv;
   $e_attr .= '_by_id' if $is_multie;
   my $g = Graph->new(multiedged => $is_multie, multivertexed => $is_multiv);
+  $g->$v_add(@$_) for $is_multiv ? ([ qw(v w) ], [ qw(v z) ]) : [ qw(v) ];
   $g->$v_attr(@$_, graphviz => { label => "@$_" })
     for $is_multiv ? ([ qw(a w) ], [ qw(a z) ]) : [ qw(a) ];
   $g->$e_attr(@$_, graphviz => { label => "@$_" })

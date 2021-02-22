@@ -14,7 +14,10 @@ t/author-pod-syntax.t
 t/complex_equality.t
 t/default.t
 t/maybe.t
+t/nested.t
+t/nested_pairingheap.t
 t/pattern-order.t
 t/return.t
 t/simple_equality.t
 t/tree.t
+t/treemap.t

@@ -24,7 +24,8 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Devel::StrictMode' => '0',
-                                      'Moo' => '0'
+                                      'Moo' => '0',
+                                      'version' => '0.77'
                                     }
                     },
        'test' => {

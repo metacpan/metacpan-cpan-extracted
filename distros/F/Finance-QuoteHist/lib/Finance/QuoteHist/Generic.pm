@@ -672,7 +672,12 @@ sub date_normalize {
     $normal_date = ParseDate($m =~ /^\d+$/ ? "$y/$m/01" : "$m 01 $y");
   }
   else {
-    $normal_date = ParseDate($date);
+    if ($date =~ /^\d{10}$/) {
+      $normal_date = ParseDateString("epoch $date");
+    }
+    else {
+      $normal_date = ParseDate($date);
+    }
   }
   $normal_date or return undef;
   return $normal_date if $self->target_mode eq 'intraday';
@@ -1594,7 +1599,7 @@ Matthew P. Sisk, E<lt>F<sisk@mojotoad.com>E<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000-2017 Matthew P. Sisk. All rights reserved. All wrongs
+Copyright (c) 2000-2021 Matthew P. Sisk. All rights reserved. All wrongs
 revenged. This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-use JSON           qw/decode_json/;
+use JSON           qw/encode_json decode_json/;
 use LWP::UserAgent qw//;
 use HTTP::Request  qw//;
 use URI::Encode    qw/uri_encode/;
@@ -116,19 +116,38 @@ sub send {
 		print $res->content . "\n";
 	}
 
+	# response is an HTTP::Response object, sent is HTTP::Request
+
     if ($res->is_success) {
         return $res->content;
     } else {
+		# I don't know what the fuck any of this is
 		# print request unless we already printed it
-		if (!$self->{print_request} and $self->{print_request_on_error}) {
+		if ($self->{print_request_on_error} and !$self->{print_request}) {
 			print Dumper($request);
 			print Dumper($res);
 		} elsif ($self->{request_errors}) {
-			# I dont think printing content has ever given useful information
-			croak "Request error: HTTP ".$res->status_line .", Content: $res->{_content}";
-		} else {
+			my $json; 
+			my $success = eval { $json = decode_json $res->{_content}; };
+
+			# If Reddit returned valid json, add it to a hash and print it
+			if ($success) {
+				my $err = {
+					error		=> 1,
+					code		=> $res->code,
+					status_line	=> $res->status_line,
+					data		=> $json,
+				};
+				
+				my $rtn = encode_json $err;
+				die "$rtn\n";
+
+			} else {
+				die "Request error: HTTP ".$res->status_line .", Content: $res->{_content}";
+			}
+			#die $res->{_content}."\n";
+		} else { # default: print status line and exit
 			#croak sprintf("Request error: HTTP %s last token: %s time: %s", $res->status_line, $self->{last_token}, time);
-			#croak sprintf("Request error: HTTP %s", $res->status_line);
 			die sprintf("Request error: HTTP %s\n", $res->status_line);
 		}
     }

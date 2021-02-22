@@ -39,7 +39,7 @@ write_text("$dir/meta/alex.jpg", "content-type: image/jpeg");
 # html
 
 my $page = query_web("GET /robots.txt HTTP/1.0\r\nhost: $host:$port");
-for (qw(/raw/* /html/* /diff/* /history/* /do/changes* /do/all/changes* /do/rss /do/atom /do/new /do/more /do/match /do/search)) {
+for (qw(/raw /html /diff /history /do/changes /do/all/changes /do/rss /do/atom /do/new /do/more /do/match /do/search)) {
   my $url = quotemeta;
   like($page, qr/^Disallow: $url/m, "Robots are disallowed from $url");
 }

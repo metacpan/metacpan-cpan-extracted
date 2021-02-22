@@ -1,3 +1,6 @@
+v5.0.4    2021-02-16 13:30:11 EST
+  - Use Mojo::Promise in tests instead of the deprecated and decored Mojo::IOLoop::Delay (#17, Stefan Adams)
+
 v5.0.3    2020-08-02 18:15:20 EDT
   - Minion requirement bumped to 10.13.
   - Removed experimental support for job sequences.

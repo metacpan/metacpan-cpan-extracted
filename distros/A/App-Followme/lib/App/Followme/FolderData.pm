@@ -12,7 +12,7 @@ use File::Spec::Functions qw(abs2rel catfile rel2abs splitdir);
 use base qw(App::Followme::BaseData);
 use App::Followme::FIO;
 
-our $VERSION = "1.96";
+our $VERSION = "1.97";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -94,6 +94,26 @@ sub check_filename {
 
     die "Cannot use \$$name outside of loop" unless defined $filename;
     return;
+}
+
+#-----------------------------------------------------------------------
+# Get the name of the web file a file will be converted to
+
+sub convert_filename {
+    my ($self, $filename) = @_;
+
+    $filename =~ s/\.[^\.]*$/.$self->{web_extension}/;
+    return $filename;
+}
+
+#-----------------------------------------------------------------------
+# Get the name of the source directory for ConvertPage
+
+sub convert_source_directory {
+    my ($self, $directory) = @_;
+
+    # Defaults to same as output directory 
+    return $directory;
 }
 
 #----------------------------------------------------------------------

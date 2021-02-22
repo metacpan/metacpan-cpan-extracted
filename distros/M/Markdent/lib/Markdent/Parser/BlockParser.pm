@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Digest::SHA qw( sha1_hex );
 use Encode qw( encode );
@@ -75,11 +75,11 @@ sub parse_document {
     my $self = shift;
     my $text = shift;
 
-    $self->_treat_list_item_as_line();
+    $self->_treat_list_item_as_line;
 
     $self->_hash_html_blocks($text);
 
-    $self->_span_parser()->extract_link_ids($text);
+    $self->_span_parser->extract_link_ids($text);
 
     $self->_parse_text($text);
 }
@@ -139,7 +139,7 @@ sub _parse_text {
     my $last_pos;
 PARSE:
     while (1) {
-        if ( $self->debug() && pos ${$text} ) {
+        if ( $self->debug && pos ${$text} ) {
             $self->_print_debug( "Remaining text:\n[\n"
                     . substr( ${$text}, pos ${$text} )
                     . "\n]\n" );
@@ -160,7 +160,7 @@ PARSE:
             die $msg;
         }
 
-        my @look_for = $self->_possible_block_matches();
+        my @look_for = $self->_possible_block_matches;
 
         $self->_debug_look_for(@look_for);
 
@@ -181,7 +181,7 @@ sub _possible_block_matches {
     my @look_for;
 
     push @look_for, qw( hashed_html horizontal_rule )
-        unless $self->_list_level();
+        unless $self->_list_level;
 
     push @look_for, qw(
         html_comment
@@ -193,7 +193,7 @@ sub _possible_block_matches {
     );
 
     push @look_for, 'list_item'
-        if $self->_list_level();
+        if $self->_list_level;
 
     push @look_for, 'paragraph';
 
@@ -222,7 +222,7 @@ sub _match_hashed_html {
     $self->_debug_parse_result(
         $1,
         'hashed html',
-    ) if $self->debug();
+    ) if $self->debug;
 
     $self->_send_event(
         HTMLBlock => html => $html,
@@ -249,7 +249,7 @@ sub _match_html_comment {
     $self->_debug_parse_result(
         $comment,
         'html comment block',
-    ) if $self->debug();
+    ) if $self->debug;
 
     $self->_detab_text( \$comment );
 
@@ -288,7 +288,7 @@ sub _match_atx_header {
         $1,
         'atx header',
         [ level => $level ],
-    ) if $self->debug();
+    ) if $self->debug;
 
     $header_text =~ s/^$HorizontalWS*//;
 
@@ -323,7 +323,7 @@ sub _match_two_line_header {
         $1,
         'two-line header',
         [ level => $level ],
-    ) if $self->debug();
+    ) if $self->debug;
 
     $self->_header( $level, $2 );
 
@@ -337,7 +337,7 @@ sub _header {
 
     $self->_send_event( StartHeader => level => $level );
 
-    $self->_span_parser()->parse_block($text);
+    $self->_span_parser->parse_block($text);
 
     $self->_send_event( EndHeader => level => $level );
 
@@ -370,7 +370,7 @@ sub _match_horizontal_rule {
     $self->_debug_parse_result(
         $1,
         'horizontal rule',
-    ) if $self->debug();
+    ) if $self->debug;
 
     $self->_send_event('HorizontalRule');
 
@@ -415,7 +415,7 @@ sub _match_blockquote {
     $self->_debug_parse_result(
         $bq,
         'blockquote',
-    ) if $self->debug();
+    ) if $self->debug;
 
     $self->_send_event('StartBlockquote');
 
@@ -423,7 +423,7 @@ sub _match_blockquote {
 
     # Even if the blockquote is inside a list, we want to look for paragraphs,
     # not list items.
-    my $list_level = $self->_list_level();
+    my $list_level = $self->_list_level;
     $self->_set_list_level(0);
 
     # Dingus treats a new blockquote level as starting a new paragraph as
@@ -512,7 +512,7 @@ sub _match_preformatted {
     $self->_debug_parse_result(
         $pre,
         'preformatted',
-    ) if $self->debug();
+    ) if $self->debug;
 
     $pre =~ s/^(?:\p{SpaceSeparator}{4}|\t)//gm;
 
@@ -540,7 +540,7 @@ sub _list_re {
 
     my $block_start;
 
-    if ( $self->_list_level() ) {
+    if ( $self->_list_level ) {
         $block_start = qr/(?: (?<= \n ) | $EmptyLines )/xm;
     }
     else {
@@ -562,7 +562,7 @@ sub _match_list {
     my $self = shift;
     my $text = shift;
 
-    my $list_re = $self->_list_re();
+    my $list_re = $self->_list_re;
 
     return unless ${$text} =~ / \G
                                 $list_re
@@ -594,17 +594,17 @@ sub _match_list {
     $self->_debug_parse_result(
         $list,
         $type,
-    ) if $self->debug();
+    ) if $self->debug;
 
     $self->_send_event( 'Start' . $type );
 
-    $self->_inc_list_level();
+    $self->_inc_list_level;
 
     my @items = $self->_split_list_items($list);
 
     $self->_handle_list_items( $type, @items );
 
-    $self->_dec_list_level();
+    $self->_dec_list_level;
 
     $self->_send_event( 'End' . $type );
 
@@ -659,7 +659,7 @@ sub _handle_list_items {
         $item =~ s/(?<=\n)^ (?: \p{SpaceSeparator}{4} | \t )//xgm;
 
         $self->_print_debug("Parsing list item for blocks:\n[$item]\n")
-            if $self->debug();
+            if $self->debug;
 
         # This is a hack to ensure that the last item in a loose list (each
         # item is a paragraph) also is treated as a paragraph, not just a list
@@ -670,23 +670,23 @@ sub _handle_list_items {
 
                 $self->_print_debug(
                     "Treating last list item as a paragraph because previous item ends with empty line\n"
-                ) if $self->debug();
+                ) if $self->debug;
 
-                $self->_treat_list_item_as_paragraph();
+                $self->_treat_list_item_as_paragraph;
             }
             else {
-                $self->_treat_list_item_as_line();
+                $self->_treat_list_item_as_line;
             }
         }
         elsif ( $item =~ /^$EmptyLine\z/m ) {
             $self->_print_debug(
                 "Treating item as a paragraph because it ends with empty line\n"
-            ) if $self->debug();
+            ) if $self->debug;
 
-            $self->_treat_list_item_as_paragraph();
+            $self->_treat_list_item_as_paragraph;
         }
         else {
-            $self->_treat_list_item_as_line();
+            $self->_treat_list_item_as_line;
         }
 
         $self->_parse_text( \$item );
@@ -730,15 +730,15 @@ sub _match_list_item {
     $self->_debug_parse_result(
         $1,
         'list_item',
-    ) if $self->debug();
+    ) if $self->debug;
 
     $self->_send_event('StartParagraph')
-        if $self->_list_item_is_paragraph();
+        if $self->_list_item_is_paragraph;
 
-    $self->_span_parser()->parse_block($1);
+    $self->_span_parser->parse_block($1);
 
     $self->_send_event('EndParagraph')
-        if $self->_list_item_is_paragraph();
+        if $self->_list_item_is_paragraph;
 
     return 1;
 }
@@ -747,7 +747,7 @@ sub _match_paragraph {
     my $self = shift;
     my $text = shift;
 
-    my $list_re = $self->_list_re();
+    my $list_re = $self->_list_re;
 
     # At this point anything that is not an empty line must be a paragraph.
     return unless ${$text} =~ / \G
@@ -775,11 +775,11 @@ sub _match_paragraph {
     $self->_debug_parse_result(
         $1,
         'paragraph',
-    ) if $self->debug();
+    ) if $self->debug;
 
     $self->_send_event('StartParagraph');
 
-    $self->_span_parser()->parse_block($1);
+    $self->_span_parser->parse_block($1);
 
     $self->_send_event('EndParagraph');
 
@@ -787,7 +787,7 @@ sub _match_paragraph {
 }
 ## use critic
 
-__PACKAGE__->meta()->make_immutable();
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -805,7 +805,7 @@ Markdent::Parser::BlockParser - Block parser for standard Markdown
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 DESCRIPTION
 
@@ -849,7 +849,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

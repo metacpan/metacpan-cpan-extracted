@@ -11,6 +11,7 @@ typedef enum _marpaESLIFBootstrapStackTypeEnum {
   marpaESLIFBootstrapStackTypeEnum_OP_DECLARE,
   marpaESLIFBootstrapStackTypeEnum_SYMBOL_NAME,
   marpaESLIFBootstrapStackTypeEnum_RHS_PRIMARY,
+  marpaESLIFBootstrapStackTypeEnum_RHS_ALTERNATIVE,
   marpaESLIFBootstrapStackTypeEnum_RHS,
   marpaESLIFBootstrapStackTypeEnum_ADVERB_ITEM_ACTION,
   marpaESLIFBootstrapStackTypeEnum_ADVERB_ITEM_LEFT_ASSOCIATION,
@@ -37,6 +38,8 @@ typedef enum _marpaESLIFBootstrapStackTypeEnum {
   marpaESLIFBootstrapStackTypeEnum_ALTERNATIVES,
   marpaESLIFBootstrapStackTypeEnum_PRIORITIES,
   marpaESLIFBootstrapStackTypeEnum_SINGLE_SYMBOL,
+  marpaESLIFBootstrapStackTypeEnum_SYMBOL,
+  marpaESLIFBootstrapStackTypeEnum_TERMINAL,
   marpaESLIFBootstrapStackTypeEnum_GRAMMAR_REFERENCE,
   marpaESLIFBootstrapStackTypeEnum_INACESSIBLE_TREATMENT,
   marpaESLIFBootstrapStackTypeEnum_ON_OR_OFF,
@@ -46,6 +49,7 @@ typedef enum _marpaESLIFBootstrapStackTypeEnum {
   marpaESLIFBootstrapStackTypeEnum_ALTERNATIVE_NAME,
   marpaESLIFBootstrapStackTypeEnum_ARRAY,
   marpaESLIFBootstrapStackTypeEnum_STRING,
+  marpaESLIFBootstrapStackTypeEnum_LHS,
   _marpaESLIFBootstrapStackTypeEnum_LAST
 } marpaESLIFBootstrapStackTypeEnum_t;
 
@@ -55,6 +59,7 @@ static char _MARPAESLIF_BOOTSTRAP_STACK_TYPE[_marpaESLIFBootstrapStackTypeEnum_L
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_OP_DECLARE                       &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_OP_DECLARE])
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_SYMBOL_NAME                      &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_SYMBOL_NAME])
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_RHS_PRIMARY                      &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_RHS_PRIMARY])
+#define MARPAESLIF_BOOTSTRAP_STACK_TYPE_RHS_ALTERNATIVE                  &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_RHS_ALTERNATIVE])
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_RHS                              &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_RHS])
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_ADVERB_ITEM_ACTION               &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_ADVERB_ITEM_ACTION])
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_ADVERB_ITEM_LEFT_ASSOCIATION     &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_ADVERB_ITEM_LEFT_ASSOCIATION])
@@ -81,6 +86,8 @@ static char _MARPAESLIF_BOOTSTRAP_STACK_TYPE[_marpaESLIFBootstrapStackTypeEnum_L
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_ALTERNATIVES                     &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_ALTERNATIVES])
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_PRIORITIES                       &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_PRIORITIES])
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_SINGLE_SYMBOL                    &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_SINGLE_SYMBOL])
+#define MARPAESLIF_BOOTSTRAP_STACK_TYPE_SYMBOL                           &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_SYMBOL])
+#define MARPAESLIF_BOOTSTRAP_STACK_TYPE_TERMINAL                         &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_TERMINAL])
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_GRAMMAR_REFERENCE                &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_GRAMMAR_REFERENCE])
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_INACESSIBLE_TREATMENT            &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_INACESSIBLE_TREATMENT])
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_ON_OR_OFF                        &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_ON_OR_OFF])
@@ -90,32 +97,37 @@ static char _MARPAESLIF_BOOTSTRAP_STACK_TYPE[_marpaESLIFBootstrapStackTypeEnum_L
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_ALTERNATIVE_NAME                 &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_ALTERNATIVE_NAME])
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_ARRAY                            &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_ARRAY])
 #define MARPAESLIF_BOOTSTRAP_STACK_TYPE_STRING                           &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_STRING])
-
-#define MARPAESLIF_BOOTSTRAP_STACK_TYPE_START MARPAESLIF_BOOTSTRAP_STACK_TYPE_NA
-#define MARPAESLIF_BOOTSTRAP_STACK_TYPE_END MARPAESLIF_BOOTSTRAP_STACK_TYPE_STRING
+#define MARPAESLIF_BOOTSTRAP_STACK_TYPE_LHS                              &(_MARPAESLIF_BOOTSTRAP_STACK_TYPE[marpaESLIFBootstrapStackTypeEnum_LHS])
 
 /* Forward declarations */
 typedef enum   marpaESLIF_bootstrap_stack_context               marpaESLIF_bootstrap_stack_context_t;
 typedef enum   marpaESLIF_bootstrap_adverb_list_item_type       marpaESLIF_bootstrap_adverb_list_item_type_t;
 typedef enum   marpaESLIF_bootstrap_pause_type                  marpaESLIF_bootstrap_pause_type_t;
 typedef enum   marpaESLIF_bootstrap_single_symbol_type          marpaESLIF_bootstrap_single_symbol_type_t;
+typedef enum   marpaESLIF_bootstrap_terminal_type               marpaESLIF_bootstrap_terminal_type_t;
 typedef enum   marpaESLIF_bootstrap_rhs_primary_type            marpaESLIF_bootstrap_rhs_primary_type_t;
+typedef enum   marpaESLIF_bootstrap_rhs_alternative_type        marpaESLIF_bootstrap_rhs_alternative_type_t;
 typedef enum   marpaESLIF_bootstrap_grammar_reference_type      marpaESLIF_bootstrap_grammar_reference_type_t;
 typedef enum   marpaESLIF_bootstrap_inaccessible_treatment_type marpaESLIF_bootstrap_inaccessible_treatment_type_t;
 typedef enum   marpaESLIF_bootstrap_on_or_off_type              marpaESLIF_bootstrap_on_or_off_type_t;
 typedef enum   marpaESLIF_bootstrap_event_initializer_type      marpaESLIF_bootstrap_event_initializer_type_t;
 typedef enum   marpaESLIF_bootstrap_event_declaration_type      marpaESLIF_bootstrap_event_declaration_type_t;
 
-typedef struct marpaESLIF_bootstrap_utf_string                marpaESLIF_bootstrap_utf_string_t;
-typedef struct marpaESLIF_bootstrap_single_symbol             marpaESLIF_bootstrap_single_symbol_t;
-typedef struct marpaESLIF_bootstrap_adverb_list_item          marpaESLIF_bootstrap_adverb_list_item_t;
-typedef struct marpaESLIF_bootstrap_grammar_reference         marpaESLIF_bootstrap_grammar_reference_t;
-typedef struct marpaESLIF_bootstrap_symbol_name_and_reference marpaESLIF_bootstrap_symbol_name_and_reference_t;
-typedef struct marpaESLIF_bootstrap_rhs_primary               marpaESLIF_bootstrap_rhs_primary_t;
-typedef struct marpaESLIF_bootstrap_rhs_primary_exception     marpaESLIF_bootstrap_rhs_primary_exception_t;
-typedef struct marpaESLIF_bootstrap_rhs_primary_quantified    marpaESLIF_bootstrap_rhs_primary_quantified_t;
-typedef struct marpaESLIF_bootstrap_alternative               marpaESLIF_bootstrap_alternative_t;
-typedef struct marpaESLIF_bootstrap_event_initialization      marpaESLIF_bootstrap_event_initialization_t;
+typedef struct marpaESLIF_bootstrap_utf_string                 marpaESLIF_bootstrap_utf_string_t;
+typedef struct marpaESLIF_bootstrap_single_symbol              marpaESLIF_bootstrap_single_symbol_t;
+typedef struct marpaESLIF_bootstrap_symbol                     marpaESLIF_bootstrap_symbol_t;
+typedef struct marpaESLIF_bootstrap_lhs                        marpaESLIF_bootstrap_lhs_t;
+typedef struct marpaESLIF_bootstrap_terminal                   marpaESLIF_bootstrap_terminal_t;
+typedef struct marpaESLIF_bootstrap_adverb_list_item           marpaESLIF_bootstrap_adverb_list_item_t;
+typedef struct marpaESLIF_bootstrap_grammar_reference          marpaESLIF_bootstrap_grammar_reference_t;
+typedef struct marpaESLIF_bootstrap_symbol_and_reference       marpaESLIF_bootstrap_symbol_and_reference_t;
+typedef struct marpaESLIF_bootstrap_rhs_primary                marpaESLIF_bootstrap_rhs_primary_t;
+typedef struct marpaESLIF_bootstrap_rhs_alternative            marpaESLIF_bootstrap_rhs_alternative_t;
+typedef struct marpaESLIF_bootstrap_rhs_alternative_priorities marpaESLIF_bootstrap_rhs_alternative_priorities_t;
+typedef struct marpaESLIF_bootstrap_rhs_alternative_exception  marpaESLIF_bootstrap_rhs_alternative_exception_t;
+typedef struct marpaESLIF_bootstrap_rhs_alternative_quantified marpaESLIF_bootstrap_rhs_alternative_quantified_t;
+typedef struct marpaESLIF_bootstrap_alternative                marpaESLIF_bootstrap_alternative_t;
+typedef struct marpaESLIF_bootstrap_event_initialization       marpaESLIF_bootstrap_event_initialization_t;
 
 enum marpaESLIF_bootstrap_adverb_list_item_type {
   MARPAESLIF_BOOTSTRAP_ADVERB_LIST_ITEM_TYPE_NA = 0,
@@ -156,18 +168,40 @@ struct marpaESLIF_bootstrap_utf_string {
 enum marpaESLIF_bootstrap_single_symbol_type {
   MARPAESLIF_BOOTSTRAP_SINGLE_SYMBOL_TYPE_NA = 0,
   MARPAESLIF_BOOTSTRAP_SINGLE_SYMBOL_TYPE_SYMBOL,
-  MARPAESLIF_BOOTSTRAP_SINGLE_SYMBOL_TYPE_CHARACTER_CLASS,
-  MARPAESLIF_BOOTSTRAP_SINGLE_SYMBOL_TYPE_REGULAR_EXPRESSION,
-  MARPAESLIF_BOOTSTRAP_SINGLE_SYMBOL_TYPE_QUOTED_STRING
+  MARPAESLIF_BOOTSTRAP_SINGLE_SYMBOL_TYPE_TERMINAL
+};
+
+struct marpaESLIF_bootstrap_symbol {
+  char *symbols;
+};
+
+struct marpaESLIF_bootstrap_lhs {
+  char *symbols;
+};
+
+enum marpaESLIF_bootstrap_terminal_type {
+  MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE_NA = 0,
+  MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE_CHARACTER_CLASS,
+  MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE_REGULAR_EXPRESSION,
+  MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE_QUOTED_STRING,
+  MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE__EOF,
+  MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE__EOL
+};
+
+struct marpaESLIF_bootstrap_terminal {
+  marpaESLIF_bootstrap_terminal_type_t type;
+  union {
+    marpaESLIF_bootstrap_utf_string_t *characterClassp;
+    marpaESLIF_bootstrap_utf_string_t *regularExpressionp;
+    marpaESLIF_bootstrap_utf_string_t *stringp;
+  } u;
 };
 
 struct marpaESLIF_bootstrap_single_symbol {
   marpaESLIF_bootstrap_single_symbol_type_t type;
   union {
-    char *symbols;
-    marpaESLIF_bootstrap_utf_string_t *characterClassp;
-    marpaESLIF_bootstrap_utf_string_t *regularExpressionp;
-    marpaESLIF_bootstrap_utf_string_t *quotedStringp;
+    marpaESLIF_bootstrap_symbol_t     *symbolp;
+    marpaESLIF_bootstrap_terminal_t   *terminalp;
   } u;
 };
 
@@ -178,7 +212,7 @@ struct marpaESLIF_bootstrap_adverb_list_item {
     short                                        left_associationb;
     short                                        right_associationb;
     short                                        group_associationb;
-    marpaESLIF_bootstrap_single_symbol_t        *separatorSingleSymbolp;
+    marpaESLIF_bootstrap_rhs_primary_t          *separatorRhsPrimaryp;
     short                                        properb;
     short                                        hideseparatorb;
     int                                          ranki;
@@ -197,13 +231,18 @@ struct marpaESLIF_bootstrap_adverb_list_item {
   } u;
 };
 
+enum marpaESLIF_bootstrap_rhs_alternative_type {
+  MARPAESLIF_BOOTSTRAP_RHS_ALTERNATIVE_TYPE_NA = 0,
+  MARPAESLIF_BOOTSTRAP_RHS_ALTERNATIVE_TYPE_RHS_PRIMARY,
+  MARPAESLIF_BOOTSTRAP_RHS_ALTERNATIVE_TYPE_PRIORITIES,
+  MARPAESLIF_BOOTSTRAP_RHS_ALTERNATIVE_TYPE_EXCEPTION,
+  MARPAESLIF_BOOTSTRAP_RHS_ALTERNATIVE_TYPE_QUANTIFIED
+};
+
 enum marpaESLIF_bootstrap_rhs_primary_type {
   MARPAESLIF_BOOTSTRAP_RHS_PRIMARY_TYPE_NA = 0,
   MARPAESLIF_BOOTSTRAP_RHS_PRIMARY_TYPE_SINGLE_SYMBOL,
-  MARPAESLIF_BOOTSTRAP_RHS_PRIMARY_TYPE_SYMBOL_NAME_AND_REFERENCE,
-  MARPAESLIF_BOOTSTRAP_RHS_PRIMARY_TYPE_PRIORITIES,
-  MARPAESLIF_BOOTSTRAP_RHS_PRIMARY_TYPE_EXCEPTION,
-  MARPAESLIF_BOOTSTRAP_RHS_PRIMARY_TYPE_QUANTIFIED
+  MARPAESLIF_BOOTSTRAP_RHS_PRIMARY_TYPE_SYMBOL_AND_REFERENCE
 };
 
 enum marpaESLIF_bootstrap_grammar_reference_type {
@@ -228,38 +267,52 @@ enum marpaESLIF_bootstrap_event_declaration_type {
   MARPAESLIF_BOOTSTRAP_EVENT_DECLARATION_TYPE_COMPLETED
 };
 
-struct marpaESLIF_bootstrap_symbol_name_and_reference {
-  char                                     *symbols;
+struct marpaESLIF_bootstrap_symbol_and_reference {
+  marpaESLIF_bootstrap_symbol_t            *symbolp;
   marpaESLIF_bootstrap_grammar_reference_t *grammarReferencep;
 };
 
-struct marpaESLIF_bootstrap_rhs_primary_exception {
+struct marpaESLIF_bootstrap_rhs_alternative_priorities {
+  short                               skipb;
+  genericStack_t                     *alternativesStackp;
+};
+
+struct marpaESLIF_bootstrap_rhs_alternative_exception {
+  short                               skipb;
   marpaESLIF_bootstrap_rhs_primary_t *rhsPrimaryp;
   marpaESLIF_bootstrap_rhs_primary_t *rhsPrimaryExceptionp;
   genericStack_t                     *adverbListItemStackp;
 };
 
-struct marpaESLIF_bootstrap_rhs_primary_quantified {
+struct marpaESLIF_bootstrap_rhs_alternative_quantified {
+  short                               skipb;
   marpaESLIF_bootstrap_rhs_primary_t *rhsPrimaryp;
   int                                 minimumi;
   genericStack_t                     *adverbListItemStackp;
 };
 
 struct marpaESLIF_bootstrap_rhs_primary {
-  short                                    skipb;
-  marpaESLIF_symbol_t                     *symbolShallowp;
+  marpaESLIF_symbol_t                     *symbolShallowp; /* To avoid possible recursion */
   marpaESLIF_bootstrap_rhs_primary_type_t  type;
   union {
     marpaESLIF_bootstrap_single_symbol_t             *singleSymbolp;
-    marpaESLIF_bootstrap_symbol_name_and_reference_t *symbolNameAndReferencep;
-    genericStack_t                                   *alternativesStackp;
-    marpaESLIF_bootstrap_rhs_primary_exception_t      exception;
-    marpaESLIF_bootstrap_rhs_primary_quantified_t     quantified;
+    marpaESLIF_bootstrap_symbol_and_reference_t      *symbolAndReferencep;
+  } u;
+};
+
+struct marpaESLIF_bootstrap_rhs_alternative {
+  marpaESLIF_symbol_t                         *symbolShallowp; /* To avoid possible recursion */
+  marpaESLIF_bootstrap_rhs_alternative_type_t  type;
+  union {
+    marpaESLIF_bootstrap_rhs_primary_t                *rhsPrimaryp;
+    marpaESLIF_bootstrap_rhs_alternative_priorities_t  priorities;
+    marpaESLIF_bootstrap_rhs_alternative_exception_t   exception;
+    marpaESLIF_bootstrap_rhs_alternative_quantified_t  quantified;
   } u;
 };
 
 struct marpaESLIF_bootstrap_alternative {
-  genericStack_t      *rhsPrimaryStackp;
+  genericStack_t      *rhsAlternativeStackp;
   genericStack_t      *adverbListItemStackp;
   int                  priorityi;         /* Used when there is the loosen "||" operator */
   marpaESLIF_symbol_t *forcedLhsp;        /* ditto */

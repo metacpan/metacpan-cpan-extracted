@@ -1,0 +1,45 @@
+---
+abstract: 'Provide stacktrace and other information to generic Log::Any handlers'
+author:
+  - 'Tom Molesworth <TEAM@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Any-Adapter-Coderef
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Log::Any::Adapter::Coderef:
+    file: lib/Log/Any/Adapter/Coderef.pm
+    version: '0.001'
+requires:
+  Log::Any: '1.050'
+  Sys::Hostname: '0'
+  Time::HiRes: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/team-at-cpan/Log-Any-Adapter-Coderef/issues
+  homepage: https://github.com/team-at-cpan/Log-Any-Adapter-Coderef
+  repository: https://github.com/team-at-cpan/Log-Any-Adapter-Coderef.git
+version: '0.001'
+x_authority: cpan:TEAM
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -31,15 +31,17 @@ gCNF
                 </ds:X509Data>
             </ds:KeyInfo>
         </KeyDescriptor>
+        <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
         <ArtifactResolutionService
                 index="0"
                 isDefault="true"
                 Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
                 Location="https://as.test.fakeme.govt.nz/sso/ArtifactResolver/metaAlias/fakemetest/fakemeidp"/>
-        <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
-        <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</NameIDFormat>
         <SingleSignOnService
                 Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
                 Location="https://test.fakeme.govt.nz/fakeme-test/validate/fakeme-test-idp.xhtml"/>
+        <SingleSignOnService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                Location="https://test.fakeme.govt.nz/fakeme-test/validate/fakeme-test-post-idp.xhtml"/>
     </IDPSSODescriptor>
 </EntityDescriptor>

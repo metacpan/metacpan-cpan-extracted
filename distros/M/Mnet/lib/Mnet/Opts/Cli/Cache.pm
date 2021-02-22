@@ -12,6 +12,7 @@ package Mnet::Opts::Cli::Cache;
 use warnings;
 use strict;
 use Carp;
+use Mnet;
 use Mnet::Log::Conditional;
 use Mnet::Opts::Set;
 

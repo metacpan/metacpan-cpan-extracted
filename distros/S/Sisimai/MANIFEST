@@ -618,9 +618,9 @@ set-of-emails/maildir/bsd/rfc3834-02.eml
 set-of-emails/maildir/bsd/rfc3834-03.eml
 set-of-emails/maildir/bsd/rfc3834-04.eml
 set-of-emails/maildir/bsd/rhost-cox-01.eml
-set-of-emails/maildir/bsd/rhost-exchange-online-01.eml
-set-of-emails/maildir/bsd/rhost-exchange-online-02.eml
-set-of-emails/maildir/bsd/rhost-exchange-online-03.eml
+set-of-emails/maildir/bsd/rhost-exchangeonline-01.eml
+set-of-emails/maildir/bsd/rhost-exchangeonline-02.eml
+set-of-emails/maildir/bsd/rhost-exchangeonline-03.eml
 set-of-emails/maildir/bsd/rhost-franceptt-01.eml
 set-of-emails/maildir/bsd/rhost-franceptt-02.eml
 set-of-emails/maildir/bsd/rhost-franceptt-03.eml
@@ -633,8 +633,8 @@ set-of-emails/maildir/bsd/rhost-franceptt-10.eml
 set-of-emails/maildir/bsd/rhost-franceptt-11.eml
 set-of-emails/maildir/bsd/rhost-godaddy-02.eml
 set-of-emails/maildir/bsd/rhost-godaddy-03.eml
-set-of-emails/maildir/bsd/rhost-google-apps-01.eml
-set-of-emails/maildir/bsd/rhost-google-apps-02.eml
+set-of-emails/maildir/bsd/rhost-googleapps-01.eml
+set-of-emails/maildir/bsd/rhost-googleapps-02.eml
 set-of-emails/maildir/bsd/rhost-iua-01.eml
 set-of-emails/maildir/bsd/rhost-kddi-01.eml
 set-of-emails/maildir/bsd/rhost-kddi-02.eml
@@ -700,9 +700,9 @@ set-of-emails/maildir/dos/lhost-yandex-01.eml
 set-of-emails/maildir/dos/lhost-zoho-01.eml
 set-of-emails/maildir/dos/rfc3464-01.eml
 set-of-emails/maildir/dos/rfc3834-01.eml
-set-of-emails/maildir/dos/rhost-exchange-online-01.eml
+set-of-emails/maildir/dos/rhost-exchangeonline-01.eml
 set-of-emails/maildir/dos/rhost-franceptt-01.eml
-set-of-emails/maildir/dos/rhost-google-apps-01.eml
+set-of-emails/maildir/dos/rhost-googleapps-01.eml
 set-of-emails/maildir/dos/rhost-iua-01.eml
 set-of-emails/maildir/dos/rhost-kddi-01.eml
 set-of-emails/maildir/dos/rhost-tencentqq-01.eml
@@ -801,9 +801,9 @@ set-of-emails/maildir/mac/lhost-yandex-01.eml
 set-of-emails/maildir/mac/lhost-zoho-01.eml
 set-of-emails/maildir/mac/rfc3464-01.eml
 set-of-emails/maildir/mac/rfc3834-01.eml
-set-of-emails/maildir/mac/rhost-exchange-online-01.eml
+set-of-emails/maildir/mac/rhost-exchangeonline-01.eml
 set-of-emails/maildir/mac/rhost-franceptt-01.eml
-set-of-emails/maildir/mac/rhost-google-apps-01.eml
+set-of-emails/maildir/mac/rhost-googleapps-01.eml
 set-of-emails/maildir/mac/rhost-iua-01.eml
 set-of-emails/maildir/mac/rhost-kddi-01.eml
 set-of-emails/maildir/mac/rhost-tencentqq-01.eml

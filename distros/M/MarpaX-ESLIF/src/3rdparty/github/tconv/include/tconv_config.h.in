@@ -16,10 +16,20 @@
 #  else
 #    ifndef C_INLINE_IS_INLINE
 /* Next line is never executed when inline is "inline" */
-#      define inline @C_INLINE@
+#      define inline C_INLINE
 #    endif
 #  endif
 #endif
+
+/* __builtin_expect support */
+#cmakedefine C___BUILTIN_EXPECT @C___BUILTIN_EXPECT@
+#ifdef C___BUILTIN_EXPECT
+#  define TCONV_LIKELY(x)    C___BUILTIN_EXPECT(x, 1)
+#  define TCONV_UNLIKELY(x)  C___BUILTIN_EXPECT(x, 0)
+#else
+#  define TCONV_LIKELY(x)    x
+#  define TCONV_UNLIKELY(x)  x
+#endif /* C___BUILTIN_EXPECT */
 
 /* Convenience macro */
 #ifndef TCONV_NTRACE

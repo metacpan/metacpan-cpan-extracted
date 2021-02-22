@@ -10,651 +10,647 @@
 
 {
 
-	package DBD::Sybase;
+  package DBD::Sybase;
 
-	use DBI        ();
-	use DynaLoader ();
-	use Exporter   ();
+  use DBI        ();
+  use DynaLoader ();
+  use Exporter   ();
 
-	use Sys::Hostname ();
+  use Sys::Hostname ();
 
-	@ISA = qw(DynaLoader Exporter);
+  @ISA = qw(DynaLoader Exporter);
 
-	@EXPORT = qw(CS_ROW_RESULT CS_CURSOR_RESULT CS_PARAM_RESULT
-	  CS_STATUS_RESULT CS_MSG_RESULT CS_COMPUTE_RESULT);
+  @EXPORT = qw(CS_ROW_RESULT CS_CURSOR_RESULT CS_PARAM_RESULT
+    CS_STATUS_RESULT CS_MSG_RESULT CS_COMPUTE_RESULT);
 
-	$hostname  = Sys::Hostname::hostname();
-	$init_done = 0;
-	$VERSION   = '1.16';
-	my $Revision = substr( q$Revision: 1.119 $, 10 );
+  $hostname  = Sys::Hostname::hostname();
+  $init_done = 0;
+  $VERSION   = '1.17';
+  
+  require_version DBI 1.30;
 
-	require_version DBI 1.30;
+  # dl_open() calls need to use the RTLD_GLOBAL flag if
+  # you are going to use the Kerberos libraries.
+  # There are systems / OSes where this does not work (AIX 5.x, for example)
+  # set to 1 to get RTLD_GLOBAL turned on.
+  sub dl_load_flags { 0x00 }
 
-	# dl_open() calls need to use the RTLD_GLOBAL flag if
-	# you are going to use the Kerberos libraries.
-	# There are systems / OSes where this does not work (AIX 5.x, for example)
-	# set to 1 to get RTLD_GLOBAL turned on.
-	sub dl_load_flags { 0x00 }
+  bootstrap DBD::Sybase $VERSION;
 
-	bootstrap DBD::Sybase $VERSION;
+  $drh = undef;    # holds driver handle once initialised
 
-	$drh = undef;    # holds driver handle once initialised
+  sub driver {
+    return $drh if $drh;
+    my ( $class, $attr ) = @_;
+    $class .= "::dr";
+    ($drh) = DBI::_new_drh(
+      $class,
+      {
+        'Name'        => 'Sybase',
+        'Version'     => $VERSION,
+        'Attribution' => 'Sybase DBD by Michael Peppler',
+      }
+    );
 
-	sub driver {
-		return $drh if $drh;
-		my ( $class, $attr ) = @_;
-		$class .= "::dr";
-		($drh) = DBI::_new_drh(
-			$class,
-			{
-				'Name'        => 'Sybase',
-				'Version'     => $VERSION,
-				'Attribution' => 'Sybase DBD by Michael Peppler',
-			}
-		);
+    if ( $DBI::VERSION >= 1.37 && !$DBD::Sybase::init_done ) {
+      DBD::Sybase::db->install_method('syb_nsql');
+      DBD::Sybase::db->install_method('syb_date_fmt');
+      DBD::Sybase::db->install_method('syb_isdead');
+      DBD::Sybase::st->install_method('syb_ct_get_data');
+      DBD::Sybase::st->install_method('syb_ct_data_info');
+      DBD::Sybase::st->install_method('syb_ct_send_data');
+      DBD::Sybase::st->install_method('syb_ct_prepare_send');
+      DBD::Sybase::st->install_method('syb_ct_finish_send');
+      DBD::Sybase::st->install_method('syb_output_params');
+      DBD::Sybase::st->install_method('syb_describe');
+      ++$DBD::Sybase::init_done;
+    }
 
-		if ( $DBI::VERSION >= 1.37 && !$DBD::Sybase::init_done ) {
-			DBD::Sybase::db->install_method('syb_nsql');
-			DBD::Sybase::db->install_method('syb_date_fmt');
-			DBD::Sybase::db->install_method('syb_isdead');
-			DBD::Sybase::st->install_method('syb_ct_get_data');
-			DBD::Sybase::st->install_method('syb_ct_data_info');
-			DBD::Sybase::st->install_method('syb_ct_send_data');
-			DBD::Sybase::st->install_method('syb_ct_prepare_send');
-			DBD::Sybase::st->install_method('syb_ct_finish_send');
-			DBD::Sybase::st->install_method('syb_output_params');
-			DBD::Sybase::st->install_method('syb_describe');
-			++$DBD::Sybase::init_done;
-		}
+    $drh;
+  }
 
-		$drh;
-	}
+  sub CLONE {
+    undef $drh;
+  }
 
-	sub CLONE {
-		undef $drh;
-	}
-
-	1;
+  1;
 }
 
 {
 
-	package DBD::Sybase::dr;    # ====== DRIVER ======
-	use strict;
+  package DBD::Sybase::dr;    # ====== DRIVER ======
+  use strict;
 
-	sub connect {
-		my ( $drh, $dbase, $user, $auth, $attr ) = @_;
-		my $server = $dbase || $ENV{DSQUERY} || 'SYBASE';
+  sub connect {
+    my ( $drh, $dbase, $user, $auth, $attr ) = @_;
+    my $server = $dbase || $ENV{DSQUERY} || 'SYBASE';
 
-		my ($this) = DBI::_new_dbh(
-			$drh,
-			{
-				'Name'         => $server,
-				'Username'     => $user,
-				'CURRENT_USER' => $user,
-			}
-		);
+    my ($this) = DBI::_new_dbh(
+      $drh,
+      {
+        'Name'         => $server,
+        'Username'     => $user,
+        'CURRENT_USER' => $user,
+      }
+    );
 
-		DBD::Sybase::db::_login( $this, $server, $user, $auth, $attr )
-		  or return undef;
+    DBD::Sybase::db::_login( $this, $server, $user, $auth, $attr )
+      or return undef;
 
-		return $this;
-	}
+    return $this;
+  }
 
-	sub data_sources {
-		my @s;
-		if ( $^O eq 'MSWin32' ) {
-			open( INTERFACES, "$ENV{SYBASE}/ini/sql.ini" ) or return;
-			@s = map { /\[(\S+)\]/i; "dbi:Sybase:server=$1" } grep /\[/i,
-			  <INTERFACES>;
-			close(INTERFACES);
-		}
-		else {
-			open( INTERFACES, "$ENV{SYBASE}/interfaces" ) or return;
-			@s = map { /^(\S+)/i; "dbi:Sybase:server=$1" } grep /^[^\s\#]/i,
-			  <INTERFACES>;
-			close(INTERFACES);
-		}
+  sub data_sources {
+    my @s;
+    if ( $^O eq 'MSWin32' ) {
+      open( INTERFACES, "$ENV{SYBASE}/ini/sql.ini" ) or return;
+      @s = map { /\[(\S+)\]/i; "dbi:Sybase:server=$1" } grep /\[/i,
+        <INTERFACES>;
+      close(INTERFACES);
+    } else {
+      open( INTERFACES, "$ENV{SYBASE}/interfaces" ) or return;
+      @s = map { /^(\S+)/i; "dbi:Sybase:server=$1" } grep /^[^\s\#]/i,
+        <INTERFACES>;
+      close(INTERFACES);
+    }
 
-		return @s;
-	}
+    return @s;
+  }
 }
 
 {
 
-	package DBD::Sybase::db;    # ====== DATABASE ======
-	use strict;
+  package DBD::Sybase::db;    # ====== DATABASE ======
+  use strict;
 
-	use DBI qw(:sql_types);
-	use Carp;
+  use DBI qw(:sql_types);
+  use Carp;
 
-	sub prepare {
-		my ( $dbh, $statement, @attribs ) = @_;
+  sub prepare {
+    my ( $dbh, $statement, @attribs ) = @_;
 
-		# create a 'blank' sth
+    # create a 'blank' sth
 
-		my $sth = DBI::_new_sth( $dbh, { 'Statement' => $statement, } );
+    my $sth = DBI::_new_sth( $dbh, { 'Statement' => $statement, } );
 
-		DBD::Sybase::st::_prepare( $sth, $statement, @attribs )
-		  or return undef;
+    DBD::Sybase::st::_prepare( $sth, $statement, @attribs )
+      or return undef;
 
-		$sth;
-	}
+    $sth;
+  }
 
-	sub tables {
-		my $dbh     = shift;
-		my $catalog = shift;
-		my $schema  = shift || '%';
-		my $table   = shift || '%';
-		my $type    = shift || '%';
-		$type =~ s/[\'\"\s]//g;    # strip quotes and spaces
-		if ( $type =~ /,/ ) {      # multiple types
-			$type = '['
-			  . join( '', map { substr( $_, 0, 1 ) } split /,/, $type ) . ']';
-		}
-		else {
-			$type = substr( $type, 0, 1 );
-		}
-		$type =~ s/T/U/;
+  sub tables {
+    my $dbh     = shift;
+    my $catalog = shift;
+    my $schema  = shift || '%';
+    my $table   = shift || '%';
+    my $type    = shift || '%';
+    $type =~ s/[\'\"\s]//g;    # strip quotes and spaces
+    if ( $type =~ /,/ ) {      # multiple types
+      $type =
+        '[' . join( '', map { substr( $_, 0, 1 ) } split /,/, $type ) . ']';
+    } else {
+      $type = substr( $type, 0, 1 );
+    }
+    $type =~ s/T/U/;
 
-		my $sth;
-		if ( $catalog and $catalog ne '%' ) {
-			$sth =
-			  $dbh->prepare(
+    my $sth;
+    if ( $catalog and $catalog ne '%' ) {
+      $sth =
+        $dbh->prepare(
 "select o.name from $catalog..sysobjects o, $catalog..sysusers u where o.type like '$type' and o.name like '$table' and o.uid = u.uid and u.name like '$schema'"
-			  );
-		}
-		else {
-			$sth =
-			  $dbh->prepare(
+        );
+    } else {
+      $sth =
+        $dbh->prepare(
 "select o.name from sysobjects o, sysusers u where o.type like '$type' and o.name like '$table' and o.uid = u.uid and u.name like '$schema'"
-			  );
-		}
+        );
+    }
 
-		$sth->execute;
-		my @names;
-		my $dat;
-		while ( $dat = $sth->fetch ) {
-			push( @names, $dat->[0] );
-		}
-		@names;
-	}
+    $sth->execute;
+    my @names;
+    my $dat;
+    while ( $dat = $sth->fetch ) {
+      push( @names, $dat->[0] );
+    }
+    @names;
+  }
 
-	# NOTE - RaiseError & PrintError is turned off while we are inside this
-	# function, so we must check for any error, and return immediately if
-	# any error is found.
-	# XXX add optional deadlock detection?
-	sub do {
-		my ( $dbh, $statement, $attr, @params ) = @_;
+  # NOTE - RaiseError & PrintError is turned off while we are inside this
+  # function, so we must check for any error, and return immediately if
+  # any error is found.
+  # XXX add optional deadlock detection?
+  sub do {
+    my ( $dbh, $statement, $attr, @params ) = @_;
 
-		my $sth = $dbh->prepare( $statement, $attr ) or return undef;
-		$sth->execute(@params) or return undef;
-		return undef if $sth->err;
-		if ( defined( $sth->{syb_more_results} ) ) {
-			{
-				while ( my $dat = $sth->fetch ) {
-					return undef if $sth->err;
+    my $sth = $dbh->prepare( $statement, $attr ) or return undef;
+    $sth->execute(@params)                       or return undef;
+    return undef if $sth->err;
+    if ( defined( $sth->{syb_more_results} ) ) {
+      {
+        while ( my $dat = $sth->fetch ) {
+          return undef if $sth->err;
 
-					# XXX do something intelligent here...
-				}
-				redo if $sth->{syb_more_results};
-			}
-		}
-		my $rows = $sth->rows;
+          # XXX do something intelligent here...
+        }
+        redo if $sth->{syb_more_results};
+      }
+    }
+    my $rows = $sth->rows;
 
-		( $rows == 0 ) ? "0E0" : $rows;
-	}
+    ( $rows == 0 ) ? "0E0" : $rows;
+  }
 
-	# This will only work if the statement handle used to do the insert
-	# has been properly freed. Otherwise this will try to fetch @@identity
-	# from a different (new!) connection - which is obviously wrong.
-	sub last_insert_id {
-		my ( $dbh, $catalog, $schema, $table, $field, $attr ) = @_;
+  # This will only work if the statement handle used to do the insert
+  # has been properly freed. Otherwise this will try to fetch @@identity
+  # from a different (new!) connection - which is obviously wrong.
+  sub last_insert_id {
+    my ( $dbh, $catalog, $schema, $table, $field, $attr ) = @_;
 
-		# parameters are ignored.
+    # parameters are ignored.
 
-		my $sth = $dbh->prepare('select @@identity');
-		if ( !$sth->execute ) {
-			return undef;
-		}
-		my $value;
-		($value) = $sth->fetchrow_array;
-		$sth->finish;
+    my $sth = $dbh->prepare('select @@identity');
+    if ( !$sth->execute ) {
+      return undef;
+    }
+    my $value;
+    ($value) = $sth->fetchrow_array;
+    $sth->finish;
 
-		return $value;
-	}
+    return $value;
+  }
 
-	sub table_info {
-		my $dbh     = shift;
-		my $catalog = $dbh->quote(shift);
-		my $schema  = $dbh->quote(shift);
-		my $table   = $dbh->quote(shift);
-		my $type    = $dbh->quote(shift);
+  sub table_info {
+    my $dbh     = shift;
+    my $catalog = $dbh->quote(shift);
+    my $schema  = $dbh->quote(shift);
+    my $table   = $dbh->quote(shift);
+    my $type    = $dbh->quote(shift);
 
-		my $sth = $dbh->prepare("sp_tables $table, $schema, $catalog, $type");
+    # https://github.com/mpeppler/DBD-Sybase/issues/53
+    # sp_tables is broken in ASE 15 and later...
+    #my $sth = $dbh->prepare("sp_tables $table, $schema, $catalog, $type");
+ 
+    my $sth = $dbh->prepare( q{
+          select TABLE_QUALIFIER = db_name()
+               , TABLE_OWNER     = u.name
+               , TABLE_NAME      = o.name
+               , TABLE_TYPE      =
+                   case o.type
+                       when "U" then "TABLE"
+                       when "V" then "VIEW"
+                       when "S" then "SYSTEM TABLE"
+                   end
+               , REMARKS         = NULL
+            from sysobjects o
+              join sysusers   u
+                on u.uid = o.uid
+           where o.type in ('U', 'V', 'S')
+                  and o.id > 99
+             });
+ 
+    $sth->execute;
+    $sth;
+  }
 
-		# Another possibility would be:
-		#           select TABLE_QUALIFIER = NULL
-		#                , TABLE_OWNER     = u.name
-		#                , TABLE_NAME      = o.name
-		#                , TABLE_TYPE      = o.type  -- XXX
-		#                , REMARKS         = NULL
-		#             from sysobjects o
-		#                , sysusers   u
-		#            where o.type in ('U', 'V', 'S')
-		#              and o.uid = u.uid
+  {
 
-		$sth->execute;
-		$sth;
-	}
+    my $names = [
+      qw(TABLE_CAT TABLE_SCHEM TABLE_NAME COLUMN_NAME DATA_TYPE
+        TYPE_NAME COLUMN_SIZE BUFFER_LENGTH DECIMAL_DIGITS
+        NUM_PREC_RADIX NULLABLE REMARKS COLUMN_DEF SQL_DATA_TYPE
+        SQL_DATETIME_SUB CHAR_OCTET_LENGTH ORDINAL_POSITION
+        IS_NULLABLE
+      )
+    ];
 
-	{
+    # Technique of using DBD::Sponge borrowed from DBD::mysql...
+    sub column_info {
+      my $dbh     = shift;
+      my $catalog = $dbh->quote(shift);
+      my $schema  = $dbh->quote(shift);
+      my $table   = $dbh->quote(shift);
+      my $column  = $dbh->quote(shift);
 
-		my $names = [
-			qw(TABLE_CAT TABLE_SCHEM TABLE_NAME COLUMN_NAME DATA_TYPE
-			  TYPE_NAME COLUMN_SIZE BUFFER_LENGTH DECIMAL_DIGITS
-			  NUM_PREC_RADIX NULLABLE REMARKS COLUMN_DEF SQL_DATA_TYPE
-			  SQL_DATETIME_SUB CHAR_OCTET_LENGTH ORDINAL_POSITION
-			  IS_NULLABLE
-			  )
-		];
+      my $sth = $dbh->prepare("sp_columns $table, $schema, $catalog, $column");
+      return undef unless $sth;
 
-		# Technique of using DBD::Sponge borrowed from DBD::mysql...
-		sub column_info {
-			my $dbh     = shift;
-			my $catalog = $dbh->quote(shift);
-			my $schema  = $dbh->quote(shift);
-			my $table   = $dbh->quote(shift);
-			my $column  = $dbh->quote(shift);
+      if ( !$sth->execute() ) {
+        return DBI::set_err( $dbh, $sth->err(), $sth->errstr() );
+      }
+      my @cols;
+      while ( my $d = $sth->fetchrow_arrayref() ) {
+        push( @cols, [ @$d[ 0 .. 11 ], @$d[ 14 .. 19 ] ] );
+      }
+      my $dbh2;
+      if ( !( $dbh2 = $dbh->{'~dbd_driver~_sponge_dbh'} ) ) {
+        $dbh2 = $dbh->{'~dbd_driver~_sponge_dbh'} = DBI->connect("DBI:Sponge:");
+        if ( !$dbh2 ) {
+          DBI::set_err( $dbh, 1, $DBI::errstr );
+          return undef;
+        }
+      }
+      my $sth2 = $dbh2->prepare(
+        "SHOW COLUMNS",
+        {
+          'rows'          => \@cols,
+          'NAME'          => $names,
+          'NUM_OF_FIELDS' => scalar(@$names)
+        }
+      );
+      if ( !$sth2 ) {
+        DBI::set_err( $sth2, $dbh2->err(), $dbh2->errstr() );
+      }
+      $sth2->execute;
+      $sth2;
+    }
+  }
 
-			my $sth =
-			  $dbh->prepare("sp_columns $table, $schema, $catalog, $column");
-			return undef unless $sth;
+  sub primary_key_info {
+    my $dbh     = shift;
+    my $catalog = $dbh->quote(shift);    # == database in Sybase terms
+    my $schema  = $dbh->quote(shift);    # == owner in Sybase terms
+    my $table   = $dbh->quote(shift);
 
-			if ( !$sth->execute() ) {
-				return DBI::set_err( $dbh, $sth->err(), $sth->errstr() );
-			}
-			my @cols;
-			while ( my $d = $sth->fetchrow_arrayref() ) {
-				push( @cols, [ @$d[ 0 .. 11 ], @$d[ 14 .. 19 ] ] );
-			}
-			my $dbh2;
-			if ( !( $dbh2 = $dbh->{'~dbd_driver~_sponge_dbh'} ) ) {
-				$dbh2 = $dbh->{'~dbd_driver~_sponge_dbh'} =
-				  DBI->connect("DBI:Sponge:");
-				if ( !$dbh2 ) {
-					DBI::set_err( $dbh, 1, $DBI::errstr );
-					return undef;
-				}
-			}
-			my $sth2 = $dbh2->prepare(
-				"SHOW COLUMNS",
-				{
-					'rows'          => \@cols,
-					'NAME'          => $names,
-					'NUM_OF_FIELDS' => scalar(@$names)
-				}
-			);
-			if ( !$sth2 ) {
-				DBI::set_err( $sth2, $dbh2->err(), $dbh2->errstr() );
-			}
-			$sth2->execute;
-			$sth2;
-		}
-	}
+    my $sth = $dbh->prepare("sp_pkeys $table, $schema, $catalog");
 
-	sub primary_key_info {
-		my $dbh     = shift;
-		my $catalog = $dbh->quote(shift);    # == database in Sybase terms
-		my $schema  = $dbh->quote(shift);    # == owner in Sybase terms
-		my $table   = $dbh->quote(shift);
+    $sth->execute;
+    $sth;
+  }
 
-		my $sth = $dbh->prepare("sp_pkeys $table, $schema, $catalog");
+  sub foreign_key_info {
+    my $dbh        = shift;
+    my $pk_catalog = $dbh->quote(shift);    # == database in Sybase terms
+    my $pk_schema  = $dbh->quote(shift);    # == owner in Sybase terms
+    my $pk_table   = $dbh->quote(shift);
+    my $fk_catalog = $dbh->quote(shift);    # == database in Sybase terms
+    my $fk_schema  = $dbh->quote(shift);    # == owner in Sybase terms
+    my $fk_table   = $dbh->quote(shift);
 
-		$sth->execute;
-		$sth;
-	}
+    my $sth =
+      $dbh->prepare(
+"sp_fkeys $pk_table, $pk_schema, $pk_catalog, $fk_table, $fk_schema, $fk_catalog"
+      );
 
-	sub foreign_key_info {
-		my $dbh        = shift;
-		my $pk_catalog = $dbh->quote(shift);    # == database in Sybase terms
-		my $pk_schema  = $dbh->quote(shift);    # == owner in Sybase terms
-		my $pk_table   = $dbh->quote(shift);
-		my $fk_catalog = $dbh->quote(shift);    # == database in Sybase terms
-		my $fk_schema  = $dbh->quote(shift);    # == owner in Sybase terms
-		my $fk_table   = $dbh->quote(shift);
+    $sth->execute;
+    $sth;
+  }
 
-		my $sth =
-		  $dbh->prepare(
-"sp_fkeys $pk_table, $pk_catalog, $pk_schema, $fk_table, $fk_catalog, $fk_schema"
-		  );
+  sub statistics_info {
+    my $dbh       = shift;
+    my $catalog   = $dbh->quote(shift);    # == database in Sybase terms
+    my $schema    = $dbh->quote(shift);    # == owner in Sybase terms
+    my $table     = $dbh->quote(shift);
+    my $is_unique = shift;
+    my $quick     = shift;
 
-		$sth->execute;
-		$sth;
-	}
+    my $sth =
+      $dbh->prepare(
+      "sp_indexes \@\@servername, $table, $schema, $catalog, NULL, $is_unique");
 
-	sub statistics_info {
-		my $dbh       = shift;
-		my $catalog   = $dbh->quote(shift);    # == database in Sybase terms
-		my $schema    = $dbh->quote(shift);    # == owner in Sybase terms
-		my $table     = $dbh->quote(shift);
-		my $is_unique = shift;
-		my $quick     = shift;
+    $sth->execute;
+    $sth;
+  }
 
-		my $sth =
-		  $dbh->prepare(
-"sp_indexes \@\@servername, $table, $catalog, $schema, NULL, $is_unique"
-		  );
+  sub ping_pl {    # old code - now implemented by syb_ping() in dbdimp.c
+    my $dbh = shift;
+    return 0 if DBD::Sybase::db::_isdead($dbh);
 
-		$sth->execute;
-		$sth;
-	}
+    # Use "select 1" suggested by Henri Asseily.
+    my $sth = $dbh->prepare("select 1");
 
-	sub ping_pl {    # old code - now implemented by syb_ping() in dbdimp.c
-		my $dbh = shift;
-		return 0 if DBD::Sybase::db::_isdead($dbh);
+    return 0 if !$sth;
 
-		# Use "select 1" suggested by Henri Asseily.
-		my $sth = $dbh->prepare("select 1");
+    my $rc = $sth->execute;
 
-		return 0 if !$sth;
+    # Changed && to || for 1.07.
+    return 0 if ( !defined($rc) || DBD::Sybase::db::_isdead($dbh) );
 
-		my $rc = $sth->execute;
+    $sth->finish;
+    return 1;
+  }
 
-		# Changed && to || for 1.07.
-		return 0 if ( !defined($rc) || DBD::Sybase::db::_isdead($dbh) );
+  # Allows us to cache this data as it is static.
+  my @type_info;
 
-		$sth->finish;
-		return 1;
-	}
+  sub type_info_all {
+    my ($dbh) = @_;
 
-	sub type_info_all {
-		my ($dbh) = @_;
+    if(scalar(@type_info) > 0) {
+      return \@type_info;
+    }
 
    # Calling sp_datatype_info returns the appropriate data for the server that
    # we are currently connected to.
    # In general the data is static, so it's not really necessary, but ASE 12.5
    # introduces some changes, in particular char/varchar max lenghts that depend
    # on the server's page size. 12.5.1 introduces the DATE and TIME datatypes.
-		my $sth = $dbh->prepare("sp_datatype_info");
-		my $data;
-		if ( $sth->execute ) {
-			$data = $sth->fetchall_arrayref;
-		}
-		my $ti = [
-			{
-				TYPE_NAME          => 0,
-				DATA_TYPE          => 1,
-				PRECISION          => 2,
-				LITERAL_PREFIX     => 3,
-				LITERAL_SUFFIX     => 4,
-				CREATE_PARAMS      => 5,
-				NULLABLE           => 6,
-				CASE_SENSITIVE     => 7,
-				SEARCHABLE         => 8,
-				UNSIGNED_ATTRIBUTE => 9,
-				MONEY              => 10,
-				AUTO_INCREMENT     => 11,
-				LOCAL_TYPE_NAME    => 12,
-				MINIMUM_SCALE      => 13,
-				MAXIMUM_SCALE      => 14,
-				sql_data_type      => 15,
-				sql_datetime_sub   => 16,
-				num_prec_radix     => 17,
-				interval_precision => 18,
-			},
-		];
+    my $sth = $dbh->prepare("sp_datatype_info");
+    my $data;
+    if ( $sth->execute ) {
+      $data = $sth->fetchall_arrayref;
+    }
+    my $ti = [
+      {
+        TYPE_NAME          => 0,
+        DATA_TYPE          => 1,
+        PRECISION          => 2,
+        LITERAL_PREFIX     => 3,
+        LITERAL_SUFFIX     => 4,
+        CREATE_PARAMS      => 5,
+        NULLABLE           => 6,
+        CASE_SENSITIVE     => 7,
+        SEARCHABLE         => 8,
+        UNSIGNED_ATTRIBUTE => 9,
+        MONEY              => 10,
+        AUTO_INCREMENT     => 11,
+        LOCAL_TYPE_NAME    => 12,
+        MINIMUM_SCALE      => 13,
+        MAXIMUM_SCALE      => 14,
+        sql_data_type      => 15,
+        sql_datetime_sub   => 16,
+        num_prec_radix     => 17,
+        interval_precision => 18,
+        USERTYPE           => 19
+      },
+    ];
 
-		# ASE 11.x only returns 13 columns:
-		my $c;
-		if ( ( $c = scalar( @{ $data->[0] } ) ) < 19 ) {
-			foreach ( keys( %{ $ti->[0] } ) ) {
-				if ( $ti->[0]->{$_} >= $c ) {
-					delete( $ti->[0]->{$_} );
-				}
-			}
-		}
-		push( @$ti, @$data );
+    # ASE 11.x only returns 13 columns, MS-SQL return 20...
+    my $columnCount = @{ $data->[0] };
+    foreach my $columnName ( keys( %{ $ti->[0] } ) ) {
+      if ( $ti->[0]->{$columnName} >= $columnCount ) {
+        delete( $ti->[0]->{$columnName} );
+      }
+    }
+    push( @$ti, @$data );
 
-		return $ti;
-	}
+    foreach (@$ti) {
+      push(@type_info, $_);
+    }
+    return \@type_info;
+  }
 
-	# First straight port of DBlib::nsql.
-	# mpeppler, 2/19/01
-	# Updated by Merijn Broeren 4/17/2007
-	# This version *can* handle ? placeholders
-	sub nsql {
-		my ( $dbh, $sql, $type, $callback, $option ) = @_;
-		my ( @res, %resbytype );
-		my $retrycount   = $dbh->FETCH('syb_deadlock_retry');
-		my $retrysleep   = $dbh->FETCH('syb_deadlock_sleep') || 60;
-		my $retryverbose = $dbh->FETCH('syb_deadlock_verbose');
-		my $nostatus     = $dbh->FETCH('syb_nsql_nostatus');
+  # First straight port of DBlib::nsql.
+  # mpeppler, 2/19/01
+  # Updated by Merijn Broeren 4/17/2007
+  # This version *can* handle ? placeholders
+  sub nsql {
+    my ( $dbh, $sql, $type, $callback, $option ) = @_;
+    my ( @res, %resbytype );
+    my $retrycount   = $dbh->FETCH('syb_deadlock_retry');
+    my $retrysleep   = $dbh->FETCH('syb_deadlock_sleep') || 60;
+    my $retryverbose = $dbh->FETCH('syb_deadlock_verbose');
+    my $nostatus     = $dbh->FETCH('syb_nsql_nostatus');
 
-		$option = $callback
-		  if ref($callback) eq 'HASH'
-		  and ref($option) ne 'HASH';
-		my $bytype = $option->{bytype} || 0;
-		my $merge = $bytype eq 'merge';
+    $option = $callback if ref($callback) eq 'HASH' and ref($option) ne 'HASH';
+    my $bytype = $option->{bytype} || 0;
+    my $merge  = $bytype eq 'merge';
 
-		my @default_types = (
-			DBD::Sybase::CS_ROW_RESULT(),   DBD::Sybase::CS_CURSOR_RESULT(),
-			DBD::Sybase::CS_PARAM_RESULT(), DBD::Sybase::CS_MSG_RESULT(),
-			DBD::Sybase::CS_COMPUTE_RESULT()
-		);
-		my $oktypes = $option->{oktypes}
-		  || ( $nostatus
-			? [@default_types]
-			: [ @default_types, DBD::Sybase::CS_STATUS_RESULT() ] );
-		my %oktypes = map { ( $_ => 1 ) } @$oktypes;
+    my @default_types = (
+      DBD::Sybase::CS_ROW_RESULT(),   DBD::Sybase::CS_CURSOR_RESULT(),
+      DBD::Sybase::CS_PARAM_RESULT(), DBD::Sybase::CS_MSG_RESULT(),
+      DBD::Sybase::CS_COMPUTE_RESULT()
+    );
+    my $oktypes = $option->{oktypes}
+      || (
+      $nostatus
+      ? [@default_types]
+      : [ @default_types, DBD::Sybase::CS_STATUS_RESULT() ]
+      );
+    my %oktypes = map { ( $_ => 1 ) } @$oktypes;
 
-		my @params = $option->{arglist} ? @{ $option->{arglist} } : ();
+    my @params = $option->{arglist} ? @{ $option->{arglist} } : ();
 
-		if ( ref $type ) {
-			$type = ref $type;
-		}
-		elsif ( not defined $type ) {
-			$type = "";
-		}
+    if ( ref $type ) {
+      $type = ref $type;
+    } elsif ( not defined $type ) {
+      $type = "";
+    }
 
-		my $sth = $dbh->prepare($sql);
-		return unless $sth;
+    my $sth = $dbh->prepare($sql);
+    return unless $sth;
 
-		my $raiserror = $dbh->FETCH('RaiseError');
+    my $raiserror = $dbh->FETCH('RaiseError');
 
-		my $errstr;
-		my $err;
+    my $errstr;
+    my $err;
 
-		# Rats - RaiseError doesn't seem to work inside of this routine.
-		# So we fake it with lots of die() statements.
-		#	$sth->{RaiseError} = 1;
+    # Rats - RaiseError doesn't seem to work inside of this routine.
+    # So we fake it with lots of die() statements.
+    #	$sth->{RaiseError} = 1;
 
-	  DEADLOCK:
-		{
+  DEADLOCK:
+    {
 
-			# Initialize $err before each iteration through this loop.
-			# Otherwise, we inherit the value from the previous failure.
+      # Initialize $err before each iteration through this loop.
+      # Otherwise, we inherit the value from the previous failure.
 
-			$err = undef;
+      $err = undef;
 
-			# ditto for @res, %resbytype
-			@res       = ();
-			%resbytype = ();
+      # ditto for @res, %resbytype
+      @res       = ();
+      %resbytype = ();
 
-			# Use RaiseError technique to throw a fatal error if anything goes
-			# wrong in the execute or fetch phase.
-			eval {
-				$sth->execute(@params) || die $sth->errstr;
-				{
-					my $result_type = $sth->{syb_result_type};
-					my ( @set, $data );
-					if ( not exists $oktypes{$result_type} ) {
-						while ( $data = $sth->fetchrow_arrayref ) {
-							;    # do not include return status rows..
-						}
-					}
-					elsif ( $type eq "HASH" ) {
-						while ( $data = $sth->fetchrow_hashref ) {
-							die $sth->errstr if ( $sth->err );
-							if ( ref $callback eq "CODE" ) {
-								unless ( $callback->(%$data) ) {
-									return;
-								}
-							}
-							else {
-								push( @set, {%$data} );
-							}
-						}
-					}
-					elsif ( $type eq "ARRAY" ) {
-						while ( $data = $sth->fetchrow_arrayref ) {
-							die $sth->errstr if ( $sth->err );
-							if ( ref $callback eq "CODE" ) {
-								unless ( $callback->(@$data) ) {
-									return;
-								}
-							}
-							else {
-								push( @set,
-									( @$data == 1 ? $$data[0] : [@$data] ) );
-							}
-						}
-					}
-					else {
+      # Use RaiseError technique to throw a fatal error if anything goes
+      # wrong in the execute or fetch phase.
+      eval {
+        $sth->execute(@params) || die $sth->errstr;
+        {
+          my $result_type = $sth->{syb_result_type};
+          my ( @set, $data );
+          if ( not exists $oktypes{$result_type} ) {
+            while ( $data = $sth->fetchrow_arrayref ) {
+              ;    # do not include return status rows..
+            }
+          } elsif ( $type eq "HASH" ) {
+            while ( $data = $sth->fetchrow_hashref ) {
+              die $sth->errstr if ( $sth->err );
+              if ( ref $callback eq "CODE" ) {
+                unless ( $callback->(%$data) ) {
+                  return;
+                }
+              } else {
+                push( @set, {%$data} );
+              }
+            }
+          } elsif ( $type eq "ARRAY" ) {
+            while ( $data = $sth->fetchrow_arrayref ) {
+              die $sth->errstr if ( $sth->err );
+              if ( ref $callback eq "CODE" ) {
+                unless ( $callback->(@$data) ) {
+                  return;
+                }
+              } else {
+                push( @set, ( @$data == 1 ? $$data[0] : [@$data] ) );
+              }
+            }
+          } else {
 
-						# If you ask for nothing, you get nothing.  But suck out
-						# the data just in case.
-						while ( $data = $sth->fetch ) { 1; }
+            # If you ask for nothing, you get nothing.  But suck out
+            # the data just in case.
+            while ( $data = $sth->fetch ) { 1; }
 
-	# NB this is actually *counting* the result sets which are not ignored above
-						$res[0]++;    # Return non-null (true)
-					}
+    # NB this is actually *counting* the result sets which are not ignored above
+            $res[0]++;    # Return non-null (true)
+          }
 
-					die $sth->errstr if ( $sth->err );
+          die $sth->errstr if ( $sth->err );
 
-					if (@set) {
-						if ($merge) {
-							$resbytype{$result_type} ||= [];
-							push @{ $resbytype{$result_type} }, @set;
-						}
-						elsif ($bytype) {
-							push @res, { $result_type => [@set] };
-						}
-						else {
-							push @res, @set;
-						}
-					}
+          if (@set) {
+            if ($merge) {
+              $resbytype{$result_type} ||= [];
+              push @{ $resbytype{$result_type} }, @set;
+            } elsif ($bytype) {
+              push @res, { $result_type => [@set] };
+            } else {
+              push @res, @set;
+            }
+          }
 
-					redo if $sth->{syb_more_results};
-				}
-			};
+          redo if $sth->{syb_more_results};
+        }
+      };
 
-			# If $@ is set then something failed in the eval{} call above.
-			if ($@) {
-				$errstr = $@;
-				$err = $sth->err || $dbh->err;
-				if ( $retrycount && $err == 1205 ) {
-					if ( $retrycount < 0 || $retrycount-- ) {
-						carp "SQL deadlock encountered.  Retrying...\n"
-						  if $retryverbose;
-						sleep($retrysleep);
-						redo DEADLOCK;
-					}
-					else {
-						carp "SQL deadlock retry failed ",
-						  $dbh->FETCH('syb_deadlock_retry'),
-						  " times.  Aborting.\n"
-						  if $retryverbose;
-						last DEADLOCK;
-					}
-				}
+      # If $@ is set then something failed in the eval{} call above.
+      if ($@) {
+        $errstr = $@;
+        $err    = $sth->err || $dbh->err;
+        if ( $retrycount && $err == 1205 ) {
+          if ( $retrycount < 0 || $retrycount-- ) {
+            carp "SQL deadlock encountered.  Retrying...\n"
+              if $retryverbose;
+            sleep($retrysleep);
+            redo DEADLOCK;
+          } else {
+            carp "SQL deadlock retry failed ",
+              $dbh->FETCH('syb_deadlock_retry'), " times.  Aborting.\n"
+              if $retryverbose;
+            last DEADLOCK;
+          }
+        }
 
-				last DEADLOCK;
-			}
-		}
+        last DEADLOCK;
+      }
+    }
 
-		#
-		# If we picked any sort of error, then don't feed the data back.
-		#
-		if ($err) {
-			if ($raiserror) {
-				croak($errstr);
-			}
-			return;
-		}
-		elsif ( ref $callback eq "CODE" ) {
-			return 1;
-		}
-		else {
-			if ($merge) {
-				return %resbytype;
-			}
-			else {
-				return @res;
-			}
-		}
-	}
+    #
+    # If we picked any sort of error, then don't feed the data back.
+    #
+    if ($err) {
+      if ($raiserror) {
+        croak($errstr);
+      }
+      return;
+    } elsif ( ref $callback eq "CODE" ) {
+      return 1;
+    } else {
+      if ($merge) {
+        return %resbytype;
+      } else {
+        return @res;
+      }
+    }
+  }
 
-	if ( $DBI::VERSION >= 1.37 ) {
-		*syb_nsql = *nsql;
-	}
+  if ( $DBI::VERSION >= 1.37 ) {
+    *syb_nsql = *nsql;
+  }
 }
 
 {
 
-	package DBD::Sybase::st;    # ====== STATEMENT ======
-	use strict;
+  package DBD::Sybase::st;    # ====== STATEMENT ======
+  use strict;
 
-	sub syb_output_params {
-		my ($sth) = @_;
+  sub syb_output_params {
+    my ($sth) = @_;
 
-		my @results;
-		my $status;
+    my @results;
+    my $status;
 
-		{
-			while ( my $d = $sth->fetch ) {
+    {
+      while ( my $d = $sth->fetch ) {
 
-				# The tie() doesn't work here, so call the FETCH method
-				# directly....
-				if ( $sth->FETCH('syb_result_type') == 4042 ) {
-					push( @results, @$d );
-				}
-				elsif ( $sth->FETCH('syb_result_type') == 4043 ) {
-					$status = $d->[0];
-				}
-			}
-			redo if $sth->FETCH('syb_more_results');
-		}
+        # The tie() doesn't work here, so call the FETCH method
+        # directly....
+        if ( $sth->FETCH('syb_result_type') == 4042 ) {
+          push( @results, @$d );
+        } elsif ( $sth->FETCH('syb_result_type') == 4043 ) {
+          $status = $d->[0];
+        }
+      }
+      redo if $sth->FETCH('syb_more_results');
+    }
 
-		# XXX What to do if $status != 0???
+    # XXX What to do if $status != 0???
 
-		@results;
-	}
+    @results;
+  }
 
-	sub exec_proc {
-		my ($sth) = @_;
+  sub exec_proc {
+    my ($sth) = @_;
 
-		my @results;
-		my $status;
+    my @results;
+    my $status;
 
-		$sth->execute || return undef;
+    $sth->execute || return undef;
 
-		{
-			while ( my $d = $sth->fetch ) {
+    {
+      while ( my $d = $sth->fetch ) {
 
-				# The tie() doesn't work here, so call the FETCH method
-				# directly....
-				if ( $sth->FETCH('syb_result_type') == 4043 ) {
-					$status = $d->[0];
-				}
-			}
-			redo if $sth->FETCH('syb_more_results');
-		}
+        # The tie() doesn't work here, so call the FETCH method
+        # directly....
+        if ( $sth->FETCH('syb_result_type') == 4043 ) {
+          $status = $d->[0];
+        }
+      }
+      redo if $sth->FETCH('syb_more_results');
+    }
 
-		# XXX What to do if $status != 0???
+    # XXX What to do if $status != 0???
 
-		$status;
-	}
+    $status;
+  }
 
 }
 
@@ -2002,7 +1998,7 @@ Manual for more information on the set command and on the arithabort option.
 =item $bool = $dbh->syb_isdead
 
 Tests the connection to see if the connection has been marked DEAD by OpenClient.
-The connection can get marked DEAD if an error occurs on the connection, or the connection fails.
+The connection can get marked DEAD if an error occurs on the connection, or the connection fails.
 
 =back
 

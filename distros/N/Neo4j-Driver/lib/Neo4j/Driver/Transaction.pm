@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.21';
+$Neo4j::Driver::Transaction::VERSION = '0.22';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -65,10 +65,10 @@ sub run {
 sub _prepare {
 	my ($self, $query, @parameters) = @_;
 	
-	croak 'Query cannot be unblessed reference' if ref $query && ! blessed $query;
-	if ($query->isa('REST::Neo4p::Query')) {
+	if (ref $query) {
+		croak 'Query cannot be unblessed reference' unless blessed $query;
 		# REST::Neo4p::Query->query is not part of the documented API
-		$query = '' . $query->query;
+		$query = '' . $query->query if $query->isa('REST::Neo4p::Query');
 	}
 	
 	my $params;
@@ -266,7 +266,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 

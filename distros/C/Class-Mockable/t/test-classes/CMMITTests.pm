@@ -75,7 +75,17 @@ sub wrong_args_subref :Tests(2) {
             { input => sub { $_[0] eq 'foo' } , output => 'foo' },
         ])
     );
+    _wrong_args_subref_tests();
+}
 
+sub get_data_from_file :Tests(2) {
+    CMMITTestClass->_set_test_method(
+        Class::Mock::Method::InterfaceTester->new(\"t/method-tests-in-a-file.dd")
+    );
+    _wrong_args_subref_tests();
+}
+
+sub _wrong_args_subref_tests {
     ok(CMMITTestClass->_test_method('foo') eq 'foo', "correct method call gets right result back (checking with a subref)");
     _check_result(
         CMMIT->WRONG_ARGS,

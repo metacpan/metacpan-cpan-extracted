@@ -1,5 +1,9 @@
 Revision history for Async-Methods
 
+0.000004 - 2021-02-17
+  - use AWAIT_NEW_FAIL instead of AWAIT_FAIL to avoid dropped promises
+  - die if accidentally called as class method via indirect object notation
+
 0.000003 - 2020-04-24
   - Inline Mojo::Promise::Role::Get logic
 

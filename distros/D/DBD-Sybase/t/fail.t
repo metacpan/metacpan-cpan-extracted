@@ -24,11 +24,11 @@ my $dbh = DBI->connect("dbi:Sybase:server=$Srv;database=$Db", $Uid, $Pwd, {Print
 ok(defined($dbh), 'Connect');
 
 if(!$dbh) {
-    warn "No connection - did you set the user, password and server name correctly in PWD?\n";
-    for (4 .. 12) {
-	ok(0);
-    }
-    exit(0);
+  warn "No connection - did you set the user, password and server name correctly in PWD?\n";
+  for (4 .. 12) {
+	  ok(0);
+  }
+  exit(0);
 }
 
 
@@ -48,10 +48,10 @@ $rc = $sth->execute;
 ok(defined($rc), 'Sysusers');
 
 while(my $d = $sth->fetch) {
-    ;
+  ;
 }
 
-$rc = $dbh->do("create table #test(one int not null primary key, two int not null, three int not null check(two != three))");
+$rc = $dbh->do("create table #test(one int not null primary key, two int not null, three int not null, check(two != three))");
 
 ok(defined($rc), 'Create table');
 
@@ -83,7 +83,7 @@ $rc = $sth->execute;
 ok(defined($rc), 'select');
 
 while(my $d = $sth->fetch) {
-    print "@$d\n";
+  print "@$d\n";
 }
 #print "ok 11\n";
 
@@ -96,9 +96,9 @@ insert #test(one, two, three) values (11, 12, 13)
 $rc = $sth->execute;
 ok(defined($rc), 'prepare/execute multi');
 do {
-    while(my $d = $sth->fetch) {
-	print "@$d\n";
-    }
+  while(my $d = $sth->fetch) {
+    print "@$d\n";
+  }
 } while($sth->{syb_more_results});
 
 $dbh->do("drop table #test");

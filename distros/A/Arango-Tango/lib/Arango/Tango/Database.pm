@@ -1,7 +1,7 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::Tango::Database;
-$Arango::Tango::Database::VERSION = '0.013';
+$Arango::Tango::Database::VERSION = '0.015';
 use Arango::Tango::Cursor;
 use Arango::Tango::API;
 
@@ -137,7 +137,7 @@ Arango::Tango::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 USAGE
 
@@ -232,7 +232,7 @@ Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Alberto Simões.
+This software is copyright (c) 2019-2021 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

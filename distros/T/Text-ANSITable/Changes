@@ -1,3 +1,16 @@
+0.602   2021-02-19  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Don't emit color reset sequence \e[0m when not using
+	  color.
+
+	- [doc] Add sections on referring to columns & rows.
+
+	- [doc] Standardize spelling col_name -> colname.
+
+	- [refactor] Standardize spelling of variable row_num -> rownum,
+	  col_num -> colnum.
+
+
 0.601   2020-10-05  Released-By: PERLANCAR; Urgency: medium
 
 	- Add prereqs to ColorThemes::Standard and BorderStyles::Standard

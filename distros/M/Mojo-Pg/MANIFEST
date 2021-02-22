@@ -20,7 +20,6 @@ lib/Mojo/Pg/Migrations.pm
 lib/Mojo/Pg/PubSub.pm
 lib/Mojo/Pg/Results.pm
 lib/Mojo/Pg/Transaction.pm
-lib/SQL/Abstract/Pg.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -45,6 +44,5 @@ t/pod.t
 t/pod_coverage.t
 t/pubsub.t
 t/results.t
-t/sql.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,12 +1,6 @@
-# Test the regex subroutine InKana provided by LJM.
-
-use warnings;
-use strict;
-use Test::More;
-use Lingua::JA::Moji 'InKana';
-use utf8;
-
-binmode STDOUT, ":utf8";
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;binmode STDOUT, ":utf8";
 my $builder = Test::More->builder;
 binmode $builder->output,         ":utf8";
 binmode $builder->failure_output, ":utf8";

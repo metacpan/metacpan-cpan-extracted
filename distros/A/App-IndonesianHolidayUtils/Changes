@@ -1,13 +1,23 @@
-Revision history for App-IndonesianHolidayUtils
+0.060    2021-01-13  Released-By: PERLANCAR; Urgency: medium
 
-0.04    2016-01-18 (PERLANCAR)
+	- Switch to x.yyy versioning.
+
+        - Bump minimum prereq version of Calendar::Indonesia::Holiday to 0.331.
+
+
+0.05    2021-01-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: is-id-holiday.
+
+
+0.04    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.03    2015-09-03 (PERLANCAR)
+0.03    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -16,14 +26,14 @@ Revision history for App-IndonesianHolidayUtils
 	  requirement.
 
 
-0.02    2015-04-28 (PERLANCAR)
+0.02    2015-04-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dzil] Fix inserting list of execs into POD.
 
 
-0.01     2015-04-28 (PERLANCAR)
+0.01     2015-04-28  Released-By: PERLANCAR
 
          - First release, split from Calendar-Indonesian-Holiday dist to reduce
            dependencies in that dist.

@@ -1,8 +1,6 @@
-use warnings;
-use strict;
-use Test::More;
-use utf8;
-use Lingua::JA::Moji 'katakana2syllable';
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;
 use warnings;
 use strict;
 my $builder = Test::More->builder;

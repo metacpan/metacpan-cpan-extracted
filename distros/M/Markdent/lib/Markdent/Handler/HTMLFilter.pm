@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Markdent::CapturedEvents;
 
@@ -26,14 +26,14 @@ sub filter_event {
         HTMLTag
         StartHTMLTag
         EndHTMLTag
-    );
+        );
 
-    $self->handler()->handle_event($event);
+    $self->handler->handle_event($event);
 
     return;
 }
 
-__PACKAGE__->meta()->make_immutable();
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -51,7 +51,7 @@ Markdent::Handler::HTMLFilter - Filters out HTML events from the event stream
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ for HTML entities.
 
 This class provides the following methods:
 
-=head2 Markdent::Handler::HTMLFilter->new()
+=head2 Markdent::Handler::HTMLFilter->new
 
 This method creates a new handler.
 
@@ -98,7 +98,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

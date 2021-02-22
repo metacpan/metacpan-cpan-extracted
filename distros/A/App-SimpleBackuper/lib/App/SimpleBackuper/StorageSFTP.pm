@@ -40,7 +40,7 @@ sub _do {
 				print " (attempt to reconnect failed: $_)";
 			};
 		} else {
-			$self->{sftp}->die_on_error("Can't $method (status=".$self->{sftp}->status.")");
+			$self->{sftp}->die_on_error("Can't $method (@$params) (status=".$self->{sftp}->status.")");
 		}
 	}
 	return \@result;

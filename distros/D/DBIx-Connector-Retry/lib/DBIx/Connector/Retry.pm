@@ -3,7 +3,7 @@ package DBIx::Connector::Retry;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: DBIx::Connector with block retry support
 use version;
-our $VERSION = 'v0.900.1'; # VERSION
+our $VERSION = 'v0.900.2'; # VERSION
 
 use strict;
 use warnings;
@@ -134,6 +134,17 @@ has retry_debug => (
     lazy     => 1,
 );
 
+sub _warn_retry_debug {
+    my $self = shift;
+
+    my $current_attempt_count = $self->failed_attempt_count + 1;
+
+    warn sprintf(
+        'Retrying %s coderef (attempt %d) after caught exception: %s',
+        $self->execute_method, $current_attempt_count, $self->last_exception
+    );
+}
+
 #pod =head2 retry_handler
 #pod
 #pod An optional handler that will be checked on each retry.  It will be passed the Connector
@@ -152,7 +163,9 @@ has retry_debug => (
 #pod         my $err = $c->last_exception;
 #pod         $err = $err->error if blessed $err && $err->isa('DBIx::Connector::RollbackError');
 #pod
-#pod         $err =~ /deadlock|timeout/i;  # only retry on deadlocks or timeouts
+#pod         # only retry on deadlocks or timeouts (only look in the first line
+#pod         # of the error to avoid e.g. accidental matches in a stack trace)
+#pod         $err =~ /^\V*(?:deadlock|timeout)/i;
 #pod     });
 #pod
 #pod Default is an always-true coderef.
@@ -174,6 +187,22 @@ has retry_handler => (
 
 sub clear_retry_handler { shift->retry_handler(sub { 1 }) }
 
+#pod =head2 execute_method
+#pod
+#pod The current L<DBIx::Connector> execution method name being called, which would either be
+#pod C<run> or C<txn>.  Since C<svp> is not overridden, it would never be encountered.  If the
+#pod connector is not in the middle of DB block execution, this attribute is blank.
+#pod
+#pod =cut
+
+has execute_method => (
+    is       => 'ro',
+    isa      => Str,
+    init_arg => undef,
+    writer   => '_set_execute_method',
+    default  => '',
+);
+
 #pod =head2 failed_attempt_count
 #pod
 #pod The number of failed attempts so far.  This can be used in the L</retry_handler> or
@@ -191,12 +220,17 @@ has failed_attempt_count => (
     lazy     => 1,
     trigger  => sub {
         my ($self, $val) = @_;
-        die sprintf (
-            'Reached max_attempts amount of %d, latest exception: %s',
-            $self->max_attempts, $self->last_exception
-        ) if $self->max_attempts <= ( $val || 0 );
+        $self->_die_from_max_attempts if $self->max_attempts <= ( $val || 0 );
     },
 );
+
+sub _die_from_max_attempts {
+    my $self = shift;
+    die sprintf (
+        'Reached max_attempts amount of %d, latest exception: %s',
+        $self->max_attempts, $self->last_exception
+    );
+}
 
 #pod =head2 exception_stack
 #pod
@@ -338,8 +372,10 @@ foreach my $method (qw< run txn >) {
 sub _retry_loop {
     my ($self, $orig, $method, $mode, $cref, $wantarray) = @_;
 
-    $self->_reset_exception_stack;
-    $self->_set_failed_attempt_count(0);
+    # For the purposes of nesting, these variables should be localized.
+    local $self->{exception_stack}      = [];
+    local $self->{failed_attempt_count} = 0;
+    local $self->{execute_method}       = $method;
 
     # If we already started in a transaction, that implies nesting, so don't
     # retry the query.  We can't guarantee that the statements before the block
@@ -382,12 +418,7 @@ sub _retry_loop {
             die $run_err unless $self->retry_handler->($self);
 
             # Debug line
-            warn sprintf(
-                'Retrying %s coderef (attempt %d) after caught exception: %s',
-                $method,
-                $self->failed_attempt_count + 1,
-                $run_err,
-            ) if $self->retry_debug;
+            $self->_warn_retry_debug if $self->retry_debug;
         }
     } while ($run_err);
 
@@ -523,7 +554,7 @@ DBIx::Connector::Retry - DBIx::Connector with block retry support
 
 =head1 VERSION
 
-version v0.900.1
+version v0.900.2
 
 =head1 SYNOPSIS
 
@@ -609,7 +640,9 @@ For example:
         my $err = $c->last_exception;
         $err = $err->error if blessed $err && $err->isa('DBIx::Connector::RollbackError');
 
-        $err =~ /deadlock|timeout/i;  # only retry on deadlocks or timeouts
+        # only retry on deadlocks or timeouts (only look in the first line
+        # of the error to avoid e.g. accidental matches in a stack trace)
+        $err =~ /^\V*(?:deadlock|timeout)/i;
     });
 
 Default is an always-true coderef.
@@ -619,6 +652,12 @@ This attribute has the following handles:
 =head3 clear_retry_handler
 
 Sets it back to the always-true default.
+
+=head2 execute_method
+
+The current L<DBIx::Connector> execution method name being called, which would either be
+C<run> or C<txn>.  Since C<svp> is not overridden, it would never be encountered.  If the
+connector is not in the middle of DB block execution, this attribute is blank.
 
 =head2 failed_attempt_count
 
@@ -799,7 +838,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+This software is Copyright (c) 2018 - 2021 by Grant Street Group.
 
 This is free software, licensed under:
 

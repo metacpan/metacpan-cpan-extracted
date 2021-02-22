@@ -13,6 +13,7 @@ typedef SV PADNAME;
 #  define PadnamelistMAX(pnl)     AvFILLp(pnl)
 
 #  define PadARRAY(p)             AvARRAY(p)
+#  define PadMAX(pad)             AvFILLp(pad)
 #endif
 
 #ifndef av_top_index
@@ -27,12 +28,30 @@ typedef SV PADNAME;
 #  define block_start(a)         Perl_block_start(aTHX_ a)
 #endif
 
+#ifndef cv_clone
+#  define cv_clone(a)            Perl_cv_clone(aTHX_ a)
+#endif
+
 #ifndef intro_my
 #  define intro_my()             Perl_intro_my(aTHX)
 #endif
 
+#ifndef CX_CUR
+#  define CX_CUR() (&cxstack[cxstack_ix])
+#endif
+
+#if HAVE_PERL_VERSION(5, 24, 0)
+#  define OLDSAVEIX(cx)  (cx->blk_oldsaveix)
+#else
+#  define OLDSAVEIX(cx)  (PL_scopestack[cx->blk_oldscopesp-1])
+#endif
+
 #ifndef OpSIBLING
 #  define OpSIBLING(op)  (op->op_sibling)
+#endif
+
+#ifndef OpMORESIB_set
+#  define OpMORESIB_set(op,sib)  ((op)->op_sibling = (sib))
 #endif
 
 #ifndef op_convert_list
@@ -58,4 +77,16 @@ static OP *S_op_convert_list(pTHX_ I32 type, I32 flags, OP *o)
 #    define PARENT_PAD_INDEX_set(sv,val) \
         STMT_START { ((XPVNV*)SvANY(sv))->xnv_u.xpad_cop_seq.xlow = (val); } STMT_END
 #  endif
+#endif
+
+/* On Perl 5.14 this had a different name */
+#ifndef pad_add_name_pvn
+#define pad_add_name_pvn(name, len, flags, typestash, ourstash)  MY_pad_add_name(aTHX_ name, len, flags, typestash, ourstash)
+PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, HV *typestash, HV *ourstash)
+{
+  /* perl 5.14's Perl_pad_add_name requires a NUL-terminated name */
+  SV *namesv = sv_2mortal(newSVpvn(name, len));
+
+  return Perl_pad_add_name(aTHX_ SvPV_nolen(namesv), SvCUR(namesv), flags, typestash, ourstash);
+}
 #endif

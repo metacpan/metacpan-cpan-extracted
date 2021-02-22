@@ -211,7 +211,7 @@ default) or the "assertion" service to retrieve identity attributes.
 
 Use this option with the 'make-req' command to generate a request with a
 non-default value for the 'AssertionConsumerServiceIndex' parameter.  If not
-specified, this value will default to the number 0.
+specified, the ACS used will be the one marked with isDefault="true".
 
 =item B<< --allow-create >>
 

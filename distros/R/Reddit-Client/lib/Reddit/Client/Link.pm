@@ -5,14 +5,100 @@ use warnings;
 use Carp;
 
 require Reddit::Client::VotableThing;
-
+# is_original_content in base class
 use base   qw/Reddit::Client::VotableThing/;
-use fields qw/link_flair_text media url link_flair_css_class num_reports
-              created_utc banned_by subreddit title author_flair_text is_self
-              author media_embed author_flair_css_class selftext domain
-              num_comments clicked saved thumbnail subreddit_id approved_by
-              selftext_html created hidden over_18 permalink morecomments
-		user_reports mod_reports/;
+use fields qw/
+approved_at_utc
+approved_by
+archived
+author
+author_flair_background_color
+author_flair_css_class
+author_flair_richtext
+author_flair_template_id
+author_flair_text
+author_flair_text_color
+author_flair_type
+author_fullname
+author_patreon_flair
+author_premium
+awarders
+banned_at_utc
+banned_by
+brand_safe
+can_gild
+can_mod_post
+category
+clicked
+content_categories
+contest_mode
+created
+created_utc
+crosspost_parent
+discussion_type
+distinguished
+domain
+gilded
+gildings
+hidden
+hide_score
+is_crosspostable
+is_meta
+is_reddit_media_domain
+is_robot_indexable
+is_self
+is_video
+link_flair_background_color
+link_flair_css_class
+link_flair_richtext
+link_flair_template_id
+link_flair_text
+link_flair_text_color
+link_flair_type
+locked
+media
+media_embed
+mod_reports
+morecomments
+num_comments
+num_reports
+over_18
+permalink
+pwls
+quarantine
+removal_reason
+removed
+removed_by
+removed_by_category
+report_reasons
+saved
+secure_media
+selftext
+selftext_html
+send_replies
+spam
+spoiler
+sr_detail
+steward_reports
+stickied
+subreddit
+subreddit_id
+subreddit_name_prefixed
+subreddit_subscribers
+subreddit_type
+suggested_sort
+thumbnail
+thumbnail_height
+thumbnail_width
+title
+total_awards_received
+url
+user_reports
+view_count
+visited
+whitelist_status
+wls
+/;
 
 use constant type => "t3";
 

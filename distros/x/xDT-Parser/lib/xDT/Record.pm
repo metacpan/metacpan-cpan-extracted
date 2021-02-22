@@ -2,22 +2,12 @@ package xDT::Record;
 
 use v5.10;
 use Moose;
-use namespace::autoclean;
 
 use xDT::RecordType;
 
 =head1 NAME
 
 xDT::Record - A xDT record
-
-=head1 VERSION
-
-Version 1.00
-
-=cut
-
-our $VERSION = '1.00';
-
 
 =head1 SYNOPSIS
 
@@ -27,10 +17,10 @@ They provide some methods to acces fields and record type metadata.
     use xDT::Record;
 
     my $record = xDT::Record->new($line);
-    say 'Value: '. $record->getValue();
-    say 'Length: '. $record->getLength();
+    say 'Value: '. $record->get_value();
+    say 'Length: '. $record->get_length();
 
-    my $recordType = $record->getRecordType();
+    my $record_type = $record->get_record_type();
 
 =head1 ATTRIBUTES
 
@@ -44,29 +34,29 @@ has 'length' => (
 	is            => 'ro',
 	isa           => 'Str',
 	required      => 1,
-	reader        => 'getLength',
+	reader        => 'get_length',
 	documentation => q{The length of this records value (there are 2 extra symbols at the end of the string).},
 );
 
-=head2 recordType
+=head2 record_type
 
 This records record type.
 
 =cut
 
-has 'recordType' => (
+has 'record_type' => (
 	is            => 'rw',
 	isa           => 'Maybe[xDT::RecordType]',
 	required      => 1,
-	writer        => 'setRecordType',
-	reader        => 'getRecordType',
+	writer        => 'set_record_type',
+	reader        => 'get_record_type',
 	handles       => {
-		getAccessor  => 'getAccessor',
-		getLabels    => 'getLabels',
-		getId        => 'getId',
-		getType      => 'getType',
-		getMaxLength => 'getLength',
-		isObjectEnd  => 'isObjectEnd',
+		get_accessor   => 'get_accessor',
+		get_labels     => 'get_labels',
+		get_id         => 'get_id',
+		get_type       => 'get_type',
+		get_max_length => 'get_length',
+		is_object_end  => 'is_object_end',
 	},
 	documentation => q{The record type of this record.},
 );
@@ -80,7 +70,7 @@ The value of this record.
 has 'value' => (
 	is            => 'ro',
 	isa           => 'Maybe[Str]',
-	reader        => 'getValue',
+	reader        => 'get_value',
 	documentation => q{The value of this record as string.},
 );
 
@@ -88,64 +78,67 @@ has 'value' => (
 around BUILDARGS => sub {
 	my ($orig, $class, $line) = @_;
 
+	my $value = substr($line, 7);
+	$value =~ s/\s*$//g;
+
 	return $class->$orig(
-		length     => substr($line, 0, 3),
-		recordType => undef,
-		value      => substr($line, 7, -2),
+		length      => substr($line, 0, 3),
+		record_type => undef,
+		value       => $value,
 	);
 };
 
 =head1 SUBROUTINES/METHODS
 
-=head2 getLength
+=head2 get_length
 
 Returns the length of this record.
 
 =cut
 
-=head2 getRecordType
+=head2 get_record_type
 
 Returns the record type of this record.
 
 =cut
 
-=head2 getAccessor
+=head2 get_accessor
 
 Returns the accessor of the records record type.
 
 =cut
 
-=head2 getLabels
+=head2 get_labels
 
 Returns the labels of the records record type.
 
 =cut
 
-=head2 getId
+=head2 get_id
 
 Returns the id of the records record type.
 
 =cut
 
-=head2 getType
+=head2 get_type
 
 Returns the type of the records record type.
 
 =cut
 
-=head2 getMaxLength
+=head2 get_max_length
 
 Returns the maximum length of the records record type.
 
 =cut
 
-=head2 isObjectEnd
+=head2 is_object_end
 
 Checks if the records record type is an end record.
 
 =cut
 
-=head2 getValue
+=head2 get_value
 
 Returns the value of this record.
 
@@ -153,56 +146,7 @@ Returns the value of this record.
 
 =head1 AUTHOR
 
-Christoph Beger, C<< <christoph.beger at imise.uni-leipzig.de> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-xdt-parser at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=xDT-Parser>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc xDT::Record
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=xDT-Parser>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/xDT-Parser>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/xDT-Parser>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/xDT-Parser/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2017 Christoph Beger.
-
-This program is released under the following license: MIT
-
+Christoph Beger, C<< <christoph.beger at medizin.uni-leipzig.de> >>
 
 =cut
 

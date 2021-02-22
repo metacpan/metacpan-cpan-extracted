@@ -86,6 +86,9 @@ new(package, ...)
             case EAV_PARAM_RFC:
                 eav->rfc = SvIV(ST(i+1));
                 break;
+            case EAV_PARAM_UNKNOWN:
+                /* TODO: croak? */
+                break;
             }
         }
 
@@ -120,6 +123,9 @@ setup(self, ...)
                 break;
             case EAV_PARAM_RFC:
                 eav->rfc = SvIV(ST(i+1));
+                break;
+            case EAV_PARAM_UNKNOWN:
+                /* TODO: croak? */
                 break;
             }
         }

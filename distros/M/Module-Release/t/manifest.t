@@ -7,17 +7,13 @@ use Test::Output;
 
 use Cwd;
 
+require 't/lib/setup_common.pl';
+
 my $class = 'Module::Release';
-my $file  = ".releaserc";
-
-use_ok( $class );
-can_ok( $class, 'new' );
-
-BEGIN {
-	use File::Spec::Functions qw(rel2abs catfile);
-	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
-	require $file;
-	}
+subtest setup => sub {
+	use_ok( $class );
+	can_ok( $class, 'new' );
+	};
 
 my @subs = qw(
 	manifest_name files_in_manifest touch_all_in_manifest check_manifest
@@ -61,11 +57,12 @@ my %files = map { $_, 1 } qw(README Changes Makefile.PL Foo.pm);
 END { unlink keys %files }
 
 {
-open my($fh), ">", $release->manifest_name or warn "Could not create $file: $!";
+my $file = $release->manifest_name;
+open my($fh), ">", $file or warn "Could not create $file: $!";
 print $fh "$_\n" for keys %files;
 close $fh;
 
-ok( -e $release->manifest_name, "MANIFEST file is there" );
+ok( -e $file, "MANIFEST file is there" );
 
 my @files = eval { $release->files_in_manifest };
 my $at = $@;
@@ -77,8 +74,7 @@ is( scalar @files, scalar keys %files,
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # create the files in MANIFEST
 {
-foreach my $file ( keys %files )
-	{
+foreach my $file ( keys %files ) {
 	open my($fh), ">", $file or warn "Could not create $file: $!";
 	close $fh;
 	ok( -e $file, "file [$file] exists" );

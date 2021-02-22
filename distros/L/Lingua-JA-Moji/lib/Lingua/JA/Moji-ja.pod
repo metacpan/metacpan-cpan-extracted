@@ -25,7 +25,7 @@ produces output
     アイウエオ
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.58/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.59/examples/synopsis.pl> in the distribution.)
 
 
 Convert between different forms of kana:
@@ -51,13 +51,13 @@ produces output
     ㋐㋑㋒㋓㋔㋕゛ッ㋫゜㋪゜ョン
 
 
-(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.58/examples/syn-kana.pl> in the distribution.)
+(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.59/examples/syn-kana.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.58
-corresponding to git commit L<a3c4e85468fa8096b3e16d5d15082a25fb708ff3|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/a3c4e85468fa8096b3e16d5d15082a25fb708ff3> made on Wed Jan 13 01:15:51 2021 +0900.
+This document describes Lingua::JA::Moji version 0.59
+corresponding to git commit L<be2468e4970005f644414a88bacd3580379a73a1|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/be2468e4970005f644414a88bacd3580379a73a1> made on Thu Feb 18 20:24:17 2021 +0900.
 
 =head1 説明
 
@@ -792,6 +792,25 @@ L</0.53>から
 
 
 
+=head2 strip_sound_marks 
+
+
+
+    use Lingua::JA::Moji 'strip_sound_marks';
+
+
+Strip sound marks from kana, so that for example パン (katakana pan)
+becomes ハン (katakana han).
+
+L</0.59>から
+
+
+
+
+
+
+
+
 
 
 =head1 変体仮名
@@ -1392,7 +1411,7 @@ produces output
     アッタカ〜イ -> アッタカアイ
 
 
-(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.58/examples/onbiki.pl> in the distribution.)
+(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.59/examples/onbiki.pl> in the distribution.)
 
 
 =item L<Lingua::JA::Regular::Unicode>
@@ -1584,6 +1603,10 @@ dakuten and handakuten and some other odd kanji/kana confusions.
 =item 0.58
 
 This added L</kana_consonant>.
+
+=item 0.59
+
+This added L</strip_sound_marks>.
 
 =back
 

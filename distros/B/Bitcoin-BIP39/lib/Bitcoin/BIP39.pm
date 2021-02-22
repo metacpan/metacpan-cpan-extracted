@@ -1,7 +1,9 @@
 package Bitcoin::BIP39;
 
-our $DATE = '2018-01-06'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-09'; # DATE
+our $DIST = 'Bitcoin-BIP39'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -65,7 +67,7 @@ our %args_entropy = (
 
 our %arg_encoding = (
     encoding => {
-        schema => ['str', in=>"hex"],
+        schema => ['str', in=>["hex"]],
         default => 'hex',
     },
 );
@@ -251,7 +253,7 @@ Bitcoin::BIP39 - A BIP39 implementation in Perl
 
 =head1 VERSION
 
-This document describes version 0.002 of Bitcoin::BIP39 (from Perl distribution Bitcoin-BIP39), released on 2018-01-06.
+This document describes version 0.003 of Bitcoin::BIP39 (from Perl distribution Bitcoin-BIP39), released on 2021-01-09.
 
 =head1 DESCRIPTION
 
@@ -309,9 +311,11 @@ C<zh-traditional>.
 
 Mnemonic phrase.
 
+
 =back
 
 Return value:  (any)
+
 
 
 =head2 entropy_to_bip39_mnemonic
@@ -345,9 +349,11 @@ Will retrieve wordlist from C<< WordList::E<lt>LANG_CODEE<gt>::BIP39 >> Perl mod
 For Chinese (simplified), use C<zh-simplified>. For Chinese (traditional), use
 C<zh-traditional>.
 
+
 =back
 
 Return value:  (any)
+
 
 
 =head2 gen_bip39_mnemonic
@@ -376,6 +382,7 @@ Will retrieve wordlist from C<< WordList::E<lt>LANG_CODEE<gt>::BIP39 >> Perl mod
 
 For Chinese (simplified), use C<zh-simplified>. For Chinese (traditional), use
 C<zh-traditional>.
+
 
 =back
 
@@ -409,7 +416,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,13 +4,13 @@
       "Graham TerMarsch (cpan@howlingfrog.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "TAP-Formatter-JUnitREGRU",
    "prereqs" : {
@@ -32,6 +32,7 @@
             "File::Slurp" : "0",
             "Moose" : "0",
             "MooseX::NonMoose" : "0",
+            "TAP::Formatter::JUnit" : "0",
             "TAP::Harness" : "3.12",
             "XML::Generator" : "0"
          }
@@ -40,7 +41,7 @@
    "provides" : {
       "TAP::Formatter::JUnitREGRU" : {
          "file" : "lib/TAP/Formatter/JUnitREGRU.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "TAP::Formatter::JUnitREGRU::Result" : {
          "file" : "lib/TAP/Formatter/JUnitREGRU/Result.pm"
@@ -55,5 +56,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.11"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

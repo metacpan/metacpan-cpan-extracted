@@ -17,7 +17,7 @@
 package App::Phoebe;
 use Modern::Perl;
 use Encode qw(encode_utf8);
-use JSON;
+use Mojo::JSON;
 
 our (@extensions, $log);
 

@@ -1,0 +1,9 @@
+8.76 2021-02-16
+  - Monkey patch Mojo::IOLoop to add class method
+
+8.75 2021-02-15
+  - Fix a few minor release issues from the 8.74 release
+
+8.74 2021-02-14
+  - Release, extracted from Mojolicious as of 8.73
+

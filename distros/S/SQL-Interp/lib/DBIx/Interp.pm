@@ -8,7 +8,7 @@ use base 'DBI';
 use Exporter 'import';
 
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 our %EXPORT_TAGS = (all => [qw(
     attr dbi_interp key_field
@@ -77,7 +77,7 @@ sub new {
         croak 'DBIx::Interp::db::new() not passed database connection';
     }
 
-    my $interp = SQL::Interp->new(($dbh || ()), @_);
+    my $interp = SQL::Interp->new(@_);
     my $self = $dbh;
     bless $self, $class;
     my $private = $self->{$priv} = {};
@@ -86,7 +86,6 @@ sub new {
 
     # weaken circular references to allow garbage collection
     weaken $private->{stx}->{dbx};
-    weaken $private->{interp}->{dbh};
 
     return $self;
 }

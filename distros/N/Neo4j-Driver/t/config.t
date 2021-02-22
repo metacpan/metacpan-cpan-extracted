@@ -167,11 +167,9 @@ subtest 'uris with path/query' => sub {
 
 subtest 'tls' => sub {
 	plan skip_all => "(LWP::Protocol::https unavailable)" unless eval 'require LWP::Protocol::https; 1';
-	plan tests => 6;
-	throws_ok {
-		$d = Neo4j::Driver->new('https://test/')->config(tls_ca => 'foo.');
-		$d->session;
-	} qr/\bfoo\..*\b(?:No such file|does not exist)\b/i, 'create https with tls_ca';
+	plan tests => 7;
+	lives_ok { $d = Neo4j::Driver->new('https://test/')->config(tls_ca => 'foo.'); } 'create https with tls_ca';
+	throws_ok { $d->session; } qr/\bfoo\./, 'https session fails with missing tls_ca file';
 	is $d->{tls_ca}, 'foo.', 'tls_ca';
 	throws_ok {
 		Neo4j::Driver->new('https://test/')->config(tls => 0)->session;

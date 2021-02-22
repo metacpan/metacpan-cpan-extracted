@@ -1,6 +1,15 @@
 CHANGE LOG
 ==========
 
+2021-02-12 - v0.85.0
+--------------------
+
+### Changed
+    - use 'Should', which should speed up performance
+
+### Fixed
+    - use `carp` and don't `croack`; becasue `finish` or `close` are idempotent
+
 2020-07-08 - v0.84.0
 --------------------
 

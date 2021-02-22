@@ -1,5 +1,10 @@
 Revision history for Perl extension DBD::Mock.
 
+1.59 2021-02-22T13:25:52Z
+    - Added error detection for when a result set's callback doesn't return
+      an arrayref or arrayrefs
+    - Moved to GitLab for issue tracking
+
 1.58 2020-11-02T13:34:48Z
     - Added the ability for mock result sets to set custom attributes for
       statement handles. Thanks to Erik Huelsmann for testing the new feature.

@@ -1,5 +1,10 @@
 Alien::Prototype::Window automatically installs the Prototype Window Class
 
+
+*** DEPRECATED *** - DO NOT USE
+
+
+
 Copyright (C) 2007, Graham TerMarsch.  All Rights Reserved.
 
 This is free software; you can redistribute it and/or modify it under the same

@@ -16,7 +16,7 @@ use File::Spec;
 use IPC::Cmd qw(run);
 use Carp;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 my %sections = (
     global => 1,

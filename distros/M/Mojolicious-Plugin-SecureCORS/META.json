@@ -56,7 +56,7 @@
    "provides" : {
       "Mojolicious::Plugin::SecureCORS" : {
          "file" : "lib/Mojolicious/Plugin/SecureCORS.pm",
-         "version" : "v2.0.3"
+         "version" : "v2.0.4"
       }
    },
    "release_status" : "stable",
@@ -71,9 +71,10 @@
          "web" : "https://github.com/powerman/perl-Mojolicious-Plugin-SecureCORS"
       }
    },
-   "version" : "v2.0.3",
+   "version" : "v2.0.4",
    "x_contributors" : [
-      "Veesh Goldman <rabbiveesh@gmail.com>"
+      "Veesh Goldman <rabbiveesh@gmail.com>",
+      "Will Sheppard <1519594+willsheppard@users.noreply.github.com>"
    ],
    "x_serialization_backend" : "JSON::XS version 4.02"
 }

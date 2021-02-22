@@ -1,5 +1,9 @@
 Revision history for Math-AnyNum
 
+0.38    2021-02-21
+
+        - Changed the result of `RATIONAL % INTEGER` to match the output of `ratmod`.
+
 0.37    2021-01-19
 
         - Added the `faulhaber_polynomial(n,x)` function (also aliased as `faulhaber`).

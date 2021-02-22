@@ -76,6 +76,6 @@
          "web" : "https://git.deguest.jp/jack/Module-Generic"
       }
    },
-   "version" : "v0.13.5",
+   "version" : "v0.13.6",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

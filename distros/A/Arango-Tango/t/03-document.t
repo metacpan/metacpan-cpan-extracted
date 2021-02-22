@@ -25,10 +25,13 @@ my $list = $collection->document_paths();
 is ref($list) => "ARRAY" => "List of paths is an array";
 like $list->[0] => qr!/_db/tmp_/_api/document/collection/\d+! => "path looks right";
 
-$collection->create_document( q!{ "Hello" : "World" }! );
+$collection->create_document( q!{ "Hello" : "World", "_key" : "baz" }! );
 $list = $collection->document_paths();
 
 is scalar(@$list), 2;
+
+my $document = $collection->document("baz");
+is ref($document) => "HASH" => "document retrieved correctly";
 
 my $ans = $collection->truncate;
 is $ans->{name}, "collection";

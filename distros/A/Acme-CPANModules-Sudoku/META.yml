@@ -23,7 +23,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Acme-CPANModules-Sudoku/issues
   homepage: https://metacpan.org/release/Acme-CPANModules-Sudoku
   repository: git://github.com/perlancar/perl-Acme-CPANModules-Sudoku.git
-version: '0.001'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

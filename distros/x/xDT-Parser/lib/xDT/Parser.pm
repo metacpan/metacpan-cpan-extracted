@@ -2,11 +2,10 @@ package xDT::Parser;
 
 use v5.10;
 use Moose;
-use namespace::autoclean;
 use FileHandle;
-use Carp;
 
 use xDT::Record;
+use xDT::RecordType;
 use xDT::Object;
 
 =head1 NAME
@@ -15,34 +14,45 @@ xDT::Parser - A Parser for xDT files.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.03
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.03';
 
 
 =head1 SYNOPSIS
 
-Can be used to open xdt files and to iterate over contained objects.
+Can be used to open xdt files and strings, and to iterate over contained objects.
 
     use xDT::Parser;
 
     my $parser = xDT::Parser->new();
     # or
-    my $parser = xDT::Parser->new($configFile);
+    my $parser = xDT::Parser->new(record_type_config => $config);
+    # or
+    my $parser = xDT::Parser->new(
+        record_type_config => xDT::Parser::build_config_from_xml($xml_file)
+    );
+    # or
+    my $parser = xDT::Parser->new(
+        record_type_config => JSON::Parser::read_json($json_file)
+    );
 
-    # A config file must be in XML format and can be used to add
+    # A record type configuration can be provided via xml file or arrayref and can be used to add
     # metadata (like accessor string or labels) to each record type.
 
-    $parser->open($xdtFile);
+    $parser->open(file => $xdt_file);     # read from file
+    # or
+    $parser->open(string => $xdt_string); # read from string
 
-    my $object = $parser->nextObject();
-    # ...
+    while (my $object = $parser->next_object) {  # iterate xdt objects
+        # ...
+    }
 
-    $parser->close();
+    $parser->close(); # close the file handle
 
-=head1 ATTRUBITES
+=head1 ATTRIBUTES
 
 =head2 fh
 
@@ -56,53 +66,82 @@ has 'fh' => (
     documentation => q{The filehandle the parser will use to read xDT data.},
 );
 
-=head2 config
+=head2 record_type_config
 
-The file where configurations of this parser are stored.
+The C<RecordType> configurations.
+
+e.g.:
+
+    [{
+        "id": "0201",
+        "length": "9",
+        "type": "num",
+        "accessor": "bsnr",
+        "labels": {
+            "en": "BSNR",
+            "de": "BSNR"
+        }
+    }]
 
 =cut
 
-has 'configFile' => (
+has 'record_type_config' => (
     is            => 'rw',
-    isa           => 'Maybe[Str]',
-    documentation => q{The file where configurations of this parser are stored.},
+    isa           => 'ArrayRef',
+    documentation => q{Contains configurations for record types.},
 );
 
 
 around BUILDARGS => sub {
-	my $orig  = shift;
-	my $class = shift;
+    my $orig  = shift;
+    my $class = shift;
 
-	if (@_ == 1 && !ref $_[0]) {
-		return $class->$orig(configFile => $_[0]);
-	} else {
-		my %params = @_;
-		return $class->$orig(\%params);
-	}
+    if (@_ == 1) {
+        return $class->$orig(record_type_config => $_[0]);
+    } else {
+        my %params = @_;
+        return $class->$orig(\%params);
+    }
 };
 
 =head1 SUBROUTINES/METHODS
 
-=head1 open($xdtFile)
+=head2 open
 
-Sets the parsers filehandle on this file.
+$parser->open(file => 'example.gdt');
+$parser->open(string => $xdt_string);
+
+Open a file or string with the parser.
+If both file and string are given, the string will be ignored.
 More information about the file format can be found at L<http://search.cpan.org/dist/xDT-RecordType/>.
 
 =cut
 
 sub open {
-    my ($self, $file) = @_;
+    my ($self, %args) = @_;
 
-    croak("Error: provided file '$file' does not exist or is not readable.")
-        unless (-f $file);
+    my $file   = $args{file};
+    my $string = $args{string};
+    my $fh;
 
-    my $fh = FileHandle->new($file, 'r')
-        or croak("Error: could not open filehandle $file.");
-    
+    die 'Error: No file or string argument given to parse xDT.'
+        unless (defined $file or defined $string);
+
+    if (defined $file) {
+        die "Error: Provided file '$file' does not exist or is not readable."
+            unless (-f $file);
+
+        $fh = FileHandle->new($file, 'r')
+            or die "Error: Could not open file handle for '$file'.";
+    } else {
+        $fh = FileHandle->new(\$string, 'r')
+            or die 'Error: Could not open file handle for provided string.';
+    }
+
     $self->fh($fh);
 }
 
-=head1 close
+=head2 close
 
 Closes the parsers filehandle
 
@@ -114,22 +153,62 @@ sub close {
     close $self->fh;
 }
 
-=head1 nextObject
+=head2 next_object
 
-Returns the next object of the xDT file.
+Returns the next object from xDT.
 
 =cut
 
-sub nextObject {
+sub next_object {
     my $self = shift;
-    my $object = xDT::Object->new();
+    my @records;
 
     while (my $record = $self->_next()) {
-        last if ($record->isObjectEnd);
-        $object->addRecord($record);
+        last if ($record->is_object_end);
+        push @records, $record;
+    }
+
+    return undef unless (scalar @records);
+
+    my $object = xDT::Object->new();
+    foreach my $record (@records) {
+        $object->add_record($record);
     }
 
     return $object;
+}
+
+=head2 build_config_from_xml
+
+Extracts metadata for a given record type id from a XML config file, if a file was given.
+Otherwise id and accessor are set to the given id and all other attributes are undef.
+
+XML::Simple must be installed in order to use this method.
+
+Format of the XML config file:
+
+	<RecordTypes>
+		<RecordType id="theId" length="theLength" type="theType" accessor="theAccessor">
+			<label lang="en">TheEnglishLabel</label>
+			<label lang="de">TheGermanLabel</label>
+			<!-- more labels -->
+		</RecordType>
+		<!-- more record types -->
+	</RecordTypes>
+
+=cut
+
+sub build_config_from_xml {
+	my $file = shift;
+
+    return [] unless (length $file);
+
+    use XML::Simple;
+	return XML::Simple->new(
+        KeyAttr    => { label => 'lang' },
+        GroupTags  => { labels => 'label' },
+		ContentKey => '-content',
+	)->XMLin($file)->{RecordType};
 }
 
 sub _next {
@@ -141,9 +220,9 @@ sub _next {
     } while ($line =~ /^\s*$/);
 
     my $record = xDT::Record->new($line);
-    $record->setRecordType(xDT::RecordType->new(
-        configFile => $self->configFile,
-        id         => substr($line, 3, 4)
+    $record->set_record_type(xDT::RecordType::build_from_arrayref(
+        substr($line, 3, 4),
+        $self->record_type_config,
     ));
 
     return $record;
@@ -151,56 +230,7 @@ sub _next {
 
 =head1 AUTHOR
 
-Christoph Beger, C<< <christoph.beger at imise.uni-leipzig.de> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-xdt-parser at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=xDT-Parser>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc xDT::Parser
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=xDT-Parser>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/xDT-Parser>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/xDT-Parser>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/xDT-Parser/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2017 Christoph Beger.
-
-This program is released under the following license: MIT
-
+Christoph Beger, C<< <christoph.beger at medizin.uni-leipzig.de> >>
 
 =cut
 

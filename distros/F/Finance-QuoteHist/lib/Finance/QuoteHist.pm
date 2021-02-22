@@ -10,7 +10,7 @@ use Carp;
 
 use Finance::QuoteHist::Generic;
 
-$VERSION = '1.29';
+$VERSION = '1.30';
 
 my @DEFAULT_ENGINES = qw(
   Finance::QuoteHist::Yahoo
@@ -163,13 +163,12 @@ Matthew P. Sisk, E<lt>F<sisk@mojotoad.com>E<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000-2017 Matthew P. Sisk. All rights reserved. All wrongs
+Copyright (c) 2000-2021 Matthew P. Sisk. All rights reserved. All wrongs
 revenged. This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-Finance::QuoteHist::Generic(3), Finance::QuoteHist::Yahoo(3),
-Finance::QuoteHist::QuoteMedia(3), perl(1).
+Finance::QuoteHist::Generic(3), Finance::QuoteHist::Yahoo(3), perl(1).
 
 =cut

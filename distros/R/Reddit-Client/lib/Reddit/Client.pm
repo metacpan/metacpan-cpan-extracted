@@ -1,23 +1,52 @@
 package Reddit::Client;
 
-our $VERSION = '1.2817';
-# TODO: make ispost, iscomment and get_type static
-# 1.2817-documentation update
-# 1.281 -morecomments get_collapsed args
-# 1.281 -get_collapsed can also return morecomments
-# 1.28  -get_links_by_id
-#		-get_collapsed_comments
-#		-get_comments new version
-#		-MoreComments objects
-#		-added function get_replies to Link
-#       -can change subdomain (www to old or new, etc)
-#       -removed line number message on die. should this be an option instead?
-#		-get_permalink renamed ro get_web_url in Link and Comment
+our $VERSION = '1.3864'; 
+# Needs doc:
+# report, modmail_mute, modmail_action, Modm...->archive, sticky_post
+
+
+# 1.3863 fixed bug in get_subreddit_info that prevented some pages from working
+
+# 1.386 2/19/21
+# updated get_subreddit_info, now takes second arg for specific page
+# added approve_user
+
+# 1.385 11/23/20
+# added modmail_action, ModmConv...->archive
+# 1.384
+# added invite_mod, arg-only version of invite_moderator
+# 1.384 10/11/20 update
+#   added report
+#
+# 1.384 9/29/20 
+#	added modmail_mute
+#	submit_text: field 'text' is no longer required
+#   added more fields to Link
+
+# 1.383 added sticky_post
+
+# next big version can be when we put in the new mute
+# 1.382 (should be big ver?) added friend function - no we didn't
+
+# 1.381 changed default max request from 500 to 100
+# 1.38 7/27/20 
+# 	added ModmailConversation and ModmailMessage classes
+#	added function new_modmail_conversation 
+# 1.375 7/2/20 added sr_detail to Link
+# 1.374 added nsfw option to submit_link
+
+# 1.373 2/3/20 edit now returns the edited thing's  id
+# 1.372 
+# -get_link now gets its links in a proper way, by calling get_links_by_ids and
+#  taking the first element
+# -Link class now has many more keys; should now reflect most or all of the keys
+#  Reddit returns, minus 'downs' and 'ups' because they are deprecated and can
+#  cause confusion
+
 
 $VERSION = eval $VERSION;
 
 use strict;
-use warnings;
 use Carp;
 
 use Data::Dumper   qw/Dumper/;
@@ -25,7 +54,7 @@ use JSON           qw/decode_json/;
 use File::Spec     qw//;
 use Digest::MD5    qw/md5_hex/;
 use POSIX          qw/strftime/;
-use File::Path::Expand qw//;
+#use File::Path::Expand qw//; # Does nothing?
 
 require Reddit::Client::Account;
 require Reddit::Client::Comment;
@@ -34,6 +63,8 @@ require Reddit::Client::SubReddit;
 require Reddit::Client::Request;
 require Reddit::Client::Message;
 require Reddit::Client::MoreComments;
+require Reddit::Client::ModmailConversation;
+require Reddit::Client::ModmailMessage;
 
 #===============================================================================
 # Constants
@@ -124,6 +155,29 @@ use constant API_GET_MODMAIL         => 38;
 use constant API_BAN                 => 39;
 use constant API_MORECHILDREN        => 40;
 use constant API_BY_ID               => 41;
+use constant API_FLAIR               => 42;
+use constant API_DELETEFLAIR         => 43;
+use constant API_UNBAN               => 44;
+use constant API_DISTINGUISH         => 45;
+use constant API_UNDISTINGUISH       => 46;
+use constant API_LOCK                => 47;
+use constant API_UNLOCK              => 48;
+use constant API_MARKNSFW            => 49;
+use constant API_UNMARKNSFW          => 50;
+use constant API_FLAIRTEMPLATE2      => 51;
+use constant API_LINKFLAIRV1         => 52;
+use constant API_LINKFLAIRV2         => 53;
+use constant API_USERFLAIRV1         => 54;
+use constant API_USERFLAIRV2         => 55;
+use constant API_NEW_MM_CONV         => 56;
+use constant API_FRIEND              => 57;
+use constant API_STICKY_POST         => 58;
+use constant API_MM_MUTE             => 59;
+use constant API_REPORT              => 60;
+use constant API_MM_POST_ACTION      => 61;
+use constant API_MM_GET_ACTION       => 62;
+use constant API_SUBINFO             => 63;
+use constant API_ABOUT               => 64;
 
 #===============================================================================
 # Parameters
@@ -134,7 +188,6 @@ our $BASE_URL         = 'https://oauth.reddit.com';
 use constant BASE_URL =>'https://oauth.reddit.com';
 our $LINK_URL         = 'https://www.reddit.com'; # Why are there two of these?
 use constant LINK_URL =>'https://www.reddit.com'; # both are unused now?
-our $UA               = sprintf 'Reddit::Client/%f', $VERSION;
 
 our @API;
 $API[API_ME            ] = ['GET',  '/api/v1/me'              ];
@@ -168,7 +221,8 @@ $API[API_CREATEMULTI   ] = ['POST', '/api/multi/user/%s/m/%s' ];
 $API[API_GETMULTI      ] = ['GET', '/api/multi/user/%s/m/%s%s'];
 $API[API_DELETEMULTI   ] = ['DELETE','/api/multi/user/%s/m/%s'];
 $API[API_EDITMULTI     ] = ['PUT',  '/api/multi/user/%s/m/%s' ];
-$API[API_SUBREDDIT_INFO] = ['GET',  '/r/%s/about'             ];
+$API[API_ABOUT         ] = ['GET',  '/r/%s/about'             ];
+$API[API_SUBINFO       ] = ['GET',  '/r/%s/about/%s'          ];
 $API[API_SEARCH        ] = ['GET',  '/r/%s/search'            ];
 $API[API_MODQ          ] = ['GET',  '/r/%s/about/%s'          ];
 $API[API_EDIT          ] = ['POST', '/api/editusertext'       ];
@@ -179,6 +233,34 @@ $API[API_GET_MODMAIL   ] = ['GET',  '/api/mod/conversations'  ];
 $API[API_BAN           ] = ['POST', '/r/%s/api/friend'        ];
 $API[API_MORECHILDREN  ] = ['GET',  '/api/morechildren'       ];
 $API[API_BY_ID         ] = ['GET',  '/by_id'                  ];
+$API[API_FLAIR         ] = ['POST', '/r/%s/api/flair'         ];
+$API[API_DELETEFLAIR   ] = ['POST', '/r/%s/api/deleteflair'   ];
+$API[API_UNBAN         ] = ['POST', '/r/%s/api/unfriend'      ];
+$API[API_DISTINGUISH   ] = ['POST', '/api/distinguish'        ];
+$API[API_UNDISTINGUISH ] = ['POST', '/api/distinguish'        ];
+$API[API_LOCK          ] = ['POST', '/api/lock'               ]; # fullname 
+$API[API_UNLOCK        ] = ['POST', '/api/unlock'             ]; # only
+$API[API_MARKNSFW      ] = ['POST', '/api/marknsfw'           ]; # these
+$API[API_UNMARKNSFW    ] = ['POST', '/api/unmarknsfw'         ]; # four
+$API[API_FLAIRTEMPLATE2] = ['POST', '/r/%s/api/flairtemplate_v2'];
+$API[API_LINKFLAIRV1   ] = ['GET',  '/r/%s/api/link_flair'    ];
+$API[API_LINKFLAIRV2   ] = ['GET',  '/r/%s/api/link_flair_v2' ];
+$API[API_USERFLAIRV1   ] = ['GET',  '/r/%s/api/user_flair'    ];
+$API[API_USERFLAIRV2   ] = ['GET',  '/r/%s/api/user_flair_v2' ];
+# Read modmail conversation uses GET on the same endpoint
+$API[API_NEW_MM_CONV   ] = ['POST', '/api/mod/conversations'  ];
+$API[API_FRIEND        ] = ['PUT',  '/api/v1/me/friends/%'    ];
+$API[API_STICKY_POST   ] = ['POST', '/api/set_subreddit_sticky']; 
+$API[API_MM_MUTE       ] = ['POST', '/api/mod/conversations/%s/mute'];
+$API[API_REPORT        ] = ['POST', '/api/report'             ];
+$API[API_MM_POST_ACTION] = ['POST', '/api/mod/conversations/%s/%s'];
+
+#POST /api/mod/conversations/:conversation_id/mute
+#conversation_id                 base36 modmail conversation id
+
+#
+#
+
 
 #===============================================================================
 # Class methods
@@ -216,6 +298,7 @@ sub new {
 		 croak "param 'user_agent' is required.";
 	}
 	$self->{user_agent} 	= $param{user_agent};
+	# request_errors does nothing?
 	$self->{request_errors} = $param{print_request_errors} || $param{request_errors} || 0;
 	$self->{print_response} = $param{print_response} || $param{print_response_conent} || 0;
 	$self->{print_request}  = $param{print_request} || 0;
@@ -432,7 +515,8 @@ sub api_json_request {
 
     my $result = $self->json_request($method, $path, $query, $post_data);
 
-    if (exists $result->{errors}) {
+	# This breaks on endpoints that return an array like flairselect v2
+    if (ref $result eq 'HASH' and exists $result->{errors}) {
         my @errors = @{$result->{errors}};
 
         if (@errors) {
@@ -441,7 +525,7 @@ sub api_json_request {
             croak $message;
         }
     }
-
+	# The fuck is this?
     if (defined $callback && ref $callback eq 'CODE') {
         return $callback->($result);
     } else {
@@ -528,7 +612,7 @@ sub popular_subreddits {
 #===============================================================================
 sub get_inbox {
 	my ($self, %param) = @_;
-    	my $limit     	= $param{limit}		|| DEFAULT_LIMIT;
+    my $limit     	= $param{limit}		|| DEFAULT_LIMIT;
 	my $mode	= $param{mode}		|| MESSAGES_INBOX;	
 	my $view	= $param{view}		|| MESSAGES_INBOX;
 
@@ -537,8 +621,8 @@ sub get_inbox {
 	my $query = {};
 	$query->{mark}   = $param{mark} ? 'true' : 'false';
 	$query->{sr_detail} = $param{sr_detail} if $param{sr_detail};
-        $query->{before} = $param{before} if $param{before};
-        $query->{after}  = $param{after}  if $param{after};
+    $query->{before} = $param{before} if $param{before};
+    $query->{after}  = $param{after}  if $param{after};
 	if (exists $param{limit}) { $query->{limit} = $param{limit} || 500; }
 	else 			  { $query->{limit} = DEFAULT_LIMIT;	    }
 	
@@ -548,6 +632,7 @@ sub get_inbox {
 		data	=> $query,
 	);
 
+	#return $result;
 	return [
 		map { Reddit::Client::Message->new($self, $_->{data}) } @{$result->{data}{children}}
 	];
@@ -571,16 +656,33 @@ sub mark_inbox_read {
 # Subreddits and listings
 #===============================================================================
 
+# works section 1:
+# banned, muted, wikibanned, contributors, wikicontributors, moderators, edit, log
+
+# should work but returns undef:
+# rules (uses read), traffic (uses modconfig),
+#
 sub get_subreddit_info {
 	my $self	= shift;
 	my $sub		= shift || croak 'Argument 1 (subreddit name) is required.';
 	$sub = subreddit($sub);
+	my $page    = shift;
+
+	my ($api, $args);
+	if ($page) {
+		$api  = API_SUBINFO;
+		$args = [$sub, $page];
+	} else {
+		$api = API_ABOUT;
+		$args = [$sub];
+	}
 
 	my $result = $self->api_json_request(
-		api 	=> API_SUBREDDIT_INFO,
-		args	=> [$sub],
+		api 	=> $api,
+		args	=> $args,
 	);
-	return $result->{data};
+	#return $result->{data};
+	return $result;
 }
 
 sub info {
@@ -655,26 +757,30 @@ sub find_subreddits {
 }
 
 sub fetch_links {
-    	my ($self, %param) = @_;
-    	my $subreddit = $param{sub} || $param{subreddit} || '';
-    	my $view      = $param{view}      || VIEW_DEFAULT;
+	my ($self, %param) = @_;
+	my $subreddit = $param{sub} || $param{subreddit} || '';
+	my $view      = $param{view}|| VIEW_DEFAULT;
 
 	my $query = $self->set_listing_defaults(%param);
 
-    	$subreddit = subreddit($subreddit);
+	$subreddit = subreddit($subreddit);
 
-    	my $args = [$view];
-    	unshift @$args, $subreddit if $subreddit;
+	my $args = [$view];
+	unshift @$args, $subreddit if $subreddit;
 
-    	my $result = $self->api_json_request(
-        	api      => ($subreddit ? API_LINKS_FRONT : API_LINKS_OTHER),
-        	args     => $args,
-        	data     => $query,
-    	);
+#$API[API_LINKS_OTHER   ] = ['GET',  '/%s'                     ];
+#$API[API_LINKS_FRONT   ] = ['GET',  '/r/%s/%s'                ];
+# this is backwards? front is actually a specific sub, other is front page
+	my $result = $self->api_json_request(
+		api      => ($subreddit ? API_LINKS_FRONT : API_LINKS_OTHER),
+		args     => $args,
+		data     => $query,
+	);
+	#return $result;
 
-    	return [
-        	map { Reddit::Client::Link->new($self, $_->{data}) } @{$result->{data}{children}} 
-    	];
+	return [
+		map { Reddit::Client::Link->new($self, $_->{data}) } @{$result->{data}{children}} 
+	];
 }
 
 sub get_links { # alias for fetch_links to make naming convention consistent
@@ -687,8 +793,7 @@ sub get_links_by_id {
 	die "get_links_by_id: argument 1 (\@fullnames) is required.\n" unless @fullnames;
 	@fullnames = map { fullname($_, 't3') } @fullnames;
 	my $str = join ",", @fullnames;	
-	#my $result = $self->api_json_request(
-	$self->{print_request_on_error} = 1;
+	# what the fuck is this?
 	my $result = $self->json_request('GET', $API[API_BY_ID][1]."/$str");
 
 	return [
@@ -697,14 +802,13 @@ sub get_links_by_id {
 }
 
 sub get_link {
-    	my ($self, $fullname) = @_;
-	croak "expected argument 1: id or fullname" unless $fullname;
+    my ($self, $fullname) = @_;
+	die  "get_link: need arg 1 (id/fullname)" unless $fullname;
 
 	$fullname = fullname($fullname, 't3');
-	my $info = $self->info($fullname);
-	return unless $info;
+	my $result = $self->json_request('GET', $API[API_BY_ID][1]."/$fullname");
 
-	return Reddit::Client::Link->new($self, $info);
+	return Reddit::Client::Link->new($self, $result->{data}{children}[0]{data});
 }
 
 sub get_comment {
@@ -735,7 +839,6 @@ sub get_subreddit_comments {
 	else 			  { $query->{limit} = DEFAULT_LIMIT;	    }
 
 	$subreddit = subreddit($subreddit); # remove slashes and leading r/
-    	#my $args = [$view]; # this did nothing
     	my $args = $subreddit ? [$subreddit] : [];
 
     	my $result = $self->api_json_request(
@@ -744,6 +847,7 @@ sub get_subreddit_comments {
         	data     => $query,
     	);
 
+		#return $result;
 		#return $result->{data}{children}[0]->{data};
     	return [
         	 map {Reddit::Client::Comment->new($self, $_->{data})} @{$result->{data}{children}} 
@@ -755,7 +859,7 @@ sub get_subreddit_comments {
 #=============================================================
 sub remove {
 	my $self = shift;
-	my $fullname = shift || croak "arg 1 (fullname) is required.";
+	my $fullname = shift || die "remove: arg 1 (fullname) is required.\n";
 	
     	my $result = $self->api_json_request(
 		api  => API_REMOVE,
@@ -766,7 +870,7 @@ sub remove {
 # like remove, but sets spam flag
 sub spam {
 	my $self = shift;
-	my $fullname = shift || croak "arg 1 (fullname) is required.";
+	my $fullname = shift || croak "spam: arg 1 (fullname) is required.\n";
 	
     	my $result = $self->api_json_request(
 		api  => API_REMOVE,
@@ -776,7 +880,7 @@ sub spam {
 }
 sub approve {
 	my $self = shift;
-	my $fullname = shift || croak "arg 1 (fullname) is required.";
+	my $fullname = shift || die "approve: arg 1 (fullname) is required.\n";
 	
     	my $result = $self->api_json_request(
 		api  => API_APPROVE,
@@ -786,7 +890,7 @@ sub approve {
 }
 sub ignore_reports {
 	my $self = shift;
-	my $fullname = shift || croak "arg 1 (fullname) is required.";
+	my $fullname = shift || die "ignore_reports: arg 1 (fullname) is required.\n";
 	
 	my $result = $self->api_json_request(
 		api  => API_IGNORE_REPORTS,
@@ -794,18 +898,69 @@ sub ignore_reports {
 	);
 	return $result;
 }
-# ban uses the "modcontributors" oauth scope
+sub lock {
+	my ($self, $fullname, %param) = @_;
+	die "lock: arg 1 (fullname) is required.\n" unless $fullname;
+
+	if (!ispost($fullname) and !iscomment($fullname)) {
+		die "lock: arg 1 must be a fullname of a post or comment.\n";
+	}
+
+	my $lock = exists $param{lock} ? $param{lock} : 1;
+
+	my $result = $self->api_json_request(
+		api	 => $lock ? API_LOCK : API_UNLOCK,
+		data => { id => $fullname },
+	);
+	return $result;
+}
+sub unlock {
+	my ($self, $fullname, %param) = @_;
+	
+	return $self->lock($fullname, lock=>0);
+}
+sub nsfw {
+	my ($self, $fullname, %param) = @_;
+	die "nsfw: arg 1 (fullname) is required.\n" unless $fullname;
+
+	if (!ispost($fullname)) {
+		die "nsfw: arg 1 must be a fullname of a post or comment.\n";
+	}
+
+	my $nsfw = exists $param{nsfw} ? $param{nsfw} : 1;
+
+	my $result = $self->api_json_request(
+		api	 => $nsfw ? API_MARKNSFW : API_UNMARKNSFW,
+		data => { id => $fullname },
+	);
+	return $result;
+}
+sub unnsfw {
+	my ($self, $fullname, %param) = @_;
+	
+	return $self->nsfw($fullname, nsfw=>0);
+}
+# -ban is really a call to friend, which creates relationships between accounts.
+# other functions can call it and pass in a different mode (see functions below)
+# this is to make it just as unreadable as Reddit's endpoint
+# TODO: make this a general fn, call ban from outside like modinvite is
+#
+# -ban uses the "modcontributors" oauth scope EXCEPT:
+#   -moderator and moderator_invite use "modothers"
+#   -wikibanned and wikicontributor require both modcontributors and modwiki
+# https://old.reddit.com/dev/api/#POST_api_friend
+#
 sub ban {
 	my ($self, %param) = @_;
 	my $sub	= $param{sub} || $param{subreddit} || die "subreddit is required\n";
 	
 	my $data = {}; 
-	$data->{name}	= $param{username} || die "username is required\n";
-	# ban_context = fullname, but of what - not required
+	$data->{name} = $param{user} || $param{username} || die "username is required\n";
+	# ban_context = fullname (of what?) - not required
 
 	# Ban message
 	$data->{ban_message} = $param{ban_message} if $param{ban_message};
-	# Reason: matches short report reason
+	# Reason: short report reason
 	if ($param{reason}) { 
 		if (length $param{reason} > 100) {
 			print "Warning: 'reason' longer than 100 characters. Truncating.\n";
@@ -822,20 +977,33 @@ sub ban {
 		$data->{note} = $param{note};
 	}
 
-	# $data->{container} not needed unless mode is friend or enemy
-	if ($param{duration}){
+	if ($param{duration}){ # if 0 this never even hits which we want anyway
 		if ($param{duration} > 999) {
 			print "Warning: Max duration is 999. Setting to 999.\n";
 			$param{duration} = 999;
 		} elsif ($param{duration} < 1) {
-			print "Warning: min duration is 1. Setting to indefinite.\n";
 			$param{duration} = 0;
 		}
 		$data->{duration} = $param{duration} if $param{duration};
 	}
+	# $data->{container} is not needed unless mode is friend or enemy
+	# from docs for unfriend https://old.reddit.com/dev/api/#POST_api_unfriend:
+	# The user can either be passed in by name (nuser) or by fullname (iuser). If type is friend or enemy, 'container' MUST be the current user's fullname; for other types, the subreddit must be set via URL (e.g., /r/funny/api/unfriend)
+	# So what would the arg be? /r/<sub>/api/friend?
+	# Unfriend has its own endpoint too
 	# $data->{permissions} = ?
-	# type: one of (friend, moderator, moderator_invite, contributor, banned, muted, wikibanned, wikicontributor)
-	$data->{type} = 'banned';
+
+	# type is one of (friend, moderator, moderator_invite, contributor, banned, muted, wikibanned, wikicontributor)
+	if ($param{mode} eq 'mute') {
+		$data->{type} = 'muted';
+	} elsif ($param{mode} eq 'contributor') {
+		$data->{type} = 'contributor';
+	} elsif ($param{mode} eq 'moderator_invite') {
+		#print "modinvite\n";
+		$data->{type} = 'moderator_invite';
+	} else {
+		$data->{type} = 'banned';
+	}
 
 	my $result = $self->api_json_request(
 		api  => API_BAN, 
@@ -844,6 +1012,163 @@ sub ban {
 	);
 	return $result;
 }
+
+sub mute {
+	my ($self, %param) = @_;
+	$param{mode} = 'mute';
+	return $self->ban(%param);
+}
+
+sub add_approved_user {
+	my ($self, %param) = @_;
+	$param{mode} = 'contributor';
+	return $self->ban(%param);
+}
+# more sensible version of add_approved_user
+sub approve_user {
+	my ($self, $user, $sub) = @_;
+	my %param;
+	$param{username} = $user || die "approve_user: arg 1 (username) is required.\n";
+	$param{subreddit} = $sub || die "approve_user: arg 2 (sub) is required.\n";
+	$param{mode} = 'contributor';
+	return $self->ban(%param);
+}
+# Requires scope 'modothers'
+sub invite_moderator {
+	my ($self, %param) = @_;
+	$param{mode} = 'moderator_invite';
+	return $self->ban(%param);
+}
+# so we already had a function to do this and we wrote another one
+sub invite_mod {
+	my ($this, $sub, $user) = @_;
+
+	return $this->ban( # excellent naming of that function, bravo
+		user	=> $user,
+		sub		=> $sub,
+		mode	=> 'moderator_invite',
+	);
+}
+
+sub unban {
+	my ($self, %param) = @_;
+	my $sub	= $param{sub} || $param{subreddit} || die "subreddit is required\n";
+	
+	my $data = {}; 
+	$data->{name}	= $param{username} || die "username is required\n";
+	# ban_context = fullname, but of what - not required
+
+	if ($param{mode} eq 'mute') {
+		$data->{type} = 'muted';
+	} else {
+		$data->{type} = 'banned';
+	}
+
+	my $result = $self->api_json_request(
+		api  => API_UNBAN, 
+		args => [$sub],
+		data => $data,
+	);
+	return $result;
+}
+
+sub unmute {
+	my ($self, %param) = @_;
+	$param{mode} = 'mute';
+	return $self->unban(%param);
+}
+
+sub distinguish {
+	my ($self, $fullname, %param) = @_;
+	my $data = {};
+
+	if (!iscomment($fullname) and !ispost($fullname)) {
+		die 'Fullname is required (comment preceeded by "t1_", post "t3_")';
+	}
+
+	if (iscomment($fullname)) {
+		# only top level can be sticky
+		my $sticky = exists $param{sticky} ? $param{sticky} : 0;
+		$data->{sticky} = $sticky ? 'true' : 'false';
+	}
+
+	$data->{id} = $fullname;
+
+
+	$data->{how} = 'yes';
+	# Check manual setting of 'how'. Normal users should never set 'how'.
+	if ($param{how}) {
+		my @valid = qw/yes no admin special/;
+		my $ok;
+		for (@valid) {
+			if ($param{how} eq $_) {
+				$ok = 1;
+				last; # because we have to save potentially TWO CYCLES, right asshole? yeah spend all day on 2 cycles, that's a good use of your time
+			}
+		}
+
+		die "valid values for 'how' are: yes, no, admin, special\n" unless $ok;
+	}
+	
+	my $result = $self->api_json_request(
+		api  => API_DISTINGUISH, 
+		data => $data,
+	);
+	return $result;
+}
+
+sub undistinguish {
+	my ($self, $fullname, %param) = @_;
+	my $data = {};
+
+	if (!iscomment($fullname) and !ispost($fullname)) {
+		die 'Fullname is required (comment preceeded by "t1_", post "t3_")';
+	}
+
+	$data->{id} = $fullname;
+	$data->{how} = 'no';
+
+	my $result = $self->api_json_request(
+		api  => API_UNDISTINGUISH, 
+		data => $data,
+	);
+	return $result;
+}
+
+# https://old.reddit.com/dev/api/#POST_api_report
+# Send a report. Don't know what most of these fields do. made them all optional
+sub report {
+	my ($this, %param) = @_;
+
+	# Nearly all optional until we know what they do lol
+	my $data = {};
+	# is sub required, tho? Not for a sitewide report
+	# required here so we don't accidentally send a sitewide report
+	$data->{custom_text} 	= $param{custom_text} if $param{custom_text};
+	$data->{from_help_desk} = bool($param{from_help_desk}) if exists $param{from_help_desk};
+	$data->{from_modmail} 	= bool($param{from_modmail}) if exists $param{from_modmail};
+
+	$data->{modmail_conv_id}= $param{modmail_conv_id} if $param{modmail_conv_id};
+	$data->{other_reason} 	= $param{other_reason} if $param{other_reason};
+	$data->{reason} 		= $param{reason} if $param{reason};
+	$data->{rule_reason} 	= $param{rule_reason} if $param{rule_reason};
+	$data->{site_reason} 	= $param{site_reason} if $param{site_reason};
+	#$data->{sr_name} 		= $param{sub} || $param{subreddit} || croak "sub or subreddit is required."; # API says sr_name can be 1000 characters?
+	$data->{sr_name} 		= $param{sub}||$param{subreddit} if $param{sub}||$param{subreddit}; 
+	my $id 					= $param{id}||$param{fullname} || croak "fullname (alias id) is required";
+	croak "fullname (alias id) must be a fullname" unless $id =~ /^t[0-9]_/;
+	$data->{thing_id}		= $id;
+	
+	#$data->{strict_freeform_reports} = bool($param{strict_freeform_reports}) if exists $param{strict_freeform_reports};
+	$data->{strict_freeform_reports} = "true"; # see docs
+	$data->{usernames} 		= $param{usernames} if $param{usernames}; # a comma-delimited list
+
+	return $this->api_json_request(
+		api  => API_REPORT, 
+		data => $data,
+	);
+}
+
 sub get_modlinks {
     my ($self, %param) = @_;
 
@@ -876,13 +1201,26 @@ sub get_modqueue {
 	return $self->get_modlinks(%param);
 }
 
+# Get new modmail. This returns metadata and the first message for each conver-
+# sation. Full conversations must be loaded separately with get_conversation
+
 # after: conversation id
 # entity: comma-delimited list of subreddit names
 # limit
 # sort: one of (recent, mod, user, unread)
 # state: one of (new, inprogress, mod, notifications, archived, highlighted, all
+
+# Returns: 
+#  conversationIds, array of conversation IDs
+#  conversations, hash of data about the conversation, keys are conversation IDs
+#   -subject
+#   -numMessages
+#   -state - corresponds to state arg?
+#   -authors, array of hashes of information about each author
+#   -participant, hash of info about the user from the top message?
+#   -owner, hash of info about the sub
 sub get_modmail {
-    	my ($self, %param) = @_;
+    my ($self, %param) = @_;
 
 	my $data	= {};
 	$data->{sort}	= $param{sort} || 'unread';
@@ -901,49 +1239,184 @@ sub get_modmail {
 	);
 	return $result;
 }
-sub get_modmail_raw {
-    	my ($self, %param) = @_;
 
-	my $data	= {};
-	$data->{sort}	= $param{sort} || 'unread';
-	$data->{state}	= $param{state} || 'all';
-	$data->{after}	= $param{after} if $param{after};
-	$data->{limit}	= exists $param{limit} ? ( $param{limit} ? $param{limit} : 500 )  : DEFAULT_LIMIT;
+# GET /api/mod/conversations/:conversation_id
+#   Returns all messages, mod actions and conversation metadata for id
+#     conversation_id   base36 modmail conversation id
+#     markRead          boolean
 
-	my $subs	= $param{entity} || $param{subreddits} || $param{subs};
-	if ($subs) {
-		$subs		= join ",", @$subs if ref $subs eq 'ARRAY';	
-		$data->{entity} = $subs if $subs;
+sub get_conversation {
+	my ($this, $id, %param) = @_;
+
+}
+
+# "This endpoint will create a ModmailConversation object as well as the first ModmailMessage within the ModmailConversation object."
+sub new_modmail_conversation {
+	my ($this, %param) = @_;
+	my $data = {};
+
+	$data->{body} = $param{body} || croak "new_modmail_conversation: body is required.";
+	# Unlike Reddit's functionality, this hides the author name by default
+	my $auth = exists $param{isAuthorHidden} ? $param{isAuthorHidden} : 
+			 ( exists $param{hide_author} ? $param{hide_author} : 1 );
+	#$data->{isAuthorHidden} = exists $param{isAuthorHidden} ? ( $param{isAuthorHidden} ? "true" : "false" ) : "true"; 
+	$data->{isAuthorHidden} = $auth ? "true" : "false"; 
+	$data->{srName}  = $param{subreddit} || $param{sub} || $param{srName} || croak "new_modmail_conversation: subreddit is required (also accepts aliases 'sub' and 'srName')";
+	my $subj = $param{subject} || croak "new_modmail_conversation: subject is required";
+	if (length $subj > 100) {
+		print "new_modmail_conversation: subject truncated to 100 characters.\n";
+		$subj = substr $subj, 0, 100;
 	}
-	my $result = $self->api_json_request(
-		api	=> API_GET_MODMAIL,
-		data	=> $data,
+	$data->{subject} = $subj;
+
+	# users only or can subreddit be target?
+	$data->{to} = $param{to} || croak "new_modmail_conversation: fullname is required.";
+	#$fullname = fullname 
+	# body, isAuthorHidden, srName, subject=100 chars, to=fullname
+	# documentation is WRONG. to is not a fullname, it's just a username
+	my $result = $this->api_json_request(
+		api	 => API_NEW_MM_CONV,
+		data => $data, 
 	);
+	if (ref $result eq 'HASH') {
+		return new Reddit::Client::ModmailConversation($this, $result->{conversation}, $result->{messages}, $result->{modActions});
+	}
 	return $result;
+}
+
+sub sticky_post {
+	my ($this, $id, %opt) = @_;
+	my $data = {};
+	# docs say id but maybe they mean fullname
+	$id = fullname($id, 't3') || die "sticky_post: arg 1 (id) is required.\n";
+	$data->{id} = $id;
+
+	if ($opt{num}) {
+		if ($opt{num} =~ /^[1234]$/) {
+			$data->{num} = $opt{num};
+		} else {
+			print "sticky_post: option 'num' must be an integer from 1-4. Unsetting.\n";
+		}
+	}
+	
+	$data->{state} = exists $opt{sticky} ? ($opt{sticky} ? "true" : "false") : "true";
+	$data->{to_profile} = exists $opt{to_profile} ? ($opt{to_profile} ? "true" : "false") : "false";
+
+	return $this->api_json_request(
+		api	 => API_STICKY_POST,
+		data => $data, 
+	);
+
+}
+
+#=============================================================
+# New modmail functions
+# most use the same URL format so we should make a central function
+
+# Sub for many modmail actions
+# these actions take no args, just the action
+# TODO: call these from ModmailConversation
+sub modmail_action {
+	my ($this, $action, $id) = @_;
+	croak "args 1 and 2 (action and id) are required" unless $action and $id;
+	$action = lc $action;
+
+	# Choose MM_POST_ACTION or MM_GET_ACTION
+	# POST: bulk_read, approve (?), archive, disapprove (?), highlight,
+	# unarchive, unban, unmute
+
+	# POST: read and unread take single arg
+
+	# POST: mute takes hours, has own function
+	# POST: temp_ban takes duration, support elsehwere
+
+	# only hightlight uses DELETE, not supporting
+	my @post_actions = qw/bulk_read approve archive disapprove highlight unarchive unban unmute /;
+	my $api;
+	for (@post_actions) {
+		if ($action eq $_) { 
+			$api = API_MM_POST_ACTION;
+ 			last; 
+		}
+	}
+	croak "'$action' is not a recognized action. only POST actions are implemented at this time." unless $api;
+
+
+	return $this->api_json_request(
+		api	 => $api,
+		args => [$id, $action],
+	);
+}
+
+
+# num_hours                               one of (72, 168, 672)
+sub modmail_mute {
+	my ($this, $id, $length) = @_;
+	$length ||= 72;
+
+	# We should accept days too
+	if ($length == 3 or $length == 7 or $length == 28) {
+		$length *= 24;
+	} elsif ($length != 72 and $length != 168 and $length != 672) {
+		die "arg 2 (length) must be 3, 7, or 28 days (or 72, 168, or 672 hours)\n";
+	} 
+
+	my $data = { num_hours => $length };
+	my $args = [ $id ];
+
+	return $this->api_json_request(
+		api	 => API_MM_MUTE,
+		args => $args,
+		data => $data, 
+	);
 }
 
 #=============================================================
 # Users
 #=============================================================
-sub get_user {
-    	my ($self, %param) = @_;
-	my $view	= $param{view} || 'overview';
-	my $user	= $param{user} || croak "expected 'user'";
+sub get_user { 
+	#my ($self, %param) = @_;
+	#$user	= $param{user} || $param{username} || croak "expected 'user'";
+	#$view	= $param{view} || 'overview';
+	my $self = shift;
+	my ($user, $view, %param);
 
-	my $query = $self->set_listing_defaults(%param);
+	# old ver: user=>$user, view=>$view
+	# what if someone passes in another key?
+	# this fails with unpredictable results lol
 
-    	my $args = [$user, $view];
+	# even elements = old way, odd = new way
+	my $odd = scalar(@_) % 2;
+	if (!$odd or $_[0] eq 'user' or $_[0] eq 'username' or $_[0] eq 'view') {
+		print "This form of get_user is deprecated. A future version will take the following simplified argument structure: get_user(\$username, \%params)\n";
+		%param = @_;
+		$user  = $param{user} || $param{username} || croak "expected 'user'";
+	} else {
+	# new ver: $user, %params
+		$user = shift;
+		%param= @_;
+	}
 
+	$view	= $param{view} || 'overview';
+
+	# This can accept limit as data? are all GET string args sent as data?
+	my $data = $self->set_listing_defaults(%param);
+
+    my $args = [$user, $view];
+
+	# $API[API_USER          ] = ['GET',  '/user/%s/%s'             ];
+	# view is different here; would need third arg, 'sort=new' 
+	# /user/TheUser/submitted?sort=new
 	my $result = $self->api_json_request(
 		api      => API_USER,
 		args     => $args,
-		data     => $query,
+		data     => $data,
 	);
 
 	if ($view eq 'about') {
-		#return $result->{data};
 		return Reddit::Client::Account->new($self, $result->{data});
 	}
+
 	return [
 		map {
 
@@ -954,22 +1427,6 @@ sub get_user {
 
 		@{$result->{data}{children}} 
 	];
-}
-# Remember that this will return a new hash and any key not from here will be
-# wuped out
-sub set_listing_defaults {
-    	my ($self, %param) = @_;
-	my $query = {};
-    	$query->{before} = $param{before} if $param{before};
-    	$query->{after}  = $param{after}  if $param{after};
-	$query->{only}   = $param{only}   if $param{only};
-	$query->{count}  = $param{count}  if $param{count};
-	$query->{show}	 = 'all' 	  if $param{show} or $param{show_all};
-	$query->{sr_detail} = 'true' 	  if $param{sr_detail};
-   	if (exists $param{limit}) { $query->{limit} = $param{limit} || 500; }
-	else 			  { $query->{limit} = DEFAULT_LIMIT;	    }
-	
-	return $query;
 }
 #===============================================================================
 # Change posts or comments
@@ -990,7 +1447,7 @@ sub edit {
 		api	=> API_EDIT,
 		data	=> $data,
 	);
-	return $result;
+	return $result->{data}{things}[0]{data}{name};
 }
 
 sub delete {
@@ -1002,7 +1459,7 @@ sub delete {
     	DEBUG('Delete post/comment %s', $name);
 
     	my $result = $self->api_json_request(api => API_DEL, data => { id => $name });
-    	return 1;
+    	return $result;
 }
 
 #===============================================================================
@@ -1015,8 +1472,9 @@ sub submit_link {
     my $subreddit = $param{subreddit} || $param{sub} || '';
     my $title     = $param{title}     || croak 'Expected "title"';
     my $url       = $param{url}       || croak 'Expected "url"';
-    my $replies = exists $param{inbox_replies} ? ($param{inbox_replies} ? "true" : "false") : "true";
-    my $repost = exists $param{repost} ? ($param{repost} ? "true" : "false") : "false";
+    my $replies   = exists $param{inbox_replies} ? ($param{inbox_replies} ? "true" : "false") : "true";
+    my $repost    = exists $param{repost} ? ($param{repost} ? "true" : "false") : "false";
+	my $nsfw      = exists $param{nsfw} ? ($param{nsfw} ? "true" : "false") : "false";
 
     DEBUG('Submit link to %s: %s', $subreddit, $title, $url);
 
@@ -1029,6 +1487,7 @@ sub submit_link {
         kind        => SUBMIT_LINK,
 		sendreplies => $replies,
 		resubmit    => $repost,
+		nsfw		=> $nsfw,
     });
 
     return $result->{data}{name};
@@ -1064,7 +1523,7 @@ sub submit_text {
     my ($self, %param) = @_;
     my $subreddit = $param{subreddit} || $param{sub} || die "expected 'subreddit'\n";
     my $title     = $param{title}     || croak 'Expected "title"';
-    my $text      = $param{text}      || croak 'Expected "text"';
+    my $text      = $param{text}      || "";#croak 'Expected "text"';
     # true and false have to be the strings "true" or "false"
     my $replies = exists $param{inbox_replies} ? ($param{inbox_replies} ? "true" : "false") : "true";
 
@@ -1077,23 +1536,140 @@ sub submit_text {
         text     => $text,
         sr       => $subreddit,
         kind     => SUBMIT_SELF,
-	sendreplies=>$replies,
+		sendreplies=>$replies,
     });
 
     return $result->{data}{name};
 }
-# This could go in the user section or here, but it seems like it will be
+# These could go in the user section or here, but it seems like it will be
 # more commonly used for flairing posts
-sub set_post_flair {
-    	my ($self, %param) = @_;
-	my $sub 	= $param{subreddit} || croak "Expected 'subreddit'";
-	my $post_id 	= $param{post_id} || croak "Need 'post_id'";
-	my $flairid	= $param{flair_template_id} || croak "need 'flair template id'";
+sub template {
+   	my ($self, %param) = @_;
+	my $data = {}; # POST data
+	my $url_arg;   # arguments that get interpolated into the URL
+	
+	my $result = $self->api_json_request(
+		api		=> API_FLAIR,
+		args	=> [$url_arg],
+		data	=> $data
+	);
+}
+
+# flair a post, not using an existing template, just manually providing the
+# text and CSS class 
+sub flair_post {
+   	my ($self, %param) = @_;
+	my $link_fullname = $param{link_id} || $param{post_id} || die "flair_post: need 'link_id'\n";
+	$link_fullname = fullname($link_fullname, 't3');
+	my $subreddit = $param{sub} || $param{subreddit} || die "flair_post: need 'subreddit'\n";
+	# Initializing $text to '' here was accidentally preventing a concatenation
+	# warning from Request
+	my $text = $param{text} ? substr($param{text}, 0, 64) : '';
+	my $css_class = $param{css_class}; # optional
+
+	my $data = { link => $link_fullname };
+	$data->{text} = $text if $text;
+	$data->{css_class} = $css_class if $css_class;
+
+	my $result = $self->api_json_request(
+		api		=> API_FLAIR,
+		args	=> [$subreddit],
+		data	=> $data
+	);
+}
+sub flair_link {
+   	my ($self, %param) = @_;
+	return $self->flair_post(%param);
+}
+
+# flair a user, not using an existing template, just manually providing the
+# text and CSS class 
+sub flair_user {
+   	my ($self, %param) = @_;
+	my $username = $param{username} || die "flair_user: need 'link_id'\n";
+	my $text = $param{text} ? substr($param{text}, 0, 64) : '';
+	my $css_class = $param{css_class}; #optional
+	my $subreddit = $param{sub} || $param{subreddit} || die "flair_user: need 'subreddit'\n";
+
+	my $data = { name => $username };
+	$data->{text} = $text if $text;
+	$data->{css_class} = $css_class if $css_class;
+
+	my $result = $self->api_json_request(
+		api		=> API_FLAIR,
+		args	=> [$subreddit],
+		data	=> $data
+	);
+
+}
+
+sub set_post_flair { # select_flair alias
+#sub select_flair {
+    my ($self, %param) = @_;
+	#return $self->set_post_flair(%param);
+	return $self->select_flair(%param);
+}
+# select_flair can apply flair which appears styled in multi views (such as
+# r/all, your homepage, and both kinds of multis).
+# Flair applied through other methods has no style in multi views.
+#								view sub newred | sub oldred | multi view
+#	Apply manually new reddit				x						x
+#	API										x						x
+#	Automod applies							x			x!			x
+#
+# -New reddit and multis always ignore CSS class
+# -Old reddit will have the new style IF it is applied by Automod and IF it has
+# no css_class. Otherwise it uses old styles like usual.
+#	-If a css_class is added by any means, old reddit will lose new styles.
+#   -If you alter the flair in any way through either the old or new interface,
+#    old reddit will lose the new style. 
+#   -If text is altered with flair_link, old reddit will lose new styles.
+# - Multi view (same as r/all view) seems to show whatever new reddit does.
+# - text_color and background_color seem to have no effect on anything.
+#
+# Flair will use values from the flair selection as defaults. Some can only be
+# set through the new interface or the API.
+#
+# It looks like flair templates with a background_color attempt to hard code the
+# background color - that is, they use style="" tags. There is no way to do this
+# with old reddit, only API and new. The override_css option in /r/api/flairtemplate2 may be related. 
+#sub set_post_flair { # select_flair alias
+sub select_flair {
+   	my ($self, %param) = @_;
+	my $errmsg  = "select_flair: 'subreddit' and 'flair_template_id' (or alias 'flair_id') are required.\n";
+	my $sub 	= $param{sub} || $param{subreddit} || die $errmsg;
+	my $flairid	= $param{flair_template_id} || $param{flair_id} || die $errmsg;
+	my $post_id	= $param{link_id} || $param{post_id};
+
+	# This doesn't use LINK_FLAIR or USER_FLAIR, it watches for link id or usern
+	if (!$post_id and !$param{username}) {
+		die "select_flair: either 'link_id' or 'username' is required.\n";
+	} elsif ($post_id) {
+		$post_id = fullname($post_id, 't3');
+	}
+
+	my $textcol = $param{text_color};
+	# putting an actual color here will be a common mistake
+	if ($textcol) {
+		$textcol = lc $textcol;
+		if ($textcol ne 'light' and $textcol ne 'dark') {
+			die "select_flair: if provided, text_color must be 'light' or 'dark'.\n";
+		}
+	}
+
 	my $data	= {};
 
-	if (!$self->ispost($post_id)) { $post_id = "t3_".$post_id; }
-	$data->{link} = $post_id;
+	$data->{background_color} = $param{background_color} if $param{background_color};
+	$data->{css_class} = $param{css_class} if $param{css_class};
 	$data->{flair_template_id} = $flairid;
+	$data->{link} = $post_id if $post_id;
+	$data->{name} = $param{username} if $param{username};
+	$data->{return_rtjson} = $param{return_rtjson} if $param{return_rtjson};
+	$data->{text_color} = $textcol if $textcol;
+	# if given empty string Reddit ignores the parameter-- i.e. you can't do 
+	# tricks like invisibly flair something, like you could with v1
+	# Also passing undef here gives a concatenation error in Request
+	$data->{text} = $param{text} || '';
 
 	my $result = $self->api_json_request(
 		api 	=> API_SELECTFLAIR,
@@ -1101,13 +1677,18 @@ sub set_post_flair {
 		data	=> $data
 	);
 
-	#return @{$result->{data}{children}};
+	return $result;
+}
+sub select_user_flair {
+    my ($self, %param) = @_;
+	return $self->set_user_flair(%param);
 }
 sub set_user_flair {
+	my $errmsg  = "select_user_flair: keys 'subreddit', 'username', and 'flair_template_id' (or alias 'flair_id') are required.\n";
     	my ($self, %param) = @_;
-	my $sub 	= $param{subreddit} || croak "Expected 'subreddit'";
-	my $user 	= $param{username} || croak "Need 'username'";
-	my $flairid	= $param{flair_template_id} || croak "need 'flair template id'";
+	my $sub 	= $param{subreddit} || die $errmsg;
+	my $user 	= $param{username} || die $errmsg;
+	my $flairid	= $param{flair_template_id} || $param{flair_id} || die $errmsg;
 	my $data	= {};
 
 	$data->{name} = $user;
@@ -1119,28 +1700,27 @@ sub set_user_flair {
 		data	=> $data
 	);
 
-	#return @{$result->{data}{children}};
+	return $result;
 }
 
 # Return a hash reference with keys 'choices' and 'current'
 # 'choices' is array of hashes with flair options
 # 'current' is the post's current flair
 sub get_flair_options {
-    	my ($self, %param) = @_;
-	my $sub 	= $param{subreddit} || croak "Expected 'subreddit'";
-	my $post_id = $param{post_id};
+   	my ($self, %param) = @_;
+	my $sub 	= $param{sub} || $param{subreddit} || die "get_flair_options: 'subreddit' (or alias 'sub') is required.\n";
+	my $post_id = $param{link_id} || $param{post_id};
 	my $user	= $param{username};
 	my $data	= {};
 
 	if ($post_id) {
-		if (!$self->ispost($post_id)) { $post_id = "t3_".$post_id; }
+		$post_id = fullname($post_id, 't3');
 		$data->{link} = $post_id;
 	} elsif ($user) {
 		$data->{user} = $user;
 	} else {
-		croak "Need 'post_id' or 'username'";
+		die "get_flair_options: Need 'post_id' or 'username'";
 	}
-
 
 	my $result = $self->api_json_request(
 		api 	=> API_FLAIROPTS,
@@ -1148,6 +1728,7 @@ sub get_flair_options {
 		data	=> $data,
 	);
 
+	# What's this? Fixing the booleans?
 	if ($result->{choices}) {
 		for (my $i=0; $result->{choices}[$i]; $i++) {
 			$result->{choices}[$i]->{flair_text_editable} = $result->{choices}[$i]->{flair_text_editable} ? 1 : 0;
@@ -1155,6 +1736,92 @@ sub get_flair_options {
 		}
 	}
 
+	return $result;
+}
+sub get_link_flair_options { # v2: default now
+	my $self = shift;
+	my $sub  = shift || die "get_link_flair_options: Need arg 1 (subreddit)\n";
+
+	my $result = $self->api_json_request(
+		api 	=> API_LINKFLAIRV2,
+		args 	=> [$sub],
+	);
+	return $result;
+}
+sub get_link_flair_options_v1 { # v1
+	my $self = shift;
+	my $sub  = shift || die "get_link_flair_options: Need arg 1 (subreddit)\n";
+
+	my $result = $self->api_json_request(
+		api 	=> API_LINKFLAIRV1,
+		args 	=> [$sub],
+	);
+	return $result;
+}
+sub get_user_flair_options { # v2: default now
+	my $self = shift;
+	my $sub  = shift || die "get_link_flair_options: Need arg 1 (subreddit)\n";
+
+	my $result = $self->api_json_request(
+		api 	=> API_USERFLAIRV2,
+		args 	=> [$sub],
+	);
+	return $result;
+}
+sub get_user_flair_options_v1 { # v1
+	my $self = shift;
+	my $sub  = shift || die "get_link_flair_options: Need arg 1 (subreddit)\n";
+
+	my $result = $self->api_json_request(
+		api 	=> API_USERFLAIRV1,
+		args 	=> [$sub],
+	);
+	return $result;
+}
+# uses flairtemplate_v2 endpoint, which is for new but works for old
+sub flairtemplate {
+   	my ($self, %param) = @_;
+	my $sub 	= $param{sub} || $param{subreddit} || die "flairtemplate: 'subreddit' (or alias 'sub') is required.\n";
+	my $bg 		= $param{background_color} if $param{background_color};
+	my $flairid	= $param{flair_template_id} || $param{flair_id} || $param{id} || undef;
+	#my $type 	= $param{flair_type} || die $err;
+	my $modonly = exists $param{mod_only} ? ($param{mod_only} ? 'true' : 'false') : 'false';
+	my $editable= exists $param{text_editable} ? ($param{text_editable} ? 'true' : 'false') : 'false';
+	my $textcol = $param{text_color};
+	# putting an actual color here will be a common mistake
+	if ($textcol) {
+		$textcol = lc $textcol;
+		if ($textcol ne 'light' and $textcol ne 'dark') {
+			die "flairtemplate: if provided, text_color must be one of (light, dark).\n";
+		}
+	}
+	# override_css is undocumented and not returned by get_link_flair_options
+	# $override is unused here as yet
+	#my $override= exists $param{override_css} ? ($param{override_css}   ? 'true' : 'false') : 'false'; 
+
+	if ($bg and substr($bg, 0, 1) ne '#') { $bg = "#$bg"; } #requires hash
+
+	my $data = {};
+	$data->{allowable_content} = $param{allowable_content} if $param{allowable_content};
+	$data->{background_color} = $bg if $bg;
+	$data->{css_class} = $param{css_class} if $param{css_class};
+	$data->{max_emojis} = $param{max_emojis} if $param{max_emojis};
+	# No documentation; presumably required for editing
+	$data->{flair_template_id} = $flairid if $flairid;
+	# api defaults to USER_FLAIR, we default to LINK_FLAIR
+	$data->{flair_type} = $param{flair_type} || 'LINK_FLAIR';
+	$data->{mod_only} = $modonly if exists $param{mod_only};
+	# No documentation. Probably wants "true or "false".
+	$data->{override_css} = $param{override_css} if $param{override_css};
+	$data->{text} = $param{text} if $param{text};
+	$data->{text_color} = $textcol if $textcol;
+	$data->{text_editable} = $editable if exists $param{text_editable};
+
+	my $result = $self->api_json_request(
+		api 	=> API_FLAIRTEMPLATE2,
+		args 	=> [$sub],
+		data	=> $data,
+	);
 	return $result;
 }
 
@@ -1302,7 +1969,7 @@ sub submit_comment {
 	# the replies option, it does nothing
     #my $replies = exists $param{inbox_replies} ? ($param{inbox_replies} ? "true" : "false") : "true";
 
-    croak '$fullname must be a post or comment' if !$self->ispost($parent_id) && !$self->iscomment($parent_id);
+    croak '$fullname must be a post or comment' if !ispost($parent_id) && !iscomment($parent_id);
     DEBUG('Submit comment under %s', $parent_id);
 
     my $result = $self->api_json_request(api => API_COMMENT, data => {
@@ -1311,7 +1978,7 @@ sub submit_comment {
 		#sendreplies=>$replies,
     });
 
-    return $result->{data}{things}[0]{data}{id};
+    return $result->{data}{things}[0]{data}{name};
 }
 
 sub comment {
@@ -1352,7 +2019,7 @@ sub vote {
     my ($self, $name, $direction) = @_;
     defined $name      || croak 'Expected $name';
     defined $direction || croak 'Expected $direction';
-    croak '$fullname must be a post or comment' if !$self->ispost($name) && !$self->iscomment($name);
+    croak '$fullname must be a post or comment' if !ispost($name) && !iscomment($name);
     croak 'Invalid vote direction' unless "$direction" =~ /^(-1|0|1)$/;
     DEBUG('Vote %d for %s', $direction, $name);
     $self->api_json_request(api => API_VOTE, data => { dir => $direction, id  => $name });
@@ -1365,7 +2032,7 @@ sub vote {
 sub save {
     my $self = shift;
     my $name = shift || croak 'Expected $fullname';
-    croak '$fullname must be a post or comment' if !$self->ispost($name) && !$self->iscomment($name);
+    croak '$fullname must be a post or comment' if !ispost($name) && !iscomment($name);
     DEBUG('Save %s', $name);
     $self->api_json_request(api => API_SAVE, data => { id => $name });
 }
@@ -1373,7 +2040,7 @@ sub save {
 sub unsave {
     my $self = shift;
     my $name = shift || croak 'Expected $fullname';
-    croak '$fullname must be a post or comment' if !$self->ispost($name) && !$self->iscomment($name);
+    croak '$fullname must be a post or comment' if !ispost($name) && !iscomment($name);
     DEBUG('Unsave %s', $name);
     $self->api_json_request(api => API_UNSAVE, data => { id => $name });
 }
@@ -1381,7 +2048,7 @@ sub unsave {
 sub hide {
     my $self = shift;
     my $name = shift || croak 'Expected $fullname';
-    croak '$fullname must be a post' if !$self->ispost($name);
+    croak '$fullname must be a post' if !ispost($name);
     DEBUG('Hide %s', $name);
     $self->api_json_request(api => API_HIDE, data => { id => $name });
 }
@@ -1389,7 +2056,7 @@ sub hide {
 sub unhide {
     my $self = shift;
     my $name = shift || croak 'Expected $fullname';
-    croak '$fullname must be a post' if !$self->ispost($name);
+    croak '$fullname must be a post' if !ispost($name);
     DEBUG('Unhide %s', $name);
     $self->api_json_request(api => API_UNHIDE, data => { id => $name });
 }
@@ -1449,6 +2116,7 @@ sub create_multi {
         	if (ref $param{subreddits} ne 'ARRAY') { croak "'subreddits' must be an array reference."; }
 
 		$model->{subreddits} = [ map { { name=> $_ } } @{$param{subreddits}} ];
+		#print Dumper($model->{subreddits});
 	}
 
 	# Put a ribbon on it
@@ -1506,7 +2174,7 @@ sub get_origin {
 # Strip the type portion of a filname (i.e. t3_), if it exists
 sub id {
 	my $id	= shift;
-	$id 	=~ s/^[tT]\d_//;
+	$id 	=~ s/^t\d_//;
 	return $id;
 }
 # accept id or fullname, always return fullname
@@ -1516,21 +2184,22 @@ sub fullname {
 	$id = $type."_".$id if substr($id, 0, 3) ne $type."_";
 	return $id;
 }
-
-sub ispost { # todo: make this static function
-	my ($self, $name) = @_;
-    	my $type = substr $name, 0, 2;
+sub bool {
+	return shift ? "true" : "false";
+}
+sub ispost { 
+	my $name = shift;
+    my $type = substr $name, 0, 2;
 	return $type eq 't3';
 }
-
-sub iscomment { # todo: make this static
-	my ($self, $name) = @_;
-    	my $type = substr $name, 0, 2;
+sub iscomment {
+	my $name = shift;
+    my $type = substr($name, 0, 2);
 	return $type eq 't1';
 }
-sub get_type { # ditto
-	my ($self, $name) = @_;
-    	return lc substr $name, 0, 2;
+sub get_type { 
+	my $name = shift;
+    return lc substr($name, 0, 2) if $name;
 }
 sub DEBUG {
     if ($DEBUG) {
@@ -1559,6 +2228,25 @@ sub subreddit {
     }
 }
 
+# Remember that this returns a new hash and any key not from here will be
+# wiped out
+sub set_listing_defaults {
+   	my ($self, %param) = @_;
+	my $query = {};
+   	$query->{before} = $param{before} if $param{before};
+   	$query->{after}  = $param{after}  if $param{after};
+	$query->{only}   = $param{only}   if $param{only};
+	$query->{count}  = $param{count}  if $param{count};
+	$query->{show}	 = 'all' 	      if $param{show} or $param{show_all};
+	$query->{sort}   = $param{sort}   if $param{sort};
+	$query->{sr_detail} = 'true' 	  if $param{sr_detail};
+																#  500?
+   	if (exists $param{limit}) { $query->{limit} = $param{limit} || 100; }
+	else                      { $query->{limit} = DEFAULT_LIMIT;        }
+	
+	return $query;
+}
+
 1;
 
 __END__
@@ -1573,29 +2261,27 @@ Reddit::Client - A Perl wrapper for the Reddit API.
 
 Reddit::Client handles Oauth session management and HTTP communication with Reddit's external API. For more information about the Reddit API, see L<https://github.com/reddit/reddit/wiki/API>. 
 
-=head1 SYNOPSIS
+=head1 EXAMPLE
 
     use Reddit::Client;
     
-    my $client_id   = "DFhtrhBgfhhRTd";
-    my $secret      = "KrDNsbeffdbILOdgbgSvSBsbfFs";
-    
-    # Create a Reddit::Client object and authorize in one step: "script" app
+    # Create a Reddit::Client object and authorize: "script"-type app
     my $reddit = new Reddit::Client(
         user_agent  => "Test script 1.0 by /u/myusername",
-        client_id   => $client_id,
-        secret      => $secret,
+        client_id   => "client_id_string",
+        secret      => "secret_string",
         username    => "reddit_username",
         password    => "reddit_password",
     );
     
-    # Create a Reddit::Client object and authorize in one step: "web" app
+    # Create a Reddit::Client object and authorize: "web"-type app
+    # Authorization can also be done separately with get_token()
     my $reddit = new Reddit::Client(
         user_agent    => "Test script 1.0 by /u/myusername",
-        client_id     => $client_id,
-        secret        => $secret,
+        client_id     => "client_id_string",
+        secret        => "secret_string",
         refresh_token => "refresh_token",
-    );	
+    );
     
     # Check your inbox
     my $me = $reddit->me();
@@ -1611,12 +2297,12 @@ Reddit::Client handles Oauth session management and HTTP communication with Redd
     # Get posts from a subreddit or multi
     my $posts = $reddit->get_links(subreddit=>'test', limit=>5);
     
-    foreach my $post (@$posts) {
+    for my $post (@$posts) {
         print $post->{is_self} ? $post->{selftext} : $post->{url};
         print $post->get_web_url();
 
         if ($post->{title} =~ /some phrase/) {
-            $post->reply("hi, I'm a bot");
+            $post->reply("hi, I'm a bot, oops I'm banned already, harsh");
         }
     }
 
@@ -1628,19 +2314,25 @@ Reddit::Client uses Oauth to communicate with Reddit. To get Oauth keys, visit y
 
 =item Script apps
 
-Most users will want a "script"-type app. This is an app intended for personal use that uses a username and password to authenticate. The I<description> and I<about url> fields can be empty, and the I<redirect URI> can be any valid URL (script apps don't use them). Once created, you can give other users permission to use it by adding them in the "add developer" field. (They each use their own username and password to authenticate.)
+Most new users will want a "script"-type app. This is an app intended for personal use that uses a username and password to authenticate. The I<description> and I<about url> fields can be empty, and the I<redirect URI> can be any valid URL (script apps don't use them). Once created, you can give other users permission to use it by adding them in the "add developer" field. Each account uses its own username and password to authenticate.
 
 Use the app's client id and secret along with your username and password to create a L<new|https://metacpan.org/pod/Reddit::Client#new> Reddit::Client object.
 
 =item Web apps
 
-As of v1.20, Reddit::Client also supports "web" apps. These are apps that can take actions on behalf of any user that grants them permission. (If you have ever seen a permission screen for a Reddit app that says "SomeRedditApp wants your permission to...", that's a web app.)
+As of v1.20, Reddit::Client also supports "web"-type apps. These are apps that can take actions on behalf of any user that grants them permission. (They use the familiar "ThisRedditApp wants your permission to..." screen.)
 
-While they are fully supported, there is not yet a setup guide, so getting one running is left as an exercise for the reader. You will need a web server, which you will use to direct users to Reddit's authorization page, which will get the user's permission to do whatever the app has asked to do. It will then redirect the user back to the app's I<redirect URI>. This process generates a refresh token, which is a unique string that your app will use to authenticate instead of a username and password. You will probably want to store refresh tokens locally, otherwise you will have to get permission from the user every time the app runs.
+While they are fully supported, there is not yet a setup guide, so getting one running is left as an exercise for the reader. You will need a web server, which you will use to direct users to Reddit's authorization page, where the user will be asked to grant the app permissions. Reddit's authorization page will then redirect the user back to the app's redirect URI. This process generates a refresh token, which is a unique string that your app will use to authenticate instead of a username and password. You will probably want to store refresh tokens locally, otherwise you will have to get permission from the user every time the app runs.
 
 Documentation for the web app flow can be found at L<https://github.com/reddit-archive/reddit/wiki/OAuth2>.
 
 =back
+
+=head1 V1 vs. V2
+
+v1 is "old" Reddit (the one you see if you use the subdomain old.reddit.com), v2 new (the one you see with new.reddit.com). Reddit's API has some endpoints that are for one or the other. This guide has labeled most of the v2 functions as such, but some may be missing. (Both labels and functions. Or rather: some functions are definitely missing, and some labels I<may> be missing.)
+
+When in doubt, use v2. It's usually the same as v1 but with more options, like flair, which can have extra colors and styles in New Reddit.
 
 =head1 TERMINOLOGY
 
@@ -1648,33 +2340,33 @@ Reddit's API is slightly inconsistent in its naming. To avoid confusion, this gu
 
 =over
 
-=item fullname
-
-A thing's complete ID with prefix. Example: t1_3npkj4. Whe Reddit returns data, the fullname is usually found in the "name" field. The type of thing can be determined by the prefix; for example, t1 for comments and t3 for links.
-
 =item id
 
 A thing's short ID without prefix. Example: 3npkj4. Seen in your address bar when viewing, for example, a post or comment. 
+
+=item fullname
+
+A thing's complete ID with prefix. Example: t1_3npkj4. When Reddit returns data, the fullname is usually found in the "name" field. The type of thing can be determined by the prefix; for example, t1 for comments and t3 for links.
 
 =back
 
 =head1 LISTINGS
 
-Methods that return listings can accept several optional parameters:
+Lists of things returned by the Reddit API are called I<listings>. Endpoints that return listings accept several optional parameters:
 
 =over
 
-C<limit>: Integer. How many things to return. Default 25, maximum 100. If I<limit> is present but false, this is interpreted as "no limit" and the maximum is returned.
-
-C<before>: Fullname. Return results that occur before I<fullname> in the listing. 
+C<limit>: Integer. How many things to return. Default 25, maximum 100. If I<limit> is 0, this is interpreted as "no limit" and the maximum is returned.
 
 C<after>: Fullname. Return results that occur after I<fullname> in the listing.
 
-C<count>: Integer. Appears to be used by the Reddit website to number listings after the first page. Listings returned by the API are not numbered, so it does not seem to have a use in the API.
+C<before>: Fullname. Return results that occur before I<fullname> in the listing. 
 
-C<only>: The string "links" or "comments". Return only links or only comments. Only relevant to listings that could contain both.
+C<only>: The string "links" or "comments". Return only links or only comments. (Obviously only relevant to listings that could contain both.)
 
 C<show_all>: Boolean. Return items that would have been omitted, for example posts you have hidden, or have reported, or are hidden from you because you are using the option to hide posts after you've upvoted/downvoted them. Default false.
+
+C<count>: Integer. Appears to be used by the Reddit website to number listings after the first page. Listings returned by the API are not numbered, so it does not seem to have a use in the API.
 
 =back
 
@@ -1682,9 +2374,20 @@ Note that 'before' and 'after' mean before and after I<in the listing>, not nece
 
 =head1 MISC
 
-All functions that take the parameter 'subreddit' also accept the alias 'sub'.
+Most functions that take the parameter C<subreddit> also accept the alias C<sub>, likewise for C<username> and C<user>.
 
-This guide indicates optional arguments with brackets ([]), a convention we borrowed from from PHP's online manual. This creates some slight overlap with Perl's brackets, which are used to indicate an anonymous array reference, however which of the two is intended should be clear from the context.
+Optional arguments are indicated by a hard-coded default value:
+
+    function ( $required, $optional = 'default_value' )
+
+Most methods accept options as a hash, after normal arguments (and sometimes replacing them). These may be provided as an actual hash, or with C<key =<gt> value> shorthand.
+    
+    function ( $required, %options ) # as an actual hash
+    function ( $required, option2 => 'default_value' ) # with hash shorthand
+
+Required options are indicated as a scalar. 
+
+    function ( option1 => $is_required, option2 => 'is_optional' )
 
 =head1 METHODS
 
@@ -1696,22 +2399,28 @@ This guide indicates optional arguments with brackets ([]), a convention we borr
 
 Approve a comment or post (moderator action).
 
+=item approve_user
+
+    approve_user ( $username, $subreddit )
+
+Add an approved user to a subreddit (moderator action). Replaces deprecated function add_approved_user.
+
 =item ban
 
     ban ( username => $username, subreddit => $subreddit,
-        [ duration => $duration, ] [ ban_message => $message, ] [ reason => $reason, ] [ note => $note ] )
+          duration => 0, ban_message => undef, reason => undef, note => undef )
 
-Ban a user from a subreddit. C<username> and C<subreddit> are required. Optional arguments include:
+Ban a user from a subreddit. C<username> and C<subreddit> are required. Optional arguments:
 
 =over
 
 C<duration>: Duration in days. Range 1-999. If false or not provided, the ban is indefinite.
 
-C<ban_message>: The message sent to the banned user. (Markdown is allowed.)
+C<ban_message>: The message sent to the banned user. Markdown is allowed.
 
-C<reason>: A short ban reason (100 characters max). On the website ban page, this matches the ban reason you would select from the dropdown menu. It is arbitrary: it doesn't have to match up with the reasons from the menu and can be blank. Only visible to moderators.
+C<reason>: A short ban reason, 100 characters max. On the website ban page, this in equivalent to the ban reason you would select from the dropdown menu. (For example, "Spam".) It is arbitrary: it doesn't have to match up with the reasons from the menu and can be blank. Only visible to moderators.
 
-C<note>: An optional note, 300 characters max. Only visible to moderators. Will be concatenated to the `reason` on the subreddit's ban page.
+C<note>: An optional note, 300 characters max. Only visible to moderators. Will be concatenated to the `reason` on the subreddit's ban page. 
 
 =back
 
@@ -1721,19 +2430,18 @@ A ban will overwrite any existing ban for that user. For example, to change the 
 
     comment ( $fullname, $text )
 	
-Make a comment under C<$fullname>, which must be either a post or a comment. Return the fullname of the new comment.
-
-This function is an alias for C<submit_comment>, and is equivalent to
-
-    submit_comment ( parent_id => $fullname, text => $text )
+Make a comment under C<$fullname>, which must be a post or a comment. Return the fullname of the new comment.
 	
 =item create_multi
 
     create_multi ( name => $multi_name, 
-                 [ description => $description, ] [ visibility => $visibility, ] [ subreddits => [ subreddits ], ]
-                 [ icon_name => $icon_name, ] [ key_color => $hex_code, ] [ weighting_scheme => $weighting_scheme, ] )
+                   description => undef, visibility => 'private', subreddits => [ ],
+                   icon_name => undef, key_color => 'CEE3F8', weighting_scheme => undef, 
+                   username => undef )
 
-Create a multireddit. The only required argument is the name. A multi can also be created with C<edit_multi>, the only difference being that C<create_multi> will fail with a HTTP 409 error if a multi with that name already exists.
+Create a multireddit. The only required argument is the name. A multi can also be created with C<edit_multi>, the only difference being that C<create_multi> will fail with a HTTP 409 error if a multi with that name already exists. As of March 2019, trying to add a banned sub to a multi will fail with a 403 Unauthorized. 
+
+Requires a username, which script apps have by default, but if you're using a web app, you'll need to either pass it in explicitly, or set the username property on your Reddit::Client object. 
 
 Returns a hash of information about the newly created multireddit.
 
@@ -1773,24 +2481,38 @@ Delete a post or comment.
 	
 Delete a multireddit.
 
+=item distinguish
+
+    distinguish ( $fullname, sticky => 0, how => 'yes' )
+
+Distinguish a comment or post (moderator action). Options:
+
+=over
+
+C<sticky> Distinguish and sticky a comment. Only works for top-level comments.
+
+C<how> This option should probably be left untouched. Valid values are "yes", "no", "admin", "special". Admin is for Reddit admins only; the rest are unexplained.
+
+=back
+
 =item edit
 
     edit ( $fullname, $text )
 	
-Edit a text post or comment. Unlike on the website, C<$text> can be an empty string, although to prevent accidental wipeouts it must be defined.
+Edit a text post or comment. Unlike on the website, C<$text> can be an empty string. (It must be defined but can be a false value.)
 
 =item edit_multi
 
-Edit a multireddit. Will create a new multireddit if one with that name doesn't exist. The arguments are identical to [create_multi](#create_multi).
+Edit a multireddit. Will create a new multireddit if one with that name doesn't exist. The arguments are identical to L<create_multi|https://metacpan.org/pod/Reddit::Client#create_multi>.	
 
 =item edit_wiki
 
-    edit_wiki ( subreddit => $subreddit, page => $page, content => $content,
-              [ previous => $previous_version_id, ] [ reason => $edit_reason, ] )
+    edit_wiki ( subreddit => $subreddit, page => $page, 
+                content => '', previous => undef, reason => undef )
+
+subreddit and page are required. Optional:
 
 =over
-	
-C<page> is the page being edited.
 
 C<content> is the new page content. Can be empty but must be defined. Maximum 524,288 characters.
 
@@ -1798,36 +2520,86 @@ C<reason> is the edit reason. Max 256 characters, will be truncated if longer. O
 
 C<previous> is the ID of the intended previous version of the page; if provided, that is the version the page will be rolled back to in a rollback. However, there's no way to find out what this should be from the Reddit website, or currently from Reddit::Client either. Use it only if you know what you're doing.
 
+Note that if you are updating your sub's automod (which you can do using the page "config/automoderator"), and it has syntax errors, it will fail with the message "HTTP 415 Unsupported Media Type".
+
 =back
 
 =item find_subreddits
 
-    find_subreddits ( q => $query, [ sort => 'relevance', ]  )
+    find_subreddits ( q => $query, sort => 'relevance' )
 
 Returns a list of Subreddit objects matching the search string C<$query>. Optionally sort them by C<sort>, which can be "relevance" or "activity".
 
-=item get_collapsed_comments
+=item flair_link
 
-    get_collapsed_comments ( link_id => $link_id, children => $children,
-                           [ limit_children => 0, ] [ sort => $sort, ] )
+    flair_link ( subreddit => $subreddit, link_id => $link_id_or_fullname, 
+                 text => undef, css_class => undef )
 
-Expand a list of collapsed comments found in a MoreComments object. Return a flat list of Comment objects.
+Flair a post with arbitrary text and css class. 
+
+C<text> and C<css_class> are optional. If not provided, they will remove the existing text and/or css class. One advantage of doing this through the API (as opposed to the Reddit website) is that a css class can be applied with no text at all, not even an empty string. This allows you to have automoderator react to a thread or user in ways that are completely invisible to users.
 
 =over
 
-C<link_id> is the ID of the link the comments are under. 
+C<css_class> can be anything; it does not have to match an existing flair template. To select a flair template from the sub's list of flair, use L<select_post_flair|https://metacpan.org/pod/Reddit::Client#select_post_flair>.
 
-C<children> is a reference to an array containing the comment IDs. 
-
-If C<limit_children> is true, return only the requested comments, not replies to them. Otherwise return as many replies as possible (possibly resulting in more MoreComments objects down the line).
-
-C<sort> is one of 'confidence', 'top', 'new', 'controversial', 'old', 'random', 'qa', 'live'. Default seems to be 'confidence'.
+C<text> will be truncated to 64 characters if longer.
 
 =back
 
+=item flair_post
+
+Alias for flair_link.
+
+=item flair_user
+
+    flair_user ( username => $username, text => $text, 
+                 css_class => undef, subreddit => undef )
+
+Flair a user with arbitrary text and css class. Behaves exactly as L<flair_post|https://metacpan.org/pod/Reddit::Client#flair_post> except that it is given a username instead of a link ID. To select a flair template from the sub's list of flair, use L<select_user_flair|https://metacpan.org/pod/Reddit::Client#select_user_flair>.
+
+=item flairtemplate (v2)
+
+    flairtemplate( subreddit => $subreddit, 
+                   allowable_content => 'all', background_color => undef, flair_template_id => undef, 
+                   flair_type => 'LINK_FLAIR', text => undef, text_color => undef, text_editable => 1,
+                   max_emojis => undef, mod_only => 0, override_css => undef )
+
+Create or edit a v2 flair template. Can be used from the old (v1) interface; the V2 options will simply not be present.
+
+Every argument except C<subreddit> is optional. If you supply C<flair_template_id>, it will edit the flair with that id, otherwise it will create a new one.
+
+=over
+
+C<subreddit>: Required. Accepts alias 'sub'.
+
+C<allowable_content>: "all", "emoji", or "text". Default all.
+
+C<background_color>: 6 digit hex code, with or without a hash mark.
+
+C<flair_template_id> or C<id>: Accepts alias 'id'. 
+
+C<flair_type>: 'LINK_FLAIR' or 'USER_FLAIR'. Defaults to LINK_FLAIR (this differs from the API, which defaults to URER_FLAIR).
+
+C<max_emojis>: An integer from 1 to 10, default 10.
+
+C<mod_only>: Whether it can be edited by non-moderators. Default false.
+
+C<text>: A string up to 64 characters long.
+
+C<text_color>: 'dark' or 'light'. Default dark. To prevent confusion that this option might want an actual color, Reddit::Client will die with an error if given any other value.
+
+C<text_editable>: Whether the flair's text is editable. Default true.
+
+C<override_css>: This has no documentation and preliminary tests haven't shown it to do anything. In certain cases, Reddit's V2 flair style will override V1 flair CSS, for example when applied by Automod; it may be intended to control this behavior.
+
+=back
+
+Reddit will return a hash reference with some information about the new or edited flair. The returned keys do not match the input keys in all cases, unfortunately.
+
 =item get_comment 
 
-    get_comment ( $id_or_fullname, [ include_children => 0 ] )
+    get_comment ( $id_or_fullname, include_children => 0 )
 
 Returns a Comment object for C<$id_or_fullname>. Note that by default, this only includes the comment itself and not replies. This is by Reddit's design; there isn't a way to return a comment and its replies in one request, using only the comment's id. 
 
@@ -1849,7 +2621,7 @@ or
 
     get_comments ( url => $url )
 
-Get the comment tree for the selected subreddit/link\_id, subreddit/link\_id/comment_id, permalink, or URL. This will be a mix of Comment and MoreComments objects, which are placeholders for collapsed comments. This is analogous to the "show more comments" links on the website.
+Get the comment tree for the selected subreddit/link_id, subreddit/link_id/comment_id, permalink, or URL. This will be a mix of Comment and MoreComments objects, which are placeholders for collapsed comments. They correspond to the "show more comments" links on the website.
 
 If you already have a Link or Comment object, it's best to call its own C<get_comments> method, which takes no arguments and supplies all of the necessary information for you. If you do decide to use this version:
 
@@ -1857,23 +2629,37 @@ If you already have a Link or Comment object, it's best to call its own C<get_co
 
 C<permalink> is the value found in the C<permalink> field of a Link or Comment. It is the URL minus the protocol and hostname, i.e. "/r/subreddit/comments/link_id/optional_title/comment_id". This is somewhat awkward but it's just how Reddit works. It's not intended to be something you contruct yourself; this option is intended for passing in the C<permalink> from an existing Link or Comment.
 
-C<url> is a complete URL for a link or comment, i.e. what would be in address bar on the website.
+C<url> is a complete URL for a link or comment, as seen in address bar on the website.
 
 C<subreddit>, C<link_id> and C<comment_id> should be self explanatory. It accepts either short IDs or fullnames, and like all functions that take C<subreddit> as an argument, it can be appreviated to C<sub>.
 
 =back
 
-Interally, all of these options simply create a permalink and pass it on to Reddit's API, because that is the only argument that this endpoint accepts.
+Internally, all of these options simply create a permalink and pass it on to Reddit's API, because that is the only argument that this endpoint accepts.
+
+B<MoreComments>
+
+When iterating a list of Comments (for example from get_comments), you may come across objects with type "more".  They correspond to the comments on the website that are not initially expanded (you have to click "show more comments" to see them). It is a MoreComments object. Use its get_collapsed_comments method to get a list of the Comments it contains.
+
+    my $cmts = $r->get_comments( url => $url );
+
+    for my $cmt ( @$cmts ) {
+        if ( $cmt->type eq 'more' ) {
+            print "This is a MoreComments object. Expanding children.\n";
+            my $more = $cmt->get_collapsed_comments();
+			# $more is now an array reference containing Comments and possibly more MoreComments
+        }
+    }
+
+This example shows the functionality but is not very useful, because each MoreComment may contain even more MoreComments, which themselves may contain even more MoreComments. That means to get at every last comment, you need a recursive function or similar.
 
 =item get_flair_options
 
-    get_flair_options( subreddit => $subreddit, post_id => $post_id_or_fullname )
+    get_flair_options( subreddit => $subreddit, link_id => $link_id_or_fullname )
 
     get_flair_options( subreddit => $subreddit, username => $username )
-	
-Return the flair options for either the post or the user provided.
 
-Returns a hash containing two keys:
+Get the link or user's current flair, and options for flair that may be applied. Return flair options for the post or the user provided. Returns a hash containing two keys:
 
 =over
 
@@ -1883,9 +2669,13 @@ C<current> is a hash of the post or user's existing flair.
 
 =back
 
+This endpoint seems to be the only way to retrieve a link or user's I<current> flair template ID. 
+
+To get a link or user's v2 flair list, which includes values like background color and text color (but does B<not> include the current flair template ID), use L<get_link_flair_options|https://metacpan.org/pod/Reddit::Client#get_link_flair_options> or L<get_user_flair_options|https://metacpan.org/pod/Reddit::Client#get_link_flair_options>.
+
 =item get_inbox 
 
-    get_inbox ( [ view => MESSAGES_INBOX ] )
+    get_inbox ( view => 'inbox' )
 				
 Returns a listing of Message objects, where C<view> is one of the MESSAGE L<constants|https://metacpan.org/pod/Reddit::Client#CONSTANTS>. All arguments are optional. If all are omitted your default inbox will be returned-- what you would see if you went to reddit.com and clicked the mailbox icon.
 
@@ -1897,9 +2687,15 @@ Checking your inbox via the API doesn't mark it as read. To do that you'll need 
 
 Returns a Link object for C<$id_or_fullname>.
 
+=item get_link_flair_options (v2)
+
+    get_link_flair_options ( $subreddit ) 
+
+Get a list of the subreddit's link flairs. Uses the V2 endpoint, which includes values like background color and text color. (The V1 endpoint is still available through get_link_flair_options_v1, however its return values are a subset of the V2 options so there is not much reason to use it.)
+
 =item get_links
 
-    get_links ( [ subreddit => undef, ] [ view => VIEW_DEFAULT, ] )
+    get_links ( subreddit => undef, view => VIEW_DEFAULT )
 
 Returns a listing of Link objects. All arguments are optional.
 
@@ -1915,7 +2711,7 @@ Return an array of Link objects.
 
 =item get_modlinks
 
-    get_modlinks ( [ subreddit => 'mod', ] [ mode => 'modqueue' ] )
+    get_modlinks ( subreddit => 'mod', mode => 'modqueue' )
 	
 Return links related to subreddit moderation. C<subreddit> defaults to 'mod', which is subreddits you moderate. C<mode> can be one of 5 values: reports, spam, modqueue, unmoderated, and edited. It defaults to 'modqueue'. Using both defaults will get you the same result as clicking the "modqueue" link that RES places in the upper left of the page, or /r/mod/about/modqueue.
 
@@ -1944,18 +2740,29 @@ The number with C<user_reports> is the number of times that particular report ha
 
 =item get_modqueue
 
-    get_modqueue ( [ subreddit => 'mod' ] )
+    get_modqueue ( subreddit => 'mod' )
 
 Get the modqueue, i.e. the listing of links and comments you get by visiting /r/mod/about/modqueue. Optionally supply a subreddit. Defaults to 'mod', which is all subreddits you moderate. Identical to calling C<get_modlinks (subreddit => 'mod', mode => 'modqueue')>.
 
 =item get_multi
 
     get_multi ( name => $multi_name, 
-              [ user => $username, ] [ expand => 0, ] )
+                user => $username, expand => 0 )
 	
 Get a hash of information about a multireddit. C<$username> defaults to your username.
 
 If C<expand> is true, returns more detailed information about the subreddits in the multi. This can be quite a bit of information, comparable to the amount of information contained in a Subreddit object, however it's not I<exactly> the same, and if you try to create a Subreddit object out of it you'll fail.
+
+=item new_modmail_conversation
+
+    new_modmail_conversation ( body => $markdown, subject => $subject, subreddit => $subreddit,
+                               to => $username, hide_author => 1 )
+
+Creates a new modmail conversation and sends the first message in it. Returns a new ModmailConversation object, which will contain the first message as a ModmailMessage object.
+
+All keys are required except for hide_author, which defaults to true. This is different than the behavior of the Reddit website, which shows the name of the moderator by default. hide_author is an alias for isAuthorHidden, the field's proper name, which you can use instead.
+
+Reddit's documentation incorrectly says that C<to> should be a fullname. It is actually just a username. (A user's fullname would be something like t2_xxxxx.)
 
 =item get_permalink
 
@@ -1977,15 +2784,17 @@ C<code> is the one-time use code returned by Reddit after a user authorizes your
 
 =item get_subreddit_comments
 
-    get_subreddit_comments ( [ subreddit => '', ] )
+    get_subreddit_comments ( subreddit => undef )
 
 Returns a list of Comment objects from a subreddit or multi. If subreddit is omitted the account's "front page" subreddits are returned (i.e. what you see when you visit reddit.com and are logged in).
 
 =item get_subreddit_info
 
-    get_subreddit_info ( $subreddit )
+    get_subreddit_info ( $subreddit, $page = undef )
 	
-Returns a hash of information about subreddit C<$subreddit>.
+Returns a hash of information about subreddit C<$subreddit>. If $page is provided, return that page.
+
+$page can be one of (this list may not be complete): banned, muted, contributors, wikibanned, wikicontributors, moderators, edit (returns the subreddit's settings), log, modqueue, unmoderated, reports, edited. 'rules' and 'traffic' are accepted by Reddit but always return undefined (as of 2/15/2021). 'flair' will cause an error.
 
 =item get_token
 
@@ -1999,29 +2808,35 @@ or
 
     get_token
 
-Get an authentication token from Reddit. Normally a user has no reason to call this function themselves. If you pass in your authentication info when creating a new Reddit::Client onject, C<get_token> will be called automatically using the information provided. Similarly, if your script runs continuously for more than an hour, a new token will be obtained automatically. C<get_token> is exposed in case you need to refresh your authorization token manually for some reason, for example if you want to switch to a different user within the same Reddit::Client instance.
+Get an authentication token from Reddit. Normally a user has no reason to call this function themselves. If you pass in your authentication info when creating a new Reddit::Client onject, C<get_token> will be called automatically using the information provided. If your script runs continuously for more than an hour, a new token will be obtained automatically. C<get_token> is exposed in case you need to refresh your authorization token manually for some reason, for example if you want to switch to a different user within the same Reddit::Client instance.
 
 If any arguments are provided, all of the appropriate arguments are required. If none are provided, it will use the information from the previous call.
 
 =item get_user
 
-    get_user ( user => $username, [ view => USER_OVERVIEW, ] )
+    get_user ( user => $username, view => 'overview' )
 			   
 Get information about a user, where C<view> is one of the user L<constants|https://metacpan.org/pod/Reddit::Client#CONSTANTS>: overview, comments, submitted, gilded, upvoted, downvoted, hidden, saved, or about. Defaults to 'overview', which shows the user's most recent comments and posts.
 
-The result will be a listing of Links or Comments or a mix of both, except in the case of the 'about' view, in which case it will be a single Account object.
+The result will be a listing of Links and/or Comments, except in the 'about' view, in which case it will be a single Account object.
+
+=item get_user_flair_options (v2)
+
+    get_user_flair_options ( $subreddit ) 
+
+Get a list of the subreddit's user flairs. Uses the V2 endpoint, which includes values like background color and text color. (The V1 endpoint is still available through get_user_flair_options_v1, however its return values are a subset of the V2 options so there is not much reason to use it.)
 
 =item get_wiki
 
     get_wiki ( sub => $subreddit, page => $page, 
-             [ data => 0, ] [ v => $version, ] [ v2 => $diff_version ] )
+               data => 0, v => undef, v2 => undef )
 
 Get the content of a wiki page. If C<data> is true, fetch the full data hash for the page. If C<v> is given, show the wiki page as it was at that version. If both C<v> and C<v2> are given, show a diff of the two.
 
 =item get_wiki_data
 
     get_wiki_data ( sub => $subreddit, page => $page, 
-                  [ v => $version, ] [ v2 => $diff_version ] )
+                    v => undef, v2 => undef )
 
 Get a data hash for wiki page I<$page>. This function is the same as calling C<get_wiki> with C<data=>1>.
 
@@ -2041,19 +2856,27 @@ Hide a post.
 
     ignore_reports ( $fullname )
 
-	Ignore reports for a comment or post (moderator action).
+Ignore reports for a comment or post (moderator action).
 
 =item info 
 
     info ( $fullname )
 
-Returns a hash of information about C<$fullname>. C<$fullname> can be any of the 8 types of thing.
+Returns a hash of information about C<$fullname>. This will be the raw information hash from Reddit, not loaded into an object of the appropriate class (because classes don't exist for every type of thing, and because Reddit periodically updates the API, creating new fields, so it's nice to have a way to look at the raw data it's returning). C<$fullname> can be any of the 8 types of thing.
 
 =item list_subreddits
 
-    list_subreddits ( [ view => SUBREDDITS_HOME ] )
+    list_subreddits ( view => undef )
 
 Returns a list of subreddits, where C<view> is one of the subreddit L<constants|https://metacpan.org/pod/Reddit::Client#CONSTANTS>: '' (i.e. home), 'subscriber', 'popular', 'new', 'contributor', or 'moderator'. Note that as of January 2018 some views, such as the default, are limited to 5,000 results. 'new' still gives infinite results (i.e. a list of all subreddits in existence). Others are untested.
+
+=item lock
+
+    lock ( $fullname, lock => 1 )
+
+Lock a post's comment section or individual comment (moderator action). Will fail with a 400 if used on an archived (over 6 months old) post.
+
+Using optional argument C<lock =E<gt> 0> is the same as calling L<unlock|https://metacpan.org/pod/Reddit::Client#unlock> on the fullname.
 
 =item mark_inbox_read
 
@@ -2067,39 +2890,63 @@ Mark everything in your inbox as read. May take some time to complete.
 
 Return an Account object that contains information about the logged in account. Aside from static account information it contains the C<has_mail> property, which will be true if there is anything in your inbox.
 
+=item mute
+
+    mute ( username => $username, subreddit => $subreddit, [ note => $note ] )
+
+Mute a user (moderator action). Optionally leave a note that only moderators can see.
+
 =item new 
 
-    new ( user_agent => $user_agent, 
-        [ client_id => $client_id, secret => $secret, username => $username, password => $password, ]
-        [ print_request_errors => 0, ]  [ print_response => 0, ] [ print_request => 0, ] [ print_request_on_error => 0 ] 
-        [ subdomain => 'www', ] )
+    # script-type app
+    new ( user_agent => $user_agent, client_id => $client_id, secret => $secret,
+          username => $username, password => $password, 
+          print_request_errors => 0, print_response => 0, print_request => 0, print_request_on_error => 0,
+          subdomain => 'www' )
 
 or
 
-    new ( user_agent => $user_agent, 
-        [ client_id => $client_id, secret => $secret, refresh_token => $refresh_token ]
-        [ print_request_errors => 0, ]  [ print_response => 0, ] [ print_request => 0, ] [ print_request_on_error => 0 ]
-        [ subdomain => 'www', ] )
+    # web-type app
+    new ( user_agent => $user_agent, client_id => $client_id, secret => $secret,
+          refresh_token => $refresh_token,
+          print_request_errors => 0, print_response => 0, print_request => 0, print_request_on_error => 0,
+          subdomain => 'www', username => undef )
 
 Instantiate a new Reddit::Client object. Optionally authenticate at the same time. (Unless you have some reason not to, this is the recommended way to do it.) For "script"-type apps, this is done by passing in a username, password, client_id and secret. For "web"-type apps, this is done by passing in a refresh_token, client_id and secret.
 
-C<user_agent> is a string that uniquely identifies your app. The API Rules (L<https://github.com/reddit/reddit/wiki/API#rules>) say it should be "something unique and descriptive, including the target platform, a unique application identifier, a version string, and your username as contact information". It also includes this warning: "NEVER lie about your user-agent. This includes spoofing popular browsers and spoofing other bots. We will ban liars with extreme prejudice." C<user_agent> is required as of version 1.2 (before, Reddit::Client would provide one if you didn't).
+C<user_agent> is a string that uniquely identifies your app. The L<API rules|https://github.com/reddit/reddit/wiki/API#rules> say it should be "something unique and descriptive, including the target platform, a unique application identifier, a version string, and your username as contact information". It also includes this warning: "NEVER lie about your user-agent. This includes spoofing popular browsers and spoofing other bots. We will ban liars with extreme prejudice." C<user_agent> is required as of version 1.2 (before, Reddit::Client would provide one if you didn't).
 
-Optional arguments:
+C<subdomain> is the subdomain in links generated by Reddit::Client (for example with C<get_web_url>). You can use this to generate links to old.reddit.com to force the old version of Reddit, for example, or new.reddit.com for the new. Default www.
+
+C<username> is optional for web apps. Unlike a script app, at no point does a web app know your username unless you explicitly provide it. This means that if you're using a function that requires a username (L<create_multi|https://metacpan.org/pod/Reddit::Client#create_multi> and L<edit_multi|https://metacpan.org/pod/Reddit::Client#edit_multi> are two), and you haven't either passed it into the function directly or set the property in your Reddit::Client object, it will fail. 
+
+B<Error handling>
+
+By default, if there is an error, Reddit::Client will print the HTTP status line and then die. You can change this behavior with the following variables:
 
 =over
 
-C<subdomain>: The subdomain in links generated by Reddit::Client (for example with C<get_web_url>). You can use this to generate links to old.reddit.com to force the old version of Reddit, for example, or new.reddit.com for the new. Default www.
+C<print_request_errors>: If there was an error, print some information about it before dying.
 
-C<print_response_content>: Print the content portion of Reddit's HTTP response. Default is print nothing on success and an error code on failure. The content will usually be a blob of JSON, but for certain 500 errors, it may be an entre web page.
+Reddit will usually return some JSON in the case of an error. If it has, Reddit::Client will add some of its own information to it, encode it all to a JSON string, print it, and die. It will contain the keys C<code>, C<status_line>, C<error> (which will always be 1), and C<data>, which will contain Reddit's JSON data. The fields in Reddit's return JSON are unpredictable and vary from endpoint to endpoint.
 
-C<print_request_errors>: If there is an error, print the content portion of Reddit's response. Not very useful as Reddit's response is usually just a text string repeating the error code.
+Sometimes Reddit will not return valid JSON; for example, if the request fails because Reddit's CDN was unable to reach their servers, you'll get a complete webpage. If Reddit did not return valid JSON for this or some other reason, Reddit::Client will print the HTTP status line and the content portion of the response.
 
-C<print_request>: Print the I<entire> HTTP request and response for every request.
+C<print_response_content>: Print the content portion of Reddit's HTTP response. 
 
-C<print_request_on_error>: If there is a request error, print the I<entire> HTTP request and response.
+C<print_request>: Print the entire HTTP request and response.
+
+C<print_request_on_error>: If there is a request error, print the entire HTTP request and response.
 
 =back
+
+=item nsfw
+
+    nsfw ( $fullname, nsfw => 1 )
+
+Flag a post as NSFW (moderator action).
+
+Using optional argument C<nsfw =E<gt> 0> is the same as calling L<unnsfw|https://metacpan.org/pod/Reddit::Client#unnsfw> on the fullname.
 
 =item remove
 
@@ -2121,30 +2968,61 @@ Save a post or comment.
 
 Send a private message to C<$username>. C<$subject> is limited to 100 characters.
 
-=item set_post_flair
+=item select_flair (v2)
 
-    set_post_flair ( subreddit => $subreddit, post_id => $post_id_or_fullname, flair_template_id => $flair_id )
-	
-Set the flair on a post. C<flair_template_id> is acquired via C<get_flair_options()>.
+    select_flair ( link_id => $id_or_fullname, subreddit => $subreddit, flair_id => $flair_template_id, 
+                   background_color => 'cccccc', css_class => '', text_color => 'dark', text => '' )
 
-=item set_user_flair
+or
 
-    set_user_flair ( subreddit => $subreddit, username => $username, flair_template_id => $flair_id )
-	
-Set the flair for a user. C<flair_template_id> is acquired via C<get_flair_options()>.
+    select_flair ( username => $username, subreddit => $subreddit, flair_id => $flair_template_id, 
+                   background_color => 'cccccc', css_class=> '', text_color => 'dark', text => '' )
+
+Select flair for a user or link from among the sub's flair templates. To flair a post without an existing template, use L<flair_post|https://metacpan.org/pod/Reddit::Client#flair_post> (v1 only).
+
+=over
+
+C<background_color> Hex code, with or without hash mark. Defaults to light grey.
+
+C<css_class> The CSS class to be used in the v1 interface. No effect on v2 interface.
+
+C<flair_template_id> is acquired via L<get_link_flair_options|https://metacpan.org/pod/Reddit::Client#get_link_flair_options> or L<get_user_flair_options|https://metacpan.org/pod/Reddit::Client#get_user_flair_options>. It can also be copied from the v2 flair interface on the website. C<flair_id> may be used as an alias for C<flair_template_id>. Required.
+
+C<link_id> The link to apply flair to. Either it or C<username> is required.
+
+C<return_rtjson> all|only|none. "all" saves attributes and returns json (default), "only" only returns json, "none" only saves attributes.
+
+C<subreddit> The subreddit.
+
+C<text> The flair text. 64 characters max.
+
+C<text_color> The text color on the v2 interface. Can be "dark" (default) or "light". To help prevent mistaking this option for an actual color, select_flair will die with an error if given anything else.
+
+C<username> Username to apply flair to. Either it or C<link_id> is required.
+
+=back
+
+
+=item set_post_flair and select_post_flair
+
+Deprecated. Use L<select_flair|https://metacpan.org/pod/Reddit::Client#select_flair> or L<flair_post|https://metacpan.org/pod/Reddit::Client#flair_post>.
+
+=item set_user_flairs
+
+Deprecated. Use L<select_user_flair|https://metacpan.org/pod/Reddit::Client#select_user_flair> or L<flair_user|https://metacpan.org/pod/Reddit::Client#flair_user>.
 
 =item submit_comment 
 
     submit_comment ( parent_id => $fullname, text => $text)
 
-Submit a comment under C<$fullname>, which must be a post or comment. Returns fullname of the new comment.
+Deprecated in favor of L<comment|https://metacpan.org/pod/Reddit::Client#comment>. Submit a comment under C<$fullname>, which must be a post or comment. Returns fullname of the new comment.
 
 =item submit_crosspost
 
     submit_crosspost ( subreddit => $subreddit, title => $title, source_id => $fullname, 
-                     [ inbox_replies => 1, ] [ repost => 0, ] )
+                       inbox_replies => 1, repost => 0 )
 
-Submit a crosspost. Returns the fullname of the new post. You must be subscribed to or a moderator of the subreddit you are crossposting to, otherwise it will fail with the error message "subreddit not found". (This message seems to be an error itself, or is possibly referring to Reddit's internal logic. For example, when crossposting, maybe Reddit selects the subreddit from your list of subscribed/moderated subreddits, and "subreddit not found" means it can't be found in this list.)
+Submit a crosspost. Returns the fullname of the new post. 
 
 C<source_id> is the id or fullname of an existing post. This function is identical to C<submit_link>, but with C<source_id> replacing C<url>.  
 
@@ -2154,7 +3032,7 @@ If C<inbox_replies> is defined and is false, disable inbox replies for that post
 =item submit_link 
 
     submit_link ( subreddit => $subreddit, title => $title, url => $url, 
-                [ inbox_replies => 1, ] [ repost => 0, ] )
+                [ inbox_replies => 1, ] [ repost => 0, ] [ nsfw => 0, ] )
 
 Submit a link. Returns the fullname of the new post. 
 
@@ -2162,16 +3040,48 @@ If C<inbox_replies> is defined and is false, disable inbox replies for that post
 
 =item submit_text 
 
-    submit_text ( subreddit => $subreddit, title => $title, text => $text, 
-                [ inbox_replies => 1 ] )
+    submit_text ( subreddit => $subreddit, title => $title,  
+                [ text => $text, inbox_replies => 1 ] )
 
 Submit a text post. Returns the fullname of the new post. If C<inbox_replies> is defined and is false, disable inbox replies for that post.
+
+=item unban
+
+    unban ( username => $username, subreddit => $subreddit )
+
+Un-ban a user (moderator action).
+
+=item undistinguish
+
+    undistinguish ( $fullname )
+
+Un-distinguish a comment or post (moderator action).
 
 =item unhide 
 
     unhide ( $fullname )
 
 Unhide a post.
+
+=item unlock
+
+    unlock ( $fullname )
+
+Unlock a post's comment section or individual comment (moderator action).
+
+Equivalent to calling L<lock|https://metacpan.org/pod/Reddit::Client#lock>(C<$fullname>, C<lock=E<gt>0>).
+
+=item unmute
+
+    unmute ( username => $username, subreddit => $subreddit )
+
+Un-mute a user (moderator action).
+
+=item unnsfw
+
+    unnsfw ( $fullname )
+
+Remove the NSFW flag from a post (moderator action). Equivalent to calling L<nsfw|https://metacpan.org/pod/Reddit::Client#nsfw>(C<$fullname>, C<nsfw=E<gt>0>).
 
 =item unsave 
 
@@ -2237,6 +3147,79 @@ Vote on a post or comment. C<$direction> can be 1, 0, or -1 (0 to clear votes).
     USER_HIDDEN             => 'hidden'
     USER_SAVED              => 'saved'
     USER_ABOUT              => 'about'
+
+=head1 CHANGELOG
+
+Reddit::Client has tracked changes with comments at the head of the main module for years now, but this is obviously not ideal for users who just want to know what is new. A changelog text file, function, or something more nicely-formatted is planned; for now, this section will have a cut-and-paste of recent changes from the comments.
+
+    # 1.386 2/19/21
+    # updated get_subreddit_info, now takes second arg for specific page
+    # added approve_user
+    
+    # 1.385 11/23/20
+    # added modmail_action, ModmConv...->archive
+    # 1.384
+    # added invite_mod, arg-only version of invite_moderator
+    # 1.384 10/11/20 update
+    #   added report
+    #
+    # 1.384 9/29/20
+    #   added modmail_mute
+    #   submit_text: field 'text' is no longer required
+    #   added more fields to Link
+    
+    # 1.383 added sticky_post
+    
+    # next big version can be when we put in the new mute
+    # 1.382 (should be big ver?) added friend function - no we didn't
+    
+    # 1.381 changed default max request from 500 to 100
+    
+    # 1.38 7/27/20
+    #   added ModmailConversation and ModmailMessage classes
+    #   added function new_modmail_conversation
+
+
+    # 1.375 7/2/20 added sr_detail to Link
+    # 1.374 added nsfw option to submit_link
+    
+    # 1.373 edit now returns the edited thing's id
+    # 1.372
+    # -get_link now gets its links in a proper way, by calling get_links_by_ids and
+    #  taking the first element
+    # -Link class now has many more keys; should now reflect most or all of the keys
+    #  Reddit returns, minus 'downs' and 'ups' because they are deprecated and can
+    #  cause confusion
+
+
+    # 1.37 01/09/20
+    # -added select_flair (v2)
+    # -added flairtemplate, creates or edits a v2 flair template
+    # -added get_link_flair_options. Gets link flair for a sub. uses v2 endpoint.
+    # -added get_link_flair_options_v1, which uses the v1 endpoint and is instantly deprecated
+    # -added get_user_flair_options. Gets link flair for a sub. uses v2 endpoint.
+    # -added get_user_flair_options_v1, which uses the v1 endpoint and is instantly deprecated
+    # -select_post_flair is renamed select_flair, now accepts v2 arguments, and can
+    # accept a username instead to flair a user. See the documentation for description
+
+    
+    # 1.36 12/22/19: new functions lock, unlock, nsfw, unnsfw
+
+    # 1.352 10/25/19: iscomment, ispost and get_type are now static
+    # added functions distinguish, undistinguish
+    
+    # 10/05/19 1.351 delete now returns result
+    # 10/02/19 1.35 add_approved_user, minor housekeeping
+    # 1.341 7/30 removed warnings, they're stupid
+    # 7/30 mute and unmute
+    # 1.33 7/10 corrected 'edited' to not be boolean
+    # 5/29 1.32 unban
+    # 5/3 .315 submit_comment now returns fullname not id
+    # 4/25 .314 4/8 1.313
+    #  .314 added locked key to Comment, was this a recent Reddit change?
+    # 1.313 changed the behavior of print_request_errors
+    # 1.312 requests that fail with print_request_errors as true now die instead of
+    #       croak, which lets you capture the error message
 
 =head1 AUTHOR
 

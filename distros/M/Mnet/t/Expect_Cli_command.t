@@ -5,7 +5,7 @@
 use warnings;
 use strict;
 use Mnet::T;
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 # init perl code for these tests
 my $perl = <<'perl-eof';
@@ -38,6 +38,26 @@ Mnet::T::test_perl({
         ' >$EXPECT
     pre-eof
     perl    => $perl . '
+        print $expect->command("test") . "\n";
+    ',
+    filter  => 'grep -v "Mnet::Log - started" | grep -v "Mnet::Log finished"',
+    expect  => "output",
+    debug   => '--debug',
+});
+
+# command method with prompt_re
+Mnet::T::test_perl({
+    name    => 'command method with prompt_re',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n prompt%;   read INPUT
+            echo -n prompt%;   read INPUT
+            echo output
+            echo -n prompt%;   read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl . '
+        $expect->prompt_re("^prompt\%\$");
         print $expect->command("test") . "\n";
     ',
     filter  => 'grep -v "Mnet::Log - started" | grep -v "Mnet::Log finished"',

@@ -1,5 +1,5 @@
 package App::CSE::File;
-$App::CSE::File::VERSION = '0.015';
+$App::CSE::File::VERSION = '0.016';
 use Moose;
 
 use App::CSE;
@@ -24,11 +24,16 @@ has 'encoding' => ( is => 'ro' , isa => 'Str', lazy_build => 1 );
 has 'content' => ( is => 'ro' , isa => 'Maybe[Str]', required => 1, lazy_build => 1 );
 has 'raw_content' => ( is => 'ro' , isa => 'Maybe[Str]', required => 1 , lazy_build => 1);
 has 'decl' => ( is => 'ro' , isa => 'ArrayRef[Str]' , lazy_build => 1);
+has 'call' => ( is => 'ro' , isa => 'ArrayRef[Str]' , lazy_build => 1);
 
 has 'stat' => ( is => 'ro' , isa => 'File::stat' , lazy_build => 1 );
 has 'mtime' => ( is => 'ro' , isa => 'DateTime' , lazy_build => 1);
 
 sub _build_decl{
+  return [];
+}
+
+sub _build_call{
   return [];
 }
 

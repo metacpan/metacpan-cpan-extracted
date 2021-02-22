@@ -6,7 +6,7 @@ use List::MoreUtils qw{uniq};
 use CGI qw{};
 use CGI::Carp qw{fatalsToBrowser}; #not an exporter
 use Config::IniFiles qw{};
-use Power::Outlet qw{};
+use Power::Outlet 0.42 qw{};
 use Time::HiRes qw{alarm};
 use Parallel::ForkManager 1.01;
 
@@ -34,10 +34,12 @@ my @outlets  = map {
                } $cfg->Sections;
 
 if (defined $switch) {
-  my $section= $cgi->param('outlet') || ''; #outlet section
-  my $data   = first {$_->{'section'} eq $section} @outlets; #this outlet data
+  my $section = $cgi->param('outlet') || ''; #outlet section
+  my $data    = first {$_->{'section'} eq $section} @outlets; #this outlet data
   die(qq{Error: Outlet "$section" not found.}) unless defined $data;
-  Power::Outlet->new(%$data)->switch;
+  my $action  = $cgi->param('action');
+  $action     = 'SWITCH' unless defined $action;
+  Power::Outlet->new(%$data)->action($action);
 }
 
 my %forms    = ();
@@ -69,6 +71,9 @@ foreach my $outlet (@outlets) {#main forking loop
              : $status eq 'ON'      ? '/power-outlet-images/btn-on.png'
              : $status eq 'OFF'     ? '/power-outlet-images/btn-off.png'
              :                        '/power-outlet-images/btn-error.png';
+  my $action = $status eq 'ON'      ? 'OFF'
+             : $status eq 'OFF'     ? 'ON'
+             : 'SWITCH';
   #form for each outlet
   my $form   = $cgi->div({-style=>'width: 119px; padding-bottom: 109px; position: relative; float: left;'},
                  $cgi->div({-style=>'background-color: #FFFFFF; position: absolute; left: 1px; right: 1px; top: 1px; bottom: 1px; padding: 1px; border: 1px solid; border-color: #D9D9D9; border-radius: 25px;'},
@@ -78,6 +83,7 @@ foreach my $outlet (@outlets) {#main forking loop
                                                 -method=>'POST',
                                                 -action=>$cgi->script_name),
                      $cgi->hidden(-name => 'group'),
+                     $cgi->hidden(-name => 'action', -value=>$action,              -override=>1),
                      $cgi->hidden(-name => 'outlet', -value=>$outlet->{'section'}, -override=>1),
                      $cgi->image_button(-name=>'switch',  -src=>$image),
                      $cgi->end_multipart_form,

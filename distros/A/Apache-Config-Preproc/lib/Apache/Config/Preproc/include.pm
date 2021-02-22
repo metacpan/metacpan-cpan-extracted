@@ -14,7 +14,7 @@ our $VERSION = '1.03';
 sub new {
     my $class = shift;
     my $conf = shift;
-    my $self = bless $class->SUPER::new($conf), $class;
+    my $self = $class->SUPER::new($conf);
     $self->{context} = [];
     local %_ = @_;
     $self->{server_root} = delete $_{server_root};

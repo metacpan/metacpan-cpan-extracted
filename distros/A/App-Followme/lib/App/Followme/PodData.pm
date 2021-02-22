@@ -14,7 +14,7 @@ use File::Spec::Functions qw(abs2rel catfile rel2abs splitdir);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.96";
+our $VERSION = "1.97";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -38,27 +38,24 @@ sub alter_url {
     my ($self, $url) = @_;
 
     my $site_url = $self->get_site_url();
-    $url =~ s/^$site_url//;
 
-    my @podfile_path = split(/::/, $url);
-    my $podfile = pop(@podfile_path);
+    my $package = $url;
+    $package =~ s/^$site_url//;
+    $package =~ s/^$self->{package}:://;
 
-    my $filename = catfile($self->{pod_directory}, 
-                           @podfile_path, $podfile);
+    my @package_path = split(/::/, $package);
+    my $filename = catfile($self->{base_directory}, @package_path);
 
     my $found;
     foreach my $ext ('pod', 'pm', 'pl') {
         if (-e "$filename.$ext") {
-            $podfile = lc("$podfile.$ext");
+            $filename .= ".$ext";
             $found = 1;
             last;
         }
     }
 
     if ($found) {
-        $filename = catfile($self->{pod_directory}, 
-                           @podfile_path, $podfile);
-
         $url = $self->filename_to_url($self->{top_directory}, 
                                       $filename,
                                       $self->{web_extension});
@@ -67,6 +64,36 @@ sub alter_url {
     }
 
     return $url;
+}
+
+#-----------------------------------------------------------------------
+# Get the name of the web file a file will be converted to
+
+sub convert_filename {
+    my ($self, $filename) = @_;
+
+    my $new_file = abs2rel($filename, $self->{base_directory});
+    $new_file = join('-', splitdir(lc($new_file)));
+
+    $new_file =~ s/\.[^\.]*$/.$self->{web_extension}/;
+    $new_file = catfile($self->{final_directory}, $new_file);
+
+    return $new_file;
+}
+
+#-----------------------------------------------------------------------
+# Get the name of the source directory for ConvertPage
+
+sub convert_source_directory {
+    my ($self, $directory) = @_;
+
+    my $source_directory;
+    if (fio_same_file($directory, $self->{final_directory},
+                      $self->{case_sensitivity})) {
+        $source_directory = $self->{base_directory};
+    }
+
+    return $source_directory;
 }
 
 #----------------------------------------------------------------------
@@ -121,6 +148,11 @@ sub fetch_content {
         }
     }
 
+    if ($content{title}) {
+        my @title_parts = split(/\s+-+\s+/, $content{title}, 2);
+        $content{title} = $title_parts[0];
+    }
+
     return %content;
 }
 
@@ -157,37 +189,79 @@ sub fetch_sections {
 sub filename_to_url {
     my ($self, $directory, $filename, $ext) = @_;
 
-    $filename = rel2abs($filename);
-    $filename = lc(abs2rel($filename, $self->{base_directory}));
-    $filename = catfile($self->{final_directory}, $filename);
-    $filename = fio_shorten_path($filename) if $filename =~ /\.\./;
-
+    $filename = $self->convert_filename($filename);
     return $self->SUPER::filename_to_url($directory, $filename, $ext);
 }
 
 #----------------------------------------------------------------------
 # Find the directory containing the pod files
 
-sub find_pod_directory {
+sub find_base_directory {
     my ($self)= @_;
 
     my @package_path = split(/::/, $self->{package});
-    pop(@package_path);
     my $package_folder = catfile(@package_path);
+    my $package_file = "$package_folder.pm";
 
     my @folders;
     push(@folders, split(/\s*,\s*/, $self->{pod_directory}))
         if $self->{pod_directory};
     push(@folders, @INC);
 
-    for my $pod_folder (@folders) {
-        my $base_folder = catfile($pod_folder, $package_folder);
-        if (-e $base_folder) {
-            return ($pod_folder, $base_folder);
+    for my $folder (@folders) {
+        if (-e catfile($folder, $package_file)) {
+            pop(@package_path);
+            return ($folder, \@package_path);
+
+        } elsif(-e catfile($folder, $package_folder)) {
+            return ($folder, \@package_path);
         }
     }
 
     return;
+}
+
+#----------------------------------------------------------------------
+# Treat all pod files as if they were in a single directory
+
+sub find_matching_directories {
+    my ($self, $directory) = @_;
+
+    my @directories = ();
+    return @directories;
+}
+
+#----------------------------------------------------------------------
+# Treat all pod files as if they were in a single directory
+
+sub find_matching_files {
+    my ($self, $folder) = @_;
+
+    my ($filenames, $folders) = fio_visit($folder);
+
+    my @files;
+    foreach my $filename (@$filenames) {
+        push(@files, $filename) if $self->match_file($filename);
+    }
+
+    foreach my $folder (@$folders) {
+        push(@files, $self->find_matching_files($folder)) 
+            if $self->match_directory($folder);
+    }
+
+    return @files;
+}
+
+#-----------------------------------------------------------------------
+# Treat all pod files as if they were in a single directory
+
+sub get_folders {
+    my ($self, $filename) = @_;
+
+    my ($directory, $file) = fio_split_filename($filename);
+    my @directories = $self->find_matching_directories($directory);
+
+    return \@directories;
 }
 
 #----------------------------------------------------------------------
@@ -216,13 +290,13 @@ sub initialize_parser {
 sub setup {
     my ($self, %configuration) = @_;
 
-    my ($pod_folder, $base_folder) = $self->find_pod_directory();
+    my  ($pod_folder, $package_path) = $self->find_base_directory();
     die "Couldn't find folder for $self->{package}" 
         unless defined $pod_folder;
 
     $self->{final_directory} = $self->{base_directory};
-    $self->{base_directory} = $base_folder;
-    $self->{pod_directory} = $pod_folder;
+    $self->{base_directory} = catfile($pod_folder, @$package_path);
+    $self->{package} = join('::', @$package_path);
     
     return;
 }

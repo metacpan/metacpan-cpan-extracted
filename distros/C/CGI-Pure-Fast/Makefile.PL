@@ -19,14 +19,13 @@ requires 'CGI::Pure' => 0.01;
 requires 'FCGI' => 0.77;
 requires 'Readonly' => 0;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=CGI-Pure-Fast';
-resources 'homepage' => 'https://github.com/tupinek/CGI-Pure-Fast';
-resources 'repository' => 'git://github.com/tupinek/CGI-Pure-Fast';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/CGI-Pure-Fast/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/CGI-Pure-Fast';
+resources 'repository' => 'git://github.com/michal-josef-spacek/CGI-Pure-Fast';
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.08';
+version '0.09';
 
 # Run.
 WriteAll();

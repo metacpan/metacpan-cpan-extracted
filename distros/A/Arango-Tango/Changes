@@ -1,3 +1,15 @@
+0.015 2021-02-20
+    
+     - Add configuration option for scheme (defaults to http)
+     - Add http_status method to get last request HTTP status code
+     - Refactored API module code.
+
+0.014  2021-02-19
+
+    - Collection.pm
+      - new method: document
+    - Guarantee sequential testing.
+    
 0.013  2020-06-24
 
     - Skip tests if authentication fails.

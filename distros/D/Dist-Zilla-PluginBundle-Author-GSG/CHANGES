@@ -1,6 +1,13 @@
 Changelog for Dist-Zilla-PluginBundle-Author-GSG
 
-v0.1.4 2021-01-27T17:48:40
+v0.1.5 2021-02-11T22:46:05
+ - Update README (Andrew Hewus Fresh)
+ - Correctly include Makefile.inc in example (Andrew Fresh)
+ - Correct spelling of PodWeaver Plugin (Andrew Fresh)
+ - Fix warning on newer versions of perl (Andrew Hewus Fresh)
+ - Report perl version earlier in test output (Andrew Hewus Fresh)
+
+v0.1.4 2021-01-27T17:02:28
  - Update README (Andrew Hewus Fresh)
  - Move ReadmeAnyFromPod below PodWeaver (Andrew Hewus Fresh)
 

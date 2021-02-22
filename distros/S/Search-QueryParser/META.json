@@ -1,0 +1,51 @@
+{
+   "abstract" : "parses a query string into a data structure",
+   "author" : [
+      "Laurent Dami <dami AT cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Search-QueryParser",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "constant" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Search::QueryParser" : {
+         "file" : "lib/Search/QueryParser.pm",
+         "version" : "0.95"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/Search-QueryParser"
+      }
+   },
+   "version" : "0.95",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

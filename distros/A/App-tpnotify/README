@@ -1,0 +1,32 @@
+App::tpnotify
+=============
+
+This command line tool notifies the coordinator of the Translation
+Project <http://translationproject.org> about a new POT file.
+Notification is sent via email.  Before sending, a number of checks
+is run on the POT file itself and the package containing it in order
+to ensure consistency of data and avoid spurious notifications.
+
+Installation
+------------
+
+Usual way:
+
+ perl Makefile.PL
+ make install
+
+Documentation
+-------------
+
+See "man tpnotify" (or "perldoc tpnotify", or "tpnotify --help"),
+for a detailed manual.
+
+Copying
+-------
+
+This package is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+See http://www.gnu.org/licenses.

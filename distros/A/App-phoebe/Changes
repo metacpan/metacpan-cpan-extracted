@@ -1,3 +1,38 @@
+2.08
+
+- Updated dependencies to Mojolicious 9.0 (because the tls_verify
+  parameter was replaced by a more general tls_options).
+
+- Reduced the SSL session cache to 64 in attempt to fix a memory leak
+  but which I was unable to do: the solution I'm using right now is to
+  use memory parameters in the systemd service definition.
+
+- Fixed colour links in /changes within wiki spaces.
+
+- Fixed output of /robots.txt.
+
+- contrib/oddmuse.pl: New, in case you want to serve an Oddmuse wiki
+  from Phoebe (like I do); working on support to translate Oddmuse
+  namespaces to wiki spaces transparently.
+
+- contrib/gopher.pl: New, in case you want to serve your Phoebe wiki
+  via Gopher; this does not work with contrib/oddmuse.pl – if you want
+  to serve your Oddmuse wiki via Gopher, use the gopher-server.pl
+  which is part of Oddmuse.
+
+- contrib/speed-bump.pl: Improved detection of non-human behaviour;
+  added client finger print requirements for admin views, debug view,
+  and status view; save stats every half hour; load them on startup;
+  add network range blocking.
+
+- contrib/wikipedia.pl: There are constellations where the spanning
+  table code goes nuts and throws a gazillion warnings. I still
+  haven't fixed this, so for the time being, tables are simple no
+  longer handled.
+
+- contrib/heap-dump.pl: New, in case you need to debug heap dumps of
+  the Phoebe process.
+
 2.07
 
 - Fixed serving of robots.txt in a virtual hosting environment;

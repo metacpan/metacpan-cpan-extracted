@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="de-DE" class="no-js">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    
+    <title>Willkommen in der APA – Austria Presse Agentur</title>
+    <meta name="description" content="Willkommen in der Welt der APA - Austria Presse Agentur! Verschaffen Sie sich einen Überblick über Österreichs größten Informationsdienstleister.">
+    <meta name="author" content="APA">
+
+    <meta property="og:title" content="Willkommen in der APA – Austria Presse Agentur">
+    <meta property="og:url" content="https://apa.at/">
+    <meta property="og:description" content="Willkommen in der Welt der APA - Austria Presse Agentur! Verschaffen Sie sich einen Überblick über Österreichs größten Informationsdienstleister.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://apa.at/wp-content/uploads/2020/05/apa_start_1.jpg">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:creator" content="@apa_at">
+    <meta name="twitter:title" content="Willkommen in der APA – Austria Presse Agentur">
+    <meta name="twitter:description" content="Willkommen in der Welt der APA - Austria Presse Agentur! Verschaffen Sie sich einen Überblick über Österreichs größten Informationsdienstleister.">
+    <meta name="twitter:image" content="https://apa.at/wp-content/uploads/2020/05/apa_start_1.jpg">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto+Slab|Roboto:300,400,500,900|Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+    <link rel="preload" href="https://apa.at/wp-content/themes/apa/public/fonts/Socialico-Regular.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="https://apa.at/wp-content/themes/apa/public/fonts/materialdesignicons-webfont.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://apa.at/wp-content/themes/apa/public/js/app.js" as="script" importance="high">
+    <link rel="preload" href="https://apa.at/wp-content/themes/apa/public/css/app.css" as="style" importance="high">
+
+    <link rel="stylesheet" href="https://apa.at/wp-content/themes/apa/public/css/app.css" importance="high">
+
+    <link rel='dns-prefetch' href='//s.w.org' />
+<style id='wp-typography-custom-inline-css' type='text/css'>
+sub, sup{font-size: 75%;line-height: 100%}sup{vertical-align: 60%}sub{vertical-align: -10%}.amp{font-family: Baskerville, "Goudy Old Style", Palatino, "Book Antiqua", "Warnock Pro", serif;font-size: 1.1em;font-style: italic;font-weight: normal;line-height: 1em}.caps{font-size: 90%}.dquo{margin-left: -0.4em}.quo{margin-left: -0.2em}.pull-single{margin-left: -0.15em}.push-single{margin-right: 0.15em}.pull-double{margin-left: -0.38em}.push-double{margin-right: 0.38em}
+</style>
+<style id='wp-typography-safari-font-workaround-inline-css' type='text/css'>
+body {-webkit-font-feature-settings: "liga";font-feature-settings: "liga";-ms-font-feature-settings: normal;}
+</style>
+<link rel="https://api.w.org/" href="https://apa.at/wp-json/" /><link rel="alternate" type="application/json" href="https://apa.at/wp-json/wp/v2/pages/2689" /><link rel="canonical" href="https://apa.at/" />
+<link rel="icon" href="https://apa.at/wp-content/uploads/2020/02/cropped-APA_favicon-32x32.png" sizes="32x32" />
+<link rel="icon" href="https://apa.at/wp-content/uploads/2020/02/cropped-APA_favicon-192x192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://apa.at/wp-content/uploads/2020/02/cropped-APA_favicon-180x180.png" />
+<meta name="msapplication-TileImage" content="https://apa.at/wp-content/uploads/2020/02/cropped-APA_favicon-270x270.png" />
+
+    <script type="text/javascript">
+        function scrollToAnchor (anchor) {
+            setTimeout(function () {
+                var yOffset = -124;
+                var element = document.getElementById(anchor);
+                var y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+                window.scrollTo({top: y, behavior: 'smooth'});
+            }, 50);
+        }
+    </script>
+
+    
+    
+    <style>
+        :root {
+                    --color-primary:#E10000;
+                    --color-primary-light:#F8DDDB;
+                }
+        [v-cloak] {
+            display: none;
+        }
+
+
+        body {
+            margin: 0;
+        }
+
+        .progress {
+            position: relative;
+            height: 4px;
+            display: block;
+            width: 100%;
+            background-color: #e1000042;
+            border-radius: 2px;
+            background-clip: padding-box;
+            overflow: hidden;
+        }
+
+        .progress .indeterminate {
+            background-color: #e10000;
+        }
+
+        .progress .indeterminate:before {
+            content: '';
+            position: absolute;
+            background-color: inherit;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            will-change: left, right;
+            -webkit-animation: indeterminate 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+            animation: indeterminate 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+        }
+
+        .progress .indeterminate:after {
+            content: '';
+            position: absolute;
+            background-color: inherit;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            will-change: left, right;
+            -webkit-animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+            animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+            -webkit-animation-delay: 1.15s;
+            animation-delay: 1.15s;
+        }
+
+        @-webkit-keyframes indeterminate {
+            0% {
+                left: -35%;
+                right: 100%;
+            }
+            60% {
+                left: 100%;
+                right: -90%;
+            }
+            100% {
+                left: 100%;
+                right: -90%;
+            }
+        }
+        @keyframes indeterminate {
+            0% {
+                left: -35%;
+                right: 100%;
+            }
+            60% {
+                left: 100%;
+                right: -90%;
+            }
+            100% {
+                left: 100%;
+                right: -90%;
+            }
+        }
+        @-webkit-keyframes indeterminate-short {
+            0% {
+                left: -200%;
+                right: 100%;
+            }
+            60% {
+                left: 107%;
+                right: -8%;
+            }
+            100% {
+                left: 107%;
+                right: -8%;
+            }
+        }
+        @keyframes indeterminate-short {
+            0% {
+                left: -200%;
+                right: 100%;
+            }
+            60% {
+                left: 107%;
+                right: -8%;
+            }
+            100% {
+                left: 107%;
+                right: -8%;
+            }
+        }
+    </style>
+</head>
+
+<body class="home page-template-default page page-id-2689">
+BODY
+</body>
+</html>
+
+<!-- Dynamic page generated in 0.663 seconds. -->
+<!-- Cached page generated by WP-Super-Cache on 2021-02-20 17:47:02 -->
+
+<!-- Compression = gzip -->
+<!-- super cache -->

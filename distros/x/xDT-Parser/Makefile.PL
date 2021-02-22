@@ -1,26 +1,34 @@
 use 5.006;
 use strict;
 use warnings;
+
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME             => 'xDT::Parser',
-    AUTHOR           => q{Christoph Beger <christoph.beger@imise.uni-leipzig.de>},
-    VERSION_FROM     => 'lib/xDT/Parser.pm',
-    ABSTRACT_FROM    => 'lib/xDT/Parser.pm',
-    LICENSE          => 'MIT',
-    PL_FILES         => {},
-    MIN_PERL_VERSION => '5.006',
-    CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
+    NAME         => 'xDT::Parser',
+    VERSION_FROM => 'lib/xDT/Parser.pm',
+    ABSTRACT     => 'Perl xDT Parser',
+    AUTHOR       => 'Christoph Beger <christoph.beger@medizin.uni-leipzig.de>',
+    LICENSE      => 'MIT',
+    META_MERGE   => {
+        dynamic_config => 0,
+        'meta-spec'    => { version   => 2 },
+        no_index       => { directory => [ qw(examples t config) ], },
+        prereqs        => { runtime   => { requires => { perl => '5.006' } } },
+        resources      => {
+            bugtracker => { web => 'https://github.com/ChristophB/perl-xdt-parser/issues' },
+            license    => [ 'https://opensource.org/licenses/MIT' ],
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/ChristophB/perl-xdt-parser.git',
+                web  => 'https://github.com/ChristophB/perl-xdt-parser',
+            },
+        },
     },
-    BUILD_REQUIRES => {
-        'Test::More' => '0',
-    },
-    PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
-    },
+    CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => '7.44' },
+    BUILD_REQUIRES     => { 'Test::More' => '1.3' },
+    PREREQ_PM          => { 'Moose' => '2.2', 'XML::Simple' => '2.25' },
+    test  => { TESTS => 't/*.t t/*/*.t' },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'xDT-Parser-*' },
 );

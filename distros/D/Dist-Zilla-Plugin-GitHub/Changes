@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-Plugin-GitHub
 
+0.48      2021-02-20 22:19:08Z
+
+  - fix uninitialized warning, and dump full response, on receipt of an error
+    from github
+  - use https URLs for metacpan.org, p3rl.org
+  - fix use of authentication tokens against latest github APIs
+
 0.47      2018-09-16 22:43:24Z
 
   - Fix infinite loop when using 2FA (Joelle Maslak, #55)

@@ -31,6 +31,10 @@ WriteMakefile(NAME         => 'Apache::Config::Preproc',
 			  url => 'git://git.gnu.org.ua/acpp.git',
 			  web => 'http://git.gnu.org.ua/cgit/acpp.git/',
 		      },
+		      bugtracker => {
+			  web => 'https://puszcza.gnu.org.ua/bugs/?group=acpp',
+			  mailto => 'gray+acpp@gnu.org.ua'
+		      }
 		  },
 		  provides => Module::Metadata->provides(version => '1.4',
 							 dir => 'lib')

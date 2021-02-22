@@ -1,6 +1,6 @@
 package Net::IPAM::Tree;
 
-our $VERSION = '2.00';
+our $VERSION = '2.11';
 
 use 5.10.0;
 use strict;
@@ -172,6 +172,27 @@ sub contains {
   return $self->{root}->_contains($thing);
 }
 
+=head2 contains_not_equal($thing)
+
+Reports whether the given $thing (L<Net::IPAM::IP> or L<Net::IPAM::Block>) is truly contained (not equal) in any child of the node.
+
+Returns the outermost containing block or undef.
+
+=cut
+
+sub contains_not_equal {
+  my ( $self, $thing ) = @_;
+  Carp::croak("missing or wrong arg,") unless Scalar::Util::blessed($thing);
+
+  # make a /32 or /128 block if thing is an IP
+  $thing = Net::IPAM::Block->new($thing) if $thing->isa('Net::IPAM::IP');
+
+  Carp::croak("wrong arg,") unless $thing->isa('Net::IPAM::Block');
+
+  # just look in childs of root node
+  return $self->{root}->_contains_not_equal($thing);
+}
+
 =head2 lookup($thing)
 
 Returns L<Net::IPAM::Block> with longest prefix match for $thing (L<Net::IPAM::IP> or L<Net::IPAM::Block>)
@@ -204,6 +225,27 @@ sub lookup {
   return $self->{root}->_lookup($thing);
 }
 
+=head2 lookup_not_equal($thing)
+
+Returns L<Net::IPAM::Block> with longest prefix match (but not equal) for $thing (L<Net::IPAM::IP> or L<Net::IPAM::Block>)
+in the tree, undef if not found.
+
+This can be used for fast routing table lookups.
+
+=cut
+
+sub lookup_not_equal {
+  my ( $self, $thing ) = @_;
+  Carp::croak("missing or wrong arg,") unless Scalar::Util::blessed($thing);
+
+  # make a /32 or /128 block if thing is an IP
+  $thing = Net::IPAM::Block->new($thing) if $thing->isa('Net::IPAM::IP');
+
+  Carp::croak("wrong arg,") unless $thing->isa('Net::IPAM::Block');
+
+  return $self->{root}->_lookup_not_equal($thing);
+}
+
 =head2 remove
 
 Remove one block from tree, relink parent/child relation at the gap.
@@ -216,7 +258,7 @@ Returns undef if $block is not found.
 
 sub remove {
   Carp::croak("missing or wrong arg,") unless Scalar::Util::blessed( $_[1] );
-  Carp::croak("wrong arg,") unless $_[1]->isa('Net::IPAM::Block');
+  Carp::croak("wrong arg,")            unless $_[1]->isa('Net::IPAM::Block');
 
   # remove block, relink childs
   return $_[0]->{root}->_remove( $_[1], 0 );
@@ -234,7 +276,7 @@ Returns undef if $block is not found.
 
 sub remove_branch {
   Carp::croak("missing or wrong arg,") unless Scalar::Util::blessed( $_[1] );
-  Carp::croak("wrong arg,") unless $_[1]->isa('Net::IPAM::Block');
+  Carp::croak("wrong arg,")            unless $_[1]->isa('Net::IPAM::Block');
 
   # remove block and child nodes
   return $_[0]->{root}->_remove( $_[1], 1 );
@@ -273,52 +315,25 @@ possible example (with callback):
 =cut
 
 sub to_string {
-  my ( $self, $block_to_str ) = @_;
+  my ( $self, $cb ) = @_;
 
-  if ( defined $block_to_str ) {
-    Carp::croak("attribute 'cb' is no CODE_REF,") unless ref $block_to_str eq 'CODE';
+  if ( defined $cb ) {
+    Carp::croak("attribute 'cb' is no CODE_REF,") unless ref $cb eq 'CODE';
   }
   else {
-    $block_to_str = sub { return "$_[0]" };
+    $cb = sub { return "$_[0]" };
   }
 
-  # string buffer, filled by closure
-  my $buf;
+  # prefix = '', buf = ''
+  my $buf = $self->{root}->_to_string( $cb, '', '' );
 
-  # recdescent algo
-  my $walk_and_stringify;
-
-  $walk_and_stringify = sub {
-    my ( $node, $prefix ) = @_;
-
-    # number of child nodes
-    my $nc = $node->childs;
-
-    return if $nc == 0;
-
-    for ( my $i = 0 ; $i < $nc ; $i++ ) {
-
-      # last child?
-      if ( $i == $nc - 1 ) {
-        $buf .= sprintf( "%s%s\n", $prefix . '└─ ', $block_to_str->( $node->{childs}[$i]{block} ) );
-        $walk_and_stringify->( $node->{childs}[$i], $prefix . '   ' );
-      }
-      else {
-        $buf .= sprintf( "%s%s\n", $prefix . '├─ ', $block_to_str->( $node->{childs}[$i]{block} ) );
-        $walk_and_stringify->( $node->{childs}[$i], $prefix . '│  ' );
-      }
-    }
-  };
-
-  $walk_and_stringify->( $self->{root}, '' );
-
-  return "▼\n" . $buf if defined $buf;
+  return "▼\n" . $buf if $buf;
   return;
 }
 
 =head2 walk
 
-Walks the tree, starting at root node in depth first order.
+Walks the tree in depth first pre-order.
 
   my $err_string = $t->walk($callback);
 
@@ -327,7 +342,8 @@ and the current depth (counting from 0) as arguments.
 
 	my $err_string = $callback->($node, $depth);
 
-The callback must return undef if there is no error!
+The callback B<MUST> return undef if there is no error!
+
 On error, the walk is stopped and the error is returned to the caller.
 
 Example, get some tree statistics:
@@ -339,7 +355,7 @@ Example, get some tree statistics:
 
     $n++;
     $max_c = $node->childs if $max_c < $node->childs;
-    $max_d = $depth + 1    if $max_d < $depth + 1;
+    $max_d = $depth        if $max_d < $depth;
 
     return;    # explicit return (undef) if there is no error!
   };
@@ -351,33 +367,13 @@ Example, get some tree statistics:
 
 sub walk {
   my ( $self, $cb ) = @_;
-  Carp::croak("missing arg,") unless defined $cb;
+  Carp::croak("missing arg,")                        unless defined $cb;
   Carp::croak("wrong arg, callback is no CODE_REF,") unless ref $cb eq 'CODE';
 
-  # recursive func, declare ahead
-  my $walk_rec;
-
-  $walk_rec = sub {
-    my ( $node, $depth ) = @_;
-
-    my $err = $cb->( $node, $depth );
-    return $err if $err;
-
-    # walk the childs
-    foreach my $child ( $node->childs ) {
-      my $err = $walk_rec->( $child, $depth + 1 );
-      return $err if $err;
-    }
-
-    return;
-  };
-
-  # start at root node
   foreach my $child ( $self->{root}->childs ) {
-    my $err = $walk_rec->( $child, 0 );
-    return $err if $err;
+    my $err = $child->_walk( $cb, 0 );
+    return $err if defined $err;
   }
-
   return;
 }
 
@@ -389,14 +385,10 @@ implemented as a simple L</"walk"> callback.
 =cut
 
 sub len {
-  my $self = shift;
+  my $n   = 0;
+  my $err = shift->walk( sub { $n++; return } );
 
-  my $n;
-  my $counter_cb = sub { $n++; return };
-
-  my $err = $self->walk($counter_cb);
   Carp::croak($err) if defined $err;
-
   return $n;
 }
 

@@ -10,7 +10,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $FCGI_LISTEN_QUEUE_DEFAULT => 100;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # External request.
 our $EXT_REQUEST;
@@ -54,6 +54,7 @@ CGI::Pure::Fast - Fast Common Gateway Interface Class for CGI::Pure.
 =head1 SYNOPSIS
 
  use CGI::Pure::Fast;
+
  my $cgi = CGI::Pure::Fast->new(%parameters);
  $cgi->append_param('par', 'value');
  my @par_value = $cgi->param('par');
@@ -79,11 +80,9 @@ CGI::Pure::Fast - Fast Common Gateway Interface Class for CGI::Pure.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use CGI::Pure::Fast;
  use HTTP::Headers;
 
@@ -138,6 +137,10 @@ Common Gateway Interface Class for loading/saving object in file.
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/CGI-Pure-Fast>
+
 =head1 AUTHOR
 
 Michal Josef Špaček L<mailto:skim@cpan.org>
@@ -146,11 +149,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2011-2021 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

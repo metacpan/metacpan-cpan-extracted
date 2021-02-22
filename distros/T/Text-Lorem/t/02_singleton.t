@@ -1,12 +1,14 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More;
 
-use_ok("Text::Lorem");
-ok( my $object = Text::Lorem->new(),            "Made a new object" );
-ok( my $words = $object->words(3),              "Got some words" );
-ok( my $object_bis = Text::Lorem->new(),            "Made a new object" );
-ok( my $words_bis = $object_bis->words(3),              "Got some words" );
+my $class = 'Text::Lorem';
+use_ok($class);
+
+my $object = $class->new();
+my $object_singleton = $class->new();
+
+ok( $object_singleton == $object, 'new instance is a singleton of the original' );
+
+done_testing();

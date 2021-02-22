@@ -121,5 +121,8 @@ minify(inStr)
       RETVAL = result;
       Safefree(outStr);
     }
+    else {
+      croak("TextMinify returned NULL");
+    }
   OUTPUT:
     RETVAL

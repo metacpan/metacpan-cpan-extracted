@@ -101,6 +101,9 @@ implementations that will ensure that required methods are present. Those roles
 also do type checking ( using L<Type::Tiny> and friends ) on input params and
 returned values. Other than that, those roles do nothing and can be ignored.
 
+Type constraints in these declarations are only checked under 'STRICT' (See
+L<Devel::Strict>).
+
 For convenience and those that desire type-checks, there is also a
 L<OpenTracing::Types> library build upon L<Type::Libray> using
 L<"Duck Typing"|Type::Tiny::Duck>.
@@ -163,7 +166,7 @@ Theo van Hoesel <tvanhoesel@perceptyx.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2021, Perceptyx Inc
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0.

@@ -1,3 +1,12 @@
+0.102 2021/02/16
+    - pkcs5-tool(1): Added support for "env:<name>" and "file:<path>" for --input and --password params
+    - pkcs5-tool(1): Read password from user input (readline)
+    - pkcs5-tool(1): Added support for read input data from STDIN
+    - pkcs5-tool(1): Added CLI.pm class and t/60.CLI.t test
+    - PBKDF2.pm: Added new PBKDF2WithHmapSHA* functions
+    - PBKDF2.pm: Fixed PBKDF2 LDAP schema function
+    - Fixed critiques and code beautification
+
 0.101 2020/07/15
     - Added missing Crypt::OpenSSL::AES module prerequisite in Makefile.PL
     - Improved pkcs5-tool command

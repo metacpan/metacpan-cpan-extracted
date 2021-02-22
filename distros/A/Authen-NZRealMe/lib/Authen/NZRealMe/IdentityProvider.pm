@@ -1,5 +1,5 @@
 package Authen::NZRealMe::IdentityProvider;
-$Authen::NZRealMe::IdentityProvider::VERSION = '1.20';
+$Authen::NZRealMe::IdentityProvider::VERSION = '1.21';
 use strict;
 use warnings;
 
@@ -19,6 +19,11 @@ my $ns_ds         = [ NS_PAIR('ds') ];
 
 my $soap_binding  = URI('saml_b_soap');
 
+my %saml_binding = (
+    URI('saml_binding_artifact') => 'artifact',
+    URI('saml_binding_redirect') => 'redirect',
+    URI('saml_binding_post')     => 'post',
+);
 
 sub new {
     my $class = shift;
@@ -36,7 +41,6 @@ sub new {
 sub conf_dir              { shift->{conf_dir};               }
 sub type                  { shift->{type};                   }
 sub entity_id             { shift->{entity_id};              }
-sub single_signon_location{ shift->{single_signon_location}; }
 sub signing_cert_pem_data { shift->{signing_cert_pem_data};  }
 
 sub login_cert_pem_data {
@@ -47,6 +51,18 @@ sub login_cert_pem_data {
     return $params->{signing_cert_pem_data};
 }
 
+sub single_signon_location {
+    my($self, $binding) = @_;
+
+    my @locations = values %{$self->{sso}};
+    return $locations[0] if @locations == 1;
+
+    die "Need a binding for single_signon_location" unless defined $binding;
+
+    my $location = $self->{sso}->{lc($binding)}
+        or die "No mapping for single_signon_location '$binding' binding";
+    return $location;
+}
 
 sub artifact_resolution_location {
     my($self, $index) = @_;
@@ -102,7 +118,6 @@ sub _read_metadata_from_file {
     my %params;
     foreach (
         [ entity_id              => q{/md:EntityDescriptor/@entityID} ],
-        [ single_signon_location => q{/md:EntityDescriptor/md:IDPSSODescriptor/md:SingleSignOnService/@Location} ],
         [ signing_cert_pem_data  => q{/md:EntityDescriptor/md:IDPSSODescriptor/md:KeyDescriptor[@use = 'signing']/ds:KeyInfo/ds:X509Data/ds:X509Certificate} ],
     ) {
         $params{$_->[0]} = $xc->findvalue($_->[1]);
@@ -117,7 +132,7 @@ sub _read_metadata_from_file {
     ) . "\n";
 
     my %ars;
-    foreach my $svc( $xc->findnodes(
+    foreach my $svc ( $xc->findnodes(
         q{/md:EntityDescriptor/md:IDPSSODescriptor/md:ArtifactResolutionService}
     )) {
         my($index)   = $xc->findvalue(q{./@index}, $svc)
@@ -130,6 +145,20 @@ sub _read_metadata_from_file {
             if $binding ne $soap_binding;
     }
     $params{ars} = \%ars;
+
+    my %sso;
+    foreach my $svc ( $xc->findnodes(
+        q{/md:EntityDescriptor/md:IDPSSODescriptor/md:SingleSignOnService},
+    )) {
+        my $binding = $xc->findvalue(q{./@Binding}, $svc)
+            or die "No Binding for SingleSignOnService:\n" . $svc->toString;
+        my $type = $saml_binding{$binding}
+            or die "Unrecognised binding '$binding' for SingleSignOnService: \n" . $svc->toString;
+        $sso{$type} = $xc->findvalue(q{./@Location}, $svc)
+            or die "No Location for SingleSignOnService binding '$binding':\n" . $svc->toString;
+    }
+    $params{sso} = \%sso;
+    die "No SingleSignOnService element defined in $metadata_file\n" unless keys %sso;
 
     my $cache_key = $self->conf_dir . '-' . $type;
     $metadata_cache{$cache_key} = \%params;
@@ -197,10 +226,24 @@ Accessor for the C<conf_dir> parameter passed in to the constructor.
 
 Accessor for the C<ID> parameter in the Identity Provider metadata file.
 
-=head2 single_signon_location
+=head2 single_signon_location ( binding )
 
 Accessor for the C<SingleSignOnService> parameter in the Service Provider
 metadata file.
+
+The optional parameter C<binding> is required if multiple SingleSignOnService
+elements are defined:
+
+=over 4
+
+=item artifact => SAML 2.0 HTTP-Artifact binding
+
+=item redirect => SAML 2.0 HTTP-Redirect binding
+
+=item post => SAML 2.0 HTTP-POST binding
+
+=back
+
 
 =head2 signing_cert_pem_data
 

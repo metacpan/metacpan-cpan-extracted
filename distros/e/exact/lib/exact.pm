@@ -9,7 +9,7 @@ use Import::Into;
 use Sub::Util 'set_subname';
 use Syntax::Keyword::Try;
 
-our $VERSION = '1.16'; # VERSION
+our $VERSION = '1.17'; # VERSION
 
 use feature    ();
 use utf8       ();
@@ -26,6 +26,7 @@ my %features = (
     18 => ['lexical_subs'],
     24 => [ qw( postderef postderef_qq ) ],
     28 => ['bitwise'],
+    32 => [ qw( isa indirect ) ],
 );
 
 my %deprecated = (
@@ -40,7 +41,7 @@ my %experiments = (
 
 my @function_list = qw(
     nostrict nowarnings noutf8 noc3 nobundle noexperiments noskipexperimentalwarnings noautoclean nocarp
-    notry trytiny
+    notry trytiny noisa
 );
 
 my @feature_list   = map { @$_ } values %features, values %deprecated, values %experiments;
@@ -87,6 +88,14 @@ sub import {
     elsif ( not grep { $_ eq 'nobundle' } @functions ) {
         feature->import( ':5.' . $perl_version );
     }
+
+    push( @features, 'isa' ) if (
+        $perl_version >= 32 and
+        not grep { $_ eq 'isa' } @features and
+        not grep { $_ eq 'noisa' } @functions
+    );
+
+    feature->unimport('indirect') if ( $perl_version >= 32 );
 
     try {
         feature->import($_) for (@features);
@@ -270,7 +279,7 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =for markdown [![test](https://github.com/gryphonshafer/exact/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact)
@@ -283,8 +292,9 @@ Instead of this:
     use warnings;
     use utf8;
     use open ':std', ':utf8';
-    use feature ':5.23';
-    use feature qw( signatures refaliasing bitwise );
+    use feature ':5.32';
+    use feature qw( signatures refaliasing bitwise isa );
+    no feature 'indirect';
     use mro 'c3';
     use IO::File;
     use IO::Handle;
@@ -323,11 +333,19 @@ enable L<strictures> (version 2)
 
 =item *
 
-load the latest L<feature> bundle supported by the current Perl version
+activate the latest L<feature> bundle supported by the current Perl version
 
 =item *
 
-load all experimental L<feature>s and switch off experimental warnings
+activate all experimental L<feature>s and switch off experimental warnings
+
+=item *
+
+activate the C<isa> feature (if Perl version is 5.32 or greater)
+
+=item *
+
+deactivate the C<indirect> feature
 
 =item *
 
@@ -405,6 +423,11 @@ This skips importing the functionality of L<Syntax::Keyword::Try>.
 If you want to use L<Try::Tiny> instead of L<Syntax::Keyword::Try>, this is how.
 Note that if you specify both C<trytiny> and C<notry>, the latter will win.
 
+=head2 C<noisa>
+
+The C<isa> feature is activated by default if the Perl version is 5.32 or
+greater. If you want not that, specify C<noisa>.
+
 =head1 BUNDLES
 
 You can always provide a list of explicit features and bundles from L<feature>.
@@ -434,6 +457,18 @@ v5.26
 26
 
 =back
+
+Note that bundles are exactly the same as what's in L<feature>, so for any
+feature not part of a version bundle in L<feature>, you won't pick up that
+feature with a bundle unless you explicitly declare the feature.
+
+The exception to this is C<isa>, which is available in Perl 5.32 and greater but
+not included in the 5.32 bundle. However, C<isa> is explicitly included if your
+Perl version is 5.32 or greater unless you specify C<noisa>.
+
+Note also that the C<indirect> feature is unimported by default, which is
+counter to the non-exact default way, which is to import it. You can deunimport
+C<indirect> by explicitly specifying C<indirect>.
 
 =head1 EXTENSIONS
 

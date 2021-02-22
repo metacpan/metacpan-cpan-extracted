@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use locale;
 
-our $VERSION = "0.94";
+our $VERSION = "0.95";
 
 =head1 NAME
 
@@ -343,19 +343,27 @@ method L<err> can be called to get an explanatory message.
 
 
 
-sub parse { return (_parse(@_))[0]; } # just return 1st result from _parse
+sub parse {
+  my $self = shift;
+  my $s_orig = $_[0];
+  my ($parsedQuery, $restOfString) = $self->_parse(@_);
+  if ($restOfString) {
+    $self->{err} ||= "[$s_orig] : parsed into " . $self->unparse($parsedQuery)
+                   . ", but unable to parse [$restOfString]";
+    return undef;
+  }
+
+  return $parsedQuery;
+}
+
 
 sub _parse{ # returns ($parsedQuery, $restOfString)
-  my $self = shift;
-  my $s = shift;
-  my $implicitPlus = shift;
-  my $parentField = shift;	# only for recursive calls
-  my $parentOp = shift;		# only for recursive calls
+  my ($self, $s, $implicitPlus, $parentField, $parentOp) = @_; # last 2 args only for recursive calls
 
-  my $q = {};
+  my $q       = {};
   my $preBool = '';
-  my $err = undef;
-  my $s_orig = $s;
+  my $err     = undef;
+  my $s_orig  = $s;
 
   $s =~ s/^\s+//; # remove leading spaces
 
@@ -363,7 +371,7 @@ LOOP :
   while ($s) { # while query string is not empty
     for ($s) { # temporary alias to $_ for easier regex application
       my $sign = $implicitPlus ? "+" : "";
-      my $field = $parentField || $self->{defField};
+      my $explicit_field;
       my $op = $parentOp || ":";
 
       last LOOP if m/^\)/; # return from recursive call if meeting a ')'
@@ -379,10 +387,14 @@ LOOP :
           or 
           s/^($self->{rxField})\s*($self->{rxOp})\s*//   # field name and op
 	  or
-	  s/^()($self->{rxOpNoField})\s*//) {          # no field, just op
-      	$err = "field '$1' inside '$parentField'", last LOOP if $parentField;
-	($field, $op) = ($1, $2); 
+	  s/^()($self->{rxOpNoField})\s*//) {            # no field, just op
+	($explicit_field, $op) = ($1, $2);
+      	$err = "field '$explicit_field' inside '$parentField'", last LOOP if $parentField;
       }
+
+      # target field, either explicit or implicit
+      my $field = $explicit_field || $parentField || $self->{defField};
+
 
       # parse a value (single term or quoted list or parens)
       my $subQ = undef;
@@ -393,7 +405,7 @@ LOOP :
 	$subQ = {field=>$field, op=>$op, value=>$val, quote=>$quote};
       }
       elsif (s/^\(\s*//) { # parse parentheses 
-	my ($r, $s2) = $self->_parse($s, $implicitPlus, $field, $op);
+	my ($r, $s2) = $self->_parse($s, $implicitPlus, $explicit_field, $op);
 	$err = $self->err, last LOOP if not $r; 
 	$s = $s2;
 	$s =~ s/^\)\s*// or $err = "no matching ) ", last LOOP;
@@ -422,7 +434,7 @@ LOOP :
       }
       else {
 	$err = "unexpected string in query : $_", last LOOP if $_;
-	$err = "missing value after $field $op", last LOOP if $field;
+	$err = "missing value after $field $op" , last LOOP if $field;
       }
     }
   }

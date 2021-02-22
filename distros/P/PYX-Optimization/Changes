@@ -1,2 +1,25 @@
+0.04 2021-02-21T02:41:29+01:00
+ - Add missing return to code. Add blank line after arguments.
+ - Fix output encoding and add tests.
+ - UTF-8 -> utf-8
+
+0.03 2021-02-20T12:38:00+01:00
+ - Add PYX code for data and comment, which are removed.
+ - Add descriptions to test cases.
+ - Add test for constructor.
+ - Add tests for parse().
+ - Add tests for parse_handler().
+ - Rewrite implicit encode() to Encode::encode().
+ - Update README.
+
+0.02 2021-02-20T12:16:20+01:00
+ - Add 'output_encoding' parameter and fix output encoding for default
+   UTF-8.
+ - Fix bugtracker.
+ - Rewrite implicit decode() to PYX::Utils::decode().
+ - Rewrite implicit encode() to PYX::Utils::encode().
+ - Update copyright years.
+ - Update examples/ directory.
+
 0.01 2020-05-01T18:15:58+02:00
  - First version.

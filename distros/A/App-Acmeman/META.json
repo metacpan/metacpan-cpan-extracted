@@ -62,7 +62,7 @@
    "provides" : {
       "App::Acmeman" : {
          "file" : "lib/App/Acmeman.pm",
-         "version" : "3.06"
+         "version" : "3.07"
       },
       "App::Acmeman::Apache::Layout" : {
          "file" : "lib/App/Acmeman/Apache/Layout.pm"
@@ -106,11 +106,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "gray+acmeman@gnu.org.ua",
+         "web" : "https://puszcza.gnu.org.ua/bugs/?group=acmeman"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://git.gnu.org.ua/acmeman.git",
          "web" : "http://git.gnu.org.ua/cgit/acmeman.git/"
       }
    },
-   "version" : "3.06"
+   "version" : "3.07"
 }

@@ -28,6 +28,7 @@ Joshua
 Katana
 Klausner
 Leffler
+Liam
 MMDD
 McCauley
 PDX
@@ -37,6 +38,7 @@ Rolsky's
 Thomas
 Truskett
 Types
+Widdowson
 Www
 WwwD
 YWww
@@ -71,6 +73,7 @@ hhmmss
 hhmmssZ
 joe
 josh
+lbw
 lib
 mmss
 ss

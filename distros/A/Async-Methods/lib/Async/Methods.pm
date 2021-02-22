@@ -1,6 +1,6 @@
 package Async::Methods;
 
-our $VERSION = '0.000003'; # v0.0.3
+our $VERSION = '0.000004'; # v0.0.4
 
 $VERSION = eval $VERSION;
 
@@ -39,7 +39,7 @@ sub then::_ {
       if (my $else = $else{$f}) {
         $else->(@_)
       } else {
-        $f_type->AWAIT_FAIL(@_)
+        $f_type->AWAIT_NEW_FAIL(@_)
       }
     },
   );
@@ -105,11 +105,14 @@ sub this {
     }
     return wantarray ? @result : $result[0];
   }
-  die "Don't know how to await for $self";
+  Carp::croak "Don't know how to await::this for $self";
 }
 
 sub await::_ {
   my ($self, $method, @args) = @_;
+  if ($self eq 'await') {
+    Carp::croak "Call of '${method} await' should be '${method} +await'";
+  }
   my $f = ($self->can('then')
     ? $self->then::_($method, @args)
     : $self->$method(@args)

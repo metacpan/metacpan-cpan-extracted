@@ -7,6 +7,8 @@ use Test::XML;
 use File::Slurp qw(slurp);
 use File::Spec;
 
+use Data::Dumper;
+
 ###############################################################################
 # Figure out how many TAP files we have to run.  Yes, the results *ARE* going
 # to be different when parsing the raw TAP output than when running under

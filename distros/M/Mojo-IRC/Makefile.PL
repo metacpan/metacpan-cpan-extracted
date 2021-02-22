@@ -7,21 +7,16 @@ my %WriteMakefileArgs = (
   ABSTRACT_FROM  => 'lib/Mojo/IRC.pm',
   VERSION_FROM   => 'lib/Mojo/IRC.pm',
   EXE_FILES      => [qw()],
-  BUILD_REQUIRES => {}
-,
-  TEST_REQUIRES  => {
-  'Test::More' => '0.88'
-}
-,
+  BUILD_REQUIRES => {},
+  TEST_REQUIRES  => {'Test::More' => '0.88'},
   PREREQ_PM      => {
-  'IRC::Utils' => '0.12',
-  'List::Util' => '1.33',
-  'Mojolicious' => '7.18',
-  'Parse::IRC' => '1.20',
-  'Unicode::UTF8' => '0.59'
-}
-,
-  META_MERGE     => {
+    'IRC::Utils'    => '0.12',
+    'List::Util'    => '1.33',
+    'Mojolicious'   => '7.54',
+    'Parse::IRC'    => '1.20',
+    'Unicode::UTF8' => '0.59'
+  },
+  META_MERGE => {
     'dynamic_config' => 0,
     'meta-spec'      => {version => 2},
     'resources'      => {

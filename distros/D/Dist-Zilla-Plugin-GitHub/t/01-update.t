@@ -44,7 +44,7 @@ my @tests = (
         ],
         expected_request => [
             PATCH => 'https://api.github.com/repos/bob/My-Stuff' => {
-                headers => {},
+                headers => { Accept => 'application/vnd.github.v3+json' },
                 content => json({
                     name => 'My-Stuff',
                     description => 'Sample DZ Dist',

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use HTML::Entities qw( encode_entities );
 use Markdent::CheckedOutput;
@@ -326,6 +326,18 @@ sub end_strong {
     $self->_stream_end_tag('strong');
 }
 
+sub start_strikethrough {
+    my $self = shift;
+
+    $self->_stream_start_tag('del');
+}
+
+sub end_strikethrough {
+    my $self = shift;
+
+    $self->_stream_end_tag('del');
+}
+
 sub start_code {
     my $self = shift;
 
@@ -528,7 +540,7 @@ sub line_break {
         my $self = shift;
         my ($html) = $validator->(@_);
 
-        $self->_output()->print($html);
+        $self->_output->print($html);
     }
 }
 
@@ -657,7 +669,7 @@ Markdent::Role::HTMLStream - A role for handlers which generate HTML
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 DESCRIPTION
 
@@ -667,7 +679,7 @@ generate a stream of HTML output based on those events.
 =head1 REQUIRED METHODS
 
 This role requires that consuming classes implement two methods, C<<
-$handler->start_document() >> and C<< $handler->end_document() >>.
+$handler->start_document >> and C<< $handler->end_document >>.
 
 =head1 ROLES
 
@@ -692,7 +704,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

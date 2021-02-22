@@ -8,7 +8,7 @@ use warnings;
 use Class::Load ':all'; # For try_load_class() and is_class_loaded().
 
 use File::Spec;  # For catdir.
-use File::Slurp; # For read_dir.
+use File::Slurper 'read_dir';
 
 use Hash::FieldHash ':all';
 
@@ -19,7 +19,7 @@ fieldhash my %my_id_generators => 'my_id_generators';
 fieldhash my %my_serializers   => 'my_serializers';
 
 our $errstr  = '';
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 # -----------------------------------------------
 
@@ -2643,12 +2643,9 @@ L<https://github.com/ronsavage/Data-Session.git>
 
 =head1 Support
 
-Log a bug on RT: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Session>.
+LBugs should be reported via the CPAN bug tracker at
 
-The L<CGI::Application> mailing list often discusses issues relating to L<CGI::Session>,
-and the author of L<Data::Session> monitors that list, so that is another forum available to you.
-
-See L<http://www.erlbaum.net/mailman/listinfo/cgiapp> for details.
+L<https://github.com/ronsavage/Data-Session/issues>
 
 =head1 Thanks
 

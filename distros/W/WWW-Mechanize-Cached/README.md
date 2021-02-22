@@ -4,7 +4,7 @@ WWW::Mechanize::Cached - Cache response to be polite
 
 # VERSION
 
-version 1.54
+version 1.55
 
 # SYNOPSIS
 

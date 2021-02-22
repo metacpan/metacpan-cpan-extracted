@@ -1,54 +1,64 @@
 NAME
-    Text::Lorem - Generate random latin looking text
+    Text::Lorem - Generate random Latin looking text
 
 SYNOPSIS
-     #!/usr/bin/perl
- 
-     use strict;
-     use warnings;
-     use Text::Lorem;
- 
-     my $text = Text::Lorem->new();
+        use Text::Lorem;
 
-     # Generate a string of text with 5 words
-     $words = $text->words(5);
+        my $text = Text::Lorem->new();
 
-     # Generate a string of text with 2 sentences
-     $sentences = $text->sentences(2);
+        # Generate a string of text with 5 words
+        $words = $text->words(5);
 
-     #Generate 3 paragraphs
-     $paragraphs = $text->paragraphs(3);
+        # Generate a list of 5 words
+        @words = $text->words(5);
+
+        # Generate a string of text with 2 sentences
+        $sentences = $text->sentences(2);
+
+        # Generate a list of 2 sentences
+        @sentences = $text->sentences(2);
+
+        # Generate a string of text with 3 paragraphs
+        $paragraphs = $text->paragraphs(3);
+
+        # Generate a list of 3 paragraphs
+        @paragraphs = $text->paragraphs(3);
 
 DESCRIPTION
-    Often when developing a website its important to have placeholders for
-    content. This module generates prescribed amounts of fake latin text.
+    Often when developing a website or other application it's important to
+    have placeholders for content. This module generates prescribed amounts
+    of fake Latin text.
 
 CONSTRUCTOR
-    new()
-        The default constructor, `new' takes no arguments and returns a
+    "new()"
+        The default constructor, "new()" takes no arguments and returns a
         Text::Lorem object.
 
 METHODS
-    words( INTEGER )
-        Returns INTEGER fake latin words.
+    All methods below will return a string in scalar context or list in list
+    context.
 
-    sentences( INTEGER )
-        Returns INTEGER sentences in fake latin.
+    "words( INTEGER )"
+        Returns INTEGER fake Latin words.
 
-    paragraphs( INTEGER )
-        Returns INTEGER paragraphs of fake latin text.
+    "sentences( INTEGER )"
+        Returns INTEGER sentences in fake Latin.
+
+    "paragraphs( INTEGER )"
+        Returns INTEGER paragraphs of fake Latin text.
 
 THANKS
     Thanks to the guys who pushed me off the cliff called comfort and into
-    the scary world of Perl: james Duncan, Leon Brocard.
+    the scary world of Perl: James Duncan, Leon Brocard.
 
 AUTHOR
     Adeola Awoyemi (adeola@fotango.com)
 
 SEE ALSO
-      WWW::Lipsum(3) and http://lipsum.com/
+      L<WWW::Lipsum> and L<http://lipsum.com/>
 
 COPYRIGHT
-    Copyright 2003 Fotango Ltd. All rights reserved. This software is
-    released under the same license as Perl itself.
+    Copyright 2003 Fotango Ltd. All rights reserved.
+    <http://opensource.fotango.com/> This software is released under the
+    same license as Perl itself.
 

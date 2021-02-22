@@ -1,5 +1,5 @@
 package Util::Medley::Roles::Attributes::Spawn;
-$Util::Medley::Roles::Attributes::Spawn::VERSION = '0.055';
+$Util::Medley::Roles::Attributes::Spawn::VERSION = '0.058';
 use Modern::Perl;
 use Moose::Role;
 use Util::Medley::Spawn;
@@ -10,7 +10,7 @@ Util::Medley::Roles::Attributes::Spawn
 
 =head1 VERSION
 
-version 0.055
+version 0.058
 
 =cut
 

@@ -2,37 +2,43 @@ NAME
     Acme::CPANModules::Sudoku - Sudoku-related modules on CPAN
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModules::Sudoku (from
-    Perl distribution Acme-CPANModules-Sudoku), released on 2021-01-12.
+    This document describes version 0.004 of Acme::CPANModules::Sudoku (from
+    Perl distribution Acme-CPANModules-Sudoku), released on 2021-01-13.
 
 DESCRIPTION
     Recently (Dec 2020) I picked up more interest in Sudoku, as I was
     spending more time at home with the kids, and there was a book of Sudoku
     puzzles lying around in the room.
 
-    There are certainly more modules on CPAN for solving Sudoku puzzles
-    compared to modules/scripts that let you play Sudoku. Basically, I find
-    that there's no good playable Sudoku game on CPAN.
-
     Playing
 
-    <pm::Games::Sudoku::CLI>. Since it's CLI (prompt-based) instead of TUI,
-    it's not really convenient to play unless you're a CLI freak.
+    There are certainly more modules on CPAN for solving Sudoku puzzles
+    compared to for playing. And between the two available modules, I find
+    that there's no good playable Sudoku game on CPAN. You'd be better off
+    opening your browser and visit <https://websudoku.com> or
+    <https://sudoku.com>. Sad but true. Not the case for all games though. I
+    did enjoy *Games::FrozenBubble* and still play *Games::2048* from time
+    to time.
 
-    <pm::Games::Sudoku::Component::TkPlayer>. It's GUI and barely playable,
-    but clunky and not pretty. There's no visual indicator for separating
-    the larger 3x3 boxes.
+    These modules are for playing Sudoku:
+
+    Games::Sudoku::CLI. Since it's CLI (prompt-based) instead of TUI, it's
+    not really convenient to play unless you're a CLI freak.
+
+    Games::Sudoku::Component::TkPlayer. It's GUI and barely playable, but
+    clunky and not pretty. There's no visual indicator for separating the
+    larger 3x3 boxes.
 
     Generating
 
     These modules can generate Sudoku puzzles for you, though not let you
-    interactively play/solve them.
+    interactively play/solve them:
 
     Spreadsheet::HTML::Presets::Sudoku
 
     Solving
 
-    There's no shortage of modules written to solve Sudoku puzzles. I plan
+    There is no shortage of modules written to solve Sudoku puzzles. I plan
     to benchmark these but for now here's the list:
 
     Games::Sudoku::Lite
@@ -52,6 +58,10 @@ DESCRIPTION
     Games::YASudoku
 
 ACME::MODULES ENTRIES
+    *   Games::Sudoku::CLI
+
+    *   Games::Sudoku::Component::TkPlayer
+
     *   Spreadsheet::HTML::Presets::Sudoku
 
     *   Games::Sudoku::Lite

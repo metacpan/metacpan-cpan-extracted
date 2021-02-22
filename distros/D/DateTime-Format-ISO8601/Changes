@@ -1,3 +1,9 @@
+0.16     2021-02-14
+
+- Add support for YYYYMMDDThhmm[+-]hhmm and YYYY-MM-DDThh:mm+hh:mm
+  formats. Based on GH #13 from lbjw.
+
+
 0.15     2020-10-24
 
 - Fixed the SYNOPSIS, which showed calling parse_time with a string that would

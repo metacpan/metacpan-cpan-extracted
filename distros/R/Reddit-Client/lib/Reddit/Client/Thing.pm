@@ -6,14 +6,50 @@ use Carp;
 
 use List::Util qw/first/;
 
-our @BOOL_FIELDS = qw/is_self likes clicked saved hidden over_18 over18 edited
-                      has_mail has_mod_mail is_mod is_gold was_comment new
-		      public_traffic is_employee verified has_verified_email/;
+# If a field is used by another class it must also be added to that class's 
+# fields
+# Why does adding a field that exists in link but not comment (can_mod_post)
+# break comments but not other types of things, like profiles?
+# because can_mod_post DOES exist for comments. this would get to that field,
+# which was previously ignored, but now it's in BOOL here, so it would try to 
+# set it, but the field didn't exist in Comment, so it would fail.
+our @BOOL_FIELDS = qw/
+can_mod_post
+clicked
+has_mail
+has_mod_mail
+has_verified_email
+hidden
+is_employee
+is_gold
+is_mod
+is_original_content
+is_self
+likes
+locked
+new
+over18
+over_18
+public_traffic
+quarantine
+removed
+saved
+spam
+spoiler
+stickied
+verified
+was_comment
 
+isAuto
+isHighlighted
+isInternal
+isRepliable
+/;
 
 use fields qw/session name id/;
 
 sub new {
+	# $reddit is a Reddit::Client object
     my ($class, $reddit, $source_data) = @_;
     my $self = fields::new($class);
     $self->{session} = $reddit; # could this be called something more sensible

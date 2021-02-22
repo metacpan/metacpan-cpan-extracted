@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHub::Update;
 use strict;
 use warnings;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use JSON::MaybeXS;
 use Moose;
@@ -117,12 +117,12 @@ sub after_release {
         $params->{homepage} = $meta_home;
     } elsif ($self->metacpan) {
         $self->log("Using MetaCPAN URL");
-        $params->{homepage} = "http://metacpan.org/release/$dist_name/";
+        $params->{homepage} = "https://metacpan.org/release/$dist_name/";
     } elsif ($self->p3rl) {
         $self->log("Using P3rl URL");
         my $guess_name = $dist_name;
         $guess_name =~ s/\-/\:\:/g;
-        $params->{homepage} = "http://p3rl.org/$guess_name";
+        $params->{homepage} = "https://p3rl.org/$guess_name";
     }
 
     my $url = $self->api."/repos/$repo_name";
@@ -137,6 +137,7 @@ sub after_release {
         return;
     }
 
+    $self->log_debug("Sending PATCH $url");
     my $response = HTTP::Tiny->new->request('PATCH', $url, {
         content => encode_json($params),
         headers => $self->_auth_headers,
@@ -160,6 +161,7 @@ sub _current_params {
 
     my $http = HTTP::Tiny->new;
 
+    $self->log_debug("Sending GET $url");
     my $response = $http->request('GET', $url);
 
     return $self->_check_response($response);
@@ -180,7 +182,7 @@ Dist::Zilla::Plugin::GitHub::Update - Update a GitHub repo's info on release
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -235,13 +237,13 @@ default). This is used when trying to guess the repository name.
 =item C<p3rl>
 
 The GitHub homepage field will be set to the p3rl.org shortened URL
-(e.g. C<http://p3rl.org/Dist::Zilla::Plugin::GitHub>) if this option is set to true (default is
+(e.g. C<https://p3rl.org/Dist::Zilla::Plugin::GitHub>) if this option is set to true (default is
 false).
 
 =item C<metacpan>
 
 The GitHub homepage field will be set to the metacpan.org distribution URL
-(e.g. C<http://metacpan.org/release/Dist-Zilla-Plugin-GitHub>) if this option is set to true
+(e.g. C<https://metacpan.org/release/Dist-Zilla-Plugin-GitHub>) if this option is set to true
 (default).
 
 This takes precedence over the C<p3rl> options (if both are

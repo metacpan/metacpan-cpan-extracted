@@ -21,7 +21,8 @@ my @files = (
     't/1.txt',
     't/2.txt',
     't/3.txt',
-    't/4.txt'
+    't/4.txt',
+    't/5.txt'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

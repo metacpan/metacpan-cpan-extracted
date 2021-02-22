@@ -61,18 +61,24 @@ and attach a Perl (.pl) program illustrating the problem, if possible. If you
 believe that you have a program patch, and offer to share it as a PR, we may
 give the go-ahead. Unsolicited PRs may be closed without further action.
 
+Discussion of a more general nature, not related to a specific bug or feature
+(enhancement) request, may be made in "https://www.catskilltech.com/forum/general-12/textknuthplass-general-discussion/"
+
 ## License
 
 This product is licensed under the Perl license. You may redistribute under
 the GPL license, if desired, but you will have to add a copy of that license
 to your distribution, per its terms.
 
+(c)copyright 2020-2021 by Phil M Perry
+earlier copyrights held by Simon Cozens
+
 ## An Example
 
 Find an example of using Text::KnuthPlass in `examples/KP.pl`. It assumes that
 Text::Hyphen and PDF::Builder are installed. You can easily substitute
 PDF::API2 and change the PDF::Builder references in the code. You have a choice
-of two text selections to format, and can change many settings, such as the
+of three text selections to format, and can change many settings, such as the
 font, font size, indentation amount, leading, line length (in Points), and
 whether output is flush right or ragged right. The output file is `KP.pdf`.
 

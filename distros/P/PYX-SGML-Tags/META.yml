@@ -31,13 +31,13 @@ no_index:
 requires:
   Class::Utils: 0.05
   Error::Pure: 0.15
-  PYX::Parser: 0.05
+  PYX::Parser: 0.08
   PYX::Utils: 0.01
-  Tags::Output::Raw: 0.1
+  Tags::Output::Raw: 0.11
   perl: 5.6.2
 resources:
   bugtracker: https://github.com/michal-josef-spacek/PYX-SGML-Tags/issues
   homepage: https://github.com/michal-josef-spacek/PYX-SGML-Tags
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/PYX-SGML-Tags
-version: '0.06'
+version: '0.08'

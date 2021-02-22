@@ -46,7 +46,9 @@
       },
       "x_mentions" : {
          "x_mentions" : {
+            "Games::Sudoku::CLI" : "0",
             "Games::Sudoku::CPSearch" : "0",
+            "Games::Sudoku::Component::TkPlayer" : "0",
             "Games::Sudoku::General" : "0",
             "Games::Sudoku::Kubedoku" : "0",
             "Games::Sudoku::Lite" : "0",
@@ -70,7 +72,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-Sudoku"
       }
    },
-   "version" : "0.001",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

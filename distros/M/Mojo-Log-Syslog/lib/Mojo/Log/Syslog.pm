@@ -6,7 +6,7 @@ use File::Basename 'basename';
 use Sys::Syslog qw(:standard :macros);
 use Carp;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 sub new {
     my $class = shift;

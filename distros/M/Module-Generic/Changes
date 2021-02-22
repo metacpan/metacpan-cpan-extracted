@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+0.13.6 2021-02-14T13:01:16+0900
+    - Improved test unit for cygwin not supporting crypt
+
 0.13.5 2021-02-06T11:46:18+0900
     - Corrected a mising require for DateTime::Format::Strptime
     - Improved the _warnings_is_enabled helper method

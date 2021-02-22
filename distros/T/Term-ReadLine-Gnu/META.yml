@@ -24,5 +24,5 @@ resources:
   homepage: http://sourceforge.net/projects/perl-trg/
   license: http://dev.perl.org/licenses/
   repository: https://sourceforge.net/p/perl-trg/code/HEAD/tree/
-version: '1.37'
+version: '1.39'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

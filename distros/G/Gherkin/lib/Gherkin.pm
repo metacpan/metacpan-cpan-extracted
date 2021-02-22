@@ -1,5 +1,5 @@
 package Gherkin;
-$Gherkin::VERSION = '17.0.1';
+$Gherkin::VERSION = '17.0.2';
 use strict;
 use warnings;
 

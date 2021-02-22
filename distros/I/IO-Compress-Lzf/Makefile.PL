@@ -3,7 +3,7 @@
 use strict ;
 require 5.006 ;
 
-$::VERSION = '2.100' ;
+$::VERSION = '2.101' ;
 
 use lib '.';
 use private::MakeUtil;

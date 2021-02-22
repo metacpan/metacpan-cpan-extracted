@@ -1,0 +1,78 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Command::Template::Instance
+
+=head1 SYNOPSIS
+
+   use Command::Template::Instance;
+
+   my @template = qw{ ls [options=-l] <dir> };
+   my $instance = Command::Template::Instance->new(@template);
+
+   # @c1 = qw< ls -l / >
+   my @c1 = $ct->generate(dir => '/');
+
+   # @c2 = qw< ls -la / >
+   my @c2 = $ct->generate(dir => '/etc', options => '-la');
+
+   # @c3 = @c4 = qw< ls /usr/bin >
+   my @c3 = $ct->generate(dir => '/usr/bin', options => undef);
+   my @c4 = $ct->generate(dir => '/usr/bin', options => []);
+
+   # @c5 = qw< ls -l -a /usr/bin >
+   my @c5 = $ct->generate(dir => '/usr/bin', options => [qw< -l -a >]);
+
+
+=head1 DESCRIPTION
+
+This class implements the main expansion mechanism for command
+templates.
+
+=head1 INTERFACE
+
+=head2 B<< defaults >>
+
+   my $href = $obj->defaults;
+   $obj->defaults({...});
+
+Get or set the default bindings for expansion. Returns or accepts a hash
+reference with key/value pairs representing the default bindings.
+
+=head2 B<< generate >>
+
+   my @command = $obj->generate(%bindings); # OR
+   my $command = $obj->generate(%bindings);
+
+Expand the template according to the provided bindings and, if set, the
+default ones.
+
+Returns a list of strings in list context, a reference to an array
+containing the list otherwise.
+
+=head2 B<< new >>
+
+   my $instance = Command::Template::Instance(@template);
+
+Generate a new object, suitable for serially expand the provided
+C<@template>.
+
+=head2 B<< template >>
+
+   my $aref = $obj->template;
+
+Get a copy of the template used for the expansion.
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for Command::Template.
+
+
+=cut

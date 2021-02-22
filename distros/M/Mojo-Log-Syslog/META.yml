@@ -2,18 +2,29 @@
 abstract: 'syslog for Mojo projects'
 author:
   - 'Sergey Poznyakoff <gray@gnu.org>'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Mojo-Log-Syslog
 no_index:
   directory:
     - t
     - inc
+provides:
+  Mojo::Log::Syslog:
+    file: lib/Mojo/Log/Syslog.pm
+    version: '1.03'
+requires:
+  Mojolicious: '7.58'
+  Sys::Syslog: '0'
 resources:
+  bugtracker: https://puszcza.gnu.org.ua/bugs/?group=mojosyslog
   repository: git://git.gnu.org.ua/mojosyslog.git
-version: 1.02
+version: '1.03'

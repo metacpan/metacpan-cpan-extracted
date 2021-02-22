@@ -19,18 +19,25 @@ use fields qw/
 	first_message
 	first_message_name
 	likes				
-	link_title			new
+	link_title
+	new
 	parent_id
+	permalink
 	replies
 	subject
 	subreddit
-					was_comment
+	was_comment
 	/;
 
-1; 
 
 use constant type => "t4";
 
+sub get_web_url {
+	my $this = shift;
+	return $this->{session}->get_origin()."/message/messages/".$this->{id};
+}
+
+1; 
 __END__
 
 =pod
@@ -44,3 +51,4 @@ Reddit::Client::Message
 A thing that can appear in a user's inbox (comment or message, t1 or t4).
 
 =cut
+

@@ -117,6 +117,7 @@ subtest ihost => sub {
 
 	SKIP: {
 		skip "Locale is not set!", scalar @tests unless length $ENV{LC_ALL};
+		skip "Locale is not UTF-8!", scalar @tests unless length $ENV{LC_ALL} =~ /UTF-?8/;
 		run_table( '%i', \@tests );
 		}
 	};

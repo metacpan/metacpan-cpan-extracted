@@ -15,18 +15,21 @@ Readonly::Scalar my $ATTR_CHARS => q{<&"};
 Readonly::Scalar my $CHAR_CHARS => q{<&\240};
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # Encode newline in data to '\n' in output.
 sub encode_newline {
 	my $string = shift;
+
 	$string =~ s/\n/\\n/gms;
+
 	return $string;
 }
 
 # Encode '<&"' attribute entities.
 sub encode_attr_entities {
 	my $data_r = shift;
+
 	if (ref $data_r eq 'SCALAR') {
 		${$data_r} = encode_entities(decode_entities(${$data_r}),
 			$ATTR_CHARS);
@@ -45,6 +48,7 @@ sub encode_attr_entities {
 # Encode '<&NBSP' char entities.
 sub encode_char_entities {
 	my $data_r = shift;
+
 	if (ref $data_r eq 'SCALAR') {
 		${$data_r} = encode_entities(decode_entities(${$data_r}),
 			$CHAR_CHARS);
@@ -166,8 +170,8 @@ __END__
 
 =head1 DEPENDENCIES
 
-L<HTML::Entities>,
 L<Error::Pure>,
+L<HTML::Entities>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -192,12 +196,12 @@ L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2020 Michal Josef Špaček
+© 2005-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

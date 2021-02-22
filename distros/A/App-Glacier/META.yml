@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,6 +17,73 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  App::Glacier:
+    file: lib/App/Glacier.pm
+    version: '2.12'
+  App::Glacier::Bre:
+    file: lib/App/Glacier/Bre.pm
+  App::Glacier::Command:
+    file: lib/App/Glacier/Command.pm
+  App::Glacier::Command::CreateVault:
+    file: lib/App/Glacier/Command/CreateVault.pm
+  App::Glacier::Command::DeleteFile:
+    file: lib/App/Glacier/Command/DeleteFile.pm
+  App::Glacier::Command::DeleteVault:
+    file: lib/App/Glacier/Command/DeleteVault.pm
+  App::Glacier::Command::Get:
+    file: lib/App/Glacier/Command/Get.pm
+  App::Glacier::Command::Jobs:
+    file: lib/App/Glacier/Command/Jobs.pm
+  App::Glacier::Command::ListVault:
+    file: lib/App/Glacier/Command/ListVault.pm
+  App::Glacier::Command::Periodic:
+    file: lib/App/Glacier/Command/Periodic.pm
+  App::Glacier::Command::Purge:
+    file: lib/App/Glacier/Command/Purge.pm
+  App::Glacier::Command::Put:
+    file: lib/App/Glacier/Command/Put.pm
+  App::Glacier::Command::Sync:
+    file: lib/App/Glacier/Command/Sync.pm
+  App::Glacier::Config:
+    file: lib/App/Glacier/Config.pm
+    version: '1.00'
+  App::Glacier::Core:
+    file: lib/App/Glacier/Core.pm
+  App::Glacier::DB:
+    file: lib/App/Glacier/DB.pm
+  App::Glacier::DB::GDBM:
+    file: lib/App/Glacier/DB/GDBM.pm
+  App::Glacier::DateTime:
+    file: lib/App/Glacier/DateTime.pm
+  App::Glacier::Directory:
+    file: lib/App/Glacier/Directory.pm
+  App::Glacier::Directory::GDBM:
+    file: lib/App/Glacier/Directory/GDBM.pm
+  App::Glacier::EclatCreds:
+    file: lib/App/Glacier/EclatCreds.pm
+  App::Glacier::Glob:
+    file: lib/App/Glacier/Glob.pm
+  App::Glacier::HttpCatch:
+    file: lib/App/Glacier/HttpCatch.pm
+  App::Glacier::Job:
+    file: lib/App/Glacier/Job.pm
+  App::Glacier::Job::ArchiveRetrieval:
+    file: lib/App/Glacier/Job/ArchiveRetrieval.pm
+  App::Glacier::Job::FileRetrieval:
+    file: lib/App/Glacier/Job/FileRetrieval.pm
+  App::Glacier::Job::InventoryRetrieval:
+    file: lib/App/Glacier/Job/InventoryRetrieval.pm
+  App::Glacier::Progress:
+    file: lib/App/Glacier/Progress.pm
+  App::Glacier::Roster:
+    file: lib/App/Glacier/Roster.pm
+  App::Glacier::Roster::GDBM:
+    file: lib/App/Glacier/Roster/GDBM.pm
+  App::Glacier::Signature:
+    file: lib/App/Glacier/Signature.pm
+  App::Glacier::Timestamp:
+    file: lib/App/Glacier/Timestamp.pm
 requires:
   Carp: '1.26'
   Data::Dumper: '2.13506'
@@ -39,4 +106,7 @@ requires:
   Storable: '2.34'
   Term::ReadKey: '2.32'
   Text::Locus: '1.01'
-version: '2.10'
+resources:
+  bugtracker: https://puszcza.gnu.org.ua/bugs/?group=glacier
+  repository: git://git.gnu.org.ua/glacier.git
+version: '2.12'

@@ -5,13 +5,13 @@ package UTF8::R2;
 #
 # http://search.cpan.org/dist/UTF8-R2/
 #
-# Copyright (c) 2019, 2020 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.12';
+$VERSION = '0.14';
 $VERSION = $VERSION;
 
 use strict;
@@ -102,7 +102,7 @@ my $bare_w = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_';
 sub import {
     my $self = shift @_;
     if (defined($_[0]) and ($_[0] =~ /\A[0123456789]/)) {
-        if ($_[0] != $UTF8::R2::VERSION) {
+        if ($_[0] ne $UTF8::R2::VERSION) {
             my($package,$filename,$line) = caller;
             die "$filename requires UTF8::R2 $_[0], this is version $UTF8::R2::VERSION, stopped at $filename line $line.\n";
         }
@@ -111,6 +111,7 @@ sub import {
     for (@_) {
         if ($_ eq '%mb') {
             no strict qw(refs);
+            # tie my %mb, __PACKAGE__; # makes: Parentheses missing around "my" list
             tie my %mb, 'UTF8::R2';
             *{caller().'::mb'} = \%mb;
         }
@@ -118,12 +119,6 @@ sub import {
             $x = $utf8_codepoint{$_};
         }
     }
-}
-
-#---------------------------------------------------------------------
-# shortcut of omitted $_
-sub _ {
-    @_ ? $_[0] : $_
 }
 
 #---------------------------------------------------------------------
@@ -143,7 +138,7 @@ sub confess {
 
 #---------------------------------------------------------------------
 # chop() for UTF-8 codepoint string
-sub UTF8::R2::chop (@) {
+sub UTF8::R2::chop {
     my $chop = '';
     for (@_ ? @_ : $_) {
         if (my @x = /\G$x/g) {
@@ -156,19 +151,19 @@ sub UTF8::R2::chop (@) {
 
 #---------------------------------------------------------------------
 # chr() for UTF-8 codepoint string
-sub UTF8::R2::chr (;$) {
-    local $_ = &_;
-    if ($_ < 0) {
-        return pack 'C*', 0xEF, 0xBF, 0xBD; # Unicode Codepoint 'REPLACEMENT CHARACTER' (U+FFFD)
-    }
-    else {
-        my @octet = ();
-        do {
-            unshift @octet, ($_ % 0x100);
-            $_ = int($_ / 0x100);
-        } while ($_ > 0);
-        return pack 'C*', @octet;
-    }
+sub UTF8::R2::chr {
+    local $_ = @_ ? $_[0] : $_;
+
+# Negative values give the Unicode replacement character (chr(0xfffd)),
+# except under the bytes pragma, where the low eight bits of the value
+# (truncated to an integer) are used.
+
+    my @octet = ();
+    do {
+        unshift @octet, ($_ % 0x100);
+        $_ = int($_ / 0x100);
+    } while ($_ > 0);
+    return pack 'C*', @octet;
 }
 
 #---------------------------------------------------------------------
@@ -193,39 +188,36 @@ sub UTF8::R2::getc (;*) {
 
 #---------------------------------------------------------------------
 # index() for UTF-8 codepoint string
-sub UTF8::R2::index ($$;$) {
-    if (@_ == 2) {
-        my $index = CORE::index $_[0], $_[1];
-        if ($index < 1) {
-            return $index;
-        }
-        else {
-            return UTF8::R2::length(CORE::substr $_[0], 0, $index);
-        }
+sub UTF8::R2::index {
+    my $index = 0;
+    if (@_ == 3) {
+        $index = CORE::index $_[0], $_[1], CORE::length(UTF8::R2::substr($_[0], 0, $_[2]));
     }
-    elsif (@_ == 3) {
-        my $index = CORE::index $_[0], $_[1], CORE::length(UTF8::R2::substr($_[0], 0, $_[2]));
-        if ($index < 1) {
-            return $index;
-        }
-        else {
-            return UTF8::R2::length(CORE::substr $_[0], 0, $index);
-        }
+    else {
+        $index = CORE::index $_[0], $_[1];
+    }
+    if ($index == -1) {
+        return -1;
+    }
+    else {
+        return UTF8::R2::length(CORE::substr $_[0], 0, $index);
     }
 }
 
 #---------------------------------------------------------------------
 # universal lc() for UTF-8 codepoint string
-sub UTF8::R2::lc (;$) {
+sub UTF8::R2::lc {
+    local $_ = @_ ? $_[0] : $_;
     #                          A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z
-    return join '', map { {qw( A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z )}->{$_}||$_ } (&_ =~ /\G$x/g);
+    return join '', map { {qw( A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z )}->{$_}||$_ } /\G$x/g;
     #                          A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z
 }
 
 #---------------------------------------------------------------------
 # universal lcfirst() for UTF-8 codepoint string
-sub UTF8::R2::lcfirst (;$) {
-    if (&_ =~ UTF8::R2::qr(qr/\A(.)(.*)\z/s)) {
+sub UTF8::R2::lcfirst {
+    local $_ = @_ ? $_[0] : $_;
+    if (/\A($x)(.*)\z/s) {
         return UTF8::R2::lc($1) . $2;
     }
     else {
@@ -235,15 +227,17 @@ sub UTF8::R2::lcfirst (;$) {
 
 #---------------------------------------------------------------------
 # length() for UTF-8 codepoint string
-sub UTF8::R2::length (;$) {
-    return scalar(() = &_ =~ /\G$x/g);
+sub UTF8::R2::length {
+    local $_ = @_ ? $_[0] : $_;
+    return scalar(() = /\G$x/g);
 }
 
 #---------------------------------------------------------------------
 # ord() for UTF-8 codepoint string
-sub UTF8::R2::ord (;$) {
+sub UTF8::R2::ord {
+    local $_ = @_ ? $_[0] : $_;
     my $ord = 0;
-    if (&_ =~ /\A($x)/) {
+    if (/\A($x)/) {
         for my $octet (unpack 'C*', $1) {
             $ord = $ord * 0x100 + $octet;
         }
@@ -252,19 +246,13 @@ sub UTF8::R2::ord (;$) {
 }
 
 #---------------------------------------------------------------------
-# qr/ \x{Unicode} / for UTF-8 codepoint string
-sub _unicode_hex {
+# qr/ \x{UTF8hex} / for UTF-8 codepoint string
+sub _utf8_hex {
     my($codepoint) = @_;
 
-    # \x{unicode_hex}
-    if ((my($unicode_by_hex) = $codepoint =~ /\A \\x \{ ([01234567890ABCDEFabcdef]+) \} \z/x)) {
-        my $unicode = hex $unicode_by_hex;
-        if (0) { }
-        elsif ($unicode <     0x80) { return pack('U0C*',                                                                   $unicode          ) }
-        elsif ($unicode <    0x800) { return pack('U0C*',                                            $unicode>>6     |0xC0, $unicode&0x3F|0x80) }
-        elsif ($unicode <  0x10000) { return pack('U0C*',                    $unicode>>12     |0xE0, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
-        elsif ($unicode < 0x110000) { return pack('U0C*', $unicode>>18|0xF0, $unicode>>12&0x3F|0x80, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
-        else { confess qq{@{[__FILE__]}: \\x{$unicode_by_hex} is out of Unicode (0 to 0x10FFFF)}; }
+    # \x{UTF8hex}
+    if ((my($hexcode) = $codepoint =~ /\A \\x \{ ([01234567890ABCDEFabcdef]+) \} \z/x)) {
+        return UTF8::R2::chr(hex $hexcode);
     }
     else {
         return $codepoint;
@@ -273,8 +261,8 @@ sub _unicode_hex {
 
 #---------------------------------------------------------------------
 # qr/ [A-Z] / for UTF-8 codepoint string
-sub _list_all_by_hyphen {
-    my($a,$b) = map { _unicode_hex($_) } @_;
+sub _list_all_by_hyphen_utf8_like {
+    my($a,$b) = map { _utf8_hex($_) } @_;
 
     my @a = (undef, unpack 'C*', $a);
     my @b = (undef, unpack 'C*', $b);
@@ -402,7 +390,7 @@ $a[3] < 0xBF ?  sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF] [
 
 #---------------------------------------------------------------------
 # qr// for UTF-8 codepoint string
-sub UTF8::R2::qr ($) {
+sub UTF8::R2::qr {
     my $before_regex = $_[0];
     my($package,$filename,$line) = caller;
 
@@ -429,13 +417,13 @@ sub UTF8::R2::qr ($) {
 
                 # hyphen of [A-Z] or [^A-Z]
                 if (($i < $#before_subclass) and ($before_subclass[$i+1] eq '-')) {
-                    push @mbcs, _list_all_by_hyphen($before_subclass[$i], $before_subclass[$i+2]);
+                    push @mbcs, _list_all_by_hyphen_utf8_like($before_subclass[$i], $before_subclass[$i+2]);
                     $i += 3;
                 }
 
                 # any "one"
                 else {
-                    $before_subclass = _unicode_hex($before_subclass);
+                    $before_subclass = _utf8_hex($before_subclass);
                     if (0) { }
 
                     # \any
@@ -551,7 +539,7 @@ sub UTF8::R2::qr ($) {
         }
 
         # else
-        else { push @after_subregex, _unicode_hex($before_subregex) }
+        else { push @after_subregex, _utf8_hex($before_subregex) }
     }
 
     my $after_regex = join '', @after_subregex;
@@ -560,7 +548,7 @@ sub UTF8::R2::qr ($) {
 
 #---------------------------------------------------------------------
 # reverse() for UTF-8 codepoint string
-sub UTF8::R2::reverse (@) {
+sub UTF8::R2::reverse {
 
     # in list context,
     if (wantarray) {
@@ -585,30 +573,25 @@ sub UTF8::R2::reverse (@) {
 
 #---------------------------------------------------------------------
 # rindex() for UTF-8 codepoint string
-sub UTF8::R2::rindex ($$;$) {
-    if (@_ == 2) {
-        my $rindex = CORE::rindex $_[0], $_[1];
-        if ($rindex < 1) {
-            return $rindex;
-        }
-        else {
-            return UTF8::R2::length(CORE::substr $_[0], 0, $rindex);
-        }
+sub UTF8::R2::rindex {
+    my $rindex = 0;
+    if (@_ == 3) {
+        $rindex = CORE::rindex $_[0], $_[1], CORE::length(UTF8::R2::substr($_[0], 0, $_[2]));
     }
-    elsif (@_ == 3) {
-        my $rindex = CORE::rindex $_[0], $_[1], CORE::length(UTF8::R2::substr($_[0], 0, $_[2]));
-        if ($rindex < 1) {
-            return $rindex;
-        }
-        else {
-            return UTF8::R2::length(CORE::substr $_[0], 0, $rindex);
-        }
+    else {
+        $rindex = CORE::rindex $_[0], $_[1];
+    }
+    if ($rindex == -1) {
+        return -1;
+    }
+    else {
+        return UTF8::R2::length(CORE::substr $_[0], 0, $rindex);
     }
 }
 
 #---------------------------------------------------------------------
 # split() for UTF-8 codepoint string
-sub UTF8::R2::split (;$$$) {
+sub UTF8::R2::split {
     if (defined($_[0]) and (($_[0] eq '') or ($_[0] =~ /\A \( \? \^? [-a-z]* : \) \z/x))) {
         my @x = (defined($_[1]) ? $_[1] : $_) =~ /\G$x/g;
         if (defined($_[2]) and ($_[2] > 0) and (scalar(@x) > $_[2])) {
@@ -642,20 +625,33 @@ sub UTF8::R2::split (;$$$) {
 #---------------------------------------------------------------------
 # substr() for UTF-8 codepoint string
 eval sprintf <<'END', ($] >= 5.014) ? ':lvalue' : '';
-#                            vv--------*******
-sub UTF8::R2::substr ($$;$$) %s {
+#                    vv----------------*******
+sub UTF8::R2::substr %s {
     my @x = $_[0] =~ /\G$x/g;
+
+    # If the substring is beyond either end of the string, substr() returns the undefined
+    # value and produces a warning. When used as an lvalue, specifying a substring that
+    # is entirely outside the string raises an exception.
+    # http://perldoc.perl.org/functions/substr.html
+
+    # A return with no argument returns the scalar value undef in scalar context,
+    # an empty list () in list context, and (naturally) nothing at all in void
+    # context.
 
     if (($_[1] < (-1 * scalar(@x))) or (+1 * scalar(@x) < $_[1])) {
         return;
     }
 
+    # substr($string,$offset,$length,$replacement)
     if (@_ == 4) {
         my $substr = join '', splice @x, $_[1], $_[2], $_[3];
         $_[0] = join '', @x;
         $substr; # "return $substr" doesn't work, don't write "return"
     }
+
+    # substr($string,$offset,$length)
     elsif (@_ == 3) {
+        local $SIG{__WARN__} = sub {}; # avoid: Use of uninitialized value in join or string at here
         my $octet_offset =
             ($_[1] < 0) ? -1 * CORE::length(join '', @x[$#x+$_[1]+1 .. $#x])     :
             ($_[1] > 0) ?      CORE::length(join '', @x[0           .. $_[1]-1]) :
@@ -666,6 +662,8 @@ sub UTF8::R2::substr ($$;$$) %s {
             0;
         CORE::substr($_[0], $octet_offset, $octet_length);
     }
+
+    # substr($string,$offset)
     else {
         my $octet_offset =
             ($_[1] < 0) ? -1 * CORE::length(join '', @x[$#x+$_[1]+1 .. $#x])     :
@@ -711,7 +709,7 @@ sub _list_all_ASCII_by_hyphen {
 
 #---------------------------------------------------------------------
 # tr/// for UTF-8 codepoint string
-sub UTF8::R2::tr ($$$;$) {
+sub UTF8::R2::tr {
     my @x           = $_[0] =~ /\G$x/g;
     my @search      = _list_all_ASCII_by_hyphen($_[1] =~ /\G$x/g);
     my @replacement = _list_all_ASCII_by_hyphen($_[2] =~ /\G$x/g);
@@ -865,16 +863,18 @@ sub UTF8::R2::tr ($$$;$) {
 
 #---------------------------------------------------------------------
 # universal uc() for UTF-8 codepoint string
-sub UTF8::R2::uc (;$) {
+sub UTF8::R2::uc {
+    local $_ = @_ ? $_[0] : $_;
     #                          a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z
-    return join '', map { {qw( a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z )}->{$_}||$_ } (&_ =~ /\G$x/g);
+    return join '', map { {qw( a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z )}->{$_}||$_ } /\G$x/g;
     #                          a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z
 }
 
 #---------------------------------------------------------------------
 # universal ucfirst() for UTF-8 codepoint string
-sub UTF8::R2::ucfirst (;$) {
-    if (&_ =~ UTF8::R2::qr(qr/\A(.)(.*)\z/s)) {
+sub UTF8::R2::ucfirst {
+    local $_ = @_ ? $_[0] : $_;
+    if (/\A($x)(.*)\z/s) {
         return UTF8::R2::uc($1) . $2;
     }
     else {
@@ -885,7 +885,8 @@ sub UTF8::R2::ucfirst (;$) {
 # syntax sugar for UTF-8 codepoint regex
 #
 # tie my %mb, 'UTF8::R2';
-# $result = $_ =~ $mb{qr/$utf8regex/imsxogc}
+# $result = $_ =~ $mb{qr/$utf8regex/imsxo}
+# $result = $_ =~ m<\G$mb{qr/$utf8regex/imsxo}>gc
 # $result = $_ =~ s<$mb{qr/before/imsxo}><after>egr
 
 sub TIEHASH  { bless { }, $_[0] }
@@ -922,7 +923,7 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
   use UTF8::R2 qw( %mb );           # multibyte regex by %mb
 
     $result = UTF8::R2::chop(@_)
-    $result = UTF8::R2::chr($_)
+    $result = UTF8::R2::chr($utf8octet_not_unicode)
     $result = UTF8::R2::getc(FILEHANDLE)
     $result = UTF8::R2::index($_, 'ABC', 5)
     $result = UTF8::R2::lc($_)
@@ -961,7 +962,7 @@ name.
   ------------------------------------------------------------------------------------------------------------------------------------------
   chop                    UTF8::R2::chop(@_)                         usually chomp() is useful
   ------------------------------------------------------------------------------------------------------------------------------------------
-  chr                     UTF8::R2::chr($_)                          returns UTF-8 codepoint octets by UTF-8 number (not by Unicode number)
+  chr                     UTF8::R2::chr($_)                          returns UTF-8 codepoint octets by UTF-8 hex number (not by Unicode number)
   ------------------------------------------------------------------------------------------------------------------------------------------
   getc                    UTF8::R2::getc(FILEHANDLE)                 get UTF-8 codepoint octets
   ------------------------------------------------------------------------------------------------------------------------------------------
@@ -977,22 +978,24 @@ name.
                           m<@{[UTF8::R2::qr(qr/$utf8regex/imsxo)]}>gc
                             or                                       not supports named character (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
                           use UTF8::R2 qw(%mb);                      not supports character properties (like \p{PROP} and \P{PROP})
-                          $mb{qr/$utf8regex/imsxo}
-                          m<\G$mb{qr/$utf8regex/imsxo}>gc
+                          $mb{qr/$utf8regex/imsxo}                   modifier i, m, s, x, o work on compile time
+                          m<\G$mb{qr/$utf8regex/imsxo}>gc            modifier g,c work on run time
 
                           Special Escapes in Regex                   Support Perl Version
                           --------------------------------------------------------------------------------------------------
-                          $mb{qr/ \x{Unicode} /}                     since perl 5.005
+                          $mb{qr/ \x{UTF8hex} /}                     since perl 5.005
+                          $mb{qr/ [\x{UTF8hex}] /}                   since perl 5.005
                           $mb{qr/ [[:POSIX:]] /}                     since perl 5.005
                           $mb{qr/ [[:^POSIX:]] /}                    since perl 5.005
                           $mb{qr/ [^ ... ] /}                        ** CAUTION ** perl 5.006 cannot this
+                          $mb{qr/ [\x{UTF8hex}-\x{UTF8hex}] /}       since perl 5.008
                           $mb{qr/ \h /}                              since perl 5.010
                           $mb{qr/ \v /}                              since perl 5.010
                           $mb{qr/ \H /}                              since perl 5.010
                           $mb{qr/ \V /}                              since perl 5.010
                           $mb{qr/ \R /}                              since perl 5.010
                           $mb{qr/ \N /}                              since perl 5.012
-
+                          (max \x{UTF8hex} is \x{7FFFFFFF})
   ------------------------------------------------------------------------------------------------------------------------------------------
   ?? or m??                 (nothing)
   ------------------------------------------------------------------------------------------------------------------------------------------

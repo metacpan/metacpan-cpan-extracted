@@ -14,10 +14,17 @@ sub greple {
 }
 
 my $greple_path = sub {
+    # Find 'greple' from $PATH
+    for my $path (split /:+/, $ENV{PATH}) {
+	$path .= "/greple";
+	return $path if -x $path;
+    }
+    # Find 'greple' beside App/Greple.pm file
     use App::Greple;
+    my $pm_path = $INC{"App/Greple.pm"};
     my $install =
-	($INC{"App/Greple.pm"} =~ m{(^.*) /lib (?:/[^/]+){0,2} /App/Greple\.pm$}x)[0]
-	    or die;
+	($pm_path =~ m{(^.*) /lib (?:/[^/]+){0,2} /App/Greple\.pm$}x)[0]
+	    or die $pm_path;
     for my $dir (qw(bin script)) {
 	my $file = "$install/$dir/greple";
 	return $file if -f $file;

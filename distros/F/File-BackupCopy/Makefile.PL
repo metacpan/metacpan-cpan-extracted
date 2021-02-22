@@ -24,6 +24,10 @@ my %makefile_args = (
                 url => 'git://git.gnu.org.ua/file-backup.git',
 		web => 'http://git.gnu.org.ua/cgit/file-backup.git/',
 	    },
+	    bugtracker => {
+	        web => 'https://puszcza.gnu.org.ua/bugs/?group=file-backup',
+    	        mailto => 'gray+file-backup@gnu.org.ua'
+            }
 	},
 	provides => Module::Metadata->provides(version => '1.4',
 					       dir => 'lib')

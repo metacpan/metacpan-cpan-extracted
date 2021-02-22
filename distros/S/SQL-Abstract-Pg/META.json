@@ -1,0 +1,63 @@
+{
+   "abstract" : "PostgreSQL features for SQL::Abstract",
+   "author" : [
+      "Sebastian Riedel <sri@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SQL-Abstract-Pg",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "SQL::Abstract" : "2.0",
+            "perl" : "5.016"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mojolicious/sql-abstract-pg/issues"
+      },
+      "homepage" : "https://mojolicious.org",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mojolicious/sql-abstract-pg.git",
+         "web" : "https://github.com/mojolicious/sql-abstract-pg"
+      },
+      "x_IRC" : {
+         "url" : "irc://chat.freenode.net/#mojo",
+         "web" : "https://webchat.freenode.net/#mojo"
+      }
+   },
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

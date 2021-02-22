@@ -1,9 +1,10 @@
+use v5.16;
+
 package Module::Release::WebUpload::Mojo;
 
 use strict;
 use warnings;
 use Exporter qw(import);
-use vars qw($VERSION);
 
 use Carp qw(croak);
 use Mojo::UserAgent;
@@ -16,7 +17,7 @@ our @EXPORT = qw(
 	pause_add_uri
 	);
 
-$VERSION = '2.125';
+our $VERSION = '2.127';
 
 =encoding utf8
 
@@ -63,12 +64,12 @@ sub web_upload {
 		 form => $params,
 		 );
 
-	if( my $res = $tx->success ) {
+	if( my $res = eval { $tx->result } ) {
 		$self->_print( "File uploaded\n" );
 		return 1;
 		}
 	else {
-		my $err = $tx->error;
+		my $err = $tx->res->error;
 		$self->_print( "$err->{code} response: $err->{message}" ) if $err->{code};
 		$self->_print( "Connection error: $err->{message}" );
 		return 0;
@@ -79,7 +80,7 @@ sub make_agent {
 	my( $self ) = @_;
 	my $agent = Mojo::UserAgent->new;
 	$agent->transactor->name( 'release' );
-	$agent->http_proxy( $self->config->http_proxy ) if $self->config->http_proxy;
+	$agent->http_proxy( $self->config->http_proxy )   if $self->config->http_proxy;
 	$agent->https_proxy( $self->config->https_proxy ) if $self->config->https_proxy;
 
 	return $agent;
@@ -129,7 +130,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2018, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2007-2021, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

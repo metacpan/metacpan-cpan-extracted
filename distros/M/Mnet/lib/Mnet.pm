@@ -3,7 +3,7 @@ package Mnet;
 # version number used by Makefile.PL
 #   these should be set to "dev", expect when creating a new release
 #   refer to developer build notes in Makefile.PL for more info
-our $VERSION = "5.21";
+our $VERSION = " 5.22";
 
 =head1 NAME
 
@@ -61,7 +61,7 @@ Mnet - Testable network automation and reporting
         output  => $cli->report,
     });
 
-    # recreate cli option object, forking children if in --batch mode
+    # fork children if in --batch mode, cli opts set for current child
     #   process one device or ten thousand devices with the same script
     #   exit --batch parent process here when finished forking children
     $cli = Mnet::Batch::fork($cli);
@@ -93,6 +93,7 @@ Mnet - Testable network automation and reporting
 
     # parse interface loopack0 stanza from device config
     #   returns int loop0 line and lines indented under int loop0
+    #   see perldoc Mnet::Stanza for more ios config templating info
     my $loop = Mnet::Stanza::parse($config, qr/^interface Loopback0$/);
 
     # parse primary ip address from loopback config stanza
@@ -116,32 +117,41 @@ The main features are:
 
 =item *
 
-Record and replay connected command line sessions, speeding development
-and allow for regression testing of complex automation scripts.
+L<Mnet::Test> module can record and replay L<Mnet> script options, connected
+expect sessions, and compare outputs, speeding development and allowing for
+integration and regression testing of complex automation scripts.
 
 =item *
 
-Reliable automation of cisco ios and other command line sessions, including
+L<Mnet::Expect::Cli::Ios> and L<Mnet::Expect::Cli> modules for reliable
+automation of cisco ios and other command line sessions, including
 authentication and command prompt handling.
 
 =item *
 
-Automation scripts can run in batch mode to concurrently process a list of
-devices, using a simple command line argument and a device list file.
+L<Mnet::Stanza> module for templated config parsing and generation on cisco ios
+devices and other similar indented stanza text files.
 
 =item *
 
-Facilitate easy log, debug, alert and error output from automation scripts,
-outputs can be redirected to per-device files
+L<Mnet::Batch> can run automation scripts in batch mode to concurrently process
+a list of devices, using a simple command line argument and a device list file.
 
 =item *
 
-Flexible config settings via command line, environment variable, and/or batch
+L<Mnet::Log> can facilitate easy log, debug, alert and error output from
+automation scripts, outputs can be redirected to per-device files.
+
+=item *
+
+L<Mnet::Opts::Cli> module for config settings via command line, environment
+variable, and/or batch scripts, with help, tips, and password redaction.
 device list files.
 
 =item *
 
-Report data from scripts can be output as csv, json, or sql.
+L<Mnet::Report::Table> module for aggregating report data from scripts,
+supporting output in formats such as csv, json, and sql.
 
 =back
 
@@ -168,8 +178,8 @@ Or download and install from L<https://github.com/menzascripting/Mnet>
     make install
 
 Check your PERL5LIB environment variable if INSTALL_BASE was used, or if you
-copied the lib/Mnet directory somewhere instead of using Makefile.PL. Refer
-to L<ExtUtils::MakeMaker> for more information
+copied the lib/Mnet directory somewhere instead of using the included
+Makefile.PL script. Refer to L<ExtUtils::MakeMaker> for more information
 
 =head1 AUTHOR
 
@@ -214,9 +224,13 @@ L<Mnet::Test>
 =cut
 
 # required modules
-#   cpan complians if use strict is missing
+#   note that cpan complians if use strict is missing
+#   perl 5.10 or higer required for all Mnet modules, they all use this module
+#       perl 5.10 may be requried for tie to capture stdout and stderr
+#       perl 5.8.9 warning: use of "shift" without parentheses is ambiguous
 use warnings;
 use strict;
+use 5.010;
 
 # normal end of package
 1;

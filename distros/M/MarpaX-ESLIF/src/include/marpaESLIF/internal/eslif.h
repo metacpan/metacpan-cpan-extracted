@@ -77,8 +77,10 @@
 #define G1_RULE_ADVERB_ITEM_22                   "G1_rule_adverb_item_22"
 #define G1_RULE_ACTION_1                         "G1_rule_action_1"
 #define G1_RULE_ACTION_2                         "G1_rule_action_2"
+#define G1_RULE_ACTION_3                         "G1_rule_action_3"
 #define G1_RULE_SYMBOL_ACTION_1                  "G1_rule_symbol_action_1"
 #define G1_RULE_SYMBOL_ACTION_2                  "G1_rule_symbol_action_2"
+#define G1_RULE_SYMBOL_ACTION_3                  "G1_rule_symbol_action_3"
 #define G1_RULE_LEFT_ASSOCIATION                 "G1_rule_left_association"
 #define G1_RULE_RIGHT_ASSOCIATION                "G1_rule_right_association"
 #define G1_RULE_GROUP_ASSOCIATION                "G1_rule_group_association"
@@ -128,6 +130,8 @@
 #define G1_RULE_TERMINAL_1                       "G1_rule_terminal_1"
 #define G1_RULE_TERMINAL_2                       "G1_rule_terminal_2"
 #define G1_RULE_TERMINAL_3                       "G1_rule_terminal_3"
+#define G1_RULE_TERMINAL_4                       "G1_rule_terminal_4"
+#define G1_RULE_TERMINAL_5                       "G1_rule_terminal_5"
 #define G1_RULE_SYMBOL                           "G1_rule_symbol"
 #define G1_RULE_SYMBOL_NAME_1                    "G1_rule_symbol_name_1"
 #define G1_RULE_SYMBOL_NAME_2                    "G1_rule_symbol_name_2"
@@ -266,8 +270,10 @@
 #define G1_ACTION_ADVERB_ITEM_22                   "::shift" /* <adverb item> ::= <regex action> */
 #define G1_ACTION_ACTION_1                         "G1_action_action_1"                         /* done */
 #define G1_ACTION_ACTION_2                         "G1_action_action_2"                         /* done */
+#define G1_ACTION_ACTION_3                         "G1_action_action_3"                         /* done */
 #define G1_ACTION_SYMBOLACTION_1                   "G1_action_symbolaction_1"                   /* done */
 #define G1_ACTION_SYMBOLACTION_2                   "G1_action_symbolaction_2"                   /* done */
+#define G1_ACTION_SYMBOLACTION_3                   "G1_action_symbolaction_3"                   /* done */
 #define G1_ACTION_LEFT_ASSOCIATION                 "G1_action_left_association"                 /* done */
 #define G1_ACTION_RIGHT_ASSOCIATION                "G1_action_right_association"                /* done */
 #define G1_ACTION_GROUP_ASSOCIATION                "G1_action_group_association"                /* done */
@@ -303,7 +309,7 @@
 #define G1_ACTION_EVENT_NAME_5                     "::ascii" /* <event name> ::= ':discard[switch]' */
 #define G1_ACTION_LHS                              "::shift" /* lhs ::= <symbol name> */
 #define G1_ACTION_RHS                              "G1_action_rhs"                              /* done */
-#define G1_ACTION_RHS_ALTERNATIVE_1                "::shift" /* <rhs alternative> ::= <rhs primary> */
+#define G1_ACTION_RHS_ALTERNATIVE_1                "G1_action_rhs_alternative_1"                /* done */
 #define G1_ACTION_RHS_ALTERNATIVE_2                "G1_action_rhs_alternative_2"                /* done */
 #define G1_ACTION_RHS_ALTERNATIVE_3                "G1_action_rhs_alternative_3"                /* done */
 #define G1_ACTION_RHS_ALTERNATIVE_4                "G1_action_rhs_alternative_4"                /* done */
@@ -313,11 +319,13 @@
 #define G1_ACTION_RHS_PRIMARY_1                    "G1_action_rhs_primary_1"                    /* done */
 #define G1_ACTION_RHS_PRIMARY_2                    "G1_action_rhs_primary_2"                    /* done */
 #define G1_ACTION_SINGLE_SYMBOL_1                  "G1_action_single_symbol_1"                  /* done */
-#define G1_ACTION_SINGLE_SYMBOL_2                  "::shift"                                    /* done */
+#define G1_ACTION_SINGLE_SYMBOL_2                  "G1_action_single_symbol_2"                  /* done */
 #define G1_ACTION_TERMINAL_1                       "G1_action_terminal_1"                       /* done */
 #define G1_ACTION_TERMINAL_2                       "G1_action_terminal_2"                       /* done */
 #define G1_ACTION_TERMINAL_3                       "G1_action_terminal_3"                       /* done */
-#define G1_ACTION_SYMBOL                           "::shift" /* symbol ::= <symbol name> */
+#define G1_ACTION_TERMINAL_4                       "G1_action_terminal_4"                       /* done */
+#define G1_ACTION_TERMINAL_5                       "G1_action_terminal_5"                       /* done */
+#define G1_ACTION_SYMBOL                           "G1_action_symbol" /* symbol ::= <symbol name> */
 #define G1_ACTION_SYMBOL_NAME_1                    "G1_action_symbol_name_1" /* <symbol name> ::= <bare name> */
 #define G1_ACTION_SYMBOL_NAME_2                    "G1_action_symbol_name_2" /* <symbol name> ::= <bracketed name> */ /* done */
 #define G1_ACTION_ACTION_NAME_1                    "::ascii" /* <action name> ::= <ascii graph name> */

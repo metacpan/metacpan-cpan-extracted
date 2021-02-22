@@ -4,7 +4,7 @@ requires 'JSON::RPC2', 'v0.4.0';
 requires 'JSON::RPC2::Server', 'v0.4.0';
 requires 'JSON::XS';
 requires 'Mojo::Base';
-requires 'Mojolicious', '5.11';
+requires 'Mojolicious', '8.67';
 
 on configure => sub {
     requires 'Module::Build::Tiny', '0.034';

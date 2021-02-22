@@ -20,7 +20,7 @@ name: Text-KnuthPlass
 provides:
   Text::KnuthPlass:
     file: lib/Text/KnuthPlass.pm
-    version: '1.05'
+    version: '1.06'
   Text::KnuthPlass::Box:
     file: lib/Text/KnuthPlass.pm
   Text::KnuthPlass::Breakpoint:
@@ -33,5 +33,9 @@ provides:
     file: lib/Text/KnuthPlass.pm
   Text::KnuthPlass::Penalty:
     file: lib/Text/KnuthPlass.pm
-version: '1.05'
+resources:
+  bugtracker: https://github.com/PhilterPaper/Text-KnuthPlass/issues
+  homepage: https://metacpan.org/pod/Text::KnuthPlass
+  repository: https://github.com/PhilterPaper/Text-KnuthPlass
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

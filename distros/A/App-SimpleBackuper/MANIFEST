@@ -1,6 +1,3 @@
-.vscode/launch.json
-App-SimpleBackuper-0.2.10.tar
-App-SimpleBackuper-0.2.9.tar
 bin/simple-backuper
 Changes
 lib/App/SimpleBackuper.pm

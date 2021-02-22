@@ -19,9 +19,9 @@ readme_from 'Tags.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.05;
 requires 'Error::Pure' => 0.15;
-requires 'PYX::Parser' => 0.05;
+requires 'PYX::Parser' => 0.08;
 requires 'PYX::Utils' => 0.01;
-requires 'Tags::Output::Raw' => 0.10;
+requires 'Tags::Output::Raw' => 0.11;
 requires 'perl' => '5.6.2';
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/PYX-SGML-Tags/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/PYX-SGML-Tags';
@@ -35,7 +35,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.06';
+version '0.08';
 
 # Run.
 WriteAll();

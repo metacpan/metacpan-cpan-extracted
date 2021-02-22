@@ -31,14 +31,14 @@ sub StorageCheck {
 		my $name = fmt_hex2base64($part->{hash});
 		if(! exists $listing->{ $name }) {
 			if($fix) {
-				$blocks2delete{ $part->{block_id} } = 1;
+				push @{ $blocks2delete{ $part->{block_id} } }, $part->{hash};
 			} else {
 				push @{ $fails{'Storage lost file'} }, $name;
 			}
 		}
 		elsif($part->{size} != $listing->{ $name }) {
 			if($fix) {
-				$blocks2delete{ $part->{block_id} } = 1;
+				push @{ $blocks2delete{ $part->{block_id} } }, $part->{hash};
 			} else {
 				push @{ $fails{'Storage corrupted'} }, "$name weights $listing->{ $name } instead of $part->{size}";
 			}
@@ -52,8 +52,30 @@ sub StorageCheck {
 		
 		foreach my $block_id (keys %blocks2delete) {
 			my $block = $state->{db}->{blocks}->find_row({ id => $block_id });
+			my $justRemoveParts;
+			if(! $block) {
+				print "Block # $block_id wasn't found. Maybe it removed earler.";
+				$justRemoveParts = 1;
+			}
+			if(! $blocks_info->{ $block_id }){
+				print "Info of block # $block_id wasn't collected. ";
+				$justRemoveParts = 1;
+			}
+			if($justRemoveParts) {
+				print "Removing parts too:\n";
+				foreach my $part (@{ $blocks2delete{ $block_id } }) {
+					$state->{db}->{parts}->delete({hash => $part});
+					print "\t".fmt_hex2base64($part)."\n";
+				}
+				next;
+			}
+			
 			print "Removing block # $block_id\n";
-			App::SimpleBackuper::_BlockDelete($options, $state, $block, $blocks_info->{$block_id}->[2]);
+			try {
+				App::SimpleBackuper::_BlockDelete($options, $state, $block, $blocks_info->{$block_id}->[2]);
+			} catch {
+				die $_ if $_ !~ /No such file/;
+			};
 		}
 		App::SimpleBackuper::BackupDB($options, $state);
 	}

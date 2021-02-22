@@ -1,3 +1,19 @@
+2021-02-12  1.06  (Phil M Perry)
+
+  Build.PL
+   Add resources for repository and bugtracker (point to GitHub).
+
+  tools/pod2cpanhtml.pl, INFO/kp.html, MANIFEST, .github/workflows/test.yml
+   Let's see if Continuous Integration is any happier with this HTML produced
+    by a more up-to-date tool. No, but try excluding kp.html from lint.
+
+  README.md, INFO/kp.html, lib/Text/KnuthPlass.pm, MANIFEST
+   2021 copyright. NOT archiving Changes, yet. kp.html moved to INFO/.
+
+  MANIFEST, kp.html, RoadMap, .gitignore, lib/Text/KnuthPlass.pm
+   Ship documentation (POD) kp.html (also on GitHub). 
+    Roadmap/discussions/thoughts (RoadMap) in public on GitHub (Read-Only).
+
 2020-12-29  1.05  (Phil M Perry)
 
   examples/KP.pl

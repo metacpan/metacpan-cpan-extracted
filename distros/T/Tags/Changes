@@ -1,3 +1,15 @@
+0.11 2021-02-20T18:31:32+01:00
+ [Common]
+ - Add blank lines after arguments and before return.
+ - Fix bugtracker.
+ - Update copyright years.
+
+ [Tags::Output]
+ - Add 'output_encoding' parameter.
+ - Add $self argument to callbacks as second argument.
+ - Add default 'output_callback' with encoding to 'output_encoding' if
+   defined.
+
 0.10 2020-10-14T00:56:08+02:00
  [Common]
  - Add missing test messages.

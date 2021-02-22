@@ -1,5 +1,11 @@
 Revision history for perl module Amazon::SNS::V4
 
+2.0  2021-02-12
+   - Switch pod to use head2 instad of item for methods and attributes
+   - Lightly document FIFO Topic support, update document URLs to https
+   - Make Message Deduplication ID actually optional (don't default to undef)
+   - Switch default service url to https
+
 1.11 2021-02-11
    - Add support for publishing to FIFO queues
    - Requires MessageGroupId, and possibly MessageDeduplicationId

@@ -2,7 +2,7 @@ NAME
     App::CalId - Display Indonesian calendar on the command-line
 
 VERSION
-    This document describes version 0.131 of App::CalId (from Perl
+    This document describes version 0.132 of App::CalId (from Perl
     distribution App-CalId), released on 2021-01-13.
 
 SYNOPSIS

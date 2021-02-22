@@ -1,0 +1,16 @@
+$VAR1 = [
+          {
+            'output' => 'foo',
+            'method' => 'foo',
+            'input' => [
+                         'foo'
+                       ]
+          },
+          {
+            'output' => 'bar',
+            'input' => [
+                         'bar'
+                       ],
+            'method' => 'bar'
+          }
+        ];

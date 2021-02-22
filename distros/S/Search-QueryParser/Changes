@@ -1,5 +1,9 @@
 Revision history for Perl extension Search::QueryParser.
 
+0.95 21.02.2021
+  - fix RT#52814 (report an error when unable to parse the entire query string) - thanks larryl
+  - fix RT#129981 (explicit fields in parenthesis when defField is present) - thanks Christopher Causer
+
 0.94 30.09.2009
    - patch from Peter Karman to add 'defField' option
    - add support for quoting field names (RT 47423)

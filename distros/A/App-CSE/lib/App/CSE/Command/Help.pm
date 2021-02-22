@@ -1,5 +1,5 @@
 package App::CSE::Command::Help;
-$App::CSE::Command::Help::VERSION = '0.015';
+$App::CSE::Command::Help::VERSION = '0.016';
 use Moose;
 extends qw/App::CSE::Command/;
 
@@ -86,6 +86,9 @@ Examples:
 
    ## Search for some_method, excluding the files declaring it:
    cse some_method -decl:some_method
+
+   ## Search for files where a given method is called:
+   cse call:some_method
 
 =head3 search syntax
 

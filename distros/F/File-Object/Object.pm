@@ -1,17 +1,14 @@
 package File::Object;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use File::Spec::Functions qw(catdir catfile splitdir);
 use FindBin qw($Bin $Script);
 
-# Version.
-our $VERSION = 0.11;
+our $VERSION = 0.13;
 
 # Constructor.
 sub new {
@@ -70,6 +67,7 @@ sub new {
 # Add dir.
 sub dir {
 	my ($self, @dirs) = @_;
+
 	foreach my $dir (@dirs) {
 		if (defined $dir) {
 			$self->_dir($dir);
@@ -83,9 +81,11 @@ sub dir {
 # Add file.
 sub file {
 	my ($self, @file_path) = @_;
+
 	my $file = pop @file_path;
 	$self->dir(@file_path);
 	$self->_file($file);
+
 	return $self;
 }
 
@@ -93,16 +93,19 @@ sub file {
 # Get dir.
 sub get_dir {
 	my ($self, $dir_num) = @_;
+
 	$dir_num ||= 1;
 	if ($self->{'type'} eq 'file') {
 		$dir_num++;
 	}
+
 	return $self->{'path'}->[-$dir_num];
 }
 
 # Get file.
 sub get_file {
 	my $self = shift;
+
 	if ($self->{'type'} eq 'file') {
 		return $self->{'path'}->[-1];
 	} else {
@@ -128,6 +131,7 @@ sub reset {
 # Serialize path.
 sub s {
 	my $self = shift;
+
 	if ($self->{'type'} eq 'dir') {
 		return catdir(@{$self->{'path'}});
 	} else {
@@ -138,6 +142,7 @@ sub s {
 # Set actual values to constructor values.
 sub set {
 	my $self = shift;
+
 	my @path = @{$self->{'path'}};
 	$self->{'_set'}->{'type'} = $self->{'type'};
 	if ($self->{'type'} eq 'file') {
@@ -146,6 +151,7 @@ sub set {
 	} else {
 		$self->{'_set'}->{'dir'} = \@path;
 	}
+
 	return $self;
 }
 
@@ -184,18 +190,21 @@ sub up {
 # Add dir array.
 sub _dir {
 	my ($self, @dir) = @_;
+
 	if ($self->{'type'} eq 'file') {
 		$self->{'type'} = 'dir';
 		$self->{'file'} = undef;
 		pop @{$self->{'path'}};
 	}
 	push @{$self->{'path'}}, @dir;
+
 	return;
 }
 
 # Add file array.
 sub _file {
 	my ($self, $file) = @_;
+
 	if (! defined $file) {
 		return;
 	}
@@ -206,12 +215,14 @@ sub _file {
 		push @{$self->{'path'}}, $file;
 		$self->{'type'} = 'file';
 	}
+
 	return;
 }
 
 # Update path.
 sub _update_path {
 	my $self = shift;
+
 	if ($self->{'type'} eq 'file') {
 		$self->{'path'} = [
 			@{$self->{'dir'}},
@@ -226,6 +237,7 @@ sub _update_path {
 			$self->{'path'} = [splitdir($Bin)];
 		}
 	}
+
 	return;
 }
 
@@ -244,85 +256,117 @@ File::Object - Object system for filesystem paths.
 =head1 SYNOPSIS
 
  use File::Object;
+
  my $obj = File::Object->new(%parameters);
- $obj->dir(@dir);
- $obj->file(@file_path);
+ my $self = $obj->dir(@dir);
+ my $self = $obj->file(@file_path);
  my $dir = $obj->get_dir($dir_num);
  my $file = $obj->get_file;
- $obj->reset;
+ my $self = $obj->reset;
  my $path = $obj->s;
- $obj->set;
- $obj->up($num);
+ my $self = $obj->set;
+ my $self = $obj->up($num);
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = File::Object->new(%parameters);
 
 Constructor.
+
+Returns instance of object.
 
 =over 8
 
 =item * C<dir>
 
- Directory path in reference to array.
- Default value is [].
+Directory path in reference to array.
+
+Default value is [].
 
 =item * C<file>
 
- File path.
- Default value is undef.
+File path.
+
+Default value is undef.
 
 =item * C<type>
 
- Type of path.
- Types:
+Type of path.
+Types:
+
  - file
  - dir
- Default value is 'dir'.
+
+Default value is 'dir'.
 
 =back
 
-=item C<dir(@dir)>
+=head2 C<dir>
 
- Add directory or directories to object.
- Returns main object.
+ my $self = $obj->dir(@dir);
 
-=item C<file(@file_path)>
+Add directory or directories to object.
 
- Add file or directory/directories with file to object.
- Returns main object.
+Returns instance of object.
 
-=item C<get_dir($dir_num)>
+=head2 C<file>
 
- Returns $dir_num level directory.
- Default value of $dir_num is 1.
+ my $self = $obj->file(@file_path);
 
-=item C<get_file()>
+Add file or directory/directories with file to object.
 
- Returns:
+Returns instance of object.
+
+=head2 C<get_dir>
+
+ my $dir = $obj->get_dir($dir_num);
+
+Default value of C<$dir_num> is 1.
+
+Returns C<$dir_num> level directory.
+
+=head2 C<get_file>
+
+ my $file = $obj->get_file;
+
+Returns:
+
  - Filename if object is file path.
  - undef if object is directory path.
 
-=item C<reset()>
+=head2 C<reset>
 
- Reset to constructor values.
+ my $self = $obj->reset;
 
-=item C<s()>
+Reset to constructor values.
 
- Serialize path and return.
+Returns instance of object.
 
-=item C<set()>
+=head2 C<s>
 
- Set actual values to constructor values.
+ my $path = $obj->s;
 
-=item C<up($up_num)>
+Serialize path and return.
 
- Go to $up_num upper directory.
- Returns main object.
+Returns string.
 
-=back
+=head2 C<set>
+
+ my $self = $obj->set;
+
+Set actual values to constructor values.
+
+Returns instance of object.
+
+=head2 C<up>
+
+ my $self = $obj->up($num);
+
+Go to $up_num upper directory.
+
+Returns instance of object.
 
 =head1 ERRORS
 
@@ -339,11 +383,9 @@ Constructor.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Object;
 
  # Print actual directory path.
@@ -354,11 +396,9 @@ Constructor.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Object;
 
  # Print parent directory path.
@@ -369,11 +409,9 @@ Constructor.
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Object;
 
  # Object with directory path.
@@ -397,11 +435,9 @@ Constructor.
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Object;
 
  # Object with directory path.
@@ -446,7 +482,7 @@ Cross-platform path specification manipulation
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/File-Object>
+L<https://github.com/michal-josef-spacek/File-Object>
 
 =head1 AUTHOR
 
@@ -456,11 +492,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Josef Špaček 2009-2018
- BSD 2-Clause License
+© Michal Josef Špaček 2009-2021
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.13
 
 =cut

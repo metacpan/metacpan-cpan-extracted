@@ -1,3 +1,8 @@
+0.32 2021-02-22
+
+* Remove debugging fprintf accidentally sent to CPAN
+* Fix for PP for older versions
+
 0.31 2021-02-11
 
 * Rename "run" to "create"

@@ -1,9 +1,6 @@
-use warnings;
-use strict;
-use Test::More;
-use Lingua::JA::Moji qw/kana2romaji romaji2kana/;
-use utf8;
-is (kana2romaji ('ドッグ'), 'doggu');
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;is (kana2romaji ('ドッグ'), 'doggu');
 # Common
 is (kana2romaji ('ジェット', {style => 'common'}), 'jetto');
 is (kana2romaji ('ウェ', {style => 'common'}), 'we');

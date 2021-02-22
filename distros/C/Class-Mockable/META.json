@@ -4,13 +4,14 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
    "license" : [
+      "unknown",
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Class-Mockable",
    "no_index" : {
@@ -34,12 +35,12 @@
          "requires" : {
             "Capture::Tiny" : "0.21",
             "Data::Compare" : "0",
-            "Data::Dumper" : "0",
+            "Data::Dumper::Concise" : "0",
             "PadWalker" : "1",
             "Scalar::Util" : "0",
             "Test::Class" : "0",
             "Test::Class::Load" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
@@ -52,5 +53,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Class-Mockable"
       }
    },
-   "version" : "1.3000"
+   "version" : "1.3001",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

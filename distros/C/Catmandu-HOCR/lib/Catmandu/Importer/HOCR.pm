@@ -149,13 +149,19 @@ sub _next {
         }
         elsif ( $nodeType == $start_element && defined($class) && ($class eq "ocr_word" || $class eq "ocrx_word") ) {
 
-            #skip this element
-            $reader->read();
-            if( $line ) {
-                push @{$line->{text}}, $reader->value();
+            # only include text nodes, and read until end of span
+            while( $reader->read() ){
+
+                # text may be enclosed with <strong>
+                if( $reader->nodeType() == XML_READER_TYPE_TEXT ){
+                    push @{$line->{text}}, $reader->value();
+                }
+                elsif( $reader->nodeType == $end_element && $reader->localName eq "span" ){
+                    last;
+                }
+
             }
-            #skip end element
-            $reader->read();
+
         }
         elsif ( defined($line) && $nodeType == $end_element ) {
 

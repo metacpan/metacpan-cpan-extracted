@@ -2,7 +2,7 @@
 
 use strict;
 use Test::More;
-use Test::Modern;
+use Test::Modern qw(cmp_deeply set);
 
 BEGIN {
   use_ok('Attean') or BAIL_OUT "Attean required for tests";
@@ -25,6 +25,10 @@ my $iter = $parser->parse_iter_from_bytes('<http://example.org/foo> a <http://ex
 ok(my $ser = Attean->get_serializer('RDFa')->new(base => iri('http://example.org/'),
 																 namespaces => $ns)
 	, 'Assignment OK');
+
+cmp_deeply($ser->media_types, set(qw(application/xhtml+xml text/html)) );
+cmp_deeply($ser->file_extensions, set(qw(html xhtml)) );
+
 my $string = tests($ser);
 like($string, qr|<meta name="generator" value="RDF::RDFa::Generator::HTML::Head"/>|, 'Head generator is correct');
 like($string, qr|xmlns:foaf="http://xmlns.com/foaf/0.1/"|, 'FOAF is in there');

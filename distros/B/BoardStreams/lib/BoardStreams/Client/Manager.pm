@@ -12,7 +12,7 @@ use Data::Dump 'dump';
 use List::Util 'min';
 use Carp 'croak';
 
-our $VERSION = "v0.0.13";
+our $VERSION = "v0.0.21";
 
 has 'url';
 has 'connection_status_o';

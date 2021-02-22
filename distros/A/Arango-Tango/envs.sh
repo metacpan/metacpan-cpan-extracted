@@ -1,0 +1,3 @@
+export ARANGO_DB_HOST=127.0.0.1
+export ARANGO_DB_USERNAME=root
+export ARANGO_DB_PASSWORD=password

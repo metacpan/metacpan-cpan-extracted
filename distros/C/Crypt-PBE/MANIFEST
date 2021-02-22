@@ -1,6 +1,7 @@
 bin/pkcs5-tool
 Changes
 lib/Crypt/PBE.pm
+lib/Crypt/PBE/CLI.pm
 lib/Crypt/PBE/PBES1.pm
 lib/Crypt/PBE/PBES2.pm
 lib/Crypt/PBE/PBKDF1.pm
@@ -11,10 +12,13 @@ MANIFEST			This list of files
 README.md
 t/00-load.t
 t/10-PBKDF1.t
+t/11-PBKDF1-alias.t
 t/20-PBKDF2.t
 t/21-PBKDF2-RFC6070.t
+t/22-PBKDF2-alias.t
 t/30-PBES1.t
 t/40-PBES2.t
 t/50-PBE.t
+t/60-CLI.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

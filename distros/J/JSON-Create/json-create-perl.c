@@ -1558,9 +1558,10 @@ json_create_not_ref (json_create_t * jc, SV * r)
 	       Unicode::UCD. If we don't catch it with SvIOK as
 	       above, we get an error of the form 'Argument
 	       "Latin" isn't numeric in subroutine entry' */
+#if 0
 	    fprintf (stderr, "%s:%d: SVt_PVIV without valid IV %s\n", 
 		     __FILE__, __LINE__, SvPV_nolen (r));
-
+#endif /* 0 */
 	    CALL (json_create_add_string (jc, r));
 	}
 	break;

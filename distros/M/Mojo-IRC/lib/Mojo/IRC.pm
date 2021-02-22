@@ -1,6 +1,7 @@
 package Mojo::IRC;
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::IOLoop;
+use Mojo::Promise;
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use IRC::Utils   ();
@@ -11,7 +12,7 @@ use constant DEBUG        => $ENV{MOJO_IRC_DEBUG}     || 0;
 use constant DEFAULT_CERT => $ENV{MOJO_IRC_CERT_FILE} || catfile dirname(__FILE__), 'mojo-irc-client.crt';
 use constant DEFAULT_KEY  => $ENV{MOJO_IRC_KEY_FILE}  || catfile dirname(__FILE__), 'mojo-irc-client.key';
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 our %NUMERIC2NAME = (470 => 'ERR_LINKCHANNEL');
 
@@ -26,10 +27,10 @@ has connect_timeout => sub { $ENV{MOJO_IRC_CONNECT_TIMEOUT} || 30 };
 has ioloop          => sub { Mojo::IOLoop->singleton };
 has local_address   => '';
 has name            => 'Mojo IRC';
-has nick   => sub { shift->_build_nick };
-has parser => sub { Parse::IRC->new; };
-has pass   => '';
-has real_host => '';
+has nick            => sub { shift->_build_nick };
+has parser          => sub { Parse::IRC->new; };
+has pass            => '';
+has real_host       => '';
 
 has server_settings => sub {
   return {chantypes => '#', prefix => '(ov)@+'};
@@ -65,11 +66,11 @@ sub connect {
   my @extra;
 
   if (!$host) {
-    Mojo::IOLoop->next_tick(sub { $self->$cb('server() is not set.') });
+    $self->ioloop->next_tick(sub { $self->$cb('server() is not set.') });
     return $self;
   }
   if ($self->{stream_id}) {
-    Mojo::IOLoop->next_tick(sub { $self->$cb('') });
+    $self->ioloop->next_tick(sub { $self->$cb('') });
     return $self;
   }
 
@@ -81,7 +82,8 @@ sub connect {
     push @extra, tls_ca   => $tls->{ca} if $tls->{ca};     # not sure why this should be supported, but adding it anyway
     push @extra, tls_cert => $tls->{cert} || DEFAULT_CERT;
     push @extra, tls_key  => $tls->{key} || DEFAULT_KEY;
-    push @extra, tls_verify => 0x00 if $tls->{insecure};
+    push @extra, tls_verify => 0x00 if $tls->{insecure}; # Mojolicious < 9.0
+    push @extra, tls_options => {SSL_verify_mode => 0x00} if $tls->{insecure}; # Mojolicious >= 9.0
   }
 
   $port ||= 6667;
@@ -124,17 +126,13 @@ sub connect {
       $stream->on(read => sub { $self->_read($_[1]) });
 
       $self->{stream} = $stream;
-      $self->ioloop->delay(
-        sub {
-          my $delay = shift;
-          $self->write(PASS => $self->pass, $delay->begin) if length $self->pass;
-          $self->write(NICK => $self->nick, $delay->begin);
-          $self->write(USER => $self->user, 8, '*', ':' . $self->name, $delay->begin);
-        },
-        sub {
-          $self->$cb('');
-        }
-      );
+      $self->ioloop->next_tick(sub {
+        my @promises;
+        push @promises, $self->write_p(PASS => $self->pass) if length $self->pass;
+        push @promises, $self->write_p(NICK => $self->nick);
+        push @promises, $self->write_p(USER => $self->user, 8, '*', ':' . $self->name);
+        Mojo::Promise->all(@promises)->finally(sub { $self->$cb('') });
+      });
     }
   );
 
@@ -167,7 +165,7 @@ sub disconnect {
     );
   }
   elsif ($cb) {
-    Mojo::IOLoop->next_tick(sub { $self->$cb });
+    $self->ioloop->next_tick(sub { $self->$cb });
   }
 
   $self;
@@ -203,10 +201,17 @@ sub write {
     $self->{stream}->write("$buf\r\n", sub { $self->$cb(''); });
   }
   else {
-    Mojo::IOLoop->next_tick(sub { $self->$cb('Not connected.') });
+    $self->ioloop->next_tick(sub { $self->$cb('Not connected.') });
   }
 
   $self;
+}
+
+sub write_p {
+  my ($self, @args) = @_;
+  my $p = Mojo::Promise->new->ioloop($self->ioloop);
+  $self->write(@args, sub { length $_[1] ? $p->reject($_[1]) : $p->resolve(1) });
+  return $p;
 }
 
 sub ctcp_ping {
@@ -351,7 +356,7 @@ Mojo::IRC - IRC Client for the Mojo IOLoop
 
 =head1 VERSION
 
-0.45
+0.46
 
 =head1 SYNOPSIS
 
@@ -598,6 +603,14 @@ This method writes a message to the IRC server. C<@str> will be concatenated
 with " " and "\r\n" will be appended. C<&callback> is called once the message is
 delivered over the stream. The second argument to the callback will be
 an error message: Empty string on success and a description on error.
+
+=head2 write_p
+
+  $promise = $self->write_p(@str);
+
+Like L</"write">, but returns a L<Mojo::Promise> instead of taking a callback.
+The promise will be resolved on success, or rejected with the error message on
+error.
 
 =head1 DEFAULT EVENT HANDLERS
 

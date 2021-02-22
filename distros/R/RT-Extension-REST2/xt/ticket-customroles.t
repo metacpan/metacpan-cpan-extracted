@@ -40,7 +40,7 @@ for my $email (qw/multi@example.com test@localhost multi2@example.com single2@ex
 }
 
 $user->PrincipalObj->GrantRight( Right => $_ )
-    for qw/CreateTicket ShowTicket ModifyTicket OwnTicket AdminUsers SeeGroup/;
+    for qw/CreateTicket ShowTicket ModifyTicket OwnTicket AdminUsers SeeGroup SeeQueue/;
 
 # Create and view ticket with no watchers
 {
@@ -517,6 +517,50 @@ $user->PrincipalObj->GrantRight( Right => $_ )
             _url => re(qr{$rest_base_path/user/multi2\@example\.com$}),
         }],
     }), 'fetched group');
+}
+
+{
+    my $payload = {
+        Subject => 'Test custom rules applied later',
+        Queue   => 'General',
+    };
+
+    my $res = $mech->post_json("$rest_base_path/ticket",
+        $payload,
+        'Authorization' => $auth,
+    );
+    is($res->code, 201);
+    ok(my $ticket_url = $res->header('location'));
+    ok((my $ticket_id) = $ticket_url =~ qr[/ticket/(\d+)]);
+
+    my $later_single = RT::CustomRole->new(RT->SystemUser);
+    ($ok, $msg) = $later_single->Create(Name => 'Later Single Member', MaxValues => 1);
+    ok($ok, $msg);
+    my $later_single_id = $later_single->Id;
+
+    ($ok, $msg) = $later_single->AddToObject($queue->id);
+    ok($ok, $msg);
+
+    my $later_multi = RT::CustomRole->new(RT->SystemUser);
+    ($ok, $msg) = $later_multi->Create(Name => 'Later Multi Member');
+    ok($ok, $msg);
+    my $later_multi_id = $later_multi->Id;
+
+    ($ok, $msg) = $later_multi->AddToObject($queue->id);
+    ok($ok, $msg);
+
+    $res = $mech->get($ticket_url,
+        'Authorization' => $auth,
+    );
+    is($res->code, 200);
+
+    my $content = $mech->json_response;
+    cmp_deeply($content->{$later_multi->GroupType}, [], 'no Later Multi Member');
+    cmp_deeply($content->{$later_single->GroupType}, {
+        type => 'user',
+        id   => 'Nobody',
+        _url => re(qr{$rest_base_path/user/Nobody$}),
+    }, 'Later Single Member is Nobody');
 }
 
 done_testing;

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use File::Slurper qw( read_text );
 
@@ -71,10 +71,10 @@ sub BUILD {
     my $self = shift;
 
     die 'Cannot pass both --file and --text options'
-        if $self->has_file() && $self->has_text();
+        if $self->has_file && $self->has_text;
 
     die 'You must pass a --file or --text parameter'
-        unless $self->has_file() || $self->has_text();
+        unless $self->has_file || $self->has_text;
 
     return;
 }
@@ -84,24 +84,24 @@ sub run {
 
     ## no critic (InputOutput::ProhibitExplicitStdin)
     my $markdown
-        = $self->has_file()
-        ? $self->file() eq '-'
+        = $self->has_file
+        ? $self->file eq '-'
             ? do { local $/ = undef; <STDIN> }
-            : read_text( $self->file() )
-        : $self->text();
+            : read_text( $self->file )
+        : $self->text;
 
-    my ( $class, %p ) = $self->_has_title()
+    my ( $class, %p ) = $self->_has_title
         ? (
         'Markdent::Simple::Document',
-        title => $self->title(),
-        ( $self->_has_charset()  ? ( charset  => $self->charset() )  : () ),
-        ( $self->_has_language() ? ( language => $self->language() ) : () ),
+        title => $self->title,
+        ( $self->_has_charset  ? ( charset  => $self->charset )  : () ),
+        ( $self->_has_language ? ( language => $self->language ) : () ),
         )
         : ('Markdent::Simple::Fragment');
 
-    my $html = $class->new()->markdown_to_html(
+    my $html = $class->new->markdown_to_html(
         markdown => $markdown,
-        dialects => $self->dialects(),
+        dialects => $self->dialects,
         %p,
     );
 
@@ -112,6 +112,6 @@ sub run {
     exit 0;
 }
 
-__PACKAGE__->meta()->make_immutable();
+__PACKAGE__->meta->make_immutable;
 
 1;

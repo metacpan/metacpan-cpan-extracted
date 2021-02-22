@@ -5102,6 +5102,13 @@ static double constant(name, arg)
 #else
 					goto not_there;
 #endif
+				if (strEQ(name, "CS_SEC_EXTENDED_ENCRYPTION"))
+#ifdef CS_SEC_ENCRYPTION
+					return CS_SEC_EXTENDED_ENCRYPTION;
+#else
+					goto not_there;
+#endif
+
 				if (strEQ(name, "CS_SEC_NEGOTIATE"))
 #ifdef CS_SEC_NEGOTIATE
 					return CS_SEC_NEGOTIATE;

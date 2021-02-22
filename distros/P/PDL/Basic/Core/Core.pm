@@ -8,7 +8,7 @@ use PDL::Exporter;
 require PDL; # for $VERSION
 use DynaLoader;
 our @ISA    = qw( PDL::Exporter DynaLoader );
-our $VERSION = '2.025';
+our $VERSION = '2.026';
 bootstrap PDL::Core $VERSION;
 use PDL::Types ':All';
 use Config;
@@ -456,7 +456,7 @@ Returns a 'null' piddle.
 
  $x = null;
 
-C<null()> has a special meaning to L<PDL::PP|PDL::PP>. It is used to
+C<null()> has a special meaning to L<PDL::PP>. It is used to
 flag a special kind of empty piddle, which can grow to
 appropriate dimensions to store a result (as opposed to
 storing a result in an existing piddle).
@@ -548,7 +548,7 @@ Return piddle dimensions as a perl list
  pdl> p @tmp = dims zeroes 10,3,22
  10 3 22
 
-See also L<shape|shape> which returns a piddle instead.
+See also L</shape> which returns a piddle instead.
 
 =head2 shape
 
@@ -565,7 +565,7 @@ Return piddle dimensions as a piddle
  pdl> p $shape = shape zeroes 10,3,22
  [10 3 22]
 
-See also L<dims|dims> which returns a perl list.
+See also L</dims> which returns a perl list.
 
 =head2 ndims
 
@@ -668,7 +668,7 @@ Internal: Return the numeric value identifying the piddle datatype
 Mainly used for internal routines.
 
 NOTE: get_datatype returns 'just a number' not any special
-type object, unlike L<type|/type>.
+type object, unlike L</type>.
 
 =head2 howbig
 
@@ -707,13 +707,13 @@ Most piddles hold their internal data in a packed perl string, to take
 advantage of perl's memory management.  This gives you direct access
 to the string, which is handy when you need to manipulate the binary
 data directly (e.g. for file I/O).  If you modify the string, you'll
-need to call L<upd_data|upd_data> afterward, to make sure that the
+need to call L</upd_data> afterward, to make sure that the
 piddle points to the new location of the underlying perl variable.
 
 Calling C<get_dataref> automatically physicalizes your piddle (see
 L<make_physical|/PDL::make_physical>).  You definitely
 don't want to do anything to the SV to truncate or deallocate the
-string, unless you correspondingly call L<reshape|/reshape> to make the
+string, unless you correspondingly call L</reshape> to make the
 PDL match its new data dimension.
 
 You definitely don't want to use get_dataref unless you know what you
@@ -729,7 +729,7 @@ Update the data pointer in a piddle to match its perl SV.
 
 This is useful if you've been monkeying with the packed string
 representation of the PDL, which you probably shouldn't be doing
-anyway.  (see L<get_dataref|get_dataref>.)
+anyway.  (see L</get_dataref>.)
 
 =cut
 
@@ -1483,7 +1483,7 @@ Make sure the data portion of a piddle can be accessed from XS code.
 Ensures that a piddle gets its own allocated copy of data. This obviously
 implies that there are certain piddles which do not have their own data.
 These are so called I<virtual> piddles that make use of the I<vaffine>
-optimisation (see L<PDL::Indexing|PDL::Indexing>).
+optimisation (see L<PDL::Indexing>).
 They do not have their own copy of
 data but instead store only access information to some (or all) of another
 piddle's data.
@@ -1492,7 +1492,7 @@ Note: this function should not be used unless absolutely necessary
 since otherwise memory requirements might be severely increased. Instead
 of writing your own XS code with the need to call C<make_physical> you
 might want to consider using the PDL preprocessor
-(see L<PDL::PP|PDL::PP>)
+(see L<PDL::PP>)
 which can be used to transparently access virtual piddles without the
 need to physicalise them (though there are exceptions).
 
@@ -1713,13 +1713,13 @@ resulting in the following output
  3,1,0,-1,
 
 which is used in
-L<PDL::Graphics::TriD::VRML|PDL::Graphics::TriD::VRML>
+L<PDL::Graphics::TriD::VRML>
 to generate VRML output.
 
 Currently, this is probably not much more than a POP (proof of principle)
 but is hoped to be useful enough for some real life work.
 
-Check L<PDL::PP|PDL::PP> for the format of the signature. Currently, the
+Check L<PDL::PP> for the format of the signature. Currently, the
 C<[t]> qualifier and all type qualifiers are ignored.
 
 =cut
@@ -1764,7 +1764,7 @@ Use explicit threading over specified dimensions (see also L<PDL::Indexing>)
  $x = zeroes 3,4,5;
  $y = $x->thread(2,0);
 
-Same as L<PDL::thread1|/PDL::thread1>, i.e. uses thread id 1.
+Same as L</PDL::thread1>, i.e. uses thread id 1.
 
 =cut
 
@@ -2188,8 +2188,8 @@ sub PDL::nslice_if_pdl {
 
 =for ref
 
-C<nslice> was an internally used interface for L<PDL::NiceSlice|PDL::NiceSlice>,
-but is now merely a springboard to L<PDL::Slice|PDL::Slice>.  It is deprecated
+C<nslice> was an internally used interface for L<PDL::NiceSlice>,
+but is now merely a springboard to L<PDL::Slices>.  It is deprecated
 and likely to disappear in PDL 3.0.
 
 =cut
@@ -2281,7 +2281,7 @@ Test the in-place flag on a piddle
   $out = ($in->is_inplace) ? $in : zeroes($in);
   $in->set_inplace(0)
 
-Provides access to the L<inplace|/inplace> hint flag, within the perl millieu.
+Provides access to the L</inplace> hint flag, within the perl millieu.
 That way functions you write can be inplace aware... If given an
 argument the inplace flag will be set or unset depending on the value
 at the same time. Can be used for shortcut tests that delete the
@@ -2300,8 +2300,8 @@ Set the in-place flag on a piddle
   $out = ($in->is_inplace) ? $in : zeroes($in);
   $in->set_inplace(0);
 
-Provides access to the L<inplace|/inplace> hint flag, within the perl millieu.
-Useful mainly for turning it OFF, as L<inplace|/inplace> turns it ON more
+Provides access to the L</inplace> hint flag, within the perl millieu.
+Useful mainly for turning it OFF, as L</inplace> turns it ON more
 conveniently.
 
 =head2 new_or_inplace
@@ -2364,7 +2364,7 @@ sub new_or_inplace {
 
 Internal method: create piddle by specification
 
-This is the argument processing method called by L<zeroes|/zeroes>
+This is the argument processing method called by L</zeroes>
 and some other functions
 which constructs piddles from argument lists of the form:
 
@@ -2477,8 +2477,8 @@ zero dimension.
  I found no matches!
 
 Note that having zero elements is rather different from the concept
-of being a null piddle, see the L<PDL::FAQ|PDL::FAQ> and
-L<PDL::Indexing|PDL::Indexing>
+of being a null piddle, see the L<PDL::FAQ> and
+L<PDL::Indexing>
 manpages for discussions of this.
 
 =cut
@@ -2674,7 +2674,7 @@ eliminate all singleton dimensions (dims of size 1)
 
 Alias for C<reshape(-1)>. Removes all singleton dimensions
 and preserves dataflow. A more concise interface is
-provided by L<PDL::NiceSlice|PDL::NiceSlice> via modifiers:
+provided by L<PDL::NiceSlice> via modifiers:
 
  use PDL::NiceSlice;
  $y = $w(0,0;-); # same as $w(0,0)->squeeze
@@ -3190,7 +3190,7 @@ appends only two piddles along their first dimension, and
 L<glue|PDL::Primitive/glue>, which can append more than two piddles
 along an arbitrary dimension.
 
-Also consider the generic constructor L<pdl|pdl>, which can handle
+Also consider the generic constructor L</pdl>, which can handle
 piddles of different sizes (with zero-padding), and will return a
 piddle of type 'double' by default, but may be considerably faster (up
 to 10x) than cat.
@@ -3616,7 +3616,7 @@ Retrieve header information from a piddle
  print "Number of pixels in the X-direction=$$h{NAXIS1}\n";
 
 The C<gethdr> function retrieves whatever header information is contained
-within a piddle. The header can be set with L<sethdr|/sethdr> and is always a
+within a piddle. The header can be set with L</sethdr> and is always a
 hash reference or undef.
 
 C<gethdr> returns undef if the piddle has not yet had a header
@@ -3631,7 +3631,7 @@ in-place once it has been retrieved:
   $xh->{FILENAME} = $filename;
 
 It is also important to realise that in most cases the header is not
-automatically copied when you copy the piddle.  See L<hdrcpy|/hdrcpy>
+automatically copied when you copy the piddle.  See L</hdrcpy>
 to enable automatic header copying.
 
 Here's another example: a wrapper around rcols that allows your piddle
@@ -3666,9 +3666,9 @@ so you can use it in a hash dereference as in the example.  If the
 header does not yet exist, it gets autogenerated as an empty hash.
 
 Note that this is usually -- but not always -- What You Want.  If you
-want to use a tied L<Astro::FITS::Header|Astro::FITS::Header> hash,
+want to use a tied L<Astro::FITS::Header> hash,
 for example, you should either construct it yourself and use C<sethdr>
-to put it into the piddle, or use L<fhdr|fhdr> instead.  (Note that
+to put it into the piddle, or use L</fhdr> instead.  (Note that
 you should be able to write out the FITS file successfully regardless
 of whether your PDL has a tied FITS header object or a vanilla hash).
 
@@ -3686,7 +3686,7 @@ The C<fhdr> function allows convenient access to the header of a
 piddle.  Unlike C<gethdr> it is guaranteed to return a defined value,
 so you can use it in a hash dereference as in the example.  If the
 header does not yet exist, it gets autogenerated as a tied
-L<Astro::FITS::Header|Astro::FITS::Header> hash.
+L<Astro::FITS::Header> hash.
 
 Astro::FITS::Header tied hashes are better at matching the behavior of
 FITS headers than are regular hashes.  In particular, the hash keys
@@ -3741,8 +3741,8 @@ the elements happen to be scalars):
 which is considerably faster but just copies the top level.
 
 The C<sethdr> function must be given a hash reference or undef.  For
-further information on the header, see L<gethdr|/gethdr>, L<hdr|/hdr>,
-L<fhdr|/fhdr> and L<hdrcpy|/hdrcpy>.
+further information on the header, see L</gethdr>, L</hdr>,
+L</fhdr> and L</hdrcpy>.
 
 =head2 hdrcpy
 

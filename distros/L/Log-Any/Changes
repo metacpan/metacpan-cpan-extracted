@@ -2,6 +2,13 @@ Revision history for Log-Any
 
 ** denotes an incompatible change
 
+1.709     2021-02-17 15:16:20-06:00 America/Chicago
+
+    [Added]
+
+    - Added "Log::Any->has_consumer" for the rare case where one needs
+      to know if a consumer has already been configured.
+
 1.708     2020-01-12 22:56:43-05:00 America/New_York
 
     [Added]

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -15,7 +15,7 @@ sub handle_event {
     return;
 }
 
-__PACKAGE__->meta()->make_immutable();
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -33,7 +33,7 @@ Markdent::Handler::Null - A handler which ignores all events
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ This class implements an event receiver which ignores all events.
 
 This class provides the following methods:
 
-=head2 Markdent::Handler::Null->new()
+=head2 Markdent::Handler::Null->new
 
 This method creates a new handler.
 
@@ -69,7 +69,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

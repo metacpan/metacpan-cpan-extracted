@@ -3,11 +3,19 @@ abstract: 'Translate places using http://download.geonames.org/'
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
+  DBI: '0'
+  File::Copy: '0'
+  File::Open::NoCache::ReadOnly: '0'
+  IO::AIO: '0'
+  Test::Carp: '0'
   Test::Most: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Config: '0'
+  File::Which: '0'
+  LWP::Simple: '0'
+  Try::Tiny: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,6 +30,7 @@ requires:
   DBD::CSV: '0'
   DBD::SQLite: '0'
   DBI: '0'
+  Error::Simple: '0'
   File::Spec: '0'
   File::pfopen: '0'
   Module::Info: '0'
@@ -31,5 +40,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Locale-Places/issues
   repository: git://github.com/nigelhorne/Locale-Places.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

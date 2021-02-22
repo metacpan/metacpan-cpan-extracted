@@ -1,5 +1,14 @@
 Revision history for App-bookmarks
 
+0.28    2021.02.17
+        fixed missing require DBD::SQLite (firefox)
+
+0.27    2021.02.16
+        added win32 Edge support
+        fixed win32 bug (find)
+        fixed Chrome bug (localappdata)
+        more tests (firefox)
+
 0.26    2021.01.31
         improved handling of optional dependencies
 

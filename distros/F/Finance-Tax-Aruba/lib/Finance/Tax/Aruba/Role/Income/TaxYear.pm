@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Role::Income::TaxYear;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moose::Role;
 
 # ABSTRACT: A role that implements income tax logic
@@ -50,6 +50,17 @@ has pension_employer => (
     builder => '_build_pension_employer',
     predicate => 'has_pension_employer',
 );
+
+has bonus => (
+    is => 'ro',
+    isa => 'Num',
+    default => 0,
+);
+
+sub _get_max {
+    my ($max, $value) = @_;
+    return $value > $max ? $max : $value;
+}
 
 sub _build_pension_employee {
     my $self = shift;
@@ -228,7 +239,8 @@ sub _build_yearly_income {
     my $self = shift;
     return $self->yearly_income_gross
          - $self->wervingskosten
-         - $self->pension_employee;
+         - $self->pension_employee
+         + $self->bonus;
 }
 
 sub _get_tax_bracket {
@@ -271,7 +283,9 @@ sub _get_tax_variable {
 
 sub income_tax {
     my $self = shift;
-    return $self->tax_variable + $self->tax_fixed;
+    my $income_tax = $self->tax_variable + $self->tax_fixed;
+    $income_tax =~ s/\.[0-9]+$//;
+    return $income_tax;
 }
 
 sub _build_wervingskosten {
@@ -280,9 +294,7 @@ sub _build_wervingskosten {
         $self->yearly_income_gross,
         $self->wervingskosten_percentage
     );
-    return $self->wervingskosten_max
-        if $wervingskosten > $self->wervingskosten_max;
-    return $wervingskosten;
+    return _get_max($self->wervingskosten_max, $wervingskosten);
 }
 
 sub get_cost {
@@ -301,9 +313,7 @@ sub _build_taxfree_amount {
 
 sub _get_aov_yearly_income {
     my $self = shift;
-    my $max  = $self->aov_max * ($self->months / 12);
-    my $jaarloon = $self->yearly_income;
-    return $jaarloon > $max ? $max : $jaarloon;
+    return _get_max($self->aov_max, $self->yearly_income);
 }
 
 sub aov_employee {
@@ -319,6 +329,14 @@ sub aov_employer {
     return $self->get_cost(
         $self->aov_yearly_income,
         $self->aov_percentage_employer
+    );
+}
+
+sub pension_premium {
+    my $self = shift;
+    return $self->get_cost(
+        $self->yearly_income_gross,
+        $self->pension_employee_perc + $self->pension_employer_perc
     );
 }
 
@@ -340,10 +358,7 @@ sub azv_premium {
 
 sub _get_azv_yearly_income {
     my $self = shift;
-    my $max  = $self->azv_max * ($self->months / 12);
-    my $jaarloon = $self->yearly_income;
-    $jaarloon = $max if $jaarloon > $max;
-    return $jaarloon;
+    return _get_max($self->azv_max, $self->yearly_income);
 }
 
 sub azv_employee {
@@ -376,6 +391,38 @@ sub taxable_wage {
     return $taxable_wage < 0 ? 0 : $taxable_wage;
 }
 
+sub employee_income_deductions {
+    my $self = shift;
+    return $self->aov_employee + $self->azv_employee + $self->income_tax;
+}
+
+sub pension_total {
+    my $self = shift;
+    return $self->pension_premium;
+}
+
+sub tax_free_wage {
+    my $self = shift;
+    return
+          $self->yearly_income
+        - $self->employee_income_deductions
+        - $self->taxfree_amount;
+}
+
+sub net_income {
+    my $self = shift;
+    $self->tax_free_wage + $self->taxfree_amount;
+}
+
+sub company_costs {
+    my $self = shift;
+    return $self->net_income
+        + $self->aov_premium
+        + $self->azv_premium
+        + $self->income_tax
+        + $self->pension_employer;
+}
+
 1;
 
 __END__
@@ -390,7 +437,7 @@ Finance::Tax::Aruba::Role::Income::TaxYear - A role that implements income tax l
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

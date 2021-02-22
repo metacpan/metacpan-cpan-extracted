@@ -1,5 +1,13 @@
 Revision history for Types-Algebraic
 
+0.07  2021-02-20 14:18:04 CET
+        - Remove undeclared and unused use of Test::Exception for now. (Thanks eserte!)
+        - Bump version dependency for List::MoreUtils so we're guaranteed to have zip_unflatten. (Thanks eserte!)
+
+0.06  2021-02-20 00:07:27 CET
+        - Support nested patterns inside match statements.
+          This required re-writing the match keyword to use Keyword::Simple instead of Keyword::Declare.
+
 0.05  2020-08-03 23:52:24 CEST
         - Handle return statements in both array and scalar contexts.
 

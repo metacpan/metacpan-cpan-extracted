@@ -1,3 +1,7 @@
+4.16
+ - Workaround mpfr library assertion failure in decimalize() that occurs when
+   precision is 1 && mpfr library version is 4.0.1.
+
 4.15
  - Make some changes in test files relating to bareword filehandles and indirect
    object syntax.

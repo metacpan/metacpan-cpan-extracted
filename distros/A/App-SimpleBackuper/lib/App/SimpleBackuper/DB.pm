@@ -9,7 +9,7 @@ use App::SimpleBackuper::DB::PartsTable;
 use App::SimpleBackuper::DB::BlocksTable;
 use App::SimpleBackuper::DB::UidsGidsTable;
 
-const my $FORMAT_VERSION => 1;
+const my $FORMAT_VERSION => 2;
 
 sub _unpack_tmpl {
 	my($self, $tmpl) = @_;
@@ -40,16 +40,67 @@ sub new {
 		$self->{dump} = $$dump_ref;
 		$self->{offset} = 0;
 		
-		my($format_version, $backups_cnt, $files_cnt, $uids_gids_cnt) = $self->_unpack_tmpl("JJJJ");
-		
-		die "Unsupported database format version $format_version" if $format_version != $FORMAT_VERSION;
-		
-		$self->{backups}	->[$_ - 1] = $self->_unpack_record() for 1 .. $backups_cnt;
-		$self->{files}		->[$_ - 1] = $self->_unpack_record() for 1 .. $files_cnt;
-		$self->{uids_gids}	->[$_ - 1] = $self->_unpack_record() for 1 .. $uids_gids_cnt;
-		
+		my $format_version = $self->_unpack_tmpl('J');
+		my $parse_method = "parse_format_v$format_version";
+		die "Unsupported database format version $format_version" if ! $self->can($parse_method);
+		$self->$parse_method();
 		delete $self->{ $_ } foreach qw(dump offset);
 	}
+	
+	return $self;
+}
+
+sub dump {
+	my($self) = @_;
+	my $dump_method = "dump_format_v$FORMAT_VERSION";
+	return $self->$dump_method();
+}
+
+sub parse_format_v2 {
+	my($self) = @_;
+	
+	my($backups_cnt, $files_cnt, $parts_cnt, $blocks_cnt, $uids_gids_cnt) = $self->_unpack_tmpl("JJJJJ");
+	
+	$self->{backups}	= App::SimpleBackuper::DB::BackupsTable->new($backups_cnt);
+	$self->{backups}	->[$_ - 1] = $self->_unpack_record() for 1 .. $backups_cnt;
+	$self->{files}		= App::SimpleBackuper::DB::FilesTable->new($files_cnt);
+	$self->{files}		->[$_ - 1] = $self->_unpack_record() for 1 .. $files_cnt;
+	$self->{parts}		= App::SimpleBackuper::DB::PartsTable->new($parts_cnt);
+	$self->{parts}		->[$_ - 1] = $self->_unpack_record() for 1 .. $parts_cnt;
+	$self->{blocks}		= App::SimpleBackuper::DB::BlocksTable->new($blocks_cnt);
+	$self->{blocks}		->[$_ - 1] = $self->_unpack_record() for 1 .. $blocks_cnt;
+	$self->{uids_gids}	= App::SimpleBackuper::DB::UidsGidsTable->new($uids_gids_cnt);
+	$self->{uids_gids}	->[$_ - 1] = $self->_unpack_record() for 1 .. $uids_gids_cnt;
+}
+
+sub dump_format_v2 {
+	my($self) = @_;
+	
+	return \ join('',
+		pack("JJJJJJ", $FORMAT_VERSION, map {scalar @{ $self->{$_} }} qw(backups files parts blocks uids_gids)),
+		map { pack("Ja".length($_), length($_), $_) } map {@{ $self->{$_} }} qw(backups files parts blocks uids_gids)
+	);
+}
+
+sub parse_format_v1 {
+	my($self) = @_;
+	
+	my($backups_cnt, $files_cnt, $uids_gids_cnt) = $self->_unpack_tmpl("JJJ");
+	
+	$self->{backups}	= App::SimpleBackuper::DB::BackupsTable->new($backups_cnt);
+	foreach(my $q = 0; $q < $backups_cnt; $q++) {
+		# upgrade backups format
+		my $record = $self->_unpack_record();
+		$record = $self->{backups}->unpack_format_v1($record);
+		$record = $self->{backups}->pack($record);
+		$self->{backups}->[ $q ] = $record;
+	}
+	$self->{files}		= App::SimpleBackuper::DB::FilesTable->new($files_cnt);
+	$self->{files}		->[$_ - 1] = $self->_unpack_record() for 1 .. $files_cnt;
+	$self->{uids_gids}	= App::SimpleBackuper::DB::UidsGidsTable->new($uids_gids_cnt);
+	$self->{uids_gids}	->[$_ - 1] = $self->_unpack_record() for 1 .. $uids_gids_cnt;
+	
+	delete $self->{ $_ } foreach qw(dump offset);
 	
 	my %backups_files_cnt = map {$self->{backups}->unpack($_)->{id} => 0} @{ $self->{backups} };
 	for my $q (0 .. $#{ $self->{files} }) {
@@ -87,25 +138,9 @@ sub new {
 		$backup->{files_cnt} = $files_cnt;
 		$self->{backups}->upsert({ id => $backup_id }, $backup );
 	}
-	
-	# DEBUG:
-	#foreach my $part ( @{ $self->{parts} } ) {
-	#	next if $self->{blocks}->find_row({ id => $self->{parts}->unpack($part)->{block_id} });
-	#	die "Block not found!";
-	#}
-	#
-	#foreach my $file ( @{ $self->{files} } ) {
-	#	foreach my $version (@{ $self->{files}->unpack($file)->{versions} }) {
-	#		next if ! $version->{block_id};
-	#		next if $self->{blocks}->find_row({ id => $version->{block_id} });
-	#		die "Block not found!";
-	#	}
-	#}
-	
-	return $self;
 }
 
-sub dump {
+sub dump_format_v1 {
 	my $self = shift;
 	
 	return \ join('',

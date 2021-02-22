@@ -1,12 +1,13 @@
 package OpenTracing::Role::ScopeManager;
 
-our $VERSION = 'v0.84.0';
+our $VERSION = 'v0.85.0';
 
 use Moo::Role;
+use MooX::Should;
 
 use Carp;
 use OpenTracing::Types qw/Scope Span assert_Scope/;
-use Role::Declare;
+use Role::Declare::Should;
 use Types::Standard qw/Bool CodeRef Dict Maybe/;
 
 # The chosen design is to have only 1 active scope and use callback to change
@@ -17,7 +18,7 @@ use Types::Standard qw/Bool CodeRef Dict Maybe/;
 #
 has active_scope => (
     is => 'rwp',
-    isa => Scope,
+    should => Scope,
     init_arg => undef,
     reader => 'get_active_scope',
     writer => 'set_active_scope',
@@ -56,7 +57,6 @@ instance_method build_scope (
 BEGIN {
 #   use Role::Tiny::With;
     with 'OpenTracing::Interface::ScopeManager'
-        if $ENV{OPENTRACING_INTERFACE};
 }
 
 1;

@@ -1,6 +1,6 @@
 package TOML::Tiny::Util;
 # ABSTRACT: utility functions used by TOML::Tiny
-$TOML::Tiny::Util::VERSION = '0.10';
+$TOML::Tiny::Util::VERSION = '0.11';
 use strict;
 use warnings;
 no warnings 'experimental';
@@ -32,10 +32,10 @@ sub is_strict_array {
 
       when ('') {
         for ($value) {
-          $type = 'bool'     when /$Boolean/;
-          $type = 'float'    when /$Float/;
-          $type = 'integer'  when /$Integer/;
-          $type = 'datetime' when /$DateTime/;
+          $type = 'bool'     when /^$Boolean/;
+          $type = 'float'    when /^$Float/;
+          $type = 'integer'  when /^$Integer/;
+          $type = 'datetime' when /^$DateTime/;
           default{ $type = 'string' };
         }
       }
@@ -72,7 +72,7 @@ TOML::Tiny::Util - utility functions used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 AUTHOR
 
@@ -80,7 +80,7 @@ Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Jeff Ober.
+This software is copyright (c) 2021 by Jeff Ober.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

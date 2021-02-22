@@ -126,6 +126,11 @@ CONFIGURATION
         password-change link expires. The default value is 4*60*60, meaning
         that password-change links expire after four hours by default.
 
+    $ResetPasswordFromAddress
+        By default, the From address in the password reset email is the
+        default $CorrespondAddress from RT. You can use this option to set a
+        different From address for the reset email.
+
 AUTHOR
     Best Practical Solutions, LLC <modules@bestpractical.com>
 

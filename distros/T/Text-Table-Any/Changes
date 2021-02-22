@@ -1,3 +1,24 @@
+0.101   2021-02-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add options: separate_rows.
+
+	- Rename Text::Table::Span to Text::Table::More.
+
+
+0.100   2021-02-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Add backend: Text::UnicodeBox::Table.
+
+
+0.099   2021-02-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Add backends: Text::Table::Manifold, Text::Table::Span,
+          Text::Table::Sprintf.
+
+	- [doc] Mention Acme::CPANModules::TextTable instead of the old
+	  Bencher::Scenario::TextTableModules.
+
+
 0.098   2021-02-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Update Text::ANSITable's border style name (Text::ANSITable

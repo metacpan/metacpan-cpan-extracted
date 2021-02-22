@@ -1,5 +1,9 @@
 Revision history for Perl extension TAP::Formatter::JUnit.
 
+0.12    Sat Feb  20 10:33 MSK 2021
+    - Fix against empty tests queue while tracking test run duration time
+    - Fix module naming
+
 0.11    Wed Oct  1 13:26 PDT 2014
     - Use "IPC::Run" instead of "IPC::Open2" in tests, to fix problems with
       tests freezing on Windows.

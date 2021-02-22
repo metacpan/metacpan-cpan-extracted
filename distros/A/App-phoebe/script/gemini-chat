@@ -106,7 +106,7 @@ if (!defined $pid) {
     tls => 1,
     tls_cert => $cert,
     tls_key => $key,
-    tls_verify => 0x00, } => sub {
+    tls_options => { SSL_verify_mode => 0x00 }} => sub {
       my ($loop, $err, $stream) = @_;
       # 1h timeout (for chat)
       $stream->timeout(3600);

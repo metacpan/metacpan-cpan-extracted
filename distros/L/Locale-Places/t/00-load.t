@@ -1,5 +1,6 @@
 #!perl -T
 
+use warnings;
 use strict;
 use lib './lib';
 

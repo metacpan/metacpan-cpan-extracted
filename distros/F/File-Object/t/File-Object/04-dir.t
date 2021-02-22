@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use File::Object;
 use File::Spec::Functions qw(catdir);
 use Test::More 'tests' => 3;

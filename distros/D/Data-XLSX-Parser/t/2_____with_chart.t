@@ -25,7 +25,7 @@ $parser->add_row_event_handler(sub {
     push @$cells, $row;
 });
 
-$parser->sheet($parser->workbook->sheet_id($sheets[0]));
+$parser->sheet_by_rid($parser->workbook->sheet_rid($sheets[0]));
 
 is $cells->[0][0], 1, 'val 0,0 ok';
 is $cells->[0][1], 10, 'val 0,1 ok';

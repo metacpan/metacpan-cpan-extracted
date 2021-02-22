@@ -1,0 +1,10 @@
+id: fruit
+en: fruit
+ja: 果物
+es: Fruto
+
+id: monkey
+en: monkey
+ja: 猿
+es:  taxonómico
+

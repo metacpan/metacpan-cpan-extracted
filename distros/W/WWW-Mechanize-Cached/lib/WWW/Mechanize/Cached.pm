@@ -15,7 +15,7 @@ use Carp qw( carp croak );
 use Data::Dump qw( dump );
 use Storable qw( nfreeze thaw );
 
-our $VERSION = '1.54';
+our $VERSION = '1.55';
 
 has is_cached        => ( is => 'rw', isa => Maybe [Bool], default => undef );
 has positive_cache   => ( is => 'rw', isa => Bool, default => 1 );
@@ -281,7 +281,7 @@ WWW::Mechanize::Cached - Cache response to be polite
 
 =head1 VERSION
 
-version 1.54
+version 1.55
 
 =head1 SYNOPSIS
 

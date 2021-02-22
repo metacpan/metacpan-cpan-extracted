@@ -53,10 +53,10 @@
          "web" : "https://github.com/mojolicious/minion"
       },
       "x_IRC" : {
-         "url" : "irc://irc.freenode.net/#mojo",
+         "url" : "irc://chat.freenode.net/#mojo",
          "web" : "https://webchat.freenode.net/#mojo"
       }
    },
-   "version" : "10.15",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "10.16",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

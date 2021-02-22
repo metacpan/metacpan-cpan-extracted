@@ -2,6 +2,20 @@ CHANGE LOG
 ==========
 
 
+2020-02-15 - v0.43.1
+--------------------
+
+### Fixed
+  - Some typo's
+
+
+2020-02-15 - v0.43.0
+--------------------
+
+### Changed
+  - Use 'should' with `MooX::Should` and roles including `Role::Declare::Should`
+
+
 2020-07-16 - v0.42.1
 --------------------
 

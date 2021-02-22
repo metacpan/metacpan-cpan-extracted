@@ -14,7 +14,7 @@ use vars qw( @EXPORT_OK %EXPORT_TAGS );
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use vars '$VERSION';
-$VERSION = '1.21';
+$VERSION = '1.22';
 my $CPERL = $^V =~ /c$/ ? 1 : 0;
 
 use vars '@Scalars';
@@ -451,6 +451,11 @@ use vars '@Barewords';
     x
     xor
     y
+  ),
+  ($] >= 5.033007 ? qw(
+    try
+    catch
+  ) : ()
 ));
 
 use vars '@TieIOMethods';

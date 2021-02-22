@@ -4,7 +4,7 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "gpl_3"
    ],
@@ -46,7 +46,7 @@
    "provides" : {
       "Config::AST" : {
          "file" : "lib/Config/AST.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Config::AST::Follow" : {
          "file" : "lib/Config/AST/Follow.pm"
@@ -69,12 +69,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "gray+config-ast@gnu.org.ua",
+         "web" : "https://puszcza.gnu.org.ua/bugs/?group=config-ast"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://git.gnu.org.ua/config-ast.git",
          "web" : "http://git.gnu.org.ua/cgit/config-ast.git/"
       }
    },
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.07"
 }

@@ -24,14 +24,3 @@ directives:
     options:
       outlets: '1,2,6,7'
       host: bar
-
-- name: MQTT Event Toggle Outside Lights
-  topic: cmnd/outside_lights/EVENT
-  value: TOGGLE
-  actions:
-  - name: Outside Lights
-    driver: iBootBarGroup
-    command: 'SWITCH'
-    options:
-      outlets: '1,2,6,7'
-      host: bar

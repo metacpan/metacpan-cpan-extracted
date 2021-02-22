@@ -1,6 +1,9 @@
 .appveyor.yml
 bin/dumbbench
 Changes
+examples/cmpthese.pl
+examples/negative_rate.pl
+examples/timethese.pl
 examples/TryPackage.pm
 INSTALL.SKIP
 lib/Benchmark/Dumb.pm

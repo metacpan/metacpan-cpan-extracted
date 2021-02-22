@@ -10,9 +10,9 @@ BEGIN {
 }
 
 my $t = Net::IPAM::Tree->new;
-ok($t->insert(), 'insert nothing is ok');
+ok( $t->insert(), 'insert nothing is ok' );
 
-eval { $t->to_string(\'foo') };
+eval { $t->to_string( \'foo' ) };
 like( $@, qr/CODE/i, 'to_string: wrong arg' );
 
 eval { $t->contains() };
@@ -66,6 +66,6 @@ foreach my $b (@blocks) {
   push @items, Net::IPAM::Block->new($b);
 }
 $t->insert(@items);
-ok($t->walk( sub { return 'err' } ), 'walk: cb with err' );
+ok( $t->walk( sub { return 'err' } ), 'walk: cb with err' );
 
 done_testing();

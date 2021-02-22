@@ -1,5 +1,5 @@
 package App::CSE::Lucy::Search::QueryParser;
-$App::CSE::Lucy::Search::QueryParser::VERSION = '0.015';
+$App::CSE::Lucy::Search::QueryParser::VERSION = '0.016';
 use base qw/Lucy::Search::QueryParser/;
 
 use Log::Log4perl;

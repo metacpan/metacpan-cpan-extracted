@@ -101,7 +101,9 @@ my $configure_emailserver=sub {
    my $recpatcha_secret_key=$_[7]||'';
    my ($stdout,$stderr)=('','');
    my $handle=$localhost;my $connect_error='';
-   my $sudo=($^O eq 'cygwin')?'':'sudo ';
+   my $sudo=($^O eq 'cygwin')?'':
+         'sudo env "LD_LIBRARY_PATH='.
+         '/usr/local/lib64:$LD_LIBRARY_PATH" "PATH=$PATH" ';
    ($stdout,$stderr)=setup_aws_security(
       'EmailServerSecurityGroup','EmailServer.com Security Group');
    ($stdout,$stderr)=$handle->cmd($sudo.'id www-data');
@@ -201,7 +203,7 @@ my $configure_emailserver=sub {
          ' libcurl libcurl-devel libicu libicu-devel re2c'.
          ' libpng-devel.x86_64 freetype-devel.x86_64 cmake'.
          ' oniguruma oniguruma-devel tcl tcl-devel git-all'.
-         ' lzip libffi-devel libc-client-devel'.
+         ' lzip libffi-devel libc-client-devel texinfo',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'yum -y update','__display__');
@@ -446,26 +448,81 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
+   # https://bipulkkuri.medium.com/install-latest-gcc-on-centos-linux-release-7-6-a704a11d943d
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone git://gcc.gnu.org/git/gcc.git',
-      '__display__');
-   ($stdout,$stderr)=$handle->cwd('gcc');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'mkdir -vp build','__display__');
-   ($stdout,$stderr)=$handle->cwd('build');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      '../configure --enable-languages=c,c++ --disable-multilib',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make -j2','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make install','__display__');
+      'wget -qO- http://mirrors.concertpass.com/gcc/releases/');
+   $stdout=~s/^.*href=["]([^"]+?)["].*$/$1/s;
+   chop $stdout;
+   $stdout=~s/gcc-//;
+   my $verss=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.'gcc --version');
+   $stdout=~s/^.*?GCC[)]\s+?([^\s]+)\s+Copyright.*$/$1/s;
+   if ($stdout ne $verss) {
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget --random-wait --progress=dot '.
+         'http://ftp.gnu.org/gnu/autoconf/autoconf-latest.tar.gz',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "chown -v $username:$username autoconf-latest.tar.gz",'__display__')
+         if $^O ne 'cygwin';
+      ($stdout,$stderr)=$handle->cmd($sudo.'tar zxvf autoconf-latest.tar.gz',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'rm -rvf autoconf-latest.tar.gz',
+         '__display__');
+      ($stdout,$stderr)=$handle->cwd("autoconf-*");
+      ($stdout,$stderr)=$handle->cmd($sudo.'./configure','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget -qO- https://git.savannah.gnu.org/cgit/automake.git');
+      $stdout=~s#^.*?Download.*?href.*?href=['](.*?snapshot.*?)['].*$#$1#s;
+      my $atarfile=$stdout;
+      $atarfile=~s/^.*\/(.*)$/$1/;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget --random-wait --progress=dot '.
+         'https://git.savannah.gnu.org'.$stdout,
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "tar xvf $atarfile",'__display__');
+      $atarfile=~s/.tar.gz$//;
+      ($stdout,$stderr)=$handle->cwd($atarfile);
+      ($stdout,$stderr)=$handle->cmd($sudo.
+          './bootstrap','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+          './configure','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+          'make install','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget --random-wait --progress=dot '.
+         "http://mirrors.concertpass.com/gcc/releases/gcc-$verss/gcc-$verss.tar.xz",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "tar xvf gcc-$verss.tar.xz",'__display__');
+      ($stdout,$stderr)=$handle->cwd("gcc-$verss");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp build','__display__');
+      ($stdout,$stderr)=$handle->cwd('build');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         '../configure --enable-languages=c,c++ --disable-multilib',
+         '3600','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make bootstrap','3600','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','3600','__display__');
+      ($stdout,$stderr)=$handle->cwd('..');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'rm -rfv build','__display__');
+   }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone https://gitlab.gnome.org/GNOME/libxml2.git',
       '__display__');
    ($stdout,$stderr)=$handle->cwd('libxml2');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'ACLOCAL_PATH=/usr/share/aclocal '.
       './autogen.sh','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make','__display__');
@@ -544,14 +601,16 @@ if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
          "tar xvf Python-$version.tar.xz",
          '__display__');
       ($stdout,$stderr)=$handle->cwd("Python-$version");
-      ($stdout,$stderr)=$handle->cmd($sudo.
+      # sudo is cleared of env vars to use system gcc
+      # gcc-10 built python hangs during testing 2/20/2021
+      ($stdout,$stderr)=$handle->cmd('sudo '.
          './configure --prefix=/usr/local --exec-prefix=/usr/local '.
          '--enable-shared --enable-optimizations '.
          'LDFLAGS="-Wl,-rpath /usr/local/lib"',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'make','3600','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
+      ($stdout,$stderr)=$handle->cmd('sudo '.
+         'make','7200','__display__');
+      ($stdout,$stderr)=$handle->cmd('sudo '.
          'make altinstall','__display__');
       $version=~s/^(\d+\.\d+).*$/$1/;
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -593,7 +652,6 @@ if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
             "python$version -m pip install awscli",
             '__display__');
       }
-      $sudo='sudo env "PATH=$PATH" ';
       ($stdout,$stderr)=$handle->cmd($sudo.
          'python --version','__display__');
    }
@@ -1326,12 +1384,12 @@ END
             'yum-builddep -y mariadb-server',
             '__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
-            '/bin/cmake -DRPM=centos7 server/',
+            '/bin/cmake -DRPM=centos7 server/','3600',
             '__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
-            'make install',600,'__display__');
+            'make install','3600','__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
-            'make package',600,'__display__');
+            'make package','3600','__display__');
       } else {
          ($stdout,$stderr)=$handle->cmd($sudo.
             'mv -fv /opt/mariadb /opt/source/mariadb',
@@ -1526,7 +1584,7 @@ END
       print $out if $output!~/^MariaDB.*?>\s*$/;
       last if $output=~/$prompt|Bye/;
       if (!$cmd_sent && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd='DROP DATABASE roundcubemail;';
+         my $cmd='DROP DATABASE roundcube;';
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
@@ -1540,7 +1598,7 @@ END
          sleep 1;
          next;
       } elsif ($cmd_sent==2 && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd='CREATE DATABASE roundcubemail CHARACTER SET '.
+         my $cmd='CREATE DATABASE roundcube CHARACTER SET '.
                  'utf8 COLLATE utf8_general_ci;';
          print "$cmd\n";
          $handle->print($cmd);
@@ -1549,14 +1607,14 @@ END
          sleep 1;
          next;
       } elsif ($cmd_sent==3 && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd='DROP USER roundcubeuser@localhost;';
+         my $cmd='DROP USER roundcube@localhost;';
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
       } elsif ($cmd_sent==4 && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd='CREATE USER roundcubeuser@localhost IDENTIFIED BY '.
+         my $cmd='CREATE USER roundcube@localhost IDENTIFIED BY '.
                  "'".$service_and_cert_password."';";
          print "$cmd\n";
          $handle->print($cmd);
@@ -1565,7 +1623,7 @@ END
          next;
       } elsif ($cmd_sent==5 && $output=~/MariaDB.*?>\s*$/) {
          my $cmd='GRANT ALL PRIVILEGES ON roundcube.*'.
-                 ' TO roundcubeuser@localhost;';
+                 ' TO roundcube@localhost;';
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
@@ -1706,7 +1764,7 @@ END
          ($stdout,$stderr)=$handle->cmd($sudo.
             './configure','__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
-            'make','__display__');
+            'make','3600','__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
             'make install','__display__');
          ($stdout,$stderr)=$handle->cwd('/opt/source');
@@ -1754,19 +1812,21 @@ END
          'git clone https://github.com/php/php-src.git',
          '__display__');
       ($stdout,$stderr)=$handle->cwd('php-src');
-      # https://clipbucket.com/cb-install-requirements/
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git branch -a');
-      my @phpbranch=map { $_ =~ s/^.*(PHP.*)/$1/ ? $_ : () }
-         split /\n/, $stdout;
+         'git tag -l');
+      #$stdout=~s/^.*(php-[\d.]+?)\s.*$/$1/s;
+      # composer.phar does not work with php 8
+      $stdout=~s/^.*(php-7.[\d.]+?)\s.*$/$1/s;
+      my $vn=$stdout;
+      $vn=~s/^php-(\d).*$/$1/;
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "git checkout $phpbranch[$#phpbranch]",'__display__');
+         "git checkout $stdout",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './buildconf --force','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         './configure --prefix=/usr/local/php7 '.
-         '--with-config-file-path=/usr/local/php7/etc '.
-         '--with-config-file-scan-dir=/usr/local/php7/etc/conf.d '.
+         './configure --prefix=/usr/local/php'.$vn.' '.
+         '--with-config-file-path=/usr/local/php'.$vn.'/etc '.
+         '--with-config-file-scan-dir=/usr/local/php'.$vn.'/etc/conf.d '.
          '--enable-bcmath '.
          '--with-bz2 '.
          '--with-curl '.
@@ -1801,76 +1861,76 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.'make -j2',300,'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'ln -s /usr/local/php7/bin/php /usr/local/bin/php');
+         'ln -s /usr/local/php'.$vn.'/bin/php /usr/local/bin/php');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'ln -s /usr/local/php7/bin/php /usr/bin/php');
+         'ln -s /usr/local/php'.$vn.'/bin/php /usr/bin/php');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'mkdir -vp /usr/local/php7/etc/conf.d','__display__');
+         'mkdir -vp /usr/local/php'.$vn.'/etc/conf.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ./php.ini-production /usr/local/php7/etc/php.ini',
+         'cp -v ./php.ini-production /usr/local/php'.$vn.'/etc/php.ini',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i \'s/post_max_size = 8M/post_max_size = 500M/\' ".
-         "/usr/local/php7/etc/php.ini");
+         "/usr/local/php$vn/etc/php.ini");
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i \'s/upload_max_filesize = 2M/upload_max_filesize = 500M/\' ".
-         "/usr/local/php7/etc/php.ini");
+         "/usr/local/php$vn/etc/php.ini");
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i \'s/max_execution_time = 30/max_execution_time = 7500/\' ".
-         "/usr/local/php7/etc/php.ini");
+         "/usr/local/php$vn/etc/php.ini");
       ($stdout,$stderr)=$handle->cmd($sudo.
          'sed -i \'s/memory_limit = 128M/memory_limit = 256M/\' '.
-         '/usr/local/php7/etc/php.ini');
+         '/usr/local/php'.$vn.'/etc/php.ini');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'sed -i \'s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/\' '.
-         '/usr/local/php7/etc/php.ini');
+         '/usr/local/php'.$vn.'/etc/php.ini');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'sed -i \'s/;date.timezone =/date.timezone = \"America/Chicago\"/\' '.
-         '/usr/local/php7/etc/php.ini');
+         '/usr/local/php'.$vn.'/etc/php.ini');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'mkdir -vp /usr/local/php7/etc/conf.d','__display__');
+         'mkdir -vp /usr/local/php'.$vn.'/etc/conf.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'mkdir -vp /usr/local/php7/etc/php-fpm.d','__display__');
+         'mkdir -vp /usr/local/php'.$vn.'/etc/php-fpm.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ./sapi/fpm/www.conf /usr/local/php7/etc/php-fpm.d/www.conf',
+         'cp -v ./sapi/fpm/www.conf /usr/local/php'.$vn.'/etc/php-fpm.d/www.conf',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php7/etc/php-fpm.conf',
+         'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php'.$vn.'/etc/php-fpm.conf',
          '__display__');
-      my $wcnf=<<END;
+      my $wcnf=<<"END";
 catch_workers_output = yes
 
 php_flag[display_errors] = on
-php_admin_value[error_log] = /usr/local/php7/var/log/fpm-php.www.log
+php_admin_value[error_log] = /usr/local/php$vn/var/log/fpm-php.www.log
 php_admin_flag[log_errors] = on
 END
       ($stdout,$stderr)=$handle->cmd(
          "echo -e \"$wcnf\" | ${sudo}tee -a ".
-         '/usr/local/php7/etc/php-fpm.d/www.conf');
+         '/usr/local/php'.$vn.'/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'touch /var/log/fpm-php.www.log');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'chmod -v 777 /var/log/fpm-php.www.log','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php7/etc/php-fpm.conf',
+         'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php'.$vn.'/etc/php-fpm.conf',
          '__display__');
       my $zend=<<END;
 ; Zend OPcache
 extension=opcache.so
 END
       ($stdout,$stderr)=$handle->cmd("echo -e \"$zend\" > ".
-         '/usr/local/php7/etc/conf.d/modules.ini');
+         '/usr/local/php'.$vn.'/etc/conf.d/modules.ini');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i 's/user = nobody/user = www-data/' ".
-         '/usr/local/php7/etc/php-fpm.d/www.conf');
+         '/usr/local/php'.$vn.'/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i 's/group = nobody/group = www-data/' ".
-         '/usr/local/php7/etc/php-fpm.d/www.conf');
+         '/usr/local/php'.$vn.'/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i 's/\;env.PATH./env[PATH]/' ".
-         '/usr/local/php7/etc/php-fpm.d/www.conf');
+         '/usr/local/php'.$vn.'/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'ln -s /usr/local/php7/sbin/php-fpm /usr/sbin/php-fpm');
+         'ln -s /usr/local/php'.$vn.'/sbin/php-fpm /usr/sbin/php-fpm');
       #
       # echo-ing/streaming files over ssh can be tricky. Use echo -e
       #          and replace these characters with thier HEX
@@ -1883,7 +1943,7 @@ END
       #          $  -   \\x24     %  -  \\x25
       #
       # https://www.lisenet.com/2014/ - bash approach to conversion
-      my $fpmsrv=<<END;
+      my $fpmsrv=<<"END";
 [Unit]
 Description=The PHP FastCGI Process Manager
 After=syslog.target network.target
@@ -1891,7 +1951,7 @@ After=syslog.target network.target
 [Service]
 Type=simple
 PIDFile=/run/php-fpm/php-fpm.pid
-ExecStart=/usr/local/php7/sbin/php-fpm --nodaemonize --fpm-config /usr/local/php7/etc/php-fpm.conf
+ExecStart=/usr/local/php$vn/sbin/php-fpm --nodaemonize --fpm-config /usr/local/php$vn/etc/php-fpm.conf
 ExecReload=/bin/kill -USR2 \\x24MAINPID
 
 [Install]
@@ -1928,18 +1988,18 @@ END
          }
       }
       ($stdout,$stderr)=$handle->cmd($sudo.
-         '/usr/local/php7/bin/pecl channel-update pecl.php.net',
+         '/usr/local/php'.$vn.'/bin/pecl channel-update pecl.php.net',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'wget -qO- https://pecl.php.net/package/mailparse');
       $stdout=~s/^.*?get\/(mailparse-.*?).tgz.*$/$1/s;
       my $version=$stdout;
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "/usr/local/php7/bin/pecl install $version",
+         "/usr/local/php$vn/bin/pecl install $version",
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'bash -c "echo extension=mailparse.so > '.
-         '/usr/local/php7/etc/conf.d/mailparse.ini"');
+         '/usr/local/php'.$vn.'/etc/conf.d/mailparse.ini"');
       ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm start',
          '__display__');
    } elsif (-e '/opt/cpanel/ea-php70') {
@@ -2111,6 +2171,7 @@ END
       }
       next;
    }
+
    my $aliases=<<END;
 #
 # mysql config file for local(8) aliases(5) lookups
@@ -2139,9 +2200,9 @@ additional_conditions = AND status = 'paid'
 option_group = client
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$aliases\" > ".
-      "mysql_aliases.cf");
+      "${home_dir}mysql_aliases.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v ~/mysql_aliases.cf /etc/postfix',
+      "mv -v ${home_dir}mysql_aliases.cf /etc/postfix",
       '__display__');
    my $virtual=<<END;
 user = mailuser
@@ -2153,9 +2214,9 @@ where_field = domain
 hosts = 127.0.0.1
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$virtual\" > ".
-      "mysql-virtual_domains.cf");
+      "${home_dir}mysql-virtual_domains.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v ~/mysql-virtual_domains.cf /etc/postfix',
+      "mv -v ${home_dir}mysql-virtual_domains.cf /etc/postfix",
       '__display__');
    my $forward=<<END;
 user = mailuser
@@ -2167,9 +2228,9 @@ where_field = source
 hosts = 127.0.0.1
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$forward\" > ".
-      "mysql-virtual_forwardings.cf");
+      "${home_dir}mysql-virtual_forwardings.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v ~/mysql-virtual_forwardings.cf /etc/postfix',
+      "mv -v ${home_dir}mysql-virtual_forwardings.cf /etc/postfix",
       '__display__');
    my $mailboxes=<<END;
 user = mailuser
@@ -2181,9 +2242,9 @@ where_field = email
 hosts = 127.0.0.1
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$mailboxes\" > ".
-      "~/mysql-virtual_mailboxes.cf");
+      "${home_dir}mysql-virtual_mailboxes.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v ~/mysql-virtual_mailboxes.cf /etc/postfix',
+      "mv -v ${home_dir}mysql-virtual_mailboxes.cf /etc/postfix",
       '__display__');
    my $email2=<<END;
 user = mailuser
@@ -2195,9 +2256,9 @@ where_field = email
 hosts = 127.0.0.1
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$email2\" > ".
-      "~/mysql-virtual_email2email.cf");
+      "${home_dir}mysql-virtual_email2email.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v ~/mysql-virtual_email2email.cf /etc/postfix',
+      "mv -v ${home_dir}mysql-virtual_email2email.cf /etc/postfix",
       '__display__');
    my $transport=<<END;
 user = mailuser
@@ -2209,9 +2270,9 @@ where_field = domain
 hosts = 127.0.0.1
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$transport\" > ".
-      "~/mysql-virtual_transports.cf");
+      "${home_dir}mysql-virtual_transports.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v ~/mysql-virtual_transports.cf /etc/postfix',
+      "mv -v ${home_dir}mysql-virtual_transports.cf /etc/postfix",
       '__display__');
    my $limit=<<END;
 user = mailuser
@@ -2223,9 +2284,9 @@ where_field = email
 hosts = 127.0.0.1
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$limit\" > ".
-      "~/mysql-virtual_mailbox_limit_maps.cf");
+      "${home_dir}mysql-virtual_mailbox_limit_maps.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v ~/mysql-virtual_mailbox_limit_maps.cf /etc/postfix',
+      "mv -v ${home_dir}mysql-virtual_mailbox_limit_maps.cf /etc/postfix",
       '__display__');
    my $destination=<<END;
 user = mailuser
@@ -2237,9 +2298,9 @@ where_field = domain
 hosts = 127.0.0.1
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$destination\" > ".
-      "~/mysql-mydestination.cf");
+      "${home_dir}mysql-mydestination.cf");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -v ~/mysql-mydestination.cf /etc/postfix',
+      "mv -v ${home_dir}mysql-mydestination.cf /etc/postfix",
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chmod -v 640 /etc/postfix/mysql-*.cf','__display__');
@@ -2250,12 +2311,13 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'groupadd -g 4099 dovecot');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'useradd -u 4099 -r -g dovecot -s /usr/bin/nologin -d ".
-      "/home/dovecot -m dovecot');
+      'useradd -u 4099 -r -g dovecot -s /usr/bin/nologin -d '.
+      '/home/dovecot -m dovecot');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'groupadd -g 5000 vmail');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'useradd -u 5000 -r -g vmail -s /usr/bin/nologin -d /home/vmail -m vmail');
+      'useradd -u 5000 -r -g vmail -s /usr/bin/nologin -d '.
+      '/home/vmail -m vmail');
    #($stdout,$stderr)=$handle->cmd($sudo.
    #   'openssl req -new -outform PEM -out /etc/postfix/smtpd.cert '.
    #   '-newkey rsa:2048 -nodes -keyout /etc/postfix/smtpd.key '.
@@ -2469,7 +2531,7 @@ END
       "make",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "make install",'__display__');
-   ($stdout,$stderr)=$handle->cwd('example-config/doc');
+   ($stdout,$stderr)=$handle->cwd('doc/example-config');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v dovecot.conf /usr/local/etc/dovecot",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2863,7 +2925,9 @@ END
    ($stdout,$stderr)=$handle->cwd('rspamd.build');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cmake .. -DENABLE_HYPERSCAN=ON -DENABLE_LUAJIT=ON '.
-      '-DCMAKE_BUILD_TYPE=RelWithDebuginfo','__display__');
+      '-DCMAKE_BUILD_TYPE=RelWithDebuginfo '.
+      '-DCMAKE_CXX_COMPILER=/usr/local/bin/g++ '.
+      '-DCMAKE_C_COMPILER=/usr/local/bin/gcc','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2871,7 +2935,6 @@ END
 
 #cleanup;
 
-   $sudo='sudo ';
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chown -R www-data:www-data /var/www','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.

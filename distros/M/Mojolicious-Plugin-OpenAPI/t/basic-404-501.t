@@ -8,7 +8,7 @@ use Mojo::Base 'Mojolicious';
 sub startup {
   my $app = shift;
   $app->plugin(OpenAPI => {url => 'data://main/v2.yaml'});
-  $app->plugin(OpenAPI => {url => 'data://main/v3.yaml', schema => 'v3'});
+  $app->plugin(OpenAPI => {url => 'data://main/v3.yaml'});
 }
 
 package MyApp::Controller::User;
@@ -24,13 +24,8 @@ my $t = Test::Mojo->new(MyApp->new);
 for my $base_url (qw(/v2 /v3)) {
   subtest $base_url => sub {
     $t->get_ok("$base_url/user")->status_is(200)->json_is('/age', 42);
-
     $t->get_ok("$base_url/user?code=201")->status_is(501)
       ->json_is('/errors/0/message', 'No response rule for "201".');
-
-    $t->delete_ok("$base_url/user?code=201")->status_is(501)
-      ->json_is('/errors/0/message', 'Not Implemented.');
-
     $t->get_ok("$base_url/user/foo")->status_is(404)->json_is('/errors/0/message', 'Not Found.');
   };
 }

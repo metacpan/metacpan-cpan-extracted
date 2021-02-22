@@ -1,17 +1,18 @@
 package OpenTracing::Role::Tracer;
 
-our $VERSION = 'v0.84.0';
+our $VERSION = 'v0.85.0';
 
 use syntax qw/maybe/;
 
 use Moo::Role;
 use MooX::HandlesVia;
+use MooX::Should;
 
 use Carp;
 use List::Util qw/first/;
 use OpenTracing::Types qw/ScopeManager Span SpanContext is_Span is_SpanContext/;
 use Ref::Util qw/is_plain_hashref/;
-use Role::Declare -lax;
+use Role::Declare::Should -lax;
 use Try::Tiny;
 use Types::Common::Numeric qw/PositiveOrZeroNum/;
 use Types::Standard qw/ArrayRef CodeRef Dict HashRef InstanceOf Maybe Object Str Undef/;
@@ -21,7 +22,7 @@ our @CARP_NOT;
 
 has scope_manager => (
     is              => 'ro',
-    isa             => ScopeManager,
+    should          => ScopeManager,
     reader          => 'get_scope_manager',
     default => sub {
         require 'OpenTracing::Implementation::NoOp::ScopeManager';
@@ -167,7 +168,7 @@ use constant ContextFormatter => Dict[
 
 has context_formatters => (
     is          => 'rw',
-    isa         => ArrayRef[ContextFormatter],
+    should      => ArrayRef[ContextFormatter],
     handles_via => 'Array',
     handles     => {
         register_context_formatter  => 'unshift',
@@ -268,7 +269,6 @@ instance_method build_context (
 BEGIN {
 #   use Role::Tiny::With;
     with 'OpenTracing::Interface::Tracer'
-        if $ENV{OPENTRACING_INTERFACE};
 }
 
 

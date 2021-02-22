@@ -1,7 +1,6 @@
-use warnings;
-use strict;
-use Test::More;
-use Lingua::JA::Moji 'is_romaji';
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;
 
 my @words = qw(hana flower tora);
 my @copy = @words;

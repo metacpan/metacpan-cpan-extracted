@@ -7,11 +7,19 @@ use warnings;
 use Exporter qw(import);
 
 our @EXPORT = qw(
-	check_vcs vcs_tag vcs_exit make_vcs_tag get_vcs_tag_format
+	check_vcs
 	get_recent_contributors
+	get_vcs_tag_format
+	is_allowed_branch
+	make_vcs_tag
+	vcs_branch
+	vcs_commit_message
+	vcs_commit_message_template
+	vcs_exit
+	vcs_tag
 	);
 
-our $VERSION = '1.015';
+our $VERSION = '1.016';
 
 =encoding utf8
 
@@ -44,6 +52,12 @@ Check the state of the Git repository.
 
 =cut
 
+sub _get_time {
+	my( $self ) = @_;
+	require POSIX;
+	POSIX::strftime( '%Y%m%d%H%M%S', localtime );
+	}
+
 sub check_vcs {
 	my $self = shift;
 
@@ -53,7 +67,7 @@ sub check_vcs {
 
 	no warnings 'uninitialized';
 
-	my( $branch ) = $self->run('git rev-parse --abbrev-ref HEAD');
+	my $branch = $self->vcs_branch;
 
 	my $up_to_date = ($git_status eq '');
 
@@ -65,24 +79,76 @@ sub check_vcs {
 	return 1;
 	}
 
-=item vcs_tag(TAG)
+=item get_recent_contributors()
 
-Tag the release in local Git.
+Return a list of contributors since last release.
 
 =cut
 
-sub vcs_tag {
-	my( $self, $tag ) = @_;
+sub get_recent_contributors {
+	my $self = shift;
 
-	$tag ||= $self->make_vcs_tag;
+	chomp( my $last_tagged_commit    = $self->run("git rev-list --tags --max-count=1") );
+	chomp( my @commits_from_last_tag = split /\R/, $self->run("git rev-list $last_tagged_commit..HEAD") );
 
-	$self->_print( "Tagging release with $tag\n" );
+	my @authors_since_last_tag =
+		map { qx{git show --no-patch --pretty=format:'%an <%ae>' $_} }
+		@commits_from_last_tag;
+	my %authors = map { $_, 1 } @authors_since_last_tag;
+	my @authors = sort keys %authors;
 
-	return 0 unless defined $tag;
+	return @authors;
+	}
 
-	$self->run( "git tag $tag" );
+=item is_allowed_branch
 
-	return 1;
+Returns true if the current branch is allowed to release.
+
+1. Look at the config for C<allowed_branches>. That's a comma-separated
+list of allowed branch names. If the current branch is exactly any of
+those, return true. Or, keep trying.
+
+2. Look at the config for C<allowed_branches_regex>. If the current
+branch matches that Perl pattern, return true. Or, keep trying.
+
+3. If the current branch is exactly C<master> or C<main>, return true.
+
+4. Or, return false.
+
+=cut
+
+sub is_allowed_branch {
+	my( $self ) = @_;
+	my $branch = $self->vcs_branch;
+
+	return do {
+		if( $self->config->allowed_branches ) {
+			my $s = $self->config->allowed_branches;
+			scalar grep { $_ eq $branch } split /\s*,\s*/, $s;
+			}
+		elsif( $self->config->allowed_branches_regex ) {
+			my $re = eval { my $r = $self->config->allowed_branches_regex; qr/$r/ };
+			$branch =~ m/$re/;
+			}
+		elsif( $branch eq 'master' or $branch eq 'main' ) { 1 }
+		else { 0 }
+		};
+	}
+
+=item get_vcs_tag_format
+
+Return the tag format. It's a sprintf-like syntax, but with one format:
+
+	%v  replace with the full version
+
+If you've set C<> in the configuration, it uses that. Otherwise it
+returns C<release-%v>.
+
+=cut
+
+sub get_vcs_tag_format {
+	my( $self ) = @_;
+	$self->config->git_default_tag || 'release-%v'
 	}
 
 =item make_vcs_tag
@@ -110,28 +176,46 @@ sub make_vcs_tag {
 	return $tag_format;
 	}
 
-sub _get_time {
-	my( $self ) = @_;
-	require POSIX;
-	POSIX::strftime( '%Y%m%d%H%M%S', localtime );
-	}
+=item vcs_branch()
 
-=item get_vcs_tag_format
-
-Return the tag format. It's a sprintf-like syntax, but with one format:
-
-	%v  replace with the full version
-
-If you've set C<> in the configuration, it uses that. Otherwise it
-returns C<release-%v>.
+Return the current branch name.
 
 =cut
 
-sub get_vcs_tag_format {
-	my( $self ) = @_;
+sub vcs_branch {
+	state $branch;
+	return $branch if $branch;
 
-	$self->config->get( 'git_default_tag' ) ||
-	'release-%v'
+	my( $self ) = @_;
+	( $branch ) = $self->run('git rev-parse --abbrev-ref HEAD');
+	chomp( $branch );
+	$branch;
+	}
+
+=item vcs_commit_message_template()
+
+Returns the config for C<commit_message_format>, or the default C<'* for version %s'>.
+This is a C<sprintf> ready string. The first argument to C<sprintf>
+is the release version.
+
+=cut
+
+sub vcs_commit_message_template {
+	my( $self ) = @_;
+	$self->config->commit_message_format // '* for version %s'
+	}
+
+=item vcs_commit_message()
+
+Returns the commit message, using C<vcs_commit_message_template> as the
+format.
+
+=cut
+
+sub vcs_commit_message {
+	my( $self, $args ) = @_;
+	my $template = $self->vcs_commit_message_template;
+	sprintf $template, $args->{version};
 	}
 
 =item vcs_exit
@@ -159,25 +243,24 @@ sub vcs_exit {
 	return 1;
 	}
 
-=item get_recent_contributors()
+=item vcs_tag(TAG)
 
-Return a list of contributors since last release.
+Tag the release in local Git, using the value from C<make_vcs_tag>.
 
 =cut
 
-sub get_recent_contributors {
-	my $self = shift;
+sub vcs_tag {
+	my( $self, $tag ) = @_;
 
-	chomp( my $last_tagged_commit    = $self->run("git rev-list --tags --max-count=1") );
-	chomp( my @commits_from_last_tag = split /\R/, $self->run("git rev-list $last_tagged_commit..HEAD") );
+	$tag ||= $self->make_vcs_tag;
 
-	my @authors_since_last_tag =
-		map { qx{git show --no-patch --pretty=format:'%an <%ae>' $_} }
-		@commits_from_last_tag;
-	my %authors = map { $_, 1 } @authors_since_last_tag;
-	my @authors = sort keys %authors;
+	$self->_print( "Tagging release with $tag\n" );
 
-	return @authors;
+	return 0 unless defined $tag;
+
+	$self->run( "git tag $tag" );
+
+	return 1;
 	}
 
 =back

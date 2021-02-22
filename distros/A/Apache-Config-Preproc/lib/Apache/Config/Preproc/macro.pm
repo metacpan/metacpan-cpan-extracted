@@ -10,7 +10,7 @@ our $VERSION = '1.03';
 sub new {
     my $class = shift;
     my $conf = shift;
-    my $self = bless $class->SUPER::new($conf), $class;
+    my $self = $class->SUPER::new($conf);
     $self->{keep} = {};
     croak "bad number of arguments: @_" if @_ % 2;
     local %_ = @_;

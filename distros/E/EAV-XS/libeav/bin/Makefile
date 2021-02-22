@@ -25,7 +25,7 @@ shared: eav
 
 eav: $(OBJECTS)
 	# bin -> shared linkage
-	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) -L.. -leav $(LIBS)
+	$(CC) -o $@ $(OBJECTS) -L.. -leav $(LIBS) $(LDFLAGS)
 
 eav.static: LDFLAGS = -static
 eav.static: $(OBJECTS)

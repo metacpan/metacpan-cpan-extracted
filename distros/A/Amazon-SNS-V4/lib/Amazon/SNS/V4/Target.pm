@@ -3,7 +3,7 @@ package Amazon::SNS::V4::Target;
 use strict;
 use warnings;
 
-our $VERSION = '1.11';
+our $VERSION = '2.0';
 use base qw(Class::Accessor);
 
 use JSON;

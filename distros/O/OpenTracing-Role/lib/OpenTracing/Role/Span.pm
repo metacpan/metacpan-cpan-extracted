@@ -1,12 +1,13 @@
 package OpenTracing::Role::Span;
 
-our $VERSION = 'v0.84.0';
+our $VERSION = 'v0.85.0';
 
 
 
 use Moo::Role;
 use MooX::HandlesVia;
 use MooX::ProtectedAttributes;
+use MooX::Should;
 
 use Carp;
 use OpenTracing::Types qw/:types :is/;
@@ -16,7 +17,7 @@ use Types::Common::Numeric qw/PositiveOrZeroNum/;
 
 has operation_name => (
     is              => 'rwp',
-    isa             => Str,
+    should          => Str,
     required        => 1,
 #   writer          => 'overwrite_operation_name',
     reader          => 'get_operation_name', # it's not in the Interface
@@ -24,20 +25,20 @@ has operation_name => (
 
 has start_time => (
     is              => 'ro',
-    isa             => PositiveOrZeroNum,
+    should          => PositiveOrZeroNum,
     default         => sub { epoch_floatingpoint() }
 );
 
 has finish_time => (
     is              => 'rwp',
-    isa             => PositiveOrZeroNum,
+    should          => PositiveOrZeroNum,
     predicate       => 'has_finished',
     init_arg        => undef,
 );
 
 has tags => (
     is              => 'rwp',
-    isa             => HashRef[Value],
+    should          => HashRef[Value],
     handles_via     => 'Hash',
     handles         => {
         get_tags => 'all',
@@ -47,7 +48,7 @@ has tags => (
 
 has context => (
     is              => 'ro',
-    isa             => SpanContext,
+    should          => SpanContext,
     reader          => 'get_context',
 #   writer          => '_set_context',
     required        => 1, # either from Span->get_context or SpanContext self
@@ -72,7 +73,7 @@ sub overwrite_operation_name {
 sub finish {
     my $self = shift;
     
-    croak "Span has already been finished"
+    carp "Span has already been finished" and return $self
         if $self->has_finished;
     
     my $epoch_timestamp = shift // epoch_floatingpoint();
@@ -190,7 +191,7 @@ sub duration {
 
 protected_has child_of => (
     is => 'ro',
-    isa => Span | SpanContext,
+    should => Span | SpanContext,
     required => 0,
 );
 #
@@ -245,7 +246,7 @@ sub _set_context {
 
 has on_finish => (
     is              => 'ro',
-    isa             => Maybe[CodeRef],
+    should          => Maybe[CodeRef],
     predicate       => 1,
 );
 
@@ -278,7 +279,6 @@ sub epoch_floatingpoint {
 BEGIN {
 #   use Role::Tiny::With;
     with 'OpenTracing::Interface::Span'
-        if $ENV{OPENTRACING_INTERFACE};
 }
 
 

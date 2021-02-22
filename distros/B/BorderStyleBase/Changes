@@ -1,3 +1,32 @@
+0.009   2021-02-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to 'use utf8' in BorderStyle::Test::Labeled now
+	  that we've used non-ASCII.
+
+
+0.008   2021-02-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] When border char (4,6) is not available, use (4,0); when
+	  (4,7) is not available, use (4,3).
+
+
+0.007   2021-01-31  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] When border struct doesn't provide row 6, return from row 0;
+	  when border struct doesn't provide row 7, return from row 5.
+
+
+0.006   2021-01-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to BorderStyle 2.0.6 (extra top & border characters).
+
+
+0.005   2021-01-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Support BorderStyle 2.0.4 (characters for table with row/column
+	  spans).
+
+
 0.004   2020-06-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Make get_struct() work as static method as well (BorderStyle

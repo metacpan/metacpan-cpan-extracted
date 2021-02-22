@@ -235,9 +235,7 @@ get '/to_string' => sub {
 get '/source' => sub {
   my $c    = shift;
   my $file = $c->param('fail') ? 'does_not_exist.txt' : '../lite_app.t';
-  $c->render_maybe('this_does_not_ever_exist')
-    or $c->reply->static($file)
-    or $c->res->headers->header('X-Missing' => 1);
+  $c->render_maybe('this_does_not_ever_exist') or $c->reply->static($file);
 };
 
 get '/foo_relaxed/#test' => sub {
@@ -395,13 +393,13 @@ get '/captures/:foo/:bar' => sub {
 app->routes->add_condition(
   default => sub {
     my ($route, $c, $captures, $num) = @_;
-    $captures->{test} = $captures->{text} . "$num works!";
+    $captures->{test} = $captures->{foo} . "$num works!";
     return 1 if $c->stash->{default} == $num;
     return undef;
   }
 );
 
-get '/default/:text' => (default => 23) => sub {
+get '/default/:foo' => (default => 23) => sub {
   my $c       = shift;
   my $default = $c->stash('default');
   my $test    = $c->stash('test');
@@ -597,7 +595,8 @@ $t->get_ok('/static.txt' => {Range => 'bytes=2-5'})->status_is(206)->header_is(S
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 4)->content_is('st s');
 
 # Protected DATA template
-$t->get_ok('/template.txt.epl')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Oops!/);
+$t->get_ok('/template.txt.epl')->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Route without action and nothing to render/);
 
 # Captured "0"
 $t->get_ok('/null/0')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')->content_is('0');
@@ -686,7 +685,7 @@ subtest 'Reverse proxy with "X-Forwarded-For" and trusted proxies (untrusted ori
 };
 
 subtest 'Reverse proxy with "X-Forwarded-For" and trusted proxy networks' => sub {
-  local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8, 192.0.2.1/32';
+  local $ENV{MOJO_TRUSTED_PROXIES} = '127.0.0.0/8, 192.0.2.1/32';
   my $t = Test::Mojo->new;
   $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})->status_is(200)
     ->header_unlike('X-Original' => qr/192\.0\.2\.(?:2|1)/)
@@ -694,7 +693,7 @@ subtest 'Reverse proxy with "X-Forwarded-For" and trusted proxy networks' => sub
 };
 
 subtest 'Reverse proxy with "X-Forwarded-For" and trusted proxies (all addresses trusted)' => sub {
-  local $ENV{MOJO_TRUSTED_PROXIES} = '0/0';
+  local $ENV{MOJO_TRUSTED_PROXIES} = '0.0.0.0/0';
   my $t = Test::Mojo->new;
   $t->get_ok('/0' => {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})->status_is(200)
     ->header_unlike('X-Original' => qr/192\.0\.2\.(?:2|1)/)
@@ -702,7 +701,7 @@ subtest 'Reverse proxy with "X-Forwarded-For" and trusted proxies (all addresses
 };
 
 subtest 'Reverse proxy with "X-Forwarded-For" and trusted proxies (unexpected leading address)' => sub {
-  local $ENV{MOJO_TRUSTED_PROXIES} = '127.0/8, 192.0.2.1';
+  local $ENV{MOJO_TRUSTED_PROXIES} = '127.0.0.0/8, 192.0.2.1';
   my $t = Test::Mojo->new;
   $t->get_ok('/0' => {'X-Forwarded-For' => '7.7.7.7, 192.0.2.2, 192.0.2.1'})->status_is(200)
     ->header_unlike('X-Original' => qr/192\.0\.2\.(?:2|1)/)
@@ -744,13 +743,12 @@ $t->get_ok('/inline/ep/include')->status_is(200)->content_is("♥just ♥\nworks
 $t->get_ok('/to_string')->status_is(200)->content_is('beforeafter');
 
 # Render static file outside of public directory
-$t->get_ok('/source')->status_is(200)->content_type_is('application/octet-stream')->header_isnt('X-Missing' => 1)
-  ->content_like(qr!get_ok\('/source!);
+$t->get_ok('/source')->status_is(200)->content_type_is('application/octet-stream')->content_like(qr!get_ok\('/source!);
 
 # File does not exist
 $log = '';
 $cb  = $t->app->log->on(message => sub { $log .= pop });
-$t->get_ok('/source?fail=1')->status_is(404)->header_is('X-Missing' => 1)->content_is("Oops!\n");
+$t->get_ok('/source?fail=1')->status_is(500)->content_like(qr/Static file "does_not_exist.txt" not found/);
 like $log, qr/Static file "does_not_exist.txt" not found/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 

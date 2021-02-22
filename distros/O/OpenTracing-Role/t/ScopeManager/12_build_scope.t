@@ -1,6 +1,7 @@
 use Test::Most;
 
 
+use Devel::StrictMode;
 
 subtest "All happy ..." => sub {
     
@@ -20,6 +21,8 @@ subtest "All happy ..." => sub {
 
 
 subtest "Missing Required Named Arguments ..." => sub {
+    
+    SKIP: { skip "Not under STRICT, no exceptions thrown", 2 unless STRICT;
     
     my $some_scope = bless {}, 'MyStub::Scope';
     
@@ -45,11 +48,14 @@ subtest "Missing Required Named Arguments ..." => sub {
     } qr/missing named parameter: finish_span_on_close/,
         "Does require a 'finish_span_on_close' argumnent";
     
+    }
 };
 
 
 
 subtest "Bad Return Type ..." => sub {
+    
+    SKIP: { skip "Not under STRICT, no exceptions thrown", 2 unless STRICT;
     
     my $some_scope = bless {}, 'MyStub::Scope';
     
@@ -62,6 +68,7 @@ subtest "Bad Return Type ..." => sub {
         );
     } qr/Undef did not pass type constraint "Scope"/,
         "Does need to return a Scope";
+    }
     
 };
 

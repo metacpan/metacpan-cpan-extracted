@@ -1,0 +1,14 @@
+Revision history for Perl extension CGI::remote_addr
+
+0.03      2021-02-15 10:09:27-08:00 America/Vancouver
+    - Switch to Dist::Zilla for release management
+    - POD fixups; SYNOPSIS
+    - update test to use proper subtests
+    - move to GitHub
+    - use namespace::clean to keep our namespace clean
+
+0.02    Fri Apr 23 22:27 PDT 2010
+    - Switch to Git
+
+0.01    Thu Mar  6 13:33 PST 2008
+    - initial version

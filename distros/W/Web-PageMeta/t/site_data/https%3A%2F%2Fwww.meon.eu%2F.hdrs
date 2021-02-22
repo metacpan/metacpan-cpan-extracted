@@ -1,0 +1,14 @@
+$VAR1 = {
+          'cache-control' => 'max-age=900',
+          'connection' => 'keep-alive',
+          'URL' => 'https://www.meon.eu/',
+          'content-length' => '9409',
+          'set-cookie' => 'meon_web_session=d8d36650f6099408dc11202a094621738d23220d; domain=blog.kutej.net; path=/; expires=Sat, 20-Feb-2021 21:26:28 GMT; HttpOnly',
+          'vary' => 'Accept-Encoding',
+          'date' => 'Sat, 20 Feb 2021 17:26:28 GMT',
+          'Status' => '200',
+          'expires' => 'Sat, 20 Feb 2021 17:41:28 GMT',
+          'content-type' => 'text/html; charset=utf-8',
+          'server' => 'nginx/1.10.3',
+          'Reason' => 'OK'
+        };

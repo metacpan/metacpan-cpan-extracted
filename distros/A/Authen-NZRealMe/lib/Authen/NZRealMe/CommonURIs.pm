@@ -1,5 +1,5 @@
 package Authen::NZRealMe::CommonURIs;
-$Authen::NZRealMe::CommonURIs::VERSION = '1.20';
+$Authen::NZRealMe::CommonURIs::VERSION = '1.21';
 use strict;
 use warnings;
 
@@ -171,6 +171,15 @@ URI for XML Encryption block encryption algorithm "RSAES-PKCS1-v1_5".  Source:
 
 URI for XML Encryption block encryption algorithm "AES128-CBC".  Source: [XENC].
 
+=item xenc_aes256cbc => http://www.w3.org/2001/04/xmlenc#aes256-cbc
+
+URI for XML Encryption block encryption algorithm "AES256-CBC".  Source: [XENC].
+
+=item xenc_rsa_oaep_mgf1p => http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p
+
+URI for XML Encryption key transport encryption algorithm "RSA OAEP MGF1P".
+Source: [XENC].
+
 =item rsa_1_5 => http://www.w3.org/2001/04/xmlenc#rsa-1_5
 
 URI for XML Encryption key transport encryption algorithm "RSA Version 1.5".
@@ -270,11 +279,15 @@ Identifier type used for SAML 2.0 binding type references.  Source [SAML2].
 
 =item saml_binding_artifact => urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact
 
-Indentifier type used for SAML 2.0 HTTP-Artifact binding.  Source [SAML2].
+Identifier type used for SAML 2.0 HTTP-Artifact binding.  Source [SAML2].
+
+=item saml_binding_redirect => urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect
+
+Identifier type used for SAML 2.0 HTTP-Redirect binding.  Source [SAML2].
 
 =item saml_binding_post => urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
 
-Indentifier type used for SAML 2.0 HTTP-POST binding.  Source [SAML2].
+Identifier type used for SAML 2.0 HTTP-POST binding.  Source [SAML2].
 
 =item saml_success => urn:oasis:names:tc:SAML:2.0:status:Success
 
@@ -290,6 +303,16 @@ Identifier type used for SAML 2.0 response failure status references.  Source
 
 Identifier type used for SAML 2.0 response 'unknown principal' status
 references.  Source [SAML2].
+
+=item saml_nameid_format_persistent => urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+
+Identifier type used for SAML 2.0 NameID subject format, unique identifier is retained.
+Source [SAML2].
+
+=item saml_nameid_format_transient => urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+
+Identifier type used for SAML 2.0 NameID subject format, unique identifier for each flow.
+Source [SAML2].
 
 =item rm_timeout => urn:nzl:govt:ict:stds:authn:deployment:RealMe:SAML:2.0:status:Timeout
 

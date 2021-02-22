@@ -1,0 +1,620 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Trav::Dir - Practical traversing of directories
+
+=head1 SYNOPSIS
+
+    
+    use FindBin '$Bin';
+    use Trav::Dir;
+    my $o = Trav::Dir->new (
+        # Don't traverse directories matching these patterns
+        no_trav => qr!/(\.git|xt|blib)$!,
+        # Reject files matching this pattern
+        rejfile => qr!~$|MYMETA|\.tar\.gz!,
+        # Don't add directories to @files
+        no_dir => 1,
+    );
+    my @files;
+    chdir "$Bin/..";
+    $o->find_files (".", \@files);
+    for (sort @files) {
+        print "$_\n";
+    }
+
+
+produces output
+
+    ./.gitignore
+    ./Changes
+    ./MANIFEST.SKIP
+    ./Makefile
+    ./Makefile.PL
+    ./build.pl
+    ./examples/forgot-slash-out.txt
+    ./examples/forgot-slash.pl
+    ./examples/random-file-out.txt
+    ./examples/random-file.pl
+    ./examples/synopsis-out.txt
+    ./examples/synopsis.pl
+    ./lib/Trav/Dir.pm
+    ./lib/Trav/Dir.pod
+    ./lib/Trav/Dir.pod.tmpl
+    ./make-pod.pl
+    ./pm_to_blib
+    ./t/trav-dir.t
+    ./versionup.pl
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Trav-Dir-0.02/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents version 0.02 of Trav-Dir
+corresponding to L<git commit bfcab10e35a95164c58faf5bd863cc47bee06ee8|https://github.com/benkasminbullock/trav-dir/commit/bfcab10e35a95164c58faf5bd863cc47bee06ee8> released on Sun Feb 21 13:46:36 2021 +0900.
+
+=head1 DESCRIPTION
+
+Traverse directories and make a list of files. Replacement for
+L</File::Find>.
+
+=head1 METHODS
+
+=head2 find_files
+
+    $o->find_files ($dir, \@files);
+
+Traverse C<$dir> and its subdirectories, and list all the files found
+into C<@files>. find_files first makes a list of the files in C<$dir>,
+then it goes through the list and recursively calls itself on
+directories, and then stores the files into C<@files>. If the user
+provides a callback in L</new>, it also calls the user callback on
+each file.
+
+File names are fully qualified, in other words the file names in
+C<@files> include the file's directory.
+
+You can omit the second argument, C<@files>, and just use a
+L</callback> instead.
+
+    my $o = Trav::Dir->new (callback => \& my_function);
+    $o->find_files ($dir);
+
+See L</callback>.
+
+The list of files C<@files> is deliberately not made a return value so
+that you can run C<find_files> over a list of directories.
+
+    for my $dir (@dirs) {
+        $td->find_files ($dir, \@files);
+    }
+
+New files are added to the end of C<@files> using C<push>.
+
+If both C<callback> and C<@files> are omitted, C<find_files> prints a
+warning and returns, since there is nothing to do. You might see this
+warning if you accidentally omit the slash before C<@files> like this:
+
+    
+    use Trav::Dir;
+    my $o = Trav::Dir->new ();
+    my @files;
+    $o->find_files (".", @files);
+    
+    
+
+
+produces output
+
+    No file list and no callback at /usr/home/ben/projects/trav-dir/examples/forgot-slash.pl line 7.
+
+
+(This example is included as L<F<forgot-slash.pl>|https://fastapi.metacpan.org/source/BKB/Trav-Dir-0.02/examples/forgot-slash.pl> in the distribution.)
+
+
+Symbolic links (files which return a true value with the -l test) are
+not traversed or recorded. See L</No support for symbolic links> for a
+discussion.
+
+"find_files" was originally the name of a subroutine in the script
+which became Trav::Dir.
+
+=head2 new
+
+    my $o = Trav::Dir->new (%options);
+
+Create a new Trav::Dir object. There are no mandatory options. The
+options are as follows:
+
+=over
+
+=item callback
+
+    Trav::Dir->new (callback => \& call_me);
+
+A subroutine to call back when each file is found, similar to the
+C<wanted> routine of L</File::Find>. It is called like this
+
+    &callback ($data, $file);
+
+Here C<$file> is the full path of the file and C<$data> is the data
+you pass with L</data>.
+
+Directories are also sent to your callback. If you don't want
+directories, use the L</no_dir> option.
+
+=item data
+
+    Trav::Dir->new (data => \%my_structure);
+
+A data item to pass to callbacks. See L</callback> and L</preprocess>
+for the calling conventions.
+
+=item maxsize
+
+    Trav::Dir->new (maxsize => 200_000);
+
+Maximum file size to consider. If left undefined it is not used. If
+defined, if the file under consideration is bigger than this, the file
+is skipped. This test is not applied to directories.
+
+This option was implemented to assist file search indexing by
+rejecting very large files. In the file search case the largest text
+file I need to search over is a C file of 118,090 bytes, so I set this
+to 200,000 to quickly reject larger files. Dealing with binary files
+and so on is handled by the callback or by the indexing application
+which uses the list of files.
+
+=item minsize
+
+    Trav::Dir->new (minsize => 10);
+
+Minimum file size to consider. If left undefined it is not used. If
+defined, if the file under consideration is smaller than this, the
+file is skipped. This test is not applied to directories.
+
+This option was implemented to assist a file search indexing program
+by rejecting very small files. In the case of the file search it is
+set to 10 so that files with less than 10 bytes are not indexed at
+all.
+
+=item no_dir
+
+    Trav::Dir->new (no_dir => 1);
+
+Don't include directories in the results sent to L</callback> or
+included in C<@files>.
+
+This option was implemented to assist a file search indexing program
+by rejecting directories.
+
+=item no_trav
+
+    Trav::Dir->new (no_trav => qr!\.git\b!);
+
+Regex to reject directories to traverse. If a directory matches this
+regex, it is not traversed at all, and its subdirectories are not
+traversed or even seen.
+
+This option was implemented for an incremental backup system to stop
+going into directories containing files which didn't need to be backed
+up, a file search indexing system for stopping going into directories
+containing files which don't need to be indexed, such as
+computer-generated HTML files or old web server log files, and a
+project status checking script which checks whether projects have
+uncommitted changes. For example for the project status checking
+script, the code looks like this:
+
+    my $td = Trav::Dir->new (
+        only => qr!^\.git$!,
+        no_trav => qr!/(?:
+            \.git
+        |
+            bugzilla
+        |
+            cancelled
+        |
+            www
+        |
+            blib
+        |
+            man-pages/man[0-9]
+        )/?$!x,
+    );
+
+To see what projects there are, it looks for a file called F<.git>,
+but to save time it doesn't go into directories like F<.git> or
+F<blib> or some other patterns where there are lots of files we are
+sure are not relevant, and it doesn't go into the cancelled project
+directory, since we don't care about whether those projects are up to
+date.
+
+=item only
+
+    Trav::Dir->new (only => qr!.*\.html$!);
+
+Regex to accept only files which match it. This is applied to the file
+name without the directory, so for example if you want to find files
+starting with a pattern like C<apple-touch-icon.*>, you can use C<^>
+to match the beginning of the file name:
+
+    Trav::Dir->new (only => qr!^apple-touch-icon.*!);
+
+This option was implemented to assist searching for certain types of
+file.
+
+For example the following script finds files called C<hanzierrorlog>
+under a directory C</mount/backup/incremental/2019>, and then removes
+them when they are found with a callback named C<found>:
+
+    my $td = Trav::Dir->new (
+        only => qr!hanzierrorlog!,
+        callback => \& found,
+    );
+    $td->find_files ('/mount/backup/incremental/2019');
+    sub found
+    {
+        my (undef, $file) = @_;
+        unlink $file or warn "Failed to unlink $file: $!";
+    }
+
+=item preprocess
+
+    Trav::Dir->new (preprocess => \& my_function);
+
+A function which preprocesses the list of files of a directory. It is
+called in the form
+
+    preprocess ($data, $dir, \@files);
+
+where C<$data> is what is specified with L</data>, C<$dir> is the
+directory of the files, and C<@files> is the list of files in that
+directory.
+
+Trav::Dir does not call C<chdir>, but the file names in C<@files> are
+not qualified, that is they do not contain the directory of the file,
+C<$dir>.
+
+To alter what files are processed, alter the reference you get,
+e.g. to stop processing of the directory use
+
+    @$files = ();
+
+This may change in a future version of the module.
+
+This option was implemented as a substitute for the C<preprocess>
+method of L</File::Find> when I replaced its use by use of Trav::Dir,
+for an incremental backup system, to prevent the backup system going
+into directories flagged not to be backed up.
+
+=item rejfile
+
+    Trav::Dir->new (rejfile => qr!~$!);
+
+Regex for rejecting files. If a file matches this regex it is never
+sent to the callback specified with L</callback>. The regex is applied
+to the file without the directory name.
+
+This was implemented for things such as the above example, where C<~>
+is the character used by Emacs editor backups, to prevent old editor
+backup files from being indexed by a search system.
+
+=item verbose
+
+    Trav::Dir->new (verbose => 1);
+
+Print a lot of messages about how the files are being processed.
+
+=back
+
+=head1 SEE ALSO
+
+=head2 CPAN
+
+There are a number of other CPAN modules for going into directories
+and making a list of files.
+
+=over
+
+=item L<File::Find>
+
+This is a Perl version of the Unix "find" utility. It is part of the
+Perl core so is installed with Perl by default.
+
+=back
+
+=over
+
+=item Alternatives to File::Find
+
+These modules offer alternatives to File::Find but are not based on it.
+
+=over
+
+=item L<File::chdir::WalkDir>
+
+=item L<File::Find::Declare>
+
+Moose-based
+
+=item L<File::Find::Node>
+
+"Object oriented directory tree traverser"
+
+=item L<File::Find::Object>
+
+"An object oriented File::Find replacement"
+
+=item L<File::Next>
+
+=item L<Path::Class::Iterator>
+
+"walk a directory structure"
+
+=item L<Path::Class::Rule>
+
+"Iterative, recursive file finder with Path::Class"
+
+=item L<Path::Iterator::Rule>
+
+=back
+
+=item File::Find extensions
+
+These extend L</File::Find> in various ways.
+
+=over
+
+=item L<File::Find::CaseCollide>
+
+"find collisions in filenames, differing only in case"
+
+=item L<File::Find::Duplicates>
+
+=item L<File::Find::Rex>
+
+"Combines simpler File::Find interface with support for regular
+expression search criteria."
+
+=item L<File::Find::Rule>
+
+"Alternative interface to File::Find"
+
+It features very comprehensive tests for different kinds of files
+which you can chain together to get lists of files.
+
+=item L<File::Find::utf8>
+
+"Fully UTF-8 aware File::Find"
+
+It forces the file names from bytes to characters.
+
+=back
+
+=item File::Find assistants
+
+These help you to use L</File::Find>.
+
+=over
+
+=item L<File::Find::Closures>
+
+"functions you can use with File::Find"
+
+=item L<File::Finder>
+
+"nice wrapper for File::Find ala find"
+
+It writes C<wanted> subroutines for File::Find.
+
+=item L<File::Find::Wanted>
+
+"More obvious wrapper around File::Find"
+
+=back
+
+=item Other
+
+=over
+
+=item L<File::Find::Match>
+
+"Perform different actions on files based on file name."
+
+=item L<File::Find::Random>
+
+The documentation doesn't make it very clear what this does. To get a
+random file using Trav::Dir, try the following:
+
+    
+    # $Bin is the directory of our script itself.
+    use FindBin '$Bin';
+    use Trav::Dir;
+    # A list of files.
+    my @files;
+    # The Trav::Dir object.
+    my $o = Trav::Dir->new ();
+    # Tell the Trav::Dir object to find all the files under the above directory.
+    $o->find_files ("$Bin/..", \@files);
+    # This is how Perl gets the lengths of arrays.
+    # See perldoc -f scalar.
+    my $nfiles = scalar (@files);
+    # "rand(n)" is always < n, and int truncates the fractional part.
+    # See perldoc -f rand, perldoc -f int.
+    my $random = int (rand ($nfiles)); 
+    # At last we have our random file.
+    print $files[$random];
+
+
+produces output
+
+    /usr/home/ben/projects/trav-dir/examples/../.git/objects/cb
+
+(This example is included as L<F<random-file.pl>|https://fastapi.metacpan.org/source/BKB/Trav-Dir-0.02/examples/random-file.pl> in the distribution.)
+
+
+=back
+
+=back
+
+=head2 Other ways to do the same thing
+
+If you need to find a file with a certain name, on a Unix system, the
+C<find> facility may be useful, as is the C<locate> facility. For
+example to find all "coredumps", one can use
+
+    my @core = `locate ".core"`;
+
+C<locate> is usually run at certain times of the day by the operating
+system so it is not necessarily completely up to date. 
+
+C<grep> can be quite handy too to eliminate bad patterns. In my case I
+have a giant number of files under an incremental backup directory, so
+I use
+
+    my @junk = `locate guff | grep -v incremental`;
+    for my $file (@junk) {
+        chomp $file;
+        print "$file\n";
+    }
+
+to find files with the letters "guff" in their names.
+
+=head1 HISTORY
+
+Trav::Dir was created as an alternative to L</File::Find> and the
+other modules on CPAN. I very strongly disliked File::Find for quite a
+long time, but also found the alternatives like File::Find::Rule
+excessively complicated, so I would end up writing various scripts to
+traverse directories, leading to duplication of efforts. I eventually
+decided not to write any more duplicate code but make a single module
+which would serve a practical purpose.
+
+In my opinion this module has the following merits:
+
+=over
+
+=item No need for closures or global variables
+
+There are all kinds of articles, stackoverflow, and perlmonks
+questions, and L<several CPAN modules|/File::Find assistants> about
+how to write closures and C<wanted> functions for File::Find, but
+these are working around a deficiency of the module.
+
+Trav::Dir eliminates the need for closures or global variables by
+allowing the user to supply a L</data> argument to L</new>.
+
+=item No pseudo-global variables
+
+For some reason or another, File::Find communicates with the user
+routine it calls C<wanted> using various pseudo-global variables like
+C<$File::Find::name>. These are annoying to repeatedly type and are
+also completely unnecessary. 
+
+Trav::Dir uses standard Perl subroutine arguments in callbacks. See
+L</callback> and L</preprocess>.
+
+=item Pattern-matching
+
+File::Find has no facility to match directories or files against
+patterns.  Instead each and every directory and file must be handled
+by a user callback, and the user callback must interact with
+File::Find using lengthy fully-qualified arguments like
+C<$File::Find::prune>. Stopping File::Find from wading through
+unwanted directories requires the user to write lots of annoying,
+fiddly code involving closures and global variables and File::Find's
+silly C<$File::Find::*> pseudo-global variables, to prevent it from
+doing so.
+
+Trav::Dir greatly simplifies the selection of files by allowing regex
+arguments like L</no_trav>, L</only> and L</rejfile> to sort through
+directories and file names. 
+
+=item Does not call chdir
+
+File::Find insists on doing chdir into each and every directory it
+examines. In practice it is very rare that one actually needs to
+change into a directory.
+
+Trav::Dir does not call chdir. The file name passed to the callback is
+fully-qualified. It is a very simple matter to remove the directory
+from the file name if necessary.
+
+=item No support for symbolic links
+
+Quite a large chunk of File::Find's documentation is about its endless
+ways of handling symbolic links, and yet it is very rare that one
+needs to do this task.
+
+Trav::Dir avoids having to make any number of contortions by not
+following symbolic links. I have never needed to follow a symbolic
+link when traversing a directory of files.
+
+=item No needless complexity
+
+In designing this module I've made something which does the practical
+task of going through directories and looking at the files.  In the
+rare cases that a complicated task such as sorting the list of files
+before examining them, checking file permissions, or postprocessing a
+directory needs to be carried out, it can be handled by the callback
+function, so I deliberately haven't included complex facilities like
+the extraordinarily complicated handling of symbolic links in
+File::Find, or the huge number of rules in L</File::Find::Rule>. All
+of these things can be done much more simply and without reinventing
+the wheel by writing a suitable callback function.
+
+=item Documentation
+
+File::Find's documentation includes wrong statements, undocumented
+variables like C<$File::Find::prune>, and oddities like calling the
+user callback C<wanted> and then writing that the subroutine is
+misnamed, or having both a CAVEAT section containing two caveats,
+followed by a BUGS AND CAVEATS section containing only one caveat, and
+no bugs.
+
+I've reported some of them to the Perl bug list. I've also submitted a
+pull request to correct some of the problems. Please see there for
+details if you would like to contribute.
+
+=back
+
+Prior to creating this module I was regularly using L</File::Find> and
+I had also used L</File::Find::Rule>, as well as using code such as
+
+    my $pm = `find . -name *.pm`;
+    my @pm = split /\n/, $pm;
+
+The bulk of Trav::Dir's code was taken from scripts written as an
+alternative to either File::Find and friends or the above kinds of
+things. The scripts had been in use for several years in various
+places. The random-looking names of the options to L</new> are just
+the names from the old scripts.
+
+Since starting this module in February 2021, I've been able to replace
+all uses of File::Find, backticks, and the other scripts, with
+Trav::Dir.
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

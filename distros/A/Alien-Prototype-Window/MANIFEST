@@ -13,3 +13,4 @@ t/02-install.t
 t/pod.t
 t/pod-coverage.t
 windows_js_1.3.zip
+META.json

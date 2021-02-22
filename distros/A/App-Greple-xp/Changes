@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-xp
 
+0.04 2021-02-15T07:47:53Z
+
+    - Update document.
+    - Modify getting script path strategy.
+
 0.03 2021-02-03T07:29:14Z
 
     - Update test code to get greple script path.

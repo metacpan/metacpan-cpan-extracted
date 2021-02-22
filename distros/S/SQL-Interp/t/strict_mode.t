@@ -17,6 +17,13 @@ eval {
         'sql_interp can be renamed at the same time as sql_interp_strict is being renamed to sql_interp'
     );
 };
-unlike($@,qr/failed sql_interp_strict/,"basic strict mode test");
+unlike($@,qr/failed sql_interp_strict/,"non-strict insecure mode test");
 
-
+eval {
+    my ($sql) = sql_interp(sql('WHERE x=', 5));
+    is( $sql,
+        'WHERE x= 5',
+        'sql_interp can be renamed at the same time as sql_interp_strict is being renamed to sql_interp'
+    );
+};
+unlike($@,qr/failed sql_interp_strict/,"non-strict sql() test");

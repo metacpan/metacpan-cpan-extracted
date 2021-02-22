@@ -16,7 +16,7 @@ BEGIN {
   #
   # ExtUtils::CppGuess does not install everywhere.
   # This is why we provide it explicitely, we are ok if it fails at run-time
-  # (eg. on solaris).
+  # (eg. with Sun C compiler).
   #
   eval 'use ExtUtils::CppGuess; 1;' || die "$@";
 }
@@ -121,18 +121,18 @@ if ($nvtype eq 'float') {
 # Guess CXX configuration
 #
 #
-# Sun/Solaris CC is a special case, we know that guess_compiler will always get it wrong
+# Sun C compiler is a special case, we know that guess_compiler will always get it wrong
 #
-my $solariscase = 0;
-$ac->msg_checking(sprintf "if this is solaris compiler");
-if ($ac->link_if_else("#if defined(__sun) && defined(__SVR4)\n#else\n#error \"this is not solaris compiler\"\n#endif\nint main() { return 0; }")) {
+my $sunc = 0;
+$ac->msg_checking(sprintf "if this is Sun C compiler");
+if ($ac->link_if_else("#ifdef __SUNPRO_C\n#else\n#error \"this is not Sun C compiler\"\n#endif\nint main() { return 0; }")) {
   $ac->msg_result('yes');
   my $cc = which($ENV{CC}) || '';
   if (! $cc) {
     #
     # Should never happen since we checked that the compiler works
     #
-    $ac->msg_notice("Warning! Solaris C compiler working but which() on its location returned false !?");
+    $ac->msg_notice("Warning! Sun C compiler working but which() on its location returned false !?");
   } else {
     #
     # $cc should be a full path
@@ -146,7 +146,7 @@ if ($ac->link_if_else("#if defined(__sun) && defined(__SVR4)\n#else\n#error \"th
       #
       # No CC at the same location?
       #
-      $ac->msg_notice("Warning! Solaris C compiler detected but no CC found at the same location - trying with default search path");
+      $ac->msg_notice("Warning! Sun C compiler detected but no CC found at the same location - trying with default search path");
       $cxx = 'CC';
     } else {
       #
@@ -157,7 +157,7 @@ if ($ac->link_if_else("#if defined(__sun) && defined(__SVR4)\n#else\n#error \"th
         $cxxfromPATH = abs_path($cxxfromPATH);
         my $cxxfromWhich = abs_path($cxx);
         if ($cxxfromWhich eq $cxxfromPATH) {
-          $ac->msg_notice("Solaris C compiler detected and its CC counterpart is already in the search path");
+          $ac->msg_notice("Sun C compiler detected and its CC counterpart is already in the search path");
           $cxx = 'CC';
         }
       }
@@ -172,19 +172,19 @@ if ($ac->link_if_else("#if defined(__sun) && defined(__SVR4)\n#else\n#error \"th
         $ac->msg_notice("Removed -x c++ from CXXFLAGS");
       }
     } else {
-      $ac->msg_notice("Warning! Solaris C compiler detected but no CC found neither in path neither where is the C compiler");
+      $ac->msg_notice("Warning! Sun C compiler detected but no CC found neither in path neither where is the C compiler");
     }
     #
     # In any case, add -lCrun and do not execute guess_compiler - cross fingers if we did not managed to find CXX
     #
     $ac->msg_notice("Adding -lCrun to OTHERLDFLAGS");
     push(@OTHERLDFLAGS, '-lCrun');
-    $solariscase = 1;
+    $sunc = 1;
   }
 } else {
   $ac->msg_result('no');
 }
-if (! $solariscase) {
+if (! $sunc) {
   try {
     my ($cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess) = guess_compiler();
     if (defined($cxx_guess) && (length($cxx_guess) > 0) && which($cxx_guess)) {
@@ -313,6 +313,39 @@ if (is_os_type('Windows')) {
     }
   }
 }
+
+# goto no_tweak_on_optimization_flags;
+$ac->msg_checking("Checking optimization flags:");
+if (($cbuilder_config{cc} // 'cc') eq 'cl') {
+    foreach my $flag ("/O2") {
+        $ac->msg_checking("Checking if flag $flag works:");
+        if (try_compile("#include <stdlib.h>\nint main() {\n  exit(0);\n}\n", $flag)) {
+            $ac->msg_result('yes');
+            $ENV{PERL_EXTUTILS_CBUILDER_CONFIG_optimize} .= " $flag";
+            last;
+        } else {
+            $ac->msg_result('no');
+        }
+    }
+} else {
+    #
+    # We test AIX case first because it overlaps with general O3
+    #
+    foreach my $flag ("-O3 -qstrict", # xlc
+                      "-O3",          # cl, gcc
+                      "-xO3"          # CC
+                      ) {
+        $ac->msg_checking("Checking if flag $flag works:");
+        if (try_compile("#include <stdlib.h>\nint main() {\n  exit(0);\n}\n", $flag)) {
+            $ac->msg_result('yes');
+            $ENV{PERL_EXTUTILS_CBUILDER_CONFIG_optimize} .= " $flag";
+            last;
+        } else {
+            $ac->msg_result('no');
+        }
+    }
+}
+no_tweak_on_optimization_flags:
 
 my $OTHERLDFLAGS = join(' ', @OTHERLDFLAGS);
 print "\n";
@@ -513,10 +546,8 @@ my %WriteMakefileArgs = (
     "JSON::MaybeXS" => "1.004000",
     "Math::BigFloat" => 0,
     "Math::BigInt" => 0,
-    "Moo" => 0,
     "XSLoader" => 0,
     "constant" => 0,
-    "namespace::autoclean" => 0,
     "namespace::clean" => 0,
     "overload" => 0,
     "parent" => 0,
@@ -525,6 +556,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Dumper" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
@@ -547,7 +579,7 @@ my %WriteMakefileArgs = (
     "threads::shared" => 0,
     "utf8" => 0
   },
-  "VERSION" => "4.0.1",
+  "VERSION" => "5.0.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -563,6 +595,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Data::Dumper" => 0,
   "Devel::GlobalDestruction" => 0,
   "Encode" => 0,
   "ExtUtils::MakeMaker" => 0,
@@ -578,7 +611,6 @@ my %FallbackPrereqs = (
   "Log::Log4perl" => "1.32",
   "Math::BigFloat" => 0,
   "Math::BigInt" => 0,
-  "Moo" => 0,
   "Safe::Isa" => 0,
   "Test::Deep" => "1.128",
   "Test::Deep::NoTest" => 0,
@@ -588,7 +620,6 @@ my %FallbackPrereqs = (
   "XSLoader" => 0,
   "constant" => 0,
   "diagnostics" => 0,
-  "namespace::autoclean" => 0,
   "namespace::clean" => 0,
   "open" => 0,
   "overload" => 0,

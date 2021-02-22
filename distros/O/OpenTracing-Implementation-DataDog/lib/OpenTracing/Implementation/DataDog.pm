@@ -3,7 +3,7 @@ package OpenTracing::Implementation::DataDog;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.42.1';
+our $VERSION = 'v0.43.1';
 
 use aliased 'OpenTracing::Implementation::DataDog::Tracer';
 
@@ -22,7 +22,6 @@ sub bootstrap_tracer {
 BEGIN {
     use Role::Tiny::With;
     with 'OpenTracing::Implementation::Interface::Bootstrap'
-        if $ENV{OPENTRACING_INTERFACE}
 } # check at compile time, perl -c will work
 
 

@@ -35,8 +35,8 @@ requires:
   Readonly: 0
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PYX
+  bugtracker: https://github.com/michal-josef-spacek/PYX/issues
   homepage: https://github.com/michal-josef-spacek/PYX
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/PYX
-version: '0.07'
+version: '0.08'

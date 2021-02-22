@@ -1,5 +1,11 @@
 Revision history for MojoX-Log-Fast
 
+v1.2.0  2021-02-17 19:24:12 EET
+        - Fix compatibility with Mojolicious 9.0.
+
+v1.1.0  2021-02-17 19:02:05 EET
+        - Fix compatibility with Mojolicious 8.24.
+
 v1.0.1  2018-04-03 20:15:42 EEST
 	- Reformat doc.
 

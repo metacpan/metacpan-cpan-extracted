@@ -2,12 +2,14 @@ package Crypt::PBE;
 
 use strict;
 use warnings;
+use utf8;
 
 use Carp;
+
 use Crypt::PBE::PBES1;
 use Crypt::PBE::PBES2;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use Exporter qw(import);
 
@@ -151,11 +153,11 @@ Crypt::PBE - Perl extension for PKCS #5 Password-Based Encryption Algorithms
 
 =over 4
 
-=item * L<PBEWithMD2AndDES> : Password-Based Encryption with MD2 and DES
+=item * C<PBEWithMD2AndDES> : Password-Based Encryption with MD2 and DES
 
-=item * L<PBEWithMD5AndDES> : Password-Based Encryption with MD5 and DES
+=item * C<PBEWithMD5AndDES> : Password-Based Encryption with MD5 and DES
 
-=item * L<PBEWithSHA1AndDES> : Password-Based Encryption with SHA1 and DES
+=item * C<PBEWithSHA1AndDES> : Password-Based Encryption with SHA1 and DES
 
 =back
 
@@ -163,35 +165,35 @@ Crypt::PBE - Perl extension for PKCS #5 Password-Based Encryption Algorithms
 
 =over 4
 
-=item * L<PBEWithHmacSHA1AndAES_128> : Password-Based Encryption with SHA-1 HMAC and AES 128 bit
+=item * C<PBEWithHmacSHA1AndAES_128> : Password-Based Encryption with SHA-1 HMAC and AES 128 bit
 
-=item * L<PBEWithHmacSHA1AndAES_192> : Password-Based Encryption with SHA-1 HMAC and AES 192 bit
+=item * C<PBEWithHmacSHA1AndAES_192> : Password-Based Encryption with SHA-1 HMAC and AES 192 bit
 
-=item * L<PBEWithHmacSHA1AndAES_256> : Password-Based Encryption with SHA-1 HMAC and AES 256 bit
+=item * C<PBEWithHmacSHA1AndAES_256> : Password-Based Encryption with SHA-1 HMAC and AES 256 bit
 
-=item * L<PBEWithHmacSHA224AndAES_128> : Password-Based Encryption with SHA-224 HMAC and AES 128 bit
+=item * C<PBEWithHmacSHA224AndAES_128> : Password-Based Encryption with SHA-224 HMAC and AES 128 bit
 
-=item * L<PBEWithHmacSHA224AndAES_192> : Password-Based Encryption with SHA-224 HMAC and AES 192 bit
+=item * C<PBEWithHmacSHA224AndAES_192> : Password-Based Encryption with SHA-224 HMAC and AES 192 bit
 
-=item * L<PBEWithHmacSHA224AndAES_256> : Password-Based Encryption with SHA-224 HMAC and AES 256 bit
+=item * C<PBEWithHmacSHA224AndAES_256> : Password-Based Encryption with SHA-224 HMAC and AES 256 bit
 
-=item * L<PBEWithHmacSHA256AndAES_128> : Password-Based Encryption with SHA-256 HMAC and AES 128 bit
+=item * C<PBEWithHmacSHA256AndAES_128> : Password-Based Encryption with SHA-256 HMAC and AES 128 bit
 
-=item * L<PBEWithHmacSHA256AndAES_192> : Password-Based Encryption with SHA-256 HMAC and AES 192 bit
+=item * C<PBEWithHmacSHA256AndAES_192> : Password-Based Encryption with SHA-256 HMAC and AES 192 bit
 
-=item * L<PBEWithHmacSHA256AndAES_256> : Password-Based Encryption with SHA-256 HMAC and AES 256 bit
+=item * C<PBEWithHmacSHA256AndAES_256> : Password-Based Encryption with SHA-256 HMAC and AES 256 bit
 
-=item * L<PBEWithHmacSHA384AndAES_128> : Password-Based Encryption with SHA-384 HMAC and AES 128 bit
+=item * C<PBEWithHmacSHA384AndAES_128> : Password-Based Encryption with SHA-384 HMAC and AES 128 bit
 
-=item * L<PBEWithHmacSHA384AndAES_192> : Password-Based Encryption with SHA-384 HMAC and AES 192 bit
+=item * C<PBEWithHmacSHA384AndAES_192> : Password-Based Encryption with SHA-384 HMAC and AES 192 bit
 
-=item * L<PBEWithHmacSHA384AndAES_256> : Password-Based Encryption with SHA-384 HMAC and AES 256 bit
+=item * C<PBEWithHmacSHA384AndAES_256> : Password-Based Encryption with SHA-384 HMAC and AES 256 bit
 
-=item * L<PBEWithHmacSHA512AndAES_128> : Password-Based Encryption with SHA-512 HMAC and AES 128 bit
+=item * C<PBEWithHmacSHA512AndAES_128> : Password-Based Encryption with SHA-512 HMAC and AES 128 bit
 
-=item * L<PBEWithHmacSHA512AndAES_192> : Password-Based Encryption with SHA-512 HMAC and AES 192 bit
+=item * C<PBEWithHmacSHA512AndAES_192> : Password-Based Encryption with SHA-512 HMAC and AES 192 bit
 
-=item * L<PBEWithHmacSHA512AndAES_256> : Password-Based Encryption with SHA-512 HMAC and AES 256 bit
+=item * C<PBEWithHmacSHA512AndAES_256> : Password-Based Encryption with SHA-512 HMAC and AES 256 bit
 
 =back
 
@@ -239,7 +241,7 @@ L<https://github.com/giterlizzi/perl-Crypt-PBE>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2020-2021 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

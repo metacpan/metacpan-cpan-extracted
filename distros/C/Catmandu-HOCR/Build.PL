@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Franck"
   ],
   "dist_name" => "Catmandu-HOCR",
-  "dist_version" => "0.01",
+  "dist_version" => "0.02",
   "license" => "perl",
   "module_name" => "Catmandu::HOCR",
   "recursive_test_files" => 1,

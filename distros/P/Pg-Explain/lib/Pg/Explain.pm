@@ -32,11 +32,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =cut
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 =head1 SYNOPSIS
 
@@ -87,6 +87,12 @@ Information about triggers that were called during execution of this query. Arra
 
 =back
 
+=head2 jit
+
+Contains information about JIT timings, as object of Pg::Explain::JIT class.
+
+If there was no JIT info, it will return undef.
+
 =cut
 
 sub source_format  { my $self = shift; $self->{ 'source_format' }  = $_[ 0 ] if 0 < scalar @_; return $self->{ 'source_format' }; }
@@ -94,6 +100,7 @@ sub planning_time  { my $self = shift; $self->{ 'planning_time' }  = $_[ 0 ] if 
 sub execution_time { my $self = shift; $self->{ 'execution_time' } = $_[ 0 ] if 0 < scalar @_; return $self->{ 'execution_time' }; }
 sub total_runtime  { my $self = shift; $self->{ 'total_runtime' }  = $_[ 0 ] if 0 < scalar @_; return $self->{ 'total_runtime' }; }
 sub trigger_times  { my $self = shift; $self->{ 'trigger_times' }  = $_[ 0 ] if 0 < scalar @_; return $self->{ 'trigger_times' }; }
+sub jit            { my $self = shift; $self->{ 'jit' }            = $_[ 0 ] if 0 < scalar @_; return $self->{ 'jit' }; }
 
 =head2 add_trigger_time
 
@@ -235,6 +242,9 @@ sub new {
     else {
         croak( 'One of (source, source_file) parameters has to be provided)' );
     }
+
+    # Initialize jit to undef
+    $self->{ 'jit' } = undef;
     return $self;
 }
 
@@ -404,6 +414,9 @@ sub as_text {
             $textual .= sprintf( "Trigger %s: time=%.3f calls=%d\n", $t->{ 'name' }, $t->{ 'time' }, $t->{ 'calls' } );
         }
     }
+    if ( $self->jit ) {
+        $textual .= $self->jit->as_text();
+    }
     if ( $self->execution_time ) {
         $textual .= "Execution time: " . $self->execution_time . " ms\n";
     }
@@ -443,6 +456,12 @@ sub get_struct {
     $reply->{ 'execution_time' } = $self->execution_time if $self->execution_time;
     $reply->{ 'total_runtime' }  = $self->total_runtime if $self->total_runtime;
     $reply->{ 'trigger_times' }  = clone( $self->trigger_times ) if $self->trigger_times;
+    if ( $self->jit ) {
+        $reply->{ 'jit' }                  = {};
+        $reply->{ 'jit' }->{ 'functions' } = $self->jit->functions;
+        $reply->{ 'jit' }->{ 'options' }   = clone( $self->jit->options );
+        $reply->{ 'jit' }->{ 'timings' }   = clone( $self->jit->timings );
+    }
     return $reply;
 }
 
@@ -488,7 +507,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2015 hubert depesz lubaczewski, all rights reserved.
+Copyright 2008-2021 hubert depesz lubaczewski, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -4,7 +4,7 @@ Keyword::DEVELOPMENT - Have code blocks which don't exist unless you ask for the
 
 # VERSION
 
-Version 0.01
+Version 0.04
 
 # SYNOPSIS
 
@@ -94,37 +94,32 @@ Note the handy line directive on line 13 to ensure your line numbers remain
 correct. If you're not familiar with line directives, see
 [https://perldoc.perl.org/perlsyn.html#Plain-Old-Comments-(Not!)](https://perldoc.perl.org/perlsyn.html#Plain-Old-Comments-\(Not!\))
 
+# ALTERNATIVES
+
+As SawyerX pointed out, can replicate the functionality of this module in pure
+Perl, if desired:
+
+    use constant PRODUCTION => !!$ENV{PRODUCTION};
+    DEVELOPMENT {expensive_debugging_code()} unless PRODUCTION;
+
+Versus:
+
+    use Keyword::DEVELOPMENT;
+    DEVELOPMENT {expensive_debugging_code()};
+
+The first version works because the line is removed entirely from the source
+code using constant-folding (if `PRODUCTION` evaluates to false during
+compile time, the entire line will be omitted).
+
+I think `Keyword::DEVELOPMENT` is less fragile in that you never need to
+remember the `unless PRODUCTION` statement modifier. However, we do rely on
+the pluggable keyword functionality introduced in 5.012. Be warned!
+
 # AUTHOR
 
 Curtis "Ovid" Poe, `<ovid at allaroundtheworld.fr>`
 
-# BUGS
-
-The `Keyword::Declare` module on which this code is based struggles with
-postfix dereferencing. Thus, the following sample program fails:
-
-    #!/usr/bin/env perl
-
-    use 5.024;
-    use Keyword::DEVELOPMENT;
-
-    my $aref = [ 1, 2, 3 ];
-    DEVELOPMENT {
-        my @example = map { $_ => $_ } $aref->@*;
-        print join '-' => @example;
-    }
-
-That fails with the following error message:
-
-        Invalid DEVELOPMENT at declare.pl line 8.
-        Expected:
-                DEVELOPMENT  <block>
-        but found:
-                DEVELOPMENT  {
-        Compilation failed at declare.pl line 8.
-
-Switching from postfix to prefix dereferencing makes the error go away:
-`@$aref` instead of `$aref->@*`.
+# BUGS AND LIMITATIONS
 
 Please report any bugs or feature requests to `bug-keyword-assert at
 rt.cpan.org`, or through the web interface at

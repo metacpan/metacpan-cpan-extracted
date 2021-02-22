@@ -35,22 +35,26 @@
             "Text::FormatTable" : "0",
             "Text::MarkdownTable" : "0",
             "Text::Table" : "0",
+            "Text::Table::ASV" : "0",
             "Text::Table::CSV" : "0.022",
             "Text::Table::HTML" : "0",
             "Text::Table::HTML::DataTables" : "0",
             "Text::Table::LTSV" : "0",
+            "Text::Table::Manifold" : "0",
+            "Text::Table::More" : "0",
             "Text::Table::Org" : "0",
             "Text::Table::Paragraph" : "0",
+            "Text::Table::Sprintf" : "0",
             "Text::Table::TSV" : "0",
             "Text::Table::TinyBorderStyle" : "0",
             "Text::Table::TinyColor" : "0",
             "Text::Table::TinyColorWide" : "0",
             "Text::Table::TinyWide" : "0",
             "Text::Table::XLSX" : "0",
-            "Text::TabularDisplay" : "0"
+            "Text::TabularDisplay" : "0",
+            "Text::UnicodeBox::Table" : "0"
          },
          "requires" : {
-            "Text::Table::ASV" : "0",
             "Text::Table::Tiny" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -78,7 +82,7 @@
          "web" : "https://github.com/perlancar/perl-Text-Table-Any"
       }
    },
-   "version" : "0.098",
+   "version" : "0.101",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

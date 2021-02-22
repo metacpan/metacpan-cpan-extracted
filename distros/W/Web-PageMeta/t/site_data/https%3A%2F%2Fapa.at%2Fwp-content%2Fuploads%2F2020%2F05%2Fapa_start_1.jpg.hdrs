@@ -1,0 +1,16 @@
+$VAR1 = {
+          'x-content-type-options' => 'nosniff',
+          'content-length' => '98990',
+          'accept-ranges' => 'bytes',
+          'URL' => 'https://apa.at/wp-content/uploads/2020/05/apa_start_1.jpg',
+          'connection' => 'keep-alive',
+          'date' => 'Sat, 20 Feb 2021 17:23:17 GMT',
+          'server' => 'nginx',
+          'Status' => '200',
+          'x-frame-options' => 'SAMEORIGIN',
+          'content-type' => 'image/jpeg',
+          'etag' => '"5ede1cc7-182ae"',
+          'x-xss-protection' => '1; mode=block',
+          'last-modified' => 'Mon, 08 Jun 2020 11:11:03 GMT',
+          'Reason' => 'OK'
+        };

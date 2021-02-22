@@ -52,7 +52,7 @@ SYNOPSIS
             output  => $cli->report,
         });
 
-        # recreate cli option object, forking children if in --batch mode
+        # fork children if in --batch mode, cli opts set for current child
         #   process one device or ten thousand devices with the same script
         #   exit --batch parent process here when finished forking children
         $cli = Mnet::Batch::fork($cli);
@@ -84,6 +84,7 @@ SYNOPSIS
 
         # parse interface loopack0 stanza from device config
         #   returns int loop0 line and lines indented under int loop0
+        #   see perldoc Mnet::Stanza for more ios config templating info
         my $loop = Mnet::Stanza::parse($config, qr/^interface Loopback0$/);
 
         # parse primary ip address from loopback config stanza
@@ -102,24 +103,31 @@ DESCRIPTION
 
     The main features are:
 
-    *   Record and replay connected command line sessions, speeding
-        development and allow for regression testing of complex automation
+    *   Mnet::Test module can record and replay Mnet script options, connected
+        expect sessions, and compare outputs, speeding development and
+        allowing for integration and regression testing of complex automation
         scripts.
 
-    *   Reliable automation of cisco ios and other command line sessions,
-        including authentication and command prompt handling.
+    *   Mnet::Expect::Cli::Ios and Mnet::Expect::Cli modules for reliable
+        automation of cisco ios and other command line sessions, including
+        authentication and command prompt handling.
 
-    *   Automation scripts can run in batch mode to concurrently process a
-        list of devices, using a simple command line argument and a device
-        list file.
+    *   Mnet::Stanza module for templated config parsing and generation on
+        cisco ios devices and other similar indented stanza text files.
 
-    *   Facilitate easy log, debug, alert and error output from automation
-        scripts, outputs can be redirected to per-device files
+    *   Mnet::Batch can run automation scripts in batch mode to concurrently
+        process a list of devices, using a simple command line argument and a
+        device list file.
 
-    *   Flexible config settings via command line, environment variable,
-        and/or batch device list files.
+    *   Mnet::Log can facilitate easy log, debug, alert and error output from
+        automation scripts, outputs can be redirected to per-device files.
 
-    *   Report data from scripts can be output as csv, json, or sql.
+    *   Mnet::Opts::Cli module for config settings via command line,
+        environment variable, and/or batch scripts, with help, tips, and
+        password redaction. device list files.
+
+    *   Mnet::Report::Table module for aggregating report data from scripts,
+        supporting output in formats such as csv, json, and sql.
 
     Most of the Mnet sub-modules can be used independently of each other,
     unless otherwise noted.
@@ -143,8 +151,8 @@ INSTALLATION
         make install
 
     Check your PERL5LIB environment variable if INSTALL_BASE was used, or if
-    you copied the lib/Mnet directory somewhere instead of using Makefile.PL.
-    Refer to ExtUtils::MakeMaker for more information
+    you copied the lib/Mnet directory somewhere instead of using the included
+    Makefile.PL script. Refer to ExtUtils::MakeMaker for more information
 
 AUTHOR
     The Mnet perl distribution has been created and is maintained by Mike

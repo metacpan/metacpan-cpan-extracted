@@ -5,7 +5,7 @@ use warnings;
 package Log::Any;
 
 # ABSTRACT: Bringing loggers and listeners together
-our $VERSION = '1.708';
+our $VERSION = '1.709';
 
 use Log::Any::Manager;
 use Log::Any::Proxy::Null;
@@ -27,6 +27,7 @@ our $OverrideDefaultProxyClass;
 {
     my $manager = Log::Any::Manager->new();
     sub _manager { return $manager }
+    sub has_consumer { $manager->has_consumer }
 }
 
 sub import {
@@ -134,7 +135,7 @@ Log::Any - Bringing loggers and listeners together
 
 =head1 VERSION
 
-version 1.708
+version 1.709
 
 =head1 SYNOPSIS
 
@@ -411,6 +412,8 @@ application could do this:
     use Log::Any::Adapter ('File', '/path/to/file.log');
 
 See the L<Log::Any::Adapter> documentation for more details.
+
+To detect if a consumer exists, use C<< Log::Any->has_consumer >>.
 
 =head1 Q & A
 

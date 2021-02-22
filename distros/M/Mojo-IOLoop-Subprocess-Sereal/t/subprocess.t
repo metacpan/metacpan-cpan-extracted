@@ -7,6 +7,7 @@ use Test::More;
 
 use Mojo::IOLoop;
 use Mojo::IOLoop::Subprocess::Sereal;
+use Mojo::Promise;
 
 # Huge result
 my ($fail, $result);
@@ -73,18 +74,12 @@ is $result, 23, 'right result';
 
 # Concurrent subprocesses
 ($fail, $result) = ();
-Mojo::IOLoop->delay(
-  sub {
-    my $delay = shift;
-    Mojo::IOLoop->$_subprocess(sub {1}, $delay->begin);
-    Mojo::IOLoop->$_subprocess->run(sub {2}, $delay->begin);
-  },
-  sub {
-    my ($delay, $err1, $result1, $err2, $result2) = @_;
-    $fail = $err1 || $err2;
-    $result = [$result1, $result2];
-  }
-)->wait;
+my ($promise, $promise2) = (Mojo::Promise->new, Mojo::Promise->new);
+Mojo::IOLoop->$_subprocess->run(sub {1}, sub {$_[1] ? $promise->reject($_[1]) : $promise->resolve($_[2])});
+Mojo::IOLoop->$_subprocess->run(sub {2}, sub {$_[1] ? $promise2->reject($_[1]) : $promise2->resolve($_[2])});
+Mojo::Promise->all($promise, $promise2)->then(sub {
+  $result = [map { $_->[0] } @_];
+})->catch(sub { $fail = shift })->wait;
 ok !$fail, 'no error';
 is_deeply $result, [1, 2], 'right structure';
 

@@ -2,18 +2,16 @@ package Crypt::PBE::PBKDF1;
 
 use strict;
 use warnings;
+use utf8;
 
 use Carp;
-
 use MIME::Base64;
-
 use Digest::MD2 qw(md2);
 use Digest::MD5 qw(md5);
 use Digest::SHA qw(sha1);
-
 use Exporter qw(import);
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 our @EXPORT = qw(
     pbkdf1
@@ -61,20 +59,9 @@ sub new {
 
 }
 
-sub hash_algorithm {
-    my ($self) = @_;
-    return $self->{hash};
-}
-
-sub count {
-    my ($self) = @_;
-    return $self->{count};
-}
-
-sub derived_key_length {
-    my ($self) = @_;
-    return $self->{dk_len};
-}
+sub hash_algorithm     { shift->{hash} }
+sub count              { shift->{count} }
+sub derived_key_length { shift->{dk_len} }
 
 sub derived_key {
     my ($self) = @_;
@@ -404,7 +391,7 @@ L<https://github.com/giterlizzi/perl-Crypt-PBE>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2020-2021 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

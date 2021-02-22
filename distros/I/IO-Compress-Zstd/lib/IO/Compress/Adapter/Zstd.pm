@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.100 qw(:Status);
+use IO::Compress::Base::Common  2.101 qw(:Status);
 use Compress::Stream::Zstd qw(ZSTD_MAX_CLEVEL);
 use Compress::Stream::Zstd::Compressor qw(ZSTD_CSTREAM_IN_SIZE);
 
 our ($VERSION);
-$VERSION = '2.100';
+$VERSION = '2.101';
 
 sub mkCompObject
 {

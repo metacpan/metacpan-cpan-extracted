@@ -9,7 +9,7 @@ use MarpaX::ESLIF::JSON::Decoder;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '4.0.1'; # VERSION
+our $VERSION = '5.0.7'; # VERSION
 
 
 
@@ -48,7 +48,7 @@ MarpaX::ESLIF::JSON - ESLIF's JSON interface
 
 =head1 VERSION
 
-version 4.0.1
+version 5.0.7
 
 =head1 DESCRIPTION
 
@@ -81,6 +81,10 @@ This is strict grammar extended with:
 =item NaN
 
 =item Unicode's control characters (range C<[\x00-\x1F]>).
+
+=item Number with non significant zeroes on the left.
+
+=item Number with a leading C<+> sign.
 
 =back
 

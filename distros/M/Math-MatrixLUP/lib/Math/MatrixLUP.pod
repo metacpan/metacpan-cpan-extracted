@@ -6,7 +6,7 @@ Math::MatrixLUP - Matrix operations and LUP decomposition.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -222,7 +222,7 @@ Add two matrices of the same dimensions:
     my $C = $A + $B;
     my $C = $A->add($B);
 
-If one of the arguments it not a B<Math::MatrixLUP> object, scalar addition is performed:
+If one of the arguments is not a B<Math::MatrixLUP> object, scalar addition is performed:
 
     my $B = $A + $scalar;
 
@@ -233,7 +233,7 @@ Subtract two matrices of the same dimensions:
     my $C = $A - $B;
     my $C = $A->sub($B);
 
-If one of the arguments it not a B<Math::MatrixLUP> object, scalar subtraction is performed:
+If one of the arguments is not a B<Math::MatrixLUP> object, scalar subtraction is performed:
 
     my $B = $A - $scalar;
     my $B = $scalar - $A;
@@ -245,7 +245,7 @@ Multiplication of two matrices, where the number of columns in B<A> equals the n
     my $C = $A * $B;
     my $C = $A->mul($B);
 
-If one of the arguments it not a B<Math::MatrixLUP> object, scalar multiplication is performed:
+If one of the arguments is not a B<Math::MatrixLUP> object, scalar multiplication is performed:
 
     my $B = $A * $scalar;
 
@@ -260,7 +260,7 @@ Defined as:
 
     A/B = A * B^(-1)
 
-If one of the arguments it not a B<Math::MatrixLUP> object, scalar division is performed:
+If one of the arguments is not a B<Math::MatrixLUP> object, scalar division is performed:
 
     my $B = $A / $scalar;
     my $B = $scalar / $A;
@@ -276,7 +276,7 @@ Defined as:
 
     A mod B = A - B*floor(A/B)
 
-If one of the arguments it not a B<Math::MatrixLUP> object, scalar modulo is performed:
+If one of the arguments is not a B<Math::MatrixLUP> object, scalar modulo is performed:
 
     my $B = $A % $scalar;
     my $B = $scalar % $A;
@@ -296,7 +296,7 @@ Matrix exponentiation modulo C<m>, where the exponent is an arbitrary large posi
 
     my $B = $A->powmod($n, $m);
 
-Negative exponents are not supported yet.
+For negative C<n>, this operation is defined only if the matrix can be inverted.
 
 =head1 * Bitwise operations
 
@@ -326,18 +326,17 @@ Entrywise bitwise operations:
 
 Returns a new matrix with rows and columns flipped.
 
-=head2 vertical_flip
+=head2 vflip / vertical_flip
 
 Returns a new matrix with rows flipped.
 
-=head2 horizontal_flip
+=head2 hflip / horizontal_flip
 
 Returns a new matrix with columns flipped.
 
 =head2 transpose
 
-Returns the transposed matrix. This is the matrix where colums and
-rows of the argument matrix are swaped.
+Returns the transposed matrix. This is a new matrix where columns and rows of the self-matrix are swapped.
 
 =head2 concat
 
@@ -392,6 +391,12 @@ Invert a square matrix.
 
     my $B = $A->inv;
 
+=head2 invmod
+
+Invert a square matrix modulo a positive integer.
+
+    my $B = $A->invmod($m);
+
 =head2 det / determinant
 
 Compute the determinant of a square matrix.
@@ -443,10 +448,6 @@ at object-level in order to avoid recomputing the LUP decomposition multiple tim
 
 =head1 SEE ALSO
 
-=over 4
-
-=item * Related libraries
-
 L<Math::Matrix> - Multiply and invert matrices.
 
 L<Math::GSL::Matrix> - Mathematical functions concerning Matrices using the GNU Scientific Library (GSL).
@@ -454,8 +455,6 @@ L<Math::GSL::Matrix> - Mathematical functions concerning Matrices using the GNU 
 L<Math::MatrixDecomposition::LU> - LU decomposition with partial pivoting of a real matrix.
 
 L<Math::AnyNum> - Arbitrary size precision for integers, rationals, floating-points and complex numbers.
-
-=back
 
 =head1 REPOSITORY
 

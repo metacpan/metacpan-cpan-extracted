@@ -1,7 +1,9 @@
+use 5.008;
+
 package Business::ISMN::Data;
 use strict;
 
-our $VERSION  = '1.132';
+our $VERSION  = '1.202';
 
 =encoding utf8
 
@@ -23,7 +25,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2005-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2005-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

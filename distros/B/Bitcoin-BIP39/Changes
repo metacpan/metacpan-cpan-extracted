@@ -1,10 +1,17 @@
-0.002   2018-01-06 (PERLANCAR)
+0.003   2021-01-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix schema in Rinci metadata.
+
+	- [test] Add comment why a test should die.
+
+
+0.002   2018-01-06  Released-By: PERLANCAR
 
 	- Add package alias: Bitcoin::Mnemonic.
 
 	- Tweak Rinci metadata.
 
 
-0.001   2018-01-01 (PERLANCAR)
+0.001   2018-01-01  Released-By: PERLANCAR
 
         - First release.

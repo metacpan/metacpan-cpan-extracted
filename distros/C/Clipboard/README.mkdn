@@ -1,0 +1,131 @@
+# NAME
+
+Clipboard - Copy and paste with any OS
+
+# VERSION
+
+version 0.27
+
+# SYNOPSIS
+
+    use Clipboard;
+    print Clipboard->paste;
+    Clipboard->copy('foo');
+    # Same as copy on non-X / non-Xclip systems
+    Clipboard->copy_to_all_selections('text_to_copy');
+
+Clipboard->cut() is an alias for copy(). copy() is the preferred
+method, because we're not really "cutting" anything.
+
+# DESCRIPTION
+
+Who doesn't remember the first time they learned to copy and paste, and
+generated an exponentially growing text document?   Yes, that's right,
+clipboards are magical.
+
+With Clipboard.pm, this magic is now trivial to access,
+in a cross-platform-consistent API, from your Perl code.
+
+# STATUS
+
+Seems to be working well for Linux, OSX, \*BSD, and Windows.  I use it
+every day on Linux, so I think I've got most of the details hammered out
+(X selections are kind of weird).  Please let me know if you encounter
+any problems in your setup.
+
+# AUTHOR
+
+Ryan King <rking@panoptic.com>
+
+# COPYRIGHT
+
+Copyright (c) 2010. Ryan King. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+# SEE ALSO
+
+[clipaccumulate(1)](http://man.he.net/man1/clipaccumulate), [clipbrowse(1)](http://man.he.net/man1/clipbrowse), [clipedit(1)](http://man.he.net/man1/clipedit),
+[clipfilter(1)](http://man.he.net/man1/clipfilter), [clipjoin(1)](http://man.he.net/man1/clipjoin)
+
+# SUPPORT
+
+## Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+- MetaCPAN
+
+    A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+    [https://metacpan.org/release/Clipboard](https://metacpan.org/release/Clipboard)
+
+- RT: CPAN's Bug Tracker
+
+    The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+    [https://rt.cpan.org/Public/Dist/Display.html?Name=Clipboard](https://rt.cpan.org/Public/Dist/Display.html?Name=Clipboard)
+
+- CPANTS
+
+    The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+    [http://cpants.cpanauthors.org/dist/Clipboard](http://cpants.cpanauthors.org/dist/Clipboard)
+
+- CPAN Testers
+
+    The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+    [http://www.cpantesters.org/distro/C/Clipboard](http://www.cpantesters.org/distro/C/Clipboard)
+
+- CPAN Testers Matrix
+
+    The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+    [http://matrix.cpantesters.org/?dist=Clipboard](http://matrix.cpantesters.org/?dist=Clipboard)
+
+- CPAN Testers Dependencies
+
+    The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+    [http://deps.cpantesters.org/?module=Clipboard](http://deps.cpantesters.org/?module=Clipboard)
+
+## Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to `bug-clipboard at rt.cpan.org`, or through
+the web interface at [https://rt.cpan.org/Public/Bug/Report.html?Queue=Clipboard](https://rt.cpan.org/Public/Bug/Report.html?Queue=Clipboard). You will be automatically notified of any
+progress on the request by the system.
+
+## Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+[https://github.com/shlomif/Clipboard](https://github.com/shlomif/Clipboard)
+
+    git clone git://github.com/shlomif/Clipboard.git
+
+# AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+# BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+[https://github.com/shlomif/Clipboard/issues](https://github.com/shlomif/Clipboard/issues)
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Ryan King <rking@panoptic.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

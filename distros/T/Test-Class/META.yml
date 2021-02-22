@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.052, CPAN::Meta::Converter version 2.150004'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,9 +40,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Class
-  repository: https://github.com/adrianh/test-class.git
-version: '0.50'
+  bugtracker: https://github.com/szabgab/test-class/issues
+  repository: https://github.com/szabgab/test-class.git
+version: '0.52'
 x_IRC: irc://irc.perl.org/#perl-qa
 x_MailingList: http://lists.perl.org/list/perl-qa.html
 x_contributors:
@@ -61,5 +61,4 @@ x_contributors:
   - 'Klaus S. Madsen <ksm@jobindex.dk>'
   - 'Zefram <zefram@fysh.org>'
   - 'Kent Fredric <kentfredric@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
-
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,8 +8,9 @@ use MIME::Types;
 use Encode            qw/encode_utf8/;
 use Carp;
 use Params::Validate  qw/validate SCALAR HASHREF/;
+use Scalar::Util      qw/looks_like_number/;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 sub new {
   my $class = shift;
@@ -113,9 +114,8 @@ sub attach {
 
 
 sub page_break {
-  my ($self, $break) = @_;
-  $break ||= 'always';
-  return qq{<br clear='all' style='page-break-before:$break'>\n};
+  my ($self) = @_;
+  return qq{<br clear='all' style='page-break-before:always'>\n};
 }
 
 
@@ -223,8 +223,8 @@ sub _main {
     if ($i > 1) {
       # type of break
       my $break = $section->{new_page};
-      $break = 'always' if $break && $break !~ /\w/; # if true but not a word
-      $break ||= 'auto';                             # if false
+      $break = 'always' if $break && looks_like_number($break); # if true but not a word
+      $break ||= 'auto';                                        # if false
       # otherwise, type of break will just be the word given in {new_page}
 
       # insert into body
@@ -436,7 +436,7 @@ MsOffice::Word::HTML::Writer - Writing documents for MsWord in HTML format
                                   $doc->field('NUMPAGES')),
     footer => sprintf("printed at %s", 
                                   $doc->field('PRINTDATE')),
-    new_page => 1, # or 'left', or 'right'
+    new_page => 1, # or 'always', or 'left', or 'right'
   );
   $doc->write("this is the second section, look at header/footer");
   
@@ -650,7 +650,7 @@ variable, a reference to another filehandle, etc.
                                   $doc->field('NUMPAGES')),
     footer => sprintf("printed at %s", 
                                   $doc->field('PRINTDATE')),
-    new_page => 1, # or 'left', or 'right'
+    new_page => 1, # or 'always, or 'left', or 'right'
   );
 
 Opens a new section within the document
@@ -721,7 +721,9 @@ Footer content for the first page.
 If true, a page break will be inserted before the new section.
 If the argument is the word C<'left'> or C<'right'>, one or two
 page breaks will be inserted so that the next page is formatted
-as a left (right) page.
+as a left (right) page. If the argument is a numeric true value, it
+is translated into the word 'always', which tells MsWord to
+insert a page break in any case.
 
 =back
 
@@ -750,14 +752,12 @@ returning it as an HTTP response.
 
 =head2 page_break
 
-  my $html = $doc->page_break;
-  my $html = $doc->page_break('left');
-  my $html = $doc->page_break('right');
+  $doc->write($doc->page_break);
 
-Returns HTML markup for encoding a page break.
-If an argument C<'left'> or C<'right'> is given, one or two
-page breaks will be inserted so that the next page is formatted
-as a left (right) page.
+Returns HTML markup for encoding a page break I<within the same section>.
+Another way of inserting a page break is to create a new section
+with an C<new_page> parameter -- see L</create_section>.
+
 
 =head2 tab
 

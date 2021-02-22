@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use CGI::Pure::Fast;
+
      my $cgi = CGI::Pure::Fast->new(%parameters);
      $cgi->append_param('par', 'value');
      my @par_value = $cgi->param('par');
@@ -21,11 +22,9 @@ METHODS
      Other methods are same as CGI::Pure.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use CGI::Pure::Fast;
      use HTTP::Headers;
 
@@ -70,15 +69,19 @@ SEE ALSO
     CGI::Pure::Save
         Common Gateway Interface Class for loading/saving object in file.
 
+REPOSITORY
+    <https://github.com/michal-josef-spacek/CGI-Pure-Fast>
+
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2018 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2011-2021 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

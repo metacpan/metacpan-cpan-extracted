@@ -39,7 +39,7 @@ If you want to hack on the source it might be a good idea to install
 command:
 
 ```
-git clone https://github.com/voegelas/CPANPLUS-Dist-Slackware.git
+git clone https://github.com/graygnuorg/CPANPLUS-Dist-Slackware.git
 ```
 
 ## LICENSE AND COPYRIGHT

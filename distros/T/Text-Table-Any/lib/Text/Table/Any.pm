@@ -1,9 +1,9 @@
 package Text::Table::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-01'; # DATE
+our $DATE = '2021-02-20'; # DATE
 our $DIST = 'Text-Table-Any'; # DIST
-our $VERSION = '0.098'; # VERSION
+our $VERSION = '0.101'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -12,27 +12,31 @@ our $VERSION = '0.098'; # VERSION
 #END IFUNBUILT
 
 our @BACKENDS = qw(
-                      Text::Table::Tiny
-                      Text::Table::TinyBorderStyle
-                      Text::Table::TinyColor
-                      Text::Table::TinyColorWide
-                      Text::Table::TinyWide
-                      Text::Table::Org
-                      Text::Table::CSV
-                      Text::Table::TSV
-                      Text::Table::LTSV
-                      Text::Table::ASV
-                      Text::Table::HTML
-                      Text::Table::HTML::DataTables
-                      Text::Table::Paragraph
+                      Term::TablePrint
                       Text::ANSITable
                       Text::ASCIITable
                       Text::FormatTable
                       Text::MarkdownTable
                       Text::Table
-                      Text::TabularDisplay
+                      Text::Table::ASV
+                      Text::Table::CSV
+                      Text::Table::HTML
+                      Text::Table::HTML::DataTables
+                      Text::Table::LTSV
+                      Text::Table::Manifold
+                      Text::Table::More
+                      Text::Table::Org
+                      Text::Table::Paragraph
+                      Text::Table::Sprintf
+                      Text::Table::Tiny
+                      Text::Table::TinyBorderStyle
+                      Text::Table::TinyColor
+                      Text::Table::TinyColorWide
+                      Text::Table::TinyWide
+                      Text::Table::TSV
                       Text::Table::XLSX
-                      Term::TablePrint
+                      Text::TabularDisplay
+                      Text::UnicodeBox::Table
               );
 
 sub _encode {
@@ -48,62 +52,101 @@ sub backends {
 sub table {
     my %params = @_;
 
-    my $rows       = $params{rows} or die "Must provide rows!";
-    my $backend    = $params{backend} || 'Text::Table::Tiny';
-    my $header_row = $params{header_row} // 1;
+    my $rows          = $params{rows} or die "Must provide rows!";
+    my $backend       = $params{backend} || 'Text::Table::Tiny';
+    my $header_row    = $params{header_row} // 1;
+    my $separate_rows = $params{separate_rows} // 0;
 
     if ($backend eq 'Text::Table::Tiny') {
         require Text::Table::Tiny;
         return Text::Table::Tiny::table(
-            rows => $rows, header_row => $header_row) . "\n";
+            rows => $rows,
+            header_row => $header_row,
+            separate_rows => $separate_rows,
+        ) . "\n";
     } elsif ($backend eq 'Text::Table::TinyBorderStyle') {
         require Text::Table::TinyBorderStyle;
         return Text::Table::TinyBorderStyle::table(
-            rows => $rows, header_row => $header_row) . "\n";
+            rows => $rows,
+            header_row => $header_row,
+        ) . "\n";
     } elsif ($backend eq 'Text::Table::TinyColor') {
         require Text::Table::TinyColor;
         return Text::Table::TinyColor::table(
-            rows => $rows, header_row => $header_row) . "\n";
+            rows => $rows,
+            header_row => $header_row,
+        ) . "\n";
     } elsif ($backend eq 'Text::Table::TinyColorWide') {
         require Text::Table::TinyColorWide;
         return Text::Table::TinyColorWide::table(
-            rows => $rows, header_row => $header_row) . "\n";
+            rows => $rows,
+            header_row => $header_row,
+        ) . "\n";
     } elsif ($backend eq 'Text::Table::TinyWide') {
         require Text::Table::TinyWide;
         return Text::Table::TinyWide::table(
-            rows => $rows, header_row => $header_row) . "\n";
+            rows => $rows,
+            header_row => $header_row,
+        ) . "\n";
+    } elsif ($backend eq 'Text::Table::More') {
+        require Text::Table::More;
+        return Text::Table::More::generate_table(
+            rows => $rows,
+            header_row => $header_row,
+            separate_rows => $separate_rows,
+        ) . "\n";
+    } elsif ($backend eq 'Text::Table::Sprintf') {
+        require Text::Table::Sprintf;
+        return Text::Table::Sprintf::table(
+            rows => $rows,
+            header_row => $header_row,
+        ) . "\n";
     } elsif ($backend eq 'Text::Table::Org') {
         require Text::Table::Org;
         return Text::Table::Org::table(
-            rows => $rows, header_row => $header_row);
+            rows => $rows,
+            header_row => $header_row,
+        );
     } elsif ($backend eq 'Text::Table::CSV') {
         require Text::Table::CSV;
         return Text::Table::CSV::table(
-            rows => $rows, header_row => $header_row);
+            rows => $rows,
+            header_row => $header_row,
+        );
     } elsif ($backend eq 'Text::Table::TSV') {
         require Text::Table::TSV;
         return Text::Table::TSV::table(
-            rows => $rows);
+            rows => $rows,
+        );
     } elsif ($backend eq 'Text::Table::LTSV') {
         require Text::Table::LTSV;
         return Text::Table::LTSV::table(
-            rows => $rows);
+            rows => $rows,
+        );
     } elsif ($backend eq 'Text::Table::ASV') {
         require Text::Table::ASV;
         return Text::Table::ASV::table(
-            rows => $rows, header_row => $header_row);
+            rows => $rows,
+            header_row => $header_row,
+        );
     } elsif ($backend eq 'Text::Table::HTML') {
         require Text::Table::HTML;
         return Text::Table::HTML::table(
-            rows => $rows, header_row => $header_row);
+            rows => $rows,
+            header_row => $header_row,
+        );
     } elsif ($backend eq 'Text::Table::HTML::DataTables') {
         require Text::Table::HTML::DataTables;
         return Text::Table::HTML::DataTables::table(
-            rows => $rows, header_row => $header_row);
+            rows => $rows,
+            header_row => $header_row,
+        );
     } elsif ($backend eq 'Text::Table::Paragraph') {
         require Text::Table::Paragraph;
         return Text::Table::Paragraph::table(
-            rows => $rows, header_row => $header_row);
+            rows => $rows,
+            header_row => $header_row,
+        );
     } elsif ($backend eq 'Text::ANSITable') {
         require Text::ANSITable;
         my $t = Text::ANSITable->new(
@@ -120,7 +163,30 @@ sub table {
             $t->columns([ map {"col$_"} 0..$#{$rows->[0]} ]);
             $t->add_row($_) for @$rows;
         }
+        $t->show_row_separator(1) if $separate_rows;
         return $t->draw;
+    } elsif ($backend eq 'Text::Table::Manifold') {
+        require Text::Table::Manifold;
+        my $t = Text::Table::Manifold->new;
+        if ($header_row) {
+            $t->headers($rows->[0]);
+            $t->data([ @{$rows}[1 .. $#{$rows}] ]);
+        } else {
+            $t->headers([ map {"col$_"} 0..$#{$rows->[0]} ]);
+            $t->data($rows);
+        }
+        return join("\n", @{$t->render(padding => 1)}) . "\n";
+    } elsif ($backend eq 'Text::UnicodeBox::Table') {
+        require Text::UnicodeBox::Table;
+        my $t = Text::UnicodeBox::Table->new;
+        if ($header_row) {
+            $t->add_header(@{ $rows->[0] });
+            $t->add_row(@{ $rows->[$_] }) for 1 .. $#{$rows};
+        } else {
+            $t->add_header(map {"col$_"} 0..$#{$rows->[0]});
+            $t->add_row(@{ $rows->[$_] }) for 0 .. $#{$rows};
+        }
+        return $t->render;
     } elsif ($backend eq 'Text::ASCIITable') {
         require Text::ASCIITable;
         my $t = Text::ASCIITable->new();
@@ -196,7 +262,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.098 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2021-02-01.
+This document describes version 0.101 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2021-02-20.
 
 =head1 SYNOPSIS
 
@@ -326,31 +392,7 @@ Optional. Pick a backend module. Supported backends:
 
 =over
 
-=item * Text::Table::Tiny
-
-=item * Text::Table::TinyBorderStyle
-
-=item * Text::Table::TinyColor
-
-=item * Text::Table::TinyColorWide
-
-=item * Text::Table::TinyWide
-
-=item * Text::Table::Org
-
-=item * Text::Table::CSV
-
-=item * Text::Table::TSV
-
-=item * Text::Table::LTSV
-
-=item * Text::Table::ASV
-
-=item * Text::Table::HTML
-
-=item * Text::Table::HTML::DataTables
-
-=item * Text::Table::Paragraph
+=item * Term::TablePrint
 
 =item * Text::ANSITable
 
@@ -362,11 +404,43 @@ Optional. Pick a backend module. Supported backends:
 
 =item * Text::Table
 
-=item * Text::TabularDisplay
+=item * Text::Table::ASV
+
+=item * Text::Table::CSV
+
+=item * Text::Table::HTML
+
+=item * Text::Table::HTML::DataTables
+
+=item * Text::Table::LTSV
+
+=item * Text::Table::Manifold
+
+=item * Text::Table::More
+
+=item * Text::Table::Org
+
+=item * Text::Table::Paragraph
+
+=item * Text::Table::Sprintf
+
+=item * Text::Table::Tiny
+
+=item * Text::Table::TinyBorderStyle
+
+=item * Text::Table::TinyColor
+
+=item * Text::Table::TinyColorWide
+
+=item * Text::Table::TinyWide
+
+=item * Text::Table::TSV
 
 =item * Text::Table::XLSX
 
-=item * Term::TablePrint
+=item * Text::TabularDisplay
+
+=item * Text::UnicodeBox::Table
 
 =back
 
@@ -375,6 +449,11 @@ Optional. Pick a backend module. Supported backends:
 Optional. If given a true value, the first row in the data will be interpreted
 as a header row, and separated visually from the rest of the table (e.g. with a
 ruled line). But some backends won't display differently.
+
+=item * separate_rows
+
+Boolean. Optional. Default false. If set to true, will draw a separator line
+after each data row.
 
 =back
 
@@ -401,7 +480,7 @@ feature.
 
 =head1 SEE ALSO
 
-L<Bencher::Scenario::TextTableModules>
+L<Acme::CPANModules::TextTable>
 
 =head1 AUTHOR
 

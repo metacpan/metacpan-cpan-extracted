@@ -34,8 +34,8 @@ PDL::Primitive - primitive operations for pdl
 This module provides some primitive and useful functions defined
 using PDL::PP and able to use the new indexing tricks.
 
-See L<PDL::Indexing|PDL::Indexing> for how to use indices creatively.
-For explanation of the signature format, see L<PDL::PP|PDL::PP>.
+See L<PDL::Indexing> for how to use indices creatively.
+For explanation of the signature format, see L<PDL::PP>.
 
 =head1 SYNOPSIS
 
@@ -209,7 +209,7 @@ matrix-multiply them:
 INTERNALS
 
 The mechanics of the multiplication are carried out by the
-L<matmult|/matmult> method.
+L</matmult> method.
 
 =cut
 
@@ -236,7 +236,7 @@ but for large matrices that breaks CPU cache and is slow.  Instead,
 matmult calculates its result in 32x32x32 tiles, to keep the memory
 footprint within cache as long as possible on most modern CPUs.
 
-For usage, see L<x|/x>, a description of the overloaded 'x' operator
+For usage, see L</x>, a description of the overloaded 'x' operator
 
 
 
@@ -399,7 +399,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 Efficient Triple matrix product C<a*b*c>
 
 Efficiency comes from by using the temporary C<tmp>. This operation only
-scales as C<N**3> whereas threading using L<inner2|/inner2> would scale
+scales as C<N**3> whereas threading using L</inner2> would scale
 as C<N**4>.
 
 The reason for having this routine is that you do not need to
@@ -721,7 +721,7 @@ any other values, even themselves.  As a result, they are
 always unique. C<uniq> returns the NaN values at the end
 of the result piddle.  This follows the Matlab usage.
 
-See L<uniqind|uniqind> if you need the indices of the unique
+See L</uniqind> if you need the indices of the unique
 elements rather than the values.
 
 =cut
@@ -789,7 +789,7 @@ Matlab usage.
 Note: The returned pdl is 1D; any structure of the input
 piddle is lost.
 
-See L<uniq|uniq> if you want the unique values instead of the
+See L</uniq> if you want the unique values instead of the
 indices.
 
 =cut
@@ -861,7 +861,7 @@ higher dimensions are taken to run across vectors. The return
 value is always 2D; any structure of the input PDL (beyond using
 the 0th dimension for vector index) is lost.
 
-See also L<uniq|uniq> for a unique list of scalars; and
+See also L</uniq> for a unique list of scalars; and
 L<qsortvec|PDL::Ufunc/qsortvec> for sorting a list of vectors
 lexicographcally.
 
@@ -872,7 +872,7 @@ lexicographcally.
 
 =for bad
 
-If a vector contains all bad values, it is ignored as in L<uniq|uniq>.
+If a vector contains all bad values, it is ignored as in L</uniq>.
 If some of the values are good, it is treated as a normal vector. For
 example, [1 2 BAD] and [BAD 2 3] could be returned, but [BAD BAD BAD]
 could not.  Vectors containing BAD values will be returned after any
@@ -1039,8 +1039,8 @@ Clip (threshold) a piddle by (optional) upper or lower bounds.
 =for bad
 
 clip handles bad values since it is just a
-wrapper around L<hclip|/hclip> and
-L<lclip|/lclip>.
+wrapper around L</hclip> and
+L</lclip>.
 
 =cut
 
@@ -1599,7 +1599,7 @@ dimensions must be compatible in the threading sense. The resulting
 size of the first dimension is the sum of the sizes of the first dimensions
 of the two argument piddles - i.e. C<n + m>.
 
-Similar functions include L<glue|/glue> (below), which can append more
+Similar functions include L</glue> (below), which can append more
 than two piddles along an arbitrary dimension, and
 L<cat|PDL::Core/cat>, which can append more than two piddles that all
 have the same sized dimensions.
@@ -1633,7 +1633,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for ref
 
 Glue two or more PDLs together along an arbitrary dimension
-(N-D L<append|append>).
+(N-D L</append>).
 
 Sticks $x, $y, and all following arguments together along the
 specified dimension.  All other dimensions must be compatible in the
@@ -1652,10 +1652,10 @@ then it is taken as a dimension along which to glue everything else,
 so you can say C<$cube = PDL::glue(3,@image_list);> if you like.
 
 C<glue> is implemented in pdl, using a combination of L<xchg|PDL::Slices/xchg> and
-L<append|append>.  It should probably be updated (one day) to a pure PP
+L</append>.  It should probably be updated (one day) to a pure PP
 function.
 
-Similar functions include L<append|/append> (above), which appends
+Similar functions include L</append> (above), which appends
 only two piddles along their first dimension, and
 L<cat|PDL::Core/cat>, which can append more than two piddles that all
 have the same sized dimensions.
@@ -1779,7 +1779,7 @@ Constructor which returns piddle of random numbers
 etc (see L<zeroes|PDL::Core/zeroes>).
 
 This is the uniform distribution between 0 and 1 (excluding both 0 and
-1, cf L<random|/random>). The arguments are the same as C<zeroes> (q.v.) -
+1, cf L</random>). The arguments are the same as C<zeroes> (q.v.) -
 i.e. one can specify dimensions, types or give a template.
 
 You can use the perl function L<srand|perlfunc/srand> to seed the random
@@ -2552,7 +2552,7 @@ search if you like. For out of bounds values it just does a linear
 extrapolation and sets the corresponding element of C<$err> to 1,
 which is otherwise 0.
 
-See also L<interpol|/interpol>, which uses the same routine,
+See also L</interpol>, which uses the same routine,
 differing only in the handling of extrapolation - an error message
 is printed rather than returning an error piddle.
 
@@ -2588,7 +2588,7 @@ routine for 1D linear interpolation
 
  $yi = interpol($xi, $x, $y)
 
-C<interpol> uses the same search method as L<interpolate|/interpolate>,
+C<interpol> uses the same search method as L</interpolate>,
 hence C<$x> must be I<strictly> ordered (either increasing or decreasing).
 The difference occurs in the handling of out-of-bounds values; here
 an error message is printed.
@@ -2878,7 +2878,7 @@ Converts a one dimensional index piddle to a set of ND coordinates
 returns an array of piddles containing the ND indexes corresponding to
 the one dimensional list indices. The indices are assumed to
 correspond to array C<$x> clumped using C<clump(-1)>. This routine is
-used in the old vector form of L<whichND|/whichND>, but is useful on
+used in the old vector form of L</whichND>, but is useful on
 its own occasionally.
 
 Returned piddles have the L<indx|PDL::Core/indx> datatype.  C<$indices> can have
@@ -2934,7 +2934,7 @@ Returns indices of non-zero values from a 1-D PDL
 returns a pdl with indices for all those elements that are nonzero in
 the mask. Note that the returned indices will be 1D. If you feed in a
 multidimensional mask, it will be flattened before the indices are
-calculated.  See also L<whichND|/whichND> for multidimensional masks.
+calculated.  See also L</whichND> for multidimensional masks.
 
 If you want to index into the original mask or a similar piddle
 with output from C<which>, remember to flatten it before calling index:
@@ -2943,17 +2943,17 @@ with output from C<which>, remember to flatten it before calling index:
   $idx = which $data > 0.5; # $idx is now 1D
   $bigsum = $data->flat->index($idx)->sum;  # flatten before indexing
 
-Compare also L<where|/where> for similar functionality.
+Compare also L</where> for similar functionality.
 
 SEE ALSO:
 
-L<which_both|/which_both> returns separately the indices of both
+L</which_both> returns separately the indices of both
 zero and nonzero values in the mask.
 
-L<where|/where> returns associated values from a data PDL, rather than
+L</where> returns associated values from a data PDL, rather than
 indices into the mask PDL.
 
-L<whichND|/whichND> returns N-D indices into a multidimensional PDL.
+L</whichND> returns N-D indices into a multidimensional PDL.
 
 =for example
 
@@ -3005,7 +3005,7 @@ Returns indices of zero and nonzero values in a mask PDL
 
  ($i, $c_i) = which_both($mask);
 
-This works just as L<which|/which>, but the complement of C<$i> will be in
+This works just as L</which>, but the complement of C<$i> will be in
 C<$c_i>.
 
 =for example
@@ -3059,7 +3059,7 @@ the mask is nonzero.
 The output PDLs are still connected to the original data PDLs, for the
 purpose of dataflow.
 
-C<where> combines the functionality of L<which|/which> and L<index|PDL::Slices/index>
+C<where> combines the functionality of L</which> and L<index|PDL::Slices/index>
 into a single operation.
 
 BUGS:
@@ -3242,9 +3242,9 @@ list context whichND expressions can be replaced with:
 
 SEE ALSO:
 
-L<which|/which> finds coordinates of nonzero values in a 1-D mask.
+L</which> finds coordinates of nonzero values in a 1-D mask.
 
-L<where|/where> extracts values from a data PDL that are associated
+L</where> extracts values from a data PDL that are associated
 with nonzero values in a mask PDL.
 
 =for example
@@ -3347,7 +3347,7 @@ in set operation terms.
 
 The resulting vector will contain the intersection of C<$x> and C<$y>, so
 the elements that are in both C<$x> and C<$y>. Note that for convenience
-this operation is also aliased to L<intersect|intersect>.
+this operation is also aliased to L</intersect>.
 
 =back
 
@@ -3407,7 +3407,7 @@ Finally find all odd squares:
 Another common occurrence is to want to get all objects that are
 in C<$x> and in the complement of C<$y>. But it is almost always best
 to create the complement explicitly since the universe that both are
-taken from is not known. Thus use L<which_both|which_both> if possible
+taken from is not known. Thus use L</which_both> if possible
 to keep track of complements.
 
 If this is impossible the best approach is to make a temporary:
@@ -3503,7 +3503,7 @@ Calculate the intersection of two piddles
 
    Usage: $set = intersect($x, $y);
 
-This routine is merely a simple interface to L<setops|setops>. See
+This routine is merely a simple interface to L</setops>. See
 that for more information
 
 =for example

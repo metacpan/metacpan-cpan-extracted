@@ -129,7 +129,7 @@ do {
 
     $obj->{date_format} = 'Day, dd Mon yyyy';
     $date = $obj->format_date(0, time());
-    like($date, qr(\w\w\w, \d\d \w\w\w \d\d\d\d$),
+    like($date, qr(\w+\.?, \d\d \w+\.? \d\d\d\d$),
          'Format date with user supplied format'); # test 17
 
     my $size = $obj->format_size(0, 2500);

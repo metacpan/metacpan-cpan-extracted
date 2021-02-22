@@ -1,0 +1,45 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Cairo' => '0',
+                                    'Glib' => '0'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::Depends' => '0',
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'ExtUtils::PkgConfig' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'perl' => '5.006'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Gtk3' => '0',
+                                      'XSLoader' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

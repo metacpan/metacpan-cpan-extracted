@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ no_index:
 requires:
   DBD::Pg: '3.007004'
   Mojolicious: '8.50'
-  SQL::Abstract: '1.86'
+  SQL::Abstract::Pg: '1.0'
   perl: '5.016'
 resources:
   IRC:
@@ -32,5 +32,5 @@ resources:
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/mojo-pg.git
-version: '4.24'
+version: '4.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

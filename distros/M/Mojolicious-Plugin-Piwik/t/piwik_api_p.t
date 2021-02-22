@@ -40,7 +40,7 @@ my %param = (
 my $result;
 $c->piwik->api_p(Track => {
   site_id => 1,
-  action_url => 'https://sojolicio.us',
+  action_url => 'https://sojolicious.example',
   action_name => 'Test'
 })->then(sub { $result = shift })->wait;
 

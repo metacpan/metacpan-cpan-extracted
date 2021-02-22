@@ -1,4 +1,6 @@
 #!/usr/bin/perl
+use strict;
+use warnings;
 
 =pod
 
@@ -9,29 +11,29 @@ Reported by Sagar Shah.
 
 =cut
 
-use strict;
-use warnings;
-
 use Test::More 1.0;
 
-BEGIN {
-	use File::Spec::Functions qw(rel2abs catfile);
-	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
-	require $file;
-	}
-
-unlink '.releaserc';
-ok( ! (-e '.releaserc'), 'The .releaserc file is missing (good)' );
-
-unlink 'releaserc';
-ok( ! (-e 'releaserc'), 'The releaserc file is missing (good)' );
+require 't/lib/setup_common.pl';
 
 my $class = 'Module::Release';
-use_ok( $class );
+subtest setup => sub {
+	use_ok( $class );
+	can_ok( $class, 'new' );
+	};
 
-ok( ! eval{ close STDERR; $class->new() }, 'new() does not die (good)' );
+subtest remove_conf_files => sub {
+	unlink '.releaserc';
+	ok( ! (-e '.releaserc'), 'The .releaserc file is missing (good)' );
 
-like( $@, qr/Could not find conf file releaserc/,
-	'Missing conf file dies with the right error message' );
+	unlink 'releaserc';
+	ok( ! (-e 'releaserc'), 'The releaserc file is missing (good)' );
+	};
+
+subtest new => sub {
+	ok( ! eval{ close STDERR; $class->new() }, 'new() does not die (good)' );
+
+	like( $@, qr/Could not find conf file releaserc/,
+		'Missing conf file dies with the right error message' );
+	};
 
 done_testing();

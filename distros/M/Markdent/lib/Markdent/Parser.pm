@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean 0.09;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Markdent::Parser::BlockParser;
 use Markdent::Parser::SpanParser;
@@ -90,31 +90,31 @@ sub BUILD {
     my %sp_args;
     for my $key (
         grep {defined}
-        map  { $_->init_arg() }
-        $self->_span_parser_class()->meta()->get_all_attributes()
+        map  { $_->init_arg }
+        $self->_span_parser_class->meta->get_all_attributes
     ) {
 
         $sp_args{$key} = $args->{$key}
             if exists $args->{$key};
     }
 
-    $sp_args{handler} = $self->handler();
+    $sp_args{handler} = $self->handler;
 
     $self->_set_span_parser_args( \%sp_args );
 
     my %bp_args;
     for my $key (
         grep {defined}
-        map  { $_->init_arg() }
-        $self->_block_parser_class()->meta()->get_all_attributes()
+        map  { $_->init_arg }
+        $self->_block_parser_class->meta->get_all_attributes
     ) {
 
         $bp_args{$key} = $args->{$key}
             if exists $args->{$key};
     }
 
-    $bp_args{handler}     = $self->handler();
-    $bp_args{span_parser} = $self->_span_parser();
+    $bp_args{handler}     = $self->handler;
+    $bp_args{span_parser} = $self->_span_parser;
 
     $self->_set_block_parser_args( \%bp_args );
 }
@@ -149,7 +149,7 @@ sub _set_classes_for_dialects {
             next
                 if $specified_class
                 && $specified_class->can('meta')
-                && $specified_class->meta()->does_role($role);
+                && $specified_class->meta->does_role($role);
 
             push @roles, $role;
         }
@@ -162,7 +162,7 @@ sub _set_classes_for_dialects {
             superclasses => [ $self->$class_meth() ],
             roles        => \@roles,
             cache        => 1,
-        )->name();
+        )->name;
 
         my $set_meth = '_set' . $class_meth;
         $self->$set_meth($class);
@@ -187,13 +187,13 @@ sub _role_name_for_dialect {
 sub _build_block_parser {
     my $self = shift;
 
-    return $self->_block_parser_class()->new( $self->_block_parser_args() );
+    return $self->_block_parser_class->new( $self->_block_parser_args );
 }
 
 sub _build_span_parser {
     my $self = shift;
 
-    return $self->_span_parser_class()->new( $self->_span_parser_args() );
+    return $self->_span_parser_class->new( $self->_span_parser_args );
 }
 
 {
@@ -210,7 +210,7 @@ sub _build_span_parser {
 
         $self->_send_event('StartDocument');
 
-        $self->_block_parser()->parse_document( \$text );
+        $self->_block_parser->parse_document( \$text );
 
         $self->_send_event('EndDocument');
 
@@ -229,7 +229,7 @@ sub _clean_text {
     return;
 }
 
-__PACKAGE__->meta()->make_immutable();
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -247,7 +247,7 @@ Markdent::Parser - A markdown parser
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 SYNOPSIS
 
@@ -339,7 +339,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

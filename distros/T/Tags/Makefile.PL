@@ -23,8 +23,7 @@ requires 'Exporter' => 0;
 requires 'HTML::Entities' => 0;
 requires 'Readonly' => 0;
 requires 'perl' => '5.8.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Tags';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags';
 test_requires 'English' => 0;
@@ -35,7 +34,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Warn' => 0;
 tests_recursive;
-version '0.10';
+version '0.11';
 
 # Run.
 WriteAll();

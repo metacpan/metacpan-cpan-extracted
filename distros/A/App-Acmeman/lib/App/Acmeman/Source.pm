@@ -35,7 +35,8 @@ sub is_set {
 sub define_domain {
     my $self = shift;
     my $cn = shift || croak "domain name must be given";
-    $self->set('domain', $cn, 'files', 'default');
+    $self->set('domain', $cn, 'files', 'default')
+        unless $self->is_set('domain', $cn, 'files');
 }
 
 sub define_alias {

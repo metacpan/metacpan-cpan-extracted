@@ -7,7 +7,7 @@ use JCT;
 use JSON::Parse '0.60', 'parse_json';
 
 my $skip_true_test;
-if ($ENV{JSONCreatePP} && "$]" =~ m!5\.01[68]!) {
+if ($ENV{JSONCreatePP} && "$]" =~ m!5\.0[01][02468]!) {
     note ("Skipping tests of true with PP and Perl $]");
     $skip_true_test = 1;
 }

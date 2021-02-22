@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 85;
+plan tests => 87;
 
 my @module_files = (
     'Markdent.pm',
@@ -29,6 +29,7 @@ my @module_files = (
     'Markdent/Event/EndListItem.pm',
     'Markdent/Event/EndOrderedList.pm',
     'Markdent/Event/EndParagraph.pm',
+    'Markdent/Event/EndStrikethrough.pm',
     'Markdent/Event/EndStrong.pm',
     'Markdent/Event/EndTable.pm',
     'Markdent/Event/EndTableBody.pm',
@@ -55,6 +56,7 @@ my @module_files = (
     'Markdent/Event/StartListItem.pm',
     'Markdent/Event/StartOrderedList.pm',
     'Markdent/Event/StartParagraph.pm',
+    'Markdent/Event/StartStrikethrough.pm',
     'Markdent/Event/StartStrong.pm',
     'Markdent/Event/StartTable.pm',
     'Markdent/Event/StartTableBody.pm',

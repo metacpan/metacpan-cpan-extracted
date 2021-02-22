@@ -4,7 +4,7 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "lgpl_2_1"
    ],
@@ -50,17 +50,20 @@
    "provides" : {
       "Apache::Defaults" : {
          "file" : "lib/Apache/Defaults.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "gray+apache-defaults@gnu.org.ua",
+         "web" : "https://puszcza.gnu.org.ua/bugs/?group=apache-defaults"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://git.gnu.org.ua/apache-defaults.git",
          "web" : "http://git.gnu.org.ua/cgit/apache-defaults.git"
       }
    },
-   "version" : "1.02",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.03"
 }

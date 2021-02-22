@@ -18,8 +18,11 @@ is $got, 1, 'stopwords';
 
 my $files = [qw( t/1.txt t/2.txt )];
 
-$obj = Text::TFIDF::Ngram->new( files => $files, size => 1, stopwords => 0 );
-isa_ok $obj, 'Text::TFIDF::Ngram';
+$obj = new_ok 'Text::TFIDF::Ngram' => [
+    files => $files,
+    size => 1,
+    stopwords => 0,
+];
 
 my $expected = $files;
 $got = $obj->files;
@@ -110,8 +113,11 @@ is_deeply $got, $expected, 'tfidf_by_file';
 
 $files = [qw( t/3.txt t/4.txt )];
 
-$obj = Text::TFIDF::Ngram->new( files => $files, size => 2, stopwords => 0 );
-isa_ok $obj, 'Text::TFIDF::Ngram';
+$obj = new_ok 'Text::TFIDF::Ngram' => [
+    files => $files,
+    size => 2,
+    stopwords => 0,
+];
 
 $filename = 't/3.txt';
 $term     = 'as snow';
@@ -144,8 +150,11 @@ is $got, $expected, 'TFIDF';
 
 $files = [qw( t/1.txt t/2.txt )];
 
-$obj = Text::TFIDF::Ngram->new( files => $files, size => 1, stopwords => 1 );
-isa_ok $obj, 'Text::TFIDF::Ngram';
+$obj = new_ok 'Text::TFIDF::Ngram' => [
+    files => $files,
+    size => 1,
+    stopwords => 1,
+];
 
 $filename = 't/1.txt';
 $term     = 'sample';
@@ -166,8 +175,11 @@ $expected = { sample => 1, };
 $got = $obj->counts->{$filename};
 is_deeply $got, $expected, 'counts';
 
-$obj = Text::TFIDF::Ngram->new( files => $files, size => 2, stopwords => 0 );
-isa_ok $obj, 'Text::TFIDF::Ngram';
+$obj = new_ok 'Text::TFIDF::Ngram' => [
+    files => $files,
+    size => 2,
+    stopwords => 0,
+];
 
 $term = 'a sample';
 
@@ -194,8 +206,12 @@ is_deeply $got, $expected, 'counts';
 
 $filename = 't/4.txt';
 
-$obj = Text::TFIDF::Ngram->new( files => [$filename], size => 2, stopwords => 0, punctuation => '' );
-isa_ok $obj, 'Text::TFIDF::Ngram';
+$obj = new_ok 'Text::TFIDF::Ngram' => [
+    files => [$filename],
+    size => 2,
+    stopwords => 0,
+    punctuation => '',
+];
 $expected = {
     'lamb .'      => 1,
     'was white'   => 1,
@@ -213,8 +229,12 @@ $expected = {
 $got = $obj->counts->{$filename};
 is_deeply $got, $expected, 'counts';
 
-$obj = Text::TFIDF::Ngram->new( files => [$filename], size => 2, stopwords => 0, lowercase => 1 );
-isa_ok $obj, 'Text::TFIDF::Ngram';
+$obj = new_ok 'Text::TFIDF::Ngram' => [
+    files => [$filename],
+    size => 2,
+    stopwords => 0,
+    lowercase => 1,
+];
 $expected = {
     'was white'   => 1,
     'as cotton'   => 1,
@@ -225,6 +245,27 @@ $expected = {
     'a little'    => 1,
     'white as'    => 1,
     'fleece was'  => 1
+};
+$got = $obj->counts->{$filename};
+is_deeply $got, $expected, 'counts';
+
+$filename = 't/5.txt';
+
+$obj = new_ok 'Text::TFIDF::Ngram' => [
+    files => [$filename],
+    size => 2,
+    stopwords => 0,
+    lowercase => 1,
+];
+$expected = {
+  'as snow'      => 1,
+  'fleece was'   => 1,
+  "had'a little" => 1,
+  'its fleece'   => 1,
+  'little lamb'  => 1,
+  "mary had'a"   => 1,
+  'was white'    => 1,
+  'white as'     => 1,
 };
 $got = $obj->counts->{$filename};
 is_deeply $got, $expected, 'counts';

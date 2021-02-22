@@ -44,8 +44,9 @@
             "MooX::Attribute::ENV" : "0.02",
             "MooX::Enumeration" : "0",
             "MooX::HandlesVia" : "0",
+            "MooX::Should" : "v0.1.4",
             "OpenTracing::Implementation" : "0.03",
-            "OpenTracing::Role" : "v0.84.0",
+            "OpenTracing::Role" : "v0.85.0",
             "PerlX::Maybe" : "0",
             "Ref::Util" : "0",
             "Sub::Trigger::Lock" : "0",
@@ -71,6 +72,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.42.1",
+   "version" : "v0.43.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

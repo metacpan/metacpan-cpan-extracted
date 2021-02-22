@@ -10,7 +10,7 @@ use namespace::clean; # to avoid having an "in_global_destruction" method
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '4.0.1'; # VERSION
+our $VERSION = '5.0.7'; # VERSION
 
 
 #
@@ -229,7 +229,7 @@ MarpaX::ESLIF::Base - ESLIF base
 
 =head1 VERSION
 
-version 4.0.1
+version 5.0.7
 
 =head1 DESCRIPTION
 

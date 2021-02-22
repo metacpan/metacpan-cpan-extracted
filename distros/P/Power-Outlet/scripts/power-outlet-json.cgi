@@ -156,24 +156,28 @@ Use three nodes: inject, http request, and debug.
 
 To add an outlet for the web service, add a new INI section to the power-outlet.ini file.
 
-  [Unique_Section_Name]
-  type=iBoot
-  host=Lamp
+  [Tree]
+  type=Tasmota
+  host=light-tree
+  groups=Outside Lights
 
 If you need to override the defaults
 
-  [Unique_Section_Name]
-  type=iBoot
-  host=Lamp
+  [Kitchen]
+  type=Shelly
+  name=Kitchen
+  host=sw-kitchen
   port=80
-  pass=PASS
-  name=My iBoot Description
+  style=relay
+  index=0
+  groups=Inside Lights
 
 WeMo device
 
-  [WeMo]
+  [Living Room]
   type=WeMo
-  host=mywemo
+  host=sw-living-room
+  groups=Inside Lights
 
 Default Location: /etc/power-outlet.ini
 

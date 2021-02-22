@@ -4,10 +4,12 @@ author:
   - 'Ron Savage (ron@savage.net.au)'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +33,7 @@ requires:
   Fcntl: '1.06'
   File::Basename: '2.77'
   File::Path: '2.07'
-  File::Slurp: '9999.19'
+  File::Slurper: '0.012'
   File::Spec: '3.3'
   File::Temp: '0.22'
   FreezeThaw: '0.5001'
@@ -40,8 +42,6 @@ requires:
   Safe: '2.35'
   Scalar::Util: '1.27'
   Storable: '2.39'
-  Test::More: '1.001014'
-  Test::Pod: '1.48'
   Try::Tiny: '0.12'
   YAML::Tiny: '1.51'
   autovivification: '0'
@@ -51,7 +51,8 @@ requires:
   vars: '0'
   warnings: '0'
 resources:
+  bugtracker: https://github.com/ronsavage/Data-Session/issues
   license: http://opensource.org/licenses/Artistic-2.0
   repository: https://github.com/ronsavage/Data-Session.git
-version: '1.17'
-
+version: '1.18'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,7 +5,7 @@ use warnings;
 
 use vars qw($VERSION);
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 sub new {
     my $cls = shift;
@@ -16,38 +16,38 @@ sub new {
 sub init {
     my ($self) = @_;
     if (defined $self->{'expando'}) {
-        my $rx = qr/\G$self->{'expando'}/;
+        my $rx = qr/$self->{'expando'}/;
         $self->{'consume_expando'} = sub {
-            $_ =~ /$rx/gc ? (defined $2 ? $2 : $1) : ()
+            $_ =~ s/\A$rx// ? (defined $2 ? $2 : $1) : ()
         }
     }
     else {
         $self->{'consume_expando'} ||= sub {
-            m{ \G \% ([^%()]*) \( ([^\s()]+) \) }xgc
+            s{ \A \% ([^%()]*) \( ([^\s()]+) \) }{}x
                 ? ($2, $1)
                 : ()
         };
     }
     if (defined $self->{'literal'}) {
-        my $rx = qr/\G$self->{'literal'}/;
+        my $rx = qr/$self->{'literal'}/;
         $self->{'consume_literal'} = sub {
-            $_ =~ /$rx/gc ? ($1) : ()
+            s/\A$rx// ? ($1) : ()
         }
     }
     else {
         $self->{'consume_literal'} ||= sub {
-            m{ \G (.) }xgc ? ($1) : ()
+            s{\A(.)}{}s ? ($1) : ()
         }
     }
     if (defined $self->{'escaped_literal'}) {
-        my $rx = qr/\G$self->{'escaped_literal'}/;
+        my $rx = qr/$self->{'escaped_literal'}/;
         $self->{'consume_escaped_literal'} = sub {
-            $_ =~ /$rx/gc ? ($1) : ()
+            $_ =~ s/\A$rx// ? ($1) : ()
         }
     }
     else {
         $self->{'consume_escaped_literal'} ||= sub {
-            m{ \G \\ (.) }xgc ? ($1) : ()
+            s{\A\\(.)}{} ? ($1) : ()
         }
     }
     if (defined $self->{'dot_separator'}) {
@@ -98,17 +98,25 @@ sub expand {
     my $sfy = $self->{'stringify'};
     my $out = '';
     local $_ = $str;
-    pos($_) = 0;
-    while (pos($_) < length($_)) {
+    while (length $_) {
         my $res;
         if (my ($code, $fmt) = $mat->()) {
             my $val = $dec->($self, $code, $stash);
             $res = $sfy->($self, $val);
             $res = sprintf($fmt, $res) if defined $fmt && length $fmt;
         }
-        elsif (!defined ($res = &$lit)
-            && !defined ($res = &$esc)) {
-            die "Unparseable: $_";
+        elsif (s/\A(\s+)//) {
+            $res = $1;
+        }
+        elsif (defined ($res = &$esc) || defined ($res = &$lit)) {
+            1;
+        }
+        else {
+            my $p = length($str) - length($_);
+            my $L = substr($str, 0, $p);
+            my $R = substr($str, $p);
+            die "Unparseable substring at <*>: $L<*>$R";
+            $res = $1;
         }
         $out .= $res;
     }
@@ -321,7 +329,10 @@ A separator to use in expando codes in order to access values not at the top
 level of the stash.  Decoding happens
 
 For example, if B<dot_separator> is set to C<.> or C<qr/\./> then the expando
-C<foo.bar.baz> expanded using stash C<$h> will yield the same value as the expando C<baz> expanded using stash C<$h->{foo}{bar}> (or the empty string, if said value is undefined).  This may or may not be the same value as C<$h->{foo}{bar}{baz}>, depending on the B<decoder>.
+C<foo.bar.baz> expanded using stash C<$h> will yield the same value as the
+expando C<baz> expanded using stash C<< $h->{foo}{bar} >> (or the empty string,
+if said value is undefined).  This may or may not be the same value as
+C<< $h->{foo}{bar}{baz} >>, depending on the B<decoder>.
 
 For example, if C<$h> is this:
 

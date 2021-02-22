@@ -1,7 +1,6 @@
-use warnings;
-use strict;
-use Test::More;
-use Lingua::JA::Moji qw/is_romaji_strict is_romaji_semistrict/;
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;
 
 ok (is_romaji_strict ('Shigeru Yoshikawa'), "Shigeru Yoshikawa = Japanese");
 ok (is_romaji_semistrict ('Shigeru Yoshikawa'), "Shigeru Yoshikawa = Japanese");

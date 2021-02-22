@@ -1,5 +1,10 @@
 Revision history for Neo4j::Driver
 
+0.22  2021-02-11
+
+ - allow statements to begin with whitespace (fix issue #13)
+ - fix test failing in old Perls with non-English locale (issue #12)
+
 0.21  2021-02-06
 
  - add experimental support for HTTP responses in Jolt format

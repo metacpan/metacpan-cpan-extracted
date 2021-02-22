@@ -65,14 +65,14 @@ Most of the routines require an integer parameter called C<check>;
 if set to 0, then no checks on the validity of the input data are
 made, otherwise these checks are made.
 The value of C<check> can be set to 0 if a routine
-such as L<chim|/chim> has already been successfully called.
+such as L</chim> has already been successfully called.
 
 =over 4
 
 =item * 
 
 If not known, estimate derivative values for the points
-using the L<chim|/chim>, L<chic|/chic>, or L<chsp|/chsp> routines
+using the L</chim>, L</chic>, or L</chsp> routines
 (the following routines require both the function (C<f>)
 and derivative (C<d>) values at a set of points (C<x>)). 
 
@@ -80,12 +80,12 @@ and derivative (C<d>) values at a set of points (C<x>)).
 
 Evaluate, integrate, or differentiate the resulting PCH
 function using the routines:
-L<chfd|/chfd>; L<chfe|/chfe>; L<chia|/chia>; L<chid|/chid>.
+L</chfd>; L</chfe>; L</chia>; L</chid>.
 
 =item * 
 
 If desired, you can check the monotonicity of your
-data using L<chcm|/chcm>. 
+data using L</chcm>. 
 
 =back
  
@@ -255,9 +255,9 @@ Fast Fourier Transform
   $v_in = pdl(1,0,1,0);
   ($azero,$x,$y) = PDL::Slatec::fft($v_in);
 
-C<PDL::Slatec::fft> is a convenience wrapper for L<ezfftf|ezfftf>, and
+C<PDL::Slatec::fft> is a convenience wrapper for L</ezfftf>, and
 performs a Fast Fourier Transform on an input vector C<$v_in>. The
-return values are the same as for L<ezfftf|ezfftf>.
+return values are the same as for L</ezfftf>.
 
 =head2 rfft
 
@@ -271,11 +271,11 @@ reverse Fast Fourier Transform
   print $v_in, $vout
   [1 0 1 0] [1 0 1 0]
 
-C<PDL::Slatec::rfft> is a convenience wrapper for L<ezfftb|ezfftb>,
+C<PDL::Slatec::rfft> is a convenience wrapper for L</ezfftb>,
 and performs a reverse Fast Fourier Transform. The input is the same
-as the output of L<PDL::Slatec::fft|/PDL::Slatec::fft>, and the output
+as the output of L</PDL::Slatec::fft>, and the output
 of C<rfft> is a data vector, similar to what is input into
-L<PDL::Slatec::fft|/PDL::Slatec::fft>.
+L</PDL::Slatec::fft>.
 
 =cut
 
@@ -577,7 +577,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Compute the determinant and inverse of a certain real
 symmetric positive definite matrix using the factors
-computed by L<poco|/poco>.
+computed by L</poco>.
 
 =for bad
 
@@ -605,7 +605,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
   Signature: (a(n,n);int [o]ipvt(n);[o]det(two=2);[o]work(n);int job())
 
 Compute the determinant and inverse of a matrix using the
-factors computed by L<geco|/geco> or L<gefa|/gefa>.
+factors computed by L</geco> or L</gefa>.
 
 =for bad
 
@@ -633,7 +633,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
   Signature: (a(lda,n);int ipvt(n);b(n);int job())
 
 Solve the real system C<A*X=B> or C<TRANS(A)*X=B> using the
-factors computed by L<geco|/geco> or L<gefa|/gefa>.
+factors computed by L</geco> or L</gefa>.
 
 =for bad
 
@@ -691,8 +691,8 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
   Signature: (int n();[o]wsave(foo))
 
 Subroutine ezffti initializes the work array C<wsave()>
-which is used in both L<ezfftf|/ezfftf> and 
-L<ezfftb|/ezfftb>.  
+which is used in both L</ezfftf> and 
+L</ezfftb>.  
 The prime factorization
 of C<n> together with a tabulation of the trigonometric functions
 are computed and stored in C<wsave()>.
@@ -847,13 +847,13 @@ Calculate the derivatives at the given set of points (C<$x,$f>,
 where C<$x> is strictly increasing).
 The resulting set of points - C<$x,$f,$d>, referred to
 as the cubic Hermite representation - can then be used in
-other functions, such as L<chfe|/chfe>, L<chfd|/chfd>,
-and L<chia|/chia>.
+other functions, such as L</chfe>, L</chfd>,
+and L</chia>.
 
 The boundary conditions are compatible with monotonicity,
 and if the data are only piecewise monotonic, the interpolant
 will have an extremum at the switch points; for more control
-over these issues use L<chic|/chic>. 
+over these issues use L</chic>. 
 
 Error status returned by C<$ierr>:
 
@@ -916,12 +916,12 @@ Control over the boundary conditions is given by the
 C<$ic> and C<$vc> piddles, and the value of C<$mflag> determines
 the treatment of points where monotoncity switches
 direction. A simpler, more restricted, interface is available 
-using L<chim|/chim>.
+using L</chim>.
 
 The first and second elements of C<$ic> determine the boundary
 conditions at the start and end of the data respectively.
 If the value is 0, then the default condition, as used by
-L<chim|/chim>, is adopted.
+L</chim>, is adopted.
 If greater than zero, no adjustment for monotonicity is made,
 otherwise if less than zero the derivative will be adjusted.
 The allowed magnitudes for C<ic(0)> are:
@@ -1174,9 +1174,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 Interpolate function and derivative values.
 
 Given a piecewise cubic Hermite function - such as from
-L<chim|/chim> - evaluate the function (C<$fe>) and 
+L</chim> - evaluate the function (C<$fe>) and 
 derivative (C<$de>) at a set of points (C<$xe>).
-If function values alone are required, use L<chfe|/chfe>.
+If function values alone are required, use L</chfe>.
 Set C<check> to 0 to skip checks on the input data.
 
 Error status returned by C<$ierr>:
@@ -1244,9 +1244,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 Interpolate function values.
 
 Given a piecewise cubic Hermite function - such as from
-L<chim|/chim> - evaluate the function (C<$fe>) at
+L</chim> - evaluate the function (C<$fe>) at
 a set of points (C<$xe>).
-If derivative values are also required, use L<chfd|/chfd>.
+If derivative values are also required, use L</chfd>.
 Set C<check> to 0 to skip checks on the input data.
 
 Error status returned by C<$ierr>:
@@ -1310,8 +1310,8 @@ Integrate (x,f(x)) over arbitrary limits.
 
 Evaluate the definite integral of a a piecewise
 cubic Hermite function over an arbitrary interval,
-given by C<[$la,$lb]>. C<$d> should contain the derivative values, computed by L<chim|/chim>.
-See L<chid|/chid> if the integration limits are
+given by C<[$la,$lb]>. C<$d> should contain the derivative values, computed by L</chim>.
+See L</chid> if the integration limits are
 data points.
 Set C<check> to 0 to skip checks on the input data.
 
@@ -1390,12 +1390,12 @@ Evaluate the definite integral of a a piecewise
 cubic Hermite function between C<x($ia)> and
 C<x($ib)>. 
 
-See L<chia|/chia> for integration between arbitrary
+See L</chia> for integration between arbitrary
 limits.
 
 Although using a fortran routine, the values of
 C<$ia> and C<$ib> are zero offset.
-C<$d> should contain the derivative values, computed by L<chim|/chim>.
+C<$d> should contain the derivative values, computed by L</chim>.
 Set C<check> to 0 to skip checks on the input data.
 
 Error status returned by C<$ierr>:

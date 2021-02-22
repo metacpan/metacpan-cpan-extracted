@@ -1,5 +1,8 @@
 # Changes for App::url
 
+1.007 2021-02-13T12:56:04Z
+	* Skip some punycode tests if the locale is not UTF-8
+
 1.006 2021-01-13T14:09:22Z
 	* freshen the distro, remove Travis CI, add GitHub actions
 	* fix a small pod error (Github #2, Christian Garbs)

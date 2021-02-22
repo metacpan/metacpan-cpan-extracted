@@ -103,6 +103,11 @@ typedef enum bootstrap_grammar_G1_enum {
   G1_TERMINAL_EVENT_ACTION,
   G1_TERMINAL_DEFAULT_ENCODING,
   G1_TERMINAL_FALLBACK_ENCODING,
+  G1_TERMINAL__EOF,
+  G1_TERMINAL__EOL,
+  G1_TERMINAL_WHITESPACE,
+  G1_TERMINAL_PERL_COMMENT,
+  G1_TERMINAL_CPLUSPLUS_COMMENT,
   /* ----- Non terminals ------ */
   G1_META_STATEMENTS,
   G1_META_STATEMENT,
@@ -195,7 +200,7 @@ typedef enum bootstrap_grammar_G1_enum {
   G1_META_FALSE,
   G1_META_TRUE,
   G1_META_STANDARD_NAME,
-  G1_META_QUOTED_NAME,
+  G1_META_QUOTED_STRING_LITERAL,
   G1_META_QUOTED_STRING,
   G1_META_CHARACTER_CLASS,
   G1_META_REGULAR_EXPRESSION,
@@ -203,9 +208,6 @@ typedef enum bootstrap_grammar_G1_enum {
   G1_META_BRACKETED_NAME,
   G1_META_RESTRICTED_ASCII_GRAPH_NAME,
   G1_META_LUA_ACTION_NAME,
-  G1_META_WHITESPACE,
-  G1_META_PERL_COMMENT,
-  G1_META_CPLUSPLUS_COMMENT,
   G1_META_GRAPH_ASCII_NAME
 } bootstrap_grammar_G1_enum_t;
 
@@ -303,7 +305,7 @@ bootstrap_grammar_meta_t bootstrap_grammar_G1_metas[] = {
   { G1_META_FALSE,                            L0_JOIN_G1_META_FALSE,                       0,       0,           0,            0 },
   { G1_META_TRUE,                             L0_JOIN_G1_META_TRUE,                        0,       0,           0,            0 },
   { G1_META_STANDARD_NAME,                    L0_JOIN_G1_META_STANDARD_NAME,               0,       0,           0,            0 },
-  { G1_META_QUOTED_NAME,                      L0_JOIN_G1_META_QUOTED_NAME,                 0,       0,           0,            0 },
+  { G1_META_QUOTED_STRING_LITERAL,            L0_JOIN_G1_META_QUOTED_STRING_LITERAL,       0,       0,           0,            0 },
   { G1_META_QUOTED_STRING,                    L0_JOIN_G1_META_QUOTED_STRING,               0,       0,           0,            0 },
   { G1_META_CHARACTER_CLASS,                  L0_JOIN_G1_META_CHARACTER_CLASS,             0,       0,           0,            0 },
   { G1_META_REGULAR_EXPRESSION,               L0_JOIN_G1_META_REGULAR_EXPRESSION,          0,       0,           0,            0 },
@@ -311,9 +313,6 @@ bootstrap_grammar_meta_t bootstrap_grammar_G1_metas[] = {
   { G1_META_BRACKETED_NAME,                   L0_JOIN_G1_META_BRACKETED_NAME,              0,       0,           0,            0 },
   { G1_META_RESTRICTED_ASCII_GRAPH_NAME,      L0_JOIN_G1_META_RESTRICTED_ASCII_GRAPH_NAME, 0,       0,           0,            0 },
   { G1_META_LUA_ACTION_NAME,                  L0_JOIN_G1_META_LUA_ACTION_NAME,             0,       0,           0,            0 },
-  { G1_META_WHITESPACE,                       L0_JOIN_G1_META_WHITESPACE,                  0,       0,           0,            0 },
-  { G1_META_PERL_COMMENT,                     L0_JOIN_G1_META_PERL_COMMENT,                0,       0,           0,            0 },
-  { G1_META_CPLUSPLUS_COMMENT,                L0_JOIN_G1_META_CPLUSPLUS_COMMENT,           0,       0,           0,            0 },
   { G1_META_GRAPH_ASCII_NAME,                 L0_JOIN_G1_META_GRAPH_ASCII_NAME,            0,       0,           0,            0 }
 };
 
@@ -1062,6 +1061,54 @@ bootstrap_grammar_terminal_t bootstrap_grammar_G1_terminals[] = {
 #else
     NULL, NULL
 #endif
+  },
+  { G1_TERMINAL__EOF, MARPAESLIF_TERMINAL_TYPE_STRING, NULL,
+    "':eof'",
+#ifndef MARPAESLIF_NTRACE
+    ":eof", ":eo"
+#else
+    NULL, NULL
+#endif
+  },
+  { G1_TERMINAL__EOL, MARPAESLIF_TERMINAL_TYPE_STRING, NULL,
+    "':eol'",
+#ifndef MARPAESLIF_NTRACE
+    ":eol", ":eo"
+#else
+    NULL, NULL
+#endif
+  },
+  { G1_TERMINAL_WHITESPACE, MARPAESLIF_TERMINAL_TYPE_REGEX, NULL,
+    "[\\s]+",
+#ifndef MARPAESLIF_NTRACE
+    "\x09\x20xxx", "\x09\x20"
+#else
+    NULL, NULL
+#endif
+  },
+  /* --------------------------------------------------------------------------------------------------------------------------------- */
+  /* Taken from Regexp::Common::comment, $RE{comment}{Perl} */
+  /* Perl stringified version is: (?:(?:#)(?:[^\n]*)(?:\n)) */
+  /* \z added to match the end of the buffer (ESLIF will ask more data if this is not EOF as well) */
+  { G1_TERMINAL_PERL_COMMENT, MARPAESLIF_TERMINAL_TYPE_REGEX, "u",
+    "(?:(?:#)(?:[^\\n]*)(?:\\n|\\z))",
+#ifndef MARPAESLIF_NTRACE
+    "# Comment up to the end of the buffer", "# Again a comment"
+#else
+    NULL, NULL
+#endif
+  },
+  /* --------------------------------------------------------------------------------------------------------------------------------- */
+  /* Taken from Regexp::Common::comment, $RE{comment}{'C++'}, which includes the C language comment */
+  /* Perl stringified version is: (?:(?:(?://)(?:[^\n]*)(?:\n))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/))*)(?:\*\/))) */
+  /* \z added to match the end of the buffer in the // mode (ESLIF will ask more data if this is not EOF as well) */
+  { G1_TERMINAL_CPLUSPLUS_COMMENT, MARPAESLIF_TERMINAL_TYPE_REGEX, "u",
+    "(?:(?:(?://)(?:[^\\n]*)(?:\\n|\\z))|(?:(?:/\\*)(?:(?:[^\\*]+|\\*(?!/))*)(?:\\*/)))",
+#ifndef MARPAESLIF_NTRACE
+    "// Comment up to the end of the buffer", "// Again a comment"
+#else
+    NULL, NULL
+#endif
   }
 };
 
@@ -1106,7 +1153,7 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
   */
   { G1_META_DESC_RULE,                        G1_RULE_DESC_RULE,                              MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL__DESC,
                                                                                                                                      G1_META_OP_DECLARE,
-                                                                                                                                     G1_META_QUOTED_NAME                          }, -1,                        -1,      -1,              0, G1_ACTION_DESC_RULE },
+                                                                                                                                     G1_META_QUOTED_STRING_LITERAL                }, -1,                        -1,      -1,              0, G1_ACTION_DESC_RULE },
   { G1_META_EMPTY_RULE,                       G1_RULE_EMPTY_RULE,                             MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_META_LHS,
                                                                                                                                      G1_META_OP_DECLARE,
                                                                                                                                      G1_META_ADVERB_LIST                          }, -1,                        -1,      -1,              0, G1_ACTION_EMPTY_RULE },
@@ -1147,32 +1194,32 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
                                                                                                                                      G1_META_EVENT_INITIALIZATION,
                                                                                                                                      G1_TERMINAL_EQUAL,
                                                                                                                                      G1_TERMINAL_COMPLETED,
-                                                                                                                                     G1_META_SYMBOL_NAME                          }, -1,                        -1,      -1,              0, G1_ACTION_COMPLETION_EVENT_DECLARATION_1 },
+                                                                                                                                     G1_META_SYMBOL                               }, -1,                        -1,      -1,              0, G1_ACTION_COMPLETION_EVENT_DECLARATION_1 },
   { G1_META_COMPLETION_EVENT_DECLARATION,     G1_RULE_COMPLETION_EVENT_DECLARATION_2,         MARPAESLIF_RULE_TYPE_ALTERNATIVE, 5, { G1_TERMINAL_EVENT,
                                                                                                                                      G1_META_EVENT_INITIALIZATION,
                                                                                                                                      G1_META_OP_DECLARE,
                                                                                                                                      G1_TERMINAL_COMPLETED,
-                                                                                                                                     G1_META_SYMBOL_NAME                          }, -1,                        -1,      -1,              0, G1_ACTION_COMPLETION_EVENT_DECLARATION_2 },
+                                                                                                                                     G1_META_SYMBOL                               }, -1,                        -1,      -1,              0, G1_ACTION_COMPLETION_EVENT_DECLARATION_2 },
   { G1_META_NULLED_EVENT_DECLARATION,         G1_RULE_NULLED_EVENT_DECLARATION_1,             MARPAESLIF_RULE_TYPE_ALTERNATIVE, 5, { G1_TERMINAL_EVENT,
                                                                                                                                      G1_META_EVENT_INITIALIZATION,
                                                                                                                                      G1_TERMINAL_EQUAL,
                                                                                                                                      G1_TERMINAL_NULLED,
-                                                                                                                                     G1_META_SYMBOL_NAME                          }, -1,                        -1,      -1,              0, G1_ACTION_NULLED_EVENT_DECLARATION_1 },
+                                                                                                                                     G1_META_SYMBOL                               }, -1,                        -1,      -1,              0, G1_ACTION_NULLED_EVENT_DECLARATION_1 },
   { G1_META_NULLED_EVENT_DECLARATION,         G1_RULE_NULLED_EVENT_DECLARATION_1,             MARPAESLIF_RULE_TYPE_ALTERNATIVE, 5, { G1_TERMINAL_EVENT,
                                                                                                                                      G1_META_EVENT_INITIALIZATION,
                                                                                                                                      G1_META_OP_DECLARE,
                                                                                                                                      G1_TERMINAL_NULLED,
-                                                                                                                                     G1_META_SYMBOL_NAME                          }, -1,                        -1,      -1,              0, G1_ACTION_NULLED_EVENT_DECLARATION_1 },
+                                                                                                                                     G1_META_SYMBOL                               }, -1,                        -1,      -1,              0, G1_ACTION_NULLED_EVENT_DECLARATION_1 },
   { G1_META_PREDICTION_EVENT_DECLARATION,     G1_RULE_PREDICTED_EVENT_DECLARATION_1,          MARPAESLIF_RULE_TYPE_ALTERNATIVE, 5, { G1_TERMINAL_EVENT,
                                                                                                                                      G1_META_EVENT_INITIALIZATION,
                                                                                                                                      G1_TERMINAL_EQUAL,
                                                                                                                                      G1_TERMINAL_PREDICTED,
-                                                                                                                                     G1_META_SYMBOL_NAME                          }, -1,                        -1,      -1,              0, G1_ACTION_PREDICTED_EVENT_DECLARATION_1 },
+                                                                                                                                     G1_META_SYMBOL                               }, -1,                        -1,      -1,              0, G1_ACTION_PREDICTED_EVENT_DECLARATION_1 },
   { G1_META_PREDICTION_EVENT_DECLARATION,     G1_RULE_PREDICTED_EVENT_DECLARATION_2,          MARPAESLIF_RULE_TYPE_ALTERNATIVE, 5, { G1_TERMINAL_EVENT,
                                                                                                                                      G1_META_EVENT_INITIALIZATION,
                                                                                                                                      G1_META_OP_DECLARE,
                                                                                                                                      G1_TERMINAL_PREDICTED,
-                                                                                                                                     G1_META_SYMBOL_NAME                          }, -1,                        -1,      -1,              0, G1_ACTION_PREDICTED_EVENT_DECLARATION_2 },
+                                                                                                                                     G1_META_SYMBOL                               }, -1,                        -1,      -1,              0, G1_ACTION_PREDICTED_EVENT_DECLARATION_2 },
   /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb  actions
   */
@@ -1246,6 +1293,9 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
   { G1_META_ACTION,                           G1_RULE_ACTION_2,                               MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_ACTION,
                                                                                                                                      G1_TERMINAL_THEN,
                                                                                                                                      G1_META_STRING_LITERAL                       }, -1,                        -1,      -1,              0, G1_ACTION_ACTION_2 },
+  { G1_META_ACTION,                           G1_RULE_ACTION_3,                               MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_ACTION,
+                                                                                                                                     G1_TERMINAL_THEN,
+                                                                                                                                     G1_META_QUOTED_STRING_LITERAL                }, -1,                        -1,      -1,              0, G1_ACTION_ACTION_3 },
   /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb  actions
   */
@@ -1260,7 +1310,7 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
                                                                                                                                      G1_TERMINAL_GROUP                            }, -1,                        -1,      -1,              0, G1_ACTION_GROUP_ASSOCIATION },
   { G1_META_SEPARATOR_SPECIFICATION,          G1_RULE_SEPARATOR_SPECIFICATION,                MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_SEPARATOR,
                                                                                                                                      G1_TERMINAL_THEN,
-                                                                                                                                     G1_META_SINGLE_SYMBOL                        }, -1,                        -1,      -1,              0, G1_ACTION_SEPARATOR_SPECIFICATION },
+                                                                                                                                     G1_META_RHS_PRIMARY                          }, -1,                        -1,      -1,              0, G1_ACTION_SEPARATOR_SPECIFICATION },
   /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb  actions
   */
@@ -1332,6 +1382,9 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
   { G1_META_SYMBOL_ACTION,                    G1_RULE_SYMBOL_ACTION_2,                        MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_SYMBOL_ACTION,
                                                                                                                                      G1_TERMINAL_THEN,
                                                                                                                                      G1_META_STRING_LITERAL                       }, -1,                        -1,      -1,              0, G1_ACTION_SYMBOLACTION_2 },
+  { G1_META_SYMBOL_ACTION,                    G1_RULE_SYMBOL_ACTION_3,                        MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_SYMBOL_ACTION,
+                                                                                                                                     G1_TERMINAL_THEN,
+                                                                                                                                     G1_META_QUOTED_STRING_LITERAL                }, -1,                        -1,      -1,              0, G1_ACTION_SYMBOLACTION_3 },
   { G1_META_IF_ACTION,                        G1_RULE_IF_ACTION,                              MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_IF_ACTION,
                                                                                                                                      G1_TERMINAL_THEN,
                                                                                                                                      G1_META_IFACTION_NAME                        }, -1,                        -1,      -1,              0, G1_ACTION_IFACTION },
@@ -1342,7 +1395,7 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
   /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb  actions
   */
-  { G1_META_ALTERNATIVE_NAME,                 G1_RULE_ALTERNATIVE_NAME_2,                     MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_QUOTED_NAME                          }, -1,                        -1,      -1,              0, G1_ACTION_ALTERNATIVE_NAME_2 },
+  { G1_META_ALTERNATIVE_NAME,                 G1_RULE_ALTERNATIVE_NAME_2,                     MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_QUOTED_STRING_LITERAL                }, -1,                        -1,      -1,              0, G1_ACTION_ALTERNATIVE_NAME_2 },
   { G1_META_EVENT_NAME,                       G1_RULE_EVENT_NAME_1,                           MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_RESTRICTED_ASCII_GRAPH_NAME          }, -1,                        -1,      -1,              0, G1_ACTION_EVENT_NAME_1 },
   /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb  actions
@@ -1387,7 +1440,7 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
                                                                                                                                      G1_META_ADVERB_LIST,
                                                                                                                                      G1_TERMINAL_RPAREN                           }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_7 },
   { G1_META_RHS_PRIMARY,                      G1_RULE_RHS_PRIMARY_1,                          MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_SINGLE_SYMBOL                        }, -1,                        -1,      -1,              0, G1_ACTION_RHS_PRIMARY_1 },
-  { G1_META_RHS_PRIMARY,                      G1_RULE_RHS_PRIMARY_2,                          MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_META_SYMBOL_NAME,
+  { G1_META_RHS_PRIMARY,                      G1_RULE_RHS_PRIMARY_2,                          MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_META_SYMBOL,
                                                                                                                                      G1_TERMINAL_AT_SIGN,
                                                                                                                                      G1_META_GRAMMAR_REFERENCE                    }, -1,                        -1,      -1,              0, G1_ACTION_RHS_PRIMARY_2 },
   /*
@@ -1398,6 +1451,8 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
   { G1_META_TERMINAL,                         G1_RULE_TERMINAL_1,                             MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_CHARACTER_CLASS                      }, -1,                        -1,      -1,              0, G1_ACTION_TERMINAL_1 },
   { G1_META_TERMINAL,                         G1_RULE_TERMINAL_2,                             MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_REGULAR_EXPRESSION                   }, -1,                        -1,      -1,              0, G1_ACTION_TERMINAL_2 },
   { G1_META_TERMINAL,                         G1_RULE_TERMINAL_3,                             MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_QUOTED_STRING                        }, -1,                        -1,      -1,              0, G1_ACTION_TERMINAL_3 },
+  { G1_META_TERMINAL,                         G1_RULE_TERMINAL_4,                             MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_TERMINAL__EOF                             }, -1,                        -1,      -1,              0, G1_ACTION_TERMINAL_4 },
+  { G1_META_TERMINAL,                         G1_RULE_TERMINAL_5,                             MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_TERMINAL__EOL                             }, -1,                        -1,      -1,              0, G1_ACTION_TERMINAL_5 },
   { G1_META_SYMBOL,                           G1_RULE_SYMBOL,                                 MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_SYMBOL_NAME                          }, -1,                        -1,      -1,              0, G1_ACTION_SYMBOL },
   /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb  actions
@@ -1448,9 +1503,9 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
   /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb  actions
   */
-  { G1_META_DISCARD,                          G1_RULE_DISCARD_1,                              MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_WHITESPACE                           }, -1,                        -1,      -1,              0, NULL },
-  { G1_META_DISCARD,                          G1_RULE_DISCARD_2,                              MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_PERL_COMMENT                         }, -1,                        -1,      -1,              0, NULL },
-  { G1_META_DISCARD,                          G1_RULE_DISCARD_3,                              MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_CPLUSPLUS_COMMENT                    }, -1,                        -1,      -1,              0, NULL },
+  { G1_META_DISCARD,                          G1_RULE_DISCARD_1,                              MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_TERMINAL_WHITESPACE                       }, -1,                        -1,      -1,              0, NULL },
+  { G1_META_DISCARD,                          G1_RULE_DISCARD_2,                              MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_TERMINAL_PERL_COMMENT                     }, -1,                        -1,      -1,              0, NULL },
+  { G1_META_DISCARD,                          G1_RULE_DISCARD_3,                              MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_TERMINAL_CPLUSPLUS_COMMENT                }, -1,                        -1,      -1,              0, NULL },
 
   /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb  actions

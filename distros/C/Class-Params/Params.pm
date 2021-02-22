@@ -11,7 +11,7 @@ use Scalar::Util qw(blessed);
 # Export.
 Readonly::Array our @EXPORT_OK => qw(params);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Params processing.
 sub params {
@@ -78,6 +78,7 @@ sub _check_type {
 # Check one type.
 sub _check_type_one {
 	my ($value, $type) = @_;
+
 	if (ref $value eq $type 
 		|| ref \$value eq $type) {
 
@@ -91,6 +92,7 @@ sub _check_type_one {
 # Class: CLASS/undef.
 sub _check_class {
 	my ($value, $class_name) = @_;
+
 	if ($class_name) {
 
 		# Array.
@@ -113,6 +115,7 @@ sub _check_class {
 # Check ref to class.
 sub _check_class_one {
 	my ($class, $class_name) = @_;
+
 	if (! blessed($class) || ! $class->isa($class_name)) {
 		return 0;
 	} else {
@@ -133,6 +136,7 @@ sub _check_class_one {
 =head1 SYNOPSIS
 
  use Class::Params qw(params);
+
  params($self, $def_hr, $params_ar);
 
 =head1 DEFINITION FORMAT
@@ -147,18 +151,19 @@ sub _check_class_one {
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<params>
 
-=item C<params($self, $def_hr, $params_ar)>
+ params($self, $def_hr, $params_ar);
 
- Check for structure over definition and save input data to $self.
- Parameters:
+Check for structure over definition and save input data to $self.
+
+Parameters:
+
  $self - Structure, for data save.
  $def_hr - Definition hash ref.
  $params_ar - Reference to array of key-value pairs.
- Returns undef.
 
-=back
+Returns undef.
 
 =head1 ERRORS
 
@@ -169,11 +174,9 @@ sub _check_class_one {
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Class::Params qw(params);
 
  # Definition.
@@ -191,11 +194,9 @@ sub _check_class_one {
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Class::Params qw(params);
  use Data::Printer;
 
@@ -219,11 +220,9 @@ sub _check_class_one {
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Class::Params qw(params);
 
  # Definition.
@@ -243,11 +242,9 @@ sub _check_class_one {
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Class::Params qw(params);
  use Data::Printer;
 
@@ -287,7 +284,7 @@ L<Scalar::Util>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Class-Params>
+L<https://github.com/michal-josef-spacek/Class-Params>
 
 =head1 AUTHOR
 
@@ -295,11 +292,12 @@ Michal Josef Špaček L<skim@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Josef Špaček 2011-2018
- BSD 2-Clause License
+© Michal Josef Špaček 2011-2021
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

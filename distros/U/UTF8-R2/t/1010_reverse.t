@@ -2,7 +2,7 @@
 #
 # 1010_reverse.t
 #
-# Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 # This file is encoded in UTF-8.
@@ -26,6 +26,17 @@ use vars qw(@test);
     sub {1},
     sub {1},
     sub {1},
+    sub {1},
+# 11
+    sub { $_='ABCDEF';               my $r=          reverse($_);  $r  eq "FEDCBA"         },
+    sub { $_='ABCDEF';               my $r=UTF8::R2::reverse($_);  $r  eq "FEDCBA"         },
+    sub { $_='あいうえおか';         my $r=UTF8::R2::reverse($_);  $r  eq "かおえういあ"   },
+    sub { $_='ABCDEF';               my $r=          reverse();    $r  eq "FEDCBA"         },
+    sub { $_='ABCDEF';               my $r=UTF8::R2::reverse();    $r  eq "FEDCBA"         },
+    sub { $_='あいうえおか';         my $r=UTF8::R2::reverse();    $r  eq "かおえういあ"   },
+    sub { $_='ABCDEF';               my $r=          reverse;      $r  eq "FEDCBA"         },
+    sub { $_='ABCDEF';               my $r=UTF8::R2::reverse;      $r  eq "FEDCBA"         },
+    sub { $_='あいうえおか';         my $r=UTF8::R2::reverse;      $r  eq "かおえういあ"   },
     sub {1},
 #
 );

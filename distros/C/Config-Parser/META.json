@@ -4,7 +4,7 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "gpl_3"
    ],
@@ -45,7 +45,7 @@
    "provides" : {
       "Config::Parser" : {
          "file" : "lib/Config/Parser.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Config::Parser::Ini" : {
          "file" : "lib/Config/Parser/Ini.pm"
@@ -53,12 +53,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "gray+config-parser@gnu.org.ua",
+         "web" : "https://puszcza.gnu.org.ua/bugs/?group=config-parser"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://git.gnu.org.ua/config-parser.git",
          "web" : "http://git.gnu.org.ua/cgit/config-parser.git/"
       }
    },
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.05"
 }

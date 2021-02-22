@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-$VERSION = "0.3";
+$VERSION = "0.32";
 
 my $lorem_singleton;
 
@@ -16,12 +16,12 @@ sub new {
 
 sub generate_wordlist {
   my $self = shift;
-  [ map { s/\W//; lc($_) }split(/\s+/, <DATA>) ];
+  return [ map { s/\W//; lc($_) }split(/\s+/, <DATA>) ];
 }
 
 sub wordlist {
   my $self = shift;
-  $self->{ wordlist } ||= $self->generate_wordlist();
+  return $self->{ wordlist } ||= $self->generate_wordlist();
 }
 
 sub wordcount {
@@ -39,13 +39,13 @@ sub words {
   my $num  = shift;
   my @words;
   push @words, $self->get_word() for (1..$num);
-  return join(' ', @words);
+  return wantarray ? @words : join ' ', @words;
 }
 
 sub get_sentence {
   my $self = shift;
-  my $words = $self->words( 4 + int( rand( 6 ) ) );
-  ucfirst( $words );
+  my $words = $self->words( 4 + int( rand( 6 ) ) ) . '.';
+  return ucfirst( $words );
 }
 
 sub sentences {
@@ -53,13 +53,13 @@ sub sentences {
   my $num = shift;
   my @sentences;
   push @sentences, $self->get_sentence for (1..$num);
-  join( '. ', @sentences ) . '.';
+  return wantarray ? @sentences : join ' ', @sentences;
 }
 
 sub get_paragraph {
   my $self = shift;
-  my $sentences = $self->sentences(3 + int( rand( 4 ) ) );
-  
+  my $paragraph = $self->sentences(3 + int( rand( 4 ) ) );
+  return $paragraph;
 }
 
 sub paragraphs {
@@ -67,7 +67,7 @@ sub paragraphs {
   my $num = shift;
   my @paragraphs;
   push @paragraphs, $self->get_paragraph for (1..$num);
-  join( "\n\n", @paragraphs );
+  return wantarray ? @paragraphs : join "\n\n", @paragraphs;
 }
 
 1;
@@ -81,17 +81,26 @@ Text::Lorem - Generate random Latin looking text
 =head1 SYNOPSIS
 
     use Text::Lorem;
-   
+
     my $text = Text::Lorem->new();
-  
+
     # Generate a string of text with 5 words
     $words = $text->words(5);
-  
+
+    # Generate a list of 5 words
+    @words = $text->words(5);
+
     # Generate a string of text with 2 sentences
     $sentences = $text->sentences(2);
-  
-    # Generate 3 paragraphs
+
+    # Generate a list of 2 sentences
+    @sentences = $text->sentences(2);
+
+    # Generate a string of text with 3 paragraphs
     $paragraphs = $text->paragraphs(3);
+
+    # Generate a list of 3 paragraphs
+    @paragraphs = $text->paragraphs(3);
 
 =head1 DESCRIPTION
 
@@ -109,6 +118,8 @@ The default constructor, C<new()> takes no arguments and returns a Text::Lorem o
 =back
 
 =head1 METHODS
+
+All methods below will return a string in scalar context or list in list context.
 
 =over 4
 

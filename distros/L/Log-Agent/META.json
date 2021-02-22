@@ -29,7 +29,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.001",
+   "version" : "1.004",
    "x_installdirs" : "site",
    "x_version_from" : "Agent.pm"
 }

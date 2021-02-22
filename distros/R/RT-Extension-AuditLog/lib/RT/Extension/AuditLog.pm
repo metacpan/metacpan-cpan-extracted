@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::AuditLog;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -21,6 +21,17 @@ in all cases.
 =head1 RT VERSION
 
 Tested with RT 4.4.
+
+As it, it does not work on our RT3.8 installation, but that might be more
+question of the Mason version, than the RT version itself. 
+
+As the missing C<$q->request()> is the prblem, a possible workaround is to
+replace most for the code in F<Default> by
+
+$RT::AuditLogger->info(join(" ",
+   $session{'CurrentUser'}->Name, $r->method(), $r->unparsed_uri())); 
+};
+
 
 =head1 INSTALLATION
 

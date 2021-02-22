@@ -2,7 +2,7 @@ package HTTP::OAI;
 
 use strict;
 
-our $VERSION = '4.10';
+our $VERSION = '4.11';
 
 use constant OAI_NS => 'http://www.openarchives.org/OAI/2.0/';
 

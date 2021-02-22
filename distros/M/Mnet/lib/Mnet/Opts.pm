@@ -38,6 +38,7 @@ Mnet::Opts implements the methods listed below.
 use warnings;
 use strict;
 use Carp;
+use Mnet;
 use Mnet::Dump;
 use Mnet::Log::Conditional qw( DEBUG INFO WARN FATAL NOTICE );
 use Mnet::Opts::Set;

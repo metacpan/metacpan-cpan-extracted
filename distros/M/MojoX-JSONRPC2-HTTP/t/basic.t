@@ -21,7 +21,7 @@ $server2->register('method', sub { return undef, 123, 'GET is bad!' });
 $server3->register('method', sub { return 'surprise' });
 
 my $r = app->routes;
-$r->jsonrpc2('/', $server3)->over(headers => {'X-Secret'=>42});
+$r->jsonrpc2('/', $server3)->requires(headers => {'X-Secret'=>42});
 $r->jsonrpc2('/', $server1);
 $r->jsonrpc2_get('/', $server2);
 

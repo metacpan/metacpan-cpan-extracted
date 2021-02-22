@@ -1,5 +1,9 @@
 Revision history for Locale::Places
 
+0.04	Wed Feb 17 22:25:40 EST 2021
+	Fix http://www.cpantesters.org/cpan/report/f59da8fa-5743-11eb-9b90-718ee0dd574a
+	Use SQLite3 for the database, provides a major speedup
+
 0.03	Wed  6 Jan 20:02:37 EST 2021
 	If LWP::Simple::WithCache isn't installed, fall back to LWP::Simple
 	If $to eq $from don't look anything up

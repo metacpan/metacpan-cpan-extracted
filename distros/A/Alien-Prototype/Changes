@@ -1,5 +1,9 @@
 Revision history for Perl extension Alien::Prototype.
 
+1.6.0.3     Mon Feb 15 12:04 PST 2021
+    - DEPRECATED; DO NOT USE
+    - move to GitHub
+
 1.6.0.2     Fri Apr 23 22:20 PDT 2010
     - switch to Git
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw{Power::Outlet::Common::IP::HTTP::JSON};
 
-our $VERSION='0.26';
+our $VERSION='0.41';
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ Power::Outlet::Tasmota - Control and query a Tasmota GIPO configured as a Relay 
 
 =head1 SYNOPSIS
 
-  my $outlet = Power::Outlet::Tasmota->new(host => "tasmota", relay => "POWER");
+  my $outlet = Power::Outlet::Tasmota->new(host => "tasmota", relay => "POWER1");
   print $outlet->query, "\n";
   print $outlet->on, "\n";
   print $outlet->off, "\n";
@@ -34,7 +34,7 @@ Examples:
 
 Query default relay
 
-  $ curl http://tasmota/cm?cmnd=POWER
+  $ curl http://tasmota/cm?cmnd=POWER1
   {"POWER1":"ON"}
 
 Toggle (Switch) relay 4
@@ -66,7 +66,7 @@ Turn ON relay 2
 
 Tasmota version 8.1.0 supports up to 8 relays.  These 8 relays map to the relay tokens "POWER1", "POWER2", ... "POWER8". With "POWER" being the default relay name for the first relay defined in the configuration.
 
-Default: POWER
+Default: POWER1
 
 =cut
 
@@ -77,7 +77,18 @@ sub relay {
   return $self->{'relay'};
 }
 
-sub _relay_default {'POWER'};
+sub _relay {
+  my $self  = shift;
+  my $relay = uc($self->relay); #upper case
+  #Added suport for ID only relay 
+  $relay    = "POWER$relay" if $relay =~ m/\A[0-9]\Z/;
+  #support SetOption26 on and off
+  $relay   .= '1' if $relay eq "POWER"; #see SetOption26
+  die unless $relay =~ m/\APOWER[0-9]\Z/; #0-8???
+  return $relay;
+}
+
+sub _relay_default {'POWER1'};
 
 =head2 host
 
@@ -114,7 +125,7 @@ sub _http_path_default {'/cm'};
 
 Sets and returns the user used for authentication with the Tasmota hardware
 
-  my $outlet = Power::Outlet::Tasmota->new(host=>"tasmota", relay=>"POWER", user=>"mylogin", password=>"mypassword");
+  my $outlet = Power::Outlet::Tasmota->new(host=>"tasmota", relay=>"POWER1", user=>"mylogin", password=>"mypassword");
   print $outlet->query, "\n";
 
 Default: undef() #which is only passed on the url when defined
@@ -161,9 +172,13 @@ Note: The FriendlyName is cached for the life of the object.
 sub name {
   my $self = shift;
   unless ($self->{'name'}) {
-    my $fn = $self->relay;
-    $fn =~ s/POWER/FriendlyName/i;             # e.g. POWER2 => FriendlyName2
-    $self->{'name'} = $self->_call($fn => ''); # {"FriendlyName4":"Smart Outlet Bottom Amber LED"}
+    my $relay = $self->_relay;
+    if ($relay eq "POWER0") {
+      $self->{'name'} = "All";
+    } else {
+      $relay          =~ s/POWER/FriendlyName/i;
+      $self->{'name'} =  $self->_get(cmnd=>"FriendlyName")->{$relay} || $relay;
+    }
   }
   return $self->{'name'};
 }
@@ -176,7 +191,7 @@ Sends an HTTP message to the device to query the current state
 
 sub query {
   my $self = shift;
-  return $self->_call($self->relay, '');
+  return $self->_call('');
 }
 
 =head2 on
@@ -187,7 +202,7 @@ Sends a message to the device to Turn Power ON
 
 sub on {
   my $self = shift;
-  return $self->_call($self->relay, 'ON');
+  return $self->_call('ON');
 }
 
 =head2 off
@@ -198,7 +213,7 @@ Sends a message to the device to Turn Power OFF
 
 sub off {
   my $self = shift;
-  return $self->_call($self->relay, 'OFF');
+  return $self->_call('OFF');
 }
 
 =head2 switch
@@ -209,7 +224,7 @@ Sends a message to the device to toggle the power
 
 sub switch {
   my $self = shift;
-  return $self->_call($self->relay, 'TOGGLE');
+  return $self->_call('TOGGLE');
 }
 
 =head2 cycle
@@ -221,35 +236,32 @@ Sends messages to the device to Cycle Power (ON-OFF-ON or OFF-ON-OFF).
 #see Power::Outlet::Common->cycle
 
 sub _call {
-  my $self     = shift;
-  my $command  = shift; #e.g. POWER1 or FriendlyName2
-  my $argument = shift;
-  die('Error: Method _call() syntax _call(POWERx => ""|ON|OFF|TOGGLE)') unless $command  =~ m/\A(POWER|FriendlyName)[1-9]?\Z/i;
-  die('Error: Method _call() syntax _call(""|ON|OFF|TOGGLE)')           unless $argument =~ m/\A(|ON|OFF|TOGGLE)\Z/i;
+  my $self   = shift;
+  my $arg    = shift;         #e.g. "" || ON || OFF || TOGGLE
+  my $relay  = $self->_relay; #e.g. POWER0 || POWER1 || POWER2 ... (not POWER, not FriendlyName)
+  my $hash   = $self->_get(cmnd=>"$relay $arg");
+  #use Data::Dumper qw{Dumper};
+  #print Dumper($hash);
+  my $return = $relay eq 'POWER1' ? $hash->{'POWER'} || $hash->{'POWER1'}               #SetOption26 on|off
+             : $relay eq 'POWER0' ? ((grep {$_ eq 'ON'} values %$hash) ? 'ON' : 'OFF')  #any on = on
+             : $hash->{$relay};
+  return $return;
+}
 
+sub _get {
+  my $self  = shift;
+  my @param = @_;
   #http://<ip>/cm?user=admin&password=joker&cmnd=Power%20Toggle
-  my $url      = $self->url; #isa URI from Power::Outlet::Common::IP::HTTP
-  my @auth     = $self->user ? (user => $self->user, password => $self->password) : ();
-  my $cmnd     = $argument   ? join(" ", $command => $argument)                   : $command;
-  $url->query_form(@auth, cmnd => $cmnd);
+  my $url   = $self->url; #isa URI from Power::Outlet::Common::IP::HTTP
+  my @auth  = $self->user ? (user => $self->user, password => $self->password) : ();
+  $url->query_form(@auth, @param);
   #print "$url\n";
-
-  my $hash     = $self->json_request(GET => $url); #isa HASH
+  my $hash  = $self->json_request(GET => $url); #isa HASH
   #{"POWER1":"OFF"}
   #{"Command":"Unknown"}
   #{"WARNING":"Enter command cmnd="}
-
-  die("Error: Method _call($argument) failed to return expected JSON format") unless ref($hash) eq "HASH";
-  my ($key)    = keys %$hash;
-  my $value    = $hash->{$key}; #ON|OFF or error
-  if ($key =~ m/\APOWER[1-9]?\Z/i) {
-    die(qq{Error: Web service error, Value "$value" not ON or OFF}) unless $value =~ m/\A(ON|OFF)\Z/i;
-  } elsif ($key =~ m/\AFriendlyName[1-9]?\Z/i) {
-    #ok
-  } else {
-    die(qq{Error: Web service error, $key: "$value"});
-  }
-  return $value;
+  die("Error: Method _get failed to return expected JSON object") unless ref($hash) eq "HASH";
+  return $hash;
 }
 
 =head1 BUGS

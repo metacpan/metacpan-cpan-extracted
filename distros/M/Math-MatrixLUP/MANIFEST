@@ -28,3 +28,5 @@ t/polynomial_interpolation.t
 t/polynomial_regression_anynum.t
 t/row_echelon_form.t
 t/row_echelon_form_anynum.t
+utils/auto_perltidy.sh
+utils/bak_cleaner.sh

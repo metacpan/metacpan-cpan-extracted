@@ -1,4 +1,5 @@
 package ExtUtils::CBuilder;
+our $VERSION = '0.280236'; # VERSION
 
 use File::Spec ();
 use File::Path ();
@@ -7,7 +8,7 @@ use Perl::OSType qw/os_type/;
 
 use warnings;
 use strict;
-our $VERSION = '0.280235'; # VERSION
+
 our @ISA;
 
 # We only use this once - don't waste a symbol table entry on it.

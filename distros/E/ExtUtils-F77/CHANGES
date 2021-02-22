@@ -1,8 +1,15 @@
-ExtUtils::F77 Changes list 
---------------------------
+1.26 2021-02-16
+- Parse fortran compilers with complicated names - thanks @d-lamb
+- Get compiler from %ENV - thanks @d-lamb
+
+v1.25 released Jan 27th 2020
+---------------------------
+
+* Fix of version number comparison in F77.pm link_gnufortran_compiler routine
 
 v1.24 released Jul 21st 2019
---------------------------- 
+---------------------------
+
 * Fix of library order of -lgfortran and -lquadmath which effected MS Windows
 
 v1.23 released Jan 5th 2019

@@ -1,0 +1,344 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Table::Trans - A simple translation system for templating
+
+=head1 SYNOPSIS
+
+    
+    use utf8;
+    use Table::Trans ':all';
+    my $text =<<EOF;
+    id: insect
+    ja: 昆虫
+    de: Insekten
+    
+    id: frog
+    ja: 蛙
+    de: Froschlurche
+    EOF
+    my $trans = read_trans ($text, scalar => 1);
+    print $trans->{frog}{ja}, "\n";
+    my %vars;
+    get_lang_trans ($trans, \%vars, 'ja');
+    print $vars{trans}{frog}, "\n";
+
+
+produces output
+
+    蛙
+    蛙
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Table-Trans-0.01/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents version 0.01 of Table-Trans
+corresponding to L<git commit b6d3415ea2143ca67e2c17c266aed0439bafb429|https://github.com/benkasminbullock/table-trans/commit/b6d3415ea2143ca67e2c17c266aed0439bafb429> released on Tue Feb 16 10:56:49 2021 +0900.
+
+=head1 DESCRIPTION
+
+This module provides simple translation storage based on the
+L<Table::Readable> format.
+
+=head1 FUNCTIONS
+
+=head2 get_lang_name
+
+    my $language = get_lang_name ($lang);
+
+Given a language code like C<en>, convert it into the native name of
+the language, like "English".
+
+=head2 get_lang_trans
+
+     get_lang_trans ($trans, $vars, $lang);
+
+Put the translations from $trans for language $lang into
+$vars->{trans}. This is intended for the case where you want to run a
+template file several times with different languages. For example
+using L<Template> you might have
+
+    [ % trans.frog % ]
+
+in your template, then run it with
+
+    for my $lang (qw!en ja de!) {
+        get_lang_trans ($trans, \%vars, $lang);
+        $vars{lang} = $lang;
+        $tt->process ('in.tmpl', \%vars, "out.$lang.html", binmode => 'utf8');
+    }
+
+to produce similar outputs in three languages.
+
+=head2 read_trans
+
+    my $trans = read_trans ('file.txt');
+
+Also get the order:
+
+    my ($trans, $order) = read_trans ('file.txt');
+
+Read a file of translations in L<Table::Readable> format.
+
+The same options as L<Table::Readable/read_table> are accepted. To
+read from a scalar instead of a file, use C<< scalar => 1 >>:
+
+    my $trans = read_trans ($text, scalar => 1);
+
+=head2 trans_to_json_file
+
+    trans_to_json_file ('file.txt', 'file.json');
+
+Convert the translations in F<file.txt> into F<file.json>.
+
+=head2 write_trans
+
+     write_trans (\%trans, [qw/en ja es/], "output.txt", \@id_order);
+
+Write the translations stored in C<%trans> for the languages "en",
+"ja" and "es" in the order given by C<@id_order> to the file
+C<output.txt> in the L<Table::Readable> format.
+
+=head1 FORMAT
+
+The basic format of the translations is the L<Table::Readable> format,
+with each translated piece of text being identified with the code
+C<id> then each particular language having its own entry.
+
+=head2 Macros
+
+Macros to insert another translation can be used in the form C<{{id}}>
+and the translation of C<id> in the language of the entry will be
+inserted, so if we have
+
+    id: ape
+    en: monkey
+    ja: さる
+
+    id: monkeybusiness
+    en: {{ape}} business
+    ja: {{ape}}さわぎ
+
+then the C<ja> (Japanese) entry for the ID "monkeybusiness" will be さ
+るさわぎ and the English entry will be "monkey business".
+
+To use the same substitution for every language, use the key "all":
+
+    id: email
+    all: bkb@cpan.org
+
+    id: contact
+    en: Email me at <a href='mailto:{{email}}'>{{email}}</a>
+    ja: メルアド：<a href='mailto:{{email}}'>{{email}}</a>
+
+If either C<all> or the specific language translation (C<en> or C<ja>)
+does not exist, a fatal error occurs.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<JSON::Create>
+
+This is used for storing the translations in JSON format.
+
+=item L<JSON::Parse>
+
+This is only used by the tests.
+
+=item L<Table::Readable>
+
+This is used as the basic format for storing and editing translations.
+
+=back
+
+=head1 BUGS
+
+=over
+
+=item id is Indonesian
+
+Unfortunately the two-letter ISO code for the Indonesian language is
+C<id>, so at some point it will become necessary to change to a
+different key. I haven't done it yet due to the work involved in
+changing a large number of files over to a different key, and because
+I am not currently supporting Indonesian language anywhere.
+
+=back
+
+=head1 SEE ALSO
+
+=head2 CPAN
+
+There are several modules on CPAN for dealing with the GNU gettext
+format, and one for dealing with the TMX format for human-language
+translations.
+
+ 
+
+
+
+=head3 GNU gettext
+
+=over
+
+
+=item L<Data::Localize::Gettext>
+
+
+[⭐ Author: L<DMAKI|https://metacpan.org/author/DMAKI>; Date: C<2019-10-04>; Version: C<0.00028>]
+
+
+
+
+=item L<File::Gettext>
+
+
+[⭐ Author: L<PJFL|https://metacpan.org/author/PJFL>; Date: C<2017-03-01>; Version: C<v0.33.1>]
+
+
+
+
+=item L<Gettext>
+
+
+[Author: L<JBRIGGS|https://metacpan.org/author/JBRIGGS>; Date: C<2000-01-09>; Version: C<0.01>]
+
+
+
+
+=item L<Locale::gettext>
+
+
+[⭐ Author: L<PVANDRY|https://metacpan.org/author/PVANDRY>; Date: C<2015-09-28>; Version: C<1.07>]
+
+
+
+
+=item L<Locale::Maketext::Gettext>
+
+
+[Author: L<IMACAT|https://metacpan.org/author/IMACAT>; Date: C<2019-09-16>; Version: C<1.30>]
+
+
+
+
+=item L<Locale::XGettext>
+
+
+[⭐ Author: L<GUIDO|https://metacpan.org/author/GUIDO>; Date: C<2018-11-04>; Version: C<0.7>]
+
+
+
+
+=item L<qbit::GetText>
+
+
+[Author: L<MADSKILL|https://metacpan.org/author/MADSKILL>; Date: C<2018-11-05>; Version: C<2.8>]
+
+
+
+=back
+
+=head3 Other formats and ideas
+
+=over
+
+
+=item L<Lingua::String>
+
+
+[Author: L<NHORNE|https://metacpan.org/author/NHORNE>; Date: C<2021-01-24>; Version: C<0.02>]
+
+
+
+Strings which come out in different languages depending on the
+environment.
+
+
+=item L<Locale::Country::Multilingual>
+
+
+[⭐ Author: L<OSCHWALD|https://metacpan.org/author/OSCHWALD>; Date: C<2014-08-22>; Version: C<0.25>]
+
+
+
+This does something like L</get_lang_name> in this module, but more
+comprehensively.
+
+
+=item L<MetaTrans>
+
+
+[Author: L<SKIM|https://metacpan.org/author/SKIM>; Date: C<2009-09-06>; Version: C<1.05>]
+
+
+
+"Class for creating multilingual meta-translators"
+
+
+=item L<Pangloss>
+
+
+[⭐ Author: L<SPURKIS|https://metacpan.org/author/SPURKIS>; Date: C<2004-06-03>; Version: C<0.06>]
+
+
+
+"A multilingual web-based glossary." There's a huge amount of code
+here, but the last update was in 2004.
+
+
+=item L<XML::TMX>
+
+
+[⭐ Author: L<AMBS|https://metacpan.org/author/AMBS>; Date: C<2017-09-07>; Version: C<0.36>]
+
+
+
+This module supports the TMX (Translation Memory eXchange) format,
+which is XML.
+
+=back
+
+=head2 Other
+
+=over
+
+=item OmegaT
+
+L<OmegaT|https://en.wikipedia.org/wiki/OmegaT> (link to Wikipedia) is
+a free-software translation system in Java which supports Gettext and
+TMX.
+
+=item Trados
+
+L<Trados|https://en.wikipedia.org/wiki/SDL_Trados_Studio> (link to
+Wikipedia) is the most popular commercial translation memory software.
+
+=back
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2008-2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

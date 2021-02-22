@@ -13,3 +13,4 @@ lib/Catmandu/Importer/HOCR.pm
 t/author-pod-syntax.t
 t/catmandu-importer-hocr.t
 t/html/ossa.html
+t/html/strong.html

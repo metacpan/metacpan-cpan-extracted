@@ -13,7 +13,7 @@ use App::Followme::Web;
 
 use base qw(App::Followme::ConfiguredObject);
 
-our $VERSION = "1.96";
+our $VERSION = "1.97";
 
 use constant COMMAND_START => '<!-- ';
 use constant COMMAND_END => '-->';

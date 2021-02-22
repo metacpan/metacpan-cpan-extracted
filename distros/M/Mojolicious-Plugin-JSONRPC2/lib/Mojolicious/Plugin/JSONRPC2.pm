@@ -3,7 +3,7 @@ package Mojolicious::Plugin::JSONRPC2;
 use Mojo::Base 'Mojolicious::Plugin';
 use Carp;
 
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.3';
 
 use JSON::XS;
 # to ensure callback runs on notification
@@ -87,7 +87,7 @@ Mojolicious::Plugin::JSONRPC2 - JSON-RPC 2.0 over HTTP
 
 =head1 VERSION
 
-This document describes Mojolicious::Plugin::JSONRPC2 version v2.0.1
+This document describes Mojolicious::Plugin::JSONRPC2 version v2.0.3
 
 
 =head1 SYNOPSIS
@@ -102,7 +102,7 @@ This document describes Mojolicious::Plugin::JSONRPC2 version v2.0.1
         my $server = JSON::RPC2::Server->new();
 
         $r->jsonrpc2('/rpc', $server);
-        $r->jsonrpc2_get('/rpc', $server)->over(
+        $r->jsonrpc2_get('/rpc', $server)->requires(
             headers => { $app->jsonrpc2_headers }
         );
 
@@ -154,14 +154,14 @@ closures).
 
 =head2 jsonrpc2_headers
 
-    $app->routes->over(headers => { $app->jsonrpc2_headers });
+    $app->routes->requires(headers => { $app->jsonrpc2_headers });
 
 You can use this condition to distinguish between JSON-RPC 2.0 and other
 request types on same C<$path> - for example if you want to serve web page
 and RPC on same url you can do this:
 
     my $r = $app->routes;
-    $r->jsonrpc2_get('/', $server)->over(headers=>{$app->jsonrpc2_headers});
+    $r->jsonrpc2_get('/', $server)->requires(headers=>{$app->jsonrpc2_headers});
     $r->get('/')->to('controller#action');
 
 If you don't use this condition and plugin's handler will get request with

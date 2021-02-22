@@ -1,5 +1,5 @@
 package Util::Medley::Cache;
-$Util::Medley::Cache::VERSION = '0.055';
+$Util::Medley::Cache::VERSION = '0.058';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -19,7 +19,7 @@ Util::Medley::Cache - Simple caching mechanism.
 
 =head1 VERSION
 
-version 0.055
+version 0.058
 
 =cut
 
@@ -301,7 +301,7 @@ multi method delete (Str :$key!,
                		 Str :$ns) {
 
 	$self->_l1Delete(@_) if $self->l1Enabled;
-	$self->_l2Delete(@_) if $self->l1Enabled;
+	$self->_l2Delete(@_) if $self->l2Enabled;
 
 	return 1;
 }

@@ -23,7 +23,6 @@
          "xt"
       ],
       "file" : [
-         "README.solaris",
          "lib/MarpaX/ESLIF/Value/Type.pm"
       ]
    },
@@ -90,10 +89,8 @@
             "JSON::MaybeXS" : "1.004000",
             "Math::BigFloat" : "0",
             "Math::BigInt" : "0",
-            "Moo" : "0",
             "XSLoader" : "0",
             "constant" : "0",
-            "namespace::autoclean" : "0",
             "namespace::clean" : "0",
             "overload" : "0",
             "parent" : "0",
@@ -108,6 +105,7 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "Data::Dumper" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
@@ -136,94 +134,93 @@
    "provides" : {
       "MarpaX::ESLIF" : {
          "file" : "lib/MarpaX/ESLIF.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Base" : {
          "file" : "lib/MarpaX/ESLIF/Base.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Event::Type" : {
          "file" : "lib/MarpaX/ESLIF/Event/Type.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Grammar" : {
          "file" : "lib/MarpaX/ESLIF/Grammar.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Grammar::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Properties.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Grammar::Rule::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Rule/Properties.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Grammar::Symbol::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Symbol/Properties.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::JSON" : {
          "file" : "lib/MarpaX/ESLIF/JSON.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::JSON::Decoder" : {
          "file" : "lib/MarpaX/ESLIF/JSON/Decoder.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::JSON::Decoder::RecognizerInterface" : {
          "file" : "lib/MarpaX/ESLIF/JSON/Decoder/RecognizerInterface.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::JSON::Encoder" : {
          "file" : "lib/MarpaX/ESLIF/JSON/Encoder.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Logger::Level" : {
          "file" : "lib/MarpaX/ESLIF/Logger/Level.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Recognizer" : {
          "file" : "lib/MarpaX/ESLIF/Recognizer.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::RegexCallout" : {
          "file" : "lib/MarpaX/ESLIF/RegexCallout.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Rule::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Rule/PropertyBitSet.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::String" : {
          "file" : "lib/MarpaX/ESLIF/String.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Symbol" : {
          "file" : "lib/MarpaX/ESLIF/Symbol.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Symbol::EventBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/EventBitSet.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Symbol::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/PropertyBitSet.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Symbol::Type" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/Type.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       },
       "MarpaX::ESLIF::Value" : {
          "file" : "lib/MarpaX/ESLIF/Value.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.7"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-MarpaX-ESLIF@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-ESLIF"
+         "web" : "https://github.com/jddurand/c-marpaeslif/issues"
       },
       "homepage" : "https://metacpan.org/release/MarpaX-ESLIF",
       "repository" : {
@@ -232,7 +229,7 @@
          "web" : "https://github.com/jddurand/c-marpaeslif"
       }
    },
-   "version" : "4.0.1",
+   "version" : "5.0.7",
    "x_authority" : "cpan:JDDPAUSE",
    "x_contributors" : [
       "Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>"

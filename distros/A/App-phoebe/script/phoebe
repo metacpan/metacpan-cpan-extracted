@@ -329,6 +329,8 @@ Basically, this is the template for our service:
     Restart=always
     User=phoebe
     Group=phoebe
+    MemoryMax=100M
+    MemoryHigh=90M
     [Install]
     WantedBy=multi-user.target
 
@@ -541,6 +543,8 @@ Here's what my F<phoebe.service> file actually looks like:
     Restart=always
     User=alex
     Group=ssl-cert
+    MemoryMax=100M
+    MemoryHigh=90M
     ExecStart=/home/alex/src/phoebe/script/phoebe \
      --port=1965 \
      --log_level=debug \
@@ -619,18 +623,19 @@ L<https://en.wikipedia.org/wiki/Robots_exclusion_standard>
 Here's my suggestion:
 
     User-agent: *
-    Disallow: /raw/*
-    Disallow: /html/*
-    Disallow: /diff/*
-    Disallow: /history/*
-    Disallow: /do/changes*
-    Disallow: /do/all/changes*
-    Disallow: /do/all/latest/changes*
+    Disallow: /raw
+    Disallow: /html
+    Disallow: /diff
+    Disallow: /history
+    Disallow: /do/comment
+    Disallow: /do/changes
+    Disallow: /do/all/changes
+    Disallow: /do/all/latest/changes
     Disallow: /do/rss
     Disallow: /do/atom
     Disallow: /do/all/atom
     Disallow: /do/new
-    Disallow: /do/more/*
+    Disallow: /do/more
     Disallow: /do/match
     Disallow: /do/search
     # allowing do/index!
@@ -1032,7 +1037,7 @@ use File::Slurper qw(read_text read_binary read_lines read_dir write_text write_
 use Encode qw(encode_utf8 decode_utf8 decode);
 use Net::IDN::Encode qw(domain_to_ascii);
 use Socket qw(:addrinfo SOCK_RAW);
-use List::Util qw(first min);
+use List::Util qw(first min any);
 use Modern::Perl '2018';
 use File::ReadBackwards;
 use IO::Socket::SSL;
@@ -1168,11 +1173,6 @@ sub verify_fingerprint {
   return 1;
 }
 
-# the default is to request client certificates and then to simply accept them
-IO::Socket::SSL::set_defaults(
-  SSL_verify_mode => SSL_VERIFY_PEER,
-  SSL_verify_callback => \&verify_fingerprint);;
-
 # defaults
 $server->{port} ||= [1965];
 $server->{wiki_token} ||= ['hello'];
@@ -1209,14 +1209,24 @@ $SIG{HUP} = sub { Mojo::IOLoop->next_tick(\&configure) };
 # servers for both IPv4 and IPv6…
 for my $host (keys %{$server->{host}}) {
   for my $address (get_ip_numbers($host)) {
+    $server->{address}->{$address} = $host;
     for my $port (@{$server->{port}}) {
-      $log->info("Listening on $address:$port");
+      $log->info("$host: listening on $address:$port");
       Mojo::IOLoop->server({
 	address => $address,
 	port => $port,
 	tls => 1,
 	tls_cert => $server->{cert_file},
 	tls_key  => $server->{key_file},
+	tls_options => {
+	  # request client certificates and accept them
+	  SSL_verify_mode => SSL_VERIFY_PEER,
+	  SSL_verify_callback => \&verify_fingerprint,
+	  SSL_create_ctx_callback => sub {
+	    my $ctx = shift;
+	    Net::SSLeay::CTX_sess_set_cache_size($ctx, 64);
+	  }
+	}
       } => sub {
 	my ($loop, $stream) = @_;
 	my $data = { buffer => '', handler => \&handle_request };
@@ -1224,7 +1234,7 @@ for my $host (keys %{$server->{host}}) {
 	  my ($stream, $bytes) = @_;
 	  $log->debug("Received " . length($bytes) . " bytes");
 	  $data->{buffer} .= $bytes;
-	  $data->{handler}->($stream, $data) })});
+	  $data->{handler}->($stream, $data) }) });
     }
   }
 }
@@ -1567,6 +1577,8 @@ sub blog {
     print_link($stream, $host, $space, $id);
   }
   print_link($stream, $host, $space, "More...", "do/more/" . ($n * 10)) if @blog > $n;
+  print_link($stream, $host, $space, "Atom Feed", "do/blog/atom") if $n == 10;
+  print_link($stream, $host, $space, "RSS Feed", "do/blog/rss") if $n == 10;
   $stream->write("\n");
 }
 
@@ -1697,7 +1709,7 @@ sub serve_blog {
   $stream->write("# Blog\n");
   my @blog = blog_pages($host, $space);
   if (not @blog) {
-    $stream->write("The are no blog pages.\n");
+    $stream->write("There are no blog pages.\n");
     return;
   }
   $stream->write("Serving up to $n entries.\n");
@@ -1715,7 +1727,7 @@ sub serve_index {
   $log->info("Serving index of all pages");
   $stream->write("# All Pages\n");
   my @pages = pages($host, $space);
-  $stream->write("The are no pages.\n") unless @pages;
+  $stream->write("There are no pages.\n") unless @pages;
   for my $id (sort { newest_first($stream, $a, $b) } @pages) {
     print_link($stream, $host, $space, $id);
   }
@@ -1975,9 +1987,9 @@ sub serve_changes {
   $log->info("Serving $n changes");
   success($stream);
   $stream->write("# Changes\n");
-  if (not $style) { print_link($stream, $host, undef, "Colour changes", "do/changes/$n/colour") }
-  elsif ($style eq "colour") { print_link($stream, $host, undef, "Fancy changes", "do/changes/$n/fancy") }
-  elsif ($style eq "fancy") { print_link($stream, $host, undef, "Normal changes", "do/changes/$n") }
+  if (not $style) { print_link($stream, $host, $space, "Colour changes", "do/changes/$n/colour") }
+  elsif ($style eq "colour") { print_link($stream, $host, $space, "Fancy changes", "do/changes/$n/fancy") }
+  elsif ($style eq "fancy") { print_link($stream, $host, $space, "Normal changes", "do/changes/$n") }
   print_link($stream, $host, undef, "Changes for all spaces", "do/all/changes")
       if @{$server->{wiki_space}};
   print_link($stream, $host, $space, "Atom Feed", "do/atom");
@@ -2141,6 +2153,7 @@ sub all_logs {
   my $stream = shift;
   my $host = shift;
   my $n = shift;
+  my $filter = shift;
   # merge all logs
   my @log;
   my $dir = $server->{wiki_dir};
@@ -2153,9 +2166,9 @@ sub all_logs {
     $log->debug("Reading $changes");
     next unless my $fh = File::ReadBackwards->new($changes);
     if (keys %{$server->{host}} > 1) {
-      push(@log, @{read_log($stream, $fh, $n, split(/\//, $space, 2))});
+      push(@log, @{read_log($stream, $fh, $n, split(/\//, $space, 2), $filter)});
     } else {
-      push(@log, @{read_log($stream, $fh, $n, $host, $space)});
+      push(@log, @{read_log($stream, $fh, $n, $host, $space, $filter)});
     }
   }
   @log = sort { $b->[0] <=> $a->[0] } @log;
@@ -2168,11 +2181,13 @@ sub read_log {
   my $n = shift;
   my $host = shift;
   my $space = shift;
+  my $filter = shift;
   my @changes;
   for (1 .. $n) {
     $_ = decode_utf8($fh->readline);
     # $_ can be undefined or a newline (which won't split)
     last unless $_ and $_ ne "\n";
+    next if $filter and not /$filter/;
     chomp;
     push(@changes, [split(/\x1f/), $host, $space]);
   }
@@ -2386,6 +2401,73 @@ sub rss {
   $stream->write("</rss>\n");
 }
 
+sub serve_blog_rss {
+  my $stream = shift;
+  my $host = shift;
+  my $space = shift;
+  $log->info("Serving Gemini Blog RSS");
+  success($stream, "application/rss+xml");
+  blog_rss($stream, $host, $space, 'gemini');
+}
+
+sub blog_rss {
+  my $stream = shift;
+  my $host = shift;
+  my $space = shift;
+  my $scheme = shift;
+  my $name = $server->{wiki_main_page} || "Phoebe";
+  my $port = port($stream);
+  $stream->write("<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n");
+  $stream->write("<channel>\n");
+  $stream->write(encode_utf8 "<title>" . quote_html($name) . "</title>\n");
+  $stream->write("<description>Blog pages on this wiki.</description>\n");
+  $stream->write("<link>$scheme://$host:$port/</link>\n");
+  $stream->write("<atom:link rel=\"self\" type=\"application/rss+xml\" href=\"$scheme://$host:$port/do/blog/rss\" />\n");
+  $stream->write("<generator>Phoebe</generator>\n");
+  $stream->write("<docs>http://blogs.law.harvard.edu/tech/rss</docs>\n");
+  my $dir = wiki_dir($host, $space);
+  my @blog = blog_pages($host, $space);
+  my $ts = changes_for($host, $space, @blog);
+  # hard coded: 10 pages blog RSS, no pagination
+  for my $id (@blog[0 .. min($#blog, 9)]) {
+    $stream->write("<item>\n");
+    $stream->write(encode_utf8 "<title>" . quote_html($id) . "</title>\n");
+    my $link = to_url($stream, $host, $space, "page/$id", $scheme);
+    $stream->write("<link>$link</link>\n");
+    $stream->write("<guid>$link</guid>\n");
+    $stream->write(encode_utf8 "<description>" . quote_html(text($host, $space, $id)) . "</description>\n");
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday) = gmtime($ts->{$id}); # Sat, 07 Sep 2002 00:00:01 GMT
+    $stream->write("<pubDate>"
+		   . sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT", qw(Sun Mon Tue Wed Thu Fri Sat)[$wday], $mday,
+			     qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)[$mon], $year + 1900, $hour, $min, $sec)
+		   . "</pubDate>\n");
+    $stream->write("</item>\n");
+  }
+  $stream->write("</channel>\n");
+  $stream->write("</rss>\n");
+}
+
+sub changes_for {
+  my $host = shift;
+  my $space = shift;
+  my @ids = @_;
+  my %result;
+  my $dir = wiki_dir($host, $space);
+  my $log = "$dir/changes.log";
+  if (-e $log and my $fh = File::ReadBackwards->new($log)) {
+    while (@ids) {
+      last unless $_ = decode_utf8($fh->readline);
+      chomp;
+      my ($ts, $id, $revision, $code) = split(/\x1f/);
+      if (any { $_ eq $id } @ids) {
+	@ids = grep { $_ ne $id } @ids;
+	$result{$id} = $ts;
+      }
+    }
+  }
+  return \%result;
+}
+
 sub serve_atom {
   my $stream = shift;
   my $host = shift;
@@ -2470,7 +2552,6 @@ sub atom {
   for (1 .. 100) {
     my ($ts, $id, $revision, $code, $host, $space, $show_space) = $next->();
     last unless $ts and $id;
-    $feed_ts = $ts if $ts gt $feed_ts;
     my $name = name($stream, $id, $host, $space, $show_space);
     if ($revision eq "🖹") {
       next if $seen{$name};
@@ -2505,10 +2586,57 @@ sub atom {
       $seen{$name . "\x1c"} = 1;
     }
     my ($sec, $min, $hour, $mday, $mon, $year) = gmtime($ts); # 2003-12-13T18:30:02Z
-    $stream->write("<updated>"
-		   . sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ", $year + 1900, $mon + 1, $mday, $hour, $min, $sec)
-		   . "</updated>\n");
+    $ts = sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ", $year + 1900, $mon + 1, $mday, $hour, $min, $sec);
+    $stream->write("<updated>$ts</updated>\n");
+    $feed_ts = $ts if $ts gt $feed_ts;
     $stream->write("<author><name>$code</name></author>\n");
+    $stream->write("</entry>\n");
+  }
+  $stream->write("<updated>$feed_ts</updated>\n");
+  $stream->write("</feed>\n");
+}
+
+sub serve_blog_atom {
+  my $stream = shift;
+  my $host = shift;
+  my $space = shift;
+  $log->info("Serving Gemini Blog Atom");
+  success($stream, "application/atom+xml");
+  blog_atom($stream, $host, $space, 'gemini');
+}
+
+sub blog_atom {
+  my $stream = shift;
+  my $host = shift;
+  my $space = shift;
+  my $scheme = shift;
+  my $name = $server->{wiki_main_page} || "Phoebe";
+  my $port = port($stream);
+  $stream->write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+  $stream->write("<feed xmlns=\"http://www.w3.org/2005/Atom\">\n");
+  $stream->write(encode_utf8 "<title>" . quote_html($name) . "</title>\n");
+  my $link = to_url($stream, $host, $space, "", $scheme);
+  $stream->write("<link href=\"$link\"/>\n");
+  $link = to_url($stream, $host, $space, "do/blog/atom", $scheme);
+  $stream->write("<link rel=\"self\" type=\"application/atom+xml\" href=\"$link\"/>\n");
+  $stream->write("<id>$link</id>\n");
+  my $feed_ts = "0001-01-01T00:00:00Z";
+  $stream->write("<generator uri=\"https://alexschroeder.ch/cgit/phoebe/about/\" version=\"1.0\">Phoebe</generator>\n");
+  my $dir = wiki_dir($host, $space);
+  my @blog = blog_pages($host, $space);
+  my $changes = changes_for($host, $space, @blog);
+  # hard coded: 10 pages blog ATOM, no pagination
+  for my $id (@blog[0 .. min($#blog, 9)]) {
+    $stream->write("<entry>\n");
+    $stream->write(encode_utf8 "<title>" . quote_html($id) . "</title>\n");
+    my $link = to_url($stream, $host, $space, "page/$id", $scheme);
+    $stream->write("<link href=\"$link\"/>\n");
+    $stream->write("<id>$link</id>\n");
+    $stream->write(encode_utf8 "<content type=\"text\">" . quote_html(text($host, $space, $id)) . "</content>\n");
+    my ($sec, $min, $hour, $mday, $mon, $year) = gmtime($changes->{$id}); # 2003-12-13T18:30:02Z
+    my $ts = sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ", $year + 1900, $mon + 1, $mday, $hour, $min, $sec);
+    $stream->write("<updated>$ts</updated>\n");
+    $feed_ts = $ts if $ts gt $feed_ts;
     $stream->write("</entry>\n");
   }
   $stream->write("<updated>$feed_ts</updated>\n");
@@ -2910,15 +3038,18 @@ sub text {
 sub robots () {
   my $ban = << 'EOT';
 User-agent: *
-Disallow: /raw/*
-Disallow: /html/*
-Disallow: /diff/*
-Disallow: /history/*
-Disallow: /do/changes*
-Disallow: /do/all/changes*
-Disallow: /do/all/latest/changes*
+Disallow: /raw
+Disallow: /html
+Disallow: /diff
+Disallow: /history
+Disallow: /do/comment
+Disallow: /do/changes
+Disallow: /do/all/changes
+Disallow: /do/all/latest/changes
 Disallow: /do/rss
+Disallow: /do/blog/rss
 Disallow: /do/atom
+Disallow: /do/blog/atom
 Disallow: /do/all/atom
 Disallow: /do/new
 Disallow: /do/more
@@ -3626,8 +3757,12 @@ sub process_gemini {
       serve_all_changes($stream, $host, $n||100, $style||"", $filter||"");
     } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/rss$!) {
       serve_rss($stream, $host, space($stream, $host, $space));
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/blog/rss$!) {
+      serve_blog_rss($stream, $host, space($stream, $host, $space));
     } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/atom$!) {
       serve_atom($stream, $host, space($stream, $host, $space));
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/blog/atom$!) {
+      serve_blog_atom($stream, $host);
     } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/all/atom$!) {
       serve_all_atom($stream, $host);
     } elsif (($host) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?/robots.txt(?:[#?].*)?$!) {

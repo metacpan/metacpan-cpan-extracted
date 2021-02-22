@@ -57,7 +57,7 @@ srtscale - Speed up or slow down times in .srt by a factor
 
 =head1 VERSION
 
-This document describes version 0.004 of srtscale (from Perl distribution App-SubtitleUtils), released on 2021-01-08.
+This document describes version 0.005 of srtscale (from Perl distribution App-SubtitleUtils), released on 2021-01-08.
 
 =head1 SYNOPSIS
 

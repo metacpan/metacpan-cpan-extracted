@@ -33,9 +33,12 @@ eIJDW3VGxfgc
         </ds:X509Data>
       </ds:KeyInfo>
     </KeyDescriptor>
-    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
-    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
+    <!-- NameIDFormat defaults to urn:oasis:names:tc:SAML:2.0:nameid-format:persistent -->
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
                               index="0"
+                              Location="https://www.example.govt.nz/app/sample/login-acs" />
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
+                              index="1"
                               isDefault="true"
                               Location="https://www.example.govt.nz/app/sample/login-acs" />
   </SPSSODescriptor>

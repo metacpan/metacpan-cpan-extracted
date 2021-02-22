@@ -1,31 +1,20 @@
 use strict;
 use warnings FATAL => 'all';
 
-package MarpaX::ESLIF::String;
-    
 #
 # Based on BSON::String v1.10.2
 #
+package MarpaX::ESLIF::String;
+use Carp qw/croak/;
 
 # ABSTRACT: ESLIF String is any string value with encoding attribute
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-
-use namespace::autoclean;
-use Encode qw//;
-use Carp qw/croak/;
-use Moo;
-
-our $VERSION = '4.0.1'; # VERSION
+our $VERSION = '5.0.7'; # VERSION
 
 
-has 'value' => ( is => 'ro' );
-
-
-has 'encoding' => ( is => 'ro' );
-
-sub BUILDARGS {
+sub new {
     my ($class, $value, $encoding) = @_;
 
     croak 'Undefined value' unless defined($value);
@@ -34,7 +23,25 @@ sub BUILDARGS {
     $value = "$value"; # Make sure it is a PV
     $encoding = "$encoding"; # Make sure it is a PV
 
-    return {value => $value, encoding => $encoding}
+    #
+    # We TRUST the encoding. If user lies, behaviour will be undetermined.
+    #
+    my $lcEncoding = lc($encoding);
+    if ($lcEncoding eq 'utf8' || $lcEncoding eq 'utf-8') {
+        utf8::upgrade($value)
+    }
+
+    return bless {value => $value, encoding => $encoding}, $class
+}
+
+sub encoding {
+    # my ($self) = @_;
+    return $_[0]->{encoding} # For performance
+}
+
+sub value {
+    # my ($self) = @_;
+    return $_[0]->{value} # For performance
 }
 
 use overload (
@@ -78,7 +85,7 @@ MarpaX::ESLIF::String - ESLIF String is any string value with encoding attribute
 
 =head1 VERSION
 
-version 4.0.1
+version 5.0.7
 
 =head1 DESCRIPTION
 
@@ -106,7 +113,7 @@ Returns the associated encoding.
 
 =head1 SEE ALSO
 
-L<MarpaX::ESLIF>, L<Encode>
+L<MarpaX::ESLIF>
 
 =head1 AUTHOR
 

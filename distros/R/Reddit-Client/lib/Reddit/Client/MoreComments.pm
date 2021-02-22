@@ -33,3 +33,16 @@ sub get_collapsed_comments {
 
 __END__
 
+=pod
+
+  get_collapsed_commnts in Client.pm
+
+C<link_id> is the ID of the link the comments are under. 
+
+C<children> is a reference to an array containing the comment IDs. 
+
+If C<limit_children> is true, return only the requested comments, not replies to them. Otherwise return as many replies as possible (possibly resulting in more MoreComments objects down the line).
+
+C<sort> is one of 'confidence', 'top', 'new', 'controversial', 'old', 'random', 'qa', 'live'. Default seems to be 'confidence'.
+
+=cut

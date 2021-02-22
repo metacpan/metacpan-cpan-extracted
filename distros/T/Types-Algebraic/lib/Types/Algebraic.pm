@@ -3,15 +3,46 @@ package Types::Algebraic;
 use strict;
 use 5.022;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
+use Carp qw(croak confess);
+use Data::Dumper;
 use List::Util qw(all);
-use List::MoreUtils qw(pairwise);
+use List::MoreUtils qw(pairwise zip_unflatten);
 use Keyword::Declare;
+use Keyword::Simple;
 use Moops;
 use PPR;
+use Scalar::Util qw(blessed);
 
 our $_RETURN_SENTINEL = \23;
+
+our %_KNOWN_CONSTRUCTORS;
+
+my ($expected, $fail_loc) = ('match statement', 0);
+our $_TA_REGEX_LIB = qr{
+    (?(DEFINE)
+        (?<ADTPattern>
+            \( (?&PerlOWS)
+               (?{ $expected = "the name of a constructor", $fail_loc = pos() })
+               (?&PerlIdentifier)                        # constructor
+               (?{ $expected = "zero or more constructor arguments", $fail_loc = pos() })
+               (?:(?&PerlNWS) (?&ADTPatternSegment))*    # 0 or more arguments
+               (?&PerlOWS)
+            \)
+        )
+
+        (?<ADTPatternSegment>
+            (?:
+                \$ (?&PerlIdentifier) |   # variable
+                   (?&PerlIdentifier) |   # constuctor without arguments
+                   (?&ADTPattern)         # constructor with arguments - requires parentheses
+            )
+        )
+    )
+
+    $PPR::GRAMMAR
+}xms;
 
 class ADT {
     has tag => (is => "ro", isa => Str);
@@ -41,42 +72,148 @@ class ADT {
         '""' => \&_stringify;
 }
 
-keytype ADTMatch is /
-    (?:
-        with (?&PerlNWS) \( (?&PerlOWS) (?<tag>(?&PerlIdentifier)) (?<identifiers> (?: (?&PerlNWS) \$ (?&PerlIdentifier) )* ) (?&PerlOWS) \) |
-        default
-    ) (?&PerlOWS) (?<block> (?&PerlBlock) ) (?&PerlOWS)
+sub _apply_pattern {
+    my ($value, $pattern) = @_;
 
-/x;
+    if ($pattern->{type} eq 'variable') {
+        return (1, [$value]);
+    }
+
+    return 0 unless $value && blessed($value) && $value->isa('Types::Algebraic::ADT');
+
+    return 0 unless $pattern->{constructor} eq $value->tag;
+
+    my @variables;
+    for my $pair (List::MoreUtils::zip_unflatten(@{$value->values}, @{$pattern->{arguments}})) {
+        my ($rv, $new_vars) = _apply_pattern(@$pair);
+        return 0 unless $rv;
+        push(@variables, @$new_vars);
+    }
+
+    return (1, \@variables);
+}
 
 keytype ADTConstructor is / (?<tag> (?&PerlIdentifier)) (?<fields> (?: (?&PerlNWS) : (?&PerlIdentifier) )* ) /x;
+
+sub _verify_constructor {
+    my ($constructor, $arity) = @_;
+    my $info = $_KNOWN_CONSTRUCTORS{$constructor};
+
+    confess("Unknown constructor '$constructor'. Pattern matching requires types created through Types::Algebraic.")
+        unless $info;
+
+    confess("Constructor '$constructor' expects $info->{arg_count} arguments - but is pattern matched with $arity.")
+        unless $info->{arg_count} == $arity;
+
+}
+
+sub _parse_pattern {
+    my ($pattern) = @_;
+    $pattern =~ m{
+        \A
+        \(
+           (?&PerlOWS)
+           (?<tag>(?&PerlIdentifier))
+           (?<identifiers> (?:(?&PerlNWS) (?&ADTPatternSegment))* )
+           (?&PerlOWS)
+        \)
+        $Types::Algebraic::_TA_REGEX_LIB
+    }xms;
+    my ($tag, $idents) = @+{qw(tag identifiers)};
+
+    my @segments;
+    my @variables;
+    while ($idents =~ m/(?&PerlNWS) (?<segment>(?&ADTPatternSegment)) $Types::Algebraic::_TA_REGEX_LIB/xmsg) {
+        my $segment = $+{segment};
+
+        if ($segment =~ m/^\$/) {
+            push(@segments, { type => 'variable', value => $segment });
+            push(@variables, $segment);
+        } elsif ($segment =~ m/^\(/) {
+            my ($parsed, $new_vars) = _parse_pattern($segment);
+            push(@segments, $parsed);
+            push(@variables, @$new_vars);
+        } else {
+            _verify_constructor($segment, 0);
+
+            push(@segments, { type => 'pattern', constructor => $segment, arguments => [] });
+        }
+    }
+
+    _verify_constructor($tag, scalar @segments);
+
+    return ({ type => 'pattern', constructor => $tag, arguments => \@segments }, \@variables);
+}
 
 sub import {
     Moops->import;
 
-    keyword match (ParenthesesList $v, '{', ADTMatch* @body, '}') {
+    Keyword::Simple::define 'match', sub {
+        my ($doc_src) = @_;
+
+        ($expected, $fail_loc) = ('match statement', 0);
+        my $curly_open = '{';
+
+        $$doc_src =~ s{
+            \A
+            (?&PerlNWS)
+            (?{ $expected = "parenthesized expression", $fail_loc = pos() })
+            (?<matched_expression> (?&PerlParenthesesList) )
+            (?&PerlNWS)
+            (?{ $expected = "a '$curly_open'", $fail_loc = pos() })
+            \{ (?&PerlOWS)
+
+            $Types::Algebraic::_TA_REGEX_LIB
+        }{}xms or croak("Invalid match statement.\nExpected: $expected\nFound: ", substr($$doc_src, $fail_loc) =~ /(\S+)/,"\n");
+
+        my $expr = $+{matched_expression};
+
         my $res = "{\n";
-        my $match_body = $v . "->match(\n";
-        for my $case (@body) {
-            my $tag = $case->{tag};
-            my $idents = $case->{identifiers};
+        my $match_body = $expr . "->match(\n";
 
-            my @idents;
-            while ($idents =~ m/ (?&PerlNWS) (?<ident> \$ (?&PerlIdentifier) $PPR::GRAMMAR )/xg ) {
-                push(@idents, $+{ident});
-            }
+        while ($$doc_src =~ m/^(?:with|default)/) {
+            $$doc_src =~ s{
+                \A
+                (?{ $expected = "a with or default statement", $fail_loc = pos() })
+                (?:
+                    with (?&PerlNWS)
+                    (?{ $expected = "a match pattern", $fail_loc = pos() })
+                        (?<with_pattern> (?&ADTPattern))
+                    |
+                    (?<default> default)
+                ) (?&PerlOWS)
+                (?{ $expected = "a code block", $fail_loc = pos() })
+                (?<block> (?&PerlBlock) ) (?&PerlOWS)
 
-            my $count = scalar @idents;
-            my $args = join(", ", @idents);
-            my $block = $case->{block};
+                $Types::Algebraic::_TA_REGEX_LIB
+            }{}xms or croak("Invalid match statement.\nExpected: $expected\nFound: ", substr($$doc_src, $fail_loc) =~ /(\S+)/,"\n");
 
-            if ($tag) {
-                $match_body .= "[ '$tag', $count, sub { my ($args) = \@_; $block; return \$Types::Algebraic::_RETURN_SENTINEL; } ],\n";
-            } else {
+            my ($default, $pattern, $block) = @+{qw(default with_pattern block)};
+
+            if ($default) {
                 $match_body .= "[ sub { $block; return \$Types::Algebraic::_RETURN_SENTINEL; } ],\n";
+            } else {
+                my ($parsed, $variables) = _parse_pattern($pattern);
+
+                local $Data::Dumper::Indent = 0;
+                local $Data::Dumper::Terse = 1;
+
+                my $flattened_pattern = Data::Dumper::Dumper($parsed);
+                my $args = join(',', @$variables);
+
+                $match_body .= "[$flattened_pattern, sub { my ($args) = \@_; $block; return \$Types::Algebraic::_RETURN_SENTINEL; } ],\n";
             }
         }
-        $match_body .= ");\n";
+        $match_body .= ")";
+
+        my $curly_close = '}';
+        $$doc_src =~ s{
+            \A
+            (?{ $expected = "a '$curly_close'", $fail_loc = pos() })
+            \}
+
+            $Types::Algebraic::_TA_REGEX_LIB
+        }{}xms or croak("Invalid match statement.\nExpected: $expected\nFound: ", substr($$doc_src, $fail_loc) =~ /(\S+)/,"\n");
 
         $res .= <<"EOF";
     if (wantarray) {
@@ -88,8 +225,9 @@ sub import {
     }
 EOF
         $res .= "}\n";
-        return $res;
-    }
+        #say STDERR "\n\n\n$res\n\n-----\n";
+        $$doc_src = $res . $$doc_src;
+    };
 
     keyword data (Ident $name, '=', ADTConstructor* @constructors :sep(/\|/)) {
         my %ARGS;
@@ -102,6 +240,11 @@ EOF
             }
 
             $ARGS{$tag} = scalar @args;
+
+            $_KNOWN_CONSTRUCTORS{$tag} = {
+                typename  => $name,
+                arg_count => scalar @args,
+            };
         }
 
         my $args_str = join(", ", map { "$_ => $ARGS{$_}" } keys %ARGS);
@@ -124,12 +267,11 @@ CODE
     sub match {
         my $self = shift;
         for my $case (@_) {
-            if (@$case == 3) {
-                my ($tag, $argc, $f) = @$case;
-                confess("$tag requires $ARGS{$tag} arguments - pattern uses $argc") unless $ARGS{$tag} == $argc;
-                if ($tag eq $self->tag) {
-                    return $f->(@{ $self->values });
-                }
+            if (@$case == 2) {
+                my ($pattern, $f) = @$case;
+
+                my ($matches, $values) = Types::Algebraic::_apply_pattern($self, $pattern);
+                return $f->(@$values) if $matches;
             }
             # default
             if (@$case == 1) {
@@ -147,6 +289,8 @@ CODE
 
         }
 
+        #say STDERR $res;
+
         return $res;
     }
 
@@ -154,7 +298,7 @@ CODE
 
 sub unimport {
     unkeyword data;
-    unkeyword match;
+    Keyword::Simple::undefine 'match';
 }
 
 1;
@@ -225,6 +369,27 @@ You can also create a default fallback case, which will always run if reached.
   match ($color) {
       with (Red) { say "Yay, you picked my favorite color!"; }
       default    { say "Bah. You clearly have no taste."; }
+  }
+
+=head2 Nested patterns
+
+Note, patterns can be nested, allowing for more complex unpacking:
+
+  data PairingHeap = Empty | Heap :head :subheaps;
+  data Pair = Pair :left :right;
+
+  # Merge two pairing heaps (https://en.wikipedia.org/wiki/Pairing_heap)
+  sub merge {
+      my ($h1, $h2) = @_;
+
+      match (Pair($h1, $h2)) {
+          with (Pair Empty $h) { return $h; }
+          with (Pair $h Empty) { return $h; }
+          with (Pair (Heap $e1 $s1) (Heap $e2 $s2)) {
+              return $e1 < $e2 ? Heap($e1, [$h2, @$s1])
+                               : Heap($e2, [$h1, @$s2]);
+          }
+      }
   }
 
 =head1 LIMITATIONS

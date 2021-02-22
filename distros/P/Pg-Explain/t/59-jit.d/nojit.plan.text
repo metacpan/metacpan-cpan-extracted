@@ -1,0 +1,4 @@
+Aggregate  (cost=18.26..18.27 rows=1 width=8) (actual time=0.297..0.299 rows=1 loops=1)
+  ->  Seq Scan on pg_class  (cost=0.00..17.21 rows=421 width=0) (actual time=0.014..0.218 rows=416 loops=1)
+Planning Time: 1.018 ms
+Execution Time: 0.651 ms

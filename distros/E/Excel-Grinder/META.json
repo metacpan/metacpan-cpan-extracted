@@ -1,0 +1,81 @@
+{
+   "abstract" : "Import/export plain Excel (XLSX) files as simply as possible.",
+   "author" : [
+      "Eric Chernoff <eric@weaverstreet.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.11",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Excel-Grinder",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Excel::Writer::XLSX" : "1.05",
+            "Spreadsheet::XLSX" : "0.15",
+            "perl" : "5.024001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Excel::Grinder" : {
+         "file" : "lib/Excel/Grinder.pm",
+         "version" : "1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ericschernoff/Excel-Grinder/issues"
+      },
+      "homepage" : "https://github.com/ericschernoff/Excel-Grinder",
+      "repository" : {
+         "url" : "git://github.com/ericschernoff/Excel-Grinder.git",
+         "web" : "https://github.com/ericschernoff/Excel-Grinder"
+      }
+   },
+   "version" : "1.0",
+   "x_authority" : "cpan:ECHERNOF",
+   "x_contributors" : [
+      "Eric Chernoff <eric@pepper.weaverstreet.net>",
+      "Eric Chernoff <ericschernoff@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

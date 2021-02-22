@@ -1,5 +1,5 @@
 package App::CSE::Command::Search;
-$App::CSE::Command::Search::VERSION = '0.015';
+$App::CSE::Command::Search::VERSION = '0.016';
 use Moose;
 extends qw/App::CSE::Command/;
 
@@ -216,7 +216,7 @@ sub _build_query{
   # }
 
   my $analyzer;
-  my $fields = [ 'content' , 'decl', 'path' ];
+  my $fields = [ 'content' , 'decl', 'call', 'path' ];
 
   if( $self->query_str() =~ /\*/ ){
     # Let the query parser keep the *'s

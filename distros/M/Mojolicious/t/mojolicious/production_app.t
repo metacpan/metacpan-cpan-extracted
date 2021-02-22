@@ -15,8 +15,8 @@ my $t = Test::Mojo->new('MojoliciousTest');
 
 # Application is already available
 is $t->app->routes->find('something')->to_string, '/test4/:something', 'right pattern';
-is $t->app->routes->find('test3')->pattern->defaults->{namespace},      'MojoliciousTestController', 'right namespace';
-is $t->app->routes->find('withblock')->pattern->defaults->{controller}, 'foo',                       'right controller';
+is $t->app->routes->find('test3')->pattern->defaults->{namespace},      'MojoliciousTest2::Foo', 'right namespace';
+is $t->app->routes->find('withblock')->pattern->defaults->{controller}, 'foo',                   'right controller';
 is ref $t->app->routes->find('something'), 'Mojolicious::Routes::Route', 'right class';
 is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes', 'right class';
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
@@ -37,12 +37,12 @@ is $t->app->static->file('mojo/jquery/jquery.js'), undef, 'no jQuery';
 is_deeply $t->app->routes->namespaces, ['MojoliciousTest::Controller', 'MojoliciousTest'], 'right namespaces';
 
 # Plugin::Test::SomePlugin2::register (security violation)
-$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page Not Found/);
+$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(404)->status_is(500)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Not development mode error!/);
 
 # Plugin::Test::SomePlugin2::register (security violation again)
-$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page Not Found/);
+$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(404)->status_is(500)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Not development mode error!/);
 
 # SyntaxError::foo in production mode (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
@@ -77,7 +77,8 @@ $t->get_ok('/hello.txt')->status_is(200)->header_is(Server => 'Mojolicious (Perl
   ->content_like(qr/Hello Mojo from a static file!/);
 
 # Foo::bar in production mode (missing action)
-$t->get_ok('/foo/baz')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page Not Found/);
+$t->get_ok('/foo/baz')->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Not development mode error!/);
 
 # Try to access a file which is not under the web root via path traversal in
 # production mode
@@ -112,8 +113,8 @@ $t->get_ok('/just/some/template')->status_is(200)->header_is(Server => 'Mojolici
   ->content_is("Production template with low precedence.\n");
 
 # MojoliciousTest3::Bar::index (controller class in development namespace)
-$t->get_ok('/test9' => {'X-Test' => 'Hi there!'})->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page Not Found/);
+$t->get_ok('/test9' => {'X-Test' => 'Hi there!'})->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Not development mode error!/);
 
 # MojoliciousTest::Baz::index (controller class precedence)
 $t->get_ok('/test10')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')

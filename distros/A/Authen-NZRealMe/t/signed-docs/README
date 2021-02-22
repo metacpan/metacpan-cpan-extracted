@@ -49,7 +49,28 @@ namespace of the element with the target attribute:
       --id-attr:ID urn:oasis:names:tc:SAML:2.0:assertion:Assertion \
       doc.xml
 
-The <X509Certificate /> data was added manually because xmlsec1 didn't seem to
-support that.
+The <X509Certificate /> data is not added using the above command.
+To add <X509Certificate /> data, a pkcs12 file containing the key and cert is required.
+
+ a) Add the following <KeyInfo><X509Data/></KeyInfo> to the XML
+   <Signature>
+   ...
+     <SignatureValue/>
+     <KeyInfo><X509Data/></KeyInfo>
+   </Signature>
+
+ b) create p12 file, use password 123456
+    openssl pkcs12 -export \
+      -inkey t/test-conf/idp-assertion-sign-key.pem \
+      -in t/test-conf/idp-assertion-sign-crt.pem \
+      -out t/test-conf/idp-assertion-sign.p12
+  Password: 123456
+  Verify: 123456
+
+ c) create signed file
+   xmlsec1 --sign --output t/signed-docs/30-encrypted-assertion-and-flt-json.xml \
+     --pkcs12 t/test-conf/idp-assertion-sign.p12 --pwd 123456 \
+     --pubkey-cert-pem t/test-conf/idp-assertion-sign-crt.pem \
+     --id-attr:ID Assertion t/test-data/encrypted-assertion-and-flt-json.xml.template
 
 See also: https://users.dcc.uchile.cl/~pcamacho/tutorial/web/xmlsec/xmlsec.html

@@ -1,3 +1,7 @@
+1.07 2021-01-12
+
+* Change bugtracker address.
+
 1.06 2020-01-23
 
 * Adopt the testsuite for systems with directory separator other than '/'.

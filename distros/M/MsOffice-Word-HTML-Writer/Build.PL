@@ -5,7 +5,7 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name         => 'MsOffice::Word::HTML::Writer',
     license             => 'perl',
-    dist_author         => 'Laurent Dami <laurent.dami AT etat.ge.ch>',
+    dist_author         => 'Laurent Dami <dami AT cpan.org>',
     dist_version_from   => 'lib/MsOffice/Word/HTML/Writer.pm',
     requires => {
         'utf8'              => 0,
@@ -17,6 +17,7 @@ my $builder = Module::Build->new(
         'MIME::Types'       => 0,
 	'Module::Build'     => 0,
         'Params::Validate'  => 0,
+        'Scalar::Util'      => 0,
     },
     add_to_cleanup      => [ 'MsOffice-Word-HTML-Writer-*' ],
     create_makefile_pl  => 'traditional',

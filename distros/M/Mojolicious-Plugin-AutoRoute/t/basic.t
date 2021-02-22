@@ -147,13 +147,22 @@ note 'AutoRoute write before normal route';
   $t->get_ok('/foo/../foo')->status_is('404');
 }
 
+# Mojolicious compatibility
+my $any_method_name;
+if ($Mojolicious::VERSION >= '8.67') {
+  $any_method_name = 'any'
+}
+else {
+  $any_method_name = 'route'
+}
+
 note 'top_dir option (two differenct route)';
 {
   package Test6;
   use Mojolicious::Lite;
 
   plugin 'AutoRoute';
-  my $r = app->routes->route("/prefix");
+  my $r = app->routes->$any_method_name("/prefix");
   plugin 'AutoRoute', top_dir => 'myauto', route => $r;
   
   my $app = Test6->new;
@@ -170,7 +179,7 @@ note 'top_dir option (two differenct route, first has route, second is normal)';
   package Test6;
   use Mojolicious::Lite;
 
-  my $r = app->routes->route("/prefix");
+  my $r = app->routes->$any_method_name("/prefix");
   plugin 'AutoRoute', top_dir => 'myauto', route => $r;
   plugin 'AutoRoute';
   

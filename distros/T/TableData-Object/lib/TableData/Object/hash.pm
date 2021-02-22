@@ -1,9 +1,9 @@
 package TableData::Object::hash;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-29'; # DATE
+our $DATE = '2021-01-10'; # DATE
 our $DIST = 'TableData-Object'; # DIST
-our $VERSION = '0.112'; # VERSION
+our $VERSION = '0.113'; # VERSION
 
 use 5.010001;
 use strict;
@@ -166,7 +166,7 @@ TableData::Object::hash - Manipulate hash via table object
 
 =head1 VERSION
 
-This document describes version 0.112 of TableData::Object::hash (from Perl distribution TableData-Object), released on 2020-05-29.
+This document describes version 0.113 of TableData::Object::hash (from Perl distribution TableData-Object), released on 2021-01-10.
 
 =head1 SYNOPSIS
 
@@ -204,7 +204,7 @@ Source repository is at L<https://github.com/perlancar/perl-TableData-Object>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=TableData-Object>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-TableData-Object/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -216,7 +216,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

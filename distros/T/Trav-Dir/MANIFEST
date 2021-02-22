@@ -1,0 +1,13 @@
+Changes
+examples/forgot-slash.pl
+examples/random-file.pl
+examples/synopsis.pl
+lib/Trav/Dir.pm
+lib/Trav/Dir.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/trav-dir.t
+versionup.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

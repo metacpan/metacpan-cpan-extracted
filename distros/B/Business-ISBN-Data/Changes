@@ -1,4 +1,26 @@
-Revision history for Perl module 
+Revision history for Perl module Business::ISBN::Data
+
+20210112.006 2021-02-16T04:08:08Z
+	* Fix testing bug. This module needs Business::ISBN 3.005 to match 
+	the data structures. Prior to that, Business::ISBN had a bug with
+	ISBN13.
+
+20210112.005_03 2021-02-15T17:43:08Z
+	* I think the CPAN Tester failures are using older versions of
+	Business::ISBN (older than 3.005 all seem to fail). I assumed they
+	started fresh, but I guess not. Require a recent version in the
+	default_data test.
+
+20210112.005_02 2021-02-14T05:07:05Z
+	* Try harder to see what's going on in CPAN Testers
+
+20210112.005_01 2021-02-13T12:40:28Z
+	* Try harder to figure out these test failures
+
+20210112.005 2021-02-13T05:23:58Z
+	* Fix the default data test. It should only run when you have 
+	Business::ISBN already, and it shouldn't do stupid things like
+	using an array that I didn't put anything in.
 
 20210112.004 2021-02-10T04:29:32Z
 	* Test the default data.

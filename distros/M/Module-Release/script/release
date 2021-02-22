@@ -1,6 +1,7 @@
 #!/usr/local/bin/perl
 use strict;
 use warnings;
+use open qw(:std :utf8);
 
 =encoding utf8
 
@@ -12,13 +13,15 @@ release - give your Perl distros to the world
 
 	release [OPTIONS] [ LOCAL_FILE [ REMOTE_FILE ] ]
 
+	# print a help message and exit
+	release -h
+
 	# try a dry run without uploading anything
 	release -t
+
 	# skip dist while checking
 	release -D
 
-	# print a help message and exit
-	release -h
 
 	# skip kwalitee testing (e.g. a script distro)
 	release -k
@@ -44,8 +47,11 @@ This program automates Perl module releases. It makes the
 distribution, tests it, checks that source control is up to date, tags
 source control, and uploads it to the PAUSE.
 
-By default this script assumes that you use CVS, but recognizes SVN
-and git and switches when appropriate.
+By default this script assumes that you use Git as your source control
+and relies mostly on L<Module::Release::Git>, which is an external
+module. This distributes L<Module::Release::SVN>, but I haven't touched
+that in years. There's still some code for CVS that I should probably
+rip out.
 
 =head2 Process
 
@@ -60,6 +66,14 @@ defense against releasing bad distributions.
 Look in the current working directory for C<.releaserc>.  See the
 Configuration section.  If release cannot find the configuration file,
 it dies.
+
+=item Various sanity checks
+
+These are related to various mistakes I've made at some point.
+
+	* am I allowed to release from this branch (so, not an experimental branch)
+	* have I listed all the prereqs?
+	* is the version greater than what I've already released?
 
 =item Test and make the distribution
 
@@ -129,6 +143,10 @@ Skip the tests. This is useful when you just want to upload.
 
 Print the program name and version then exit
 
+=item -V
+
+Skip the version check against CPAN
+
 =back
 
 =head2 Configuration
@@ -150,11 +168,33 @@ release does not test the perls in any particular order.
 
 =over 4
 
+=item allow_glob_in_perls
+
+If true, expand globs in the C<perls> configuration.
+
+Default: 0
+
+=item allow_branches
+
+A comma-separated list of literal branch names that are allowed
+to release (requires Module::Release::Git 1.016).
+
+=item allow_branches_regex
+
+A Perl pattern to match version control branches that are allowed
+to release (requires Module::Release::Git 1.016).
+
 =item automated_testing
 
 Set C<automated_testing> to the value you want for the
 $ENV{AUTOMATED_TESTING} setting. By default this is 0, so
 testing is started in interactive mode.
+
+=item commit_message_format
+
+A sprintf format for the message when C<release> commits its changes.
+So far this takes one C<%s> placeholder for the module version
+(requires Module::Release::Git 1.016).
 
 =item cpan_user
 
@@ -168,11 +208,22 @@ many perls.
 
 Default: the perl that's running C<release>.
 
-=item allow_glob_in_perls
+=item release_subclass
 
-If true, expand globs in the C<perls> configuration.
+DEPRECATED AND REMOVED. You should really just write your own
+release script. Fork this one even!
 
-Default: 0
+=item required
+
+An optional list of comma-separated modules that are required to be
+available. These are checked I<before> building C<Makefile>.
+
+ required DBI,Text::CSV_XS,SQL::Statement
+
+A list like this can be handy when testing against a lot of perl
+versions (see C<perls> above) in which some do and some do not have
+all required modules installed. Another good reason to have this is
+when testing against I<optional> modules.
 
 =item skip_kwalitee
 
@@ -184,11 +235,6 @@ distribution with no modules in it).
 Set C<skip_prereqs> to 1 if you don't want to run the Test::Prereq
 checks. By default this is 0 and C<release> will try to check
 prerequisites.
-
-=item release_subclass
-
-DEPRECATED AND REMOVED. You should really just write your own
-release script. Fork this one even!
 
 =back
 
@@ -246,7 +292,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may use this software under the same terms as Perl itself.
 
@@ -257,12 +303,12 @@ Ken Williams turned the original release(1) script into a module.
 Andy Lester contributed to the module and script.
 
 H. Merijn Brand submitted patches to work with 5.005 and to create
-the automated_testing feature.
+the automated_testing and required features.
 
 =cut
 
 use Getopt::Std;
-use Module::Release '2.021';
+use Module::Release '2.127';
 
 my $class = "Module::Release";
 
@@ -275,17 +321,16 @@ my @extra_opts = split /\s+/, $ENV{RELEASE_OPTS};
 push @ARGV, @extra_opts;
 
 my %opts;
-getopts('aChdptvkT', \%opts) or $opts{h} = 1;
+getopts('aChdptvVkT', \%opts) or $opts{h} = 1;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-my( $script_version ) = '2.01';
+my( $script_version ) = '2.127';
 
 if( $opts{v} ) {
 	print "$0 version $script_version\n";
 	exit;
 	}
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 if( $opts{h} ) {
@@ -304,6 +349,7 @@ both) if not supplied.
 	-k   Skip kwalitee check
 	-t   Just make and test distribution, don't tag/upload
 	-v   Print the script version number and exit
+	-V   Skip the version check
 
 The program works in the current directory, and looks for a .releaserc
 or releaserc file and the environment for its preferences.  See
@@ -333,7 +379,6 @@ my $release = $class->new( %params );
 $release->_debug( "release $script_version, using $class "
 	.  $class->VERSION . "\n" );
 
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # load whatever will handle source control
 {
@@ -353,12 +398,23 @@ foreach my $vcs ( @vcs ) {
 
 	$release->load_mixin( $module );
 
-	die "Could not load $module: $@\n" if $@;
+	$release->_die( "Could not load $module: $@\n" ) if $@;
 
 	last;
 	}
-
 }
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Are we on the right branch? I've made mistakes where I released
+# from an experimental branch, and I don't want to do that again.
+if( $release->can('is_allowed_branch') ) {  # New in Module::Release::Git 1.016
+	$release->_print("============Checking for allowed branch\n");
+	my $branch = $release->vcs_branch;
+ 	unless( $release->is_allowed_branch ) {
+		$release->_die( "Configuration blocks release from branch <$branch>\n" );
+		}
+	$release->_print( "Branch <$branch> is allowed to release\n" );
+	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Will we upload to PAUSE?
@@ -366,13 +422,13 @@ if( $release->config->cpan_user ) { # not a dry run
 	$release->load_mixin( 'Module::Release::PAUSE' );
 	}
 
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Are we checking prereqs?
 $release->load_mixin( 'Module::Release::Prereq' );
 
 my $skip_prereqs = $opts{p} || $release->config->skip_prereqs;
 my $skip_dist    = $opts{D} || $release->config->skip_dist;
+my $required     =             $release->config->required || "";
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Set automated testing from command line, config, environment, or default
@@ -389,33 +445,25 @@ $release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a}
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# test with a bunch of perls
-unless( $opts{T} ) {
-	my $old_perl = $release->get_perl;
+# Check that this is a version later than the one of CPAN
+unless( $opts{V} ) {
+	$release->_print("============Checking CPAN versions\n");
+	$release->load_mixin( 'Module::Release::MetaCPAN' );
 
-	foreach my $perl ( $release->perls ) {
-		$release->_print("============Testing with $perl\n");
-		$release->set_perl( $perl ) or next;
+	# need to make the dist to guess the name, then look up that
+	# name in MetaCPAN
+	$release->dist;
+	$release->_print("Module name is <". $release->module_name . ">\n");
 
-		$release->clean;
-		$release->build_makefile;
-		$release->make;
-		$release->test;
+	my $cpan = $release->cpan_version;
+	my $dist = $release->dist_version;
 
-		unless( $skip_prereqs ) {
-			$release->check_prereqs;
-			}
-		else {
-			$opts{t} or $release->_print( "Skipping prereq checks. Shame on you!\n" );
-			}
+	$release->_print("CPAN Version: $cpan\n");
+	$release->_print("Dist Version: $dist\n");
 
-		unless( $skip_dist ) {
-			$release->dist;
-			$release->disttest;
-			}
+	if( version->parse($cpan) >= version->parse($dist) ) {
+		$release->_die( "Local version <$dist> is not greater than current version <$cpan>\n" );
 		}
-
-	$release->set_perl( $old_perl );
 	}
 
 
@@ -438,6 +486,7 @@ else {
 # check MANIFEST. When we run 'make manifest' nothing should be
 # added or removed from MANIFEST
 unless( $opts{'m'} || $release->config->skip_manifest ) {
+	$release->_print("============Checking MANIFEST\n");
 	$release->load_mixin('Module::Release::MANIFEST');
 	$release->clean;
 	$release->build_makefile;
@@ -461,15 +510,53 @@ if ($skip_dist) {
 	}
 else {
 	$release->dist unless( $release->local_file and -e $release->local_file );
-
 	$Version = $release->dist_version;
-
-	$release->_debug( "dist version is  $Version\n" );
+	$release->_debug( "dist version is <$Version>\n" );
 	}
 
 $Version = $release->dist_version;
 
-$release->_debug( "dist version is  $Version\n" );
+$release->_debug( "dist version is <$Version>\n" );
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# test with a bunch of perls
+unless( $opts{T} ) {
+	my $old_perl = $release->get_perl;
+
+	PERL: foreach my $perl ( $release->perls ) {
+		$release->_print("============Testing with $perl\n");
+		$release->set_perl( $perl ) or next;
+
+		$release->clean;
+
+		foreach my $mod ( grep m/\S/ => split m/\s*,\s*/ => $required ) {
+			system "$perl -M$mod -e1 >/dev/null 2>&1";
+			if( $? ) {
+				warn "Prereq $mod not available\n";
+				next PERL;
+				}
+			}
+
+		$release->build_makefile;
+		$release->make;
+		$release->test;
+
+		unless( $skip_prereqs ) {
+			$release->check_prereqs;
+			}
+		else {
+			$opts{t} or $release->_print( "Skipping prereq checks. Shame on you!\n" );
+			}
+
+		unless( $skip_dist ) {
+			$release->dist;
+			$release->disttest;
+			}
+		}
+
+	$release->set_perl( $old_perl );
+	}
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -477,6 +564,8 @@ $release->_debug( "dist version is  $Version\n" );
 # things or uploads. Don't leave anything behind.
 
 if( $opts{t} ) {
+	$release->_print("============Cleaning up\n");
+	$release->_print( "This is a dry run, so stopping. Cleaning up.\n" );
 	$release->distclean;
 	unlink glob( '*.tar *.tgz *.tar.gz *.tar.bz *.tar.bz2 *.tbz *.zip' );
 	exit;
@@ -485,6 +574,7 @@ if( $opts{t} ) {
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # CPAN::Spec::Changes
+$release->_print("============Getting Changes\n");
 unless( $release->debug or $opts{C} ) {
 	$release->show_recent_contributors;
 
@@ -508,8 +598,8 @@ unless( $release->debug or $opts{C} ) {
 
 	rename $changes, $bak or die "Could not backup $changes. $!\n";
 
-	open my $in, '<:encoding(UTF-8)', $bak or die "Could not read old $changes file! $!\n";
-	open my $out, ">:encoding(UTF-8)", $changes;
+	open my $in,  '<:encoding(UTF-8)', $bak or $release->_die( "Could not read old $changes file! $!\n" );
+	open my $out, '>:encoding(UTF-8)', $changes;
 
 	while( <$in> ) {
 		print $out $_;
@@ -524,12 +614,21 @@ unless( $release->debug or $opts{C} ) {
 	close $out;
 
 	my $command = do {
-		if(    -d 'CVS' )  { 'cvs commit -m' }
+		   if( -d 'CVS'  ) { 'cvs commit -m' }
 		elsif( -d '.svn' ) { 'svn commit -m' }
 		elsif( -d '.git' ) { 'git commit -a -m' }
 		};
 
-	my $vcs_commit = `$command "* for version $Version" 2>&1`;
+	my $commit_message = do {
+		if( $release->can( 'vcs_commit_message' ) ) { # Module::Release::Git 1.016
+			$release->vcs_commit_message( { version => $Version } );
+			}
+		else {
+			sprintf '* for release %s', $Version;
+			}
+		};
+
+	my $vcs_commit = `$command "$commit_message" 2>&1`;
 
 	$release->_print( $vcs_commit );
 	}
@@ -553,12 +652,9 @@ $release->_debug( "This is where I should release stuff\n" );
 
 while( $release->should_upload_to_pause ) {
 	$release->load_mixin( 'Module::Release::WebUpload::Mojo' );
-	$release->_print("Now uploading to PAUSE\n" );
 	$release->_print("============Uploading to PAUSE\n");
 	last if $release->debug;
-
 	$release->web_upload;
-
 	last;
 	}
 
@@ -566,10 +662,9 @@ $release->vcs_tag unless $release->debug;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+$release->_print("============Cleaning up\n");
 $release->clean;
-
 $release->vcs_exit;
-
 $release->_print( "Done.\n" );
 
 __END__

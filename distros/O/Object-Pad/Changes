@@ -1,5 +1,18 @@
 Revision history for Object-Pad
 
+0.36    2021-02-19
+        [CHANGES]
+         * Added $classmeta->compose_role() (RT134261)
+         * Docs updates
+            + Point out that slot variables can also be exposed via :reader etc
+            + Reördering for better reading
+         * Always add accessor method name to "Too (many/few) arguments"
+           messages even on older perls
+
+        [BUGFIXES]
+         * Fix unit tests for change of argcheck message format in perl 5.33.6
+           (RT134074)
+
 0.35    2020-12-28
         [CHANGES]
          * Permit roles to request their methods still be directly invokable,

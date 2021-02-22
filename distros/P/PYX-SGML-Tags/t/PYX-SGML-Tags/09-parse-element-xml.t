@@ -50,7 +50,7 @@ $pyx_data = <<'END';
 Acíl ředkev
 )čupřina
 END
-$obj->parse($pyx_data);
+$obj->parse(decode_utf8($pyx_data));
 is($tags->flush, decode_utf8('<čupřina cíl="ředkev" />'),
 	'Parse element with attribute in utf-8 (xml version).');
 $tags->reset;

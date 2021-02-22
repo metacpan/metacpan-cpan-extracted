@@ -1,0 +1,1 @@
+{"results":[],"errors":[{"code":"Neo.ClientError.Statement.SyntaxError","message":"Unexpected end of input: expected whitespace, CYPHER options, EXPLAIN, PROFILE or Query (line 1, column 1 (offset: 0))\n\"\"\n ^"}]}

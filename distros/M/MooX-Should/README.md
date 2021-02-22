@@ -4,7 +4,7 @@ MooX::Should - optional type restrictions for Moo attributes
 
 # VERSION
 
-version v0.1.2
+version v0.1.4
 
 # SYNOPSIS
 
@@ -63,8 +63,8 @@ has thing => (
 
 # SEE ALSO
 
-- [Devel::StrictMode](https://metacpan.org/pod/Devel::StrictMode)
-- [PerlX::Maybe](https://metacpan.org/pod/PerlX::Maybe)
+- [Devel::StrictMode](https://metacpan.org/pod/Devel%3A%3AStrictMode)
+- [PerlX::Maybe](https://metacpan.org/pod/PerlX%3A%3AMaybe)
 
 # SOURCE
 
@@ -82,15 +82,20 @@ feature.
 
 # AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Theo van Hoesel <vanhoesel@cpan.org>
 
-# CONTRIBUTOR
+Originally written by Robert Rothenberg <rrwo@cpan.org>.
 
-Mohammad S Anwar <mohammad.anwar@yahoo.com>
+# CONTRIBUTORS
+
+- Mohammad S Anwar <mohammad.anwar@yahoo.com>
+- Robert Rothenberg <rrwo@cpan.org>
+- Theo van Hoesel <tvanhoesel@perceptyx.com>
+- Zakariyya Mughal <zaki.mughal@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

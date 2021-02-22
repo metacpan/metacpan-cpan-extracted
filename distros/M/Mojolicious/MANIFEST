@@ -44,7 +44,6 @@ lib/Mojo/HelloWorld.pm
 lib/Mojo/Home.pm
 lib/Mojo/IOLoop.pm
 lib/Mojo/IOLoop/Client.pm
-lib/Mojo/IOLoop/Delay.pm
 lib/Mojo/IOLoop/resources/server.crt
 lib/Mojo/IOLoop/resources/server.key
 lib/Mojo/IOLoop/Server.pm
@@ -205,7 +204,6 @@ t/mojo/cookiejar.t
 t/mojo/daemon.t
 t/mojo/daemon_ipv6_tls.t
 t/mojo/date.t
-t/mojo/delay.t
 t/mojo/dom.t
 t/mojo/dynamic_methods.t
 t/mojo/eventemitter.t
@@ -318,6 +316,7 @@ t/mojolicious/lib/MojoliciousTest/Command/test_command.pm
 t/mojolicious/lib/MojoliciousTest/Controller/Foo/Bar.pm
 t/mojolicious/lib/MojoliciousTest/Exceptional.pm
 t/mojolicious/lib/MojoliciousTest/Foo.pm
+t/mojolicious/lib/MojoliciousTest/Plugin/DeploymentPlugin.pm
 t/mojolicious/lib/MojoliciousTest/Plugin/Test/SomePlugin2.pm
 t/mojolicious/lib/MojoliciousTest/Plugin/UPPERCASETestPlugin.pm
 t/mojolicious/lib/MojoliciousTest/PODTest.pm
@@ -326,7 +325,6 @@ t/mojolicious/lib/MojoliciousTest/SyntaxError.pm
 t/mojolicious/lib/MojoliciousTest2/Foo.pm
 t/mojolicious/lib/MojoliciousTest3/Bar.pm
 t/mojolicious/lib/MojoliciousTest3/Baz.pm
-t/mojolicious/lib/MojoliciousTestController.pm
 t/mojolicious/lib/PluginWithEmbeddedApp.pm
 t/mojolicious/lib/PluginWithTemplate.pm
 t/mojolicious/lib/SingleFileTestApp.pm

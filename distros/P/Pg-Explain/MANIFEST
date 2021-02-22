@@ -9,6 +9,7 @@ lib/Pg/Explain/FromJSON.pm
 lib/Pg/Explain/FromText.pm
 lib/Pg/Explain/FromXML.pm
 lib/Pg/Explain/FromYAML.pm
+lib/Pg/Explain/JIT.pm
 lib/Pg/Explain/Node.pm
 lib/Pg/Explain/StringAnonymizer.pm
 MANIFEST			This list of files
@@ -336,6 +337,15 @@ t/58-auto-explain.d/xml-simple.plan
 t/58-auto-explain.d/yaml-analyze.plan
 t/58-auto-explain.d/yaml-simple.plan
 t/58-auto-explain.t
+t/59-jit.d/jit.plan.json
+t/59-jit.d/jit.plan.text
+t/59-jit.d/jit.plan.xml
+t/59-jit.d/jit.plan.yaml
+t/59-jit.d/nojit.plan.json
+t/59-jit.d/nojit.plan.text
+t/59-jit.d/nojit.plan.xml
+t/59-jit.d/nojit.plan.yaml
+t/59-jit.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

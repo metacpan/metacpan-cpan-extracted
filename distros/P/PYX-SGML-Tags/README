@@ -21,7 +21,7 @@ METHODS
 
     *       "input_encoding"
 
-            Input encoding.
+            Input encoding for parse_file() and parse_handler() usage.
 
             Default value is 'utf-8'.
 
@@ -31,6 +31,12 @@ METHODS
             constructor parameter 'input_tags_item_callback'.
 
             Default value is undef.
+
+    *       "output_encoding"
+
+            Output encoding.
+
+            Default value is 'utf-8'.
 
     *       "tags"
 
@@ -49,15 +55,17 @@ METHODS
   "parse_file"
      $obj->parse_file($input_file, $out);
 
-    Parse file with PYX data. Output is serialization to SGML. If $out not
-    present, use 'output_handler'.
+    Parse file with PYX data. $input_file file is decoded by
+    'input_encoding'. Output is serialization to SGML. If $out not present,
+    use 'output_handler'.
 
     Returns undef.
 
   "parse_handler"
      $obj->parse_handle($input_file_handler, $out);
 
-    Parse PYX handler. Output is serialization to SGML. If $out not present,
+    Parse PYX handler. $input_file_handler handler is decoded by
+    'input_encoding'. Output is serialization to SGML. If $out not present,
     use 'output_handler'.
 
     Returns undef.
@@ -194,10 +202,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2011-2020 Michal Josef Špaček
+    © 2011-2021 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.08
 

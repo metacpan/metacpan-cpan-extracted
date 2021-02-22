@@ -28,7 +28,7 @@ $app->routes->get('/content' => { text => 'content' });
 use FindBin qw($Bin);
 
 my $ua1 = Mojo::UserAgent::Cached->new( local_dir => "$Bin/../t/data" );
-ok $ua1->get('newsfeed.xml')->success, 'Can fetch local file and success is set';
+ok $ua1->get('newsfeed.xml')->res->is_success, 'Can fetch local file and success is set';
 is $ua1->get('newsfeed.xml')->res->code, 200, 'Can fetch local file and get correct status';
 like $ua1->get('newsfeed.xml')->res->body, qr/^<\?xml/, 'Can fetch local file and get its body';
 
@@ -129,7 +129,7 @@ subtest 'ABCN-3572' => sub {
         $url => sub {
             my ($ua, $tx) = @_;
             $headers = $tx->res->headers;
-            $success = $tx->success;
+            $success = $tx->res->is_success;
             $code    = $tx->res->code;
             $body    = $tx->res->body;
             Mojo::IOLoop->stop;
@@ -206,6 +206,31 @@ subtest 'Should run callbacks even if content is cached' => sub {
       is $tx->res->code, 200, 'Can fetch cached file and get correct status';
    });
 
+};
+
+subtest 'Should emit events even if content is cached' => sub {
+    my $ua = Mojo::UserAgent::Cached->new();
+    $ua->server->app($app);
+
+    # Allow caching /foo requests too
+    local *Mojo::UserAgent::Cached::is_cacheable = sub { return 1; };
+
+    my $url = '/content';
+    my $tx = $ua->get($url);
+
+    my ($finished_req, $finished_tx, $finished_res);
+    $tx = $ua->build_tx('GET' => $url);
+    ok !$tx->is_finished, 'transaction is not finished';
+    $tx->req->on(finish => sub { $finished_req++ });
+    $tx->on(finish => sub { $finished_tx++ });
+    $tx->res->on(finish => sub { $finished_res++ });
+    my $cached_tx = $ua->start($tx);
+    is $finished_tx,  1, 'finish event on transaction has been emitted once';
+    is $finished_req, 1, 'finish event on request has been emitted once';
+    is $finished_res, 1, 'finish event on response has been emitted once';
+    ok $cached_tx->is_finished, 'transaction is finished';
+    ok $cached_tx->req->is_finished, 'request is finished';
+    ok $cached_tx->res->is_finished, 'response is finished';
 };
 
 subtest 'expired+cached functionality' => sub {

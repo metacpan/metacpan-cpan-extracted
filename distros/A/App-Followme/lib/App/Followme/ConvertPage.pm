@@ -7,10 +7,10 @@ use lib '../..';
 
 use base qw(App::Followme::Module);
 
-use File::Spec::Functions qw(abs2rel catfile rel2abs);
+use File::Spec::Functions qw(abs2rel rel2abs catfile splitdir);
 use App::Followme::FIO;
 
-our $VERSION = "1.96";
+our $VERSION = "1.97";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -77,10 +77,7 @@ sub title_to_filename {
 sub update_file {
     my ($self, $folder, $prototype, $file) = @_;
 
-    my ($base_directory, $basename) = fio_split_filename($file);
-    my $new_file = catfile($folder, $basename);
-    $new_file =~ s/\.[^\.]*$/.$self->{web_extension}/;
-
+    my $new_file = $self->{data}->convert_filename($file);
     my $page = $self->render_file($self->{template_file}, $file);
     $page = $self->reformat_file($prototype, $new_file, $page);
 
@@ -95,37 +92,28 @@ sub update_folder {
     my ($self, $folder) = @_;
 
     my $index_file = $self->to_file($folder);
-    my $base_directory = ${$self->{data}->build('base_directory', $index_file)};
-    my $same_directory = fio_same_file($base_directory, $self->{base_directory},
-                                        $self->{case_sensitivity});
+    my $source_folder = $self->{data}->convert_source_directory($folder);
+    return unless $source_folder;
 
-    my $source_directory;
-    if ($same_directory) {
-        $source_directory = $folder;
-    } else {
-        $source_directory = catfile($base_directory,
-                                    abs2rel($folder, $self->{base_directory}));
-    }
-
-    $index_file = $self->to_file($source_directory);
+    my $same_directory = fio_same_file($folder, $source_folder, 
+                                       $self->{case_sensitivity});
+ 
+    $index_file = $self->to_file($source_folder);
     my $files = $self->{data}->build('files', $index_file);
 
     my $prototype;
     foreach my $file (@$files) {
         my $prototype ||= $self->find_prototype($folder, 0);
         eval {$self->update_file($folder, $prototype, $file)};
-        $self->check_error($@, $file);
-
-        unlink($file) if $same_directory;
+        if ($self->check_error($@, $file)) {
+            unlink($file) if $same_directory;
+        }
     }
 
-    if (! $self->{quick_update}) {
-        my $folders = $self->{data}->build('folders', $source_directory);
-        foreach my $subfolder (@$folders) {
-            $subfolder = catfile($folder, abs2rel($subfolder,
-                                                  $source_directory));
-            $self->update_folder($subfolder);
-        }
+    my $folders = $self->{data}->build('folders', $index_file);
+
+    foreach my $subfolder (@$folders) {
+        $self->update_folder($subfolder);
     }
 
     return;
@@ -140,9 +128,6 @@ sub write_file {
     $filename = rel2abs($filename);
     my $time = ${$self->{data}->build('mdate', $filename)};
     my $new_filename = $self->title_to_filename($filename);
-
-    $new_filename = fio_make_dir($new_filename);
-    die "Couldn't create directory for $new_filename" unless $new_filename;
 
     fio_write_page($new_filename, $page, $binmode);
 

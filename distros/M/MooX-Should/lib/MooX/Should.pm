@@ -2,38 +2,53 @@ package MooX::Should;
 
 # ABSTRACT: optional type restrictions for Moo attributes
 
+use version 0.77 ();
+
 use Moo       ();
 use Moo::Role ();
 
+our $USE_MOO_UTILS;
+
+BEGIN {
+    if( version->parse( Moo->VERSION ) >= version->parse('2.003006') ) {
+        $USE_MOO_UTILS = 1;
+        require Moo::_Utils;
+    }
+}
+
 use Devel::StrictMode;
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.1.4';
+
 
 sub import {
     my ($class) = @_;
 
     my $target = caller;
 
+    my $has = $target->can('has') or return;
+
     my $installer =
-      $target->isa("Moo::Object")
-      ? \&Moo::_install_tracked
-      : \&Moo::Role::install_tracked;
+      $USE_MOO_UTILS
+      ? \&Moo::_Utils::_install_tracked
+      : $target->isa("Moo::Object")
+          ? \&Moo::_install_tracked
+          : \&Moo::Role::_install_tracked;
 
-    if ( my $has = $target->can('has') ) {
+    my $wrapper = sub {
+        my ( $name, %args ) = @_;
 
-        my $wrapper = sub {
-            my ( $name, %args ) = @_;
+        if (STRICT) {
+            $args{isa} = delete $args{should} if exists $args{should}
+        } else {
+            delete $arg{should}
+        }
 
-            if ( my $should = delete $args{should} ) {
-                $args{isa} = $should if STRICT;
-            }
+        return $has->( $name => %args );
+    };
 
-            return $has->( $name => %args );
-        };
+    $installer->( $target, "has", $wrapper );
 
-        $installer->( $target, "has", $wrapper );
-
-    }
 
 }
 
@@ -52,7 +67,7 @@ MooX::Should - optional type restrictions for Moo attributes
 
 =head1 VERSION
 
-version v0.1.2
+version v0.1.4
 
 =head1 SYNOPSIS
 
@@ -131,17 +146,37 @@ feature.
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Theo van Hoesel <vanhoesel@cpan.org>
 
-=head1 CONTRIBUTOR
+Originally written by Robert Rothenberg <rrwo@cpan.org>.
 
-=for stopwords Mohammad S Anwar
+=head1 CONTRIBUTORS
+
+=for stopwords Mohammad S Anwar Robert Rothenberg Theo van Hoesel Zakariyya Mughal
+
+=over 4
+
+=item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
+=item *
+
+Robert Rothenberg <rrwo@cpan.org>
+
+=item *
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+=item *
+
+Zakariyya Mughal <zaki.mughal@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

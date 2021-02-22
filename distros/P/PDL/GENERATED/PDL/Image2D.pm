@@ -306,7 +306,7 @@ C<box2d> should be updated to support similar edge options
 as C<conv2d> and C<med2d> etc.
 
 Boxcar averaging is a pretty crude way of filtering. For serious stuff
-better filters are around (e.g., use L<conv2d|conv2d> with the appropriate
+better filters are around (e.g., use L</conv2d> with the appropriate
 kernel). On the other hand it is fast and computational cost grows only
 approximately linearly with window size.
 
@@ -355,7 +355,7 @@ copied across.
 
 =for bad
 
-This routine does not handle bad values - use L<patchbad2d|/patchbad2d> instead
+This routine does not handle bad values - use L</patchbad2d> instead
 
 =cut
 
@@ -388,7 +388,7 @@ patch bad pixels out of 2D images containing bad values
 Pixels are replaced by the average of their non-bad neighbours;
 if all neighbours are bad, the output is set bad.
 If the input piddle contains I<no> bad values, then a straight copy
-is performed (see L<patch2d|/patch2d>).
+is performed (see L</patch2d>).
 
 
 
@@ -490,7 +490,7 @@ Connected 8-component labeling of a binary image.
 Connected 8-component labeling of 0,1 image - i.e. find separate
 segmented objects and fill object pixels with object number.
 8-component labeling includes all neighboring pixels.
-This is just a front-end to ccNcompt.  See also L<cc4compt|cc4compt>.
+This is just a front-end to ccNcompt.  See also L</cc4compt>.
 
 =for example
 
@@ -505,7 +505,7 @@ Connected 4-component labeling of a binary image.
 Connected 4-component labeling of 0,1 image - i.e. find separate
 segmented objects and fill object pixels with object number.
 4-component labling does not include the diagonal neighbors.
-This is just a front-end to ccNcompt.  See also L<cc8compt|cc8compt>.
+This is just a front-end to ccNcompt.  See also L</cc8compt>.
 
 =for example
 
@@ -541,7 +541,7 @@ Connected component labeling of a binary image.
 
 Connected component labeling of 0,1 image - i.e. find separate
 segmented objects and fill object pixels with object number.
-See also L<cc4compt|cc4compt> and L<cc8compt|cc8compt>.
+See also L</cc4compt> and L</cc8compt>.
 
 The connectivity parameter must be 4 or 8.
 
@@ -585,14 +585,14 @@ This function works inplace, i.e. modifies C<im>.
   polyfill($im,$ps,$colour,[\%options]);
 
 The default method of determining which points lie inside of the polygon used
-is not as strict as the method used in L<pnpoly|pnpoly>. Often, it includes vertices
+is not as strict as the method used in L</pnpoly>. Often, it includes vertices
 and edge points. Set the C<Method> option to change this behaviour.
 
 =for option
 
 Method   -  Set the method used to determine which points lie in the polygon.
             => Default - internal PDL algorithm
-            => pnpoly  - use the L<pnpoly|pnpoly> algorithm
+            => pnpoly  - use the L</pnpoly> algorithm
 
 =for example
 
@@ -720,14 +720,14 @@ return the (dataflown) area of an image described by a polygon
   polyfillv($im,$ps,[\%options]);
 
 The default method of determining which points lie inside of the polygon used
-is not as strict as the method used in L<pnpoly|pnpoly>. Often, it includes vertices
+is not as strict as the method used in L</pnpoly>. Often, it includes vertices
 and edge points. Set the C<Method> option to change this behaviour.
 
 =for option
 
 Method   -  Set the method used to determine which points lie in the polygon.
             => Default - internal PDL algorithm
-            => pnpoly  - use the L<pnpoly|pnpoly> algorithm
+            => pnpoly  - use the L</pnpoly> algorithm
 
 =for example
 
@@ -793,7 +793,7 @@ newly created image
 
   ($newcols,$newrows) = rotnewsz $oldn, $oldm, $angle;
 
-L<PDL::Transform|PDL::Transform> offers a more general interface to
+L<PDL::Transform> offers a more general interface to
 distortions, including rotation, with various types of sampling; but
 rot2d is faster.
 
@@ -1489,7 +1489,7 @@ sub PDL::warp2d {
 
 =for ref
 
-Return the specified kernel, as used by L<warp2d|/warp2d>
+Return the specified kernel, as used by L</warp2d>
 
 =for usage
 

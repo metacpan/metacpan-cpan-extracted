@@ -17,6 +17,9 @@ my %WriteMakefileArgs = (
     "Module::Build" => 0
   },
   "DISTNAME" => "String-Expando",
+  "EXE_FILES" => [
+    "bin/strexpand"
+  ],
   "LICENSE" => "perl",
   "NAME" => "String::Expando",
   "PREREQ_PM" => {
@@ -27,7 +30,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }

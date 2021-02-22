@@ -15,4 +15,15 @@ MY::Build->new(
     'build_requires'    => {
         'Test::Exception'       => 0,
         },
+    'meta_merge' => {
+        'x_deprecated'          => 1,
+        'bugtracker' => {
+            'web'  => 'https://github.com/bleargh45/Alien-Prototype-Carousel/issues',
+            },
+        'repository' => {
+            'type' => 'git',
+            'url'  => 'git://github.com/bleargh45/Alien-Prototype-Carousel.git',
+            'web'  => 'https://github.com/bleargh45/Alien-Prototype-Carousel',
+            },
+        },
     )->create_build_script();

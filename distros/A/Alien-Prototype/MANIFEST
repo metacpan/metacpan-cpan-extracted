@@ -3,6 +3,7 @@ Makefile.PL
 Changes
 MANIFEST
 MANIFEST.SKIP
+META.json
 META.yml
 README.txt
 prototype.js

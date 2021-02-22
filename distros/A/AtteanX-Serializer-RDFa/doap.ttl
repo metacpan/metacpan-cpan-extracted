@@ -18,10 +18,10 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [
+	doap-deps:runtime-requirement [ doap-deps:on "Moo"^^doap-deps:CpanId ], [
 		doap-deps:on "RDF::RDFa::Generator 0.200"^^doap-deps:CpanId;
-	], [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Attean 0.019"^^doap-deps:CpanId ], [ doap-deps:on "Moo"^^doap-deps:CpanId ];
-	doap-deps:test-recommendation [ doap-deps:on "RDF::NS 20160408"^^doap-deps:CpanId ];
+	], [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Attean 0.019"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "RDF::NS 20160408"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Prefixes"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Modern"^^doap-deps:CpanId ], [
 		doap-deps:on "Module::Load::Conditional"^^doap-deps:CpanId;
 	], [ doap-deps:on "URI::NamespaceMap"^^doap-deps:CpanId ];
@@ -34,7 +34,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:name            "AtteanX-Serializer-RDFa";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/v_0-01>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/v_0-100>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/v_0-01>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/v_0-100>, <http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/v_0-110>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/p5-atteanx-serializer-rdfa>;
@@ -68,13 +68,44 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Serializer-RDFa-0.100.tar.gz>;
 	doap:revision        "0.100"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/v_0-110>
+	a                    doap:Version;
+	rdfs:label           "Add required file_extentions method";
+	dc:identifier        "AtteanX-Serializer-RDFa-0.110"^^xsd:string;
+	dc:issued            "2021-02-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Attean 0.029 requires file_extensions method."@en;
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/jonass>;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Make a Markdown README."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Bring test coverage to 100%."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Small documentation improvements."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/AtteanX-Serializer-RDFa-0.110.tar.gz>;
+	doap:revision        "0.110"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/jonass>
+	a                    foaf:Person;
+	foaf:name            "Jonas Smedegaard";
+	foaf:nick            "JONASS", "jonass";
+	foaf:page            <https://metacpan.org/author/JONASS>.
+
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:kjetilk@cpan.org>;
 	foaf:name            "Kjetil Kjernsmo";
 	foaf:nick            "KJETILK", "KjetilK";
 	foaf:page            <https://metacpan.org/author/KJETILK>;
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-atteanx-serializer-rdfa&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>;
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-atteanx-serializer-rdfa&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>, <https://solid.kjernsmo.net/profile/card#me>;
 	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
 	wot:hasKey           _:B1.
 
@@ -84,8 +115,8 @@
 	foaf:mbox            <mailto:kjetilk@cpan.org>;
 	foaf:name            "Kjetil Kjernsmo";
 	foaf:nick            "KjetilK";
-	owl:sameAs           <http://purl.org/NET/cpan-uri/person/kjetilk>;
-	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/kjetilk>, <https://solid.kjernsmo.net/profile/card#me>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>, <https://solid.kjernsmo.net/profile/card>;
 	wot:hasKey           _:B1.
 
 <irc://irc.perl.org/#perlrdf>

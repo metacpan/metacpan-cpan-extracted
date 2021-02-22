@@ -1,9 +1,9 @@
 package BorderStyles::Standard;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2021-01-31'; # DATE
 our $DIST = 'BorderStyles-Standard'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: A standard collection of border styles
@@ -20,7 +20,7 @@ BorderStyles::Standard - A standard collection of border styles
 
 =head1 VERSION
 
-This document describes version 0.002 of BorderStyles::Standard (from Perl distribution BorderStyles-Standard), released on 2020-06-11.
+This document describes version 0.005 of BorderStyles::Standard (from Perl distribution BorderStyles-Standard), released on 2021-01-31.
 
 =head1 BORDER STYLES
 
@@ -33,6 +33,10 @@ No borders, but data row separator is still drawn using dashes.
 =item * L<BorderStyle::ASCII::SingleLine>
 
 Single line border with ASCII characters.
+
+=item * L<BorderStyle::ASCII::SingleLineDoubleAfterHeader>
+
+Just like ASCII::SingleLine but uses double line to separate header row and first data row.
 
 =item * L<BorderStyle::ASCII::SingleLineHorizontalOnly>
 
@@ -114,9 +118,17 @@ Single-line border with UTF8 characters.
 
 Bold single-line border with UTF8 characters.
 
+=item * L<BorderStyle::UTF8::SingleLineBoldHeader>
+
+Single-line border (header box bold) with UTF8 characters.
+
 =item * L<BorderStyle::UTF8::SingleLineCurved>
 
 Single-line border with UTF8 characters, curved edges.
+
+=item * L<BorderStyle::UTF8::SingleLineDoubleAfterHeader>
+
+Just like UTF8::SingleLine but uses double line to separate header row and first data row.
 
 =item * L<BorderStyle::UTF8::SingleLineHorizontalOnly>
 
@@ -154,7 +166,7 @@ Source repository is at L<https://github.com/perlancar/perl-BorderStyles-Standar
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyles-Standard>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-BorderStyles-Standard/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -174,7 +186,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

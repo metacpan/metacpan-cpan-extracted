@@ -18,17 +18,16 @@ do { my $x = {
                       'requires' => {
                                       'CLDR::Number' => '0',
                                       'DBIx::Connector::Retry' => '0',
-                                      'Data::Float' => '0',
                                       'List::Util' => '1.33',
-                                      'Moo' => '0',
+                                      'Moo' => '2.00',
                                       'MooX::StrictConstructor' => '0',
                                       'POSIX' => '0',
                                       'Scalar::Util' => '0',
-                                      'Term::ProgressBar' => '0',
+                                      'Term::ProgressBar' => '2.14',
                                       'Time::HiRes' => '0',
                                       'Type::Utils' => '0',
                                       'Types::Common::Numeric' => '0',
-                                      'Types::Standard' => '0',
+                                      'Types::Standard' => '1.00',
                                       'namespace::clean' => '0'
                                     }
                     },
@@ -38,8 +37,7 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'Class::Load' => '0',
-                                   'DBIx::Class::Core' => '0',
-                                   'DBIx::Class::Schema' => '0',
+                                   'DBIx::Class' => '0.07000',
                                    'Env' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',

@@ -7,19 +7,15 @@ option bool => color => 'Force coloring of host names', aliases => ['c'];
 
 app {
   my ($self, $command, @hosts) = @_;
-  my $ioloop = Mojo::IOLoop->delay;
   my @color = ($self->color or -t STDOUT) ? (RED, CLEAR) : ('', '');
-  my @forks;
+  my (@forks, @p);
 
   die "Usage: $0 [command] [host0] [host1] ...\n" unless $command and @hosts;
 
   for my $host (@hosts) {
     my $f   = Mojo::IOLoop::ReadWriteFork->new;
-    my $cb  = $ioloop->begin;
     my $buf = '';
 
-    $f->on(close => $cb);
-    $f->on(error => sub { warn $_[1] });
     $f->on(
       read => sub {
         $buf .= $_[1];
@@ -28,11 +24,10 @@ app {
       }
     );
 
-    $f->run(ssh => $host => $command);
-    push @forks, $f;
+    push @p, $f->run_p(ssh => $host => $command);
   }
 
-  $ioloop->wait;
+  Mojo::Promise->all(@p)->wait;
 
   return 0;
 };

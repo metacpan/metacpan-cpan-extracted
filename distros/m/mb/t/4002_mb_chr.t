@@ -32,6 +32,17 @@ use vars qw(@test);
     sub {1},
     sub {1},
     sub {1},
+# 21
+    sub { ($] >= 5.006) or do {  $_=-1; my $r=    chr($_); $r eq "\xFF" } },
+    sub { ($] >= 5.006) or do {  $_=-1; my $r=    chr;     $r eq "\xFF" } },
+    sub {                        $_=-1; my $r=mb::chr($_); $r eq "\xFF"   },
+    sub {                        $_=-1; my $r=mb::chr;     $r eq "\xFF"   },
+    sub { ($] >= 5.006) or do {  $_=-2; my $r=    chr($_); $r eq "\xFE" } },
+    sub { ($] >= 5.006) or do {  $_=-2; my $r=    chr;     $r eq "\xFE" } },
+    sub {                        $_=-2; my $r=mb::chr($_); $r eq "\xFE"   },
+    sub {                        $_=-2; my $r=mb::chr;     $r eq "\xFE"   },
+    sub {1},
+    sub {1},
 #
 );
 

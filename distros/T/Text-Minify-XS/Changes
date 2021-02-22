@@ -1,5 +1,18 @@
 Revision history for Text-Minify-XS:
 
+v0.3.7    2021-02-18 16:53:32+00:00 Europe/London
+  [Enhancements]
+  - The function will die rather than return undef if there is a
+    memory error.
+
+  [Documentation]
+  - Added SEE ALSO section.
+
+  [Tests]
+  - Added more test cases.
+
+  - Removed a useless TODO from tests.
+
 v0.3.6    2021-01-05 14:12:59+00:00 Europe/London
   [Bug Fixes]
   - Return destination instead of source when empty.

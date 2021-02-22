@@ -3,6 +3,9 @@ use parent 'Sisimai::Lhost';
 use feature ':5.10';
 use strict;
 use warnings;
+use Sisimai::String;
+use Encode;
+use Encode::Guess; Encode::Guess->add_suspects(@{ Sisimai::String->encodenames });
 
 sub description { 'IBM Domino Server' }
 sub make {
@@ -15,21 +18,25 @@ sub make {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    return undef unless index($mhead->{'subject'}, 'DELIVERY FAILURE:') == 0;
+    return undef unless $mhead->{'subject'} =~ /\ADELIVERY(?:[ ]|_)FAILURE:/;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr|^Content-Type:[ ]message/delivery-status|m;
+    state $rebackbone = qr|^Content-Type:[ ]message/rfc822|m;
     state $startingof = { 'message' => ['Your message'] };
     state $messagesof = {
         'userunknown' => [
             'not listed in Domino Directory',
             'not listed in public Name & Address Book',
+            "non répertorié dans l'annuaire Domino",
             'Domino ディレクトリには見つかりません',
         ],
         'filtered'    => ['Cannot route mail to user'],
         'systemerror' => ['Several matches found in Domino Directory'],
     };
 
+    require Sisimai::RFC1894;
+    my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
+    my $permessage = {};    # (Hash) Store values of each Per-Message field
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
     my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
     my $readcursor = 0;     # (Integer) Points the current cursor position
@@ -89,20 +96,57 @@ sub make {
             } elsif( $e =~ /\A[ ][ ]Subject: (.+)\z/ ) {
                 #   Subject: Nyaa
                 $subjecttxt = $1;
+
+            } elsif( my $f = Sisimai::RFC1894->match($e) ) {
+                # There are some fields defined in RFC3464, try to match
+                next unless my $o = Sisimai::RFC1894->field($e);
+                next if $o->[-1] eq 'addr';
+
+                if( $o->[-1] eq 'code' ) {
+                    # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
+                    $v->{'spec'}      ||= $o->[1];
+                    $v->{'diagnosis'} ||= $o->[2];
+
+                } else {
+                    # Other DSN fields defined in RFC3464
+                    next unless exists $fieldtable->{ $o->[0] };
+                    $v->{ $fieldtable->{ $o->[0] } } = $o->[2];
+
+                    next unless $f == 1;
+                    $permessage->{ $fieldtable->{ $o->[0] } } = $o->[2];
+                }
             }
         }
     }
     return undef unless $recipients;
 
     for my $e ( @$dscontents ) {
+        # Check the utf8 flag and fix
+        UTF8FLAG: while(1) {
+            # Delete the utf8 flag because there are a string including some characters which have 
+            # utf8 flag but utf8::is_utf8 returns false
+            last unless length $e->{'diagnosis'};
+            last unless Sisimai::String->is_8bit(\$e->{'diagnosis'});
+
+            my $cv = $e->{'diagnosis'};
+            my $ce = Encode::Guess->guess($cv);
+            last unless ref $ce;
+
+            $cv = Encode::encode_utf8($cv);
+            $e->{'diagnosis'} = $cv;
+            last;
+        }
+
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
         $e->{'recipient'} = Sisimai::Address->s3s4($e->{'recipient'});
+        $e->{'lhost'}   ||= $permessage->{'rhost'};
+        $e->{ $_ }      ||= $permessage->{ $_ } || '' for keys %$permessage;
 
         for my $r ( keys %$messagesof ) {
             # Check each regular expression of Domino error messages
             next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $messagesof->{ $r } };
-            $e->{'reason'} = $r;
-            $e->{'status'} = Sisimai::SMTP::Status->code($r, 0) || '';
+            $e->{'reason'}   = $r;
+            $e->{'status'} ||= Sisimai::SMTP::Status->code($r, 0) || '';
             last;
         }
     }
@@ -151,7 +195,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2021 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

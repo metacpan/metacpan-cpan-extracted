@@ -6,8 +6,8 @@ requires 'File::Spec::Functions', '3.75';
 requires 'File::Path', '2.16';
 requires 'Digest::MD5', '2.55';
 requires 'Text::Markdown', '1.000031';
+requires 'Image::Size', '3.300';
 
-recommends 'Image::Size', 3.300;
 recommends 'Net::FTP', '0';
 
 on 'test' => sub {

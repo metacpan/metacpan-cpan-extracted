@@ -1,3 +1,15 @@
+2.27 2021-02-16
+- need ExtUtils::F77 import to work at least on FreeBSD
+- disable calls to pgmtext(!) in tests on FreeBSD
+
+2.26 2021-02-15
+- ExtUtils::F77 is not a runtime requirement
+- tests no longer ask for device - set the environment var (default /NULL)
+
+2.25 2021-02-13
+- macOS11 patch for LD flags - thanks @karlglazebrook
+- use Devel::CheckLib to find right PNG lib
+
 2.24 2019-03-19
  - doc updates - thanks @djerius
  - patches to use pkg-config if available - thanks @djerius

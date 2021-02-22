@@ -1,22 +1,20 @@
 requires 'CLDR::Number';
 requires 'DBIx::Connector::Retry';
-requires 'Data::Float';
-requires 'List::Util', '1.33';
-requires 'Moo';
+requires 'List::Util', '1.33';          # has any/all/etc.
+requires 'Moo', '2.00';                 # sane minimum baseline
 requires 'MooX::StrictConstructor';
 requires 'POSIX';
 requires 'Scalar::Util';
-requires 'Term::ProgressBar';
+requires 'Term::ProgressBar', '2.14';   # with silent option
 requires 'Time::HiRes';
 requires 'Type::Utils';
 requires 'Types::Common::Numeric';
-requires 'Types::Standard';
+requires 'Types::Standard', '1.00';     # sane minimum baseline
 requires 'namespace::clean';
 
 on test => sub {
     requires 'Class::Load';
-    requires 'DBIx::Class::Core';
-    requires 'DBIx::Class::Schema';
+    requires 'DBIx::Class', '0.07000';  # sane minimum baseline
     requires 'Env';
     requires 'Path::Class';
     requires 'Path::Class::File';

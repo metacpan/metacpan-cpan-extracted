@@ -1,17 +1,14 @@
 package Log::FreeSWITCH::Line::Data;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use English;
 use Error::Pure::Always;
 use Error::Pure qw(err);
 use Mo qw(builder is required);
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 has date => (
 	'is' => 'ro',
@@ -93,6 +90,7 @@ Log::FreeSWITCH::Line::Data - Data object which represents FreeSWITCH log line.
 =head1 SYNOPSIS
 
  use Log::FreeSWITCH::Line::Data;
+
  my $obj = Log::FreeSWITCH::Line::Data->new(%params);
  my $date = $obj->date;
  my $datetime_o = $obj->datetime_obj;
@@ -209,11 +207,9 @@ Log::FreeSWITCH::Line::Data - Data object which represents FreeSWITCH log line.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Module.
  use Log::FreeSWITCH::Line::Data;
 
  # Object.
@@ -252,21 +248,22 @@ FreeSWITCH log line parsing and serializing.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Log-FreeSWITCH-Line>
+L<https://github.com/michal-josef-spacek/Log-FreeSWITCH-Line>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- BSD 2-Clause License
+© 2014-2021 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

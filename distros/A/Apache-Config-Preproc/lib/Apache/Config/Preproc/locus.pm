@@ -8,7 +8,7 @@ our $VERSION = '1.03';
 
 sub new {
     my $class = shift;
-    my $self = bless $class->SUPER::new(@_), $class;
+    my $self = $class->SUPER::new(@_);
     $self->{filename} = $self->conf->filename;
     $self->{line} = 0;
     $self->{context} = [];

@@ -32,10 +32,17 @@ delete $ENV{V}; # because it could mess up Git::NextVersion
     plan skip_all => "No Git!" unless $git->has_git_in_path;
 
     my $version = $git->version;
+    diag "Have git $version";
+
+    # This should make us skip tests if the version is unparsable
+    # but I actually want to see what the version is on cpantesters
+    # causing the "Invalid version format" error.
+    # http://www.cpantesters.org/cpan/report/10799c66-614d-11eb-8a9e-254c33959232
+    #$version = do { local $@; eval { local $SIG{__DIE__};
+    #        version->parse($version) } } || 'v0';
+
     plan skip_all => "Git is too old: $version"
         if $version < version->parse(v1.7.5);
-
-    diag "Have git $version";
 }
 
 my $year   = 1900 + (localtime)[5];

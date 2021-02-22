@@ -6,7 +6,7 @@ OpenTracing::Implementation::DataDog::Utils - DataDog Utilities
 
 =cut
 
-our $VERSION = 'v0.42.1';
+our $VERSION = 'v0.43.1';
 
 ;
 
@@ -63,7 +63,7 @@ Theo van Hoesel <tvanhoesel@perceptyx.com>
 =head1 COPYRIGHT AND LICENSE
 
 'OpenTracing::Implementation::DataDog'
-is Copyright (C) 2019 .. 2020, Perceptyx Inc
+is Copyright (C) 2019 .. 2021, Perceptyx Inc
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0.

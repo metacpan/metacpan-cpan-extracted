@@ -43,6 +43,7 @@ t/kana2romaji.t
 t/katakana2syllable.t
 t/Lingua-JA-Moji.t
 t/lingua-ja-regular-unicode.t
+t/LJMT.pm
 t/new-old-kanji.t
 t/romaji2kana.t
 t/smallize.t

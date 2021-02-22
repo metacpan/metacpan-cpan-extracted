@@ -8,7 +8,7 @@ use Cpanel::JSON::XS;
 use Gherkin::Parser;
 
 package App::GherkinGenerateAst;
-
+$App::GherkinGenerateAst::VERSION = '17.0.2';
 sub run {
     my ($class, $fh, @file_list) = @_;
     my $next_id = 0;

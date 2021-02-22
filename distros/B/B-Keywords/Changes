@@ -93,3 +93,6 @@ Revision history for Perl extension B::Keywords.
 1.21 2019-12-17 17:38:00 rurban
   - isa was added with 5.31.7
   - improved t/z_kwalitee.t
+1.22 2021-02-22 09:42:18 rurban
+  - add try/catch by Tom Wyant
+ 

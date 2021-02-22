@@ -2,6 +2,7 @@ Build.PL
 Changes
 MANIFEST
 README.md
+INFO/kp.html
 lib/Text/KnuthPlass.pm
 lib/Text/KnuthPlass.xs
 lib/Text/typemap
@@ -14,6 +15,7 @@ t/pod.t
 tools/1_pc.pl
 tools/2_t-tests.pl
 tools/3_examples.pl
+tools/pod2cpanhtml.pl
 examples/KP.pl
 META.yml
 META.json

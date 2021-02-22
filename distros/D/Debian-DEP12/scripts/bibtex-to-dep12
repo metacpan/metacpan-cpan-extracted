@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Debian::DEP12;
+use Text::BibTeX;
+
+@ARGV = ( '-' ) unless @ARGV;
+
+for my $i (0..$#ARGV) {
+    my $filename = $ARGV[$i];
+    print "---\n" if $i;
+    my $bibfile = Text::BibTeX::File->new( $filename )
+        || die "$0: $filename: $!\n";
+    my $meta = Debian::DEP12->new( $bibfile );
+    print $meta->to_YAML;
+}

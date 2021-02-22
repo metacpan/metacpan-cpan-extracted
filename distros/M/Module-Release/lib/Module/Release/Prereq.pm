@@ -1,13 +1,14 @@
+use v5.16;
+
 package Module::Release::Prereq;
 
 use strict;
 use warnings;
 use Exporter qw(import);
-use vars qw($VERSION);
 
 our @EXPORT = qw( check_prereqs _get_prereq_ignore_list );
 
-$VERSION = '2.125';
+our $VERSION = '2.127';
 
 =encoding utf8
 
@@ -41,8 +42,7 @@ my %Prereq_modules = (
 	'Build.PL' => 'Test::Prereq::Build',
 	);
 
-sub check_prereqs
-	{
+sub check_prereqs {
 	my $prereqs_type = $_[0]->config->makefile_PL;
 	my $test_prereqs = $Prereq_modules{$prereqs_type // ''} || 'Test::Prereq';
 
@@ -65,8 +65,7 @@ sub check_prereqs
 	$_[0]->_print( "done\n" );
 	}
 
-sub _get_prereq_ignore_list
-	{
+sub _get_prereq_ignore_list {
 	my @ignore = split /\s+/, $_[0]->config->ignore_prereqs || '';
 	}
 
@@ -88,7 +87,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2018, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2007-2021, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

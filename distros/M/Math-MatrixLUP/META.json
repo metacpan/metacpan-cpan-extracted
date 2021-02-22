@@ -3,8 +3,8 @@
    "author" : [
       "Daniel Șuteu <trizen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "artistic_2"
    ],
@@ -26,7 +26,7 @@
       },
       "runtime" : {
          "recommends" : {
-            "Math::AnyNum" : "0.31"
+            "Math::AnyNum" : "0.38"
          },
          "requires" : {
             "Carp" : "0",
@@ -37,7 +37,7 @@
    "provides" : {
       "Math::MatrixLUP" : {
          "file" : "lib/Math/MatrixLUP.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/trizen/Math-MatrixLUP"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

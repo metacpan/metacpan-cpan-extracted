@@ -1,14 +1,23 @@
 Changes
+config/RecordTypes.xml
+examples/example1.gdt
+examples/example2.gdt
+ignore.txt
 lib/xDT/Object.pm
 lib/xDT/Parser.pm
 lib/xDT/Record.pm
 lib/xDT/RecordType.pm
 Makefile.PL
 MANIFEST			This list of files
+parse.pl
 README
 t/00-load.t
+t/lib/Record.pm
+t/lib/RecordType.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/run-test-class.t
+xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

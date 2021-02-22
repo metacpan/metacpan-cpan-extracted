@@ -22,7 +22,7 @@ a somewhat-convoluted interface to the C<interpolate>
 function of L<PDL::Primitive|PDL::Primitive/interpolate>. 
 However, it is expected that derived classes,
 such as 
-L<PDL::Interpolate::Slatec|PDL::Interpolate::Slatec>,
+L<PDL::Interpolate::Slatec>,
 will actually be used in real-world situations.
 
 To use, create a PDL::Interpolate (or a derived class)
@@ -65,18 +65,18 @@ derived classes may modify this list.
  type       g     type of interpolation
 
 A flag of C<s> means that a user can set this attribute 
-with the L<new|/new> or L<set|/set> methods,
+with the L</new> or L</set> methods,
 a flag of C<g> means that the user can obtain the 
-value of this attribute using L<get|/get>,
+value of this attribute using L</get>,
 and a flag of C<r> means that the attribute is required
-when an object is created (see the L<new|/new> method).
+when an object is created (see the L</new> method).
 
  Attribute  Default value
  bc         "none"
  type       "linear"
 
 If a routine is sent an attribute it does not understand, then
-it ignores that attribute, except for L<get|/get>, which
+it ignores that attribute, except for L</get>, which
 returns C<undef> for that value.
 
 =head1 METHODS
@@ -114,11 +114,11 @@ use strict;
 
 Create a PDL::Interpolate object.
 
-The required L<attributes|/attributes> are 
+The required L</attributes> are 
 C<x> and C<y>.
 At present the only available interpolation method 
 is C<"linear"> - which just uses
-L<PDL::Primitive::interpolate|PDL::Primitive::interpolate> - and
+L<PDL::Primitive::interpolate> - and
 there are no options for boundary conditions, which is why
 the C<type> and C<bc> attributes can not be changed.
 

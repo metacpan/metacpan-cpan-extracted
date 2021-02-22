@@ -1,0 +1,58 @@
+{
+   "abstract" : "(DEPRECATED) installing and finding Prototype Window Class",
+   "author" : [
+      "Graham TerMarsch (cpan@howlingfrog.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Prototype-Window",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Test::Exception" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::scriptaculous" : "v1.7.1.103",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Prototype::Window" : {
+         "file" : "lib/Alien/Prototype/Window.pm",
+         "version" : "v1.3.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.3.4",
+   "x_bugtracker" : {
+      "web" : "https://github.com/bleargh45/Alien-Prototype-Window/issues"
+   },
+   "x_deprecated" : 1,
+   "x_repository" : {
+      "type" : "git",
+      "url" : "git://github.com/bleargh45/Alien-Prototype-Window.git",
+      "web" : "https://github.com/bleargh45/Alien-Prototype-Window"
+   },
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

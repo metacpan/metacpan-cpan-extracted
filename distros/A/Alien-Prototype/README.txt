@@ -1,5 +1,10 @@
 Alien::Prototype automatically installs ths Prototype JS library
 
+
+*** DEPRECATED *** - DO NOT USE
+
+
+
 Copyright (C) 2007, Graham TerMarsch.  All Rights Reserved.
 
 This is free software; you can redistribute it and/or modify it under the same

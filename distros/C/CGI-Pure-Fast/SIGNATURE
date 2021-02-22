@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,39 +12,42 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: RIPEMD160
 
-SHA1 18a4ad57370fcc18d59f4172155de2acac5ad33c Changes
-SHA1 fbd48ffdac39b07206ec35c19ac9a46793af5797 Fast.pm
-SHA1 b35d5112a6b88cfff435740fc3181b579c57d26f LICENSE
-SHA1 d673a9907acfced001f2e6e75dae826f6ef26e99 MANIFEST
-SHA1 c2be4091ee8fa703974723452557af53dc464286 META.yml
-SHA1 118cf5e10afe82362791ca6aff8a5f4bf3e73888 Makefile.PL
-SHA1 afe45f38406cd5052440ba541589f61c922b3e83 README
-SHA1 f5256ee2eff097e6424bad565736778d0ebe3e39 examples/ex1.pl
-SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
-SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
-SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
-SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
-SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
-SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
-SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
-SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
-SHA1 041e03e95d1ac819e0617305ff49e4733a492146 t/CGI-Pure-Fast/01-use.t
-SHA1 36c87a3121700b49e23fa4c1193bae6f912ec364 t/CGI-Pure-Fast/02-version.t
-SHA1 c08ad5dac7c47d673f603652e1f72b9adc520f4e xt/CGI-Pure-Fast/01-pod_coverage.t
-SHA1 4b16958b0a795e5bfe473dc9ff5a9017a92c2bff xt/CGI-Pure-Fast/02-pod.t
+SHA256 b2666ebd7f5d8b08413393d70be8f8c5d5e6d968054d465f27d81391fc047831 Changes
+SHA256 ef99d9b618f2914842661c976543e5e9d5f52fd2fc30beb149f349c3adf78de3 Fast.pm
+SHA256 34d2556257954a24f966c4da3104507e1a97c3899588d1acfd3b4e7c2002abb3 LICENSE
+SHA256 fa6273d0803d4cb54cee79829087c0bef1aa68dab4b27631c7ff7cbc0e8ab4b8 MANIFEST
+SHA256 68fa618faa91222010b717568f3477818612a5fdfb8ed96d1816fbb6bf8a6ad0 META.yml
+SHA256 6fcb4f5bfc583a52b34e7e6e5788b01b5047fb5a878c5ecb04895c62f708ddb4 Makefile.PL
+SHA256 3916a64abc21116011f4ec4ff55ddb3dc2ed2f7d6a1a4de6fb5cc13995e8c9a6 README
+SHA256 a38ec1b255855a38be96542ea208c203129df5e10d06b517879c51f20cdb2f62 examples/ex1.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 e6644cd05dbc358ab46080fa51161f96f2cb2f1e43e8ae4ffcc938ba91065693 t/CGI-Pure-Fast/01-use.t
+SHA256 6b8fd645fd190d110b5102865d9335b510eb9201d26c9e4e8ec1d07668217dd4 t/CGI-Pure-Fast/02-version.t
+SHA256 f2850d4cd8bdcaae0e898259426f37f6376754d8a964a6e2f37c14cd2275cc87 xt/CGI-Pure-Fast/01-pod_coverage.t
+SHA256 d3237cf9f26c052ab661dbdc708c224d06f9b061d3daba81d3f05427ed42ec55 xt/CGI-Pure-Fast/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAlplwY8ACgkQKyiOZjWe
-rHZERwf9HnkCHeAvT7LDWVpC2gTyJdRtUT7WS/73u8TR9KE7XQSou/GjkBidcTw9
-tR6j7oCZLRlval8Q1CXaWpApKbbpTS5g9W94O9CgC24WTZDkWaJ00xpGQIVS8bcJ
-rC3yokKkspXHhYDxmFB3IAewI7tga6FHCTfK2nhN8KI5Y6rCoFt1THaWz2HncS0o
-UvsmxhhE77hm5QZIPQyl06R1fhqyLJxzvGIkM95fTO5OB8bg07+rVTRd4X+6KpPi
-XuZM6PsXb6IVG/7I6hmyxJaUoGL+iwx32SiGlPMpRtogCclgGvlR9cxOmG4Q+IUv
-slPG3TRuVTMknXJhhQ3YAZ6HdndFgA==
-=7/55
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmAyOyEACgkQgmqNLzlX
+aRfs+Av9GSZBbYaC2/Cvc86mY29fcsG19+26RC/0d/K5jBexHKyaN9OA5soTMmAT
+Vs5bXyLI2q3aQ1YBt7UKD4PJ3iwqfPFGpsvbxyoBUrTvhAoCVMAapHrU74nvuRbh
+N2K1du39SoA0FTYPjyZsPGDlidZgk3bLUejl7OCQDdrSV7S7k5MjVWNlB4V1bZuv
++NUI9wT4usFzZGHHjaO46MyMCpq1QUOyGMB6i+C8oVN9uICHIkd15loTbbS26OLj
+2aOJuWMUNnqV5YorAtqD9KGuuB19YmJviAxYIA1idME6VJ/DrQZrOLjV+qSCHmAp
+T4i/RTpLsJaQXrdHj8AqNyUE8G97ap9Scr34FocEvQ5veWX4EjIKj/dTpchbHElt
+B2lOtKz54xfQ3EiiMnRgW9LnD6fTjEHbHLs6dvveJZM3aow8qz8wLCBKEp3tO7Ef
+u8JdTA/sDmhHdcqnO/MRMgOV1AoVHgRi2zjzCg0EuheoRHPmU7bcKg2gHt0/Sp4B
+5IbykjNC
+=K36n
 -----END PGP SIGNATURE-----

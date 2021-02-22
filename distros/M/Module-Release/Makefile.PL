@@ -44,12 +44,12 @@ my $github    = 'https://github.com/briandfoy/module-release';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
-	'MIN_PERL_VERSION' => '5.010',
+	'MIN_PERL_VERSION' => '5.016',
 
 	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
-	'LICENSE'       => 'artistic2',
+	'LICENSE'       => 'artistic_2',
 	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
 
 	'EXE_FILES'    =>  [ 'script/release' ],
@@ -65,10 +65,10 @@ my %WriteMakefile = (
 	'PREREQ_PM'    => {
 		'CACertOrg::CA'         => '0',
 		'ConfigReader::Simple'  => '0',
-		'DateTime'              => '0',
 		'IO::Null'              => '0',
-		'Mojolicious'           => '4.50',
+		'Mojolicious'           => '8',
 		'Term::ReadKey'         => '0',
+		'Time::Piece'           => '0',
 		'URI'                   => '0',
 		},
 

@@ -2,15 +2,15 @@ package Crypt::PBE::PBES1;
 
 use strict;
 use warnings;
+use utf8;
 
 use Carp;
 use Crypt::CBC;
+use Exporter qw(import);
 
 use Crypt::PBE::PBKDF1;
 
-use Exporter qw(import);
-
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 use constant ENCRYPTION => { 'des' => 'Crypt::DES', };
 
@@ -215,7 +215,7 @@ L<https://github.com/giterlizzi/perl-Crypt-PBE>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2020-2021 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

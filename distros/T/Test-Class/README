@@ -2,7 +2,7 @@ NAME
     Test::Class - Easily create test classes in an xUnit/JUnit style
 
 VERSION
-    version 0.50
+    version 0.51
 
 SYNOPSIS
       package Example::Test;
@@ -477,6 +477,21 @@ RETURNING EARLY
         for (my $n=1; $n*$n<50; ++$n) {
           ok 1, "$n squared is less than fifty";
         }
+      }
+
+RETURNING LATE
+    If a test method runs too many tests, by default the test plan succeeds.
+
+    However, if the class's "fail_if_returned_late" method returns true,
+    then the extra tests will trigger a failure. For example,
+
+      package MyClass;
+      use base 'Test::Class';
+      sub fail_if_returned_late { 1 }
+
+      sub oops : Tests(1) {
+        ok 1, "just a simple test";
+        ok 1, "just a simple test"; #oops I copied and pasted too many tests
       }
 
 SKIPPED TESTS
@@ -1172,6 +1187,12 @@ METHODS
         returns true, then the missing tests fail, otherwise, they skip. See
         "Returning Early" and "Skipped Tests".
 
+    fail_if_returned_late
+        Controls what happens if a method returns after running too many
+        tests. It is called with no arguments in boolean context; if it
+        returns true, then the extra tests trigger a failure test. See
+        "Returning Late" and "Skipped Tests".
+
 HELP FOR CONFUSED JUNIT USERS
     This section is for people who have used JUnit (or similar) and are
     confused because they don't see the TestCase/Suite/Runner class
@@ -1287,35 +1308,18 @@ OTHER MODULES FOR XUNIT TESTING IN PERL
         output test results in the format that Test::Harness expects, but
         things like todo tests and skipping tests are not supported.
 
-BUGS
-    None known at the time of writing.
+SUPPORT
+    Bugs may be submitted through GitHub issues
+    <https://github.com/szabgab/test-class/issues>
 
-    If you find any bugs please let me know by e-mail at
-    <adrianh@quietstars.com>, or report the problem with
-    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Class>.
-
-COMMUNITY
-  perl-qa
-    If you are interested in testing using Perl I recommend you visit
-    <http://qa.perl.org/> and join the excellent perl-qa mailing list. See
-    <http://lists.perl.org/showlist.cgi?name=perl-qa> for details on how to
-    subscribe.
-
-  perlmonks
-    You can find users of Test::Class, including the module author, on
-    <http://www.perlmonks.org/>. Feel free to ask questions on Test::Class
-    there.
-
-  CPAN::Forum
-    The CPAN Forum is a web forum for discussing Perl's CPAN modules. The
-    Test::Class forum can be found at
-    <http://www.cpanforum.com/dist/Test-Class>.
+    There is also an irc channel available for users of this distribution,
+    at "#perl-qa" on "irc.perl.org" <irc://irc.perl.org/#perl-qa>.
 
 TO DO
     If you think this module should do something that it doesn't (or does
     something that it shouldn't) please let me know.
 
-    You can see my current to do list at
+    You can see an old to do list at
     <http://adrianh.tadalist.com/lists/public/4798>, with an RSS feed of
     changes at <http://adrianh.tadalist.com/lists/feed_public/4798>.
 
@@ -1346,9 +1350,6 @@ AUTHORS
     Adrian Howard <adrianh@quietstars.com>, Curtis "Ovid" Poe, <ovid at
     cpan.org>, Mark Morgan <makk384@gmail.com>.
 
-    If you use this module, and can spare the time please let us know or
-    rate it at <http://cpanratings.perl.org/rate/?distribution=Test-Class>.
-
 SEE ALSO
     Test::Class::Load
         Simple way to load "Test::Class" classes automatically.
@@ -1362,9 +1363,6 @@ SEE ALSO
         Moose and non-Moose code. It offers reporting, extensibility, test
         inheritance, parallel testing and more.
 
-    <http://del.icio.us/tag/Test::Class>
-        Delicious links on Test::Class.
-
     Perl Testing: A Developer's Notebook by Ian Langworth and chromatic
         Chapter 8 covers using Test::Class.
 
@@ -1377,19 +1375,24 @@ SEE ALSO
 
     Test::Class Tutorial series written by Curtis "Ovid" Poe
 
-        *   <http://www.modernperlbooks.com/mt/2009/03/organizing-test-suite
+        *   Organizing Test Suites with Test::Class
+            <http://www.modernperlbooks.com/mt/2009/03/organizing-test-suite
             s-with-testclass.html>
 
-        *   <http://www.modernperlbooks.com/mt/2009/03/reusing-test-code-wit
+        *   Reusing Test Code with Test::Class
+            <http://www.modernperlbooks.com/mt/2009/03/reusing-test-code-wit
             h-testclass.html>
 
-        *   <http://www.modernperlbooks.com/mt/2009/03/making-your-testing-l
+        *   Making Your Testing Life Easier
+            <http://www.modernperlbooks.com/mt/2009/03/making-your-testing-l
             ife-easier.html>
 
-        *   <http://www.modernperlbooks.com/mt/2009/03/using-test-control-me
+        *   Using Test Control Methods with Test::Class
+            <http://www.modernperlbooks.com/mt/2009/03/using-test-control-me
             thods-with-testclass.html>
 
-        *   <http://www.modernperlbooks.com/mt/2009/03/working-with-testclas
+        *   Working with Test::Class Test Suites
+            <http://www.modernperlbooks.com/mt/2009/03/working-with-testclas
             s-test-suites.html>
 
     Test::Builder
@@ -1398,11 +1401,8 @@ SEE ALSO
     Test::Simple & Test::More
         Basic utilities for writing tests.
 
-    <http://qa.perl.org/test-modules.html>
+    <https://qa.perl.org/test-modules.html>
         Overview of some of the many testing modules available on CPAN.
-
-    <http://del.icio.us/tag/perl+testing>
-        Delicious links on perl testing.
 
     Test::Object
         Another approach to object oriented testing.

@@ -1,4 +1,9 @@
 Revision history for RT-Extension-AuditLog
 
+0.03 [2021/02/16]
+ - Comments regarding running on old installations.
+ - Manual changes to Module/Install/RTx.pm to hopefully get the paths right
+   (Credits Angel Gonza¡lez Berdaso)
+
 0.02 [2020/07/30]
  - Initial version

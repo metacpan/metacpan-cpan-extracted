@@ -21,6 +21,17 @@ use vars qw(@test);
     sub {1},
     sub {1},
     sub {1},
+# 11
+    sub { $_='ABCDEF';               my $r=    reverse($_);  $r  eq "FEDCBA"         },
+    sub { $_='ABCDEF';               my $r=mb::reverse($_);  $r  eq "FEDCBA"         },
+    sub { $_='‚ ‚¢‚¤‚¦‚¨‚©';         my $r=mb::reverse($_);  $r  eq "‚©‚¨‚¦‚¤‚¢‚ "   },
+    sub { $_='ABCDEF';               my $r=    reverse();    $r  eq "FEDCBA"         },
+    sub { $_='ABCDEF';               my $r=mb::reverse();    $r  eq "FEDCBA"         },
+    sub { $_='‚ ‚¢‚¤‚¦‚¨‚©';         my $r=mb::reverse();    $r  eq "‚©‚¨‚¦‚¤‚¢‚ "   },
+    sub { $_='ABCDEF';               my $r=    reverse;      $r  eq "FEDCBA"         },
+    sub { $_='ABCDEF';               my $r=mb::reverse;      $r  eq "FEDCBA"         },
+    sub { $_='‚ ‚¢‚¤‚¦‚¨‚©';         my $r=mb::reverse;      $r  eq "‚©‚¨‚¦‚¤‚¢‚ "   },
+    sub {1},
 #
 );
 

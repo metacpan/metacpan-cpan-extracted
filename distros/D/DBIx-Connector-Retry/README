@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.900.1
+    version v0.900.2
 
 SYNOPSIS
 
@@ -93,7 +93,9 @@ ATTRIBUTES
             my $err = $c->last_exception;
             $err = $err->error if blessed $err && $err->isa('DBIx::Connector::RollbackError');
     
-            $err =~ /deadlock|timeout/i;  # only retry on deadlocks or timeouts
+            # only retry on deadlocks or timeouts (only look in the first line
+            # of the error to avoid e.g. accidental matches in a stack trace)
+            $err =~ /^\V*(?:deadlock|timeout)/i;
         });
 
     Default is an always-true coderef.
@@ -103,6 +105,13 @@ ATTRIBUTES
   clear_retry_handler
 
     Sets it back to the always-true default.
+
+ execute_method
+
+    The current DBIx::Connector execution method name being called, which
+    would either be run or txn. Since svp is not overridden, it would never
+    be encountered. If the connector is not in the middle of DB block
+    execution, this attribute is blank.
 
  failed_attempt_count
 
@@ -292,7 +301,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+    This software is Copyright (c) 2018 - 2021 by Grant Street Group.
 
     This is free software, licensed under:
 

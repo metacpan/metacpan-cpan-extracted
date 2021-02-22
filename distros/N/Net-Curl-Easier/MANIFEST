@@ -1,0 +1,12 @@
+.github/workflows/linux.yml
+.github/workflows/macos.yml
+.gitignore
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+lib/Net/Curl/Easier.pm
+t/easier.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

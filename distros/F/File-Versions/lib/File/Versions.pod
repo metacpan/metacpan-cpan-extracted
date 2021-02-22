@@ -17,8 +17,8 @@ File::Versions - Emacs-like versioned file names
 
 =head1 VERSION
 
-This documents File::Versions version 0.09
-corresponding to git commit L<7d641410d8d898ad7292d9eaf531614fea033e59|https://github.com/benkasminbullock/File-Versions/commit/7d641410d8d898ad7292d9eaf531614fea033e59> released on Sat May 12 10:40:28 2018 +0900.
+This documents File::Versions version 0.10
+corresponding to git commit L<e92bce4dbd4380b54aee11a352e18879b0e8c226|https://github.com/benkasminbullock/File-Versions/commit/e92bce4dbd4380b54aee11a352e18879b0e8c226> released on Sun Feb 14 14:09:19 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -52,6 +52,16 @@ return value is the name of the backup file.
 There is something similar to this module in the source code of the
 "rename" utility which comes with Perl.
 
+=head2 CPAN modules
+
+=over
+
+=item L<File::BackupCopy>
+
+It is remarkably similar to this module.
+
+=back
+
 =head1 EXPORTS
 
 L</backup_name> and L</make_backup> are exported on demand. The export
@@ -83,7 +93,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2010-2018
+2010-2021
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

@@ -2,8 +2,6 @@ package xDT::Object;
 
 use v5.10;
 use Moose;
-use namespace::autoclean;
-use Carp;
 
 use xDT::Record;
 
@@ -11,28 +9,19 @@ use xDT::Record;
 
 xDT::Object - Instances of this module are collections of xDT records.
 
-=head1 VERSION
-
-Version 1.00
-
-=cut
-
-our $VERSION = '1.00';
-
-
 =head1 SYNOPSIS
 
 Instances should be used to aggregate records for a single patient.
-Each object should starts and ends with respective record types of the used xDT version.
+Each object should start and end with respective record types of the used xDT version.
 
     use xDT::Object;
 
     my @records = (); # should be an array of xDT::Record instances
     my $object  = xDT::Object->new();
-    $object->addRecord(@records);
+    $object->add_record(@records);
 
-    say 'Patient number: '. $object->getValue('patientNumber');
-    say 'Birthdate: '. $object->getValue('birthdate');
+    say 'Patient number: '. $object->get_value('patient_number');
+    say 'Birthdate: '. $object->get_value('birthdate');
 
 =head1 ATTRIBUTES
 
@@ -48,89 +37,115 @@ has 'records' => (
     traits  => ['Array'],
     default => sub { [ ] },
     handles => {
-        getRecords    => 'elements',
-        addRecord     => 'push',
-        mapRecords    => 'map',
-        recordCount   => 'count',
-        sortedRecords => 'sort',
-        nextRecord    => 'shift',
+        get_records    => 'elements',
+        add_record     => 'push',
+        map_records    => 'map',
+        record_count   => 'count',
+        sorted_records => 'sort',
+        next_record    => 'shift',
     },
     documentation => q{A collection of logical associated records.},
 );
 
 =head1 SUBROUTINES/METHODS
 
-=head2 isEmpty
+=head2 is_empty
 
 Checks if this object has any records.
 
 =cut
 
-sub isEmpty {
+sub is_empty {
     my $self = shift;
 
-    return $self->recordCount == 0;
+    return $self->record_count == 0;
 }
 
-=head2 get($accessor)
+=head2 get_every_record($accessor)
 
-This function returns all records of the object with have the given accessor.
+Returns all records as arrayref, which have the given accessor.
 
 =cut
 
-sub get {
+sub get_every_record {
     my $self     = shift;
-    my $accessor = shift // croak('Error: parameter $accessor missing.');
-
-    return grep { $_->getAccessor() eq $accessor } $self->getRecords();
+    my $accessor = shift // die 'Error: parameter $accessor missing.';
+    return [ grep { $_->get_accessor() eq $accessor } $self->get_records() ];
 }
 
-=head2 getValue($accessor)
+=head2 get_record($accessor)
 
-In contrast to xDT::Object->get(), this function returns the values of records, returned by xDT::Object->get().
+Returns the first record with the given accessor, if there are any, else undef.
 
 =cut
 
-sub getValue {
+sub get_record {
     my $self     = shift;
-    my $accessor = shift // croak('Error: parameter $accessor missing.');
-    my @records  = $self->get($accessor);
-    
-    return undef unless @records;
-    return map { $_->getValue() } @records;
+    my $accessor = shift // die 'Error: parameter $accessor missing.';
+    my ($record) = grep { $_->get_accessor() eq $accessor } $self->get_records();
+
+    return $record;
 }
 
-=head2 getRecords
+=head2 get_every_value($accessor)
+
+Returns the values of all records as arrayref, which have the given accessor.
+
+=cut
+
+sub get_every_value {
+    my $self     = shift;
+    my $accessor = shift // die 'Error: parameter $accessor missing.';
+    my $records  = $self->get_every_record($accessor);
+
+    return [ map { $_->get_value } @$records ];
+}
+
+=head2 get_value($accessor)
+
+Returns the value of the first record with the given accessor, if there are any, else undef.
+
+=cut
+
+sub get_value {
+    my $self     = shift;
+    my $accessor = shift // die 'Error: parameter $accessor missing.';
+    my $record   = $self->get_record($accessor);
+
+    return $record ? $record->get_value : undef;
+}
+
+=head2 get_records
 
 Corresponse to the elements function.
 
 =cut
 
-=head2 addRecord
+=head2 add_record
 
 Corresponse to the push function.
 
 =cut
 
-=head2 mapRecords
+=head2 map_records
 
 Corresponse to the map function.
 
 =cut
 
-=head2 recordCount
+=head2 record_count
 
 Correpsonse to the count function.
 
 =cut
 
-=head2 sortedRecords
+=head2 sorted_records
 
 Corresponse to the sort function.
 
 =cut
 
-=head2 nextRecord
+=head2 next_record
 
 Corresponse to the shift function.
 
@@ -138,56 +153,7 @@ Corresponse to the shift function.
 
 =head1 AUTHOR
 
-Christoph Beger, C<< <christoph.beger at imise.uni-leipzig.de> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-xdt-parser at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=xDT-Parser>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc xDT::Object
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=xDT-Parser>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/xDT-Parser>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/xDT-Parser>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/xDT-Parser/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2017 Christoph Beger.
-
-This program is released under the following license: MIT
-
+Christoph Beger, C<< <christoph.beger at medizin.uni-leipzig.de> >>
 
 =cut
 

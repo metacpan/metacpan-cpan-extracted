@@ -12,4 +12,5 @@ t/urls.t
 t/format.t
 t/html-res/format.t.html
 t/html-res/blockquote.t.html
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

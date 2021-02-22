@@ -1,0 +1,12 @@
+$ perl examples/synopsis.pl &
+$ telnet localhost 7777
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+{"I'm feeling lucky":"punk"}
+{
+	"I'm feeling lucky":"punk",
+	"data":"OK",
+	"hello":"world"
+}
+Connection closed by foreign host.

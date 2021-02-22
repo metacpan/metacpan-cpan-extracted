@@ -6,5 +6,8 @@
   },
   'b' => {
     'attributes' => {}
+  },
+  'v' => {
+    'attributes' => {}
   }
 }

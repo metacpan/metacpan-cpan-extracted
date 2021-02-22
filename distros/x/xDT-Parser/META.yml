@@ -1,13 +1,13 @@
 ---
-abstract: 'A Parser for xDT files.'
+abstract: 'Perl xDT Parser'
 author:
-  - 'Christoph Beger <christoph.beger@imise.uni-leipzig.de>'
+  - 'Christoph Beger <christoph.beger@medizin.uni-leipzig.de>'
 build_requires:
-  Test::More: '0'
+  Test::More: '1.3'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+  ExtUtils::MakeMaker: '7.44'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,16 @@ no_index:
   directory:
     - t
     - inc
+    - examples
+    - t
+    - config
 requires:
+  Moose: '2.2'
+  XML::Simple: '2.25'
   perl: '5.006'
-version: '1.00'
+resources:
+  bugtracker: https://github.com/ChristophB/perl-xdt-parser/issues
+  license: https://opensource.org/licenses/MIT
+  repository: https://github.com/ChristophB/perl-xdt-parser.git
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

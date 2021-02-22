@@ -17,6 +17,10 @@ METHODS
 
     Returns instance of object.
 
+    *       "output_encoding"
+
+            Output encoding. Default value is 'utf-8'.
+
     *       "output_handler"
 
             Output handler. Default value is STDOUT.
@@ -96,7 +100,7 @@ EXAMPLE2
      # Usage: __SCRIPT__ pyx_file
 
 DEPENDENCIES
-    Class::Utils, Error::Pure, PYX, PYX::Parser, PYX::Utils.
+    Class::Utils, Encode, Error::Pure, PYX, PYX::Parser, PYX::Utils.
 
 SEE ALSO
     Task::PYX
@@ -111,10 +115,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2011-2020 Michal Josef Špaček
+    © 2011-2021 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.04
 

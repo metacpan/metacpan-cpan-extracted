@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::Mobi;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.06';
+our $VERSION = '0.7';
 
 my $pattern =
 qr/android.+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i;
@@ -43,30 +43,39 @@ Mojolicious::Plugin::Mobi - Mojolicious Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
+
+  # Register plugin Mobi and its helper to your application
   $self->plugin('Mobi');
-  $self->routes->route("/")->over(mobile=>1)->to("Mobile#index");
-  # or
+
+  # One way of how to use it
+  $self->routes->route("/")->requires(mobile=>1)->to("Mobile#index");
+
+  # or another
   $self->render(text=>"You are mobile.") if $self->is_mobile;
 
-  # Mojolicious::Lite - not tested this way
+  # Mojolicious::Lite
+
+  # Register plugin Mobi and its helper to your application
   plugin 'Mobi';
-  get '/' => sub { 
+
+  # Use the helper anywhere within your app
+  get '/' => sub {
     if (is_mobile()) {
       redirect_to("http://m.example.com");
     }
   }
-  # or
-  get '/' => (mobile=>1) => sub {
+
+  # or hook it up in the route as a requirement
+  get '/' => (mobile => 1) => sub {
     my $self = shift;
-    $self->render(text=>"This is a mobile version of this site.");
+    $self->render(text => "This is a mobile version of this site.");
   };
 
 
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Mobi> is a L<Mojolicious> plugin. This module provides
-a helper method is_mobile and route condition to be more easy to use in your
-dispatcher.
+a helper method is_mobile and route condition so it is easier to use in a dispatcher.
 
 =head1 METHODS
 

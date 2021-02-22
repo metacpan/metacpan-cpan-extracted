@@ -53,10 +53,12 @@ subtest 'No retries' => sub {
         $conn->run(ping => sub {
             my $dbh = shift;
             $dbh->do('INSERT INTO dbi_test (a) VALUES ("foobar")') for (1 .. 50);
+            is($conn->execute_method, 'run', 'Inter-sub execute_method is correct');
         });
     } 'Run is successful';
 
     my ($row_count) = $conn->dbh->selectrow_array('SELECT COUNT(*) FROM dbi_test');
+    is($conn->execute_method, '', 'Post-run execute_method is blank');
     cmp_ok($row_count, '==', 50, 'Row counts are as expected');
     cmp_ok($retries,   '==',  0, 'No retries');
 };
@@ -88,21 +90,24 @@ subtest 'Super flaky connection' => sub {
         $conn->txn(ping => sub {
             my $dbh = shift;
             $dbh->do('INSERT INTO dbi_test (a) VALUES ("foobar")') for (1 .. 50);
+            is($conn->execute_method, 'txn', 'Inter-sub execute_method is correct');
         });
     } 'Run is successful';
 
     my ($row_count) = $conn->dbh->selectrow_array('SELECT COUNT(*) FROM dbi_test');
+    is($conn->execute_method, '', 'Post-run execute_method is blank');
     cmp_ok($row_count, '==', 50, 'Row counts are as expected');
     cmp_ok($retries,   '==',  4, 'Some retries');
 };
 
 my $nested_i = 0;
 sub _nested_main_block {
-    my $dbh = shift;
+    my ($dbh, $conn) = @_;
     $nested_i++;
     die 'Your sneedles are gootched' if $nested_i % 5;  # silently die 4 out of 5 times
 
     $dbh->do('INSERT INTO dbi_test (a) VALUES ("foobar")') for (1 .. 50);
+    is($conn->execute_method, 'run', 'Nested inter-sub execute_method is correct');
 }
 
 subtest 'Nesting blocks' => sub {
@@ -117,12 +122,14 @@ subtest 'Nesting blocks' => sub {
     try_ok {
         for (1..5) {
             $conn->txn(ping => sub {
-                $conn->run(ping => \&_nested_main_block);
+                $conn->run(ping => sub { _nested_main_block($_, $conn) });
+                is($conn->execute_method, 'txn', 'Inter-sub execute_method is correct');
             });
         }
     } 'Run is successful';
 
     my ($row_count) = $conn->dbh->selectrow_array('SELECT COUNT(*) FROM dbi_test');
+    is($conn->execute_method, '', 'Post-run execute_method is blank');
     cmp_ok($row_count, '==', 250, 'Row counts are as expected');
     cmp_ok($retries,   '==',  20, 'Some retries');
 };

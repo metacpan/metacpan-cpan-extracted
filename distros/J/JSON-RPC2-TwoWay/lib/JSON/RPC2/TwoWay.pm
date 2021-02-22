@@ -3,14 +3,14 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 # standard perl
 use Carp;
 use Data::Dumper;
 
 # cpan
-use JSON::MaybeXS;
+use JSON::MaybeXS qw();
 
 # us
 use JSON::RPC2::TwoWay::Connection;
@@ -27,6 +27,7 @@ sub new {
 	my ($class, %opt) = @_;
 	my $self = {
 		debug => $opt{debug} // 0,
+		json => $opt{json} // JSON::MaybeXS->new(),
 		methods => {},
 	};
 	return bless $self, $class;
@@ -39,6 +40,7 @@ sub newconnection {
 		owner => $opt{owner},
 		write => $opt{write},
 		debug => $self->{debug},
+		json => $self->{json},
 	);
 	return $conn
 }
@@ -99,7 +101,7 @@ sub _handle_request {
 
 	if ($m->{raw}) {
 		my $cb;
-		$cb = sub { $c->write(encode_json($_[0])) if $id } if $m->{non_blocking};
+		$cb = sub { $c->write($self->{json}->encode($_[0])) if $id } if $m->{non_blocking};
 
 		local $@;
 		#my @ret = eval { $m->{cb}->($c, $jsonr, $r, $cb)};
@@ -107,7 +109,7 @@ sub _handle_request {
 		return $self->_error($c, $id, ERR_ERR, "Method threw error: $@") if $@;
 		#say STDERR 'method returned: ', Dumper(\@ret);
 
-		$c->write(encode_json($ret[0])) if !$cb and $id;
+		$c->write($self->{json}->encode($ret[0])) if !$cb and $id;
 		return
 	}
 
@@ -127,7 +129,7 @@ sub _error {
 	my ($self, $c, $id, $code, $message, $data) = @_;
 	my $err = "error: $code " . $message // '';
 	say STDERR $err if $self->{debug};
-	$c->write(encode_json({
+	$c->write($self->{json}->encode({
 		jsonrpc     => '2.0',
 		id          => $id,
 		error       => {
@@ -143,7 +145,7 @@ sub _result {
 	my ($self, $c, $id, $result) = @_;
 	$result = $$result[0] if scalar(@$result) == 1;
 	#say STDERR Dumper($result) if $self->{debug};
-	$c->write(encode_json({
+	$c->write($self->{json}->encode({
 		jsonrpc     => '2.0',
 		id          => $id,
 		result      => $result,
@@ -196,6 +198,8 @@ Valid arguments are:
 =over 4
 
 =item - debug: print debugging to STDERR
+
+=item - json: json encoder/decoder object to use. Defaults to JSON::MaybeXS->new().
 
 =back
 

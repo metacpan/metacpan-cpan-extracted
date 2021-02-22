@@ -1,0 +1,517 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Test::CLI - Testing command-line invocations
+
+=head1 VERSION
+
+This document describes Test::CLI version 0.001.
+
+=begin html
+
+<!-- a href="https://travis-ci.org/polettix/Test-CLI">
+<img alt="Build Status" src="https://travis-ci.org/polettix/Test-CLI.svg?branch=master">
+</a -->
+<a href="https://www.perl.org/">
+<img alt="Perl Version" src="https://img.shields.io/badge/perl-5.24+-brightgreen.svg">
+</a>
+<a href="https://badge.fury.io/pl/Test-CLI">
+<img alt="Current CPAN version" src="https://badge.fury.io/pl/Test-CLI.svg">
+</a>
+<a href="http://cpants.cpanauthors.org/dist/Test-CLI">
+<img alt="Kwalitee" src="http://cpants.cpanauthors.org/dist/Test-CLI.png">
+</a>
+<a href="http://www.cpantesters.org/distro/O/Test-CLI.html?distmat=1">
+<img alt="CPAN Testers" src="https://img.shields.io/badge/cpan-testers-blue.svg">
+</a>
+<a href="http://matrix.cpantesters.org/?dist=Test-CLI">
+<img alt="CPAN Testers Matrix" src="https://img.shields.io/badge/matrix-@testers-blue.svg">
+</a>
+
+=end html
+
+=head1 SYNOPSIS
+
+   use Test::CLI qw< tc >;
+
+   my $tc = tc(qw{ ls [options=-l] <dir> });
+
+   ok $tc->run('/'), 'plain run returns success/failure as boolean';
+
+   # run and test on one go
+   $tc->run_ok(dir => '/etc'); # run & test in one go
+   $tc->run_ok(dir => '/var', 'optional message');
+
+   # Last run is cached, all tests are related to it
+   $tc->stdout_like(qr{log});
+   $tc->stderr_is('');
+
+   # Tests can be chained
+   $tc->exit_code_is(0)
+      ->signal_is(0)
+      ->timeout_is(0)
+      ->stdout_like(qr{run});
+
+   # Verbose mode produces a dump of the whole run result if the test
+   # is not successful
+   $tc->verbose(1);
+   $tc->failure_ok('test fails because run was ok'); # will dump data
+
+   # It's always possible to go more in depth anyway
+   $tc->run('/not-existent');
+   my $run = $tc->last_run; # Test::Command::Runner::Record object
+   isnt $run->exit_code, 0, 'file does not exist'
+      or diag($run->stdout);
+
+=head1 DESCRIPTION
+
+C<Test::CLI> helps with performing tests of invoking external commands,
+leveraging L<Command::Template::Runner> for a flexible way of easily
+calling these commands and L<Command::Template::Runner::Record> for
+analyzing the outcome of these commands.
+
+In general, it is geared at covering simpler cases where there is no
+interaction with the command that is run, apart possibly providing a
+standard input for the command to read in. To this extent, then, it is
+mostly indicated for non-interactive commands (like, for example, most
+Unix commands, or most of the sub-commands of C<git>).
+
+
+=head1 INTERFACE
+
+The interface is I<object-oriented>, with the exception of the function
+L</tc> (which is also aliased as L</test_cli>) that allows easily
+getting a new C<Test::CLI> object.
+
+=head2 Functions
+
+There is one function with two aliases:
+
+=over
+
+=item C<test_cli>
+
+=item C<tc>
+
+   my $tc = test_cli(@command_template);
+
+Create a C<Test::CLI> object from the provided C<@command_template>. It
+is actually a wrapper around the L</new> class method.
+
+=back
+
+
+=head2 Class Method: Constructor
+
+The following constructor is supported as a class method:
+
+=over
+
+=item C<new>
+
+   my $tc = Test::CLI->new(@command_template);
+
+The C<@command_template> is parsed and used through L<Command::Template>
+(actually, through L<Command::Template::Runner>).
+
+Returns a C<Test::CLI> object, see below for the available interface of
+this object.
+
+=back
+
+=head2 Methods: Accessors
+
+The following accessors are supported:
+
+=over
+
+=item C<last_run>
+
+   my $r = $tc->last_run;
+
+Returns the last C<Command::Template::Runner::Record> produced in the
+last command run.
+
+Read-only.
+
+=item C<last_command>
+
+   my $string = $tc->last_command;
+
+Returns the stringification of the latest command that was run.
+
+Read-only.
+
+=item C<runner>
+
+   my $runner = $tc->runner;
+
+Returns the C<Command::Template::Runner> object used by C<Test::CLI> for
+executing commans.
+
+Read-only.
+
+=item C<verbose>
+
+   my $is_verbose = $tc>verbose;
+   $tc->verbose(1); # set verbose mode
+   $tc->verbose(0); # unset verbose mode
+
+Get or set the verbosity in error output. When set, each error in a test
+also generates a dump of the L<Command::Template::Runner::Record> object
+via a C<diag> call.
+
+Defaults to I<false>.
+
+Returns the current value for the flag when called without parameters.
+Sets the value and returns the object reference otherwise.
+
+Read-write method.
+
+=back
+
+=head2 Method: Executing
+
+The following method allows executing one run of the command template
+through L<Command::Template::Runner>, although with a different return
+value.
+
+=over
+
+=item C<run>
+
+   my $run_was_successful = $tc->run(%bindings_and_options);
+
+Run the command with the provided bindings and options (see
+L<Command::Template::Runner> for the details).
+
+The method returns a I<true> value if the command execution is
+successful (i.e. the exit value is 0 and there was no signal terminating
+the command). It also records the last run overall result as a
+C<Command::Template::Runner::Record> object that can be later retrieved
+via L</last_run>.
+
+=back
+
+=head2 Method: Dumping
+
+The following method is not a test but allows introspection. It is
+called automatically if a test is unsuccessful and L</verbose> is
+I<true>.
+
+=over
+
+=item C<dump_diag>
+
+This method method allows dumping the outcome of the last run as a
+C<diag> message (which goes to standard error).
+
+The method returns a reference to the object itself, for easier
+chaining.
+
+=back
+
+
+=head2 Methods: Testing
+
+The central methods of this package are devoted to testing the outcome
+of a command execution.
+
+All the following methods return the object's reference, so that
+multiple tests can be chained one after another.
+
+Before describing the methods, it's useful to point out what
+characteristics are tested:
+
+=over
+
+=item I<exit code>
+
+the command's exit code, typically provided by the command's C<exit>
+function;
+
+=item I<signal>
+
+a signal that might have forced the command's process to exit;
+
+=item I<timeout>
+
+a timeout set when calling the command, which might have been hit
+(leading to termination of the command's process) or not;
+
+=item I<stdout>
+
+what the command sends on the standard output;
+
+=item I<stderr>
+
+what the command sends on the standard error;
+
+=item I<merged>
+
+what the command sends on either output channels (standard error first,
+then standard output).
+
+=back
+
+
+All test functions accept an optional last parameter to pass a custom
+message to mark the text; if not present or undefined, it is
+automatically generated based on the specific test and the command that
+has been expanded.
+
+The following test functions are available:
+
+=over
+
+=item C<run_ok>
+
+   $tc->run_ok(\%bindings_and_opts);
+   $tc->run_ok(\%bindings_and_opts, $message);
+
+First call L</run> and then L</ok> to do a new run with the provided
+parameters and then check that the run is successful.
+
+=item C<run_failure_ok>
+
+   $tc->run_failure_ok(\%bindings_and_opts);
+   $tc->run_failure_ok(\%bindings_and_opts, $message);
+
+First call L</run> and then L</failure_ok> to do a new run with the
+provided parameters and then check that the run is NOT successful.
+
+
+=item C<ok>
+
+   $tc->ok;
+   $tc->ok('command successful');
+
+Check if the latest run was successful. This is defined by
+L<Command::Template::Runner::Record/success>, that checks that neither a
+signal nor a non-0 exit code were returned.
+
+=item C<failure_ok>
+
+   $tc->failure_ok;
+   $tc->failure_ok('command failed as expected');
+
+Check if the latest run was unsuccessful (this is considered a condition
+to pass the test, i.e. the test passes if the command fails).  This is
+defined by L<Command::Template::Runner::Record/failure>, that checks
+that neither a signal nor a non-0 exit code were returned.
+
+=back
+
+Other test functions are described in the following subsections.
+
+=head3 Characteristic-specific successful tests
+
+This type of test succeeds if the value corresponding to the specific
+characteristic is 0.
+
+=over
+
+=item C<exit_code_ok>
+
+   $tc->exit_code_ok;
+   $tc->exit_code_ok('exit code 0 as expected');
+
+=item C<signal_ok>
+
+   $tc->signal_ok;
+   $tc->signal_ok('signal 0 as expected');
+
+=item C<in_time_ok>
+
+   $tc->in_time_ok;
+   $tc->in_time_ok('timeout 0 as expected');
+
+=back
+
+
+=head3 Characteristic-specific failure tests
+
+This type of test succeeds if the value corresponding to the specific
+characteristic is different from 0.
+
+=over
+
+=item C<exit_code_failure_ok>
+
+   $tc->exit_code_failure_ok;
+   $tc->exit_code_failure_ok('exit code different from 0 as expected');
+
+=item C<signal_failure_ok>
+
+   $tc->signal_failure_ok;
+   $tc->signal_failure_ok('signal different from 0 as expected');
+
+=item C<timed_out_ok>
+
+   $tc->timed_out_ok;
+   $tc->timed_out_ok('timeout different from 0 as expected');
+
+=back
+
+=head3 Characteristic-specific equality tests
+
+This type of test succeeds is the value corresponding to the specific
+characteristic is as specified.
+
+=over
+
+=item C<exit_code_is>
+
+   $tc->exit_code_is(0);
+   $tc->exit_code_is(42, 'exit code is 42 as expected');
+
+=item C<signal_is>
+
+   $tc->signal_is(0);
+   $tc->signal_is(9, 'killed without appeal');
+
+=item C<timeout_is>
+
+   $tc->timeout_is(0);
+   $tc->timeout_is(5, 'timed out after 5 seconds');
+
+=item C<stdout_is>
+
+   $tc->stdout_is('foo bar baz');
+   $tc->stdout_is('foo bar baz', 'standard output as expected');
+
+=item C<stderr_is>
+
+   $tc->stderr_is('foo bar baz');
+   $tc->stderr_is('foo bar baz', 'standard error as expected');
+
+=item C<merged_is>
+
+   $tc->merged_is('foo bar baz');
+   $tc->merged_is('foo bar baz', 'merge of standard output and error as expected');
+
+=back
+
+=head3 Characteristic-specific inequality tests
+
+This type of test succeeds is the value corresponding to the specific
+characteristic is different from what specified.
+
+=over
+
+=item C<exit_code_isnt>
+
+   $tc->exit_code_isnt(0);
+   $tc->exit_code_isnt(42, 'exit code is 42 as expected');
+
+=item C<signal_isnt>
+
+   $tc->signal_isnt(0);
+   $tc->signal_isnt(9, 'not killed without appeal');
+
+=item C<timeout_isnt>
+
+   $tc->timeout_isnt(0);
+   $tc->timeout_isnt(5, 'timeout not 5 seconds');
+
+=item C<stdout_isnt>
+
+   $tc->stdout_isnt('foo bar baz');
+   $tc->stdout_isnt('foo bar baz', 'standard output different from it');
+
+=item C<stderr_isnt>
+
+   $tc->stderr_isnt('foo bar baz');
+   $tc->stderr_isnt('foo bar baz', 'standard error different from it');
+
+=item C<merged_isnt>
+
+   $tc->merged_isnt('foo bar baz');
+   $tc->merged_isnt('foo bar baz', 'merge of standard output and error...');
+
+=back
+
+=head3 Characteristic-specific similarity (match) tests
+
+This type of test succeeds is the value corresponding to the specific
+characteristic matches a regular expression.
+
+=over
+
+=item C<stdout_like>
+
+   $tc->stdout_like(qr{(^mxs: foo | bar | baz)});
+   $tc->stdout_like(qr{(^mxs: foo | bar | baz)}, 'standard output match');
+
+=item C<stderr_like>
+
+   $tc->stderr_like(qr{(^mxs: foo | bar | baz)});
+   $tc->stderr_like(qr{(^mxs: foo | bar | baz)}, 'standard error match');
+
+=item C<merged_like>
+
+   $tc->merged_like(qr{(^mxs: foo | bar | baz)});
+   $tc->merged_like(qr{(^mxs: foo | bar | baz)}, 'merged outputs match');
+
+=back
+
+=head3 Characteristic-specific unsimilarity (negated match) tests
+
+This type of test succeeds is the value corresponding to the specific
+characteristic does not match a regular expression.
+
+=over
+
+=item C<stdout_unlike>
+
+   $tc->stdout_unlike(qr{(^mxs: foo | bar | baz)});
+   $tc->stdout_unlike(qr{(^mxs: foo | bar | baz)}, 'standard output no match');
+
+=item C<stderr_unlike>
+
+   $tc->stderr_unlike(qr{(^mxs: foo | bar | baz)});
+   $tc->stderr_unlike(qr{(^mxs: foo | bar | baz)}, 'standard error no match');
+
+=item C<merged_unlike>
+
+   $tc->merged_unlike(qr{(^mxs: foo | bar | baz)});
+   $tc->merged_unlike(qr{(^mxs: foo | bar | baz)}, 'merged outputs no match');
+
+=back
+
+
+=head1 BUGS AND LIMITATIONS
+
+Minimul perl version 5.24.
+
+Report bugs through GitHub (patches welcome) at
+L<https://github.com/polettix/Test-CLI>.
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

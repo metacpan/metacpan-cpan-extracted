@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Release::Git
 
+1.016 2021-02-13T11:45:12Z
+	* Add config to set the commit message format
+	* Add a way to control which version control branch can release
+
 1.015 2021-01-25T19:03:38Z
 	* Corion added better git-fu that avoids localization problems
 	https://github.com/briandfoy/module-release-git/pull/2

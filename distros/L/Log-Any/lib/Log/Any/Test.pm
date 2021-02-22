@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Test;
 
 # ABSTRACT: Test what you're logging with Log::Any
-our $VERSION = '1.708';
+our $VERSION = '1.709';
 
 no warnings 'once';
 $Log::Any::OverrideDefaultAdapterClass = 'Log::Any::Adapter::Test';
@@ -25,7 +25,7 @@ Log::Any::Test - Test what you're logging with Log::Any
 
 =head1 VERSION
 
-version 1.708
+version 1.709
 
 =head1 SYNOPSIS
 

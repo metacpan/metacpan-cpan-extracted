@@ -48,5 +48,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/NoAuth/Bugs.html?Dist=Module::Generic
   repository: https://git.deguest.jp/jack/Module-Generic
-version: v0.13.5
+version: v0.13.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

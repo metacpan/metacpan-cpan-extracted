@@ -45,6 +45,22 @@ my @tests = (
         { time_zone => '+0400' }
     ],
     [
+        qw( YYYY-MM-DDThh:mm+hh:mm 1985-04-12T10:15+04:00 1985-04-12T10:15:00 ),
+        { time_zone => '+0400' }
+    ],
+    [
+        qw( YYYY-MM-DDThh:mm+hh:mm 1985-04-12T10:15-04:00 1985-04-12T10:15:00 ),
+        { time_zone => '-0400' }
+    ],
+    [
+        qw( YYYYMMDDThhmm+hhmm 19850412T1015+0400 1985-04-12T10:15:00 ),
+        { time_zone => '+0400' }
+    ],
+    [
+        qw( YYYYMMDDThhmm+hhmm 19850412T1015-0400 1985-04-12T10:15:00 ),
+        { time_zone => '-0400' }
+    ],
+    [
         qw( YYYY-MM-DDThh:mm:ss+hh:mm 1985-04-12T10:15:30+04:00 ),
         { time_zone => '+0400' }
     ],

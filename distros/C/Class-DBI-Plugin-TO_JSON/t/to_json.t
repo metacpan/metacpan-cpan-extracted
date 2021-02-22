@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More;
 
 ###############################################################################
 # Make sure that we've got DBD::SQLite and JSON::XS available; they're both

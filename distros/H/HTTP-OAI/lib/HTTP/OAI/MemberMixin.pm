@@ -2,7 +2,7 @@ package HTTP::OAI::MemberMixin;
 
 @ISA = qw( LWP::MemberMixin );
 
-our $VERSION = '4.10';
+our $VERSION = '4.11';
 
 sub new
 {

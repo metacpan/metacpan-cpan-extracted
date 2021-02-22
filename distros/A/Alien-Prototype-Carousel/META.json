@@ -1,0 +1,57 @@
+{
+   "abstract" : "(DEPRECATED) installing and finding Prototype Carousel component",
+   "author" : [
+      "Graham TerMarsch (cpan@howlingfrog.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Prototype-Carousel",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::scriptaculous" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Prototype::Carousel" : {
+         "file" : "lib/Alien/Prototype/Carousel.pm",
+         "version" : "v0.26.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.26.4",
+   "x_bugtracker" : {
+      "web" : "https://github.com/bleargh45/Alien-Prototype-Carousel/issues"
+   },
+   "x_deprecated" : 1,
+   "x_repository" : {
+      "type" : "git",
+      "url" : "git://github.com/bleargh45/Alien-Prototype-Carousel.git",
+      "web" : "https://github.com/bleargh45/Alien-Prototype-Carousel"
+   },
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

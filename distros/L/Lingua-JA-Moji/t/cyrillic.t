@@ -1,9 +1,7 @@
-use warnings;
-use strict;
-use Test::More tests => 10;
-use Lingua::JA::Moji qw/kana2cyrillic cyrillic2katakana/;
-use utf8;
-binmode STDOUT, ':utf8';
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;
+
 my %examples = (
     'シンブン',  'симбун',      
     'サンカ',   'санка',        
@@ -33,3 +31,4 @@ my $k2 = cyrillic2katakana ($c2);
 ok ($k1 eq 'ヤブ ノ ナカ ノ クロネコ');
 ok ($k2 eq 'カネト シンド');
 
+done_testing ();

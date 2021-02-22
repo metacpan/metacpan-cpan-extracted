@@ -43,6 +43,7 @@ use warnings;
 use strict;
 use Carp;
 use Exporter qw( import );
+use Mnet;
 use Mnet::Opts::Cli::Cache;
 
 # export function names

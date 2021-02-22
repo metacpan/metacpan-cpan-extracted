@@ -20,7 +20,7 @@ no_index:
 provides:
   App::Acmeman:
     file: lib/App/Acmeman.pm
-    version: '3.06'
+    version: '3.07'
   App::Acmeman::Apache::Layout:
     file: lib/App/Acmeman/Apache/Layout.pm
   App::Acmeman::Apache::Layout::debian:
@@ -73,5 +73,6 @@ requires:
   Text::ParseWords: '3.27'
   perl: '5.016001'
 resources:
+  bugtracker: https://puszcza.gnu.org.ua/bugs/?group=acmeman
   repository: git://git.gnu.org.ua/acmeman.git
-version: '3.06'
+version: '3.07'

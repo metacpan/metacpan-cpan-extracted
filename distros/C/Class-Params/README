@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Class::Params qw(params);
+
      params($self, $def_hr, $params_ar);
 
 DEFINITION FORMAT
@@ -15,13 +16,18 @@ DEFINITION FORMAT
      'par3' => ['_par3', 'Class', ['SCALAR', 'Class'], 0],
 
 SUBROUTINES
-    "params($self, $def_hr, $params_ar)"
-             Check for structure over definition and save input data to $self.
-             Parameters:
-             $self - Structure, for data save.
-             $def_hr - Definition hash ref.
-             $params_ar - Reference to array of key-value pairs.
-             Returns undef.
+  "params"
+     params($self, $def_hr, $params_ar);
+
+    Check for structure over definition and save input data to $self.
+
+    Parameters:
+
+     $self - Structure, for data save.
+     $def_hr - Definition hash ref.
+     $params_ar - Reference to array of key-value pairs.
+
+    Returns undef.
 
 ERRORS
      params():
@@ -30,11 +36,9 @@ ERRORS
              Unknown parameter '%s'.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Class::Params qw(params);
 
      # Definition.
@@ -51,11 +55,9 @@ EXAMPLE1
      # Unknown parameter 'bad_par'.
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Class::Params qw(params);
      use Data::Printer;
 
@@ -78,11 +80,9 @@ EXAMPLE2
      # }
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Class::Params qw(params);
 
      # Definition.
@@ -101,11 +101,9 @@ EXAMPLE3
      # Bad parameter 'par' class.
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Class::Params qw(params);
      use Data::Printer;
 
@@ -140,15 +138,16 @@ DEPENDENCIES
     Error::Pure, Exporter, Readonly, Scalar::Util.
 
 REPOSITORY
-    <https://github.com/tupinek/Class-Params>
+    <https://github.com/michal-josef-spacek/Class-Params>
 
 AUTHOR
     Michal Josef Špaček skim@cpan.org
 
 LICENSE AND COPYRIGHT
-     © Michal Josef Špaček 2011-2018
-     BSD 2-Clause License
+    © Michal Josef Špaček 2011-2021
+
+    BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

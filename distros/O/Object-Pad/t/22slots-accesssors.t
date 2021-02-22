@@ -7,6 +7,10 @@ use Test::More;
 
 use Object::Pad;
 
+my $MATCH_ARGCOUNT =
+   # Perl since 5.33.6 adds got-vs-expected counts to croak message
+   $] >= 5.033006 ? qr/ \(got \d+; expected \d+\)/ : "";
+
 class Colour {
    has $red   :reader            :writer;
    has $green :reader(get_green) :writer;
@@ -33,7 +37,7 @@ class Colour {
    my $LINE = __LINE__+1;
    ok( !defined eval { $col->red(55); 1 },
       'reader method complains if given any arguments' );
-   like( $@, qr/^Too many arguments for subroutine(?: \S+)?(?: at \S+ line $LINE\.)?$/,
+   like( $@, qr/^Too many arguments for subroutine 'Colour::red'$MATCH_ARGCOUNT(?: at \S+ line $LINE\.)?$/,
       'exception message from too many arguments to reader' );
 }
 
@@ -52,7 +56,7 @@ class Colour {
    my $LINE = __LINE__+1;
    ok( !defined eval { $col->set_red; 1 },
       'writer method complains if given no argument' );
-   like( $@, qr/^Too few arguments for subroutine(?: \S+)?(?: at \S+ line $LINE\.)?$/,
+   like( $@, qr/^Too few arguments for subroutine 'Colour::set_red'$MATCH_ARGCOUNT(?: at \S+ line $LINE\.)?$/,
       'exception message from too few arguments to writer' );
 }
 

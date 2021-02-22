@@ -24,6 +24,7 @@ use Business::Fixflo::Property;
 
     Address
     AdditionalDetails
+    AgencyId
     AppointmentDate
     AttendenceDate
     AssignedAgent
@@ -76,6 +77,7 @@ use Business::Fixflo::Property;
 has [ qw/
     Address
     AdditionalDetails
+    AgencyId
     AppointmentDate
     AttendenceDate
     AssignedAgent

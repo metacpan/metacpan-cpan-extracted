@@ -16,6 +16,9 @@ t/1_____loreyna126.t
 t/1_____loreyna126.xlsx
 t/2_____with_chart.t
 t/2_____with_chart.xlsx
+t/_serial_time.t
+t/ascii_table.t
+t/ascii_table.xlsx
 t/bug-relationship.t
 t/bug-relationship.xlsx
 t/bug-sheet-cache.t
@@ -24,6 +27,8 @@ t/bug-trim-space.t
 t/bug-trim-space.xlsx
 t/format_test_sheet.t
 t/format_test_sheet.xlsx
+t/generated.t
+t/generated.xlsx
 t/sheet_by_rid.t
 t/sheet_by_rid.xlsx
 xt/sample-data.xlsx

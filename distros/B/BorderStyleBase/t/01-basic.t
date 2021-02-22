@@ -17,7 +17,7 @@ subtest new => sub {
 subtest get_border_char => sub {
     my $bs = BorderStyle::Test::Labeled->new;
     is($bs->get_border_char(0, 0), "A");
-    is($bs->get_border_char(0, 1, 3), "bbb");
+    is($bs->get_border_char(0, 1, 3), "BBB");
 
     my $bs2 = BorderStyle::Test::CustomChar->new(character=>"x");
     is($bs2->get_border_char(0, 0, 3), "xxx");

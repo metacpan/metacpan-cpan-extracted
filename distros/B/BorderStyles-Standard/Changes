@@ -1,3 +1,21 @@
+0.005   2021-01-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to BorderStyle 2.0.6 (extra top & border characters).
+
+
+0.004   2021-01-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Add border styles: {ASCII,UTF8}::SingleLineDoubleAfterHeader.
+
+
+0.003   2021-01-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to BorderStyle 2.0.4 (border characters for table with
+	  row/column span).
+
+	- Add border style: UTF8::SingleLineBoldHeader.
+
+
 0.002    2020-06-11  Released-By: PERLANCAR; Urgency: low
 
          - No functional changes.

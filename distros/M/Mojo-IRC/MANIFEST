@@ -1,6 +1,3 @@
-.perltidyrc
-.ship.conf
-.travis.yml
 Changes
 cpanfile
 doc/rfc2812.txt
@@ -30,16 +27,5 @@ t/reconnect.t
 t/register.t
 t/test-mojo-irc-synopsis.t
 t/tls.t
-t/ua-channel-topic.t
-t/ua-channel-users-lc.t
-t/ua-channel-users.t
-t/ua-channels.t
-t/ua-join-channel.t
-t/ua-join-redirect.t
-t/ua-kick.t
-t/ua-mode.t
-t/ua-nick.t
-t/ua-part-channel.t
-t/ua-whois.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

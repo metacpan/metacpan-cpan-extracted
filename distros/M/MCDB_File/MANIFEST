@@ -10,4 +10,5 @@ perlext.map
 t/01main.t
 t/02last.t
 typemap
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,9 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.59 2021-02-18
+
+* strip_sound_marks added
+
 0.58 2021-01-13
 
 * kana_consonant added

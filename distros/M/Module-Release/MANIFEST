@@ -4,6 +4,7 @@ INSTALL.SKIP
 lib/Module/Release.pm
 lib/Module/Release/Kwalitee.pm
 lib/Module/Release/MANIFEST.pm
+lib/Module/Release/MetaCPAN.pm
 lib/Module/Release/PAUSE.pm
 lib/Module/Release/Prereq.pm
 lib/Module/Release/SVN.pm

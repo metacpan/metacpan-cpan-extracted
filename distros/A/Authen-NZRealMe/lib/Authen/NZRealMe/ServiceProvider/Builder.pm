@@ -1,5 +1,5 @@
 package Authen::NZRealMe::ServiceProvider::Builder;
-$Authen::NZRealMe::ServiceProvider::Builder::VERSION = '1.20';
+$Authen::NZRealMe::ServiceProvider::Builder::VERSION = '1.21';
 use warnings;
 use strict;
 use feature "switch";
@@ -98,6 +98,8 @@ sub _build_meta {
         my $args  = $class->_prompt_field_values($sp);
         $sp->{$_} = $args->{$_} foreach @field_names;
 
+        $sp->{nameid_format} = $class->_prompt_for_nameid_format($sp);
+
         my @acs_list = $class->_prompt_for_acs($sp);
         $sp->{acs_list} = \@acs_list;
 
@@ -188,6 +190,40 @@ sub _validate_id {
 }
 
 
+sub _prompt_for_nameid_format {
+    my($class, $sp) = @_;
+    my $dir = $sp->conf_dir or die "conf_dir not defined\n";
+
+    _new_block;
+    my $nameid_format = _nameid_format_choice($sp->type, $sp->nameid_format // '');
+
+    return $nameid_format;
+}
+
+sub _nameid_format_choice {
+    my($type, $curr_value) = @_;
+
+    if ($type eq 'login') {
+        return URI('saml_nameid_format_persistent');
+    }
+
+    my $choice = '';
+    if($curr_value eq URI('saml_nameid_format_transient')) {
+        $choice = 'a'
+    }
+    elsif($curr_value eq URI('saml_nameid_format_persistent')) {
+        $choice = 'l'
+    }
+    $choice = _menu_prompt(
+        'NameIDFormat (a=Assertion Only, l = Assert and Login)> ',
+        qr(^[al]$),
+        $choice
+    );
+
+    return $choice eq 'a' ? URI('saml_nameid_format_transient') : URI('saml_nameid_format_persistent');
+}
+
+
 sub _prompt_for_acs {
     my($class, $sp) = @_;
     my $dir = $sp->conf_dir or die "conf_dir not defined\n";
@@ -208,27 +244,41 @@ sub _prompt_for_acs {
     while(1) {
         if(!@acs_list) {
             print "Adding a new Assertion Consumer Service entry ...\n\n";
-            push @acs_list, _new_acs_entry($no_ssl_keypair);
+            my $acs = _new_acs_entry($no_ssl_keypair);
+            $acs->{is_default} = 1;
+            push @acs_list, $acs;
         }
         _list_current_acs_entries(@acs_list); # Will normalise index sequence
         print
             "Select 'a' to add an ACS; the index number to edit an ACS;\n"
-          . "d<index> to delete an entry; or 'c' to continue.\n\n";
-        my @options = ('a', map { $_->{index} } @acs_list);
-        my $prompt_opt = join('/', @options);
-        my $pattern = '^(' . join('|', @options) . '|d\d+|c)$';
-        my $resp = lc(_menu_prompt("Select ($prompt_opt/d<n>/c)> ", $pattern));
+          . "r<index> to remove an entry; or d<index> to mark the default entry.\n"
+          . "or 'c' to continue.\n\n";
+        my @indexes = map { $_->{index} } @acs_list;
+        my $pattern = '^(a|c|(?:|r|d)(?:' . join('|', @indexes) . '))$';
+        my $prompt_opt = join('/', @indexes);
+        my $resp = lc(_menu_prompt("Select (a/$prompt_opt/r<n>/d<n>/c)> ", $pattern));
         if($resp eq 'a') {
             push @acs_list, _new_acs_entry($no_ssl_keypair);
         }
         elsif($resp =~ /^\d+$/) {
-            my($acs) = grep { $_->{index} == $resp } @acs_list
-                or die "Can't find ACS with index=$resp\n";
+            print "Editing ACS with index=$resp ...\n\n";
+            my($acs) = grep { $_->{index} == $resp } @acs_list;
             _edit_acs_entry($acs, $no_ssl_keypair);
         }
-        elsif(my($unwanted) = $resp =~ /^d(\d+)$/) {
-            print "Deleting ACS with index=$unwanted ...\n\n";
+        elsif(my($unwanted) = $resp =~ /^r(\d+)$/) {
+            print "Removing ACS with index=$unwanted ...\n\n";
             @acs_list = grep { $_->{index} != $unwanted } @acs_list;
+        }
+        elsif(my($default) = $resp =~ /^d(\d+)$/) {
+            print "Defaulting ACS with index=$default ...\n\n";
+            foreach my $acs (@acs_list) {
+                if ($acs->{index} == $default) {
+                    $acs->{is_default} = 1;
+                }
+                else {
+                    delete $acs->{is_default};
+                }
+            }
         }
         else {
             last;
@@ -248,9 +298,11 @@ sub _list_current_acs_entries {
         foreach my $acs (@acs_list) {
             $acs->{index} = $i++;
             print
-                "  Index:    $acs->{index}\n"
-              . "  Binding:  $acs->{binding}\n"
-              . "  Location: $acs->{location}\n\n"
+                "  Index:     $acs->{index}\n"
+              . "  Binding:   $acs->{binding}\n"
+              . "  Location:  $acs->{location}\n"
+              . ($acs->{is_default} ? "  isDefault: true\n" : '')
+              . "\n"
         }
     }
     else {

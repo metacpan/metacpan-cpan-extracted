@@ -16,6 +16,7 @@ clean_test_environment($arango);
 ## -- version
 my $version = $arango->version;
 is $version->{server} => 'arango';
+is ($arango->http_status(), 200, "Version returns a 200 status");
 
 $version = $arango->version( details => 1 );
 ok (exists($version->{details}));

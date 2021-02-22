@@ -1,5 +1,5 @@
 package Util::Medley::DateTime;
-$Util::Medley::DateTime::VERSION = '0.055';
+$Util::Medley::DateTime::VERSION = '0.058';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -22,7 +22,7 @@ Util::Medley::DateTime - Class with various datetime methods.
 
 =head1 VERSION
 
-version 0.055
+version 0.058
 
 =cut
 

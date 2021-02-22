@@ -4,7 +4,7 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "artistic_2"
    ],
@@ -19,13 +19,41 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "7.58",
+            "Sys::Syslog" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::Log::Syslog" : {
+         "file" : "lib/Mojo/Log/Syslog.pm",
+         "version" : "1.03"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "gray+mojosyslog@gnu.org.ua",
+         "web" : "https://puszcza.gnu.org.ua/bugs/?group=mojosyslog"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://git.gnu.org.ua/mojosyslog.git",
          "web" : "http://git.gnu.org.ua/cgit/mojosyslog.git/"
       }
    },
-   "version" : "1.02"
+   "version" : "1.03"
 }

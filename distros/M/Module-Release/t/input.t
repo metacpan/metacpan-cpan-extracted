@@ -2,18 +2,18 @@
 use strict;
 use warnings;
 
-use Test::More 1.0 tests => 3;
+use Test::More 1.0;
 use File::Temp qw(:seekable);
 
-use Module::Release;
+require 't/lib/setup_common.pl';
 
-BEGIN {
-	use File::Spec::Functions qw(rel2abs catfile);
-	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
-	require $file;
-	}
+my $class = 'Module::Release';
+subtest setup => sub {
+	use_ok( $class );
+	can_ok( $class, 'new' );
+	};
 
-my $release = Module::Release->new;
+my $release = $class->new;
 my $temp_fh = File::Temp->new;
 $temp_fh->write("to be or not to be\n");
 $temp_fh->flush();
@@ -27,3 +27,5 @@ is(
     "to be or not to be\n",
     '_slurp returns content from input file handle'
 	);
+
+done_testing();

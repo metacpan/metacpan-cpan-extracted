@@ -27,6 +27,12 @@ Watcher Process
 
 =cut
 
+=includes
+
+method: scheme
+
+=cut
+
 =synopsis
 
   package MyApp;
@@ -64,6 +70,12 @@ Zing::Types
 =inherits
 
 Zing::Process
+
+=cut
+
+=attributes
+
+on_scheme: ro, opt, Maybe[CodeRef]
 
 =cut
 
@@ -108,6 +120,25 @@ automatically invoked when the process is executed.
 
   $myapp->scheme;
 
+=method scheme
+
+The scheme method, when not overloaded, executes the callback in the
+L</on_scheme> attribute and expects a process scheme to be processed.
+
+=signature scheme
+
+scheme(Any @args) : Scheme
+
+=example-1 scheme
+
+  my $watcher = Zing::Watcher->new(
+    on_scheme => sub {
+      ['MyApp::Handler', [], 1]
+    },
+  );
+
+  $watcher->scheme;
+
 =cut
 
 package main;
@@ -138,6 +169,13 @@ $subs->scenario('receive', fun($tryable) {
 
 $subs->scenario('scheme', fun($tryable) {
   ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'scheme', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, ['MyApp::Handler', [], 1];
 
   $result
 });

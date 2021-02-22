@@ -2,4 +2,6 @@ load.t
 pod.t
 pod_coverage.t
 check_vcs.t
+vcs_branch.t
+vcs_commit_message.t
 vcs_tag.t

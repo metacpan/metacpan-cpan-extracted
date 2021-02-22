@@ -17,6 +17,7 @@ AnyParser
 AutoLink
 BalancedEvent
 BlockParser
+Bucheli
 CLI
 CaptureEvents
 CapturedEvents
@@ -39,6 +40,7 @@ EndLink
 EndListItem
 EndOrderedList
 EndParagraph
+EndStrikethrough
 EndStrong
 EndTable
 EndTableBody
@@ -71,6 +73,7 @@ Image
 Internal
 Jason
 Jonas
+Konrad
 LineBreak
 MARKDENT
 Manual
@@ -108,6 +111,7 @@ StartLink
 StartListItem
 StartOrderedList
 StartParagraph
+StartStrikethrough
 StartStrong
 StartTable
 StartTableBody
@@ -136,6 +140,7 @@ esque
 html
 inline
 jmac
+konrad
 lang
 lib
 markdent
@@ -147,6 +152,7 @@ parsers
 preformatted
 racke
 shlomif
+strikethrough
 tom
 unordered
 uri

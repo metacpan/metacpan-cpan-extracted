@@ -1,5 +1,10 @@
 	$Id: CHANGES,v 1.23 2010/03/28 11:23:45 mpeppler Exp $
 	
+2.20    Minor changes
+
+        Added CS_SEC_EXTENDED_ENCRYPTION
+        Moved code to github: https://github.com/mpeppler/sybperl
+
 2.19    Bug Fixes
 
         Fixed incorrect handling of various "new" datatypes (date,

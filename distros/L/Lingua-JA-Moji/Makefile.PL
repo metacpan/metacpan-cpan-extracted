@@ -13,7 +13,7 @@ WriteMakefile (
     ABSTRACT_FROM => $pod,
     PREREQ_PM => {
         'Convert::Moji' => '0.05',
-	'JSON::Parse' => '0.49',
+	'JSON::Parse' => '0.61',
     },
     META_MERGE => {
         resources => {
@@ -22,13 +22,10 @@ WriteMakefile (
         },
         no_index => {
             directory => 'build',
+	    file => [
+		't/LJMT.pm',
+	    ],
         },
-	x_contributors => [
-	    'Naoki Tomita <tomita@cpan.org>',
-	    'David Steinbrunner',
-	    'Neil Bowers <neilb@cpan.org>',
-	    'Karl Williamson <khw@cpan.org>',
-	],
     },
     LICENSE => 'perl',
     MIN_PERL_VERSION => '5.008009',

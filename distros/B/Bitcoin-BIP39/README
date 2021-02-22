@@ -2,8 +2,8 @@ NAME
     Bitcoin::BIP39 - A BIP39 implementation in Perl
 
 VERSION
-    This document describes version 0.002 of Bitcoin::BIP39 (from Perl
-    distribution Bitcoin-BIP39), released on 2018-01-06.
+    This document describes version 0.003 of Bitcoin::BIP39 (from Perl
+    distribution Bitcoin-BIP39), released on 2021-01-09.
 
 DESCRIPTION
     This module is an implementation of BIP39 (mnemonic phrase). Features:
@@ -132,7 +132,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

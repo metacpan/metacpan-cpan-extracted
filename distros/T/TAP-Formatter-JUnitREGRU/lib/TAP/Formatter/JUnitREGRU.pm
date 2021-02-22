@@ -10,7 +10,7 @@ use XML::Generator;
 use Encode;
 use TAP::Formatter::JUnitREGRU::Session;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 has 'testsuites' => (
     is      => 'rw',

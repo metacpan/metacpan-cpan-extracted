@@ -70,6 +70,7 @@ use warnings;
 use strict;
 use Carp;
 use Data::Dumper;
+use Mnet;
 use Mnet::Log::Conditional qw( DEBUG INFO WARN FATAL NOTICE );
 use Mnet::Opts::Cli::Cache;
 use Mnet::Tee;
@@ -352,10 +353,8 @@ sub _record {
     # add current captured input to data before recording to file
     $Mnet::Test::data->{"Mnet::Test"}->{outputs} = Mnet::Tee::test_outputs();
 
-    # prepare to dump test data
-    my $dumper = Data::Dumper->new([$Mnet::Test::data]);
-    $dumper->Sortkeys(1);
-    my $dump = $dumper->Dump;
+    # prepare dump of test data, with keys in consitant sort order
+    my $dump = Data::Dumper->new([$Mnet::Test::data])->Sortkeys(1)->Dump;
 
     # replace default Data::Dumper var name with something more descriptive
     #   this will help discourage bypassing this module to access these files

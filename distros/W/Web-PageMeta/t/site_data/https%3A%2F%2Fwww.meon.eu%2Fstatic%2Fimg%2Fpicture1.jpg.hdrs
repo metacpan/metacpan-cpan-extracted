@@ -1,0 +1,15 @@
+$VAR1 = {
+          'etag' => '"53f61002-3b172"',
+          'date' => 'Sat, 20 Feb 2021 17:51:58 GMT',
+          'last-modified' => 'Thu, 21 Aug 2014 15:28:02 GMT',
+          'connection' => 'keep-alive',
+          'expires' => 'Sat, 20 Feb 2021 18:06:58 GMT',
+          'server' => 'nginx/1.10.3',
+          'content-length' => '242034',
+          'Status' => '200',
+          'cache-control' => 'max-age=900',
+          'accept-ranges' => 'bytes',
+          'URL' => 'https://www.meon.eu/static/img/picture1.jpg',
+          'content-type' => 'image/jpeg',
+          'Reason' => 'OK'
+        };

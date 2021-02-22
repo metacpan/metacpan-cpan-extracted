@@ -20,5 +20,8 @@ t/lib/CMMITTestClass/Subclass.pm
 t/lib/CMTests/TestClass.pm
 t/test-class.t
 MANIFEST.SKIP
+lib/Class/Mock/Common.pm
+t/method-tests-in-a-file.dd
+t/tests-in-a-file.dd
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

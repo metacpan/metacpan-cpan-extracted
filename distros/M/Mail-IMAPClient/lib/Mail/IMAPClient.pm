@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Mail::IMAPClient;
-our $VERSION = '3.42';
+our $VERSION = '3.43';
 
 use Mail::IMAPClient::MessageSet;
 
@@ -505,7 +505,7 @@ sub compress {
     }
 
     $self->{Prewritemethod} = sub {
-        my ( $imap, $string ) = @_;
+        my ( $self, $string ) = @_;
 
         my ( $rc, $out1, $out2 );
         ( $out1, $rc ) = $do->deflate($string);
@@ -530,12 +530,12 @@ sub compress {
     };
 
     $self->{Readmethod} = sub {
-        my ( $imap, $fh, $buf, $len, $off ) = @_;
+        my ( $self, $fh, $buf, $len, $off ) = @_;
 
         # get more data, but empty $Ibuf first if any data is left
         my ( $lz, $li ) = ( length $Zbuf, length $Ibuf );
         if ( $lz || !$li ) {
-            my $ret = sysread( $fh, $Zbuf, $len, length $Zbuf );
+            my $ret = sysread( $fh, $Zbuf, $len || 4096, length $Zbuf );
             $lz = length $Zbuf;
             return $ret if ( !$ret && !$lz );    # $ret is undef or 0
         }
@@ -548,6 +548,16 @@ sub compress {
                 return undef;
             }
             $Ibuf .= $tbuf;
+            $li = length $Ibuf;
+        }
+
+        if ( !$li ) {
+            # note: faking EAGAIN here is only safe with level-triggered
+            # I/O readiness notifications (select, poll).  Refactoring
+            # callers will be needed in the unlikely case somebody wants
+            # to use edge-triggered notifications (EV_CLEAR, EPOLLET).
+            $! = EAGAIN;
+            return undef;
         }
 
         # pull desired length of data from $Ibuf
@@ -2568,7 +2578,7 @@ sub parse_headers {
             next;
         }
 
-        if ( $header and $header =~ s/^(\S+)\:\s*// ) {
+        if ( $header and $header =~ s/^(\S+?)\:\s*// ) {
             $field = $fieldmap{ lc $1 } || $1;
             push @{ $h->{$field} }, $header;
         }
@@ -3047,9 +3057,9 @@ sub append_string($$$;$$) {
 
     my $data = join '', $self->Results;
 
-    # look for something like return size or self if no size found:
-    # <tag> OK [APPENDUID <uid> <size>] APPEND completed
-    my $ret = $data =~ m#\s+(\d+)\]# ? $1 : $self;
+    # look for append-uid otherwise return self
+    # <tag> OK [APPENDUID <uidvalidity> <append-uid>] APPEND completed
+    my $ret = $data =~ m#APPENDUID\s+\S+\s+(\d+)\]# ? $1 : $self;
 
     return $ret;
 }

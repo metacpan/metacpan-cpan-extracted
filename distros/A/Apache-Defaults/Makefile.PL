@@ -27,6 +27,10 @@ WriteMakefile(NAME         => 'Apache::Defaults',
 			  url => 'git://git.gnu.org.ua/apache-defaults.git',
 			  web => 'http://git.gnu.org.ua/cgit/apache-defaults.git'
 		      },
+		      bugtracker => {
+			  web => 'https://puszcza.gnu.org.ua/bugs/?group=apache-defaults',
+			  mailto => 'gray+apache-defaults@gnu.org.ua'
+		      }		      
 		  },
   	          provides => Module::Metadata->provides(version => '1.4',
 							 dir => 'lib')

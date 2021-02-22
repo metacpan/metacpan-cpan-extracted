@@ -96,7 +96,6 @@ do { my $x = {
                                    'Test::JSON::Schema::Acceptance' => '1.000',
                                    'Test::Memory::Cycle' => '0',
                                    'Test::More' => '0.96',
-                                   'Test::Warnings' => '0.027',
                                    'lib' => '0',
                                    'open' => '0',
                                    'perl' => '5.016',

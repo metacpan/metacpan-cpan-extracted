@@ -7,6 +7,22 @@ use File::Basename;
 use File::Find qw/find/;
 use File::Path qw/make_path/;
 use POSIX qw/EXIT_SUCCESS/;
+use Try::Tiny;
+
+#
+# ExtUtils::CBuilder custom configuration from environment:
+# Any environment variable PERL_EXTUTILS_CBUILDER_CONFIG_\w+ is
+# considered
+#
+my %EXTUTILS_BUILDER_CONFIG =
+    map {
+        my $key = $_;
+        $key =~ s/^PERL_EXTUTILS_CBUILDER_CONFIG_//;
+        $key => $ENV{$_}
+    }
+    grep {
+        $_ =~ /^PERL_EXTUTILS_CBUILDER_CONFIG_\w+/
+    } keys %ENV;
 
 # ------------------------------------------------------------
 # Generation of objects using perl setup, for use in perl's XS
@@ -20,7 +36,65 @@ print "Generating config for genericLogger version $version\n";
 my $config_h_in = File::Spec->catfile('include', 'genericLogger_config.h.in');
 my $config_h    = File::Spec->catfile('output', 'include', 'genericLogger', 'config.h');
 make_path(dirname($config_h));
-Config::AutoConf::INI->new(logfile => 'config.log')->check;
+my $ac = Config::AutoConf::INI->new(logfile => 'config.log');
+$ac->msg_checking("for __builtin_expect()");
+my $__builtin_expect = <<__BUILTIN_EXPECT;
+#include <stdlib.h>
+
+#define C__BUILTIN_EXPECT __builtin_expect
+#define C_LIKELY(x)    C__BUILTIN_EXPECT(!!(x), 1)
+#define C_UNLIKELY(x)  C__BUILTIN_EXPECT(!!(x), 0)
+
+/* Copied from https://kernelnewbies.org/FAQ/LikelyUnlikely */
+int main(char *argv[], int argc)
+{
+   int a;
+
+   /* Get the value from somewhere GCC can't optimize */
+   a = atoi (argv[1]);
+
+   if (C_UNLIKELY(a == 2))
+      a++;
+   else
+      a--;
+
+   return 0;
+}
+__BUILTIN_EXPECT
+    if (try_compile($__builtin_expect)) {
+        $ac->msg_result('yes');
+        $ac->define_var("C___BUILTIN_EXPECT", "__builtin_expect");
+    } else {
+        $ac->msg_result('no');
+    }
+
+foreach my $inline_keyword (qw/inline __inline__ inline__ __inline/) {
+    $ac->msg_checking("for $inline_keyword");
+    my $inline_source = <<INLINE_SOURCE;
+typedef int foo_t;
+static $inline_keyword foo_t static_foo() {
+  return 0;
+}
+foo_t foo() {
+  return 0;
+}
+int main(int argc, char *argv[]){
+  return 0;
+}
+INLINE_SOURCE
+    if (try_compile($inline_source)) {
+        $ac->msg_result('yes');
+        $ac->define_var("C_INLINE", $inline_keyword);
+        if ($inline_keyword eq 'inline') {
+            $ac->define_var("C_INLINE_IS_INLINE", $inline_keyword);
+        }
+        last;
+    } else {
+        $ac->msg_result('no');
+    }
+}
+
+$ac->check;
 write_config($version, $config_h_in, $config_h);
 
 # -------------
@@ -52,7 +126,7 @@ find(
 # Generate objects
 # (individually- not efficient but I do not see how CBuilder mixes C and C++ source files)
 # ----------------------------------------------------------------------------------------
-my $cbuilder = ExtUtils::CBuilder->new();
+my $cbuilder = ExtUtils::CBuilder->new(config => \%EXTUTILS_BUILDER_CONFIG);
 my @objects;
 my $obj_dir = File::Spec->catfile('output', 'obj4perl');
 
@@ -118,7 +192,6 @@ sub write_config {
 
 #include <genericLogger/config_autoconf.h>
 
-#define C_INLINE
 #define GENERICLOGGER_VERSION "$version"
    
 $c_va_copy
@@ -159,4 +232,28 @@ $error
 C_WRAPPER
         
     return $c_wrapper
+}
+
+sub try_compile {
+    my ($csource, $extra_compiler_flags) = @_;
+
+    my $fh = File::Temp->new(UNLINK => 0, SUFFIX => '.c');
+    print $fh "$csource\n";
+    close($fh);
+    my $source = $fh->filename;
+    my $rc = 0;
+
+    try {
+        my $cbuilder = ExtUtils::CBuilder->new(config => \%EXTUTILS_BUILDER_CONFIG, quiet => 1);
+        my $obj = basename($cbuilder->object_file($source));
+        $cbuilder->compile(
+            source               => $source,
+            object_file          => $obj,
+            extra_compiler_flags => $extra_compiler_flags
+            );
+        $rc = 1;
+    };
+    unlink $fh->filename;
+
+    return $rc;
 }

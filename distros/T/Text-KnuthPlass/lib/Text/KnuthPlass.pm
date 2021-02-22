@@ -4,8 +4,8 @@ use constant DEBUG => 0;
 use warnings;
 use strict;
 
-our $VERSION = '1.05'; # VERSION
-my $LAST_UPDATE = '1.05'; # manually update whenever file is edited
+our $VERSION = '1.06'; # VERSION
+my $LAST_UPDATE = '1.06'; # manually update whenever file is edited
 
 eval { XSLoader::load("Text::KnuthPlass", $VERSION); } or die $@;
 # Or else there's a Perl version
@@ -217,6 +217,10 @@ C<value>s, which are the text which went into them; glue has C<stretch>
 and C<shrink> to determine how much it should vary in width. That should
 be all you need for basic typesetting; for more, see the source, and see
 the original Knuth-Plass paper in "Digital Typography".
+
+Why I<typeset> rather than something like I<linesplit>? Per 
+L</ACKNOWLEDGEMENTS>, this code is ported from the Javascript product 
+B<typeset>.
 
 This method is a thin wrapper around the three methods below.
 
@@ -512,7 +516,7 @@ sub _computeCost {
     warn sprintf "Total width: %f\n", $self->{totals}{width} if DEBUG;
     my $width = $self->{sum}{width} - $active->totals->{width};
     my $stretch = 0; my $shrink = 0;
-    my $linelength = $currentLine < @{$self->linelengths} ? 
+    my $linelength = $currentLine <= @{$self->linelengths} ? 
                         $self->{linelengths}[$currentLine-1] :
                         $self->{linelengths}[-1];
 
@@ -610,7 +614,7 @@ Knuth-Plass implementation. Any bugs, however, are probably my fault.
 
 =head1 BUGS
 
-Please report any bugs or feature requests to the _issues_ section of 
+Please report any bugs or feature requests to the I<issues> section of 
 C<https://github.com/PhilterPaper/Text-KnuthPlass>.
 
 Do NOT under ANY circumstances open a PR (Pull Request) to report a bug. It is 
@@ -623,7 +627,7 @@ give the go-ahead. Unsolicited PRs may be closed without further action.
 
 Copyright (c) 2011 Simon Cozens.
 
-Copyright (c) 2020 Phil M Perry.
+Copyright (c) 2020-2021 Phil M Perry.
 
 This program is released under the following license: Perl, GPL
 

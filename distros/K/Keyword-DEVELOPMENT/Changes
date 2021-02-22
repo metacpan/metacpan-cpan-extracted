@@ -1,5 +1,13 @@
 Revision history for Keyword-DEVELOPMENT
 
+0.06    February 16, 2021
+        Fix version in POD.
+        Fixed an error in the documentation. Thanks, Toby Inkster!
+
+0.05    February 16, 2021
+        Added experimental support for only running DEVELOPMENT blocks in
+        packages matching a PERL_KEYWORD_DEVELOPMENT_MATCH regular expression.
+
 0.04    December 4th, 2017
 		Switched from Keyword::Declare to Keyword::Simple to avoid postfix
 		dereferencing bug. 

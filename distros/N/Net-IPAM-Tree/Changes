@@ -1,5 +1,15 @@
 Revision history for Net-IPAM-Tree
 
+2.11    Sun, 14 Feb 2021 18:43:03 +0100
+        - more checks against possible index panics in corner cases
+
+2.10    Sun, 14 Feb 2021 17:47:37 +0100
+        - add method contains_not_equal()
+        - add method lookup_not_equal()
+        - refactor some quirks in to_string()
+        - refactor some quirks in walk()
+        - tweak the algo a little bit
+
 2.00    Tue, 19 Jan 2021 16:31:49 +0100
         - use Net::IPAM::Block::sort_block during insert()
 

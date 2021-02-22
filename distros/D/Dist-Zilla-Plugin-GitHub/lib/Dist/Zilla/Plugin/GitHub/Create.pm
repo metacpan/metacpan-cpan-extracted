@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHub::Create;
 use strict;
 use warnings;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use JSON::MaybeXS;
 use Moose;
@@ -139,6 +139,7 @@ sub after_mint {
 
     $content = encode_json($params);
 
+    $self->log_debug("Sending POST $url");
     my $response = $http->request('POST', $url, {
         content => $content,
         headers => $self->_auth_headers,
@@ -206,7 +207,7 @@ Dist::Zilla::Plugin::GitHub::Create - Create a new GitHub repo on dzil new
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 

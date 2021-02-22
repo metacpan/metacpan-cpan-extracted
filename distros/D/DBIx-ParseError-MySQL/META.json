@@ -1,0 +1,71 @@
+{
+   "abstract" : "Error parser for MySQL",
+   "author" : [
+      "Grant Street Group <developers@grantstreet.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-ParseError-MySQL",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.1101"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::GSG" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "2.00",
+            "Scalar::Util" : "0",
+            "Types::Standard" : "1.00"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test2::Bundle::More" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::ParseError::MySQL" : {
+         "file" : "lib/DBIx/ParseError/MySQL.pm",
+         "version" : "v1.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/GrantStreetGroup/DBIx-ParseError-MySQL/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/GrantStreetGroup/DBIx-ParseError-MySQL.git",
+         "web" : "https://github.com/GrantStreetGroup/DBIx-ParseError-MySQL"
+      }
+   },
+   "version" : "v1.0.1",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "JSON::XS version 4.02",
+   "x_spdx_expression" : "Artistic-2.0",
+   "x_static_install" : 1
+}
+

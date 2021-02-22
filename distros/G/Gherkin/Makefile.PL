@@ -2,18 +2,24 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A parser and compiler for the Gherkin language",
-  "AUTHOR" => "'Erik Huelsmann <ehuels\@gmail.com>', 'Peter Sergeant <pete\@clueball.com>', 'Cucumber Ltd', 'Gaspar Nagy'",
+  "AUTHOR" => "Erik Huelsmann <ehuels\@gmail.com>, Peter Sergeant <pete\@clueball.com>, Cucumber Ltd, Gaspar Nagy",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Gherkin",
+  "EXE_FILES" => [
+    "bin/gherkin-generate-ast",
+    "bin/gherkin-generate-pickles",
+    "bin/gherkin-generate-tokens"
+  ],
   "LICENSE" => "mit",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Gherkin",
   "PREREQ_PM" => {
     "Class::XSAccessor" => 0,
@@ -26,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "17.0.1",
+  "VERSION" => "17.0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,5 +1,8 @@
 Revision history for MojoX-JSONRPC2-HTTP
 
+v2.0.2  2021-02-17 17:44:09 EET
+	- Require Mojolicious-8.67.
+
 v2.0.1  2017-02-22 06:54:29 EET
 	- Reformat doc.
 	- Require Mojolicious-7.13.

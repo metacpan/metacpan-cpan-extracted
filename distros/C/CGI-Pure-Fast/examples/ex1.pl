@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use CGI::Pure::Fast;
 use HTTP::Headers;
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Markdent::Types;
 
@@ -41,14 +41,14 @@ sub start_document {
     $self->_stream_raw($Doctype);
     $self->_stream_start_tag(
         'html', {
-            $self->_has_language() ? ( lang => $self->language() ) : (),
+            $self->_has_language ? ( lang => $self->language ) : (),
         },
     );
     $self->_stream_start_tag('head');
-    $self->_stream_start_tag( 'meta', { charset => $self->charset() } )
-        if $self->_has_charset();
+    $self->_stream_start_tag( 'meta', { charset => $self->charset } )
+        if $self->_has_charset;
     $self->_stream_start_tag('title');
-    $self->_stream_text( $self->title() );
+    $self->_stream_text( $self->title );
     $self->_stream_end_tag('title');
     $self->_stream_end_tag('head');
     $self->_stream_start_tag('body');
@@ -61,7 +61,7 @@ sub end_document {
     $self->_stream_end_tag('html');
 }
 
-__PACKAGE__->meta()->make_immutable();
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -79,7 +79,7 @@ Markdent::Handler::HTMLStream::Document - Turns Markdent events into a complete 
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 DESCRIPTION
 
@@ -148,7 +148,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

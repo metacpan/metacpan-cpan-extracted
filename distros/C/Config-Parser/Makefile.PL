@@ -26,6 +26,10 @@ WriteMakefile(NAME      =>      'Config::Parser',
 			  url => 'git://git.gnu.org.ua/config-parser.git',
 			  web => 'http://git.gnu.org.ua/cgit/config-parser.git/',
 		      },
+		      bugtracker => {
+			  web => 'https://puszcza.gnu.org.ua/bugs/?group=config-parser',
+			  mailto => 'gray+config-parser@gnu.org.ua'
+		      }
 		  },
 		  provides => Module::Metadata->provides(version => '1.4',
 							 dir => 'lib')

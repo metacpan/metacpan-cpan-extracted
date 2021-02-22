@@ -4,13 +4,13 @@
       "Adrian Howard <adrianh@quietstars.com>, Curtis \"Ovid\" Poe, <ovid at cpan.org>, Mark Morgan <makk384@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.052, CPAN::Meta::Converter version 2.150004",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Class",
    "no_index" : {
@@ -20,9 +20,6 @@
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {}
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -62,16 +59,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Test-Class@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Class"
+         "web" : "https://github.com/szabgab/test-class/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/adrianh/test-class.git",
-         "web" : "https://github.com/adrianh/test-class"
+         "url" : "https://github.com/szabgab/test-class.git",
+         "web" : "https://github.com/szabgab/test-class"
       }
    },
-   "version" : "0.50",
+   "version" : "0.52",
    "x_IRC" : "irc://irc.perl.org/#perl-qa",
    "x_MailingList" : "http://lists.perl.org/list/perl-qa.html",
    "x_contributors" : [
@@ -91,6 +87,5 @@
       "Zefram <zefram@fysh.org>",
       "Kent Fredric <kentfredric@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }
-

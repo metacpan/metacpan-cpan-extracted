@@ -1,5 +1,8 @@
 Revision history for Perl extension Config::HAProxy.
 
+1.06  Fri Feb 12 20:37:32 2021
+	- Change bugtracker address.
+
 1.05  Mon May 27 13:59:57 2019
 	- unlink temporary file on error
 

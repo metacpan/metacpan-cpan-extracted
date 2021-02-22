@@ -2,7 +2,7 @@
 #
 # 1002_chr.t
 #
-# Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 # This file is encoded in UTF-8.
@@ -28,14 +28,25 @@ use vars qw(@test);
     sub {1},
     sub {1},
 # 11
-    sub { $_=0xE38182; my $r=UTF8::R2::chr($_); $r eq 'あ'           },
-    sub { $_=0xE38182; my $r=UTF8::R2::chr;     $r eq 'あ'           },
-    sub { $_=-1;       my $r=UTF8::R2::chr($_); $r eq "\xEF\xBF\xBD" },
-    sub { $_=-1;       my $r=UTF8::R2::chr;     $r eq "\xEF\xBF\xBD" },
+    sub { $_=0xE38182; my $r=UTF8::R2::chr($_); $r eq 'あ' },
+    sub { $_=0xE38182; my $r=UTF8::R2::chr;     $r eq 'あ' },
     sub {1},
     sub {1},
     sub {1},
     sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
+# 21
+    sub { ($] >= 5.006) or do { $_=-1; my $r=          chr($_); $r eq "\xFF" } },
+    sub { ($] >= 5.006) or do { $_=-1; my $r=          chr;     $r eq "\xFF" } },
+    sub {                       $_=-1; my $r=UTF8::R2::chr($_); $r eq "\xFF"   },
+    sub {                       $_=-1; my $r=UTF8::R2::chr;     $r eq "\xFF"   },
+    sub { ($] >= 5.006) or do { $_=-2; my $r=          chr($_); $r eq "\xFE" } },
+    sub { ($] >= 5.006) or do { $_=-2; my $r=          chr;     $r eq "\xFE" } },
+    sub {                       $_=-2; my $r=UTF8::R2::chr($_); $r eq "\xFE"   },
+    sub {                       $_=-2; my $r=UTF8::R2::chr;     $r eq "\xFE"   },
     sub {1},
     sub {1},
 #

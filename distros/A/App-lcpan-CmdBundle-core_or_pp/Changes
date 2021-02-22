@@ -1,24 +1,36 @@
-0.04    2017-07-10 (PERLANCAR)
+0.051   2021-02-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Derp, fix regression bug caused by previous commit.
+
+
+0.050   2021-02-13  Released-By: PERLANCAR; Urgency: medium; Broken: yes
+
+	- [bugfixes] Fix --with-prereqs and --with-recursive-prereqs due to
+	  bug in passing arguments to deps() (the function accepts 'dists',
+	  not 'modules').
+
+
+0.04    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.03    2017-01-20 (PERLANCAR)
+0.03    2017-01-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Add Pod::Weaver plugin: PWP:App::lcpan.
 
 
-0.02    2016-03-09 (PERLANCAR)
+0.02    2016-03-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [Bugfix] Fix messages.
 
 
-0.01    2016-03-09 (PERLANCAR)
+0.01    2016-03-09  Released-By: PERLANCAR
 
         - First release.

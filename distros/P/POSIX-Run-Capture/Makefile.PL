@@ -29,6 +29,10 @@ WriteMakefile(
                 url => 'git://git.gnu.org.ua/posixruncapture.git',
 		web => 'http://git.gnu.org.ua/cgit/posixruncapture.git/',
 	    },
+            bugtracker => {
+	        web => 'https://puszcza.gnu.org.ua/bugs/?group=posixruncapture',
+	        mailto => 'gray+posixruncapture@gnu.org.ua'
+	    }
 	},
 	provides => Module::Metadata->provides(version => '1.4',
 					       dir => 'lib')

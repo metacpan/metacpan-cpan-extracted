@@ -21,11 +21,11 @@ no_index:
     - private
 requires:
   Compress::LZO: '0'
-  IO::Compress::Base: '2.100'
-  IO::Uncompress::Base: '2.100'
+  IO::Compress::Base: '2.101'
+  IO::Uncompress::Base: '2.101'
 resources:
   bugtracker: https://github.com/pmqs/IO-Compress-Lzop/issues
   homepage: https://github.com/pmqs/IO-Compress-Lzop
   repository: git://github.com/pmqs/IO-Compress-Lzop.git
-version: '2.100'
+version: '2.101'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,10 +1,7 @@
 Build.PL
 Changes
 LICENSE
-MANIFEST
 META.json
-META.yml
-README
 README.md
 cpanfile
 lib/Data/QuickMemoPlus/Reader.pm
@@ -19,3 +16,5 @@ t/data/good_file.lqm
 t/data/junk.lqm
 t/data/missing_jlqm.lqm
 t/lib/ExampleMemo.pm
+META.yml
+MANIFEST

@@ -48,6 +48,7 @@ t/73mop-create-slot.t
 t/74mop-method.t
 t/75mop-create-method.t
 t/76mop-role.t
+t/77mop-compose-role.t
 t/79mop-generated.t
 t/80async-method.t
 t/80dynamically+Object-Pad.t

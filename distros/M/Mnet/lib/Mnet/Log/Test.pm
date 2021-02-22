@@ -21,6 +21,9 @@ Refer to L<Mnet::Log> and L<Mnet::Test> for more information.
 # required modules
 use warnings;
 use strict;
+use Mnet;
+
+
 
 =head1 SEE ALSO
 

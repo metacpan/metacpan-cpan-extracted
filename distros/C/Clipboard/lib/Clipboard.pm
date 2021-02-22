@@ -1,5 +1,5 @@
 package Clipboard;
-$Clipboard::VERSION = '0.26';
+$Clipboard::VERSION = '0.27';
 use strict;
 use warnings;
 
@@ -72,7 +72,7 @@ Clipboard - Copy and paste with any OS
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -211,7 +211,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ryan King <rking@panoptic.com>.
+This software is copyright (c) 2021 by Ryan King <rking@panoptic.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -19,7 +19,7 @@ use POSIX;
 use Zing::Logic;
 use Zing::Loop;
 
-our $VERSION = '0.26'; # VERSION
+our $VERSION = '0.27'; # VERSION
 
 # ATTRIBUTES
 
@@ -109,6 +109,18 @@ has 'name' => (
 fun new_name($self) {
   $self->app->id->string
 }
+
+has 'on_perform' => (
+  is => 'ro',
+  isa => 'Maybe[CodeRef]',
+  opt => 1,
+);
+
+has 'on_receive' => (
+  is => 'ro',
+  isa => 'Maybe[CodeRef]',
+  opt => 1,
+);
 
 has 'parent' => (
   is => 'ro',
@@ -234,6 +246,22 @@ method metadata() {
   }
 }
 
+method perform(@args) {
+  return $self if !$self->on_perform;
+
+  my $performed = $self->on_perform->($self, @args);
+
+  return $performed;
+}
+
+method receive(@args) {
+  return $self if !$self->on_receive;
+
+  my $received = $self->on_receive->($self, @args);
+
+  return $received;
+}
+
 method recv() {
   return $self->mailbox->recv;
 }
@@ -293,6 +321,8 @@ method winddown() {
 }
 
 1;
+
+
 
 =encoding utf8
 
@@ -408,6 +438,22 @@ This attribute is read-only, accepts C<(Meta)> values, and is optional.
   name(Name)
 
 This attribute is read-only, accepts C<(Name)> values, and is optional.
+
+=cut
+
+=head2 on_perform
+
+  on_perform(Maybe[CodeRef])
+
+This attribute is read-only, accepts C<(Maybe[CodeRef])> values, and is optional.
+
+=cut
+
+=head2 on_receive
+
+  on_receive(Maybe[CodeRef])
+
+This attribute is read-only, accepts C<(Maybe[CodeRef])> values, and is optional.
 
 =cut
 
@@ -570,6 +616,32 @@ The ping method returns truthy if the process of the PID provided is active.
   # given: synopsis
 
   $process->ping(12345);
+
+=back
+
+=cut
+
+=head2 receive
+
+  receive(Str $from, HashRef $data) : Any
+
+The receive method, when not overloaded, executes the callback in the
+L</on_receive> attribute for each cycle of the event loop.
+
+=over 4
+
+=item receive example #1
+
+  # given: synopsis
+
+  $process = Zing::Process->new(
+    on_receive => sub {
+      my ($self, $from, $data) = @_;
+      [$from, $data];
+    },
+  );
+
+  $process->receive($process->term, { ping => 1 });
 
 =back
 
@@ -788,20 +860,20 @@ Copyright (C) 2011-2019, Al Newkirk, et al.
 
 This is free software; you can redistribute it and/or modify it under the terms
 of the The Apache License, Version 2.0, as elucidated in the L<"license
-file"|https://github.com/iamalnewkirk/zing/blob/master/LICENSE>.
+file"|https://github.com/cpanery/zing/blob/master/LICENSE>.
 
 =head1 PROJECT
 
-L<Wiki|https://github.com/iamalnewkirk/zing/wiki>
+L<Wiki|https://github.com/cpanery/zing/wiki>
 
-L<Project|https://github.com/iamalnewkirk/zing>
+L<Project|https://github.com/cpanery/zing>
 
-L<Initiatives|https://github.com/iamalnewkirk/zing/projects>
+L<Initiatives|https://github.com/cpanery/zing/projects>
 
-L<Milestones|https://github.com/iamalnewkirk/zing/milestones>
+L<Milestones|https://github.com/cpanery/zing/milestones>
 
-L<Contributing|https://github.com/iamalnewkirk/zing/blob/master/CONTRIBUTE.md>
+L<Contributing|https://github.com/cpanery/zing/blob/master/CONTRIBUTE.md>
 
-L<Issues|https://github.com/iamalnewkirk/zing/issues>
+L<Issues|https://github.com/cpanery/zing/issues>
 
 =cut

@@ -4,7 +4,7 @@
       "Magnus Woldrich <m@japh.se>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -52,6 +52,6 @@
          "x_bugtracker" : "https://github.com/trapd00r/pimpd2/issues"
       }
    },
-   "version" : "0.346",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.348",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

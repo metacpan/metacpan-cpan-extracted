@@ -3,7 +3,7 @@ package Amazon::SNS::V4::FifoTopic;
 use strict;
 use warnings;
 
-our $VERSION = '1.11';
+our $VERSION = '2.0';
 use base qw(Amazon::SNS::V4::Topic);
 
 use JSON;
@@ -52,7 +52,9 @@ sub Publish
 		'MessageStructure'	=> $structure,
 		'Subject'		=> $subj,
 		'MessageGroupId'    => $groupid,
-		'MessageDeduplicationId' => $dedupeid,
+		defined $dedupeid ?
+			('MessageDeduplicationId' => $dedupeid) :
+			(),
 		'Attributes'		=> $attributes,
 	});
 

@@ -14,7 +14,7 @@ WriteMakefile(
 		'Crypt::Eksblowfish'		=> 0,
 		'Crypt::OpenSSL::Random'	=> 0,
 		'MIME::Base64'				=> 0,
-		'Test::More'				=> 0,
+		'version'					=> 0.77,
 	},
 	'MIN_PERL_VERSION'	=> 5.010000,
 	'LICENSE' => 'perl_5',

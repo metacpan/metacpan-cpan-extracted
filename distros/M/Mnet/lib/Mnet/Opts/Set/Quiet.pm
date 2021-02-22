@@ -17,6 +17,9 @@ This module can be used as a pragma to enable the L<Mnet::Log> --quiet option.
 # required modules
 use warnings;
 use strict;
+use Mnet;
+
+
 
 =head1 SEE ALSO
 

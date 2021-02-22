@@ -1,7 +1,7 @@
 package Catmandu::HOCR;
 use Catmandu::Sane;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 =encoding utf8
 

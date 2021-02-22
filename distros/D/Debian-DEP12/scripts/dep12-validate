@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Debian::DEP12;
+
+@ARGV = ( '-' ) unless @ARGV;
+
+for my $i (0..$#ARGV) {
+    my $filename = $ARGV[$i];
+    open( my $inp, '<' . $filename );
+    my $yaml = join '', <$inp>;
+    close $inp;
+
+    my $meta = Debian::DEP12->new( $yaml );
+    my @warnings = $meta->validate;
+
+    for my $warning (@warnings) {
+        $warning->set( 'file', $filename );
+        warn "$0: $warning\n";
+    }
+}

@@ -2,8 +2,8 @@ NAME
     Text::Table::Any - Generate text table using one of several backends
 
 VERSION
-    This document describes version 0.098 of Text::Table::Any (from Perl
-    distribution Text-Table-Any), released on 2021-02-01.
+    This document describes version 0.101 of Text::Table::Any (from Perl
+    distribution Text-Table-Any), released on 2021-02-20.
 
 SYNOPSIS
      use Text::Table::Any;
@@ -123,31 +123,7 @@ FUNCTIONS
 
         Optional. Pick a backend module. Supported backends:
 
-        *   Text::Table::Tiny
-
-        *   Text::Table::TinyBorderStyle
-
-        *   Text::Table::TinyColor
-
-        *   Text::Table::TinyColorWide
-
-        *   Text::Table::TinyWide
-
-        *   Text::Table::Org
-
-        *   Text::Table::CSV
-
-        *   Text::Table::TSV
-
-        *   Text::Table::LTSV
-
-        *   Text::Table::ASV
-
-        *   Text::Table::HTML
-
-        *   Text::Table::HTML::DataTables
-
-        *   Text::Table::Paragraph
+        *   Term::TablePrint
 
         *   Text::ANSITable
 
@@ -159,11 +135,43 @@ FUNCTIONS
 
         *   Text::Table
 
-        *   Text::TabularDisplay
+        *   Text::Table::ASV
+
+        *   Text::Table::CSV
+
+        *   Text::Table::HTML
+
+        *   Text::Table::HTML::DataTables
+
+        *   Text::Table::LTSV
+
+        *   Text::Table::Manifold
+
+        *   Text::Table::More
+
+        *   Text::Table::Org
+
+        *   Text::Table::Paragraph
+
+        *   Text::Table::Sprintf
+
+        *   Text::Table::Tiny
+
+        *   Text::Table::TinyBorderStyle
+
+        *   Text::Table::TinyColor
+
+        *   Text::Table::TinyColorWide
+
+        *   Text::Table::TinyWide
+
+        *   Text::Table::TSV
 
         *   Text::Table::XLSX
 
-        *   Term::TablePrint
+        *   Text::TabularDisplay
+
+        *   Text::UnicodeBox::Table
 
     *   header_row (bool, default 0)
 
@@ -171,6 +179,11 @@ FUNCTIONS
         interpreted as a header row, and separated visually from the rest of
         the table (e.g. with a ruled line). But some backends won't display
         differently.
+
+    *   separate_rows
+
+        Boolean. Optional. Default false. If set to true, will draw a
+        separator line after each data row.
 
   backends
     Return list of supported backends. You can also get the list from the
@@ -192,7 +205,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Bencher::Scenario::TextTableModules
+    Acme::CPANModules::TextTable
 
 AUTHOR
     perlancar <perlancar@cpan.org>

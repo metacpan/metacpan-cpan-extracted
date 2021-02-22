@@ -3870,9 +3870,6 @@ the subject buffer. Affects STR_PTR and TMP1. Does not modify
 STR_PTR for invalid character sequences. */
 DEFINE_COMPILER;
 
-SLJIT_UNUSED_ARG(backtracks);
-SLJIT_UNUSED_ARG(must_be_valid);
-
 #if defined SUPPORT_UNICODE && PCRE2_CODE_UNIT_WIDTH != 32
 struct sljit_jump *jump;
 #endif
@@ -3880,6 +3877,9 @@ struct sljit_jump *jump;
 #ifdef SUPPORT_UNICODE
 #if PCRE2_CODE_UNIT_WIDTH == 8
 struct sljit_label *label;
+
+SLJIT_UNUSED_ARG(backtracks);
+SLJIT_UNUSED_ARG(must_be_valid);
 
 if (common->utf)
   {

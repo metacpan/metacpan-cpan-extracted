@@ -1,0 +1,813 @@
+lang: ar
+name: العربية
+
+lang: arz
+name: مصرى
+
+lang: be-x-old
+name: ‪Беларуская (тарашкевіца)‬
+
+lang: fa
+name: فارسی
+
+lang: ha
+name: هَوُسَ
+
+lang: he
+name: עברית
+
+lang: ku
+name: Kurdî
+
+lang: nn
+name: ‪Norsk (nynorsk)‬
+
+lang: pnb
+name: نجابی
+
+lang: ur
+name: اردو
+
+lang: yi
+name: יידיש
+
+lang: zh-CN
+name: 简体中文
+
+lang: zh-TW
+name: 繁體中文
+
+
+# From Wikipedia www.wikipedia.org
+
+lang: ab
+name: Аҧсуа
+
+lang: ace
+name: Bahsa Acèh
+
+lang: af
+name: Afrikaans
+
+lang: ak
+name: Akan
+
+lang: als
+name: Alemannisch
+
+lang: am
+name: አማርኛ
+
+lang: an
+name: Aragonés
+
+lang: ang
+name: Ænglisc
+
+lang: as
+name: অসমীযা়
+
+lang: ast
+name: Asturianu
+
+lang: av
+name: Авар
+
+lang: ay
+name: Aymar
+
+lang: az
+name: Azərbaycanca
+
+lang: ba
+name: Башҡортса
+
+lang: bar
+name: Boarisch
+
+lang: bat-smg
+name: Žemaitėška
+
+lang: bcl
+name: Bikol Central
+
+lang: be
+name: Беларуская (Акадэмічная)
+
+lang: be-tarask
+name: Беларуская (Тарашкевіца)
+
+lang: bg
+name: Български
+
+lang: bh
+name: भोजपुरी
+
+lang: bi
+name: Bislama
+
+lang: bjn
+name: Bahasa Banjar
+
+lang: bm
+name: Bamanankan
+
+lang: bn
+name: বাংলা
+
+lang: bo
+name: བོད་ཡིག
+
+lang: bpy
+name: বিষ্ণুপ্রিয়া মণিপুরী
+
+lang: br
+name: Brezhoneg
+
+lang: bs
+name: Bosanski
+
+lang: bug
+name: ᨅᨔ ᨕᨙᨁᨗ / Basa Ugi
+
+lang: bxr
+name: Буряад
+
+lang: ca
+name: Català
+
+lang: cbk-zam
+name: Chavacano de Zamboanga
+
+lang: cdo
+name: Mìng-dĕ̤ng-ngṳ̄
+
+lang: ce
+name: Нохчийн
+
+lang: ceb
+name: Sinugboanong Binisaya
+
+lang: ch
+name: Chamoru
+
+lang: chr
+name: ᏣᎳᎩ
+
+lang: chy
+name: Tsėhesenėstsestotse
+
+lang: co
+name: Corsu
+
+lang: cr
+name: Nēhiyawēwin / ᓀᐦᐃᔭᐍᐏᐣ
+
+lang: crh
+name: Qırımtatarca
+
+lang: cs
+name: Čeština
+
+lang: csb
+name: Kaszëbsczi
+
+lang: cu
+name: Словѣ́ньскъ / ⰔⰎⰑⰂⰡⰐⰠⰔⰍⰟ
+
+lang: cv
+name: Чӑвашла
+
+lang: cy
+name: Cymraeg
+
+lang: da
+name: Dansk
+
+lang: de
+name: Deutsch
+
+lang: diq
+name: Zazaki
+
+lang: dsb
+name: Dolnoserbski
+
+lang: dz
+name: རྫོང་ཁ
+
+lang: ee
+name: Eʋegbe
+
+lang: el
+name: Ελληνικά
+
+lang: eml
+name: Emigliàn–Rumagnòl
+
+lang: en
+name: English
+
+lang: eo
+name: Esperanto
+
+lang: es
+name: Español
+
+lang: et
+name: Eesti
+
+lang: eu
+name: Euskara
+
+lang: ext
+name: Estremeñu
+
+lang: ff
+name: Fulfulde
+
+lang: fi
+name: Suomi
+
+lang: fiu-vro
+name: Võro
+
+lang: fj
+name: Na Vosa Vaka-Viti
+
+lang: fo
+name: Føroyskt
+
+lang: fr
+name: Français
+
+lang: frp
+name: Arpitan
+
+lang: frr
+name: Nordfriisk
+
+lang: fur
+name: Furlan
+
+lang: fy
+name: Frysk
+
+lang: ga
+name: Gaeilge
+
+lang: gag
+name: Gagauz
+
+lang: gan
+name: 贛語
+
+lang: gd
+name: Gàidhlig
+
+lang: gl
+name: Galego
+
+lang: gn
+name: Avañe’ẽ
+
+lang: gom
+name: कोंकणी / Konknni
+
+lang: got
+name: 𐌲𐌿𐍄𐌹𐍃𐌺
+
+lang: gu
+name: ગુજરાતી
+
+lang: gv
+name: Gaelg
+
+lang: hak
+name: Hak-kâ-fa / 客家話
+
+lang: haw
+name: ʻŌlelo Hawaiʻi
+
+lang: hi
+name: हिन्दी
+
+lang: hif
+name: Fiji Hindi
+
+lang: hr
+name: Hrvatski
+
+lang: hsb
+name: Hornjoserbsce
+
+lang: ht
+name: Kreyòl Ayisyen
+
+lang: hu
+name: Magyar
+
+lang: hy
+name: Հայերեն
+
+lang: ia
+name: Interlingua
+
+lang: id
+name: Bahasa Indonesia
+
+lang: ie
+name: Interlingue
+
+lang: ig
+name: Igbo
+
+lang: ik
+name: Iñupiak
+
+lang: ilo
+name: Ilokano
+
+lang: io
+name: Ido
+
+lang: is
+name: Íslenska
+
+lang: it
+name: Italiano
+
+lang: iu
+name: ᐃᓄᒃᑎᑐᑦ / Inuktitut
+
+lang: ja
+name: 日本語
+
+lang: jbo
+name: lojban
+
+lang: jv
+name: Jawa
+
+lang: ka
+name: ქართული
+
+lang: kaa
+name: Qaraqalpaqsha
+
+lang: kab
+name: Taqbaylit
+
+lang: kbd
+name: Адыгэбзэ
+
+lang: kg
+name: Kongo
+
+lang: ki
+name: Gĩkũyũ
+
+lang: kl
+name: Kalaallisut
+
+lang: km
+name: ភាសាខ្មែរ
+
+lang: kn
+name: ಕನ್ನಡ
+
+lang: ko
+name: 한국어
+
+lang: koi
+name: Перем Коми
+
+lang: krc
+name: Къарачай–Малкъар
+
+lang: ksh
+name: Ripoarisch
+
+lang: kv
+name: Коми
+
+lang: kw
+name: Kernewek
+
+lang: ky
+name: Кыргызча
+
+lang: la
+name: Latina
+
+lang: lb
+name: Lëtzebuergesch
+
+lang: lbe
+name: Лакку
+
+lang: lez
+name: Лезги
+
+lang: lg
+name: Luganda
+
+lang: li
+name: Limburgs
+
+lang: lij
+name: Lìgure
+
+lang: lmo
+name: Lumbaart
+
+lang: ln
+name: Lingála
+
+lang: lo
+name: ພາສາລາວ
+
+lang: lt
+name: Lietuvių
+
+lang: ltg
+name: Latgaļu
+
+lang: lv
+name: Latviešu
+
+lang: mai
+name: मैथिली
+
+lang: map-bms
+name: Basa Banyumasan
+
+lang: mdf
+name: Мокшень
+
+lang: mg
+name: Malagasy
+
+lang: mhr
+name: Олык Марий
+
+lang: mi
+name: Māori
+
+lang: min
+name: Bahaso Minangkabau
+
+lang: mk
+name: Македонски
+
+lang: ml
+name: മലയാളം
+
+lang: mn
+name: Монгол
+
+lang: mr
+name: मराठी
+
+lang: mrj
+name: Кырык Мары
+
+lang: ms
+name: Bahasa Melayu
+
+lang: mt
+name: Malti
+
+lang: mwl
+name: Mirandés
+
+lang: my
+name: မြန်မာဘာသာ
+
+lang: myv
+name: Эрзянь
+
+lang: na
+name: Dorerin Naoero
+
+lang: nah
+name: Nāhuatlahtōlli
+
+lang: nap
+name: Nnapulitano
+
+lang: nds
+name: Plattdüütsch
+
+lang: nds-nl
+name: Nedersaksisch
+
+lang: ne
+name: नेपाली
+
+lang: new
+name: नेपाल भाषा
+
+lang: nl
+name: Nederlands
+
+lang: no
+name: Nynorsk
+
+lang: nov
+name: Novial
+
+lang: nrm
+name: Nouormand / Normaund
+
+lang: nso
+name: Sesotho sa Leboa
+
+lang: nv
+name: Diné Bizaad
+
+lang: ny
+name: Chichewa
+
+lang: oc
+name: Occitan
+
+lang: om
+name: Afaan Oromoo
+
+lang: or
+name: ଓଡି଼ଆ
+
+lang: os
+name: Ирон æвзаг
+
+lang: pa
+name: ਪੰਜਾਬੀ (ਗੁਰਮੁਖੀ)
+
+lang: pag
+name: Pangasinán
+
+lang: pam
+name: Kapampangan
+
+lang: pap
+name: Papiamentu
+
+lang: pcd
+name: Picard
+
+lang: pdc
+name: Deitsch
+
+lang: pfl
+name: Pfälzisch
+
+lang: pi
+name: पाऴि
+
+lang: pih
+name: Norfuk / Pitkern
+
+lang: pl
+name: Polski
+
+lang: pms
+name: Piemontèis
+
+lang: pnt
+name: Ποντιακά
+
+lang: pt
+name: Português
+
+lang: qu
+name: Runa Simi
+
+lang: rm
+name: Rumantsch
+
+lang: rmy
+name: Romani
+
+lang: rn
+name: Kirundi
+
+lang: ro
+name: Română
+
+lang: roa-rup
+name: Armãneashce
+
+lang: roa-tara
+name: Tarandíne
+
+lang: ru
+name: Русский
+
+lang: rue
+name: Русиньскый Язык
+
+lang: rw
+name: Kinyarwanda
+
+lang: sa
+name: संस्कृतम्
+
+lang: sah
+name: Саха Тыла
+
+lang: sc
+name: Sardu
+
+lang: scn
+name: Sicilianu
+
+lang: sco
+name: Scots
+
+lang: se
+name: Davvisámegiella
+
+lang: sg
+name: Sängö
+
+lang: sh
+name: Srpskohrvatski / Српскохрватски
+
+lang: si
+name: සිංහල
+
+lang: simple
+name: Simple English
+
+lang: sk
+name: Slovenčina
+
+lang: sl
+name: Slovenščina
+
+lang: sm
+name: Gagana Sāmoa
+
+lang: sn
+name: ChiShona
+
+lang: so
+name: Soomaaliga
+
+lang: sq
+name: Shqip
+
+lang: sr
+name: Српски / Srpski
+
+lang: srn
+name: Sranantongo
+
+lang: ss
+name: SiSwati
+
+lang: st
+name: Sesotho
+
+lang: stq
+name: Seeltersk
+
+lang: su
+name: Basa Sunda
+
+lang: sv
+name: Svenska
+
+lang: sw
+name: Kiswahili
+
+lang: szl
+name: Ślůnski
+
+lang: ta
+name: தமிழ்
+
+lang: te
+name: తెలుగు
+
+lang: tet
+name: Tetun
+
+lang: tg
+name: Тоҷикӣ
+
+lang: th
+name: ภาษาไทย
+
+lang: ti
+name: ትግርኛ
+
+lang: tk
+name: Türkmençe
+
+lang: tl
+name: Tagalog
+
+lang: tn
+name: Setswana
+
+lang: to
+name: faka Tonga
+
+lang: tpi
+name: Tok Pisin
+
+lang: tr
+name: Türkçe
+
+lang: ts
+name: Xitsonga
+
+lang: tt
+name: Татарча / Tatarça
+
+lang: tum
+name: chiTumbuka
+
+lang: tw
+name: Twi
+
+lang: ty
+name: Reo Mā’ohi
+
+lang: tyv
+name: Тыва дыл
+
+lang: udm
+name: Удмурт
+
+lang: uk
+name: Українська
+
+lang: uz
+name: Oʻzbekcha / Ўзбекча
+
+lang: ve
+name: Tshivenḓa
+
+lang: vec
+name: Vèneto
+
+lang: vep
+name: Vepsän
+
+lang: vi
+name: Tiếng Việt
+
+lang: vls
+name: West-Vlams
+
+lang: vo
+name: Volapük
+
+lang: wa
+name: Walon
+
+lang: war
+name: Winaray
+
+lang: wo
+name: Wolof
+
+lang: wuu
+name: 吳語
+
+lang: xal
+name: Хальмг
+
+lang: xh
+name: isiXhosa
+
+lang: xmf
+name: მარგალური
+
+lang: yo
+name: Yorùbá
+
+lang: za
+name: Cuengh
+
+lang: zea
+name: Zeêuws
+
+lang: zh
+name: 中文
+
+lang: zh-classical
+name: 文言
+
+lang: zh-min-nan
+name: Bân-lâm-gú / Hō-ló-oē
+
+lang: zh-yue
+name: 粵語
+
+lang: zu
+name: isiZulu
+

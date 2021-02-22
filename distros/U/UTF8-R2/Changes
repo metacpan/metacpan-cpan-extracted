@@ -1,5 +1,15 @@
 Revision history for this software.
 
+0.14  2021-02-18 00:00:00
+  - skip some tests to avoid: Use of code point 0xF0908080 is not allowed; the permissible max is 0x7FFFFFFF
+  - created by INABA Hitoshi
+
+0.13  2021-02-13 00:00:00
+  - like mb.pm modulino, removed subroutine prototypes
+  - like mb.pm modulino, UTF8::R2::chr doesn't return U+FFFD if $_ < 0
+  - like mb.pm modulino, qr/\x{here}/, qr/[\x{here}]/, and qr/[\x{here}-\x{here}]/ mean UTF-8 octet string, not Unicode
+  - created by INABA Hitoshi
+
 0.12  2020-12-22 00:00:00
   - fix POD
   - created by INABA Hitoshi

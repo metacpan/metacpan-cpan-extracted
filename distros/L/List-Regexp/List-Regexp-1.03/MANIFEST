@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+regexp-opt
+lib/List/Regexp.pm
+t/TestRegexp.pm
+t/array.t
+t/charset.t
+t/prefix.t
+t/single-w.t
+t/single.t
+t/suffix.t

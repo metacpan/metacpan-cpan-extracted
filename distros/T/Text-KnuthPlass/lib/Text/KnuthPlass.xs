@@ -40,10 +40,12 @@ NV _compute_cost(Text_KnuthPlass self, IV start, IV end, Breakpoint* a,
     HV* totals = a->totals;
     NV width = nvHash(sum, "width") - nvHash(totals,"width");
     AV* linelengths = (AV*)SvRV(*hv_fetch((HV*)self, "linelengths", 11, FALSE));
+    /* ll is index of LAST element of linelengths, NOT the size (length) */
     I32 ll = av_len(linelengths);
     NV stretch = 0;
     NV shrink = 0;
     NV linelength = SvNV(*av_fetch(linelengths, current_line <= ll ? current_line-1 : ll, 0));
+/*warn("Computing cost, ll=%i current_line=%i linelength=%i\n", ll, current_line, linelength);*/
 
     debug(warn("Computing cost from %i to %i\n", start, end));
     debug(warn("Sum width: %f\n", nvHash(sum, "width")));
@@ -245,6 +247,7 @@ _mainloop(self, node, index, nodes)
             debug(warn("Inner loop\n"));
 
             current_line = 1+ active->line;
+/*warn("_mainloop, current_line=%i\n", current_line);*/
             ratio = _compute_cost(self, position, index, active, current_line, nodes);
             debug(warn("Got a ratio of %f\n", ratio));
             if (ratio < 1 || (isPenalty(node) && nodepenalty == -infinity))

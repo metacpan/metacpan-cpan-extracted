@@ -1,5 +1,11 @@
 Revision history for Perl module Test::File
 
+1.446 2021-02-20T21:18:48Z
+	* Better cygwin detection, from Achim Gratz
+
+1.445 2021-02-16T08:57:34Z
+	* Get the tests to pass under Cygwin (Github #17, from Slaven Rezić)
+
 1.444 2021-01-06T03:40:19Z
 	* Remove Travis, add GitHub actions
 	* Add file_is_symlink_not_ok

@@ -1,0 +1,168 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Gzip::Libdeflate - Libdeflate compression library
+
+=head1 SYNOPSIS
+
+    
+    use Gzip::Libdeflate;
+    my $gl = Gzip::Libdeflate->new (level => 12);
+    my $out = $gl->compress ("ABCDEFG" x 2);
+    print length ($out), "\n";
+    my $rt = $gl->decompress ($out);
+    print "$rt\n";
+    
+
+
+produces output
+
+    29
+    ABCDEFGABCDEFG
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Libdeflate-0.02/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents version 0.02 of Gzip-Libdeflate
+corresponding to L<git commit 009e90b2d795e8a4412e4590c482d1ce8b50d30c|https://github.com/benkasminbullock/gzip-libdeflate/commit/009e90b2d795e8a4412e4590c482d1ce8b50d30c> released on Sun Feb 21 09:08:43 2021 +0900. This
+distribution also includes libdeflate version 1.7. 
+
+=head1 DESCRIPTION
+
+This module provides an interface to libdeflate. Libdeflate is a
+newly-written compression library which offers the same C<deflate>
+form of compression as zlib, as used in gzip, libpng and many similar
+utilities. This distribution includes libdeflate within itself, so it
+is not necessary to have that on your system.
+
+=head1 METHODS
+
+=head2 compress
+
+    my $comp_thing = $gl->compress ($thing);
+
+Compress input C<$thing> using whatever compression level and type you
+have specified for C<$gl> in L</new>.
+
+=head2 decompress
+
+    my $thing = $gl->decompress ($dthing);
+
+Decompress C<$comp_thing> into C<$thing>. If you have chosen the
+C<zlib> or C<deflate> options in L</new>, you also need to
+specify the expected size of C<$thing>.
+
+    my $thing = $gl->decompress ($dthing, 1000);
+
+In the C<gzip> format, the size is stored within the data itself, so
+it doesn't need to be specified.
+
+=head2 new
+
+    my $gl = Gzip::Libdeflate->new (%options);
+
+Possible options are
+
+=over
+
+=item level
+
+    my $gl = Gzip::Libdeflate->new (level => 9);
+
+A numerical argument of compression level from 1 (fast and poor
+compression) to 12 (slow and good compression).  If you do not specify
+it, the default is 6. These correspond to the compression levels of
+zlib, but with extra compression levels 10-12 also added. See L</About
+libdeflate> for details. 
+
+As with zlib, there is also a "zero compression" option of level 0
+which just puts the input into the gzip format without compressing it
+at all.
+
+=item type
+
+    my $gl = Gzip::Libdeflate->new (type => 'deflate');
+
+Change the type of compression. The default is type C<gzip> but you
+can also choose C<deflate> and C<zlib>. These are all the same thing
+up to headers.
+
+=back
+
+=head1 SEE ALSO
+
+=head2 About libdeflate
+
+Libdeflate is a new library which offers the same form of deflate
+compression as offered by C<zlib>. From its README:
+
+=over
+
+libdeflate is a library for fast, whole-buffer DEFLATE-based
+compression and decompression.
+
+=back
+
+See the L<Libdeflate github
+repository|https://github.com/ebiggers/libdeflate> for full
+information.
+
+=head2 CPAN modules
+
+=over
+
+=item L<Alien::libdeflate>
+
+=back
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+
+
+Libdeflate's copyright and licence are as follows.
+
+Copyright 2016 Eric Biggers
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation files
+(the "Software"), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+

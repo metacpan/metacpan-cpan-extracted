@@ -8,6 +8,8 @@ lib/Reddit/Client/Thing.pm
 lib/Reddit/Client/VotableThing.pm
 lib/Reddit/Client/Message.pm
 lib/Reddit/Client/MoreComments.pm
+lib/Reddit/Client/ModmailConversation.pm
+lib/Reddit/Client/ModmailMessage.pm
 
 ignore.txt
 Makefile.PL

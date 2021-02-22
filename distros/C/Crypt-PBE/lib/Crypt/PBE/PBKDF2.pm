@@ -2,17 +2,15 @@ package Crypt::PBE::PBKDF2;
 
 use strict;
 use warnings;
+use utf8;
 
 use Carp;
 use POSIX;
-
 use MIME::Base64;
-
 use Digest::SHA qw(hmac_sha1 hmac_sha224 hmac_sha256 hmac_sha384 hmac_sha512);
-
 use Exporter qw(import);
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 our @EXPORT = qw(
     pbkdf2
@@ -30,7 +28,6 @@ our @EXPORT_OK = qw(
     pbkdf2_hmac_sha224
     pbkdf2_hmac_sha224_base64
     pbkdf2_hmac_sha224_hex
-    pbkdf2_hmac_sha224_ldap
 
     pbkdf2_hmac_sha256
     pbkdf2_hmac_sha256_base64
@@ -40,12 +37,17 @@ our @EXPORT_OK = qw(
     pbkdf2_hmac_sha384
     pbkdf2_hmac_sha384_base64
     pbkdf2_hmac_sha384_hex
-    pbkdf2_hmac_sha384_ldap
 
     pbkdf2_hmac_sha512
     pbkdf2_hmac_sha512_base64
     pbkdf2_hmac_sha512_hex
     pbkdf2_hmac_sha512_ldap
+
+    PBKDF2WithHmacSHA1
+    PBKDF2WithHmacSHA224
+    PBKDF2WithHmacSHA256
+    PBKDF2WithHmacSHA384
+    PBKDF2WithHmacSHA512
 );
 
 sub new {
@@ -74,20 +76,9 @@ sub new {
 
 }
 
-sub prf {
-    my ($self) = @_;
-    return $self->{prf};
-}
-
-sub count {
-    my ($self) = @_;
-    return $self->{count};
-}
-
-sub derived_key_length {
-    my ($self) = @_;
-    return $self->{dk_len};
-}
+sub prf                { shift->{prf} }
+sub count              { shift->{count} }
+sub derived_key_length { shift->{dk_len} }
 
 sub validate {
     my ( $self, $derived_key, $password ) = @_;
@@ -215,35 +206,46 @@ sub _pbkdf2_F {
 
 }
 
-for my $hmac (qw/hmac_sha1 hmac_sha224 hmac_sha256 hmac_sha384 hmac_sha512/) {
+# PBKDF2 aliases
 
-    my $sub_name = 'pbkdf2_' . $hmac;
+for my $variant (qw(1 224 256 384 512)) {
 
     no strict 'refs';    ## no critic
 
-    *{$sub_name} = sub {
+    my $prf = "hmac_sha${variant}";
+
+    *{"PBKDF2WithHmacSHA${variant}"} = sub {
         my (%params) = @_;
-        $params{prf} = $hmac;
+        $params{prf} = $prf;
         return pbkdf2(%params);
     };
 
-    *{ $sub_name . '_base64' } = sub {
+    *{"pbkdf2_hmac_sha${variant}"} = sub {
         my (%params) = @_;
-        $params{prf} = $hmac;
+        $params{prf} = $prf;
+        return pbkdf2(%params);
+    };
+
+    *{"pbkdf2_hmac_sha${variant}_base64"} = sub {
+        my (%params) = @_;
+        $params{prf} = $prf;
         return encode_base64 pbkdf2(%params), '';
     };
 
-    *{ $sub_name . '_hex' } = sub {
+    *{"pbkdf2_hmac_sha${variant}_hex"} = sub {
         my (%params) = @_;
-        $params{prf} = $hmac;
+        $params{prf} = $prf;
         return join '', unpack '(H2)*', pbkdf2(%params);
     };
 
-    *{ $sub_name . '_ldap' } = sub {
-        my (%params) = @_;
-        $params{prf} = $hmac;
-        return pbkdf2_ldap(%params);
-    };
+    if ( $variant != 224 && $variant != 384 ) {
+        *{"pbkdf2_hmac_sha${variant}_ldap"} = sub {
+            my (%params) = @_;
+            $params{prf} = $prf;
+            return pbkdf2_ldap(%params);
+        };
+    }
+
 }
 
 sub pbkdf2_hex {
@@ -256,20 +258,23 @@ sub pbkdf2_base64 {
 
 sub pbkdf2_ldap {
 
-    my ( $hmac, $password, $salt, $count ) = @_;
+    my (%params) = @_;
 
-    if ( $hmac eq 'sha224' || $hmac eq 'sha384' ) {
-        croak "$hmac not supported LDAP scheme";
+    $params{prf} =~ s/-/_/;
+
+    if ( $params{prf} eq 'hmac-sha224' || $params{prf} eq 'hmac-sha384' ) {
+        croak "$params{prf} not supported LDAP scheme";
     }
 
-    my $derived_key = pbkdf2( $hmac, $password, $salt, $count );
+    my $derived_key = pbkdf2(%params);
+    my $count       = $params{count} || 1_000;
 
     my $scheme          = 'PBKDF2';
-    my $b64_salt        = b64_to_ab64( encode_base64( $salt, '' ) );
+    my $b64_salt        = b64_to_ab64( encode_base64( $params{salt}, '' ) );
     my $b64_derived_key = b64_to_ab64( encode_base64( $derived_key, '' ) );
 
-    $scheme = 'PBKDF2-SHA256' if ( $hmac eq 'sha256' );
-    $scheme = 'PBKDF2-SHA512' if ( $hmac eq 'sha512' );
+    $scheme = 'PBKDF2-SHA256' if ( $params{prf} eq 'hmac-sha256' );
+    $scheme = 'PBKDF2-SHA512' if ( $params{prf} eq 'hmac-sha512' );
 
     return "{$scheme}$count\$$b64_salt\$$b64_derived_key";
 
@@ -425,6 +430,22 @@ Return derived key in LDAP C<{PBKDF2}> schema using PBKDF2 function.
 
 =head2 EXPORTABLE HELPER FUNCTIONS
 
+Return the derived key using SHA1/224/256/384/512 HMAC digest (Java-style):
+
+=over 4
+
+=item PBKDF2WithHmacSHA1
+
+=item PBKDF2WithHmacSHA224
+
+=item PBKDF2WithHmacSHA256
+
+=item PBKDF2WithHmacSHA384
+
+=item PBKDF2WithHmacSHA512
+
+=back
+
 Return the derived key using SHA1/224/256/384/512 HMAC digest:
 
 =over 4
@@ -473,17 +494,13 @@ Return the derived key using SHA1/224/256/384/512 HMAC digest in HEX:
 
 =back
 
-Return the derived key using SHA1/224/256/384/512 HMAC digest in LDAP {PBKDF2} schema:
+Return the derived key using SHA1/224/256/384/512 HMAC digest in {PBKDF2} LDAP schema:
 
 =over 4
 
 =item pbkdf2_hmac_sha1_ldap
 
-=item pbkdf2_hmac_sha224_ldap
-
 =item pbkdf2_hmac_sha256_ldap
-
-=item pbkdf2_hmac_sha384_ldap
 
 =item pbkdf2_hmac_sha512_ldap
 
@@ -536,7 +553,7 @@ L<https://github.com/giterlizzi/perl-Crypt-PBE>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2020-2021 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

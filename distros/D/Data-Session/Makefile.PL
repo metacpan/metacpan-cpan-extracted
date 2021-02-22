@@ -9,8 +9,8 @@ my(%params) =
 (
 	($] ge '5.005') ?
 	(
-		AUTHOR   => 'Ron Savage (ron@savage.net.au)',
-		ABSTRACT => 'Persistent session data management',
+		AUTHOR		=> 'Ron Savage (ron@savage.net.au)',
+		ABSTRACT	=> 'Persistent session data management',
 	) : (),
 	clean =>
 	{
@@ -18,49 +18,54 @@ my(%params) =
 	},
 	dist =>
 	{
-		COMPRESS => 'gzip',
-		SUFFIX   => 'gz'
+		COMPRESS	=> 'gzip',
+		SUFFIX		=> 'gz'
 	},
-	DISTNAME  => 'Data-Session',
-	NAME      => 'Data::Session',
-	LICENSE   => 'artistic_2',
-	PL_FILES  => {},
-	PREREQ_PM =>
+	DISTNAME	=> 'Data-Session',
+	LICENSE		=> 'perl',
+	NAME		=> 'Data::Session',
+	PL_FILES	=> {},
+	PREREQ_PM	=>
 	{
-		'autovivification' => 0,
-		'CGI' => 3.63,
-		'Class::Load' => 0.19,
-		'Config::Tiny' => 2.14,
-		'Data::Dumper' => 2.145,
-		'Data::UUID' => 1.218,
-		'DBD::SQLite' => 1.39,
-		'DBI' => 1.627,
-		'DBIx::Admin::CreateTable' => 2.07,
-		'Digest::MD5' => 2.52,
-		'Digest::SHA' => 5.84,
-		'Fcntl' => 1.06,
-		'File::Basename' => 2.77,
-		'File::Path' => 2.07,
-		'File::Slurp' => 9999.19,
-		'File::Spec' => 3.30,
-		'File::Temp' => 0.22,
-		'FreezeThaw' => 0.5001,
-		'Hash::FieldHash' => 0.14,
-		'JSON' => 2.59,
-		'overload' => 0,
-		'parent' => 0,
-		'Safe' => 2.35,
-		'Scalar::Util' => 1.27,
-		'Storable' => 2.39,
-		'strict' => 0,
-		'Test::More' => 1.001014,
-		'Test::Pod' => 1.48,
-		'Try::Tiny' => 0.12,
-		'vars' => 0,
-		'warnings' => 0,
-		'YAML::Tiny' => 1.51,
+		'autovivification'			=> 0,
+		'CGI'						=> 3.63,
+		'Class::Load'				=> 0.19,
+		'Config::Tiny'				=> 2.14,
+		'Data::Dumper'				=> 2.145,
+		'Data::UUID'				=> 1.218,
+		'DBD::SQLite'				=> 1.39,
+		'DBI'						=> 1.627,
+		'DBIx::Admin::CreateTable'	=> 2.07,
+		'Digest::MD5'				=> 2.52,
+		'Digest::SHA'				=> 5.84,
+		'Fcntl'						=> 1.06,
+		'File::Basename'			=> 2.77,
+		'File::Path'				=> 2.07,
+		'File::Slurper'				=> 0.012,
+		'File::Spec'				=> 3.30,
+		'File::Temp'				=> 0.22,
+		'FreezeThaw'				=> 0.5001,
+		'Hash::FieldHash'			=> 0.14,
+		'JSON'						=> 2.59,
+		'overload'					=> 0,
+		'parent'					=> 0,
+		'Safe'						=> 2.35,
+		'Scalar::Util'				=> 1.27,
+		'Storable'					=> 2.39,
+		'strict'					=> 0,
+		'Try::Tiny'					=> 0.12,
+		'vars'						=> 0,
+		'warnings'					=> 0,
+		'YAML::Tiny'				=> 1.51,
 	},
-	VERSION_FROM => 'lib/Data/Session.pm',
+	TEST_REQUIRES =>
+	{
+		'Test::More'	=> 1.001014,
+		'Test::Pod'		=> 1.48,
+	},
+	VERSION_FROM	=> 'lib/Data/Session.pm',
+	INSTALLDIRS		=> 'site',
+	EXE_FILES		=> [],
 );
 
 if ( ($ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/) && ($ExtUtils::MakeMaker::VERSION > 6.30) )
@@ -74,13 +79,16 @@ if ($ExtUtils::MakeMaker::VERSION ge '6.46')
 	{
 		'meta-spec' =>
 		{
-			'version' => 2,
+			version => 2,
 		},
 		resources   =>
 		{
-			'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Session',
-			'license'    => 'http://opensource.org/licenses/Artistic-2.0',
-			repository   =>
+			bugtracker =>
+			{
+				web => 'https://github.com/ronsavage/Data-Session/issues',
+			},
+			license		=> 'http://opensource.org/licenses/Artistic-2.0',
+			repository	=>
 			{
 				'type' => 'git',
 				'url' => 'https://github.com/ronsavage/Data-Session.git',

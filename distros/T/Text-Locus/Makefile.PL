@@ -23,6 +23,10 @@ WriteMakefile(
                 url => 'git://git.gnu.org.ua/text-locus.git',
 		web => 'http://git.gnu.org.ua/cgit/text-locus.git/',
 	    },
+	    bugtracker => {
+	        web => 'https://puszcza.gnu.org.ua/bugs/?group=text-locus',
+		mailto => 'gray+text-locus@gnu.org.ua'
+	    }
 	},
 	provides => Module::Metadata->provides(version => '1.4',
 					       dir => 'lib')

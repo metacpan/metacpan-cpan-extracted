@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.26
+    version 1.27
 
 SYNOPSIS
 
@@ -59,6 +59,8 @@ FUNCTIONS
     is running the test script (and not with the default system perl). This
     will also be shown in the diagnostic output on failure.
 
+    This function was added in version 1.05.
+
  script_runs
 
      script_runs( $script, $test_name );
@@ -77,7 +79,10 @@ FUNCTIONS
     test script (and not with the default system perl). This will also be
     shown in the diagnostic output on failure.
 
-    You may pass in options as a hash as the second argument.
+    This function was added in version 1.05.
+
+    You may pass in options as a hash as the second argument (as of version
+    1.09).
 
     exit
 
@@ -89,6 +94,8 @@ FUNCTIONS
       Array reference of Perl options to be passed to the interpreter.
       Things like -w or -x can be passed this way. This may be either a
       single string or an array reference.
+
+      This option was added in version 1.25.
 
     signal
 
@@ -142,12 +149,16 @@ FUNCTIONS
     Tests if the output to stdout from the previous "script_runs" matches
     the expected value exactly.
 
+    This function was added in version 1.09.
+
  script_stdout_isnt
 
      script_stdout_is $expected_stdout, $test_name;
 
     Tests if the output to stdout from the previous "script_runs" does NOT
     match the expected value exactly.
+
+    This function was added in version 1.09.
 
  script_stdout_like
 
@@ -156,12 +167,16 @@ FUNCTIONS
     Tests if the output to stdout from the previous "script_runs" matches
     the regular expression.
 
+    This function was added in version 1.09.
+
  script_stdout_unlike
 
      script_stdout_unlike $regex, $test_name;
 
     Tests if the output to stdout from the previous "script_runs" does NOT
     match the regular expression.
+
+    This function was added in version 1.09.
 
  script_stderr_is
 
@@ -170,12 +185,16 @@ FUNCTIONS
     Tests if the output to stderr from the previous "script_runs" matches
     the expected value exactly.
 
+    This function was added in version 1.09.
+
  script_stderr_isnt
 
      script_stderr_is $expected_stderr, $test_name;
 
     Tests if the output to stderr from the previous "script_runs" does NOT
     match the expected value exactly.
+
+    This function was added in version 1.09.
 
  script_stderr_like
 
@@ -184,12 +203,16 @@ FUNCTIONS
     Tests if the output to stderr from the previous "script_runs" matches
     the regular expression.
 
+    This function was added in version 1.09.
+
  script_stderr_unlike
 
      script_stderr_unlike $regex, $test_name;
 
     Tests if the output to stderr from the previous "script_runs" does NOT
     match the regular expression.
+
+    This function was added in version 1.09.
 
  program_runs
 
@@ -209,6 +232,8 @@ FUNCTIONS
 
     See File::Spec or Path::Class for routines useful in building pathnames
     in a cross-platform way.
+
+    This function was added in version 1.26.
 
  program_stdout_is
 

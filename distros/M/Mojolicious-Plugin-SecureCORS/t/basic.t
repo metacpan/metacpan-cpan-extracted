@@ -26,7 +26,7 @@ $r = $r->any('/b');
 $r = $r->any('/c')->to('cors.credentials' => 1);
 $r1 = $r->any('/d1')->to('cors.credentials' => undef);
 $r2 = $r->any('/d2');
-$r2->cors('<*path>')->to(path=>undef);
+$r2->cors('<*anypath>')->to(anypath=>undef);
 $r1->get('/e1', {'cors.origin'=>'http://localhost null', text=>'E1'});
 $r2->put('/e2', {'cors.origin'=>qr/\.local\z/, text=>'E2'});
 $r2->get('/e3', {text=>'E3'});

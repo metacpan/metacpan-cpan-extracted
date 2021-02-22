@@ -3,6 +3,7 @@ abstract: unknown
 author:
   - unknown
 build_requires:
+  Devel::StrictMode: '0'
   ExtUtils::MakeMaker: '0'
   Test::Deep: '1.130'
   Test::Interface: '0'
@@ -31,14 +32,15 @@ requires:
   MooX::Enumeration: '0'
   MooX::HandlesVia: '0'
   MooX::ProtectedAttributes: '0'
-  OpenTracing::Interface: v0.205.0
+  MooX::Should: v0.1.4
+  OpenTracing::Interface: v0.206.1
   OpenTracing::Types: '0'
-  Role::Declare: '0'
+  Role::Declare::Should: '0'
   Sub::Trigger::Lock: '0'
   Time::HiRes: '0'
   Try::Tiny: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '0'
   Types::TypeTiny: '0'
-version: v0.84.0
+version: v0.85.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

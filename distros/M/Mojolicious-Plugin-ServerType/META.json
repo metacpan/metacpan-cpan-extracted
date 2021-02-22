@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "Mojolicious" : "7.93",
-            "perl" : "5.010001"
+            "perl" : "5.016001"
          }
       },
       "test" : {
@@ -55,18 +55,21 @@
    "provides" : {
       "Mojolicious::Plugin::ServerType" : {
          "file" : "lib/Mojolicious/Plugin/ServerType.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/scrapheap/Mojolicious-Plugin-ServerType/issues"
+      },
       "homepage" : "https://gitlab.com/scrapheap/Mojolicious-Plugin-ServerType",
       "repository" : {
          "url" : "git://gitlab.com/scrapheap/Mojolicious-Plugin-ServerType.git",
          "web" : "https://gitlab.com/scrapheap/Mojolicious-Plugin-ServerType"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:JLCOOPER",
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1

@@ -5,7 +5,7 @@ use warnings;
 
 use Digest::SHA qw(sha256_hex);
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 RT->AddStyleSheets("resetpassword.css");
 
@@ -38,7 +38,7 @@ sub CreateTokenAndResetPassword {
     my $token = CreateToken($user);
     return unless $token;     # CreateToken will log error
 
-    my ($status, $msg) = RT::Interface::Email::SendEmailUsingTemplate(
+    my %send_options = (
         To        => $user->EmailAddress,
         Template  => 'PasswordReset',
         Arguments => {
@@ -46,6 +46,12 @@ sub CreateTokenAndResetPassword {
             User  => $user,
         },
     );
+
+    $send_options{'From'} = RT->Config->Get('ResetPasswordFromAddress')
+        if RT->Config->Get('ResetPasswordFromAddress');
+
+    my ($status, $msg) = RT::Interface::Email::SendEmailUsingTemplate(%send_options);
+
     return ($status, $msg);
 }
 
@@ -197,6 +203,12 @@ user admin page, but no self-service options.
 Set this config value to the time in seconds before a password-change
 link expires.  The default value is 4*60*60, meaning that password-change
 links expire after four hours by default.
+
+=item C<$ResetPasswordFromAddress>
+
+By default, the From address in the password reset email is the default
+C<$CorrespondAddress> from RT. You can use this option to set a
+different From address for the reset email.
 
 =back
 

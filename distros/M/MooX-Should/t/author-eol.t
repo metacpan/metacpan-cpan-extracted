@@ -20,19 +20,21 @@ my @files = (
     't/00-report-prereqs.t',
     't/01-strict.t',
     't/02-lax.t',
+    't/03-role.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',
+    't/author-minimum-version.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/lib/TestClass.pm',
+    't/lib/TestRole.pm',
     't/release-check-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',
-    't/release-minimum-version.t',
     't/release-trailing-space.t'
 );
 

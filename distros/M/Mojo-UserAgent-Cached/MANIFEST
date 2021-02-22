@@ -11,12 +11,16 @@ lib/Mojo/UserAgent/Cached.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
-prepare_release.sh
+Mojo-UserAgent-Cached-1.16.tar.gz
 README.md
 t/data/body+headers.txt
 t/data/incorrect_format_xml.xml
 t/data/invalid_xml.xml
 t/data/malformed_xml.xml
 t/data/newsfeed.xml
-t/mojo_user_agent.t
+t/mojo/lib/Mojo/TestConnectProxy.pm
+t/mojo/user_agent.t
+t/mojo/user_agent_online.t
+t/mojo/user_agent_socks.t
+t/mojo/user_agent_unix.t
 t/mojo_useragent_cached.t

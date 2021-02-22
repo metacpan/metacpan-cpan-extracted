@@ -1,3 +1,6 @@
+1.001     2021-02-16 17:19:49 EST
+  - Use Mojo::Promise in tests instead of the deprecated and decored Mojo::IOLoop::Delay.
+
 1.000     2017-12-17 17:05:24 EST
   - Add Mojo::IOLoop::Subprocess::Role::Sereal and use it to provide the $_subprocess method.
   - Update $_subprocess to not call ->run if given no callbacks (as in Mojolicious 7.59).

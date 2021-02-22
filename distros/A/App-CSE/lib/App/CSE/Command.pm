@@ -1,5 +1,5 @@
 package App::CSE::Command;
-$App::CSE::Command::VERSION = '0.015';
+$App::CSE::Command::VERSION = '0.016';
 use Moose;
 
 has 'cse' => ( is => 'ro' , isa => 'App::CSE', weak_ref => 1, required => 1);

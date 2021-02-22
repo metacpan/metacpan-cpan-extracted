@@ -1,12 +1,7 @@
-# These tests are from the Perl distribution
-# 'Lingua::JA::Regular::Unicode' authored by MATSUNO★Tokuhiro
-
-use warnings;
-use strict;
-use Lingua::JA::Moji ':all';
-use Test::More tests => 10;
-use utf8;
-binmode STDOUT, ":utf8";
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;
+use Test::More tests => 10;binmode STDOUT, ":utf8";
 my $input = <<EOF;
 --- input:    およよＡＢＣＤＥＦＧｂｆｅge１２３123
 --- expected: およよABCDEFGbfege123123

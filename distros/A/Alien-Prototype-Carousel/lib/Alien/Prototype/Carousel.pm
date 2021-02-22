@@ -16,7 +16,7 @@ use Alien::scriptaculous;
 # Version number
 ###############################################################################
 our $CAROUSEL_VERSION = '0.26';
-our $VERSION = '0.26.3';
+our $VERSION = '0.26.4';
 
 ###############################################################################
 # Subroutine:   version()
@@ -98,7 +98,7 @@ sub install {
 
 =head1 NAME
 
-Alien::Prototype::Carousel - installing and finding Prototype Carousel component
+Alien::Prototype::Carousel - (DEPRECATED) installing and finding Prototype Carousel component
 
 =head1 SYNOPSIS
 
@@ -110,6 +110,8 @@ Alien::Prototype::Carousel - installing and finding Prototype Carousel component
   Alien::Prototype::Carousel->install( $my_destination_directory );
 
 =head1 DESCRIPTION
+
+B<DEPRECATED> - DO NOT USE
 
 Please see L<Alien> for the manifesto of the Alien namespace.
 

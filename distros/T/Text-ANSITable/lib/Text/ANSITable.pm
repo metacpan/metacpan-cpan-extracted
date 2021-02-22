@@ -1,9 +1,9 @@
 package Text::ANSITable;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-05'; # DATE
+our $DATE = '2021-02-19'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.601'; # VERSION
+our $VERSION = '0.602'; # VERSION
 
 use 5.010001;
 use Carp;
@@ -361,20 +361,20 @@ sub _colnum {
 }
 
 sub get_cell {
-    my ($self, $row_num, $col) = @_;
+    my ($self, $rownum, $col) = @_;
 
     $col = $self->_colnum($col);
 
-    $self->{rows}[$row_num][$col];
+    $self->{rows}[$rownum][$col];
 }
 
 sub set_cell {
-    my ($self, $row_num, $col, $val) = @_;
+    my ($self, $rownum, $col, $val) = @_;
 
     $col = $self->_colnum($col);
 
-    my $oldval = $self->{rows}[$row_num][$col];
-    $self->{rows}[$row_num][$col] = $val;
+    my $oldval = $self->{rows}[$rownum][$col];
+    $self->{rows}[$rownum][$col] = $val;
     $oldval;
 }
 
@@ -1014,13 +1014,13 @@ sub _detect_column_types {
 # calculate width and height of a cell, but skip calculating (to save some
 # cycles) if width is already set by frow_setheights / fcol_setwidths.
 sub _opt_calc_cell_width_height {
-    my ($self, $frow_num, $col, $text) = @_;
+    my ($self, $frownum, $col, $text) = @_;
 
     $col = $self->_colnum($col);
     my $setw  = $self->{_draw}{fcol_setwidths}[$col];
     my $calcw = !defined($setw) || $setw < 0;
-    my $seth  = defined($frow_num) ?
-        $self->{_draw}{frow_setheights}[$frow_num] : undef;
+    my $seth  = defined($frownum) ?
+        $self->{_draw}{frow_setheights}[$frownum] : undef;
     my $calch = !defined($seth) || $seth < 0;
 
     my $wh;
@@ -1036,7 +1036,7 @@ sub _opt_calc_cell_width_height {
     } else {
         $wh = [$setw, $seth];
     }
-    #say "D:_opt_calc_cell_width_height(", $frow_num//"undef", ", $col) = $wh->[0], $wh->[1]";
+    #say "D:_opt_calc_cell_width_height(", $frownum//"undef", ", $col) = $wh->[0], $wh->[1]";
     $wh;
 }
 
@@ -1325,6 +1325,7 @@ sub draw_theme_color {
 
 sub get_color_reset {
     my $self = shift;
+    return "" unless $self->use_color;
     return "" if $self->{color_theme_obj}->get_struct->{_no_color};
     "\e[0m";
 }
@@ -1483,7 +1484,7 @@ sub _get_data_cell_lines {
     my $ct   = $self->{color_theme};
     my $oy   = $self->{_draw}{frow_orig_indices}[$y];
     my $cell = $self->{_draw}{frows}[$y][$x];
-    my $args = {table=>$self, row_num=>$y, col_num=>$x, data=>$cell,
+    my $args = {table=>$self, rownum=>$y, colnum=>$x, data=>$cell,
                 orig_data=>$self->{rows}[$oy][$x]};
 
     my $tmp;
@@ -1652,14 +1653,14 @@ sub draw {
             }
             #use Data::Dump; print "TMP: dcell_lines: "; dd $dcell_lines;
             for my $l (0..@{ $dcell_lines->[0] }-1) {
-                $self->draw_border_char({row_num=>$r}, 3, 0);
+                $self->draw_border_char({rownum=>$r}, 3, 0);
                 for my $i (0..@$fcols-1) {
                     $self->draw_str($dcell_lines->[$i][$l]);
                     $self->draw_color_reset;
-                    $self->draw_border_char({row_num=>$r}, 3, 1)
+                    $self->draw_border_char({rownum=>$r}, 3, 1)
                         unless $i == @$fcols-1;
                 }
-                $self->draw_border_char({row_num=>$r}, 3, 2);
+                $self->draw_border_char({rownum=>$r}, 3, 2);
                 $self->draw_str("\n");
             }
 
@@ -1674,7 +1675,7 @@ sub draw {
                             $fcol_rpads->[$ci];
                     push @b, 4, $i==@$fcols-1 ? 3:2, 1;
                 }
-                $self->draw_border_char({row_num=>$r}, @b);
+                $self->draw_border_char({rownum=>$r}, @b);
                 $self->draw_str("\n");
             }
         } # for frow
@@ -1714,7 +1715,7 @@ Text::ANSITable - Create nice formatted tables using extended ASCII and ANSI col
 
 =head1 VERSION
 
-This document describes version 0.601 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2020-10-05.
+This document describes version 0.602 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2021-02-19.
 
 =head1 SYNOPSIS
 
@@ -1788,6 +1789,36 @@ fine-grained options to customize appearance.
 <p><img src="http://blogs.perl.org/users/steven_haryanto/ansitable5.png" /></p>
 
 =end HTML
+
+=head1 REFERRING TO COLUMNS
+
+Columns can be referred to be integer number (0-based) or name (string). You
+should not have integer numbers as column names because that will be confusing.
+Example:
+
+ $t->columns(["col1", "col2", "col3"]); # col1=0, col2=1, col3=2
+ $t->add_row([...]);
+ ...
+
+ # set visible columns
+ $t->column_filter([1,2,1]); # col2, col3, col2
+ $t->column_filter(["col2","col3","col2"]); # same thing
+
+See also: L</REFERRING TO ROWS>.
+
+=head1 REFERRING TO ROWS
+
+Rows are referred to by integer number (0-based).
+
+ $t->columns(["name", "age", "gender"]);
+ $t->add_row(["marty", ...]); # first row (0)
+ $t->add_row(["wendy", ...]); # second row (1)
+ $t->add_row(["charlotte", ...]); # third row (2)
+
+ # set visible rows
+ $t->row_filter([0,2]); # marty & charlotte
+
+See also: L</REFERRING TO COLUMNS>.
 
 =head1 BORDER STYLES
 
@@ -1975,8 +2006,8 @@ When adding row:
 
 Example:
 
- $t->set_row_style($row_num, tpad => 1);
- $t->set_row_style($row_num, bpad => 2);
+ $t->set_row_style($rownum, tpad => 1);
+ $t->set_row_style($rownum, bpad => 2);
 
 When adding row:
 
@@ -2212,7 +2243,7 @@ using C<add_row()> and C<add_rows()> methods.
 
 When drawing, only show rows that match this. Can be an array containing indices
 of rows which should be shown, or a coderef which will be called for each row
-with arguments C<< ($row, $row_num) >> and should return a bool value indicating
+with arguments C<< ($row, $rownum) >> and should return a bool value indicating
 whether that row should be displayed.
 
 Internal note: During drawing, rows will be filtered and put into C<<
@@ -2223,7 +2254,7 @@ $t->{_draw}{frows} >>.
 When drawing, only show columns that match this. Can be an array containing
 names of columns that should be displayed (column names can be in different
 order or duplicate, column can also be referred to with its numeric index). Can
-also be a coderef which will be called with C<< ($col_name, $col_num) >> for
+also be a coderef which will be called with C<< ($colname, $colnum) >> for
 every column and should return a bool value indicating whether that column
 should be displayed. The coderef version is more limited in that it cannot
 reorder the columns or instruct for the same column to be displayed more than
@@ -2351,7 +2382,7 @@ overriden by per-row C<bpad> style.
 =head2 cell_fgcolor => RGB|CODE
 
 Set foreground color for all cells. Value should be 6-hexdigit RGB. Can also be
-a coderef that will receive %args (e.g. row_num, col_name, col_num) and should
+a coderef that will receive %args (e.g. rownum, col_name, colnum) and should
 return an RGB color. Can be overriden by per-cell C<fgcolor> style.
 
 =head2 cell_bgcolor => RGB|CODE
@@ -2362,7 +2393,7 @@ Like C<cell_fgcolor> but for background color.
 
 Set foreground color for all headers. Overrides C<cell_fgcolor> for headers.
 Value should be a 6-hexdigit RGB. Can also be a coderef that will receive %args
-(e.g. col_name, col_num) and should return an RGB color.
+(e.g. col_name, colnum) and should return an RGB color.
 
 =head2 header_bgcolor => RGB|CODE
 
@@ -2425,14 +2456,14 @@ Can also add per-row styles (which can also be done using C<row_style()>).
 
 Add a row separator line.
 
-=head2 $t->get_cell($row_num, $col) => VAL
+=head2 $t->get_cell($rownum, $col) => VAL
 
-Get cell value at row #C<$row_num> (starts from zero) and column named/numbered
+Get cell value at row #C<$rownum> (starts from zero) and column named/numbered
 C<$col>.
 
-=head2 $t->set_cell($row_num, $col, $newval) => VAL
+=head2 $t->set_cell($rownum, $col, $newval) => VAL
 
-Set cell value at row #C<$row_num> (starts from zero) and column named/numbered
+Set cell value at row #C<$rownum> (starts from zero) and column named/numbered
 C<$col>. Return old value.
 
 =head2 $t->get_column_style($col, $style) => VAL
@@ -2463,13 +2494,13 @@ column style is calculated from all the conditional column styles and the
 per-column styles then merged together. This is the per-column style actually
 applied.
 
-=head2 $t->get_row_style($row_num) => VAL
+=head2 $t->get_row_style($rownum) => VAL
 
-Get per-row style for row numbered C<$row_num>.
+Get per-row style for row numbered C<$rownum>.
 
-=head2 $t->set_row_style($row_num, $style=>$newval[, $style2=>$newval2, ...])
+=head2 $t->set_row_style($rownum, $style=>$newval[, $style2=>$newval2, ...])
 
-Set per-row style(s) for row numbered C<$row_num>. Available values for
+Set per-row style(s) for row numbered C<$rownum>. Available values for
 C<$style>: C<align>, C<valign>, C<height>, C<vpad>, C<tpad>, C<bpad>,
 C<fgcolor>, C<bgcolor>.
 
@@ -2484,18 +2515,18 @@ on conditional style.
 
 =for comment | =head2 $t->clear_cond_row_styles | Clear all the conditional row styles.
 
-=head2 $t->get_eff_row_style($row_num, $style) => VAL
+=head2 $t->get_eff_row_style($rownum, $style) => VAL
 
 Get "effective" row style named C<$style> for a particular row. Effective row
 style is calculated from all the conditional row styles and the per-row styles
 then merged together. This is the per-row style actually applied.
 
-=head2 $t->get_cell_style($row_num, $col, $style) => VAL
+=head2 $t->get_cell_style($rownum, $col, $style) => VAL
 
 Get per-cell style named C<$style> for a particular cell. Return undef if there
 is no per-cell style with that name.
 
-=head2 $t->set_cell_style($row_num, $col, $style=>$newval[, $style2=>$newval2, ...])
+=head2 $t->set_cell_style($rownum, $col, $style=>$newval[, $style2=>$newval2, ...])
 
 Set per-cell style(s). Available values for C<$style>: C<align>, C<valign>,
 C<formats>, C<fgcolor>, C<bgcolor>.
@@ -2511,7 +2542,7 @@ on conditional style.
 
 =for comment | =head2 $t->clear_cond_cell_styles | Clear all the conditional cell styles.
 
-=head2 $t->get_eff_cell_style($row_num, $col, $style) => VAL
+=head2 $t->get_eff_cell_style($rownum, $col, $style) => VAL
 
 Get "effective" cell style named C<$style> for a particular cell. Effective cell
 style is calculated from all the conditional cell styles and the per-cell styles
@@ -2850,10 +2881,10 @@ terminal emulators with black background.
 
 =head3 How to set different background colors for odd/even rows?
 
-Aside from doing C<< $t->set_row_style($row_num, bgcolor=>...) >> for each row,
+Aside from doing C<< $t->set_row_style($rownum, bgcolor=>...) >> for each row,
 you can also do this:
 
- $t->cell_bgcolor(sub { my ($self, %args) = @_; $args{row_num} % 2 ? '202020' : undef });
+ $t->cell_bgcolor(sub { my ($self, %args) = @_; $args{rownum} % 2 ? '202020' : undef });
 
 Or, you can use conditional row styles:
 
@@ -2919,7 +2950,7 @@ will display the bool columns as num and str instead.
 =head2 ANSITABLE_ROW_STYLES => str(json)
 
 Can be used to set per-row styles. Interpreted right before draw(). Value should
-be a JSON-encoded a hash of C<< row_num => {style => val, ...} >> pairs.
+be a JSON-encoded a hash of C<< rownum => {style => val, ...} >> pairs.
 Example:
 
  % ANSITABLE_ROW_STYLES='{"0":{"bgcolor":"000080","vpad":1}}' ansitable-list-border-styles
@@ -2929,7 +2960,7 @@ will display the first row with blue background color and taller height.
 =head2 ANSITABLE_CELL_STYLES => str(json)
 
 Can be used to set per-cell styles. Interpreted right before draw(). Value
-should be a JSON-encoded a hash of C<< "row_num,col" => {style => val, ...} >>
+should be a JSON-encoded a hash of C<< "rownum,col" => {style => val, ...} >>
 pairs. Example:
 
  % ANSITABLE_CELL_STYLES='{"1,1":{"bgcolor":"008000"}}' ansitable-list-border-styles
@@ -2957,7 +2988,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-ANSITable>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSITable>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-ANSITable/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -3014,7 +3045,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

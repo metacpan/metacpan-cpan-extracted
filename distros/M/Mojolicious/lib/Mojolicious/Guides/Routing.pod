@@ -336,7 +336,7 @@ L<Mojolicious::Controller> or L<Mojo> before dispatching to it.
 You can use the C<namespace> stash value to change the namespace of a whole route with all its children.
 
   # /bye -> MyApp::MyController::Foo::Bar->bye
-  $r->get('/bye')->to(namespace => 'MyApp::MyController::Foo::Bar', action => 'bye');
+  $r->get('/bye')->to(namespace => 'MyApp::MyController', controller => 'Foo::Bar', action => 'bye');
 
 The C<controller> is always converted from C<snake_case> to C<CamelCase> with L<Mojo::Util/"camelize">, and then
 appended to this C<namespace>.
@@ -428,21 +428,6 @@ name present, this works similar to the regular expression C<([^/.]+)?>.
   $r->get('/test/:mymessage/123')->to('foo#bar', mymessage => 'hi');
 
 And if two optional placeholders are only separated by a slash, that slash can become optional as well.
-
-  # /           -> {controller => 'foo',   action => 'bar'}
-  # /users      -> {controller => 'users', action => 'bar'}
-  # /users/list -> {controller => 'users', action => 'list'}
-  $r->get('/:controller/:action')->to('foo#bar');
-
-Special stash values like C<controller> and C<action> can also be placeholders, which is very convenient especially
-during development, but should only be used very carefully, because every controller method becomes a potential route.
-All uppercase methods as well as those starting with an underscore are automatically hidden from the router and you can
-use L<Mojolicious::Routes/"hide"> to add additional ones.
-
-  # Hide "create" method in all controllers
-  $r->hide('create');
-
-This has already been done for all attributes and methods from L<Mojolicious::Controller>.
 
 =head2 Restrictive placeholders
 

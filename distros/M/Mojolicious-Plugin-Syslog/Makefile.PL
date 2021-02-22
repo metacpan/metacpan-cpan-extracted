@@ -8,6 +8,7 @@ my %WriteMakefileArgs = (
   ABSTRACT_FROM  => 'lib/Mojolicious/Plugin/Syslog.pm',
   VERSION_FROM   => 'lib/Mojolicious/Plugin/Syslog.pm',
   EXE_FILES      => [qw()],
+  OBJECT         => '',
   BUILD_REQUIRES => {}
 ,
   TEST_REQUIRES  => {

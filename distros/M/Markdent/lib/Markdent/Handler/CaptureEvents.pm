@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Markdent::CapturedEvents;
 use Specio::Declare;
@@ -18,14 +18,14 @@ has captured_events => (
     is       => 'ro',
     isa      => object_isa_type('Markdent::CapturedEvents'),
     init_arg => undef,
-    default  => sub { Markdent::CapturedEvents->new() },
+    default  => sub { Markdent::CapturedEvents->new },
 );
 
 sub handle_event {
-    $_[0]->captured_events()->capture_events( $_[1] );
+    $_[0]->captured_events->capture_events( $_[1] );
 }
 
-__PACKAGE__->meta()->make_immutable();
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -43,7 +43,7 @@ Markdent::Handler::CaptureEvents - Captures events for replaying later
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 DESCRIPTION
 
@@ -55,11 +55,11 @@ parsing at an intermediate stage.
 
 This class provides the following methods:
 
-=head2 Markdent::Handler::CapturedEvents->new()
+=head2 Markdent::Handler::CapturedEvents->new
 
 This method creates a new handler.
 
-=head2 $mhce->captured_events()
+=head2 $mhce->captured_events
 
 Returns a L<Markdent::CapturedEvents> object containing all the events seen by
 this handler so far.
@@ -86,7 +86,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

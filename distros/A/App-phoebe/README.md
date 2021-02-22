@@ -317,6 +317,8 @@ Basically, this is the template for our service:
     Restart=always
     User=phoebe
     Group=phoebe
+    MemoryMax=100M
+    MemoryHigh=90M
     [Install]
     WantedBy=multi-user.target
 
@@ -513,9 +515,11 @@ Here's what my `phoebe.service` file actually looks like:
     Restart=always
     User=alex
     Group=ssl-cert
+    MemoryMax=100M
+    MemoryHigh=90M
     ExecStart=/home/alex/src/phoebe/script/phoebe \
      --port=1965 \
-     --log_level=info \
+     --log_level=debug \
      --wiki_dir=/home/alex/phoebe \
      --host=transjovian.org \
      --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
@@ -591,18 +595,19 @@ index and what they ought to skip. It doesn't always work.
 Here's my suggestion:
 
     User-agent: *
-    Disallow: /raw/*
-    Disallow: /html/*
-    Disallow: /diff/*
-    Disallow: /history/*
-    Disallow: /do/changes*
-    Disallow: /do/all/changes*
-    Disallow: /do/all/latest/changes*
+    Disallow: /raw
+    Disallow: /html
+    Disallow: /diff
+    Disallow: /history
+    Disallow: /do/comment
+    Disallow: /do/changes
+    Disallow: /do/all/changes
+    Disallow: /do/all/latest/changes
     Disallow: /do/rss
     Disallow: /do/atom
     Disallow: /do/all/atom
     Disallow: /do/new
-    Disallow: /do/more/*
+    Disallow: /do/more
     Disallow: /do/match
     Disallow: /do/search
     # allowing do/index!

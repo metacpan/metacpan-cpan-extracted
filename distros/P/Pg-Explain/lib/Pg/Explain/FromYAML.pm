@@ -20,6 +20,7 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 use base qw( Pg::Explain::From );
 use YAML;
 use Carp;
+use Pg::Explain::JIT;
 
 =head1 NAME
 
@@ -27,11 +28,11 @@ Pg::Explain::FromYAML - Parser for explains in YAML format
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =cut
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 =head1 SYNOPSIS
 
@@ -92,7 +93,7 @@ sub parse_source {
             $self->explain->add_trigger_time( $ts );
         }
     }
-
+    $self->explain->jit( Pg::Explain::JIT->new( 'struct' => $struct->{ 'JIT' } ) ) if $struct->{ 'JIT' };
     return $top_node;
 }
 
@@ -112,7 +113,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2015 hubert depesz lubaczewski, all rights reserved.
+Copyright 2008-2021 hubert depesz lubaczewski, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

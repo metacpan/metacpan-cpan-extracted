@@ -860,7 +860,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 The value for which the area under the
 Gaussian probability density function (integrated from
-minus infinity) is equal to the argument (cf L<erfi|/erfi>). Works inplace.
+minus infinity) is equal to the argument (cf L</erfi>). Works inplace.
 
 =for bad
 

@@ -1,0 +1,19 @@
+$VAR1 = {
+          'expires' => 'Wed, 17 Feb 2021 22:40:43 GMT',
+          'content-security-policy' => 'frame-ancestors \'none\';',
+          'URL' => 'https://geizhals.at/huawei-matebook-14-amd-space-grey-2020-53011gry-a2374481.html',
+          'vary' => 'User-Agent, Accept-Encoding',
+          'x-frame-options' => 'DENY',
+          'date' => 'Sat, 20 Feb 2021 22:40:43 GMT',
+          'Status' => '200',
+          'set-cookie' => 'csrf=AA7BEFDA-73CC-11EB-A595-DC179547F1BE--beb7561478fa932cbe6b9a7b929604921286e1a6; path=/; secure; SameSite=Lax',
+          'accept-ranges' => 'bytes',
+          'content-type' => 'text/html;charset=iso-8859-1',
+          'Reason' => 'OK',
+          'link' => '<//gzhls.at>; rel="preconnect"',
+          'cache-control' => 'no-cache, no-store, private',
+          'transfer-encoding' => 'chunked',
+          'server' => 'GH61',
+          'x-ua-device' => 'pc',
+          'connection' => 'keep-alive'
+        };

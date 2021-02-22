@@ -1,0 +1,46 @@
+NAME
+
+    Log::Any::Adapter::Coderef - arbitrary code handlers for Log::Any
+    messages
+
+SYNOPSIS
+
+     use JSON::MaybeUTF8 qw(:v1);
+     use Log::Any::Adapter qw(Coderef) => sub {
+      my ($data) = @_;
+      STDERR->print(encode_json_utf8($data) . "\n");
+     };
+
+DESCRIPTION
+
+    Provides support for sending log messages through a custom sub, for
+    cases when you want to do something that isn't provided by existing
+    adapters.
+
+    Currently takes a single $code parameter as a callback. This will be
+    called for every log message, passing a hashref which has the following
+    keys:
+
+      * epoch - current time, as a floating-point epoch value
+
+      * severity - log level, e.g. info or debug
+
+      * message - the formatted log message
+
+      * host - current hostname
+
+      * pid - current process ID ("$$" in perlvar)
+
+      * stack - arrayref of stacktrace entries, see caller
+
+    Additional keys may be added in future, for example structured data.
+
+AUTHOR
+
+    Tom Molesworth <TEAM@cpan.org>.
+
+LICENSE
+
+    Copyright Tom Molesworth 2020-2021. Licensed under the same terms as
+    Perl itself.
+

@@ -6,10 +6,10 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use PYX::Parser;
-use PYX::Utils qw(encode);
+use PYX::Utils;
 use Tags::Output::Raw;
 
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -23,6 +23,9 @@ sub new {
 	# Input 'Tags' item callback.
 	$self->{'input_tags_item_callback'} = undef;
 
+	# Output encoding.
+	$self->{'output_encoding'} = 'utf-8';
+
 	# Tags object.
 	$self->{'tags'} = undef;
 
@@ -33,6 +36,7 @@ sub new {
 		$self->{'tags'} = Tags::Output::Raw->new(
 			'input_tags_item_callback'
 				=> $self->{'input_tags_item_callback'},
+			'output_encoding' => $self->{'output_encoding'},
 			'output_handler' => \*STDOUT,
 		);
 	}
@@ -125,7 +129,7 @@ sub _data {
 	my ($self, $data) = @_;
 
 	my $tags = $self->{'non_parser_options'}->{'tags'};
-	$tags->put(['d', encode($data)]);
+	$tags->put(['d', PYX::Utils::encode($data)]);
 
 	return;
 }
@@ -155,7 +159,7 @@ sub _comment {
 	my ($self, $comment) = @_;
 
 	my $tags = $self->{'non_parser_options'}->{'tags'};
-	$tags->put(['c', encode($comment)]);
+	$tags->put(['c', PYX::Utils::encode($comment)]);
 
 	return;
 }
@@ -196,7 +200,7 @@ Returns instance of class.
 
 =item * C<input_encoding>
 
-Input encoding.
+Input encoding for parse_file() and parse_handler() usage.
 
 Default value is 'utf-8'.
 
@@ -206,6 +210,12 @@ Input 'Tags' item callback.
 This callback is for Tags::Output::* constructor parameter 'input_tags_item_callback'.
 
 Default value is undef.
+
+=item * C<output_encoding>
+
+Output encoding.
+
+Default value is 'utf-8'.
 
 =item * C<tags>
 
@@ -231,6 +241,7 @@ Returns undef.
  $obj->parse_file($input_file, $out);
 
 Parse file with PYX data.
+C<$input_file> file is decoded by 'input_encoding'.
 Output is serialization to SGML.
 If C<$out> not present, use 'output_handler'.
 
@@ -241,6 +252,7 @@ Returns undef.
  $obj->parse_handle($input_file_handler, $out);
 
 Parse PYX handler.
+C<$input_file_handler> handler is decoded by 'input_encoding'.
 Output is serialization to SGML.
 If C<$out> not present, use 'output_handler'.
 
@@ -397,12 +409,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2020 Michal Josef Špaček
+© 2011-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.08
 
 =cut

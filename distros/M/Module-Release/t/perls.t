@@ -2,17 +2,15 @@
 use strict;
 use warnings;
 
-use Test::More 1.0 'no_plan';
+use Test::More 1.0;
 
-BEGIN {
-	use File::Spec::Functions qw(rel2abs catfile);
-	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
-	require $file;
-	}
-
-use Data::Dumper;
+require 't/lib/setup_common.pl';
 
 my $class = 'Module::Release';
+subtest setup => sub {
+	use_ok( $class );
+	can_ok( $class, 'new' );
+	};
 
 use_ok( $class );
 
@@ -150,3 +148,5 @@ is( $p0, $pX, "The reset perl is the one in \$^X" );
 }
 
 }
+
+done_testing();

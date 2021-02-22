@@ -13,7 +13,10 @@ azure-pipelines.yml
 bench/capture-vs-text-markdown-vs-parse
 bin/markdent-html
 cpanfile
+dev-bin/install-xt-tools.sh
 dist.ini
+git/hooks/pre-commit.sh
+git/setup.pl
 lib/Markdent.pm
 lib/Markdent/CLI.pm
 lib/Markdent/CapturedEvents.pm
@@ -37,6 +40,7 @@ lib/Markdent/Event/EndLink.pm
 lib/Markdent/Event/EndListItem.pm
 lib/Markdent/Event/EndOrderedList.pm
 lib/Markdent/Event/EndParagraph.pm
+lib/Markdent/Event/EndStrikethrough.pm
 lib/Markdent/Event/EndStrong.pm
 lib/Markdent/Event/EndTable.pm
 lib/Markdent/Event/EndTableBody.pm
@@ -63,6 +67,7 @@ lib/Markdent/Event/StartLink.pm
 lib/Markdent/Event/StartListItem.pm
 lib/Markdent/Event/StartOrderedList.pm
 lib/Markdent/Event/StartParagraph.pm
+lib/Markdent/Event/StartStrikethrough.pm
 lib/Markdent/Event/StartStrong.pm
 lib/Markdent/Event/StartTable.pm
 lib/Markdent/Event/StartTableBody.pm
@@ -103,6 +108,7 @@ lib/Markdent/Types.pm
 lib/Markdent/Types/Internal.pm
 perlcriticrc
 perltidyrc
+precious.toml
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/CapturedEvents.t
@@ -124,6 +130,7 @@ t/lib/Test/Markdent.pm
 t/markup/github/bare-auto-link.t
 t/markup/github/em-in-words.t
 t/markup/github/fenced-block.t
+t/markup/github/strikethrough.t
 t/markup/multi-dialect/github-theory.t
 t/markup/standard/backslash-escape.t
 t/markup/standard/blockquote.t
@@ -190,14 +197,13 @@ t/mdtest-data/Tidyness.text
 t/mdtest-data/Tidyness.xhtml
 t/mdtest.t
 t/parse-twice.t
-tidyall.ini
 xt/author/00-compile.t
 xt/author/clean-namespaces.t
 xt/author/mojibake.t
 xt/author/pod-spell.t
 xt/author/pod-syntax.t
+xt/author/precious.t
 xt/author/test-version.t
-xt/author/tidyall.t
+xt/extra/pod-coverage.t
 xt/release/cpan-changes.t
 xt/release/meta-json.t
-xt/release/pod-coverage.t

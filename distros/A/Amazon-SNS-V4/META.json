@@ -39,19 +39,19 @@
    "provides" : {
       "Amazon::SNS::V4" : {
          "file" : "lib/Amazon/SNS/V4.pm",
-         "version" : "1.11"
+         "version" : "2.0"
       },
       "Amazon::SNS::V4::FifoTopic" : {
          "file" : "lib/Amazon/SNS/V4/FifoTopic.pm",
-         "version" : "1.11"
+         "version" : "2.0"
       },
       "Amazon::SNS::V4::Target" : {
          "file" : "lib/Amazon/SNS/V4/Target.pm",
-         "version" : "1.11"
+         "version" : "2.0"
       },
       "Amazon::SNS::V4::Topic" : {
          "file" : "lib/Amazon/SNS/V4/Topic.pm",
-         "version" : "1.11"
+         "version" : "2.0"
       }
    },
    "release_status" : "stable",
@@ -66,7 +66,7 @@
       },
       "x_IRC" : "irc://irc.styxnet.tech/#perl"
    },
-   "version" : "1.11",
+   "version" : "2.0",
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_spdx_expression" : "GPL-2.0-only"
 }

@@ -1,0 +1,4 @@
+$VAR1 = [
+            { input => sub { $_[0] eq 'foo' } , output => 'foo' },
+            { input => sub { $_[0] eq 'foo' } , output => 'foo' },
+        ];

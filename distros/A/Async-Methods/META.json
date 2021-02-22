@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Async-Methods",
    "no_index" : {
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.000003",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.000004",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -24,6 +24,7 @@ WriteMakefile(
         'Digest::MD5'         => '0',
         'Digest::SHA'         => '0',
         'Crypt::OpenSSL::AES' => '0',
+        'Term::ReadKey'       => '0',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

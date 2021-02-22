@@ -4,7 +4,7 @@ use utf8;
 
 package App::url;
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 use Carp qw(carp);
 use Mojo::Base -strict, -signatures;

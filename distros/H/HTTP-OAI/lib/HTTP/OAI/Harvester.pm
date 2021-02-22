@@ -4,7 +4,7 @@ use base HTTP::OAI::UserAgent;
 
 use strict;
 
-our $VERSION = '4.10';
+our $VERSION = '4.11';
 
 sub new {
 	my ($class,%args) = @_;
@@ -131,7 +131,8 @@ In the examples I use arXiv.org's and cogprints OAI interfaces. To avoid causing
 	use HTTP::OAI;
 
 	my $h = new HTTP::OAI::Harvester(baseURL=>'http://arXiv.org/oai2');
-	my $response = $h->repository($h->Identify)
+	my $response = $h->Identify;
+
 	if( $response->is_error ) {
 		print "Error requesting Identify:\n",
 			$response->code . " " . $response->message, "\n";
@@ -174,16 +175,15 @@ In the examples I use arXiv.org's and cogprints OAI interfaces. To avoid causing
 	$response = $h->ListRecords(
 		metadataPrefix=>'oai_dc',
 		handlers=>{metadata=>'HTTP::OAI::Metadata::OAI_DC'},
+		onRecord=>sub {
+			my $rec = shift;
+
+			printf"%s\t%s\t%s\n"
+					 , $rec->identifier
+					 , $rec->datestamp
+					 , join(',', @{$rec->metadata->dc->{'title'}});
+		}
 	);
-	while( my $rec = $response->next ) {
-		print $rec->identifier, "\t",
-			$rec->datestamp, "\n",
-			$rec->metadata, "\n";
-		print join(',', @{$rec->metadata->dc->{'title'}}), "\n";
-	}
-	if( $rec->is_error ) {
-		die $response->message;
-	}
 
 	# Offline parsing
 	$I = HTTP::OAI::Identify->new();

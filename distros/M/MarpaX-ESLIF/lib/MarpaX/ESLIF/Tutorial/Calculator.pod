@@ -14,7 +14,7 @@ MarpaX::ESLIF::Tutorial::Calculator - MarpaX::ESLIF Calculator Tutorial
 
 =head1 VERSION
 
-version 4.0.1
+version 5.0.7
 
 =head1 DESCRIPTION
 

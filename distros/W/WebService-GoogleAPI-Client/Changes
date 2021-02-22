@@ -1,3 +1,8 @@
+0.25      2021-02-21 21:40:04+02:00 Asia/Jerusalem
+
+- Fix bug from overzealous dep burnination, goauth works now
+- move bugtracker to correct repo
+
 0.24      2021-01-29 10:33:10+02:00 Asia/Jerusalem
 
 - Fix some test breakage - min perl version now 5.20.0

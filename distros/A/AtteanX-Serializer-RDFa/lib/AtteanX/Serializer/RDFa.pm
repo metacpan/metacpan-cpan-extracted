@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.100';
+our $VERSION   = '0.110';
 
 use Moo;
 use Types::Standard qw(Str Maybe HashRef ConsumerOf);
@@ -45,6 +45,8 @@ sub media_types {
   return [qw(application/xhtml+xml text/html)];
 }
 
+sub file_extensions { return [qw(html xhtml)] };
+
 sub _make_document {
   my ($self, $iter) = @_;
   my $store = Attean->get_store('Memory')->new();
@@ -83,10 +85,10 @@ AtteanX::Serializer::RDFa - RDFa Serializer for Attean
  use Attean;
  use Attean::RDF qw(iri);
  use URI::NamespaceMap;
- 
+
  my $ser = Attean->get_serializer('RDFa')->new;
  my $string = $ser->serialize_iter_to_bytes($iter);
- 
+
  my $ns = URI::NamespaceMap->new( { ex => iri('http://example.org/') });
  $ns->guess_and_add('foaf');
  my $note = RDF::RDFa::Generator::HTML::Pretty::Note->new(iri('http://example.org/foo'), 'This is a Note');
@@ -146,7 +148,7 @@ example.
 
 =head2 Methods
 
-This implements two required methods:
+This implements four required methods:
 
 =over
 
@@ -159,6 +161,10 @@ the L<IO::Handle> object C<< $fh >>.
 
 Serializes the elements from the L<Attean::API::Iterator> C<< $iterator >>
 and returns the serialization as a UTF-8 encoded byte string.
+
+=item C<< media_types >> and C<< file_extensions >>
+
+Declares that HTML media types are used for the output of this module.
 
 =back
 
@@ -187,7 +193,7 @@ Kjetil Kjernsmo E<lt>kjetilk@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2017, 2018, 2019 by Kjetil Kjernsmo.
+This software is copyright (c) 2017, 2018, 2019, 2021 by Kjetil Kjernsmo.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

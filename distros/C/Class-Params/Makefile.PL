@@ -22,15 +22,14 @@ requires 'Exporter' => 0;
 requires 'Readonly' => 0;
 requires 'Scalar::Util' => 0;
 requires 'perl' => '5.8.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Class-Params';
-resources 'homepage' => 'https://github.com/tupinek/Class-Params';
-resources 'repository' => 'git://github.com/tupinek/Class-Params';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Class-Params/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Class-Params';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Class-Params';
 test_requires 'English' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

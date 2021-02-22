@@ -1,7 +1,7 @@
 package Test::Script;
 
 # ABSTRACT: Basic cross-platform tests for scripts
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 use 5.008001;
@@ -480,7 +480,7 @@ Test::Script - Basic cross-platform tests for scripts
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 
@@ -534,6 +534,8 @@ Note also that the test will be run with the same L<perl> interpreter that
 is running the test script (and not with the default system perl). This
 will also be shown in the diagnostic output on failure.
 
+This function was added in version 1.05.
+
 =head2 script_runs
 
  script_runs( $script, $test_name );
@@ -552,7 +554,9 @@ The test will be run with the same L<perl> interpreter that is running the
 test script (and not with the default system perl). This will also be shown
 in the diagnostic output on failure.
 
-You may pass in options as a hash as the second argument.
+This function was added in version 1.05.
+
+You may pass in options as a hash as the second argument (as of version 1.09).
 
 =over 4
 
@@ -566,6 +570,8 @@ on your platform (usually 0).
 Array reference of Perl options to be passed to the interpreter.  Things
 like C<-w> or C<-x> can be passed this way.  This may be either a single
 string or an array reference.
+
+This option was added in version 1.25.
 
 =item signal
 
@@ -626,12 +632,16 @@ Same as C<stdout> above, except for stderr.
 Tests if the output to stdout from the previous L</script_runs> matches the
 expected value exactly.
 
+This function was added in version 1.09.
+
 =head2 script_stdout_isnt
 
  script_stdout_is $expected_stdout, $test_name;
 
 Tests if the output to stdout from the previous L</script_runs> does NOT match the
 expected value exactly.
+
+This function was added in version 1.09.
 
 =head2 script_stdout_like
 
@@ -640,12 +650,16 @@ expected value exactly.
 Tests if the output to stdout from the previous L</script_runs> matches the regular
 expression.
 
+This function was added in version 1.09.
+
 =head2 script_stdout_unlike
 
  script_stdout_unlike $regex, $test_name;
 
 Tests if the output to stdout from the previous L</script_runs> does NOT match the regular
 expression.
+
+This function was added in version 1.09.
 
 =head2 script_stderr_is
 
@@ -654,12 +668,16 @@ expression.
 Tests if the output to stderr from the previous L</script_runs> matches the
 expected value exactly.
 
+This function was added in version 1.09.
+
 =head2 script_stderr_isnt
 
  script_stderr_is $expected_stderr, $test_name;
 
 Tests if the output to stderr from the previous L</script_runs> does NOT match the
 expected value exactly.
+
+This function was added in version 1.09.
 
 =head2 script_stderr_like
 
@@ -668,12 +686,16 @@ expected value exactly.
 Tests if the output to stderr from the previous L</script_runs> matches the regular
 expression.
 
+This function was added in version 1.09.
+
 =head2 script_stderr_unlike
 
  script_stderr_unlike $regex, $test_name;
 
 Tests if the output to stderr from the previous L</script_runs> does NOT match the regular
 expression.
+
+This function was added in version 1.09.
 
 =head2 program_runs
 
@@ -701,6 +723,8 @@ The C<%options> do not support the C<interpreter_options> key.
 
 See L<File::Spec> or L<Path::Class> for routines useful in building pathnames
 in a cross-platform way.
+
+This function was added in version 1.26.
 
 =head2 program_stdout_is
 

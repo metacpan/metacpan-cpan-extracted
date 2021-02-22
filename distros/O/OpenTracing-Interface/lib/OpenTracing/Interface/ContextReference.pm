@@ -5,10 +5,10 @@ use strict;
 use warnings;
 
 
-our $VERSION = 'v0.205.0';
+our $VERSION = 'v0.206.1';
 
 
-use Role::Declare;
+use Role::Declare::Should;
 
 use OpenTracing::Types qw/ContextReference SpanContext/;
 use Types::Standard qw/Bool/;

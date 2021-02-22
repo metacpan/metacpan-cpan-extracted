@@ -16,20 +16,43 @@ WriteMakefile(
     'script/titan',
   ],
   PREREQ_PM => {
+    # t/prerequisites.t is serious about all these!
+    'B' => 0,
+    'lib' => 0,
+    'utf8' => 0,
     'strict' => 0,
     'warnings' => 0,
-    'Algorithm::Diff' => 0,
-    'File::ReadBackwards' => 0,
-    'Net::IDN::Encode' => 0,
-    'IRI' => 0,
-    'Encode::Locale' => 0,
-    'Mojolicious' => 8.12, # Mojo::IOLoop, also adds IO::Socket::IP
-    'IO::Socket::SSL' => 0, # optional for Mojo::IOLoop
-    'File::Slurper' => 0,
     'Modern::Perl' => 1.20180701, # for '2018'
-    'Mojo::IOLoop' => 0,
     'URI::Escape' => 0,
-    'Mojo::Log' => 0,
+    'Encode' => 0,
+    'Encode::Locale' => 0,
+    'Algorithm::Diff' => 0,
+    'File::Path' => 0,
+    'File::Temp' => 0,
+    'File::Basename' => 0,
+    'File::ReadBackwards' => 0,
+    'File::Slurper' => 0,
+    'Getopt::Long' => 0,
+    'List::Util' => 0,
+    'Pod::Text' => 0,
+    'Socket' => 0,
+    'Test::More' => 0,
+    'Mojolicious' => 9.00,       # removed tls_verify from Mojo::IOLoop::TLS 9.0
+    'Mojo::IOLoop' => 0,         # part of Mojolicious
+    'Mojo::IOLoop::Server' => 0, # part of Mojolicious
+    'Mojo::Log' => 0,            # part of Mojolicious
+    'Mojo::UserAgent' => 0,      # part of Mojolicious
+    'IO::Socket::SSL' => 2.069,  # optional for Mojo::IOLoop
+    'Net::SSLeay' => 1.90,
+    'Net::IDN::Encode' => 0,
+    'Term::ReadLine' => 0,       # for script/gemini-chat
+    'Mojolicious::Plugin::CGI' => 0,  # for contrib/oddmuse.pl
+    'DateTime::Format::ISO8601' => 0, # for contrib/oddmuse.pl
+    'CGI' => 0,                       # for contrib/oddmuse.pl
+    'IRI' => 0,      # for script/gemini
+    'Net::IP' => 0,  # required for contrib/speed-bump.pl
+    'Net::DNS' => 0, # required for contrib/speed-bump.pl
+    'IO::Socket::IP' => 0, # required for t/gopher.t
   },
   META_MERGE => {
     'meta-spec' => { version => 2 },

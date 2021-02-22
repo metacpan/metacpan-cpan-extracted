@@ -4,7 +4,7 @@ App::Greple::xp - extended pattern module
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -12,8 +12,8 @@ greple -Mxp
 
 =head1 DESCRIPTION
 
-This module provides functions can be used by B<greple> pattern and
-region options.
+This module provides functions those can be used by B<greple> pattern
+and region options.
 
 =head1 OPTIONS
 
@@ -31,15 +31,6 @@ region options.
 
 Read file contents and use each lines as a pattern for options.
 
-Lines start with hash mark (C<#>) is ignored as a comment line.
-
-String after double slash (C<//>) is also ignored.
-
-Because file name is globbed, you can use wild card to give multiple
-files.
-
-    $ greple -Mxp --exclude-pattern '*.exclude' ...
-
 =item B<--le-string> I<file>
 
 =item B<--inside-string> I<file>
@@ -54,6 +45,21 @@ Almost same as B<*-pattern> option but each line is concidered as a
 fixed string rather than regular expression.
 
 =back
+
+=head2 COMMENT
+
+Lines start with hash mark (C<#>) is ignored as a comment line.
+
+String after double slash (C<//>) is also ignored with preceding
+spaces.
+
+=head2 WILD CARD
+
+Because I<file> parameter is globbed, you can use wild card to give
+multiple files.  If nothing matched to the wild card, this option is
+simply ignored with no message.
+
+    $ greple -Mxp --exclude-pattern '*.exclude' ...
 
 =head1 SEE ALSO
 
@@ -81,7 +87,7 @@ use v5.14;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use Exporter 'import';
 our @EXPORT = qw(&xp_pattern_file);
@@ -112,7 +118,7 @@ sub xp_pattern_file {
 		next if $p =~ /^\s*#/;
 	    }
 	    if ($opt{slash_comment} and !$opt{fixed}) {
-		$p =~ s{//.*}{};
+		$p =~ s{\s*//.*}{};
 	    }
 	    next unless $p =~ /\S/;
 	    my $re = $opt{fixed} ? qr/\Q$p/ : qr/$p/m;

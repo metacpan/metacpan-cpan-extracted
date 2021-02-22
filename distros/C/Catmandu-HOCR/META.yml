@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-HOCR/issues
   homepage: https://github.com/LibreCat/Catmandu-HOCR
   repository: https://github.com/LibreCat/Catmandu-HOCR.git
-version: '0.01'
+version: '0.02'
 x_contributors:
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

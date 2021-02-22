@@ -1,5 +1,5 @@
 # SNMP Sendmail Statistics Module -*- perl -*- 
-# Copyright (C) 2015, 2016 Sergey Poznyakoff <gray@gnu.org>
+# Copyright (C) 2015, 2016, 2019 Sergey Poznyakoff <gray@gnu.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ WriteMakefile(
     'PM'              => {
 	'Sendmail.pm' => '$(INST_LIBDIR)/Sendmail.pm'
     },
+    'EXE_FILES'       => [ 'netsnmp-sendmail-setup' ],
     'PREREQ_PM'       => { 'NetSNMP::OID' => 0, 
                            'NetSNMP::agent' => 0, 
                            'NetSNMP::ASN' => 0 },
@@ -40,6 +41,10 @@ WriteMakefile(
 		url => 'git://git.gnu.org.ua/netsnmp-sendmail.git',
 		web => 'http://git.gnu.org.ua/cgit/netsnmp-sendmail.git/',
 	    },
+            bugtracker => {
+	        web => 'https://puszcza.gnu.org.ua/bugs/?group=netsnmp-sendmail',
+		mailto => 'gray+netsnmp-sendmail@gnu.org.ua'
+	    }
 	},
 	provides => Module::Metadata->provides(version => '2', dir => '.')
     }

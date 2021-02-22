@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use Module::Metadata;
 use Pod::Find qw(pod_where);
 use Pod::Usage;
 
@@ -33,7 +34,25 @@ WriteMakefile(NAME => 'App::Glacier',
 				  'Storable' => 2.34,
 				  'Term::ReadKey' => 2.32,
 				  'Text::Locus' => 1.01
-	      } );
+	      },
+	      META_MERGE => {
+		  'meta-spec' => { version => 2 },
+		  resources => {
+		      repository => {
+			  type => 'git',
+			  url => 'git://git.gnu.org.ua/glacier.git',
+			  web => 'http://git.gnu.org.ua/cgit/glacier.git/',
+		      },
+		      bugtracker => {
+			  web => 'https://puszcza.gnu.org.ua/bugs/?group=glacier',
+			  mailto => 'gray+glacier@gnu.org.ua'
+		      }
+		  },
+		  provides => Module::Metadata->provides(version => '1.4',
+							 dir => 'lib')
+	      }
+	      
+    );
 
 sub pod_command_name {
     my ($pack) = @_;

@@ -2,13 +2,16 @@
 abstract: 'configuration file parser for ldap.conf'
 author:
   - 'Sergey Poznyakoff <gray@gnu.org>'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Config-Parser-ldap
 no_index:
   directory:
@@ -17,7 +20,13 @@ no_index:
 provides:
   Config::Parser::ldap:
     file: lib/Config/Parser/ldap.pm
-    version: 1.00
+    version: '1.02'
+requires:
+  Carp: '0'
+  Config::AST: '1.05'
+  Config::Parser: '1.03'
+  perl: '5.016001'
 resources:
+  bugtracker: https://puszcza.gnu.org.ua/bugs/?group=config-parser-ldap
   repository: git://git.gnu.org.ua/config-parser-ldap.git
-version: 1.00
+version: '1.02'

@@ -23,6 +23,10 @@ WriteMakefile(NAME      =>      'Config::Parser::ldap',
 			  url => 'git://git.gnu.org.ua/config-parser-ldap.git',
 			  web => 'http://git.gnu.org.ua/cgit/config-parser-ldap.git/',
 		      },
+		      bugtracker => {
+		          web => 'https://puszcza.gnu.org.ua/bugs/?group=config-parser-ldap',
+		          mailto => 'gray+config-parser-ldap@gnu.org.ua'
+		      }
 		  },
 		  provides => Module::Metadata->provides(version => '1.4',
 							 dir => 'lib')

@@ -1,16 +1,27 @@
 use strict;
 
-use File::Temp qw(tempdir);
-use Test::More 0.95;
+use Test::More 1;
 
-my $dir = tempdir( CLEANUP => 1 ) or BAILOUT( "Could not setup temp directory" );
+use Config;
+use File::Temp qw(tempdir);
+
+sub is_unix_superuser () {
+    ($^O ne 'MSWin32' and ( $> == 0 or $< == 0 ))
+    or
+    ($^O eq 'cygwin' and grep { $_ == 544 } split /\s+/, `/usr/bin/id -G`)
+	}
+sub is_cygwin         () { scalar grep { lc($^O) eq $_ or lc($Config{osname}) eq $_ } qw( cygwin msys msys2 ) }
+
+sub is_win32          () { $^O eq 'MSWin32' }
+
+my $dir = tempdir( CLEANUP => 1 ) or BAIL_OUT( "Could not setup temp directory" );
 
 unless( -d $dir ) {
 	mkdir 'test_files', 0700
-		or BAILOUT( "Could not make directory! $!" );
+		or BAIL_OUT( "Could not make directory! $!" );
 	}
 
-chdir $dir or BAILOUT( "Could not change directory! $!" );
+chdir $dir or BAIL_OUT( "Could not change directory! $!" );
 
 my @files = qw(
 max_file       non_zero_file  not_readable   readable       zero_file
@@ -25,23 +36,23 @@ foreach my $file ( @files ) {
 
 {
 my $count = chmod 0644, @files;
-is( $count, scalar @files ) or BAILOUT( "Could not make files readable" );
+is( $count, scalar @files ) or BAIL_OUT( "Could not make files readable" );
 }
 
 {
 my $count = chmod 0400, 'readable', 'not_writable', 'not_executable';
-is( $count, 3 ) or BAILOUT( "Could not make files readable" );
+is( $count, 3 ) or BAIL_OUT( "Could not make files readable" );
 }
 
 {
 my $count = chmod 0200, 'writable', 'not_readable',
 		'zero_file', 'max_file', 'non_zero_file';
-is( $count, 5 ) or BAILOUT( "Could not make files writable" );
+is( $count, 5 ) or BAIL_OUT( "Could not make files writable" );
 }
 
 {
 my $count = chmod 0100, 'executable';
-is( $count, 1 ) or BAILOUT( "Could not make files executable" );
+is( $count, 1 ) or BAIL_OUT( "Could not make files executable" );
 }
 
 truncate 'zero_file', 0;
@@ -49,11 +60,11 @@ truncate 'max_file', 10;
 truncate 'min_file',  0;
 
 {
-open FH, '> min_file' or BAILOUT( "Could not write to min_file: $!" );
+open FH, '> min_file' or BAIL_OUT( "Could not write to min_file: $!" );
 binmode FH; #, Windows, yo!
 print FH 'x' x 40, $/, 'x' x 11, $/;
 close FH;
 }
 is( -s 'min_file', 51 + 2 * length( $/ ) );
 
-mkdir 'sub_dir', 0755 or BAILOUT( "Could not cerate subdir: $!" );
+mkdir 'sub_dir', 0755 or BAIL_OUT( "Could not cerate subdir: $!" );

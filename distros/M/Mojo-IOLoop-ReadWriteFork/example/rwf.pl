@@ -9,12 +9,10 @@ version 'Mojo::IOLoop::ReadWriteFork';
 
 app {
   my ($self, $command, @hosts) = @_;
-  my $delay = Mojo::IOLoop->delay;
-  my @rwf;
+  my (@p, @rwf);
 
   for my $host (@hosts) {
     my $rwf = Mojo::IOLoop::ReadWriteFork->new;
-    my $cb  = $delay->begin;
     my $buf = '';
 
     if ($self->flush) {
@@ -29,24 +27,22 @@ app {
       $rwf->on(read => sub { $buf .= $_[1] });
     }
 
-    $rwf->on(error => $cb);
     $rwf->on(
       close => sub {
         my ($rwf, $exit_value, $signal) = @_;
-        return $rwf->$cb($buf || "Could not execute $command: $exit_value") if $exit_value;
+        return warn "Could not execute $command: $exit_value" if $exit_value;
         warn "--- $host\n" unless $self->flush;
         $buf =~ s!\n$!!;
         print $self->flush ? "$host: $buf\n" : "$buf\n" if length $buf;
-        $rwf->$cb("");
       }
     );
 
-    $rwf->run(ssh => $host => $command);
+    push @p,   $rwf->run_p(ssh => $host => $command);
     push @rwf, $rwf;
     warn "+++ ssh $host $command\n";
   }
 
-  $delay->wait;
+  Mojo::Promise->all(@p)->wait;
 
   return 0;
 };

@@ -8,7 +8,7 @@ use Carp;
 use Clone;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 NAME
 
@@ -375,7 +375,7 @@ Sergey Poznyakoff, E<lt>gray@gnu.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 by Sergey Poznyakoff
+Copyright (C) 2018-2021 by Sergey Poznyakoff
 
 This library is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

@@ -1,6 +1,14 @@
 Changelog for DBIx-BatchChunker
 
-v0.940.2 2020-10-29T14:41:19
+v0.940.4 2021-02-17T20:41:05
+ - Update README (Brendan Byrd)
+ - Enforce sane minimum baseline versions in the cpanfile (Brendan Byrd)
+
+v0.940.3 2021-02-11T21:46:10
+ - Update README / LICENSE (Brendan Byrd)
+ - Use ~0 as the max integer for $DB_MAX_ID (Brendan Byrd)
+
+v0.940.2 2020-10-29T12:56:15
  - Move has_dbic_retry_opts to a private predicate (Brendan Byrd)
  - update README for v0.940.2 (Mark Flickinger)
  - SM-2747: Fix max_end boundary bug with process_past_max (Brendan Byrd)

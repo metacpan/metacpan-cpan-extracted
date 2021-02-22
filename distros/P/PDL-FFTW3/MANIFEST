@@ -12,3 +12,4 @@ template_real.c
 TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/FFTW3.pm                   mod=PDL::FFTW3 pd=FFTW3.pd (added by pdlpp_mkgen)

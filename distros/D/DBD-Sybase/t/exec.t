@@ -53,7 +53,7 @@ get_all_results($sth);
 
 #$dbh->do("use tempdb");
 $dbh->do("set arithabort off");
-$dbh->do("if object_id('dbitest') != NULL drop proc dbitest");
+$dbh->do("if object_id('dbitest') is not NULL drop proc dbitest");
 $rc = $dbh->do(qq{
 create proc dbitest \@one varchar(20), \@two int, \@three numeric(5,2), \@four smalldatetime, \@five float output
 as
@@ -128,7 +128,7 @@ get_all_results($sth);
 
 $dbh->do("drop proc dbitest");
 
-$dbh->do("if object_id('dbitest') != NULL drop proc dbitest");
+$dbh->do("if object_id('dbitest') is not NULL drop proc dbitest");
 $rc = $dbh->do(qq{
 create proc dbitest \@one varchar(20), \@two int, \@three numeric(5,2), \@four smalldatetime --, \@five float = null output
 as

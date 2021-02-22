@@ -3,19 +3,23 @@ abstract: 'DBI driver for Sybase datasources'
 author:
   - 'Michael Peppler (mpeppler@peppler.org)'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.120351'
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.143240'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBD-Sybase
 no_index:
   directory:
     - t
     - inc
-requires: {}
-version: 1.16
+requires:
+  DBI: '0'
+resources:
+  bugtracker: https://github.com/mpeppler/DBD-Sybase/issues
+  repository: https://github.com/mpeppler/DBD-Sybase.git
+version: '1.17'

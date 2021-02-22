@@ -1,3 +1,8 @@
+3.07 2021-01-12
+
+	- Change bugtracker address.
+	- Change root certificate URL and make it configurable.
+
 3.06 2020-06-15
 
 	- Improve error reporting

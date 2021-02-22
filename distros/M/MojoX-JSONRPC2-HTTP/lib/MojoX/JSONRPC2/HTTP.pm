@@ -3,7 +3,7 @@ package MojoX::JSONRPC2::HTTP;
 use Mojo::Base -base;
 use Carp;
 
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.2';
 
 use Mojo::UserAgent;
 use JSON::RPC2::Client;
@@ -118,7 +118,7 @@ MojoX::JSONRPC2::HTTP - Client for JSON RPC 2.0 over HTTP
 
 =head1 VERSION
 
-This document describes MojoX::JSONRPC2::HTTP version v2.0.1
+This document describes MojoX::JSONRPC2::HTTP version v2.0.2
 
 
 =head1 SYNOPSIS

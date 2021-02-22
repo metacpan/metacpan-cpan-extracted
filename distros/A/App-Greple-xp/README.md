@@ -5,7 +5,7 @@ App::Greple::xp - extended pattern module
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -13,8 +13,8 @@ greple -Mxp
 
 # DESCRIPTION
 
-This module provides functions can be used by **greple** pattern and
-region options.
+This module provides functions those can be used by **greple** pattern
+and region options.
 
 # OPTIONS
 
@@ -26,15 +26,6 @@ region options.
 
     Read file contents and use each lines as a pattern for options.
 
-    Lines start with hash mark (`#`) is ignored as a comment line.
-
-    String after double slash (`//`) is also ignored.
-
-    Because file name is globbed, you can use wild card to give multiple
-    files.
-
-        $ greple -Mxp --exclude-pattern '*.exclude' ...
-
 - **--le-string** _file_
 - **--inside-string** _file_
 - **--outside-string** _file_
@@ -43,6 +34,21 @@ region options.
 
     Almost same as **\*-pattern** option but each line is concidered as a
     fixed string rather than regular expression.
+
+## COMMENT
+
+Lines start with hash mark (`#`) is ignored as a comment line.
+
+String after double slash (`//`) is also ignored with preceding
+spaces.
+
+## WILD CARD
+
+Because _file_ parameter is globbed, you can use wild card to give
+multiple files.  If nothing matched to the wild card, this option is
+simply ignored with no message.
+
+    $ greple -Mxp --exclude-pattern '*.exclude' ...
 
 # SEE ALSO
 

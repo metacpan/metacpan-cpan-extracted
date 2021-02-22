@@ -9,7 +9,7 @@ use _test;
 
 use strict;
 
-use Test::More tests=>36; 
+use Test::More tests=>38; 
 #use Test::More qw(no_plan);
 
 use Data::Dumper;
@@ -114,7 +114,7 @@ $dbh->{syb_quoted_identifier} = 0;
 # Test multiple result sets, varying column names
 $sth = $dbh->prepare("
 select uid, name from sysusers where uid = -2
-select spid, kpid, suid from master..sysprocesses where spid = \@\@spid
+select spid, kpid, uid from master..sysprocesses where spid = \@\@spid
 ");
 ok($sth, 'prepare multiple');
 $rc = $sth->execute;
@@ -145,7 +145,7 @@ SKIP: {
 #my $ti = $dbh->type_info_all;
 #foreach
 my @type_info = $dbh->type_info(DBI::SQL_CHAR);
-ok(@type_info > 1, 'type_info');
+ok(@type_info >= 1, 'type_info');
 
 ok(exists($type_info[0]->{DATA_TYPE}), 'type_info DATA_TYPE');
 
@@ -159,10 +159,10 @@ SKIP: {
     ok($desc[0]->{TYPE} == 8, 'describe TYPE');
 }
 
-$sth = $dbh->prepare(q|select suid, suser_name(suid), cpu, physical_io
+$sth = $dbh->prepare(q|select uid, suser_name(uid), cpu, physical_io
 from master..sysprocesses
-order by suid
-compute sum(cpu), sum(physical_io) by suid
+order by uid
+compute sum(cpu), sum(physical_io) by uid
 		       |
 );
 
@@ -191,7 +191,7 @@ if($dbh->{syb_server_version} ge '12.5.3') {
     my $sth = $dbh->prepare("select convert(date, getdate()), convert(time, getdate())");
     $sth->execute;
     while(my $r = $sth->fetch) {
-	print "@$r\n";
+	    print "@$r\n";
     }
 }
 
@@ -199,28 +199,39 @@ if($dbh->{syb_server_version} ge '12.5.3') {
 #
 
 SKIP: {
-    skip 'requires ASE 15 ', 2 unless $dbh->{syb_server_version} ge '15';
+    skip 'requires ASE 15 ', 2 if $dbh->{syb_server_version} lt '15' || $dbh->{syb_server_version} eq 'Unknown';
     $dbh->{PrintError} = 1;
     my $sth = $dbh->prepare("select convert(unsigned smallint, power(2, 15)), convert(bigint, power(convert(bigint, 2), 32))");
     $sth->execute;
     while(my $r = $sth->fetch) {
-	print "@$r\n";
-	ok($r->[0] == 32768, "unsigned smallint");
-	ok($r->[1] == 4294967296, "bigint");
+	    print "@$r\n";
+	    ok($r->[0] == 32768, "unsigned smallint");
+	    ok($r->[1] == 4294967296, "bigint");
     }
 }
 
 SKIP: {
-    skip 'requires ASE 15.5 ', 2 unless $dbh->{syb_server_version} ge '15.5';
+    skip 'requires ASE 15.5 ', 4 if $dbh->{syb_server_version} lt '15.5' || $dbh->{syb_server_version} eq 'Unknown';
     $dbh->{PrintError} = 1;
     $dbh->syb_date_fmt('LONGMS');
     my $sth = $dbh->prepare("select current_bigdatetime(), current_bigtime()");
     $sth->execute;
     while(my $r = $sth->fetch) {
-    print "@$r\n";
-    ok(1 == 1, "bigdatetime");
-    ok(1 == 1, "bigtime");
+      print "@$r\n";
+      ok(1 == 1, "bigdatetime");
+      ok(1 == 1, "bigtime");
     }
+
+    $dbh->syb_date_fmt('ISO');
+
+    my $sth = $dbh->prepare("select current_bigdatetime(), current_bigtime()");
+    $sth->execute;
+    while(my $r = $sth->fetch) {
+      print "@$r\n";
+      ok(1 == 1, "bigdatetime");
+      ok(1 == 1, "bigtime");
+    }
+
 }
 
 

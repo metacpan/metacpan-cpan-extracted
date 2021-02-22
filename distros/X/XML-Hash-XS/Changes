@@ -1,5 +1,11 @@
 Revision history for perl module XML::Hash::XS
 
+0.56    2021-02-14
+    - Fix XML parsing with file handle
+        - Thanks to Rory Zweistra for report
+    - Fix case of "XML::Simple" in docs
+        - Thanks to Anirvan Chatterjee for help
+
 0.55    2020-03-03
     - Parse "xml-stylesheet" processing instruction
 

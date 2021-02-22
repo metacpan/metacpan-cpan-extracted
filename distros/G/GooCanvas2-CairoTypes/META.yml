@@ -1,0 +1,42 @@
+---
+abstract: 'Bridge between GooCanvas2 and Cairo types'
+author:
+  - 'Alexey Sokolov <sokolov@google.com>'
+build_requires:
+  Cairo: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Glib: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::Depends: '0'
+  ExtUtils::MakeMaker: '0'
+  ExtUtils::PkgConfig: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GooCanvas2-CairoTypes
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  GooCanvas2::CairoTypes:
+    file: lib/GooCanvas2/CairoTypes.pm
+    version: '0.001'
+requires:
+  Gtk3: '0'
+  XSLoader: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.001'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

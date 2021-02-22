@@ -1,27 +1,28 @@
 package Util::Medley::YAML;
-$Util::Medley::YAML::VERSION = '0.055';
+$Util::Medley::YAML::VERSION = '0.058';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
-use Kavorka '-all';
+use Kavorka 'method';
 use Data::Printer alias => 'pdump';
 use Carp;
+use YAML;
 
 with 'Util::Medley::Roles::Attributes::List';
 
 =head1 NAME
 
-Util::Medley::XML - utility XML methods
+Util::Medley::YAML - utility YAML methods
 
 =head1 VERSION
 
-version 0.055
+version 0.058
 
 =cut
 
 =head1 SYNOPSIS
 
- my $util = Util::Medley::XML->new;
+ my $util = Util::Medley::YAML->new;
 
 =cut
 
@@ -29,7 +30,7 @@ version 0.055
 
 =head1 DESCRIPTION
 
-Provides utility methods for working with XML.  All methods confess on
+Provides utility methods for working with YAML.  All methods confess on
 error.
 
 =cut
@@ -38,93 +39,55 @@ error.
 
 =head1 METHODS
 
-=head2 xmlBeautifyFile
-
-Beautifies an XML file.  Requires the xmllint command.
-
-=over
-
-=item usage:
-
- $util->xmlBeautifyFile($path);
-
- $util->xmlBeautifyFile(path => $path);
- 
-=item args:
-
-=over
-
-=item path [Str]
-
-Location of the xml file.
-
-=back
-
-=back
+=head2 yamlDecode 
 
 =cut
-use YAML;
-multi method yamlBeautifyFile (Str :$path!,
-                               Int :$sortDepth = 0) {
 
-    $YAML::SortKeys = 0;
-    $YAML::UseHeader = 0;
-     
-    my $yaml = YAML::LoadFile($path);
-    say '---';
-    foreach my $key ($self->List->nsort(keys %$yaml)) { 
-        my $node = YAML::Dump({ $key => $yaml->{$key}});    	
-        say $node;
+method decode (Str $yaml) {
+
+    my @yaml = YAML::Load($yaml);    
+    
+    return @yaml;        
+}
+
+=head2 yamlEncode
+
+=cut
+
+method encode(ArrayRef|HashRef $data) {
+
+    if (ref($data) eq 'HASH') {
+        $data = [ $data ];     
     }
+    
+    my $str = YAML::Dump(@$data);     
+    
+    return $str;
 }
 
-multi method yamlBeautifyFile (Str $path,
-                               Int $sortDepth = 0) {
-
-	$self->yamlBeautifyFile(path => $path,
-	   sortDepth => $sortDepth);
-}
-
-=head2 xmlBeautifyString
-
-Formats an XML string.  Requires the xmllint command.
-
-=over
-
-=item usage:
-
- $util->xmlBeautifyString($xml);
-
- $util->XmlBeautifyString(xml => $xml);
- 
-=item args:
-
-=over
-
-=item xml [Str]
-
-An XML string.
-
-=back
-
-=back
+=head2 yamlRead
 
 =cut
 
-multi method xmlBeautifyString (Str :$xml!) {
-
-	my @cmd = ( 'xmllint', '--format', '-' );
-	my ( $stdout, $stderr, $exit ) =
-	  $self->Spawn->capture( cmd => \@cmd, stdin => $xml );
-
-	return $stdout;
+method read (Str $path) {
+    
+    my @yaml = YAML::LoadFile($path);    
+    
+    return @yaml;
 }
 
-multi method xmlBeautifyString (Str $xml) {
+=head2 yamlWrite 
 
-	return $self->xmlBeautifyString(xml => $xml);
+=cut
+
+method write (Str              $path,
+              ArrayRef|HashRef $data) {
+
+    if (ref($data) eq 'HASH') {
+        $data = [ $data ];     
+    }
+    
+    YAML::DumpFile($path, @$data);    
 }
-                	  
-######################################################################
 
 1;

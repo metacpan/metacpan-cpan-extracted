@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+my ($channel, $exit, @stuff) = @ARGV;
+my $fh = $channel eq 'stderr' ? \*STDERR : \*STDOUT;
+if (@stuff) {
+   if ($stuff[0] eq '-') {
+      my $everything = do { local $/; <STDIN> };
+      print {$fh} $everything;
+   }
+   elsif ($stuff[0] =~ m{\A sleep = (\d+)}mxs) {
+      sleep $1;
+   }
+   else {
+      for my $item (@stuff) {
+         if ($item =~ m{\A -(stdout|stderr)=(.*)}mxs) {
+            my $fh = $1 eq 'stderr' ? \*STDERR : \*STDOUT;
+            print {$fh} $2;
+         }
+         else {
+            print {$fh} $item;
+         }
+      }
+   }
+}
+kill -$exit, $$ if ($exit < 0);
+exit $exit;
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 SYNOPSIS
+
+   # just like true: no output, exit code 0
+   sparring stdout 0 
+
+   # a simple echo
+   sparring stdout 0 hello world
+
+   # something on stderr
+   sparring stderr 0 hello world
+
+   # print something, then exit code 42
+   sparring stdout 42 something
+
+   # print something, then self-kill with signal 10
+   sparring stdout -10 something
+
+=cut

@@ -6,7 +6,7 @@ use B::Hooks::EndOfScope 'on_scope_end';
 use Carp;
 
 # ABSTRACT: Sugar methods for declaring DBIx::Class::Result data definitions
-our $VERSION = '1.00'; # VERSION
+our $VERSION = '1.01'; # VERSION
 
 
 our $CALLER; # can be used localized to wrap caller context into an anonymous sub
@@ -531,7 +531,7 @@ DBIx::Class::ResultDDL - Sugar methods for declaring DBIx::Class::Result data de
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 

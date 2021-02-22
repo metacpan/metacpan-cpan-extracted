@@ -6,7 +6,7 @@ use warnings;
 use XSLoader;
 use parent 'Exporter';
 
-our $VERSION = '0.001000';
+our $VERSION = '0.002000';
 XSLoader::load( 'URI::XSEscape', $VERSION );
 
 our @EXPORT_OK = qw{
@@ -47,12 +47,11 @@ __END__
 
 =head1 NAME
 
-L<URI::XSEscape> - Fast XS URI-escaping library, replacing
-L<URI::Escape>.
+URI::XSEscape - Fast XS URI-escaping library, replacing L<URI::Escape>.
 
 =head1 VERSION
 
-Version 0.001000
+Version 0.002000
 
 =head1 SYNOPSIS
 

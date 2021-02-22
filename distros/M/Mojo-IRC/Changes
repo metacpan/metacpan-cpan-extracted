@@ -1,5 +1,11 @@
 Revision history for perl distribution Mojo-IRC
 
+0.46 2020-02-16
+ - Fix insecure option for Mojolicious 9.0
+ - Add write_p method returning a Mojo::Promise
+ - Use promises instead of deprecated and decored Mojo::IOLoop::Delay
+ - Deprecated Mojo::IRC::UA
+
 0.45 2018-06-07T14:41:06+0800
  - Add insecure option for invalid certs with Mojolicious 7.80
    Contributor: Dan Book

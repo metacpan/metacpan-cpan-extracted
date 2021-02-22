@@ -34,7 +34,8 @@ my $dbh = DBI->connect(
 $dbh->{syb_enable_utf8} = 1;
 
 
-unless ( $dbh->{syb_server_version} ge '15' && $dbh->{syb_enable_utf8}) {
+# Don't run this test on MS-SQL ("Unknown") servers...
+unless ($dbh->{syb_server_version} ne 'Unknown' && $dbh->{syb_server_version} ge '15' && $dbh->{syb_enable_utf8}) {
     plan skip_all => 'This test requires ASE 15 or later, and OpenClient 15.x or later';
 }
 

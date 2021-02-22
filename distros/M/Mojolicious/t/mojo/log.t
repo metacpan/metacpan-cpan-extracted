@@ -22,7 +22,7 @@ subtest 'Logging to file' => sub {
   like $content,   qr/\[.*\] \[\d+\] \[fatal\] I ♥ Mojolicious/,                              'right fatal message';
   like $content,   qr/\[.*\] \[\d+\] \[error\] This too/,                                     'right error message';
   unlike $content, qr/\[.*\] \[\d+\] \[debug\] Does not work/,                                'no debug message';
-  unlike $content, qr/\[.*\] \[\d+\] \[debug\] And this\ntoo\n/,                              'right debug message';
+  unlike $content, qr/\[.*\] \[\d+\] \[debug\] And this too\n/,                               'right debug message';
 };
 
 subtest 'Logging to STDERR' => sub {
@@ -41,13 +41,13 @@ subtest 'Logging to STDERR' => sub {
   like $content, qr/\[.*\] \[error\] Just works\n/,      'right error message';
   like $content, qr/\[.*\] \[fatal\] I ♥ Mojolicious\n/, 'right fatal message';
   like $content, qr/\[.*\] \[debug\] Works too\n/,       'right debug message';
-  like $content, qr/\[.*\] \[debug\] And this\ntoo\n/,   'right debug message';
+  like $content, qr/\[.*\] \[debug\] And this too\n/,    'right debug message';
 };
 
 subtest 'Formatting' => sub {
   my $log = Mojo::Log->new;
   like $log->format->(time,       'debug', 'Test 123'), qr/^\[.*\] \[debug\] Test 123\n$/, 'right format';
-  like $log->format->(time,       'debug', qw(Test 1 2 3)), qr/^\[.*\] \[debug\] Test\n1\n2\n3\n$/, 'right format';
+  like $log->format->(time,       'debug', qw(Test 1 2 3)), qr/^\[.*\] \[debug\] Test 1 2 3\n$/, 'right format';
   like $log->format->(time,       'error', 'I ♥ Mojolicious'), qr/^\[.*\] \[error\] I ♥ Mojolicious\n$/, 'right format';
   like $log->format->(CORE::time, 'error', 'I ♥ Mojolicious'), qr/^\[.*\] \[error\] I ♥ Mojolicious\n$/, 'right format';
   $log->format(sub {
@@ -71,8 +71,27 @@ subtest 'Short log messages (systemd)' => sub {
   like $log->format->(time, 'warn',  'Test 123'), qr/^<4>\[\d+\] \[w\] Test 123\n$/, 'right format';
   like $log->format->(time, 'error', 'Test 123'), qr/^<3>\[\d+\] \[e\] Test 123\n$/, 'right format';
   like $log->format->(time, 'fatal', 'Test 123'), qr/^<2>\[\d+\] \[f\] Test 123\n$/, 'right format';
-  like $log->format->(time, 'debug', 'Test', '1', '2', '3'), qr/^<7>\[\d+\] \[d\] Test\n<7>1\n<7>2\n<7>3\n$/,
+  like $log->format->(time, 'debug', 'Test', '1', '2', '3'), qr/^<7>\[\d+\] \[d\] Test 1 2 3\n$/, 'right format';
+};
+
+subtest 'Colorized log messages' => sub {
+  my $log = Mojo::Log->new;
+  ok !$log->color, 'plain messages';
+  like $log->format->(time, 'debug', 'Test 123'), qr/^\[.*\] \[debug\] Test 123\n$/, 'right format';
+  local $ENV{MOJO_LOG_COLOR} = 1;
+  $log = Mojo::Log->new;
+  ok $log->color, 'colored messages';
+  $log = Mojo::Log->new(color => 1);
+  ok $log->color, 'colored messages';
+  like $log->format->(time, 'debug', 'Test 123'), qr/^\[.+\] \[\d+\] \[debug\] Test 123\n$/,             'right format';
+  like $log->format->(time, 'info',  'Test 123'), qr/^\[.+\] \[\d+\] \[info\] Test 123\n$/,              'right format';
+  like $log->format->(time, 'warn',  'Test 123'), qr/^\e\[33m\[.+\] \[\d+\] \[warn\] Test 123\n\e\[0m$/, 'right format';
+  like $log->format->(time, 'error', 'Test 123'), qr/^\e\[31m\[.+\] \[\d+\] \[error\] Test 123\n\e\[0m$/,
     'right format';
+  like $log->format->(time, 'fatal', 'Test 123'), qr/^\e\[37;41m\[.+\] \[\d+\] \[fatal\] Test 123\n\e\[0m$/,
+    'right format';
+  like $log->format->(1613484767, 'error', 'Test', '1', '2', '3'),
+    qr/^\e\[31m\[.+\] \[\d+\] \[error\] Test 1 2 3\n\e\[0m$/, 'right format';
 };
 
 subtest 'Events' => sub {
@@ -115,7 +134,7 @@ subtest 'History' => sub {
   }
   my $content = decode 'UTF-8', $buffer;
   like $content,   qr/\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{5}\] \[$$\] \[error\] First\n/, 'right error message';
-  like $content,   qr/\[.*\] \[info\] Fourth\nFifth\n/,                                         'right info message';
+  like $content,   qr/\[.*\] \[info\] Fourth Fifth\n/,                                          'right info message';
   unlike $content, qr/debug/,                                                                   'no debug message';
   like $history->[0][0], qr/^[0-9.]+$/, 'right epoch time';
   is $history->[0][1],   'fatal',       'right level';

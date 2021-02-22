@@ -3,7 +3,7 @@ runtime:
     perl: '5.010001'
     List::Util: 0
     Minion: '10.13'
-    Mojolicious: '7.29'
+    Mojolicious: '7.49'
     Mojo::SQLite: '3.000'
     Sys::Hostname: 0
     Time::HiRes: 0

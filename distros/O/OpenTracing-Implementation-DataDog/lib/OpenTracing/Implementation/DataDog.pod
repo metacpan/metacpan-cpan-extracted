@@ -7,7 +7,7 @@ OpenTracing::Implementation::DataDog - Sending traces to DataDog using Agent
 
 =head1 VERSION
 
-This is version 'v0.42.1'
+This is version 'v0.43.1'
 
 
 
@@ -89,11 +89,26 @@ context can be found for C<<$tracer->extract_context>>.
 
 
 
-=head2 OPENTRACING_INTERFACE
+=head2 STRICT
 
-If set to true, this will wrap all methods inside L<Type::Tiny> typechecks, for
-incomming parameters and return values. Beside that, it will add check for
-required methods according to the L<OpenTracing::Interface> API description.
+STRICT on itself not a environment variable, but a boolean constant from
+L<Devel::StrictMode> that uses the following set of environment variables:
+
+=over
+
+=item C<PERL_STRICT>
+
+=item C<EXTENDED_TESTING>
+
+=item C<AUTHOR_TESTING>
+
+=item C<RELEASE_TESTING>
+
+=back
+
+When any of those are set, tests are run using type constraints and parameter
+checks are performed, as well as return objects or values. During production it
+is recommended to keep these switched off for performance improvements.
 
 
 
@@ -106,7 +121,7 @@ Theo van Hoesel <tvanhoesel@perceptyx.com>
 =head1 COPYRIGHT AND LICENSE
 
 'OpenTracing::Implementation::DataDog'
-is Copyright (C) 2019 .. 2020, Perceptyx Inc
+is Copyright (C) 2019 .. 2021, Perceptyx Inc
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0.

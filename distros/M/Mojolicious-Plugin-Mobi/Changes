@@ -1,5 +1,8 @@
 This file documents the revision history for Mojolicious-Plugin-Mobi.
 
+0.07    2020-02-16 00:00:00
+        - Make plugin Mojolicious v9 compatible
+
 0.4     2013-11-17 00:00:00
         - Tests requires Mojolicious 4.50
 
@@ -11,4 +14,4 @@ This file documents the revision history for Mojolicious-Plugin-Mobi.
         - More unit tests in t/
 
 0.1     2011-12-19 00:00:00
-        - First public version 
+        - First public version

@@ -8,7 +8,11 @@ use App::SimpleBackuper::RegularFile;
 
 describe RegularFile => sub {
 	it compress => sub {
-		my $rf = bless { data => 'a' x 1000, options => { compression_level => 9 } } => 'App::SimpleBackuper::RegularFile';
+		my $rf = bless {
+			data		=> 'a' x 1000,
+			options		=> { compression_level => 9 },
+			filepath	=> 'zzz',
+		} => 'App::SimpleBackuper::RegularFile';
 		$rf->compress();
 		ok length( $rf->{data} ) < 1000;
 		$rf->decompress();

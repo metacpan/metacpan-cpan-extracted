@@ -116,11 +116,6 @@ KEYWORDS
 
        BaseClass->VERSION( $ver )
 
-    An optional list of attributes may be supplied in similar syntax as for
-    subs or lexical variables. (These are annotations about the class
-    itself; the concept should not be confused with per-object-instance
-    data, which here is called "slots").
-
     One or more roles can be composed into the class by the keyword
     implements
 
@@ -128,7 +123,11 @@ KEYWORDS
           ...
        }
 
-    The following class attributes are supported:
+    An optional list of attributes may be supplied in similar syntax as for
+    subs or lexical variables. (These are annotations about the class
+    itself; the concept should not be confused with per-object-instance
+    data, which here is called "slots"). The following class attributes are
+    supported:
 
   :repr(TYPE)
 
@@ -276,7 +275,8 @@ KEYWORDS
     Member fields are private to a class or role. They are not visible to
     users of the class, nor to subclasses, nor to any class that a role is
     applied to. In order to provide access to them a class may wish to use
-    "method" to create an accessor.
+    "method" to create an accessor, or use the attributes such as ":reader"
+    to get one generated.
 
     A scalar slot may provide a expression that gives an initialisation
     value, which will be assigned into the slot of every instance during

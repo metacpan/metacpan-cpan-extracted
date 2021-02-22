@@ -54,7 +54,9 @@ option can be set to a file, a named pipe, or /dev/stdin as above.
 By default --batch list lines are processed one at a time unless linux
 /proc/stat is detected, in which case batch command lines are processed with
 as many concurrent processes as possible without overutilizing the cpu. The
---batch-idle and --batch-min options can be used to adjust this.
+--batch-idle and --batch-min options can be used to adjust this. On systems
+without /proc/stat support use --batch-min to set the number of concurrent
+processes.
 
 Note that a script using this module will throw an error when it ends if
 the L<Mnet::Opts::Cli> new method was used to parse command line arguments
@@ -74,6 +76,7 @@ Mnet::Batch implements the functions listed below.
 use warnings;
 use strict;
 use Carp;
+use Mnet;
 use Mnet::Log::Conditional qw( DEBUG INFO WARN FATAL NOTICE );
 use Mnet::Opts::Cli::Cache;
 use Mnet::Opts::Set;
@@ -96,8 +99,8 @@ INIT {
             batch list may be read from standard input by specifying /dev/stdin
             for a dir try: find /dir -name *.test | sed "s/^/--replay /" | ...
             children are --silent, warnings are issued for child exit errors
-            use --batch-idle to set percentage of idle cpu to target
             use --batch-min to set number of concurrent batch processes
+            use --batch-idle to set percentage of idle cpu to target
             refer to perldoc Mnet::Batch for more information
         ',
     }) if $INC{"Mnet/Opts/Cli.pm"};
@@ -122,8 +125,8 @@ INIT {
         help_tip    => 'set number of concurrent processes',
         help_text   => '
             default is to allow a minimum of 1 batch child processes
-            this may be increased on systems that support --batch-idle
-            refer to --help batch and --help --batch-idle for more infor
+            this may be increased on systems not having --batch-idle support
+            refer to --help batch and --help --batch-idle for more info
             refer also to perldoc Mnet::Batch for more information
         ',
     }) if $INC{"Mnet/Opts/Cli.pm"};;
@@ -348,7 +351,7 @@ sub _fork_ok {
     # read input fork_data hash, the following keys may be used:
     #   child_count => set to count of currently running forked children
     #   child_max   => absolute upper child limit, calculated from cpu_count
-    #   child_min   => set from caller may be adjusted for /proc/stat idle cpu
+    #   child_min   => set from caller, may be adjusted for /proc/stat idle cpu
     #   cpu_count   => set from /proc/stat, indicates /proc/stat is available
     #   idle_target => set from caller to percent cpu utilization to leave idle
     #   last_idle   => set to count of idle ticks from last /proc/stat sample

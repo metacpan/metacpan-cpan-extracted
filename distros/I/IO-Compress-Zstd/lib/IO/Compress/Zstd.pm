@@ -5,16 +5,16 @@ use warnings;
 require Exporter ;
 use bytes;
 
-use IO::Compress::Base 2.100 ;
+use IO::Compress::Base 2.101 ;
 
-use IO::Compress::Base::Common  2.100 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Zstd 2.100 ;
+use IO::Compress::Base::Common  2.101 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Zstd 2.101 ;
 use Compress::Stream::Zstd qw(ZSTD_MAX_CLEVEL);
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $ZstdError);
 
-$VERSION = '2.100';
+$VERSION = '2.101';
 $ZstdError = '';
 
 @ISA    = qw( IO::Compress::Base Exporter );

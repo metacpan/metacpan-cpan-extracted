@@ -6,15 +6,15 @@ use warnings;
 use Test::More 1.0;
 use Capture::Tiny qw( capture_stdout );
 
-use Module::Release;
+require 't/lib/setup_common.pl';
 
-BEGIN {
-	use File::Spec::Functions qw(rel2abs catfile);
-	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
-	require $file;
-	}
+my $class = 'Module::Release';
+subtest setup => sub {
+	use_ok( $class );
+	can_ok( $class, 'new' );
+	};
 
-my $release = Module::Release->new;
+my $release = $class->new;
 
 {
 no warnings 'redefine';

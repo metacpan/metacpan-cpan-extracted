@@ -1,0 +1,82 @@
+NAME
+    App::StatisticsUtils - CLI utilities related to statistics
+
+VERSION
+    This document describes version 0.001 of App::StatisticsUtils (from Perl
+    distribution App-StatisticsUtils), released on 2021-01-15.
+
+DESCRIPTION
+    This distribution contains the following CLI utilities:
+
+    *   pct2z
+
+    *   z2pct
+
+FUNCTIONS
+  pct2z
+    Usage:
+
+     pct2z($pct) -> any
+
+    Convert percentile to z-score (for standard normal distribution).
+
+    Examples:
+
+    *   Example #1:
+
+         pct2z(50); # -> 0
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $pct* => *float*
+
+    Return value: (any)
+
+  z2pct
+    Usage:
+
+     z2pct($z) -> any
+
+    Convert z-score to percentile (for standard normal distribution).
+
+    Examples:
+
+    *   Example #1:
+
+         z2pct(0); # -> 50
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $z* => *float*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-StatisticsUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-StatisticsUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-App-StatisticsUtils/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

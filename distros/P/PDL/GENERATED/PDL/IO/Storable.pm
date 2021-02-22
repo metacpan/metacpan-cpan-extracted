@@ -293,7 +293,7 @@ sub STORABLE_thaw {
 
 =for ref
 
-store a piddle using L<Storable|Storable>
+store a piddle using L<Storable>
 
 =for example
 
@@ -306,7 +306,7 @@ store a piddle using L<Storable|Storable>
 
 =for ref
 
-freeze a piddle using L<Storable|Storable>
+freeze a piddle using L<Storable>
 
 =for example
 

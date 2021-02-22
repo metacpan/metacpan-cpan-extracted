@@ -1,0 +1,79 @@
+{
+   "abstract" : "get page open-graph / meta data",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "keywords" : [
+      "open",
+      "graph",
+      "opengraph",
+      "web",
+      "page",
+      "meta",
+      "title",
+      "preview"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Web-PageMeta",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Future" : "0",
+            "Path::Class" : "0",
+            "Test::Most" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3607"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Future" : "0",
+            "Future::AsyncAwait" : "0",
+            "Future::HTTP" : "0",
+            "Log::Any" : "0",
+            "Moose" : "0",
+            "MooseX::Types::URI" : "0",
+            "Time::HiRes" : "0",
+            "URI" : "0",
+            "URI::QueryParam" : "0",
+            "Web::Scraper" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.022"
+         }
+      }
+   },
+   "provides" : {
+      "Web::PageMeta" : {
+         "file" : "lib/Web/PageMeta.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/Web-PageMeta/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jozef/Web-PageMeta"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

@@ -10,7 +10,7 @@ OpenTracing::Types - Type constraints for checking Interfaces
 
 
 
-our $VERSION = 'v0.205.0';
+our $VERSION = 'v0.206.1';
 
 
 
@@ -238,7 +238,7 @@ Theo van Hoesel <tvanhoesel@perceptyx.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-'OpenTracing Types' is Copyright (C) 2020, Perceptyx Inc
+'OpenTracing Types' is Copyright (C) 2020 .. 2021, Perceptyx Inc
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0.

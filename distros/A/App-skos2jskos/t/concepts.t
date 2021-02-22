@@ -20,12 +20,11 @@ ok !$exit, 'ok';
 my $concepts = slurp_ndjson("$dir/concepts.ndjson");
 $concepts = [ sort { $a->{uri} cmp $b->{uri} } @$concepts ];
 
-#note explain $concepts;
-
 is_deeply $concepts,
   [
     {
         inScheme => [ { uri => 'http://example.org/' } ],
+        topConceptOf => [ { uri => 'http://example.org/' } ],
         notation => ["\x{2603}"],
         prefLabel => { en => 'A', de => "\x{c4}" },
         type     => ['http://www.w3.org/2004/02/skos/core#Concept'],

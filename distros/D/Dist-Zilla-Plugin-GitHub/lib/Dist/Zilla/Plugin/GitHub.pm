@@ -1,9 +1,9 @@
-package Dist::Zilla::Plugin::GitHub; # git description: v0.46-4-gf3f9437
+package Dist::Zilla::Plugin::GitHub; # git description: v0.47-12-g6b55af0
 # ABSTRACT: Plugins to integrate Dist::Zilla with GitHub
 use strict;
 use warnings;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use JSON::MaybeXS;
 use Moose;
@@ -122,22 +122,15 @@ sub _build_credentials {
     } else {
         $token = `git config github.token`;    chomp $token;
         $pass  = `git config github.password`; chomp $pass;
-
-        # modern "tokens" can be used as passwords with basic auth, so...
-        # see https://help.github.com/articles/creating-an-access-token-for-command-line-use
-        $pass ||= $token if $token;
     }
 
-    $self->log("Err: Login with GitHub token is deprecated")
-        if $token && !$pass;
-
-    if (!$pass) {
+    if (!$pass and !$token) {
         $pass = $self->zilla->chrome->prompt_str(
             "GitHub password for '$login'", { noecho => 1 },
         );
     }
 
-    return {login => $login, pass => $pass};
+    return { login => $login, pass => $pass, token => $token };
 }
 
 sub _has_credentials {
@@ -150,11 +143,14 @@ sub _auth_headers {
 
     my $credentials = $self->_credentials;
 
-    my %headers;
+    my %headers = ( Accept => 'application/vnd.github.v3+json' );
     if ($credentials->{pass}) {
         require MIME::Base64;
         my $basic = MIME::Base64::encode_base64("$credentials->{login}:$credentials->{pass}", '');
         $headers{Authorization} = "Basic $basic";
+    }
+    elsif ($credentials->{token}) {
+       $headers{Authorization} = "token $credentials->{token}";
     }
 
     # This can't be done at object creation because we autodetect the
@@ -211,14 +207,16 @@ sub _check_response {
 
         if (!$response->{success}) {
             return 'redo' if (($response->{status} eq '401') and
-                              ($response->{headers}{'x-github-otp'} =~ /^required/));
+                              (($response->{headers}{'x-github-otp'} // '') =~ /^required/));
 
-            $self->log("Err: ", $json_text->{message});
+            require Data::Dumper;
+            $self->log("Err: ", Data::Dumper->new([ $response ])->Indent(2)->Terse(1)->Sortkeys(1)->Dump);
             return;
         }
 
         return $json_text;
     } catch {
+        $self->log("Error: $_");
         if ($response and !$response->{success} and
             $response->{status} eq '599') {
             #possibly HTTP::Tiny error
@@ -226,10 +224,10 @@ sub _check_response {
             return;
         }
 
-        $self->log("Err: Can't connect to GitHub");
+        $self->log("Error communicating with GitHub: $_");
 
         return;
-    }
+    };
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -247,7 +245,7 @@ Dist::Zilla::Plugin::GitHub - Plugins to integrate Dist::Zilla with GitHub
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 DESCRIPTION
 
@@ -291,7 +289,7 @@ Alessandro Ghedini <alexbio@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alessandro Ghedini Karen Etheridge Dave Rolsky Mike Friedman Jeffrey Ryan Thalhammer Rafael Kitover Joelle Maslak Doherty Vyacheslav Matyukhin Alexandr Ciornii Brian Phillips Chris Weyl Ioan Rogers Jose Luis Perez Diez Mohammad S Anwar Ricardo Signes
+=for stopwords Alessandro Ghedini Karen Etheridge Dave Rolsky Mike Friedman Jeffrey Ryan Thalhammer Joelle Maslak Doherty Rafael Kitover Alexandr Ciornii Brian Phillips Chris Weyl Ioan Rogers Jose Luis Perez Diez Mohammad S Anwar Paul Cochrane Ricardo Signes Vyacheslav Matyukhin
 
 =over 4
 
@@ -317,10 +315,6 @@ Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
 
 =item *
 
-Rafael Kitover <rkitover@cpan.org>
-
-=item *
-
 Joelle Maslak <jmaslak@antelope.net>
 
 =item *
@@ -329,7 +323,7 @@ Mike Doherty <doherty@cs.dal.ca>
 
 =item *
 
-Vyacheslav Matyukhin <mmcleric@yandex-team.ru>
+Rafael Kitover <rkitover@cpan.org>
 
 =item *
 
@@ -357,7 +351,15 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 
+Paul Cochrane <paul.cochrane@posteo.de>
+
+=item *
+
 Ricardo Signes <rjbs@cpan.org>
+
+=item *
+
+Vyacheslav Matyukhin <mmcleric@yandex-team.ru>
 
 =back
 

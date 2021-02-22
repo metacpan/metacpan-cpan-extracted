@@ -1,15 +1,6 @@
-use warnings;
-use strict;
-use utf8;
 use FindBin '$Bin';
-use Test::More;
-my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
-binmode STDOUT, ":encoding(utf8)";
-binmode STDERR, ":encoding(utf8)";
-use Lingua::JA::Moji qw/hentai2kana hentai2kanji kana2hentai kanji2hentai/;
+use lib "$Bin";
+use LJMT;
 
 # Cannot yet copy paste hentaigana into Emacs.
 

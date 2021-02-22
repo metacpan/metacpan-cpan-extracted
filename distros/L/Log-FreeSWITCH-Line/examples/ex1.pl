@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Module.
 use Data::Printer;
 use Log::FreeSWITCH::Line qw(parse);
 

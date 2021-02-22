@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Markdent::Types;
 
@@ -22,7 +22,7 @@ has handler => (
 sub _send_event {
     my $self = shift;
 
-    $self->handler()->handle_event( $self->_make_event(@_) );
+    $self->handler->handle_event( $self->_make_event(@_) );
 }
 ## use critic
 
@@ -53,7 +53,7 @@ sub _detab_text {
 sub _debug_look_for {
     my $self = shift;
 
-    return unless $self->debug();
+    return unless $self->debug;
 
     my @look_debug = map { ref $_ ? "$_->[0] ($_->[1])" : $_ } @_;
 
@@ -80,7 +80,7 @@ Markdent::Role::AnyParser - A role for block and span parsers
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 DESCRIPTION
 
@@ -127,7 +127,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

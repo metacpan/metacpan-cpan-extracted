@@ -1,6 +1,6 @@
 package Quantum::Superpositions::Lazy::Role::Collapsible;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use v5.24;
 use warnings;
@@ -129,16 +129,16 @@ sub operate
 
 sub transform
 {
-	my ($self, $coderef) = @_;
+	my ($self, $coderef, @more) = @_;
 
-	return $self->operate("_transform", $coderef, undef);
+	return $self->operate("_transform", $coderef, @more, undef);
 }
 
 sub compare
 {
-	my ($self, $coderef) = @_;
+	my ($self, $coderef, @more) = @_;
 
-	return $self->operate("_compare", $coderef, undef);
+	return $self->operate("_compare", $coderef, @more, undef);
 }
 
 sub to_ket_notation

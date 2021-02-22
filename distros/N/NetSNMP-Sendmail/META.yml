@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,13 +20,13 @@ no_index:
 provides:
   NetSNMP::Sendmail:
     file: lib/Sendmail.pm
-    version: '0.95'
+    version: '0.96'
 requires:
   NetSNMP::ASN: '0'
   NetSNMP::OID: '0'
   NetSNMP::agent: '0'
   perl: '5.010000'
 resources:
+  bugtracker: https://puszcza.gnu.org.ua/bugs/?group=netsnmp-sendmail
   repository: git://git.gnu.org.ua/netsnmp-sendmail.git
-version: '0.95'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.96'

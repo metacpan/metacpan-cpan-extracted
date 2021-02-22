@@ -6,6 +6,8 @@ package Mnet::T;
 use warnings;
 use strict;
 use Carp;
+use Config;
+use Mnet;
 use Test::More;
 
 
@@ -56,6 +58,14 @@ sub test_perl {
 #
 # troubleshoot a single test with: INIT { our $mnet_test_perl = $name_re }
 
+#? problem on cpantesters with grep on one sparc64-openbsd system
+#   test filters with grep get error 'grep: -: No such file or directory'
+#   no sed errors, no defined aliases, both commands in /usr/bin, in $PATH
+#   grep gives this error if run with no stdin, example: `grep test -`
+#   dosn't matter if it's one grep command, or multiple, complex or simple
+#   debuged with new if-block for not $result, syswrite stderr with extra info
+#   $Config::Config{archname} code can skip, better to simple/accurate/fail
+
     # read input specs
     my $specs = shift;
 
@@ -92,7 +102,7 @@ sub test_perl {
     $specs->{expect} =~ s/(^\n+|\n+$)//g;
 
     # get output from command, remove leading/trailing blank lines
-    ( my $output = `$command` ) =~ s/(^\n+|\n+$)//g;
+    ( my $output = `( $command ) 2>&1` ) =~ s/(^\n+|\n+$)//g;
 
     # compare command output to expected output
     #   added leading cr makes for cleaner Test::More::is output

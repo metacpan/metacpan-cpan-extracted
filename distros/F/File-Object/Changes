@@ -1,3 +1,16 @@
+0.13 2021-02-21T10:59:26+01:00
+ - Add blank lines after arguments and before return.
+ - Improve constructor parameters in doc.
+ - Update author github username.
+
+0.12 2021-02-21T03:08:47+01:00
+ - Fix bugtracker.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rewrite POD to use =head2 in METHODS section.
+ - Update Module::Install to 1.19 version.
+ - Update copyright years.
+
 0.11 2018-01-22T11:56:21+01:00
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
  - Update Module::Install to 1.18 version.

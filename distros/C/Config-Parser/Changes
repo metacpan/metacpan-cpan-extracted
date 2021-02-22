@@ -1,5 +1,8 @@
 Revision history for Perl extension Config::Parser
 
+1.05  Fri Feb 12 20:42:10 2021
+	- Change bugtracker address.
+
 1.04  Thu Aug 29 08:17:52 2019
 	- use Config::AST 1.05
 

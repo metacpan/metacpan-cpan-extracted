@@ -1,0 +1,48 @@
+NAME
+    GooCanvas2::CairoTypes - Bridge between GooCanvas2 and Cairo types
+
+SYNOPSIS
+            use GooCanvas2;
+            use GooCanvas2::CairoTypes;
+
+            my $pattern = Cairo::SolidPattern->create_rgba(0, 0, 0, 0);
+            my $rect = GooCanvas2::CanvasRect->new(
+                    ...,
+                    'fill-pattern' => $pattern,  # fails without CairoTypes, just works with
+            );
+
+            # Sometimes (but not always, no idea why) this fails:
+            $rect->get('fill-pattern')->set_filter('linear);
+            # Here's the solution:
+            GooCanvas2::CairoTypes::cairoize_pattern($rect->get('fill-pattern'))
+                    ->set_filter('linear);
+
+DESCRIPTION
+    There is an issue in the interaction between GooCanvas, GObject
+    Introspection, Cairo, and their Perl bindings, which causes some
+    functionality to be unusable from Perl side. This is better described
+    here
+    <https://stackoverflow.com/questions/64625955/cairosolidpattern-is-not-o
+    f-type-goocanvas2cairopattern>, and there was an attempt
+    <https://gitlab.gnome.org/GNOME/goocanvas/-/merge_requests/9> to fix it
+    upstream. Until it's fixed, this can serve as a workaround for it.
+
+    Currently this module only "fixes"
+    "Cairo::Pattern/GooCanvas2::CairoPattern" interop. For certain calls it
+    just works if this module was included; for some other calls you need to
+    explicitly convert the type.
+
+    If you have any idea how to fix those cases to not require such call, or
+    need to bridge more types, pull requests
+    <https://github.com/DarthGandalf/GooCanvas2-CairoTypes> are welcome!
+
+AUTHOR
+    Alexey Sokolov, <sokolov@google.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2021 by Google
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.22.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

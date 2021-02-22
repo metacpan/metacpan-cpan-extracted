@@ -1,0 +1,46 @@
+{
+   "abstract" : "Sybase API modules",
+   "author" : [
+      "Michael Peppler (mpeppler@peppler.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "sybperl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mpeppler/sybperl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mpeppler/sybperl.git",
+         "web" : "https://github.com/mpeppler/sybperl"
+      }
+   },
+   "version" : "2.20"
+}

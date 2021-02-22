@@ -30,7 +30,7 @@ my $meta = {
                                          },
                                        },
                           test      => {
-                                         recommends => { "RDF::NS" => 20160408 },
+                                         recommends => { "RDF::NS" => 20160408, "RDF::Prefixes" => 0 },
                                          requires   => {
                                                          "Module::Load::Conditional" => 0,
                                                          "Test::Modern"              => 0,
@@ -40,7 +40,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "AtteanX::Serializer::RDFa" => { file => "lib/AtteanX/Serializer/RDFa.pm", version => "0.100" },
+                          "AtteanX::Serializer::RDFa" => { file => "lib/AtteanX/Serializer/RDFa.pm", version => "0.110" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -57,7 +57,8 @@ my $meta = {
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => "0.100",
+  "version"          => "0.110",
+  "x_contributors"   => ["Jonas Smedegaard (JONASS) <jonass\@cpan.org>"],
   "x_static_install" => 1,
 };
 

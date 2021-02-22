@@ -32,7 +32,7 @@
    "provides" : {
       "Text::KnuthPlass" : {
          "file" : "lib/Text/KnuthPlass.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Text::KnuthPlass::Box" : {
          "file" : "lib/Text/KnuthPlass.pm"
@@ -54,6 +54,15 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.05",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PhilterPaper/Text-KnuthPlass/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Text::KnuthPlass",
+      "repository" : {
+         "url" : "https://github.com/PhilterPaper/Text-KnuthPlass"
+      }
+   },
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

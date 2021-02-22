@@ -1,5 +1,11 @@
 Revision history for Perl extension App::Followme
 
+1.97 2021-02-17T14:10:47Z
+    - Modified test for format_date to work with different locales
+    - Rewrote ConvertPage.pm to us object polymorphism when creating files 
+    - Rewrote PodData.pm to write help files to a single existing directory
+    - Made Image::Size a required package
+
 1.96 2021-02-04T13:55:26Z
     - Rewrote sort code
     - Added variables $extension and @related_files

@@ -1,0 +1,53 @@
+{
+   "abstract" : "(DISCOURAGED) Promises/A+ and flow-control helpers",
+   "author" : [
+      "The L<Mojolicious/AUTHORS>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.027",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojo-IOLoop-Delay",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.027"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::IOLoop::Delay" : {
+         "file" : "lib/Mojo/IOLoop/Delay.pm",
+         "version" : "8.76"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Mojo-IOLoop-Delay/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Mojo-IOLoop-Delay"
+      }
+   },
+   "version" : "8.76",
+   "x_deprecated" : 1
+}

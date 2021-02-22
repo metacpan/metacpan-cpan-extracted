@@ -1,5 +1,5 @@
 -*- Indented-text -*-
-#	$Id: INSTALL 487 2015-05-23 08:00:11Z hayashi $
+#	$Id: INSTALL 581 2021-02-22 08:36:32Z hayashi $
 
 1. How to Install Term::ReadLine::Gnu
 
@@ -31,7 +31,11 @@
 
 	% perl Makefile.PL --prefix=/mydir
 
-	If you are not an administrator and cannot install Perl module
+	You can specify multiple directories by separating them with colons;
+
+	% perl Makefile.PL --prefix=/termcap/dir:/readline/dir
+
+        If you are not an administrator and cannot install Perl module
 	in your system directory, try
 		perldoc perlfaq8
 	and see the section 'How do I keep my own module/library
@@ -74,22 +78,18 @@
 	instead.  GNU Readline Library 4.2 is not supported.  Use 4.2a
 	instead.
 
-	If you have any reasons in which use must use one of the follows;
-		GNU Readline Library 2.1
-		libreadline.a in bash-2.0.tar.gz
-		Cygwin b20.1
-	see INSTALL file which is included in Term-ReadLine-Gnu-1.11.
-
 	Executing `perl Makefile.PL` detects which version of
 	the GNU Readline Library is already installed and warns you if
 	you have the unsupported version.
 
 	In the following example, the install prefix directory is
 	`/usr/local/gnu'.
-	
-	You can specify any directory for the GNU Readline library and
-	its header files, by editing `LIBS' and/or `INC' section in
-	Makefile.PL.
+
+	If you have any reasons in which use must use one of the follows;
+		GNU Readline Library 2.1
+		libreadline.a in bash-2.0.tar.gz
+		Cygwin b20.1
+	see INSTALL file which is included in Term-ReadLine-Gnu-1.11.	
 
 2.1. Install from the GNU Readline Library Source
 
@@ -100,9 +100,15 @@
 	3. make and install
 		% make install
 
-2.1.1. Install on Mac OS X
+2.1.1. Install on macOS
 
-	/usr/bin/perl on Mac OS X 10.5 (Leopard) and later supports
+        On macOS Big Sur or later 'perl Makefile.PL' may warn as
+          "Could not find neither libtermcap, libtinfo, libncurses, or libcurses."
+        You should be able to ignore this warning if you have Xcode installed. See
+          https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/381
+        for details. To suppress this message, use ExtUtils::MakeMaker 7.58 or later.
+
+	/usr/bin/perl on macOS 10.5 (Leopard) and later supports
 	32bit/64bit universal binary.  Make Makefile as follows;
 
 	# tested only on Mavericks
@@ -124,19 +130,25 @@
 
 2.2. Using Package
 
-2.2.1. RPM on Linux
+2.2.1. APT based Linux
 
-	On Linux you need to install 'ncurses-devel' package in
-	addition to 'readline-devel' package.  On distributions using
-	RPM do follows;
+	On APT-based Linux you need to install 'libncurses-dev' package in
+	addition to 'libreadline-dev' package.
+
+	% sudo apt install libncurses-dev libreadline-dev
+
+2.2.2. RPM based Linux
+
+	On RPM-based Linux you need to install 'ncurses-devel' package in
+	addition to 'readline-devel' package.
 
 	% sudo yum install ncurses-devel
 	% sudo yum install readline-devel
 
-2.2.2. homebrew on Mac OS X
+2.2.3. Homebrew on macOS
 
-       1. Install homebrew
-	See http://brew.sh/.
+       1. Install Homebrew
+	See https://brew.sh/.
 
        2. Use homebrew to install the GNU Readline Library:
        		% brew install readline

@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ name: Test-Script
 provides:
   Test::Script:
     file: lib/Test/Script.pm
-    version: '1.26'
+    version: '1.27'
 requires:
   Capture::Tiny: '0'
   File::Spec: '0.80'
@@ -32,12 +32,13 @@ resources:
   bugtracker: https://github.com/plicease/Test-Script/issues
   homepage: https://metacpan.org/pod/Test::Script
   repository: git://github.com/plicease/Test-Script.git
-version: '1.26'
+version: '1.27'
 x_contributors:
   - 'Adam Kennedy'
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Brendan Byrd'
   - 'Chris White <cxw@cpan.org>'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.33.6
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

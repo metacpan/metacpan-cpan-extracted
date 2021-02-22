@@ -1,8 +1,9 @@
 NAME
-    WHO::GrowthReference::GenChart - Create WHO growth chart ()
+    WHO::GrowthReference::GenChart - Create WHO growth chart
+    (weight/height/BMI)
 
 VERSION
-    This document describes version 0.001 of WHO::GrowthReference::GenChart
+    This document describes version 0.003 of WHO::GrowthReference::GenChart
     (from Perl distribution WHO-GrowthReference-GenChart), released on
     2021-01-10.
 
@@ -32,9 +33,9 @@ FUNCTIONS
 
      gen_who_growth_chart_from_table(%args) -> [status, msg, payload, meta]
 
-    Create WHO growth chart ().
+    Create WHO growth chart (weight/height/BMI).
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -90,7 +91,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-WHO-GrowthReference-GenChart/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WHO-GrowthReference-G
+    enChart>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

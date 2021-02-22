@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Perl Neo4j driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.21';
+$Neo4j::Driver::VERSION = '0.22';
 
 use Carp qw(croak);
 
@@ -169,7 +169,7 @@ Neo4j::Driver - Perl Neo4j driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 

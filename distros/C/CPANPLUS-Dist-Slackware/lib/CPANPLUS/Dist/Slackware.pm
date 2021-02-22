@@ -3,7 +3,7 @@ package CPANPLUS::Dist::Slackware;
 use strict;
 use warnings;
 
-our $VERSION = '1.029';
+our $VERSION = '1.030';
 
 use base qw(CPANPLUS::Dist::Base);
 
@@ -720,7 +720,7 @@ CPANPLUS::Dist::Slackware - Install Perl distributions on Slackware Linux
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware version 1.029.
+This document describes CPANPLUS::Dist::Slackware version 1.030.
 
 =head1 SYNOPSIS
 
@@ -1066,8 +1066,8 @@ Some Perl distributions fail to show interactive prompts if the C<verbose> optio
 is not set.  This problem has been reported as bug #47818 and bug #72095 at
 L<https://rt.cpan.org/>.
 
-Please report any bugs to C<bug-cpanplus-dist-slackware at rt.cpan.org>, or
-through the web interface at L<https://rt.cpan.org/>.
+Please report any bugs using the issue tracker at
+L<https://github.com/graygnuorg/CPANPLUS-Dist-Slackware/issues>.
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -22,5 +22,12 @@ WriteMakefile(
       },
       x_IRC => 'irc://irc.perl.org/#pdl',
     },
+    prereqs => {
+      develop => {
+        requires => {
+          'CPAN::Changes' => '0',
+        },
+      },
+    },
   },
 );

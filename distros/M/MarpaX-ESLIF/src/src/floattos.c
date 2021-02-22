@@ -36,11 +36,11 @@
       marpaESLIF_stringGenerator.allocl      = 0;                       \
                                                                         \
       genericLoggerp = GENERICLOGGER_CUSTOM(_marpaESLIF_generateStringWithLoggerCallback, (void *) &marpaESLIF_stringGenerator, GENERICLOGGER_LOGLEVEL_TRACE); \
-      if (genericLoggerp == NULL) {                                     \
+      if (MARPAESLIF_UNLIKELY(genericLoggerp == NULL)) {                \
         goto err;                                                       \
       }                                                                 \
       GENERICLOGGER_TRACEF(genericLoggerp, "%f", (double) MARPAESLIF_INFINITY); \
-      if (! marpaESLIF_stringGenerator.okb) {                           \
+      if (MARPAESLIF_UNLIKELY(! marpaESLIF_stringGenerator.okb)) {      \
         goto err;                                                       \
       }                                                                 \
       goto done;                                                        \
@@ -61,11 +61,11 @@
       marpaESLIF_stringGenerator.allocl      = 0;                       \
                                                                         \
       genericLoggerp = GENERICLOGGER_CUSTOM(_marpaESLIF_generateStringWithLoggerCallback, (void *) &marpaESLIF_stringGenerator, GENERICLOGGER_LOGLEVEL_TRACE); \
-      if (genericLoggerp == NULL) {                                     \
+      if (MARPAESLIF_UNLIKELY(genericLoggerp == NULL)) {                \
         goto err;                                                       \
       }                                                                 \
       GENERICLOGGER_TRACEF(genericLoggerp, "%f", (double) MARPAESLIF_NAN); \
-      if (! marpaESLIF_stringGenerator.okb) {                           \
+      if (MARPAESLIF_UNLIKELY(! marpaESLIF_stringGenerator.okb)) {      \
         goto err;                                                       \
       }                                                                 \
       goto done;                                                        \
@@ -92,7 +92,7 @@
     genericLogger_t              *genericLoggerp = NULL;                \
     marpaESLIF_stringGenerator_t  marpaESLIF_stringGenerator;           \
                                                                         \
-    if (marpaESLIFp == NULL) {                                          \
+    if (MARPAESLIF_UNLIKELY(marpaESLIFp == NULL)) {                     \
       errno = EINVAL;                                                   \
       goto err;                                                         \
     }                                                                   \
@@ -107,12 +107,12 @@
     marpaESLIF_stringGenerator.allocl      = 0;                         \
                                                                         \
     genericLoggerp = GENERICLOGGER_CUSTOM(_marpaESLIF_generateStringWithLoggerCallback, (void *) &marpaESLIF_stringGenerator, GENERICLOGGER_LOGLEVEL_TRACE); \
-    if (genericLoggerp == NULL) {                                       \
+    if (MARPAESLIF_UNLIKELY(genericLoggerp == NULL)) {                  \
       goto err;                                                         \
     }                                                                   \
                                                                         \
     GENERICLOGGER_TRACEF(genericLoggerp, fmts, (int) decimal_dig, (fmts_type) x); \
-    if (! marpaESLIF_stringGenerator.okb) {                             \
+    if (MARPAESLIF_UNLIKELY(! marpaESLIF_stringGenerator.okb)) {        \
       goto err;                                                         \
     }                                                                   \
                                                                         \

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the TF-IDF measure for ngram phrases
 
-our $VERSION = '0.0505';
+our $VERSION = '0.0508';
 
 use Moo;
 use strictures 2;
@@ -37,7 +37,7 @@ has stopwords => (
 
 has punctuation => (
     is      => 'ro',
-    default => sub { qr/[-!"#$%&()*+,.\/\\:;<=>?@\[\]^_`{|}~]/ },
+    default => sub { qr/(?!')[[:punct:]]/ },
 );
 
 
@@ -173,7 +173,7 @@ Text::TFIDF::Ngram - Compute the TF-IDF measure for ngram phrases
 
 =head1 VERSION
 
-version 0.0505
+version 0.0508
 
 =head1 SYNOPSIS
 
@@ -225,7 +225,7 @@ Regular expression to be used to parse-out unwanted punctuation.  Giving the
 constructor a value of C<''> or C<0> will override this and not exclude any
 characters from the results.
 
-Default: qr/[-!"#$%&()*+,.\/\\:;<=>?@\[\]^_`{|}~]/
+Default: C<qr/(?!')[[:punct:]]/>
 
 Note that the default does not exclude the single quote.
 
@@ -279,12 +279,14 @@ seen.
 Return the inverse document frequency of a B<phrase> across all corpus
 documents.
 
+If the phrase is not in the corpus, a warning is issued and undef is
+returned.
+
 =head2 tfidf
 
   $tfidf = $t->tfidf( $file, $phrase );
 
-Compute the TF-IDF weight for the given B<file> and B<phrase>.  If the phrase
-is not in the corpus, a warning is issued and undef is returned.
+Compute the TF-IDF weight for the given B<file> and B<phrase>.
 
 =head2 tfidf_by_file
 
@@ -312,7 +314,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

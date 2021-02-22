@@ -3,17 +3,19 @@
 use strict;
 use warnings;
 
-use Test::More 0.89;
-use Crypt::Argon2 qw/argon2i_pass argon2i_raw argon2i_verify/;
+use Test::More 0.90;
+use Crypt::Argon2 qw/argon2i_pass argon2i_raw argon2i_verify argon2id_pass argon2_needs_rehash/;
 
 sub hashtest {
 	my ($t_cost, $m_cost, $parallelism, $password, $salt, $hexref, $mcfref) = @_;
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
-	my $encoded = argon2i_pass($password, $salt, $t_cost, $m_cost, $parallelism, 32);
-	is($encoded, $mcfref, "$t_cost:$m_cost:$parallelism($password, $salt) encodes as expected");
-	ok(argon2i_verify($encoded, $password), "$t_cost:$m_cost:$parallelism($password, $salt) matches as expected");
-	my $hex = unpack "H*", argon2i_raw($password, $salt, $t_cost, $m_cost, $parallelism, 32);
-	is($hex, $hexref, "$t_cost:$m_cost:$parallelism($password, $salt) verifies as expected");
+	subtest "argon2i($t_cost, $m_cost, $parallelism, $password, $salt)", sub {
+		my $encoded = argon2i_pass($password, $salt, $t_cost, $m_cost, $parallelism, 32);
+		is($encoded, $mcfref, "$t_cost:$m_cost:$parallelism($password, $salt) encodes as expected");
+		ok(argon2i_verify($encoded, $password), "$t_cost:$m_cost:$parallelism($password, $salt) matches as expected");
+		my $hex = unpack "H*", argon2i_raw($password, $salt, $t_cost, $m_cost, $parallelism, 32);
+		is($hex, $hexref, "$t_cost:$m_cost:$parallelism($password, $salt) verifies as expected");
+	};
 }
 
 hashtest(2, '64M', 1, 'password', 'somesalt',
@@ -45,5 +47,16 @@ if ($ENV{EXTENDED_TESTING} || $ENV{AUTHOR_TESTING}) {
 		'd1587aca0922c3b5d6a83edab31bee3c4ebaef342ed6127a55d19b2351ad1f41',
 		'$argon2i$v=19$m=1048576,t=2,p=1$c29tZXNhbHQ$0Vh6ygkiw7XWqD7asxvuPE667zQu1hJ6VdGbI1GtH0E');
 }
+
+subtest 'needs_rehash', sub {
+	my $encoded = argon2id_pass('password', 'saltsalt', 2, '64M', 1, 32);
+	ok(!argon2_needs_rehash($encoded, 'argon2id', 2, '64M', 1, 32, 8), 'No rehash with same parameters');
+	ok(argon2_needs_rehash($encoded, 'argon2i', 2, '64M', 1, 32, 8), 'Rehash with different argon2 variant');
+	ok(argon2_needs_rehash($encoded, 'argon2id', 1, '64M', 1, 32, 8), 'Rehash with different time cost');
+	ok(argon2_needs_rehash($encoded, 'argon2id', 2, '128M', 1, 32, 8), 'Rehash with different memory cost');
+	ok(argon2_needs_rehash($encoded, 'argon2id', 2, '64M', 2, 32, 8), 'Rehash with different parallelism');
+	ok(argon2_needs_rehash($encoded, 'argon2id', 2, '64M', 1, 16, 8), 'Rehash with different output length');
+	ok(argon2_needs_rehash($encoded, 'argon2id', 2, '64M', 1, 32, 16), 'Rehash with different salt length');
+};
 
 done_testing();

@@ -1,0 +1,36 @@
+---
+abstract: 'A template to build command line arrays, and run them'
+author:
+  - 'Flavio Poletti (flavio@polettix.it)'
+build_requires:
+  Path::Tiny: '0.084'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Command-Template
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  IPC::Run: '20200505.0'
+  perl: '5.024000'
+resources:
+  bugtracker: https://github.com/polettix/Command-Template/issues
+  homepage: https://github.com/polettix/Command-Template
+  repository: https://github.com/polettix/Command-Template.git
+version: '0.001'
+x_contributors:
+  - 'Flavio Poletti <flavio@polettix.it>'
+x_generated_by_perl: v5.24.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

@@ -1,5 +1,9 @@
 Revision history for Mojolicious::Plugin::ServerType
 
+0.02 2021-02-22T11:46:26Z
+    - moved issue tracking to the GitLab repo
+    - minimum Perl version increased to 5.16 (matching Mojolicious 8.50+)
+
 0.01 2020-01-13T13:10:49Z
     - original version
 

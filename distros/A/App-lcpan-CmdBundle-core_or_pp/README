@@ -3,9 +3,9 @@ NAME
     are core/PP
 
 VERSION
-    This document describes version 0.04 of
+    This document describes version 0.051 of
     App::lcpan::CmdBundle::core_or_pp (from Perl distribution
-    App-lcpan-CmdBundle-core_or_pp), released on 2017-07-10.
+    App-lcpan-CmdBundle-core_or_pp), released on 2021-02-13.
 
 SYNOPSIS
     Install this distribution, then the lcpan subcommands below will be
@@ -58,7 +58,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

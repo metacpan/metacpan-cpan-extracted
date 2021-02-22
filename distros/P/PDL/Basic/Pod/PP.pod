@@ -149,6 +149,10 @@ Set the version for .pm and .xs files
 
 =head1 OVERVIEW
 
+For an alternate introduction to PDL::PP, see L<Practical Magick with
+C, PDL, and PDL::PP -- a guide to compiled add-ons for
+PDL|https://arxiv.org/abs/1702.07753>.
+
 Why do we need PP? Several reasons: firstly, we want to be able to
 generate subroutine code for each of the PDL datatypes (PDL_Byte,
 PDL_Short, etc).  AUTOMATICALLY.  Secondly, when referring to slices
@@ -1054,7 +1058,7 @@ arguments. Thus one could also write this as:
 
 The type specification in C<Pars> exempts the argument from
 variation in the typeloop - rather it is automatically converted
-too and from the type specified. This is obviously useful in
+to and from the type specified. This is obviously useful in
 a more general example, e.g.:
 
 	void myfunc(int n,float *v1,long *v2);
@@ -1071,8 +1075,8 @@ it automatically though the code has yet to attain that
 level of sophistication!
 
 Finally note when types are converted automatically one MUST
-use the C<[o]> qualifier for output variables or you hard
-one changes will get optimised away by PP!
+use the C<[o]> qualifier for output variables or you hard-won
+changes will get optimised away by PP!
 
 If you interface a large library you can automate the interfacing even
 further. Perl can help you again(!) in doing this. In many libraries
@@ -1426,7 +1430,7 @@ many cases the external libraries either use derived types or
 pointers of various types.
 
 The standard way to handle this in Perl is to use a C<typemap> file.
-This is discussed in some detail in L<perlxs|perlxs> in the standard
+This is discussed in some detail in L<perlxs> in the standard
 Perl documentation. In PP the functionality is very similar, so you can
 create a C<typemap> file in the directory where your PP file resides and
 when it is built it is automatically read in to figure out the appropriate
@@ -2455,6 +2459,9 @@ L<PDL::Internals>
 L<PDL::BadValues> for information on bad values
 
 I<perlxs>, I<perlxstut>
+
+L<Practical Magick with C, PDL, and PDL::PP -- a guide to compiled
+add-ons for PDL|https://arxiv.org/abs/1702.07753>
 
 =head1 CURRENTLY UNDOCUMENTED
 

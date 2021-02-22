@@ -7,9 +7,23 @@ use Carp;
 require Reddit::Client::Thing;
 
 use base   qw/Reddit::Client::Thing/;
-use fields qw/over18 header_img created_utc header_title header_size
-              description display_name created url title subscribers
-              public_traffic public_description subreddit_type/;
+use fields qw/
+created
+created_utc
+description
+display_name
+header_img
+header_size
+header_title
+over18
+public_description
+public_traffic
+quarantine
+subreddit_type
+subscribers
+title
+url  
+/;         
 
 use constant type => "t5";
 

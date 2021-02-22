@@ -34,8 +34,8 @@ void *tconv_charset_ICU_new(tconv_t tconvp, void *voidp)
   TCONV_TRACE(tconvp, "%s(%p, %p)", funcs, tconvp, voidp);
 
   TCONV_TRACE(tconvp, "%s - malloc(%lld)", funcs, (unsigned long long) sizeof(tconv_charset_ICU_context_t));
-  contextp = malloc(sizeof(tconv_charset_ICU_context_t));
-  if (contextp == NULL) {
+  contextp = (tconv_charset_ICU_context_t *) malloc(sizeof(tconv_charset_ICU_context_t));
+  if (TCONV_UNLIKELY(contextp == NULL)) {
     TCONV_TRACE(tconvp, "%s - malloc(%lld) failure, %s", funcs, (unsigned long long) sizeof(tconv_charset_ICU_context_t), strerror(errno));
     goto err;
   }

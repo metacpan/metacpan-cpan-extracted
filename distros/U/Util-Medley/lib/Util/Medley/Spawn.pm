@@ -1,5 +1,5 @@
 package Util::Medley::Spawn;
-$Util::Medley::Spawn::VERSION = '0.055';
+$Util::Medley::Spawn::VERSION = '0.058';
 ###############################################################################
 
 use Modern::Perl;
@@ -18,7 +18,7 @@ Util::Medley::Spawn - utility methods for system commands
 
 =head1 VERSION
 
-version 0.055
+version 0.058
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package MojoX::Log::Fast;
 use Mojo::Base 'Mojo::Log';
 use Carp 'croak';
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.2.0';
 
 use Log::Fast;
 
@@ -31,6 +31,14 @@ sub new {
     return $self;
 }
 
+sub context {
+    my ($parent, @context) = @_;
+    my $self = $parent->new();
+    $self->level($parent->level);
+    $self->{'context'} = \@context;
+    return $self;
+}
+
 sub config  { return shift->{'_logger'}->config(@_); }
 sub ident   { return shift->{'_logger'}->ident(@_); }
 
@@ -50,14 +58,17 @@ sub level {
 
 sub _message {
     my ($self, $level, @lines) = @_;
+    if ($self->{'context'}) {
+        unshift @lines, @{$self->{context}}
+    }
     if ($level eq 'debug') {
-        $self->{'_logger'}->DEBUG(join "\n", @lines);
+        $self->{'_logger'}->DEBUG(join q{ }, @lines);
     } elsif ($level eq 'info') {
-        $self->{'_logger'}->INFO(join "\n", @lines);
+        $self->{'_logger'}->INFO(join q{ }, @lines);
     } elsif ($level eq 'warn') {
-        $self->{'_logger'}->WARN(join "\n", @lines);
+        $self->{'_logger'}->WARN(join q{ }, @lines);
     } else { # error, fatal
-        $self->{'_logger'}->ERR(join "\n", @lines);
+        $self->{'_logger'}->ERR(join q{ }, @lines);
     }
     return;
 }
@@ -74,7 +85,7 @@ MojoX::Log::Fast - Log::Fast for Mojolicious
 
 =head1 VERSION
 
-This document describes MojoX::Log::Fast version v1.0.1
+This document describes MojoX::Log::Fast version v1.2.0
 
 
 =head1 SYNOPSIS
@@ -111,6 +122,19 @@ that log level.
 
 If Log::Fast instance $logfast doesn't provided then Log::Fast->global()
 will be used by default.
+
+=head2 context
+
+        my $new = $log->context('[extra] [information]');
+
+Construct a new child L<Mojo::Log::Fast> object that will include context information
+with every log message.
+
+        # Log with context
+        my $log = Mojo::Log::Fast->new;
+        my $context = $log->context('[17a60115]');
+        $context->debug('This is a log message with context information');
+        $context->info('And another');
 
 =head2 config
 

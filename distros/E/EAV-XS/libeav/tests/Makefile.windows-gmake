@@ -55,7 +55,8 @@ clean:
 
 check: check-domain check-lpart check-email check-lib
 
-check-domain: $(TARGETS) $(PARTIAL_TRT)
+check-domain: t-all-tlds-test.exe t-domain-length.exe
+check-domain: t-dash-domains.exe t-retired.exe
 	$(info # =====================================================)
 	$(info # domain tests)
 	$(info # =====================================================)
@@ -64,7 +65,8 @@ check-domain: $(TARGETS) $(PARTIAL_TRT)
 	./t-dash-domains.exe ../data/xn-dash-domains.txt
 	./t-retired.exe 2 2 ../data/retired.txt
 
-check-lpart: $(TARGETS) $(PARTIAL_TRT)
+check-lpart: t-822-localpart.exe t-5321-localpart.exe
+check-lpart: t-5322-localpart.exe t-6531-localpart.exe
 	$(info # === localpart tests)
 	./t-822-localpart.exe 24 19 ../data/localpart-ascii.txt
 	./t-5321-localpart.exe 21 22 ../data/localpart-ascii.txt
@@ -109,7 +111,7 @@ check-email: check-email-822 check-email-5321
 check-email: check-email-5322 check-email-6531
 
 
-check-email-822: $(TARGETS) $(PARTIAL_TRT)
+check-email-822: t-822-email.exe
 	$(info =====================================================)
 	$(info === RFC 822 email address tests)
 	$(info =====================================================)
@@ -117,7 +119,7 @@ check-email-822: $(TARGETS) $(PARTIAL_TRT)
 	./t-822-email.exe 0 44 ../data/fail-email-ascii.txt
 
 
-check-email-5321: $(TARGETS) $(PARTIAL_TRT)
+check-email-5321: t-5321-email.exe
 	$(info # =====================================================)
 	$(info # === RFC 5321 email address tests)
 	$(info # =====================================================)
@@ -125,7 +127,7 @@ check-email-5321: $(TARGETS) $(PARTIAL_TRT)
 	./t-5321-email.exe 0 44 ../data/fail-email-ascii.txt
 
 
-check-email-5322: $(TARGETS) $(PARTIAL_TRT)
+check-email-5322: t-5322-email.exe
 	$(info # =====================================================)
 	$(info # === RFC 5322 email address tests)
 	$(info # =====================================================)
@@ -133,7 +135,8 @@ check-email-5322: $(TARGETS) $(PARTIAL_TRT)
 	./t-5322-email.exe 0 44 ../data/fail-email-ascii.txt
 
 
-check-email-6531:
+check-email-6531: t-6531-email.exe t-6531-email-fqdn.exe
+check-email-6531: t-6531-email-tld.exe t-6531-email-tld-special.exe
 	$(info # =====================================================)
 	$(info # === RFC 6531 tests)
 	$(info # =====================================================)
@@ -263,7 +266,7 @@ endif
 endif
 endif
 
-check-lib:
+check-lib: t-eav.exe t-eav-all-modes.exe t-result.exe
 	$(info # =====================================================)
 	$(info # === library tests)
 	$(info # =====================================================)

@@ -2,13 +2,18 @@
 abstract: 'run command and capture its output'
 author:
   - 'Sergey Poznyakoff <gray@gnu.org>'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Cmp: '1.06'
+  File::Temp: '0.23'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: POSIX-Run-Capture
 no_index:
   directory:
@@ -17,7 +22,10 @@ no_index:
 provides:
   POSIX::Run::Capture:
     file: lib/POSIX/Run/Capture.pm
-    version: 1.01
+    version: '1.02'
+requires:
+  perl: '5.006'
 resources:
+  bugtracker: https://puszcza.gnu.org.ua/bugs/?group=posixruncapture
   repository: git://git.gnu.org.ua/posixruncapture.git
-version: 1.01
+version: '1.02'

@@ -64,14 +64,12 @@ WriteMakefile(
     META_MERGE   => {
         resources => {
             bugtracker => {
-                web =>
-'https://rt.cpan.org/Public/Dist/Display.html?Name=Mail-IMAPClient',
-                mailto => 'bug-Mail-IMAPClient@rt.cpan.org',
+                web => 'https://github.com/plobbes/mail-imapclient/issues',
             },
-            homepage   => 'https://sourceforge.net/projects/mail-imapclient/',
+            homepage   => 'https://github.com/plobbes/mail-imapclient/',
             repository => {
-                url  => 'git://git.code.sf.net/p/mail-imapclient/git',
-                web  => 'https://sourceforge.net/p/mail-imapclient/git/',
+                url  => 'https://github.com/plobbes/mail-imapclient.git',
+                web  => 'https://github.com/plobbes/mail-imapclient/',
                 type => 'git',
             },
         },

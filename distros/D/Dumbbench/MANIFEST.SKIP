@@ -61,5 +61,9 @@
 # Avoid archives of this distribution
 \bDumbbench-[\d\.\_]+
 
-\.travis.yml
-\.releaserc
+\.?releaserc
+\bMANIFEST\s\d
+\bChanges\s\d
+\.icloud$
+\A\.github\b
+

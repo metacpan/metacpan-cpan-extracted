@@ -49,14 +49,17 @@ sub RTx {
     $ENV{RTHOME} =~ s{/RT\.pm$}{} if defined $ENV{RTHOME};
     $ENV{RTHOME} =~ s{/lib/?$}{}  if defined $ENV{RTHOME};
     my @try = $ENV{RTHOME} ? ($ENV{RTHOME}, "$ENV{RTHOME}/lib") : ();
-    my $prefix = $ENV{PREFIX};
-    push @INC, "$prefix/lib";
+# manual change /ol/21/02/16
+    #   my $prefix = $ENV{PREFIX};
+    #	push @INC, "$prefix/lib";
     while (1) {
         my @look = @INC;
         unshift @look, grep {defined and -d $_} @try;
         push @look, grep {defined and -d $_}
             map { ( "$_/rt4/lib", "$_/lib/rt4", "$_/lib" ) } @prefixes;
-        last if eval {local @INC = @look; require RT; $RT::LocalPluginPath = '$(DESTDIR)'."$prefix/plugins"; $RT::LocalLibPath};
+# manual change /ol/21/02/16
+#        last if eval {local @INC = @look; require RT; $RT::LocalPluginPath = '$(DESTDIR)'."$prefix/plugins"; $RT::LocalLibPath};
+	last if eval {local @INC = @look; require RT; $RT::LocalLibPath};
 
         warn
             "Cannot find the location of RT.pm that defines \$RT::LocalPath in: @look\n";

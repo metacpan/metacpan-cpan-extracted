@@ -1,0 +1,17 @@
+Changes
+examples/synopsis.pl
+lib/Table/l2n.txt
+lib/Table/Trans.pm
+lib/Table/Trans.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/json.t
+t/ReadTrans.t
+t/table-trans.t
+t/test-trans.txt
+t/x-lang-macro.t
+versionup.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

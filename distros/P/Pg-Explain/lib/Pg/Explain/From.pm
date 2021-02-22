@@ -26,11 +26,11 @@ Pg::Explain::From - Base class for parsers of non-text explain formats.
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =cut
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 =head1 SYNOPSIS
 
@@ -291,7 +291,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2015 hubert depesz lubaczewski, all rights reserved.
+Copyright 2008-2021 hubert depesz lubaczewski, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -9,9 +9,10 @@ use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
 use Test::Mojo;
 use Test::More;
+use version;
 
 plan skip_all => 'Minion::Backend::SQLite >=4.001 need to be installed to run this test'
-  unless eval 'require Minion::Backend::SQLite;Minion::Backend::SQLite->VERSION >= 4.001';
+  unless eval 'require Minion::Backend::SQLite; version->parse(Minion::Backend::SQLite->VERSION) >= version->parse(4.001)';
 plan skip_all => 'EV need to be installed to run this test'
   unless eval { Mojo::IOLoop->singleton->reactor->isa('Mojo::Reactor::EV') };
 

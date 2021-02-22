@@ -1,3 +1,14 @@
+0.2.23  2021-02-13
+    - Version bump
+0.2.22  2021-02-13
+    - Improve files version priorities.
+    - Fix versions dups.
+    - Fix crash while deleting not existent file while storage checking.
+    - Fix warning in test.
+    - Speedup initialize queue of blocks to delete.
+    - Speedup DB initialization.
+    - Not finished yet backups marks in stats as 'unfinished'.
+    - DB format v2: parts and blocks saved too for fastest DB launch.
 0.2.21  2020-12-20
     - Non-zero exit code if some files failed to backup.
     - Report about deleted files for free up space.

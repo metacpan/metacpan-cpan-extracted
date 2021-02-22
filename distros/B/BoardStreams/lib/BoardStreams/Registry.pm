@@ -6,15 +6,13 @@ use BoardStreams::Util 'belongs_to';
 
 use Safe::Isa;
 use List::Util 'pairs', 'first';
-use Scalar::Util 'reftype';
-use Storable 'dclone';
 use Data::Dumper;
 
 no autovivification;
 
 use experimental 'postderef';
 
-our $VERSION = "v0.0.13";
+our $VERSION = "v0.0.21";
 
 use constant SINGLE_VARS => qw/ join leave cleanup /;
 

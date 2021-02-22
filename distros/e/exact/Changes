@@ -1,5 +1,9 @@
 Revision history for exact
 
+1.17      2021-02-16 22:20:16-08:00 America/Los_Angeles
+        - Add feature isa support
+        - Default to no feature indirect
+
 1.16      2021-02-05 03:07:56-08:00 America/Los_Angeles
         - Set Syntax::Keyword::Try minimum version to 0.18
 

@@ -15,6 +15,13 @@ my $builder = Module::Build->new(
 	'JSON::Syck' => 0,  # for t-test
     },
     add_to_cleanup      => [ 'Text-KnuthPlass-*' ],
+    meta_merge => {
+        resources      => {
+	    'repository' => 'https://github.com/PhilterPaper/Text-KnuthPlass',
+	    'bugtracker' => 'https://github.com/PhilterPaper/Text-KnuthPlass/issues',
+	    'homepage'   => 'https://metacpan.org/pod/Text::KnuthPlass',
+        },
+    },
 );
 
 $builder->create_build_script();

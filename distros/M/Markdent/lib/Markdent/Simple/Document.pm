@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use Markdent::Handler::HTMLStream::Document;
 use Markdent::Types;
@@ -63,7 +63,7 @@ with 'Markdent::Role::Simple';
     }
 }
 
-__PACKAGE__->meta()->make_immutable();
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -81,13 +81,13 @@ Markdent::Simple::Document - Convert Markdown to an HTML Document
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 SYNOPSIS
 
     use Markdent::Simple::Document;
 
-    my $mds  = Markdent::Simple::Document->new();
+    my $mds  = Markdent::Simple::Document->new;
     my $html = $mds->markdown_to_html(
         title    => 'My Document',
         markdown => $markdown,
@@ -102,7 +102,7 @@ complete HTML document.
 
 This class provides the following methods:
 
-=head2 Markdent::Simple::Document->new()
+=head2 Markdent::Simple::Document->new
 
 Creates a new Markdent::Simple::Document object.
 
@@ -155,7 +155,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

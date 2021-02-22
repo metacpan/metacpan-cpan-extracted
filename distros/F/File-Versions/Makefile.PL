@@ -13,9 +13,7 @@ WriteMakefile (
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     VERSION_FROM => $pm,
     PREREQ_PM => {
-	'Carp' => 0,
         'List::Util' => 0,
-        'Test::More' => 0,
     },
     META_MERGE => {
         resources => {

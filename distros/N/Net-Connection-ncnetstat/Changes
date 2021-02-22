@@ -1,5 +1,22 @@
 Revision history for Net-Connection-ncnetstat
 
+0.7.1	 2021-02-19/08:00
+		 - Bump the min version of Text::ANSITable required to 0.601. Thanks SREZIC / #134375.
+		 - Fix some typos in bin/ncnetstat docs. Thanks RSAVAGE / #134382.
+
+0.7.0	 2021-02-19/06:30
+		 - Revert to lsof on FreeBSD given formatting problems with
+		   sockstat on FreeBSD with long IPv6 addresses.
+
+0.6.4	 2021-02-17/04:00
+		 - Change use if around to play friendly with older versions of Perl.
+
+0.6.3	 2021-02-16/10:30
+		 - Fix at runtime module use to actually work now. Thanks Grinnz, Botje!
+
+0.6.2	 2021-02-16/02:30
+		 - Remove it accidentally using Net::Conection::lsof always.
+
 0.6.1	 2021-02-08/20:00
 		 - Accidentally inverted the OS check for FreeBSD in Makefile.PL.
 

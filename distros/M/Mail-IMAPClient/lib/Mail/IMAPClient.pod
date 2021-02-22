@@ -4013,14 +4013,14 @@ See L</Prewritemethod> and L</Readmethod> for details.
 
 =head1 REPORTING BUGS
 
-Please send bug reports to C<bug-Mail-IMAPClient@rt.cpan.org> or
-https://rt.cpan.org/Public/Dist/Display.html?Name=Mail-IMAPClient
+Please file bug reports via
+https://github.com/plobbes/mail-imapclient/issues
 
 =head1 COPYRIGHT AND LICENSE
 
   Copyright (C) 1999-2003 The Kernen Group, Inc.
   Copyright (C) 2007-2009 Mark Overmeer
-  Copyright (C) 2010-2019 Phil Pearl (Lobbes)
+  Copyright (C) 2010-2021 Phil Pearl (Lobbes)
   All rights reserved.
 
 This library is free software; you can redistribute it and/or modify

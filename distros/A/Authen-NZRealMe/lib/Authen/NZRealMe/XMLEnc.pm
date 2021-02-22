@@ -1,5 +1,5 @@
 package Authen::NZRealMe::XMLEnc;
-$Authen::NZRealMe::XMLEnc::VERSION = '1.20';
+$Authen::NZRealMe::XMLEnc::VERSION = '1.21';
 use strict;
 use warnings;
 
@@ -39,6 +39,8 @@ my(%enc_alg_by_name, %enc_alg_by_uri);
 __PACKAGE__->register_encryption_algorithm($_, URI($_)) foreach (qw(
     xenc_rsa15
     xenc_aes128cbc
+    xenc_rsa_oaep_mgf1p
+    xenc_aes256cbc
 ));
 
 
@@ -83,8 +85,10 @@ sub encrypt_one_element {
 
     my $xc = $self->_xcdom_from_xml($xml);
 
-    my $target_id = $args{target_id} or croak "Need target_id";
-    my $algorithm_name = $args{algorithm} or croak "Need algorithm";
+    my $target_id                 = $args{target_id}     or croak "Need target_id";
+    my $algorithm_name            = $args{algorithm}     or croak "Need algorithm";
+    my $random_key_algorithm_name = $args{key_algorithm} or croak "Need random key algorithm";
+
     my $id_attr   = '@' . $self->id_attr;
 
     my($node) = $xc->findnodes(qq{//*[$id_attr='$target_id']})
@@ -95,14 +99,14 @@ sub encrypt_one_element {
     my $algorithm = $self->_find_enc_alg($algorithm_name);
     my $key_info = $self->_gen_key($algorithm);
 
-    my $rsa_alg = $self->_find_enc_alg('xenc_rsa15');
+    my $rsa_alg = $self->_find_enc_alg($random_key_algorithm_name);
     my $rsa_key = $self->rsa_public_key();
     $key_info->{encrypted_key} =
         $self->_encrypt_bytes($rsa_alg, $rsa_key, $key_info->{key});
 
     my $ciphertext = $self->_encrypt_bytes($algorithm, $key_info, $frag_xml);
     my $enc_frag = $self->_generate_encrypted_data_element(
-        $key_info, $ciphertext
+        $key_info, $ciphertext, $random_key_algorithm_name, $algorithm_name
     );
     my $frag_parser = XML::LibXML->new();
     my $ed_node = $frag_parser->parse_balanced_chunk($enc_frag);
@@ -115,7 +119,7 @@ sub encrypt_one_element {
 
 
 sub _generate_encrypted_data_element {
-    my($self, $key_info, $ciphertext) = @_;
+    my($self, $key_info, $ciphertext, $random_key_algorithm_name, $algorithm_name) = @_;
 
     my $encrypted_key_b64 = encode_base64($key_info->{encrypted_key});
     my $ciphertext_b64 = encode_base64($key_info->{iv} . $ciphertext);
@@ -124,12 +128,12 @@ sub _generate_encrypted_data_element {
     my $enc_frag = $x->EncryptedData($ns_xenc,
         { Type => URI('xenc_type_element'), },
         $x->EncryptionMethod($ns_xenc,
-            { Algorithm => URI('xenc_aes128cbc') },
+            { Algorithm => URI($algorithm_name) },
         ),
         $x->KeyInfo($ns_ds,
             $x->EncryptedKey($ns_xenc,
                 $x->EncryptionMethod($ns_xenc,
-                    { Algorithm => URI('xenc_rsa15') },
+                    { Algorithm => URI($random_key_algorithm_name) },
                 ),
                 $x->CipherData($ns_xenc,
                     $x->CipherValue($ns_xenc, "\n" . $encrypted_key_b64),
@@ -206,9 +210,6 @@ sub _extract_encrypted_key {
         './xenc:EncryptionMethod/@Algorithm', $encrypted_key
     ) or die "Unable to find Algorithm in <EncryptedKey>";
     my $algorithm = $self->_find_enc_alg($algorithm_ns);
-    die "Unexpected key encryption algorithm '$algorithm->{name}'"
-      . " (expected: 'xenc_rsa15')"
-        unless $algorithm->{name} eq 'xenc_rsa15';
 
     my $b64_value = $xc->findvalue(
         './xenc:CipherData/xenc:CipherValue', $encrypted_key
@@ -392,6 +393,22 @@ sub _encrypt_rsa15 {
     return $ciphertext;
 }
 
+sub _decrypt_rsa_oaep_mgf1p {
+    my($self, $rsa_key, $ciphertext) = @_;
+    $rsa_key->use_pkcs1_oaep_padding;
+    my $plaintext = $rsa_key->decrypt($ciphertext);
+    return $plaintext;
+}
+
+
+sub _encrypt_rsa_oaep_mgf1p {
+    my($self, $rsa_key, $plaintext) = @_;
+    $rsa_key->use_pkcs1_oaep_padding;
+    my $ciphertext = $rsa_key->encrypt($plaintext);
+    return $ciphertext;
+}
+
+
 
 sub _decrypt_aes128cbc {
     my($self, $aes128_key, $ciphertext) = @_;
@@ -428,6 +445,46 @@ sub _key_gen_aes128cbc {
     my $iv          = random_bytes(Crypt::Cipher::blocksize('AES'));
     return {
         key   => $aes128_key,
+        iv    => $iv,
+    };
+}
+
+
+sub _decrypt_aes256cbc {
+    my($self, $aes256_key, $ciphertext) = @_;
+
+    my $cipher    = 'AES';
+    my $padding   = 0; # no padding - we handle that below
+    my $blocksize = Crypt::Cipher::blocksize($cipher);
+    my $iv        = substr($ciphertext, 0, $blocksize, '');
+    my $cbc = Crypt::Mode::CBC->new($cipher, $padding);
+    my $plaintext = $cbc->decrypt($ciphertext, $aes256_key, $iv);
+    return $self->_strip_padding($plaintext, $blocksize);
+}
+
+
+sub _encrypt_aes256cbc {
+    my($self, $key_info, $plaintext) = @_;
+
+    my $cipher     = 'AES';
+    my $padding    = 0; # no padding - we handle that below
+    my $blocksize  = Crypt::Cipher::blocksize($cipher);
+    my $aes256_key = $key_info->{key} or die "No key in key_info";
+    my $iv         = $key_info->{iv}  or die "No iv in key_info";
+    $plaintext     = $self->_add_padding($plaintext, $blocksize);
+    my $cbc = Crypt::Mode::CBC->new($cipher, $padding);
+    my $ciphertext = $cbc->encrypt($plaintext, $aes256_key, $iv);
+    return $ciphertext;
+}
+
+
+sub _key_gen_aes256cbc {
+    my($self) = @_;
+
+    my $aes256_key  = random_bytes(Crypt::Cipher::keysize('AES'));
+    my $iv          = random_bytes(Crypt::Cipher::blocksize('AES'));
+    return {
+        key   => $aes256_key,
         iv    => $iv,
     };
 }
@@ -514,7 +571,7 @@ constructor, or indirectly with the 'pub_cert_file' argument.
 An accessor for the PEM-encoded text used to instantiate an RSA public key
 object for encryption.  The value can be supplied directly using the
 'pub_key_text' argument to the constructor, or indirectly with the
-'pub_cert_text' or 'pub_)cert_file' arguments.
+'pub_cert_text' or 'pub_cert_file' arguments.
 
 =head2 register_encryption_algorithm
 
@@ -538,14 +595,27 @@ using the C<pub_key_text> method.
 =head2 rsa15 - RSAES-PKCS1-v1_5
 
 Used only to encrypt/decrypt the random key which in turn is used by the block
-cipher to encrypt the XML element data.
+cipher to encrypt the XML element data. This is used by the old RealMe service to
+encrypt the random key.
 
 =head2 aes128cbc - AES128-CBC
 
-This is the only supported block cipher used for the encryption/decryption of
+This is the oold supported block cipher used for the encryption/decryption of
 XML elements.  Whilst it is recognised that use of this cipher is not
 recommended due to concerns about its security, it is the cipher used by the
 RealMe service to encrypt SAML assertions.
+
+=head2 rsa_oaep_mgf1p - RSA-OAEP-MGF1P
+
+Used only to encrypt/decrypt the random key which in turn is used by the block
+cipher to encrypt the XML element data. This is used by the new RealMe service to
+encrypt the random key.
+
+=head2 aes256cbc - AES256-CBC
+
+This is the supported block cipher used for the encryption/decryption
+of XML elements.  This is the cipher used by the new RealMe service to
+encrypt SAML assertions.
 
 =head1 SEE ALSO
 

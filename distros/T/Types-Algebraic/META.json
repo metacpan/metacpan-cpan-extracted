@@ -38,7 +38,8 @@
       "runtime" : {
          "requires" : {
             "Keyword::Declare" : "0.001015",
-            "List::MoreUtils" : "0.07",
+            "Keyword::Simple" : "0",
+            "List::MoreUtils" : "0.420",
             "List::Util" : "1.33",
             "Moops" : "0",
             "PPR" : "0",
@@ -54,7 +55,7 @@
    "provides" : {
       "Types::Algebraic" : {
          "file" : "lib/Types/Algebraic.pm",
-         "version" : "0.05"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -69,7 +70,7 @@
          "web" : "https://github.com/Eckankar/Types-Algebraic"
       }
    },
-   "version" : "0.05",
+   "version" : "0.07",
    "x_contributors" : [
       "Sebastian Paaske T\u00f8rholm <Eckankar@gmail.com>"
    ],

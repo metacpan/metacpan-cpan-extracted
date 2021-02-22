@@ -1,25 +1,6 @@
-use warnings;
-use strict;
-use utf8;
-use Test::More;
-# http://code.google.com/p/test-more/issues/detail?id=46
-binmode Test::More->builder->output, ":utf8";
-binmode Test::More->builder->failure_output, ":utf8";
-BEGIN {
-    use_ok ('Lingua::JA::Moji');
-};
-
-use Lingua::JA::Moji qw/romaji2kana
-                        kana2romaji
-                        is_romaji
-                        romaji2hiragana
-                        is_kana
-                        romaji_styles
-                        kana_to_large
-			nigori_first
-			cleanup_kana
-			bad_kanji
-			yurei_moji/;
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;
 
 # Basic tests of romaji/kana conversion
 
@@ -157,7 +138,6 @@ ok (@ym > 0, "Got a non-empty list from yurei_moji");
 ok (find_kanji (\@ym, '彁'), "Found non-existent kanji in yurei moji list");
 
 done_testing ();
-exit;
 
 # Find a kanji $kanji in a list of kanjis $list and return true if
 # found, false if not.

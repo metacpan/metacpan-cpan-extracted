@@ -1,5 +1,14 @@
 Revision history for App-skos2jskos
 
+0.2.4  2021-02-15 12:37:02 CET
+    - Make inScheme optional if topConceptOf is used
+
+0.2.3  2021-02-15 11:38:13 CET
+    - Add topConceptOf if given at concepts
+
+0.2.2  2021-02-15 11:05:58 CET
+    - Add topConceptOf to concepts
+
 0.2.1  2019-05-16 13:05:33 CEST
     - Remove some tests to avoid installation failure
 

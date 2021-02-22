@@ -1,5 +1,9 @@
 Revision history for Crypt-Argon2
 
+0.008     2021-02-19 20:13:53+01:00 Europe/Amsterdam
+          - Add a argon2_needs_rehash function
+          - Enforce byte semantics for passwords and salts
+
 0.007     2020-03-07 16:52:17+01:00 Europe/Amsterdam
           - Make 256M test an extended test
 

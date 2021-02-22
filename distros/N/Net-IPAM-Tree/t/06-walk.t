@@ -16,12 +16,15 @@ foreach my $b (@blocks) {
   push @items, Net::IPAM::Block->new($b);
 }
 my $t = Net::IPAM::Tree->new;
-$t->insert(@items);
+cmp_ok( $t->len, '==', 0, 'len() of empty tree == 0' );
 
-ok( !$t->{root}->parent,     'root node has no parent' );
-ok( !$t->{root}->block,      'root node has no block' );
-ok( $t->{root}->childs == 3, 'this tree has 3 childs at root level' );
-ok( $t->len == 7,            'this tree has 7 nodes' );
+$t->insert(@items);
+cmp_ok( $t->len, '==', 7, 'after insert, len of tree == 7' );
+
+ok( !$t->{root}->parent, 'root node has no parent' );
+ok( !$t->{root}->block,  'root node has no block' );
+
+cmp_ok( $t->{root}->childs, '==', 3, 'this tree has 3 childs at root level' );
 
 my ( $n, $max_d, $max_c ) = ( 0, 0, 0 );
 
@@ -34,11 +37,11 @@ my $cb = sub {
 };
 
 ok( !$t->walk($cb), "walk returns undef on success" );
-ok( $n == 7,        "walk and count nodes" );
-ok( $max_c == 3,    "walk and count max childs" );
-ok( $max_d == 3,    "walk and count levels" );
+cmp_ok( $n,     '==', 7, "walk and count nodes" );
+cmp_ok( $max_c, '==', 3, "walk and count max childs" );
+cmp_ok( $max_d, '==', 3, "walk and count levels" );
 
 $cb = sub { $_[0]->block eq '1.2.3.6/32' ? return 'test-error' : return };
-ok( $t->walk($cb) eq 'test-error', 'propagate error to caller' );
+is( $t->walk($cb), 'test-error', 'propagate error to caller' );
 
 done_testing();

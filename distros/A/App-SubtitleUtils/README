@@ -2,7 +2,7 @@ NAME
     App::SubtitleUtils - Utilities related to video subtitles
 
 VERSION
-    This document describes version 0.004 of App::SubtitleUtils (from Perl
+    This document describes version 0.005 of App::SubtitleUtils (from Perl
     distribution App-SubtitleUtils), released on 2021-01-08.
 
 DESCRIPTION
@@ -25,6 +25,11 @@ DESCRIPTION
     *   subshift
 
     *   vtt2srt
+
+HISTORY
+    Most of them are scripts I first wrote in 2003 and first packaged as
+    CPAN distribution in late 2020. They need to be rewritten to properly
+    use Getopt::Long etc; someday.
 
 HOMEPAGE
     Please visit the project's homepage at

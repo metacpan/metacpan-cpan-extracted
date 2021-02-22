@@ -8,6 +8,7 @@ use Crypt::OpenSSL::RSA;
 use Crypt::OpenSSL::X509;
 use File::Basename;
 use File::Path qw(make_path);
+use File::Spec;
 use DateTime::Format::Strptime;
 use LWP::UserAgent;
 use LWP::Protocol::https;
@@ -24,12 +25,14 @@ use Text::ParseWords;
 use App::Acmeman::Log qw(:all :sysexits);
 use feature 'state';
 
-our $VERSION = '3.06';
+our $VERSION = '3.07';
 
 my $progdescr = "manages ACME certificates";
 
-my $letsencrypt_root_cert_url =
-    'https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem';
+our $acme_dir = '/etc/ssl/acme';
+our $letsencrypt_root_cert_basename = 'lets-encrypt-root.pem';
+our $letsencrypt_root_cert_url =
+    'https://letsencrypt.org/certs/lets-encrypt-r3-cross-signed.pem';
 
 sub new {
     my $class = shift;
@@ -151,6 +154,7 @@ sub host_ns_ok {
     foreach my $ip ($self->resolve($host)) {
 	return 1 if $self->myip($ip);
     }
+    error("$host does not resolve to our IP");
     return 0
 }
 
@@ -203,7 +207,8 @@ sub setup {
     
     $self->prep_dir($self->cf->get(qw(core rootdir)).'/file');
 
-    $self->get_root_cert('/etc/ssl/acme/lets-encrypt-x3-cross-signed.pem');
+    $self->get_root_cert(File::Spec->catfile($acme_dir,
+					     $letsencrypt_root_cert_basename));
 
     foreach my $src ($self->cf->get(qw(core source))) {
 	unless ($src->setup(dry_run => $self->dry_run_option,
@@ -228,7 +233,11 @@ sub collect {
 			     || $self->host_ns_ok($_) }
                          ($k, ($v->{alt} ? @{$v->{alt}} : ()))];
 	if (@$alt) {
-	    $k = shift @$alt;
+	    my $name = shift @$alt;
+	    if ($name ne $k) {
+	        error("$k: CN changed to $name, update your configuration");
+	    }
+	    $k = $name;
 	    $alt = undef unless @$alt;
 	} else {
 	    error("ignoring $k: none of its names resolves to our IP");

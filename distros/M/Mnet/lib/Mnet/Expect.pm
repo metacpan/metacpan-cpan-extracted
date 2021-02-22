@@ -41,6 +41,7 @@ use parent qw( Mnet::Log::Conditional );
 use Carp;
 use Errno;
 use Expect();
+use Mnet;
 use Mnet::Dump;
 use Mnet::Opts::Cli::Cache;
 

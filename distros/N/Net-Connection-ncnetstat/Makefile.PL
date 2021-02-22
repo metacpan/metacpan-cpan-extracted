@@ -19,10 +19,10 @@ my %WriteMakefileArgs = (
 	},
 	PREREQ_PM => {
 		'Net::Connection'        => '0.2.0',
-		'Net::Connection::Match' => '0.4.0',
+		'Net::Connection::Match' => '0.5.0',
 		'Net::Connection::Sort'  => '0.0.1',
 		'Term::ANSIColor'        => '4.06',
-		'Text::ANSITable'        => '0.501',
+		'Text::ANSITable'        => '0.601',
 		'Getopt::Long'           => '0.0.0',
 		'Data::Unixish::Apply'   => '1.570',
 	},
@@ -30,12 +30,12 @@ my %WriteMakefileArgs = (
 	clean => { FILES    => 'Net-Connection-ncnetstat-*' },
 );
 
-if ( $^O =~ /freebsd/ ) {
-	$WriteMakefileArgs{PREREQ_PM}{'Net::Connection::FreeBSD_sockstat'} = '0.0.1';
-}
-else {
-	$WriteMakefileArgs{PREREQ_PM}{'Net::Connection::lsof'} = '0.1.1';
-}
+#if ( $^O =~ /freebsd/ ) {
+#	$WriteMakefileArgs{PREREQ_PM}{'Net::Connection::FreeBSD_sockstat'} = '0.0.1';
+#}
+#else {
+	$WriteMakefileArgs{PREREQ_PM}{'Net::Connection::lsof'} = '0.2.0';
+#}
 
 # Compatibility with old versions of ExtUtils::MakeMaker
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 } ) {

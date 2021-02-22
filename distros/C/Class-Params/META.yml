@@ -30,8 +30,8 @@ requires:
   Scalar::Util: 0
   perl: 5.8.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Params
-  homepage: https://github.com/tupinek/Class-Params
+  bugtracker: https://github.com/michal-josef-spacek/Class-Params/issues
+  homepage: https://github.com/michal-josef-spacek/Class-Params
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/tupinek/Class-Params
-version: '0.05'
+  repository: git://github.com/michal-josef-spacek/Class-Params
+version: '0.06'

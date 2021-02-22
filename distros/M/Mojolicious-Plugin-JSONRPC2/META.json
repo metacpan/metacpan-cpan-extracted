@@ -43,7 +43,7 @@
             "JSON::RPC2::Server" : "v0.4.0",
             "JSON::XS" : "0",
             "Mojo::Base" : "0",
-            "Mojolicious" : "5.11",
+            "Mojolicious" : "8.67",
             "perl" : "5.010001"
          }
       },
@@ -60,7 +60,7 @@
    "provides" : {
       "Mojolicious::Plugin::JSONRPC2" : {
          "file" : "lib/Mojolicious/Plugin/JSONRPC2.pm",
-         "version" : "v2.0.1"
+         "version" : "v2.0.3"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/powerman/perl-Mojolicious-Plugin-JSONRPC2"
       }
    },
-   "version" : "v2.0.1",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "v2.0.3",
+   "x_serialization_backend" : "JSON::XS version 4.02"
 }
 

@@ -16,7 +16,7 @@ my $app = $t->app;
 $app->mode('production');
 
 $app->plugin(Piwik => {
-  url => 'sojolicio.us/piwik'
+  url => 'sojolicious.example/piwik'
 });
 
 my $c = $app->build_controller;

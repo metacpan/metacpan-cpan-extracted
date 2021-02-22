@@ -5,6 +5,7 @@ use Carp qw(carp croak);
 use Crypt::Eksblowfish ();
 use Crypt::OpenSSL::Random ();
 use MIME::Base64 qw(encode_base64 decode_base64);
+use version 0.77 ();
 use base qw(Exporter);
 
 our @EXPORT;
@@ -25,7 +26,7 @@ our %EXPORT_TAGS = (
 	'consts'	=> [ grep /^PASSWORD_/, @EXPORT_OK ],
 	'funcs'		=> [ grep /^password_/, @EXPORT_OK ],
 );
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use constant PASSWORD_BCRYPT   => 1;
 use constant PASSWORD_ARGON2I  => 2;
@@ -296,10 +297,6 @@ sub password_needs_rehash {
 		}
 	}
 	elsif (($algo == PASSWORD_ARGON2ID) || ($algo == PASSWORD_ARGON2I)) {
-		if ($info{'version'} < 19) {
-			$options{'debug'} && warn('Version mismatch: ' . $info{'version'} . '<19');
-			return 1;
-		}
 		my $memory_cost = $options{'memory_cost'} // PASSWORD_ARGON2_DEFAULT_MEMORY_COST;
 		if ($info{'options'}->{'memory_cost'} != $memory_cost) {
 			$options{'debug'} && warn('memory_cost mismatch: ' . $info{'options'}->{'memory_cost'} . "<>$memory_cost");
@@ -315,25 +312,37 @@ sub password_needs_rehash {
 			$options{'debug'} && warn('threads mismatch: ' . $info{'options'}->{'threads'} . "<>$threads");
 			return 1;
 		}
-		my $salt_encoded = $info{'salt'};
-		my $salt = decode_base64($salt_encoded);
-		if (!defined($salt)) {
-			$options{'debug'} && warn("decode_base64('$salt_encoded') failed");
-			return 1;
-		}
-		my $actual_salt_length = length($salt);
 		my $wanted_salt_length = defined($options{'salt'}) && length($options{'salt'}) ? length($options{'salt'}) : PASSWORD_ARGON2_DEFAULT_SALT_LENGTH;
-		if ($wanted_salt_length != $actual_salt_length) {
-			$options{'debug'} && warn("wanted salt length ($wanted_salt_length) != actual salt length ($actual_salt_length)");
-			return 1;
-		}
-		my $tag_encoded = $info{'hash'};
-		my $tag = decode_base64($tag_encoded);
-		my $actual_tag_length = length($tag);
 		my $wanted_tag_length = $options{'tag_length'} || PASSWORD_ARGON2_DEFAULT_TAG_LENGTH;	# undocumented; not a PHP option; 4 - 2^32 - 1
-		if ($wanted_tag_length != $actual_tag_length) {
-			$options{'debug'} && warn("wanted tag length ($wanted_tag_length) != actual tag length ($actual_tag_length)");
-			return 1;
+
+		if ($INC{'Crypt/Argon2.pm'} || eval { require Crypt::Argon2; }) {
+			if (version->parse($Crypt::Argon2::VERSION) < version->parse('0.008')) {
+				if ($info{'version'} < 19) {
+					$options{'debug'} && warn('Version mismatch: ' . $info{'version'} . '<19');
+					return 1;
+				}
+				my $salt_encoded = $info{'salt'};
+				my $salt = decode_base64($salt_encoded);
+				if (!defined($salt)) {
+					$options{'debug'} && warn("decode_base64('$salt_encoded') failed");
+					return 1;
+				}
+				my $actual_salt_length = length($salt);
+				if ($wanted_salt_length != $actual_salt_length) {
+					$options{'debug'} && warn("wanted salt length ($wanted_salt_length) != actual salt length ($actual_salt_length)");
+					return 1;
+				}
+				my $tag_encoded = $info{'hash'};
+				my $tag = decode_base64($tag_encoded);
+				my $actual_tag_length = length($tag);
+				if ($wanted_tag_length != $actual_tag_length) {
+					$options{'debug'} && warn("wanted tag length ($wanted_tag_length) != actual tag length ($actual_tag_length)");
+					return 1;
+				}
+			}
+			else {
+				return Crypt::Argon2::argon2_needs_rehash($crypted, $info{'algoSig'}, $time_cost, $memory_cost . 'k', $threads, $wanted_tag_length, $wanted_salt_length);
+			}
 		}
 	}
 	else {
@@ -427,7 +436,7 @@ sub get_info {
 
 =item hash($password, %options)
 
-Proxy method for C<password_hash($password, $algo, $options)>.
+Proxy method for C<password_hash($password, $algo, %options)>.
 The difference is that this method does have an $algo argument,
 but instead allows the algorithm to be specified with the 'algo' option (in %options).
 

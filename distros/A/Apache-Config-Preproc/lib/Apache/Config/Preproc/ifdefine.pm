@@ -8,7 +8,7 @@ our $VERSION = '1.03';
 
 sub new {
     my ($class, $conf) = @_;
-    my $self = bless $class->SUPER::new($conf), $class;
+    my $self = $class->SUPER::new($conf);
     @{$self->{D}}{@_} = (1) x @_;
     return $self;
 }

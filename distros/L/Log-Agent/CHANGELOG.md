@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.004] - 2021-02-13
+### Changed
+- Moved from Travis CI with Coveralls to Drone CI with CodeCov.
+
 ## [1.003] - 2017-11-10
 ### Added
 - Added a license file.
@@ -7,7 +11,7 @@
 ### Fixed
 - Fixed remaining relative paths in unit tests. (Florian Schlichting,
   CPAN #123578)
-
+  
 ## [1.002] - 2017-10-27
 ### Added
 - Added support for TravisCI.
@@ -15,8 +19,7 @@
 ### Fixed
 - Fix test failures due to '.' removal from @INC under Perl 5.26 when 
   PERL_USE_UNSAFE_INC=0. (Kent Fredric, CPAN #121459)
-
-
+  
 ## [1.001] - 2015-11-29
 ### Added
 - Added .gitignore.
@@ -208,6 +211,7 @@
 ## 0.100
 Initial revision.
 
+[1.004]: https://github.com/mrogaski/Log-Agent/compare/v1.003...v1.004
 [1.003]: https://github.com/mrogaski/Log-Agent/compare/v1.002...v1.003
 [1.002]: https://github.com/mrogaski/Log-Agent/compare/v1.001...v1.002
 [1.001]: https://github.com/mrogaski/Log-Agent/compare/v1.000...v1.001

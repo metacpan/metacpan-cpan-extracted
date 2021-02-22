@@ -101,14 +101,15 @@ my @inputs = (
            \"id\" : 16010789,
           \"verified\" : false
        }
-     }"
+     }",
+    "{\"+Inf\":+Inf, \"-Inf\":-Inf, \"+NaN\":+NaN, \"-NaN\":-NaN}",
     );
 
 my $eslif = MarpaX::ESLIF->new($log);
 isa_ok($eslif, 'MarpaX::ESLIF');
 
 $log->info('Creating JSON native grammar');
-my $eslifJson = MarpaX::ESLIF::JSON->new($eslif);
+my $eslifJson = MarpaX::ESLIF::JSON->new($eslif, 0);
 
 foreach (0..$#inputs) {
     if (! doparse($inputs[$_], 0)) {

@@ -26,58 +26,58 @@ no_index:
 provides:
   BoardStreams:
     file: lib/BoardStreams.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::Client:
     file: lib/BoardStreams/Client.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::Client::Channel:
     file: lib/BoardStreams/Client/Channel.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::Client::Manager:
     file: lib/BoardStreams/Client/Manager.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::Client::StructDiff:
     file: lib/BoardStreams/Client/StructDiff.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::Client::Utils:
     file: lib/BoardStreams/Client/Utils.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::Client::WebSocket:
     file: lib/BoardStreams/Client/WebSocket.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::DBMigrations:
     file: lib/BoardStreams/DBMigrations.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::Exception:
     file: lib/BoardStreams/Exception.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::Exception::DbError:
     file: lib/BoardStreams/Exception.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::Exception::DbError::Duplicate:
     file: lib/BoardStreams/Exception.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::ListenerObservable:
     file: lib/BoardStreams/ListenerObservable.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::Registry:
     file: lib/BoardStreams/Registry.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::Transaction:
     file: lib/BoardStreams/Transaction.pm
-    version: v0.0.13
+    version: v0.0.21
   BoardStreams::Util:
     file: lib/BoardStreams/Util.pm
-    version: v0.0.13
+    version: v0.0.21
   Mojolicious::Plugin::BoardStreams:
     file: lib/Mojolicious/Plugin/BoardStreams.pm
-    version: v0.0.13
+    version: v0.0.21
 requires:
   Data::Dump: '0'
   Data::GUID: '0'
   Future::AsyncAwait: '0.36'
   List::AllUtils: '0'
-  Mojo::Pg: '4.12'
+  Mojo::Pg: '4.24'
   Mojolicious: '8.32'
   Moo: '0'
   RxPerl: v6.5.0
@@ -92,7 +92,7 @@ resources:
   bugtracker: https://gitlab.com/karjala/boardstreams.pm/issues
   homepage: https://gitlab.com/karjala/boardstreams.pm
   repository: git://gitlab.com/karjala/boardstreams.pm.git
-version: v0.0.13
+version: v0.0.21
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

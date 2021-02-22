@@ -1,5 +1,30 @@
 Revision history for Perl module Module::Release
 
+2.127 2021-02-13T11:46:58Z
+	* Move dist testing past quicker-to-fail sanity checks
+	* Check that the release will have a version larger than what is
+	already on CPAN
+	* Add Module::Release::Git 1.016 featues to control which branch 
+	can release and set the commit message format from config
+	* Clean up a lot of the output, adding more section headers as
+	the process moves through its stages
+	* see the "Configuration" section in script/release for what's
+	new. Most things should be fine even if you don't have the latest
+	modules.
+
+2.126_01 2021-01-29T18:36:09Z
+	* Fix the code to look back in git history to find the latest
+	contributors
+	* Update the Mojo code to upload to PAUSE. This means the min Perl
+	is now v5.16.
+	* Dumped DateTime in favor of Time::Piece because our requirements
+	are modest. Time::Piece comes with Perl.
+	* Tux added a `require` field to configuration
+	* Dump Travis CI but add Github Actions
+
+2.125 2018-05-22T14:13:33Z
+	* Add "required" .releaserc entry to test perls before you use them
+
 2.125 2018-02-27T10:55:54Z
 	* Make this a stable release
 

@@ -4,7 +4,7 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "gpl_3"
    ],
@@ -19,19 +19,43 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
    "provides" : {
       "Text::Locus" : {
          "file" : "lib/Text/Locus.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "gray+text-locus@gnu.org.ua",
+         "web" : "https://puszcza.gnu.org.ua/bugs/?group=text-locus"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://git.gnu.org.ua/text-locus.git",
          "web" : "http://git.gnu.org.ua/cgit/text-locus.git/"
       }
    },
-   "version" : "1.03"
+   "version" : "1.04"
 }

@@ -99,7 +99,7 @@ subtest 'die_on_error = 0' => sub {
 	# failing statement
 	SKIP: { skip '(test requires JSON)', 3 unless ref $r eq 'Neo4j::Driver::Result::JSON';
 	$w = '';
-	lives_ok { $w = warning { is $t->run('iced manifolds.')->size, 0 }; } 'execute cypher syntax error';
+	lives_ok { $w = warning { is $t->run(' iced manifolds.')->size, 0 }; } 'execute cypher syntax error';
 	(like $w, qr/\bStatement\b.*Syntax/i, 'cypher syntax error') or diag 'got warning(s): ', explain($w);
 	}
 };

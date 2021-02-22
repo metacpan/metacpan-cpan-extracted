@@ -49,6 +49,11 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.2.7",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/choroba/xsh"
+      }
+   },
+   "version" : "v2.2.8",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

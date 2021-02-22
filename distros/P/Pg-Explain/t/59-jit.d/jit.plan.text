@@ -1,0 +1,12 @@
+Gather  (cost=1000.00..5523045.00 rows=7404 width=56) (actual time=79.181..10808.951 rows=99743 loops=1)
+  Workers Planned: 2
+  Workers Launched: 2
+  ->  Parallel Seq Scan on test  (cost=0.00..5521304.60 rows=3085 width=56) (actual time=81.341..10788.440 rows=33248 loops=3)
+        Filter: ((tts >= '2019-01-01'::date) AND (tts <= '2020-01-01'::date) AND (0 = (tint % 50)))
+        Rows Removed by Filter: 33300086
+Planning Time: 0.385 ms
+JIT:
+  Functions: 7
+  Options: Inlining true, Optimization false, Expressions true, Deforming true
+  Timing: Generation 0.851 ms, Inlining 161.112 ms, Optimization 49.255 ms, Emission 32.862 ms, Total 244.080 ms
+Execution Time: 10842.410 ms

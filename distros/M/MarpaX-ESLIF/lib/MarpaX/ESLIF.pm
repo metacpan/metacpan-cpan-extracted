@@ -62,12 +62,13 @@ BEGIN {
 # Bootstrap
 #
 BEGIN {
-    our $VERSION = '4.0.1'; # VERSION
+    our $VERSION = '5.0.7'; # VERSION
 
     require XSLoader;
     # Modules that we depent on bootstrap
     use Math::BigFloat qw//;
     use Math::BigInt qw//;
+    use Encode qw//;
     XSLoader::load(__PACKAGE__, $VERSION);
 }
 
@@ -111,7 +112,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 4.0.1
+version 5.0.7
 
 =head1 SYNOPSIS
 

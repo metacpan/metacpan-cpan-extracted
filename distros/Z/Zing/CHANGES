@@ -1,6 +1,19 @@
 Changelog for Zing
 
-0.26 2021-01-04T22:35:13
+0.27 2021-02-12T16:55:59
+ - Add release updates
+ - Update dist.ini
+ - Update project files
+ - Update POD templates
+ - Add POD files
+ - Implement Zing::System
+ - Merge missing functionality from Zing::Zang classes
+ - Implement Zing::File
+ - Merge functionality from Zing::Zang classes
+ - Refactor GitHub actions workflow
+
+0.26 2021-01-04T22:35:19
+ - Built release version 0.26
  - Add release updates
  - Ensure Zing::Table objects inflate using current environment (#272)
 

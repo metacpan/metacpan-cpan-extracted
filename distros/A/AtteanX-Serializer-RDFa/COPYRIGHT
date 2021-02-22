@@ -7,15 +7,15 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
- t/bytes.t
-Copyright: Copyright 2019 Kjetil Kjernsmo.
+ t/fh.t
+Copyright: Copyright 2021 Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: README
- README.pod
- lib/AtteanX/Serializer/RDFa.pm
-Copyright: This software is copyright (c) 2017, 2018, 2019 by Kjetil Kjernsmo.
-License: GPL-1.0+ or Artistic-1.0
+Files: INSTALL
+ LICENSE
+ README.md
+Copyright: Unknown
+License: Unknown
 
 Files: COPYRIGHT
  CREDITS
@@ -23,33 +23,36 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: INSTALL
- LICENSE
-Copyright: Unknown
-License: Unknown
-
-Files: dist.ini
- t/fh.t
-Copyright: Copyright 2018 Kjetil Kjernsmo.
+Files: README
+ lib/AtteanX/Serializer/RDFa.pm
+Copyright: This software is copyright (c) 2017, 2018, 2019, 2021 by Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/01basic.t
-Copyright: This software is copyright (c) 2017 by Kjetil Kjernsmo.
+Files: dist.ini
+Copyright: Copyright 2018 Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: t/bytes.t
+Copyright: Copyright 2020 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+Copyright: This software is copyright (c) 2017 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2021 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2021 by the copyright holder(s).
  
  This is free software, licensed under:
  

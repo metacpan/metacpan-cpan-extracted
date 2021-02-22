@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = 'v0.42.1';
+our $VERSION = 'v0.43.1';
 
 =head1 NAME
 
@@ -38,6 +38,7 @@ and later
 use syntax 'maybe';
 
 use Moo;
+use MooX::Should;
 
 with 'OpenTracing::Role::Tracer';
 
@@ -99,7 +100,7 @@ construct a client object.
 
 has client => (
     is          => 'lazy',
-    isa         => Object,
+    should      => Object,
     handles     => [qw/send_span/],
     coerce
     => sub { is_plain_hashref $_[0] ? Client->new( %{$_[0]} ) : $_[0] },
@@ -110,7 +111,7 @@ has client => (
 
 has default_resource_name => (
     is          => 'ro',
-    isa         => Str,
+    should      => Str,
     predicate   => 1,
 );
 
@@ -118,7 +119,7 @@ has default_resource_name => (
 
 has default_service_name => (
     is          => 'ro',
-    isa         => Str,
+    should      => Str,
     predicate   => 1,
 );
 
@@ -126,7 +127,7 @@ has default_service_name => (
 
 has default_service_type => (
     is          => 'ro',
-    isa         => Str,
+    should      => Str,
     predicate   => 1,
 );
 
@@ -252,7 +253,7 @@ Theo van Hoesel <tvanhoesel@perceptyx.com>
 =head1 COPYRIGHT AND LICENSE
 
 'OpenTracing::Implementation::DataDog'
-is Copyright (C) 2019 .. 2020, Perceptyx Inc
+is Copyright (C) 2019 .. 2021, Perceptyx Inc
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0.

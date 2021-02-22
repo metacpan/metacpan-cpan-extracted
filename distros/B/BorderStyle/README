@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     2
 
 VERSION
-    This document describes version 2.0.4 of BorderStyle (from Perl
-    distribution BorderStyle), released on 2021-01-23.
+    This document describes version 2.0.6 of BorderStyle (from Perl
+    distribution BorderStyle), released on 2021-01-31.
 
 DESCRIPTION
     This document specifies a way to create and use border styles
@@ -105,12 +105,15 @@ SPECIFICATION
 
          [                           # y
          #x 0  1  2  3  4  5  6  7
-           [A, B, C, D,              # 0 Top border characters
+           [A, B, C, D],             # 0 Top border characters (if drawing header row)
            [E, F, G],                # 1 Vertical separators for header row
            [H, I, J, K, a, b],       # 2 Separator between header row and first data row
            [L, M, N],                # 3 Vertical separators for data row
            [O, P, Q, R, e, f, g, h], # 4 Separator between data rows
            [S, T, U, V],             # 5 Bottom border characters
+
+           [Ȧ, Ḃ, Ċ, Ḋ],             # 6 Top border characters (if not drawing header row)
+           [Ṣ, Ṭ, Ụ, Ṿ],             # 7 Bottom border characters (if drawing header row but there are no data rows)
          ]
 
         When drawing border, below is how the border characters will be
@@ -123,6 +126,24 @@ SPECIFICATION
          OPPPQPPPR        #4 Separator between data rows
          L   M   N        #3
          STTTUTTTV        #5 Bottom border characters
+
+        When not drawing a header row, these characters will be used
+        instead:
+
+         ȦḂḂḂĊḂḂḂḊ        #6 Top border characters (when not drawing header row)
+         L   M   N        #3 Vertical separators for data row
+         OPPPQPPPR        #4 Separator between data rows
+         L   M   N        #3
+         OPPPQPPPR        #4
+         L   M   N        #3
+         STTTUTTTV        #5 Bottom border characters
+
+        When drawing a header row and there are no data rows, these
+        characters will be used:
+
+         ABBBCBBBD        #0 Top border characters
+         E   F   G        #1 Vertical separators for header row
+         ṢṬṬṬỤṬṬṬṾ        #7 Bottom border characters (when there is header row but no data row)
 
         In table with column and row spans (demonstrates characters "a",
         "b", "e", "f", "g", "h"):

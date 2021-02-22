@@ -6,18 +6,14 @@ use warnings;
 use Net::Connection;
 use Net::Connection::Match;
 use Net::Connection::Sort;
-use Net::Connection::lsof;
 use Term::ANSIColor;
 use Proc::ProcessTable;
 use Text::ANSITable;
 
 # use Net::Connection::FreeBSD_sockstat if possible
-if ( $^O =~ /freebsd/ ) {
-	use Net::Connection::FreeBSD_sockstat;
-}
-else {
-	use Net::Connection::lsof;
-}
+#use if $^O eq 'freebsd', 'Net::Connection::FreeBSD_sockstat';
+#use if $^O ne 'freebsd', 'Net::Connection::lsof';
+use Net::Connection::lsof;
 
 =head1 NAME
 
@@ -25,11 +21,11 @@ Net::Connection::ncnetstat - The backend for ncnetstat, the colorized and enhanc
 
 =head1 VERSION
 
-Version 0.6.1
+Version 0.7.1
 
 =cut
 
-our $VERSION = '0.6.1';
+our $VERSION = '0.7.1';
 
 
 =head1 SYNOPSIS
@@ -177,12 +173,12 @@ sub run {
 	my $self = $_[0];
 
 	my @objects;
-	if ( $^O !~ /freebsd/ ) {
+#	if ( $^O !~ /freebsd/ ) {
 		@objects = &lsof_to_nc_objects;
-	}
-	else {
-		@objects = &sockstat_to_nc_objects;
-	}
+#	}
+#	else {
+#		@objects = &sockstat_to_nc_objects;
+#	}
 
 	my @found;
 	if ( defined( $self->{match} ) ) {

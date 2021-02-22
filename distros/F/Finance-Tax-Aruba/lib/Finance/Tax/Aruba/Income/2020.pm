@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Income::2020;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moose;
 use namespace::autoclean;
 
@@ -101,13 +101,23 @@ Finance::Tax::Aruba::Income::2020 - Income tax calculator for the year 2020
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
 Calculate your taxes and other social premiums for the year 2020.
+
+=head1 METHODS
+
+=head2 is_year
+
+Year selector method
+
+    if ($module->is_year(2020)) {
+        return "year is 2020";
+    }
 
 =head1 SEE ALSO
 

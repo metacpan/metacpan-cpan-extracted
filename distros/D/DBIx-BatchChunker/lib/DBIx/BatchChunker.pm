@@ -3,7 +3,7 @@ package DBIx::BatchChunker;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Run large database changes safely
 use version;
-our $VERSION = 'v0.940.2'; # VERSION
+our $VERSION = 'v0.940.4'; # VERSION
 
 use Moo;
 use MooX::StrictConstructor;
@@ -14,7 +14,6 @@ use Types::Standard        qw( Any Item Str Num Bool Undef ArrayRef HashRef Code
 use Types::Common::Numeric qw( PositiveInt PositiveOrZeroInt PositiveOrZeroNum );
 use Type::Utils;
 
-use Data::Float;
 use List::Util        1.33 (qw( min max sum any first ));  # has any/all/etc.
 use POSIX                   qw( ceil );
 use Scalar::Util            qw( blessed weaken );
@@ -26,7 +25,7 @@ use DBIx::BatchChunker::LoopState;
 # Don't export the above, but don't conflict with StrictConstructor, either
 use namespace::clean -except => [qw< new meta >];
 
-our $DB_MAX_ID = Data::Float::max_integer;  # used for progress_past_max
+our $DB_MAX_ID = ~0;  # used for progress_past_max
 
 #pod =encoding utf8
 #pod
@@ -579,9 +578,8 @@ has 'sleep' => (
 #pod
 #pod Turned off by default.
 #pod
-#pod B<NOTE:> If your RDBMS has a problem with a number as high as whatever L<max_integer|Data::Float/max_integer>
-#pod reports, you may want to set the C<$DB_MAX_ID> global variable in this module to
-#pod something lower.
+#pod B<NOTE:> If your RDBMS has a problem with a number as high as whatever C<~0> reports,
+#pod you may want to set the C<$DB_MAX_ID> global variable in this module to something lower.
 #pod
 #pod =cut
 
@@ -1536,7 +1534,7 @@ DBIx::BatchChunker - Run large database changes safely
 
 =head1 VERSION
 
-version v0.940.2
+version v0.940.4
 
 =head1 SYNOPSIS
 
@@ -1889,9 +1887,8 @@ miss any new rows that come up between L</calculate_ranges> and the end of the l
 
 Turned off by default.
 
-B<NOTE:> If your RDBMS has a problem with a number as high as whatever L<max_integer|Data::Float/max_integer>
-reports, you may want to set the C<$DB_MAX_ID> global variable in this module to
-something lower.
+B<NOTE:> If your RDBMS has a problem with a number as high as whatever C<~0> reports,
+you may want to set the C<$DB_MAX_ID> global variable in this module to something lower.
 
 =head3 single_rows
 
@@ -2095,7 +2092,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+This software is Copyright (c) 2018 - 2021 by Grant Street Group.
 
 This is free software, licensed under:
 

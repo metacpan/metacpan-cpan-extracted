@@ -7,19 +7,13 @@ use Test::More 1;
 use Config;
 use File::Spec;
 
-my $class = 'Module::Release';
+require 't/lib/setup_common.pl';
 
+my $class = 'Module::Release';
 subtest setup => sub {
 	use_ok( $class );
 	can_ok( $class, 'new' );
 	};
-
-BEGIN {
-	use File::Spec::Functions qw(rel2abs catfile);
-	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
-	require $file;
-	}
-
 
 my %required_env;
 my $debug_env_var = 'RELEASE_DEBUG';

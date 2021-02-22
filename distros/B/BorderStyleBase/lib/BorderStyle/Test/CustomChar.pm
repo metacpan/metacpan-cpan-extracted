@@ -1,9 +1,9 @@
 package BorderStyle::Test::CustomChar;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-19'; # DATE
+our $DATE = '2021-02-06'; # DATE
 our $DIST = 'BorderStyleBase'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use strict;
 use warnings;
@@ -48,7 +48,7 @@ BorderStyle::Test::CustomChar
 
 =head1 VERSION
 
-This document describes version 0.004 of BorderStyle::Test::CustomChar (from Perl distribution BorderStyleBase), released on 2020-06-19.
+This document describes version 0.009 of BorderStyle::Test::CustomChar (from Perl distribution BorderStyleBase), released on 2021-02-06.
 
 =head1 HOMEPAGE
 
@@ -60,7 +60,7 @@ Source repository is at L<https://github.com/perlancar/perl-BorderStyleBase>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyleBase>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-BorderStyleBase/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -72,7 +72,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

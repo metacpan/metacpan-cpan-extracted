@@ -13,7 +13,6 @@ build_requires:
   Test::JSON::Schema::Acceptance: '1.000'
   Test::Memory::Cycle: '0'
   Test::More: '0.96'
-  Test::Warnings: '0.027'
   lib: '0'
   open: '0'
   perl: '5.016'
@@ -45,43 +44,43 @@ no_index:
 provides:
   JSON::Schema::Draft201909:
     file: lib/JSON/Schema/Draft201909.pm
-    version: '0.022'
+    version: '0.023'
   JSON::Schema::Draft201909::Annotation:
     file: lib/JSON/Schema/Draft201909/Annotation.pm
-    version: '0.022'
+    version: '0.023'
   JSON::Schema::Draft201909::Document:
     file: lib/JSON/Schema/Draft201909/Document.pm
-    version: '0.022'
+    version: '0.023'
   JSON::Schema::Draft201909::Error:
     file: lib/JSON/Schema/Draft201909/Error.pm
-    version: '0.022'
+    version: '0.023'
   JSON::Schema::Draft201909::Result:
     file: lib/JSON/Schema/Draft201909/Result.pm
-    version: '0.022'
+    version: '0.023'
   JSON::Schema::Draft201909::Utilities:
     file: lib/JSON/Schema/Draft201909/Utilities.pm
-    version: '0.022'
+    version: '0.023'
   JSON::Schema::Draft201909::Vocabulary:
     file: lib/JSON/Schema/Draft201909/Vocabulary.pm
-    version: '0.022'
+    version: '0.023'
   JSON::Schema::Draft201909::Vocabulary::Applicator:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Applicator.pm
-    version: '0.022'
+    version: '0.023'
   JSON::Schema::Draft201909::Vocabulary::Content:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Content.pm
-    version: '0.022'
+    version: '0.023'
   JSON::Schema::Draft201909::Vocabulary::Core:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Core.pm
-    version: '0.022'
+    version: '0.023'
   JSON::Schema::Draft201909::Vocabulary::Format:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Format.pm
-    version: '0.022'
+    version: '0.023'
   JSON::Schema::Draft201909::Vocabulary::MetaData:
     file: lib/JSON/Schema/Draft201909/Vocabulary/MetaData.pm
-    version: '0.022'
+    version: '0.023'
   JSON::Schema::Draft201909::Vocabulary::Validation:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Validation.pm
-    version: '0.022'
+    version: '0.023'
 requires:
   B: '0'
   Carp: '0'
@@ -117,7 +116,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Draft201909/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Draft201909
   repository: https://github.com/karenetheridge/JSON-Schema-Draft201909.git
-version: '0.022'
+version: '0.023'
 x_Dist_Zilla:
   perl:
     version: '5.033006'
@@ -828,7 +827,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.022
+          tag: v0.023
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

@@ -3,7 +3,7 @@ use 5.14.0;
 
 package WebService::GoogleAPI::Client;
 
-our $VERSION = '0.24';    # VERSION
+our $VERSION = '0.25';    # VERSION
 
 use Data::Dump qw/pp/;
 use Moo;
@@ -426,7 +426,7 @@ WebService::GoogleAPI::Client - Google API Discovery and SDK
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 

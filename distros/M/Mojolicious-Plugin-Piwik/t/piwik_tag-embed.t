@@ -11,7 +11,7 @@ my $t = Test::Mojo->new;
 my $app = $t->app;
 
 $app->plugin(Piwik => {
-  url => 'sojolicio.us/piwik',
+  url => 'sojolicious.example/piwik',
   site_id => 2
 });
 
@@ -34,7 +34,7 @@ $t->get_ok('/embed-stash')
   ->text_is('p', 'not ok');
 
 $app->plugin(Piwik => {
-  url => 'sojolicio.us/piwik',
+  url => 'sojolicious.example/piwik',
   site_id => 2,
   embed => 1
 });

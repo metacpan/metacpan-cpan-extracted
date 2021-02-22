@@ -1,6 +1,6 @@
 package TOML::Tiny::Tokenizer;
 # ABSTRACT: tokenizer used by TOML::Tiny
-$TOML::Tiny::Tokenizer::VERSION = '0.10';
+$TOML::Tiny::Tokenizer::VERSION = '0.11';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -62,7 +62,7 @@ sub next_token {
     my $newline = !!($prev eq 'EOL' || $prev eq 'table' || $prev eq 'array_table');
 
     for ($self->{source}) {
-      /\G$WS+/gc;               # ignore whitespace
+      /\G$WS+/gc;                # ignore whitespace
       /\G$Comment$/mgc && next;  # ignore comments
 
       last when /\G$/gc;
@@ -251,7 +251,7 @@ TOML::Tiny::Tokenizer - tokenizer used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 AUTHOR
 
@@ -259,7 +259,7 @@ Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Jeff Ober.
+This software is copyright (c) 2021 by Jeff Ober.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

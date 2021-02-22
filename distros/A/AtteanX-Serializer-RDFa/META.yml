@@ -28,7 +28,7 @@ optional_features: {}
 provides:
   AtteanX::Serializer::RDFa:
     file: lib/AtteanX/Serializer/RDFa.pm
-    version: '0.100'
+    version: '0.110'
 requires:
   Attean: '0.019'
   Moo: '0'
@@ -43,6 +43,8 @@ resources:
   homepage: https://metacpan.org/release/AtteanX-Serializer-RDFa
   license: http://dev.perl.org/licenses/
   repository: git://github.com/kjetilk/p5-atteanx-serializer-rdfa.git
-version: '0.100'
+version: '0.110'
+x_contributors:
+  - 'Jonas Smedegaard (JONASS) <jonass@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

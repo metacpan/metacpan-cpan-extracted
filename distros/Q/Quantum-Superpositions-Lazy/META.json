@@ -60,6 +60,6 @@
          "url" : "https://github.com/brtastic/perl-quantum-superpositions-lazy"
       }
    },
-   "version" : "1.07",
+   "version" : "1.08",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

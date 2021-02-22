@@ -19,13 +19,13 @@ requires:
   B::Hooks::EndOfScope: '0'
   Carp: '0'
   DBIx::Class::Core: '0'
-  Exporter::Extensible: '0'
+  Exporter::Extensible: '0.08'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/nrdvana/perl-DBIx-Class-ResultDDL/issues
   repository: https://github.com/nrdvana/perl-DBIx-Class-ResultDDL.git
-version: '1.00'
+version: '1.01'
 x_contributors:
   - 'Veesh Goldman <rabbiveesh@gmail.com>'
 x_generated_by_perl: v5.26.3

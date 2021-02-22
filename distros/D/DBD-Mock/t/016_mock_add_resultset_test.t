@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 
 BEGIN {
     use_ok('DBD::Mock');  
@@ -367,5 +368,24 @@ $dbh->{mock_add_resultset} = {
     is( $dbh->{mock_last_insert_ids}{y}, 5, "If we provide a last_insert_id value then the one stored against the table shouldn't be updated");
 }
 
+
+$dbh->{mock_add_resultset} = {
+    sql => 'SELECT x FROM y WHERE z = ?',
+    callback => sub {
+        return (
+            fields => [ 'a' ],
+            rows => [ 1 ],
+        );
+    },
+};
+
+{
+    my $sth = $dbh->prepare('SELECT x FROM y WHERE z = ?');
+    isa_ok($sth, 'DBI::st');
+
+    throws_ok {
+        my $rows = $sth->execute(1);
+    } qr/DBD::Mock error - a resultset's callback should return rows as an arrayref of arrayrefs/, "If we don't provided an arrayref or arrayrefs for the rows then that's an error";
+}
 
 done_testing();

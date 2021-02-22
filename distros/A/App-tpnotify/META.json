@@ -1,0 +1,73 @@
+{
+   "abstract" : "Notifies translationproject.org about new POT file",
+   "author" : [
+      "Sergey Poznyakoff <gray@gnu.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-tpnotify",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Basename" : "2.84",
+            "File::Path" : "2.08",
+            "File::Temp" : "0.22",
+            "Getopt::Long" : "2.34",
+            "IPC::Open2" : "1.04",
+            "LWP::UserAgent" : "0",
+            "Locale::PO" : "0.27",
+            "Mail::Message" : "2.115",
+            "Mail::Send" : "2.09",
+            "Pod::Man" : "2.25",
+            "Pod::Usage" : "1.51",
+            "Sys::Hostname" : "0",
+            "URI" : "0",
+            "Unix::Sysexits" : "0.06",
+            "perl" : "5.016001"
+         }
+      }
+   },
+   "provides" : {
+      "App::tpnotify" : {
+         "file" : "tpnotify",
+         "version" : "1.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "gray+tpnotify@gnu.org.ua",
+         "web" : "https://puszcza.gnu.org.ua/bugs/?group=tpnotify"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.gnu.org.ua/tpnotify.git",
+         "web" : "http://git.gnu.org.ua/cgit/tpnotify.git/"
+      }
+   },
+   "version" : "1.03"
+}

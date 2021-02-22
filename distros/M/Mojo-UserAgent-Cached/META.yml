@@ -1,4 +1,5 @@
 ---
+abstract: 'Caching, Non-blocking I/O HTTP, Local file and WebSocket user agent'
 author:
   - 'Nicolas Mendoza <mendoza@pvv.ntnu.no>'
 build_requires:
@@ -12,7 +13,7 @@ configure_requires:
 distribution_type: module
 dynamic_config: 1
 generated_by: 'Module::Install version 1.19'
-license: perl
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
@@ -31,12 +32,14 @@ requires:
   File::Path: 0
   File::Spec: 0
   List::Util: '1.29'
-  Mojolicious: '7.15'
+  Mojolicious: '8.72'
   POSIX: 0
   Readonly: 0
   String::Truncate: 0
   Time::HiRes: 0
   perl: 5.10.1
 resources:
+  bugtracker: https://github.com/nicomen/mojo-useragent-cached/issues
   license: http://dev.perl.org/licenses/
-version: '1.12'
+  repository: http://github.com/nicomen/mojo-useragent-cached
+version: '1.16'

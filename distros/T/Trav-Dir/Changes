@@ -1,0 +1,11 @@
+Revision history for Perl module Trav::Dir
+
+0.02 2021-02-21
+
+- Document more about differences with File::Find
+- Fix bug with minsize / maxsize
+
+0.01 2021-02-19
+
+- Initial version
+

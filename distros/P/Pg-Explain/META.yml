@@ -19,31 +19,34 @@ name: Pg-Explain
 provides:
   Pg::Explain:
     file: lib/Pg/Explain.pm
-    version: '1.04'
+    version: '1.05'
   Pg::Explain::Analyzer:
     file: lib/Pg/Explain/Analyzer.pm
-    version: '1.04'
+    version: '1.05'
   Pg::Explain::From:
     file: lib/Pg/Explain/From.pm
-    version: '1.04'
+    version: '1.05'
   Pg::Explain::FromJSON:
     file: lib/Pg/Explain/FromJSON.pm
-    version: '1.04'
+    version: '1.05'
   Pg::Explain::FromText:
     file: lib/Pg/Explain/FromText.pm
-    version: '1.04'
+    version: '1.05'
   Pg::Explain::FromXML:
     file: lib/Pg/Explain/FromXML.pm
-    version: '1.04'
+    version: '1.05'
   Pg::Explain::FromYAML:
     file: lib/Pg/Explain/FromYAML.pm
-    version: '1.04'
+    version: '1.05'
+  Pg::Explain::JIT:
+    file: lib/Pg/Explain/JIT.pm
+    version: '1.05'
   Pg::Explain::Node:
     file: lib/Pg/Explain/Node.pm
-    version: '1.04'
+    version: '1.05'
   Pg::Explain::StringAnonymizer:
     file: lib/Pg/Explain/StringAnonymizer.pm
-    version: '1.04'
+    version: '1.05'
 requires:
   Clone: '0'
   Digest::SHA: '0'
@@ -55,5 +58,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://gitlab.com/depesz/Pg--Explain.git
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

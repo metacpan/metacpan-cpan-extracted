@@ -1,0 +1,259 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+JSON::Server - JSON-only server
+
+=head1 SYNOPSIS
+
+    
+    use JSON::Server;
+    my $js = JSON::Server->new (handler => \& hello, port => '7777', data => 'OK');
+    $js->serve ();
+    
+    sub hello
+    {
+        my ($data, $input) = @_;
+        return {%$input, hello => 'world', data => $data};
+    }
+    
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Server-0.01/examples/synopsis.pl> in the distribution.)
+
+
+Then test your server:
+
+    $ perl examples/synopsis.pl &
+    $ telnet localhost 7777
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+    {"I'm feeling lucky":"punk"}
+    {
+            "I'm feeling lucky":"punk",
+            "data":"OK",
+            "hello":"world"
+    }
+    Connection closed by foreign host.
+
+
+=head1 VERSION
+
+This documents version 0.01 of JSON-Server
+corresponding to L<git commit 557295f1d182c1a8425a5dd13c74c27a153f8c93|https://github.com/benkasminbullock/json-server/commit/557295f1d182c1a8425a5dd13c74c27a153f8c93> released on Sun Feb 21 17:00:48 2021 +0900.
+
+=head1 DESCRIPTION
+
+This sets up an internet socket through which JSON passes. Each JSON
+message should be followed by a zero byte.
+
+=head1 METHODS
+
+=head2 new
+
+    my $js = JSON::Server->new (handler => \& something, data => $my_data,
+		                port => '3737');
+
+The possible options are as follows.
+
+=over
+
+=item data
+
+Data to pass the handler. If omitted, the handler will get an
+undefined value as its first argument.
+
+=item handler
+
+Your handler (callback).
+
+    sub handler
+    {
+        my ($data, $input) = @_;
+        return {error => "I don't like this input"};
+    }
+    my $js = JSON::Server->new (handler => \&handler);
+
+The handler function should accept two arguments, the first is the
+user data which is supplied to L</new> and the second is the parsed
+input from the socket. It should return one value which is then passed
+back through the socket as JSON. The user handler function does not
+need to serialize or deserialize, that is done by this module. 
+
+Usually a handler would take a hash reference as an argument and
+return a hash reference as result, but it can accept and return either
+an array reference or a scalar, depending on what your client sends.
+
+If you do not supply a handler, the server prints a warning about the
+lack of a handler and substitutes an echo function which merely
+returns your input back to you. This is useful for testing. The echo
+server is not exported, but if you want to get the echo server
+directly without a warning being printed, use
+
+    my $server = JSON::Server->new (
+        port => '1234',
+        handler => \&JSON::Server::echo,
+    );
+
+=item port
+
+The port to serve on. This needs to be specified, there is no default
+value.
+
+=back
+
+=head2 serve
+
+    $js->serve ();
+
+Serves JSON on the specified port. Input is JSON followed by a zero
+byte, output is JSON followed by a zero byte. Non-JSON input results
+in a response of the form C<{"error":"invalid JSON"}> being
+returned. What is or is not valid JSON is decided by
+L<JSON::Parse/valid_json>.
+
+Messages to the server need to be terminated with a zero byte (a byte
+containing a zero). The return message is also terminated with a zero
+byte. This will need to be removed before parsing the JSON at your
+end. The need for a zero byte might be removed at some point, but it
+removes the necessity for having to parse and re-parse the input to
+find the end of the JSON, since a zero byte is invalid as JSON.
+
+In early versions of this module the server was closing the connection
+after each message, but it now keeps the connection open
+indefinitely. You can make the server close the connection with a
+control message.
+
+=head1 JSON
+
+=head2 Booleans
+
+Unlike many programming languages, Perl doesn't have C<true> and
+C<false>, which means that boolean literals (C<true> and C<false>) can
+become something of an issue when using JSON. 
+
+If you need booleans, import L<JSON::Create::Bool> from the
+L<JSON::Create> distribution.
+
+    use JSON::Create::Bool;
+
+in your code and then
+
+    my $value = true;
+
+etc. to get C<true> and C<false> literals in the JSON.
+
+Perl's built-in C<undef> will produce JSON C<null>.
+
+=head2 Unicode
+
+Perl doesn't allow character-encoded strings through sockets, so
+character input is automatically downgraded on output using
+L<JSON::Create/downgrade_utf8>, and since JSON is a UTF-8 only format,
+all input is upgraded to character input using
+L<JSON::Parse/upgrade_utf8>.
+
+=head1 CONTROLS
+
+=head2 Controlling the server
+
+To control the server, send an object (a hash reference) with the key
+C<JSON::Server::control>:
+
+    send_to_server ({'JSON::Server::control' => 'stop'});
+
+The server accepts the following commands:
+
+=over
+
+=item close
+
+C<{"JSON::Server::control":"close"}> causes the server to close the
+connection. It prints a response
+C<{"JSON::Server::response":"closing"}> to acknowledge the control
+message.
+
+=item stop
+
+C<{"JSON::Server::control":"stop"}> causes the server to return from
+its event loop. It prints a response
+C<{"JSON::Server::response":"stopping"}> to acknowledge the control
+message.
+
+=back
+
+Whatever else is sent in the object with the control message is
+discarded.
+
+=head2 JSON::Client
+
+There is an example client module called L<JSON::Client> in the
+distribution. See this distribution's F<t/> (test) directory for
+examples of use.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<IO::Select>
+
+At the moment JSON::Server is non-forking and reads from multiple
+sockets, so it uses IO::Select to choose the socket to read from.
+
+=item L<IO::Socket>
+
+This is used to communicate the information to and from the client.
+
+=item L<JSON::Create>
+
+This is used to encode the response JSON from a native structure.
+
+=item L<JSON::Parse>
+
+This is used to decode the received JSON into a native structure.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item JSON RPC
+
+=over
+
+=item L<JRPC>
+
+=item L<JSON::RPC::Dispatcher>
+
+=item L<JSON::RPC>
+
+=item L<JSON::RPC2::TwoWay>
+
+=item L<RPC::JSON>
+
+=back
+
+=back
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

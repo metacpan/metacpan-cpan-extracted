@@ -8,13 +8,14 @@ my $builder = Module::Build->new(
   include_dirs => 'include',
   'build_requires' => {
     'Module::Build' => '0.28',
-    'Test::More' => '0.89'
+    'Test::More' => '0.90'
   },
   'configure_requires' => {
     'Module::Build' => '0.28'
   },
   'requires' => {
     'Exporter' => '5.57',
+    'MIME::Base64' => '0',
     'XSLoader' => '0',
     'strict' => '0',
     'warnings' => '0'

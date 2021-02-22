@@ -1,4 +1,4 @@
-TAP::Formatter::JUnitREGRU formats TAP output as JUnit XML
+TAP::Formatter::JUnit formats TAP output as JUnit XML
 
 Copyright (C) 2008, Graham TerMarsch.  All Rights Reserved.
 

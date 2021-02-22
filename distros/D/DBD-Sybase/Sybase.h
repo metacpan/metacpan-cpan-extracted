@@ -122,11 +122,11 @@ void     syb_st_destroy _((SV *sth, imp_sth_t *imp_sth));
 int      syb_st_blob_read _((SV *sth, imp_sth_t *imp_sth,
                 int field, long offset, long len, SV *destrv, long destoffset));
 int      syb_ct_get_data _((SV *sth, imp_sth_t *imp_sth, 
-			    int column, SV *bufrv, int buflen));
+                int column, SV *bufrv, int buflen));
 int      syb_ct_data_info _((SV *sth, imp_sth_t *imp_sth, int action, 
-			     int column, SV *attr));
+               int column, SV *attr));
 int      syb_ct_send_data _((SV *sth, imp_sth_t *imp_sth, char *buffer, 
-			     int size));
+               int size));
 int      syb_ct_prepare_send _((SV *sth, imp_sth_t *));
 int      syb_ct_finish_send _((SV *sth, imp_sth_t *));
 int      syb_st_STORE_attrib _((SV *sth, imp_sth_t *imp_sth, SV *keysv, SV *valuesv));
@@ -135,7 +135,7 @@ SV      *syb_st_FETCH_attrib _((SV *sth, imp_sth_t *imp_sth, SV *keysv));
 int      syb_describe _((SV *sth, imp_sth_t *imp_sth));
 int      syb_bind_ph  _((SV *sth, imp_sth_t *imp_sth,
                 SV *param, SV *value, IV sql_type, SV *attribs,
-				int is_inout, IV maxlen));
+                int is_inout, IV maxlen));
 
 
 /* prototypes for module-specific functions */

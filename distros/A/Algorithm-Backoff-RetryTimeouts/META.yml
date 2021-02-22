@@ -1,0 +1,35 @@
+---
+abstract: 'A backoff-style retry algorithm with adjustable timeout support'
+author:
+  - 'Grant Street Group <developers@grantstreet.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.1101'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-Backoff-RetryTimeouts
+provides:
+  Algorithm::Backoff::RetryTimeouts:
+    file: lib/Algorithm/Backoff/RetryTimeouts.pm
+    version: v1.0.0
+requires:
+  Algorithm::Backoff::Exponential: '0.009'
+  Storable: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://github.com/GrantStreetGroup/Algorithm-Backoff-RetryTimeouts/issues
+  repository: git://github.com/GrantStreetGroup/Algorithm-Backoff-RetryTimeouts.git
+version: v1.0.0
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0
+x_static_install: 1

@@ -39,3 +39,7 @@ v1.09	2020-05-25
 
 v1.10	2020-05-26
 	- Add CONTRIBUTING.md
+	- Fix a POD comment.
+
+v1.11	2021-02-19
+	- Add check and support for Crypt::Argon2 function argon2_needs_rehash() since version 0.008.

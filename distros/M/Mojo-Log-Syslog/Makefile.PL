@@ -22,6 +22,12 @@ WriteMakefile(
 		url => 'git://git.gnu.org.ua/mojosyslog.git',
 		web => 'http://git.gnu.org.ua/cgit/mojosyslog.git/',
 	    },
-	}
+            bugtracker => {
+	        web => 'https://puszcza.gnu.org.ua/bugs/?group=mojosyslog',
+		mailto => 'gray+mojosyslog@gnu.org.ua'
+	    },
+	},
+        provides => Module::Metadata->provides(version => '1.4',
+					       dir => 'lib')
     }
 );

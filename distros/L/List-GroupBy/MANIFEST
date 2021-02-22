@@ -8,5 +8,6 @@ lib/List/GroupBy.pm
 minil.toml
 t/00_compile.t
 t/01_groupBy.t
+t/02_returnRefs.t
 META.yml
 MANIFEST

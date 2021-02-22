@@ -11,11 +11,11 @@ Net::Connection::Match - Runs a stack of checks to match Net::Connection objects
 
 =head1 VERSION
 
-Version 0.4.0
+Version 0.5.0
 
 =cut
 
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.0';
 
 
 =head1 SYNOPSIS
@@ -78,7 +78,8 @@ our $VERSION = '0.4.0';
 This initializes a new check object.
 
 It takes one value and thht is a hash ref with the key checks.
-This is a array of hashes.
+This is a array of hashes. If the array is empty, it will default
+to using the All test.
 
 If new fails, it will die.
 
@@ -123,7 +124,12 @@ sub new{
 	}
 	# Will never match anything.
 	if ( ! defined $args{checks}[0] ){
-		die ('Nothing in the checks array');
+		$args{checks}[0] = {
+			type   => 'All',
+			invert => 0,
+			args   => {}
+		};
+
 	}
 	if ( ref( %{ $args{checks}[0] } ) eq 'HASH' ){
 		die ('The first item in the checks array is not a hash');
@@ -143,9 +149,6 @@ sub new{
 				checks=>[],
 				};
     bless $self;
-
-	# will hold the created check objects
-	my @checks;
 
 	# Loads up each check or dies if it fails to.
 	my $check_int=0;

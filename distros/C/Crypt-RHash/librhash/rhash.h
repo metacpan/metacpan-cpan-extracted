@@ -51,6 +51,8 @@ enum rhash_ids
 	RHASH_CRC32C    = 0x4000000,
 	RHASH_SNEFRU128 = 0x8000000,
 	RHASH_SNEFRU256 = 0x10000000,
+	RHASH_BLAKE2S   = 0x20000000,
+	RHASH_BLAKE2B   = 0x40000000,
 
 	/**
 	 * The bit-mask containing all supported hash functions.
@@ -62,7 +64,7 @@ enum rhash_ids
 		RHASH_HAS160 | RHASH_SNEFRU128 | RHASH_SNEFRU256 |
 		RHASH_SHA224 | RHASH_SHA256 | RHASH_SHA384 | RHASH_SHA512 |
 		RHASH_SHA3_224 | RHASH_SHA3_256 | RHASH_SHA3_384 | RHASH_SHA3_512 |
-		RHASH_EDONR256 | RHASH_EDONR512,
+		RHASH_EDONR256 | RHASH_EDONR512 | RHASH_BLAKE2S | RHASH_BLAKE2B,
 
 	RHASH_GOST = RHASH_GOST94, /* deprecated constant name */
 	RHASH_GOST_CRYPTOPRO = RHASH_GOST94_CRYPTOPRO, /* deprecated constant name */
@@ -70,7 +72,7 @@ enum rhash_ids
 	/**
 	 * The number of supported hash functions.
 	 */
-	RHASH_HASH_COUNT = 29
+	RHASH_HASH_COUNT = 31
 };
 
 /**
@@ -418,25 +420,7 @@ RHASH_API rhash_uptr_t rhash_transmit(
 #define RMSG_GET_OPENSSL_MASK 11
 #define RMSG_GET_OPENSSL_SUPPORTED_MASK 12
 #define RMSG_GET_OPENSSL_AVAILABLE_MASK 13
-#define RMSG_GET_LIBRHASH_VERSION 14
-
-#define RMSG_BT_ADD_FILE 32
-#define RMSG_BT_SET_OPTIONS 33
-#define RMSG_BT_SET_ANNOUNCE 34
-#define RMSG_BT_SET_PIECE_LENGTH 35
-#define RMSG_BT_SET_PROGRAM_NAME 36
-#define RMSG_BT_GET_TEXT 37
-#define RMSG_BT_SET_BATCH_SIZE 38
-
-/**
- * RMSG_BT_SET_OPTIONS message option: generate private BitTorrent.
- */
-#define RHASH_BT_OPT_PRIVATE 1
-/**
- * RMSG_BT_SET_OPTIONS message option: calculate infohash without torrent file body.
- */
-#define RHASH_BT_OPT_INFOHASH_ONLY 2
-
+#define RMSG_GET_LIBRHASH_VERSION 20
 
 /* HELPER MACROS */
 

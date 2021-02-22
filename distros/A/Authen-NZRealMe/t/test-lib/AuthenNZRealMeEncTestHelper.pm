@@ -50,6 +50,9 @@ sub regenerate_saml_response_post_file {
 
     my $encrypted_xml;
     if($target_id) {
+        my $signer_algorithm     = $args{algorithms}{signer}     or die "need signer algorithm";
+        my $random_key_algorithm = $args{algorithms}{random_key} or die "need random_key algorithm";
+        my $encrypt_algorithm    = $args{algorithms}{encrypt}    or die "need encrypt algorithm";
 
         # Add a signature (using incorrect key if a bad sig is required)
 
@@ -60,7 +63,7 @@ sub regenerate_saml_response_post_file {
         my $signer = Authen::NZRealMe->class_for('xml_signer')->new(
             key_file          => $idp_key_file,
             pub_cert_file     => $idp_pub_cert_file,
-            algorithm         => 'rsa_sha256',
+            algorithm         => $signer_algorithm,
             id_attr           => 'ID',
             include_x509_cert => 1,
         );
@@ -76,7 +79,8 @@ sub regenerate_saml_response_post_file {
         );
 
         $encrypted_xml = $encrypter->encrypt_one_element($signed_xml,
-            algorithm         => 'xenc_aes128cbc',
+            algorithm         => $encrypt_algorithm,
+            key_algorithm     => $random_key_algorithm,
             target_id         => $target_id,
         );
         $encrypted_xml =~ s{\A\s*<[?]xml.*?[?]>\s+}{};

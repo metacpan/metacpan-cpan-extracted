@@ -5,6 +5,7 @@ use warnings;
 use XML::Parser::Expat;
 use Archive::Zip ();
 use File::Temp;
+use Carp;
 
 sub new {
     my ($class, $archive) = @_;
@@ -17,13 +18,13 @@ sub new {
         _buf       => '',
     }, $class;
 
-    my $fh = File::Temp->new( SUFFIX => '.xml' );
+    my $fh = File::Temp->new( SUFFIX => '.xml' ) or confess "couldn't create temporary file: $!";
 
     my $handle = $archive->shared_strings or return $self;
-    die 'Failed to write temporally file: ', $fh->filename
+    confess 'Failed to write temporary file: ', $fh->filename
         unless $handle->extractToFileNamed($fh->filename) == Archive::Zip::AZ_OK;
 
-    my $parser = XML::Parser::Expat->new;
+    my $parser = XML::Parser::Expat->new(Namespaces=>1);
     $parser->setHandlers(
         Start => sub { $self->_start(@_) },
         End   => sub { $self->_end(@_) },
@@ -67,3 +68,28 @@ sub _char {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Data::XLSX::Parser::SharedStrings - SharedStrings class of Data::XLSX::Parser
+
+=head1 DESCRIPTION
+
+Data::XLSX::Parser::SharedStrings parses the SharedStrings of the workbook and provides methods to get the shared string by the passed index and the count of contained shared strings.
+
+=head1 METHODS
+
+=head2 get
+
+get the shared string by the passed index
+
+=head2 count
+
+get the count of contained shared strings.
+
+=head1 AUTHOR
+
+Daisuke Murase <typester@cpan.org>
+
+=cut

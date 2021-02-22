@@ -292,9 +292,9 @@ elsif($command eq 'stats') {
 		['name', 'max files cnt', 'current files cnt', '%'],
 		map {[
 			$_->{name},
-			$_->{max_files_cnt},
+			($_->{is_done} ? $_->{max_files_cnt} : '? (unfinished)'),
 			$_->{files_cnt},
-			($_->{max_files_cnt} ? int($_->{files_cnt} / $_->{max_files_cnt} * 100).'%' : '-'),
+			($_->{is_done} ? int($_->{files_cnt} / $_->{max_files_cnt} * 100).'%' : ''),
 		]} map {$state{db}->{backups}->unpack($_)} @{ $state{db}->{backups} }
 	]);
 }

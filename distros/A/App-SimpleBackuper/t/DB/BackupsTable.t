@@ -12,6 +12,7 @@ describe BackupsTable => sub {
 			id				=> 33,
 			files_cnt		=> 8888,
 			max_files_cnt	=> 99999,
+			is_done			=> 1,
 			name			=> 'test',
 		};
 		

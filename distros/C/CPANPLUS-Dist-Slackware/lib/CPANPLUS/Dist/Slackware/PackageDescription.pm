@@ -3,7 +3,7 @@ package CPANPLUS::Dist::Slackware::PackageDescription;
 use strict;
 use warnings;
 
-our $VERSION = '1.029';
+our $VERSION = '1.030';
 
 use English qw( -no_match_vars );
 
@@ -539,7 +539,7 @@ CPANPLUS::Dist::Slackware::PackageDescription - Collect information on a new Sla
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware::PackageDescription version 1.029.
+This document describes CPANPLUS::Dist::Slackware::PackageDescription version 1.030.
 
 =head1 SYNOPSIS
 
@@ -735,8 +735,8 @@ Andreas Voegele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 BUGS AND LIMITATIONS
 
-Please report any bugs to C<bug-cpanplus-dist-slackware at rt.cpan.org>, or
-through the web interface at L<https://rt.cpan.org/>.
+Please report any bugs using the issue tracker at
+L<https://github.com/graygnuorg/CPANPLUS-Dist-Slackware/issues>.
 
 =head1 LICENSE AND COPYRIGHT
 

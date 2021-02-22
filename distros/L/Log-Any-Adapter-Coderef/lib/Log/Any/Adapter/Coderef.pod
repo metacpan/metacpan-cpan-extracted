@@ -1,0 +1,68 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Log::Any::Adapter::Coderef
+at lib/Log/Any/Adapter/Coderef.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Log::Any::Adapter::Coderef - arbitrary code handlers for L<Log::Any> messages
+
+=head1 SYNOPSIS
+
+ use JSON::MaybeUTF8 qw(:v1);
+ use Log::Any::Adapter qw(Coderef) => sub {
+  my ($data) = @_;
+  STDERR->print(encode_json_utf8($data) . "\n");
+ };
+
+=head1 DESCRIPTION
+
+Provides support for sending log messages through a custom C<sub>, for cases when
+you want to do something that isn't provided by existing adapters.
+
+Currently takes a single C<$code> parameter as a callback. This will be
+called for every log message, passing a hashref which has the following keys:
+
+=over 4
+
+=item * C<epoch> - current time, as a floating-point epoch value
+
+=item * C<severity> - log level, e.g. C<info> or C<debug>
+
+=item * C<message> - the formatted log message
+
+=item * C<host> - current hostname
+
+=item * C<pid> - current process ID (L<perlvar/$$>)
+
+=item * C<stack> - arrayref of stacktrace entries, see L<caller>
+
+=back
+
+Additional keys may be added in future, for example structured data.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Log::Any::Adapter::Base>
+
+L<delegate_method_to_slot|Log::Any::Adapter::Base/delegate_method_to_slot>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth C<< <TEAM@cpan.org> >>.
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2020-2021. Licensed under the same terms as Perl itself.
+

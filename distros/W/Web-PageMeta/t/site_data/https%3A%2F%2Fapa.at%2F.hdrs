@@ -1,0 +1,16 @@
+$VAR1 = {
+          'URL' => 'https://apa.at/',
+          'connection' => 'keep-alive',
+          'last-modified' => 'Sat, 20 Feb 2021 16:47:02 GMT',
+          'content-length' => '134044',
+          'cache-control' => 'max-age=3, must-revalidate',
+          'server' => 'nginx',
+          'Status' => '200',
+          'content-type' => 'text/html; charset=UTF-8',
+          'x-xss-protection' => '1; mode=block',
+          'x-content-type-options' => 'nosniff',
+          'x-frame-options' => 'SAMEORIGIN',
+          'vary' => 'Accept-Encoding, Cookie',
+          'date' => 'Sat, 20 Feb 2021 16:57:34 GMT',
+          'Reason' => 'OK'
+        };

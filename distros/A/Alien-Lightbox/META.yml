@@ -1,23 +1,34 @@
 ---
-name: Alien-Lightbox
-version: 2.03.3.3
+abstract: '(DEPRECATED) installing and finding Lightbox JS'
 author:
-  - Graham TerMarsch (cpan@howlingfrog.com)
-abstract: installing and finding Lightbox JS
-license: perl
-resources:
-  license: ~
-requires:
-  Alien::scriptaculous: 0
-  perl: 5.6.0
+  - 'Graham TerMarsch (cpan@howlingfrog.com)'
 build_requires:
-  Archive::Zip: 0
-  Test::Exception: 0
+  Archive::Zip: '0'
+  Test::Exception: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Lightbox
 provides:
   Alien::Lightbox:
     file: lib/Alien/Lightbox.pm
-    version: 2.03.3.3
-generated_by: Module::Build version 0.32
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: v2.3.3.4
+requires:
+  Alien::scriptaculous: '0'
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v2.3.3.4
+x_bugtracker:
+  web: https://github.com/bleargh45/Alien-Lightbox/issues
+x_deprecated: 1
+x_repository:
+  type: git
+  url: git://github.com/bleargh45/Alien-Lightbox.git
+  web: https://github.com/bleargh45/Alien-Lightbox
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,10 +7,10 @@ use Struct::Diff 'patch';
 use Exporter 'import';
 our @EXPORT_OK = qw/ patch_state /;
 
-our $VERSION = "v0.0.13";
+our $VERSION = "v0.0.21";
 
 sub patch_state ($struct, $diff) {
-    patch($struct, $diff);
+    patch($struct, $diff) if defined $diff;
 
     return $struct;
 }

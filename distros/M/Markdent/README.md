@@ -4,13 +4,13 @@ Markdent - An event-based Markdown parser toolkit
 
 # VERSION
 
-version 0.38
+version 0.39
 
 # SYNOPSIS
 
     use Markdent::Simple::Document;
 
-    my $parser = Markdent::Simple::Document->new();
+    my $parser = Markdent::Simple::Document->new;
     my $html   = $parser->markdown_to_html(
         title    => 'My Document',
         markdown => $markdown,
@@ -141,6 +141,7 @@ Dave Rolsky <autarch@urth.org>
 - Denis Ibaev <dionys@gmail.com>
 - Jason McIntosh <jmac@appleseed-sc.com>
 - Jonas Smedegaard <dr@jones.dk>
+- Konrad Bucheli <konrad.bucheli@gmx.ch>
 - Polina Shubina <925043@mai.com>
 - Shlomi Fish <shlomif@shlomifish.org>
 - Stefan Hornburg (Racke) <racke@linuxia.de>
@@ -148,7 +149,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

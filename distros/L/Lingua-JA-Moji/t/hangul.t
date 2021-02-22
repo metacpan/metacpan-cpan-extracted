@@ -1,8 +1,6 @@
-use warnings;
-use strict;
-use Lingua::JA::Moji qw/kana2hangul hangul2kana/;
-use utf8;
-use Test::More;
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;
 my $builder = Test::More->builder;
 binmode $builder->output,         ":utf8";
 binmode $builder->failure_output, ":utf8";

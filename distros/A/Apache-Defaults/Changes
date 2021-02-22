@@ -1,3 +1,5 @@
+1.03 2021-01-12
+	- Change bugtracker address.
 1.02 2019-08-25
 	- Make sure constructor never croaks if on_error is set to 'return'
 	  Improve diagnostics.

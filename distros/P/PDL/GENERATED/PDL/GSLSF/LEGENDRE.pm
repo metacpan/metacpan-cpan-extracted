@@ -200,7 +200,7 @@ The parameter norm should be:
 lmax is the maximum degree l.
 csphase should be (-1) to INCLUDE the Condon-Shortley phase factor (-1)^m, or (+1) to EXCLUDE it.
 
-See L<gsl_sf_legendre_array_index> to get the value of C<l> and C<m> in the returned vector.
+See L</gsl_sf_legendre_array_index> to get the value of C<l> and C<m> in the returned vector.
 
 
 

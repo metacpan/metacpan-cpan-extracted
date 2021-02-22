@@ -4,7 +4,7 @@
       "Wieger Opmeer <wiegerop@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,7 @@
       "runtime" : {
          "requires" : {
             "JSON::MaybeXS" : "0",
-            "JSON::RPC2::TwoWay" : "0.02",
+            "JSON::RPC2::TwoWay" : "0.05",
             "MojoX::NetstringStream" : "0.06",
             "Mojolicious" : "6.00",
             "perl" : "5.010"
@@ -41,7 +41,9 @@
          "web" : "https://github.com/a6502/JobCenter-Client-Mojo"
       }
    },
-   "version" : "0.40",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+   "version" : "0.41",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -56,10 +56,10 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTTP-Message/issues
   homepage: https://github.com/libwww-perl/HTTP-Message
   repository: https://github.com/libwww-perl/HTTP-Message.git
-version: '6.27'
+version: '6.28'
 x_Dist_Zilla:
   perl:
-    version: '5.030002'
+    version: '5.030003'
   plugins:
     -
       class: Dist::Zilla::Plugin::MetaResources
@@ -157,7 +157,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Author::OALDERS/InstallGuide'
       version: '1.200013'
@@ -344,7 +344,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.30.1
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.047'
@@ -352,7 +352,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.28.0
+          git_version: 2.30.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -436,7 +436,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.30.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -449,11 +449,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.27
+          tag: v6.28
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.30.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -491,7 +491,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.30.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -505,7 +505,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.30.1
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.047'
@@ -666,11 +666,12 @@ x_contributors:
   - 'Toru Yamaguchi <zigorou@cpan.org>'
   - 'uid39246 <uid39246>'
   - 'Ville Skyttä <ville.skytta@iki.fi>'
+  - 'Vít Strádal <vit.stradal@gooddata.com>'
   - 'William Storey <wstorey@maxmind.com>'
   - 'Yuri Karaban <tech@askold.net>'
   - 'Zakariyya Mughal <zaki.mughal@gmail.com>'
   - 'Zefram <zefram@fysh.org>'
-x_generated_by_perl: v5.30.2
+x_generated_by_perl: v5.30.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

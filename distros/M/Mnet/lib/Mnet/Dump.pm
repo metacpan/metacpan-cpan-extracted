@@ -5,26 +5,23 @@ package Mnet::Dump;
 # required modules
 use warnings;
 use strict;
+use Mnet;
 use Data::Dumper;
 
 
 
 sub line {
 
-# $line = Mnet::Dump::line($value)
+# $out = Mnet::Dump::line($val)
 # purpose: returns single line sorted Data::Dumper output for input value
 # $value: input variable to dump, can be a scalar, hash, array, reference, etc
-# $line: output Data::Dumper line, examples: undef, "value", [ list ], { etc }
+# $out: output Data::Dumper line, examples: undef, "value", [ list ], { etc }
 
     # read input value, dump it as a sorted single Data::Dumper line
-    my $value = shift;
-    my $value_dumper = Data::Dumper->new([$value]);
-    $value_dumper->Indent(0);
-    $value_dumper->Sortkeys(1);
-    $value_dumper->Useqq(1);
-    my $value_dump = $value_dumper->Dump;
-    $value_dump =~ s/(^\$VAR1 = |;\n*$)//g;
-    return $value_dump;
+    my $val = shift;
+    my $out = Data::Dumper->new([$val])->Indent(0)->Sortkeys(1)->Useqq(1)->Dump;
+    $out =~ s/(^\$VAR1 = |;\n*$)//g;
+    return $out;
 }
 
 

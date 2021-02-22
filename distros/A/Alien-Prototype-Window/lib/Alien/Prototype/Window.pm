@@ -17,7 +17,7 @@ use Alien::scriptaculous;
 # Version number
 ###############################################################################
 our $PWC_VERSION = '1.3';
-our $VERSION = '1.3.3';
+our $VERSION = '1.3.4';
 
 ###############################################################################
 # Subroutine:   version()
@@ -121,7 +121,7 @@ sub install {
 
 =head1 NAME
 
-Alien::Prototype::Window - installing and finding Prototype Window Class
+Alien::Prototype::Window - (DEPRECATED) installing and finding Prototype Window Class
 
 =head1 SYNOPSIS
 
@@ -133,6 +133,8 @@ Alien::Prototype::Window - installing and finding Prototype Window Class
   Alien::Prototype::Window->install( $my_destination_directory );
 
 =head1 DESCRIPTION
+
+B<DEPRECATED> - DO NOT USE
 
 Please see L<Alien> for the manifesto of the Alien namespace.
 

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Networking delegate for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.21';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.22';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction Neo4j::Driver::Transaction::Bolt);
@@ -188,7 +188,7 @@ Neo4j::Driver::Net::Bolt - Networking delegate for Neo4j Bolt
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 DESCRIPTION
 

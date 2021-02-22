@@ -17,8 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "WHO::GrowthReference::Table",
   "PREREQ_PM" => {
+    "Data::Section::Seekable::Reader" => 0,
     "Exporter" => "5.57",
     "Statistics::Standard_Normal" => 0,
+    "Text::CSV" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -28,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,12 +38,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Section::Seekable::Reader" => 0,
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Statistics::Standard_Normal" => 0,
   "Test::More" => 0,
+  "Text::CSV" => 0,
   "strict" => 0,
   "warnings" => 0
 );

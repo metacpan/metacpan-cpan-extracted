@@ -164,4 +164,19 @@ subtest(
     }
 );
 
+subtest(
+    '1 digit year in 2015',
+    sub {
+        my $epoch
+            = DateTime->new( year => 2015, month => 1, day => 1 )->epoch;
+        no warnings 'redefine';
+        ## no critic (Variables::ProtectPrivateVars)
+        local *DateTime::_core_time = sub {$epoch};
+
+        my $parser = DateTime::Format::ISO8601->new;
+        my $dt     = $parser->parse_datetime('-6W155');
+        is( $dt->ymd, '2016-04-15' );
+    }
+);
+
 done_testing();

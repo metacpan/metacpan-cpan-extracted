@@ -7,7 +7,7 @@ use warnings;
 package Acme::ConspiracyTheory::Random;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.013';
+our $VERSION   = '0.014';
 
 use Exporter::Shiny qw( theory bad_punctuation );
 use List::Util 1.54 ();
@@ -108,6 +108,7 @@ sub shady_group {
 			{ plural => 0, name => 'Twitter' },
 			{ plural => 0, name => 'Facebook' },
 			{ plural => 0, name => 'Google' },
+			{ plural => 0, name => 'Monsanto' },
 			{ plural => 0, name => 'the Wall Street establishment', shortname => 'Wall Street' },
 			{ plural => 1, name => 'people at 10 Downing Street', shortname => "Downing Street" },
 			{ plural => 0, name => 'Goldman Sachs' },
@@ -122,6 +123,7 @@ sub shady_group {
 					['Venus', 'the Venutians'],
 					['Mars', 'the Martians'],
 					['Pluto', 'the Plutonians'],
+					['Andromeda', 'the Andromedans'],
 					['the moon', 'the moonlings'],
 					['the Counter-Earth', 'the anti-Earthlings'],
 				);
@@ -136,7 +138,11 @@ sub shady_group {
 	};
 	
 	_MERGE_( $redstring, shady_group => $xx );
-	return $xx->{name};
+	my $name = $xx->{name};
+	if ($name =~ /ists$/ && $name !~ /^the/) {
+		$name = "the $name";
+	}
+	return $name;
 }
 
 sub real_animal {
@@ -217,6 +223,7 @@ sub shady_project {
 		'the Global Warming Hoax',
 		'the New Chronology',
 		'the Great Replacement',
+		'the Great Reset',
 		'the LGBT Agenda',
 		'the Kalergi Plan',
 		'Eurabia',
@@ -314,6 +321,7 @@ sub chemicals {
 		'5G',
 		'antimatter',
 		'dark matter',
+		'fluoride',
 	);
 	
 	_MERGE_( $redstring, chemicals => $chemicals );
@@ -1186,6 +1194,12 @@ sub hidden_truth {
 					"MKUltra is still happening";
 				},
 				sub {
+					shady_group( $redstring );
+					$redstring->{antagonist} //= $redstring->{shady_group};
+					$redstring->{topic} = { name => 'avalanches', plural => 1 };
+					$redstring->{antagonist}{name} . " was responsible for the Dyatlov Pass incident";
+				},
+				sub {
 					$redstring->{topic} = { name => 'Jeffrey Epstein', plural => 0 };
 					"Epstein didn't kill himself";
 				},
@@ -1219,6 +1233,11 @@ sub hidden_truth {
 					"aliens abduct people for probing";
 				},
 				sub {
+					$redstring->{topic} = { name => 'CERN', plural => 0 };
+					$redstring->{random_place} //= 'Switzerland';
+					"the large hadron collider will destroy the planet";
+				},
+				sub {
 					$redstring->{topic} = { name => 'steal beams', plural => 1 };
 					$redstring->{random_place} //= 'New York';
 					"9/11 was an inside job";
@@ -1230,6 +1249,10 @@ sub hidden_truth {
 						'the Boston Marathon Bombing',
 						'Malaysia Airlines Flight 370',
 						'the JFK assassination',
+						'Project Monarch',
+						'the 1993 WTC bombing',
+						'the 2017 hurricane season (Project Geostorm)',
+						'Deepwater Horizon',
 					);
 					$redstring->{topic} = { name => 'false flag operations', plural => 1 };
 					"$badevent was orchestrated by the US government";

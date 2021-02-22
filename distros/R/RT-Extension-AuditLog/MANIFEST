@@ -1,4 +1,5 @@
 Changes
+dist.ini
 gitignore
 html/Callbacks/AuditLog/autohandler/Default
 inc/Module/Install.pm
@@ -18,4 +19,3 @@ lib/RT/Extension/AuditLog.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
-README

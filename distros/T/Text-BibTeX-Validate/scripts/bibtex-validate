@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Scalar::Util qw( blessed );
+use Text::BibTeX;
+use Text::BibTeX::Validate qw( validate_BibTeX );
+use Text::BibTeX::Validate::Warning;
+
+@ARGV = ( '-' ) unless @ARGV;
+
+for my $filename (@ARGV) {
+    my $bibfile = Text::BibTeX::File->new( $filename )
+        || die "$filename: $!\n";
+    while( my $entry = Text::BibTeX::Entry->new( $bibfile ) ) {
+        my @warnings = validate_BibTeX( $entry );
+
+        for my $warning (@warnings) {
+            if( blessed $warning &&
+                $warning->isa( Text::BibTeX::Validate::Warning:: ) ) {
+                $warning->{file} = $filename;
+                $warning->{key} = $entry->{key};
+                warn "$0: $warning\n";
+            } else {
+                warn "$0: $filename: $entry->{key}: $warning";
+            }
+        }
+    }
+}

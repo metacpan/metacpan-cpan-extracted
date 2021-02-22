@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
 package Object::Pad::MOP::Class;
 
 use v5.14;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 # This is an XS-implemented object type provided by Object::Pad itself
 require Object::Pad;
@@ -64,6 +64,16 @@ contain at most one item.
 
 Returns a list of roles implemented by this class, as
 L<Object::Pad::MOP::Class> instances.
+
+=head2 compose_role
+
+   $metaclass->compose_role( $rolename )
+   $metaclass->compose_role( $rolemeta )
+
+Adds a new role to the list of those implemented by the class.
+
+The new role can be specified either as a plain string giving its name, or as
+an C<Object::Pad::MOP::Class> meta instance directly.
 
 =head2 add_BUILD
 

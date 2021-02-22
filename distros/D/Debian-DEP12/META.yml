@@ -1,0 +1,28 @@
+---
+abstract: 'interface to Debian DEP 12 format'
+author:
+  - 'Andrius Merkys <merkys@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Text::BibTeX: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Debian-DEP12
+requires:
+  Data::Validate::Email: '0'
+  Data::Validate::URI: '0'
+  Text::BibTeX::Validate: v0.3.0
+  YAML::XS: '0.69'
+resources:
+  bugtracker: https://github.com/merkys/debian-dep12/issues
+  homepage: https://search.cpan.org/dist/Debian-DEP12
+  repository: git://github.com/merkys/debian-dep12.git
+version: 0.1.0
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

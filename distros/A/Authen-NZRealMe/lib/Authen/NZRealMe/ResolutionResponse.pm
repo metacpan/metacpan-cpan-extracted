@@ -1,5 +1,5 @@
 package Authen::NZRealMe::ResolutionResponse;
-$Authen::NZRealMe::ResolutionResponse::VERSION = '1.20';
+$Authen::NZRealMe::ResolutionResponse::VERSION = '1.21';
 use warnings;
 use strict;
 use Carp      qw(croak);

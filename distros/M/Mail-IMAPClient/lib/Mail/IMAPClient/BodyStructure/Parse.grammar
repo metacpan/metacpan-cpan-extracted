@@ -73,6 +73,7 @@ bodyMD5:	NIL | STRING
 bodylang:	NIL | STRING | STRINGS
 bodyextra:	NIL | STRING | STRINGS
 bodyloc:	NIL | STRING
+bodyextensions:  NIL | STRING
 
 personalname:	NIL | STRING
 sourceroute:	NIL | STRING
@@ -120,7 +121,7 @@ basicfields: 	bodysubtype bodyparms(?) bodyid(?)
 	}
 
 textmessage: 	TEXT <commit> basicfields textlines(?) bodyMD5(?)
-		bodydisp(?) bodylang(?) bodyextra(?)
+		bodydisp(?) bodylang(?) bodyextra(?) bodyextensions(s?)
 	{
 	  $return = $item{basicfields} || {};
 	  $return->{bodytype} = 'TEXT';
@@ -160,7 +161,7 @@ nestedmessage:	rfc822message <commit> bodyparms bodyid bodydesc bodyenc
 	}
 
 multipart:	subpart(s) <commit> bodysubtype
-		bodyparms(?) bodydisp(?) bodylang(?) bodyloc(?) bodyextra(?)
+		bodyparms(?) bodydisp(?) bodylang(?) bodyloc(?) bodyextra(?) bodyextensions(s?)
 		<defer: $subpartCount = 0>
 	{ $return =
 	    { bodysubtype   => $item{bodysubtype}

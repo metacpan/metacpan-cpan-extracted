@@ -8,9 +8,6 @@
 /* It is very important here to list all the terminals first, and in order compatible */
 /* with bootstrap_grammar_L0_terminals[] and bootstrap_grammar_L0_rules[] */
 typedef enum bootstrap_grammar_L0_enum {
-  L0_TERMINAL_WHITESPACE = 0,
-  L0_TERMINAL_PERL_COMMENT,
-  L0_TERMINAL_CPLUSPLUS_COMMENT,
   L0_TERMINAL_OP_DECLARE_ANY_GRAMMAR,
   L0_TERMINAL_OP_DECLARE_TOP_GRAMMAR,
   L0_TERMINAL_OP_DECLARE_LEX_GRAMMAR,
@@ -44,9 +41,6 @@ typedef enum bootstrap_grammar_L0_enum {
   L0_TERMINAL_SEMICOLON,
   L0_TERMINAL_GRAPH_ASCII_CHARACTERS,
   /* ----- Non terminals ------ */
-  L0_META_WHITESPACE,
-  L0_META_PERL_COMMENT,
-  L0_META_CPLUSPLUS_COMMENT,
   L0_META_OP_DECLARE_ANY_GRAMMAR,
   L0_META_OP_DECLARE_TOP_GRAMMAR,
   L0_META_OP_DECLARE_LEX_GRAMMAR,
@@ -64,7 +58,7 @@ typedef enum bootstrap_grammar_L0_enum {
   L0_META_BRACKETED_NAME,
   L0_META_BRACKETED_NAME_STRING,
   L0_META_QUOTED_STRING,
-  L0_META_QUOTED_NAME,
+  L0_META_QUOTED_STRING_LITERAL,
   L0_META_CHARACTER_CLASS,
   L0_META_REGULAR_EXPRESSION,
   L0_META_GRAPH_ASCII_NAME
@@ -73,9 +67,6 @@ typedef enum bootstrap_grammar_L0_enum {
 /* All non-terminals are listed here */
 bootstrap_grammar_meta_t bootstrap_grammar_L0_metas[] = {
   /* Identifier                           Description                              Start  Discard :discard[on] :discard[off] */
-  { L0_META_WHITESPACE,                   L0_JOIN_G1_META_WHITESPACE,                  0,       0,           0,            0 },
-  { L0_META_PERL_COMMENT,                 L0_JOIN_G1_META_PERL_COMMENT,                0,       0,           0,            0 },
-  { L0_META_CPLUSPLUS_COMMENT,            L0_JOIN_G1_META_CPLUSPLUS_COMMENT,           0,       0,           0,            0 },
   { L0_META_OP_DECLARE_ANY_GRAMMAR,       L0_JOIN_G1_META_OP_DECLARE_ANY_GRAMMAR,      0,       0,           0,            0 },
   { L0_META_OP_DECLARE_TOP_GRAMMAR,       L0_JOIN_G1_META_OP_DECLARE_TOP_GRAMMAR,      0,       0,           0,            0 },
   { L0_META_OP_DECLARE_LEX_GRAMMAR,       L0_JOIN_G1_META_OP_DECLARE_LEX_GRAMMAR,      0,       0,           0,            0 },
@@ -93,7 +84,7 @@ bootstrap_grammar_meta_t bootstrap_grammar_L0_metas[] = {
   { L0_META_BRACKETED_NAME,               L0_JOIN_G1_META_BRACKETED_NAME,              0,       0,           0,            0 },
   { L0_META_BRACKETED_NAME_STRING,        "bracketed name string",                     0,       0,           0,            0 },
   { L0_META_QUOTED_STRING,                L0_JOIN_G1_META_QUOTED_STRING,               0,       0,           0,            0 },
-  { L0_META_QUOTED_NAME,                  L0_JOIN_G1_META_QUOTED_NAME,                 0,       0,           0,            0 },
+  { L0_META_QUOTED_STRING_LITERAL,        L0_JOIN_G1_META_QUOTED_STRING_LITERAL,       0,       0,           0,            0 },
   { L0_META_CHARACTER_CLASS,              L0_JOIN_G1_META_CHARACTER_CLASS,             0,       0,           0,            0 },
   { L0_META_REGULAR_EXPRESSION,           L0_JOIN_G1_META_REGULAR_EXPRESSION,          0,       0,           0,            0 },
   { L0_META_GRAPH_ASCII_NAME,             L0_JOIN_G1_META_GRAPH_ASCII_NAME,            0,       0,           0,            0 }
@@ -134,42 +125,8 @@ __DATA__
   /* --------------------------------------------------------------------------------------------------------------------------------- */
   /*                                                             TERMINALS                                                             */
   /* --------------------------------------------------------------------------------------------------------------------------------- */
-  /* --------------------------------------------------------------------------------------------------------------------------------- */
-  { L0_TERMINAL_WHITESPACE, MARPAESLIF_TERMINAL_TYPE_REGEX, NULL,
-    "[\\s]+",
-#ifndef MARPAESLIF_NTRACE
-    "\x09\x20xxx", "\x09\x20"
-#else
-    NULL, NULL
-#endif
-  },
-  /* --------------------------------------------------------------------------------------------------------------------------------- */
-  /* Taken from Regexp::Common::comment, $RE{comment}{Perl} */
-  /* Perl stringified version is: (?:(?:#)(?:[^\n]*)(?:\n)) */
-  /* \z added to match the end of the buffer (ESLIF will ask more data if this is not EOF as well) */
-  { L0_TERMINAL_PERL_COMMENT, MARPAESLIF_TERMINAL_TYPE_REGEX, "u",
-    "(?:(?:#)(?:[^\\n]*)(?:\\n|\\z))",
-#ifndef MARPAESLIF_NTRACE
-    "# Comment up to the end of the buffer", "# Again a comment"
-#else
-    NULL, NULL
-#endif
-  },
-  /* --------------------------------------------------------------------------------------------------------------------------------- */
-  /* Taken from Regexp::Common::comment, $RE{comment}{'C++'}, which includes the C language comment */
-  /* Perl stringified version is: (?:(?:(?://)(?:[^\n]*)(?:\n))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/))*)(?:\*\/))) */
-  /* \z added to match the end of the buffer in the // mode (ESLIF will ask more data if this is not EOF as well) */
-  { L0_TERMINAL_CPLUSPLUS_COMMENT, MARPAESLIF_TERMINAL_TYPE_REGEX, "u",
-    "(?:(?:(?://)(?:[^\\n]*)(?:\\n|\\z))|(?:(?:/\\*)(?:(?:[^\\*]+|\\*(?!/))*)(?:\\*/)))",
-#ifndef MARPAESLIF_NTRACE
-    "// Comment up to the end of the buffer", "// Again a comment"
-#else
-    NULL, NULL
-#endif
-  },
-  /* --------------------------------------------------------------------------------------------------------------------------------- */
   { L0_TERMINAL_OP_DECLARE_ANY_GRAMMAR, MARPAESLIF_TERMINAL_TYPE_REGEX, NULL,
-    ":\\[\\d+\\]:=",
+    ":\\[[\\d]+\\]:=",
 #ifndef MARPAESLIF_NTRACE
     ":[0123]:=", ":[0"
 #else
@@ -380,12 +337,6 @@ __DATA__
 
 bootstrap_grammar_rule_t bootstrap_grammar_L0_rules[] = {
   /*
-    lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb  actions
-  */
-  { L0_META_WHITESPACE,                       "whitespace",                                   MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_WHITESPACE                       }, -1,                        -1,      -1,             0, NULL },
-  { L0_META_PERL_COMMENT,                     "perl comment",                                 MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_PERL_COMMENT                     }, -1,                        -1,      -1,             0, NULL },
-  { L0_META_CPLUSPLUS_COMMENT,                "cplusplus comment",                            MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_CPLUSPLUS_COMMENT                }, -1,                        -1,      -1,             0, NULL },
-  /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb actions
   */
   { L0_META_OP_DECLARE_ANY_GRAMMAR,           "op declare any grammar",                       MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_OP_DECLARE_ANY_GRAMMAR           }, -1,                        -1,      -1,             0, NULL },
@@ -423,7 +374,7 @@ bootstrap_grammar_rule_t bootstrap_grammar_L0_rules[] = {
   { L0_META_QUOTED_STRING,                    "quoted string 2",                              MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { L0_TERMINAL_QUOTED_STRING,
                                                                                                                                      L0_TERMINAL_SEMICOLON,
                                                                                                                                      L0_TERMINAL_STRING_MODIFIERS                 }, -1,                        -1,      -1,             0, NULL },
-  { L0_META_QUOTED_NAME,                      "quoted name",                                  MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_QUOTED_STRING                    }, -1,                        -1,      -1,             0, NULL },
+  { L0_META_QUOTED_STRING_LITERAL,            "quoted string literal",                        MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_QUOTED_STRING                    }, -1,                        -1,      -1,             0, NULL },
   { L0_META_CHARACTER_CLASS,                  "character class 1",                            MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_CHARACTER_CLASS_REGEXP           }, -1,                        -1,      -1,             0, NULL },
   { L0_META_CHARACTER_CLASS,                  "character class 2",                            MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { L0_TERMINAL_CHARACTER_CLASS_REGEXP,
                                                                                                                                      L0_TERMINAL_SEMICOLON,

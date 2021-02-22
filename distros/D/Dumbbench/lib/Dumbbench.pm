@@ -4,7 +4,7 @@ use warnings;
 use Carp ();
 use Time::HiRes ();
 
-our $VERSION = '0.111';
+our $VERSION = '0.501';
 
 require Dumbbench::Result;
 require Dumbbench::Stats;
@@ -370,7 +370,7 @@ will turn it off entirely.
 
 =head2 add_instances
 
-Takes one ore more instances of subclasses of L<Dumbbench::Instance>
+Takes one or more instances of subclasses of L<Dumbbench::Instance>
 as argument. Each of those is one I<benchmark>, really.
 They are run in sequence and reported separately.
 

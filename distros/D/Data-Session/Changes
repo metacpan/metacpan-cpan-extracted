@@ -1,5 +1,14 @@
 Revision history for Perl extension Data::Session.
 
+1.18  2017-08-14T11:13:00
+	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Replace File::Slurp with File::Slurper to help fix CPAN Tester error reports.
+	- Use File::Temp to replace hard-coded occurances of /tmp in t/*.ini. This is in response
+		to reports from CPAN Testers.
+	- Reformat Makefile.PL, and update bugtracker to github.
+	- Switch from the Artistic licence to the Perl one.
+
 1.17  2015-02-14T09:38:00
 	- Fix a bug in Data::Session.get_my_drivers(). See RT#111844. Many thanx to Slaven Rezic
 		for the report, diagnosis and patch.

@@ -41,6 +41,7 @@ use warnings;
 use strict;
 use parent qw( Mnet::Log::Conditional );
 use Carp;
+use Mnet;
 use Mnet::Dump;
 use Mnet::Log::Conditional qw( DEBUG INFO WARN FATAL NOTICE );
 use Mnet::Opts::Cli::Cache;

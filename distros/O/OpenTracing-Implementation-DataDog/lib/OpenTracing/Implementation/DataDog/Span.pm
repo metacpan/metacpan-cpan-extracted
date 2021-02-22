@@ -6,11 +6,12 @@ OpenTracing::Implementation::DataDog::Span - A DataDog Implementation for a Span
 
 =cut
 
-our $VERSION = 'v0.42.1';
+our $VERSION = 'v0.43.1';
 
 use syntax 'maybe';
 
 use Moo;
+use MooX::Should;
 
 with 'OpenTracing::Role::Span';
 
@@ -42,7 +43,7 @@ DataDog requires that its length should not exceed 100 characters.
 =cut
 
 has '+operation_name' => (
-    isa => Str->where( 'length($_) <= 100' ),
+    should => Str->where( 'length($_) <= 100' ),
 );
 
 
@@ -94,7 +95,7 @@ Theo van Hoesel <tvanhoesel@perceptyx.com>
 =head1 COPYRIGHT AND LICENSE
 
 'OpenTracing::Implementation::DataDog'
-is Copyright (C) 2019 .. 2020, Perceptyx Inc
+is Copyright (C) 2019 .. 2021, Perceptyx Inc
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0.

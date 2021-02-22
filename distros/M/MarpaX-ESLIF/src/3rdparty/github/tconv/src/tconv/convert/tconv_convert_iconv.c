@@ -22,7 +22,7 @@ void  *tconv_convert_iconv_new(tconv_t tconvp, const char *tocodes, const char *
   tconv_convert_iconv_context_t *tconv_convert_iconv_contextp = NULL;
 
   tconv_convert_iconv_contextp = (tconv_convert_iconv_context_t *) malloc(sizeof(tconv_convert_iconv_context_t));
-  if (tconv_convert_iconv_contextp == NULL) {
+  if (TCONV_UNLIKELY(tconv_convert_iconv_contextp == NULL)) {
     return NULL;
   }
 

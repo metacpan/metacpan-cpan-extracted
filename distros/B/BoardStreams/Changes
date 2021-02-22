@@ -1,5 +1,45 @@
 Revision history for Perl extension BoardStreams
 
+v0.0.21 2021-02-21T18:21:32Z
+
+    - client pings the server, not the opposite
+
+v0.0.20 2021-02-20T18:16:37Z
+
+    - changed cleanup sub's parameters
+
+v0.0.19 2021-02-20T13:42:48Z
+
+    - workaround for upstream database issue
+
+v0.0.18 2021-02-20T03:19:11Z
+
+    - action, request, leave handlers require client to have joined
+    - subsequent joins do not execute the join handler
+    - create_channel returns false if channel already existed
+    - allow lock_state when IOLoop is not running
+    - more efficient global_cleanup
+
+v0.0.17 2021-02-18T04:32:19Z
+
+    - added cleanup_interval config option
+    - patchState (and patch_state) do nothing if diff is null/undefined
+    - changed meaning of heartbeat_timeout
+    - fixed race condition in global_cleanup method
+
+v0.0.16 2021-02-16T20:53:00Z
+
+    - fixed bug where Perl client had trouble processing nonref state
+
+v0.0.15 2021-02-15T12:44:55Z
+
+    - fixed missing dependency
+    - upped dependency on Mojo::Pg
+
+v0.0.14 2021-02-12T10:48:26Z
+
+    - circumvention of an upstream database issue
+
 v0.0.13 2021-02-10T17:41:31Z
 
     - added begin and $tx->lock_state methods

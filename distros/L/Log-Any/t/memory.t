@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 34;
+use Test::More tests => 37;
 use Log::Any;
 use Log::Any::Adapter::Util qw(cmp_deeply);
 
@@ -44,6 +44,7 @@ isa_ok( $Foo::log->adapter, $nullclass, 'Foo::log before set' );
 isa_ok( $Bar::log->adapter, $nullclass, 'Bar::log before set' );
 isa_ok( $Baz::log->adapter, $nullclass, 'Baz::log before set' );
 isa_ok( $main_log->adapter, $nullclass, 'main_log before set' );
+ok( !Log::Any->has_consumer, 'no consumer yet' );
 
 my $entry = Log::Any::Adapter->set( { category => qr/Foo|Bar/ }, "+$memclass" );
 
@@ -51,6 +52,7 @@ isa_ok( $Foo::log->adapter, $memclass,  'Foo::log after first set' );
 isa_ok( $Bar::log->adapter, $memclass,  'Bar::log after first set' );
 isa_ok( $Baz::log->adapter, $nullclass, 'Baz::log after first set' );
 isa_ok( $main_log->adapter, $nullclass, 'main_log after first set' );
+ok( Log::Any->has_consumer, 'consumer active' );
 
 my $entry2 =
   Log::Any::Adapter->set( { category => qr/Baz|main/ }, "+$memclass" );
@@ -59,6 +61,7 @@ isa_ok( $Foo::log->adapter, $memclass, 'Foo::log after second set' );
 isa_ok( $Bar::log->adapter, $memclass, 'Bar::log after second set' );
 isa_ok( $Baz::log->adapter, $memclass, 'Baz::log after second set' );
 isa_ok( $main_log->adapter, $memclass, 'main_log after second set' );
+ok( Log::Any->has_consumer, 'consumer active' );
 
 ok( $Foo::log ne $Bar::log, 'Foo::log and Bar::log are different' );
 is( $main_log->adapter, Log::Any->get_logger()->adapter, "memoization - no cat" );

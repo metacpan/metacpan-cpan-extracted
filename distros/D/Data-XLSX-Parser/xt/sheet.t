@@ -18,7 +18,6 @@ isa_ok $workbook, 'Data::XLSX::Parser::Workbook';
 my @names = $workbook->names;
 is scalar @names, 2, '2 workbook ok';
 
-my $sheet_id = $workbook->sheet_id($names[0]);
-my $sheet = $parser->sheet($sheet_id);
+my $sheet_rid = $workbook->sheet_rid($names[0]);
 
 done_testing;

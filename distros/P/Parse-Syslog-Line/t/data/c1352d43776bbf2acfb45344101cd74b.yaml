@@ -1,0 +1,27 @@
+---
+expected:
+  content: '10.1.2.3 - - [18/Feb/2021:17:07:26 +0000] "CONNECT hcaptcha.com:443 HTTP/1.1" 200 3879 "-" "-" TCP_TUNNEL:HIER_DIRECT'
+  date: 2021-02-18
+  date_raw: Feb 18 17:07:26 2021
+  datetime_obj: ~
+  datetime_raw: Feb 18 17:07:26 2021
+  datetime_str: 2021-02-18T17:07:26Z
+  domain: example.com
+  epoch: 1613668046
+  facility: ~
+  facility_int: ~
+  host: webproxy101
+  host_raw: webproxy101.example.com
+  message: '(squid-1)[58016]: 10.1.2.3 - - [18/Feb/2021:17:07:26 +0000] "CONNECT hcaptcha.com:443 HTTP/1.1" 200 3879 "-" "-" TCP_TUNNEL:HIER_DIRECT'
+  message_raw: '2021 Feb 18 17:07:26 webproxy101.example.com (squid-1)[58016]: 10.1.2.3 - - [18/Feb/2021:17:07:26 +0000] "CONNECT hcaptcha.com:443 HTTP/1.1" 200 3879 "-" "-" TCP_TUNNEL:HIER_DIRECT'
+  offset: Z
+  preamble: ~
+  priority: ~
+  priority_int: ~
+  program_name: (squid-1)
+  program_pid: 58016
+  program_raw: '(squid-1)[58016]'
+  program_sub: ~
+  time: 17:07:26
+name: Squid log parsing
+string: '2021 Feb 18 17:07:26 webproxy101.example.com (squid-1)[58016]: 10.1.2.3 - - [18/Feb/2021:17:07:26 +0000] "CONNECT hcaptcha.com:443 HTTP/1.1" 200 3879 "-" "-" TCP_TUNNEL:HIER_DIRECT'

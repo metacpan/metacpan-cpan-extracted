@@ -212,7 +212,7 @@ if ($opt_i) {
     print STDERR "-"x length($rev),"\n";
     print STDERR $rev;
     print STDERR "-"x length($rev),"\n\n";
-    print STDERR "Copyright (c) 2002-2011 Petr Pajas, 2012-2019 E. Choroba.\n";
+    print STDERR "Copyright (c) 2002-2011 Petr Pajas, 2012-2021 E. Choroba.\n";
     print STDERR "This is free software, you may use it and distribute it under\n";
     print STDERR "either the GNU GPL Version 2, or under the Perl Artistic License.\n";
   }
@@ -778,7 +778,7 @@ Displays the help as manual page.
 
 Petr Pajas <pajas@matfyz.cz>
 
-Copyright 2000-2011 Petr Pajas, 2012-2019 E. Choroba. All rights reserved.
+Copyright 2000-2011 Petr Pajas, 2012-2021 E. Choroba. All rights reserved.
 
 =head1 SEE ALSO
 

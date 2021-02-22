@@ -1,5 +1,13 @@
 Revision history for Perl extension Data-XLSX-Parser
 
+0.20 2021-02-16T10:32:42Z
+
+    - bug fix: Fix 1 second misalignment of time about rounding timestamp.
+    - improvement: Now row_event_handler gets 2nd args as row detail information.
+    - improvement: Documents and Pods are more fulfilled.
+    - notice: Data::XLSX::Parser->sheet() has retired. use sheet_id() instead.
+    - notice: Data::XLSX::Parser->Workbook::sheet_id() always returns sheet ID. If you need relationship ID for Data::XLSX::Parser->sheet_by_rid(), use sheet_rid() instead.
+
 0.14 2015-12-21T12:19:11Z
 
     - bug fix: revised implements for 0.13_01

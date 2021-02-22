@@ -8,6 +8,7 @@ use Test::More 0.98;
 use Data::Dump::Color qw(dump dd ddx);
 
 local $Data::Dump::Color::COLOR = 0;
+local $Data::Dump::Color::COLOR_THEME = "Default16";
 subtest dump => sub {
     is_deeply(dump([1, 2, 3]), "[1, 2, 3]");
 };

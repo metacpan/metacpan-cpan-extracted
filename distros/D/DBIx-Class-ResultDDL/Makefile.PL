@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     "B::Hooks::EndOfScope" => 0,
     "Carp" => 0,
     "DBIx::Class::Core" => 0,
-    "Exporter::Extensible" => 0,
+    "Exporter::Extensible" => "0.08",
     "strict" => 0,
     "warnings" => 0
   },
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "1.00",
+  "VERSION" => "1.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +39,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "DBIx::Class::Core" => 0,
   "Data::Dumper" => 0,
-  "Exporter::Extensible" => 0,
+  "Exporter::Extensible" => "0.08",
   "Test2::V0" => 0,
   "strict" => 0,
   "warnings" => 0

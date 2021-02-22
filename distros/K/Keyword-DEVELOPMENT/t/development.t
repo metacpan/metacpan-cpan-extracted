@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 
 BEGIN {
-    # just in case someone turned this one
     $ENV{PERL_KEYWORD_DEVELOPMENT} = 1;
 }
 use lib 'lib';

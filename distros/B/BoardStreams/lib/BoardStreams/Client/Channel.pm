@@ -11,7 +11,7 @@ use Data::Dump 'dump';
 use Storable 'dclone';
 use Scalar::Util 'weaken';
 
-our $VERSION = "v0.0.13";
+our $VERSION = "v0.0.21";
 
 has 'name';
 has 'events_patches_o';
@@ -146,7 +146,7 @@ sub new ($class, $name, $manager, $messages_to_server_o) {
         op_with_latest_from($self->state_o),
         op_map(sub ($ps, @) {
             my ($p, $s) = @$ps;
-            return patch_state(dclone($s), $p);
+            return patch_state(dclone([$s])->[0], $p);
         }),
     )->subscribe(sub ($state) { $self->state_o->next($state) });
 

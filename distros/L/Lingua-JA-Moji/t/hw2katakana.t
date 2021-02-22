@@ -1,13 +1,11 @@
-use strict;
-use warnings;
-use Test::More tests => 2;
-
-use utf8;
-
-use Lingua::JA::Moji qw/hw2katakana kana2hw/;
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;
 
 my $full = 'アイウカキギョウ。、「」';
 my $half = 'ｱｲｳｶｷｷﾞｮｳ｡､｢｣';
 
-is( hw2katakana($half), $full );
-is( kana2hw($full), $half );
+is (hw2katakana($half), $full);
+is (kana2hw($full), $half);
+
+done_testing ();

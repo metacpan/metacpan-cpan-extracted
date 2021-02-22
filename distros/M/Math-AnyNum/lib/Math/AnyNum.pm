@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -4242,8 +4242,12 @@ sub __mod__ {
     #
   Math_GMPq__Math_GMPq: {
 
-        Math::GMPq::Rmpq_sgn($y)
-          || goto &_nan;
+        if (Math::GMPq::Rmpq_integer_p($y)) {
+            $y = _mpq2mpz($y);
+            goto Math_GMPq__Math_GMPz;
+        }
+
+        Math::GMPq::Rmpq_sgn($y) || goto &_nan;
 
         my $quo = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_div($quo, $x, $y);
@@ -4263,25 +4267,10 @@ sub __mod__ {
     }
 
   Math_GMPq__Math_GMPz: {
-
-        Math::GMPz::Rmpz_sgn($y)
-          || goto &_nan;
-
-        my $quo = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_div_z($quo, $x, $y);
-
-        # Floor
-        Math::GMPq::Rmpq_integer_p($quo) || do {
-            my $z = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_set_q($z, $quo);
-            Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
-            Math::GMPq::Rmpq_set_z($quo, $z);
-        };
-
-        Math::GMPq::Rmpq_mul_z($quo, $quo, $y);
-        Math::GMPq::Rmpq_sub($quo, $x, $quo);
-
-        return $quo;
+        Math::GMPz::Rmpz_sgn($y) || goto &_nan;
+        my $r = _modular_rational($x, $y) // goto &_nan;
+        Math::GMPz::Rmpz_mod($r, $r, $y);
+        return $r;
     }
 
   Math_GMPq__Math_MPFR: {
@@ -9347,7 +9336,6 @@ sub powmod ($$$) {
     Math::GMPz::Rmpz_sgn($m) || goto &nan;
 
     if (ref($n) ne 'Math::GMPz') {
-
         if (__is_int__($n)) {
             $n = _any2mpz($n) // goto &nan;
         }

@@ -3,7 +3,7 @@ package PYX::Format;
 use strict;
 use warnings;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 1;
 
@@ -79,12 +79,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2020 Michal Josef Špaček
+© 2005-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

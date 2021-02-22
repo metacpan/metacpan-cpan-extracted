@@ -4,10 +4,13 @@ use Math::MPFR qw(:mpfr);
 use Config;
 use Test::More;
 
-# With version 4 and later of mpfr, minimum precision is 1.
 # For version 3 and earlier, minimum precision is 2.
+# With version 4 and later of mpfr, minimum precision is 1.
+# However, mpfr-4.0.0 and 4.0.1 are buggy when precision is 1,
+# so we have the decimalize() function disallow precision of 1
+# if the mpfr library version is less than 4.0.2.
 my $prec_correction = 0;
-$prec_correction++ if 4 > MPFR_VERSION_MAJOR;
+$prec_correction++ if 262146 > MPFR_VERSION; # earlier than 4.0.2
 
 if(Math::MPFR::MPFR_3_1_6_OR_LATER) {
 
@@ -118,15 +121,28 @@ if(Math::MPFR::MPFR_3_1_6_OR_LATER) {
    }
 
    my $prec;
-   $prec = $v < 10 ? $v + $prec_correction
+   $prec = $v < 10 ? $v
                    : 1 + int(rand(200));
-   Rmpfr_set_default_prec($prec);
+
+   eval {Rmpfr_set_default_prec($prec);};
+
+   if($prec_correction && $prec == 1 && 262144 > MPFR_VERSION) {
+     like( $@, qr/^Precision must be set to at least 2/, "precision of 1 is forbidden" );
+     next;
+   }
 
    my $op1 = Math::MPFR->new($s1);
    my $op2 = Math::MPFR->new($s2);
    my $op3 = Math::MPFR->new($s3);
 
-   my $str1 = decimalize($op1);
+   my $str1;
+   eval{ $str1 = decimalize($op1); };
+
+   if($prec_correction && $prec == 1 && 262146 > MPFR_VERSION) {
+     like( $@, qr/^Precision of 1 not allowed/, "precision of 1 is forbidden" );
+     next;
+   }
+
    my $str2 = decimalize($op2);
    my $str3 = decimalize($op3);
 

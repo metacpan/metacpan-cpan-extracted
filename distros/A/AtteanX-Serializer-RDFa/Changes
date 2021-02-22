@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/AtteanX-Serializer-RDFa>
 Bug tracker:  <https://github.com/kjetilk/p5-atteanx-serializer-rdfa/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.110	2021-02-16	Add required file_extentions method
+
+ - Added: Bring test coverage to 100%.
+ - Added: Small documentation improvements.
+ - Updated: Attean 0.029 requires file_extensions method.
+   Jonas Smedegaard++
+ - Updated: Make a Markdown README.
+
 0.100	2019-02-21	Fix tests
 
  [ Bug Fixes ]

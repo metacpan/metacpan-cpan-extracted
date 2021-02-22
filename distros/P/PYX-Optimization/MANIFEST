@@ -24,9 +24,13 @@ t/data/ex2.pyx
 t/data/ex3.pyx
 t/data/ex4.pyx
 t/data/ex5.pyx
+t/data/ex6.pyx
+t/data/ex7.pyx
 t/PYX-Optimization/01-use.t
 t/PYX-Optimization/02-version.t
 t/PYX-Optimization/04-new.t
-t/PYX-Optimization/05-parse_file.t
+t/PYX-Optimization/05-parse.t
+t/PYX-Optimization/06-parse_file.t
+t/PYX-Optimization/07-parse_handler.t
 xt/PYX-Optimization/01-pod_coverage.t
 xt/PYX-Optimization/02-pod.t

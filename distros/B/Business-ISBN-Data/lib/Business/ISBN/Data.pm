@@ -7,7 +7,7 @@ use Carp                  qw(carp);
 use File::Basename        qw(dirname);
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '20210112.004';
+our $VERSION = '20210112.006';
 
 =encoding utf8
 
@@ -22,7 +22,9 @@ see L<Business::ISBN>
 =head1 DESCRIPTION
 
 You don't need to load this module yourself in most cases. L<Business::ISBN>
-will load it when it loads.
+will load it when it loads. You must use L<Business::ISBN> 3.005 or later
+because the data structure changed slightly to fix a bug with ISBN13
+prefixes.
 
 These data are generated from the F<RangeMessage.xml> file provided by
 the ISBN Agency. The distributed version matches the date in the version
@@ -58,6 +60,21 @@ to lead it there):
 
 	pp ... -a '..../RangeMessage.xml;RangeMessage.xml'
 
+If you put the F<RangeMessage.xml> in the current working directory of
+the application, the module should find it.
+
+=head2 Updating the default data
+
+In the repo, find the F<examples/make_default_data.pl> program. Run
+that against the latest F<RangeMessage.xml>:
+
+	% perl -Ilib examples/make_default_data.pl RangeMessage.xml
+
+That produces the code you need to replace in the module. Check that
+that data aren't weird: sometimes the group names have errors or
+oddities. The program handles escaping single quotes and trimming
+white space.
+
 =head1 SOURCE AVAILABILITY
 
 This module lives in a Github repository:
@@ -84,7 +101,8 @@ directory to make it work with Perl app bundlers.
 
 Josef Moravec C<< <josef.moravec@gmail.com> >> updated the data in January 2019.
 
-Peter Williams fixed a serious issue with ISBN-13 (GitHub #5)
+Peter Williams fixed a serious issue with ISBN-13 (GitHub #5). You must
+use Business::ISBN 3.005 or later because the data structure changed.
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -96,7 +114,7 @@ You may redistribute this under the terms of the Artistic License 2.0.
 
 sub _default_data {
 	(
-	_data_date => '20120112',
+	_data_date => '20210112',
 	_serial    => '0c5e7d67-d086-48c1-80f9-55319988b0c0',
 	_source    => __FILE__,
 	978 => {

@@ -1,6 +1,6 @@
 package Quantum::Superpositions::Lazy::Superposition;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use v5.24;
 use warnings;
@@ -258,10 +258,21 @@ An alias to I<collapse> method. Also invoked with overloaded C<"">.
 	my $transformed1 = $superposition->transform(sub { shift() * 2 });
 	my $transformed2 = $superposition->transform(sub { $_ * 2 });
 
+	# more arguments can be specified, which will be passed to the subroutine
+	my $transformed = $superposition->transform(sub { $_[0] * $_[1] }, $another_superposition);
+
 Enables creating a new superposition from an existing one using complex logic
-passed as a subroutine reference in the argument. This argument is also passed
-as a localized C<$_>.  Works just like the regular computations but with a
-custom function.
+passed as a subroutine reference in the first argument. Can optionally accept
+more arguments (superpositions) that can take part in the calculation.
+
+The first argument is also passed as a localized C<$_>. Works just like the
+regular computations but with a custom function. This can be thought of as a
+way to use a function against some superpositions, for example
+L<List::Util/max>:
+
+	$pos->transform(\&max, $another_pos, $yet_another_pos);
+
+Will produce a superposition with a maximum of each three values of the given superpositions.
 
 =head2 compare
 
@@ -269,7 +280,9 @@ custom function.
 	my $boolean = $superposition->compare(sub { shift() =~ /regexp/ });
 	my $matches = fetch_matches { $superposition->compare(sub { /regexp/ }) };
 
-Like </transform>, but performs a logical comparison instead of a state mutation.
+Like </transform>, but performs a logical comparison instead of a state
+mutation. Just like transform, it can accept more superpositions as its
+arguments.
 
 =head1 OVERLOADING
 

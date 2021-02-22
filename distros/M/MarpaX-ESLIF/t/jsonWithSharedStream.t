@@ -21,6 +21,7 @@ sub event_action           { my ($self) = shift; $log->infof('Events: %s', \@_);
 package MyValueInterface;
 use strict;
 use diagnostics;
+use Log::Any qw/$log/;
 
 sub new                { my ($pkg) = @_; bless { result => undef }, $pkg }
 sub isWithHighRankOnly { 1 }
@@ -30,6 +31,15 @@ sub isWithNull         { 0 }
 sub maxParses          { 0 }
 sub getResult          { $_[0]->{result} }
 sub setResult          { $_[0]->{result} = $_[1] }
+
+sub do_members {
+    my $self = shift;
+
+    my $rc = {};
+    map { $rc->{$_->[0]} = $_->[1] } @_;
+
+    return $rc;
+}
 
 package main;
 use strict;
@@ -63,22 +73,22 @@ perl_comment ::= /(?:(?:#)(?:[^\\n]*)(?:\\n|\\z))/u
 
 json         ::= object
                | array
-object       ::= LCURLY members RCURLY
-               | OBJECT_FROM_INNER_GRAMMAR
-members      ::= pair*                 action => do_array separator => ','
-pair         ::= string ':' value      action => do_array
+object       ::= (- LCURLY -) members (- RCURLY -)
+               | OBJECT_FROM_INNER_GRAMMAR action => ::concat
+members      ::= pair*                       action => do_members separator => ',' hide-separator => 1
+pair         ::= string (- ':' -) value      action => ::row
 event value$ = completed <value>
 event ^value = predicted <value>
 value        ::= string
                | object
                | number
                | array
-               | 'true'                action => do_true
-               | 'false'               action => do_true
-               | 'null'                action => ::undef
-array        ::= '[' ']'               action => do_empty_array
-               | '[' elements ']'
-elements     ::= value+                action => do_array separator => ','
+               | 'true'                         action => ::true
+               | 'false'                        action => ::false
+               | 'null'                         action => ::undef
+array        ::= (- '[' -)          (- ']' -)   action => ::row
+               | (- '[' -) elements (- ']' -)   action => ::row
+elements     ::= value+                         action => ::row separator => ',' hide-separator => 1
 number         ~ int
                | int frac
                | int exp
@@ -254,17 +264,20 @@ sub doparse {
                 # Set exhausted flag since this grammar is very likely to exit when data remains
                 $marpaESLIFRecognizerObject->set_exhausted_flag(1);
                 # Force read of the LCURLY lexeme
+                $log->info("LCURLY lexeme read");
                 $marpaESLIFRecognizerObject->lexemeRead('LCURLY', '{', 1); # In UTF-8 '{' is one byte
                 my $value = doparse($marpaESLIFRecognizerObject, undef, $recursionLevel + 1);
                 # Inject object's value
-                $marpaESLIFRecognizer->lexemeRead('OBJECT_FROM_INNER_GRAMMAR', $value, 0); # Stream moved synchroenously
+                $log->infof("Injecting value from sub grammar: %s", $value);
+                $log->info("OBJECT_FROM_INNER_GRAMMAR lexeme read");
+                $marpaESLIFRecognizer->lexemeRead('OBJECT_FROM_INNER_GRAMMAR', $value, 0); # Stream moved synchroneously
                 $marpaESLIFRecognizerObject->unshare();
             }
             elsif ($event->{event} eq '^RCURLY') {
                 # Force read of the RCURLY lexeme
+                $log->info("RCURLY lexeme read");
                 $marpaESLIFRecognizer->lexemeRead('RCURLY', '}', 1); # In UTF-8 '}' is one byte
-                $rc = 1;
-                goto done;
+                goto valuation;
             } elsif ($event->{event} eq '^value' || $event->{event} eq 'value$') {
                 # No op
             } else {
@@ -278,8 +291,7 @@ sub doparse {
         my $eof = $marpaESLIFRecognizer->isEof;
         my $bytes = $marpaESLIFRecognizer->input;
         if ((! defined($bytes)) && $eof) {
-            $rc = 1;
-            goto done;
+            goto valuation;
         }
         #
         # Resume
@@ -287,14 +299,27 @@ sub doparse {
         $ok = $marpaESLIFRecognizer->resume();
     }
 
-    $rc = 1;
+  valuation:
+    #
+    # Call for valuation
+    #
+    my $valueInterface = MyValueInterface->new();
+    my $eslifValue = MarpaX::ESLIF::Value->new($marpaESLIFRecognizer, $valueInterface);
+    while ($eslifValue->value()) {
+        if (defined($rc)) {
+            $log->fatal("[%d] Ambiguous grammar, first value: %s, other value: %s", $recursionLevel, $rc, $valueInterface->getResult());
+            die "Ambiguous grammar";
+        }
+        $rc = $valueInterface->getResult();
+        $log->infof("[%d] Value: %s", $recursionLevel, $rc);
+    }
     goto done;
 
   err:
-    $rc = 0;
+    $rc = undef;
 
   done:
-    if ($rc) {
+    if (defined($rc)) {
         #
         # Get last discarded data
         #

@@ -10,7 +10,7 @@ use Gherkin::Parser;
 use Gherkin::Pickles::Compiler;
 
 package App::GherkinGeneratePickles;
-
+$App::GherkinGeneratePickles::VERSION = '17.0.2';
 sub run {
     my ( $class, $fh, @file_list ) = @_;
     my $json = Cpanel::JSON::XS->new->utf8->canonical;

@@ -57,8 +57,8 @@
    },
    "provides" : {
       "Data::QuickMemoPlus::Reader" : {
-         "file" : "lib/Data\\QuickMemoPlus\\Reader.pm",
-         "version" : "0.08"
+         "file" : "lib/Data/QuickMemoPlus/Reader.pm",
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,8 @@
          "web" : "https://github.com/FractalLotus/Data-QuickMemoPlus-Reader"
       }
    },
-   "version" : "0.08",
+   "version" : "0.12",
+   "x_authority" : "cpan:BSHIELDS",
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

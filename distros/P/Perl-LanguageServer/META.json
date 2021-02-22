@@ -48,6 +48,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.1.0",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/richterger/Perl-LanguageServer.git",
+         "web" : "https://github.com/richterger/Perl-LanguageServer"
+      }
+   },
+   "version" : "v2.2.0",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

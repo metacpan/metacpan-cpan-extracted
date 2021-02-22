@@ -36,7 +36,7 @@ C<accumulate> along a dimension. These all do their job across the
 first dimension but by using the slicing functions you can do it
 on any dimension.
 
-The L<PDL::Reduce|PDL::Reduce> module provides an alternative interface
+The L<PDL::Reduce> module provides an alternative interface
 to many of the functions in this module.
 
 =head1 SYNOPSIS
@@ -137,7 +137,7 @@ I<any> dimension.
 
  $spectrum = dprodover $image->xchg(0,1)
 
-Unlike L<prodover|/prodover>, the calculations are performed in double
+Unlike L</prodover>, the calculations are performed in double
 precision.
 
 
@@ -240,7 +240,7 @@ is the first element of the parameter.
 
  $spectrum = cumuprodover $image->xchg(0,1)
 
-Unlike L<cumuprodover|/cumuprodover>, the calculations are performed in double
+Unlike L</cumuprodover>, the calculations are performed in double
 precision.
 
 
@@ -337,7 +337,7 @@ I<any> dimension.
 
  $spectrum = dsumover $image->xchg(0,1)
 
-Unlike L<sumover|/sumover>, the calculations are performed in double
+Unlike L</sumover>, the calculations are performed in double
 precision.
 
 
@@ -440,7 +440,7 @@ is the first element of the parameter.
 
  $spectrum = cumusumover $image->xchg(0,1)
 
-Unlike L<cumusumover|/cumusumover>, the calculations are performed in double
+Unlike L</cumusumover>, the calculations are performed in double
 precision.
 
 
@@ -850,7 +850,7 @@ I<any> dimension.
 
  $spectrum = daverage $image->xchg(0,1)
 
-Unlike L<average|/average>, the calculation is performed in double
+Unlike L</average>, the calculation is performed in double
 precision.
 
 
@@ -1212,7 +1212,7 @@ sub PDL::oddpct {
 
 Return the average of all elements in a piddle.
 
-See the documentation for L<average|/average> for more information.
+See the documentation for L</average> for more information.
 
 =for usage
 
@@ -1246,7 +1246,7 @@ sub PDL::avg {
 
 Return the sum of all elements in a piddle.
 
-See the documentation for L<sumover|/sumover> for more information.
+See the documentation for L</sumover> for more information.
 
 =for usage
 
@@ -1280,7 +1280,7 @@ sub PDL::sum {
 
 Return the product of all elements in a piddle.
 
-See the documentation for L<prodover|/prodover> for more information.
+See the documentation for L</prodover> for more information.
 
 =for usage
 
@@ -1314,7 +1314,7 @@ sub PDL::prod {
 
 Return the average (in double precision) of all elements in a piddle.
 
-See the documentation for L<daverage|/daverage> for more information.
+See the documentation for L</daverage> for more information.
 
 =for usage
 
@@ -1348,7 +1348,7 @@ sub PDL::davg {
 
 Return the sum (in double precision) of all elements in a piddle.
 
-See the documentation for L<dsumover|/dsumover> for more information.
+See the documentation for L</dsumover> for more information.
 
 =for usage
 
@@ -1382,7 +1382,7 @@ sub PDL::dsum {
 
 Return the product (in double precision) of all elements in a piddle.
 
-See the documentation for L<dprodover|/dprodover> for more information.
+See the documentation for L</dprodover> for more information.
 
 =for usage
 
@@ -1416,7 +1416,7 @@ sub PDL::dprod {
 
 Return the check for zero of all elements in a piddle.
 
-See the documentation for L<zcover|/zcover> for more information.
+See the documentation for L</zcover> for more information.
 
 =for usage
 
@@ -1450,7 +1450,7 @@ sub PDL::zcheck {
 
 Return the logical and of all elements in a piddle.
 
-See the documentation for L<andover|/andover> for more information.
+See the documentation for L</andover> for more information.
 
 =for usage
 
@@ -1484,7 +1484,7 @@ sub PDL::and {
 
 Return the bitwise and of all elements in a piddle.
 
-See the documentation for L<bandover|/bandover> for more information.
+See the documentation for L</bandover> for more information.
 
 =for usage
 
@@ -1518,7 +1518,7 @@ sub PDL::band {
 
 Return the logical or of all elements in a piddle.
 
-See the documentation for L<orover|/orover> for more information.
+See the documentation for L</orover> for more information.
 
 =for usage
 
@@ -1552,7 +1552,7 @@ sub PDL::or {
 
 Return the bitwise or of all elements in a piddle.
 
-See the documentation for L<borover|/borover> for more information.
+See the documentation for L</borover> for more information.
 
 =for usage
 
@@ -1586,7 +1586,7 @@ sub PDL::bor {
 
 Return the minimum of all elements in a piddle.
 
-See the documentation for L<minimum|/minimum> for more information.
+See the documentation for L</minimum> for more information.
 
 =for usage
 
@@ -1620,7 +1620,7 @@ sub PDL::min {
 
 Return the maximum of all elements in a piddle.
 
-See the documentation for L<maximum|/maximum> for more information.
+See the documentation for L</maximum> for more information.
 
 =for usage
 
@@ -1654,7 +1654,7 @@ sub PDL::max {
 
 Return the median of all elements in a piddle.
 
-See the documentation for L<medover|/medover> for more information.
+See the documentation for L</medover> for more information.
 
 =for usage
 
@@ -1688,7 +1688,7 @@ sub PDL::median {
 
 Return the mode of all elements in a piddle.
 
-See the documentation for L<modeover|/modeover> for more information.
+See the documentation for L</modeover> for more information.
 
 =for usage
 
@@ -1722,7 +1722,7 @@ sub PDL::mode {
 
 Return the oddmedian of all elements in a piddle.
 
-See the documentation for L<oddmedover|/oddmedover> for more information.
+See the documentation for L</oddmedover> for more information.
 
 =for usage
 
@@ -1768,7 +1768,7 @@ Useful in conditional expressions:
 
 =for bad
 
-See L<or|/or> for comments on what happens when all elements
+See L</or> for comments on what happens when all elements
 in the check are bad.
 
 =cut
@@ -1796,7 +1796,7 @@ Useful in conditional expressions:
 
 =for bad
 
-See L<and|/and> for comments on what happens when all elements
+See L</and> for comments on what happens when all elements
 in the check are bad.
 
 =cut
@@ -1822,7 +1822,7 @@ Returns an array with minimum and maximum values of a piddle.
 
 This routine does I<not> thread over the dimensions of C<$pdl>; 
 it returns the minimum and maximum values of the whole array.
-See L<minmaximum|/minmaximum> if this is not what is required.
+See L</minmaximum> if this is not what is required.
 The two values are returned as Perl scalars similar to min/max.
 
 =for example
@@ -2343,7 +2343,7 @@ Find minimum and maximum and their indices for a given piddle;
  pdl> p $min, $max, $min_ind, $max_ind
  [-2 0] [4 3] [0 1] [2 2]
 
-See also L<minmax|/minmax>, which clumps the piddle together.
+See also L</minmax>, which clumps the piddle together.
 
 
 

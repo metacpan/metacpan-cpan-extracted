@@ -56,16 +56,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/pscott-au/WebService-GoogleAPI-Client/issues"
+         "web" : "https://github.com/rabbiveesh/WebService-GoogleAPI-Client/issues"
       },
       "homepage" : "https://pscott-au.github.io/WebService-GoogleAPI-Client/",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/pscott-au/WebService-GoogleAPI-Client.git",
-         "web" : "https://github.com/pscott-au/WebService-GoogleAPI-Client"
+         "url" : "git://github.com/rabbiveesh/WebService-GoogleAPI-Client.git",
+         "web" : "https://github.com/rabbiveesh/WebService-GoogleAPI-Client"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Apache-2.0"

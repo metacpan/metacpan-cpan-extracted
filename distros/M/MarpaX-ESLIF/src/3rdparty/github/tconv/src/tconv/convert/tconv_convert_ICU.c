@@ -236,7 +236,7 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
     size_t uCharSizel = uCharCapacityl * sizeof(UChar);
     /* +1 hiden for eventual signature add */
     uCharBufOrigp = (const UChar *) malloc(uCharSizel + sizeof(UChar));
-    if (uCharBufOrigp == NULL) {
+    if (TCONV_UNLIKELY(uCharBufOrigp == NULL)) {
       goto err;
     }
     uCharBufLimitp = (const UChar *) (uCharBufOrigp + uCharCapacityl); /* In unit of UChar */
@@ -319,7 +319,7 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
       goto err;
     }
     uSetPatternTos = malloc((uSetPatternTol + 1) * sizeof(UChar));
-    if (uSetPatternTos == NULL) {
+    if (TCONV_UNLIKELY(uSetPatternTos == NULL)) {
       goto err;
     }
     uErrorCode = U_ZERO_ERROR;
@@ -391,7 +391,7 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
         goto err;
       }
       uLocales = (UChar *) malloc(uLocaleLength * sizeof(UChar));
-      if (uLocales == NULL) {
+      if (TCONV_UNLIKELY(uLocales == NULL)) {
         goto err;
       }
       uErrorCode = U_ZERO_ERROR;
@@ -460,7 +460,7 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
   /* Setup the context                                           */
   /* ----------------------------------------------------------- */
   contextp = (tconv_convert_ICU_context_t *) malloc(sizeof(tconv_convert_ICU_context_t));
-  if (contextp == NULL) {
+  if (TCONV_UNLIKELY(contextp == NULL)) {
     goto err;
   }
 
@@ -1131,7 +1131,7 @@ static inline UBool _increaseChunkBuffer(tconv_convert_ICU_context_t *contextp, 
   chunkp     = (chunkp     == NULL) ? (UChar *) malloc(chunkSizel) : (UChar *) realloc(chunkp,     chunkSizel);
   chunkCopyp = (chunkCopyp == NULL) ? (UChar *) malloc(chunkSizel) : (UChar *) realloc(chunkCopyp, chunkSizel);
 
-  if ((chunkp == NULL) || (chunkCopyp == NULL)) {
+  if (TCONV_UNLIKELY((chunkp == NULL) || (chunkCopyp == NULL))) {
     return FALSE;
   }
   contextp->chunkp         = chunkp;
@@ -1151,7 +1151,7 @@ static inline UBool _increaseOutBuffer(tconv_convert_ICU_context_t *contextp, in
 
   outp = (outp == NULL) ? (UChar *) malloc(outSizel) : (UChar *) realloc(outp, outSizel);
 
-  if (outp == NULL) {
+  if (TCONV_UNLIKELY(outp == NULL)) {
     return FALSE;
   }
   contextp->outp         = outp;

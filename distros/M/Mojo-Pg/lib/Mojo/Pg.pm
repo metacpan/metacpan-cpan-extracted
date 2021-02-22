@@ -22,7 +22,7 @@ has options         => sub {
 has [qw(password username)] => '';
 has pubsub                  => sub { Mojo::Pg::PubSub->new(pg => shift) };
 
-our $VERSION = '4.24';
+our $VERSION = '4.25';
 
 sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, pg => $_[0]) }
 
@@ -493,8 +493,6 @@ This is the class hierarchy of the L<Mojo::Pg> distribution.
 =item * L<Mojo::Pg::Results>
 
 =item * L<Mojo::Pg::Transaction>
-
-=item * L<SQL::Abstract::Pg>
 
 =back
 

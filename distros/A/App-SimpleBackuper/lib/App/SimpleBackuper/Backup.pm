@@ -13,7 +13,7 @@ use App::SimpleBackuper::_BlockDelete;
 use App::SimpleBackuper::_BlocksInfo;
 
 const my $SIZE_OF_TOP_FILES => 10;
-const my $SAVE_DB_PERIOD => 10 * 60;
+const my $SAVE_DB_PERIOD => 60 * 60;
 const my $PRINT_PROGRESS_PERIOD => 60;
 
 sub _proc_uid_gid($$$) {
@@ -40,6 +40,36 @@ sub _proc_uid_gid($$$) {
 	$gid = $group->{id};
 	
 	return $uid, $gid;
+}
+
+sub _get_block_to_delete {
+	my($state) = @_;
+	
+	if(ref($state->{blocks2delete_prio2size2chunks}) eq 'HASH') {
+		$state->{blocks2delete_prio2size2chunks} = [
+			map {$state->{blocks2delete_prio2size2chunks}->{ $_ }}
+			sort {$a <=> $b}
+			keys %{ $state->{blocks2delete_prio2size2chunks} }
+		];
+	}
+	
+	return if ! @{ $state->{blocks2delete_prio2size2chunks} };
+	
+	if(ref($state->{blocks2delete_prio2size2chunks}->[0]) eq 'HASH') {
+		$state->{blocks2delete_prio2size2chunks}->[0] = [
+			map {$state->{blocks2delete_prio2size2chunks}->[0]->{ $_ }}
+			sort {$a <=> $b}
+			keys %{ $state->{blocks2delete_prio2size2chunks}->[0] }
+		];
+	}
+	
+	my $prio_basket = $state->{blocks2delete_prio2size2chunks}->[0];
+	my $size_basket = $prio_basket->[0];
+	my $block_id = shift @$size_basket;
+	shift @$prio_basket if ! @$size_basket;
+	shift @{ $state->{blocks2delete_prio2size2chunks} } if ! @$prio_basket;
+	
+	return $block_id, @{ $state->{blocks_info}->{ $block_id }->[2] };
 }
 
 sub Backup {
@@ -83,14 +113,16 @@ sub Backup {
 	$backups->upsert({ id => $cur_backup->{id} }, $cur_backup);
 	
 	{
-		#print "blocks stack to delete...";
-		my $blocks_info = _BlocksInfo($options, $state);
-		$state->{blocks_stack2delete} = [
-			map {[ $_, @{ $blocks_info->{$_}->[2] } ]} sort {
-				$blocks_info->{$a}->[0] <=> $blocks_info->{$b}->[0]
-				or $blocks_info->{$b}->[1] <=> $blocks_info->{$a}->[1]
-			} grep {$_} map { $blocks->unpack( $_ )->{id} } @$blocks
-		];
+		$state->{blocks_info} = _BlocksInfo($options, $state);
+		
+		$state->{blocks2delete_prio2size2chunks} = {};
+		foreach my $block (@$blocks) {
+			my $block_id = $blocks->unpack($block)->{id};
+			next if ! $block_id; # What's this?
+			my $block_info = $state->{blocks_info}->{ $block_id };
+			push @{	$state->{blocks2delete_prio2size2chunks}->{ $block_info->[0] }->{ $block_info->[1] } }, $block_id;
+		}
+		
 		print " OK\n" if $options->{verbose};
 	}
 	
@@ -178,44 +210,49 @@ sub Backup {
 		print "Updating dir $full_path..." if $options->{verbose};
 		my $file = $files->find_by_parent_id_name($dir2upd->{parent_id}, $dir2upd->{filename});
 		my @stat = lstat($full_path);
-		next if ! @stat;
-		my($uid, $gid) =_proc_uid_gid($stat[4], $stat[5], $state->{db}->{uids_gids});
-		if($file->{versions}->[-1]->{backup_id_max} == $state->{last_backup_id} - 1) {
-			$file->{versions}->[-1] = {
-				%{ $file->{versions}->[-1] },
-				backup_id_max	=> $state->{last_backup_id},
-				uid				=> $uid,
-				gid				=> $gid,
-				size			=> $stat[7],
-				mode			=> $stat[2],
-				mtime			=> $stat[9],
-				block_id		=> 0,
-				symlink_to		=> undef,
-				parts			=> [],
-			};
-		} else {
-			push @{ $file->{versions} }, {
-				backup_id_min	=> $state->{last_backup_id},
-				backup_id_max	=> $state->{last_backup_id},
-				uid				=> $uid,
-				gid				=> $gid,
-				size			=> $stat[7],
-				mode			=> $stat[2],
-				mtime			=> $stat[9],
-				block_id		=> 0,
-				symlink_to		=> undef,
-				parts			=> [],
+		if(@stat and $file->{versions}->[-1]->{backup_id_max} != $state->{last_backup_id}) {
+			my($uid, $gid) =_proc_uid_gid($stat[4], $stat[5], $state->{db}->{uids_gids});
+			if($file->{versions}->[-1]->{backup_id_max} == $state->{last_backup_id} - 1) {
+				$file->{versions}->[-1] = {
+					%{ $file->{versions}->[-1] },
+					backup_id_max	=> $state->{last_backup_id},
+					uid				=> $uid,
+					gid				=> $gid,
+					size			=> $stat[7],
+					mode			=> $stat[2],
+					mtime			=> $stat[9],
+					block_id		=> 0,
+					symlink_to		=> undef,
+					parts			=> [],
+				};
+			} else {
+				push @{ $file->{versions} }, {
+					backup_id_min	=> $state->{last_backup_id},
+					backup_id_max	=> $state->{last_backup_id},
+					uid				=> $uid,
+					gid				=> $gid,
+					size			=> $stat[7],
+					mode			=> $stat[2],
+					mtime			=> $stat[9],
+					block_id		=> 0,
+					symlink_to		=> undef,
+					parts			=> [],
+				}
 			}
+			$files->upsert({ id => $file->{id}, parent_id => $file->{parent_id} }, $file);
+			
+			my $backup = $backups->find_row({ id => $state->{last_backup_id} });
+			$backup->{files_cnt}++;
+			$backup->{max_files_cnt}++;
+			$backups->upsert({ id => $backup->{id} }, $backup );
 		}
-		$files->upsert({ id => $file->{id}, parent_id => $file->{parent_id} }, $file);
-		
-		my $backup = $backups->find_row({ id => $state->{last_backup_id} });
-		$backup->{files_cnt}++;
-		$backup->{max_files_cnt}++;
-		$backups->upsert({ id => $backup->{id} }, $backup );
 		
 		print "OK\n" if $options->{verbose};
 	}
+	
+	my $backup = $backups->find_row({ id => $state->{last_backup_id} });
+	$backup->{is_done} = 1;
+	$backups->upsert({ id => $backup->{id} }, $backup );
 	
 	App::SimpleBackuper::BackupDB($options, $state);
 	
@@ -470,13 +507,12 @@ sub _file_proc {
 					$file_weight_spent += $reg_file->size;
 					
 					if($state->{total_weight} > $options->{space_limit}) {
-						print "freeing up space by ".fmt_weight($state->{total_weight} - $options->{space_limit})."\n" if $options->{verbose};
+						print ", freeing up space by ".fmt_weight($state->{total_weight} - $options->{space_limit})."...\n" if $options->{verbose};
 						$file_time_spent += time;
 						while($state->{total_weight} > $options->{space_limit}) {
 							_free_up_space($options, $state, \%block_ids);
 						}
 						$file_time_spent -= time;
-						print "\t... " if $options->{verbose};
 					}
 					
 					$state->{profile}->{storage} -= time;
@@ -616,9 +652,10 @@ sub _free_up_space {
 	my($backups, $files, $blocks, $parts) = @{ $state->{db} }{qw(backups files blocks parts)};
 	
 	my $deleted = 0;
-	while ( @{ $state->{blocks_stack2delete} } ) {
-		my($block_id, @files) = @{ shift @{ $state->{blocks_stack2delete} } };
-		next if exists $protected_block_ids->{$block_id};
+	while(1) {
+		my($block_id, @files) = _get_block_to_delete($state);
+		last if ! $block_id;
+		next if exists $protected_block_ids->{ $block_id };
 		my $block = $blocks->find_row({ id => $block_id });
 		next if ! $block;
 		next if $block->{last_backup_id} == $state->{last_backup_id};

@@ -21,7 +21,7 @@ trouble.
 
 This package offers a OO interface to the PGPLOT plotting package. This
 is intended to replace the traditional interface in
-L<PDL::Graphics::PGPLOT|PDL::Graphics::PGPLOT>
+L<PDL::Graphics::PGPLOT>
 and contains interfaces to a large number of PGPLOT routines. Below the
 usage examples for each function tend to be given in the non-OO version for
 historical reasons. This will slowly be changed, but in the meantime refer
@@ -580,7 +580,7 @@ logically different he chooses to have two windows open:
   $area_win = PDL::Graphics::PGPLOT::Window->new(Device => '/xw',
               Aspect => 1, WindowWidth => 5);
 
-See the documentation for L<new|/new> below for a full overview of the
+See the documentation for L</new> below for a full overview of the
 options you can pass to the constructor.
 
 Next, Odd wants to create plotting areas for subsequent plots and maybe
@@ -1056,7 +1056,7 @@ create this piddle.
 If C<$image> is two-dimensional, you get a grey or pseudocolor image
 using the scalar values at each X,Y point.  If C<$image> is
 three-dimensional and the third dimension has order 3, then it is
-treated as an RGB true-color image via L<rgbi|rgbi>.
+treated as an RGB true-color image via L</rgbi>.
 
 There are several options related to scaling.  By default, the image
 is scaled to fit the PGPLOT default viewport on the screen.  Scaling,
@@ -1264,7 +1264,7 @@ coordinate system by saying:
 The identity transform is used if you select a mapping for which there is
 no information in the header.
 Please note that this support is B<experimental> and is not guaranteed
-to work correctly; please see the documentation for the L<_FITS_tr|/_FITS_tr>
+to work correctly; please see the documentation for the L</_FITS_tr>
 routine for more information.
 
 =back
@@ -1281,7 +1281,7 @@ Display an RGB FITS image with correct axes
 
   $win->fits_rgbi( image, [$min,$max], [$opt] );
 
-Works exactly like L<fits_imag|/fits_imag>, but the image must be in
+Works exactly like L</fits_imag>, but the image must be in
 (X,Y,RGB) form.  Only the first two axes of the FITS header are examined.
 
 =head2 fits_cont
@@ -1295,8 +1295,8 @@ in the FITS header of the image.
 
   $win->fits_cont( image, [$contours, $transform, $misval], [$opt] )
 
-Does the same thing for the L<cont|/cont> routine that
-L<fits_imag|/fits_imag> does for the L<imag|/imag> routines.
+Does the same thing for the L</cont> routine that
+L</fits_imag> does for the L</imag> routines.
 
 =head2 draw_wedge
 
@@ -1338,7 +1338,7 @@ How wide should the wedge be, in units of character size.  Default is B<2>.
 A text label to be added to the wedge.  If set, it is probably worth
 increasing the C<Width> value by about 1 to keep the text readable.
 Default is B<''>.  This is equivalent to the C<WTitle> option to
-L<imag|imag>, L<fits_imag|fits_imag>, and similar methods.
+L</imag>, L</fits_imag>, and similar methods.
 
 =item ForeGround (synonym Fg)
 
@@ -1377,7 +1377,7 @@ Load an image colour table.
    ctab ( $levels, $red, $green, $blue, [$contrast, $brightness] )
    ctab ( '', $contrast, $brightness ) # use last color table
 
-Note: See L<PDL::Graphics::LUT|PDL::Graphics::LUT> for access to a large
+Note: See L<PDL::Graphics::LUT> for access to a large
 number of colour tables.
 
 Notionally, all non-RGB images and vectors have their colors looked up
@@ -1391,7 +1391,7 @@ You can specify specific indexed colors by appropriate use of the
 available number of colors can change depending on the output device.
 (Someone needs to write a specific hardware-dependent lookup table interface).
 
-See also L<imag|imag> for a description of how to use only part of the
+See also L</imag> for a description of how to use only part of the
 color table for a particular image.
 
 =head2 ctab_info
@@ -1413,7 +1413,7 @@ Turn on automatic logarithmic scaling in C<line> and C<points>
 Setting the argument to 1 turns on automatic log scaling and setting it to
 zero turns it off again. The function can be used in both the object
 oriented and standard interface. To learn more, see the documentation for
-the L<axis option|axis>.
+the L</axis option|axis>.
 
 =for example
 
@@ -1458,9 +1458,9 @@ The following standard options influence this command:
 
 Plot a list of vectors as discrete sets of connected points
 
-This works much like L<line|line>, but for discrete sets of connected
+This works much like L</line>, but for discrete sets of connected
 points.  There are two ways to break lines: you can pass in x/y coordinates
-just like in L<line|line>, but with an additional C<pen> piddle that
+just like in L</line>, but with an additional C<pen> piddle that
 indicates whether the pen is up or down on the line segment following
 each point (so you set it to zero at the end of each line segment you
 want to draw);  or you can pass in an array ref containing a list
@@ -1479,7 +1479,7 @@ Equally happily, even if you are using the array ref mechanism
 to break your polylines you can feed in an array ref of C<pen> values to
 take advantage of the color functionality or further dice your polylines.
 
-Note that, unlike L<line|line>, C<lines> has no no specify-$y-only
+Note that, unlike L</line>, C<lines> has no no specify-$y-only
 calling path.  That's because C<lines> is intended more for line art than for
 plotting, so you always have to specify both $x and $y.
 
@@ -1675,7 +1675,7 @@ Note that meddling with the C<ioffset> and C<bias> often will require you to
 change the default plot range somewhat. It is also worth noting that if
 you have TriD working you will probably be better off using
 L<mesh3d|PDL::Graphics::TriD/mesh3d> or
-a similar command - see the L<PDL::Graphics::TriD|PDL::Graphics::TriD>
+a similar command - see the L<PDL::Graphics::TriD>
 module.
 
 =for example
@@ -1816,7 +1816,7 @@ might need changing in the case of very large ellipses.
 =back
 
 The routine also recognises the same standard options as
-accepted by L<poly|/poly>.
+accepted by L</poly>.
 
 =head2 rectangle
 
@@ -1829,7 +1829,7 @@ Draw a rectangle.
  Usage: rectangle($xcenter, $ycenter, $xside, $yside, [, $angle, $opt]);
 
 This routine draws a rectangle with the chosen fill style. Internally
-it calls L<poly|/poly> which is somewhat slower than C<pgrect> but which
+it calls L</poly> which is somewhat slower than C<pgrect> but which
 allows for rotated rectangles as well. The routine recognises the same
 options as C<poly> and in addition the following:
 
@@ -1914,7 +1914,7 @@ Display a pair of 2-D piddles as vectors, with FITS header interpretation
 
  Usage: fits_vect ($x, $y, [$scale, $pos, $transform, $misval] )
 
-C<fits_vect> is to L<vect|/vect> as L<fits_imag|/fits_imag> is to L<imag|imag>.
+C<fits_vect> is to L</vect> as L</fits_imag> is to L</imag>.
 
 =head2 transform
 
@@ -1926,7 +1926,7 @@ Create transform array for contour and image plotting
 
  $win->transform([$xdim,$ydim], $options);
 
-(For information on coordinate transforms, try L<PDL::Transform|PDL::Transform>.)
+(For information on coordinate transforms, try L<PDL::Transform>.)
 This function creates a transform array in the format required by the image
 and contouring routines. You must call it with the dimensions of your image
 as arguments or pass these as an anonymous hash - see the example below.
@@ -4064,7 +4064,7 @@ sub redraw_axes {
 
 Given a PGPLOT tr matrix and an image size, calculate the
 data world coordinates over which the image ranges.  This is
-used in L<imag|imag> and L<cont|cont>.  It keeps track of the
+used in L</imag> and L</cont>.  It keeps track of the
 required half-pixel offset to display images properly -- eg
 feeding in no tr matrix at all, nx=20, and ny=20 will
 will return (-0.5,19.5,-0.5,19.5).  It also checks the options
@@ -4130,8 +4130,8 @@ sub _image_xyrange {
 
 Given a FITS image, return the PGPLOT transformation matrix to convert
 pixel coordinates to scientific coordinates.   Used by
-L<fits_imag|/fits_imag>, L<fits_rgbi|/fits_rgbi>, and
-L<fits_cont|/fits_cont>, but may come in handy for other methods.
+L</fits_imag>, L</fits_rgbi>, and
+L</fits_cont>, but may come in handy for other methods.
 
 =for example
 

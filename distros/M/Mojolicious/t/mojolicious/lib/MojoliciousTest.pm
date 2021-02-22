@@ -64,10 +64,11 @@ sub startup {
   $r->any('/plugin/camel_case')->to('foo#plugin_camel_case');
 
   # /exceptional/*
-  $r->any('/exceptional/:action')->to('exceptional#');
+  $r->any('/exceptional/this_one_dies')->to('exceptional#this_one_dies');
 
   # /exceptional_too/*
-  $r->any('/exceptional_too')->inline(1)->to('exceptional#this_one_might_die')->any('/:action');
+  $r->any('/exceptional_too')->inline(1)->to('exceptional#this_one_might_die')->any('/this_one_dies')
+    ->to('#this_one_dies');
 
   # /fun/time
   $r->fun('/time')->to('foo#fun');
@@ -91,13 +92,13 @@ sub startup {
   $r->any('/something_missing')->to('foo#url_for_missing');
 
   # /test3 (no class, just a namespace)
-  $r->any('/test3')->to(namespace => 'MojoliciousTestController', action => 'index');
+  $r->any('/test3')->to(namespace => 'MojoliciousTest2::Foo', action => 'test');
+
+  # /test4 (controller class without action)
+  $r->any('/test1')->to(controller => 'Foo::Bar');
 
   # /test2 (different namespace test)
   $r->any('/test2')->to(namespace => 'MojoliciousTest2', controller => 'Foo', action => 'test');
-
-  # /test5 (only namespace test)
-  $r->any('/test5')->to(namespace => 'MojoliciousTest2::Foo', action => 'test');
 
   # /test6 (no namespace test)
   $r->any('/test6')->to(namespace => '', controller => 'mojolicious_test2-foo', action => 'test');
@@ -140,8 +141,19 @@ sub startup {
   # /rss.xml (mixed formats)
   $r->any('/rss.xml')->to('foo#bar', format => 'rss');
 
-  # /*/* (the default route)
-  $r->any('/<controller>/<action>')->to(action => 'index');
+  $r->any('/foo/yada')->to('Foo#yada');
+  $r->any('/foo')->to('foo#index');
+  $r->any('/foo-bar')->to('foo-bar#index');
+  $r->any('/foo/baz')->to('foo#baz');
+  $r->any('/plugin-test-some_plugin2/register')->to('plugin-test-some_plugin2#register');
+  $r->any('/foo/syntaxerror')->to('foo#syntaxerror');
+  $r->any('/syntax_error/foo')->to('syntax_error#foo');
+  $r->any('/:foo/test' => [foo => [qw(foo bar)]])->to('foo#test');
+  $r->any('/another')->to('another#index');
+  $r->any('/foo/willdie')->to('foo#willdie');
+  $r->any('/foo/templateless')->to('foo#templateless');
+  $r->any('/foo/withlayout')->to('foo#withlayout');
+  $r->any('/side_effects-test/index')->to('side_effects-test#index');
 
   # /just/some/template (embedded template)
   $r->any('/just/some/template')->to(template => 'just/some/template');

@@ -1,9 +1,45 @@
 ==================================================
-Changes from 2019-12-01 00:00:00 +0000 to present.
+Changes from 2020-02-20 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.055 at 2020-11-30 16:50:10 +0000
+version 0.058 at 2021-02-19 22:46:07 +0000
+------------------------------------------
+
+  Change: 95f7dd7f038f5715c7db242707c21c7e82e56de2
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2021-02-19 16:45:57 +0000
+
+    fixed bug in Util::Medley::Cache::delete() 
+
+------------------------------------------
+version 0.057 at 2021-02-16 21:38:24 +0000
+------------------------------------------
+
+  Change: 3e22a775a248c60d9e87b7eb257d9c5810828b27
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2021-02-16 15:38:24 +0000
+
+    cosmetic change 
+
+  Change: 774fc3e74268d60755af0cbcbcac607ab4a5a890
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2021-02-16 15:37:21 +0000
+
+    added lib/Util/Medley/Simple/* and new YAML class 
+
+------------------------------------------
+version 0.056 at 2021-02-16 21:36:18 +0000
+------------------------------------------
+
+  Change: e1c57228af5b199d59f0ada87300cd33a425f17c
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2021-02-16 15:36:18 +0000
+
+    v0.056 
+
+------------------------------------------
+version 0.055 at 2020-11-30 16:50:00 +0000
 ------------------------------------------
 
   Change: da94d9b658b3086c321b3f21c503c5a7922e0035
@@ -391,105 +427,6 @@ version 0.025 at 2020-03-06 22:27:55 +0000
 
     added Util::Medley::Number 
 
-------------------------------------------
-version 0.024 at 2020-01-21 19:02:25 +0000
-------------------------------------------
-
-  Change: 0ccfdcfee4afb1858a62e8bae37d5ea9e7c6d59e
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2020-01-21 13:01:52 +0000
-
-    added lib/Util/Medley/Package.pm 
-
-------------------------------------------
-version 0.023 at 2020-01-17 21:55:56 +0000
-------------------------------------------
-
-  Change: 116f9fe923de47eed528841848b063e68e2e1d67
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2020-01-17 15:55:37 +0000
-
-    added which method to Util-Medley/lib/Util/Medley/File.pm 
-
-  Change: 86b74ab5833e8aa78422a783f9c4044dc74cc548
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2020-01-10 10:12:03 +0000
-
-    updated pod in lib/Util/Medley/File.pm 
-
-------------------------------------------
-version 0.022 at 2020-01-09 15:05:17 +0000
-------------------------------------------
-
-  Change: 4673cb91f26daccfb9449f854b36a2095363076e
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2020-01-09 09:05:17 +0000
-
-    added workaround to assist getting Kavorka dep installed 
-
-------------------------------------------
-version 0.021 at 2020-01-07 14:34:25 +0000
-------------------------------------------
-
-  Change: bd611c47c5d3b7b5b7c5e396429534bdfce8d52a
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2020-01-07 08:34:25 +0000
-
-    added methods:
-
-    File::slurp()
-
-    List::diff()
-
-    List::differ() 
-
-------------------------------------------
-version 0.020 at 2019-12-05 20:35:26 +0000
-------------------------------------------
-
-  Change: 6f57c1936f10ad25d39ce87838a96a6ca6e8cb8a
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-12-05 14:33:45 +0000
-
-    - fixed pod for findFiles - modified nsort to sort without regard to
-    locale 
-
-------------------------------------------
-version 0.019 at 2019-12-02 21:00:33 +0000
-------------------------------------------
-
-  Change: 21635abd849d7ee47cd8f1ec6fd49e91599b3a39
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-12-02 15:00:33 +0000
-
-    fixed bug in File::findFiles method 
-
-------------------------------------------
-version 0.018 at 2019-12-02 20:52:21 +0000
-------------------------------------------
-
-  Change: fe1c534c65990924402aa1277d91eb3da2c7a346
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-12-02 14:52:21 +0000
-
-    added File::touch method 
-
-  Change: e605c6d9c68ed09b6dc2ebc0e0859562a12e9eb0
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-12-02 13:45:11 +0000
-
-    updated find perldoc 
-
-------------------------------------------
-version 0.017 at 2019-12-02 19:42:40 +0000
-------------------------------------------
-
-  Change: 5ce8ee03c041921bdeeab759744b6153d7019553
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-12-02 13:42:40 +0000
-
-    added maxDepth option to find* methods 
-
 =================================================
-Plus 12 releases after 2019-12-01 00:00:00 +0000.
+Plus 20 releases after 2020-02-20 00:00:00 +0000.
 =================================================

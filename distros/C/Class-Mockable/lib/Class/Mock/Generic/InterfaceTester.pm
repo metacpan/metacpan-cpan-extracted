@@ -3,18 +3,19 @@ package Class::Mock::Generic::InterfaceTester;
 use strict;
 use warnings;
 
-our $VERSION = '1.3000';
+our $VERSION = '1.3001';
 
 use vars qw($AUTOLOAD);
 
 use Test::More ();
 use Data::Compare;
 use Scalar::Util;
-use Data::Dumper;
-local $Data::Dumper::Indent = 1;
+use Data::Dumper::Concise;
 
 use Class::Mockable
     _ok => sub { Test::More::ok($_[0], @_[1..$#_]) };
+
+use Class::Mock::Common ();
 
 =head1 NAME
 
@@ -76,6 +77,23 @@ or, more simply:
         }
     );
     ok(My::Module->something_that_updates_storage_for_non_payment);
+
+You can also create mocks by loading them from a file:
+
+    my $interface_tester = Class::Mock::Generic::InterfaceTester->new(
+        \"filename.dd"
+    );
+
+or:
+
+    my $interface_tester = Class::Mock::Generic::InterfaceTester->new;
+    $interface_tester->add_fixtures(
+        \"filename.dd"
+    );
+
+Yes, that's a reference to a scalar. The scalar is assumed to be a filename
+which will be read, and whose contents should be valid arguments to create
+fixtures.
 
 =head1 METHODS
 
@@ -183,6 +201,37 @@ C<set_name> are treated as normal mocked method calls.
 
 When the mock object goes out of scope, this is called as usual.  It
 will emit a test failure if not all the fixtures were used.
+
+=head1 RECORDING AND PLAYBACK
+
+As noted above you can read fixtures from a file by passing a reference to
+a scalar filename as the first argument to C<new> or C<add_fixtures>.
+
+Recording fixtures to a file is not yet implemented.
+
+=cut
+
+# You can also record the interactions of your tests with a class by setting the
+# environment variable PERL_CMGIT_RECORD to a true value and passing some extra
+# args to C<new>. As well as the reference to a filename, also pass the name of
+# the class whose input and output you wish to record, and optionally either a
+# list of methods or a regex that matches method names thus:
+# 
+#     Class::Mock::Generic::InterfaceTester->new(
+#         \"filename.dd",
+#         'I::Want::To::Mock::This',
+#         qw(but only these methods) # or qr/^(but|only|these|methods)$/
+#     );
+# 
+# and the mock object will pass args through to the underlying class and record
+# what happens. If no list of methods or regex is present then all methods will
+# be recorded, including those inherited from superclasses, except those whose
+# names begin with an underscore.
+# 
+# The observant amongst you will have noticed that because when reading from
+# a file all arguments after the first are ignored, then you can choose to
+# record or to playback by just setting the environment variable and making
+# no other changes. This is deliberate.
 
 =head1 PHILOSOPHY
 
@@ -322,9 +371,10 @@ sub new {
     return $self;
 }
 
-# Declaring this as a coderef rather than a method so we can decide
+# $_add_fixtures is a coderef rather than a method so we can decide
 # whether it exists or not based on how the constructor was called,
 # for maximum backwards-compatibility.
+#
 
 $_add_fixtures = sub {
     my $self = shift;
@@ -332,7 +382,9 @@ $_add_fixtures = sub {
     $self->{_fixtures_have_been_set} = 1;
 
     # We might have been passed an arrayref or a list.
-    my @args = (ref($_[0]) eq 'ARRAY' && @_ == 1) ? @{$_[0]} : @_;
+    my @args = (ref($_[0]) eq 'ARRAY' && @_ == 1)  ? @{$_[0]} :
+               (ref($_[0]) eq 'SCALAR' && @_ == 1) ? Class::Mock::Common::_get_tests_from_file(${$_[0]}) :
+                                                     @_;
 
     # Our fixtures might be raw hashrefs, or method name => hashref pairs.
     # You can't mix and match.
@@ -455,7 +507,7 @@ sub DESTROY {
  
 =head1 AUTHOR
 
-Copyright 2012, 2017 UK2 Ltd and David Cantrell E<lt>david@cantrell.org.ukE<gt>
+Copyright 2012 - 2020 UK2 Ltd and David Cantrell E<lt>david@cantrell.org.ukE<gt>
 
 Some contributions from Sam Kington
 

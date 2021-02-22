@@ -7,7 +7,7 @@ use Cwd qw(abs_path);
 use Text::ParseWords;
 use mro;
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 sub new {
     my $class = shift;

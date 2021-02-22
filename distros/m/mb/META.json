@@ -1,6 +1,6 @@
 {
     "name" : "mb",
-    "version" : "0.20",
+    "version" : "0.22",
     "abstract" : "run Perl script in MBCS encoding (not only CJK ;-)",
     "author" : [
         "ina <ina@cpan.org>"

@@ -1,5 +1,5 @@
 package App::CSE::File::TextXScala;
-$App::CSE::File::TextXScala::VERSION = '0.015';
+$App::CSE::File::TextXScala::VERSION = '0.016';
 use Moose;
 
 extends qw/App::CSE::File/;

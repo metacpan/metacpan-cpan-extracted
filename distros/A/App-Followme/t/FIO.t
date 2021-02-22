@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 
-use Test::More tests => 35;
+use Test::More tests => 32;
 
 use Cwd;
 use IO::File;
@@ -225,50 +225,24 @@ EOQ
 };
 
 #----------------------------------------------------------------------
-# Test shorten path
-
-do {
-    my @path = ('help', 'followme', '..', '..');
-    my $file = "poddata.html";
-    
-    my $url = catfile($test_dir, @path, $file);
-    my $url_ok = catfile($test_dir, $file);
-
-    my $short_url = fio_shorten_path($url);
-    is($short_url, $url_ok, "Shorten path"); # test 25
-};
-
-#----------------------------------------------------------------------
 # Test filename to url
 
 do {
     my $url_ok = 'index.html';
     my $filename = catfile($test_dir, $url_ok);
     my $url = fio_filename_to_url($test_dir, $filename);
-    is($url, $url_ok, 'Simple url'); # test 26
+    is($url, $url_ok, 'Simple url'); # test 25
 
     $filename = catfile($test_dir, 'index.md');
     $url = fio_filename_to_url($test_dir, $filename, 'html');
-    is($url, $url_ok, 'Url from filename'); # test 27
+    is($url, $url_ok, 'Url from filename'); # test 26
 
     $url_ok = 'subdir/foobar.html';
     my @path = split(/\//, $url_ok);
     $filename = catfile($test_dir, @path);
     $url = fio_filename_to_url($test_dir, $filename, 'html');
-    is($url, $url_ok, 'Url in subdirectory'); # test 28
+    is($url, $url_ok, 'Url in subdirectory'); # test 27
 
-};
-
-#----------------------------------------------------------------------
-# Create a new directory
-
-do {
-    my $filename = catfile($test_dir, 'subspace/index.html');
-    my ($dir_ok, $file_ok) = fio_split_filename($filename);
-    my $new_filename = fio_make_dir($filename);
-
-    is($new_filename, $filename, "Get filename from make_dir"); # test 29
-    ok(-e $dir_ok, "Make directory"); # test 30
 };
 
 #----------------------------------------------------------------------
@@ -287,21 +261,21 @@ do {
 
 	my $str1 = fio_flatten($data->{name1});
 	my $val1 = 'value1'; 
-	is($str1, $val1, "flatten a string"); # test 31
+	is($str1, $val1, "flatten a string"); # test 28
 
 	my $str2 = fio_flatten($data->{name2});
 	my $val2 = 'value2'; 
-	is($str2, $val2, "flatten another string"); # test 32
+	is($str2, $val2, "flatten another string"); # test 29
 		
 	my $str4 = fio_flatten($data->{name4});
 	my $val4 = 'subvalue3, subvalue4'; 
-	is($str4, $val4, "flatten an array"); # test33
+	is($str4, $val4, "flatten an array"); # test30
 	
 	my $str3 = fio_flatten($data->{name3});
 	my $val3 = 'subname1: subvalue1, subname2: subvalue2';
-	is($str3, $val3, "flatten a hash"); # test34
+	is($str3, $val3, "flatten a hash"); # test31
 	
 	my $total = "name1: $val1, name2: $val2, name3: $val3, name4: $val4";
 	my $str = fio_flatten($data);
-	is($str, $total, "flatten a complex structure"); # test35
+	is($str, $total, "flatten a complex structure"); # test32
 };

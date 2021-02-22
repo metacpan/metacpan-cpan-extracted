@@ -5,7 +5,14 @@ use warnings FATAL => qw( all );
 use Carp;
 use Data::Dumper;
 
-sub new { bless [] => shift }
+sub new {
+	my($class, $number_of_records) = @_;
+	
+	$number_of_records //= 0;
+	my @arr = (undef) x $number_of_records;
+	
+	return bless \@arr => $class;
+}
 
 sub find_row {
 	my $self = shift;

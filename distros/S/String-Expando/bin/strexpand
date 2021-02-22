@@ -1,0 +1,105 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use String::Expando 0.07;
+
+sub usage;
+sub fatal;
+
+my %arg = parse_options();
+my $defs = delete $arg{'definitions'};
+my %stash;
+foreach (@$defs) {
+    /^([^=]+)=(.*)$/ or usage;
+    $stash{$1} = $2;
+}
+my $expando = String::Expando->new(%arg, 'stash' => \%stash);
+while (<>) {
+    print $expando->expand($_);
+}
+
+# --- Functions
+
+sub parse_options {
+    # I would love to use Getopt::Long for command-line argument parsing, but
+    # this would effectively cause String::Expando to depend on Getopt::Long,
+    # which strikes me as wrong -- most users of this distribution won't be
+    # using this script, they'll just be using String::Expando.
+    my @defs;
+    my %arg = (
+        'definitions' => \@defs,
+    );
+    my %opt = (
+        'D=s' => \@defs,
+        'e=s' => 'expando',
+        'c' => sub {
+            # One-character expandos (%a, %b, etc.) with %% expanding to %
+            $arg{'expando'} = qr/%(.)/;
+            $arg{'escaped_literal'} = qr/%(%)/;
+            $arg{'literal'} = qr/(.)/;
+        },
+        'C' => sub {
+            # One-character expandos using $ instead of %
+            $arg{'expando'} = qr/\$(.)/;
+            $arg{'escaped_literal'} = qr/\$(\$)/;
+            $arg{'literal'} = qr/(.)/;
+        },
+    );
+    my @options = sort keys %opt;
+    my $opt_chars = '[' . join('', map { substr($_, 0, 1) } keys %opt) . ']';
+    my $rxopt = qr/$opt_chars/;
+    while (@ARGV) {
+        shift, last if $ARGV[0] eq '--';
+        last if $ARGV[0] !~ s/^-(?=.)//;
+        # Determine which option to set ($opt)
+        my $arg = shift @ARGV;
+        usage if $arg !~ s/^($rxopt)(.*)//;
+        my ($opt, $remainder) = ($1, $2);
+        my ($fullspec, @etc) = grep { substr($_, 0, 1) eq $opt } @options;
+        die "non-unique option: $fullspec @etc" if @etc;
+        my $spec = substr($fullspec, 1);
+        # Determine the value to set it to ($val)
+        my $val;
+        if ($spec eq '') {
+            # Option that doesn't take an argument
+            $val = 1;
+            if (length $remainder) {
+                usage if $remainder !~ /^-$rxopt/;
+                unshift @ARGV, '-' . $remainder;
+            }
+        }
+        elsif ($spec =~ s/^=//) {
+            $val = length($remainder) ? $remainder
+                 : @ARGV              ? shift @ARGV
+                 : usage;
+            if ($spec eq 'i') {
+                usage if $val !~ /^-?[0-9]+$/;
+            }
+        }
+        else {
+            die "invalid option specification: $fullspec";
+        }
+        # Determine how the caller wants us to set the option's value, and set it
+        my $dst = $opt{$fullspec};
+        my $ref = ref $dst;
+        if ($ref eq 'SCALAR') {
+            $$dst = $val;
+        }
+        elsif ($ref eq 'ARRAY') {
+            push @$dst, $val;
+        }
+        elsif ($ref eq '') {
+            $arg{$opt} = $val;
+        }
+        elsif ($ref eq 'CODE') {
+            $dst->($opt, $val);
+        }
+        else {
+            die "invalid destination for option -$opt: $ref";
+        }
+    }
+    return %arg;
+}
+

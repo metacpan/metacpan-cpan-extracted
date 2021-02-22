@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHub::Meta;
 use strict;
 use warnings;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use JSON::MaybeXS;
 use Moose;
@@ -130,6 +130,7 @@ sub metadata {
     $self->log("Getting GitHub repository info");
 
     my $url      = $self->api."/repos/$repo_name";
+    $self->log_debug("Sending GET $url");
     my $response = $http->request('GET', $url, $self->require_auth ? {headers => $self->_auth_headers} : ());
 
     my $repo = $self->_check_response($response);
@@ -206,7 +207,7 @@ Dist::Zilla::Plugin::GitHub::Meta - Add a GitHub repo's info to META.{yml,json}
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -311,7 +312,7 @@ Wiki happens to be activated (see the GitHub repository's C<Admin> panel).
 =item C<bugs>
 
 The META bugtracker web field will be set to the issue's page of the repository
-on GitHub, if this options is set to true (default) and if the GitHub Issues happen to
+on GitHub, if this option is set to true (default) and if the GitHub Issues happen to
 be activated (see the GitHub repository's C<Admin> panel).
 
 =item C<fork>

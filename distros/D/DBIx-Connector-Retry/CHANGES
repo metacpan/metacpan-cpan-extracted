@@ -1,14 +1,19 @@
 Changelog for DBIx-Connector-Retry
 
-v0.900.1 2020-05-14T20:27:15
+v0.900.2 2021-02-11T22:09:54
+ - Update README / LICENSE (Brendan Byrd)
+ - Fix nested state variable problem with localization (Brendan Byrd)
+ - Add execute_method checks to standard tests (Brendan Byrd)
+ - Transplant warn/die calls into their own private methods (Brendan Byrd)
+ - Add new execute_method attribute (Brendan Byrd)
+ - Improve deadlock/timeout example (Larry Leszczynski)
+
+v0.900.1 2020-05-14T20:27:01
  - Update README (Brendan Byrd)
  - Clean up cpanfile (Andrew Hewus Fresh)
  - Clean up POD for new PodWeaver settings (Andrew Hewus Fresh)
  - Move xt tests to correct location (Andrew Hewus Fresh)
  - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
-
-v0.900.0 2018-07-05T22:52:17
- - No changes found
 
 0.90 2018-07-05T22:52:17
  - Typo fixups (Brendan Byrd)
@@ -20,3 +25,6 @@ v0.900.0 2018-07-05T22:52:17
  - Add some bare attributes for extra constructor options (Brendan Byrd)
  - Add a set of tests (Brendan Byrd)
  - Initial version of DBIx::Connector::Retry (Brendan Byrd)
+
+v0.900.0 2018-07-05T22:52:17
+ - No changes found

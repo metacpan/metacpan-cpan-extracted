@@ -1,5 +1,10 @@
 Revision history for Math-MatrixLUP
 
+0.03    2021-02-21
+
+        - Added the `invmod` method.
+        - Added support for negative exponents in `powmod`.
+
 0.02    2019-02-11
 
         - Fixed some tests which required a recent version of Math::AnyNum.

@@ -27,6 +27,10 @@ WriteMakefile(
                 url => 'git://git.gnu.org.ua/config-haproxy.git',
 		web => 'http://git.gnu.org.ua/cgit/config-haproxy.git/',
 	    },
+	    bugtracker => {
+		web => 'https://puszcza.gnu.org.ua/bugs/?group=config-haproxy',
+  	        mailto => 'gray+config-haproxy@gnu.org.ua'
+            }	    
 	},
 	provides => Module::Metadata->provides(version => '1.4',
 					       dir => 'lib')

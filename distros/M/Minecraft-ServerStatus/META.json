@@ -1,0 +1,56 @@
+{
+   "abstract" : "A Minecraft server status checker",
+   "author" : [
+      "Lloyd Dilley <ldilley@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Minecraft-ServerStatus",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::INET" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_metaspec" : {
+         "version" : 2
+      },
+      "X_web" : "https://github.com/FragLand/minestat",
+      "bugtracker" : {
+         "web" : "https://github.com/FragLand/minestat/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/FragLand/minestat.git"
+      }
+   },
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

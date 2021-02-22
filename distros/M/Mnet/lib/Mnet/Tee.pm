@@ -45,12 +45,12 @@ Mnet::Tee implements the functions listed below.
 =cut
 
 # required modules
-#   perl 5.10 may be requried for tie to capture stdout and stderr
 use warnings;
 use strict;
 use 5.010;
 use Carp;
 use Exporter qw( import );
+use Mnet;
 use Mnet::Log::Conditional qw( DEBUG INFO WARN FATAL NOTICE );
 use Mnet::Opts::Cli::Cache;
 

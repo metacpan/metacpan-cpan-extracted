@@ -1,4 +1,4 @@
-requires 'perl', '5.010001';
+requires 'perl', '5.016001';
 requires 'Mojolicious', '>=7.93';
 
 on 'test' => sub {

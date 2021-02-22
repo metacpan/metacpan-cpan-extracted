@@ -1,0 +1,59 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ARRAY	lib/TOML/Tiny/Writer.pm	/^      ARRAY: for my $k (grep{ ref $data->{$_} eq 'ARRAY' } sort keys %$data) {$/;"	l
+TOKEN	lib/TOML/Tiny/Parser.pm	/^  TOKEN: while (my $token = $self->next_token) {$/;"	l
+TOML::Tiny	lib/TOML/Tiny.pm	/^package TOML::Tiny;$/;"	p
+TOML::Tiny::Grammar	lib/TOML/Tiny/Grammar.pm	/^package TOML::Tiny::Grammar;$/;"	p
+TOML::Tiny::Parser	lib/TOML/Tiny/Parser.pm	/^package TOML::Tiny::Parser;$/;"	p
+TOML::Tiny::Tokenizer	lib/TOML/Tiny/Tokenizer.pm	/^package TOML::Tiny::Tokenizer;$/;"	p
+TOML::Tiny::Util	lib/TOML/Tiny/Util.pm	/^package TOML::Tiny::Util;$/;"	p
+TOML::Tiny::Writer	lib/TOML/Tiny/Writer.pm	/^package TOML::Tiny::Writer;$/;"	p
+build_negpath_test_files	build-tests.pl	/^sub build_negpath_test_files{$/;"	s
+build_pospath_test_files	build-tests.pl	/^sub build_pospath_test_files{$/;"	s
+current_line	lib/TOML/Tiny/Tokenizer.pm	/^sub current_line {$/;"	s
+deannotate	build-tests.pl	/^sub deannotate{$/;"	s
+decode	lib/TOML/Tiny.pm	/^sub decode {$/;"	s
+deturd_json	build-tests.pl	/^sub deturd_json{$/;"	s
+encode	lib/TOML/Tiny.pm	/^sub encode {$/;"	s
+error	lib/TOML/Tiny/Tokenizer.pm	/^sub error {$/;"	s
+expect_type	lib/TOML/Tiny/Parser.pm	/^sub expect_type {$/;"	s
+from_toml	lib/TOML/Tiny.pm	/^sub from_toml {$/;"	s
+get_keys	lib/TOML/Tiny/Parser.pm	/^sub get_keys {$/;"	s
+inflate_float	lib/TOML/Tiny/Parser.pm	/^sub inflate_float {$/;"	s
+inflate_integer	lib/TOML/Tiny/Parser.pm	/^sub inflate_integer {$/;"	s
+is_strict_array	lib/TOML/Tiny/Util.pm	/^sub is_strict_array {$/;"	s
+new	lib/TOML/Tiny.pm	/^sub new {$/;"	s
+new	lib/TOML/Tiny/Parser.pm	/^sub new {$/;"	s
+new	lib/TOML/Tiny/Tokenizer.pm	/^sub new {$/;"	s
+next_token	lib/TOML/Tiny/Parser.pm	/^sub next_token {$/;"	s
+next_token	lib/TOML/Tiny/Tokenizer.pm	/^sub next_token {$/;"	s
+parse	lib/TOML/Tiny.pm	/^sub parse {$/;"	s
+parse	lib/TOML/Tiny/Parser.pm	/^sub parse {$/;"	s
+parse_array_table	lib/TOML/Tiny/Parser.pm	/^sub parse_array_table {$/;"	s
+parse_error	lib/TOML/Tiny/Parser.pm	/^sub parse_error {$/;"	s
+parse_inline_array	lib/TOML/Tiny/Parser.pm	/^sub parse_inline_array {$/;"	s
+parse_inline_table	lib/TOML/Tiny/Parser.pm	/^sub parse_inline_table {$/;"	s
+parse_key	lib/TOML/Tiny/Parser.pm	/^sub parse_key {$/;"	s
+parse_table	lib/TOML/Tiny/Parser.pm	/^sub parse_table {$/;"	s
+parse_value	lib/TOML/Tiny/Parser.pm	/^sub parse_value {$/;"	s
+pop_keys	lib/TOML/Tiny/Parser.pm	/^sub pop_keys {$/;"	s
+push_keys	lib/TOML/Tiny/Parser.pm	/^sub push_keys {$/;"	s
+scan_to_key	lib/TOML/Tiny/Parser.pm	/^sub scan_to_key {$/;"	s
+set_keys	lib/TOML/Tiny/Parser.pm	/^sub set_keys {$/;"	s
+slurp	build-tests.pl	/^sub slurp{$/;"	s
+strftime_rfc3339	lib/TOML/Tiny/Writer.pm	/^sub strftime_rfc3339 {$/;"	s
+to_toml	lib/TOML/Tiny.pm	/^sub to_toml {$/;"	s
+to_toml	lib/TOML/Tiny/Writer.pm	/^sub to_toml {$/;"	s
+to_toml_key	lib/TOML/Tiny/Writer.pm	/^sub to_toml_key {$/;"	s
+to_toml_string	lib/TOML/Tiny/Writer.pm	/^sub to_toml_string {$/;"	s
+tokenize_float	lib/TOML/Tiny/Tokenizer.pm	/^sub tokenize_float {$/;"	s
+tokenize_integer	lib/TOML/Tiny/Tokenizer.pm	/^sub tokenize_integer {$/;"	s
+tokenize_key	lib/TOML/Tiny/Tokenizer.pm	/^sub tokenize_key {$/;"	s
+tokenize_string	lib/TOML/Tiny/Tokenizer.pm	/^sub tokenize_string {$/;"	s
+unescape_chars	lib/TOML/Tiny/Tokenizer.pm	/^sub unescape_chars {$/;"	s
+unescape_str	lib/TOML/Tiny/Tokenizer.pm	/^sub unescape_str {$/;"	s
+update_position	lib/TOML/Tiny/Tokenizer.pm	/^sub update_position {$/;"	s

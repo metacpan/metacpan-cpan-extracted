@@ -3,67 +3,102 @@ NAME
 
 SYNOPSIS
      use File::Object;
+
      my $obj = File::Object->new(%parameters);
-     $obj->dir(@dir);
-     $obj->file(@file_path);
+     my $self = $obj->dir(@dir);
+     my $self = $obj->file(@file_path);
      my $dir = $obj->get_dir($dir_num);
      my $file = $obj->get_file;
-     $obj->reset;
+     my $self = $obj->reset;
      my $path = $obj->s;
-     $obj->set;
-     $obj->up($num);
+     my $self = $obj->set;
+     my $self = $obj->up($num);
 
 METHODS
-    "new(%parameters)"
-            Constructor.
+  "new"
+     my $obj = File::Object->new(%parameters);
 
-            *       "dir"
+    Constructor.
 
-                     Directory path in reference to array.
-                     Default value is [].
+    Returns instance of object.
 
-            *       "file"
+    *       "dir"
 
-                     File path.
-                     Default value is undef.
+            Directory path in reference to array.
 
-            *       "type"
+            Default value is [].
 
-                     Type of path.
-                     Types:
-                     - file
-                     - dir
-                     Default value is 'dir'.
+    *       "file"
 
-    "dir(@dir)"
-             Add directory or directories to object.
-             Returns main object.
+            File path.
 
-    "file(@file_path)"
-             Add file or directory/directories with file to object.
-             Returns main object.
+            Default value is undef.
 
-    "get_dir($dir_num)"
-             Returns $dir_num level directory.
-             Default value of $dir_num is 1.
+    *       "type"
 
-    "get_file()"
-             Returns:
-             - Filename if object is file path.
-             - undef if object is directory path.
+            Type of path. Types:
 
-    "reset()"
-             Reset to constructor values.
+             - file
+             - dir
 
-    "s()"
-             Serialize path and return.
+            Default value is 'dir'.
 
-    "set()"
-             Set actual values to constructor values.
+  "dir"
+     my $self = $obj->dir(@dir);
 
-    "up($up_num)"
-             Go to $up_num upper directory.
-             Returns main object.
+    Add directory or directories to object.
+
+    Returns instance of object.
+
+  "file"
+     my $self = $obj->file(@file_path);
+
+    Add file or directory/directories with file to object.
+
+    Returns instance of object.
+
+  "get_dir"
+     my $dir = $obj->get_dir($dir_num);
+
+    Default value of $dir_num is 1.
+
+    Returns $dir_num level directory.
+
+  "get_file"
+     my $file = $obj->get_file;
+
+    Returns:
+
+     - Filename if object is file path.
+     - undef if object is directory path.
+
+  "reset"
+     my $self = $obj->reset;
+
+    Reset to constructor values.
+
+    Returns instance of object.
+
+  "s"
+     my $path = $obj->s;
+
+    Serialize path and return.
+
+    Returns string.
+
+  "set"
+     my $self = $obj->set;
+
+    Set actual values to constructor values.
+
+    Returns instance of object.
+
+  "up"
+     my $self = $obj->up($num);
+
+    Go to $up_num upper directory.
+
+    Returns instance of object.
 
 ERRORS
      new():
@@ -78,11 +113,9 @@ ERRORS
                      PATH -> path;
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Object;
 
      # Print actual directory path.
@@ -92,11 +125,9 @@ EXAMPLE1
      # /usr/local/bin
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Object;
 
      # Print parent directory path.
@@ -106,11 +137,9 @@ EXAMPLE2
      # /usr/local
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Object;
 
      # Object with directory path.
@@ -133,11 +162,9 @@ EXAMPLE3
      # path\to\subdir\file2
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Object;
 
      # Object with directory path.
@@ -170,7 +197,7 @@ SEE ALSO
         Cross-platform path specification manipulation
 
 REPOSITORY
-    <https://github.com/tupinek/File-Object>
+    <https://github.com/michal-josef-spacek/File-Object>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -178,9 +205,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Josef Špaček 2009-2018
-     BSD 2-Clause License
+    © Michal Josef Špaček 2009-2021
+
+    BSD 2-Clause License
 
 VERSION
-    0.11
+    0.13
 

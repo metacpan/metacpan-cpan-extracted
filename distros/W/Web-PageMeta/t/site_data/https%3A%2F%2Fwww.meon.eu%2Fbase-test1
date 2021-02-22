@@ -1,0 +1,6 @@
+<html>
+    <head>
+        <base href="/static/img/"/>
+        <meta property="og:image" content="testing-base.jpg"/>
+    </head>
+</html>

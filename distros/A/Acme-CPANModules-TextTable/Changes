@@ -1,3 +1,40 @@
+0.009   2021-02-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add features: column_width, per_column_width, row_height,
+	  per_row_height, pad, vpad.
+
+	- Add entries: Text::Table::Any, Text::Table::More,
+          Text::Table::Manifold, Text::UnicodeBox::Table.
+
+	- [doc] Mention Acme::CPANModules::HTMLTable.
+
+	- Add datasets that contain color & wide char.
+
+
+0.008   2021-02-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename feature: color -> color_data.
+
+        - Add features: custom_border, custom_color, color_theme, align_cell,
+	  align_column, rowspan, colspan.
+
+	- Add participants: Text::Table::TinyBorderStyle,
+	  Text::Table::Span.
+
+
+0.007   2021-01-31  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.006 & 0.006.1.
+
+
+0.006.1  2021-01-25  Released-By: PERLANCAR; Urgency: medium; Cancelled: yes
+
+	- Add feature: multiline_data.
+
+        - UPDATE 2021-01-31: rename version from 0.006 to 0.006.1 to avoid
+          conflict.
+
+
 0.006   2020-09-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Note that Text::Table::Tiny (1.01_01) can now handle wide

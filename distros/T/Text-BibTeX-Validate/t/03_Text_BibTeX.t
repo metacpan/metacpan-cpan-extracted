@@ -33,14 +33,11 @@ close $fh;
 my $bibfile = Text::BibTeX::File->new( $tmp->filename );
 my $entry = Text::BibTeX::Entry->new( $bibfile );
 my $warning;
-local $SIG{__WARN__} = sub { $warning = $_[0] };
 
-validate_BibTeX( $entry );
-$warning =~ s/\n$// if $warning;
+( $warning ) = validate_BibTeX( $entry );
 is( $warning, undef );
 
 $entry->set( 'doi', 'doi/10.1107/S1600576715022396' );
-validate_BibTeX( $entry );
-$warning =~ s/\n$// if $warning;
-is( $warning,
+( $warning ) = validate_BibTeX( $entry );
+is( "$warning",
     'doi: value \'doi/10.1107/S1600576715022396\' does not look like valid DOI' );

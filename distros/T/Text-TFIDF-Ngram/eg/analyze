@@ -18,6 +18,7 @@ my %opts = (
     type   => 'txt',
     punc   => '[-!"#$%&()*+,.\/\\:;<=>?@\[\]^_`{|}~]',
     lc     => 0,
+    proper => 0,
 );
 GetOptions( \%opts,
     'dir=s@',
@@ -28,6 +29,7 @@ GetOptions( \%opts,
     'type=s',
     'punc=s',
     'lc',
+    'proper',
     'help|?',
     'man',
 ) or pod2usage(2);
@@ -62,6 +64,8 @@ if ( $opts{top} ) {
         my $n = 0;
 
         for my $p ( sort { $x->{$file}{$b} <=> $x->{$file}{$a} } keys %{ $x->{$file} } ) {
+            next if $opts{proper} && $p =~ /[A-Z]/;
+
             last if ++$n > $opts{top};
 
             printf "\t%d. %s = %.10f\n", $n, $p, $x->{$file}{$p};
@@ -102,11 +106,11 @@ analyze - TF-IDF Analyze a corpus
 
   perl analyze --dir=/some/corpus [options]
 
-  perl analyze --dir=/Users/you/Documents/lit/inaugural --top=5
+  perl analyze --dir=/Users/you/Documents/lit/inaugural --top=5 --proper
   perl analyze --dir=/Users/you/Documents/lit/inaugural --phrase='public good'
   perl analyze --dir=/Users/you/Documents/lit/inaugural --dir=/Users/you/Documents/lit/SOTU --top=5
   perl analyze --dir=/Users/you/Documents/lit/Shakespeare --size=3 --top=5
-  perl analyze --dir=/Users/you/perl5/lib/site_perl/Music --size=1 --type=pm --punc=''
+  perl analyze --dir=/Users/you/perl5/lib/site_perl/Music --size=1 --type=pm --punc=0
 
 =head1 DESCRIPTION
 
@@ -161,7 +165,7 @@ Default: C<txt>
 =item --punc
 
 A string defining a regular expression of characters to exclude from results.
-Giving a C<''> or C<0> as the value for this will not exclude any characters.
+Giving C<0> as the value for this will not exclude any characters.
 
 Default: [-!"#$%&()*+,.\/\\:;<=>?@\[\]^_`{|}~]
 
@@ -170,6 +174,12 @@ Note that the single quote is not excluded by default.
 =item --lc
 
 Lower-case the results.
+
+Default: C<0>
+
+=item --proper
+
+Skip phrases with capitalized words (often proper nouns).
 
 Default: C<0>
 

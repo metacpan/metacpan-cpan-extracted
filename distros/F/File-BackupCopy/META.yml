@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,11 +21,11 @@ no_index:
 provides:
   File::BackupCopy:
     file: lib/File/BackupCopy.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   File::Temp: '0.23'
   perl: '5.014002'
 resources:
+  bugtracker: https://puszcza.gnu.org.ua/bugs/?group=file-backup
   repository: git://git.gnu.org.ua/file-backup.git
-version: '1.01'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.02'

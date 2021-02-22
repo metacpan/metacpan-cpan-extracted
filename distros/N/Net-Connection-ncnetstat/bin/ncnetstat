@@ -6,7 +6,7 @@ use Getopt::Long;
 use Net::Connection::ncnetstat;
 
 sub version{
-	print "ncnetstat v. 0.3.0\n";
+	print "ncnetstat v. 0.3.1\n";
 }
 
 sub help{
@@ -941,19 +941,19 @@ Set to either 0 or 1, boolean, for setting the default.
 
 =head1 EXAMPLES
 
-    ncnestat -s established,time_wait
+    ncnetstat -s established,time_wait
 
 Return a list of connection that are in the established or time_wait state.
 
-    ncnestat -c ::/0
+    ncnetstat -c ::/0
 
 Return a list of all IPv6 addresses.
 
-    ncnestat -c ::1/128,127.0.0.1/32
+    ncnetstat -c ::1/128,127.0.0.1/32
 
 Return all connections to localhost.
 
-    ncnestat -c 192.168.15.2/32 -l
+    ncnetstat -c 192.168.15.2/32 -l
 
 Display all connections listening explicitly on 192.168.15.2.
 

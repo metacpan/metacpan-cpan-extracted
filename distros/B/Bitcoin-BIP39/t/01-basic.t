@@ -17,6 +17,7 @@ subtest bip39_mnemonic_to_entropy => sub {
        "d62e9fe56a9d3bf8e58396e931359f27");
     is(bip39_mnemonic_to_entropy(mnemonic => "stomach insane welcome steel squirrel wise noodle index truck meadow guitar exchange"),
        pack("H*","d62e9fe56a9d3bf8e58396e931359f27"));
+    # should die because checksum doesn't match
     dies_ok { bip39_mnemonic_to_entropy(mnemonic => "stomach insane welcome steel squirrel wise noodle index truck meadow guitar guitar", encoding=>"hex") };
     # XXX test encoding=undef
     # XXX test other language

@@ -1,1 +1,0 @@
-{"results":[{"columns":["n.mixed"],"data":[{"row":["%äĀ한\uD83D\uDE00ô"],"meta":[null],"rest":["%äĀ한\uD83D\uDE00ô"]}]}],"errors":[],"commit":"http://localhost:7474/db/neo4j/tx/179/commit","transaction":{"expires":"Tue, 01 Jan 2999 00:00:00 +0000"}}

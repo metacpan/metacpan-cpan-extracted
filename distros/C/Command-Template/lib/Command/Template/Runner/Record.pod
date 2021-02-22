@@ -1,0 +1,134 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Command::Template::Runner::Record
+
+
+=head1 SYNOPSIS
+
+   use Command::Template 'cr';
+
+   my $runner = cr(qw{ ls [options=-l] <dir> });
+   my $run = $runner->run(options => '-la', dir => '/usr');
+
+   say $run->stdout if $run->success;
+   say $run->stderr if $run->failure; # same as ! $run->success
+   say 'killed by signal ' . $run->signal if $run->signal;
+   say 'exit value was' . $run->exit_code;
+
+
+=head1 DESCRIPTION
+
+This class represents the outcome of a single run by
+L<Command::Template.:Runner>; it can be used to investigate the outcome
+in all its parts (e.g. error conditions, what was printed on standard
+output, what was printed as standard error, etc.
+
+=head1 INTERFACE
+
+=head2 B<< command >>
+
+   my $aref = $run->command;
+
+Returns a reference to an array containing the expanded command that was
+executed.
+
+=head2 B< command_as_string >
+
+   my $s = $run->command_as_string;
+
+Returns a stringification of the whole command (assumes using
+L</command>);
+
+=head2 B<< exit_code >>
+
+   my $ec = $run->exit_code;
+
+The process's exit code.
+
+=head2 B<< failure >>
+
+   say 'failed' if $run->failed;
+
+Check whether the invocation failed. It is the opposite of L</success>.
+
+=head2 B<< full_exit_code >>
+
+   my $integer = $run->full_exit_code;
+
+The *full* exit code, including the exit code in the higher byte of the
+pair and the termination signal in the lower.
+
+=head2 B<< merged >>
+
+   my $text = $run->merged;
+
+A mix of standard error and standard output. At the moment first
+standard error, then standard output.
+
+=head2 B<< new >>
+
+   my $object = Command::Template::Runner::Record->new($data);
+
+Constructor (it is not generally meant to be used by end customers).
+
+=head2 B<< options >>
+
+   my $href = $run->options;
+
+A reference to the hash set for options while running. This might e.g.
+contain a key C<stdin> with the standard input provided to the child
+process.
+
+=head2 B<< signal >>
+
+   my $sig = $run->signal;
+
+The signal integer code, in case the child process was terminated due to
+an unhandled signal.
+
+=head2 B<< stderr >>
+
+   my $text = $run->stderr;
+
+What was sent out to standard error.
+
+=head2 B<< stdout >>
+
+   my $text = $run->stdout;
+
+What was sent out to standard output.
+
+=head2 B<< success >>
+
+   say 'everything ok' if $run->success;
+
+Check whether the invocation succeeded. It is the opposite of
+L</failure>:
+
+=head2 B<< timed_out >>
+
+   my $bool = $run->timed_out;
+
+Check whether the operation timed out or not.
+
+=head2 B<< timeout >>
+
+   my $int = $run->timeout;
+
+Returns the timeout value. This is 0 if no timeout was set or the
+command exited without reaching the timeout.
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for Command::Template.
+
+
+=cut

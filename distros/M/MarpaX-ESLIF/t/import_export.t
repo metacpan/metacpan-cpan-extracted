@@ -16,6 +16,7 @@ sub isWithTrack            { 1 }
 package MyValueInterface;
 use strict;
 use diagnostics;
+use Data::Dumper;
 
 sub new                { my ($pkg) = @_; bless { result => undef }, $pkg }
 sub isWithHighRankOnly { 1 }
@@ -25,7 +26,7 @@ sub isWithNull         { 0 }
 sub maxParses          { 0 }
 sub getResult          { $_[0]->{result} }
 sub setResult          { $_[0]->{result} = $_[1] }
-sub perl_proxy         { $_[1] }
+sub perl_proxy         { print "  perl_proxy received value: " . Dumper($_[1]); $_[1] }
 
 package main;
 use strict;
@@ -165,7 +166,8 @@ foreach my $inputArray (@input) {
     my $eslifValue = MarpaX::ESLIF::Value->new($eslifRecognizer, $eslifValueInterface);
     $eslifValue->value();
     my $value = $eslifValueInterface->getResult;
-    if ($input->$_isa('MarpaX::ESLIF::String') && $input->encoding eq 'UTF-8') {
+    my $original_input = $input;
+    if ($original_input->$_isa('MarpaX::ESLIF::String') && $original_input->encoding eq 'UTF-8') {
         #
         # marpaESLIF will always reinject UTF-8 strings as true PV scalars for performance
         #
@@ -173,7 +175,7 @@ foreach my $inputArray (@input) {
         $value = "$value" if defined($value);
     }
     my ($ok, $stack) = cmp_details($value, $input);
-    diag(deep_diag($stack)) unless (ok($ok, "import/export of " . (ref($input) ? ref($input) : (defined($input) ? ((length($input) > 0) ? "$input" : '<empty string>') : 'undef'))));
+    diag(deep_diag($stack)) unless (ok($ok, "import/export of " . (ref($original_input) ? ref($original_input) : (defined($original_input) ? ((length($original_input) > 0) ? "$original_input" : '<empty string>') : 'undef'))));
 }
 
 done_testing();

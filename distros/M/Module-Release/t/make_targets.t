@@ -2,22 +2,18 @@
 use strict;
 use warnings;
 
-use Test::More 1.0 'no_plan';
+use Test::More 1.0;
 use Test::Output;
 
 use Cwd;
 
+require 't/lib/setup_common.pl';
+
 my $class = 'Module::Release';
-my $file  = ".releaserc";
-
-use_ok( $class );
-can_ok( $class, 'new' );
-
-BEGIN {
-	use File::Spec::Functions qw(rel2abs catfile);
-	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
-	require $file;
-	}
+subtest setup => sub {
+	use_ok( $class );
+	can_ok( $class, 'new' );
+	};
 
 my @makefile_pl_targets = qw(
 	build_makefile
@@ -278,3 +274,5 @@ stdout_like
 
 is( $release->local_file, 'foo.tar.gz', "Local file guessed from output" );
 }
+
+done_testing();

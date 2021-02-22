@@ -7,7 +7,7 @@ use namespace::autoclean;
 use MIME::Base64;
 
 extends 'RT::Extension::REST2::Resource';
-use RT::Extension::REST2::Util qw( error_as_json update_custom_fields );
+use RT::Extension::REST2::Util qw( error_as_json update_custom_fields update_role_members fix_custom_role_ids);
 
 sub dispatch_rules {
     Path::Dispatcher::Rule::Regex->new(
@@ -91,10 +91,9 @@ sub from_json {
                 unless $attachment->{$field};
             }
         }
-
-        $body->{NoContent} = 1 unless $body->{Content};
     }
 
+    $body->{NoContent} = 1 unless $body->{Content};
     if (!$body->{NoContent} && !$body->{ContentType}) {
         return error_as_json(
             $self->response,
@@ -115,6 +114,17 @@ sub add_message {
         Type      => $args{ContentType} || $self->request->content_type,
         Subject   => $args{Subject},
     );
+
+    # Check for any bad input data before making updates
+    my ($ok, $errmsg, $return_code) = $self->validate_input(\%args);
+    if (!$ok) {
+        if ( $return_code ) {
+            return error_as_json($self->response, \$return_code, $errmsg);
+        }
+        else {
+            return error_as_json($self->response, \400, $errmsg);
+        }
+    }
 
     # Process attachments
     foreach my $attachment (@{$args{Attachments}}) {
@@ -150,7 +160,18 @@ sub add_message {
 
     push @results, $msg;
     push @results, update_custom_fields($self->record, $args{CustomFields});
+
+    # update_role_members wants custom role IDs (like RT::CustomRole-ID)
+    # rather than role names.
+    my $renamed_custom_roles = fix_custom_role_ids($self->record, $args{CustomRoles});
+    push @results, update_role_members($self->record, $renamed_custom_roles);
     push @results, $self->_update_txn_custom_fields( $TransObj, $args{TxnCustomFields} || $args{TransactionCustomFields} );
+
+    # Set ticket status if we were passed a "Status":"foo" argument
+    if ($args{Status}) {
+        my ($ok, $msg) = $self->record->SetStatus($args{Status});
+        push(@results, $msg);
+    }
 
     $self->created_transaction($TransObj);
     $self->response->body(JSON::to_json(\@results, { pretty => 1 }));
@@ -203,6 +224,15 @@ sub create_path {
     my $self = shift;
     my $id = $self->created_transaction->Id;
     return "/transaction/$id";
+}
+
+sub validate_input {
+    my $self = shift;
+    my $args = shift;
+
+    # Add CF and other pre-update validation here
+
+    return (1, 'Validation passed');
 }
 
 __PACKAGE__->meta->make_immutable;

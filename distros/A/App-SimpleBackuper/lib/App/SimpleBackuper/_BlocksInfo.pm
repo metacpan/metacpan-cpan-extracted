@@ -12,6 +12,8 @@ sub _BlocksInfo($$;$$$$) {
 	$path //= '/';
 	$priority //= 0;
 	
+	my($oldest_backup_id) = $state->{db}->{backups}->unpack($state->{db}->{backups}->[0])->{id};
+	
 	my $subfiles = $state->{db}->{files}->find_all({parent_id => $parent_id});
 	foreach my $file ( @$subfiles ) {
 		
@@ -27,9 +29,11 @@ sub _BlocksInfo($$;$$$$) {
 		foreach my $version ( @{ $file->{versions} } ) {
 			next if ! $version->{block_id};
 			
+			my $backup_id_score = $version->{backup_id_max} - $oldest_backup_id + 1;
+			
 			$block_info->{ $version->{block_id} } ||= [0, 0, []];
-			if($block_info->{ $version->{block_id} }->[0] < $version->{backup_id_max} * $prio) {
-				$block_info->{ $version->{block_id} }->[0] = $version->{backup_id_max} * $prio;
+			if($block_info->{ $version->{block_id} }->[0] < $backup_id_score * $prio) {
+				$block_info->{ $version->{block_id} }->[0] = $backup_id_score * $prio;
 			}
 			foreach my $part (@{ $version->{parts} }) {
 				$block_info->{ $version->{block_id} }->[1] += $part->{size};

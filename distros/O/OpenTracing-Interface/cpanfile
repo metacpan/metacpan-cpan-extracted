@@ -1,7 +1,7 @@
 requires        'Carp';
 requires        'Package::Constants';
 requires        'Role::Inspector', '>= 0.006';
-requires        'Role::Declare', '>= 0.04';
+requires        'Role::Declare::Should';
 requires        'Type::Tiny', '>= 1.006';
 requires        'Type::Library';
 requires        'Type::Utils';

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP::LWP;
 # ABSTRACT: HTTP agent adapter for libwww-perl
-$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.21';
+$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.22';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP);
@@ -132,7 +132,7 @@ Neo4j::Driver::Net::HTTP::LWP - HTTP agent adapter for libwww-perl
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 

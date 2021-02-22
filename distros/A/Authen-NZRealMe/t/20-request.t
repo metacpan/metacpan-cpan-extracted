@@ -85,7 +85,7 @@ ok($xml, 'extracted XML request for analysis');
 
 xml_found_node_ok($xml, q{/nssamlp:AuthnRequest});
 xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@Version} => '2.0');
-xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@AssertionConsumerServiceIndex} => '0');
+xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@AssertionConsumerServiceIndex} => '1');
 xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@ID} => $req_id);
 xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@IssueInstant} => $req->request_time);
 xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@Destination} => $sp->idp->single_signon_location);

@@ -1,0 +1,58 @@
+{
+   "abstract" : "(DEPRECATED) installing and finding Lightbox JS",
+   "author" : [
+      "Graham TerMarsch (cpan@howlingfrog.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Lightbox",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Test::Exception" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::scriptaculous" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Lightbox" : {
+         "file" : "lib/Alien/Lightbox.pm",
+         "version" : "v2.3.3.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v2.3.3.4",
+   "x_bugtracker" : {
+      "web" : "https://github.com/bleargh45/Alien-Lightbox/issues"
+   },
+   "x_deprecated" : 1,
+   "x_repository" : {
+      "type" : "git",
+      "url" : "git://github.com/bleargh45/Alien-Lightbox.git",
+      "web" : "https://github.com/bleargh45/Alien-Lightbox"
+   },
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

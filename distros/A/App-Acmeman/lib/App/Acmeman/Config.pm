@@ -52,7 +52,7 @@ sub mangle {
     if (my $fnode = $self->getnode('files')) {
 	while (my ($k, $v) = each %{$fnode->subtree}) {
 	    $v->set('files', $k, 'type', 'split')
-		unless $v->has_key('type', 'split');
+		unless $v->has_key('type');
 	    if ($v->subtree('type') eq 'single') {
 		unless ($v->has_key('certificate-file')) {
 		    $self->error("files.$k.certificate-file not defined");

@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-MYPACKAGESTART (tconv 1 0 63)
+MYPACKAGESTART (tconv 1 0 71)
 
 ####################
 # Specific options #
@@ -205,9 +205,9 @@ IF (WIN32 AND NOT CYGWIN)
     COMMAND "${CMAKE_COMMAND}" -E copy_directory "${PROJECT_SOURCE_DIR}/3rdparty/github/dlfcn-win32" "${3RDPARTY_OUTPUT_PATH}/dlfcn-win32"
     WORKING_DIRECTORY "${3RDPARTY_OUTPUT_PATH}"
     )
-  SET (dlfcn_src "${3RDPARTY_OUTPUT_PATH}/dlfcn-win32/dlfcn.c")
+  SET (dlfcn_src "${3RDPARTY_OUTPUT_PATH}/dlfcn-win32/src/dlfcn.c")
   LIST (APPEND libtconv_src ${dlfcn_src})
-  LIST (APPEND libtconv_inc ${3RDPARTY_OUTPUT_PATH}/dlfcn-win32)
+  LIST (APPEND libtconv_inc ${3RDPARTY_OUTPUT_PATH}/dlfcn-win32/src)
   SET (DLFCNWIN32_FOUND TRUE)
 ELSE ()
   SET (DLFCNWIN32_FOUND FALSE)

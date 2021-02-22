@@ -7,6 +7,7 @@ use strict;
 use warnings;
 use utf8;
 use lib './lib';
+use Config;
 
 BEGIN { use_ok( 'Module::Generic' ) || BAIL_OUT( "Unable to load Module::Generic" ); }
 
@@ -46,10 +47,14 @@ is( $s, 'Hello world', 'chomp' );
 $s->chop;
 is( $s, 'Hello worl', 'chop' );
 ## OpenBSD does not have des crypt it seems and uses blowfish instead
-unless( $^O eq 'openbsd' )
+SKIP:
 {
+    if( $^O eq 'openbsd' || $Config{libs} !~ /\b\-lcrypt\b/ )
+    {
+        skip( "crypt unsupported on $^O", 1 );
+    }
     is( $s->crypt( 'key' ), 'keqUNAuo7.kCQ', 'crypt' );
-}
+};
 is( $s->fc( 'Hello worl' ), 1, 'fc' );
 is( Module::Generic::Scalar->new( '0xAf' )->hex, 175, 'hex' );
 isa_ok( Module::Generic::Scalar->new( '0xAf' )->hex, 'Module::Generic::Number' );

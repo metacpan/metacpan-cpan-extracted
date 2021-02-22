@@ -3,20 +3,20 @@ package WHO::GrowthReference::GenChart;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-10'; # DATE
 our $DIST = 'WHO-GrowthReference-GenChart'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(gen_who_growth_chart_from_tsv);
+our @EXPORT_OK = qw(gen_who_growth_chart_from_table);
 
 our %SPEC;
 
 $SPEC{gen_who_growth_chart_from_table} = {
     v => 1.1,
-    summary => 'Create WHO growth chart ()',
+    summary => 'Create WHO growth chart (weight/height/BMI)',
     args => {
         gender => {
             schema => ['str*', in=>['M','F']],
@@ -351,7 +351,7 @@ sub gen_who_growth_chart_from_table {
 }
 
 1;
-# ABSTRACT: Create WHO growth chart ()
+# ABSTRACT: Create WHO growth chart (weight/height/BMI)
 
 __END__
 
@@ -361,11 +361,11 @@ __END__
 
 =head1 NAME
 
-WHO::GrowthReference::GenChart - Create WHO growth chart ()
+WHO::GrowthReference::GenChart - Create WHO growth chart (weight/height/BMI)
 
 =head1 VERSION
 
-This document describes version 0.001 of WHO::GrowthReference::GenChart (from Perl distribution WHO-GrowthReference-GenChart), released on 2021-01-10.
+This document describes version 0.003 of WHO::GrowthReference::GenChart (from Perl distribution WHO-GrowthReference-GenChart), released on 2021-01-10.
 
 =head1 SYNOPSIS
 
@@ -399,9 +399,9 @@ Usage:
 
  gen_who_growth_chart_from_table(%args) -> [status, msg, payload, meta]
 
-Create WHO growth chart ().
+Create WHO growth chart (weightE<sol>heightE<sol>BMI).
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -461,7 +461,7 @@ Source repository is at L<https://github.com/perlancar/perl-WHO-GrowthReference-
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WHO-GrowthReference-GenChart/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WHO-GrowthReference-GenChart>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

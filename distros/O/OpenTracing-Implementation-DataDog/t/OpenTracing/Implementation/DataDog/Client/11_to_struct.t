@@ -1,14 +1,7 @@
 use Test::Most;
 
-BEGIN {
-    $ENV{OPENTRACING_INTERFACE} = 1 unless exists $ENV{OPENTRACING_INTERFACE};
-}
-#
-# This breaks if it would be set to 0 externally, so, don't do that!!!
-
 
 use aliased 'OpenTracing::Implementation::DataDog::Client';
-
 use aliased 'OpenTracing::Implementation::DataDog::Span';
 use aliased 'OpenTracing::Implementation::DataDog::SpanContext';
 

@@ -3,7 +3,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use Exporter qw( import );
 
@@ -30,6 +30,7 @@ sub groupBy {
 
     croak "operations should be a hashref" unless ref $options->{operations} eq "HASH";
 
+
     my %op = map {
         my $operation = $options->{operations}->{ $_ } // $nop;
 
@@ -37,6 +38,7 @@ sub groupBy {
 
         $_ => $operation;
     } @keys;
+
 
     my $groupings = {};
 
@@ -46,13 +48,16 @@ sub groupBy {
         my $current = $groupings;
 
         foreach my $key ( @keys ) {
-            $current = $current->{ $op{ $key }->( $item->{ $key } // $default->{ $key } // '' ) } //= {};
+            my $branch = $op{ $key }->( $item->{ $key } // $default->{ $key } // '' );
+
+            $current = $current->{ $branch } //= {};
         }
 
-        push @{ $current->{ $op{ $leaf }->( $item->{$leaf} // $default->{ $leaf } // '' ) } }, $item;
+        my $leafNode = $op{ $leaf }->( $item->{$leaf} // $default->{ $leaf } // '' );
+        push @{ $current->{ $leafNode } }, $item;
     }
    
-    return %{$groupings};
+    return wantarray ? %$groupings : $groupings;
 }
 
 
@@ -106,7 +111,7 @@ List::GroupBy - Group a list of hashref's to a multilevel hash of hashrefs of ar
     %groupedList = groupBy(
         {
             keys => [ 'surname', 'firstname' ],
-            defaults => { surname => 'blogs' }
+            defaults => { surname => 'Blogs' }
         },
         @list
     );
@@ -179,7 +184,15 @@ the list by the keys provided in the array ref.
 
 Note: undefined values for a key will be defaulted to the empty string.
 
-Returns a hash of hashrefs of arrayrefs
+Returns:
+
+=over 4
+
+=item C<List Context> - a hash of hashrefs of arrayrefs
+
+=item C<Scalar Context> - a hashref of hashrefs of arrayrefs
+
+=back
 
 
 =item C<< groupBy( { keys => [ 'key', ... ], defaults => { 'key' => 'default', ... }, operations => { 'key' => sub, ... }, LIST ) >>
@@ -211,11 +224,36 @@ grouping. If there's no entry for a key then the value is just used as is.
 Each funtion is passed the value as it's only parameter and it's return
 value is used for the key.
 
+If you wish to make a grouping case-insensitive then you can use an operation
+on that key that simply folds (C<fc()>)the case e.g.
+
+    %groupedList = groupBy (
+        {
+            keys => [ 'surname', 'firstname' ],
+            defaults => { surname => 'Blogs' },
+            operations => {
+                surname => sub { fc( $_[0] ) },
+                firstname => sub { fc ( $_[0] ) },
+            },
+        },
+        @list
+    );
+
+
 =back
 
-Returns a hash of hashrefs of arrayrefs
+Returns:
+
+=over 4
+
+=item C<List Context> - a hash of hashrefs of arrayrefs
+
+=item C<Scalar Context> - a hashref of hashrefs of arrayrefs
 
 =back
+
+=back
+
 
 =head1 LICENSE
 

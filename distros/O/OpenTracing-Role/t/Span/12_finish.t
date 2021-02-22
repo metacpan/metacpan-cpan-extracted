@@ -1,7 +1,7 @@
 use Test::Most;
 
 
-$ENV{OPENTRACING_INTERFACE} = 1 unless exists $ENV{OPENTRACING_INTERFACE};
+$ENV{EXTENDED_TESTING} = 1 unless exists $ENV{EXTENDED_TESTING};
 #
 # This breaks if it would be set to 0 externally, so, don't do that!!!
 
@@ -75,7 +75,7 @@ subtest "Finishing only once" => sub {
     ok $test_span->has_finished(),
         "... but has, after 'finish' has been called";
     
-    throws_ok {
+    warning_like {
         $test_span->finish( )
     } qr/Span has already been finished/,
         "... and can not 'finish' again";

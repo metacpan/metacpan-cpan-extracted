@@ -66,7 +66,7 @@ Mnet::T::test_perl({
         ERR - main perl die, died
         inf - Mnet::Report::Table row {
         inf - Mnet::Report::Table row    data  => "row before error"
-        inf - Mnet::Report::Table row    error => "main perl die, died"
+        inf - Mnet::Report::Table row    error => "main, perl die, died"
         inf - Mnet::Report::Table row }
         --- - Mnet::Log finished, errors
     expect-eof
@@ -113,7 +113,7 @@ Mnet::T::test_perl({
         ERR - main perl die, died
         inf - Mnet::Report::Table row {
         inf - Mnet::Report::Table row    data  => "row_on_error"
-        inf - Mnet::Report::Table row    error => "main perl die, died"
+        inf - Mnet::Report::Table row    error => "main, perl die, died"
         inf - Mnet::Report::Table row }
         --- - Mnet::Log finished, errors
     expect-eof

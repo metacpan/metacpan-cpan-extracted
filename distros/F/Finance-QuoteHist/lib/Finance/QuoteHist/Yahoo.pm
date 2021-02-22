@@ -10,6 +10,25 @@ use Finance::QuoteHist::Generic;
 @ISA = qw(Finance::QuoteHist::Generic);
 
 use Date::Manip;
+use JSON;
+
+# curl 'https://query2.finance.yahoo.com/v8/finance/chart/TLSA?formatted=true&crumb=l92p7dftYe%2F&lang=en-US&region=US&includeAdjustedClose=true&interval=1d&period1=1455840000&period2=1613692800&events=div%7Csplit&useYfid=true&corsDomain=finance.yahoo.com' \
+#  -H 'authority: query2.finance.yahoo.com' \
+#  -H 'pragma: no-cache' \
+#  -H 'cache-control: no-cache' \
+#  -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36' \
+#  -H 'dnt: 1' \
+#  -H 'accept: */*' \
+#  -H 'origin: https://finance.yahoo.com' \
+#  -H 'sec-fetch-site: same-site' \
+#  -H 'sec-fetch-mode: cors' \
+#  -H 'sec-fetch-dest: empty' \
+#  -H 'referer: https://finance.yahoo.com/quote/TLSA/history?period1=1455840000&period2=1613692800&interval=1d&filter=history&frequency=1d&includeAdjustedClose=true' \
+#  -H 'accept-language: en-US,en;q=0.9' \
+#  -H 'cookie: B=a912p61g2vk8r&b=3&s=tt; GUC=AQEBAQFgMSJgOUIaCwP5; A1=d=AQABBBvRL2ACEAlRbREoQmTRqOBpeDBZhKQFEgEBAQEiMWA5YAAAAAAA_SMAAAcIG9EvYDBZhKQ&S=AQAAApHY37COo3qJCJvBwk9D-TA; A3=d=AQABBBvRL2ACEAlRbREoQmTRqOBpeDBZhKQFEgEBAQEiMWA5YAAAAAAA_SMAAAcIG9EvYDBZhKQ&S=AQAAApHY37COo3qJCJvBwk9D-TA; A1S=d=AQABBBvRL2ACEAlRbREoQmTRqOBpeDBZhKQFEgEBAQEiMWA5YAAAAAAA_SMAAAcIG9EvYDBZhKQ&S=AQAAApHY37COo3qJCJvBwk9D-TA&j=US; cmp=t=1613746462&j=0; PRF=t%3DTLSA%252BIBM%252B%255EYHQ' \
+#  -H 'sec-gpc: 1' \
+#  --compressed
+
 
 # https://query1.finance.yahoo.com/v7/finance/download/IBM?period1=1495391410&period2=1498069810&interval=1d&events=history&crumb=bB6k340lPXt
 # https://query1.finance.yahoo.com/v7/finance/download/IBM?period1=993096000&period2=1498017600&interval=1wk&events=history&crumb=bB6k340lPXt
@@ -26,7 +45,7 @@ sub new {
   my $class = ref($that) || $that;
   my %parms = @_;
 
-  $parms{parse_mode} = 'csv';
+  $parms{parse_mode} = 'json';
   $parms{ua_params} ||= {};
   $parms{ua_params}{cookie_jar} ||= {};
 
@@ -38,10 +57,6 @@ sub new {
   my $ticker = $parms{symbols};
   $ticker = $ticker->[0] if ref $ticker eq 'ARRAY';
   my $html = $self->fetch("https://finance.yahoo.com/quote/$ticker/history");
-
-  open(F, ">/tmp/hmm.html");
-  print F $html;
-  close(F);
 
   # extract the cookie crumb
   my %crumbs;
@@ -66,32 +81,18 @@ sub new {
 
 sub granularities { qw( daily weekly monthly ) }
 
-sub labels {
-  my $self = shift;
-  my %parms = @_;
-  my $target_mode = $parms{target_mode} || $self->target_mode;
-  my @labels;
-  if ($target_mode eq 'split') {
-    @labels = qw( date stock );
-  }
-  else {
-    @labels = $self->SUPER::labels(%parms);
-    push(@labels, 'adj') if $target_mode eq 'quote';
-  }
-  @labels;
-}
-
 sub url_maker {
   my($self, %parms) = @_;
   my $target_mode = $parms{target_mode} || $self->target_mode;
-  my $parse_mode  = $parms{parse_mode}  || $self->parse_mode;
+  my $parse_mode = $parms{parse_mode} || $self->parse_mode;
 
   # *always* block unknown target mode and parse mode combinations for
   # cascade to work properly!
   return undef unless $target_mode eq 'quote' ||
                       $target_mode eq 'split' ||
                       $target_mode eq 'dividend';
-  return undef unless $parse_mode eq 'html' || $parse_mode eq 'csv';
+
+  $parse_mode = "json";
 
   my $granularity = lc($parms{granularity} || $self->granularity);
   my $grain = 'd';
@@ -105,8 +106,24 @@ sub url_maker {
     ($start_date, $end_date) = ($end_date, $start_date);
   }
 
-  my $host = "query1.finance.yahoo.com";
-  my $base_url = "https://$host/v7/finance/download/$ticker?";
+  #my $host = "query1.finance.yahoo.com";
+  #my $base_url = "https://$host/v7/finance/download/$ticker?";
+  
+  # https://query2.finance.yahoo.com/v8/finance/chart/TLSA?
+  #   formatted=true
+  #   crumb=l92p7dftYe%2F
+  #   lang=en-US
+  #   region=US
+  #   includeAdjustedClose=true
+  #   interval=1d
+  #   period1=1455840000
+  #   period2=1613692800
+  #   events=div%7Csplit
+  #   useYfid=true
+  #   corsDomain=finance.yahoo.com
+
+  my $host = "query2.finance.yahoo.com";
+  my $base_url = "https://$host/v8/finance/chart/$ticker?";
   my @base_parms;
   if ($start_date) {
     my($y, $m, $d) = $self->ymd($start_date);
@@ -131,6 +148,7 @@ sub url_maker {
 
   if ($target_mode eq "quote") {
     push(@base_parms, "events=history");
+    push(@base_parms, "includeAdjustedClose=true")
   }
   elsif ($target_mode eq "dividend") {
     push(@base_parms, "events=div");
@@ -143,6 +161,82 @@ sub url_maker {
 
   my @urls = $base_url . join('&', @base_parms);
   return sub { pop @urls };
+}
+
+sub json_parser {
+  my $self = shift;
+  my $target_mode = $self->target_mode();
+  my $json_quote_parse = sub {
+    my $data_result = shift;
+    my $data_indicators = $data_result->{indicators} || {};
+    my $data_quote      = ($data_indicators->{quote} || [])->[0];
+    my @rows = [];
+    if ($data_quote) {
+      my $data_high       = $data_quote->{high};
+      my $data_close      = $data_quote->{close};
+      my $data_open       = $data_quote->{open};
+      my $data_low        = $data_quote->{low};
+      my $data_volume     = $data_quote->{volume};
+      my $data_adj_close  = $data_indicators->{adjclose}[0]{adjclose};
+      my $data_timestamp  = $data_result->{timestamp};
+      for my $i (0 .. $#{$data_timestamp}) {
+        push(@rows, [
+          $data_timestamp->[$i],
+          $data_open->[$i],
+          $data_high->[$i],
+          $data_low->[$i],
+          $data_close->[$i],
+          $data_volume->[$i],
+        ]);
+      }
+    }
+    \@rows;
+  };
+  my $json_split_parse = sub {
+    my $data_result = shift;
+    my $data_events = $data_result->{events} || {};
+    my $data_splits = $data_events->{splits} || {};
+    my @rows;
+    if ($data_splits) {
+      for my $rec (sort values %$data_splits) {
+        push(@rows, [
+          $rec->{date},
+          $rec->{numerator},
+          $rec->{denominator},
+        ]);
+      }
+    }
+    \@rows;
+  };
+  my $json_div_parse = sub {
+    # "date" "amount"
+    my $data_result = shift;
+    my $data_events = $data_result->{events} || {};
+    my $data_dividends = $data_events->{dividends} || {};
+    my @rows;
+    for my $rec (sort values %$data_dividends) {
+      push(@rows, [
+        $rec->{date},
+        $rec->{amount},
+      ]);
+    }
+    \@rows;
+  };
+  sub {
+    my $data = shift;
+    $data = decode_json($data);
+    my $data_result = $data->{chart}{result}[0] || {};
+    if ($target_mode eq "quote") {
+      return $json_quote_parse->($data_result);
+    }
+    elsif ($target_mode eq "split") {
+      return $json_split_parse->($data_result);
+    }
+    elsif ($target_mode eq "dividend") {
+      return $json_div_parse->($data_result);
+    }
+    else { die "unknown mode: $target_mode" }
+  };
 }
 
 1;
@@ -284,7 +378,7 @@ Matthew P. Sisk, E<lt>F<sisk@mojotoad.com>E<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000-2017 Matthew P. Sisk. All rights reserved. All wrongs
+Copyright (c) 2000-2021 Matthew P. Sisk. All rights reserved. All wrongs
 revenged. This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 

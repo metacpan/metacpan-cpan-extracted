@@ -15,6 +15,21 @@ use POSIX qw/EXIT_SUCCESS/;
 use Perl::OSType qw/is_os_type/;
 use Try::Tiny;
 
+#
+# ExtUtils::CBuilder custom configuration from environment:
+# Any environment variable PERL_EXTUTILS_CBUILDER_CONFIG_\w+ is
+# considered
+#
+my %EXTUTILS_BUILDER_CONFIG =
+    map {
+        my $key = $_;
+        $key =~ s/^PERL_EXTUTILS_CBUILDER_CONFIG_//;
+        $key => $ENV{$_}
+    }
+    grep {
+        $_ =~ /^PERL_EXTUTILS_CBUILDER_CONFIG_\w+/
+    } keys %ENV;
+
 # ------------------------------------------------------------
 # Generation of objects using perl setup, for use in perl's XS
 # ------------------------------------------------------------
@@ -30,7 +45,7 @@ make_path(dirname($config_h));
 
 my $ac = Config::AutoConf::INI->new(logfile => 'config.log');
 my @extra_compiler_flags = ();
-my %cbuilder_config = ExtUtils::CBuilder->new()->get_config;
+my %cbuilder_config = ExtUtils::CBuilder->new(config => \%EXTUTILS_BUILDER_CONFIG)->get_config;
 my $isc99 = 0;
 if (($cbuilder_config{cc} // 'cc') ne 'cl') {
     $ac->msg_checking("Checking if C99 is enabled by default:");
@@ -131,7 +146,7 @@ qw/
 # Generate objects
 # (individually- not efficient but I do not see how CBuilder mixes C and C++ source files)
 # ----------------------------------------------------------------------------------------
-my $cbuilder = ExtUtils::CBuilder->new();
+my $cbuilder = ExtUtils::CBuilder->new(config => \%EXTUTILS_BUILDER_CONFIG);
 my @objects;
 my $obj_dir = File::Spec->catfile('output', 'obj4perl');
 
@@ -221,7 +236,7 @@ sub try_compile {
     my $rc = 0;
 
     try {
-        my $cbuilder = ExtUtils::CBuilder->new();
+        my $cbuilder = ExtUtils::CBuilder->new(config => \%EXTUTILS_BUILDER_CONFIG);
         my $obj = basename($cbuilder->object_file($source));
         $cbuilder->compile(
             source               => $source,

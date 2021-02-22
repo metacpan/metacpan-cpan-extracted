@@ -1,18 +1,12 @@
-use warnings;
-use strict;
-use utf8;
 use FindBin '$Bin';
-use Test::More;
-my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
-binmode STDOUT, ":encoding(utf8)";
-binmode STDERR, ":encoding(utf8)";
-use Lingua::JA::Moji ':all';
+use lib "$Bin";
+use LJMT;
+
 my $input = '~abxyz!"#$ABXYZ';
 my $wide = ascii2wide ($input);
 like ($wide, qr/ＡＢＸＹＺ/, "got wide ascii out");
+
 my $roundtrip = wide2ascii ($wide);
 is ($input, $roundtrip, "Roundtrip OK");
+
 done_testing ();

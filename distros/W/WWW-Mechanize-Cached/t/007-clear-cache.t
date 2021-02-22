@@ -3,7 +3,7 @@
 use strict;
 use warnings FATAL => 'all';
 
-use Test::More tests => 13;
+use Test::More;
 
 use constant {
     ADDRESS           => 'wikipedia.org',

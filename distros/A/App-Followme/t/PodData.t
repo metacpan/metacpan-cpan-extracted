@@ -6,7 +6,7 @@ use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
 use Test::Requires 'Pod::Simple::XHTML';
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 use lib '../..';
 
@@ -35,14 +35,28 @@ $test_dir = cwd();
 #----------------------------------------------------------------------
 # Create object
 
-my $obj = App::Followme::PodData->new(extension => 'pm,pod',
-                                      title_template => '<h1></h1>',
-                                      site_url => 'http://www.example.com/',
-                                      package => 'App::Followme::PodData',
-                                      pod_directory => $lib,
-                                      );
+my %parameters = (extension => 'pm,pod',
+                  title_template => '<h1></h1>',
+                  site_url => 'http://www.example.com/',
+                  package => 'App::Followme::PodData',
+                  pod_directory => $lib,
+                 );
+
+my $obj = App::Followme::PodData->new(%parameters);
 isa_ok($obj, "App::Followme::PodData"); # test 1
 can_ok($obj, qw(new build)); # test 2
+
+
+#----------------------------------------------------------------------
+# Test file handling 
+do {
+    my @files = $obj->find_matching_files($obj->{base_directory});
+    ok(@files > 10, "Find matching files"); # test 3
+
+    my $ok_filename = catfile($test_dir, 'basedata.html');
+    my $filename = $obj->convert_filename($files[0]);
+    is($filename, $ok_filename, "Get converted file"); # test 4
+};
 
 #----------------------------------------------------------------------
 # Test url manipulation
@@ -51,40 +65,42 @@ do {
     my $url = "http://www.example.comApp::Followme::PodData";
     my $url_ok =  "poddata.html";
     my $new_url = $obj->alter_url($url);
-    is($new_url, $url_ok, "Alter url"); # test 3
+    is($new_url, $url_ok, "Alter url"); # test 5
 };
 
 #----------------------------------------------------------------------
 # Test conversion of pod files
 
 do {
-    my $pod_directory = $obj->find_pod_directory();
-    my $ok_directory = catfile($lib, 'App', 'Followme');
-    is($pod_directory, $ok_directory, 'test find pod directory'); # test 4
+    $obj = App::Followme::PodData->new(%parameters);
+    my ($pod_directory, $package_path) = $obj->find_base_directory();
+    my $directory = catfile($pod_directory, @$package_path);
+    my $ok_directory = catfile($lib, 'App');
+    is($directory, $ok_directory, 'test find base directory'); # test 6
 
-    my $index_file = $obj->dir_to_filename($pod_directory);
-    my $files = $obj->build('files', $index_file);
+    my $index_file = $obj->dir_to_filename($obj->{base_directory});
+    my $files = $obj->build('all_files', $index_file);
 
     my $file_list = join(',', @$files);
-    ok(index($file_list, '.pod') > 0, "Build file list"); # test 5
+    ok(index($file_list, '.pod') > 0, "Build file list"); # test 7
 
     my @files = sort(@$files);
     my $file = shift(@files);
     my $body = $obj->build('body', $file);
 
-    ok(index($$body, "SYNOPSIS") > 0, "Convert Text"); # test 6
+    ok(index($$body, "SYNOPSIS") > 0, "Convert Text"); # test 8
 
     my $title = $obj->build('$title', $file);
-    is($$title, "App::Followme::BaseData", "Get title"); # test 7
+    is($$title, "App::Followme::BaseData", "Get title"); # test 9
 
     my $summary = $obj->build('$summary', $file);
-    ok(index($$summary, "base class") > 0, "Get summary"); # test 8
+    ok(index($$summary, "base class") > 0, "Get summary"); # test 10
 
     my @pod_files = grep(/\.pod$/, @files);
     foreach my $pod_file (@pod_files) {
         my $body = $obj->build('body', $pod_file);
         my @urls = $$body =~ /href="([^"]*)"/g;
-        like($urls[0], qr(^[\/a-z]+\.html$), "Test url conversion"); # test 9
-        ok(@urls > 10, "Test finding all urls"); # test 10
+        like($urls[0], qr(^[\/a-z]+\.html$), "Test url conversion"); # test 11
+        ok(@urls > 10, "Test finding all urls"); # test 12
     }
 };

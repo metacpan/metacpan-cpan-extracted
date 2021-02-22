@@ -1,5 +1,8 @@
 Revision history for Business-Fixflo
 
+0.41     2021-02-22
+        - Add AgencyId to Business::Fixflo::Issue
+
 0.40     2021-02-11
         - Add QuoteRequests to Business::Fixflo::Issue
 

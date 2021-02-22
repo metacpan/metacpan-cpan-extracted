@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Validation vocabulary
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -310,7 +310,7 @@ JSON::Schema::Draft201909::Vocabulary::Validation - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 DESCRIPTION
 

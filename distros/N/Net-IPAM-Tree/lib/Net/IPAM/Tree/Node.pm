@@ -3,6 +3,7 @@ package Net::IPAM::Tree::Node;
 use 5.10.0;
 use strict;
 use warnings;
+use utf8;
 use List::MoreUtils qw();
 
 =head1 NAME
@@ -11,7 +12,8 @@ Net::IPAM::Tree::Node - A node in the Net::IPAM::Tree
 
 =head1 SYNOPSIS
 
-This module is not useful standalone, it's just needed for Net::IPAM::Tree
+This module is not useful standalone, it's just needed for Net::IPAM::Tree.
+The implementation details are hidden by the public API in Net::IPAM::Tree.
 
 A node is a recursive datastructure with a payload (block) and a parent and zero or more child nodes.
 
@@ -24,6 +26,7 @@ A node is a recursive datastructure with a payload (block) and a parent and zero
   use Net::IPAM::Tree::Node;
 
   my $n = Net::IPAM::Tree::Node->new( { block => $block, parent = $node, childs = [] } );
+
 
 =head1 METHODS
 
@@ -93,15 +96,18 @@ sub _insert_node {
   # -1 if $node->{childs} is an empty array
   my $idx = List::MoreUtils::lower_bound { $_->{block}->cmp( $input->{block} ) } @{ $node->{childs} };
 
-  # idx not -1 and not at end of slice, check for dup block
-  if ( $idx >= 0 && $idx < $nc && $input->{block}->cmp( $node->{childs}[$idx]->{block} ) == 0 ) {
+  # idx not -1 and not after end of slice, check for dup block
+  # search index may be -1 or at $nc, take care for index panics
+  if ( $idx >= 0 and $idx < $nc ) {
 
     # don't insert dups, return undef, must be handled at callers side
-    return;
+    return if $input->{block}->cmp( $node->{childs}[$idx]->{block} ) == 0;
   }
 
-  # not in front of slice, check if prev child contains this new node
+  # match is not in front of childs slice, check if prev child contains this new node
   if ( $idx > 0 ) {
+
+    # make alias just for better reading
     my $prev = $node->{childs}[ $idx - 1 ];
     if ( $prev->{block}->contains( $input->{block} ) ) {
 
@@ -110,34 +116,29 @@ sub _insert_node {
     }
   }
 
-  # add as new child on this level
-  # set parent to this current node
+  # add as new child on this level, set parent to this current node
   $input->{parent} = $node;
 
-  # childs are empty, just append
-  if ( $idx < 0 ) {
-    push @{ $node->{childs} }, $input;
-    return 1;
-  }
-
-  # input is greater than all others and not contained in any child before, just append
-  if ( $idx == $nc ) {
+  # idx = -1, childs are empty
+  # idx = n,  *greater than* all other childs and not contained in any child before
+  # easy peasy, just append
+  if ( $idx < 0 or $idx == $nc ) {
     push @{ $node->{childs} }, $input;
     return 1;
   }
 
   # ###
-  # input new node somewhere in the 'middle', insert in place, complex algo due to relinking
+  # input new node somewhere in the slice, insert in place, but complex algo due to relinking
   # $node->{childs} = [..$idx, $input, $idx..]
 
-  # childs after idx need special treatment for relinking
-  # cut off the tail after $idx
+  # all childs after idx need special treatment for relinking
+  # cut off and save the tail after $idx
   my @tail_childs = splice @{ $node->{childs} }, $idx;
 
-  # push $input at end of childs
+  # push $input at end of remaining childs
   push @{ $node->{childs} }, $input;
 
-  # now handle the tail of the childs [idx:]
+  # now handle the tail of the childs
   # we can't just append the rest, maybe new input child contains next childs in row
   while ( my $child = shift @tail_childs ) {
 
@@ -149,8 +150,9 @@ sub _insert_node {
       next;
     }
 
+    # stop relinking
     # childs are sorted, stop relinking after first child not contained in new input node
-    # just copy this child and tail
+    # just copy this child and rest of tail
     push @{ $node->{childs} }, $child, @tail_childs;
 
     # ready
@@ -162,12 +164,12 @@ sub _insert_node {
 }
 
 ####
-# _remove($block, $branch)
+# _remove($block, $del_branch)
 #
 # Remove block in node or childs of node, returns undef if not found.
 # If $branch is true, don't relink the child nodes.
 #
-#   $node->_remove($block, $branch) // warn("block not found,");
+#   $node->_remove($block, $del_branch) // warn("block not found,");
 #
 
 sub _remove {
@@ -181,8 +183,9 @@ sub _remove {
   my $idx = List::MoreUtils::lower_bound { $_->{block}->cmp($that) } @{ $node->{childs} };
 
   # found by exact match?
-  # search index may be at $nc, take care for index panics
-  if ( $idx < $nc ) {
+  # idx not -1 and not after end of slice, check for dup block
+  # search index may be -1 or at $nc, take care for index panics
+  if ( $idx >= 0 and $idx < $nc ) {
     if ( $node->{childs}[$idx]->{block}->cmp($that) == 0 ) {
 
       # save for relinking of grandchilds
@@ -206,7 +209,7 @@ sub _remove {
   }
 
   # no exact match at this level, check if child before idx contains the input?
-  # search index may be 0, take care for index panics
+  # search index may be <= 0, take care for index panics
   if ( $idx > 0 ) {
 
     # child before idx may contain the item, recdescent
@@ -240,8 +243,9 @@ sub _contains {
   # find first index where child->{block} >= block
   my $idx = List::MoreUtils::lower_bound { $_->{block}->cmp($block) } @{ $node->{childs} };
 
-  # search index may be at $nc, take care for index panics
-  if ( $idx < $nc ) {
+  # found by exact match?
+  # search index may be -1 or at $nc, take care for index panics
+  if ( $idx >= 0 and $idx < $nc ) {
 
     # child at idx may be equal to item
     if ( $block->cmp( $node->{childs}[$idx]->{block} ) == 0 ) {
@@ -249,8 +253,36 @@ sub _contains {
     }
   }
 
-  # search index may be 0 and blocks are not equal (see above), return undef (false)
-  return if $idx == 0;
+  # search index may be <=0 and blocks are not equal (see above), return undef (false)
+  return if $idx <= 0;
+
+  # child before idx may contain the item
+  return $node->{childs}[ $idx - 1 ]{block} if $node->{childs}[ $idx - 1 ]{block}->contains($block);
+
+  return;
+}
+
+####
+# _contains_not_equal($block)
+#
+# Reports whether the given block is truly contained (not equal) in any child of the node.
+#
+# block is a Net::IPAM::Block or a subclass
+#
+# returns the outermost containing block or undef
+
+sub _contains_not_equal {
+  my ( $node, $block ) = @_;
+  #
+  # number of childs, return undef (false) if 0
+  my $nc = scalar @{ $node->{childs} } || return;
+
+  # childs are sorted find pos in childs
+  # find first index where child->{block} >= block
+  my $idx = List::MoreUtils::lower_bound { $_->{block}->cmp($block) } @{ $node->{childs} };
+
+  # search index may be <=0 and equal not allowed, return undef (false)
+  return if $idx <= 0;
 
   # child before idx may contain the item
   return $node->{childs}[ $idx - 1 ]{block} if $node->{childs}[ $idx - 1 ]{block}->contains($block);
@@ -278,7 +310,8 @@ sub _lookup {
   my $idx = List::MoreUtils::lower_bound { $_->{block}->cmp($block) } @{ $node->{childs} };
 
   # found by exact match?
-  if ( $idx < $nc ) {
+  # search index may be -1 or at $nc, take care for index panics
+  if ( $idx >= 0 and $idx < $nc ) {
     if ( $node->{childs}[$idx]->{block}->cmp($block) == 0 ) {
       return $node->{childs}[$idx]->{block};
     }
@@ -303,6 +336,87 @@ sub _lookup {
 
   # return this block as longest-prefix-match
   return $node->{block};
+}
+
+####
+# _lookup_not_equal($block)
+#
+# Returns item in tree with longest-prefix-match for $block, returns undef if not found or equal.
+#
+# block is a Net::IPAM::Block or a subclass
+#
+# returns the lpm block
+
+sub _lookup_not_equal {
+  my ( $node, $block ) = @_;
+  #
+  # number of childs, return undef if we have no childs
+  my $nc = scalar @{ $node->{childs} } || return;
+
+  # childs are sorted find pos in childs on this level
+  # find first index where child->{block} >= block
+  my $idx = List::MoreUtils::lower_bound { $_->{block}->cmp($block) } @{ $node->{childs} };
+
+  # search index may be <= 0 and equal not allowed
+  return if $idx <= 0;
+
+  # make alias, better to read or debug
+  my $this = $node->{childs}[ $idx - 1 ];
+
+  if ( $this->{block}->contains($block) ) {
+
+    # return this block as longest-prefix-match if there are no more childs
+    return $this->{block} if @{ $this->{childs} } == 0;
+
+    # recursive descent
+    return $this->_lookup($block);
+  }
+
+  # return this block as longest-prefix-match
+  return $node->{block};
+}
+
+# recdescent
+sub _to_string {
+  my ( $node, $cb, $buf, $prefix ) = @_;
+
+  # number of child nodes
+  my $nc = $node->childs;
+
+  # make alias for better reading
+  my $empty_str = "";
+
+  return $empty_str if $nc == 0;
+
+  for ( my $i = 0 ; $i < $nc ; $i++ ) {
+
+    # last child?
+    if ( $i == $nc - 1 ) {
+      $buf .= sprintf( "%s%s\n", $prefix . "└─ ", $cb->( $node->{childs}[$i]{block} ) );
+      $buf .= $node->{childs}[$i]->_to_string( $cb, $empty_str, $prefix . "   ", );
+    }
+    else {
+      $buf .= sprintf( "%s%s\n", $prefix . "├─ ", $cb->( $node->{childs}[$i]{block} ) );
+      $buf .= $node->{childs}[$i]->_to_string( $cb, $empty_str, $prefix . "│  " );
+    }
+  }
+  return $buf;
+}
+
+# recdescent
+sub _walk {
+  my ( $node, $cb, $depth ) = @_;
+
+  my $err = $cb->( $node, $depth );
+  return $err if $err;
+
+  # walk the childs recdescent
+  foreach my $child ( $node->childs ) {
+    my $err = $child->_walk( $cb, $depth + 1 );
+    return $err if $err;
+  }
+
+  return;
 }
 
 =head1 AUTHOR

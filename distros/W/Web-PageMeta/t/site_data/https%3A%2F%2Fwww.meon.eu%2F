@@ -1,0 +1,137 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Jozef Kutej, meon.eu - digitizing creativity</title><meta charset="utf-8"></meta><meta http-equiv="X-UA-Compatible" content="IE=edge"></meta><meta name="viewport" content="width=device-width, initial-scale=1.0"></meta><meta name="description" content="homepage"></meta><meta name="author" content=""></meta><meta name="format-detection" content="telephone=no"></meta><link rel="icon" href="/static/img/favicon.ico" type="image/x-icon"></link><link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon"></link><link href="/static/meon-Web-merged.css?t=1457187350" rel="stylesheet"></link><script type="text/javascript">
+        document.write('<link rel=stylesheet href="/static/css2/50_site-js.css" type="text/css" media="screen" />');//-->
+    </script></head><body><header><div class="follow-box"><div class="container"><ul class="address_icon"><li><img src="/static/img/page1_icon1.png" alt=""></img><a href="https://www.google.com/maps/place/Lindengasse+56,+1070+Wien,+Austria/@48.1996628,16.3370371,15z/data=!4m5!3m4!1s0x476d078cbbb85c8b:0xd4fa23aab5e92936!8m2!3d48.1996592!4d16.3457918?hl=de-AT">
+                            meon.at,
+                            c/o Impact Hub Vienna,
+                            Lindengasse 56/2/1,
+                            1070 Wien,
+                            Österreich
+                        </a></li><li><img src="/static/img/page1_icon3.png" alt=""></img><a href="tel:+4369918141077">+43 699 181 410 77</a></li><li><img src="/static/img/page1_icon2.png" alt=""></img><span class="meon-email"></span><noscript><span style="color: red;">please enable JavaScript</span></noscript></li></ul><ul class="follow_icon"><li><a href="https://plus.google.com/b/115001335736700628958/115001335736700628958/about"><img src="/static/img/follow_icon2.png" alt=""></img></a></li><li><a href="http://at.linkedin.com/in/jozefkutej"><img src="/static/img/follow_icon5.png" alt=""></img></a></li></ul></div></div><div id="stuck_container"><div class="menuBox"><div class="container"><h1 class="navbar-brand navbar-brand_"><a href="/"><img src="/static/img/logo.png" style="height: 5em" alt=""></img><span>meon</span></a></h1><nav class="navbar navbar-default navbar-static-top tm_navbar clearfix" role="navigation"><ul class="nav sf-menu clearfix"><li class="active"><a href="/">Home</a></li><li><a href="/about">About</a></li><li><a href="/services">Services</a></li><li><a href="/projects">Projects</a></li><li><a href="/contact">Contact</a></li></ul></nav></div></div></div></header><div>
+
+<div class="slider">
+    <div class="camera_wrap">
+        <div data-src="/static/img/picture1.jpg">
+            <div class="camera-caption fadeIn">
+                <p class="title">IT &amp; Software<br>supporting<br>your business</p>
+                <a href="/about" class="btn-default btn1">find out more</a>
+            </div>
+        </div>
+        <div data-src="/static/img/picture2.jpg">
+            <div class="camera-caption fadeIn">
+                <p class="title">Web Applications<br>with<br>human touch</p>
+                <a href="/projects" class="btn-default btn1">find out more</a>
+            </div>
+        </div>
+        <div data-src="/static/img/picture3.jpg">
+            <div class="camera-caption fadeIn">
+                <p class="title">Computer networks<br>for stable<br>information flow</p>
+                <a href="/services" class="btn-default btn1">find out more</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="global">
+    <div class="center-box">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                    <figure><img src="/static/img/page1_icon4.png" alt=""></img></figure>
+                    <p class="title">1. Analysis</p>
+                    <p>We will start by carefully analysing your current processes and needs,
+                    talking to everyone involved and begin designing a unique software system that will
+                    be flexible for your growing business.
+                    </p>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                    <figure><img src="/static/img/page1_icon5.png" alt=""></img></figure>
+                    <p class="title">2. Planning</p>
+                    <p>Detailed planning for how a final product looks saves costs and
+                    development time. We plan this with you every step of the way so the final
+                    product fits your business needs.
+                    </p>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                    <figure><img src="/static/img/page1_icon6.png" alt=""></img></figure>
+                    <p class="title">3. Programming</p>
+                    <p>Creating high-quality custom software for you is our challenge.
+                    We'll make sure you will be able to use your software in
+                    milestone stages even before final completion.
+                    </p>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                    <figure><img src="/static/img/page1_icon7.png" alt=""></img></figure>
+                    <p class="title">4. Profit</p>
+                    <p>Usage and profit is the final step where a great software can take you.
+                    Your software becomes a part of your company. It deserves attention and
+                    maintenance to be able to grow with your business.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="welcome-box">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-7 col-md-7 col-sm-12 pull-right">
+                    <figure><img src="/static/img/page1_pic1.png" alt=""></img></figure>
+                </div>
+                <div class="col-lg-5 col-md-5 col-sm-12 pull-left">
+                    <p class="title">The world of communication.</p>
+                    <h4>Being informed is inevitable. Being not overwhelmed by too much input is prerequisite for it.</h4>
+                    <p>We'll carefully analyse, plan and program software that will meet your special needs
+                    </p>
+                    <a href="/contact" class="btn-default btn3">Get your free project analysis</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+            <div class="col-lg-12">
+                <h2>Our Methods</h2>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4">
+                        <div class="thumb-pad0">
+                            <div class="thumbnail">
+                                <figure><img src="/static/img/page1_badge1.png" alt=""></img></figure>
+                                <div class="caption">
+                                    <p class="title">Analyse <br>and plan</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4">
+                        <div class="thumb-pad0">
+                            <div class="thumbnail">
+                                <figure><img src="/static/img/page1_badge2.png" alt=""></img></figure>
+                                <div class="caption">
+                                    <p class="title">Execute <br>and build</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4">
+                        <div class="thumb-pad0">
+                            <div class="thumbnail">
+                                <figure><img src="/static/img/page1_badge3.png" alt=""></img></figure>
+                                <div class="caption">
+                                    <p class="title">Deliver <br>and profit</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><footer><div class="container"><div class="row"><div class="col-lg-12"><p><em id="copyright-year"></em> by Jozef Kutej, meon.eu</p></div></div></div></footer><script src="/static/meon-Web-merged.js?t=1457187350"></script><script type="text/javascript">
+            var _paq = _paq || [];
+            (function(){ var u=(("https:" == document.location.protocol) ? "https://stats.meon.eu/" : "http://stats.meon.eu/");
+            _paq.push(['setSiteId', 1]);
+            _paq.push(['setTrackerUrl', u+'piwik.php']);
+            _paq.push(['trackPageView']);
+            _paq.push(['enableLinkTracking']);
+            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript'; g.defer=true; g.async=true; g.src=u+'piwik.js';
+            s.parentNode.insertBefore(g,s); })();
+        </script><script src="/static/js2/jquery.mobile.customized.min.js"></script></body></html>

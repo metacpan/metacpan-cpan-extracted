@@ -4,12 +4,12 @@
 .vstags
 Changes
 cpanfile
-lib/JSON/Validator/OpenAPI/Mojolicious.pm
 lib/Mojolicious/Plugin/OpenAPI.pm
 lib/Mojolicious/Plugin/OpenAPI/Cors.pm
 lib/Mojolicious/Plugin/OpenAPI/Guides/OpenAPIv2.pod
 lib/Mojolicious/Plugin/OpenAPI/Guides/OpenAPIv3.pod
 lib/Mojolicious/Plugin/OpenAPI/Guides/Swagger2.pod
+lib/Mojolicious/Plugin/OpenAPI/Parameters.pm
 lib/Mojolicious/Plugin/OpenAPI/Security.pm
 lib/Mojolicious/Plugin/OpenAPI/SpecRenderer.pm
 Makefile.PL

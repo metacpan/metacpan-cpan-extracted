@@ -1,5 +1,24 @@
 Revision history for MooX-Should:
 
+v0.1.4    2021-02-12 12:52:59+01:00 Europe/Amsterdam
+  [Performance]
+  - Minor change to squeeze out more performance
+
+v0.1.3    2021-02-11 20:18:18+01:00 Europe/Amsterdam
+  [Bug Fixes]
+  - Fix how has is modified for Moo roles on newer versions of Moo (Zakariyya Mughal).
+
+  - Change module VERSION to be a proper VERSION object.
+
+  [Documentation]
+  - Added INSTALL file to the distribution.
+
+  - Bumped copyright year.
+
+  [Tests]
+  - Updated test to be consistent with example code in POD
+    (Mohammad S Anwar).
+
 v0.1.2    2018-08-22 17:40:28+01:00 Europe/London
   [Documentation]
   - Fixed typo in example (Mohammad S Anwar).

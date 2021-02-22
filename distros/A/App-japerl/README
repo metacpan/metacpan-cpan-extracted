@@ -4,13 +4,13 @@ NAME
 
 SYNOPSIS
 
-  japerl [switches] [--] script.pl [arguments]
+  $ japerl [switches] [--] script.pl [arguments]
 
 DESCRIPTION
 
   japerl was created with the intention of succeeding JPerl.
   japerl provides glocalization script environment on both modern Perl
-  and traditional Perl by using Char::* software family.
+  and traditional Perl by using mb.pm modulino.
 
   This is often misunderstood, but japerl and jacode.pl have different
   purposes and functions.
@@ -31,35 +31,18 @@ DESCRIPTION
 
   May you do good magic with japerl.
 
-INSTALLATION
+SUPPORTED PERL VERSIONS
 
-  1. Install a member of Char software family
-  2. Copy japerl.bat to any directory
-  3. Customize japerl.bat
+  perl version 5.005_03 to newest perl
 
 SEE ALSO
 
-  Glocalization - Wikipedia
-  http://en.wikipedia.org/wiki/Glocalization
-
-  Welcome to Modern Perl; No.31 encoding: To jperl lovers,
-  https://gihyo.jp/dev/serial/01/modern-perl/0031
-
-  JPerl - Japanized Perl or Japanese Perl
-  http://www.cpan.org/authors/id/W/WA/WATANABE/
-
-  Char - CPAN
-  http://search.cpan.org/dist/Char/
-
-  Jacode - CPAN
-  http://search.cpan.org/dist/Jacode/
-
-  Jacode4e - CPAN
-  http://search.cpan.org/dist/Jacode4e/
-
-  Modern::Open - CPAN
-  http://search.cpan.org/dist/Modern-Open/
-
-  BackPAN - A Complete History of CPAN
-  http://backpan.perl.org/authors/id/I/IN/INA/
+  https://metacpan.org/author/INA
+  http://backpan.cpantesters.org/authors/id/I/IN/INA/
+  https://metacpan.org/release/mb
+  https://metacpan.org/release/UTF8-R2
+  https://metacpan.org/release/Perl7-Handy
+  https://metacpan.org/release/Jacode4e-RoundTrip
+  https://metacpan.org/release/Jacode4e
+  https://metacpan.org/release/Jacode
 

@@ -287,3 +287,12 @@ static PADOFFSET MY_parse_lexvar(pTHX)
 
   return pad_add_name_pvn(lexname, PL_parser->bufptr - lexname, 0, NULL, NULL);
 }
+
+#define parse_scoped_block(flags)  MY_parse_scoped_block(aTHX_ flags)
+static OP *MY_parse_scoped_block(pTHX_ int flags)
+{
+  OP *ret;
+  I32 save_ix = block_start(TRUE);
+  ret = parse_block(flags);
+  return block_end(save_ix, ret);
+}

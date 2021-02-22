@@ -4,7 +4,7 @@
       "Dan Book <dbook@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -41,7 +41,7 @@
             "List::Util" : "0",
             "Minion" : "10.13",
             "Mojo::SQLite" : "3.000",
-            "Mojolicious" : "7.29",
+            "Mojolicious" : "7.49",
             "Sys::Hostname" : "0",
             "Time::HiRes" : "0",
             "perl" : "5.010001"
@@ -64,7 +64,7 @@
    "provides" : {
       "Minion::Backend::SQLite" : {
          "file" : "lib/Minion/Backend/SQLite.pm",
-         "version" : "v5.0.3"
+         "version" : "v5.0.4"
       }
    },
    "release_status" : "stable",
@@ -80,13 +80,14 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "v5.0.3",
+   "version" : "v5.0.4",
    "x_contributors" : [
       "Dan Book <grinnz@grinnz.com>",
+      "Stefan Adams <s1037989@gmail.com>",
       "yrjustice <43676784+yrjustice@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

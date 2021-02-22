@@ -19,6 +19,7 @@ my @files = (
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',
     'xt/author/changes_has_content.t',
+    'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',
     'xt/author/minimum-version.t',
@@ -28,8 +29,7 @@ my @files = (
     'xt/author/pod-syntax.t',
     'xt/author/portability.t',
     'xt/release/changes_has_content.t',
-    'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t'
+    'xt/release/cpan-changes.t'
 );
 
 notabs_ok($_) foreach @files;

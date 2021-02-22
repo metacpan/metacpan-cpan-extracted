@@ -1,0 +1,324 @@
+NAME
+    Text::Table::More - Generate text table with simple interface and many
+    options
+
+VERSION
+    This document describes version 0.011 of Text::Table::More (from Perl
+    distribution Text-Table-More), released on 2021-02-21.
+
+SYNOPSIS
+     #!perl
+ 
+     use 5.010001;
+     use strict;
+     use warnings;
+ 
+     use Text::Table::More qw/generate_table/;
+ 
+     my $rows = [
+         # header row
+         ["Year",
+          "Comedy",
+          "Drama",
+          "Variety",
+          "Lead Comedy Actor",
+          "Lead Drama Actor",
+          "Lead Comedy Actress",
+          "Lead Drama Actress"],
+ 
+         # first data row
+         [1962,
+          "The Bob Newhart Show (NBC)",
+          {text=>"The Defenders (CBS)", rowspan=>3}, # each cell can be hashref to specify text (content) as well as attributes
+          "The Garry Moore Show (CBS)",
+          {text=>"E. G. Marshall, The Defenders (CBS)", rowspan=>2, colspan=>2},
+          {text=>"Shirley Booth, Hazel (NBC)", rowspan=>2, colspan=>2}],
+ 
+         # second data row
+         [1963,
+          {text=>"The Dick Van Dyke Show (CBS)", rowspan=>2},
+          "The Andy Williams Show (NBC)"],
+ 
+         # third data row
+         [1964,
+          "The Danny Kaye Show (CBS)",
+          {text=>"Dick Van Dyke, The Dick Van Dyke Show (CBS)", colspan=>2},
+          {text=>"Mary Tyler Moore, The Dick Van Dyke Show (CBS)", colspan=>2}],
+ 
+         # fourth data row
+         [1965,
+          {text=>"four winners (Outstanding Program Achievements in Entertainment)", colspan=>3},
+          {text=>"five winners (Outstanding Program Achievements in Entertainment)", colspan=>4}],
+ 
+         # fifth data row
+         [1966,
+          "The Dick Van Dyke Show (CBS)",
+          "The Fugitive (ABC)",
+          "The Andy Williams Show (NBC)",
+          "Dick Van Dyke, The Dick Van Dyke Show (CBS)",
+          "Bill Cosby, I Spy (CBS)",
+          "Mary Tyler Moore, The Dick Van Dyke Show (CBS)",
+          "Barbara Stanwyck, The Big Valley (CBS)"],
+     ];
+ 
+     binmode STDOUT, "utf8";
+     print generate_table(
+         rows => $rows,      # required
+         header_row => 1,    # optional, default 0
+         separate_rows => 1, # optional, default 0
+         border_style => $ARGV[0] // 'ASCII::SingleLineDoubleAfterHeader',
+         # optional, this is module name in BorderStyle::* namespace, without the prefix
+         #align => 'left',   # optional, default 'left'. can be left/middle/right.
+         #valign => 'top',   # optional, default 'top'. can be top/middle/bottom.
+ 
+         #color => 1,        # optional, default 0. turn on support for cell content that contain ANSI color codes.
+ 
+         #wide_char => 1,    # optional, default 0. turn on support for wide Unicode characters.
+ 
+         row_attrs => [
+             # rownum (0-based int), attributes (hashref)
+             [0, {align=>'middle', bottom_border=>1}],
+         ],
+ 
+         col_attrs => [
+             # colnum (0-based int), attributes (hashref)
+             [2, {valign=>'middle'}],
+         ],
+ 
+         #cell_attrs => [
+         #    # rownum (0-based int), colnum (0-based int), attributes (hashref)
+         #    [1, 2, {rowspan=>3}],
+         #    [1, 4, {rowspan=>2, colspan=>2}],
+         #    [1, 5, {rowspan=>2, colspan=>2}],
+         #    [2, 1, {rowspan=>2}],
+         #    [3, 2, {colspan=>2}],
+         #    [3, 3, {colspan=>2}],
+         #    [4, 1, {colspan=>3}],
+         #    [4, 2, {colspan=>4}],
+         #],
+ 
+     );
+
+    will output something like:
+
+     .------+------------------------------+----------------------+------------------------------+---------------------------------------------+-------------------------+------------------------------------------------+----------------------------------------.
+     | Year |            Comedy            |        Drama         |           Variety            |              Lead Comedy Actor              |    Lead Drama Actor     |              Lead Comedy Actress               |           Lead Drama Actress           |
+     +======+==============================+======================+==============================+=============================================+=========================+================================================+========================================+
+     | 1962 | The Bob Newhart Show (NBC)   |                      | The Garry Moore Show (CBS)   | E. G. Marshall, The Defenders (CBS)                                   | Shirley Booth, Hazel (NBC)                                                              |
+     +------+------------------------------+                      +------------------------------+                                                                       |                                                                                         |
+     | 1963 | The Dick Van Dyke Show (CBS) | The Defenders (CBS)  | The Andy Williams Show (NBC) |                                                                       |                                                                                         |
+     +------+                              |                      +------------------------------+-----------------------------------------------------------------------+-----------------------------------------------------------------------------------------+
+     | 1964 |                              |                      | The Danny Kaye Show (CBS)    | Dick Van Dyke, The Dick Van Dyke Show (CBS)                           | Mary Tyler Moore, The Dick Van Dyke Show (CBS)                                          |
+     +------+------------------------------+----------------------+------------------------------+-----------------------------------------------------------------------+-----------------------------------------------------------------------------------------+
+     | 1965 | four winners (Outstanding Program Achievements in Entertainment)                   | five winners (Outstanding Program Achievements in Entertainment)                                                                                                |
+     +------+------------------------------+----------------------+------------------------------+---------------------------------------------+-------------------------+------------------------------------------------+----------------------------------------+
+     | 1966 | The Dick Van Dyke Show (CBS) | The Fugitive (ABC)   | The Andy Williams Show (NBC) | Dick Van Dyke, The Dick Van Dyke Show (CBS) | Bill Cosby, I Spy (CBS) | Mary Tyler Moore, The Dick Van Dyke Show (CBS) | Barbara Stanwyck, The Big Valley (CBS) |
+     `------+------------------------------+----------------------+------------------------------+---------------------------------------------+-------------------------+------------------------------------------------+----------------------------------------'
+
+    If you set the "border_style" argument to "UTF8::SingleLineBoldHeader":
+
+     print generate_table(
+         rows => $rows,
+         border_style => "UTF8::SingleLineBoldHeader",
+         ...
+     );
+
+    then the output will be something like:
+
+     ┏━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+     ┃ Year ┃            Comedy            ┃        Drama         ┃           Variety            ┃              Lead Comedy Actor              ┃    Lead Drama Actor     ┃              Lead Comedy Actress               ┃           Lead Drama Actress           ┃
+     ┡━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+     │ 1962 │ The Bob Newhart Show (NBC)   │                      │ The Garry Moore Show (CBS)   │ E. G. Marshall, The Defenders (CBS)                                   │ Shirley Booth, Hazel (NBC)                                                              │
+     ├──────┼──────────────────────────────┤                      ├──────────────────────────────┤                                                                       │                                                                                         │
+     │ 1963 │ The Dick Van Dyke Show (CBS) │ The Defenders (CBS)  │ The Andy Williams Show (NBC) │                                                                       │                                                                                         │
+     ├──────┤                              │                      ├──────────────────────────────┼───────────────────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────┤
+     │ 1964 │                              │                      │ The Danny Kaye Show (CBS)    │ Dick Van Dyke, The Dick Van Dyke Show (CBS)                           │ Mary Tyler Moore, The Dick Van Dyke Show (CBS)                                          │
+     ├──────┼──────────────────────────────┴──────────────────────┴──────────────────────────────┼───────────────────────────────────────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────┤
+     │ 1965 │ four winners (Outstanding Program Achievements in Entertainment)                   │ five winners (Outstanding Program Achievements in Entertainment)                                                                                                │
+     ├──────┼──────────────────────────────┬──────────────────────┬──────────────────────────────┼─────────────────────────────────────────────┬─────────────────────────┬────────────────────────────────────────────────┬────────────────────────────────────────┤
+     │ 1966 │ The Dick Van Dyke Show (CBS) │ The Fugitive (ABC)   │ The Andy Williams Show (NBC) │ Dick Van Dyke, The Dick Van Dyke Show (CBS) │ Bill Cosby, I Spy (CBS) │ Mary Tyler Moore, The Dick Van Dyke Show (CBS) │ Barbara Stanwyck, The Big Valley (CBS) │
+     └──────┴──────────────────────────────┴──────────────────────┴──────────────────────────────┴─────────────────────────────────────────────┴─────────────────────────┴────────────────────────────────────────────────┴────────────────────────────────────────┘
+
+DESCRIPTION
+    This module uses the simple interface of Text::Table::Tiny (0.04) with
+    support for more formatting options like column/row spans, border style,
+    per-row/column/cell align/valign.
+
+    Keywords: rowspan, colspan.
+
+PER-ROW ATTRIBUTES
+  align
+    String. Value is either "left", "middle", "right". Specify text
+    alignment of cells. Override table argument, but is overridden by
+    per-column or per-cell attribute of the same name.
+
+  valign
+    String. Value is either "top", "middle", "bottom". Specify vertical text
+    alignment of cells. Override table argument, but is overridden by
+    per-column or per-cell attribute of the same name.
+
+  bottom_border
+    Boolean.
+
+  top_border
+    Boolean.
+
+PER-COLUMN ATTRIBUTES
+  align
+    String. Value is either "left", "middle", "right". Specify text
+    alignment of cells. Override table argument and per-row attribute of the
+    same name, but is overridden by per-cell attribute of the same name.
+
+  valign
+    String. Value is either "top", "middle", "bottom". Specify vertical text
+    alignment of cells. Override table argument and per-row attribute of the
+    same name, but is overridden by per-cell attribute of the same name.
+
+PER-CELL ATTRIBUTES
+  align
+    String. Value is either "left", "middle", "right". Override table
+    argument, per-row attribute, and per-column attribute of the same name.
+
+  valign
+    String. Value is either "top", "middle", "bottom". Specify vertical text
+    alignment of cells. Override table argument, per-row attribute, and
+    per-column attribute of the same name.
+
+  colspan
+    Positive integer. Default 1.
+
+  rowspan
+    Positive integer. Default 1.
+
+FUNCTIONS
+  generate_table
+    Usage:
+
+     my $table_str = generate_table(%args);
+
+    Arguments:
+
+    *   rows
+
+        Array of arrayrefs (of strings or hashrefs). Required. Each array
+        element is a row of cells. A cell can be a string like "foo"
+        specifying only the text (equivalent to "<{ text=""foo" >>) or a
+        hashref which allows you to specify a cell's text ("text") as well
+        as attributes like "rowspan" (int, >= 1), "colspan" (int, >= 1),
+        etc. See "PER-CELL ATTRIBUTES" for the list of known per-cell
+        attributes.
+
+        Currently, "top_border" and "bottom_border" needs to be specified
+        for the first column of a row and will take effect for the whole
+        row.
+
+        Alternatively, you can also specify cell attributes using
+        "cell_attrs" argument.
+
+    *   header_row
+
+        Boolean. Optional. Default 0. Whether to treat the first row as the
+        header row, which means draw a separator line between it and the
+        rest.
+
+    *   border_style
+
+        Str. Optional. Default to "ASCII::SingleLineDoubleAfterHeader". This
+        is Perl module under the BorderStyle namespace, without the
+        namespace prefix. To see how a border style looks like, you can use
+        the CLI show-border-style from App::BorderStyleUtils.
+
+    *   align
+
+        String. Value is either "left", "middle", "right". Specify
+        horizontal text alignment of cells. Overriden by overridden by
+        per-row, per-column, or per-cell attribute of the same name.
+
+    *   valign
+
+        String. Value is either "top", "middle", "bottom". Specify vertical
+        text alignment of cells. Overriden by overridden by per-row,
+        per-column, or per-cell attribute of the same name.
+
+    *   row_attrs
+
+        Array of records. Optional. Specify per-row attributes. Each record
+        is a 2-element arrayref: "[$row_idx, \%attrs]". $row_idx is
+        zero-based. See "PER-ROW ATTRIBUTES" for the list of known
+        attributes.
+
+    *   col_attrs
+
+        Array of records. Optional. Specify per-column attributes. Each
+        record is a 2-element arrayref: "[$col_idx, \%attrs]". $col_idx is
+        zero-based. See "PER-COLUMN ATTRIBUTES" for the list of known
+        attributes.
+
+    *   cell_attrs
+
+        Array of records. Optional. Specify per-cell attributes. Each record
+        is a 3-element arrayref: "[$row_idx, $col_idx, \%attrs]". $row_idx
+        and $col_idx are zero-based. See "PER-CELL ATTRIBUTES" for the list
+        of known attributes.
+
+        Alternatively, you can specify a cell's attribute in the "rows"
+        argument directly, by specifying a cell as hashref.
+
+    *   separate_rows
+
+        Boolean. Optional. Default 0. If set to true, will add a separator
+        between data rows. Equivalent to setting "bottom_border" or
+        "top_border" attribute to true for each row.
+
+    *   wide_char
+
+        Boolean. Optional. Default false. Turn on wide character support.
+        Cells that contain wide Unicode characters will still be properly
+        aligned. Note that this requires optional prereq
+        Text::WideChar::Util or Text::ANSI::WideUtil.
+
+    *   color
+
+        Boolean. Optional. Default false. Turn on color support. Cells that
+        contain ANSI color codes will still be properly aligned. Note that
+        this requires optional prereq Text::ANSI::Util or
+        Text::ANSI::WideUtil.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-Table-More>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-Table-More>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Text-Table-More/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Text::ANSITable also offers lots of formatting options, but currently
+    lacks support for rowspan/colspan. It also uses an OO interface and has
+    features I never use: hiding rows and selecting display columns
+    different from declared columns. I currently plan to actively develop
+    Text::Table::More instead of Text::ANSITable, but we'll see.
+
+    Acme::CPANModules::TextTable contains a comparison and benchmark for
+    modules that generate text table.
+
+    HTML <TABLE> element,
+    <https://www.w3.org/TR/2014/REC-html5-20141028/tabular-data.html>,
+    <https://www.w3.org/html/wiki/Elements/table>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -11,12 +11,13 @@ use List::Util 'any';
 use Exporter 'import';
 our @EXPORT_OK = qw/
     true false to_bool eqq belongs_to string
+    next_tick_p
 /;
 our %EXPORT_TAGS = (
     bool => [qw/ true false to_bool /],
 );
 
-our $VERSION = "v0.0.13";
+our $VERSION = "v0.0.21";
 
 sub to_bool :prototype(_) { $_[0] ? true : false }
 
@@ -33,6 +34,14 @@ sub belongs_to ($item, $array) {
 
 sub string :prototype(_) {
     return ''.($_[0] // '');
+}
+
+sub next_tick_p {
+    my $p = Mojo::Promise->new;
+    Mojo::IOLoop->next_tick(sub {
+        $p->resolve;
+    });
+    return $p;
 }
 
 1;

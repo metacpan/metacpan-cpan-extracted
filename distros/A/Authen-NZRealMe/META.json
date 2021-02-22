@@ -1,10 +1,10 @@
 {
    "abstract" : "Integrate with RealMe login and identity services (formerly \"igovt logon\")",
    "author" : [
-      "Grant McLean <grant@catalyst.net.nz>"
+      "Andrew Maguire <andrew.maguire@catalyst.net.nz>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
    "license" : [
       "perl_5"
    ],
@@ -52,17 +52,12 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/catalyst/Authen-NZRealMe/issues"
-      },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/catalyst/Authen-NZRealMe.git",
-         "web" : "https://github.com/catalyst/Authen-NZRealMe"
+         "url" : "git://github.com/Authen-NZRealMe.git",
+         "web" : "https://github.com/Authen-NZRealMe"
       }
    },
-   "version" : "1.20",
-   "x_generated_by_perl" : "v5.18.2",
-   "x_serialization_backend" : "JSON::XS version 2.34"
+   "version" : "1.21"
 }
 

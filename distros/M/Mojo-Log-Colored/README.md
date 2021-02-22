@@ -79,6 +79,11 @@ A callback for formatting log messages. Cannot be passed to `new` at constructio
 
 [Mojo::Log::Colored](https://metacpan.org/pod/Mojo::Log::Colored) inherits all methods from [Mojo::Log](https://metacpan.org/pod/Mojo::Log) and does not implement new ones.
 
+# BREAKING CHANGES
+
+Mojolicious changed the way multi-line log messages are emitted [in version 9](https://mojolicious.io/blog/2021/02/14/announcing-mojolicious-9-0/).
+This logger honours this default format.
+
 # SEE ALSO
 
 [Mojo::Log](https://metacpan.org/pod/Mojo::Log), [Term::ANSIColor](https://metacpan.org/pod/Term::ANSIColor)

@@ -7,18 +7,13 @@ use Test::Output;
 
 use Cwd;
 
+require 't/lib/setup_common.pl';
+
 my $class = 'Module::Release';
-my $file  = ".releaserc";
-
-use_ok( $class );
-can_ok( $class, 'new' );
-
-BEGIN {
-	use File::Spec::Functions qw(rel2abs catfile);
-	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
-	require $file;
-	}
-
+subtest setup => sub {
+	use_ok( $class );
+	can_ok( $class, 'new' );
+	};
 
 my @subs = qw(touch touch_all_in_manifest);
 

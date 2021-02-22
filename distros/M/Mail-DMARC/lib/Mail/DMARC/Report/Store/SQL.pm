@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Store::SQL;
-our $VERSION = '1.20200214';
+our $VERSION = '1.20210220';
 use strict;
 use warnings;
 
@@ -84,7 +84,7 @@ sub next_todo {
     my ( $self ) = @_;
 
     if ( ! exists $self->{ _todo_list } ) {
-        $self->{_todo_list} = $self->query( $self->grammar->select_todo_query, [ time ] );
+        $self->{_todo_list} = $self->query( $self->grammar->select_todo_query, [ $self->time ] );
         return if ! $self->{_todo_list};
     }
 
@@ -110,8 +110,7 @@ sub retrieve_todo {
 
     # this method extracts the data from the SQL tables and populates a
     # list of Aggregate report objects with them.
-    my $reports = $self->query( $self->grammar->select_todo_query, [ time ] );
-
+    my $reports = $self->query( $self->grammar->select_todo_query, [ $self->time ] );
     my @reports_todo;
     return \@reports_todo if ! scalar @$reports;
 
@@ -207,7 +206,7 @@ sub get_report_id {
     # They aggregate on the From domain, where the DMARC policy was discovered
         $ids = $self->query(
         $self->grammar->select_id_with_end,
-        [ $from_dom_id, time, $author_id ]
+        [ $from_dom_id, $self->time, $author_id ]
         );
     };
 
@@ -433,7 +432,7 @@ sub insert_agg_record {
 sub insert_error {
     my ( $self, $rid, $error ) = @_;
     # wait >5m before trying to deliver this report again
-    $self->query($self->grammar->insert_error(0), [time + (5*60), $rid]);
+    $self->query($self->grammar->insert_error(0), [$self->time + (5*60), $rid]);
 
     return $self->query(
         $self->grammar->insert_error(1),
@@ -521,8 +520,12 @@ sub db_connect {
     my $user = $self->config->{report_store}{user};
     my $pass = $self->config->{report_store}{pass};
 
-    if ($self->{grammar} and $self->{grammar}->dsn =~ /$dsn/i) {
-        return $self->{dbix} if $self->{dbix};    # caching
+    # cacheing
+    if ($self->{grammar} && $self->{dbix}) {
+        my $cached_grammar_type = $self->{grammar}->dsn;
+        if ( $dsn =~ /$cached_grammar_type/ ) {
+            return $self->{dbix};    # caching
+        }
     }
 
     my $needs_tables;
@@ -551,6 +554,7 @@ sub db_connect {
     if ($needs_tables) {
         $self->apply_db_schema($needs_tables);
     }
+
     return $self->{dbix};
 }
 
@@ -678,7 +682,7 @@ Mail::DMARC::Report::Store::SQL - store and retrieve reports from a SQL RDBMS
 
 =head1 VERSION
 
-version 1.20200214
+version 1.20210220
 
 =head1 DESCRIPTION
 
@@ -712,7 +716,7 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Matt Simerson.
+This software is copyright (c) 2021 by Matt Simerson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

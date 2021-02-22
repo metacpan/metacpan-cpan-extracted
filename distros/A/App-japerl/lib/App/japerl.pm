@@ -5,15 +5,15 @@ package App::japerl;
 #
 # https://metacpan.org/release/App-japerl
 #
-# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 $VERSION = $VERSION;
 
 use 5.00503;
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 
 1;
 
@@ -33,7 +33,7 @@ App::japerl - JPerl-again Perl glocalization scripting environment
 
 japerl was created with the intention of succeeding JPerl.
 japerl provides glocalization script environment on both modern Perl
-and traditional Perl by using Char::* software family.
+and traditional Perl by using mb.pm modulino.
 
 This is often misunderstood, but japerl and jacode.pl have different
 purposes and functions.

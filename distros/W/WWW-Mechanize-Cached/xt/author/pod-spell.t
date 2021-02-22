@@ -17,10 +17,12 @@ Alders'
 Anderson
 Andy
 Bjorn
+Book
 Bowers
 Cached
 Champoux
 Choroba
+Dan
 Fredric
 Gardner
 Iain
@@ -46,6 +48,7 @@ bolav
 choroba
 current
 genehack
+grinnz
 jjr
 kentfredric
 lib

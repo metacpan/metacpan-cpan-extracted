@@ -94,7 +94,7 @@ DESCRIPTION
 SUBROUTINES
 
   VERY USEFUL UTF-8 CODEPOINT FEATURE
-    UTF8::R2::qr(qr/ utf8_regex_here . \D \H \N \R \S \V \W \b \d \h \s \v \w \x{Unicode} [ \D \H \S \V \W \b \d \h \s \v \w \x{Unicode} [:POSIX:] [:^POSIX:] ] ? + * {n} {n,} {n,m} /imsxogc)
+    UTF8::R2::qr(qr/ utf8_regex_here . \D \H \N \R \S \V \W \b \d \h \s \v \w \x{UTF8hex} [ \D \H \S \V \W \b \d \h \s \v \w \x{UTF8hex} \x{UTF8hex}-\x{UTF8hex} [:POSIX:] [:^POSIX:] ] ? + * {n} {n,} {n,m} /imsxogc)
     UTF8::R2::split(qr/$utf8regex/imsxo, $_, 3)
     UTF8::R2::tr($_, 'ABC', 'XYZ', 'cdsr')
     use UTF8::R2 qw(%mb);
@@ -103,8 +103,11 @@ SUBROUTINES
       $_ =~ s<$mb{qr/before/imsxo}><after>egr
 
   OTHER UTF-8 CODEPOINT FEATURE
+    The following functions were created to ensure symmetry as a language.
+    You will not have much chance to use them when you write your application
+    programs.
     UTF8::R2::chop(@_)
-    UTF8::R2::chr($_)
+    UTF8::R2::chr($utf8octet_not_unicode)
     UTF8::R2::getc(FILEHANDLE)
     UTF8::R2::index($_, 'ABC', 5)
     UTF8::R2::lc($_)

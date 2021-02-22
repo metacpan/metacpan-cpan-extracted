@@ -1,7 +1,6 @@
-use warnings;
-use strict;
-use Test::More;
-use Lingua::JA::Moji 'is_romaji';
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;
 
 my @tests = (
 {
@@ -42,7 +41,7 @@ TODO: {
     run (@bug_tests);
 }
 done_testing ();
-exit;
+
 
 sub run
 {

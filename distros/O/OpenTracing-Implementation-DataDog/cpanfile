@@ -1,4 +1,4 @@
-requires        "OpenTracing::Role", '>= v0.84.0';
+requires        "OpenTracing::Role", '>= v0.85.0';
 requires        "OpenTracing::Implementation", '0.03';
 
 requires        "Carp";
@@ -13,6 +13,7 @@ requires        "Moo::Role";
 requires        "MooX::Attribute::ENV", '>= 0.02';
 requires        "MooX::HandlesVia";
 requires        "MooX::Enumeration";
+requires        "MooX::Should", '>=v0.1.4';
 requires        "PerlX::Maybe";
 requires        "Ref::Util";
 requires        "Sub::Trigger::Lock";

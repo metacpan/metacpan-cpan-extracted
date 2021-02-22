@@ -1,8 +1,7 @@
-use warnings;
-use strict;
-use utf8;
-use Lingua::JA::Moji ':all';
-use Test::More;
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;
+
 
 my $circled = '㊄';
 my $expect = '五';
@@ -27,4 +26,4 @@ is ($round_trip3, $accept, "Uncircled ka (possible) to circled");
 
 done_testing ();
 
-exit;
+

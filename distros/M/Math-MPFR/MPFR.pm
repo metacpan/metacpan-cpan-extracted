@@ -185,7 +185,7 @@ Rmpfr_round_nearest_away rndna
 atonv nvtoa atodouble doubletoa numtoa atonum Rmpfr_dot Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt
 );
 
-    our $VERSION = '4.15';
+    our $VERSION = '4.16';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);

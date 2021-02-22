@@ -1,9 +1,25 @@
 Revision history for Text-YAWikiFormater
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.51    2021/02/22
+        I guess that once you use a version like '0.xx' you are stuck
+        with no review numbers - they are converted differently.
+
+0.51.1  2021/02/22
+        just a version just as CPAN indexer complains that .50.[12]
+        are smaller than 0.50
+
+0.50.2  2021/02/22
+        * update the change log with the changes for 0.50.1
+        * reverse the order of the changelog (most recent on top)
+
+0.50.1  2021/02/22
+        minor fixes:
+        * change how empty lines are handled
+        * make the order of processing tags consistent
 
 0.50		2013/04/02
 				First release
 
+0.01    Date/time
+        First version, released on an unsuspecting world.
 

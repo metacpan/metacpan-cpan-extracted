@@ -39,12 +39,13 @@ agent.
 
 
 
-our $VERSION = 'v0.42.1';
+our $VERSION = 'v0.43.1';
 
 use English;
 
 use Moo;
 use MooX::Attribute::ENV;
+use MooX::Should;
 
 use Carp;
 use HTTP::Request ();
@@ -80,7 +81,7 @@ and returns a L<HTTP::Response> compliant response object.
 
 has http_user_agent => (
     is => 'lazy',
-    isa => HasMethods[qw/request/],
+    should => HasMethods[qw/request/],
     handles => { send_http_request => 'request' },
 );
 
@@ -99,7 +100,7 @@ defaults to C<http>
 
 has scheme => (
     is => 'ro',
-    isa => Enum[qw/http https/],
+    should => Enum[qw/http https/],
     default => 'http',
 );
 
@@ -400,7 +401,7 @@ Theo van Hoesel <tvanhoesel@perceptyx.com>
 =head1 COPYRIGHT AND LICENSE
 
 'OpenTracing::Implementation::DataDog'
-is Copyright (C) 2019 .. 2020, Perceptyx Inc
+is Copyright (C) 2019 .. 2021, Perceptyx Inc
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0.

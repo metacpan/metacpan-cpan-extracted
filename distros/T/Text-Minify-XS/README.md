@@ -4,7 +4,7 @@ Text::Minify::XS - Simple text minification
 
 # VERSION
 
-version v0.3.6
+version v0.3.7
 
 # SYNOPSIS
 
@@ -48,6 +48,12 @@ Pull requests to support older versions of Perl are welcome. See
 Malformed UTF-8 characters may be be mangled or omitted from the
 output. You should ensure that the input string is properly encoded as
 UTF-8.
+
+# SEE ALSO
+
+[String::Strip](https://metacpan.org/pod/String::Strip)
+
+[Text::Trim](https://metacpan.org/pod/Text::Trim)
 
 # SOURCE
 

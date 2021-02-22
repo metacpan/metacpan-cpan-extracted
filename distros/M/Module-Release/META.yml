@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 keywords:
   - workflow
   - module
@@ -32,13 +32,13 @@ no_index:
 requires:
   CACertOrg::CA: '0'
   ConfigReader::Simple: '0'
-  DateTime: '0'
   IO::Null: '0'
-  Mojolicious: '4.50'
+  Mojolicious: '8'
   Term::ReadKey: '0'
+  Time::Piece: '0'
   URI: '0'
-  perl: '5.010'
+  perl: '5.016'
 resources:
   repository: https://github.com/briandfoy/module-release
-version: '2.125'
+version: '2.127'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

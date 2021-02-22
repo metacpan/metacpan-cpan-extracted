@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -31,12 +31,14 @@ use Storable;
 use Sys::Hostname;
 
 # from cpan
-use JSON::RPC2::TwoWay 0.04; # for access to the request
+use JSON::RPC2::TwoWay 0.05; # for configurable json encoder
 # JSON::RPC2::TwoWay depends on JSON::MaybeXS anyways, so it can be used here
 # without adding another dependency
-use JSON::MaybeXS;
+use JSON::MaybeXS qw();
 use MojoX::NetstringStream 0.06;
 
+# us
+use RPC::Switch::Client::Steps;
 
 has [qw(
 	actions address auth cb_used channels clientid conn debug ioloop
@@ -67,6 +69,7 @@ sub new {
 	$self->{channels} = {}; # per channel hash of waitids
 	$self->{debug} = $debug;
 	$self->{json} = $args{json} // 1;
+	$self->{jsonobject} = $args{jsonobject}  // JSON::MaybeXS->new(),
 	$self->{ping_timeout} = $args{ping_timeout} // 300;
 	$self->{ioloop} = $args{ioloop} // Mojo::IOLoop->singleton;
 	$self->{log} = $args{log}
@@ -103,7 +106,10 @@ sub connect {
 		$self->ioloop->stop;
 	});
 
-	my $rpc = JSON::RPC2::TwoWay->new(debug => $self->{debug}) or croak 'no rpc?';
+	my $rpc = JSON::RPC2::TwoWay->new(
+		debug => $self->{debug},
+		json => $self->{jsonobject},
+	) or croak 'no rpc?';
 	$rpc->register('rpcswitch.greetings', sub { $self->rpc_greetings(@_) }, notification => 1);
 	$rpc->register('rpcswitch.ping', sub { $self->rpc_ping(@_) });
 	$rpc->register('rpcswitch.channel_gone', sub { $self->rpc_channel_gone(@_) }, notification => 1);
@@ -189,29 +195,29 @@ sub is_connected {
 
 sub rpc_greetings {
 	my ($self, $c, $i) = @_;
-	$self->ioloop->delay(
-		sub {
-			my $d = shift;
-			die "wrong api version $i->{version} (expected 1.0)" unless $i->{version} eq '1.0';
-			$self->log->info('got greeting from ' . $i->{who});
-			$c->call('rpcswitch.hello', {who => $self->who, method => $self->method, token => $self->token}, $d->begin(0));
-		},
-		sub {
-			my ($d, $e, $r) = @_;
-			my $w;
-			#say 'hello returned: ', Dumper(\@_);
-			die "hello returned error $e->{message} ($e->{code})" if $e;
-			die 'no results from hello?' unless $r;
-			($r, $w) = @$r;
-			if ($r) {
-				$self->log->info("hello returned: $r, $w");
-				$self->{auth} = 1;
-			} else {
-				$self->log->error('hello failed: ' . ($w // ''));
-				$self->{auth} = 0; # defined but false
-			}
+	RPC::Switch::Client::Steps->new(ioloop => $self->ioloop)->steps([sub{
+		my $steps = shift;
+		die "wrong api version $i->{version} (expected 1.0)" unless $i->{version} eq '1.0';
+		$self->log->info('got greeting from ' . $i->{who});
+		$c->call(
+			'rpcswitch.hello',
+			{who => $self->who, method => $self->method, token => $self->token},
+			$steps->next,
+		);
+	}, sub {
+		my ($steps, $e, $r) = @_;
+		my $w;
+		die "hello returned error $e->{message} ($e->{code})" if $e;
+		die 'no results from hello?' unless $r;
+		($r, $w) = @$r;
+		if ($r) {
+			$self->log->info("hello returned: $r, $w");
+			$self->{auth} = 1;
+		} else {
+			$self->log->error('hello failed: ' . ($w // ''));
+			$self->{auth} = 0; # defined but false
 		}
-	)->catch(sub {
+	}],sub {
 		my ($err) = @_;
 		$self->log->error('something went wrong in handshake: ' . $err);
 		$self->{auth} = '';
@@ -254,12 +260,12 @@ sub call_nb {
 
 	if ($self->{json}) {
 		$inargsj = $inargs;
-		$inargs = decode_json($inargs);
+		$inargs = $self->{jsonobject}->decode($inargs);
 		croak 'inargs is not a json object' unless ref $inargs eq 'HASH';
 	} else {
 		croak 'inargs should be a hashref' unless ref $inargs eq 'HASH';
 		# test encoding
-		$inargsj = encode_json($inargs);
+		$inargsj = $self->{jsonobject}->encode($inargs);
 		if ($reqauth) {
 		}
 	}
@@ -290,55 +296,54 @@ sub call_nb {
 	$inargsj = decode_utf8($inargsj);
 	$self->log->debug("calling $method with '" . $inargsj . "'" . (($vtag) ? " (vtag $vtag)" : ''));
 
-	my $delay = $self->ioloop->delay( #->steps(
-		sub {
-			my $d = shift;
-			$self->conn->callraw({
-				method => $method,
-				params => $inargs,
-				($reqauth ? (rpcswitch => { vcookie => 'eatme', reqauth => $reqauth }) : ()),
-			}, $d->begin(0));
-		},
-		sub {
-			#print Dumper(@_);
-			my ($d, $e, $r) = @_;
-			if ($e) {
-				$e = $e->{error};
-				$self->log->error("call returned error: $e->{message} ($e->{code})");
-				$rescb->(RES_ERROR, "$e->{message} ($e->{code})") if $rescb;
+	RPC::Switch::Client::Steps->new(ioloop => $self->ioloop)->steps([sub{
+		my $steps = shift;
+		$self->conn->callraw({
+			method => $method,
+			params => $inargs,
+			($reqauth ? (rpcswitch => { vcookie => 'eatme', reqauth => $reqauth }) : ()),
+		}, $steps->next );
+	}, sub {
+		#$self->log->debug('got response:' .  Dumper(\@_));
+		my ($steps, $e, $r) = @_;
+		if ($e) {
+			$e = $e->{error};
+			$self->log->error("call returned error: $e->{message} ($e->{code})");
+			$rescb->(RES_ERROR, "$e->{message} ($e->{code})") if $rescb;
+			return;
+		}
+		my ($rescb, $tmr) = @{$req}{qw(rescb tmr)};
+		return unless $rescb; # $rescb is undef if a timeout happeded
+		my ($status, $outargs) = @{$r->{result}};
+		if ($status eq RES_WAIT) {
+			my $vci = $r->{rpcswitch}->{vci};
+			unless ($vci) {
+				$self->log->error("missing rpcswitch vci after RES_WAIT");
 				return;
 			}
-			my ($rescb, $tmr) = @{$req}{qw(rescb tmr)};
-			return unless $rescb; # $rescb is undef if a timeout happeded
-			my ($status, $outargs) = @{$r->{result}};
-			if ($status eq RES_WAIT) {
-				#print '@$r', Dumper($r);
-				my $vci = $r->{rpcswitch}->{vci};
-				unless ($vci) {
-					$self->log->error("missing rpcswitch vci after RES_WAIT");
-					return;
-				}
 
-				# note the relation to the channel so we can throw an error if
-				# the channel disappears
-				# outargs should contain waitid
-				# autovivification ftw?
-				$self->{channels}->{$vci}->{$outargs} = $req;
-				$waitcb->($status, $outargs) if $waitcb;
-			} else {
-				$outargs = encode_json($outargs) if $self->{json} and ref $outargs;
-				$rescb->($status, $outargs);
-				$self->ioloop->remove($tmr) if $tmr;
-			}
+			# note the relation to the channel so we can throw an error if
+			# the channel disappears
+			# outargs should contain waitid
+			# autovivification ftw?
+			$self->{channels}->{$vci}->{$outargs} = $req;
+			$waitcb->($status, $outargs) if $waitcb;
+		} else {
+			$outargs = $self->{jsonobject}->encode($outargs)
+				if $self->{json} and ref $outargs;
+			$rescb->($status, $outargs);
+			$self->ioloop->remove($tmr) if $tmr;
 		}
-	)->catch(sub {
+		return;
+	}], sub {
 		my ($err) = @_;
 		$self->log->error("Something went wrong in call_nb: $err");
 		my ($rescb, $tmr) = @{$req}{qw(rescb tmr)};
-		$rescb->(RES_ERROR, $err);
+		$rescb->(RES_ERROR, $err) if $rescb;
 		$self->ioloop->remove($tmr) if $tmr;
 		return @_;
 	});
+	return;
 }
 
 sub get_status {
@@ -353,7 +358,7 @@ sub get_status {
 		notify => ($notify ? JSON->true : JSON->false),
 	};
 	# meh:
-	$inargs = encode_json($inargs) if $self->{json};
+	$inargs = $self->{jsonobject}->encode($inargs) if $self->{json};
 
 	# fixme: reuse call?
 	my ($done, $status, $outargs);
@@ -389,7 +394,8 @@ sub rpc_result {
 	my ($rescb, $tmr) = @{$req}{qw(rescb tmr)};
 	return unless $rescb;
 	$self->ioloop->remove($tmr) if $tmr;
-	$outargs = encode_json($outargs) if $self->{json} and ref $outargs;
+	$outargs = $self->{jsonobject}->encode($outargs)
+		 if $self->{json} and ref $outargs;
 	$rescb->($status, $outargs);
 	return;
 }
@@ -484,21 +490,22 @@ sub announce {
 	
 	croak "already have action $method" if $self->actions->{$method};
 	
-	my $err;
-	$self->ioloop->delay( #->steps(
+	my ($done, $err);
+	RPC::Switch::Client::Steps->new(ioloop => $self->ioloop)->steps([
 	sub {
-		my $d = shift;
+		my $steps = shift;
 		# fixme: check results?
 		$self->conn->call('rpcswitch.announce', {
 				 workername => $workername,
 				 method => $method,
 				 (($args{filter}) ? (filter => $args{filter}) : ()),
 				 (($args{doc}) ? (doc => $args{doc}) : ()),
-			}, $d->begin(0));
+			}, $steps->next(),
+		);
 	},
 	sub {
 		#say 'call returned: ', Dumper(\@_);
-		my ($d, $e, $r) = @_;
+		my ($steps, $e, $r) = @_;
 		if ($e) {
 			$self->log->debug("announce got error " . Dumper($e));
 			$err = $e->{message};
@@ -526,10 +533,14 @@ sub announce {
 			raw => 1,
 		);
 		$self->log->debug("succesfully announced $method");
-	})->catch(sub {
+		$done++;
+	}],sub {
 		($err) = @_;
 		$self->log->debug("something went wrong with announce: $err");
-	})->wait();
+		$done++;
+	});
+
+	$self->_loop(sub { !$done });
 
 	return $err;
 }
@@ -568,7 +579,7 @@ sub _magic {
 	# fastest to slowest?
 	if ($action->{mode} eq 'async2') {
 		my $cb2 = sub {
-			my $request = encode_json({
+			my $request = $self->{jsonobject}->encode({
 				jsonrpc => '2.0',
 				method => 'rpcswitch.result',
 				rpcswitch   => $rpcswitch,
@@ -584,7 +595,7 @@ sub _magic {
 		}
 	} elsif ($action->{mode} eq 'async') {
 		my $cb2 = sub {
-			my $request = encode_json({
+			my $request = $self->{jsonobject}->encode({
 				jsonrpc => '2.0',
 				method => 'rpcswitch.result',
 				rpcswitch   => $rpcswitch,
@@ -609,7 +620,7 @@ sub _magic {
 		}
 	} elsif ($action->{mode} eq 'subproc') {
 		my $cb2 = sub {
-			my $request = encode_json({
+			my $request = $self->{jsonobject}->encode({
 				jsonrpc => '2.0',
 				method => 'rpcswitch.result',
 				rpcswitch   => $rpcswitch,
@@ -683,7 +694,6 @@ sub _subproc {
 		}
 	);
 }
-
 
 sub close {
 	my ($self) = @_;
@@ -823,6 +833,10 @@ expected and json encoded.  (default true)
 =item - log: L<Mojo::Log> object to use
 
 (per default a new L<Mojo::Log> object is created)
+
+=item - jsonobject: json encoder/decoder object to use
+
+(per default a new L<JSON::MaybeXS> object is created)
 
 =item - timeout: how long to wait for Api calls to complete
 

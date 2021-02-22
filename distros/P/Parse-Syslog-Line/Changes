@@ -1,20 +1,42 @@
 ==================================================
-Changes from 2017-05-22 00:00:00 +0000 to present.
+Changes from 2019-02-19 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 4.5 at 2019-05-22 03:58:17 +0000
+version 4.6 at 2021-02-18 22:40:24 +0000
 ----------------------------------------
 
-  Change: b1231d1c3f920e910624d4b1180c5ea8808d45f7
+  Change: 1e2b67a489bd9852e457c614a7eb0a1a1c76027e
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-21 20:57:51 +0000
+  Date : 2021-02-18 14:40:10 +0000
+
+    Tag the 4.6 release 
+
+  Change: 918d12c42851d19c9f9e78c7e2d81fac05eb7fc8
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-02-18 14:25:13 +0000
+
+    Handle weird program names
+
+    In squid3, the syslog ident changed from `squid` to `(squid)` which failed
+    to parse as a `program_name`. Correct this by allowing any character in the
+    first position. 
+
+  Change: ce09b5506e374622e385c89ff40a5915be6d69a5
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-28 20:13:04 +0000
+
+    TravisCIA updated with App::CISetup 
+
+  Change: 921ddbb57cc8f4d4a9b294258c193f3ac9553579
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-21 20:59:00 +0000
 
     Documentation regenerated for 4.5 release 
 
-  Change: fcd4bfb4fd455040c6276b15da05a8e879a66478
+  Change: 186d3914f5d0830e84976157f38c48bb9a3e8469
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-21 20:55:31 +0000
+  Date : 2019-05-21 20:59:00 +0000
 
     Document and fix parse_syslog_lines()
 
@@ -22,6 +44,12 @@ version 4.5 at 2019-05-22 03:58:17 +0000
     documentation. This function is not exported by default and has no tests. I
     will be fixing that in future releases while testing the integration into
     syslog processors. 
+
+  Change: 498a47f898be57eddf1ef7e610a4b81154f764ad
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-05-20 08:47:31 +0000
+
+    Fix unless conditional for JSON::MaybeXS loading 
 
   Change: 90415de755348d5aafb52a84df3b44eb15fe1bde
   Author: Brad Lhotsky <brad@divisionbyzero.net>
@@ -99,298 +127,6 @@ version 4.5 at 2019-05-22 03:58:17 +0000
 
     Remove "sub expression" grouping and gender specificity in a comment 
 
-----------------------------------------
-version 4.4 at 2018-05-25 01:29:27 +0000
-----------------------------------------
-
-  Change: 67342e8bc50bdbf2811bacf7c1983f09b287dbfc
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-24 18:29:27 +0000
-
-    Ignore log files in the repo used for testing 
-
-  Change: 00c03f59e6596375829b1db6ff036af22221075f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-24 18:27:17 +0000
-
-    fixup 
-
-  Change: 33e610806f083ea6c25747e23296c7b1a9eae653
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-24 10:39:19 +0000
-
-    Version Bump for the 4.4 Release 
-
-  Change: 979c1d8ad55eb5df058a19e6c8c4b21f7fded203
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-24 10:24:59 +0000
-
-    Added a complex k/v log entry to the benchmark suite 
-
-  Change: 69a93d7107568855853f503c3db878893a85d536
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-24 10:24:59 +0000
-
-    Improve Key/Value Detection
-
-    Be smarter about handling key/value pairs. This isn't perfect, but it's a
-    lot better than the previous revision. This will strip all "brackets" from
-    the front and end of values and uses a smart regex to figure out the
-    boundaries for the values. This allows for k/v detection on fields like:
-
-    dateStarted=2018-05-24 10:11:23 +00:00 dateStopped=2018-05-24 10:14:23
-    +00:00
-
-    And wind up with:
-
-    {
-
-    ...
-
-    SDATA => {
-
-    ...
-
-    dateStarted => '2018-05-24 10:11:23 +00:00',
-
-    dateStopped => '2018-05-24 10:14:23 +00:00',
-
-    ...
-
-    }
-
-    }
-
-    Unstructured logs are fun! 
-
-----------------------------------------
-version 4.3 at 2018-05-11 23:43:58 +0000
-----------------------------------------
-
-  Change: a2601667283958a3ac28200573c931363afedac8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-11 16:43:58 +0000
-
-    Format POD for 4.3 Release 
-
-  Change: 26a63b5830a91b2b9b90527c2f10a0e9fd0f5ca5
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-11 16:36:17 +0000
-
-    Auto Detect Structured Data in Messages
-
-    Disabled by default, but via the toggles:
-
-    $Parse::Syslog::Line::AutoDetectJSON = 1;
-
-    $Parse::Syslog::Line::AutoDetectKeyValues = 1;
-
-    The content of the message will be checked for JSON or Splunk style
-    key/values pairs. If found, they'll be extracted into the SDATA element of
-    the returned HashReference.
-
-    Also added the --sdata flag to parse-syslog-line.pl and an --manual flag
-    too. 
-
-----------------------------------------
-version 4.2 at 2017-11-26 23:49:10 +0000
-----------------------------------------
-
-  Change: 24ce203cfebfd5ee8c185f697c6166da2414d33c
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-11-26 15:49:10 +0000
-
-    Release version 4.2 to address test failures
-
-    CPAN Testers uncovered a few more issues with systems based on the
-    precision of local calculations and the timezone of the host system. Two
-    fixes in this release:
-
-    * Always set the OutputTimeZone when set_syslog_timezone() is called as
-
-    per the docs. This also makes the tests pass as the timezone is
-
-    expected. * New variable $HiResFmt and default to '%0.6f'. Use this to set
-    the
-
-    correct precision in the date strings. If tests continue to fail due
-
-    to precision erros, I will override the precision in the tests using
-
-    this variable. 
-
-  Change: 24c3cf8f168c1fbe02e45457a82a7ca46a006083
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-11-26 14:20:47 +0000
-
-    Allow cuotomizing the high resolution time format.
-
-    Allow overriding the default microsecond resolution timestamps for the high
-    resolution timestamps. This should address some test failures where
-    HTTP::Date::str2time() is causing rounding errors.
-
-    Touch up test output for easier debugging. 
-
-  Change: 89c1839a3ca33b9588884f2f4060a6a0e3ad734f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-11-26 20:53:11 +0000
-
-    Fix timezone output in tests
-
-    * Ensure that OutputTimeZone is set to true when we call
-
-    set_syslog_timezone() so behavior matches the documentation * Correct
-    ordering of timezone related calls in t/01-parse.t 
-
-----------------------------------------
-version 4.1 at 2017-11-25 00:24:51 +0000
-----------------------------------------
-
-  Change: c24ed3db75f4e12e853f57ccdd099e206d930fd8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-11-24 16:24:51 +0000
-
-    Version 4.1 fixes for CPAN Testers and bonus utility
-
-    * Force UTC timezone in the test suite so the parsing of timestamps is
-
-    reliable even on systems where Perl can't figure out the timezone, ie,
-
-    the BSD's and Darwin * Retab to pass all xtests * Install new utility
-    parse-syslog-line.pl to provide something for
-
-    everyone to play with immediately 
-
-----------------------------------------
-version 4.0 at 2017-07-17 04:52:15 +0000
-----------------------------------------
-
-  Change: 47382a670e105bae399d01ed68ec82fb4c4dc2d8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-07-17 06:52:15 +0000
-
-    Version 4.0 to fix broken 3.9 upload. 
-
-  Change: 57866bb6a97c5d839fd1f599432bec770041d6e9
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-07-17 06:49:42 +0000
-
-    Fix broken dependencies
-
-    Mistakenly added Datetime::TimeZone, instead of DateTime::TimeZone and as a
-    general requires when it's only a test requirement. 
-
-----------------------------------------
-version 3.9 at 2017-07-17 04:45:03 +0000
-----------------------------------------
-
-  Change: af6d87cb22522c8cdde612e6f50576240e7b4df3
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-07-17 06:45:03 +0000
-
-    Version 3.9 Release Adjustments 
-
-  Change: 0818c63aebe2b2c2e862c48772998c43d65971de
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-07-16 21:08:29 +0000
-
-    Fix "Dist::Zilla = >= 1.23" to "DateTime >= 1.23"
-
-    Doing too many things at once, including debugging why the newest version
-    of Dist::Zilla broke a few plugins. Brain replaced "DateTime" with
-    Dist::Zilla for some reason. 
-
-----------------------------------------
-version 3.8 at 2017-07-17 01:28:59 +0000
-----------------------------------------
-
-  Change: db048f6090f235a2d260fc2b3c05200f31c6b35e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-07-17 03:28:59 +0000
-
-    Version bump for 3.8 to fix failing CPAN Testers tests 
-
-  Change: c54d620cc4d258a970cf029e99cac9f40557ba17
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-07-17 03:26:29 +0000
-
-    Bug inolder versions of DateTime causes rounding errors.
-
-    Require DateTime >= 1.23 where the bug with from_epoch() is corrected. 
-
-  Change: ece9daed98be2eb239e9311529fd34c99ac9688d
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-07-15 23:37:28 +0000
-
-    Fixes for some test failures on CPAN Testers 
-
-  Change: 8e6000cf2505bbac212257c151e222443f79598a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2017-07-15 22:21:24 +0000
-
-    Adding tests for date parsing libraries to the benchmarks directory. 
-
-----------------------------------------
-version 3.7 at 2017-07-01 01:09:14 +0000
-----------------------------------------
-
-  Change: 38fd47d87a1748d6f5d629b4d08c27d1d7e6a7b6
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2017-06-30 18:09:14 +0000
-
-    Docs regenerated for release 3.7 
-
-  Change: 9962ab830e690f43e0dcd5a1a1a743e915f982fe
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2017-06-30 18:09:14 +0000
-
-    Remove the datetime_local and datetime_utc fields, datetime_str is what you
-    want always.
-
-    Also convert regexes to explicit non-backtracking. 
-
-  Change: 06ebc048f34fbf7c7b86cd8784dd7d54c90d0d63
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2017-06-30 18:09:14 +0000
-
-    Added the new datefields into the spec. 
-
-  Change: 251510a5be147a44fcc9a2fe68821e8511e1e33d
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2017-06-30 18:09:14 +0000
-
-    Disable grouping captures on date regexes. 
-
-  Change: a99e54a4ea96a00bcaebb089af69f1ee6ca4f8a3
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2017-06-30 18:09:14 +0000
-
-    Almost ready for a release. 
-
-  Change: 09ddc8637760c758c40d98d2878d2bcf27188f3b
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2017-06-30 18:09:14 +0000
-
-    Reworking the date handling logic. 
-
-  Change: 22bd1081c40b77698b83befce990d0096ef10a6d
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2017-06-30 17:55:32 +0000
-
-    Added the Recommended settings into the test suite. 
-
-  Change: e8d3e5aca1a01ddfce08aea892fb35bbc9065c51
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2017-06-30 17:52:30 +0000
-
-    Use Dumbbench for benchmarking. 
-
-  Change: 2922e97db8a63b78e25c8d8865a6ed5218295ceb
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2017-06-30 15:34:09 +0000
-
-    Simple benchmark for NYTProf'ing. 
-
 =================================================
-Plus 27 releases after 2017-05-22 00:00:00 +0000.
+Plus 35 releases after 2019-02-19 00:00:00 +0000.
 =================================================

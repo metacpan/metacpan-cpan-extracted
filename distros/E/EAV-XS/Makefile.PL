@@ -156,16 +156,17 @@ sub MY::subdir_x {
 sub MY::postamble {
     return <<'EOL';
 $(MYEXTLIB): libeav/Makefile
-	$(MAKE) -C libeav static $(LIBEAV_OPTIONS) $(LIBEAV_MAKEFILE) \
-		INCLUDES="$(DEFINE)"
+	$(MAKE) -C libeav $(LIBEAV_MAKEFILE) $(LIBEAV_OPTIONS) INCLUDES="$(DEFINE)" \
+		static
 
 clean-libeav:
-	$(MAKE) -C libeav clean $(LIBEAV_OPTIONS) $(LIBEAV_MAKEFILE) \
-		INCLUDES="$(DEFINE)"
+	$(MAKE) -C libeav $(LIBEAV_MAKEFILE) $(LIBEAV_OPTIONS) INCLUDES="$(DEFINE)" \
+		clean
 
 check-libeav:
-	$(MAKE) -C libeav check $(LIBEAV_OPTIONS) $(LIBEAV_MAKEFILE) \
-		INCLUDES="$(DEFINE)" LDFLAGS="$(OTHERLDFLAGS)"
+	$(MAKE) -C libeav $(LIBEAV_MAKEFILE) $(LIBEAV_OPTIONS) INCLUDES="$(DEFINE)" \
+		LDFLAGS="$(OTHERLDFLAGS)" \
+		check
 
 EOL
 }

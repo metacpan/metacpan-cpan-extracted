@@ -1,18 +1,38 @@
-Class::DBI::Plugin::TO_JSON eases integration of Class::DBI and JSON::XS
+NAME
 
-Copyright (C) 2008, Graham TerMarsch.  All Rights Reserved.
+    Class::DBI::Plugin::TO_JSON - Help integrate Class::DBI with JSON::XS
 
-This is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+SYNOPSIS
 
-To install:
-    perl Build.PL
-    ./Build
-    ./Build test
-    ./Build install
+      package MY::DB;
+      use base qw(Class::DBI);
+      use Class::DBI::Plugin::TO_JSON;
 
-or:
-    perl Makefile.PL
-    make
-    make test
-    make install
+DESCRIPTION
+
+    Class::DBI::Plugin::TO_JSON helps integrate Class::DBI with JSON::XS,
+    by implementing a TO_JSON() method which turns your data record into a
+    plain/raw HASHREF with no inflated values.
+
+METHODS
+
+    TO_JSON()
+
+      Turns the Class::DBI data record into a HASHREF suitable for use with
+      JSON::XS
+
+AUTHOR
+
+    Graham TerMarsch (cpan@howlingfrog.com)
+
+COPYRIGHT
+
+    Copyright (C) 2008, Graham TerMarsch. All rights reserved.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+
+SEE ALSO
+
+    JSON::XS, Class::DBI.
+

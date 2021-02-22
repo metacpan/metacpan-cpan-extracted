@@ -1,6 +1,6 @@
+.github/workflows/ci.yaml
 .perltidyrc
 .ship.conf
-.travis.yml
 Changes
 cpanfile
 example/rwf.pl
@@ -9,7 +9,7 @@ example/tail.pl
 lib/Mojo/IOLoop/ReadWriteFork.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 t/00-basic.t
 t/app.t
 t/bash.t
@@ -22,6 +22,7 @@ t/invalid.t
 t/leaky-errno.t
 t/minion.t
 t/poll.t
+t/premature-close.t
 t/ssh.t
 t/sudo.t
 t/synopsis.t

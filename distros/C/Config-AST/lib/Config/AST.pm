@@ -1,5 +1,5 @@
 # This file is part of Config::AST                            -*- perl -*-
-# Copyright (C) 2017-2019 Sergey Poznyakoff <gray@gnu.org>
+# Copyright (C) 2017-2021 Sergey Poznyakoff <gray@gnu.org>
 #
 # Config::AST is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'sort' => [ qw(NO_SORT SORT_NATURAL SORT_PATH) ] );
 our @EXPORT_OK = qw(NO_SORT SORT_NATURAL SORT_PATH);
     
-our $VERSION = "1.06";
+our $VERSION = "1.07";
 
 =head1 NAME
 

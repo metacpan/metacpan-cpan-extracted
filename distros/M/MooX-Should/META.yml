@@ -1,7 +1,7 @@
 ---
 abstract: 'optional type restrictions for Moo attributes'
 author:
-  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Theo van Hoesel <vanhoesel@cpan.org>'
 build_requires:
   File::Spec: '0'
   Module::Metadata: '0'
@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 keywords:
   - Moo
   - types
@@ -25,15 +25,21 @@ name: MooX-Should
 provides:
   MooX::Should:
     file: lib/MooX/Should.pm
-    version: v0.1.2
+    version: v0.1.4
 requires:
   Devel::StrictMode: '0'
   Moo: '0'
+  version: '0.77'
 resources:
   bugtracker: https://github.com/robrwo/MooX-Should/issues
   repository: git://github.com/robrwo/MooX-Should.git
-version: v0.1.2
+version: v0.1.4
 x_authority: cpan:RRWO
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Theo van Hoesel <tvanhoesel@perceptyx.com>'
+  - 'Zakariyya Mughal <zaki.mughal@gmail.com>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

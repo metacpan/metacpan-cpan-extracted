@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 30 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 33 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'BorderStyle/ASCII/None.pm',
     'BorderStyle/ASCII/SingleLine.pm',
+    'BorderStyle/ASCII/SingleLineDoubleAfterHeader.pm',
     'BorderStyle/ASCII/SingleLineHorizontalOnly.pm',
     'BorderStyle/ASCII/SingleLineInnerOnly.pm',
     'BorderStyle/ASCII/SingleLineOuterOnly.pm',
@@ -31,7 +32,9 @@ my @module_files = (
     'BorderStyle/UTF8/None.pm',
     'BorderStyle/UTF8/SingleLine.pm',
     'BorderStyle/UTF8/SingleLineBold.pm',
+    'BorderStyle/UTF8/SingleLineBoldHeader.pm',
     'BorderStyle/UTF8/SingleLineCurved.pm',
+    'BorderStyle/UTF8/SingleLineDoubleAfterHeader.pm',
     'BorderStyle/UTF8/SingleLineHorizontalOnly.pm',
     'BorderStyle/UTF8/SingleLineInnerOnly.pm',
     'BorderStyle/UTF8/SingleLineOuterOnly.pm',

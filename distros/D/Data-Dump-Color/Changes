@@ -1,3 +1,9 @@
+0.243   2021-02-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Make Scalar::Util::LooksLikeNumber an optional prereq, to make
+	  Data::Dump::Color fatpackable [GH#8].
+
+
 0.242   2021-02-06  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Make dd() return the original arguments, like in Data::Dmp

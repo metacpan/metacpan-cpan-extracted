@@ -1,5 +1,10 @@
 Revision history for Perl extension Class::DBI::Plugin::TO_JSON:
 
+0.04      2021-02-15 13:09:13-08:00 America/Vancouver
+    - Switch to Dist::Zilla for release management
+    - POD fixups; spelling
+    - Move to GitHub
+
 0.03    Fri Apr 23 16:49 PDT 2010
     - Switch to Git
 

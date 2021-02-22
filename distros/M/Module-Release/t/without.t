@@ -4,13 +4,13 @@ use warnings;
 
 use Test::More 1.0;
 
-BEGIN {
-	use File::Spec::Functions qw(rel2abs catfile);
-	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
-	require $file;
-	}
+require 't/lib/setup_common.pl';
 
-use Module::Release;
+my $class = 'Module::Release';
+subtest setup => sub {
+	use_ok( $class );
+	can_ok( $class, 'new' );
+	};
 
 use Test::Without::Module qw( Test::Prereq Module::CPANTS::Analyse );
 
@@ -25,7 +25,7 @@ foreach my $tuple ( @tuples ) {
 	my $rc = eval "{ package Module::Release; require $module; $module\->import  }";
 	ok( defined $rc, "Loading $module succeeds" );
 
-	my $release = Module::Release->new( quiet => 1 );
+	my $release = $class->new( quiet => 1 );
 	can_ok( $release, $method );
 
 	eval { $release->$method };

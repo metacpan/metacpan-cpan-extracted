@@ -5,6 +5,7 @@ use warnings;
 use XML::Parser::Expat;
 use Archive::Zip ();
 use File::Temp;
+use Carp;
 
 use constant BUILTIN_FMT  => 0;
 use constant BUILTIN_TYPE => 1;
@@ -73,13 +74,13 @@ sub new {
         _current_style => undef,
     }, $class;
 
-    my $fh = File::Temp->new( SUFFIX => '.xml' );
+    my $fh = File::Temp->new( SUFFIX => '.xml' ) or confess "couldn't create temporary file: $!";
 
-    my $handle = $archive->styles;
-    die 'Failed to write temporally file: ', $fh->filename
+    my $handle = $archive->styles or confess "couldn't get handle to styles archive: $!";
+    confess 'Failed to write temporary file: ', $fh->filename
         unless $handle->extractToFileNamed($fh->filename) == Archive::Zip::AZ_OK;
 
-    my $parser = XML::Parser::Expat->new;
+    my $parser = XML::Parser::Expat->new(Namespaces=>1);
     $parser->setHandlers(
         Start => sub { $self->_start(@_) },
         End   => sub { $self->_end(@_) },
@@ -121,8 +122,7 @@ sub _start {
 
     if ($name eq 'cellXfs') {
         $self->{_is_cell_xfs} = 1;
-    }
-    elsif ($self->{_is_cell_xfs} and $name eq 'xf') {
+    } elsif ($self->{_is_cell_xfs} and $name eq 'xf') {
         $self->{_current_style} = {
             numFmt => int($attrs{numFmtId}) || 0,
             exists $attrs{fontId}   ? ( font   => $attrs{fontId} )   : (),
@@ -132,11 +132,9 @@ sub _start {
             exists $attrs{applyFont} ? ( applyFont => $attrs{applyFont} ) : (),
             exists $attrs{applyNumberFormat} ? ( applyNumFmt => $attrs{applyNumberFormat} ) : (),
         };
-    }
-    elsif ($name eq 'numFmts') {
+    } elsif ($name eq 'numFmts') {
         $self->{_is_num_fmts} = 1;
-    }
-    elsif ($self->{_is_num_fmts} and $name eq 'numFmt'){
+    } elsif ($self->{_is_num_fmts} and $name eq 'numFmt'){
         $self->{_current_numfmt} = {
             numFmtId   => $attrs{numFmtId},
             exists $attrs{formatCode} ? (
@@ -152,14 +150,11 @@ sub _end {
 
     if ($name eq 'cellXfs') {
         $self->{_is_cell_xfs} = 0;
-    }
-    elsif ($self->{_current_style} and $name eq 'xf') {
+    } elsif ($self->{_current_style} and $name eq 'xf') {
         push @{ $self->{_number_formats } }, delete $self->{_current_style};
-    }
-    elsif ($name eq 'numFmts') {
+    } elsif ($name eq 'numFmts') {
         $self->{_is_num_fmts} = 0;
-    }
-    elsif ($self->{_current_numfmt} and $name eq 'numFmt') {
+    } elsif ($self->{_current_numfmt} and $name eq 'numFmt') {
         my $id = $self->{_current_numfmt}{numFmtId};
         $self->{_num_fmt}{ $id } = delete $self->{_current_numfmt};
     }
@@ -186,3 +181,32 @@ sub _parse_format_code_type {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Data::XLSX::Parser::Styles - Styles class of Data::XLSX::Parser
+
+=head1 DESCRIPTION
+
+Data::XLSX::Parser::Styles parses the styles of the workbook and provides methods to get the cell style from the passed style id, convert the style to a type (float, int, datetime.date, etc.) and convert the style to a format string.
+
+=head1 METHODS
+
+=head2 cell_style
+
+get the cell style from the current cell's style id.
+
+=head2 cell_type_from_style
+
+convert the style to a type (float, int, datetime.date, etc.).
+
+=head2 cell_format_from_style
+
+convert the style to a builtin format string.
+
+=head1 AUTHOR
+
+Daisuke Murase <typester@cpan.org>
+
+=cut

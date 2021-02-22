@@ -7,7 +7,7 @@
 #podDocumentation
 package GitHub::Crud;
 use v5.16;
-our $VERSION = 20210212;
+our $VERSION = 202102121;
 use warnings FATAL => qw(all);
 use strict;
 use Carp              qw(confess);
@@ -15,6 +15,7 @@ use Data::Dump        qw(dump);
 use Data::Table::Text qw(:all !fileList);
 use Digest::SHA1      qw(sha1_hex);
 use Date::Manip;
+use Scalar::Util      qw(blessed reftype looks_like_number);
 use Time::HiRes       qw(time);
 use Encode            qw(encode decode);
 use utf8;                                                                       # To allow utf8 constants for testing
@@ -319,10 +320,8 @@ sub list($)                                                                     
   my $failed = $gitHub->failed = $r->status != 200;                             # Check response code
   $failed and $gitHub->confessOnFailure and confess dump($gitHub);              # Confess to any failure if so requested
 
-  if ($failed)                                                                  # Failed to retrieve a list of files
-   {$gitHub->fileList = [];
-   }
-  else
+  $gitHub->fileList = [];
+  if (!$failed and reftype($r->data) =~ m(array)i)                              # Array of file  details
    {for(@{$r->data})                                                            # Objectify and save L<sha> digests from file descriptions retrieved by this call
      {bless $_, "GitHub::Crud::Response::Data";
       saveSha($gitHub, $_);
@@ -529,7 +528,7 @@ sub exists($)                                                                   
   $gitHub->gitFolder    = $folder;
   $gitHub->nonRecursive = $nonRecursive;
 
-  if (!$gitHub->failed)                                                         # Look for requested file in file listing
+  if (!$gitHub->failed and reftype($gitHub->response->data) =~ m(array)i)       # Look for requested file in file listing
    {for(@{$gitHub->response->data})
      {return $_ if $_->path eq $gitHub->gitFile;
      }
@@ -920,6 +919,7 @@ sub writeFileFromCurrentRun($$)                                                 
 
 sub writeFileFromFileFromCurrentRun($)                                          # Write a file into the repository from the current run
  {my ($target) = @_;                                                            # File name both locally and in the repo
+  -e $target or confess "File to upload does not exist:\n$target";
   if (my $g = currentRepo)                                                      # We are on GitHub
    {$g->gitFile = $target;
     $g->write(scalar(readFile($target)));

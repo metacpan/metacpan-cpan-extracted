@@ -26,7 +26,7 @@ use Time::HiRes qw/time/;
 Readonly my $HTTP_OK => 200;
 Readonly my $HTTP_FILE_NOT_FOUND => 404;
 
-our $VERSION = '1.12';
+our $VERSION = '1.16';
 
 # TODO: Timeout, fallback
 # TODO: Expected result content (json etc)
@@ -84,7 +84,6 @@ sub new {
         request_timeout
         server
         transactor
-
     /;
 
     my $ua = $class->SUPER::new(%mojo_agent_config);
@@ -164,28 +163,38 @@ sub start {
   my $key = $self->generate_key($url, @opts);
   my $start_time = time;
 
+  # Fork-safety
+  $self->_cleanup->server->restart if $self->{pid} && $self->{pid} ne $$;
+  $self->{pid} //= $$;
+
   # We wrap the incoming callback in our own callback to be able to cache the response
   my $wrapper_cb = $cb ? sub {
     my ($ua, $tx) = @_;
     $cb->($ua, $ua->_post_process_get($tx, $start_time, $key, @opts));
   } : ();
+
   # Is an absolute URL or an URL relative to the app eg. http://foo.com/ or /foo.txt
   if ($url !~ m{ \A file:// }gmx && (Mojo::URL->new($url)->is_abs || ($url =~ m{ \A / }gmx && !$self->always_return_file))) {
     if ($self->is_cacheable($key)) {
       my $serialized = $self->cache_agent->get($key);
       if ($serialized) {
+        $serialized->{events} = $tx->{events};
+        $serialized->{req_events} = $tx->req->{events};
+        $serialized->{res_events} = $tx->res->{events};
         my $cached_tx = _build_fake_tx($serialized);
         $self->_log_line($cached_tx, {
           start_time => $start_time,
           key => $key,
           type => 'cached result',
         });
+        $cached_tx->req->finish;
+        $cached_tx->res->finish;
+        $cached_tx->closed;
         return $cb->($self, $cached_tx) if $cb;
         return $cached_tx;
       }
     }
-    # Fork-safety
-    $self->_cleanup->server->restart unless ($self->{pid} //= $$) eq $$;
+
     # Non-blocking
     if ($wrapper_cb) {
       warn "-- Non-blocking request (@{[_url($tx)]})\n" if Mojo::UserAgent::DEBUG;
@@ -207,7 +216,7 @@ sub start {
       $code = $res->{code};
     } or $self->logger->error($EVAL_ERROR);
 
-    my $params = { url => $url, body => $res->{body}, code => $code, method => 'FILE', headers => $res->{headers} };
+    my $params = { url => $url, body => $res->{body}, code => $code, method => 'FILE', headers => $res->{headers}, events => $tx->{events}, req_events => $tx->req->{events}, res_events => $tx->res->{events} };
 
     # first non-blocking, if no callback, regular post process
     my $tx = _build_fake_tx($params);
@@ -234,6 +243,9 @@ sub _post_process_get {
                 if (my $cache_obj = $self->cache_agent->get_object($key)) {
                     my $serialized = $cache_obj->value;
                     $serialized->{headers}->{'X-Mojo-UserAgent-Cached-ExpiresAt'} = $cache_obj->expires_at($key);
+                    $serialized->{events} = $tx->{events};
+                    $serialized->{req_events} = $tx->req->{events};
+                    $serialized->{res_events} = $tx->res->{events};
 
                     my $expired_tx = _build_fake_tx($serialized);
                     $self->_log_line( $expired_tx, {
@@ -242,6 +254,9 @@ sub _post_process_get {
                         type       => 'expired and cached',
                         orig_tx    => $tx,
                     });
+                    $expired_tx->req->finish;
+                    $expired_tx->res->finish;
+                    $expired_tx->closed;
 
                     return $expired_tx;
                 }
@@ -370,6 +385,10 @@ sub _build_fake_tx {
     $tx->res->{json} = $opts->{json};
     $tx->res->body($opts->{body});
 
+    $tx->{events} = $opts->{events};
+    $tx->req->{events} = $opts->{req_events};
+    $tx->res->{events} = $opts->{res_events};
+
     return $tx;
 }
 
@@ -492,6 +511,8 @@ sub _get_stacktrace {
         $package . $_->line();
     } grep { $_ } @frames;
 }
+
+sub _url { shift->req->url->to_abs }
 
 1;
 

@@ -30,7 +30,7 @@ sub import {
       if ( @_ && lc( $_[0] ) eq "pool" );
 }
 
-our $VERSION = '1.58';
+our $VERSION = '1.59';
 
 our $drh    = undef;    # will hold driver handle
 our $err    = 0;        # will hold any error codes

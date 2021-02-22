@@ -1,3 +1,11 @@
+0.09 2021-02-21T14:08:52+01:00
+ - Add blank lines before return and after arguments.
+ - Fix bugtracker.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Update author github username.
+ - Update copyright years.
+
 0.08 2018-01-22T16:30:04+01:00
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
  - Update Module::Install to 1.19 version.

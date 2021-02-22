@@ -3,11 +3,13 @@ package BoardStreams::Transaction;
 use Mojo::Base -base, -signatures;
 
 use Mojo::JSON 'from_json', 'to_json', 'encode_json';
+use Mojo::IOLoop;
 use Struct::Diff 'diff';
 use List::AllUtils 'each_array', 'indexes';
 use Storable 'dclone';
+use Carp 'croak';
 
-our $VERSION = "v0.0.13";
+our $VERSION = "v0.0.21";
 
 has bs_prefix => sub { die "bs_prefix is required" };
 has c => sub { die "c is required" };
@@ -46,7 +48,7 @@ sub lock_state ($self, $channel_names, $sub, %opts) {
     my $notify_payload_size_limit = $self->notify_payload_size_limit;
     my $event_patch_sequence_name = $self->event_patch_sequence_name;
 
-    my $multi_mode = length ref $channel_names;
+    my $multi_mode = ref $channel_names eq 'ARRAY';
     $channel_names = [$channel_names] if not $multi_mode;
     my $db = $self->db;
     my $tx = $self->pg_tx;
@@ -56,7 +58,7 @@ sub lock_state ($self, $channel_names, $sub, %opts) {
         { for => 'update' },
     )->hashes;
 
-    if (! $opts{no_ban}) {
+    if (! $opts{no_ban} and Mojo::IOLoop->is_running) {
         my $workers_state = $self->c->$bs_prefix->get_state($WORKERS_CHANNEL);
         $workers_state->{$worker_uuid}
             and ! $workers_state->{$worker_uuid}{banned}

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Relationship;
 # ABSTRACT: Describes a relationship from a Neo4j graph
-$Neo4j::Driver::Type::Relationship::VERSION = '0.21';
+$Neo4j::Driver::Type::Relationship::VERSION = '0.22';
 
 use parent 'Neo4j::Types::Relationship';
 use overload '%{}' => \&_hash, fallback => 1;
@@ -92,7 +92,7 @@ Neo4j::Driver::Type::Relationship - Describes a relationship from a Neo4j graph
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 

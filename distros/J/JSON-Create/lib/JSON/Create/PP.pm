@@ -47,7 +47,7 @@ use Carp qw/croak carp confess cluck/;
 use Scalar::Util qw/looks_like_number blessed reftype/;
 use Unicode::UTF8 qw/decode_utf8 valid_utf8 encode_utf8/;
 use B;
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 sub create_json
 {

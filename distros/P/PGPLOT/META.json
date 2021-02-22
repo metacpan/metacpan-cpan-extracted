@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -27,24 +27,33 @@
       },
       "configure" : {
          "requires" : {
+            "Devel::CheckLib" : "1.14",
             "ExtUtils::F77" : "1.13"
          }
       },
-      "runtime" : {
+      "develop" : {
          "requires" : {
-            "ExtUtils::F77" : "1.13"
+            "CPAN::Changes" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/perl5-PGPLOT/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/PDLPorters/perl5-PGPLOT.git",
          "web" : "https://github.com/PDLPorters/perl5-PGPLOT"
       }
    },
-   "version" : "2.24",
+   "version" : "2.27",
    "x_IRC" : "irc://irc.perl.org/#pdl",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

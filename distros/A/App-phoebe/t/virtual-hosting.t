@@ -29,7 +29,7 @@ require './t/test.pl';
 
 # robots
 my $page = query_gemini("$base/robots.txt");
-my @urls = qw(/raw/* /html/* /diff/* /history/* /do/changes* /do/all/changes* /do/all/latest/changes* /do/rss /do/atom /do/new /do/more /do/match /do/search);
+my @urls = qw(/raw /html /diff /history /do/changes /do/all/changes /do/all/latest/changes /do/rss /do/atom /do/new /do/more /do/match /do/search);
 for (map { ($_, "/alex$_", "/berta$_") } @urls) {
   my $url = quotemeta;
   like($page, qr/^Disallow: $url/m, "Robots are disallowed from $url");

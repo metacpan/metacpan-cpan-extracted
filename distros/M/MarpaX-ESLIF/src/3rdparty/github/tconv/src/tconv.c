@@ -101,7 +101,7 @@ struct tconv_helper {
 #define TCONV_MALLOC(tconvp, funcs, ptr, type, size) do {		\
     TCONV_TRACE((tconvp), "%s - malloc(%lld)", (funcs), (unsigned long long) (size)); \
     (ptr) = (type) malloc(size);					\
-    if ((ptr) == NULL) {						\
+    if (TCONV_UNLIKELY((ptr) == NULL)) {                                \
       TCONV_TRACE((tconvp), "%s - malloc(%lld) failure, %s", (funcs), (unsigned long long) (size), strerror(errno)); \
       goto err;								\
     } else {								\
@@ -114,7 +114,7 @@ struct tconv_helper {
     type tmp;								\
     TCONV_TRACE((tconvp), "%s - realloc(%p, %lld)", (funcs), (ptr), (unsigned long long) (size)); \
     tmp = (type) realloc((ptr), (size));				\
-    if (tmp == NULL) {							\
+    if (TCONV_UNLIKELY(tmp == NULL)) {                                  \
       TCONV_TRACE((tconvp), "%s - realloc(%p, %lld) failure, %s", (funcs), (ptr), (unsigned long long) (size), strerror(errno)); \
       goto err;								\
     } else {								\
@@ -127,7 +127,7 @@ struct tconv_helper {
 #define TCONV_STRDUP(tconvp, funcs, dst, src) do {			\
     TCONV_TRACE((tconvp), "%s - strdup(\"%s\")", (funcs), (src));	\
     (dst) = strdup(src);						\
-    if ((dst) == NULL) {						\
+    if (TCONV_UNLIKELY((dst) == NULL)) {                                \
       TCONV_TRACE((tconvp), "%s - strdup(\"%s\") failure, %s", (funcs), (src), strerror(errno)); \
       goto err;								\
     } else {								\
@@ -221,7 +221,7 @@ int tconv_close(tconv_t tconvp)
     }
     if (tconvp->sharedLibraryHandlep != NULL) {
       TCONV_TRACE(tconvp, "%s - closing shared library: dlclose(%p)", funcs, tconvp->sharedLibraryHandlep);
-      if (dlclose(tconvp->sharedLibraryHandlep) != 0) {
+      if (TCONV_UNLIKELY(dlclose(tconvp->sharedLibraryHandlep) != 0)) {
         TCONV_TRACE(tconvp, "%s - dlclose failure, %s", funcs, dlerror());
         errno = EFAULT;
         rci = -1;
@@ -265,7 +265,7 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
 
   /* The very initial malloc cannot be done with TCONV_MALLOC */
   tconvp = (tconv_t) malloc(sizeof(struct tconv));
-  if (tconvp == NULL) {
+  if (TCONV_UNLIKELY(tconvp == NULL)) {
     goto err;
   }
   /* Make sure everything is initialized NOW regardless of what is coded after */
@@ -342,14 +342,14 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
         break;
       case TCONV_CHARSET_PLUGIN:
         TCONV_TRACE(tconvp, "%s - charset detector type is plugin", funcs);
-        if (tconvOptionp->charsetp->u.plugin.filenames == NULL) {
+        if (TCONV_UNLIKELY(tconvOptionp->charsetp->u.plugin.filenames == NULL)) {
           TCONV_TRACE(tconvp, "%s - null charset plugin filename", funcs);
           errno = EINVAL;
           goto err;
         }
         TCONV_TRACE(tconvp, "%s - opening shared library %s", funcs, tconvOptionp->charsetp->u.plugin.filenames);
         tconvp->sharedLibraryHandlep = dlopen(tconvOptionp->charsetp->u.plugin.filenames, RTLD_LAZY);
-        if (tconvp->sharedLibraryHandlep == NULL) {
+        if (TCONV_UNLIKELY(tconvp->sharedLibraryHandlep == NULL)) {
           TCONV_TRACE(tconvp, "%s - dlopen failure, %s", funcs, dlerror());
           errno = EINVAL;
           goto err;
@@ -369,9 +369,9 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
 	    charset_frees = "tconv_charset_freep";
 	  }
 	}
-        tconvp->charsetExternal.tconv_charset_newp  = dlsym(tconvp->sharedLibraryHandlep, charset_news);
-        tconvp->charsetExternal.tconv_charset_runp  = dlsym(tconvp->sharedLibraryHandlep, charset_runs);
-        tconvp->charsetExternal.tconv_charset_freep = dlsym(tconvp->sharedLibraryHandlep, charset_frees);
+        tconvp->charsetExternal.tconv_charset_newp  = (tconv_charset_new_t) dlsym(tconvp->sharedLibraryHandlep, charset_news);
+        tconvp->charsetExternal.tconv_charset_runp  = (tconv_charset_run_t) dlsym(tconvp->sharedLibraryHandlep, charset_runs);
+        tconvp->charsetExternal.tconv_charset_freep = (tconv_charset_free_t) dlsym(tconvp->sharedLibraryHandlep, charset_frees);
         tconvp->charsetExternal.optionp             = tconvOptionp->charsetp->u.plugin.optionp;
         break;
       case TCONV_CHARSET_ICU:
@@ -398,7 +398,7 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
         tconvp->charsetExternal.optionp             = NULL;
         break;
       }
-      if (tconvp->charsetExternal.tconv_charset_runp == NULL) {
+      if (TCONV_UNLIKELY(tconvp->charsetExternal.tconv_charset_runp == NULL)) {
         /* Formally, only the "run" entry point is required */
         TCONV_TRACE(tconvp, "%s - tconv_charset_runp is NULL", funcs);
         errno = EINVAL;
@@ -406,7 +406,7 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
       }
     } else {    
       TCONV_TRACE(tconvp, "%s - setting default charset options", funcs);
-      if (_tconvDefaultCharsetOption(tconvp, &(tconvp->charsetExternal)) == 0) {
+      if (TCONV_UNLIKELY(_tconvDefaultCharsetOption(tconvp, &(tconvp->charsetExternal)) == 0)) {
         goto err;
       }
     }
@@ -418,14 +418,14 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
         break;
       case TCONV_CONVERT_PLUGIN:
         TCONV_TRACE(tconvp, "%s - converter type is plugin", funcs);
-        if (tconvOptionp->convertp->u.plugin.filenames == NULL) {
+        if (TCONV_UNLIKELY(tconvOptionp->convertp->u.plugin.filenames == NULL)) {
           TCONV_TRACE(tconvp, "%s - null convert filename", funcs);
           errno = EINVAL;
           goto err;
         }
         TCONV_TRACE(tconvp, "%s - opening shared library %s", funcs, tconvOptionp->convertp->u.plugin.filenames);
         tconvp->sharedLibraryHandlep = dlopen(tconvOptionp->convertp->u.plugin.filenames, RTLD_LAZY);
-        if (tconvp->sharedLibraryHandlep == NULL) {
+        if (TCONV_UNLIKELY(tconvp->sharedLibraryHandlep == NULL)) {
           TCONV_TRACE(tconvp, "%s - dlopen failure, %s", funcs, dlerror());
           errno = EINVAL;
           goto err;
@@ -445,9 +445,9 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
 	    convert_frees = "tconv_convert_freep";
 	  }
 	}
-        tconvp->convertExternal.tconv_convert_newp  = dlsym(tconvp->sharedLibraryHandlep, convert_news);
-        tconvp->convertExternal.tconv_convert_runp  = dlsym(tconvp->sharedLibraryHandlep, convert_runs);
-        tconvp->convertExternal.tconv_convert_freep = dlsym(tconvp->sharedLibraryHandlep, convert_frees);
+        tconvp->convertExternal.tconv_convert_newp  = (tconv_convert_new_t) dlsym(tconvp->sharedLibraryHandlep, convert_news);
+        tconvp->convertExternal.tconv_convert_runp  = (tconv_convert_run_t) dlsym(tconvp->sharedLibraryHandlep, convert_runs);
+        tconvp->convertExternal.tconv_convert_freep = (tconv_convert_free_t) dlsym(tconvp->sharedLibraryHandlep, convert_frees);
         tconvp->convertExternal.optionp             = tconvOptionp->convertp->u.plugin.optionp;
         break;
       case TCONV_CONVERT_ICU:
@@ -488,7 +488,7 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
         tconvp->convertExternal.optionp             = NULL;
         break;
       }
-      if (tconvp->convertExternal.tconv_convert_runp == NULL) {
+      if (TCONV_UNLIKELY(tconvp->convertExternal.tconv_convert_runp == NULL)) {
         /* Formally, only the "run" entry point is required */
         TCONV_TRACE(tconvp, "%s - tconv_convert_runp is NULL", funcs);
         errno = EINVAL;
@@ -496,7 +496,7 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
       }
     } else {    
       TCONV_TRACE(tconvp, "%s - setting default converter options", funcs);
-      if (_tconvDefaultConvertOption(tconvp, &(tconvp->convertExternal)) == 0) {
+      if (TCONV_UNLIKELY(_tconvDefaultConvertOption(tconvp, &(tconvp->convertExternal)) == 0)) {
         goto err;
       }
     }
@@ -506,7 +506,7 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
     }
 
   } else {
-    if (_tconvDefaultCharsetAndConvertOptions(tconvp) == 0) {
+    if (TCONV_UNLIKELY(_tconvDefaultCharsetAndConvertOptions(tconvp) == 0)) {
       goto err;
     }
   }
@@ -537,7 +537,7 @@ size_t tconv(tconv_t tconvp, char **inbufsp, size_t *inbytesleftlp, char **outbu
 
   TCONV_TRACE(tconvp, "%s(%p, %p, %p, %p, %p)", funcs, tconvp, inbufsp, inbytesleftlp, outbufsp, outbytesleftlp);
 
-  if (tconvp == NULL) {
+  if (TCONV_UNLIKELY(tconvp == NULL)) {
     errno = EINVAL;
     goto err;
   }
@@ -555,7 +555,7 @@ size_t tconv(tconv_t tconvp, char **inbufsp, size_t *inbytesleftlp, char **outbu
       TCONV_TRACE(tconvp, "%s - initializing charset detection: %p(%p, %p)", funcs, tconvp->charsetExternal.tconv_charset_newp, tconvp, charsetOptionp);
       tconvp->errors[0] = '\0';
       charsetContextp = tconvp->charsetExternal.tconv_charset_newp(tconvp, charsetOptionp);
-      if (charsetContextp == NULL) {
+      if (TCONV_UNLIKELY(charsetContextp == NULL)) {
 	goto err;
       }
     }
@@ -597,7 +597,7 @@ size_t tconv(tconv_t tconvp, char **inbufsp, size_t *inbytesleftlp, char **outbu
       TCONV_TRACE(tconvp, "%s - initializing convert engine: %p(%p, %p, %p, %p)", funcs, tconvp->convertExternal.tconv_convert_newp, tconvp, tconvp->tocodes, tconvp->fromcodes, convertOptionp);
       tconvp->errors[0] = '\0';
       convertContextp = tconvp->convertExternal.tconv_convert_newp(tconvp, tconvp->tocodes, tconvp->fromcodes, convertOptionp);
-      if (convertContextp == NULL) {
+      if (TCONV_UNLIKELY(convertContextp == NULL)) {
 	goto err;
       }
     }
@@ -631,10 +631,10 @@ static inline short _tconvDefaultCharsetAndConvertOptions(tconv_t tconvp)
 
   TCONV_TRACE(tconvp, "%s(%p)", funcs, tconvp);
 
-  if (_tconvDefaultCharsetOption(tconvp, &(tconvp->charsetExternal)) == 0) {
+  if (TCONV_UNLIKELY(_tconvDefaultCharsetOption(tconvp, &(tconvp->charsetExternal)) == 0)) {
     goto err;
   }
-  if (_tconvDefaultConvertOption(tconvp, &(tconvp->convertExternal)) == 0) {
+  if (TCONV_UNLIKELY(_tconvDefaultConvertOption(tconvp, &(tconvp->convertExternal)) == 0)) {
     goto err;
   }
 
@@ -859,7 +859,7 @@ tconv_helper_t *tconv_helper_newp(tconv_t tconvp, void *contextp, tconv_producer
   char              *toclones = NULL;
   char              *fromclones = NULL;
 
-  if ((tconvp == NULL) || (tconvp == (tconv_t)-1) || (producerp == NULL) || (consumerp == NULL)) {
+  if (TCONV_UNLIKELY((tconvp == NULL) || (tconvp == (tconv_t)-1) || (producerp == NULL) || (consumerp == NULL))) {
     errno = EINVAL;
     return NULL;
   }
@@ -954,7 +954,7 @@ short tconv_helper_original_version(tconv_t tconvp, void *contextp, tconv_produc
 
   TCONV_TRACE(tconvp, "%s(%p, %p, %p, %p)", funcs, tconvp, contextp, producerp, consumerp);
 
-  if ((tconvp == NULL) || (producerp == NULL) || (consumerp == NULL)) {
+  if (TCONV_UNLIKELY((tconvp == NULL) || (producerp == NULL) || (consumerp == NULL))) {
     errno = EINVAL;
     return 0;
   }
@@ -998,7 +998,7 @@ short tconv_helper_original_version(tconv_t tconvp, void *contextp, tconv_produc
           deltal = producercountl - notusedl;
           /* Will that really happen in real-life ? Possible in theory, though. */
           allocl = inputallocl + deltal;
-          if (allocl < inputallocl) {
+          if (TCONV_UNLIKELY(allocl < inputallocl)) {
             errno = ERANGE;
             goto err;
           }
@@ -1129,7 +1129,7 @@ short tconv_helper_original_version(tconv_t tconvp, void *contextp, tconv_produc
         }
 
         /* Consumer says it has used this number of bytes (can be zero) */
-        if (consumerresultl > consumercountl) {
+        if (TCONV_UNLIKELY(consumerresultl > consumercountl)) {
           /* Non sense, consumer says it has used more than what we provided -; */
           errno = ERANGE;
           goto err;
@@ -1185,7 +1185,7 @@ short tconv_helper_original_version(tconv_t tconvp, void *contextp, tconv_produc
             /* memmove indeed. We consider that fatal in any case -; */
             allocl = outputallocl * 2;
             /* Will that really happen in real-life ? Possible in theory, though. */
-            if (allocl < outputallocl) {
+            if (TCONV_UNLIKELY(allocl < outputallocl)) {
               errno = ERANGE;
               goto err;
             }
@@ -1299,7 +1299,7 @@ static short _tconv_helper_run_oneb(tconv_helper_t *tconv_helperp)
           deltal = producercountl - notusedl;
           /* Will that really happen in real-life ? Possible in theory, though. */
           allocl = tconv_helperp->inputallocl + deltal;
-          if (allocl < tconv_helperp->inputallocl) {
+          if (TCONV_UNLIKELY(allocl < tconv_helperp->inputallocl)) {
             TCONV_TRACE(tconvp, "%s - size_t flip", funcs);
             errno = ERANGE;
             goto err;
@@ -1461,7 +1461,7 @@ static short _tconv_helper_run_oneb(tconv_helper_t *tconv_helperp)
       /* Note that it is a non-sense to have E2BIG in reset mode */
       allocl = tconv_helperp->outputallocl + TCONV_HELPER_BUFSIZ;
       /* Will that really happen in real-life ? Possible in theory, though. */
-      if (allocl < tconv_helperp->outputallocl) {
+      if (TCONV_UNLIKELY(allocl < tconv_helperp->outputallocl)) {
         errno = ERANGE;
         goto err;
       }
@@ -1511,7 +1511,7 @@ static short _tconv_helper_run_oneb(tconv_helper_t *tconv_helperp)
     }
 
     if (consumercountl > 0) {
-      if (consumercountl > tconv_helperp->outputguardl) {
+      if (TCONV_UNLIKELY(consumercountl > tconv_helperp->outputguardl)) {
         /* Non sense, consumer says it has used more than what we provided -; */
         TCONV_TRACE(tconvp, "%s - consumerp(...) error: consumercountl=%ld > tconv_helperp->outputguardl=%ld", funcs, (unsigned long) consumercountl, (unsigned long) tconv_helperp->outputguardl);
         errno = ERANGE;
@@ -1559,7 +1559,7 @@ short tconv_helper_runb(tconv_helper_t *tconv_helperp)
   static const char funcs[] = "tconv_helper_runb";
   short             rcb;
 
-  if (tconv_helperp == NULL) {
+  if (TCONV_UNLIKELY(tconv_helperp == NULL)) {
     errno = EINVAL;
     return 0;
   }
@@ -1629,7 +1629,7 @@ tconv_t tconv_helper_tconvp(tconv_helper_t *tconv_helperp)
   static const char funcs[] = "tconv_helper_tconvp";
   tconv_t           tconvp;
 
-  if (tconv_helperp == NULL) {
+  if (TCONV_UNLIKELY(tconv_helperp == NULL)) {
     errno = EINVAL;
     return (tconv_t)-1;
   }
@@ -1648,7 +1648,7 @@ short tconv_helper_pauseb(tconv_helper_t *tconv_helperp)
   static const char funcs[] = "tconv_helper_pauseb";
   tconv_t           tconvp;
 
-  if (tconv_helperp == NULL) {
+  if (TCONV_UNLIKELY(tconv_helperp == NULL)) {
     errno = EINVAL;
     return 0;
   }
@@ -1669,7 +1669,7 @@ short tconv_helper_endb(tconv_helper_t *tconv_helperp)
   static const char funcs[] = "tconv_helper_endb";
   tconv_t           tconvp;
 
-  if (tconv_helperp == NULL) {
+  if (TCONV_UNLIKELY(tconv_helperp == NULL)) {
     errno = EINVAL;
     return 0;
   }
@@ -1690,7 +1690,7 @@ short tconv_helper_stopb(tconv_helper_t *tconv_helperp)
   static const char funcs[] = "tconv_helper_stopb";
   tconv_t           tconvp;
 
-  if (tconv_helperp == NULL) {
+  if (TCONV_UNLIKELY(tconv_helperp == NULL)) {
     errno = EINVAL;
     return 0;
   }

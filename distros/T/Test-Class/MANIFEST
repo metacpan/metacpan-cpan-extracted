@@ -3,9 +3,7 @@ lib/Test/Class.pm
 lib/Test/Class/Load.pm
 lib/Test/Class/MethodInfo.pm
 Makefile.PL
-MANIFEST
-META.json
-META.yml
+MANIFEST			This list of files
 README
 t/00-load.t
 t/20-load-classes.t
@@ -81,3 +79,5 @@ xt/perlcriticrc
 xt/pmv.t
 xt/pod.t
 xt/spelling.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

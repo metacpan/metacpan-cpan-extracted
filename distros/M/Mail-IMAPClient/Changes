@@ -5,6 +5,19 @@ Changes from 2.99_01 to 3.16    made by Mark Overmeer
 Changes from 0.09    to 2.99_01 made by David Kernen
 	- Potential compatibility issues from 3.17+ highlighted with '*'
 
+version 3.43: Tue Feb 16 16:53:26 UTC 2021
+	- admin: update copyright, move from rt.cpan.org (retired) to github
+	- rt.cpan.org#132720: compress: Readmethod: avoid false-positive EOF
+	  [Eric Wong]
+	- rt.cpan.org#129920: Parsing headers fails under special condition
+	  [Jens Berthold]
+	- rt.cpan.org#132654: avoid cyclic reference on ->compress
+	  [Eric Wong]
+	- rt.cpan.org#132380: append_string can fail to match APPENDUID in response
+	  [Radomír Polách]
+	- rt.cpan.org#133496: allow for undocumented BODYSTRUCTURE extensions
+	  [Rhesa Rozendaal]
+
 version 3.42: Sun Feb 24 00:43:29 UTC 2019
 	- rt.cpan.org#12859: has_capability() changes in 3.41 broke imap4rev1()
 	  [Gilles Lamiral and Gábor Leszlauer]

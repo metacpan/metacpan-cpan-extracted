@@ -1,21 +1,27 @@
---- #YAML:1.0
-name:               Search-QueryParser
-version:            0.94
-abstract:           parses a query string into a data structure
+---
+abstract: 'parses a query string into a data structure'
 author:
-    - Laurent Dami <laurent.dami AT etat ge ch>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Laurent Dami <dami AT cpan.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:  {}
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.52
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Search-QueryParser
+provides:
+  Search::QueryParser:
+    file: lib/Search/QueryParser.pm
+    version: '0.95'
+requires:
+  constant: '0'
+  perl: '5.008'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/damil/Search-QueryParser
+version: '0.95'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

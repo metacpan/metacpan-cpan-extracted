@@ -1,6 +1,7 @@
 # libeav - Email Address Validation Library
 
 ![build](https://github.com/gh0stwizard/libeav/workflows/build/badge.svg)
+[![codecov](https://codecov.io/gh/gh0stwizard/libeav/branch/master/graph/badge.svg?token=AX694KORHH)](https://codecov.io/gh/gh0stwizard/libeav)
 
 ## Description
 

@@ -9,10 +9,16 @@ typemap
 MANIFEST
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+CONTRIBUTING.md
+COPYING
 librhash/aich.c
 librhash/aich.h
 librhash/algorithms.c
 librhash/algorithms.h
+librhash/blake2b.c
+librhash/blake2b.h
+librhash/blake2s.c
+librhash/blake2s.h
 librhash/byte_order.c
 librhash/byte_order.h
 librhash/crc32.c
@@ -65,6 +71,7 @@ librhash/tth.h
 librhash/ustd.h
 librhash/util.c
 librhash/util.h
+librhash/version.h
 librhash/whirlpool.c
 librhash/whirlpool.h
 librhash/whirlpool_sbox.c

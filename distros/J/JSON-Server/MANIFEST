@@ -1,0 +1,20 @@
+Changes
+examples/synopsis-example.txt
+examples/synopsis.pl
+lib/JSON/Client.pm
+lib/JSON/Client.pod
+lib/JSON/Server.pm
+lib/JSON/Server.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+script/echo.pl
+t/00-json-server.t
+t/array-ref.t
+t/boolean.t
+t/JST.pm
+t/utf8-server.t
+t/utf8.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

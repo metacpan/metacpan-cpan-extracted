@@ -1,3 +1,8 @@
+0.11 2021-02-12
+-Fix bug in strict_arrays where string containing integer is recognized as an
+ integer, causing parsing to fail when present in an array containing other
+ strings
+
 0.10 2020-09-08
 -Remove dependency on DateTime::Format::RFC3339
 

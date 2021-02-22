@@ -24,8 +24,8 @@ ok( $t->remove($item) && !$t->remove($item), "remove $item" );
 ok( $t->insert($item), "insert $item" );
 
 $item = Net::IPAM::Block->new('1.2.3.7/31');
-ok( $t->remove($item), "remove $item" );
-ok( $t->insert($item), "insert $item" );
+ok( $t->remove($item),        "remove $item" );
+ok( $t->insert($item),        "insert $item" );
 ok( $t->remove_branch($item), "remove_branch $item" );
 
 # special blocks for test coverage

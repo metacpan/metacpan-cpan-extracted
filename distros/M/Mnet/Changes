@@ -1,4 +1,9 @@
 
+5.22    2021-02-15
+
+    - new Mnet::Stanza::ios templating function
+
+
 5.21    2020-08-30
 
     - cpan release

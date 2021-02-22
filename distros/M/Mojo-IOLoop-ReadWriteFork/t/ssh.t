@@ -8,14 +8,10 @@ $ENV{READWRITEFORK_SSH} ||= Mojo::File->new('.readwritefork_ssh')->slurp;
 chomp $ENV{READWRITEFORK_SSH};
 
 my $fork = Mojo::IOLoop::ReadWriteFork->new;
-my ($read, $exit_value);
-
+my $read;
 $fork->on(read => sub { $read .= $_[1]; });
-$fork->on(close => sub { $exit_value = $_[1]; Mojo::IOLoop->stop; });
-$fork->run(ssh => $ENV{READWRITEFORK_SSH}, qw( ls -l / ));
-Mojo::IOLoop->start;
+$fork->run_p(ssh => $ENV{READWRITEFORK_SSH}, qw( ls -l / ))->wait;
 
 like $read, qr{bin.*sbin}s, 'ls -l';
-is $exit_value, 0, 'exit_value';
 
 done_testing;

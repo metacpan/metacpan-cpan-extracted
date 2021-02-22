@@ -45,6 +45,10 @@ my %makefile_args = (
 		url => 'git://git.gnu.org.ua/acmeman.git',
 		web => 'http://git.gnu.org.ua/cgit/acmeman.git/',
 	    },
+	    bugtracker => {
+		web => 'https://puszcza.gnu.org.ua/bugs/?group=acmeman',
+		mailto => 'gray+acmeman@gnu.org.ua'
+	    }
 	},
 	provides => Module::Metadata->provides(version => '1.4',
 					       dir => 'lib')

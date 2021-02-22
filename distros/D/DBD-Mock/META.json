@@ -61,7 +61,7 @@
    "provides" : {
       "DBD::Mock" : {
          "file" : "lib/DBD/Mock.pm",
-         "version" : "1.58"
+         "version" : "1.59"
       },
       "DBD::Mock::Pool" : {
          "file" : "lib/DBD/Mock/Pool.pm"
@@ -90,13 +90,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/scrapheap/DBD-Mock/issues"
+      },
       "homepage" : "https://gitlab.com/scrapheap/DBD-Mock",
       "repository" : {
          "url" : "git://gitlab.com/scrapheap/DBD-Mock.git",
          "web" : "https://gitlab.com/scrapheap/DBD-Mock"
       }
    },
-   "version" : "1.58",
+   "version" : "1.59",
    "x_authority" : "cpan:JLCOOPER",
    "x_contributors" : [
       "Bernhard Graf <GRAF@cpan.org>",

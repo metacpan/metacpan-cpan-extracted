@@ -12,6 +12,6 @@ END_OF_MESSAGE
 
 }
 
-our $VERSION = 'v0.205.0';
+our $VERSION = 'v0.206.1';
 
 1;

@@ -10,6 +10,7 @@ build_requires:
   Test::NoWarnings: 0
   Test::Pod: 0
   Test::Pod::Coverage: 0
+  Unicode::UTF8: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
@@ -30,12 +31,12 @@ requires:
   Class::Utils: 0.05
   Error::Pure: 0.15
   PYX: 0.01
-  PYX::Parser: 0.01
+  PYX::Parser: 0.08
   PYX::Utils: 0.01
   perl: 5.6.2
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PYX-Optimization
+  bugtracker: https://github.com/michal-josef-spacek/PYX-Optimization/issues
   homepage: https://github.com/michal-josef-spacek/PYX-Optimization
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/PYX-Optimization
-version: '0.01'
+version: '0.04'

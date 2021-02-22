@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,57 +12,60 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 aa5114436bd893a8e2b604bf14aad9cb59e92766 Changes
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
-SHA1 ecc13b648ad48d02fe7175acd4c36facdef9849b Line.pm
-SHA1 e5156392fab944afdbe8d42ccc6ad4e9be2039d3 Line/Data.pm
-SHA1 701efb3f16e9da8a9f7a827cd1d7010b1969af57 MANIFEST
-SHA1 4af218674a631456afc917a104df661d7728ee67 META.yml
-SHA1 b7ea608ba1ed6028c1e3f6a0c15ade365597e1aa Makefile.PL
-SHA1 04ef962a07bb9836fd177cc6df7eb32311b3da14 README
-SHA1 0f12aede8b6d2497b311721685744d0f958f9a36 examples/ex1.pl
-SHA1 c9569897dd97cc38174354be514ecaf9cb48ab1c examples/ex2.pl
-SHA1 a8c48b46e4c94a150b07154a015691cad7d22629 examples/ex3.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 85d7f392970ea438981f4e41d410447e553ac4fe t/Log-FreeSWITCH-Line-Data/01-use.t
-SHA1 4968087a4b9937398b3f95a9ebd1afe43cde21ff t/Log-FreeSWITCH-Line-Data/02-version.t
-SHA1 278aa208bfe0512186c927a0b761f2ab58b197cb t/Log-FreeSWITCH-Line-Data/03-new.t
-SHA1 b10b7928d891ed48f6eaad100d13f2f2f7107442 t/Log-FreeSWITCH-Line-Data/04-date.t
-SHA1 9679dc3a71bd3e387d7791e3c6cc51aeeb2d722c t/Log-FreeSWITCH-Line-Data/05-datetime_obj.t
-SHA1 9d8cafe13dd1f74fbbdb0fa2356c140ed5479d8d t/Log-FreeSWITCH-Line-Data/06-file.t
-SHA1 226fa3b9a6c0bf072462c13330863a59d199edd4 t/Log-FreeSWITCH-Line-Data/07-file_line.t
-SHA1 cf16b56c6f737be8dd85a660d1f9823bfb12d0f7 t/Log-FreeSWITCH-Line-Data/08-message.t
-SHA1 5f14bc18cb03d7221cb4d539325dfa8254278286 t/Log-FreeSWITCH-Line-Data/09-raw.t
-SHA1 c2e02cd6aa43bd559e0bad7711559cdcc033ed6d t/Log-FreeSWITCH-Line-Data/10-time.t
-SHA1 e1ecd122ed33fefda6eceab3ce064b30b25fb324 t/Log-FreeSWITCH-Line-Data/11-type.t
-SHA1 438f318512ea90a65de4345245427b76cc50271f t/Log-FreeSWITCH-Line/01-use.t
-SHA1 7fdd1a81e0073e91080960dba54ee5a3adc63e23 t/Log-FreeSWITCH-Line/02-version.t
-SHA1 f1445bf372958f13e8c014b38ec82ecf6c74cce2 t/Log-FreeSWITCH-Line/03-parse.t
-SHA1 77f96c3a92f2129661dee195fe98715836e98305 t/Log-FreeSWITCH-Line/04-serialize.t
-SHA1 82b2688a7c014743251aaa54cee73d45fc931a31 xt/Log-FreeSWITCH-Line-Data/01-pod_coverage.t
-SHA1 f38e5ef00c5e6ce2f605fe195a4d72a4ab61802c xt/Log-FreeSWITCH-Line-Data/02-pod.t
-SHA1 d0dcff47918c9475b4cd92082c6d8483dbac0137 xt/Log-FreeSWITCH-Line/01-pod_coverage.t
-SHA1 dc28e3c936a6274c2debfb1d2fcbca5addcf2221 xt/Log-FreeSWITCH-Line/02-pod.t
+SHA256 d9d79d5bd93c99b7f3e5e0ea8aeefb758a1f67f6985f21a2699b1cd40f21428e Changes
+SHA256 5edcf21a55753b6644ff28fc1f3cf0da959301324b213a574776aae78cf1e141 LICENSE
+SHA256 948d6a82e25cdf1dee7f4277eeae0271d30e6db88d42d099962ce7e51b69764d Line.pm
+SHA256 03e3811831000ff4afdbcaca61b6731e7f29b9f51d2fa2b9765e8e88fe2753d3 Line/Data.pm
+SHA256 6bb8150f9b09503922dd4336940c7a7b37160992cff745db046e421e5cb10df4 MANIFEST
+SHA256 d08cf43824b25f86b83a002c6985364e8555a88b23716f62802be87b98a5b733 META.yml
+SHA256 92c5e4650124751f766c41bb4d2837cb3b841d64730348d9c68e3d1151da1250 Makefile.PL
+SHA256 ec0044834b4b3af2326748f6151ccd766b077ac4d5c741452f400e96edfddcdd README
+SHA256 457aabf1318c786f7b4f31149d4e2f85a89df7f04c26375506472ba8a3a67287 examples/ex1.pl
+SHA256 67bf8fa1956b1064d778a4f26518e230f3d6c6110b774a06aedf33de7f117aff examples/ex2.pl
+SHA256 30b514c14c3d65423d487d37696df0ce06b93af89ec23ec992f4ffa8e449e07e examples/ex3.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 b39c74c7a2998bf34ccf7b9a030608cb55b5fcaeba460188c07c24b1c8bba7e8 t/Log-FreeSWITCH-Line-Data/01-use.t
+SHA256 b15286bed4e5b2160c778e852e67062142ba91c7f5e7a536dbae91b439df90fd t/Log-FreeSWITCH-Line-Data/02-version.t
+SHA256 70b4b5f061b9d7f42276b17a10704b1fa35d9bd839ffdd98ba7426156f207513 t/Log-FreeSWITCH-Line-Data/03-new.t
+SHA256 9f5c6fe7e48c7d041e82e915d49c03b7d595270f69cc1f1378ebdabae52c05b6 t/Log-FreeSWITCH-Line-Data/04-date.t
+SHA256 2d5a27724cb528869b2b1f4d8092e7630275ce3faf7baa55165997cfdcfd7c1f t/Log-FreeSWITCH-Line-Data/05-datetime_obj.t
+SHA256 65d346d949debaef4f22f1c0c7e61fd290ce8219cdfd9563061b08bfeb87579e t/Log-FreeSWITCH-Line-Data/06-file.t
+SHA256 0e6eeaee5aa3898e66b300fea1541119cda9cce9847883b6a3e1c2ea39e68162 t/Log-FreeSWITCH-Line-Data/07-file_line.t
+SHA256 8e75bcb3e2954cfeb03d3a888097b978370ab7a4034a10eded3afd8bad7577d4 t/Log-FreeSWITCH-Line-Data/08-message.t
+SHA256 41d7cc06e6471f54bf270d3893c3db121e35abf60fb7e55b0a493e9b408ce321 t/Log-FreeSWITCH-Line-Data/09-raw.t
+SHA256 411b2abb8901ecf030d2ddd6f343ded067b21e23e7ddc12cd0fd4b502b6b072f t/Log-FreeSWITCH-Line-Data/10-time.t
+SHA256 df94885d78876b723f525978bea56ac1f8649d84e6427e137b75ab2fe2e6ac1d t/Log-FreeSWITCH-Line-Data/11-type.t
+SHA256 49ad19cb348e7d149227ea9ed00524cf1ddade951aa25c8567fc33dfba2fd707 t/Log-FreeSWITCH-Line/01-use.t
+SHA256 a051862d18f94c38c6404fba7907df204a90a936ec918be188d5fe13c993b261 t/Log-FreeSWITCH-Line/02-version.t
+SHA256 39386b70561e58788881717bb62afd44194f5adfd41e1917c84923df03624919 t/Log-FreeSWITCH-Line/03-parse.t
+SHA256 69f1d8873ba6139e8f24be9062dc4f2c3f01d126d7fad4aaf9c50a490deb43e0 t/Log-FreeSWITCH-Line/04-serialize.t
+SHA256 93a53c499d8144f20460054a4e624ceec834b2ffd75a223cd6808fd77bc97570 xt/Log-FreeSWITCH-Line-Data/01-pod_coverage.t
+SHA256 f3fcf3c0c530a31999bac384b622d5f0d7219d70b0608925626ace853aa5edd4 xt/Log-FreeSWITCH-Line-Data/02-pod.t
+SHA256 fb1287dda5b3ac7a5d87891298e685aeca5391daba89e56c1ce392df145568ce xt/Log-FreeSWITCH-Line/01-pod_coverage.t
+SHA256 698613cd38b9dfc9820556d5a8a9138656c460529daa76fdcfdabd1b14bbfdbc xt/Log-FreeSWITCH-Line/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWKKwPAAoJEJe+XXKaIuTl+SgIALvbbofRFjnzYMBOuNbVE97W
-pbsbs7M+7xOsHW+zOzfL+QNzedE8SNVEbLOTxQ+AciIJAk6h2jMOvm8IPzB8+b+N
-EpxYrKQOikr9gIMPoMrOtJ1lsO/3NqT+fHcrxoBttty8K4hWHJ8zwu7i8i+EiIw2
-rPa2bk8swgxQRUK+Q13Gm/9P+qWU+hoxn13B0bHKodXvvNuX7rjBxpQ15mOL+3eo
-xr1e2kW8jty560I7SQVqYKoyrTvTkx8YX6CLRAgcGZJM3nmul6yk31EqRidh7KDA
-kZNhjzISDQiY424t6HylaBjMMfc7bB36YuvNjkTc7L377mInUmcMRSrqpIJckIg=
-=1TBE
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmAycLMACgkQgmqNLzlX
+aRcpEgv7Bzu9WRM7TpIiHEhku73tz+9uMkDsxotq2bYyGhiNy9Sci5RVkKFCbuwi
+yKtbHikiwm2eZtLlwy5E4pJib3wIssZWTxRFGdcMh9CcgqMgvCbOflA5Romze52u
+66nCHcJxM9Y1/nAhdM7AIfWu4/RsPu9LSXj3ikWHQw6evpRQiYUnQoMrqr9gsk6r
+2NZbicEGJpRnCDY36z/bnLUPl4HZjemid4GZRtq6Tg/Wy9fxagI1yKX0V/e+GdVv
+e1hvCMICWi0mr2h6gpwNwU9eG3kr64EXW721ENbDgosj1WRfZn1f/mDXqgJDfM3+
+HFY33nKygdMPOdg+iWYM/toHbP+aOS09HNVdMEqy8V5ZWuXXtt0EhCJGx0Lw8mRH
+ckesyX58KY/d1eo0zc3iJM3f6spc3Cpe0SMRDfHU/f02sthqRTjHueqbUWNNp0xM
+Yo8API2VclGnyVFon/pg8sNzIhq5EuBRtAxhKLDFc3voZowQ1t0EAragwl31Hv49
+3VfkKMBn
+=Vmo8
 -----END PGP SIGNATURE-----

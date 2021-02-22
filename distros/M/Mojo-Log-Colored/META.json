@@ -4,7 +4,7 @@
       "simbabque <simbabque@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -57,7 +57,7 @@
    "provides" : {
       "Mojo::Log::Colored" : {
          "file" : "lib/Mojo/Log/Colored.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -71,12 +71,12 @@
          "web" : "https://github.com/simbabque/Mojo-Log-Colored"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "E. Choroba <choroba@matfyz.cz>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Tina Müller <cpan2@tinita.de>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

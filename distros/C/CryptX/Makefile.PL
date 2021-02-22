@@ -32,6 +32,8 @@ else {
   $mycflags .= " $ENV{CPPFLAGS}" if $ENV{CPPFLAGS};
 
   #FIX: gcc with -flto is a trouble maker see https://github.com/DCIT/perl-CryptX/issues/32
+  #FIX: another issue with "-flto=auto" see https://github.com/DCIT/perl-CryptX/pull/66
+  $mycflags =~ s/-flto=[a-zA-Z0-9]+//g; # -flto=auto -flto=jobserver -flto=N ...
   $mycflags =~ s/-flto\b//g;
 
   #FIX: avoid -Wwrite-strings -Wcast-qual -pedantic -pedantic-errors -ansi -std=c89

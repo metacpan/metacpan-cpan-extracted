@@ -1,5 +1,17 @@
 Revision history for Text-TFIDF-Ngram
 
+0.0508 2021-02-15 11:39:02
+    - Add a test for the single quote.
+
+0.0507 2021-02-15 07:45:19
+    - Whoops! Fix excluded character!
+
+0.0506 2021-02-15 07:36:29
+    - Improve documentation.
+    - Improve eg/analyze.
+    - Improve tests a bit.
+    - Simplify punctuation regular expression.
+
 0.0505 2020-04-15 13:57:35
     - Improve the eg/linkage and eg/analyze programs.
 

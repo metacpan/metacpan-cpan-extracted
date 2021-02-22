@@ -42,7 +42,7 @@ List::GroupBy - Group a list of hashref's to a multilevel hash of hashrefs of ar
     %groupedList = groupBy(
         {
             keys => [ 'surname', 'firstname' ],
-            defaults => { surname => 'blogs' }
+            defaults => { surname => 'Blogs' }
         },
         @list
     );
@@ -111,7 +111,10 @@ hashrefs of arrayrefs.
 
     Note: undefined values for a key will be defaulted to the empty string.
 
-    Returns a hash of hashrefs of arrayrefs
+    Returns:
+
+    - `List Context` - a hash of hashrefs of arrayrefs
+    - `Scalar Context` - a hashref of hashrefs of arrayrefs
 
 - `groupBy( { keys => [ 'key', ... ], defaults => { 'key' => 'default', ... }, operations => { 'key' => sub, ... }, LIST )`
 
@@ -140,7 +143,25 @@ hashrefs of arrayrefs.
         Each funtion is passed the value as it's only parameter and it's return
         value is used for the key.
 
-    Returns a hash of hashrefs of arrayrefs
+        If you wish to make a grouping case-insensitive then you can use an operation
+        on that key that simply folds (`fc()`)the case e.g.
+
+            %groupedList = groupBy (
+                {
+                    keys => [ 'surname', 'firstname' ],
+                    defaults => { surname => 'Blogs' },
+                    operations => {
+                        surname => sub { fc( $_[0] ) },
+                        firstname => sub { fc ( $_[0] ) },
+                    },
+                },
+                @list
+            );
+
+    Returns:
+
+    - `List Context` - a hash of hashrefs of arrayrefs
+    - `Scalar Context` - a hashref of hashrefs of arrayrefs
 
 # LICENSE
 

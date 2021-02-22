@@ -59,7 +59,7 @@ END
 
 subtest 'query error handling' => sub {
 	plan tests => 3;
-	throws_ok { $s->run('iced manifolds.'); } qr/syntax/i, 'cypher syntax error';
+	throws_ok { $s->run(' iced manifolds.'); } qr/syntax/i, 'cypher syntax error';
 	my $q = 'RETURN 42';
 	throws_ok { $s->run(\$q) } qr/\bunblessed reference\b/, 'bogus reference query';
 	SKIP: {

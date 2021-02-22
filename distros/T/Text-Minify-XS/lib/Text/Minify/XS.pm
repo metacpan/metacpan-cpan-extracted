@@ -12,7 +12,7 @@ require XSLoader;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(minify);
 
-our $VERSION = 'v0.3.6';
+our $VERSION = 'v0.3.7';
 
 XSLoader::load( "Text::Minify::XS", $VERSION );
 
@@ -30,7 +30,7 @@ Text::Minify::XS - Simple text minification
 
 =head1 VERSION
 
-version v0.3.6
+version v0.3.7
 
 =head1 SYNOPSIS
 
@@ -77,6 +77,12 @@ L</SOURCE>.
 Malformed UTF-8 characters may be be mangled or omitted from the
 output. You should ensure that the input string is properly encoded as
 UTF-8.
+
+=head1 SEE ALSO
+
+L<String::Strip>
+
+L<Text::Trim>
 
 =head1 SOURCE
 

@@ -1,5 +1,11 @@
 Revision history for Mojolicious-Plugin-JSONRPC2
 
+v2.0.3  2021-02-17 11:40:37 EET
+        - Require Mojolicious-8.67 for Route::requires().
+
+v2.0.2  2021-02-16 18:30:06 EET
+        - Fix compatibility with Mojo.
+
 v2.0.1  2018-04-03 19:55:13 EEST
 	- Reformat doc.
 

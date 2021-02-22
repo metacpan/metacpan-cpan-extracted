@@ -1,7 +1,7 @@
 package WebService::GoogleAPI::Client::AccessToken;
 use strictures;
 
-our $VERSION = '0.24';    # VERSION
+our $VERSION = '0.25';    # VERSION
 
 # ABSTRACT: A small class for bundling user and scopes with a token
 use Moo;
@@ -26,7 +26,7 @@ WebService::GoogleAPI::Client::AccessToken - A small class for bundling user and
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 

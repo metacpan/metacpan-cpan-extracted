@@ -1,18 +1,17 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.021-2-g4cb3030
+package JSON::Schema::Draft201909; # git description: v0.022-4-g2db4ba0
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use JSON::MaybeXS;
-use Feature::Compat::Try;
 use Carp qw(croak carp);
 use List::Util 1.55 qw(pairs first uniqint);
 use Ref::Util 0.100 qw(is_ref is_plain_hashref is_plain_coderef);
@@ -27,6 +26,7 @@ use strictures 2;
 use MooX::TypeTiny 0.002002;
 use MooX::HandlesVia;
 use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional slurpy);
+use Feature::Compat::Try;
 use JSON::Schema::Draft201909::Error;
 use JSON::Schema::Draft201909::Result;
 use JSON::Schema::Draft201909::Document;
@@ -547,7 +547,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

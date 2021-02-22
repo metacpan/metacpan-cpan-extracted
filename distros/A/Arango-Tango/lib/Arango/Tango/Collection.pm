@@ -1,6 +1,6 @@
 # ABSTRACT: ArangoDB Collection object
 package Arango::Tango::Collection;
-$Arango::Tango::Collection::VERSION = '0.013';
+$Arango::Tango::Collection::VERSION = '0.015';
 use warnings;
 use strict;
 
@@ -8,6 +8,23 @@ use Arango::Tango::API;
 
 BEGIN {
     Arango::Tango::API::_install_methods "Arango::Tango::Collection" => {
+
+        ## Document Management -- Keeping here for now.
+        document => {
+            rest => [ get => '{{database}}_api/document/{name}/{key}' ],
+            inject_properties => [ 'database', 'name' ],
+            signature => ['key'],
+            ## FIXME - Header parameters still not supported
+           },
+
+        replace => {
+            rest => [ put => '{{database}}_api/document/{name}/{key}' ],
+            inject_properties => [ 'database', 'name' ],
+            signature => ['key'],
+            require_document => 1,
+           },
+
+        ## Collection Management
 
         load => {
             rest   => [ put => '{{database}}_api/collection/{name}/load'],
@@ -61,7 +78,6 @@ BEGIN {
             rest => [ put => '{{database}}_api/collection/{name}/rotate' ],
             inject_properties => [ 'database', 'name' ],
         },
-
 
         figures => {
             rest => [ get => '{{database}}_api/collection/{name}/figures' ],
@@ -139,7 +155,7 @@ Arango::Tango::Collection - ArangoDB Collection object
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 USAGE
 
@@ -188,6 +204,12 @@ optionally the document data in the collection.
    $n = $collection->count;
 
 In addition to the above C<checksum>, the result also contains the number of documents.
+
+=head2 C<document>
+
+   $doc = $collection->document("doc_key");
+
+Retrieves a document given a specific key. The header options are not supported yet.
 
 =head2 C<figures>
 
@@ -288,7 +310,7 @@ Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Alberto Simões.
+This software is copyright (c) 2019-2021 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

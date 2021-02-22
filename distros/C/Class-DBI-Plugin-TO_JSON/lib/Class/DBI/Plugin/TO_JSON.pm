@@ -17,7 +17,7 @@ our @EXPORT = qw(
 ###############################################################################
 # Version number.
 ###############################################################################
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 ###############################################################################
 # Subroutine:   TO_JSON()
@@ -64,9 +64,10 @@ plain/raw HASHREF with no inflated values.
 
 =over
 
-=item B<TO_JSON()>
+=item TO_JSON()
 
-Turns the CDBI data record into a HASHREF suitable for use with C<JSON::XS>
+Turns the C<Class::DBI> data record into a HASHREF suitable for use with
+C<JSON::XS>
 
 =back
 

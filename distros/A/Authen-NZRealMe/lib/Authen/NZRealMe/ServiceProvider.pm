@@ -1,5 +1,5 @@
 package Authen::NZRealMe::ServiceProvider;
-$Authen::NZRealMe::ServiceProvider::VERSION = '1.20';
+$Authen::NZRealMe::ServiceProvider::VERSION = '1.21';
 use strict;
 use warnings;
 use autodie;
@@ -14,6 +14,7 @@ use URI::Escape  qw(uri_escape uri_unescape);
 use POSIX        qw(strftime);
 use Date::Parse  qw();
 use File::Spec   qw();
+use JSON::XS     qw();
 use MIME::Base64 qw();
 
 use Authen::NZRealMe::CommonURIs qw(URI NS_PAIR);
@@ -71,15 +72,10 @@ my @avs_namespaces  = ( $ns_xpil, $ns_xal );
 my @icms_namespaces = ( $ns_ds, $ns_saml, $ns_icms, $ns_wsse, $ns_wsu, $ns_wst, $ns_soap12  );
 my @wsdl_namespaces = ( $ns_wsdl, $ns_wsdl_soap, $ns_wsam );
 
-my %urn_nameid_format = (
-    login     => 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
-    assertion => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
-    unspec    => 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified',
-);
-
 my %urn_attr_name = (
     fit         => 'urn:nzl:govt:ict:stds:authn:attribute:igovt:IVS:FIT',
-    ivs         => 'urn:nzl:govt:ict:stds:authn:safeb64:attribute:igovt:IVS:Assertion:Identity',
+    ivsx        => 'urn:nzl:govt:ict:stds:authn:safeb64:attribute:igovt:IVS:Assertion:Identity',
+    ivs         => 'urn:nzl:govt:ict:stds:authn:safeb64:attribute:igovt:IVS:Assertion:JSON:Identity',
     avs         => 'urn:nzl:govt:ict:stds:authn:safeb64:attribute:NZPost:AVS:Assertion:Address',
     icms_token  => 'urn:nzl:govt:ict:stds:authn:safeb64:attribute:opaque_token',
 );
@@ -126,7 +122,7 @@ sub organization_name      { shift->{organization_name};      }
 sub organization_url       { shift->{organization_url};       }
 sub contact_company        { shift->{contact_company};        }
 sub _x                     { shift->{x};                      }
-sub nameid_format          { return $urn_nameid_format{ shift->type };         }
+sub nameid_format          { shift->{nameid_format};          }
 sub signing_cert_pathname  { shift->{conf_dir} . '/' . $signing_cert_filename; }
 sub signing_key_pathname   { shift->{conf_dir} . '/' . $signing_key_filename;  }
 sub ssl_cert_pathname      { shift->{conf_dir} . '/' . $ssl_cert_filename;     }
@@ -249,8 +245,17 @@ sub _read_metadata_from_file {
         [ organization_name      => q{/samlmd:EntityDescriptor/samlmd:Organization/samlmd:OrganizationName} ],
         [ organization_url       => q{/samlmd:EntityDescriptor/samlmd:Organization/samlmd:OrganizationURL} ],
         [ contact_company        => q{/samlmd:EntityDescriptor/samlmd:ContactPerson/samlmd:Company} ],
+        [ nameid_format          => q{/samlmd:EntityDescriptor/samlmd:SPSSODescriptor/samlmd:NameIDFormat} ],
     ) {
         $params{$_->[0]} = $xc->findvalue($_->[1]);
+    }
+
+    if (! $params{nameid_format}) {
+        # Old metadata files do not contain NameIDFormat, set the default:
+        $params{nameid_format} = {
+            login     => URI('saml_nameid_format_persistent'),
+            assertion => URI('saml_nameid_format_transient'),
+        }->{$self->type};
     }
 
     my @acs_list =
@@ -385,12 +390,23 @@ sub _xpath_context_dom {
 
 sub select_acs_by_index {
     my $self  = shift;
-    my $index = shift // '0';
+    my $index = shift // 'default';
 
-    my @match = grep { $_->{index} eq $index } $self->acs_list
-        or die qq{Unable to find <AssertionConsumerService> with index="$index"};
+    my @match;
+    foreach my $acs ( $self->acs_list ) {
+        if ($index eq 'default') {
+            push @match, $acs if $acs->{is_default};
+        }
+        elsif ($acs->{index} eq $index) {
+            push @match, $acs;
+        }
+    }
+    my $str = $index eq 'default' ? qq{isDefault="true"} : qq{index="$index"};
+    die qq{Unable to find <AssertionConsumerService> with $str}
+        unless @match;
+
     my $count = @match;
-    die qq{$count <AssertionConsumerService> elements have index="$index"}
+    die qq{$count <AssertionConsumerService> elements have $str}
         unless $count == 1;
     return $match[0];
 }
@@ -401,7 +417,8 @@ sub new_request {
 
     my %opt = @_;
     my $acs = $self->select_acs_by_index($opt{acs_index});
-    my $req = Authen::NZRealMe->class_for('authen_request')->new($self, @_);
+    $opt{acs_index} = $acs->{index};
+    my $req = Authen::NZRealMe->class_for('authen_request')->new($self, %opt);
     return $req;
 }
 
@@ -497,8 +514,8 @@ sub resolve_posted_assertion {
     my $response = $self->_verify_assertion($xml, %args);
 
     if($response->is_success) {
-        if($self->type eq 'assertion'  and  $args{resolve_flt}) {
-             $self->_resolve_flt($response, %args);
+        if($self->type eq 'assertion' and $self->nameid_format ne URI('saml_nameid_format_persistent')) {
+             $self->_resolve_flt($response, %args) if $args{resolve_flt};
         }
     }
 
@@ -809,6 +826,7 @@ sub _verify_assertion {
     }
     elsif($self->type eq 'assertion') {
         $self->_extract_assertion_payload($response, $xc, $assertion);
+        $self->_extract_assertion_flt($response, $xc, $subject);
     }
 
     return $response;
@@ -961,7 +979,7 @@ sub _compare_times {
     foreach ($date1, $date2) {
         s/\s+//g;
         die "Invalid timestamp '$_'\n"
-            unless /\A\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ(.*)\z/s;
+            unless /\A\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(?:[.]\d+)?Z(.*)\z/s;
         die "Non-UTC dates are not supported: '$_'" if $1;
     }
 
@@ -980,6 +998,22 @@ sub _extract_login_payload {
     $flt =~ s{\s+}{}g;
 
     $response->set_flt($flt);
+}
+
+sub _extract_assertion_flt {
+    my($self, $response, $xc, $subject) = @_;
+
+    # Extract the FLT
+
+    my $flt = $xc->findvalue(q{./saml:NameID}, $subject)
+        or die "Can't find NameID element in response:\n" . $response->xml . "\n";
+
+    $flt =~ s{\s+}{}g;
+
+    if ($flt =~ m{^(?:WLG|AKL|AZU|CHC)}) {
+        # Valid FLT strings
+        $response->set_flt($flt);
+    }
 }
 
 
@@ -1003,6 +1037,9 @@ sub _extract_assertion_payload {
         elsif($name eq $urn_attr_name{ivs}) {
             $self->_extract_ivs_details($response, $value);
         }
+        elsif($name eq $urn_attr_name{ivsx}) {
+            $self->_extract_ivsx_details($response, $value);
+        }
         elsif($name eq $urn_attr_name{avs}) {
             $self->_extract_avs_details($response, $value);
         }
@@ -1014,6 +1051,22 @@ sub _extract_assertion_payload {
 
 
 sub _extract_ivs_details {
+    my($self, $response, $data) = @_;
+
+    my $json = JSON::XS::decode_json($data);
+
+    my $dob  = $json->{dateOfBirth} or warn "dateOfBirth field is not in JSON IVS";
+    my $name = $json->{name}        or warn "name field is not in JSON IVS";
+
+    $response->set_date_of_birth($dob->{dateOfBirthValue});
+    $response->set_surname(   $name->{lastName});
+    $response->set_first_name($name->{firstName});
+    $response->set_mid_names( $name->{middleName});
+
+    $response->set_gender($json->{gender}) if $json->{gender};
+}
+
+sub _extract_ivsx_details {
     my($self, $response, $xml) = @_;
 
     my $xc = $self->_xpath_context_dom($xml, @ivs_namespaces);
@@ -1068,7 +1121,6 @@ sub _extract_ivs_details {
         q{/xpil:Party/xpil:PersonInfo/@xpil:Gender},
         sub { $response->set_gender(shift); }
     );
-
 }
 
 
@@ -1192,6 +1244,7 @@ sub _gen_sp_sso_descriptor {
         },
         $self->_gen_key_info('signing'),
         $self->_gen_key_info('encryption'),
+        $self->_gen_nameid_format(),
         @acs_elements,
     );
 }
@@ -1213,6 +1266,15 @@ sub _gen_key_info {
                 ),
             ),
         ),
+    );
+}
+
+sub _gen_nameid_format {
+    my $self = shift;
+    my $x    = $self->_x;
+
+    return $x->NameIDFormat(
+        $self->nameid_format(),
     );
 }
 
@@ -1411,8 +1473,14 @@ L<Authen::NZRealMe::IdentityProvider>.
 
 =head2 nameid_format
 
-Returns a string URN representing the format of the NameID (Federated Logon Tag
-- FLT) requested/expected from the Identity Provider.
+Returns a string URN representing the format of the NameID
+requested/expected from the Identity Provider.
+
+When this value is C<urn:urn:oasis:names:tc:SAML:2.0:nameid-format:persistent>
+then the NameID value is the Federated Logon Tag (FLT).
+
+Otherwise, it is C<urn:oasis:names:tc:SAML:2.0:nameid-format:transient>
+and the FLT must be obtained via the back-channel service, iCMS.
 
 =head2 token_generator
 
@@ -1472,6 +1540,12 @@ Default: 'low'.
 
 User-supplied string value that will be returned as a URL parameter to the
 assertion consumer service.
+
+=item acs_index => integer or 'default'
+
+Used to specify the numeric index of the Assertion Consumer Service
+you would like the response sent to.
+The value C<default> may also be used to specify the ACS marked as the default.
 
 =back
 
@@ -1576,9 +1650,9 @@ dialogue with the IdP and retrieve it from state when resolving the artifact.
 
 Optional parameter which may be used to specify the numeric index of the
 Assertion Consumer Service you would like the response sent to.  This would
-normally be ommitted, resulting in the default value (0) being used.  Currently
+normally be omitted, resulting in the default being used.  Currently
 the primary reason for specifying this value is if your metadata defines one or
-more ACS entries using the HTTP-Artefact binding and one or more which use the
+more ACS entries using the HTTP-Artifact binding and one or more which use the
 HTTP-POST binding. This parameter will allow you to tell the server which
 binding to use - which may be useful while transitioning your system from one
 binding to another.
@@ -1617,6 +1691,9 @@ C<< <Assertion> >> elements are present in the supplied XML.
 =head2 select_acs_by_index ( $index )
 
 Used by C<new_request> to validate the requested acs_index value.
+The value C<default> may also be used to specify the ACS marked as the default.
+
+Returns the selected ACS.
 
 =head2 now_as_iso
 

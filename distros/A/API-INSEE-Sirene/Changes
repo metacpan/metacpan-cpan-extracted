@@ -1,5 +1,12 @@
 Revision history for Perl extension API::INSEE::Sirene.
 
+4.02
+        - The getCustomCriteria method doesn't take $use_historized_field parameter anymore
+          The module will now auto-detect historized fields
+        - Added setCurrentEndpoint method
+        - Aliases are now mapped with more fields
+        - Updated documentation
+
 4.01
         - Updated dependencies in Makefile.PL
 

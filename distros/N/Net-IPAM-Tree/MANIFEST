@@ -9,7 +9,7 @@ META.yml
 README
 t/00-load.t
 t/01-new.t
-t/02-lookup.t
+t/02-lookup-contains.t
 t/03-remove.t
 t/04-to_string.t
 t/05-errors.t

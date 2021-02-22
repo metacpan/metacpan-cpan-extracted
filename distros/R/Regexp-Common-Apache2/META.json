@@ -1,0 +1,64 @@
+{
+   "abstract" : "Apache2 Expressions",
+   "author" : [
+      "Jacques Deguest (jack@deguest.jp)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Regexp-Common-Apache2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Regexp::Common" : "2017060201",
+            "parent" : "0",
+            "perl" : "5.022001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302162",
+            "Test::Pod" : "1.52"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://git.deguest.jp/jack/Regexp-Common-Apache2/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://git.deguest.jp/jack/Regexp-Common-Apache2"
+      }
+   },
+   "version" : "v0.1.1",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

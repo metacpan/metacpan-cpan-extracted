@@ -1,3 +1,13 @@
+0.004   2021-01-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Put data in __DATA__ section as CSV instead of as Perl data
+	  structure expression, to avoid huge source code.
+
+	- Return potential height & weight.
+
+	- [doc] Update sample output.
+
+
 0.003   2021-01-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Return various z-scores and percentiles, return z-3, z-2, z-1,

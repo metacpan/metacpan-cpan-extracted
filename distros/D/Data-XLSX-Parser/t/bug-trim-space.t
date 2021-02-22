@@ -29,7 +29,9 @@ $parser->add_row_event_handler(sub {
     is $row->[ $col{C} ], 'c', 'c ok';
 });
 
-$parser->sheet(1);
+my $name = ( $parser->workbook->names )[0];
+my $rid  = $parser->workbook->sheet_rid( $name );
+$parser->sheet_by_rid( $rid );
 
 ok $i, 'callback running ok';
 

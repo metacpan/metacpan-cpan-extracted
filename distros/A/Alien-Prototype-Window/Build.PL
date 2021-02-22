@@ -16,4 +16,15 @@ MY::Build->new(
         'Archive::Zip'          => 0,
         'Test::Exception'       => 0,
         },
+    'meta_merge'        => {
+        'x_deprecated'          => 1,
+        'bugtracker' => {
+            'web'  => 'https://github.com/bleargh45/Alien-Prototype-Window/issues',
+            },
+        'repository' => {
+            'type' => 'git',
+            'url'  => 'git://github.com/bleargh45/Alien-Prototype-Window.git',
+            'web'  => 'https://github.com/bleargh45/Alien-Prototype-Window',
+            },
+        },
     )->create_build_script();

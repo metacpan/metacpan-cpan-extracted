@@ -20,6 +20,7 @@ Module::Build->new(
     meta_merge => {
         resources => {
             repository => 'https://code.blicky.net/yorhel/SQL-Interp',
+            bugtracker => 'https://code.blicky.net/yorhel/SQL-Interp/issues',
         },
     },
 )->create_build_script();

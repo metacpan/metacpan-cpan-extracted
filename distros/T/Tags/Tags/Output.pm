@@ -4,9 +4,10 @@ use strict;
 use warnings;
 
 use Class::Utils qw(set_params);
+use Encode;
 use Error::Pure qw(err);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # Constructor.
 sub new {
@@ -34,15 +35,18 @@ sub new {
 # Finalize Tags output.
 sub finalize {
 	my $self = shift;
+
 	while (@{$self->{'printed_tags'}}) {
 		$self->put(['e', $self->{'printed_tags'}->[0]]);
 	}
+
 	return;
 }
 
 # Flush tags in object.
 sub flush {
 	my ($self, $reset_flag) = @_;
+
 	my $ouf = $self->{'output_handler'};
 	my $ret;
 	if (ref $self->{'flush_code'} eq 'ARRAY') {
@@ -72,13 +76,16 @@ sub flush {
 # Return array of opened elements.
 sub open_elements {
 	my $self = shift;
+
 	return @{$self->{'printed_tags'}};
 }
 
 # Deprecated.
 sub open_tags {
 	my $self = shift;
+
 	warn "Method open_tags() is deprecated";
+
 	return $self->open_elements;
 }
 
@@ -173,11 +180,13 @@ sub reset {
 # Check arguments.
 sub _check_arguments {
 	my ($self, $tags_struct_ar, $min_arg_num, $max_arg_num) = @_;
+
 	my $arg_num = scalar @{$tags_struct_ar};
 	if ($arg_num < $min_arg_num || $arg_num > $max_arg_num) {
 		err 'Bad number of arguments.', 
 			'\'Tags\' structure', join ', ', @{$tags_struct_ar};
 	}
+
 	return;
 }
 
@@ -211,7 +220,21 @@ sub _default_parameters {
 	$self->{'input_tags_item_callback'} = undef;
 
 	# Output callback.
-	$self->{'output_callback'} = undef;
+	$self->{'output_callback'} = sub {
+		my ($data_sr, $self) = @_;
+
+		if (defined $self->{'output_encoding'}) {
+			${$data_sr} = Encode::encode(
+				$self->{'output_encoding'},
+				${$data_sr},
+			);
+		}
+
+		return;
+	};
+
+	# Output encoding.
+	$self->{'output_encoding'} = undef;
 
 	# Set output handler.
 	$self->{'output_handler'} = undef;
@@ -236,7 +259,7 @@ sub _process_callback {
 	if (defined $self->{$callback_type}
 		&& ref $self->{$callback_type} eq 'CODE') {
 
-		$self->{$callback_type}->($data_r);
+		$self->{$callback_type}->($data_r, $self);
 	}
 
 	return;
@@ -245,63 +268,81 @@ sub _process_callback {
 # Attributes.
 sub _put_attribute {
 	my ($self, $attr, $value) = @_;
+
 	push @{$self->{'flush_code'}}, 'Attribute';
+
 	return;
 }
 
 # Begin of tag.
 sub _put_begin_of_tag {
 	my ($self, $tag) = @_;
+
 	push @{$self->{'flush_code'}}, 'Begin of tag';
+
 	return;
 }
 
 # CData.
 sub _put_cdata {
 	my ($self, @cdata) = @_;
+
 	push @{$self->{'flush_code'}}, 'CData';
+
 	return;
 }
 
 # Comment.
 sub _put_comment {
 	my ($self, @comments) = @_;
+
 	push @{$self->{'flush_code'}}, 'Comment';
+
 	return;
 }
 
 # Data.
 sub _put_data {
 	my ($self, @data) = @_;
+
 	push @{$self->{'flush_code'}}, 'Data';
+
 	return;
 }
 
 # End of tag.
 sub _put_end_of_tag {
 	my ($self, $tag) = @_;
+
 	push @{$self->{'flush_code'}}, 'End of tag';
+
 	return;
 }
 
 # Instruction.
 sub _put_instruction {
 	my ($self, $target, $code) = @_;
+
 	push @{$self->{'flush_code'}}, 'Instruction';
+
 	return;
 }
 
 # Raw data.
 sub _put_raw {
 	my ($self, @raw_data) = @_;
+
 	push @{$self->{'flush_code'}}, 'Raw data';
+
 	return;
 }
 
 # Reset flush code.
 sub _reset_flush {
 	my $self = shift;
+
 	$self->{'flush_code'} = [];
+
 	return;
 }
 
@@ -354,7 +395,25 @@ __END__
 =item * C<output_callback>
 
  Output callback.
- Default value is undef.
+ Default value is callback which encode to output encoding, if parameter 'output_encoding' is present.
+
+ Arguments of callback:
+ - $data_sr - Reference to data
+ - $self - Object
+
+ Example for output encoding in iso-8859-2:
+ 'output_callback' => sub {
+         my ($data_sr, $self) = @_;
+
+         ${$data_sr} = encode('iso-8859-2', ${$data_sr});
+
+         return;
+ }
+
+=item * C<output_encoding>
+
+ Output encoding.
+ Default value is undef, which mean not encode.
 
 =item * C<output_handler>
 
@@ -543,6 +602,7 @@ Constructor.
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
+L<Encode>,
 L<Error::Pure>.
 
 =head1 SEE ALSO
@@ -567,12 +627,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2020 Michal Josef Špaček
+© 2005-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

@@ -1,0 +1,25 @@
+# Exclude the author-only build scripts
+(build|make-pod|clean)\.pl
+# Exclude the built module
+blib/.*
+# Exclude all git files
+\.gitignore$
+\.git/.*
+# Don't include the Makefile made from Makefile.PL in the distribution.
+Makefile$
+# Exclude the stamp file
+pm_to_blib
+# Exclude the META files made by ExtUtils::MakeMaker
+MYMETA..*
+# Exclude backup files made by ExtUtils::MakeMaker
+.*\.bak
+# Exclude untarred distribution files
+^Trav-Dir-[0-9\.]+/$
+# Exclude tarred distribution files
+^Trav-Dir-[0-9\.]+\.tar\.gz$
+# Template for building pod file.
+^lib/Trav/Dir.pod\.tmpl$
+# Don't include the outputs from running the examples
+^examples/.*-out\.txt$
+# Author tests
+^xt/.*.t$

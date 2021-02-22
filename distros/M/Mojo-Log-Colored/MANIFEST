@@ -8,6 +8,8 @@ lib/Mojo/Log/Colored.pm
 minil.toml
 t/00_compile.t
 t/log.t
+t/logformat_post_9.t
+t/logformat_pre_9.t
 t/via_mojo.t
 META.yml
 MANIFEST

@@ -1,0 +1,75 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+JSON::Client - Example client for JSON::Server
+
+=head1 VERSION
+
+This documents version 0.01 of JSON::Client
+corresponding to L<git commit 557295f1d182c1a8425a5dd13c74c27a153f8c93|https://github.com/benkasminbullock/json-server/commit/557295f1d182c1a8425a5dd13c74c27a153f8c93> released on Sun Feb 21 17:00:48 2021 +0900.
+
+=head1 DESCRIPTION
+
+This is an example client module for L<JSON::Server> which sends and
+receives to a JSON::Server server.
+
+=head1 SYNOPSIS
+
+    my $client = JSON::Client->new (
+        port => '5555', # This is the port of the server we are using
+    );
+
+=head1 METHODS
+
+=head2 new
+
+Make a new JSON client object. Possible options are
+
+=over
+
+=item port
+
+The port of the JSON::Server we are communicating with.
+
+=item verbose
+
+Print debugging messages. The format and frequency of these messages
+should not be relied upon.
+
+=back
+
+=head2 send
+
+    my $reply = $client->send ($data);
+
+Send data. The return value is the response of the server, decoded
+from the JSON.
+
+=cut
+
+=head1 SEE ALSO
+
+See the documentation for L<JSON::Server> for details of dependencies.
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

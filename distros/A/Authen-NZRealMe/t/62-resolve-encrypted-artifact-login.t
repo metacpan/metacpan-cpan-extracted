@@ -34,6 +34,11 @@ isa_ok($idp => 'Authen::NZRealMe::IdentityProvider', 'parent class');
 # AuthenNZRealMeEncTestHelper::regenerate_saml_response_post_file(
 #     assertion_source_file => 'encrypted-soap-response-plaintext.xml',
 #     signature_target_id   => 'sa5856952693ea21cb1a76b25b7ed1c7e74cb982ad',
+#     algorithms            => {
+#         encrypt    => 'xenc_aes128cbc',
+#         random_key => 'xenc_rsa15',
+#         signer     => 'rsa_sha256',
+#     },
 #     output_file           => 'login-assertion-3.xml',
 # );
 my $artifact    = $idp->make_artifact(3); # login-assertion-3.xml

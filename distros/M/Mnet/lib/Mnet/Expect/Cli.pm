@@ -46,6 +46,7 @@ use warnings;
 use strict;
 use parent qw( Mnet::Expect );
 use Carp;
+use Mnet;
 use Mnet::Dump;
 use Mnet::Opts::Cli::Cache;
 use Time::HiRes;
@@ -72,7 +73,7 @@ in the L<Mnet::Expect> module new method:
     password        set to password for spawned command, if needed
     password_in     stderr prompt for stdin entry of password if not set
     password_re     undef to skip password/code/phrase prompt detection
-    prompt_re       undef to disable prompt detect, refer to prompt_re
+    prompt_re       undef to disable post-login prompt detect, see below
     timeout         seconds for Expect restart_timeout_upon_receive
     username        set to username for spawned command, if needed
     username_re     undef to skip login/user/username promt detection
@@ -92,6 +93,20 @@ with text that appears in login banners. For example:
 
     (?i)(closed|error|denied|fail|incorrect|invalid|refused|sorry)
 
+A default prompt_re regex string is used by this method to detect and confirm
+the specific prompt text in use on a connected system, after login. When this
+happens prompt_re is rewritten with the detected prompt text, which is used by
+the command method to detect the end of command output.
+
+By default prompts ending with $ % # : > are detected, this can be changed by
+setting prompt_re to a different regex string when calling the new method, or
+disabled by setting to undef:
+
+    (^|\r|\n)\S.*(\$|\%|#|:|>) ?(\r|\n|$)
+
+Refer also to the prompt_re method which can be used to examine or change
+prompt_re for an existing session returned by this method.
+
 Refer to the L<Mnet::Expect> module for more information.
 
 =cut
@@ -110,8 +125,7 @@ Refer to the L<Mnet::Expect> module for more information.
 
     # note default options for this class
     #   includes recognized cli opts and opts for this object
-    #       failed_re default based on educated guess, specifics noted below:
-    #           /(closed|error|denied|fail|incorrect|invalid|refused|sorry)/i
+    #       failed_re default undef to be safe, refer to perldoc for more info
     #           junos telnet =~ /^Login incorrent/m
     #       password_re default based on educated guess, specifics noted below:
     #           junos telnet =~ /^Password:$/m
@@ -119,7 +133,7 @@ Refer to the L<Mnet::Expect> module for more information.
     #           junos telnet =~ /^\S+> $/mi
     #       username_re default based on educated guess, specifics noted below:
     #           junos telnet =~ /^login: $/m
-    #   the following keys starting with underscore are used internally:
+    #   following keys starting with underscore are used internally:
     #       _command_cache_content => hash ref, refer to _command_cache_clear
     #       _command_cache_counter => integer, refer to _command_cache_clear
     #       _password_ => causes password value to be hidden in opts debug
@@ -138,13 +152,18 @@ Refer to the L<Mnet::Expect> module for more information.
         _password_  => undef,
         password_in => undef,
         password_re => '(?i)pass(code|phrase|word):?\s*(\r|\n)?$',
-        prompt_re   => '(^|\r|\n)\S.*(\$|\%|#|:|>) ?(\r|\n|$)',
+        prompt_re   => undef, # see below
         record      => undef,
         replay      => undef,
         timeout     => 30,
         username    => undef,
         username_re => '(?i)(login|user(name)?):?\s*(\r|\n)?$',
     };
+
+    # prompt_re default based on educated guess, specifics noted below:
+    #   junos telnet =~ /^\S+> $/mi
+    #   update perldoc for this sub with new default, if changed below
+    $defaults->{prompt_re} = '(^|\r|\n)\S.*(\$|\%|#|:|>) ?(\r|\n|$)';
 
     # update future object $self hash with default opts
     foreach my $opt (sort keys %$defaults) {
@@ -379,11 +398,25 @@ sub command {
 
     $output = $expect->command($command, $timeout, \@prompts)
 
-This method returns output from the specified command from the current expect
-cli session, or undefined if there was a timeout.
+This method returns output from the specified command sent to the current
+expect cli session, or undefined if there was a timeout.
 
-The timeout input argument can be used to override the timeout for the current
-object.
+Note that this method caches command output, so that if the exact same command
+is sent repeatedly the first output from the connected device will be returned
+for subsequent calls. Refer to the command_cache_clear method for more info.
+
+The optional timeout argument can be used to override the default timeout for
+the new object.
+
+The optional prompts reference argument can be used to handle prompts that may
+occur when running a command, such as confirmation prompts. It should contain
+pairs of regex strings and responses. The regex string values should be what
+goes in between the forward slash characters of a regular expression. The
+response can be a string that is sent to the expect session without a carraige
+return, or may be a code reference that gets the current object and output as
+input args and returns a response string. An null prompt regex string is
+activated for timeouts. An undef prompt response causes an immediate return of
+output.
 
     # sends $command, uses default timeout, defines some prompts
     my $output = $expect->command($command, undef, [
@@ -399,16 +432,9 @@ object.
 
     ]);
 
-The prompts reference argument can be used to handle prompts that occur after
-entering a command, such as confirmation prompts. It should contain pairs of
-regex strings and responses. The regex string values should be what goes in
-between the forward slash characters of a regular expression. The response can
-be a string that is sent to the expect session without a carraige return, or
-may be a code reference that gets the current object and output as input args
-and returns a response string. An null prompt regex string is activated for
-timeouts. An undef prompt response causes an immediate return of output.
-
-Refer also to the command_cache_clear method for more info.
+By default the end of command output is recognized using the prompt_re string
+detected by the new method after login. Refer to the new and prompt_re methods
+for more information.
 
 =cut
 
@@ -632,7 +658,7 @@ sub command_cache_clear {
 
 This method can be used to clear the cache used by the command method.
 
-Normally the the command method caches the outputs for all executed commands,
+Normally the command method caches the outputs for all executed commands,
 returning cached output when the same command is executed subsequently. When
 the cache is cleared the command method will execute the next instance of any
 specific command instead of returning cached output.
@@ -726,14 +752,25 @@ sub prompt_re {
 
     $prompt_re = $expect->prompt_re($prompt_re)
 
-Get and/or set new prompt_re for the current object.
+This method can be used to get and/or set the prompt_re regex string for an
+existing object, which is used by the command method to detect the end of
+output for a sent command. The prompt_re regex string should be specific enough
+to detect the cli prompt without matching any other command outputs.
 
-By default prompts that end with $ % # : > are recognized, and the first prompt
-detected after login is used as prompt_re for the rest of the expect session.
+By default the new method set prompt_re for the rest of the session to the
+first prompt detected after login, confirmed by sending a carraige return and
+getting the same specifc prompt again. This prompt detection can be adjusted or
+disabled, refer to the new method for more info.
 
-Note that prompt_re should start with a regex caret symbol and end with a regex
-dollar sign, to ensure it works correctly. Also the /Q and /E escape sequences
-do not appear to work in an expect regex.
+Note that normally prompt_re should start with a regex caret symbol and end
+with a regex dollar sign, so that all characters in the command prompt line are
+matched, and avoid spurrious matches in command outputs. Be aware of any spaces
+that at the end of a prompt, as in the example below:
+
+    $expect->prompt_re('^st-city-dev> $');
+
+Also note that the /Q and /E escape sequences do not appear to be recognized by
+expect, they should be avoided.
 
 =cut
 

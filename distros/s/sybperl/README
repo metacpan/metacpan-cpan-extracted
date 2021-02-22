@@ -55,70 +55,7 @@ System 10.
 
 Recent Changes:
 
-2.16    Various bug fixes
-
-        Added DBSETLENCRYPT() to Sybase::DBlib.
-	Added DBDEAD() to Sybase::Sybperl.
-
-	Bug Fixes
-	494   Do not try to use the ocs.cfg file if it exists.
-        499   Change MAXNAME to DBMAXNAME in the DBlib source.
-        500   $date->info return invalid data.
-        511   Change login to syb_login in DBlib.xs (work-around for FreeBSD).
-	516   Money/Numeric values lose precision when not using 
-              UseMoney/UseNumeric.
-	518   looking for non-existent library file (solaris 2.8/ASE 12.5.0.3
-	      perl 5.8)
-	498   Problem compiling sybperl under HP-UX 64-bit mode.
-	488   Sybase::CTlib and DBD::Sybase end up using the same error 
-	      handler
-	470   BLK.pm does not handle empty columns as NULL, and does not 
-              have retry logic of BCP.pm
-	410   BCP.pm has regex bug.
-	379   Sybase::BCP::config() does not correctly handle incremental 
-              changes
-
-2.15    Various bug fixes
-
-        Support for 64bit OpenClient on platforms that support this
-        (Thanks to Pamela Schulz for her help with this)
-        Added CTlib/t/xblk.t and CTlib/t/prepare.t test scripts.
-	CS_BLK_CANCEL was not exported.
-	For building with FreeTDS you can now add -DNOBLK to the 
-	EXTRA_DEFS line in CONFIG.
-
-	Bug Fixes
-	468   Makefile.PL has syntax error when used with perl 5.8.x
-	460   Idem.
-	439   Makefile.PL fails for very old Sybase installation (i.e.
-              installation with no CT-Library)
-	423   Fix Makefile.PL for Win32 builds.
-	422   t/bcp.t fails against 11.0.3.3 linux servers.
-
-
-2.14	And more (minor) bug fixes
-
-	config.pl's getExtraLibs() now tries to determine the Client
-	Library version to avoid linking with -linsck or -ltli for
-	OC 11 or later (as the correct library is loaded dynamically 
-	based on the values defined in $SYBASE/config/libtcl.cfg)
-        Added support for CS_HAFAILOVER connect option (thanks to 
-	Ranko Popovic)
-        Added CTlib version of nsql().
-	Documentation patches from Geoffrey Rommel.
-	Fixed memory leak when using UseDateTime/UseMoney/UseNumeric.
-	Add Async calls for CTlib (ct_poll(), etc).
-	Add CS_DATA_LCHAR connection capability.
-        Add ct_dyn_prepare() and ct_dyn_execute() to handle "dynamic SQL"
-	- thanks to Masatsuyo Takahas for the patch.
-	Add experimental blk_*() calls.
-	Ask for the PWD entries during the perl Makefile.PL phase.
-	Add Sybase::BLK module (based on Sybase::BCP) (*many* thanks to
-        Scott Zetlan for this!)
-	
-	Bug Fixes
-	309   Sybase::BCP fails test if server is set to use 
-	      datarows locking by default.
+See the CHANGES document
 
 ---------------------------------------------------------------------
 
@@ -419,11 +356,10 @@ In case of problems:
 
 First, read the FAQ file in the sybperl distribution.
 
-Second, fire off an e-mail to me (mpeppler@peppler.org) or to the Sybperl
-mailing list (sybperl-l@peppler.org) with a *full* description of
-what doesn't work, including version numbers of Perl and sybperl, the
-hardware and OS version, and the Sybase Open Client version you are
-using.
+Second, fire off an e-mail to me (mpeppler@peppler.org) with a *full* 
+description of what doesn't work, including version numbers of Perl 
+and sybperl, the hardware and OS version, and the Sybase Open Client 
+version you are using.
 
 The regression tests don't attempt to test *everything*, but they do
 test all of the basic functions, and should work cleanly.
@@ -431,19 +367,12 @@ test all of the basic functions, and should work cleanly.
 There are quite a few small example scripts in eg/ which illustrate
 the use of both the DBlib and CTlib modules.
 
-There is a mailing list for discussing sybperl related questions
-(sybperl-l@peppler.org). Send a message to
-sybperl-l-request@peppler.org with 'subscribe' in the body of the message
-to subscribe to the list.
-
 
 
 Reporting Bugs:
 ===============
 
-I have set up a (simple) bug tracking database, which can be accessed
-on line at http://www.peppler.org/cgi-bin/bug.cgi. You can submit bugs 
-directly, or send me email using the SPR file in this directory.
+Use the github issues tool at https://github.com/mpeppler/sybperl/issues
 
 When submitting bugs, or any sort of problem report, please make sure
 you include full version information for Sybperl, Perl, Sybase and

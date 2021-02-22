@@ -32,13 +32,21 @@ is($sp->contact_company, 'Department of Examples Login Services',
     "SP contact company name loaded from metadata looks good");
 
 my @acs_list = $sp->acs_list;
-is(scalar(@acs_list), 1, 'one Assertion Consumer service is defined');
-my($acs1) = @acs_list;
+is(scalar(@acs_list), 2, 'two Assertion Consumer service are defined');
+my($acs0, $acs1) = @acs_list;
+ok($acs0, 'ACS 0');
+is($acs0->{location}, 'https://www.example.govt.nz/app/sample/login-acs',
+    " URL from metadata looks good");
+is($acs0->{index}, '0', " index");
+is($acs0->{is_default}, undef, " not default");
+is($acs0->{binding}, 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST', " binding");
+
+ok($acs1, 'ACS 1');
 is($acs1->{location}, 'https://www.example.govt.nz/app/sample/login-acs',
-    "ACS URL from metadata looks good");
-is($acs1->{index}, '0', "ACS index");
-is($acs1->{is_default}, '1', "ACS index");
-is($acs1->{binding}, 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact', "ACS index");
+    " URL from metadata looks good");
+is($acs1->{index}, '1', " index");
+is($acs1->{is_default}, 1, " is default");
+is($acs1->{binding}, 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact', " binding");
 
 # Load IdP metadata for login service
 
@@ -69,10 +77,21 @@ is($sp->contact_company, 'Department of Examples Identity Services',
     "SP contact company name loaded from metadata looks good");
 
 @acs_list = $sp->acs_list;
-is(scalar(@acs_list), 1, 'one Assertion Consumer service is defined');
-($acs1) = @acs_list;
+is(scalar(@acs_list), 2, 'two Assertion Consumer service are defined');
+($acs0, $acs1) = @acs_list;
+ok($acs0, 'ACS 0');
+is($acs0->{location}, 'https://www.example.govt.nz/app/sample/identity-acs',
+    " URL from metadata looks good");
+is($acs0->{index}, '0', " index");
+is($acs0->{is_default}, undef, " not default");
+is($acs0->{binding}, 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST', " binding");
+
+ok($acs1, 'ACS 1');
 is($acs1->{location}, 'https://www.example.govt.nz/app/sample/identity-acs',
-    "ACS URL from metadata looks good");
+    " URL from metadata looks good");
+is($acs1->{index}, '1', " index");
+is($acs1->{is_default}, 1, " is default");
+is($acs1->{binding}, 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact', " binding");
 
 # Load IdP metadata for login service
 

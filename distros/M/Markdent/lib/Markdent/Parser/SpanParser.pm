@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use re 'eval';
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use List::AllUtils qw( uniq );
 use Markdent::Event::AutoLink;
@@ -159,7 +159,7 @@ sub parse_block {
     my $text = shift;
 
     $self->_print_debug("Parsing text for span-level markup\n\n$text\n")
-        if $self->debug();
+        if $self->debug;
 
     # Note that we have to pass a _reference_ to text in order to make sure
     # that we are matching the same variable with /g regexes each time.
@@ -171,13 +171,13 @@ sub parse_block {
 
     $self->_debug_pending_events('before text merging');
 
-    $self->_merge_consecutive_text_events();
+    $self->_merge_consecutive_text_events;
 
     $self->_debug_pending_events('after text merging');
 
-    $self->handler()->handle_event($_) for $self->_pending_events();
+    $self->handler->handle_event($_) for $self->_pending_events;
 
-    $self->_clear_pending_events();
+    $self->_clear_pending_events;
 
     return;
 }
@@ -188,18 +188,18 @@ sub _parse_text {
 
 PARSE:
     while (1) {
-        if ( $self->debug() && pos ${$text} ) {
+        if ( $self->debug && pos ${$text} ) {
             $self->_print_debug( "Remaining text:\n[\n"
                     . substr( ${$text}, pos ${$text} )
                     . "\n]\n" );
         }
 
         if ( ${$text} =~ /\G\z/gc ) {
-            $self->_event_for_text_buffer();
+            $self->_event_for_text_buffer;
             last;
         }
 
-        my @look_for = $self->_possible_span_matches();
+        my @look_for = $self->_possible_span_matches;
 
         $self->_debug_look_for(@look_for);
 
@@ -221,12 +221,12 @@ sub _possible_span_matches {
 
     my %open = $self->_open_start_events_for_span( 'code', 'link' );
     if ( my $event = $open{code} ) {
-        return [ 'code_end', $event->delimiter() ];
+        return [ 'code_end', $event->delimiter ];
     }
 
     my @look_for = 'escape';
 
-    push @look_for, $self->_look_for_strong_and_emphasis();
+    push @look_for, $self->_look_for_strong_and_emphasis;
 
     push @look_for, 'code_start';
 
@@ -247,7 +247,7 @@ sub _look_for_strong_and_emphasis {
     # If we are in both, we need to try to end the most recent one first.
     if ( $open{strong} && $open{emphasis} ) {
         my $last_saw;
-        for my $event ( $self->_pending_events() ) {
+        for my $event ( $self->_pending_events ) {
             my $event_name = $event->event_name;
             if ( $event_name eq 'start_strong' ) {
                 $last_saw = 'strong';
@@ -262,17 +262,17 @@ sub _look_for_strong_and_emphasis {
             ? qw( strong emphasis )
             : qw( emphasis strong );
 
-        return map { [ $_ . '_end', $open{$_}->delimiter() ] } @order;
+        return map { [ $_ . '_end', $open{$_}->delimiter ] } @order;
     }
     elsif ( $open{emphasis} ) {
         return (
             'strong_start',
-            [ 'emphasis_end', $open{emphasis}->delimiter() ]
+            [ 'emphasis_end', $open{emphasis}->delimiter ]
         );
     }
     elsif ( $open{strong} ) {
         return (
-            [ 'strong_end', $open{strong}->delimiter() ],
+            [ 'strong_end', $open{strong}->delimiter ],
             'emphasis_start'
         );
     }
@@ -288,7 +288,7 @@ sub _open_start_events_for_span {
     my %wanted_end   = map { 'end_' . $_   => $_ } @_;
 
     my %open;
-    for my $event ( $self->_pending_events() ) {
+    for my $event ( $self->_pending_events ) {
         my $event_name = $event->event_name;
         $open{ $wanted_start{$event_name} } = $event
             if $wanted_start{$event_name};
@@ -307,13 +307,13 @@ sub _build_emphasis_start_delimiter_re {
 }
 
 sub _build_escapable_chars {
-    return [ qw( \ ` * _ { } [ ] ( ) + - . ! < > ), '#' ];
+    return [ qw( \ ` * _ { } [ ] ( ) + - . ! < > ~ ), '#' ];
 }
 
 sub _build_escape_re {
     my $self = shift;
 
-    my $chars = join q{}, uniq( @{ $self->_escapable_chars() } );
+    my $chars = join q{}, uniq( @{ $self->_escapable_chars } );
 
     return qr/\\([\Q$chars\E])/;
 }
@@ -329,14 +329,14 @@ sub _match_escape {
     my $self = shift;
     my $text = shift;
 
-    my $escape_re = $self->_escape_re();
+    my $escape_re = $self->_escape_re;
 
     return unless ${$text} =~ / \G
                                 ($escape_re)
                               /xgc;
 
     $self->_print_debug("Interpreting as escaped character\n\n[$1]\n")
-        if $self->debug();
+        if $self->debug;
 
     $self->_save_span_text($2);
 
@@ -378,7 +378,7 @@ sub _match_emphasis_start {
 
     my ($delim) = $self->_match_delimiter_start(
         $text,
-        $self->_emphasis_start_delimiter_re(),
+        $self->_emphasis_start_delimiter_re,
     ) or return;
 
     my $event = $self->_make_event( StartEmphasis => delimiter => $delim );
@@ -732,7 +732,7 @@ sub _match_line_break {
     my $self = shift;
     my $text = shift;
 
-    my $line_break_re = $self->_line_break_re();
+    my $line_break_re = $self->_line_break_re;
 
     return unless ${$text} =~ /\G$line_break_re/gcs;
 
@@ -749,7 +749,7 @@ sub _match_plain_text {
 
     my $end_of_text_re = join '|',
         grep {defined} (
-        $self->_text_end_res(),
+        $self->_text_end_res,
         );
 
     # Note that we're careful not to consume any of the characters marking the
@@ -779,7 +779,7 @@ sub _match_plain_text {
                     /xgcs;
 
     $self->_print_debug("Interpreting as plain text\n\n[$1]\n")
-        if $self->debug();
+        if $self->debug;
 
     $self->_save_span_text($1);
 
@@ -791,8 +791,8 @@ sub _text_end_res {
     my $self = shift;
 
     return (
-        $self->_escape_re(),
-        $self->_line_break_re(),
+        $self->_escape_re,
+        $self->_line_break_re,
     );
 }
 
@@ -800,13 +800,13 @@ sub _markup_event {
     my $self  = shift;
     my $event = shift;
 
-    $self->_event_for_text_buffer();
+    $self->_event_for_text_buffer;
 
-    if ( $self->debug() ) {
-        my $msg = 'Found markup: ' . $event->event_name();
+    if ( $self->debug ) {
+        my $msg = 'Found markup: ' . $event->event_name;
 
         if ( $event->can('delimiter') ) {
-            $msg .= ' - delimiter: [' . $event->delimiter() . ']';
+            $msg .= ' - delimiter: [' . $event->delimiter . ']';
         }
 
         $msg .= "\n";
@@ -816,16 +816,16 @@ sub _markup_event {
 
     $self->_add_pending_event($event);
 
-    $self->_convert_invalid_start_events_to_text()
-        if $event->is_end();
+    $self->_convert_invalid_start_events_to_text
+        if $event->is_end;
 }
 
 sub _event_for_text_buffer {
     my $self = shift;
 
-    return unless $self->_has_span_text_buffer();
+    return unless $self->_has_span_text_buffer;
 
-    my $text = $self->_span_text_buffer();
+    my $text = $self->_span_text_buffer;
 
     $self->_detab_text( \$text );
 
@@ -833,7 +833,7 @@ sub _event_for_text_buffer {
 
     $self->_add_pending_event($event);
 
-    $self->_clear_span_text_buffer();
+    $self->_clear_span_text_buffer;
 }
 
 sub _convert_invalid_start_events_to_text {
@@ -842,7 +842,7 @@ sub _convert_invalid_start_events_to_text {
 
     # We want to operate directly on the reference so we can convert
     # individual events in place
-    my $events = $self->__pending_events();
+    my $events = $self->__pending_events;
 
     my @starts;
 EVENT:
@@ -851,10 +851,10 @@ EVENT:
 
         next unless $event->does('Markdent::Role::BalancedEvent');
 
-        if ( $event->is_start() ) {
+        if ( $event->is_start ) {
             push @starts, [ $i, $event ];
         }
-        elsif ( $event->is_end() ) {
+        elsif ( $event->is_end ) {
             while ( my $start = pop @starts ) {
                 next EVENT
                     if $event->balances_event( $start->[1] );
@@ -877,11 +877,11 @@ sub _convert_start_event_to_text {
     my $self  = shift;
     my $event = shift;
 
-    if ( $self->debug() ) {
-        my $msg = 'Found bad start event for ' . $event->name();
+    if ( $self->debug ) {
+        my $msg = 'Found bad start event for ' . $event->name;
 
         if ( $event->can('delimiter') ) {
-            $msg .= q{ with "} . $event->delimiter() . q{" as the delimiter};
+            $msg .= q{ with "} . $event->delimiter . q{" as the delimiter};
         }
 
         $msg .= "\n";
@@ -891,8 +891,8 @@ sub _convert_start_event_to_text {
 
     return $self->_make_event(
         Text => (
-            text            => $event->as_text(),
-            _converted_from => $event->event_name(),
+            text            => $event->as_text,
+            _converted_from => $event->event_name,
         )
     );
 }
@@ -900,7 +900,7 @@ sub _convert_start_event_to_text {
 sub _merge_consecutive_text_events {
     my $self = shift;
 
-    my $events = $self->__pending_events();
+    my $events = $self->__pending_events;
 
     my $merge_start;
 
@@ -908,7 +908,7 @@ sub _merge_consecutive_text_events {
     for my $i ( 0 .. $#{$events} ) {
         my $event = $events->[$i];
 
-        if ( $event->event_name() eq 'text' ) {
+        if ( $event->event_name eq 'text' ) {
             $merge_start = $i
                 unless defined $merge_start;
         }
@@ -945,12 +945,12 @@ sub _splice_merged_text_event {
     my $start  = shift;
     my $end    = shift;
 
-    my @to_merge = map { $_->text() } @{$events}[ $start .. $end ];
+    my @to_merge = map { $_->text } @{$events}[ $start .. $end ];
 
     $self->_print_debug(
         "Merging consecutive text events ($start-$end) for: \n"
             . ( join q{}, map {"  - [$_]\n"} @to_merge ) )
-        if $self->debug();
+        if $self->debug;
 
     my $merged_text = join q{}, @to_merge;
 
@@ -968,18 +968,18 @@ sub _debug_pending_events {
     my $self = shift;
     my $desc = shift;
 
-    return unless $self->debug();
+    return unless $self->debug;
 
     my $msg = "Pending event stream $desc:\n";
 
-    for my $event ( $self->_pending_events() ) {
-        $msg .= $event->debug_dump() . "\n";
+    for my $event ( $self->_pending_events ) {
+        $msg .= $event->debug_dump . "\n";
     }
 
     $self->_print_debug($msg);
 }
 
-__PACKAGE__->meta()->make_immutable();
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -997,7 +997,7 @@ Markdent::Parser::SpanParser - Span parser for standard Markdown
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 DESCRIPTION
 
@@ -1045,7 +1045,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

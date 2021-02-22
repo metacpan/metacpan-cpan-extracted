@@ -3,33 +3,35 @@ abstract: 'Harness output delegate for JUnit output'
 author:
   - 'Graham TerMarsch (cpan@howlingfrog.com)'
 build_requires:
-  IO::Scalar: 0
-  IPC::Run: 0
-  Test::More: 0
-  Test::XML: 0
+  IO::Scalar: '0'
+  IPC::Run: '0'
+  Test::More: '0'
+  Test::XML: '0'
 configure_requires:
-  Module::Build: 0.42
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.132661'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: TAP-Formatter-JUnitREGRU
 provides:
   TAP::Formatter::JUnitREGRU:
     file: lib/TAP/Formatter/JUnitREGRU.pm
-    version: 0.11
+    version: '0.12'
   TAP::Formatter::JUnitREGRU::Result:
     file: lib/TAP/Formatter/JUnitREGRU/Result.pm
   TAP::Formatter::JUnitREGRU::Session:
     file: lib/TAP/Formatter/JUnitREGRU/Session.pm
 requires:
-  File::Slurp: 0
-  Moose: 0
-  MooseX::NonMoose: 0
-  TAP::Harness: 3.12
-  XML::Generator: 0
+  File::Slurp: '0'
+  Moose: '0'
+  MooseX::NonMoose: '0'
+  TAP::Formatter::JUnit: '0'
+  TAP::Harness: '3.12'
+  XML::Generator: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.11
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

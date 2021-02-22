@@ -7,7 +7,7 @@ ENDIF ()
 # when we do make marpaESLIFPerlRelease
 #
 # SET (MYPACKAGE_DEBUG TRUE)
-MYPACKAGESTART (marpaESLIF 4 0 1)
+MYPACKAGESTART (marpaESLIF 5 0 7)
 
 ###########
 # Library #
@@ -37,12 +37,33 @@ ELSE ()
 ENDIF ()
 SET (MARPAESLIF_UINT32_T ${MYPACKAGE_UINT32_TYPEDEF})
 #
+# We need to know endianness in case there is no signbit
+#
+INCLUDE (TestBigEndian)
+TEST_BIG_ENDIAN (IS_BIG_ENDIAN)
+IF (IS_BIG_ENDIAN)
+  SET (WORDS_BIGENDIAN TRUE CACHE BOOL "Big endian library")
+  MARK_AS_ADVANCED (WORDS_BIGENDIAN)
+ELSE ()
+  SET (WORDS_BIGENDIAN FALSE CACHE BOOL "Big endian library")
+  MARK_AS_ADVANCED (WORDS_BIGENDIAN)
+ENDIF ()
+#
 # ... Ok -;
 #
 MYPACKAGELIBRARY(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/config.h.in
   ${INCLUDE_OUTPUT_PATH}/marpaESLIF/internal/config.h
   src/marpaESLIF.c)
+
+#
+# m dependency
+#
+IF (CMAKE_MATH_LIBS)
+  FOREACH (_target ${PROJECT_NAME} ${PROJECT_NAME}_static)
+    TARGET_LINK_LIBRARIES(${_target} PUBLIC ${CMAKE_MATH_LIBS})
+  ENDFOREACH ()
+ENDIF ()
 
 #
 # Since we embed marpaESLIFLua with a #include directive, we have to propagate the
@@ -62,7 +83,8 @@ ENDFOREACH ()
 ###############
 MYPACKAGETESTEXECUTABLE(marpaESLIFTester           test/marpaESLIFTester.c)
 MYPACKAGETESTEXECUTABLE(adventTester               test/adventTester.c)
-MYPACKAGETESTEXECUTABLE(jsonTester                 test/jsonTester.c)
+MYPACKAGETESTEXECUTABLE(jsonTesterStrict           test/jsonTesterStrict.c)
+MYPACKAGETESTEXECUTABLE(jsonTesterNotStrict        test/jsonTesterNotStrict.c)
 MYPACKAGETESTEXECUTABLE(jsonTesterLua              test/jsonTesterLua.c)
 MYPACKAGETESTEXECUTABLE(jsonTesterWithSharedStream test/jsonTesterWithSharedStream.c)
 MYPACKAGETESTEXECUTABLE(selfTester                 test/selfTester.c)
@@ -117,7 +139,8 @@ ENDFOREACH ()
 #########
 MYPACKAGECHECK(marpaESLIFTester)
 MYPACKAGECHECK(adventTester)
-MYPACKAGECHECK(jsonTester)
+MYPACKAGECHECK(jsonTesterStrict)
+MYPACKAGECHECK(jsonTesterNotStrict)
 MYPACKAGECHECK(jsonTesterLua)
 MYPACKAGECHECK(jsonTesterWithSharedStream)
 MYPACKAGECHECK(selfTester)

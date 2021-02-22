@@ -5,12 +5,15 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+README
 README.md
 SIGNATURE
+bin/strexpand
 dist.ini
 lib/String/Expando.pm
 t/001.use.t
 t/002.simple.t
 t/003.dots.t
+t/004.multiline.t
 t/author-critic.t
 t/author-pod-syntax.t

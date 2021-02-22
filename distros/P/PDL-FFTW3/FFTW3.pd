@@ -1,3 +1,9 @@
+=head1 NAME
+
+PDL::FFTW3 - PDL interface to the Fastest Fourier Transform in the West v3
+
+=cut
+
 # -*- cperl -*-
 
 ##### General layout of the module #####
@@ -10,7 +16,7 @@
 # I generate code for up to 10-dimensional FFTs
 my $maxrank = 10;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 pp_addpm( {At => 'Top'}, slurp('README.pod') );
 
@@ -161,10 +167,10 @@ sub generateDefinitions
   # forward
   # I have the real dimensions, but not nhalf
   $pp_def{RedoDimsCode} = <<'EOF';
-if( $PDL(complex)->ndims <= 1 || $PDL(complex)->dims[1] <= 0 )
+if( $PDL(complexv)->ndims <= 1 || $PDL(complexv)->dims[1] <= 0 )
   $SIZE(nhalf) = (int)( $PDL(real)->dims[0]/2 ) + 1;
 EOF
-  $pp_def{Pars} = "real($dims_real_string); [o]complex($dims_complex_string);";
+  $pp_def{Pars} = "real($dims_real_string); [o]complexv($dims_complex_string);";
   $pp_def{Code} = $code_real_forward;
   pp_def( "__rfft$rank", %pp_def );
 
@@ -182,9 +188,9 @@ EOF
   #  $out->dim(0) = 2*$in->dim(1) - 2
   $pp_def{RedoDimsCode} = <<'EOF';
 if( $PDL(real)->dims[0] <= 0 )
-  $SIZE(n1) = 2*$PDL(complex)->dims[1] - 2;
+  $SIZE(n1) = 2*$PDL(complexv)->dims[1] - 2;
 EOF
-  $pp_def{Pars} = "complex($dims_complex_string); [o]real($dims_real_string);";
+  $pp_def{Pars} = "complexv($dims_complex_string); [o]real($dims_real_string);";
   $pp_def{Code} = $code_real_backward;
   pp_def( "__irfft$rank", %pp_def );
 }

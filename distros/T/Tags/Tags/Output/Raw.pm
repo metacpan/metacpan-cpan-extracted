@@ -15,7 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # Finalize Tags output.
 sub finalize {
@@ -288,6 +288,7 @@ sub _put_data {
 # End of tag.
 sub _put_end_of_tag {
 	my ($self, $tag) = @_;
+
 	if ($self->{'xml'}) {
 		my $printed = shift @{$self->{'printed_tags'}};
 		if (! defined $printed) {
@@ -451,7 +452,7 @@ __END__
 
  Example:
  'data_callback' => sub {
-         my $data_ar = shift;
+         my ($data_ar, $self) = @_;
          foreach my $data (@{$data_ar}) {
 
                  # Some process.
@@ -486,13 +487,25 @@ __END__
 
  Output callback.
  Input argument is reference to scalar of output string.
- Default value is undef.
- Example for output encoding in utf8:
+ Default value is callback which encode to output encoding, if parameter 'output_encoding' is present.
+
+ Arguments of callback:
+ - $data_sr - Reference to data
+ - $self - Object
+
+ Example for output encoding in iso-8859-2:
  'output_callback' => sub {
-         my $data_sr = shift;
-         ${$data_sr} = encode_utf8(${$data_sr});
+         my ($data_sr, $self) = @_;
+
+         ${$data_sr} = encode('iso-8859-2', ${$data_sr});
+
          return;
  }
+
+=item * C<output_encoding>
+
+ Output encoding.
+ Default value is undef, which mean not encode.
 
 =item * C<output_handler>
 
@@ -628,7 +641,7 @@ __END__
  # Object.
  my $tags = Tags::Output::Raw->new(
          'data_callback' => sub {
-                 my $data_ar = shift;
+                 my ($data_ar, $self) = @_;
                  foreach my $data (@{$data_ar}) {
                           $data = encode_utf8($data);
                  }
@@ -681,12 +694,12 @@ L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2020 Michal Josef Špaček
+© 2005-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

@@ -201,3 +201,7 @@ foreach my $test (@tests) {
 		#print "\n\n";
 	}
 }
+
+#diag('-----');
+#use Crypt::Argon2;
+#diag('Crypt::Argon2::VERSION: ' . $Crypt::Argon2::VERSION);

@@ -17,13 +17,13 @@ For now, the documentation can be found at: [https://boardstreams.dev](https://b
 # ASSOCIATION WITH JAVASCRIPT LIBRARIES
 
 This module release should be used in conjunction with npm package `boardstreams` version
-[0.0.8](https://www.npmjs.com/package/boardstreams/v/0.0.8).
+[0.0.11](https://www.npmjs.com/package/boardstreams/v/0.0.11).
 
-    $ npm install boardstreams@0.0.8 --save
+    $ npm install boardstreams@0.0.11 --save
 
 Or:
 
-    <script src="https://unpkg.com/boardstreams@0.0.8"></script>
+    <script src="https://unpkg.com/boardstreams@0.0.11"></script>
 
 # NOTIFICATIONS FOR NEW RELEASES
 

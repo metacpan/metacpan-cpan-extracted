@@ -1,3 +1,14 @@
+2.0.6   2021-01-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Introduce bottom border characters (when we are drawing header
+	  row but there are no data rows).
+
+
+2.0.5   2021-01-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Introduce top border characters when not drawing header row.
+
+
 2.0.4   2021-01-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Relabel border characters, introduce 6 more border characters for

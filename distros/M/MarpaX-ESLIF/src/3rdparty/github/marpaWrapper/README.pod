@@ -526,13 +526,19 @@ Returns 1 on success, 0 on failure.
 
 =head2 marpaWrapperRecognizer_progressLogb
 
-  typedef char *(symbolDescriptionCallback_t)(void *userDatavp, int symboli);
+  typedef struct marpaWrapperRecognizerContext {
+    int   valuei;
+    void *valuep;
+  } marpaWrapperRecognizerContext_t;
+
+  typedef char *(*marpaWrapperRecognizerSymbolDescriptionCallback_t)(void *userDatavp, int symboli);
+  typedef void  (*marpaWrapperRecognizerContextFreeCallback_t)(void *userDatavp, marpaWrapperRecognizerContext_t *contextp);
 
   marpaWrapperRecognizer_progressLogb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp,
                                       int starti, int endi,
                                       genericLoggerLevel_t logleveli,
                                       void *userDatavp,
-                                      symbolDescriptionCallback_t symbolDescriptionCallbackp);
+                                      marpaWrapperRecognizerSymbolDescriptionCallback_t symbolDescriptionCallbackp);
 
 Convenient method that is using the eventual generic logger specified at object instance phase: if the generic logger is set, then this method will call it with the logging level C<logleveli>, using a symbol description returned by callback C<symbolDescriptionCallbackp>. C<userDatavp> is an opaque pointer, typically used to propagate a userspace context, the callback will be used for every symbol identifier C<symboli>. If no callback, or if the callback returns C<NULL>, the hardcoded symbol description C<?> is used.
 
@@ -557,6 +563,52 @@ Rule is being predicted
 The second item C<%d> is the current rule identifier. Then C<%d..%d> is the I<earleme identifier> corresponding to C<earleySetOrigIdi> followed by the I<earleme identifier> corresponding to C<earleySetIdi>. The rest is the rule description: there are as many calls to the logger as there are RHS. Position will show as the C<.> dot character. Please note that in the usual I<token-stream> model, the I<earleme identifier> is the same as the I<earley set identifier>.
 
 Returns 1 on success, 0 on failure.
+
+=head2 marpaWrapperRecognizer_grammarp
+
+  marpaWrapperGrammar_t *marpaWrapperRecognizer_grammarp(marpaWrapperRecognizer_t *marpaWrapperRecognizerp);
+
+Returns the grammar associated to C<marpaWrapperRecognizerp>, C<NULL> if failure.
+
+=head2 marpaWrapperRecognizer_contextSetb
+
+  short marpaWrapperRecognizer_contextSetb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, marpaWrapperRecognizerContext_t context);
+
+Associates a context to current Earleme Set Id.
+
+Returns 0 on failure, 1 on success.
+
+=head2 marpaWrapperRecognizer_contextGetb
+
+  short marpaWrapperRecognizer_contextGetb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, int i, marpaWrapperRecognizerContext_t *contextp);
+
+When C<contextp> is not C<NULL>, fills it with the context at Earleme Set Id C<i>, where C<i> follows the perl's L<splice|http://perldoc.perl.org/functions/splice.html> method conventions for an offset, i.e.: if the value is negative, start that far from the end of all positions.
+
+Returns 0 on failure, 1 on success.
+
+=head2 marpaWrapperRecognizer_currentEarlemeb
+
+  short marpaWrapperRecognizer_currentEarlemeb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, int *ip);
+
+When C<ip> is not C<NULL>, fills it with the current earleme.
+
+Returns 0 on failure, 1 on success.
+
+=head2 marpaWrapperRecognizer_earlemeb
+
+  short marpaWrapperRecognizer_earlemeb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, int i, int *ip);;
+
+When C<ip> is not C<NULL>, fills it with the earleme at Earleme Set Id C<i>, where C<i> follows the perl's L<splice|http://perldoc.perl.org/functions/splice.html> method conventions for an offset, i.e.: if the value is negative, start that far from the end of all positions.
+
+Returns 0 on failure, 1 on success.
+
+=head2 marpaWrapperRecognizer_furthestEarlemeb
+
+  short marpaWrapperRecognizer_furthestEarlemeb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, int *ip);
+
+When C<ip> is not C<NULL>, fills it with the furthest earleme.
+
+Returns 0 on failure, 1 on success.
 
 =head2 marpaWrapperRecognizer_freev
 

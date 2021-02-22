@@ -1,0 +1,749 @@
+NAME
+    Regexp::Common::Apache2 - Apache2 Expressions
+
+SYNOPSIS
+        use Regexp::Common qw( Apache2 );
+        use Regexp::Common::Apache2 qw( $ap_true $ap_false );
+
+        while( <> )
+        {
+            my $pos = pos( $_ );
+            /\G$RE{Apache2}{Word}/gmc      and  print "Found a word expression at pos $pos\n";
+            /\G$RE{Apache2}{Variable}/gmc  and  print "Found a variable $+{varname} at pos $pos\n";
+        }
+
+        # Override Apache2 expressions by the legacy ones
+        $RE{Apache2}{-legacy => 1}
+        # or use it with the Legacy prefix:
+        if( $str =~ /^$RE{Apache2}{LegacyVariable}$/ )
+        {
+            print( "Found variable $+{variable} with name $+{varname}\n" );
+        }
+
+VERSION
+        v0.1.0
+
+DESCRIPTION
+    This is the perl port of Apache2 expressions
+    <https://httpd.apache.org/docs/trunk/en/expr.html>
+
+    The regular expressions have been designed based on Apache2 Backus-Naur
+    Form (BNF) definition as described below in "APACHE2 EXPRESSION"
+
+    You can also use the extended pattern by calling Regexp::Common::Apache2
+    like:
+
+        $RE{Apache2}{-legacy => 1}
+
+    All of the regular expressions use named capture. See "%+" in perlvar
+    for more information on named capture.
+
+APACHE2 EXPRESSION
+  comp
+    BNF:
+
+        stringcomp
+        | integercomp
+        | unaryop word
+        | word binaryop word
+        | word "in" listfunc
+        | word "=~" regex
+        | word "!~" regex
+        | word "in" "{" list "}"
+
+        $RE{Apache2}{Comp}
+
+    For example:
+
+        "Jack" != "John"
+        123 -ne 456
+        # etc
+
+    This uses other expressions namely "stringcomp", "integercomp", "word",
+    "listfunc", "regex", "list"
+
+    The capture names are:
+
+    *comp*
+        Contains the entire capture block
+
+    *comp_binary*
+        Matches the expression that uses a binary operator, such as:
+
+            ==, =, !=, <, <=, >, >=, -ipmatch, -strmatch, -strcmatch, -fnmatch
+
+    *comp_binaryop*
+        The binary op used if the expression is a binary comparison. Binary
+        operator is:
+
+            ==, =, !=, <, <=, >, >=, -ipmatch, -strmatch, -strcmatch, -fnmatch
+
+    *comp_integercomp*
+        When the comparison is for an integer comparison as opposed to a
+        string comparison.
+
+    *comp_list*
+        Contains the list used to check a word against, such as:
+
+            "Jack" in {"John", "Peter", "Jack"}
+
+    *comp_listfunc*
+        This contains the *listfunc* when the expressions contains a word
+        checked against a list function, such as:
+
+            "Jack" in listMe("some arguments")
+
+    *comp_regexp*
+        The regular expression used when a word is compared to a regular
+        expression, such as:
+
+            "Jack" =~ /\w+/
+
+        Here, *comp_regexp* would contain "/\w+/"
+
+    *comp_regexp_op*
+        The regular expression operator used when a word is compared to a
+        regular expression, such as:
+
+            "Jack" =~ /\w+/
+
+        Here, *comp_regexp_op* would contain "=~"
+
+    *comp_stringcomp*
+        When the comparison is for a string comparison as opposed to an
+        integer comparison.
+
+    *comp_unary*
+        Matches the expression that uses unary operator, such as:
+
+            -d, -e, -f, -s, -L, -h, -F, -U, -A, -n, -z, -T, -R
+
+    *comp_word*
+        Contains the word that is the object of the comparison.
+
+    *comp_word_in_list*
+        Contains the expression of a word checked against a list, such as:
+
+            "Jack" in {"John", "Peter", "Jack"}
+
+    *comp_word_in_listfunc*
+        Contains the word when it is being compared to a listfunc, such as:
+
+            "Jack" in listMe("some arguments")
+
+    *comp_word_in_regexp*
+        Contains the expression of a word checked against a regular
+        expression, such as:
+
+            "Jack" =~ /\w+/
+
+        Here the word "Jack" (without the parenthesis) would be captured in
+        *comp_word*
+
+    *comp_worda*
+        Contains the first word in comparison expression
+
+    *comp_wordb*
+        Contains the second word in comparison expression
+
+  cond
+    BNF:
+
+        "true"
+        | "false"
+        | "!" cond
+        | cond "&&" cond
+        | cond "||" cond
+        | comp
+        | "(" cond ")"
+
+        $RE{Apache2}{Cond}
+
+    For example:
+
+        use Regexp::Common::Apache qw( $ap_true $ap_false );
+        ($ap_false && $ap_true)
+
+    The capture names are:
+
+    *cond*
+        Contains the entire capture block
+
+    *cond_and*
+        Contains the expression like:
+
+            ($ap_true && $ap_true)
+
+    *cond_false*
+        Contains the false expression like:
+
+            ($ap_false)
+
+    *cond_neg*
+        Contains the expression if it is preceded by an exclamation mark,
+        such as:
+
+            !$ap_true
+
+    *cond_or*
+        Contains the expression like:
+
+            ($ap_true || $ap_true)
+
+    *cond_true*
+        Contains the true expression like:
+
+            ($ap_true)
+
+  expr
+    BNF: cond | string
+
+        $RE{Apache2}{Expr}
+
+    The capture names are:
+
+    *expr*
+        Contains the entire capture block
+
+    *expr_cond*
+        Contains the expression of the condition
+
+    *expr_string*
+        Contains the expression of a string
+
+  function
+    BNF: funcname "(" words ")"
+
+        $RE{Apache2}{Function}
+
+    For example:
+
+        base64("Some string")
+
+    The capture names are:
+
+    *function*
+        Contains the entire capture block
+
+    *function_args*
+        Contains the list of arguments. In the example above, this would be
+        "Some string"
+
+    *function_name*
+        The name of the function . In the example above, this would be
+        "base64"
+
+  integercomp
+    BNF:
+
+        word "-eq" word | word "eq" word
+        | word "-ne" word | word "ne" word
+        | word "-lt" word | word "lt" word
+        | word "-le" word | word "le" word
+        | word "-gt" word | word "gt" word
+        | word "-ge" word | word "ge" word
+
+        $RE{Apache2}{IntegerComp}
+
+    For example:
+
+        123 -ne 456
+        789 gt 234
+        # etc
+
+    The hyphen before the operator is optional, so you can say "eq" instead
+    of "-eq"
+
+    The capture names are:
+
+    *stringcomp*
+        Contains the entire capture block
+
+    *integercomp_op*
+        Contains the comparison operator
+
+    *integercomp_worda*
+        Contains the first word in the string comparison
+
+    *integercomp_wordb*
+        Contains the second word in the string comparison
+
+  join
+    BNF:
+
+        "join" ["("] list [")"]
+        | "join" ["("] list "," word [")"]
+
+        $RE{Apache2}{Join}
+
+    For example:
+
+        join({"word1" "word2"})
+        # or
+        join({"word1" "word2"}, ', ')
+
+    This uses "list" and "word"
+
+    The capture names are:
+
+    *join*
+        Contains the entire capture block
+
+    *join_list*
+        Contains the value of the list
+
+    *join_word*
+        Contains the value for word used to join the list
+
+  list
+    BNF:
+
+        split
+        | listfunc
+        | "{" words "}"
+        | "(" list ")
+
+        $RE{Apache2}{List}
+
+    For example:
+
+        split( /\w+/, "Some string" )
+        # or
+        {"some", "words"}
+        # or
+        (split( /\w+/, "Some string" ))
+        # or
+        ( {"some", "words"} )
+
+    This uses "split", "listfunc", words and "list"
+
+    The capture names are:
+
+    *list*
+        Contains the entire capture block
+
+    *list_func*
+        Contains the value if a "listfunc" is used
+
+    *list_list*
+        Contains the value if this is a list embedded within parenthesis
+
+    *list_split*
+        Contains the value if the list is based on a split
+
+    *list_words*
+        Contains the value for a list of words.
+
+  listfunc
+    BNF: listfuncname "(" words ")"
+
+        $RE{Apache2}{Function}
+
+    For example:
+
+        base64("Some string")
+
+    This is quite similar to the "function" regular expression
+
+    The capture names are:
+
+    *listfunc*
+        Contains the entire capture block
+
+    *listfunc_args*
+        Contains the list of arguments. In the example above, this would be
+        "Some string"
+
+    *listfunc_name*
+        The name of the function . In the example above, this would be
+        "base64"
+
+  regany
+    BNF: regex | regsub
+
+        $RE{Apache2}{Regany}
+
+    For example:
+
+        /\w+/i
+        # or
+        m,\w+,i
+
+    This regular expression includes "regany" and "regsub"
+
+    The capture names are:
+
+    *regany*
+        Contains the entire capture block
+
+    *regany_regex*
+        Contains the regular expression. See "regex"
+
+    *regany_regsub*
+        Contains the substitution regular expression. See "regsub"
+
+  regex
+    BNF:
+
+        "/" regpattern "/" [regflags]
+        | "m" regsep regpattern regsep [regflags]
+
+        $RE{Apache2}{Regex}
+
+    For example:
+
+        /\w+/i
+        # or
+        m,\w+,i
+
+    The capture names are:
+
+    *regex*
+        Contains the entire capture block
+
+    *regflags*
+        The regula expression modifiers. See perlre
+
+        This can be any combination of:
+
+            i, s, m, g
+
+    *regpattern*
+        Contains the regular expression. See perlre for example and
+        explanation of how to use regular expression. Apache2 uses PCRE,
+        i.e. perl compliant regular expressions.
+
+    *regsep*
+        Contains the regular expression separator, which can be any of:
+
+            /, #, $, %, ^, |, ?, !, ', ", ",", ;, :, ".", _, -
+
+  regsub
+    BNF: "s" regsep regpattern regsep string regsep [regflags]
+
+        $RE{Apache2}{Regsub}
+
+    For example:
+
+        s/\w+/John/gi
+
+    The capture names are:
+
+    *regflags*
+        The modifiers used which can be any combination of:
+
+            i, s, m, g
+
+        See perlre for an explanation of their usage and meaning
+
+    *regstring*
+        The string replacing the text found by the regular expression
+
+    *regsub*
+        Contains the entire capture block
+
+    *regpattern*
+        Contains the regular expression which is perl compliant since
+        Apache2 uses PCRE.
+
+    *regsep*
+        Contains the regular expression separator, which can be any of:
+
+            /, #, $, %, ^, |, ?, !, ', ", ",", ;, :, ".", _, -
+
+  split
+    BNF:
+
+        "split" ["("] regany "," list [")"]
+        | "split" ["("] regany "," word [")"]
+
+        $RE{Apache2}{Split}
+
+    For example:
+
+        split( /\w+/, "Some string" )
+
+    This uses "regany", "list" and "word"
+
+    The capture names are:
+
+    *split*
+        Contains the entire capture block
+
+    *split_regex*
+        Contains the regular expression used for the split
+
+    *split_list*
+        The list being split. It can also be a word. See below
+
+    *split_word*
+        The word being split. It can also be a list. See above
+
+  string
+    BNF: substring | string substring
+
+        $RE{Apache2}{String}
+
+    For example:
+
+        URI accessed is: %{REQUEST_URI}
+
+    The capture names are:
+
+    *string*
+        Contains the entire capture block
+
+  stringcomp
+    BNF:
+
+        word "==" word
+        | word "!=" word
+        | word "<"  word
+        | word "<=" word
+        | word ">"  word
+        | word ">=" word
+
+        $RE{Apache2}{StringComp}
+
+    For example:
+
+        "John" == "Jack"
+        sub(s/\w+/Jack/i, "John") != "Jack"
+        # etc
+
+    The capture names are:
+
+    *stringcomp*
+        Contains the entire capture block
+
+    *stringcomp_op*
+        Contains the comparison operator
+
+    *stringcomp_worda*
+        Contains the first word in the string comparison
+
+    *stringcomp_wordb*
+        Contains the second word in the string comparison
+
+  sub
+    BNF: "sub" ["("] regsub "," word [")"]
+
+        $RE{Apache2}{Sub}
+
+    For example:
+
+        sub(s/\w/John/gi,"Peter")
+
+    The capture names are:
+
+    *sub*
+        Contains the entire capture block
+
+    *sub_regsub*
+        Contains the substitution expression, i.e. in the example above,
+        this would be:
+
+            s/\w/John/gi
+
+    *sub_word*
+        The target for the substitution. In the example above, this would be
+        "Peter"
+
+  substring
+    BNF: cstring | variable
+
+        $RE{Apache2}{Substring}
+
+    For example:
+
+        Jack
+        # or
+        %{REQUEST_URI}
+        # or
+        %{:sub(s/\b\w+\b/Peter/, "John"):}
+
+    See "variable" and "word" regular expression for more on those.
+
+    The capture names are:
+
+    *substring*
+        Contains the entire capture block
+
+  variable
+    BNF:
+
+        "%{" varname "}"
+        | "%{" funcname ":" funcargs "}"
+        | "%{:" word ":}"
+        | "%{:" cond ":}"
+        | rebackref
+
+        $RE{Apache2}{Variable}
+        # or
+        $RE{Apache2}{LegacyVariable}
+
+    For example:
+
+        %{REQUEST_URI}
+        # or
+        %{md5:"some string"}
+        # or
+        %{:sub(s/\b\w+\b/Peter/, "John"):}
+        # or a reference to previous regular expression capture groups
+        $1, $2, etc..
+
+    See "word" and "cond" regular expression for more on those.
+
+    The capture names are:
+
+    *variable*
+        Contains the entire capture block
+
+    *var_cond*
+        If this is a condition inside a variable, such as:
+
+            %{:$ap_true == $ap_false}
+
+    *var_func_args*
+        Contains the function arguments.
+
+    *var_func_name*
+        Contains the function name.
+
+    *var_word*
+        A variable containing a word. See "word" for more information about
+        word expressions.
+
+    *varname*
+        Contains the variable name without the percent sign or dollar sign
+        (if legacy regular expression is enabled) or the possible
+        surrounding accolades
+
+  word
+    BNF:
+
+        digits
+        | "'" string "'"
+        | '"' string '"'
+        | word "." word
+        | variable
+        | sub
+        | join
+        | function
+        | "(" word ")"
+
+        $RE{Apache2}{Word}
+
+    This is the most complex regular expression used, since it uses all the
+    others and can recurse deeply
+
+    For example:
+
+        12
+        # or
+        "John"
+        # or
+        'Jack'
+        # or
+        %{REQUEST_URI}
+        # or
+        %{HTTP_HOST}.%{HTTP_PORT}
+        # or
+        %{:sub(s/\b\w+\b/Peter/, "John"):}
+        # or
+        sub(s,\w+,Paul,gi, "John")
+        # or
+        join({"Paul", "Peter"}, ', ')
+        # or
+        md5("some string")
+        # or any word surrounded by parenthesis, such as:
+        ("John")
+
+    See "string", "word", "variable", "sub", "join", "function" regular
+    expression for more on those.
+
+    The capture names are:
+
+    *word*
+        Contains the entire capture block
+
+    *word_digits*
+        If the word is actually digits, thise contains those digits.
+
+    *word_dot_word*
+        This contains the text when two words are separated by a dot.
+
+    *word_enclosed*
+        Contains the value of the word enclosed by single or double quotes
+        or by surrounding parenthesis.
+
+    *word_function*
+        Contains the word containing a "function"
+
+    *word_join*
+        Contains the word containing a "join"
+
+    *word_quote*
+        If the word is enclosed by single or double quote, this contains the
+        single or double quote character
+
+    *word_sub*
+        If the word is a substitution, this contains tha substitution
+
+    *word_variable*
+        Contains the word containing a "variable"
+
+  words
+    BNF:
+
+        word
+        | word "," list
+
+        $RE{Apache2}{Words}
+
+    For example:
+
+        "Jack"
+        # or
+        "John", {"Peter", "Paul"}
+        # or
+        sub(s/\b\w+\b/Peter/, "John"), {"Peter", "Paul"}
+
+    See "word" and "list" regular expression for more on those.
+
+    The capture names are:
+
+    *words*
+        Contains the entire capture block
+
+    *words_word*
+        Contains the word
+
+    *words_list*
+        Contains the list
+
+LEGACY
+    There are 2 expressions that can be used as legacy:
+
+    *comp*
+        See "comp"
+
+    *variable*
+        See "variable"
+
+CHANGES & CONTRIBUTIONS
+    Feel free to reach out to the author for possible corrections,
+    improvements, or suggestions.
+
+AUTHOR
+    Jacques Deguest <jack@deguest.jp>
+
+SEE ALSO
+    <https://httpd.apache.org/docs/trunk/en/expr.html>
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2020 DEGUEST Pte. Ltd.
+
+    You can use, copy, modify and redistribute this package and associated
+    files under the same terms as Perl itself.
+

@@ -3,7 +3,7 @@ package Mojolicious::Plugin::SecureCORS;
 use Mojo::Base 'Mojolicious::Plugin';
 use Carp;
 
-our $VERSION = 'v2.0.3';
+our $VERSION = 'v2.0.4';
 
 use List::MoreUtils qw( any none );
 
@@ -199,7 +199,7 @@ Mojolicious::Plugin::SecureCORS - Complete control over CORS
 
 =head1 VERSION
 
-This document describes Mojolicious::Plugin::SecureCORS version v2.0.3
+This document describes Mojolicious::Plugin::SecureCORS version v2.0.4
 
 
 =head1 SYNOPSIS
@@ -222,7 +222,7 @@ This document describes Mojolicious::Plugin::SecureCORS version v2.0.3
         # set CORS options for this route (at least "origin" option must be
         # defined to allow CORS, either here or in parent routes)
         $r->get(…, {'cors.origin' => '*'}, …);
-        $r->route(…)->to('cors.origin' => '*');
+        $r->any(…)->to('cors.origin' => '*');
 
         # allow non-simple (with preflight) CORS on this route
         $r->cors(…);
@@ -342,7 +342,7 @@ handling preflight - see below for example.
 
     $app->routes->cors(...);
 
-Accept same params as L<Mojolicious::Routes::Route/"route">.
+Accept same params as L<Mojolicious::Routes::Route/"any">.
 
 Add handler for preflight (OPTIONS) CORS request - it's required to allow
 non-simple CORS requests on given path.

@@ -4,7 +4,7 @@
       "Phil Pearl (Lobbes) <plobbes+mail-imapclient@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,8 +50,8 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://sourceforge.net/projects/mail-imapclient/"
+      "homepage" : "https://github.com/plobbes/mail-imapclient/"
    },
-   "version" : "3.42",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "3.43",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

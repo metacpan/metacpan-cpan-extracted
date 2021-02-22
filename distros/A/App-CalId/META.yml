@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-App-CalId/issues
   homepage: https://metacpan.org/release/App-CalId
   repository: git://github.com/perlancar/perl-App-CalId.git
-version: '0.131'
+version: '0.132'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

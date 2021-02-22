@@ -5,7 +5,7 @@ This is a Language Server and Debug Protocol Adapter for Perl
 
 It implements the Language Server Protocol which provides
 syntax-checking, symbol search, etc. Perl to various editors, for
-example Visual Stuido Code or Atom.
+example Visual Studio Code or Atom.
 
 https://microsoft.github.io/language-server-protocol/specification
 
@@ -30,6 +30,7 @@ FEATURES
   * Goto Definition
   * Find References
   * Supports multiple workspace folders
+  * Document and selection formatting via perltidy
   * Run on remote system via ssh
 
 * Debugger
@@ -88,8 +89,8 @@ You can also look for information at:
     CPAN Ratings
         http://cpanratings.perl.org/d/Perl-LanguageServer
 
-    Search CPAN
-        http://search.cpan.org/dist/Perl-LanguageServer/
+    MetaCPAN
+        https://metacpan.org/release/Perl-LanguageServer
 
 
 LICENSE AND COPYRIGHT

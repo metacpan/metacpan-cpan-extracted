@@ -258,8 +258,10 @@ sub open_channel {
     # No channel defined, use 'error', or revert to STDERR
     #
 
-    $filename = $self->channels->{'error'} unless
-            defined $filename && length $filename;
+    unless (defined $filename && length $filename) {
+        $filename = $self->channels->{'error'};
+        ($filename, $rotate) = @$filename if ref $filename eq 'ARRAY';
+    }
 
     unless (defined $filename && length $filename) {
         require Log::Agent::Channel::Handle;

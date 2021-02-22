@@ -325,7 +325,7 @@ Example:
 
 =for ref
 
-This method is similar to L<ran_gaussian|/ran_gaussian> except that it takes
+This method is similar to L</ran_gaussian> except that it takes
 the parameters of the distribution as a piddle and returns a piddle of equal
 dimensions.
 
@@ -396,7 +396,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_poisson|/ran_poisson> except that it takes the distribution
+Similar to L</ran_poisson> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -459,7 +459,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_bernoulli|/ran_bernoulli> except that it takes the distribution
+Similar to L</ran_bernoulli> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -485,7 +485,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_beta|/ran_beta> except that it takes the distribution
+Similar to L</ran_beta> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -512,7 +512,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_binomial|/ran_binomial> except that it takes the distribution
+Similar to L</ran_binomial> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -538,7 +538,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_cauchy|/ran_cauchy> except that it takes the distribution
+Similar to L</ran_cauchy> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -565,7 +565,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_chisq|/ran_chisq> except that it takes the distribution
+Similar to L</ran_chisq> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -591,7 +591,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_exponential|/ran_exponential> except that it takes the distribution
+Similar to L</ran_exponential> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -618,7 +618,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_exppow|/ran_exppow> except that it takes the distribution
+Similar to L</ran_exppow> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -645,7 +645,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_fdist|/ran_fdist> except that it takes the distribution
+Similar to L</ran_fdist> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -671,7 +671,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_flat|/ran_flat> except that it takes the distribution
+Similar to L</ran_flat> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -697,7 +697,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_gamma|/ran_gamma> except that it takes the distribution
+Similar to L</ran_gamma> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -724,7 +724,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_geometric|/ran_geometric> except that it takes the distribution
+Similar to L</ran_geometric> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -750,7 +750,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_gumbel1|/ran_gumbel1> except that it takes the distribution
+Similar to L</ran_gumbel1> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -776,7 +776,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_gumbel2|/ran_gumbel2> except that it takes the distribution
+Similar to L</ran_gumbel2> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -805,7 +805,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_hypergeometric|/ran_hypergeometric> except that it takes the distribution
+Similar to L</ran_hypergeometric> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -831,7 +831,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_laplace|/ran_laplace> except that it takes the distribution
+Similar to L</ran_laplace> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -858,7 +858,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_levy|/ran_levy> except that it takes the distribution
+Similar to L</ran_levy> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -884,7 +884,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_logarithmic|/ran_logarithmic> except that it takes the distribution
+Similar to L</ran_logarithmic> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -910,7 +910,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_logistic|/ran_logistic> except that it takes the distribution
+Similar to L</ran_logistic> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -937,7 +937,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_lognormal|/ran_lognormal> except that it takes the distribution
+Similar to L</ran_lognormal> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -966,7 +966,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_negative_binomial|/ran_negative_binomial> except that it takes the distribution
+Similar to L</ran_negative_binomial> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -993,7 +993,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_pareto|/ran_pareto> except that it takes the distribution
+Similar to L</ran_pareto> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -1008,7 +1008,7 @@ Usage:
 
 Fills output piddle with random integer values from the Pascal distribution.
 The Pascal distribution is simply a negative binomial distribution
-(see L<ran_negative_binomial|/ran_negative_binomial>) with an integer value of C<$n>.
+(see L</ran_negative_binomial>) with an integer value of C<$n>.
 
 Usage:
 
@@ -1021,7 +1021,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_pascal|/ran_pascal> except that it takes the distribution
+Similar to L</ran_pascal> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -1047,7 +1047,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_rayleigh|/ran_rayleigh> except that it takes the distribution
+Similar to L</ran_rayleigh> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -1074,7 +1074,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_rayleigh_tail|/ran_rayleigh_tail> except that it takes the distribution
+Similar to L</ran_rayleigh_tail> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -1101,7 +1101,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_tdist|/ran_tdist> except that it takes the distribution
+Similar to L</ran_tdist> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -1128,7 +1128,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_ugaussian_tail|/ran_ugaussian_tail> except that it takes the distribution
+Similar to L</ran_ugaussian_tail> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -1154,7 +1154,7 @@ Usage:
 
 =for ref
 
-Similar to L<ran_weibull|/ran_weibull> except that it takes the distribution
+Similar to L</ran_weibull> except that it takes the distribution
 parameters as a piddle and returns a piddle of equal dimensions.
 
 Usage:
@@ -1186,8 +1186,8 @@ Example:
 =for ref
 
 This method returns a handle that must be used when calling
-L<ran_discrete|/ran_discrete>. You specify the probability of the integer number
-that are returned by L<ran_discrete|/ran_discrete>.
+L</ran_discrete>. You specify the probability of the integer number
+that are returned by L</ran_discrete>.
 
 Usage:
 

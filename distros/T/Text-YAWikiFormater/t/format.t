@@ -58,6 +58,8 @@ Some text in the outside!
 
 [[Some Page Section|SomePage#section]]
 
+[[ Categ > Page ]]
+
 http://www.sapo.pt
 
 {{image: "/images/test.png"}}

@@ -129,10 +129,8 @@ sub new{
 	my $ports_int=0;
 	if ( defined( $args{ports} ) ){
 		while (defined( $args{ports}[$ports_int] )) {
-			if ( $args{ports}[$ports_int] =~ /^[0-9]+$/ ){
+			if ( $args{ports}[$ports_int] =~ /^[0-9\*]+$/ ){
 				$self->{ports}{ $args{ports}[$ports_int] }= $args{ports}[$ports_int];
-			}elsif( $args{ports}[$ports_int] =~ /^\*$/  ){
-				$self->{ports}{'*'}='*';
 			}else{
 				my $port_number=(getservbyname( $args{ports}[$ports_int] , '' ))[2];
 
@@ -224,13 +222,13 @@ sub match{
 	my $fport=$object->foreign_port;
 
 	# If either are non-numeric, resolve them if possible
-	if ( $lport !~ /^[0-9]+$/ ){
+	if ( $lport !~ /^[0-9\*]+$/ ){
 		my $lport_number=(getservbyname( $lport , '' ))[2];
 		if ( defined( $lport_number ) ){
 			$lport=$lport_number;
 		}
 	}
-	if ( $fport !~ /^[0-9]+$/ ){
+	if ( $fport !~ /^[0-9\*]+$/ ){
 		my $fport_number=(getservbyname( $fport , '' ))[2];
 		if ( defined( $fport_number ) ){
 			$fport=$fport_number;

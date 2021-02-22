@@ -4,7 +4,7 @@ use Mojo::ByteStream 'b';
 use Scalar::Util qw/blessed/;
 use Mojo::URL;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 # Todo: Support alternative bases for https-paths
 # Todo: Update to https://tools.ietf.org/html/rfc6570
@@ -131,6 +131,7 @@ sub register {
       my @parts;
       while ($r) {
         my $p = '';
+
         foreach my $part (@{$r->pattern->tree}) {
           my $t = $part->[0];
 
@@ -146,11 +147,15 @@ sub register {
 
           # Various wildcards
           elsif ($t =~ m/^(?:wildcard|placeholder|relaxed)$/) {
+
+            # Support different tree variants in Mojolicious (before and after 9)
+            my $n = ref $part->[1] eq 'ARRAY' ? $part->[1]->[0] : $part->[1];
+
             if (exists $values{$part->[1]}) {
-              $p .= $values{$part->[1]};
+              $p .= $values{$n};
             }
             else {
-              $p .= '{' . $part->[1] . '}';
+              $p .= "{$n}";
             };
           };
         };

@@ -2,10 +2,10 @@
 #define MARPAESLIF_INTERNAL_STRUCTURES_H
 
 #include <marpaESLIF.h>
+#include "config.h"
 /*
  * Prior to genericStack inclusion, we want to define a custom type for performance
  */
-
 #define GENERICSTACK_CUSTOM marpaESLIFValueResult_t
 
 #include <marpaWrapper.h>
@@ -41,6 +41,7 @@ typedef struct  marpaESLIF_alternative     marpaESLIF_alternative_t;
 typedef         marpaESLIFAction_t         marpaESLIF_action_t;
 typedef         marpaESLIFActionType_t     marpaESLIF_action_type_t;
 typedef struct  marpaESLIF_stream          marpaESLIF_stream_t;
+typedef struct  marpaESLIF_stringGenerator marpaESLIF_stringGenerator_t;
 
 /* Symbol types */
 enum marpaESLIF_symbol_type {
@@ -53,7 +54,9 @@ enum marpaESLIF_symbol_type {
 enum marpaESLIF_terminal_type {
   MARPAESLIF_TERMINAL_TYPE_NA = 0,
   MARPAESLIF_TERMINAL_TYPE_STRING,   /* String */
-  MARPAESLIF_TERMINAL_TYPE_REGEX     /* Regular expression */
+  MARPAESLIF_TERMINAL_TYPE_REGEX,    /* Regular expression */
+  MARPAESLIF_TERMINAL_TYPE__EOF,     /* :eof */
+  MARPAESLIF_TERMINAL_TYPE__EOL,     /* :eol */
 };
 
 /* Regex modifiers - we take JPCRE2 matching semantics, c.f. https://neurobin.org/projects/softwares/libs/jpcre2/ */
@@ -107,6 +110,7 @@ struct marpaESLIF_terminal {
   short                       memcmpb;             /* Flag saying that memcmp is possible */
   char                       *bytes;               /* Original UTF-8 bytes, used for memcmp() when possible */
   size_t                      bytel;               /* i.e. when this is a string terminal without modifier */
+  short                       pseudob;             /* Pseudo terminal */
 };
 
 /* Matcher return values */
@@ -205,6 +209,8 @@ struct marpaESLIF_grammar {
   short                  latmb;                              /* Longest acceptable token match mode */
   marpaWrapperGrammar_t *marpaWrapperGrammarStartp;          /* Grammar implementation at :start */
   marpaWrapperGrammar_t *marpaWrapperGrammarStartNoEventp;   /* Grammar implementation at :start forcing no event */
+  size_t                 nTerminall;                         /* Total number of grammar terminals */
+  int                   *terminalArrayp;                     /* Total grammar terminals */
   size_t                 nSymbolStartl;                      /* Number of lexemes at the very beginning of marpaWrapperGrammarStartp */
   int                   *symbolArrayStartp;                  /* Lexemes at the very beginning of marpaWrapperGrammarStartp */
   marpaWrapperGrammar_t *marpaWrapperGrammarDiscardp;        /* Grammar implementation at :discard */
@@ -231,6 +237,7 @@ struct marpaESLIF_grammar {
   int                    discardi;                           /* Discard symbol ID - filled during grammar validation */
   char                  *defaultEncodings;                   /* Default encoding is reader returns NULL */
   char                  *fallbackEncodings;                  /* Fallback encoding is reader returns NULL and tconv fails to detect encoding */
+  short                  fastDiscardb;                       /* True when :discard can be done in the context of the current recognizer */
 };
 
 /* ----------------------------------- */
@@ -241,6 +248,7 @@ struct marpaESLIF {
   marpaESLIFOption_t      marpaESLIFOption;
   marpaESLIF_terminal_t  *anycharp;                    /* internal regex for match any character */
   marpaESLIF_terminal_t  *newlinep;                    /* Internal regex for match newline */
+  marpaESLIFSymbol_t     *newlineSymbolp;              /* Internal symbol for match newline */
   marpaESLIF_terminal_t  *stringModifiersp;            /* Internal regex for match string modifiers */
   marpaESLIF_terminal_t  *characterClassModifiersp;    /* Internal regex for match character class modifiers */
   marpaESLIF_terminal_t  *regexModifiersp;             /* Internal regex for match regex modifiers */
@@ -255,7 +263,24 @@ struct marpaESLIF {
 #ifdef HAVE_LOCALE_H
   struct lconv           *lconvp;
 #endif
+  char                    decimalPointc;
   const uint8_t          *tablesp;                     /* Output of pcre2_maketables */
+#ifdef MARPAESLIF_HAVE_LONG_LONG
+  size_t                  llongmincharsl;              /* Number of digits of LLONG_MIN */
+  size_t                  llongmaxcharsl;              /* Number of digits of LLONG_MAX */
+#else
+  size_t                  longmincharsl;               /* Number of digits of LONG_MIN */
+  size_t                  longmaxcharsl;               /* Number of digits of LONG_MAX */
+#endif
+#ifdef MARPAESLIF_INFINITY
+  float                   positiveinfinityf;           /* +Inf */
+  float                   negativeinfinityf;           /* -Inf */
+#endif
+#ifdef MARPAESLIF_NAN
+  float                   positivenanf;                /* +NaN */
+  float                   negativenanf;                /* -NaN */
+  short                   nanconfidenceb;              /* 1 when ESLIF think that NaN representation is correct */
+#endif
 };
 
 struct marpaESLIFGrammar {
@@ -273,6 +298,9 @@ struct marpaESLIFGrammar {
   size_t                     luaprecompiledl;    /* Lua script source precompiled length in byte */
   marpaESLIF_string_t       *luadescp;           /* Delayed until show is requested */
   int                        internalRuleCounti; /* Internal counter when creating internal rules (groups '(-...-)' and '(...)' */
+  short                      hasPseudoTerminalb; /* Any pseudo terminal in the grammar ? */
+  short                      hasEofPseudoTerminalb; /* Any :eof terminal in the grammar ? */
+  short                      hasEolPseudoTerminalb; /* Any :eol terminal in the grammar ? */
 };
 
 struct marpaESLIF_meta {
@@ -285,8 +313,18 @@ struct marpaESLIF_meta {
   marpaESLIFGrammar_t         _marpaESLIFGrammarLexemeClone;    /* Cloned ESLIF grammar in lexeme search mode (no event): allocated when meta is allocated */
   marpaESLIF_grammar_t        _grammar;
   marpaESLIFGrammar_t         *marpaESLIFGrammarLexemeClonep;   /* Cloned ESLIF grammar in lexeme search mode (no event) */
+  size_t                       nTerminall;                      /* Total number of grammar terminals */
+  int                         *terminalArrayShallowp;           /* Total grammar terminals */
   size_t                       nSymbolStartl;                   /* Number of lexemes at the very beginning of marpaWrapperGrammarStartp */
   int                         *symbolArrayStartp;               /* Lexemes at the very beginning of marpaWrapperGrammarStartp */
+};
+
+struct marpaESLIF_stringGenerator {
+  marpaESLIF_t *marpaESLIFp;
+  char         *s;      /* Pointer */
+  size_t        l;      /* Used size */
+  short         okb;    /* Status */
+  size_t        allocl; /* Allocated size */
 };
 
 struct marpaESLIFValue {
@@ -310,6 +348,8 @@ struct marpaESLIFValue {
   genericHash_t                _afterPtrHash;
   genericHash_t               *afterPtrHashp;
   marpaESLIFRepresentation_t   proxyRepresentationp; /* Proxy representation callback, c.f. json.c for an example */
+  marpaESLIF_stringGenerator_t stringGenerator; /* Internal string generator, put here to avoid unnecessary malloc()/free() calls */
+  genericLogger_t             *stringGeneratorLoggerp; /* Internal string generator logger, put here to avoid unnecessary genericLogger_newp()/genericLogger_freev() calls */
 };
 
 struct marpaESLIF_stream {
@@ -320,8 +360,6 @@ struct marpaESLIF_stream {
   short                  eofb;                 /* EOF flag */
   short                  utfb;                 /* A flag to say if input is UTF-8 correct. Automatically true if charconvb is true. Can be set by regex engine as well. */
   short                  charconvb;            /* A flag to say if latest stream chunk was converted to UTF-8 */
-  char                  *lastFroms;            /* Last from encoding as per user, in user's encoding */
-  size_t                 lastFroml;            /* Last from encoding length as per user, in user's encoding */
   char                  *bytelefts;            /* Buffer when character conversion needs to reread leftover bytes */
   size_t                 byteleftl;            /* Usable length of this buffer */
   size_t                 byteleftallocl;       /* Allocated length of this buffer */
@@ -332,7 +370,6 @@ struct marpaESLIF_stream {
   short                  nextReadIsFirstReadb; /* Flag to say if next read is first read */
   short                  noAnchorIsOkb;        /* Flag to say if the "A" flag in regexp modifiers is allowed: removing PCRE2_ANCHOR is allowed ONLY is the whole stream was read once */
   char                  *encodings;            /* Current encoding. Always != NULL when charconvb is true. Always NULL when charconvb is false. */
-  marpaESLIF_terminal_t *encodingp;            /* Terminal case-insensitive version of current encoding. Always != NULL when charconvb is true. Always NULL when charconvb is false. */
   tconv_t                tconvp;               /* current converter. Always != NULL when charconvb is true. Always NULL when charconvb is false. */
   size_t                 linel;                /* Line number */
   size_t                 columnl;              /* Column number */
@@ -448,6 +485,10 @@ struct marpaESLIFRecognizer {
 
   /* We always maintain a shallow pointer to the top-level recognizer, to ease access to lua state */
   marpaESLIFRecognizer_t      *marpaESLIFRecognizerTopp;
+
+  /* At every recognizer pass, we use this array whose size is equal to the total number of marpa grammar terminals */
+  /* and we set here the number of expected grammar terminals */
+  int                         *expectedTerminalArrayp;   /* Total list of expected terminals */
 };
 
 struct marpaESLIF_lexeme_data {

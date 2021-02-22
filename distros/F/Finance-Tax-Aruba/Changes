@@ -1,5 +1,15 @@
 Revision history for Finance-Tax-Aruba
 
+0.003     2021-02-16 15:12:19Z
+
+    * Update POD for bin/loon.pl
+    * Update POD for xtests
+    * Calculate based on yearly figures in bin/loon.pl
+    * Small bug fixes
+    * Add tax-free option in bin/loon.pl
+    * AZV/OAV/AWW cannot be divided by the months unlike income tax
+    * Update income taxes for 2021
+
 0.002     2020-06-20 13:04:22Z
 
     * Add pension support for 2020

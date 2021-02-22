@@ -1,6 +1,6 @@
 package SQL::Interp;
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 use strict;
 use warnings;
@@ -54,33 +54,16 @@ my $items_ref = undef;
 # [local to sql_interp functions]
 my $is_var_used = 0;
 
-# state item (SQL::Iterpolate or DBI handle) used in interpolation.
-# [local to sql_interp functions]
-my $state = undef;
-
 # bind elements in interpolation
 # [local to sql_interp functions]
 my @bind;
 
-# only used by DBIx::Interp, so not further documented here
+# only used by DBIx::Interp, so not further documented here.
+# Doesn't do anything, but may accept options to influence sql_interp()'s behavior in the future.
 sub new {
-    my $class = shift;
-
-    # process special params.
-    my $dbh;
-    while (ref $_[0] ne '') {
-        if (UNIVERSAL::isa($_[0], 'DBI::db')) {
-            $dbh = shift;
-        }
-    }
-    my %params = @_;
-
-    # build object
-    my $self = bless {
-        dbh                   => $dbh,
-    }, $class;
-    return $self;
+    bless {}, shift;
 }
+
 
 # note: sql_interp is not reentrant.
 sub sql_interp {
@@ -91,19 +74,10 @@ sub sql_interp {
     $idx = 0;
     $items_ref = undef;
     $is_var_used = 0;
-    $state = undef;
     @bind = ();
 
-    # extract state item (if any)
-    my $interp;
-    if (UNIVERSAL::isa($items[0], 'SQL::Interp')) {
-        $state = $interp = $items[0];
-    }
-    elsif (UNIVERSAL::isa($items[0], 'DBI::db')) {
-        $state = $items[0];
-    }
-
-    shift @items if $state;
+    # Legacy: We may be called with an object as first argument; it's unused so throw it away
+    shift @items if UNIVERSAL::isa($items[0], 'SQL::Interp') || UNIVERSAL::isa($items[0], 'DBI::db');
 
     $items_ref = \@items;
 
@@ -705,6 +679,12 @@ To work under strict mode, you need to concatenate the strings instead:
 
     sql_interp("SELECT * FROM "."foo"."WHERE a = ",\$b);
 
+Note that strict mode only checks the immediate arguments of
+C<sql_interp_strict()>, it does not check nested interpolation using the
+C<sql()> function (described below). Thus, the previous example can also be
+written as:
+
+    sql_interp(sql("SELECT * FROM ","foo","WHERE a = "),\$b);
 
 =head1 A Couple Helper Functions You Sometimes Need
 
@@ -825,22 +805,8 @@ Also thanks to: Mark Tiefenbruck (syntax), Wojciech Pietron (Oracle compat),
 Jim Chromie (DBIx::Interp idea), Juerd Waalboer, Terrence Brannon (early
 feedback), and others.
 
-If you like SQL::Interp, please consider supporting the project by adding
-support for the 'quote_char' and 'name_sep' options. SQL::Abstract has code
-that can be borrowed for this. See this bug report for details:
-http://rt.cpan.org/Public/Bug/Display.html?id=31488
-
-If you use SQL::Interp with PostgreSQL and are interested in a further
-performance improvement, considering working on this optimization: "RT#39778:
-wish: optimize IN() to be ANY() for compatible PostgreSQL versions":
-https://rt.cpan.org/Ticket/Display.html?id=39778
-
 The SQL::Interp Git repository is hosted at
 L<https://code.blicky.net/yorhel/SQL-Interp>.
-
-=head1 Bug Reporting
-
-Use rt.cpan.org for bug reports.
 
 =head1 License
 
@@ -848,7 +814,7 @@ Copyright (c) 2004-2005 David Manura.
 
 Copyright (c) 2005-2019 Mark Stosberg.
 
-Copyright (c) 2019 Yoran Heling.
+Copyright (c) 2019-2021 Yoran Heling.
 
 This module is free software. It may be used, redistributed
 and/or modified under the same terms as Perl itself.

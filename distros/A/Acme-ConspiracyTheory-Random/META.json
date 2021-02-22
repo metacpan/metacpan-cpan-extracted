@@ -51,7 +51,7 @@
    "provides" : {
       "Acme::ConspiracyTheory::Random" : {
          "file" : "lib/Acme/ConspiracyTheory/Random.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Acme-ConspiracyTheory-Random/project"
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_provides_scripts" : {
       "conspire" : {
          "file" : "bin/conspire"

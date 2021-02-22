@@ -4,12 +4,13 @@ use warnings;
 package CMGITtests;
 
 use Config;
-use Test::More tests => 30;
+use Test::More tests => 35;
 use Capture::Tiny qw(capture);
 use Class::Mock::Generic::InterfaceTester;
 
 # Basics: if we mock a method call fixture, it works.
 correct_method_call_gets_correct_results();
+correct_method_call_gets_correct_results_from_file();
 
 # Check that we can set_name
 set_name_not_mocked();
@@ -40,6 +41,7 @@ with_mocked_ok( sub {
 # The various ways we have of adding fixtures work fine.
 add_fixtures_method_not_mocked();
 add_fixtures_arrayref();
+add_fixtures_from_file();
 add_fixtures_list();
 add_fixtures_ordered_hash();
 add_fixtures_input_omitted();
@@ -121,9 +123,21 @@ sub didnt_run_all_tests {
 sub correct_method_call_gets_correct_results {
     my $interface = Class::Mock::Generic::InterfaceTester->new([
         { method => 'foo', input => ['foo'], output => 'foo' },
+        { method => 'bar', input => ['bar'], output => 'bar' },
     ]);
 
     ok($interface->foo('foo') eq 'foo', "correct method call gets right result back");
+    ok($interface->bar('bar') eq 'bar', "... twice");
+}
+
+sub correct_method_call_gets_correct_results_from_file {
+    my $interface = Class::Mock::Generic::InterfaceTester->new(
+        \"t/tests-in-a-file.dd"
+    );
+
+    note("Loaded tests from file");
+    ok($interface->foo('foo') eq 'foo', "correct method call gets right result back");
+    ok($interface->bar('bar') eq 'bar', "... twice");
 }
 
 sub run_out_of_tests {
@@ -241,6 +255,16 @@ sub add_fixtures_arrayref {
         \[qw(on a carousel)],
         'can return some random other type of ref'
     );
+}
+
+sub add_fixtures_from_file {
+    my $interface_tester = Class::Mock::Generic::InterfaceTester->new;
+    $interface_tester->add_fixtures(
+        \"t/tests-in-a-file.dd"
+    );
+    note("Loaded tests from file");
+    ok($interface_tester->foo('foo') eq 'foo', "correct method call gets right result back");
+    ok($interface_tester->bar('bar') eq 'bar', "... twice");
 }
 
 sub add_fixtures_list {

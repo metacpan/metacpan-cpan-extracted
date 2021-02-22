@@ -1,16 +1,16 @@
+use v5.16;
+
 package Module::Release::PAUSE;
 
 use strict;
 use warnings;
 use Exporter qw(import);
-use vars qw($VERSION);
 
 use Carp qw(croak);
 
-our @EXPORT = qw(
-	);
+our @EXPORT = qw();
 
-$VERSION = '2.125';
+our $VERSION = '2.127';
 
 =encoding utf8
 
@@ -20,16 +20,13 @@ Module::Release::PAUSE - Interact with the Perl Authors Upload Server (PAUSE)
 
 =head1 SYNOPSIS
 
+=head1 DESCRIPTION
+
 The release script automatically loads this module if it thinks that you
 want to upload to PAUSE by noticing the C<cpan_user> configuration
 directive.
 
-=head1 DESCRIPTION
-
-=over 4
-
-
-=back
+There's nothing here yet.
 
 =head1 SEE ALSO
 
@@ -47,7 +44,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2018, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2007-2021, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

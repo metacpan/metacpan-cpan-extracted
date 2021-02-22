@@ -1,22 +1,15 @@
+use strict;
+
 use ExtUtils::MakeMaker;
-
-BEGIN {
-eval 'use blib "../ExtUtils";' # For KGB development
-if -e "../ExtUtils";
-}
-
-use ExtUtils::F77; # This should work most of the time
+use Config;
+use Devel::CheckLib qw(check_lib);
+use ExtUtils::F77; # need imports else doesn't work
 
 # Examples of how to explicitly override default automatic choice
 # of OS and compiler (currently commented out):
 
 #use ExtUtils::F77 qw(solaris); 
 #use ExtUtils::F77 qw(generic g77); 
-
-use Config;
-use IO::File;
-
-use strict;
 
 # use command line KEY=VALUE to override defaults.  VALUES are comma
 # separated lists
@@ -35,7 +28,7 @@ my %Arg = (
 	   LDIR => undef,
 
 	   # extra libraries and directories
-	   EXLIB => 'png12,z',
+	   EXLIB => join(',', grep check_lib(lib => $_), qw(png12 png16 z)),
 	   EXDIR => '/Applications/PDL/pgplot,/usr/local/lib',
 	  );
 
@@ -149,8 +142,7 @@ sub find_required_driver_libs ($) {
 
     my $retval = "";
 
-    my $fh = IO::File->new( "< $infile" )
-	or return $retval;
+    open my $fh, '<', $infile or return $retval;
 
     # known library requirements
     #
@@ -235,6 +227,12 @@ if ( $is_vms ) {
        $items{LDFLAGS} = $Config{ldflags};
        $items{LDDLFLAGS} = $Config{lddlflags};
        
+       # Added this 11/1/2021 to avoid warnings about 'compact unwinds' on MacOS11
+       my @darwin_vers = split("\\.",$Config{osvers});  # Darwin version XX.YY.ZZ
+       if ($darwin_vers[0]>=20) { # Big Sur
+          $items{LDDLFLAGS} .= "  -Wl,-no_compact_unwind"; # Avoid mess of warnings about this
+       }
+
        # Karl - now figure out automagically WHICH binary arch
        # to build for and change the various flags
        
@@ -250,8 +248,8 @@ if ( $is_vms ) {
 
 WriteMakefile(
     'NAME'	=> 'PGPLOT',
-    'CONFIGURE_REQUIRES' => { 'ExtUtils::F77' => 1.13 },
-    'PREREQ_PM' => { 'ExtUtils::F77' => 1.13 },
+    'CONFIGURE_REQUIRES' => { 'ExtUtils::F77' => 1.13, 'Devel::CheckLib' => '1.14' },
+    'TEST_REQUIRES' => { 'Test::More' => '0.88' },
     'VERSION_FROM'	=> 'PGPLOT.pm',
     'dist'      => { COMPRESS=>"gzip", SUFFIX=>"gz" },
     'depend'    => { '$(OBJECT)' => q[pgfun.c arrays.c PGPLOT.c]},
@@ -259,11 +257,18 @@ WriteMakefile(
        "meta-spec" => { version => 2 },
        dynamic_config => 1, # deps actually do change
        resources => {
-          bugtracker  => 'https://github.com/PDLPorters/perl5-PGPLOT/issues',
+          bugtracker  => {web=>'https://github.com/PDLPorters/perl5-PGPLOT/issues'},
           repository  => {
              url => 'git://github.com/PDLPorters/perl5-PGPLOT.git',
              type => 'git',
              web => 'https://github.com/PDLPorters/perl5-PGPLOT',
+          },
+       },
+       prereqs => {
+          develop => {
+             requires => {
+                'CPAN::Changes' => '0',
+             },
           },
        },
        x_IRC => 'irc://irc.perl.org/#pdl',

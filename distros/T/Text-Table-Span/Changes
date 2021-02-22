@@ -1,0 +1,67 @@
+0.009   2021-02-20  Released-By: PERLANCAR; Urgency: high
+
+        - Rename module from Text::Table::Span to Text::Table::More. The old
+          name is deprecated.
+
+
+0.008   2021-02-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add wide character and color support.
+
+	- Recognize attribute: valign.
+
+
+0.007   2021-02-19  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	- Add arguments: row_attrs (to specify per-row attributes), col_attrs
+          (to specify per-column attributes) in addition to per-cell attributes
+          in cell_attrs.
+
+        - Add argument: align. Recognize attribute: align (per-table, per-row,
+          per-column, as well as per-cell).
+
+        - [incompatible change] Only observe bottom_border & top_border in
+          per-row attributes.
+
+
+0.006   2021-02-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Update/fix example code.
+
+
+0.005   2021-02-19  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	- [incompatible change] Rename argument 'row_separator' to
+	  'separate_rows' to follow Text::Table::Tiny and
+	  Text::Table::TinyBorderStyle.
+
+
+0.004   2021-02-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add missing prereq [GH#1].
+
+
+0.003   2021-02-16  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Mention Acme::CPANModules::TextTable.
+
+	- [doc] Fix POD formatting.
+
+
+0.002   2021-02-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] In Synopsis, add sample output using border style
+          UTF8::SingleLineBoldHeader.
+
+	- [doc] Update term in sample code's comment.
+
+	- [testing] Remove extraneous, unused code in test.
+
+
+0.001   2021-02-14  Released-By: PERLANCAR
+
+        - First release.

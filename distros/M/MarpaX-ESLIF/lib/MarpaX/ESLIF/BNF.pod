@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 4.0.1
+version 5.0.7
 
 =head1 DESCRIPTION
 
@@ -39,9 +39,9 @@ They consist of C<bare names>, or can be enclosed in angle brackets if whitespac
 
 The grammar can contain multiple levels, the level syntax being:
 
-  ::=         # Alias for level 0
-    ~         # Alias for level 1
-  :[\d]+:=    # General form
+  ::=           # Alias for level 0
+    ~           # Alias for level 1
+  :\[[\d]+\]:=  # General form
 
 The level 0 must exist. We will use only C<::=> and/or C<~> in the rest of this document for conveniene, though we are adressing any possible level.
 
@@ -55,9 +55,25 @@ A rule consist of a left symbol, followed by the level, followed by one or more 
 
 =item Terminals
 
-There are three types of explicit terminals.
+There are four types of explicit terminals.
 
 =over
+
+=item * Pseudo terminals
+
+=over
+
+=item :eof
+
+A zero-length terminal that matches only at the of the stream.
+
+=item :eol
+
+A zero-length terminal that matches only after a newline.
+
+Note that the newline is hardcoded to be any unicode newline, i.e. C<(*BSR_UNICODE)\R> in PCRE2 terminology. The presence of :eol pseudo-terminal anywhere in the grammar enforces the C<newlineb> flag in recognizers.
+
+=back
 
 =item * Strings
 
@@ -166,7 +182,12 @@ Without any indication, a lexeme is always assumed to be at the grammar of the n
 
   X ::= Y@'Grammar Description'
 
-This is working because a grammar description is unique across all sub-grammars.
+This is working because a grammar description is unique across all sub-grammars. Note that when accessing a grammar by description, the later must have been declared before, using the C<:desc> rule. Therefore a good practice is to forward declare all grammars at the beginning, e.g.:
+
+  :desc    ::= 'Main Grammar'
+  :desc      ~ 'Sub Grammar 1'
+  :desc :[2]:= 'Sub Grammar 2'
+  :desc :[3]:= 'Sub Grammar 3'
 
 =item explicitely by relative level
 
@@ -332,7 +353,15 @@ The C<:discard> symbol, despite belonging to a given grammar, is not accessible 
   :discard ::= symbolname1 event => discard_symbolname1$
   :discard ::= symbolname2 event => discard_symbolname2$
 
-Note than when an event is set, this will be triggered only on the C<:discard>'s RHS completion, therefore the RHS of the C<:discard> must be an LHS in the same grammar when there is an event setting.
+Note than when an event is set, this will be triggered only on the C<:discard>'s RHS completion, therefore the RHS of the C<:discard> must be an LHS in the same grammar when there is an event setting and when C<:discard> refers to a symbol.
+
+An explicit terminal can also be set directly, e.g.:
+
+  :discard ::= /[\s]+/                                                                        event => whitespace$
+  :discard ::= /(?:(?:#)(?:[^\n]*)(?:\n|\z))/u                                                event => perl_comment$
+  :discard ::= /(?:(?:(?://)(?:[^\n]*)(?:\n|\z))|(?:(?:/\*)(?:(?:[^\*]+|\*(?!/))*)(?:\*/)))/u event => cplusplus_comment$
+
+this form is highly recommended, because ESLIF recognizes the case where C<:discard> consist only of explicit terminals, and applies an optimization that prevent the intanciation of an internal parse.
 
 =item Events
 
@@ -400,7 +429,7 @@ The grammar's C<symbol-action> can be overwritten by setting such entry in C<:le
   :lexeme   ::= symbolname2 symbol-action => Custom_action
   :terminal ::= 'ThisTerminal' symbol-action => ::lua->lua_custom_action
 
-A lexeme or a terminal can have a C<if-action> setting, that applies I<only> when the lexeme or a terminal is discovered via the automatic scan. The C<if-action> must refer to a callback in user-land's recognizer interface or in embedded lua interpreter, and must return a boolean:
+A lexeme or a terminal can have an C<if-action> setting, that applies I<only> when the lexeme or a terminal is discovered via the automatic scan. The C<if-action> must refer to a callback in user-land's recognizer interface or in embedded lua interpreter, and must return a boolean:
 
   :lexeme   ::= symbolname1 if-action => Custom_action1
   :lexeme   ::= symbolname2 if-action => lua::->Custom_action2
@@ -420,9 +449,9 @@ Completion, predicted or nulled events are supported, targetting a symbol name. 
 
 For example:
 
-  event a     = completed  symbolname
-  event b=off = nulled     symbolname
-  event c=on  = predicted ^symbolname
+  event symbolname$      = completed symbolname
+  event symbolname[]=off = nulled    symbolname
+  event ^symbolname=on   = predicted symbolname
 
 =item Generic event callback
 
@@ -662,8 +691,8 @@ Events can be specified, with an eventual initializer, given that default initia
 A name can be associated to the rule, in the form:
 
   name => something
-  name => 'quoted name'  # No modifier is allowed after the string
-  name => "quoted name"  # No modifier is allowed after the string
+  name => 'quoted string literal'  # No modifier is allowed after the string
+  name => "quoted string literal"  # No modifier is allowed after the string
 
 =back
 
@@ -682,9 +711,12 @@ MarpaX::ESLIF BNF can be expressed in itself:
    */
   :start                         ::= statements
   :desc                          ::= 'G1'
-  :discard                       ::= <whitespace>
-  :discard                       ::= <perl comment>
-  :discard                       ::= <cplusplus comment>
+   # whitespace
+  :discard                       ::= /[\s]+/
+   # perl comment
+  :discard                       ::= /(?:(?:#)(?:[^\n]*)(?:\n|\z))/u
+   # C++ comment
+  :discard                       ::= /(?:(?:(?:\/\/)(?:[^\n]*)(?:\n|\z))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/))*)(?:\*\/)))/u
   
   /*
    * ***************
@@ -717,8 +749,9 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | <exception statement>
                                    | <autorank statement>
                                    | <lua script statement>
+                                   | <terminal rule>
   <start rule>                   ::= ':start' <op declare> <symbol>
-  <desc rule>                    ::= ':desc' <op declare> <quoted name>
+  <desc rule>                    ::= ':desc' <op declare> <quoted string literal>
   <empty rule>                   ::= <lhs> <op declare> <adverb list>
   <null statement>               ::= ';'
   <statement group>              ::= '{' <statements> '}'
@@ -727,12 +760,13 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <discard rule>                 ::= ':discard' <op declare> <rhs primary> <adverb list>
   <default rule>                 ::= ':default' <op declare> <adverb list>
   <lexeme rule>                  ::= ':lexeme' <op declare> <symbol> <adverb list>
-  <completion event declaration> ::= 'event' <event initialization> '=' 'completed' <symbol name>
-                                   | 'event' <event initialization> <op declare> 'completed' <symbol name>
-  <nulled event declaration>     ::= 'event' <event initialization> '=' 'nulled' <symbol name>
-                                   | 'event' <event initialization> <op declare> 'nulled' <symbol name>
-  <prediction event declaration> ::= 'event' <event initialization> '=' 'predicted' <symbol name>
-                                   | 'event' <event initialization> <op declare> 'predicted' <symbol name>
+  <terminal rule>                ::= ':terminal' <op declare> <terminal> <adverb list>
+  <completion event declaration> ::= 'event' <event initialization> '=' 'completed' <symbol>
+                                   | 'event' <event initialization> <op declare> 'completed' <symbol>
+  <nulled event declaration>     ::= 'event' <event initialization> '=' 'nulled' <symbol>
+                                   | 'event' <event initialization> <op declare> 'nulled' <symbol>
+  <prediction event declaration> ::= 'event' <event initialization> '=' 'predicted' <symbol>
+                                   | 'event' <event initialization> <op declare> 'predicted' <symbol>
   <inaccessible statement>       ::= 'inaccessible' 'is' <inaccessible treatment> 'by' 'default'
   <inaccessible treatment>       ::= 'warn'
                                    | 'ok'
@@ -771,10 +805,11 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | <regex action>
   <action>                       ::= 'action' /=>|\x{21D2}/u <action name>
                                    | 'action' /=>|\x{21D2}/u <string literal>
+                                   | 'action' /=>|\x{21D2}/u <quoted string literal>
   <left association>             ::= 'assoc' /=>|\x{21D2}/u 'left'
   <right association>            ::= 'assoc' /=>|\x{21D2}/u 'right'
   <group association>            ::= 'assoc' /=>|\x{21D2}/u 'group'
-  <separator specification>      ::= 'separator' /=>|\x{21D2}/u <single symbol>
+  <separator specification>      ::= 'separator' /=>|\x{21D2}/u <rhs primary>
   <proper specification>         ::= 'proper' /=>|\x{21D2}/u <false>
                                    | 'proper' /=>|\x{21D2}/u <true>
   <hide separator specification> ::= 'hide-separator' /=>|\x{21D2}/u <false>
@@ -799,13 +834,14 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <null adverb>                  ::= ','
   <symbol action>                ::= 'symbol-action' /=>|\x{21D2}/u <symbol action name>
                                    | 'symbol-action' /=>|\x{21D2}/u <string literal>
+                                   | 'symbol-action' /=>|\x{21D2}/u <quoted string literal>
   <if action>                    ::= 'if-action' /=>|\x{21D2}/u <if action name>
   <regex action>                 ::= 'regex-action' /=>|\x{21D2}/u <regex action name>
   <event action>                 ::= 'event-action' /=>|\x{21D2}/u <event action name>
   <default encoding>             ::= 'default-encoding' /=>|\x{21D2}/u <default encoding name>
   <fallback encoding>            ::= 'fallback-encoding' /=>|\x{21D2}/u <fallback encoding name>
   <alternative name>             ::= <standard name>
-                                   | <quoted name>
+                                   | <quoted string literal>
   <event name>                   ::= <restricted ascii graph name>
                                    | ':symbol'
                                    | ':discard[on]'
@@ -821,12 +857,14 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | '(-' <rhs primary> <quantifier> <adverb list> '-)'
                                    | '(' <rhs primary> <quantifier> <adverb list> ')'
   <rhs primary>                  ::= <single symbol>
-                                   | <symbol name> '@' <grammar reference>
+                                   | <symbol> '@' <grammar reference>
   <single symbol>                ::= <symbol>
                                    | <terminal>
   <terminal>                     ::= <character class>
                                    | <regular expression>
                                    | <quoted string>
+                                   | ':eof'
+                                   | ':eol'
   <symbol>                       ::= <symbol name>
   <symbol name>                  ::= <bare name>
                                    | <bracketed name>
@@ -883,10 +921,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <lua script statement>         ::= '<luascript>' <discard off> <lua script source> '</luascript>' <discard on>
   <lua script source>            ::= /[\s\S]/*
   
-  <whitespace>                     ~ /[\s]+/
-  <perl comment>                   ~ /(?:(?:#)(?:[^\n]*)(?:\n|\z))/u
-  <cplusplus comment>              ~ /(?:(?:(?:\/\/)(?:[^\n]*)(?:\n|\z))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/))*)(?:\*\/)))/u
-  <op declare any grammar>         ~ /:\[\d+\]:=/
+  <op declare any grammar>         ~ /:\[[\d]+\]:=/
   <op declare top grammar>         ~ '::='
   <op declare lex grammar>         ~ '~'
   <op loosen>                      ~ '||'
@@ -905,7 +940,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <bracketed name string>          ~ /[\s\w]+/
   <quoted string>                  ~ /(?:(?|(?:')(?:[^\\']*(?:\\.[^\\']*)*)(?:')|(?:")(?:[^\\"]*(?:\\.[^\\"]*)*)(?:")|(?:\x{201C})(?:[^\\\x{201D}]*(?:\\.[^\\\x{201D}]*)*)(?:\x{201D})))/su
                                    | /(?:(?|(?:')(?:[^\\']*(?:\\.[^\\']*)*)(?:')|(?:")(?:[^\\"]*(?:\\.[^\\"]*)*)(?:")|(?:\x{201C})(?:[^\\\x{201D}]*(?:\\.[^\\\x{201D}]*)*)(?:\x{201D})))/su ':' /ic?/
-  <quoted name>                    ~ /(?:(?|(?:')(?:[^\\']*(?:\\.[^\\']*)*)(?:')|(?:")(?:[^\\"]*(?:\\.[^\\"]*)*)(?:")|(?:\x{201C})(?:[^\\\x{201D}]*(?:\\.[^\\\x{201D}]*)*)(?:\x{201D})))/su
+  <quoted string literal>          ~ /(?:(?|(?:')(?:[^\\']*(?:\\.[^\\']*)*)(?:')|(?:")(?:[^\\"]*(?:\\.[^\\"]*)*)(?:")|(?:\x{201C})(?:[^\\\x{201D}]*(?:\\.[^\\\x{201D}]*)*)(?:\x{201D})))/su
   <character class>                ~ /((?:\[(?:(?>[^\[\]]+)|(?-1))*\]))/
                                    | /((?:\[(?:(?>[^\[\]]+)|(?-1))*\]))/ ':' /[eijmnsxDJUuaNbcA]+/
   <regular expression>             ~ /(?:(?|(?:\/(?![*\/]))(?:[^\\\/]*(?:\\.[^\\\/]*)*)(?:\/)))/su

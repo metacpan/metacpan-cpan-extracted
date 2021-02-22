@@ -30,6 +30,7 @@ WriteMakefile
                    'IO::Socket::SSL' => 0,
                    'JSON::Parse' => 0,
                    'JSON::SL' => 0,
+                   'JSON::WebToken' => 0,
                    'JSON::XS' => 0,
                    'LWP::Protocol::https' => 0,
                    'LWP::UserAgent' => 0,

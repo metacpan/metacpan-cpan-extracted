@@ -12,19 +12,19 @@ use IO::File;
 use Time::Local;
 use Time::Format;
 use File::Spec::Functions qw(abs2rel catfile curdir file_name_is_absolute
-                             no_upwards rel2abs splitdir updir);
+                             no_upwards rel2abs splitdir);
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(fio_filename_to_url fio_flatten 
                  fio_full_file_name fio_format_date fio_get_date 
                  fio_get_size fio_glob_patterns fio_is_newer 
-                 fio_make_dir fio_match_patterns fio_most_recent_file 
+                 fio_match_patterns fio_most_recent_file 
                  fio_read_page fio_same_file fio_set_date 
-                 fio_shorten_path fio_split_filename fio_to_file 
+                 fio_split_filename fio_to_file 
                  fio_visit fio_write_page);
 
-our $VERSION = "1.96";
+our $VERSION = "1.97";
 
 #----------------------------------------------------------------------
 # Calculate the check sum for a file
@@ -226,27 +226,6 @@ sub fio_is_newer {
 }
 
 #----------------------------------------------------------------------
-# Create a new directory to write a file in if it doesn't exist
-
-sub fio_make_dir {
-    my ($filename) = @_;
-
-    my $flag = 1;
-    my ($dir, $file) = fio_split_filename($filename);
-
-    if (! -e $dir) {
-        my @dirs = splitdir($dir);
-        my $last_dir = lc(pop(@dirs));
-        $dir = catfile(@dirs, $last_dir);
-
-        $flag = mkdir($dir);
-    }
-
-    $filename = catfile($dir, $file);
-    return $flag ? $filename : '';
-}
-
-#----------------------------------------------------------------------
 # Return true if filename matches pattern
 
 sub fio_match_patterns {
@@ -346,29 +325,6 @@ sub fio_set_date {
     }
 
     return utime($date, $date, $filename);
-}
-
-#----------------------------------------------------------------------
-# Remove dotted directories from directory path
-
-sub fio_shorten_path {
-    my ($filename) = @_;
-    
-    my @path = splitdir($filename);
-    my $file = pop(@path);
-
-    my @newpath;
-    foreach my $dir (@path) {
-        if ($dir eq curdir()) {
-            ;
-        } elsif ($dir eq updir()) {
-            pop(@newpath);
-        } else {
-            push(@newpath, $dir);
-        }
-    }
-
-    return catfile(@newpath, $file);
 }
 
 #----------------------------------------------------------------------

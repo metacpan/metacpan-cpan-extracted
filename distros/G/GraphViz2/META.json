@@ -76,6 +76,6 @@
          "web" : "https://github.com/graphviz-perl/GraphViz2"
       }
    },
-   "version" : "2.65",
+   "version" : "2.66",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

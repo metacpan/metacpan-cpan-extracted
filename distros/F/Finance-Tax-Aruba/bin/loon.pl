@@ -5,22 +5,38 @@ use strict;
 # PODNAME: loon.pl
 # ABSTRACT: A salary cost calculator
 
-use Text::Table;
-use Finance::Tax::Aruba::Income;
 use Data::Dumper;
+use DateTime;
+use Finance::Tax::Aruba::Income;
 use Getopt::Long;
 use Pod::Usage;
+use Text::Table;
 
 my %opts = (
     months => 12,
     help   => 0,
     cur    => 'awg',
-    year   => 2020,
+    yearly => 0,
 );
 
 {
     local $SIG{__WARN__};
-    my $ok = eval { GetOptions(\%opts, qw(help cur=s months=i rate=f from year=s), 'pension-employee=f', 'pension-employer=f'); };
+    my $ok = eval {
+        GetOptions(\%opts, qw(
+                help
+                cur=s
+                months=i
+                rate=f
+                from
+                year=s
+                yearly
+            ),
+            'pension-employee=f',
+            'pension-employer=f',
+            'tax-free=f',
+            'bonus=f'
+        );
+    };
     if (!$ok) {
         die($@);
     }
@@ -51,16 +67,29 @@ sub to_cur {
 my $maandloon = to_awg($ARGV[0]);
 my $months    = $opts{months};
 
+$opts{'tax-free'} = ($opts{'tax-free'} // 0) * $months;
+
+if ($opts{yearly}) {
+    $maandloon = $maandloon / $months;
+}
+
+$opts{year} //= DateTime->now->year;
+
 my $calc = Finance::Tax::Aruba::Income->tax_year(
     $opts{year},
     income => $maandloon,
     months => $opts{months},
     exists $opts{'pension-employee'}
-        ? (pension_employee_perc => $opts{'pension-employee'},)
+        ? (pension_employee_perc => $opts{'pension-employee'})
         : (),
     exists $opts{'pension-employer'}
-        ? (pension_employer_perc => $opts{'pension-employer'},)
+        ? (pension_employer_perc => $opts{'pension-employer'})
         : (),
+
+    exists $opts{'bonus'}
+        ? (bonus => $opts{'bonus'})
+        : (),
+
 );
 
 sub _p {
@@ -79,11 +108,12 @@ my @order = qw(
     -
     bruto
     werving
+    pensioen_employee
+    bonus
     jaarloon
     -
     azv
     aov
-    pensioen_employee
     -
     zuiver
     tabelinkomen
@@ -95,14 +125,17 @@ my @order = qw(
     -
     free
     netto
-    netto_inc
+    tax_free
+    wage
     -
     azv_employer
     aov_employer
     pensioen_employer
-    cost_employer
+    -
     azv_total
     aov_total
+    pensioen
+    cost_employer
     -
     gov_gets
     effective_rate
@@ -111,29 +144,20 @@ my @order = qw(
 my $jaarloon_bruto = $calc->yearly_income_gross;
 my $jaarloon       = $calc->yearly_income;
 
-my $pensioen = $calc->pension_employee + $calc->pension_employer;
+my $pensioen = $calc->pension_total;
 my $tax_free = $calc->taxfree_amount;
 
-my $netto = $jaarloon
-    - $calc->income_tax
-    - $calc->aov_employee
-    - $calc->azv_employee
-    - $calc->taxfree_amount;
+my $azv_total = $calc->azv_premium;
+my $aov_total = $calc->aov_premium;
 
-my $payable = $netto + $tax_free;
+my $gov_gets = $calc->income_tax + $azv_total + $aov_total;
 
-my $company_pays = $jaarloon + $calc->aov_employer + $calc->azv_employer + $calc->pension_employer;
-
-my $azv_total = $calc->azv_employee + $calc->azv_employer;
-my $aov_total = $calc->aov_employee + $calc->aov_employer;
-
-my $gov_gets = $calc->income_tax + $azv_total + $aov_total + $pensioen;
 my $effective_rate = $gov_gets / $jaarloon * 100;
 
 my %year = (
     bruto          => $calc->yearly_income_gross,
     jaarloon       => $calc->yearly_income,
-    netto          => $netto,
+    netto          => $calc->tax_free_wage,
     werving        => $calc->wervingskosten,
     azv            => $calc->azv_employee,
     aov            => $calc->aov_employee,
@@ -148,15 +172,17 @@ my %year = (
     aov_employer   => $calc->aov_employer,
     conv_rate      => $opts{rate},
     free           => $calc->taxfree_amount,
-    netto_inc      => $payable,
-    pensioen       => $pensioen,
+    wage           => $calc->net_income + $opts{'tax-free'},
     pensioen_employee => $calc->pension_employee,
     pensioen_employer => $calc->pension_employer,
-    cost_employer  => $company_pays,
+    pensioen       => $calc->pension_total,
+    cost_employer  => $calc->company_costs,
     effective_rate => $effective_rate,
     gov_gets       => $gov_gets,
-    azv_total      => $azv_total,
-    aov_total      => $aov_total,
+    azv_total      => $calc->azv_premium,
+    aov_total      => $calc->aov_premium,
+    tax_free       => $opts{'tax-free'},
+    bonus          => $calc->bonus,
 );
 
 my %mapping = (
@@ -178,7 +204,8 @@ my %mapping = (
     effective_rate => 'Effectief belastingtarief',
     $opts{rate} ? (conv_rate => "$opts{rate}awg/1eur") : (),
     free           => "Belastingvrije voet",
-    netto_inc      => "Uit te betalen loon",
+    tax_free       => "Onbelastbaar inkomen",
+    wage           => "Uit te betalen loon",
     pensioen_employee => sprintf('Pension (%s%%)', $calc->pension_employee_perc),
     pensioen_employer => sprintf('Pension (%s%%)', $calc->pension_employer_perc),
     pensioen       => sprintf('Pension Totaal (%s%%)',
@@ -192,6 +219,7 @@ my %mapping = (
         $calc->aov_percentage_employee + $calc->aov_percentage_employer),
 
     gov_gets       => "Social premiums and taxes",
+    bonus          => "Bonus"
 );
 
 my ($longest) = sort { length($b) <=> length($a) } values %mapping;
@@ -248,7 +276,7 @@ loon.pl - A salary cost calculator
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -268,7 +296,7 @@ Currency, mainly used for display reasons. Defaults to C<awg>.
 
 =item --rate
 
-Conversion rate from Aruban Guilder to the used currency. 
+Conversion rate from Aruban Guilder to the used currency.
 
 When using USD as a currency the default becomes C<1.79>. When using other
 currencies the default becomes C<2>.
@@ -279,7 +307,19 @@ Define the amount of months. Defaults to C<12>.
 
 =item --from
 
-The monthly amount is in the currency used by the C<--cur> option. The
+The monthly amount is in the currency used by the C<--cur> option.
+
+=item --pension-employee
+
+The mandatory pension percentage paid by the employee
+
+=item --pension-employer
+
+The mandatory pension percentage paid by the employer
+
+=item --tax-free
+
+Add the amount of tax free income to your paycheck
 
 =back
 

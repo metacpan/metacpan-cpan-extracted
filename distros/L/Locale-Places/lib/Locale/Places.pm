@@ -15,11 +15,11 @@ Locale::Places - Translate places using http://download.geonames.org/
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 METHODS
 
@@ -28,10 +28,11 @@ our $VERSION = '0.03';
 Create a Locale::Places object.
 
 Takes one optional parameter, directory,
-which tells the object where to find the file GB.csv.
+which tells the object where to find the file GB.sql
 If that parameter isn't given,
 the module will attempt to find the databases,
 but that can't be guaranteed.
+Any other options are passed to the underlying database driver.
 
 =cut
 
@@ -40,15 +41,19 @@ sub new {
 	my $class = ref($proto) || $proto;
 
 	# Use Locale::Places->new, not Locale::Places::new
-	return unless($class);
+	if(!defined($class)) {
+		Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		return;
+	}
 
-	my $directory = $param{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
+	my $directory = delete $param{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
 	$directory =~ s/\.pm$//;
 
 	Locale::Places::DB::init({
 		directory => File::Spec->catfile($directory, 'databases'),
 		no_entry => 1,
-		cache => $param{cache} || CHI->new(driver => 'Memory', datastore => {})
+		cache => $param{cache} || CHI->new(driver => 'Memory', datastore => {}),
+		%param
 	});
 
 	return bless { }, $class;
@@ -69,6 +74,9 @@ the code makes a best guess based on the environment.
    # Prints "Douvres"
    print Locale::Places->new()->translate({ place => 'Dover', from => 'en', to => 'fr' });
 
+   # Prints "Douvres" if we're working on a French system
+   print Locale::Places->new()->translate('Dover');
+
 =cut
 
 sub translate {
@@ -81,17 +89,23 @@ sub translate {
 		%params = @_;
 	} else {
 		$params{'place'} = shift;
+		$params{'from'} = 'en';
 	}
 
 	my $place = $params{'place'};
 	if(!defined($place)) {
-		Carp::croak(__PACKAGE__, ': usage: translate(place => $place, from => $language1, to => $language2)');
+		Carp::carp(__PACKAGE__, ': usage: translate(place => $place, from => $language1, to => $language2)');
+		return;
 	}
 
 	my $to = $params{'to'};
 	my $from = $params{'from'};
 	if((!defined($from)) && !defined($to)) {
-		Carp::croak(__PACKAGE__, ': usage: translate(place => $place, from => $language1, to => $language2)');
+		$to ||= $self->_get_language();
+		if(!defined($to)) {
+			Carp::carp(__PACKAGE__, ': usage: translate(place => $place, from => $language1, to => $language2)');
+			return;
+		}
 	}
 
 	$from ||= $self->_get_language();
@@ -109,11 +123,23 @@ sub translate {
 	# TODO: Add a country argument and choose a database based on that
 	$self->{'gb'} ||= Locale::Places::DB::GB->new(no_entry => 1);
 
-	if($place = $self->{'gb'}->fetchrow_hashref({ type => $from, data => $place })) {
-		if(my $line = $self->{'gb'}->fetchrow_hashref({ type => $to, code2 => $place->{'code2'} })) {
+	my @places = @{$self->{'gb'}->selectall_hashref({ type => $from, data => $place, ispreferredname => 1 })};
+	if(scalar(@places) == 0) {
+		@places = @{$self->{'gb'}->selectall_hashref({ type => $from, data => $place })};
+	}
+
+	if(scalar(@places) == 1) {
+		if(my $line = $self->{'gb'}->fetchrow_hashref({ type => $to, code2 => $places[0]->{'code2'} })) {
 			return $line->{'data'};
 		}
+	} elsif(scalar(@places) > 1) {
+		foreach my $p(@places) {
+			if(my $line = $self->{'gb'}->fetchrow_hashref({ type => $to, code2 => $p->{'code2'} })) {
+				return $line->{'data'};
+			}
+		}
 	}
+	return;	# undef
 }
 
 # https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
@@ -132,6 +158,7 @@ sub _get_language {
 			return lc($1);
 		}
 	}
+	return;	# undef
 }
 
 =head1 AUTHOR
@@ -158,9 +185,9 @@ You can also look for information at:
 
 L<https://metacpan.org/release/Locale-Places>
 
-=item * RT: CPAN's request tracker
+=item * GitHub
 
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Locale-Places>
+L<https://github.com/nigelhorne/Locale-Places>
 
 =item * CPANTS
 

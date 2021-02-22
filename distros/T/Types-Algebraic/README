@@ -72,6 +72,27 @@ USAGE
           default    { say "Bah. You clearly have no taste."; }
       }
 
+ Nested patterns
+
+    Note, patterns can be nested, allowing for more complex unpacking:
+
+      data PairingHeap = Empty | Heap :head :subheaps;
+      data Pair = Pair :left :right;
+    
+      # Merge two pairing heaps (https://en.wikipedia.org/wiki/Pairing_heap)
+      sub merge {
+          my ($h1, $h2) = @_;
+    
+          match (Pair($h1, $h2)) {
+              with (Pair Empty $h) { return $h; }
+              with (Pair $h Empty) { return $h; }
+              with (Pair (Heap $e1 $s1) (Heap $e2 $s2)) {
+                  return $e1 < $e2 ? Heap($e1, [$h2, @$s1])
+                                   : Heap($e2, [$h1, @$s2]);
+              }
+          }
+      }
+
 LIMITATIONS
 
     Currently, match statements can't be nested.

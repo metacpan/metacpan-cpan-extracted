@@ -35,8 +35,8 @@ requires:
   Readonly: 0
   perl: 5.8.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Tags
+  bugtracker: https://github.com/michal-josef-spacek/Tags/issues
   homepage: https://github.com/michal-josef-spacek/Tags
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags
-version: '0.10'
+version: '0.11'

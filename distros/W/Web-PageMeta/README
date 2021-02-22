@@ -1,0 +1,104 @@
+NAME
+    Web::PageMeta - get page open-graph / meta data
+
+SYNOPSIS
+        use Web::PageMeta;
+        my $page = Web::PageMeta->new(url => "https://www.apa.at/");
+        say $page->title;
+        say $page->image;
+
+    async fetch previews and images:
+
+        use Web::PageMeta;
+        my @urls = qw(
+            https://www.apa.at/
+            http://www.diepresse.at/
+            https://metacpan.org/
+            https://github.com/
+        );
+        my @page_views = map { Web::PageMeta->new( url => $_ ) }
+                @urls;
+        Future->wait_all( map { $_->fetch_image_data_ft, } @page_views )->get;
+        foreach my $pv (@page_views) {
+            say 'title> '.$pv->title;
+            say 'img_size> '.length($pv->image_data);
+        }
+
+        # alternativelly instead of Future->wait_all()
+        use Future::Utils qw( fmap_void );
+        fmap_void(
+            sub { return $_[0]->fetch_image_data_ft },
+            foreach    => [@page_views],
+            concurrent => 3
+        )->get;
+
+DESCRIPTION
+    Get (not only) open-graph web page meta data. can be used in both normal
+    and async code.
+
+ACCESSORS
+  new
+    Constructor, only "url" is required.
+
+  url
+    HTTP url to fetch data from.
+
+  title
+    Returns title of the page.
+
+  description
+    Returns description of the page.
+
+  image
+    Returns image location of the page.
+
+  image_data
+    Returns image binary data of "image" link.
+
+  page_meta
+    Returns hash ref with all open-graph data.
+
+  extra_scraper
+    Web::Scrape object to fetch image, title or description from different
+    than default location.
+
+        use Web::Scrape;
+        use Web::PageMeta;
+        my $escraper = scraper {
+            process_first '.slider .camera_wrap div', 'image' => '@data-src';
+        };
+        my $wmeta = Web::PageMeta->new(
+            url => 'https://www.meon.eu/',
+            extra_scraper => $escraper,
+        );
+
+  fetch_page_meta_ft
+    Returns future object for fetching paga meta data. See "ASYNC USE". On
+    done "page_meta" hash is returned.
+
+    has fetch_image_data_ft
+
+    Returns future object for fetching image data. See "ASYNC USE" On done
+    "image_data" scalar is returned.
+
+ASYNC USE
+    To run multiple page meta data or image http requests in parallel or to
+    be used in async programs "fetch_page_meta_ft" and fetch_image_data_ft
+    returning Future object can be used. See "SYNOPSIS" or t/02_async.t for
+    sample use.
+
+SEE ALSO
+    <https://ogp.me/>
+
+AUTHOR
+    Jozef Kutej, "<jkutej at cpan.org>"
+
+LICENSE AND COPYRIGHT
+    Copyright 2021 jkutej@cpan.org
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

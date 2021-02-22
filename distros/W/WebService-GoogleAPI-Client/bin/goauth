@@ -4,10 +4,11 @@ use strictures;
 
 package goauth;
 
-our $VERSION = '0.24';    # VERSION
+our $VERSION = '0.25';    # VERSION
 
 use Carp;
 use Mojolicious::Lite;
+use Mojo::File qw/path/;
 use Config::JSON;
 use feature 'say';
 use Net::EmptyPort qw(empty_port);
@@ -17,11 +18,11 @@ use Net::EmptyPort qw(empty_port);
 
 
 my $filename = $ARGV[0] || 'gapi.json';
-my $file     = file($filename);
+my $file     = path($filename);
 
-if ($file->stat())    ## file exists
+if ($file->stat)    ## file exists
 {
-  say 'File ', $file->absolute() . ' exists';
+  say qq'File "${\$file->to_abs}" exists';
   input_if_not_exists(['gapi/client_id', 'gapi/client_secret', 'gapi/scopes']);
   ## this potentially allows mreging with a json file with data external
   ## to the app or to augment missing scope from file generated from
@@ -33,9 +34,8 @@ if ($file->stat())    ## file exists
 }
 
 sub setup {
-  say 'Project Credentials config file "'
-    . $file->absolute()
-    . '" with OAUTH App Secrets and user tokens not found. Creating new file...';
+  say
+qq'Project Credentials config file "${\$file->to_abs}" with OAUTH App Secrets and user tokens not found. Creating new file...';
 
   ## TODO: consider allowing the gapi.json to be either seeded or to extend the credentials.json provided by Google
   my $oauth = {};
@@ -65,7 +65,7 @@ sub setup {
       . 'https://www.googleapis.com/auth/contacts.readonly https://mail.google.com';
   }
 
-  my $tokensfile = Config::JSON->create($file->absolute());
+  my $tokensfile = Config::JSON->create($file->to_abs);
   $tokensfile->set('gapi/client_id',     $oauth->{client_id});
   $tokensfile->set('gapi/client_secret', $oauth->{client_secret});
   $tokensfile->set('gapi/scopes',        $oauth->{scopes});
@@ -93,7 +93,7 @@ sub runserver {
   my $port = empty_port(3000);
   say
 "Starting web server. Before authorization don't forget to allow redirect_uri to http://127.0.0.1 in your Google Console Project";
-  $ENV{'GOAUTH_TOKENSFILE'} = $file->absolute();
+  $ENV{'GOAUTH_TOKENSFILE'} = $file->to_abs;
 
   my $config = Config::JSON->new($ENV{'GOAUTH_TOKENSFILE'});
 
@@ -210,7 +210,7 @@ goauth - CLI tool with mini http server for negotiating Google OAuth2 Authorisat
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head2 SUMMARY
 

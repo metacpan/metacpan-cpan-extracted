@@ -3,6 +3,15 @@ IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("../../../3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
 
+#
+# Policies common to all our files
+#
+FOREACH (_policy CMP0018 CMP0063 CMP0075)
+  IF (POLICY ${_policy})
+    CMAKE_POLICY (SET ${_policy} NEW)
+  ENDIF ()
+ENDFOREACH ()
+
 MYPACKAGESTART (pcre2 10 33 0)
 
 IF (FIXME_CMAKE_ABSOLUTE)

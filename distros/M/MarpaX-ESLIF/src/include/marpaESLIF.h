@@ -10,6 +10,10 @@
 /* ===================================== */
 /* long long detection using only macros */
 /* ===================================== */
+/* It is recommended to use the macro    */
+/* MARPAESLIF_LONG_LONG if               */
+/* MARPAESLIF_HAVE_LONG_LONG is defined. */
+/* ===================================== */
 #if defined(LLONG_MAX) && defined(LLONG_MIN)
 #  define MARPAESLIF_HAVE_LONG_LONG
 #  define MARPAESLIF_LONG_LONG long long
@@ -62,7 +66,11 @@ typedef struct marpaESLIFSymbol          marpaESLIFSymbol_t;
 typedef void  (*marpaESLIFValueResultFreeCallback_t)(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
 
 /* Reader recognizer callback. It returns encoding information, giving eventual encoding in *encodingsp, spreaded over *encodinglp bytes. Encoding of encoding is free. */
-typedef short (*marpaESLIFReader_t)(void *userDatavp, char **inputcpp, size_t *inputlp, short *eofbp, short *characterStreambp, char **encodingsp, size_t *encodinglp);
+/* The content of inputcpp and encodingsp might be volatile data that the end-user want to dispose immediately after the reader callback, therefore there is a */
+/* disposal argument that is guaranteed to be called if it is not NULL. */
+/* A typical situation is e.g. the JNI environment: inputcp may be the result of a call to GetByteArrayElements(). This implies a call to ReleaseByteArrayElements(). */
+typedef void  (*marpaESLIFReaderDispose_t)(void *userDatavp, char *inputcp, size_t inputl, short eofb, short characterStreamb, char *encodings, size_t encodingl);
+typedef short (*marpaESLIFReader_t)(void *userDatavp, char **inputcpp, size_t *inputlp, short *eofbp, short *characterStreambp, char **encodingsp, size_t *encodinglp, marpaESLIFReaderDispose_t *disposeCallbackpp);
 
 /* If recognizer callback: marpaESLIFValueResultLexemep is of type ARRAY and represents the binary memory chunk of current lexeme */
 typedef short (*marpaESLIFRecognizerIfCallback_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultLexemep, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp);
@@ -149,7 +157,7 @@ typedef struct marpaESLIFRecognizerOption {
   marpaESLIFRecognizerIfActionResolver_t    ifActionResolverp;   /* Will return the function doing the wanted if action */
   marpaESLIFRecognizerEventActionResolver_t eventActionResolverp; /* Will return the function doing the wanted event action */
   marpaESLIFRecognizerRegexActionResolver_t regexActionResolverp; /* Will return the function doing the wanted regex callout action */
-  marpaESLIFRecognizerImport_t              importerp;           /* Will ask end-user to import a marpaESLIFValueResult */
+  marpaESLIFRecognizerImport_t              importerp;           /* If end-user want to import a marpaESLIFValueResult */
 } marpaESLIFRecognizerOption_t;
 
 typedef enum marpaESLIFEventType {
@@ -202,7 +210,8 @@ typedef marpaESLIFValueSymbolCallback_t (*marpaESLIFValueSymbolActionResolver_t)
 /* It is legal to return NULL in encodingmaybesp, then this is an opaque sequence of bytes, else */
 /* this is considered as a string in this given encoding. */
 /* Note that it is the responsibility of the caller to make sure that *inputcpp and **encodingmaybesp points to valid memory area when the call returns */
-typedef short (*marpaESLIFRepresentation_t)(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, char **inputcpp, size_t *inputlp, char **encodingasciisp);
+typedef void (*marpaESLIFRepresentationDispose_t)(void *userDatavp, char *inputcp, size_t inputl, char *encodingasciis);
+typedef short (*marpaESLIFRepresentation_t)(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, char **inputcpp, size_t *inputlp, char **encodingasciisp, marpaESLIFRepresentationDispose_t *disposeCallbackpp);
 typedef char marpaESLIFValueResultChar_t;
 typedef short marpaESLIFValueResultShort_t;
 typedef long marpaESLIFValueResultLong_t;
@@ -450,17 +459,13 @@ typedef struct marpaESLIFSymbolProperty {
   marpaESLIFAction_t          *ifActionp;              /* Symbol recognizer if action */
 } marpaESLIFSymbolProperty_t;
 
-/* For any JSON number (including +/-Infinity, +/-Nan):
-   - If marpaESLIF fails to support this floating point value, it will default to the UNDEF type
-   - If a corresponding callback is set, this will be called with:
-   * the input string (pointer and size)
-   * the proposal (can be the UNDEF type) that the user can overwrite
-
-   For a finite number, marpaESLIF will try ONLY with the DOUBLE type if it can handle correctly overflow or underflow.
-   For +/-Infinity, if marpaESLIF has support for them, it will use it in a FLOAT type.
-   For +/-NaN, if marpaESLIF has NaN support, it will use it in a FLOAT type. Signed NaN is not explicitely supported.
-*/
-typedef short (*marpaESLIFJSONProposalAction_t)(void *userDatavp, char *strings, size_t stringl, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+/* Whenever marpaESLIF fails to parse exactly a JSON number it will call the proposal callback if defined. */
+/* It will always propose either UNDEF or a LONG DOUBLE if available, else a DOUBLE.                       */
+/* The user can safely overwrite the proposal that is in the stack.                                        */
+/* Note that a signed integer number is always explicitly converted to a signe double 0 with no proposal.  */
+/*           +/-Infinity and +/-NaN always goes to a FLOAT with no proposal.                               */
+/*           marpaESLIF tries hard to use a non-floating number, calls the proposal in any other case.     */
+typedef short (*marpaESLIFJSONProposalAction_t)(void *userDatavp, char *strings, size_t stringl, marpaESLIFValueResult_t *marpaESLIFValueResultp, short confidenceb);
 
 typedef struct marpaESLIFJSONDecodeOption {
   short                                        disallowDupkeysb;                /* Do not allow duplicate key in an object */
@@ -496,9 +501,12 @@ extern "C" {
   marpaESLIF_EXPORT short                         marpaESLIF_versionMajorb(marpaESLIF_t *marpaESLIFp, int *versionMajorip);
   marpaESLIF_EXPORT short                         marpaESLIF_versionMinorb(marpaESLIF_t *marpaESLIFp, int *versionMinorip);
   marpaESLIF_EXPORT short                         marpaESLIF_versionPatchb(marpaESLIF_t *marpaESLIFp, int *versionPatchip);
-  marpaESLIF_EXPORT short                         marpaESLIF_extend_builtin_actionb(marpaESLIF_t *marpaESLIFp, char **actionsArrayp, size_t actionsArrayl);
   marpaESLIF_EXPORT marpaESLIFOption_t           *marpaESLIF_optionp(marpaESLIF_t *marpaESLIFp);
   marpaESLIF_EXPORT marpaESLIFGrammar_t          *marpaESLIF_grammarp(marpaESLIF_t *marpaESLIFp);
+  /* Helper function that tells if a string could be parsed to a number using the non-strict ESLIF's JSON number formalism */
+  /* restricted to not special numbers, i.e. /[+-]?(?:[0-9]+)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?/.                          */
+  /* This does NOT handle Infinity nor Nans, see the specific functions later that check on the explicit value.            */
+  marpaESLIF_EXPORT short                         marpaESLIF_numberb(marpaESLIF_t *marpaESLIFp, char *s, marpaESLIFValueResult_t *marpaESLIFValueResultp, short *confidencebp);
 
   marpaESLIF_EXPORT marpaESLIFGrammar_t          *marpaESLIFGrammar_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammarOption_t *marpaESLIFGrammarOptionp);
   marpaESLIF_EXPORT marpaESLIF_t                 *marpaESLIFGrammar_eslifp(marpaESLIFGrammar_t *marpaESLIFGrammarp);
@@ -595,9 +603,9 @@ extern "C" {
   /* Import helpers                                                                                                                                                 */
   /* -------------------------------------------------------------------------------------------------------------------------------------------------------------- */
   /* ROW and TABLE types are flat'idified:                                                                                                                          */
-  /* - For an ROW type, all members are imported first in order, then the row marpaESLIFValueResult itself (which contains the number of elements in u.r.sizel)     */
+  /* - For a ROW type, all members are imported first in order, then the row marpaESLIFValueResult itself (which contains the number of elements in u.r.sizel)      */
   /*   i.e. value[0], value[1], ... value[value.u.r.sizel - 1], value                                                                                               */
-  /* - For an TABLE type, all members are imported first in order, then the array marpaESLIFValueResult itself (which contains the number of elements in u.t.sizel) */
+  /* - For a TABLE type, all members are imported first in order, then the array marpaESLIFValueResult itself (which contains the number of elements in u.t.sizel)  */
   /*   i.e. table[0], table[1], ... table[table.u.t.sizel - 1], table                                                                                               */
   /*   Since a table member is nothign else but a row with an even number of elements, it means this can be reinterpreted as:                                       */
   /*        key[0],value[0]...,key[(table.u.t.sizel/2)-1],value[(table.u.t.sizel/2)-1]                                                                              */
@@ -609,9 +617,9 @@ extern "C" {
   /*   At the end it must have exactly one element in its internal stack.                                                                                           */
   /* -------------------------------------------------------------------------------------------------------------------------------------------------------------- */
   /* marpaESLIFValue_importb call the end-user importerp() function callback. */
-  marpaESLIF_EXPORT short                         marpaESLIFValue_importb(marpaESLIFValue_t *marpaESLIFValuep, marpaESLIFValueResult_t *marpaESLIFValueResultp, marpaESLIFValueResult_t *marpaESLIFValueResultResolvedp);
+  marpaESLIF_EXPORT short                         marpaESLIFValue_importb(marpaESLIFValue_t *marpaESLIFValuep, marpaESLIFValueResult_t *marpaESLIFValueResultp);
   /* marpaESLIFRecognizer_importb call the end-user importerp() function callback. */
-  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_importb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultp, marpaESLIFValueResult_t *marpaESLIFValueResultResolvedp);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_importb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
 
   /* Helper routine to guess the encoding of a byte array. If it returns a non-NULL value it is the responsibility of the caller to free it */
   marpaESLIF_EXPORT char                         *marpaESLIF_encodings(marpaESLIF_t *marpaESLIFp, char *bytep, size_t bytel);
@@ -640,8 +648,11 @@ extern "C" {
   /* Value result helpers                  */
   /* ------------------------------------- */
   /* These mathods return a true value if the underlying float, double or long double hosts an infinity or NaN value. */
-  marpaESLIF_EXPORT short                         marpaESLIFValueResult_isinfb(marpaESLIFValueResult_t *marpaESLIFValueResultp);
-  marpaESLIF_EXPORT short                         marpaESLIFValueResult_isnanb(marpaESLIFValueResult_t *marpaESLIFValueResultp);
+  marpaESLIF_EXPORT short                         marpaESLIFValueResult_isinfb(marpaESLIF_t *marpaESLIFp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+  marpaESLIF_EXPORT short                         marpaESLIFValueResult_isnanb(marpaESLIF_t *marpaESLIFp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+  /* Not all systems represent correctly +/-Nan, *confidencebp will be a true value if marpaESLIF is sure */
+  marpaESLIF_EXPORT short                         marpaESLIFValueResult_is_positive_nanb(marpaESLIF_t *marpaESLIFp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short *confidencebp);
+  marpaESLIF_EXPORT short                         marpaESLIFValueResult_is_negative_nanb(marpaESLIF_t *marpaESLIFp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short *confidencebp);
 
   /* ------------------------------------- */
   /* Floating point method helpers         */
@@ -662,9 +673,9 @@ extern "C" {
   /* as in normal recognizer lifetime. */
   /* It can be also used outside of any grammar on a free input string */
   /* If there is match, *matchbp will contain a true value, else a false value */
-  /* When there is match bytepp will contain a copy of the match and the end-user is responsible to free it. Length is in *bytelp */
-  marpaESLIF_EXPORT short                        marpaESLIFSymbol_tryb(marpaESLIFSymbol_t *marpaESLIFSymbolp, char *inputs, size_t inputl, short *matchbp, char **bytepp, size_t *bytelp);
-  marpaESLIF_EXPORT short                        marpaESLIFRecognizer_symbol_tryb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFSymbol_t *marpaESLIFSymbolp, short *matchbp, char **bytepp, size_t *bytelp);
+  /* When there is match marpaESLIFValueResultArrayp will contain the result. The caller is responsible to free it it is not shallow */
+  marpaESLIF_EXPORT short                        marpaESLIFSymbol_tryb(marpaESLIFSymbol_t *marpaESLIFSymbolp, char *inputs, size_t inputl, short *matchbp, marpaESLIFValueResultArray_t *marpaESLIFValueResultArrayp);
+  marpaESLIF_EXPORT short                        marpaESLIFRecognizer_symbol_tryb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFSymbol_t *marpaESLIFSymbolp, short *matchbp, marpaESLIFValueResultArray_t *marpaESLIFValueResultArrayp);
   marpaESLIF_EXPORT void                         marpaESLIFSymbol_freev(marpaESLIFSymbol_t *marpaESLIFSymbolp);
 #ifdef __cplusplus
 }

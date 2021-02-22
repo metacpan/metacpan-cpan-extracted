@@ -72,18 +72,29 @@ port=143
 Project Links
 =============
 - Bugs/tickets:
-    https://rt.cpan.org/Public/Dist/Display.html?Name=Mail-IMAPClient
+    https://github.com/plobbes/mail-imapclient/issues
 - Source code repository (git):
-    https://sourceforge.net/p/mail-imapclient/git/
     https://github.com/plobbes/mail-imapclient/
+    https://sourceforge.net/p/mail-imapclient/git/
 - CPAN releases:
     https://metacpan.org/release/Mail-IMAPClient
+
+TESTING
+=======
+Ubuntu under WSL 2.0
+
+$ sudo apt install dovecot-imapd  # imap server
+$ sudo adduser imaptest           # test user
+# dependencies
+$ sudo apt install make libio-socket-ssl-perl libtest-pod-perl libparse-recdescent-perl
+$ sudo /etc/init.d/rsyslog start
+$ sudo /etc/init.d/dovecot start
 
 COPYRIGHT AND LICENSE
 =====================
 Copyright (C) 1999-2003 The Kernen Group, Inc.
 Copyright (C) 2007-2009 Mark Overmeer
-Copyright (C) 2010-2019 Phil Pearl (Lobbes)
+Copyright (C) 2010-2021 Phil Pearl (Lobbes)
 All rights reserved.
 
 This library is free software; you can redistribute it and/or modify

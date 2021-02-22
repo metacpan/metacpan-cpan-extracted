@@ -12,7 +12,7 @@ use Test::Builder;
 use Test::Class::MethodInfo;
 use Try::Tiny;
 
-our $VERSION = '0.50';
+our $VERSION = '0.52';
 
 my $Check_block_has_run;
 {
@@ -300,8 +300,13 @@ sub _run_method {
         _exception_failure($self, $method, $exception, $tests)
                 if $exception;
     } elsif ($num_done > $num_expected) {
+        local $Test::Builder::Level = $Test::Builder::Level+1;
         my $class = ref $self;
-        $Builder->diag("expected $num_expected test(s) in $class\::$method, $num_done completed\n");
+        if ($self->fail_if_returned_late) {
+            $Builder->ok(0, "expected $num_expected test(s) in $class\::$method, $num_done completed");
+        } else {
+            $Builder->diag("expected $num_expected test(s) in $class\::$method, $num_done completed\n");
+        }
     } else {
         until (($Builder->current_test - $num_start) >= $num_expected) {
             if ($exception) {
@@ -309,6 +314,7 @@ sub _run_method {
                 $skip_reason = "$method died";
                 $exception = '';
             } else {
+                local $Test::Builder::Level = $Test::Builder::Level+1;
                 if ($self->fail_if_returned_early) {
                     my $class = ref $self;
                     $Builder->ok(0, "($class\::$method returned before plan complete)");
@@ -322,6 +328,7 @@ sub _run_method {
 }
 
 sub fail_if_returned_early { 0 }
+sub fail_if_returned_late { 0 }
 
 sub _show_header {
     my ($self, @tests) = @_;
@@ -486,7 +493,7 @@ Test::Class - Easily create test classes in an xUnit/JUnit style
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -943,6 +950,22 @@ However, if the class's C<fail_if_returned_early> method returns true, then the 
     for (my $n=1; $n*$n<50; ++$n) {
       ok 1, "$n squared is less than fifty";
     }
+  }
+
+
+=head1 RETURNING LATE
+
+If a test method runs too many tests, by default the test plan succeeds.
+
+However, if the class's C<fail_if_returned_late> method returns true, then the extra tests will trigger a failure.  For example,
+
+  package MyClass;
+  use base 'Test::Class';
+  sub fail_if_returned_late { 1 }
+
+  sub oops : Tests(1) {
+    ok 1, "just a simple test";
+    ok 1, "just a simple test"; #oops I copied and pasted too many tests
   }
 
 
@@ -1576,6 +1599,10 @@ See the section on the L</"GENERAL FILTERING OF TESTS"> for more information.
 
 Controls what happens if a method returns before it has run all of its tests.  It is called with no arguments in boolean context; if it returns true, then the missing tests fail, otherwise, they skip.  See L<"Returning Early"> and L<"Skipped Tests">.
 
+=item B<fail_if_returned_late>
+
+Controls what happens if a method returns after running too many tests.  It is called with no arguments in boolean context; if it returns true, then the extra tests trigger a failure test.  See L<"Returning Late"> and L<"Skipped Tests">.
+
 
 =back
 
@@ -1668,34 +1695,18 @@ Test::Unit implements it's own testing framework separate from L<Test::Harness>.
 
 =back
 
+=head1 SUPPORT
 
-=head1 BUGS
+Bugs may be submitted through L<GitHub issues|https://github.com/szabgab/test-class/issues>
 
-None known at the time of writing.
-
-If you find any bugs please let me know by e-mail at <adrianh@quietstars.com>, or report the problem with L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Class>.
-
-
-=head1 COMMUNITY
-
-=head2 perl-qa
-
-If you are interested in testing using Perl I recommend you visit L<http://qa.perl.org/> and join the excellent perl-qa mailing list. See L<http://lists.perl.org/showlist.cgi?name=perl-qa> for details on how to subscribe.
-
-=head2 perlmonks
-
-You can find users of Test::Class, including the module author, on  L<http://www.perlmonks.org/>. Feel free to ask questions on Test::Class there.
-
-=head2 CPAN::Forum
-
-The CPAN Forum is a web forum for discussing Perl's CPAN modules.   The Test::Class forum can be found at L<http://www.cpanforum.com/dist/Test-Class>.
-
+There is also an irc channel available for users of this distribution, at
+L<C<#perl-qa> on C<irc.perl.org>|irc://irc.perl.org/#perl-qa>.
 
 =head1 TO DO
 
 If you think this module should do something that it doesn't (or does something that it shouldn't) please let me know.
 
-You can see my current to do list at L<http://adrianh.tadalist.com/lists/public/4798>, with an RSS feed of changes at L<http://adrianh.tadalist.com/lists/feed_public/4798>.
+You can see an old to do list at L<http://adrianh.tadalist.com/lists/public/4798>, with an RSS feed of changes at L<http://adrianh.tadalist.com/lists/feed_public/4798>.
 
 
 =head1 ACKNOWLEDGMENTS
@@ -1770,8 +1781,6 @@ This module wouldn't be possible without the excellent L<Test::Builder>. Thanks 
 
 Adrian Howard <adrianh@quietstars.com>, Curtis "Ovid" Poe, <ovid at cpan.org>, Mark Morgan <makk384@gmail.com>.
 
-If you use this module, and can spare the time please let us know or rate it at L<http://cpanratings.perl.org/rate/?distribution=Test-Class>.
-
 =head1 SEE ALSO
 
 =over 4
@@ -1787,10 +1796,6 @@ Test::Class with additional conveniences to reduce need for some boilerplate cod
 =item L<Test::Class::Moose>
 
 Testing framework allows you to write your tests in Moose and test Moose and non-Moose code.  It offers reporting, extensibility, test inheritance, parallel testing and more.
-
-=item L<http://del.icio.us/tag/Test::Class>
-
-Delicious links on Test::Class.
 
 =item Perl Testing: A Developer's Notebook by Ian Langworth and chromatic
 
@@ -1808,15 +1813,15 @@ Includes the article "Test-Driven Development in Perl" by Piers Cawley that uses
 
 =over 4
 
-=item * L<http://www.modernperlbooks.com/mt/2009/03/organizing-test-suites-with-testclass.html>
+=item * L<Organizing Test Suites with Test::Class|http://www.modernperlbooks.com/mt/2009/03/organizing-test-suites-with-testclass.html>
 
-=item * L<http://www.modernperlbooks.com/mt/2009/03/reusing-test-code-with-testclass.html>
+=item * L<Reusing Test Code with Test::Class|http://www.modernperlbooks.com/mt/2009/03/reusing-test-code-with-testclass.html>
 
-=item * L<http://www.modernperlbooks.com/mt/2009/03/making-your-testing-life-easier.html>
+=item * L<Making Your Testing Life Easier|http://www.modernperlbooks.com/mt/2009/03/making-your-testing-life-easier.html>
 
-=item * L<http://www.modernperlbooks.com/mt/2009/03/using-test-control-methods-with-testclass.html>
+=item * L<Using Test Control Methods with Test::Class|http://www.modernperlbooks.com/mt/2009/03/using-test-control-methods-with-testclass.html>
 
-=item * L<http://www.modernperlbooks.com/mt/2009/03/working-with-testclass-test-suites.html>
+=item * L<Working with Test::Class Test Suites|http://www.modernperlbooks.com/mt/2009/03/working-with-testclass-test-suites.html>
 
 =back
 
@@ -1828,13 +1833,9 @@ Support module for building test libraries.
 
 Basic utilities for writing tests.
 
-=item L<http://qa.perl.org/test-modules.html>
+=item L<https://qa.perl.org/test-modules.html>
 
 Overview of some of the many testing modules available on CPAN.
-
-=item L<http://del.icio.us/tag/perl+testing>
-
-Delicious links on perl testing.
 
 =item L<Test::Object>
 

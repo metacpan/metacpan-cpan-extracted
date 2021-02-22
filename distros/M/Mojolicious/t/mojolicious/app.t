@@ -20,13 +20,19 @@ use Mojo::IOLoop;
 use Mojolicious;
 use Mojolicious::Controller;
 
-# Missing config file
-{
+subtest 'Missing config file' => sub {
   eval { Test::Mojo->new('MojoliciousConfigTest')->app };
   like $@, qr/mojolicious_config_test.conf" missing/, 'right error';
   local $ENV{MOJO_MODE} = 'whatever';
   is(Test::Mojo->new('MojoliciousConfigTest')->app->config->{it}, 'works', 'right result');
-}
+};
+
+subtest 'Bad deployment plugins' => sub {
+  eval { Test::Mojo->new('MojoliciousTest')->app->plugin(Config => {default => {plugins => 'fail'}}) };
+  like $@, qr/Configuration value "plugins" is not an array reference/, 'right error';
+  eval { Test::Mojo->new('MojoliciousTest')->app->plugin(Config => {default => {plugins => ['fail']}}) };
+  like $@, qr/Configuration value "plugins" contains an entry that is not a hash reference/, 'right error';
+};
 
 # Mode detection
 {
@@ -45,18 +51,19 @@ my @path = qw(th is mojo dir wil l never-ever exist);
 my $app  = Mojolicious->new(home => Mojo::Home->new(@path));
 is $app->home, path(@path), 'right home directory';
 
-# Config override
-my $t = Test::Mojo->new('MojoliciousTest');
-ok !$t->app->config->{config_override}, 'no override';
-ok !$t->app->config->{foo},             'no value';
-$t = Test::Mojo->new('MojoliciousTest', {foo => 'bar'});
-ok $t->app->config->{config_override}, 'override';
-is $t->app->config->{foo}, 'bar', 'right value';
-$t = Test::Mojo->new(MojoliciousTest->new, {foo => 'baz'});
-ok $t->app->config->{config_override}, 'override';
-is $t->app->config->{foo}, 'baz', 'right value';
+subtest 'Config override' => sub {
+  my $t = Test::Mojo->new('MojoliciousTest');
+  ok !$t->app->config->{config_override}, 'no override';
+  ok !$t->app->config->{foo},             'no value';
+  $t = Test::Mojo->new('MojoliciousTest', {foo => 'bar'});
+  ok $t->app->config->{config_override}, 'override';
+  is $t->app->config->{foo}, 'bar', 'right value';
+  $t = Test::Mojo->new(MojoliciousTest->new, {foo => 'baz'});
+  ok $t->app->config->{config_override}, 'override';
+  is $t->app->config->{foo}, 'baz', 'right value';
+};
 
-$t = Test::Mojo->new('MojoliciousTest');
+my $t = Test::Mojo->new('MojoliciousTest');
 
 subtest 'Preload namespaces' => sub {
   is_deeply $t->app->preload_namespaces, ['MojoliciousTest::Controller'], 'right namespaces';
@@ -65,8 +72,8 @@ subtest 'Preload namespaces' => sub {
 
 # Application is already available
 is $t->app->routes->find('something')->to_string, '/test4/:something', 'right pattern';
-is $t->app->routes->find('test3')->pattern->defaults->{namespace},      'MojoliciousTestController', 'right namespace';
-is $t->app->routes->find('withblock')->pattern->defaults->{controller}, 'foo',                       'right controller';
+is $t->app->routes->find('test3')->pattern->defaults->{namespace},      'MojoliciousTest2::Foo', 'right namespace';
+is $t->app->routes->find('withblock')->pattern->defaults->{controller}, 'foo',                   'right controller';
 is ref $t->app->routes->find('something'), 'Mojolicious::Routes::Route', 'right class';
 is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes', 'right class';
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
@@ -98,44 +105,37 @@ like $@, qr/^Can't locate object method "missing" via package "Mojolicious::Rout
 eval { Mojolicious::Route::missing() };
 like $@, qr/^Undefined subroutine &Mojolicious::Route::missing called/, 'right error';
 
-# Hidden controller attributes and methods
-$t->app->routes->hide('bar');
-ok !$t->app->routes->is_hidden('foo'), 'not hidden';
-ok $t->app->routes->is_hidden('bar'),                 'is hidden';
-ok $t->app->routes->is_hidden('_foo'),                'is hidden';
-ok $t->app->routes->is_hidden('AUTOLOAD'),            'is hidden';
-ok $t->app->routes->is_hidden('DESTROY'),             'is hidden';
-ok $t->app->routes->is_hidden('FOO_BAR'),             'is hidden';
-ok $t->app->routes->is_hidden('app'),                 'is hidden';
-ok $t->app->routes->is_hidden('attr'),                'is hidden';
-ok $t->app->routes->is_hidden('continue'),            'is hidden';
-ok $t->app->routes->is_hidden('cookie'),              'is hidden';
-ok $t->app->routes->is_hidden('every_cookie'),        'is hidden';
-ok $t->app->routes->is_hidden('every_param'),         'is hidden';
-ok $t->app->routes->is_hidden('every_signed_cookie'), 'is hidden';
-ok $t->app->routes->is_hidden('finish'),              'is hidden';
-ok $t->app->routes->is_hidden('has'),                 'is hidden';
-ok $t->app->routes->is_hidden('helpers'),             'is hidden';
-ok $t->app->routes->is_hidden('match'),               'is hidden';
-ok $t->app->routes->is_hidden('new'),                 'is hidden';
-ok $t->app->routes->is_hidden('on'),                  'is hidden';
-ok $t->app->routes->is_hidden('param'),               'is hidden';
-ok $t->app->routes->is_hidden('render'),              'is hidden';
-ok $t->app->routes->is_hidden('render_later'),        'is hidden';
-ok $t->app->routes->is_hidden('render_maybe'),        'is hidden';
-ok $t->app->routes->is_hidden('render_to_string'),    'is hidden';
-ok $t->app->routes->is_hidden('rendered'),            'is hidden';
-ok $t->app->routes->is_hidden('req'),                 'is hidden';
-ok $t->app->routes->is_hidden('res'),                 'is hidden';
-ok $t->app->routes->is_hidden('send'),                'is hidden';
-ok $t->app->routes->is_hidden('session'),             'is hidden';
-ok $t->app->routes->is_hidden('signed_cookie'),       'is hidden';
-ok $t->app->routes->is_hidden('stash'),               'is hidden';
-ok $t->app->routes->is_hidden('tap'),                 'is hidden';
-ok $t->app->routes->is_hidden('tx'),                  'is hidden';
-ok $t->app->routes->is_hidden('url_for'),             'is hidden';
-ok $t->app->routes->is_hidden('write'),               'is hidden';
-ok $t->app->routes->is_hidden('write_chunk'),         'is hidden';
+subtest 'Reserved stash value' => sub {
+  ok !$t->app->routes->is_reserved('foo'), 'not reserved';
+  ok $t->app->routes->is_reserved('action'),     'is reserved';
+  ok $t->app->routes->is_reserved('app'),        'is reserved';
+  ok $t->app->routes->is_reserved('cb'),         'is reserved';
+  ok $t->app->routes->is_reserved('controller'), 'is reserved';
+  ok $t->app->routes->is_reserved('data'),       'is reserved';
+  ok $t->app->routes->is_reserved('extends'),    'is reserved';
+  ok $t->app->routes->is_reserved('format'),     'is reserved';
+  ok $t->app->routes->is_reserved('handler'),    'is reserved';
+  ok $t->app->routes->is_reserved('inline'),     'is reserved';
+  ok $t->app->routes->is_reserved('json'),       'is reserved';
+  ok $t->app->routes->is_reserved('layout'),     'is reserved';
+  ok $t->app->routes->is_reserved('namespace'),  'is reserved';
+  ok $t->app->routes->is_reserved('path'),       'is reserved';
+  ok $t->app->routes->is_reserved('status'),     'is reserved';
+  ok $t->app->routes->is_reserved('template'),   'is reserved';
+  ok $t->app->routes->is_reserved('text'),       'is reserved';
+  ok $t->app->routes->is_reserved('variant'),    'is reserved';
+};
+
+subtest 'Reserved stash value (in placeholder)' => sub {
+  eval { $t->app->routes->any('/:controller') };
+  like $@, qr/Route pattern "\/:controller" contains a reserved stash value/, 'right error';
+  eval { $t->app->routes->any('/:action') };
+  like $@, qr/Route pattern "\/:action" contains a reserved stash value/, 'right error';
+  eval { $t->app->routes->any('/foo/:text') };
+  like $@, qr/Route pattern "\/foo\/:text" contains a reserved stash value/, 'right error';
+  eval { $t->app->routes->any('/foo/<text:num>') };
+  like $@, qr/Route pattern "\/foo\/<text:num>" contains a reserved stash value/, 'right error';
+};
 
 # Unknown hooks
 ok !$t->app->plugins->emit_chain('does_not_exist'),         'hook has been emitted';
@@ -157,15 +157,17 @@ is $t->app->plugins->emit_chain(custom_chain => 4), 8, 'hook has been emitted';
 is $t->app->start(qw(test_command --to)), 'works too!', 'right result';
 
 # Plugin::Test::SomePlugin2::register (security violation)
-$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)->content_like(qr/Page Not Found/);
+$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(404)->status_is(500)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)
+  ->content_like(qr/Class "MojoliciousTest::Plugin::Test::SomePlugin2" is not a controller/);
 
 # Plugin::Test::SomePlugin2::register (security violation again)
 $t->app->log->level('debug')->unsubscribe('message');
 my $log = '';
 my $cb  = $t->app->log->on(message => sub { $log .= pop });
-$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)->content_like(qr/Page Not Found/);
+$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(404)->status_is(500)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)
+  ->content_like(qr/Class "MojoliciousTest::Plugin::Test::SomePlugin2" is not a controller/);
 like $log, qr/Class "MojoliciousTest::Plugin::Test::SomePlugin2" is not a controller/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -200,16 +202,9 @@ $t->get_ok('/fun/joy')->status_is(200)->attr_is('p.joy', 'style', 'background-co
 # Foo::baz (missing action without template)
 $log = '';
 $cb  = $t->app->log->on(message => sub { $log .= pop });
-$t->get_ok('/foo/baz')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)
-  ->content_like(qr/Page Not Found/);
+$t->get_ok('/foo/baz')->status_is(500)->header_is(Server => 'Mojolicious (Perl)')->content_unlike(qr/Something/)
+  ->content_like(qr/Route without action and nothing to render/);
 like $log, qr/Action not found in controller/, 'right message';
-$t->app->log->unsubscribe(message => $cb);
-
-# Foo::render (action not allowed)
-$log = '';
-$cb  = $t->app->log->on(message => sub { $log .= pop });
-$t->get_ok('/foo/render')->status_is(404)->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Page Not Found/);
-like $log, qr/Action "render" is not allowed/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
 # Foo::yada (action-less template)
@@ -288,7 +283,8 @@ $t->put_ok('/somethingtest' => {'X-Test' => 'Hi there!'})->status_is(200)->heade
   ->content_is('/test4/42');
 $t->post_ok('/somethingtest?_method=PUT' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('/test4/42');
-$t->get_ok('/somethingtest?_method=PUT' => {'X-Test' => 'Hi there!'})->status_is(404);
+$t->get_ok('/somethingtest?_method=PUT' => {'X-Test' => 'Hi there!'})->status_is(500)
+  ->content_like(qr/Controller "MojoliciousTest::Somethingtest" does not exist/);
 
 # Foo::url_for_missing
 $t->get_ok('/something_missing' => {'X-Test' => 'Hi there!'})->status_is(200)
@@ -312,12 +308,12 @@ $t->get_ok('/test2' => {'X-Test' => 'Hi there!'})->status_is(200)->header_is('X-
   ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr!/test2!);
 
 # MojoliciousTestController::index
-$t->get_ok('/test3' => {'X-Test' => 'Hi there!'})->status_is(200)->header_is('X-Bender' => 'Bite my shiny metal ass!')
-  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/No class works!/);
+$t->get_ok('/test3' => {'X-Test' => 'Hi there!'})->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Namespace "MojoliciousTest2::Foo" requires a controller/);
 
-# MojoliciousTestController::index (only namespace)
-$t->get_ok('/test5' => {'X-Test' => 'Hi there!'})->status_is(200)->header_is('X-Bender' => 'Bite my shiny metal ass!')
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('/test5');
+# MojoliciousTest::Foo::Bar (no action)
+$t->get_ok('/test1' => {'X-Test' => 'Hi there!'})->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Controller "MojoliciousTest::Controller::Foo::Bar" requires an action/);
 
 # MojoliciousTestController::index (no namespace)
 $t->get_ok('/test6' => {'X-Test' => 'Hi there!'})->status_is(200)->header_is('X-Bender' => 'Bite my shiny metal ass!')
@@ -350,7 +346,7 @@ $t->get_ok('/another/file')->status_is(200)->header_is(Server => 'Mojolicious (P
 # Static directory /another
 $log = '';
 $cb  = $t->app->log->on(message => sub { $log .= pop });
-$t->get_ok('/another')->status_is(404)->header_is(Server => 'Mojolicious (Perl)');
+$t->get_ok('/another')->status_is(500)->header_is(Server => 'Mojolicious (Perl)');
 like $log, qr/Controller "MojoliciousTest::Another" does not exist/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
@@ -499,6 +495,12 @@ $t->get_ok('/redispatch/secret')->status_is(200)->header_is(Server => 'Mojolicio
 # SingleFileTestApp::Redispatch::secret
 $t->get_ok('/redispatch/secret?rly=1')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('Secret!');
+
+subtest 'Override deployment plugins' => sub {
+  my $t = Test::Mojo->new('SingleFileTestApp',
+    {plugins => [{'MojoliciousTest::Plugin::DeploymentPlugin' => {name => 'override_helper'}}]});
+  is $t->app->override_helper, 'deployment plugins work!', 'right value';
+};
 
 $t = Test::Mojo->new('MojoliciousTest');
 

@@ -59,6 +59,7 @@ use strict;
 use parent 'Mnet::Opts';
 use Carp;
 use Getopt::Long;
+use Mnet;
 use Mnet::Dump;
 use Mnet::Log::Conditional qw( DEBUG INFO WARN FATAL NOTICE );
 use Mnet::Opts::Cli::Cache;

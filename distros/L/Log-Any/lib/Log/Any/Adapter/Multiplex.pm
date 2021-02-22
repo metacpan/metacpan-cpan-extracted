@@ -1,7 +1,6 @@
 package Log::Any::Adapter::Multiplex;
-
 # ABSTRACT: Adapter to use allow structured logging across other adapters
-# VERSION
+our $VERSION = '1.709';
 
 use Log::Any;
 use Log::Any::Adapter;
@@ -117,7 +116,7 @@ Log::Any::Adapter::Multiplex - Adapter to use allow structured logging across ot
 
 =head1 VERSION
 
-version 1.708
+version 1.709
 
 =head1 SYNOPSIS
 

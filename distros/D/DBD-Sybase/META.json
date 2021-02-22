@@ -4,7 +4,7 @@
       "Michael Peppler (mpeppler@peppler.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.120351",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "unknown"
    ],
@@ -31,9 +31,21 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "DBI" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "1.16"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mpeppler/DBD-Sybase/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mpeppler/DBD-Sybase.git",
+         "web" : "https://github.com/mpeppler/DBD-Sybase"
+      }
+   },
+   "version" : "1.17"
 }

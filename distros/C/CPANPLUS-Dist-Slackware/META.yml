@@ -9,7 +9,7 @@ configure_requires:
 conflicts:
   Module::Build: '< 0.36'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,8 +35,9 @@ requires:
   perl: '5.006001'
   version: '0.77'
 resources:
-  repository: https://github.com/voegelas/CPANPLUS-Dist-Slackware.git
-version: '1.029'
-x_generated_by_perl: v5.32.0
+  bugtracker: https://github.com/graygnuorg/CPANPLUS-Dist-Slackware/issues
+  repository: https://github.com/graygnuorg/CPANPLUS-Dist-Slackware.git
+version: '1.032'
+x_generated_by_perl: v5.22.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

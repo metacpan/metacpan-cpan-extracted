@@ -3,7 +3,10 @@ use Mojo::Base 'Mojo::IRC';
 
 use Data::Dumper ();
 use IRC::Utils   ();
+use Mojo::Util   ();
 use constant DEBUG => $ENV{MOJO_IRC_DEBUG} || 0;
+
+Mojo::Util::deprecated 'Mojo::IRC::UA is deprecated and should no longer be used';
 
 has op_timeout => 10;
 
@@ -51,11 +54,11 @@ sub channel_topic {
   my $res = length($topic // '') ? {} : undef;
 
   if (!$channel) {
-    Mojo::IOLoop->next_tick(sub { $self->$cb('Cannot get/set topic without channel name.', {}) });
+    $self->ioloop->next_tick(sub { $self->$cb('Cannot get/set topic without channel name.', {}) });
     return $self;
   }
   if ($channel =~ /\s/) {
-    Mojo::IOLoop->next_tick(sub { $self->$cb('Cannot get/set topic on channel with spaces in name.', {}) });
+    $self->ioloop->next_tick(sub { $self->$cb('Cannot get/set topic on channel with spaces in name.', {}) });
     return $self;
   }
 
@@ -96,7 +99,7 @@ sub channel_users {
   my $users = {};
 
   if (!$channel) {
-    Mojo::IOLoop->next_tick(sub { $self->$cb('Cannot get users without channel name.', {}) });
+    $self->ioloop->next_tick(sub { $self->$cb('Cannot get users without channel name.', {}) });
     return $self;
   }
 
@@ -126,7 +129,7 @@ sub join_channel {
   # err_needmoreparams and will not allow special "JOIN 0"
 
   if (!$channel) {
-    Mojo::IOLoop->next_tick(sub { $self->$cb('Cannot join without channel name.') });
+    $self->ioloop->next_tick(sub { $self->$cb('Cannot join without channel name.') });
     return $self;
   }
 
@@ -254,11 +257,11 @@ sub part_channel {
 
   # err_needmoreparams
   if (!$channel) {
-    Mojo::IOLoop->next_tick(sub { $self->$cb('Cannot part without channel name.') });
+    $self->ioloop->next_tick(sub { $self->$cb('Cannot part without channel name.') });
     return $self;
   }
   if ($channel =~ /\s/) {
-    Mojo::IOLoop->next_tick(sub { $self->$cb('Cannot part channel with spaces.') });
+    $self->ioloop->next_tick(sub { $self->$cb('Cannot part channel with spaces.') });
     return $self;
   }
 
@@ -283,7 +286,7 @@ sub whois {
   my $info = {channels => {}, name => '', nick => $target, server => '', user => ''};
 
   unless ($target) {
-    Mojo::IOLoop->next_tick(sub { $self->$cb('Cannot retrieve whois information without target.', {}) });
+    $self->ioloop->next_tick(sub { $self->$cb('Cannot retrieve whois information without target.', {}) });
     return $self;
   }
 
@@ -411,7 +414,7 @@ sub _write_and_wait {
 
   # We want a "master timeout" as well, in case the server never send
   # us any response.
-  $tid = Mojo::IOLoop->timer(
+  $tid = $self->ioloop->timer(
     ($timeout = $self->op_timeout),
     sub {
       delete $self->{write_and_wait}{$_}{$cmd} for keys %$look_for;
@@ -432,7 +435,7 @@ sub _write_and_wait {
         return unless lc $v eq lc $needle->{$k};
       }
 
-      Mojo::IOLoop->remove($tid);
+      $self->ioloop->remove($tid);
       delete $self->{write_and_wait}{$_}{$cmd} for keys %$look_for;
       $self->$handler($event => '', $res);
     };
@@ -445,7 +448,7 @@ sub _write_and_wait {
     sub {
       my ($self, $err) = @_;
       return unless $err;    # no error
-      Mojo::IOLoop->remove($tid);
+      $self->ioloop->remove($tid);
       delete $self->{write_and_wait}{$_}{$cmd} for keys %$look_for;
       $self->$handler(err_write => $err, {});
     }
@@ -460,7 +463,7 @@ sub _write_and_wait {
 
 =head1 NAME
 
-Mojo::IRC::UA - IRC Client with sugar on top
+Mojo::IRC::UA - IRC Client with sugar on top (DEPRECATED)
 
 =head1 SYNOPSIS
 
@@ -472,7 +475,7 @@ Mojo::IRC::UA - IRC Client with sugar on top
 L<Mojo::IRC::UA> is a module which extends L<Mojo::IRC> with methods
 that can track changes in state on the IRC server.
 
-This module is EXPERIMENTAL and can change without warning.
+This module is DEPRECATED and should no longer be used.
 
 =head1 ATTRIBUTES
 

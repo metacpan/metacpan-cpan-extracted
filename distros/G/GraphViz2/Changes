@@ -1,3 +1,6 @@
+2.66 2021-02-21
+- from_graph not drop isolated vertices - thanks @jhannah-mm for report
+
 2.65 2021-01-09
 - undirected edges don't get doubled in from_graph, changes dot_input
 

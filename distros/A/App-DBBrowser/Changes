@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.258    2021-02-20
+        - Signal name: fixed spelling.
+
 2.257    2021-02-04
         - Check regex after user input.
 

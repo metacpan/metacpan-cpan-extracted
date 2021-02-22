@@ -4,13 +4,13 @@
       "Andrius Merkys <merkys@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Text-BibTeX-Validate",
    "prereqs" : {
@@ -24,7 +24,8 @@
             "Algorithm::CheckDigits" : "0",
             "Data::Validate::Email" : "0",
             "Data::Validate::URI" : "0",
-            "Scalar::Util" : "0"
+            "Scalar::Util" : "0",
+            "Text::sprintfn" : "0"
          }
       },
       "test" : {
@@ -47,8 +48,7 @@
          "web" : "https://github.com/merkys/text-bibtex-validate"
       }
    },
-   "version" : "0.1.1",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+   "version" : "0.3.0",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

@@ -1,0 +1,563 @@
+#!/bin/sh
+#! -*-perl-*-
+# This file is part of NetSNMP::Sendmail
+# Copyright (C) 2019-2020 Sergey Poznyakoff <gray@gnu.org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+eval 'exec perl -x -wS $0 ${1+"$@"}'
+    if 0;
+
+use strict;
+use warnings;
+use File::Temp;
+use File::Basename;
+use IPC::Cmd qw(can_run);
+use POSIX qw(strftime);
+use Fcntl;
+use Getopt::Long qw(:config gnu_getopt no_ignore_case require_order);
+use Pod::Usage;
+
+sub addts {
+    my $fd = shift;
+    print $fd "# Line added by $0 at "
+	      . strftime("%Y-%m-%dT%H:%M:%S", localtime)
+	      . "\n";
+}
+
+my $my_ts_rx = qr{^# Line added by $0 at };
+
+use constant {
+    EX_OK => 0,           # Success
+    EX_UNCHANGED => 1,    # Files not changed
+    EX_FATAL => 2,        # Fatal error
+    EX_USAGE => 64        # Usage error
+};
+
+use constant {
+    CMD_SETUP => 0,
+    CMD_REMOVE => 1
+};
+
+my $suppress_level = 0;
+my $dry_run;
+my @updated_services;
+
+use constant {
+    L_INFO => 0,
+    L_NOTICE => 1,
+    L_WARN => 2,
+    L_ERR => 3
+};
+
+use constant MAX_SUPPRESS_LEVEL => L_WARN;
+
+sub printlog {
+    my $level = shift;
+    if ($suppress_level <= $level) {
+	my $fh = (($level >= L_WARN) ? \*STDERR : \*STDOUT);
+	print $fh "$0: ".join(' ',@_)."\n";
+    }
+}
+
+my @restart_commands = (
+    [qw(systemctl restart $service)],
+    [qw(service $service restart)],
+    [qw(/etc/init.d/$service restart)],
+    [qw(/etc/rc.d/$service restart)],
+);
+my %restart_override;
+
+sub restart_service {
+    my $service = shift;
+
+    my $cmd = $restart_override{$service};
+    return if $cmd && $cmd eq 'no';
+
+    printlog(L_NOTICE, "restarting $service");
+    return if $dry_run;
+
+    if ($cmd) {
+	printlog(L_NOTICE, "running $cmd");
+	system($cmd);
+    } else {
+	foreach $cmd (@restart_commands) {
+	    my @c = map { s/\$service/$service/g; $_ } @$cmd;
+	    if (can_run($c[0])) {
+		printlog(L_NOTICE, "running @c");
+		system(@c);
+		return if ($? == 0);
+	    }
+	}
+    }
+}
+
+sub file_replace {
+    my ($file, $newfile) = @_;
+    my $bk = "$file~";
+    unlink $bk if -e $bk;
+    rename $file, $bk or die "can't rename $file to $bk: $!";
+    unless (rename $newfile, $file) {
+	printlog(L_WARN,
+		 "can't rename $newfile to $file: $!; restoring from backup");
+	unless (rename $bk, $file) {
+	    printlog(L_ERR, "failed to rename $bk to $file: $!");
+	    exit(EX_FATAL);
+	}
+    }
+}
+
+sub file_remline {
+    my ($file, $fd, $line, $endline) = @_;
+    $endline //= $line;
+    printlog(L_NOTICE,
+	     ($endline == $line) ? "editing $file: removing line $line"
+	     : "editing $file: removing lines $line-$endline");
+    return if $dry_run;
+    my $ofd = File::Temp->new(DIR => dirname($file), UNLINK => $dry_run);
+    seek($fd, 0, SEEK_SET) or die "seek $file: $!";
+    my $ln = 0;
+    while (<$fd>) {
+	$ln++;
+	next if ($line <= $ln && $ln <= $endline);
+	print $ofd $_;
+    }
+    close $ofd;
+    close $fd;
+    file_replace($file, $ofd->filename);
+}
+
+sub scan_snmpd_conf {
+    my ($file, $fd) = @_;
+
+    my $line = 0;
+    my $comline;
+    my $insert_line;
+
+    while (<$fd>) {
+	++$line;
+	chomp;
+	s/^\s+//;
+	
+	if (/$my_ts_rx/) {
+	    $comline = $line;
+	    next;
+	}
+	
+	if (/^perl\s+use\s+NetSNMP::Sendmail/) {
+	    if ($comline && $comline + 1 == $line) {
+		return (1, $comline, $line);
+	    } else {
+		return (1, $line);
+	    }
+	}
+	
+	if (/^perl\s+use/) {
+	    $insert_line = $line;
+	}
+    }
+    return (0, $insert_line || $line + 1);
+}
+
+sub update_snmpd_conf {
+    my ($ifile, $ifd, $insert_line, $stmt) = @_;
+
+    seek($ifd, 0, SEEK_SET) or die "seek: $!";
+    my $ofd = File::Temp->new(DIR => dirname($ifile), UNLINK => $dry_run);
+    my $line = 0;
+    while (<$ifd>) {
+	chomp;
+	++$line;
+	if ($insert_line && $line == $insert_line) {
+	    printlog(L_NOTICE, "editing $ifile (line $line)");
+	    addts $ofd;
+	    print $ofd "$stmt\n";
+	    $insert_line = undef;
+	}
+	print $ofd "$_\n";
+    }
+    if ($insert_line) {
+	printlog(L_NOTICE, "editing $ifile (append)");
+	addts $ofd;
+	print $ofd "$stmt\n";
+    }
+    close $ofd;
+    file_replace($ifile, $ofd->filename) unless ($dry_run);
+}
+
+sub edit_snmpd_conf {
+    my ($command, $name, $stmt) = @_;
+    my $u = umask(077);
+    if (open(my $fd, '<', $name)) {
+	my ($found, $line, $endline) = scan_snmpd_conf($name, $fd);
+	if ($command == CMD_SETUP) {
+	    if ($found) {
+		printlog(L_INFO, "$name:".($endline ? $endline : $line).": NetSNMP::Sendmail already enabled");
+	    } else {
+		update_snmpd_conf($name, $fd, $line, $stmt);
+	        push @updated_services, 'snmpd';
+	    }
+	} elsif ($found) {
+	    file_remline($name, $fd, $line, $endline);
+            push @updated_services, 'snmpd';
+	}
+	close $fd;
+    } else {
+	printlog(L_ERR, "can't open $name: $!");
+	exit(EX_FATAL);
+    }
+    umask($u);
+}
+
+sub check_file {
+    my $file = shift;
+    if (-f $file) {
+	if (! -r $file) {
+	    printlog(L_ERR, "$file is not readable");
+	    exit(EX_FATAL);
+	}
+    } else {
+	printlog(L_ERR, "$file does not exist");
+	exit(EX_FATAL);
+    }
+}
+
+# Check if NetSNMP::Sendmail is available.
+# To avoid namespace contamination, do it in a subprocess.
+# The module requires SmtpAgent.pm, whic spits out lots of messages
+# to STDERR when loaded outside of snmpd, so first redirect stderr
+# to /dev/null.
+sub check_module {
+    my $pid = fork();
+    die "fork failed" unless defined $pid;
+    if ($pid == 0) {
+	open(STDERR, '>', '/dev/null');
+	require NetSNMP::Sendmail;
+	exit 0;
+    }
+    wait;
+    if ($?) {
+	printlog(L_ERR, "NetSNMP::Sendmail doesn't seem to be installed");
+	exit(EX_FATAL);
+    }
+}
+
+sub scan_sendmail_mc {
+    my $fd = shift;
+    my $name;
+    my $last_nl;
+    my $comline;
+    my $line = 0;
+    while (<$fd>) {
+	$line++;
+	$last_nl = chomp;
+	s/^\s+//;
+
+	if (/$my_ts_rx/) {
+	    $comline = $line;
+	    next;
+	}
+	if (/^define\(\s*`?STATUS_FILE'?\s*,\s*`?(.+?)'?\s*\)/) {
+	    $name = $1;
+	    last
+	}
+    }
+
+    return ($name, $last_nl,
+	    ($comline && $comline + 1 == $line) ? ($comline, $line) : ($line));
+}
+
+sub edit_sendmail_mc {
+    my ($command, $file, $default_statfile) = @_;
+    if (open(my $fd, '+<', $file)) {
+	my $need_make;
+	my ($statfile, $last_nl, $line, $endline) = scan_sendmail_mc($fd);
+	if ($command == CMD_SETUP) {
+	    if ($statfile) {
+		printlog(L_INFO,
+			 "$file:".($endline ? $endline : $line).
+			 ": status file $statfile already enabled");
+	    } else {
+		$statfile = $default_statfile;
+		printlog(L_NOTICE, "editing $file");
+		unless ($dry_run) {
+		    seek($fd, 0, SEEK_END) or die "seek: $!";
+		    print $fd "\n" unless $last_nl;
+		    addts $fd;
+		    print $fd "define(`STATUS_FILE', `$statfile')\n";
+		}
+	        push @updated_services, 'sendmail';
+	        $need_make = !$dry_run;
+	    }
+
+	    if (-f $statfile) {
+		printlog(L_INFO, "$statfile exists");
+	    } else {
+	        printlog(L_NOTICE, "creating $statfile");
+	        unless ($dry_run) {
+		    if (open($fd, '>', $statfile)) {
+			close($fd);
+		    } else {
+		        warn "failed to create $statfile: $!";
+		    }
+		}
+	    }
+	} elsif ($statfile) {
+	    if ($endline) {
+		file_remline($file, $fd, $line, $endline);
+   	        push @updated_services, 'sendmail';
+	        $need_make = !$dry_run;
+	    } else {
+		printlog(L_INFO,
+			 "$file:$line: retaining status file setup: not configured by $0");
+	    }
+	}
+	close $fd;
+
+	if ($need_make) {
+	    my $sendmail_dir = dirname($file);
+	    printlog(L_NOTICE, "running make in $sendmail_dir");
+	    system("make "
+		   . ($dry_run ? '-n ' : '')
+		   . "-C $sendmail_dir");
+	}
+    } else {
+	printlog(L_ERR, "can't open $file: $!");
+	exit(EX_FATAL);
+    }
+}
+
+# Main
+my $snmpd_conf = '/etc/snmp/snmpd.conf';
+my $sendmail_mc = '/etc/mail/sendmail.mc';
+my $sendmail_statfile = '/etc/mail/sendmail.st';
+my $sendmail_bindir;
+
+my $command = CMD_SETUP;
+
+GetOptions('quiet|q+' => \$suppress_level,
+	   'dry-run|n' => \$dry_run,
+	   'status-file=s' => \$sendmail_statfile,
+	   'bindir=s' => \$sendmail_bindir,
+	   'restart=s' => sub {
+	       my ($name,$cmd) = split /=/, $_[1], 2;
+	       $restart_override{$name} = $cmd;
+	   },
+	   'configure' => sub { $command = CMD_SETUP },
+	   'deconfigure' => sub { $command = CMD_REMOVE },
+	   'help' => sub {
+	       pod2usage(-exitstatus => EX_OK, -verbose => 2);
+	   },
+	   'usage' => sub {
+	       pod2usage(-exitstatus => EX_OK, -verbose => 0);
+	   }
+) or pod2usage(-exitstatus => EX_USAGE, -verbose => 0, -output => \*STDERR);
+
+pod2usage(-exitstatus => EX_USAGE, -verbose => 0, -output => \*STDERR)
+    if @ARGV;
+
+if ($suppress_level > MAX_SUPPRESS_LEVEL) {
+    $suppress_level = MAX_SUPPRESS_LEVEL;
+}
+
+check_module;
+check_file($snmpd_conf);
+check_file($sendmail_mc);
+check_file('/etc/mail/Makefile');
+
+unless ($sendmail_bindir) {
+    if (-d "/usr/lib/sm.bin") {
+	$sendmail_bindir = "/usr/lib/sm.bin";
+    }
+}
+
+my $stmt = 'perl use NetSNMP::Sendmail';
+if ($sendmail_bindir) {
+    $stmt .= ' qw(:config bindir /usr/lib/sm.bin)';
+}
+$stmt .= ';';
+
+edit_sendmail_mc($command, $sendmail_mc, $sendmail_statfile);
+edit_snmpd_conf($command, $snmpd_conf, $stmt);
+
+map { restart_service($_) } @updated_services;
+
+exit(@updated_services ? EX_OK : EX_UNCHANGED);
+
+__END__
+=head1 NAME
+
+netsnmp-sendmail-setup - sets up Sendmail monitoring via SNMP
+
+=head1 SYNOPSIS
+
+B<netsnmp-sendmail-setup>
+[B<-nq>]
+[B<--bindir=I<DIR>>]
+[B<--configure>]
+[B<--deconfigure>]
+[B<--dry-run>]
+[B<--status-file=I<FILE>>]
+[B<--quiet>]
+[B<--restart=I<service>=I<command>>]
+    
+B<netsnmp-sendmail-setup> B<--help> | B<--usage>
+
+=head1 DESCRIPTION
+
+Sets up B<sendmail> and B<snmpd> for obtaining Sendmail statistics via
+SNMP. First, it checks whether the Sendmail configuration source
+F</etc/mail/sendmail.mc> contains the B<STATUS_FILE> clause and adds it
+if not. Then, it creates the status file and runs B<make> in the F</etc/mail>
+directory. Finally, the file F</etc/snmp/snmpd.conf> is scanned for the
+B<perl use NetSNMP::Sendmail> statement. It is added if not already present.
+Each added configuration line is preceded by a comment stating that it
+was added by the script.
+
+When run with the B<--deconfigure> option, the reverse operation is
+performed.  The B<NetSNMP::Sendmail> configuration statement is removed
+from the snmpd configuration unconditionally.  The B<STATUS_FILE> clause
+is removed from F</etc/mail/sendmail.mc> only if it is preceded by the
+B<netsnmp-sendmail-setup> comment marker.  The status file itself is
+never removed.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--bindir=I<DIR>>
+
+Some installations place Sendmail binaries in a separate directory, which
+is not included in the B<$PATH> environment variable.  Use this option to
+inform B<NetSNMP::Sendmail> about this.
+
+Notice for the users of Debian-based systems: the F</usr/lib/sm.bin>
+directory is picked up automatically.
+
+=item B<--configure>
+
+A no-op option included for symmetry with B<--deconfigure>.    
+
+=item B<--deconfigure>
+
+Remove the configuration statements previously added to the snmdp and
+sendmail configuration files.    
+    
+=item B<-n>, B<--dry-run>
+
+Dry run mode.  Don't modify any files, just print what would have been done
+and exit with the appropriate error code (see B<EXIT STATUS> section).
+
+Use the B<--quiet> option to control the amount of data printed.
+
+=item B<-q>, B<--quiet>
+
+Quiet mode.  When used once, suppresses informative output.  When used twice,
+suppresses both informative output and notification messages about modified
+files.
+
+=item B<--restart=I<service>=I<command>>
+
+Use I<command> to restart system service I<service> (either B<snmpd> or
+B<sendmail>).  Use B<--restart=I<service>=no> to skip restarting this
+particular I<service>.
+
+In the absence of this option, B<netsnmp-sendmail-setup> uses the first
+available command from the following list:
+
+    systemctl restart $service
+    service $service restart
+    /etc/init.d/$service restart
+    /etc/rc.d/$service restart
+
+=item B<--status-file=I<FILE>>
+
+Name of the Sendmail status file to use when generating the
+B<define(STATUS_FILE)> statement in the Sendmail configuration file.
+
+=item B<--help>
+
+Displays short help message.
+
+=item B<--usage>
+
+Displaye short usage message.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item F</etc/mail/Makefile>
+
+This file is supposed to recreate the B<sendmail.cf> file from B<sendmail.mc>
+if no special goal is given.
+
+=item F</etc/snmp/snmpd.conf>
+
+Default B<snmpd> configuration file.  This file must exist.
+
+=item F</etc/mail/sendmail.mc>
+
+Default source file for creating B<sendmail.cf>.
+
+=item F</etc/mail/sendmail.st>
+
+Default statistics file to use. Can be changed using the B<--status-file>
+option.
+
+=item F</usr/lib/sm.bin>
+
+Default directory for Sendmail binaries on Debian-based installations. If
+exists, it will be used in the B<NetSNMP::Sendmail> configuration.
+
+This can be changed using the B<--bindir> command line option.
+
+=back
+
+=head1 EXIT STATUS
+
+=over 4
+
+=item B<0>
+
+Success.
+
+=item B<1>
+
+Success, no modification was necessary.
+
+=item B<2>
+
+Fatal error occurred.
+
+=item B<64>
+
+Command line usage error.
+
+=back
+
+=head1 SEE ALSO
+
+B<NetSNMP::Sendmail>(3).
+
+=head1 BUGS
+
+The Sendmail configuration directory and the name of the B<snmpd>
+configuration file are hardcoded.
+
+The command relies on B<make -C /etc/mail> to create F<sendmail.cf> from
+F<sendmail.mc>.
+
+=cut

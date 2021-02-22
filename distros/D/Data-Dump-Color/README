@@ -2,8 +2,8 @@ NAME
     Data::Dump::Color - Like Data::Dump, but with color
 
 VERSION
-    This document describes version 0.242 of Data::Dump::Color (from Perl
-    distribution Data-Dump-Color), released on 2021-02-06.
+    This document describes version 0.243 of Data::Dump::Color (from Perl
+    distribution Data-Dump-Color), released on 2021-02-13.
 
 SYNOPSIS
     Use it like you would Data::Dump, e.g.:
@@ -133,7 +133,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Data-Dump-Color/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-Color>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

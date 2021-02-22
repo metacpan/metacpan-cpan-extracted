@@ -1,5 +1,10 @@
 Revision history for Perl module Dumbbench
 
+0.501 2021-02-15T16:39:38Z
+	* Align the rates and precision separately (Github #4). This changes
+	the data structure that cmpthese returns by inserting a column in
+	each row.
+
 0.111 2017-06-17T06:50:28Z
 	* Add a --float option to use basic floating point notation
 	instead of scientific notation (Eric Herman, Pull Request #6 in 

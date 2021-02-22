@@ -150,7 +150,7 @@ typedef struct {
     xh_char_t           encoding[XH_PARAM_LEN];
     xh_char_t          *tmp;
     size_t              tmp_size;
-    xh_char_t          *node, *end, *content;
+    xh_char_t          *node, *end, *end_of_attr_value, *content;
     unsigned int        flags;
     xh_x2h_node_t      *nodes;
     SV                **lval;

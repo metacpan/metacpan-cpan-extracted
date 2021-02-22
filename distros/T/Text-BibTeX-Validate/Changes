@@ -1,3 +1,19 @@
+0.3.0 2021-02-18
+
+    - Switching from issuing Perl warnings to returning
+      Text::BibTeX::Validate::Warning instances.
+    - Implementing clean_BibTeX() which cleans the BibTeX according to
+      validation suggestions.
+    - Suggesting replacements for month numbers and long names.
+
+0.2.0 2021-02-15
+
+    - Renaming 'btvalidate' -> 'bibtex-validate'.
+    - Issuing warnings as objects.
+    - Reporting PMCIDs provided instead of PMIDs.
+    - Reporting empty fields.
+    - Reporting URLs with trailing newlines.
+
 0.1.1 2021-02-03
 
     - Adding POD.

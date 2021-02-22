@@ -1,9 +1,9 @@
 #
 #	Makefile.PL for Term::ReadLine::Gnu
 #
-#	$Id: Makefile.PL 568 2020-04-23 13:25:35Z hayashi $
+#	$Id: Makefile.PL 585 2021-02-22 14:09:53Z hayashi $
 #
-#	Copyright (c) 1996-2017 Hiroo Hayashi.  All rights reserved.
+#	Copyright (c) 1996-2021 Hiroo Hayashi.  All rights reserved.
 #		<hiroo.hayashi@computer.org>
 #
 #	This program is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@ use ExtUtils::MakeMaker;
 use Config;
 use Getopt::Long;
 use 5.008; use 5.8.1;
-my ($defs, $libs, $lddflags, $RLLIB, $RLINC);
+my ($defs, $libs, $lddflags, $RLLIB, $RLINC, @LIBPTH);
 
 # exit 0 before creating the Makefile to be CPAN Testers friendly
 # see http://wiki.cpantester.org/wiki/CPANAuthorNotes
@@ -39,10 +39,6 @@ if ($ENV{AUTOMATED_TESTING}
     warn "wrong \$TERM value: $ENV{TERM}\n";
     exit 0;
 }
-# I could not reach a tester, "Chris Williams (BINGOS)".
-#if ($ENV{AUTOMATED_TESTING} && ($Config{osname} eq 'openbsd')) {
-#    die "OS unsupported\nPlease contact the author.\n";
-#}
 
 $defs = ($Config{strings} =~ m|/string.h$|) ? '-DHAVE_STRING_H' : '';
 
@@ -57,10 +53,24 @@ if ($Config{ccflags} =~ /-D_FORTIFY_SOURCE=/) {
     GetOptions("prefix=s" => \$prefix,
 	       "libdir=s" => \$libdir,
 	       "includedir=s" => \$incdir);
-    $RLLIB = defined $libdir
-	? "-L$libdir" : (defined $prefix ? "-L$prefix/lib" : '');
-    $RLINC = defined $incdir
-	? "-I$incdir" : (defined $prefix ? "-I$prefix/include" : '');
+    if (defined $libdir) {
+        foreach (split(':', $libdir)) {
+            $RLLIB .= " -L$_";
+            push (@LIBPTH, $_);
+        }
+    }
+    if (defined $incdir) {
+        foreach (split(':', $incdir)) {
+            $RLINC .= " -I$_";
+        }
+    }
+    if (defined $prefix) {
+        foreach (split(':', $prefix)) {
+            $RLLIB .= " -L$_/lib";
+            push (@LIBPTH, "$_/lib");
+            $RLINC .= " -I$_/include";
+        }
+    }
 }
 
 if ($Config{osname} eq 'os2') {
@@ -73,11 +83,15 @@ if ($Config{osname} eq 'os2') {
     # OS X uses libedit, but they've named it libreadline...
     # see if user has installed gnu readline via homebrew
     if ($Config{osname} eq 'darwin' && !($RLLIB || $RLINC)) {
-        my $homebrew_prefix = `brew --prefix readline`;
-        if ($homebrew_prefix) {
+        foreach ('readline', 'ncurses') {
+            my $homebrew_prefix = `brew --prefix $_`;
             chomp $homebrew_prefix;
-            $RLLIB = "-L$homebrew_prefix/lib";
-            $RLINC = "-I$homebrew_prefix/include";
+            if ($homebrew_prefix
+                && ((substr($Config{osvers}, 0, index($Config{osvers}, '.')) > 19) || -d $homebrew_prefix)) {
+                $RLLIB .= " -L$homebrew_prefix/lib";
+                push (@LIBPTH, "$homebrew_prefix/lib");
+                $RLINC .= " -I$homebrew_prefix/include";
+            }
         }
     }
 
@@ -95,8 +109,16 @@ if ($Config{osname} eq 'os2') {
 	|| &search_lib('-lcurses');
 
     unless ($TERMCAP_LIB) {
-	warn "Could not find neither libtermcap, libtinfo, libncurses, or libcurses.\n";
-	exit $err;
+        warn "Could not find neither libtermcap, libtinfo, libncurses, or libcurses.\n";
+        if ($Config{osname} eq 'darwin'
+            && substr($Config{osvers}, 0, index($Config{osvers}, '.')) > 19
+            && $ExtUtils::MakeMaker::VERSION < 7.58) {
+            warn "Install XCode or use Homebrew package.\n";
+            warn "macOS Big Sur or later requires ExtUtils::MakeMaker 7.58 or later.\n";
+            warn "See https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/381 for details.\n";
+        } else {
+            exit $err;
+        }
     } 
  
     $libs = "-lreadline $TERMCAP_LIB";
@@ -176,9 +198,16 @@ exit(0);
 # Search a library '$lib' in $Config{libpth} directories, and return
 # $lib if exist or undef unless exist.
 
-# ExtUtils::Liblist::ext() do similar job as this subroutine, but it
-# warns unnecessary messages.
+# ExtUtils::Liblist::ext() is not verbose by default any more and does much better job.
 sub search_lib {
+    my ($lib) = @_;
+    my ($EXTRALIBS, $BSLOADLIBS, $LDLOADLIBS, $LD_RUN_PATH) = ExtUtils::Liblist->ext($lib);
+    return $EXTRALIBS || $LDLOADLIBS || search_lib_sub($lib);
+}
+
+# ExtUtils::Liblist::ext() do similar job as this subroutine, but it
+# warns unnecessary messages. -> TRG-1.38: Now it is used to search termcap library.
+sub search_lib_sub {
     my ($lib) = @_;
     unless ($lib =~ /^-l/) {
 	warn "search_lib: illegal arguments, \`$lib\'.\n";
@@ -186,14 +215,10 @@ sub search_lib {
     }
     my $libbase = 'lib' . substr($lib, 2) . $Config{lib_ext};
     my $libbase_so = 'lib' . substr($lib, 2) . "." . $Config{so};
-    foreach (split(' ', $Config{libpth})) {
+    foreach (@LIBPTH) {
 	if (-f $_ . '/' . $libbase) {
-#	    print "$_/$libbase\n";
-	    print "Found \`$_/$libbase\'.\n";
 	    return $lib;
 	} elsif (-f $_ . '/' . $libbase_so) {
-#	    print "$_/$libbase_so\n";
-	    print "Found \`$_/$libbase_so\'.\n";
 	    return $lib;
 	}
     }

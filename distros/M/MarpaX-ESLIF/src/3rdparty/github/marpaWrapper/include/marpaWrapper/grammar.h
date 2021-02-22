@@ -22,14 +22,16 @@ typedef enum marpaWrapperGrammarEventType {
   MARPAWRAPPERGRAMMAR_EVENTTYPE_PREDICTION = 0x04
 } marpaWrapperGrammarEventType_t;
 
-/* Possile triggered events */
-typedef struct marpaWrapperGrammarEvent {
-  enum {
-    MARPAWRAPPERGRAMMAR_EVENT_COMPLETED,
+typedef enum marpaWrapperGrammarTriggeredEventType {
+    MARPAWRAPPERGRAMMAR_EVENT_COMPLETED = 0,
     MARPAWRAPPERGRAMMAR_EVENT_NULLED,
     MARPAWRAPPERGRAMMAR_EVENT_EXPECTED,
     MARPAWRAPPERGRAMMAR_EVENT_EXHAUSTED
-  } eventType;
+} marpaWrapperGrammarTriggeredEventType_t;
+
+/* Possile triggered events */
+typedef struct marpaWrapperGrammarEvent {
+  marpaWrapperGrammarTriggeredEventType_t eventType;
   int symboli; /* -1 in case of exhaustion, symbolId otherwise */
 } marpaWrapperGrammarEvent_t;
 

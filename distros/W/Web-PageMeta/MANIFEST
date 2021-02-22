@@ -1,0 +1,25 @@
+Build.PL
+Changes
+lib/Web/PageMeta.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00_compile.t
+t/01_scraping-processing.t
+t/02_async.t
+t/site_data/fetch_sitedata.pl
+t/site_data/https%3A%2F%2Fapa.at%2F
+t/site_data/https%3A%2F%2Fapa.at%2F.hdrs
+t/site_data/https%3A%2F%2Fapa.at%2Fwp-content%2Fuploads%2F2020%2F05%2Fapa_start_1.jpg
+t/site_data/https%3A%2F%2Fapa.at%2Fwp-content%2Fuploads%2F2020%2F05%2Fapa_start_1.jpg.hdrs
+t/site_data/https%3A%2F%2Fgeizhals.at%2Fx-a2374481.html
+t/site_data/https%3A%2F%2Fgeizhals.at%2Fx-a2374481.html.hdrs
+t/site_data/https%3A%2F%2Fwww.meon.eu%2F
+t/site_data/https%3A%2F%2Fwww.meon.eu%2F.hdrs
+t/site_data/https%3A%2F%2Fwww.meon.eu%2Fbase-test1
+t/site_data/https%3A%2F%2Fwww.meon.eu%2Fbase-test1.hdrs
+t/site_data/https%3A%2F%2Fwww.meon.eu%2Fbase-test2
+t/site_data/https%3A%2F%2Fwww.meon.eu%2Fbase-test2.hdrs
+t/site_data/https%3A%2F%2Fwww.meon.eu%2Fstatic%2Fimg%2Fpicture1.jpg
+t/site_data/https%3A%2F%2Fwww.meon.eu%2Fstatic%2Fimg%2Fpicture1.jpg.hdrs

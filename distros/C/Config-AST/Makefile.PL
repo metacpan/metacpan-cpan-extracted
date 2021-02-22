@@ -27,6 +27,10 @@ WriteMakefile(NAME      =>      'Config::AST',
 			  url => 'git://git.gnu.org.ua/config-ast.git',
 			  web => 'http://git.gnu.org.ua/cgit/config-ast.git/',
 		      },
+		      bugtracker => {
+			  web => 'https://puszcza.gnu.org.ua/bugs/?group=config-ast',
+			  mailto => 'gray+config-ast@gnu.org.ua'
+		      }
 		  },
 		  provides => Module::Metadata->provides(version => '1.4',
 							 dir => 'lib')

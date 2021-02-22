@@ -8,7 +8,7 @@ package Object::Pad;
 use v5.14;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use Carp;
 
@@ -139,18 +139,16 @@ An optional version check can also be supplied; it performs the equivalent of
 
    BaseClass->VERSION( $ver )
 
-An optional list of attributes may be supplied in similar syntax as for subs
-or lexical variables. (These are annotations about the class itself; the
-concept should not be confused with per-object-instance data, which here is
-called "slots").
-
 One or more roles can be composed into the class by the keyword C<implements>
 
    class Name implements ROLE, ROLE,... {
       ...
    }
 
-The following class attributes are supported:
+An optional list of attributes may be supplied in similar syntax as for subs
+or lexical variables. (These are annotations about the class itself; the
+concept should not be confused with per-object-instance data, which here is
+called "slots"). The following class attributes are supported:
 
 =head3 :repr(TYPE)
 
@@ -294,7 +292,7 @@ to store references to anonymous arrays or hashes.
 Member fields are private to a class or role. They are not visible to users of
 the class, nor to subclasses, nor to any class that a role is applied to. In
 order to provide access to them a class may wish to use L</method> to create
-an accessor.
+an accessor, or use the attributes such as L</:reader> to get one generated.
 
 A scalar slot may provide a expression that gives an initialisation value,
 which will be assigned into the slot of every instance during the constructor

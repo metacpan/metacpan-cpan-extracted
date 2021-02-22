@@ -1,3 +1,7 @@
+0.002000    2021-02-16
+            * Teach encoder to accept numbers, and make tests use plain URI::Escape.
+            * Fix encoding of upgraded strings.
+
 0.000008    2016-07-14
             * Use memcpy instead of copying three bytes separately,
               it gets us a bit more speed.

@@ -1,5 +1,15 @@
 Revision history for this software.
 
+0.22  2021-02-21 00:00:00
+  - supports version strings
+  - removed package name from some variables
+  - created by INABA Hitoshi
+
+0.21  2021-02-14 00:00:00
+  - fix mb::reverse() with no parameters on scalar context
+  - local $_ in mb::chr, mb::_lstat, mb::_stat
+  - created by INABA Hitoshi
+
 0.20  2021-01-27 00:00:00
   - removes $term and introduce parse_ambiguous_char()
   - removes mb::PERL package

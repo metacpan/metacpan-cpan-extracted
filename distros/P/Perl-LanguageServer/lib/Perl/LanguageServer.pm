@@ -29,11 +29,11 @@ Perl::LanguageServer - Language Server and Debug Protocol Adapter for Perl
 
 =head1 VERSION
 
-Version 2.1.0
+Version 2.2.0
 
 =cut
 
-our $VERSION = '2.1.0';
+our $VERSION = '2.2.0';
 
 
 =head1 SYNOPSIS
@@ -42,7 +42,7 @@ This is a Language Server and Debug Protocol Adapter for Perl
 
 It implements the Language Server Protocol which provides
 syntax-checking, symbol search, etc. Perl to various editors, for
-example Visual Stuido Code or Atom.
+example Visual Studio Code or Atom.
 
 L<https://microsoft.github.io/language-server-protocol/specification>
 
@@ -54,12 +54,6 @@ L<https://microsoft.github.io/debug-adapter-protocol/overview>
 To use both with Visual Studio Code, install the extention "perl"
 
 Any comments and patches are welcome.
-
-NOTE: This module uses Compiler::Lexer. The version on cpan (0.22) is buggy
-crashes from time to time. For this reason a working version from github
-is bundled with this module and will be installed when you run Makefile.PL.
-
-L<https://github.com/goccy/p5-Compiler-Lexer>
 
 =cut
 
@@ -73,7 +67,9 @@ our $workspace ;
 our $dev_tool ;
 our $debug1 = 0 ;
 our $debug2 = 0 ;
+our $log_file ;
 our $client_version ;
+our $reqseq = 1_000_000_000 ;
 
 
 has 'channel' =>
@@ -136,7 +132,16 @@ sub logger
         }
     $src = $self if (!$src) ;
     
-    print STDERR $src?$src -> log_prefix . ': ':'', @_ ;    
+    if ($log_file)
+        {
+        open my $fh, '>>', $log_file or warn "$log_file : $!" ;
+        print $fh $src?$src -> log_prefix . ': ':'', @_ ;    
+        close $fh ;
+        }
+    else
+        {
+        print STDERR $src?$src -> log_prefix . ': ':'', @_ ;    
+        }
     }
 
 
@@ -186,7 +191,7 @@ sub call_method
         }
     else
         {
-        die "Unknown methd $method" ;    
+        die "Unknown method $method" ;    
         }
     $module = $req -> type eq 'dbgint'?'DebugAdapterInterface':'DebugAdapter' if ($req -> is_dap) ;    
 
@@ -227,12 +232,15 @@ sub process_req
     {
     my ($self, $id, $reqdata) = @_ ;
 
-    $running_coros{$id} = async
+    my $xid = $id ;
+    $xid ||= $reqseq++ ;
+    $running_coros{$xid} = async
         {
         my $req_guard = Guard::guard 
             { 
-            delete $running_reqs{$id} ;
-            delete $running_coros{$id} ;
+            $self -> logger ("done handle_req id=$xid\n") if ($debug1) ;
+            delete $running_reqs{$xid} ;
+            delete $running_coros{$xid} ;
             };
 
         my $type   = $reqdata -> {type} ;
@@ -240,7 +248,7 @@ sub process_req
         $type      = defined ($id)?'request':'notification' if (!$type) ;
         $self -> logger ("handle_req id=$id\n") if ($debug1) ;
         my $req = Perl::LanguageServer::Req  -> new ({ id => $id, is_dap => $is_dap, type => $type, params => $is_dap?$reqdata -> {arguments} || {}:$reqdata -> {params}}) ;
-        $running_reqs{$id} = $req ;
+        $running_reqs{$xid} = $req ;
 
         my $rsp ;
         my $outdata ;
@@ -294,7 +302,6 @@ sub process_req
                 $self -> logger ("<--- Response: ", $jsonpretty -> encode ($outjson), "\n") ;
                 }
             }
-        cede () ;
         } ;
     }
 
@@ -413,7 +420,12 @@ sub _run_tcp_server
                             close ($fh) ;
                             $fh = undef ;
                             }
-                        $tcpcv -> send if ($quit || $exit);
+                        if ($quit || $exit)
+                            {
+                            $tcpcv -> send ;
+                            IO::AIO::reinit () ; # stop AIO requests
+                            exit (1) ;
+                            }
                         } ;
                     } ;
                 } ;
@@ -436,7 +448,8 @@ sub _run_tcp_server
                         } ;        
                     }    
                 $@ = undef ;
-                Coro::AnyEvent::sleep (1) ;
+                Coro::AnyEvent::sleep (2) ;
+                IO::AIO::reinit () ; # stop AIO requests
                 exit (1) ; # stop LS, vscode will restart it
                 }
             }
@@ -462,6 +475,10 @@ sub run
             $debug1 = shift @ARGV  ;
             $debug2 = $debug1 > 1?1:0 ;    
             }
+        elsif ($opt eq '--log-file')
+            {
+            $log_file = shift @ARGV ;
+            }
         elsif ($opt eq '--port')
             {
             $listen_port = shift @ARGV  ;    
@@ -484,15 +501,15 @@ sub run
     
     my $cv = AnyEvent::CondVar -> new ;
 
-   if ($heartbeat)
+   if ($heartbeat || $debug2)
         {
         async
             {
             my $i = 0 ;
             while (1)
                 {
-                print STDERR "#####$i\n" ;
-                Coro::AnyEvent::sleep (3) ;
+                logger (undef, "##### $i #####\n running: " . dump (\%running_reqs) . " coros: " . dump (\%running_coros), "\n") ;
+                Coro::AnyEvent::sleep (10) ;
                 $i++ ;
                 }
             } ;

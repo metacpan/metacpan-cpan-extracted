@@ -4,7 +4,7 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "lgpl_2_1"
    ],
@@ -53,7 +53,7 @@
    "provides" : {
       "Apache::Config::Preproc" : {
          "file" : "lib/Apache/Config/Preproc.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Apache::Config::Preproc::Expand" : {
          "file" : "lib/Apache/Config/Preproc/Expand.pm"
@@ -94,12 +94,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "gray+acpp@gnu.org.ua",
+         "web" : "https://puszcza.gnu.org.ua/bugs/?group=acpp"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://git.gnu.org.ua/acpp.git",
          "web" : "http://git.gnu.org.ua/cgit/acpp.git/"
       }
    },
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.07"
 }

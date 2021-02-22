@@ -24,7 +24,7 @@ no_index:
 provides:
   MojoX::Log::Fast:
     file: lib/MojoX/Log/Fast.pm
-    version: v1.0.1
+    version: v1.2.0
 requires:
   Log::Fast: '0'
   Mojo::Base: '0'
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/powerman/perl-MojoX-Log-Fast/issues
   homepage: https://github.com/powerman/perl-MojoX-Log-Fast
   repository: https://github.com/powerman/perl-MojoX-Log-Fast.git
-version: v1.0.1
+version: v1.2.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -3,7 +3,7 @@ package DBIx::BatchChunker::LoopState;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Loop state object for DBIx::BatchChunker
 use version;
-our $VERSION = 'v0.940.2'; # VERSION
+our $VERSION = 'v0.940.4'; # VERSION
 
 use Moo;
 use MooX::StrictConstructor;
@@ -295,7 +295,7 @@ DBIx::BatchChunker::LoopState - Loop state object for DBIx::BatchChunker
 
 =head1 VERSION
 
-version v0.940.2
+version v0.940.4
 
 =head1 SYNOPSIS
 
@@ -409,7 +409,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+This software is Copyright (c) 2018 - 2021 by Grant Street Group.
 
 This is free software, licensed under:
 

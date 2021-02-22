@@ -2,6 +2,7 @@ package Keyword::DEVELOPMENT;
 
 use 5.012;    # required for pluggable keywords
 use warnings;
+use Carp 'croak';
 use Keyword::Simple;
 
 =head1 NAME
@@ -10,11 +11,11 @@ Keyword::DEVELOPMENT - Have code blocks which don't exist unless you ask for the
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -39,19 +40,41 @@ If the environment variable C<PERL_KEYWORD_DEVELOPMENT> is set to a true
 value, the code block is executed. Otherwise, the entire block is removed at
 compile-time, thus ensuring that there is no runtime overhead for the block.
 
+ALternatively, you can set the C<PERL_KEYWORD_DEVELOPMENT_MATCH> variable to a
+valid Perl regular expression to only run C<DEVELOPMENT> blocks in packages
+matching the regex.
+
 This is primarily a development tool for performance-critical code.
 
 =cut
 
 sub import {
+    my $caller = caller;
+
+    my $match = $ENV{PERL_KEYWORD_DEVELOPMENT_MATCH};
+    if ( defined $match ) {
+        $ENV{PERL_KEYWORD_DEVELOPMENT} = 1;
+        my $success = eval { qr/$match/; 1 };
+        unless ($success) {
+            my $error = $@;
+            croak(
+"PERL_KEYWORD_DEVELOPMENT_MATCH environment variable '$ENV{PERL_KEYWORD_DEVELOPMENT_MATCH}' is not a valid regex: $error"
+            );
+        }
+    }
+
     Keyword::Simple::define 'DEVELOPMENT', sub {
+        my $in_development = 0;
         my ($ref) = @_;
         if ( $ENV{PERL_KEYWORD_DEVELOPMENT} ) {
-            substr( $$ref, 0, 0 ) = 'if (1)';
+            if ( defined $match ) {
+                $in_development = $caller =~ /$match/ ? 1 : 0;
+            }
+            else {
+                $in_development = 1;
+            }
         }
-        else {
-            substr( $$ref, 0, 0 ) = 'if (0)';
-        }
+        substr( $$ref, 0, 0 ) = "if ($in_development)";
     };
 }
 
@@ -66,7 +89,7 @@ Consider the following code:
     #!/usr/bin/env perl
 
     BEGIN {
-        # just in case someone turned this one
+        # just in case someone turned this off
         $ENV{PERL_KEYWORD_DEVELOPMENT} = 1;
     }
     use lib 'lib';
@@ -122,13 +145,29 @@ Note the handy line directive on line 13 to ensure your line numbers remain
 correct. If you're not familiar with line directives, see
 L<https://perldoc.perl.org/perlsyn.html#Plain-Old-Comments-(Not!)>
 
+=head1 MATCHING PACKAGES
+
+If you use C<Keyword::DEVELOPMENT> extensively, you may find that the
+C<DEVELOPMENT> block is called too frequently. As of version 0.05, an
+experimental feature has been added to allow you to only invoke C<DEVELOPMENT>
+blocks in packages matching a regex. Set the C<PERL_KEYWORD_DEVELOPMENT_MATCH>
+variable to a Perl regular expression instead of the
+C<PERL_KEYWORD_DEVELOPMENT> variable. Only packages whose names match the
+regular expression will have their C<DEVELOPMENT> block triggered.
+
+    PERL_KEYWORD_DEVELOPMENT_MATCH='^(?:Our::Codebase::|Our::MonkeyPatches::)' \
+        perl some_code.pl
+
+The above will only run C<DEVELOPMENT> for packages whose package names start
+with C<Our::Codebase::> or C<Our::MonkeyPatches::>.
+
 =head1 ALTERNATIVES
 
 As SawyerX pointed out, can replicate the functionality of this module in pure
 Perl, if desired:
 
     use constant PRODUCTION => !!$ENV{PRODUCTION};
-    DEVELOPMENT {expensive_debugging_code()} unless PRODUCTION;
+    do {expensive_debugging_code()} unless PRODUCTION;
 
 Versus:
 
@@ -187,7 +226,6 @@ L<http://search.cpan.org/dist/Keyword-DEVELOPMENT/>
 
 Thanks to Damian Conway for the excellent C<Keyword::Declare> module.
 
-
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2017 Curtis "Ovid" Poe.
@@ -227,7 +265,6 @@ YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
 CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 
 =cut
 

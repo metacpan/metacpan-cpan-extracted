@@ -1,21 +1,32 @@
 ---
-name: Alien-Prototype
-version: 1.6.0.2
+abstract: '(DEPRECATED) installing and finding Prototype JS library'
 author:
-  - Graham TerMarsch (cpan@howlingfrog.com)
-abstract: installing and finding Prototype JS library
-license: perl
-resources:
-  license: ~
-requires:
-  perl: 5.6.0
+  - 'Graham TerMarsch (cpan@howlingfrog.com)'
 build_requires:
-  Test::Exception: 0
+  Test::Exception: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Prototype
 provides:
   Alien::Prototype:
     file: lib/Alien/Prototype.pm
-    version: 1.6.0.2
-generated_by: Module::Build version 0.32
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: v1.6.0.3
+requires:
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v1.6.0.3
+x_bugtracker:
+  web: https://github.com/bleargh45/Alien-Prototype/issues
+x_deprecated: 1
+x_repository:
+  type: git
+  url: git://github.com/bleargh45/Alien-Prototype.git
+  web: https://github.com/bleargh45/Alien-Prototype
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

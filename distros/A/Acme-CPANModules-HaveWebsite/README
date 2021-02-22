@@ -1,0 +1,141 @@
+NAME
+    Acme::CPANModules::HaveWebsite - Modules that have their own website
+
+VERSION
+    This document describes version 0.002 of Acme::CPANModules::HaveWebsite
+    (from Perl distribution Acme-CPANModules-HaveWebsite), released on
+    2021-02-18.
+
+DESCRIPTION
+    This list is first constructed based on Gabor Szabo's post:
+    <https://dev.to/szabgab/perl-modules-with-their-own-web-site-2gmo> on
+    2021-02-16. It has then been updated with more entries.
+
+ACME::MODULES ENTRIES
+    *   App::Ack
+
+        Website URL: <https://beyondgrep.com/>
+
+    *   App::cpanminus
+
+        Website URL: <http://cpanmin.us/>
+
+    *   App::perlbrew
+
+        Website URL: <https://perlbrew.pl/>
+
+    *   App::TimeTracker
+
+        Website URL: <http://timetracker.plix.at/>
+
+    *   Catalyst
+
+        Website URL: <http://www.catalystframework.org/>
+
+    *   Dancer
+
+        Website URL: <https://perldancer.org/>
+
+    *   Mojolicious
+
+        Website URL: <https://mojolicious.org/>
+
+    *   MooX::Role::JSON_LD
+
+        Website URL: <https://davorg.dev/moox-role-json_ld/>
+
+    *   Padre
+
+        Website URL: <http://padre.perlide.org/>
+
+    *   PDL
+
+        Website URL: <https://pdl.perl.org>
+
+    *   Perl::Critic
+
+        Website URL: <http://perlcritic.com/>
+
+    *   Plack
+
+        Website URL: <https://plackperl.org/>
+
+    *   Rex
+
+        Website URL: <https://www.rexify.org/>
+
+    *   Template
+
+        Website URL: <http://www.template-toolkit.org/>
+
+    *   Test::BDD::Cucumber
+
+        Website URL: <https://pherkin.pm/>
+
+    *   Type::Tiny
+
+        Website URL: <https://typetiny.toby.ink/>
+
+    *   Wx
+
+        Website URL: <http://www.wxperl.it/>
+
+    *   Zydeco
+
+        Website URL: <https://zydeco.toby.ink/>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanmodules CLI
+    (from App::cpanmodules distribution):
+
+        % cpanmodules ls-entries HaveWebsite | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=HaveWebsite -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::HaveWebsite -E'say $_->{module} for @{ $Acme::CPANModules::HaveWebsite::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-HaveWebsite>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-HaveWebsite>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Acme-CPANModules-HaveWebsite/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -27,19 +27,10 @@ has home             => sub { Mojo::Home->new->detect(ref shift) };
 has log              => sub {
   my $self = shift;
 
-  my $mode = $self->mode;
-  my $log  = Mojo::Log->new;
-
-  # DEPRECATED!
-  my $home = $self->home;
-  if (-d $home->child('log') && -w _) {
-    $log->path($home->child('log', "$mode.log"));
-    Mojo::Util::deprecated(qq{Logging to "log/$mode.log" is DEPRECATED});
-  }
-
   # Reduced log output outside of development mode
+  my $log = Mojo::Log->new;
   return $log->level($ENV{MOJO_LOG_LEVEL}) if $ENV{MOJO_LOG_LEVEL};
-  return $mode eq 'development' ? $log : $log->level('info');
+  return $self->mode eq 'development' ? $log : $log->level('info');
 };
 has 'max_request_size';
 has mode               => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
@@ -63,8 +54,8 @@ has types     => sub { Mojolicious::Types->new };
 has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
-our $CODENAME = 'Supervillain';
-our $VERSION  = '8.73';
+our $CODENAME = 'Waffle';
+our $VERSION  = '9.01';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -164,11 +155,6 @@ sub new {
   # Default to controller and application namespace
   my $controller = "@{[ref $self]}::Controller";
   my $r          = $self->preload_namespaces([$controller])->routes->namespaces([$controller, ref $self]);
-
-  # Hide controller attributes/methods
-  $r->hide(qw(app continue cookie every_cookie every_param every_signed_cookie finish helpers match on param render));
-  $r->hide(qw(render_later render_maybe render_to_string rendered req res send session signed_cookie stash tx url_for));
-  $r->hide(qw(write write_chunk));
 
   $self->plugin($_) for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);
 
@@ -787,6 +773,8 @@ L<https://opensource.org/licenses/OFL-1.1>.
 =head1 CODE NAMES
 
 Every major release of L<Mojolicious> has a code name, these are the ones that have been used in the past.
+
+9.0, C<Waffle> (U+1F9C7)
 
 8.0, C<Supervillain> (U+1F9B9)
 

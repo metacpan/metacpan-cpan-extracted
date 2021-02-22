@@ -27,6 +27,7 @@ Mnet::Opts::Set implements the functions listed below.
 # required modules
 use warnings;
 use strict;
+use Mnet;
 use Carp;
 
 

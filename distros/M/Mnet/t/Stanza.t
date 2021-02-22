@@ -7,19 +7,21 @@ use strict;
 use Mnet::Stanza;
 use Test::More tests => 15;
 
-# check trim function
+# check trim function, including handling of extra spaces within text
+#   extra spaces between hyphens preserved in remark/description commands only
 Test::More::is(
     Mnet::Stanza::trim("
-        double  spaces
+        -  -
+        remark -  -
+        description -  -
          indented
           trailing" . " " . "
-    "), "double spaces\n indented\n  trailing", "trim"
+    "), "- -\nremark -  -\ndescription -  -\n indented\n  trailing", "trim"
 );
 
 # check trim not needed
 Test::More::is(
-    Mnet::Stanza::trim("stanza1\n stanza2"), "stanza1\n stanza2", "trim unneeded");
-
+    Mnet::Stanza::trim("s1\n s2"), "s1\n s2", "trim unneeded");
 
 # check parse function, returning the correct number of list elements
 #   stanza2 should be returned under stanza1, not as a separate element

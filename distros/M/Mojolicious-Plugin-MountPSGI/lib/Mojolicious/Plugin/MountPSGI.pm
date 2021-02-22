@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojolicious::Plugin::MountPSGI::Proxy;
 
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub register {
   my ($self, $app, $conf) = @_;
@@ -44,8 +44,11 @@ sub register {
   my $proxy = Mojolicious::Plugin::MountPSGI::Proxy->new(%args);
 
   # Generate route
-  my $route = $app->routes->route($path)->detour(app => $proxy);
-  $route->over(host => $host) if $host;
+  my $route = $app->routes->any($path)->partial(1)->to(app => $proxy);
+  if ($host) {
+    my $requires = $route->can('requires') || $route->can('over');
+    $route->$requires(host => $host);
+  }
 
   return $route;
 }

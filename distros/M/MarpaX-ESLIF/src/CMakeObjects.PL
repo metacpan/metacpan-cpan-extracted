@@ -18,6 +18,21 @@ use POSIX qw/EXIT_SUCCESS strftime/;
 use Try::Tiny;
 
 #
+# ExtUtils::CBuilder custom configuration from environment:
+# Any environment variable PERL_EXTUTILS_CBUILDER_CONFIG_\w+ is
+# considered
+#
+my %EXTUTILS_BUILDER_CONFIG =
+    map {
+        my $key = $_;
+        $key =~ s/^PERL_EXTUTILS_CBUILDER_CONFIG_//;
+        $key => $ENV{$_}
+    }
+    grep {
+        $_ =~ /^PERL_EXTUTILS_CBUILDER_CONFIG_\w+/
+    } keys %ENV;
+
+#
 # Move to current dir of this script
 #
 my $okupdir = dirname($0);
@@ -26,7 +41,7 @@ chdir($okupdir) || die "Cannot move to $okupdir, $!";
 print "Working directory set to $okupdir\n";
 
 my $isc99 = 0;
-my %cbuilder_config = ExtUtils::CBuilder->new()->get_config;
+my %cbuilder_config = ExtUtils::CBuilder->new(config => \%EXTUTILS_BUILDER_CONFIG)->get_config;
 if (($cbuilder_config{cc} // 'cc') ne 'cl') {
     print "Checking if C99 is enabled by default: ";
     if (try_compile("#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L\n#error \"C99 is not enabled\"\n#endif\nint main(){return 0;}")) {
@@ -166,6 +181,63 @@ make_path(dirname($config_h));
         }
     }
 
+    $ac->msg_checking("for __builtin_expect()");
+    my $__builtin_expect = <<__BUILTIN_EXPECT;
+#include <stdlib.h>
+
+#define C__BUILTIN_EXPECT __builtin_expect
+#define C_LIKELY(x)    C__BUILTIN_EXPECT(!!(x), 1)
+#define C_UNLIKELY(x)  C__BUILTIN_EXPECT(!!(x), 0)
+
+/* Copied from https://kernelnewbies.org/FAQ/LikelyUnlikely */
+int main(char *argv[], int argc)
+{
+   int a;
+
+   /* Get the value from somewhere GCC can't optimize */
+   a = atoi (argv[1]);
+
+   if (C_UNLIKELY(a == 2))
+      a++;
+   else
+      a--;
+
+   return 0;
+}
+__BUILTIN_EXPECT
+    if (try_compile($__builtin_expect)) {
+        $ac->msg_result('yes');
+        $ac->define_var("C___BUILTIN_EXPECT", "__builtin_expect");
+    } else {
+        $ac->msg_result('no');
+    }
+
+    foreach my $inline_keyword (qw/inline __inline__ inline__ __inline/) {
+        $ac->msg_checking("for $inline_keyword");
+        my $inline_source = <<INLINE_SOURCE;
+typedef int foo_t;
+static $inline_keyword foo_t static_foo() {
+  return 0;
+}
+foo_t foo() {
+  return 0;
+}
+int main(int argc, char *argv[]){
+  return 0;
+}
+INLINE_SOURCE
+        if (try_compile($inline_source)) {
+            $ac->msg_result('yes');
+            $ac->define_var("C_INLINE", $inline_keyword);
+            if ($inline_keyword eq 'inline') {
+                $ac->define_var("C_INLINE_IS_INLINE", $inline_keyword);
+            }
+            last;
+        } else {
+            $ac->msg_result('no');
+        }
+    }
+
     $ac->check;
     write_config($MARPAESLIF_VERSION, $MARPAESLIF_VERSION_MAJOR, $MARPAESLIF_VERSION_MINOR, $MARPAESLIF_VERSION_PATCH, $config_h_in, $config_h);
 }
@@ -273,7 +345,7 @@ AUTOCONF
   pcre2_valid_utf.c
   pcre2_xclass.c/;
   push(@pcre2_src, File::Spec->catfile(File::Spec->curdir, 'pcre2_chartables.c'));
-  my $cbuilder = ExtUtils::CBuilder->new();
+  my $cbuilder = ExtUtils::CBuilder->new(config => \%EXTUTILS_BUILDER_CONFIG);
   my @objects;
   my $obj_dir = File::Spec->catfile('output', 'obj4perl');
   make_path($obj_dir);
@@ -341,7 +413,7 @@ my @sources = File::Spec->catfile('src', 'marpaESLIF.c');
 # Generate objects
 # Our embedded lua requires some public C flags that we cannot invent
 # ----------------------------------------------------------------------------------------
-my $cbuilder = ExtUtils::CBuilder->new();
+my $cbuilder = ExtUtils::CBuilder->new(config => \%EXTUTILS_BUILDER_CONFIG);
 my $obj_dir = File::Spec->catfile('output', 'obj4perl');
 make_path($obj_dir);
 foreach my $source (@sources) {
@@ -583,6 +655,78 @@ typedef unsigned int marpaESLIF_uint32_t;
 #  endif
 #endif
 
+#ifdef HAVE_STRTOLL
+#  define C_STRTOLL strtoll
+#else
+#  ifdef HAVE__STRTOLL
+#    define C_STRTOLL _strtoll
+#  else
+#    ifdef HAVE___STRTOLL
+#      define C_STRTOLL __strtoll
+#    else
+#      ifdef HAVE_STRTOI64
+#        define C_STRTOLL strtoi64
+#      else
+#        ifdef HAVE__STRTOI64
+#          define C_STRTOLL _strtoi64
+#        else
+#          ifdef HAVE___STRTOI64
+#            define C_STRTOLL __strtoi64
+#          endif
+#        endif
+#      endif
+#    endif
+#  endif
+#endif
+
+#ifdef HAVE_SIGNBIT
+#  define C_SIGNBIT signbit
+#else
+#  ifdef HAVE__SIGNBIT
+#    define C_SIGNBIT _signbit
+#  else
+#    ifdef HAVE___SIGNBIT
+#      define C_SIGNBIT __signbit
+#    endif
+#  endif
+#endif
+
+#ifdef HAVE_COPYSIGN
+#  define C_COPYSIGN copysign
+#else
+#  ifdef HAVE__COPYSIGN
+#    define C_COPYSIGN _copysign
+#  else
+#    ifdef HAVE___COPYSIGN
+#      define C_COPYSIGN __copysign
+#    endif
+#  endif
+#endif
+
+#ifdef HAVE_COPYSIGNF
+#  define C_COPYSIGNF copysignf
+#else
+#  ifdef HAVE__COPYSIGNF
+#    define C_COPYSIGNF _copysignf
+#  else
+#    ifdef HAVE___COPYSIGNF
+#      define C_COPYSIGNF __copysignf
+#    endif
+#  endif
+#endif
+
+#ifdef HAVE_COPYSIGNL
+#  define C_COPYSIGNL copysignl
+#else
+#  ifdef HAVE__COPYSIGNL
+#    define C_COPYSIGNL _copysignl
+#  else
+#    ifdef HAVE___COPYSIGNL
+#      define C_COPYSIGNL __copysignl
+#    endif
+#  endif
+#endif
+
 #endif /* MARPAESLIF_CONFIG_WRAPPER_H */
 CONFIG
     close($fh) || warn "Cannot close $output, $!";
@@ -598,7 +742,7 @@ sub try_compile {
     my $rc = 0;
 
     try {
-        my $cbuilder = ExtUtils::CBuilder->new(quiet => 1);
+        my $cbuilder = ExtUtils::CBuilder->new(config => \%EXTUTILS_BUILDER_CONFIG, quiet => 1);
         my $obj = basename($cbuilder->object_file($source));
         $cbuilder->compile(
             source               => $source,
@@ -636,7 +780,7 @@ int main() {
 }
 ";
     my $rc =  eval {
-        my $cbuilder = ExtUtils::CBuilder->new(quiet => 1);
+        my $cbuilder = ExtUtils::CBuilder->new(config => \%EXTUTILS_BUILDER_CONFIG, quiet => 1);
         my ($fh, $filename) = tempfile(SUFFIX => '.c', UNLINK => 0);
         print $fh $source;
         close($fh) || warn "Cannot close $filename, $!";
@@ -684,7 +828,7 @@ int main() {
 }
 ";
     my $rc =  eval {
-        my $cbuilder = ExtUtils::CBuilder->new(quiet => 1);
+        my $cbuilder = ExtUtils::CBuilder->new(config => \%EXTUTILS_BUILDER_CONFIG, quiet => 1);
         my ($fh, $filename) = tempfile(SUFFIX => '.c', UNLINK => 0);
         print $fh $source;
         close($fh) || warn "Cannot close $filename, $!";

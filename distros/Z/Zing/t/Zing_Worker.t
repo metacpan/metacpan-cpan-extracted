@@ -27,6 +27,13 @@ Worker Process
 
 =cut
 
+=includes
+
+method: handle
+method: queues
+
+=cut
+
 =synopsis
 
   package MyApp;
@@ -70,6 +77,13 @@ Zing::Types
 =inherits
 
 Zing::Process
+
+=cut
+
+=attributes
+
+on_handle: ro, opt, Maybe[CodeRef]
+on_queues: ro, opt, Maybe[CodeRef]
 
 =cut
 
@@ -125,6 +139,57 @@ automatically invoked iteratively by the event-loop.
 
   $myapp->receive($myapp->name, { status => 'ok' });
 
+=method handle
+
+The handle method, when not overloaded, executes the callback in the
+L</on_handle> attribute for each new message available in any of the queues
+delcared.
+
+=signature handle
+
+handle(Str $queue, HashRef $data) : Any
+
+=example-1 handle
+
+  my $worker = Zing::Worker->new(
+    on_handle => sub {
+      my ($self, $queue, $data) = @_;
+      [$queue, $data];
+    },
+  );
+
+  $worker->handle('todos', {});
+
+=method queues
+
+The queues method, when not overloaded, executes the callback in the
+L</on_queues> attribute and expects a list of named queues to be processed.
+
+=signature queues
+
+queues(Any @args) : ArrayRef[Str]
+
+=example-1 queues
+
+  my $worker = Zing::Worker->new(
+    on_queues => sub {
+      ['todos'];
+    },
+  );
+
+  $worker->queues;
+
+=example-2 queues
+
+  my $worker = Zing::Worker->new(
+    on_queues => sub {
+      my ($self, @queues) = @_;
+      [@queues, 'other'];
+    },
+  );
+
+  $worker->queues('todos-p1', 'todos-p2', 'todos-p3');
+
 =cut
 
 package main;
@@ -161,6 +226,28 @@ $subs->scenario('perform', fun($tryable) {
 
 $subs->scenario('receive', fun($tryable) {
   ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'handle', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result->[0], 'todos';
+  is_deeply $result->[1], {};
+
+  $result
+});
+
+$subs->example(-1, 'queues', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, ['todos'];
+
+  $result
+});
+
+$subs->example(-2, 'queues', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, ['todos-p1', 'todos-p2', 'todos-p3', 'other'];
 
   $result
 });

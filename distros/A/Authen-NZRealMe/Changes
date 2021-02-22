@@ -1,5 +1,7 @@
 Revision history for Authen-NZRealMe
 
+1.21      2021-02-22 10:15:36+13:00 Pacific/Auckland
+
 1.20      2020-02-25 13:07:33+13:00 Pacific/Auckland
     - implement HTTP-POST binding through new resolve_posted_assertion()
       method in ServiceProvider.pm

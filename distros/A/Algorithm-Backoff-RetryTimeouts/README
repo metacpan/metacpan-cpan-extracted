@@ -1,0 +1,209 @@
+NAME
+
+    Algorithm::Backoff::RetryTimeouts - A backoff-style retry algorithm
+    with adjustable timeout support
+
+VERSION
+
+    version v1.0.0
+
+SYNOPSIS
+
+        use Algorithm::Backoff::RetryTimeouts;
+    
+        my $retry_algo = Algorithm::Backoff::RetryTimeouts->new(
+            # common adjustments (defaults shown)
+            max_attempts          => 8,
+            max_actual_duration   => 50,
+            jitter_factor         => 0.1,
+            timeout_jitter_factor => 0.1,
+            adjust_timeout_factor => 0.5,
+            min_adjust_timeout    => 5,
+    
+            # other defaults
+            initial_delay         => sqrt(2),
+            exponent_base         => sqrt(2),
+            delay_on_success      => 0,
+            min_delay             => 0,
+            max_delay             => undef,
+            consider_actual_delay => 1,
+        );
+    
+        my ($delay, $timeout);
+        $timeout = $retry_algo->timeout;
+    
+        my $is_successful = 0;
+        while (!$is_successful) {
+            $actionee->timeout( $timeout );
+            $is_successful = $actionee->do_the_thing;
+    
+            ($delay, $timeout) = $is_successful ? $retry_algo->success : $retry_algo->failure;
+            die "Ran out of time" if $delay == -1;
+            sleep $delay;
+        }
+
+DESCRIPTION
+
+    This module is a subclass of Algorithm::Backoff::Exponential that adds
+    support for adjustable timeouts during each retry. This also comes with
+    a sane set of defaults as a good baseline for most kinds of retry
+    operations.
+
+    A combination of features solves for most problems that would arise
+    from retry operations:
+
+      * Maximum attempts - Forces the algorithm to give up if repeated
+      attempts don't yield success.
+
+      * Maximum duration - Forces the algorithm to give up if no successes
+      happen within a certain time frame.
+
+      * Exponential backoff - A sqrt(2) exponential delay keeps single
+      retries from waiting too long, while spreading out repeated retries
+      that may fail too quickly and run out of max attempts. This also
+      decreases the congestion that happens with repeated attempts.
+
+      * Jitter - Adding random jitter to the retry delays solves for the
+      Thundering Herd problem.
+
+      * Adjustable timeouts - Providing an adjustable timeout after each
+      request solves the opposite problem of exponential backoffs: slower,
+      unresponsive errors that gobble up all of the max duration time in
+      one go. Each new timeout is a certain percentage of the time left.
+
+ Typical scenario
+
+    Here's an example scenario of the algorithm with existing defaults:
+
+        $retry_algo is created, and timer starts
+    
+        Initial timeout is 25s
+    
+        1st attempt fails instantly
+    
+        $retry_algo says to wait 1.4s (±10% jitter), and use a timeout of 24.3s
+    
+        2nd attempt fails instantly
+    
+        $retry_algo says to wait 2s (±10% jitter), and use a timeout of 23.3s
+    
+        3rd attempt fails after the full 23.3s timeout
+    
+        $retry_algo says to not wait (since the attempt already used up the delay), and use
+        a timeout of 11.7s
+    
+        4th attempt succeeds
+
+CONSTRUCTOR
+
+    The "new" constructor takes all of the base options from
+    Algorithm::Backoff::Exponential. Some of the defaults are changed (also
+    shown in the "SYNOPSIS" above), but otherwise function the same way.
+
+      * max_attempts => uint (default: 8)
+
+      * max_actual_duration => ufloat (default: 50)
+
+      * jitter_factor => float (default: 0.1)
+
+      * initial_delay => ufloat (default: sqrt(2))
+
+      * exponent_base => ufloat (default: sqrt(2))
+
+      * delay_on_success => ufloat (default: 0)
+
+      * min_delay => ufloat (default: 0)
+
+      * max_delay => ufloat
+
+      * consider_actual_delay => bool (default: 1)
+
+    The following new options are added in this module:
+
+      * adjust_timeout_factor => ufloat (default: 0.5)
+
+      How much of the remaining time to use for the next attempt's timeout,
+      as a factor between 0 and 1.
+
+      In order to prevent a single attempt from using up all of the
+      remaining time, an adjustable timeout will force the attempt to only
+      use a portion of the time. By default, only 50% of the remaining time
+      will be set as the next timeout value.
+
+      * min_adjust_timeout => ufloat (default: 5)
+
+      Minimum timeout value, in seconds.
+
+      This value bypasses any max_actual_duration checks, so the total time
+      spent on sleeping and attempts may end up exceeding that value by a
+      small amount (up to max_actual_duration + min_adjust_timeout). In
+      this case, future failures will return a delay of -1 as expected.
+
+      * timeout_jitter_factor => float (default: 0.1)
+
+      How much randomness to add to the adjustable timeout.
+
+      Delay jitter may not be enough to desynchronize two processes that
+      are consistently timing out on the same problem. In those cases, the
+      delay will usually be zero and won't have any sort of jitter to solve
+      the problem itself. A jitter factor against the timeout will ensure
+      simultaneous attempts have slightly different timeout windows.
+
+METHODS
+
+ success
+
+        my ($delay, $timeout) = $retry_algo->success([ $timestamp ]);
+
+    Log a successful attempt. If not specified, $timestamp defaults to
+    current time. Unlike the base class, this method will return a list
+    containing both the suggested delay and the suggested timeout for the
+    next attempt.
+
+ failure
+
+        my ($delay, $timeout) = $retry_algo->failure([ $timestamp ]);
+
+    Log a failed attempt. If not specified, $timestamp defaults to current
+    time. Unlike the base class, this method will return a list containing
+    both the suggested delay and the suggested timeout for the next
+    attempt.
+
+ delay
+
+        my $delay = $retry_algo->delay;
+
+    Returns the last suggested delay, in seconds.
+
+    The delay will return -1 to suggest that the process should give up and
+    fail, if max_attempts or max_actual_duration have been reached.
+
+ timeout
+
+        my $timeout = $retry_algo->delay;
+
+    Returns the last suggested timeout, in seconds. If no attempts have
+    been logged, it will suggest an initial timeout to start with.
+
+    This will be a floating-point number, so you may need to convert it to
+    an integer if your timeout system doesn't support decimals.
+
+    A timeout of -1 will be returned if max_actual_duration was forcefully
+    turned off.
+
+SEE ALSO
+
+    Algorithm::Backoff - Base distro for this module
+
+AUTHOR
+
+    Grant Street Group <developers@grantstreet.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2020 - 2021 by Grant Street Group.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

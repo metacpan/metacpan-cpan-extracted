@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use File::Temp;
 use PYX::Optimization;
 
 # Content.
@@ -20,4 +19,10 @@ END
 PYX::Optimization->new->parse($pyx_to_optimize);
 
 # Output:
-# TODO
+# (element
+# -data data
+# )element
+# _comment
+# (element
+# -foo
+# )element

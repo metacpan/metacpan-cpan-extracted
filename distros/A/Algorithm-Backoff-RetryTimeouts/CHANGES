@@ -1,0 +1,11 @@
+Changelog for Algorithm-Backoff-RetryTimeouts
+
+v1.0.0 2021-02-11T22:07:03
+ - Fix POD error (Brendan Byrd)
+ - Create distribution files (Andrew Hewus Fresh)
+ - Set _attempts / _last_timestamp even on max duration/attempt failures
+   (Brendan Byrd)
+ - Fix unnecessary delays during the first failure (Brendan Byrd)
+ - Add timeout_jitter_factor with a default of 10% (Brendan Byrd)
+ - Create Algorithm::Backoff::RetryTimeouts and unit test (Brendan Byrd)
+ - Initial Commit (Brendan Byrd)

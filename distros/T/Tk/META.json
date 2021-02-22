@@ -4,13 +4,13 @@
       "nick@ing-simmons.net (Nick Ing-Simmons)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unrestricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tk",
    "no_index" : {
@@ -43,5 +43,6 @@
          "url" : "http://github.com/eserte/perl-tk"
       }
    },
-   "version" : "804.035"
+   "version" : "804.036",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

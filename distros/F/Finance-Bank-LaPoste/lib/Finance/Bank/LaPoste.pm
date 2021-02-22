@@ -10,7 +10,7 @@ use HTML::Parser;
 use HTML::Form;
 use Digest::MD5();
 
-our $VERSION = '9.03';
+our $VERSION = '9.04';
 
 # $Id: $
 # $Log: LaPoste.pm,v $
@@ -100,7 +100,7 @@ my $normalize_number = sub {
     my ($s) = @_;
     defined($s) or return 0;
     $s =~ s/\xC2?\xA0//; # non breakable space, both in UTF8 and latin1
-    $s =~ s/ //;
+    $s =~ s/ //g;
     $s =~ s/,/./;
     $s + 0; # turn into a number
 };
@@ -181,15 +181,25 @@ sub _output { my $f = shift; open(my $F, ">$f") or die "output in file $f failed
 # then do "md5sum /tmp/[0-9].xpm"
 my $debug_imgs = 0;
 my %img_md5sum_to_number = (
+    '7b0866f479c82ef8cc6c2d599b283644' => 0,
     'dbe97681a77bd75f811cd318e1b6def3' => 0,
+    '1f15c095fe13e73d341ff1f099925c59' => 1,
     '264fc8643f2277ce7df738d8bf0d4533' => 1,
+    'af46867b6383a7f4ba563bd493c59163' => 2,
     'bc09366762776a5bca2161105607302b' => 2,
+    '79215c3e70645d77bee10b57f41397bb' => 3,
     '71a5e8344d0343928ff077cf292fc7e3' => 3,
+    '6cc8cc78c841a3baa24ea997f5e95372' => 4,
     '50a363a8d16f6fbba5e8b14432e2d73e' => 4,
+    '424288417b5c56e211dd7e770b7f2a78' => 5,
     'd8ce75d8bd5c64a2ed10deede9ad7bc9' => 5,
+    '6647804420c37a463b762a3a0d7e247e' => 6,
     '03c32205bcc9fa135b2a3d105dbb2644' => 6,
+    'a26bac1f76ebffceaeb2eccf5e806ebe' => 7,
     'ab159c63f95caa870429812c0cd09ea5' => 7,
+    '069cd50cee9e34dff1f17b387122ff5a' => 8,
     '16454f3fb921be822f379682d0727f3f' => 8,
+    'e74f78fb6d04b5d9f0a814d120a685d8' => 9,    
     '336809b2bb178abdb8beec26e523af34' => 9,
     '6110983d937627e8b2c131335c9c73e8' => 'blank',
 );
@@ -252,7 +262,6 @@ sub _list_accounts {
         my $html = _GET_content($self, _rel_url($response, '/voscomptes/canalXHTML/comptesCommun/synthese_ep/afficheSyntheseEP-synthese_ep.ea'));
         push @l, _list_accounts_one_page($self, $html, 'savings');
     }
-    @l or _output("/tmp/t.html", $html);
     @l;
 }
 
@@ -262,29 +271,29 @@ sub _list_accounts_one_page {
 
     my $flag = '';
     my ($url, $name, $owner, $account_no, $balance_cb);
-    
+
     foreach (split("\n", $html)) {
-        if ($flag eq 'url' && m!<a href="(.*?)"! || m!redirigerVersCU16\(event, '(.*?)'\)!) {
+        if ($flag eq 'url' && m!<a href="(.*?)"! || m!redirigerVersPage\(event, '(.*?)'\)!) {
             $url = $1;
         } elsif (m!<h3>(.*?)\s*</h3>(?:<span>(.*)</span>)?!) {
             $name = $1;
             $owner = $2;
         } elsif (m!num(?:&#233;|..?)ro de compte">.*</abbr>(.*?)</!) {
             $account_no = $1;
-        } elsif (m!<span class="number">([\d\s,.+-]*)! && $url) {
+        } elsif (m!<div class="amount-euro">([\d\s,.+-]*)! && $url) {
             my $balance = $normalize_number->($1);
             push @l, { url => $url, balance => $balance, name => $name, owner => $owner, account_no => $account_no, type => $type } if $url;
             $url = '';
-        } elsif ($flag eq 'balance_cb' && m!<span>([\d\s,.+-]*)!) {
+        } elsif ($flag eq 'balance_cb' && m!<span class="amount">([\d\s,.+-]*)!) {
 	    $flag = '';
             $balance_cb = $normalize_number->($1);            
             $url =~ s/&amp;/&/g;
             push @l, { url => $url, balance => $balance_cb, name => "Carte bancaire", owner => $owner, account_no => $account_no, type => 'cb' }  if $self->{cb_accounts} || $self->{all_accounts};
         }
 
-        if (/account-resume--banq|account-resume--saving/) {
+        if (/account-resume--ccp|account-resume--saving/) {
             $flag = 'url';
-        } elsif (/D&#233;bit diff&#233;r&#233; en cours/) {
+        } elsif (/D&eacute;bit diff&eacute;r&eacute; en cours/) {
             $flag = 'balance_cb';
         }
     }

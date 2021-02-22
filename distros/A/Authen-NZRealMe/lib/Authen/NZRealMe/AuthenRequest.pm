@@ -1,5 +1,5 @@
 package Authen::NZRealMe::AuthenRequest;
-$Authen::NZRealMe::AuthenRequest::VERSION = '1.20';
+$Authen::NZRealMe::AuthenRequest::VERSION = '1.21';
 use strict;
 use warnings;
 
@@ -24,7 +24,8 @@ sub new {
     my $self = bless {
         allow_create    => 'false',
         auth_strength   => 'low',
-        acs_index       => 0,
+        acs_index       => 'default',
+        sso_binding     => undef,
         @_,
     }, $class;
     return $self->_init($sp);
@@ -37,7 +38,7 @@ sub _init {
     $self->{service_type}    = $sp->type;
     $self->{request_id}      = $sp->generate_saml_id('AuthnRequest');
     $self->{entity_id}       = $sp->entity_id;
-    $self->{destination_url} = $sp->idp->single_signon_location;
+    $self->{destination_url} = $sp->idp->single_signon_location($self->sso_binding());
     $self->{request_time}    = $sp->now_as_iso();
     $self->{nameid_format}   = $sp->nameid_format();
 
@@ -59,6 +60,7 @@ sub destination_url { shift->{destination_url};     }
 sub saml_request    { shift->{saml_request};        }
 sub relay_state     { shift->{relay_state};         }
 sub acs_index       { shift->{acs_index};           }
+sub sso_binding     { shift->{sso_binding};         }
 sub allow_create    { shift->_bool('allow_create'); }
 sub auth_strength   { shift->{auth_strength};       }
 sub _query_string   { shift->{query_string};        }
@@ -286,7 +288,13 @@ Accessor for the XML document containing the SAML2 AuthenRequest.
 =head2 acs_index
 
 Accessor for the C<acs_index> parameter optionally passed to the constructor.
-If not provided, a default ACS index of 0 will be used.
+If not provided, the default ACS will be used.
+
+=head2 sso_binding
+
+Accessor for the C<sso_binding> parameter optionally passed to the constructor.
+This parameter is only required if there are two or more SingleSignOnService
+elements defined in the IdP service metadata.
 
 =head2 relay_state
 

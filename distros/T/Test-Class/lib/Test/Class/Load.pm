@@ -8,7 +8,7 @@ use File::Find;
 use File::Spec;
 use Module::Runtime 'require_module';
 
-our $VERSION = '0.50';
+our $VERSION = '0.52';
 
 # Override to get your own filter
 sub is_test_class {
@@ -69,7 +69,7 @@ Test::Class::Load - Load C<Test::Class> classes automatically.
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -213,13 +213,13 @@ C<Test::Class::Load> is taint safe.  Because we're reading the class names from 
 
  my ($package) = $_package =~ /^([[:word:]]+(?:::[[:word:]]+)*)$/;
 
+=head1 SUPPORT
+
+See L<Test::Class>
+
 =head1 AUTHOR
 
 Curtis "Ovid" Poe, C<< <ovid@cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-test-class-load@rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Class-Load>. I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 ACKNOWLEDGMENTS
 

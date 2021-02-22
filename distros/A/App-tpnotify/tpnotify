@@ -1,0 +1,1274 @@
+#!/bin/sh
+#! -*- perl -*-
+eval 'exec perl -x -S $0 ${1+"$@"}'
+    if 0;
+# Copyright (C) 2016-2021 Sergey Poznyakoff <gray@gnu.org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config gnu_getopt no_ignore_case);
+use Pod::Usage;
+use Pod::Man;
+use LWP::UserAgent;
+use URI;
+use Unix::Sysexits;
+use File::Basename;
+use File::Temp qw(tempdir);
+use File::Path qw(remove_tree);
+use IPC::Open2;
+use Mail::Send;
+use Mail::Message;
+use Sys::Hostname;
+use POSIX qw(strftime);
+use Locale::PO;
+use Safe;
+
+my $progname = basename($0);
+my $progdescr = "Notifies translationproject.org about new POT file";
+our $VERSION = "1.03";
+
+my $keep;          # Keep temporary directory on errors
+my $signature_file = "$ENV{HOME}/.signature"; # Signature file
+my $verbose;       # Verbose mode
+my $dry_run;       # Dry-run mode
+my %mailer_args;   # Mailer arguments
+my @add_headers;   # Additional headers
+my $refile_method; # Refiling method
+my $force_option;
+
+my $template = <<'EOT';
+To: <coordinator@translationproject.org>
+Subject: $package_base.pot
+
+Hello,
+
+The new $release_type version of $package_name is available at:
+
+    $archive_url
+
+$signature
+EOT
+    ;
+
+my $tp_url = q{http://translationproject.org/domain/${domain}.html};
+my $pot_regex_str =
+  q{The current template for this domain is <a href="(.*?)">};
+
+my $wd;         # Temporary working directory
+my %files;      # Extracted files.  Key - name under $topdir, value - pathname
+		# within $wd
+
+# Package variables: these are shared with the Safe compartment in
+# expand_template.
+our $sender;          # Sender email
+our $fullname;        # Sender real name
+our $localdomain;     # Local domain name
+our $recipient;       # Override recipient address
+our $archive_url;     # Tarball URL
+our $archive_file;    # Archive file name
+our $topdir;          # Toplevel directory from the archive
+our $package_name;    # Package name;
+our $package_tarname; # Package archive name
+our $package_version; # Package version number
+our $package_base;    # Package base name
+our $release_type;    # Package type (alpha or stable)
+
+sub err {
+    my $msg = shift;
+    local %_ = @_;
+
+    print STDERR "$progname: ";
+    print STDERR "$_{prefix}: " if exists $_{prefix} && defined $_{prefix};
+    print STDERR "$msg\n";
+}
+
+sub abend {
+    my $code = shift;
+    &err;
+    if ($keep && $code ne EX_USAGE && $code ne EX_CONFIG) {
+	err("examine $wd for details");
+    }
+    exit($code);
+}
+
+sub info {
+    print "$progname: ";
+    print @_;
+    print "\n";
+}
+
+# download($source_url, dest => 'filename' or ref)
+# ------------------------------------------------
+# Downloads material from $source.  If 'dest' is a reference to a scalar,
+# the downloaded material is stored to that ref.  If it is a filename,
+# the material is stored in the named disk file.  If 'dest' is not given,
+# the name of the disk file is determined as the basename of the path
+# component from the $source_url.
+sub download {
+    my ($source,%opt) = @_;
+    my $url = new URI($source);
+
+    my $dest = delete $opt{dest} || basename($url->path);
+    my %args;
+    if ($verbose) {
+	if (ref($dest) eq '') {
+	    $args{':content_file'} = $dest;
+	    info("downloading $source to $wd/$dest");
+	} else {
+	    info("downloading $source");
+	}
+    }
+
+    my $scheme = $url->scheme;
+    eval {
+	require "LWP/Protocol/$scheme.pm";
+    };
+    if ($@) {
+	$@ =~ s/\s+at [^\s]+ line \d+\.$//;
+	abend(EX_OSERR, "$@");
+    }
+    my $ua = LWP::UserAgent->new();
+    $ua->agent("tpnotify/$VERSION");
+    my $response = $ua->get($url->as_string, %args);
+    unless ($response->is_success) {
+	abend(EX_UNAVAILABLE,
+	      "downloading $source failed: " . $response->status_line);
+    }
+    if (ref($dest) eq 'SCALAR') {
+	$$dest = $response->decoded_content;
+    }
+    return $dest;
+}
+
+# get_sources($URL)
+# -----------------
+# Download and extract source archive.
+sub get_sources {
+    my ($source) = @_;
+    $archive_file = download($source);
+    info("scanning $archive_file") if $verbose;
+    open(my $fd, '-|', "tar tf $archive_file")
+	or abend(EX_NOINPUT, "can't open $archive_file: $!");
+    while (<$fd>) {
+	chomp;
+	unless (m#^(?<dir>.+?)/(?<file>.*)$#) {
+	    abend(EX_DATAERR, "$archive_file content suspicious: member $_");
+	}
+	if (defined($topdir)) {
+	    unless ($+{dir} eq $topdir) {
+		abend(EX_DATAERR,
+		      "$archive_file content suspicious: $+{dir} does not match $topdir");
+	    }
+	} else {
+	    $topdir = $+{dir};
+	}
+	my $f = $+{file};
+	if ($f eq 'configure.ac' || $f =~ m#po/.*\.pot#) {
+	    $files{$f} = $_;
+	}
+    }
+    close $fd;
+    info("top level directory: $topdir") if $verbose;
+
+    # Verify available files
+    unless (exists($files{'configure.ac'})) {
+	abend(EX_DATAERR, "no configure.ac in $archive_file");
+    }
+    unless (keys(%files) > 1) {
+	abend(EX_DATAERR, "no potfile in $archive_file");
+    }
+
+    my $filelist = join(' ', values(%files));
+    info("extracting from $archive_file") if $verbose;
+    my $cmd = "tar xf $archive_file $filelist";
+    system($cmd);
+    check_command_status($cmd);
+}
+
+# check_command_status($STAT)
+# ---------------------------
+# Handles the result of the system or wait function call.
+sub check_command_status {
+    my $cmd = shift;
+    my $status = shift || $?;
+
+    if ($status == -1) {
+	abend(EX_OSERR, "failed to run $cmd");
+    } elsif ($status & 127) {
+	abend(EX_UNAVAILABLE, "$cmd exited on signal " . ($status & 127));
+    } elsif (my $e = ($status >> 8)) {
+	abend(EX_UNAVAILABLE, "$cmd exited with status $e");
+    }
+}
+
+# verify
+# ------
+# Verifies the tarball. Determines canonical package name, extracts the POT
+# file and checks if it lists the correct package name in its
+# "Project-Id-Version" header and that its msgids differ from the ones
+# already registered on the TP.
+sub verify {
+    my ($in, $out);
+    my $pid = open2($out, $in, "m4 -P - $files{'configure.ac'}")
+	or abend(EX_NOINPUT, "can't open $files{'configure.ac'}: $!");
+    print $in <<'EOT';
+m4_divert(-1)
+m4_changequote([,])
+m4_define([AC_INIT],[m4_divert(0)$1
+$2[]m4_divert(-1)])
+EOT
+    close $in;
+    waitpid($pid, 0);
+    check_command_status("m4");
+    chomp(my @lines = <$out>);
+    abend(EX_DATAERR, "can't parse $files{'configure.ac'}")
+	unless $#lines == 1;
+    ($package_name, $package_version) = @lines;
+    $package_tarname = $package_name;
+    $package_tarname =~ s/GNU\s+//;
+    $package_tarname = lc $package_tarname; # FIXME: this is not always right,
+					    # perhaps
+    info("package $package_name, tarname $package_tarname, version $package_version") if $verbose;
+    $package_base = "$package_tarname-$package_version";
+
+    unless (defined($release_type)) {
+	if ($package_version =~ m/\d+\.\d+\.(\d+)/ && int($1) >= 90) {
+	    $release_type = 'alpha';
+	} else {
+	    $release_type = 'stable';
+	}
+    }
+
+    if (substr($archive_file, 0, length($package_base)) ne $package_base) {
+	abend(EX_DATAERR,
+	      "filename $archive_file does not begin with $package_base");
+    }
+    if ($package_base ne $topdir) {
+	abend(EX_DATAERR,
+	      "toplevel directory $topdir does not begin with $package_base");
+    }
+    my $potfile = "po/$package_tarname.pot";
+    unless ($files{$potfile}) {
+	abend(EX_DATAERR, "potfile $potfile not found in archive");
+    }
+    verify_potfile($files{$potfile});
+}
+
+# po_header($FILENAME)
+# --------------------
+# Extract the PO header from the POT file $FILENAME.
+# Returns a reference to a hash: header-name => value.
+sub po_header {
+    my $name = shift;
+    print "READING $name\n";
+    (my $h = Locale::PO->load_file_asarray($name)->[0]->msgstr)
+	=~ s/^"(.*)"$/$1/;
+    my %ret;
+    foreach my $s (split /\\n/, $h) {
+	if ($s =~ /^(.+?):\s*(.*)$/) {
+	    $ret{lc $1}=$2;
+	}
+    }
+    \%ret;
+}
+
+# po_serialize($FILENAME)
+# -----------------------
+# Serializes the pot file in the unambiguous way.
+# Extracts the msgids, sorts them lexicographically and concatenates them.
+sub po_serialize {
+    my $name = shift;
+    join("\n", sort map { ($_->msgid // '') . ':' . ($_->msgid_plural // '') } @{Locale::PO->load_file_asarray($name)});
+}
+
+# po_cmp($A, $B)
+# --------------
+# Compares two POT files.  Returns 'true' if the two files contain exactly
+# the same set of msgids.
+sub po_cmp {
+    my ($a,$b) = @_;
+    po_serialize($a) eq po_serialize($b);
+}
+
+# verify_potfile($FILENAME)
+# -------------------------
+# Verifies the potfile extracted from the archive.
+# Checks if the POT file mentions the correct package string in its
+# Project-Id-Version header.  Downloads the POT file registered on the
+# TP and makes sure its msgids are not the same as defined in the POT
+# file from the archive.
+sub verify_potfile {
+    my $potname = shift;
+    my $hdr = po_header($potname);
+    my $vs = $hdr->{'project-id-version'};
+    if ($vs ne "$package_name $package_version") {
+	err("$potname: Project-Id-Version does not match \"$package_name $package_version\"");
+	exit(EX_DATAERR) unless $force_option;
+    }
+
+    (my $url = $tp_url) =~ s/\$\{domain\}/$package_tarname/;
+    download($url, dest => \my $content);
+    if ($content =~ m{$pot_regex_str}) {
+	my $tp_potname = download($1);
+	if (po_cmp($potname, $tp_potname)) {
+	    err("potfile contains no new msgids; no need to upload");
+	    exit(0) unless $force_option;
+	}
+    }
+}
+
+# Reads the signature file from $signature_file.
+sub read_signature {
+    if (defined($signature_file)) {
+	if (open(my $fd, '<', $signature_file)) {
+	    local $/;
+	    my $sig = <$fd>;
+	    close($fd);
+	    return $sig;
+	}
+    }
+    return undef;
+}
+
+# Expands the message template.
+# Returns the expanded text.  Abends on failure.
+sub expand_template {
+    my $cpt = new Safe;
+
+    $cpt->share(qw($sender
+		   $fullname
+		   $localdomain
+		   $recipient
+		   $archive_file
+		   $archive_url
+		   $package_name
+		   $package_version
+		   $package_base
+		   $release_type
+		   $topdir
+		   $signature));
+    chomp(${$cpt->varglob('signature')} = read_signature);
+
+    (my $tmpl = $template) =~ s/\@/\\\@/g;
+    if ($cpt->reval("\$_ = qq{$tmpl}",1)) {
+	return $_;
+    } else {
+	abend(EX_DATAERR, "while expanding template: $@");
+    }
+}
+
+# Reads the current value of the MH Path setting.
+sub read_mh_path {
+    my $file = File::Spec->catfile($ENV{HOME}, '.mh_profile');
+    if (-f $file) {
+	if (open(my $fd, '<', $file)) {
+	    my $prev;
+	    while (<$fd>) {
+		chomp;
+		if (s/^\s+//) {
+		    $prev .= ' ' . $_;
+		} else {
+		    last if defined($prev) && $prev =~ /^Path:/;
+		    $prev = $_;
+		}
+	    }
+	    close $fd;
+	    return $prev if $prev =~ s/^Path:\s+//;
+	} else {
+	    err("can't open $file: $!", prefix => 'warning');
+	}
+    }
+    return "$ENV{HOME}/Mail";
+}
+
+sub notify {
+    my $msg = Mail::Message->read(expand_template);
+    $msg->head()->add('From', "\"$fullname\" <$sender>") unless $msg->get('From');
+    foreach my $hdr (@add_headers) {
+	$msg->head()->add($hdr);
+    }
+    $msg->head()->add("X-Mailer: $progname $VERSION");
+
+    if ($verbose) {
+	info("message to send");
+	$msg->print();
+	print "\n";
+	info("end of message");
+    }
+
+    if ($dry_run) {
+	info("NOT sending");
+	return;
+    }
+
+    info("sending message") if $verbose;
+
+    if (my $folder = $msg->get('Fcc')) {
+	$msg->head()->delete('Fcc');
+	refile($msg, $folder);
+    }
+    $msg->send(%mailer_args);
+
+#    my $to = $recipient || $msg->get('To');
+#    info("Location of $package_base.pot sent to $to");
+}
+
+sub mail_box_manager_supported {
+    eval {
+	require Mail::Box::Manager;
+    };
+    return !$@;
+}
+
+sub mail_box_manager_refile {
+    my ($msg,$folder) = @_;
+
+    my %args = (create => 1, access => 'rw');
+
+    if ($folder =~ m#^/#) {
+	$args{type} = 'mbox';
+	$args{folder} = $folder;
+    } elsif ($folder =~ s#mh:(?://)?(.+)#$1#) {
+	$args{type} = 'mh';
+	if ($folder =~ m#^/#) {
+	    $args{folder} = $folder;
+	} else {
+	    $args{folder} = read_mh_path() . '/' . $folder;
+	}
+    } elsif ($folder =~ s#maildir:(?://)?(.+)#$1#) {
+	$args{type} = 'maildir';
+	$args{folder} = $folder;
+    } else {
+	abend(EX_DATAERR, "unrecognized Fcc folder: $folder");
+    }
+
+    my $mgr = Mail::Box::Manager->new();
+    my $fld = $mgr->open(%args)
+	or abend(EX_CANTCREAT, "can't open folder $folder");
+    $fld->addMessage($msg)
+	or abend(EX_CANTCREAT, "can't save message to folder $folder");
+    $fld->close;
+}
+
+sub movemail_supported {
+    if (open(my $fd, '-|', 'movemail --version')) {
+	chomp($_ = <$fd>);
+	if (m{^movemail \(GNU Mailutils\) (?<maj>\d+)\.(?<min>\d+)}) {
+	    return 1;
+	}
+    }
+}
+
+sub movemail_refile {
+    my ($msg,$folder) = @_;
+
+    my $tmpname = "message";
+
+    open(my $fd, '>', $tmpname)
+	or abend(EX_CANTCREAT, "can't create temporary file: $!");
+    my $sender_address = ($msg->study('From')->addresses())[0]->address();
+    print $fd "From $sender_address "
+	      . strftime("%a %b %e %H:%M:%S %Y", gmtime)
+	      . "\n";
+    $msg->write($fd);
+    close($fd);
+
+    if ($folder =~ m{mh:(?://)?(.+)}) {
+	my $dir = $1;
+	if (!File::Spec->file_name_is_absolute($dir) && $dir !~ '^~') {
+	    if (my $path = read_mh_path()) {
+		$folder = File::Spec->catfile($path, $dir);
+	    } else {
+		err("no MH Path: assuming mh://$dir", prefix => 'warning');
+	    }
+	    $folder = 'mh://' . $folder;
+	}
+    }
+    system("movemail $wd/$tmpname $folder");
+    unlink $tmpname;
+}
+
+my %refile_tab = (
+    'movemail' => { supported => \&movemail_supported,
+		    refile => \&movemail_refile,
+		    priority => 10 },
+    'perl' =>     { supported => \&mail_box_manager_supported,
+		    refile => \&mail_box_manager_refile,
+		    priority => 0 }
+);
+
+sub refile {
+    unless ($refile_method) {
+	foreach my $meth (sort {
+	    $refile_tab{$a}{priority} <=> $refile_tab{$b}{priority} }
+			  keys %refile_tab) {
+	    if (&{$refile_tab{$meth}{supported}}) {
+		$refile_method = $meth;
+		last;
+	    }
+	}
+	unless ($refile_method) {
+	    err("no method is available to refile the message");
+	    return;
+	}
+    }
+    info("using $refile_method for refiling");
+    &{$refile_tab{$refile_method}{refile}}(@_);
+}
+
+
+END {
+    chdir("/");
+    if (!($? && $keep)) {
+	remove_tree($wd, {error => \my $err});
+	if (@$err) {
+	    err("errors removing $wd:");
+	    for my $diag (@$err) {
+		my ($file, $message) = %$diag;
+		if ($file eq '') {
+		    err($message);
+		} else {
+		    err("$file: $message");
+		}
+	    }
+	}
+    }
+}
+
+sub set_mailer {
+    my ($mailer, $locus) = @_;
+    if ($mailer =~ /sendmail:(.*)/) {
+	$mailer_args{via} = 'sendmail';
+	$mailer_args{executable} = $1 if $1;
+    } elsif ($mailer =~ m#smtp://(?:(?<user>[^:]+)(?::(?<password>.+))?@)?(?<host>[^:]+)(?::(?<port>\d+))?#) {
+	$mailer_args{via} = 'smtp';
+	$mailer_args{hostname} = $+{host};
+	$mailer_args{port} = $+{port} if $+{port};
+	$mailer_args{username} = $+{user} if $+{user};
+	$mailer_args{password} = $+{password} if $+{password};
+    } else {
+	err("unknown mailer spec", prefix => $locus);
+	return 0;
+    }
+    return 1;
+}
+
+sub read_template_file {
+    my ($file, $locus) = @_;
+    if (open(my $fd, '<', $file)) {
+	local $/;
+	$template = <$fd>;
+	close($fd);
+	return 1;
+    } else {
+	err("can't open template file $file: $!", prefix => $locus);
+	return 0;
+    }
+}
+
+my %kw = (
+    keep => \$keep,
+    'template-file' => \&read_template_file,
+    template => \$template,
+    'signature-file' => \$signature_file,
+    mailer => \&set_mailer,
+    from => \$sender,
+    sender => \$sender,
+    fullname => \$fullname,
+    domain => \$localdomain,
+    to => \$recipient,
+    add => \@add_headers,
+    'add-header' => \@add_headers,
+    'refile-method' => \$refile_method
+);
+
+sub read_config {
+    my $config_file = shift;
+    open(FILE, "<", $config_file)
+	or abend(EX_NOINPUT, "cannot open $config_file: $!");
+    my $line = 0;
+    my $err;
+    my $key;
+    my $val;
+    my $heredoc;
+    my $heredoc_line;
+    while (<FILE>) {
+	++$line;
+
+	if ($heredoc) {
+	    if (/^$heredoc\s*$/) {
+		$heredoc = undef;
+	    } else {
+		$val .= $_;
+		next;
+	    }
+	} else {
+	    chomp;
+	    s/^\s+//;
+	    s/\s+$//;
+	    s/#.*//;
+	    next if ($_ eq "");
+
+	    if (/^(.*?)\s*=\s*(.*)/) {
+		$key = $1;
+		$val = $2;
+
+		if ($val =~ /<<(\w+)\s*$/) {
+		    $heredoc = $1;
+		    $heredoc_line = $line;
+		    $val = '';
+		    next;
+		}
+	    } else {
+		err("$config_file:$line: syntax error");
+		++$err;
+	    }
+	}
+
+	if (exists($kw{$key})) {
+	    my $ref = $kw{$key};
+	    if (ref($ref) eq 'CODE') {
+		unless (&{$ref}($val, "$config_file:$line")) {
+		    ++$err;
+		}
+	    } elsif (ref($ref) eq 'ARRAY') {
+		push @{$ref}, $val;
+	    } else {
+		$$ref = $val;
+	    }
+	} else {
+	    err("$config_file:$line: unrecognized keyword: '$key'");
+	    ++$err;
+	}
+    }
+    close FILE;
+
+    abend(EX_CONFIG, "unfinished heredoc, started at line $heredoc_line")
+	if defined $heredoc;
+    abend(EX_CONFIG, "errors in config file") if $err;
+}
+
+#
+my $debug;
+my $config_file = "$ENV{HOME}/.tpnotify" if -e "$ENV{HOME}/.tpnotify";
+
+Getopt::Long::Configure(qw(gnu_getopt no_ignore_case pass_through));
+GetOptions("help" => sub {
+	      pod2usage(-exitstatus => EX_OK, -verbose => 2);
+	   },
+	   "h" => sub {
+	      pod2usage(-message => "$progname: $progdescr",
+			-exitstatus => EX_OK);
+	   },
+	   "usage" => sub {
+	      pod2usage(-exitstatus => EX_OK, -verbose => 0);
+	   },
+	   "config|c=s" => \$config_file,
+	   "no-config|N" => sub { $config_file = undef },
+    );
+
+read_config($config_file) if defined $config_file;
+
+Getopt::Long::Configure(qw(gnu_getopt no_ignore_case no_pass_through));
+
+GetOptions("keep|k" => \$keep,
+	   "alpha|A" => sub { $release_type = 'alpha' },
+	   "stable|S" => sub { $release_type = 'stable' },
+	   "template|t=s" => sub {
+	       exit(EX_NOINPUT) unless read_template_file($_[1])
+	   },
+	   "signature|s=s" => \$signature_file,
+	   "no-signature" => sub { $signature_file = undef },
+	   "verbose|v+" => \$verbose,
+	   "dry-run|n" => \$dry_run,
+	   "debug|d+" => \$debug,
+	   "mailer|m=s" => sub {
+	       exit(EX_USAGE) unless set_mailer($_[1])
+	   },
+	   "from|f=s" => \$sender,
+	   "fullname|F=s" => \$fullname,
+	   "domain|D=s" => \$localdomain,
+	   "to=s" => \$recipient,
+	   "add|a=s@" => \@add_headers,
+	   "refile-method=s" => \$refile_method,
+	   "force" => \$force_option
+) or exit(EX_USAGE);
+
+++$verbose if $dry_run;
+if ($debug && exists($mailer_args{via})) {
+    if ($mailer_args{via} eq 'sendmail') {
+	$mailer_args{sendmail_options} = []
+	    unless exists $mailer_args{sendmail_options};
+	push @{$mailer_args{sendmail_options}},
+	      '-O', 'LogLevel=99', '-d10.100', '-d13.90', '-d11.100';
+    } elsif ($mailer_args{via} eq 'smtp') {
+	$mailer_args{smtp_debug} = 1;
+    }
+}
+
+if ($sender && exists($mailer_args{via})) {
+    if ($mailer_args{via} eq 'sendmail') {
+	$mailer_args{sendmail_options} = []
+	    unless exists $mailer_args{sendmail_options};
+	push @{$mailer_args{sendmail_options}}, '-f', $sender;
+    } elsif ($mailer_args{via} eq 'smtp') {
+	$mailer_args{from} = $sender;
+    }
+}
+
+my ($name,undef,undef,undef,undef,$comment,$gecos) = getpwuid($<);
+$fullname = $gecos || $comment || $name unless defined $fullname;
+$sender = $name . '@' . ($localdomain || hostname()) unless defined $sender;
+
+if ($recipient) {
+    $mailer_args{to} = $recipient;
+}
+
+$archive_url = shift;
+abend(EX_USAGE, "not enough arguments") unless defined $archive_url;
+abend(EX_USAGE, "too many arguments") unless $#ARGV == -1;
+if ($refile_method) {
+    abend(EX_USAGE, "unknown refiling method")
+	unless exists($refile_tab{$refile_method});
+    abend(EX_USAGE, "refiling method not supported")
+	unless (&{$refile_tab{$refile_method}{supported}});
+}
+
+$wd = tempdir()
+      or abend(EX_CANTCREAT, "can't create temporary directory: $!");
+chdir($wd) or abend(EX_OSERR, "can't change to temporary directory $wd: $!");
+
+get_sources($archive_url);
+verify;
+notify;
+
+__END__
+
+=head1 NAME
+
+tpnotify - Notifies translationproject.org about new POT file
+
+=head1 SYNOPSIS
+
+B<tpnotify>
+[B<-ANSdnkv>]
+[B<-D> I<DOMAIN>]
+[B<-F> I<NAME>]
+[B<-a> I<HDR>B<:>I<VALUE>
+[B<-c> I<FILE>]
+[B<-f> I<FROM>]
+[B<-m> I<SPEC>]
+[B<-s> I<FILE>]
+[B<-t> I<FILE>]
+[B<--add=>I<HDR>:I<VAL>]
+[B<--alpha>]
+[B<--config=>I<FILE>]
+[B<--debug>]
+[B<--domain=>I<DOMAIN>]
+[B<--dry-run>]
+[B<--force>]
+[B<--from=>I<EMAIL>]
+[B<--fullname=>I<NAME>]
+[B<--keep>]
+[B<--mailer=>I<SPEC>]
+[B<--no-config>]
+[B<--no-signature>]
+[B<--refile-method=>B<perl> | B<mailutils>]
+[B<--signature=>I<FILE>]
+[B<--stable>]
+[B<--template=>I<FILE>]
+[B<--to=>I<EMAIL>]
+[B<--verbose>]
+I<URL>
+
+B<tpnotify>
+[B<-h>]
+[B<--help>]
+[B<--usage>]
+
+=head1 DESCRIPTION
+
+Notifies the coordinator of the I<Translation Project> about new
+POT file available at I<URL>.  The URL must point to a tarball of
+a package registered at TP (I<http://translationproject.org/domain/>).
+The tool works as follows:
+
+First of all, the indicated I<URL> is downloaded to a temporary location
+on disk.  The contents of the retrieved tarball is inspected.  It must
+contain the file F<configure.ac> in the project top level directory and
+one or more files with the B<.pot> suffix in the F<po> subdirectory.
+
+These files are extracted.  The F<configure.ac> is parsed in order to
+determine the package name and version (from the B<AC_INIT> statement).
+The canonical package name is formed by concatenating the package name
+(with the eventual B<GNU> prefix stripped), a dash, and the version
+number.  The name of the POT file is constructed by appending the
+B<.pot> suffix to the base name,  This file is looked up in the B<po>
+subdirectory.
+
+When this initial stage is through, the message template is expanded.
+See the B<TEMPLATE> section below, for a detailed discussion of this
+stage.  The resulting email message is then sent.  Unless the B<--to>
+option is given, the recipients are obtained from the headers B<To:>,
+B<Cc:>, and B<Bcc:> of the formatted message.  The B<--to> option supplies
+the recipient email to be used instead of those.
+
+The B<Fcc:> header can be used to save the copy of the message being sent
+in a mailbox.  If its value is an absolute or relative pathname, it is assumed
+to be a mailbox in traditional B<UNIX> format (relative pathnames are
+expanded relative to the user home directory).  Otherwise, it is a B<folder
+url>:
+
+=over 8
+
+=item B<mbox:>[B<//>]I<PATHNAME>
+
+UNIX mailbox located at I<PATHNAME> (relative or absolute).
+
+=item B<mh:>[B<//>]I<PATHNAME>
+
+MH mailbox at I<PATHNAME>.  Relative pathnames are resolved by prepending
+the value of the B<Path> header from the F<~/.mh_profile> file.  If not
+defined, the B<~/Mail> directory is assumed.
+
+=item B<maildir:>[B<//>]I<PATHNAME>
+
+Maildir folder at I<PATHNAME>.  Relative pathnames are relative to the
+current user's home directory.
+
+=back
+
+Two methods can be used to support B<Fcc> refiling: the B<perl> method, which
+uses the B<Mail::Box::Manager> Perl package, and the B<mailutils> method,
+which uses GNU mailutils.  By default, B<tpnotify> attempts to use B<perl>,
+and falls back to B<mailutils> if that's not possible.  If the latter is not
+available as well, it issues an error message and terminates.  The user can
+select the refiling method using the B<--refile-method> option.  See the
+B<BUGS> section for details.
+
+Additional configuration is supplied in configuration file and command line.
+The latter overrides the former.  See the section B<CONFIGURATION> for a
+detailed discussion of the configuration file format.
+
+The B<-v> (B<--verbose>) command line option instructs the tool to verbosely
+list each step being executed.  Additionally, the B<-d> (B<--debug>) option
+enables a detailed printout of debugging information describing the mail
+sending process.
+
+The B<-n> (B<--dry-run>) option causes the program to verbosely print what
+is being done (as if given the B<--verbose> option), but not actually send
+the constructed message.
+
+=head1 CONFIGURATION
+
+The default configuration file is named B<.tpnotify> and is located in the
+current user home directory.  It's OK if it does not exist.  In this case
+the tool will use the built-in defaults.  Two command line options are
+provided to alter that behavior.  The B<-c I<FILE>> (B<--config=>I<FILE>)
+option causes the program to read configuration file from I<FILE>.  It
+is an error if that file does not exist or is unreadable.  The B<--no-config>
+option instructs B<tpnotify> to ignore the configuration file.
+
+When reading the configuration file, empty lines and lines starting with
+a hash sign (B<#>) are ignored.  Remaining lines must contain valid
+configuration statements,
+
+A statement consists of a keyword, followed by an equals sign and a value.
+Arbitrary amount of white space are allowed at the beginning and end of
+line, as well as around the equals sign.  Multiline values can be entered
+using the familiar I<here-document> syntax.  A here-document is
+introduced by the B<<<> marker followed by arbitrary word.  The lines following
+that construct are collected and concatenated until a line is found that
+contains only that word alone.  The word must appear at the beginning of
+the line (no leading whitespace allowed).  However, whitespace is allowed
+between the word and end of line.  For example
+
+    template = <<EOF
+	To: <coordinator@translationproject.org>
+	Subject: $package_base.pot
+
+	$archive_url
+    EOF
+
+The valid statements are as follows:
+
+=over 8
+
+=item B<keep=>B<1> | B<0>
+
+If an error occurs, don't remove the temporary directory.  This allows the
+user to get more insight into the reasons of the failure.
+
+See also the B<--keep> option.
+
+=item B<template-file=>I<FILE>
+
+Name of the file to read template from.  See also the B<--template> command
+line option.
+
+=item B<template=>I<TEXT>
+
+Template for the message.  The I<TEXT> is normally a here-document.
+See the B<TEMPLATE> section for a description of its format.
+
+=item B<signature-file=>I<FILE>
+
+Read signature from the given file.  See also the B<--signature> command line
+option.
+
+=item B<mailer=>I<SPEC>
+
+Sets mailer.  The argument is a mailer specification as discussed in the
+description of the B<--mailer> command line option below.
+
+=item B<sender=>I<EMAIL>
+
+Sets the sender email address.  See also the B<--sender> option.
+
+=item B<fullname=>I<STRING>
+
+Sets the real name of the recipient.  See the B<--fullname> command
+line option.
+
+=item B<domain=>I<DOMAIN>
+
+Sets the sender domain name.  This is used when creating the
+sender email address to be used in the B<From:> header.  See also the
+B<--domain> command line option.
+
+=item B<to=>I<EMAIL>
+
+Sets the recipient address to be used instead of the emails from
+B<To:>, B<Cc:>, and B<Bcc:> headers of the constructed message.
+
+=item B<add=>I<HDR>B<:>I<VAL>
+
+Adds the given header to the message.  See also the B<--add> command line
+option.
+
+=item B<refile-method=>B<perl> | B<mailutils>
+
+Selects the method to implement B<Fcc>.  The value B<perl> means to use
+B<Mail::Box::Manager> perl package (L<https://metacpan.org/release/Mail-Box>).
+The value B<mailutils> means to use the B<movemail> program from B<GNU
+mailutils> (L<https://mailutils.org>).
+
+By default, the first available method is used.  See the
+B<BUGS> section for possible reasons to use this setting.
+
+=back
+
+An example of the configuration file follows:
+
+    # Example configuration file for tpnotify
+    #
+    mailer   = smtp://127.0.0.1:24
+    from     = gray@gnu.org
+    template = <<EOT
+    To: <coordinator@translationproject.org>
+    Subject: $package_base.pot
+
+    The new $release_type version of $package_name is available at:
+
+       $archive_url
+
+    $signature
+    EOT
+
+=head1 TEMPLATE
+
+The template is an email message conforming to the B<RFC-2822>.  It
+can (and, actually must) contain variables that will be replaced with
+their actual values during the expansion.  The variables are:
+
+=over 8
+
+=item $sender
+
+Sender email address.  It is constructed by concatenating the login name of
+the invoking user, the B<@> sign, and the local host name.  If the B<--domain>
+command line option, or B<domain> configuration statement is used, its value
+is substituted instead of the local host name.  If the B<--from> option or
+B<sender> configuration statement is used, its value overrides the constructed
+one.
+
+=item $fullname
+
+Full real name of the sender.  It can be supplied by the B<--fullname> command
+line option or B<fullname> configuration statement.  If neither of these is
+present, the name is obtained from the B<Gecos> line in the B<passwd> entry of
+the invoking user.
+
+=item $localdomain
+
+Local domain name.  It is the value of the command line option B<--domain>.  If
+not present, the value of the configuration statement B<domain> is used.  If
+that is not present either, then the local host name is used instead.
+
+=item $signature
+
+Contents of the I<signature file> with the final newline character removed.
+The file location is given by the command line option B<--signature> or the
+configuration statement B<--signature-file>.
+
+=item $archive_url
+
+I<URL> of the tarball as supplied in the command line.
+
+=item $archive_file
+
+Name of the tarball.  It is the last pathname component from I<URL>.
+
+=item $topdir
+
+Project top level directory as seen in the downloaded tarball.
+
+=item $package_name
+
+Full package name.  E.g. B<GNU dico>.
+
+=item $package_tarname
+
+Package I<tarname>.  It is the B<$package_name> value with the eventual
+B<GNU> prefix stripped off.
+
+=item $package_version
+
+Package version number.
+
+=item $package_base
+
+Package base name, constructed as a concatenation of values of the
+B<$package_tarname> and B<$package_version>, separated by a dash.
+
+=item $release_type
+
+Package type: B<alpha>, or B<stable>.  Unless supplied with the corresponding
+command line option, it is determined by analyzing B<$package_number>.  The
+type is B<alpha>, if the number contains three numeric parts, separated by
+dots, and the value of the last part is greater than or equal to 90.  Otherwise,
+the type is B<stable>.
+
+=back
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--force>
+
+Force submitting the message even if the downloaded POT file does not pass
+checks.
+
+=item B<--no-config>
+
+Don't read configuration file.
+
+=item B<--no-signature>
+
+Don't read signature file.  The B<$signature> template variable will be
+undefined.
+
+=item B<--to=>I<EMAIL>
+
+Send message to I<EMAIL>, instead of the addresses specified in the message
+itself.
+
+=item B<-A>, B<--alpha>
+
+Assume I<URL> is an alpha release.
+
+=item B<-D>, B<--domain=>I<DOMAIN>
+
+Use I<DOMAIN> as the sender domain.  This is used when creating the
+sender email address to be used in the B<From:> header.  It is constructed
+by concatenating the login name of the invoking user, the B<@> sign, and the
+local host name (or I<DOMAIN>, if set).
+
+=item B<-F>, B<--fullname=>I<NAME>
+
+Set the full real name of the sender.  It is used to construct the B<From:>
+header.  When using B<sendmail> mailer, it will also be passed with the B<-F>
+option to B<sendmail>.
+
+=item B<-S>, B<--stable>
+
+Assume I<URL> is a stable release.
+
+=item B<-a>, B<--add=>I<HDR>B<:>I<VAL>
+
+Append the given header to the message.
+
+=item B<-c>, B<--config=>I<FILE>
+
+Read configuration from I<FILE>, instead of F<~/.tpnotify>.
+
+=item B<-d>, B<--debug>
+
+Debug the mail sending transaction.
+
+=item B<-f>, B<--from=>I<EMAIL>
+
+Sets the sender email address.  Unless this option is supplied, the email
+address of the sender of the message will be constructed by concatenating
+the login name of the invoking user, the B<@> sign, and the
+local host name (or the local domain, if set via the B<--domain> option).
+
+=item B<-k>, B<--keep>
+
+If an error occurs, don't remove the temporary directory.  This allows the
+user to get more insight into the reasons of the failure.
+
+=item B<-m>, B<--mailer=>I<SPEC>
+
+Sets the mailer.  The I<SPEC> is one of the following:
+
+=over 4
+
+=item B<sendmail:>
+
+Use the default sendmail binary for sending.
+
+=item B<sendmail:>F<program>
+
+Use the sendmail-compatible program.  F<program> is the absolute pathname
+of the program.
+
+=item B<smtp://>[I<USER>[B<:>I<PASS>]B<@>]I<HOSTNAME>[B<:>I<PORT>]
+
+Send mail using SMTP.  I<HOSTNAME> is the hostname or IP address of the mail
+relay to use.  I<PORT>, if supplied, is the port number to use instead of the
+default 25.  Optional I<USER> and I<PASS> provide credentials, if the relay
+requires authentication.
+
+=back
+
+=item B<-n>, B<--dry-run>
+
+Don't actually send the message.  Verbosely print what is being done (see
+the B<--verbose> option) and display the content of the message that would
+have been sent.
+
+=item B<--refile-method=>B<perl> | B<mailutils>
+
+Select the method to implement B<Fcc>.  Refer to the description of
+the B<refile-method> setting in the B<CONFIGURATION> chapter for a
+detailed discussion.
+
+=item B<-s>, B<--signature=>I<FILE>
+
+Read signature from I<FILE>.  The content of the file is available as the
+value of the B<$signature> template variable.
+
+=item B<-t>, B<--template=>I<FILE>
+
+Read template from I<FILE>.  See the section B<TEMPLATE> for its format.
+
+=item B<-v>, B<--verbose>
+
+Verbosely print what is being done.
+
+=back
+
+The following options are informative.  They cause the program to print
+the required piece of information and exit.  The remaining options and
+arguments are silently ignored.
+
+=over 8
+
+=item B<-h>
+
+Produce a short help summary.
+
+=item B<--help>
+
+Print a detailed manual.
+
+=item B<--usage>
+
+Display a short command line usage summary.
+
+=back
+
+=head1 EXIT CODE
+
+=over 4
+
+=item B<0>
+
+Success
+
+=item B<64>
+
+Command line usage error.
+
+=item B<65>
+
+Downloaded archive contains invalid data.  See the error messages for details.
+
+=item B<66>
+
+Required input file cannot be opened.
+
+=item B<69>
+
+Subprocess exited with error status or on signal.
+
+=item B<71>
+
+Failed to run subprocess, or failed to change the directory.
+
+=item B<73>
+
+Required output file cannot be created or written.
+
+=item B<78>
+
+Configuration error.
+
+=back
+
+=head1 BUGS
+
+If your template file contains an B<Fcc> header pointing to a B<MH> folder,
+you will get the following message:
+
+    WARNING: Folder already locked with file <FILENAME>
+
+This is not a B<tpnotify> bug, but a bug of B<Mail::Box::Manager>.  It has
+been reported (see L<https://rt.cpan.org/Public/Bug/Display.html?id=130193>)
+and hopefully it will be fixed in one of the future versions of
+B<Mail::Box::Manager>.
+
+This is only a warning and can safely be ignored.  If it does bother you,
+you can switch to GNU mailutils for refiling the message.  To do so, first
+install movemail from GNU mailutils (the exact instructions vary depending
+on the distro you are using), and then use the
+B<--refile-method=mailutils> option or B<refile-method=mailutils> statement
+in your F<~/.tpnotify> configuration file.
+
+=head1 AUTHOR
+
+Sergey Poznyakoff <gray@gnu.org>
+
+=head1 LICENSE
+
+GPLv3+: GNU GPL version 3 or later, see L<http://gnu.org/licenses/gpl.html>
+
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+    
+=cut

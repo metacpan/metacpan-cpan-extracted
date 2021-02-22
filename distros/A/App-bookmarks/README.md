@@ -17,47 +17,37 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-`bookmarks` is a tool to export bookmarks from files supplied as arguments, or
-from browsers default locations (when called without arguments). The following
-sources are supported :
+`bookmarks` is a tool to export bookmarks from files supplied as arguments, or from browsers default locations (when called without arguments). The following sources are supported :
 
 - Safari (Mac)
 - Firefox (Mac/Linux/Windows)
 - Chrome (Mac/Linux/Windows)
 - Internet Explorer (Windows)
+- Edge (Windows)
 - Plain text (.txt)
 - Markdown (.md)
 
-Files named _*.plist_, _*.sqlite_ and _*Bookmarks_ are processed as Safari, Firefox
-and Chrome bookmarks, respectively. Directories named _*Favorites_ are processed
-as Internet Explorer favorites.
+Files named _*.plist_, _*.sqlite_ and _*Bookmarks_ are processed as Safari, Firefox and Chrome bookmarks, respectively. Directories named _*Favorites_ are processed as Internet Explorer favorites.
 
-The fields `<title>`, `<url>` and `<description>` are retrieved (when existing) and
-are available for exporting (in the desired format), by default :
-`<title> <url> <description>`
+Fields `<title>`, `<url>` and `<description>` are retrieved (when existing) and exported in the desired format, by default : `<title> <url> <description>`.
 
-The same format is used for plain text and markdown files :
+That same format is used for plain text and markdown files :
 ```
-plain text example http://example.txt #tag1 #tag2
-[markdown example](http://example.md) #tag1 #tag2
+plain text example http://example.txt with a description
+[markdown example](http://example.md) with a description
 ```
 
-The `<description>` field is filled with Safari's Description, Firefox's Tags or
-empty for Chrome and Internet Explorer.
+The `<description>` field contains Safari's _Description_ or Firefox's _Tags_ but is empty for Chrome, Internet Explorer and Edge.
 
 
 SEARCH BOOKMARKS INTERACTIVELY FROM CLI
 ---------------------------------------
 
-This tool can be used to search and open bookmarks interactively from the CLI. The
-following instructions are for macOS, but it should be similar on any regular OS.
+This tool can be used to search and open bookmarks interactively from the CLI. The following instructions are for macOS, but it should be similar on any regular OS.
 
 ![](tty.png)
 
-Install the wonderful [fzf](https://github.com/junegunn/fzf) (available in
-[Homebrew](https://brew.sh)), [URI::Find](https://github.com/schwern/URI-Find) (CPAN),
-[App::uricolor](https://github.com/kal247/App-uricolor) (CPAN),
-and add these aliases to your shell :
+Install the wonderful [fzf](https://github.com/junegunn/fzf) (available in [Homebrew](https://brew.sh)), [URI::Find](https://github.com/schwern/URI-Find) (CPAN), [App::uricolor](https://github.com/kal247/App-uricolor) (CPAN), and add these aliases to your shell :
 
 **Open link(s) with default application :**
 ```
@@ -117,7 +107,7 @@ PREREQUISITES
 All are optional.
 
 - Safari : macOS
-- Firefox : DBI
+- Firefox : DBI, DBD::SQLite
 - Chrome : File::Slurper, JSON
 - Internet Explorer : Config::Any, Config::Tiny, Win32
 - Plain text : URI::Find

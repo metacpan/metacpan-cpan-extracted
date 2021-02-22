@@ -1,9 +1,9 @@
 package ColorTheme::Data::Dump::Color::Default256;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-06'; # DATE
+our $DATE = '2021-02-13'; # DATE
 our $DIST = 'Data-Dump-Color'; # DIST
-our $VERSION = '0.242'; # VERSION
+our $VERSION = '0.243'; # VERSION
 
 use parent 'ColorThemeBase::Static::FromStructColors';
 
@@ -45,7 +45,7 @@ ColorTheme::Data::Dump::Color::Default256 - Default color theme for Data::Dump::
 
 =head1 VERSION
 
-This document describes version 0.242 of ColorTheme::Data::Dump::Color::Default256 (from Perl distribution Data-Dump-Color), released on 2021-02-06.
+This document describes version 0.243 of ColorTheme::Data::Dump::Color::Default256 (from Perl distribution Data-Dump-Color), released on 2021-02-13.
 
 =head1 HOMEPAGE
 
@@ -57,7 +57,7 @@ Source repository is at L<https://github.com/perlancar/perl-Data-Dump-Color>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Data-Dump-Color/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-Color>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

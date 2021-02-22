@@ -2,8 +2,8 @@ NAME
     BorderStyles::Standard - A standard collection of border styles
 
 VERSION
-    This document describes version 0.002 of BorderStyles::Standard (from
-    Perl distribution BorderStyles-Standard), released on 2020-06-11.
+    This document describes version 0.005 of BorderStyles::Standard (from
+    Perl distribution BorderStyles-Standard), released on 2021-01-31.
 
 BORDER STYLES
     *   BorderStyle::ASCII::None
@@ -13,6 +13,11 @@ BORDER STYLES
     *   BorderStyle::ASCII::SingleLine
 
         Single line border with ASCII characters.
+
+    *   BorderStyle::ASCII::SingleLineDoubleAfterHeader
+
+        Just like ASCII::SingleLine but uses double line to separate header
+        row and first data row.
 
     *   BorderStyle::ASCII::SingleLineHorizontalOnly
 
@@ -102,9 +107,18 @@ BORDER STYLES
 
         Bold single-line border with UTF8 characters.
 
+    *   BorderStyle::UTF8::SingleLineBoldHeader
+
+        Single-line border (header box bold) with UTF8 characters.
+
     *   BorderStyle::UTF8::SingleLineCurved
 
         Single-line border with UTF8 characters, curved edges.
+
+    *   BorderStyle::UTF8::SingleLineDoubleAfterHeader
+
+        Just like UTF8::SingleLine but uses double line to separate header
+        row and first data row.
 
     *   BorderStyle::UTF8::SingleLineHorizontalOnly
 
@@ -142,8 +156,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyles-Standard
-    >
+    <https://github.com/perlancar/perl-BorderStyles-Standard/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -160,7 +173,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -582,10 +582,10 @@ BEGIN {
     sub {1},
 ##############################################################################
 # 481
-    sub { $_=qq{\a\b\e\f\n\r\t\053\cC\xeb};  my $r=    $_ =~ tr/\a\b\e\f\n\r\t\053\cC\xeb/ABCDEFGHIJ/;          $r == 10                            },
-    sub { $_=qq{\a\b\e\f\n\r\t\053\cC\xeb};  my $r=    $_ =~ tr/\a\b\e\f\n\r\t\053\cC\xeb/ABCDEFGHIJ/;          $_ eq 'ABCDEFGHIJ'                  },
-    sub { $_=qq{ABCDEFGHIJ};                 my $r=    $_ =~ tr/ABCDEFGHIJ/\a\b\e\f\n\r\t\053\cC\xeb/;          $r == 10                            },
-    sub { $_=qq{ABCDEFGHIJ};                 my $r=    $_ =~ tr/ABCDEFGHIJ/\a\b\e\f\n\r\t\053\cC\xeb/;          $_ eq qq{\a\b\e\f\n\r\t\053\cC\xeb} },
+    sub { $_=qq{\a\b\e\f\n\r\t\053\cC};  my $r=    $_ =~ tr/\a\b\e\f\n\r\t\053\cC/ABCDEFGHI/;          $r == 9                         },
+    sub { $_=qq{\a\b\e\f\n\r\t\053\cC};  my $r=    $_ =~ tr/\a\b\e\f\n\r\t\053\cC/ABCDEFGHI/;          $_ eq 'ABCDEFGHI'               },
+    sub { $_=qq{ABCDEFGHI};              my $r=    $_ =~ tr/ABCDEFGHI/\a\b\e\f\n\r\t\053\cC/;          $r == 9                         },
+    sub { $_=qq{ABCDEFGHI};              my $r=    $_ =~ tr/ABCDEFGHI/\a\b\e\f\n\r\t\053\cC/;          $_ eq qq{\a\b\e\f\n\r\t\053\cC} },
     sub {1},
     sub {1},
     sub {1},
@@ -594,10 +594,10 @@ BEGIN {
     sub {1},
 #-----------------------------------------------------------------------------
 # 491
-    sub { $_=qq{\a\b\e\f\n\r\t\053\cC\xeb};  my $r=UTF8::R2::tr($_,qq{\a\b\e\f\n\r\t\053\cC\xeb},qq{ABCDEFGHIJ});          $r == 10                            },
-    sub { $_=qq{\a\b\e\f\n\r\t\053\cC\xeb};  my $r=UTF8::R2::tr($_,qq{\a\b\e\f\n\r\t\053\cC\xeb},qq{ABCDEFGHIJ});          $_ eq 'ABCDEFGHIJ'                  },
-    sub { $_=qq{ABCDEFGHIJ};                 my $r=UTF8::R2::tr($_,qq{ABCDEFGHIJ},qq{\a\b\e\f\n\r\t\053\cC\xeb});          $r == 10                            },
-    sub { $_=qq{ABCDEFGHIJ};                 my $r=UTF8::R2::tr($_,qq{ABCDEFGHIJ},qq{\a\b\e\f\n\r\t\053\cC\xeb});          $_ eq qq{\a\b\e\f\n\r\t\053\cC\xeb} },
+    sub { $_=qq{\a\b\e\f\n\r\t\053\cC};  my $r=UTF8::R2::tr($_,qq{\a\b\e\f\n\r\t\053\cC},qq{ABCDEFGHI});          $r == 9                         },
+    sub { $_=qq{\a\b\e\f\n\r\t\053\cC};  my $r=UTF8::R2::tr($_,qq{\a\b\e\f\n\r\t\053\cC},qq{ABCDEFGHI});          $_ eq 'ABCDEFGHI'               },
+    sub { $_=qq{ABCDEFGHI};              my $r=UTF8::R2::tr($_,qq{ABCDEFGHI},qq{\a\b\e\f\n\r\t\053\cC});          $r == 9                         },
+    sub { $_=qq{ABCDEFGHI};              my $r=UTF8::R2::tr($_,qq{ABCDEFGHI},qq{\a\b\e\f\n\r\t\053\cC});          $_ eq qq{\a\b\e\f\n\r\t\053\cC} },
     sub {1},
     sub {1},
     sub {1},
@@ -606,10 +606,10 @@ BEGIN {
     sub {1},
 #-----------------------------------------------------------------------------
 # 501
-    sub { $_=qq{\a\b\e\f\n\r\t\053\cC\xeb};  my $r=UTF8::R2::tr($_,qq{\a\b\e\f\n\r\t\053\cC\xeb},qq{ＡＢＣＤＥＦＧＨＩＪ});          $r == 10                            },
-    sub { $_=qq{\a\b\e\f\n\r\t\053\cC\xeb};  my $r=UTF8::R2::tr($_,qq{\a\b\e\f\n\r\t\053\cC\xeb},qq{ＡＢＣＤＥＦＧＨＩＪ});          $_ eq 'ＡＢＣＤＥＦＧＨＩＪ'        },
-    sub { $_=qq{ＡＢＣＤＥＦＧＨＩＪ};       my $r=UTF8::R2::tr($_,qq{ＡＢＣＤＥＦＧＨＩＪ},qq{\a\b\e\f\n\r\t\053\cC\xeb});          $r == 10                            },
-    sub { $_=qq{ＡＢＣＤＥＦＧＨＩＪ};       my $r=UTF8::R2::tr($_,qq{ＡＢＣＤＥＦＧＨＩＪ},qq{\a\b\e\f\n\r\t\053\cC\xeb});          $_ eq qq{\a\b\e\f\n\r\t\053\cC\xeb} },
+    sub { $_=qq{\a\b\e\f\n\r\t\053\cC};  my $r=UTF8::R2::tr($_,qq{\a\b\e\f\n\r\t\053\cC},qq{ＡＢＣＤＥＦＧＨＩ});          $r == 9                         },
+    sub { $_=qq{\a\b\e\f\n\r\t\053\cC};  my $r=UTF8::R2::tr($_,qq{\a\b\e\f\n\r\t\053\cC},qq{ＡＢＣＤＥＦＧＨＩ});          $_ eq 'ＡＢＣＤＥＦＧＨＩ'      },
+    sub { $_=qq{ＡＢＣＤＥＦＧＨＩ};     my $r=UTF8::R2::tr($_,qq{ＡＢＣＤＥＦＧＨＩ},qq{\a\b\e\f\n\r\t\053\cC});          $r == 9                         },
+    sub { $_=qq{ＡＢＣＤＥＦＧＨＩ};     my $r=UTF8::R2::tr($_,qq{ＡＢＣＤＥＦＧＨＩ},qq{\a\b\e\f\n\r\t\053\cC});          $_ eq qq{\a\b\e\f\n\r\t\053\cC} },
     sub {1},
     sub {1},
     sub {1},

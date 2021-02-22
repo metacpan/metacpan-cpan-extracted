@@ -1,4 +1,6 @@
 Changes
+examples/load_and_save.pl
+examples/load_cookies.t
 examples/placeholder.pl
 INSTALL.SKIP
 lib/HTTP/Cookies/Chrome.pm
@@ -15,6 +17,7 @@ t/pod_coverage.t
 t/save.t
 t/test_manifest
 test-corpus/Cookies
+test-corpus/cookies.db
 xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

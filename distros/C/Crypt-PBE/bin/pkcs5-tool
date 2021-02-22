@@ -2,166 +2,12 @@
 
 use strict;
 use warnings;
-
 use utf8;
 
-use MIME::Base64;
-use Getopt::Long qw( :config gnu_compat );
-use Pod::Usage;
-use Cwd;
-use Carp;
-use English qw( -no_match_vars );
+use Crypt::PBE::CLI;
 
-use Crypt::PBE::PBES1;
-use Crypt::PBE::PBES2;
+Crypt::PBE::CLI->run( \@ARGV, \*ARGV ) unless caller();
 
-our $VERSION = '0.101';
-
-sub cli_error {
-    my ($error) = @_;
-    $error =~ s/ at .* line \d+.*//;
-    print "ERROR: $error\n";
-    exit(255);
-}
-
-sub show_version {
-
-    require Crypt::PBE;
-    require Crypt::CBC;
-    require Crypt::DES;
-    require Crypt::OpenSSL::AES;
-
-    print "
-pkcs5-tool v$VERSION
-
-CORE
-  Perl                 ($PERL_VERSION, $OSNAME)
-
-CRYPT
-  Crypt::PBE           ($Crypt::PBE::VERSION)
-  Crypt::CBC           ($Crypt::CBC::VERSION)
-  Crypt::DES           ($Crypt::DES::VERSION)
-  Crypt::OpenSSL::AES  ($Crypt::OpenSSL::AES::VERSION)
-
-DIGEST
-  Digest::SHA          ($Digest::SHA::VERSION)
-  Digest::MD5          ($Digest::MD5::VERSION)
-  Digest::MD2          ($Digest::MD2::VERSION)
-
-";
-
-    exit(0);
-
-}
-
-my @options = qw(
-    help|h
-    man
-    version
-    verbose|v
-    null|0
-
-    input=s
-    password=s
-    count=i
-    hash=s
-    hmac=s
-    encryption=s
-    digest=s
-
-    scheme=s
-    algorithm=s
-
-    encrypt
-    decrypt
-    list-algorithms
-);
-
-my $pbe_mapping = {
-    'PBEWithMD2AndDES'  => { scheme => 'pbes1', hash => 'md2',  encryption => 'des' },
-    'PBEWithMD5AndDES'  => { scheme => 'pbes1', hash => 'md5',  encryption => 'des' },
-    'PBEWithSHA1AndDES' => { scheme => 'pbes1', hash => 'sha1', encryption => 'des' },
-
-    'PBEWithHmacSHA1AndAES_128'   => { scheme => 'pbes2', hmac => 'hmac-sha1',   encryption => 'aes-128' },
-    'PBEWithHmacSHA1AndAES_192'   => { scheme => 'pbes2', hmac => 'hmac-sha1',   encryption => 'aes-192' },
-    'PBEWithHmacSHA1AndAES_256'   => { scheme => 'pbes2', hmac => 'hmac-sha1',   encryption => 'aes-256' },
-    'PBEWithHmacSHA224AndAES_128' => { scheme => 'pbes2', hmac => 'hmac-sha224', encryption => 'aes-128' },
-    'PBEWithHmacSHA224AndAES_192' => { scheme => 'pbes2', hmac => 'hmac-sha224', encryption => 'aes-192' },
-    'PBEWithHmacSHA224AndAES_256' => { scheme => 'pbes2', hmac => 'hmac-sha224', encryption => 'aes-256' },
-    'PBEWithHmacSHA256AndAES_128' => { scheme => 'pbes2', hmac => 'hmac-sha256', encryption => 'aes-128' },
-    'PBEWithHmacSHA256AndAES_192' => { scheme => 'pbes2', hmac => 'hmac-sha256', encryption => 'aes-192' },
-    'PBEWithHmacSHA256AndAES_256' => { scheme => 'pbes2', hmac => 'hmac-sha256', encryption => 'aes-256' },
-    'PBEWithHmacSHA384AndAES_128' => { scheme => 'pbes2', hmac => 'hmac-sha384', encryption => 'aes-128' },
-    'PBEWithHmacSHA384AndAES_192' => { scheme => 'pbes2', hmac => 'hmac-sha384', encryption => 'aes-192' },
-    'PBEWithHmacSHA384AndAES_256' => { scheme => 'pbes2', hmac => 'hmac-sha384', encryption => 'aes-256' },
-    'PBEWithHmacSHA512AndAES_128' => { scheme => 'pbes2', hmac => 'hmac-sha512', encryption => 'aes-128' },
-    'PBEWithHmacSHA512AndAES_192' => { scheme => 'pbes2', hmac => 'hmac-sha512', encryption => 'aes-192' },
-    'PBEWithHmacSHA512AndAES_256' => { scheme => 'pbes2', hmac => 'hmac-sha512', encryption => 'aes-256' },
-};
-
-my $options = {};
-
-GetOptions( $options, @options ) or pod2usage( -verbose => 0 );
-
-pod2usage( -exitstatus => 0, -verbose => 2 ) if ( $options->{man} );
-pod2usage( -exitstatus => 0, -verbose => 0 ) if ( $options->{help} );
-
-show_version if ( $options->{version} );
-
-if ( $options->{'list-algorithms'} ) {
-    print join( "\n", sort keys %{$pbe_mapping} );
-    print "\n";
-    exit(0);
-}
-
-pod2usage( -exitstatus => 1, -verbose => 0 ) if ( !$options->{algorithm} );
-
-my $pbe_params = $pbe_mapping->{ $options->{algorithm} };
-
-if ( !$pbe_params ) {
-    print "ERROR: Invalid algorithm\n\n";
-    pod2usage( -exitstatus => 1, -verbose => 0 );
-}
-
-my $pbes = undef;
-
-if ( $pbe_params->{scheme} eq 'pbes1' ) {
-
-    $pbes = Crypt::PBE::PBES1->new(
-        password   => $options->{password},
-        count      => $options->{count} || 1_000,
-        hash       => $pbe_params->{hash},
-        encryption => $pbe_params->{encryption},
-    );
-
-}
-
-if ( $pbe_params->{scheme} eq 'pbes2' ) {
-
-    $pbes = Crypt::PBE::PBES2->new(
-        password   => $options->{password},
-        count      => $options->{count} || 1_000,
-        hmac       => $pbe_params->{hmac},
-        encryption => $pbe_params->{encryption},
-    );
-
-}
-
-if ( $options->{encrypt} ) {
-    print encode_base64 $pbes->encrypt( $options->{input} ), '';
-    print "\0" if ( $options->{null} );
-    print "\n" if ( !$options->{null} );
-}
-
-if ( $options->{decrypt} ) {
-    print $pbes->decrypt( decode_base64 $options->{input} );
-    print "\0" if ( $options->{null} );
-    print "\n" if ( !$options->{null} );
-}
-
-exit(0);
-
-__END__
 =encoding utf-8
 
 =head1 NAME
@@ -173,21 +19,21 @@ pkcs5-tool - PKCS#5 Password-Based Encryption Tools
     pkcs5-tool [OPTIONS]
 
     Options:
-        --help              Brief help message
-        --man               Full documentation
-        --verbose           Print more info during run
-        --version           Print version
+          --help                Brief help message
+          --man                 Full documentation
+          --version             Print version
+      -v, --verbose             Verbose
 
-        --algorithm         PBE algorithm
-        --list-algorithms   List PBE algorithm
+          --algorithm           PBE algorithm
+          --list-algorithms     List PBE algorithms
 
-        -0, --null          Return NULL char instead of new line 
+      -0, --null                Return NULL char instead of new line
 
-        --password          Password
-        --input             Input data
+          --password            Password
+          --input               Input data
         
-        --encrypt
-        --decrypt
+          --encrypt             Encrypt some data
+          --decrypt             Decrypt some data
 
     Examples:
 
@@ -199,9 +45,14 @@ pkcs5-tool - PKCS#5 Password-Based Encryption Tools
 
             pkcs5-tool --algorithm PBEWithHmacSHA1AndAES_128 --password mypassword --input <Base64 encrypted data> --decrypt
 
+        Read input from STDIN:
+
+            echo -n "secret" | pkcs5-tool --algorithm PBEWithHmacSHA1AndAES_128 --password mypassword --encrypt
+            pkcs5-tool --algorithm PBEWithHmacSHA1AndAES_128 --password mypassword --encrypt < /path/of/secret
+
 =head1 DESCRIPTION
 
-C<pkcs5-tool> PKCS#% Password-Based Encryption Tools
+C<pkcs5-tool> PKCS#5 Password-Based Encryption Tools
 
 =head1 AUTHOR
 
@@ -209,7 +60,7 @@ L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2018-2020 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+Copyright © 2018-2021 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 You may use and distribute this module according to the same terms
 that Perl is distributed under.

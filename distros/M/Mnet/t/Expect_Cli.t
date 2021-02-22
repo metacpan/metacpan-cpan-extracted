@@ -194,7 +194,7 @@ Mnet::T::test_perl({
 #   example: failed_re /refused/, banner "unauthorized access refused"
 #   this would be an enhancement, current code can't handle this situation
 #   fix is no default failed_re, perldoc says set failed_re or timeout on fails
-#   refer to to-do not in git commit 65d08eb Mnet::Expect::Cli for ideas
+#   refer to to-do noted in git commit 65d08eb Mnet::Expect::Cli for ideas
 #Mnet::T::test_perl({
 #    name    => 'new login skipped pre-login banner failed_re text',
 #    pre     => <<'    pre-eof',

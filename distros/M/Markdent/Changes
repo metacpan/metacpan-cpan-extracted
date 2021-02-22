@@ -1,3 +1,9 @@
+0.39   2021-02-12
+
+- Add support for strikethrough (~~) in the GitHub dialect. Implemented by
+  Konrad Bucheli. Fixes GH #16. GH #27.
+
+
 0.38   2020-11-07
 
 - Fix a bug where a line starting with a tab in the middle of a paragraph

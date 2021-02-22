@@ -1,13 +1,14 @@
+use v5.16;
+
 package Module::Release::Kwalitee;
 
 use strict;
 use warnings;
 use Exporter qw(import);
-use vars qw($VERSION);
 
 our @EXPORT = qw(check_kwalitee cpants_lint cpants_pass_regex );
 
-$VERSION = '2.125';
+our $VERSION = '2.127';
 
 =encoding utf8
 
@@ -94,7 +95,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2018, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2007-2021, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

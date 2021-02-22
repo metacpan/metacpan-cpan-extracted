@@ -1,0 +1,17 @@
+{
+   "license" : [ "perl_5" ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/jberger/Mojo-IOLoop-Delay"
+      },
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Mojo-IOLoop-Delay/issues"
+      },
+      "license" : [ "http://dev.perl.org/licenses/" ]
+   },
+   "x_deprecated": 1
+}

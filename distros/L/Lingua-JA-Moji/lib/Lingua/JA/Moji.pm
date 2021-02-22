@@ -7,69 +7,70 @@ use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
-use JSON::Parse 'json_file_to_perl';
+use JSON::Parse 'read_json';
 
 our @EXPORT_OK = qw/
-		    bad_kanji
-		    cleanup_kana
-		    hangul2kana
-		    hentai2kana
-		    hentai2kanji
-		    kana2hentai
-		    kanji2hentai
-		    katakana2square
-		    nigori_first
-		    smallize_kana
-		    square2katakana
-                    InHankakuKatakana
-                    InKana
-                    InWideAscii
-                    ascii2wide
-                    bracketed2kanji
-                    braille2kana
-                    circled2kana
-                    circled2kanji
-                    cyrillic2katakana
-                    hira2kata
-                    hw2katakana
-                    is_hiragana
-                    is_kana
-                    is_romaji
-                    is_romaji_semistrict
-                    is_romaji_strict
-                    is_voiced
-                    kana2braille
-                    kana2circled
-                    kana2cyrillic
-                    kana2hangul
-                    kana2hw
-                    kana2katakana
-                    kana2morse
-                    kana2romaji
-                    kana_to_large
-                    kanji2bracketed
-                    kanji2circled
-                    kata2hira
-                    katakana2hw
-                    katakana2syllable
-                    morse2kana
-                    new2old_kanji
-                    normalize_romaji
-                    old2new_kanji
-                    romaji2hiragana
-                    romaji2kana
-                    romaji_styles
-                    romaji_vowel_styles
-                    wide2ascii
-		    yurei_moji
-		    join_sound_marks
-		    split_sound_marks
-		    kana_consonant
-		   /;
+    InHankakuKatakana
+    InKana
+    InWideAscii
+    ascii2wide
+    bad_kanji
+    bracketed2kanji
+    braille2kana
+    circled2kana
+    circled2kanji
+    cleanup_kana
+    cyrillic2katakana
+    hangul2kana
+    hentai2kana
+    hentai2kanji
+    hira2kata
+    hw2katakana
+    is_hiragana
+    is_kana
+    is_romaji
+    is_romaji_semistrict
+    is_romaji_strict
+    is_voiced
+    join_sound_marks
+    kana2braille
+    kana2circled
+    kana2cyrillic
+    kana2hangul
+    kana2hentai
+    kana2hw
+    kana2katakana
+    kana2morse
+    kana2romaji
+    kana_consonant
+    kana_to_large
+    kanji2bracketed
+    kanji2circled
+    kanji2hentai
+    kata2hira
+    katakana2hw
+    katakana2square
+    katakana2syllable
+    morse2kana
+    new2old_kanji
+    nigori_first
+    normalize_romaji
+    old2new_kanji
+    romaji2hiragana
+    romaji2kana
+    romaji_styles
+    romaji_vowel_styles
+    smallize_kana
+    split_sound_marks
+    strip_sound_marks
+    square2katakana
+    wide2ascii
+    yurei_moji
+/;
 
 our %EXPORT_TAGS = (
     'all' => \@EXPORT_OK,
@@ -1122,6 +1123,14 @@ sub split_sound_marks
     return $input;
 }
 
+sub strip_sound_marks
+{
+    my ($input) = @_;
+    $input =~ s!($handaku)!$handaku2not{$1}!g;
+    $input =~ s!($daku)!$daku2not{$1}!g;
+    return $input;
+}
+
 sub kana2katakana
 {
     my ($input) = @_;
@@ -1495,7 +1504,7 @@ my $hendat;
 
 sub load_hentai
 {
-    $hendat = json_file_to_perl ($hentai_file);
+    $hendat = read_json ($hentai_file);
     for my $h (@$hendat) {
 	my $hi = $h->{hi};
 	my $hen = chr ($h->{u});

@@ -4,7 +4,7 @@ use warnings;
 use Time::HiRes qw{};
 use base qw{Package::New};
 
-our $VERSION = '0.36';
+our $VERSION = '0.42';
 our $STATE   = 'OFF';
 
 =head1 NAME
@@ -28,6 +28,30 @@ Power::Outlet::Common is a base class for controlling and querying a power outle
 =head2 new
 
 =head1 METHODS
+
+=head2 action
+
+Smart case insensitive text-based wrapper around methods 0|ON => on, 1|OFF => off, SWITCH|TOGGLE => switch, CYCLE => cycle, QUERY => query
+
+=cut
+
+sub action {
+  my $self   = shift;
+  my $action = shift;
+  if ($action =~ m/\A(?:1|ON)\Z/i) {
+    $self->on;
+  } elsif ($action =~ m/\A(?:0|OFF)\Z/i) {
+    $self->off;
+  } elsif ($action =~ m/\A(?:SWITCH|TOGGLE)\Z/i) {
+    $self->switch;
+  } elsif ($action =~ m/\A(?:CYCLE)\Z/i) {
+    $self->cycle;
+  } elsif ($action =~ m/\A(?:QUERY)\Z/i) {
+    $self->query;
+  } else {
+    die(qq{Error: action "$action" not supported});
+  } 
+}
 
 =head2 query
 

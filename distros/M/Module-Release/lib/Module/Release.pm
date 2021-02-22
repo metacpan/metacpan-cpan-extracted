@@ -1,3 +1,5 @@
+use v5.16;
+
 package Module::Release;
 
 =encoding utf8
@@ -22,15 +24,13 @@ use strict;
 
 use warnings;
 no warnings;
-use vars qw($VERSION);
 
-$VERSION = '2.125';
+our $VERSION = '2.127';
 
 use Carp qw(carp croak);
 use File::Basename qw(dirname);
 use File::Spec;
 use Scalar::Util qw(blessed);
-use DateTime;
 
 my %Loaded_mixins = ( );
 
@@ -95,6 +95,24 @@ C<ConfigReader::Simple> to get these values:
 
 =over 4
 
+=item cpan_user
+
+Your PAUSE user id.
+
+=item cpan_pass
+
+Your PAUSE password, but don't use this. Put it in the environment
+variable.
+
+=item http_proxy
+
+=item https_proxy
+
+=item ignore_prereqs
+
+A whitespace separated list of modules for C<Test::Prereq> to ignore.
+But, don't use C<Test::Prereq>. It was not a good idea.
+
 =item makefile_PL
 
 The name of the file to run as F<Makefile.PL>.  The default is
@@ -111,19 +129,10 @@ The name of the file created by C<makefile_PL> above.  The default is
 C<"Makefile">, but you can set it to C<"Build"> for
 C<Module::Build>-based systems.
 
-=item cpan_user
+=item module_name
 
-Your PAUSE user id.
-
-=item cpan_pass
-
-=item http_proxy
-
-=item https_proxy
-
-=item ignore_prereqs
-
-A whitespace separated list of modules for C<Test::Prereq> to ignore.
+C<release> tries to guess the module name from the distro name, but if
+you don't like that, set the module name in the config file.
 
 =back
 
@@ -202,7 +211,7 @@ sub _set_defaults {
 			quiet          => 0,
 			devnull        => File::Spec->devnull,
 			ignore_prereqs => '',
-
+			module_name    => undef,
 			%params,
 		   };
 
@@ -255,6 +264,7 @@ sub _process_configuration {
 		[ qw(Makefile.PL makefile_PL) ],
 		[ qw(Makefile    makefile)    ],
 		[ qw(make        make)        ],
+		[ qw(module_name module_name) ],
 		);
 
 	foreach my $pair ( @pairs ) {
@@ -264,7 +274,6 @@ sub _process_configuration {
 			if $self->config->exists($config);
 		}
 	}
-
 
 	my @required = qw(  );
 
@@ -276,7 +285,6 @@ sub _process_configuration {
 			}
 		}
 	$self->_die( "Missing configuration data" ) unless $ok;
-
 
 	if( $self->config->perls ) {
 		my @paths = split /:/, $self->config->perls;
@@ -472,7 +480,7 @@ sub perls {
     my $self = shift;
 
     my @perls = keys %{$self->{perls}};
-	warn "perls are [@perls]\n";
+	$self->_debug( "perls at the start [@perls]" );
 
     # Sort them
     @perls =
@@ -482,9 +490,10 @@ sub perls {
 	map  { [ $_, (m{.*/(.*)}) ] }
 	grep { -x $_ }
 	@perls;
-	warn "perls are [@perls]\n";
 
-    warn "Testing with ", scalar @perls, " versions of perl\n";
+	$self->_debug( "perls after filtering [@perls]" );
+	$self->_debug( "Testing with " . @perls . " perls" );
+
     return @perls;
     }
 
@@ -789,7 +798,7 @@ name if not set on the command line.
 
 sub dist {
 	my $self = shift;
-	$self->_print( "Making dist... " );
+	$self->_print( "Making dist...\n" );
 
 	$self->build_makefile;
 
@@ -814,7 +823,7 @@ sub dist {
 	$self->_die( "Local file '$self->{local_file}' does not exist\n" )
 		unless -f $self->local_file;
 
-	$self->_print( "done\n" );
+	$self->_print( "Done making dist\n" );
 	}
 
 =item disttest
@@ -944,8 +953,6 @@ sub dist_version {
 		$self->_debug( "Unhandled version" );
 		return '';
 		}
-
-
 	}
 
 =item dist_version_format
@@ -962,6 +969,27 @@ sub dist_version_format {
 	my( $major, $minor, $dev ) = @_;
 
 	sprintf "%s.%s%s", $major, $minor, $dev;
+	}
+
+=item module_name
+
+Returns the module name. This either takes it from the config file
+or tries to guess it from the distro name.
+
+=cut
+
+sub module_name {
+	my $self = shift;
+	return $self->{module_name} if $self->{module_name};
+
+	my $name = $self->local_file;
+	$self->_debug( "Guessing name. Local file is  <$name>\n" );
+
+	$name =~ s/-\d.*//g;
+	$name =~ s/-/::/g;
+	$self->_debug( "Guessing name. Module name is  <$name>\n" );
+
+	$self->{module_name} = $name;
 	}
 
 =item check_manifest
@@ -1241,9 +1269,8 @@ Changes file.
 =cut
 
 sub get_release_date {
-	my $self = shift;
-	my $dt = DateTime->now(time_zone => 'UTC');
-	return $dt->datetime . 'Z';
+	state $rc = require Time::Piece;
+	return Time::Piece->gmtime->datetime . 'Z';
 	}
 
 =item run
@@ -1427,7 +1454,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2018, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2007-2021, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

@@ -4,14 +4,14 @@ DateTime::Format::ISO8601 - Parses ISO8601 formats
 
 # VERSION
 
-version 0.15
+version 0.16
 
 # SYNOPSIS
 
     use DateTime::Format::ISO8601;
 
     my $datetime_str = '2020-07-25T11:32:31';
-    my $dt       = DateTime::Format::ISO8601->parse_datetime($datetime_str);
+    my $dt = DateTime::Format::ISO8601->parse_datetime($datetime_str);
     say $dt;
 
     # This format is ambiguous and could be either a date or time, so use the
@@ -33,8 +33,8 @@ version 0.15
 
 # DESCRIPTION
 
-Parses almost all ISO8601 date and time formats. ISO8601 time-intervals will
-be supported in a later release.
+Parses almost all ISO8601 date and time formats. ISO8601 time-intervals will be
+supported in a later release.
 
 # METHODS
 
@@ -61,8 +61,8 @@ Accepts an optional hash.
 
 - cut\_off\_year
 
-    A integer representing the cut-off point between interpreting 2-digits years
-    as 19xx or 20xx.
+    A integer representing the cut-off point between interpreting 2-digits years as
+    19xx or 20xx.
 
         2-digit years <  cut_off_year will be interpreted as 20xx
         2-digit years >= cut_off_year will be untreated as 19xx
@@ -72,8 +72,8 @@ Accepts an optional hash.
 - legacy\_year
 
     A boolean value controlling if a 2-digit year is interpreted as being in the
-    current century (unless a `base_datetime` is set) or if `cut_off_year`
-    should be used to place the year in either 20xx or 19xx.
+    current century (unless a `base_datetime` is set) or if `cut_off_year` should
+    be used to place the year in either 20xx or 19xx.
 
     If this is true, then the `cut_off_year` is used. If this is false, then the
     year is always interpreted as being in the current century.
@@ -97,13 +97,13 @@ from incomplete date/time formats.
 
 ### $iso8601->cut\_off\_year
 
-Returns a integer representing the cut-off point between interpreting
-2-digits years as 19xx or 20xx.
+Returns a integer representing the cut-off point between interpreting 2-digits
+years as 19xx or 20xx.
 
 ### $iso8601->set\_cut\_off\_year($int)
 
-Accepts a integer representing the cut-off point between interpreting
-2-digits years as 19xx or 20xx.
+Accepts a integer representing the cut-off point between interpreting 2-digits
+years as 19xx or 20xx.
 
     2-digit years <  legacy_year will be interpreted as 20xx
     2-digit years >= legacy_year will be interpreted as 19xx
@@ -115,17 +115,17 @@ Returns a boolean value indicating the 2-digit year handling behavior.
 ### $iso8601->set\_legacy\_year($bool)
 
 Accepts a boolean value controlling if a 2-digit year is interpreted as being
-in the current century (unless a `base_datetime` is set) or if
-`cut_off_year` should be used to place the year in either 20xx or 19xx.
+in the current century (unless a `base_datetime` is set) or if `cut_off_year`
+should be used to place the year in either 20xx or 19xx.
 
 ## Class Methods
 
 ### DateTime::Format::ISO8601->DefaultCutOffYear($int)
 
-Accepts a integer representing the cut-off point for 2-digit years when
-calling `parse_*` as class methods and the default value for `cut_off_year`
-when creating objects. If called with no parameters this method will return
-the default value for `cut_off_year`.
+Accepts a integer representing the cut-off point for 2-digit years when calling
+`parse_*` as class methods and the default value for `cut_off_year` when
+creating objects. If called with no parameters this method will return the
+default value for `cut_off_year`.
 
 ### DateTime::Format::ISO8601->DefaultLegacyYear($bool)
 
@@ -156,23 +156,23 @@ timezone offset.
 
 # FORMATS
 
-There are 6 strings that can match against date only or time only formats.
-The `parse_datetime` method will attempt to match these ambiguous strings
-against date only formats. If you want to match against the time only formats
-use the `parse_time` method.
+There are 6 strings that can match against date only or time only formats. The
+`parse_datetime` method will attempt to match these ambiguous strings against
+date only formats. If you want to match against the time only formats use the
+`parse_time` method.
 
 ## Conventions
 
 - Expanded ISO8601
 
-    These formats are supported with exactly 6 digits for the year.
-    Support for a variable number of digits will be in a later release.
+    These formats are supported with exactly 6 digits for the year. Support for a
+    variable number of digits will be in a later release.
 
 - Precision
 
-    If a format doesn't include a year all larger time unit up to and including
-    the year are filled in using the current date/time or \[if set\] the
-    `base_datetime` object.
+    If a format doesn't include a year all larger time unit up to and including the
+    year are filled in using the current date/time or \[if set\] the `base_datetime`
+    object.
 
 - Fractional time
 
@@ -180,8 +180,8 @@ use the `parse_time` method.
 
 ## Supported via parse\_datetime
 
-The supported formats are listed by the section of ISO 8601:2000(E) in
-which they appear.
+The supported formats are listed by the section of ISO 8601:2000(E) in which
+they appear.
 
 ### 5.2 Dates
 
@@ -356,14 +356,13 @@ Values can optionally be prefixed with 'T'.
 
 # CREDITS
 
-Iain 'Spoon' Truskett (SPOON) who wrote [DateTime::Format::Builder](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ABuilder).
-That has grown into _The Vacuum Energy Powered `Swiss Army` Katana_
-of date and time parsing. This module was inspired by and conceived
-in honor of Iain's work.
+Iain 'Spoon' Truskett (SPOON) who wrote [DateTime::Format::Builder](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ABuilder). That has
+grown into _The Vacuum Energy Powered `Swiss Army` Katana_ of date and time
+parsing. This module was inspired by and conceived in honor of Iain's work.
 
 Tom Phoenix (PHOENIX) and PDX.pm for helping me solve the ISO week conversion
-bug. Not by fixing the code but motivation me to fix it so I could
-participate in a game of `Zendo`.
+bug. Not by fixing the code but motivation me to fix it so I could participate
+in a game of `Zendo`.
 
 Jonathan Leffler (JOHNL) for reporting a test bug.
 
@@ -397,11 +396,12 @@ The source code repository for DateTime-Format-ISO8601 can be found at [https://
 
 - Doug Bell <doug@preaction.me>
 - joe <draxil@gmail.com>
+- Liam Widdowson <lbw@telstra.com>
 - Thomas Klausner <domm@plix.at>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Joshua Hoblitt.
+This software is copyright (c) 2021 by Joshua Hoblitt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

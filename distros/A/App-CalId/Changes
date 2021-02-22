@@ -1,3 +1,10 @@
+0.132   2021-01-13  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention cal in See Also.
+
+
 0.131   2021-01-13  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Bail out if CLI option parsing fails.

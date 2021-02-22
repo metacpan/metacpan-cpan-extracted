@@ -1,13 +1,7 @@
-# Tests adapted from
-# https://github.com/WaniKani/WanaKana/blob/master/test/tests.js
+use FindBin '$Bin';
+use lib "$Bin";
+use LJMT;
 
-use warnings;
-use strict;
-use Test::More;
-use Lingua::JA::Moji ':all';
-use utf8;
-binmode Test::More->builder->output, ":utf8";
-binmode Test::More->builder->failure_output, ":utf8";
 
 is (romaji2hiragana ("IROHANIHOHETO"), "いろはにほへと", "Even the colorful fregrant flowers");
 is (romaji2hiragana ("CHIRINURUWO"), "ちりぬるを", "Die sooner or later");
@@ -84,4 +78,4 @@ is (kana2romaji("ゑひもせすん", $opts), "wehimosesun", "nor become intoxic
 is (kana2romaji("きんにくまん", $opts), "kinnikuman", "Double and single n");
 is (kana2romaji("んんにんにんにゃんやん", $opts), "nnninninnyan'yan", "N extravaganza");
 done_testing ();
-exit;
+

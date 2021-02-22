@@ -1,3 +1,14 @@
+0.07 2021-02-21T15:39:45+01:00
+ [Common]
+ - Fix bugtracker.
+ - Fix use lib '.' in Makefile.PL.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.06 2015-10-22T11:27:41+02:00
  [Common]
  - Move author tests to xt/ directory.

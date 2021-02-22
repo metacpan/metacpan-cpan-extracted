@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "AtteanX-Serializer-RDFa",
    "no_index" : {
@@ -47,7 +47,8 @@
       },
       "test" : {
          "recommends" : {
-            "RDF::NS" : "20160408"
+            "RDF::NS" : "20160408",
+            "RDF::Prefixes" : "0"
          },
          "requires" : {
             "Module::Load::Conditional" : "0",
@@ -60,7 +61,7 @@
    "provides" : {
       "AtteanX::Serializer::RDFa" : {
          "file" : "lib/AtteanX/Serializer/RDFa.pm",
-         "version" : "0.100"
+         "version" : "0.110"
       }
    },
    "release_status" : "stable",
@@ -80,7 +81,10 @@
       "x_IRC" : "irc://irc.perl.org/#perlrdf",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/project"
    },
-   "version" : "0.100",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "version" : "0.110",
+   "x_contributors" : [
+      "Jonas Smedegaard (JONASS) <jonass@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

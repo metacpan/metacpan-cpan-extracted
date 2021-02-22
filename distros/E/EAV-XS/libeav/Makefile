@@ -6,6 +6,10 @@ INSTALL ?= install
 PERL ?= perl
 SED ?= sed
 
+LIB_PATH = $(shell realpath . 2>/dev/null || readlink -f -- .)
+ifeq ($(LIB_PATH),)
+$(error Neither realpath or readlink has been found on the system)
+endif
 
 ifndef RFC6531_FOLLOW_RFC5322
 export RFC6531_FOLLOW_RFC5322 = OFF
@@ -35,10 +39,12 @@ BIN_TARGET = eav
 BIN_TARGET_STATIC = eav.static
 
 TARGETS = $(BIN_TARGET) $(DLL_TARGET) $(LIB_TARGET)
-bin_SOURCES = $(wildcard bin/*.c)
-bin_OBJECTS = $(patsubst bin/%.c, bin/%.o, $(bin_SOURCES))
 SOURCES = $(wildcard src/*.c)
 OBJECTS = $(patsubst src/%.c, src/%.o, $(SOURCES))
+
+# coverage data files
+gcov_gcda = $(patsubst src/%.c, src/%.gcda, $(SOURCES))
+gcov_gcno = $(patsubst src/%.c, src/%.gcno, $(SOURCES))
 
 #----------------------------------------------------------#
 
@@ -52,6 +58,8 @@ LIBS ?= -L$(IDNKIT_DIR)/lib -lidnkit
 LIBS_STATIC ?= -L$(IDNKIT_DIR)/lib -lidnkit
 PARTIAL = $(wildcard partial/idnkit/*.c)
 OBJECTS += $(patsubst  partial/idnkit/%.c,  partial/idnkit/%.o, $(PARTIAL))
+gcov_gcda += $(patsubst partial/idnkit/%.c, partial/idnkit/%.gcda, $(PARTIAL))
+gcov_gcno += $(patsubst partial/idnkit/%.c, partial/idnkit/%.gcno, $(PARTIAL))
 else ifeq ($(FORCE_IDN),idn2)
 $(info > Force using libidn2)
 WITH_IDN = idn2
@@ -60,6 +68,8 @@ LIBS ?= $(shell $(PKG_CONFIG) --libs libidn2)
 LIBS_STATIC ?= $(shell $(PKG_CONFIG) --static --libs libidn2)
 PARTIAL = $(wildcard partial/idn2/*.c)
 OBJECTS += $(patsubst  partial/idn2/%.c,  partial/idn2/%.o, $(PARTIAL))
+gcov_gcda += $(patsubst partial/idn2/%.c, partial/idn2/%.gcda, $(PARTIAL))
+gcov_gcno += $(patsubst partial/idn2/%.c, partial/idn2/%.gcno, $(PARTIAL))
 else ifeq ($(FORCE_IDN),idn)
 $(info > Force using libidn)
 WITH_IDN = idn
@@ -68,6 +78,8 @@ LIBS ?= $(shell $(PKG_CONFIG) --libs libidn)
 LIBS_STATIC ?= $(shell $(PKG_CONFIG) --static --libs libidn)
 PARTIAL = $(wildcard partial/idn/*.c)
 OBJECTS += $(patsubst  partial/idn/%.c,  partial/idn/%.o, $(PARTIAL))
+gcov_gcda += $(patsubst partial/idn/%.c, partial/idn/%.gcda, $(PARTIAL))
+gcov_gcno += $(patsubst partial/idn/%.c, partial/idn/%.gcno, $(PARTIAL))
 else
 $(error !!! Unknown IDN library type)
 endif
@@ -81,6 +93,8 @@ LIBS = $(shell $(PKG_CONFIG) --libs libidn2)
 LIBS_STATIC = $(shell $(PKG_CONFIG) --static --libs libidn2)
 PARTIAL = $(wildcard partial/idn2/*.c)
 OBJECTS += $(patsubst  partial/idn2/%.c,  partial/idn2/%.o, $(PARTIAL))
+gcov_gcda += $(patsubst partial/idn2/%.c, partial/idn2/%.gcda, $(PARTIAL))
+gcov_gcno += $(patsubst partial/idn2/%.c, partial/idn2/%.gcno, $(PARTIAL))
 else ifeq ($(shell $(PKG_CONFIG) --exists 'libidn' || echo NO),)
 $(info > Found libidn)
 WITH_IDN = idn
@@ -89,6 +103,8 @@ LIBS = $(shell $(PKG_CONFIG) --libs libidn)
 LIBS_STATIC = $(shell $(PKG_CONFIG) --static --libs libidn)
 PARTIAL = $(wildcard partial/idn/*.c)
 OBJECTS += $(patsubst  partial/idn/%.c,  partial/idn/%.o, $(PARTIAL))
+gcov_gcda += $(patsubst partial/idn/%.c, partial/idn/%.gcda, $(PARTIAL))
+gcov_gcno += $(patsubst partial/idn/%.c, partial/idn/%.gcno, $(PARTIAL))
 else
 $(info > Using idnkit by default)
 WITH_IDN = idnkit
@@ -98,6 +114,8 @@ LIBS = -L$(IDNKIT_DIR)/lib -lidnkit
 LIBS_STATIC = -L$(IDNKIT_DIR)/lib -lidnkit
 PARTIAL = $(wildcard partial/idnkit/*.c)
 OBJECTS += $(patsubst  partial/idnkit/%.c,  partial/idnkit/%.o, $(PARTIAL))
+gcov_gcda += $(patsubst partial/idnkit/%.c, partial/idnkit/%.gcda, $(PARTIAL))
+gcov_gcno += $(patsubst partial/idnkit/%.c, partial/idnkit/%.gcno, $(PARTIAL))
 endif
 endif
 
@@ -113,10 +131,7 @@ endif
 
 #----------------------------------------------------------#
 
-
 CPPFLAGS += $(DEFS) $(INCLUDES)
-
-LIB_PATH = $(shell realpath .)
 
 export _defs = $(DEFS)
 export _libs = $(LIBS)
@@ -151,8 +166,8 @@ $(BIN_TARGET_STATIC): $(LIB_TARGET)
 
 $(DLL_TARGET): $(OBJECTS)
 	# library -> shared linkage
-	$(CC) -shared $(LDFLAGS) -Iinclude -Wl,-soname,$(DLL_TARGET) \
-		-o $(DLL_TARGET) $(OBJECTS) $(LIBS)
+	$(CC) -shared -Iinclude -Wl,-soname,$(DLL_TARGET) \
+		-o $(DLL_TARGET) $(OBJECTS) $(LIBS) $(LDFLAGS)
 
 $(LIB_TARGET): $(OBJECTS)
 	# library -> static linkage
@@ -203,6 +218,8 @@ libeav.pc: libeav.pc.in
 clean: clean-tests clean-bin
 	# cleanup
 	$(RM) $(DLL_TARGET) $(LIB_TARGET) $(OBJECTS) libeav.pc
+	$(RM) $(gcov_gcda)
+	$(RM) $(gcov_gcno)
 
 clean-tests:
 	$(MAKE) -C tests clean
@@ -250,4 +267,14 @@ install-man:
 
 #----------------------------------------------------------#
 
-.PHONY: all debug check clean docs install libs libeav.pc
+coverage: CFLAGS += -O0 -coverage -fprofile-abs-path
+coverage: LDFLAGS += -lgcov
+coverage: coverage-check
+
+# don't use directly, use 'make coverage'
+coverage-check: libs
+	$(MAKE) -C tests check CFLAGS="-O0 -coverage -fprofile-abs-path" LDFLAGS="-lgcov"
+
+#----------------------------------------------------------#
+
+.PHONY: all debug check clean docs install libs libeav.pc coverage

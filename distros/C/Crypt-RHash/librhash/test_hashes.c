@@ -456,6 +456,32 @@ const char* edonr512_tests[] = {
 	0
 };
 
+/* verified by b2sum utility */
+const char* blake2s_tests[] = {
+	"", "69217A3079908094E11121D042354A7C1F55B6482CA1A51E1B250DFD1ED0EEF9",
+	"a", "4A0D129873403037C2CD9B9048203687F6233FB6738956E0349BD4320FEC3E90",
+	"abc", "508C5E8C327C14E2E1A72BA34EEB452F37458B209ED63A294D999B4C86675982",
+	"message digest", "FA10AB775ACF89B7D3C8A6E823D586F6B67BDBAC4CE207FE145B7D3AC25CD28C",
+	"abcdefghijklmnopqrstuvwxyz", "BDF88EB1F86A0CDF0E840BA88FA118508369DF186C7355B4B16CF79FA2710A12",
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "C75439EA17E1DE6FA4510C335DC3D3F343E6F9E1CE2773E25B4174F1DF8B119B",
+	"12345678901234567890123456789012345678901234567890123456789012345678901234567890", "FDAEDB290A0D5AF9870864FEC2E090200989DC9CD53A3C092129E8535E8B4F66",
+	"The quick brown fox jumps over the lazy dog", "606BEEEC743CCBEFF6CBCDF5D5302AA855C256C29B88C8ED331EA1A6BF3C8812",
+	0
+};
+
+/* verified by b2sum utility */
+const char* blake2b_tests[] = {
+	"", "786A02F742015903C6C6FD852552D272912F4740E15847618A86E217F71F5419D25E1031AFEE585313896444934EB04B903A685B1448B755D56F701AFE9BE2CE",
+	"a", "333FCB4EE1AA7C115355EC66CEAC917C8BFD815BF7587D325AEC1864EDD24E34D5ABE2C6B1B5EE3FACE62FED78DBEF802F2A85CB91D455A8F5249D330853CB3C",
+	"abc", "BA80A53F981C4D0D6A2797B69F12F6E94C212F14685AC4B74B12BB6FDBFFA2D17D87C5392AAB792DC252D5DE4533CC9518D38AA8DBF1925AB92386EDD4009923",
+	"message digest", "3C26CE487B1C0F062363AFA3C675EBDBF5F4EF9BDC022CFBEF91E3111CDC283840D8331FC30A8A0906CFF4BCDBCD230C61AAEC60FDFAD457ED96B709A382359A",
+	"abcdefghijklmnopqrstuvwxyz", "C68EDE143E416EB7B4AAAE0D8E48E55DD529EAFED10B1DF1A61416953A2B0A5666C761E7D412E6709E31FFE221B7A7A73908CB95A4D120B8B090A87D1FBEDB4C",
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "99964802E5C25E703722905D3FB80046B6BCA698CA9E2CC7E49B4FE1FA087C2EDF0312DFBB275CF250A1E542FD5DC2EDD313F9C491127C2E8C0C9B24168E2D50",
+	"12345678901234567890123456789012345678901234567890123456789012345678901234567890", "686F41EC5AFFF6E87E1F076F542AA466466FF5FBDE162C48481BA48A748D842799F5B30F5B67FC684771B33B994206D05CC310F31914EDD7B97E41860D77D282",
+	"The quick brown fox jumps over the lazy dog", "A8ADD4BDDDFD93E4877D2746E62817B116364A1FA7BC148D95090BC7333B3673F82401CF7AA2E4CB1ECD90296E3F14CB5413F8ED77BE73045B13914CDCD6A918",
+	0
+};
+
 /* BTIH calculated with filename = "test.txt", verified using uTorrent */
 const char* btih_with_filename_tests[] = {
 	"", "042C8E2D2780B0AFAE6599A02914D6C3F1515B12",
@@ -526,6 +552,8 @@ struct test_vectors_t short_test_vectors[] = {
 	{ RHASH_SHA3_512, sha3_512_tests },
 	{ RHASH_EDONR256, edonr256_tests },
 	{ RHASH_EDONR512, edonr512_tests },
+	{ RHASH_BLAKE2S, blake2s_tests },
+	{ RHASH_BLAKE2B, blake2b_tests },
 	{ 0, 0 }
 };
 
@@ -551,17 +579,22 @@ static void log_message(char* format, ...)
 	va_end(vl);
 }
 
+enum ChunkedDataBitFlags {
+	CHDT_NO_FLAGS = 0,
+	CHDT_SET_FILENAME = 1,
+	CHDT_REPEAT_SMALL_CHUNK = 2
+};
+
 /**
- * Calculate hash of the message specified by chunk string, repeated until
- * the given length is reached.
+ * Calculate message digest of the data by chunks of the specified size.
  *
  * @param hash_id id of the hash algorithm to use
- * @param msg_chunk the message chunk as a null-terminated string
- * @param chunk_size the size of the chunk in bytes
- * @param count the number of chunks in the message
- * @param set_filename boolean flag: set a filename for the BTIH hash
+ * @param data the data to hash
+ * @param chunk_size the size of a chunk
+ * @param total_size the total size of the data to be hashed
+ * @param flags bit flags to control the hashing process
  */
-static char* repeat_hash(unsigned hash_id, const char* chunk, size_t chunk_size, size_t msg_size, int set_filename)
+static char* hash_data_by_chunks(unsigned hash_id, const char* data, size_t chunk_size, size_t total_size, unsigned flags)
 {
 	struct rhash_context* ctx;
 	size_t left, size;
@@ -570,13 +603,22 @@ static char* repeat_hash(unsigned hash_id, const char* chunk, size_t chunk_size,
 
 	ctx = rhash_init(hash_id);
 
-	if ((hash_id & RHASH_BTIH) && set_filename) {
-		rhash_torrent_add_file(ctx, "test.txt", (unsigned long long)msg_size);
+	if ((hash_id & RHASH_BTIH) && (flags & CHDT_SET_FILENAME)) {
+		rhash_torrent_add_file(ctx, "test.txt", (unsigned long long)total_size);
 	}
-
-	for (left = msg_size; left > 0; left -= size) {
-		size = (left > chunk_size ? chunk_size : left);
-		rhash_update(ctx, (const unsigned char*)chunk, size);
+	if (!!(flags & CHDT_REPEAT_SMALL_CHUNK)) {
+		/* repeat the small chunk of data until the total_size is reached */
+		for (left = total_size; left > 0; left -= size) {
+			size = (left > chunk_size ? chunk_size : left);
+			rhash_update(ctx, (const unsigned char*)data, size);
+		}
+	} else {
+		/* split the long data buffer and hash it by small chunks */
+		size_t index;
+		for (index = 0, left = total_size; left > 0; index += size, left -= size) {
+			size = (left > chunk_size ? chunk_size : left);
+			rhash_update(ctx, (const unsigned char*)data + index, size);
+		}
 	}
 	rhash_final(ctx, 0);
 	rhash_print(out, ctx, hash_id, RHPR_UPPERCASE);
@@ -590,35 +632,49 @@ static char* repeat_hash(unsigned hash_id, const char* chunk, size_t chunk_size,
  * Report error if calculated hash differs from the expected value.
  *
  * @param hash_id id of the algorithm to test
- * @param msg_chunk the message chunk as a null-terminated string
+ * @param data the data to hash
  * @param chunk_size the size of the chunk in bytes
- * @param count the number of chunks in the message
+ * @param total_size the total size of the data to be hashed
  * @param hash the expected hash value
- * @param set_filename need to set a filename for BTIH hash
+ * @param flags bit flags to control the hashing process
  */
-static void assert_hash_long_msg(unsigned hash_id, const char* msg_chunk, size_t chunk_size, size_t msg_size, const char* hash, const char* msg_name, int set_filename)
+static void assert_hash_long_msg(unsigned hash_id, const char* data, size_t chunk_size, size_t total_size, const char* hash, const char* msg_name, unsigned flags)
 {
 	char* result;
-	result = repeat_hash(hash_id, msg_chunk, chunk_size, msg_size, set_filename);
+	result = hash_data_by_chunks(hash_id, data, chunk_size, total_size, flags);
 	if (strcmp(result, hash) != 0) {
 		const char* hash_name = rhash_get_name(hash_id); /* the hash function name */
-		if (msg_name) log_message("failed: %s(%s) = %s, expected %s\n", hash_name, msg_name, result, hash);
-		else log_message("failed: %s(\"%s\") = %s, expected %s\n", hash_name, msg_chunk, result, hash);
+		if (msg_name)
+			log_message("failed: %s(%s) = %s, expected %s\n", hash_name, msg_name, result, hash);
+		else
+			log_message("failed: %s(\"%s\") = %s, expected %s\n", hash_name, data, result, hash);
 		g_errors++;
 	}
 }
 
 /**
- * Calculate hash of the given message.
+ * Calculate message digest for the data of given size.
  *
  * @param hash_id id of the hash algorithm to use
- * @param msg the message to hash
- * @param set_filename need to set a filename for BTIH hash
+ * @param data the data to hash
+ * @param data_size the size of the data
+ * @param flags bit flags to control the hashing process
  */
-static char* hash_message(unsigned hash_id, const char* msg, int set_filename)
+static char* hash_data(unsigned hash_id, const char* data, size_t data_size, unsigned flags)
 {
-	size_t msg_size = strlen(msg);
-	return repeat_hash(hash_id, msg, msg_size, msg_size, set_filename);
+	return hash_data_by_chunks(hash_id, data, data_size, data_size, flags);
+}
+
+/**
+ * Calculate message digest of the given message.
+ *
+ * @param hash_id id of the hash algorithm to use
+ * @param str the message to hash
+ * @param flags bit flags to control the hashing process
+ */
+static char* hash_message(unsigned hash_id, const char* str, unsigned flags)
+{
+	return hash_data(hash_id, str, strlen(str), flags);
 }
 
 /**
@@ -626,14 +682,14 @@ static char* hash_message(unsigned hash_id, const char* msg, int set_filename)
  * against the expected one. Report error on fail.
  *
  * @param hash_id id of the algorithm to test
- * @param message the message to hash
+ * @param str the message to hash
  * @param expected_hash the expected hash value
- * @param set_filename need to set a filename for BTIH hash
+ * @param flags bit flags to control the hashing process
  */
-static void assert_hash(unsigned hash_id, const char* msg, const char* expected_hash, int set_filename)
+static void assert_hash(unsigned hash_id, const char* str, const char* expected_hash, unsigned flags)
 {
-	size_t msg_size = strlen(msg);
-	assert_hash_long_msg(hash_id, msg, msg_size, msg_size, expected_hash, NULL, set_filename);
+	size_t length = strlen(str);
+	assert_hash_long_msg(hash_id, str, length, length, expected_hash, NULL, flags);
 }
 
 /**
@@ -644,16 +700,18 @@ static void assert_hash(unsigned hash_id, const char* msg, const char* expected_
  * @param ch the character the message is filled with
  * @param msg_size the size of message in bytes
  * @param expected_hash the expected hash value
- * @param set_filename need to set a filename for BTIH hash
+ * @param flags bit flags to control the hashing process
  */
-static void assert_rep_hash(unsigned hash_id, char ch, size_t msg_size, const char* hash, int set_filename)
+static void assert_rep_hash(unsigned hash_id, char ch, size_t msg_size, const char* hash, unsigned flags)
 {
 	char ALIGN_ATTR(64) msg_chunk[8192]; /* 8 KiB */
 	char msg_name[20];
 	memset(msg_chunk, ch, 8192);
-	if (ch >= 32) sprintf(msg_name, "\"%c\"x%d", ch, (int)msg_size);
-	else sprintf(msg_name, "\"\\%o\"x%d", (unsigned)(unsigned char)ch, (int)msg_size);
-	assert_hash_long_msg(hash_id, msg_chunk, 8192, msg_size, hash, msg_name, set_filename);
+	if (ch >= 32)
+		sprintf(msg_name, "\"%c\"x%d", ch, (int)msg_size);
+	else
+		sprintf(msg_name, "\"\\%o\"x%d", (unsigned)(unsigned char)ch, (int)msg_size);
+	assert_hash_long_msg(hash_id, msg_chunk, 8192, msg_size, hash, msg_name, flags | CHDT_REPEAT_SMALL_CHUNK);
 }
 
 /*=========================================================================*
@@ -665,12 +723,12 @@ static void assert_rep_hash(unsigned hash_id, char ch, size_t msg_size, const ch
  *
  * @param hash_id id of the algorithm to test
  * @param ptr pointer to array of pairs <message,expected-hash>
- * @param set_filename need to set a filename for BTIH hash
+ * @param flags bit flags to control the hashing process
  */
-static void test_known_strings_pairs(unsigned hash_id, const char** ptr, int set_filename)
+static void test_known_strings_pairs(unsigned hash_id, const char** ptr, unsigned flags)
 {
 	for (; ptr[0] && ptr[1]; ptr += 2) {
-		assert_hash(hash_id, ptr[0], ptr[1], set_filename);
+		assert_hash(hash_id, ptr[0], ptr[1], flags);
 	}
 }
 
@@ -684,8 +742,8 @@ static void test_known_strings(unsigned hash_id)
 	int i;
 	for (i = 0; short_test_vectors[i].tests != 0; i++) {
 		if (hash_id == short_test_vectors[i].hash_id) {
-			int set_filename = (short_test_vectors[i].tests == btih_with_filename_tests);
-			test_known_strings_pairs(hash_id, short_test_vectors[i].tests, set_filename);
+			unsigned flags = (short_test_vectors[i].tests == btih_with_filename_tests ? CHDT_SET_FILENAME : CHDT_NO_FLAGS);
+			test_known_strings_pairs(hash_id, short_test_vectors[i].tests, flags);
 			break;
 		}
 	}
@@ -698,8 +756,8 @@ static void test_all_known_strings(void)
 {
 	int i;
 	for (i = 0; short_test_vectors[i].tests != 0; i++) {
-		int set_filename = (short_test_vectors[i].tests == btih_with_filename_tests);
-		test_known_strings_pairs(short_test_vectors[i].hash_id, short_test_vectors[i].tests, set_filename);
+		unsigned flags = (short_test_vectors[i].tests == btih_with_filename_tests ? CHDT_SET_FILENAME : CHDT_NO_FLAGS);
+		test_known_strings_pairs(short_test_vectors[i].hash_id, short_test_vectors[i].tests, flags);
 	}
 }
 
@@ -746,6 +804,8 @@ static void test_long_strings(void)
 		{ RHASH_SHA3_512, "3C3A876DA14034AB60627C077BB98F7E120A2A5370212DFFB3385A18D4F38859ED311D0A9D5141CE9CC5C66EE689B266A8AA18ACE8282A0E0DB596C90B0A7B87" },
 		{ RHASH_EDONR256, "56F4B8DC0A41C8EA0A6A42C949883CD5DC25DF8CF4E43AD474FD4492A7A07966" }, /* verified by eBASH SUPERCOP implementation */
 		{ RHASH_EDONR512, "B4A5A255D67869C990FE79B5FCBDA69958794B8003F01FD11E90FEFEC35F22BD84FFA2E248E8B3C1ACD9B7EFAC5BC66616E234A6E938D3526DEE26BD0DE9C562" }, /* verified by eBASH SUPERCOP implementation */
+		{ RHASH_BLAKE2S, "BEC0C0E6CDE5B67ACB73B81F79A67A4079AE1C60DAC9D2661AF18E9F8B50DFA5" }, /* verified by b2sum utility */
+		{ RHASH_BLAKE2B, "98FB3EFB7206FD19EBF69B6F312CF7B64E3B94DBE1A17107913975A793F177E1D077609D7FBA363CBBA00D05F7AA4E4FA8715D6428104C0A75643B0FF3FD3EAF" }, /* verified by b2sum utility */
 		{ RHASH_GOST12_256, "841AF1A0B2F92A800FB1B7E4AABC8E48763153C448A0FC57C90BA830E130F152" },
 		{ RHASH_GOST12_512, "D396A40B126B1F324465BFA7AA159859AB33FAC02DCDD4515AD231206396A266D0102367E4C544EF47D2294064E1A25342D0CD25AE3D904B45ABB1425AE41095" },
 #ifdef USE_KECCAK
@@ -759,8 +819,8 @@ static void test_long_strings(void)
 
 	/* test all algorithms on 1,000,000 characters of 'a' */
 	for (count = 0; count < (sizeof(tests) / sizeof(id_to_hash_t)); count++) {
-		int set_filename = (tests[count].hash_id == RHASH_BTIH);
-		assert_rep_hash(tests[count].hash_id, 'a', 1000000, tests[count].expected_hash, set_filename);
+		unsigned flags = (tests[count].hash_id == RHASH_BTIH ? CHDT_SET_FILENAME : CHDT_NO_FLAGS);
+		assert_rep_hash(tests[count].hash_id, 'a', 1000000, tests[count].expected_hash, flags);
 	}
 
 	/* BTIH calculated without a filename. The hash value can't be verified by torrent tools */
@@ -827,10 +887,11 @@ static void test_results_consistency(void)
  */
 static void test_unaligned_messages_consistency(void)
 {
-	int i, start, hash_id, alignment_size;
+	int start, alignment_size;
+	unsigned hash_id;
 
-	/* loop by sums */
-	for (i = 0, hash_id = 1; (hash_id & RHASH_ALL_HASHES); hash_id <<= 1, i++) {
+	/* loop by hash algorithms */
+	for (hash_id = 1; (hash_id & RHASH_ALL_HASHES); hash_id <<= 1) {
 		char expected_hash[130];
 		assert(rhash_get_digest_size(hash_id) < (int)sizeof(expected_hash));
 
@@ -841,17 +902,40 @@ static void test_unaligned_messages_consistency(void)
 			char message[30];
 			int j, msg_length = 11 + alignment_size;
 
-			/* fill the buffer fifth shifted letter sequence */
-			for (j = 0; j < msg_length; j++) message[start + j] = 'a' + j;
+			/* fill the buffer with the shifted letter sequence */
+			for (j = 0; j < msg_length; j++)
+				message[start + j] = 'a' + j;
 			message[start + j] = 0;
 
 			if (start == 0) {
-				/* save original hash value */
-				strcpy(expected_hash, hash_message(hash_id, message + start, 0));
+				strcpy(expected_hash, hash_message(hash_id, message + start, 0)); /* save hash value */
 			} else {
-				/* verify obtained hash value */
-				assert_hash(hash_id, message + start, expected_hash, 0);
+				assert_hash(hash_id, message + start, expected_hash, 0); /* verify hash value */
 			}
+		}
+	}
+}
+
+/**
+ * Test that a message digest of a data block is independent on a chunk size.
+ */
+static void test_chunk_size_consistency(void)
+{
+	char buffer[8192];
+	unsigned hash_id;
+	size_t i;
+	for (i = 0; i < sizeof(buffer); i++)
+		buffer[i] = (char)(unsigned char)(i % 255);
+
+	/* loop by hash algorithms */
+	for (hash_id = 1; (hash_id & RHASH_ALL_HASHES); hash_id <<= 1) {
+		char expected_hash[130];
+		strcpy(expected_hash, hash_data(hash_id, buffer, sizeof(buffer), 0)); /* save hash value */
+		for (i = 0; i < 2; i++) {
+			int chunk_size = (i == 0 ? 512 : 3);
+			char msg_name[40];
+			sprintf(msg_name, "8k buffer by chunks of %d bytes", chunk_size);
+			assert_hash_long_msg(hash_id, buffer, chunk_size, sizeof(buffer), expected_hash, msg_name, CHDT_NO_FLAGS);
 		}
 	}
 }
@@ -872,7 +956,7 @@ static void test_endianness(void)
 static void test_version_sanity(void)
 {
 	unsigned version = rhash_get_version();
-	if (!(version & 0xff0000) || (version & 0xfff0e0e0)) {
+	if (!(version & 0xff000000) || (version & 0xf0e0e0e0)) {
 		log_message("error: wrong librhash version: %x\n", version);
 		g_errors++;
 	}
@@ -883,7 +967,7 @@ static void test_version_sanity(void)
  */
 static void test_generic_assumptions(void)
 {
-	unsigned mask = (1 << RHASH_HASH_COUNT) - 1;
+	unsigned mask = (1u << RHASH_HASH_COUNT) - 1u;
 	if (mask != RHASH_ALL_HASHES) {
 		log_message("error: wrong algorithms count %d for the mask 0x%x\n", RHASH_HASH_COUNT, RHASH_ALL_HASHES);
 		g_errors++;
@@ -1035,6 +1119,7 @@ int main(int argc, char* argv[])
 		test_long_strings();
 		test_results_consistency();
 		test_unaligned_messages_consistency();
+		test_chunk_size_consistency();
 		test_magnet();
 		if (g_errors == 0)
 			printf("All sums are working properly!\n");

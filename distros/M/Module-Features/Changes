@@ -1,0 +1,22 @@
+0.1.2   2021-02-22  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- Fix example, typos.
+
+	- Revise some wording, add description.
+
+
+0.1.1   2021-02-21  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+        - In Declaring Features section, mention about required features that
+          must be declared by user module.
+
+	- Fix wording, typos, formatting.
+
+
+0.1.0   2021-02-21  Released-By: PERLANCAR
+
+        - First release.

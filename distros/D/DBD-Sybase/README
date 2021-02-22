@@ -7,6 +7,7 @@ $Id: README,v 1.27 2011/04/25 08:59:17 mpeppler Exp $
    You may distribute under the terms of either the GNU General Public
    License or the Artistic License, as specified in the Perl README file.
 
+https://github.com/mpeppler/DBD-Sybase
 
 This Sybase DBI driver is built using the Sybase OpenClient Client
 Library (aka CT-library). You will need to have that installed before
@@ -36,18 +37,10 @@ Getting Help
 ============
 
 If you are stuck please start by searching the Web, the appropriate
-mailing lists and my bug database, as it is likely that someone else
-will have experienced the same problem before you. Hint: Google is
-your friend :-)
+mailing lists, etc, as it is likely that someone else
+will have experienced the same problem before you.
 
-The sybperl-l mailing list is dedicated to Sybase <-> perl issues and 
-covers both the sybperl modules (Sybase::CTlib, etc.) and DBD::Sybase.
-It is archived and searchable at http://www.peppler.org/archive/sybperl-l/
-
-If after seaching you still don't find any solution then post a question
-(with as much detail as possible) to either dbi-users@perl.org,
-sybperl-l@peppler.org or freetds@lists.ibiblio.org (only use the
-latter if you use the FreeTDS libraries with DBD::Sybase).
+You can report issues at https://github.com/mpeppler/DBD-Sybase/issues
 
 For recent changes please see the CHANGES file.
 

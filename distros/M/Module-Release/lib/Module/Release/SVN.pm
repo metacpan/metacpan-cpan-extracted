@@ -1,15 +1,16 @@
+use v5.16;
+
 package Module::Release::SVN;
 
 use strict;
 use warnings;
 use Exporter qw(import);
-use vars qw($VERSION);
 
 use Carp;
 
 our @EXPORT = qw(check_vcs vcs_tag make_vcs_tag);
 
-$VERSION = '2.125';
+our $VERSION = '2.127';
 
 =encoding utf8
 
@@ -257,7 +258,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2018, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2007-2021, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the Artistic License 2.0.

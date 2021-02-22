@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 use List::AllUtils qw( insert_after_string sum );
 use Markdent::Event::StartTable;
@@ -42,9 +42,9 @@ around _possible_block_matches => sub {
 
     my @look_for = $self->$orig();
 
-    return @look_for if $self->_list_level();
+    return @look_for if $self->_list_level;
 
-    if ( $self->_in_table() ) {
+    if ( $self->_in_table ) {
         insert_after_string 'list', 'table_cell', @look_for;
     }
     else {
@@ -138,14 +138,14 @@ sub _match_table {
     $self->_debug_parse_result(
         $1,
         'table',
-    ) if $self->debug();
+    ) if $self->debug;
 
     my $caption = defined $2 ? $2 : $5;
 
     $self->_debug_parse_result(
         $caption,
         'table caption',
-    ) if defined $caption && $self->debug();
+    ) if defined $caption && $self->debug;
 
     my $header = $3;
     my $body   = $4;
@@ -153,12 +153,12 @@ sub _match_table {
     $self->_debug_parse_result(
         $header,
         'table header',
-    ) if $self->debug();
+    ) if $self->debug;
 
     $self->_debug_parse_result(
         $body,
         'table body',
-    ) if $self->debug();
+    ) if $self->debug;
 
     my @header;
 
@@ -179,7 +179,7 @@ sub _match_table {
         }
     }
 
-    $self->_enter_table();
+    $self->_enter_table;
 
     my %caption = defined $caption ? ( caption => $caption ) : ();
     $self->_send_event( 'StartTable', %caption );
@@ -190,7 +190,7 @@ sub _match_table {
 
     $self->_send_event('EndTable');
 
-    $self->_leave_table();
+    $self->_leave_table;
 
     return 1;
 }
@@ -445,9 +445,9 @@ sub _match_table_cell {
     $self->_debug_parse_result(
         $1,
         'table cell',
-    ) if $self->debug();
+    ) if $self->debug;
 
-    $self->_span_parser()->parse_block($1);
+    $self->_span_parser->parse_block($1);
 }
 ## use critic
 
@@ -467,7 +467,7 @@ Markdent::Dialect::Theory::BlockParser - Block parser for Theory's proposed Mark
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 DESCRIPTION
 
@@ -504,7 +504,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Dave Rolsky.
+This software is copyright (c) 2021 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

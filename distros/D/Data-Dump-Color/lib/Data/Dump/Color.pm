@@ -5,12 +5,12 @@
 package Data::Dump::Color;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-06'; # DATE
+our $DATE = '2021-02-13'; # DATE
 our $DIST = 'Data-Dump-Color'; # DIST
-our $VERSION = '0.242'; # VERSION
+our $VERSION = '0.243'; # VERSION
 
 use 5.010001;
-use strict;
+use strict 'subs', 'vars';
 use vars qw(@EXPORT @EXPORT_OK $VERSION $DEBUG);
 use subs qq(dump);
 
@@ -26,7 +26,17 @@ use vars qw(%seen %refcnt @fixup @cfixup %require $TRY_BASE64 @FILTERS $INDENT);
 use vars qw($COLOR $COLOR_THEME $INDEX $LENTHRESHOLD);
 
 require Win32::Console::ANSI if $^O =~ /Win/;
-use Scalar::Util::LooksLikeNumber qw(looks_like_number);
+
+my $lan_available;
+eval {
+    require Scalar::Util::LooksLikeNumber;
+    *looks_like_number = \&Scalar::Util::LooksLikeNumber::looks_like_number;
+    $lan_available = 1;
+    1;
+} or do {
+    require Scalar::Util;
+    *looks_like_number = \&Scalar::Util::looks_like_number;
+};
 
 $TRY_BASE64 = 50 unless defined $TRY_BASE64;
 $INDENT = "  " unless defined $INDENT;
@@ -306,10 +316,20 @@ sub _dump
 		$cout = _col('undef', "undef");
 	    }
 	    elsif (my $ntype = looks_like_number($$rval)) {
-		my $val = $ntype < 20 ? qq("$$rval") : $$rval;
-                my $col = $ntype =~ /^(5|13|8704)$/ ? "float":"number";
-                $out  = $val;
-		$cout = _col($col => $val);
+                if ($lan_available) {
+                    # ntype returns details of the nature of numeric value in
+                    # scalar, including the ability to differentiate stringy
+                    # number "123" vs 123.
+                    my $val = $ntype < 20 ? qq("$$rval") : $$rval;
+                    my $col = $ntype =~ /^(5|13|8704)$/ ? "float":"number";
+                    $out  = $val;
+                    $cout = _col($col => $val);
+                } else {
+                    my $val = $$rval;
+                    my $col = "number";
+                    $out  = $val;
+                    $cout = _col($col => $val);
+                }
 	    }
 	    else {
 		$out  = str($$rval);
@@ -745,7 +765,7 @@ Data::Dump::Color - Like Data::Dump, but with color
 
 =head1 VERSION
 
-This document describes version 0.242 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2021-02-06.
+This document describes version 0.243 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2021-02-13.
 
 =head1 SYNOPSIS
 
@@ -762,7 +782,7 @@ index, depth indicator, and so on.
 For more information, see Data::Dump. This documentation explains what's
 different between this module and Data::Dump.
 
-=for Pod::Coverage ^(dumpf|pp|quote|tied_str|fullname|format_list|str)$
+=for Pod::Coverage ^(dumpf|pp|quote|tied_str|fullname|format_list|str|looks_like_number)$
 
 =head1 RESULTS
 
@@ -899,7 +919,7 @@ Source repository is at L<https://github.com/perlancar/perl-Data-Dump-Color>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Data-Dump-Color/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-Color>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

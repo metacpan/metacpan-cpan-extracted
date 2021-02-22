@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::core_or_pp;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2021-02-13'; # DATE
+our $VERSION = '0.051'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,21 +53,37 @@ sub handle_cmd {
     my $core       = delete $args{core};
     my $pp         = delete $args{pp};
     my $core_or_pp = delete($args{core_or_pp}) // 1;
+    my $mods0      = delete $args{modules};
 
     my $mods = {};
     if ($with_prereqs || $with_recursive_prereqs) {
-        my $res = App::lcpan::deps(
+        require App::lcpan::Cmd::mod2dist;
+
+        my $res;
+        $res = App::lcpan::Cmd::mod2dist::handle_cmd(%args, modules=>$mods0);
+        #log_trace "mod2dist result: %s", $res;
+        return [500, "Can't mod2dist: $res->[0] - $res->[1]"]
+            unless $res->[0] == 200;
+        my $dists = ref($res->[2]) eq 'HASH' ? [sort keys %{$res->[2]}] : [$res->[2]];
+        #log_trace "dists=%s", $dists;
+
+        $res = App::lcpan::deps(
             %args,
+            dists => $dists,
             (level => -1) x !!$with_recursive_prereqs,
         );
-        return $res unless $res->[0] == 200;
+        return [500, "Can't deps: $res->[0] - $res->[1]"]
+            unless $res->[0] == 200;
+
         for my $e (@{ $res->[2] }) {
             $e->{module} =~ s/^\s+//;
             $mods->{$e->{module}} = $e->{version};
+            #log_trace "Added %s (%s) to list of modules to check",
+            #    $e->{module}, $e->{version};
         }
-        $mods->{$_} //= 0 for @{ $args{modules} };
+        $mods->{$_} //= 0 for @$mods0;
     } else {
-        $mods->{$_} = 0 for @{ $args{modules} };
+        $mods->{$_} = 0 for @$mods0;
     }
 
     my $what;
@@ -134,7 +150,7 @@ App::lcpan::Cmd::core_or_pp - Check that a module (with its prereqs) are all cor
 
 =head1 VERSION
 
-This document describes version 0.04 of App::lcpan::Cmd::core_or_pp (from Perl distribution App-lcpan-CmdBundle-core_or_pp), released on 2017-07-10.
+This document describes version 0.051 of App::lcpan::Cmd::core_or_pp (from Perl distribution App-lcpan-CmdBundle-core_or_pp), released on 2021-02-13.
 
 =head1 DESCRIPTION
 
@@ -147,9 +163,9 @@ This module handles the L<lcpan> subcommand C<core-or-pp>.
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, result, meta]
+ handle_cmd(%args) -> [status, msg, payload, meta]
 
-Check that a module (with its prereqs) are all core/PP.
+Check that a module (with its prereqs) are all coreE<sol>PP.
 
 This function is not exported.
 
@@ -163,7 +179,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -171,13 +187,26 @@ Defaults to C<~/cpan>.
 
 Filename of index.
 
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
 =item * B<modules>* => I<array[perl::modname]>
 
 =item * B<pp> => I<bool>
 
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
 =item * B<with_prereqs> => I<bool>
 
 =item * B<with_recursive_prereqs> => I<bool>
+
 
 =back
 
@@ -186,7 +215,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -214,7 +243,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

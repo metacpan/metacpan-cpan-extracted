@@ -1,5 +1,8 @@
 Revision history for Perl extension Test-Script
 
+1.27      2021-02-17 13:15:57 -0700
+  - Documentation improvements (RRWO++ gh#31, gh#30)
+
 1.26      2019-10-25 21:22:03 -0700
   - Add program_runs and related functions for testing programs
     that do not run under Perl (gh#26, gh#27)

@@ -7,7 +7,7 @@ use warnings;
 
 use JSON;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 # -----------------------------------------------
 

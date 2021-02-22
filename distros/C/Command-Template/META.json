@@ -1,0 +1,73 @@
+{
+   "abstract" : "A template to build command line arrays, and run them",
+   "author" : [
+      "Flavio Poletti (flavio@polettix.it)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Command-Template",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.20",
+            "Path::Tiny" : "0.084",
+            "Template::Perlish" : "1.52",
+            "Test::Pod" : "1.51",
+            "Test::Pod::Coverage" : "1.04"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IPC::Run" : "20200505.0",
+            "perl" : "5.024000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Tiny" : "0.084"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/polettix/Command-Template/issues"
+      },
+      "homepage" : "https://github.com/polettix/Command-Template",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/polettix/Command-Template.git",
+         "web" : "https://github.com/polettix/Command-Template"
+      }
+   },
+   "version" : "0.001",
+   "x_contributors" : [
+      "Flavio Poletti <flavio@polettix.it>"
+   ],
+   "x_generated_by_perl" : "v5.24.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04",
+   "x_static_install" : 1
+}
+

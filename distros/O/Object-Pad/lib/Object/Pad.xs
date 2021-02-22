@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -185,17 +185,15 @@ static COP *S_find_cop_for_lvintro(pTHX_ PADOFFSET padix, OP *o, COP **copp)
 }
 
 #define make_croak_op(message)  S_make_croak_op(aTHX_ message)
-static OP *S_make_croak_op(pTHX_ const char *message)
+static OP *S_make_croak_op(pTHX_ SV *message)
 {
-  SV *sv = newSVpvn(message, strlen(message));
-
 #if HAVE_PERL_VERSION(5, 22, 0)
-  sv_catpvs(sv, " at %s line %d.\n");
+  sv_catpvs(message, " at %s line %d.\n");
   /* die sprintf($message, (caller)[1,2]) */
   return op_convert_list(OP_DIE, 0,
     op_convert_list(OP_SPRINTF, 0,
       op_append_list(OP_LIST,
-        newSVOP(OP_CONST, 0, sv),
+        newSVOP(OP_CONST, 0, message),
         newSLICEOP(0,
           op_append_list(OP_LIST,
             newSVOP(OP_CONST, 0, newSViv(1)),
@@ -206,14 +204,14 @@ static OP *S_make_croak_op(pTHX_ const char *message)
    * to correct it still make OP_SPRINTF crash with "Out of memory!". For now
    * lets just avoid the sprintf
    */
-  sv_catpvs(sv, "\n");
+  sv_catpvs(message, "\n");
   return newLISTOP(OP_DIE, 0, newOP(OP_PUSHMARK, 0),
-    newSVOP(OP_CONST, 0, sv));
+    newSVOP(OP_CONST, 0, message));
 #endif
 }
 
-#define make_argcheck_ops(required, optional, slurpy)  S_make_argcheck_ops(aTHX_ required, optional, slurpy)
-static OP *S_make_argcheck_ops(pTHX_ int required, int optional, char slurpy)
+#define make_argcheck_ops(required, optional, slurpy, subname)  S_make_argcheck_ops(aTHX_ required, optional, slurpy, subname)
+static OP *S_make_argcheck_ops(pTHX_ int required, int optional, char slurpy, SV *subname)
 {
 #ifdef HAVE_OP_ARGCHECK
   UNOP_AUX_item *aux = (UNOP_AUX_item *)PerlMemShared_malloc(sizeof(UNOP_AUX_item) * 3);
@@ -233,6 +231,7 @@ static OP *S_make_argcheck_ops(pTHX_ int required, int optional, char slurpy)
   OP *ret = NULL;
 
   if(required > 0) {
+    SV *message = newSVpvf("Too few arguments for subroutine '%" SVf "'", subname);
     /* @_ >= required or die ... */
     OP *checkop = 
       newSTATEOP(0, NULL,
@@ -241,12 +240,13 @@ static OP *S_make_argcheck_ops(pTHX_ int required, int optional, char slurpy)
             /* scalar @_ */
             op_contextualize(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv)), G_SCALAR),
             newSVOP(OP_CONST, 0, newSViv(required))),
-          make_croak_op("Too few arguments for subroutine")));
+          make_croak_op(message)));
 
     ret = op_append_list(OP_LINESEQ, ret, checkop);
   }
 
   {
+    SV *message = newSVpvf("Too many arguments for subroutine '%" SVf "'", subname);
     /* @_ <= (required+optional) or die ... */
     OP *checkop =
       newSTATEOP(0, NULL,
@@ -255,7 +255,7 @@ static OP *S_make_argcheck_ops(pTHX_ int required, int optional, char slurpy)
             /* scalar @_ */
             op_contextualize(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv)), G_SCALAR),
             newSVOP(OP_CONST, 0, newSViv(required + optional))),
-          make_croak_op("Too many arguments for subroutine")));
+          make_croak_op(message)));
 
     ret = op_append_list(OP_LINESEQ, ret, checkop);
   }
@@ -549,8 +549,7 @@ static OP *pp_methstart(pTHX)
 
 static OP *newMETHSTARTOP(I32 flags, U8 private)
 {
-  OP *op = newOP(OP_CUSTOM, flags);
-  op->op_ppaddr = &pp_methstart;
+  OP *op = newOP_CUSTOM(&pp_methstart, flags);
   op->op_private = private;
   return op;
 }
@@ -617,13 +616,6 @@ static OP *pp_sv(pTHX)
   PUSHs(cSVOP->op_sv);
   PUTBACK;
   return PL_op->op_next;
-}
-
-static OP *newSVOP_SV(SV *sv, I32 flags)
-{
-  OP *op = newSVOP_CUSTOM(flags, sv);
-  op->op_ppaddr = &pp_sv;
-  return op;
 }
 
 static OP *newSLOTPADOP(I32 flags, U8 private, PADOFFSET padix, SLOTOFFSET slotix)
@@ -734,7 +726,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
       switch(sigil) {
         case '$':
           /* push ..., $defaultsv */
-          op = newSVOP_SV(slotmeta->defaultsv, 0);
+          op = newSVOP_CUSTOM(&pp_sv, 0, slotmeta->defaultsv);
           break;
         case '@':
           /* push ..., [] */
@@ -1534,6 +1526,8 @@ static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname
 
   ClassMeta *classmeta = slotmeta->class;
 
+  SV *mname_fq = newSVpvf("%" SVf "::%s", classmeta->name, mname);
+
   I32 floor_ix = start_subparse(FALSE, 0);
   SAVEFREESV(PL_compcv);
 
@@ -1551,7 +1545,7 @@ static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname
       (classmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0), classmeta->repr));
 
   ops = op_append_list(OP_LINESEQ, ops,
-    make_argcheck_ops((type == ACCESSOR_WRITER) ? 1 : 0, 0, 0));
+    make_argcheck_ops((type == ACCESSOR_WRITER) ? 1 : 0, 0, 0, mname_fq));
 
   ops = op_append_list(OP_LINESEQ, ops,
     newSLOTPADOP(0, OPpSLOTPAD_SV, padix, slotmeta->slotix));
@@ -1585,8 +1579,7 @@ static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname
   SvREFCNT_inc(PL_compcv);
   ops = block_end(save_ix, ops);
 
-  CV *cv = newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, newSVpvf("%" SVf "::%s", classmeta->name, mname)),
-    NULL, NULL, ops);
+  CV *cv = newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, mname_fq), NULL, NULL, ops);
   CvMETHOD_on(cv);
 
   LEAVE;
@@ -1890,7 +1883,7 @@ done:
 
     *op_ptr = newBINOP(OP_SASSIGN, 0,
       op,
-      newSVOP_SV(SvREFCNT_inc(slotmeta->defaultsv), 0));
+      newSVOP_CUSTOM(&pp_sv, 0, SvREFCNT_inc(slotmeta->defaultsv)));
   }
 
   if(lex_read_unichar(0) != ';') {
@@ -2434,6 +2427,38 @@ roles(self)
     }
 
     XSRETURN(count);
+  }
+
+void
+compose_role(self, role)
+    SV *self
+    SV *role
+  CODE:
+  {
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+    ClassMeta *rolemeta = NULL;
+
+    if(SvROK(role)) {
+      if(!sv_derived_from(role, "Object::Pad::MOP::Class"))
+        croak("Expected a role name string or Object::Pad::MOP::Class; got %" SVf, SVfARG(role));
+
+      rolemeta = NUM2PTR(ClassMeta *, SvUV(SvRV(role)));
+    }
+    else {
+      HV *rolestash = gv_stashsv(role, 0);
+      /* Don't attempt to `require` it; that is caller's responsibilty */
+      if(!rolestash)
+        croak("Role %" SVf " does not exist", SVfARG(role));
+
+      GV **metagvp = (GV **)hv_fetchs(rolestash, "META", 0);
+      if(metagvp)
+        rolemeta = NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*metagvp))));
+    }
+
+    if(!rolemeta || rolemeta->type != METATYPE_ROLE)
+      croak("%" SVf " is not a role", SVfARG(role));
+
+    mop_class_compose_role(meta, rolemeta);
   }
 
 void
