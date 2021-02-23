@@ -1,9 +1,14 @@
+0.28    2021-02-23
+
+    - Hopefully fix prereqs on cygwin.
+        - https://github.com/shlomif/Clipboard/issues/7
+        - Thanks to @tzccinct .
+
 0.27    2021-02-13
 
     - README.md instead of README and INSTALL
         - https://github.com/shlomif/Clipboard/issues/5
         - Thanks to https://github.com/mitchblank .
-
 0.26    2020-05-16
 
     - Try to fix 'Wide character in print' warning with Xclip

@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 
-use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -23,11 +22,10 @@ require App::Followme;
 
 my $test_dir = catdir(@path, 'test');
 rmtree($test_dir);
+
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-
 chdir $test_dir or die $!;
-$test_dir = getcwd();
 
 #----------------------------------------------------------------------
 # Test set directory
@@ -52,19 +50,19 @@ do {
 do {
     my $app = App::Followme->new();
 
-    chdir($test_dir) or die $!;
-    $test_dir = cwd();
-    my $config = 'followme.cfg';
-    my @config_files_ok = (catfile($test_dir, $config));
+    my $config = catfile($test_dir, 'followme.cfg');
+    my @config_files_ok = ($config);
 
     fio_write_page($config, "remote_url: http://www.example.com\n");
 
     my $directory;
+    my @directories = ($test_dir);
     foreach my $dir (qw(one two three)) {
-        mkdir($dir) or die $!;
-        chmod 0755, $dir;
-        chdir ($dir) or die $!;
-        $directory = getcwd();
+        push(@directories, $dir);
+
+        $directory = catfile(@directories);
+        mkdir($directory) or die $!;
+        chmod 0755, $directory;
 
         $config = catfile($directory, 'followme.cfg');
         push(@config_files_ok, $config);
@@ -72,7 +70,7 @@ do {
         fio_write_page($config, "run_after:\n  - App::Followme::CreateSitemap\n");
 
         foreach my $file (qw(first.html second.html third.html)) {
-            fio_write_page($file, "Fake data\n");
+            fio_write_page(catfile($directory, $file), "Fake data\n");
         }
     }
 
@@ -81,12 +79,12 @@ do {
     $app->run($test_dir);
 
     my $count = 9;
-    chdir($test_dir) or die $!;
-    $test_dir = cwd();
+    @directories = ($test_dir);
     foreach my $dir (qw(one two three)) {
-        chdir ($dir) or die $!;
+        push(@directories, $dir);
+        $directory = catfile(@directories);
 
-        my $filename = rel2abs('sitemap.txt');
+        my $filename = catfile($directory, 'sitemap.txt');
         ok(-e $filename, 'Ran create sitemap'); # test 4, 6, 8
 
         my $page = fio_read_page($filename);

@@ -58,18 +58,21 @@
    "provides" : {
       "Keyword::TailRecurse" : {
          "file" : "lib/Keyword/TailRecurse.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/scrapheap/keyword_tailRecurse/issues"
+      },
       "homepage" : "https://gitlab.com/scrapheap/keyword_tailRecurse",
       "repository" : {
          "url" : "git://gitlab.com/scrapheap/keyword_tailRecurse.git",
          "web" : "https://gitlab.com/scrapheap/keyword_tailRecurse"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:JLCOOPER",
    "x_contributors" : [
       "Yanick <YANICK@cpan.org>"

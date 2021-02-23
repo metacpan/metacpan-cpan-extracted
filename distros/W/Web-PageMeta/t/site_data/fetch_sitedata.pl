@@ -5,14 +5,14 @@ use warnings;
 use 5.010;
 
 use Data::Dumper;
-use Future::HTTP;
+use Future::HTTP::AnyEvent;
 use URI::Escape qw(uri_escape);
 use Path::Class qw(file dir);
 use FindBin qw($Bin);
 
 my $url = $ARGV[0] || die 'provide url as an argument';
 
-Future::HTTP->new->http_get($url)->then(
+Future::HTTP::AnyEvent->new->http_get($url)->then(
     sub {
         my ( $body, $headers ) = @_;
         my $outfile_body = file( $Bin, uri_escape($url) );

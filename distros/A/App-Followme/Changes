@@ -1,5 +1,12 @@
 Revision history for Perl extension App::Followme
 
+1.98 2021-02-22T21:56:55Z
+    - Rewrote code that removes site url from pod links
+    - Updated all tests to use absolute filenames to avoid problems
+    - Fixed bugs in UploadSite.pm
+    - Removed cwd and getcwd from software and tests where it was not needed
+    - Create one level of directory when writing file if not present
+
 1.97 2021-02-17T14:10:47Z
     - Modified test for format_date to work with different locales
     - Rewrote ConvertPage.pm to us object polymorphism when creating files 

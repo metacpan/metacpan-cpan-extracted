@@ -25,5 +25,7 @@ MYMETA..*
 ^xt/.*.t$
 # Produced by XS
 ^Libdeflate.(?:c|o|bs)$
-# Copyright notice
+# Copyright notice, this is copied into the documentation & source code
 ^libd-copyr$
+# Don't really need for CPAN
+^bench/.*$

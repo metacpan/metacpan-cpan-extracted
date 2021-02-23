@@ -1,8 +1,6 @@
 #
 #	XS.pm : perl function definition for Term::ReadLine::Gnu
 #
-#	$Id: XS.pm 586 2021-02-22 14:34:38Z hayashi $
-#
 #	Copyright (c) 1999-2021 Hiroo Hayashi.  All rights reserved.
 #
 #	This program is free software; you can redistribute it and/or
@@ -16,7 +14,7 @@ use warnings;
 use AutoLoader 'AUTOLOAD';
 
 our $VERSION;
-$VERSION='1.39';	# added for CPAN
+$VERSION='1.40';	# added for CPAN
 
 # make aliases
 our %Attribs;

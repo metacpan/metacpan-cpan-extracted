@@ -40,10 +40,12 @@
       },
       "runtime" : {
          "requires" : {
+            "AnyEvent::HTTP" : "0",
             "Encode" : "0",
             "Future" : "0",
             "Future::AsyncAwait" : "0",
-            "Future::HTTP" : "0",
+            "Future::HTTP::AnyEvent" : "0",
+            "HTTP::Exception" : "0",
             "Log::Any" : "0",
             "Moose" : "0",
             "MooseX::Types::URI" : "0",
@@ -59,7 +61,7 @@
    "provides" : {
       "Web::PageMeta" : {
          "file" : "lib/Web/PageMeta.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -74,6 +76,6 @@
          "url" : "http://github.com/jozef/Web-PageMeta"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

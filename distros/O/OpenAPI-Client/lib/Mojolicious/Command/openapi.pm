@@ -8,7 +8,7 @@ use Mojo::Util qw(encode getopt);
 use constant YAML    => eval 'require YAML::XS;1';
 use constant REPLACE => $ENV{JSON_VALIDATOR_REPLACE} // 1;
 
-sub _say { length && say encode('UTF-8', $_) for @_ }
+sub _say  { length && say encode('UTF-8', $_) for @_ }
 sub _warn { warn @_ }
 
 has description => 'Perform Open API requests';
@@ -17,7 +17,7 @@ has usage       => sub { shift->extract_usage . "\n" };
 has _client => undef;
 has _ops    => sub {
   my $client = shift->_client;
-  my $paths  = $client->validator->bundle({replace => REPLACE})->{paths} || {};
+  my $paths  = $client->validator->get('/paths') || {};
   my %ops;
 
   for my $path (keys %$paths) {
@@ -53,10 +53,14 @@ sub run {
 
   die $self->usage unless $client_args[0];
 
-  push @client_args, app => $self->app if $client_args[0] =~ m!^/! and !-e $client_args[0];
+  if ($client_args[0] =~ m!^/! and !-e $client_args[0]) {
+    $client_args[0] = Mojo::URL->new($client_args[0]);
+    push @client_args, app => $self->app;
+  }
+
   $self->_client(OpenAPI::Client->new(@client_args));
   return $self->_info($info_about) if $info_about;
-  return $self->_list unless $op;
+  return $self->_list                  unless $op;
   die qq(Unknown operationId "$op".\n) unless $self->_client->can($op);
 
   $self->_client->ua->proxy->detect unless $ENV{OPENAPI_NO_PROXY};
@@ -90,7 +94,7 @@ sub _info {
 }
 
 sub _json {
-  return unless defined(my $data = Mojo::JSON::Pointer->new(shift)->get(shift));
+  return            unless defined(my $data = Mojo::JSON::Pointer->new(shift)->get(shift));
   return _say $data unless ref $data eq 'HASH' || ref $data eq 'ARRAY';
   _say Mojo::Util::decode('UTF-8', encode_json $data);
 }

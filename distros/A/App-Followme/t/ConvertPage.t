@@ -61,8 +61,8 @@ $test_dir = cwd();
 #----------------------------------------------------------------------
 # Create object
 
-my $template_file = 'template.htm';
-my $prototype_file = rel2abs('index.html');
+my $template_file = catfile($template_directory, 'template.htm');
+my $prototype_file = catfile($test_dir, 'index.html');
 
 my $cvt = App::Followme::ConvertPage->new(template_directory => $template_directory,
                                           template_file => $template_file);
@@ -130,14 +130,14 @@ EOQ
     my $cvt = App::Followme::ConvertPage->new(%configuration);
 
     fio_write_page($prototype_file, $index);
-    fio_write_page(catfile($template_directory, $template_file), $template);
+    fio_write_page($template_file, $template);
 
 	my $sec = 40;
     foreach my $count (qw(four three two one)) {
         my $output = $text;
         $output =~ s/%%/$count/g;
 
-        my $filename = "$count.md";
+        my $filename = catfile($test_dir, "$count.md");
         fio_write_page($filename, $output);
         age($filename, $sec);
         $sec -= 10;
@@ -148,7 +148,7 @@ EOQ
 # Get filename from title
 
 do {
-   my $filename = rel2abs('one.html');
+   my $filename = catfile($test_dir, 'one.html');
    my $new_filename = $cvt->title_to_filename($filename);
    is($new_filename, $filename, "Title to filename"); #test 3
 };
@@ -158,12 +158,13 @@ do {
 do {
     $cvt->update_file($test_dir, $prototype_file, 'four.md');
 
-    my $page = fio_read_page('four.html');
+    my $file = catfile($test_dir, 'four.html');
+    my $page = fio_read_page($file);
     like($page, qr/<h1>Four<\/h1>/, 'Update file four'); # test 4
 
     $cvt->update_folder($test_dir);
     foreach my $count (qw(three two one)) {
-        my $file = "$count.html";
+        $file = catfile($test_dir, "$count.html");
         $page = fio_read_page($file);
         my $kount = ucfirst($count);
 

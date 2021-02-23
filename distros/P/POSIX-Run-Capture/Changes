@@ -1,5 +1,8 @@
 Revision history for Perl extension POSIX::Run::Capture.
 
+1.03  Tue Feb 23 12:21:17 2021
+	- Fix packaging
+	
 1.02  Sat Feb 13 09:30:49 2021
 	- change bugtracker address
 

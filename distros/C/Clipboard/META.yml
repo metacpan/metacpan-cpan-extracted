@@ -22,16 +22,16 @@ name: Clipboard
 provides:
   Clipboard:
     file: lib/Clipboard.pm
-    version: '0.27'
+    version: '0.28'
   Clipboard::MacPasteboard:
     file: lib/Clipboard/MacPasteboard.pm
-    version: '0.27'
+    version: '0.28'
   Clipboard::Win32:
     file: lib/Clipboard/Win32.pm
-    version: '0.27'
+    version: '0.28'
   Clipboard::Xclip:
     file: lib/Clipboard/Xclip.pm
-    version: '0.27'
+    version: '0.28'
 requires:
   CGI: '0'
   File::Spec: '0'
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://github.com/shlomif/Clipboard/issues
   homepage: http://metacpan.org/release/Clipboard
   repository: git://github.com/shlomif/Clipboard.git
-version: '0.27'
+version: '0.28'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -339,6 +339,13 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::OSPrereqs:
           os: MSWin32
       name: MSWin32
+      version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::OSPrereqs
+      config:
+        Dist::Zilla::Plugin::OSPrereqs:
+          os: cygwin
+      name: cygwin
       version: '0.011'
     -
       class: Dist::Zilla::Plugin::ReadmeMarkdownFromPod

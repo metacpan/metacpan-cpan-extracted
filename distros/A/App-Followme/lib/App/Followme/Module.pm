@@ -6,7 +6,6 @@ use warnings;
 use integer;
 use lib '../..';
 
-use Cwd;
 use IO::File;
 use File::Spec::Functions qw(abs2rel catfile file_name_is_absolute
                              no_upwards rel2abs splitdir updir);
@@ -16,7 +15,7 @@ use App::Followme::Web;
 
 use base qw(App::Followme::ConfiguredObject);
 
-our $VERSION = "1.97";
+our $VERSION = "1.98";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

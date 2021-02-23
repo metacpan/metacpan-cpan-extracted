@@ -1,5 +1,8 @@
 Revision history for Perl extension Keyword-TailRecurse
 
+0.04 2021-02-23T08:07:51Z
+    - Moved to using GitLab for issue tracking
+
 0.03 2020-02-07T10:08:58Z
     - Adjusted `Keyword::Simple` dependency to require at least version 0.03
     - Reworked Sub::Call::Tail compatibility for calling object methods to

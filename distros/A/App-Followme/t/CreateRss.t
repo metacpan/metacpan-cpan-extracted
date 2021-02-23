@@ -118,14 +118,15 @@ EOQ
 
     # Create underlying files
 
-    fio_write_page('index.html', $index);
+    my $filename = catfile($test_dir, 'index.html');
+    fio_write_page($filename, $index);
 
 	my $sec = 50;
     foreach my $count (qw(four three two one)) {
         my $output = $page;
         $output =~ s/%%/$count/g;
 
-        my $filename = "$count.html";
+        my $filename = catfile($test_dir, "$count.html");
         fio_write_page($filename, $output);
         age($filename, $sec);
         $sec -= 10;

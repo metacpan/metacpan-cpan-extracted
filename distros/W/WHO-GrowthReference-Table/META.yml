@@ -28,7 +28,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-WHO-GrowthReference-Table/issues
   homepage: https://metacpan.org/release/WHO-GrowthReference-Table
   repository: git://github.com/perlancar/perl-WHO-GrowthReference-Table.git
-version: '0.004'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

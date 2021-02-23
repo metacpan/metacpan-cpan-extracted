@@ -7,14 +7,13 @@ use lib '../..';
 
 use base qw(App::Followme::Module);
 
-use Cwd;
 use IO::Dir;
 use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile no_upwards);
 
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.97";
+our $VERSION = "1.98";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

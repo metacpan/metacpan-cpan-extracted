@@ -1,5 +1,7 @@
 	-*- Indented-text -*-
-	$Id: Changes 586 2021-02-22 14:34:38Z hayashi $
+
+1.40  2021-02-23
+        - Migrate the repository and the bug tracker to GitHub
 
 1.39  2021-02-22
         - Makefile.PL

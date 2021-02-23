@@ -14,7 +14,7 @@ use MIME::Base64 qw(encode_base64);
 use App::Followme::FIO;
 use App::Followme::NestedText;
 
-our $VERSION = "1.97";
+our $VERSION = "1.98";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

@@ -22,10 +22,10 @@ no_index:
 provides:
   POSIX::Run::Capture:
     file: lib/POSIX/Run/Capture.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   perl: '5.006'
 resources:
   bugtracker: https://puszcza.gnu.org.ua/bugs/?group=posixruncapture
   repository: git://git.gnu.org.ua/posixruncapture.git
-version: '1.02'
+version: '1.03'

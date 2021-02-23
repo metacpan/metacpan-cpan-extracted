@@ -1,8 +1,6 @@
 /*
  *	Gnu.xs --- GNU Readline wrapper module
  *
- *	$Id: Gnu.xs 575 2020-12-27 01:58:24Z hayashi $
- *
  *	Copyright (c) 1996-2020 Hiroo Hayashi.  All rights reserved.
  *
  *	This program is free software; you can redistribute it and/or

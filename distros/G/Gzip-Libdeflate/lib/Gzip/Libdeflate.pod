@@ -25,13 +25,13 @@ produces output
     ABCDEFGABCDEFG
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Libdeflate-0.02/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Libdeflate-0.03/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.02 of Gzip-Libdeflate
-corresponding to L<git commit 009e90b2d795e8a4412e4590c482d1ce8b50d30c|https://github.com/benkasminbullock/gzip-libdeflate/commit/009e90b2d795e8a4412e4590c482d1ce8b50d30c> released on Sun Feb 21 09:08:43 2021 +0900. This
+This documents version 0.03 of Gzip-Libdeflate
+corresponding to L<git commit 67596aabf1b6c377a362f04c4c78e2f2dbd66fcf|https://github.com/benkasminbullock/gzip-libdeflate/commit/67596aabf1b6c377a362f04c4c78e2f2dbd66fcf> released on Tue Feb 23 15:05:49 2021 +0900. This
 distribution also includes libdeflate version 1.7. 
 
 =head1 DESCRIPTION
@@ -51,6 +51,29 @@ is not necessary to have that on your system.
 Compress input C<$thing> using whatever compression level and type you
 have specified for C<$gl> in L</new>.
 
+=head2 compress_file
+
+    my $out = $gl->compress_file (%options);
+
+File to compressed scalar:
+
+    my $out = $gl->compress_file (in => $file);
+
+File to compressed file:
+
+    $gl->compress_file (in => $file, out => "$file.gz");
+
+Scalar to compressed file:
+
+    $gl->compress_file (from => $uncompressed, out => "$file.gz");
+
+This is a convenience method which uses L</File::Slurper> to read and
+write the binary files. 
+
+For the opposite operation, see L</decompress_file>.
+
+This method was added in version 0.03 of the module.
+
 =head2 decompress
 
     my $thing = $gl->decompress ($dthing);
@@ -63,6 +86,51 @@ specify the expected size of C<$thing>.
 
 In the C<gzip> format, the size is stored within the data itself, so
 it doesn't need to be specified.
+
+=head2 decompress_file
+
+    my $out = $gl->decompress_file (%options);
+
+Compressed file to scalar:
+
+    my $out = $gl->decompress_file (in => $file);
+
+Compressed file to file:
+
+    $gl->decompress_file (in => "$file.gz", out => $file);
+
+Compressed scalar to file:
+
+    $gl->decompress_file (from => $compressed, out => $file);
+
+If using C<zlib> or C<deflate> compression, a numerical size must also
+be specified.
+
+    $gl->decompress_file (in => $zlib_file, out => $file, size => 9999);
+
+This is a convenience method which uses L</File::Slurper> to read and
+write the binary files.
+
+For the opposite operation, see L</compress_file>.
+
+This method was added in version 0.03 of the module.
+
+=head2 get_level
+
+    my $level = $gl->get_level ();
+
+Retrieve the level of compression as a number.
+
+This method was added in version 0.03 of the module.
+
+=head2 get_type
+
+    my $type = $gl->get_type ();
+
+Retrieve the type of compression from an object as a string, either
+C<deflate>, C<gzip> (the default), or C<zlib>.
+
+This method was added in version 0.03 of the module.
 
 =head2 new
 
@@ -93,6 +161,17 @@ at all.
 Change the type of compression. The default is type C<gzip> but you
 can also choose C<deflate> and C<zlib>. These are all the same thing
 up to headers.
+
+=back
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<File::Slurper>
+
+File::Slurper is used by L</compress_file> and L</decompress_file> to
+read and write binary data.
 
 =back
 

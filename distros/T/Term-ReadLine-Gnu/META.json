@@ -39,16 +39,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Term-ReadLine-Gnu"
+         "web" : "https://github.com/hirooih/perl-trg/issues"
       },
-      "homepage" : "http://sourceforge.net/projects/perl-trg/",
+      "homepage" : "https://github.com/hirooih/perl-trg",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://sourceforge.net/p/perl-trg/code/HEAD/tree/"
+         "url" : "https://github.com/hirooih/perl-trg.git"
       }
    },
-   "version" : "1.39",
+   "version" : "1.40",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

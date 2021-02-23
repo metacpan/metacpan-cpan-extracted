@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 
-use Cwd;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
@@ -45,9 +44,7 @@ chmod 0755, $test_dir;
 my $sub_dir = catfile(@path, "test", "sub"); 
 mkdir $sub_dir or die $!;
 chmod 0755, $sub_dir;
-
 chdir $test_dir or die $!;
-$test_dir = cwd();
 
 my %configuration = (
                     remove_comments => 0,
@@ -85,14 +82,18 @@ EOQ
     foreach my $dir (('sub', '')) {
         foreach my $count (qw(four three two one)) {
             my $output = $page;
-
             $output =~ s/%%/$count/g;
 
-            my $filename = $dir ? catfile($dir, $count) : $count;
+            my $filename;
+            if ($dir) {
+                $filename = catfile($test_dir, $dir, $count);
+            } else {
+                $filename = catfile($test_dir, $count);
+            }
             $filename .= '.html';
 
 			my $sec;
-            if ($filename eq 'one.html') {
+            if ($count eq 'one' && $dir eq '') {
                 $output =~ s/begin/section/g;
                 $output =~ s/end/endsection/g;
                 $sec = 0;
@@ -112,23 +113,25 @@ EOQ
 do {
     my $es = App::Followme::EditSections->new(%configuration);
 
-    my $output = $es->strip_comments('one.html', 1);
-    my $output_ok = fio_read_page('one.html');
+    my $filename = catfile($test_dir, 'one.html');
+    my $output = $es->strip_comments($filename, 1);
+    my $output_ok = fio_read_page($filename);
     is($output, $output_ok, 'strip comments, keep sections'); # test 1
 
-    $output = $es->strip_comments('one.html', 0);
+    $output = $es->strip_comments($filename, 0);
     $output_ok =~ s/(<!--.*?-->)//g;
     is($output, $output_ok, 'strip comments and sections'); # test 2
 
-    $output = $es->strip_comments('two.html', 0);
-    $output_ok = fio_read_page('two.html');
+    $filename = catfile($test_dir, 'two.html');
+    $output = $es->strip_comments($filename, 0);
+    $output_ok = fio_read_page($filename);
     is($output, $output_ok, 'don\'t strip comments'); # test 3
 
     $configuration{remove_comments} = 1;
     $es = App::Followme::EditSections->new(%configuration);
     $configuration{remove_comments} = 0;
 
-    $output = $es->strip_comments('two.html', 0);
+    $output = $es->strip_comments($filename, 0);
     $output_ok =~ s/(<!--.*?-->)//g;
     is($output, $output_ok, 'strip comments'); # test 4
 };
@@ -139,7 +142,8 @@ do {
 do {
     my $es = App::Followme::EditSections->new(%configuration);
 
-    my $prototype = $es->strip_comments('one.html', 1);
+    my $filename = catfile($test_dir, 'one.html');
+    my $prototype = $es->strip_comments($filename, 1);
     $es->update_folder($test_dir);
 
     my $output_template = <<EOQ;
@@ -172,16 +176,22 @@ EOQ
 
     foreach my $dir (('sub', '')) {
         for my $count (qw(one two three four)) {
-            my $file = $dir ? catfile($dir, $count) : $count;
-            next if $file eq 'one';
+            next if $count eq 'one' && $dir eq '';
 
-            $file .= '.html';
-            my $output = fio_read_page($file);
+            my $filename;
+            if ($dir) {
+                $filename = catfile($test_dir, $dir, $count);
+            } else {
+                $filename = catfile($test_dir, $count);
+            }
+            $filename .= '.html';
+
+            my $output = fio_read_page($filename);
 
             my $output_ok = $output_template;
             $output_ok =~ s/%%/$count/g;
 
-            is($output, $output_ok, "update file $file"); # test 5-11
+            is($output, $output_ok, "update file $filename"); # test 5-11
         }
     }
 

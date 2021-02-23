@@ -1,0 +1,12 @@
+$VAR1 = {
+          'content-type' => 'text/plain; charset=UTF-8',
+          'content-length' => '103',
+          'date' => 'Mon, 22 Feb 2021 19:39:31 GMT',
+          'set-cookie' => 'meon_web_session=661d8a29ce2b03dfed7faa1e1361ad458c07e132; domain=blog.kutej.net; path=/; expires=Mon, 22-Feb-2021 23:39:31 GMT; HttpOnly',
+          'server' => 'nginx/1.10.3',
+          'Status' => '404',
+          'Reason' => 'Not Found',
+          'connection' => 'keep-alive',
+          'URL' => 'https://www.meon.eu/Web-PageMeta-notfound',
+          'HTTPVersion' => '1.1'
+        };

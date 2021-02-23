@@ -1,7 +1,3 @@
-bench/bench.pl
-bench/c/random.c
-bench/random.pl
-bench/time.pl
 Changes
 examples/synopsis.pl
 gzip-libdeflate-perl.c
@@ -14,6 +10,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 ppport.h
 README
+t/files.t
 t/gzip-libdeflate.t
 t/index.html.gz
 typemap

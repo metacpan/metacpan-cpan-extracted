@@ -1,8 +1,6 @@
 # -*- perl -*-
 #	readline.t - Test script for Term::ReadLine:GNU
 #
-#	$Id: readline.t 570 2020-04-23 15:05:14Z hayashi $
-#
 #	Copyright (c) 1996-2020 Hiroo Hayashi.  All rights reserved.
 #
 #	This program is free software; you can redistribute it and/or

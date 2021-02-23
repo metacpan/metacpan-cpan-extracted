@@ -62,7 +62,7 @@ do {
 # Test url manipulation
 
 do {
-    my $url = "http://www.example.comApp::Followme::PodData";
+    my $url = "App::Followme::PodData";
     my $url_ok =  "poddata.html";
     my $new_url = $obj->alter_url($url);
     is($new_url, $url_ok, "Alter url"); # test 5

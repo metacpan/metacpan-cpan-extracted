@@ -1,0 +1,24 @@
+BEGIN;
+    -- Load the TAP functions.
+    CREATE EXTENSION pgtap;
+    SET client_min_messages TO warning;
+
+    -- Plan the tests.
+
+    SELECT plan(2);
+
+    -- Validate required tables
+
+    SELECT has_table('pg_database');
+
+    -- Run tests
+
+    PREPARE test AS SELECT datistemplate FROM pg_database
+        WHERE datname = 'template0';
+    SELECT results_eq('test',ARRAY[true],'template0 is a template');
+    DEALLOCATE test;
+
+    -- Finish the tests and clean up.
+    SELECT * FROM finish();
+
+ROLLBACK;

@@ -20,9 +20,9 @@ no_index:
 requires:
   perl: '5.008001'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Term-ReadLine-Gnu
-  homepage: http://sourceforge.net/projects/perl-trg/
+  bugtracker: https://github.com/hirooih/perl-trg/issues
+  homepage: https://github.com/hirooih/perl-trg
   license: http://dev.perl.org/licenses/
-  repository: https://sourceforge.net/p/perl-trg/code/HEAD/tree/
-version: '1.39'
+  repository: https://github.com/hirooih/perl-trg.git
+version: '1.40'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

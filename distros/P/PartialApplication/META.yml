@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.6, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,12 +28,14 @@ no_index:
 provides:
   PartialApplication:
     file: lib/PartialApplication.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Carp: '1.22'
   perl: '5.008001'
 resources:
+  bugtracker: https://gitlab.com/scrapheap/partialApplication/issues
+  homepage: https://gitlab.com/scrapheap/partialApplication
   repository: git://gitlab.com/scrapheap/partialApplication.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

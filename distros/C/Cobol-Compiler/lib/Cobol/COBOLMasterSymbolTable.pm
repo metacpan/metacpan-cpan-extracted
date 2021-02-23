@@ -3,9 +3,10 @@ package Cobol::Compiler::COBOLMasterSymbolTable;
 sub new {
 	my ($class) = @_;
 
-	my $self = { IDENTIFICATION => undef, 
-			DATAID => undef, 
-			MAINPROCEDURE => undef, };
+	### set up IDs (symbols) for the master compiling system
+	my $self = { IDENTIFICATION => Cobol::Compiler::ProgramID->new(""),
+			PROGRAM-ID => Cobol::Compiler::ProgramID->new(""),
+	};
 
 	$class = ref($class) || $class;
 

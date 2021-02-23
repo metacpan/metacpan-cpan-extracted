@@ -79,6 +79,26 @@ subtest 'fmap_void' => sub {
     eq_or_diff(\@execs_img, ['10', '5', '30'], 'fmap_void()->get()');
 };
 
+subtest 'fail on non-200' => sub {
+    # this test will try real http request
+    # http request will fail with or without functioning internet connection
+    my $ok_http_fail;
+    my $ft =
+        Web::PageMeta->new(url => 'https://www.meon.eu/Web-PageMeta-notfound',)->fetch_page_meta_ft;
+    $ft->on_fail(
+        sub {
+            $ok_http_fail = 1;
+        }
+    );
+    $ft->on_done(
+        sub {
+            $ok_http_fail = 0;
+        }
+    );
+    $ft->await;
+    is($ok_http_fail, 1, 'future fail() on non-200 status');
+};
+
 done_testing();
 
 package Test::Mock::Future::HTTP;

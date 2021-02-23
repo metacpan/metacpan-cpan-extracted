@@ -18,24 +18,27 @@ use Test::More;
 use Encode qw(decode_utf8);
 use utf8; # tests contain UTF-8 characters and it matters
 
+my $msg;
+if (not $ENV{TEST_AUTHOR} or $ENV{TEST_AUTHOR} < 2) {
+  $msg = 'Diagnostics are an author test. Set $ENV{TEST_AUTHOR} to "2" to run.';
+}
+plan skip_all => $msg if $msg;
+
 our $host = 'localhost';
 our $port;
 
 require './t/test.pl';
 
- SKIP: {
-   skip "Set DIAGNOSTICS to run gemini-diagnostics" unless $ENV{DIAGNOSTICS};
-   say "Running gemini-diagnostics $host $port";
-   open(my $fh, "-|:utf8", "gemini-diagnostics $host $port")
-       or skip "Cannot run gemini-diagnostics";
-   diag "A lot of errors at the beginning are OK!";
+say "Running gemini-diagnostics $host $port";
+open(my $fh, "-|:utf8", "gemini-diagnostics $host $port")
+    or plan skip_all => "Cannot run gemini-diagnostics";
+diag "A lot of errors at the beginning are OK!";
 
-   my $test;
-   while (<$fh>) {
-     $test = $1 if /\[(\w+)\]/;
-     next unless m/^ *(x|✓)/;
-     ok($1 eq "✓", $test);
-   }
+my $test;
+while (<$fh>) {
+  $test = $1 if /\[(\w+)\]/;
+  next unless m/^ *(x|✓)/;
+  ok($1 eq "✓", $test);
 }
 
 done_testing();

@@ -27,10 +27,10 @@ requires:
   YAML::PP: '0.020'
   perl: '5.010001'
 resources:
-  IRC: irc://irc.freenode.net/#mojo
+  IRC: irc://irc.freenode.net/#perl-openapi
   bugtracker: https://github.com/mojolicious/json-validator/issues
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/json-validator.git
-version: '4.13'
+version: '4.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

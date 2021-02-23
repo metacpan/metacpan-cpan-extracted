@@ -1,5 +1,4 @@
 	-*- Indented-text -*-
-$Id: README 477 2014-12-14 05:35:36Z hayashi $
 
 Term::ReadLine::Gnu --- GNU Readline Library Wrapper Module
 
@@ -58,15 +57,15 @@ How to build/install:
 Bugs:
 	There may be many bugs in both programs and documents.
 	Comments and bug reports are very welcome. Send me a E-Mail or
-	open a ticket on the bug tracker at rt.cpan.org;
+	open a ticket on the bug tracker on GitHub;
 
-	http://rt.cpan.org/Dist/Display.html?Queue=Term-ReadLine-Gnu
+	https://github.com/hirooih/perl-trg/issues
 
 Author:
 	Hiroo Hayashi <hiroo.hayashi@computer.org>
 
 Project Home Page
-	http://sourceforge.net/projects/perl-trg/
+	https://github.com/hirooih/perl-trg
 
 Revision History:
 	See Changes.

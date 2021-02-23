@@ -1,0 +1,18 @@
+jq/scripts/gen_builtin_inc.pl
+jq/src/setenv.h
+jq/src/setenv.c
+jq/builtin.c.patch
+jq/CMakeLists.txt
+jq/Config.cmake.in
+jq/dist.info
+jq/jq.pc.cmake.in
+lib/Alien/LibJQ.pm
+t/001_load.t
+alienfile
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -127,12 +127,6 @@ Note that this usage of `env()` is currently EXPERIMENTAL:
 Returns a [Mojo::URL](https://metacpan.org/pod/Mojo%3A%3AURL) object with the base URL to the API. The default value
 comes from `schemes`, `basePath` and `host` in the Open API specification.
 
-## pre\_processor
-
-["pre\_processor"](#pre_processor) is deprecated.
-
-Use ["after\_build\_tx"](#after_build_tx) and ["generators" in Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo%3A%3AUserAgent%3A%3ATransactor#generators) instead.
-
 ## ua
 
     $ua = $client->ua;
@@ -200,9 +194,9 @@ Extra `%attributes`:
     $validator = $client->validator;
     $validator = $class->validator;
 
-Returns a [JSON::Validator::OpenAPI::Mojolicious](https://metacpan.org/pod/JSON%3A%3AValidator%3A%3AOpenAPI%3A%3AMojolicious) object for a generated
-class. Not that this is a global variable, so changing the object will affect
-all instances.
+Returns a [JSON::Validator::Schema::OpenAPIv2](https://metacpan.org/pod/JSON%3A%3AValidator%3A%3ASchema%3A%3AOpenAPIv2) object for a generated class.
+Not that this is a global variable, so changing the object will affect all
+instances.
 
 # COPYRIGHT AND LICENSE
 

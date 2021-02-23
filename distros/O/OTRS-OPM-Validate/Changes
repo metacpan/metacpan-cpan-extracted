@@ -1,6 +1,10 @@
 Revision history for OTRS::OPM::Validate
 ========================================
 
+0.03   2021-02-23 07:59:00
+
+    * Fix bug in regular expression: Some whitespaces in the XML declaration were not accepted
+
 0.02   2021-01-16 08:27:00
 
     * CPANtester results showed that this works only with Perl 5.20 and later

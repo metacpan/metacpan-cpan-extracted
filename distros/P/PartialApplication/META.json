@@ -4,7 +4,7 @@
       "Jason Cooper <JLCOOPER@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.5",
+   "generated_by" : "Minilla/v3.1.6",
    "license" : [
       "perl_5"
    ],
@@ -57,16 +57,21 @@
    "provides" : {
       "PartialApplication" : {
          "file" : "lib/PartialApplication.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/scrapheap/partialApplication/issues"
+      },
+      "homepage" : "https://gitlab.com/scrapheap/partialApplication",
       "repository" : {
-         "url" : "git://gitlab.com/scrapheap/partialApplication.git"
+         "url" : "git://gitlab.com/scrapheap/partialApplication.git",
+         "web" : "https://gitlab.com/scrapheap/partialApplication"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1
 }

@@ -1,8 +1,6 @@
 #
 #	Makefile.PL for Term::ReadLine::Gnu
 #
-#	$Id: Makefile.PL 585 2021-02-22 14:09:53Z hayashi $
-#
 #	Copyright (c) 1996-2021 Hiroo Hayashi.  All rights reserved.
 #		<hiroo.hayashi@computer.org>
 #
@@ -161,9 +159,9 @@ WriteMakefile
      META_MERGE	  => {
 	 resources => {
 	     license => 'http://dev.perl.org/licenses/',
-	     homepage => 'http://sourceforge.net/projects/perl-trg/',
-	     bugtracker => 'http://rt.cpan.org/Public/Dist/Display.html?Name=Term-ReadLine-Gnu',
-	     repository => 'https://sourceforge.net/p/perl-trg/code/HEAD/tree/',
+	     homepage => 'https://github.com/hirooih/perl-trg',
+	     bugtracker => 'https://github.com/hirooih/perl-trg/issues',
+	     repository => 'https://github.com/hirooih/perl-trg.git',
 	 },
      },
      VERSION_FROM => 'Gnu.pm',
@@ -178,7 +176,7 @@ WriteMakefile
       ) : () ),
      INC	  => $RLINC,
      dist	  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
-     clean	  => { FILES => "rlver.c rlver$Config{_exe} rlmalloc.c rlmalloc$Config{_exe}" },
+     clean	  => { FILES => "rlver.c rlver$Config{_exe} rlmalloc.c rlmalloc$Config{_exe} .history_test" },
 );
 
 if ($Config{usesfio} eq 'true') {

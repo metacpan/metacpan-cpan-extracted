@@ -45,7 +45,7 @@
    "provides" : {
       "POSIX::Run::Capture" : {
          "file" : "lib/POSIX/Run/Capture.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -60,5 +60,5 @@
          "web" : "http://git.gnu.org.ua/cgit/posixruncapture.git/"
       }
    },
-   "version" : "1.02"
+   "version" : "1.03"
 }

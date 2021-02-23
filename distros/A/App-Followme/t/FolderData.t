@@ -5,7 +5,7 @@ use Test::More tests => 31;
 
 use Cwd;
 use File::Path qw(rmtree);
-use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
+use File::Spec::Functions qw(abs2rel catdir catfile rel2abs splitdir);
 
 #----------------------------------------------------------------------
 # Change the modification date of a file
@@ -74,13 +74,13 @@ do {
 
     my $obj = App::Followme::FolderData->new(%configuration);
 
-    my $filename = catfile('archive','one.txt');
+    my $filename = catfile($test_dir, 'archive','one.txt');
 
     my $title = $obj->calculate_title($filename);
     my $title_ok = 'One';
     is($title, $title_ok, 'Calculate file title'); # test 3
 
-    my $index_name = catfile('archive','index.html');
+    my $index_name = catfile($test_dir, 'archive','index.html');
     $title = $obj->calculate_title($index_name);
     $title_ok = 'Archive';
     is($title, $title_ok, 'Calculate directory title'); # test 4
@@ -175,18 +175,16 @@ EOQ
     my @ok_files;
     my @ok_all_files;
     my @ok_breadcrumbs;
+    my @dirs = ($test_dir);
     foreach my $dir (('', 'archive')) {
-        my $index_name = 'index.html';
-        $index_name = catfile($dir, $index_name) if $dir;
-        push(@ok_breadcrumbs, rel2abs($index_name));
+        push(@dirs, $dir) if $dir;
+        my $index_name = catfile(@dirs, 'index.html');
+        push(@ok_breadcrumbs, $index_name);
 
         foreach my $count (sort qw(four three two one index)) {
             my $output = $code;
             $output =~ s/%%/$count/g;
 
-            my @dirs;
-            push(@dirs, $test_dir);
-            push(@dirs, $dir) if $dir;
             my $filename = catfile(@dirs, "$count.html");
             my $xfilename = catfile(@dirs, "$count.xhtml");
 
@@ -201,7 +199,7 @@ EOQ
 
     my $obj = App::Followme::FolderData->new(directory => $test_dir);
 
-    my $size = $obj->get_size('three.html');
+    my $size = $obj->get_size(catfile($test_dir, 'three.html'));
     ok($size > 300, 'get file size'); # test 22
 
     my $index_file = catfile($test_dir,'index.html');
@@ -211,16 +209,16 @@ EOQ
     my $all_files = $obj->get_all_files($index_file);
     is_deeply($all_files, \@ok_all_files, 'Build all files'); # test 24
 
-    my $filename = catfile('archive', 'two.html');
+    my $filename = catfile($test_dir, 'archive', 'two.html');
     my $breadcrumbs = $obj->get_breadcrumbs($filename);
     is_deeply($breadcrumbs, \@ok_breadcrumbs, 'Build breadcrumbs'); # test 25
 
-    $filename = rel2abs('archive');
+    $filename = catdir($test_dir, 'archive');
     my $folders = $obj->get_folders($test_dir);
     is_deeply($folders, [$filename], 'Build folders'); # test 26
 
-    my $related_files = $obj->get_related_files('one.html');
-    my $related_ok = [rel2abs('one.html'), rel2abs('one.xhtml')];
+    my $related_files = $obj->get_related_files(catfile($test_dir, 'one.html'));
+    my $related_ok = [catfile($test_dir, 'one.html'), catfile($test_dir, 'one.xhtml')];
     is_deeply($related_files, $related_ok, 'Build list of related files'); # test 27
 
     $obj = App::Followme::FolderData->new(directory => $test_dir,

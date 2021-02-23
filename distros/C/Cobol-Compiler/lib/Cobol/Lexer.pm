@@ -1,5 +1,8 @@
 package Cobol::Compiler::Lexer;
 
+### use constant => qw(DATA PROCEDURE WORKING-STORAGE);
+use feature "switch";
+
 sub new {
 	my ($class) = @_;
 

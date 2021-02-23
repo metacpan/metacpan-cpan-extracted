@@ -7,7 +7,7 @@ use Module::Build;
 my $build = Module::Build->new
   (
    module_name => 'Astro::FITS::Header',
-   license  => 'gpl',
+   license  => 'gpl3',
    dist_abstract => 'Object-oriented interface to FITS HDUs',
    dist_author => [
                    'Alasdair Allan <aa@astro.ex.ac.uk>',
@@ -16,15 +16,28 @@ my $build = Module::Build->new
                    'Craig DeForest <deforest@boulder.swri.edu>',
                    'Jim Lewis <jrl@ast.cam.ac.uk>',
                   ],
-   dist_version => '3.07',
+   dist_version => '3.08',
    meta_merge => {
+               'meta-spec' => {
+                   version => 2,
+               },
                resources =>  {
-                              repository => "git://github.com/timj/perl-Astro-FITS-Header.git",
-                              homepage => "http://github.com/timj/perl-Astro-FITS-Header/tree/master",
+                              repository => {
+                                  url => 'git://github.com/timj/perl-Astro-FITS-Header.git',
+                                  web => 'https://github.com/timj/perl-Astro-FITS-Header/',
+                                  type => 'git',
+                              },
+                              homepage => 'https://github.com/timj/perl-Astro-FITS-Header/',
                              },
+               prereqs => {
+                    runtime => {
+                        suggests => {
+                            'Starlink::AST' => 0,
+                        },
+                    },
+               },
                 },
    recommends => {
-                  'Starlink::AST' => 0,
                   'Astro::FITS::CFITSIO' => 0,
                  },
    build_requires => {

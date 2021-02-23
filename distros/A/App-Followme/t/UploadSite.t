@@ -120,12 +120,12 @@ EOQ
 
     my $local = {};
     my $hash_ok = {};
-    my @dirs = ('', 'sub');
-
-    foreach my $dir (@dirs) {
+    foreach my $dir (('', 'sub')) {
         if ($dir) {
-            mkdir $dir;
-            chmod 0755, $dir;
+            my $directory = catdir($local_dir, $dir);
+            mkdir $directory;
+            chmod 0755, $directory;
+
             $local->{$dir} = 1;
             $hash_ok->{$dir} = 'dir';
         }
@@ -135,11 +135,12 @@ EOQ
             $output =~ s/!!/$dir/g;
             $output =~ s/%%/$count/g;
 
-            my $filename = $dir ? catfile($dir, "$count.html") : "$count.html";
+            my $file = $dir ? catfile($dir, "$count.html") : "$count.html";
+            my $filename = catfile($local_dir, $file);
             fio_write_page($filename, $output);
 
-            $local->{$filename} = 1;
-            $hash_ok->{$filename} = $up->{data}->build('checksum', $filename);
+            $local->{$file} = 1;
+            $hash_ok->{$file} = ${$up->{data}->build('checksum', $filename)};
 
             my $new_page = $up->rewrite_base_tag($page);
             like($new_page, qr(<base href="$up->{remote_url}"),

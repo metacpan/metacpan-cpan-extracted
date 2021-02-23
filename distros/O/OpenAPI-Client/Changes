@@ -1,5 +1,10 @@
 Revision history for perl distribution OpenAPI-Client
 
+1.00 2021-02-23T15:25:00+0900
+ - Updated to use new JSON::Validator schema API
+ - Add support for JSON::Validator::Schema::OpenAPIv3
+ - Removed pre_processor()
+
 0.25 2020-06-30T18:45:37+0900
  - Fix setting correct request method on client errors
 

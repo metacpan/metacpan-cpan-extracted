@@ -8,13 +8,13 @@
       "Jim Lewis <jrl@ast.cam.ac.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
-      "open_source"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Astro-FITS-Header",
    "prereqs" : {
@@ -30,7 +30,9 @@
       },
       "runtime" : {
          "recommends" : {
-            "Astro::FITS::CFITSIO" : "0",
+            "Astro::FITS::CFITSIO" : "0"
+         },
+         "suggests" : {
             "Starlink::AST" : "0"
          }
       }
@@ -38,42 +40,44 @@
    "provides" : {
       "Astro::FITS::Header" : {
          "file" : "lib/Astro/FITS/Header.pm",
-         "version" : "3.04"
+         "version" : "3.08"
       },
       "Astro::FITS::Header::AST" : {
          "file" : "lib/Astro/FITS/Header/AST.pm",
-         "version" : "3.01"
+         "version" : "3.08"
       },
       "Astro::FITS::Header::CFITSIO" : {
          "file" : "lib/Astro/FITS/Header/CFITSIO.pm",
-         "version" : "3.02"
+         "version" : "3.08"
       },
       "Astro::FITS::Header::GSD" : {
          "file" : "lib/Astro/FITS/Header/GSD.pm",
-         "version" : "3.01"
+         "version" : "3.08"
       },
       "Astro::FITS::Header::Item" : {
          "file" : "lib/Astro/FITS/Header/Item.pm",
-         "version" : "3.02"
+         "version" : "3.08"
       },
       "Astro::FITS::Header::NDF" : {
          "file" : "lib/Astro/FITS/Header/NDF.pm",
-         "version" : "3.02"
+         "version" : "3.08"
       },
       "Astro::FITS::HeaderCollection" : {
          "file" : "lib/Astro/FITS/Header.pm",
-         "version" : "3.01"
+         "version" : "3.08"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://github.com/timj/perl-Astro-FITS-Header/tree/master",
+      "homepage" : "https://github.com/timj/perl-Astro-FITS-Header/",
       "license" : [
-         "http://opensource.org/licenses/gpl-license.php"
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
       ],
       "repository" : {
-         "url" : "git://github.com/timj/perl-Astro-FITS-Header.git"
+         "type" : "git",
+         "url" : "git://github.com/timj/perl-Astro-FITS-Header.git",
+         "web" : "https://github.com/timj/perl-Astro-FITS-Header/"
       }
    },
-   "version" : "3.07"
+   "version" : "3.08"
 }

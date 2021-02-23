@@ -12,7 +12,7 @@ use App::Followme::FIO;
 use App::Followme::NestedText;
 use App::Followme::Web;
 
-our $VERSION = "1.97";
+our $VERSION = "1.98";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

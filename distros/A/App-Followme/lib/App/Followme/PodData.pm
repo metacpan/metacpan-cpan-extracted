@@ -14,7 +14,7 @@ use File::Spec::Functions qw(abs2rel catfile rel2abs splitdir);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.97";
+our $VERSION = "1.98";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -37,13 +37,18 @@ sub parameters {
 sub alter_url {
     my ($self, $url) = @_;
 
-    my $site_url = $self->get_site_url();
+    my $site_url = $self->get_site_url($url);
 
-    my $package = $url;
-    $package =~ s/^$site_url//;
+    my $package;
+    if ($site_url eq substr($url, 0, length($site_url))) {
+        $package = substr($url, length($site_url));
+    } else {
+        $package = $url;
+    }
+
     $package =~ s/^$self->{package}:://;
-
     my @package_path = split(/::/, $package);
+
     my $filename = catfile($self->{base_directory}, @package_path);
 
     my $found;

@@ -21,12 +21,13 @@ gzip_libdeflate_t;
 
 struct type2name {
     const char * name;
+    int namelen;
     int value;
 }
 gl_type_name[] = {
-    {"deflate", libdeflate_deflate},
-    {"gzip", libdeflate_gzip},
-    {"zlib", libdeflate_zlib},
+    {"deflate", strlen ("deflate"), libdeflate_deflate},
+    {"gzip", strlen ("gzip"), libdeflate_gzip},
+    {"zlib", strlen ("zlib"), libdeflate_zlib},
 };
 
 #define N_TYPES (sizeof (gl_type_name)/sizeof (struct type2name))
@@ -43,6 +44,20 @@ gl_type_name[] = {
 #define MSG(format, args...)
 #endif /* def DEBUG */
 
+static SV *
+gl_get_type (gzip_libdeflate_t * gl)
+{
+    int i;
+    for (i = 0; i < N_TYPES; i++) {
+	struct type2name * b;
+	b = & gl_type_name[i];
+	if (gl->t == b->value) {
+	    return newSVpv (b->name, b->namelen);
+	}
+    }
+    return &PL_sv_undef;
+}
+
 static void
 gl_set_type (gzip_libdeflate_t * gl, int type)
 {
@@ -52,6 +67,12 @@ gl_set_type (gzip_libdeflate_t * gl, int type)
     }
     MSG ("Setting type to %d", type);
     gl->t = type;
+}
+
+static SV *
+gl_get_level (gzip_libdeflate_t * gl)
+{
+    return newSViv (gl->level);
 }
 
 static void
@@ -92,8 +113,10 @@ gl_set (gzip_libdeflate_t * gl, SV * key_sv, SV * value_sv)
 	}
 	value = SvPV (value_sv, valuel);
 	for (i = 0; i < 3; i++) {
-	    if (strcmp (value, gl_type_name[i].name) == 0) {
-		gl_set_type (gl, gl_type_name[i].value);
+	    struct type2name * b;
+	    b = & gl_type_name[i];
+	    if (valuel == b->namelen && strcmp (value, b->name) == 0) {
+		gl_set_type (gl, b->value);
 		return;
 	    }
 	}
@@ -211,7 +234,7 @@ load_u32_gzip(const u8 *p)
 }
 
 static SV *
-gzip_libdeflate_decompress (gzip_libdeflate_t * gl, SV * in_sv, SV * size)
+gzip_libdeflate_decompress (gzip_libdeflate_t * gl, SV * in_sv, size_t size)
 {
     const char * in;
     STRLEN in_len;
@@ -233,22 +256,18 @@ gzip_libdeflate_decompress (gzip_libdeflate_t * gl, SV * in_sv, SV * size)
     switch (gl->t) {
     case libdeflate_deflate:
     case libdeflate_zlib:
-	if (size == 0 || ! SvIOK (size)) {
-	    warn ("A numerical size is required to decompress deflate/zlib inputs");
+	if (size == 0) {
+	    warn ("A non-zero size is required to decompress deflate/zlib inputs");
 	    return &PL_sv_undef;
 	}
-	r = SvIV (size);
+	r = size;
 	break;
     case libdeflate_gzip:
 	if (size == 0) {
 	    r = load_u32_gzip((u8*)(&in[in_len - 4]));
 	}
-	else if (! SvIOK (size)) {
-	    warn ("Size is not a number");
-	    return & PL_sv_undef;
-	}
 	else {
-	    r = SvIV (size);
+	    r = size;
 	}
 	break;
     case libdeflate_none:
@@ -288,6 +307,21 @@ gzip_libdeflate_decompress (gzip_libdeflate_t * gl, SV * in_sv, SV * size)
     }
     while (0);
     return set_up_out (out, r);
+}
+
+static void
+gzip_libdeflate_free (gzip_libdeflate_t * gl)
+{
+    MSG ("Freeing");
+    if (gl->c) {
+	libdeflate_free_compressor (gl->c);
+	gl->c = 0;
+    }
+    if (gl->d) {
+	libdeflate_free_decompressor (gl->d);
+	gl->d = 0;
+    }
+    Safefree (gl);
 }
 
 #define GLSET						\

@@ -1,5 +1,5 @@
 package Clipboard::MacPasteboard;
-$Clipboard::MacPasteboard::VERSION = '0.27';
+$Clipboard::MacPasteboard::VERSION = '0.28';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ __END__
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

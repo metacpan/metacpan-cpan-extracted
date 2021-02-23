@@ -1,5 +1,5 @@
 package OTRS::OPM::Validate;
-$OTRS::OPM::Validate::VERSION = '0.02';
+$OTRS::OPM::Validate::VERSION = '0.03';
 # ABSTRACT: Validate .opm files
 
 use v5.20;
@@ -21,6 +21,20 @@ my %boundaries = (
 sub validate {
     my ($class, $content) = @_;
 
+    $content =~ s{
+      <!-- .*? -->
+    }{}xmsg;
+
+    my ($check,$grammar) = _grammar();
+    my $match = $content =~ $grammar;
+    die 'Invalid .opm file' if !$match;
+
+    for my $key ( keys %boundaries ) {
+        $check->( $key );
+    }
+}
+
+sub _grammar {
     my %s;
 
     my $check = sub {
@@ -44,7 +58,7 @@ sub validate {
 
        (?(DEFINE)
            (?<PACKAGE>
-               \s* <\?xml \s* version="1.0" \s* encoding="utf-8"\?> \s+
+               \s* <\?xml \s* version="1.0" \s* encoding="[^"]+?" \s* \?> \s+
                \s* <(?<product>otrs|otobo)_package \s+ version="[12].[0-9]+">
                (?:\s*(?&PACKAGE_TAGS))+
                \s* </\g{product}_package> \s*
@@ -362,16 +376,7 @@ sub validate {
        )
     }xms;
 
-    $content =~ s{
-      <!-- .*? -->
-    }{}xmsg;
-
-    my $match = $content =~ $grammar;
-    die 'Invalid .opm file' if !$match;
-
-    for my $key ( keys %boundaries ) {
-        $check->( $key );
-    }
+    return $check, $grammar;
 }
 
 1;
@@ -388,7 +393,7 @@ OTRS::OPM::Validate - Validate .opm files
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

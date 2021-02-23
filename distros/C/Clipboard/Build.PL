@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Clipboard",
-  "dist_version" => "0.27",
+  "dist_version" => "0.28",
   "license" => "perl",
   "module_name" => "Clipboard",
   "recursive_test_files" => 1,
@@ -62,6 +62,10 @@ if ( $^O =~ /darwin/i ) {
 }
 
 if ( $^O eq 'MSWin32' ) {
+	$module_build_args{requires}{'Win32::Clipboard'} = '0';
+}
+
+if ( $^O eq 'cygwin' ) {
 	$module_build_args{requires}{'Win32::Clipboard'} = '0';
 }
 

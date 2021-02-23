@@ -21,6 +21,19 @@ use IO::Socket::SSL;
 use Mojo::IOLoop::Server;
 use utf8; # tests contain UTF-8 characters and it matters
 
+my $msg;
+if (not $ENV{TEST_AUTHOR}) {
+  $msg = 'Contributions are author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
+} else {
+  for my $module (qw(IO::Socket::IP)) {
+    if (not eval { require $module }) {
+      $msg = "You need to install the $module module for this test.";
+      last;
+    }
+  }
+}
+plan skip_all => $msg if $msg;
+
 our $host;
 our $base;
 our $dir;

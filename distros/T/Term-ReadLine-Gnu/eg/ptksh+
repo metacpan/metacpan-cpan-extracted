@@ -1,7 +1,5 @@
 #!/usr/local/bin/perl -w
 #
-# $Id: ptksh+ 475 2014-12-13 03:20:00Z hayashi $
-#
 # POD documentation after __END__
 
 # This program is contributed by Achim Bohnet.  It demonstrates how to

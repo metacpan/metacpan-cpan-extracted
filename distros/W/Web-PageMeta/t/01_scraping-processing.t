@@ -62,6 +62,30 @@ subtest 'www.meon.eu/base-test2' => sub {
     is($wmeta->image, 'https://www.meon.at/static/img/testing-base2.jpg', 'image()');
 };
 
+subtest 'www.meon.eu/Web-PageMeta-notfound' => sub {
+    my $wmeta = Web::PageMeta->new(
+        url => 'https://www.meon.eu/Web-PageMeta-notfound',
+        _ua => Test::Mock::Future::HTTP->new,
+    );
+    throws_ok { $wmeta->image } 'HTTP::Exception::404', 'test 404 not found';
+};
+subtest 'nonexistinghostname.meon.eu/' => sub {
+    my $wmeta = Web::PageMeta->new(
+        url => 'https://nonexistinghostname.meon.eu/',
+        _ua => Test::Mock::Future::HTTP->new,
+    );
+    eval {$wmeta->title};
+    if (ok($@, 'exception on broken hostname')) {
+        my $e = $@;
+        isa_ok($e, 'HTTP::Exception::503', '503 status');
+        like(
+            $e->status_message,
+            qr/\(595\) No such device or address/,
+            '503 status, originally 595 from AnyEvent::HTTP'
+        );
+    }
+};
+
 done_testing();
 
 package Test::Mock::Future::HTTP;

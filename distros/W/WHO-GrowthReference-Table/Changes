@@ -1,3 +1,27 @@
+0.006   2021-01-10  Released-By: PERLANCAR; Urgency: low
+
+	- No data changes.
+
+	- [doc] Mention WHO::GrowthReference::GenChart.
+
+
+0.005   2021-01-08  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+        [Incompatible Changes]
+
+        - Rename some result keys to be more consistent, e.g. mean_height ->
+          height_mean, mean_weight -> weight_mean.
+
+	[Enhancements]
+
+        - Add and return BMI data.
+
+        - Add option --now to use a certain date as today's date instead of the
+          current date.
+
+        - Add option --age to specify age instead of dob.
+
+
 0.004   2021-01-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Put data in __DATA__ section as CSV instead of as Perl data

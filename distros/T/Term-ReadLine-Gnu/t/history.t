@@ -1,8 +1,6 @@
 # -*- perl -*-
 #	history.t --- Term::ReadLine:GNU History Library Test Script
 #
-#	$Id: history.t 524 2016-05-26 16:14:26Z hayashi $
-#
 #	Copyright (c) 1998-2016 Hiroo Hayashi.  All rights reserved.
 #
 #	This program is free software; you can redistribute it and/or

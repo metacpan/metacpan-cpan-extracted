@@ -1,5 +1,4 @@
 -*- Indented-text -*-
-#	$Id: INSTALL 581 2021-02-22 08:36:32Z hayashi $
 
 1. How to Install Term::ReadLine::Gnu
 
@@ -45,9 +44,9 @@
 1.3 Trouble Shooting
 
         If you have any trouble when using or installing this module
-	or find a bug, please open a ticket on the bug tracker at
-	rt.cpan.org;
-	<http://rt.cpan.org/Dist/Display.html?Queue=Term-ReadLine-Gnu>
+	or find a bug, please open a ticket on the bug tracker on
+	GitHub;
+	<https://github.com/hirooih/perl-trg/issues>
 
 	It will help other people who have same problems.
 

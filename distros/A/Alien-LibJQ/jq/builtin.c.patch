@@ -1,0 +1,12 @@
+--- src/builtin.c.orig	2021-02-20 21:23:48.927878700 +0800
++++ src/builtin.c	2021-02-20 21:27:36.698376700 +0800
+@@ -42,6 +42,9 @@
+ #include "locfile.h"
+ #include "jv_unicode.h"
+ #include "jv_alloc.h"
++#ifndef HAVE_SETENV
++#include "setenv.h"
++#endif
+ 
+ 
+ static jv type_error(jv bad, const char* msg) {

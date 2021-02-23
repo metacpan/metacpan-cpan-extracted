@@ -1,0 +1,10 @@
+--- This file is part of LuaDist project
+
+name = "jq"
+version = "1.6"
+
+desc = "jq is a lightweight and flexible command-line JSON processor."
+author = "https://github.com/stedolan/jq/graphs/contributors"
+license = "https://github.com/stedolan/jq/blob/master/COPYING"
+url = "https://stedolan.github.io/jq/"
+maintainer = "https://github.com/stedolan/jq/graphs/contributors"

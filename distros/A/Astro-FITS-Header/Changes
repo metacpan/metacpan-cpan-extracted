@@ -1,0 +1,78 @@
+Revision history for Astro::FITS::Header
+
+3.08 2021-02-22
+
+  - Starlink::AST recommends prereq changed to suggests.
+
+  - Tied interface FIRSTKEY and CLEAR methods now handle
+    subheaders (RT #127228).
+
+3.07 2012-08-02
+
+  - Respect ReadOnly flag when opening FITS extensions.
+    Fixes RT #78746 from Diab Jerius.
+
+3.06 2012-07-13
+
+  - Minor fix to header merging to properly treat an undef card
+    as an undef values rather than as a comment card.
+
+3.05 2012-06-27
+
+  - Spelling fixes from debian (RT #78071)
+
+3.04 2012-06-19
+
+  - Numeric cards with no space before the comment are now parsed correctly.
+
+  - A HISTORY item is now written to NDF files when the header is updated.
+
+  - The ChangeLog has been removed from this release.
+
+3.03 2011-01-04
+
+  - Ensure that GPL is used throughout package rather than a mix of Perl licence
+    and GPL. Fixes RT #61875
+
+3.02 2010-12-31
+
+  - Use Module::Build
+
+3.01 2009-03-17
+
+  - New append() method to append a header or items to an existing
+    header, overwriting duplicates.
+
+  - A header can now be constructed from a simple perl hash
+
+  - Item objects now have a copy constructor.
+
+  - When importing an AST frameset a specific encoding can be
+    specified.
+
+  - The Item constructor can now guess the header type.
+
+  - Fixes in item removal, tied interface for history and subheaders
+    and NDF opening when a directory has a space.
+
+3.0 2006-08-19
+
+ - Can now select items by type using the itembytype() method.
+
+ - Add equals() method.
+
+ - Add ability to merge two Header objects into one.
+
+ - Subheaders now supported by tie.
+
+ - Fix bug RT#4816 (Diab Jerius)
+
+ - change the distribution layout to be more in line with standard usage.
+
+2.9.2 2004-03-07
+
+ - Fix tied interface to recognized proper FITS undef cards
+
+ - Fix bug in comment parsing (duplicate of RT #11722)
+
+ - Add optional support for Starlink::AST module

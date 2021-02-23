@@ -1,8 +1,6 @@
 # -*- perl -*-
 #	utf8_binary.t --- Term::ReadLine::Gnu UTF-8 binary string test script
 #
-#	$Id: utf8_binary.t 565 2019-01-14 04:48:22Z hayashi $
-#
 #	Copyright (c) 2016-2019 Hiroo Hayashi.  All rights reserved.
 #
 #	This program is free software; you can redistribute it and/or

@@ -13,6 +13,7 @@ WriteMakefile (
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     LICENSE => 'perl',
     PREREQ_PM => {
+	'File::Slurper' => '0.012',
     },
     META_MERGE => {
 	'meta-spec' => {

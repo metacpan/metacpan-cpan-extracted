@@ -656,7 +656,7 @@ if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
          'python --version','__display__');
    }
 }
-$do=0;
+$do=1;
 if ($do==1) { # INSTALL LATEST VERSION OF NGINX
    # https://nealpoole.com/blog/2011/04/setting-up-php-fastcgi-and-nginx
    #    -dont-trust-the-tutorials-check-your-configuration/
@@ -2631,7 +2631,7 @@ END
        "sed -i \"s*unix_listener lmtp*$ad*\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
   ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \"0,/#mode = 0666/{s/#mode = 0666/mode = 060X/}\" ".
+       "sed -i \"0,/#mode = 0666/{s/#mode = 0666/mode = 0600X/}\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"0,/#mode = 0666/{s/#mode = 0666/mode = 0660/}\" ".
@@ -2688,6 +2688,10 @@ END
        "sed -i \"s/#user = root/user = vmail/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
   ($stdout,$stderr)=$handle->cmd($sudo.
+       "cp -v conf.d/auth-system.conf.ext ".
+       "/usr/local/etc/dovecot/conf.d",
+       '__display__');
+  ($stdout,$stderr)=$handle->cmd($sudo.
        "cp -v conf.d/10-ssl.conf ".
        "/usr/local/etc/dovecot/conf.d",
        '__display__');
@@ -2702,8 +2706,7 @@ END
        "sed -i \"s*ssl/private/dovecot.pem*".
        "letsencrypt/live/$domain_url/privkey.pem*\" ".
        "/usr/local/etc/dovecot/conf.d/10-ssl.conf");
-  ($stdout,$stderr)=$handle->cwd($gtarfile);
-  ($stdout,$stderr)=$handle->cmd($sudo.'pwd','__display__');
+  ($stdout,$stderr)=$handle->cwd("/opt/source/$gtarfile");
   ($stdout,$stderr)=$handle->cmd($sudo.
        "cp -v dovecot.service.in /etc/systemd/system/dovecot.service",
        '__display__');
@@ -2714,7 +2717,9 @@ END
        "sed -i \"s*.bindir.*/usr/local/bin*\" ".
        "/etc/systemd/system/dovecot.service");
   ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \"s*.rundir.*/var/run*\" ".
+       'mkdir -vp /var/run/dovecot','__display__');
+  ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \"s*.rundir.*/var/run/dovecot*\" ".
        "/etc/systemd/system/dovecot.service");
   ($stdout,$stderr)=$handle->cmd($sudo.
        'systemctl daemon-reload');

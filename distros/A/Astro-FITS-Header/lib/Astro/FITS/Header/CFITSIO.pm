@@ -40,7 +40,7 @@ use base qw/ Astro::FITS::Header /;
 use Astro::FITS::CFITSIO qw / :longnames :constants /;
 use Carp;
 
-$VERSION = 3.02;
+$VERSION = 3.08;
 
 # C O N S T R U C T O R ----------------------------------------------------
 

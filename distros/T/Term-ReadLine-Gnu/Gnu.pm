@@ -1,8 +1,6 @@
 #
 #	Gnu.pm --- The GNU Readline/History Library wrapper module
 #
-#	$Id: Gnu.pm 586 2021-02-22 14:34:38Z hayashi $
-#
 #	Copyright (c) 1996-2021 Hiroo Hayashi.  All rights reserved.
 #
 #	This program is free software; you can redistribute it and/or
@@ -93,7 +91,7 @@ BEGIN {
     use Exporter ();
     use DynaLoader;
 
-    our $VERSION = '1.39';		# update Gnu::XS::VERSION also.
+    our $VERSION = '1.40';		# update Gnu::XS::VERSION also.
 
     # Term::ReadLine::Gnu::AU makes a function in
     # `Term::ReadLine::Gnu::XS' as a method.
@@ -2156,7 +2154,7 @@ further details.
 
 =over 4
 
-=item L<Term::ReadLine::Gnu Project Home Page|http://sourceforge.net/projects/perl-trg/>
+=item L<Term::ReadLine::Gnu Project Home Page|https://github.com/hirooih/perl-trg>
 
 =item L<GNU Readline Library Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>
 
@@ -2243,7 +2241,7 @@ GTK+ support in addition to Tk.
 =over 4
 
 =item Submit a bug report to
-L<rt.cpan.org|https://rt.cpan.org/Dist/Display.html?Name=Term-ReadLine-Gnu>.
+L<the bug tracker on GitHub|https://github.com/hirooih/perl-trg/issues>.
 
 =item C<add_defun()> can define up to 16 functions.
 

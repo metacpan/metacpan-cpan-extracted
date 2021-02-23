@@ -51,7 +51,7 @@ SV *
 decompress (gl, in, size = 0)
 	Gzip::Libdeflate gl;
 	SV * in;
-	SV * size;
+	size_t size;
 CODE:
 	RETVAL = gzip_libdeflate_decompress (gl, in, size);
 OUTPUT:
@@ -65,18 +65,26 @@ verbose (gl, onoff)
 CODE:
 	gl->verbose = !! SvTRUE (onoff);
 
+SV *
+get_type (gl)
+	Gzip::Libdeflate gl;
+CODE:
+	RETVAL = gl_get_type (gl);
+OUTPUT:
+	RETVAL
+
+SV *
+get_level (gl)
+	Gzip::Libdeflate gl;
+CODE:
+	RETVAL = gl_get_level (gl);
+OUTPUT:
+	RETVAL
+
+
 void
 DESTROY (gl)
 	Gzip::Libdeflate gl;
 CODE:
-	MSG ("Freeing");
-	if (gl->c) {
-		libdeflate_free_compressor (gl->c);
-		gl->c = 0;
-	}
-	if (gl->d) {
-		libdeflate_free_decompressor (gl->d);
-		gl->d = 0;
-	}
-	Safefree (gl);
+	gzip_libdeflate_free (gl);
 

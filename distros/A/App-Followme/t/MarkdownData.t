@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 
-use Cwd;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
@@ -32,9 +31,7 @@ chmod 0755, $test_dir;
 my $sub_dir = catfile(@path, "test", "sub");
 mkdir $sub_dir or die $!;
 chmod 0755, $sub_dir;
-
 chdir $test_dir or die $!;
-$test_dir = cwd();
 
 #----------------------------------------------------------------------
 # Create test data
@@ -48,7 +45,7 @@ date: 2015-11-22T20:23:13
 Page %%
 --------
 
-This is a paragraph
+This is a paragraph.
 
 
     This is preformatted text.
@@ -93,7 +90,7 @@ do {
         is($$title, "Page $count", "get title $count"); # test 4, 9. 14, 19
 
         my $description = $obj->build('description', $file);
-        is($$description, 'This is a paragraph',
+        is($$description, 'This is a paragraph.',
            "get description $count"); # test 5, 10, 15, 20
 
         my $date = $obj->build('date', $file);

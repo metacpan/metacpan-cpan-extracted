@@ -1,0 +1,65 @@
+# Testcase for runcap - run program and capture its output -*- autotest -*-
+# Copyright (C) 2019-2020 Sergey Poznyakoff
+#
+# Runcap is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at your
+# option) any later version.
+#
+# Runcap is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Runcap. If not, see <http://www.gnu.org/licenses/>.
+
+AT_SETUP([runcap_read])
+AT_KEYWORDS([read])
+
+# Prepare expout for the three subsequent tests
+AT_CHECK([
+AT_DATA([expout],
+[res=0
+exit code: 0
+stdout: 71 lines, 4051 bytes
+stderr: 0 lines, 0 bytes
+READ 0:
+])
+cat $INPUT >> expout
+echo "" >> expout
+])
+
+# Test reading on full buffer capacity
+AT_CHECK([rt -r stdout::::t -- genout $INPUT],
+[0],
+[expout])
+
+# Test reading with ridiculously small buffer
+AT_CHECK([rt -s 4 -r stdout::::t -- genout $INPUT],
+[0],
+[expout])
+
+# Test reading with extremely small buffer
+AT_CHECK([rt -s 1 -r stdout::::t -- genout $INPUT],
+[0],
+[expout])
+
+# Test a combination of seeks and reads
+AT_CHECK([rt -s 10 -r stdout:12:5::t -r stdout:80:55::t -r stdout:15:23::t  -- genout $INPUT],[0],
+[res=0
+exit code: 0
+stdout: 71 lines, 4051 bytes
+stderr: 0 lines, 0 bytes
+READ 0:
+ER I. Down t
+READ 1:
+ get very tired of sitting by her sister on the
+bank, and of having nothing to d
+READ 2:
+bit-Hole
+
+Alice 
+])
+
+AT_CLEANUP

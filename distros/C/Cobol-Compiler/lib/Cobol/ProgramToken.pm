@@ -13,3 +13,16 @@ sub new {
 
 }
 
+sub getPROGRAMID {
+	my ($self) = @_;
+
+	return $self->{subTokens}[Cobol::Compiler::ProgramToken->PROGRAM-ID];
+}
+
+sub getIDENTIFICATION {
+	my ($self) = @_;
+
+	return $self->{subTokens}[Cobol::Compiler::ProgramToken->IDENTIFICATION];
+}
+
+1;

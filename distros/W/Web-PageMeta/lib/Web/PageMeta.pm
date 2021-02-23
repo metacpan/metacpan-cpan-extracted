@@ -1,6 +1,6 @@
 package Web::PageMeta;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use 5.010;
 use Moose;
@@ -10,10 +10,11 @@ use URI::QueryParam;
 use Log::Any qw($log);
 use Future 0.44;
 use Future::AsyncAwait;
-use Future::HTTP;
+use Future::HTTP::AnyEvent;
 use Web::Scraper;
 use Encode qw(find_mime_encoding);
 use Time::HiRes qw(time);
+use HTTP::Exception;
 
 use namespace::autoclean;
 
@@ -74,7 +75,7 @@ has 'fetch_image_data_ft' => (
 has '_ua' => (
     is      => 'ro',
     lazy    => 1,
-    default => sub {Future::HTTP->new()},
+    default => sub {Future::HTTP::AnyEvent->new()},
 );
 
 has '_html_meta_scraper' => (
@@ -105,15 +106,16 @@ sub _build__html_meta_scraper {
 async sub _build__fetch_page_meta_ft {
     my ($self) = @_;
 
+    # await url htmp http download
     my $timer = time();
     my ($body, $headers) =
         await $self->_ua->http_get($self->url, headers => {'Accept' => 'text/html',},);
-    my $status = $headers->{Status};
+    my $status = _get_update_status_reason($headers);
     $log->debugf('page meta fetch %d %s finished in %.3fs', $status, $self->url, time() - $timer);
+    HTTP::Exception->throw($status, status_message => $headers->{Reason})
+        if ($status != 200);
 
-    die 'failed to fetch ' . $self->url
-        unless $status == 200;
-
+    # turn body to utf-8
     if (my $content_type = $headers->{'content-type'}) {
         if (my ($charset) = ($content_type =~ m/\bcharset=(.+)/)) {
             if (my $decoder = find_mime_encoding($charset)) {
@@ -122,6 +124,7 @@ async sub _build__fetch_page_meta_ft {
         }
     }
 
+    # scrape default head meta
     my $scraper_data = $self->_html_meta_scraper->scrape(\$body);
     my %page_meta    = (
         title       => $scraper_data->{title} // '',
@@ -134,6 +137,7 @@ async sub _build__fetch_page_meta_ft {
         $page_meta{$1} = $val;
     }
 
+    # do any other extra scraping
     if ($self->has_extra_scraper) {
         my $escraper_data = $self->extra_scraper->scrape(\$body);
         foreach my $key (keys %{$escraper_data}) {
@@ -141,6 +145,7 @@ async sub _build__fetch_page_meta_ft {
         }
     }
 
+    # make image links absolute
     if ($page_meta{image}) {
         my $base_url = (
             $scraper_data->{base_href}
@@ -156,20 +161,32 @@ async sub _build__fetch_page_meta_ft {
 async sub _build__fetch_image_data_ft {
     my ($self) = @_;
 
+    # await for image link
     await $self->fetch_page_meta_ft;
     my $fetch_url = $self->image;
     return $self->{image_data} = ''
         unless $fetch_url;
 
+    # await image http download
     my $timer = time();
     my ($body, $headers) = await $self->_ua->http_get($fetch_url);
-    my $status = $headers->{Status};
+    my $status = _get_update_status_reason($headers);
     $log->debugf('img fetch %d %s for %s finished in %.3fs',
         $status, $fetch_url, $self->url, time() - $timer);
+    HTTP::Exception->throw($status, status_message => $headers->{Reason})
+        if ($status != 200);
 
-    die 'failed to fetch ' . $fetch_url
-        unless $status == 200;
     return $self->{image_data} = $body;
+}
+
+sub _get_update_status_reason {
+    my ($headers) = @_;
+    my $status = $headers->{Status};
+    unless (HTTP::Status::status_message($status)) {
+        $headers->{Reason} = sprintf('(%d) %s', $status, $headers->{Reason});
+        $status = $headers->{Status} = 503;
+    }
+    return $status;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -218,6 +235,9 @@ async fetch previews and images:
 
 Get (not only) open-graph web page meta data. can be used in both normal
 and async code.
+
+For any other than 200 http status codes during data downloads,
+L<HTTP::Exception> is thrown.
 
 =head1 ACCESSORS
 
@@ -269,7 +289,7 @@ than default location.
 Returns future object for fetching paga meta data. See L</"ASYNC USE">.
 On done L</page_meta> hash is returned.
 
-has fetch_image_data_ft
+=head2 fetch_image_data_ft
 
 Returns future object for fetching image data. See L</"ASYNC USE">
 On done L</image_data> scalar is returned.

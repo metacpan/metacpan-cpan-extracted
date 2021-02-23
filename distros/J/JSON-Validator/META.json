@@ -61,8 +61,8 @@
          "url" : "https://github.com/mojolicious/json-validator.git",
          "web" : "https://github.com/mojolicious/json-validator"
       },
-      "x_IRC" : "irc://irc.freenode.net/#mojo"
+      "x_IRC" : "irc://irc.freenode.net/#perl-openapi"
    },
-   "version" : "4.13",
+   "version" : "4.14",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -2,29 +2,25 @@ package OpenAPI::Client;
 use Mojo::EventEmitter -base;
 
 use Carp ();
-use JSON::Validator::OpenAPI::Mojolicious;
+use JSON::Validator;
 use Mojo::UserAgent;
 use Mojo::Util 'deprecated';
 use Mojo::Promise;
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '0.25';
+our $VERSION = '1.00';
 
 my $BASE = __PACKAGE__;
-my $X_RE = qr{^x-};
 
 has base_url => sub {
   my $self    = shift;
-  my $schema  = $self->validator->schema;
+  my $schema  = $self->validator;
   my $schemes = $schema->get('/schemes') || [];
 
   return Mojo::URL->new->host_port($schema->get('/host') || 'localhost')->path($schema->get('/basePath') || '/')
     ->scheme($schemes->[0] || 'http');
 };
-
-# Will be deprecated
-has pre_processor => undef;
 
 has ua => sub { Mojo::UserAgent->new };
 
@@ -42,13 +38,10 @@ sub call_p {
 
 sub new {
   my ($class, $specification) = (shift, shift);
-  my $attrs     = @_ == 1 ? shift : {@_};
-  my $validator = JSON::Validator::OpenAPI::Mojolicious->new;
+  my $attrs = @_ == 1 ? shift : {@_};
 
-  $validator->coerce($attrs->{coerce} // 'booleans,numbers,strings');
-  $validator->ua->server->app($attrs->{app}) if $attrs->{app};
   $class = $class->_url_to_class($specification);
-  _generate_class($class, $validator->load_and_validate_schema($specification, $attrs)) unless $class->isa($BASE);
+  _generate_class($class, $specification, $attrs) unless $class->isa($BASE);
 
   my $self = bless $attrs, $class;
   $self->ua->transactor->name('Mojo-OpenAPI (Perl)') unless $self->{ua};
@@ -61,11 +54,17 @@ sub new {
   return $self;
 }
 
-sub validator { Carp::confess('No JSON::Validator::OpenAPI::Mojolicious object available') }
+sub validator { Carp::confess("validator() is not defined for $_[0]") }
 
 sub _generate_class {
-  my ($class, $validator) = @_;
-  my $paths = $validator->get('/paths') || {};
+  my ($class, $specification, $attrs) = @_;
+
+  my $jv = JSON::Validator->new;
+  $jv->coerce($attrs->{coerce} // 'booleans,numbers,strings');
+  $jv->store->ua->server->app($attrs->{app}) if $attrs->{app};
+
+  my $schema = $jv->schema($specification)->schema;
+  die "Invalid schema: $specification has the following errors:\n", join "\n", @{$schema->errors} if @{$schema->errors};
 
   eval <<"HERE" or Carp::confess("package $class: $@");
 package $class;
@@ -73,36 +72,23 @@ use Mojo::Base '$BASE';
 1;
 HERE
 
-  Mojo::Util::monkey_patch($class => validator => sub {$validator});
+  Mojo::Util::monkey_patch($class => validator => sub {$schema});
 
-  for my $path (keys %$paths) {
-    next if $path =~ $X_RE;
-    my $path_parameters = $validator->get([paths => $path => 'parameters']) || [];
-
-    for my $http_method (keys %{$validator->get([paths => $path])}) {
-      next if $http_method =~ $X_RE or $http_method eq 'parameters';
-      my %op_spec      = %{$validator->get([paths => $path => $http_method])};
-      my $operation_id = $op_spec{operationId} or next;
-
-      $op_spec{method}     = lc $http_method;
-      $op_spec{parameters} = [@$path_parameters, @{$op_spec{parameters} || []}];
-      $op_spec{path}       = [grep {length} split '/', $path];
-
-      warn "[$class] Add method $operation_id() for $http_method $path\n" if DEBUG;
-
-      $class->_generate_method_bnb($operation_id, \%op_spec);
-      $class->_generate_method_p("${operation_id}_p", \%op_spec);
-    }
+  for my $route ($schema->routes->each) {
+    next unless $route->{operation_id};
+    warn "[$class] Add method $route->{operation_id}() for $route->{method} $route->{path}\n" if DEBUG;
+    $class->_generate_method_bnb($route->{operation_id} => $route);
+    $class->_generate_method_p("$route->{operation_id}_p" => $route);
   }
 }
 
 sub _generate_method_bnb {
-  my ($class, $method_name, $op_spec) = @_;
+  my ($class, $method_name, $route) = @_;
 
   Mojo::Util::monkey_patch $class => $method_name => sub {
     my $cb   = ref $_[-1] eq 'CODE' ? pop : undef;
     my $self = shift;
-    my $tx   = $self->_build_tx($op_spec, @_);
+    my $tx   = $self->_build_tx($route, @_);
 
     if ($tx->error) {
       return $tx unless $cb;
@@ -117,11 +103,11 @@ sub _generate_method_bnb {
 }
 
 sub _generate_method_p {
-  my ($class, $method_name, $op_spec) = @_;
+  my ($class, $method_name, $route) = @_;
 
   Mojo::Util::monkey_patch $class => $method_name => sub {
     my $self = shift;
-    my $tx   = $self->_build_tx($op_spec, @_);
+    my $tx   = $self->_build_tx($route, @_);
 
     return $self->ua->start_p($tx) unless my $err = $tx->error;
     return Mojo::Promise->new->reject($err->{message}) unless $err->{code};
@@ -131,66 +117,62 @@ sub _generate_method_p {
 }
 
 sub _build_tx {
-  my ($self, $op_spec, $params, %content) = @_;
+  my ($self, $route, $params, %content) = @_;
   my $v   = $self->validator;
   my $url = $self->base_url->clone;
-  my ($tx, %headers, @errors);
+  my ($tx, %headers);
 
-  push @{$url->path}, map { local $_ = $_; s,\{(\w+)\},{$params->{$1}//''},ge; $_ } @{$op_spec->{path}};
+  push @{$url->path}, map { local $_ = $_; s,\{(\w+)\},{$params->{$1}//''},ge; $_ } grep {length} split '/',
+    $route->{path};
 
-  for my $p (@{$op_spec->{parameters}}) {
-    my ($in, $name, $type) = @$p{qw(in name type)};
-    my ($ct, @e);
+  my @errors = $self->validator->validate_request(
+    [@$route{qw(method path)}],
+    {
+      body => sub {
+        my $name = shift;
 
-    if ($in eq 'body' and !exists $params->{$name}) {
-      for ('body', sort keys %{$self->ua->transactor->generators}) {
-        next if $_ eq 'form' or !exists $content{$_};
-        $ct = $_;
-        $params->{$name} = $content{$ct};
-        last;
-      }
-    }
+        if (exists $params->{$name}) {
+          $content{json} = $params->{$name};
+        }
+        else {
+          for ('body', sort keys %{$self->ua->transactor->generators}) {
+            next unless exists $content{$_};
+            $params->{$name} = $content{$_};
+            last;
+          }
+        }
 
-    if (exists $params->{$name} or $p->{required}) {
-      @e = $v->validate($params,
-        {type => 'object', required => $p->{required} ? [$name] : [], properties => {$name => $p->{schema} || $p}});
+        return {exists => $params->{$name}, value => $params->{$name}};
+      },
+      formData => sub {
+        my $name  = shift;
+        my $value = _param_as_array($name => $params);
+        $content{form}{$name} = $params->{$name};
+        return {exists => !!@$value, value => $value};
+      },
+      header => sub {
+        my $name  = shift;
+        my $value = _param_as_array($name => $params);
+        $headers{$name} = $value;
+        return {exists => !!@$value, value => $value};
+      },
+      path => sub {
+        my $name = shift;
+        return {exists => exists $params->{$name}, value => $params->{$name}};
+      },
+      query => sub {
+        my $name  = shift;
+        my $value = _param_as_array($name => $params);
+        $url->query->param($name => $value);
+        return {exists => !!@$value, value => $value};
+      },
     }
-
-    if (@e) {
-      warn "[@{[ref $self]}] Validation for $url failed: @e\n" if DEBUG;
-      push @errors, @e;
-    }
-    elsif (!exists $params->{$name} or $in eq 'path') {
-      1;
-    }
-    elsif ($in eq 'query') {
-      $url->query->param($name => $params->{$name}) if $in eq 'query';
-    }
-    elsif ($in eq 'header') {
-      $headers{$name} = $params->{$name};
-    }
-    elsif ($in eq 'formData') {
-      $content{form}{$name} = $params->{$name};
-    }
-    elsif ($in eq 'body') {
-      $ct ||= 'json';
-      $content{$ct} = $params->{$name};
-
-      # Back compat check
-      if ($ct eq 'body' and ref $content{$ct}) {
-        deprecated 'Maybe you meant to use (.., json => {}) instead of "body"?';
-        $content{json} = delete $content{body},;
-      }
-    }
-    else {
-      warn "[@{[ref $self]}] Unknown 'in' '$in' for parameter '$name'";
-    }
-  }
+  );
 
   if (@errors) {
-    warn "[@{[ref $self]}] Validation for $url failed: @errors.\n" if DEBUG;
+    warn "[@{[ref $self]}] Validation for $route->{method} $url failed: @errors\n" if DEBUG;
     $tx = Mojo::Transaction::HTTP->new;
-    $tx->req->method(uc $op_spec->{method});
+    $tx->req->method(uc $route->{method});
     $tx->req->url($url);
     $tx->res->headers->content_type('application/json');
     $tx->res->body(Mojo::JSON::encode_json({errors => \@errors}));
@@ -198,21 +180,19 @@ sub _build_tx {
     $tx->res->error({message => 'Invalid input', code => 400});
   }
   else {
-    warn "[@{[ref $self]}] Validation for $url was successful.\n" if DEBUG;
-    if (my $pre_processor = $self->{pre_processor}) {
-      deprecated 'pre_processor is DEPRECATED in favor of...';    # 2018-09-01
-      $tx = $self->ua->build_tx($op_spec->{method}, $url, $pre_processor->(\%headers, \%content));
-    }
-    else {
-      $tx
-        = $self->ua->build_tx($op_spec->{method}, $url, \%headers, defined $content{body} ? $content{body} : %content);
-    }
+    warn "[@{[ref $self]}] Validation for $route->{method} $url was successful\n" if DEBUG;
+    $tx = $self->ua->build_tx($route->{method}, $url, \%headers, defined $content{body} ? $content{body} : %content);
   }
 
-  $tx->req->env->{operationId} = $op_spec->{operationId};
+  $tx->req->env->{operationId} = $route->{operation_id};
   $self->emit(after_build_tx => $tx);
 
   return $tx;
+}
+
+sub _param_as_array {
+  my ($name, $params) = @_;
+  return !exists $params->{$name} ? [] : ref $params->{$name} eq 'ARRAY' ? $params->{$name} : [$params->{$name}];
 }
 
 sub _url_to_class {
@@ -222,7 +202,7 @@ sub _url_to_class {
   $package =~ s!\W!_!g;
   $package = Mojo::Util::md5_sum($package) if length $package > 110;    # 110 is a bit random, but it cannot be too long
 
-  return sprintf '%s::%s', __PACKAGE__, $package;
+  return "$BASE\::$package";
 }
 
 1;
@@ -358,12 +338,6 @@ Note that this usage of C<env()> is currently EXPERIMENTAL:
 Returns a L<Mojo::URL> object with the base URL to the API. The default value
 comes from C<schemes>, C<basePath> and C<host> in the Open API specification.
 
-=head2 pre_processor
-
-L</pre_processor> is deprecated.
-
-Use L</after_build_tx> and L<Mojo::UserAgent::Transactor/generators> instead.
-
 =head2 ua
 
   $ua = $client->ua;
@@ -435,9 +409,9 @@ See L<JSON::Validator/coerce>. Default to "booleans,numbers,strings".
   $validator = $client->validator;
   $validator = $class->validator;
 
-Returns a L<JSON::Validator::OpenAPI::Mojolicious> object for a generated
-class. Not that this is a global variable, so changing the object will affect
-all instances.
+Returns a L<JSON::Validator::Schema::OpenAPIv2> object for a generated class.
+Not that this is a global variable, so changing the object will affect all
+instances.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,0 +1,13 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+datarootdir=${prefix}/share
+datadir=${prefix}/share
+
+Name: jq
+Description: lightweight and flexible command-line JSON processor
+Version: @PACKAGE_VERSION@
+Requires:
+Libs: -L${libdir} -ljq -lonig
+Cflags: -I${includedir}

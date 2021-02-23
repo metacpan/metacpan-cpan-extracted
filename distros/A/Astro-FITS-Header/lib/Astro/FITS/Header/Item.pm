@@ -39,7 +39,7 @@ use overload (
 use vars qw/ $VERSION /;
 use Carp;
 
-$VERSION = 3.02;
+$VERSION = 3.08;
 
 =head1 METHODS
 

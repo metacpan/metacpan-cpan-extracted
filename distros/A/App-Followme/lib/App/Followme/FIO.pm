@@ -6,7 +6,6 @@ use warnings;
 use integer;
 use lib '../..';
 
-use Cwd;
 use IO::Dir;
 use IO::File;
 use Time::Local;
@@ -24,7 +23,7 @@ our @EXPORT = qw(fio_filename_to_url fio_flatten
                  fio_split_filename fio_to_file 
                  fio_visit fio_write_page);
 
-our $VERSION = "1.97";
+our $VERSION = "1.98";
 
 #----------------------------------------------------------------------
 # Calculate the check sum for a file
@@ -397,10 +396,12 @@ sub fio_write_page {
     my ($filename, $page, $binmode) = @_;
 
 	my ($dir, $base) = fio_split_filename($filename);
+
 	if (! -e $dir) {
 		$dir = rel2abs($dir);
-		die "Couldn't write $filename, no directory $dir\n";
-	}
+        die "Couldn't create directory $dir for $filename: $!" 
+            unless mkdir($dir);
+    }
 	
     my $fd = IO::File->new($filename, 'w');
     die "Couldn't write $filename: $!\n" unless $fd;

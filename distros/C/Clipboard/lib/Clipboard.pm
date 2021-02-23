@@ -1,5 +1,5 @@
 package Clipboard;
-$Clipboard::VERSION = '0.27';
+$Clipboard::VERSION = '0.28';
 use strict;
 use warnings;
 
@@ -72,7 +72,7 @@ Clipboard - Copy and paste with any OS
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 

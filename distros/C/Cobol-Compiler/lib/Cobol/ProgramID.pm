@@ -5,13 +5,10 @@ package Cobol::Compiler::ProgramID;
 use parent 'ID';
 
 sub new {
-	my ($class, $prevtokens) = @_;
-        my $self = $class->SUPER::new;
+	my ($class, $id) = @_;
+        my $self = $class->SUPER::new( $id );
+	$self->{installer} = Cobol::Compiler::ProgramTokenInstaller->new);
 
-
-	for (my $i = 0; $i < length(@{ $prevtokens }); $i++) {
-		push(@{ $self->{prevTokens} }, $prevtokens[$i]);
-	}
 
 }
 

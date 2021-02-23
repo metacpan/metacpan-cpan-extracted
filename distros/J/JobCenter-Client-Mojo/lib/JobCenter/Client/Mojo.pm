@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.41'; # VERSION
+our $VERSION = '0.42'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -283,7 +283,7 @@ sub call_nb {
 	} else {
 		croak 'inargs should be a hashref' unless ref $inargs eq 'HASH';
 		# test encoding
-		$inargsj = $self->{jsonobject}->decode($inargs);
+		$inargsj = $self->{jsonobject}->encode($inargs);
 		if ($clenv) {
 			croak 'clenv should be a hashref' unless ref $clenv eq 'HASH';
 		}

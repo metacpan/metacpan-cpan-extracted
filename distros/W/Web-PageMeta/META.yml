@@ -29,12 +29,14 @@ name: Web-PageMeta
 provides:
   Web::PageMeta:
     file: lib/Web/PageMeta.pm
-    version: '0.01'
+    version: '0.02'
 requires:
+  AnyEvent::HTTP: '0'
   Encode: '0'
   Future: '0'
   Future::AsyncAwait: '0'
-  Future::HTTP: '0'
+  Future::HTTP::AnyEvent: '0'
+  HTTP::Exception: '0'
   Log::Any: '0'
   Moose: '0'
   MooseX::Types::URI: '0'
@@ -48,5 +50,5 @@ resources:
   bugtracker: http://github.com/jozef/Web-PageMeta/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jozef/Web-PageMeta
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

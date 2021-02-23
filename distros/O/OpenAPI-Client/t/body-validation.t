@@ -23,15 +23,15 @@ $client->once(after_build_tx => sub { $req = pop->req });
 
 $tx = $client->loginUser;
 is $tx->req, $req, 'after_build_tx emitted tx';
-is $tx->res->code, 400, 'invalid loginUser';
+is $tx->res->code, 400, 'invalid loginUser' or diag explain($tx->res->json);
 is $tx->error->{message}, 'Invalid input', 'invalid message';
 
 $tx = $client->loginUser({body => {email => 'superman@example.com', password => 's3cret'}});
-is $tx->res->code, 200, 'valid loginUser';
+is $tx->res->code, 200, 'valid loginUser' or diag explain($tx->res->json);
 is $tx->res->json->{email}, 'superman@example.com', 'valid return';
 
 $tx = $client->loginUser({body => {password => 's3cret'}});
-is $tx->res->code, 400, 'missing email';
+is $tx->res->code, 400, 'missing email' or diag explain($tx->res->json);
 is $tx->error->{message}, 'Invalid input', 'invalid message';
 
 $client->once(after_build_tx => sub { pop->req->headers->header('X-Secret' => 'supersecret') });

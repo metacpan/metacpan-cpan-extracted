@@ -1,5 +1,8 @@
 Revision history for Perl extension PartialApplication
 
+0.04 2021-02-23T10:35:49Z
+    - Switch to GitLab for issue tracking
+
 0.03 2019-08-30T12:01:40Z
 
     - added details about how to contribute to the module

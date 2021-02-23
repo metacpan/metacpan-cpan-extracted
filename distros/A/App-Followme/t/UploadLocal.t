@@ -49,7 +49,7 @@ do {
 
     my $dir = 'subdir';
     my $remote_file = 'filename.html';
-    my $local_file = rel2abs($remote_file);
+    my $local_file = catfile($local_dir, $remote_file);
 
     my $file = <<EOQ;
 <html>

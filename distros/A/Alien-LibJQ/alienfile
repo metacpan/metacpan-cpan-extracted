@@ -1,0 +1,47 @@
+use alienfile;
+
+use File::Spec::Functions qw/catfile/;
+
+# download utility available
+plugin 'Probe::CommandLine' => (
+   command   => 'curl',
+);
+plugin 'Probe::CommandLine' => (
+   command   => 'wget',
+   secondary => 1,
+);
+
+share {
+   #start_url 'https://github.com/stedolan/jq/releases/';
+   # china mirror
+   start_url 'https://hub.fastgit.org/stedolan/jq/releases/';
+   plugin Download => (
+      version => qr/^jq-([0-9\.]+)\.tar\.gz$/o,
+   );
+   plugin Extract => 'tar.gz';
+   plugin 'Build::CMake';
+   # require Strawberry perl gmake.exe on windows
+   plugin 'Build::Make' => ( $^O eq 'MSWin32' ? 'gmake' : 'make' );
+   build [
+      # pitch in required cmake stuff
+      'echo %cd%',
+      [ '%{cp}', catfile('..', '..', '..', 'jq', 'scripts', 'gen_builtin_inc.pl'), 'scripts' ],
+      [ '%{cp}', catfile('..', '..', '..', 'jq', 'src', 'setenv.h'), 'src' ],
+      [ '%{cp}', catfile('..', '..', '..', 'jq', 'src', 'setenv.c'), 'src' ],
+      [ '%{cp}', catfile('..', '..', '..', 'jq', 'builtin.c.patch'), '.' ],
+      [ '%{cp}', catfile('..', '..', '..', 'jq', 'CMakeLists.txt'),  '.' ],
+      [ '%{cp}', catfile('..', '..', '..', 'jq', 'Config.cmake.in'), '.' ],
+      [ '%{cp}', catfile('..', '..', '..', 'jq', 'dist.info'),       '.' ],
+      [ '%{cp}', catfile('..', '..', '..', 'jq', 'jq.pc.cmake.in'),  '.' ],
+      # execute cmake build
+      [ '%{cmake}', -G => '%{cmake_generator}', ( $^O eq 'MSWin32' ? '-DCMAKE_MAKE_PROGRAM=%{make}' : () ),
+         '-DBUILD_SHARED_LIBS=OFF', '-DCMAKE_POSITION_INDEPENDENT_CODE=ON',
+         '-DENABLE_MAINTAINER_MODE=OFF', '-DWITH_ONIGURUMA=builtin',
+         '-DCMAKE_INSTALL_PREFIX=%{.install.prefix}',
+         '.'
+      ],
+      '%{make}',
+      '%{make} install',
+   ];
+   plugin 'Gather::IsolateDynamic';
+};

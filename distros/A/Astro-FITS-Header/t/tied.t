@@ -5,7 +5,7 @@
 use strict;
 
 #load test
-use Test::More tests => 294;
+use Test::More tests => 297;
 
 # load modules
 use Astro::FITS::Header;
@@ -229,6 +229,27 @@ foo
 bar
 FOO
     );
+
+# Test handling of subheaders.
+my ($header3, @diff3) = Astro::FITS::Header->new(Cards => [
+    'KEY1    =                    1 / Example header                                 ',
+    'KEY2    =                    2 / Example header                                 ',
+])->merge_primary(Astro::FITS::Header->new(Cards => [
+    'KEY1    =                    1 / Example header                                 ',
+    'KEY2    =                    3 / Example header                                 ',
+]));
+$header3->subhdrs(@diff3);
+tie my %keywords3, 'Astro::FITS::Header', $header3, tiereturnsref => 1;
+is_deeply(\%keywords3, {
+    'KEY1' => '1',
+    'SUBHEADERS' => [{'KEY2' => '2'}, {'KEY2' => '3'}],
+}, 'Tied hash with subheaders');
+%keywords3 = ();
+is_deeply(\%keywords3, {}, 'Cleared tied hash is empty');
+$keywords3{'KEY3'} = 4;
+is_deeply(\%keywords3, {
+    'KEY3' => 4,
+}, 'Cleared tied hash with new key');
 
 # principal of least surprise.... you should get back what you put in!
 #$href->{REVERSE} = "foo / bar";

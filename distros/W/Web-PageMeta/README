@@ -36,6 +36,9 @@ DESCRIPTION
     Get (not only) open-graph web page meta data. can be used in both normal
     and async code.
 
+    For any other than 200 http status codes during data downloads,
+    HTTP::Exception is thrown.
+
 ACCESSORS
   new
     Constructor, only "url" is required.
@@ -76,8 +79,7 @@ ACCESSORS
     Returns future object for fetching paga meta data. See "ASYNC USE". On
     done "page_meta" hash is returned.
 
-    has fetch_image_data_ft
-
+  fetch_image_data_ft
     Returns future object for fetching image data. See "ASYNC USE" On done
     "image_data" scalar is returned.
 

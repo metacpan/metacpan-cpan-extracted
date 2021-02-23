@@ -17,14 +17,14 @@ name: OTRS-OPM-Validate
 provides:
   OTRS::OPM::Validate:
     file: lib/OTRS/OPM/Validate.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   perl: '5.020'
 resources:
   bugtracker: http://github.com/perlservices/OTRS-OPM-Validate/issues
   homepage: http://github.com/perlservices/OTRS-OPM-Validate
   repository: git://github.com/perlservices/OTRS-OPM-Validate.git
-version: '0.02'
+version: '0.03'
 x_contributors:
   - 'reneeb <info@perl-services.de>'
 x_generated_by_perl: v5.26.1
