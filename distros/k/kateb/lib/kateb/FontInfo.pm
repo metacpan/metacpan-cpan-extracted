@@ -1,5 +1,5 @@
 package kateb::FontInfo;
-$kateb::FontInfo::VERSION = '01.00.23';
+$kateb::FontInfo::VERSION = '01.00.25';
 
 use strict;
 use warnings;
@@ -307,26 +307,31 @@ sub nahid {
 sub mikhak {
 	my $self    = shift;
 	my $version = shift;
+	my $file_version = $version;
+	$file_version =~ s/\( (\d+) \)/.$1/x;
 	my $link =
 		$self->{mikhak}->{publisher} . "/" .
 		$self->{mikhak}->{name} .
 		"/releases/download/" .
 		$version . "/" .
-		$self->{mikhak}->{name} . "-" . $version .
+		$self->{mikhak}->{name} . "-" . $file_version .
 		".zip"
 	;
+
 	return $link;
 }
 
 sub estedad {
 	my $self    = shift;
 	my $version = shift;
+	my $file_version = $version;
+	$file_version =~ s/\(\d+\)//;
 	my $link =
 		$self->{estedad}->{publisher} . "/" .
 		$self->{estedad}->{name} .
 		"/releases/download/" .
 		$version . "/" .
-		$self->{estedad}->{name} . "-v" . $version .
+		$self->{estedad}->{name} . "-v" . $file_version .
 		".zip"
 	;
 	return $link;

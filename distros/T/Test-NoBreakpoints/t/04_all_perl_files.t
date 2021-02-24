@@ -1,15 +1,22 @@
 BEGIN {
     use Test::More;
-    our $tests = 1;
+    our $tests = 0;
     eval "use Test::NoWarnings";
     $tests++ unless( $@ );
+    eval "use Test::Exception";
+    if ($@) {
+        my $b = Test::Builder->new;
+        $b->diag('Test::Exception not installed.  Not all tests will run');
+    }
+    else {
+        $tests++;
+    }
     plan tests => $tests;
     chdir 't' if -d 't';
     use lib '../lib', '../blib/lib';
 }
 
 use Test::NoBreakpoints 'all_perl_files';
-use Test::Exception;
 
 # test that all files in the test directory are found properly
 my @tests = qw|

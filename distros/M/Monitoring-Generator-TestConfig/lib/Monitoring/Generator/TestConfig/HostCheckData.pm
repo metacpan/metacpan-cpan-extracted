@@ -19,7 +19,7 @@ sub get_test_hostcheck {
     my $self = shift;
     our $testhostcheck;
     return($testhostcheck) if defined $testhostcheck;
-    while(my $line = <DATA>) { $testhostcheck .= $line; }
+    $testhostcheck = do { local $/; <DATA> };
     return($testhostcheck);
 }
 

@@ -1,11 +1,11 @@
 package POE::Component::Client::WebSocket;
 
-use 5.006;
+use v5.26.0;;
 use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '0.27'; 
+$VERSION = '0.29'; 
 
 use Carp qw(carp croak);
 use Errno qw(ETIMEDOUT ECONNRESET);
@@ -33,14 +33,14 @@ require HTTP::Response;
 
 # Global stuff for checks etc.
 my $validOpts = {
-	types => {
-		'continuation'  => 1,
-		'text'          => 1,
-		'binary'        => 1,
-		'ping'          => 1,
-		'pong'          => 1,
-		'close'         => 1,
-	}
+    types => {
+        'continuation'  => 1,
+        'text'          => 1,
+        'binary'        => 1,
+        'ping'          => 1,
+        'pong'          => 1,
+        'close'         => 1,
+    }
 };
 
 =head1 NAME
@@ -49,7 +49,7 @@ POE::Component::Client::WebSocket - A POE compatible websocket client
 
 =head1 VERSION
 
-Version 0.22
+Version 0.29
 
 =head1 WARNING: Work in progress! Only uploaded early for testing purposes!
 
@@ -112,75 +112,77 @@ Create a new object, takes 1 argument.. a fully qualified websocket URI.
 =cut
 
 sub new {
-	my ($class,$uri) = @_;
+    my ($class,$uri) = @_;
 
-	my $self = bless {
-			alias   => __PACKAGE__,
-			session => 0,
-	}, $class;
+    my $self = bless {
+        alias   => __PACKAGE__,
+        session => 0,
+    }, $class;
 
-	my ($scheme, $auth, $path, $query, $frag) = uri_split($uri);
-	my ($host,$port) = split(/:/,$auth);
+    my ($scheme, $auth, $path, $query, $frag) = uri_split($uri);
+    my ($host,$port) = split(/:/,$auth);
 
-	# If we are on WSS we are probably using https, if not probably http
-	if (!$port) {
-			if (uc($scheme) eq 'WSS')       { $port = 443 }
-			else                            { $port = 80 }
-	}
+    # If we are on WSS we are probably using https, if not probably http
+    if (!$port) {
+        if (uc($scheme) eq 'WSS')       { $port = 443 }
+        else                            { $port = 80 }
+    }
 
-   
-	my $key = "";
-	for (1..16) { $key .= int(rand(9)) }
+    my $key = "";
+    for (1..16) { $key .= int(rand(9)) }
 
-	$self->{session} = POE::Session->create(
-			package_states => [
-				$self => {
-					_start          =>      '_start',
-					_stop           =>      '_stop',
-					keep_alive      =>      '_keep_alive',
-					connect         =>      '_connect',
-					handler         =>      '_handler',
-					origin          =>      '_origin',
-					send            =>      '_send',
-					parent          =>      '_parent',
-					socket_birth    =>      '_socket_birth',
-					socket_death    =>      '_socket_death',
-					socket_input    =>      '_socket_input',
-				}
-			],
-			heap => {
-				parent          => POE::Kernel->get_active_session()->ID,
-				handlers        => {
-					read            =>      'websocket_read',
-					connected       =>      'websocket_connected',
-					handshake       =>      'websocket_handshake',
-					disconnected    =>      'websocket_disconnected',
-					error           =>      'websocket_error',
-				},
-				uri             => {
-					scheme          => $scheme,
-					auth            => $auth,
-					path            => $path,
-					query           => $query,
-					frag            => $frag,
-					host            => $host,
-					port            => $port,
-				},
-				req             => {
-					'origin'                =>      'http://'.$host,
-					'sec-websocket-key'     =>      encode_base64($key),
-				},
-				_state          => {
-					run             =>      1,
-					frame           =>      Protocol::WebSocket::Frame->new,
-				},
-			
-			}
-	);
+    my $origin = (uc $scheme eq 'WSS' ? 'https' : 'http') . "://$host";
 
-	$self->{id} = $self->{session}->ID;
+    $self->{session} = POE::Session->create(
+        package_states => [
+            $self => {
+                _start                  =>  '_start',
+                _stop                   =>  '_stop',
+                keep_alive              =>  '_keep_alive',
+                connect                 =>  '_connect',
+                handler                 =>  '_handler',
+                origin                  =>  '_origin',
+                send                    =>  '_send',
+                parent                  =>  '_parent',
+                socket_birth            =>  '_socket_birth',
+                socket_death            =>  '_socket_death',
+                socket_input            =>  '_socket_input',
+            }
+        ],
+        heap => {
+            parent          => POE::Kernel->get_active_session()->ID,
+            handlers        => {
+                read                    => 'websocket_read',
+                connected               => 'websocket_connected',
+                handshake               => 'websocket_handshake',
+                disconnected            => 'websocket_disconnected',
+                error                   => 'websocket_error',
+            },
+            uri             => {
+                scheme                  =>  $scheme,
+                auth                    =>  $auth,
+                path                    =>  $path,
+                query                   =>  $query,
+                frag                    =>  $frag,
+                host                    =>  $host,
+                port                    =>  $port,
+                full                    =>  $uri
+            },
+            req             => {
+                'origin'                =>  $origin,
+                'sec-websocket-key'     =>  encode_base64($key),
+            },
+            _state          => {
+                run                     =>  1,
+                frame                   =>  Protocol::WebSocket::Frame->new,
+            },
+    
+        }
+    );
 
-	return $self;    
+    $self->{id} = $self->{session}->ID;
+
+    return $self;
 }
 
 =head1 Default handlers and arguments
@@ -233,7 +235,10 @@ Start the connection
 
 =cut
 
-sub connect { my $self = shift; POE::Kernel->post( $self->{session}->ID, 'connect', @_ ) }
+sub connect { 
+    my $self = shift;
+    POE::Kernel->post( $self->{session}->ID, 'connect', @_ );
+}
 
 =head2 handler
 
@@ -242,16 +247,16 @@ Adjust the handlers events are sent to
 =cut
 
 sub handler {
-        my ($self,$target,$destination) = @_;
+    my ($self,$target,$destination) = @_;
 
-        return if ( (!$target) || (!$destination) );
+    return if ( (!$target) || (!$destination) );
 
-        POE::Kernel->post(
-                $self->{session}->ID,
-                'handler',
-                $target,
-                $destination
-        );
+    POE::Kernel->post(
+        $self->{session}->ID,
+        'handler',
+        $target,
+        $destination
+    );
 }
 
 =head2 origin
@@ -261,15 +266,15 @@ Change the origin from the automatically generated one to something else.
 =cut
 
 sub origin {
-        my ($self,$target) = @_;
+    my ($self,$target) = @_;
 
-        return if (!$target);
+    return if (!$target);
 
-        POE::Kernel->post(
-			$self->{session}->ID,
-			'origin',
-			$target
-        );
+    POE::Kernel->post(
+                    $self->{session}->ID,
+                    'origin',
+                    $target
+    );
 }
 
 =head2 parent
@@ -279,15 +284,15 @@ Override the 'send to' parent for the module, by default this is the module that
 =cut
 
 sub parent {
-        my ($self,$target) = @_;
+    my ($self,$target) = @_;
 
-        return if (!$target);
+    return if (!$target);
 
-        POE::Kernel->post(
-                $self->{session}->ID,
-                'parent',
-                $target
-        );
+    POE::Kernel->post(
+            $self->{session}->ID,
+            'parent',
+            $target
+    );
 }
 
 =head2 send
@@ -301,15 +306,15 @@ Send data to the server, arguments are:
 =cut
 
 sub send {
-        my ($self,$data,$type,$fin,$masked) = @_;
+    my ($self,$data,$type,$fin,$masked) = @_;
 
-        return if (!$data);
+    return if (!$data);
 
-        POE::Kernel->post(
-                $self->{session}->ID,
-                'send',
-                $data,$type,$fin,$masked
-        );
+    POE::Kernel->post(
+            $self->{session}->ID,
+            'send',
+            $data,$type,$fin,$masked
+    );
 }
 
 
@@ -322,9 +327,9 @@ Initial start handler
 =cut
 
 sub _start {
-        my ($kernel,$heap) = @_[KERNEL,HEAP];
+    my ($kernel,$heap) = @_[KERNEL,HEAP];
 
-        $kernel->yield('keep_alive');
+    $kernel->yield('keep_alive');
 }
 
 =head2 _stop
@@ -343,11 +348,11 @@ Do not allow the module to stop running
 =cut
 
 sub _keep_alive {
-        my ($kernel,$heap) = @_[KERNEL,HEAP];
+    my ($kernel,$heap) = @_[KERNEL,HEAP];
 
-        return if (!$heap->{_state}->{run});
+    return if (!$heap->{_state}->{run});
 
-        $kernel->delay_add('keep_alive' => 1);
+    $kernel->delay_add('keep_alive' => 1);
 }
 
 =head2 _connect
@@ -357,14 +362,15 @@ Initate a connect to the websocket
 =cut
 
 sub _connect {
-        my ($kernel,$heap) = @_[KERNEL,HEAP];
+    my ($kernel,$heap) = @_[KERNEL,HEAP];
 
-        $heap->{socket} = POE::Wheel::SocketFactory->new(
-                RemoteAddress   => $heap->{uri}->{host},
-                RemotePort      => $heap->{uri}->{port},
-                SuccessEvent    => 'socket_birth',
-                FailureEvent    => 'socket_death',
-        );}
+    $heap->{socket} = POE::Wheel::SocketFactory->new(
+        RemoteAddress   => $heap->{uri}->{host},
+        RemotePort      => $heap->{uri}->{port},
+        SuccessEvent    => 'socket_birth',
+        FailureEvent    => 'socket_death',
+    );
+}
 
 =head2 _handler
 
@@ -373,9 +379,9 @@ Adjust the distribution map for handlers
 =cut
 
 sub _handler {
-        my ($kernel,$heap,$target,$destination) = @_[KERNEL,HEAP,ARG0,ARG1];
+    my ($kernel,$heap,$target,$destination) = @_[KERNEL,HEAP,ARG0,ARG1];
 
-        $heap->{handlers}->{lc($target)} = $destination;
+    $heap->{handlers}->{lc($target)} = $destination;
 }
 
 =head2 _origin
@@ -385,9 +391,9 @@ Change the origin used in the opening handshake
 =cut
 
 sub _origin {
-        my ($kernel,$heap,$target) = @_[KERNEL,HEAP,ARG0];
+    my ($kernel,$heap,$target) = @_[KERNEL,HEAP,ARG0];
 
-        $heap->{req}->{origin} = $target;
+    $heap->{req}->{origin} = $target;
 }
 
 =head2 _parent
@@ -397,9 +403,9 @@ Change the currently targeted session to communicate events with.
 =cut
 
 sub _parent {
-        my ($kernel,$heap,$target) = @_[KERNEL,HEAP,ARG0];
+    my ($kernel,$heap,$target) = @_[KERNEL,HEAP,ARG0];
 
-        $heap->{parent} = $target;
+    $heap->{parent} = $target;
 }
 
 =head2 _send
@@ -409,15 +415,15 @@ Send a frame encoded request to the server
 =cut
 
 sub _send {
-        my ($kernel,$heap,$data,$type,$fin,$masked) = @_[KERNEL,HEAP,ARG0,ARG1,ARG2,ARG3];
+    my ($kernel,$heap,$data,$type,$fin,$masked) = @_[KERNEL,HEAP,ARG0,ARG1,ARG2,ARG3];
 
-        $data = "" if (!$data);
-        $type = 'text' if ( (!$type) || (! $validOpts->{types}->{$type}) );
-        $fin = 1 if ((!defined $fin) || ($fin !~ m#^[01]$#));
-        $masked = 1 if ((!defined $masked) || ($fin !~ m#^[01]$#));
+    $data = "" if (!$data);
+    $type = 'text' if ( (!$type) || (! $validOpts->{types}->{$type}) );
+    $fin = 1 if ((!defined $fin) || ($fin !~ m#^[01]$#));
+    $masked = 1 if ((!defined $masked) || ($fin !~ m#^[01]$#));
 
-        my $frame = Protocol::WebSocket::Frame->new( buffer => $data, type => $type, fin => $fin, masked => $masked );
-        $heap->{wheel}->put($frame->to_bytes);
+    my $frame = Protocol::WebSocket::Frame->new( buffer => $data, type => $type, fin => $fin, masked => $masked );
+    $heap->{wheel}->put($frame->to_bytes);
 }
 
 =head2 _socket_birth
@@ -427,53 +433,59 @@ Handle a socket when it connects to something
 =cut 
 
 sub _socket_birth { 
-        my ($kernel, $socket, $sockid, $heap) = @_[KERNEL, ARG0, ARG3, HEAP];
+    my ($kernel, $socket, $sockid, $heap) = @_[KERNEL, ARG0, ARG3, HEAP];
 
-        if ( uc($heap->{uri}->{scheme}) eq 'WSS' ) {
-                $heap->{_state}->{sslfilter} = POE::Filter::SSL->new(client=>1);
-
-                $heap->{filters}->{output} = POE::Filter::Stackable->new(Filters => [ $heap->{_state}->{sslfilter} ]);
-                $heap->{filters}->{input} = POE::Filter::Stackable->new(Filters => [ $heap->{_state}->{sslfilter} ]);
-        } else {
-                $heap->{filters}->{output} = POE::Filter::Stackable->new(Filters => []);
-                $heap->{filters}->{input} = POE::Filter::Stackable->new(Filters => []);
-        }
-                
-        $heap->{filters}->{output}->push(POE::Filter::Stream->new());
-        $heap->{filters}->{input}->push(POE::Filter::Stream->new());
-
-        $heap->{wheel} = POE::Wheel::ReadWrite->new(
-			Handle          => $socket,
-			Driver          => POE::Driver::SysRW->new(),
-			OutputFilter    => $heap->{filters}->{output},
-			InputFilter     => $heap->{filters}->{input},
-			InputEvent      => 'socket_input',
-			ErrorEvent      => 'socket_death',
+    if ( uc($heap->{uri}->{scheme}) eq 'WSS' ) {
+        $heap->{_state}->{sslfilter} = POE::Filter::SSL->new(
+            client => 1,
+            sni => $heap->{uri}->{host},
         );
 
-        my $request = HTTP::Request->new(GET => '/');
-        $request->protocol('HTTP/1.1');
-        $request->header(
-			Upgrade                         => 'WebSocket',
-			Connection                      => 'Upgrade',
-			Host                            => $heap->{uri}->{host},
-			Origin                          => $heap->{req}->{origin},
-			'Sec-WebSocket-Key'             => $heap->{req}->{'sec-websocket-key'},
-			'Sec-WebSocket-Protocol'        => 'chat',
-			'Sec-WebSocket-Version'         => 13,
-        );
-		
-		# Add a lock for when to stop reading the stream
-		$heap->{httpresp} = 1;
+        $heap->{filters}->{output} = POE::Filter::Stackable->new(Filters => [ $heap->{_state}->{sslfilter} ]);
+        $heap->{filters}->{input} = POE::Filter::Stackable->new(Filters => [ $heap->{_state}->{sslfilter} ]);
+    } else {
+        $heap->{filters}->{output} = POE::Filter::Stackable->new(Filters => []);
+        $heap->{filters}->{input} = POE::Filter::Stackable->new(Filters => []);
+    }
 
-		# Send the request to the server
-        $heap->{wheel}->put($request->as_string());
+    $heap->{filters}->{output}->push(POE::Filter::Stream->new());
+    $heap->{filters}->{input}->push(POE::Filter::Stream->new());
 
-        # Incase we want to investigate what we sent later.
-        $heap->{_state}->{req} = $request;
+    $heap->{wheel} = POE::Wheel::ReadWrite->new(
+        Handle          => $socket,
+        Driver          => POE::Driver::SysRW->new(),
+        OutputFilter    => $heap->{filters}->{output},
+        InputFilter     => $heap->{filters}->{input},
+        InputEvent      => 'socket_input',
+        ErrorEvent      => 'socket_death',
+    );
 
-		# Post back a copy of the request
-        $kernel->post( $heap->{parent}, $heap->{handlers}->{'connected'}, $request );
+    my $request = HTTP::Request->new(GET => $heap->{uri}->{full});
+    $request->protocol('HTTP/1.1');
+    $request->header(
+        'Upgrade'                   =>  'WebSocket',
+        'Connection'                =>  'Upgrade',
+        'Host'                      =>  $heap->{uri}->{host},
+        'Origin'                    =>  $heap->{req}->{origin},
+        'Sec-WebSocket-Key'         =>  $heap->{req}->{'sec-websocket-key'},
+        'Sec-WebSocket-Protocol'    =>  'chat',
+        'Sec-WebSocket-Version'     =>  13,
+        'Cache-Control'             =>  'no-cache',
+        'Pragma'                    =>  'no-cache',
+        'User-Agent'                =>  "POE::Component::Client::WebSocket $VERSION"
+    );
+
+    # Add a lock for when to stop reading the stream
+    $heap->{httpresp} = 1;
+
+    # Send the request to the server
+    $heap->{wheel}->put($request->as_string("\r\n"));
+
+    # Incase we want to investigate what we sent later.
+    $heap->{_state}->{req} = $request;
+
+    # Post back a copy of the request
+    $kernel->post( $heap->{parent}, $heap->{handlers}->{'connected'}, $request );
 }
 
 =head2 _socket_death
@@ -483,9 +495,9 @@ Handle a socket when it is disconnected
 =cut
 
 sub _socket_death { 
-	my ($kernel,$heap) = @_[KERNEL,HEAP];
-	
-	$kernel->post( $heap->{parent}, $heap->{handlers}->{disconnected} )	
+    my ($kernel,$heap) = @_[KERNEL,HEAP];
+    
+    $kernel->post( $heap->{parent}, $heap->{handlers}->{disconnected} )	
 }
 
 =head2 _socket_input
@@ -495,50 +507,51 @@ Read data from the socket
 =cut
 
 sub _socket_input { 
-        my ($kernel,$heap,$buf) = @_[KERNEL,HEAP,ARG0];
+    my ($kernel,$heap,$buf) = @_[KERNEL,HEAP,ARG0];
 
-		if ( $heap->{httpresp} ) {
-			$heap->{httpbuf} .= $buf;
-			
-			if ( $heap->{httpbuf} =~ m#\r\n$#m ) {
-				# Remove the lock
-				delete $heap->{httpresp};
-			
+    if ( $heap->{httpresp} ) {
+        $heap->{httpbuf} .= $buf;
+        
+        if ( $heap->{httpbuf} =~ m#\r\n$#m ) {
+                # Remove the lock
+                delete $heap->{httpresp};
+
                 # Keep a copy of the response we got incase we want to have a look at it later
                 $heap->{_state}->{res} = $buf;
-				
-				# Create an investigatable response object
-				my $resp = HTTP::Response->parse($heap->{httpbuf});
+
+                # Create an investigatable response object
+                my $resp = HTTP::Response->parse($heap->{httpbuf});
 
                 # Lets see if we can proceed
                 if ($resp->code() == 101) {
                     # Ok connected
 
-					# Send a copy of the handshake back to the users space
-					$kernel->post( $heap->{parent}, $heap->{handlers}->{'handshake'}, $resp );
+                    # Send a copy of the handshake back to the users space
+                    $kernel->post( $heap->{parent}, $heap->{handlers}->{'handshake'}, $resp );
                 }
-			}
+            }
 
-			return;
-		}
+            return;
+    }
 
-		$heap->{_state}->{frame}->append($buf);
+    $heap->{_state}->{frame}->append($buf);
 
-		while (my $frame = $heap->{_state}->{frame}->next) { $kernel->post( $heap->{parent}, $heap->{handlers}->{read}, $frame ) }
+    while (my $frame = $heap->{_state}->{frame}->next) { 
+        $kernel->post( $heap->{parent}, $heap->{handlers}->{read}, $frame ) 
+    }
 }
  
 =head1 AUTHOR
 
 Paul G Webster, C<< <daemon at cpan.org> >>
 
+=head1 Contributors
+
+Tom Ryder C << anonymous@while.verifying >>
+
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-poe-component-client-websocket at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-Client-WebSocket>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
+Please report any bugs or feature requests to L<https://github.com/PaulGWebster/POE-Component-Client-Websocket>
 
 =head1 SUPPORT
 
@@ -551,21 +564,17 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * GitHub (please report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-Client-WebSocket>
+L<https://github.com/PaulGWebster/POE-Component-Client-Websocket/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
 L<http://annocpan.org/dist/POE-Component-Client-WebSocket>
 
-=item * CPAN Ratings
+=item * Search MetaCPAN
 
-L<http://cpanratings.perl.org/d/POE-Component-Client-WebSocket>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/POE-Component-Client-WebSocket/>
+L<http://search.metacpan.org/dist/POE-Component-Client-WebSocket/>
 
 =back
 
@@ -575,7 +584,7 @@ L<http://search.cpan.org/dist/POE-Component-Client-WebSocket/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Paul G Webster.
+Copyright 2021 Paul G Webster.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

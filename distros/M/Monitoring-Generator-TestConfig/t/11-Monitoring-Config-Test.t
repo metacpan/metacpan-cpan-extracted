@@ -6,12 +6,6 @@ use File::Basename;
 use Monitoring::Generator::TestConfig;
 
 my $cleanup = 1;
-my $test_dir = tempdir(CLEANUP => $cleanup);
-my $mgt = Monitoring::Generator::TestConfig->new( 'output_dir' => $test_dir, 'overwrite_dir' => 1 );
-
-if(!defined $mgt->{'binary'} or ! -x $mgt->{'binary'}) {
-   plan( skip_all => 'no binary found at all, skipping config test' );
-}
 
 
 # which layouts to test
@@ -71,50 +65,59 @@ $configtests = {
                          },
 };
 
-for my $name (keys %{$configtests}) {
-    for my $layout (@layouts) {
-        my $test_dir = tempdir(CLEANUP => $cleanup);
-
-        my $conf = $configtests->{$name};
-        $conf->{'layout'}     = $layout;
-        $conf->{'output_dir'} = $test_dir;
-        my $mgt = Monitoring::Generator::TestConfig->new( %{$conf} );
-        isa_ok($mgt, 'Monitoring::Generator::TestConfig');
-        $mgt->create();
-
-        if(!defined $ENV{'TEST_AUTHOR'}) {
-            print "skipping further layout test for $layout: set \$ENV{TEST_AUTHOR}\n";
-            next;
-        }
-        if(! -x $mgt->{'binary'}) {
-            print "skipping further layout test for $layout: $!\n";
-            next;
-        }
-
-        my $testcommands = [];
-        if($layout eq 'shinken') {
-            my $basedir = dirname($mgt->{'binary'});
-            push @{$testcommands}, "cd ".$basedir." && ".$mgt->{'binary'}.' -v -c '.$test_dir.'/'.$mgt->{'layout'}.'.cfg';
-            push @{$testcommands}, $test_dir.'/init.d/'.$mgt->{'layout'}.' checkconfig';
-        } else {
-            push @{$testcommands}, $mgt->{'binary'}.' -v '.$test_dir.'/'.$mgt->{'layout'}.'.cfg';
-            push @{$testcommands}, $test_dir.'/init.d/'.$mgt->{'layout'}.' checkconfig';
-        }
-
-        # add some more tests
-        push @{$testcommands}, $test_dir.'/init.d/'.$mgt->{'layout'}.' start';
-        push @{$testcommands}, $test_dir.'/init.d/'.$mgt->{'layout'}.' status';
-        push @{$testcommands}, $test_dir.'/init.d/'.$mgt->{'layout'}.' stop';
-
-        for $cmd (@{$testcommands}) {
-            open(my $ph, '-|', $cmd) or die('exec "'.$cmd.'" failed: $!');
-            my $output = "";
-            while(<$ph>) {
-                $output .= $_;
+for my $layout (@layouts) {
+    SKIP: {
+        {
+            my $test_dir = tempdir(CLEANUP => $cleanup);
+            my $mgt = Monitoring::Generator::TestConfig->new( 'output_dir' => $test_dir, 'overwrite_dir' => 1, layout => $layout );
+            if(!defined $mgt->{'binary'} or ! -x $mgt->{'binary'}) {
+               skip "$layout, no binary found";
             }
-            close($ph);
-            my $rt = $?>>8;
-            is($rt,0,"$name: $cmd") or BAIL_OUT($output);
+        }
+        for my $name (keys %{$configtests}) {
+            my $test_dir = tempdir(CLEANUP => $cleanup);
+
+            my $conf = $configtests->{$name};
+            $conf->{'layout'}     = $layout;
+            $conf->{'output_dir'} = $test_dir;
+            my $mgt = Monitoring::Generator::TestConfig->new( %{$conf} );
+            isa_ok($mgt, 'Monitoring::Generator::TestConfig');
+            $mgt->create();
+
+            if(!defined $ENV{'TEST_AUTHOR'}) {
+                print "skipping further layout test for $layout: set \$ENV{TEST_AUTHOR}\n";
+                next;
+            }
+            if(! -x $mgt->{'binary'}) {
+                print "skipping further layout test for $layout: $!\n";
+                next;
+            }
+
+            my $testcommands = [];
+            if($layout eq 'shinken') {
+                my $basedir = dirname($mgt->{'binary'});
+                push @{$testcommands}, "cd ".$basedir." && ".$mgt->{'binary'}.' -v -c '.$test_dir.'/'.$mgt->{'layout'}.'.cfg';
+                push @{$testcommands}, $test_dir.'/init.d/'.$mgt->{'layout'}.' checkconfig';
+            } else {
+                push @{$testcommands}, $mgt->{'binary'}.' -v '.$test_dir.'/'.$mgt->{'layout'}.'.cfg';
+                push @{$testcommands}, $test_dir.'/init.d/'.$mgt->{'layout'}.' checkconfig';
+            }
+
+            # add some more tests
+            push @{$testcommands}, $test_dir.'/init.d/'.$mgt->{'layout'}.' start';
+            push @{$testcommands}, $test_dir.'/init.d/'.$mgt->{'layout'}.' status';
+            push @{$testcommands}, $test_dir.'/init.d/'.$mgt->{'layout'}.' stop';
+
+            for $cmd (@{$testcommands}) {
+                open(my $ph, '-|', $cmd) or die('exec "'.$cmd.'" failed: $!');
+                my $output = "";
+                while(<$ph>) {
+                    $output .= $_;
+                }
+                close($ph);
+                my $rt = $?>>8;
+                is($rt,0,"$name: $cmd") or BAIL_OUT($output);
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.12';
+    $VERSION = '0.13';
 }
 
 =encoding utf-8
@@ -147,6 +147,29 @@ C<$new> is rejected with the relevant value(s).
 
 =back
 
+=head1 B<EXPERIMENTAL:> ASYNC/AWAIT SUPPORT
+
+This module implements L<Future::AsyncAwait::Awaitable>.
+Once you load L<Future::AsyncAwait> this lets you do nifty stuff like:
+
+    use Future::AsyncAwait future_class => 'Promise::XS::Promise';
+
+    async sub do_stuff {
+        return 1 + await fetch_number_p();
+    }
+
+    my $one_plus_number = await do_stuff();
+
+… which roughly equates to:
+
+    sub do_stuff {
+        return fetch_number_p()->then( sub { 1 + $foo } );
+    }
+
+    do_stuff->then( sub {
+        $one_plus_number = shift;
+    } );
+
 =head1 EVENT LOOPS
 
 By default this library uses no event loop. This is a generally usable
@@ -217,7 +240,6 @@ Windows. There may be a workaround possible, but none is implemented for now.
 use Exporter 'import';
 our @EXPORT_OK= qw/all collect deferred resolved rejected/;
 
-use Promise::XS::Loader ();
 use Promise::XS::Deferred ();
 use Promise::XS::Promise ();
 
@@ -232,6 +254,9 @@ use constant DEFERRAL_CR => {
 # convenience
 *deferred = *Promise::XS::Deferred::create;
 
+require XSLoader;
+XSLoader::load('Promise::XS', $VERSION);
+
 sub use_event {
     my ($name, @args) = @_;
 
@@ -242,6 +267,39 @@ sub use_event {
         die( __PACKAGE__ . ": unknown event engine: $name" );
     }
 }
+
+sub _convert_to_our_promise {
+    my $thenable = shift;
+    my $deferred= Promise::XS::Deferred::create();
+    my $called;
+
+    local $@;
+    eval {
+        $thenable->then(sub {
+            return if $called++;
+            $deferred->resolve(@_);
+        }, sub {
+            return if $called++;
+            $deferred->reject(@_);
+        });
+        1;
+    } or do {
+        my $error= $@;
+        if (!$called++) {
+            $deferred->reject($error);
+        }
+    };
+
+    # This promise is purely internal, so let’s not warn
+    # when its rejection is unhandled.
+    $deferred->clear_unhandled_rejection();
+
+    return $deferred->promise;
+}
+
+Promise::XS::Deferred::___set_conversion_helper(
+    \&_convert_to_our_promise,
+);
 
 #----------------------------------------------------------------------
 # Aggregator functions

@@ -4,49 +4,42 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-        "NAME"                  =>      'POE::Component::Client::WebSocket',
-        "AUTHOR"                =>      q{Paul G Webster <daemon@cpan.org>},
-        "MIN_PERL_VERSION"      =>      "5.006",
-        "ABSTRACT"              =>      "A simplistic websocket client for use in POE applications.",
-        "CONFIGURE_REQUIRES"    =>      { "ExtUtils::MakeMaker" => 0 },
-        "DISTNAME"              =>      "POE-Component-Client-WebSocket",
-        "LICENSE"               =>      "artistic_2",
-        "PREREQ_PM"             =>      {
-                "POE"                           =>      0,
-                "POE::Filter::SSL"              =>      0,
-                "POE::Filter::HTTP::Parser"     =>      0,
-                "POE::Filter::Stackable"        =>      0,
-                "URI"                           =>      0,
-                "MIME::Base64"                  =>      0,
-                "Protocol::WebSocket::Frame"    =>      0,
-        },
-        TEST_REQUIRES          =>      {
-                'Test::More'                    =>      0,
-        },
-        VERSION_FROM           =>       'lib/POE/Component/Client/WebSocket.pm',
-        "test" => {
-                "TESTS"        => "t/*.t"
-        }
+    NAME             => 'POE::Component::Client::WebSocket',
+    AUTHOR           => q{Paul G Webster <daemon@cpan.org>},
+    VERSION_FROM     => 'lib/POE/Component/Client/WebSocket.pm',
+    ABSTRACT_FROM    => 'lib/POE/Component/Client/WebSocket.pm',
+    LICENSE          => 'agpl_3',
+    MIN_PERL_VERSION => '5.006',
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '0',
+    },
+    TEST_REQUIRES => {
+        'Test::More' => '0',
+    },
+    PREREQ_PM => {
+        #'ABC'              => '1.6',
+        #'Foo::Bar::Module' => '5.0401',
+    },
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean => { FILES => 'POE-Component-Client-*' },
 );
 
-my %FallbackPrereqs = (
-        "POE"                           =>      0,
-        "POE::Filter::SSL"              =>      0,
-        "POE::Filter::HTTP::Parser"     =>      0,
-        "POE::Filter::Stackable"        =>      0,
-        "URI"                           =>      0,
-        "MIME::Base64"                  =>      0,
-        "Protocol::WebSocket::Frame"    =>      0,
-);
-
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
-  delete $WriteMakefileArgs{TEST_REQUIRES};
-  delete $WriteMakefileArgs{BUILD_REQUIRES};
-  $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
+# Compatibility with old versions of ExtUtils::MakeMaker
+unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {
+    my $test_requires = delete $WriteMakefileArgs{TEST_REQUIRES} || {};
+    @{$WriteMakefileArgs{PREREQ_PM}}{keys %$test_requires} = values %$test_requires;
 }
- 
-delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
- 
-WriteMakefile(%WriteMakefileArgs);
 
+unless (eval { ExtUtils::MakeMaker->VERSION('6.55_03'); 1 }) {
+    my $build_requires = delete $WriteMakefileArgs{BUILD_REQUIRES} || {};
+    @{$WriteMakefileArgs{PREREQ_PM}}{keys %$build_requires} = values %$build_requires;
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
+delete $WriteMakefileArgs{MIN_PERL_VERSION}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
+delete $WriteMakefileArgs{LICENSE}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
+
+WriteMakefile(%WriteMakefileArgs);

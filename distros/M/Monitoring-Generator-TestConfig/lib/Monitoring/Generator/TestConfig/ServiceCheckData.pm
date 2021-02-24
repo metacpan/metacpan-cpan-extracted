@@ -20,7 +20,7 @@ sub get_test_servicecheck {
     my $self = shift;
     our $testservicecheck;
     return($testservicecheck) if defined $testservicecheck;
-    while(my $line = <DATA>) { $testservicecheck .= $line; }
+    $testservicecheck = do { local $/; <DATA> };
     return($testservicecheck);
 }
 

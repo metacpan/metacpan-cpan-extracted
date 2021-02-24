@@ -1,0 +1,67 @@
+{
+   "abstract" : "test that files do not contain soft breakpoints",
+   "author" : [
+      "James FitzGibbon <jfitz@cpan.org>, Apocalypse <APOCAL@cpan.org>, Chisel <chisel@chizography.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-NoBreakpoints",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "Test::Builder" : "0",
+            "strict" : "0",
+            "vars" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Test::More" : "0.92",
+            "Test::Tester" : "0.09",
+            "Test::UseAllModules" : "0",
+            "lib" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/renderorange/Test-NoBreakpoints/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/renderorange/Test-NoBreakpoints.git",
+         "web" : "https://github.com/renderorange/Test-NoBreakpoints"
+      }
+   },
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

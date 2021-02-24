@@ -1,5 +1,8 @@
 Revision history for Perl extension Monitoring::Generator::TestConfig.
 
+0.48  Tue Feb 23 17:08:24 CET 2021
+	add support to generate contacts and contactgroup
+
 0.46  Mon Dec 26 19:57:30 CET 2016
 	fix tests on later perl versions
 

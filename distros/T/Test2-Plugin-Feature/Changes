@@ -1,3 +1,7 @@
+0.001106  2021-02-23 13:39:08-05:00 America/Toronto
+
+    - Properly support pherkin match mode
+
 0.001105  2021-02-22 18:05:07-05:00 America/Toronto
 
     - Fix repository link

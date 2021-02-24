@@ -44,7 +44,6 @@
             "Alien::Build" : "2.37",
             "Alien::Build::MM" : "0.25",
             "Alien::Build::Plugin::Build::CMake" : "0.99",
-            "Alien::Build::Plugin::Build::Make" : "0.99",
             "ExtUtils::MakeMaker" : "7.46",
             "File::Spec" : "0"
          }
@@ -58,7 +57,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.03",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.37",
       "requires" : {

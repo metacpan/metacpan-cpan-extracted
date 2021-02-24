@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-10'; # DATE
+our $DATE = '2021-01-16'; # DATE
 our $DIST = 'WHO-GrowthReference-GenTable'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ add-who-growth-reference-fields-to-table - Add WHO reference fields to table
 
 =head1 VERSION
 
-This document describes version 0.001 of add-who-growth-reference-fields-to-table (from Perl distribution WHO-GrowthReference-GenTable), released on 2021-01-10.
+This document describes version 0.002 of add-who-growth-reference-fields-to-table (from Perl distribution WHO-GrowthReference-GenTable), released on 2021-01-16.
 
 =head1 SYNOPSIS
 
@@ -58,27 +58,31 @@ C<weight>. And these additional fields will be added:
 
  height_potential
  height_zscore
- height_z-3
- height_z-2
- height_z-1
- height_z0
- height_z+1
- height_z+2
- height_z+3
+ height_SD3neg
+ height_SD2neg
+ height_SD1neg
+ height_SD0
+ height_SD1
+ height_SD2
+ height_SD3
+ 
  weight_zscore
- weight_z-3
- weight_z-2
- weight_z-1
- weight_z0
- weight_z+1
- weight_z+2
- weight_z+3
+ weight_SD3neg
+ weight_SD2neg
+ weight_SD1neg
+ weight_SD0
+ weight_SD1
+ weight_SD2
+ weight_SD3
+ 
  bmi_zscore
- bmi_z-2
- bmi_z-1
- bmi_z0
- bmi_z+1
- bmi_z+2
+ bmi_SD3neg
+ bmi_SD2neg
+ bmi_SD1neg
+ bmi_SD0
+ bmi_SD1
+ bmi_SD2
+ bmi_SD3
 
 =head1 OPTIONS
 
@@ -252,7 +256,7 @@ Source repository is at L<https://github.com/perlancar/perl-WHO-GrowthReference-
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WHO-GrowthReference-GenTable>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WHO-GrowthReference-GenTable/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

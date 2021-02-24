@@ -23,7 +23,7 @@ no_index:
 provides:
   App::cpm:
     file: lib/App/cpm.pm
-    version: '0.997002'
+    version: '0.997003'
   App::cpm::CLI:
     file: lib/App/cpm/CLI.pm
   App::cpm::CircularDependency:
@@ -80,9 +80,8 @@ provides:
     file: lib/App/cpm/version.pm
 recommends:
   Carton: '0'
-  IO::Uncompress::Gunzip: '0'
 requires:
-  CPAN::Common::Index: '0'
+  CPAN::02Packages::Search: '0'
   CPAN::DistnameInfo: '0'
   CPAN::Meta: '0'
   CPAN::Meta::Requirements: '2.130'
@@ -109,7 +108,7 @@ resources:
   bugtracker: https://github.com/skaji/cpm/issues
   homepage: https://github.com/skaji/cpm
   repository: https://github.com/skaji/cpm.git
-version: '0.997002'
+version: '0.997003'
 x_contributors:
   - 'Andrew Rodland <andrew@cleverdomain.org>'
   - 'Dave Rolsky <autarch@urth.org>'

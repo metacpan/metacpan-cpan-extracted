@@ -5,8 +5,8 @@ use strict;
 use warnings;
 use Carp;
 use POSIX qw(ceil);
-use File::Which;
 use Data::Dumper;
+use IPC::Cmd qw(can_run);
 use Monitoring::Generator::TestConfig::ServiceCheckData;
 use Monitoring::Generator::TestConfig::HostCheckData;
 use Monitoring::Generator::TestConfig::InitScriptData;
@@ -14,7 +14,7 @@ use Monitoring::Generator::TestConfig::P1Data;
 use Monitoring::Generator::TestConfig::Modules::Shinken;
 use Monitoring::Generator::TestConfig::ShinkenInitScriptData;
 
-our $VERSION = '0.46';
+our $VERSION = '0.48';
 
 =head1 NAME
 
@@ -46,7 +46,7 @@ Arguments are in key-value pairs.
     layout                      which config should be generated, valid options are "nagios", "icinga", "shinken" and "omd"
     user                        user, defaults to the current user
     group                       group, defaults to the current users group
-    prefix                      prefix to all hosts / services
+    prefix                      prefix to all hosts / services / contacts / contactgroups
     binary                      path to your nagios/icinga bin
     hostcount                   amount of hosts to export, Default 10
     hostcheckcmd                use custom hostcheck command line
@@ -62,6 +62,13 @@ Arguments are in key-value pairs.
     router_types                key/value settings for percentage of hosttypes for router
     service_types               key/value settings for percentage of servicetypes, possible keys are ok,warning,critical,unknown,flap,random,block
     skip_dependencys            no service dependencys will be exported
+    contactscount               amount of contacts to export, Default 1
+    contactgroupscount          amount of contactgroups to export, Default 1
+    contactspergroup            amount of contacts to export, Default 1
+    contactsperhost             amount of contacts per host, Default 0
+    contactgroupsperhost        amount of contactgroups per host, Default 1
+    contactsperservice          amount of contacts per service, Default 0
+    contactgroupsperservice     amount of contactgroups per service, Default 1
 
 =back
 
@@ -79,6 +86,13 @@ sub new {
                     'prefix'              => '',
                     'overwrite_dir'       => 0,
                     'binary'              => undef,
+                    'contactscount'       => 1,
+                    'contactgroupscount'  => 1,
+                    'contactspergroup'    => 1,
+                    'contactsperhost'     => 0,
+                    'contactgroupsperhost'=> 1,
+                    'contactsperservice'  => 0,
+                    'contactgroupsperservice' => 1,
                     'routercount'         => 5,
                     'hostcount'           => 10,
                     'hostcheckcmd'        => undef,
@@ -203,13 +217,13 @@ sub new {
     if(!defined $self->{'binary'}) {
         my @possible_bin_locations;
         if($self->{'layout'} eq 'nagios') {
-            $self->{'binary'} = which('nagios3') || which('nagios') || undef;
+            $self->{'binary'} = can_run('nagios3') || can_run('nagios') || undef;
             @possible_bin_locations = qw|/usr/sbin/nagios3 /usr/bin/nagios3 /usr/local/bin/nagios3 /usr/sbin/nagios /usr/bin/nagios /usr/local/bin/nagios|;
         } elsif($self->{'layout'} eq 'icinga' ) {
-            $self->{'binary'} = which('icinga') || undef;
+            $self->{'binary'} = can_run('icinga') || undef;
             @possible_bin_locations = qw|/usr/sbin/icinga /usr/bin/icinga /usr/local/bin/icinga|;
         } elsif($self->{'layout'} eq 'shinken' ) {
-            $self->{'binary'} = which('shinken-arbiter') || '/usr/local/shinken/bin/shinken-arbiter';
+            $self->{'binary'} = can_run('shinken-arbiter') || '/usr/local/shinken/bin/shinken-arbiter';
         }
 
         # still not defined?
@@ -277,11 +291,11 @@ sub create {
     # export config files and plugins
     my $init = $self->{'layout'};
     my $objects = {};
-    $objects = $self->_set_hosts_cfg($objects);
+    my($contactnames, $contactgroupnames) = $self->_set_contacts_cfg($objects);
+    $objects = $self->_set_hosts_cfg($objects, $contactnames, $contactgroupnames);
     $objects = $self->_set_hostgroups_cfg($objects);
-    $objects = $self->_set_services_cfg($objects);
+    $objects = $self->_set_services_cfg($objects, $contactnames, $contactgroupnames);
     $objects = $self->_set_servicegroups_cfg($objects);
-    $objects = $self->_set_contacts_cfg($objects);
     $objects = $self->_set_commands_cfg($objects);
     $objects = $self->_set_timeperiods_cfg($objects);
     my $obj_prefix = '/etc/conf.d';
@@ -374,8 +388,7 @@ sub create {
 
 ########################################
 sub _set_hosts_cfg {
-    my $self    = shift;
-    my $objects = shift;
+    my($self, $objects, $contactnames, $contactgroupnames) = @_;
 
     $objects->{'host'} = [] unless defined $objects->{'host'};
 
@@ -395,7 +408,6 @@ sub _set_hosts_cfg {
         'notification_interval'          => 0,
         'notification_period'            => '24x7',
         'notification_options'           => 'd,u,r',
-        'contact_groups'                 => 'test_contact',
         'register'                       => 0,
     };
 
@@ -441,6 +453,20 @@ sub _set_hosts_cfg {
                 $host->{'action_url'}     = 'http://google.com/?q=$HOSTNAME$';
             }
 
+            # add contacts
+            my @contacts = ();
+            for(my $z = 0; $z < $self->{'contactsperhost'}; $z++) {
+                push @contacts, $contactnames->[ rand @{$contactnames} ];
+            }
+            $host->{'contacts'} = join(',', @contacts) if scalar @contacts > 0;
+
+            # add contactgroups
+            my @contactgroups = ();
+            for(my $z = 0; $z < $self->{'contactgroupsperhost'}; $z++) {
+                push @contactgroups, $contactgroupnames->[ rand @{$contactgroupnames} ];
+            }
+            $host->{'contact_groups'} = join(',', @contactgroups) if scalar @contactgroups > 0;
+
             $host = $self->_merge_config_hashes($host, $self->{'host_settings'});
             push @{$objects->{'host'}}, $host;
         }
@@ -474,6 +500,20 @@ sub _set_hosts_cfg {
         }
         $host->{'active_checks_enabled'} = '0' if $type eq 'pending';
 
+        # add contacts
+        my @contacts = ();
+        for(my $z = 0; $z < $self->{'contactsperhost'}; $z++) {
+            push @contacts, $contactnames->[ rand @{$contactnames} ];
+        }
+        $host->{'contacts'} = join(',', @contacts) if scalar @contacts > 0;
+
+        # add contactgroups
+        my @contactgroups = ();
+        for(my $z = 0; $z < $self->{'contactgroupsperhost'}; $z++) {
+            push @contactgroups, $contactgroupnames->[ rand @{$contactgroupnames} ];
+        }
+        $host->{'contact_groups'} = join(',', @contactgroups) if scalar @contactgroups > 0;
+
         $host = $self->_merge_config_hashes($host, $self->{'host_settings'});
         push @{$objects->{'host'}}, $host;
     }
@@ -506,8 +546,7 @@ sub _set_hostgroups_cfg {
 
 ########################################
 sub _set_services_cfg {
-    my $self = shift;
-    my $objects = shift;
+    my($self, $objects, $contactnames, $contactgroupnames) = @_;
 
     $objects->{'service'} = [] unless defined $objects->{'service'};
 
@@ -533,7 +572,6 @@ sub _set_services_cfg {
         'max_check_attempts'              => 3,
         'notification_period'             => '24x7',
         'notification_options'            => 'w,u,c,r',
-        'contact_groups'                  => 'test_contact',
         'register'                        => 0,
     };
 
@@ -581,6 +619,20 @@ sub _set_services_cfg {
                 $service->{'notes_url'}      = 'http://google.com/?q=$HOSTNAME$';
                 $service->{'action_url'}     = 'http://google.com/?q=$HOSTNAME$';
             }
+
+            # add contacts
+            my @contacts = ();
+            for(my $z = 0; $z < $self->{'contactsperservice'}; $z++) {
+                push @contacts, $contactnames->[ rand @{$contactnames} ];
+            }
+            $service->{'contacts'} = join(',', @contacts) if scalar @contacts > 0;
+
+            # add contactgroups
+            my @contactgroups = ();
+            for(my $z = 0; $z < $self->{'contactgroupsperservice'}; $z++) {
+                push @contactgroups, $contactgroupnames->[ rand @{$contactgroupnames} ];
+            }
+            $service->{'contact_groups'} = join(',', @contactgroups) if scalar @contactgroups > 0;
 
             $service = $self->_merge_config_hashes($service, $self->{'service_settings'});
             push @{$objects->{'service'}}, $service;
@@ -643,30 +695,47 @@ sub _set_servicedependency_cfg {
 
 ########################################
 sub _set_contacts_cfg {
-    my $self    = shift;
-    my $objects = shift;
-
-    $objects->{'contactgroup'} = [] unless defined $objects->{'contactgroup'};
-    push @{$objects->{'contactgroup'}}, {
-        'contactgroup_name'  => 'test_contact',
-        'alias'              => 'test_contacts_alias',
-        'members'            => 'test_contact',
-    };
+    my($self, $objects) = @_;
 
     $objects->{'contact'} = [] unless defined $objects->{'contact'};
-    push @{$objects->{'contact'}}, {
-        'contact_name'                  => 'test_contact',
-        'alias'                         => 'test_contact_alias',
-        'service_notification_period'   => '24x7',
-        'host_notification_period'      => '24x7',
-        'service_notification_options'  => 'w,u,c,r',
-        'host_notification_options'     => 'd,r',
-        'service_notification_commands' => 'notify-service',
-        'host_notification_commands'    => 'notify-host',
-        'email'                         => 'nobody@localhost',
-    };
+    my @contacts = ();
+    my $nr_length = $self->{'fixed_length'} || length($self->{'contactscount'});
+    for(my $x = 0; $x < $self->{'contactscount'}; $x++) {
+        my $nr   = sprintf("%0".$nr_length."d", $x);
+        my $name = $self->{'prefix'}."contact_".$nr;
+        push @contacts, $name;
+        push @{$objects->{'contact'}}, {
+            'contact_name'                  => $name,
+            'alias'                         => $self->{'prefix'}."contactalias_".$nr,
+            'service_notification_period'   => '24x7',
+            'host_notification_period'      => '24x7',
+            'service_notification_options'  => 'w,u,c,r',
+            'host_notification_options'     => 'd,r',
+            'service_notification_commands' => 'notify-service',
+            'host_notification_commands'    => 'notify-host',
+            'email'                         => 'nobody@localhost',
+        };
+    }
 
-    return($objects);
+    my @contactgroups = ();
+    $objects->{'contactgroup'} = [] unless defined $objects->{'contactgroup'};
+    $nr_length = $self->{'fixed_length'} || length($self->{'contactgroupscount'});
+    for(my $x = 0; $x < $self->{'contactgroupscount'}; $x++) {
+        my $nr = sprintf("%0".$nr_length."d", $x);
+        my @members = ();
+        for(my $y = 0; $y < $self->{'contactspergroup'}; $y++) {
+            push @members, $contacts[ rand @contacts ];
+        }
+        my $name = $self->{'prefix'}."contactgroup_".$nr;
+        push @contactgroups, $name;
+        push @{$objects->{'contactgroup'}}, {
+            'contactgroup_name'  => $name,
+            'alias'              => $self->{'prefix'}."groupalias_".$nr,
+            'members'            => join(',', @members),
+        };
+    }
+
+    return(\@contacts, \@contactgroups);
 }
 
 ########################################

@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use App::FilePacker;
+
+my $help = <<EOF;
+filepacker - $App::FilePacker::VERSION
+
+Usage:
+    filepacker <file> [module] <dir>
+
+Arguments:
+    <file>   - The name of the file to create.
+    [module] - The module name used in the package line.
+    <dir>    - The directory containing the files to pack.
+
+This program will create a self-extracting tarball as a Perl module.
+
+The newly created module will contain a single function C<extract> that 
+takes a directory as an argument and will unpack the tarbell into that 
+directory.
+
+EOF
+
+if ( ( @ARGV <= 1 ) or ( @ARGV >= 4  ) ) {
+    print $help;
+    exit -1;
+} elsif ( @ARGV == 2 ) {
+    my ( $file, $directory ) = @ARGV;
+    my $module = substr( $file, 0, -3 ); # Drop expected .pm
+
+    App::FilePacker->new(
+        out  => $file,
+        name => $module,
+        dir  => $directory,
+    )->write;
+
+} elsif ( @ARGV == 3 ) {
+    my ( $file, $module, $directory ) = @ARGV;
+    App::FilePacker->new(
+        out  => $file,
+        name => $module,
+        dir  => $directory,
+    )->write;
+}
+

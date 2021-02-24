@@ -9,5 +9,5 @@ Name: jq
 Description: lightweight and flexible command-line JSON processor
 Version: @PACKAGE_VERSION@
 Requires:
-Libs: -L${libdir} -ljq -lonig
+Libs: -L${libdir} -ljq -lonig -lm
 Cflags: -I${includedir}

@@ -1,5 +1,10 @@
 Revision history for Perl extension Promise::XS:
 
+0.13
+- Experimental async/await support added.
+- Skip failing (not super-consequential) test on 5.8.
+- Fix CPAN.pm installation problems.
+
 0.12 Wed 13 Jan 2021
 - Detect and throw on infinite recursion (issue #4).
 

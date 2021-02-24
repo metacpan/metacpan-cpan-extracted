@@ -70814,3 +70814,14 @@ S/SG/SGRAY/POSIX-Run-Capture-1.03.tar.gz
 H/HA/HAYASHI/Term-ReadLine-Gnu-1.40.tar.gz
 J/JK/JKUTEJ/Web-PageMeta-0.02.tar.gz
 P/PE/PERLANCAR/WHO-GrowthReference-Table-0.006.tar.gz
+D/DO/DONGXU/Alien-LibJQ-0.03.tar.gz
+S/SK/SKAJI/App-cpm-0.997003.tar.gz
+S/SY/SYMKAT/App-FilePacker-0.001.tar.gz
+Y/YL/YLAVOIE/Test2-Plugin-Feature-0.001106.tar.gz
+E/ES/ESTRELOW/HTTP-Request-Webpush-0.15.tar.gz
+K/KI/KIAVASH/kateb/kateb-01.00.25.tar.gz
+N/NI/NIERLEIN/Monitoring-Generator-TestConfig-0.48.tar.gz
+D/DA/DAEMON/POE-Component-Client-WebSocket-0.29.tar.gz
+F/FE/FELIPE/Promise-XS-0.13.tar.gz
+B/BL/BLAINEM/Test-NoBreakpoints-0.16.tar.gz
+P/PE/PERLANCAR/WHO-GrowthReference-GenTable-0.002.tar.gz

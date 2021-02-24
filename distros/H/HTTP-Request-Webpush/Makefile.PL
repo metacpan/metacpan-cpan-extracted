@@ -9,7 +9,7 @@ WriteMakefile(
     VERSION_FROM    => 'lib/HTTP/Request/Webpush.pm',
     test => {TESTS => 't/*.t'},
     LICENSE => "apache_2_0",
-    AUTHOR => 'Erich Strelow <estrelow@cpan.org',
+    AUTHOR => 'Erich Strelow <estrelow@cpan.org>',
     PREREQ_PM => {
        "JSON"        => "2.00",
        "Crypt::JWT"  => "0.013",

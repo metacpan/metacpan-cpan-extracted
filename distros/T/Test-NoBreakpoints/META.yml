@@ -1,33 +1,37 @@
 ---
 abstract: 'test that files do not contain soft breakpoints'
 author:
-  - 'James FitzGibbon <jfitz@cpan.org>'
-  - 'Apocalypse <APOCAL@cpan.org>'
-  - 'Chisel <chisel@chizography.net>'
+  - 'James FitzGibbon <jfitz@cpan.org>, Apocalypse <APOCAL@cpan.org>, Chisel <chisel@chizography.net>'
 build_requires:
-  File::Find: 0
-  Test::Exception: 0
-  Test::More: 0.92
-  Test::Tester: 0.09
-  Test::UseAllModules: 0
-  warnings: 0
+  ExtUtils::MakeMaker: '6.52'
+  File::Find: '0'
+  Test::More: '0.92'
+  Test::Tester: '0.09'
+  Test::UseAllModules: '0'
+  lib: '0'
+  warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Test-NoBreakpoints
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Exporter: 0
-  File::Find: 0
-  File::Spec: 0
-  Test::Builder: 0
-  strict: 0
-  vars: 0
+  Exporter: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  Test::Builder: '0'
+  strict: '0'
+  vars: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Test-NoBreakpoints
-  repository: git://github.com/jf647/Test-NoBreakpoints.git
-version: 0.15
+  bugtracker: http://github.com/renderorange/Test-NoBreakpoints/issues
+  repository: git://github.com/renderorange/Test-NoBreakpoints.git
+version: '0.16'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

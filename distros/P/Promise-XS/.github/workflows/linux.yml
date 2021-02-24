@@ -50,6 +50,8 @@ jobs:
         run: "cpanm --notest IO::Async ||:"
       - name: Install Mojolicious (optional)
         run: "cpanm --notest Mojolicious ||:"
+      - name: Install Future::AsyncAwait (optional)
+        run: "cpanm --notest Future::AsyncAwait ||:"
       - name: Install Dependencies
         run: cpanm --notest --installdeps .
       - name: perl Makefile.PL

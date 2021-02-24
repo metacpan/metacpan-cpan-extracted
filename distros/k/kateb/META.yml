@@ -33,5 +33,5 @@ requires:
   perl: '5.012'
 resources:
   repository: https://github.com/kiamazi/kateb.git
-version: v01.00.23
+version: v01.00.25
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

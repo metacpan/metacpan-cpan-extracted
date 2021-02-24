@@ -1,7 +1,7 @@
 # This Makefile is for the POE::Component::Client::WebSocket extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# 7.1002 (Revision: 71002) from the contents of
+# 7.44 (Revision: 74400) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
@@ -11,45 +11,45 @@
 
 #   MakeMaker Parameters:
 
-#     ABSTRACT => q[A simplistic websocket client for use in POE applications.]
+#     ABSTRACT_FROM => q[lib/POE/Component/Client/WebSocket.pm]
 #     AUTHOR => [q[Paul G Webster <daemon@cpan.org>]]
 #     BUILD_REQUIRES => {  }
 #     CONFIGURE_REQUIRES => { ExtUtils::MakeMaker=>q[0] }
-#     DISTNAME => q[POE-Component-Client-WebSocket]
-#     LICENSE => q[artistic_2]
+#     LICENSE => q[agpl_3]
 #     MIN_PERL_VERSION => q[5.006]
 #     NAME => q[POE::Component::Client::WebSocket]
-#     PREREQ_PM => { MIME::Base64=>q[0], POE=>q[0], POE::Filter::HTTP::Parser=>q[0], POE::Filter::SSL=>q[0], POE::Filter::Stackable=>q[0], Protocol::WebSocket::Frame=>q[0], Test::More=>q[0], URI=>q[0] }
+#     PREREQ_PM => { Test::More=>q[0] }
 #     TEST_REQUIRES => { Test::More=>q[0] }
 #     VERSION_FROM => q[lib/POE/Component/Client/WebSocket.pm]
-#     test => { TESTS=>q[t/*.t] }
+#     clean => { FILES=>q[POE-Component-Client-*] }
+#     dist => { COMPRESS=>q[gzip -9f], SUFFIX=>q[gz] }
 
 # --- MakeMaker post_initialize section:
 
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /usr/local/lib/perl5/5.24/mach/Config.pm).
+# These definitions are from config.sh (via /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/5.32.0/x86_64-linux/Config.pm).
 # They may have been overridden via Makefile.PL or on the command line.
 AR = ar
 CC = cc
-CCCDLFLAGS = -DPIC -fPIC
-CCDLFLAGS =   -Wl,-R/usr/local/lib/perl5/5.24/mach/CORE
+CCCDLFLAGS = -fPIC
+CCDLFLAGS = -Wl,-E
 DLEXT = so
 DLSRC = dl_dlopen.xs
 EXE_EXT = 
 FULL_AR = /usr/bin/ar
 LD = cc
-LDDLFLAGS = -shared  -L/usr/local/lib/perl5/5.24/mach/CORE -lperl -L/usr/local/lib -fstack-protector-strong
-LDFLAGS = -lpthread -Wl,-E  -fstack-protector-strong -L/usr/local/lib
-LIBC = 
+LDDLFLAGS = -shared -O2 -L/usr/local/lib -fstack-protector-strong
+LDFLAGS =  -fstack-protector-strong -L/usr/local/lib
+LIBC = libc-2.28.so
 LIB_EXT = .a
 OBJ_EXT = .o
-OSNAME = freebsd
-OSVERS = 11.0-release-p10
+OSNAME = linux
+OSVERS = 4.19.0-14-amd64
 RANLIB = :
-SITELIBEXP = /usr/local/lib/perl5/site_perl
-SITEARCHEXP = /usr/local/lib/perl5/site_perl/mach/5.24
+SITELIBEXP = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/site_perl/5.32.0
+SITEARCHEXP = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/site_perl/5.32.0/x86_64-linux
 SO = so
 VENDORARCHEXP = 
 VENDORLIBEXP = 
@@ -61,11 +61,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = POE::Component::Client::WebSocket
 NAME_SYM = POE_Component_Client_WebSocket
-VERSION = 0.27
+VERSION = 0.29
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_27
+VERSION_SYM = 0_29
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.27
+XS_VERSION = 0.29
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -76,58 +76,62 @@ INST_MAN1DIR = blib/man1
 INST_MAN3DIR = blib/man3
 MAN1EXT = 1
 MAN3EXT = 3
+MAN1SECTION = 1
+MAN3SECTION = 3
 INSTALLDIRS = site
-INSTALL_BASE = /home/paul/perl5
 DESTDIR = 
-PREFIX = $(INSTALL_BASE)
-INSTALLPRIVLIB = $(INSTALL_BASE)/lib/perl5
+PREFIX = $(SITEPREFIX)
+PERLPREFIX = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0
+SITEPREFIX = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0
+VENDORPREFIX = 
+INSTALLPRIVLIB = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/5.32.0
 DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)
-INSTALLSITELIB = $(INSTALL_BASE)/lib/perl5
+INSTALLSITELIB = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/site_perl/5.32.0
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
-INSTALLVENDORLIB = $(INSTALL_BASE)/lib/perl5
+INSTALLVENDORLIB = 
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = $(INSTALL_BASE)/lib/perl5/amd64-freebsd-thread-multi
+INSTALLARCHLIB = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/5.32.0/x86_64-linux
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = $(INSTALL_BASE)/lib/perl5/amd64-freebsd-thread-multi
+INSTALLSITEARCH = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/site_perl/5.32.0/x86_64-linux
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
-INSTALLVENDORARCH = $(INSTALL_BASE)/lib/perl5/amd64-freebsd-thread-multi
+INSTALLVENDORARCH = 
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
-INSTALLBIN = $(INSTALL_BASE)/bin
+INSTALLBIN = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/bin
 DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)
-INSTALLSITEBIN = $(INSTALL_BASE)/bin
+INSTALLSITEBIN = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/bin
 DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)
-INSTALLVENDORBIN = $(INSTALL_BASE)/bin
+INSTALLVENDORBIN = 
 DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)
-INSTALLSCRIPT = $(INSTALL_BASE)/bin
+INSTALLSCRIPT = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/bin
 DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)
-INSTALLSITESCRIPT = $(INSTALL_BASE)/bin
+INSTALLSITESCRIPT = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/bin
 DESTINSTALLSITESCRIPT = $(DESTDIR)$(INSTALLSITESCRIPT)
-INSTALLVENDORSCRIPT = $(INSTALL_BASE)/bin
+INSTALLVENDORSCRIPT = 
 DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)
-INSTALLMAN1DIR = $(INSTALL_BASE)/man/man1
+INSTALLMAN1DIR = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/man/man1
 DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)
-INSTALLSITEMAN1DIR = $(INSTALL_BASE)/man/man1
+INSTALLSITEMAN1DIR = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/man/man1
 DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)
-INSTALLVENDORMAN1DIR = $(INSTALL_BASE)/man/man1
+INSTALLVENDORMAN1DIR = 
 DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)
-INSTALLMAN3DIR = $(INSTALL_BASE)/man/man3
+INSTALLMAN3DIR = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/man/man3
 DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)
-INSTALLSITEMAN3DIR = $(INSTALL_BASE)/man/man3
+INSTALLSITEMAN3DIR = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/man/man3
 DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
-INSTALLVENDORMAN3DIR = $(INSTALL_BASE)/man/man3
+INSTALLVENDORMAN3DIR = 
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
-PERL_LIB = /usr/local/lib/perl5/5.24
-PERL_ARCHLIB = /usr/local/lib/perl5/5.24/mach
-PERL_ARCHLIBDEP = /usr/local/lib/perl5/5.24/mach
+PERL_LIB = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/5.32.0
+PERL_ARCHLIB = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/5.32.0/x86_64-linux
+PERL_ARCHLIBDEP = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/5.32.0/x86_64-linux
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile
 MAKEFILE_OLD = Makefile.old
 MAKE_APERL_FILE = Makefile.aperl
 PERLMAINCC = $(CC)
-PERL_INC = /usr/local/lib/perl5/5.24/mach/CORE
-PERL_INCDEP = /usr/local/lib/perl5/5.24/mach/CORE
-PERL = "/usr/local/bin/perl5.24.1"
-FULLPERL = "/usr/local/bin/perl5.24.1"
+PERL_INC = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/5.32.0/x86_64-linux/CORE
+PERL_INCDEP = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/5.32.0/x86_64-linux/CORE
+PERL = "/home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/bin/perl"
+FULLPERL = "/home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/bin/perl"
 ABSPERL = $(PERL)
 PERLRUN = $(PERL)
 FULLPERLRUN = $(FULLPERL)
@@ -140,9 +144,9 @@ PERM_DIR = 755
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /usr/local/lib/perl5/5.24/ExtUtils/MakeMaker.pm
-MM_VERSION  = 7.1002
-MM_REVISION = 71002
+MAKEMAKER   = /home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/5.32.0/ExtUtils/MakeMaker.pm
+MM_VERSION  = 7.44
+MM_REVISION = 74400
 
 # FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
 # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
@@ -190,12 +194,9 @@ PERL_ARCHIVE_AFTER =
 
 TO_INST_PM = lib/POE/Component/Client/WebSocket.pm
 
-PM_TO_BLIB = lib/POE/Component/Client/WebSocket.pm \
-	blib/lib/POE/Component/Client/WebSocket.pm
-
 
 # --- MakeMaker platform_constants section:
-MM_Unix_VERSION = 7.1002
+MM_Unix_VERSION = 7.44
 PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc
 
 
@@ -250,7 +251,7 @@ TAR = tar
 TARFLAGS = cvf
 ZIP = zip
 ZIPFLAGS = -r
-COMPRESS = gzip --best
+COMPRESS = gzip -9f
 SUFFIX = .gz
 SHAR = shar
 PREOP = $(NOECHO) $(NOOP)
@@ -261,7 +262,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = POE-Component-Client-WebSocket
-DISTVNAME = POE-Component-Client-WebSocket-0.27
+DISTVNAME = POE-Component-Client-WebSocket-0.29
 
 
 # --- MakeMaker macro section:
@@ -287,13 +288,14 @@ DISTVNAME = POE-Component-Client-WebSocket-0.27
 PASTHRU = LIBPERL_A="$(LIBPERL_A)"\
 	LINKTYPE="$(LINKTYPE)"\
 	PREFIX="$(PREFIX)"\
-	INSTALL_BASE="$(INSTALL_BASE)"
+	PASTHRU_DEFINE='$(DEFINE) $(PASTHRU_DEFINE)'\
+	PASTHRU_INC='$(INC) $(PASTHRU_INC)'
 
 
 # --- MakeMaker special_targets section:
 .SUFFIXES : .xs .c .C .cpp .i .s .cxx .cc $(OBJ_EXT)
 
-.PHONY: all config static dynamic test linkext manifest blibdirs clean realclean disttest distdir
+.PHONY: all config static dynamic test linkext manifest blibdirs clean realclean disttest distdir pure_all subdirs clean_subdirs makemakerdflt manifypods realclean_subdirs subdirs_dynamic subdirs_pure_nolink subdirs_static subdirs-test_dynamic subdirs-test_static test_dynamic test_static
 
 
 
@@ -310,8 +312,9 @@ PASTHRU = LIBPERL_A="$(LIBPERL_A)"\
 all :: pure_all manifypods
 	$(NOECHO) $(NOOP)
 
-
 pure_all :: config pm_to_blib subdirs linkext
+	$(NOECHO) $(NOOP)
+
 	$(NOECHO) $(NOOP)
 
 subdirs :: $(MYEXTLIB)
@@ -376,7 +379,7 @@ $(INST_MAN3DIR)$(DFSEP).exists :: Makefile.PL
 
 # --- MakeMaker linkext section:
 
-linkext :: $(LINKTYPE)
+linkext :: dynamic
 	$(NOECHO) $(NOOP)
 
 
@@ -390,7 +393,7 @@ BOOTSTRAP =
 
 # --- MakeMaker dynamic section:
 
-dynamic :: $(FIRST_MAKEFILE) $(BOOTSTRAP) $(INST_DYNAMIC)
+dynamic :: $(FIRST_MAKEFILE) config $(INST_BOOT) $(INST_DYNAMIC)
 	$(NOECHO) $(NOOP)
 
 
@@ -414,9 +417,9 @@ POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"
 POD2MAN = $(POD2MAN_EXE)
 
 
-manifypods : pure_all  \
+manifypods : pure_all config  \
 	lib/POE/Component/Client/WebSocket.pm
-	$(NOECHO) $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) -u \
+	$(NOECHO) $(POD2MAN) --section=$(MAN3SECTION) --perm_rw=$(PERM_RW) -u \
 	  lib/POE/Component/Client/WebSocket.pm $(INST_MAN3DIR)/POE::Component::Client::WebSocket.$(MAN3EXT) 
 
 
@@ -461,19 +464,20 @@ clean :: clean_subdirs
 	  pm_to_blib.ts so_locations \
 	  tmon.out 
 	- $(RM_RF) \
-	  blib 
+	  POE-Component-Client-* blib 
 	  $(NOECHO) $(RM_F) $(MAKEFILE_OLD)
 	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
 
 
 # --- MakeMaker realclean_subdirs section:
-realclean_subdirs :
+# so clean is forced to complete before realclean_subdirs runs
+realclean_subdirs : clean
 	$(NOECHO) $(NOOP)
 
 
 # --- MakeMaker realclean section:
 # Delete temporary files (via clean) and also delete dist files
-realclean purge ::  clean realclean_subdirs
+realclean purge :: realclean_subdirs
 	- $(RM_F) \
 	  $(FIRST_MAKEFILE) $(MAKEFILE_OLD) 
 	- $(RM_RF) \
@@ -484,7 +488,7 @@ realclean purge ::  clean realclean_subdirs
 metafile : create_distdir
 	$(NOECHO) $(ECHO) Generating META.yml
 	$(NOECHO) $(ECHO) '---' > META_new.yml
-	$(NOECHO) $(ECHO) 'abstract: '\''A simplistic websocket client for use in POE applications.'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'abstract: '\''A POE compatible websocket client'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'author:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  - '\''Paul G Webster <daemon@cpan.org>'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'build_requires:' >> META_new.yml
@@ -493,8 +497,8 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'configure_requires:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  ExtUtils::MakeMaker: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'dynamic_config: 1' >> META_new.yml
-	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) 'license: artistic_2' >> META_new.yml
+	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'license: open_source' >> META_new.yml
 	$(NOECHO) $(ECHO) 'meta-spec:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  url: http://module-build.sourceforge.net/META-spec-v1.4.html' >> META_new.yml
 	$(NOECHO) $(ECHO) '  version: '\''1.4'\''' >> META_new.yml
@@ -504,31 +508,24 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '    - t' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
-	$(NOECHO) $(ECHO) '  MIME::Base64: '\''0'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  POE: '\''0'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  POE::Filter::HTTP::Parser: '\''0'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  POE::Filter::SSL: '\''0'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  POE::Filter::Stackable: '\''0'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  Protocol::WebSocket::Frame: '\''0'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  URI: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  perl: '\''5.006'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''0.27'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''0.29'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
-	$(NOECHO) $(ECHO) '   "abstract" : "A simplistic websocket client for use in POE applications.",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "abstract" : "A POE compatible websocket client",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "author" : [' >> META_new.json
 	$(NOECHO) $(ECHO) '      "Paul G Webster <daemon@cpan.org>"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
 	$(NOECHO) $(ECHO) '   "dynamic_config" : 1,' >> META_new.json
-	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "license" : [' >> META_new.json
-	$(NOECHO) $(ECHO) '      "artistic_2"' >> META_new.json
+	$(NOECHO) $(ECHO) '      "agpl_3"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
 	$(NOECHO) $(ECHO) '   "meta-spec" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",' >> META_new.json
-	$(NOECHO) $(ECHO) '      "version" : "2"' >> META_new.json
+	$(NOECHO) $(ECHO) '      "version" : 2' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "name" : "POE-Component-Client-WebSocket",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "no_index" : {' >> META_new.json
@@ -540,8 +537,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '   "prereqs" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '      "build" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "ExtUtils::MakeMaker" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Test::More" : "0"' >> META_new.json
+	$(NOECHO) $(ECHO) '            "ExtUtils::MakeMaker" : "0"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "configure" : {' >> META_new.json
@@ -551,20 +547,18 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "runtime" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "MIME::Base64" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "POE" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "POE::Filter::HTTP::Parser" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "POE::Filter::SSL" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "POE::Filter::Stackable" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Protocol::WebSocket::Frame" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "URI" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "perl" : "5.006"' >> META_new.json
+	$(NOECHO) $(ECHO) '         }' >> META_new.json
+	$(NOECHO) $(ECHO) '      },' >> META_new.json
+	$(NOECHO) $(ECHO) '      "test" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Test::More" : "0"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.27",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 2.27300_01"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.29",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.04"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -664,17 +658,17 @@ ci :
 distmeta : create_distdir metafile
 	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -e q{META.yml};' \
 	  -e 'eval { maniadd({q{META.yml} => q{Module YAML meta-data (added by MakeMaker)}}) }' \
-	  -e '    or print "Could not add META.yml to MANIFEST: $$$${'\''@'\''}\n"' --
+	  -e '    or die "Could not add META.yml to MANIFEST: $${'\''@'\''}"' --
 	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -f q{META.json};' \
 	  -e 'eval { maniadd({q{META.json} => q{Module JSON meta-data (added by MakeMaker)}}) }' \
-	  -e '    or print "Could not add META.json to MANIFEST: $$$${'\''@'\''}\n"' --
+	  -e '    or die "Could not add META.json to MANIFEST: $${'\''@'\''}"' --
 
 
 
 # --- MakeMaker distsignature section:
 distsignature : distmeta
 	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }' \
-	  -e '    or print "Could not add SIGNATURE to MANIFEST: $$$${'\''@'\''}\n"' --
+	  -e '    or die "Could not add SIGNATURE to MANIFEST: $${'\''@'\''}"' --
 	$(NOECHO) cd $(DISTVNAME) && $(TOUCH) SIGNATURE
 	cd $(DISTVNAME) && cpansign -s
 
@@ -750,7 +744,7 @@ doc_perl_install :: all
 	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
-		"installed into" $(INSTALLPRIVLIB) \
+		"installed into" "$(INSTALLPRIVLIB)" \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
@@ -761,7 +755,7 @@ doc_site_install :: all
 	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
-		"installed into" $(INSTALLSITELIB) \
+		"installed into" "$(INSTALLSITELIB)" \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
@@ -772,7 +766,7 @@ doc_vendor_install :: all
 	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
 	-$(NOECHO) $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
-		"installed into" $(INSTALLVENDORLIB) \
+		"installed into" "$(INSTALLVENDORLIB)" \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
@@ -821,12 +815,13 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = perl
-FULLPERL      = "/usr/local/bin/perl5.24.1"
+FULLPERL      = "/home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/bin/perl"
+MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/5.32.0/x86_64-linux" "-I/home/paul.webster/perl5/perlbrew/perls/perl-5.32.0/lib/5.32.0"
 
-$(MAP_TARGET) :: static $(MAKE_APERL_FILE)
+$(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
 
-$(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
+$(MAKE_APERL_FILE) : static $(FIRST_MAKEFILE) pm_to_blib
 	$(NOECHO) $(ECHO) Writing \"$(MAKE_APERL_FILE)\" for this $(MAP_TARGET)
 	$(NOECHO) $(PERLRUNINST) \
 		Makefile.PL DIR="" \
@@ -835,63 +830,69 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
 
 # --- MakeMaker test section:
-
 TEST_VERBOSE=0
 TEST_TYPE=test_$(LINKTYPE)
 TEST_FILE = test.pl
-TEST_FILES = t/*.t
+TEST_FILES = 
 TESTDB_SW = -d
 
 testdb :: testdb_$(LINKTYPE)
-
-test :: $(TEST_TYPE) subdirs-test
-
-subdirs-test ::
 	$(NOECHO) $(NOOP)
 
+test :: $(TEST_TYPE)
+	$(NOECHO) $(NOOP)
 
-test_dynamic :: pure_all
-	PERL_DL_NONLAZY=1 $(FULLPERLRUN) "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness($(TEST_VERBOSE), '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)
-
-testdb_dynamic :: pure_all
-	PERL_DL_NONLAZY=1 $(FULLPERLRUN) $(TESTDB_SW) "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)
-
+# Occasionally we may face this degenerate target:
 test_ : test_dynamic
+	$(NOECHO) $(NOOP)
 
-test_static :: test_dynamic
-testdb_static :: testdb_dynamic
+subdirs-test_dynamic :: dynamic pure_all
+
+testdb_dynamic test_dynamic :: subdirs-test_dynamic
+	$(NOECHO) $(ECHO) 'No tests defined for $(NAME) extension.'
+
+subdirs-test_static :: static pure_all
+
+testdb_static test_static :: subdirs-test_static
+	$(NOECHO) $(ECHO) 'No tests defined for $(NAME) extension.'
+
 
 
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="$(VERSION)">' > $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '    <ABSTRACT>A simplistic websocket client for use in POE applications.</ABSTRACT>' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '    <AUTHOR>Paul G Webster &lt;daemon@cpan.org&gt;</AUTHOR>' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <PERLCORE VERSION="5,006,0,0" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="MIME::Base64" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="POE::" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="POE::Filter::HTTP::Parser" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="POE::Filter::SSL" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="POE::Filter::Stackable" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Protocol::WebSocket::Frame" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="URI::" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="amd64-freebsd-thread-multi-5.24" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '</SOFTPKG>' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="POE-Component-Client-WebSocket" VERSION="0.29">' > POE-Component-Client-WebSocket.ppd
+	$(NOECHO) $(ECHO) '    <ABSTRACT>A POE compatible websocket client</ABSTRACT>' >> POE-Component-Client-WebSocket.ppd
+	$(NOECHO) $(ECHO) '    <AUTHOR>Paul G Webster &lt;daemon@cpan.org&gt;</AUTHOR>' >> POE-Component-Client-WebSocket.ppd
+	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> POE-Component-Client-WebSocket.ppd
+	$(NOECHO) $(ECHO) '        <PERLCORE VERSION="5,006,0,0" />' >> POE-Component-Client-WebSocket.ppd
+	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-5.32" />' >> POE-Component-Client-WebSocket.ppd
+	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> POE-Component-Client-WebSocket.ppd
+	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> POE-Component-Client-WebSocket.ppd
+	$(NOECHO) $(ECHO) '</SOFTPKG>' >> POE-Component-Client-WebSocket.ppd
 
 
 # --- MakeMaker pm_to_blib section:
 
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
-	  lib/POE/Component/Client/WebSocket.pm blib/lib/POE/Component/Client/WebSocket.pm 
+	  'lib/POE/Component/Client/WebSocket.pm' 'blib/lib/POE/Component/Client/WebSocket.pm' 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 
 # --- MakeMaker selfdocument section:
+
+# here so even if top_targets is overridden, these will still be defined
+# gmake will silently still work if any are .PHONY-ed but nmake won't
+
+static ::
+	$(NOECHO) $(NOOP)
+
+dynamic ::
+	$(NOECHO) $(NOOP)
+
+config ::
+	$(NOECHO) $(NOOP)
 
 
 # --- MakeMaker postamble section:

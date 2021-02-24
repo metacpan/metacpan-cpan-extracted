@@ -24,7 +24,7 @@ sub get_init_script {
     my $binary    = shift;
     our $initsource;
     if(!defined $initsource) {
-       while(my $line = <DATA>) { $initsource .= $line; }
+       $initsource = do { local $/; <DATA> };
     }
 
     my $binpath = $binary;

@@ -2,6 +2,7 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 
+# ignore system library, force a build from source code
 BEGIN { $ENV{ALIEN_INSTALL_TYPE} = 'share'; }
 
 use File::Spec;

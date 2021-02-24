@@ -3,7 +3,7 @@ package App::Yath::Plugin::feature;
 use strict;
 use warnings;
 
-our $VERSION = '0.001105';
+our $VERSION = '0.001106';
 
 use parent 'App::Yath::Plugin';
 use App::Yath::Options;
@@ -12,8 +12,6 @@ option_group {prefix => 'feature', category => "Plugin feature"} => sub {
 
     option match => (
         #short        => 'm',
-        type         => 'b',
-        default      => 0,
         description  => ['Only match steps in from features with available ones'],
     );
 
@@ -150,11 +148,14 @@ sub munge_files {
     for my $tf (@$testfiles) {
        if ($tf->file =~ m/[.]feature$/) {
             my @args = ();
-            foreach (qw(config debug_profile extension i18n match
+            foreach (qw(config debug_profile extension i18n
                         matching output profile tags theme)) {
               push @args, "--$_", $settings->feature->$_
                 if defined $settings->feature->$_;
             }
+            push @args, '--match'
+                if defined $settings->feature->match
+                && $settings->feature->match;
             foreach (@{$settings->feature->steps}) {
               push @args, '--steps', $_;
             }
@@ -198,7 +199,7 @@ App::Yath::Plugin::feature - Plugin to allow testing Pherkin files.
 
 =head1 VERSION
 
-version 0.001105
+version 0.001106
 
 =head1 SYNOPSIS
 

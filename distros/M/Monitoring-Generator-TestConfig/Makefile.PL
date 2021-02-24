@@ -12,7 +12,6 @@ resources(
     'repository', => 'https://github.com/sni/Monitoring-Generator-TestConfig',
 );
 
-requires      'File::Which'   => 0;
 test_requires 'Test::More'    => 0.87;
 
 install_script 'bin/create_monitoring_test_config.pl';

@@ -1,16 +1,16 @@
 {
-   "abstract" : "A simplistic websocket client for use in POE applications.",
+   "abstract" : "A POE compatible websocket client",
    "author" : [
       "Paul G Webster <daemon@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_2"
+      "agpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "POE-Component-Client-WebSocket",
    "no_index" : {
@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -33,18 +32,16 @@
       },
       "runtime" : {
          "requires" : {
-            "MIME::Base64" : "0",
-            "POE" : "0",
-            "POE::Filter::HTTP::Parser" : "0",
-            "POE::Filter::SSL" : "0",
-            "POE::Filter::Stackable" : "0",
-            "Protocol::WebSocket::Frame" : "0",
-            "URI" : "0",
             "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.27",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.29",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

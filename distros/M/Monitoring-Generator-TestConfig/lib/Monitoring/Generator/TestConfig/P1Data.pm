@@ -22,9 +22,8 @@ sub get_p1_script {
     my $self      = shift;
     our $scriptsource;
     if(!defined $scriptsource) {
-       while(my $line = <DATA>) { $scriptsource .= $line; }
+       $scriptsource = do { local $/; <DATA> };
     }
-
     return($scriptsource);
 }
 

@@ -1,21 +1,18 @@
-#!perl
 
 BEGIN {
-  unless ($ENV{RELEASE_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for release candidate testing');
-  }
+    use Test::More;
+    unless ($ENV{RELEASE_TESTING}) {
+        plan skip_all => 'Release test. Set $ENV{RELEASE_TESTING} to a true value to run.';
+    }
 }
 
+use strict;
+use warnings;
 
-use Test::More;
-
-eval "use Test::Pod::Coverage 1.08";
-plan skip_all => "Test::Pod::Coverage 1.08 required for testing POD coverage"
-  if $@;
+eval "use Test::Pod::Coverage";
+plan skip_all => "Test::Pod::Coverage required to criticise code" if $@;
 
 eval "use Pod::Coverage::TrustPod";
-plan skip_all => "Pod::Coverage::TrustPod required for testing POD coverage"
-  if $@;
+plan skip_all => "Pod::Coverage::TrustPod required to criticise code" if $@;
 
 all_pod_coverage_ok({ coverage_class => 'Pod::Coverage::TrustPod' });

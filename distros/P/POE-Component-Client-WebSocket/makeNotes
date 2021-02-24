@@ -1,1 +1,0 @@
-perl Makefile.PL; make manifest; make distdir; make dist

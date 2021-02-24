@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.14'
+generated_by: 'Module::Install version 1.19'
 license: gpl3
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,6 @@ no_index:
     - inc
     - t
 requires:
-  File::Which: 0
   perl: '5.005'
 resources:
   bugtracker: https://github.com/sni/Monitoring-Generator-TestConfig/issues

@@ -1,9 +1,6 @@
 NAME
     Test::NoBreakpoints - test that files do not contain soft breakpoints
 
-VERSION
-    version 0.15
-
 SYNOPSIS
      use Test::NoBreakpoints;
      plan tests => $num_tests;

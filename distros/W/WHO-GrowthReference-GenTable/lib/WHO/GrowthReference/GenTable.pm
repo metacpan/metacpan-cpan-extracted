@@ -1,9 +1,9 @@
 package WHO::GrowthReference::GenTable;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-10'; # DATE
+our $DATE = '2021-01-16'; # DATE
 our $DIST = 'WHO-GrowthReference-GenTable'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,27 +24,31 @@ You supply a CSV/TSV containing these fields: `date` (or `age`), `height`, and
 
     height_potential
     height_zscore
-    height_z-3
-    height_z-2
-    height_z-1
-    height_z0
-    height_z+1
-    height_z+2
-    height_z+3
+    height_SD3neg
+    height_SD2neg
+    height_SD1neg
+    height_SD0
+    height_SD1
+    height_SD2
+    height_SD3
+
     weight_zscore
-    weight_z-3
-    weight_z-2
-    weight_z-1
-    weight_z0
-    weight_z+1
-    weight_z+2
-    weight_z+3
+    weight_SD3neg
+    weight_SD2neg
+    weight_SD1neg
+    weight_SD0
+    weight_SD1
+    weight_SD2
+    weight_SD3
+
     bmi_zscore
-    bmi_z-2
-    bmi_z-1
-    bmi_z0
-    bmi_z+1
-    bmi_z+2
+    bmi_SD3neg
+    bmi_SD2neg
+    bmi_SD1neg
+    bmi_SD0
+    bmi_SD1
+    bmi_SD2
+    bmi_SD3
 
 _
     args => {
@@ -97,7 +101,6 @@ sub add_who_growth_reference_fields_to_table {
     my %args = @_;
     my $gender = $args{gender};
     my $dob    = $args{dob};
-    my $which  = $args{which};
 
     my $aoh;
     my ($age_key, $date_key, $height_key, $weight_key);
@@ -119,13 +122,9 @@ sub add_who_growth_reference_fields_to_table {
         $date_key   = List::Util::first(sub { /date|time/i }, @keys);
         defined($age_key) || defined($date_key) or return [400, "Table does not contain 'age' nor 'date/time' field"];
         $height_key = List::Util::first(sub { /height/i }, @keys);
-        if ($which eq 'height' || $which eq 'bmi') {
-            defined $height_key or return [400, "Table does not contain 'height' field"];
-        }
+        defined $height_key or return [400, "Table does not contain 'height' field"];
         $weight_key = List::Util::first(sub { /weight/i }, @keys);
-        if ($which eq 'weight' || $which eq 'bmi') {
-            defined $weight_key or return [400, "Table does not contain 'weight' field"];
-        }
+        defined $weight_key or return [400, "Table does not contain 'weight' field"];
     }
 
     my @orig_fields = sort keys %{ $aoh->[0] };
@@ -146,44 +145,47 @@ sub add_who_growth_reference_fields_to_table {
             my $res = WHO::GrowthReference::Table::get_who_growth_reference(
                 gender => $gender,
                 defined($date_key) ? (dob => $dob, now => $time) : (age => 365.25*86400*$row->{$age_key}),
-                defined($height_key) ? (height => $row->{$height_key}) : (),
-                defined($weight_key) ? (weight => $row->{$weight_key}) : (),
+                defined($height_key) && length($row->{$height_key}) ? (height => $row->{$height_key}) : (),
+                defined($weight_key) && length($row->{$weight_key}) ? (weight => $row->{$weight_key}) : (),
             );
             return [400, "Table row[$i]: Cannot get WHO growth reference data: $res->[0] - $res->[1]"]
                 unless $res->[0] == 200;
             #use DD; dd $res->[2];
             $row->{age_ym} = $res->[2]{age};
-            if (defined $height_key) {
+            if (defined $height_key && length $row->{$height_key}) {
                 $row->{'height_potential'} = $res->[2]{height_potential};
                 $row->{'height_zscore'} = $res->[2]{height_zscore};
-                $row->{'height_z-3'} = $res->[2]{'height_Z-3'};
-                $row->{'height_z-2'} = $res->[2]{'height_Z-2'};
-                $row->{'height_z-1'} = $res->[2]{'height_Z-1'};
-                $row->{'height_z0'}  = $res->[2]{'height_Z0'};
-                $row->{'height_z+1'} = $res->[2]{'height_Z+1'};
-                $row->{'height_z+2'} = $res->[2]{'height_Z+2'};
-                $row->{'height_z+3'} = $res->[2]{'height_Z+3'};
+                $row->{'height_SD3neg'} = $res->[2]{'height_SD3neg'};
+                $row->{'height_SD2neg'} = $res->[2]{'height_SD2neg'};
+                $row->{'height_SD1neg'} = $res->[2]{'height_SD1neg'};
+                $row->{'height_SD0'}  = $res->[2]{'height_SD0'};
+                $row->{'height_SD1'} = $res->[2]{'height_SD1'};
+                $row->{'height_SD2'} = $res->[2]{'height_SD2'};
+                $row->{'height_SD3'} = $res->[2]{'height_SD3'};
             }
-            if (defined $weight_key) {
+            if (defined $weight_key && length $row->{$weight_key}) {
                 $row->{'weight_zscore'} = $res->[2]{weight_zscore};
-                $row->{'weight_z-3'} = $res->[2]{'weight_Z-3'};
-                $row->{'weight_z-2'} = $res->[2]{'weight_Z-2'};
-                $row->{'weight_z-1'} = $res->[2]{'weight_Z-1'};
-                $row->{'weight_z0'}  = $res->[2]{'weight_Z0'};
-                $row->{'weight_z+1'} = $res->[2]{'weight_Z+1'};
-                $row->{'weight_z+2'} = $res->[2]{'weight_Z+2'};
-                $row->{'weight_z+3'} = $res->[2]{'weight_Z+3'};
+                $row->{'weight_SD3neg'} = $res->[2]{'weight_SD3neg'};
+                $row->{'weight_SD2neg'} = $res->[2]{'weight_SD2neg'};
+                $row->{'weight_SD1neg'} = $res->[2]{'weight_SD1neg'};
+                $row->{'weight_SD0'}  = $res->[2]{'weight_SD0'};
+                $row->{'weight_SD1'} = $res->[2]{'weight_SD1'};
+                $row->{'weight_SD2'} = $res->[2]{'weight_SD2'};
+                $row->{'weight_SD3'} = $res->[2]{'weight_SD3'};
             }
-            if (defined $height_key && defined $weight_key) {
+            if (defined $height_key && length $row->{$height_key} &&
+                    defined $weight_key && length $row->{$weight_key}) {
                 if ($row->{$weight_key} && $row->{$height_key}) {
                     $row->{bmi} = $row->{$weight_key} / ($row->{$height_key}/100)**2;
                 }
                 $row->{'bmi_zscore'} = $res->[2]{bmi_zscore};
-                $row->{'bmi_z-2'} = $res->[2]{'bmi_Z-2'};
-                $row->{'bmi_z-1'} = $res->[2]{'bmi_Z-1'};
-                $row->{'bmi_z0'}  = $res->[2]{'bmi_Z0'};
-                $row->{'bmi_z+1'} = $res->[2]{'bmi_Z+1'};
-                $row->{'bmi_z+2'} = $res->[2]{'bmi_Z+2'};
+                $row->{'bmi_SD3neg'} = $res->[2]{'bmi_SD3neg'};
+                $row->{'bmi_SD2neg'} = $res->[2]{'bmi_SD2neg'};
+                $row->{'bmi_SD1neg'} = $res->[2]{'bmi_SD1neg'};
+                $row->{'bmi_SD0'}  = $res->[2]{'bmi_SD0'};
+                $row->{'bmi_SD1'} = $res->[2]{'bmi_SD1'};
+                $row->{'bmi_SD2'} = $res->[2]{'bmi_SD2'};
+                $row->{'bmi_SD3'} = $res->[2]{'bmi_SD3'};
             }
         }
     } # ADD_FIELDS
@@ -206,7 +208,7 @@ WHO::GrowthReference::GenTable - Add WHO reference fields to table
 
 =head1 VERSION
 
-This document describes version 0.001 of WHO::GrowthReference::GenTable (from Perl distribution WHO-GrowthReference-GenTable), released on 2021-01-10.
+This document describes version 0.002 of WHO::GrowthReference::GenTable (from Perl distribution WHO-GrowthReference-GenTable), released on 2021-01-16.
 
 =head1 SYNOPSIS
 
@@ -247,27 +249,31 @@ C<weight>. And these additional fields will be added:
 
  height_potential
  height_zscore
- height_z-3
- height_z-2
- height_z-1
- height_z0
- height_z+1
- height_z+2
- height_z+3
+ height_SD3neg
+ height_SD2neg
+ height_SD1neg
+ height_SD0
+ height_SD1
+ height_SD2
+ height_SD3
+ 
  weight_zscore
- weight_z-3
- weight_z-2
- weight_z-1
- weight_z0
- weight_z+1
- weight_z+2
- weight_z+3
+ weight_SD3neg
+ weight_SD2neg
+ weight_SD1neg
+ weight_SD0
+ weight_SD1
+ weight_SD2
+ weight_SD3
+ 
  bmi_zscore
- bmi_z-2
- bmi_z-1
- bmi_z0
- bmi_z+1
- bmi_z+2
+ bmi_SD3neg
+ bmi_SD2neg
+ bmi_SD1neg
+ bmi_SD0
+ bmi_SD1
+ bmi_SD2
+ bmi_SD3
 
 This function is not exported by default, but exportable.
 
@@ -325,7 +331,7 @@ Source repository is at L<https://github.com/perlancar/perl-WHO-GrowthReference-
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WHO-GrowthReference-GenTable>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WHO-GrowthReference-GenTable/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

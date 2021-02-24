@@ -120,6 +120,10 @@ struct xspr_promise_s {
             xspr_result_t *result;
         } finished;
     };
+
+    /* For async/await: */
+    SV* on_ready_immediate;
+    SV* self_sv_ref;
 };
 
 struct xspr_callback_queue_s {
@@ -595,6 +599,10 @@ void xspr_immediate_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* pro
     xspr_callback_free(aTHX_ callback);
 }
 
+#define _XSPR_FREE_ON_READY_IMMEDIATE(promise) \
+    SvREFCNT_dec(promise->on_ready_immediate); \
+    SvREFCNT_dec(SvRV(promise->on_ready_immediate));
+
 /* Transitions a promise from pending to finished, using the given result */
 void xspr_promise_finish(pTHX_ xspr_promise_t* promise, xspr_result_t* result)
 {
@@ -607,6 +615,16 @@ void xspr_promise_finish(pTHX_ xspr_promise_t* promise, xspr_result_t* result)
     promise->state = XSPR_STATE_FINISHED;
     promise->finished.result = result;
     xspr_result_incref(aTHX_ promise->finished.result);
+
+    /* fprintf(stderr, "finishing p=%p (%d callbacks)\n", promise, count); */
+
+    /* For async/await: */
+    if (promise->on_ready_immediate != NULL) {
+        xspr_invoke_perl(aTHX_ promise->on_ready_immediate, NULL, 0);
+
+        _XSPR_FREE_ON_READY_IMMEDIATE(promise);
+        promise->on_ready_immediate = NULL;
+    }
 
     unsigned i;
     for (i = 0; i < count; i++) {
@@ -626,6 +644,12 @@ void xspr_promise_finish(pTHX_ xspr_promise_t* promise, xspr_result_t* result)
         else {
             xspr_immediate_process(aTHX_ pending_callbacks[i], promise);
         }
+    }
+
+    if (promise->self_sv_ref != NULL) {
+        SvREFCNT_dec(promise->self_sv_ref);
+        SvREFCNT_dec(SvRV(promise->self_sv_ref));
+        promise->self_sv_ref = NULL;
     }
 
     if (MY_CXT.deferral_cr) {
@@ -694,6 +718,10 @@ void xspr_promise_decref(pTHX_ xspr_promise_t *promise)
             assert(0);
         }
 
+        if (promise->on_ready_immediate != NULL) {
+            _XSPR_FREE_ON_READY_IMMEDIATE(promise);
+        }
+
         Safefree(promise);
     }
 }
@@ -705,6 +733,8 @@ xspr_promise_t* xspr_promise_new(pTHX)
     Newxz(promise, 1, xspr_promise_t);
     promise->refs = 1;
     promise->state = XSPR_STATE_PENDING;
+    promise->on_ready_immediate = NULL;
+    promise->self_sv_ref = NULL;
     return promise;
 }
 
@@ -967,6 +997,42 @@ SV* _promise_to_sv(pTHX_ xspr_promise_t* promise_p) {
     return _ptr_to_svrv(aTHX_ promise_ptr, MY_CXT.pxs_promise_stash);
 }
 
+/* When Future::AsyncAwait creates a promise/future it does NOT
+   hold a strong reference to that object. Consequently, we have to
+   ensure that the object lasts until we’re done with it. So introduce
+   a (temporary!) circular reference. */
+#define _IMMORTALIZE_PROMISE_SV(promise_sv, promise_p) \
+    do { \
+        /* fprintf(stderr, "making immortal: sv=%p p=%p\n", promise_sv, promise_p); */ \
+        promise_p->self_sv_ref = promise_sv; \
+        SvREFCNT_inc(promise_sv); \
+        SvREFCNT_inc(SvRV(promise_sv)); \
+    } while (0)
+
+static inline SV* _create_preresolved_promise(pTHX_ SV** args, I32 argslen, bool immortalize) {
+    xspr_promise_t* promise_p = create_promise(aTHX);
+
+    _resolve_promise(aTHX_ promise_p, args, argslen);
+
+    SV* promise_sv = _promise_to_sv(aTHX_ promise_p);
+
+    if (immortalize) _IMMORTALIZE_PROMISE_SV(promise_sv, promise_p);
+
+    return promise_sv;
+}
+
+static inline SV* _create_prerejected_promise(pTHX_ SV** args, I32 argslen, bool immortalize) {
+    xspr_promise_t* promise_p = create_promise(aTHX);
+
+    _reject_promise(aTHX_ NULL, promise_p, args, argslen);
+
+    SV* promise_sv = _promise_to_sv(aTHX_ promise_p);
+
+    if (immortalize) _IMMORTALIZE_PROMISE_SV(promise_sv, promise_p);
+
+    return promise_sv;
+}
+
 //----------------------------------------------------------------------
 
 MODULE = Promise::XS     PACKAGE = Promise::XS
@@ -1054,22 +1120,14 @@ CLONE(...)
 SV *
 resolved(...)
     CODE:
-        xspr_promise_t* promise_p = create_promise(aTHX);
-
-        _resolve_promise(aTHX_ promise_p, &(ST(0)), items);
-
-        RETVAL = _promise_to_sv(aTHX_ promise_p);
+        RETVAL = _create_preresolved_promise(aTHX_ &(ST(0)), items, false);
     OUTPUT:
         RETVAL
 
 SV *
 rejected(...)
     CODE:
-        xspr_promise_t* promise_p = create_promise(aTHX);
-
-        _reject_promise(aTHX_ NULL, promise_p, &(ST(0)), items);
-
-        RETVAL = _promise_to_sv(aTHX_ promise_p);
+        RETVAL = _create_prerejected_promise(aTHX_ &(ST(0)), items, false);
     OUTPUT:
         RETVAL
 
@@ -1282,8 +1340,139 @@ void
 DESTROY(SV* self_sv)
     CODE:
         PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
+        /* fprintf(stderr, "DESTROYing sv=%p, p=%p\n", self_sv, self->promise); */
 
         _warn_on_destroy_if_needed(aTHX_ self->promise, self_sv);
 
         xspr_promise_decref(aTHX_ self->promise);
         Safefree(self);
+
+# ----------------------------------------------------------------------
+# Future::AsyncAwait interface:
+# ----------------------------------------------------------------------
+
+SV*
+AWAIT_NEW_DONE(...)
+    CODE:
+        UNUSED(items);
+        RETVAL = _create_preresolved_promise(aTHX_ &(ST(1)), items - 1, true);
+    OUTPUT:
+        RETVAL
+
+SV*
+AWAIT_NEW_FAIL(...)
+    CODE:
+        UNUSED(items);
+        RETVAL = _create_prerejected_promise(aTHX_ &(ST(1)), items - 1, true);
+    OUTPUT:
+        RETVAL
+
+SV*
+AWAIT_CLONE(...)
+    CODE:
+        UNUSED(items);
+
+        xspr_promise_t* promise_p = create_promise(aTHX);
+
+        RETVAL = _promise_to_sv(aTHX_ promise_p);
+
+        _IMMORTALIZE_PROMISE_SV(RETVAL, promise_p);
+    OUTPUT:
+        RETVAL
+
+void
+AWAIT_DONE(SV* self_sv, ...)
+    CODE:
+        PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
+        _resolve_promise(aTHX_ self->promise, &ST(1), items - 1);
+
+void
+AWAIT_FAIL(SV* self_sv, ...)
+    CODE:
+        PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
+        _reject_promise(aTHX_ NULL, self->promise, &ST(1), items - 1);
+
+bool
+AWAIT_IS_READY(SV *self_sv)
+    CODE:
+        PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
+
+        RETVAL = (self->promise->state != XSPR_STATE_PENDING);
+    OUTPUT:
+        RETVAL
+
+void
+AWAIT_GET(SV *self_sv)
+    PPCODE:
+        DEFERRED_CLASS_TYPE* self = _get_deferred_from_sv(aTHX_ self_sv);
+
+        assert(self->promise->state == XSPR_STATE_FINISHED);
+
+        SV** results = self->promise->finished.result->results;
+        int result_count = self->promise->finished.result->count;
+
+        if (RESULT_IS_RESOLVED(self->promise->finished.result)) {
+            int i;
+
+            switch (GIMME_V) {
+                if (!result_count) XSRETURN_EMPTY;
+
+                case G_ARRAY:
+                    EXTEND(SP, result_count);
+
+                    for (i=0; i<result_count; i++) {
+                        PUSHs( sv_2mortal( newSVsv(results[i]) ) );
+                    }
+
+                    XSRETURN(result_count);
+
+                case G_SCALAR:
+                    EXTEND(SP, 1);
+                    PUSHs( sv_2mortal( newSVsv(results[0]) ) );
+                    XSRETURN(1);
+
+                case G_VOID:
+                    XSRETURN_EMPTY;
+
+                default:
+                    assert(0);
+            }
+        }
+        else {
+            SV* err;
+            if (result_count) {
+                err = sv_2mortal( newSVsv( results[0] ) );
+            }
+            else {
+                err = &PL_sv_undef;
+            }
+
+            croak_sv(err);
+        }
+
+void
+AWAIT_CHAIN_CANCEL(...)
+    CODE:
+        UNUSED(items);
+
+void
+AWAIT_ON_CANCEL(...)
+    CODE:
+        UNUSED(items);
+
+UV
+AWAIT_IS_CANCELLED(...)
+    CODE:
+        UNUSED(items);
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+void
+AWAIT_ON_READY(SV *self_sv, SV* coderef)
+    CODE:
+        PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
+
+        self->promise->on_ready_immediate = coderef;
+        SvREFCNT_inc(coderef);
+        SvREFCNT_inc(SvRV(coderef));

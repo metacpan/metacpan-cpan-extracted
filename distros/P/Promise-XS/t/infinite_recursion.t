@@ -9,6 +9,8 @@ use Test::FailWarnings;
 
 use Promise::XS;
 
+plan skip_all => "Ancient perl: $^V" if $^V lt v5.10.0;
+
 my @tests = (
     [ 'then', 'resolved' ],
     [ 'catch', 'rejected', 1 ],

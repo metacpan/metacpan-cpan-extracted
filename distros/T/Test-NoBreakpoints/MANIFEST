@@ -3,10 +3,8 @@ LICENSE
 MANIFEST
 META.yml
 Makefile.PL
-README
-README.mkdn
-dist.ini
 lib/Test/NoBreakpoints.pm
+README
 t/00-load.t
 t/01_use.t
 t/02_pod.t
@@ -27,3 +25,4 @@ t/release-kwalitee.t
 t/release-no-tabs.t
 t/release-pod-coverage.t
 t/release-pod-syntax.t
+META.json                                Module JSON meta-data (added by MakeMaker)
