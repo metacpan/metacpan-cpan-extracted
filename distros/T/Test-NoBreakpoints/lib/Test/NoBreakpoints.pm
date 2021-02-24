@@ -41,7 +41,7 @@ use Test::Builder;
 require Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 @ISA       = 'Exporter';
 @EXPORT    = qw|

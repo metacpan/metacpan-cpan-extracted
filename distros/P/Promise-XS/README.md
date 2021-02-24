@@ -123,10 +123,10 @@ Given the following …
 
 # **EXPERIMENTAL:** ASYNC/AWAIT SUPPORT
 
-This module implements [Future::AsyncAwait::Awaitable](https://metacpan.org/pod/Future::AsyncAwait::Awaitable).
-Once you load [Future::AsyncAwait](https://metacpan.org/pod/Future::AsyncAwait) this lets you do nifty stuff like:
+This module is [Promise::AsyncAwait](https://metacpan.org/pod/Promise::AsyncAwait)-compatible.
+Once you load that module you can do nifty stuff like:
 
-    use Future::AsyncAwait future_class => 'Promise::XS::Promise';
+    use Promise::AsyncAwait;
 
     async sub do_stuff {
         return 1 + await fetch_number_p();

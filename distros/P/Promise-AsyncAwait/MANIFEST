@@ -1,0 +1,14 @@
+.github/workflows/linux.yml
+.github/workflows/macos.yml
+.github/workflows/windows.yml
+.gitignore
+.travis.yml
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+lib/Promise/AsyncAwait.pm
+t/anyevent.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

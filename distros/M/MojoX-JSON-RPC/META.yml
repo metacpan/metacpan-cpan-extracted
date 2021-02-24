@@ -1,25 +1,25 @@
 ---
-abstract: 'Perl implementation of JSON-RPC 2.0 protocol for Mojolicious'
+abstract: Perl implementation of JSON-RPC 2.0 protocol for Mojolicious
 author:
   - 'Henry Tang <henryykt@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: MojoX-JSON-RPC
 no_index:
   directory:
     - t
     - inc
 requires:
-  Mojolicious: '7.13'
+  Mojolicious: 7.13
 resources:
   repository: https://github.com/dk/MojoX-JSON-RPC.git
-version: '0.12'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: 0.13
+x_serialization_backend: YAML version 1.30

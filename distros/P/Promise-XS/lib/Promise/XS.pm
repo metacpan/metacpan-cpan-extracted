@@ -6,7 +6,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.13';
+    $VERSION = '0.14';
 }
 
 =encoding utf-8
@@ -149,10 +149,10 @@ C<$new> is rejected with the relevant value(s).
 
 =head1 B<EXPERIMENTAL:> ASYNC/AWAIT SUPPORT
 
-This module implements L<Future::AsyncAwait::Awaitable>.
-Once you load L<Future::AsyncAwait> this lets you do nifty stuff like:
+This module is L<Promise::AsyncAwait>-compatible.
+Once you load that module you can do nifty stuff like:
 
-    use Future::AsyncAwait future_class => 'Promise::XS::Promise';
+    use Promise::AsyncAwait;
 
     async sub do_stuff {
         return 1 + await fetch_number_p();

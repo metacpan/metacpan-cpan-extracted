@@ -21,7 +21,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(finddeps);
 
-$VERSION = '3.04';
+$VERSION = '3.05';
 
 use constant MAXINT => ~0;
 
@@ -553,10 +553,12 @@ sub _getreqs {
                 } elsif(File::Type->mime_type($file_data) =~ m{^application/x-(gzip|tar)$}) {
                     $rval = $tar_extractor->($tempfile);
                 } elsif(File::Type->mime_type($file_data) eq 'application/x-bzip2') {
-                    open(my $fh, '-|', qw(bzip2 -dc), $tempfile) ||
+                    no warnings qw(exec);
+                    if(open(my $fh, '-|', qw(bzip2 -dc), $tempfile)) {
+                        $rval = $tar_extractor->($fh);
+                    } else {
                         $self->_yell("Can't unbzip2 $tempfile: $!");
-                    if($fh) { $rval = $tar_extractor->($fh); }
-                    close($fh);
+                    }
                 } else { $rval = $file_data; } # oh, it must have been a meta file
                 return $rval;
             },

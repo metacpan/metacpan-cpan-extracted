@@ -162,7 +162,7 @@ sub close_test {
     }
 
     # track time for teardown, if needed
-    if ($timer_enabled) {
+    if ($timer_enabled && @{$queue}) {
         my $duration = $self->parser->end_time - $queue->[-1]->time;
         my $case     = $xml->testcase( {
             'name' => _squeaky_clean('(teardown)'),

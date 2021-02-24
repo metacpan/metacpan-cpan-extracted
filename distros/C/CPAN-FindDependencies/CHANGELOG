@@ -1,3 +1,5 @@
+3.05    2021-02-23      Skip tests that rely on bzip2 when it's not available
+
 3.04    2020-11-08      Script args can be --args, to be a bit more conventional
 
 3.03    2020-10-29      There are more exciting ways in which perldoc can be

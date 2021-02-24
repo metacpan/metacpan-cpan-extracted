@@ -5,7 +5,8 @@ use warnings;
 use Carp qw(croak);
 use Math::DifferenceSet::Planar::Data;
 use Math::BigInt try => 'GMP';
-use Math::Prime::Util qw(is_power is_prime_power euler_phi factor_exp gcd);
+use Math::Prime::Util
+    qw(is_power is_prime_power euler_phi factor_exp gcd mulmod addmod);
 
 # Math::DifferenceSet::Planar=ARRAY(...)
 # ........... index ...........     # ........... value ...........
@@ -21,7 +22,7 @@ use constant _F_PEAK      =>  8;    # peak elements arrayref, initially undef
 use constant _F_ETA       =>  9;    # "eta" value, initially undef
 use constant _NFIELDS     => 10;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 our $_LOG_MAX_ORDER  = 22.1807;         # limit for integer exponentiation
 our $_MAX_ENUM_COUNT = 32768;           # limit for stored rotator set size
@@ -42,7 +43,7 @@ sub _multipliers {
     my $x = $base;
     while (@mult < $n && $x != 1) {
         push @mult, $x;
-        $x = $x * $base % $modulus;
+        $x = mulmod($x, $base, $modulus);
     }
     push @mult, q[...] if $x != 1;
     die "assertion failed: not $n elements: @mult" if @mult != $n;
@@ -68,7 +69,7 @@ sub _rotators {
                 }
                 next;
             }
-            @sieve[ map { $x * $_ % $modulus } @mult ] = ();
+            @sieve[ map { mulmod($_, $x, $modulus) } @mult ] = ();
             push @{$rotators}, $x;
         }
     }
@@ -95,7 +96,7 @@ sub _sequential_rotators {
                 next ELEMENT if !($x % $p);
             }
             foreach my $e (@mult) {
-                next ELEMENT if $x * $e % $modulus < $x;
+                next ELEMENT if mulmod($x, $e, $modulus) < $x;
             }
             ++$mx;
             return $x;
@@ -320,7 +321,7 @@ sub check_elements {
         push @elements, splice @elements, 0, $mx if $mx;
         my ($multiple) = eval { _sort_elements(
             $modulus,
-            map { $_ * $factor % $modulus } @elements
+            map { mulmod($_, $factor, $modulus) } @elements
         )};
         return 0 if !defined $multiple;
         my $d1 = $elements[0] - $multiple->[0];
@@ -397,7 +398,8 @@ sub translate {
     my $modulus = $this->[_F_MODULUS];
     $delta %= $modulus;
     return $this if !$delta;
-    my @elements = map { ($_ + $delta) % $modulus } @{$this->[_F_ELEMENTS]};
+    my @elements =
+        map { addmod($_, $delta, $modulus) } @{$this->[_F_ELEMENTS]};
     my $that = bless [@{$this}], ref $this;
     $that->[_F_ELEMENTS]  = \@elements;
     $that->[_F_INDEX_MIN] =
@@ -452,7 +454,7 @@ sub multiply {
     return $this if 1 == $factor;
     my ($elements, $index_min) = _sort_elements(
         $modulus,
-        map { $_ * $factor % $modulus } @{$this->[_F_ELEMENTS]}
+        map { mulmod($_, $factor, $modulus) } @{$this->[_F_ELEMENTS]}
     );
     my $that = bless [@{$this}], ref $this;
     $that->[_F_ELEMENTS ] = $elements;
@@ -544,7 +546,7 @@ Math::DifferenceSet::Planar - object class for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.011 of Math::DifferenceSet::Planar.
+This documentation refers to version 0.012 of Math::DifferenceSet::Planar.
 
 =head1 SYNOPSIS
 

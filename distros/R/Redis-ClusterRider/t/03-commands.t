@@ -2,7 +2,7 @@ use 5.008000;
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 use Test::Fatal;
 BEGIN {
   require 't/test_helper.pl';
@@ -30,6 +30,21 @@ my $other_cluster = new_cluster(
   lazy => 1,
 );
 t_get($other_cluster);
+
+my $other_cluster_2 = new_cluster(
+  refresh_interval => 5,
+  cnx_timeout      => 5,
+  read_timeout     => 5,
+);
+t_failover($other_cluster_2, 1);
+
+my $other_cluster_3 = new_cluster(
+  allow_slaves     => 1,
+  refresh_interval => 5,
+  cnx_timeout      => 5,
+  read_timeout     => 5,
+);
+t_failover($other_cluster_3, 0);
 
 sub t_nodes {
   my $cluster = shift;
@@ -143,4 +158,45 @@ sub t_keys {
   is_deeply( \@t_reply, \@mock_keys, 'list; KEYS' );
 
   return;
+}
+
+sub t_failover {
+  my ( $cluster, $num_init ) = @_;
+
+  my $counter = 0;
+  my $orig_init = *{$Redis::ClusterRider::{_init}}{CODE};
+  local *Redis::ClusterRider::_init = sub {
+    $counter++;
+    goto &$orig_init;
+  };
+
+  update_command_replies(
+    cluster_slots => [
+      [ '0',
+        '5961',
+        [ '127.0.0.1', '7003', '14550b7425c44231090719acd5a5d42ad5424b4f' ],
+        [ '127.0.0.1', '7000', '4b2fa9c315cddbc1c1c729b60ade711fe141d61b' ],
+        [ '127.0.0.1', '7005', '050ece77147551db844467770883cf5cd2c8bc2b' ],
+      ],
+      [ '5962',
+        '10922',
+        [ '127.0.0.1', '7004', 'a859a49ad96f8312f91fc8c6b402484eda913c83' ],
+        [ '127.0.0.1', '7001', 'f7fc4a7c3f340ea44dc8f92a6fda041dc640de90' ],
+      ],
+      [ '10923',
+        '11421',
+        [ '127.0.0.1', '7003', '14550b7425c44231090719acd5a5d42ad5424b4f' ],
+        [ '127.0.0.1', '7000', '4b2fa9c315cddbc1c1c729b60ade711fe141d61b' ],
+        [ '127.0.0.1', '7005', '050ece77147551db844467770883cf5cd2c8bc2b' ],
+      ],
+      [ '11422',
+        '16383',
+        [ '127.0.0.1', '7006', '08c40bd2b18d9c2a20e6d8a27b8da283566a665d' ],
+        [ '127.0.0.1', '7002', '001dadcde7704079c3c6ea679323215c0930af57' ],
+      ],
+    ],
+  );
+
+  $cluster->get('foo');
+  is $counter, $num_init, 'GET; number of times _init() was called';
 }

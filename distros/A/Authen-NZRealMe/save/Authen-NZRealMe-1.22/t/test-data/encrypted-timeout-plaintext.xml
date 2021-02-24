@@ -1,0 +1,17 @@
+<samlp:Response
+        xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+        ID="s915f02edbf44c8c37bfe4d6019f3a261fc5b73030"
+        InResponseTo="e1db069d533bcb0a5c75f489c739ba52e625cb827"
+        Version="2.0"
+        IssueInstant="2020-01-21T09:16:51Z">
+    <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">https://test.fakeme.govt.nz/saml2</saml:Issuer>
+    <samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+        <samlp:StatusCode xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" Value="urn:oasis:names:tc:SAML:2.0:status:Responder">
+            <samlp:StatusCode xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" Value="urn:nzl:govt:ict:stds:authn:deployment:GLS:SAML:2.0:status:Timeout">
+            </samlp:StatusCode>
+        </samlp:StatusCode>
+        <samlp:StatusMessage xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+            RealMe login service session timeout
+        </samlp:StatusMessage>
+    </samlp:Status>
+</samlp:Response>

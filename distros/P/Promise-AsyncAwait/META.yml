@@ -1,0 +1,26 @@
+---
+abstract: 'Async/await with promises'
+author:
+  - 'Felipe Gasper (FELIPE)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Promise-AsyncAwait
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Future::AsyncAwait: '0.47'
+  Promise::XS: '0.13'
+  Test::FailWarnings: '0'
+  Test::More: '0'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

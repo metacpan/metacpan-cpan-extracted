@@ -1,5 +1,5 @@
 package Authen::NZRealMe::ResolutionResponse;
-$Authen::NZRealMe::ResolutionResponse::VERSION = '1.21';
+$Authen::NZRealMe::ResolutionResponse::VERSION = '1.22';
 use warnings;
 use strict;
 use Carp      qw(croak);
@@ -404,7 +404,7 @@ See L<Authen::NZRealMe> for documentation index.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2019 Enrolment Services, New Zealand Electoral Commission
+Copyright (c) 2010-2022 Enrolment Services, New Zealand Electoral Commission
 
 Written by Grant McLean E<lt>grant@catalyst.net.nzE<gt>
 

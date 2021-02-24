@@ -1,6 +1,9 @@
 Revision history for Perl extension Promise::XS:
 
-0.13
+0.14 Wed 24 Feb 2021
+- Fix hold-ref test’s skip logic for old Future::AsyncAwait versions.
+
+0.13 Tue 23 Feb 2021
 - Experimental async/await support added.
 - Skip failing (not super-consequential) test on 5.8.
 - Fix CPAN.pm installation problems.

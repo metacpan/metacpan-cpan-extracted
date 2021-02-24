@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -23,6 +23,11 @@
   /* On perls before 5.24 we have to do some extra work to save the itervar
    * from being thrown away */
 #  define HAVE_ITERVAR
+#endif
+
+#if HAVE_PERL_VERSION(5, 33, 7)
+/* perl 5.33.7 added CXp_TRY and the CxTRY macro for true try/catch semantics */
+#  define HAVE_CX_TRY
 #endif
 
 #ifdef SAVEt_CLEARPADRANGE
@@ -983,6 +988,11 @@ nosave:
       frame->type = CXt_EVAL;
       frame->gimme = cx->blk_gimme;
 
+#ifdef HAVE_CX_TRY
+      if(CxTRY(cx))
+        frame->type |= CXp_TRY;
+#endif
+
       frame->el.eval.retop = cx->blk_eval.retop;
 
       break;
@@ -1318,6 +1328,19 @@ static void MY_resume_frame(pTHX_ SuspendedFrame *frame)
       PL_in_eval = EVAL_INEVAL;
       CLEAR_ERRSV();
       break;
+
+#ifdef HAVE_CX_TRY
+    case CXt_EVAL|CXp_TRY:
+      if(CATCH_GET)
+        panic("Too late to docatch()\n");
+
+      cx = cx_pushblock(CXt_EVAL|CXp_EVALBLOCK|CXp_TRY, frame->gimme,
+        PL_stack_sp, PL_savestack_ix);
+      cx_pushtry(cx, frame->el.eval.retop);
+      PL_in_eval = EVAL_INEVAL;
+      CLEAR_ERRSV();
+      break;
+#endif
 
     default:
       panic("TODO: Unsure how to restore a %d frame\n", frame->type);

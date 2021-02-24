@@ -1,5 +1,5 @@
 package Authen::NZRealMe;
-$Authen::NZRealMe::VERSION = '1.21';
+$Authen::NZRealMe::VERSION = '1.22';
 use warnings;
 use strict;
 
@@ -253,10 +253,7 @@ __END__
 =head1 IMPLEMENTATION DETAILS
 
 This module does not implement 100% of the APIs exposed by the RealMe service.
-In particular, it only implements the 'Artifact' binding and not the 'POST'
-binding.  This is simply because the 'POST' binding was made available after
-this module was initially developed and the authors have not yet had a
-requirement to implement the 'POST' binding.  Patches are welcome.
+It does support both the 'Artifact' binding and the 'POST' binding options.
 
 The module also does not currently implement the RCMS API.  Once again, this
 is because the authors have not yet needed RCMS functionality.  Patches are
@@ -375,7 +372,11 @@ identifier associating the user's login account with the agency web site.
 The RealMe assertion server is also a SAML IdP and can be accessed using the
 same process described above.  The response returned from the assertion server
 will include details of the user's verified identity and/or address (the user
-must first consent to sharing the requested details).
+must first consent to sharing the requested details). If the 'Assert and Login'
+option is choosen when integrating with RealMe, the FLT will now also be
+returned in the response, in either XML or JSON format (another option at
+integration time). The iCMS back-channel is thus no longer required with the
+'Assert and Login' option. This module supports both options.
 
 The agency web site is a SAML Service Provider or 'SP'.  The Authen::NZRealMe
 module implements the SAML SP role on behalf of the agency web app.
@@ -465,7 +466,8 @@ the case of an unexpected error, the method call will generate an exception
 which you will need to catch and log.
 
 A response from the login service will only include an FLT attribute, whereas a
-response from the assertion service may contain a number of identity attributes.
+response from the assertion service may contain a number of identity attributes
+and, optionally, the FLT attribute.
 See L<Authen::NZRealMe::ResolutionResponse> for details of methods provided to
 access the attribute values.
 
@@ -830,38 +832,35 @@ L<https://github.com/catalyst/Authen-NZRealMe/issues>
 
 =item * Source code repository on GitHub
 
-L<https://github.com/grantm/Authen-NZRealMe>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Authen-NZRealMe>
+L<https://github.com/catalyst/Authen-NZRealMe>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Authen-NZRealMe>
+L<https://cpanratings.perl.org/dist/Authen-NZRealMe>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Authen-NZRealMe/>
+L<https://metacpan.org/release/Authen-NZRealMe>
 
 =back
 
 Commercial support and consultancy is available through Catalyst IT Limited
-L<http://www.catalyst.net.nz>.
+L<https://www.catalyst.net.nz>.
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2019 Enrolment Services, New Zealand Electoral Commission
+Copyright (c) 2010-2022 Enrolment Services, New Zealand Electoral Commission
 
 Written by Grant McLean E<lt>grant@catalyst.net.nzE<gt> and
-Haydn Newport E<lt>haydn@catalyst.net.nzE<gt>.
+Haydn Newport E<lt>haydn@catalyst.net.nzE<gt> and
+Andrew Maguire E<lt>andrew.maguire@catalyst.net.nzE<gt>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See https://dev.perl.org/licenses/ for more information.
 
 =cut
 

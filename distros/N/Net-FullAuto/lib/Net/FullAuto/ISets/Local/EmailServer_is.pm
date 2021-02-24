@@ -3209,9 +3209,9 @@ END
 
       Name => 'email_address',
       Input => 1,
-      Result => $stripe_keys,
+      #Result => $stripe_keys,
       #Result =>
-   #$Net::FullAuto::ISets::Local::EmailServer_is::select_emailserver_setup,
+   $Net::FullAuto::ISets::Local::EmailServer_is::select_emailserver_setup,
       Banner => $email_banner,
 
    };

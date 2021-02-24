@@ -5,8 +5,9 @@ use warnings;
 use Test::MockObject;
 use Clone qw( clone );
 
-BEGIN {
-  my %command_replies = (
+my %command_replies;
+sub prepare_mock {
+  %command_replies = (
     cluster_info => 'cluster_state:ok',
 
     cluster_slots => [
@@ -58,10 +59,31 @@ BEGIN {
       my $mock = Test::MockObject->new({});
       $mock->{server} = $params{server};
 
+      my ( $is_master, $is_readonly ) = ( 0, 0 );
       foreach my $cmd_name ( keys %command_replies ) {
         $mock->mock( $cmd_name,
           sub {
             my $self = shift;
+
+            my ( $master_node, $range_start, $range_end );
+            if ( $cmd_name ne 'cluster_slots' ) {
+              $is_master = 0;
+              my $slots_raw = $mock->cluster_slots;
+              foreach my $range ( @{$slots_raw} ) {
+                $range_start = shift @{$range};
+                $range_end = shift @{$range};
+                $master_node = $range->[0][0] . ':' . $range->[0][1];
+                $is_master = 1 if $master_node eq $self->{server};
+              }
+            }
+
+            if ( $cmd_name eq 'readonly' ) {
+              $is_readonly = 1;
+            }
+            elsif ( $cmd_name eq 'get' && !( $is_master || $is_readonly ) ) {
+              die "[error] MOVED $range_start $master_node\n";
+            }
+
             return clone( $command_replies{$cmd_name} );
           }
         );
@@ -79,14 +101,22 @@ BEGIN {
         }
       );
 
+      $mock->mock( 'on_connect', $params{on_connect} );
+      $mock->on_connect;
+
       return $mock;
     },
   );
 }
 
+sub update_command_replies {
+  %command_replies = ( %command_replies, @_ );
+}
+
 use Redis::ClusterRider;
 
 sub new_cluster {
+  prepare_mock();
   my %params = @_;
 
   return Redis::ClusterRider->new(

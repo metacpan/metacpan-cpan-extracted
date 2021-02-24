@@ -1,5 +1,5 @@
 package Authen::NZRealMe::ServiceProvider::Builder;
-$Authen::NZRealMe::ServiceProvider::Builder::VERSION = '1.21';
+$Authen::NZRealMe::ServiceProvider::Builder::VERSION = '1.22';
 use warnings;
 use strict;
 use feature "switch";
@@ -525,7 +525,7 @@ See L<Authen::NZRealMe> for documentation index.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2019 Enrolment Services, New Zealand Electoral Commission
+Copyright (c) 2010-2022 Enrolment Services, New Zealand Electoral Commission
 
 Written by Grant McLean E<lt>grant@catalyst.net.nzE<gt>
 

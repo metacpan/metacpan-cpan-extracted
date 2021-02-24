@@ -1,5 +1,5 @@
 ---
-abstract: 'colored pretty-print of Perl data structures and objects'
+abstract: 'colored & full-featured pretty print of Perl data structures and objects'
 author:
   - 'Breno G. de Oliveira <garu@cpan.org>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,21 +18,15 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '0'
-  Clone::PP: '0'
   Fcntl: '0'
-  File::HomeDir: '0.91'
   File::Spec: '0'
   File::Temp: '0'
-  Package::Stash: '0.3'
   Scalar::Util: '0'
-  Sort::Naturally: '0'
-  Term::ANSIColor: '3'
-  Test::More: '0.88'
+  Test::More: '0'
   version: '0.77'
 resources:
   bugtracker: https://github.com/garu/Data-Printer/issues/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/garu/Data-Printer
-version: '0.40'
+version: '1.000000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

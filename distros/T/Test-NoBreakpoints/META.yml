@@ -33,5 +33,5 @@ requires:
 resources:
   bugtracker: http://github.com/renderorange/Test-NoBreakpoints/issues
   repository: git://github.com/renderorange/Test-NoBreakpoints.git
-version: '0.16'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

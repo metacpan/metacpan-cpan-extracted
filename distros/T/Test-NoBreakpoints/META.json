@@ -62,6 +62,6 @@
          "web" : "https://github.com/renderorange/Test-NoBreakpoints"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -1,40 +1,44 @@
 Revision history for Test-NoBreakpoints
 
-2021-02-23  v0.16
-    - Convert build to ExtUtils::MakeMaker
+0.17 2021-02-23
+     - Remove Test::Exception and fix test plan increment
+     - Fix Changes file layout
 
-2012-02-16  v0.15
-    - fix RT#75059
-    - Fix tests to not exclude author only tests when it isn't appropriate
-      to do so (e.g. file finds / counts)
+0.16 2021-02-23
+     - Convert build to ExtUtils::MakeMaker
 
-2012-01-04  v0.14
-    - apply patch from https://rt.cpan.org/Ticket/Display.html?id=53609
-    - Remove deprecated methods
-    - Convert to Dist::Zilla
-    - Make tests pass under 'dzil smoke'
-    - Make tests pass under 'dzil test' and 'prove'
+0.15 2012-02-16
+     - fix RT#75059
+     - Fix tests to not exclude author only tests when it isn't appropriate
+       to do so (e.g. file finds / counts)
 
-2005-01-13  v0.13
-    - change 'brkpts' to 'breakpoints' on the advice of Andy Lester The old
-      names still exist, but will emit warnings unless supressed using the
-      warnings pragma.  The old names will be removed after two releases or a
-      reasonable period of time, whichever is longer.
+0.14 2012-01-04
+     - apply patch from https://rt.cpan.org/Ticket/Display.html?id=53609
+     - Remove deprecated methods
+     - Convert to Dist::Zilla
+     - Make tests pass under 'dzil smoke'
+     - Make tests pass under 'dzil test' and 'prove'
 
-2004-12-30  v0.12
-    - require v0.09 of Test::Tester.  Should fix the blow-up reported in
-      cpantesters report #176356.
+0.13 2005-01-13
+     - change 'brkpts' to 'breakpoints' on the advice of Andy Lester The old
+       names still exist, but will emit warnings unless supressed using the
+       warnings pragma.  The old names will be removed after two releases or a
+       reasonable period of time, whichever is longer.
 
-2004-12-27  v0.11
-    - Fix $VERSION to be interpreted as a string.
-    - make t/baz/foo.t a usable do-nothing test script - it seems that some
-      versions of EU::MM recurse into the t directory, trying to find all.t
-      files.  Should fix the problem in cpantesters failure report #170736.
-    - re-steal^H^H^H^H^Hborrow all_pod_files() from a newer version of
-      Test::Pod in an attempt to make it more robust and fix the problem
-      reported in cpantesters failure reports #170633 and #120973.
-    - Switch from Test::Builder::Tester to Test::Tester, which has a less
-      arcane syntax and isn't as bothered about newline differences.
+0.12 2004-12-30
+     - require v0.09 of Test::Tester.  Should fix the blow-up reported in
+       cpantesters report #176356.
 
-2004-01-28  v0.10
-    - Initial release to CPAN
+0.11 2004-12-27
+     - Fix $VERSION to be interpreted as a string.
+     - make t/baz/foo.t a usable do-nothing test script - it seems that some
+       versions of EU::MM recurse into the t directory, trying to find all.t
+       files.  Should fix the problem in cpantesters failure report #170736.
+     - re-steal^H^H^H^H^Hborrow all_pod_files() from a newer version of
+       Test::Pod in an attempt to make it more robust and fix the problem
+       reported in cpantesters failure reports #170633 and #120973.
+     - Switch from Test::Builder::Tester to Test::Tester, which has a less
+       arcane syntax and isn't as bothered about newline differences.
+
+0.10 2004-01-28
+     - Initial release to CPAN

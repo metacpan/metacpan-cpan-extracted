@@ -1,5 +1,5 @@
 package Authen::NZRealMe::XMLEnc;
-$Authen::NZRealMe::XMLEnc::VERSION = '1.21';
+$Authen::NZRealMe::XMLEnc::VERSION = '1.22';
 use strict;
 use warnings;
 
@@ -624,7 +624,7 @@ See L<Authen::NZRealMe> for documentation index.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2020 Enrolment Services, New Zealand Electoral Commission
+Copyright (c) 2010-2022 Enrolment Services, New Zealand Electoral Commission
 
 Written by Grant McLean E<lt>grant@catalyst.net.nzE<gt>
 

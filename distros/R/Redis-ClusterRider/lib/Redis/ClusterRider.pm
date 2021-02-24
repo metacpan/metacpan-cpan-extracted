@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Redis;
 use List::MoreUtils qw( bsearch );
@@ -250,7 +250,6 @@ sub _prepare_nodes {
   my %nodes_pool;
   my @slots;
   my @masters_nodes;
-  my @slave_nodes;
 
   my $nodes_pool_old = $self->{_nodes_pool};
 
@@ -270,10 +269,6 @@ sub _prepare_nodes {
         }
         else {
           $nodes_pool{$hostport} = $self->_new_node($hostport);
-
-          unless ($is_master) {
-            push( @slave_nodes, $hostport );
-          }
         }
 
         if ($is_master) {
@@ -294,27 +289,6 @@ sub _prepare_nodes {
   $self->{_nodes}        = [ keys %nodes_pool ];
   $self->{_master_nodes} = \@masters_nodes;
   $self->{_slots}        = \@slots;
-
-  if ( $self->{allow_slaves} && @slave_nodes ) {
-    $self->_prepare_slaves( \@slave_nodes );
-  }
-
-  return;
-}
-
-sub _prepare_slaves {
-  my $self        = shift;
-  my $slave_nodes = shift;
-
-  foreach my $hostport ( @{$slave_nodes} ) {
-    local $@;
-
-    eval { $self->_run_command( 'readonly', [], [ $hostport ] ) };
-
-    if ($@) {
-      warn $@;
-    }
-  }
 
   return;
 }
@@ -373,6 +347,12 @@ sub _create_on_node_connect {
   weaken($self);
 
   return sub {
+    my $redis = shift;
+
+    if ( $self->{allow_slaves} ) {
+      $redis->readonly;
+    }
+
     if ( defined $self->{on_node_connect} ) {
       $self->{on_node_connect}->($hostport);
     }

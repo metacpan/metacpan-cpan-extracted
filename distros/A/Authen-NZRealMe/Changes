@@ -1,6 +1,34 @@
 Revision history for Authen-NZRealMe
 
+1.22      2021-02-24 16:03:38+13:00 Pacific/Auckland
+    - require JSON::XS
+    - updates to documentation
+
 1.21      2021-02-22 10:15:36+13:00 Pacific/Auckland
+    - Support both the current and upcoming new RealMe platform.
+    - The replatformed RealMe has changed behaviour so that the:
+      . Login Service always returns NameIDFormat as 'persistent'.
+      . Assertion returns NameIDFormat as 'transient' for "Assert Only"
+        and 'persistent' for "Assert and Login".
+    - NameIDFormat is now read from the service provider metadata files
+      For backwards compatibility, if NameIDFormat is not in the metadata,
+      then Assertion assumes transient and Login assumes persistent.
+    - the nzrealme make-meta now adds a NameIDFormat element to metadata files
+      This command is enhanced to set the isDefault attribute to one
+      AssertionConsumerService element.
+    - The rePlatformed RealMe now returns the Assertion resolution response
+      in JSON format, base64 encoded. For existing RealMe integrations, the
+      original XML format may be returned still, with an option to use JSON.
+      Both response formats will be supported for backwards compatiblility.
+    - Supports new xenc_oaep_mgf1p and xenc_aes256cbc encryptions.
+    - Assertions using the "Assert and Login" mode will receive the FLT
+      as part of the Assertion resolution response, no back-channel required.
+      For backward-compatibility, the FLT is only resolved via the iCMS back
+      channel if the NameIDFormat is transient and the resolve_flt parameter
+      is true. In the new platform, iCMS is not used.
+    - iCMS functionality is deprecated, it will be removed in the next release.
+      It will be decommissioned by RealMe after 18th March 2021.
+    - Parameter acs_index set to 'default' will use the ACS with isDefault="true"
 
 1.20      2020-02-25 13:07:33+13:00 Pacific/Auckland
     - implement HTTP-POST binding through new resolve_posted_assertion()

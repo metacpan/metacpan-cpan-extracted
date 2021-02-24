@@ -1,16 +1,8 @@
 BEGIN {
     use Test::More;
-    our $tests = 0;
+    our $tests = 1;
     eval "use Test::NoWarnings";
     $tests++ unless( $@ );
-    eval "use Test::Exception";
-    if ($@) {
-        my $b = Test::Builder->new;
-        $b->diag('Test::Exception not installed.  Not all tests will run');
-    }
-    else {
-        $tests++;
-    }
     plan tests => $tests;
     chdir 't' if -d 't';
     use lib '../lib', '../blib/lib';

@@ -10,25 +10,12 @@ my %options = (
     LICENSE             => 'perl',
     PL_FILES            => {},
     PREREQ_PM => {
-        'Test::More'      => 0.88,
-        'Term::ANSIColor' => 3.0,  # introduces 'bright_*' colors
+        'Test::More'      => 0,
         'Scalar::Util'    => 0,
         'version'         => 0.77, # handling VSTRINGS
-        'Sort::Naturally' => 0,
-        'Package::Stash'  => 0.30,
-        'Carp'            => 0,
-        'Clone::PP'       => 0,
-        'File::HomeDir'   => 0.91, # introduces File::HomeDir::Test
         'File::Spec'      => 0,
         'File::Temp'      => 0,
         'Fcntl'           => 0,
-        ($] >= 5.010
-            ? ()
-            : (
-                'MRO::Compat' => 0.09,
-                'Hash::Util::FieldHash::Compat' => 0.03,
-              )
-        ),
     },
     META_MERGE => {
         resources => {
@@ -41,11 +28,24 @@ my %options = (
     clean => { FILES => 'Data-Printer-*' },
 );
 
-
 if ($^O =~ /Win32/i) {
     $options{PREREQ_PM}{'Win32::Console::ANSI'} = 1.0;
 }
 
+if ($ENV{DDPTESTCOVERAGE}) {
+    foreach my $p (qw(
+        DBI DBD::SQLite DBIx::Class
+        Time::Piece DateTime::TimeZone DateTime::Incomplete DateTime::Tiny
+        Date::Tiny Date::Calc Date::Pcalc Date::Handler
+        Date::Handler::Delta Date::Simple Date::Manip Panda::Date
+        DateTime DateTime::Duration Mojolicious Class::Date Class::Date::Rel
+        Digest::MD5 Digest::SHA Digest::MD2 Digest::MD4
+        JSON::PP JSON::XS JSON JSON::Any JSON::MaybeXS JSON::DWIW
+        JSON::SL Pegex::JSON Cpanel::JSON::XS JSON::Tiny JSON::Typist Dancer
+        Dancer2 HTTP::Message
+    )) {
+        $options{PREREQ_PM}{$p} = 0;
+    }
+}
 
 WriteMakefile( %options );
-

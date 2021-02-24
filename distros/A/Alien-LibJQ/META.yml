@@ -3,13 +3,13 @@ abstract: 'Build libjq library (https://stedolan.github.io/jq/)'
 author:
   - 'Dongxu Ma (dongxu __at__ cpan.org)'
 build_requires:
-  Alien::Build: '2.37'
+  Alien::Build: '0'
   Alien::Build::MM: '0.25'
   Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
-  Alien::cmake3: '0.05'
+  Alien::cmake3: '0.02'
   Archive::Tar: '0'
   Config: '0'
-  ExtUtils::MakeMaker: '7.46'
+  ExtUtils::MakeMaker: '0'
   HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
   IO::Zlib: '0'
@@ -19,11 +19,10 @@ build_requires:
   URI: '0'
   URI::Escape: '0'
 configure_requires:
-  Alien::Build: '2.37'
+  Alien::Build: '1.19'
   Alien::Build::MM: '0.25'
   Alien::Build::Plugin::Build::CMake: '0.99'
-  ExtUtils::MakeMaker: '7.46'
-  File::Spec: '0'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -36,10 +35,10 @@ no_index:
     - t
     - inc
 requires:
-  Alien::Base: '2.37'
+  Alien::Base: '0'
   Alien::Build: '0.25'
   perl: '5.008001'
-version: '0.03'
+version: '0.04'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.37'
   requires:

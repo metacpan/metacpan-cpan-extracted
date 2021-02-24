@@ -15,7 +15,7 @@ use constant _F_DATA     => 0;  # result set object
 use constant _F_PATH     => 1;  # result set object
 use constant _NFIELDS    => 2;
 
-our $VERSION  = '0.011';
+our $VERSION  = '0.012';
 our @CARP_NOT = qw(Math::DifferenceSet::Planar);
 
 our $DATABASE_DIR = dist_dir('Math-DifferenceSet-Planar');
@@ -124,7 +124,7 @@ Math::DifferenceSet::Planar::Data - storage of sample planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.011 of
+This documentation refers to version 0.012 of
 Math::DifferenceSet::Planar::Data.
 
 =head1 SYNOPSIS

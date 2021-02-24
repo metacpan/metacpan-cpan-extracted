@@ -1,0 +1,90 @@
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512" xmlns:iCMS="urn:nzl:govt:ict:stds:authn:deployment:igovt:gls:iCMS:1_0">
+  <soap:Header>
+    <wsa:Action wsu:Id="c11a21379497138bed1057ec428f99cce72deeef2">http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Validate</wsa:Action>
+    <wsa:MessageID wsu:Id="b7be00cce26c8cc663dba2b56f84cbdfd6c70d497">urn:uuid:ed14cec9-ae10-47c1-b280-1136545d3324</wsa:MessageID>
+    <wsa:To wsu:Id="c84a70491703b6c1fdc615d56a3ca24ba4fab6ab6">https://ws.test.logon.fakeme.govt.nz/icms/Validate_v1_1</wsa:To>
+    <wsa:ReplyTo wsu:Id="a605811fea6bfc70f64c64c12fac2495706ea8590">
+      <wsa:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa:Address>
+    </wsa:ReplyTo>
+    <wsse:Security soap:mustUnderstand="true">
+      <wsu:Timestamp wsu:Id="a00d40059264bb32f4f774bc3378c7addb0140a5b">
+        <wsu:Created>2019-02-14T08:29:56Z</wsu:Created>
+        <wsu:Expires>2019-02-14T08:34:56Z</wsu:Expires>
+      </wsu:Timestamp>
+    </wsse:Security>
+  </soap:Header>
+  <soap:Body wsu:Id="c37b3b3b88c6b5d4fe2b8b7460bcdbdd393e262d2">
+    <wst:RequestSecurityToken>
+      <wst:RequestType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/Validate</wst:RequestType>
+      <wst:TokenType>http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0</wst:TokenType>
+      <wst:ValidateTarget><saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xs="http://www.w3.org/2001/XMLSchema" ID="_57c78500-30cc-11e9-ae4b-5397601cc114" IssueInstant="2015-08-08T03:03:48.490Z" Version="2.0"><dsig:Signature xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+  <dsig:SignedInfo>
+    <dsig:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+    <dsig:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+    <dsig:Reference URI="#_57c78500-30cc-11e9-ae4b-5397601cc114">
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+        <dsig:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+      <dsig:DigestValue>FmYje7BSRNSveQEqNXhchUtz7bE=</dsig:DigestValue>
+    </dsig:Reference>
+  </dsig:SignedInfo>
+  <dsig:SignatureValue>
+ZLsY1q2NRGykReW9FRFXFElHtzk2C/JEWK/7VhEoqZfUhcmpPxyTLHJnfYbZBJImo4Eb0cPTWa3/
+A8BCdE/5TD0/K0t4vVi1UUCKw2H3yv3Yew8lm4JBd2PZ/mc83+Wib5Z1WR5wcpm7Avyzn4/F0/gC
+IkGdqw9cwb2yz/F8szfoQz9MAHmByO8VVLGCWSVyxKnB5MxdND3Tdn05JWIxJ+bVt/sCfjexxq9R
+JktDW9n2O3Ke/L4/ZEHwwPEdurCp8MaflrB/wmSqmtJ0Qf+QPfkXvtQP20zPEGFOaNtYrUobW1jJ
+xf43E/AxxZzq4FagsancK5Uq/hexOdIo9tvXXQ==
+</dsig:SignatureValue>
+</dsig:Signature>
+  <saml2:Issuer>https://test.logon.fakeme.govt.nz/icms</saml2:Issuer>
+  <saml2:Subject>
+    <saml2:EncryptedID>
+      <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="_27ac55263f1b9a230d9d65af8503cc5a" Type="http://www.w3.org/2001/04/xmlenc#Element">
+        <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+          <ds:RetrievalMethod Type="http://www.w3.org/2001/04/xmlenc#EncryptedKey" URI="#_6f6a9156ab07f772d0cdbe3590d93a55"/>
+        </ds:KeyInfo>
+        <xenc:CipherData>
+          <xenc:CipherValue>bheuUITkTQ72zvcV7tZfxeVldZAHbkOeMiTGbwq4DQZafZ6yxiBbLbwJ5tnPKSzbvDFQ3TzIrXjg1b5L81X3sYhnh9rx8Pvc6sHI17dL7bpIUY9jUi/5jzGKqnZ+sVYtbR27fF5+8c80T0M5YiihJaOAO1brAU4azhLcbn3DMbSogDDchCROH7z/fCBFJdeoAmj1OaDAf7HLIzL/qYCa8MHkeQtc7qfHVoMual153YMGB20qoVunqwGmtYCHGnAGjiVMUJOShLD2yC7o7b6Jxa51W/2q/sKrAI3pUTYF1DlAkxn/dq71kYkG9JPpLkQzGF/sB0OqJS98qBqi+d47IQwMvUnt2kT6YszhO1xwN7PL0xS4xPxyaJoIZusYX3+Z1fEjNJWE3tGXpgZxEycuOxZg22A93+bVgC57akp434GVw1pTCPWhzCp1DZt0Bd5o</xenc:CipherValue>
+        </xenc:CipherData>
+      </xenc:EncryptedData>
+      <xenc:EncryptedKey xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="_6f6a9156ab07f772d0cdbe3590d93a55">
+        <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p">
+          <ds:DigestMethod xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+        </xenc:EncryptionMethod>
+        <xenc:CipherData>
+          <xenc:CipherValue>9n0GRJATQAKkxXRYVtskYvaGiw8VqP2+L9teZ72biAyxCrWgHBz8m9zfsL9A85vwPn1tvK0iVBPQ+rfncZLYdDJi/y/aETs/Iq9XSI00R6noMwVHSe1EhJLIEP7lb4l0vs9S11QfGG8zmKrMWFBS0Kl2e58f9pF9Le0LTfAwvOucR2rDgbuZn3TEKZ26ra68VTNMNuBRpyMVisA4Wk10/3Ur1V+zmangOQIJzu5bVCke10pxLfFb7Cmurs4NP3ygRxicSk/pDjr/Cr790vbOC6yON2+IWwhbxbvaoR6GbBHjq6qeEAeugGuVgL5qEBcnc0fg1GTkuPB60UlCtitRxTSB</xenc:CipherValue>
+        </xenc:CipherData>
+        <xenc:ReferenceList>
+          <xenc:DataReference URI="#_27ac55263f1b9a230d9d65af8503cc5a"/>
+        </xenc:ReferenceList>
+      </xenc:EncryptedKey>
+    </saml2:EncryptedID>
+    <saml2:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:sender-vouches"/>
+  </saml2:Subject>
+  <saml2:Conditions NotBefore="2015-08-08T03:03:48.490Z" NotOnOrAfter="2015-08-08T04:03:45.499Z">
+    <saml2:AudienceRestriction>
+      <saml2:Audience>https://test.logon.fakeme.govt.nz/icms#Validate</saml2:Audience>
+    </saml2:AudienceRestriction>
+  </saml2:Conditions>
+  <saml2:AuthnStatement AuthnInstant="2015-08-08T03:03:45.499Z">
+    <saml2:SubjectLocality Address="202.78.240.7" DNSName="172.29.222.25"/>
+    <saml2:AuthnContext>
+      <saml2:AuthnContextClassRef>urn:nzl:govt:ict:stds:authn:deployment:GLS:SAML:2.0:ac:classes:ModStrength</saml2:AuthnContextClassRef>
+    </saml2:AuthnContext>
+  </saml2:AuthnStatement>
+  <saml2:AttributeStatement>
+    <saml2:Attribute FriendlyName="intended-presenter" Name="intended-presenter" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+      <saml2:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">https://secure.elections.org.nz/app/enrol</saml2:AttributeValue>
+    </saml2:Attribute>
+    <saml2:Attribute FriendlyName="permitted-usage" Name="permitted-usage" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+      <saml2:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">urn:nzl:govt:ict:stds:authn:deployment:igovt:gls:iCMS:1_0:SAMLV2.0:Authenticated</saml2:AttributeValue>
+    </saml2:Attribute>
+  </saml2:AttributeStatement>
+</saml2:Assertion></wst:ValidateTarget>
+      <iCMS:AllowCreateFLT/>
+    </wst:RequestSecurityToken>
+  </soap:Body>
+</soap:Envelope>

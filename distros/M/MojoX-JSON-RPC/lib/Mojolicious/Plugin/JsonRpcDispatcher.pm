@@ -10,7 +10,7 @@ sub register {
     if ( exists $conf->{services} && ref $conf->{services} eq 'HASH' ) {
     SVC:
         while ( my ( $path, $svc ) = each %{ $conf->{services} } ) {
-            $r->route($path)->to(
+            $r->any($path)->to(
                 'Dispatcher#call',
                 service   => $svc,
                 namespace => 'MojoX::JSON::RPC',

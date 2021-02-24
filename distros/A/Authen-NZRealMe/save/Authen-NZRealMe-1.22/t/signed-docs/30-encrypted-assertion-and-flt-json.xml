@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<samlp:Response xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="_5d390cd7-ec58-43d6-8b51-89867380e95b" InResponseTo="d70e226fd22aea999d43b5a4d7cba1d4336e85278" Version="2.0" IssueInstant="2020-11-26T01:17:56.6557903Z" Destination="https://www.example.govt.nz/app/sample/login-acs">
+  <saml:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://test.fakeme.govt.nz/saml2</saml:Issuer>
+  <samlp:Status>
+    <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+  </samlp:Status>
+  <saml:EncryptedAssertion>
+    <saml:Assertion xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="_836fed88-04ee-4c4a-92ad-dd80ea49bf93" Version="2.0" IssueInstant="2020-11-26T01:17:56.5607921Z">
+      <saml:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://test.fakeme.govt.nz/saml2</saml:Issuer>
+      <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <SignedInfo>
+          <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+          <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+          <Reference URI="#_836fed88-04ee-4c4a-92ad-dd80ea49bf93">
+            <Transforms>
+              <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+              <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#">
+                <InclusiveNamespaces xmlns="http://www.w3.org/2001/10/xml-exc-c14n#" PrefixList="saml samlp xenc xs"/>
+              </Transform>
+            </Transforms>
+            <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+            <DigestValue>7poBpKNklnk/CXRtoAH2fqx6pnq5F91P2wGjHXnbfHA=</DigestValue>
+          </Reference>
+        </SignedInfo>
+        <SignatureValue>A7SnHvFt6F/mc5CeI8wTRAyM6Yn8/vhyRj7O3I4MlbdHlsCDpwsMZyeK6utNR3XO
+Q9cQHHtB9pXWQqtrj0caqCeiidziE/3fAasHzi0JfpQRl3DMbfYwQo9S2Ko2giu3
+g5iEphmd1W8xLx0CUhUydWMbp8SdptbzXtxhPYhuhephxViFAYsaRlOxOC+KYNHm
+MZZiFi1Gay5neGRQlPTMZFnUUtwjttti0TPAFafCJfgufABWOThOA64xmG8UcXta
+7S99uc6mT94a2xojnVqZdH9JQPWxUlxFaEV2jNfW3f4od7GNHdNgY8ioJUhdvgdt
+d07wNYj6Du1MRM3EDlxCAQ==</SignatureValue>
+        <KeyInfo><X509Data>
+<X509Certificate>MIIDLzCCAhegAwIBAgIJAJys5okjA3N3MA0GCSqGSIb3DQEBBQUAMC4xLDAqBgNV
+BAMMI3Rlc3Quc2lnbmluZy5hY2NvdW50LmZha2VtZS5nb3Z0Lm56MB4XDTE0MDUz
+MDAwNTkwMFoXDTE0MDYyOTAwNTkwMFowLjEsMCoGA1UEAwwjdGVzdC5zaWduaW5n
+LmFjY291bnQuZmFrZW1lLmdvdnQubnowggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw
+ggEKAoIBAQDNQWtXKquqhfJt/X8C8Gyg9+2LrhcCvQdyXnTVAITItV1kTk+l2tze
+QNo7yU0Z9i692Gn+UBobPoRwmHgCXu6ZyKxH1qOBqwnqyhhezYSQNm8ReBaSPlP1
+yYswDvY+/N9MBAcZvCt8BSNz4Tsv+gP7WrHOx5U0zrSkVcEGhaCcLFsdo3R2SMFP
+xvVpRmIqRPKzyANZqyoMtoRnIhxyuppaO1fSKvy1TG0SK7dLDVWIn2NPMZMpvZsG
+9JorBAeit5nO/eE8GSxe/i8lvjIuZS/Rc57+71RmeemFz+MbIGZ4tU+YqY0SupXz
+24E0dIsMzSl3rXEU/VD9L4etaxz0pz4ZAgMBAAGjUDBOMB0GA1UdDgQWBBQfsK+Y
+Bi2/Vk+Fvyc22UEvhx1QQTAfBgNVHSMEGDAWgBQfsK+YBi2/Vk+Fvyc22UEvhx1Q
+QTAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4IBAQBXgE/zv3lWxf7e3nGc
+Xpl6JBPv2cB7nwDjeoDxRwx2oThuRoFLtrFmjonrUZIMUWapUBGA+/WjMlq9GuB2
+a1UUx4izOPX9QDHzPTewuDO4tiyI+vTXrXno+8CW7wOi9OwOVaiY8X677nPhJUIP
+LBcBdweYxC7nLdhNLKEXMyRXlg/mD5ACDQAAiUbs/yx3Br4K3YQyM7oZOCAfJR4+
+whCR4OTRYNM1bH7LQNM88N6EPyRnkP3mJpu0HH2wNFOc1hfF2hq9Icwu3VhsQLnm
+nv8TV6OwdEoqMNCPozBegc27rf6AixerOnOJk1hMVLq4GM3Dy0O1qPC3tniFbzUv
+gCNF</X509Certificate>
+</X509Data></KeyInfo>
+      </Signature>
+      <saml:Subject>
+        <saml:NameID NameQualifier="https://test.fakeme.govt.nz/saml2" SPNameQualifier="https://www.example.govt.nz/app/sample-login" Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">CHCBD4387DCB7782F1D97B5C4E6A57267B3</saml:NameID>
+        <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+          <saml:SubjectConfirmationData NotOnOrAfter="2020-11-26T01:22:56.5607921Z" Recipient="https://selin.wlg.election.govt.nz/saml2/acs" InResponseTo="d70e226fd22aea999d43b5a4d7cba1d4336e85278"/>
+        </saml:SubjectConfirmation>
+      </saml:Subject>
+      <saml:Conditions NotBefore="2020-11-26T01:17:56.5607921Z" NotOnOrAfter="2020-11-26T01:22:56.5607921Z">
+        <saml:AudienceRestriction>
+          <saml:Audience>https://www.example.govt.nz/app/sample-login</saml:Audience>
+        </saml:AudienceRestriction>
+      </saml:Conditions>
+      <saml:AuthnStatement SessionIndex="979b5790-c5e4-45e5-bb11-db77dd9fc212" AuthnInstant="2020-11-26T01:17:56.5607921Z">
+        <saml:AuthnContext>
+          <saml:AuthnContextClassRef>
+          urn:nzl:govt:ict:stds:authn:deployment:GLS:SAML:2.0:ac:classes:ModStrength</saml:AuthnContextClassRef>
+        </saml:AuthnContext>
+      </saml:AuthnStatement>
+      <saml:AttributeStatement xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        <saml:Attribute Name="urn:nzl:govt:ict:stds:authn:attribute:igovt:IVS:FIT" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+          <saml:AttributeValue xsi:type="xs:string">WLG0283bb09f7c54d87ba22056f65bd0aa8</saml:AttributeValue>
+        </saml:Attribute>
+        <saml:Attribute Name="urn:nzl:govt:ict:stds:authn:safeb64:attribute:igovt:IVS:Assertion:JSON:Identity" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+          <saml:AttributeValue xsi:type="xs:string">
+          eyJUcmFuc2FjdGlvbklkIjoiNDRhNmUwNWUtM2NiNS00OGY1LWJhZDctYjM0MTc5ZWY5NDM4IiwiTmFtZSI6eyJGaXJzdE5hbWUiOiJCb2IiLCJNaWRkbGVOYW1lIjoiQmFuYW5hIiwiTGFzdE5hbWUiOiJTbWl0aCIsIk5hbWVEaXNwdXRlZCI6ZmFsc2V9LCJQbGFjZU9mQmlydGgiOnsiTG9jYWxpdHkiOiJTb21ld2hlcmUiLCJDb3VudHJ5IjoiTmV3IFplYWxhbmQiLCJQbGFjZU9mQmlydGhEaXNwdXRlZCI6ZmFsc2V9LCJHZW5kZXIiOnsiR2VuZGVyVmFsdWUiOiJNIiwiR2VuZGVyRGlzcHV0ZWQiOmZhbHNlfSwiRGF0ZU9mQmlydGgiOnsiRGF0ZU9mQmlydGhWYWx1ZSI6IjE5MDAtMDEtMDEiLCJEYXRlT2ZCaXJ0aERpc3B1dGVkIjpmYWxzZX19</saml:AttributeValue>
+        </saml:Attribute>
+        <saml:Attribute Name="urn:nzl:govt:ict:stds:authn:safeb64:attribute:NZPost:AVS:Assertion:JSON:Address" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+          <saml:AttributeValue xsi:type="xs:string">
+          eyJVbml0IjoiMjciLCJTdHJlZXQiOiJTbWl0aCBTdHJlZXQiLCJTdWJ1cmIiOiJTb21ld2hlcmUiLCJDaXR5IjoiV2VsbGluZ3RvbiIsIlJ1cmFsRGVsaXZlcnkiOiJSRDUiLCJQb3N0Y29kZSI6IjEwMDAiLCJDb3VudHJ5IjoiTmV3IFplYWxhbmQiLCJWYWxpZEZyb20iOiIyMDEyLTAxLTAxIn0=</saml:AttributeValue>
+        </saml:Attribute>
+        <saml:Attribute Name="logon_attributes_token" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="logon attribute token">
+          <saml:AttributeValue xsi:nil="true"/>
+        </saml:Attribute>
+      </saml:AttributeStatement>
+    </saml:Assertion>
+  </saml:EncryptedAssertion>
+</samlp:Response>

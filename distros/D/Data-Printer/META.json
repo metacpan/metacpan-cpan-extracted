@@ -1,16 +1,16 @@
 {
-   "abstract" : "colored pretty-print of Perl data structures and objects",
+   "abstract" : "colored & full-featured pretty print of Perl data structures and objects",
    "author" : [
       "Breno G. de Oliveira <garu@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-Printer",
    "no_index" : {
@@ -32,17 +32,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "Clone::PP" : "0",
             "Fcntl" : "0",
-            "File::HomeDir" : "0.91",
             "File::Spec" : "0",
             "File::Temp" : "0",
-            "Package::Stash" : "0.3",
             "Scalar::Util" : "0",
-            "Sort::Naturally" : "0",
-            "Term::ANSIColor" : "3",
-            "Test::More" : "0.88",
+            "Test::More" : "0",
             "version" : "0.77"
          }
       }
@@ -59,6 +53,6 @@
          "url" : "https://github.com/garu/Data-Printer"
       }
    },
-   "version" : "0.40",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.000000",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

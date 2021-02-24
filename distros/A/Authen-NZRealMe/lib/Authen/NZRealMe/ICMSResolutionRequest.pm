@@ -1,5 +1,5 @@
 package Authen::NZRealMe::ICMSResolutionRequest;
-$Authen::NZRealMe::ICMSResolutionRequest::VERSION = '1.21';
+$Authen::NZRealMe::ICMSResolutionRequest::VERSION = '1.22';
 use warnings;
 use strict;
 
@@ -256,7 +256,7 @@ See L<Authen::NZRealMe> for documentation index.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2019 Enrolment Services, New Zealand Electoral Commission
+Copyright (c) 2010-2022 Enrolment Services, New Zealand Electoral Commission
 
 Written by Haydn Newport E<lt>haydn@catalyst.net.nzE<gt>
 

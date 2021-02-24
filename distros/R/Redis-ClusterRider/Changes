@@ -1,5 +1,9 @@
 Revision history for Perl extension Redis::ClusterRider.
 
+0.22 Wed Feb 24 15:40:00 MSK 2021
+  - Send 'READONLY' command to all nodes using 'on_connect' attribute of 'Redis'
+    package. Thanks for Sawasa (plainbanana).
+
 0.21 Sat Nov 14 17:16:00 MSK 2020
   - Bugfix: make sure to call _init. Thanks to Masahiro Honma
 
