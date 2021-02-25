@@ -3,7 +3,7 @@ use warnings;
 use utf8;
 
 use Test::Builder::Tester;
-use Test::More 0.95;
+use Test::More 1;
 use Test::File;
 use Test::utf8;
 

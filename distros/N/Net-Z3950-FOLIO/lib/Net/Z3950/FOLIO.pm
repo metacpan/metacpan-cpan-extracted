@@ -14,10 +14,11 @@ use Data::Dumper; $Data::Dumper::Indent = 1;
 
 use Net::Z3950::FOLIO::Session;
 use Net::Z3950::FOLIO::OPACXMLRecord qw(makeOPACXMLRecord);
+use Net::Z3950::FOLIO::MARCHoldings qw(insertMARCHoldings);
 use Net::Z3950::FOLIO::RPN;;
 
 
-our $VERSION = '1.6';
+our $VERSION = '1.7';
 
 
 sub FORMAT_USMARC { '1.2.840.10003.5.10' }
@@ -222,6 +223,7 @@ sub _fetch_handler {
     } elsif ($format eq FORMAT_USMARC && (!$comp || $comp eq 'f' || $comp eq 'b')) {
 	# Static USMARC from SRS
 	my $marc = $session->marc_record($rs, $index1);
+	insertMARCHoldings($rec, $marc, $session->{cfg});
 	$res = $marc->as_usmarc();
     } elsif ($format eq FORMAT_USMARC) {
 	_throw(25, "USMARC records available in element-sets: f, b");

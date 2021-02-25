@@ -1,5 +1,9 @@
 Revision history for Perl extension Pepper
 
+1.5 2021-02-24T16:55:42Z
+
+    - Make it possible to send out your custom response, useful for sending files.
+
 1.4 2021-02-02T17:18:01Z
 
     - Modified DB to use DBI's HandleError option to capture all errors.

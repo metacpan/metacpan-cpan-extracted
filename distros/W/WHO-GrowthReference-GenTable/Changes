@@ -1,6 +1,20 @@
-0.002   2021-01-16  Released-By: PERLANCAR; Urgency: medium
+0.003   2021-01-16  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.002 and 0.002.1.
+
+
+0.002.1 2021-01-16  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust to WHO::GrowthReference::Table 0.007.
+
+        - UPDATE: rename version 0.002 -> 0.002.1 due to conflict.
+
+
+0.002   2021-01-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Tweak Abstract.
 
 
 0.001   2021-01-10  Released-By: PERLANCAR

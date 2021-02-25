@@ -4,7 +4,7 @@ use Test::Mojo;
 
 sub startup {
   my $r = shift->routes;
-  $r->route('/drop/:schema')
+  $r->any('/drop/:schema')
     ->to('Schema#schema_drop', namespace=>'Mojolicious::Plugin::RoutesAuthDBI');
 }
 

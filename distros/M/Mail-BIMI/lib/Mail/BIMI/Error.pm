@@ -1,6 +1,6 @@
 package Mail::BIMI::Error;
 # ABSTRACT: Class to represent an error condition
-our $VERSION = '3.20210113'; # VERSION
+our $VERSION = '3.20210225'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -37,6 +37,7 @@ my %ERROR_MAP = (
   SVG_SIZE                 => { description => 'SVG Document exceeds maximum size' },
   SVG_UNZIP_ERROR          => { description => 'Error unzipping SVG' },
   SVG_VALIDATION_ERROR     => { description => 'SVG did not validate' },
+  VMC_EXPIRED              => { description => 'VMC has expired' },
   VMC_FETCH_ERROR          => { description => 'Could not fetch VMC', result => 'temperror' },
   VMC_PARSE_ERROR          => { description => 'Could not parse VMC' },
   VMC_REQUIRED             => { description => 'VMC is required' },
@@ -73,7 +74,7 @@ Mail::BIMI::Error - Class to represent an error condition
 
 =head1 VERSION
 
-version 3.20210113
+version 3.20210225
 
 =head1 DESCRIPTION
 

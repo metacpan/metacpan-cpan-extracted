@@ -1,0 +1,11 @@
+0.002   2021-02-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with Pod::Weaver plugin [Module::Features] to render
+          information into POD pages.
+
+
+0.001   2021-02-25  Released-By: PERLANCAR
+
+        - First release.

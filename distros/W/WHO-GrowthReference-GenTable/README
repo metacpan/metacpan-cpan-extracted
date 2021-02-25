@@ -1,8 +1,9 @@
 NAME
-    WHO::GrowthReference::GenTable - Add WHO reference fields to table
+    WHO::GrowthReference::GenTable - Add WHO growth reference fields to
+    table
 
 VERSION
-    This document describes version 0.002 of WHO::GrowthReference::GenTable
+    This document describes version 0.003 of WHO::GrowthReference::GenTable
     (from Perl distribution WHO-GrowthReference-GenTable), released on
     2021-01-16.
 
@@ -32,7 +33,7 @@ FUNCTIONS
 
      add_who_growth_reference_fields_to_table(%args) -> [status, msg, payload, meta]
 
-    Add WHO reference fields to table.
+    Add WHO growth reference fields to table.
 
     You supply a CSV/TSV containing these fields: "date" (or "age"),
     "height", and "weight". And these additional fields will be added:

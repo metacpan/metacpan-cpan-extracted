@@ -1,10 +1,8 @@
 use strict;
 
 use Test::Builder::Tester;
-use Test::More 0.95;
+use Test::More 1;
 use Test::File;
-
-use Config;
 
 =pod
 
@@ -82,7 +80,7 @@ subtest readable_fails => sub { SKIP: {
 
 subtest not_readable_fails => sub { SKIP: {
 	skip "Superuser has special privileges", 3, if is_unix_superuser();
-	skip "Not possible to make file unreadable on MSYS or Cygwin" if is_cygwin();
+	skip "Not possible to make file unreadable on MSYS" if is_msys();
 	test_out( 'ok 1 - writeable is not readable' );
 	file_not_readable_ok( 'writeable' );
 	test_out( 'ok 2 - writeable really is not readable' );
@@ -102,7 +100,7 @@ subtest writable_fails => sub {
 	file_writable_ok( 'writable' );
 	test_out( "ok 2 - $label" );
 	file_writable_ok( 'writable', $label );
-	if( is_cygwin() or is_unix_superuser() ) {
+	if( is_msys() or is_unix_superuser() ) {
 		test_out( 'ok 3 - readable is writable' );
 		}
 	else {
@@ -118,7 +116,7 @@ subtest writable_fails => sub {
 
 subtest not_writable => sub { SKIP: {
 	skip "Superuser has special privileges", 1, if is_unix_superuser();
-	skip "Not possible to make file unreadable on MSYS or Cygwin" if is_cygwin();
+	skip "Not possible to make file unreadable on MSYS" if is_msys();
 	test_out( 'ok 1 - readable is not writable' );
 	test_out( 'not ok 2 - writable is not writable' );
 	test_diag('File [writable] is writable!');

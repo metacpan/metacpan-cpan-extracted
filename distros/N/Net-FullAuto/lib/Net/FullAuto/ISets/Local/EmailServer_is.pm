@@ -384,33 +384,103 @@ if ($do==1) {
          'pkgconfig libtool gcc-c++ gmp-devel '.
          'mpfr-devel libmpc-devel','__display__');
    }
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'firewall-cmd --zone=public --permanent --add-port=25/tcp',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'firewall-cmd --zone=public --permanent --add-port=465/tcp',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'firewall-cmd --zone=public --permanent --add-port=587/tcp',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'firewall-cmd --zone=public --permanent --add-port=110/tcp',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'firewall-cmd --zone=public --permanent --add-port=995/tcp',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'firewall-cmd --zone=public --permanent --add-port=143/tcp',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'firewall-cmd --zone=public --permanent --add-port=80/tcp',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'firewall-cmd --zone=public --permanent --add-port=443/tcp',
-      '__display__');
-    ($stdout,$stderr)=$handle->cmd($sudo.
-      'firewall-cmd --reload',
-      '__display__');
+
+   test_for_amazon_ec2();
+   if ($main::amazon) {
+      my $n=$main::aws->{fullauto}->
+            {SecurityGroups}->[0]->{GroupName}||'';
+      my $c='aws ec2 describe-security-groups '.
+            "--group-names $n";
+      my ($hash,$output,$error)=('','','');
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error;
+      my $cidr=$hash->{SecurityGroups}->[0]->{IpPermissions}
+              ->[0]->{IpRanges}->[0]->{CidrIp};
+              ->[0]->{IpRanges}->[0]->{CidrIp};
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 22 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 80 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 443 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 25 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 465 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 587 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 110 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 995 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 143 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+
+   } else {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --zone=public --permanent --add-port=25/tcp',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --zone=public --permanent --add-port=465/tcp',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --zone=public --permanent --add-port=587/tcp',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --zone=public --permanent --add-port=110/tcp',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --zone=public --permanent --add-port=995/tcp',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --zone=public --permanent --add-port=143/tcp',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --zone=public --permanent --add-port=80/tcp',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --zone=public --permanent --add-port=443/tcp',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --reload',
+         '__display__');
+   }
    ($stdout,$stderr)=$handle->cmd($sudo.'mkdir -vp /opt/source',
       '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
@@ -1119,7 +1189,7 @@ END
                   $handle->print('brian.kelly@fullauto.com');
                   $output='';
                } elsif (-1<index $output,'Terms of Service') {
-                  $handle->print('A');
+                  $handle->print('Y');
                   $output='';
                } elsif (-1<index $output,'Would you be willing') {
                   $handle->print('Y');
@@ -2010,73 +2080,6 @@ END
          "/etc/init.d/ea-php70-php-fpm start",'__display__');
    }
 
-  test_for_amazon_ec2();
-  if ($main::amazon) {
-     ($stdout,$stderr)=$handle->cmd('wget https://dl.eff.org/certbot-auto');
-     ($stdout,$stderr)=$handle->cmd('chmod -v a+x certbot-auto','__display__');
-     my $ad='%SP%%SP%}%NL%'.
-            '  BOOTSTRAP_VERSION="BootstrapRpmCommon $BOOTSTRAP_RPM_COMMON_VERSION"%NL%'.
-            'elif grep -i "Amazon Linux" /etc/issue > /dev/null 2>&1 || \%NL%'.
-            '     grep %SQ%cpe:.*:amazon_linux:2%SQ% /etc/os-release > /dev/null 2>&1; then%NL%'.
-            '  Bootstrap() {%NL%'.
-            '    ExperimentalBootstrap "Amazon Linux" BootstrapRpmCommon%NL%'.
-            '  }%NL%'.
-            '  BOOTSTRAP_VERSION="BootstrapRpmCommon $BOOTSTRAP_RPM_COMMON_VERSION"';
-     ($stdout,$stderr)=$handle->cmd(
-        "sed -i -e '/Amazon Linux. BootstrapRpmCommon/{n;N;d}' certbot-auto");
-     ($stdout,$stderr)=$handle->cmd(
-        "${sudo}sed -i \'/Amazon Linux. BootstrapRpmCommon/a$ad\' certbot-auto");
-     ($stdout,$stderr)=$handle->cmd(
-        "${sudo}sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-        'certbot-auto');
-     ($stdout,$stderr)=$handle->cmd(
-        "${sudo}sed -i \'s/%SP%/ /g\' ".
-        'certbot-auto');
-     ($stdout,$stderr)=$handle->cmd("${sudo}sed -i \"s/%SQ%/\'/g\" ".
-        'certbot-auto');
-     ($stdout,$stderr)=$handle->cmd($sudo.
-        "certbot --debug --nginx -d $domain_url -d www.$domain_url",
-        '__display__');
-   } else {
-      foreach my $num (1..3) {
-         sleep 3;
-         ($stdout,$stderr)=clean_filehandle($handle);
-         $handle->print($sudo.
-            "certbot --nginx -d $domain_url -d www.$domain_url");
-         $prompt=$handle->prompt();
-         my $output='';
-         while (1) {
-            $output.=fetch($handle);
-            last if $output=~/$prompt/;
-            print $output;
-            if (-1<index $output,'Attempt to reinstall') {
-               $handle->print('1');
-               $output='';
-            } elsif (-1<index $output,'No redirect') {
-               $handle->print('2');
-               $output='';
-            } elsif (-1<index $output,'Enter email address') {
-               $handle->print('brian.kelly@fullauto.com');
-               $output='';
-            } elsif (-1<index $output,'Terms of Service') {
-               $handle->print('A');
-               $output='';
-            } elsif (-1<index $output,'Would you be willing') {
-               $handle->print('Y');
-               $output='';
-            } elsif ((-1<index $output,'existing certificate')
-                  && (-1==index $output,'--duplicate')) {
-               $handle->print('C');
-               $output='';
-            }
-         }
-         ($stdout,$stderr)=clean_filehandle($handle);
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'grep Certbot /etc/nginx/nginx.conf');
-         last if $stdout;
-      }
-   }
-
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    my $install_postfix=<<'END';
 
@@ -2614,117 +2617,119 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/#ssl =/ssl =/g\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/#port = 143/port = 0/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/#port = 993/port = 993/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/#port = 995/port = 995/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/#port = 110/port = 0/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  $ad='unix_listener /var/spool/postfix/private/dovecot-lmtp';
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   $ad='unix_listener /var/spool/postfix/private/dovecot-lmtp';
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s*unix_listener lmtp*$ad*\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"0,/#mode = 0666/{s/#mode = 0666/mode = 0600X/}\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"0,/#mode = 0666/{s/#mode = 0666/mode = 0660/}\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"0,/#user = /{s/#user =/user = postfix/}\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"0,/#group = /{s/#group =/group = postfix/}\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"/mode = 0600/a%SP%%SP%%SP%%SP%group = postfix\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/%SP%/ /g\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"/mode = 0600/a%SP%%SP%%SP%%SP%user = postfix\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/#  mode = 0666/  mode = 0600X/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"0,/#}/ s/#}/X}/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"0,/#}/ s/#}/}/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/X}/#}/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"/mode = 0600X/a%SP%%SP%%SP%%SP%user = vmail\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/0600X/0600/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/#user = .default_internal_user/user = dovecot/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/%SP%/ /g\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  $ad='unix_listener /var/spool/postfix/private/auth';
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   $ad='unix_listener /var/spool/postfix/private/auth';
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s*unix_listener auth-userdb*$ad*\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  $ad='unix_listener auth-userdb';
-  my $bd='#unix_listener /var/spool/postfix/private/auth';
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   $ad='unix_listener auth-userdb';
+   my $bd='#unix_listener /var/spool/postfix/private/auth';
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s*$bd*$ad*\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/#user = root/user = vmail/\" ".
        "/usr/local/etc/dovecot/conf.d/10-master.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "cp -v conf.d/auth-system.conf.ext ".
        "/usr/local/etc/dovecot/conf.d",
        '__display__');
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "cp -v conf.d/10-ssl.conf ".
        "/usr/local/etc/dovecot/conf.d",
        '__display__');
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s/#ssl = yes/ssl = required/\" ".
        "/usr/local/etc/dovecot/conf.d/10-ssl.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s*ssl/certs/dovecot.pem*".
        "letsencrypt/live/$domain_url/fullchain.pem*\" ".
        "/usr/local/etc/dovecot/conf.d/10-ssl.conf");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s*ssl/private/dovecot.pem*".
        "letsencrypt/live/$domain_url/privkey.pem*\" ".
        "/usr/local/etc/dovecot/conf.d/10-ssl.conf");
-  ($stdout,$stderr)=$handle->cwd("/opt/source/$gtarfile");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cwd("/opt/source/$gtarfile");
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "cp -v dovecot.service.in /etc/systemd/system/dovecot.service",
        '__display__');
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s*.sbindir.*/usr/local/sbin*\" ".
        "/etc/systemd/system/dovecot.service");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s*.bindir.*/usr/local/bin*\" ".
        "/etc/systemd/system/dovecot.service");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        'mkdir -vp /var/run/dovecot','__display__');
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \"s*.rundir.*/var/run/dovecot*\" ".
        "/etc/systemd/system/dovecot.service");
-  ($stdout,$stderr)=$handle->cmd($sudo.
+   ($stdout,$stderr)=$handle->cmd($sudo.
        'systemctl daemon-reload');
-  ($stdout,$stderr)=$handle->cmd($sudo.
-       'systemctl restart dovecot');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #    'systemctl restart dovecot');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       '/usr/local/bin/dovecot');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    my $install_roundcube=<<'END';
 
@@ -3209,9 +3214,10 @@ END
 
       Name => 'email_address',
       Input => 1,
+      Result => $standup_emailserver,
       #Result => $stripe_keys,
       #Result =>
-   $Net::FullAuto::ISets::Local::EmailServer_is::select_emailserver_setup,
+   #$Net::FullAuto::ISets::Local::EmailServer_is::select_emailserver_setup,
       Banner => $email_banner,
 
    };

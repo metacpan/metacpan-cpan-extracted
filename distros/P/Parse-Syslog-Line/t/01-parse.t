@@ -5,6 +5,7 @@ use warnings;
 
 use FindBin;
 use Data::Dumper;
+use Module::Load qw( load );
 use Path::Tiny qw(path);
 use Test::MockTime;
 use Test::More;
@@ -21,6 +22,12 @@ Test::MockTime::set_fixed_time("2018-12-01T00:00:00Z");
 my $dataDir = path("$FindBin::Bin")->child('data');
 my @TESTS = ();
 
+my $JSON_OK;
+eval {
+    load 'JSON::MaybeXS';
+    $JSON_OK++;
+};
+
 $dataDir->visit(sub {
     my ($p) = @_;
 
@@ -29,7 +36,13 @@ $dataDir->visit(sub {
 
     # Load the Test Data, fatal errors will cause test failures
     eval {
-        push @TESTS, YAML::LoadFile( $p->stringify );
+        my $test = YAML::LoadFile( $p->stringify );
+        if( $test->{options} and $test->{options}{AutoDetectJSON} ) {
+            push @TESTS, $test if $JSON_OK;
+        }
+        else {
+            push @TESTS, $test;
+        }
         1;
     } or do {
         my $err = $@;

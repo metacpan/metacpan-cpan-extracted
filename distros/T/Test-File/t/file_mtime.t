@@ -2,7 +2,7 @@ use warnings;
 use strict;
 
 use Test::Builder::Tester;
-use Test::More 0.95;
+use Test::More 1;
 use Test::File;
 
 require "./t/setup_common";

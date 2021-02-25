@@ -1,6 +1,6 @@
 package Pepper;
 
-$Pepper::VERSION = '1.4';
+$Pepper::VERSION = '1.5';
 
 use Pepper::DB;
 use Pepper::PlackHandler;
@@ -84,7 +84,7 @@ sub execute_handler {
 	}
 	
 	# ship the content to the client
-	$self->send_response($response_content);
+	$self->send_response($response_content) if $response_content;
 
 }
 

@@ -1,0 +1,182 @@
+NAME
+    Module::Features::TextTable - Features of modules that generate text
+    tables
+
+VERSION
+    This document describes version 0.002 of Module::Features::TextTable
+    (from Perl distribution Module-Features-TextTable), released on
+    2021-02-25.
+
+DESCRIPTION
+DEFINED FEATURES
+    Features defined by this module:
+
+    *   can_align_cell_containing_color_code
+
+        Optional. Type: bool.
+
+    *   can_align_cell_containing_newline
+
+        Optional. Type: bool.
+
+    *   can_align_cell_containing_wide_character
+
+        Optional. Type: bool.
+
+    *   can_color
+
+        Optional. Type: bool. Can produce colored table.
+
+    *   can_color_theme
+
+        Optional. Type: bool. Allow choosing colors from a named set of
+        palettes.
+
+    *   can_colspan
+
+        Optional. Type: bool.
+
+    *   can_customize_border
+
+        Optional. Type: bool. Let user customize border character in some
+        way, e.g. selecting from several available borders, disable border.
+
+    *   can_halign
+
+        Optional. Type: bool. Provide a way for user to specify horizontal
+        alignment (left/middle/right) of cells.
+
+    *   can_halign_individual_cell
+
+        Optional. Type: bool. Provide a way for user to specify different
+        horizontal alignment (left/middle/right) for individual cells.
+
+    *   can_halign_individual_column
+
+        Optional. Type: bool. Provide a way for user to specify different
+        horizontal alignment (left/middle/right) for individual columns.
+
+    *   can_halign_individual_row
+
+        Optional. Type: bool. Provide a way for user to specify different
+        horizontal alignment (left/middle/right) for individual rows.
+
+    *   can_hpad
+
+        Optional. Type: bool. Provide a way for user to specify horizontal
+        padding of cells.
+
+    *   can_hpad_individual_cell
+
+        Optional. Type: bool. Provide a way for user to specify different
+        horizontal padding of individual cells.
+
+    *   can_hpad_individual_column
+
+        Optional. Type: bool. Provide a way for user to specify different
+        horizontal padding of individual columns.
+
+    *   can_hpad_individual_row
+
+        Optional. Type: bool. Provide a way for user to specify different
+        horizontal padding of individual rows.
+
+    *   can_rowspan
+
+        Optional. Type: bool.
+
+    *   can_set_cell_height
+
+        Optional. Type: bool. Allow setting height of rows.
+
+    *   can_set_cell_height_of_individual_row
+
+        Optional. Type: bool. Allow setting height of individual rows.
+
+    *   can_set_cell_width
+
+        Optional. Type: bool. Allow setting height of rows.
+
+    *   can_set_cell_width_of_individual_column
+
+        Optional. Type: bool. Allow setting height of individual rows.
+
+    *   can_use_box_character
+
+        Optional. Type: bool. Can use terminal box-drawing character when
+        drawing border.
+
+    *   can_valign
+
+        Optional. Type: bool. Provide a way for user to specify vertical
+        alignment (top/middle/bottom) of cells.
+
+    *   can_valign_individual_cell
+
+        Optional. Type: bool. Provide a way for user to specify different
+        vertical alignment (top/middle/bottom) for individual cells.
+
+    *   can_valign_individual_column
+
+        Optional. Type: bool. Provide a way for user to specify different
+        vertical alignment (top/middle/bottom) for individual columns.
+
+    *   can_valign_individual_row
+
+        Optional. Type: bool. Provide a way for user to specify different
+        vertical alignment (top/middle/bottom) for individual rows.
+
+    *   can_vpad
+
+        Optional. Type: bool. Provide a way for user to specify vertical
+        padding of cells.
+
+    *   can_vpad_individual_cell
+
+        Optional. Type: bool. Provide a way for user to specify different
+        vertical padding of individual cells.
+
+    *   can_vpad_individual_column
+
+        Optional. Type: bool. Provide a way for user to specify different
+        vertical padding of individual columns.
+
+    *   can_vpad_individual_row
+
+        Optional. Type: bool. Provide a way for user to specify different
+        vertical padding of individual rows.
+
+    *   speed
+
+        Optional. Type: str. Subjective speed rating, relative to other text
+        table modules.
+
+    For more details on module features, see Module::Features.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-Features-TextTable>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-Features-TextTable>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Module-Features-TextTable/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Module::Features
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

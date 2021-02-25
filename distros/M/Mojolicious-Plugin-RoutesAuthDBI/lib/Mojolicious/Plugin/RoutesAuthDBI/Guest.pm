@@ -2,7 +2,6 @@ package Mojolicious::Plugin::RoutesAuthDBI::Guest;
 use Mojo::Base -base;#'Mojolicious::Plugin::Authentication'
 use Mojolicious::Plugin::RoutesAuthDBI::Util qw(json_enc json_dec);
 
-
 has [qw(session_key stash_key app plugin model)];
 
 sub new {

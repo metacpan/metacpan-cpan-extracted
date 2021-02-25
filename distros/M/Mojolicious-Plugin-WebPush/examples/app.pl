@@ -65,12 +65,12 @@ sub webpush_config {
 }
 
 sub subs_session2user_p {
-  return Mojo::Promise->reject("Session not logged in") if !$_[0]{user_id};
-  Mojo::Promise->resolve($_[0]{user_id});
+  return Mojo::Promise->reject("Session not logged in") if !$_[1]{user_id};
+  Mojo::Promise->resolve($_[1]{user_id});
 }
 
 sub subs_create_p {
-  my ($user_id, $subs_info) = @_;
+  my ($c, $user_id, $subs_info) = @_;
   app->sqlite->db->insert(
     'users',
     { username => $user_id, subs_info => encode_json($subs_info) },
@@ -79,7 +79,7 @@ sub subs_create_p {
 }
 
 sub subs_read_p {
-  my ($user_id) = @_;
+  my ($c, $user_id) = @_;
   my @results = app->sqlite->db->select(
     'users',
     [qw(subs_info)],
@@ -90,7 +90,7 @@ sub subs_read_p {
 }
 
 sub subs_delete_p {
-  my ($user_id) = @_;
+  my ($c, $user_id) = @_;
   return app->webpush->read_p($user_id)->then(sub {
     app->sqlite->db->delete('users', { username => $user_id });
     $_[0];

@@ -1,9 +1,31 @@
 ==================================================
-Changes from 2019-02-19 00:00:00 +0000 to present.
+Changes from 2019-02-26 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 4.6 at 2021-02-18 22:40:24 +0000
+version 4.7 at 2021-02-25 00:04:16 +0000
+----------------------------------------
+
+  Change: 54fff942c417fdb3c300b3bf08bc584c3d2c972d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-02-24 16:03:01 +0000
+
+    Stop tests from failing without JSON::MaybeXS
+
+    Prior to this patch, tests were failing on the smoke test infrastructure
+    since `JSON::MaybeXS` is an optional dependency.
+
+    The tests now check for `JSON::MaybeXS` and only load and run the tests if
+    it's present.
+
+    Also adjusted the call of `decode_json()` to use the package path to
+    prevent issues if something else loads `JSON::MaybeXS` without importing
+    the `decode_json()` symbol.
+
+    Release as 4.7 to the CPAN. 
+
+----------------------------------------
+version 4.6 at 2021-02-18 22:40:10 +0000
 ----------------------------------------
 
   Change: 1e2b67a489bd9852e457c614a7eb0a1a1c76027e
@@ -128,5 +150,5 @@ version 4.6 at 2021-02-18 22:40:24 +0000
     Remove "sub expression" grouping and gender specificity in a comment 
 
 =================================================
-Plus 35 releases after 2019-02-19 00:00:00 +0000.
+Plus 35 releases after 2019-02-26 00:00:00 +0000.
 =================================================

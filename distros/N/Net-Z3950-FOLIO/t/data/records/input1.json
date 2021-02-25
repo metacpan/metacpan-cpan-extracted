@@ -22,7 +22,7 @@
     {
       "accessionNumber": null,
       "barcode": "01234567890",
-      "chronology": null,
+      "chronology": "29",
       "copyNumber": "1",
       "descriptionOfPieces": null,
       "discoverySuppress": null,
@@ -35,6 +35,12 @@
           "uri": "https://ezproxy.simmons.edu/login?url=http://www.jstor.org/stable/10.2307/j.ctt24hc08"
         }
       ],
+      "effectiveCallNumberComponents": {
+        "callNumber": "HD1131.S860 1989",
+        "prefix": "123",
+        "suffix": "abc",
+        "typeId": "95467209-6d7b-468b-94df-0f5d7ad2747d"
+      },
       "enumeration": "42",
       "formerIds": [],
       "hrid": "item12345",
@@ -119,8 +125,8 @@
           }
         ]
       },
-      "volume": "",
-      "yearCaption": []
+      "volume": "1",
+      "yearCaption": ["a", "b"]
     }
   ],
   "holdingsStatements": [],

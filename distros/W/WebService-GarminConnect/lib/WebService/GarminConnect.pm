@@ -9,7 +9,7 @@ use URI;
 use JSON;
 use Data::Dumper;
 
-our $VERSION = '1.0.8'; # VERSION
+our $VERSION = '1.0.9'; # VERSION
 
 =head1 NAME
 
@@ -17,7 +17,7 @@ WebService::GarminConnect - Access data from Garmin Connect
 
 =head1 VERSION
 
-version 1.0.8
+version 1.0.9
 
 =head1 SYNOPSIS
 
@@ -195,7 +195,10 @@ sub activities {
     my $searchurl = $self->{searchurl} .
       "?start=$start&limit=$pagesize";
 
-    my $request = HTTP::Request->new(GET => $searchurl);
+    my $headers = [
+      'NK' => 'NT',
+    ];
+    my $request = HTTP::Request->new('GET', $searchurl, $headers);
     my $response = $ua->request($request);
     croak "Can't make search request: " . $response->status_line
       unless $response->is_success;

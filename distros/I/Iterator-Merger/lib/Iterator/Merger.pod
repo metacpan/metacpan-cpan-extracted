@@ -1,0 +1,125 @@
+=head1 NAME
+
+Iterator::Merger - an iterator to efficiently merge sorted iterators
+
+=head1 SYNOPSIS
+
+    use Iterator::Merger qw(imerge);
+
+    # $ite1 and $ite2 are iterators generating sorted output
+    # These can be code references or filehandlers
+
+    my $merger = imerge($ite1, $ite2);
+
+    while (my $next = $merger->()) {
+        print $next, "\n";
+    }
+
+    # example with two files and a sub:
+
+    open(my $fh1, '<', 'foo.sorted') or die $!;
+    open(my $fh2, '<', 'bar.sorted') or die $!;
+
+    my $sub = do {
+        my $i = 0;
+        sub {
+            ++$i<100_000_000 && sprintf("%08d", $i)
+        }
+    };
+
+    my $merger = imerge($fh1, $fh2, $sub);
+
+    while (my $next = $merger->()) {
+        print $next, "\n";
+    }
+
+=head1 DESCRIPTION
+
+C<Iterator::Merger> generates the fastest possible pure Perl iterator to merge sorted iterators.
+Source iterators can be code references or filhandlers, and must produce a sorted output.
+The generated iterator is always a code reference.
+
+See the Implementation section for more details.
+
+=over 4
+
+=item imerge ITERATORS
+
+ITERATORS is a list of either CODE or GLOB references that must generate an ascending sorted output.
+This function returns a CODE reference that generate the sort-merged output of all ITERATORS.
+Sorting is done using the cmp comparison operator.
+
+CODE iterators are evaluated in scalar context until undef is returned.
+GLOB iterators are evaluated in scalar context, relying on the $/ separator, until EOF.
+
+=item imerge_num ITERATORS
+
+Same as C<imerge>, but sorting is done using the <=> comparison operator.
+
+=item imerge_raw ITERATORS
+
+Same as C<imerge>, but no sorting is done, nor expected in source iterators.
+Iteratos are read in order until undef is returned or EOF is reached.
+
+=head1 EXPORTS
+
+Nothing by default.
+Functions can be imported explicitely
+
+    use Iterator::Merger qw(imerge imerge_num imerge_raw);
+
+=head1 IMPLEMENTATION
+
+=over 4
+
+C<imerge> and C<imerge_num> are very fast as the comparison code is generated
+on the fly, but the price to pay is that any first call with a given number of
+iterators will take some time and memory to generate and evaluate the code.
+Subsequent calls with the same number of source iterators will reuse the same
+code.
+
+The cost of this overhead has to be evaluated in comparison to the number of
+sorted elements to merge.
+
+The size of the generated code double for each additionnal source iterator, up
+to a limit.
+
+For example the comparison code for 9 iterators represent about 15KiB of
+minified Perl code.
+
+When the number of source iterators exceeds 9, C<imerge> and C<imerge_num>
+ressort to using the very fast L<Array::Heap> module.
+This limit was empirically chosen as a safe point where using a heap is almost
+as efficient as using "brute-force" generated comparison, without any
+generation overhead.
+
+This limit can be changed using the $Iterator::Merger::Max_generate variable.
+
+=back
+
+=head1 TODO
+
+=over 4
+
+=item * XS version with on the fly C code generation?
+
+=back
+
+=head1 SEE ALSO
+
+L<Sort::Merge>, generally much slower but can be an interesting alternative when a small
+number of elements is to be merged, as it does not have any generation overhead.
+
+=head1 AUTHOR
+
+Thomas Drugeon, E<lt>tdrugeon@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by Thomas Drugeon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.32 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

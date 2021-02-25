@@ -1,3 +1,13 @@
+1.00  2021-02-25
+    - HTTPS: SSL_verifycn_name and SSL_hostname handling
+    - removed final slash in directory node in opendir/readir
+    - added opendir_slash to replicate old behavior of preserving final slash
+    - bug correction: open_at was not working as intended with local files
+    - post() function added
+    - accept 204 as a success status code
+    - $MAX_LENGTH_SKIP default value increased from 16KB to 256KB
+    - updated to Module::Install 1.19
+
 0.91  2013-08-28
     - get(): returns '502' response headers when none was received
 
@@ -29,5 +39,4 @@
     - recommands IO::Socket::SSL and Time::y2038 in makefile
 
 0.87  2012-02-14
-    - First release on CPAN, but the module already
-      has more than 3 years of evolution
+    - First release on CPAN (module in use since 2009)

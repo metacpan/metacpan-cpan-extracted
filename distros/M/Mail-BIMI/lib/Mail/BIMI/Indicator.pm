@@ -1,6 +1,6 @@
 package Mail::BIMI::Indicator;
 # ABSTRACT: Class to model a BIMI indicator
-our $VERSION = '3.20210113'; # VERSION
+our $VERSION = '3.20210225'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -153,9 +153,12 @@ sub _build_is_valid($self) {
     }
     else {
       eval {
-        $self->parser->validate( $self->data_xml );
-        $is_valid=1;
-        $self->log_verbose('SVG is valid');
+        my $data_xml = $self->data_xml;
+        if ($data_xml) {
+          $self->parser->validate( $data_xml );
+          $is_valid=1;
+          $self->log_verbose('SVG is valid');
+        }
         1;
       } || do {
         my $validation_error = $@;
@@ -215,7 +218,7 @@ Mail::BIMI::Indicator - Class to model a BIMI indicator
 
 =head1 VERSION
 
-version 3.20210113
+version 3.20210225
 
 =head1 DESCRIPTION
 

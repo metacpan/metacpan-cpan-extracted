@@ -1,3 +1,21 @@
+<opacRecord>
+  <bibliographicRecord>
+    <record
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+        xmlns="http://www.loc.gov/MARC21/slim">
+    
+      <leader>03101cam a2200505Ii 4500</leader>
+      <controlfield tag="007">cr cnu---unuuu</controlfield>
+      <controlfield tag="008">1234567890123456789012345678901</controlfield>
+      <datafield tag="845" ind1=" " ind2=" ">
+        <subfield code="3">Bituminous Coal Division and National Bituminous Coal Commission Records</subfield>
+        <subfield code="a">"No information obtained from a producer disclosing cost of production or sales realization shall be made public without the consent of the producer from whom the same shall have been obtained";</subfield>
+        <subfield code="c">50 Stat.88.</subfield>
+      </datafield>
+    </record>
+  </bibliographicRecord>
+  <holdings>
     <holding>
       <typeOfRecord>c</typeOfRecord>
       <encodingLevel>5</encodingLevel>
@@ -22,3 +40,5 @@
         </circulation>
       </circulations>
     </holding>
+  </holdings>
+</opacRecord>

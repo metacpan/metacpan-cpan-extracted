@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::Builder::Tester;
-use Test::More 0.95;
+use Test::More 1;
 use Test::File;
 
 use File::Spec::Functions qw(catfile);

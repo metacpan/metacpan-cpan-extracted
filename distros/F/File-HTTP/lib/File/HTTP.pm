@@ -16,11 +16,12 @@ use constant 1.03; # hash ref, perl 5.7.2
 # - Time::y2038 or Time::Local
 # - IO::Socket::SSL
 
-our $VERSION = '0.91';
+our $VERSION = '1.00';
 
 our @EXPORT_OK = qw(
-	open stat open_at open_stream slurp_stream get
+	open stat open_at open_stream slurp_stream get post
 	opendir readdir rewinddir telldir seekdir closedir 
+	opendir_slash
 	_e _s
 );
 
@@ -45,6 +46,7 @@ use constant FIELDS => qw(
 	URL
 	PROTO
 	HOST
+	REMOTE_HOST
 	OFFSET
 	CURRENT_OFFSET
 	CONTENT_LENGTH
@@ -57,6 +59,7 @@ use constant FIELDS => qw(
 	MTIME
 	LAST_MODIFIED
 	CONTENT_TYPE
+	HTTP_VERSION
 	FH
 	FH_STAT
 	LAST_READ
@@ -66,7 +69,8 @@ use constant FIELDS => qw(
 	
 	REQUEST_TIME
 	RESPONSE_TIME
-	
+
+	NO_CLOSE_ON_DESTROY
 	
 	DIR_LIST
 	DIR_POS
@@ -79,20 +83,30 @@ use constant do {my $i=-1; +{ map {$_ => ++$i} FIELDS } };
 use constant AF_INET		=> &Socket::AF_INET;
 use constant SOCK_STREAM	=> &Socket::SOCK_STREAM;
 use constant IPPROTO_TCP	=> &Socket::IPPROTO_TCP;
+use constant SOL_SOCKET		=> &Socket::SOL_SOCKET;
+use constant SO_LINGER		=> &Socket::SO_LINGER;
+use constant DONT_LINGER	=> pack(II => 1, 0);
 use constant READ_MODE		=> &Fcntl::S_IRUSR | &Fcntl::S_IRGRP | &Fcntl::S_IROTH;
 
 # user modifiable global parameters
 our $REQUEST_HEADERS;
 our $RESPONSE_HEADERS;
 our $IGNORE_REDIRECTIONS;
-our $VERBOSE			= DEBUG;
+our $IGNORE_ERRORS;
+our $VERBOSE;
+our $DEBUG_SLOW_CONNECTION;
 our $MAX_REDIRECTIONS		= 7;
 our $MAX_HEADER_LINES		= 50;
 our $MAX_HEADER_SIZE		= 65536;
 our $MAX_SEC_NO_CLOSE		= 3;
-our $MAX_LENGTH_SKIP		= 16*1024;
+our $MAX_LENGTH_SKIP		= 256*1024;
 our $USER_AGENT			= __PACKAGE__. '/'. $VERSION;
 our $TUNNELING_USER_AGENT;	# default to $USER_AGENT when undefined
+
+if (DEBUG) {
+	$VERBOSE = 1;
+	$DEBUG_SLOW_CONNECTION = 1;
+}
 
 my $SSL_LOADED;
 my $TIME_GM_CODE;
@@ -157,7 +171,7 @@ sub _e ($) {
 	defined _s($_[0])
 }
 
-sub opendir ($$) {
+sub opendir_slash ($$) {
 	my $dir = pop;
 	
 	if (($dir||'') =~ m!^https?://!) {
@@ -171,6 +185,27 @@ sub opendir ($$) {
 		
 		local $/;
 		$self->[DIR_LIST] = [ '.', '..', grep {not m!^\.\.?/?!} <$fh> =~ m! href="(?:(?:$self->[PROTO]://)?$path)?([^/\?"]+/?)"!g ];
+		$self->[DIR_POS] = 0;
+		1	
+	} else {
+		CORE::opendir($_[0], $dir)
+	}
+}
+
+sub opendir ($$) {
+	my $dir = pop;
+	
+	if (($dir||'') =~ m!^https?://!) {
+		$_[0] ||= Symbol::gensym();
+		my $self = tie(*{$_[0]}, __PACKAGE__, $dir, undef) || return;
+		
+		my $path = $self->[REAL_PATH];
+		$path =~ s/\?.*$//;
+	
+		my $fh = $self->[FH];
+		
+		local $/;
+		$self->[DIR_LIST] = [ '.', '..', grep {not m!^\.\.?/?!} <$fh> =~ m! href="(?:(?:$self->[PROTO]://)?$path)?([^/\?"]+)/?"!g ];
 		$self->[DIR_POS] = 0;
 		1	
 	} else {
@@ -283,17 +318,17 @@ sub open_at ($$;$) {
 		$_[0] ||= Symbol::gensym();
 		return tie(*{$_[0]}, __PACKAGE__, $file, $offset) && 1
 	} else {
-		my $fh = CORE::open($_[0], '<', $file);
+		CORE::open($_[0], '<', $file);
 		no warnings;
-		seek($fh, $offset, 0) if $offset && $fh;
-		return $fh;
+		seek($_[0], $offset, 0) if $offset && $_[0];
+		return $_[0];
 	}
 }
 
 sub open_stream ($;$) {
 	my ($url, $offset) = @_;
 	$url = "http://$url" unless $url =~ m!^https?://!i;
-	my $self = TIEHANDLE(__PACKAGE__, $url, $offset) || return undef;
+	my $self = TIEHANDLE(__PACKAGE__, $url, $offset, 1) || return undef;
 	@$self[CONTENT_LENGTH, FH]
 }
 
@@ -309,16 +344,51 @@ sub slurp_stream {
 }
 
 sub get {
+	# args: url, follow redirections
 	my $url = shift;
 	local $IGNORE_REDIRECTIONS = not shift;
+	local $IGNORE_ERRORS = 1;
 	local $REQUEST_HEADERS;
 	local $RESPONSE_HEADERS;
-	local $/;
 	my $fh = open_stream($url);
 	return (
 		$REQUEST_HEADERS,
-		$RESPONSE_HEADERS || "HTTP/1.0 502 Bad Gateway\015\012\015\012",
-		$fh ? <$fh> : ''
+		$RESPONSE_HEADERS || "HTTP/1.0 502 Bad Gateway\015\012Content-Length: 0\015\012\015\012",
+		$fh ? do {local $/; <$fh>} : ''
+	)
+}
+
+sub post {
+	# args: url, type, body
+	# does not follow redirections
+	my $url = shift;
+	my $type = shift;
+
+	my ($proto, undef, $host, $port, $path) = $url =~ m!^(https?)://(?:([^/:]+:[^/@]+)@)?([^/:]+)(?:\:(\d+))?(/[^#]+)?!i;
+
+	$proto = uc $proto;
+	$port ||= $Proto2Port{$proto};
+	$path ||= '/';
+	my $netloc = ($port==$Proto2Port{$proto}) ? $host : "$host:$port";
+
+	local $IGNORE_REDIRECTIONS = 1;
+	local $IGNORE_ERRORS = 1;
+	local $RESPONSE_HEADERS;
+	local $REQUEST_HEADERS = \join("\015\012",
+		"POST $path HTTP/1.0",
+		"Host: $netloc",
+		"User-Agent: $USER_AGENT",
+		($type ? ("Content-Type: $type") : ()),
+		'Content-Length: '. bytes::length($_[0]),
+		"Connection: close",
+		'',
+		$_[0]
+	);
+	my $fh = open_stream($url);
+	return (
+		$REQUEST_HEADERS,
+		$RESPONSE_HEADERS || "HTTP/1.0 502 Bad Gateway\015\012Content-Length: 0\015\012\015\012",
+		$fh ? do {local $/; <$fh>} : ''
 	)
 }
 
@@ -336,7 +406,9 @@ sub _handshake {
 	my $headers;
 	{
 		no warnings;
-		(print($fh $req_headers) && $self->_read($headers, 5)) || die "error: ".&Errno::EIO; # Input/output error;
+		print($fh $req_headers) || die "error: ".&Errno::EIO."\nwhen sending request:\n$req_headers"; # Input/output error;
+		# shutdown($fh, 1);
+		$self->_read($headers, 5) || die "error: ".&Errno::EIO."\nwhen reading response headers from request:\n$req_headers"; # Input/output error;
 	}
 	unless (defined($headers) && $headers eq 'HTTP/') {
 		die "error: wrong HTTP headers\n";
@@ -359,6 +431,7 @@ sub _handshake {
 	}
 	$self->[LAST_HEADERS_SIZE] += bytes::length($headers);
 	DEBUG && warn $headers;
+	DEBUG && warn time - $self->[REQUEST_TIME];
 	
 	return ($code, $headers);
 }
@@ -369,7 +442,7 @@ sub _initiate {
 	$self->[LAST_HEADERS_SIZE] ||= 0;
 	if ($self->_connected) {
 		if ($self->[CURRENT_OFFSET] == $self->[OFFSET]) {
-			DEBUG && warn "same offset\n";
+			DEBUG && print STDERR "[same offset]";
 			$self->[LAST_READ] = time;
 			return 1;
 		}
@@ -381,20 +454,20 @@ sub _initiate {
 			$self->[LAST_READ] = time;
 			return 1;
 		}
-		DEBUG && warn "close\n";
+		DEBUG && print STDERR "[close]";
 	}
 	elsif (DEBUG) {
 		warn "not connected";
 	}
 
-	$REQUEST_HEADERS = do {
+	$REQUEST_HEADERS = ($REQUEST_HEADERS && ref $REQUEST_HEADERS) ? $$REQUEST_HEADERS : do {
 		my @h = (
 			"GET $self->[PATH] HTTP/1.0",
 			"Host: $self->[NETLOC]",
 			"User-Agent: $USER_AGENT",
 			"Connection: close",
 		);
-		push @h, "Proxy-Connection: close" if $self->[CONNECT_NETLOC] && $self->[PROTO] ne 'HTTPS';
+		# push @h, "Proxy-Connection: close" if $self->[CONNECT_NETLOC] && $self->[PROTO] ne 'HTTPS';
 		push @h, "Range: bytes=$self->[OFFSET]-" if defined $self->[OFFSET];
 		push @h, "Authorization: Basic ". MIME::Base64::encode_base64($self->[AUTH]) if $self->[AUTH];
 	
@@ -403,13 +476,26 @@ sub _initiate {
 
 	die "error: ".&Errno::EFAULT unless $self->[IP]; # Bad address
 
+	if ($self->[FH]) {
+		# shutdown($self->[FH], 2);
+		CORE::close($self->[FH]);
+		# select(undef, undef, undef, 0.1);
+	}
 	$self->[FH] = undef;
 	$self->[REQUEST_TIME] = time;
+	($self->[HTTP_VERSION]) = $REQUEST_HEADERS =~m! HTTP/(\d+\.\d+)\r?\n!;
+	$self->[HTTP_VERSION] += 0;
 	$self->[LAST_HEADERS_SIZE] = 0;
 	socket($self->[FH], AF_INET, SOCK_STREAM, IPPROTO_TCP) || die $!;
+	# setsockopt($self->[FH], SOL_SOCKET, SO_LINGER, DONT_LINGER) || die $!;
+
 	select((select($self->[FH]), $|=1)[0]); # autoflush
 	for (1..10) {
+		my $t = $DEBUG_SLOW_CONNECTION && time;
 		my $status = connect($self->[FH], Socket::sockaddr_in($self->[PORT], $self->[IP]));
+		if ($DEBUG_SLOW_CONNECTION && time-$t >= .4) {
+			warn sprintf "\nSLOW %s CONNECTION to %s:%d: %s", ($status ? 'SUCCESS' : 'FAILED'), $self->[HOST], $self->[PORT], time-$t;
+		}
 		last if $status;
 		die $! unless $_ < 3 && $! =~ /Interrupted system call/i;
 	}
@@ -433,24 +519,32 @@ sub _initiate {
 			);
 			die "error: HTTP error $code from proxy during CONNECT\n" unless $code == 200;
 		}
-#		use Time::This;
-#		timed {
-			IO::Socket::SSL->start_SSL($self->[FH],
-				SSL_session_cache_size	=> 100,
-				SSL_verify_mode => &IO::Socket::SSL::SSL_VERIFY_NONE,
-			);
-#		} "SSL start $self->[PATH] @ $self->[OFFSET]";
+
+		IO::Socket::SSL->start_SSL($self->[FH],
+			SSL_verifycn_name => $self->[REMOTE_HOST],
+			SSL_hostname => $self->[REMOTE_HOST],
+			SSL_session_cache_size => 100,
+			SSL_verify_mode => &IO::Socket::SSL::SSL_VERIFY_NONE,
+		);
 	}
-	
+
 	(my $code, $RESPONSE_HEADERS) = $self->_handshake($REQUEST_HEADERS);
 
 	$self->[RESPONSE_TIME] = time;
 
-	if ($code != (defined($self->[OFFSET]) ? 206 : 200)) {
+	my $code_ok = do {
+		if (defined $self->[OFFSET]) {
+			$code == 206
+		} else {
+			$code == 200 || $code == 204
+		}
+	};
+
+	if (!$code_ok) {
 		if ($code =~ /^3/ && $RESPONSE_HEADERS =~ /\015?\012Location: ([^\015\012]+)/i) {
 			die "redirection: $1\n" unless $IGNORE_REDIRECTIONS;
 		}
-		else {
+		elsif (!$IGNORE_ERRORS) {
 			$self->[CONTENT_LENGTH] ||= ($RESPONSE_HEADERS =~ /\015?\012Content-Length: (\d+)/i && $1);
 			if ($code =~ /^200$|^416$/ && $self->[OFFSET] >= $self->[CONTENT_LENGTH]) {
 				DEBUG && warn "out of range\n";
@@ -462,7 +556,7 @@ sub _initiate {
 			}
 		}
 	}
-	if ($RESPONSE_HEADERS =~ m!\015?\012Transfert-Encoding: +chunked!i) {
+	if ($RESPONSE_HEADERS =~ m!\015?\012Transfert-Encoding: +chunked!i && $self->[HTTP_VERSION] <= 1) {
 		$! = $HTTP2FS_error{$code} || &Errno::ENOSYS; # ENOSYS: Function not implemented
 		die "error: $!\n";
 	}
@@ -515,15 +609,19 @@ sub _read {
 }
 
 sub TIEHANDLE {
-	my ($class, $url, $offset) = @_;
+	my ($class, $url, $offset, $no_close_on_destroy) = @_;
 	my $self = bless [], $class;
 	my $redirections = 0;
+
+	$self->[NO_CLOSE_ON_DESTROY] = $no_close_on_destroy;
 
 	SET_URL: {
 		$self->[URL] = $url;
 		$self->[OFFSET] = $offset;
 		$self->[CURRENT_OFFSET] = $offset;
 		($self->[PROTO], $self->[AUTH], $self->[HOST], $self->[PORT], $self->[PATH]) = $url =~ m!^(https?)://(?:([^/:]+:[^/@]+)@)?([^/:]+)(?:\:(\d+))?(/[^#]+)?!i;
+		$self->[REMOTE_HOST] = $self->[HOST];
+
 		if ($self->[AUTH]) {
 			require MIME::Base64;
 			#$VERBOSE && carp "authentication in URI is not supported";
@@ -568,7 +666,6 @@ sub TIEHANDLE {
 		$self->[IP] = Socket::inet_aton($self->[HOST]);
 		eval { $self->_initiate };
 
-
 		if ($@) {
 			if ($@ =~ /^redirection: ([^\n]+)/) {
 				my $location = $1;
@@ -596,8 +693,12 @@ sub TIEHANDLE {
 				redo SET_URL;
 			}
 			elsif ($@ =~ /^error: (\d+)/) {
+				$VERBOSE && carp $@;
 				$! = $1;
 				return undef;
+			}
+			elsif ($@ =~ /^HTTPS support/) {
+				die $@;
 			}
 			else {
 				$VERBOSE && carp $@;
@@ -678,6 +779,7 @@ sub SEEK {
 	else {
 		return undef
 	}
+	1
 }
 
 sub WRITE {
@@ -697,7 +799,18 @@ sub BINMODE {
 }
 
 sub CLOSE {
-	$_[0]->[FH] = undef
+	my $self = shift;
+	return unless $self->[FH];
+	# CORE::shutdown($self->[FH], 2);
+	CORE::close($self->[FH]);
+	$self->[FH] = undef
+}
+
+sub DESTROY {
+	DEBUG && warn "\nDESTROY";
+	my $self = shift || return;
+	return if $self->[NO_CLOSE_ON_DESTROY];
+	$self->CLOSE
 }
 
 # STAT, ISATTY, ISBINARY => used in perl 5.11 ?

@@ -20,7 +20,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Module-Features/issues
   homepage: https://metacpan.org/release/Module-Features
   repository: git://github.com/perlancar/perl-Module-Features.git
-version: 0.1.2
+version: 0.1.6
 x_Dist_Zilla:
   perl:
     version: '5.030000'

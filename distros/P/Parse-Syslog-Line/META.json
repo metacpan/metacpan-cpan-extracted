@@ -85,7 +85,7 @@
          "web" : "https://github.com/reyjrar/Parse-Syslog-Line"
       }
    },
-   "version" : "4.6",
+   "version" : "4.7",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028001"
@@ -456,7 +456,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v4.6",
+                  "tag" : "v4.7",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -536,7 +536,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release-4.6",
+                  "tag" : "release-4.7",
                   "tag_format" : "release-%v",
                   "tag_message" : "v%V"
                },

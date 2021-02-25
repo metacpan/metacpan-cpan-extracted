@@ -96,7 +96,7 @@ sub expand_single_variable_reference {
     } elsif (!ref($val)) {
 	return expand_scalar_variable_reference($key, $val);
     } else {
-	die "non-hash, non-array, non-scale configuration key '$key'";
+	die "non-hash, non-array, non-scalar configuration key '$key'";
     }
 }
 
@@ -190,13 +190,30 @@ Net::Z3950::FOLIO::Config - configuration file for the FOLIO Z39.50 gateway
     "queryFilter": "source=marc",
     "graphqlQuery": "instances.graphql-query",
     "chunkSize": 5
+    "marcHoldings": {
+      "field": "952",
+      "indicators": [" ", " "],
+      "holdingsElements": {
+        "t": "copyNumber"
+      },
+      "itemElements": {
+        "b": "itemId",
+        "k": "_callNumberPrefix",
+        "h": "_callNumber",
+        "m": "_callNumberSuffix",
+        "v": "_volume",
+        "e": "_enumeration",
+        "y": "_yearCaption",
+        "c": "_chronology"
+      }
+    },
     "postProcessing": {
       "marc": {
-	"008": { "op": "regsub", "pattern": "([13579])", "replacement": "[$1]", "flags": "g" },
-	"245$a": [
-	  { "op": "stripDiacritics" },
-	  { "op": "regsub", "pattern": "[abc]", "replacement": "*", "flags": "g" }
-	]
+        "008": { "op": "regsub", "pattern": "([13579])", "replacement": "[$1]", "flags": "g" },
+        "245$a": [
+          { "op": "stripDiacritics" },
+          { "op": "regsub", "pattern": "[abc]", "replacement": "*", "flags": "g" }
+        ]
       }
     }
   }
@@ -345,6 +362,74 @@ search. This can be tweaked to tune performance. Setting it too low
 will result in many requests with small numbers of records returned
 each time; setting it too high will result in fetching and decoding
 more records than are actually wanted.
+
+=head2 C<marcHoldings>
+
+An optional object specifying how holdings and item-level data should
+be mapped into MARC fields. It contains four elements:
+
+=over 4
+
+=item C<field>
+
+A string specifying which MARC field should be used for holdings
+information. When a record contains multiple holdings, a separate
+instance of this MARC field is created for each holding.
+
+=item C<indicators>
+
+An array containing two strings, each of them specifying one of the
+two indicators to be used in the MARC field that contains
+holdings. There must be exactly two elements: blank indicators can
+be specified as a single space.
+
+information.
+
+=item C<holdingsElements>
+
+An object specifying MARC subfields that should be set from
+holdings-level data. The keys are the single-character names of the
+subfields, and the corresponding values are the names of
+holdings-level fields in the OPAC XML record structure.
+
+See C<itemElements> for detail of the structure.
+
+=item C<itemElements>
+
+An object specifying MARC subfields that should be set from item-level
+data. The keys are the single-character names of the subfields, and
+the corresponding values are the names of item-level fields in the
+OPAC XML record structure. In addition to the standard field names,
+several additional special fields are avaialable, not part of the OPAC
+Z39.50 record, assigned names that begin with underscores:
+
+=over 4
+
+=item C<_enumeration>
+
+=item C<_chronology>
+
+=item C<_callNumber>
+
+=item C<_callNumberPrefix>
+
+=item C<_callNumberSuffix>
+
+=item C<_volume>
+
+=item C<_yearCaption>
+
+=back
+
+Since there may be multiple items in a single holding, sets of these
+fields can repeat, e.g. for a holding with two items each specifying
+data that is encoded in the C<b>, C<e> and C<h> subfields, the field
+would take the form
+
+  $b 46243154 $e 1994/95 v.1 $h
+  $b 46243072 $e 1994/95 v.2 $h TD224.I3I58b
+
+=back
 
 =head2 C<postProcessing>
 

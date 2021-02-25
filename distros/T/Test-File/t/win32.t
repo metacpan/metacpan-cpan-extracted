@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::Builder::Tester;
-use Test::More 0.95;
+use Test::More 1;
 
 subtest load => sub {
 	use_ok( 'Test::File' );

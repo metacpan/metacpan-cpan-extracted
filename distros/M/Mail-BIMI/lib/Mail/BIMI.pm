@@ -1,6 +1,6 @@
 package Mail::BIMI;
 # ABSTRACT: BIMI object
-our $VERSION = '3.20210113'; # VERSION
+our $VERSION = '3.20210225'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -188,6 +188,7 @@ sub _build_result($self) {
       SPF_PLUS_ALL
       SVG_FETCH_ERROR
       VMC_FETCH_ERROR
+      VMC_EXPIRED
       VMC_PARSE_ERROR
       VMC_VALIDATION_ERROR
       SVG_GET_ERROR
@@ -259,7 +260,7 @@ Mail::BIMI - BIMI object
 
 =head1 VERSION
 
-version 3.20210113
+version 3.20210225
 
 =head1 DESCRIPTION
 

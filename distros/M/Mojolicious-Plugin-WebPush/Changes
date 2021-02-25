@@ -1,3 +1,7 @@
+0.05 2021-02-24
+- update example to work right with $c in signature
+- zap webpush.aud as is supposed to be base URL of push service, not of app
+
 0.04 2021-02-10
 - add $c to all callbacks - thanks @uniejo
 

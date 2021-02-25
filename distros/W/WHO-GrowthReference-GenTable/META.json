@@ -1,5 +1,5 @@
 {
-   "abstract" : "Add WHO reference fields to table",
+   "abstract" : "Add WHO growth reference fields to table",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -73,7 +73,7 @@
          "web" : "https://github.com/perlancar/perl-WHO-GrowthReference-GenTable"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

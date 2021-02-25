@@ -5,7 +5,7 @@ use Data::Printer::Object;
 use Data::Printer::Common;
 use Data::Printer::Config;
 
-our $VERSION = '1.000000';
+our $VERSION = '1.000001';
 $VERSION = eval $VERSION;
 
 my $rc_arguments;
@@ -689,7 +689,7 @@ This means you could have the following in one of your classes:
 Notice that B<< you can do this without adding Data::Printer as a dependency >>
 to your project! Just write your sub and it will be called with the object to
 be printed and a C<$ddp> object ready for you. See
-L<< Data::Printer::Object|/Data::Printer::Object/"Methods and Accessors for Filter Writers" >>
+L<< Data::Printer::Object|Data::Printer::Object/"Methods and Accessors for Filter Writers" >>
 for how to use it to pretty-print your data.
 
 Finally, if your object implements string overload or provides a method called
@@ -722,6 +722,18 @@ will trigger autovivification:
 
     my @x;
     p $x[5]; # undef, but will initialize the array with 5 elements (all undef)
+
+Slices (both array and hash) must be coerced into actual arrays (or hashes)
+to properly shown. So if you want to print a slice, instead of doing something
+like this:
+
+    p @somevar[1..10]; # WRONG! DON'T DO THIS!
+
+try one of those:
+
+    my @x = @somevar[1..10]; p @x;   # works!
+    p [ @somevar[1..0] ]->@*;        # also works!
+    p @{[@somevar[1..0]]};           # this works too!!
 
 Finally, as mentioned before, you cannot pass anonymous references on the
 default mode of C<< use_prototypes = 1 >>:
@@ -918,24 +930,26 @@ The module allows several customization options, even letting you load it as a
 complete drop-in replacement for Template::Plugin::Dumper so you don't even have
 to change your previous templates!
 
+=head2 Migrating from Data::Dumper to Data::Printer
+
+If you are porting your code to use Data::Printer instead of
+Data::Dumper, you could replace:
+
+  use Data::Dumper;
+
+with something like:
+
+  use Data::Printer;
+  sub Dumper { np @_, colored => 1 }
+
+this sub will accept multiple variables just like Data::Dumper.
+
 =head2 Unified interface for Data::Printer and other debug formatters
 
 I<< (contributed by Kevin McGrath (catlgrep)) >>
 
-If you are porting your code to use Data::Printer instead of
-Data::Dumper or similar, you can just replace:
-
-  use Data::Dumper;
-
-with:
-
-  use Data::Printer alias => 'Dumper';
-
-making sure to provide Data::Printer with the proper alias for the
-previous dumping function.
-
-If, however, you want a really unified approach where you can easily
-flip between debugging outputs, use L<Any::Renderer> and its plugins,
+If you want a really unified approach to easily flip between debugging
+outputs, use L<Any::Renderer> and its plugins,
 like L<Any::Renderer::Data::Printer>.
 
 =head2 Printing stack traces with arguments expanded using Data::Printer
@@ -1001,7 +1015,7 @@ David E. Wheeler (theory), Damien Krotkine (dams), Denis Howe, dirk,
 Dotan Dimet, Eden Cardim (edenc), Elliot Shank (elliotjs), Eugen Konkov (KES777),
 Fernando Corrêa (SmokeMachine), Fitz Elliott, Florian (fschlich),
 Frew Schmidt (frew), GianniGi, Graham Knop (haarg), Graham Todd,
-Gregory J. Oschwald, grr, Håkon Hægland, Nigel Metheringham (nigelm),
+Gregory J. Oschwald, grr, Håkon Hægland, Iaroslav O. Kosmina (darviarush),
 Ivan Bessarabov (bessarabv), J Mash, James E. Keenan (jkeenan),
 Jarrod Funnell (Timbus), Jay Allen (jayallen), Jay Hannah (jhannah),
 jcop, Jesse Luehrs (doy), Joel Berger (jberger),
@@ -1010,13 +1024,15 @@ Kartik Thakore (kthakore), Kevin Dawson (bowtie), Kevin McGrath (catlgrep),
 Kip Hampton (ubu), Londran, Marcel Grünauer (hanekomu),
 Marco Masetti (grubert65), Mark Fowler (Trelane), Martin J. Evans,
 Matt S. Trout (mst), Maxim Vuets, Michael Conrad, Mike Doherty (doherty),
-Nicolas R (atoomic), Nuba Princigalli (nuba), Olaf Alders (oalders),
-Paul Evans (LeoNerd), Pedro Melo (melo), Philippe Bruhat (BooK),
-Przemysław Wesołek (jest), Rebecca Turner (iarna), Renato Cron (renatoCRON),
-Ricardo Signes (rjbs), Rob Hoelz (hoelzro), sawyer, Sebastian Willing (Sewi),
-Sergey Aleynikov (randir), Slaven Rezić, Stanislaw Pusep (syp),
-Stephen Thirlwall (sdt), sugyan, Tai Paul, Tatsuhiko Miyagawa (miyagawa),
-Thomas Sibley (tsibley), Tim Heaney (oylenshpeegul), Torsten Raudssus (Getty),
+Nicolas R (atoomic),  Nigel Metheringham (nigelm), Nuba Princigalli (nuba),
+Olaf Alders (oalders), Paul Evans (LeoNerd), Pedro Melo (melo),
+Philippe Bruhat (BooK), Przemysław Wesołek (jest), Rebecca Turner (iarna),
+Renato Cron (renatoCRON), Ricardo Signes (rjbs), Rob Hoelz (hoelzro),
+Salve J. Nilsen (sjn), sawyer, Sebastian Willing (Sewi),
+Sébastien Feugère (smonff), Sergey Aleynikov (randir), Slaven Rezić,
+Stanislaw Pusep (syp), Stephen Thirlwall (sdt), sugyan, Tai Paul,
+Tatsuhiko Miyagawa (miyagawa), Thomas Sibley (tsibley),
+Tim Heaney (oylenshpeegul), Toby Inkster (tobyink), Torsten Raudssus (Getty),
 Tokuhiro Matsuno (tokuhirom), trapd00r, Tsai Chung-Kuan, vividsnow,
 Wesley Dal`Col (blabos), y, Yanick Champoux (yanick).
 

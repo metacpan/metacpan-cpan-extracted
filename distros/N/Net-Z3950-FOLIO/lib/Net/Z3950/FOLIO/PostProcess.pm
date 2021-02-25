@@ -2,9 +2,10 @@ package Net::Z3950::FOLIO::PostProcess;
 
 use strict;
 use warnings;
+use utf8;
 
 use Data::Dumper;
-use Unicode::Diacritic::Strip ':all';
+use Unicode::Diacritic::Strip 'fast_strip';
 
 
 sub postProcess {
@@ -70,8 +71,23 @@ sub applyRule {
 sub applyStripDiacritics {
     my($_rule, $value) = @_;
 
-    # it seems that the regular strip_diacritics function just plain no-ops, hence fast_strip instead
-    my $result = fast_strip($value);
+    my $result = $value;
+
+    # Extra special case: needs handling first, as fast_strip converts ipper-case thorn to "th"
+    $result =~ s/Þ/TH/g;
+
+    # It seems that the regular strip_diacritics function just plain no-ops, hence fast_strip instead
+    $result = fast_strip($result);
+
+    # Special cases required in ZF-31, but apparently not implemented by fast_strip
+    $result =~ s/ß/ss/g;
+    $result =~ s/ẞ/SS/g;
+    $result =~ s/Đ/D/g;
+    $result =~ s/ð/d/g;
+    $result =~ s/Æ/AE/g;
+    $result =~ s/æ/ae/g;
+    $result =~ s/Œ/OE/g; # For some reason, fast_strip handle the lower-case version but not the upper-case
+
     # warn "stripping diacritics: '$value' -> '$result'";
     return $result;
 }

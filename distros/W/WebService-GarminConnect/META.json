@@ -57,8 +57,8 @@
          "web" : "https://github.com/jlouder/garmin-connect-perl"
       }
    },
-   "version" : "1.0.8",
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "version" : "1.0.9",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

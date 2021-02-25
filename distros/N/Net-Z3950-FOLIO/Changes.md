@@ -1,5 +1,13 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## [1.7](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v1.7) (Wed Feb 24 18:28:36 GMT 2021)
+
+* The `stripDiacritics` post-processor handles additional special cases. Fixes ZF-31.
+* [The sample `Dockerfile`](Dockerfile) now invokes the server with the `-v-session` command-line option. This disables logging of new and ended sessions, which is a practical neccesity when deployed using Kubernetes, AWS ECS or similar setups, as these frequently ping the server to check that it's alive, resulting in log-flooding.
+* Clarifications to the documentation.
+* We no longer need to use a configuration override for ISBN searching in the Chicago service. Completes ZF-24.
+* Towards providing MARC holdings data. Part of ZF-30.
+
 ## [1.6](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v1.6) (Tue Jan 26 15:34:56 GMT 2021)
 
 * Element-set names are treated case-insensitively, meaning that (among other things) "F" and "B" are recognized as well as "f" and "b". Fixes ZF-29.

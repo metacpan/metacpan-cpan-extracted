@@ -13,12 +13,13 @@ plugin 'WebPush' => webpush_config();
 # modified port of github.com/web-push-libs/vapid/py_vapid tests
 
 my $t = Test::Mojo->new;
+my $ENDPOINT = 'https://updates.push.services.mozilla.com';
 subtest 'sign RFC8292' => sub {
-  my $result = app->webpush->authorization;
+  my $result = app->webpush->authorization({endpoint => "$ENDPOINT/push"});
   ok $result =~ qr/^vapid t=(.*),k=(.*)$/;
   my ($t, $k) = ($1, $2);
   my $t_val = decode_json decode_base64url((split /\./, $t)[1]);
-  is_deeply $t_val, { aud => app->webpush->aud, sub => $SUB, exp => $t_val->{exp} };
+  is_deeply $t_val, { aud => $ENDPOINT, sub => $SUB, exp => $t_val->{exp} };
   is $k, $PUBKEY_B64;
   ok app->webpush->verify_token($result);
 };

@@ -52,7 +52,7 @@
          "web" : "https://github.com/perlancar/perl-Module-Features"
       }
    },
-   "version" : "0.1.2",
+   "version" : "0.1.6",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

@@ -3,7 +3,7 @@ use Test::More;
 use Test::Mojo;
 
 sub startup {
-  shift->routes->route('/app')
+  shift->routes->any('/app')
     ->to('install#sampl_app', namespace=>'Mojolicious::Plugin::RoutesAuthDBI');
 }
 

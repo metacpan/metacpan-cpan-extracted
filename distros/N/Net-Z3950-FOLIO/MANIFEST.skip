@@ -2,5 +2,6 @@
 Dockerfile
 Jenkinsfile
 ModuleDescriptor.json
+doc/TODO.md
 doc/srs/Loading MARC recs for OAI-PMH testing.mp4
 start

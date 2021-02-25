@@ -30,7 +30,7 @@ use Test::Builder;
 	file_mtime_gt_ok file_mtime_lt_ok file_mtime_age_ok
 	);
 
-$VERSION = '1.446';
+$VERSION = '1.447';
 
 my $Test = Test::Builder->new();
 

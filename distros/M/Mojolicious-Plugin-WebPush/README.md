@@ -162,19 +162,13 @@ for possibilities.
 
 ## webpush.authorization
 
-    my $header_value = $c->webpush->authorization;
+    my $header_value = $c->webpush->authorization($subs_info);
 
-Won't function without ["claim\_sub"](#claim_sub) and ["ecc\_private\_key"](#ecc_private_key). Returns
-a suitable `Authorization` header value to send to a push service.
-Valid for a period defined by ["claim\_exp\_offset"](#claim_exp_offset). Not currently cached,
+Won't function without ["claim\_sub"](#claim_sub) and ["ecc\_private\_key"](#ecc_private_key), or
+`$subs_info` having a valid URL to get the base of as the `aud`
+claim. Returns a suitable `Authorization` header value to send to
+a push service.  Valid for a period defined by ["claim\_exp\_offset"](#claim_exp_offset).
 but could become so to avoid unnecessary computation.
-
-## webpush.aud
-
-    my $aud = $c->webpush->aud;
-
-Gives the app's value it will use for the `aud` JWT claim, useful mostly
-for testing.
 
 ## webpush.public\_key
 

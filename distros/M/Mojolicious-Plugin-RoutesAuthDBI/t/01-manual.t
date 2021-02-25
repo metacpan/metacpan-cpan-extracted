@@ -3,7 +3,7 @@ use Test::More;
 use Test::Mojo;
 
 sub startup {
-  shift->routes->route('/man')
+  shift->routes->any('/man')
     ->to('install#manual', namespace=>'Mojolicious::Plugin::RoutesAuthDBI');
 }
 

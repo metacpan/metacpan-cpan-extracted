@@ -13,6 +13,21 @@ BEGIN {
 	[ 'Museum für Naturkunde', 'Museum fur Naturkunde', 'u-umlaut' ],
 	[ 'façade', 'facade', 'cedilla' ],
 	[ 'àÀâÂäçéÉèÈêÊëîïôùÙûüÜ', 'aAaAaceEeEeEeiiouUuuU', 'kitchen sink' ],
+	# Individual characters specified in ZF-31
+	[ 'ß', 'ss', 'small letter sharp S (Eszett)' ],
+	[ 'ẞ', 'SS', 'capital letter sharp S (Eszett)' ],
+	[ 'Þ', 'TH', 'upper-case THORN' ],
+	[ 'þ', 'th', 'lower case THORN' ],
+	[ 'Đ', 'D', 'upper-case ETH' ],
+	[ 'ð', 'd', 'lower case ETH' ],
+	[ 'Æ', 'AE', 'upper-case AE ligature' ],
+	[ 'æ', 'ae', 'lower-case AE ligature' ],
+	[ 'Œ', 'OE', 'upper-case OE ligature' ],
+	[ 'œ', 'oe', 'lower-case OE ligature' ],
+	[ 'Ł', 'L', 'capital letter L with stroke' ],
+	[ 'ł', 'l', 'small letter L with stroke' ],
+	[ 'ßẞÞþĐðÆæŒœŁł', 'ssSSTHthDdAEaeOEoeLl', 'all of the above' ],
+	[ 'ßẞÞþĐðÆæŒœŁłßẞÞþĐðÆæŒœŁł', 'ssSSTHthDdAEaeOEoeLlssSSTHthDdAEaeOEoeLl', 'twice' ],
     );
     @regsubTests = (
 	# value, pattern, replacement, flags, expected, caption

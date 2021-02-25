@@ -68,7 +68,7 @@ C<File::HTTP> open, read and seek into remote files and directories transparentl
 
 =item stat FH or FILE
 
-Imported with the :open or :all tags.
+Imported with the :open tag.
 
 Act exaclty as CORE::open and CORE::stat, but also work with remote HTTP files.
 
@@ -80,13 +80,11 @@ Only works with Web servers that allow range queries (see CAVEATS).
 
 You should use C<open_stream> when servers do not allow range queries.
 
-=back
-
 =item opendir DIR
 
 =item readdir / rewinddir / telldir / seekdir / closedir DIRH
 
-Imported with the :opendir or :all tags.
+Imported with the :opendir tag.
 
 Act exaclty as CORE::opendir and associated CORE functions, but also work with
 remote HTTP directories.
@@ -97,13 +95,16 @@ Returns a Tied filehanlder when opening a remote directory.
 
 Only works with Web servers that allow directory listing.
 
-=back
+=item opendir_slash DIR
+
+Similar to C<opendir>, but preserve final slash when present to make it easier
+to differenciate directories and files.
+(This was what C<opendir> did up to version 0.91, but was removed as it was
+not in line with CORE::opendir's behavior)
 
 =item open_stream URL
 
 open a readable but not seekable filehandle to the specified URL
-
-=back
 
 =item slurp_stream URL
 
@@ -111,8 +112,6 @@ context dependent slurping of an url
 
     my $content = slurp_stream($url);
     my @lines = slurp_stream($url);
-
-=back
 
 =item get URL [follow redirections]
 
@@ -127,9 +126,16 @@ Contrary to slrup_stream, default behavior is to ignore redirections
 If set to follow redirections, $request_headers and $response_headers
 will correspond to the last emitted request.
 
-=back
+=item post URL TYPE BODY
 
-=item open_at URL
+Similar to C<get> but with a post request, with a content-type,and a body.
+Always ignore redirections.
+
+=item open_at URL OFFSET
+
+Similar to to C<open>, but with an offset. It is more efficient than using
+C<open> and C<seek> when the offset is already known, as it saves an HTTP
+request.
 
 =back
 
@@ -161,8 +167,6 @@ You can also use the -everywhere tag to export emulation function into all names
     use File::HTTP qw(-everywhere);
     
     # now all modules shall magicaly work with remote files (or not)
-
-=back
 
 =head1 CAVEATS
 

@@ -1,4 +1,4 @@
-use Test::More 0.95;
+use Test::More 1;
 
 my @classes = qw(Test::File);
 

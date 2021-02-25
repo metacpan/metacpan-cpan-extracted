@@ -361,7 +361,7 @@ sub model {
   
 };
 
-our $VERSION = '0.880';
+our $VERSION = '0.881';
 
 =pod
 
@@ -377,7 +377,7 @@ Plugin makes an auth operations throught the plugin L<Mojolicious::Plugin::Authe
 
 =head1 VERSION
 
-0.880
+0.881
 
 =head1 NAME
 
@@ -520,7 +520,7 @@ Hashref variables for SQL templates of models dictionaries. Defaults is C<$Mojol
 
 See L<Mojolicious::Plugin::RoutesAuthDBI::Install>.
 
-=head1 OVER CONDITIONS
+=head1 REQUIRES CONDITIONS
 
 =head2 access
 
@@ -530,17 +530,17 @@ Heart of this plugin! This condition apply for all db routes even if column auth
 
 =item * No access check to route, but authorization by session will ready:
 
-  $r->route('/foo')->...->over(access=>{auth=>0})->...;
+  $r->any('/foo')->...->requires(access=>{auth=>0})->...;
 
 =item * Allow if has authentication only:
 
-  $r->route('/foo')->...->over(access=>{auth=>'only'})->...;
+  $r->any('/foo')->...->requires(access=>{auth=>'only'})->...;
   # same as
-  # $r->route('/foo')->...->over(authenticated => 1)->...; # see Mojolicious::Plugin::Authentication
+  # $r->any('/foo')->...->requires(authenticated => 1)->...; # see Mojolicious::Plugin::Authentication
 
 =item * Allow for guest
 
-  $r->route('/foo')->...->over(access=>{guest=>1})->...;
+  $r->any('/foo')->...->requires(access=>{guest=>1})->...;
   
 To makes guest session:
 
@@ -550,37 +550,37 @@ See L<Mojolicious::Plugin::RoutesAuthDBI::Guest>
 
 =item * Route accessible if profile roles assigned to either B<loadable> namespace or controller 'Bar.pm' (which assigned neither namespece on db or assigned to that loadable namespace) or action 'bar' on controller Bar.pm (action record in db table actions):
 
-  $r->route('/bar-bar-any-namespace')->to('bar#bar',)->over(access=>{auth=>1})->...;
+  $r->any('/bar-bar-any-namespace')->to('bar#bar',)->requires(access=>{auth=>1})->...;
 
 =item * Explicit defined namespace route accessible either namespace 'Bar' or 'Bar::Bar.pm' controller or action 'bar' in controller 'Bar::Bar.pm' (which assigned to namespace 'Bar' in table refs):
 
-  $r->route('/bar-bar-bar')->to('bar#bar', namespace=>'Bar')->over(access=>{auth=>1})->...;
+  $r->any('/bar-bar-bar')->to('bar#bar', namespace=>'Bar')->requires(access=>{auth=>1})->...;
 
 =item * Check access by overriden namespace 'BarX': controller and action also with that namespace in db table refs:
 
-  $r->route('/bar-nsX')->to('bar#bar', namespace=>'Bar')->over(access=>{auth=>1, namespace=>'BarX'})->...;
+  $r->any('/bar-nsX')->to('bar#bar', namespace=>'Bar')->requires(access=>{auth=>1, namespace=>'BarX'})->...;
 
 =item * Check access by overriden namespace 'BarX' and controller 'BarX.pm', action record also with that ns & c in db table refs:
 
-  $r->route('/bar-nsX-cX')->to('bar#bar', namespace=>'Bar')->over(access=>{auth=>1, namespace=>'BarX', controller=>'BarX'})->...;
+  $r->any('/bar-nsX-cX')->to('bar#bar', namespace=>'Bar')->requires(access=>{auth=>1, namespace=>'BarX', controller=>'BarX'})->...;
 
 =item * Full override names access:
 
-  $r->route('/bar-nsX-cX-aX')->to('bar#bar', namespace=>'Bar')->over(access=>{auth=>1, namespace=>'BarX', controller=>'BarX', action=>'barX'})->...;
+  $r->any('/bar-nsX-cX-aX')->to('bar#bar', namespace=>'Bar')->requires(access=>{auth=>1, namespace=>'BarX', controller=>'BarX', action=>'barX'})->...;
 
 =item *
 
-  $r->route('/bar-cX-aX')->to('bar#bar',)->over(access=>{auth=>1, controller=>'BarX', action=>'barX'})->...;
+  $r->any('/bar-cX-aX')->to('bar#bar',)->requires(access=>{auth=>1, controller=>'BarX', action=>'barX'})->...;
 
 =item * Route accessible if profile roles list has defined role (admin):
 
-  $r->route('/bar-role-admin')->to('bar#bar',)->over(access=>{auth=>1, role=> 'admin'})->...;
+  $r->any('/bar-role-admin')->to('bar#bar',)->requires(access=>{auth=>1, role=> 'admin'})->...;
   
 =item * Pass callback to access condition
 
 The callback will get parameters: $profile, $route, $c, $captures, $args (this callback ref). Callback must returns true or false for restrict access. Example simple auth access:
 
-  $r->route('/check-auth')->over(access=>sub {my ($profile, $route, $c, $captures, $args) = @_; return $profile;})->to(cb=>sub {my $c =shift; $c->render(format=>'txt', text=>"Hi @{[$c->auth_user->{names}]}!\n\nYou have access!");});
+  $r->any('/check-auth')->requires(access=>sub {my ($profile, $route, $c, $captures, $args) = @_; return $profile;})->to(cb=>sub {my $c =shift; $c->render(format=>'txt', text=>"Hi @{[$c->auth_user->{names}]}!\n\nYou have access!");});
 
 =back
 
@@ -618,31 +618,31 @@ Registration() & access() & <internal>.
 It table will generate the L<Mojolicious routes|http://mojolicious.org/perldoc/Mojolicious/Guides/Routing>:
 
     # GET /city/new 
-    $r->route('/city/new')->via('get')->over(<access>)->to(controller => 'city', action => 'new_form')->name('city_new_form');
+    $r->any('/city/new')->methods('get')->requires(<access>)->to(controller => 'city', action => 'new_form')->name('city_new_form');
 
     # GET /city/123 - show item with id 123
-    $r->route('/city/:id')->via('get')->over(<access>)->to(controller => 'city', action => 'show')->name('city_show');
+    $r->any('/city/:id')->methods('get')->requires(<access>)->to(controller => 'city', action => 'show')->name('city_show');
 
     # GET /city/edit/123 - form to edit an item
-    $r->route('/city/edit/:id')->via('get')->over(<access>)->to(controller => 'city', action => 'edit_form')->name('city_edit_form');
+    $r->any('/city/edit/:id')->methods('get')->requires(<access>)->to(controller => 'city', action => 'edit_form')->name('city_edit_form');
 
     # GET /cities - list of all items
-    $r->route('/cities')->via('get')->over(<access>)->to(controller => 'city', action => 'index')->name('cities_index');
+    $r->any('/cities')->methods('get')->requires(<access>)->to(controller => 'city', action => 'index')->name('cities_index');
 
     # POST /city - create new item or update the item
-    $r->route('/city')->via('post')->to(controller => 'city', action => 'save')->name('city_save');
+    $r->any('/city')->methods('post')->to(controller => 'city', action => 'save')->name('city_save');
     
     # GET /city/delete/123 - form to confirm delete an item id=123
-    $r->route('/city/delete/:id')->via('get')->over(<access>)->to(controller => 'city', action => 'delete_form')->name('city_delete_form');
+    $r->any('/city/delete/:id')->methods('get')->requires(<access>)->to(controller => 'city', action => 'delete_form')->name('city_delete_form');
 
     # DELETE /city/123 - delete an item id=123
-    $r->route('/city/:id')->via('delete')->over(<access>)->to(controller => 'city', action => 'delete')->name('city_delete');
+    $r->any('/city/:id')->methods('delete')->requires(<access>)->to(controller => 'city', action => 'delete')->name('city_delete');
         
     # without HTTP method and no auth restrict
-    $r->route('/')->to(controller => 'Home', action => 'index')->name('home_index');
+    $r->any('/')->to(controller => 'Home', action => 'index')->name('home_index');
         
     # GET or POST /foo/baz 
-    $r->route('/foo/baz')->via('GET', 'post')->over(<access>)->to(controller => 'Foo', action => 'baz')->name('foo_baz');
+    $r->any('/foo/baz')->methods('GET', 'post')->requires(<access>)->to(controller => 'Foo', action => 'baz')->name('foo_baz');
 
 =head2 Warning
 

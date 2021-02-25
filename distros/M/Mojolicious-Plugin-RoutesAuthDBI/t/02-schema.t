@@ -13,7 +13,7 @@ sub startup {
     #~ template=>$config,
   #~ );
   my $r = $app->routes;
-  $r->route('/schema/:schema')
+  $r->any('/schema/:schema')
     ->to('Schema#schema', namespace=>'Mojolicious::Plugin::RoutesAuthDBI');
 }
 

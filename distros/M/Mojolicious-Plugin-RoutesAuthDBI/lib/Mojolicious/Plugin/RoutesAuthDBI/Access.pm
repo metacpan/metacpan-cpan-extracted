@@ -259,7 +259,7 @@ sub auth_cookie {
 
 =head1 NAME
 
-Mojolicious::Plugin::RoutesAuthDBI::Access - Generation routes, authentication and controll access to routes trought sintax of ->over(...), see L<Mojolicious::Routes::Route#over>
+Mojolicious::Plugin::RoutesAuthDBI::Access - Generation routes, authentication and controll access to routes trought sintax of ->requires(...), see L<Mojolicious::Routes::Route#requires>
 
 =head1 DB DESIGN DIAGRAM
 
@@ -293,11 +293,11 @@ Check by tables ids: routes, actions, controllers, namespaces. Check refs to pro
 
 Access to routes by names: action, controller, namespace, role. This way used for db route to access namespace and for non db routes by syntax:
 
-  $r->route('/foo')->...->to('foo#bar')->over(access=>{auth=>1})->...; 
+  $r->any('/foo')->...->to('foo#bar')->requires(access=>{auth=>1})->...; 
 
 or
 
-  $r->...->over(access=>{auth=>1, role => <id|name>})->...; # access to route by role id|name
+  $r->...->requires(access=>{auth=>1, role => <id|name>})->...; # access to route by role id|name
 
 =back
 

@@ -1,5 +1,5 @@
 package HTTP::API::Client;
-$HTTP::API::Client::VERSION = '0.08';
+$HTTP::API::Client::VERSION = '0.09';
 use strict;
 use warnings;
 
@@ -296,12 +296,31 @@ sub delete {
     return $self->send( DELETE => @_ );
 }
 
+sub _execute_callbacks {
+    my ($self, $type, %options) = @_;
+
+    my $sth = $options{$type};
+
+    while (my ($key, $callback) = each %$sth) {
+        next if !defined $callback;
+        next if !UNIVERSAL::isa($callback, 'CODE');
+        $sth->{$key} = $self->$callback(key => $key, %options);
+    }
+}
+
 sub send {
     my $self         = shift;
     my $method       = shift || "GET";
     my $path         = shift;
     my $data         = shift || {};
     my $headers      = shift || {};
+
+    my %options = (
+        method  => \$method,
+        path    => \$path,
+        data    => $data,
+        headers => $headers,
+    );
 
     if ( my $pd = $self->pre_defined_data ) {
         %$data = ( %$pd, %$data );
@@ -310,6 +329,9 @@ sub send {
     if ( my $ph = $self->pre_defined_headers ) {
         %$headers = ( %$ph, %$headers );
     }
+
+    $self->_execute_callbacks(data    => %options);
+    $self->_execute_callbacks(headers => %options);
 
     my $ua           = $self->ua;
     my $base_url     = $self->base_url;

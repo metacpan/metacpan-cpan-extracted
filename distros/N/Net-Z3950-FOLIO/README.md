@@ -59,9 +59,9 @@ Whichever approach to running the server you prefer, the [default configuration 
 
 ## Access via SRU
 
-Thanks to the magic of the protocol-polyglot [YAZ GFS](https://software.indexdata.com/yaz/doc/server.html), the FOLIO Z39.50 server also serves the SRU (REST-like) and SRW (SOAP-based) protocols. For example, if running the server on your local host, you can use the following to obtain an XML-formatted OPAC record containing both bibliographic metadata in MARCXML format and holdings-and-item information such as might be used by an OPAC.
+Thanks to the magic of the protocol-polyglot [YAZ GFS](https://software.indexdata.com/yaz/doc/server.html), the FOLIO Z39.50 server also serves the SRU (REST-like) and SRW (SOAP-based) protocols. For example, if running the server on your local host, you can use the following to obtain an XML-formatted OPAC record containing both bibliographic metadata in MARCXML format and holdings-and-item information such as might be used by an OPAC. Replace placeholder <dbname> with the real database name (or tenant id).
 
-    http://localhost:9997/sru/TEST?version=1.1&operation=searchRetrieve&query=title=a&maximumRecords=1&recordSchema=opac
+    http://localhost:9997/<dbname>?version=1.1&operation=searchRetrieve&query=title=a&maximumRecords=1&recordSchema=opac
 
 ## Additional information
 

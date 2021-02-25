@@ -1,4 +1,4 @@
-use Test::More 0.95;
+use Test::More 1;
 
 BEGIN {
 	our $getpwuid_should_die = 0;

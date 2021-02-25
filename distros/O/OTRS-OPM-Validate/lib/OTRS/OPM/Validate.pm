@@ -1,5 +1,5 @@
 package OTRS::OPM::Validate;
-$OTRS::OPM::Validate::VERSION = '0.03';
+$OTRS::OPM::Validate::VERSION = '0.04';
 # ABSTRACT: Validate .opm files
 
 use v5.20;
@@ -25,7 +25,7 @@ sub validate {
       <!-- .*? -->
     }{}xmsg;
 
-    my ($check,$grammar) = _grammar();
+    my ($check,$grammar) = _grammar( $content );
     my $match = $content =~ $grammar;
     die 'Invalid .opm file' if !$match;
 
@@ -35,6 +35,8 @@ sub validate {
 }
 
 sub _grammar {
+    my ($content) = @_;
+
     my %s;
 
     my $check = sub {
@@ -45,11 +47,31 @@ sub _grammar {
 
         $s{$name} //= 0;
 
+        my $context = '';
+#        my $pos     = pos();
+#        if ( $pos ) {
+#            my $start_length = 30;
+#            my $start        = $pos - $start_length;
+#            if ( $start < 0 ) {
+#                $start_length = $pos;
+#                $start        = 0;
+#            }
+#
+#            my $end_length = 30;
+#            if ( $pos + $end_length > length $content ) {
+#                $end_length = ( length $content ) - $pos;
+#            }
+#
+#            $context = sprintf "\n%s <-- --> %s",
+#                ( substr $content, $start, $start_length ),
+#                ( substr $content, $pos, $end_length );
+#        }
+
         if ( $s{$name} > $max ) {
-            die sprintf 'Too many "%s" elements. Max %s element(s) allowed.', $name, $max;
+            die sprintf 'Too many "%s" elements. Max %s element(s) allowed.%s', $name, $max, $context;
         }
         elsif ( $s{$name} < $min ) {
-            die sprintf 'Too few "%s" elements. Min %s element(s) required.', $name, $min;
+            die sprintf 'Too few "%s" elements. Min %s element(s) required.%s', $name, $min, $context;
         }
     };
 
@@ -78,6 +100,7 @@ sub _grammar {
                (?&DESCRIPTION) |
                (?&INTRO) |
                (?&CODE) |
+               (?&PACKAGEMERGE) |
                (?&PREREQ) |
                (?&FILELIST) |
                (?&DATABASE) |
@@ -150,6 +173,18 @@ sub _grammar {
                (?:Version=".*?"(?{++$s{'Prereq.Version'}; $check->('Prereq.Version', 1)}))
            )
 
+           (?<PACKAGEMERGE>
+               <PackageMerge (?{delete $s{'Merge.Name'};})
+                 (\s+ (?&PACKAGEMERGEATTR))+>.*?
+               </PackageMerge> (?{$check->('Merge.Name', 1, 1);})
+           )
+
+           (?<PACKAGEMERGEATTR>
+               (?:TargetVersion=".*?"(?{++$s{'Merge.Version'}; $check->('Merge.Version', 1)})) |
+               (?:Name=".*?"(?{++$s{'Merge.Name'};}))
+           )
+
+
            (?<FILELIST>
                <Filelist>(\s*(?&FILE))+\s*</Filelist>
            )
@@ -161,14 +196,14 @@ sub _grammar {
            )
 
            (?<FILE_ATTR>
-               (?:Location=".*?"(?{++$s{'File.Location'}; $check->('File.Location',1,1)})) |
-               (?:Encode=".*?"(?{++$s{'File.Encode'}; $check->('File.Encode',1,1)})) |
-               (?:Permission=".*?"(?{++$s{'File.Permission'}; $check->('File.Permission',1,1)}))
+               (?:Location=".*?"(?{++$s{'File.Location'};})) |
+               (?:Encode=".*?"(?{++$s{'File.Encode'};})) |
+               (?:Permission=".*?"(?{++$s{'File.Permission'};}))
            )
 
            (?<DATABASE>
                <Database(?<database_type>Install|Upgrade|Reinstall|Uninstall) (?{delete @s{map{'Database.'. $_}qw/Type Version/};})
-                   ( \s+ (?&DATABASE_ATTR))+>
+                   ( \s+ (?&DATABASE_ATTR)){0,3}>
                    (\s* (?&DATABASE_TAGS) )+ \s*
                </Database\g{database_type}>
            )
@@ -393,7 +428,7 @@ OTRS::OPM::Validate - Validate .opm files
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-16'; # DATE
 our $DIST = 'WHO-GrowthReference-GenTable'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,7 +25,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Add WHO reference fields to table
+# ABSTRACT: Add WHO growth reference fields to table
 # PODNAME: add-who-growth-reference-fields-to-table
 
 __END__
@@ -36,11 +36,11 @@ __END__
 
 =head1 NAME
 
-add-who-growth-reference-fields-to-table - Add WHO reference fields to table
+add-who-growth-reference-fields-to-table - Add WHO growth reference fields to table
 
 =head1 VERSION
 
-This document describes version 0.002 of add-who-growth-reference-fields-to-table (from Perl distribution WHO-GrowthReference-GenTable), released on 2021-01-16.
+This document describes version 0.003 of add-who-growth-reference-fields-to-table (from Perl distribution WHO-GrowthReference-GenTable), released on 2021-01-16.
 
 =head1 SYNOPSIS
 

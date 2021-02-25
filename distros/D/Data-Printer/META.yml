@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/garu/Data-Printer/issues/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/garu/Data-Printer
-version: '1.000000'
+version: '1.000001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

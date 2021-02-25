@@ -1,5 +1,8 @@
 Revision history for WebService-GarminConnect
 
+1.0.9   2021-02-24
+        - Search now requires an extra header
+
 1.0.8   2019-04-19
         - More changes to the Garmin login process (thanks noduck!)
 

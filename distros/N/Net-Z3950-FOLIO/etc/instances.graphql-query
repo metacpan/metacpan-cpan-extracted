@@ -98,6 +98,12 @@ query($cql: String, $offset: Int, $limit: Int) {
           itemLevelCallNumberPrefix
           itemLevelCallNumberSuffix
           itemLevelCallNumberTypeId
+          effectiveCallNumberComponents {
+            callNumber
+            prefix
+            suffix
+            typeId
+          }
           materialTypeId
           materialType {
             id

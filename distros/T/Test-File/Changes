@@ -1,5 +1,8 @@
 Revision history for Perl module Test::File
 
+1.447 2021-02-24T21:32:41Z
+	* Trying harder to get the tests to pass on Cygwin
+
 1.446 2021-02-20T21:18:48Z
 	* Better cygwin detection, from Achim Gratz
 

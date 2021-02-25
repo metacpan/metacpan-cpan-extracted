@@ -2,10 +2,8 @@ use strict;
 use warnings;
 
 use Test::Builder::Tester;
-use Test::More 0.95;
+use Test::More 1;
 use Test::File;
-
-use Config;
 
 require "./t/setup_common";
 
@@ -31,9 +29,9 @@ file_contains_like( 'bmoogle', $pattern1 );
 test_test();
 
 SKIP: {
-skip "Superuser has special privileges",                       1 if is_unix_superuser();
-skip "Windows has a different idea of readable",               1 if is_win32();
-skip "Not possible to make file unreadable on MSYS or Cygwin", 1 if is_cygwin();
+skip "Superuser has special privileges",             1 if is_unix_superuser();
+skip "Windows has a different idea of readable",     1 if is_win32();
+skip "Not possible to make file unreadable on MSYS", 1 if is_msys();
 test_out( "not ok 1 - not_readable contains $pattern1" );
 test_diag( 'File [not_readable] is not readable!' );
 test_fail(+1);
@@ -61,9 +59,9 @@ file_contains_unlike( 'bmoogle', $bad_pattern );
 test_test();
 
 SKIP: {
-skip "Superuser has special privileges",                       1 if is_unix_superuser();
-skip "Windows has a different idea of readable",               1 if is_win32();
-skip "Not possible to make file unreadable on MSYS or Cygwin", 1 if is_cygwin();
+skip "Superuser has special privileges",             1 if is_unix_superuser();
+skip "Windows has a different idea of readable",     1 if is_win32();
+skip "Not possible to make file unreadable on MSYS", 1 if is_msys();
 test_out( "not ok 1 - not_readable doesn't contain $bad_pattern" );
 test_diag( 'File [not_readable] is not readable!' );
 test_fail(+1);
@@ -97,9 +95,9 @@ file_contains_like( 'bmoogle', [ $pattern1, $pattern2 ] );
 test_test();
 
 SKIP: {
-skip "Superuser has special privileges",                       1 if is_unix_superuser();
-skip "Windows has a different idea of readable",               1 if is_win32();
-skip "Not possible to make file unreadable on MSYS or Cygwin", 1 if is_cygwin();
+skip "Superuser has special privileges",             1 if is_unix_superuser();
+skip "Windows has a different idea of readable",     1 if is_win32();
+skip "Not possible to make file unreadable on MSYS", 1 if is_msys();
 test_out( "not ok 1 - not_readable contains $pattern1" );
 test_diag( 'File [not_readable] is not readable!' );
 test_fail(+1);
@@ -134,9 +132,9 @@ file_contains_unlike( 'bmoogle', [ $bad_pattern, $bad_pattern ] );
 test_test();
 
 SKIP: {
-skip "Superuser has special privileges",                       1 if is_unix_superuser();
-skip "Windows has a different idea of readable",               1 if is_win32();
-skip "Not possible to make file unreadable on MSYS or Cygwin", 1 if is_cygwin();
+skip "Superuser has special privileges",             1 if is_unix_superuser();
+skip "Windows has a different idea of readable",     1 if is_win32();
+skip "Not possible to make file unreadable on MSYS", 1 if is_msys();
 test_out( "not ok 1 - not_readable doesn't contain $bad_pattern" );
 test_diag( 'File [not_readable] is not readable!' );
 test_fail(+1);
@@ -157,8 +155,7 @@ done_testing();
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-sub like_diag
-{
+sub like_diag {
 	my ($string, $pattern, $verb) = @_;
 
 	my $diag = ' ' x 18 . "'$string'\n";
@@ -166,4 +163,4 @@ sub like_diag
 	$diag =~ s/^/# /mg;
 
 	test_err($diag);
-}
+	}

@@ -3,7 +3,7 @@ package WHO::GrowthReference::GenTable;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-16'; # DATE
 our $DIST = 'WHO-GrowthReference-GenTable'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,7 +16,7 @@ our %SPEC;
 
 $SPEC{add_who_growth_reference_fields_to_table} = {
     v => 1.1,
-    summary => 'Add WHO reference fields to table',
+    summary => 'Add WHO growth reference fields to table',
     description => <<'_',
 
 You supply a CSV/TSV containing these fields: `date` (or `age`), `height`, and
@@ -194,7 +194,7 @@ sub add_who_growth_reference_fields_to_table {
 }
 
 1;
-# ABSTRACT: Add WHO reference fields to table
+# ABSTRACT: Add WHO growth reference fields to table
 
 __END__
 
@@ -204,11 +204,11 @@ __END__
 
 =head1 NAME
 
-WHO::GrowthReference::GenTable - Add WHO reference fields to table
+WHO::GrowthReference::GenTable - Add WHO growth reference fields to table
 
 =head1 VERSION
 
-This document describes version 0.002 of WHO::GrowthReference::GenTable (from Perl distribution WHO-GrowthReference-GenTable), released on 2021-01-16.
+This document describes version 0.003 of WHO::GrowthReference::GenTable (from Perl distribution WHO-GrowthReference-GenTable), released on 2021-01-16.
 
 =head1 SYNOPSIS
 
@@ -242,7 +242,7 @@ Usage:
 
  add_who_growth_reference_fields_to_table(%args) -> [status, msg, payload, meta]
 
-Add WHO reference fields to table.
+Add WHO growth reference fields to table.
 
 You supply a CSV/TSV containing these fields: C<date> (or C<age>), C<height>, and
 C<weight>. And these additional fields will be added:

@@ -1,6 +1,11 @@
 Revision history for OTRS::OPM::Validate
 ========================================
 
+0.04   2021-02-25 12:14:00
+
+    * Support <PackageMerge> Tag
+    * Fix bug: Attributes in <Database(Install|Uninstall|Upgrade)> are optional
+
 0.03   2021-02-23 07:59:00
 
     * Fix bug in regular expression: Some whitespaces in the XML declaration were not accepted
